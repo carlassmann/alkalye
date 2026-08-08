@@ -404,6 +404,9 @@ function ScaledSlideContainer({
 	}
 
 	let baseSize = baseSizes[size]
+	let isImageOnly = blocks.every(block =>
+		block.content.every(content => content.type === "image"),
+	)
 
 	let blocksKey = JSON.stringify(blocks)
 	let depsKey = `${blocksKey}-${isPortrait}-${baseSize.h1}-${measureKey}-${mediaLoadVersion}`
@@ -472,9 +475,6 @@ function ScaledSlideContainer({
 				let availableW = Math.max(0, container.clientWidth - paddingX)
 				let availableH = Math.max(0, container.clientHeight - paddingY)
 
-				let isImageOnly = blocks.every(b =>
-					b.content.every(c => c.type === "image"),
-				)
 				let margin = isImageOnly ? 1 : 0.9
 				let maxW = availableW * margin
 				let maxH = availableH * margin
@@ -612,8 +612,8 @@ function ScaledSlideContainer({
 			fontSet?.removeEventListener?.("loadingerror", handleFontsDone)
 		}
 	}, [
-		blocks,
 		blocksKey,
+		isImageOnly,
 		isPortrait,
 		baseSize,
 		gridTemplate.cols,
