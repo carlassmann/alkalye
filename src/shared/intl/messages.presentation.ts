@@ -4,6 +4,7 @@ export { basePresentationMessages, dePresentationMessages }
 
 let basePresentationMessages = messages({
 	"presentation.slideshow.label": "Slideshow",
+	"presentation.slideshow.options": "Slideshow options",
 	"presentation.slideshow.previous": "Previous slide",
 	"presentation.slideshow.next": "Next slide",
 	"presentation.slideshow.toggleFullscreen": "Toggle fullscreen",
@@ -32,6 +33,7 @@ let basePresentationMessages = messages({
 
 let dePresentationMessages = translate(basePresentationMessages, {
 	"presentation.slideshow.label": "Präsentation",
+	"presentation.slideshow.options": "Präsentationsoptionen",
 	"presentation.slideshow.previous": "Vorherige Folie",
 	"presentation.slideshow.next": "Nächste Folie",
 	"presentation.slideshow.toggleFullscreen": "Vollbild umschalten",

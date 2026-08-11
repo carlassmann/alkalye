@@ -51,6 +51,7 @@ type SheetSide = "top" | "right" | "bottom" | "left"
 interface SheetContentProps extends DialogPrimitive.Popup.Props {
 	side?: SheetSide
 	showCloseButton?: boolean
+	closeLabel?: string
 }
 
 function SheetContent({
@@ -58,6 +59,7 @@ function SheetContent({
 	children,
 	side = "right",
 	showCloseButton = true,
+	closeLabel = "Close",
 	...props
 }: SheetContentProps) {
 	let sideStyles = {
@@ -105,7 +107,7 @@ function SheetContent({
 						}
 					>
 						<XIcon />
-						<span className="sr-only">Close</span>
+						<span className="sr-only">{closeLabel}</span>
 					</DialogPrimitive.Close>
 				)}
 			</DialogPrimitive.Popup>

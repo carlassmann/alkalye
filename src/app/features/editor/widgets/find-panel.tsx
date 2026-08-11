@@ -216,6 +216,7 @@ function FindPanel({
 					<TooltipTrigger
 						render={
 							<Button size="icon-xs" variant="ghost" onClick={handleClose}>
+								<span className="sr-only">{t("editor.find.close")}</span>
 								<X className="size-3.5" />
 							</Button>
 						}
@@ -234,6 +235,8 @@ function FindPanel({
 							<Button
 								size="icon-xs"
 								variant={caseSensitive ? "secondary" : "ghost"}
+								aria-label={t("editor.find.caseSensitive")}
+								aria-pressed={caseSensitive}
 								onClick={() => {
 									if (isControlled) {
 										onCaseChange?.(!caseSensitive)
@@ -257,6 +260,8 @@ function FindPanel({
 							<Button
 								size="xs"
 								variant={fuzzy ? "secondary" : "ghost"}
+								aria-label={t("editor.find.fuzzyMatching")}
+								aria-pressed={fuzzy}
 								onClick={() => {
 									if (isControlled) {
 										onFuzzyChange?.(!fuzzy)
@@ -299,6 +304,7 @@ function FindPanel({
 								variant="ghost"
 								onClick={handlePrev}
 								disabled={matchInfo.total === 0}
+								aria-label={t("editor.find.previous")}
 							>
 								<ChevronUp className="size-3.5" />
 							</Button>
@@ -319,6 +325,7 @@ function FindPanel({
 								variant="ghost"
 								onClick={handleNext}
 								disabled={matchInfo.total === 0}
+								aria-label={t("editor.find.next")}
 							>
 								<ChevronDown className="size-3.5" />
 							</Button>

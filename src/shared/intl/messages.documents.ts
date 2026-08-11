@@ -170,6 +170,8 @@ let baseDocumentsMessages = messages({
 
 	"timeMachine.title": "Time Machine",
 	"timeMachine.exit": "Exit",
+	"timeMachine.actions": "Time Machine actions",
+	"timeMachine.editHistory": "Edit history",
 	"timeMachine.dateByAuthor": "{$date} by {$author}",
 	"timeMachine.createCopy": "Create Copy",
 	"timeMachine.restoreThisVersion": "Restore This Version",
@@ -365,6 +367,8 @@ let deDocumentsMessages = translate(baseDocumentsMessages, {
 
 	"timeMachine.title": "Zeitmaschine",
 	"timeMachine.exit": "Beenden",
+	"timeMachine.actions": "Zeitmaschinenaktionen",
+	"timeMachine.editHistory": "Bearbeitungsverlauf",
 	"timeMachine.dateByAuthor": "{$date} von {$author}",
 	"timeMachine.createCopy": "Kopie erstellen",
 	"timeMachine.restoreThisVersion": "Diese Version wiederherstellen",

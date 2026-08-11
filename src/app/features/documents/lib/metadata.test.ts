@@ -54,6 +54,19 @@ describe("document metadata", () => {
 		expect(extractDocumentMetadata("").title).toBe("Untitled")
 	})
 
+	test("skips leading image assets when deriving the title", () => {
+		expect(
+			extractDocumentMetadata(
+				"![Cover](asset:co_asset)\n\n# Project Notes\n\nBody",
+			).title,
+		).toBe("Project Notes")
+		expect(
+			extractDocumentMetadata(
+				"![Cover](asset:co_asset)# Recovered Title\n\nBody",
+			).title,
+		).toBe("Recovered Title")
+	})
+
 	test("adds metadata timestamp for new documents", () => {
 		let updatedAt = new Date("2026-01-01T00:00:00Z")
 

@@ -5,6 +5,7 @@ import {
 	SidebarHeader,
 } from "@/app/components/ui/sidebar"
 import { ImportDropZone, type ImportedFile } from "@/app/features/import-export"
+import { useIntl } from "@/shared/intl/setup"
 
 export { ListSidebar }
 
@@ -19,8 +20,14 @@ function ListSidebar({
 	children: React.ReactNode
 	onImport?: (files: ImportedFile[]) => Promise<void>
 }) {
+	let t = useIntl()
 	return (
-		<Sidebar side="left" collapsible="offcanvas">
+		<Sidebar
+			side="left"
+			collapsible="offcanvas"
+			mobileTitle={t("doc.sidebar.syncedDocuments")}
+			mobileCloseLabel={t("doc.sidebar.closeFile")}
+		>
 			<SidebarHeader
 				className="border-border flex-row items-center justify-between border-b p-2"
 				style={{ height: "48px" }}

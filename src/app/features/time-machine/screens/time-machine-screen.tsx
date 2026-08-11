@@ -727,7 +727,13 @@ function TimeMachineToolbar({
 				paddingRight: "max(1rem, env(safe-area-inset-right))",
 			}}
 		>
-			<Button variant="ghost" size="sm" onClick={onExit} className="gap-1.5">
+			<Button
+				variant="ghost"
+				size="sm"
+				onClick={onExit}
+				aria-label={t("timeMachine.exit")}
+				className="gap-1.5"
+			>
 				<X className="size-4" />
 				<span className="hidden sm:inline">{t("timeMachine.exit")}</span>
 			</Button>
@@ -747,7 +753,12 @@ function TimeMachineToolbar({
 			<DropdownMenu>
 				<DropdownMenuTrigger
 					render={
-						<Button variant="ghost" size="icon" nativeButton={false}>
+						<Button
+							variant="ghost"
+							size="icon"
+							nativeButton={false}
+							aria-label={t("timeMachine.actions")}
+						>
 							<EllipsisVertical className="size-4" />
 						</Button>
 					}
@@ -1369,6 +1380,7 @@ function TimeMachineSlider({
 	className,
 	getTooltipContent,
 }: TimeMachineSliderProps) {
+	let t = useIntl()
 	let [localValue, setLocalValue] = useState(value)
 	let [isHovering, setIsHovering] = useState(false)
 	let [isDragging, setIsDragging] = useState(false)
@@ -1406,6 +1418,10 @@ function TimeMachineSlider({
 				<SliderPrimitive.Track className="bg-muted relative h-1.5 w-full rounded-none select-none">
 					<SliderPrimitive.Indicator className="bg-primary h-full select-none" />
 					<SliderPrimitive.Thumb
+						getAriaLabel={() => t("timeMachine.editHistory")}
+						getAriaValueText={(_, thumbValue) =>
+							getTooltipContent(thumbValue) ?? String(thumbValue)
+						}
 						className="border-ring ring-ring/50 relative block size-5 shrink-0 rounded-none border bg-white transition-[color,box-shadow] select-none after:absolute after:-inset-2 hover:ring-1 focus-visible:ring-1 focus-visible:outline-hidden active:ring-1 disabled:pointer-events-none disabled:opacity-50"
 						onMouseEnter={() => setIsHovering(true)}
 						onMouseLeave={() => setIsHovering(false)}

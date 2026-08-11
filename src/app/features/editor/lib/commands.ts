@@ -5,6 +5,7 @@ import { sortTaskLists } from "./sort-tasks"
 export {
 	insertCodeBlock,
 	insertImage,
+	insertMarkdownBlock,
 	insertLink,
 	insertNewlineContinueMarkupTight,
 	moveLineDown,
@@ -268,6 +269,33 @@ let insertImage: Command = view => {
 		selection: { anchor: urlStart, head: urlEnd },
 	})
 	return true
+}
+
+function insertMarkdownBlock(text: string): Command {
+	return view => {
+		let { from, to } = view.state.selection.main
+		let before = view.state.sliceDoc(0, from)
+		let after = view.state.sliceDoc(to)
+		let prefix =
+			before && !before.endsWith("\n\n")
+				? before.endsWith("\n")
+					? "\n"
+					: "\n\n"
+				: ""
+		let suffix =
+			after && !after.startsWith("\n\n")
+				? after.startsWith("\n")
+					? "\n"
+					: "\n\n"
+				: ""
+		let insertion = `${prefix}${text}${suffix}`
+
+		view.dispatch({
+			changes: { from, to, insert: insertion },
+			selection: { anchor: from + prefix.length + text.length },
+		})
+		return true
+	}
 }
 
 let insertCodeBlock: Command = view => {

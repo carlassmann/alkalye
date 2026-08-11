@@ -3,7 +3,7 @@ import { Button as ButtonPrimitive } from "@base-ui/react/button"
 import { cn } from "@/app/lib/cn"
 import { useIsMobile } from "@/app/hooks/use-mobile"
 import { Button } from "@/app/components/ui/button"
-import { Sheet, SheetContent } from "@/app/components/ui/sheet"
+import { Sheet, SheetContent, SheetTitle } from "@/app/components/ui/sheet"
 import {
 	PanelRight,
 	PanelLeft,
@@ -170,6 +170,8 @@ function SidebarProvider({
 interface SidebarProps extends React.ComponentProps<"div"> {
 	side?: "left" | "right"
 	collapsible?: "offcanvas" | "icon" | "none"
+	mobileTitle?: string
+	mobileCloseLabel?: string
 }
 
 function Sidebar({
@@ -177,6 +179,8 @@ function Sidebar({
 	collapsible = "offcanvas",
 	className,
 	children,
+	mobileTitle,
+	mobileCloseLabel,
 	...props
 }: SidebarProps) {
 	let ctx = useSidebar()
@@ -225,7 +229,8 @@ function Sidebar({
 			>
 				<SheetContent
 					side={side}
-					className="bg-background text-foreground w-(--sidebar-width-mobile) [&>button]:hidden"
+					closeLabel={mobileCloseLabel}
+					className="bg-background text-foreground w-(--sidebar-width-mobile)"
 					style={
 						{
 							"--sidebar-width-mobile": SIDEBAR_WIDTH_MOBILE,
@@ -236,6 +241,9 @@ function Sidebar({
 						} as React.CSSProperties
 					}
 				>
+					{mobileTitle && (
+						<SheetTitle className="sr-only">{mobileTitle}</SheetTitle>
+					)}
 					<div className="flex h-full w-full flex-col">{children}</div>
 				</SheetContent>
 			</Sheet>

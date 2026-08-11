@@ -165,6 +165,10 @@ function SidebarAssets({
 		}
 	}
 
+	function createTldraw() {
+		onCreateTldraw?.()
+	}
+
 	function handleCancelUpload() {
 		videoUpload?.abortController.abort()
 		setVideoUpload(null)
@@ -251,7 +255,7 @@ function SidebarAssets({
 					</Tooltip>
 					<DropdownMenuContent align="end">
 						{onCreateTldraw && (
-							<DropdownMenuItem onClick={onCreateTldraw}>
+							<DropdownMenuItem onClick={createTldraw}>
 								<PenTool className="size-4" />
 								{t("assets.newWhiteboard")}
 							</DropdownMenuItem>

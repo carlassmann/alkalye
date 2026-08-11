@@ -575,6 +575,35 @@ describe("parsePresentation - visual blocks", () => {
 		)
 	})
 
+	it("keeps non-indented list items as teleprompter lines", () => {
+		let items = parsePresentation(`---
+mode: present
+title: QA Teleprompter
+---
+# Slide One
+
+Opening line
+
+---
+
+# Slide Two
+
+- First
+- Second
+
+---
+
+# Slide Three
+
+Closing line`)
+
+		let slideTwoLines = items.flatMap(item =>
+			item.type === "line" && item.slideNumber === 2 ? [item.text] : [],
+		)
+
+		expect(slideTwoLines).toEqual(["First", "Second"])
+	})
+
 	it("handles mixed content - teleprompter text as separate items", () => {
 		let items = parsePresentation(
 			"# Title\n  Subtitle\n\n# Another\nSpeaker notes",

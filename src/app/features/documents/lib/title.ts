@@ -17,7 +17,7 @@ function getDocumentTitle(
 
 	if (frontmatter?.title) return frontmatter.title
 
-	let line = body.split("\n").find(l => l.trim()) ?? ""
+	let line = findTitleLine(body)
 	return (
 		line
 			.replace(/^#{1,6}\s+/, "")
@@ -108,4 +108,14 @@ function countMatches(text: string, query: string): number {
 		idx += q.length
 	}
 	return count
+}
+
+function findTitleLine(body: string): string {
+	for (let line of body.split("\n")) {
+		let withoutLeadingImages = line
+			.trim()
+			.replace(/^(?:!\[[^\]]*\]\([^)]+\)\s*)+/, "")
+		if (withoutLeadingImages) return withoutLeadingImages
+	}
+	return ""
 }

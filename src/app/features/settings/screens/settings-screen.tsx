@@ -79,6 +79,7 @@ import {
 	reloadDiagnosticsReport,
 } from "@/app/lib/reload-diagnostics"
 import { useIntl, T } from "@/shared/intl/setup"
+import { makeProfileNameSchema } from "../lib/profile-name"
 
 export { SettingsScreen, settingsQuery }
 export type { LoadedAccount, SettingsLoaderData, SettingsSearch }
@@ -188,10 +189,10 @@ interface ProfileSectionProps {
 
 function makeNameSchema(t: ReturnType<typeof useIntl>) {
 	return z.object({
-		name: z
-			.string()
-			.min(1, t("settings.profile.nameRequired"))
-			.max(50, t("settings.profile.nameTooLong")),
+		name: makeProfileNameSchema({
+			required: t("settings.profile.nameRequired"),
+			tooLong: t("settings.profile.nameTooLong"),
+		}),
 	})
 }
 
@@ -258,7 +259,9 @@ function EditNameDialog({
 		defaultValues: { name: currentName },
 		validators: { onSubmit: nameSchema },
 		onSubmit: ({ value }) => {
-			onSave(value.name.trim())
+			let result = nameSchema.safeParse(value)
+			if (!result.success) return
+			onSave(result.data.name)
 			onOpenChange(false)
 		},
 	})
@@ -307,11 +310,7 @@ function EditNameDialog({
 										placeholder={t("settings.profile.yourName")}
 										autoFocus
 									/>
-									{isInvalid && (
-										<FieldError>
-											{field.state.meta.errors.join(", ")}
-										</FieldError>
-									)}
+									{isInvalid && <FieldError errors={field.state.meta.errors} />}
 								</Field>
 							)
 						}}
@@ -996,12 +995,14 @@ function NumericSetting({
 						size="icon-sm"
 						onClick={decrement}
 						disabled={value <= min}
+						aria-label={t("settings.numericDecrease", { label })}
 						className="size-7 rounded-r-none border-r-0"
 					>
 						<Minus className="size-3" />
 					</Button>
 					<Input
 						type="number"
+						aria-label={label}
 						value={value.toFixed(decimals)}
 						onChange={handleInputChange}
 						step={step}
@@ -1012,6 +1013,7 @@ function NumericSetting({
 						size="icon-sm"
 						onClick={increment}
 						disabled={value >= max}
+						aria-label={t("settings.numericIncrease", { label })}
 						className="size-7 rounded-l-none border-l-0"
 					>
 						<Plus className="size-3" />

@@ -56,7 +56,7 @@ import {
 	type ResolvedTheme,
 	type ThemeStyles,
 } from "@/app/features/themes"
-import { T } from "@/shared/intl/setup"
+import { T, useIntl } from "@/shared/intl/setup"
 
 export { Slideshow }
 export type { Slide, HighlightRange }
@@ -250,6 +250,7 @@ function SlideControls({
 	onExit?: () => void
 	onGoToTeleprompter?: () => void
 }) {
+	let t = useIntl()
 	let currentSlideIdx = slides.findIndex(
 		s => s.slideNumber === currentSlideNumber,
 	)
@@ -314,7 +315,10 @@ function SlideControls({
 			style={{ paddingBottom: "max(0px, env(safe-area-inset-bottom))" }}
 		>
 			<DropdownMenu>
-				<DropdownMenuTrigger className="text-muted-foreground hover:text-foreground hover:bg-muted/50 flex size-8 items-center justify-center rounded-sm opacity-40 transition-opacity hover:opacity-100">
+				<DropdownMenuTrigger
+					aria-label={t("presentation.slideshow.options")}
+					className="text-muted-foreground hover:text-foreground hover:bg-muted/50 flex size-8 items-center justify-center rounded-sm opacity-40 transition-opacity hover:opacity-100"
+				>
 					<EllipsisIcon className="size-4" />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end" side="top" sideOffset={8}>

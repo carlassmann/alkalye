@@ -87,6 +87,8 @@ let baseSettingsMessages = messages({
 	"settings.language.en": "English",
 	"settings.language.de": "Deutsch",
 	"settings.numericDefault": "default: {$value}",
+	"settings.numericDecrease": "Decrease {$label}",
+	"settings.numericIncrease": "Increase {$label}",
 
 	"themes.picker.ariaLabel": "Theme",
 	"themes.picker.tooltip": "Select theme",
@@ -186,6 +188,8 @@ let deSettingsMessages = translate(baseSettingsMessages, {
 	"settings.language.en": "English",
 	"settings.language.de": "Deutsch",
 	"settings.numericDefault": "Standard: {$value}",
+	"settings.numericDecrease": "{$label} verringern",
+	"settings.numericIncrease": "{$label} erhöhen",
 
 	"themes.picker.ariaLabel": "Design",
 	"themes.picker.tooltip": "Design wählen",

@@ -35,6 +35,7 @@ import { editorExtensions } from "../lib/extensions"
 import {
 	insertCodeBlock,
 	insertImage,
+	insertMarkdownBlock,
 	insertLink,
 	insertNewlineContinueMarkupTight,
 	moveLineDown,
@@ -169,6 +170,7 @@ interface MarkdownEditorRef {
 	setContent(markdown: string): void
 	focus(): void
 	insertText(text: string): void
+	insertBlock(text: string): void
 
 	getSelection(): { from: number; to: number } | null
 	getSelectedText(): string
@@ -762,6 +764,11 @@ function MarkdownEditor(
 		})
 	}
 
+	function insertBlock(text: string) {
+		if (!view) return
+		insertMarkdownBlock(text)(view)
+	}
+
 	function runCommand(cmd: (view: EditorView) => boolean) {
 		if (!view) return
 		cmd(view)
@@ -844,6 +851,7 @@ function MarkdownEditor(
 		setContent,
 		focus,
 		insertText,
+		insertBlock,
 		getSelection: () => {
 			if (!view) return null
 			let { from, to } = view.state.selection.main
@@ -957,6 +965,7 @@ function MarkdownEditor(
 			setContent,
 			focus,
 			insertText,
+			insertBlock,
 			getSelection: () => {
 				if (!view) return null
 				let { from, to } = view.state.selection.main

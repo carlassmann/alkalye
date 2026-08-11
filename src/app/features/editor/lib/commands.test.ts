@@ -1,7 +1,10 @@
 import { indentLess, indentMore } from "@codemirror/commands"
 import { indentUnit } from "@codemirror/language"
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown"
-import { insertNewlineContinueMarkupTight } from "./commands"
+import {
+	insertMarkdownBlock,
+	insertNewlineContinueMarkupTight,
+} from "./commands"
 import { EditorState } from "@codemirror/state"
 import { EditorView } from "@codemirror/view"
 import { afterEach, describe, expect, it } from "vitest"
@@ -32,6 +35,28 @@ afterEach(() => {
 	views.forEach(view => view.destroy())
 	views = []
 	document.body.innerHTML = ""
+})
+
+describe("insertMarkdownBlock", () => {
+	it("separates a block inserted before a heading", () => {
+		let view = createEditorView("# Project Notes", 0)
+
+		insertMarkdownBlock("![Cover](asset:co_asset)")(view)
+
+		expect(view.state.doc.toString()).toBe(
+			"![Cover](asset:co_asset)\n\n# Project Notes",
+		)
+	})
+
+	it("separates a block from surrounding text", () => {
+		let view = createEditorView("BeforeAfter", 6)
+
+		insertMarkdownBlock("![Cover](asset:co_asset)")(view)
+
+		expect(view.state.doc.toString()).toBe(
+			"Before\n\n![Cover](asset:co_asset)\n\nAfter",
+		)
+	})
 })
 
 describe("indentMore", () => {

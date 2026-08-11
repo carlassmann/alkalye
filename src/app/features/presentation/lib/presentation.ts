@@ -131,11 +131,7 @@ function buildSectionItems(
 			}
 			currentBlockStart = tokenStartLine + token.raw.split("\n").length - 1
 			currentBlockEnd = currentBlockStart
-		} else if (
-			token.type === "list" &&
-			hasIndentedListItems(token as Tokens.List)
-		) {
-			// Handle mixed-indentation lists specially
+		} else if (token.type === "list") {
 			let result = processListToken(
 				token as Tokens.List,
 				tokenStartLine,

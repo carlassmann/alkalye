@@ -42,7 +42,12 @@ function DocumentSidebar({
 	}, [activeTab])
 
 	return (
-		<Sidebar side="right" collapsible="offcanvas">
+		<Sidebar
+			side="right"
+			collapsible="offcanvas"
+			mobileTitle={t("editor.toolbar.documentTools")}
+			mobileCloseLabel={t("doc.sidebar.closeFile")}
+		>
 			<SidebarHeader className="border-border gap-0 border-b p-0">
 				<div
 					className="flex flex-row items-center justify-between px-3"

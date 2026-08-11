@@ -852,7 +852,7 @@ function SpaceEditorContent({
 								onDelete={makeDeleteAsset(doc, docWithContent)}
 								onDownload={makeDownloadAsset(doc)}
 								onInsert={(assetId, name) => {
-									editor.current?.insertText(`![${name}](asset:${assetId})`)
+									editor.current?.insertBlock(`![${name}](asset:${assetId})`)
 								}}
 								onToggleMute={assetId => {
 									let asset = doc.assets?.find(a => a?.$jazz.id === assetId)
