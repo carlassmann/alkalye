@@ -1,4 +1,5 @@
 export {
+	collectStorageDiagnostics,
 	clearReloadDiagnostics,
 	readReloadDiagnostics,
 	recordStartupTrace,
@@ -22,6 +23,7 @@ type ReloadDiagnostic = {
 
 let storageKey = "alkalye:reload-diagnostics"
 let maximumEntries = 200
+let jazzDatabaseName = "jazz-storage"
 
 function readReloadDiagnostics(): ReloadDiagnostic[] {
 	try {
@@ -68,6 +70,10 @@ function recordStartupTraceOnce(
 	if (!exists) recordStartupTrace(event, details)
 }
 
+async function collectStorageDiagnostics(): Promise<void> {
+	await Promise.all([collectStorageEstimate(), collectJazzDatabaseCounts()])
+}
+
 function startStartupSpan(event: string, details: StartupTraceDetails = {}) {
 	let startedAt = performance.now()
 	recordStartupTrace(`${event}:start`, details)
@@ -107,6 +113,67 @@ function reloadDiagnosticsReport(): string {
 	return JSON.stringify(report, null, 2)
 }
 
+async function collectStorageEstimate(): Promise<void> {
+	if (hasCurrentRunEvent("browser-storage-breakdown")) return
+
+	try {
+		let estimate = await navigator.storage.estimate()
+		let details: StartupTraceDetails = {
+			usageMegabytes: bytesToMegabytes(estimate.usage),
+			quotaMegabytes: bytesToMegabytes(estimate.quota),
+		}
+		let rawEstimate: unknown = estimate
+		if (isRecord(rawEstimate) && isRecord(rawEstimate.usageDetails)) {
+			for (let [key, bytes] of Object.entries(rawEstimate.usageDetails)) {
+				if (typeof bytes !== "number") continue
+				details[`usage.${key}Megabytes`] = bytesToMegabytes(bytes)
+			}
+		}
+		recordStartupTraceOnce("browser-storage-breakdown", details)
+	} catch (error) {
+		recordStartupTraceOnce("browser-storage-breakdown:error", {
+			error: getErrorName(error),
+		})
+	}
+}
+
+async function collectJazzDatabaseCounts(): Promise<void> {
+	if (hasCurrentRunEvent("jazz-indexeddb-counts")) return
+
+	let startedAt = performance.now()
+	let database: IDBDatabase | null = null
+	try {
+		database = await openDatabase(jazzDatabaseName)
+		let storeNames = Array.from(database.objectStoreNames)
+		let details: StartupTraceDetails = {
+			databaseVersion: database.version,
+			storeCount: storeNames.length,
+		}
+		if (storeNames.length > 0) {
+			let transaction = database.transaction(storeNames, "readonly")
+			let counts = await Promise.all(
+				storeNames.map(async storeName => {
+					let count = await requestResult(
+						transaction.objectStore(storeName).count(),
+					)
+					return { storeName, count }
+				}),
+			)
+			for (let { storeName, count } of counts) {
+				details[`records.${storeName}`] = count
+			}
+		}
+		details.durationMs = roundMilliseconds(performance.now() - startedAt)
+		recordStartupTraceOnce("jazz-indexeddb-counts", details)
+	} catch (error) {
+		recordStartupTraceOnce("jazz-indexeddb-counts:error", {
+			durationMs: roundMilliseconds(performance.now() - startedAt),
+			error: getErrorName(error),
+		})
+	} finally {
+		database?.close()
+	}
+}
 function parseDiagnostic(value: unknown): ReloadDiagnostic[] {
 	if (!isRecord(value)) return []
 	if (typeof value.at !== "string" || typeof value.event !== "string") return []
@@ -128,6 +195,37 @@ function parseDiagnostic(value: unknown): ReloadDiagnostic[] {
 
 function getRunId(): string {
 	return window.__alkalyeStartupTraceId ?? "unknown"
+}
+
+function hasCurrentRunEvent(event: string): boolean {
+	let runId = getRunId()
+	return readReloadDiagnostics().some(
+		entry => entry.runId === runId && entry.event === event,
+	)
+}
+
+function openDatabase(name: string): Promise<IDBDatabase> {
+	return requestResult(indexedDB.open(name))
+}
+
+function requestResult<T>(request: IDBRequest<T>): Promise<T> {
+	return new Promise(function resolveRequest(resolve, reject) {
+		request.addEventListener("success", () => resolve(request.result), {
+			once: true,
+		})
+		request.addEventListener("error", () => reject(request.error), {
+			once: true,
+		})
+	})
+}
+
+function bytesToMegabytes(bytes: number | undefined): number {
+	if (!bytes) return 0
+	return roundMilliseconds(bytes / 1024 / 1024)
+}
+
+function getErrorName(error: unknown): string {
+	return error instanceof Error ? error.name : "UnknownError"
 }
 
 function roundMilliseconds(value: number): number {

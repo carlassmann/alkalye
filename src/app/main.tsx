@@ -25,6 +25,7 @@ export { PWA, buildSyncConfig }
 
 init({ domain: "alkalye.com" })
 let appBundleEvaluatedAt = performance.now()
+let jazzProviderStartedAt = performance.now()
 recordStartupTraceOnce("app-bundle-evaluated")
 
 let router = createRouter({
@@ -61,6 +62,7 @@ function buildSyncConfig(): JazzSyncConfig {
 }
 
 function PWA() {
+	recordStartupTraceOnce("jazz-provider-started")
 	recordStartupTraceOnce("react-root-rendering")
 	return (
 		<StrictMode>
@@ -96,6 +98,9 @@ function RouterWithJazz() {
 
 	useEffect(() => {
 		recordStartupTraceOnce("react-mounted")
+		recordStartupTraceOnce("jazz-context-ready", {
+			durationMs: elapsedSince(jazzProviderStartedAt),
+		})
 		navigator.storage?.estimate().then(estimate => {
 			recordStartupTraceOnce("browser-storage-estimated", {
 				usageMegabytes: bytesToMegabytes(estimate.usage),

@@ -74,6 +74,7 @@ import {
 import { useIsOnline } from "@/app/hooks/use-online"
 import { testIds } from "@/app/lib/test-ids"
 import {
+	collectStorageDiagnostics,
 	clearReloadDiagnostics,
 	readReloadDiagnostics,
 	reloadDiagnosticsReport,
@@ -1339,10 +1340,15 @@ function AppSection() {
 
 function ReloadDiagnosticsSection() {
 	let [entries, setEntries] = useState(readReloadDiagnostics)
-	let [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle")
+	let [copyState, setCopyState] = useState<
+		"idle" | "preparing" | "copied" | "failed"
+	>("idle")
 	let latest = entries.at(-1)
 
 	async function handleCopy() {
+		setCopyState("preparing")
+		await collectStorageDiagnostics()
+		setEntries(readReloadDiagnostics())
 		let copied = await copyText(reloadDiagnosticsReport())
 		setCopyState(copied ? "copied" : "failed")
 		setTimeout(() => setCopyState("idle"), 2000)
@@ -1382,8 +1388,19 @@ function ReloadDiagnosticsSection() {
 					)}
 				</div>
 				<div className="flex gap-2">
-					<Button onClick={handleCopy} variant="outline" size="sm">
-						{copyState === "copied" ? (
+					<Button
+						onClick={handleCopy}
+						variant="outline"
+						size="sm"
+						disabled={copyState === "preparing"}
+						className="min-w-36"
+					>
+						{copyState === "preparing" ? (
+							<>
+								<Loader2 className="mr-1.5 size-3.5 animate-spin" />
+								<T k="settings.reloadDiagnostics.preparing" />
+							</>
+						) : copyState === "copied" ? (
 							<>
 								<Check className="mr-1.5 size-3.5" />
 								<T k="settings.reloadDiagnostics.copied" />
@@ -1400,7 +1417,12 @@ function ReloadDiagnosticsSection() {
 							</>
 						)}
 					</Button>
-					<Button onClick={handleClear} variant="ghost" size="sm">
+					<Button
+						onClick={handleClear}
+						variant="ghost"
+						size="sm"
+						disabled={copyState === "preparing"}
+					>
 						<Trash2 className="mr-1.5 size-3.5" />
 						<T k="settings.reloadDiagnostics.clear" />
 					</Button>

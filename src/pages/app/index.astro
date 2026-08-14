@@ -99,6 +99,58 @@ let metaDescription =
 					}
 				}
 
+				try {
+					let originalOpen = indexedDB.open.bind(indexedDB)
+					let restored = false
+					function restoreOpen() {
+						if (restored) return
+						restored = true
+						indexedDB.open = originalOpen
+					}
+					indexedDB.open = function tracedIndexedDbOpen(
+						name: string,
+						version?: number,
+					) {
+						let request =
+							version === undefined
+								? originalOpen(name)
+								: originalOpen(name, version)
+						if (name !== "jazz-storage") return request
+
+						let startedAt = performance.now()
+						record("jazz-indexeddb-open:start", { version: version ?? null })
+						request.addEventListener("upgradeneeded", event => {
+							record("jazz-indexeddb-open:upgrade", {
+								oldVersion: event.oldVersion,
+								newVersion: event.newVersion,
+							})
+						})
+						request.addEventListener("blocked", () =>
+							record("jazz-indexeddb-open:blocked"),
+						)
+						request.addEventListener("success", () => {
+							record("jazz-indexeddb-open:complete", {
+								durationMs:
+									Math.round((performance.now() - startedAt) * 10) / 10,
+								databaseVersion: request.result.version,
+								storeCount: request.result.objectStoreNames.length,
+							})
+							restoreOpen()
+						})
+						request.addEventListener("error", () => {
+							record("jazz-indexeddb-open:error", {
+								durationMs:
+									Math.round((performance.now() - startedAt) * 10) / 10,
+								error: request.error?.name ?? "UnknownError",
+							})
+							restoreOpen()
+						})
+						return request
+					}
+				} catch {
+					record("jazz-indexeddb-instrumentation-unavailable")
+				}
+
 				let navigation = performance.getEntriesByType("navigation")[0]
 				record("boot", {
 					path: location.pathname,
