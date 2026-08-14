@@ -1,25 +1,14 @@
 import { useEffect } from "react"
-import { co, type MaybeLoaded } from "jazz-tools"
-import { Document } from "../lib/schema"
-import { UserAccount } from "@/schema"
+import { writeLastOpenedDocument } from "../lib/last-opened-document"
 
 export { useTrackLastOpened }
 
-function useTrackLastOpened(me: Me, doc: Doc) {
+function useTrackLastOpened(
+	accountId: string,
+	documentId: string,
+	spaceId?: string,
+) {
 	useEffect(() => {
-		if (!me.$isLoaded || !me.root) return
-
-		let docId = doc.$jazz.id
-		let spaceId = doc.spaceId
-		let { lastOpenedDocId, lastOpenedSpaceId } = me.root
-
-		if (lastOpenedDocId === docId && lastOpenedSpaceId === spaceId) return
-		if (lastOpenedDocId === docId && !spaceId && !lastOpenedSpaceId) return
-
-		me.root.$jazz.set("lastOpenedDocId", docId)
-		me.root.$jazz.set("lastOpenedSpaceId", spaceId)
-	}, [me, doc])
+		writeLastOpenedDocument(accountId, documentId, spaceId)
+	}, [accountId, documentId, spaceId])
 }
-
-type Me = MaybeLoaded<co.loaded<typeof UserAccount, { root: true }>>
-type Doc = co.loaded<typeof Document>

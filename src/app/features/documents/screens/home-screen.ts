@@ -1,20 +1,15 @@
 import { redirect } from "@tanstack/react-router"
 import { Group, co, type ResolveQuery } from "jazz-tools"
-import { UserAccount } from "@/schema"
+import { Space, UserAccount } from "@/schema"
 import { CommentThread, Document } from "../lib/schema"
 import { createDocumentMetadata } from "../lib/metadata"
 import { startStartupSpan } from "@/app/lib/reload-diagnostics"
+import {
+	clearLastOpenedDocument,
+	readLastOpenedDocument,
+} from "../lib/last-opened-document"
 
-export {
-	homeLoader,
-	homeLastOpenedQuery,
-	homeDocumentsQuery,
-	findFallbackHomeDocument,
-}
-
-let homeLastOpenedQuery = {
-	root: true,
-} as const satisfies ResolveQuery<typeof UserAccount>
+export { homeLoader, homeDocumentsQuery, findFallbackHomeDocument }
 
 let homeDocumentsQuery = {
 	root: {
@@ -39,29 +34,47 @@ async function homeLoader({ context, deps }: HomeLoaderArgs) {
 	if (!me) return null
 
 	if (!deps.personal) {
-		let finishLastOpened = startStartupSpan("home-last-opened-load")
-		let loaded = await me.$jazz.ensureLoaded({ resolve: homeLastOpenedQuery })
-		let { lastOpenedDocId, lastOpenedSpaceId } = loaded.root ?? {}
-		finishLastOpened({ hasLastOpenedDocument: Boolean(lastOpenedDocId) })
-
-		if (lastOpenedDocId) {
+		let lastOpened = readLastOpenedDocument(me.$jazz.id)
+		if (lastOpened) {
 			let finishDocument = startStartupSpan("home-last-document-load")
-			let doc = await Document.load(lastOpenedDocId)
+			let doc = await Document.load(lastOpened.documentId)
 			finishDocument({
 				loaded: doc.$isLoaded,
 				loadingState: doc.$jazz.loadingState,
 			})
 			if (doc.$isLoaded && !doc.deletedAt) {
-				if (lastOpenedSpaceId) {
+				if (lastOpened.spaceId) {
+					let finishSpace = startStartupSpan("home-last-space-load")
+					let space = await Space.load(lastOpened.spaceId, {
+						resolve: { documents: true },
+					})
+					finishSpace({
+						loaded: space.$isLoaded,
+						loadingState: space.$jazz.loadingState,
+					})
+					if (
+						space.$isLoaded &&
+						space.documents.some(
+							spaceDoc => spaceDoc?.$jazz.id === lastOpened.documentId,
+						)
+					) {
+						throw redirect({
+							to: "/spaces/$spaceId/doc/$id",
+							params: {
+								spaceId: lastOpened.spaceId,
+								id: lastOpened.documentId,
+							},
+						})
+					}
+					if (space.$isLoaded) clearLastOpenedDocument(me.$jazz.id)
+				} else {
 					throw redirect({
-						to: "/spaces/$spaceId/doc/$id",
-						params: { spaceId: lastOpenedSpaceId, id: lastOpenedDocId },
+						to: "/doc/$id",
+						params: { id: lastOpened.documentId },
 					})
 				}
-				throw redirect({
-					to: "/doc/$id",
-					params: { id: lastOpenedDocId },
-				})
+			} else {
+				clearLastOpenedDocument(me.$jazz.id)
 			}
 		}
 	}

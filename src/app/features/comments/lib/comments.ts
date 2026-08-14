@@ -25,6 +25,7 @@ export {
 	copyCommentsAndApplyContent,
 	applyContentDiffWithCommentAnchors,
 	applyContentDiffLoadingCommentAnchors,
+	replaceDocumentContentPreservingAnchors,
 	recoverRange,
 	mapCommentRangeAcrossContent,
 	type LoadedCommentDocument,
@@ -316,6 +317,26 @@ function applyContentDiffWithCommentAnchors(
 	}))
 
 	doc.content.$jazz.applyDiff(newContent)
+
+	for (let update of updates) {
+		if (update.range.orphaned) continue
+		update.thread.$jazz.set(
+			"anchor",
+			makeAnchor(doc, update.range.from, update.range.to, update.thread.anchor),
+		)
+	}
+}
+
+function replaceDocumentContentPreservingAnchors(
+	doc: LoadedAnchorDocument,
+	content: co.loaded<ReturnType<typeof co.plainText>>,
+) {
+	let updates = getActiveCommentAnchorThreads(doc).map(thread => ({
+		thread,
+		range: getCommentRange(doc, thread.anchor),
+	}))
+
+	doc.$jazz.set("content", content)
 
 	for (let update of updates) {
 		if (update.range.orphaned) continue

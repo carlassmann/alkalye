@@ -18,6 +18,7 @@ export {
 	copyCommentsAndApplyContent,
 	applyContentDiffWithCommentAnchors,
 	applyContentDiffLoadingCommentAnchors,
+	replaceDocumentContentPreservingAnchors,
 	type LoadedCommentDocument,
 	type LoadedAnchorDocument,
 	type CommentRange,

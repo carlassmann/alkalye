@@ -1,5 +1,11 @@
 // schema
-export { Document, CursorEntry, CursorFeed, HighlightRange } from "./lib/schema"
+export {
+	Document,
+	CursorEntry,
+	CursorFeed,
+	HighlightRange,
+	ArchivedDocumentContent,
+} from "./lib/schema"
 export { createSpaceDocument } from "./lib/create-space-document"
 
 // lib — document CRUD

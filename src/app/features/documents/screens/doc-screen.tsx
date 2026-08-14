@@ -130,6 +130,7 @@ import { testIds } from "@/app/lib/test-ids"
 import { useIntl } from "@/shared/intl/setup"
 import { makeFolderDocumentContent } from "../lib/folders"
 import { createDocumentMetadata, syncDocumentMetadata } from "../lib/metadata"
+import { useDocumentCompaction } from "../hooks/use-document-compaction"
 import { recordStartupTraceOnce } from "@/app/lib/reload-diagnostics"
 
 export { DocScreen, personalMeResolve }
@@ -263,6 +264,13 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 		recordStartupTraceOnce("editor-ready", {
 			route: "personal-document",
 			contentCharacters: doc.content.toString().length,
+			documentTransactions:
+				doc.$jazz.raw.core.getValidSortedTransactions().length,
+			contentTransactions:
+				doc.content.$jazz.raw.core.getValidSortedTransactions().length,
+			archivedGenerations: doc.archivedContent?.$isLoaded
+				? doc.archivedContent.length
+				: null,
 			assetCount: doc.assets?.length ?? 0,
 			commentCount: doc.comments?.length ?? 0,
 		})
@@ -310,6 +318,7 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 		doc,
 		editorRef: editor,
 	})
+	useDocumentCompaction(doc, !readOnly)
 	let assets =
 		doc.assets?.flatMap(a =>
 			a?.$isLoaded ? [toEditorAsset(a, resolvedTheme)] : [],
@@ -340,7 +349,7 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 		initialContent: content,
 	})
 	useEditorSettings(editorSettings)
-	useTrackLastOpened(me, doc)
+	useTrackLastOpened(me.$jazz.id, doc.$jazz.id, doc.spaceId)
 
 	let resolveWikilink = useWikilinkResolver(content, documents)
 	let handleWikilinkClick = (id: string, newTab: boolean) => {
@@ -365,7 +374,6 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 		let cursor = pendingSave.current.cursor
 		pendingSave.current = null
 		applyContentDiffWithCommentAnchors(doc, pendingContent)
-		doc.$jazz.set("updatedAt", new Date())
 		syncDocumentMetadata(doc)
 		if (cursor) {
 			updateCursor(cursor.from, cursor.to)
@@ -478,7 +486,6 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 				let cursor = pendingSave.current?.cursor
 				pendingSave.current = null
 				applyContentDiffWithCommentAnchors(doc, newContent)
-				doc.$jazz.set("updatedAt", new Date())
 				syncDocumentMetadata(doc)
 				if (cursor) {
 					updateCursor(cursor.from, cursor.to)
@@ -507,7 +514,6 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 
 		if (currentContent !== doc.content.toString()) {
 			applyContentDiffWithCommentAnchors(doc, currentContent)
-			doc.$jazz.set("updatedAt", new Date())
 			syncDocumentMetadata(doc)
 		}
 	}

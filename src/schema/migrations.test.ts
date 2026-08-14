@@ -29,6 +29,11 @@ import {
 	runAccountMigration,
 	setMigrationFullDownloadTimeout,
 } from "./migrations"
+import {
+	clearLastOpenedDocument,
+	readLastOpenedDocument,
+	writeLastOpenedDocument,
+} from "@/app/features/documents/lib/last-opened-document"
 
 let BareAccount = co
 	.account({ profile: UserProfile, root: UserRoot })
@@ -247,6 +252,143 @@ describe("runAccountMigration - idempotency on a fully loaded account", () => {
 		expect(after.root.documents.$jazz.id).toBe(documentsIdBefore)
 		expect(after.root.spaces?.$jazz.id).toBe(spacesIdBefore)
 	})
+
+	test("rotates unbounded root history into a bounded replay snapshot", async () => {
+		let account = await createJazzTestAccount({
+			isCurrentActiveAccount: true,
+			AccountSchema: UserAccount,
+		})
+		let before = await account.$jazz.ensureLoaded({
+			resolve: {
+				root: {
+					documents: true,
+					inactiveDocuments: true,
+					spaces: true,
+					settings: true,
+					themes: true,
+				},
+			},
+		})
+		let oldRoot = before.root
+		let documentsId = oldRoot.documents.$jazz.id
+		let inactiveDocumentsId = oldRoot.inactiveDocuments?.$jazz.id
+		let spacesId = oldRoot.spaces?.$jazz.id
+		let settingsId = oldRoot.settings?.$jazz.id
+		let themesId = oldRoot.themes?.$jazz.id
+		let ownerId = oldRoot.$jazz.owner.$jazz.id
+
+		for (let index = 0; index < 1_000; index++) {
+			oldRoot.$jazz.set("lastOpenedDocId", `document-${index}`)
+		}
+		oldRoot.$jazz.set("language", "de")
+		oldRoot.$jazz.set("migrationVersion", 1)
+		let oldReplaySize =
+			oldRoot.$jazz.raw.core.getValidSortedTransactions().length
+
+		await runAccountMigration(account)
+
+		let after = await account.$jazz.ensureLoaded({
+			resolve: {
+				root: {
+					documents: true,
+					inactiveDocuments: true,
+					spaces: true,
+					settings: true,
+					themes: true,
+				},
+			},
+		})
+		let newReplaySize =
+			after.root.$jazz.raw.core.getValidSortedTransactions().length
+		expect(oldReplaySize).toBeGreaterThan(1_000)
+		expect(after.root.$jazz.id).not.toBe(oldRoot.$jazz.id)
+		expect(after.root.$jazz.owner.$jazz.id).toBe(ownerId)
+		expect(after.root.documents.$jazz.id).toBe(documentsId)
+		expect(after.root.inactiveDocuments?.$jazz.id).toBe(inactiveDocumentsId)
+		expect(after.root.spaces?.$jazz.id).toBe(spacesId)
+		expect(after.root.settings?.$jazz.id).toBe(settingsId)
+		expect(after.root.themes?.$jazz.id).toBe(themesId)
+		expect(after.root.language).toBe("de")
+		expect(after.root.migrationVersion).toBe(2)
+		expect(newReplaySize).toBeLessThanOrEqual(2)
+		expect(readLastOpenedDocument(account.$jazz.id)).toEqual({
+			documentId: "document-999",
+		})
+		clearLastOpenedDocument(account.$jazz.id)
+	})
+
+	test("recompacts a current root that exceeds the replay budget", async () => {
+		let account = await createJazzTestAccount({
+			isCurrentActiveAccount: true,
+			AccountSchema: UserAccount,
+		})
+		let before = await account.$jazz.ensureLoaded({
+			resolve: { root: { documents: true, spaces: true } },
+		})
+		let oldRoot = before.root
+		let documentsId = oldRoot.documents.$jazz.id
+		let spacesId = oldRoot.spaces?.$jazz.id
+
+		for (let index = 0; index < 1_000; index++) {
+			oldRoot.$jazz.set("lastOpenedDocId", `stale-client-${index}`)
+		}
+		expect(oldRoot.migrationVersion).toBe(2)
+		expect(
+			oldRoot.$jazz.raw.core.getValidSortedTransactions().length,
+		).toBeGreaterThan(1_000)
+
+		await runAccountMigration(account)
+
+		let after = await account.$jazz.ensureLoaded({
+			resolve: { root: { documents: true, spaces: true } },
+		})
+		expect(after.root.$jazz.id).not.toBe(oldRoot.$jazz.id)
+		expect(after.root.documents.$jazz.id).toBe(documentsId)
+		expect(after.root.spaces?.$jazz.id).toBe(spacesId)
+		expect(after.root.migrationVersion).toBe(2)
+		expect(
+			after.root.$jazz.raw.core.getValidSortedTransactions().length,
+		).toBeLessThanOrEqual(2)
+		clearLastOpenedDocument(account.$jazz.id)
+	})
+
+	test("seeds device-local navigation from a current root", async () => {
+		let account = await createJazzTestAccount({
+			isCurrentActiveAccount: true,
+			AccountSchema: UserAccount,
+		})
+		let { root } = await account.$jazz.ensureLoaded({ resolve: { root: true } })
+		let rootId = root.$jazz.id
+		root.$jazz.set("lastOpenedDocId", "synced-document")
+		root.$jazz.set("lastOpenedSpaceId", "synced-space")
+
+		await runAccountMigration(account)
+
+		expect(account.$jazz.raw.get("root")).toBe(rootId)
+		expect(readLastOpenedDocument(account.$jazz.id)).toEqual({
+			documentId: "synced-document",
+			spaceId: "synced-space",
+		})
+		clearLastOpenedDocument(account.$jazz.id)
+	})
+
+	test("keeps newer device-local navigation while compacting", async () => {
+		let account = await createJazzTestAccount({
+			isCurrentActiveAccount: true,
+			AccountSchema: UserAccount,
+		})
+		let { root } = await account.$jazz.ensureLoaded({ resolve: { root: true } })
+		root.$jazz.set("lastOpenedDocId", "legacy-document")
+		root.$jazz.set("migrationVersion", 1)
+		writeLastOpenedDocument(account.$jazz.id, "device-document")
+
+		await runAccountMigration(account)
+
+		expect(readLastOpenedDocument(account.$jazz.id)).toEqual({
+			documentId: "device-document",
+		})
+		clearLastOpenedDocument(account.$jazz.id)
+	})
 })
 
 describe("runAccountMigration - guarded backfill of missing keys", () => {
@@ -340,6 +482,10 @@ describe("runAccountMigration - previous document schema", () => {
 		feedAllChunks(legacyAccount.profile.$jazz.owner.$jazz.raw.core, freshNode)
 		feedAllChunks(legacyAccount.profile.$jazz.raw.core, freshNode)
 		feedAllChunks(legacyRoot.$jazz.raw.core, freshNode)
+		feedAllChunks(legacyRoot.documents.$jazz.raw.core, freshNode)
+		if (legacyRoot.spaces) {
+			feedAllChunks(legacyRoot.spaces.$jazz.raw.core, freshNode)
+		}
 
 		let currentAgent = UserAccount.getCoValueClass().fromNode(freshNode)
 		setActiveAccount(currentAgent)
@@ -353,8 +499,6 @@ describe("runAccountMigration - previous document schema", () => {
 		setActiveAccount(currentAccount)
 
 		await runAccountMigration(currentAccount)
-		expect(currentAccount.root.documents.$isLoaded).toBe(false)
-		expect(currentAccount.root.spaces?.$isLoaded).toBe(false)
 		for (let core of sourceNode.allCoValues()) {
 			feedAllChunks(core, freshNode)
 		}
@@ -374,7 +518,8 @@ describe("runAccountMigration - previous document schema", () => {
 		})
 		if (!root.spaces) throw new Error("spaces failed to load")
 
-		expect(root.$jazz.id).toBe(legacyRoot.$jazz.id)
+		expect(root.$jazz.id).not.toBe(legacyRoot.$jazz.id)
+		expect(root.migrationVersion).toBe(2)
 		expect(root.spaces.$jazz.id).toBe(spacesId)
 		expect(root.spaces.map(space => space?.name)).toEqual([
 			"Product",
@@ -545,7 +690,7 @@ describe("runAccountMigration - account streaming data loss (regression)", () =>
 		setMigrationFullDownloadTimeout(10_000)
 	})
 
-	test("never creates a root on a login against a streaming account (original incident)", async () => {
+	test("compacts only after a streaming account finishes", async () => {
 		let { account, realRoot } = await buildAccountWithRealRoot()
 		let { freshNode, rawAccountId, chunkCount, withheldChunk } =
 			await loadOnNodeStreaming(account, account.$jazz.raw.core)
@@ -567,7 +712,12 @@ describe("runAccountMigration - account streaming data loss (regression)", () =>
 
 		await runAccountMigration(migrationAccount)
 
-		expect(migrationAccount.$jazz.raw.get("root")).toBe(realRoot.$jazz.id)
+		let { root } = await migrationAccount.$jazz.ensureLoaded({
+			resolve: { root: { documents: true } },
+		})
+		expect(root.$jazz.id).not.toBe(realRoot.$jazz.id)
+		expect(root.documents.$jazz.id).toBe(realRoot.documents.$jazz.id)
+		expect(root.migrationVersion).toBe(2)
 	})
 
 	test("writes nothing when the account never finishes streaming", async () => {

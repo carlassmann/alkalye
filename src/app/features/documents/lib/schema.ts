@@ -10,6 +10,7 @@ export {
 	CommentAnchor,
 	CommentReply,
 	CommentThread,
+	ArchivedDocumentContent,
 }
 
 let CursorEntry = z.object({
@@ -53,9 +54,21 @@ let CommentThread = co.map({
 	updatedAt: z.date(),
 })
 
+let ArchivedDocumentContent = co.map({
+	content: co.plainText(),
+	successor: co.optional(co.plainText()),
+	cutoverFrontier: z.record(z.string(), z.number()),
+	reconciledFrontier: z.record(z.string(), z.number()).optional(),
+	successorSeedFrontier: z.record(z.string(), z.number()).optional(),
+	successorReconciledFrontier: z.record(z.string(), z.number()).optional(),
+	cutoverAt: z.date(),
+	successorId: z.string(),
+})
+
 let Document = co.map({
 	version: z.literal(1),
 	content: co.plainText(),
+	archivedContent: co.optional(co.list(ArchivedDocumentContent)),
 	title: z.string().optional(),
 	pinned: z.boolean().optional(),
 	path: z.string().optional(),

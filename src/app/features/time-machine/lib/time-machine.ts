@@ -1,6 +1,7 @@
 import type { co } from "jazz-tools"
 import type { Document, UserAccount } from "@/schema"
 import { Asset, TldrawRevision } from "@/schema"
+import { getDocumentContentGenerations } from "@/app/features/documents/lib/document-generations"
 
 export {
 	getEditHistory,
@@ -26,6 +27,8 @@ interface EditHistoryItem {
 	index: number
 	madeAt: Date
 	accountId: string | null
+	contentId: string
+	generationIndex: number
 }
 
 function accountIdFromSessionId(sessionId: string): string {
@@ -51,13 +54,21 @@ function getEditHistory(doc: LoadedDocument): EditHistoryItem[] {
 		return cached.edits
 	}
 
-	let timestampToOp = new Map<
-		number,
-		{ madeAt: number; accountId: string | null }
-	>()
+	let generations = getDocumentContentGenerations(doc)
+	let editsByGeneration = generations.map(
+		() => new Map<number, { madeAt: number; accountId: string | null }>(),
+	)
 
-	function collectTransactions(core: typeof contentRaw.core) {
-		for (let tx of core.getValidSortedTransactions()) {
+	function collectTransactions(
+		core: typeof contentRaw.core,
+		generationIndex: number,
+		seedFrontier?: Record<string, number>,
+	) {
+		let transactions = core.getValidSortedTransactions()
+		for (let tx of transactions) {
+			let seedTransactionCount = seedFrontier?.[tx.txID.sessionID] ?? 0
+			if (tx.txID.txIndex < seedTransactionCount) continue
+			let timestampToOp = editsByGeneration[generationIndex]
 			if (!timestampToOp.has(tx.madeAt)) {
 				timestampToOp.set(tx.madeAt, {
 					madeAt: tx.madeAt,
@@ -67,42 +78,71 @@ function getEditHistory(doc: LoadedDocument): EditHistoryItem[] {
 		}
 	}
 
-	collectTransactions(contentRaw.core)
+	for (let [index, generation] of generations.entries()) {
+		let seedFrontier = generations[index - 1]?.archive?.successorSeedFrontier
+		collectTransactions(generation.content.$jazz.raw.core, index, seedFrontier)
+	}
+
+	function collectRelatedTransactions(core: typeof contentRaw.core) {
+		for (let tx of core.getValidSortedTransactions()) {
+			let generationIndex = getGenerationIndexAtTime(generations, tx.madeAt)
+			let timestampToOp = editsByGeneration[generationIndex]
+			if (!timestampToOp.has(tx.madeAt)) {
+				timestampToOp.set(tx.madeAt, {
+					madeAt: tx.madeAt,
+					accountId: accountIdFromSessionId(tx.txID.sessionID),
+				})
+			}
+		}
+	}
 
 	if (doc.assets?.$isLoaded) {
-		collectTransactions(doc.assets.$jazz.raw.core)
+		collectRelatedTransactions(doc.assets.$jazz.raw.core)
 		for (let asset of doc.assets.values()) {
-			if (asset?.$isLoaded) collectTransactions(asset.$jazz.raw.core)
+			if (asset?.$isLoaded) collectRelatedTransactions(asset.$jazz.raw.core)
 		}
 	}
 
 	if (doc.comments?.$isLoaded) {
-		collectTransactions(doc.comments.$jazz.raw.core)
+		collectRelatedTransactions(doc.comments.$jazz.raw.core)
 		for (let thread of doc.comments.values()) {
 			if (!thread?.$isLoaded) continue
-			collectTransactions(thread.$jazz.raw.core)
+			collectRelatedTransactions(thread.$jazz.raw.core)
 			if (thread.replies?.$isLoaded) {
-				collectTransactions(thread.replies.$jazz.raw.core)
+				collectRelatedTransactions(thread.replies.$jazz.raw.core)
 				for (let reply of thread.replies.values()) {
-					if (reply?.$isLoaded) collectTransactions(reply.$jazz.raw.core)
+					if (reply?.$isLoaded) collectRelatedTransactions(reply.$jazz.raw.core)
 				}
 			}
 		}
 	}
 
-	let sortedTimestamps = [...timestampToOp.keys()].sort((a, b) => a - b)
-
-	let edits: EditHistoryItem[] = sortedTimestamps.map((time, index) => {
-		let op = timestampToOp.get(time)!
-		return {
-			index,
-			madeAt: new Date(time),
-			accountId: op.accountId,
+	let edits: EditHistoryItem[] = []
+	for (let [generationIndex, timestampToOp] of editsByGeneration.entries()) {
+		let contentId = generations[generationIndex].content.$jazz.id
+		let sortedTimestamps = [...timestampToOp.keys()].sort((a, b) => a - b)
+		for (let time of sortedTimestamps) {
+			let op = timestampToOp.get(time)!
+			edits.push({
+				index: edits.length,
+				madeAt: new Date(time),
+				accountId: op.accountId,
+				contentId,
+				generationIndex,
+			})
 		}
-	})
+	}
 
 	if (edits.length === 0) {
-		edits = [{ index: 0, madeAt: doc.createdAt, accountId: null }]
+		edits = [
+			{
+				index: 0,
+				madeAt: doc.createdAt,
+				accountId: null,
+				contentId: doc.content.$jazz.id,
+				generationIndex: generations.length - 1,
+			},
+		]
 	}
 
 	editHistoryCache.set(contentRaw, { edits, transactionCount })
@@ -118,13 +158,29 @@ function getContentAtEdit(doc: LoadedDocument, editIndex: number): string {
 		return doc.content.toString()
 	}
 
-	let isLatestEdit = editIndex === edits.length - 1
+	let edit = edits[editIndex]
+	let isLatestEdit =
+		editIndex === edits.length - 1 && edit.contentId === doc.content.$jazz.id
 	if (isLatestEdit) {
 		return doc.content.toString()
 	}
 
-	let edit = edits[editIndex]
-	return doc.content.$jazz.raw.atTime(edit.madeAt.getTime()).toString()
+	let generation = getDocumentContentGenerations(doc).find(
+		item => item.content.$jazz.id === edit.contentId,
+	)
+	if (!generation) return doc.content.toString()
+	return generation.content.$jazz.raw.atTime(edit.madeAt.getTime()).toString()
+}
+
+function getGenerationIndexAtTime(
+	generations: ReturnType<typeof getDocumentContentGenerations>,
+	timestamp: number,
+) {
+	for (let [index, generation] of generations.entries()) {
+		if (!generation.archive) continue
+		if (timestamp <= generation.archive.cutoverAt.getTime()) return index
+	}
+	return generations.length - 1
 }
 
 function getEditTimestamp(doc: LoadedDocument, editIndex: number): number {
@@ -265,7 +321,12 @@ function groupEditsByDay(edits: EditHistoryItem[]): DayGroup[] {
 }
 
 function getTransactionCount(doc: LoadedDocument) {
-	let count = doc.content.$jazz.raw.core.getValidSortedTransactions().length
+	let count = getDocumentContentGenerations(doc).reduce(
+		(total, generation) =>
+			total +
+			generation.content.$jazz.raw.core.getValidSortedTransactions().length,
+		0,
+	)
 
 	if (doc.assets?.$isLoaded) {
 		count += doc.assets.$jazz.raw.core.getValidSortedTransactions().length

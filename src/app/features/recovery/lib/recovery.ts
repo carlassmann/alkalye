@@ -547,9 +547,9 @@ function carryOverRootFields(restored: LoadedRoot, current: LoadedRoot): void {
 	}
 }
 
+// Migration version describes a root's physical history and cannot be inherited.
 let CARRIED_ROOT_SCALARS = [
 	"language",
-	"migrationVersion",
 	"lastOpenedDocId",
 	"lastOpenedSpaceId",
 ] as const

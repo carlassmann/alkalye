@@ -83,6 +83,7 @@ type ViewMode = "days" | "edits"
 
 let resolve = {
 	content: true,
+	archivedContent: { $each: { content: true, successor: true } },
 	assets: {
 		$each: assetContentResolve,
 	},

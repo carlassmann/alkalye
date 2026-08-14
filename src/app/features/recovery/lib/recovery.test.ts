@@ -144,17 +144,19 @@ describe("recovery - root pointer overwrite (damage mode a)", () => {
 		expect(after.documents.$jazz.id).toBe(documentsId)
 	})
 
-	test("settings and scalar keys survive a root recovery", async () => {
+	test("settings and safe scalar keys survive a root recovery", async () => {
 		let { account, root: oldRoot } = await seedAccount()
 		let oldRootId = oldRoot.$jazz.id
 		let oldSettingsId = oldRoot.$jazz.raw.get("settings")
 		expect(typeof oldSettingsId).toBe("string")
+		oldRoot.$jazz.set("migrationVersion", undefined)
 
 		account.$jazz.set("root", makeFreshEmptyRoot())
 
 		let { root: currentRoot } = await account.$jazz.ensureLoaded({
 			resolve: { root: true },
 		})
+		currentRoot.$jazz.set("migrationVersion", 2)
 		currentRoot.$jazz.set("language", "de")
 		currentRoot.$jazz.set("lastOpenedDocId", "co_zSomeDocId")
 
@@ -168,6 +170,7 @@ describe("recovery - root pointer overwrite (damage mode a)", () => {
 		expect(restored.$jazz.raw.get("settings")).toBe(oldSettingsId)
 		expect(restored.language).toBe("de")
 		expect(restored.lastOpenedDocId).toBe("co_zSomeDocId")
+		expect(restored.migrationVersion).toBeUndefined()
 	})
 
 	test("doc deleted on the current root is not resurrected as active by a root recovery", async () => {

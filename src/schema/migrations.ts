@@ -1,4 +1,4 @@
-import { Group, co } from "jazz-tools"
+import { Group, co, type ResolveQuery } from "jazz-tools"
 import { Theme } from "@/app/features/themes/lib/schema"
 import {
 	Settings,
@@ -7,6 +7,10 @@ import {
 import { fetchWelcomeContent } from "@/app/features/onboarding/lib/welcome-content"
 import { Document } from "@/app/features/documents/lib/schema"
 import { createDocumentMetadata } from "@/app/features/documents/lib/metadata"
+import {
+	readLastOpenedDocument,
+	writeLastOpenedDocument,
+} from "@/app/features/documents/lib/last-opened-document"
 import { Space } from "@/app/features/spaces/lib/schema"
 import { recordStartupTrace } from "@/app/lib/reload-diagnostics"
 import { UserRoot, UserProfile, type UserAccount } from "@/schema"
@@ -14,6 +18,16 @@ import { UserRoot, UserProfile, type UserAccount } from "@/schema"
 export { runAccountMigration, setMigrationFullDownloadTimeout }
 
 let fullDownloadTimeoutMs = 10_000
+let currentRootMigrationVersion = 2
+// Stale clients can keep writing current roots, so version alone cannot bound replay.
+let rootReplayTransactionBudget = 1_000
+let compactableRootResolve = {
+	documents: true,
+	inactiveDocuments: true,
+	spaces: true,
+	settings: true,
+	themes: true,
+} as const satisfies ResolveQuery<typeof UserRoot>
 
 function setMigrationFullDownloadTimeout(ms: number) {
 	fullDownloadTimeoutMs = ms
@@ -63,7 +77,7 @@ async function initializeNewAccount(
 			"root",
 			UserRoot.create({
 				documents: co.list(Document).create([]),
-				migrationVersion: 1,
+				migrationVersion: currentRootMigrationVersion,
 			}),
 		)
 	}
@@ -116,8 +130,70 @@ async function backfillExistingAccount(
 	let root = loaded.value.root
 	if (!(await isFullyDownloaded(root, "root"))) return "root-timeout"
 
-	addMissingRootCollections(root)
-	return "complete"
+	preserveLastOpenedDocument(account.$jazz.id, root)
+	let migrationIsCurrent =
+		(root.migrationVersion ?? 0) >= currentRootMigrationVersion
+	let replayTransactions =
+		root.$jazz.raw.core.getValidSortedTransactions().length
+	let replayIsBounded = replayTransactions <= rootReplayTransactionBudget
+	recordMigrationTrace("account-migration-root-inspected", {
+		migrationVersion: root.migrationVersion ?? 0,
+		replayTransactions,
+		replayIsBounded,
+	})
+	if (migrationIsCurrent && replayIsBounded) return "current"
+
+	let referencesLoadStartedAt = performance.now()
+	recordMigrationTrace("account-migration-root-references-load:start")
+	let compactable = await withTimeout(
+		account.$jazz.ensureLoaded({
+			resolve: { root: compactableRootResolve },
+		}),
+		fullDownloadTimeoutMs,
+	)
+	recordMigrationTrace("account-migration-root-references-load:complete", {
+		loaded: compactable.ok && Boolean(compactable.value.root),
+		durationMs: millisecondsSince(referencesLoadStartedAt),
+	})
+	if (!compactable.ok || !compactable.value.root)
+		return "root-references-timeout"
+
+	let compactedRoot = compactUserRoot(compactable.value.root)
+	account.$jazz.set("root", compactedRoot)
+	return migrationIsCurrent ? "recompacted" : "compacted"
+}
+
+function preserveLastOpenedDocument(
+	accountId: string,
+	root: co.loaded<typeof UserRoot>,
+) {
+	if (!root.lastOpenedDocId || readLastOpenedDocument(accountId)) return
+	writeLastOpenedDocument(
+		accountId,
+		root.lastOpenedDocId,
+		root.lastOpenedSpaceId,
+	)
+}
+
+function compactUserRoot(
+	root: co.loaded<typeof UserRoot, typeof compactableRootResolve>,
+) {
+	let owner = root.$jazz.owner
+	let values: Parameters<typeof UserRoot.create>[0] = {
+		documents: root.documents,
+		inactiveDocuments:
+			root.inactiveDocuments ?? co.list(Document).create([], owner),
+		spaces: root.spaces ?? co.list(Space).create([], owner),
+		settings:
+			root.settings ??
+			Settings.create({ editor: DEFAULT_EDITOR_SETTINGS }, owner),
+		themes: root.themes ?? co.list(Theme).create([], owner),
+		migrationVersion: currentRootMigrationVersion,
+	}
+	if (root.language) values.language = root.language
+	if (root.lastOpenedDocId) values.lastOpenedDocId = root.lastOpenedDocId
+	if (root.lastOpenedSpaceId) values.lastOpenedSpaceId = root.lastOpenedSpaceId
+	return UserRoot.create(values, owner)
 }
 
 function addMissingRootCollections(root: co.loaded<typeof UserRoot>) {
@@ -212,7 +288,10 @@ async function withTimeout<T>(
 	let timer: ReturnType<typeof setTimeout> | undefined
 	try {
 		return await Promise.race([
-			promise.then(value => ({ ok: true as const, value })),
+			promise.then(
+				value => ({ ok: true as const, value }),
+				() => ({ ok: false as const }),
+			),
 			new Promise<{ ok: false }>(resolve => {
 				timer = setTimeout(() => resolve({ ok: false }), ms)
 			}),

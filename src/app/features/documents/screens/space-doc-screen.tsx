@@ -128,6 +128,7 @@ import { testIds } from "@/app/lib/test-ids"
 import { useIntl } from "@/shared/intl/setup"
 import { makeFolderDocumentContent } from "../lib/folders"
 import { syncDocumentMetadata } from "../lib/metadata"
+import { useDocumentCompaction } from "../hooks/use-document-compaction"
 
 export { SpaceDocScreen, spaceResolve, spaceLoaderResolve, spaceMeResolve }
 export { settingsResolve }
@@ -265,6 +266,14 @@ function SpaceEditorContent({
 		recordStartupTraceOnce("editor-ready", {
 			route: "space-document",
 			contentCharacters: doc.content?.toString().length ?? 0,
+			documentTransactions:
+				doc.$jazz.raw.core.getValidSortedTransactions().length,
+			contentTransactions: doc.content?.$isLoaded
+				? doc.content.$jazz.raw.core.getValidSortedTransactions().length
+				: null,
+			archivedGenerations: doc.archivedContent?.$isLoaded
+				? doc.archivedContent.length
+				: null,
 			assetCount: doc.assets?.length ?? 0,
 			commentCount: doc.comments?.length ?? 0,
 			spaceDocumentCount: space.documents?.length ?? 0,
@@ -316,6 +325,7 @@ function SpaceEditorContent({
 		doc,
 		editorRef: editor,
 	})
+	useDocumentCompaction(doc, !readOnly)
 	let assets =
 		doc.assets?.flatMap(a =>
 			a?.$isLoaded ? [toEditorAsset(a, resolvedTheme)] : [],
@@ -348,7 +358,7 @@ function SpaceEditorContent({
 		initialContent: content,
 	})
 	useEditorSettings(editorSettings)
-	useTrackLastOpened(me, doc)
+	useTrackLastOpened(me.$jazz.id, doc.$jazz.id, doc.spaceId)
 	useHealSpaceDocIds(space, spaceId)
 
 	let docTitle = getDocumentTitle(content)
@@ -374,7 +384,6 @@ function SpaceEditorContent({
 		let cursor = pendingSave.current.cursor
 		pendingSave.current = null
 		applyContentDiffWithCommentAnchors(doc, pendingContent)
-		doc.$jazz.set("updatedAt", new Date())
 		syncDocumentMetadata(doc)
 		if (cursor) {
 			updateCursor(cursor.from, cursor.to)
@@ -483,7 +492,6 @@ function SpaceEditorContent({
 				let cursor = pendingSave.current?.cursor
 				pendingSave.current = null
 				applyContentDiffWithCommentAnchors(doc, newContent)
-				doc.$jazz.set("updatedAt", new Date())
 				syncDocumentMetadata(doc)
 				if (cursor) {
 					updateCursor(cursor.from, cursor.to)
@@ -512,7 +520,6 @@ function SpaceEditorContent({
 
 		if (currentContent !== doc.content.toString()) {
 			applyContentDiffWithCommentAnchors(doc, currentContent)
-			doc.$jazz.set("updatedAt", new Date())
 			syncDocumentMetadata(doc)
 		}
 	}
