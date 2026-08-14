@@ -64,12 +64,21 @@ let metaDescription =
 		</div>
 		<PWA client:only="react" />
 		<script>
+			import { startBrowserStartupInstrumentation } from "@/app/lib/browser-startup-instrumentation"
+
 			let appWindow = window as typeof window & {
 				__pwaColdStartRedirect?: boolean
 				__alkalyeReady?: boolean
 				__alkalyeReadyAt?: number
 				__alkalyeReadyRoute?: string
 				__alkalyeStartupTraceId?: string
+				__alkalyeStartupTraceRecord?: (
+					event: string,
+					details?: Record<string, unknown>,
+				) => void
+				__alkalyeStartupTraceFlush?: () => void
+				__alkalyeStartupTraceClear?: () => void
+				__alkalyeStartupTraceHasCurrentEvent?: (event: string) => boolean
 			}
 			let appNavigator = window.navigator as Navigator & { standalone?: boolean }
 
@@ -78,78 +87,71 @@ let metaDescription =
 			appWindow.__alkalyeReadyRoute = "boot"
 			;(function () {
 				let storageKey = "alkalye:reload-diagnostics"
+				let maximumEntries = 200
 				let runId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 				appWindow.__alkalyeStartupTraceId = runId
 
-				function record(event: string, details: Record<string, unknown> = {}) {
+				function loadEntries(): unknown[] {
 					try {
 						let stored = localStorage.getItem(storageKey)
 						let parsed: unknown = stored ? JSON.parse(stored) : []
-						let entries = Array.isArray(parsed) ? parsed : []
-						entries.push({
-							runId,
-							at: new Date().toISOString(),
-							elapsedMs: Math.round(performance.now() * 10) / 10,
-							event,
-							details,
-						})
-						localStorage.setItem(storageKey, JSON.stringify(entries.slice(-200)))
+						return Array.isArray(parsed) ? parsed : []
+					} catch {
+						return []
+					}
+				}
+
+				let entries = loadEntries()
+				let persistTimer: ReturnType<typeof setTimeout> | undefined
+
+				function persist() {
+					clearTimeout(persistTimer)
+					persistTimer = undefined
+					try {
+						localStorage.setItem(
+							storageKey,
+							JSON.stringify(entries.slice(-maximumEntries)),
+						)
 					} catch {
 						return
 					}
 				}
 
-				try {
-					let originalOpen = indexedDB.open.bind(indexedDB)
-					let restored = false
-					function restoreOpen() {
-						if (restored) return
-						restored = true
-						indexedDB.open = originalOpen
+				function record(event: string, details: Record<string, unknown> = {}) {
+					entries.push({
+						runId,
+						at: new Date().toISOString(),
+						elapsedMs: Math.round(performance.now() * 10) / 10,
+							event,
+							details,
+						})
+					if (entries.length > maximumEntries) {
+						entries = entries.slice(-maximumEntries)
 					}
-					indexedDB.open = function tracedIndexedDbOpen(
-						name: string,
-						version?: number,
-					) {
-						let request =
-							version === undefined
-								? originalOpen(name)
-								: originalOpen(name, version)
-						if (name !== "jazz-storage") return request
-
-						let startedAt = performance.now()
-						record("jazz-indexeddb-open:start", { version: version ?? null })
-						request.addEventListener("upgradeneeded", event => {
-							record("jazz-indexeddb-open:upgrade", {
-								oldVersion: event.oldVersion,
-								newVersion: event.newVersion,
-							})
-						})
-						request.addEventListener("blocked", () =>
-							record("jazz-indexeddb-open:blocked"),
-						)
-						request.addEventListener("success", () => {
-							record("jazz-indexeddb-open:complete", {
-								durationMs:
-									Math.round((performance.now() - startedAt) * 10) / 10,
-								databaseVersion: request.result.version,
-								storeCount: request.result.objectStoreNames.length,
-							})
-							restoreOpen()
-						})
-						request.addEventListener("error", () => {
-							record("jazz-indexeddb-open:error", {
-								durationMs:
-									Math.round((performance.now() - startedAt) * 10) / 10,
-								error: request.error?.name ?? "UnknownError",
-							})
-							restoreOpen()
-						})
-						return request
-					}
-				} catch {
-					record("jazz-indexeddb-instrumentation-unavailable")
+					clearTimeout(persistTimer)
+					persistTimer = setTimeout(persist, 50)
 				}
+
+				appWindow.__alkalyeStartupTraceRecord = record
+				appWindow.__alkalyeStartupTraceFlush = persist
+				appWindow.__alkalyeStartupTraceClear = () => {
+					clearTimeout(persistTimer)
+					persistTimer = undefined
+					entries = []
+					localStorage.removeItem(storageKey)
+				}
+				appWindow.__alkalyeStartupTraceHasCurrentEvent = event =>
+					entries.some(entry => {
+						if (typeof entry !== "object" || entry === null) return false
+						return (
+							"runId" in entry &&
+							entry.runId === runId &&
+							"event" in entry &&
+							entry.event === event
+						)
+					})
+
+				startBrowserStartupInstrumentation(record)
 
 				let navigation = performance.getEntriesByType("navigation")[0]
 				record("boot", {
@@ -189,10 +191,14 @@ let metaDescription =
 						).length,
 					})
 				})
-				addEventListener("beforeunload", () => record("beforeunload"))
-				addEventListener("pagehide", event =>
-					record("pagehide", { persisted: event.persisted }),
-				)
+				addEventListener("beforeunload", () => {
+					record("beforeunload")
+					persist()
+				})
+				addEventListener("pagehide", event => {
+					record("pagehide", { persisted: event.persisted })
+					persist()
+				})
 				addEventListener("pageshow", event =>
 					record("pageshow", { persisted: event.persisted }),
 				)

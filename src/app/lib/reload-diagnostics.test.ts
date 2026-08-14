@@ -19,11 +19,24 @@ describe("startup diagnostics", () => {
 
 	afterEach(() => {
 		vi.unstubAllGlobals()
+		Reflect.deleteProperty(window, "__alkalyeStartupTraceRecord")
+		Reflect.deleteProperty(window, "__alkalyeStartupTraceFlush")
+		Reflect.deleteProperty(window, "__alkalyeStartupTraceClear")
+		Reflect.deleteProperty(window, "__alkalyeStartupTraceHasCurrentEvent")
 		if (originalStorage) {
 			Object.defineProperty(navigator, "storage", originalStorage)
 		} else {
 			Reflect.deleteProperty(navigator, "storage")
 		}
+	})
+
+	test("uses the shared boot recorder without synchronous storage work", () => {
+		let record = vi.fn()
+		window.__alkalyeStartupTraceRecord = record
+
+		recordStartupTrace("booted", { documentCount: 12 })
+
+		expect(record).toHaveBeenCalledWith("booted", { documentCount: 12 })
 	})
 
 	test("records bounded, session-scoped timing entries", () => {
@@ -64,6 +77,7 @@ describe("startup diagnostics", () => {
 		let report: unknown = JSON.parse(reloadDiagnosticsReport())
 		expect(report).toEqual(
 			expect.objectContaining({
+				diagnosticsVersion: 2,
 				currentRunId: "test-run",
 				environment: expect.objectContaining({
 					userAgent: expect.any(String),
@@ -79,6 +93,7 @@ describe("startup diagnostics", () => {
 		Object.defineProperty(navigator, "storage", {
 			configurable: true,
 			value: {
+				persisted: async () => false,
 				estimate: async () => ({
 					usage: 100 * 1024 * 1024,
 					quota: 500 * 1024 * 1024,
@@ -91,13 +106,46 @@ describe("startup diagnostics", () => {
 		})
 
 		let close = vi.fn()
-		let counts = { coValues: 54, transactions: 1200 }
+		let rows = {
+			coValues: [
+				{
+					rowID: 1,
+					id: "co_large",
+					header: {
+						type: "coplaintext",
+						ruleset: { type: "ownedByGroup" },
+						meta: null,
+					},
+				},
+				{
+					rowID: 2,
+					id: "co_small",
+					header: {
+						type: "comap",
+						ruleset: { type: "group" },
+						meta: null,
+					},
+				},
+			],
+			sessions: [
+				{ coValue: 1, lastIdx: 1000 },
+				{ coValue: 1, lastIdx: 100 },
+				{ coValue: 2, lastIdx: 100 },
+			],
+			transactions: [],
+		}
+		let counts = { coValues: 2, sessions: 3, transactions: 1200 }
+		let storeNames = Object.assign(Object.keys(counts), {
+			contains: (name: string) => name in counts,
+		})
 		let database = {
 			version: 7,
-			objectStoreNames: Object.keys(counts),
+			objectStoreNames: storeNames,
 			transaction: () => ({
-				objectStore: (name: keyof typeof counts) => ({
+				objectStoreNames: storeNames,
+				objectStore: (name: keyof typeof rows) => ({
 					count: () => successfulRequest(counts[name]),
+					getAll: () => successfulRequest(rows[name]),
 				}),
 			}),
 			close,
@@ -106,7 +154,9 @@ describe("startup diagnostics", () => {
 			open: () => successfulRequest(database),
 		})
 
-		await collectStorageDiagnostics()
+		await collectStorageDiagnostics([
+			{ id: "co_large", label: "personal-document:0:content" },
+		])
 
 		let entries = readReloadDiagnostics()
 		expect(
@@ -115,6 +165,7 @@ describe("startup diagnostics", () => {
 		).toEqual({
 			usageMegabytes: 100,
 			quotaMegabytes: 500,
+			persisted: false,
 			"usage.indexedDBMegabytes": 80,
 			"usage.cachesMegabytes": 20,
 		})
@@ -123,10 +174,31 @@ describe("startup diagnostics", () => {
 		).toEqual(
 			expect.objectContaining({
 				databaseVersion: 7,
-				storeCount: 2,
-				"records.coValues": 54,
+				storeCount: 3,
+				"records.coValues": 2,
 				"records.transactions": 1200,
 				durationMs: expect.any(Number),
+			}),
+		)
+		expect(
+			entries.find(entry => entry.event === "jazz-indexeddb-distribution")
+				?.details,
+		).toEqual(
+			expect.objectContaining({
+				transactionCountFromSessions: 1200,
+				top1TransactionPercent: 91.7,
+				"transactionsByType.coplaintext": 1100,
+			}),
+		)
+		expect(
+			entries.find(entry => entry.event === "jazz-covalue-transaction-rank")
+				?.details,
+		).toEqual(
+			expect.objectContaining({
+				rank: 1,
+				id: "co_large",
+				label: "personal-document:0:content",
+				transactionCount: 1100,
 			}),
 		)
 		expect(close).toHaveBeenCalledOnce()

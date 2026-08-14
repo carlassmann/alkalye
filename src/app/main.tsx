@@ -20,6 +20,7 @@ import { init } from "@plausible-analytics/tracker"
 import { IntlProvider } from "@/shared/intl/setup"
 import { messagesDe } from "@/shared/intl/messages"
 import { recordStartupTraceOnce } from "@/app/lib/reload-diagnostics"
+import { finishBrowserStartupInstrumentation } from "@/app/lib/browser-startup-instrumentation"
 
 export { PWA, buildSyncConfig }
 
@@ -101,6 +102,7 @@ function RouterWithJazz() {
 		recordStartupTraceOnce("jazz-context-ready", {
 			durationMs: elapsedSince(jazzProviderStartedAt),
 		})
+		finishBrowserStartupInstrumentation()
 		navigator.storage?.estimate().then(estimate => {
 			recordStartupTraceOnce("browser-storage-estimated", {
 				usageMegabytes: bytesToMegabytes(estimate.usage),

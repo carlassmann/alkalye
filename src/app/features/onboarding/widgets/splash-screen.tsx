@@ -10,6 +10,13 @@ declare global {
 		__alkalyeReadyAt?: number
 		__alkalyeReadyRoute?: string
 		__alkalyeStartupTraceId?: string
+		__alkalyeStartupTraceRecord?: (
+			event: string,
+			details?: Record<string, unknown>,
+		) => void
+		__alkalyeStartupTraceFlush?: () => void
+		__alkalyeStartupTraceClear?: () => void
+		__alkalyeStartupTraceHasCurrentEvent?: (event: string) => boolean
 	}
 }
 

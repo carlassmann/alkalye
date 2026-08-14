@@ -8,6 +8,7 @@ import { fetchWelcomeContent } from "@/app/features/onboarding/lib/welcome-conte
 import { Document } from "@/app/features/documents/lib/schema"
 import { createDocumentMetadata } from "@/app/features/documents/lib/metadata"
 import { Space } from "@/app/features/spaces/lib/schema"
+import { recordStartupTrace } from "@/app/lib/reload-diagnostics"
 import { UserRoot, UserProfile, type UserAccount } from "@/schema"
 
 export { runAccountMigration, setMigrationFullDownloadTimeout }
@@ -32,11 +33,25 @@ async function runAccountMigration(
 	account: co.loaded<typeof UserAccount>,
 	creationProps?: { name: string },
 ) {
+	let startedAt = performance.now()
+	recordMigrationTrace("account-migration:start", {
+		creation: Boolean(creationProps),
+	})
 	if (creationProps) {
 		await initializeNewAccount(account, creationProps)
+		recordMigrationTrace("account-migration:complete", {
+			creation: true,
+			outcome: "initialized",
+			durationMs: millisecondsSince(startedAt),
+		})
 		return
 	}
-	await backfillExistingAccount(account)
+	let outcome = await backfillExistingAccount(account)
+	recordMigrationTrace("account-migration:complete", {
+		creation: false,
+		outcome,
+		durationMs: millisecondsSince(startedAt),
+	})
 }
 
 async function initializeNewAccount(
@@ -73,27 +88,36 @@ async function initializeNewAccount(
 	addMissingRootCollections(root)
 }
 
-async function backfillExistingAccount(account: co.loaded<typeof UserAccount>) {
+async function backfillExistingAccount(
+	account: co.loaded<typeof UserAccount>,
+): Promise<string> {
 	// Not a safety guard: the login path never writes to the account map, so
 	// the has("root") early-return below already writes nothing on a streaming
 	// account. Waiting makes has("root") authoritative, so the backfill runs on
 	// a freshly synced login instead of being silently skipped.
-	if (!(await isFullyDownloaded(account))) return
-	if (!account.$jazz.has("root")) return
+	if (!(await isFullyDownloaded(account, "account"))) return "account-timeout"
+	if (!account.$jazz.has("root")) return "root-missing"
 
+	let rootLoadStartedAt = performance.now()
+	recordMigrationTrace("account-migration-root-load:start")
 	let loaded = await withTimeout(
 		account.$jazz.ensureLoaded({ resolve: { root: true } }),
 		fullDownloadTimeoutMs,
 	)
-	if (!loaded.ok || !loaded.value.root) return
+	recordMigrationTrace("account-migration-root-load:complete", {
+		loaded: loaded.ok && Boolean(loaded.value.root),
+		durationMs: millisecondsSince(rootLoadStartedAt),
+	})
+	if (!loaded.ok || !loaded.value.root) return "root-load-timeout"
 
 	// ensureLoaded already only emits completely downloaded CoValues in
 	// jazz-tools 0.20.4 (see CoValueCoreSubscription.isReadyForEmit), but that
 	// is an implementation detail - re-check before trusting missing keys.
 	let root = loaded.value.root
-	if (!(await isFullyDownloaded(root))) return
+	if (!(await isFullyDownloaded(root, "root"))) return "root-timeout"
 
 	addMissingRootCollections(root)
+	return "complete"
 }
 
 function addMissingRootCollections(root: co.loaded<typeof UserRoot>) {
@@ -149,15 +173,36 @@ type SyncableCoValue = {
 // key once the CoValue is fully downloaded; on uncertainty (timeout) skip the
 // backfill entirely, since every backfilled key is optional and harmless when
 // absent.
-async function isFullyDownloaded(value: SyncableCoValue): Promise<boolean> {
+async function isFullyDownloaded(
+	value: SyncableCoValue,
+	phase: "account" | "root",
+): Promise<boolean> {
+	let startedAt = performance.now()
 	let core = value.$jazz.raw.core
-	if (core.isCompletelyDownloaded()) return true
+	let alreadyComplete = core.isCompletelyDownloaded()
+	recordMigrationTrace(`account-migration-${phase}-download:start`, {
+		alreadyComplete,
+	})
+	if (alreadyComplete) {
+		recordMigrationTrace(`account-migration-${phase}-download:complete`, {
+			completed: true,
+			alreadyComplete: true,
+			durationMs: millisecondsSince(startedAt),
+		})
+		return true
+	}
 
 	let streamed = await withTimeout(
 		core.waitForFullStreaming(),
 		fullDownloadTimeoutMs,
 	)
-	return streamed.ok && core.isCompletelyDownloaded()
+	let completed = streamed.ok && core.isCompletelyDownloaded()
+	recordMigrationTrace(`account-migration-${phase}-download:complete`, {
+		completed,
+		alreadyComplete: false,
+		durationMs: millisecondsSince(startedAt),
+	})
+	return completed
 }
 
 async function withTimeout<T>(
@@ -175,4 +220,16 @@ async function withTimeout<T>(
 	} finally {
 		clearTimeout(timer)
 	}
+}
+
+function recordMigrationTrace(
+	event: string,
+	details: Record<string, string | number | boolean> = {},
+): void {
+	if (typeof window === "undefined" || !window.__alkalyeStartupTraceId) return
+	recordStartupTrace(event, details)
+}
+
+function millisecondsSince(startedAt: number): number {
+	return Math.round((performance.now() - startedAt) * 10) / 10
 }

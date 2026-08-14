@@ -1347,7 +1347,10 @@ function ReloadDiagnosticsSection() {
 
 	async function handleCopy() {
 		setCopyState("preparing")
-		await collectStorageDiagnostics()
+		let { collectStartupDiagnosticLabels } =
+			await import("../lib/startup-diagnostic-labels")
+		let labels = await collectStartupDiagnosticLabels()
+		await collectStorageDiagnostics(labels)
 		setEntries(readReloadDiagnostics())
 		let copied = await copyText(reloadDiagnosticsReport())
 		setCopyState(copied ? "copied" : "failed")
