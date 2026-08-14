@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import { z } from "zod"
 import { Document } from "@/schema"
 import { DocScreen, loaderResolve } from "@/app/features/documents"
+import { startStartupSpan } from "@/app/lib/reload-diagnostics"
 
 export { Route }
 
@@ -17,7 +18,15 @@ let Route = createFileRoute("/doc/$id/")({
 	loader: async ({ params }) => {
 		// Block navigation only on what the editor needs to paint; asset
 		// binaries stream in afterwards via the screen's deep subscription.
+		let finishLoad = startStartupSpan("personal-document-loader")
 		let doc = await Document.load(params.id, { resolve: loaderResolve })
+		finishLoad({
+			loaded: doc.$isLoaded,
+			loadingState: doc.$jazz.loadingState,
+			contentCharacters: doc.$isLoaded ? doc.content.toString().length : 0,
+			assetCount: doc.$isLoaded ? (doc.assets?.length ?? 0) : 0,
+			commentCount: doc.$isLoaded ? (doc.comments?.length ?? 0) : 0,
+		})
 		if (!doc.$isLoaded) {
 			return { doc: null, loadingState: doc.$jazz.loadingState }
 		}

@@ -7,6 +7,7 @@ import {
 	loaderResolve,
 	settingsResolve,
 } from "@/app/features/documents"
+import { startStartupSpan } from "@/app/lib/reload-diagnostics"
 
 export { Route }
 
@@ -23,10 +24,19 @@ let Route = createFileRoute("/spaces/$spaceId/doc/$id/")({
 		// Block navigation only on the space's document list and the opened
 		// document; the other documents' contents stream in afterwards via the
 		// screen's deep subscription.
+		let finishCoreLoad = startStartupSpan("space-document-loader")
 		let [space, doc] = await Promise.all([
 			Space.load(params.spaceId, { resolve: spaceLoaderResolve }),
 			Document.load(params.id, { resolve: loaderResolve }),
 		])
+		finishCoreLoad({
+			spaceLoaded: space.$isLoaded,
+			documentLoaded: doc.$isLoaded,
+			spaceDocumentCount: space.$isLoaded ? (space.documents?.length ?? 0) : 0,
+			contentCharacters: doc.$isLoaded ? doc.content.toString().length : 0,
+			assetCount: doc.$isLoaded ? (doc.assets?.length ?? 0) : 0,
+			commentCount: doc.$isLoaded ? (doc.comments?.length ?? 0) : 0,
+		})
 
 		if (!space.$isLoaded) {
 			return {
@@ -46,9 +56,11 @@ let Route = createFileRoute("/spaces/$spaceId/doc/$id/")({
 			}
 		}
 
+		let finishSettings = startStartupSpan("space-settings-load")
 		let me = context.me
 			? await context.me.$jazz.ensureLoaded({ resolve: settingsResolve })
 			: null
+		finishSettings({ loaded: Boolean(me?.$isLoaded) })
 
 		return { space, doc, loadingState: null, me }
 	},

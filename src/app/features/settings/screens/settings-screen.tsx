@@ -1339,15 +1339,19 @@ function AppSection() {
 
 function ReloadDiagnosticsSection() {
 	let [entries, setEntries] = useState(readReloadDiagnostics)
+	let [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle")
 	let latest = entries.at(-1)
 
 	async function handleCopy() {
-		await navigator.clipboard.writeText(reloadDiagnosticsReport())
+		let copied = await copyText(reloadDiagnosticsReport())
+		setCopyState(copied ? "copied" : "failed")
+		setTimeout(() => setCopyState("idle"), 2000)
 	}
 
 	function handleClear() {
 		clearReloadDiagnostics()
 		setEntries([])
+		setCopyState("idle")
 	}
 
 	return (
@@ -1362,8 +1366,16 @@ function ReloadDiagnosticsSection() {
 				<div className="bg-background border-border mb-4 rounded-md border p-3 font-mono text-xs">
 					{latest ? (
 						<>
-							<div>{latest.event}</div>
+							<div className="flex items-center justify-between gap-3">
+								<span>{latest.event}</span>
+								<span className="text-muted-foreground tabular-nums">
+									{latest.elapsedMs} ms
+								</span>
+							</div>
 							<div className="text-muted-foreground mt-1">{latest.at}</div>
+							<div className="text-muted-foreground mt-1">
+								{entries.length} events
+							</div>
 						</>
 					) : (
 						<T k="settings.reloadDiagnostics.empty" />
@@ -1371,8 +1383,22 @@ function ReloadDiagnosticsSection() {
 				</div>
 				<div className="flex gap-2">
 					<Button onClick={handleCopy} variant="outline" size="sm">
-						<Copy className="mr-1.5 size-3.5" />
-						<T k="settings.reloadDiagnostics.copy" />
+						{copyState === "copied" ? (
+							<>
+								<Check className="mr-1.5 size-3.5" />
+								<T k="settings.reloadDiagnostics.copied" />
+							</>
+						) : copyState === "failed" ? (
+							<>
+								<AlertCircle className="mr-1.5 size-3.5" />
+								<T k="settings.reloadDiagnostics.copyFailed" />
+							</>
+						) : (
+							<>
+								<Copy className="mr-1.5 size-3.5" />
+								<T k="settings.reloadDiagnostics.copy" />
+							</>
+						)}
 					</Button>
 					<Button onClick={handleClear} variant="ghost" size="sm">
 						<Trash2 className="mr-1.5 size-3.5" />
@@ -1382,6 +1408,27 @@ function ReloadDiagnosticsSection() {
 			</div>
 		</section>
 	)
+}
+
+async function copyText(value: string): Promise<boolean> {
+	try {
+		if (navigator.clipboard) {
+			await navigator.clipboard.writeText(value)
+			return true
+		}
+	} catch {
+		// The selection fallback supports older standalone iOS web apps.
+	}
+
+	let textarea = document.createElement("textarea")
+	textarea.value = value
+	textarea.style.position = "fixed"
+	textarea.style.opacity = "0"
+	document.body.append(textarea)
+	textarea.select()
+	let copied = document.execCommand("copy")
+	textarea.remove()
+	return copied
 }
 
 function makeExportTheme(

@@ -9,6 +9,7 @@ declare global {
 		__alkalyeReady?: boolean
 		__alkalyeReadyAt?: number
 		__alkalyeReadyRoute?: string
+		__alkalyeStartupTraceId?: string
 	}
 }
 

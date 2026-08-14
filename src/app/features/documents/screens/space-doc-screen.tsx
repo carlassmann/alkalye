@@ -96,6 +96,7 @@ import {
 	Settings,
 	Plus,
 } from "lucide-react"
+import { recordStartupTraceOnce } from "@/app/lib/reload-diagnostics"
 
 import { SidebarViewLinks } from "../widgets/sidebar-view-links"
 import {
@@ -238,6 +239,7 @@ function SpaceEditorContent({
 	docId: string
 	loaderMe: LoadedSettingsMe | null
 }) {
+	let accountDataStartedAt = useRef(performance.now())
 	let t = useIntl()
 	let navigate = useNavigate()
 	let editor = useMarkdownEditorRef()
@@ -259,6 +261,16 @@ function SpaceEditorContent({
 		return () => setAutomationReadyState(false, "space-doc")
 	}, [])
 
+	useEffect(() => {
+		recordStartupTraceOnce("editor-ready", {
+			route: "space-document",
+			contentCharacters: doc.content?.toString().length ?? 0,
+			assetCount: doc.assets?.length ?? 0,
+			commentCount: doc.comments?.length ?? 0,
+			spaceDocumentCount: space.documents?.length ?? 0,
+		})
+	}, [doc, space.documents])
+
 	let { theme, setTheme } = useTheme()
 	let resolvedTheme = useResolvedTheme()
 	let {
@@ -272,6 +284,17 @@ function SpaceEditorContent({
 
 	let isAuthenticated = useIsAuthenticated()
 	let me = useAccount(UserAccount, { resolve: spaceMeResolve })
+	useEffect(() => {
+		if (!me.$isLoaded) return
+		recordStartupTraceOnce("space-account-data-loaded", {
+			personalDocumentCount: me.root.documents?.length ?? 0,
+			spaceDocumentCount: space.documents?.length ?? 0,
+			hasSettings: Boolean(me.root.settings?.$isLoaded),
+			durationMs:
+				Math.round((performance.now() - accountDataStartedAt.current) * 10) /
+				10,
+		})
+	}, [me, space.documents])
 
 	let editorSettings =
 		me.$isLoaded && me.root?.settings?.$isLoaded

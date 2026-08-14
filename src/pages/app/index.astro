@@ -69,6 +69,7 @@ let metaDescription =
 				__alkalyeReady?: boolean
 				__alkalyeReadyAt?: number
 				__alkalyeReadyRoute?: string
+				__alkalyeStartupTraceId?: string
 			}
 			let appNavigator = window.navigator as Navigator & { standalone?: boolean }
 
@@ -77,14 +78,22 @@ let metaDescription =
 			appWindow.__alkalyeReadyRoute = "boot"
 			;(function () {
 				let storageKey = "alkalye:reload-diagnostics"
+				let runId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+				appWindow.__alkalyeStartupTraceId = runId
 
 				function record(event: string, details: Record<string, unknown> = {}) {
 					try {
 						let stored = localStorage.getItem(storageKey)
 						let parsed: unknown = stored ? JSON.parse(stored) : []
 						let entries = Array.isArray(parsed) ? parsed : []
-						entries.push({ at: new Date().toISOString(), event, details })
-						localStorage.setItem(storageKey, JSON.stringify(entries.slice(-100)))
+						entries.push({
+							runId,
+							at: new Date().toISOString(),
+							elapsedMs: Math.round(performance.now() * 10) / 10,
+							event,
+							details,
+						})
+						localStorage.setItem(storageKey, JSON.stringify(entries.slice(-200)))
 					} catch {
 						return
 					}
@@ -96,6 +105,37 @@ let metaDescription =
 					navigationType:
 						navigation && "type" in navigation ? navigation.type : "unknown",
 					visibility: document.visibilityState,
+					online: navigator.onLine,
+					standalone:
+						matchMedia("(display-mode: standalone)").matches ||
+						appNavigator.standalone === true,
+					serviceWorkerControlled: Boolean(navigator.serviceWorker?.controller),
+				})
+				addEventListener("DOMContentLoaded", () =>
+					record("dom-content-loaded"),
+				)
+				addEventListener("load", () => {
+					let timing = performance.getEntriesByType("navigation")[0]
+					let resources = performance.getEntriesByType("resource")
+					record("window-loaded", {
+						domInteractiveMs:
+							timing &&
+							"domInteractive" in timing &&
+							typeof timing.domInteractive === "number"
+								? Math.round(timing.domInteractive)
+								: null,
+						loadEventMs:
+							timing &&
+							"loadEventEnd" in timing &&
+							typeof timing.loadEventEnd === "number"
+								? Math.round(timing.loadEventEnd)
+								: null,
+						resourceCount: resources.length,
+						scriptCount: resources.filter(
+							resource =>
+								"initiatorType" in resource && resource.initiatorType === "script",
+						).length,
+					})
 				})
 				addEventListener("beforeunload", () => record("beforeunload"))
 				addEventListener("pagehide", event =>
@@ -112,19 +152,6 @@ let metaDescription =
 				)
 				addEventListener("unhandledrejection", event =>
 					record("unhandledrejection", { reason: String(event.reason) }),
-				)
-				addEventListener(
-					"click",
-					event => {
-						let target = event.target
-						if (!(target instanceof Element)) return
-						let link = target.closest("a[href]")
-						record("click", {
-							tag: target.tagName,
-							href: link?.getAttribute("href") ?? null,
-						})
-					},
-					{ capture: true },
 				)
 				navigator.serviceWorker?.addEventListener("controllerchange", () =>
 					record("service-worker-controllerchange"),

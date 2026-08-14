@@ -130,6 +130,7 @@ import { testIds } from "@/app/lib/test-ids"
 import { useIntl } from "@/shared/intl/setup"
 import { makeFolderDocumentContent } from "../lib/folders"
 import { createDocumentMetadata, syncDocumentMetadata } from "../lib/metadata"
+import { recordStartupTraceOnce } from "@/app/lib/reload-diagnostics"
 
 export { DocScreen, personalMeResolve }
 
@@ -236,6 +237,7 @@ type LoadedMe = ReturnType<
 >
 
 function EditorContent({ doc, docId }: EditorContentProps) {
+	let accountDataStartedAt = useRef(performance.now())
 	let t = useIntl()
 	let navigate = useNavigate()
 	let editor = useMarkdownEditorRef()
@@ -257,6 +259,15 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 		return () => setAutomationReadyState(false, "personal-doc")
 	}, [])
 
+	useEffect(() => {
+		recordStartupTraceOnce("editor-ready", {
+			route: "personal-document",
+			contentCharacters: doc.content.toString().length,
+			assetCount: doc.assets?.length ?? 0,
+			commentCount: doc.comments?.length ?? 0,
+		})
+	}, [doc])
+
 	let { theme, setTheme } = useTheme()
 	let resolvedTheme = useResolvedTheme()
 	let {
@@ -270,6 +281,16 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 
 	let isAuthenticated = useIsAuthenticated()
 	let me = useAccount(UserAccount, { resolve: personalMeResolve })
+	useEffect(() => {
+		if (!me.$isLoaded) return
+		recordStartupTraceOnce("personal-account-data-loaded", {
+			documentCount: me.root.documents?.length ?? 0,
+			hasSettings: Boolean(me.root.settings?.$isLoaded),
+			durationMs:
+				Math.round((performance.now() - accountDataStartedAt.current) * 10) /
+				10,
+		})
+	}, [me])
 
 	let editorSettings =
 		me.$isLoaded && me.root?.settings?.$isLoaded ? me.root.settings : undefined

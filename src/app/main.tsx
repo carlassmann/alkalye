@@ -1,5 +1,6 @@
 import { StrictMode, useEffect } from "react"
 import { JazzReactProvider, useAccount } from "jazz-tools/react"
+import { co } from "jazz-tools"
 import { createRouter, RouterProvider } from "@tanstack/react-router"
 import { PUBLIC_JAZZ_SYNC_SERVER } from "astro:env/client"
 import { Toaster } from "sonner"
@@ -18,10 +19,13 @@ import { installRecoveryConsole } from "@/app/features/recovery"
 import { init } from "@plausible-analytics/tracker"
 import { IntlProvider } from "@/shared/intl/setup"
 import { messagesDe } from "@/shared/intl/messages"
+import { recordStartupTraceOnce } from "@/app/lib/reload-diagnostics"
 
 export { PWA, buildSyncConfig }
 
 init({ domain: "alkalye.com" })
+let appBundleEvaluatedAt = performance.now()
+recordStartupTraceOnce("app-bundle-evaluated")
 
 let router = createRouter({
 	basepath: "/app",
@@ -57,6 +61,7 @@ function buildSyncConfig(): JazzSyncConfig {
 }
 
 function PWA() {
+	recordStartupTraceOnce("react-root-rendering")
 	return (
 		<StrictMode>
 			<JazzReactProvider
@@ -90,6 +95,25 @@ function RouterWithJazz() {
 	useCleanupDeleted()
 
 	useEffect(() => {
+		recordStartupTraceOnce("react-mounted")
+		navigator.storage?.estimate().then(estimate => {
+			recordStartupTraceOnce("browser-storage-estimated", {
+				usageMegabytes: bytesToMegabytes(estimate.usage),
+				quotaMegabytes: bytesToMegabytes(estimate.quota),
+			})
+		})
+	}, [])
+
+	useEffect(() => {
+		if (!me.$isLoaded) return
+		recordStartupTraceOnce("jazz-account-root-loaded", {
+			loadingState: me.$jazz.loadingState,
+			hasRoot: Boolean(me.root),
+			durationMs: elapsedSince(appBundleEvaluatedAt),
+		})
+	}, [me])
+
+	useEffect(() => {
 		if (!me.$isLoaded || !requestedLocale) return
 		if (me.root?.language !== requestedLocale) {
 			me.root?.$jazz.set("language", requestedLocale)
@@ -114,7 +138,7 @@ function RouterWithJazz() {
 			    read context.me at navigation time and never re-run when it
 			    changes, so an early navigation with me=null would render an
 			    empty screen forever. */}
-			{me.$isLoaded && <RouterProvider router={router} context={{ me }} />}
+			{me.$isLoaded && <TracedRouterProvider me={me} />}
 		</>
 	)
 
@@ -127,6 +151,18 @@ function RouterWithJazz() {
 	) : (
 		<IntlProvider>{intlWrapped}</IntlProvider>
 	)
+}
+
+function TracedRouterProvider({
+	me,
+}: {
+	me: co.loaded<typeof UserAccount, { root: true }>
+}) {
+	useEffect(() => {
+		recordStartupTraceOnce("router-mounted", { path: window.location.pathname })
+	}, [])
+
+	return <RouterProvider router={router} context={{ me }} />
 }
 
 function LocalJazzPoke() {
@@ -162,4 +198,13 @@ function clearRequestedLocale() {
 	let url = new URL(window.location.href)
 	url.searchParams.delete("lang")
 	window.history.replaceState(window.history.state, "", url)
+}
+
+function bytesToMegabytes(bytes: number | undefined): number {
+	if (!bytes) return 0
+	return Math.round((bytes / 1024 / 1024) * 10) / 10
+}
+
+function elapsedSince(startedAt: number): number {
+	return Math.round((performance.now() - startedAt) * 10) / 10
 }

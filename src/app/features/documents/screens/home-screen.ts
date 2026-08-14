@@ -3,6 +3,7 @@ import { Group, co, type ResolveQuery } from "jazz-tools"
 import { UserAccount } from "@/schema"
 import { CommentThread, Document } from "../lib/schema"
 import { createDocumentMetadata } from "../lib/metadata"
+import { startStartupSpan } from "@/app/lib/reload-diagnostics"
 
 export {
 	homeLoader,
@@ -38,11 +39,18 @@ async function homeLoader({ context, deps }: HomeLoaderArgs) {
 	if (!me) return null
 
 	if (!deps.personal) {
+		let finishLastOpened = startStartupSpan("home-last-opened-load")
 		let loaded = await me.$jazz.ensureLoaded({ resolve: homeLastOpenedQuery })
 		let { lastOpenedDocId, lastOpenedSpaceId } = loaded.root ?? {}
+		finishLastOpened({ hasLastOpenedDocument: Boolean(lastOpenedDocId) })
 
 		if (lastOpenedDocId) {
+			let finishDocument = startStartupSpan("home-last-document-load")
 			let doc = await Document.load(lastOpenedDocId)
+			finishDocument({
+				loaded: doc.$isLoaded,
+				loadingState: doc.$jazz.loadingState,
+			})
 			if (doc.$isLoaded && !doc.deletedAt) {
 				if (lastOpenedSpaceId) {
 					throw redirect({
@@ -58,8 +66,13 @@ async function homeLoader({ context, deps }: HomeLoaderArgs) {
 		}
 	}
 
+	let finishDocuments = startStartupSpan("home-documents-load")
 	let loadedMe = await me.$jazz.ensureLoaded({ resolve: homeDocumentsQuery })
 	let docs = loadedMe.root?.documents
+	finishDocuments({
+		loaded: Boolean(docs?.$isLoaded),
+		documentCount: docs?.$isLoaded ? docs.length : 0,
+	})
 	if (!docs?.$isLoaded) return null
 
 	let fallbackDoc = findFallbackHomeDocument(Array.from(docs))
