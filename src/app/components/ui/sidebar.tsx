@@ -478,7 +478,7 @@ function SidebarMenuButton({
 			data-active={isActive}
 			nativeButton={nativeButton}
 			className={cn(
-				"peer/menu-button ring-sidebar-ring pointer-fine:hover:bg-sidebar-accent pointer-fine:hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground data-[active=true]:bg-foreground data-[active=true]:text-background flex w-full items-center gap-2 overflow-hidden rounded-none p-2 text-left text-sm transition-[width,height] outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:font-medium [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+				"peer/menu-button ring-sidebar-ring pointer-fine:hover:bg-sidebar-accent pointer-fine:hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground flex w-full items-center gap-2 overflow-hidden rounded-none p-2 text-left text-sm transition-[width,height] outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:font-medium [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
 				size === "sm" && "h-9 text-xs pointer-fine:h-7",
 				size === "lg" && "h-12 text-sm",
 				className,
