@@ -6,6 +6,11 @@ import * as Option from "effect/Option"
 import { co } from "jazz-tools"
 import { createPersonalDocument } from "@/app/features/documents"
 import { getDocumentTitle } from "@/app/features/documents"
+import { applyContentDiffWithCommentAnchors } from "@/app/features/comments"
+import {
+	compactDocumentContent,
+	replaceDocumentContentGeneration,
+} from "@/app/features/documents/lib/document-generations"
 import { moveDocumentToSpace } from "@/app/features/documents"
 import { parseInviteLink } from "@/app/features/sharing"
 import { parseSpaceInviteLink } from "@/app/features/spaces"
@@ -33,12 +38,14 @@ export {
 	loadAccount,
 	listDocs,
 	findDocument,
+	compactCliDocument,
+	replaceCliDocumentContent,
 	loadDocumentContent,
+	loadDocumentForMutation,
 	loadDocumentMetadata,
 	findSpace,
 	createSpaceScopedDoc,
 	summarizeDoc,
-	maybeSync,
 	syncMutation,
 	readRequiredContentInput,
 	readRequiredSecretInput,
@@ -65,6 +72,7 @@ type LoadedCliDocumentMetadata = co.loaded<
 type MaybeLoadedCliDocumentMetadata = Awaited<
 	ReturnType<typeof loadRawDocumentMetadata>
 >
+type MaybeLoadedCliDocument = Awaited<ReturnType<typeof loadRawDocument>>
 type FreshnessOptions = {
 	allowStale: boolean
 	timeoutMs: number
@@ -121,20 +129,12 @@ async function loadAccount(jazz: JazzContext, timeoutMs: number = 10_000) {
 		resolve: {
 			profile: true,
 			root: {
-				documents: {
-					$each: { content: true, comments: { $each: { replies: true } } },
-				},
-				inactiveDocuments: {
-					$each: { content: true, comments: { $each: { replies: true } } },
-				},
+				documents: true,
+				inactiveDocuments: true,
 				spaces: {
 					$each: {
-						documents: {
-							$each: {
-								content: true,
-								comments: { $each: { replies: true } },
-							},
-						},
+						$onError: "catch",
+						documents: true,
 					},
 				},
 			},
@@ -146,16 +146,25 @@ async function listDocs(
 	account: LoadedAccount,
 	scopeValue: string | undefined,
 	deleted: boolean,
+	timeoutMs: number = 10_000,
 ) {
 	let scope = parseScope(scopeValue)
-	let entries = collectDocsForScope(account, scope)
+	let entries = await Promise.all(
+		collectDocsForScope(account, scope, deleted).map(async entry => ({
+			doc: await loadDocumentSummary(entry.doc.$jazz.id, timeoutMs),
+			spaceId: entry.spaceId,
+		})),
+	)
+	let loadedEntries = entries
 		.flatMap(entry =>
 			entry.doc ? [{ doc: entry.doc, spaceId: entry.spaceId }] : [],
 		)
 		.filter(entry =>
 			deleted ? Boolean(entry.doc.deletedAt) : !entry.doc.deletedAt,
 		)
-	let summaries = entries.map(entry => summarizeDoc(entry.doc, entry.spaceId))
+	let summaries = loadedEntries.map(entry =>
+		summarizeDoc(entry.doc, entry.spaceId),
+	)
 	return summaries.sort((left, right) =>
 		right.updatedAt.localeCompare(left.updatedAt),
 	)
@@ -173,6 +182,7 @@ async function findDocument(account: LoadedAccount, docId: string) {
 		}
 	}
 	for (let space of account.root.spaces ?? []) {
+		if (!space?.$isLoaded) continue
 		for (let doc of space.documents) {
 			if (doc?.$jazz.id === docId) {
 				return { doc: await ensureDocLoaded(doc), space }
@@ -180,6 +190,67 @@ async function findDocument(account: LoadedAccount, docId: string) {
 		}
 	}
 	throw new NotFoundError({ message: `Document not found: ${docId}` })
+}
+
+async function compactCliDocument(
+	doc: LoadedCliDocument,
+	transactionBudget?: number,
+) {
+	let compactable = await loadCompactableCliDocument(doc)
+	return compactDocumentContent(compactable, transactionBudget)
+}
+
+async function replaceCliDocumentContent(
+	doc: LoadedCliDocument,
+	content: string,
+) {
+	let currentContent = doc.content.toString()
+	if (currentContent === content) return
+	if (getChangedContentSpan(currentContent, content) > 4_000) {
+		let compactable = await loadCompactableCliDocument(doc)
+		if (await replaceDocumentContentGeneration(compactable, content)) return
+		throw new SyncPeerError({
+			message:
+				"Large document replacement could not establish a safe generation cutover. Retry after sync completes and collaborators disconnect.",
+		})
+	}
+	applyContentDiffWithCommentAnchors(doc, content)
+	await compactCliDocument(doc)
+}
+
+async function loadCompactableCliDocument(doc: LoadedCliDocument) {
+	return doc.$jazz.ensureLoaded({
+		resolve: {
+			content: true,
+			comments: { $each: true },
+			cursors: true,
+			archivedContent: { $each: true, $onError: "catch" },
+		},
+	})
+}
+
+function getChangedContentSpan(currentContent: string, nextContent: string) {
+	let prefix = 0
+	let sharedLength = Math.min(currentContent.length, nextContent.length)
+	while (
+		prefix < sharedLength &&
+		currentContent[prefix] === nextContent[prefix]
+	) {
+		prefix++
+	}
+
+	let suffix = 0
+	while (
+		suffix < sharedLength - prefix &&
+		currentContent[currentContent.length - suffix - 1] ===
+			nextContent[nextContent.length - suffix - 1]
+	) {
+		suffix++
+	}
+	return Math.max(
+		currentContent.length - prefix - suffix,
+		nextContent.length - prefix - suffix,
+	)
 }
 
 async function loadDocumentMetadata(
@@ -213,9 +284,27 @@ async function loadDocumentContent(
 	return doc
 }
 
+async function loadDocumentForMutation(
+	jazz: JazzContext,
+	docId: string,
+	timeoutMs: number,
+): Promise<LoadedCliDocument> {
+	await waitForRemote(jazz, docId, timeoutMs)
+	let options = { allowStale: false, timeoutMs }
+	let doc = await withTimeout(
+		loadRawDocument(docId),
+		timeoutMs,
+		`Remote sync timed out while loading target document ${docId} after ${timeoutMs}ms.`,
+	)
+	assertLoadedDocument(docId, doc)
+	await waitForTargetSync(doc, "document", options)
+	await waitForTargetSync(doc.content, "document content", options)
+	return doc
+}
+
 function findSpace(account: LoadedAccount, spaceId: string) {
 	let space = account.root.spaces?.find(item => item?.$jazz.id === spaceId)
-	if (!space) {
+	if (!space?.$isLoaded) {
 		throw new NotFoundError({ message: `Space not found: ${spaceId}` })
 	}
 	return space
@@ -239,6 +328,7 @@ async function createSpaceScopedDoc(
 function summarizeDoc(
 	doc: {
 		$jazz: { id: string }
+		title?: string
 		content?: { toString(): string }
 		createdAt: Date
 		updatedAt: Date
@@ -249,7 +339,7 @@ function summarizeDoc(
 ) {
 	return {
 		docId: doc.$jazz.id,
-		title: getDocumentTitle(doc),
+		title: doc.title ?? getDocumentTitle(doc),
 		spaceId: spaceId ?? doc.spaceId ?? null,
 		createdAt: doc.createdAt.toISOString(),
 		updatedAt: doc.updatedAt.toISOString(),
@@ -257,20 +347,13 @@ function summarizeDoc(
 	}
 }
 
-async function maybeSync(
-	account: JazzContext["account"],
-	enabled: boolean,
-	timeoutMs: number,
-) {
-	if (!enabled) return
-	await account.$jazz.waitForAllCoValuesSync({ timeout: timeoutMs })
-}
-
-async function syncMutation(
-	account: JazzContext["account"],
-	timeoutMs: number,
-) {
-	await account.$jazz.waitForAllCoValuesSync({ timeout: timeoutMs })
+async function syncMutation(jazz: JazzContext, timeoutMs: number) {
+	await jazz.account.$jazz.waitForAllCoValuesSync({ timeout: timeoutMs })
+	if (!jazz.isConnected()) {
+		throw new SyncPeerError({
+			message: "Sync connection lost before the write was confirmed.",
+		})
+	}
 }
 
 async function readRequiredContentInput(
@@ -379,21 +462,27 @@ function resolveFlags(args: GlobalArgs) {
 function collectDocsForScope(
 	account: LoadedAccount,
 	scope: ReturnType<typeof parseScope>,
+	includeInactive: boolean,
 ) {
 	if (scope.kind === "space") {
 		let space = findSpace(account, scope.spaceId)
 		return space.documents.map(doc => ({ doc, spaceId: space.$jazz.id }))
 	}
-	let personal = [
-		...account.root.documents,
-		...(account.root.inactiveDocuments ?? []),
-	].map(doc => ({ doc, spaceId: null as string | null }))
+	let personalDocuments = includeInactive
+		? [...account.root.documents, ...(account.root.inactiveDocuments ?? [])]
+		: account.root.documents
+	let personal = personalDocuments.map(doc => ({
+		doc,
+		spaceId: null as string | null,
+	}))
 	if (scope.kind === "personal") return personal
 	let spaceDocs = (account.root.spaces ?? []).flatMap(space =>
-		space.documents.map(doc => ({
-			doc,
-			spaceId: space.$jazz.id as string | null,
-		})),
+		space?.$isLoaded
+			? space.documents.map(doc => ({
+					doc,
+					spaceId: space.$jazz.id as string | null,
+				}))
+			: [],
 	)
 	return [...personal, ...spaceDocs]
 }
@@ -434,23 +523,15 @@ async function readStdin(): Promise<string> {
 	return Buffer.concat(chunks).toString("utf8")
 }
 
-async function ensureDocLoaded(
-	doc:
-		| LoadedCliDocument
-		| {
-				$jazz: {
-					ensureLoaded(args: {
-						resolve: CliDocumentResolve
-					}): Promise<LoadedCliDocument>
-				}
-		  },
-): Promise<LoadedCliDocument> {
-	if ("content" in doc) {
-		return doc
-	}
-	return doc.$jazz.ensureLoaded({
+async function ensureDocLoaded(doc: {
+	$jazz: { id: string }
+}): Promise<LoadedCliDocument> {
+	let loaded = await Document.load(doc.$jazz.id, {
 		resolve: { content: true, comments: { $each: { replies: true } } },
+		skipRetry: true,
 	})
+	assertLoadedDocument(doc.$jazz.id, loaded)
+	return loaded
 }
 
 async function waitForRemote(
@@ -520,10 +601,50 @@ function loadRawDocumentMetadata(docId: string) {
 	return Document.load(docId, { resolve: { content: true } })
 }
 
+function loadRawDocument(docId: string) {
+	return Document.load(docId, {
+		resolve: { content: true, comments: { $each: { replies: true } } },
+	})
+}
+
+async function loadDocumentSummary(docId: string, timeoutMs: number) {
+	return new Promise<co.loaded<typeof Document> | null>(resolve => {
+		let unsubscribe: (() => void) | undefined
+		let settled = false
+		let timeout = setTimeout(() => {
+			if (settled) return
+			settled = true
+			unsubscribe?.()
+			resolve(null)
+		}, timeoutMs)
+		function finish(doc: co.loaded<typeof Document> | null) {
+			if (settled) return
+			settled = true
+			clearTimeout(timeout)
+			unsubscribe?.()
+			resolve(doc)
+		}
+		unsubscribe = Document.subscribe(
+			docId,
+			{ resolve: {}, onError: () => finish(null) },
+			doc => finish(doc),
+		)
+		if (settled) unsubscribe()
+	})
+}
+
 function assertLoadedDocumentMetadata(
 	docId: string,
 	doc: MaybeLoadedCliDocumentMetadata,
 ): asserts doc is LoadedCliDocumentMetadata {
+	if (doc.$isLoaded) return
+	throwDocumentLoadError(docId, doc.$jazz.loadingState)
+}
+
+function assertLoadedDocument(
+	docId: string,
+	doc: MaybeLoadedCliDocument,
+): asserts doc is LoadedCliDocument {
 	if (doc.$isLoaded) return
 	throwDocumentLoadError(docId, doc.$jazz.loadingState)
 }

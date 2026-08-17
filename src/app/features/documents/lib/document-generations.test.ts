@@ -71,6 +71,52 @@ describe("document content generations", () => {
 		})
 	})
 
+	test("preserves long comment positions during compaction", async () => {
+		let selected = "x".repeat(1_500)
+		let content = `Before ${selected} after`
+		let doc = await createPersonalDocument(account, content)
+		let loaded = await doc.$jazz.ensureLoaded({
+			resolve: { content: true, comments: { $each: true }, cursors: true },
+		})
+		let thread = createCommentThread(
+			loaded,
+			{ from: 7, to: 7 + selected.length },
+			"Long selection",
+		)
+		if (!thread) throw new Error("Comment not created")
+
+		expect(await compactDocumentContent(loaded, 0)).toBe(true)
+		expect(getCommentRange(loaded, thread.anchor)).toEqual({
+			from: 7,
+			to: 7 + selected.length,
+			orphaned: false,
+		})
+	})
+
+	test("allows the successor seed in addition to the edit budget", async () => {
+		let doc = await createPersonalDocument(account, "Version 1")
+		let loaded = await doc.$jazz.ensureLoaded({
+			resolve: { content: true, comments: { $each: true }, cursors: true },
+		})
+		applyContentDiffWithCommentAnchors(loaded, "Version 2")
+		applyContentDiffWithCommentAnchors(loaded, "Version 3")
+		expect(await compactDocumentContent(loaded, 1)).toBe(true)
+
+		let reloaded = await Document.load(loaded.$jazz.id, {
+			resolve: {
+				content: true,
+				comments: { $each: true },
+				cursors: true,
+				archivedContent: { $each: true, $onError: "catch" },
+			},
+		})
+		if (!reloaded.$isLoaded) throw new Error("Document not reloaded")
+		applyContentDiffWithCommentAnchors(reloaded, "Version 4")
+
+		expect(await compactDocumentContent(reloaded, 1)).toBe(false)
+		expect(reloaded.archivedContent).toHaveLength(1)
+	})
+
 	test("Time Machine stitches archived and active generations", async () => {
 		let doc = await createPersonalDocument(account, "Version 1")
 		let loaded = await doc.$jazz.ensureLoaded({
@@ -140,6 +186,7 @@ describe("document content generations", () => {
 		})
 		applyContentDiffWithCommentAnchors(loaded, "Generation 2")
 		await compactDocumentContent(loaded, 1)
+		applyContentDiffWithCommentAnchors(loaded, "Generation 2.5")
 		applyContentDiffWithCommentAnchors(loaded, "Generation 3")
 		await compactDocumentContent(loaded, 1)
 

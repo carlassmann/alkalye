@@ -118,7 +118,9 @@ let staleOkOption = Options.boolean("stale-ok").pipe(
 	Options.withDescription("Allow cached data if remote sync is incomplete."),
 )
 let syncOption = Options.boolean("sync").pipe(
-	Options.withDescription("Wait for remote sync before exiting."),
+	Options.withDescription(
+		"Compatibility flag; mutations always wait for remote durability.",
+	),
 )
 let passphraseOption = Options.optional(Options.text("passphrase"))
 let passphraseFileOption = Options.optional(Options.file("passphrase-file"))

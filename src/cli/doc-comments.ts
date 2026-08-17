@@ -43,7 +43,7 @@ let docCommentList = Command.make(
 	args =>
 		runCommand("doc.comment.list", args, async config => {
 			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz)
+			let account = await loadAccount(jazz, config.timeoutMs)
 			let located = await findDocument(account, args.docId)
 			let data = {
 				docId: located.doc.$jazz.id,
@@ -70,7 +70,7 @@ let docCommentAdd = Command.make(
 	args =>
 		runCommand("doc.comment.add", args, async config => {
 			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz)
+			let account = await loadAccount(jazz, config.timeoutMs)
 			let located = await findDocument(account, args.docId)
 			requireDocumentEdit(located.doc)
 			if (!areCommentsEnabled(located.doc)) {
@@ -113,7 +113,7 @@ let docCommentAdd = Command.make(
 				})
 			}
 
-			await syncMutation(jazz.account, config.timeoutMs)
+			await syncMutation(jazz, config.timeoutMs)
 			await jazz.done()
 			return summarizeCommentThread(located.doc, thread)
 		}),
@@ -130,7 +130,7 @@ let docCommentReply = Command.make(
 	args =>
 		runCommand("doc.comment.reply", args, async config => {
 			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz)
+			let account = await loadAccount(jazz, config.timeoutMs)
 			let located = await findDocument(account, args.docId)
 			requireDocumentEdit(located.doc)
 			if (!args.body.trim()) {
@@ -138,7 +138,7 @@ let docCommentReply = Command.make(
 			}
 			let thread = findCommentThread(located.doc, args.commentId)
 			addCommentReply(thread, args.body, account.profile.name)
-			await syncMutation(jazz.account, config.timeoutMs)
+			await syncMutation(jazz, config.timeoutMs)
 			await jazz.done()
 			return summarizeCommentThread(located.doc, thread)
 		}),
@@ -154,12 +154,12 @@ let docCommentResolve = Command.make(
 	args =>
 		runCommand("doc.comment.resolve", args, async config => {
 			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz)
+			let account = await loadAccount(jazz, config.timeoutMs)
 			let located = await findDocument(account, args.docId)
 			requireDocumentEdit(located.doc)
 			let thread = findCommentThread(located.doc, args.commentId)
 			resolveCommentThread(thread)
-			await syncMutation(jazz.account, config.timeoutMs)
+			await syncMutation(jazz, config.timeoutMs)
 			await jazz.done()
 			return summarizeCommentThread(located.doc, thread)
 		}),
@@ -175,12 +175,12 @@ let docCommentReopen = Command.make(
 	args =>
 		runCommand("doc.comment.reopen", args, async config => {
 			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz)
+			let account = await loadAccount(jazz, config.timeoutMs)
 			let located = await findDocument(account, args.docId)
 			requireDocumentEdit(located.doc)
 			let thread = findCommentThread(located.doc, args.commentId)
 			reopenCommentThread(thread)
-			await syncMutation(jazz.account, config.timeoutMs)
+			await syncMutation(jazz, config.timeoutMs)
 			await jazz.done()
 			return summarizeCommentThread(located.doc, thread)
 		}),
@@ -196,12 +196,12 @@ let docCommentDelete = Command.make(
 	args =>
 		runCommand("doc.comment.delete", args, async config => {
 			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz)
+			let account = await loadAccount(jazz, config.timeoutMs)
 			let located = await findDocument(account, args.docId)
 			requireDocumentEdit(located.doc)
 			let thread = findCommentThread(located.doc, args.commentId)
 			deleteCommentThread(thread)
-			await syncMutation(jazz.account, config.timeoutMs)
+			await syncMutation(jazz, config.timeoutMs)
 			await jazz.done()
 			return {
 				docId: located.doc.$jazz.id,
@@ -220,11 +220,11 @@ let docCommentEnable = Command.make(
 	args =>
 		runCommand("doc.comment.enable", args, async config => {
 			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz)
+			let account = await loadAccount(jazz, config.timeoutMs)
 			let located = await findDocument(account, args.docId)
 			requireDocumentEdit(located.doc)
 			setCommentsEnabled(located.doc, true)
-			await syncMutation(jazz.account, config.timeoutMs)
+			await syncMutation(jazz, config.timeoutMs)
 			await jazz.done()
 			return { docId: located.doc.$jazz.id, commentsEnabled: true }
 		}),
@@ -239,11 +239,11 @@ let docCommentDisable = Command.make(
 	args =>
 		runCommand("doc.comment.disable", args, async config => {
 			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz)
+			let account = await loadAccount(jazz, config.timeoutMs)
 			let located = await findDocument(account, args.docId)
 			requireDocumentEdit(located.doc)
 			setCommentsEnabled(located.doc, false)
-			await syncMutation(jazz.account, config.timeoutMs)
+			await syncMutation(jazz, config.timeoutMs)
 			await jazz.done()
 			return { docId: located.doc.$jazz.id, commentsEnabled: false }
 		}),

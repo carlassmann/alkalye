@@ -3,6 +3,7 @@ import { diff } from "fast-myers-diff"
 import { ArchivedDocumentContent, Document } from "./schema"
 import {
 	applyContentDiffWithCommentAnchors,
+	replaceDocumentContentMappingAnchors,
 	replaceDocumentContentPreservingAnchors,
 } from "@/app/features/comments"
 import {
@@ -13,6 +14,7 @@ import {
 export {
 	DOCUMENT_CONTENT_TRANSACTION_BUDGET,
 	compactDocumentContent,
+	replaceDocumentContentGeneration,
 	reconcileArchivedDocumentContent,
 	getDocumentContentGenerations,
 	mergeNonConflictingText,
@@ -54,7 +56,8 @@ async function compactDocumentContent(
 ) {
 	let transactionCount =
 		doc.content.$jazz.raw.core.getValidSortedTransactions().length
-	if (transactionCount <= transactionBudget) return false
+	let seedTransactionCount = getSuccessorSeedTransactionCount(doc)
+	if (transactionCount <= transactionBudget + seedTransactionCount) return false
 	let finish = startStartupSpan("document-content-compaction", {
 		documentId: doc.$jazz.id,
 		contentId: doc.content.$jazz.id,
@@ -68,7 +71,7 @@ async function compactDocumentContent(
 				content: true,
 				comments: { $each: true },
 				cursors: true,
-				archivedContent: true,
+				archivedContent: { $each: true, $onError: "catch" },
 			},
 		})
 	} catch (error) {
@@ -80,6 +83,13 @@ async function compactDocumentContent(
 		return false
 	}
 	doc = loaded
+	transactionCount =
+		doc.content.$jazz.raw.core.getValidSortedTransactions().length
+	seedTransactionCount = getSuccessorSeedTransactionCount(doc)
+	if (transactionCount <= transactionBudget + seedTransactionCount) {
+		finish({ status: "within-budget", seedTransactionCount })
+		return false
+	}
 	let contentRaw = doc.content.$jazz.raw
 	if (compactions.has(contentRaw)) {
 		finish({ status: "already-running" })
@@ -107,32 +117,17 @@ async function compactDocumentContent(
 			return false
 		}
 
-		let cutoverFrontier = contentRaw.core.frontier()
 		let successor = co
 			.plainText()
 			.create(doc.content.toString(), doc.$jazz.owner)
-		let archive = ArchivedDocumentContent.create(
-			{
-				content: doc.content,
-				successor,
-				cutoverFrontier,
-				successorSeedFrontier: successor.$jazz.raw.core.frontier(),
-				cutoverAt: new Date(),
-				successorId: successor.$jazz.id,
-			},
-			doc.$jazz.owner,
-		)
+		let archive = createDocumentContentArchive(doc, successor, false)
 
 		if (doc.content.$jazz.id !== contentRaw.id) {
 			finish({ status: "pointer-changed" })
 			return false
 		}
-		let archives = doc.archivedContent
+		let archives = getOrCreateDocumentContentArchives(doc)
 		if (!archives) {
-			archives = co.list(ArchivedDocumentContent).create([], doc.$jazz.owner)
-			doc.$jazz.set("archivedContent", archives)
-		}
-		if (!archives.$isLoaded) {
 			finish({ status: "archive-load-failed" })
 			return false
 		}
@@ -152,6 +147,81 @@ async function compactDocumentContent(
 	} finally {
 		compactions.delete(contentRaw)
 	}
+}
+
+async function replaceDocumentContentGeneration(
+	doc: CompactableDocument,
+	content: string,
+) {
+	let loaded
+	try {
+		loaded = await doc.$jazz.ensureLoaded({
+			resolve: {
+				content: true,
+				comments: { $each: true },
+				cursors: true,
+				archivedContent: { $each: true, $onError: "catch" },
+			},
+		})
+	} catch {
+		return false
+	}
+	if (!loaded.$isLoaded || hasActiveDocumentCollaborators(loaded)) return false
+
+	let contentRaw = loaded.content.$jazz.raw
+	if (compactions.has(contentRaw)) return false
+	compactions.add(contentRaw)
+	try {
+		try {
+			await contentRaw.core.waitForSync({ timeout: 5_000 })
+		} catch {
+			return false
+		}
+		if (
+			loaded.content.$jazz.id !== contentRaw.id ||
+			hasActiveDocumentCollaborators(loaded)
+		)
+			return false
+
+		let successor = co.plainText().create(content, loaded.$jazz.owner)
+		let archive = createDocumentContentArchive(loaded, successor, true)
+		let archives = getOrCreateDocumentContentArchives(loaded)
+		if (!archives) return false
+
+		archives.$jazz.push(archive)
+		replaceDocumentContentMappingAnchors(loaded, successor)
+		return true
+	} finally {
+		compactions.delete(contentRaw)
+	}
+}
+
+function createDocumentContentArchive(
+	doc: CompactableDocument,
+	successor: co.loaded<ReturnType<typeof co.plainText>>,
+	replaced: boolean,
+) {
+	return ArchivedDocumentContent.create(
+		{
+			content: doc.content,
+			successor,
+			cutoverFrontier: doc.content.$jazz.raw.core.frontier(),
+			successorSeedFrontier: successor.$jazz.raw.core.frontier(),
+			replaced: replaced || undefined,
+			cutoverAt: new Date(),
+			successorId: successor.$jazz.id,
+		},
+		doc.$jazz.owner,
+	)
+}
+
+function getOrCreateDocumentContentArchives(doc: CompactableDocument) {
+	let archives = doc.archivedContent
+	if (!archives) {
+		archives = co.list(ArchivedDocumentContent).create([], doc.$jazz.owner)
+		doc.$jazz.set("archivedContent", archives)
+	}
+	return archives.$isLoaded ? archives : null
 }
 
 function hasActiveDocumentCollaborators(doc: CompactableDocument) {
@@ -251,6 +321,14 @@ async function reconcileArchivedDocumentContentUnsafe(
 			.atFrontier(reconciledFrontier)
 			.toString()
 		if (archivedContent === reconciledContent) continue
+		if (archive.replaced) {
+			archive.$jazz.set(
+				"reconciledFrontier",
+				archive.content.$jazz.raw.core.frontier(),
+			)
+			conflicts++
+			continue
+		}
 
 		let merged = mergeNonConflictingText(
 			reconciledContent,
@@ -419,4 +497,17 @@ function mapBasePosition(
 		}
 	}
 	return mapped
+}
+
+function getSuccessorSeedTransactionCount(doc: CompactableDocument) {
+	if (!doc.archivedContent?.$isLoaded) return 0
+	let predecessor = doc.archivedContent.find(
+		archive =>
+			archive?.$isLoaded && archive.successorId === doc.content.$jazz.id,
+	)
+	if (!predecessor?.$isLoaded || !predecessor.successorSeedFrontier) return 0
+	return Object.values(predecessor.successorSeedFrontier).reduce(
+		(total, lastTransactionIndex) => total + lastTransactionIndex + 1,
+		0,
+	)
 }

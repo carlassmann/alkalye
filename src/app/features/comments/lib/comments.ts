@@ -1,7 +1,7 @@
 import { co } from "jazz-tools"
 import type { TextPos } from "jazz-tools"
 import { stringifyOpID } from "cojson"
-import { diff } from "fast-myers-diff"
+import { calcPatch, diff } from "fast-myers-diff"
 import { CommentReply, CommentThread, Document } from "@/schema"
 import { syncDocumentMetadata } from "@/app/features/documents/lib/metadata"
 
@@ -26,6 +26,7 @@ export {
 	applyContentDiffWithCommentAnchors,
 	applyContentDiffLoadingCommentAnchors,
 	replaceDocumentContentPreservingAnchors,
+	replaceDocumentContentMappingAnchors,
 	recoverRange,
 	mapCommentRangeAcrossContent,
 	type LoadedCommentDocument,
@@ -61,6 +62,9 @@ type RangeRecovery = (
 	content: string,
 	anchor: CommentAnchorData,
 ) => RecoveredRange | null
+
+let MAX_DELETE_GRAPHEMES_PER_TRANSACTION = 2_000
+let MAX_ANCHOR_QUOTE_LENGTH = 1_000
 
 type CommentAnchorData = {
 	start?: string
@@ -316,7 +320,7 @@ function applyContentDiffWithCommentAnchors(
 		),
 	}))
 
-	doc.content.$jazz.applyDiff(newContent)
+	applyContentDiffInBoundedTransactions(doc.content, newContent)
 
 	for (let update of updates) {
 		if (update.range.orphaned) continue
@@ -327,19 +331,69 @@ function applyContentDiffWithCommentAnchors(
 	}
 }
 
+function applyContentDiffInBoundedTransactions(
+	content: LoadedAnchorDocument["content"],
+	newContent: string,
+) {
+	let raw = content.$jazz.raw
+	let currentGraphemes = raw.toGraphemes(raw.toString())
+	let nextGraphemes = raw.toGraphemes(newContent)
+	let patches = Array.from(calcPatch(currentGraphemes, nextGraphemes))
+
+	raw.core.pauseNotifyUpdate()
+	try {
+		for (let [from, to, inserted] of patches.reverse()) {
+			let deleteTo = to
+			while (deleteTo > from) {
+				let deleteFrom = Math.max(
+					from,
+					deleteTo - MAX_DELETE_GRAPHEMES_PER_TRANSACTION,
+				)
+				content.deleteRange({ from: deleteFrom, to: deleteTo })
+				deleteTo = deleteFrom
+			}
+			if (inserted.length > 0) {
+				content.insertBefore(from, raw.fromGraphemes(inserted))
+			}
+		}
+	} finally {
+		raw.core.resumeNotifyUpdate()
+	}
+}
+
 function replaceDocumentContentPreservingAnchors(
 	doc: LoadedAnchorDocument,
 	content: co.loaded<ReturnType<typeof co.plainText>>,
 ) {
+	replaceDocumentContentMappingAnchors(doc, content)
+}
+
+function replaceDocumentContentMappingAnchors(
+	doc: LoadedAnchorDocument,
+	content: co.loaded<ReturnType<typeof co.plainText>>,
+) {
+	let newContent = content.toString()
+	let changes = getContentChanges(doc.content.toString(), newContent)
 	let updates = getActiveCommentAnchorThreads(doc).map(thread => ({
 		thread,
-		range: getCommentRange(doc, thread.anchor),
+		range: mapCommentRange(
+			getCommentRange(doc, thread.anchor),
+			changes,
+			newContent,
+		),
 	}))
 
 	doc.$jazz.set("content", content)
 
 	for (let update of updates) {
-		if (update.range.orphaned) continue
+		if (update.range.orphaned) {
+			update.thread.$jazz.set("anchor", {
+				...update.thread.anchor,
+				start: undefined,
+				end: undefined,
+			})
+			continue
+		}
 		update.thread.$jazz.set(
 			"anchor",
 			makeAnchor(doc, update.range.from, update.range.to, update.thread.anchor),
@@ -623,9 +677,11 @@ function makeAnchor(
 }
 
 function deriveAnchorQuotes(current: string, previous?: CommentAnchorData) {
+	let currentQuote = current || previous?.quote || ""
+	let originalQuote = previous?.originalQuote ?? previous?.quote ?? current
 	return {
-		current: current || previous?.quote || "",
-		original: previous?.originalQuote ?? previous?.quote ?? current,
+		current: currentQuote.slice(0, MAX_ANCHOR_QUOTE_LENGTH),
+		original: originalQuote.slice(0, MAX_ANCHOR_QUOTE_LENGTH),
 	}
 }
 
@@ -709,9 +765,38 @@ type DiffChange = {
 }
 
 function getContentChanges(oldContent: string, newContent: string) {
+	let changedSpan = getChangedContentSpan(oldContent, newContent)
+	let changedLength = Math.max(
+		changedSpan.toA - changedSpan.fromA,
+		changedSpan.toB - changedSpan.fromB,
+	)
+	if (changedLength > 4_000) return [changedSpan]
 	return Array.from(diff(oldContent, newContent)).map(
 		([fromA, toA, fromB, toB]) => ({ fromA, toA, fromB, toB }),
 	)
+}
+
+function getChangedContentSpan(oldContent: string, newContent: string) {
+	let prefix = 0
+	let sharedLength = Math.min(oldContent.length, newContent.length)
+	while (prefix < sharedLength && oldContent[prefix] === newContent[prefix]) {
+		prefix++
+	}
+
+	let suffix = 0
+	while (
+		suffix < sharedLength - prefix &&
+		oldContent[oldContent.length - suffix - 1] ===
+			newContent[newContent.length - suffix - 1]
+	) {
+		suffix++
+	}
+	return {
+		fromA: prefix,
+		toA: oldContent.length - suffix,
+		fromB: prefix,
+		toB: newContent.length - suffix,
+	}
 }
 
 function getRestoredCommentRange(
@@ -772,7 +857,11 @@ function mapCommentRange(
 	if (range.orphaned) return range
 
 	let mapped = mapRangeEdges(range, changes)
+	if (mapped.to >= mapped.from) return collapseBlankRange(mapped, content)
 	let repaired = repairInvertedRange(mapped, range, changes)
+	if (repaired.to - repaired.from > MAX_ANCHOR_QUOTE_LENGTH) {
+		return orphanedRange()
+	}
 	return collapseBlankRange(repaired, content)
 }
 

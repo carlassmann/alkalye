@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 
 import { NodeContext, NodeRuntime } from "@effect/platform-node"
+import { defaultTeardown } from "@effect/platform/Runtime"
 import { Effect } from "effect"
 import process from "node:process"
 import { cli } from "@/cli/app"
@@ -26,11 +27,23 @@ cli([process.argv[0], process.argv[1], ...strippedArgs]).pipe(
 	Effect.provide(NodeContext.layer),
 	Effect.catchAll(error =>
 		Effect.sync(() => {
-			process.exit(getExitCode(error))
+			exitAfterOutputFlush(getExitCode(error))
 		}),
 	),
-	NodeRuntime.runMain,
+	NodeRuntime.runMain({
+		teardown: exit => defaultTeardown(exit, exitAfterOutputFlush),
+	}),
 )
+
+function exitAfterOutputFlush(code: number) {
+	let pendingStreams = 2
+	function finishStream() {
+		pendingStreams--
+		if (pendingStreams === 0) process.exit(code)
+	}
+	process.stdout.write("", finishStream)
+	process.stderr.write("", finishStream)
+}
 
 type GlobalFlagResult = {
 	strippedArgs: string[]

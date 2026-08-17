@@ -61,6 +61,7 @@ let ArchivedDocumentContent = co.map({
 	reconciledFrontier: z.record(z.string(), z.number()).optional(),
 	successorSeedFrontier: z.record(z.string(), z.number()).optional(),
 	successorReconciledFrontier: z.record(z.string(), z.number()).optional(),
+	replaced: z.boolean().optional(),
 	cutoverAt: z.date(),
 	successorId: z.string(),
 })

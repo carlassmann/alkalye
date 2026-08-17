@@ -79,8 +79,19 @@ function getEditHistory(doc: LoadedDocument): EditHistoryItem[] {
 	}
 
 	for (let [index, generation] of generations.entries()) {
-		let seedFrontier = generations[index - 1]?.archive?.successorSeedFrontier
+		let predecessor = generations[index - 1]?.archive
+		let seedFrontier = predecessor?.successorSeedFrontier
 		collectTransactions(generation.content.$jazz.raw.core, index, seedFrontier)
+		if (predecessor?.replaced) {
+			let firstTransaction =
+				generation.content.$jazz.raw.core.getValidSortedTransactions()[0]
+			editsByGeneration[index].set(predecessor.cutoverAt.getTime(), {
+				madeAt: predecessor.cutoverAt.getTime(),
+				accountId: firstTransaction
+					? accountIdFromSessionId(firstTransaction.txID.sessionID)
+					: null,
+			})
+		}
 	}
 
 	function collectRelatedTransactions(core: typeof contentRaw.core) {
