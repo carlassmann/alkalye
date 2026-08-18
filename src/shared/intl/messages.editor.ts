@@ -37,8 +37,8 @@ let baseEditorMessages = messages({
 	"editor.menu.previewImage": "Preview Image",
 	"editor.menu.findSelection": "Find Selection",
 	"editor.menu.insert": "Insert",
-	"editor.menu.nativeHintMac": "Shift-right-click for native menu",
-	"editor.menu.nativeHint": "Shift-right-click for native menu",
+	"editor.menu.nativeHintMac": "Option-right-click for system text menu",
+	"editor.menu.nativeHint": "Alt-right-click for system text menu",
 	"editor.menu.toggleComplete": "Toggle Complete",
 	"editor.menu.sortTasks": "Sort Tasks",
 
@@ -162,8 +162,8 @@ let deEditorMessages = translate(baseEditorMessages, {
 	"editor.menu.previewImage": "Bildvorschau",
 	"editor.menu.findSelection": "Auswahl suchen",
 	"editor.menu.insert": "Einfügen",
-	"editor.menu.nativeHintMac": "Umschalt-Rechtsklick für natives Menü",
-	"editor.menu.nativeHint": "Umschalt-Rechtsklick für natives Menü",
+	"editor.menu.nativeHintMac": "Option-Rechtsklick für System-Textmenü",
+	"editor.menu.nativeHint": "Alt-Rechtsklick für System-Textmenü",
 	"editor.menu.toggleComplete": "Fertigstellung umschalten",
 	"editor.menu.sortTasks": "Aufgaben sortieren",
 

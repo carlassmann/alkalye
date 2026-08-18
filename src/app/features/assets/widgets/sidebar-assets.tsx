@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect, type ReactNode } from "react"
 import { useForm } from "@tanstack/react-form"
 import { z } from "zod"
 import { Image as JazzImage } from "jazz-tools/react"
@@ -17,6 +17,12 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/app/components/ui/dropdown-menu"
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuTrigger,
+} from "@/app/components/ui/context-menu"
 import {
 	Tooltip,
 	TooltipContent,
@@ -51,6 +57,7 @@ import {
 } from "lucide-react"
 import { useIntl, T } from "@/shared/intl/setup"
 import { useResolvedTheme } from "@/app/components/appearance"
+import { useHasFinePointer } from "@/app/hooks/use-fine-pointer"
 import type { SidebarAsset } from "../lib/asset-view-models"
 
 export { SidebarAssets }
@@ -61,6 +68,14 @@ interface VideoUploadState {
 	phase: UploadPhase
 	progress: number
 	abortController: AbortController
+}
+
+interface AssetAction {
+	id: string
+	label: string
+	icon: ReactNode
+	onClick: () => void
+	destructive?: boolean
 }
 
 interface SidebarAssetsProps {
@@ -105,6 +120,7 @@ function SidebarAssets({
 	let t = useIntl()
 	let colorScheme = useResolvedTheme()
 	let { isMobile } = useSidebar()
+	let hasFinePointer = useHasFinePointer()
 	let fileInputRef = useRef<HTMLInputElement>(null)
 	let [renameOpen, setRenameOpen] = useState(false)
 	let [renamingAsset, setRenamingAsset] = useState<SidebarAsset | null>(null)
@@ -203,6 +219,64 @@ function SidebarAssets({
 		}
 	}
 
+	function getAssetActions(asset: SidebarAsset): AssetAction[] {
+		let actions: AssetAction[] = []
+
+		if (asset.type === "tldraw" && onEditTldraw) {
+			actions.push({
+				id: "edit-whiteboard",
+				label: t("assets.editWhiteboard"),
+				icon: <PenTool />,
+				onClick: () => onEditTldraw(asset.id),
+			})
+		}
+		if (onInsert) {
+			actions.push({
+				id: "insert",
+				label: t("assets.insert"),
+				icon: <Plus />,
+				onClick: () => onInsert(asset.id, asset.name),
+			})
+		}
+		if (onDownload) {
+			actions.push({
+				id: "download",
+				label: t("assets.download"),
+				icon: <Download />,
+				onClick: () => onDownload(asset.id, asset.name),
+			})
+		}
+		if (onRename) {
+			actions.push({
+				id: "rename",
+				label: t("assets.rename"),
+				icon: <Pencil />,
+				onClick: () => handleRename(asset),
+			})
+		}
+		if (asset.type === "video" && onToggleMute) {
+			actions.push({
+				id: "toggle-mute",
+				label: asset.muteAudio
+					? t("assets.unmuteAudio")
+					: t("assets.muteAudio"),
+				icon: asset.muteAudio ? <Volume2 /> : <VolumeX />,
+				onClick: () => onToggleMute(asset.id),
+			})
+		}
+		if (onDelete) {
+			actions.push({
+				id: "delete",
+				label: t("assets.delete"),
+				icon: <Trash2 />,
+				onClick: () => handleDeleteClick(asset.id),
+				destructive: true,
+			})
+		}
+
+		return actions
+	}
+
 	return (
 		<div
 			className="relative flex flex-1 flex-col"
@@ -282,120 +356,123 @@ function SidebarAssets({
 			/>
 			<SidebarGroupContent className="flex flex-1 flex-col">
 				{assets.length === 0 ? (
-					<div className="text-muted-foreground flex flex-1 flex-col items-center justify-center gap-2 text-xs">
-						<ImageIcon className="size-6 opacity-50" />
-						<p>
-							<T k="assets.noAssetsYet" />
-						</p>
-					</div>
+					<ContextMenu disabled={readOnly || !hasFinePointer}>
+						<ContextMenuTrigger
+							className="flex flex-1 flex-col"
+							onTouchStart={event => event.preventBaseUIHandler()}
+						>
+							<div className="text-muted-foreground flex flex-1 flex-col items-center justify-center gap-2 text-xs">
+								<ImageIcon className="size-6 opacity-50" />
+								<p>
+									<T k="assets.noAssetsYet" />
+								</p>
+							</div>
+						</ContextMenuTrigger>
+						<ContextMenuContent>
+							{onCreateTldraw && (
+								<ContextMenuItem onClick={createTldraw}>
+									<PenTool />
+									{t("assets.newWhiteboard")}
+								</ContextMenuItem>
+							)}
+							<ContextMenuItem onClick={() => fileInputRef.current?.click()}>
+								<Upload />
+								{t("assets.uploadOrImport")}
+							</ContextMenuItem>
+						</ContextMenuContent>
+					</ContextMenu>
 				) : (
 					<SidebarMenu>
-						{assets.map(asset => (
-							<SidebarMenuItem key={asset.id}>
-								<DropdownMenu>
-									<DropdownMenuTrigger
-										disabled={readOnly}
-										render={
-											<SidebarMenuButton disabled={readOnly} nativeButton>
-												<div className="bg-muted size-8 shrink-0 overflow-hidden rounded">
-													{asset.type === "image" && asset.imageId ? (
-														<JazzImage
-															imageId={asset.imageId}
-															className="size-full object-cover"
-														/>
-													) : asset.type === "tldraw" &&
-													  (colorScheme === "dark"
-															? asset.darkPreviewId
-															: asset.lightPreviewId) ? (
-														<JazzImage
-															imageId={
-																colorScheme === "dark"
-																	? asset.darkPreviewId!
-																	: asset.lightPreviewId!
+						{assets.map(asset => {
+							let actions = getAssetActions(asset)
+							return (
+								<SidebarMenuItem key={asset.id}>
+									<ContextMenu disabled={readOnly || !hasFinePointer}>
+										<ContextMenuTrigger
+											onTouchStart={event => event.preventBaseUIHandler()}
+										>
+											<DropdownMenu>
+												<DropdownMenuTrigger
+													disabled={readOnly}
+													render={
+														<SidebarMenuButton disabled={readOnly} nativeButton>
+															<div className="bg-muted size-8 shrink-0 overflow-hidden rounded">
+																{asset.type === "image" && asset.imageId ? (
+																	<JazzImage
+																		imageId={asset.imageId}
+																		className="size-full object-cover"
+																	/>
+																) : asset.type === "tldraw" &&
+																  (colorScheme === "dark"
+																		? asset.darkPreviewId
+																		: asset.lightPreviewId) ? (
+																	<JazzImage
+																		imageId={
+																			colorScheme === "dark"
+																				? asset.darkPreviewId!
+																				: asset.lightPreviewId!
+																		}
+																		className="size-full object-cover"
+																	/>
+																) : asset.type === "video" &&
+																  asset.getVideoBlob ? (
+																	<VideoThumbnail
+																		assetId={asset.id}
+																		getBlob={asset.getVideoBlob}
+																	/>
+																) : (
+																	<div className="flex size-full items-center justify-center">
+																		{asset.type === "video" ? (
+																			<Film className="text-muted-foreground size-4" />
+																		) : asset.type === "tldraw" ? (
+																			<PenTool className="text-muted-foreground size-4" />
+																		) : (
+																			<ImageIcon className="text-muted-foreground size-4" />
+																		)}
+																	</div>
+																)}
+															</div>
+															<span className="truncate">{asset.name}</span>
+														</SidebarMenuButton>
+													}
+												/>
+												<DropdownMenuContent
+													side={isMobile ? "bottom" : "left"}
+													align={isMobile ? "center" : "start"}
+												>
+													{actions.map(action => (
+														<DropdownMenuItem
+															key={action.id}
+															onClick={action.onClick}
+															variant={
+																action.destructive ? "destructive" : "default"
 															}
-															className="size-full object-cover"
-														/>
-													) : asset.type === "video" && asset.getVideoBlob ? (
-														<VideoThumbnail
-															assetId={asset.id}
-															getBlob={asset.getVideoBlob}
-														/>
-													) : (
-														<div className="flex size-full items-center justify-center">
-															{asset.type === "video" ? (
-																<Film className="text-muted-foreground size-4" />
-															) : asset.type === "tldraw" ? (
-																<PenTool className="text-muted-foreground size-4" />
-															) : (
-																<ImageIcon className="text-muted-foreground size-4" />
-															)}
-														</div>
-													)}
-												</div>
-												<span className="truncate">{asset.name}</span>
-											</SidebarMenuButton>
-										}
-									/>
-									<DropdownMenuContent
-										side={isMobile ? "bottom" : "left"}
-										align={isMobile ? "center" : "start"}
-									>
-										{asset.type === "tldraw" && onEditTldraw && (
-											<DropdownMenuItem onClick={() => onEditTldraw(asset.id)}>
-												<PenTool className="size-4" />
-												{t("assets.editWhiteboard")}
-											</DropdownMenuItem>
-										)}
-										{onInsert && (
-											<DropdownMenuItem
-												onClick={() => onInsert(asset.id, asset.name)}
-											>
-												<Plus className="size-4" />
-												<T k="assets.insert" />
-											</DropdownMenuItem>
-										)}
-										{onDownload && (
-											<DropdownMenuItem
-												onClick={() => onDownload(asset.id, asset.name)}
-											>
-												<Download className="size-4" />
-												<T k="assets.download" />
-											</DropdownMenuItem>
-										)}
-										{onRename && (
-											<DropdownMenuItem onClick={() => handleRename(asset)}>
-												<Pencil className="size-4" />
-												<T k="assets.rename" />
-											</DropdownMenuItem>
-										)}
-										{asset.type === "video" && onToggleMute && (
-											<DropdownMenuItem onClick={() => onToggleMute(asset.id)}>
-												{asset.muteAudio ? (
-													<>
-														<Volume2 className="size-4" />
-														<T k="assets.unmuteAudio" />
-													</>
-												) : (
-													<>
-														<VolumeX className="size-4" />
-														<T k="assets.muteAudio" />
-													</>
-												)}
-											</DropdownMenuItem>
-										)}
-										{onDelete && (
-											<DropdownMenuItem
-												onClick={() => handleDeleteClick(asset.id)}
-												className="text-destructive focus:text-destructive"
-											>
-												<Trash2 className="size-4" />
-												<T k="assets.delete" />
-											</DropdownMenuItem>
-										)}
-									</DropdownMenuContent>
-								</DropdownMenu>
-							</SidebarMenuItem>
-						))}
+														>
+															{action.icon}
+															{action.label}
+														</DropdownMenuItem>
+													))}
+												</DropdownMenuContent>
+											</DropdownMenu>
+										</ContextMenuTrigger>
+										<ContextMenuContent>
+											{actions.map(action => (
+												<ContextMenuItem
+													key={action.id}
+													onClick={action.onClick}
+													variant={
+														action.destructive ? "destructive" : "default"
+													}
+												>
+													{action.icon}
+													{action.label}
+												</ContextMenuItem>
+											))}
+										</ContextMenuContent>
+									</ContextMenu>
+								</SidebarMenuItem>
+							)
+						})}
 					</SidebarMenu>
 				)}
 			</SidebarGroupContent>

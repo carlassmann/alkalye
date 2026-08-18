@@ -63,6 +63,7 @@ import { fileDropCursor, clearFileDropCursor } from "../lib/file-drop-cursor"
 import { EditorContextMenu } from "./editor-context-menu"
 
 import { useIsMobile } from "@/app/hooks/use-mobile"
+import { useHasFinePointer } from "@/app/hooks/use-fine-pointer"
 import { useFindPanel } from "../hooks/use-find-panel"
 import { useScreenKeyboardBottomInset } from "../hooks/use-screen-keyboard-bottom-inset"
 import {
@@ -252,6 +253,7 @@ function MarkdownEditor(
 
 	let t = useIntl()
 	let isMobile = useIsMobile()
+	let hasFinePointer = useHasFinePointer()
 
 	// Find panel state is URL-driven via hook
 	let { findOpen, findQuery, findCase, findFuzzy, setFind } = useFindPanel()
@@ -1057,7 +1059,7 @@ function MarkdownEditor(
 			<EditorContextMenu
 				editor={internalRef}
 				readOnly={readOnly}
-				nativeContextMenu={isMobile}
+				nativeContextMenu={!hasFinePointer}
 				canAddComment={Boolean(onAddComment)}
 				onAddComment={() => {
 					let opened = floatingActionsRef.current?.triggerAddComment() ?? false

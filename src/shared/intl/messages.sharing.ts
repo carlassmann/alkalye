@@ -79,6 +79,7 @@ let baseSharingMessages = messages({
 	"sharing.sidebar.public": "Public",
 	"sharing.sidebar.edit": "edit",
 	"sharing.sidebar.view": "view",
+	"sharing.sidebar.manage": "Manage sharing",
 
 	"sharing.document.link.canEditLabel": "Can edit",
 	"sharing.document.link.canViewLabel": "Can view",
@@ -201,6 +202,7 @@ let deSharingMessages = translate(baseSharingMessages, {
 	"sharing.sidebar.public": "Öffentlich",
 	"sharing.sidebar.edit": "bearbeiten",
 	"sharing.sidebar.view": "ansehen",
+	"sharing.sidebar.manage": "Freigabe verwalten",
 
 	"sharing.document.link.canEditLabel": "Kann bearbeiten",
 	"sharing.document.link.canViewLabel": "Kann ansehen",

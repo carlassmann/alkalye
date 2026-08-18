@@ -17,6 +17,13 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/app/components/ui/dropdown-menu"
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuTrigger,
+} from "@/app/components/ui/context-menu"
+import { useHasFinePointer } from "@/app/hooks/use-fine-pointer"
 import { cn } from "@/app/lib/cn"
 import { useIntl } from "@/shared/intl/setup"
 import {
@@ -150,6 +157,7 @@ function CommentThreadItem({
 	authorName?: string
 }) {
 	let t = useIntl()
+	let hasFinePointer = useHasFinePointer()
 	let [collapsed, setCollapsed] = useState(false)
 	let [replyOpen, setReplyOpen] = useState(false)
 	let [reply, setReply] = useState("")
@@ -184,96 +192,132 @@ function CommentThreadItem({
 	}
 
 	return (
-		<article
-			className={cn(
-				"group rounded-sm px-2 py-2 text-sm",
-				"pointer-fine:hover:bg-sidebar-accent/60",
-				selected && "bg-sidebar-accent shadow-[inset_2px_0_0_var(--brand)]",
-				thread.resolvedAt && "text-muted-foreground",
-			)}
-		>
-			<div className="flex items-start gap-1.5">
-				<Button
-					size="icon-xs"
-					variant="ghost"
-					aria-label={collapsed ? t("comments.expand") : t("comments.collapse")}
-					className="mt-0.5 shrink-0"
-					onClick={() => setCollapsed(value => !value)}
-					nativeButton
-				>
-					{collapsed ? <ChevronRight /> : <ChevronDown />}
-				</Button>
-				<button
-					type="button"
-					className="min-h-8 min-w-0 flex-1 text-left"
-					onClick={onSelect}
-				>
-					<blockquote
+		<ContextMenu disabled={readOnly || !hasFinePointer}>
+			<ContextMenuTrigger
+				onTouchStart={event => event.preventBaseUIHandler()}
+				render={
+					<article
 						className={cn(
-							"line-clamp-2 text-xs leading-5",
-							selected ? "text-foreground" : "text-muted-foreground",
+							"group rounded-sm px-2 py-2 text-sm",
+							"pointer-fine:hover:bg-sidebar-accent/60",
+							selected &&
+								"bg-sidebar-accent shadow-[inset_2px_0_0_var(--brand)]",
+							thread.resolvedAt && "text-muted-foreground",
 						)}
 					>
-						{range.orphaned ? t("comments.orphaned") : thread.anchor.quote}
-					</blockquote>
-				</button>
-				<div className="flex shrink-0 items-center gap-0.5">
-					{thread.resolvedAt && (
-						<Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
-							{t("comments.resolvedBadge")}
-						</Badge>
-					)}
-					{!readOnly && (
-						<ThreadActionsMenu thread={thread} onReply={openReply} />
-					)}
-				</div>
-			</div>
-			{!collapsed && (
-				<div className="mt-1.5 space-y-1.5 pl-6">
-					{replies.map(item => (
-						<div
-							key={item.$jazz.id}
-							className="bg-muted/45 rounded-sm px-2 py-1.5"
-						>
-							<div className="text-muted-foreground mb-0.5 truncate text-[11px]">
-								{item.authorName ?? t("comments.unknownAuthor")}
-							</div>
-							<p className="text-foreground/90 text-xs leading-5 whitespace-pre-wrap">
-								{item.body}
-							</p>
-						</div>
-					))}
-					{replyOpen && (
-						<form
-							className="bg-background rounded-sm p-2 shadow-[0_0_0_1px_var(--border)]"
-							onSubmit={handleReply}
-						>
-							<Textarea
-								value={reply}
-								onChange={event => setReply(event.target.value)}
-								onKeyDown={handleReplyKeyDown}
-								placeholder={t("comments.replyPlaceholder")}
-								minRows={2}
-							/>
-							<div className="mt-2 flex justify-end gap-1">
-								<Button
-									type="button"
-									variant="ghost"
-									size="sm"
-									onClick={cancelReply}
+						<div className="flex items-start gap-1.5">
+							<Button
+								size="icon-xs"
+								variant="ghost"
+								aria-label={
+									collapsed ? t("comments.expand") : t("comments.collapse")
+								}
+								className="mt-0.5 shrink-0"
+								onClick={() => setCollapsed(value => !value)}
+								nativeButton
+							>
+								{collapsed ? <ChevronRight /> : <ChevronDown />}
+							</Button>
+							<button
+								type="button"
+								className="min-h-8 min-w-0 flex-1 text-left"
+								onClick={onSelect}
+							>
+								<blockquote
+									className={cn(
+										"line-clamp-2 text-xs leading-5",
+										selected ? "text-foreground" : "text-muted-foreground",
+									)}
 								>
-									{t("editor.dialog.cancel")}
-								</Button>
-								<Button type="submit" size="sm" disabled={!reply.trim()}>
-									<MessageSquarePlus />
-									{t("comments.reply")}
-								</Button>
+									{range.orphaned
+										? t("comments.orphaned")
+										: thread.anchor.quote}
+								</blockquote>
+							</button>
+							<div className="flex shrink-0 items-center gap-0.5">
+								{thread.resolvedAt && (
+									<Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
+										{t("comments.resolvedBadge")}
+									</Badge>
+								)}
+								{!readOnly && (
+									<ThreadActionsMenu thread={thread} onReply={openReply} />
+								)}
 							</div>
-						</form>
-					)}
-				</div>
-			)}
-		</article>
+						</div>
+						{!collapsed && (
+							<div className="mt-1.5 space-y-1.5 pl-6">
+								{replies.map(item => (
+									<div
+										key={item.$jazz.id}
+										className="bg-muted/45 rounded-sm px-2 py-1.5"
+									>
+										<div className="text-muted-foreground mb-0.5 truncate text-[11px]">
+											{item.authorName ?? t("comments.unknownAuthor")}
+										</div>
+										<p className="text-foreground/90 text-xs leading-5 whitespace-pre-wrap">
+											{item.body}
+										</p>
+									</div>
+								))}
+								{replyOpen && (
+									<form
+										className="bg-background rounded-sm p-2 shadow-[0_0_0_1px_var(--border)]"
+										onSubmit={handleReply}
+									>
+										<Textarea
+											value={reply}
+											onChange={event => setReply(event.target.value)}
+											onKeyDown={handleReplyKeyDown}
+											placeholder={t("comments.replyPlaceholder")}
+											minRows={2}
+										/>
+										<div className="mt-2 flex justify-end gap-1">
+											<Button
+												type="button"
+												variant="ghost"
+												size="sm"
+												onClick={cancelReply}
+											>
+												{t("editor.dialog.cancel")}
+											</Button>
+											<Button type="submit" size="sm" disabled={!reply.trim()}>
+												<MessageSquarePlus />
+												{t("comments.reply")}
+											</Button>
+										</div>
+									</form>
+								)}
+							</div>
+						)}
+					</article>
+				}
+			/>
+			<ContextMenuContent>
+				<ContextMenuItem onClick={openReply}>
+					<MessageSquarePlus />
+					{t("comments.reply")}
+				</ContextMenuItem>
+				{thread.resolvedAt ? (
+					<ContextMenuItem onClick={() => reopenCommentThread(thread)}>
+						<RotateCcw />
+						{t("comments.reopen")}
+					</ContextMenuItem>
+				) : (
+					<ContextMenuItem onClick={() => resolveCommentThread(thread)}>
+						<Check />
+						{t("comments.resolve")}
+					</ContextMenuItem>
+				)}
+				<ContextMenuItem
+					variant="destructive"
+					onClick={() => deleteCommentThread(thread)}
+				>
+					<Trash2 />
+					{t("comments.delete")}
+				</ContextMenuItem>
+			</ContextMenuContent>
+		</ContextMenu>
 	)
 }
 

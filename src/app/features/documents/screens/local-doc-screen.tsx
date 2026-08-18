@@ -35,6 +35,7 @@ import {
 	ContextMenu,
 	ContextMenuContent,
 	ContextMenuItem,
+	ContextMenuSeparator,
 	ContextMenuTrigger,
 } from "@/app/components/ui/context-menu"
 import {
@@ -98,6 +99,7 @@ import { useWikilinkResolver } from "../lib/use-wikilink-resolver"
 import { toast } from "sonner"
 import { tryCatch } from "@/app/lib/try-catch"
 import { useIntl } from "@/shared/intl/setup"
+import { useHasFinePointer } from "@/app/hooks/use-fine-pointer"
 
 export { LocalDocScreen }
 
@@ -422,29 +424,28 @@ function LocalEditorContent({
 		}
 	}, [])
 
+	async function handleSaveAs(file: LocalFileEntry) {
+		let title = getDocumentTitle(file.content) || file.filename || "Untitled"
+		let suggestedName = file.filename || title + ".md"
+		let result = await saveLocalFileAs(file.content, suggestedName)
+		if (!result) return
+
+		useLocalFileStore.getState().addFile({
+			id: result.id,
+			filename: suggestedName,
+			lastOpened: Date.now(),
+			content: file.content,
+			lastSavedContent: file.content,
+			hasUnsavedChanges: false,
+			isActive: true,
+		})
+	}
+
 	let handlersRef = useRef({
 		handleSaveAs: async () => {
-			let currentState = useLocalFileStore.getState()
-			let currentFile = currentState.getActiveFile()
+			let currentFile = useLocalFileStore.getState().getActiveFile()
 			if (!currentFile) return
-
-			let title =
-				getDocumentTitle(currentFile.content) ||
-				currentFile.filename ||
-				"Untitled"
-			let suggestedName = currentFile.filename || title + ".md"
-			let result = await saveLocalFileAs(currentFile.content, suggestedName)
-			if (result) {
-				currentState.addFile({
-					id: result.id,
-					filename: suggestedName,
-					lastOpened: Date.now(),
-					content: currentFile.content,
-					lastSavedContent: currentFile.content,
-					hasUnsavedChanges: false,
-					isActive: true,
-				})
-			}
+			await handleSaveAs(currentFile)
 		},
 		toggleLeft,
 		toggleRight,
@@ -515,9 +516,12 @@ function LocalEditorContent({
 		}
 	}
 
-	async function handleDownload() {
-		let filename = activeFile.filename || docTitle + ".md"
-		let blob = new Blob([content], { type: "text/markdown;charset=utf-8" })
+	function handleDownload(file: LocalFileEntry) {
+		let title = getDocumentTitle(file.content) || "Untitled"
+		let filename = file.filename || title + ".md"
+		let blob = new Blob([file.content], {
+			type: "text/markdown;charset=utf-8",
+		})
 		let url = URL.createObjectURL(blob)
 		let a = document.createElement("a")
 		a.href = url
@@ -620,6 +624,8 @@ function LocalEditorContent({
 							activeFileId={activeFile.id}
 							onSwitchFile={handleSwitchFile}
 							onCloseFile={handleCloseFile}
+							onSaveAs={file => void handleSaveAs(file)}
+							onDownload={handleDownload}
 							isMobile={isMobile}
 							setLeftOpenMobile={setLeftOpenMobile}
 						/>
@@ -697,7 +703,7 @@ function LocalEditorContent({
 							<LocalFileMenu
 								onOpen={handleOpenFile}
 								onSaveAs={() => void handlersRef.current.handleSaveAs()}
-								onDownload={handleDownload}
+								onDownload={() => handleDownload(activeFile)}
 								onCopyToSynced={() => setCopyDialogOpen(true)}
 								isMobile={isMobile}
 							/>
@@ -739,6 +745,8 @@ function LocalFilesList({
 	activeFileId,
 	onSwitchFile,
 	onCloseFile,
+	onSaveAs,
+	onDownload,
 	isMobile,
 	setLeftOpenMobile,
 }: {
@@ -746,16 +754,22 @@ function LocalFilesList({
 	activeFileId: string
 	onSwitchFile: (fileId: string) => void
 	onCloseFile: (fileId: string) => void
+	onSaveAs: (file: LocalFileEntry) => void
+	onDownload: (file: LocalFileEntry) => void
 	isMobile: boolean
 	setLeftOpenMobile: (open: boolean) => void
 }) {
+	let t = useIntl()
+	let hasFinePointer = useHasFinePointer()
 	let sortedFiles = [...files].sort((a, b) => b.lastOpened - a.lastOpened)
+	let supportsFileSystem = isFileSystemAccessSupported()
 
 	return (
 		<SidebarMenu>
 			{sortedFiles.map(file => (
-				<ContextMenu key={file.id}>
+				<ContextMenu key={file.id} disabled={!hasFinePointer}>
 					<ContextMenuTrigger
+						onTouchStart={event => event.preventBaseUIHandler()}
 						render={
 							<SidebarMenuButton
 								isActive={file.id === activeFileId}
@@ -790,12 +804,23 @@ function LocalFilesList({
 						}
 					/>
 					<ContextMenuContent>
+						{supportsFileSystem && (
+							<ContextMenuItem onClick={() => onSaveAs(file)}>
+								<Check />
+								{t("doc.saveAs")}
+							</ContextMenuItem>
+						)}
+						<ContextMenuItem onClick={() => onDownload(file)}>
+							<Download />
+							{t("doc.download")}
+						</ContextMenuItem>
+						<ContextMenuSeparator />
 						<ContextMenuItem
 							onClick={() => void onCloseFile(file.id)}
 							className="gap-2"
 						>
-							<X className="size-4" />
-							Close
+							<X />
+							{t("doc.sidebar.closeFile")}
 						</ContextMenuItem>
 					</ContextMenuContent>
 				</ContextMenu>

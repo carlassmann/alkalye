@@ -8,15 +8,24 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@/app/components/ui/sidebar"
-import { Globe, Lock, Users } from "lucide-react"
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuTrigger,
+} from "@/app/components/ui/context-menu"
+import { Globe, Lock, Trash2, UserCog, Users } from "lucide-react"
 import { ShareDialog } from "./share-dialog"
 import { Document, UserAccount } from "@/schema"
 import {
 	listCollaborators,
 	isDocumentPublic,
+	getDocumentGroup,
+	revokeDocumentInvite,
 	type Collaborator,
 } from "../lib/document-sharing"
 import { testIds } from "@/app/lib/test-ids"
+import { useHasFinePointer } from "@/app/hooks/use-fine-pointer"
 import { useIntl, T } from "@/shared/intl/setup"
 
 export { SidebarCollaboration }
@@ -37,6 +46,7 @@ function SidebarCollaboration({
 	spaceGroupId,
 }: SidebarCollaborationProps) {
 	let t = useIntl()
+	let hasFinePointer = useHasFinePointer()
 	let [shareOpen, setShareOpen] = useState(false)
 	let [collaborators, setCollaborators] = useState<Collaborator[]>([])
 
@@ -59,6 +69,15 @@ function SidebarCollaboration({
 
 	let otherCollaborators = collaborators.filter(c => c.id !== currentUserId)
 	let hasCollaborators = otherCollaborators.length > 0 || isPublic
+	let isAdmin = doc?.$isLoaded && getDocumentGroup(doc)?.myRole() === "admin"
+
+	function removeCollaborator(collaborator: Collaborator) {
+		if (!doc?.$isLoaded || !isAdmin) return
+		revokeDocumentInvite(doc, collaborator.inviteGroupId)
+		setCollaborators(current =>
+			current.filter(item => item.id !== collaborator.id),
+		)
+	}
 
 	return (
 		<>
@@ -100,17 +119,36 @@ function SidebarCollaboration({
 					)}
 
 					{otherCollaborators.map(c => (
-						<div
-							key={c.id}
-							className="text-muted-foreground flex items-center justify-between px-2 py-1 text-xs"
-						>
-							<span className="truncate">{c.name}</span>
-							<span className="shrink-0 opacity-60">
-								{c.role === "writer"
-									? t("sharing.sidebar.edit")
-									: t("sharing.sidebar.view")}
-							</span>
-						</div>
+						<ContextMenu key={c.id} disabled={!hasFinePointer}>
+							<ContextMenuTrigger
+								onTouchStart={event => event.preventBaseUIHandler()}
+								render={
+									<div className="text-muted-foreground flex items-center justify-between px-2 py-1 text-xs">
+										<span className="truncate">{c.name}</span>
+										<span className="shrink-0 opacity-60">
+											{c.role === "writer"
+												? t("sharing.sidebar.edit")
+												: t("sharing.sidebar.view")}
+										</span>
+									</div>
+								}
+							/>
+							<ContextMenuContent>
+								<ContextMenuItem onClick={() => setShareOpen(true)}>
+									<UserCog />
+									{t("sharing.sidebar.manage")}
+								</ContextMenuItem>
+								{isAdmin && (
+									<ContextMenuItem
+										variant="destructive"
+										onClick={() => removeCollaborator(c)}
+									>
+										<Trash2 />
+										{t("sharing.document.collaborators.removeAccess")}
+									</ContextMenuItem>
+								)}
+							</ContextMenuContent>
+						</ContextMenu>
 					))}
 
 					{isPublic && (

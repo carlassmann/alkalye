@@ -63,6 +63,7 @@ function EditorContextMenu({
 	onWikilinkClick,
 }: EditorContextMenuProps) {
 	let savedSelection = useRef<Range | null>(null)
+	let lastTouchAt = useRef(0)
 	let [context, setContext] = useState(emptyContext)
 	let hasSelection = context.selection.from !== context.selection.to
 	let hasContextualItems = Boolean(
@@ -106,12 +107,14 @@ function EditorContextMenu({
 			<ContextMenuTrigger
 				className="select-text"
 				render={children}
-				style={{ WebkitTouchCallout: nativeContextMenu ? "default" : "none" }}
+				style={{ WebkitTouchCallout: "default" }}
 				onTouchStart={event => {
-					if (nativeContextMenu) event.preventBaseUIHandler()
+					lastTouchAt.current = Date.now()
+					event.preventBaseUIHandler()
 				}}
 				onContextMenu={event => {
-					if (nativeContextMenu || event.shiftKey) {
+					let followsTouch = Date.now() - lastTouchAt.current < 2000
+					if (nativeContextMenu || followsTouch || event.altKey) {
 						event.preventBaseUIHandler()
 						event.nativeEvent.stopImmediatePropagation()
 						return
