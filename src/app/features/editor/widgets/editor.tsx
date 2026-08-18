@@ -60,6 +60,7 @@ import { createBacklinkDecorations } from "../lib/backlink-decorations"
 import { findExtension, selectMatch } from "../lib/find-extension"
 import { FindPanel } from "./find-panel"
 import { fileDropCursor, clearFileDropCursor } from "../lib/file-drop-cursor"
+import { EditorContextMenu } from "./editor-context-menu"
 
 import { useIsMobile } from "@/app/hooks/use-mobile"
 import { useFindPanel } from "../hooks/use-find-panel"
@@ -846,6 +847,52 @@ function MarkdownEditor(
 		setFind({ open: false })
 	}
 
+	async function cut() {
+		if (!view) return
+		let { from, to } = view.state.selection.main
+		if (from === to) return
+		let text = view.state.sliceDoc(from, to)
+		try {
+			await navigator.clipboard.writeText(text)
+		} catch {
+			toast.error(t("editor.clipboard.unavailable"))
+			return
+		}
+		view.dispatch({
+			changes: { from, to, insert: "" },
+			selection: { anchor: from },
+		})
+		view.focus()
+	}
+
+	async function copy() {
+		if (!view) return
+		let { from, to } = view.state.selection.main
+		if (from === to) return
+		let text = view.state.sliceDoc(from, to)
+		try {
+			await navigator.clipboard.writeText(text)
+			view.focus()
+		} catch {
+			toast.error(t("editor.clipboard.unavailable"))
+		}
+	}
+
+	async function paste() {
+		if (!view) return
+		try {
+			let text = await navigator.clipboard.readText()
+			let { from, to } = view.state.selection.main
+			view.dispatch({
+				changes: { from, to, insert: text },
+				selection: { anchor: from + text.length },
+			})
+			view.focus()
+		} catch {
+			toast.error(t("editor.clipboard.unavailable"))
+		}
+	}
+
 	useImperativeHandle(ref, () => ({
 		getContent,
 		setContent,
@@ -889,36 +936,9 @@ function MarkdownEditor(
 				view.focus()
 			}
 		},
-		cut: () => {
-			if (!view) return
-			let { from, to } = view.state.selection.main
-			if (from === to) return
-			let text = view.state.sliceDoc(from, to)
-			navigator.clipboard.writeText(text)
-			view.dispatch({
-				changes: { from, to, insert: "" },
-				selection: { anchor: from },
-			})
-			view.focus()
-		},
-		copy: () => {
-			if (!view) return
-			let { from, to } = view.state.selection.main
-			if (from === to) return
-			let text = view.state.sliceDoc(from, to)
-			navigator.clipboard.writeText(text)
-			view.focus()
-		},
-		paste: async () => {
-			if (!view) return
-			let text = await navigator.clipboard.readText()
-			let { from, to } = view.state.selection.main
-			view.dispatch({
-				changes: { from, to, insert: text },
-				selection: { anchor: from + text.length },
-			})
-			view.focus()
-		},
+		cut,
+		copy,
+		paste,
 		toggleBold: () => runCommand(toggleBold),
 		toggleItalic: () => runCommand(toggleItalic),
 		toggleStrikethrough: () => runCommand(toggleStrikethrough),
@@ -983,33 +1003,33 @@ function MarkdownEditor(
 			setScrollPosition: () => {},
 			undo: () => {},
 			redo: () => {},
-			cut: () => {},
-			copy: () => {},
-			paste: async () => {},
-			toggleBold: () => {},
-			toggleItalic: () => {},
-			toggleStrikethrough: () => {},
-			toggleInlineCode: () => {},
-			setHeading: () => {},
-			toggleBulletList: () => {},
-			toggleOrderedList: () => {},
-			toggleTaskList: () => {},
+			cut,
+			copy,
+			paste,
+			toggleBold: () => runCommand(toggleBold),
+			toggleItalic: () => runCommand(toggleItalic),
+			toggleStrikethrough: () => runCommand(toggleStrikethrough),
+			toggleInlineCode: () => runCommand(toggleInlineCode),
+			setHeading: level => runCommand(setHeadingLevel(level)),
+			toggleBulletList: () => runCommand(toggleBulletList),
+			toggleOrderedList: () => runCommand(toggleOrderedList),
+			toggleTaskList: () => runCommand(toggleTaskList),
 			toggleTaskComplete: () => {
 				if (view) {
 					toggleTaskCompleteWithSort(autoSortRef.current)(view)
 					view.focus()
 				}
 			},
-			toggleBlockquote: () => {},
-			setBody: () => {},
-			insertLink: () => {},
-			insertImage: () => {},
-			insertCodeBlock: () => {},
-			indent: () => {},
-			outdent: () => {},
-			moveLineUp: () => {},
-			moveLineDown: () => {},
-			sortTasks: () => {},
+			toggleBlockquote: () => runCommand(toggleBlockquote),
+			setBody: () => runCommand(setBody),
+			insertLink: () => runCommand(insertLink),
+			insertImage: () => runCommand(insertImage),
+			insertCodeBlock: () => runCommand(insertCodeBlock),
+			indent: () => view && void indentMore(view),
+			outdent: () => view && void indentLess(view),
+			moveLineUp: () => runCommand(moveLineUp),
+			moveLineDown: () => runCommand(moveLineDown),
+			sortTasks: () => runCommand(sortTasks),
 			getLinkAtCursor,
 			getEditor: () => view,
 			refreshDecorations,
@@ -1034,7 +1054,19 @@ function MarkdownEditor(
 					onHeightChange={setFindPanelHeight}
 				/>
 			)}
-			<div ref={containerRef} className={className} />
+			<EditorContextMenu
+				editor={internalRef}
+				readOnly={readOnly}
+				nativeContextMenu={isMobile}
+				canAddComment={Boolean(onAddComment)}
+				onAddComment={() => {
+					let opened = floatingActionsRef.current?.triggerAddComment() ?? false
+					if (!opened) toast.info(t("comments.selectionRequired"))
+				}}
+				onWikilinkClick={onWikilinkClick}
+			>
+				<div ref={containerRef} className={className} />
+			</EditorContextMenu>
 
 			<FloatingActions
 				editor={internalRef}
