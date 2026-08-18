@@ -171,7 +171,6 @@ interface SidebarProps extends React.ComponentProps<"div"> {
 	side?: "left" | "right"
 	collapsible?: "offcanvas" | "icon" | "none"
 	mobileTitle?: string
-	mobileCloseLabel?: string
 }
 
 function Sidebar({
@@ -180,7 +179,6 @@ function Sidebar({
 	className,
 	children,
 	mobileTitle,
-	mobileCloseLabel,
 	...props
 }: SidebarProps) {
 	let ctx = useSidebar()
@@ -229,7 +227,7 @@ function Sidebar({
 			>
 				<SheetContent
 					side={side}
-					closeLabel={mobileCloseLabel}
+					showCloseButton={false}
 					className="bg-background text-foreground w-(--sidebar-width-mobile)"
 					style={
 						{

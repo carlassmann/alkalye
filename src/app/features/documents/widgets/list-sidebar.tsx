@@ -26,7 +26,6 @@ function ListSidebar({
 			side="left"
 			collapsible="offcanvas"
 			mobileTitle={t("doc.sidebar.syncedDocuments")}
-			mobileCloseLabel={t("doc.sidebar.closeFile")}
 		>
 			<SidebarHeader
 				className="border-border flex-row items-center justify-between border-b p-2"

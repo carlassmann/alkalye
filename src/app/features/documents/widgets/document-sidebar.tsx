@@ -46,7 +46,6 @@ function DocumentSidebar({
 			side="right"
 			collapsible="offcanvas"
 			mobileTitle={t("editor.toolbar.documentTools")}
-			mobileCloseLabel={t("doc.sidebar.closeFile")}
 		>
 			<SidebarHeader className="border-border gap-0 border-b p-0">
 				<div
