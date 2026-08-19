@@ -1,7 +1,12 @@
 import { co, type Group } from "jazz-tools"
 import { createImage } from "jazz-tools/media"
 import { z } from "zod"
-import { Asset, TldrawAsset, TldrawRevision } from "./schema"
+import {
+	Asset,
+	TldrawAsset,
+	TldrawRevision,
+	WhiteboardPresenceFeed,
+} from "./schema"
 import { Document } from "@/app/features/documents/lib/schema"
 import { syncDocumentMetadata } from "@/app/features/documents/lib/metadata"
 
@@ -85,6 +90,7 @@ function createTldrawAssetFromRevision(
 			type: "tldraw",
 			name,
 			revision,
+			presence: WhiteboardPresenceFeed.create([], { owner }),
 			createdAt,
 		},
 		owner,

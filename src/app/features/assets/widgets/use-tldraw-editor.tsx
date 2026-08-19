@@ -109,6 +109,7 @@ function useTldrawEditor({
 	let dialog = editor ? (
 		<TldrawEditorDialog
 			open={true}
+			assetId={editor.assetId}
 			name={editor.name}
 			initialJson={editor.initialJson}
 			mode={editor.mode}

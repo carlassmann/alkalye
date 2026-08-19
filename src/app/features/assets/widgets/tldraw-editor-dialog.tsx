@@ -22,6 +22,7 @@ import { ConfirmDialog } from "@/app/components/ui/confirm-dialog"
 import { T, useIntl } from "@/shared/intl/setup"
 import type { TldrawSave } from "../lib/tldraw"
 import type { TldrawCanvasHandle } from "./tldraw-canvas"
+import { WhiteboardPresence } from "./whiteboard-presence"
 
 export { TldrawEditorDialog }
 
@@ -33,6 +34,7 @@ let LazyTldrawCanvas = lazy(() =>
 
 interface TldrawEditorDialogProps {
 	open: boolean
+	assetId?: string
 	name: string
 	initialJson?: string
 	mode: "create" | "edit" | "import"
@@ -42,6 +44,7 @@ interface TldrawEditorDialogProps {
 
 function TldrawEditorDialog({
 	open,
+	assetId,
 	name,
 	initialJson,
 	mode,
@@ -111,13 +114,16 @@ function TldrawEditorDialog({
 					className="inset-0 top-0 left-0 isolate !flex h-[100dvh] max-w-none translate-x-0 flex-col gap-0 rounded-none border-0 p-0 ring-0 sm:top-0 sm:max-w-none sm:translate-y-0"
 				>
 					<DialogHeader className="border-border bg-background z-10 flex h-[calc(3.5rem+env(safe-area-inset-top))] shrink-0 flex-row items-end justify-between gap-3 border-b px-2 pt-[env(safe-area-inset-top)] pb-1.5 sm:h-14 sm:items-center sm:px-3 sm:pt-0 sm:pb-0">
-						<div className="min-w-0 px-1">
-							<DialogTitle className="truncate text-sm font-medium sm:text-base">
-								{name}
-							</DialogTitle>
-							<DialogDescription className="sr-only">
-								{t("assets.whiteboardEditorDescription")}
-							</DialogDescription>
+						<div className="flex min-w-0 flex-1 items-center gap-2 px-1">
+							<div className="min-w-0">
+								<DialogTitle className="truncate text-sm font-medium sm:text-base">
+									{name}
+								</DialogTitle>
+								<DialogDescription className="sr-only">
+									{t("assets.whiteboardEditorDescription")}
+								</DialogDescription>
+							</div>
+							{assetId && <WhiteboardPresence assetId={assetId} />}
 						</div>
 						<div className="flex shrink-0 items-center gap-1.5">
 							<Button

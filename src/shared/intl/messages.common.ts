@@ -41,6 +41,8 @@ let baseCommonMessages = messages({
 	"assets.whiteboardSaved": "Whiteboard saved",
 	"assets.whiteboardAdded": "Whiteboard added",
 	"assets.whiteboardSaveFailed": "Could not save the whiteboard",
+	"assets.whiteboardPresenceOne": "1 other viewing",
+	"assets.whiteboardPresenceMany": "{$count} others viewing",
 	"assets.discardWhiteboardTitle": "Discard whiteboard changes?",
 	"assets.discardWhiteboardDescription":
 		"Your changes since opening the whiteboard will be lost.",
@@ -201,6 +203,8 @@ let deCommonMessages = translate(baseCommonMessages, {
 	"assets.whiteboardAdded": "Whiteboard hinzugefügt",
 	"assets.whiteboardSaveFailed":
 		"Das Whiteboard konnte nicht gespeichert werden",
+	"assets.whiteboardPresenceOne": "1 weitere Sitzung",
+	"assets.whiteboardPresenceMany": "{$count} weitere Sitzungen",
 	"assets.discardWhiteboardTitle": "Whiteboard-Änderungen verwerfen?",
 	"assets.discardWhiteboardDescription":
 		"Deine Änderungen seit dem Öffnen des Whiteboards gehen verloren.",
