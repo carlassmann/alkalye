@@ -135,6 +135,19 @@ function EditorContextMenu({
 					}
 
 					let nextContext = getEditorContext(view, position)
+					let nextHasSelection =
+						nextContext.selection.from !== nextContext.selection.to
+					let nextHasContext = Boolean(
+						nextContext.linkUrl ||
+						nextContext.wikiLinkId ||
+						nextContext.isTask ||
+						nextContext.image,
+					)
+					if (!nextHasSelection && !nextHasContext) {
+						event.preventBaseUIHandler()
+						event.nativeEvent.stopImmediatePropagation()
+						return
+					}
 					savedSelection.current = nextContext.selection
 					setContext(nextContext)
 				}}

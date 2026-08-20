@@ -701,6 +701,8 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 						commentsEnabled ? handleCreateCommentFromSelection : undefined
 					}
 					autoSortTasks={editorSettings?.editor?.autoSortTasks}
+					spellcheck={editorSettings?.editor?.spellcheck ?? true}
+					spellcheckLanguage={editorSettings?.editor?.spellcheckLanguage}
 					extensions={[
 						imageExtensions({
 							resolver: assetId => {

@@ -86,6 +86,7 @@ let baseCommonMessages = messages({
 
 	"help.label": "Help",
 	"help.welcome": "Welcome",
+	"help.shortcuts": "Keyboard shortcuts",
 	"help.tutorAlkalye": "Alkalye Tutor",
 	"help.tutorMarkdown": "Markdown Tutor",
 	"help.tutorPresentation": "Presentation Tutor",
@@ -250,6 +251,7 @@ let deCommonMessages = translate(baseCommonMessages, {
 
 	"help.label": "Hilfe",
 	"help.welcome": "Willkommen",
+	"help.shortcuts": "Tastaturkürzel",
 	"help.tutorAlkalye": "Alkalye Tutor",
 	"help.tutorMarkdown": "Markdown Tutor",
 	"help.tutorPresentation": "Präsentations Tutor",

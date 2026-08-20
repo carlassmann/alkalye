@@ -8,6 +8,7 @@ function useFindPanel(): {
 	findQuery?: string
 	findCase?: boolean
 	findFuzzy?: boolean
+	findReplace?: boolean
 	setFind: (updates: FindPanelState) => void
 } {
 	let search = useSearch({ strict: false }) as FindSearchSchema
@@ -17,6 +18,7 @@ function useFindPanel(): {
 	let findQuery = search.q
 	let findCase = search.case
 	let findFuzzy = search.fuzzy
+	let findReplace = search.replace
 
 	let setFind = useCallback(
 		(updates: FindPanelState) => {
@@ -30,6 +32,7 @@ function useFindPanel(): {
 					delete next.q
 					delete next.case
 					delete next.fuzzy
+					delete next.replace
 				}
 			}
 
@@ -57,6 +60,11 @@ function useFindPanel(): {
 				}
 			}
 
+			if (updates.replace !== undefined) {
+				if (updates.replace) next.replace = true
+				else delete next.replace
+			}
+
 			void navigate({
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				search: next as any,
@@ -66,7 +74,7 @@ function useFindPanel(): {
 		[navigate, search],
 	)
 
-	return { findOpen, findQuery, findCase, findFuzzy, setFind }
+	return { findOpen, findQuery, findCase, findFuzzy, findReplace, setFind }
 }
 
 interface FindPanelState {
@@ -74,6 +82,7 @@ interface FindPanelState {
 	q?: string
 	case?: boolean
 	fuzzy?: boolean
+	replace?: boolean
 }
 
 interface FindSearchSchema {
@@ -81,5 +90,6 @@ interface FindSearchSchema {
 	q?: string
 	case?: boolean
 	fuzzy?: boolean
+	replace?: boolean
 	[key: string]: unknown
 }

@@ -898,6 +898,44 @@ function EditorSection({ settings: jazzSettings }: EditorSectionProps) {
 						onChange={v => setSettings({ autoSortTasks: v })}
 					/>
 
+					<ToggleSetting
+						id="spellcheck-toggle"
+						label={<T k="settings.editor.spellcheck" />}
+						checked={settings.spellcheck ?? true}
+						onChange={v => setSettings({ spellcheck: v })}
+					/>
+
+					<div className="flex min-h-8 items-center justify-between gap-4">
+						<label htmlFor="spellcheck-language" className="text-sm">
+							<T k="settings.editor.spellcheckLanguage" />
+						</label>
+						<Select
+							value={settings.spellcheckLanguage || "system"}
+							onValueChange={value => {
+								if (value === "system" || value === "en" || value === "de") {
+									setSettings({
+										spellcheckLanguage: value === "system" ? "" : value,
+									})
+								}
+							}}
+						>
+							<SelectTrigger id="spellcheck-language" className="w-40">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="system">
+									<T k="settings.editor.spellcheckLanguage.system" />
+								</SelectItem>
+								<SelectItem value="en">
+									<T k="settings.editor.spellcheckLanguage.english" />
+								</SelectItem>
+								<SelectItem value="de">
+									<T k="settings.editor.spellcheckLanguage.german" />
+								</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+
 					<div className="flex min-h-8 items-center justify-between gap-4">
 						<label htmlFor="stats-badge-unit" className="text-sm">
 							<T k="settings.editor.statsBadge" />

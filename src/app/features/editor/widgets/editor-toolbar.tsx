@@ -32,7 +32,11 @@ import {
 	ArrowDownToLine,
 } from "lucide-react"
 import { Kbd } from "@/app/components/ui/kbd"
-import { getShortcutLabel, type ShortcutId } from "@/app/lib/shortcut-registry"
+import {
+	getAriaShortcut,
+	getShortcutLabel,
+	type ShortcutId,
+} from "@/app/lib/shortcut-registry"
 import { ThemePicker, PresetPicker } from "@/app/features/themes"
 import { cn } from "@/app/lib/cn"
 import { useIntl, T } from "@/shared/intl/setup"
@@ -367,6 +371,9 @@ function ToolbarButton({
 						size="icon"
 						onClick={onClick}
 						aria-label={label}
+						aria-keyshortcuts={
+							shortcutId ? getAriaShortcut(shortcutId) : undefined
+						}
 						className={cn("shrink-0", className)}
 					>
 						{icon}

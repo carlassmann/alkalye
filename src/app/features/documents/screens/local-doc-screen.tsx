@@ -643,6 +643,8 @@ function LocalEditorContent({
 					resolveWikilink={resolveWikilink}
 					onWikilinkClick={handleWikilinkClick}
 					autoSortTasks={editorSettings?.editor?.autoSortTasks}
+					spellcheck={editorSettings?.editor?.spellcheck ?? true}
+					spellcheckLanguage={editorSettings?.editor?.spellcheckLanguage}
 					extensions={[...presentationExtensions()]}
 				/>
 				<EditorToolbar

@@ -12,7 +12,13 @@ import {
 import { Kbd } from "@/app/components/ui/kbd"
 import { getShortcutLabel } from "@/app/lib/shortcut-registry"
 import { useSidebar } from "@/app/components/ui/sidebar"
-import { setFindQuery, selectMatch, getFindState } from "../lib/find-extension"
+import {
+	getFindState,
+	replaceAllMatches,
+	replaceCurrentMatch,
+	selectMatch,
+	setFindQuery,
+} from "../lib/find-extension"
 import { useIntl, T } from "@/shared/intl/setup"
 
 export { FindPanel }
@@ -22,6 +28,7 @@ interface FindPanelProps {
 	query?: string
 	caseSensitive?: boolean
 	fuzzy?: boolean
+	replaceOpen?: boolean
 	onQueryChange?: (query: string) => void
 	onCaseChange?: (caseSensitive: boolean) => void
 	onFuzzyChange?: (fuzzy: boolean) => void
@@ -34,6 +41,7 @@ function FindPanel({
 	query: controlledQuery,
 	caseSensitive: controlledCaseSensitive,
 	fuzzy: controlledFuzzy,
+	replaceOpen,
 	onQueryChange,
 	onCaseChange,
 	onFuzzyChange,
@@ -44,6 +52,14 @@ function FindPanel({
 	let { rightOpen, isMobile } = useSidebar()
 	let inputRef = useRef<HTMLInputElement>(null)
 	let panelRef = useRef<HTMLDivElement>(null)
+	let [selectionScope] = useState(() =>
+		view && view.state.selection.main.from !== view.state.selection.main.to
+			? {
+					from: view.state.selection.main.from,
+					to: view.state.selection.main.to,
+				}
+			: undefined,
+	)
 
 	// Use controlled values or local state with persistence
 	let isControlled = controlledQuery !== undefined
@@ -60,6 +76,8 @@ function FindPanel({
 	let fuzzy = isControlled ? (controlledFuzzy ?? false) : localFuzzy
 
 	let [matchInfo, setMatchInfo] = useState({ current: 0, total: 0 })
+	let [replacement, setReplacement] = useState(lastReplacement)
+	let [selectionOnly, setSelectionOnly] = useState(false)
 
 	let closeRef = useRef(onClose)
 	let viewRef = useRef(view)
@@ -183,12 +201,38 @@ function FindPanel({
 		if (view) selectMatch(view, "prev")
 	}
 
+	function handleReplace() {
+		if (!view) return
+		if (
+			replaceCurrentMatch(
+				view,
+				replacement,
+				selectionOnly ? selectionScope : undefined,
+			)
+		) {
+			lastReplacement = replacement
+		}
+	}
+
+	function handleReplaceAll() {
+		if (!view) return
+		replaceAllMatches(
+			view,
+			replacement,
+			selectionOnly ? selectionScope : undefined,
+		)
+		lastReplacement = replacement
+	}
+
 	let sidebarWidth = rightOpen && !isMobile ? "14rem" : "0px"
 
 	let panel = (
 		<div
 			ref={panelRef}
-			className="find-panel bg-background border-border fixed z-50 flex flex-col gap-1.5 rounded border p-2 shadow-md transition-[right] duration-200 ease-in md:flex-row md:items-center md:py-1.5"
+			className={cn(
+				"find-panel bg-background border-border fixed z-50 flex flex-col gap-1.5 rounded border p-2 shadow-md transition-[right] duration-200 ease-in md:py-1.5",
+				!replaceOpen && "md:flex-row md:items-center",
+			)}
 			style={{
 				top: "calc(48px + env(safe-area-inset-top) + 0.75rem)",
 				right: `calc(${sidebarWidth} + 0.75rem)`,
@@ -226,6 +270,39 @@ function FindPanel({
 					</TooltipContent>
 				</Tooltip>
 			</div>
+
+			{replaceOpen && (
+				<div className="flex flex-wrap items-center gap-1.5">
+					<input
+						value={replacement}
+						onChange={event => setReplacement(event.target.value)}
+						onKeyDown={event => {
+							if (event.key === "Enter") {
+								event.preventDefault()
+								handleReplace()
+							}
+						}}
+						placeholder="Replace with…"
+						aria-label="Replace with"
+						className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-7 min-w-40 flex-1 border bg-transparent px-2 text-xs outline-none focus-visible:ring-1"
+					/>
+					<Button size="xs" variant="outline" onClick={handleReplace}>
+						Replace
+					</Button>
+					<Button size="xs" variant="outline" onClick={handleReplaceAll}>
+						Replace all
+					</Button>
+					<label className="flex min-h-7 items-center gap-1.5 px-1 text-xs">
+						<input
+							type="checkbox"
+							checked={selectionOnly}
+							disabled={!selectionScope}
+							onChange={event => setSelectionOnly(event.target.checked)}
+						/>
+						Selection only
+					</label>
+				</div>
+			)}
 
 			{/* Row 2: Controls */}
 			<div className="flex items-center gap-1.5">
@@ -354,3 +431,4 @@ function FindPanel({
 let lastQuery = ""
 let lastCaseSensitive = false
 let lastFuzzy = false
+let lastReplacement = ""

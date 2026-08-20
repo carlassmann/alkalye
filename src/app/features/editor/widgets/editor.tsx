@@ -23,18 +23,33 @@ import {
 import { languages } from "@codemirror/language-data"
 import {
 	defaultKeymap,
+	addCursorAbove,
+	addCursorBelow,
+	copyLineDown,
+	copyLineUp,
+	deleteLine,
 	history,
 	historyKeymap,
 	indentLess,
 	indentMore,
+	insertBlankLine,
 	redo,
+	selectLine,
 	undo,
 } from "@codemirror/commands"
+import {
+	selectNextOccurrence,
+	selectSelectionMatches,
+} from "@codemirror/search"
 import { syntaxTree } from "@codemirror/language"
 import { Image as JazzImage } from "jazz-tools/react"
 import { editorExtensions } from "../lib/extensions"
 import {
 	insertCodeBlock,
+	insertBlankLineAbove,
+	insertMarkdownLineBreak,
+	clearFormatting,
+	demoteHeading,
 	insertImage,
 	indentMarkdown,
 	insertMarkdownBlock,
@@ -43,6 +58,8 @@ import {
 	moveLineDown,
 	moveLineUp,
 	outdentMarkdown,
+	promoteHeading,
+	renumberOrderedLists,
 	setBody,
 	setHeadingLevel,
 	sortTasks,
@@ -56,6 +73,21 @@ import {
 	toggleTaskCompleteWithSort,
 	toggleTaskList,
 } from "../lib/commands"
+import {
+	expandMarkdownSelection,
+	shrinkMarkdownSelection,
+} from "../lib/selection-commands"
+import {
+	insertTable,
+	insertTableRow,
+	moveTableCellBackward,
+	moveTableCellForward,
+} from "../lib/table-commands"
+import { orderedListRenumbering } from "../lib/ordered-list-renumbering"
+import { createCodeLanguageAutocomplete } from "../lib/code-language-autocomplete"
+import { createSlashCommands } from "../lib/slash-commands"
+import { insertPastedHtml, insertPastedText } from "../lib/paste-commands"
+import { createSpellcheckExtension } from "../lib/spellcheck"
 import { createBracketsExtension } from "../lib/autocomplete-brackets"
 import { createWikilinkAutocomplete } from "../lib/wikilink-autocomplete"
 import { createLinkDecorations } from "../lib/link-decorations"
@@ -96,9 +128,18 @@ import { useIntl } from "@/shared/intl/setup"
 import type { EditorAsset } from "@/app/features/assets"
 import {
 	getCodeMirrorShortcut,
+	getAriaShortcut,
+	getShortcutDefinitions,
+	isShortcutEvent,
+	isShortcutTargetBlocked,
 	type ShortcutId,
 } from "@/app/lib/shortcut-registry"
 import { combinedAutocompletion } from "@/app/lib/completion-sources"
+import {
+	CommandPalette,
+	ShortcutsDialog,
+	type CommandId,
+} from "./command-palette"
 
 export { MarkdownEditor, useMarkdownEditorRef }
 export { parseFrontmatter } from "../lib/frontmatter"
@@ -168,6 +209,8 @@ interface MarkdownEditorProps {
 	readOnly?: boolean
 	className?: string
 	autoSortTasks?: boolean
+	spellcheck?: boolean
+	spellcheckLanguage?: string
 }
 
 type VideoUploadState = {
@@ -258,6 +301,8 @@ function MarkdownEditor(
 		readOnly,
 		className,
 		autoSortTasks,
+		spellcheck = true,
+		spellcheckLanguage,
 		ref,
 	} = props
 
@@ -266,7 +311,8 @@ function MarkdownEditor(
 	let hasFinePointer = useHasFinePointer()
 
 	// Find panel state is URL-driven via hook
-	let { findOpen, findQuery, findCase, findFuzzy, setFind } = useFindPanel()
+	let { findOpen, findQuery, findCase, findFuzzy, findReplace, setFind } =
+		useFindPanel()
 	let findPanelOpen = findOpen
 	let findPanelOpenRef = useRef(false)
 
@@ -274,6 +320,7 @@ function MarkdownEditor(
 	let containerRef = useRef<HTMLDivElement>(null)
 	let readOnlyCompartment = useRef(new Compartment())
 	let placeholderCompartment = useRef(new Compartment())
+	let spellcheckCompartment = useRef(new Compartment())
 	let floatingActionsRef = useRef<FloatingActionsRef>(null)
 	let [view, setView] = useState<EditorView | null>(null)
 	let [isFocused, setIsFocused] = useState(false)
@@ -287,6 +334,8 @@ function MarkdownEditor(
 	} | null>(null)
 	let pendingTldrawEdit = useRef<string | null>(null)
 	let [videoUpload, setVideoUpload] = useState<VideoUploadState | null>(null)
+	let [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
+	let [shortcutsOpen, setShortcutsOpen] = useState(false)
 
 	let callbacksRef = useRef({ onChange, onCursorChange, onFocus, onBlur })
 	findPanelOpenRef.current = findPanelOpen
@@ -297,6 +346,7 @@ function MarkdownEditor(
 	let importTldrawRef = useRef(onImportTldraw)
 	let addCommentEnabledRef = useRef(Boolean(onAddComment))
 	let activeDropsRef = useRef<Set<DropTarget>>(new Set())
+	let rawPasteRef = useRef(false)
 
 	useEffect(() => {
 		callbacksRef.current = { onChange, onCursorChange, onFocus, onBlur }
@@ -376,6 +426,8 @@ function MarkdownEditor(
 		value,
 		placeholder,
 		readOnly,
+		spellcheck,
+		spellcheckLanguage,
 		isMobile,
 		externalExtensions,
 	})
@@ -393,7 +445,11 @@ function MarkdownEditor(
 					writableShortcut("italic", toggleItalic),
 					writableShortcut("inlineCode", toggleInlineCode),
 					writableShortcut("link", insertLink),
-					writableShortcut("image", insertImage),
+					writableShortcut("image", view => {
+						let opened =
+							floatingActionsRef.current?.triggerAssetPicker() ?? false
+						return opened || insertImage(view)
+					}),
 					writableShortcut("strikethrough", toggleStrikethrough),
 					writableShortcut("heading1", setHeadingLevel(1)),
 					writableShortcut("heading2", setHeadingLevel(2)),
@@ -420,8 +476,33 @@ function MarkdownEditor(
 					}),
 					writableShortcut("moveLineUp", moveLineUp),
 					writableShortcut("moveLineDown", moveLineDown),
+					writableShortcut("duplicateLineUp", copyLineUp),
+					writableShortcut("duplicateLineDown", copyLineDown),
+					writableShortcut("deleteLine", deleteLine),
+					writableShortcut("insertLineBelow", insertBlankLine),
+					writableShortcut("insertLineAbove", insertBlankLineAbove),
+					writableShortcut("indentSelection", indentMore),
+					writableShortcut("outdentSelection", indentLess),
+					shortcut("selectLine", selectLine),
+					shortcut("addCursorAbove", addCursorAbove),
+					shortcut("addCursorBelow", addCursorBelow),
+					shortcut("selectNextOccurrence", selectNextOccurrence),
+					shortcut("selectAllOccurrences", selectSelectionMatches),
+					shortcut("expandSelection", expandMarkdownSelection),
+					shortcut("shrinkSelection", shrinkMarkdownSelection),
+					writableShortcut("hardBreak", insertMarkdownLineBreak),
+					shortcut("commandPalette", () => {
+						setCommandPaletteOpen(true)
+						return true
+					}),
+					writableShortcut("indent", moveTableCellForward),
+					writableShortcut("outdent", moveTableCellBackward),
 					shortcut("indent", indentMarkdown),
 					shortcut("outdent", outdentMarkdown),
+					{
+						key: "Enter",
+						run: runWritable(insertTableRow),
+					},
 					{
 						key: "Enter",
 						run: runWritable(insertNewlineContinueMarkupTight),
@@ -440,6 +521,14 @@ function MarkdownEditor(
 							view.state.selection.main.to,
 						)
 						setFind({ open: true, q: selectedText || undefined })
+						return true
+					}),
+					shortcut("replace", view => {
+						let selectedText = view.state.sliceDoc(
+							view.state.selection.main.from,
+							view.state.selection.main.to,
+						)
+						setFind({ open: true, replace: true, q: selectedText || undefined })
 						return true
 					}),
 					shortcut("findNext", view => {
@@ -466,6 +555,10 @@ function MarkdownEditor(
 			editorExtensions,
 			highlightActiveLine(),
 			EditorView.lineWrapping,
+			EditorView.clickAddsSelectionRange.of(event => event.altKey),
+			EditorView.contentAttributes.of({
+				"aria-keyshortcuts": editorAriaShortcuts(),
+			}),
 			EditorView.updateListener.of(update => {
 				if (update.docChanged) {
 					if (callbacksRef.current.onChange) {
@@ -494,6 +587,8 @@ function MarkdownEditor(
 			}),
 			// Feature extensions
 			createBracketsExtension(),
+			createCodeLanguageAutocomplete(),
+			createSlashCommands(),
 			combinedAutocompletion(),
 			createWikilinkAutocomplete(() => dataRef.current.documents ?? []),
 			createLinkDecorations(),
@@ -506,6 +601,7 @@ function MarkdownEditor(
 				handleWikilinkNavigate,
 			),
 			findExtension,
+			orderedListRenumbering,
 			fileDropCursor,
 			...(initRef.current.externalExtensions ?? []),
 		]
@@ -518,6 +614,12 @@ function MarkdownEditor(
 			),
 			readOnlyCompartment.current.of(
 				initRef.current.readOnly ? EditorState.readOnly.of(true) : [],
+			),
+			spellcheckCompartment.current.of(
+				createSpellcheckExtension(
+					initRef.current.spellcheck,
+					initRef.current.spellcheckLanguage,
+				),
 			),
 		)
 
@@ -649,13 +751,73 @@ function MarkdownEditor(
 			})()
 		}
 
+		function handleKeyDown(event: KeyboardEvent) {
+			rawPasteRef.current = isShortcutEvent(event, "rawPaste")
+		}
+
+		function handlePaste(event: ClipboardEvent) {
+			if (activeView.state.readOnly) return
+			if (rawPasteRef.current) {
+				rawPasteRef.current = false
+				return
+			}
+
+			let files = Array.from(event.clipboardData?.files ?? [])
+			let images = files.filter(file => file.type.startsWith("image/"))
+			let uploadImage = uploadImageRef.current
+			if (images.length > 0 && uploadImage) {
+				event.preventDefault()
+				let target: DropTarget = { pos: activeView.state.selection.main.from }
+				activeDropsRef.current.add(target)
+				void (async () => {
+					try {
+						for (let file of images) {
+							let result = await uploadImage(file)
+							let text = `![${result.name}](asset:${result.id})`
+							let pos = Math.min(target.pos, activeView.state.doc.length)
+							activeView.dispatch({
+								changes: { from: pos, insert: text },
+								selection: { anchor: pos + text.length },
+							})
+						}
+					} catch (error) {
+						console.error("Clipboard image upload failed:", error)
+						toast.error(
+							t("editor.upload.failed", { name: images[0]?.name ?? "image" }),
+						)
+					} finally {
+						activeDropsRef.current.delete(target)
+					}
+				})()
+				return
+			}
+
+			let html = event.clipboardData?.getData("text/html") ?? ""
+			if (html && insertPastedHtml(activeView, html)) {
+				event.preventDefault()
+				return
+			}
+			let text = event.clipboardData?.getData("text/plain") ?? ""
+			if (
+				activeView.state.selection.main.from !==
+					activeView.state.selection.main.to &&
+				insertPastedText(activeView, text)
+			) {
+				event.preventDefault()
+			}
+		}
+
 		// Capture phase so our preventDefault runs before CodeMirror's
 		// own drop handler on .cm-content.
 		dom.addEventListener("dragover", handleDragOver, true)
 		dom.addEventListener("drop", handleDrop, true)
+		dom.addEventListener("keydown", handleKeyDown, true)
+		dom.addEventListener("paste", handlePaste, true)
 		return () => {
 			dom.removeEventListener("dragover", handleDragOver, true)
 			dom.removeEventListener("drop", handleDrop, true)
+			dom.removeEventListener("keydown", handleKeyDown, true)
+			dom.removeEventListener("paste", handlePaste, true)
 		}
 	}, [view, t])
 
@@ -713,6 +875,15 @@ function MarkdownEditor(
 			),
 		})
 	}, [view, placeholder])
+
+	useEffect(() => {
+		if (!view) return
+		view.dispatch({
+			effects: spellcheckCompartment.current.reconfigure(
+				createSpellcheckExtension(spellcheck, spellcheckLanguage),
+			),
+		})
+	}, [view, spellcheck, spellcheckLanguage])
 
 	function getContent() {
 		return view?.state.doc.toString() ?? ""
@@ -820,6 +991,55 @@ function MarkdownEditor(
 		setFind({ open: false })
 	}
 
+	function runShortcut(id: CommandId) {
+		if (id === "clearFormatting") return void runCommand(clearFormatting)
+		if (id === "promoteHeading") return void runCommand(promoteHeading)
+		if (id === "demoteHeading") return void runCommand(demoteHeading)
+		if (id === "insertTable") return void runCommand(insertTable)
+		if (id === "insertDivider")
+			return void runCommand(insertMarkdownBlock("---"))
+		if (id === "insertWikilink") return void insertText("[[]]")
+		if (id === "renumberLists") return void runCommand(renumberOrderedLists)
+		if (id === "keyboardShortcuts") {
+			setShortcutsOpen(true)
+			return
+		}
+		let editorCommand = editorShortcutCommand(id, autoSortRef.current)
+		if (editorCommand) {
+			runCommand(editorCommand)
+			return
+		}
+		if (id === "image") {
+			if (!floatingActionsRef.current?.triggerAssetPicker())
+				runCommand(insertImage)
+			return
+		}
+		if (id === "comment") {
+			floatingActionsRef.current?.triggerAddComment()
+			return
+		}
+		if (id === "commandPalette") {
+			setCommandPaletteOpen(true)
+			return
+		}
+		if (id === "find" || id === "replace") {
+			setFind({ open: true, replace: id === "replace" })
+			return
+		}
+		if (id === "findNext" || id === "findPrevious") {
+			if (view) selectMatch(view, id === "findNext" ? "next" : "prev")
+			return
+		}
+		if (id === "undo") return void runCommand(undo)
+		if (id === "redo") return void runCommand(redo)
+		if (id === "cut") return void cut()
+		if (id === "copy") return void copy()
+		if (id === "paste" || id === "rawPaste") return void paste()
+		document.dispatchEvent(
+			new CustomEvent("alkalye:run-shortcut", { detail: id }),
+		)
+	}
+
 	async function cut() {
 		if (!view || view.state.readOnly) return
 		let { from, to } = view.state.selection.main
@@ -855,11 +1075,7 @@ function MarkdownEditor(
 		if (!view || view.state.readOnly) return
 		try {
 			let text = await navigator.clipboard.readText()
-			let { from, to } = view.state.selection.main
-			view.dispatch({
-				changes: { from, to, insert: text },
-				selection: { anchor: from + text.length },
-			})
+			insertPastedText(view, text)
 			view.focus()
 		} catch {
 			toast.error(t("editor.clipboard.unavailable"))
@@ -1012,14 +1228,72 @@ function MarkdownEditor(
 		}
 	})
 
+	useEffect(() => {
+		let container = containerRef.current
+		function handleGlobalKeyDown(event: KeyboardEvent) {
+			if (event.defaultPrevented || isShortcutTargetBlocked(event.target))
+				return
+			if (!isShortcutEvent(event, "commandPalette")) return
+			event.preventDefault()
+			setCommandPaletteOpen(true)
+		}
+		function handleOpenPalette() {
+			setCommandPaletteOpen(true)
+		}
+		function handleOpenShortcuts() {
+			setShortcutsOpen(true)
+		}
+		function handleEditorAction(event: Event) {
+			if (!(event instanceof CustomEvent)) return
+			if (event.detail === "image") {
+				if (floatingActionsRef.current?.triggerAssetPicker())
+					event.preventDefault()
+			}
+			if (event.detail === "comment") {
+				if (floatingActionsRef.current?.triggerAddComment())
+					event.preventDefault()
+			}
+		}
+		document.addEventListener("alkalye:open-command-palette", handleOpenPalette)
+		document.addEventListener("alkalye:open-shortcuts", handleOpenShortcuts)
+		document.addEventListener("keydown", handleGlobalKeyDown)
+		container?.addEventListener("alkalye:editor-action", handleEditorAction)
+		return () => {
+			document.removeEventListener(
+				"alkalye:open-command-palette",
+				handleOpenPalette,
+			)
+			document.removeEventListener(
+				"alkalye:open-shortcuts",
+				handleOpenShortcuts,
+			)
+			document.removeEventListener("keydown", handleGlobalKeyDown)
+			container?.removeEventListener(
+				"alkalye:editor-action",
+				handleEditorAction,
+			)
+		}
+	}, [])
+
 	return (
 		<>
+			<CommandPalette
+				open={commandPaletteOpen}
+				onOpenChange={setCommandPaletteOpen}
+				onRun={runShortcut}
+			/>
+			<ShortcutsDialog
+				open={shortcutsOpen}
+				onOpenChange={setShortcutsOpen}
+				onRun={runShortcut}
+			/>
 			{findPanelOpen && (
 				<FindPanel
 					view={view}
 					query={findQuery}
 					caseSensitive={findCase}
 					fuzzy={findFuzzy}
+					replaceOpen={findReplace}
 					onQueryChange={q => setFind({ q })}
 					onCaseChange={caseSensitive => setFind({ case: caseSensitive })}
 					onFuzzyChange={fuzzy => setFind({ fuzzy })}
@@ -1340,4 +1614,96 @@ function runWritable(run: EditorCommand): EditorCommand {
 		if (view.composing || view.compositionStarted) return false
 		return run(view)
 	}
+}
+
+function editorShortcutCommand(
+	id: ShortcutId,
+	autoSortTasks: boolean,
+): EditorCommand | null {
+	switch (id) {
+		case "bold":
+			return toggleBold
+		case "italic":
+			return toggleItalic
+		case "inlineCode":
+			return toggleInlineCode
+		case "link":
+			return insertLink
+		case "strikethrough":
+			return toggleStrikethrough
+		case "heading1":
+			return setHeadingLevel(1)
+		case "heading2":
+			return setHeadingLevel(2)
+		case "heading3":
+			return setHeadingLevel(3)
+		case "heading4":
+			return setHeadingLevel(4)
+		case "heading5":
+			return setHeadingLevel(5)
+		case "heading6":
+			return setHeadingLevel(6)
+		case "body":
+			return setBody
+		case "bulletList":
+			return toggleBulletList
+		case "orderedList":
+			return toggleOrderedList
+		case "taskList":
+			return toggleTaskList
+		case "toggleTask":
+			return toggleTaskCompleteWithSort(autoSortTasks)
+		case "sortTasks":
+			return sortTasks
+		case "blockquote":
+			return toggleBlockquote
+		case "codeBlock":
+			return insertCodeBlock
+		case "moveLineUp":
+			return moveLineUp
+		case "moveLineDown":
+			return moveLineDown
+		case "duplicateLineUp":
+			return copyLineUp
+		case "duplicateLineDown":
+			return copyLineDown
+		case "addCursorAbove":
+			return addCursorAbove
+		case "addCursorBelow":
+			return addCursorBelow
+		case "deleteLine":
+			return deleteLine
+		case "insertLineBelow":
+			return insertBlankLine
+		case "insertLineAbove":
+			return insertBlankLineAbove
+		case "selectLine":
+			return selectLine
+		case "indentSelection":
+			return indentMore
+		case "outdentSelection":
+			return indentLess
+		case "indent":
+			return indentMarkdown
+		case "outdent":
+			return outdentMarkdown
+		case "selectNextOccurrence":
+			return selectNextOccurrence
+		case "selectAllOccurrences":
+			return selectSelectionMatches
+		case "expandSelection":
+			return expandMarkdownSelection
+		case "shrinkSelection":
+			return shrinkMarkdownSelection
+		case "hardBreak":
+			return insertMarkdownLineBreak
+		default:
+			return null
+	}
+}
+
+function editorAriaShortcuts(): string {
+	return getShortcutDefinitions()
+		.map(definition => getAriaShortcut(definition.id))
+		.join(" ")
 }

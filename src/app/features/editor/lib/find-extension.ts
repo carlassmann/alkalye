@@ -12,7 +12,14 @@ import {
 	type ViewUpdate,
 } from "@codemirror/view"
 
-export { findExtension, setFindQuery, getFindState, selectMatch }
+export {
+	findExtension,
+	setFindQuery,
+	getFindState,
+	replaceAllMatches,
+	replaceCurrentMatch,
+	selectMatch,
+}
 export type { FindState, FindMatch }
 
 type FindMatch = { from: number; to: number }
@@ -86,6 +93,53 @@ function selectMatch(view: EditorView, direction: "next" | "prev") {
 
 function getFindState(view: EditorView): FindState {
 	return view.state.field(findStateField, false) ?? emptyState
+}
+
+function replaceCurrentMatch(
+	view: EditorView,
+	replacement: string,
+	scope?: FindMatch,
+): boolean {
+	let state = getFindState(view)
+	let matches = scopedMatches(state.matches, scope)
+	if (matches.length === 0) return false
+	let selection = view.state.selection.main
+	let match =
+		matches.find(
+			item => item.from === selection.from && item.to === selection.to,
+		) ??
+		matches.find(item => item.from >= selection.head) ??
+		matches[0]
+	if (!match) return false
+	view.dispatch({
+		changes: { from: match.from, to: match.to, insert: replacement },
+		selection: { anchor: match.from, head: match.from + replacement.length },
+	})
+	return true
+}
+
+function replaceAllMatches(
+	view: EditorView,
+	replacement: string,
+	scope?: FindMatch,
+): number {
+	let matches = scopedMatches(getFindState(view).matches, scope)
+	if (matches.length === 0) return 0
+	view.dispatch({
+		changes: matches.map(match => ({
+			from: match.from,
+			to: match.to,
+			insert: replacement,
+		})),
+	})
+	return matches.length
+}
+
+function scopedMatches(matches: FindMatch[], scope?: FindMatch): FindMatch[] {
+	if (!scope) return matches
+	return matches.filter(
+		match => match.from >= scope.from && match.to <= scope.to,
+	)
 }
 
 function computeMatches(

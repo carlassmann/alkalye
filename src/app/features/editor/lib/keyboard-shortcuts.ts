@@ -43,6 +43,11 @@ function setupKeyboardShortcuts(opts: {
 			opts.onPreview?.()
 			return
 		}
+		if (isShortcutEvent(e, "commandPalette")) {
+			e.preventDefault()
+			document.dispatchEvent(new Event("alkalye:open-command-palette"))
+			return
+		}
 		if (isShortcutEvent(e, "leftSidebar")) {
 			e.preventDefault()
 			opts.toggleLeft()
@@ -79,6 +84,23 @@ function setupKeyboardShortcuts(opts: {
 		}
 	}
 
+	function handleRunShortcut(event: Event) {
+		if (!(event instanceof CustomEvent)) return
+		let id = event.detail
+		if (id === "preview") opts.onPreview?.()
+		else if (id === "leftSidebar") opts.toggleLeft()
+		else if (id === "rightSidebar") opts.toggleRight()
+		else if (id === "focusMode") opts.toggleFocusMode()
+		else if (id === "find") opts.openFind?.()
+		else if (id === "print") opts.onPrintPdf?.()
+		else if (id === "saveAs") opts.onDownload?.()
+		else if (id === "save") showAutosaveToast()
+	}
+
 	document.addEventListener("keydown", handleKeyDown)
-	return () => document.removeEventListener("keydown", handleKeyDown)
+	document.addEventListener("alkalye:run-shortcut", handleRunShortcut)
+	return () => {
+		document.removeEventListener("keydown", handleKeyDown)
+		document.removeEventListener("alkalye:run-shortcut", handleRunShortcut)
+	}
 }

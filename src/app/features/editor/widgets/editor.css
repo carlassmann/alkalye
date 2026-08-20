@@ -138,6 +138,69 @@
 		var(--screen-keyboard-transition-easing);
 }
 
+.markdown-editor .cm-tooltip.cm-tooltip-autocomplete {
+	width: min(28rem, calc(100vw - 2rem));
+	padding: 0.25rem;
+	overflow: hidden;
+	color: var(--popover-foreground);
+	font-family: ui-sans-serif, system-ui, sans-serif;
+	font-size: 0.875rem;
+	background: var(--popover);
+	border: 0;
+	border-radius: var(--radius);
+	box-shadow:
+		0 0 0 1px var(--border),
+		0 12px 32px color-mix(in srgb, black 18%, transparent);
+}
+
+.markdown-editor .cm-tooltip-autocomplete > ul {
+	max-height: min(22rem, calc(100dvh - 8rem)) !important;
+	padding: 0;
+}
+
+.markdown-editor .cm-tooltip-autocomplete > ul > li {
+	display: flex;
+	min-height: 2.75rem;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.625rem 0.75rem;
+	border-radius: calc(var(--radius) - 0.25rem);
+}
+
+.markdown-editor .cm-tooltip-autocomplete > ul > li[aria-selected] {
+	color: var(--accent-foreground);
+	background: var(--accent);
+}
+
+.markdown-editor .cm-completionIcon {
+	display: none;
+}
+
+.markdown-editor .cm-completionLabel {
+	min-width: 0;
+	overflow: hidden;
+	font-weight: 500;
+	text-overflow: ellipsis;
+}
+
+.markdown-editor .cm-completionDetail {
+	min-width: 0;
+	margin-left: auto;
+	overflow: hidden;
+	color: var(--muted-foreground);
+	font-size: 0.75rem;
+	font-style: normal;
+	text-overflow: ellipsis;
+}
+
+.markdown-editor
+	.cm-tooltip-autocomplete
+	> ul
+	> li[aria-selected]
+	.cm-completionDetail {
+	color: color-mix(in srgb, var(--accent-foreground) 70%, transparent);
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.markdown-editor .cm-scroller,
 	.editor-toolbar,

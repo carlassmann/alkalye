@@ -13,6 +13,8 @@ let EditorSettings = z.object({
 	fadeDoneTasks: z.boolean(),
 	highlightCurrentLine: z.boolean(),
 	autoSortTasks: z.boolean(),
+	spellcheck: z.boolean().optional(),
+	spellcheckLanguage: z.enum(["", "en", "de"]).optional(),
 	showStatsBadge: z.boolean(),
 	statsBadgeUnit: StatsBadgeUnit,
 })
@@ -26,6 +28,8 @@ let DEFAULT_EDITOR_SETTINGS: z.infer<typeof EditorSettings> = {
 	fadeDoneTasks: false,
 	highlightCurrentLine: true,
 	autoSortTasks: false,
+	spellcheck: true,
+	spellcheckLanguage: "",
 	showStatsBadge: true,
 	statsBadgeUnit: "words",
 }

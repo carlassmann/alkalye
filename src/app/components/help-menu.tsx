@@ -8,7 +8,7 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuGroup,
 } from "@/app/components/ui/dropdown-menu"
-import { ExternalLink } from "lucide-react"
+import { ExternalLink, Keyboard } from "lucide-react"
 import { T } from "@/shared/intl/setup"
 
 export { HelpMenu }
@@ -38,6 +38,14 @@ function HelpMenu({
 						render={<Link to="/welcome" onClick={onNavigate} />}
 					>
 						<T k="help.welcome" />
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onClick={() =>
+							document.dispatchEvent(new Event("alkalye:open-shortcuts"))
+						}
+					>
+						<Keyboard />
+						<T k="help.shortcuts" />
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						render={

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
 import {
 	getCodeMirrorShortcut,
+	getAriaShortcut,
 	getShortcutDefinitions,
 	getShortcutLabel,
 	isShortcutEvent,
@@ -32,6 +33,11 @@ describe("shortcut registry", () => {
 		expect(getShortcutLabel("preview", "other")).toBe("Ctrl+Alt+R")
 		expect(getShortcutLabel("redo", "mac")).toBe("⌘⇧Z")
 		expect(getShortcutLabel("redo", "other")).toBe("Ctrl+Y")
+	})
+
+	it("derives aria-keyshortcuts values", () => {
+		expect(getAriaShortcut("commandPalette", "mac")).toBe("Meta+Shift+P")
+		expect(getAriaShortcut("commandPalette", "other")).toBe("Control+Shift+P")
 	})
 
 	it("requires exact modifiers", () => {

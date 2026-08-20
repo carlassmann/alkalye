@@ -53,7 +53,11 @@ import {
 	DialogTitle,
 } from "@/app/components/ui/dialog"
 import { cn } from "@/app/lib/cn"
-import { getShortcutLabel, type ShortcutId } from "@/app/lib/shortcut-registry"
+import {
+	getAriaShortcut,
+	getShortcutLabel,
+	type ShortcutId,
+} from "@/app/lib/shortcut-registry"
 import { useIntl, T } from "@/shared/intl/setup"
 
 export {
@@ -72,6 +76,7 @@ type Range = { from: number; to: number }
 interface FloatingActionsRef {
 	triggerContextAction: () => boolean
 	triggerAddComment: () => boolean
+	triggerAssetPicker: () => boolean
 }
 
 interface FloatingActionsProps {
@@ -370,6 +375,15 @@ function FloatingActions({
 
 	// Expose triggerContextAction to parent via ref
 	useImperativeHandle(actionsRef, () => ({
+		triggerAssetPicker: () => {
+			let view = editor.current?.getEditor()
+			if (!view || readOnly) return false
+			let selection = view.state.selection.main
+			imageRangeRef.current = { from: selection.from, to: selection.to }
+			imageSelectionRef.current = { from: selection.from, to: selection.to }
+			setImageDialogOpen(true)
+			return true
+		},
 		triggerAddComment: () => {
 			let view = editor.current?.getEditor()
 			if (!view || readOnly || !onAddComment) return false
@@ -1374,6 +1388,9 @@ function ActionButton({ icon, label, shortcutId, onClick }: ActionButtonProps) {
 						variant="brand"
 						onClick={onClick}
 						aria-label={label}
+						aria-keyshortcuts={
+							shortcutId ? getAriaShortcut(shortcutId) : undefined
+						}
 						className="shadow-md"
 						nativeButton={false}
 					>
