@@ -16,7 +16,7 @@ import {
 	DropdownMenuShortcut,
 } from "@/app/components/ui/dropdown-menu"
 import { Type } from "lucide-react"
-import { modKey, altModKey } from "@/app/lib/platform"
+import { getShortcutLabel } from "@/app/lib/shortcut-registry"
 import { WikiLinkDialog } from "./floating-actions"
 import type { MarkdownEditorRef } from "./editor"
 import { useIntl, T } from "@/shared/intl/setup"
@@ -91,8 +91,7 @@ function SidebarFormatMenu({
 								>
 									<T k="editor.menu.heading" /> {level}
 									<DropdownMenuShortcut>
-										{altModKey}
-										{level}
+										{getShortcutLabel(`heading${level}`)}
 									</DropdownMenuShortcut>
 								</DropdownMenuItem>
 							))}
@@ -111,7 +110,9 @@ function SidebarFormatMenu({
 								}
 							>
 								<T k="editor.menu.unordered" />
-								<DropdownMenuShortcut>{altModKey}L</DropdownMenuShortcut>
+								<DropdownMenuShortcut>
+									{getShortcutLabel("bulletList")}
+								</DropdownMenuShortcut>
 							</DropdownMenuItem>
 							<DropdownMenuItem
 								disabled={readOnly}
@@ -120,7 +121,9 @@ function SidebarFormatMenu({
 								}
 							>
 								<T k="editor.menu.ordered" />
-								<DropdownMenuShortcut>{altModKey}O</DropdownMenuShortcut>
+								<DropdownMenuShortcut>
+									{getShortcutLabel("orderedList")}
+								</DropdownMenuShortcut>
 							</DropdownMenuItem>
 							<DropdownMenuItem
 								disabled={readOnly}
@@ -129,7 +132,9 @@ function SidebarFormatMenu({
 								}
 							>
 								<T k="editor.menu.taskListLabel" />
-								<DropdownMenuShortcut>{altModKey}⇧L</DropdownMenuShortcut>
+								<DropdownMenuShortcut>
+									{getShortcutLabel("taskList")}
+								</DropdownMenuShortcut>
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem
@@ -139,7 +144,9 @@ function SidebarFormatMenu({
 								}
 							>
 								<T k="editor.menu.toggleComplete" />
-								<DropdownMenuShortcut>{altModKey}X</DropdownMenuShortcut>
+								<DropdownMenuShortcut>
+									{getShortcutLabel("toggleTask")}
+								</DropdownMenuShortcut>
 							</DropdownMenuItem>
 						</DropdownMenuSubContent>
 					</DropdownMenuSub>
@@ -149,7 +156,9 @@ function SidebarFormatMenu({
 						onClick={() => runAction(() => editor?.current?.toggleBlockquote())}
 					>
 						<T k="editor.menu.blockquote" />
-						<DropdownMenuShortcut>{altModKey}Q</DropdownMenuShortcut>
+						<DropdownMenuShortcut>
+							{getShortcutLabel("blockquote")}
+						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 
 					<DropdownMenuItem
@@ -157,7 +166,9 @@ function SidebarFormatMenu({
 						onClick={() => runAction(() => editor?.current?.setBody())}
 					>
 						<T k="editor.menu.body" />
-						<DropdownMenuShortcut>{altModKey}0</DropdownMenuShortcut>
+						<DropdownMenuShortcut>
+							{getShortcutLabel("body")}
+						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 
 					<DropdownMenuSub>
@@ -170,14 +181,18 @@ function SidebarFormatMenu({
 								onClick={() => runAction(() => editor?.current?.indent())}
 							>
 								<T k="editor.menu.indent" />
-								<DropdownMenuShortcut>Tab</DropdownMenuShortcut>
+								<DropdownMenuShortcut>
+									{getShortcutLabel("indent")}
+								</DropdownMenuShortcut>
 							</DropdownMenuItem>
 							<DropdownMenuItem
 								disabled={readOnly}
 								onClick={() => runAction(() => editor?.current?.outdent())}
 							>
 								<T k="editor.menu.outdent" />
-								<DropdownMenuShortcut>⇧Tab</DropdownMenuShortcut>
+								<DropdownMenuShortcut>
+									{getShortcutLabel("outdent")}
+								</DropdownMenuShortcut>
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem
@@ -185,14 +200,18 @@ function SidebarFormatMenu({
 								onClick={() => runAction(() => editor?.current?.moveLineUp())}
 							>
 								<T k="editor.menu.moveLineUp" />
-								<DropdownMenuShortcut>{altModKey}↑</DropdownMenuShortcut>
+								<DropdownMenuShortcut>
+									{getShortcutLabel("moveLineUp")}
+								</DropdownMenuShortcut>
 							</DropdownMenuItem>
 							<DropdownMenuItem
 								disabled={readOnly}
 								onClick={() => runAction(() => editor?.current?.moveLineDown())}
 							>
 								<T k="editor.menu.moveLineDown" />
-								<DropdownMenuShortcut>{altModKey}↓</DropdownMenuShortcut>
+								<DropdownMenuShortcut>
+									{getShortcutLabel("moveLineDown")}
+								</DropdownMenuShortcut>
 							</DropdownMenuItem>
 						</DropdownMenuSubContent>
 					</DropdownMenuSub>
@@ -204,14 +223,18 @@ function SidebarFormatMenu({
 						onClick={() => runAction(() => editor?.current?.toggleBold())}
 					>
 						<T k="editor.menu.bold" />
-						<DropdownMenuShortcut>{modKey}B</DropdownMenuShortcut>
+						<DropdownMenuShortcut>
+							{getShortcutLabel("bold")}
+						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						disabled={readOnly}
 						onClick={() => runAction(() => editor?.current?.toggleItalic())}
 					>
 						<T k="editor.menu.italic" />
-						<DropdownMenuShortcut>{modKey}I</DropdownMenuShortcut>
+						<DropdownMenuShortcut>
+							{getShortcutLabel("italic")}
+						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						disabled={readOnly}
@@ -220,7 +243,9 @@ function SidebarFormatMenu({
 						}
 					>
 						<T k="editor.menu.strikethrough" />
-						<DropdownMenuShortcut>{modKey}⇧X</DropdownMenuShortcut>
+						<DropdownMenuShortcut>
+							{getShortcutLabel("strikethrough")}
+						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
 
@@ -229,28 +254,36 @@ function SidebarFormatMenu({
 						onClick={() => runAction(() => editor?.current?.toggleInlineCode())}
 					>
 						<T k="editor.menu.code" />
-						<DropdownMenuShortcut>{modKey}E</DropdownMenuShortcut>
+						<DropdownMenuShortcut>
+							{getShortcutLabel("inlineCode")}
+						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						disabled={readOnly}
 						onClick={() => runAction(() => editor?.current?.insertCodeBlock())}
 					>
 						<T k="editor.menu.codeBlock" />
-						<DropdownMenuShortcut>{altModKey}C</DropdownMenuShortcut>
+						<DropdownMenuShortcut>
+							{getShortcutLabel("codeBlock")}
+						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						disabled={readOnly}
 						onClick={() => runAction(() => editor?.current?.insertLink())}
 					>
 						<T k="editor.menu.addLink" />
-						<DropdownMenuShortcut>{modKey}K</DropdownMenuShortcut>
+						<DropdownMenuShortcut>
+							{getShortcutLabel("link")}
+						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						disabled={readOnly}
 						onClick={() => runAction(() => editor?.current?.insertImage())}
 					>
 						<T k="editor.menu.addImage" />
-						<DropdownMenuShortcut>{altModKey}K</DropdownMenuShortcut>
+						<DropdownMenuShortcut>
+							{getShortcutLabel("image")}
+						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						disabled={readOnly}

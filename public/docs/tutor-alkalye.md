@@ -33,7 +33,7 @@ No need to select text or use menus.
 
 ## Focus mode
 
-Press `Cmd+Shift+F` (Mac) or `Ctrl+Shift+F` (Windows) to hide the sidebars. Just you and your words.
+Press `{{shortcut:focusMode:mac}}` (Mac) or `{{shortcut:focusMode:other}}` (Windows) to hide the sidebars. Just you and your words.
 
 Press again to exit.
 
@@ -102,7 +102,7 @@ Pinned documents show a pin icon and stay at the top regardless of sort order.
 
 ## Preview
 
-Press `Opt+Cmd+R` (Mac) or `Ctrl+Alt+R` (Windows) or click Preview from the Tool sidebar to see your document rendered as HTML.
+Press `{{shortcut:preview:mac}}` (Mac) or `{{shortcut:preview:other}}` (Windows) or click Preview from the Tool sidebar to see your document rendered as HTML.
 
 Preview updates live as you type.
 
@@ -205,7 +205,7 @@ Images are stored encrypted with your document. They sync across devices and wor
 
 **Download** (File menu) - Exports your document as a `.md` file. If you have images, creates a `.zip` with the markdown and an `assets` folder.
 
-**Save as** (`Cmd+S` / `Ctrl+S`) - Uses the system file picker to save directly to your filesystem.
+**Save as** (`{{shortcut:saveAs:mac}}` / `{{shortcut:saveAs:other}}`) - Uses the system file picker to save directly to your filesystem.
 
 ---
 
@@ -226,50 +226,50 @@ Speed up your writing with these shortcuts.
 
 ### Formatting
 
-| Action        | Mac           | Windows        |
-| ------------- | ------------- | -------------- |
-| Bold          | `Cmd+B`       | `Ctrl+B`       |
-| Italic        | `Cmd+I`       | `Ctrl+I`       |
-| Code          | `Cmd+E`       | `Ctrl+E`       |
-| Strikethrough | `Cmd+Shift+X` | `Ctrl+Shift+X` |
-| Link          | `Cmd+K`       | `Ctrl+K`       |
+| Action        | Mac                              | Windows                            |
+| ------------- | -------------------------------- | ---------------------------------- |
+| Bold          | `{{shortcut:bold:mac}}`          | `{{shortcut:bold:other}}`          |
+| Italic        | `{{shortcut:italic:mac}}`        | `{{shortcut:italic:other}}`        |
+| Code          | `{{shortcut:inlineCode:mac}}`    | `{{shortcut:inlineCode:other}}`    |
+| Strikethrough | `{{shortcut:strikethrough:mac}}` | `{{shortcut:strikethrough:other}}` |
+| Link          | `{{shortcut:link:mac}}`          | `{{shortcut:link:other}}`          |
 
 ### Headings
 
-| Action    | Mac         | Windows      |
-| --------- | ----------- | ------------ |
-| Heading 1 | `Opt+Cmd+1` | `Ctrl+Alt+1` |
-| Heading 2 | `Opt+Cmd+2` | `Ctrl+Alt+2` |
-| Heading 3 | `Opt+Cmd+3` | `Ctrl+Alt+3` |
-| Body text | `Opt+Cmd+0` | `Ctrl+Alt+0` |
+| Action    | Mac                         | Windows                       |
+| --------- | --------------------------- | ----------------------------- |
+| Heading 1 | `{{shortcut:heading1:mac}}` | `{{shortcut:heading1:other}}` |
+| Heading 2 | `{{shortcut:heading2:mac}}` | `{{shortcut:heading2:other}}` |
+| Heading 3 | `{{shortcut:heading3:mac}}` | `{{shortcut:heading3:other}}` |
+| Body text | `{{shortcut:body:mac}}`     | `{{shortcut:body:other}}`     |
 
 ### Lists
 
-| Action          | Mac               | Windows            |
-| --------------- | ----------------- | ------------------ |
-| Bullet list     | `Opt+Cmd+L`       | `Ctrl+Alt+L`       |
-| Ordered list    | `Opt+Cmd+O`       | `Ctrl+Alt+O`       |
-| Task list       | `Opt+Cmd+Shift+L` | `Ctrl+Alt+Shift+L` |
-| Toggle complete | `Opt+Cmd+X`       | `Ctrl+Alt+X`       |
+| Action          | Mac                            | Windows                          |
+| --------------- | ------------------------------ | -------------------------------- |
+| Bullet list     | `{{shortcut:bulletList:mac}}`  | `{{shortcut:bulletList:other}}`  |
+| Ordered list    | `{{shortcut:orderedList:mac}}` | `{{shortcut:orderedList:other}}` |
+| Task list       | `{{shortcut:taskList:mac}}`    | `{{shortcut:taskList:other}}`    |
+| Toggle complete | `{{shortcut:toggleTask:mac}}`  | `{{shortcut:toggleTask:other}}`  |
 
 ### Structure
 
-| Action         | Mac            | Windows         |
-| -------------- | -------------- | --------------- |
-| Move line up   | `Opt+Cmd+Up`   | `Ctrl+Alt+Up`   |
-| Move line down | `Opt+Cmd+Down` | `Ctrl+Alt+Down` |
-| Blockquote     | `Opt+Cmd+Q`    | `Ctrl+Alt+Q`    |
-| Code block     | `Opt+Cmd+C`    | `Ctrl+Alt+C`    |
+| Action         | Mac                             | Windows                           |
+| -------------- | ------------------------------- | --------------------------------- |
+| Move line up   | `{{shortcut:moveLineUp:mac}}`   | `{{shortcut:moveLineUp:other}}`   |
+| Move line down | `{{shortcut:moveLineDown:mac}}` | `{{shortcut:moveLineDown:other}}` |
+| Blockquote     | `{{shortcut:blockquote:mac}}`   | `{{shortcut:blockquote:other}}`   |
+| Code block     | `{{shortcut:codeBlock:mac}}`    | `{{shortcut:codeBlock:other}}`    |
 
 ### Navigation
 
-| Action            | Mac           | Windows        |
-| ----------------- | ------------- | -------------- |
-| Documents sidebar | `Cmd+Shift+E` | `Ctrl+Shift+E` |
-| Tools sidebar     | `Cmd+.`       | `Ctrl+.`       |
-| Focus mode        | `Cmd+Shift+F` | `Ctrl+Shift+F` |
-| Preview           | `Opt+Cmd+R`   | `Ctrl+Alt+R`   |
-| Save as           | `Cmd+S`       | `Ctrl+S`       |
+| Action            | Mac                             | Windows                           |
+| ----------------- | ------------------------------- | --------------------------------- |
+| Documents sidebar | `{{shortcut:leftSidebar:mac}}`  | `{{shortcut:leftSidebar:other}}`  |
+| Tools sidebar     | `{{shortcut:rightSidebar:mac}}` | `{{shortcut:rightSidebar:other}}` |
+| Focus mode        | `{{shortcut:focusMode:mac}}`    | `{{shortcut:focusMode:other}}`    |
+| Preview           | `{{shortcut:preview:mac}}`      | `{{shortcut:preview:other}}`      |
+| Save as           | `{{shortcut:saveAs:mac}}`       | `{{shortcut:saveAs:other}}`       |
 
 ---
 

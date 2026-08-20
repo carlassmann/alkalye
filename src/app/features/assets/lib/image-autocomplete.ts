@@ -1,10 +1,10 @@
 import {
-	autocompletion,
 	type CompletionContext,
 	type CompletionResult,
 	type Completion,
 } from "@codemirror/autocomplete"
 import { type Extension } from "@codemirror/state"
+import { completionSource } from "@/app/lib/completion-sources"
 
 export { createImageAutocomplete }
 
@@ -53,9 +53,5 @@ function createImageAutocomplete(getAssets: () => AssetInfo[]): Extension {
 		}
 	}
 
-	return autocompletion({
-		override: [imageCompletionSource],
-		activateOnTyping: true,
-		defaultKeymap: true,
-	})
+	return completionSource(imageCompletionSource)
 }

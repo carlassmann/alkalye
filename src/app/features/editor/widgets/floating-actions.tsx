@@ -34,7 +34,6 @@ import {
 	ExternalLink,
 	Image as ImageIcon,
 	Film,
-	Command,
 	FileText,
 	Link2,
 	Trash2,
@@ -54,7 +53,7 @@ import {
 	DialogTitle,
 } from "@/app/components/ui/dialog"
 import { cn } from "@/app/lib/cn"
-import { isMac } from "@/app/lib/platform"
+import { getShortcutLabel, type ShortcutId } from "@/app/lib/shortcut-registry"
 import { useIntl, T } from "@/shared/intl/setup"
 
 export {
@@ -71,7 +70,7 @@ export type { FloatingActionsProps, FloatingActionsRef }
 type Range = { from: number; to: number }
 
 interface FloatingActionsRef {
-	triggerContextAction: () => void
+	triggerContextAction: () => boolean
 	triggerAddComment: () => boolean
 }
 
@@ -392,7 +391,7 @@ function FloatingActions({
 		},
 		triggerContextAction: () => {
 			let view = editor.current?.getEditor()
-			if (!view) return
+			if (!view) return false
 
 			// Detect wikilink at cursor
 			let state = view.state
@@ -407,11 +406,13 @@ function FloatingActions({
 					let isValidLink = docs?.some(d => d.id === link.id)
 					if (isValidLink) {
 						setWikiLinkMenuOpen(true)
-					} else {
+					} else if (!readOnly) {
 						setWikilinkPrefill(link.id)
 						setWikiLinkDialogOpen(true)
+					} else {
+						return false
 					}
-					return
+					return true
 				}
 			}
 
@@ -428,8 +429,9 @@ function FloatingActions({
 					: pos + (textAfter.match(/^[^\][]*/) ?? [""])[0].length
 				wikiLinkRangeRef.current = { from, to }
 				setWikilinkPrefill((match[1] ?? "").trim())
+				if (readOnly) return false
 				setWikiLinkDialogOpen(true)
-				return
+				return true
 			}
 
 			// Check for image
@@ -443,11 +445,13 @@ function FloatingActions({
 						from: state.selection.main.from,
 						to: state.selection.main.to,
 					}
+					if (readOnly) return false
 					setImageDialogOpen(true)
-					return
+					return true
 				}
 				current = current.parent
 			}
+			return false
 		},
 	}))
 
@@ -643,7 +647,7 @@ function TaskAction({ editor, isTask, taskChecked }: TaskActionProps) {
 					? t("editor.floating.markIncomplete")
 					: t("editor.floating.markComplete")
 			}
-			shortcut="X"
+			shortcutId="toggleTask"
 			onClick={toggleTask}
 		/>
 	)
@@ -1261,7 +1265,7 @@ function MediaAction({
 interface ActionButtonProps {
 	icon: React.ReactNode
 	label: string
-	shortcut?: string
+	shortcutId?: ShortcutId
 	onClick: () => void
 }
 
@@ -1330,7 +1334,7 @@ function CommentAction({
 			<ActionButton
 				icon={<MessageSquarePlus />}
 				label={t("comments.add")}
-				shortcut="M"
+				shortcutId="comment"
 				onClick={openDialog}
 			/>
 			<Dialog open={commentDialogOpen} onOpenChange={closeDialog}>
@@ -1360,7 +1364,7 @@ function CommentAction({
 	)
 }
 
-function ActionButton({ icon, label, shortcut, onClick }: ActionButtonProps) {
+function ActionButton({ icon, label, shortcutId, onClick }: ActionButtonProps) {
 	return (
 		<Tooltip>
 			<TooltipTrigger
@@ -1379,19 +1383,7 @@ function ActionButton({ icon, label, shortcut, onClick }: ActionButtonProps) {
 			/>
 			<TooltipContent side="top" className="flex items-center gap-2">
 				{label}
-				{shortcut && (
-					<Kbd>
-						{isMac ? (
-							<>
-								⌥
-								<Command className="size-3" />
-							</>
-						) : (
-							"Ctrl+Alt+"
-						)}
-						{shortcut}
-					</Kbd>
-				)}
+				{shortcutId && <Kbd>{getShortcutLabel(shortcutId)}</Kbd>}
 			</TooltipContent>
 		</Tooltip>
 	)

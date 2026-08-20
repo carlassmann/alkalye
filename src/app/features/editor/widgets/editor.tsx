@@ -11,6 +11,7 @@ import {
 import {
 	EditorView,
 	keymap,
+	type KeyBinding,
 	placeholder as placeholderExt,
 	highlightActiveLine,
 } from "@codemirror/view"
@@ -35,11 +36,13 @@ import { editorExtensions } from "../lib/extensions"
 import {
 	insertCodeBlock,
 	insertImage,
+	indentMarkdown,
 	insertMarkdownBlock,
 	insertLink,
 	insertNewlineContinueMarkupTight,
 	moveLineDown,
 	moveLineUp,
+	outdentMarkdown,
 	setBody,
 	setHeadingLevel,
 	sortTasks,
@@ -54,6 +57,7 @@ import {
 	toggleTaskList,
 } from "../lib/commands"
 import { createBracketsExtension } from "../lib/autocomplete-brackets"
+import { createWikilinkAutocomplete } from "../lib/wikilink-autocomplete"
 import { createLinkDecorations } from "../lib/link-decorations"
 import { createWikilinkDecorations } from "../lib/wikilink-decorations"
 import { createBacklinkDecorations } from "../lib/backlink-decorations"
@@ -90,6 +94,11 @@ import {
 } from "@/app/features/import-export"
 import { useIntl } from "@/shared/intl/setup"
 import type { EditorAsset } from "@/app/features/assets"
+import {
+	getCodeMirrorShortcut,
+	type ShortcutId,
+} from "@/app/lib/shortcut-registry"
+import { combinedAutocompletion } from "@/app/lib/completion-sources"
 
 export { MarkdownEditor, useMarkdownEditorRef }
 export { parseFrontmatter } from "../lib/frontmatter"
@@ -110,6 +119,7 @@ type WikilinkDoc = {
 }
 
 type DropTarget = { pos: number }
+type EditorCommand = (view: EditorView) => boolean
 
 interface MarkdownEditorProps {
 	// Core
@@ -378,115 +388,74 @@ function MarkdownEditor(
 			keymap.of([...defaultKeymap, ...historyKeymap]),
 			Prec.highest(
 				keymap.of([
-					{ key: "Mod-b", run: toggleBold, preventDefault: true },
-					{ key: "Mod-i", run: toggleItalic, preventDefault: true },
-					{ key: "Mod-e", run: toggleInlineCode, preventDefault: true },
-					{ key: "Mod-k", run: insertLink, preventDefault: true },
-					{ key: "Alt-Mod-k", run: insertImage, preventDefault: true },
-					{
-						key: "Mod-Shift-x",
-						run: toggleStrikethrough,
-						preventDefault: true,
-					},
-					{ key: "Alt-Mod-1", run: setHeadingLevel(1), preventDefault: true },
-					{ key: "Alt-Mod-2", run: setHeadingLevel(2), preventDefault: true },
-					{ key: "Alt-Mod-3", run: setHeadingLevel(3), preventDefault: true },
-					{ key: "Alt-Mod-4", run: setHeadingLevel(4), preventDefault: true },
-					{ key: "Alt-Mod-5", run: setHeadingLevel(5), preventDefault: true },
-					{ key: "Alt-Mod-6", run: setHeadingLevel(6), preventDefault: true },
-					{ key: "Alt-Mod-0", run: setBody, preventDefault: true },
-					{ key: "Alt-Mod-l", run: toggleBulletList, preventDefault: true },
-					{ key: "Alt-Mod-o", run: toggleOrderedList, preventDefault: true },
-					{
-						key: "Alt-Mod-Shift-l",
-						run: toggleTaskList,
-						preventDefault: true,
-					},
-					{
-						key: "Alt-Mod-x",
-						run: view => toggleTaskCompleteWithSort(autoSortRef.current)(view),
-						preventDefault: true,
-					},
-					{ key: "Alt-Mod-Shift-x", run: sortTasks, preventDefault: true },
-					{ key: "Alt-Mod-q", run: toggleBlockquote, preventDefault: true },
-					{ key: "Alt-Mod-c", run: insertCodeBlock, preventDefault: true },
-					{
-						key: "Alt-Mod-m",
-						run: () => {
-							if (!addCommentEnabledRef.current) return false
-							let opened =
-								floatingActionsRef.current?.triggerAddComment() ?? false
-							if (!opened) toast.info(t("comments.selectionRequired"))
-							return true
-						},
-						preventDefault: true,
-					},
-					{ key: "Alt-Mod-ArrowUp", run: moveLineUp, preventDefault: true },
-					{
-						key: "Alt-Mod-ArrowDown",
-						run: moveLineDown,
-						preventDefault: true,
-					},
-					{
-						key: "Tab",
-						run: indentMore,
-						preventDefault: true,
-					},
-					{
-						key: "Shift-Tab",
-						run: indentLess,
-						preventDefault: true,
-					},
+					shortcutEventTracker(),
+					writableShortcut("bold", toggleBold),
+					writableShortcut("italic", toggleItalic),
+					writableShortcut("inlineCode", toggleInlineCode),
+					writableShortcut("link", insertLink),
+					writableShortcut("image", insertImage),
+					writableShortcut("strikethrough", toggleStrikethrough),
+					writableShortcut("heading1", setHeadingLevel(1)),
+					writableShortcut("heading2", setHeadingLevel(2)),
+					writableShortcut("heading3", setHeadingLevel(3)),
+					writableShortcut("heading4", setHeadingLevel(4)),
+					writableShortcut("heading5", setHeadingLevel(5)),
+					writableShortcut("heading6", setHeadingLevel(6)),
+					writableShortcut("body", setBody),
+					writableShortcut("bulletList", toggleBulletList),
+					writableShortcut("orderedList", toggleOrderedList),
+					writableShortcut("taskList", toggleTaskList),
+					writableShortcut("toggleTask", view =>
+						toggleTaskCompleteWithSort(autoSortRef.current)(view),
+					),
+					writableShortcut("sortTasks", sortTasks),
+					writableShortcut("blockquote", toggleBlockquote),
+					writableShortcut("codeBlock", insertCodeBlock),
+					writableShortcut("comment", () => {
+						if (!addCommentEnabledRef.current) return false
+						let opened =
+							floatingActionsRef.current?.triggerAddComment() ?? false
+						if (!opened) toast.info(t("comments.selectionRequired"))
+						return true
+					}),
+					writableShortcut("moveLineUp", moveLineUp),
+					writableShortcut("moveLineDown", moveLineDown),
+					shortcut("indent", indentMarkdown),
+					shortcut("outdent", outdentMarkdown),
 					{
 						key: "Enter",
-						run: insertNewlineContinueMarkupTight,
+						run: runWritable(insertNewlineContinueMarkupTight),
 					},
 					{
 						key: "Backspace",
-						run: deleteMarkupBackward,
+						run: runWritable(deleteMarkupBackward),
 					},
-					{
-						key: "Ctrl-Space",
-						run: () => {
-							floatingActionsRef.current?.triggerContextAction()
+					shortcut(
+						"contextAction",
+						() => floatingActionsRef.current?.triggerContextAction() ?? false,
+					),
+					shortcut("find", view => {
+						let selectedText = view.state.sliceDoc(
+							view.state.selection.main.from,
+							view.state.selection.main.to,
+						)
+						setFind({ open: true, q: selectedText || undefined })
+						return true
+					}),
+					shortcut("findNext", view => {
+						if (findPanelOpenRef.current) {
+							selectMatch(view, "next")
 							return true
-						},
-						preventDefault: true,
-					},
-					{
-						key: "Mod-f",
-						run: view => {
-							let selectedText = view.state.sliceDoc(
-								view.state.selection.main.from,
-								view.state.selection.main.to,
-							)
-							setFind({ open: true, q: selectedText || undefined })
+						}
+						return false
+					}),
+					shortcut("findPrevious", view => {
+						if (findPanelOpenRef.current) {
+							selectMatch(view, "prev")
 							return true
-						},
-						preventDefault: true,
-					},
-					{
-						key: "F3",
-						run: view => {
-							if (findPanelOpenRef.current) {
-								selectMatch(view, "next")
-								return true
-							}
-							return false
-						},
-						preventDefault: true,
-					},
-					{
-						key: "Shift-F3",
-						run: view => {
-							if (findPanelOpenRef.current) {
-								selectMatch(view, "prev")
-								return true
-							}
-							return false
-						},
-						preventDefault: true,
-					},
+						}
+						return false
+					}),
 				]),
 			),
 			markdown({
@@ -525,6 +494,8 @@ function MarkdownEditor(
 			}),
 			// Feature extensions
 			createBracketsExtension(),
+			combinedAutocompletion(),
+			createWikilinkAutocomplete(() => dataRef.current.documents ?? []),
 			createLinkDecorations(),
 			createWikilinkDecorations(
 				id => wikilinkResolverRef.current(id),
@@ -552,7 +523,7 @@ function MarkdownEditor(
 
 		let state = EditorState.create({
 			doc: initRef.current.value,
-			extensions,
+			extensions: [EditorState.allowMultipleSelections.of(true), extensions],
 		})
 
 		let editorView = new EditorView({
@@ -759,7 +730,7 @@ function MarkdownEditor(
 	}
 
 	function insertText(text: string) {
-		if (!view) return
+		if (!view || view.state.readOnly) return
 		let { from, to } = view.state.selection.main
 		view.dispatch({
 			changes: { from, to, insert: text },
@@ -768,12 +739,12 @@ function MarkdownEditor(
 	}
 
 	function insertBlock(text: string) {
-		if (!view) return
+		if (!view || view.state.readOnly) return
 		insertMarkdownBlock(text)(view)
 	}
 
 	function runCommand(cmd: (view: EditorView) => boolean) {
-		if (!view) return
+		if (!view || view.state.readOnly) return
 		cmd(view)
 		view.focus()
 	}
@@ -850,7 +821,7 @@ function MarkdownEditor(
 	}
 
 	async function cut() {
-		if (!view) return
+		if (!view || view.state.readOnly) return
 		let { from, to } = view.state.selection.main
 		if (from === to) return
 		let text = view.state.sliceDoc(from, to)
@@ -881,7 +852,7 @@ function MarkdownEditor(
 	}
 
 	async function paste() {
-		if (!view) return
+		if (!view || view.state.readOnly) return
 		try {
 			let text = await navigator.clipboard.readText()
 			let { from, to } = view.state.selection.main
@@ -927,13 +898,13 @@ function MarkdownEditor(
 			view.scrollDOM.scrollLeft = position.left
 		},
 		undo: () => {
-			if (view) {
+			if (view && !view.state.readOnly) {
 				undo(view)
 				view.focus()
 			}
 		},
 		redo: () => {
-			if (view) {
+			if (view && !view.state.readOnly) {
 				redo(view)
 				view.focus()
 			}
@@ -958,13 +929,13 @@ function MarkdownEditor(
 		insertImage: () => runCommand(insertImage),
 		insertCodeBlock: () => runCommand(insertCodeBlock),
 		indent: () => {
-			if (view) {
+			if (view && !view.state.readOnly) {
 				indentMore(view)
 				view.focus()
 			}
 		},
 		outdent: () => {
-			if (view) {
+			if (view && !view.state.readOnly) {
 				indentLess(view)
 				view.focus()
 			}
@@ -1332,4 +1303,41 @@ function VideoPreview({
 			)}
 		/>
 	)
+}
+
+let shortcutEvents = new WeakMap<EditorView, KeyboardEvent>()
+
+function shortcut(id: ShortcutId, run: EditorCommand): KeyBinding {
+	let binding = getCodeMirrorShortcut(id)
+	return {
+		...binding,
+		run: view => {
+			let event = shortcutEvents.get(view)
+			if (event?.isComposing || event?.getModifierState("AltGraph"))
+				return false
+			return run(view)
+		},
+		stopPropagation: true,
+	}
+}
+
+function shortcutEventTracker(): KeyBinding {
+	return {
+		any: (view, event) => {
+			shortcutEvents.set(view, event)
+			return false
+		},
+	}
+}
+
+function writableShortcut(id: ShortcutId, run: EditorCommand): KeyBinding {
+	return shortcut(id, runWritable(run))
+}
+
+function runWritable(run: EditorCommand): EditorCommand {
+	return view => {
+		if (view.state.readOnly) return true
+		if (view.composing || view.compositionStarted) return false
+		return run(view)
+	}
 }

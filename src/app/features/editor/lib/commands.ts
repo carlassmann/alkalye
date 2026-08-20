@@ -1,15 +1,19 @@
 import { insertNewlineContinueMarkup } from "@codemirror/lang-markdown"
+import { syntaxTree } from "@codemirror/language"
+import { indentLess, indentMore } from "@codemirror/commands"
 import { EditorView } from "@codemirror/view"
 import { sortTaskLists } from "./sort-tasks"
 
 export {
 	insertCodeBlock,
 	insertImage,
+	indentMarkdown,
 	insertMarkdownBlock,
 	insertLink,
 	insertNewlineContinueMarkupTight,
 	moveLineDown,
 	moveLineUp,
+	outdentMarkdown,
 	setBody,
 	setHeadingLevel,
 	sortTasks,
@@ -29,6 +33,8 @@ export {
 export type { Command }
 
 type Command = (view: EditorView) => boolean
+
+let markdownCodeNodes = new Set(["CodeBlock", "CodeText", "FencedCode"])
 
 function wrapSelection(marker: string): Command {
 	return view => {
@@ -76,6 +82,18 @@ function wrapSelection(marker: string): Command {
 		}
 		return true
 	}
+}
+
+let indentMarkdown: Command = view => {
+	if (view.composing || view.compositionStarted) return false
+	if (!shouldIndentWithTab(view)) return moveFocusFromEditor(view, 1)
+	return indentMore(view)
+}
+
+let outdentMarkdown: Command = view => {
+	if (view.composing || view.compositionStarted) return false
+	if (!shouldIndentWithTab(view)) return moveFocusFromEditor(view, -1)
+	return indentLess(view)
 }
 
 function toggleLinePrefix(prefix: string): Command {
@@ -526,4 +544,42 @@ function getIndentAndText(lineText: string): {
 	let indent = indentMatch ? indentMatch[1] : ""
 	let textAfterIndent = lineText.slice(indent.length)
 	return { indent, textAfterIndent }
+}
+
+function shouldIndentWithTab(view: EditorView): boolean {
+	if (view.state.readOnly) return false
+
+	let selection = view.state.selection.main
+	let startLine = view.state.doc.lineAt(selection.from)
+	let endLine = view.state.doc.lineAt(selection.to)
+	if (startLine.number !== endLine.number) return true
+	if (/^\s*(?:[-*+]\s|\d+\.\s)/.test(startLine.text)) return true
+
+	let node = syntaxTree(view.state).resolveInner(selection.head, -1)
+	let current: typeof node | null = node
+	for (; current; current = current.parent) {
+		if (markdownCodeNodes.has(current.name)) return true
+	}
+	return false
+}
+
+function moveFocusFromEditor(view: EditorView, direction: 1 | -1): boolean {
+	let elements = Array.from(
+		document.querySelectorAll<HTMLElement>(
+			'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[contenteditable="true"],[tabindex]',
+		),
+	).filter(element => {
+		if (element.tabIndex < 0 && element !== view.contentDOM) return false
+		return !element.closest('[hidden],[inert],[aria-hidden="true"]')
+	})
+	let activeElement = document.activeElement
+	let currentIndex = elements.findIndex(
+		element =>
+			element === activeElement ||
+			(activeElement instanceof Node && element.contains(activeElement)),
+	)
+	let target = elements[currentIndex + direction]
+	if (target) target.focus()
+	else if (activeElement instanceof HTMLElement) activeElement.blur()
+	return true
 }

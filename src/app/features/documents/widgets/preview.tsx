@@ -1,6 +1,10 @@
 import { useEffect, useState, useRef } from "react"
 import { Image as JazzImage } from "jazz-tools/react"
 import { getDocumentTitle } from "../lib/title"
+import {
+	isShortcutEvent,
+	isShortcutTargetBlocked,
+} from "@/app/lib/shortcut-registry"
 import { Marked } from "marked"
 import markedShiki from "marked-shiki"
 import { createHighlighter, type Highlighter } from "shiki"
@@ -168,15 +172,14 @@ function PreviewContent({
 	}, [content])
 
 	useEffect(() => {
+		let exit = onExit
+		if (!exit) return
+
 		function handleKeyDown(e: KeyboardEvent) {
-			if (
-				(e.metaKey || e.ctrlKey) &&
-				e.altKey &&
-				(e.key.toLowerCase() === "r" || e.code === "KeyR")
-			) {
-				e.preventDefault()
-				onExit?.()
-			}
+			if (e.defaultPrevented || isShortcutTargetBlocked(e.target)) return
+			if (!isShortcutEvent(e, "preview")) return
+			e.preventDefault()
+			exit?.()
 		}
 
 		document.addEventListener("keydown", handleKeyDown)

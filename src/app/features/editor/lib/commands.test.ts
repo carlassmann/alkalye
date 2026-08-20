@@ -2,8 +2,10 @@ import { indentLess, indentMore } from "@codemirror/commands"
 import { indentUnit } from "@codemirror/language"
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown"
 import {
+	indentMarkdown,
 	insertMarkdownBlock,
 	insertNewlineContinueMarkupTight,
+	outdentMarkdown,
 } from "./commands"
 import { EditorState } from "@codemirror/state"
 import { EditorView } from "@codemirror/view"
@@ -178,6 +180,52 @@ describe("indentLess", () => {
 		indentLess(view)
 
 		expect(view.state.doc.toString()).toBe("- Item 1\n  - Item 2\n- Item 3")
+	})
+})
+
+describe("contextual Tab", () => {
+	it("leaves plain single-line text for focus navigation", () => {
+		let view = createMarkdownEditorView("Plain text", 5)
+		let nextButton = document.createElement("button")
+		document.body.appendChild(nextButton)
+		view.focus()
+
+		expect(indentMarkdown(view)).toBe(true)
+		expect(view.state.doc.toString()).toBe("Plain text")
+		expect(document.activeElement).toBe(nextButton)
+	})
+
+	it("indents list items", () => {
+		let view = createMarkdownEditorView("- Item", 3)
+
+		expect(indentMarkdown(view)).toBe(true)
+		expect(view.state.doc.toString()).toBe("  - Item")
+	})
+
+	it("indents code blocks", () => {
+		let view = createMarkdownEditorView("```\ncode\n```", 6)
+
+		expect(indentMarkdown(view)).toBe(true)
+		expect(view.state.doc.toString()).toBe("```\n  code\n```")
+	})
+
+	it("outdents contextual content", () => {
+		let list = createMarkdownEditorView("  - Item", 4)
+
+		expect(outdentMarkdown(list)).toBe(true)
+		expect(list.state.doc.toString()).toBe("- Item")
+	})
+
+	it("uses Shift-Tab for reverse focus navigation in plain text", () => {
+		let previousButton = document.createElement("button")
+		document.body.appendChild(previousButton)
+		let plain = createMarkdownEditorView("  Plain", 4)
+
+		plain.focus()
+
+		expect(outdentMarkdown(plain)).toBe(true)
+		expect(plain.state.doc.toString()).toBe("  Plain")
+		expect(document.activeElement).toBe(previousButton)
 	})
 })
 

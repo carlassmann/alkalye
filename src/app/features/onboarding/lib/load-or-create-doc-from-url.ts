@@ -2,6 +2,7 @@ import { redirect } from "@tanstack/react-router"
 import { Group, co, type ResolveQuery } from "jazz-tools"
 import { UserAccount, Document, CommentThread } from "@/schema"
 import { createDocumentMetadata } from "@/app/features/documents/lib/metadata"
+import { replaceShortcutTokens } from "@/app/lib/shortcut-registry"
 
 export { loadOrCreateDocFromUrl }
 
@@ -58,5 +59,5 @@ async function loadOrCreateDocFromUrl(
 async function fetchContent(url: string): Promise<string> {
 	let response = await fetch(url)
 	if (!response.ok) throw new Error(`Failed to fetch ${url}`)
-	return await response.text()
+	return replaceShortcutTokens(await response.text())
 }

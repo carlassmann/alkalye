@@ -13,7 +13,7 @@ import {
 	DropdownMenuShortcut,
 } from "@/app/components/ui/dropdown-menu"
 import { Undo2 } from "lucide-react"
-import { isMac, modKey, altModKey } from "@/app/lib/platform"
+import { getShortcutLabel } from "@/app/lib/shortcut-registry"
 import type { MarkdownEditorRef } from "./editor"
 import { T } from "@/shared/intl/setup"
 
@@ -65,7 +65,9 @@ function SidebarEditMenu({ editor, disabled, readOnly }: SidebarEditMenuProps) {
 						onClick={() => runAction(() => editor?.current?.undo())}
 					>
 						<T k="editor.menu.undo" />
-						<DropdownMenuShortcut>{modKey}Z</DropdownMenuShortcut>
+						<DropdownMenuShortcut>
+							{getShortcutLabel("undo")}
+						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						disabled={readOnly}
@@ -73,8 +75,7 @@ function SidebarEditMenu({ editor, disabled, readOnly }: SidebarEditMenuProps) {
 					>
 						<T k="editor.menu.redo" />
 						<DropdownMenuShortcut>
-							{modKey}
-							{isMac ? "⇧Z" : "Y"}
+							{getShortcutLabel("redo")}
 						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
@@ -83,20 +84,26 @@ function SidebarEditMenu({ editor, disabled, readOnly }: SidebarEditMenuProps) {
 						onClick={() => runAction(() => editor?.current?.cut())}
 					>
 						<T k="editor.menu.cut" />
-						<DropdownMenuShortcut>{modKey}X</DropdownMenuShortcut>
+						<DropdownMenuShortcut>
+							{getShortcutLabel("cut")}
+						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						onClick={() => runAction(() => editor?.current?.copy())}
 					>
 						<T k="editor.menu.copy" />
-						<DropdownMenuShortcut>{modKey}C</DropdownMenuShortcut>
+						<DropdownMenuShortcut>
+							{getShortcutLabel("copy")}
+						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						disabled={readOnly}
 						onClick={() => runAction(() => editor?.current?.paste())}
 					>
 						<T k="editor.menu.paste" />
-						<DropdownMenuShortcut>{modKey}V</DropdownMenuShortcut>
+						<DropdownMenuShortcut>
+							{getShortcutLabel("paste")}
+						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem
@@ -105,13 +112,17 @@ function SidebarEditMenu({ editor, disabled, readOnly }: SidebarEditMenuProps) {
 						}
 					>
 						<T k="editor.menu.toggleComplete" />
-						<DropdownMenuShortcut>{altModKey}X</DropdownMenuShortcut>
+						<DropdownMenuShortcut>
+							{getShortcutLabel("toggleTask")}
+						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						onClick={() => runAction(() => editor?.current?.sortTasks())}
 					>
 						<T k="editor.menu.sortTasks" />
-						<DropdownMenuShortcut>{altModKey}⇧X</DropdownMenuShortcut>
+						<DropdownMenuShortcut>
+							{getShortcutLabel("sortTasks")}
+						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>

@@ -12,7 +12,8 @@ import {
 	ContextMenuSubTrigger,
 	ContextMenuTrigger,
 } from "@/app/components/ui/context-menu"
-import { altModKey, isMac, modKey } from "@/app/lib/platform"
+import { isMac } from "@/app/lib/platform"
+import { getShortcutLabel } from "@/app/lib/shortcut-registry"
 import { T } from "@/shared/intl/setup"
 import { parseWikiLinks } from "../lib/wikilink-parser"
 import type { MarkdownEditorRef } from "./editor"
@@ -178,7 +179,9 @@ function EditorContextMenu({
 						}
 					>
 						<T k="editor.menu.toggleComplete" />
-						<ContextMenuShortcut>{altModKey}X</ContextMenuShortcut>
+						<ContextMenuShortcut>
+							{getShortcutLabel("toggleTask")}
+						</ContextMenuShortcut>
 					</ContextMenuItem>
 				)}
 				{context.image && (
@@ -200,21 +203,21 @@ function EditorContextMenu({
 					onClick={() => runAction(() => editor.current?.cut())}
 				>
 					<T k="editor.menu.cut" />
-					<ContextMenuShortcut>{modKey}X</ContextMenuShortcut>
+					<ContextMenuShortcut>{getShortcutLabel("cut")}</ContextMenuShortcut>
 				</ContextMenuItem>
 				<ContextMenuItem
 					disabled={!hasSelection}
 					onClick={() => runAction(() => editor.current?.copy())}
 				>
 					<T k="editor.menu.copy" />
-					<ContextMenuShortcut>{modKey}C</ContextMenuShortcut>
+					<ContextMenuShortcut>{getShortcutLabel("copy")}</ContextMenuShortcut>
 				</ContextMenuItem>
 				<ContextMenuItem
 					disabled={readOnly || !canReadClipboard}
 					onClick={() => runAction(() => editor.current?.paste())}
 				>
 					<T k="editor.menu.paste" />
-					<ContextMenuShortcut>{modKey}V</ContextMenuShortcut>
+					<ContextMenuShortcut>{getShortcutLabel("paste")}</ContextMenuShortcut>
 				</ContextMenuItem>
 
 				{hasSelection && (
@@ -223,14 +226,18 @@ function EditorContextMenu({
 						{canAddComment && !readOnly && (
 							<ContextMenuItem onClick={() => runAction(onAddComment)}>
 								<T k="comments.add" />
-								<ContextMenuShortcut>{altModKey}M</ContextMenuShortcut>
+								<ContextMenuShortcut>
+									{getShortcutLabel("comment")}
+								</ContextMenuShortcut>
 							</ContextMenuItem>
 						)}
 						<ContextMenuItem
 							onClick={() => editor.current?.openFind(context.selectedText)}
 						>
 							<T k="editor.menu.findSelection" />
-							<ContextMenuShortcut>{modKey}F</ContextMenuShortcut>
+							<ContextMenuShortcut>
+								{getShortcutLabel("find")}
+							</ContextMenuShortcut>
 						</ContextMenuItem>
 					</>
 				)}
@@ -255,13 +262,17 @@ function EditorContextMenu({
 									onClick={() => runAction(() => editor.current?.insertLink())}
 								>
 									<T k="editor.menu.addLink" />
-									<ContextMenuShortcut>{modKey}K</ContextMenuShortcut>
+									<ContextMenuShortcut>
+										{getShortcutLabel("link")}
+									</ContextMenuShortcut>
 								</ContextMenuItem>
 								<ContextMenuItem
 									onClick={() => runAction(() => editor.current?.insertImage())}
 								>
 									<T k="editor.menu.addImage" />
-									<ContextMenuShortcut>{altModKey}K</ContextMenuShortcut>
+									<ContextMenuShortcut>
+										{getShortcutLabel("image")}
+									</ContextMenuShortcut>
 								</ContextMenuItem>
 								<ContextMenuItem
 									onClick={() =>
@@ -269,7 +280,9 @@ function EditorContextMenu({
 									}
 								>
 									<T k="editor.menu.codeBlock" />
-									<ContextMenuShortcut>{altModKey}C</ContextMenuShortcut>
+									<ContextMenuShortcut>
+										{getShortcutLabel("codeBlock")}
+									</ContextMenuShortcut>
 								</ContextMenuItem>
 							</ContextMenuSubContent>
 						</ContextMenuSub>
@@ -301,25 +314,29 @@ function FormatMenu({ editor, runAction }: FormatMenuProps) {
 				onClick={() => runAction(() => editor.current?.toggleBold())}
 			>
 				<T k="editor.menu.bold" />
-				<ContextMenuShortcut>{modKey}B</ContextMenuShortcut>
+				<ContextMenuShortcut>{getShortcutLabel("bold")}</ContextMenuShortcut>
 			</ContextMenuItem>
 			<ContextMenuItem
 				onClick={() => runAction(() => editor.current?.toggleItalic())}
 			>
 				<T k="editor.menu.italic" />
-				<ContextMenuShortcut>{modKey}I</ContextMenuShortcut>
+				<ContextMenuShortcut>{getShortcutLabel("italic")}</ContextMenuShortcut>
 			</ContextMenuItem>
 			<ContextMenuItem
 				onClick={() => runAction(() => editor.current?.toggleStrikethrough())}
 			>
 				<T k="editor.menu.strikethrough" />
-				<ContextMenuShortcut>{modKey}⇧X</ContextMenuShortcut>
+				<ContextMenuShortcut>
+					{getShortcutLabel("strikethrough")}
+				</ContextMenuShortcut>
 			</ContextMenuItem>
 			<ContextMenuItem
 				onClick={() => runAction(() => editor.current?.toggleInlineCode())}
 			>
 				<T k="editor.menu.code" />
-				<ContextMenuShortcut>{modKey}E</ContextMenuShortcut>
+				<ContextMenuShortcut>
+					{getShortcutLabel("inlineCode")}
+				</ContextMenuShortcut>
 			</ContextMenuItem>
 			<ContextMenuSeparator />
 			<ContextMenuSub>
@@ -334,8 +351,7 @@ function FormatMenu({ editor, runAction }: FormatMenuProps) {
 						>
 							<T k="editor.menu.heading" /> {level}
 							<ContextMenuShortcut>
-								{altModKey}
-								{level}
+								{getShortcutLabel(`heading${level}`)}
 							</ContextMenuShortcut>
 						</ContextMenuItem>
 					))}
@@ -350,19 +366,25 @@ function FormatMenu({ editor, runAction }: FormatMenuProps) {
 						onClick={() => runAction(() => editor.current?.toggleBulletList())}
 					>
 						<T k="editor.menu.unordered" />
-						<ContextMenuShortcut>{altModKey}L</ContextMenuShortcut>
+						<ContextMenuShortcut>
+							{getShortcutLabel("bulletList")}
+						</ContextMenuShortcut>
 					</ContextMenuItem>
 					<ContextMenuItem
 						onClick={() => runAction(() => editor.current?.toggleOrderedList())}
 					>
 						<T k="editor.menu.ordered" />
-						<ContextMenuShortcut>{altModKey}O</ContextMenuShortcut>
+						<ContextMenuShortcut>
+							{getShortcutLabel("orderedList")}
+						</ContextMenuShortcut>
 					</ContextMenuItem>
 					<ContextMenuItem
 						onClick={() => runAction(() => editor.current?.toggleTaskList())}
 					>
 						<T k="editor.menu.taskListLabel" />
-						<ContextMenuShortcut>{altModKey}⇧L</ContextMenuShortcut>
+						<ContextMenuShortcut>
+							{getShortcutLabel("taskList")}
+						</ContextMenuShortcut>
 					</ContextMenuItem>
 				</ContextMenuSubContent>
 			</ContextMenuSub>
@@ -370,13 +392,15 @@ function FormatMenu({ editor, runAction }: FormatMenuProps) {
 				onClick={() => runAction(() => editor.current?.toggleBlockquote())}
 			>
 				<T k="editor.menu.blockquote" />
-				<ContextMenuShortcut>{altModKey}Q</ContextMenuShortcut>
+				<ContextMenuShortcut>
+					{getShortcutLabel("blockquote")}
+				</ContextMenuShortcut>
 			</ContextMenuItem>
 			<ContextMenuItem
 				onClick={() => runAction(() => editor.current?.setBody())}
 			>
 				<T k="editor.menu.body" />
-				<ContextMenuShortcut>{altModKey}0</ContextMenuShortcut>
+				<ContextMenuShortcut>{getShortcutLabel("body")}</ContextMenuShortcut>
 			</ContextMenuItem>
 		</>
 	)

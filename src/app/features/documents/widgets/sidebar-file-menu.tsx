@@ -21,7 +21,7 @@ import { testIds } from "@/app/lib/test-ids"
 import { MoveToFolderDialog } from "./move-to-folder-dialog"
 import { MoveToSpaceDialog } from "@/app/features/spaces"
 import { FileText } from "lucide-react"
-import { modKey } from "@/app/lib/platform"
+import { getShortcutLabel } from "@/app/lib/shortcut-registry"
 import { Document, UserAccount } from "@/schema"
 import {
 	canEdit,
@@ -138,7 +138,9 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 					>
 						<DropdownMenuItem onClick={makeToggleFocusMode(focusMode)}>
 							{focusMode ? t("doc.exitFocusMode") : t("doc.focusMode")}
-							<DropdownMenuShortcut>{modKey}⇧F</DropdownMenuShortcut>
+							<DropdownMenuShortcut>
+								{getShortcutLabel("focusMode")}
+							</DropdownMenuShortcut>
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							onClick={makeOpenTimeMachine(
@@ -198,11 +200,15 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 						</DropdownMenuItem>
 						<DropdownMenuItem onClick={makeSaveAs(content)}>
 							{t("doc.saveAs")}
-							<DropdownMenuShortcut>{modKey}S</DropdownMenuShortcut>
+							<DropdownMenuShortcut>
+								{getShortcutLabel("saveAs")}
+							</DropdownMenuShortcut>
 						</DropdownMenuItem>
 						<DropdownMenuItem onClick={handlePrintPdf}>
 							{t("doc.printToPdf")}
-							<DropdownMenuShortcut>{modKey}P</DropdownMenuShortcut>
+							<DropdownMenuShortcut>
+								{getShortcutLabel("print")}
+							</DropdownMenuShortcut>
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							onClick={makeDuplicate(doc, me, spaceId, navigate)}

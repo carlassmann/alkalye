@@ -91,7 +91,11 @@ import {
 	DropdownMenuShortcut,
 	DropdownMenuTrigger,
 } from "@/app/components/ui/dropdown-menu"
-import { modKey, altModKey } from "@/app/lib/platform"
+import {
+	getShortcutLabel,
+	isShortcutEvent,
+	isShortcutTargetBlocked,
+} from "@/app/lib/shortcut-registry"
 import { Preview } from "../widgets/preview"
 import { parseWikiLinks } from "@/app/features/editor"
 import { useDocTitles, type ResolvedDoc } from "../lib/wikilink-titles"
@@ -463,28 +467,24 @@ function LocalEditorContent({
 
 	useEffect(() => {
 		function handleKeyDown(e: KeyboardEvent) {
-			let isMod = e.metaKey || e.ctrlKey
+			if (e.defaultPrevented || isShortcutTargetBlocked(e.target)) return
 
-			if (isMod && e.key === "s") {
+			if (isShortcutEvent(e, "saveAs")) {
 				e.preventDefault()
 				void handlersRef.current.handleSaveAs()
 			}
 
-			if (isMod && e.shiftKey && e.key.toLowerCase() === "e") {
+			if (isShortcutEvent(e, "leftSidebar")) {
 				e.preventDefault()
 				handlersRef.current.toggleLeft()
 			}
 
-			if (isMod && e.key === ".") {
+			if (isShortcutEvent(e, "rightSidebar")) {
 				e.preventDefault()
 				handlersRef.current.toggleRight()
 			}
 
-			if (
-				isMod &&
-				e.altKey &&
-				(e.key.toLowerCase() === "r" || e.code === "KeyR")
-			) {
+			if (isShortcutEvent(e, "preview")) {
 				e.preventDefault()
 				handlersRef.current.togglePreview()
 			}
@@ -901,7 +901,9 @@ function LocalPreviewTopBar({
 					<DropdownMenuItem onClick={onExit}>
 						<Pencil className="size-4" />
 						Editor
-						<DropdownMenuShortcut>{altModKey}R</DropdownMenuShortcut>
+						<DropdownMenuShortcut>
+							{getShortcutLabel("preview")}
+						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
 					<ThemeSubmenu theme={theme} setTheme={setTheme} />
@@ -1019,7 +1021,9 @@ function LocalFileMenu({
 						<DropdownMenuItem onClick={onSaveAs}>
 							<Check className="size-4" />
 							Save As...
-							<DropdownMenuShortcut>{modKey}S</DropdownMenuShortcut>
+							<DropdownMenuShortcut>
+								{getShortcutLabel("saveAs")}
+							</DropdownMenuShortcut>
 						</DropdownMenuItem>
 					)}
 					<DropdownMenuItem onClick={onDownload}>

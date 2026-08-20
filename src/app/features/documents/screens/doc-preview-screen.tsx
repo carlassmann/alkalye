@@ -10,7 +10,11 @@ import { type ResolveQuery } from "jazz-tools"
 import { toast } from "sonner"
 import { Document, UserAccount } from "@/schema"
 import { getDocumentTitle } from "../lib/title"
-import { altModKey } from "@/app/lib/platform"
+import {
+	getShortcutLabel,
+	isShortcutEvent,
+	isShortcutTargetBlocked,
+} from "@/app/lib/shortcut-registry"
 import {
 	EllipsisIcon,
 	MessageSquare,
@@ -151,10 +155,9 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 				return
 			}
 
-			if (!(e.metaKey || e.ctrlKey)) return
-			let key = e.key.toLowerCase()
+			if (e.defaultPrevented || isShortcutTargetBlocked(e.target)) return
 
-			if (!e.shiftKey && !e.altKey && key === "p") {
+			if (isShortcutEvent(e, "print")) {
 				e.preventDefault()
 				void printToPdf({
 					content,
@@ -168,7 +171,7 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 				return
 			}
 
-			if (!e.shiftKey && e.altKey && key === "m") {
+			if (isShortcutEvent(e, "comment")) {
 				if (!canAddPreviewComment) return
 				e.preventDefault()
 				let currentSelection = window.getSelection()?.toString().trim()
@@ -528,7 +531,9 @@ function TopBar({
 						<DropdownMenuItem render={<Link to="/doc/$id" params={{ id }} />}>
 							<Pencil className="size-4" />
 							Editor
-							<DropdownMenuShortcut>{altModKey}R</DropdownMenuShortcut>
+							<DropdownMenuShortcut>
+								{getShortcutLabel("preview")}
+							</DropdownMenuShortcut>
 						</DropdownMenuItem>
 						<DropdownMenuSeparator />
 						<ThemeSubmenu theme={theme} setTheme={setTheme} />

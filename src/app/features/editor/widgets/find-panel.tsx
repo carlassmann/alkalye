@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { EditorView } from "@codemirror/view"
-import { X, ChevronUp, ChevronDown, CaseSensitive, Command } from "lucide-react"
+import { X, ChevronUp, ChevronDown, CaseSensitive } from "lucide-react"
 import { cn } from "@/app/lib/cn"
 import { Button } from "@/app/components/ui/button"
 import {
@@ -10,7 +10,7 @@ import {
 	TooltipTrigger,
 } from "@/app/components/ui/tooltip"
 import { Kbd } from "@/app/components/ui/kbd"
-import { isMac } from "@/app/lib/platform"
+import { getShortcutLabel } from "@/app/lib/shortcut-registry"
 import { useSidebar } from "@/app/components/ui/sidebar"
 import { setFindQuery, selectMatch, getFindState } from "../lib/find-extension"
 import { useIntl, T } from "@/shared/intl/setup"
@@ -312,8 +312,8 @@ function FindPanel({
 					/>
 					<TooltipContent side="bottom">
 						<T k="editor.find.previous" /> <Kbd>Shift</Kbd>
-						<Kbd>F3</Kbd> {t("editor.find.shortcutOr")} <Kbd>Shift</Kbd>
-						<Kbd>Enter</Kbd>
+						<Kbd>{getShortcutLabel("findPrevious")}</Kbd>{" "}
+						{t("editor.find.shortcutOr")} <Kbd>Shift+Enter</Kbd>
 					</TooltipContent>
 				</Tooltip>
 
@@ -333,12 +333,13 @@ function FindPanel({
 					/>
 					<TooltipContent side="bottom">
 						<p>
-							<T k="editor.find.next" /> <Kbd>F3</Kbd>{" "}
+							<T k="editor.find.next" />{" "}
+							<Kbd>{getShortcutLabel("findNext")}</Kbd>{" "}
 							{t("editor.find.shortcutOr")} <Kbd>Enter</Kbd>
 						</p>
 						<p>
 							<T k="editor.find.goToMatch" />{" "}
-							<Kbd>{isMac ? <Command className="size-3" /> : "Ctrl+"}Enter</Kbd>
+							<Kbd>{getShortcutLabel("goToFindMatch")}</Kbd>
 						</p>
 					</TooltipContent>
 				</Tooltip>

@@ -1,4 +1,8 @@
 import { toast } from "sonner"
+import {
+	isShortcutEvent,
+	isShortcutTargetBlocked,
+} from "@/app/lib/shortcut-registry"
 
 export { setupKeyboardShortcuts }
 
@@ -32,50 +36,44 @@ function setupKeyboardShortcuts(opts: {
 	}
 
 	function handleKeyDown(e: KeyboardEvent) {
-		if (
-			(e.metaKey || e.ctrlKey) &&
-			e.altKey &&
-			(e.key.toLowerCase() === "r" || e.code === "KeyR")
-		) {
+		if (e.defaultPrevented || isShortcutTargetBlocked(e.target)) return
+
+		if (isShortcutEvent(e, "preview")) {
 			e.preventDefault()
 			opts.onPreview?.()
 			return
 		}
-		if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === "e") {
+		if (isShortcutEvent(e, "leftSidebar")) {
 			e.preventDefault()
 			opts.toggleLeft()
 			return
 		}
-		if ((e.metaKey || e.ctrlKey) && e.key === ".") {
+		if (isShortcutEvent(e, "rightSidebar")) {
 			e.preventDefault()
 			opts.toggleRight()
 			return
 		}
-		if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === "f") {
+		if (isShortcutEvent(e, "focusMode")) {
 			e.preventDefault()
 			opts.toggleFocusMode()
 			return
 		}
-		if (
-			(e.metaKey || e.ctrlKey) &&
-			!e.shiftKey &&
-			e.key.toLowerCase() === "f"
-		) {
+		if (isShortcutEvent(e, "find")) {
 			e.preventDefault()
 			opts.openFind?.()
 			return
 		}
-		if (
-			(e.metaKey || e.ctrlKey) &&
-			!e.shiftKey &&
-			!e.altKey &&
-			e.key.toLowerCase() === "p"
-		) {
+		if (isShortcutEvent(e, "print")) {
 			e.preventDefault()
 			opts.onPrintPdf?.()
 			return
 		}
-		if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+		if (isShortcutEvent(e, "saveAs")) {
+			e.preventDefault()
+			opts.onDownload?.()
+			return
+		}
+		if (isShortcutEvent(e, "save")) {
 			e.preventDefault()
 			showAutosaveToast()
 		}

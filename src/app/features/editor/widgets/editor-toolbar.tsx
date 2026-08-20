@@ -22,7 +22,6 @@ import {
 	List,
 	ListTodo,
 	Link2,
-	Command,
 	EyeOff,
 	Eye,
 	Copy,
@@ -33,7 +32,7 @@ import {
 	ArrowDownToLine,
 } from "lucide-react"
 import { Kbd } from "@/app/components/ui/kbd"
-import { isMac, altModKey } from "@/app/lib/platform"
+import { getShortcutLabel, type ShortcutId } from "@/app/lib/shortcut-registry"
 import { ThemePicker, PresetPicker } from "@/app/features/themes"
 import { cn } from "@/app/lib/cn"
 import { useIntl, T } from "@/shared/intl/setup"
@@ -98,7 +97,7 @@ function EditorToolbar({
 				<ToolbarButton
 					icon={<ListIcon />}
 					label={t("editor.toolbar.documents")}
-					shortcutShift="E"
+					shortcutId="leftSidebar"
 					onClick={onToggleLeftSidebar}
 				/>
 			</div>
@@ -148,20 +147,20 @@ function EditorToolbar({
 						<ToolbarButton
 							icon={<Bold />}
 							label={t("editor.toolbar.bold")}
-							shortcut="B"
+							shortcutId="bold"
 							onClick={() => editor.current?.toggleBold()}
 						/>
 						<ToolbarButton
 							icon={<Italic />}
 							label={t("editor.toolbar.italic")}
-							shortcut="I"
+							shortcutId="italic"
 							onClick={() => editor.current?.toggleItalic()}
 						/>
 						<span className="hidden md:contents">
 							<ToolbarButton
 								icon={<Code />}
 								label={t("editor.toolbar.code")}
-								shortcut="E"
+								shortcutId="inlineCode"
 								onClick={() => editor.current?.toggleInlineCode()}
 							/>
 							<DropdownMenu>
@@ -185,17 +184,7 @@ function EditorToolbar({
 									/>
 									<TooltipContent className="flex items-center gap-2">
 										<T k="editor.toolbar.heading" />
-										<Kbd>
-											{isMac ? (
-												<>
-													⌥
-													<Command className="size-3" />
-												</>
-											) : (
-												"Ctrl+Alt+"
-											)}
-											1/2/3
-										</Kbd>
+										<Kbd>{getShortcutLabel("heading1")}</Kbd>
 									</TooltipContent>
 								</Tooltip>
 								<DropdownMenuContent align="center">
@@ -206,8 +195,7 @@ function EditorToolbar({
 										>
 											H{level}
 											<span className="text-muted-foreground ml-auto text-xs">
-												{altModKey}
-												{level}
+												{getShortcutLabel(`heading${level}`)}
 											</span>
 										</DropdownMenuItem>
 									))}
@@ -218,20 +206,20 @@ function EditorToolbar({
 						<ToolbarButton
 							icon={<List />}
 							label={t("editor.toolbar.bulletList")}
-							shortcutAlt="L"
+							shortcutId="bulletList"
 							onClick={() => editor.current?.toggleBulletList()}
 						/>
 						<span className="hidden md:contents">
 							<ToolbarButton
 								icon={<ListTodo />}
 								label={t("editor.toolbar.taskList")}
-								shortcutAlt="⇧L"
+								shortcutId="taskList"
 								onClick={() => editor.current?.toggleTaskList()}
 							/>
 							<ToolbarButton
 								icon={<Link2 />}
 								label={t("editor.toolbar.link")}
-								shortcut="K"
+								shortcutId="link"
 								onClick={() => editor.current?.insertLink()}
 							/>
 							{content !== undefined && onThemeChange && (
@@ -287,17 +275,7 @@ function EditorToolbar({
 						/>
 						<TooltipContent className="flex items-center gap-2">
 							<T k="editor.toolbar.preview" />
-							<Kbd>
-								{isMac ? (
-									<>
-										⇧
-										<Command className="size-3" />
-									</>
-								) : (
-									"Ctrl+Shift+"
-								)}
-								P
-							</Kbd>
+							<Kbd>{getShortcutLabel("preview")}</Kbd>
 						</TooltipContent>
 					</Tooltip>
 				)}
@@ -307,7 +285,7 @@ function EditorToolbar({
 				<ToolbarButton
 					icon={<Wrench />}
 					label={t("editor.toolbar.documentTools")}
-					shortcutKey="."
+					shortcutId="rightSidebar"
 					onClick={onToggleRightSidebar}
 				/>
 			</div>
@@ -368,10 +346,7 @@ function useEditorScrollTopState(
 interface ToolbarButtonProps {
 	icon: React.ReactNode
 	label: string
-	shortcut?: string
-	shortcutAlt?: string
-	shortcutShift?: string
-	shortcutKey?: string
+	shortcutId?: ShortcutId
 	onClick: () => void
 	className?: string
 }
@@ -379,10 +354,7 @@ interface ToolbarButtonProps {
 function ToolbarButton({
 	icon,
 	label,
-	shortcut,
-	shortcutAlt,
-	shortcutShift,
-	shortcutKey,
+	shortcutId,
 	onClick,
 	className,
 }: ToolbarButtonProps) {
@@ -403,44 +375,7 @@ function ToolbarButton({
 			/>
 			<TooltipContent className="flex items-center gap-2">
 				{label}
-				{shortcut && (
-					<Kbd>
-						{isMac ? <Command className="size-3" /> : "Ctrl+"}
-						{shortcut}
-					</Kbd>
-				)}
-				{shortcutAlt && (
-					<Kbd>
-						{isMac ? (
-							<>
-								⌥
-								<Command className="size-3" />
-							</>
-						) : (
-							"Ctrl+Alt+"
-						)}
-						{shortcutAlt}
-					</Kbd>
-				)}
-				{shortcutShift && (
-					<Kbd>
-						{isMac ? (
-							<>
-								⇧
-								<Command className="size-3" />
-							</>
-						) : (
-							"Ctrl+Shift+"
-						)}
-						{shortcutShift}
-					</Kbd>
-				)}
-				{shortcutKey && (
-					<Kbd>
-						{isMac ? <Command className="size-3" /> : "Ctrl+"}
-						{shortcutKey}
-					</Kbd>
-				)}
+				{shortcutId && <Kbd>{getShortcutLabel(shortcutId)}</Kbd>}
 			</TooltipContent>
 		</Tooltip>
 	)
