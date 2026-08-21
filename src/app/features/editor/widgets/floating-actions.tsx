@@ -55,7 +55,9 @@ import {
 import { cn } from "@/app/lib/cn"
 import {
 	getAriaShortcut,
+	getActiveShortcutPlatform,
 	getShortcutLabel,
+	isModEnterEvent,
 	type ShortcutId,
 } from "@/app/lib/shortcut-registry"
 import { useIntl, T } from "@/shared/intl/setup"
@@ -1336,7 +1338,7 @@ function CommentAction({
 	}
 
 	function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-		if (event.key !== "Enter" || event.shiftKey) return
+		if (!isModEnterEvent(event.nativeEvent)) return
 		event.preventDefault()
 		submitComment()
 	}
@@ -1364,12 +1366,16 @@ function CommentAction({
 							value={body}
 							onChange={event => setBody(event.target.value)}
 							onKeyDown={handleKeyDown}
+							aria-keyshortcuts="Meta+Enter Control+Enter"
 							placeholder={t("comments.newPlaceholder")}
 							minRows={3}
 						/>
 						<Button type="submit" className="w-full" disabled={!canSubmit}>
 							<MessageSquarePlus />
 							{t("comments.add")}
+							<Kbd className="ml-auto">
+								{getActiveShortcutPlatform() === "mac" ? "⌘↵" : "Ctrl+Enter"}
+							</Kbd>
 						</Button>
 					</form>
 				</DialogContent>

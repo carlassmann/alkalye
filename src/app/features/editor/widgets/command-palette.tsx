@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useRef, useState, type KeyboardEvent } from "react"
 import { Search } from "lucide-react"
 import {
 	Dialog,
@@ -12,8 +12,15 @@ import {
 	getShortcutLabel,
 	type ShortcutId,
 } from "@/app/lib/shortcut-registry"
+import { useHasFinePointer } from "@/app/hooks/use-fine-pointer"
+import type { DocumentHeading } from "../lib/document-navigation"
 
-export { CommandPalette, ShortcutsDialog }
+export {
+	CommandPalette,
+	DocumentSwitcherDialog,
+	OutlineDialog,
+	ShortcutsDialog,
+}
 export type { CommandId }
 
 type CommandId =
@@ -26,6 +33,7 @@ type CommandId =
 	| "insertWikilink"
 	| "renumberLists"
 	| "keyboardShortcuts"
+	| "switchDocument"
 
 interface CommandOverlayProps {
 	open: boolean
@@ -92,6 +100,7 @@ let navigation = new Set<ShortcutId>([
 	"findPrevious",
 	"goToFindMatch",
 	"commandPalette",
+	"documentOutline",
 	"contextAction",
 ])
 
@@ -144,11 +153,18 @@ let paletteCommands = [
 		label: "Keyboard shortcuts",
 		group: "Navigation" as const,
 	},
+	{
+		id: "switchDocument" as const,
+		label: "Switch document",
+		group: "Navigation" as const,
+	},
 ]
 
 function CommandPalette({ open, onOpenChange, onRun }: CommandOverlayProps) {
+	let hasFinePointer = useHasFinePointer()
 	let [query, setQuery] = useState("")
 	let inputRef = useRef<HTMLInputElement>(null)
+	let listRef = useRef<HTMLDivElement>(null)
 	let filtered = paletteCommands.filter(shortcut =>
 		`${shortcut.label} ${shortcut.group}`
 			.toLowerCase()
@@ -158,6 +174,16 @@ function CommandPalette({ open, onOpenChange, onRun }: CommandOverlayProps) {
 	function handleOpenChange(nextOpen: boolean) {
 		if (!nextOpen) setQuery("")
 		onOpenChange(nextOpen)
+	}
+
+	function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+		if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return
+		event.preventDefault()
+		let buttons = listRef.current?.querySelectorAll<HTMLButtonElement>(
+			"[data-command-palette-item]",
+		)
+		let index = event.key === "ArrowDown" ? 0 : (buttons?.length ?? 1) - 1
+		buttons?.item(index)?.focus()
 	}
 
 	return (
@@ -170,22 +196,24 @@ function CommandPalette({ open, onOpenChange, onRun }: CommandOverlayProps) {
 					<Search className="text-muted-foreground size-4" />
 					<input
 						ref={inputRef}
-						autoFocus
+						autoFocus={hasFinePointer}
 						value={query}
 						onChange={event => setQuery(event.target.value)}
+						onKeyDown={handleSearchKeyDown}
 						placeholder="Search commands…"
 						aria-label="Search commands"
 						className="min-w-0 flex-1 bg-transparent text-sm outline-none"
 					/>
 				</div>
 				<div
+					ref={listRef}
 					className="max-h-[min(28rem,70vh)] overflow-auto py-1"
-					role="listbox"
 				>
 					{filtered.map((shortcut, index) => (
 						<button
 							key={shortcut.id}
 							type="button"
+							data-command-palette-item
 							className="hover:bg-accent focus-visible:bg-accent flex min-h-11 w-full items-center gap-3 px-3 text-left text-sm outline-none"
 							onClick={() => {
 								onRun(shortcut.id)
@@ -196,7 +224,9 @@ function CommandPalette({ open, onOpenChange, onRun }: CommandOverlayProps) {
 								if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return
 								event.preventDefault()
 								let buttons =
-									event.currentTarget.parentElement?.querySelectorAll("button")
+									listRef.current?.querySelectorAll<HTMLButtonElement>(
+										"[data-command-palette-item]",
+									)
 								let next = event.key === "ArrowDown" ? index + 1 : index - 1
 								buttons
 									?.item((next + filtered.length) % filtered.length)
@@ -209,6 +239,191 @@ function CommandPalette({ open, onOpenChange, onRun }: CommandOverlayProps) {
 							</span>
 							{"shortcutId" in shortcut && (
 								<Kbd>{getShortcutLabel(shortcut.shortcutId)}</Kbd>
+							)}
+						</button>
+					))}
+				</div>
+			</DialogContent>
+		</Dialog>
+	)
+}
+
+interface OutlineDialogProps {
+	open: boolean
+	onOpenChange: (open: boolean) => void
+	headings: DocumentHeading[]
+	onSelect: (heading: DocumentHeading) => void
+}
+
+function OutlineDialog({
+	open,
+	onOpenChange,
+	headings,
+	onSelect,
+}: OutlineDialogProps) {
+	return (
+		<QuickJumpDialog
+			open={open}
+			onOpenChange={onOpenChange}
+			title="Document outline"
+			searchLabel="Find a heading"
+			emptyLabel="No headings in this document"
+			items={headings.map(heading => ({
+				id: `${heading.from}`,
+				label: heading.title,
+				detail: `H${heading.level} · line ${heading.line}`,
+				indent: heading.level - 1,
+				value: heading,
+			}))}
+			onSelect={onSelect}
+		/>
+	)
+}
+
+interface DocumentSwitcherDialogProps {
+	open: boolean
+	onOpenChange: (open: boolean) => void
+	documents: { id: string; title: string; path?: string | null }[]
+	onSelect: (document: { id: string; title: string }) => void
+}
+
+function DocumentSwitcherDialog({
+	open,
+	onOpenChange,
+	documents,
+	onSelect,
+}: DocumentSwitcherDialogProps) {
+	return (
+		<QuickJumpDialog
+			open={open}
+			onOpenChange={onOpenChange}
+			title="Switch document"
+			searchLabel="Find a document"
+			emptyLabel="No matching documents"
+			items={documents.map(document => ({
+				id: document.id,
+				label: document.title,
+				detail: document.path || undefined,
+				value: { id: document.id, title: document.title },
+			}))}
+			onSelect={onSelect}
+		/>
+	)
+}
+
+interface QuickJumpItem<T> {
+	id: string
+	label: string
+	detail?: string
+	indent?: number
+	value: T
+}
+
+interface QuickJumpDialogProps<T> {
+	open: boolean
+	onOpenChange: (open: boolean) => void
+	title: string
+	searchLabel: string
+	emptyLabel: string
+	items: QuickJumpItem<T>[]
+	onSelect: (value: T) => void
+}
+
+function QuickJumpDialog<T>({
+	open,
+	onOpenChange,
+	title,
+	searchLabel,
+	emptyLabel,
+	items,
+	onSelect,
+}: QuickJumpDialogProps<T>) {
+	let hasFinePointer = useHasFinePointer()
+	let [query, setQuery] = useState("")
+	let listRef = useRef<HTMLDivElement>(null)
+	let filtered = items.filter(item =>
+		`${item.label} ${item.detail ?? ""}`
+			.toLowerCase()
+			.includes(query.toLowerCase()),
+	)
+
+	function handleOpenChange(nextOpen: boolean) {
+		if (!nextOpen) setQuery("")
+		onOpenChange(nextOpen)
+	}
+
+	function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+		if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return
+		event.preventDefault()
+		let buttons = listRef.current?.querySelectorAll<HTMLButtonElement>(
+			"[data-quick-jump-item]",
+		)
+		let index = event.key === "ArrowDown" ? 0 : (buttons?.length ?? 1) - 1
+		buttons?.item(index)?.focus()
+	}
+
+	return (
+		<Dialog open={open} onOpenChange={handleOpenChange}>
+			<DialogContent className="max-w-lg gap-2 p-2">
+				<DialogHeader className="sr-only">
+					<DialogTitle>{title}</DialogTitle>
+				</DialogHeader>
+				<div className="border-input flex h-11 items-center gap-2 border px-3">
+					<Search className="text-muted-foreground size-4" />
+					<input
+						type="search"
+						autoFocus={hasFinePointer}
+						value={query}
+						onChange={event => setQuery(event.target.value)}
+						onKeyDown={handleSearchKeyDown}
+						placeholder={`${searchLabel}…`}
+						aria-label={searchLabel}
+						spellCheck={false}
+						className="min-w-0 flex-1 bg-transparent text-base outline-none md:text-sm"
+					/>
+				</div>
+				<div
+					ref={listRef}
+					className="max-h-[min(28rem,70dvh)] overflow-auto py-1"
+				>
+					{filtered.length === 0 && (
+						<p className="text-muted-foreground px-3 py-8 text-center text-sm">
+							{emptyLabel}
+						</p>
+					)}
+					{filtered.map((item, index) => (
+						<button
+							key={item.id}
+							type="button"
+							data-quick-jump-item
+							className="hover:bg-accent focus-visible:bg-accent flex min-h-11 w-full items-center gap-3 px-3 text-left text-sm outline-none"
+							onClick={() => {
+								onSelect(item.value)
+								handleOpenChange(false)
+							}}
+							onKeyDown={event => {
+								if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return
+								event.preventDefault()
+								let buttons =
+									listRef.current?.querySelectorAll<HTMLButtonElement>(
+										"[data-quick-jump-item]",
+									)
+								let next = event.key === "ArrowDown" ? index + 1 : index - 1
+								buttons
+									?.item((next + filtered.length) % filtered.length)
+									?.focus()
+							}}
+						>
+							<span
+								className="min-w-0 flex-1 truncate"
+								style={{ paddingLeft: `${Math.min(item.indent ?? 0, 4)}rem` }}
+							>
+								{item.label}
+							</span>
+							{item.detail && (
+								<span className="text-muted-foreground shrink-0 text-xs">
+									{item.detail}
+								</span>
 							)}
 						</button>
 					))}

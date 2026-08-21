@@ -5,8 +5,11 @@ export {
 	getAriaShortcut,
 	getShortcutLabel,
 	getShortcutDefinitions,
+	getActiveShortcutPlatform,
+	isShortcutId,
 	isShortcutTargetBlocked,
 	isShortcutEvent,
+	isModEnterEvent,
 	replaceShortcutTokens,
 }
 export type { ShortcutId, ShortcutPlatform }
@@ -108,6 +111,10 @@ let shortcutDefinitions = [
 		id: "commandPalette",
 		default: { key: "p", modifiers: ["Mod", "Shift"] },
 	},
+	{
+		id: "documentOutline",
+		default: { key: "o", modifiers: ["Mod", "Shift"] },
+	},
 	{ id: "selectNextOccurrence", default: { key: "d", modifiers: ["Mod"] } },
 	{
 		id: "selectAllOccurrences",
@@ -149,17 +156,21 @@ let shortcutDefinitions = [
 
 type ShortcutId = (typeof shortcutDefinitions)[number]["id"]
 
-function getCodeMirrorShortcut(id: ShortcutId): { key: string; mac?: string } {
+function getActiveShortcutPlatform(): ShortcutPlatform {
+	return isMac ? "mac" : "other"
+}
+
+function getCodeMirrorShortcut(
+	id: ShortcutId,
+	platform: ShortcutPlatform = getActiveShortcutPlatform(),
+): { key: string } {
 	let definition = findShortcut(id)
-	return {
-		key: toCodeMirrorKey(definition.default),
-		mac: definition.mac ? toCodeMirrorKey(definition.mac) : undefined,
-	}
+	return { key: toCodeMirrorKey(getChord(definition, platform)) }
 }
 
 function getShortcutLabel(
 	id: ShortcutId,
-	platform: ShortcutPlatform = isMac ? "mac" : "other",
+	platform: ShortcutPlatform = getActiveShortcutPlatform(),
 ): string {
 	let chord = getChord(findShortcut(id), platform)
 	let modifierOrder: ShortcutModifier[] =
@@ -180,7 +191,7 @@ function getShortcutDefinitions() {
 
 function getAriaShortcut(
 	id: ShortcutId,
-	platform: ShortcutPlatform = isMac ? "mac" : "other",
+	platform: ShortcutPlatform = getActiveShortcutPlatform(),
 ): string {
 	let chord = getChord(findShortcut(id), platform)
 	let modifiers = (chord.modifiers ?? []).map(modifier => {
@@ -194,7 +205,7 @@ function getAriaShortcut(
 function isShortcutEvent(
 	event: KeyboardEvent,
 	id: ShortcutId,
-	platform: ShortcutPlatform = isMac ? "mac" : "other",
+	platform: ShortcutPlatform = getActiveShortcutPlatform(),
 ): boolean {
 	if (event.isComposing || event.getModifierState("AltGraph")) return false
 
@@ -211,6 +222,14 @@ function isShortcutEvent(
 		event.ctrlKey === expectsControl &&
 		event.altKey === modifiers.includes("Alt") &&
 		event.shiftKey === modifiers.includes("Shift")
+	)
+}
+
+function isModEnterEvent(event: KeyboardEvent): boolean {
+	return (
+		event.key === "Enter" &&
+		(event.metaKey || event.ctrlKey) &&
+		!event.isComposing
 	)
 }
 
@@ -239,6 +258,10 @@ function replaceShortcutTokens(content: string): string {
 		)
 	}
 	return result
+}
+
+function isShortcutId(value: string): value is ShortcutId {
+	return shortcutDefinitions.some(definition => definition.id === value)
 }
 
 function findShortcut(id: ShortcutId): ShortcutDefinition {

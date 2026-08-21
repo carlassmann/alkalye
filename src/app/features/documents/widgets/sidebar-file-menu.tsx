@@ -22,6 +22,7 @@ import { MoveToFolderDialog } from "./move-to-folder-dialog"
 import { MoveToSpaceDialog } from "@/app/features/spaces"
 import { FileText } from "lucide-react"
 import { getShortcutLabel } from "@/app/lib/shortcut-registry"
+import { isFocusMode, toggleFocusMode } from "@/app/lib/focus-mode"
 import { Document, UserAccount } from "@/schema"
 import {
 	canEdit,
@@ -136,7 +137,7 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 						align={isMobile ? "center" : "start"}
 						side={isMobile ? "bottom" : "left"}
 					>
-						<DropdownMenuItem onClick={makeToggleFocusMode(focusMode)}>
+						<DropdownMenuItem onClick={toggleFocusMode}>
 							{focusMode ? t("doc.exitFocusMode") : t("doc.focusMode")}
 							<DropdownMenuShortcut>
 								{getShortcutLabel("focusMode")}
@@ -280,23 +281,14 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 }
 
 function useFocusMode() {
-	return useSyncExternalStore(
-		callback => {
-			let observer = new MutationObserver(callback)
-			observer.observe(document.documentElement, {
-				attributes: true,
-				attributeFilter: ["data-focus-mode"],
-			})
-			return () => observer.disconnect()
-		},
-		() => document.documentElement.dataset.focusMode === "true",
-	)
-}
-
-function makeToggleFocusMode(focusMode: boolean) {
-	return function handleToggleFocusMode() {
-		document.documentElement.dataset.focusMode = String(!focusMode)
-	}
+	return useSyncExternalStore(callback => {
+		let observer = new MutationObserver(callback)
+		observer.observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ["data-focus-mode"],
+		})
+		return () => observer.disconnect()
+	}, isFocusMode)
 }
 
 function makeOpenTimeMachine(

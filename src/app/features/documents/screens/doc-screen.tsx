@@ -8,6 +8,7 @@ import {
 import { co, Group, type ResolveQuery } from "jazz-tools"
 import { useCoState, useAccount, useIsAuthenticated } from "jazz-tools/react"
 import { toast } from "sonner"
+import { toggleFocusMode } from "@/app/lib/focus-mode"
 import { Document, Space, UserAccount, createSpaceDocument } from "@/schema"
 import { handleSaveCopy } from "../lib/save-copy"
 import { resolve } from "../lib/queries"
@@ -34,6 +35,7 @@ import {
 import {
 	MarkdownEditor,
 	useMarkdownEditorRef,
+	SidebarEditorNavigation,
 	type WikilinkDoc,
 } from "@/app/features/editor"
 import { useEditorSettings } from "@/app/features/editor"
@@ -42,6 +44,7 @@ import { EditorToolbar } from "@/app/features/editor"
 import { DocumentSidebar } from "../widgets/document-sidebar"
 import { ListSidebar } from "../widgets/list-sidebar"
 import { SidebarDocumentList } from "../widgets/sidebar-document-list"
+import { DocumentFinderButton } from "../widgets/document-finder-button"
 import { SpaceSelector } from "@/app/features/spaces"
 import { SidebarSyncStatus } from "@/app/components/sidebar-sync-status"
 
@@ -95,7 +98,6 @@ import {
 	Loader2,
 	MessageSquare,
 	MessageSquareOff,
-	Search,
 	Settings,
 	Plus,
 } from "lucide-react"
@@ -430,10 +432,7 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 		return setupKeyboardShortcuts({
 			toggleLeft,
 			toggleRight,
-			toggleFocusMode: () => {
-				let current = document.documentElement.dataset.focusMode === "true"
-				document.documentElement.dataset.focusMode = String(!current)
-			},
+			toggleFocusMode,
 			openFind: () => editor.current?.openFind(),
 			onPrintPdf: async () => {
 				if (!me.$isLoaded) return
@@ -618,6 +617,13 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 			<ListSidebar
 				header={
 					<>
+						<DocumentFinderButton
+							onClick={() =>
+								setLeftOpenMobile(false, () =>
+									editor.current?.openDocumentSwitcher(),
+								)
+							}
+						/>
 						<SidebarImportExport
 							docs={allDocs.filter(d => !d.deletedAt)}
 							onImport={async files => {
@@ -703,6 +709,11 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 					autoSortTasks={editorSettings?.editor?.autoSortTasks}
 					spellcheck={editorSettings?.editor?.spellcheck ?? true}
 					spellcheckLanguage={editorSettings?.editor?.spellcheckLanguage}
+					smartPairs={editorSettings?.editor?.smartPairs ?? true}
+					markerWrapping={editorSettings?.editor?.markerWrapping ?? true}
+					tabIndent={editorSettings?.editor?.tabIndent ?? true}
+					smartPaste={editorSettings?.editor?.smartPaste ?? true}
+					autocomplete={editorSettings?.editor?.autocomplete ?? true}
 					extensions={[
 						imageExtensions({
 							resolver: assetId => {
@@ -785,20 +796,10 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 						<SidebarGroup>
 							<SidebarGroupContent>
 								<SidebarMenu>
-									<SidebarMenuItem>
-										<SidebarMenuButton
-											onClick={() =>
-												setRightOpenMobile(false, () =>
-													editor.current?.openFind(),
-												)
-											}
-											nativeButton
-										>
-											<Search className="size-4" />
-											{t("doc.find")}
-										</SidebarMenuButton>
-									</SidebarMenuItem>
-									<SidebarSeparator />
+									<SidebarEditorNavigation
+										editor={editor}
+										onOpen={open => setRightOpenMobile(false, open)}
+									/>
 									<SidebarViewLinks doc={doc} />
 									<SidebarPresentationLinks doc={doc} />
 									{!readOnly && (

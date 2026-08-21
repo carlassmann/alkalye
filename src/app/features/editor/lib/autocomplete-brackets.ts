@@ -13,26 +13,43 @@ import {
 
 export { createBracketsExtension, insertSmartDelimiter }
 
-function createBracketsExtension(): Extension {
+interface SmartDelimiterOptions {
+	smartPairs: boolean
+	markerWrapping: boolean
+}
+
+let defaultOptions: SmartDelimiterOptions = {
+	smartPairs: true,
+	markerWrapping: true,
+}
+
+function createBracketsExtension(
+	options: SmartDelimiterOptions = defaultOptions,
+): Extension {
 	return [
-		closeBrackets(),
-		keymap.of(closeBracketsKeymap),
+		...(options.smartPairs
+			? [closeBrackets(), keymap.of(closeBracketsKeymap)]
+			: []),
 		Prec.high(
 			EditorView.inputHandler.of((view, from, to, text) => {
 				let selection = view.state.selection.main
 				if (from !== selection.from || to !== selection.to) return false
-				return insertSmartDelimiter(view, text)
+				return insertSmartDelimiter(view, text, options)
 			}),
 		),
 	]
 }
 
-function insertSmartDelimiter(view: EditorView, text: string): boolean {
+function insertSmartDelimiter(
+	view: EditorView,
+	text: string,
+	options: SmartDelimiterOptions = defaultOptions,
+): boolean {
 	if (
 		view.state.readOnly ||
 		view.composing ||
 		view.compositionStarted ||
-		!isSmartDelimiter(text)
+		!isEnabledDelimiter(text, options)
 	)
 		return false
 	let openWikilinkCompletion =
@@ -113,6 +130,14 @@ function insertSmartDelimiter(view: EditorView, text: string): boolean {
 	return true
 }
 
+function isEnabledDelimiter(
+	text: string,
+	options: SmartDelimiterOptions,
+): boolean {
+	if ("`*_~".includes(text)) return options.markerWrapping
+	return options.smartPairs && (text === "[" || text === "(" || text === "<")
+}
+
 function wrapRange(range: SelectionRange, before: string, after: string) {
 	return {
 		changes: [
@@ -133,10 +158,6 @@ function isInsideBrackets(view: EditorView, from: number, to: number): boolean {
 		view.state.sliceDoc(from - 1, from) === "[" &&
 		view.state.sliceDoc(to, to + 1) === "]"
 	)
-}
-
-function isSmartDelimiter(text: string): boolean {
-	return text === "[" || text === "(" || "`*_~<".includes(text)
 }
 
 function closingDelimiter(text: string): string {

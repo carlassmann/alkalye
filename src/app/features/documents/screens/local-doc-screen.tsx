@@ -6,6 +6,7 @@ import { UserAccount } from "@/schema"
 import {
 	MarkdownEditor,
 	useMarkdownEditorRef,
+	SidebarEditorNavigation,
 	type WikilinkDoc,
 } from "@/app/features/editor"
 import { presentationExtensions } from "@/app/features/presentation"
@@ -41,7 +42,6 @@ import {
 import {
 	HelpCircle,
 	FileUp,
-	Search,
 	Settings,
 	Check,
 	AlertCircle,
@@ -104,6 +104,7 @@ import { toast } from "sonner"
 import { tryCatch } from "@/app/lib/try-catch"
 import { useIntl } from "@/shared/intl/setup"
 import { useHasFinePointer } from "@/app/hooks/use-fine-pointer"
+import { exitFocusMode, toggleFocusMode } from "@/app/lib/focus-mode"
 
 export { LocalDocScreen }
 
@@ -446,6 +447,11 @@ function LocalEditorContent({
 	}
 
 	let handlersRef = useRef({
+		handleSave: async () => {
+			let currentFile = useLocalFileStore.getState().getActiveFile()
+			if (!currentFile) return
+			await saveCurrentFile(currentFile.id, t)
+		},
 		handleSaveAs: async () => {
 			let currentFile = useLocalFileStore.getState().getActiveFile()
 			if (!currentFile) return
@@ -454,14 +460,17 @@ function LocalEditorContent({
 		toggleLeft,
 		toggleRight,
 		togglePreview: () => setIsPreview(!isPreview),
+		toggleFocusMode,
 	})
 
 	useEffect(() => {
 		handlersRef.current = {
+			handleSave: handlersRef.current.handleSave,
 			handleSaveAs: handlersRef.current.handleSaveAs,
 			toggleLeft,
 			toggleRight,
 			togglePreview: () => setIsPreview(!isPreview),
+			toggleFocusMode: handlersRef.current.toggleFocusMode,
 		}
 	})
 
@@ -469,9 +478,24 @@ function LocalEditorContent({
 		function handleKeyDown(e: KeyboardEvent) {
 			if (e.defaultPrevented || isShortcutTargetBlocked(e.target)) return
 
+			if (e.key === "Escape" && exitFocusMode()) return
+
+			if (isShortcutEvent(e, "save")) {
+				e.preventDefault()
+				void handlersRef.current.handleSave()
+				return
+			}
+
 			if (isShortcutEvent(e, "saveAs")) {
 				e.preventDefault()
 				void handlersRef.current.handleSaveAs()
+				return
+			}
+
+			if (isShortcutEvent(e, "focusMode")) {
+				e.preventDefault()
+				handlersRef.current.toggleFocusMode()
+				return
 			}
 
 			if (isShortcutEvent(e, "leftSidebar")) {
@@ -490,8 +514,23 @@ function LocalEditorContent({
 			}
 		}
 
+		function handleRunShortcut(event: Event) {
+			if (!(event instanceof CustomEvent)) return
+			let id = event.detail
+			if (id === "save") void handlersRef.current.handleSave()
+			else if (id === "saveAs") void handlersRef.current.handleSaveAs()
+			else if (id === "leftSidebar") handlersRef.current.toggleLeft()
+			else if (id === "rightSidebar") handlersRef.current.toggleRight()
+			else if (id === "preview") handlersRef.current.togglePreview()
+			else if (id === "focusMode") handlersRef.current.toggleFocusMode()
+		}
+
 		document.addEventListener("keydown", handleKeyDown)
-		return () => document.removeEventListener("keydown", handleKeyDown)
+		document.addEventListener("alkalye:run-shortcut", handleRunShortcut)
+		return () => {
+			document.removeEventListener("keydown", handleKeyDown)
+			document.removeEventListener("alkalye:run-shortcut", handleRunShortcut)
+		}
 	}, [])
 
 	async function handleOpenFile() {
@@ -635,6 +674,7 @@ function LocalEditorContent({
 
 			<div className="markdown-editor flex-1">
 				<MarkdownEditor
+					key={activeFile.id}
 					ref={editor}
 					value={content}
 					onChange={handleChange}
@@ -645,6 +685,11 @@ function LocalEditorContent({
 					autoSortTasks={editorSettings?.editor?.autoSortTasks}
 					spellcheck={editorSettings?.editor?.spellcheck ?? true}
 					spellcheckLanguage={editorSettings?.editor?.spellcheckLanguage}
+					smartPairs={editorSettings?.editor?.smartPairs ?? true}
+					markerWrapping={editorSettings?.editor?.markerWrapping ?? true}
+					tabIndent={editorSettings?.editor?.tabIndent ?? true}
+					smartPaste={editorSettings?.editor?.smartPaste ?? true}
+					autocomplete={editorSettings?.editor?.autocomplete ?? true}
 					extensions={[...presentationExtensions()]}
 				/>
 				<EditorToolbar
@@ -680,18 +725,10 @@ function LocalEditorContent({
 				<SidebarGroup>
 					<SidebarGroupContent>
 						<SidebarMenu>
-							<SidebarMenuItem>
-								<SidebarMenuButton
-									onClick={() =>
-										setRightOpenMobile(false, () => editor.current?.openFind())
-									}
-									nativeButton
-								>
-									<Search className="size-4" />
-									{t("doc.find")}
-								</SidebarMenuButton>
-							</SidebarMenuItem>
-							<SidebarSeparator />
+							<SidebarEditorNavigation
+								editor={editor}
+								onOpen={open => setRightOpenMobile(false, open)}
+							/>
 							<SidebarMenuItem>
 								<SidebarMenuButton
 									onClick={() => setIsPreview(true)}

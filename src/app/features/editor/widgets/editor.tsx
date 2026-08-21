@@ -41,7 +41,7 @@ import {
 	selectNextOccurrence,
 	selectSelectionMatches,
 } from "@codemirror/search"
-import { syntaxTree } from "@codemirror/language"
+import { bracketMatching, syntaxTree } from "@codemirror/language"
 import { Image as JazzImage } from "jazz-tools/react"
 import { editorExtensions } from "../lib/extensions"
 import {
@@ -86,9 +86,18 @@ import {
 import { orderedListRenumbering } from "../lib/ordered-list-renumbering"
 import { createCodeLanguageAutocomplete } from "../lib/code-language-autocomplete"
 import { createSlashCommands } from "../lib/slash-commands"
-import { insertPastedHtml, insertPastedText } from "../lib/paste-commands"
+import {
+	insertPastedHtml,
+	insertPastedText,
+	insertRawPastedText,
+} from "../lib/paste-commands"
 import { createSpellcheckExtension } from "../lib/spellcheck"
 import { createBracketsExtension } from "../lib/autocomplete-brackets"
+import {
+	deleteMarkerBackward,
+	deleteMarkerForward,
+} from "../lib/marker-deletion"
+import { getDocumentHeadings } from "../lib/document-navigation"
 import { createWikilinkAutocomplete } from "../lib/wikilink-autocomplete"
 import { createLinkDecorations } from "../lib/link-decorations"
 import { createWikilinkDecorations } from "../lib/wikilink-decorations"
@@ -130,6 +139,7 @@ import {
 	getCodeMirrorShortcut,
 	getAriaShortcut,
 	getShortcutDefinitions,
+	isShortcutId,
 	isShortcutEvent,
 	isShortcutTargetBlocked,
 	type ShortcutId,
@@ -137,6 +147,8 @@ import {
 import { combinedAutocompletion } from "@/app/lib/completion-sources"
 import {
 	CommandPalette,
+	DocumentSwitcherDialog,
+	OutlineDialog,
 	ShortcutsDialog,
 	type CommandId,
 } from "./command-palette"
@@ -211,6 +223,11 @@ interface MarkdownEditorProps {
 	autoSortTasks?: boolean
 	spellcheck?: boolean
 	spellcheckLanguage?: string
+	smartPairs?: boolean
+	markerWrapping?: boolean
+	tabIndent?: boolean
+	smartPaste?: boolean
+	autocomplete?: boolean
 }
 
 type VideoUploadState = {
@@ -268,6 +285,9 @@ interface MarkdownEditorRef {
 
 	openFind(initialQuery?: string): void
 	closeFind(): void
+	openCommandPalette(): void
+	openOutline(): void
+	openDocumentSwitcher(): void
 
 	showImagePreview(url: string, alt: string): void
 }
@@ -303,6 +323,11 @@ function MarkdownEditor(
 		autoSortTasks,
 		spellcheck = true,
 		spellcheckLanguage,
+		smartPairs = true,
+		markerWrapping = true,
+		tabIndent = true,
+		smartPaste = true,
+		autocomplete = true,
 		ref,
 	} = props
 
@@ -321,6 +346,8 @@ function MarkdownEditor(
 	let readOnlyCompartment = useRef(new Compartment())
 	let placeholderCompartment = useRef(new Compartment())
 	let spellcheckCompartment = useRef(new Compartment())
+	let bracketsCompartment = useRef(new Compartment())
+	let autocompleteCompartment = useRef(new Compartment())
 	let floatingActionsRef = useRef<FloatingActionsRef>(null)
 	let [view, setView] = useState<EditorView | null>(null)
 	let [isFocused, setIsFocused] = useState(false)
@@ -336,6 +363,8 @@ function MarkdownEditor(
 	let [videoUpload, setVideoUpload] = useState<VideoUploadState | null>(null)
 	let [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
 	let [shortcutsOpen, setShortcutsOpen] = useState(false)
+	let [outlineOpen, setOutlineOpen] = useState(false)
+	let [documentSwitcherOpen, setDocumentSwitcherOpen] = useState(false)
 
 	let callbacksRef = useRef({ onChange, onCursorChange, onFocus, onBlur })
 	findPanelOpenRef.current = findPanelOpen
@@ -347,6 +376,8 @@ function MarkdownEditor(
 	let addCommentEnabledRef = useRef(Boolean(onAddComment))
 	let activeDropsRef = useRef<Set<DropTarget>>(new Set())
 	let rawPasteRef = useRef(false)
+	let behaviorRef = useRef({ tabIndent, smartPaste })
+	behaviorRef.current = { tabIndent, smartPaste }
 
 	useEffect(() => {
 		callbacksRef.current = { onChange, onCursorChange, onFocus, onBlur }
@@ -428,6 +459,9 @@ function MarkdownEditor(
 		readOnly,
 		spellcheck,
 		spellcheckLanguage,
+		smartPairs,
+		markerWrapping,
+		autocomplete,
 		isMobile,
 		externalExtensions,
 	})
@@ -495,10 +529,22 @@ function MarkdownEditor(
 						setCommandPaletteOpen(true)
 						return true
 					}),
-					writableShortcut("indent", moveTableCellForward),
-					writableShortcut("outdent", moveTableCellBackward),
-					shortcut("indent", indentMarkdown),
-					shortcut("outdent", outdentMarkdown),
+					shortcut("documentOutline", () => {
+						setOutlineOpen(true)
+						return true
+					}),
+					writableShortcut("indent", view =>
+						behaviorRef.current.tabIndent ? moveTableCellForward(view) : false,
+					),
+					writableShortcut("outdent", view =>
+						behaviorRef.current.tabIndent ? moveTableCellBackward(view) : false,
+					),
+					shortcut("indent", view =>
+						behaviorRef.current.tabIndent ? indentMarkdown(view) : false,
+					),
+					shortcut("outdent", view =>
+						behaviorRef.current.tabIndent ? outdentMarkdown(view) : false,
+					),
 					{
 						key: "Enter",
 						run: runWritable(insertTableRow),
@@ -509,7 +555,15 @@ function MarkdownEditor(
 					},
 					{
 						key: "Backspace",
+						run: runWritable(deleteMarkerBackward),
+					},
+					{
+						key: "Backspace",
 						run: runWritable(deleteMarkupBackward),
+					},
+					{
+						key: "Delete",
+						run: runWritable(deleteMarkerForward),
 					},
 					shortcut(
 						"contextAction",
@@ -586,11 +640,7 @@ function MarkdownEditor(
 				}
 			}),
 			// Feature extensions
-			createBracketsExtension(),
-			createCodeLanguageAutocomplete(),
-			createSlashCommands(),
-			combinedAutocompletion(),
-			createWikilinkAutocomplete(() => dataRef.current.documents ?? []),
+			bracketMatching(),
 			createLinkDecorations(),
 			createWikilinkDecorations(
 				id => wikilinkResolverRef.current(id),
@@ -607,6 +657,22 @@ function MarkdownEditor(
 		]
 
 		extensions.push(
+			bracketsCompartment.current.of(
+				createBracketsExtension({
+					smartPairs: initRef.current.smartPairs,
+					markerWrapping: initRef.current.markerWrapping,
+				}),
+			),
+			autocompleteCompartment.current.of(
+				initRef.current.autocomplete
+					? [
+							createCodeLanguageAutocomplete(),
+							createSlashCommands(),
+							combinedAutocompletion(),
+							createWikilinkAutocomplete(() => dataRef.current.documents ?? []),
+						]
+					: [],
+			),
 			placeholderCompartment.current.of(
 				initRef.current.placeholder
 					? placeholderExt(initRef.current.placeholder)
@@ -761,7 +827,6 @@ function MarkdownEditor(
 				rawPasteRef.current = false
 				return
 			}
-
 			let files = Array.from(event.clipboardData?.files ?? [])
 			let images = files.filter(file => file.type.startsWith("image/"))
 			let uploadImage = uploadImageRef.current
@@ -791,13 +856,17 @@ function MarkdownEditor(
 				})()
 				return
 			}
-
 			let html = event.clipboardData?.getData("text/html") ?? ""
+			let text = event.clipboardData?.getData("text/plain") ?? ""
+			if (!behaviorRef.current.smartPaste) {
+				event.preventDefault()
+				insertRawPastedText(activeView, text)
+				return
+			}
 			if (html && insertPastedHtml(activeView, html)) {
 				event.preventDefault()
 				return
 			}
-			let text = event.clipboardData?.getData("text/plain") ?? ""
 			if (
 				activeView.state.selection.main.from !==
 					activeView.state.selection.main.to &&
@@ -884,6 +953,31 @@ function MarkdownEditor(
 			),
 		})
 	}, [view, spellcheck, spellcheckLanguage])
+
+	useEffect(() => {
+		if (!view) return
+		view.dispatch({
+			effects: bracketsCompartment.current.reconfigure(
+				createBracketsExtension({ smartPairs, markerWrapping }),
+			),
+		})
+	}, [view, smartPairs, markerWrapping])
+
+	useEffect(() => {
+		if (!view) return
+		view.dispatch({
+			effects: autocompleteCompartment.current.reconfigure(
+				autocomplete
+					? [
+							createCodeLanguageAutocomplete(),
+							createSlashCommands(),
+							combinedAutocompletion(),
+							createWikilinkAutocomplete(() => dataRef.current.documents ?? []),
+						]
+					: [],
+			),
+		})
+	}, [view, autocomplete])
 
 	function getContent() {
 		return view?.state.doc.toString() ?? ""
@@ -991,6 +1085,18 @@ function MarkdownEditor(
 		setFind({ open: false })
 	}
 
+	function openCommandPalette() {
+		setCommandPaletteOpen(true)
+	}
+
+	function openOutline() {
+		setOutlineOpen(true)
+	}
+
+	function openDocumentSwitcher() {
+		setDocumentSwitcherOpen(true)
+	}
+
 	function runShortcut(id: CommandId) {
 		if (id === "clearFormatting") return void runCommand(clearFormatting)
 		if (id === "promoteHeading") return void runCommand(promoteHeading)
@@ -1004,6 +1110,15 @@ function MarkdownEditor(
 			setShortcutsOpen(true)
 			return
 		}
+		if (id === "documentOutline") {
+			setOutlineOpen(true)
+			return
+		}
+		if (id === "switchDocument") {
+			setDocumentSwitcherOpen(true)
+			return
+		}
+		if (!isShortcutId(id)) return
 		let editorCommand = editorShortcutCommand(id, autoSortRef.current)
 		if (editorCommand) {
 			runCommand(editorCommand)
@@ -1075,7 +1190,9 @@ function MarkdownEditor(
 		if (!view || view.state.readOnly) return
 		try {
 			let text = await navigator.clipboard.readText()
-			insertPastedText(view, text)
+			if (behaviorRef.current.smartPaste) {
+				insertPastedText(view, text)
+			} else insertRawPastedText(view, text)
 			view.focus()
 		} catch {
 			toast.error(t("editor.clipboard.unavailable"))
@@ -1164,6 +1281,9 @@ function MarkdownEditor(
 		refreshDecorations,
 		openFind,
 		closeFind,
+		openCommandPalette,
+		openOutline,
+		openDocumentSwitcher,
 		showImagePreview: handleImagePreview,
 	}))
 
@@ -1224,6 +1344,9 @@ function MarkdownEditor(
 			refreshDecorations,
 			openFind,
 			closeFind,
+			openCommandPalette,
+			openOutline,
+			openDocumentSwitcher,
 			showImagePreview: handleImagePreview,
 		}
 	})
@@ -1233,9 +1356,15 @@ function MarkdownEditor(
 		function handleGlobalKeyDown(event: KeyboardEvent) {
 			if (event.defaultPrevented || isShortcutTargetBlocked(event.target))
 				return
-			if (!isShortcutEvent(event, "commandPalette")) return
-			event.preventDefault()
-			setCommandPaletteOpen(true)
+			if (isShortcutEvent(event, "commandPalette")) {
+				event.preventDefault()
+				setCommandPaletteOpen(true)
+				return
+			}
+			if (isShortcutEvent(event, "documentOutline")) {
+				event.preventDefault()
+				setOutlineOpen(true)
+			}
 		}
 		function handleOpenPalette() {
 			setCommandPaletteOpen(true)
@@ -1286,6 +1415,29 @@ function MarkdownEditor(
 				open={shortcutsOpen}
 				onOpenChange={setShortcutsOpen}
 				onRun={runShortcut}
+			/>
+			{outlineOpen && (
+				<OutlineDialog
+					open
+					onOpenChange={setOutlineOpen}
+					headings={getDocumentHeadings(view?.state.doc.toString() ?? value)}
+					onSelect={heading => {
+						if (!view) return
+						view.dispatch({
+							selection: { anchor: heading.from },
+							effects: EditorView.scrollIntoView(heading.from, {
+								y: "start",
+							}),
+						})
+						view.focus()
+					}}
+				/>
+			)}
+			<DocumentSwitcherDialog
+				open={documentSwitcherOpen}
+				onOpenChange={setDocumentSwitcherOpen}
+				documents={documents ?? []}
+				onSelect={document => onWikilinkClick?.(document.id, false)}
 			/>
 			{findPanelOpen && (
 				<FindPanel

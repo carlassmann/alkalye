@@ -965,6 +965,42 @@ function EditorSection({ settings: jazzSettings }: EditorSectionProps) {
 							</SelectContent>
 						</Select>
 					</div>
+
+					<div className="border-border/50 space-y-3 border-t pt-3">
+						<div className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+							<T k="settings.editor.behavior" />
+						</div>
+						<ToggleSetting
+							id="smart-pairs-toggle"
+							label={<T k="settings.editor.smartPairs" />}
+							checked={settings.smartPairs ?? true}
+							onChange={value => setSettings({ smartPairs: value })}
+						/>
+						<ToggleSetting
+							id="marker-wrapping-toggle"
+							label={<T k="settings.editor.markerWrapping" />}
+							checked={settings.markerWrapping ?? true}
+							onChange={value => setSettings({ markerWrapping: value })}
+						/>
+						<ToggleSetting
+							id="tab-indent-toggle"
+							label={<T k="settings.editor.tabIndent" />}
+							checked={settings.tabIndent ?? true}
+							onChange={value => setSettings({ tabIndent: value })}
+						/>
+						<ToggleSetting
+							id="smart-paste-toggle"
+							label={<T k="settings.editor.smartPaste" />}
+							checked={settings.smartPaste ?? true}
+							onChange={value => setSettings({ smartPaste: value })}
+						/>
+						<ToggleSetting
+							id="autocomplete-toggle"
+							label={<T k="settings.editor.autocomplete" />}
+							checked={settings.autocomplete ?? true}
+							onChange={value => setSettings({ autocomplete: value })}
+						/>
+					</div>
 				</div>
 			</div>
 		</section>
@@ -1082,10 +1118,15 @@ function ToggleSetting({
 		<div
 			className={`flex min-h-8 items-center justify-between gap-4 ${className ?? ""}`}
 		>
-			<label htmlFor={id} className="text-sm">
+			<span id={`${id}-label`} className="text-sm">
 				{label}
-			</label>
-			<Switch id={id} checked={checked} onCheckedChange={onChange} />
+			</span>
+			<Switch
+				id={id}
+				aria-labelledby={`${id}-label`}
+				checked={checked}
+				onCheckedChange={onChange}
+			/>
 		</div>
 	)
 }

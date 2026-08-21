@@ -12,8 +12,10 @@ import { Document, UserAccount } from "@/schema"
 import { getDocumentTitle } from "../lib/title"
 import {
 	getShortcutLabel,
+	getActiveShortcutPlatform,
 	isShortcutEvent,
 	isShortcutTargetBlocked,
+	isModEnterEvent,
 } from "@/app/lib/shortcut-registry"
 import {
 	EllipsisIcon,
@@ -27,6 +29,7 @@ import {
 } from "@/app/components/error-states"
 
 import { Button } from "@/app/components/ui/button"
+import { Kbd } from "@/app/components/ui/kbd"
 import { Textarea } from "@/app/components/ui/textarea"
 import {
 	Dialog,
@@ -303,7 +306,7 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 	function handleCommentKeyDown(
 		event: ReactKeyboardEvent<HTMLTextAreaElement>,
 	) {
-		if (event.key !== "Enter" || event.shiftKey) return
+		if (!isModEnterEvent(event.nativeEvent)) return
 		event.preventDefault()
 		submitPreviewComment()
 	}
@@ -447,6 +450,7 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 							value={commentBody}
 							onChange={event => setCommentBody(event.target.value)}
 							onKeyDown={handleCommentKeyDown}
+							aria-keyshortcuts="Meta+Enter Control+Enter"
 							placeholder={t("comments.newPlaceholder")}
 							minRows={3}
 						/>
@@ -457,6 +461,9 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 						>
 							<MessageSquarePlus />
 							{t("comments.add")}
+							<Kbd className="ml-auto">
+								{getActiveShortcutPlatform() === "mac" ? "⌘↵" : "Ctrl+Enter"}
+							</Kbd>
 						</Button>
 					</form>
 				</DialogContent>

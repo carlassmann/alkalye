@@ -15,6 +15,11 @@ let EditorSettings = z.object({
 	autoSortTasks: z.boolean(),
 	spellcheck: z.boolean().optional(),
 	spellcheckLanguage: z.enum(["", "en", "de"]).optional(),
+	smartPairs: z.boolean().optional(),
+	markerWrapping: z.boolean().optional(),
+	tabIndent: z.boolean().optional(),
+	smartPaste: z.boolean().optional(),
+	autocomplete: z.boolean().optional(),
 	showStatsBadge: z.boolean(),
 	statsBadgeUnit: StatsBadgeUnit,
 })
@@ -30,6 +35,11 @@ let DEFAULT_EDITOR_SETTINGS: z.infer<typeof EditorSettings> = {
 	autoSortTasks: false,
 	spellcheck: true,
 	spellcheckLanguage: "",
+	smartPairs: true,
+	markerWrapping: true,
+	tabIndent: true,
+	smartPaste: true,
+	autocomplete: true,
 	showStatsBadge: true,
 	statsBadgeUnit: "words",
 }

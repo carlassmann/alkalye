@@ -27,7 +27,7 @@ import {
 } from "./find-extension"
 import { htmlToMarkdown } from "./html-to-markdown"
 import { renumberOrderedLists } from "./ordered-list-renumbering"
-import { insertPastedText } from "./paste-commands"
+import { insertPastedText, insertRawPastedText } from "./paste-commands"
 import {
 	expandMarkdownSelection,
 	shrinkMarkdownSelection,
@@ -245,6 +245,14 @@ describe("P1 authoring commands", () => {
 		expect(text(view)).toBe(
 			"[one](https://example.com) [two](https://example.com)",
 		)
+	})
+
+	it("pastes URLs literally when smart paste is disabled", () => {
+		let view = createView("label", EditorSelection.range(0, 5))
+
+		insertRawPastedText(view, "https://example.com")
+
+		expect(text(view)).toBe("https://example.com")
 	})
 
 	it("replaces only matches inside the requested selection", () => {

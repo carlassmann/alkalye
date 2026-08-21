@@ -22,6 +22,7 @@ export {
 } from "./widgets/floating-actions"
 export { SidebarEditMenu } from "./widgets/sidebar-edit-menu"
 export { SidebarFormatMenu } from "./widgets/sidebar-format-menu"
+export { SidebarEditorNavigation } from "./widgets/sidebar-editor-navigation"
 export { FindPanel } from "./widgets/find-panel"
 
 export { useFindPanel } from "./hooks/use-find-panel"

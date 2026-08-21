@@ -6,24 +6,25 @@ import {
 	getShortcutLabel,
 	isShortcutEvent,
 	isShortcutTargetBlocked,
+	isModEnterEvent,
 	replaceShortcutTokens,
 } from "./shortcut-registry"
 
 describe("shortcut registry", () => {
-	it("has no default-platform conflicts", () => {
+	it("has no Windows or Linux conflicts", () => {
 		let bindings = getShortcutDefinitions().map(definition => ({
 			id: definition.id,
-			key: getCodeMirrorShortcut(definition.id).key,
+			key: getCodeMirrorShortcut(definition.id, "other").key,
 		}))
 
 		expect(conflicts(bindings)).toEqual([])
 	})
 
 	it("has no macOS conflicts", () => {
-		let bindings = getShortcutDefinitions().map(definition => {
-			let binding = getCodeMirrorShortcut(definition.id)
-			return { id: definition.id, key: binding.mac ?? binding.key }
-		})
+		let bindings = getShortcutDefinitions().map(definition => ({
+			id: definition.id,
+			key: getCodeMirrorShortcut(definition.id, "mac").key,
+		}))
 
 		expect(conflicts(bindings)).toEqual([])
 	})
@@ -55,6 +56,21 @@ describe("shortcut registry", () => {
 
 		expect(isShortcutEvent(composing, "bold", "other")).toBe(false)
 		expect(isShortcutEvent(altGraph, "bold", "other")).toBe(false)
+	})
+
+	it("recognizes Mod+Enter submission outside composition", () => {
+		expect(isModEnterEvent(keyboardEvent("Enter", { metaKey: true }))).toBe(
+			true,
+		)
+		expect(isModEnterEvent(keyboardEvent("Enter", { ctrlKey: true }))).toBe(
+			true,
+		)
+		expect(isModEnterEvent(keyboardEvent("Enter", {}))).toBe(false)
+		expect(
+			isModEnterEvent(
+				keyboardEvent("Enter", { ctrlKey: true, isComposing: true }),
+			),
+		).toBe(false)
 	})
 
 	it("blocks globals in forms and dialogs but allows CodeMirror", () => {

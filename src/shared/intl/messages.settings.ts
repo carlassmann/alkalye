@@ -62,6 +62,13 @@ let baseSettingsMessages = messages({
 	"settings.editor.spellcheckLanguage.system": "System default",
 	"settings.editor.spellcheckLanguage.english": "English",
 	"settings.editor.spellcheckLanguage.german": "German",
+	"settings.editor.behavior": "Authoring behavior",
+	"settings.editor.smartPairs": "Smart bracket and quote pairs",
+	"settings.editor.markerWrapping": "Wrap selections in Markdown markers",
+	"settings.editor.tabIndent": "Use Tab to indent Markdown blocks",
+	"settings.editor.smartPaste": "Convert rich text and URLs on paste",
+	"settings.editor.autocomplete":
+		"Slash, link, asset, and language suggestions",
 	"settings.editor.statsBadge": "Stats badge",
 	"settings.editor.statsBadge.words": "Words",
 	"settings.editor.statsBadge.sentences": "Sentences",
@@ -171,6 +178,15 @@ let deSettingsMessages = translate(baseSettingsMessages, {
 	"settings.editor.spellcheckLanguage.system": "Systemstandard",
 	"settings.editor.spellcheckLanguage.english": "Englisch",
 	"settings.editor.spellcheckLanguage.german": "Deutsch",
+	"settings.editor.behavior": "Schreibverhalten",
+	"settings.editor.smartPairs":
+		"Intelligente Klammer- und Anführungszeichenpaare",
+	"settings.editor.markerWrapping":
+		"Auswahl mit Markdown-Markierungen umschließen",
+	"settings.editor.tabIndent": "Markdown-Blöcke mit Tab einrücken",
+	"settings.editor.smartPaste": "Rich Text und URLs beim Einfügen umwandeln",
+	"settings.editor.autocomplete":
+		"Vorschläge für Slash, Links, Medien und Sprachen",
 	"settings.editor.statsBadge": "Statistik-Badge",
 	"settings.editor.statsBadge.words": "Wörter",
 	"settings.editor.statsBadge.sentences": "Sätze",

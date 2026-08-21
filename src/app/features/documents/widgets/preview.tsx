@@ -5,6 +5,7 @@ import {
 	isShortcutEvent,
 	isShortcutTargetBlocked,
 } from "@/app/lib/shortcut-registry"
+import { exitFocusMode } from "@/app/lib/focus-mode"
 import { Marked } from "marked"
 import markedShiki from "marked-shiki"
 import { createHighlighter, type Highlighter } from "shiki"
@@ -177,6 +178,7 @@ function PreviewContent({
 
 		function handleKeyDown(e: KeyboardEvent) {
 			if (e.defaultPrevented || isShortcutTargetBlocked(e.target)) return
+			if (e.key === "Escape" && exitFocusMode()) return
 			if (!isShortcutEvent(e, "preview")) return
 			e.preventDefault()
 			exit?.()

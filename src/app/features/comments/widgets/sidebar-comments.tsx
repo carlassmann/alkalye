@@ -9,6 +9,7 @@ import {
 	Trash2,
 } from "lucide-react"
 import { Button } from "@/app/components/ui/button"
+import { Kbd } from "@/app/components/ui/kbd"
 import { Textarea } from "@/app/components/ui/textarea"
 import { Badge } from "@/app/components/ui/badge"
 import {
@@ -26,6 +27,10 @@ import {
 import { useHasFinePointer } from "@/app/hooks/use-fine-pointer"
 import { cn } from "@/app/lib/cn"
 import { useIntl } from "@/shared/intl/setup"
+import {
+	getActiveShortcutPlatform,
+	isModEnterEvent,
+} from "@/app/lib/shortcut-registry"
 import {
 	addCommentReply,
 	deleteCommentThread,
@@ -181,7 +186,7 @@ function CommentThreadItem({
 	}
 
 	function handleReplyKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-		if (event.key !== "Enter" || event.shiftKey) return
+		if (!isModEnterEvent(event.nativeEvent)) return
 		event.preventDefault()
 		handleReply()
 	}
@@ -269,6 +274,7 @@ function CommentThreadItem({
 											value={reply}
 											onChange={event => setReply(event.target.value)}
 											onKeyDown={handleReplyKeyDown}
+											aria-keyshortcuts="Meta+Enter Control+Enter"
 											placeholder={t("comments.replyPlaceholder")}
 											minRows={2}
 										/>
@@ -284,6 +290,11 @@ function CommentThreadItem({
 											<Button type="submit" size="sm" disabled={!reply.trim()}>
 												<MessageSquarePlus />
 												{t("comments.reply")}
+												<Kbd>
+													{getActiveShortcutPlatform() === "mac"
+														? "⌘↵"
+														: "Ctrl+Enter"}
+												</Kbd>
 											</Button>
 										</div>
 									</form>

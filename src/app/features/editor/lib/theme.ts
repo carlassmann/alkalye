@@ -52,6 +52,17 @@ let editorTheme: Extension = EditorView.theme({
 	".cm-activeLine": {
 		backgroundColor: "var(--editor-active-line-bg, transparent)",
 	},
+	".cm-matchingBracket": {
+		backgroundColor: "color-mix(in srgb, var(--brand) 18%, transparent)",
+		outline: "1px solid color-mix(in srgb, var(--brand) 55%, transparent)",
+		borderRadius: "2px",
+	},
+	".cm-nonmatchingBracket": {
+		backgroundColor: "color-mix(in srgb, var(--destructive) 18%, transparent)",
+		outline:
+			"1px solid color-mix(in srgb, var(--destructive) 55%, transparent)",
+		borderRadius: "2px",
+	},
 	".cm-gutters": {
 		backgroundColor: "var(--editor-background, #fafaf8)",
 		color: "var(--editor-muted, #999)",

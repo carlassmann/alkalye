@@ -157,6 +157,42 @@ describe("smart delimiter input", () => {
 		expect(insertSmartDelimiter(view, "[")).toBe(false)
 		expect(view.state.doc.toString()).toBe("hello")
 	})
+
+	it("can disable pair wrapping independently", () => {
+		let view = createView("hello", EditorSelection.range(0, 5))
+
+		expect(
+			insertSmartDelimiter(view, "[", {
+				smartPairs: false,
+				markerWrapping: true,
+			}),
+		).toBe(false)
+		expect(
+			insertSmartDelimiter(view, "*", {
+				smartPairs: false,
+				markerWrapping: true,
+			}),
+		).toBe(true)
+		expect(view.state.doc.toString()).toBe("*hello*")
+	})
+
+	it("can disable marker wrapping independently", () => {
+		let view = createView("hello", EditorSelection.range(0, 5))
+
+		expect(
+			insertSmartDelimiter(view, "*", {
+				smartPairs: true,
+				markerWrapping: false,
+			}),
+		).toBe(false)
+		expect(
+			insertSmartDelimiter(view, "[", {
+				smartPairs: true,
+				markerWrapping: false,
+			}),
+		).toBe(true)
+		expect(view.state.doc.toString()).toBe("[hello]")
+	})
 })
 
 function createView(

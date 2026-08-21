@@ -3,6 +3,7 @@ import {
 	isShortcutEvent,
 	isShortcutTargetBlocked,
 } from "@/app/lib/shortcut-registry"
+import { exitFocusMode } from "@/app/lib/focus-mode"
 
 export { setupKeyboardShortcuts }
 
@@ -37,6 +38,8 @@ function setupKeyboardShortcuts(opts: {
 
 	function handleKeyDown(e: KeyboardEvent) {
 		if (e.defaultPrevented || isShortcutTargetBlocked(e.target)) return
+
+		if (e.key === "Escape" && exitFocusMode()) return
 
 		if (isShortcutEvent(e, "preview")) {
 			e.preventDefault()
