@@ -74,7 +74,7 @@ import {
 } from "../lib/comment-text-match"
 import { printToPdf } from "@/app/features/import-export"
 import { useIntl } from "@/shared/intl/setup"
-import { assetPreviewResolve } from "@/app/features/assets"
+import { assetPreviewResolve, toPrintableAsset } from "@/app/features/assets"
 
 export { DocPreviewScreen, previewResolve, resolveDocTitles }
 
@@ -164,6 +164,10 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 				e.preventDefault()
 				void printToPdf({
 					content,
+					assets:
+						previewDoc?.assets?.flatMap(asset =>
+							asset?.$isLoaded ? [toPrintableAsset(asset)] : [],
+						) ?? [],
 					themes: meWithThemes.$isLoaded
 						? meWithThemes.root?.themes
 						: undefined,
@@ -206,6 +210,7 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 		canAddPreviewComment,
 		content,
 		meWithThemes,
+		previewDoc?.assets,
 		previewSelection,
 		selectedCommentThreadId,
 		t,

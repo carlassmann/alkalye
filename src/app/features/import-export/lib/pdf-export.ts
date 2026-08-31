@@ -14,6 +14,8 @@ import {
 	type ThemePresetType,
 } from "@/app/features/themes/lib/document-theme"
 import { getDocumentTitle } from "@/app/features/documents/lib/title"
+import type { PrintableAsset } from "@/app/features/assets"
+import { replaceAssetSources } from "./print-media"
 
 export { printToPdf }
 
@@ -24,8 +26,9 @@ async function printToPdf(params: {
 	content: string
 	themes: LoadedThemes | undefined
 	defaultPreviewTheme: string | null
+	assets: PrintableAsset[]
 }) {
-	let { content, themes, defaultPreviewTheme } = params
+	let { content, themes, defaultPreviewTheme, assets } = params
 	let { body } = parseFrontmatter(content)
 	let title = getDocumentTitle(content)
 
@@ -56,7 +59,8 @@ async function printToPdf(params: {
 
 	let marked = new Marked()
 	marked.setOptions({ gfm: true, breaks: true })
-	let htmlContent = await marked.parse(body)
+	let parsedHtml = await marked.parse(body)
+	let htmlContent = await replaceAssetSources(parsedHtml, assets)
 
 	let printableHtml = await buildPrintableHtml({
 		title,
@@ -307,16 +311,42 @@ function openPrintWindow(html: string): void {
 		return
 	}
 
-	printWindow.document.body.innerHTML = html
-	printWindow.document.close()
+	let parsed = new DOMParser().parseFromString(html, "text/html")
+	let imported = printWindow.document.importNode(parsed.documentElement, true)
+	printWindow.document.replaceChild(
+		imported,
+		printWindow.document.documentElement,
+	)
+	void printWhenReady(printWindow)
+}
 
-	printWindow.onload = async () => {
-		// Wait for fonts to load before printing
-		if (printWindow.document.fonts?.ready) {
-			await printWindow.document.fonts.ready
-		}
-		printWindow.print()
+async function printWhenReady(printWindow: Window) {
+	if (printWindow.document.fonts?.ready) {
+		await printWindow.document.fonts.ready
 	}
+	await waitForImages(printWindow.document)
+	printWindow.print()
+}
+
+function waitForImages(document: Document): Promise<void[]> {
+	return Promise.all(
+		Array.from(document.images).map(image => {
+			if (image.complete) return Promise.resolve()
+			return new Promise<void>(resolve => {
+				let timeout = window.setTimeout(finish, 5_000)
+
+				function finish() {
+					window.clearTimeout(timeout)
+					image.removeEventListener("load", finish)
+					image.removeEventListener("error", finish)
+					resolve()
+				}
+
+				image.addEventListener("load", finish)
+				image.addEventListener("error", finish)
+			})
+		}),
+	)
 }
 
 function renderTemplateWithContent(
@@ -403,7 +433,11 @@ function blobToBase64(blob: Blob): Promise<string> {
 	return new Promise((resolve, reject) => {
 		let reader = new FileReader()
 		reader.onloadend = () => {
-			let result = reader.result as string
+			let result = reader.result
+			if (typeof result !== "string") {
+				reject(new Error("Could not read blob"))
+				return
+			}
 			let base64 = result.split(",")[1]
 			resolve(base64)
 		}

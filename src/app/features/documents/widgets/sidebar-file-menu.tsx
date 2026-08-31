@@ -49,7 +49,7 @@ import {
 	getExportComments,
 } from "@/app/features/comments"
 import type { MarkdownEditorRef } from "@/app/features/editor"
-import { serializeAsset } from "@/app/features/assets"
+import { serializeAsset, toPrintableAsset } from "@/app/features/assets"
 
 import { loadThemesForPdf } from "@/app/features/themes"
 import { createDocumentMetadata, syncDocumentMetadata } from "../lib/metadata"
@@ -116,7 +116,7 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 	let isAdmin = docGroup?.myRole() === "admin"
 	let isPinned = parseFrontmatter(content).frontmatter?.pinned === true
 	let isPresentation = getPresentationMode(content)
-	let handlePrintPdf = makePrintPdf(content, account)
+	let handlePrintPdf = makePrintPdf(content, account, doc)
 
 	return (
 		<>
@@ -511,11 +511,16 @@ function makeSaveAs(content: string) {
 function makePrintPdf(
 	content: string,
 	account: ReturnType<typeof useAccount<typeof UserAccount>>,
+	doc: LoadedDocument,
 ) {
 	return async function handlePrintPdf() {
 		if (!account.$isLoaded) return
 		let { themes, defaultPreviewTheme } = await loadThemesForPdf(account)
-		await printToPdf({ content, themes, defaultPreviewTheme })
+		let assets =
+			doc.assets?.flatMap(asset =>
+				asset?.$isLoaded ? [toPrintableAsset(asset)] : [],
+			) ?? []
+		await printToPdf({ content, themes, defaultPreviewTheme, assets })
 	}
 }
 

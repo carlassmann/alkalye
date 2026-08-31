@@ -30,6 +30,7 @@ import {
 	useTldrawEditor,
 	toEditorAsset,
 	toSidebarAsset,
+	toPrintableAsset,
 	type SidebarAsset,
 } from "@/app/features/assets"
 import {
@@ -445,7 +446,11 @@ function SpaceEditorContent({
 			onPrintPdf: async () => {
 				if (!me.$isLoaded) return
 				let { themes, defaultPreviewTheme } = await loadThemesForPdf(me)
-				void printToPdf({ content, themes, defaultPreviewTheme })
+				let assets =
+					doc.assets?.flatMap(asset =>
+						asset?.$isLoaded ? [toPrintableAsset(asset)] : [],
+					) ?? []
+				void printToPdf({ content, themes, defaultPreviewTheme, assets })
 			},
 			onPreview: () => {
 				navigate({
@@ -471,6 +476,7 @@ function SpaceEditorContent({
 		toggleLeft,
 		toggleRight,
 		content,
+		doc.assets,
 		me,
 		docWithContent,
 		editor,

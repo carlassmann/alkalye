@@ -18,7 +18,9 @@ export type { SidebarAsset } from "./widgets/sidebar-assets"
 export {
 	toEditorAsset,
 	toSidebarAsset,
+	toPrintableAsset,
 	type EditorAsset,
+	type PrintableAsset,
 } from "./lib/asset-view-models"
 export { assetPreviewResolve, assetContentResolve } from "./lib/asset-resolve"
 export {

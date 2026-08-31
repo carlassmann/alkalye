@@ -1,8 +1,8 @@
 import type { co } from "jazz-tools"
 import { Asset } from "./schema"
 
-export { toEditorAsset, toSidebarAsset }
-export type { EditorAsset, SidebarAsset }
+export { toEditorAsset, toSidebarAsset, toPrintableAsset }
+export type { EditorAsset, SidebarAsset, PrintableAsset }
 
 interface EditorAsset {
 	id: string
@@ -23,6 +23,13 @@ interface SidebarAsset {
 	tldrawRevisionId?: string
 	getVideoBlob?: () => Blob | undefined
 	muteAudio?: boolean
+}
+
+interface PrintableAsset {
+	id: string
+	name: string
+	type: "image" | "video" | "tldraw"
+	getBlob: () => Promise<Blob | undefined>
 }
 
 function toEditorAsset(
@@ -66,4 +73,42 @@ function toSidebarAsset(asset: co.loaded<typeof Asset>): SidebarAsset {
 		getVideoBlob: video ? () => video.toBlob() : undefined,
 		muteAudio: asset.type === "video" ? asset.muteAudio : undefined,
 	}
+}
+
+function toPrintableAsset(asset: co.loaded<typeof Asset>): PrintableAsset {
+	return {
+		id: asset.$jazz.id,
+		name: asset.name,
+		type: asset.type,
+		getBlob: async () => {
+			switch (asset.type) {
+				case "image": {
+					let loaded = await asset.$jazz.ensureLoaded({
+						resolve: { image: { original: true } },
+					})
+					return loaded.image.original.toBlob()
+				}
+				case "video": {
+					let loaded = await asset.$jazz.ensureLoaded({
+						resolve: { video: true },
+					})
+					return loaded.video.toBlob()
+				}
+				case "tldraw": {
+					let loaded = await asset.$jazz.ensureLoaded({
+						resolve: {
+							revision: { lightPreview: { original: true } },
+						},
+					})
+					return loaded.revision.lightPreview.original.toBlob()
+				}
+				default:
+					return unsupportedAsset(asset)
+			}
+		},
+	}
+}
+
+function unsupportedAsset(asset: never): never {
+	throw new Error(`Unsupported asset: ${asset}`)
 }
