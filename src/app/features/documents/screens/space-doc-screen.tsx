@@ -31,6 +31,7 @@ import {
 	toEditorAsset,
 	toSidebarAsset,
 	toPrintableAsset,
+	getLoadedAssets,
 	type SidebarAsset,
 } from "@/app/features/assets"
 import {
@@ -329,10 +330,9 @@ function SpaceEditorContent({
 		editorRef: editor,
 	})
 	useDocumentCompaction(doc, !readOnly)
-	let assets =
-		doc.assets?.flatMap(a =>
-			a?.$isLoaded ? [toEditorAsset(a, resolvedTheme)] : [],
-		) ?? []
+	let assets = getLoadedAssets(doc.assets).map(a =>
+		toEditorAsset(a, resolvedTheme),
+	)
 	let assetsRef = useRef(assets)
 	useEffect(() => {
 		assetsRef.current = assets
@@ -403,8 +403,9 @@ function SpaceEditorContent({
 		resolve: { content: true },
 	})
 
-	let sidebarAssets: SidebarAsset[] =
-		doc.assets?.flatMap(a => (a?.$isLoaded ? [toSidebarAsset(a)] : [])) ?? []
+	let sidebarAssets: SidebarAsset[] = getLoadedAssets(doc.assets).map(a =>
+		toSidebarAsset(a),
+	)
 	let tldrawEditor = useTldrawEditor({
 		assets: sidebarAssets,
 		readOnly,
@@ -446,10 +447,7 @@ function SpaceEditorContent({
 			onPrintPdf: async () => {
 				if (!me.$isLoaded) return
 				let { themes, defaultPreviewTheme } = await loadThemesForPdf(me)
-				let assets =
-					doc.assets?.flatMap(asset =>
-						asset?.$isLoaded ? [toPrintableAsset(asset)] : [],
-					) ?? []
+				let assets = getLoadedAssets(doc.assets).map(toPrintableAsset)
 				void printToPdf({ content, themes, defaultPreviewTheme, assets })
 			},
 			onPreview: () => {
@@ -894,7 +892,9 @@ function SpaceEditorContent({
 									editor.current?.insertBlock(`![${name}](asset:${assetId})`)
 								}}
 								onToggleMute={assetId => {
-									let asset = doc.assets?.find(a => a?.$jazz.id === assetId)
+									let asset = getLoadedAssets(doc.assets).find(
+										a => a.$jazz.id === assetId,
+									)
 									if (asset?.$isLoaded && asset.type === "video") {
 										asset.$jazz.applyDiff({ muteAudio: !asset.muteAudio })
 									}

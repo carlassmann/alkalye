@@ -74,7 +74,11 @@ import {
 } from "../lib/comment-text-match"
 import { printToPdf } from "@/app/features/import-export"
 import { useIntl } from "@/shared/intl/setup"
-import { assetPreviewResolve, toPrintableAsset } from "@/app/features/assets"
+import {
+	assetPreviewResolve,
+	getLoadedAssets,
+	toPrintableAsset,
+} from "@/app/features/assets"
 
 export { DocPreviewScreen, previewResolve, resolveDocTitles }
 
@@ -164,10 +168,7 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 				e.preventDefault()
 				void printToPdf({
 					content,
-					assets:
-						previewDoc?.assets?.flatMap(asset =>
-							asset?.$isLoaded ? [toPrintableAsset(asset)] : [],
-						) ?? [],
+					assets: getLoadedAssets(previewDoc?.assets).map(toPrintableAsset),
 					themes: meWithThemes.$isLoaded
 						? meWithThemes.root?.themes
 						: undefined,
@@ -236,7 +237,9 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 	if (!previewDoc) return <DocumentNotFound />
 
 	let doc = previewDoc
-	let assets = doc.assets?.filter(a => a?.$isLoaded) ?? []
+	let assets = doc.assets?.$isLoaded
+		? doc.assets.filter(asset => asset?.$isLoaded)
+		: []
 	let docTitle = getDocumentTitle(content)
 	let commentThreads = getVisibleCommentThreads(doc)
 	let unresolvedCommentCount = getUnresolvedCommentCount(doc)

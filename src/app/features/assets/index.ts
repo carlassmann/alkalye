@@ -19,6 +19,7 @@ export {
 	toEditorAsset,
 	toSidebarAsset,
 	toPrintableAsset,
+	getLoadedAssets,
 	type EditorAsset,
 	type PrintableAsset,
 } from "./lib/asset-view-models"

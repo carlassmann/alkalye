@@ -49,7 +49,11 @@ import {
 	getExportComments,
 } from "@/app/features/comments"
 import type { MarkdownEditorRef } from "@/app/features/editor"
-import { serializeAsset, toPrintableAsset } from "@/app/features/assets"
+import {
+	getLoadedAssets,
+	serializeAsset,
+	toPrintableAsset,
+} from "@/app/features/assets"
 
 import { loadThemesForPdf } from "@/app/features/themes"
 import { createDocumentMetadata, syncDocumentMetadata } from "../lib/metadata"
@@ -516,10 +520,7 @@ function makePrintPdf(
 	return async function handlePrintPdf() {
 		if (!account.$isLoaded) return
 		let { themes, defaultPreviewTheme } = await loadThemesForPdf(account)
-		let assets =
-			doc.assets?.flatMap(asset =>
-				asset?.$isLoaded ? [toPrintableAsset(asset)] : [],
-			) ?? []
+		let assets = getLoadedAssets(doc.assets).map(toPrintableAsset)
 		await printToPdf({ content, themes, defaultPreviewTheme, assets })
 	}
 }

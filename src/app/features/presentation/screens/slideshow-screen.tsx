@@ -89,7 +89,9 @@ function SlideshowScreen({ id, loaderData }: SlideshowScreenProps) {
 			? items[doc.presentationLine].slideNumber
 			: 1
 
-	let assets = doc.assets?.filter(a => a?.$isLoaded) ?? []
+	let assets = doc.assets?.$isLoaded
+		? doc.assets.filter(asset => asset?.$isLoaded)
+		: []
 	let canEditDoc = canEdit(doc)
 
 	return (

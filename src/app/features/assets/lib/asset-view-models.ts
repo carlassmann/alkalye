@@ -1,7 +1,7 @@
 import type { co } from "jazz-tools"
 import { Asset } from "./schema"
 
-export { toEditorAsset, toSidebarAsset, toPrintableAsset }
+export { getLoadedAssets, toEditorAsset, toSidebarAsset, toPrintableAsset }
 export type { EditorAsset, SidebarAsset, PrintableAsset }
 
 interface EditorAsset {
@@ -30,6 +30,16 @@ interface PrintableAsset {
 	name: string
 	type: "image" | "video" | "tldraw"
 	getBlob: () => Promise<Blob | undefined>
+}
+
+type LoadedAsset = co.loaded<typeof Asset>
+type AssetList =
+	| (ReadonlyArray<LoadedAsset | { $isLoaded: false }> & { $isLoaded: true })
+	| { $isLoaded: false }
+
+function getLoadedAssets(assets: AssetList | null | undefined): LoadedAsset[] {
+	if (!assets?.$isLoaded) return []
+	return assets.flatMap(asset => (asset.$isLoaded ? [asset] : []))
 }
 
 function toEditorAsset(

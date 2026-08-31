@@ -8,7 +8,13 @@ import {
 	UserAccount,
 	VideoAsset,
 } from "@/schema"
-import { toPrintableAsset } from "./asset-view-models"
+import { getLoadedAssets, toPrintableAsset } from "./asset-view-models"
+
+describe("loaded assets", () => {
+	it("treats a loading asset relation as temporarily empty", () => {
+		expect(getLoadedAssets({ $isLoaded: false })).toEqual([])
+	})
+})
 
 describe("printable assets", () => {
 	let account: co.loaded<typeof UserAccount>
