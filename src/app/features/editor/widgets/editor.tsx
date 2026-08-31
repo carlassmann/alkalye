@@ -1463,6 +1463,7 @@ function MarkdownEditor(
 					if (!opened) toast.info(t("comments.selectionRequired"))
 				}}
 				onWikilinkClick={onWikilinkClick}
+				onCreateWhiteboard={onCreateTldraw}
 			>
 				<div ref={containerRef} className={className} />
 			</EditorContextMenu>

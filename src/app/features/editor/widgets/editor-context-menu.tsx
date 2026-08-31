@@ -40,6 +40,9 @@ interface EditorContextMenuProps {
 	canAddComment?: boolean
 	onAddComment: () => void
 	onWikilinkClick?: (id: string, newTab: boolean) => void
+	onCreateWhiteboard?: (
+		onCreated: (asset: { id: string; name: string }) => void,
+	) => void
 }
 
 let headingLevels = [1, 2, 3, 4, 5, 6] satisfies Array<1 | 2 | 3 | 4 | 5 | 6>
@@ -62,6 +65,7 @@ function EditorContextMenu({
 	canAddComment,
 	onAddComment,
 	onWikilinkClick,
+	onCreateWhiteboard,
 }: EditorContextMenuProps) {
 	let savedSelection = useRef<Range | null>(null)
 	let lastTouchAt = useRef(0)
@@ -297,6 +301,21 @@ function EditorContextMenu({
 										{getShortcutLabel("codeBlock")}
 									</ContextMenuShortcut>
 								</ContextMenuItem>
+								{onCreateWhiteboard && !readOnly && (
+									<ContextMenuItem
+										onClick={() =>
+											runAction(() =>
+												onCreateWhiteboard(asset => {
+													editor.current?.insertBlock(
+														`![${asset.name}](asset:${asset.id})`,
+													)
+												}),
+											)
+										}
+									>
+										<T k="editor.menu.addWhiteboard" />
+									</ContextMenuItem>
+								)}
 							</ContextMenuSubContent>
 						</ContextMenuSub>
 					</>
