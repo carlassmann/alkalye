@@ -89,7 +89,7 @@ function HelpMenu({
 					<DropdownMenuItem
 						render={
 							<a
-								href="https://github.com/ccssmnn/alkalye"
+								href="https://github.com/carlassmann/alkalye"
 								target="_blank"
 								rel="noopener noreferrer"
 							/>
@@ -101,7 +101,7 @@ function HelpMenu({
 					<DropdownMenuItem
 						render={
 							<a
-								href="https://twitter.com/ccssmnn"
+								href="https://twitter.com/carlassmann"
 								target="_blank"
 								rel="noopener noreferrer"
 							/>

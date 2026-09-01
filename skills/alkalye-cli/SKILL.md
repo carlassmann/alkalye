@@ -18,7 +18,7 @@ Data syncs via Jazz, a local-first protocol. Every mutation is local first and s
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/ccssmnn/alkalye.git /path/to/alkalye
+git clone https://github.com/carlassmann/alkalye.git /path/to/alkalye
 cd /path/to/alkalye
 bun install
 ```

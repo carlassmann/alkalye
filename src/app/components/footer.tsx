@@ -8,16 +8,16 @@ function Footer() {
 		<footer className="text-muted-foreground mx-auto max-w-2xl px-3 py-6 text-center text-xs">
 			<div className="flex items-center justify-center gap-4">
 				<a
-					href="https://twitter.com/ccssmnn"
+					href="https://twitter.com/carlassmann"
 					target="_blank"
 					rel="noopener noreferrer"
 					className="hover:text-foreground p-1 transition-colors"
 				>
 					<Bird className="size-4" />
-					<span className="sr-only">@ccssmnn</span>
+					<span className="sr-only">@carlassmann</span>
 				</a>
 				<a
-					href="https://github.com/ccssmnn/alkalye"
+					href="https://github.com/carlassmann/alkalye"
 					target="_blank"
 					rel="noopener noreferrer"
 					className="hover:text-foreground p-1 transition-colors"

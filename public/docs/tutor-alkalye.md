@@ -23,7 +23,7 @@ Your documents sync automatically. Works offline too.
 
 When your cursor is on certain lines, floating action buttons appear:
 
-- [ ] **URLs** - Click to open the link in a new tab [Alkalye on Github](https://github.com/ccssmnn/alkalye)
+- [ ] **URLs** - Click to open the link in a new tab [Alkalye on Github](https://github.com/carlassmann/alkalye)
 - [ ] **Tasks** - Click the checkbox to toggle completion
 - [ ] **Images** - Click the Button to add an image asset ![Your Image here]()
 

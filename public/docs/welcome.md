@@ -36,7 +36,7 @@ Settings like title, tags, and presentation mode are stored directly in your mar
 
 ## Open Source
 
-Alkalye is MIT licensed and on [GitHub](https://github.com/ccssmnn/alkalye). Take the code, host it yourself, make it yours.
+Alkalye is MIT licensed and on [GitHub](https://github.com/carlassmann/alkalye). Take the code, host it yourself, make it yours.
 
 ## Pricing
 
