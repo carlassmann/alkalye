@@ -1,5 +1,7 @@
 import { chromium, type Page } from "@playwright/test"
 import { create } from "../e2e/doc-helpers"
+import { createSpace } from "../e2e/space-helpers"
+import { createAccount } from "../e2e/auth-helpers"
 import { testIds } from "../src/app/lib/test-ids"
 
 type InteractionMetric = {
@@ -65,6 +67,7 @@ let browser = await chromium.launch({ headless: !args.headed })
 let context = await browser.newContext({
 	baseURL: args.url,
 	ignoreHTTPSErrors: true,
+	permissions: ["clipboard-read", "clipboard-write"],
 	serviceWorkers: "block",
 	viewport: { width: 1280, height: 900 },
 })
@@ -73,6 +76,7 @@ try {
 	let page = await context.newPage()
 	page.setDefaultNavigationTimeout(120_000)
 	await installObservers(page)
+	await createAccount(page)
 
 	console.error(`Seeding two ${args.kb} KB documents...`)
 	let seedStartedAt = performance.now()
@@ -82,7 +86,7 @@ try {
 	console.error("Created first document")
 	await replaceEditorContent(page, buildContent("Responsiveness A", args.kb))
 	console.error("Filled first document")
-	await create(page, {
+	let second = await create(page, {
 		title: "Responsiveness B",
 	})
 	console.error("Created second document")
@@ -91,6 +95,17 @@ try {
 		`Seeded documents in ${Math.round(performance.now() - seedStartedAt)} ms`,
 	)
 	await page.waitForTimeout(2_000)
+	let firstSpace = await createSpace(page, { name: "Responsiveness Space A" })
+	await replaceEditorContent(page, buildContent("Space A", args.kb))
+	await page.waitForTimeout(2_000)
+	await createSpace(page, { name: "Responsiveness Space B" })
+	await replaceEditorContent(page, buildContent("Space B", args.kb))
+	await page.waitForTimeout(2_000)
+	await page.goto(`/app/doc/${second.id}`)
+	await page
+		.getByTestId(testIds.doc.editor)
+		.locator(".cm-content")
+		.waitFor({ state: "visible" })
 	await page.setViewportSize({ width: 390, height: 844 })
 
 	let session = await context.newCDPSession(page)
@@ -134,6 +149,22 @@ try {
 				.waitFor({
 					state: "visible",
 				})
+		}),
+	)
+
+	await leftSidebarTrigger.click()
+	await page.getByTestId(testIds.space.selectorTrigger).click()
+	measurements.push(
+		await measure(page, "switch space", async () => {
+			await page.locator(`[data-space-id="${firstSpace.id}"]`).click()
+			await page.waitForFunction(
+				spaceId => window.location.pathname.includes(`/spaces/${spaceId}/doc/`),
+				firstSpace.id,
+			)
+			await page
+				.getByTestId(testIds.doc.editor)
+				.locator(".cm-content")
+				.waitFor({ state: "visible" })
 		}),
 	)
 
@@ -284,6 +315,7 @@ function buildContent(title: string, kilobytes: number) {
 
 async function replaceEditorContent(page: Page, content: string) {
 	let editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
+	await editor.waitFor({ state: "visible" })
 	await editor.click()
 	await editor.press(process.platform === "darwin" ? "Meta+A" : "Control+A")
 	let chunkSize = 64 * 1024

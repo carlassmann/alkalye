@@ -769,7 +769,7 @@ function SpaceEditorContent({
 					spaceGroupId={space.$jazz.owner.$jazz.id}
 				/>
 			</ListSidebar>
-			<div className="markdown-editor flex-1">
+			<div className="markdown-editor flex-1" data-testid={testIds.doc.editor}>
 				<MarkdownEditor
 					key={docId}
 					ref={editor}
