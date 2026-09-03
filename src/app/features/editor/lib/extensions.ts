@@ -8,10 +8,11 @@ import {
 import { lineDecorations } from "./line-decorations"
 import { wrappedIndent } from "./wrapped-indent"
 
-export { editorExtensions }
+export { editorBaseExtensions, richMarkdownExtensions }
 
-let editorExtensions: Extension = [
-	editorTheme,
+let editorBaseExtensions: Extension = [editorTheme]
+
+let richMarkdownExtensions: Extension = [
 	syntaxHighlighting(markdownHighlightStyle),
 	lineDecorations,
 	wrappedIndent,

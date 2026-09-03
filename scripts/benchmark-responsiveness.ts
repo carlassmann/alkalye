@@ -6,17 +6,39 @@ type InteractionMetric = {
 	name: string
 	interactionId: number
 	durationMs: number
+	inputDelayMs: number
+	processingMs: number
+	presentationDelayMs: number
+}
+
+type LongFrameMetric = {
+	durationMs: number
+	scripts: {
+		sourceURL: string
+		functionName: string
+		durationMs: number
+	}[]
 }
 
 declare global {
 	interface Window {
 		__alkalyeInteractionMetrics: InteractionMetric[]
-		__alkalyeLongFrames: number[]
+		__alkalyeLongFrames: LongFrameMetric[]
 		__alkalyeMeasurementStartedAt: number
 	}
 
 	interface PerformanceEventTiming {
 		readonly interactionId: number
+	}
+
+	interface PerformanceEntry {
+		readonly scripts?: PerformanceScriptTiming[]
+	}
+
+	interface PerformanceScriptTiming {
+		readonly sourceURL: string
+		readonly functionName: string
+		readonly duration: number
 	}
 
 	interface PerformanceObserverInit {
@@ -30,8 +52,12 @@ type Measurement = {
 	medianMs: number
 	p95Ms: number
 	maximumMs: number
+	maximumInputDelayMs: number
+	maximumProcessingMs: number
+	maximumPresentationDelayMs: number
 	longFrameCount: number
 	maximumLongFrameMs: number
+	slowestFrameScripts: LongFrameMetric["scripts"]
 }
 
 let args = parseArgs(process.argv.slice(2))
@@ -45,16 +71,26 @@ let context = await browser.newContext({
 
 try {
 	let page = await context.newPage()
+	page.setDefaultNavigationTimeout(120_000)
 	await installObservers(page)
 
+	console.error(`Seeding two ${args.kb} KB documents...`)
+	let seedStartedAt = performance.now()
 	let first = await create(page, {
 		title: "Responsiveness A",
 	})
+	console.error("Created first document")
 	await replaceEditorContent(page, buildContent("Responsiveness A", args.kb))
+	console.error("Filled first document")
 	await create(page, {
 		title: "Responsiveness B",
 	})
+	console.error("Created second document")
 	await replaceEditorContent(page, buildContent("Responsiveness B", args.kb))
+	console.error(
+		`Seeded documents in ${Math.round(performance.now() - seedStartedAt)} ms`,
+	)
+	await page.waitForTimeout(2_000)
 	await page.setViewportSize({ width: 390, height: 844 })
 
 	let session = await context.newCDPSession(page)
@@ -62,7 +98,7 @@ try {
 
 	let measurements: Measurement[] = []
 	let editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
-	await editor.click()
+	await editor.press("Control+End")
 	measurements.push(
 		await measure(page, "typing", async () => {
 			await page.keyboard.type(" instant response", { delay: 30 })
@@ -135,6 +171,12 @@ async function installObservers(page: Page) {
 					name: event.name,
 					interactionId: event.interactionId,
 					durationMs: event.duration,
+					inputDelayMs: event.processingStart - event.startTime,
+					processingMs: event.processingEnd - event.processingStart,
+					presentationDelayMs: Math.max(
+						0,
+						event.duration - (event.processingEnd - event.startTime),
+					),
 				})
 			}
 		}).observe({ type: "event", buffered: true, durationThreshold: 0 })
@@ -145,7 +187,14 @@ async function installObservers(page: Page) {
 			new PerformanceObserver(list => {
 				for (let entry of list.getEntries()) {
 					if (entry.startTime < window.__alkalyeMeasurementStartedAt) continue
-					window.__alkalyeLongFrames.push(entry.duration)
+					window.__alkalyeLongFrames.push({
+						durationMs: entry.duration,
+						scripts: (entry.scripts ?? []).map(script => ({
+							sourceURL: script.sourceURL,
+							functionName: script.functionName,
+							durationMs: script.duration,
+						})),
+					})
 				}
 			}).observe({ type: "long-animation-frame", buffered: true })
 		}
@@ -172,7 +221,13 @@ async function measure(
 			longFrames: [...window.__alkalyeLongFrames],
 		}
 	})
-	let interactionDurations = groupInteractionDurations(metrics.interactions)
+	let interactions = groupInteractions(metrics.interactions)
+	let interactionDurations = interactions.map(
+		interaction => interaction.durationMs,
+	)
+	let slowestFrame = [...metrics.longFrames].sort(
+		(left, right) => right.durationMs - left.durationMs,
+	)[0]
 
 	return {
 		name,
@@ -180,18 +235,33 @@ async function measure(
 		medianMs: percentile(interactionDurations, 0.5),
 		p95Ms: percentile(interactionDurations, 0.95),
 		maximumMs: Math.max(0, ...interactionDurations),
+		maximumInputDelayMs: Math.max(
+			0,
+			...interactions.map(interaction => interaction.inputDelayMs),
+		),
+		maximumProcessingMs: Math.max(
+			0,
+			...interactions.map(interaction => interaction.processingMs),
+		),
+		maximumPresentationDelayMs: Math.max(
+			0,
+			...interactions.map(interaction => interaction.presentationDelayMs),
+		),
 		longFrameCount: metrics.longFrames.length,
-		maximumLongFrameMs: Math.max(0, ...metrics.longFrames),
+		maximumLongFrameMs: slowestFrame?.durationMs ?? 0,
+		slowestFrameScripts: slowestFrame?.scripts ?? [],
 	}
 }
 
-function groupInteractionDurations(metrics: InteractionMetric[]) {
-	let durations = new Map<number, number>()
+function groupInteractions(metrics: InteractionMetric[]) {
+	let interactions = new Map<number, InteractionMetric>()
 	for (let metric of metrics) {
-		let current = durations.get(metric.interactionId) ?? 0
-		durations.set(metric.interactionId, Math.max(current, metric.durationMs))
+		let current = interactions.get(metric.interactionId)
+		if (!current || metric.durationMs > current.durationMs) {
+			interactions.set(metric.interactionId, metric)
+		}
 	}
-	return Array.from(durations.values())
+	return Array.from(interactions.values())
 }
 
 function percentile(values: number[], percentileValue: number) {
@@ -216,7 +286,10 @@ async function replaceEditorContent(page: Page, content: string) {
 	let editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
 	await editor.click()
 	await editor.press(process.platform === "darwin" ? "Meta+A" : "Control+A")
-	await page.keyboard.insertText(content)
+	let chunkSize = 64 * 1024
+	for (let offset = 0; offset < content.length; offset += chunkSize) {
+		await page.keyboard.insertText(content.slice(offset, offset + chunkSize))
+	}
 	await page.waitForTimeout(1_000)
 }
 

@@ -497,7 +497,7 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 				if (cursor) {
 					updateCursor(cursor.from, cursor.to)
 				}
-			}, 250),
+			}, 1000),
 		}
 	}
 

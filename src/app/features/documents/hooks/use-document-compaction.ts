@@ -10,6 +10,8 @@ import { syncDocumentMetadata } from "../lib/metadata"
 
 export { useDocumentCompaction }
 
+let COMPACTION_QUIET_MS = 30_000
+
 type LoadedDocument = co.loaded<
 	typeof Document,
 	{ content: true; comments: { $each: true }; cursors: true }
@@ -29,7 +31,7 @@ function useDocumentCompaction(doc: LoadedDocument, enabled: boolean) {
 				syncDocumentMetadata(doc)
 			}
 			void compactDocumentContent(doc)
-		}, 2_000)
+		}, COMPACTION_QUIET_MS)
 		return () => clearTimeout(timeout)
 	}, [doc, enabled, contentId, ownTransactionCount])
 

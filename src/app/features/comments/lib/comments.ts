@@ -309,6 +309,13 @@ function applyContentDiffWithCommentAnchors(
 ) {
 	let oldContent = doc.content.toString()
 	if (oldContent === newContent) return
+	if (newContent.startsWith(oldContent)) {
+		doc.content.insertBefore(
+			doc.content.$jazz.raw.entries().length,
+			newContent.slice(oldContent.length),
+		)
+		return
+	}
 
 	let changes = getContentChanges(oldContent, newContent)
 	let updates = getActiveCommentAnchorThreads(doc).map(thread => ({
