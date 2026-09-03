@@ -1,11 +1,6 @@
-export { TextHighlight, parseSearchTerms }
+import { parseSearchTerms } from "@/app/lib/search-terms"
 
-function parseSearchTerms(query: string): string[] {
-	return query
-		.split(",")
-		.map(t => t.trim())
-		.filter(Boolean)
-}
+export { TextHighlight, parseSearchTerms }
 
 function TextHighlight({ text, query }: { text: string; query?: string }) {
 	if (!query?.trim() || !text) return text

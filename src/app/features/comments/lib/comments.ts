@@ -2,7 +2,11 @@ import { co } from "jazz-tools"
 import type { TextPos } from "jazz-tools"
 import { stringifyOpID } from "cojson"
 import { calcPatch, diff } from "fast-myers-diff"
-import { CommentReply, CommentThread, Document } from "@/schema"
+import {
+	CommentReply,
+	CommentThread,
+	Document,
+} from "@/app/features/documents/lib/schema"
 import { syncDocumentMetadata } from "@/app/features/documents/lib/metadata"
 
 export {

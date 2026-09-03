@@ -1,8 +1,8 @@
 import { co } from "jazz-tools"
 import { Document } from "./schema"
 import { getDocumentTitle, isDocumentPinned } from "./title"
-import { getPath, getTags } from "@/app/features/editor"
-import { getPresentationMode } from "@/app/features/presentation"
+import { getPath, getTags } from "@/app/features/editor/lib/frontmatter"
+import { getPresentationMode } from "@/app/features/presentation/lib/presentation"
 
 export {
 	syncDocumentMetadata,

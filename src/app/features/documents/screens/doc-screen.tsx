@@ -135,6 +135,7 @@ import { useIntl } from "@/shared/intl/setup"
 import { makeFolderDocumentContent } from "../lib/folders"
 import { createDocumentMetadata, syncDocumentMetadata } from "../lib/metadata"
 import { useDocumentCompaction } from "../hooks/use-document-compaction"
+import { useBackgroundDocumentSave } from "../hooks/use-background-document-save"
 import { recordStartupTraceOnce } from "@/app/lib/reload-diagnostics"
 
 export { DocScreen, personalMeResolve }
@@ -258,6 +259,7 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 		readContent: () => string
 		cursor: { from: number; to?: number } | null
 	} | null>(null)
+	let optimisticContent = useRef<string | null>(null)
 
 	useEffect(() => {
 		setAutomationReadyState(true, "personal-doc")
@@ -293,6 +295,10 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 
 	let isAuthenticated = useIsAuthenticated()
 	let me = useAccount(UserAccount, { resolve: personalMeResolve })
+	let backgroundSave = useBackgroundDocumentSave(
+		doc.$jazz.id,
+		me.$isLoaded ? me : undefined,
+	)
 	useEffect(() => {
 		if (!me.$isLoaded) return
 		recordStartupTraceOnce("personal-account-data-loaded", {
@@ -348,6 +354,7 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 	}
 
 	let content = doc.content.toString()
+	let editorContent = getEditorContent(content)
 	let { syncBacklinks } = useBacklinkSync(docId, readOnly, {
 		initialContent: content,
 	})
@@ -376,14 +383,9 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 		let pendingContent = pendingSave.current.readContent()
 		let cursor = pendingSave.current.cursor
 		pendingSave.current = null
-		applyContentDiffWithCommentAnchors(doc, pendingContent)
-		syncDocumentMetadata(doc)
-		syncBacklinks(pendingContent)
-		if (cursor) {
-			updateCursor(cursor.from, cursor.to)
-		}
+		persistContent(pendingContent, cursor)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [content, doc])
+	}, [content])
 
 	useEffect(() => {
 		if (!canEdit(doc)) return
@@ -479,6 +481,48 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 	let personalDocs =
 		me.$isLoaded && me.root?.documents?.$isLoaded ? me.root.documents : null
 
+	function persistContent(
+		pendingContent: string,
+		cursor: { from: number; to?: number } | null,
+	) {
+		let save = backgroundSave.current
+		if (!save) {
+			persistContentOnMain(pendingContent, cursor)
+			return
+		}
+		optimisticContent.current = pendingContent
+		void save
+			.save(pendingContent)
+			.then(() => {
+				syncBacklinks(pendingContent)
+				if (cursor) updateCursor(cursor.from, cursor.to)
+			})
+			.catch(error => {
+				console.error("Background document save failed", error)
+				persistContentOnMain(pendingContent, cursor)
+			})
+	}
+
+	function getEditorContent(persistedContent: string) {
+		if (pendingSave.current) {
+			return editor.current?.getContent() ?? persistedContent
+		}
+		if (optimisticContent.current === persistedContent) {
+			optimisticContent.current = null
+		}
+		return optimisticContent.current ?? persistedContent
+	}
+
+	function persistContentOnMain(
+		pendingContent: string,
+		cursor: { from: number; to?: number } | null,
+	) {
+		applyContentDiffWithCommentAnchors(doc, pendingContent)
+		syncDocumentMetadata(doc)
+		syncBacklinks(pendingContent)
+		if (cursor) updateCursor(cursor.from, cursor.to)
+	}
+
 	function queueSave(readContent: () => string) {
 		if (pendingSave.current) {
 			clearTimeout(pendingSave.current.timeoutId)
@@ -491,12 +535,7 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 				let cursor = pendingSave.current?.cursor
 				pendingSave.current = null
 				if (pendingContent === undefined) return
-				applyContentDiffWithCommentAnchors(doc, pendingContent)
-				syncDocumentMetadata(doc)
-				syncBacklinks(pendingContent)
-				if (cursor) {
-					updateCursor(cursor.from, cursor.to)
-				}
+				persistContent(pendingContent, cursor ?? null)
 			}, 1000),
 		}
 	}
@@ -704,7 +743,7 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 				<MarkdownEditor
 					key={docId}
 					ref={editor}
-					value={content}
+					value={editorContent}
 					onChange={handleEditorChange}
 					onCursorChange={handleCursorChange}
 					placeholder={t("doc.startWriting")}
