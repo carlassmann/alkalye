@@ -12,7 +12,7 @@ import { toggleFocusMode } from "@/app/lib/focus-mode"
 import { Document, Space, UserAccount, createSpaceDocument } from "@/schema"
 import { handleSaveCopy } from "../lib/save-copy"
 import { resolve, settingsResolve } from "../lib/queries"
-import type { LoaderDocument } from "../lib/queries"
+import type { LoadedDocument, LoaderDocument } from "../lib/queries"
 import { setupKeyboardShortcuts } from "@/app/features/editor"
 import {
 	makeUploadImage,
@@ -84,6 +84,7 @@ import {
 	commentsExtension,
 	createCommentThread,
 	applyContentDiffWithCommentAnchors,
+	applyContentDiffLoadingCommentAnchors,
 	copyCommentsAndApplyContent,
 	getCommentRange,
 	getUnresolvedCommentCount,
@@ -134,6 +135,7 @@ import { makeFolderDocumentContent } from "../lib/folders"
 import { syncDocumentMetadata } from "../lib/metadata"
 import { useDocumentCompaction } from "../hooks/use-document-compaction"
 import { useBackgroundDocumentSave } from "../hooks/use-background-document-save"
+import { useAfterFirstPaint } from "../hooks/use-after-first-paint"
 
 export { SpaceDocScreen, spaceResolve, spaceLoaderResolve, spaceMeResolve }
 export { settingsResolve }
@@ -165,12 +167,12 @@ interface SpaceDocScreenProps {
 
 function SpaceDocScreen({ spaceId, id, loaderData }: SpaceDocScreenProps) {
 	let navigate = useNavigate()
-
+	let deferredId = useAfterFirstPaint(id)
 	let space = useCoState(Space, spaceId, { resolve: spaceResolve })
-	let doc = useCoState(Document, id, { resolve })
+	let subscribedDoc = useCoState(Document, deferredId, { resolve })
 
 	let isSpaceDeleted = space.$jazz.loadingState === "deleted"
-	let isDocDeleted = doc.$jazz.loadingState === "deleted"
+	let isDocDeleted = subscribedDoc?.$jazz.loadingState === "deleted"
 
 	// Navigate away when space is deleted
 	useEffect(() => {
@@ -208,8 +210,12 @@ function SpaceDocScreen({ spaceId, id, loaderData }: SpaceDocScreenProps) {
 	}
 
 	// Handle live access revocation or deletion for doc
-	if (!doc.$isLoaded && doc.$jazz.loadingState !== "loading") {
-		if (doc.$jazz.loadingState === "unauthorized")
+	if (
+		subscribedDoc &&
+		!subscribedDoc.$isLoaded &&
+		subscribedDoc.$jazz.loadingState !== "loading"
+	) {
+		if (subscribedDoc.$jazz.loadingState === "unauthorized")
 			return <DocumentUnauthorized />
 		if (isDocDeleted) return null
 		return <DocumentNotFound />
@@ -217,13 +223,15 @@ function SpaceDocScreen({ spaceId, id, loaderData }: SpaceDocScreenProps) {
 
 	// Use loader data as fallback while subscription is loading
 	let loadedSpace = space.$isLoaded ? space : loaderData.space
-	let loadedDoc = doc.$isLoaded ? doc : loaderData.doc
+	let liveDoc = subscribedDoc?.$isLoaded ? subscribedDoc : null
+	let loadedDoc = liveDoc ?? loaderData.doc
 
 	return (
 		<SidebarProvider>
 			<SpaceEditorContent
 				space={loadedSpace}
 				doc={loadedDoc}
+				liveDoc={liveDoc}
 				spaceId={spaceId}
 				docId={id}
 				loaderMe={loaderData.me}
@@ -235,12 +243,14 @@ function SpaceDocScreen({ spaceId, id, loaderData }: SpaceDocScreenProps) {
 function SpaceEditorContent({
 	space,
 	doc,
+	liveDoc,
 	spaceId,
 	docId,
 	loaderMe,
 }: {
 	space: LoadedSpace
 	doc: LoaderDocument
+	liveDoc: LoadedDocument | null
 	spaceId: string
 	docId: string
 	loaderMe: LoadedSettingsMe | null
@@ -280,11 +290,11 @@ function SpaceEditorContent({
 			archivedGenerations: doc.archivedContent?.$isLoaded
 				? doc.archivedContent.length
 				: null,
-			assetCount: doc.assets?.length ?? 0,
-			commentCount: doc.comments?.length ?? 0,
+			assetCount: liveDoc?.assets?.length ?? null,
+			commentCount: liveDoc?.comments?.length ?? null,
 			spaceDocumentCount: space.documents?.length ?? 0,
 		})
-	}, [doc, space.documents])
+	}, [doc, liveDoc, space.documents])
 
 	let { theme, setTheme } = useTheme()
 	let resolvedTheme = useResolvedTheme()
@@ -332,11 +342,11 @@ function SpaceEditorContent({
 	}, [])
 
 	let { updateCursor, extension: presenceExtension } = usePresence({
-		doc,
+		doc: liveDoc,
 		editorRef: editor,
 	})
-	useDocumentCompaction(doc, !readOnly)
-	let assets = getLoadedAssets(doc.assets).map(a =>
+	useDocumentCompaction(liveDoc, !readOnly)
+	let assets = getLoadedAssets(liveDoc?.assets).map(a =>
 		toEditorAsset(a, resolvedTheme),
 	)
 	let assetsRef = useRef(assets)
@@ -372,9 +382,9 @@ function SpaceEditorContent({
 	useHealSpaceDocIds(space, spaceId)
 
 	let docTitle = getDocumentTitle(content)
-	let commentsEnabled = areCommentsEnabled(doc)
-	let commentThreads = getVisibleCommentThreads(doc)
-	let unresolvedCommentCount = getUnresolvedCommentCount(doc)
+	let commentsEnabled = liveDoc ? areCommentsEnabled(liveDoc) : false
+	let commentThreads = liveDoc ? getVisibleCommentThreads(liveDoc) : []
+	let unresolvedCommentCount = liveDoc ? getUnresolvedCommentCount(liveDoc) : 0
 	let commentAuthorName = me.$isLoaded ? me.profile?.name : undefined
 	let resolveWikilink = useWikilinkResolver(content, documents)
 	let handleWikilinkClick = (id: string, newTab: boolean) => {
@@ -402,22 +412,20 @@ function SpaceEditorContent({
 		syncDocumentMetadata(doc, { contentChanged: false })
 	}, [doc])
 
-	let docWithContent = useCoState(Document, docId, {
-		resolve: { content: true },
-	})
-
-	let sidebarAssets: SidebarAsset[] = getLoadedAssets(doc.assets).map(a =>
+	let sidebarAssets: SidebarAsset[] = getLoadedAssets(liveDoc?.assets).map(a =>
 		toSidebarAsset(a),
 	)
 	let tldrawEditor = useTldrawEditor({
 		assets: sidebarAssets,
 		readOnly,
 		createAsset: async (name, save) => {
-			let asset = await createTldrawAsset(doc, name, save)
+			if (!liveDoc) throw new Error("Document features are still loading")
+			let asset = await createTldrawAsset(liveDoc, name, save)
 			return { id: asset.$jazz.id, name: asset.name }
 		},
 		updateAsset: async (assetId, save) => {
-			await updateTldrawAsset(doc, assetId, save)
+			if (!liveDoc) throw new Error("Document features are still loading")
+			await updateTldrawAsset(liveDoc, assetId, save)
 		},
 	})
 
@@ -450,7 +458,7 @@ function SpaceEditorContent({
 			onPrintPdf: async () => {
 				if (!me.$isLoaded) return
 				let { themes, defaultPreviewTheme } = await loadThemesForPdf(me)
-				let assets = getLoadedAssets(doc.assets).map(toPrintableAsset)
+				let assets = getLoadedAssets(liveDoc?.assets).map(toPrintableAsset)
 				void printToPdf({ content, themes, defaultPreviewTheme, assets })
 			},
 			onPreview: () => {
@@ -461,9 +469,8 @@ function SpaceEditorContent({
 				})
 			},
 			onDownload: () => {
-				if (!docWithContent?.$isLoaded) return
-				let title = getDocumentTitle(docWithContent)
-				saveDocumentAs(docWithContent.content?.toString() ?? "", title)
+				let title = getDocumentTitle(doc)
+				saveDocumentAs(content, title)
 			},
 			labels: {
 				autosaveTitle: t("editor.autosave.title"),
@@ -477,9 +484,9 @@ function SpaceEditorContent({
 		toggleLeft,
 		toggleRight,
 		content,
-		doc.assets,
+		doc,
+		liveDoc,
 		me,
-		docWithContent,
 		editor,
 		t,
 	])
@@ -523,10 +530,11 @@ function SpaceEditorContent({
 		pendingContent: string,
 		cursor: { from: number; to?: number } | null,
 	) {
-		applyContentDiffWithCommentAnchors(doc, pendingContent)
-		syncDocumentMetadata(doc)
-		syncBacklinks(pendingContent)
-		if (cursor) updateCursor(cursor.from, cursor.to)
+		void applyContentDiffLoadingCommentAnchors(doc, pendingContent).then(() => {
+			syncDocumentMetadata(doc)
+			syncBacklinks(pendingContent)
+			if (cursor) updateCursor(cursor.from, cursor.to)
+		})
 	}
 
 	function queueSave(readContent: () => string) {
@@ -572,7 +580,8 @@ function SpaceEditorContent({
 		}
 
 		if (currentContent !== doc.content.toString()) {
-			applyContentDiffWithCommentAnchors(doc, currentContent)
+			if (!liveDoc) return
+			applyContentDiffWithCommentAnchors(liveDoc, currentContent)
 			syncDocumentMetadata(doc)
 			syncBacklinks(currentContent)
 		}
@@ -592,21 +601,27 @@ function SpaceEditorContent({
 		let view = editor.current?.getEditor()
 		let thread = commentThreads.find(thread => thread.$jazz.id === threadId)
 		if (!view || !thread) return
-		scrollEditorCommentIntoView(view, getCommentRange(doc, thread.anchor))
+		if (!liveDoc) return
+		scrollEditorCommentIntoView(view, getCommentRange(liveDoc, thread.anchor))
 	}
 
 	function handleCreateCommentFromSelection(
 		selection: { from: number; to: number },
 		body: string,
 	) {
-		if (!commentsEnabled) return false
+		if (!commentsEnabled || !liveDoc) return false
 		flushPendingContent()
 		if (selection.from === selection.to) {
 			toast.info(t("comments.selectionRequired"))
 			return false
 		}
 
-		let thread = createCommentThread(doc, selection, body, commentAuthorName)
+		let thread = createCommentThread(
+			liveDoc,
+			selection,
+			body,
+			commentAuthorName,
+		)
 		if (!thread) return false
 		setSelectedCommentThreadId(thread.$jazz.id)
 		openCommentsTab()
@@ -624,7 +639,8 @@ function SpaceEditorContent({
 	}
 
 	function handleSetCommentsEnabled(enabled: boolean) {
-		setCommentsEnabled(doc, enabled)
+		if (!liveDoc) return
+		setCommentsEnabled(liveDoc, enabled)
 		if (!enabled) {
 			setRightTab("tools")
 			setSelectedCommentThreadId(null)
@@ -650,10 +666,9 @@ function SpaceEditorContent({
 	useEffect(() => {
 		let view = editor.current?.getEditor()
 		if (!view) return
-		view.dispatch({
-			effects: setCommentDecorationsEffect.of(
-				commentThreads.map(thread => {
-					let range = getCommentRange(doc, thread.anchor)
+		let decorations = liveDoc
+			? getVisibleCommentThreads(liveDoc).map(thread => {
+					let range = getCommentRange(liveDoc, thread.anchor)
 					return {
 						id: thread.$jazz.id,
 						from: range.from,
@@ -662,10 +677,12 @@ function SpaceEditorContent({
 						selected: thread.$jazz.id === selectedCommentThreadId,
 						orphaned: range.orphaned,
 					}
-				}),
-			),
+				})
+			: []
+		view.dispatch({
+			effects: setCommentDecorationsEffect.of(decorations),
 		})
-	}, [doc, editor, content, commentThreads, selectedCommentThreadId])
+	}, [liveDoc, editor, content, selectedCommentThreadId])
 
 	return (
 		<>
@@ -766,8 +783,10 @@ function SpaceEditorContent({
 					resolveWikilink={resolveWikilink}
 					onWikilinkClick={handleWikilinkClick}
 					onCreateDocument={makeCreateDocument(space)}
-					onUploadImage={makeUploadImage(doc)}
-					onUploadVideo={canUploadVideo ? makeUploadVideo(doc) : undefined}
+					onUploadImage={liveDoc ? makeUploadImage(liveDoc) : undefined}
+					onUploadVideo={
+						canUploadVideo && liveDoc ? makeUploadVideo(liveDoc) : undefined
+					}
 					onImportTldraw={readOnly ? undefined : tldrawEditor.importFile}
 					onCreateTldraw={readOnly ? undefined : tldrawEditor.create}
 					onEditTldraw={readOnly ? undefined : tldrawEditor.edit}
@@ -856,9 +875,9 @@ function SpaceEditorContent({
 					/>
 				}
 			>
-				{commentsEnabled && rightTab === "comments" ? (
+				{liveDoc && commentsEnabled && rightTab === "comments" ? (
 					<SidebarComments
-						doc={doc}
+						doc={liveDoc}
 						selectedThreadId={selectedCommentThreadId}
 						onSelectThread={handleSelectComment}
 						readOnly={readOnly}
@@ -895,12 +914,14 @@ function SpaceEditorContent({
 										</SidebarMenuItem>
 									)}
 									<SidebarSeparator />
-									<SidebarFileMenu
-										doc={doc}
-										editor={editor}
-										me={me.$isLoaded ? me : undefined}
-										spaceId={spaceId}
-									/>
+									{liveDoc && (
+										<SidebarFileMenu
+											doc={liveDoc}
+											editor={editor}
+											me={me.$isLoaded ? me : undefined}
+											spaceId={spaceId}
+										/>
+									)}
 									<SidebarEditMenu
 										editor={editor}
 										disabled={!canEdit(doc)}
@@ -932,25 +953,31 @@ function SpaceEditorContent({
 							<SidebarAssets
 								assets={sidebarAssets}
 								readOnly={readOnly}
-								onUploadImages={makeUploadAssets(doc)}
-								onUploadVideo={async (file, opts) => {
-									await makeUploadVideo(doc)(file, opts)
-								}}
-								onRename={makeRenameAsset(doc)}
-								onDelete={makeDeleteAsset(doc, docWithContent)}
-								onDownload={makeDownloadAsset(doc)}
+								onUploadImages={liveDoc ? makeUploadAssets(liveDoc) : undefined}
+								onUploadVideo={
+									liveDoc
+										? async (file, options) => {
+												await makeUploadVideo(liveDoc)(file, options)
+											}
+										: undefined
+								}
+								onRename={liveDoc ? makeRenameAsset(liveDoc) : undefined}
+								onDelete={
+									liveDoc ? makeDeleteAsset(liveDoc, liveDoc) : undefined
+								}
+								onDownload={liveDoc ? makeDownloadAsset(liveDoc) : undefined}
 								onInsert={(assetId, name) => {
 									editor.current?.insertBlock(`![${name}](asset:${assetId})`)
 								}}
 								onToggleMute={assetId => {
-									let asset = getLoadedAssets(doc.assets).find(
+									let asset = getLoadedAssets(liveDoc?.assets).find(
 										a => a.$jazz.id === assetId,
 									)
 									if (asset?.$isLoaded && asset.type === "video") {
 										asset.$jazz.applyDiff({ muteAudio: !asset.muteAudio })
 									}
 								}}
-								isAssetUsed={makeIsAssetUsed(docWithContent)}
+								isAssetUsed={liveDoc ? makeIsAssetUsed(liveDoc) : undefined}
 								canUploadVideo={canUploadVideo}
 								onImportTldraw={tldrawEditor.importFile}
 								onCreateTldraw={tldrawEditor.create}

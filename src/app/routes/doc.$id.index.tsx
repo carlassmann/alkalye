@@ -24,8 +24,6 @@ let Route = createFileRoute("/doc/$id/")({
 			loaded: doc.$isLoaded,
 			loadingState: doc.$jazz.loadingState,
 			contentCharacters: doc.$isLoaded ? doc.content.toString().length : 0,
-			assetCount: doc.$isLoaded ? (doc.assets?.length ?? 0) : 0,
-			commentCount: doc.$isLoaded ? (doc.comments?.length ?? 0) : 0,
 		})
 		if (!doc.$isLoaded) {
 			return { doc: null, loadingState: doc.$jazz.loadingState }

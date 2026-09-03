@@ -34,8 +34,6 @@ let Route = createFileRoute("/spaces/$spaceId/doc/$id/")({
 			documentLoaded: doc.$isLoaded,
 			spaceDocumentCount: space.$isLoaded ? (space.documents?.length ?? 0) : 0,
 			contentCharacters: doc.$isLoaded ? doc.content.toString().length : 0,
-			assetCount: doc.$isLoaded ? (doc.assets?.length ?? 0) : 0,
-			commentCount: doc.$isLoaded ? (doc.comments?.length ?? 0) : 0,
 		})
 
 		if (!space.$isLoaded) {

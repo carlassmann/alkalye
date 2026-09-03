@@ -1,7 +1,7 @@
 import { useState, useSyncExternalStore } from "react"
 import { useNavigate } from "@tanstack/react-router"
 import { co, Group } from "jazz-tools"
-import { useCoState, useAccount } from "jazz-tools/react"
+import { useAccount } from "jazz-tools/react"
 import { toast } from "sonner"
 import {
 	SidebarMenuButton,
@@ -73,12 +73,6 @@ type LoadedMe = co.loaded<
 	typeof UserAccount,
 	{ root: { documents: { $each: true }; settings: true } }
 >
-type MaybeDocWithContent = ReturnType<
-	typeof useCoState<
-		typeof Document,
-		{ content: true; comments: { $each: true } }
-	>
->
 type EditorRef = React.RefObject<MarkdownEditorRef | null>
 
 interface SidebarFileMenuProps {
@@ -107,9 +101,7 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 	let [moveOpen, setMoveOpen] = useState(false)
 	let [moveSpaceOpen, setMoveSpaceOpen] = useState(false)
 
-	let docWithContent = useCoState(Document, doc.$jazz.id, {
-		resolve: { content: true, comments: { $each: true } },
-	})
+	let docWithContent = doc
 
 	// Themes carry binary assets, so load them on demand when exporting
 	let account = useAccount(UserAccount)
@@ -379,7 +371,7 @@ function makeRename(
 	}
 }
 
-function makeTogglePin(docWithContent: MaybeDocWithContent) {
+function makeTogglePin(docWithContent: LoadedDocument) {
 	return function handleTogglePin() {
 		if (!docWithContent?.$isLoaded || !docWithContent.content) return
 		let content = docWithContent.content.toString()
@@ -541,7 +533,7 @@ function makeDelete(
 }
 
 function makeLeave(
-	docWithContent: MaybeDocWithContent,
+	docWithContent: LoadedDocument,
 	me: LoadedMe | undefined,
 	doc: LoadedDocument,
 	navigate: ReturnType<typeof useNavigate>,

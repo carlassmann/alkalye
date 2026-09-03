@@ -17,13 +17,13 @@ type LoadedDocument = co.loaded<
 	{ content: true; comments: { $each: true }; cursors: true }
 >
 
-function useDocumentCompaction(doc: LoadedDocument, enabled: boolean) {
-	let contentId = doc.content.$jazz.id
-	let ownTransactionCount = getOwnDocumentContentTransactionCount(doc)
+function useDocumentCompaction(doc: LoadedDocument | null, enabled: boolean) {
+	let contentId = doc?.content.$jazz.id
+	let ownTransactionCount = doc ? getOwnDocumentContentTransactionCount(doc) : 0
 	let recordedTransactionCount = useRef(ownTransactionCount)
 
 	useEffect(() => {
-		if (!enabled) return
+		if (!enabled || !doc) return
 		let timeout = setTimeout(() => {
 			if (recordedTransactionCount.current !== ownTransactionCount) {
 				recordedTransactionCount.current = ownTransactionCount
@@ -36,7 +36,7 @@ function useDocumentCompaction(doc: LoadedDocument, enabled: boolean) {
 	}, [doc, enabled, contentId, ownTransactionCount])
 
 	useEffect(() => {
-		if (!enabled || !doc.archivedContent) return
+		if (!enabled || !doc?.archivedContent) return
 		let timeout = setTimeout(() => {
 			void reconcileArchivedDocumentContent(doc)
 		}, 10_000)

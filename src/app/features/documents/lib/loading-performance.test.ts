@@ -30,9 +30,8 @@ describe("document loading performance queries", () => {
 		expect(spaceResolve.documents).toEqual({ $each: true })
 	})
 
-	test("opened document loader intentionally loads editor payload", () => {
-		expect(loaderResolve.content).toBe(true)
-		expect(loaderResolve.comments).toEqual({ $each: { replies: true } })
+	test("opened document loader blocks only on content", () => {
+		expect(loaderResolve).toEqual({ content: true })
 	})
 
 	test("home fallback skips deleted documents", () => {

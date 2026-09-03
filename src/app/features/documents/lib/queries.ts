@@ -18,9 +18,6 @@ type LoadedMe = ReturnType<
 
 let loaderResolve = {
 	content: true,
-	cursors: true,
-	assets: true,
-	comments: { $each: { replies: true } },
 } as const satisfies ResolveQuery<typeof Document>
 
 let resolve = {
