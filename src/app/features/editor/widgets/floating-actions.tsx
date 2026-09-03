@@ -315,20 +315,20 @@ function FloatingActions({
 				current = current.parent
 			}
 
-			// Check for wikilinks via text-based detection (not in syntax tree)
-			let content = state.doc.toString()
-			let wikilinks = parseWikiLinks(content)
+			let line = state.doc.lineAt(pos)
+			let wikilinks = parseWikiLinks(line.text)
 			for (let link of wikilinks) {
-				if (pos >= link.from && pos <= link.to) {
+				let from = line.from + link.from
+				let to = line.from + link.to
+				if (pos >= from && pos <= to) {
 					result.wikiLinkId = link.id
-					result.wikiLinkRange = { from: link.from, to: link.to }
+					result.wikiLinkRange = { from, to }
 					break
 				}
 			}
 
 			// Also detect incomplete wikilinks: [[ or [[text without closing ]]
 			if (!result.wikiLinkId) {
-				let line = state.doc.lineAt(pos)
 				let textBefore = line.text.slice(0, pos - line.from)
 				let textAfter = line.text.slice(pos - line.from)
 				let match = textBefore.match(/\[\[([^\][]*)$/)
@@ -412,12 +412,14 @@ function FloatingActions({
 			// Detect wikilink at cursor
 			let state = view.state
 			let pos = state.selection.main.head
-			let content = state.doc.toString()
-			let wikilinks = parseWikiLinks(content)
+			let line = state.doc.lineAt(pos)
+			let wikilinks = parseWikiLinks(line.text)
 
 			for (let link of wikilinks) {
-				if (pos >= link.from && pos <= link.to) {
-					wikiLinkRangeRef.current = { from: link.from, to: link.to }
+				let from = line.from + link.from
+				let to = line.from + link.to
+				if (pos >= from && pos <= to) {
+					wikiLinkRangeRef.current = { from, to }
 					// Check if link ID resolves to an existing doc
 					let isValidLink = docs?.some(d => d.id === link.id)
 					if (isValidLink) {
@@ -433,7 +435,6 @@ function FloatingActions({
 			}
 
 			// Check for incomplete wikilink
-			let line = state.doc.lineAt(pos)
 			let textBefore = line.text.slice(0, pos - line.from)
 			let textAfter = line.text.slice(pos - line.from)
 			let match = textBefore.match(/\[\[([^\][]*)$/)

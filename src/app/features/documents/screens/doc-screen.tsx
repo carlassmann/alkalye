@@ -255,7 +255,7 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 	>(null)
 	let pendingSave = useRef<{
 		timeoutId: ReturnType<typeof setTimeout>
-		content: string
+		readContent: () => string
 		cursor: { from: number; to?: number } | null
 	} | null>(null)
 
@@ -373,11 +373,12 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 	useEffect(() => {
 		if (!pendingSave.current) return
 		clearTimeout(pendingSave.current.timeoutId)
-		let pendingContent = pendingSave.current.content
+		let pendingContent = pendingSave.current.readContent()
 		let cursor = pendingSave.current.cursor
 		pendingSave.current = null
 		applyContentDiffWithCommentAnchors(doc, pendingContent)
 		syncDocumentMetadata(doc)
+		syncBacklinks(pendingContent)
 		if (cursor) {
 			updateCursor(cursor.from, cursor.to)
 		}
@@ -478,24 +479,34 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 	let personalDocs =
 		me.$isLoaded && me.root?.documents?.$isLoaded ? me.root.documents : null
 
-	function handleChange(newContent: string) {
+	function queueSave(readContent: () => string) {
 		if (pendingSave.current) {
 			clearTimeout(pendingSave.current.timeoutId)
 		}
 		pendingSave.current = {
-			content: newContent,
+			readContent,
 			cursor: null,
 			timeoutId: setTimeout(() => {
+				let pendingContent = pendingSave.current?.readContent()
 				let cursor = pendingSave.current?.cursor
 				pendingSave.current = null
-				applyContentDiffWithCommentAnchors(doc, newContent)
+				if (pendingContent === undefined) return
+				applyContentDiffWithCommentAnchors(doc, pendingContent)
 				syncDocumentMetadata(doc)
+				syncBacklinks(pendingContent)
 				if (cursor) {
 					updateCursor(cursor.from, cursor.to)
 				}
 			}, 250),
 		}
-		syncBacklinks(newContent)
+	}
+
+	function handleEditorChange(readContent: () => string) {
+		queueSave(readContent)
+	}
+
+	function handleContentChange(newContent: string) {
+		queueSave(() => newContent)
 	}
 
 	function handleCursorChange(from: number, to?: number) {
@@ -518,6 +529,7 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 		if (currentContent !== doc.content.toString()) {
 			applyContentDiffWithCommentAnchors(doc, currentContent)
 			syncDocumentMetadata(doc)
+			syncBacklinks(currentContent)
 		}
 	}
 
@@ -693,7 +705,7 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 					key={docId}
 					ref={editor}
 					value={content}
-					onChange={handleChange}
+					onChange={handleEditorChange}
 					onCursorChange={handleCursorChange}
 					placeholder={t("doc.startWriting")}
 					readOnly={readOnly}
@@ -748,7 +760,7 @@ function EditorContent({ doc, docId }: EditorContentProps) {
 					}
 					saveCopyState={saveCopyState}
 					content={content}
-					onThemeChange={handleChange}
+					onThemeChange={handleContentChange}
 				/>
 				<EditorStatsBadge content={content} settings={editorSettings} />
 			</div>

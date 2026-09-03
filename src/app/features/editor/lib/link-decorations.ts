@@ -141,31 +141,33 @@ function parseLinks(view: EditorView): LinkMatch[] {
 	let links: LinkMatch[] = []
 	let tree = syntaxTree(view.state)
 
-	tree.iterate({
-		enter: node => {
-			if (node.name === "Link") {
-				let urlNode = node.node.getChild("URL")
-				if (!urlNode) return
+	for (let { from, to } of view.visibleRanges) {
+		tree.iterate({
+			from,
+			to,
+			enter: node => {
+				if (node.name === "Link") {
+					let urlNode = node.node.getChild("URL")
+					if (!urlNode) return
 
-				let url = view.state.sliceDoc(urlNode.from, urlNode.to)
-				// Skip asset: links (handled by image decorations)
-				if (url.startsWith("asset:")) return
+					let url = view.state.sliceDoc(urlNode.from, urlNode.to)
+					// Skip asset: links (handled by image decorations)
+					if (url.startsWith("asset:")) return
 
-				// Extract link text between [ and ]
-				// Format: [text](url) - text is between first [ and ]
-				let linkContent = view.state.sliceDoc(node.from, node.to)
-				let match = linkContent.match(/^\[([^\]]*)\]/)
-				let text = match?.[1] || "Web Link"
+					let linkContent = view.state.sliceDoc(node.from, node.to)
+					let match = linkContent.match(/^\[([^\]]*)\]/)
+					let text = match?.[1] || "Web Link"
 
-				links.push({
-					from: node.from,
-					to: node.to,
-					text,
-					url,
-				})
-			}
-		},
-	})
+					links.push({
+						from: node.from,
+						to: node.to,
+						text,
+						url,
+					})
+				}
+			},
+		})
+	}
 
 	return links
 }

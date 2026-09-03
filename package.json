@@ -23,6 +23,7 @@
 		"test:e2e:doc": "playwright test e2e/doc.spec.ts",
 		"test:e2e:headed": "playwright test --headed",
 		"bench:launch": "bun scripts/benchmark-launch.ts",
+		"bench:responsiveness": "bun scripts/benchmark-responsiveness.ts",
 		"preview": "astro preview",
 		"format": "prettier --write .",
 		"test": "vitest",

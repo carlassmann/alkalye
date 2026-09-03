@@ -182,9 +182,12 @@ function parseImages(view: EditorView, resolver: ImageResolver): ImageMatch[] {
 	let images: ImageMatch[] = []
 	let tree = syntaxTree(view.state)
 
-	tree.iterate({
-		enter: node => {
-			if (node.name === "Image") {
+	for (let visibleRange of view.visibleRanges) {
+		tree.iterate({
+			from: visibleRange.from,
+			to: visibleRange.to,
+			enter: node => {
+				if (node.name !== "Image") return
 				let urlNode = node.node.getChild("URL")
 				if (!urlNode) return
 
@@ -215,9 +218,9 @@ function parseImages(view: EditorView, resolver: ImageResolver): ImageMatch[] {
 					url,
 					assetType,
 				})
-			}
-		},
-	})
+			},
+		})
+	}
 
 	return images
 }

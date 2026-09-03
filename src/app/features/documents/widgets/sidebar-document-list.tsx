@@ -888,7 +888,6 @@ function DocumentItem({
 	spaceGroupId?: string
 	t: ReturnType<typeof useIntl>
 }) {
-	let me = useAccount(UserAccount, { resolve: { root: { documents: true } } })
 	let [shareOpen, setShareOpen] = useState(false)
 	let [deleteOpen, setDeleteOpen] = useState(false)
 	let [leaveOpen, setLeaveOpen] = useState(false)
@@ -1092,12 +1091,14 @@ function DocumentItem({
 			{shareOpen && (
 				<ShareDialog doc={doc} open={shareOpen} onOpenChange={setShareOpen} />
 			)}
-			<MoveToFolderDialog
-				doc={doc}
-				existingFolders={existingFolders}
-				open={moveOpen}
-				onOpenChange={setMoveOpen}
-			/>
+			{moveOpen && (
+				<MoveToFolderDialog
+					doc={doc}
+					existingFolders={existingFolders}
+					open={moveOpen}
+					onOpenChange={setMoveOpen}
+				/>
+			)}
 			{moveSpaceOpen && (
 				<MoveToSpaceDialog
 					doc={doc}
@@ -1116,18 +1117,42 @@ function DocumentItem({
 				onConfirm={() => onDelete(doc)}
 				confirmTestId={testIds.dialog.deleteConfirm}
 			/>
-			<ConfirmDialog
-				open={leaveOpen}
-				onOpenChange={setLeaveOpen}
-				title={t("doc.leaveDialog.title")}
-				description={t("doc.leaveDialog.description")}
-				confirmLabel={t("doc.leaveDialog.confirm")}
-				variant="destructive"
-				onConfirm={makeLeaveDocument(doc, me)}
-			>
-				{leaveOpen && <LeaveDocumentPreview doc={doc} />}
-			</ConfirmDialog>
+			{leaveOpen && (
+				<LeaveDocumentDialog
+					doc={doc}
+					open={leaveOpen}
+					onOpenChange={setLeaveOpen}
+					t={t}
+				/>
+			)}
 		</SidebarMenuItem>
+	)
+}
+
+function LeaveDocumentDialog({
+	doc,
+	open,
+	onOpenChange,
+	t,
+}: {
+	doc: SidebarDoc
+	open: boolean
+	onOpenChange: (open: boolean) => void
+	t: ReturnType<typeof useIntl>
+}) {
+	let me = useAccount(UserAccount, { resolve: { root: { documents: true } } })
+	return (
+		<ConfirmDialog
+			open={open}
+			onOpenChange={onOpenChange}
+			title={t("doc.leaveDialog.title")}
+			description={t("doc.leaveDialog.description")}
+			confirmLabel={t("doc.leaveDialog.confirm")}
+			variant="destructive"
+			onConfirm={makeLeaveDocument(doc, me)}
+		>
+			<LeaveDocumentPreview doc={doc} />
+		</ConfirmDialog>
 	)
 }
 

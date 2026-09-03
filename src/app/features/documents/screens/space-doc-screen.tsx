@@ -257,7 +257,7 @@ function SpaceEditorContent({
 	>(null)
 	let pendingSave = useRef<{
 		timeoutId: ReturnType<typeof setTimeout>
-		content: string
+		readContent: () => string
 		cursor: { from: number; to?: number } | null
 	} | null>(null)
 
@@ -383,11 +383,12 @@ function SpaceEditorContent({
 	useEffect(() => {
 		if (!pendingSave.current || !doc.content) return
 		clearTimeout(pendingSave.current.timeoutId)
-		let pendingContent = pendingSave.current.content
+		let pendingContent = pendingSave.current.readContent()
 		let cursor = pendingSave.current.cursor
 		pendingSave.current = null
 		applyContentDiffWithCommentAnchors(doc, pendingContent)
 		syncDocumentMetadata(doc)
+		syncBacklinks(pendingContent)
 		if (cursor) {
 			updateCursor(cursor.from, cursor.to)
 		}
@@ -484,24 +485,34 @@ function SpaceEditorContent({
 	let allDocs = getSpaceDocs(space)
 	let spaceDocs = space.documents?.$isLoaded ? space.documents : null
 
-	function handleChange(newContent: string) {
+	function queueSave(readContent: () => string) {
 		if (pendingSave.current) {
 			clearTimeout(pendingSave.current.timeoutId)
 		}
 		pendingSave.current = {
-			content: newContent,
+			readContent,
 			cursor: null,
 			timeoutId: setTimeout(() => {
+				let pendingContent = pendingSave.current?.readContent()
 				let cursor = pendingSave.current?.cursor
 				pendingSave.current = null
-				applyContentDiffWithCommentAnchors(doc, newContent)
+				if (pendingContent === undefined) return
+				applyContentDiffWithCommentAnchors(doc, pendingContent)
 				syncDocumentMetadata(doc)
+				syncBacklinks(pendingContent)
 				if (cursor) {
 					updateCursor(cursor.from, cursor.to)
 				}
 			}, 250),
 		}
-		syncBacklinks(newContent)
+	}
+
+	function handleEditorChange(readContent: () => string) {
+		queueSave(readContent)
+	}
+
+	function handleContentChange(newContent: string) {
+		queueSave(() => newContent)
 	}
 
 	function handleCursorChange(from: number, to?: number) {
@@ -524,6 +535,7 @@ function SpaceEditorContent({
 		if (currentContent !== doc.content.toString()) {
 			applyContentDiffWithCommentAnchors(doc, currentContent)
 			syncDocumentMetadata(doc)
+			syncBacklinks(currentContent)
 		}
 	}
 
@@ -706,7 +718,7 @@ function SpaceEditorContent({
 					key={docId}
 					ref={editor}
 					value={content}
-					onChange={handleChange}
+					onChange={handleEditorChange}
 					onCursorChange={handleCursorChange}
 					placeholder={t("doc.startWriting")}
 					readOnly={readOnly}
@@ -761,7 +773,7 @@ function SpaceEditorContent({
 					}
 					saveCopyState={saveCopyState}
 					content={content}
-					onThemeChange={handleChange}
+					onThemeChange={handleContentChange}
 				/>
 				<EditorStatsBadge content={content} settings={editorSettings} />
 			</div>

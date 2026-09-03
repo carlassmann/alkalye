@@ -421,6 +421,10 @@ function LocalEditorContent({
 		}, 1000)
 	}
 
+	function handleEditorChange(readContent: () => string) {
+		handleChange(readContent())
+	}
+
 	useEffect(() => {
 		return () => {
 			if (saveTimeoutRef.current) {
@@ -677,7 +681,7 @@ function LocalEditorContent({
 					key={activeFile.id}
 					ref={editor}
 					value={content}
-					onChange={handleChange}
+					onChange={handleEditorChange}
 					placeholder={t("doc.startWriting")}
 					documents={documents}
 					resolveWikilink={resolveWikilink}

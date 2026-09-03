@@ -123,11 +123,11 @@ function createBacklinkDecorations(
 			buildDecorations(view: EditorView): DecorationSet {
 				let builder = new RangeSetBuilder<Decoration>()
 				let doc = view.state.doc
-				let text = doc.toString()
 
 				// Check if frontmatter exists
 				let fmRange = getFrontmatterRange(view.state)
 				if (!fmRange) return Decoration.none
+				let text = doc.sliceString(0, fmRange.to)
 
 				let backlinks = getBacklinksWithRange(text)
 				if (!backlinks || backlinks.ids.length === 0) return Decoration.none

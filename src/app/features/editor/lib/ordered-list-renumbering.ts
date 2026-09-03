@@ -5,7 +5,7 @@ import {
 	Transaction,
 	type Extension,
 } from "@codemirror/state"
-import { ViewPlugin, type EditorView } from "@codemirror/view"
+import { ViewPlugin, type EditorView, type ViewUpdate } from "@codemirror/view"
 
 export { orderedListRenumbering, renumberOrderedLists }
 
@@ -20,9 +20,29 @@ let orderedListRenumbering: Extension = ViewPlugin.define(view => ({
 			)
 		)
 			return
+		if (!changedOrderedList(update)) return
 		queueMicrotask(() => renumberView(view))
 	},
 }))
+
+function changedOrderedList(update: ViewUpdate) {
+	let changed = false
+	update.changes.iterChangedRanges((fromA, toA, fromB, toB) => {
+		changed ||=
+			hasOrderedListNear(update.startState.doc, fromA, toA) ||
+			hasOrderedListNear(update.state.doc, fromB, toB)
+	})
+	return changed
+}
+
+function hasOrderedListNear(doc: Text, from: number, to: number) {
+	let startLine = Math.max(1, doc.lineAt(from).number - 1)
+	let endLine = Math.min(doc.lines, doc.lineAt(to).number + 1)
+	for (let lineNumber = startLine; lineNumber <= endLine; lineNumber++) {
+		if (/^\s*\d+\.\s/.test(doc.line(lineNumber).text)) return true
+	}
+	return false
+}
 
 function renumberOrderedLists(content: string): string {
 	let lines = content.split("\n")

@@ -177,7 +177,7 @@ type EditorCommand = (view: EditorView) => boolean
 interface MarkdownEditorProps {
 	// Core
 	value: string
-	onChange: (content: string) => void
+	onChange: (readContent: () => string) => void
 
 	// Cursor/focus callbacks
 	onCursorChange?: (from: number, to: number) => void
@@ -616,7 +616,7 @@ function MarkdownEditor(
 			EditorView.updateListener.of(update => {
 				if (update.docChanged) {
 					if (callbacksRef.current.onChange) {
-						callbacksRef.current.onChange(update.state.doc.toString())
+						callbacksRef.current.onChange(() => update.state.doc.toString())
 					}
 					// Keep in-flight drop targets aligned with the live doc so
 					// images dropped while uploads await still land at the
