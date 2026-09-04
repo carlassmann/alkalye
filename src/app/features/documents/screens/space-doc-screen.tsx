@@ -507,8 +507,13 @@ function SpaceEditorContent({
 			.then(result => {
 				if (result === "superseded") {
 					let currentContent = editor.current?.getContent()
-					if (currentContent && currentContent !== doc.content.toString()) {
+					if (
+						currentContent !== undefined &&
+						currentContent !== doc.content.toString()
+					) {
 						persistContent(currentContent, cursor)
+					} else if (optimisticContent.current === pendingContent) {
+						optimisticContent.current = null
 					}
 					return
 				}
