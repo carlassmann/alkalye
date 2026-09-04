@@ -738,6 +738,7 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 							render={
 								<Link
 									to="/new"
+									preload={false}
 									onClick={() => isMobile && setLeftOpenMobile(false)}
 								/>
 							}

@@ -7,6 +7,12 @@ test("document CRUD helpers return JSON", async ({ page }) => {
 	await waitForEditorBoot(page)
 	await createAccount(page)
 
+	let beforeHover = await list(page)
+	await page.getByTestId(testIds.doc.newButton).dispatchEvent("mouseenter")
+	await page.waitForTimeout(250)
+	let afterHover = await list(page)
+	expect(afterHover.count).toBe(beforeHover.count)
+
 	let before = await list(page)
 	expect(before.ok).toBe(true)
 

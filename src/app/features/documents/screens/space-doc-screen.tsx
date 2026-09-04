@@ -747,6 +747,7 @@ function SpaceEditorContent({
 								<Link
 									to="/new"
 									search={{ spaceId }}
+									preload={false}
 									onClick={() => isMobile && setLeftOpenMobile(false)}
 								/>
 							}
