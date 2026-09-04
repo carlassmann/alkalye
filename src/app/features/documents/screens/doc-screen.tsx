@@ -132,7 +132,11 @@ import { loadThemesForPdf } from "@/app/features/themes"
 import { testIds } from "@/app/lib/test-ids"
 import { useIntl } from "@/shared/intl/setup"
 import { makeFolderDocumentContent } from "../lib/folders"
-import { createDocumentMetadata, syncDocumentMetadata } from "../lib/metadata"
+import {
+	createDocumentMetadata,
+	needsMetadataBackfill,
+	syncDocumentMetadata,
+} from "../lib/metadata"
 import { useDocumentCompaction } from "../hooks/use-document-compaction"
 import {
 	DOCUMENT_SAVE_DEBOUNCE_MS,
@@ -390,7 +394,7 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 	}, [content])
 
 	useEffect(() => {
-		if (!canEdit(doc)) return
+		if (!canEdit(doc) || !needsMetadataBackfill(doc)) return
 		syncDocumentMetadata(doc, { contentChanged: false })
 	}, [doc])
 

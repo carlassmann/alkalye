@@ -130,7 +130,7 @@ import { loadThemesForPdf } from "@/app/features/themes"
 import { testIds } from "@/app/lib/test-ids"
 import { useIntl } from "@/shared/intl/setup"
 import { makeFolderDocumentContent } from "../lib/folders"
-import { syncDocumentMetadata } from "../lib/metadata"
+import { needsMetadataBackfill, syncDocumentMetadata } from "../lib/metadata"
 import { useDocumentCompaction } from "../hooks/use-document-compaction"
 import {
 	DOCUMENT_SAVE_DEBOUNCE_MS,
@@ -406,7 +406,7 @@ function SpaceEditorContent({
 	}, [content])
 
 	useEffect(() => {
-		if (!canEdit(doc)) return
+		if (!canEdit(doc) || !needsMetadataBackfill(doc)) return
 		syncDocumentMetadata(doc, { contentChanged: false })
 	}, [doc])
 
