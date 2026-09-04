@@ -213,6 +213,7 @@ function SpaceDocScreen({ spaceId, id, loaderData }: SpaceDocScreenProps) {
 
 	// Handle live access revocation or deletion for doc
 	if (
+		deferredId &&
 		subscribedDoc &&
 		!subscribedDoc.$isLoaded &&
 		subscribedDoc.$jazz.loadingState !== "loading"

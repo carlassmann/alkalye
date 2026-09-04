@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test"
+import { test, expect, type Page } from "@playwright/test"
 import { testIds } from "@/app/lib/test-ids"
 import { waitForEditorBoot, createAccount } from "./auth-helpers"
 import { create, readById, updateById, list, deleteById } from "./doc-helpers"
@@ -42,6 +42,15 @@ test("document CRUD helpers return JSON", async ({ page }) => {
 	expect(created.ok).toBe(true)
 	expect(created.id.length).toBeGreaterThan(10)
 
+	let existingId = before.items[0]?.id
+	if (!existingId) throw new Error("Expected an existing document")
+	let notFoundRendered = observeDocumentNotFound(page)
+	await page.locator(`[data-doc-id="${existingId}"] a`).dispatchEvent("click")
+	await expect(page).toHaveURL(new RegExp(`/doc/${existingId}`))
+	expect(await notFoundRendered).toBe(false)
+	await page.locator(`[data-doc-id="${created.id}"] a`).dispatchEvent("click")
+	await expect(page).toHaveURL(new RegExp(`/doc/${created.id}`))
+
 	let editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
 	await editor.click()
 	await editor.press("ControlOrMeta+End")
@@ -83,3 +92,22 @@ test("document CRUD helpers return JSON", async ({ page }) => {
 	expect(after.ok).toBe(true)
 	expect(after.count).toBe(before.count)
 })
+
+async function observeDocumentNotFound(page: Page) {
+	return page.evaluate(() => {
+		return new Promise<boolean>(resolve => {
+			let rendered = false
+			let check = () => {
+				if (document.body.innerText.includes("Document not found"))
+					rendered = true
+			}
+			let observer = new MutationObserver(check)
+			observer.observe(document.body, { childList: true, subtree: true })
+			check()
+			setTimeout(() => {
+				observer.disconnect()
+				resolve(rendered)
+			}, 1_000)
+		})
+	})
+}

@@ -195,6 +195,7 @@ function DocScreen({ id, loaderData }: DocScreenProps) {
 
 	// Handle live access revocation or deletion
 	if (
+		deferredId &&
 		subscribedDoc &&
 		!subscribedDoc.$isLoaded &&
 		subscribedDoc.$jazz.loadingState !== "loading"
