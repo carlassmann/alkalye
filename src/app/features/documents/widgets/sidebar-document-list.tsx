@@ -225,6 +225,7 @@ function SidebarDocumentList({
 
 	return (
 		<>
+			<MetadataBackfillTasks docs={docs} />
 			<SearchFilterBar
 				search={search}
 				onSearchChange={setSearch}
@@ -260,6 +261,15 @@ function SidebarDocumentList({
 			</SidebarGroup>
 		</>
 	)
+}
+
+function MetadataBackfillTasks({ docs }: { docs: SidebarDoc[] }) {
+	return docs.map(doc => <MetadataBackfillTask key={doc.$jazz.id} doc={doc} />)
+}
+
+function MetadataBackfillTask({ doc }: { doc: SidebarDoc }) {
+	useMetadataBackfill(doc)
+	return null
 }
 
 function SearchFilterBar({

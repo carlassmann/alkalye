@@ -22,7 +22,7 @@ function diffContent(
 ) {
 	try {
 		let patches = calculateDocumentContentPatches(
-			request.oldContent,
+			request.oldEntries,
 			request.newContent,
 		)
 		post({ type: "diffed", requestId: request.requestId, patches })

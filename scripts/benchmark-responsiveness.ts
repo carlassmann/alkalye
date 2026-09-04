@@ -140,9 +140,9 @@ try {
 					marker: "instant response!",
 				},
 			)
-			await page.waitForTimeout(500)
 		}),
 	)
+	await page.waitForTimeout(500)
 	await verifyAutosave(page, second.id, "instant response!")
 	editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
 	await editor.click()

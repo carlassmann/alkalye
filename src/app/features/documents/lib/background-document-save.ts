@@ -84,7 +84,8 @@ function createBackgroundDocumentSave(
 		let doc = await getDocument().$jazz.ensureLoaded({
 			resolve: { content: true, comments: { $each: true } },
 		})
-		let oldContent = doc.content.toString()
+		let oldEntries = doc.content.$jazz.raw.entries().map(entry => entry.value)
+		let oldContent = oldEntries.join("")
 		if (oldContent === content) return
 		if (content.startsWith(oldContent)) {
 			doc.content.insertBefore(
@@ -94,16 +95,16 @@ function createBackgroundDocumentSave(
 			await finishSave(doc)
 			return
 		}
-		let patches = await calculateDiff(oldContent, content)
+		let patches = await calculateDiff(oldEntries, content)
 		if (doc.content.toString() !== oldContent) return saveContent(content)
 		applyDocumentContentPatches(doc, content, patches)
 		if (doc.content.toString() !== content) {
 			throw new Error("Document diff did not produce the requested content")
 		}
-		await finishSave(doc)
+		finishSave(doc)
 	}
 
-	async function finishSave(
+	function finishSave(
 		doc: co.loaded<
 			typeof Document,
 			{ content: true; comments: { $each: true } }
@@ -111,13 +112,9 @@ function createBackgroundDocumentSave(
 	) {
 		doc.$jazz.set("updatedAt", new Date())
 		syncDocumentMetadata(doc)
-		await Promise.all([
-			doc.content.$jazz.raw.core.waitForSync({ timeout: 5_000 }),
-			doc.$jazz.raw.core.waitForSync({ timeout: 5_000 }),
-		])
 	}
 
-	function calculateDiff(oldContent: string, newContent: string) {
+	function calculateDiff(oldEntries: string[], newContent: string) {
 		if (closed)
 			return Promise.reject(new Error("Document diff worker is closed"))
 		let requestId = nextRequestId++
@@ -126,7 +123,7 @@ function createBackgroundDocumentSave(
 		let request: DocumentSaveWorkerRequest = {
 			type: "diff",
 			requestId,
-			oldContent,
+			oldEntries,
 			newContent,
 		}
 		worker.postMessage(request)

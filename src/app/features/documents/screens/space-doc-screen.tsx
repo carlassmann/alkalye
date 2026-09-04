@@ -535,11 +535,11 @@ function SpaceEditorContent({
 		cursor: { from: number; to?: number } | null,
 	) {
 		let currentDoc = liveDoc ?? doc
+		currentDoc.$jazz.set("updatedAt", new Date())
 		return applyContentDiffLoadingCommentAnchors(
 			currentDoc,
 			pendingContent,
 		).then(() => {
-			currentDoc.$jazz.set("updatedAt", new Date())
 			syncDocumentMetadata(currentDoc)
 			syncBacklinks(pendingContent)
 			if (cursor) updateCursor(cursor.from, cursor.to)
@@ -589,10 +589,14 @@ function SpaceEditorContent({
 		}
 
 		if (currentContent !== doc.content.toString()) {
-			if (!liveDoc) return
-			applyContentDiffWithCommentAnchors(liveDoc, currentContent)
-			syncDocumentMetadata(doc)
-			syncBacklinks(currentContent)
+			if (liveDoc) {
+				liveDoc.$jazz.set("updatedAt", new Date())
+				applyContentDiffWithCommentAnchors(liveDoc, currentContent)
+				syncDocumentMetadata(liveDoc)
+				syncBacklinks(currentContent)
+			} else {
+				void persistContentOnMain(currentContent, null)
+			}
 		}
 	}
 
@@ -604,8 +608,15 @@ function SpaceEditorContent({
 		function flushBeforePageCloses() {
 			flushPendingContentRef.current()
 		}
+		function flushWhenHidden() {
+			if (document.visibilityState === "hidden") flushBeforePageCloses()
+		}
 		window.addEventListener("pagehide", flushBeforePageCloses)
-		return () => window.removeEventListener("pagehide", flushBeforePageCloses)
+		document.addEventListener("visibilitychange", flushWhenHidden)
+		return () => {
+			window.removeEventListener("pagehide", flushBeforePageCloses)
+			document.removeEventListener("visibilitychange", flushWhenHidden)
+		}
 	}, [])
 
 	function handleSelectComment(threadId: string) {

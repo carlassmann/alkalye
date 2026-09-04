@@ -8,7 +8,7 @@ export type DocumentSaveWorkerRequest =
 	| {
 			type: "diff"
 			requestId: number
-			oldContent: string
+			oldEntries: string[]
 			newContent: string
 	  }
 	| { type: "close" }
