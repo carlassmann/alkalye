@@ -271,27 +271,22 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 
 	useEffect(() => {
 		setAutomationReadyState(true, "personal-doc")
-		return () => {
-			if (window.location.pathname.endsWith(`/doc/${docId}`)) {
-				setAutomationReadyState(false, "personal-doc")
-			}
-		}
-	}, [docId])
+		return () => setAutomationReadyState(false, "personal-doc")
+	}, [])
 
 	useEffect(() => {
-		recordStartupTraceOnce("editor-ready", {
+		recordStartupTraceOnce("editor-ready", () => ({
 			route: "personal-document",
 			contentCharacters: doc.content.toString().length,
-			documentTransactions:
-				doc.$jazz.raw.core.getValidSortedTransactions().length,
+			documentTransactions: doc.$jazz.raw.core.verifiedTransactions.length,
 			contentTransactions:
-				doc.content.$jazz.raw.core.getValidSortedTransactions().length,
+				doc.content.$jazz.raw.core.verifiedTransactions.length,
 			archivedGenerations: doc.archivedContent?.$isLoaded
 				? doc.archivedContent.length
 				: null,
 			assetCount: liveDoc?.assets?.length ?? null,
 			commentCount: liveDoc?.comments?.length ?? null,
-		})
+		}))
 	}, [doc, liveDoc])
 
 	let { theme, setTheme } = useTheme()
@@ -499,21 +494,26 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 		void save
 			.save(pendingContent)
 			.then(() => {
+				if (optimisticContent.current === pendingContent) {
+					optimisticContent.current = null
+				}
 				syncBacklinks(pendingContent)
 				if (cursor) updateCursor(cursor.from, cursor.to)
+				signalDocumentSaved(docId, pendingContent)
 			})
-			.catch(error => {
+			.catch(async error => {
+				if (optimisticContent.current === pendingContent) {
+					optimisticContent.current = null
+				}
 				console.error("Background document save failed", error)
-				persistContentOnMain(pendingContent, cursor)
+				await persistContentOnMain(pendingContent, cursor)
+				signalDocumentSaved(docId, pendingContent)
 			})
 	}
 
 	function getEditorContent(persistedContent: string) {
 		if (pendingSave.current) {
 			return editor.current?.getContent() ?? persistedContent
-		}
-		if (optimisticContent.current === persistedContent) {
-			optimisticContent.current = null
 		}
 		return optimisticContent.current ?? persistedContent
 	}
@@ -522,8 +522,13 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 		pendingContent: string,
 		cursor: { from: number; to?: number } | null,
 	) {
-		void applyContentDiffLoadingCommentAnchors(doc, pendingContent).then(() => {
-			syncDocumentMetadata(doc)
+		let currentDoc = liveDoc ?? doc
+		return applyContentDiffLoadingCommentAnchors(
+			currentDoc,
+			pendingContent,
+		).then(() => {
+			currentDoc.$jazz.set("updatedAt", new Date())
+			syncDocumentMetadata(currentDoc)
 			syncBacklinks(pendingContent)
 			if (cursor) updateCursor(cursor.from, cursor.to)
 		})
@@ -579,10 +584,17 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 		}
 	}
 
-	let backgroundSave = useBackgroundDocumentSave(
-		doc.$jazz.id,
-		me.$isLoaded ? me : undefined,
-	)
+	let backgroundSave = useBackgroundDocumentSave(liveDoc ?? doc)
+	let flushPendingContentRef = useRef(flushPendingContent)
+	flushPendingContentRef.current = flushPendingContent
+
+	useEffect(() => {
+		function flushBeforePageCloses() {
+			flushPendingContentRef.current()
+		}
+		window.addEventListener("pagehide", flushBeforePageCloses)
+		return () => window.removeEventListener("pagehide", flushBeforePageCloses)
+	}, [])
 
 	function handleSelectComment(threadId: string) {
 		if (selectedCommentThreadId === threadId) {
@@ -1123,4 +1135,12 @@ function setAutomationReadyState(ready: boolean, route: string) {
 	window.__alkalyeReadyRoute = route
 	if (ready) window.__alkalyeReadyAt = Date.now()
 	document.body.dataset.alkalyeReady = ready ? "true" : "false"
+}
+
+function signalDocumentSaved(documentId: string, content: string) {
+	window.dispatchEvent(
+		new CustomEvent("alkalye:document-saved", {
+			detail: { documentId, content },
+		}),
+	)
 }

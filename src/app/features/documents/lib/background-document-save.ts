@@ -1,150 +1,154 @@
-import {
-	experimental_JazzMessageChannel,
-	isControlledAccount,
-	type Account,
-} from "jazz-tools"
+import type { co } from "jazz-tools"
+import { applyDocumentContentPatches } from "@/app/features/comments/lib/comments"
+import { syncDocumentMetadata } from "./metadata"
+import { Document } from "./schema"
 import type {
-	MessagePortLike,
-	PostMessageTarget,
-} from "cojson/src/CojsonMessageChannel/types.js"
-import type {
+	DocumentContentPatch,
 	DocumentSaveWorkerRequest,
 	DocumentSaveWorkerResponse,
 } from "./document-save-protocol"
 
-export { createBackgroundDocumentSave, type BackgroundDocumentSave }
+export {
+	createBackgroundDocumentSave,
+	type BackgroundDocumentSave,
+	type BackgroundSaveDocument,
+}
+
+type BackgroundSaveDocument = co.loaded<typeof Document, { content: true }>
 
 type BackgroundDocumentSave = {
 	save(content: string): Promise<void>
 	close(): void
 }
 
-function createBackgroundDocumentSave(
-	documentId: string,
-	account: Account,
-): BackgroundDocumentSave {
-	if (!isControlledAccount(account)) {
-		throw new Error("Background saving requires a controlled account")
-	}
+let DOCUMENT_DIFF_TIMEOUT_MS = 10_000
 
+function createBackgroundDocumentSave(
+	getDocument: () => BackgroundSaveDocument,
+): BackgroundDocumentSave {
 	let worker = new Worker(
 		new URL("./document-save.worker.ts", import.meta.url),
-		{
-			type: "module",
-		},
+		{ type: "module" },
 	)
-	let ready = deferred<void>()
-	let requests = new Map<number, ReturnType<typeof deferred<void>>>()
+	let requests = new Map<
+		number,
+		ReturnType<typeof deferred<DocumentContentPatch[]>>
+	>()
 	let nextRequestId = 1
-	let closed = false
+	let saveQueue = Promise.resolve()
 	let closeRequested = false
-	let activeSaveCount = 0
+	let closed = false
 
 	worker.addEventListener(
 		"message",
 		(event: MessageEvent<DocumentSaveWorkerResponse>) => {
 			let response = event.data
-			if (response.type === "ready") {
-				ready.resolve()
-				return
-			}
-			if (response.type === "saved") {
-				requests.get(response.requestId)?.resolve()
+			if (response.type === "diffed") {
+				requests.get(response.requestId)?.resolve(response.patches)
 				requests.delete(response.requestId)
 				return
 			}
 			if (response.type === "failed") {
-				let error = new Error(response.message)
-				if (response.requestId === undefined) {
-					ready.reject(error)
-					return
-				}
-				requests.get(response.requestId)?.reject(error)
+				requests.get(response.requestId)?.reject(new Error(response.message))
 				requests.delete(response.requestId)
 				return
 			}
+			closed = true
 			worker.terminate()
 		},
 	)
-
-	let initialize: DocumentSaveWorkerRequest = {
-		type: "initialize",
-		accountId: account.$jazz.id,
-		accountSecret: account.$jazz.localNode.getCurrentAgent().agentSecret,
-		documentId,
-	}
-	worker.postMessage(initialize)
-	let target = new WorkerMessageTarget(worker)
-	void experimental_JazzMessageChannel
-		.expose(target, {
-			loadAs: account,
-		})
-		.catch(ready.reject)
+	worker.addEventListener("error", event => {
+		event.preventDefault()
+		failWorker(new Error(event.message || "Document diff worker failed"))
+	})
+	worker.addEventListener("messageerror", () => {
+		failWorker(new Error("Document diff worker sent an unreadable message"))
+	})
 
 	return {
-		async save(content) {
-			if (closeRequested) throw new Error("Background save is closed")
-			activeSaveCount++
-			try {
-				await ready.promise
-				let requestId = nextRequestId++
-				let result = deferred<void>()
-				requests.set(requestId, result)
-				let request: DocumentSaveWorkerRequest = {
-					type: "save",
-					requestId,
-					content,
-				}
-				worker.postMessage(request)
-				return await result.promise
-			} finally {
-				activeSaveCount--
-				closeWorkerWhenIdle()
-			}
+		save(content) {
+			if (closeRequested)
+				return Promise.reject(new Error("Background save is closed"))
+			let save = saveQueue.then(() => saveContent(content))
+			saveQueue = save.catch(() => {})
+			return save
 		},
 		close() {
+			if (closeRequested) return
 			closeRequested = true
-			closeWorkerWhenIdle()
+			void saveQueue.then(closeWorker)
 		},
 	}
 
-	function closeWorkerWhenIdle() {
-		if (!closeRequested || activeSaveCount > 0 || closed) return
+	async function saveContent(content: string): Promise<void> {
+		let doc = await getDocument().$jazz.ensureLoaded({
+			resolve: { content: true, comments: { $each: true } },
+		})
+		let oldContent = doc.content.toString()
+		if (oldContent === content) return
+		if (content.startsWith(oldContent)) {
+			doc.content.insertBefore(
+				doc.content.$jazz.raw.entries().length,
+				content.slice(oldContent.length),
+			)
+			await finishSave(doc)
+			return
+		}
+		let patches = await calculateDiff(oldContent, content)
+		if (doc.content.toString() !== oldContent) return saveContent(content)
+		applyDocumentContentPatches(doc, content, patches)
+		if (doc.content.toString() !== content) {
+			throw new Error("Document diff did not produce the requested content")
+		}
+		await finishSave(doc)
+	}
+
+	async function finishSave(
+		doc: co.loaded<
+			typeof Document,
+			{ content: true; comments: { $each: true } }
+		>,
+	) {
+		doc.$jazz.set("updatedAt", new Date())
+		syncDocumentMetadata(doc)
+		await Promise.all([
+			doc.content.$jazz.raw.core.waitForSync({ timeout: 5_000 }),
+			doc.$jazz.raw.core.waitForSync({ timeout: 5_000 }),
+		])
+	}
+
+	function calculateDiff(oldContent: string, newContent: string) {
+		if (closed)
+			return Promise.reject(new Error("Document diff worker is closed"))
+		let requestId = nextRequestId++
+		let result = deferred<DocumentContentPatch[]>()
+		requests.set(requestId, result)
+		let request: DocumentSaveWorkerRequest = {
+			type: "diff",
+			requestId,
+			oldContent,
+			newContent,
+		}
+		worker.postMessage(request)
+		let timeout = setTimeout(() => {
+			failWorker(new Error("Document diff worker timed out"))
+		}, DOCUMENT_DIFF_TIMEOUT_MS)
+		return result.promise.finally(() => clearTimeout(timeout))
+	}
+
+	function closeWorker() {
+		if (closed) return
 		closed = true
 		worker.postMessage({ type: "close" } satisfies DocumentSaveWorkerRequest)
 	}
-}
 
-class WorkerMessageTarget implements PostMessageTarget {
-	private worker: Worker
-
-	constructor(worker: Worker) {
-		this.worker = worker
-	}
-
-	postMessage(message: unknown, transfer?: MessagePortLike[]): void
-	postMessage(
-		message: unknown,
-		targetOrigin: string,
-		transfer?: MessagePortLike[],
-	): void
-	postMessage(
-		message: unknown,
-		transferOrTargetOrigin?: MessagePortLike[] | string,
-		transfer?: MessagePortLike[],
-	) {
-		let ports =
-			typeof transferOrTargetOrigin === "string"
-				? transfer
-				: transferOrTargetOrigin
-		let nativePorts: MessagePort[] = []
-		for (let port of ports ?? []) {
-			if (!(port instanceof MessagePort)) {
-				throw new Error("Jazz supplied a non-browser message port")
-			}
-			nativePorts.push(port)
-		}
-		this.worker.postMessage(message, nativePorts)
+	function failWorker(error: Error) {
+		if (closed) return
+		closed = true
+		closeRequested = true
+		for (let request of requests.values()) request.reject(error)
+		requests.clear()
+		worker.terminate()
 	}
 }
 

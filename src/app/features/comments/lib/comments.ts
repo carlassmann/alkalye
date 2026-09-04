@@ -7,6 +7,7 @@ import {
 	CommentThread,
 	Document,
 } from "@/app/features/documents/lib/schema"
+import type { DocumentContentPatch } from "@/app/features/documents/lib/document-save-protocol"
 import { syncDocumentMetadata } from "@/app/features/documents/lib/metadata"
 
 export {
@@ -29,6 +30,7 @@ export {
 	copyCommentsAndApplyContent,
 	applyContentDiffWithCommentAnchors,
 	applyContentDiffLoadingCommentAnchors,
+	applyDocumentContentPatches,
 	replaceDocumentContentPreservingAnchors,
 	replaceDocumentContentMappingAnchors,
 	recoverRange,
@@ -321,7 +323,22 @@ function applyContentDiffWithCommentAnchors(
 		return
 	}
 
-	let changes = getContentChanges(oldContent, newContent)
+	let patches: DocumentContentPatch[] = Array.from(
+		calcPatch(
+			doc.content.$jazz.raw.toGraphemes(oldContent),
+			doc.content.$jazz.raw.toGraphemes(newContent),
+		),
+		([from, to, inserted]) => ({ from, to, inserted: inserted.join("") }),
+	)
+	applyDocumentContentPatches(doc, newContent, patches)
+}
+
+function applyDocumentContentPatches(
+	doc: LoadedAnchorDocument,
+	newContent: string,
+	patches: DocumentContentPatch[],
+) {
+	let changes = getContentChanges(doc.content.toString(), newContent)
 	let updates = getActiveCommentAnchorThreads(doc).map(thread => ({
 		thread,
 		range: mapCommentRange(
@@ -331,7 +348,7 @@ function applyContentDiffWithCommentAnchors(
 		),
 	}))
 
-	applyContentDiffInBoundedTransactions(doc.content, newContent)
+	applyContentPatchesInBoundedTransactions(doc.content, patches)
 
 	for (let update of updates) {
 		if (update.range.orphaned) continue
@@ -342,18 +359,15 @@ function applyContentDiffWithCommentAnchors(
 	}
 }
 
-function applyContentDiffInBoundedTransactions(
+function applyContentPatchesInBoundedTransactions(
 	content: LoadedAnchorDocument["content"],
-	newContent: string,
+	patches: DocumentContentPatch[],
 ) {
 	let raw = content.$jazz.raw
-	let currentGraphemes = raw.toGraphemes(raw.toString())
-	let nextGraphemes = raw.toGraphemes(newContent)
-	let patches = Array.from(calcPatch(currentGraphemes, nextGraphemes))
 
 	raw.core.pauseNotifyUpdate()
 	try {
-		for (let [from, to, inserted] of patches.reverse()) {
+		for (let { from, to, inserted } of patches.reverse()) {
 			let deleteTo = to
 			while (deleteTo > from) {
 				let deleteFrom = Math.max(
@@ -364,7 +378,7 @@ function applyContentDiffInBoundedTransactions(
 				deleteTo = deleteFrom
 			}
 			if (inserted.length > 0) {
-				content.insertBefore(from, raw.fromGraphemes(inserted))
+				content.insertBefore(from, inserted)
 			}
 		}
 	} finally {

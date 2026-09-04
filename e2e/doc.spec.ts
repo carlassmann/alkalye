@@ -23,7 +23,6 @@ test("document CRUD helpers return JSON", async ({ page }) => {
 	await editor.click()
 	await editor.press("ControlOrMeta+End")
 	await page.keyboard.insertText("\nautosave persisted")
-	await page.waitForTimeout(1_500)
 	await page.reload()
 
 	let autosaved = await readById(page, { id: created.id })

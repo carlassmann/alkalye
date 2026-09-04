@@ -149,10 +149,11 @@ function matchesTypeFilter(
 ) {
 	if (typeFilter === "deleted") return Boolean(doc.deletedAt)
 	if (doc.deletedAt) return false
-	if (needsMetadataBackfill(doc)) return true
+	if (typeFilter === "all") return true
+	if (needsMetadataBackfill(doc)) return false
 	if (typeFilter === "presentation") return doc.isPresentation === true
 	if (typeFilter === "document") return doc.isPresentation !== true
-	return true
+	return false
 }
 
 function matchesSearchTerms(
@@ -161,7 +162,7 @@ function matchesSearchTerms(
 ) {
 	let terms = parseSearchTerms(search).map(t => t.toLowerCase())
 	if (terms.length === 0) return true
-	if (needsMetadataBackfill(doc)) return true
+	if (needsMetadataBackfill(doc)) return false
 
 	let searchable = [doc.title ?? "Untitled", ...(doc.tags ?? [])]
 		.join(" ")

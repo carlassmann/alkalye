@@ -1,23 +1,24 @@
 import { useEffect, useRef } from "react"
-import type { Account } from "jazz-tools"
 import {
 	createBackgroundDocumentSave,
 	type BackgroundDocumentSave,
+	type BackgroundSaveDocument,
 } from "../lib/background-document-save"
 
 export { useBackgroundDocumentSave, DOCUMENT_SAVE_DEBOUNCE_MS }
 
 let DOCUMENT_SAVE_DEBOUNCE_MS = 250
 
-function useBackgroundDocumentSave(
-	documentId: string,
-	account: Account | undefined,
-) {
+function useBackgroundDocumentSave(doc: BackgroundSaveDocument) {
 	let saveRef = useRef<BackgroundDocumentSave | null>(null)
+	let docRef = useRef(doc)
+	let documentId = doc.$jazz.id
+	useEffect(() => {
+		docRef.current = doc
+	}, [doc])
 
 	useEffect(() => {
-		if (!account) return
-		let save = createBackgroundDocumentSave(documentId, account)
+		let save = createBackgroundDocumentSave(() => docRef.current)
 		saveRef.current = save
 		return () => {
 			setTimeout(() => {
@@ -25,7 +26,7 @@ function useBackgroundDocumentSave(
 				save.close()
 			}, DOCUMENT_SAVE_DEBOUNCE_MS + 50)
 		}
-	}, [account, documentId])
+	}, [documentId])
 
 	return saveRef
 }

@@ -27,6 +27,9 @@ declare global {
 		__alkalyeInteractionMetrics: InteractionMetric[]
 		__alkalyeLongFrames: LongFrameMetric[]
 		__alkalyeMeasurementStartedAt: number
+		__alkalyeDocumentSaveCount: number
+		__alkalyeLastSavedDocumentId: string | undefined
+		__alkalyeLastSavedContent: string | undefined
 	}
 
 	interface PerformanceEventTiming {
@@ -114,7 +117,7 @@ try {
 
 	let measurements: Measurement[] = []
 	let editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
-	await editor.press("Control+End")
+	await editor.press("ControlOrMeta+End")
 	measurements.push(
 		await measure(page, "typing", async () => {
 			await page.keyboard.type(" instant response", { delay: 30 })
@@ -122,11 +125,29 @@ try {
 	)
 	measurements.push(
 		await measure(page, "autosave", async () => {
+			let saveCount = await page.evaluate(
+				() => window.__alkalyeDocumentSaveCount,
+			)
 			await page.keyboard.type("!")
-			await page.waitForTimeout(1_400)
+			await page.waitForFunction(
+				({ count, documentId, marker }) =>
+					window.__alkalyeDocumentSaveCount > count &&
+					window.__alkalyeLastSavedDocumentId === documentId &&
+					window.__alkalyeLastSavedContent?.includes(marker),
+				{
+					count: saveCount,
+					documentId: second.id,
+					marker: "instant response!",
+				},
+			)
+			await page.waitForTimeout(500)
 		}),
 	)
 	await verifyAutosave(page, second.id, "instant response!")
+	editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
+	await editor.click()
+	await editor.press("ControlOrMeta+End")
+	await page.keyboard.type(" undo fixture")
 	measurements.push(
 		await measure(page, "undo", () => page.keyboard.press("Meta+z")),
 	)
@@ -190,6 +211,9 @@ try {
 			await page
 				.locator(`[data-doc-id="${first.id}"]`)
 				.waitFor({ state: "visible" })
+			await page
+				.locator(`[data-doc-id="${second.id}"]`)
+				.waitFor({ state: "hidden" })
 		}),
 	)
 
@@ -197,15 +221,14 @@ try {
 		await measure(page, "open document", async () => {
 			await page.locator(`[data-doc-id="${first.id}"] a`).click()
 			await page.waitForFunction(
-				docId => window.location.pathname.endsWith(`/doc/${docId}`),
-				first.id,
+				({ docId, title }) =>
+					window.location.pathname.endsWith(`/doc/${docId}`) &&
+					document.body.dataset.alkalyeReady === "true" &&
+					document
+						.querySelector(".markdown-editor .cm-content")
+						?.textContent?.includes(title),
+				{ docId: first.id, title: "Responsiveness A" },
 			)
-			await page
-				.getByTestId(testIds.doc.editor)
-				.locator(".cm-content")
-				.waitFor({
-					state: "visible",
-				})
 		}),
 	)
 
@@ -215,12 +238,14 @@ try {
 		await measure(page, "switch space", async () => {
 			await page.locator(`[data-space-id="${firstSpace.id}"]`).click()
 			await page.waitForFunction(
-				spaceId => window.location.pathname.includes(`/spaces/${spaceId}/doc/`),
-				firstSpace.id,
+				({ spaceId, title }) =>
+					window.location.pathname.includes(`/spaces/${spaceId}/doc/`) &&
+					document.body.dataset.alkalyeReady === "true" &&
+					document
+						.querySelector(".markdown-editor .cm-content")
+						?.textContent?.includes(title),
+				{ spaceId: firstSpace.id, title: "Space A" },
 			)
-			await page
-				.locator(".markdown-editor .cm-content")
-				.waitFor({ state: "visible" })
 		}),
 	)
 
@@ -230,6 +255,7 @@ try {
 			viewport: "390x844",
 			documentKilobytes: args.kb,
 			frameBudgetMs: 16.7,
+			serviceWorkers: "blocked",
 		},
 		measurements,
 	}
@@ -245,6 +271,14 @@ async function installObservers(page: Page) {
 		window.__alkalyeInteractionMetrics = []
 		window.__alkalyeLongFrames = []
 		window.__alkalyeMeasurementStartedAt = 0
+		window.__alkalyeDocumentSaveCount = 0
+		window.addEventListener("alkalye:document-saved", event => {
+			window.__alkalyeDocumentSaveCount++
+			if (event instanceof CustomEvent) {
+				window.__alkalyeLastSavedDocumentId = event.detail?.documentId
+				window.__alkalyeLastSavedContent = event.detail?.content
+			}
+		})
 
 		new PerformanceObserver(list => {
 			for (let entry of list.getEntries()) {
@@ -395,8 +429,11 @@ async function verifyAutosave(page: Page, documentId: string, marker: string) {
 		documentId,
 	)
 	let editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
-	await editor.press("Control+End")
-	if (!(await editor.innerText()).includes(marker)) {
+	await editor.click()
+	await editor.press("ControlOrMeta+A")
+	await editor.press("ControlOrMeta+C")
+	let content = await page.evaluate(() => navigator.clipboard.readText())
+	if (!content.includes(marker)) {
 		throw new Error("Autosave did not persist before reload")
 	}
 }

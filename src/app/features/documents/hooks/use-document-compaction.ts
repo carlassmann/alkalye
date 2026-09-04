@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useEffect } from "react"
 import type { co } from "jazz-tools"
 import { Document } from "../lib/schema"
 import {
@@ -6,7 +6,6 @@ import {
 	getOwnDocumentContentTransactionCount,
 	reconcileArchivedDocumentContent,
 } from "../lib/document-generations"
-import { syncDocumentMetadata } from "../lib/metadata"
 
 export { useDocumentCompaction }
 
@@ -20,16 +19,10 @@ type LoadedDocument = co.loaded<
 function useDocumentCompaction(doc: LoadedDocument | null, enabled: boolean) {
 	let contentId = doc?.content.$jazz.id
 	let ownTransactionCount = doc ? getOwnDocumentContentTransactionCount(doc) : 0
-	let recordedTransactionCount = useRef(ownTransactionCount)
 
 	useEffect(() => {
 		if (!enabled || !doc) return
 		let timeout = setTimeout(() => {
-			if (recordedTransactionCount.current !== ownTransactionCount) {
-				recordedTransactionCount.current = ownTransactionCount
-				doc.$jazz.set("updatedAt", new Date())
-				syncDocumentMetadata(doc)
-			}
 			void compactDocumentContent(doc)
 		}, COMPACTION_QUIET_MS)
 		return () => clearTimeout(timeout)

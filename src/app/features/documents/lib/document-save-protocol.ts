@@ -1,17 +1,19 @@
-import type { AgentSecret } from "cojson"
+export type DocumentContentPatch = {
+	from: number
+	to: number
+	inserted: string
+}
 
 export type DocumentSaveWorkerRequest =
 	| {
-			type: "initialize"
-			accountId: string
-			accountSecret: AgentSecret
-			documentId: string
+			type: "diff"
+			requestId: number
+			oldContent: string
+			newContent: string
 	  }
-	| { type: "save"; requestId: number; content: string }
 	| { type: "close" }
 
 export type DocumentSaveWorkerResponse =
-	| { type: "ready" }
-	| { type: "saved"; requestId: number }
-	| { type: "failed"; requestId?: number; message: string }
+	| { type: "diffed"; requestId: number; patches: DocumentContentPatch[] }
+	| { type: "failed"; requestId: number; message: string }
 	| { type: "closed" }
