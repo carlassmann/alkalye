@@ -492,7 +492,14 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 		optimisticContent.current = pendingContent
 		void save
 			.save(pendingContent)
-			.then(() => {
+			.then(result => {
+				if (result === "superseded") {
+					let currentContent = editor.current?.getContent()
+					if (currentContent && currentContent !== doc.content.toString()) {
+						persistContent(currentContent, cursor)
+					}
+					return
+				}
 				if (optimisticContent.current === pendingContent) {
 					optimisticContent.current = null
 				}

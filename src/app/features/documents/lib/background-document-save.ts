@@ -1,5 +1,9 @@
 import type { co } from "jazz-tools"
-import { applyContentPatchesInBoundedTransactions } from "@/app/features/comments/lib/comments"
+import {
+	applyContentPatchesInBoundedTransactions,
+	applyDocumentContentPatches,
+	type LoadedAnchorDocument,
+} from "@/app/features/comments/lib/comments"
 import { calculateDocumentContentPatches } from "./document-diff"
 import { syncDocumentMetadata } from "./metadata"
 import { Document } from "./schema"
@@ -19,7 +23,7 @@ export {
 type BackgroundSaveDocument = co.loaded<typeof Document, { content: true }>
 
 type BackgroundDocumentSave = {
-	save(content: string): Promise<void>
+	save(content: string): Promise<"applied" | "superseded">
 	close(): void
 }
 
@@ -37,7 +41,7 @@ function createBackgroundDocumentSave(
 		ReturnType<typeof deferred<DocumentContentPatch[]>>
 	>()
 	let nextRequestId = 1
-	let saveQueue = Promise.resolve()
+	let saveQueue: Promise<unknown> = Promise.resolve()
 	let closeRequested = false
 	let closed = false
 
@@ -82,26 +86,29 @@ function createBackgroundDocumentSave(
 		},
 	}
 
-	async function saveContent(content: string): Promise<void> {
+	async function saveContent(
+		content: string,
+	): Promise<"applied" | "superseded"> {
 		let doc = getDocument()
 		let oldEntries = doc.content.$jazz.raw.entries().map(entry => entry.value)
 		let oldContent = oldEntries.join("")
-		if (oldContent === content) return
+		if (oldContent === content) return "applied"
 		if (content.startsWith(oldContent)) {
 			doc.content.insertBefore(
 				doc.content.$jazz.raw.entries().length,
 				content.slice(oldContent.length),
 			)
 			await finishSave(doc)
-			return
+			return "applied"
 		}
 		let patches = await calculateDiff(oldEntries, content)
-		if (doc.content.toString() !== oldContent) return
-		applyContentPatchesInBoundedTransactions(doc.content, patches)
+		if (doc.content.toString() !== oldContent) return "superseded"
+		applyPatchesPreservingLoadedAnchors(doc, content, patches)
 		if (doc.content.toString() !== content) {
 			throw new Error("Document diff did not produce the requested content")
 		}
 		finishSave(doc)
+		return "applied"
 	}
 
 	function finishSave(doc: BackgroundSaveDocument) {
@@ -158,10 +165,31 @@ function persistDocumentContentSynchronously(
 		)
 	} else {
 		let patches = calculateDocumentContentPatches(oldEntries, content)
-		applyContentPatchesInBoundedTransactions(doc.content, patches)
+		applyPatchesPreservingLoadedAnchors(doc, content, patches)
 	}
 	doc.$jazz.set("updatedAt", new Date())
 	syncDocumentMetadata(doc)
+}
+
+function applyPatchesPreservingLoadedAnchors(
+	doc: BackgroundSaveDocument,
+	content: string,
+	patches: DocumentContentPatch[],
+) {
+	if (hasLoadedCommentAnchors(doc)) {
+		applyDocumentContentPatches(doc, content, patches)
+		return
+	}
+	applyContentPatchesInBoundedTransactions(doc.content, patches)
+}
+
+function hasLoadedCommentAnchors(
+	doc: BackgroundSaveDocument,
+): doc is LoadedAnchorDocument {
+	return (
+		doc.comments === undefined ||
+		(doc.comments.$isLoaded && doc.comments.every(thread => thread.$isLoaded))
+	)
 }
 
 function deferred<T>() {
