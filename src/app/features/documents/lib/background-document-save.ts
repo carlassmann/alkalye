@@ -1,5 +1,6 @@
 import type { co } from "jazz-tools"
-import { applyDocumentContentPatches } from "@/app/features/comments/lib/comments"
+import { applyContentPatchesInBoundedTransactions } from "@/app/features/comments/lib/comments"
+import { calculateDocumentContentPatches } from "./document-diff"
 import { syncDocumentMetadata } from "./metadata"
 import { Document } from "./schema"
 import type {
@@ -10,6 +11,7 @@ import type {
 
 export {
 	createBackgroundDocumentSave,
+	persistDocumentContentSynchronously,
 	type BackgroundDocumentSave,
 	type BackgroundSaveDocument,
 }
@@ -81,9 +83,7 @@ function createBackgroundDocumentSave(
 	}
 
 	async function saveContent(content: string): Promise<void> {
-		let doc = await getDocument().$jazz.ensureLoaded({
-			resolve: { content: true, comments: { $each: true } },
-		})
+		let doc = getDocument()
 		let oldEntries = doc.content.$jazz.raw.entries().map(entry => entry.value)
 		let oldContent = oldEntries.join("")
 		if (oldContent === content) return
@@ -96,20 +96,15 @@ function createBackgroundDocumentSave(
 			return
 		}
 		let patches = await calculateDiff(oldEntries, content)
-		if (doc.content.toString() !== oldContent) return saveContent(content)
-		applyDocumentContentPatches(doc, content, patches)
+		if (doc.content.toString() !== oldContent) return
+		applyContentPatchesInBoundedTransactions(doc.content, patches)
 		if (doc.content.toString() !== content) {
 			throw new Error("Document diff did not produce the requested content")
 		}
 		finishSave(doc)
 	}
 
-	function finishSave(
-		doc: co.loaded<
-			typeof Document,
-			{ content: true; comments: { $each: true } }
-		>,
-	) {
+	function finishSave(doc: BackgroundSaveDocument) {
 		doc.$jazz.set("updatedAt", new Date())
 		syncDocumentMetadata(doc)
 	}
@@ -147,6 +142,26 @@ function createBackgroundDocumentSave(
 		requests.clear()
 		worker.terminate()
 	}
+}
+
+function persistDocumentContentSynchronously(
+	doc: BackgroundSaveDocument,
+	content: string,
+) {
+	let oldEntries = doc.content.$jazz.raw.entries().map(entry => entry.value)
+	let oldContent = oldEntries.join("")
+	if (oldContent === content) return
+	if (content.startsWith(oldContent)) {
+		doc.content.insertBefore(
+			oldEntries.length,
+			content.slice(oldContent.length),
+		)
+	} else {
+		let patches = calculateDocumentContentPatches(oldEntries, content)
+		applyContentPatchesInBoundedTransactions(doc.content, patches)
+	}
+	doc.$jazz.set("updatedAt", new Date())
+	syncDocumentMetadata(doc)
 }
 
 function deferred<T>() {

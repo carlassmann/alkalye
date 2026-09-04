@@ -83,8 +83,6 @@ import {
 	areCommentsEnabled,
 	commentsExtension,
 	createCommentThread,
-	applyContentDiffWithCommentAnchors,
-	applyContentDiffLoadingCommentAnchors,
 	copyCommentsAndApplyContent,
 	getCommentRange,
 	getUnresolvedCommentCount,
@@ -138,6 +136,7 @@ import {
 	DOCUMENT_SAVE_DEBOUNCE_MS,
 	useBackgroundDocumentSave,
 } from "../hooks/use-background-document-save"
+import { persistDocumentContentSynchronously } from "../lib/background-document-save"
 import { useAfterFirstPaint } from "../hooks/use-after-first-paint"
 
 export { SpaceDocScreen, spaceResolve, spaceLoaderResolve, spaceMeResolve }
@@ -513,12 +512,13 @@ function SpaceEditorContent({
 				if (cursor) updateCursor(cursor.from, cursor.to)
 				signalDocumentSaved(docId, pendingContent)
 			})
-			.catch(async error => {
+			.catch(error => {
 				if (optimisticContent.current === pendingContent) {
 					optimisticContent.current = null
 				}
 				console.error("Background document save failed", error)
-				await persistContentOnMain(pendingContent, cursor)
+				if (editor.current?.getContent() !== pendingContent) return
+				persistContentOnMain(pendingContent, cursor)
 				signalDocumentSaved(docId, pendingContent)
 			})
 	}
@@ -535,15 +535,9 @@ function SpaceEditorContent({
 		cursor: { from: number; to?: number } | null,
 	) {
 		let currentDoc = liveDoc ?? doc
-		currentDoc.$jazz.set("updatedAt", new Date())
-		return applyContentDiffLoadingCommentAnchors(
-			currentDoc,
-			pendingContent,
-		).then(() => {
-			syncDocumentMetadata(currentDoc)
-			syncBacklinks(pendingContent)
-			if (cursor) updateCursor(cursor.from, cursor.to)
-		})
+		persistDocumentContentSynchronously(currentDoc, pendingContent)
+		syncBacklinks(pendingContent)
+		if (cursor) updateCursor(cursor.from, cursor.to)
 	}
 
 	function queueSave(readContent: () => string) {
@@ -589,14 +583,7 @@ function SpaceEditorContent({
 		}
 
 		if (currentContent !== doc.content.toString()) {
-			if (liveDoc) {
-				liveDoc.$jazz.set("updatedAt", new Date())
-				applyContentDiffWithCommentAnchors(liveDoc, currentContent)
-				syncDocumentMetadata(liveDoc)
-				syncBacklinks(currentContent)
-			} else {
-				void persistContentOnMain(currentContent, null)
-			}
+			persistContentOnMain(currentContent, null)
 		}
 	}
 

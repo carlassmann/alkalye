@@ -31,6 +31,7 @@ export {
 	applyContentDiffWithCommentAnchors,
 	applyContentDiffLoadingCommentAnchors,
 	applyDocumentContentPatches,
+	applyContentPatchesInBoundedTransactions,
 	replaceDocumentContentPreservingAnchors,
 	replaceDocumentContentMappingAnchors,
 	recoverRange,
@@ -325,7 +326,7 @@ function applyContentDiffWithCommentAnchors(
 
 	let patches: DocumentContentPatch[] = Array.from(
 		calcPatch(
-			doc.content.$jazz.raw.toGraphemes(oldContent),
+			doc.content.$jazz.raw.entries().map(entry => entry.value),
 			doc.content.$jazz.raw.toGraphemes(newContent),
 		),
 		([from, to, inserted]) => ({ from, to, inserted: inserted.join("") }),

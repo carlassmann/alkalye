@@ -924,8 +924,6 @@ function DocumentItem({
 	let isAdmin = docGroup?.myRole() === "admin"
 	let docId = doc.$jazz.id
 
-	useMetadataBackfill(doc)
-
 	// Build link props based on whether we're in a space context
 	// Pass search query to open find panel when document loads
 	let searchParam = searchQuery.trim()
@@ -1196,8 +1194,6 @@ function DeletedDocumentItem({
 
 	let title = doc.title ?? "Untitled"
 	let daysLeft = doc.deletedAt ? getDaysUntilPermanentDelete(doc.deletedAt) : 0
-
-	useMetadataBackfill(doc)
 
 	async function handlePermanentDelete() {
 		if (me.$isLoaded) {
