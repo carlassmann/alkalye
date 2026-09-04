@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test"
+import { testIds } from "@/app/lib/test-ids"
 import { waitForEditorBoot, createAccount } from "./auth-helpers"
 import { create, readById, updateById, list, deleteById } from "./doc-helpers"
 
@@ -17,6 +18,16 @@ test("document CRUD helpers return JSON", async ({ page }) => {
 	})
 	expect(created.ok).toBe(true)
 	expect(created.id.length).toBeGreaterThan(10)
+
+	let editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
+	await editor.click()
+	await editor.press("ControlOrMeta+End")
+	await page.keyboard.insertText("\nautosave persisted")
+	await page.waitForTimeout(1_500)
+	await page.reload()
+
+	let autosaved = await readById(page, { id: created.id })
+	expect(autosaved.document.content).toContain("autosave persisted")
 
 	let read = await readById(page, { id: created.id })
 	expect(read.ok).toBe(true)

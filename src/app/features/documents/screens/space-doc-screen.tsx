@@ -134,7 +134,10 @@ import { useIntl } from "@/shared/intl/setup"
 import { makeFolderDocumentContent } from "../lib/folders"
 import { syncDocumentMetadata } from "../lib/metadata"
 import { useDocumentCompaction } from "../hooks/use-document-compaction"
-import { useBackgroundDocumentSave } from "../hooks/use-background-document-save"
+import {
+	DOCUMENT_SAVE_DEBOUNCE_MS,
+	useBackgroundDocumentSave,
+} from "../hooks/use-background-document-save"
 import { useAfterFirstPaint } from "../hooks/use-after-first-paint"
 
 export { SpaceDocScreen, spaceResolve, spaceLoaderResolve, spaceMeResolve }
@@ -229,6 +232,7 @@ function SpaceDocScreen({ spaceId, id, loaderData }: SpaceDocScreenProps) {
 	return (
 		<SidebarProvider>
 			<SpaceEditorContent
+				key={id}
 				space={loadedSpace}
 				doc={loadedDoc}
 				liveDoc={liveDoc}
@@ -275,8 +279,12 @@ function SpaceEditorContent({
 
 	useEffect(() => {
 		setAutomationReadyState(true, "space-doc")
-		return () => setAutomationReadyState(false, "space-doc")
-	}, [])
+		return () => {
+			if (window.location.pathname.endsWith(`/doc/${docId}`)) {
+				setAutomationReadyState(false, "space-doc")
+			}
+		}
+	}, [docId])
 
 	useEffect(() => {
 		recordStartupTraceOnce("editor-ready", {
@@ -309,10 +317,6 @@ function SpaceEditorContent({
 
 	let isAuthenticated = useIsAuthenticated()
 	let me = useAccount(UserAccount, { resolve: spaceMeResolve })
-	let backgroundSave = useBackgroundDocumentSave(
-		doc.$jazz.id,
-		me.$isLoaded ? me : undefined,
-	)
 	useEffect(() => {
 		if (!me.$isLoaded) return
 		recordStartupTraceOnce("space-account-data-loaded", {
@@ -550,7 +554,7 @@ function SpaceEditorContent({
 				pendingSave.current = null
 				if (pendingContent === undefined) return
 				persistContent(pendingContent, cursor ?? null)
-			}, 1000),
+			}, DOCUMENT_SAVE_DEBOUNCE_MS),
 		}
 	}
 
@@ -586,6 +590,11 @@ function SpaceEditorContent({
 			syncBacklinks(currentContent)
 		}
 	}
+
+	let backgroundSave = useBackgroundDocumentSave(
+		doc.$jazz.id,
+		me.$isLoaded ? me : undefined,
+	)
 
 	function handleSelectComment(threadId: string) {
 		if (selectedCommentThreadId === threadId) {

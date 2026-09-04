@@ -50,13 +50,14 @@ declare global {
 
 type Measurement = {
 	name: string
+	actionDurationMs: number
 	interactionCount: number
-	medianMs: number
-	p95Ms: number
-	maximumMs: number
-	maximumInputDelayMs: number
-	maximumProcessingMs: number
-	maximumPresentationDelayMs: number
+	medianMs: number | null
+	p95Ms: number | null
+	maximumMs: number | null
+	maximumInputDelayMs: number | null
+	maximumProcessingMs: number | null
+	maximumPresentationDelayMs: number | null
 	longFrameCount: number
 	maximumLongFrameMs: number
 	slowestFrameScripts: LongFrameMetric["scripts"]
@@ -125,6 +126,7 @@ try {
 			await page.waitForTimeout(1_400)
 		}),
 	)
+	await verifyAutosave(page, second.id, "instant response!")
 	measurements.push(
 		await measure(page, "undo", () => page.keyboard.press("Meta+z")),
 	)
@@ -297,7 +299,9 @@ async function measure(
 		window.__alkalyeMeasurementStartedAt = performance.now()
 	})
 
+	let actionStartedAt = performance.now()
 	await action()
+	let actionDurationMs = performance.now() - actionStartedAt
 	await page.waitForTimeout(500)
 
 	let metrics = await page.evaluate(() => {
@@ -316,21 +320,19 @@ async function measure(
 
 	return {
 		name,
+		actionDurationMs,
 		interactionCount: interactionDurations.length,
 		medianMs: percentile(interactionDurations, 0.5),
 		p95Ms: percentile(interactionDurations, 0.95),
-		maximumMs: Math.max(0, ...interactionDurations),
-		maximumInputDelayMs: Math.max(
-			0,
-			...interactions.map(interaction => interaction.inputDelayMs),
+		maximumMs: maximum(interactionDurations),
+		maximumInputDelayMs: maximum(
+			interactions.map(interaction => interaction.inputDelayMs),
 		),
-		maximumProcessingMs: Math.max(
-			0,
-			...interactions.map(interaction => interaction.processingMs),
+		maximumProcessingMs: maximum(
+			interactions.map(interaction => interaction.processingMs),
 		),
-		maximumPresentationDelayMs: Math.max(
-			0,
-			...interactions.map(interaction => interaction.presentationDelayMs),
+		maximumPresentationDelayMs: maximum(
+			interactions.map(interaction => interaction.presentationDelayMs),
 		),
 		longFrameCount: metrics.longFrames.length,
 		maximumLongFrameMs: slowestFrame?.durationMs ?? 0,
@@ -350,9 +352,14 @@ function groupInteractions(metrics: InteractionMetric[]) {
 }
 
 function percentile(values: number[], percentileValue: number) {
+	if (values.length === 0) return null
 	let sorted = [...values].sort((left, right) => left - right)
 	let index = Math.ceil(sorted.length * percentileValue) - 1
-	return sorted[Math.max(0, Math.min(index, sorted.length - 1))] ?? 0
+	return sorted[Math.max(0, Math.min(index, sorted.length - 1))] ?? null
+}
+
+function maximum(values: number[]) {
+	return values.length === 0 ? null : Math.max(...values)
 }
 
 function buildBody(kilobytes: number) {
@@ -376,7 +383,22 @@ async function replaceEditorContent(page: Page, content: string) {
 	for (let offset = 0; offset < content.length; offset += chunkSize) {
 		await page.keyboard.insertText(content.slice(offset, offset + chunkSize))
 	}
-	await page.waitForTimeout(1_000)
+	await page.waitForTimeout(3_000)
+}
+
+async function verifyAutosave(page: Page, documentId: string, marker: string) {
+	await page.reload()
+	await page.waitForFunction(
+		id =>
+			window.location.pathname.endsWith(`/doc/${id}`) &&
+			document.body.dataset.alkalyeReady === "true",
+		documentId,
+	)
+	let editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
+	await editor.press("Control+End")
+	if (!(await editor.innerText()).includes(marker)) {
+		throw new Error("Autosave did not persist before reload")
+	}
 }
 
 function parseArgs(rawArgs: string[]) {

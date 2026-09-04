@@ -37,6 +37,8 @@ function createBackgroundDocumentSave(
 	let requests = new Map<number, ReturnType<typeof deferred<void>>>()
 	let nextRequestId = 1
 	let closed = false
+	let closeRequested = false
+	let activeSaveCount = 0
 
 	worker.addEventListener(
 		"message",
@@ -81,24 +83,35 @@ function createBackgroundDocumentSave(
 
 	return {
 		async save(content) {
-			if (closed) throw new Error("Background save is closed")
-			await ready.promise
-			let requestId = nextRequestId++
-			let result = deferred<void>()
-			requests.set(requestId, result)
-			let request: DocumentSaveWorkerRequest = {
-				type: "save",
-				requestId,
-				content,
+			if (closeRequested) throw new Error("Background save is closed")
+			activeSaveCount++
+			try {
+				await ready.promise
+				let requestId = nextRequestId++
+				let result = deferred<void>()
+				requests.set(requestId, result)
+				let request: DocumentSaveWorkerRequest = {
+					type: "save",
+					requestId,
+					content,
+				}
+				worker.postMessage(request)
+				return await result.promise
+			} finally {
+				activeSaveCount--
+				closeWorkerWhenIdle()
 			}
-			worker.postMessage(request)
-			return result.promise
 		},
 		close() {
-			if (closed) return
-			closed = true
-			worker.postMessage({ type: "close" } satisfies DocumentSaveWorkerRequest)
+			closeRequested = true
+			closeWorkerWhenIdle()
 		},
+	}
+
+	function closeWorkerWhenIdle() {
+		if (!closeRequested || activeSaveCount > 0 || closed) return
+		closed = true
+		worker.postMessage({ type: "close" } satisfies DocumentSaveWorkerRequest)
 	}
 }
 

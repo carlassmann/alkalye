@@ -136,7 +136,10 @@ import { useIntl } from "@/shared/intl/setup"
 import { makeFolderDocumentContent } from "../lib/folders"
 import { createDocumentMetadata, syncDocumentMetadata } from "../lib/metadata"
 import { useDocumentCompaction } from "../hooks/use-document-compaction"
-import { useBackgroundDocumentSave } from "../hooks/use-background-document-save"
+import {
+	DOCUMENT_SAVE_DEBOUNCE_MS,
+	useBackgroundDocumentSave,
+} from "../hooks/use-background-document-save"
 import { useAfterFirstPaint } from "../hooks/use-after-first-paint"
 import { recordStartupTraceOnce } from "@/app/lib/reload-diagnostics"
 
@@ -224,7 +227,7 @@ function DocScreen({ id, loaderData }: DocScreenProps) {
 
 	return (
 		<SidebarProvider>
-			<EditorContent doc={doc} liveDoc={liveDoc} docId={id} />
+			<EditorContent key={id} doc={doc} liveDoc={liveDoc} docId={id} />
 		</SidebarProvider>
 	)
 }
@@ -268,8 +271,12 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 
 	useEffect(() => {
 		setAutomationReadyState(true, "personal-doc")
-		return () => setAutomationReadyState(false, "personal-doc")
-	}, [])
+		return () => {
+			if (window.location.pathname.endsWith(`/doc/${docId}`)) {
+				setAutomationReadyState(false, "personal-doc")
+			}
+		}
+	}, [docId])
 
 	useEffect(() => {
 		recordStartupTraceOnce("editor-ready", {
@@ -300,10 +307,6 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 
 	let isAuthenticated = useIsAuthenticated()
 	let me = useAccount(UserAccount, { resolve: personalMeResolve })
-	let backgroundSave = useBackgroundDocumentSave(
-		doc.$jazz.id,
-		me.$isLoaded ? me : undefined,
-	)
 	useEffect(() => {
 		if (!me.$isLoaded) return
 		recordStartupTraceOnce("personal-account-data-loaded", {
@@ -539,7 +542,7 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 				pendingSave.current = null
 				if (pendingContent === undefined) return
 				persistContent(pendingContent, cursor ?? null)
-			}, 1000),
+			}, DOCUMENT_SAVE_DEBOUNCE_MS),
 		}
 	}
 
@@ -575,6 +578,11 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 			syncBacklinks(currentContent)
 		}
 	}
+
+	let backgroundSave = useBackgroundDocumentSave(
+		doc.$jazz.id,
+		me.$isLoaded ? me : undefined,
+	)
 
 	function handleSelectComment(threadId: string) {
 		if (selectedCommentThreadId === threadId) {

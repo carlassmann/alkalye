@@ -5,7 +5,9 @@ import {
 	type BackgroundDocumentSave,
 } from "../lib/background-document-save"
 
-export { useBackgroundDocumentSave }
+export { useBackgroundDocumentSave, DOCUMENT_SAVE_DEBOUNCE_MS }
+
+let DOCUMENT_SAVE_DEBOUNCE_MS = 250
 
 function useBackgroundDocumentSave(
 	documentId: string,
@@ -18,8 +20,10 @@ function useBackgroundDocumentSave(
 		let save = createBackgroundDocumentSave(documentId, account)
 		saveRef.current = save
 		return () => {
-			if (saveRef.current === save) saveRef.current = null
-			save.close()
+			setTimeout(() => {
+				if (saveRef.current === save) saveRef.current = null
+				save.close()
+			}, DOCUMENT_SAVE_DEBOUNCE_MS + 50)
 		}
 	}, [account, documentId])
 

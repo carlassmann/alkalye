@@ -483,6 +483,12 @@ function MarkdownEditor(
 		isMobile,
 		externalExtensions,
 	})
+	useEffect(() => {
+		if (initRef.current.value.length < MAX_RICH_MARKDOWN_LENGTH) return
+		toast.info(t("editor.largeDocumentMode.title"), {
+			description: t("editor.largeDocumentMode.description"),
+		})
+	}, [t])
 
 	useEffect(() => {
 		if (!containerRef.current) return
