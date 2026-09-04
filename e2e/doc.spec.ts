@@ -52,8 +52,7 @@ test("document CRUD helpers return JSON", async ({ page }) => {
 
 	let existingId = before.items[0]?.id
 	if (!existingId) throw new Error("Expected an existing document")
-	let createdPath = `/app/doc/${created.id}`
-	await startObservingDocumentNotFound(page, createdPath, "CRUD JSON Doc")
+	await startObservingDocumentNotFound(page)
 	await page.locator(`[data-doc-id="${existingId}"] a`).dispatchEvent("click")
 	await expect(page).toHaveURL(new RegExp(`/doc/${existingId}`))
 	await page.locator(`[data-doc-id="${created.id}"] a`).dispatchEvent("click")

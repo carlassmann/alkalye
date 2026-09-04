@@ -32,12 +32,7 @@ test("space CRUD + invite helpers return JSON", async ({ page }) => {
 		spaceId: created.id,
 		title: "Second space document",
 	})
-	let secondDocumentPath = `/app/spaces/${created.id}/doc/${secondDocument.id}`
-	await startObservingDocumentNotFound(
-		page,
-		secondDocumentPath,
-		"Second space document",
-	)
+	await startObservingDocumentNotFound(page)
 	await page
 		.locator(`[data-doc-id="${firstDocumentId}"] a`)
 		.dispatchEvent("click")

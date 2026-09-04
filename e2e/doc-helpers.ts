@@ -195,41 +195,19 @@ async function deleteById(page: Page, args: DeleteByIdArgs) {
 	}
 }
 
-async function startObservingDocumentNotFound(
-	page: Page,
-	destination: string,
-	expectedContent: string,
-) {
-	await page.evaluate(
-		({ selector, destination, expectedContent }) => {
-			document.documentElement.dataset.documentNotFoundRendered = "false"
-			let leftDestination = false
-			let observer = new MutationObserver(() => {
-				if (location.pathname !== destination) leftDestination = true
-				if (document.querySelector(selector)) {
-					document.documentElement.dataset.documentNotFoundRendered = "true"
-				}
-				if (
-					leftDestination &&
-					location.pathname === destination &&
-					document
-						.querySelector(".cm-content")
-						?.textContent?.includes(expectedContent)
-				) {
-					observer.disconnect()
-				}
-			})
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-			})
-		},
-		{
-			selector: `[data-testid="${testIds.error.documentNotFound}"]`,
-			destination,
-			expectedContent,
-		},
-	)
+async function startObservingDocumentNotFound(page: Page) {
+	await page.evaluate(selector => {
+		document.documentElement.dataset.documentNotFoundRendered = "false"
+		let observer = new MutationObserver(() => {
+			if (document.querySelector(selector)) {
+				document.documentElement.dataset.documentNotFoundRendered = "true"
+			}
+		})
+		observer.observe(document.body, {
+			childList: true,
+			subtree: true,
+		})
+	}, `[data-testid="${testIds.error.documentNotFound}"]`)
 }
 
 async function didDocumentNotFoundRender(page: Page) {
