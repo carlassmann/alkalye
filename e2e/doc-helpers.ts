@@ -2,7 +2,14 @@ import { expect, type Page } from "@playwright/test"
 import { testIds } from "@/app/lib/test-ids"
 import { waitForEditorBoot } from "./auth-helpers"
 
-export { create, readById, updateById, list, deleteById }
+export {
+	create,
+	readById,
+	updateById,
+	list,
+	deleteById,
+	observeDocumentNotFound,
+}
 
 interface CreateArgs {
 	spaceId?: string
@@ -185,6 +192,25 @@ async function deleteById(page: Page, args: DeleteByIdArgs) {
 		spaceId: args.spaceId ?? null,
 		deleted: true,
 	}
+}
+
+async function observeDocumentNotFound(page: Page) {
+	return page.evaluate(() => {
+		return new Promise<boolean>(resolve => {
+			let rendered = false
+			let check = () => {
+				if (document.body.innerText.includes("Document not found"))
+					rendered = true
+			}
+			let observer = new MutationObserver(check)
+			observer.observe(document.body, { childList: true, subtree: true })
+			check()
+			setTimeout(() => {
+				observer.disconnect()
+				resolve(rendered)
+			}, 1_000)
+		})
+	})
 }
 
 function getDocPath(id: string, spaceId?: string) {

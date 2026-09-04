@@ -1,7 +1,14 @@
-import { test, expect, type Page } from "@playwright/test"
+import { test, expect } from "@playwright/test"
 import { testIds } from "@/app/lib/test-ids"
 import { waitForEditorBoot, createAccount } from "./auth-helpers"
-import { create, readById, updateById, list, deleteById } from "./doc-helpers"
+import {
+	create,
+	readById,
+	updateById,
+	list,
+	deleteById,
+	observeDocumentNotFound,
+} from "./doc-helpers"
 
 test("document CRUD helpers return JSON", async ({ page }) => {
 	await waitForEditorBoot(page)
@@ -92,22 +99,3 @@ test("document CRUD helpers return JSON", async ({ page }) => {
 	expect(after.ok).toBe(true)
 	expect(after.count).toBe(before.count)
 })
-
-async function observeDocumentNotFound(page: Page) {
-	return page.evaluate(() => {
-		return new Promise<boolean>(resolve => {
-			let rendered = false
-			let check = () => {
-				if (document.body.innerText.includes("Document not found"))
-					rendered = true
-			}
-			let observer = new MutationObserver(check)
-			observer.observe(document.body, { childList: true, subtree: true })
-			check()
-			setTimeout(() => {
-				observer.disconnect()
-				resolve(rendered)
-			}, 1_000)
-		})
-	})
-}

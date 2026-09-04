@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test"
 import { createAccount, waitForEditorBoot } from "./auth-helpers"
-import { deleteById } from "./doc-helpers"
+import { create, deleteById, observeDocumentNotFound } from "./doc-helpers"
 import {
 	acceptSpaceInvite,
 	createSpace,
@@ -19,6 +19,27 @@ test("space CRUD + invite helpers return JSON", async ({ page }) => {
 
 	let created = await createSpace(page, { name: "E2E Space" })
 	expect(created.ok).toBe(true)
+	let firstDocumentId = page.url().match(/\/doc\/([^/?#]+)/)?.[1]
+	if (!firstDocumentId) throw new Error("Expected the space's first document")
+
+	let secondDocument = await create(page, {
+		spaceId: created.id,
+		title: "Second space document",
+	})
+	let notFoundRendered = observeDocumentNotFound(page)
+	await page
+		.locator(`[data-doc-id="${firstDocumentId}"] a`)
+		.dispatchEvent("click")
+	await expect(page).toHaveURL(
+		new RegExp(`/spaces/${created.id}/doc/${firstDocumentId}`),
+	)
+	expect(await notFoundRendered).toBe(false)
+	await page
+		.locator(`[data-doc-id="${secondDocument.id}"] a`)
+		.dispatchEvent("click")
+	await expect(page).toHaveURL(
+		new RegExp(`/spaces/${created.id}/doc/${secondDocument.id}`),
+	)
 
 	let listed = await listSpaces(page, { expectedSpaceId: created.id })
 	expect(listed.ok).toBe(true)
