@@ -9,7 +9,7 @@ let Route = createFileRoute("/new")({
 		spaceId: z.string().optional(),
 	}),
 	loaderDeps: ({ search }) => ({ spaceId: search.spaceId }),
-	preloadStaleTime: 0,
+	shouldReload: ({ cause }) => cause !== "preload",
 	loader: ({ context, deps, cause }) => {
 		if (cause === "preload") return
 		return newDocLoader({ context, spaceId: deps.spaceId })

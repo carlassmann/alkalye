@@ -21,8 +21,9 @@ test("document CRUD helpers return JSON", async ({ page }) => {
 	let createdFromButtonId = new URL(page.url()).pathname.split("/").at(-1)
 	expect(createdFromButtonId).toBeTruthy()
 	if (!createdFromButtonId) throw new Error("New document URL has no ID")
-	let afterClick = await list(page)
-	expect(afterClick.count).toBe(beforeHover.count + 1)
+	await expect
+		.poll(() => page.getByTestId(testIds.doc.listItem).count())
+		.toBe(beforeHover.count + 1)
 	await deleteById(page, { id: createdFromButtonId })
 
 	let before = await list(page)
