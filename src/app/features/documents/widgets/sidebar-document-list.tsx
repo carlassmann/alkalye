@@ -668,9 +668,7 @@ function NewDocumentContextMenuItem({
 }) {
 	if (spaceId) {
 		return (
-			<ContextMenuItem
-				render={<Link to="/new" search={{ spaceId }} preload={false} />}
-			>
+			<ContextMenuItem render={<Link to="/new" search={{ spaceId }} />}>
 				<Plus />
 				{t("doc.new")}
 			</ContextMenuItem>
@@ -678,7 +676,7 @@ function NewDocumentContextMenuItem({
 	}
 
 	return (
-		<ContextMenuItem render={<Link to="/new" preload={false} />}>
+		<ContextMenuItem render={<Link to="/new" />}>
 			<Plus />
 			{t("doc.new")}
 		</ContextMenuItem>

@@ -24,6 +24,10 @@ test("document CRUD helpers return JSON", async ({ page }) => {
 	await expect
 		.poll(() => page.getByTestId(testIds.doc.listItem).count())
 		.toBe(beforeHover.count + 1)
+	await page.waitForTimeout(250)
+	expect(await page.getByTestId(testIds.doc.listItem).count()).toBe(
+		beforeHover.count + 1,
+	)
 	await deleteById(page, { id: createdFromButtonId })
 
 	let before = await list(page)
