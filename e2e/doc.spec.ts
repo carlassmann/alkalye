@@ -7,11 +7,23 @@ test("document CRUD helpers return JSON", async ({ page }) => {
 	await waitForEditorBoot(page)
 	await createAccount(page)
 
+	let newButton = page.getByTestId(testIds.doc.newButton)
 	let beforeHover = await list(page)
-	await page.getByTestId(testIds.doc.newButton).dispatchEvent("mouseenter")
+	await newButton.dispatchEvent("mouseover")
 	await page.waitForTimeout(250)
 	let afterHover = await list(page)
 	expect(afterHover.count).toBe(beforeHover.count)
+
+	await Promise.all([
+		page.waitForURL(/\/app\/doc\/co_/),
+		newButton.dispatchEvent("click"),
+	])
+	let createdFromButtonId = new URL(page.url()).pathname.split("/").at(-1)
+	expect(createdFromButtonId).toBeTruthy()
+	if (!createdFromButtonId) throw new Error("New document URL has no ID")
+	let afterClick = await list(page)
+	expect(afterClick.count).toBe(beforeHover.count + 1)
+	await deleteById(page, { id: createdFromButtonId })
 
 	let before = await list(page)
 	expect(before.ok).toBe(true)
