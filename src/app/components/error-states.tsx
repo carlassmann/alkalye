@@ -13,6 +13,7 @@ import {
 	EmptyContent,
 } from "@/app/components/ui/empty"
 import { T } from "@/shared/intl/setup"
+import { testIds } from "@/app/lib/test-ids"
 
 export {
 	DocumentNotFound,
@@ -23,7 +24,10 @@ export {
 
 function DocumentNotFound() {
 	return (
-		<div className="bg-background flex h-full items-center justify-center">
+		<div
+			className="bg-background flex h-full items-center justify-center"
+			data-testid={testIds.error.documentNotFound}
+		>
 			<Empty>
 				<EmptyHeader>
 					<EmptyMedia>

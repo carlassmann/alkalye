@@ -1,6 +1,12 @@
 import { expect, test } from "@playwright/test"
 import { createAccount, waitForEditorBoot } from "./auth-helpers"
-import { create, deleteById, observeDocumentNotFound } from "./doc-helpers"
+import {
+	create,
+	deleteById,
+	startObservingDocumentNotFound,
+	didDocumentNotFoundRender,
+} from "./doc-helpers"
+import { testIds } from "@/app/lib/test-ids"
 import {
 	acceptSpaceInvite,
 	createSpace,
@@ -26,20 +32,28 @@ test("space CRUD + invite helpers return JSON", async ({ page }) => {
 		spaceId: created.id,
 		title: "Second space document",
 	})
-	let notFoundRendered = observeDocumentNotFound(page)
+	let secondDocumentPath = `/app/spaces/${created.id}/doc/${secondDocument.id}`
+	await startObservingDocumentNotFound(
+		page,
+		secondDocumentPath,
+		"Second space document",
+	)
 	await page
 		.locator(`[data-doc-id="${firstDocumentId}"] a`)
 		.dispatchEvent("click")
 	await expect(page).toHaveURL(
 		new RegExp(`/spaces/${created.id}/doc/${firstDocumentId}`),
 	)
-	expect(await notFoundRendered).toBe(false)
 	await page
 		.locator(`[data-doc-id="${secondDocument.id}"] a`)
 		.dispatchEvent("click")
 	await expect(page).toHaveURL(
 		new RegExp(`/spaces/${created.id}/doc/${secondDocument.id}`),
 	)
+	await expect(
+		page.getByTestId(testIds.doc.editor).locator(".cm-content"),
+	).toContainText("Second space document")
+	expect(await didDocumentNotFoundRender(page)).toBe(false)
 
 	let listed = await listSpaces(page, { expectedSpaceId: created.id })
 	expect(listed.ok).toBe(true)

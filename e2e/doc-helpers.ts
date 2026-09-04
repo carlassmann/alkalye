@@ -8,7 +8,8 @@ export {
 	updateById,
 	list,
 	deleteById,
-	observeDocumentNotFound,
+	startObservingDocumentNotFound,
+	didDocumentNotFoundRender,
 }
 
 interface CreateArgs {
@@ -194,23 +195,44 @@ async function deleteById(page: Page, args: DeleteByIdArgs) {
 	}
 }
 
-async function observeDocumentNotFound(page: Page) {
-	return page.evaluate(() => {
-		return new Promise<boolean>(resolve => {
-			let rendered = false
-			let check = () => {
-				if (document.body.innerText.includes("Document not found"))
-					rendered = true
-			}
-			let observer = new MutationObserver(check)
-			observer.observe(document.body, { childList: true, subtree: true })
-			check()
-			setTimeout(() => {
-				observer.disconnect()
-				resolve(rendered)
-			}, 1_000)
-		})
-	})
+async function startObservingDocumentNotFound(
+	page: Page,
+	destination: string,
+	expectedContent: string,
+) {
+	await page.evaluate(
+		({ selector, destination, expectedContent }) => {
+			document.documentElement.dataset.documentNotFoundRendered = "false"
+			let observer = new MutationObserver(() => {
+				if (document.querySelector(selector)) {
+					document.documentElement.dataset.documentNotFoundRendered = "true"
+				}
+				if (
+					location.pathname === destination &&
+					document
+						.querySelector(".cm-content")
+						?.textContent?.includes(expectedContent)
+				) {
+					observer.disconnect()
+				}
+			})
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true,
+			})
+		},
+		{
+			selector: `[data-testid="${testIds.error.documentNotFound}"]`,
+			destination,
+			expectedContent,
+		},
+	)
+}
+
+async function didDocumentNotFoundRender(page: Page) {
+	return page.evaluate(
+		() => document.documentElement.dataset.documentNotFoundRendered === "true",
+	)
 }
 
 function getDocPath(id: string, spaceId?: string) {

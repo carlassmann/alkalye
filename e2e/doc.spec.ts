@@ -7,7 +7,8 @@ import {
 	updateById,
 	list,
 	deleteById,
-	observeDocumentNotFound,
+	startObservingDocumentNotFound,
+	didDocumentNotFoundRender,
 } from "./doc-helpers"
 
 test("document CRUD helpers return JSON", async ({ page }) => {
@@ -51,12 +52,16 @@ test("document CRUD helpers return JSON", async ({ page }) => {
 
 	let existingId = before.items[0]?.id
 	if (!existingId) throw new Error("Expected an existing document")
-	let notFoundRendered = observeDocumentNotFound(page)
+	let createdPath = `/app/doc/${created.id}`
+	await startObservingDocumentNotFound(page, createdPath, "CRUD JSON Doc")
 	await page.locator(`[data-doc-id="${existingId}"] a`).dispatchEvent("click")
 	await expect(page).toHaveURL(new RegExp(`/doc/${existingId}`))
-	expect(await notFoundRendered).toBe(false)
 	await page.locator(`[data-doc-id="${created.id}"] a`).dispatchEvent("click")
 	await expect(page).toHaveURL(new RegExp(`/doc/${created.id}`))
+	await expect(
+		page.getByTestId(testIds.doc.editor).locator(".cm-content"),
+	).toContainText("CRUD JSON Doc")
+	expect(await didDocumentNotFoundRender(page)).toBe(false)
 
 	let editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
 	await editor.click()
