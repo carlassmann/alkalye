@@ -119,6 +119,61 @@ try {
 			await page.keyboard.type(" instant response", { delay: 30 })
 		}),
 	)
+	measurements.push(
+		await measure(page, "autosave", async () => {
+			await page.keyboard.type("!")
+			await page.waitForTimeout(1_400)
+		}),
+	)
+	measurements.push(
+		await measure(page, "undo", () => page.keyboard.press("Meta+z")),
+	)
+	measurements.push(
+		await measure(page, "redo", () => page.keyboard.press("Meta+Shift+z")),
+	)
+	await page.waitForTimeout(1_200)
+
+	await editor.click()
+	measurements.push(
+		await measure(page, "open command palette", async () => {
+			await page.keyboard.press("Meta+Shift+p")
+			await page.getByRole("combobox", { name: "Search commands" }).waitFor({
+				state: "visible",
+			})
+		}),
+	)
+	await page.keyboard.press("Escape")
+	await page
+		.getByRole("combobox", { name: "Search commands" })
+		.waitFor({ state: "hidden" })
+
+	await editor.click()
+	measurements.push(
+		await measure(page, "open find", async () => {
+			await page.keyboard.press("Meta+f")
+			await page.getByPlaceholder("Find...").waitFor({ state: "visible" })
+		}),
+	)
+	measurements.push(
+		await measure(page, "find in document", async () => {
+			await page.keyboard.type("responsiveness fixture", { delay: 30 })
+		}),
+	)
+	await page.keyboard.press("Escape")
+	await page.getByPlaceholder("Find...").waitFor({ state: "hidden" })
+
+	await editor.click()
+	let documentTools = page.getByRole("dialog", { name: "Document tools" })
+	measurements.push(
+		await measure(page, "open document tools", async () => {
+			await page.keyboard.press("Meta+.")
+			await documentTools.waitFor({ state: "visible" })
+		}),
+	)
+	await page
+		.locator('[data-slot="sheet-overlay"]')
+		.click({ position: { x: 1, y: 1 } })
+	await documentTools.waitFor({ state: "hidden" })
 
 	let leftSidebarTrigger = page.getByRole("button", { name: "Documents" })
 	measurements.push(
@@ -162,8 +217,7 @@ try {
 				firstSpace.id,
 			)
 			await page
-				.getByTestId(testIds.doc.editor)
-				.locator(".cm-content")
+				.locator(".markdown-editor .cm-content")
 				.waitFor({ state: "visible" })
 		}),
 	)
@@ -314,7 +368,7 @@ function buildContent(title: string, kilobytes: number) {
 }
 
 async function replaceEditorContent(page: Page, content: string) {
-	let editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
+	let editor = page.locator(".markdown-editor .cm-content")
 	await editor.waitFor({ state: "visible" })
 	await editor.click()
 	await editor.press(process.platform === "darwin" ? "Meta+A" : "Control+A")
