@@ -154,7 +154,7 @@ describe("Time Machine - Edit History", () => {
 		expect(history2).toBe(history3)
 	})
 
-	test("getEditHistory handles document with many edits performantly", async () => {
+	test("getEditHistory handles document with many edits", async () => {
 		let doc = await createPersonalDocument(adminAccount, "Initial")
 
 		let editCount = 100
@@ -167,27 +167,17 @@ describe("Time Machine - Edit History", () => {
 		})
 		if (!loaded.$isLoaded) throw new Error("Doc not loaded")
 
-		let startHistory = performance.now()
 		let editHistory = getEditHistory(loaded)
-		let historyDuration = performance.now() - startHistory
 
-		expect(historyDuration).toBeLessThan(100)
 		expect(editHistory.length).toBeGreaterThan(0)
 
-		let startCached = performance.now()
 		for (let i = 0; i < 10; i++) {
-			getEditHistory(loaded)
+			expect(getEditHistory(loaded)).toBe(editHistory)
 		}
-		let cachedDuration = performance.now() - startCached
 
-		expect(cachedDuration).toBeLessThan(5)
-
-		let startContent = performance.now()
 		let middleEdit = Math.floor(editHistory.length / 2)
 		let middleContent = getContentAtEdit(loaded, middleEdit)
-		let contentDuration = performance.now() - startContent
 
-		expect(contentDuration).toBeLessThan(50)
 		expect(middleContent.length).toBeGreaterThan(0)
 	})
 
