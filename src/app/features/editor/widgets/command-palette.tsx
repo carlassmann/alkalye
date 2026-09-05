@@ -392,7 +392,7 @@ function CommandDialog<T>({
 							aria-selected={index === selectedIndex}
 							data-active={index === selectedIndex}
 							className="hover:bg-accent data-[active=true]:bg-accent flex min-h-11 w-full items-center gap-3 px-3 text-left text-sm outline-none"
-							onMouseEnter={() => setActiveIndex(index)}
+							onPointerMove={() => setActiveIndex(index)}
 							onClick={() => handleSelect(item)}
 						>
 							<span
