@@ -92,6 +92,7 @@ import {
 	insertRawPastedText,
 } from "../lib/paste-commands"
 import { createSpellcheckExtension } from "../lib/spellcheck"
+import { usesRichMarkdown } from "../lib/editor-performance"
 import { createBracketsExtension } from "../lib/autocomplete-brackets"
 import {
 	deleteMarkerBackward,
@@ -173,15 +174,13 @@ type WikilinkDoc = {
 
 type DropTarget = { pos: number }
 type EditorCommand = (view: EditorView) => boolean
-let MAX_RICH_MARKDOWN_LENGTH = 128 * 1024
-
 function spellcheckForDocument(
 	enabled: boolean,
 	language: string | undefined,
 	length: number,
 ) {
 	return createSpellcheckExtension(
-		enabled && length < MAX_RICH_MARKDOWN_LENGTH,
+		enabled && usesRichMarkdown(length),
 		language,
 	)
 }
@@ -484,7 +483,7 @@ function MarkdownEditor(
 		externalExtensions,
 	})
 	useEffect(() => {
-		if (initRef.current.value.length < MAX_RICH_MARKDOWN_LENGTH) return
+		if (usesRichMarkdown(initRef.current.value.length)) return
 		toast.info(t("editor.largeDocumentMode.title"), {
 			description: t("editor.largeDocumentMode.description"),
 		})
@@ -514,7 +513,7 @@ function MarkdownEditor(
 		}
 
 		function richMarkdownForLength(length: number): Extension[] {
-			return length < MAX_RICH_MARKDOWN_LENGTH ? richMarkdownFeatures() : []
+			return usesRichMarkdown(length) ? richMarkdownFeatures() : []
 		}
 
 		let extensions: Extension[] = [
@@ -655,9 +654,8 @@ function MarkdownEditor(
 			),
 			EditorState.transactionExtender.of(transaction => {
 				if (!transaction.docChanged) return null
-				let wasRich =
-					transaction.startState.doc.length < MAX_RICH_MARKDOWN_LENGTH
-				let remainsRich = transaction.newDoc.length < MAX_RICH_MARKDOWN_LENGTH
+				let wasRich = usesRichMarkdown(transaction.startState.doc.length)
+				let remainsRich = usesRichMarkdown(transaction.newDoc.length)
 				if (wasRich === remainsRich) return null
 				return {
 					effects: [

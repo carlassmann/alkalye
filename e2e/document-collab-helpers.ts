@@ -1,4 +1,4 @@
-import { expect, type Page } from "@playwright/test"
+import { expect, type BrowserContext, type Page } from "@playwright/test"
 import { testIds } from "@/app/lib/test-ids"
 import { waitForEditorBoot } from "./auth-helpers"
 
@@ -7,6 +7,7 @@ export {
 	listDocumentInvites,
 	revokeDocumentInvite,
 	acceptDocumentInvite,
+	openAcceptedDocumentInvite,
 }
 
 interface DocArgs {
@@ -24,6 +25,14 @@ interface RevokeDocumentInviteArgs extends DocArgs {
 
 interface AcceptDocumentInviteArgs {
 	link: string
+}
+
+interface AcceptedDocumentInvite {
+	context: BrowserContext
+	page: Page
+	docId: string | null
+	inviteGroupId: string | null
+	url: string
 }
 
 async function createDocumentInvite(
@@ -107,6 +116,21 @@ async function acceptDocumentInvite(
 	page: Page,
 	args: AcceptDocumentInviteArgs,
 ) {
+	let accepted = await openAcceptedDocumentInvite(page, args)
+	await accepted.context.close()
+
+	return {
+		ok: true,
+		docId: accepted.docId,
+		inviteGroupId: accepted.inviteGroupId,
+		url: accepted.url,
+	}
+}
+
+async function openAcceptedDocumentInvite(
+	page: Page,
+	args: AcceptDocumentInviteArgs,
+): Promise<AcceptedDocumentInvite> {
 	let browser = page.context().browser()
 	if (!browser) throw new Error("Browser instance unavailable")
 
@@ -131,14 +155,12 @@ async function acceptDocumentInvite(
 		await expect.poll(() => invitePage.url()).toContain(`/app/doc/${docId}`)
 	}
 
-	let url = invitePage.url()
-	await context.close()
-
 	return {
-		ok: true,
+		context,
+		page: invitePage,
 		docId,
 		inviteGroupId,
-		url,
+		url: invitePage.url(),
 	}
 }
 

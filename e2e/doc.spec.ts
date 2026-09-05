@@ -66,10 +66,70 @@ test("document CRUD helpers return JSON", async ({ page }) => {
 	await editor.click()
 	await editor.press("ControlOrMeta+End")
 	await page.keyboard.insertText("\nautosave persisted")
+	await page.locator(`[data-doc-id="${existingId}"] a`).dispatchEvent("click")
+	await expect(page).toHaveURL(new RegExp(`/doc/${existingId}`))
+	await page.locator(`[data-doc-id="${created.id}"] a`).dispatchEvent("click")
+	await expect(editor).toContainText("autosave persisted")
 	await page.reload()
 
 	let autosaved = await readById(page, { id: created.id })
 	expect(autosaved.document.content).toContain("autosave persisted")
+
+	await editor.click()
+	await editor.press("ControlOrMeta+A")
+	let largeMarker = "large-document-durable-tail"
+	let durableSave = page.evaluate(
+		({ documentId, marker }) =>
+			new Promise<void>(resolve => {
+				function handleSaved(event: Event) {
+					if (!(event instanceof CustomEvent)) return
+					if (event.detail.documentId !== documentId) return
+					if (!event.detail.content.endsWith(marker)) return
+					window.removeEventListener("alkalye:document-saved", handleSaved)
+					resolve()
+				}
+				window.addEventListener("alkalye:document-saved", handleSaved)
+			}),
+		{ documentId: created.id, marker: largeMarker },
+	)
+	await page.keyboard.insertText(`${"x".repeat(128 * 1024)}${largeMarker}`)
+	await expect(editor).toHaveAttribute("spellcheck", "false")
+	await durableSave
+	await page.reload()
+	await waitForEditorBoot(page, { path: `/app/doc/${created.id}` })
+	editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
+	await editor.click()
+	await editor.press("ControlOrMeta+A")
+	await editor.press("ControlOrMeta+C")
+	let durableLargeContent = await page.evaluate(() =>
+		navigator.clipboard.readText(),
+	)
+	expect(durableLargeContent).toHaveLength(128 * 1024 + largeMarker.length)
+	expect(durableLargeContent).toContain(largeMarker)
+	await editor.press("ControlOrMeta+A")
+	let restoredSave = page.evaluate(
+		documentId =>
+			new Promise<void>(resolve => {
+				function handleSaved(event: Event) {
+					if (!(event instanceof CustomEvent)) return
+					if (event.detail.documentId !== documentId) return
+					window.removeEventListener("alkalye:document-saved", handleSaved)
+					resolve()
+				}
+				window.addEventListener("alkalye:document-saved", handleSaved)
+			}),
+		created.id,
+	)
+	await page.keyboard.insertText("# CRUD JSON Doc\n\ncreate body")
+	await expect(editor).toHaveAttribute("spellcheck", "true")
+	await restoredSave
+	await expect
+		.poll(() =>
+			page
+				.locator(`[data-doc-id="${created.id}"]`)
+				.getAttribute("data-doc-title"),
+		)
+		.toBe("CRUD JSON Doc")
 
 	let read = await readById(page, { id: created.id })
 	expect(read.ok).toBe(true)

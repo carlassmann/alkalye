@@ -142,7 +142,10 @@ import {
 	DOCUMENT_SAVE_DEBOUNCE_MS,
 	useBackgroundDocumentSave,
 } from "../hooks/use-background-document-save"
-import { persistDocumentContentSynchronously } from "../lib/background-document-save"
+import {
+	persistDocumentContentSynchronously,
+	waitForDocumentStorageSync,
+} from "../lib/background-document-save"
 import { useAfterFirstPaint } from "../hooks/use-after-first-paint"
 import { recordStartupTraceOnce } from "@/app/lib/reload-diagnostics"
 
@@ -268,10 +271,12 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 	>(null)
 	let pendingSave = useRef<{
 		timeoutId: ReturnType<typeof setTimeout>
+		baseContent: string
 		readContent: () => string
 		cursor: { from: number; to?: number } | null
 	} | null>(null)
-	let optimisticContent = useRef<string | null>(null)
+	let [optimisticContent, setOptimisticContent] = useState<string | null>(null)
+	let editorBaseContent = useRef(doc.content.toString())
 
 	useEffect(() => {
 		setAutomationReadyState(true, "personal-doc")
@@ -361,6 +366,9 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 	}
 
 	let content = doc.content.toString()
+	if (!pendingSave.current && optimisticContent === null) {
+		editorBaseContent.current = content
+	}
 	let editorContent = getEditorContent(content)
 	let { syncBacklinks } = useBacklinkSync(docId, readOnly, {
 		initialContent: content,
@@ -388,9 +396,11 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 		if (!pendingSave.current) return
 		clearTimeout(pendingSave.current.timeoutId)
 		let pendingContent = pendingSave.current.readContent()
+		let baseContent = pendingSave.current.baseContent
 		let cursor = pendingSave.current.cursor
 		pendingSave.current = null
-		persistContent(pendingContent, cursor)
+		editorBaseContent.current = pendingContent
+		persistContent(pendingContent, cursor, baseContent)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [content])
 
@@ -488,43 +498,37 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 	function persistContent(
 		pendingContent: string,
 		cursor: { from: number; to?: number } | null,
+		baseContent: string,
 	) {
 		let save = backgroundSave.current
 		if (!save) {
-			persistContentOnMain(pendingContent, cursor)
+			persistContentOnMain(pendingContent, cursor, baseContent)
 			return
 		}
-		optimisticContent.current = pendingContent
+		setOptimisticContent(pendingContent)
 		void save
-			.save(pendingContent)
-			.then(result => {
-				if (result === "superseded") {
-					let currentContent = editor.current?.getContent()
-					if (
-						currentContent !== undefined &&
-						currentContent !== doc.content.toString()
-					) {
-						persistContent(currentContent, cursor)
-					} else if (optimisticContent.current === pendingContent) {
-						optimisticContent.current = null
-					}
-					return
-				}
-				if (optimisticContent.current === pendingContent) {
-					optimisticContent.current = null
-				}
-				syncBacklinks(pendingContent)
+			.save(pendingContent, baseContent)
+			.then(appliedContent => {
+				setOptimisticContent(current =>
+					current === pendingContent ? null : current,
+				)
+				syncBacklinks(appliedContent)
 				if (cursor) updateCursor(cursor.from, cursor.to)
-				signalDocumentSaved(docId, pendingContent)
+				signalDocumentSaved(docId, appliedContent)
 			})
-			.catch(error => {
-				if (optimisticContent.current === pendingContent) {
-					optimisticContent.current = null
-				}
+			.catch(async error => {
+				setOptimisticContent(current =>
+					current === pendingContent ? null : current,
+				)
 				console.error("Background document save failed", error)
 				if (editor.current?.getContent() !== pendingContent) return
-				persistContentOnMain(pendingContent, cursor)
-				signalDocumentSaved(docId, pendingContent)
+				let appliedContent = persistContentOnMain(
+					pendingContent,
+					cursor,
+					baseContent,
+				)
+				await waitForDocumentStorageSync(liveDoc ?? doc)
+				signalDocumentSaved(docId, appliedContent)
 			})
 	}
 
@@ -532,32 +536,40 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 		if (pendingSave.current) {
 			return editor.current?.getContent() ?? persistedContent
 		}
-		return optimisticContent.current ?? persistedContent
+		return optimisticContent ?? persistedContent
 	}
 
 	function persistContentOnMain(
 		pendingContent: string,
 		cursor: { from: number; to?: number } | null,
+		baseContent: string,
 	) {
 		let currentDoc = liveDoc ?? doc
-		persistDocumentContentSynchronously(currentDoc, pendingContent)
-		syncBacklinks(pendingContent)
+		let appliedContent = persistDocumentContentSynchronously(
+			currentDoc,
+			pendingContent,
+			baseContent,
+		)
+		syncBacklinks(appliedContent)
 		if (cursor) updateCursor(cursor.from, cursor.to)
+		return appliedContent
 	}
 
 	function queueSave(readContent: () => string) {
-		if (pendingSave.current) {
-			clearTimeout(pendingSave.current.timeoutId)
-		}
+		let queuedSave = pendingSave.current
+		if (queuedSave) clearTimeout(queuedSave.timeoutId)
+		let baseContent = queuedSave?.baseContent ?? editorBaseContent.current
 		pendingSave.current = {
+			baseContent,
 			readContent,
-			cursor: null,
+			cursor: queuedSave?.cursor ?? null,
 			timeoutId: setTimeout(() => {
 				let pendingContent = pendingSave.current?.readContent()
 				let cursor = pendingSave.current?.cursor
 				pendingSave.current = null
 				if (pendingContent === undefined) return
-				persistContent(pendingContent, cursor ?? null)
+				editorBaseContent.current = pendingContent
+				persistContent(pendingContent, cursor ?? null, baseContent)
 			}, DOCUMENT_SAVE_DEBOUNCE_MS),
 		}
 	}
@@ -588,7 +600,7 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 		}
 
 		if (currentContent !== doc.content.toString()) {
-			persistContentOnMain(currentContent, null)
+			persistContentOnMain(currentContent, null, editorBaseContent.current)
 		}
 	}
 

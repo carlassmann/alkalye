@@ -3,6 +3,7 @@ import { createAccount, waitForEditorBoot } from "./auth-helpers"
 import {
 	create,
 	deleteById,
+	list,
 	startObservingDocumentNotFound,
 	didDocumentNotFoundRender,
 } from "./doc-helpers"
@@ -27,6 +28,12 @@ test("space CRUD + invite helpers return JSON", async ({ page }) => {
 	expect(created.ok).toBe(true)
 	let firstDocumentId = page.url().match(/\/doc\/([^/?#]+)/)?.[1]
 	if (!firstDocumentId) throw new Error("Expected the space's first document")
+	let newButton = page.getByTestId(testIds.doc.newButton)
+	let beforeHover = await list(page, { spaceId: created.id })
+	await newButton.dispatchEvent("mouseover")
+	await page.waitForTimeout(250)
+	let afterHover = await list(page, { spaceId: created.id })
+	expect(afterHover.count).toBe(beforeHover.count)
 
 	let secondDocument = await create(page, {
 		spaceId: created.id,
@@ -49,6 +56,18 @@ test("space CRUD + invite helpers return JSON", async ({ page }) => {
 		page.getByTestId(testIds.doc.editor).locator(".cm-content"),
 	).toContainText("Second space document")
 	expect(await didDocumentNotFoundRender(page)).toBe(false)
+
+	let editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
+	await editor.click()
+	await editor.press("ControlOrMeta+End")
+	await page.keyboard.insertText("\nspace autosave persisted")
+	await page
+		.locator(`[data-doc-id="${firstDocumentId}"] a`)
+		.dispatchEvent("click")
+	await page
+		.locator(`[data-doc-id="${secondDocument.id}"] a`)
+		.dispatchEvent("click")
+	await expect(editor).toContainText("space autosave persisted")
 
 	let listed = await listSpaces(page, { expectedSpaceId: created.id })
 	expect(listed.ok).toBe(true)

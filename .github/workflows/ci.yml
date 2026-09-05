@@ -23,3 +23,31 @@ jobs:
       - run: bun install --frozen-lockfile
 
       - run: bun run check
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - run: bunx playwright install --with-deps chromium
+
+      - name: Start app and sync server
+        run: |
+          bunx jazz-run sync --port 4200 --host 127.0.0.1 > /tmp/alkalye-sync.log 2>&1 &
+          PUBLIC_JAZZ_SYNC_SERVER=ws://127.0.0.1:4200 bun astro dev --port 4321 --host 127.0.0.1 > /tmp/alkalye-web.log 2>&1 &
+          for attempt in {1..60}; do
+            curl --fail --silent http://127.0.0.1:4321/app >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/alkalye-web.log
+          exit 1
+
+      - run: bunx playwright test --workers=2
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4321

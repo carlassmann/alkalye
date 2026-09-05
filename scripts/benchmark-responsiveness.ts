@@ -142,7 +142,6 @@ try {
 			)
 		}),
 	)
-	await page.waitForTimeout(500)
 	await verifyAutosave(page, second.id, "instant response!")
 	editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
 	await editor.click()
@@ -261,6 +260,7 @@ try {
 	}
 
 	console.log(JSON.stringify(result, null, 2))
+	if (args.assert) assertResponsivenessBudgets(measurements)
 } finally {
 	await context.close()
 	await browser.close()
@@ -396,6 +396,44 @@ function maximum(values: number[]) {
 	return values.length === 0 ? null : Math.max(...values)
 }
 
+function assertResponsivenessBudgets(measurements: Measurement[]) {
+	let inputDelayBudgets = new Map([["filter documents", 350]])
+	let actionBudgets = new Map([
+		["open command palette", 500],
+		["open find", 500],
+		["open document tools", 500],
+		["open sidebar", 500],
+		["filter documents", 1_250],
+		["open document", 2_500],
+		["switch space", 2_000],
+		["autosave", 2_000],
+	])
+	let failures: string[] = []
+
+	for (let measurement of measurements) {
+		let inputDelayBudget = inputDelayBudgets.get(measurement.name) ?? 100
+		if (
+			measurement.maximumInputDelayMs !== null &&
+			measurement.maximumInputDelayMs > inputDelayBudget
+		) {
+			failures.push(
+				`${measurement.name}: ${measurement.maximumInputDelayMs.toFixed(1)} ms input delay exceeds ${inputDelayBudget} ms`,
+			)
+		}
+
+		let actionBudget = actionBudgets.get(measurement.name)
+		if (actionBudget && measurement.actionDurationMs > actionBudget) {
+			failures.push(
+				`${measurement.name}: ${measurement.actionDurationMs.toFixed(1)} ms completion exceeds ${actionBudget} ms`,
+			)
+		}
+	}
+
+	if (failures.length > 0) {
+		throw new Error(`Responsiveness budgets failed:\n${failures.join("\n")}`)
+	}
+}
+
 function buildBody(kilobytes: number) {
 	let line = "Low-end responsiveness fixture with realistic markdown content.\n"
 	let targetLength = kilobytes * 1024
@@ -445,11 +483,13 @@ function parseArgs(rawArgs: string[]) {
 		cpu: 4,
 		kb: 128,
 		headed: false,
+		assert: false,
 	}
 
 	for (let index = 0; index < rawArgs.length; index++) {
 		let arg = rawArgs[index]
 		if (arg === "--headed") parsed.headed = true
+		else if (arg === "--assert") parsed.assert = true
 		else if (arg === "--url") parsed.url = requireValue(rawArgs, ++index, arg)
 		else if (arg === "--cpu") {
 			parsed.cpu = parsePositiveNumber(rawArgs, ++index, arg)

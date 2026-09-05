@@ -1,4 +1,5 @@
 import { calculateDocumentContentPatches } from "./document-diff"
+import { mergeDocumentContent } from "./merge-document-content"
 import type {
 	DocumentSaveWorkerRequest,
 	DocumentSaveWorkerResponse,
@@ -21,11 +22,14 @@ function diffContent(
 	request: Extract<DocumentSaveWorkerRequest, { type: "diff" }>,
 ) {
 	try {
-		let patches = calculateDocumentContentPatches(
-			request.oldEntries,
+		let oldContent = request.oldEntries.join("")
+		let content = mergeDocumentContent(
+			request.baseContent,
 			request.newContent,
+			oldContent,
 		)
-		post({ type: "diffed", requestId: request.requestId, patches })
+		let patches = calculateDocumentContentPatches(request.oldEntries, content)
+		post({ type: "diffed", requestId: request.requestId, content, patches })
 	} catch (error) {
 		post({
 			type: "failed",

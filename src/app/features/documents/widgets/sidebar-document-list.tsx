@@ -17,7 +17,7 @@ import { togglePinned } from "@/app/features/editor"
 import { formatRelativeDate } from "../lib/title"
 import { applyContentDiffLoadingCommentAnchors } from "@/app/features/comments"
 import { needsMetadataBackfill, syncDocumentMetadata } from "../lib/metadata"
-import { useMetadataBackfill } from "../hooks/use-metadata-backfill"
+import { useMetadataBackfillQueue } from "../hooks/use-metadata-backfill"
 import { getDaysUntilPermanentDelete } from "../lib/delete-covalue"
 import { permanentlyDeletePersonalDocument } from "../lib/documents"
 import { Input } from "@/app/components/ui/input"
@@ -150,7 +150,7 @@ function matchesTypeFilter(
 	if (typeFilter === "deleted") return Boolean(doc.deletedAt)
 	if (doc.deletedAt) return false
 	if (typeFilter === "all") return true
-	if (needsMetadataBackfill(doc)) return false
+	if (needsMetadataBackfill(doc)) return true
 	if (typeFilter === "presentation") return doc.isPresentation === true
 	if (typeFilter === "document") return doc.isPresentation !== true
 	return false
@@ -162,7 +162,7 @@ function matchesSearchTerms(
 ) {
 	let terms = parseSearchTerms(search).map(t => t.toLowerCase())
 	if (terms.length === 0) return true
-	if (needsMetadataBackfill(doc)) return false
+	if (needsMetadataBackfill(doc)) return true
 
 	let searchable = [doc.title ?? "Untitled", ...(doc.tags ?? [])]
 		.join(" ")
@@ -264,11 +264,7 @@ function SidebarDocumentList({
 }
 
 function MetadataBackfillTasks({ docs }: { docs: SidebarDoc[] }) {
-	return docs.map(doc => <MetadataBackfillTask key={doc.$jazz.id} doc={doc} />)
-}
-
-function MetadataBackfillTask({ doc }: { doc: SidebarDoc }) {
-	useMetadataBackfill(doc)
+	useMetadataBackfillQueue(docs)
 	return null
 }
 

@@ -24,6 +24,7 @@
 		"test:e2e:headed": "playwright test --headed",
 		"bench:launch": "bun scripts/benchmark-launch.ts",
 		"bench:responsiveness": "bun scripts/benchmark-responsiveness.ts",
+		"bench:responsiveness:assert": "bun scripts/benchmark-responsiveness.ts --cpu 4 --assert",
 		"bench:responsiveness:book": "bun scripts/benchmark-responsiveness.ts --kb 1024 --cpu 4",
 		"preview": "astro preview",
 		"format": "prettier --write .",
