@@ -89,7 +89,6 @@ export type {
 	DuplicateProgress,
 } from "./widgets/duplicate-doc-dialog"
 export { DocumentSidebar } from "./widgets/document-sidebar"
-export { DocumentFinderButton } from "./widgets/document-finder-button"
 export { ListSidebar } from "./widgets/list-sidebar"
 export { Preview } from "./widgets/preview"
 export { SidebarDocumentList } from "./widgets/sidebar-document-list"

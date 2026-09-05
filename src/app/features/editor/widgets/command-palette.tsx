@@ -22,12 +22,7 @@ import {
 import { useHasFinePointer } from "@/app/hooks/use-fine-pointer"
 import type { DocumentHeading } from "../lib/document-navigation"
 
-export {
-	CommandPalette,
-	DocumentSwitcherDialog,
-	OutlineDialog,
-	ShortcutsDialog,
-}
+export { CommandPalette, OutlineDialog, ShortcutsDialog }
 export type { CommandId }
 
 type CommandId =
@@ -40,7 +35,6 @@ type CommandId =
 	| "insertWikilink"
 	| "renumberLists"
 	| "keyboardShortcuts"
-	| "switchDocument"
 
 interface CommandOverlayProps {
 	open: boolean
@@ -160,11 +154,6 @@ let paletteCommands = [
 		label: "Keyboard shortcuts",
 		group: "Navigation" as const,
 	},
-	{
-		id: "switchDocument" as const,
-		label: "Switch document",
-		group: "Navigation" as const,
-	},
 ]
 
 function CommandPalette({ open, onOpenChange, onRun }: CommandOverlayProps) {
@@ -214,37 +203,6 @@ function OutlineDialog({
 				detail: `H${heading.level} · line ${heading.line}`,
 				indent: heading.level - 1,
 				value: heading,
-			}))}
-			onSelect={onSelect}
-		/>
-	)
-}
-
-interface DocumentSwitcherDialogProps {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	documents: { id: string; title: string; path?: string | null }[]
-	onSelect: (document: { id: string; title: string }) => void
-}
-
-function DocumentSwitcherDialog({
-	open,
-	onOpenChange,
-	documents,
-	onSelect,
-}: DocumentSwitcherDialogProps) {
-	return (
-		<QuickJumpDialog
-			open={open}
-			onOpenChange={onOpenChange}
-			title="Switch document"
-			searchLabel="Find a document"
-			emptyLabel="No matching documents"
-			items={documents.map(document => ({
-				id: document.id,
-				label: document.title,
-				detail: document.path || undefined,
-				value: { id: document.id, title: document.title },
 			}))}
 			onSelect={onSelect}
 		/>

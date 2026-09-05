@@ -46,7 +46,6 @@ import { EditorToolbar } from "@/app/features/editor"
 import { DocumentSidebar } from "../widgets/document-sidebar"
 import { ListSidebar } from "../widgets/list-sidebar"
 import { SidebarDocumentList } from "../widgets/sidebar-document-list"
-import { DocumentFinderButton } from "../widgets/document-finder-button"
 import { SpaceSelector } from "@/app/features/spaces"
 import { SidebarSyncStatus } from "@/app/components/sidebar-sync-status"
 
@@ -731,13 +730,6 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 			<ListSidebar
 				header={
 					<>
-						<DocumentFinderButton
-							onClick={() =>
-								setLeftOpenMobile(false, () =>
-									editor.current?.openDocumentSwitcher(),
-								)
-							}
-						/>
 						<SidebarImportExport
 							docs={allDocs.filter(d => !d.deletedAt)}
 							onImport={async files => {

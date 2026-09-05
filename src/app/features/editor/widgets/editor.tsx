@@ -148,7 +148,6 @@ import {
 import { combinedAutocompletion } from "@/app/lib/completion-sources"
 import {
 	CommandPalette,
-	DocumentSwitcherDialog,
 	OutlineDialog,
 	ShortcutsDialog,
 	type CommandId,
@@ -298,7 +297,6 @@ interface MarkdownEditorRef {
 	closeFind(): void
 	openCommandPalette(): void
 	openOutline(): void
-	openDocumentSwitcher(): void
 
 	showImagePreview(url: string, alt: string): void
 }
@@ -376,7 +374,6 @@ function MarkdownEditor(
 	let [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
 	let [shortcutsOpen, setShortcutsOpen] = useState(false)
 	let [outlineOpen, setOutlineOpen] = useState(false)
-	let [documentSwitcherOpen, setDocumentSwitcherOpen] = useState(false)
 
 	let callbacksRef = useRef({ onChange, onCursorChange, onFocus, onBlur })
 	findPanelOpenRef.current = findPanelOpen
@@ -1157,10 +1154,6 @@ function MarkdownEditor(
 		setOutlineOpen(true)
 	}
 
-	function openDocumentSwitcher() {
-		setDocumentSwitcherOpen(true)
-	}
-
 	function runShortcut(id: CommandId) {
 		if (id === "clearFormatting") return void runCommand(clearFormatting)
 		if (id === "promoteHeading") return void runCommand(promoteHeading)
@@ -1176,10 +1169,6 @@ function MarkdownEditor(
 		}
 		if (id === "documentOutline") {
 			setOutlineOpen(true)
-			return
-		}
-		if (id === "switchDocument") {
-			setDocumentSwitcherOpen(true)
 			return
 		}
 		if (!isShortcutId(id)) return
@@ -1347,7 +1336,6 @@ function MarkdownEditor(
 		closeFind,
 		openCommandPalette,
 		openOutline,
-		openDocumentSwitcher,
 		showImagePreview: handleImagePreview,
 	}))
 
@@ -1410,7 +1398,6 @@ function MarkdownEditor(
 			closeFind,
 			openCommandPalette,
 			openOutline,
-			openDocumentSwitcher,
 			showImagePreview: handleImagePreview,
 		}
 	})
@@ -1497,12 +1484,6 @@ function MarkdownEditor(
 					}}
 				/>
 			)}
-			<DocumentSwitcherDialog
-				open={documentSwitcherOpen}
-				onOpenChange={setDocumentSwitcherOpen}
-				documents={documents ?? []}
-				onSelect={document => onWikilinkClick?.(document.id, false)}
-			/>
 			{findPanelOpen && (
 				<FindPanel
 					view={view}

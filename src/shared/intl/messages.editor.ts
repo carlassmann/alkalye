@@ -21,7 +21,6 @@ let baseEditorMessages = messages({
 	"editor.toolbar.documents": "Documents",
 	"editor.navigation.commandPalette": "Command palette",
 	"editor.navigation.documentOutline": "Document outline",
-	"editor.navigation.findDocument": "Find document",
 
 	"editor.heading.h1": "H1",
 	"editor.heading.h2": "H2",
@@ -153,7 +152,6 @@ let deEditorMessages = translate(baseEditorMessages, {
 	"editor.toolbar.documents": "Dokumente",
 	"editor.navigation.commandPalette": "Befehlspalette",
 	"editor.navigation.documentOutline": "Dokumentgliederung",
-	"editor.navigation.findDocument": "Dokument finden",
 
 	"editor.heading.h1": "H1",
 	"editor.heading.h2": "H2",
