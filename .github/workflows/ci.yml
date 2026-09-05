@@ -48,6 +48,6 @@ jobs:
           cat /tmp/alkalye-web.log
           exit 1
 
-      - run: bunx playwright test --workers=2
+      - run: bunx playwright test --workers=1
         env:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4321
