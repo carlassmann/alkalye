@@ -240,6 +240,7 @@ function SidebarDocumentList({
 			<SidebarGroup
 				className="flex-1"
 				data-testid={testIds.sidebar.documentList}
+				aria-busy={isLoading}
 			>
 				<SidebarGroupContent className="flex min-h-0 flex-1 flex-col">
 					<DocumentListContent

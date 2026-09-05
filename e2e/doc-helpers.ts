@@ -131,6 +131,10 @@ async function updateById(page: Page, args: UpdateByIdArgs) {
 async function list(page: Page, args: ListArgs = {}) {
 	let appPath = args.spaceId ? `/app/spaces/${args.spaceId}` : "/app"
 	await waitForEditorBoot(page, { path: appPath })
+	await expect(page.getByTestId(testIds.sidebar.documentList)).toHaveAttribute(
+		"aria-busy",
+		"false",
+	)
 
 	let search = args.search ?? ""
 	await page.getByTestId(testIds.doc.searchInput).fill(search)
