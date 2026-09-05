@@ -12,7 +12,7 @@ import { toggleFocusMode } from "@/app/lib/focus-mode"
 import { Document, Space, UserAccount, createSpaceDocument } from "@/schema"
 import { handleSaveCopy } from "../lib/save-copy"
 import { resolve, settingsResolve } from "../lib/queries"
-import type { LoaderDocument } from "../lib/queries"
+import type { LoadedDocument, LoaderDocument } from "../lib/queries"
 import { setupKeyboardShortcuts } from "@/app/features/editor"
 import {
 	makeUploadImage,
@@ -83,7 +83,6 @@ import {
 	areCommentsEnabled,
 	commentsExtension,
 	createCommentThread,
-	applyContentDiffWithCommentAnchors,
 	copyCommentsAndApplyContent,
 	getCommentRange,
 	getUnresolvedCommentCount,
@@ -131,8 +130,17 @@ import { loadThemesForPdf } from "@/app/features/themes"
 import { testIds } from "@/app/lib/test-ids"
 import { useIntl } from "@/shared/intl/setup"
 import { makeFolderDocumentContent } from "../lib/folders"
-import { syncDocumentMetadata } from "../lib/metadata"
+import { needsMetadataBackfill, syncDocumentMetadata } from "../lib/metadata"
 import { useDocumentCompaction } from "../hooks/use-document-compaction"
+import {
+	DOCUMENT_SAVE_DEBOUNCE_MS,
+	useBackgroundDocumentSave,
+} from "../hooks/use-background-document-save"
+import {
+	persistDocumentContentSynchronously,
+	waitForDocumentStorageSync,
+} from "../lib/background-document-save"
+import { useAfterFirstPaint } from "../hooks/use-after-first-paint"
 
 export { SpaceDocScreen, spaceResolve, spaceLoaderResolve, spaceMeResolve }
 export { settingsResolve }
@@ -164,12 +172,12 @@ interface SpaceDocScreenProps {
 
 function SpaceDocScreen({ spaceId, id, loaderData }: SpaceDocScreenProps) {
 	let navigate = useNavigate()
-
+	let deferredId = useAfterFirstPaint(id)
 	let space = useCoState(Space, spaceId, { resolve: spaceResolve })
-	let doc = useCoState(Document, id, { resolve })
+	let subscribedDoc = useCoState(Document, deferredId, { resolve })
 
 	let isSpaceDeleted = space.$jazz.loadingState === "deleted"
-	let isDocDeleted = doc.$jazz.loadingState === "deleted"
+	let isDocDeleted = subscribedDoc?.$jazz.loadingState === "deleted"
 
 	// Navigate away when space is deleted
 	useEffect(() => {
@@ -207,8 +215,13 @@ function SpaceDocScreen({ spaceId, id, loaderData }: SpaceDocScreenProps) {
 	}
 
 	// Handle live access revocation or deletion for doc
-	if (!doc.$isLoaded && doc.$jazz.loadingState !== "loading") {
-		if (doc.$jazz.loadingState === "unauthorized")
+	if (
+		deferredId &&
+		subscribedDoc &&
+		!subscribedDoc.$isLoaded &&
+		subscribedDoc.$jazz.loadingState !== "loading"
+	) {
+		if (subscribedDoc.$jazz.loadingState === "unauthorized")
 			return <DocumentUnauthorized />
 		if (isDocDeleted) return null
 		return <DocumentNotFound />
@@ -216,13 +229,16 @@ function SpaceDocScreen({ spaceId, id, loaderData }: SpaceDocScreenProps) {
 
 	// Use loader data as fallback while subscription is loading
 	let loadedSpace = space.$isLoaded ? space : loaderData.space
-	let loadedDoc = doc.$isLoaded ? doc : loaderData.doc
+	let liveDoc = subscribedDoc?.$isLoaded ? subscribedDoc : null
+	let loadedDoc = liveDoc ?? loaderData.doc
 
 	return (
 		<SidebarProvider>
 			<SpaceEditorContent
+				key={id}
 				space={loadedSpace}
 				doc={loadedDoc}
+				liveDoc={liveDoc}
 				spaceId={spaceId}
 				docId={id}
 				loaderMe={loaderData.me}
@@ -234,12 +250,14 @@ function SpaceDocScreen({ spaceId, id, loaderData }: SpaceDocScreenProps) {
 function SpaceEditorContent({
 	space,
 	doc,
+	liveDoc,
 	spaceId,
 	docId,
 	loaderMe,
 }: {
 	space: LoadedSpace
 	doc: LoaderDocument
+	liveDoc: LoadedDocument | null
 	spaceId: string
 	docId: string
 	loaderMe: LoadedSettingsMe | null
@@ -257,9 +275,12 @@ function SpaceEditorContent({
 	>(null)
 	let pendingSave = useRef<{
 		timeoutId: ReturnType<typeof setTimeout>
-		content: string
+		baseContent: string
+		readContent: () => string
 		cursor: { from: number; to?: number } | null
 	} | null>(null)
+	let [optimisticContent, setOptimisticContent] = useState<string | null>(null)
+	let editorBaseContent = useRef(doc.content?.toString() ?? "")
 
 	useEffect(() => {
 		setAutomationReadyState(true, "space-doc")
@@ -267,22 +288,21 @@ function SpaceEditorContent({
 	}, [])
 
 	useEffect(() => {
-		recordStartupTraceOnce("editor-ready", {
+		recordStartupTraceOnce("editor-ready", () => ({
 			route: "space-document",
 			contentCharacters: doc.content?.toString().length ?? 0,
-			documentTransactions:
-				doc.$jazz.raw.core.getValidSortedTransactions().length,
+			documentTransactions: doc.$jazz.raw.core.verifiedTransactions.length,
 			contentTransactions: doc.content?.$isLoaded
-				? doc.content.$jazz.raw.core.getValidSortedTransactions().length
+				? doc.content.$jazz.raw.core.verifiedTransactions.length
 				: null,
 			archivedGenerations: doc.archivedContent?.$isLoaded
 				? doc.archivedContent.length
 				: null,
-			assetCount: doc.assets?.length ?? 0,
-			commentCount: doc.comments?.length ?? 0,
+			assetCount: liveDoc?.assets?.length ?? null,
+			commentCount: liveDoc?.comments?.length ?? null,
 			spaceDocumentCount: space.documents?.length ?? 0,
-		})
-	}, [doc, space.documents])
+		}))
+	}, [doc, liveDoc, space.documents])
 
 	let { theme, setTheme } = useTheme()
 	let resolvedTheme = useResolvedTheme()
@@ -326,11 +346,11 @@ function SpaceEditorContent({
 	}, [])
 
 	let { updateCursor, extension: presenceExtension } = usePresence({
-		doc,
+		doc: liveDoc,
 		editorRef: editor,
 	})
-	useDocumentCompaction(doc, !readOnly)
-	let assets = getLoadedAssets(doc.assets).map(a =>
+	useDocumentCompaction(liveDoc, !readOnly)
+	let assets = getLoadedAssets(liveDoc?.assets).map(a =>
 		toEditorAsset(a, resolvedTheme),
 	)
 	let assetsRef = useRef(assets)
@@ -356,6 +376,10 @@ function SpaceEditorContent({
 	}
 
 	let content = doc.content?.toString() ?? ""
+	if (!pendingSave.current && optimisticContent === null) {
+		editorBaseContent.current = content
+	}
+	let editorContent = getEditorContent(content)
 	let { syncBacklinks } = useBacklinkSync(docId, readOnly, {
 		spaceId,
 		initialContent: content,
@@ -365,9 +389,9 @@ function SpaceEditorContent({
 	useHealSpaceDocIds(space, spaceId)
 
 	let docTitle = getDocumentTitle(content)
-	let commentsEnabled = areCommentsEnabled(doc)
-	let commentThreads = getVisibleCommentThreads(doc)
-	let unresolvedCommentCount = getUnresolvedCommentCount(doc)
+	let commentsEnabled = liveDoc ? areCommentsEnabled(liveDoc) : false
+	let commentThreads = liveDoc ? getVisibleCommentThreads(liveDoc) : []
+	let unresolvedCommentCount = liveDoc ? getUnresolvedCommentCount(liveDoc) : 0
 	let commentAuthorName = me.$isLoaded ? me.profile?.name : undefined
 	let resolveWikilink = useWikilinkResolver(content, documents)
 	let handleWikilinkClick = (id: string, newTab: boolean) => {
@@ -383,38 +407,34 @@ function SpaceEditorContent({
 	useEffect(() => {
 		if (!pendingSave.current || !doc.content) return
 		clearTimeout(pendingSave.current.timeoutId)
-		let pendingContent = pendingSave.current.content
+		let pendingContent = pendingSave.current.readContent()
+		let baseContent = pendingSave.current.baseContent
 		let cursor = pendingSave.current.cursor
 		pendingSave.current = null
-		applyContentDiffWithCommentAnchors(doc, pendingContent)
-		syncDocumentMetadata(doc)
-		if (cursor) {
-			updateCursor(cursor.from, cursor.to)
-		}
+		editorBaseContent.current = pendingContent
+		persistContent(pendingContent, cursor, baseContent)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [content, doc])
+	}, [content])
 
 	useEffect(() => {
-		if (!canEdit(doc)) return
+		if (!canEdit(doc) || !needsMetadataBackfill(doc)) return
 		syncDocumentMetadata(doc, { contentChanged: false })
 	}, [doc])
 
-	let docWithContent = useCoState(Document, docId, {
-		resolve: { content: true },
-	})
-
-	let sidebarAssets: SidebarAsset[] = getLoadedAssets(doc.assets).map(a =>
+	let sidebarAssets: SidebarAsset[] = getLoadedAssets(liveDoc?.assets).map(a =>
 		toSidebarAsset(a),
 	)
 	let tldrawEditor = useTldrawEditor({
 		assets: sidebarAssets,
 		readOnly,
 		createAsset: async (name, save) => {
-			let asset = await createTldrawAsset(doc, name, save)
+			if (!liveDoc) throw new Error("Document features are still loading")
+			let asset = await createTldrawAsset(liveDoc, name, save)
 			return { id: asset.$jazz.id, name: asset.name }
 		},
 		updateAsset: async (assetId, save) => {
-			await updateTldrawAsset(doc, assetId, save)
+			if (!liveDoc) throw new Error("Document features are still loading")
+			await updateTldrawAsset(liveDoc, assetId, save)
 		},
 	})
 
@@ -447,7 +467,7 @@ function SpaceEditorContent({
 			onPrintPdf: async () => {
 				if (!me.$isLoaded) return
 				let { themes, defaultPreviewTheme } = await loadThemesForPdf(me)
-				let assets = getLoadedAssets(doc.assets).map(toPrintableAsset)
+				let assets = getLoadedAssets(liveDoc?.assets).map(toPrintableAsset)
 				void printToPdf({ content, themes, defaultPreviewTheme, assets })
 			},
 			onPreview: () => {
@@ -458,9 +478,8 @@ function SpaceEditorContent({
 				})
 			},
 			onDownload: () => {
-				if (!docWithContent?.$isLoaded) return
-				let title = getDocumentTitle(docWithContent)
-				saveDocumentAs(docWithContent.content?.toString() ?? "", title)
+				let title = getDocumentTitle(doc)
+				saveDocumentAs(content, title)
 			},
 			labels: {
 				autosaveTitle: t("editor.autosave.title"),
@@ -474,9 +493,9 @@ function SpaceEditorContent({
 		toggleLeft,
 		toggleRight,
 		content,
-		doc.assets,
+		doc,
+		liveDoc,
 		me,
-		docWithContent,
 		editor,
 		t,
 	])
@@ -484,24 +503,91 @@ function SpaceEditorContent({
 	let allDocs = getSpaceDocs(space)
 	let spaceDocs = space.documents?.$isLoaded ? space.documents : null
 
-	function handleChange(newContent: string) {
-		if (pendingSave.current) {
-			clearTimeout(pendingSave.current.timeoutId)
+	function persistContent(
+		pendingContent: string,
+		cursor: { from: number; to?: number } | null,
+		baseContent: string,
+	) {
+		let save = backgroundSave.current
+		if (!save) {
+			persistContentOnMain(pendingContent, cursor, baseContent)
+			return
 		}
+		setOptimisticContent(pendingContent)
+		void save
+			.save(pendingContent, baseContent)
+			.then(appliedContent => {
+				setOptimisticContent(current =>
+					current === pendingContent ? null : current,
+				)
+				syncBacklinks(appliedContent)
+				if (cursor) updateCursor(cursor.from, cursor.to)
+				signalDocumentSaved(docId, appliedContent)
+			})
+			.catch(async error => {
+				setOptimisticContent(current =>
+					current === pendingContent ? null : current,
+				)
+				console.error("Background document save failed", error)
+				if (editor.current?.getContent() !== pendingContent) return
+				let appliedContent = persistContentOnMain(
+					pendingContent,
+					cursor,
+					baseContent,
+				)
+				await waitForDocumentStorageSync(liveDoc ?? doc)
+				signalDocumentSaved(docId, appliedContent)
+			})
+	}
+
+	function getEditorContent(persistedContent: string) {
+		if (pendingSave.current) {
+			return editor.current?.getContent() ?? persistedContent
+		}
+		return optimisticContent ?? persistedContent
+	}
+
+	function persistContentOnMain(
+		pendingContent: string,
+		cursor: { from: number; to?: number } | null,
+		baseContent: string,
+	) {
+		let currentDoc = liveDoc ?? doc
+		let appliedContent = persistDocumentContentSynchronously(
+			currentDoc,
+			pendingContent,
+			baseContent,
+		)
+		syncBacklinks(appliedContent)
+		if (cursor) updateCursor(cursor.from, cursor.to)
+		return appliedContent
+	}
+
+	function queueSave(readContent: () => string) {
+		let queuedSave = pendingSave.current
+		if (queuedSave) clearTimeout(queuedSave.timeoutId)
+		let baseContent = queuedSave?.baseContent ?? editorBaseContent.current
 		pendingSave.current = {
-			content: newContent,
-			cursor: null,
+			baseContent,
+			readContent,
+			cursor: queuedSave?.cursor ?? null,
 			timeoutId: setTimeout(() => {
+				let pendingContent = pendingSave.current?.readContent()
 				let cursor = pendingSave.current?.cursor
 				pendingSave.current = null
-				applyContentDiffWithCommentAnchors(doc, newContent)
-				syncDocumentMetadata(doc)
-				if (cursor) {
-					updateCursor(cursor.from, cursor.to)
-				}
-			}, 250),
+				if (pendingContent === undefined) return
+				editorBaseContent.current = pendingContent
+				persistContent(pendingContent, cursor ?? null, baseContent)
+			}, DOCUMENT_SAVE_DEBOUNCE_MS),
 		}
-		syncBacklinks(newContent)
+	}
+
+	function handleEditorChange(readContent: () => string) {
+		queueSave(readContent)
+	}
+
+	function handleContentChange(newContent: string) {
+		queueSave(() => newContent)
 	}
 
 	function handleCursorChange(from: number, to?: number) {
@@ -522,10 +608,28 @@ function SpaceEditorContent({
 		}
 
 		if (currentContent !== doc.content.toString()) {
-			applyContentDiffWithCommentAnchors(doc, currentContent)
-			syncDocumentMetadata(doc)
+			persistContentOnMain(currentContent, null, editorBaseContent.current)
 		}
 	}
+
+	let backgroundSave = useBackgroundDocumentSave(liveDoc ?? doc)
+	let flushPendingContentRef = useRef(flushPendingContent)
+	flushPendingContentRef.current = flushPendingContent
+
+	useEffect(() => {
+		function flushBeforePageCloses() {
+			flushPendingContentRef.current()
+		}
+		function flushWhenHidden() {
+			if (document.visibilityState === "hidden") flushBeforePageCloses()
+		}
+		window.addEventListener("pagehide", flushBeforePageCloses)
+		document.addEventListener("visibilitychange", flushWhenHidden)
+		return () => {
+			window.removeEventListener("pagehide", flushBeforePageCloses)
+			document.removeEventListener("visibilitychange", flushWhenHidden)
+		}
+	}, [])
 
 	function handleSelectComment(threadId: string) {
 		if (selectedCommentThreadId === threadId) {
@@ -541,21 +645,27 @@ function SpaceEditorContent({
 		let view = editor.current?.getEditor()
 		let thread = commentThreads.find(thread => thread.$jazz.id === threadId)
 		if (!view || !thread) return
-		scrollEditorCommentIntoView(view, getCommentRange(doc, thread.anchor))
+		if (!liveDoc) return
+		scrollEditorCommentIntoView(view, getCommentRange(liveDoc, thread.anchor))
 	}
 
 	function handleCreateCommentFromSelection(
 		selection: { from: number; to: number },
 		body: string,
 	) {
-		if (!commentsEnabled) return false
+		if (!commentsEnabled || !liveDoc) return false
 		flushPendingContent()
 		if (selection.from === selection.to) {
 			toast.info(t("comments.selectionRequired"))
 			return false
 		}
 
-		let thread = createCommentThread(doc, selection, body, commentAuthorName)
+		let thread = createCommentThread(
+			liveDoc,
+			selection,
+			body,
+			commentAuthorName,
+		)
 		if (!thread) return false
 		setSelectedCommentThreadId(thread.$jazz.id)
 		openCommentsTab()
@@ -573,7 +683,8 @@ function SpaceEditorContent({
 	}
 
 	function handleSetCommentsEnabled(enabled: boolean) {
-		setCommentsEnabled(doc, enabled)
+		if (!liveDoc) return
+		setCommentsEnabled(liveDoc, enabled)
 		if (!enabled) {
 			setRightTab("tools")
 			setSelectedCommentThreadId(null)
@@ -599,10 +710,9 @@ function SpaceEditorContent({
 	useEffect(() => {
 		let view = editor.current?.getEditor()
 		if (!view) return
-		view.dispatch({
-			effects: setCommentDecorationsEffect.of(
-				commentThreads.map(thread => {
-					let range = getCommentRange(doc, thread.anchor)
+		let decorations = liveDoc
+			? getVisibleCommentThreads(liveDoc).map(thread => {
+					let range = getCommentRange(liveDoc, thread.anchor)
 					return {
 						id: thread.$jazz.id,
 						from: range.from,
@@ -611,10 +721,12 @@ function SpaceEditorContent({
 						selected: thread.$jazz.id === selectedCommentThreadId,
 						orphaned: range.orphaned,
 					}
-				}),
-			),
+				})
+			: []
+		view.dispatch({
+			effects: setCommentDecorationsEffect.of(decorations),
 		})
-	}, [doc, editor, content, commentThreads, selectedCommentThreadId])
+	}, [liveDoc, editor, content, selectedCommentThreadId])
 
 	return (
 		<>
@@ -701,12 +813,12 @@ function SpaceEditorContent({
 					spaceGroupId={space.$jazz.owner.$jazz.id}
 				/>
 			</ListSidebar>
-			<div className="markdown-editor flex-1">
+			<div className="markdown-editor flex-1" data-testid={testIds.doc.editor}>
 				<MarkdownEditor
 					key={docId}
 					ref={editor}
-					value={content}
-					onChange={handleChange}
+					value={editorContent}
+					onChange={handleEditorChange}
 					onCursorChange={handleCursorChange}
 					placeholder={t("doc.startWriting")}
 					readOnly={readOnly}
@@ -715,8 +827,10 @@ function SpaceEditorContent({
 					resolveWikilink={resolveWikilink}
 					onWikilinkClick={handleWikilinkClick}
 					onCreateDocument={makeCreateDocument(space)}
-					onUploadImage={makeUploadImage(doc)}
-					onUploadVideo={canUploadVideo ? makeUploadVideo(doc) : undefined}
+					onUploadImage={liveDoc ? makeUploadImage(liveDoc) : undefined}
+					onUploadVideo={
+						canUploadVideo && liveDoc ? makeUploadVideo(liveDoc) : undefined
+					}
 					onImportTldraw={readOnly ? undefined : tldrawEditor.importFile}
 					onCreateTldraw={readOnly ? undefined : tldrawEditor.create}
 					onEditTldraw={readOnly ? undefined : tldrawEditor.edit}
@@ -761,7 +875,7 @@ function SpaceEditorContent({
 					}
 					saveCopyState={saveCopyState}
 					content={content}
-					onThemeChange={handleChange}
+					onThemeChange={handleContentChange}
 				/>
 				<EditorStatsBadge content={content} settings={editorSettings} />
 			</div>
@@ -805,9 +919,9 @@ function SpaceEditorContent({
 					/>
 				}
 			>
-				{commentsEnabled && rightTab === "comments" ? (
+				{liveDoc && commentsEnabled && rightTab === "comments" ? (
 					<SidebarComments
-						doc={doc}
+						doc={liveDoc}
 						selectedThreadId={selectedCommentThreadId}
 						onSelectThread={handleSelectComment}
 						readOnly={readOnly}
@@ -844,12 +958,14 @@ function SpaceEditorContent({
 										</SidebarMenuItem>
 									)}
 									<SidebarSeparator />
-									<SidebarFileMenu
-										doc={doc}
-										editor={editor}
-										me={me.$isLoaded ? me : undefined}
-										spaceId={spaceId}
-									/>
+									{liveDoc && (
+										<SidebarFileMenu
+											doc={liveDoc}
+											editor={editor}
+											me={me.$isLoaded ? me : undefined}
+											spaceId={spaceId}
+										/>
+									)}
 									<SidebarEditMenu
 										editor={editor}
 										disabled={!canEdit(doc)}
@@ -881,25 +997,31 @@ function SpaceEditorContent({
 							<SidebarAssets
 								assets={sidebarAssets}
 								readOnly={readOnly}
-								onUploadImages={makeUploadAssets(doc)}
-								onUploadVideo={async (file, opts) => {
-									await makeUploadVideo(doc)(file, opts)
-								}}
-								onRename={makeRenameAsset(doc)}
-								onDelete={makeDeleteAsset(doc, docWithContent)}
-								onDownload={makeDownloadAsset(doc)}
+								onUploadImages={liveDoc ? makeUploadAssets(liveDoc) : undefined}
+								onUploadVideo={
+									liveDoc
+										? async (file, options) => {
+												await makeUploadVideo(liveDoc)(file, options)
+											}
+										: undefined
+								}
+								onRename={liveDoc ? makeRenameAsset(liveDoc) : undefined}
+								onDelete={
+									liveDoc ? makeDeleteAsset(liveDoc, liveDoc) : undefined
+								}
+								onDownload={liveDoc ? makeDownloadAsset(liveDoc) : undefined}
 								onInsert={(assetId, name) => {
 									editor.current?.insertBlock(`![${name}](asset:${assetId})`)
 								}}
 								onToggleMute={assetId => {
-									let asset = getLoadedAssets(doc.assets).find(
+									let asset = getLoadedAssets(liveDoc?.assets).find(
 										a => a.$jazz.id === assetId,
 									)
 									if (asset?.$isLoaded && asset.type === "video") {
 										asset.$jazz.applyDiff({ muteAudio: !asset.muteAudio })
 									}
 								}}
-								isAssetUsed={makeIsAssetUsed(docWithContent)}
+								isAssetUsed={liveDoc ? makeIsAssetUsed(liveDoc) : undefined}
 								canUploadVideo={canUploadVideo}
 								onImportTldraw={tldrawEditor.importFile}
 								onCreateTldraw={tldrawEditor.create}
@@ -1058,4 +1180,12 @@ function setAutomationReadyState(ready: boolean, route: string) {
 	window.__alkalyeReadyRoute = route
 	if (ready) window.__alkalyeReadyAt = Date.now()
 	document.body.dataset.alkalyeReady = ready ? "true" : "false"
+}
+
+function signalDocumentSaved(documentId: string, content: string) {
+	window.dispatchEvent(
+		new CustomEvent("alkalye:document-saved", {
+			detail: { documentId, content },
+		}),
+	)
 }

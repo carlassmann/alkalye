@@ -98,6 +98,7 @@ async function createAccount(page: Page, args: CreateAccountArgs = {}) {
 		throw new Error(await createError.innerText())
 	}
 
+	await waitForAuthNavigation(page)
 	await openSettings(page)
 	await expect(page.getByTestId(testIds.auth.settingsSignOut)).toBeVisible({
 		timeout: 30_000,
@@ -149,6 +150,7 @@ async function signIn(page: Page, args: SignInArgs) {
 		throw new Error(await loginError.innerText())
 	}
 
+	await waitForAuthNavigation(page)
 	await openSettings(page)
 	await expect(page.getByTestId(testIds.auth.settingsSignOut)).toBeVisible({
 		timeout: 30_000,
@@ -158,6 +160,14 @@ async function signIn(page: Page, args: SignInArgs) {
 		ok: true,
 		signedIn: true,
 	}
+}
+
+async function waitForAuthNavigation(page: Page) {
+	await page.waitForURL(
+		url => url.pathname.startsWith("/app") && url.pathname !== "/app/settings",
+		{ timeout: 30_000 },
+	)
+	await waitForEditorBoot(page)
 }
 
 async function getRecoveryPhrase(page: Page) {

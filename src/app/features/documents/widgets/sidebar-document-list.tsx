@@ -17,7 +17,7 @@ import { togglePinned } from "@/app/features/editor"
 import { formatRelativeDate } from "../lib/title"
 import { applyContentDiffLoadingCommentAnchors } from "@/app/features/comments"
 import { needsMetadataBackfill, syncDocumentMetadata } from "../lib/metadata"
-import { useMetadataBackfill } from "../hooks/use-metadata-backfill"
+import { useMetadataBackfillQueue } from "../hooks/use-metadata-backfill"
 import { getDaysUntilPermanentDelete } from "../lib/delete-covalue"
 import { permanentlyDeletePersonalDocument } from "../lib/documents"
 import { Input } from "@/app/components/ui/input"
@@ -149,10 +149,11 @@ function matchesTypeFilter(
 ) {
 	if (typeFilter === "deleted") return Boolean(doc.deletedAt)
 	if (doc.deletedAt) return false
+	if (typeFilter === "all") return true
 	if (needsMetadataBackfill(doc)) return true
 	if (typeFilter === "presentation") return doc.isPresentation === true
 	if (typeFilter === "document") return doc.isPresentation !== true
-	return true
+	return false
 }
 
 function matchesSearchTerms(
@@ -224,6 +225,7 @@ function SidebarDocumentList({
 
 	return (
 		<>
+			<MetadataBackfillTasks docs={docs} />
 			<SearchFilterBar
 				search={search}
 				onSearchChange={setSearch}
@@ -238,6 +240,7 @@ function SidebarDocumentList({
 			<SidebarGroup
 				className="flex-1"
 				data-testid={testIds.sidebar.documentList}
+				aria-busy={isLoading}
 			>
 				<SidebarGroupContent className="flex min-h-0 flex-1 flex-col">
 					<DocumentListContent
@@ -259,6 +262,11 @@ function SidebarDocumentList({
 			</SidebarGroup>
 		</>
 	)
+}
+
+function MetadataBackfillTasks({ docs }: { docs: SidebarDoc[] }) {
+	useMetadataBackfillQueue(docs)
+	return null
 }
 
 function SearchFilterBar({
@@ -888,7 +896,6 @@ function DocumentItem({
 	spaceGroupId?: string
 	t: ReturnType<typeof useIntl>
 }) {
-	let me = useAccount(UserAccount, { resolve: { root: { documents: true } } })
 	let [shareOpen, setShareOpen] = useState(false)
 	let [deleteOpen, setDeleteOpen] = useState(false)
 	let [leaveOpen, setLeaveOpen] = useState(false)
@@ -913,8 +920,6 @@ function DocumentItem({
 	let docGroup = getDocumentGroup(doc)
 	let isAdmin = docGroup?.myRole() === "admin"
 	let docId = doc.$jazz.id
-
-	useMetadataBackfill(doc)
 
 	// Build link props based on whether we're in a space context
 	// Pass search query to open find panel when document loads
@@ -1092,12 +1097,14 @@ function DocumentItem({
 			{shareOpen && (
 				<ShareDialog doc={doc} open={shareOpen} onOpenChange={setShareOpen} />
 			)}
-			<MoveToFolderDialog
-				doc={doc}
-				existingFolders={existingFolders}
-				open={moveOpen}
-				onOpenChange={setMoveOpen}
-			/>
+			{moveOpen && (
+				<MoveToFolderDialog
+					doc={doc}
+					existingFolders={existingFolders}
+					open={moveOpen}
+					onOpenChange={setMoveOpen}
+				/>
+			)}
 			{moveSpaceOpen && (
 				<MoveToSpaceDialog
 					doc={doc}
@@ -1116,18 +1123,42 @@ function DocumentItem({
 				onConfirm={() => onDelete(doc)}
 				confirmTestId={testIds.dialog.deleteConfirm}
 			/>
-			<ConfirmDialog
-				open={leaveOpen}
-				onOpenChange={setLeaveOpen}
-				title={t("doc.leaveDialog.title")}
-				description={t("doc.leaveDialog.description")}
-				confirmLabel={t("doc.leaveDialog.confirm")}
-				variant="destructive"
-				onConfirm={makeLeaveDocument(doc, me)}
-			>
-				{leaveOpen && <LeaveDocumentPreview doc={doc} />}
-			</ConfirmDialog>
+			{leaveOpen && (
+				<LeaveDocumentDialog
+					doc={doc}
+					open={leaveOpen}
+					onOpenChange={setLeaveOpen}
+					t={t}
+				/>
+			)}
 		</SidebarMenuItem>
+	)
+}
+
+function LeaveDocumentDialog({
+	doc,
+	open,
+	onOpenChange,
+	t,
+}: {
+	doc: SidebarDoc
+	open: boolean
+	onOpenChange: (open: boolean) => void
+	t: ReturnType<typeof useIntl>
+}) {
+	let me = useAccount(UserAccount, { resolve: { root: { documents: true } } })
+	return (
+		<ConfirmDialog
+			open={open}
+			onOpenChange={onOpenChange}
+			title={t("doc.leaveDialog.title")}
+			description={t("doc.leaveDialog.description")}
+			confirmLabel={t("doc.leaveDialog.confirm")}
+			variant="destructive"
+			onConfirm={makeLeaveDocument(doc, me)}
+		>
+			<LeaveDocumentPreview doc={doc} />
+		</ConfirmDialog>
 	)
 }
 
@@ -1160,8 +1191,6 @@ function DeletedDocumentItem({
 
 	let title = doc.title ?? "Untitled"
 	let daysLeft = doc.deletedAt ? getDaysUntilPermanentDelete(doc.deletedAt) : 0
-
-	useMetadataBackfill(doc)
 
 	async function handlePermanentDelete() {
 		if (me.$isLoaded) {

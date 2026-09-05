@@ -68,10 +68,10 @@ function recordStartupTrace(
 
 function recordStartupTraceOnce(
 	event: string,
-	details: StartupTraceDetails = {},
+	details: StartupTraceDetails | (() => StartupTraceDetails) = {},
 ): void {
-	let exists = hasCurrentRunEvent(event)
-	if (!exists) recordStartupTrace(event, details)
+	if (hasCurrentRunEvent(event)) return
+	recordStartupTrace(event, typeof details === "function" ? details() : details)
 }
 
 async function collectStorageDiagnostics(

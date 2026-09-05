@@ -8,7 +8,7 @@ import {
 	WidgetType,
 } from "@codemirror/view"
 import { syntaxTree } from "@codemirror/language"
-import { parseWikiLinks } from "./wikilink-parser"
+import { parseWikiLinks, type WikiLink } from "./wikilink-parser"
 
 export { createWikilinkDecorations }
 export type { WikilinkResolver }
@@ -127,9 +127,7 @@ function createWikilinkDecorations(
 
 			buildDecorations(view: EditorView): DecorationSet {
 				let builder = new RangeSetBuilder<Decoration>()
-				let doc = view.state.doc
-				let text = doc.toString()
-				let links = parseWikiLinks(text)
+				let links = parseVisibleWikiLinks(view)
 				let selection = view.state.selection.main
 				let tree = syntaxTree(view.state)
 
@@ -201,4 +199,25 @@ function createWikilinkDecorations(
 	})
 
 	return [decorationPlugin, theme]
+}
+
+function parseVisibleWikiLinks(view: EditorView) {
+	let links: WikiLink[] = []
+	let previousTo = -1
+	for (let range of view.visibleRanges) {
+		let from = view.state.doc.lineAt(range.from).from
+		let to = view.state.doc.lineAt(range.to).to
+		if (from < previousTo) from = previousTo
+		if (from >= to) continue
+		let visibleText = view.state.sliceDoc(from, to)
+		for (let link of parseWikiLinks(visibleText)) {
+			links.push({
+				...link,
+				from: link.from + from,
+				to: link.to + from,
+			})
+		}
+		previousTo = to
+	}
+	return links
 }

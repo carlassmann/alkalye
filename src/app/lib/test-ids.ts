@@ -107,6 +107,9 @@ let testIds = {
 		successState: "invite-success-state",
 		errorState: "invite-error-state",
 	},
+	error: {
+		documentNotFound: "error-document-not-found",
+	},
 	asset: {
 		uploadButton: "asset-upload-button",
 		list: "asset-list",

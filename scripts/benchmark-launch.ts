@@ -369,11 +369,11 @@ async function measureLaunch(
 			`Timed out waiting for ready on ${target} ${path}; url=${url}; title=${title}; body=${body.slice(0, 500)}; pageErrors=${pageErrors.join(" | ")}; ${message}`,
 		)
 	}
+	let readyMs = Math.round(performance.now() - start)
 	if (expectedTitle) {
 		await expect(page).toHaveTitle(expectedTitle, { timeout: 60_000 })
 	}
 	let actualTitle = expectedTitle ? await page.title() : null
-	let readyMs = Math.round(performance.now() - start)
 	let sidebarReadyMs: number | null = null
 	let sidebarTitleCorrect: boolean | null = null
 	let sidebarDocId: string | null = null

@@ -1,8 +1,8 @@
 import { co } from "jazz-tools"
 import { Document } from "./schema"
 import { getDocumentTitle, isDocumentPinned } from "./title"
-import { getPath, getTags } from "@/app/features/editor"
-import { getPresentationMode } from "@/app/features/presentation"
+import { getPath, getTags } from "@/app/features/editor/lib/frontmatter"
+import { getPresentationMode } from "@/app/features/presentation/lib/presentation"
 
 export {
 	syncDocumentMetadata,
@@ -27,13 +27,40 @@ type MetadataBackfillCandidate = {
 }
 
 function extractDocumentMetadata(content: string) {
+	let metadataSource = getMetadataSource(content)
 	return {
-		title: getDocumentTitle(content),
-		pinned: isDocumentPinned({ content: { toString: () => content } }),
-		path: getPath(content) ?? undefined,
-		tags: getTags(content),
-		isPresentation: getPresentationMode(content),
+		title: getDocumentTitle(metadataSource),
+		pinned: isDocumentPinned({ content: { toString: () => metadataSource } }),
+		path: getPath(metadataSource) ?? undefined,
+		tags: getTags(metadataSource),
+		isPresentation: getPresentationMode(metadataSource),
 	}
+}
+
+function getMetadataSource(content: string) {
+	let position = 0
+	if (content.startsWith("---\n")) {
+		let closingMarker = content.indexOf("\n---", 4)
+		if (closingMarker < 0) return content
+		position = content.indexOf("\n", closingMarker + 4)
+		if (position < 0) return content
+		position++
+	}
+
+	while (position < content.length) {
+		let lineEnd = content.indexOf("\n", position)
+		if (lineEnd < 0) return content
+		let titleCandidate = content
+			.slice(position, lineEnd)
+			.trim()
+			.replace(/^(?:!\[[^\]]*\]\([^)]+\)\s*)+/, "")
+		if (titleCandidate) {
+			return content.slice(0, lineEnd)
+		}
+		position = lineEnd + 1
+	}
+
+	return content
 }
 
 function createDocumentMetadata(content: string, updatedAt: Date) {

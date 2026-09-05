@@ -30,9 +30,8 @@ describe("document loading performance queries", () => {
 		expect(spaceResolve.documents).toEqual({ $each: true })
 	})
 
-	test("opened document loader intentionally loads editor payload", () => {
-		expect(loaderResolve.content).toBe(true)
-		expect(loaderResolve.comments).toEqual({ $each: { replies: true } })
+	test("opened document loader blocks only on content", () => {
+		expect(loaderResolve).toEqual({ content: true })
 	})
 
 	test("home fallback skips deleted documents", () => {
@@ -55,12 +54,14 @@ describe("document loading performance queries", () => {
 		expect(findFallbackHomeDocument([active, older, deleted])).toBe(active)
 	})
 
-	test("sidebar filters keep legacy rows visible for metadata backfill", () => {
+	test("sidebar filters keep legacy rows visible until metadata is available", () => {
 		let legacyDoc = { title: undefined }
 
 		expect(needsMetadataBackfill(legacyDoc)).toBe(true)
 		expect(matchesSearchTerms(legacyDoc, "missing title")).toBe(true)
 		expect(matchesTypeFilter(legacyDoc, "presentation")).toBe(true)
+		expect(matchesSearchTerms(legacyDoc, "")).toBe(true)
+		expect(matchesTypeFilter(legacyDoc, "all")).toBe(true)
 	})
 
 	test("sidebar filters keep read-only metadata-stale rows visible", () => {
@@ -77,6 +78,8 @@ describe("document loading performance queries", () => {
 		expect(needsMetadataBackfill(staleReadOnlyDoc)).toBe(true)
 		expect(matchesSearchTerms(staleReadOnlyDoc, "missing title")).toBe(true)
 		expect(matchesTypeFilter(staleReadOnlyDoc, "presentation")).toBe(true)
+		expect(matchesSearchTerms(staleReadOnlyDoc, "")).toBe(true)
+		expect(matchesTypeFilter(staleReadOnlyDoc, "all")).toBe(true)
 	})
 
 	test("non-content checkpoints do not remain metadata-stale", () => {

@@ -33,9 +33,10 @@ let router = createRouter({
 	basepath: "/app",
 	routeTree,
 	context: { me: null },
-	defaultPreload: false,
-	defaultStaleTime: 0,
-	defaultGcTime: 0,
+	defaultPreload: "intent",
+	defaultPreloadStaleTime: 30_000,
+	defaultStaleTime: 30_000,
+	defaultGcTime: 5 * 60_000,
 })
 
 declare module "@tanstack/react-router" {

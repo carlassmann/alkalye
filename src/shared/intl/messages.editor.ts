@@ -85,6 +85,9 @@ let baseEditorMessages = messages({
 	"editor.stats.tasks": "Tasks",
 	"editor.stats.hideBadge": "Hide badge",
 	"editor.stats.hideHint": "Re-enable in Settings → Editor.",
+	"editor.largeDocumentMode.title": "Large document mode",
+	"editor.largeDocumentMode.description":
+		"Rich Markdown and spellcheck are paused to keep editing responsive.",
 
 	"editor.floating.markComplete": "Mark complete",
 	"editor.floating.markIncomplete": "Mark incomplete",
@@ -214,6 +217,9 @@ let deEditorMessages = translate(baseEditorMessages, {
 	"editor.stats.tasks": "Aufgaben",
 	"editor.stats.hideBadge": "Badge ausblenden",
 	"editor.stats.hideHint": "Aktiviere es wieder in Einstellungen → Editor.",
+	"editor.largeDocumentMode.title": "Modus für große Dokumente",
+	"editor.largeDocumentMode.description":
+		"Rich Markdown und Rechtschreibprüfung sind für schnelles Bearbeiten pausiert.",
 
 	"editor.floating.markComplete": "Als erledigt markieren",
 	"editor.floating.markIncomplete": "Als offen markieren",

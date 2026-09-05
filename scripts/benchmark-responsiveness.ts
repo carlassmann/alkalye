@@ -1,0 +1,518 @@
+import { chromium, type Page } from "@playwright/test"
+import { create } from "../e2e/doc-helpers"
+import { createSpace } from "../e2e/space-helpers"
+import { createAccount } from "../e2e/auth-helpers"
+import { testIds } from "../src/app/lib/test-ids"
+
+type InteractionMetric = {
+	name: string
+	interactionId: number
+	durationMs: number
+	inputDelayMs: number
+	processingMs: number
+	presentationDelayMs: number
+}
+
+type LongFrameMetric = {
+	durationMs: number
+	scripts: {
+		sourceURL: string
+		functionName: string
+		durationMs: number
+	}[]
+}
+
+declare global {
+	interface Window {
+		__alkalyeInteractionMetrics: InteractionMetric[]
+		__alkalyeLongFrames: LongFrameMetric[]
+		__alkalyeMeasurementStartedAt: number
+		__alkalyeDocumentSaveCount: number
+		__alkalyeLastSavedDocumentId: string | undefined
+		__alkalyeLastSavedContent: string | undefined
+	}
+
+	interface PerformanceEventTiming {
+		readonly interactionId: number
+	}
+
+	interface PerformanceEntry {
+		readonly scripts?: PerformanceScriptTiming[]
+	}
+
+	interface PerformanceScriptTiming {
+		readonly sourceURL: string
+		readonly functionName: string
+		readonly duration: number
+	}
+
+	interface PerformanceObserverInit {
+		durationThreshold?: number
+	}
+}
+
+type Measurement = {
+	name: string
+	actionDurationMs: number
+	interactionCount: number
+	medianMs: number | null
+	p95Ms: number | null
+	maximumMs: number | null
+	maximumInputDelayMs: number | null
+	maximumProcessingMs: number | null
+	maximumPresentationDelayMs: number | null
+	longFrameCount: number
+	maximumLongFrameMs: number
+	slowestFrameScripts: LongFrameMetric["scripts"]
+}
+
+let args = parseArgs(process.argv.slice(2))
+let browser = await chromium.launch({ headless: !args.headed })
+let context = await browser.newContext({
+	baseURL: args.url,
+	ignoreHTTPSErrors: true,
+	permissions: ["clipboard-read", "clipboard-write"],
+	serviceWorkers: "block",
+	viewport: { width: 1280, height: 900 },
+})
+
+try {
+	let page = await context.newPage()
+	page.setDefaultNavigationTimeout(120_000)
+	await installObservers(page)
+	await createAccount(page)
+
+	console.error(`Seeding two ${args.kb} KB documents...`)
+	let seedStartedAt = performance.now()
+	let first = await create(page, {
+		title: "Responsiveness A",
+	})
+	console.error("Created first document")
+	await replaceEditorContent(page, buildContent("Responsiveness A", args.kb))
+	console.error("Filled first document")
+	let second = await create(page, {
+		title: "Responsiveness B",
+	})
+	console.error("Created second document")
+	await replaceEditorContent(page, buildContent("Responsiveness B", args.kb))
+	console.error(
+		`Seeded documents in ${Math.round(performance.now() - seedStartedAt)} ms`,
+	)
+	await page.waitForTimeout(2_000)
+	let firstSpace = await createSpace(page, { name: "Responsiveness Space A" })
+	await replaceEditorContent(page, buildContent("Space A", args.kb))
+	await page.waitForTimeout(2_000)
+	await createSpace(page, { name: "Responsiveness Space B" })
+	await replaceEditorContent(page, buildContent("Space B", args.kb))
+	await page.waitForTimeout(2_000)
+	await page.goto(`/app/doc/${second.id}`)
+	await page
+		.getByTestId(testIds.doc.editor)
+		.locator(".cm-content")
+		.waitFor({ state: "visible" })
+	await page.setViewportSize({ width: 390, height: 844 })
+
+	let session = await context.newCDPSession(page)
+	await session.send("Emulation.setCPUThrottlingRate", { rate: args.cpu })
+
+	let measurements: Measurement[] = []
+	let editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
+	await editor.press("ControlOrMeta+End")
+	measurements.push(
+		await measure(page, "typing", async () => {
+			await page.keyboard.type(" instant response", { delay: 30 })
+		}),
+	)
+	measurements.push(
+		await measure(page, "autosave", async () => {
+			let saveCount = await page.evaluate(
+				() => window.__alkalyeDocumentSaveCount,
+			)
+			await page.keyboard.type("!")
+			await page.waitForFunction(
+				({ count, documentId, marker }) =>
+					window.__alkalyeDocumentSaveCount > count &&
+					window.__alkalyeLastSavedDocumentId === documentId &&
+					window.__alkalyeLastSavedContent?.includes(marker),
+				{
+					count: saveCount,
+					documentId: second.id,
+					marker: "instant response!",
+				},
+			)
+		}),
+	)
+	await verifyAutosave(page, second.id, "instant response!")
+	editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
+	await editor.click()
+	await editor.press("ControlOrMeta+End")
+	await page.keyboard.type(" undo fixture")
+	measurements.push(
+		await measure(page, "undo", () => page.keyboard.press("Meta+z")),
+	)
+	measurements.push(
+		await measure(page, "redo", () => page.keyboard.press("Meta+Shift+z")),
+	)
+	await page.waitForTimeout(1_200)
+
+	await editor.click()
+	measurements.push(
+		await measure(page, "open command palette", async () => {
+			await page.keyboard.press("Meta+Shift+p")
+			await page.getByRole("combobox", { name: "Search commands" }).waitFor({
+				state: "visible",
+			})
+		}),
+	)
+	await page.keyboard.press("Escape")
+	await page
+		.getByRole("combobox", { name: "Search commands" })
+		.waitFor({ state: "hidden" })
+
+	await editor.click()
+	measurements.push(
+		await measure(page, "open find", async () => {
+			await page.keyboard.press("Meta+f")
+			await page.getByPlaceholder("Find...").waitFor({ state: "visible" })
+		}),
+	)
+	measurements.push(
+		await measure(page, "find in document", async () => {
+			await page.keyboard.type("responsiveness fixture", { delay: 30 })
+		}),
+	)
+	await page.keyboard.press("Escape")
+	await page.getByPlaceholder("Find...").waitFor({ state: "hidden" })
+
+	await editor.click()
+	let documentTools = page.getByRole("dialog", { name: "Document tools" })
+	measurements.push(
+		await measure(page, "open document tools", async () => {
+			await page.keyboard.press("Meta+.")
+			await documentTools.waitFor({ state: "visible" })
+		}),
+	)
+	await page
+		.locator('[data-slot="sheet-overlay"]')
+		.click({ position: { x: 1, y: 1 } })
+	await documentTools.waitFor({ state: "hidden" })
+
+	let leftSidebarTrigger = page.getByRole("button", { name: "Documents" })
+	measurements.push(
+		await measure(page, "open sidebar", () => leftSidebarTrigger.click()),
+	)
+
+	let search = page.getByTestId(testIds.doc.searchInput)
+	await search.click()
+	measurements.push(
+		await measure(page, "filter documents", async () => {
+			await page.keyboard.type("Responsiveness A", { delay: 30 })
+			await page
+				.locator(`[data-doc-id="${first.id}"]`)
+				.waitFor({ state: "visible" })
+			await page
+				.locator(`[data-doc-id="${second.id}"]`)
+				.waitFor({ state: "hidden" })
+		}),
+	)
+
+	measurements.push(
+		await measure(page, "open document", async () => {
+			await page.locator(`[data-doc-id="${first.id}"] a`).click()
+			await page.waitForFunction(
+				({ docId, title }) =>
+					window.location.pathname.endsWith(`/doc/${docId}`) &&
+					document.body.dataset.alkalyeReady === "true" &&
+					document
+						.querySelector(".markdown-editor .cm-content")
+						?.textContent?.includes(title),
+				{ docId: first.id, title: "Responsiveness A" },
+			)
+		}),
+	)
+
+	await leftSidebarTrigger.click()
+	await page.getByTestId(testIds.space.selectorTrigger).click()
+	measurements.push(
+		await measure(page, "switch space", async () => {
+			await page.locator(`[data-space-id="${firstSpace.id}"]`).click()
+			await page.waitForFunction(
+				({ spaceId, title }) =>
+					window.location.pathname.includes(`/spaces/${spaceId}/doc/`) &&
+					document.body.dataset.alkalyeReady === "true" &&
+					document
+						.querySelector(".markdown-editor .cm-content")
+						?.textContent?.includes(title),
+				{ spaceId: firstSpace.id, title: "Space A" },
+			)
+		}),
+	)
+
+	let result = {
+		profile: {
+			cpuThrottle: args.cpu,
+			viewport: "390x844",
+			documentKilobytes: args.kb,
+			frameBudgetMs: 16.7,
+			serviceWorkers: "blocked",
+		},
+		measurements,
+	}
+
+	console.log(JSON.stringify(result, null, 2))
+	if (args.assert) assertResponsivenessBudgets(measurements)
+} finally {
+	await context.close()
+	await browser.close()
+}
+
+async function installObservers(page: Page) {
+	await page.addInitScript(() => {
+		window.__alkalyeInteractionMetrics = []
+		window.__alkalyeLongFrames = []
+		window.__alkalyeMeasurementStartedAt = 0
+		window.__alkalyeDocumentSaveCount = 0
+		window.addEventListener("alkalye:document-saved", event => {
+			window.__alkalyeDocumentSaveCount++
+			if (event instanceof CustomEvent) {
+				window.__alkalyeLastSavedDocumentId = event.detail?.documentId
+				window.__alkalyeLastSavedContent = event.detail?.content
+			}
+		})
+
+		new PerformanceObserver(list => {
+			for (let entry of list.getEntries()) {
+				let event = entry as PerformanceEventTiming
+				if (
+					event.interactionId === 0 ||
+					event.startTime < window.__alkalyeMeasurementStartedAt
+				)
+					continue
+				window.__alkalyeInteractionMetrics.push({
+					name: event.name,
+					interactionId: event.interactionId,
+					durationMs: event.duration,
+					inputDelayMs: event.processingStart - event.startTime,
+					processingMs: event.processingEnd - event.processingStart,
+					presentationDelayMs: Math.max(
+						0,
+						event.duration - (event.processingEnd - event.startTime),
+					),
+				})
+			}
+		}).observe({ type: "event", buffered: true, durationThreshold: 0 })
+
+		if (
+			PerformanceObserver.supportedEntryTypes.includes("long-animation-frame")
+		) {
+			new PerformanceObserver(list => {
+				for (let entry of list.getEntries()) {
+					if (entry.startTime < window.__alkalyeMeasurementStartedAt) continue
+					window.__alkalyeLongFrames.push({
+						durationMs: entry.duration,
+						scripts: (entry.scripts ?? []).map(script => ({
+							sourceURL: script.sourceURL,
+							functionName: script.functionName,
+							durationMs: script.duration,
+						})),
+					})
+				}
+			}).observe({ type: "long-animation-frame", buffered: true })
+		}
+	})
+}
+
+async function measure(
+	page: Page,
+	name: string,
+	action: () => Promise<unknown>,
+): Promise<Measurement> {
+	await page.evaluate(() => {
+		window.__alkalyeInteractionMetrics = []
+		window.__alkalyeLongFrames = []
+		window.__alkalyeMeasurementStartedAt = performance.now()
+	})
+
+	let actionStartedAt = performance.now()
+	await action()
+	let actionDurationMs = performance.now() - actionStartedAt
+	await page.waitForTimeout(500)
+
+	let metrics = await page.evaluate(() => {
+		return {
+			interactions: [...window.__alkalyeInteractionMetrics],
+			longFrames: [...window.__alkalyeLongFrames],
+		}
+	})
+	let interactions = groupInteractions(metrics.interactions)
+	let interactionDurations = interactions.map(
+		interaction => interaction.durationMs,
+	)
+	let slowestFrame = [...metrics.longFrames].sort(
+		(left, right) => right.durationMs - left.durationMs,
+	)[0]
+
+	return {
+		name,
+		actionDurationMs,
+		interactionCount: interactionDurations.length,
+		medianMs: percentile(interactionDurations, 0.5),
+		p95Ms: percentile(interactionDurations, 0.95),
+		maximumMs: maximum(interactionDurations),
+		maximumInputDelayMs: maximum(
+			interactions.map(interaction => interaction.inputDelayMs),
+		),
+		maximumProcessingMs: maximum(
+			interactions.map(interaction => interaction.processingMs),
+		),
+		maximumPresentationDelayMs: maximum(
+			interactions.map(interaction => interaction.presentationDelayMs),
+		),
+		longFrameCount: metrics.longFrames.length,
+		maximumLongFrameMs: slowestFrame?.durationMs ?? 0,
+		slowestFrameScripts: slowestFrame?.scripts ?? [],
+	}
+}
+
+function groupInteractions(metrics: InteractionMetric[]) {
+	let interactions = new Map<number, InteractionMetric>()
+	for (let metric of metrics) {
+		let current = interactions.get(metric.interactionId)
+		if (!current || metric.durationMs > current.durationMs) {
+			interactions.set(metric.interactionId, metric)
+		}
+	}
+	return Array.from(interactions.values())
+}
+
+function percentile(values: number[], percentileValue: number) {
+	if (values.length === 0) return null
+	let sorted = [...values].sort((left, right) => left - right)
+	let index = Math.ceil(sorted.length * percentileValue) - 1
+	return sorted[Math.max(0, Math.min(index, sorted.length - 1))] ?? null
+}
+
+function maximum(values: number[]) {
+	return values.length === 0 ? null : Math.max(...values)
+}
+
+function assertResponsivenessBudgets(measurements: Measurement[]) {
+	let inputDelayBudgets = new Map([["filter documents", 350]])
+	let actionBudgets = new Map([
+		["open command palette", 500],
+		["open find", 500],
+		["open document tools", 500],
+		["open sidebar", 500],
+		["filter documents", 1_250],
+		["open document", 2_500],
+		["switch space", 2_000],
+		["autosave", 2_000],
+	])
+	let failures: string[] = []
+
+	for (let measurement of measurements) {
+		let inputDelayBudget = inputDelayBudgets.get(measurement.name) ?? 100
+		if (
+			measurement.maximumInputDelayMs !== null &&
+			measurement.maximumInputDelayMs > inputDelayBudget
+		) {
+			failures.push(
+				`${measurement.name}: ${measurement.maximumInputDelayMs.toFixed(1)} ms input delay exceeds ${inputDelayBudget} ms`,
+			)
+		}
+
+		let actionBudget = actionBudgets.get(measurement.name)
+		if (actionBudget && measurement.actionDurationMs > actionBudget) {
+			failures.push(
+				`${measurement.name}: ${measurement.actionDurationMs.toFixed(1)} ms completion exceeds ${actionBudget} ms`,
+			)
+		}
+	}
+
+	if (failures.length > 0) {
+		throw new Error(`Responsiveness budgets failed:\n${failures.join("\n")}`)
+	}
+}
+
+function buildBody(kilobytes: number) {
+	let line = "Low-end responsiveness fixture with realistic markdown content.\n"
+	let targetLength = kilobytes * 1024
+	return line
+		.repeat(Math.ceil(targetLength / line.length))
+		.slice(0, targetLength)
+}
+
+function buildContent(title: string, kilobytes: number) {
+	return `# ${title}\n\n${buildBody(kilobytes)}`
+}
+
+async function replaceEditorContent(page: Page, content: string) {
+	let editor = page.locator(".markdown-editor .cm-content")
+	await editor.waitFor({ state: "visible" })
+	await editor.click()
+	await editor.press(process.platform === "darwin" ? "Meta+A" : "Control+A")
+	let chunkSize = 64 * 1024
+	for (let offset = 0; offset < content.length; offset += chunkSize) {
+		await page.keyboard.insertText(content.slice(offset, offset + chunkSize))
+	}
+	await page.waitForTimeout(3_000)
+}
+
+async function verifyAutosave(page: Page, documentId: string, marker: string) {
+	await page.reload()
+	await page.waitForFunction(
+		id =>
+			window.location.pathname.endsWith(`/doc/${id}`) &&
+			document.body.dataset.alkalyeReady === "true",
+		documentId,
+	)
+	let editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
+	await editor.click()
+	await editor.press("ControlOrMeta+A")
+	await editor.press("ControlOrMeta+C")
+	let content = await page.evaluate(() => navigator.clipboard.readText())
+	if (!content.includes(marker)) {
+		throw new Error("Autosave did not persist before reload")
+	}
+}
+
+function parseArgs(rawArgs: string[]) {
+	let parsed = {
+		url:
+			process.env.PLAYWRIGHT_BASE_URL ?? "https://web-main-alkalye.localhost",
+		cpu: 4,
+		kb: 128,
+		headed: false,
+		assert: false,
+	}
+
+	for (let index = 0; index < rawArgs.length; index++) {
+		let arg = rawArgs[index]
+		if (arg === "--headed") parsed.headed = true
+		else if (arg === "--assert") parsed.assert = true
+		else if (arg === "--url") parsed.url = requireValue(rawArgs, ++index, arg)
+		else if (arg === "--cpu") {
+			parsed.cpu = parsePositiveNumber(rawArgs, ++index, arg)
+		} else if (arg === "--kb") {
+			parsed.kb = parsePositiveNumber(rawArgs, ++index, arg)
+		} else {
+			throw new Error(`Unknown argument: ${arg}`)
+		}
+	}
+
+	return parsed
+}
+
+function requireValue(rawArgs: string[], index: number, flag: string) {
+	let value = rawArgs[index]
+	if (!value) throw new Error(`${flag} requires a value`)
+	return value
+}
+
+function parsePositiveNumber(rawArgs: string[], index: number, flag: string) {
+	let value = Number(requireValue(rawArgs, index, flag))
+	if (!Number.isFinite(value) || value <= 0) {
+		throw new Error(`${flag} requires a positive number`)
+	}
+	return value
+}

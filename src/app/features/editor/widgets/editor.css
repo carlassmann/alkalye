@@ -131,7 +131,8 @@
 	overflow: auto !important;
 	overscroll-behavior: contain;
 	padding-bottom: calc(
-		var(--screen-keyboard-bottom-inset, 0px) + env(safe-area-inset-bottom)
+		30dvh + var(--screen-keyboard-bottom-inset, 0px) +
+			env(safe-area-inset-bottom)
 	);
 	padding-top: var(--find-panel-height, 0px);
 	transition: padding-bottom var(--screen-keyboard-transition-duration)

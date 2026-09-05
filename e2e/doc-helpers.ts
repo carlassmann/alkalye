@@ -2,7 +2,15 @@ import { expect, type Page } from "@playwright/test"
 import { testIds } from "@/app/lib/test-ids"
 import { waitForEditorBoot } from "./auth-helpers"
 
-export { create, readById, updateById, list, deleteById }
+export {
+	create,
+	readById,
+	updateById,
+	list,
+	deleteById,
+	startObservingDocumentNotFound,
+	didDocumentNotFoundRender,
+}
 
 interface CreateArgs {
 	spaceId?: string
@@ -123,6 +131,10 @@ async function updateById(page: Page, args: UpdateByIdArgs) {
 async function list(page: Page, args: ListArgs = {}) {
 	let appPath = args.spaceId ? `/app/spaces/${args.spaceId}` : "/app"
 	await waitForEditorBoot(page, { path: appPath })
+	await expect(page.getByTestId(testIds.sidebar.documentList)).toHaveAttribute(
+		"aria-busy",
+		"false",
+	)
 
 	let search = args.search ?? ""
 	await page.getByTestId(testIds.doc.searchInput).fill(search)
@@ -185,6 +197,27 @@ async function deleteById(page: Page, args: DeleteByIdArgs) {
 		spaceId: args.spaceId ?? null,
 		deleted: true,
 	}
+}
+
+async function startObservingDocumentNotFound(page: Page) {
+	await page.evaluate(selector => {
+		document.documentElement.dataset.documentNotFoundRendered = "false"
+		let observer = new MutationObserver(() => {
+			if (document.querySelector(selector)) {
+				document.documentElement.dataset.documentNotFoundRendered = "true"
+			}
+		})
+		observer.observe(document.body, {
+			childList: true,
+			subtree: true,
+		})
+	}, `[data-testid="${testIds.error.documentNotFound}"]`)
+}
+
+async function didDocumentNotFoundRender(page: Page) {
+	return page.evaluate(
+		() => document.documentElement.dataset.documentNotFoundRendered === "true",
+	)
 }
 
 function getDocPath(id: string, spaceId?: string) {

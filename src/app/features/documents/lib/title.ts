@@ -1,5 +1,5 @@
 import { parseFrontmatter } from "@/app/features/editor/lib/frontmatter"
-import { parseSearchTerms } from "@/app/components/ui/text-highlight"
+import { parseSearchTerms } from "@/app/lib/search-terms"
 
 export {
 	getDocumentTitle,

@@ -20,12 +20,24 @@ let slideLine = Decoration.line({ class: "cm-presentation-slide-line" })
 function buildPresentationDecorations(view: EditorView): DecorationSet {
 	let builder = new RangeSetBuilder<Decoration>()
 	let doc = view.state.doc
-	let content = doc.toString()
+	let firstLine = doc.line(1)
+	if (firstLine.text !== "---") return builder.finish()
 
-	if (!getPresentationMode(content)) {
+	let frontmatterEnd: number | undefined
+	for (let lineNumber = 2; lineNumber <= doc.lines; lineNumber++) {
+		let line = doc.line(lineNumber)
+		if (line.text === "---") {
+			frontmatterEnd = line.to
+			break
+		}
+	}
+
+	if (frontmatterEnd === undefined) return builder.finish()
+	if (!getPresentationMode(doc.sliceString(0, frontmatterEnd))) {
 		return builder.finish()
 	}
 
+	let content = doc.toString()
 	let items = parsePresentation(content)
 	let ranges: { start: number; end: number }[] = []
 

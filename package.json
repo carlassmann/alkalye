@@ -23,6 +23,9 @@
 		"test:e2e:doc": "playwright test e2e/doc.spec.ts",
 		"test:e2e:headed": "playwright test --headed",
 		"bench:launch": "bun scripts/benchmark-launch.ts",
+		"bench:responsiveness": "bun scripts/benchmark-responsiveness.ts",
+		"bench:responsiveness:assert": "bun scripts/benchmark-responsiveness.ts --cpu 4 --assert",
+		"bench:responsiveness:book": "bun scripts/benchmark-responsiveness.ts --kb 1024 --cpu 4",
 		"preview": "astro preview",
 		"format": "prettier --write .",
 		"test": "vitest",
@@ -83,6 +86,7 @@
 		"tailwindcss": "^4.1.18",
 		"tldraw": "^5.2.2",
 		"tw-animate-css": "^1.4.0",
+		"unicode-segmenter": "0.12.0",
 		"vite-plugin-pwa": "^1.2.0",
 		"zod": "^4.3.6",
 		"zustand": "^5.0.10"

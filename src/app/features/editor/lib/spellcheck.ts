@@ -6,6 +6,7 @@ import {
 	ViewPlugin,
 	type ViewUpdate,
 } from "@codemirror/view"
+import { syntaxTree } from "@codemirror/language"
 
 export { createSpellcheckExtension }
 
@@ -43,25 +44,43 @@ let disabledSpellcheckRegions = ViewPlugin.fromClass(
 
 function buildDecorations(view: EditorView): DecorationSet {
 	let builder = new RangeSetBuilder<Decoration>()
-	let inFence = false
-	let inFrontmatter = view.state.doc.line(1).text.trim() === "---"
+	let tree = syntaxTree(view.state)
+	let frontmatterEnd = getFrontmatterEnd(view)
 
-	for (let lineNumber = 1; lineNumber <= view.state.doc.lines; lineNumber++) {
-		let line = view.state.doc.line(lineNumber)
-		let trimmed = line.text.trim()
-		let disabled = inFence || inFrontmatter
+	for (let visibleRange of view.visibleRanges) {
+		let line = view.state.doc.lineAt(visibleRange.from)
+		while (true) {
+			let node = tree.resolveInner(line.from, 1)
+			let inCodeBlock = false
+			let current: typeof node | null = node
+			for (; current; current = current.parent) {
+				if (current.name === "FencedCode" || current.name === "CodeBlock") {
+					inCodeBlock = true
+					break
+				}
+			}
 
-		if (/^(`{3,}|~{3,})/.test(trimmed)) {
-			disabled = true
-			inFence = !inFence
+			if ((line.to <= frontmatterEnd || inCodeBlock) && line.length > 0) {
+				builder.add(line.from, line.to, noSpellcheck)
+			}
+			if (line.to >= visibleRange.to || line.number >= view.state.doc.lines) {
+				break
+			}
+			line = view.state.doc.line(line.number + 1)
 		}
-		if (inFrontmatter && lineNumber > 1 && trimmed === "---") {
-			disabled = true
-			inFrontmatter = false
-		}
-		if (disabled && line.length > 0)
-			builder.add(line.from, line.to, noSpellcheck)
 	}
 
 	return builder.finish()
+}
+
+function getFrontmatterEnd(view: EditorView): number {
+	let doc = view.state.doc
+	if (doc.line(1).text.trim() !== "---") return 0
+
+	for (let lineNumber = 2; lineNumber <= doc.lines; lineNumber++) {
+		let line = doc.line(lineNumber)
+		if (line.text.trim() === "---") return line.to
+	}
+
+	return doc.length
 }

@@ -43,7 +43,7 @@ import {
 } from "@codemirror/search"
 import { bracketMatching, syntaxTree } from "@codemirror/language"
 import { Image as JazzImage } from "jazz-tools/react"
-import { editorExtensions } from "../lib/extensions"
+import { editorBaseExtensions, richMarkdownExtensions } from "../lib/extensions"
 import {
 	insertCodeBlock,
 	insertBlankLineAbove,
@@ -92,6 +92,7 @@ import {
 	insertRawPastedText,
 } from "../lib/paste-commands"
 import { createSpellcheckExtension } from "../lib/spellcheck"
+import { usesRichMarkdown } from "../lib/editor-performance"
 import { createBracketsExtension } from "../lib/autocomplete-brackets"
 import {
 	deleteMarkerBackward,
@@ -173,11 +174,21 @@ type WikilinkDoc = {
 
 type DropTarget = { pos: number }
 type EditorCommand = (view: EditorView) => boolean
+function spellcheckForDocument(
+	enabled: boolean,
+	language: string | undefined,
+	length: number,
+) {
+	return createSpellcheckExtension(
+		enabled && usesRichMarkdown(length),
+		language,
+	)
+}
 
 interface MarkdownEditorProps {
 	// Core
 	value: string
-	onChange: (content: string) => void
+	onChange: (readContent: () => string) => void
 
 	// Cursor/focus callbacks
 	onCursorChange?: (from: number, to: number) => void
@@ -348,6 +359,7 @@ function MarkdownEditor(
 	let spellcheckCompartment = useRef(new Compartment())
 	let bracketsCompartment = useRef(new Compartment())
 	let autocompleteCompartment = useRef(new Compartment())
+	let richMarkdownCompartment = useRef(new Compartment())
 	let floatingActionsRef = useRef<FloatingActionsRef>(null)
 	let [view, setView] = useState<EditorView | null>(null)
 	let [isFocused, setIsFocused] = useState(false)
@@ -370,6 +382,10 @@ function MarkdownEditor(
 	findPanelOpenRef.current = findPanelOpen
 	let dataRef = useRef({ assets, documents })
 	let autoSortRef = useRef(autoSortTasks ?? false)
+	let spellcheckRef = useRef({
+		enabled: spellcheck,
+		language: spellcheckLanguage,
+	})
 	let uploadImageRef = useRef(onUploadImage)
 	let uploadVideoRef = useRef(onUploadVideo)
 	let importTldrawRef = useRef(onImportTldraw)
@@ -378,6 +394,7 @@ function MarkdownEditor(
 	let rawPasteRef = useRef(false)
 	let behaviorRef = useRef({ tabIndent, smartPaste })
 	behaviorRef.current = { tabIndent, smartPaste }
+	spellcheckRef.current = { enabled: spellcheck, language: spellcheckLanguage }
 
 	useEffect(() => {
 		callbacksRef.current = { onChange, onCursorChange, onFocus, onBlur }
@@ -465,9 +482,39 @@ function MarkdownEditor(
 		isMobile,
 		externalExtensions,
 	})
+	useEffect(() => {
+		if (usesRichMarkdown(initRef.current.value.length)) return
+		toast.info(t("editor.largeDocumentMode.title"), {
+			description: t("editor.largeDocumentMode.description"),
+		})
+	}, [t])
 
 	useEffect(() => {
 		if (!containerRef.current) return
+
+		function richMarkdownFeatures(): Extension[] {
+			return [
+				markdown({
+					base: markdownLanguage,
+					codeLanguages: languages,
+					addKeymap: false,
+				}),
+				richMarkdownExtensions,
+				createLinkDecorations(),
+				createWikilinkDecorations(
+					id => wikilinkResolverRef.current(id),
+					handleWikilinkNavigate,
+				),
+				createBacklinkDecorations(
+					id => wikilinkResolverRef.current(id),
+					handleWikilinkNavigate,
+				),
+			]
+		}
+
+		function richMarkdownForLength(length: number): Extension[] {
+			return usesRichMarkdown(length) ? richMarkdownFeatures() : []
+		}
 
 		let extensions: Extension[] = [
 			history(),
@@ -601,13 +648,34 @@ function MarkdownEditor(
 					}),
 				]),
 			),
-			markdown({
-				base: markdownLanguage,
-				codeLanguages: languages,
-				addKeymap: false,
+			editorBaseExtensions,
+			richMarkdownCompartment.current.of(
+				richMarkdownForLength(initRef.current.value.length),
+			),
+			EditorState.transactionExtender.of(transaction => {
+				if (!transaction.docChanged) return null
+				let wasRich = usesRichMarkdown(transaction.startState.doc.length)
+				let remainsRich = usesRichMarkdown(transaction.newDoc.length)
+				if (wasRich === remainsRich) return null
+				return {
+					effects: [
+						richMarkdownCompartment.current.reconfigure(
+							richMarkdownForLength(transaction.newDoc.length),
+						),
+						spellcheckCompartment.current.reconfigure(
+							spellcheckForDocument(
+								spellcheckRef.current.enabled,
+								spellcheckRef.current.language,
+								transaction.newDoc.length,
+							),
+						),
+					],
+				}
 			}),
-			editorExtensions,
 			highlightActiveLine(),
+			EditorView.scrollMargins.of(view => ({
+				bottom: view.scrollDOM.clientHeight * 0.3,
+			})),
 			EditorView.lineWrapping,
 			EditorView.clickAddsSelectionRange.of(event => event.altKey),
 			EditorView.contentAttributes.of({
@@ -616,7 +684,7 @@ function MarkdownEditor(
 			EditorView.updateListener.of(update => {
 				if (update.docChanged) {
 					if (callbacksRef.current.onChange) {
-						callbacksRef.current.onChange(update.state.doc.toString())
+						callbacksRef.current.onChange(() => update.state.doc.toString())
 					}
 					// Keep in-flight drop targets aligned with the live doc so
 					// images dropped while uploads await still land at the
@@ -641,15 +709,6 @@ function MarkdownEditor(
 			}),
 			// Feature extensions
 			bracketMatching(),
-			createLinkDecorations(),
-			createWikilinkDecorations(
-				id => wikilinkResolverRef.current(id),
-				handleWikilinkNavigate,
-			),
-			createBacklinkDecorations(
-				id => wikilinkResolverRef.current(id),
-				handleWikilinkNavigate,
-			),
 			findExtension,
 			orderedListRenumbering,
 			fileDropCursor,
@@ -682,9 +741,10 @@ function MarkdownEditor(
 				initRef.current.readOnly ? EditorState.readOnly.of(true) : [],
 			),
 			spellcheckCompartment.current.of(
-				createSpellcheckExtension(
+				spellcheckForDocument(
 					initRef.current.spellcheck,
 					initRef.current.spellcheckLanguage,
+					initRef.current.value.length,
 				),
 			),
 		)
@@ -949,7 +1009,11 @@ function MarkdownEditor(
 		if (!view) return
 		view.dispatch({
 			effects: spellcheckCompartment.current.reconfigure(
-				createSpellcheckExtension(spellcheck, spellcheckLanguage),
+				spellcheckForDocument(
+					spellcheck,
+					spellcheckLanguage,
+					view.state.doc.length,
+				),
 			),
 		})
 	}, [view, spellcheck, spellcheckLanguage])
