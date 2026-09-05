@@ -84,7 +84,6 @@ let markdownHighlightStyle = HighlightStyle.define([
 		fontFamily: "var(--editor-code-font-family, 'iA Writer Mono', monospace)",
 		backgroundColor: "var(--editor-code-background, rgba(0, 0, 0, 0.05))",
 		borderRadius: "3px",
-		padding: "0.1em 0.3em",
 	},
 	{ tag: tags.link, color: "var(--editor-foreground)" },
 	{ tag: tags.url, color: "var(--editor-muted-foreground)" },

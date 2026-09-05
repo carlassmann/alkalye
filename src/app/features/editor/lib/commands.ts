@@ -5,11 +5,15 @@ import {
 	type Line,
 	type SelectionRange,
 } from "@codemirror/state"
-import { indentLess, indentMore } from "@codemirror/commands"
+import {
+	indentLess,
+	indentMore,
+	moveLineDown,
+	moveLineUp,
+} from "@codemirror/commands"
 import { EditorView } from "@codemirror/view"
 import { sortTaskLists } from "./sort-tasks"
 import { getLastCodeLanguage } from "./code-language-autocomplete"
-import { moveMarkdownBlockDown, moveMarkdownBlockUp } from "./block-movement"
 import { renumberOrderedLists as normalizeOrderedLists } from "./ordered-list-renumbering"
 
 export {
@@ -21,8 +25,8 @@ export {
 	insertMarkdownBlock,
 	insertLink,
 	insertNewlineContinueMarkupTight,
-	moveMarkdownBlockDown as moveLineDown,
-	moveMarkdownBlockUp as moveLineUp,
+	moveLineDown,
+	moveLineUp,
 	outdentMarkdown,
 	clearFormatting,
 	demoteHeading,

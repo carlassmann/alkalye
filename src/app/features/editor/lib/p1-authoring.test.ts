@@ -10,6 +10,8 @@ import {
 	insertBlankLineAbove,
 	insertLink,
 	insertMarkdownLineBreak,
+	moveLineDown,
+	moveLineUp,
 	promoteHeading,
 	setBody,
 	setHeadingLevel,
@@ -17,12 +19,12 @@ import {
 	toggleBulletList,
 	toggleTaskComplete,
 } from "./commands"
-import { moveMarkdownBlockDown, moveMarkdownBlockUp } from "./block-movement"
 import { setLastCodeLanguage } from "./code-language-autocomplete"
 import {
 	findExtension,
 	getFindState,
 	replaceAllMatches,
+	selectMatch,
 	setFindQuery,
 } from "./find-extension"
 import { htmlToMarkdown } from "./html-to-markdown"
@@ -36,6 +38,7 @@ import { createSpellcheckExtension } from "./spellcheck"
 import { createSlashCommands } from "./slash-commands"
 import { insertTable, insertTableRow, moveTableCell } from "./table-commands"
 import { combinedAutocompletion } from "@/app/lib/completion-sources"
+import { editorBaseExtensions, richMarkdownExtensions } from "./extensions"
 
 let views: EditorView[] = []
 
@@ -136,16 +139,28 @@ describe("P1 authoring commands", () => {
 		expect(text(view)).toBe('[site](https://example.com "Title")')
 	})
 
-	it("moves whole paragraph and nested-list blocks", () => {
-		let paragraph = createView("First wrapped\nparagraph\n\nSecond", 2)
-		moveMarkdownBlockDown(paragraph)
-		expect(text(paragraph)).toBe("Second\n\nFirst wrapped\nparagraph")
+	it("moves exactly the selected Markdown lines", () => {
+		let content = "```js\nconst x = 3;\nconst a = 4;\nconst b = 3;\n```"
+		let single = createView(content, content.indexOf("const a"))
+		moveLineDown(single)
+		expect(text(single)).toBe(
+			"```js\nconst x = 3;\nconst b = 3;\nconst a = 4;\n```",
+		)
 
-		let list = createView("- Parent\n  - Child\n- Sibling", 2)
-		moveMarkdownBlockDown(list)
-		expect(text(list)).toBe("- Sibling\n- Parent\n  - Child")
-		moveMarkdownBlockUp(list)
-		expect(text(list)).toBe("- Parent\n  - Child\n- Sibling")
+		let multiple = createView(content, {
+			anchor: content.indexOf("const a"),
+			head: content.indexOf("const b") + "const b = 3;".length,
+		})
+		moveLineUp(multiple)
+		expect(text(multiple)).toBe(
+			"```js\nconst a = 4;\nconst b = 3;\nconst x = 3;\n```",
+		)
+
+		let acrossFence = createView(content, content.indexOf("const x"))
+		moveLineUp(acrossFence)
+		expect(text(acrossFence)).toBe(
+			"const x = 3;\n```js\nconst a = 4;\nconst b = 3;\n```",
+		)
 	})
 
 	it("renumbers ordered lists including nested levels", () => {
@@ -263,6 +278,28 @@ describe("P1 authoring commands", () => {
 		expect(getFindState(view).matches).toHaveLength(3)
 		replaceAllMatches(view, "dog", { from: 5, to: 20 })
 		expect(text(view)).toBe("one cat two dog three cat")
+	})
+
+	it("highlights matches without shifting fenced or inline code", () => {
+		let view = createView(
+			"`inline-code`\n\n```ts\nlet d = 42\n```",
+			undefined,
+			[editorBaseExtensions, richMarkdownExtensions, findExtension],
+		)
+
+		setFindQuery(view, "d", false, false)
+		selectMatch(view, "next")
+
+		let matches = view.contentDOM.querySelectorAll(
+			".cm-find-match span, .cm-find-match-current span",
+		)
+		expect(matches).toHaveLength(2)
+		for (let match of matches) {
+			expect(getComputedStyle(match).paddingLeft).toBe("")
+			expect(getComputedStyle(match).paddingRight).toBe("")
+		}
+		expect(view.state.selection.main.empty).toBe(true)
+		expect(view.state.selection.main.head).toBe(11)
 	})
 
 	it("sets language-aware spellcheck and disables code/frontmatter", () => {

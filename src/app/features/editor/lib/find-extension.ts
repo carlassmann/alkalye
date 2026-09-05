@@ -86,7 +86,7 @@ function selectMatch(view: EditorView, direction: "next" | "prev") {
 
 	view.dispatch({
 		effects: setCurrentIndexEffect.of(newIndex),
-		selection: { anchor: match.from, head: match.to },
+		selection: { anchor: match.to },
 		scrollIntoView: true,
 	})
 }
@@ -104,9 +104,10 @@ function replaceCurrentMatch(
 	let matches = scopedMatches(state.matches, scope)
 	if (matches.length === 0) return false
 	let selection = view.state.selection.main
+	let current = state.matches[state.currentIndex]
 	let match =
 		matches.find(
-			item => item.from === selection.from && item.to === selection.to,
+			item => item.from === current?.from && item.to === current?.to,
 		) ??
 		matches.find(item => item.from >= selection.head) ??
 		matches[0]
@@ -303,12 +304,14 @@ let findDecorations = ViewPlugin.fromClass(
 )
 
 let findTheme = EditorView.baseTheme({
-	".cm-find-match": {
-		backgroundColor: "var(--editor-find-match, rgba(255, 213, 0, 0.4))",
+	".cm-find-match, .cm-find-match *": {
+		backgroundColor:
+			"var(--editor-find-match, rgba(255, 213, 0, 0.4)) !important",
 		borderRadius: "2px",
 	},
-	".cm-find-match-current": {
-		backgroundColor: "var(--editor-find-match-current, rgba(255, 150, 0, 0.6))",
+	".cm-find-match-current, .cm-find-match-current *": {
+		backgroundColor:
+			"var(--editor-find-match-current, rgba(255, 150, 0, 0.6)) !important",
 		borderRadius: "2px",
 	},
 })
