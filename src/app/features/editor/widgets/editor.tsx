@@ -675,6 +675,9 @@ function MarkdownEditor(
 				}
 			}),
 			highlightActiveLine(),
+			EditorView.scrollMargins.of(view => ({
+				bottom: view.scrollDOM.clientHeight * 0.3,
+			})),
 			EditorView.lineWrapping,
 			EditorView.clickAddsSelectionRange.of(event => event.altKey),
 			EditorView.contentAttributes.of({
