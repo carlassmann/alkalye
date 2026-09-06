@@ -44,6 +44,11 @@ describe("getWrapIndentColumns", () => {
 		expect(columns).toBe(8)
 	})
 
+	it("aligns custom task states with task text", () => {
+		let columns = getWrapIndentColumns("  - [-] dismissed task", 4)
+		expect(columns).toBe(8)
+	})
+
 	it("aligns ordered list continuation with list text", () => {
 		let columns = getWrapIndentColumns("  12. hello world", 4)
 		expect(columns).toBe(6)

@@ -90,10 +90,7 @@ function getUnorderedListTextStart(text: string, start: number): number | null {
 	if (
 		afterMarker + 2 < text.length &&
 		text[afterMarker] === "[" &&
-		text[afterMarker + 2] === "]" &&
-		(text[afterMarker + 1] === " " ||
-			text[afterMarker + 1] === "x" ||
-			text[afterMarker + 1] === "X")
+		text[afterMarker + 2] === "]"
 	) {
 		let afterTaskMarker = consumeWhitespace(text, afterMarker + 3)
 		if (afterTaskMarker > afterMarker + 3) {
