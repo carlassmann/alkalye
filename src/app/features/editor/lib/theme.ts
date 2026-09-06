@@ -14,6 +14,7 @@ let editorTheme: Extension = EditorView.theme({
 		fontVariantLigatures: "common-ligatures contextual",
 		WebkitFontFeatureSettings: '"liga" 1, "calt" 1',
 		fontFeatureSettings: '"liga" 1, "calt" 1',
+		textRendering: "optimizeLegibility",
 		backgroundColor: "var(--editor-background, #fafaf8)",
 		color: "var(--editor-foreground, #1a1a1a)",
 	},
