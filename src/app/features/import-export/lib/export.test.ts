@@ -1,9 +1,54 @@
-import { describe, it, expect } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
+import JSZip from "jszip"
 import {
+	canShareDocument,
+	createDocumentExport,
+	shareDocument,
 	transformWikilinksForExport,
 	stripBacklinksFrontmatter,
 	getRelativePath,
 } from "./export"
+
+afterEach(() => vi.unstubAllGlobals())
+
+describe("document sharing", () => {
+	it("bundles assets with the shared document", async () => {
+		let file = await createDocumentExport("![Logo](asset:logo)", "Notes", [
+			{
+				id: "logo",
+				name: "logo",
+				blob: new Blob(["image"], { type: "image/png" }),
+			},
+		])
+
+		expect(file.name).toBe("Notes.zip")
+		let archive = await JSZip.loadAsync(file)
+		await expect(archive.file("Notes/Notes.md")?.async("string")).resolves.toBe(
+			"![Logo](assets/logo.png)",
+		)
+	})
+
+	it("shares markdown content as a safely named file", async () => {
+		let share = vi.fn().mockResolvedValue(undefined)
+		vi.stubGlobal("navigator", {
+			share,
+			canShare: vi.fn().mockReturnValue(true),
+		})
+
+		await expect(shareDocument("# Notes", "Notes: draft")).resolves.toBe(true)
+
+		let shareData = share.mock.calls[0]?.[0]
+		expect(shareData?.title).toBe("Notes_ draft")
+		expect(shareData?.files[0]?.name).toBe("Notes_ draft.md")
+		expect(shareData?.files[0]?.size).toBe(new Blob(["# Notes"]).size)
+	})
+
+	it("requires browser support for sharing files", () => {
+		vi.stubGlobal("navigator", { share: vi.fn() })
+
+		expect(canShareDocument()).toBe(false)
+	})
+})
 
 describe("getRelativePath", () => {
 	it("returns title only when both docs at root", () => {

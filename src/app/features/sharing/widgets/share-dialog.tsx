@@ -39,6 +39,8 @@ import {
 	type Collaborator,
 } from "../lib/document-sharing"
 import { testIds } from "@/app/lib/test-ids"
+import { getDocumentTitle } from "@/app/features/documents"
+import { NativeShareIcon } from "@/app/components/native-share-icon"
 
 export { ShareDialog }
 
@@ -107,6 +109,8 @@ function ShareDialog({
 	let isGroupOwned = docGroup !== null
 	let isOwner = !isGroupOwned || isAdmin
 	let isCollaborator = isGroupOwned && !isAdmin
+	let canShareInvite =
+		typeof navigator !== "undefined" && typeof navigator.share === "function"
 
 	let refreshCollaboratorsRef = useRef(async () => {
 		let result = await listCollaborators(currentDoc)
@@ -160,6 +164,20 @@ function ShareDialog({
 		await navigator.clipboard.writeText(inviteLink)
 		setCopied(true)
 		setTimeout(() => setCopied(false), 2000)
+	}
+
+	async function handleShareInvite() {
+		if (!inviteLink) return
+
+		try {
+			await navigator.share({
+				title: getDocumentTitle(currentDoc.content?.toString() ?? ""),
+				url: inviteLink,
+			})
+		} catch (error) {
+			if (error instanceof Error && error.name !== "AbortError")
+				console.error("Failed to share invite link:", error)
+		}
 	}
 
 	async function handleCopyPublicLink() {
@@ -276,6 +294,18 @@ function ShareDialog({
 										)}
 									</Button>
 								</div>
+								{canShareInvite && (
+									<Button
+										variant="outline"
+										size="sm"
+										className="w-full"
+										onClick={handleShareInvite}
+										data-testid={testIds.collab.docShareInviteNativeButton}
+									>
+										<NativeShareIcon className="mr-1 size-3.5" />
+										<T k="sharing.document.link.share" />
+									</Button>
+								)}
 								<Button
 									variant="ghost"
 									size="sm"

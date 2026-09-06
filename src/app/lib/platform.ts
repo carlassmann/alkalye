@@ -7,6 +7,7 @@ export {
 	isTouchDevice,
 	isAndroid,
 	isIOS,
+	isApplePlatform,
 	isMobileDevice,
 	useIsPWAInstalled,
 	getPWAInstalledSnapshot,
@@ -30,6 +31,12 @@ function isAndroid(): boolean {
 
 function isIOS(): boolean {
 	return /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())
+}
+
+function isApplePlatform(
+	userAgent = typeof navigator === "undefined" ? "" : navigator.userAgent,
+): boolean {
+	return /mac|iphone|ipad|ipod/i.test(userAgent)
 }
 
 function isMobileDevice(): boolean {

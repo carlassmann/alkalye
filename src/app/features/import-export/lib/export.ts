@@ -4,6 +4,9 @@ import type { ExportComment } from "@/app/features/comments"
 
 export {
 	exportDocument,
+	createDocumentExport,
+	canShareDocument,
+	shareDocument,
 	saveDocumentAs,
 	exportDocumentsAsZip,
 	getExtensionFromBlob,
@@ -36,22 +39,22 @@ async function exportDocument(
 	assets?: ExportAsset[],
 	comments?: ExportComment[],
 ) {
+	let file = await createDocumentExport(content, filename, assets, comments)
+	downloadFile(file)
+}
+
+async function createDocumentExport(
+	content: string,
+	filename: string,
+	assets?: ExportAsset[],
+	comments?: ExportComment[],
+) {
 	let safeName = sanitizeFilename(filename)
 	let hasComments = comments && comments.length > 0
 
-	if ((!assets || assets.length === 0) && !hasComments) {
-		// No assets - just download the .md file
-		let blob = new Blob([content], { type: "text/markdown;charset=utf-8" })
-		let url = URL.createObjectURL(blob)
-		let a = document.createElement("a")
-		a.href = url
-		a.download = `${safeName}.md`
-		a.click()
-		URL.revokeObjectURL(url)
-		return
-	}
+	if ((!assets || assets.length === 0) && !hasComments)
+		return createDocumentFile(content, safeName)
 
-	// Bundled exports keep related files together.
 	let zip = new JSZip()
 	let docFolder = zip.folder(safeName)!
 	let assetNameMap = new Map<string, string>()
@@ -91,12 +94,56 @@ async function exportDocument(
 	writeCommentSidecar(docFolder, `${safeName}.comments.json`, comments)
 
 	let blob = await zip.generateAsync({ type: "blob" })
-	let url = URL.createObjectURL(blob)
+	return new File([blob], `${safeName}.zip`, { type: "application/zip" })
+}
+
+function downloadFile(file: File) {
+	let url = URL.createObjectURL(file)
 	let a = document.createElement("a")
 	a.href = url
-	a.download = `${safeName}.zip`
+	a.download = file.name
 	a.click()
 	URL.revokeObjectURL(url)
+}
+
+function canShareDocument() {
+	if (
+		typeof navigator === "undefined" ||
+		typeof navigator.share !== "function" ||
+		typeof navigator.canShare !== "function"
+	)
+		return false
+
+	return navigator.canShare({
+		files: [createDocumentFile("", "document")],
+	})
+}
+
+async function shareDocument(
+	content: string,
+	suggestedName: string,
+	assets?: ExportAsset[],
+	comments?: ExportComment[],
+) {
+	if (!canShareDocument()) return false
+
+	let safeName = sanitizeFilename(suggestedName)
+	let file = await createDocumentExport(content, safeName, assets, comments)
+	if (!navigator.canShare({ files: [file] })) return false
+
+	try {
+		await navigator.share({ files: [file], title: safeName })
+		return true
+	} catch (error) {
+		if (error instanceof Error && error.name === "AbortError") return false
+		throw error
+	}
+}
+
+function createDocumentFile(content: string, name: string) {
+	return new File([content], `${name}.md`, {
+		type: "text/markdown;charset=utf-8",
+	})
 }
 
 async function saveDocumentAs(content: string, suggestedName: string) {

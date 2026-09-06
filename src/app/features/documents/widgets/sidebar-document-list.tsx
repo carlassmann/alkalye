@@ -73,6 +73,7 @@ import {
 	parseSearchTerms,
 } from "@/app/components/ui/text-highlight"
 import { Spinner } from "@/app/components/ui/spinner"
+import { NativeShareIcon } from "@/app/components/native-share-icon"
 import {
 	getSharingStatus,
 	isDocumentPublic,
@@ -83,6 +84,8 @@ import {
 import { useFolderStore, FolderRow } from "./folder"
 import {
 	exportDocument,
+	canShareDocument,
+	shareDocument,
 	importMarkdownFiles,
 	ImportProgressDialog,
 	type ExportAsset,
@@ -896,7 +899,7 @@ function DocumentItem({
 	spaceGroupId?: string
 	t: ReturnType<typeof useIntl>
 }) {
-	let [shareOpen, setShareOpen] = useState(false)
+	let [collaborateOpen, setCollaborateOpen] = useState(false)
 	let [deleteOpen, setDeleteOpen] = useState(false)
 	let [leaveOpen, setLeaveOpen] = useState(false)
 	let [moveOpen, setMoveOpen] = useState(false)
@@ -920,6 +923,7 @@ function DocumentItem({
 	let docGroup = getDocumentGroup(doc)
 	let isAdmin = docGroup?.myRole() === "admin"
 	let docId = doc.$jazz.id
+	let canShare = canShareDocument()
 
 	// Build link props based on whether we're in a space context
 	// Pass search query to open find panel when document loads
@@ -1048,12 +1052,21 @@ function DocumentItem({
 						<Download />
 						{t("doc.download")}
 					</ContextMenuItem>
+					{canShare && (
+						<ContextMenuItem
+							onClick={makeShareDocument(doc, title)}
+							data-testid={testIds.doc.shareButton}
+						>
+							<NativeShareIcon />
+							{t("doc.shareCopy")}
+						</ContextMenuItem>
+					)}
 					<ContextMenuItem
-						onClick={() => setShareOpen(true)}
-						data-testid={testIds.doc.shareButton}
+						onClick={() => setCollaborateOpen(true)}
+						data-testid={testIds.doc.collaborateButton}
 					>
 						<Users />
-						{t("doc.sidebar.share")}
+						{t("doc.collaborate")}
 					</ContextMenuItem>
 					<ContextMenuItem
 						onClick={() => onDuplicate(doc)}
@@ -1094,8 +1107,12 @@ function DocumentItem({
 					)}
 				</ContextMenuContent>
 			</ContextMenu>
-			{shareOpen && (
-				<ShareDialog doc={doc} open={shareOpen} onOpenChange={setShareOpen} />
+			{collaborateOpen && (
+				<ShareDialog
+					doc={doc}
+					open={collaborateOpen}
+					onOpenChange={setCollaborateOpen}
+				/>
 			)}
 			{moveOpen && (
 				<MoveToFolderDialog
@@ -1338,6 +1355,21 @@ function makeDownloadDocument(doc: SidebarDoc, title: string) {
 			resolve: { content: true, comments: { $each: { replies: true } } },
 		})
 		await exportDocument(
+			loaded.content?.toString() ?? "",
+			title,
+			docAssets.length > 0 ? docAssets : undefined,
+			getExportComments(loaded),
+		)
+	}
+}
+
+function makeShareDocument(doc: SidebarDoc, title: string) {
+	return async function handleShareDocument() {
+		let docAssets = await loadDocumentAssets(doc)
+		let loaded = await doc.$jazz.ensureLoaded({
+			resolve: { content: true, comments: { $each: { replies: true } } },
+		})
+		await shareDocument(
 			loaded.content?.toString() ?? "",
 			title,
 			docAssets.length > 0 ? docAssets : undefined,

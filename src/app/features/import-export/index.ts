@@ -9,6 +9,9 @@ export {
 } from "./lib/import"
 export {
 	exportDocument,
+	createDocumentExport,
+	canShareDocument,
+	shareDocument,
 	saveDocumentAs,
 	exportDocumentsAsZip,
 	getExtensionFromBlob,

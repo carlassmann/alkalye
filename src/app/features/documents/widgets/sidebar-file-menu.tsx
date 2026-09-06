@@ -39,6 +39,8 @@ import { getPresentationMode } from "@/app/features/presentation"
 import { getDocumentTitle, addCopyToTitle } from "../lib/title"
 import {
 	exportDocument,
+	canShareDocument,
+	shareDocument,
 	saveDocumentAs,
 	printToPdf,
 	type ExportAsset,
@@ -113,6 +115,7 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 	let isPinned = parseFrontmatter(content).frontmatter?.pinned === true
 	let isPresentation = getPresentationMode(content)
 	let handlePrintPdf = makePrintPdf(content, account, doc)
+	let canShare = canShareDocument()
 
 	return (
 		<>
@@ -195,6 +198,14 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 						<DropdownMenuItem onClick={makeDownload(doc, content)}>
 							{t("doc.download")}
 						</DropdownMenuItem>
+						{canShare && (
+							<DropdownMenuItem
+								onClick={makeShare(doc, content)}
+								data-testid={testIds.doc.nativeShareButton}
+							>
+								{t("doc.shareCopy")}
+							</DropdownMenuItem>
+						)}
 						<DropdownMenuItem onClick={makeSaveAs(content)}>
 							{t("doc.saveAs")}
 							<DropdownMenuShortcut>
@@ -479,14 +490,7 @@ function makeTurnIntoPresentation(
 
 function makeDownload(doc: LoadedDocument, content: string) {
 	return async function handleDownload() {
-		let docAssets: ExportAsset[] = []
-		if (doc.assets?.$isLoaded) {
-			for (let asset of Array.from(doc.assets)) {
-				if (!asset?.$isLoaded) continue
-				let blob = await serializeAsset(asset)
-				if (blob) docAssets.push({ id: asset.$jazz.id, name: asset.name, blob })
-			}
-		}
+		let docAssets = await getExportAssets(doc)
 		let title = getDocumentTitle(content)
 		await exportDocument(
 			content,
@@ -502,6 +506,32 @@ function makeSaveAs(content: string) {
 		let title = getDocumentTitle(content)
 		await saveDocumentAs(content, title)
 	}
+}
+
+function makeShare(doc: LoadedDocument, content: string) {
+	return async function handleShare() {
+		let docAssets = await getExportAssets(doc)
+		let title = getDocumentTitle(content)
+		await shareDocument(
+			content,
+			title,
+			docAssets.length > 0 ? docAssets : undefined,
+			getExportComments(doc),
+		)
+	}
+}
+
+async function getExportAssets(doc: LoadedDocument) {
+	let docAssets: ExportAsset[] = []
+	if (!doc.assets?.$isLoaded) return docAssets
+
+	for (let asset of Array.from(doc.assets)) {
+		if (!asset?.$isLoaded) continue
+		let blob = await serializeAsset(asset)
+		if (blob) docAssets.push({ id: asset.$jazz.id, name: asset.name, blob })
+	}
+
+	return docAssets
 }
 
 function makePrintPdf(

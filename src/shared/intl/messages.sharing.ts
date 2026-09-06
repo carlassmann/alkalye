@@ -15,6 +15,7 @@ let baseSharingMessages = messages({
 	"sharing.document.link.canEdit": "Can edit",
 	"sharing.document.link.canView": "Can view",
 	"sharing.document.link.copyLabel": "Copy link",
+	"sharing.document.link.share": "Share invite...",
 	"sharing.document.link.dismiss": "Dismiss",
 	"sharing.document.link.createFailed": "Failed to create invite link",
 
@@ -131,6 +132,7 @@ let deSharingMessages = translate(baseSharingMessages, {
 	"sharing.document.link.canEdit": "Kann bearbeiten",
 	"sharing.document.link.canView": "Kann ansehen",
 	"sharing.document.link.copyLabel": "Link kopieren",
+	"sharing.document.link.share": "Einladung teilen...",
 	"sharing.document.link.dismiss": "Schließen",
 	"sharing.document.link.createFailed":
 		"Fehler beim Erstellen des Einladungslinks",
