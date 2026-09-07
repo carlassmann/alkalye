@@ -167,19 +167,20 @@ function DocScreen({ id, loaderData }: DocScreenProps) {
 	let spaceId = subscribedDoc?.$isLoaded
 		? subscribedDoc.spaceId
 		: loaderData.doc?.spaceId
+	let documentSpace = useCoState(Space, spaceId ?? undefined)
 
 	let isDeleted = subscribedDoc?.$jazz.loadingState === "deleted"
 
 	// Redirect space docs to their proper route (must call useEffect unconditionally)
 	useEffect(() => {
-		if (spaceId) {
+		if (spaceId && documentSpace?.$isLoaded) {
 			navigate({
 				to: "/spaces/$spaceId/doc/$id",
 				params: { spaceId, id },
 				replace: true,
 			})
 		}
-	}, [spaceId, id, navigate])
+	}, [spaceId, documentSpace?.$isLoaded, id, navigate])
 
 	// Navigate away when document is deleted
 	useEffect(() => {
@@ -215,7 +216,7 @@ function DocScreen({ id, loaderData }: DocScreenProps) {
 	let liveDoc = subscribedDoc?.$isLoaded ? subscribedDoc : null
 	let doc = liveDoc ?? loaderData.doc
 
-	if (doc.spaceId) {
+	if (doc.spaceId && documentSpace?.$jazz.loadingState === "loading") {
 		return (
 			<Empty className="h-screen">
 				<EmptyHeader>

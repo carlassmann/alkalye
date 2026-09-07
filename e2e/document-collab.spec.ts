@@ -8,6 +8,7 @@ import {
 	openAcceptedDocumentInvite,
 	revokeDocumentInvite,
 } from "./document-collab-helpers"
+import { createSpace } from "./space-helpers"
 import { testIds } from "@/app/lib/test-ids"
 
 test("document invite CRUD helpers return JSON", async ({ page }) => {
@@ -58,6 +59,35 @@ test("document invite accept helper returns JSON", async ({ page }) => {
 	expect(accepted.ok).toBe(true)
 	expect(accepted.docId).toBe(created.id)
 	expect(accepted.url).toContain(`/app/doc/${created.id}`)
+})
+
+test("document-only collaborator can open a document inside a space", async ({
+	page,
+}) => {
+	await waitForEditorBoot(page)
+	await createAccount(page)
+	let space = await createSpace(page, { name: "Document-only access" })
+	let created = await create(page, {
+		spaceId: space.id,
+		title: "Shared space document",
+		body: "Visible without joining the space",
+	})
+	let invite = await createDocumentInvite(page, {
+		spaceId: space.id,
+		docId: created.id,
+		role: "reader",
+	})
+	let collaborator = await openAcceptedDocumentInvite(page, {
+		link: invite.link,
+	})
+
+	try {
+		await expect(editorFor(collaborator.page)).toContainText(
+			"Visible without joining the space",
+		)
+	} finally {
+		await collaborator.context.close()
+	}
 })
 
 test("simultaneous writers converge without rolling back local text", async ({
