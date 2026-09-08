@@ -49,7 +49,8 @@ async function printToPdf(params: {
 	let theme = themeId
 		? findThemeById(themes ?? null, themeId)
 		: effectiveThemeName
-			? findThemeByName(themes ?? null, effectiveThemeName)
+			? (findThemeById(themes ?? null, effectiveThemeName) ??
+				findThemeByName(themes ?? null, effectiveThemeName))
 			: null
 	let preset = null
 

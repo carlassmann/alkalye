@@ -12,7 +12,7 @@ export {
 }
 
 let defaultDocumentTypographyCss = `
-  .content {
+  .document .content {
     color: var(--tw-prose-body);
     max-width: 65ch;
     :where(p):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
