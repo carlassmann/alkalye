@@ -13,6 +13,7 @@ export {
 	getCachedThemeStyles,
 	getCachedThemeStylesAsync,
 	cleanupThemeCache,
+	scopeThemeCss,
 	type ThemeStyles,
 	type ThemeRenderResult,
 }
@@ -22,6 +23,7 @@ type LoadedAsset = co.loaded<typeof ThemeAsset, { data: true }>
 
 type ThemeStyles = {
 	css: string
+	cssHash: string
 	fontFaceRules: string
 	presetVariables: string
 	blobUrls: string[]
@@ -37,6 +39,18 @@ let themeStylesCache = new Map<string, CacheEntry>()
 type ThemeRenderResult =
 	| { ok: true; styles: ThemeStyles }
 	| { ok: false; error: string }
+
+function scopeThemeCss(css: string, scopeSelector: string): string {
+	if (!css.trim()) return ""
+
+	let imports: string[] = []
+	let scopedCss = css.replace(/^\s*@import[\s\S]*?;/gim, importRule => {
+		imports.push(importRule.trim())
+		return ""
+	})
+	let scoped = `@scope (${scopeSelector}) {\n${scopedCss.replace(/:root\b/g, ":scope")}\n}`
+	return imports.length > 0 ? `${imports.join("\n")}\n${scoped}` : scoped
+}
 
 function getCachedThemeStyles(
 	theme: LoadedTheme,
@@ -114,6 +128,7 @@ function buildThemeStyles(
 
 	return {
 		css,
+		cssHash: hashText(css),
 		fontFaceRules,
 		presetVariables,
 		blobUrls,
@@ -228,6 +243,7 @@ async function buildThemeStylesAsync(
 
 	return {
 		css,
+		cssHash: hashText(css),
 		fontFaceRules,
 		presetVariables,
 		blobUrls,
@@ -263,7 +279,7 @@ function renderTemplateWithContent(
 	let parser = new DOMParser()
 	let doc = parser.parseFromString(template, "text/html")
 
-	let placeholder = doc.querySelector("[data-document]")
+	let placeholder = doc.querySelector("[data-content], [data-document]")
 	if (!placeholder) return null
 
 	placeholder.innerHTML = content
@@ -308,6 +324,15 @@ function tryRenderTemplateWithContent(
 
 function getCacheKey(themeId: string, presetName: string | null): string {
 	return `${themeId}:${presetName ?? "__default__"}`
+}
+
+function hashText(value: string): string {
+	let hash = 2166136261
+	for (let index = 0; index < value.length; index++) {
+		hash ^= value.charCodeAt(index)
+		hash = Math.imul(hash, 16777619)
+	}
+	return String(hash >>> 0)
 }
 
 function getFontFormat(mimeType: string): string {

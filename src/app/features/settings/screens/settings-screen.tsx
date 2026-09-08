@@ -42,7 +42,10 @@ import { Switch } from "@/app/components/ui/switch"
 import { UserAccount, Theme, ThemeAsset, Settings } from "@/schema"
 import {
 	parseThemeZip,
+	createDefaultTheme,
 	exportTheme,
+	createThemeSourceDocument,
+	serializeThemeSource,
 	type ThemeUploadError,
 	type ThemeExportQuery,
 } from "@/app/features/themes"
@@ -93,6 +96,7 @@ let settingsQuery = {
 			$each: {
 				css: true,
 				template: true,
+				slideTemplate: true,
 				thumbnail: { original: true },
 				assets: { $each: { data: true } },
 			},
@@ -439,6 +443,9 @@ function ThemesSection({ me }: ThemesSectionProps) {
 				template: parsed.template
 					? co.plainText().create(parsed.template, owner)
 					: undefined,
+				slideTemplate: parsed.slideTemplate
+					? co.plainText().create(parsed.slideTemplate, owner)
+					: undefined,
 				presets: parsed.presets ? JSON.stringify(parsed.presets) : undefined,
 				assets:
 					assets.length > 0
@@ -450,6 +457,16 @@ function ThemesSection({ me }: ThemesSectionProps) {
 			},
 			owner,
 		)
+		let source = await createThemeSourceDocument(me, {
+			themeId: theme.$jazz.id,
+			name: parsed.name,
+			source: serializeThemeSource({
+				css: parsed.css,
+				documentTemplate: parsed.template,
+				slideTemplate: parsed.slideTemplate,
+			}),
+		})
+		theme.$jazz.set("sourceDocId", source.$jazz.id)
 
 		if (!me.root.themes) {
 			me.root.$jazz.set("themes", co.list(Theme).create([], owner))
@@ -457,6 +474,11 @@ function ThemesSection({ me }: ThemesSectionProps) {
 		me.root.themes!.$jazz.push(theme)
 
 		setIsUploading(false)
+	}
+
+	async function handleCreateTheme() {
+		if (!me?.root) return
+		await createDefaultTheme(me)
 	}
 
 	function handleDeleteTheme() {
@@ -544,6 +566,22 @@ function ThemesSection({ me }: ThemesSectionProps) {
 													` • ${t("settings.themes.by")} ${theme.author}`}
 											</div>
 										</div>
+										{theme.sourceDocId && (
+											<Button
+												variant="ghost"
+												size="icon-sm"
+												nativeButton={false}
+												render={
+													<Link
+														to="/themes/$id/workbench"
+														params={{ id: theme.$jazz.id }}
+													/>
+												}
+												aria-label={`Edit ${theme.name} in workbench`}
+											>
+												<Pencil className="size-4" />
+											</Button>
+										)}
 										<Button
 											variant="ghost"
 											size="icon-sm"
@@ -583,24 +621,30 @@ function ThemesSection({ me }: ThemesSectionProps) {
 					className="hidden"
 					onChange={handleFileSelect}
 				/>
-				<Button
-					onClick={() => fileInputRef.current?.click()}
-					variant="outline"
-					size="sm"
-					disabled={isUploading}
-				>
-					{isUploading ? (
-						<>
-							<Loader2 className="mr-1.5 size-3.5 animate-spin" />
-							<T k="settings.themes.uploading" />
-						</>
-					) : (
-						<>
-							<Upload className="mr-1.5 size-3.5" />
-							<T k="settings.themes.uploadTheme" />
-						</>
-					)}
-				</Button>
+				<div className="flex gap-2">
+					<Button onClick={handleCreateTheme} variant="outline" size="sm">
+						<Plus className="mr-1.5 size-3.5" />
+						New custom theme
+					</Button>
+					<Button
+						onClick={() => fileInputRef.current?.click()}
+						variant="outline"
+						size="sm"
+						disabled={isUploading}
+					>
+						{isUploading ? (
+							<>
+								<Loader2 className="mr-1.5 size-3.5 animate-spin" />
+								<T k="settings.themes.uploading" />
+							</>
+						) : (
+							<>
+								<Upload className="mr-1.5 size-3.5" />
+								<T k="settings.themes.uploadTheme" />
+							</>
+						)}
+					</Button>
+				</div>
 			</div>
 
 			<ConfirmDialog

@@ -1,6 +1,11 @@
-import DOMPurify, { type Config } from "dompurify"
+import DOMPurify, { type Config, type WindowLike } from "dompurify"
 
-export { sanitizeCss, sanitizeHtml, type SanitizeResult }
+export {
+	sanitizeCss,
+	sanitizeHtml,
+	sanitizeHtmlWithWindow,
+	type SanitizeResult,
+}
 
 type SanitizeResult = {
 	sanitized: string
@@ -28,17 +33,31 @@ function sanitizeCss(css: string): SanitizeResult {
 }
 
 function sanitizeHtml(html: string): SanitizeResult {
+	return sanitizeHtmlWithPurifier(DOMPurify, html)
+}
+
+function sanitizeHtmlWithWindow(
+	window: WindowLike,
+	html: string,
+): SanitizeResult {
+	return sanitizeHtmlWithPurifier(DOMPurify(window), html)
+}
+
+function sanitizeHtmlWithPurifier(
+	purifier: typeof DOMPurify,
+	html: string,
+): SanitizeResult {
 	let removedPatterns: string[] = []
 	let removedCount = 0
 
-	DOMPurify.addHook("uponSanitizeElement", (_node, data) => {
+	purifier.addHook("uponSanitizeElement", (_node, data) => {
 		if (data.tagName && purifyConfig.FORBID_TAGS?.includes(data.tagName)) {
 			removedPatterns.push(`<${data.tagName}>`)
 			removedCount++
 		}
 	})
 
-	DOMPurify.addHook("uponSanitizeAttribute", (_node, data) => {
+	purifier.addHook("uponSanitizeAttribute", (_node, data) => {
 		if (data.attrName) {
 			if (
 				(data.attrName === "href" || data.attrName === "src") &&
@@ -54,10 +73,10 @@ function sanitizeHtml(html: string): SanitizeResult {
 		}
 	})
 
-	let sanitized: string = DOMPurify.sanitize(html, purifyConfig)
+	let sanitized: string = purifier.sanitize(html, purifyConfig)
 
-	DOMPurify.removeHooks("uponSanitizeElement")
-	DOMPurify.removeHooks("uponSanitizeAttribute")
+	purifier.removeHooks("uponSanitizeElement")
+	purifier.removeHooks("uponSanitizeAttribute")
 
 	let uniquePatterns = [...new Set(removedPatterns)]
 

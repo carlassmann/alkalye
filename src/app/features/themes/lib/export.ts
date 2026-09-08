@@ -3,6 +3,7 @@ import { type co, FileStream } from "jazz-tools"
 import { z } from "zod"
 import { Theme, ThemeAsset, ThemePreset, ThemeType } from "./schema"
 import { sanitizeFilename } from "@/app/features/import-export/lib/export"
+import { Document } from "@/app/features/documents/lib/schema"
 
 export { exportTheme, type ThemeExportQuery }
 
@@ -10,6 +11,7 @@ export { exportTheme, type ThemeExportQuery }
 type ThemeExportQuery = {
 	css: true
 	template: true
+	slideTemplate: true
 	thumbnail: { original: true }
 	assets: { $each: { data: true } }
 }
@@ -25,6 +27,8 @@ interface ThemeManifest {
 	type: z.infer<typeof ThemeType>
 	css: string
 	template?: string
+	slideTemplate?: string
+	source?: string
 	presets?: string
 	fonts?: { name: string; path: string }[]
 	thumbnail?: string
@@ -55,6 +59,23 @@ async function exportTheme(theme: LoadedThemeForExport): Promise<void> {
 		if (templateContent) {
 			zip.file("template.html", templateContent)
 			manifest.template = "template.html"
+		}
+	}
+	if (theme.slideTemplate) {
+		let slideTemplateContent = theme.slideTemplate.toString()
+		if (slideTemplateContent) {
+			zip.file("slide.html", slideTemplateContent)
+			manifest.slideTemplate = "slide.html"
+		}
+	}
+
+	if (theme.sourceDocId) {
+		let source = await Document.load(theme.sourceDocId, {
+			resolve: { content: true },
+		})
+		if (source.$isLoaded && source.content?.$isLoaded) {
+			zip.file("source.md", source.content.toString())
+			manifest.source = "source.md"
 		}
 	}
 

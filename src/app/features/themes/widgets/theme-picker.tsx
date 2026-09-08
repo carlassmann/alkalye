@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "@tanstack/react-router"
 import { useAccount, Image } from "jazz-tools/react"
 import { co } from "jazz-tools"
 import { Button } from "@/app/components/ui/button"
@@ -56,6 +57,9 @@ function ThemePicker({ content, onThemeChange, disabled }: ThemePickerProps) {
 	)
 
 	let hasThemes = themes.length > 0
+	let selectedTheme = themes.find(theme =>
+		isThemeSelected(currentThemeName, theme),
+	)
 
 	if (!hasThemes) {
 		return null
@@ -93,11 +97,9 @@ function ThemePicker({ content, onThemeChange, disabled }: ThemePickerProps) {
 							<ThemeMenuItem
 								key={theme.$jazz.id}
 								theme={theme}
-								isSelected={
-									currentThemeName?.toLowerCase() === theme.name.toLowerCase()
-								}
+								isSelected={isThemeSelected(currentThemeName, theme)}
 								onSelect={() => {
-									let newContent = setTheme(content, theme.name)
+									let newContent = setTheme(content, theme.$jazz.id)
 									onThemeChange(newContent)
 								}}
 							/>
@@ -114,11 +116,9 @@ function ThemePicker({ content, onThemeChange, disabled }: ThemePickerProps) {
 							<ThemeMenuItem
 								key={theme.$jazz.id}
 								theme={theme}
-								isSelected={
-									currentThemeName?.toLowerCase() === theme.name.toLowerCase()
-								}
+								isSelected={isThemeSelected(currentThemeName, theme)}
 								onSelect={() => {
-									let newContent = setTheme(content, theme.name)
+									let newContent = setTheme(content, theme.$jazz.id)
 									onThemeChange(newContent)
 								}}
 							/>
@@ -138,8 +138,34 @@ function ThemePicker({ content, onThemeChange, disabled }: ThemePickerProps) {
 						</DropdownMenuItem>
 					</>
 				)}
+				{selectedTheme?.sourceDocId && (
+					<>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem
+							render={
+								<Link
+									to="/themes/$id/workbench"
+									params={{ id: selectedTheme.$jazz.id }}
+								/>
+							}
+						>
+							Edit theme
+						</DropdownMenuItem>
+					</>
+				)}
 			</DropdownMenuContent>
 		</DropdownMenu>
+	)
+}
+
+function isThemeSelected(
+	themeReference: string | undefined,
+	theme: LoadedTheme,
+): boolean {
+	if (!themeReference) return false
+	return (
+		themeReference === theme.$jazz.id ||
+		themeReference.toLowerCase() === theme.name.toLowerCase()
 	)
 }
 

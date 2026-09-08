@@ -7,8 +7,10 @@ import { type co } from "jazz-tools"
 
 export {
 	getThemeName,
+	getThemeId,
 	getPresetName,
 	findThemeByName,
+	findThemeById,
 	getThemePresets,
 	findPresetByName,
 	findPresetByAppearance,
@@ -29,7 +31,12 @@ type ResolvedTheme = {
 }
 
 type ThemesQuery = {
-	$each: { css: true; template: true; assets: { $each: { data: true } } }
+	$each: {
+		css: true
+		template: true
+		slideTemplate: true
+		assets: { $each: { data: true } }
+	}
 }
 type LoadedThemes = co.loaded<
 	ReturnType<typeof co.list<typeof Theme>>,
@@ -44,6 +51,12 @@ function getThemeName(content: string): string | null {
 	if (typeof theme !== "string" || !theme.trim()) return null
 
 	return theme.trim()
+}
+
+function getThemeId(content: string): string | null {
+	let { frontmatter } = parseFrontmatter(content)
+	let value = frontmatter?.["theme-id"]
+	return typeof value === "string" && value.trim() ? value.trim() : null
 }
 
 function getPresetName(content: string): string | null {
@@ -67,6 +80,17 @@ function findThemeByName(
 		if (theme?.name?.toLowerCase() === lowerName && theme.$isLoaded) {
 			return theme
 		}
+	}
+	return null
+}
+
+function findThemeById(
+	themes: LoadedThemes | null | undefined,
+	themeId: string,
+): co.loaded<typeof Theme, ThemesQuery["$each"]> | null {
+	if (!themes) return null
+	for (let theme of themes) {
+		if (theme?.$isLoaded && theme.$jazz.id === themeId) return theme
 	}
 	return null
 }
@@ -110,10 +134,13 @@ function resolveDocumentTheme(params: {
 	themes: LoadedThemes | null | undefined
 	defaultThemeName: string | null
 	appearance?: Appearance | null
+	themeOverrideId?: string
 }): Omit<ResolvedTheme, "isLoading"> {
-	let { content, themes, defaultThemeName, appearance } = params
+	let { content, themes, defaultThemeName, appearance, themeOverrideId } =
+		params
 
 	let themeName = getThemeName(content)
+	let themeId = getThemeId(content)
 	let presetName = getPresetName(content)
 
 	let isAppearanceOnlyTheme = themeName === "light" || themeName === "dark"
@@ -121,12 +148,19 @@ function resolveDocumentTheme(params: {
 		? null
 		: (themeName ?? defaultThemeName)
 
-	if (!effectiveThemeName) {
+	if (!effectiveThemeName && !themeOverrideId) {
 		return { theme: null, preset: null, warning: null }
 	}
 
-	let theme = findThemeByName(themes ?? null, effectiveThemeName)
+	let theme = themeOverrideId
+		? findThemeById(themes ?? null, themeOverrideId)
+		: themeId
+			? findThemeById(themes ?? null, themeId)
+			: (findThemeById(themes ?? null, effectiveThemeName ?? "") ??
+				findThemeByName(themes ?? null, effectiveThemeName ?? ""))
 	if (!theme) {
+		if (themeOverrideId || themeId || effectiveThemeName?.startsWith("co_"))
+			return { theme: null, preset: null, warning: null }
 		if (themeName && !isAppearanceOnlyTheme) {
 			return {
 				theme: null,
@@ -167,6 +201,7 @@ function useDocumentTheme(
 	content: string,
 	mode: ThemeMode = "preview",
 	appearance?: Appearance | null,
+	themeOverrideId?: string,
 ): ResolvedTheme {
 	let me = useAccount(UserAccount, { resolve: themesQuery })
 
@@ -186,6 +221,7 @@ function useDocumentTheme(
 		themes: me.root.themes as LoadedThemes,
 		defaultThemeName,
 		appearance,
+		themeOverrideId,
 	})
 
 	return { ...resolved, isLoading: false }
@@ -195,7 +231,12 @@ let themesQuery = {
 	root: {
 		settings: true,
 		themes: {
-			$each: { css: true, template: true, assets: { $each: { data: true } } },
+			$each: {
+				css: true,
+				template: true,
+				slideTemplate: true,
+				assets: { $each: { data: true } },
+			},
 		},
 	},
 } as const

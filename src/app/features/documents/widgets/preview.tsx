@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, useId, type RefObject } from "react"
+import { createPortal } from "react-dom"
 import { Image as JazzImage } from "jazz-tools/react"
 import { getDocumentTitle } from "../lib/title"
 import {
@@ -18,8 +19,10 @@ import { type ResolvedDoc } from "../lib/wikilink-titles"
 import { useResolvedTheme } from "@/app/components/appearance"
 import {
 	useDocumentTheme,
+	getDefaultDocumentCss,
+	sanitizeHtml,
+	scopeThemeCss,
 	tryCachedThemeStylesAsync,
-	tryRenderTemplateWithContent,
 	type ResolvedTheme,
 	type ThemeStyles,
 } from "@/app/features/themes"
@@ -39,6 +42,7 @@ type Asset = {
 	video?: { $isLoaded?: boolean; toBlob?: () => Blob | undefined }
 	muteAudio?: boolean
 	revision?: {
+		$isLoaded?: boolean
 		lightPreview?: { $jazz: { id: string } }
 		darkPreview?: { $jazz: { id: string } }
 	}
@@ -52,6 +56,9 @@ interface PreviewProps {
 	comments?: PreviewComment[]
 	onCommentSelect?: (threadId: string) => void
 	onTextSelectionChange?: (selection: PreviewTextSelection | null) => void
+	themeOverrideId?: string
+	appearanceOverride?: "light" | "dark"
+	embedded?: boolean
 }
 
 type PreviewComment = {
@@ -83,15 +90,24 @@ function Preview({
 	comments = [],
 	onCommentSelect,
 	onTextSelectionChange,
+	themeOverrideId,
+	appearanceOverride,
+	embedded = false,
 }: PreviewProps) {
 	let resolvedTheme = useResolvedTheme()
-	let documentTheme = useDocumentTheme(content, "preview", resolvedTheme)
+	let previewAppearance = appearanceOverride ?? resolvedTheme
+	let documentTheme = useDocumentTheme(
+		content,
+		"preview",
+		previewAppearance,
+		themeOverrideId,
+	)
 
 	let wikilinkResolver: WikilinkTitleResolver = docId => {
 		return wikilinks.get(docId) ?? { title: docId, exists: false }
 	}
 
-	let marked = useMarked(wikilinkResolver, resolvedTheme)
+	let marked = useMarked(wikilinkResolver, previewAppearance)
 
 	if (!marked) return null
 
@@ -100,13 +116,14 @@ function Preview({
 			content={content}
 			assets={assets}
 			marked={marked}
-			colorScheme={resolvedTheme}
+			colorScheme={previewAppearance}
 			cacheVersion={wikilinks.size}
 			onExit={onExit}
 			documentTheme={documentTheme}
 			comments={comments}
 			onCommentSelect={onCommentSelect}
 			onTextSelectionChange={onTextSelectionChange}
+			embedded={embedded}
 		/>
 	)
 }
@@ -127,6 +144,7 @@ function PreviewContent({
 	comments,
 	onCommentSelect,
 	onTextSelectionChange,
+	embedded,
 }: {
 	content: string
 	assets?: Asset[]
@@ -138,10 +156,12 @@ function PreviewContent({
 	comments: PreviewComment[]
 	onCommentSelect?: (threadId: string) => void
 	onTextSelectionChange?: (selection: PreviewTextSelection | null) => void
+	embedded: boolean
 }) {
 	let [segments, setSegments] = useState<Segment[]>([])
 	let [prevContent, setPrevContent] = useState(content)
 	let previewRef = useRef<HTMLDivElement>(null)
+	let themeScopeId = useId()
 	let themeStylesResult = useThemeStyles(documentTheme)
 	let themeStyles = themeStylesResult.styles
 
@@ -159,9 +179,11 @@ function PreviewContent({
 		let { body } = parseFrontmatter(content)
 		let cancelled = false
 
-		parseSegments(body, assets, marked, colorScheme).then(result => {
-			if (!cancelled) setSegments(result)
-		})
+		void parseSegments(body, assets, marked, colorScheme)
+			.then(result => {
+				if (!cancelled) setSegments(result)
+			})
+			.catch(() => undefined)
 
 		return () => {
 			cancelled = true
@@ -194,39 +216,49 @@ function PreviewContent({
 		? `[data-theme] { transition: color 150ms ease-out, background-color 150ms ease-out; }`
 		: ""
 
-	// Combine all theme CSS with transitions first
-	let injectedStyles = themeStyles
-		? [
-				transitionStyles,
-				themeStyles.fontFaceRules,
-				themeStyles.presetVariables,
-				themeStyles.css,
-			]
+	let documentBaseCss = scopeThemeCss(
+		getDefaultDocumentCss(),
+		`[data-theme-scope="${themeScopeId}"]`,
+	)
+	let themeRules = themeStyles
+		? [transitionStyles, themeStyles.presetVariables, themeStyles.css]
 				.filter(Boolean)
 				.join("\n")
 		: transitionStyles
+	let isSourceTheme = Boolean(documentTheme.theme?.sourceDocId)
+	let scopedThemeRules = isSourceTheme
+		? scopeThemeCss(themeRules, `[data-theme-scope="${themeScopeId}"]`)
+		: themeRules
+	let injectedStyles = themeStyles
+		? [documentBaseCss, scopedThemeRules, themeStyles.fontFaceRules]
+				.filter(Boolean)
+				.join("\n")
+		: [documentBaseCss, scopedThemeRules].filter(Boolean).join("\n")
 
 	let templateHtml = documentTheme.theme?.template?.toString() ?? null
-	let themeName = documentTheme.theme?.name ?? "unknown"
-
-	// For template rendering, combine all segment HTML
-	let combinedHtml = segments
-		.map(seg => (seg.type === "text" ? seg.html : ""))
-		.join("")
-
-	// Try to render with template if available
-	let templatedContent: string | null = null
 	let templateError: string | null = null
-	if (templateHtml && combinedHtml) {
-		let result = tryRenderTemplateWithContent(
+	let safeTemplateHtml = templateHtml
+		? sanitizeHtml(templateHtml).sanitized
+		: null
+	if (templateHtml) {
+		let templateDocument = new DOMParser().parseFromString(
 			templateHtml,
-			combinedHtml,
-			themeName,
+			"text/html",
 		)
-		if (result.ok) {
-			templatedContent = result.html
-		} else {
-			templateError = result.error
+		if (templateDocument.querySelector("style")) {
+			templateError =
+				"HTML templates cannot contain style blocks; put CSS in a css theme fence"
+		}
+		let sanitizedDocument = safeTemplateHtml
+			? new DOMParser().parseFromString(safeTemplateHtml, "text/html")
+			: null
+		let slots = sanitizedDocument?.querySelectorAll(
+			"[data-content], [data-document]",
+		)
+		if (!slots?.length) {
+			templateError = "Template is missing [data-content] placeholder"
+		} else if (slots.length > 1) {
+			templateError = "Template needs exactly one data-content placeholder"
 		}
 	}
 
@@ -237,7 +269,7 @@ function PreviewContent({
 		if (!root) return
 		applyPreviewCommentHighlights(root, comments, onCommentSelect)
 		scrollSelectedPreviewCommentIntoView(root, comments)
-	}, [segments, templatedContent, comments, onCommentSelect])
+	}, [segments, safeTemplateHtml, comments, onCommentSelect])
 
 	useEffect(() => {
 		function handleSelectionChange() {
@@ -295,7 +327,11 @@ function PreviewContent({
 
 	return (
 		<div
-			className="min-w-0 flex-1 overflow-auto"
+			className={
+				embedded
+					? "h-full min-h-0 min-w-0 flex-1 overflow-auto"
+					: "min-w-0 flex-1 overflow-auto"
+			}
 			style={{
 				paddingLeft: "env(safe-area-inset-left)",
 				paddingRight: "env(safe-area-inset-right)",
@@ -321,62 +357,35 @@ function PreviewContent({
 				</div>
 			)}
 
-			{templatedContent ? (
-				// Render with custom template
-				<div
-					ref={previewRef}
-					className="mx-auto max-w-[65ch] px-6 py-8"
-					data-theme={documentTheme.theme?.name ?? undefined}
-					dangerouslySetInnerHTML={{ __html: templatedContent }}
-				/>
-			) : (
-				// Default rendering without template
-				// data-theme is on the outer div so themes can use [data-theme="Name"] article selectors
-				<div
-					ref={previewRef}
-					className="mx-auto max-w-[65ch] px-6 py-8"
-					data-theme={documentTheme.theme?.name ?? undefined}
-				>
-					<article className="prose prose-neutral dark:prose-invert prose-headings:font-semibold prose-a:text-foreground prose-code:before:content-none prose-code:after:content-none [&_pre]:shadow-inset [&_pre]:border-border [&_pre]:rounded-lg [&_pre]:border [&_pre]:p-4">
-						{segments.map((segment, i) => {
-							if (segment.type === "text") {
-								return (
-									<div
-										key={i}
-										dangerouslySetInnerHTML={{ __html: segment.html }}
-									/>
-								)
-							}
-							if (segment.type === "image") {
-								return (
-									<figure key={i} className="my-4">
-										<JazzImage
-											imageId={segment.imageId}
-											alt={segment.alt}
-											className="w-full rounded-lg"
-										/>
-										{segment.alt && (
-											<figcaption className="text-muted-foreground mt-2 text-center text-sm">
-												{segment.alt}
-											</figcaption>
-										)}
-									</figure>
-								)
-							}
-							return (
-								<figure key={i} className="my-4 flex flex-col items-center">
-									<VideoPlayer asset={segment.asset} />
-									{segment.alt && (
-										<figcaption className="text-muted-foreground mt-2 text-center text-sm">
-											{segment.alt}
-										</figcaption>
-									)}
-								</figure>
-							)
-						})}
-					</article>
-				</div>
-			)}
+			<div
+				data-theme-scope={themeScopeId}
+				data-appearance={colorScheme}
+				className="min-h-full"
+			>
+				{safeTemplateHtml && !templateError ? (
+					<TemplatePreview
+						previewRef={previewRef}
+						templateHtml={safeTemplateHtml}
+						segments={segments}
+						themeName={documentTheme.theme?.name}
+						appearance={colorScheme}
+						embedded={embedded}
+						comments={comments}
+						onCommentSelect={onCommentSelect}
+					/>
+				) : (
+					<div
+						ref={previewRef}
+						className={
+							embedded ? "theme document min-h-full" : "theme document"
+						}
+						data-theme={documentTheme.theme?.name ?? undefined}
+						data-appearance={colorScheme}
+					>
+						<PreviewSegments segments={segments} />
+					</div>
+				)}
+			</div>
 		</div>
 	)
 }
@@ -405,6 +414,92 @@ function applyPreviewCommentHighlights(
 			)
 		}
 	}
+}
+
+function TemplatePreview({
+	previewRef,
+	templateHtml,
+	segments,
+	themeName,
+	appearance,
+	embedded,
+	comments,
+	onCommentSelect,
+}: {
+	previewRef: RefObject<HTMLDivElement | null>
+	templateHtml: string
+	segments: Segment[]
+	themeName?: string
+	appearance: "light" | "dark"
+	embedded: boolean
+	comments: PreviewComment[]
+	onCommentSelect?: (threadId: string) => void
+}) {
+	let [slot, setSlot] = useState<HTMLElement | null>(null)
+
+	useEffect(() => {
+		let root = previewRef.current
+		if (!root || !slot) return
+		applyPreviewCommentHighlights(root, comments, onCommentSelect)
+		scrollSelectedPreviewCommentIntoView(root, comments)
+	}, [previewRef, slot, segments, comments, onCommentSelect])
+
+	return (
+		<>
+			<div
+				ref={node => {
+					previewRef.current = node
+					let candidate = node?.querySelector("[data-content], [data-document]")
+					setSlot(candidate instanceof HTMLElement ? candidate : null)
+				}}
+				className={embedded ? "theme document min-h-full" : "theme document"}
+				data-theme={themeName}
+				data-appearance={appearance}
+				dangerouslySetInnerHTML={{ __html: templateHtml }}
+			/>
+			{slot && createPortal(<PreviewSegments segments={segments} />, slot)}
+		</>
+	)
+}
+
+function PreviewSegments({ segments }: { segments: Segment[] }) {
+	return (
+		<article className="content">
+			{segments.map((segment, i) => {
+				if (segment.type === "text") {
+					return (
+						<div key={i} dangerouslySetInnerHTML={{ __html: segment.html }} />
+					)
+				}
+				if (segment.type === "image") {
+					return (
+						<figure key={i} className="my-4">
+							<JazzImage
+								imageId={segment.imageId}
+								alt={segment.alt}
+								className="w-full rounded-lg"
+							/>
+							{segment.alt && (
+								<figcaption className="text-muted-foreground mt-2 text-center text-sm">
+									{segment.alt}
+								</figcaption>
+							)}
+						</figure>
+					)
+				}
+				return (
+					<figure key={i} className="my-4 flex flex-col items-center">
+						<VideoPlayer asset={segment.asset} />
+						{segment.alt && (
+							<figcaption className="text-muted-foreground mt-2 text-center text-sm">
+								{segment.alt}
+							</figcaption>
+						)}
+					</figure>
+				)
+			})}
+		</article>
+	)
 }
 
 function clearPreviewCommentHighlights(root: HTMLElement) {
@@ -620,7 +715,11 @@ function useThemeStyles(documentTheme: ResolvedTheme): ThemeStylesResult {
 		return () => {
 			cancelled = true
 		}
-	}, [documentTheme.theme, documentTheme.preset])
+	}, [
+		documentTheme.theme,
+		documentTheme.preset,
+		documentTheme.theme?.updatedAt,
+	])
 
 	return { styles, error, isLoading }
 }

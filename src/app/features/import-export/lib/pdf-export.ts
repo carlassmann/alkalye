@@ -4,7 +4,9 @@ import { type Theme, type ThemeAsset } from "@/schema"
 import { parseFrontmatter } from "@/app/features/editor/lib/frontmatter"
 import {
 	findThemeByName,
+	findThemeById,
 	getThemeName,
+	getThemeId,
 	getPresetName,
 	findPresetByName,
 	getThemePresets,
@@ -13,6 +15,7 @@ import {
 	type ThemesQuery,
 	type ThemePresetType,
 } from "@/app/features/themes/lib/document-theme"
+import { scopeThemeCss } from "@/app/features/themes/lib/renderer"
 import { getDocumentTitle } from "@/app/features/documents/lib/title"
 import type { PrintableAsset } from "@/app/features/assets"
 import { replaceAssetSources } from "./print-media"
@@ -33,6 +36,7 @@ async function printToPdf(params: {
 	let title = getDocumentTitle(content)
 
 	let themeName = getThemeName(content)
+	let themeId = getThemeId(content)
 	let presetName = getPresetName(content)
 
 	let isAppearanceOnlyTheme = themeName === "light" || themeName === "dark"
@@ -42,9 +46,11 @@ async function printToPdf(params: {
 		effectiveThemeName = defaultPreviewTheme
 	}
 
-	let theme = effectiveThemeName
-		? findThemeByName(themes ?? null, effectiveThemeName)
-		: null
+	let theme = themeId
+		? findThemeById(themes ?? null, themeId)
+		: effectiveThemeName
+			? findThemeByName(themes ?? null, effectiveThemeName)
+			: null
 	let preset = null
 
 	if (theme && presetName) {
@@ -84,6 +90,7 @@ async function buildPrintableHtml(params: {
 	let presetVariables = ""
 	let themeCss = ""
 	let bodyContent = ""
+	let documentContent = `<article class="content">${htmlContent}</article>`
 
 	if (theme) {
 		fontFaceRules = await buildFontFaceRulesBase64(theme)
@@ -94,15 +101,18 @@ async function buildPrintableHtml(params: {
 
 		// Get CSS if loaded
 		if (theme.css?.$isLoaded) {
-			themeCss = theme.css.toString()
+			let css = theme.css.toString()
+			themeCss = theme.sourceDocId
+				? scopeThemeCss(css, `[data-theme-scope="print"]`)
+				: css
 		}
 
 		// Try to render with theme template
 		if (theme.template?.$isLoaded) {
 			let templateHtml = theme.template.toString()
-			let rendered = renderTemplateWithContent(templateHtml, htmlContent)
+			let rendered = renderTemplateWithContent(templateHtml, documentContent)
 			if (rendered) {
-				bodyContent = `<div data-theme="${theme.name}">${rendered}</div>`
+				bodyContent = createPrintableThemeRoot(theme.name, rendered)
 			}
 		}
 	}
@@ -110,7 +120,7 @@ async function buildPrintableHtml(params: {
 	// Fall back to default structure if no template or template failed
 	if (!bodyContent) {
 		let themeName = theme?.name ?? ""
-		bodyContent = `<div data-theme="${themeName}"><article>${htmlContent}</article></div>`
+		bodyContent = createPrintableThemeRoot(themeName, documentContent)
 	}
 
 	let html = `<!DOCTYPE html>
@@ -302,6 +312,10 @@ async function buildPrintableHtml(params: {
 	return html
 }
 
+function createPrintableThemeRoot(themeName: string, content: string): string {
+	return `<div data-theme-scope="print" data-appearance="light"><div class="theme document" data-theme="${themeName}" data-appearance="light">${content}</div></div>`
+}
+
 function openPrintWindow(html: string): void {
 	let printWindow = window.open("", "_blank")
 	if (!printWindow) {
@@ -356,7 +370,7 @@ function renderTemplateWithContent(
 	let parser = new DOMParser()
 	let doc = parser.parseFromString(template, "text/html")
 
-	let placeholder = doc.querySelector("[data-document]")
+	let placeholder = doc.querySelector("[data-content], [data-document]")
 	if (!placeholder) return null
 
 	placeholder.innerHTML = content

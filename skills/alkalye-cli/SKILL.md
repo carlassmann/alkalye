@@ -1,6 +1,6 @@
 ---
 name: alkalye-cli
-description: Drive Alkalye via the command line for auth, documents, spaces, and collaboration. Manage documents, share with others, and collaborate — all from the terminal.
+description: Drive Alkalye via the command line for auth, documents, themes, spaces, and collaboration. Manage documents, share with others, and collaborate — all from the terminal.
 compatibility: Requires Bun (>=1.0) and a reachable Jazz websocket sync peer.
 metadata:
   author: alkalye
@@ -85,6 +85,22 @@ alkalye auth logout
 ```
 
 Credentials are stored in `~/.alkalye/cli/` (override with `--home` or `ALKALYE_CLI_HOME`).
+
+## Themes
+
+Use theme commands to create or update themes from Markdown with separate `css theme`, optional `html document`, and optional `html slide` code fences. Read [the theme authoring guide](../../public/docs/theming-guide.md) for the rendering contract.
+
+```bash
+alkalye theme list --json
+alkalye theme create --name "My theme" --source theme.md --json
+alkalye theme get <theme-id> --json
+alkalye theme update <theme-id> --source theme.md --json
+alkalye theme delete <theme-id> --json
+```
+
+Create/update compile immediately and return identifiers and a workbench URL. Use a browser tool to inspect that URL and a real target document; check both appearances and document/slideshow modes. Export a PDF when print output matters. Syntax/template validation is not visual QA.
+
+Assign a theme by editing the target document's `theme` frontmatter through `doc content` and `doc update`. Use the theme ID and preserve the remaining document. For theme edits use `theme update`; `doc update` on its source alone relies on the browser workbench to compile it.
 
 ## Documents
 

@@ -95,7 +95,12 @@ let themesResolve = {
 	root: {
 		settings: true,
 		themes: {
-			$each: { css: true, template: true, assets: { $each: { data: true } } },
+			$each: {
+				css: true,
+				template: true,
+				slideTemplate: true,
+				assets: { $each: { data: true } },
+			},
 		},
 	},
 } as const

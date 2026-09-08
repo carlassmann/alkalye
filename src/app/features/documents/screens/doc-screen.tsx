@@ -127,7 +127,7 @@ import { HelpMenu } from "@/app/components/help-menu"
 import { EditorStatsBadge } from "@/app/features/editor"
 import { useTrackLastOpened } from "../hooks/use-track-last-opened"
 import { printToPdf } from "@/app/features/import-export"
-import { loadThemesForPdf } from "@/app/features/themes"
+import { loadThemesForPdf, syncThemeFromSource } from "@/app/features/themes"
 import { testIds } from "@/app/lib/test-ids"
 import { useIntl } from "@/shared/intl/setup"
 import { makeFolderDocumentContent } from "../lib/folders"
@@ -513,6 +513,7 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 					current === pendingContent ? null : current,
 				)
 				syncBacklinks(appliedContent)
+				if (me.$isLoaded) void syncThemeFromSource(me, docId, appliedContent)
 				if (cursor) updateCursor(cursor.from, cursor.to)
 				signalDocumentSaved(docId, appliedContent)
 			})
@@ -551,6 +552,7 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 			baseContent,
 		)
 		syncBacklinks(appliedContent)
+		if (me.$isLoaded) void syncThemeFromSource(me, docId, appliedContent)
 		if (cursor) updateCursor(cursor.from, cursor.to)
 		return appliedContent
 	}

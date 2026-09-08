@@ -2,6 +2,7 @@ import JSZip from "jszip"
 import { z } from "zod"
 import { ThemeType, ThemePreset } from "./schema"
 import { sanitizeCss, sanitizeHtml } from "./sanitize"
+import { parseThemeSource } from "./source"
 
 export {
 	parseThemeZip,
@@ -20,6 +21,8 @@ let ThemeJsonSchema = z.object({
 	type: ThemeType,
 	css: z.string().min(1, "CSS file path is required"),
 	template: z.string().optional(),
+	slideTemplate: z.string().optional(),
+	source: z.string().optional(),
 	presets: z.string().optional(),
 	fonts: z
 		.array(
@@ -41,6 +44,7 @@ interface ParsedTheme {
 	type: z.infer<typeof ThemeType>
 	css: string
 	template?: string
+	slideTemplate?: string
 	presets?: z.infer<typeof ThemePreset>[]
 	assets: ParsedThemeAsset[]
 	thumbnail?: File
@@ -171,6 +175,39 @@ async function parseThemeZip(file: File): Promise<ParseResult> {
 		}
 	}
 
+	let slideTemplate: string | undefined
+	if (themeJson.slideTemplate) {
+		let slideTemplateFile = zip.file(basePath + themeJson.slideTemplate)
+		if (slideTemplateFile) {
+			try {
+				let rawSlideTemplate = await slideTemplateFile.async("string")
+				slideTemplate = sanitizeHtml(rawSlideTemplate).sanitized
+			} catch {
+				// Optional slideshow template
+			}
+		}
+	}
+
+	if (themeJson.source) {
+		let sourceFile = zip.file(basePath + themeJson.source)
+		if (sourceFile) {
+			try {
+				let source = parseThemeSource(await sourceFile.async("string"))
+				if (source.errors.length === 0) {
+					css = sanitizeCss(source.css).sanitized
+					template = source.documentTemplate
+						? sanitizeHtml(source.documentTemplate).sanitized
+						: undefined
+					slideTemplate = source.slideTemplate
+						? sanitizeHtml(source.slideTemplate).sanitized
+						: undefined
+				}
+			} catch {
+				// Keep the compiled files when source.md is unavailable or invalid
+			}
+		}
+	}
+
 	let presets: z.infer<typeof ThemePreset>[] | undefined
 	if (themeJson.presets) {
 		let presetsPath = basePath + themeJson.presets
@@ -282,6 +319,7 @@ async function parseThemeZip(file: File): Promise<ParseResult> {
 			type: themeJson.type,
 			css,
 			template,
+			slideTemplate,
 			presets,
 			assets,
 			thumbnail,

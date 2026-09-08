@@ -40,6 +40,10 @@ bunx jazz-sync run # start sync server
 bun run dev
 ```
 
+## Theme authoring
+
+See the [theme authoring guide](public/docs/theming-guide.md) for Markdown theme sources, CSS/HTML hooks, light/dark styling, and a prompt to give your agent.
+
 ## CLI
 
 ```bash

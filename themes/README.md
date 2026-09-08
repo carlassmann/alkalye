@@ -2,6 +2,8 @@
 
 Example themes for testing the Alkalye theming system.
 
+For new themes, start with the [theme authoring guide](../public/docs/theming-guide.md) and Alkalye's **New from default** action. The packages below are older examples; use the guide for current selectors and source format.
+
 ## Available Themes
 
 ### Minimalist
@@ -161,13 +163,14 @@ Required files:
 
 - `theme.json`: Theme manifest (name, type, css path, presets path)
 - `styles.css`: Main stylesheet
-- `presets.json`: Color and font presets
 
 Optional files:
 
+- `presets.json`: Color and font presets
 - `document.html`: Custom HTML template for preview mode
+- `slide.html`: Custom HTML template for slideshow mode
+- `source.md`: Markdown theme source
 - `fonts/`: Custom font files (woff2, woff, ttf, otf)
-- `assets/`: Images and other theme assets
 
 ## License
 

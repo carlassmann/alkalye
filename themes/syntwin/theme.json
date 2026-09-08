@@ -1,0 +1,14 @@
+{
+	"version": 1,
+	"name": "Syntwin",
+	"author": "Syntwin",
+	"description": "Paper-first documentation and quiet presentation styling based on the Syntwin application brand.",
+	"type": "both",
+	"css": "styles.css",
+	"template": "document.html",
+	"source": "source.md",
+	"fonts": [
+		{ "name": "Geist", "path": "fonts/geist-latin-wght-normal.woff2" },
+		{ "name": "Geist Mono", "path": "fonts/geist-mono-latin-wght-normal.woff2" }
+	]
+}

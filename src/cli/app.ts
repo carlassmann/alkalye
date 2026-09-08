@@ -46,6 +46,7 @@ import {
 } from "@/app/features/sharing"
 import { setDocumentTitle } from "@/cli/document-title"
 import { docCommentCommand } from "@/cli/doc-comments"
+import { themeCommand } from "@/cli/themes"
 import { CliUsageError, PermissionError } from "@/cli/errors"
 import {
 	contentFileOption,
@@ -1161,6 +1162,7 @@ let root = Command.make("alkalye").pipe(
 		authCommand,
 		accountCommand,
 		docCommand,
+		themeCommand,
 		spaceCommand,
 		inviteCommand,
 		syncCommand,
