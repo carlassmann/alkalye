@@ -5,6 +5,7 @@ import { sanitizeCss, sanitizeHtml } from "./sanitize"
 import { parseThemeSource } from "./source"
 
 export {
+	parseThemeMarkdown,
 	parseThemeZip,
 	validateThemeJson,
 	ThemeJsonSchema,
@@ -48,6 +49,7 @@ interface ParsedTheme {
 	presets?: z.infer<typeof ThemePreset>[]
 	assets: ParsedThemeAsset[]
 	thumbnail?: File
+	source?: string
 }
 
 interface ParsedThemeAsset {
@@ -57,6 +59,7 @@ interface ParsedThemeAsset {
 }
 
 type ThemeUploadError =
+	| { type: "invalid_markdown"; message: string; errors: string[] }
 	| { type: "invalid_zip"; message: string }
 	| { type: "missing_manifest"; message: string }
 	| { type: "invalid_manifest"; message: string; errors: string[] }
@@ -67,6 +70,55 @@ type ThemeUploadError =
 type ParseResult =
 	| { ok: true; theme: ParsedTheme }
 	| { ok: false; error: ThemeUploadError }
+
+async function parseThemeMarkdown(file: File): Promise<ParseResult> {
+	let content = await readFileText(file)
+	let source = parseThemeSource(content)
+	if (source.errors.length > 0 || !source.css.trim())
+		return {
+			ok: false,
+			error: {
+				type: "invalid_markdown",
+				message: "Theme source is invalid.",
+				errors: source.errors.map(error => error.message),
+			},
+		}
+	return {
+		ok: true,
+		theme: {
+			name: source.metadata?.name ?? getMarkdownName(content, file.name),
+			author: source.metadata?.author,
+			description: source.metadata?.description,
+			type: source.metadata?.type ?? "both",
+			css: sanitizeCss(source.css).sanitized,
+			template: source.documentTemplate
+				? sanitizeHtml(source.documentTemplate).sanitized
+				: undefined,
+			slideTemplate: source.slideTemplate
+				? sanitizeHtml(source.slideTemplate).sanitized
+				: undefined,
+			presets: source.metadata?.presets,
+			assets: [],
+			source: content,
+		},
+	}
+}
+
+async function readFileText(file: File): Promise<string> {
+	return await new Promise((resolve, reject) => {
+		let reader = new FileReader()
+		reader.onload = () => resolve(String(reader.result))
+		reader.onerror = () => reject(reader.error)
+		reader.readAsText(file)
+	})
+}
+
+function getMarkdownName(content: string, filename: string): string {
+	let heading = content.match(/^#\s+(.+)$/m)?.[1]?.trim()
+	return (
+		heading || filename.replace(/\.theme\.md$|\.md$/i, "") || "Imported theme"
+	)
+}
 
 async function parseThemeZip(file: File): Promise<ParseResult> {
 	let zip: JSZip

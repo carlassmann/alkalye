@@ -41,6 +41,7 @@ import { Textarea } from "@/app/components/ui/textarea"
 import { Switch } from "@/app/components/ui/switch"
 import { UserAccount, Theme, ThemeAsset, Settings } from "@/schema"
 import {
+	parseThemeMarkdown,
 	parseThemeZip,
 	createDefaultTheme,
 	exportTheme,
@@ -398,7 +399,9 @@ function ThemesSection({ me }: ThemesSectionProps) {
 		setIsUploading(true)
 		setUploadError(null)
 
-		let result = await parseThemeZip(file)
+		let result = file.name.toLowerCase().endsWith(".md")
+			? await parseThemeMarkdown(file)
+			: await parseThemeZip(file)
 
 		if (!result.ok) {
 			setUploadError(result.error)
@@ -460,11 +463,13 @@ function ThemesSection({ me }: ThemesSectionProps) {
 		let source = await createThemeSourceDocument(me, {
 			themeId: theme.$jazz.id,
 			name: parsed.name,
-			source: serializeThemeSource({
-				css: parsed.css,
-				documentTemplate: parsed.template,
-				slideTemplate: parsed.slideTemplate,
-			}),
+			source:
+				parsed.source ??
+				serializeThemeSource({
+					css: parsed.css,
+					documentTemplate: parsed.template,
+					slideTemplate: parsed.slideTemplate,
+				}),
 		})
 		theme.$jazz.set("sourceDocId", source.$jazz.id)
 
@@ -617,7 +622,7 @@ function ThemesSection({ me }: ThemesSectionProps) {
 				<input
 					ref={fileInputRef}
 					type="file"
-					accept=".zip"
+					accept=".md,.theme.md,.zip"
 					className="hidden"
 					onChange={handleFileSelect}
 				/>

@@ -10,6 +10,7 @@ import {
 	serializeThemeSource,
 	syncThemeFromSource,
 } from "./source"
+import { serializePortableAssetFence } from "./portable-assets"
 import {
 	createDefaultTheme,
 	getDefaultThemeCss,
@@ -137,6 +138,71 @@ body {}
 			},
 		])
 	})
+
+	it("resolves embedded assets in CSS and HTML regardless of fence order", () => {
+		let asset = serializePortableAssetFence({
+			path: "images/pixel.gif",
+			mimeType: "image/gif",
+			base64: "R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
+		})
+		let result = parseThemeSource(`\`\`\`css theme
+.theme { background-image: url(asset:images/pixel.gif); }
+\`\`\`
+\`\`\`html document
+<main data-content><img src="asset:images/pixel.gif"></main>
+\`\`\`
+
+${asset}`)
+
+		expect(result.errors).toEqual([])
+		expect(result.css).toContain("data:image/gif;base64,")
+		expect(result.documentTemplate).toContain("data:image/gif;base64,")
+	})
+
+	it("reports invalid, duplicate, and unresolved portable assets", () => {
+		let result = parseThemeSource(`\`\`\`css theme
+.theme { background-image: url(asset:images/missing.png); }
+\`\`\`
+\`\`\`base64 asset images/logo.png image/png
+not base64
+\`\`\`
+\`\`\`base64 asset images/logo.png image/png
+YWJj
+\`\`\`
+\`\`\`base64 asset images/logo.png image/png
+YWJj
+\`\`\``)
+
+		expect(result.errors.map(error => error.message)).toEqual([
+			"Invalid base64 for images/logo.png",
+			"Duplicate asset path: images/logo.png",
+			"Unresolved asset reference: images/missing.png",
+		])
+	})
+
+	it("rejects unsafe embedded SVG", () => {
+		let result =
+			parseThemeSource(`\`\`\`base64 asset images/logo.svg image/svg+xml
+PHN2Zz48c2NyaXB0PmFsZXJ0KDEpPC9zY3JpcHQ+PC9zdmc+
+\`\`\``)
+
+		expect(result.errors).toEqual([
+			{
+				line: 1,
+				kind: "base64 asset",
+				message: "Unsafe SVG asset: images/logo.svg",
+			},
+		])
+	})
+
+	it("rejects namespace-prefixed SVG script elements", () => {
+		let result =
+			parseThemeSource(`\`\`\`base64 asset images/logo.svg image/svg+xml
+PHN2ZzpzdmcgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN2ZzpzY3JpcHQ+YWxlcnQoMSk8L3N2ZzpzY3JpcHQ+PC9zdmc6c3ZnPg==
+\`\`\``)
+
+		expect(result.errors[0]?.message).toBe("Unsafe SVG asset: images/logo.svg")
+	})
 })
 
 describe("serializeThemeSource", () => {
@@ -185,7 +251,7 @@ describe("theme source sync", () => {
 		expect(await syncThemeFromSource(account, sourceId, fullSource)).toBe(true)
 
 		let pastedSource = bindThemeSource(
-			readFileSync("themes/syntwin/source.md", "utf8"),
+			readFileSync("themes/syntwin.theme.md", "utf8"),
 			theme.$jazz.id,
 		)
 		persistDocumentContentSynchronously(source, pastedSource)
@@ -199,6 +265,7 @@ describe("theme source sync", () => {
 		if (!pastedTheme.$isLoaded) throw new Error("Theme did not load")
 		expect(pastedTheme.css.toString()).toContain("--syntwin-paper")
 		expect(pastedTheme.template?.toString()).toContain("syntwin-wordmark")
+		expect(pastedTheme.css.toString()).toContain("data:font/woff2;base64,")
 
 		let shortSource = createThemeSourceContent(
 			theme.$jazz.id,

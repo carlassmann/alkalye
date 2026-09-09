@@ -98,7 +98,7 @@ alkalye theme update <theme-id> --source theme.md --json
 alkalye theme delete <theme-id> --json
 ```
 
-Create/update compile immediately and return identifiers and a workbench URL. Use a browser tool to inspect that URL and a real target document; check both appearances and document/slideshow modes. Export a PDF when print output matters. Syntax/template validation is not visual QA.
+Themes are self-contained `.theme.md` files. Embed font/image bytes in `base64 asset <path> <mime-type>` fences and reference them as `asset:<path>` in CSS or HTML. `theme get --json` returns portable source including assets in `data.source`. Create/update compile immediately and return identifiers and a workbench URL. Use a browser tool to inspect that URL and a real target document; check both appearances and document/slideshow modes. Export a PDF when print output matters. Syntax/template validation is not visual QA.
 
 Assign a theme by editing the target document's `theme` frontmatter through `doc content` and `doc update`. Use the theme ID and preserve the remaining document. For theme edits use `theme update`; `doc update` on its source alone relies on the browser workbench to compile it.
 

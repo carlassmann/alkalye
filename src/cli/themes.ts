@@ -11,11 +11,13 @@ import {
 	parseThemeSource,
 	serializeThemeSource,
 	validateThemeTemplate,
+	type ThemeSourceMetadata,
 } from "@/app/features/themes/lib/source"
 import {
 	sanitizeCss,
 	sanitizeHtmlWithWindow,
 } from "@/app/features/themes/lib/sanitize"
+import { serializePortableTheme } from "@/app/features/themes/lib/export"
 import { NotFoundError, PermissionError, ValidationError } from "@/cli/errors"
 import { descriptions } from "@/cli/help"
 import { createAuthenticatedJazz } from "@/cli/jazz"
@@ -58,6 +60,7 @@ type ThemeLibrary = {
 	themes?: LoadedThemeList
 }
 type CompiledThemeSource = {
+	metadata?: ThemeSourceMetadata
 	css: string
 	template?: string
 	slideTemplate?: string
@@ -103,7 +106,17 @@ let themeGet = Command.make(
 			try {
 				let account = await loadAccount(jazz, config.timeoutMs)
 				let theme = await getAccountTheme(account, args.themeId)
-				let source = await getThemeSource(account, theme)
+				let sourceContent = await getThemeSource(account, theme)
+				let portableTheme = await theme.$jazz.ensureLoaded({
+					resolve: {
+						css: true,
+						template: true,
+						slideTemplate: true,
+						assets: { $each: { data: true } },
+						thumbnail: { original: true },
+					},
+				})
+				let source = await serializePortableTheme(portableTheme, sourceContent)
 				return {
 					...summarizeTheme(theme, config.baseUrl),
 					css: theme.css.toString(),
@@ -211,7 +224,12 @@ function compileThemeSource(source: string): CompiledThemeSource {
 	let slideTemplate = parsed.slideTemplate
 		? validateAndSanitizeTemplate(parsed.slideTemplate)
 		: undefined
-	return { css: sanitizeCss(parsed.css).sanitized, template, slideTemplate }
+	return {
+		css: sanitizeCss(parsed.css).sanitized,
+		template,
+		slideTemplate,
+		...(parsed.metadata ? { metadata: parsed.metadata } : {}),
+	}
 }
 
 async function createThemeFromSource(
@@ -221,14 +239,19 @@ async function createThemeFromSource(
 	let compiled = compileThemeSource(params.source)
 	let library = await loadThemeLibrary(account)
 	let themes = await ensureThemeLibrary(library)
-	let name = getThemeName(params.name, params.source)
+	let name = getThemeName(params.name ?? compiled.metadata?.name, params.source)
 	let owner = library.account.root.$jazz.owner
 	let now = new Date()
 	let theme = Theme.create(
 		{
 			version: 1,
 			name,
-			type: "both",
+			type: compiled.metadata?.type ?? "both",
+			author: compiled.metadata?.author,
+			description: compiled.metadata?.description,
+			presets: compiled.metadata?.presets
+				? JSON.stringify(compiled.metadata.presets)
+				: undefined,
 			css: co.plainText().create(compiled.css, owner),
 			template: compiled.template
 				? co.plainText().create(compiled.template, owner)
@@ -258,7 +281,7 @@ async function updateThemeFromSource(
 	let compiled = compileThemeSource(params.source)
 	let library = await loadThemeLibrary(account)
 	let theme = findAccountTheme(library.themes, params.themeId)
-	let name = params.name?.trim() || theme.name
+	let name = params.name?.trim() || compiled.metadata?.name || theme.name
 	let existingSource = theme.sourceDocId
 		? await getOwnedSourceDocument(library.account, theme.sourceDocId)
 		: undefined
@@ -282,6 +305,17 @@ async function updateThemeFromSource(
 			: undefined,
 	)
 	if (theme.name !== name) theme.$jazz.set("name", name)
+	if (compiled.metadata) {
+		if (compiled.metadata.type) theme.$jazz.set("type", compiled.metadata.type)
+		theme.$jazz.set("author", compiled.metadata.author)
+		theme.$jazz.set("description", compiled.metadata.description)
+		theme.$jazz.set(
+			"presets",
+			compiled.metadata.presets
+				? JSON.stringify(compiled.metadata.presets)
+				: undefined,
+		)
+	}
 	if (existingSource) {
 		persistDocumentContentSynchronously(existingSource, nextSource)
 	} else {

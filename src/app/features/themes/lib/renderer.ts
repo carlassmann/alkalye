@@ -1,3 +1,4 @@
+import { parse } from "css-tree"
 import { type co } from "jazz-tools"
 import { type Theme, type ThemeAsset } from "./schema"
 import { type ThemesQuery, type ThemePresetType } from "./document-theme"
@@ -43,13 +44,42 @@ type ThemeRenderResult =
 function scopeThemeCss(css: string, scopeSelector: string): string {
 	if (!css.trim()) return ""
 
-	let imports: string[] = []
-	let scopedCss = css.replace(/^\s*@import[\s\S]*?;/gim, importRule => {
-		imports.push(importRule.trim())
-		return ""
-	})
+	let { globalRules, scopedCss } = splitGlobalThemeRules(css)
 	let scoped = `@scope (${scopeSelector}) {\n${scopedCss.replace(/:root\b/g, ":scope")}\n}`
-	return imports.length > 0 ? `${imports.join("\n")}\n${scoped}` : scoped
+	return [...globalRules, scoped].join("\n")
+}
+
+function splitGlobalThemeRules(css: string) {
+	let globalRules: string[] = []
+	let spans: { from: number; to: number }[] = []
+	try {
+		let stylesheet = parse(css, {
+			positions: true,
+			parseAtrulePrelude: false,
+			parseRulePrelude: false,
+			parseValue: false,
+		})
+		if (stylesheet.type === "StyleSheet") {
+			stylesheet.children.forEach(rule => {
+				if (
+					rule.type !== "Atrule" ||
+					!rule.loc ||
+					!["import", "font-face"].includes(rule.name.toLowerCase())
+				)
+					return
+				let from = rule.loc.start.offset
+				let to = rule.loc.end.offset
+				globalRules.push(css.slice(from, to))
+				spans.push({ from, to })
+			})
+		}
+	} catch {
+		return { globalRules: [], scopedCss: css }
+	}
+	let scopedCss = css
+	for (let span of spans.reverse())
+		scopedCss = scopedCss.slice(0, span.from) + scopedCss.slice(span.to)
+	return { globalRules, scopedCss }
 }
 
 function getCachedThemeStyles(

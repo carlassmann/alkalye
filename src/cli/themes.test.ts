@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
+import { readFileSync } from "node:fs"
+import { serializePortableTheme } from "@/app/features/themes/lib/export"
 import { co } from "jazz-tools"
 import { createJazzTestAccount, setupJazzTestSync } from "jazz-tools/testing"
 import { ThemeAsset } from "@/app/features/themes/lib/schema"
@@ -16,6 +18,16 @@ import {
 
 describe("CLI theme source compiler", () => {
 	afterEach(() => vi.unstubAllGlobals())
+
+	test("compiles the entire Syntwin theme with embedded fonts and logo", () => {
+		let compiled = compileThemeSource(
+			readFileSync("themes/syntwin.theme.md", "utf8"),
+		)
+		expect(compiled.css.match(/data:font\/woff2;base64,/g)).toHaveLength(2)
+		expect(compiled.css).toContain("data:image/svg+xml;base64,")
+		expect(compiled.css).not.toContain("asset:")
+		expect(compiled.metadata?.name).toBe("Syntwin")
+	})
 
 	test("compiles CSS and HTML source", () => {
 		let compiled = compileThemeSource(validSource)
@@ -191,7 +203,7 @@ describe("CLI themes", () => {
 		}).toEqual(before)
 	})
 
-	test("preserves assets while updating compiled source", async () => {
+	test("preserves legacy assets and exports a portable theme across accounts", async () => {
 		let theme = await createThemeFromSource(account, {
 			name: "Asset theme",
 			source: validSource,
@@ -221,9 +233,40 @@ describe("CLI themes", () => {
 		})
 
 		let loadedTheme = await theme.$jazz.ensureLoaded({
-			resolve: { assets: { $each: true } },
+			resolve: {
+				css: true,
+				template: true,
+				slideTemplate: true,
+				assets: { $each: { data: true } },
+				thumbnail: { original: true },
+			},
 		})
 		expect(loadedTheme.assets?.map(item => item?.$jazz.id)).toEqual([assetId])
+		let portable = await serializePortableTheme(loadedTheme)
+		expect(portable).not.toContain("theme-source:")
+		expect(portable).toContain("base64 asset")
+		let other = await createJazzTestAccount({
+			isCurrentActiveAccount: false,
+			AccountSchema: UserAccount,
+		})
+		let imported = await createThemeFromSource(other, { source: portable })
+		expect(imported.name).toBe("Asset theme")
+		expect(imported.css.toString()).toContain(
+			"data:font/woff2;base64,Zm9udC1kYXRh",
+		)
+		let reloaded = await imported.$jazz.ensureLoaded({
+			resolve: {
+				css: true,
+				template: true,
+				slideTemplate: true,
+				assets: { $each: { data: true } },
+				thumbnail: { original: true },
+			},
+		})
+		let exportedAgain = await serializePortableTheme(reloaded)
+		expect(exportedAgain.match(/```base64 asset/g)).toHaveLength(1)
+		expect(exportedAgain.match(/```json theme metadata/g)).toHaveLength(1)
+		expect(compileThemeSource(exportedAgain).css).toBe(imported.css.toString())
 	})
 
 	test("does not expose another account's theme library", async () => {

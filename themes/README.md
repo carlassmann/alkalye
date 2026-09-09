@@ -1,11 +1,9 @@
 # Alkalye themes
 
-Start a custom theme with **New from default** in Alkalye. This copies the built-in document and slideshow styles, including light and dark modes, into an editable Markdown source.
+Each `.theme.md` file is a complete theme. Import it through **Settings → Themes → Upload theme**, or paste the entire Markdown into a theme workbench. CSS, HTML, fonts, images, and licenses travel together.
 
-See the [theme authoring guide](../public/docs/theming-guide.md) for CSS selectors, HTML templates, validation, and CLI commands.
+[Syntwin](syntwin.theme.md) provides subtle branding for documents, PDFs, and slides, including light and dark styles. No ZIP, build script, or separate assets are required.
 
-## Syntwin
+Optional examples: [document](examples/syntwin-document.md) and [talk](examples/syntwin-talk.md).
 
-[Syntwin](syntwin/README.md) is a subtle branded theme for documents, PDFs, and talks. It includes local fonts, light and dark styles, and sample content.
-
-Import [syntwin.zip](syntwin.zip) through **Settings → Themes → Upload theme**, then select it from a document's theme picker. Use the workbench to customize it.
+For your own theme, use **New from default** in Alkalye and follow the [theme authoring guide](../public/docs/theming-guide.md).

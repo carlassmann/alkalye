@@ -1,11 +1,22 @@
+import { z } from "jazz-tools"
+import { ThemeType, ThemePreset } from "./schema"
 import { Group, co } from "jazz-tools"
 import { Document, CommentThread } from "@/app/features/documents/lib/schema"
 import { createDocumentMetadata } from "@/app/features/documents/lib/metadata"
 import { parseFrontmatter } from "@/app/features/editor/lib/frontmatter"
 import { sanitizeCss, sanitizeHtml } from "./sanitize"
+import {
+	parsePortableAssetFence,
+	resolvePortableAssetReferences,
+	serializePortableAssetFence,
+	type PortableAsset,
+} from "./portable-assets"
 import { UserAccount } from "@/schema"
 
 export {
+	withThemeSourceMetadata,
+	ThemeSourceMetadataSchema,
+	type ThemeSourceMetadata,
 	bindThemeSource,
 	parseThemeSource,
 	validateThemeTemplate,
@@ -14,11 +25,22 @@ export {
 	createThemeSourceDocumentContent,
 	syncThemeFromSource,
 	getThemeSourceId,
+	serializePortableAssetFence,
 	type ThemeSource,
 	type ThemeSourceError,
 }
 
+let ThemeSourceMetadataSchema = z.object({
+	name: z.string().trim().min(1).optional(),
+	author: z.string().optional(),
+	description: z.string().optional(),
+	type: ThemeType.optional(),
+	presets: z.array(ThemePreset).optional(),
+})
+type ThemeSourceMetadata = z.infer<typeof ThemeSourceMetadataSchema>
+
 type ThemeSource = {
+	metadata?: ThemeSourceMetadata
 	css: string
 	documentTemplate?: string
 	slideTemplate?: string
@@ -27,7 +49,12 @@ type ThemeSource = {
 
 type ThemeSourceError = {
 	line: number
-	kind: "css theme" | "html document" | "html slide"
+	kind:
+		| "css theme"
+		| "html document"
+		| "html slide"
+		| "base64 asset"
+		| "json theme metadata"
 	message: string
 }
 
@@ -46,6 +73,15 @@ function parseThemeSource(
 	let documentTemplate: string | undefined
 	let slideTemplate: string | undefined
 	let errors: ThemeSourceError[] = []
+	let assets = new Map<string, PortableAsset>()
+	let assetBytes = 0
+	let metadata: ThemeSourceMetadata | undefined
+	let metadataSeen = false
+	let templateFences: {
+		kind: "html document" | "html slide"
+		line: number
+		value: string
+	}[] = []
 
 	for (let index = 0; index < lines.length; index++) {
 		let tildeOpening = lines[index].match(/^\s{0,3}(~{3,})(.*)$/)
@@ -64,6 +100,8 @@ function parseThemeSource(
 		let tickCount = opening[1].length
 		let info = opening[2].trim()
 		let kind = isThemeFence(info, tickCount) ? info : null
+		let isMetadata = tickCount === 3 && info === "json theme metadata"
+		let isPortableAsset = tickCount === 3 && info.startsWith("base64 asset")
 		let startLine = index + 1
 		let body: string[] = []
 		let closed = false
@@ -74,6 +112,65 @@ function parseThemeSource(
 				break
 			}
 			body.push(lines[index])
+		}
+
+		if (!closed && (kind || isPortableAsset || isMetadata)) {
+			errors.push({
+				line: startLine,
+				kind: kind ?? (isMetadata ? "json theme metadata" : "base64 asset"),
+				message: `Unclosed ${kind ?? "base64 asset"} fence`,
+			})
+			break
+		}
+
+		if (isMetadata) {
+			try {
+				if (metadataSeen)
+					throw new Error("Only one json theme metadata fence is allowed")
+				metadataSeen = true
+				metadata = ThemeSourceMetadataSchema.parse(JSON.parse(body.join("\n")))
+			} catch (error) {
+				errors.push({
+					line: startLine,
+					kind: "json theme metadata",
+					message:
+						error instanceof Error ? error.message : "Invalid theme metadata",
+				})
+			}
+			continue
+		}
+
+		let assetFence = parsePortableAssetFence(
+			isPortableAsset ? info : "",
+			body.join("\n"),
+		)
+		if (!kind && assetFence.type === "not-asset") continue
+		if (assetFence.type === "error") {
+			errors.push({
+				line: startLine,
+				kind: "base64 asset",
+				message: assetFence.error.message,
+			})
+			continue
+		}
+		if (assetFence.type === "asset") {
+			if (assets.has(assetFence.asset.path)) {
+				errors.push({
+					line: startLine,
+					kind: "base64 asset",
+					message: `Duplicate asset path: ${assetFence.asset.path}`,
+				})
+			} else if (assetBytes + assetFence.asset.byteLength > 5_000_000) {
+				errors.push({
+					line: startLine,
+					kind: "base64 asset",
+					message: "Embedded assets exceed 5 MB",
+				})
+			} else {
+				assets.set(assetFence.asset.path, assetFence.asset)
+				assetBytes += assetFence.asset.byteLength
+			}
+			continue
 		}
 
 		if (!kind) continue
@@ -88,14 +185,7 @@ function parseThemeSource(
 			continue
 		}
 
-		let templateError = (options.validateTemplate ?? getTemplateError)(value)
-		if (templateError) {
-			errors.push({
-				line: startLine,
-				kind,
-				message: templateError,
-			})
-		}
+		templateFences.push({ kind, line: startLine, value })
 
 		if (kind === "html document") {
 			if (documentTemplate !== undefined) {
@@ -118,10 +208,46 @@ function parseThemeSource(
 		}
 	}
 
+	let resolvedCss = resolvePortableAssetReferences(
+		cssBlocks.join("\n\n"),
+		assets,
+	)
+	let resolvedDocument = documentTemplate
+		? resolvePortableAssetReferences(documentTemplate, assets)
+		: undefined
+	let resolvedSlide = slideTemplate
+		? resolvePortableAssetReferences(slideTemplate, assets)
+		: undefined
+	for (let template of templateFences) {
+		let resolved = resolvePortableAssetReferences(template.value, assets)
+		let templateError = (options.validateTemplate ?? getTemplateError)(
+			resolved.value,
+		)
+		if (templateError) {
+			errors.push({
+				line: template.line,
+				kind: template.kind,
+				message: templateError,
+			})
+		}
+	}
+	for (let path of new Set([
+		...resolvedCss.missingPaths,
+		...(resolvedDocument?.missingPaths ?? []),
+		...(resolvedSlide?.missingPaths ?? []),
+	])) {
+		errors.push({
+			line: 1,
+			kind: "base64 asset",
+			message: `Unresolved asset reference: ${path}`,
+		})
+	}
+
 	return {
-		css: cssBlocks.join("\n\n"),
-		documentTemplate,
-		slideTemplate,
+		...(metadata ? { metadata } : {}),
+		css: resolvedCss.value,
+		documentTemplate: resolvedDocument?.value,
+		slideTemplate: resolvedSlide?.value,
 		errors,
 	}
 }
@@ -204,6 +330,11 @@ function createThemeSourceDocumentContent(params: {
 		/^---\s*\r?\n[\s\S]*?\r?\n---\s*(?:\r?\n)?/,
 		"",
 	)
+	let metadata = parseThemeSource(source, {
+		validateTemplate: () => null,
+	}).metadata
+	if (metadata)
+		source = withThemeSourceMetadata(source, { ...metadata, name: params.name })
 	return `---\ntitle: ${JSON.stringify(`Theme: ${params.name}`)}\ntheme-source: ${params.themeId}\n---\n\n${source}`
 }
 
@@ -310,6 +441,32 @@ async function syncThemeFromSource(
 					: undefined,
 			)
 		}
+		if (parsed.metadata) {
+			let metadata = parsed.metadata
+			if (metadata.name && theme.name !== metadata.name) {
+				theme.$jazz.set("name", metadata.name)
+				changed = true
+			}
+			if (metadata.type && theme.type !== metadata.type) {
+				theme.$jazz.set("type", metadata.type)
+				changed = true
+			}
+			let presets = metadata.presets
+				? JSON.stringify(metadata.presets)
+				: undefined
+			if (theme.presets !== presets) {
+				theme.$jazz.set("presets", presets)
+				changed = true
+			}
+			if (theme.author !== metadata.author) {
+				theme.$jazz.set("author", metadata.author)
+				changed = true
+			}
+			if (theme.description !== metadata.description) {
+				theme.$jazz.set("description", metadata.description)
+				changed = true
+			}
+		}
 		if (changed) theme.$jazz.set("updatedAt", new Date())
 		return true
 	} finally {
@@ -366,4 +523,38 @@ function bindThemeSource(content: string, themeId: string): string {
 		.split(/\r?\n/)
 		.filter(line => !/^\s*theme-source\s*:/.test(line))
 	return `---\n${lines.filter(Boolean).join("\n")}\ntheme-source: ${themeId}\n---\n${content.slice(frontmatter[0].length)}`
+}
+
+function withThemeSourceMetadata(
+	source: string,
+	metadata: ThemeSourceMetadata,
+): string {
+	let lines = source.split("\n")
+	let output: string[] = []
+	for (let index = 0; index < lines.length; index++) {
+		let opening = lines[index].match(/^\s{0,3}(`{3,}|~{3,})(.*)$/)
+		if (!opening) {
+			output.push(lines[index])
+			continue
+		}
+		let remove =
+			opening[1] === "```" && opening[2].trim() === "json theme metadata"
+		if (!remove) output.push(lines[index])
+		for (index++; index < lines.length; index++) {
+			if (!remove) output.push(lines[index])
+			let closing = lines[index].match(/^\s{0,3}(`{3,}|~{3,})\s*$/)
+			if (
+				closing &&
+				closing[1][0] === opening[1][0] &&
+				closing[1].length >= opening[1].length
+			)
+				break
+		}
+	}
+	return (
+		output.join("\n").trimEnd() +
+		"\n\n```json theme metadata\n" +
+		JSON.stringify(metadata, null, 2) +
+		"\n```\n"
+	)
 }

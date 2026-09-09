@@ -1,6 +1,6 @@
 # Creating themes in Alkalye
 
-Use this guide when asking an agent to create or edit a theme. It describes the Markdown source format used by the theme workbench. ZIP packages remain available for sharing and bundled fonts.
+Use this guide when asking an agent to create or edit a theme. It describes the Markdown source format used by the theme workbench. A `.theme.md` file contains the complete theme, including embedded fonts and images. Legacy ZIP packages can still be imported.
 
 ## Start from the default
 
@@ -232,24 +232,42 @@ theme: My theme
 
 Do not confuse a document's `theme` selection with the theme source's `theme-source` link. Settings can choose separate default document and slideshow themes; explicit document selections override defaults. Existing `theme-id` values should be preserved alongside their `theme` selection. Names and IDs do not grant another account access to a theme.
 
-Export a theme ZIP from Settings to share it. The package includes compiled CSS, optional templates, and `source.md` when available. Import creates a new theme and a newly linked source document. Valid packaged source determines the imported CSS and templates, but the editor source is regenerated: prose, fence grouping, and original source IDs are not preserved. Export the source document separately if you need its exact annotated Markdown.
+Export from Settings to download one `.theme.md` file. It contains the editable CSS/HTML fences, embedded assets, and theme metadata. Import creates a new theme and linked source document while preserving the source prose and fence grouping. Account-specific source IDs are removed from exports. Older ZIP themes remain importable; export them as Markdown to make them portable.
 
-For an agent building a ZIP directly, this is a minimal manifest:
+Optional `json theme metadata` fence preserves the theme name, author, description, type (`preview`, `slideshow`, or `both`), and color presets. CLI `--name` overrides its name.
 
-```json
-{
-	"version": 1,
-	"name": "My theme",
-	"type": "both",
-	"css": "styles.css"
+````markdown
+```json theme metadata
+{ "name": "My theme", "author": "Me", "type": "both" }
+```
+````
+
+## Embedded assets
+
+Store fonts and images in separate `base64 asset <path> <mime-type>` fences. Paths are local identifiers inside the Markdown, not filesystem paths. Refer to them as `asset:<path>` in CSS URLs or HTML attributes. The compiler replaces those references with data URLs, so copying the entire Markdown carries its assets to another account or machine.
+
+````markdown
+```css theme
+@font-face {
+	font-family: "Reading";
+	src: url("asset:fonts/reading.woff2") format("woff2");
+	font-weight: 100 900;
+}
+.document {
+	font-family: "Reading", sans-serif;
 }
 ```
 
-`type` is `preview`, `slideshow`, or `both`. Optional manifest fields are `author`, `description`, `template`, `slideTemplate`, `source`, `presets`, `fonts`, and `thumbnail`. Template/source/preset/thumbnail fields contain relative file paths. A font entry is `{ "name": "ReadingFont", "path": "fonts/reading.woff2" }`. Bundled fonts receive generated `@font-face` rules; use their declared names in CSS. A raw Markdown source is not a ZIP manifest.
+```base64 asset fonts/reading.woff2 font/woff2
+BASE64_ENCODED_FONT_BYTES
+```
+````
 
-A preset file uses `{ "presets": [...] }`. Each preset has `name`, `appearance` as `light` or `dark`, and `colors` with `background`, `foreground`, and `accent`. Optional colors are `accents`, `heading`, `link`, and `codeBackground`; optional `fonts` contains `title` and `body`. Presets provide `--preset-background`, `--preset-foreground`, `--preset-accent`, `--preset-accent-1` through `--preset-accent-6`, `--preset-heading`, `--preset-link`, `--preset-code-background`, `--preset-font-title`, and `--preset-font-body`. Optional values need CSS fallbacks. An explicit `preset` frontmatter name wins; otherwise matching appearance, then the first preset, is used. The Markdown workbench does not edit preset JSON or attach font files.
+Replace the placeholder with the font's actual Base64 bytes. Payloads can wrap across lines. Each decoded asset is limited to 2 MB; all assets together to 5 MB. Keep font and image licenses in the same Markdown as prose. Missing references, invalid payloads, duplicate paths, and unsupported MIME types are validation errors; they do not replace a working theme.
 
-CSS sanitization removes dangerous script-like constructs and restricts external `@import` URLs to supported font hosts: `fonts.googleapis.com`, `fonts.gstatic.com`, `use.typekit.net`, `fast.fonts.net`, `cloud.typography.com`, `fonts.bunny.net`, `rsms.me`, and `api.fontshare.com`. Prefer bundled fonts or system fallbacks for offline use. Do not assume arbitrary relative image/font URLs in source Markdown become uploaded assets.
+Supported asset MIME types are `font/woff2`, `font/woff`, `font/ttf`, `font/otf`, `image/png`, `image/jpeg`, `image/webp`, `image/gif`, and `image/svg+xml`. Use embedded assets or system fonts for offline themes. External URLs still depend on the network. CSS sanitization removes dangerous script-like constructs and restricts external font imports.
+
+The repository’s `themes/syntwin.theme.md` is a complete working example. Its optional document and talk samples live separately under `themes/examples/`; they are not required to use the theme.
 
 ## CLI workflow for agents
 
@@ -257,18 +275,18 @@ Authenticate the CLI to the same account and deployment as the browser. Themes b
 
 ```sh
 alkalye theme list --json
-alkalye theme create --name "My theme" --source theme.md --json
+alkalye theme create --name "My theme" --source theme.theme.md --json
 alkalye theme get <theme-id> --json
-alkalye theme update <theme-id> --source theme.md --json
+alkalye theme update <theme-id> --source theme.theme.md --json
 alkalye theme delete <theme-id> --json
 ```
 
 Create and update validate the source fences and HTML templates, sanitize CSS/HTML, and compile the theme immediately. No open workbench is required. Invalid source leaves the existing theme unchanged. Updates keep the theme ID and linked source document, so assigned documents continue to use the theme. Bundled fonts and other existing theme assets remain attached. Pass `--name` on update to rename the theme. Delete removes the theme from the library; its source document remains available.
 
-`theme get --json` returns editable Markdown in `data.source`; save it to a file before editing.
+`theme get --json` returns portable Markdown with embedded assets in `data.source`; save it to a file before editing.
 
 ```sh
-alkalye theme get <theme-id> --json | jq -r .data.source > theme.md
+alkalye theme get <theme-id> --json | jq -r .data.source > theme.theme.md
 ```
 
 Use the returned workbench URL to inspect the theme with `agent-browser` or another browser automation tool. Check document and slideshow modes, light and dark appearance, different pane sizes, and a real document. For print changes, export and inspect a PDF. CLI validation does not validate CSS syntax or prove the layout works.

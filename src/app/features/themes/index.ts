@@ -22,7 +22,11 @@ export {
 	scopeThemeCss,
 	type ThemeStyles,
 } from "./lib/renderer"
-export { parseThemeZip, type ThemeUploadError } from "./lib/upload"
+export {
+	parseThemeMarkdown,
+	parseThemeZip,
+	type ThemeUploadError,
+} from "./lib/upload"
 export {
 	createDefaultTheme,
 	getDefaultDocumentCss,
@@ -30,7 +34,11 @@ export {
 	getDefaultThemeSource,
 	getSlideshowBaseCss,
 } from "./lib/default-theme"
-export { exportTheme, type ThemeExportQuery } from "./lib/export"
+export {
+	exportTheme,
+	serializePortableTheme,
+	type ThemeExportQuery,
+} from "./lib/export"
 export { sanitizeCss, sanitizeHtml, type SanitizeResult } from "./lib/sanitize"
 export { ThemePicker } from "./widgets/theme-picker"
 export { ThemeWorkbenchScreen } from "./screens/theme-workbench-screen"
@@ -40,6 +48,7 @@ export {
 	createThemeSourceDocument,
 	syncThemeFromSource,
 	getThemeSourceId,
+	serializePortableAssetFence,
 	type ThemeSource,
 	type ThemeSourceError,
 } from "./lib/source"
