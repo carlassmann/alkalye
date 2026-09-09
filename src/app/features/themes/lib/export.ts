@@ -1,9 +1,10 @@
-import { type co, z } from "jazz-tools"
+import { type co, FileStream, z } from "jazz-tools"
 import { Theme, ThemePreset } from "./schema"
 import { sanitizeFilename } from "@/app/features/import-export/lib/export"
 import { Document } from "@/app/features/documents/lib/schema"
 import {
 	serializeThemeSource,
+	parseThemeSource,
 	withThemeSourceMetadata,
 	type ThemeSourceMetadata,
 } from "./source"
@@ -31,6 +32,18 @@ async function serializePortableTheme(
 		type: theme.type,
 		author: theme.author,
 		description: theme.description,
+	}
+	let sourceMetadata = parseThemeSource(source, {
+		validateTemplate: () => null,
+	}).metadata
+	if (sourceMetadata?.thumbnail) metadata.thumbnail = sourceMetadata.thumbnail
+	if (theme.thumbnail?.$isLoaded && theme.thumbnail.original?.$isLoaded) {
+		let thumbnail = theme.thumbnail.original.toBlob()
+		if (!thumbnail) throw new Error("Unable to read theme thumbnail")
+		metadata.thumbnail = fileStreamToDataUrl(
+			theme.thumbnail.original,
+			thumbnail.type || "image/png",
+		)
 	}
 	if (theme.presets) {
 		let presets = z
@@ -71,7 +84,34 @@ async function serializePortableTheme(
 	}
 	if (fontFaces.length)
 		sections.push("```css theme\n" + fontFaces.join("\n\n") + "\n```")
-	return withThemeSourceMetadata(sections.join("\n\n"), metadata)
+	let portable = withThemeSourceMetadata(sections.join("\n\n"), metadata)
+	let validation = parseThemeSource(portable, { validateTemplate: () => null })
+	if (validation.errors.length > 0)
+		throw new Error(
+			`Theme export is not portable: ${validation.errors[0]?.message}`,
+		)
+	return portable
+}
+
+function fileStreamToDataUrl(fileStream: FileStream, mimeType: string): string {
+	let data = fileStream.getChunks()
+	if (!data?.finished) throw new Error("Unable to read theme thumbnail")
+	if (
+		!(
+			"image/png" === mimeType ||
+			"image/jpeg" === mimeType ||
+			"image/webp" === mimeType ||
+			"image/gif" === mimeType
+		)
+	)
+		throw new Error(`Unsupported theme thumbnail MIME type: ${mimeType}`)
+	let byteLength = data.chunks.reduce((total, bytes) => total + bytes.length, 0)
+	if (byteLength > 2_000_000) throw new Error("Theme thumbnail exceeds 2 MB")
+	let binary = ""
+	for (let bytes of data.chunks)
+		for (let index = 0; index < bytes.length; index += 0x8000)
+			binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000))
+	return `data:${mimeType};base64,${btoa(binary)}`
 }
 
 async function loadEditableSource(

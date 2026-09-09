@@ -234,7 +234,7 @@ Do not confuse a document's `theme` selection with the theme source's `theme-sou
 
 Export from Settings to download one `.theme.md` file. It contains the editable CSS/HTML fences, embedded assets, and theme metadata. Import creates a new theme and linked source document while preserving the source prose and fence grouping. Account-specific source IDs are removed from exports. Older ZIP themes remain importable; export them as Markdown to make them portable.
 
-Optional `json theme metadata` fence preserves the theme name, author, description, type (`preview`, `slideshow`, or `both`), and color presets. CLI `--name` overrides its name.
+Optional `json theme metadata` fence preserves the theme name, author, description, type (`preview`, `slideshow`, or `both`), and color presets. An optional `thumbnail` stores a base64 PNG, JPEG, WebP, or GIF data URL (up to 2 MB). CLI `--name` overrides its name.
 
 ````markdown
 ```json theme metadata

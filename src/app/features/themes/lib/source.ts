@@ -34,6 +34,19 @@ let ThemeSourceMetadataSchema = z.object({
 	name: z.string().trim().min(1).optional(),
 	author: z.string().optional(),
 	description: z.string().optional(),
+	thumbnail: z
+		.string()
+		.refine(value => {
+			let match = value.match(
+				/^data:(image\/(?:png|jpeg|webp|gif));base64,(.*)$/,
+			)
+			return (
+				!!match &&
+				parsePortableAssetFence(`base64 asset thumbnail ${match[1]}`, match[2])
+					.type === "asset"
+			)
+		}, "Thumbnail must be a valid base64 PNG, JPEG, WebP, or GIF up to 2 MB")
+		.optional(),
 	type: ThemeType.optional(),
 	presets: z.array(ThemePreset).optional(),
 })

@@ -83,6 +83,18 @@ async function parseThemeMarkdown(file: File): Promise<ParseResult> {
 				errors: source.errors.map(error => error.message),
 			},
 		}
+	let thumbnail = source.metadata?.thumbnail
+		? dataUrlToFile(source.metadata.thumbnail, "thumbnail")
+		: undefined
+	if (source.metadata?.thumbnail && !thumbnail)
+		return {
+			ok: false,
+			error: {
+				type: "invalid_markdown",
+				message: "Theme thumbnail is invalid.",
+				errors: ["Thumbnail must be a base64 PNG, JPEG, WebP, or GIF"],
+			},
+		}
 	return {
 		ok: true,
 		theme: {
@@ -99,8 +111,24 @@ async function parseThemeMarkdown(file: File): Promise<ParseResult> {
 				: undefined,
 			presets: source.metadata?.presets,
 			assets: [],
+			thumbnail,
 			source: content,
 		},
+	}
+}
+
+function dataUrlToFile(dataUrl: string, name: string): File | undefined {
+	let match = dataUrl.match(
+		/^data:(image\/(?:png|jpeg|webp|gif));base64,([A-Za-z0-9+/=]+)$/,
+	)
+	if (!match) return undefined
+	try {
+		let binary = atob(match[2])
+		if (binary.length > 2_000_000) return undefined
+		let bytes = Uint8Array.from(binary, character => character.charCodeAt(0))
+		return new File([bytes], name, { type: match[1] })
+	} catch {
+		return undefined
 	}
 }
 

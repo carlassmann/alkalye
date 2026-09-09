@@ -226,6 +226,20 @@ describe("CLI themes", () => {
 		)
 		theme.$jazz.set("assets", co.list(ThemeAsset).create([asset], owner))
 		let assetId = asset.$jazz.id
+		let original = await co
+			.fileStream()
+			.createFromArrayBuffer(
+				new TextEncoder().encode("thumbnail").buffer,
+				"image/png",
+				"thumbnail.png",
+				{ owner },
+			)
+		theme.$jazz.set(
+			"thumbnail",
+			co
+				.image()
+				.create({ original, originalSize: [1, 1], progressive: false }, owner),
+		)
 
 		await updateThemeFromSource(account, {
 			themeId: theme.$jazz.id,
@@ -245,6 +259,9 @@ describe("CLI themes", () => {
 		let portable = await serializePortableTheme(loadedTheme)
 		expect(portable).not.toContain("theme-source:")
 		expect(portable).toContain("base64 asset")
+		expect(compileThemeSource(portable).metadata?.thumbnail).toBe(
+			"data:image/png;base64,dGh1bWJuYWls",
+		)
 		let other = await createJazzTestAccount({
 			isCurrentActiveAccount: false,
 			AccountSchema: UserAccount,
@@ -264,6 +281,9 @@ describe("CLI themes", () => {
 			},
 		})
 		let exportedAgain = await serializePortableTheme(reloaded)
+		expect(compileThemeSource(exportedAgain).metadata?.thumbnail).toBe(
+			"data:image/png;base64,dGh1bWJuYWls",
+		)
 		expect(exportedAgain.match(/```base64 asset/g)).toHaveLength(1)
 		expect(exportedAgain.match(/```json theme metadata/g)).toHaveLength(1)
 		expect(compileThemeSource(exportedAgain).css).toBe(imported.css.toString())

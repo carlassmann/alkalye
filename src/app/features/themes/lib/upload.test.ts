@@ -146,6 +146,16 @@ describe("parseThemeMarkdown", () => {
 		expect(result.ok).toBe(true)
 		if (result.ok) expect(result.theme.name).toBe("Heading Theme")
 	})
+
+	it("imports a portable thumbnail data URL", async () => {
+		let source = `# Thumb\n\n\`\`\`json theme metadata\n{"name":"Thumb","type":"preview","thumbnail":"data:image/png;base64,aGVsbG8="}\n\`\`\`\n\n\`\`\`css theme\nbody {}\n\`\`\``
+		let result = await parseThemeMarkdown(new File([source], "thumb.theme.md"))
+		expect(result.ok).toBe(true)
+		if (result.ok) {
+			expect(result.theme.thumbnail?.type).toBe("image/png")
+			expect(result.theme.thumbnail?.size).toBe(5)
+		}
+	})
 })
 
 describe("parseThemeZip - basic upload", () => {
