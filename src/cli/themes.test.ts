@@ -287,6 +287,15 @@ describe("CLI themes", () => {
 		expect(exportedAgain.match(/```base64 asset/g)).toHaveLength(1)
 		expect(exportedAgain.match(/```json theme metadata/g)).toHaveLength(1)
 		expect(compileThemeSource(exportedAgain).css).toBe(imported.css.toString())
+		await expect(
+			serializePortableTheme(reloaded, "# Draft theme"),
+		).rejects.toThrow("css theme fence")
+		await expect(
+			serializePortableTheme(
+				reloaded,
+				"```css theme\nbody {}\n```\n\n```html document\n<p>No content slot</p>\n```",
+			),
+		).rejects.toThrow("Theme export is not portable")
 	})
 
 	test("does not expose another account's theme library", async () => {

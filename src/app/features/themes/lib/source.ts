@@ -38,14 +38,14 @@ let ThemeSourceMetadataSchema = z.object({
 		.string()
 		.refine(value => {
 			let match = value.match(
-				/^data:(image\/(?:png|jpeg|webp|gif));base64,(.*)$/,
+				/^data:(image\/(?:png|jpeg|webp|gif|svg\+xml));base64,(.*)$/,
 			)
 			return (
 				!!match &&
 				parsePortableAssetFence(`base64 asset thumbnail ${match[1]}`, match[2])
 					.type === "asset"
 			)
-		}, "Thumbnail must be a valid base64 PNG, JPEG, WebP, or GIF up to 2 MB")
+		}, "Thumbnail must be a valid base64 PNG, JPEG, WebP, GIF, or safe SVG up to 2 MB")
 		.optional(),
 	type: ThemeType.optional(),
 	presets: z.array(ThemePreset).optional(),
@@ -142,6 +142,13 @@ function parseThemeSource(
 					throw new Error("Only one json theme metadata fence is allowed")
 				metadataSeen = true
 				metadata = ThemeSourceMetadataSchema.parse(JSON.parse(body.join("\n")))
+				if (metadata.thumbnail) {
+					assetBytes += atob(
+						metadata.thumbnail.slice(metadata.thumbnail.indexOf(",") + 1),
+					).length
+					if (assetBytes > 5_000_000)
+						throw new Error("Embedded assets exceed 5 MB")
+				}
 			} catch (error) {
 				errors.push({
 					line: startLine,

@@ -116,7 +116,11 @@ let themeGet = Command.make(
 						thumbnail: { original: true },
 					},
 				})
-				let source = await serializePortableTheme(portableTheme, sourceContent)
+				let source = await serializePortableTheme(
+					portableTheme,
+					sourceContent,
+					compileThemeSource,
+				)
 				return {
 					...summarizeTheme(theme, config.baseUrl),
 					css: theme.css.toString(),

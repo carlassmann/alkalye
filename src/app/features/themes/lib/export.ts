@@ -25,6 +25,7 @@ type LoadedThemeForExport = co.loaded<typeof Theme, ThemeExportQuery>
 async function serializePortableTheme(
 	theme: LoadedThemeForExport,
 	sourceOverride?: string,
+	validateSource?: (source: string) => unknown,
 ): Promise<string> {
 	let source = sourceOverride ?? (await loadEditableSource(theme))
 	let metadata: ThemeSourceMetadata = {
@@ -85,11 +86,17 @@ async function serializePortableTheme(
 	if (fontFaces.length)
 		sections.push("```css theme\n" + fontFaces.join("\n\n") + "\n```")
 	let portable = withThemeSourceMetadata(sections.join("\n\n"), metadata)
-	let validation = parseThemeSource(portable, { validateTemplate: () => null })
+	let validation = parseThemeSource(
+		portable,
+		validateSource ? { validateTemplate: () => null } : undefined,
+	)
 	if (validation.errors.length > 0)
 		throw new Error(
 			`Theme export is not portable: ${validation.errors[0]?.message}`,
 		)
+	if (!validation.css.trim())
+		throw new Error("Theme export requires a nonempty css theme fence")
+	validateSource?.(portable)
 	return portable
 }
 
@@ -101,7 +108,8 @@ function fileStreamToDataUrl(fileStream: FileStream, mimeType: string): string {
 			"image/png" === mimeType ||
 			"image/jpeg" === mimeType ||
 			"image/webp" === mimeType ||
-			"image/gif" === mimeType
+			"image/gif" === mimeType ||
+			"image/svg+xml" === mimeType
 		)
 	)
 		throw new Error(`Unsupported theme thumbnail MIME type: ${mimeType}`)

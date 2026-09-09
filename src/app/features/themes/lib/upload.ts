@@ -92,7 +92,9 @@ async function parseThemeMarkdown(file: File): Promise<ParseResult> {
 			error: {
 				type: "invalid_markdown",
 				message: "Theme thumbnail is invalid.",
-				errors: ["Thumbnail must be a base64 PNG, JPEG, WebP, or GIF"],
+				errors: [
+					"Thumbnail must be a base64 PNG, JPEG, WebP, GIF, or safe SVG",
+				],
 			},
 		}
 	return {
@@ -119,7 +121,7 @@ async function parseThemeMarkdown(file: File): Promise<ParseResult> {
 
 function dataUrlToFile(dataUrl: string, name: string): File | undefined {
 	let match = dataUrl.match(
-		/^data:(image\/(?:png|jpeg|webp|gif));base64,([A-Za-z0-9+/=]+)$/,
+		/^data:(image\/(?:png|jpeg|webp|gif|svg\+xml));base64,([A-Za-z0-9+/=]+)$/,
 	)
 	if (!match) return undefined
 	try {
