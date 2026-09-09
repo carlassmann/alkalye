@@ -591,6 +591,28 @@ Content`
 			"github",
 		)
 	})
+
+	it("only updates fields inside frontmatter", () => {
+		let content = `---
+theme: OldTheme
+---
+
+theme: ExampleTheme`
+		let updated = setTheme(content, "NewTheme")
+
+		expect(updated).toContain("theme: NewTheme\n---")
+		expect(updated).toContain("\ntheme: ExampleTheme")
+	})
+
+	it("preserves CRLF line endings", () => {
+		let content =
+			"---\r\nsyntax-theme: github\r\ntheme: OldTheme\r\n---\r\nBody"
+		let updated = setTheme(content, "NewTheme")
+
+		expect(updated).toBe(
+			"---\r\nsyntax-theme: github\r\ntheme: NewTheme\r\n---\r\nBody",
+		)
+	})
 })
 
 describe("setPreset", () => {

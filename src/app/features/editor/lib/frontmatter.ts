@@ -254,28 +254,29 @@ function setFrontmatterField(
 		return `---\n${key}: ${value}\n---\n\n${content}`
 	}
 
-	let hasField = Object.hasOwn(frontmatter, key)
-	if (!hasField) {
+	let match = content.match(/^---(\r?\n)([\s\S]*?)(?:\r?\n)?---(?:\r?\n)?/)
+	if (!match) return content
+
+	let newline = match[1]
+	let lines = match[2].split(/\r?\n/)
+	let fieldIndex = lines.findIndex(line => {
+		let colonIndex = line.indexOf(":")
+		return colonIndex >= 0 && line.slice(0, colonIndex).trim() === key
+	})
+
+	if (fieldIndex < 0) {
 		if (!value) return content
-		return content.replace(
-			/^(---\r?\n)/,
-			opening => `${opening}${key}: ${value}\n`,
-		)
+		lines.unshift(`${key}: ${value}`)
+	} else if (value) {
+		lines[fieldIndex] = `${key}: ${value}`
+	} else {
+		lines.splice(fieldIndex, 1)
 	}
 
-	let fieldPattern = new RegExp(
-		`^(---\\r?\\n(?:[^\\r\\n]*\\r?\\n)*)${key}:[ \\t]*[^\\r\\n]*(?:\\r?\\n|$)`,
-	)
-	if (!value) {
-		return removeEmptyFrontmatter(
-			content.replace(fieldPattern, (_match, opening: string) => opening),
-		)
-	}
-
-	return content.replace(
-		fieldPattern,
-		(_match, opening: string) => `${opening}${key}: ${value}\n`,
-	)
+	let remainingFields = lines.some(line => line.trim())
+	let body = content.slice(match[0].length)
+	if (!remainingFields) return body
+	return `---${newline}${lines.join(newline)}${newline}---${newline}${body}`
 }
 
 function removeEmptyFrontmatter(content: string): string {

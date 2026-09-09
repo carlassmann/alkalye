@@ -76,6 +76,11 @@ function EditorToolbar({
 		return editor.current?.getContent() ?? content ?? ""
 	}
 
+	function applyContentChange(newContent: string) {
+		editor.current?.setContent(newContent)
+		onThemeChange?.(newContent)
+	}
+
 	function scrollToTop() {
 		let view = editor.current?.getEditor()
 		if (!view) return
@@ -234,13 +239,13 @@ function EditorToolbar({
 							{content !== undefined && onThemeChange && (
 								<>
 									<ThemePicker
-										content={content}
-										onThemeChange={onThemeChange}
+										getContent={getCurrentContent}
+										onThemeChange={applyContentChange}
 										disabled={readOnly}
 									/>
 									<PresetPicker
-										content={content}
-										onPresetChange={onThemeChange}
+										getContent={getCurrentContent}
+										onPresetChange={applyContentChange}
 										disabled={readOnly}
 									/>
 								</>
@@ -249,7 +254,7 @@ function EditorToolbar({
 						{content !== undefined && onThemeChange && (
 							<SyntaxThemePicker
 								getContent={getCurrentContent}
-								onThemeChange={onThemeChange}
+								onThemeChange={applyContentChange}
 								disabled={readOnly}
 							/>
 						)}

@@ -26,16 +26,17 @@ export { PresetPicker }
 type LoadedTheme = co.loaded<typeof Theme>
 
 interface PresetPickerProps {
-	content: string
+	getContent: () => string
 	onPresetChange: (newContent: string) => void
 	disabled?: boolean
 }
 
 function PresetPicker({
-	content,
+	getContent,
 	onPresetChange,
 	disabled,
 }: PresetPickerProps) {
+	let content = getContent()
 	let me = useAccount(UserAccount, { resolve: themesResolve })
 
 	let themes: LoadedTheme[] = []
@@ -110,7 +111,7 @@ function PresetPicker({
 									currentPresetName?.toLowerCase() === preset.name.toLowerCase()
 								}
 								onSelect={() => {
-									let newContent = setPreset(content, preset.name)
+									let newContent = setPreset(getContent(), preset.name)
 									onPresetChange(newContent)
 								}}
 							/>
@@ -134,7 +135,7 @@ function PresetPicker({
 									currentPresetName?.toLowerCase() === preset.name.toLowerCase()
 								}
 								onSelect={() => {
-									let newContent = setPreset(content, preset.name)
+									let newContent = setPreset(getContent(), preset.name)
 									onPresetChange(newContent)
 								}}
 							/>
@@ -146,7 +147,7 @@ function PresetPicker({
 						<DropdownMenuSeparator />
 						<DropdownMenuItem
 							onClick={() => {
-								let newContent = setPreset(content, null)
+								let newContent = setPreset(getContent(), null)
 								onPresetChange(newContent)
 							}}
 						>
