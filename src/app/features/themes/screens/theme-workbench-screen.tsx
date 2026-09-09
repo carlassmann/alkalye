@@ -67,6 +67,8 @@ import {
 	Theme,
 } from "@/app/features/themes"
 
+import { bindThemeSource } from "../lib/source"
+
 export { ThemeWorkbenchScreen }
 
 let themeResolve = {
@@ -310,6 +312,7 @@ function Workbench({
 								ref={editor}
 								value={sourceContent}
 								onChange={makeSourceChange(
+									theme.$jazz.id,
 									source,
 									account,
 									setSourceSyncError,
@@ -772,6 +775,7 @@ function getTargetDocuments(account: LoadedAccount, sourceId: string) {
 }
 
 function makeSourceChange(
+	themeId: string,
 	source: LoadedSource,
 	account: LoadedAccount,
 	setSourceSyncError: (error: string | null) => void,
@@ -782,7 +786,10 @@ function makeSourceChange(
 		sourceSyncState.current.sequence = sequence
 		let content: string
 		try {
-			content = persistDocumentContentSynchronously(source, readContent())
+			content = persistDocumentContentSynchronously(
+				source,
+				bindThemeSource(readContent(), themeId),
+			)
 			sourceSyncState.current.content = content
 		} catch (error) {
 			if (sourceSyncState.current.sequence === sequence) {

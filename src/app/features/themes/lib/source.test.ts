@@ -1,7 +1,10 @@
+import { readFileSync } from "node:fs"
+import { persistDocumentContentSynchronously } from "@/app/features/documents/lib/background-document-save"
 import { beforeEach, describe, expect, it } from "vitest"
 import { createJazzTestAccount, setupJazzTestSync } from "jazz-tools/testing"
 import { Document, Theme, UserAccount } from "@/schema"
 import {
+	bindThemeSource,
 	getThemeSourceId,
 	parseThemeSource,
 	serializeThemeSource,
@@ -181,6 +184,22 @@ describe("theme source sync", () => {
 		let fullSource = source.content.toString()
 		expect(await syncThemeFromSource(account, sourceId, fullSource)).toBe(true)
 
+		let pastedSource = bindThemeSource(
+			readFileSync("themes/syntwin/source.md", "utf8"),
+			theme.$jazz.id,
+		)
+		persistDocumentContentSynchronously(source, pastedSource)
+		expect(source.content.toString()).toBe(pastedSource)
+		expect(await syncThemeFromSource(account, sourceId, pastedSource)).toBe(
+			true,
+		)
+		let pastedTheme = await Theme.load(theme.$jazz.id, {
+			resolve: { css: true, template: true },
+		})
+		if (!pastedTheme.$isLoaded) throw new Error("Theme did not load")
+		expect(pastedTheme.css.toString()).toContain("--syntwin-paper")
+		expect(pastedTheme.template?.toString()).toContain("syntwin-wordmark")
+
 		let shortSource = createThemeSourceContent(
 			theme.$jazz.id,
 			"h1 { color: red; }",
@@ -205,6 +224,17 @@ describe("theme source sync", () => {
 })
 
 describe("getThemeSourceId", () => {
+	it("keeps pasted sources bound to the destination theme without discarding metadata", () => {
+		let source =
+			"---\ntitle: Imported\ntheme-source: original\ntags: branding\n---\n\n```css theme\nh1 {}\n```"
+		let bound = bindThemeSource(source, "destination")
+		expect(getThemeSourceId(bound)).toBe("destination")
+		expect(bound).toContain("title: Imported")
+		expect(bound).toContain("tags: branding")
+		expect(parseThemeSource(bound).css).toBe("h1 {}")
+		expect(bindThemeSource(bound, "destination")).toBe(bound)
+	})
+
 	it("reads only the theme-source frontmatter field", () => {
 		expect(
 			getThemeSourceId(`---

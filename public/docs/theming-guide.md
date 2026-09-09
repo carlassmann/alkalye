@@ -5,7 +5,7 @@ Use this guide when asking an agent to create or edit a theme. It describes the 
 ## Start from the default
 
 1. In Settings > Themes, choose **New custom theme**, then open its workbench. **New from default** in an existing workbench creates a separate theme.
-2. Keep the generated frontmatter, especially `theme-source`. It connects this source document to its theme. Do not invent an ID or copy one from another theme.
+2. Paste or edit the Markdown source in the workbench. It keeps `theme-source` bound to the destination theme, including when you replace the entire source or paste from another theme. When editing the source as an ordinary document, preserve this generated link.
 3. Edit the CSS fences in Alkalye's editor. Start by appending a small override fence to the baseline.
 4. Switch between Document and Slideshow, select sample content or a real document, and check Light and Dark. These controls affect the preview, not your app appearance or the selected document's theme.
 5. Drag the divider to resize. Minimize/maximize controls preserve the current session's split size. Keyboard users can focus the divider and use arrow keys, Home, or End.

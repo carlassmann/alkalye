@@ -6,6 +6,7 @@ import { sanitizeCss, sanitizeHtml } from "./sanitize"
 import { UserAccount } from "@/schema"
 
 export {
+	bindThemeSource,
 	parseThemeSource,
 	validateThemeTemplate,
 	serializeThemeSource,
@@ -355,4 +356,14 @@ async function loadThemes(account: co.loaded<typeof UserAccount>) {
 		},
 	})
 	return loaded.$isLoaded ? loaded : null
+}
+
+function bindThemeSource(content: string, themeId: string): string {
+	if (getThemeSourceId(content) === themeId) return content
+	let frontmatter = content.match(/^---\r?\n([\s\S]*?)(?:\r?\n)?---(?:\r?\n)?/)
+	if (!frontmatter) return `---\ntheme-source: ${themeId}\n---\n\n${content}`
+	let lines = frontmatter[1]
+		.split(/\r?\n/)
+		.filter(line => !/^\s*theme-source\s*:/.test(line))
+	return `---\n${lines.filter(Boolean).join("\n")}\ntheme-source: ${themeId}\n---\n${content.slice(frontmatter[0].length)}`
 }
