@@ -76,6 +76,7 @@ import {
 	TooltipContent,
 } from "@/app/components/ui/tooltip"
 import { useIsOnline } from "@/app/hooks/use-online"
+import { SYNTAX_THEME_FAMILIES } from "@/app/features/syntax-highlighting"
 import { testIds } from "@/app/lib/test-ids"
 import {
 	collectStorageDiagnostics,
@@ -174,6 +175,7 @@ function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 								<T k="settings.appearance" />
 							</h2>
 							<ThemeToggle theme={theme} setTheme={setTheme} showLabel />
+							<SyntaxThemeSetting settings={me?.root?.settings} />
 						</section>
 						<LanguageSection me={me} />
 						<ThemesSection me={me} />
@@ -186,6 +188,46 @@ function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 				</div>
 			</div>
 		</>
+	)
+}
+
+function SyntaxThemeSetting({
+	settings,
+}: {
+	settings: co.loaded<typeof Settings> | null | undefined
+}) {
+	let t = useIntl()
+	let selectedFamily = SYNTAX_THEME_FAMILIES.find(
+		family => family.id === settings?.syntaxTheme,
+	)
+	let selectedFamilyId = selectedFamily?.id ?? "github"
+
+	function handleChange(value: string | null) {
+		if (!settings || !value) return
+		settings.$jazz.set("syntaxTheme", value === "github" ? undefined : value)
+	}
+
+	return (
+		<div className="mt-3 flex items-center justify-between gap-4">
+			<span className="text-sm">
+				<T k="settings.appearance.syntaxTheme" />
+			</span>
+			<Select value={selectedFamilyId} onValueChange={handleChange}>
+				<SelectTrigger
+					className="w-40"
+					aria-label={t("settings.appearance.syntaxTheme")}
+				>
+					<SelectValue>{selectedFamily?.name ?? "GitHub"}</SelectValue>
+				</SelectTrigger>
+				<SelectContent>
+					{SYNTAX_THEME_FAMILIES.map(family => (
+						<SelectItem key={family.id} value={family.id}>
+							{family.name}
+						</SelectItem>
+					))}
+				</SelectContent>
+			</Select>
+		</div>
 	)
 }
 

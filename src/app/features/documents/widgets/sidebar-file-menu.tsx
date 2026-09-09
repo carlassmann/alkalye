@@ -541,9 +541,16 @@ function makePrintPdf(
 ) {
 	return async function handlePrintPdf() {
 		if (!account.$isLoaded) return
-		let { themes, defaultPreviewTheme } = await loadThemesForPdf(account)
+		let { themes, defaultPreviewTheme, defaultSyntaxTheme } =
+			await loadThemesForPdf(account)
 		let assets = getLoadedAssets(doc.assets).map(toPrintableAsset)
-		await printToPdf({ content, themes, defaultPreviewTheme, assets })
+		await printToPdf({
+			content,
+			themes,
+			defaultPreviewTheme,
+			defaultSyntaxTheme,
+			assets,
+		})
 	}
 }
 

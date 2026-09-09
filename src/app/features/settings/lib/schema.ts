@@ -48,4 +48,5 @@ let Settings = co.map({
 	editor: EditorSettings,
 	defaultPreviewTheme: z.string().optional(),
 	defaultSlideshowTheme: z.string().optional(),
+	syntaxTheme: z.string().optional(),
 })

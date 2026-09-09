@@ -9,7 +9,6 @@ import {
 import { exitFocusMode } from "@/app/lib/focus-mode"
 import { Marked } from "marked"
 import markedShiki from "marked-shiki"
-import { createHighlighter, type Highlighter } from "shiki"
 import {
 	createWikilinkExtension,
 	type WikilinkTitleResolver,
@@ -31,6 +30,12 @@ import {
 	countOccurrences,
 	findBestTextOccurrence,
 } from "../lib/comment-text-match"
+import {
+	loadSyntaxHighlighter,
+	useSyntaxTheme,
+	type SyntaxHighlighter,
+	type SyntaxTheme,
+} from "@/app/features/syntax-highlighting"
 
 export { Preview }
 
@@ -102,12 +107,13 @@ function Preview({
 		previewAppearance,
 		themeOverrideId,
 	)
+	let syntaxTheme = useSyntaxTheme(content, previewAppearance)
 
 	let wikilinkResolver: WikilinkTitleResolver = docId => {
 		return wikilinks.get(docId) ?? { title: docId, exists: false }
 	}
 
-	let marked = useMarked(wikilinkResolver, previewAppearance)
+	let marked = useMarked(wikilinkResolver, syntaxTheme)
 
 	if (!marked) return null
 
@@ -724,38 +730,9 @@ function useThemeStyles(documentTheme: ResolvedTheme): ThemeStylesResult {
 	return { styles, error, isLoading }
 }
 
-let highlighterPromise: Promise<Highlighter> | null = null
-
-function getHighlighter() {
-	if (!highlighterPromise) {
-		highlighterPromise = createHighlighter({
-			themes: ["github-light", "vesper"],
-			langs: [
-				"javascript",
-				"typescript",
-				"jsx",
-				"tsx",
-				"html",
-				"css",
-				"json",
-				"markdown",
-				"bash",
-				"shell",
-				"python",
-				"rust",
-				"go",
-				"sql",
-				"yaml",
-				"toml",
-			],
-		})
-	}
-	return highlighterPromise
-}
-
 function useMarked(
 	wikilinkResolver: WikilinkTitleResolver,
-	resolvedTheme: "light" | "dark",
+	syntaxTheme: SyntaxTheme,
 ) {
 	let [marked, setMarked] = useState<Marked | null>(null)
 	let resolverRef = useRef(wikilinkResolver)
@@ -765,9 +742,9 @@ function useMarked(
 
 	useEffect(() => {
 		let cancelled = false
-		getHighlighter().then(highlighter => {
+		loadSyntaxHighlighter().then(highlighter => {
 			if (cancelled) return
-			let instance = createMarkedInstance(highlighter, resolvedTheme, id =>
+			let instance = createMarkedInstance(highlighter, syntaxTheme, id =>
 				resolverRef.current(id),
 			)
 			setMarked(instance)
@@ -775,23 +752,24 @@ function useMarked(
 		return () => {
 			cancelled = true
 		}
-	}, [resolvedTheme])
+	}, [syntaxTheme])
 
 	return marked
 }
 
 function createMarkedInstance(
-	highlighter: Highlighter,
-	theme: "light" | "dark",
+	highlighter: SyntaxHighlighter,
+	theme: SyntaxTheme,
 	wikilinkResolver: WikilinkTitleResolver,
 ) {
 	let instance = new Marked()
 	instance.use(
 		markedShiki({
 			highlight(code, lang) {
-				return highlighter.codeToHtml(code, {
-					lang: lang || "text",
-					theme: theme === "dark" ? "vesper" : "github-light",
+				return highlighter.highlight({
+					code,
+					language: lang,
+					theme,
 				})
 			},
 		}),

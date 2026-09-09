@@ -9,29 +9,6 @@ import {
 } from "react"
 import { createPortal } from "react-dom"
 import { Image as JazzImage } from "jazz-tools/react"
-import { createHighlighterCore, type HighlighterCore } from "shiki/core"
-import { createJavaScriptRegexEngine } from "shiki/engine/javascript"
-import astroLanguage from "shiki/dist/langs/astro.mjs"
-import cssLanguage from "shiki/dist/langs/css.mjs"
-import diffLanguage from "shiki/dist/langs/diff.mjs"
-import goLanguage from "shiki/dist/langs/go.mjs"
-import htmlLanguage from "shiki/dist/langs/html.mjs"
-import javascriptLanguage from "shiki/dist/langs/javascript.mjs"
-import jsonLanguage from "shiki/dist/langs/json.mjs"
-import jsxLanguage from "shiki/dist/langs/jsx.mjs"
-import markdownLanguage from "shiki/dist/langs/markdown.mjs"
-import pythonLanguage from "shiki/dist/langs/python.mjs"
-import rustLanguage from "shiki/dist/langs/rust.mjs"
-import shellscriptLanguage from "shiki/dist/langs/shellscript.mjs"
-import sqlLanguage from "shiki/dist/langs/sql.mjs"
-import svelteLanguage from "shiki/dist/langs/svelte.mjs"
-import tomlLanguage from "shiki/dist/langs/toml.mjs"
-import tsxLanguage from "shiki/dist/langs/tsx.mjs"
-import typescriptLanguage from "shiki/dist/langs/typescript.mjs"
-import vueLanguage from "shiki/dist/langs/vue.mjs"
-import yamlLanguage from "shiki/dist/langs/yaml.mjs"
-import githubLightTheme from "shiki/dist/themes/github-light.mjs"
-import vesperTheme from "shiki/dist/themes/vesper.mjs"
 import {
 	parsePresentationSize,
 	parsePresentationTheme,
@@ -62,6 +39,12 @@ import {
 	type ThemeStyles,
 } from "@/app/features/themes"
 import { T, useIntl } from "@/shared/intl/setup"
+import {
+	loadSyntaxHighlighter,
+	useSyntaxTheme,
+	type SyntaxDecoration,
+	type SyntaxTheme,
+} from "@/app/features/syntax-highlighting"
 
 export { Slideshow }
 export type { Slide, HighlightRange }
@@ -83,6 +66,7 @@ let ThemeContext = createContext<PresentationTheme | null>(null)
 let WikilinkContext = createContext<Map<string, ResolvedWikilink>>(new Map())
 let HighlightContext = createContext<ScopedHighlight | null>(null)
 let ContentContext = createContext<string>("")
+let SyntaxThemeContext = createContext<SyntaxTheme>("github-light")
 
 type Asset = {
 	$jazz: { id: string }
@@ -136,6 +120,7 @@ function Slideshow({
 	let systemTheme = useResolvedTheme()
 
 	let effectiveAppearance = appearanceOverride ?? appearanceTheme ?? systemTheme
+	let syntaxTheme = useSyntaxTheme(content, effectiveAppearance)
 
 	let documentTheme = useDocumentTheme(
 		content,
@@ -203,118 +188,120 @@ function Slideshow({
 		<AssetContext.Provider value={assets}>
 			<WikilinkContext.Provider value={wikilinks}>
 				<ThemeContext.Provider value={effectiveAppearance}>
-					<HighlightContext.Provider value={scopedHighlight}>
-						<ContentContext.Provider value={content}>
-							{/* Inject theme styles */}
-							{injectedStyles && <style>{injectedStyles}</style>}
-
-							<div
-								data-mode="slideshow"
-								data-theme={
-									isSourceTheme
-										? undefined
-										: (documentTheme.theme?.name ?? undefined)
-								}
-								data-appearance={
-									isSourceTheme ? undefined : effectiveAppearance
-								}
-								className={
-									isSourceTheme
-										? embedded
-											? "relative flex h-full min-h-0 min-w-0 flex-1 flex-col"
-											: "fixed inset-0 flex flex-col"
-										: embedded
-											? "theme relative flex h-full min-h-0 min-w-0 flex-1 flex-col"
-											: "theme fixed inset-0 flex flex-col"
-								}
-							>
-								{/* Theme warning banner */}
-								{documentTheme.warning && (
-									<div className="absolute top-4 left-1/2 z-50 -translate-x-1/2">
-										<div className="bg-warning/90 text-warning-foreground flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-lg">
-											<TriangleAlert className="size-4 shrink-0" />
-											<span>{documentTheme.warning}</span>
-										</div>
-									</div>
-								)}
-
-								{/* Theme error banner (corrupted theme data) */}
-								{themeStylesResult.error && (
-									<div className="absolute top-4 left-1/2 z-50 -translate-x-1/2">
-										<div className="bg-destructive/90 text-destructive-foreground flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-lg">
-											<TriangleAlert className="size-4 shrink-0" />
-											<span>
-												Theme error: {themeStylesResult.error}. Using default
-												styles.
-											</span>
-										</div>
-									</div>
-								)}
+					<SyntaxThemeContext.Provider value={syntaxTheme}>
+						<HighlightContext.Provider value={scopedHighlight}>
+							<ContentContext.Provider value={content}>
+								{/* Inject theme styles */}
+								{injectedStyles && <style>{injectedStyles}</style>}
 
 								<div
-									data-theme-scope={themeScopeId}
-									data-mode={isSourceTheme ? "slideshow" : undefined}
-									data-appearance={
-										isSourceTheme ? effectiveAppearance : undefined
+									data-mode="slideshow"
+									data-theme={
+										isSourceTheme
+											? undefined
+											: (documentTheme.theme?.name ?? undefined)
 									}
-									className="flex min-h-0 flex-1 flex-col"
+									data-appearance={
+										isSourceTheme ? undefined : effectiveAppearance
+									}
+									className={
+										isSourceTheme
+											? embedded
+												? "relative flex h-full min-h-0 min-w-0 flex-1 flex-col"
+												: "fixed inset-0 flex flex-col"
+											: embedded
+												? "theme relative flex h-full min-h-0 min-w-0 flex-1 flex-col"
+												: "theme fixed inset-0 flex flex-col"
+									}
 								>
-									<article
+									{/* Theme warning banner */}
+									{documentTheme.warning && (
+										<div className="absolute top-4 left-1/2 z-50 -translate-x-1/2">
+											<div className="bg-warning/90 text-warning-foreground flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-lg">
+												<TriangleAlert className="size-4 shrink-0" />
+												<span>{documentTheme.warning}</span>
+											</div>
+										</div>
+									)}
+
+									{/* Theme error banner (corrupted theme data) */}
+									{themeStylesResult.error && (
+										<div className="absolute top-4 left-1/2 z-50 -translate-x-1/2">
+											<div className="bg-destructive/90 text-destructive-foreground flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-lg">
+												<TriangleAlert className="size-4 shrink-0" />
+												<span>
+													Theme error: {themeStylesResult.error}. Using default
+													styles.
+												</span>
+											</div>
+										</div>
+									)}
+
+									<div
+										data-theme-scope={themeScopeId}
 										data-mode={isSourceTheme ? "slideshow" : undefined}
-										data-theme={
-											isSourceTheme
-												? (documentTheme.theme?.name ?? undefined)
-												: undefined
-										}
 										data-appearance={
 											isSourceTheme ? effectiveAppearance : undefined
 										}
-										className={
-											isSourceTheme
-												? "theme flex min-h-0 flex-1 flex-col"
-												: "flex min-h-0 flex-1 flex-col"
-										}
+										className="flex min-h-0 flex-1 flex-col"
 									>
-										{documentTheme.isLoading ||
-										themeStylesResult.isLoading ? null : safeSlideTemplate &&
-										  slideTemplateHasSlot ? (
-											<SlideTemplate
-												key={currentSlideNumber}
-												templateHtml={safeSlideTemplate}
-												currentSlideNumber={currentSlideNumber}
-												blocks={visibleBlocks}
-												size={size}
-												onClick={goToNextSlide}
-												measureKey={getThemeMeasureKey(
-													documentTheme,
-													themeStyles,
-												)}
-											/>
-										) : (
-											<ScaledSlideContainer
-												key={currentSlideNumber}
-												blocks={visibleBlocks}
-												size={size}
-												onClick={goToNextSlide}
-												measureKey={getThemeMeasureKey(
-													documentTheme,
-													themeStyles,
-												)}
-											/>
-										)}
-									</article>
+										<article
+											data-mode={isSourceTheme ? "slideshow" : undefined}
+											data-theme={
+												isSourceTheme
+													? (documentTheme.theme?.name ?? undefined)
+													: undefined
+											}
+											data-appearance={
+												isSourceTheme ? effectiveAppearance : undefined
+											}
+											className={
+												isSourceTheme
+													? "theme flex min-h-0 flex-1 flex-col"
+													: "flex min-h-0 flex-1 flex-col"
+											}
+										>
+											{documentTheme.isLoading ||
+											themeStylesResult.isLoading ? null : safeSlideTemplate &&
+											  slideTemplateHasSlot ? (
+												<SlideTemplate
+													key={currentSlideNumber}
+													templateHtml={safeSlideTemplate}
+													currentSlideNumber={currentSlideNumber}
+													blocks={visibleBlocks}
+													size={size}
+													onClick={goToNextSlide}
+													measureKey={getThemeMeasureKey(
+														documentTheme,
+														themeStyles,
+													)}
+												/>
+											) : (
+												<ScaledSlideContainer
+													key={currentSlideNumber}
+													blocks={visibleBlocks}
+													size={size}
+													onClick={goToNextSlide}
+													measureKey={getThemeMeasureKey(
+														documentTheme,
+														themeStyles,
+													)}
+												/>
+											)}
+										</article>
+									</div>
+									<SlideControls
+										slides={slides}
+										currentSlideNumber={currentSlideNumber}
+										onSlideChange={onSlideChange}
+										onExit={onExit}
+										onGoToTeleprompter={onGoToTeleprompter}
+										embedded={embedded}
+									/>
 								</div>
-								<SlideControls
-									slides={slides}
-									currentSlideNumber={currentSlideNumber}
-									onSlideChange={onSlideChange}
-									onExit={onExit}
-									onGoToTeleprompter={onGoToTeleprompter}
-									embedded={embedded}
-								/>
-							</div>
-						</ContentContext.Provider>
-					</HighlightContext.Provider>
+							</ContentContext.Provider>
+						</HighlightContext.Provider>
+					</SyntaxThemeContext.Provider>
 				</ThemeContext.Provider>
 			</WikilinkContext.Provider>
 		</AssetContext.Provider>
@@ -1173,14 +1160,10 @@ function HighlightedCode({
 	code: string
 	language?: string
 }) {
-	let presentationTheme = useContext(ThemeContext)
-	let systemTheme = useResolvedTheme()
 	let highlight = useContext(HighlightContext)
 	let content = useContext(ContentContext)
+	let syntaxTheme = useContext(SyntaxThemeContext)
 	let [html, setHtml] = useState<string | null>(null)
-
-	let effectiveTheme = presentationTheme ?? systemTheme
-	let shikiTheme = effectiveTheme === "light" ? "github-light" : "vesper"
 
 	// Stable key for decorations
 	let decorationKey = highlight?.range
@@ -1191,12 +1174,12 @@ function HighlightedCode({
 		let cancelled = false
 		let decorations = computeCodeDecorations(code, content, highlight)
 
-		getSlideshowHighlighter()
+		loadSyntaxHighlighter()
 			.then(highlighter => {
-				let lang = resolveCodeLanguage(language)
-				return highlighter.codeToHtml(code, {
-					lang,
-					theme: shikiTheme,
+				return highlighter.highlight({
+					code,
+					language,
+					theme: syntaxTheme,
 					decorations,
 				})
 			})
@@ -1209,7 +1192,7 @@ function HighlightedCode({
 		return () => {
 			cancelled = true
 		}
-	}, [code, language, shikiTheme, decorationKey, content, highlight])
+	}, [code, language, syntaxTheme, decorationKey, content, highlight])
 
 	if (html) {
 		return (
@@ -1227,97 +1210,11 @@ function HighlightedCode({
 	)
 }
 
-let slideshowHighlighterPromise: Promise<HighlighterCore> | null = null
-
-function getSlideshowHighlighter(): Promise<HighlighterCore> {
-	if (!slideshowHighlighterPromise) {
-		slideshowHighlighterPromise = createHighlighterCore({
-			themes: [githubLightTheme, vesperTheme],
-			langs: [
-				astroLanguage,
-				cssLanguage,
-				diffLanguage,
-				goLanguage,
-				htmlLanguage,
-				javascriptLanguage,
-				jsonLanguage,
-				jsxLanguage,
-				markdownLanguage,
-				pythonLanguage,
-				rustLanguage,
-				shellscriptLanguage,
-				sqlLanguage,
-				svelteLanguage,
-				tomlLanguage,
-				tsxLanguage,
-				typescriptLanguage,
-				vueLanguage,
-				yamlLanguage,
-			],
-			engine: createJavaScriptRegexEngine(),
-		})
-	}
-	return slideshowHighlighterPromise
-}
-
-let slideshowLanguages = new Set([
-	"astro",
-	"bash",
-	"cjs",
-	"css",
-	"cts",
-	"diff",
-	"go",
-	"html",
-	"javascript",
-	"js",
-	"json",
-	"jsx",
-	"markdown",
-	"mjs",
-	"mts",
-	"python",
-	"rust",
-	"sh",
-	"shell",
-	"shellscript",
-	"sql",
-	"svelte",
-	"toml",
-	"ts",
-	"tsx",
-	"typescript",
-	"vue",
-	"yaml",
-	"zsh",
-])
-
-function resolveCodeLanguage(language: string | undefined): string {
-	let normalized = normalizeCodeLanguage(language)
-	if (!normalized) return "text"
-	if (!slideshowLanguages.has(normalized)) return "text"
-	return normalized
-}
-
-function normalizeCodeLanguage(
-	language: string | undefined,
-): string | undefined {
-	let firstToken = language?.trim().split(/\s+/, 1)[0]?.toLowerCase()
-	if (!firstToken || firstToken.startsWith("{")) return undefined
-	return firstToken
-}
-
-type ShikiDecoration = {
-	start: number
-	end: number
-	properties: { class: string }
-}
-
 function computeCodeDecorations(
 	code: string,
 	content: string,
 	highlight: ScopedHighlight | null,
-): ShikiDecoration[] {
+): SyntaxDecoration[] {
 	if (!highlight) return []
 
 	let { range, slideSearchStart } = highlight

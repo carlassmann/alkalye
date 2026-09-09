@@ -48,6 +48,7 @@ export {
 	removeBacklink,
 	setTheme,
 	setPreset,
+	setSyntaxTheme,
 	type Frontmatter,
 } from "./lib/frontmatter"
 

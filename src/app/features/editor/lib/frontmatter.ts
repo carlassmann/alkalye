@@ -14,6 +14,7 @@ export {
 	removeBacklink,
 	setTheme,
 	setPreset,
+	setSyntaxTheme,
 }
 
 export type { Frontmatter }
@@ -210,57 +211,16 @@ function removeBacklink(content: string, id: string): string {
 }
 
 function setTheme(content: string, themeName: string | null): string {
-	let { frontmatter } = parseFrontmatter(content)
-
-	if (!themeName) {
-		if (!frontmatter?.theme) return content
-		let result = content.replace(
-			/^(---\r?\n[\s\S]*?)theme:\s*[^\r\n]*\r?\n/,
-			"$1",
-		)
-		result = removeEmptyFrontmatter(result)
-		// Also remove preset when removing theme
-		return setPreset(result, null)
-	}
-
-	if (!frontmatter) {
-		return `---\ntheme: ${themeName}\n---\n\n${content}`
-	}
-
-	if (!frontmatter.theme) {
-		return content.replace(/^(---\r?\n)/, `$1theme: ${themeName}\n`)
-	}
-
-	return content.replace(
-		/^(---\r?\n[\s\S]*?)theme:\s*[^\r\n]*/,
-		`$1theme: ${themeName}`,
-	)
+	let result = setFrontmatterField(content, "theme", themeName)
+	return themeName ? result : setPreset(result, null)
 }
 
 function setPreset(content: string, presetName: string | null): string {
-	let { frontmatter } = parseFrontmatter(content)
+	return setFrontmatterField(content, "preset", presetName)
+}
 
-	if (!presetName) {
-		if (!frontmatter?.preset) return content
-		let result = content.replace(
-			/^(---\r?\n[\s\S]*?)preset:\s*[^\r\n]*\r?\n/,
-			"$1",
-		)
-		return removeEmptyFrontmatter(result)
-	}
-
-	if (!frontmatter) {
-		return `---\npreset: ${presetName}\n---\n\n${content}`
-	}
-
-	if (!frontmatter.preset) {
-		return content.replace(/^(---\r?\n)/, `$1preset: ${presetName}\n`)
-	}
-
-	return content.replace(
-		/^(---\r?\n[\s\S]*?)preset:\s*[^\r\n]*/,
-		`$1preset: ${presetName}`,
-	)
+function setSyntaxTheme(content: string, familyId: string | null): string {
+	return setFrontmatterField(content, "syntax-theme", familyId)
 }
 
 function getFrontmatterRange(
@@ -281,6 +241,42 @@ function getFrontmatterRange(
 }
 
 // Helpers
+
+function setFrontmatterField(
+	content: string,
+	key: string,
+	value: string | null,
+): string {
+	let { frontmatter } = parseFrontmatter(content)
+
+	if (!frontmatter) {
+		if (!value) return content
+		return `---\n${key}: ${value}\n---\n\n${content}`
+	}
+
+	let hasField = Object.hasOwn(frontmatter, key)
+	if (!hasField) {
+		if (!value) return content
+		return content.replace(
+			/^(---\r?\n)/,
+			opening => `${opening}${key}: ${value}\n`,
+		)
+	}
+
+	let fieldPattern = new RegExp(
+		`^(---\\r?\\n(?:[^\\r\\n]*\\r?\\n)*)${key}:[ \\t]*[^\\r\\n]*(?:\\r?\\n|$)`,
+	)
+	if (!value) {
+		return removeEmptyFrontmatter(
+			content.replace(fieldPattern, (_match, opening: string) => opening),
+		)
+	}
+
+	return content.replace(
+		fieldPattern,
+		(_match, opening: string) => `${opening}${key}: ${value}\n`,
+	)
+}
 
 function removeEmptyFrontmatter(content: string): string {
 	return content.replace(/^---\r?\n\s*---\r?\n?/, "")

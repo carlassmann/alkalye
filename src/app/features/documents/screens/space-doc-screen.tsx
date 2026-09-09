@@ -465,9 +465,16 @@ function SpaceEditorContent({
 			openFind: () => editor.current?.openFind(),
 			onPrintPdf: async () => {
 				if (!me.$isLoaded) return
-				let { themes, defaultPreviewTheme } = await loadThemesForPdf(me)
+				let { themes, defaultPreviewTheme, defaultSyntaxTheme } =
+					await loadThemesForPdf(me)
 				let assets = getLoadedAssets(liveDoc?.assets).map(toPrintableAsset)
-				void printToPdf({ content, themes, defaultPreviewTheme, assets })
+				void printToPdf({
+					content,
+					themes,
+					defaultPreviewTheme,
+					defaultSyntaxTheme,
+					assets,
+				})
 			},
 			onPreview: () => {
 				navigate({

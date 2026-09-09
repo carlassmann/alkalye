@@ -1,4 +1,5 @@
 import { Marked } from "marked"
+import markedShiki from "marked-shiki"
 import { type co } from "jazz-tools"
 import { type Theme, type ThemeAsset } from "@/schema"
 import { parseFrontmatter } from "@/app/features/editor/lib/frontmatter"
@@ -19,8 +20,13 @@ import { scopeThemeCss } from "@/app/features/themes/lib/renderer"
 import { getDocumentTitle } from "@/app/features/documents/lib/title"
 import type { PrintableAsset } from "@/app/features/assets"
 import { replaceAssetSources } from "./print-media"
+import {
+	loadSyntaxHighlighter,
+	resolveSyntaxTheme,
+	type SyntaxTheme,
+} from "@/app/features/syntax-highlighting"
 
-export { printToPdf }
+export { printToPdf, renderPrintableMarkdown }
 
 type LoadedTheme = co.loaded<typeof Theme, ThemesQuery["$each"]>
 type LoadedAsset = co.loaded<typeof ThemeAsset, { data: true }>
@@ -29,9 +35,11 @@ async function printToPdf(params: {
 	content: string
 	themes: LoadedThemes | undefined
 	defaultPreviewTheme: string | null
+	defaultSyntaxTheme: string | null
 	assets: PrintableAsset[]
 }) {
-	let { content, themes, defaultPreviewTheme, assets } = params
+	let { content, themes, defaultPreviewTheme, defaultSyntaxTheme, assets } =
+		params
 	let { body } = parseFrontmatter(content)
 	let title = getDocumentTitle(content)
 
@@ -64,10 +72,12 @@ async function printToPdf(params: {
 		}
 	}
 
-	let marked = new Marked()
-	marked.setOptions({ gfm: true, breaks: true })
-	let parsedHtml = await marked.parse(body)
-	let htmlContent = await replaceAssetSources(parsedHtml, assets)
+	let syntaxTheme = resolveSyntaxTheme({
+		content,
+		defaultFamilyId: defaultSyntaxTheme,
+		appearance: "light",
+	})
+	let htmlContent = await renderPrintableMarkdown(body, assets, syntaxTheme)
 
 	let printableHtml = await buildPrintableHtml({
 		title,
@@ -77,6 +87,29 @@ async function printToPdf(params: {
 	})
 
 	openPrintWindow(printableHtml)
+}
+
+async function renderPrintableMarkdown(
+	content: string,
+	assets: PrintableAsset[],
+	syntaxTheme: SyntaxTheme,
+): Promise<string> {
+	let highlighter = await loadSyntaxHighlighter()
+	let marked = new Marked()
+	marked.use(
+		markedShiki({
+			highlight(code, language) {
+				return highlighter.highlight({
+					code,
+					language,
+					theme: syntaxTheme,
+				})
+			},
+		}),
+	)
+	marked.setOptions({ gfm: true, breaks: true })
+	let parsedHtml = await marked.parse(content)
+	return replaceAssetSources(parsedHtml, assets)
 }
 
 async function buildPrintableHtml(params: {

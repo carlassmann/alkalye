@@ -11,6 +11,7 @@ import {
 	addTag,
 	setTheme,
 	setPreset,
+	setSyntaxTheme,
 } from "./frontmatter"
 
 describe("parseFrontmatter", () => {
@@ -542,6 +543,53 @@ Content`
 			theme: "NewTheme",
 			pinned: true,
 		})
+	})
+})
+
+describe("setSyntaxTheme", () => {
+	it("sets and removes a document syntax theme without disturbing metadata", () => {
+		let content = `---
+title: Doc
+---
+Content`
+		let themed = setSyntaxTheme(content, "catppuccin")
+
+		expect(parseFrontmatter(themed).frontmatter).toEqual({
+			"syntax-theme": "catppuccin",
+			title: "Doc",
+		})
+		expect(setSyntaxTheme(themed, null)).toBe(content)
+	})
+
+	it("does not collide with the document theme field", () => {
+		let content = `---
+syntax-theme: catppuccin
+theme: OldTheme
+---
+Content`
+
+		expect(parseFrontmatter(setTheme(content, "NewTheme")).frontmatter).toEqual(
+			{
+				"syntax-theme": "catppuccin",
+				theme: "NewTheme",
+			},
+		)
+		expect(parseFrontmatter(setTheme(content, null)).frontmatter).toEqual({
+			"syntax-theme": "catppuccin",
+		})
+	})
+
+	it("replaces an empty syntax theme field", () => {
+		let content = `---
+syntax-theme:
+---
+Content`
+		let result = setSyntaxTheme(content, "github")
+
+		expect(result.match(/^syntax-theme:/gm)).toHaveLength(1)
+		expect(parseFrontmatter(result).frontmatter?.["syntax-theme"]).toBe(
+			"github",
+		)
 	})
 })
 

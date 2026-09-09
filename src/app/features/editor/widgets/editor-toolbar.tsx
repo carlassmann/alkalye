@@ -38,6 +38,7 @@ import {
 	type ShortcutId,
 } from "@/app/lib/shortcut-registry"
 import { ThemePicker, PresetPicker } from "@/app/features/themes"
+import { SyntaxThemePicker } from "@/app/features/syntax-highlighting"
 import { cn } from "@/app/lib/cn"
 import { useIntl, T } from "@/shared/intl/setup"
 
@@ -70,6 +71,10 @@ function EditorToolbar({
 }: EditorToolbarProps) {
 	let t = useIntl()
 	let isAtTop = useEditorScrollTopState(editor)
+
+	function getCurrentContent() {
+		return editor.current?.getContent() ?? content ?? ""
+	}
 
 	function scrollToTop() {
 		let view = editor.current?.getEditor()
@@ -241,6 +246,13 @@ function EditorToolbar({
 								</>
 							)}
 						</span>
+						{content !== undefined && onThemeChange && (
+							<SyntaxThemePicker
+								getContent={getCurrentContent}
+								onThemeChange={onThemeChange}
+								disabled={readOnly}
+							/>
+						)}
 					</>
 				)}
 				<ToolbarButton
