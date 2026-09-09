@@ -87,11 +87,13 @@
 			padding-right 200ms ease-in;
 	}
 
-	.group\/sidebar-wrapper[data-left-sidebar-open="true"] .markdown-editor {
+	.group\/sidebar-wrapper[data-left-sidebar-open="true"]
+		.markdown-editor:not(.theme-workbench-editor) {
 		padding-left: calc(var(--left-sidebar-width) + env(safe-area-inset-left));
 	}
 
-	.group\/sidebar-wrapper[data-right-sidebar-open="true"] .markdown-editor {
+	.group\/sidebar-wrapper[data-right-sidebar-open="true"]
+		.markdown-editor:not(.theme-workbench-editor) {
 		padding-right: calc(
 			var(--right-sidebar-width) + env(safe-area-inset-right)
 		);
@@ -195,6 +197,8 @@
 }
 
 .markdown-editor.theme-workbench-editor {
+	--editor-content-width: 100%;
+	--editor-padding: 1rem;
 	--editor-code-keyword: var(--chart-1);
 	--editor-code-atom: var(--chart-2);
 	--editor-code-number: var(--chart-3);
@@ -214,6 +218,11 @@
 	min-width: 0;
 	min-height: 0;
 	padding: 0;
+}
+
+.markdown-editor.theme-workbench-editor .cm-content {
+	width: 100%;
+	margin: 0;
 }
 
 .markdown-editor
