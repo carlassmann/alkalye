@@ -718,3 +718,42 @@ Content`
 		})
 	})
 })
+
+describe("scalar frontmatter updates", () => {
+	it("does not match field names as substrings", () => {
+		let content = `---
+autotags: keep
+tags: old
+mybacklinks: keep
+backlinks: old
+unpinned: true
+pinned: true
+---
+Content`
+
+		let updated = addTag(content, "new")
+		updated = setBacklinks(updated, ["new"])
+		updated = togglePinned(updated)
+
+		expect(parseFrontmatter(updated).frontmatter).toEqual({
+			autotags: "keep",
+			tags: "old, new",
+			mybacklinks: "keep",
+			backlinks: "new",
+			unpinned: true,
+		})
+	})
+
+	it("updates the last duplicate field read by the parser", () => {
+		let content = `---
+syntax-theme: github
+syntax-theme: vitesse
+---
+Content`
+		let updated = setSyntaxTheme(content, "catppuccin")
+
+		expect(parseFrontmatter(updated).frontmatter?.["syntax-theme"]).toBe(
+			"catppuccin",
+		)
+	})
+})

@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest"
-import { resolveSyntaxTheme } from "./syntax-highlighting"
+import {
+	loadSyntaxHighlighter,
+	resolveSyntaxTheme,
+} from "./syntax-highlighting"
 
 describe("syntax theme resolution", () => {
 	it("uses document, global, and GitHub themes in precedence order", () => {
@@ -33,5 +36,22 @@ describe("syntax theme resolution", () => {
 				appearance: "dark",
 			}),
 		).toBe("github-dark")
+	})
+
+	it("highlights common Markdown language aliases", async () => {
+		let highlighter = await loadSyntaxHighlighter()
+
+		for (let [language, code] of [
+			["md", "# Heading"],
+			["py", "def greet(): pass"],
+			["yml", "enabled: true"],
+		]) {
+			let html = highlighter.highlight({
+				code,
+				language,
+				theme: "github-dark",
+			})
+			expect(html).toContain('<span style="color:')
+		}
 	})
 })

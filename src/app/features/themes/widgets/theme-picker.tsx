@@ -40,6 +40,7 @@ function ThemePicker({
 	onThemeChange,
 	disabled,
 }: ThemePickerProps) {
+	let [open, setOpen] = useState(false)
 	let content = getContent()
 	let me = useAccount(UserAccount, { resolve: themesResolve })
 
@@ -71,7 +72,7 @@ function ThemePicker({
 	}
 
 	return (
-		<DropdownMenu>
+		<DropdownMenu open={open} onOpenChange={setOpen}>
 			<Tooltip>
 				<DropdownMenuTrigger
 					disabled={disabled}

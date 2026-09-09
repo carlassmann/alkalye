@@ -216,9 +216,11 @@ let supportedLanguages = new Set([
 	"json",
 	"jsx",
 	"markdown",
+	"md",
 	"mjs",
 	"mts",
 	"python",
+	"py",
 	"rust",
 	"sh",
 	"shell",
@@ -231,6 +233,7 @@ let supportedLanguages = new Set([
 	"typescript",
 	"vue",
 	"yaml",
+	"yml",
 	"zsh",
 ])
 

@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { useAccount } from "jazz-tools/react"
 import { co } from "jazz-tools"
 import { Button } from "@/app/components/ui/button"
@@ -36,6 +37,7 @@ function PresetPicker({
 	onPresetChange,
 	disabled,
 }: PresetPickerProps) {
+	let [open, setOpen] = useState(false)
 	let content = getContent()
 	let me = useAccount(UserAccount, { resolve: themesResolve })
 
@@ -73,7 +75,7 @@ function PresetPicker({
 	}
 
 	return (
-		<DropdownMenu>
+		<DropdownMenu open={open} onOpenChange={setOpen}>
 			<Tooltip>
 				<DropdownMenuTrigger
 					disabled={disabled}

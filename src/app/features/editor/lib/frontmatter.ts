@@ -63,19 +63,7 @@ function parseFrontmatter(content: string): {
 function togglePinned(content: string): string {
 	let { frontmatter } = parseFrontmatter(content)
 	let isPinned = frontmatter?.pinned === true
-
-	if (isPinned) {
-		return content.replace(
-			/^(---\r?\n[\s\S]*?)pinned:\s*true\r?\n([\s\S]*?---)/,
-			"$1$2",
-		)
-	}
-
-	if (!frontmatter) {
-		return `---\npinned: true\n---\n\n${content}`
-	}
-
-	return content.replace(/^(---\r?\n)/, "$1pinned: true\n")
+	return setFrontmatterField(content, "pinned", isPinned ? null : "true")
 }
 
 function getTags(content: string): string[] {
@@ -96,25 +84,13 @@ function getPath(content: string): string | null {
 }
 
 function addTag(content: string, tag: string): string {
-	let { frontmatter } = parseFrontmatter(content)
 	let existingTags = getTags(content)
 
 	if (existingTags.includes(tag)) return content
 
 	let newTags = [...existingTags, tag].join(", ")
 
-	if (!frontmatter) {
-		return `---\ntags: ${newTags}\n---\n\n${content}`
-	}
-
-	if (!frontmatter.tags) {
-		return content.replace(/^(---\r?\n)/, `$1tags: ${newTags}\n`)
-	}
-
-	return content.replace(
-		/^(---\r?\n[\s\S]*?)tags:\s*[^\r\n]*/,
-		`$1tags: ${newTags}`,
-	)
+	return setFrontmatterField(content, "tags", newTags)
 }
 
 function getBacklinks(content: string): string[] {
@@ -168,31 +144,8 @@ function getBacklinksWithRange(content: string): BacklinksWithRange | null {
 }
 
 function setBacklinks(content: string, ids: string[]): string {
-	let { frontmatter } = parseFrontmatter(content)
 	let newBacklinks = ids.filter(Boolean).join(", ")
-
-	if (!frontmatter) {
-		if (!newBacklinks) return content
-		return `---\nbacklinks: ${newBacklinks}\n---\n\n${content}`
-	}
-
-	if (!frontmatter.backlinks) {
-		if (!newBacklinks) return content
-		return content.replace(/^(---\r?\n)/, `$1backlinks: ${newBacklinks}\n`)
-	}
-
-	if (!newBacklinks) {
-		let result = content.replace(
-			/^(---\r?\n[\s\S]*?)backlinks:\s*[^\r\n]*\r?\n/,
-			"$1",
-		)
-		return removeEmptyFrontmatter(result)
-	}
-
-	return content.replace(
-		/^(---\r?\n[\s\S]*?)backlinks:\s*[^\r\n]*/,
-		`$1backlinks: ${newBacklinks}`,
-	)
+	return setFrontmatterField(content, "backlinks", newBacklinks || null)
 }
 
 function addBacklink(content: string, id: string): string {
@@ -259,10 +212,14 @@ function setFrontmatterField(
 
 	let newline = match[1]
 	let lines = match[2].split(/\r?\n/)
-	let fieldIndex = lines.findIndex(line => {
+	let fieldIndex = -1
+	for (let index = lines.length - 1; index >= 0; index--) {
+		let line = lines[index] ?? ""
 		let colonIndex = line.indexOf(":")
-		return colonIndex >= 0 && line.slice(0, colonIndex).trim() === key
-	})
+		if (colonIndex < 0 || line.slice(0, colonIndex).trim() !== key) continue
+		fieldIndex = index
+		break
+	}
 
 	if (fieldIndex < 0) {
 		if (!value) return content
@@ -277,8 +234,4 @@ function setFrontmatterField(
 	let body = content.slice(match[0].length)
 	if (!remainingFields) return body
 	return `---${newline}${lines.join(newline)}${newline}---${newline}${body}`
-}
-
-function removeEmptyFrontmatter(content: string): string {
-	return content.replace(/^---\r?\n\s*---\r?\n?/, "")
 }
