@@ -788,6 +788,13 @@ Content`
 		expect(parseFrontmatter(content).frontmatter).toBeNull()
 	})
 
+	it("preserves uniform root indentation", () => {
+		let content = "---\n title: Doc\n syntax-theme: github\n---\nBody"
+		let updated = setSyntaxTheme(content, "vitesse")
+
+		expect(updated).toBe("---\n title: Doc\n syntax-theme: vitesse\n---\nBody")
+	})
+
 	it("requires the closing delimiter on its own line", () => {
 		let content = `---
 title: Foo --- Bar

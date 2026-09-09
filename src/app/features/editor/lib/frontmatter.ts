@@ -45,12 +45,15 @@ function parseFrontmatter(content: string): {
 	let body = content.slice(block.end)
 	let frontmatter: Frontmatter = {}
 	let foundField = false
+	let rootIndent = getFrontmatterRootIndent(block.yaml)
 
 	for (let line of block.yaml.split(/\r?\n/)) {
 		let colonIdx = line.indexOf(":")
 		if (colonIdx === -1) continue
-		let key = line.slice(0, colonIdx)
-		if (!key || key !== key.trim()) continue
+		let rawKey = line.slice(0, colonIdx)
+		let key = rawKey.trim()
+		let indentation = rawKey.slice(0, rawKey.length - rawKey.trimStart().length)
+		if (!key || indentation !== rootIndent) continue
 		foundField = true
 		let value = line.slice(colonIdx + 1).trim()
 		if (value.startsWith('"') && value.endsWith('"')) {
@@ -221,20 +224,24 @@ function setFrontmatterField(
 	if (!block) return content
 
 	let lines = block.yaml ? block.yaml.split(/\r?\n/) : []
+	let rootIndent = getFrontmatterRootIndent(block.yaml) ?? ""
 	let fieldIndexes: number[] = []
 	for (let index = 0; index < lines.length; index++) {
 		let line = lines[index] ?? ""
 		let colonIndex = line.indexOf(":")
-		if (colonIndex < 0 || line.slice(0, colonIndex) !== key) continue
+		if (colonIndex < 0) continue
+		let rawKey = line.slice(0, colonIndex)
+		let indentation = rawKey.slice(0, rawKey.length - rawKey.trimStart().length)
+		if (indentation !== rootIndent || rawKey.trim() !== key) continue
 		fieldIndexes.push(index)
 	}
 
 	if (fieldIndexes.length === 0) {
 		if (!value) return content
-		lines.unshift(`${key}: ${value}`)
+		lines.unshift(`${rootIndent}${key}: ${value}`)
 	} else {
 		let fieldIndex = fieldIndexes[fieldIndexes.length - 1] ?? 0
-		if (value) lines[fieldIndex] = `${key}: ${value}`
+		if (value) lines[fieldIndex] = `${rootIndent}${key}: ${value}`
 		for (let index = fieldIndexes.length - 1; index >= 0; index--) {
 			let duplicateIndex = fieldIndexes[index]
 			if (value && duplicateIndex === fieldIndex) continue
@@ -266,4 +273,19 @@ function findFrontmatterBlock(content: string): FrontmatterBlock | null {
 		newline: opening[1],
 		closingNewline: closing[1],
 	}
+}
+
+function getFrontmatterRootIndent(yaml: string): string | null {
+	let rootIndent: string | null = null
+	for (let line of yaml.split(/\r?\n/)) {
+		let colonIndex = line.indexOf(":")
+		if (colonIndex < 0) continue
+		let rawKey = line.slice(0, colonIndex)
+		if (!rawKey.trim()) continue
+		let indentation = rawKey.slice(0, rawKey.length - rawKey.trimStart().length)
+		if (rootIndent === null || indentation.length < rootIndent.length) {
+			rootIndent = indentation
+		}
+	}
+	return rootIndent
 }

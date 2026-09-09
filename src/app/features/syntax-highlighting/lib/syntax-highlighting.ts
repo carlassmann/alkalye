@@ -222,6 +222,7 @@ let supportedLanguages = new Set([
 	"python",
 	"py",
 	"rust",
+	"rs",
 	"sh",
 	"shell",
 	"shellscript",

@@ -44,6 +44,7 @@ describe("syntax theme resolution", () => {
 		for (let [language, code] of [
 			["md", "# Heading"],
 			["py", "def greet(): pass"],
+			["rs", "fn main() {}"],
 			["yml", "enabled: true"],
 		]) {
 			let html = highlighter.highlight({
