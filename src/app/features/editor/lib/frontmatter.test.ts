@@ -767,6 +767,27 @@ Content`
 		)
 	})
 
+	it("round-trips a sole syntax theme without adding whitespace", () => {
+		let content = "# Title\n"
+		let themed = setSyntaxTheme(content, "github")
+
+		expect(setSyntaxTheme(themed, null)).toBe(content)
+	})
+
+	it("adds a field to empty frontmatter without a blank YAML line", () => {
+		let content = "---\n---\nBody"
+
+		expect(setSyntaxTheme(content, "github")).toBe(
+			"---\nsyntax-theme: github\n---\nBody",
+		)
+	})
+
+	it("requires exact frontmatter delimiters", () => {
+		let content = "--- \ntitle: Visible text\n---\nBody"
+
+		expect(parseFrontmatter(content).frontmatter).toBeNull()
+	})
+
 	it("requires the closing delimiter on its own line", () => {
 		let content = `---
 title: Foo --- Bar
@@ -788,6 +809,22 @@ Body`
 
 		expect(updated).toBe(
 			"---\nsyntax-theme: github\n---\n\n---\nJust a rule\n---\nText",
+		)
+	})
+
+	it("does not edit keys or delimiters inside YAML block scalars", () => {
+		let content = `---
+syntax-theme: github
+notes: |
+  syntax-theme: prose
+  ---
+---
+Body`
+		let updated = setSyntaxTheme(content, "vitesse")
+
+		expect(updated).toContain("  syntax-theme: prose\n  ---")
+		expect(parseFrontmatter(updated).frontmatter?.["syntax-theme"]).toBe(
+			"vitesse",
 		)
 	})
 })

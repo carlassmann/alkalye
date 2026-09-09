@@ -49,8 +49,9 @@ function parseFrontmatter(content: string): {
 	for (let line of block.yaml.split(/\r?\n/)) {
 		let colonIdx = line.indexOf(":")
 		if (colonIdx === -1) continue
+		let key = line.slice(0, colonIdx)
+		if (!key || key !== key.trim()) continue
 		foundField = true
-		let key = line.slice(0, colonIdx).trim()
 		let value = line.slice(colonIdx + 1).trim()
 		if (value.startsWith('"') && value.endsWith('"')) {
 			value = value.slice(1, -1)
@@ -127,7 +128,7 @@ function getBacklinksWithRange(content: string): BacklinksWithRange | null {
 	let block = findFrontmatterBlock(content)
 	if (!block) return null
 
-	let lines = block.yaml.split(/\r?\n/)
+	let lines = block.yaml ? block.yaml.split(/\r?\n/) : []
 	let offset = block.yamlStart
 
 	for (let line of lines) {
@@ -219,12 +220,12 @@ function setFrontmatterField(
 	let block = findFrontmatterBlock(content)
 	if (!block) return content
 
-	let lines = block.yaml.split(/\r?\n/)
+	let lines = block.yaml ? block.yaml.split(/\r?\n/) : []
 	let fieldIndexes: number[] = []
 	for (let index = 0; index < lines.length; index++) {
 		let line = lines[index] ?? ""
 		let colonIndex = line.indexOf(":")
-		if (colonIndex < 0 || line.slice(0, colonIndex).trim() !== key) continue
+		if (colonIndex < 0 || line.slice(0, colonIndex) !== key) continue
 		fieldIndexes.push(index)
 	}
 
@@ -243,15 +244,15 @@ function setFrontmatterField(
 
 	let remainingFields = lines.some(line => line.trim())
 	let body = content.slice(block.end)
-	if (!remainingFields) return body
+	if (!remainingFields) return body.replace(/^\r?\n/, "")
 	return `---${block.newline}${lines.join(block.newline)}${block.newline}---${block.closingNewline}${body}`
 }
 
 function findFrontmatterBlock(content: string): FrontmatterBlock | null {
-	let opening = content.match(/^---[ \t]*(\r?\n)/)
+	let opening = content.match(/^---(\r?\n)/)
 	if (!opening) return null
 
-	let closingPattern = /^[ \t]*---[ \t]*(\r?\n|$)/gm
+	let closingPattern = /^---(\r?\n|$)/gm
 	closingPattern.lastIndex = opening[0].length
 	let closing = closingPattern.exec(content)
 	if (!closing) return null

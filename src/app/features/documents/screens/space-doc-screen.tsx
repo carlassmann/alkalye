@@ -469,7 +469,7 @@ function SpaceEditorContent({
 					await loadThemesForPdf(me)
 				let assets = getLoadedAssets(liveDoc?.assets).map(toPrintableAsset)
 				void printToPdf({
-					content,
+					content: editor.current?.getContent() ?? content,
 					themes,
 					defaultPreviewTheme,
 					defaultSyntaxTheme,
@@ -485,7 +485,7 @@ function SpaceEditorContent({
 			},
 			onDownload: () => {
 				let title = getDocumentTitle(doc)
-				saveDocumentAs(content, title)
+				saveDocumentAs(editor.current?.getContent() ?? content, title)
 			},
 			labels: {
 				autosaveTitle: t("editor.autosave.title"),

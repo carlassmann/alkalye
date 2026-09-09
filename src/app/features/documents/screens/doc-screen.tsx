@@ -460,7 +460,7 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 					await loadThemesForPdf(me)
 				let assets = getLoadedAssets(liveDoc?.assets).map(toPrintableAsset)
 				void printToPdf({
-					content,
+					content: editor.current?.getContent() ?? content,
 					themes,
 					defaultPreviewTheme,
 					defaultSyntaxTheme,
@@ -476,7 +476,7 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 			},
 			onDownload: () => {
 				let title = getDocumentTitle(doc)
-				saveDocumentAs(content, title)
+				saveDocumentAs(editor.current?.getContent() ?? content, title)
 			},
 			labels: {
 				autosaveTitle: t("editor.autosave.title"),
