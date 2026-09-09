@@ -544,16 +544,42 @@ function getDefaultThemeCss(): string {
 function getDefaultThemeSource(): string {
 	return (
 		[
-			"# Default theme\n\nThis is the CSS used by Alkalye's built-in document and slideshow rendering. Edit it to make this theme your own. Local light and dark previews set `data-appearance`; optional `html document` and `html slide` fences need one `data-content` slot.",
-			"## Document typography\n\n```css theme\n" +
-				getDefaultDocumentTypographyCss() +
-				"\n```",
-			"## Document layout and colors\n\n```css theme\n" +
-				getDefaultDocumentColorsCss() +
-				"\n```",
-			"## Slideshow\n\n```css theme\n" + getSlideshowBaseCss() + "\n```",
+			"# Custom theme\n\nEdit these overrides. Alkalye supplies the default layout and typography.",
+			"```css theme\n" + getDefaultThemeStarterCss() + "\n```",
 		].join("\n\n") + "\n"
 	)
+}
+
+function getDefaultThemeStarterCss(): string {
+	return `
+:scope[data-appearance="light"] {
+	--theme-paper: #ffffff;
+	--theme-ink: #525252;
+	--theme-accent: #2563eb;
+}
+
+:scope[data-appearance="dark"] {
+	--theme-paper: #0a0a0a;
+	--theme-ink: #d4d4d4;
+	--theme-accent: #93c5fd;
+}
+
+:scope,
+.document,
+[data-mode="slideshow"] {
+	background: var(--theme-paper);
+	color: var(--theme-ink);
+}
+
+.document .content {
+	color: var(--theme-ink);
+}
+
+.document .content a,
+[data-mode="slideshow"] a {
+	color: var(--theme-accent);
+}
+`.trim()
 }
 
 async function createDefaultTheme(account: co.loaded<typeof UserAccount>) {
@@ -572,7 +598,7 @@ async function createDefaultTheme(account: co.loaded<typeof UserAccount>) {
 			version: 1,
 			name,
 			type: "both",
-			css: co.plainText().create(getDefaultThemeCss(), owner),
+			css: co.plainText().create(getDefaultThemeStarterCss(), owner),
 			createdAt: now,
 			updatedAt: now,
 		},

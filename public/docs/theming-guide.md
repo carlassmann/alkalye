@@ -6,11 +6,11 @@ Use this guide when asking an agent to create or edit a theme. It describes the 
 
 1. In Settings > Themes, choose **New custom theme**, then open its workbench. **New from default** in an existing workbench creates a separate theme.
 2. Paste or edit the Markdown source in the workbench. It keeps `theme-source` bound to the destination theme, including when you replace the entire source or paste from another theme. When editing the source as an ordinary document, preserve this generated link.
-3. Edit the CSS fences in Alkalye's editor. Start by appending a small override fence to the baseline.
+3. Edit the short CSS fence in Alkalye's editor. It starts with light/dark colors and a few document selectors; add another fence when it grows.
 4. Switch between Document and Slideshow, select sample content or a real document, and check Light and Dark. These controls affect the preview, not your app appearance or the selected document's theme.
 5. Drag the divider to resize. Minimize/maximize controls preserve the current session's split size. Keyboard users can focus the divider and use arrow keys, Home, or End.
 
-The baseline contains the actual CSS used by Alkalye's default document and slideshow renderers. Its sections cover document typography, document layout and colors, and slideshow styling. Document defaults use `@layer theme-base`; ordinary unlayered overrides take precedence. Keep the baseline until you deliberately replace its behavior.
+Alkalye applies its document and slideshow baseline separately from your source. A new custom theme contains only small overrides, so removing an override returns that part to the built-in style. Document defaults use `@layer theme-base`; ordinary unlayered rules take precedence.
 
 The workbench saves source edits locally and updates the compiled theme. Editing that theme changes every document using it. Create a separate theme for experiments you do not want applied elsewhere.
 
@@ -26,7 +26,7 @@ A theme is an ordinary Markdown source document linked to a separate theme recor
 
 Use exactly three opening backticks. Ordinary `css` or `html` fences, tilde fences, and four-backtick examples do not compile. Keep HTML and CSS in separate fences. HTML fences containing `<style>` are rejected. Every HTML template needs exactly one content slot after sanitization. `data-content` is preferred; `data-document` is a supported alias.
 
-For example, append this to an existing generated source, below its baseline fences:
+For example, add this as another override fence:
 
 ````markdown
 ## Reading typography
@@ -43,7 +43,7 @@ For example, append this to an existing generated source, below its baseline fen
 ```
 ````
 
-Unclosed recognized fences, duplicate HTML templates, and missing or multiple slots show errors with source locations. The preview keeps the last successfully compiled theme while those errors exist. CSS syntax errors are different: the browser may ignore invalid rules without showing a workbench error. Removing a valid fence removes its contribution; an empty source is not a reset to the saved baseline.
+Unclosed recognized fences, duplicate HTML templates, and missing or multiple slots show errors with source locations. The preview keeps the last successfully compiled theme while those errors exist. CSS syntax errors are different: the browser may ignore invalid rules without showing a workbench error. Removing a valid fence removes its overrides; an empty source uses the built-in renderer baseline. Export preserves this as a metadata-only theme; CSS and HTML overrides are optional when theme metadata is present.
 
 **Open source** opens the same source document in the ordinary editor. A Markdown file with CSS fences alone does not register a new theme. Create it through Settings or import a theme package first.
 
@@ -234,7 +234,7 @@ Do not confuse a document's `theme` selection with the theme source's `theme-sou
 
 Export from Settings to download one `.theme.md` file. It contains the editable CSS/HTML fences, embedded assets, and theme metadata. Import creates a new theme and linked source document while preserving the source prose and fence grouping. Account-specific source IDs are removed from exports. Older ZIP themes remain importable; export them as Markdown to make them portable.
 
-Optional `json theme metadata` fence preserves the theme name, author, description, type (`preview`, `slideshow`, or `both`), and color presets. An optional `thumbnail` stores a base64 PNG, JPEG, WebP, GIF, or safe SVG data URL (up to 2 MB). CLI `--name` overrides its name.
+An optional `json theme metadata` fence preserves the theme name, author, description, type (`preview`, `slideshow`, or `both`), and color presets. An optional `thumbnail` stores a base64 PNG, JPEG, WebP, GIF, or safe SVG data URL (up to 2 MB). CLI `--name` overrides its name. Changing or removing `thumbnail` in an existing metadata fence updates the picker and export.
 
 ````markdown
 ```json theme metadata
@@ -268,6 +268,8 @@ Replace the placeholder with the font's actual Base64 bytes. Payloads can wrap a
 Supported asset MIME types are `font/woff2`, `font/woff`, `font/ttf`, `font/otf`, `image/png`, `image/jpeg`, `image/webp`, `image/gif`, and `image/svg+xml`. Use embedded assets or system fonts for offline themes. External URLs still depend on the network. CSS sanitization removes dangerous script-like constructs and restricts external font imports.
 
 The repository’s `themes/syntwin.theme.md` is a complete working example. Its optional document and talk samples live separately under `themes/examples/`; they are not required to use the theme.
+
+Print `@page` rules and `@font-face` declarations remain outside the element scope. Conditional `@media`, `@supports`, and `@layer` wrappers are preserved. This lets margin-box footers repeat on every PDF page.
 
 ## CLI workflow for agents
 

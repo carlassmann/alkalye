@@ -19,6 +19,7 @@ export {
 	type ThemeSourceMetadata,
 	bindThemeSource,
 	parseThemeSource,
+	hasThemeDefinition,
 	validateThemeTemplate,
 	serializeThemeSource,
 	createThemeSourceDocument,
@@ -272,6 +273,15 @@ function parseThemeSource(
 	}
 }
 
+function hasThemeDefinition(source: ThemeSource): boolean {
+	return !!(
+		source.css.trim() ||
+		source.documentTemplate ||
+		source.slideTemplate ||
+		source.metadata
+	)
+}
+
 function isThemeFence(
 	info: string,
 	tickCount: number,
@@ -463,6 +473,14 @@ async function syncThemeFromSource(
 		}
 		if (parsed.metadata) {
 			let metadata = parsed.metadata
+			if (theme.thumbnailDataUrl !== metadata.thumbnail) {
+				theme.$jazz.set("thumbnailDataUrl", metadata.thumbnail)
+				changed = true
+			}
+			if (theme.thumbnail) {
+				theme.$jazz.set("thumbnail", undefined)
+				changed = true
+			}
 			if (metadata.name && theme.name !== metadata.name) {
 				theme.$jazz.set("name", metadata.name)
 				changed = true

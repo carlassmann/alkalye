@@ -180,7 +180,8 @@ function ThemeMenuItem({
 }) {
 	let [isHovered, setIsHovered] = useState(false)
 	let thumbnailId = theme.thumbnail?.$jazz.id
-	let hasPreviewContent = thumbnailId || theme.description
+	let thumbnailDataUrl = theme.thumbnailDataUrl
+	let hasPreviewContent = thumbnailId || thumbnailDataUrl || theme.description
 
 	return (
 		<Tooltip open={hasPreviewContent ? isHovered : false}>
@@ -202,11 +203,19 @@ function ThemeMenuItem({
 					sideOffset={8}
 					className="bg-popover text-popover-foreground ring-foreground/10 w-56 p-0 ring-1"
 				>
-					{thumbnailId && (
+					{thumbnailId ? (
 						<div className="bg-muted aspect-video w-full overflow-hidden">
 							<Image imageId={thumbnailId} className="size-full object-cover" />
 						</div>
-					)}
+					) : thumbnailDataUrl ? (
+						<div className="bg-muted aspect-video w-full overflow-hidden">
+							<img
+								src={thumbnailDataUrl}
+								alt=""
+								className="size-full object-cover"
+							/>
+						</div>
+					) : null}
 					<div className="p-3">
 						<div className="font-medium">{theme.name}</div>
 						{theme.author && (

@@ -9,6 +9,7 @@ import {
 	createThemeSourceDocument,
 	createThemeSourceDocumentContent,
 	parseThemeSource,
+	hasThemeDefinition,
 	serializeThemeSource,
 	validateThemeTemplate,
 	type ThemeSourceMetadata,
@@ -217,9 +218,9 @@ let themeCommand = Command.make("theme").pipe(
 function compileThemeSource(source: string): CompiledThemeSource {
 	let parsed = parseThemeSource(source, { validateTemplate: () => null })
 	if (parsed.errors.length > 0) throwThemeValidation(parsed.errors)
-	if (!parsed.css.trim()) {
+	if (!hasThemeDefinition(parsed)) {
 		throw new ValidationError({
-			message: "Theme source needs at least one css theme fence",
+			message: "Theme source needs a CSS, HTML, or theme metadata fence",
 		})
 	}
 	let template = parsed.documentTemplate
@@ -253,6 +254,7 @@ async function createThemeFromSource(
 			type: compiled.metadata?.type ?? "both",
 			author: compiled.metadata?.author,
 			description: compiled.metadata?.description,
+			thumbnailDataUrl: compiled.metadata?.thumbnail,
 			presets: compiled.metadata?.presets
 				? JSON.stringify(compiled.metadata.presets)
 				: undefined,
@@ -313,6 +315,7 @@ async function updateThemeFromSource(
 		if (compiled.metadata.type) theme.$jazz.set("type", compiled.metadata.type)
 		theme.$jazz.set("author", compiled.metadata.author)
 		theme.$jazz.set("description", compiled.metadata.description)
+		theme.$jazz.set("thumbnailDataUrl", compiled.metadata.thumbnail)
 		theme.$jazz.set(
 			"presets",
 			compiled.metadata.presets

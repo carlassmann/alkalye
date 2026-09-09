@@ -248,6 +248,13 @@ Content`
 			expect(body).toBe("Content")
 		})
 
+		it("stops at the empty closing delimiter before later thematic rules", () => {
+			let content = `---\n---\n# Theme source\n\n---\nLicense text`
+			let parsed = parseFrontmatter(content)
+			expect(parsed.frontmatter).toEqual({})
+			expect(parsed.body).toBe("# Theme source\n\n---\nLicense text")
+		})
+
 		it("adds backlinks to empty frontmatter", () => {
 			let content = `---
 ---
@@ -277,6 +284,13 @@ Some text`
 			// This should not be parsed as frontmatter since there's no closing ---
 			expect(frontmatter).toBeNull()
 			expect(body).toBe(content)
+		})
+
+		it("does not discover frontmatter after body content", () => {
+			let content = "Body text\n---\ntags: wrong\n---\nMore body"
+			let parsed = parseFrontmatter(content)
+			expect(parsed.frontmatter).toBeNull()
+			expect(parsed.body).toBe(content)
 		})
 	})
 

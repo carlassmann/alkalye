@@ -1,7 +1,7 @@
 import { z } from "zod"
 import type { Account } from "jazz-tools"
 
-export { connectLocalJazzPoke }
+export { connectLocalJazzPoke, waitForLocalJazzStorage }
 
 type LocalNode = Account["$jazz"]["localNode"]
 type CoValueId = Parameters<LocalNode["getCoValue"]>[0]
@@ -59,6 +59,19 @@ function connectLocalJazzPoke(account: Account) {
 		disconnectLocalWrites()
 		channel.close()
 	}
+}
+
+async function waitForLocalJazzStorage(account: Account) {
+	let node = account.$jazz.localNode
+	let storage = node.storage
+	if (!storage) return
+
+	let coValues = Array.from(node.allCoValues())
+	await Promise.all(
+		coValues.map(coValue =>
+			storage.waitForSync(coValue.id, node.getCoValue(coValue.id)),
+		),
+	)
 }
 
 function observeLocalWrites(

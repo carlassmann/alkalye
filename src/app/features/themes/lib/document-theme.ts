@@ -145,7 +145,7 @@ function resolveDocumentTheme(params: {
 
 	let isAppearanceOnlyTheme = themeName === "light" || themeName === "dark"
 	let effectiveThemeName = isAppearanceOnlyTheme
-		? null
+		? defaultThemeName
 		: (themeName ?? defaultThemeName)
 
 	if (!effectiveThemeName && !themeOverrideId) {

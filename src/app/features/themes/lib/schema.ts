@@ -49,6 +49,7 @@ let Theme = co.map({
 	presets: z.string().optional(),
 	assets: co.optional(co.list(ThemeAsset)),
 	thumbnail: co.optional(co.image()),
+	thumbnailDataUrl: z.string().optional(),
 	createdAt: z.date(),
 	updatedAt: z.date(),
 })

@@ -30,7 +30,10 @@ function parseFrontmatter(content: string): {
 	frontmatter: Frontmatter | null
 	body: string
 } {
-	let match = content.match(/^---\r?\n([\s\S]*?)(?:\r?\n)?---(?:\r?\n)?/)
+	let emptyMatch = content.match(/^---[ \t]*\r?\n---[ \t]*(?:\r?\n|$)/)
+	let match = emptyMatch
+		? [emptyMatch[0], ""]
+		: content.match(/^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/)
 	if (!match) return { frontmatter: null, body: content }
 
 	let yaml = match[1]

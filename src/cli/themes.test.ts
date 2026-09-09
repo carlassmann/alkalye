@@ -287,9 +287,39 @@ describe("CLI themes", () => {
 		expect(exportedAgain.match(/```base64 asset/g)).toHaveLength(1)
 		expect(exportedAgain.match(/```json theme metadata/g)).toHaveLength(1)
 		expect(compileThemeSource(exportedAgain).css).toBe(imported.css.toString())
-		await expect(
-			serializePortableTheme(reloaded, "# Draft theme"),
-		).rejects.toThrow("css theme fence")
+		let licenseSource = `---\n---\n# Syntwin theme\n\nLicense text\n\n---\nAnother license rule\n\n\`\`\`css theme\nbody { color: purple; }\n\`\`\``
+		let licensePortable = await serializePortableTheme(
+			loadedTheme,
+			licenseSource,
+		)
+		let licenseImported = await createThemeFromSource(other, {
+			source: licensePortable,
+		})
+		if (!licenseImported.sourceDocId)
+			throw new Error("License theme source was not created")
+		let licenseDocument = await Document.load(licenseImported.sourceDocId, {
+			loadAs: other,
+			resolve: { content: true },
+		})
+		if (!licenseDocument.$isLoaded)
+			throw new Error("License source did not load")
+		expect(licenseDocument.content.toString()).toContain("Another license rule")
+		expect(licenseImported.css.toString()).toContain("color: purple")
+		await updateThemeFromSource(other, {
+			themeId: imported.$jazz.id,
+			source: `${updatedSource}\n\n\`\`\`json theme metadata\n{"name":"Updated","type":"both"}\n\`\`\``,
+		})
+		expect(imported.thumbnailDataUrl).toBeUndefined()
+		expect(imported.thumbnail).toBeUndefined()
+		let baselineSource = await serializePortableTheme(
+			reloaded,
+			"# Baseline theme",
+		)
+		expect(compileThemeSource(baselineSource).css).toBe("")
+		let baseline = await createThemeFromSource(other, {
+			source: baselineSource,
+		})
+		expect(baseline.css.toString()).toBe("")
 		await expect(
 			serializePortableTheme(
 				reloaded,
