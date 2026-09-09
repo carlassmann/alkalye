@@ -71,12 +71,19 @@ function EditorToolbar({
 }: EditorToolbarProps) {
 	let t = useIntl()
 	let isAtTop = useEditorScrollTopState(editor)
+	let [pickerContent, setPickerContent] = useState(content ?? "")
+	let [previousContent, setPreviousContent] = useState(content)
+	if (content !== previousContent) {
+		setPreviousContent(content)
+		setPickerContent(content ?? "")
+	}
 
 	function getCurrentContent() {
 		return editor.current?.getContent() ?? content ?? ""
 	}
 
 	function applyContentChange(newContent: string) {
+		setPickerContent(newContent)
 		editor.current?.setContent(newContent)
 		onThemeChange?.(newContent)
 	}
@@ -239,11 +246,13 @@ function EditorToolbar({
 							{content !== undefined && onThemeChange && (
 								<>
 									<ThemePicker
+										content={pickerContent}
 										getContent={getCurrentContent}
 										onThemeChange={applyContentChange}
 										disabled={readOnly}
 									/>
 									<PresetPicker
+										content={pickerContent}
 										getContent={getCurrentContent}
 										onPresetChange={applyContentChange}
 										disabled={readOnly}
@@ -253,6 +262,7 @@ function EditorToolbar({
 						</span>
 						{content !== undefined && onThemeChange && (
 							<SyntaxThemePicker
+								content={pickerContent}
 								getContent={getCurrentContent}
 								onThemeChange={applyContentChange}
 								disabled={readOnly}

@@ -4,6 +4,7 @@ import { ImageOff, Maximize2, Minimize2, PenTool } from "lucide-react"
 import { toast } from "sonner"
 import {
 	EditorState,
+	EditorSelection,
 	Compartment,
 	type Extension,
 	Prec,
@@ -1885,8 +1886,7 @@ function editorAriaShortcuts(): string {
 
 function applyContentPreservingSelection(view: EditorView, content: string) {
 	let currentContent = view.state.doc.toString()
-	let cursorPosition = view.state.selection.main.head
-	let anchorPosition = view.state.selection.main.anchor
+	let selection = view.state.selection
 	let changes: { from: number; to: number; insert: string }[] = []
 
 	for (let [fromA, toA, fromB, toB] of diff(currentContent, content)) {
@@ -1899,11 +1899,14 @@ function applyContentPreservingSelection(view: EditorView, content: string) {
 	if (changes.length === 0) return
 
 	let transaction = view.state.update({ changes })
+	let mappedRanges = selection.ranges.map(range =>
+		EditorSelection.range(
+			transaction.changes.mapPos(range.anchor, 1),
+			transaction.changes.mapPos(range.head, 1),
+		),
+	)
 	view.dispatch({
 		changes,
-		selection: {
-			anchor: transaction.changes.mapPos(anchorPosition, 1),
-			head: transaction.changes.mapPos(cursorPosition, 1),
-		},
+		selection: EditorSelection.create(mappedRanges, selection.mainIndex),
 	})
 }

@@ -27,20 +27,29 @@ interface Frontmatter {
 	[key: string]: string | boolean | undefined
 }
 
+type FrontmatterBlock = {
+	yaml: string
+	yamlStart: number
+	end: number
+	newline: string
+	closingNewline: string
+}
+
 function parseFrontmatter(content: string): {
 	frontmatter: Frontmatter | null
 	body: string
 } {
-	let match = content.match(/^---\r?\n([\s\S]*?)(?:\r?\n)?---(?:\r?\n)?/)
-	if (!match) return { frontmatter: null, body: content }
+	let block = findFrontmatterBlock(content)
+	if (!block) return { frontmatter: null, body: content }
 
-	let yaml = match[1]
-	let body = content.slice(match[0].length)
+	let body = content.slice(block.end)
 	let frontmatter: Frontmatter = {}
+	let foundField = false
 
-	for (let line of yaml.split(/\r?\n/)) {
+	for (let line of block.yaml.split(/\r?\n/)) {
 		let colonIdx = line.indexOf(":")
 		if (colonIdx === -1) continue
+		foundField = true
 		let key = line.slice(0, colonIdx).trim()
 		let value = line.slice(colonIdx + 1).trim()
 		if (value.startsWith('"') && value.endsWith('"')) {
@@ -55,6 +64,9 @@ function parseFrontmatter(content: string): {
 		} else {
 			frontmatter[key] = value
 		}
+	}
+	if (!foundField && block.yaml.trim()) {
+		return { frontmatter: null, body: content }
 	}
 
 	return { frontmatter, body }
@@ -112,14 +124,11 @@ type BacklinksWithRange = {
 }
 
 function getBacklinksWithRange(content: string): BacklinksWithRange | null {
-	let match = content.match(/^---\r?\n([\s\S]*?)(?:\r?\n)?---/)
-	if (!match) return null
+	let block = findFrontmatterBlock(content)
+	if (!block) return null
 
-	let frontmatter = match[1]
-	let frontmatterStart = content.indexOf("\n") + 1
-
-	let lines = frontmatter.split(/\r?\n/)
-	let offset = frontmatterStart
+	let lines = block.yaml.split(/\r?\n/)
+	let offset = block.yamlStart
 
 	for (let line of lines) {
 		let backlinkMatch = line.match(/^backlinks:\s*(.*)$/)
@@ -207,31 +216,53 @@ function setFrontmatterField(
 		return `---\n${key}: ${value}\n---\n\n${content}`
 	}
 
-	let match = content.match(/^---(\r?\n)([\s\S]*?)(?:\r?\n)?---(?:\r?\n)?/)
-	if (!match) return content
+	let block = findFrontmatterBlock(content)
+	if (!block) return content
 
-	let newline = match[1]
-	let lines = match[2].split(/\r?\n/)
-	let fieldIndex = -1
-	for (let index = lines.length - 1; index >= 0; index--) {
+	let lines = block.yaml.split(/\r?\n/)
+	let fieldIndexes: number[] = []
+	for (let index = 0; index < lines.length; index++) {
 		let line = lines[index] ?? ""
 		let colonIndex = line.indexOf(":")
 		if (colonIndex < 0 || line.slice(0, colonIndex).trim() !== key) continue
-		fieldIndex = index
-		break
+		fieldIndexes.push(index)
 	}
 
-	if (fieldIndex < 0) {
+	if (fieldIndexes.length === 0) {
 		if (!value) return content
 		lines.unshift(`${key}: ${value}`)
-	} else if (value) {
-		lines[fieldIndex] = `${key}: ${value}`
 	} else {
-		lines.splice(fieldIndex, 1)
+		let fieldIndex = fieldIndexes[fieldIndexes.length - 1] ?? 0
+		if (value) lines[fieldIndex] = `${key}: ${value}`
+		for (let index = fieldIndexes.length - 1; index >= 0; index--) {
+			let duplicateIndex = fieldIndexes[index]
+			if (value && duplicateIndex === fieldIndex) continue
+			if (duplicateIndex !== undefined) lines.splice(duplicateIndex, 1)
+		}
 	}
 
 	let remainingFields = lines.some(line => line.trim())
-	let body = content.slice(match[0].length)
+	let body = content.slice(block.end)
 	if (!remainingFields) return body
-	return `---${newline}${lines.join(newline)}${newline}---${newline}${body}`
+	return `---${block.newline}${lines.join(block.newline)}${block.newline}---${block.closingNewline}${body}`
+}
+
+function findFrontmatterBlock(content: string): FrontmatterBlock | null {
+	let opening = content.match(/^---[ \t]*(\r?\n)/)
+	if (!opening) return null
+
+	let closingPattern = /^[ \t]*---[ \t]*(\r?\n|$)/gm
+	closingPattern.lastIndex = opening[0].length
+	let closing = closingPattern.exec(content)
+	if (!closing) return null
+
+	let yamlStart = opening[0].length
+	let yaml = content.slice(yamlStart, closing.index).replace(/\r?\n$/, "")
+	return {
+		yaml,
+		yamlStart,
+		end: closing.index + closing[0].length,
+		newline: opening[1],
+		closingNewline: closing[1],
+	}
 }

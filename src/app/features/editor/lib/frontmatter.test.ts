@@ -755,5 +755,39 @@ Content`
 		expect(parseFrontmatter(updated).frontmatter?.["syntax-theme"]).toBe(
 			"catppuccin",
 		)
+		expect(updated.match(/^syntax-theme:/gm)).toHaveLength(1)
+		expect(setSyntaxTheme(content, null)).not.toContain("syntax-theme:")
+	})
+
+	it("preserves a missing newline after the closing delimiter", () => {
+		let content = "---\nsyntax-theme: github\n---"
+
+		expect(setSyntaxTheme(content, "vitesse")).toBe(
+			"---\nsyntax-theme: vitesse\n---",
+		)
+	})
+
+	it("requires the closing delimiter on its own line", () => {
+		let content = `---
+title: Foo --- Bar
+theme: OldTheme
+---
+Body`
+		let updated = setTheme(content, "NewTheme")
+
+		expect(parseFrontmatter(updated).frontmatter).toEqual({
+			title: "Foo --- Bar",
+			theme: "NewTheme",
+		})
+		expect(updated).toContain("\nBody")
+	})
+
+	it("does not reinterpret thematic breaks as frontmatter", () => {
+		let content = "---\nJust a rule\n---\nText"
+		let updated = setSyntaxTheme(content, "github")
+
+		expect(updated).toBe(
+			"---\nsyntax-theme: github\n---\n\n---\nJust a rule\n---\nText",
+		)
 	})
 })

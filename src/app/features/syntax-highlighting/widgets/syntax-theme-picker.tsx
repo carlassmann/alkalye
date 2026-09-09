@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { Check, CodeXml } from "lucide-react"
 import { Button } from "@/app/components/ui/button"
 import {
@@ -22,16 +21,16 @@ import { T, useIntl } from "@/shared/intl/setup"
 export { SyntaxThemePicker }
 
 function SyntaxThemePicker({
+	content,
 	getContent,
 	onThemeChange,
 	disabled,
 }: {
+	content: string
 	getContent: () => string
 	onThemeChange: (content: string) => void
 	disabled?: boolean
 }) {
-	let [open, setOpen] = useState(false)
-	let content = getContent()
 	let configuredFamilyId = getSyntaxThemeFamilyId(content)
 	let selectedFamilyId = SYNTAX_THEME_FAMILIES.some(
 		family => family.id === configuredFamilyId,
@@ -45,7 +44,7 @@ function SyntaxThemePicker({
 	}
 
 	return (
-		<DropdownMenu open={open} onOpenChange={setOpen}>
+		<DropdownMenu>
 			<Tooltip>
 				<DropdownMenuTrigger
 					disabled={disabled}

@@ -30,18 +30,18 @@ type LoadedTheme = co.loaded<
 >
 
 interface ThemePickerProps {
+	content: string
 	getContent: () => string
 	onThemeChange: (newContent: string) => void
 	disabled?: boolean
 }
 
 function ThemePicker({
+	content,
 	getContent,
 	onThemeChange,
 	disabled,
 }: ThemePickerProps) {
-	let [open, setOpen] = useState(false)
-	let content = getContent()
 	let me = useAccount(UserAccount, { resolve: themesResolve })
 
 	let themes: LoadedTheme[] = []
@@ -72,7 +72,7 @@ function ThemePicker({
 	}
 
 	return (
-		<DropdownMenu open={open} onOpenChange={setOpen}>
+		<DropdownMenu>
 			<Tooltip>
 				<DropdownMenuTrigger
 					disabled={disabled}
