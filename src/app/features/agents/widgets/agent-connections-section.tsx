@@ -263,6 +263,9 @@ function AgentConnectionsSection({
 						</div>
 						{authorization && (
 							<div className="border-brand/30 bg-brand/5 mt-4 border p-3">
+								<p className="sr-only" role="status" aria-live="polite">
+									Authorization request ready for {authorization.client.name}.
+								</p>
 								<p className="text-sm font-medium">
 									Authorize {authorization.client.name}
 								</p>
@@ -301,7 +304,11 @@ function AgentConnectionsSection({
 					/>
 				)}
 			</div>
-			{error && <p className="text-destructive mt-2 text-xs">{error}</p>}
+			{error && (
+				<p className="text-destructive mt-2 text-xs" role="alert">
+					{error}
+				</p>
+			)}
 		</section>
 	)
 }
