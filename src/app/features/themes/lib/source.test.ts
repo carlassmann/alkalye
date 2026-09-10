@@ -235,16 +235,11 @@ describe("theme source sync", () => {
 	})
 
 	it("replaces starter overrides before applying later source edits", async () => {
-		console.time("theme lifecycle")
-		console.time("account")
 		let account = await createJazzTestAccount({
 			isCurrentActiveAccount: true,
 			AccountSchema: UserAccount,
 		})
-		console.timeEnd("account")
-		console.time("create")
 		let theme = await createDefaultTheme(account)
-		console.timeEnd("create")
 		let sourceId = theme.sourceDocId
 		expect(sourceId).toBeDefined()
 		if (!sourceId) throw new Error("Default theme source was not created")
@@ -260,16 +255,11 @@ describe("theme source sync", () => {
 			readFileSync("themes/syntwin.theme.md", "utf8"),
 			theme.$jazz.id,
 		)
-		console.time("source persist")
 		persistDocumentContentSynchronously(source, pastedSource)
-		console.timeEnd("source persist")
-		console.time("compiled sync")
 		expect(source.content.toString()).toBe(pastedSource)
 		expect(await syncThemeFromSource(account, sourceId, pastedSource)).toBe(
 			true,
 		)
-		console.timeEnd("compiled sync")
-		console.time("remaining lifecycle")
 		let pastedTheme = await Theme.load(theme.$jazz.id, {
 			resolve: { css: true, template: true },
 		})
@@ -298,9 +288,7 @@ describe("theme source sync", () => {
 		expect(reloadedTheme.$isLoaded).toBe(true)
 		if (!reloadedTheme.$isLoaded) throw new Error("Default theme did not load")
 		expect(reloadedTheme.css.toString()).toBe("h1 { color: blue; }")
-		console.timeEnd("remaining lifecycle")
-		console.timeEnd("theme lifecycle")
-	}, 60_000)
+	}, 10_000)
 })
 
 describe("getThemeSourceId", () => {
