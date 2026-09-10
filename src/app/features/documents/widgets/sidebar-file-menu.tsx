@@ -33,6 +33,8 @@ import {
 	parseFrontmatter,
 	togglePinned,
 	getFrontmatterRange,
+	getFrontmatterInsertion,
+	getFrontmatterFieldValueRange,
 } from "@/app/features/editor"
 import { unfoldEffect } from "@codemirror/language"
 import { getPresentationMode } from "@/app/features/presentation"
@@ -344,8 +346,10 @@ function makeRename(
 
 			if (!frontmatter.title) {
 				let inferredTitle = getInferredTitle(body)
-				let insertPos = 4
-				let titleLine = `title: ${inferredTitle}\n`
+				let insertion = getFrontmatterInsertion(content)
+				if (!insertion) return
+				let insertPos = insertion.position
+				let titleLine = `${insertion.indentation}title: ${inferredTitle}\n`
 				view.dispatch({
 					changes: { from: insertPos, to: insertPos, insert: titleLine },
 				})
@@ -354,7 +358,7 @@ function makeRename(
 					view.dispatch({
 						effects: unfoldEffect.of({ from: range.from, to: range.to }),
 					})
-				let titleStart = insertPos + 7
+				let titleStart = insertPos + insertion.indentation.length + 7
 				let titleEnd = titleStart + inferredTitle.length
 				view.dispatch({ selection: { anchor: titleStart, head: titleEnd } })
 				view.focus()
@@ -366,15 +370,10 @@ function makeRename(
 				view.dispatch({
 					effects: unfoldEffect.of({ from: range.from, to: range.to }),
 				})
-			let titleMatch = content.match(/^---\r?\n[\s\S]*?^title:\s*(.*)$/m)
-			if (titleMatch) {
-				let titleValueStart = content.indexOf(
-					titleMatch[1],
-					content.indexOf("title:"),
-				)
-				let titleValueEnd = titleValueStart + titleMatch[1].length
+			let titleRange = getFrontmatterFieldValueRange(content, "title")
+			if (titleRange) {
 				view.dispatch({
-					selection: { anchor: titleValueStart, head: titleValueEnd },
+					selection: { anchor: titleRange.from, head: titleRange.to },
 				})
 			}
 			view.focus()
@@ -418,8 +417,10 @@ function makeAddTag(
 			}
 
 			if (!frontmatter.tags) {
-				let insertPos = 4
-				let tagsLine = `tags: ${tag}\n`
+				let insertion = getFrontmatterInsertion(content)
+				if (!insertion) return
+				let insertPos = insertion.position
+				let tagsLine = `${insertion.indentation}tags: ${tag}\n`
 				view.dispatch({
 					changes: { from: insertPos, to: insertPos, insert: tagsLine },
 				})
@@ -428,28 +429,28 @@ function makeAddTag(
 					view.dispatch({
 						effects: unfoldEffect.of({ from: range.from, to: range.to }),
 					})
-				let tagStart = insertPos + 6
+				let tagStart = insertPos + insertion.indentation.length + 6
 				let tagEnd = tagStart + tag.length
 				view.dispatch({ selection: { anchor: tagStart, head: tagEnd } })
 				view.focus()
 				return
 			}
 
-			let tagsMatch = content.match(/^(tags:\s*)(.*)$/m)
-			if (tagsMatch) {
-				let lineStart = content.indexOf(tagsMatch[0])
-				let existingTags = tagsMatch[2]
-				let insertPos = lineStart + tagsMatch[1].length + existingTags.length
-				let insertText = existingTags ? `, ${tag}` : tag
+			let tagsRange = getFrontmatterFieldValueRange(content, "tags")
+			if (tagsRange) {
+				let existingTags = content
+					.slice(tagsRange.from, tagsRange.to)
+					.replace(/[,\s]+$/, "")
+				let newTags = existingTags ? `${existingTags}, ${tag}` : tag
 				view.dispatch({
-					changes: { from: insertPos, to: insertPos, insert: insertText },
+					changes: { from: tagsRange.from, to: tagsRange.to, insert: newTags },
 				})
 				let range = getFrontmatterRange(view.state)
 				if (range)
 					view.dispatch({
 						effects: unfoldEffect.of({ from: range.from, to: range.to }),
 					})
-				let tagStart = insertPos + (existingTags ? 2 : 0)
+				let tagStart = tagsRange.from + newTags.length - tag.length
 				let tagEnd = tagStart + tag.length
 				view.dispatch({ selection: { anchor: tagStart, head: tagEnd } })
 				view.focus()

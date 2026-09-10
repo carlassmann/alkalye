@@ -138,6 +138,10 @@ function ThemeWorkbenchScreen({ id }: { id: string }) {
 	let sourceId = theme.$isLoaded ? theme.sourceDocId : undefined
 	let source = useCoState(Document, sourceId, { resolve: sourceResolve })
 
+	if (!theme.$isLoaded && theme.$jazz.loadingState !== "loading") {
+		return <ThemeUnavailable />
+	}
+
 	if (!theme.$isLoaded || !account.$isLoaded) {
 		return <LoadingWorkbench />
 	}
@@ -155,6 +159,24 @@ function LoadingWorkbench() {
 			<EmptyHeader>
 				<EmptyTitle>Loading theme…</EmptyTitle>
 			</EmptyHeader>
+		</Empty>
+	)
+}
+
+function ThemeUnavailable() {
+	return (
+		<Empty className="h-screen">
+			<EmptyHeader>
+				<EmptyTitle>Theme unavailable</EmptyTitle>
+				<EmptyDescription>
+					This theme is unavailable or you no longer have access to it.
+				</EmptyDescription>
+			</EmptyHeader>
+			<Link to="/settings" search={{ from: undefined }}>
+				<Button variant="outline" size="sm">
+					Back to settings
+				</Button>
+			</Link>
 		</Empty>
 	)
 }

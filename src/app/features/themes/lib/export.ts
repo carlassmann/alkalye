@@ -2,6 +2,7 @@ import { type co, FileStream, z } from "jazz-tools"
 import { Theme, ThemePreset } from "./schema"
 import { sanitizeFilename } from "@/app/features/import-export/lib/export"
 import { Document } from "@/app/features/documents/lib/schema"
+import { setFrontmatterField } from "@/app/features/editor/lib/frontmatter"
 import {
 	serializeThemeSource,
 	parseThemeSource,
@@ -37,8 +38,14 @@ async function serializePortableTheme(
 	let sourceMetadata = parseThemeSource(source, {
 		validateTemplate: () => null,
 	}).metadata
-	if (sourceMetadata?.thumbnail) metadata.thumbnail = sourceMetadata.thumbnail
-	if (theme.thumbnail?.$isLoaded && theme.thumbnail.original?.$isLoaded) {
+	if (sourceMetadata) {
+		if (sourceMetadata.thumbnail) metadata.thumbnail = sourceMetadata.thumbnail
+	} else if (theme.thumbnailDataUrl) {
+		metadata.thumbnail = theme.thumbnailDataUrl
+	} else if (
+		theme.thumbnail?.$isLoaded &&
+		theme.thumbnail.original?.$isLoaded
+	) {
 		let thumbnail = theme.thumbnail.original.toBlob()
 		if (!thumbnail) throw new Error("Unable to read theme thumbnail")
 		metadata.thumbnail = fileStreamToDataUrl(
@@ -94,8 +101,6 @@ async function serializePortableTheme(
 		throw new Error(
 			`Theme export is not portable: ${validation.errors[0]?.message}`,
 		)
-	if (!validation.css.trim())
-		throw new Error("Theme export requires a nonempty css theme fence")
 	validateSource?.(portable)
 	return portable
 }
@@ -142,9 +147,7 @@ async function loadEditableSource(
 }
 
 function stripThemeSourceId(source: string): string {
-	return source.replace(/^(---\r?\n[\s\S]*?\r?\n---(?:\r?\n)?)/, block =>
-		block.replace(/^theme-source\s*:.*\r?\n/gm, ""),
-	)
+	return setFrontmatterField(source, "theme-source", null)
 }
 
 async function exportTheme(theme: LoadedThemeForExport): Promise<void> {

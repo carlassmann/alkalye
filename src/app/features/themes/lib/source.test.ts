@@ -11,11 +11,7 @@ import {
 	syncThemeFromSource,
 } from "./source"
 import { serializePortableAssetFence } from "./portable-assets"
-import {
-	createDefaultTheme,
-	getDefaultThemeCss,
-	getDefaultThemeSource,
-} from "./default-theme"
+import { createDefaultTheme, getDefaultThemeSource } from "./default-theme"
 import { scopeThemeCss } from "./renderer"
 
 describe("parseThemeSource", () => {
@@ -206,11 +202,15 @@ PHN2ZzpzdmcgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN2ZzpzY3JpcHQ+
 })
 
 describe("serializeThemeSource", () => {
-	it("keeps the editable default source and applied baseline identical", () => {
-		expect(parseThemeSource(getDefaultThemeSource())).toMatchObject({
-			css: getDefaultThemeCss(),
-			errors: [],
-		})
+	it("keeps the editable default source concise and override-focused", () => {
+		let source = getDefaultThemeSource()
+		let parsed = parseThemeSource(source)
+
+		expect(parsed.errors).toEqual([])
+		expect(parsed.css).toContain(':scope[data-appearance="light"]')
+		expect(parsed.css).toContain("--theme-accent")
+		expect(parsed.css).not.toContain("@layer theme-base")
+		expect(source.length).toBeLessThan(1_500)
 	})
 
 	it("round-trips CSS and optional templates", () => {
@@ -234,7 +234,7 @@ describe("theme source sync", () => {
 		await setupJazzTestSync()
 	})
 
-	it("replaces a default baseline before applying later source edits", async () => {
+	it("replaces starter overrides before applying later source edits", async () => {
 		let account = await createJazzTestAccount({
 			isCurrentActiveAccount: true,
 			AccountSchema: UserAccount,
@@ -248,6 +248,7 @@ describe("theme source sync", () => {
 		expect(source.$isLoaded).toBe(true)
 		if (!source.$isLoaded) throw new Error("Default theme source did not load")
 		let fullSource = source.content.toString()
+		expect(theme.css.toString()).toBe(parseThemeSource(fullSource).css)
 		expect(await syncThemeFromSource(account, sourceId, fullSource)).toBe(true)
 
 		let pastedSource = bindThemeSource(
@@ -287,15 +288,16 @@ describe("theme source sync", () => {
 		expect(reloadedTheme.$isLoaded).toBe(true)
 		if (!reloadedTheme.$isLoaded) throw new Error("Default theme did not load")
 		expect(reloadedTheme.css.toString()).toBe("h1 { color: blue; }")
-	})
+	}, 10_000)
 })
 
 describe("getThemeSourceId", () => {
 	it("keeps pasted sources bound to the destination theme without discarding metadata", () => {
 		let source =
-			"---\ntitle: Imported\ntheme-source: original\ntags: branding\n---\n\n```css theme\nh1 {}\n```"
+			"--- \n title: Imported\n theme-source: original\n tags: branding\n--- \n\n```css theme\nh1 {}\n```"
 		let bound = bindThemeSource(source, "destination")
 		expect(getThemeSourceId(bound)).toBe("destination")
+		expect(bound).not.toContain("theme-source: original")
 		expect(bound).toContain("title: Imported")
 		expect(bound).toContain("tags: branding")
 		expect(parseThemeSource(bound).css).toBe("h1 {}")

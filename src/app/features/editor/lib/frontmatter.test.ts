@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest"
+import { EditorState } from "@codemirror/state"
 import {
 	parseFrontmatter,
 	getBacklinks,
@@ -12,6 +13,9 @@ import {
 	setTheme,
 	setPreset,
 	setSyntaxTheme,
+	getFrontmatterRange,
+	getFrontmatterInsertion,
+	getFrontmatterFieldValueRange,
 } from "./frontmatter"
 
 describe("parseFrontmatter", () => {
@@ -249,6 +253,13 @@ Content`
 			expect(body).toBe("Content")
 		})
 
+		it("stops at the empty closing delimiter before later thematic rules", () => {
+			let content = `---\n---\n# Theme source\n\n---\nLicense text`
+			let parsed = parseFrontmatter(content)
+			expect(parsed.frontmatter).toEqual({})
+			expect(parsed.body).toBe("# Theme source\n\n---\nLicense text")
+		})
+
 		it("adds backlinks to empty frontmatter", () => {
 			let content = `---
 ---
@@ -278,6 +289,13 @@ Some text`
 			// This should not be parsed as frontmatter since there's no closing ---
 			expect(frontmatter).toBeNull()
 			expect(body).toBe(content)
+		})
+
+		it("does not discover frontmatter after body content", () => {
+			let content = "Body text\n---\ntags: wrong\n---\nMore body"
+			let parsed = parseFrontmatter(content)
+			expect(parsed.frontmatter).toBeNull()
+			expect(parsed.body).toBe(content)
 		})
 	})
 
@@ -782,10 +800,17 @@ Content`
 		)
 	})
 
-	it("requires exact frontmatter delimiters", () => {
+	it("accepts trailing whitespace on frontmatter delimiters", () => {
 		let content = "--- \ntitle: Visible text\n---\nBody"
 
-		expect(parseFrontmatter(content).frontmatter).toBeNull()
+		expect(parseFrontmatter(content)).toEqual({
+			frontmatter: { title: "Visible text" },
+			body: "Body",
+		})
+		expect(getFrontmatterRange(EditorState.create({ doc: content }))).toEqual({
+			from: 4,
+			to: 28,
+		})
 	})
 
 	it("preserves uniform root indentation", () => {
@@ -793,6 +818,14 @@ Content`
 		let updated = setSyntaxTheme(content, "vitesse")
 
 		expect(updated).toBe("---\n title: Doc\n syntax-theme: vitesse\n---\nBody")
+		expect(getFrontmatterInsertion(content)).toEqual({
+			position: 4,
+			indentation: " ",
+		})
+		expect(getFrontmatterFieldValueRange(content, "title")).toEqual({
+			from: 12,
+			to: 15,
+		})
 	})
 
 	it("requires the closing delimiter on its own line", () => {

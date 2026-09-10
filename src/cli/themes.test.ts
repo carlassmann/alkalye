@@ -19,14 +19,21 @@ import {
 describe("CLI theme source compiler", () => {
 	afterEach(() => vi.unstubAllGlobals())
 
-	test("compiles the entire Syntwin theme with embedded fonts and logo", () => {
+	test.each([
+		{ file: "syntwin", name: "Syntwin", fonts: 2 },
+		{ file: "bundeswehr", name: "Bundeswehr", fonts: 4 },
+	])("compiles the portable $name theme", ({ file, name, fonts }) => {
 		let compiled = compileThemeSource(
-			readFileSync("themes/syntwin.theme.md", "utf8"),
+			readFileSync(`themes/${file}.theme.md`, "utf8"),
 		)
-		expect(compiled.css.match(/data:font\/woff2;base64,/g)).toHaveLength(2)
-		expect(compiled.css).toContain("data:image/svg+xml;base64,")
-		expect(compiled.css).not.toContain("asset:")
-		expect(compiled.metadata?.name).toBe("Syntwin")
+		expect(compiled.css.match(/data:font\/woff2;base64,/g)).toHaveLength(fonts)
+		expect(compiled.css + compiled.template).toContain(
+			"data:image/svg+xml;base64,",
+		)
+		expect(
+			compiled.css + compiled.template + compiled.slideTemplate,
+		).not.toContain("asset:")
+		expect(compiled.metadata?.name).toBe(name)
 	})
 
 	test("compiles CSS and HTML source", () => {
@@ -287,9 +294,40 @@ describe("CLI themes", () => {
 		expect(exportedAgain.match(/```base64 asset/g)).toHaveLength(1)
 		expect(exportedAgain.match(/```json theme metadata/g)).toHaveLength(1)
 		expect(compileThemeSource(exportedAgain).css).toBe(imported.css.toString())
-		await expect(
-			serializePortableTheme(reloaded, "# Draft theme"),
-		).rejects.toThrow("css theme fence")
+		let licenseSource = `--- \n theme-source: stale\n--- \n# Syntwin theme\n\nLicense text\n\n---\nAnother license rule\n\n\`\`\`css theme\nbody { color: purple; }\n\`\`\``
+		let licensePortable = await serializePortableTheme(
+			loadedTheme,
+			licenseSource,
+		)
+		expect(licensePortable).not.toContain("theme-source:")
+		let licenseImported = await createThemeFromSource(other, {
+			source: licensePortable,
+		})
+		if (!licenseImported.sourceDocId)
+			throw new Error("License theme source was not created")
+		let licenseDocument = await Document.load(licenseImported.sourceDocId, {
+			loadAs: other,
+			resolve: { content: true },
+		})
+		if (!licenseDocument.$isLoaded)
+			throw new Error("License source did not load")
+		expect(licenseDocument.content.toString()).toContain("Another license rule")
+		expect(licenseImported.css.toString()).toContain("color: purple")
+		await updateThemeFromSource(other, {
+			themeId: imported.$jazz.id,
+			source: `${updatedSource}\n\n\`\`\`json theme metadata\n{"name":"Updated","type":"both"}\n\`\`\``,
+		})
+		expect(imported.thumbnailDataUrl).toBeUndefined()
+		expect(imported.thumbnail).toBeUndefined()
+		let baselineSource = await serializePortableTheme(
+			reloaded,
+			"# Baseline theme",
+		)
+		expect(compileThemeSource(baselineSource).css).toBe("")
+		let baseline = await createThemeFromSource(other, {
+			source: baselineSource,
+		})
+		expect(baseline.css.toString()).toBe("")
 		await expect(
 			serializePortableTheme(
 				reloaded,

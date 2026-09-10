@@ -3,7 +3,10 @@ import { ThemeType, ThemePreset } from "./schema"
 import { Group, co } from "jazz-tools"
 import { Document, CommentThread } from "@/app/features/documents/lib/schema"
 import { createDocumentMetadata } from "@/app/features/documents/lib/metadata"
-import { parseFrontmatter } from "@/app/features/editor/lib/frontmatter"
+import {
+	parseFrontmatter,
+	setFrontmatterField,
+} from "@/app/features/editor/lib/frontmatter"
 import { sanitizeCss, sanitizeHtml } from "./sanitize"
 import {
 	parsePortableAssetFence,
@@ -19,6 +22,7 @@ export {
 	type ThemeSourceMetadata,
 	bindThemeSource,
 	parseThemeSource,
+	hasThemeDefinition,
 	validateThemeTemplate,
 	serializeThemeSource,
 	createThemeSourceDocument,
@@ -272,6 +276,15 @@ function parseThemeSource(
 	}
 }
 
+function hasThemeDefinition(source: ThemeSource): boolean {
+	return !!(
+		source.css.trim() ||
+		source.documentTemplate ||
+		source.slideTemplate ||
+		source.metadata
+	)
+}
+
 function isThemeFence(
 	info: string,
 	tickCount: number,
@@ -431,7 +444,7 @@ async function syncThemeFromSource(
 		let currentCss = theme.css.toString()
 		let changed = currentCss !== css
 		if (changed) {
-			if (getDeletedCssLength(currentCss, css) > 2_000) {
+			if (getChangedCssLength(currentCss, css) > 2_000) {
 				theme.$jazz.set("css", co.plainText().create(css, theme.$jazz.owner))
 			} else {
 				theme.css.$jazz.applyDiff(css)
@@ -463,6 +476,14 @@ async function syncThemeFromSource(
 		}
 		if (parsed.metadata) {
 			let metadata = parsed.metadata
+			if (theme.thumbnailDataUrl !== metadata.thumbnail) {
+				theme.$jazz.set("thumbnailDataUrl", metadata.thumbnail)
+				changed = true
+			}
+			if (theme.thumbnail) {
+				theme.$jazz.set("thumbnail", undefined)
+				changed = true
+			}
 			if (metadata.name && theme.name !== metadata.name) {
 				theme.$jazz.set("name", metadata.name)
 				changed = true
@@ -494,7 +515,7 @@ async function syncThemeFromSource(
 	}
 }
 
-function getDeletedCssLength(currentCss: string, css: string) {
+function getChangedCssLength(currentCss: string, css: string) {
 	let prefixLength = 0
 	while (
 		prefixLength < currentCss.length &&
@@ -513,7 +534,7 @@ function getDeletedCssLength(currentCss: string, css: string) {
 		suffixLength++
 	}
 
-	return currentCss.length - prefixLength - suffixLength
+	return Math.max(currentCss.length, css.length) - prefixLength - suffixLength
 }
 
 function clearLatestSourceContent(documentId: string, content: string) {
@@ -536,13 +557,7 @@ async function loadThemes(account: co.loaded<typeof UserAccount>) {
 }
 
 function bindThemeSource(content: string, themeId: string): string {
-	if (getThemeSourceId(content) === themeId) return content
-	let frontmatter = content.match(/^---\r?\n([\s\S]*?)(?:\r?\n)?---(?:\r?\n)?/)
-	if (!frontmatter) return `---\ntheme-source: ${themeId}\n---\n\n${content}`
-	let lines = frontmatter[1]
-		.split(/\r?\n/)
-		.filter(line => !/^\s*theme-source\s*:/.test(line))
-	return `---\n${lines.filter(Boolean).join("\n")}\ntheme-source: ${themeId}\n---\n${content.slice(frontmatter[0].length)}`
+	return setFrontmatterField(content, "theme-source", themeId)
 }
 
 function withThemeSourceMetadata(

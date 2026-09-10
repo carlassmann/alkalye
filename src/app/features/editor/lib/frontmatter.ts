@@ -15,6 +15,9 @@ export {
 	setTheme,
 	setPreset,
 	setSyntaxTheme,
+	setFrontmatterField,
+	getFrontmatterInsertion,
+	getFrontmatterFieldValueRange,
 }
 
 export type { Frontmatter }
@@ -34,6 +37,9 @@ type FrontmatterBlock = {
 	newline: string
 	closingNewline: string
 }
+
+type FrontmatterInsertion = { position: number; indentation: string }
+type FrontmatterFieldValueRange = { from: number; to: number }
 
 function parseFrontmatter(content: string): {
 	frontmatter: Frontmatter | null
@@ -195,13 +201,43 @@ function getFrontmatterRange(
 	let doc = state.doc
 	let firstLine = doc.line(1)
 
-	if (firstLine.text !== "---") return null
+	if (!/^---[ \t]*$/.test(firstLine.text)) return null
 
 	for (let i = 2; i <= doc.lines; i++) {
 		let line = doc.line(i)
-		if (line.text === "---") {
+		if (/^---[ \t]*$/.test(line.text)) {
 			return { from: firstLine.to, to: line.to }
 		}
+	}
+	return null
+}
+
+function getFrontmatterInsertion(content: string): FrontmatterInsertion | null {
+	let block = findFrontmatterBlock(content)
+	if (!block) return null
+	return {
+		position: block.yamlStart,
+		indentation: getFrontmatterRootIndent(block.yaml) ?? "",
+	}
+}
+
+function getFrontmatterFieldValueRange(
+	content: string,
+	key: string,
+): FrontmatterFieldValueRange | null {
+	let block = findFrontmatterBlock(content)
+	if (!block) return null
+	let rootIndent = getFrontmatterRootIndent(block.yaml) ?? ""
+	let offset = block.yamlStart
+	for (let line of block.yaml.split(/\r?\n/)) {
+		let colonIndex = line.indexOf(":")
+		let rawKey = colonIndex < 0 ? "" : line.slice(0, colonIndex)
+		if (rawKey === `${rootIndent}${key}`) {
+			let valueStart = colonIndex + 1
+			while (line[valueStart] === " " || line[valueStart] === "\t") valueStart++
+			return { from: offset + valueStart, to: offset + line.length }
+		}
+		offset += line.length + block.newline.length
 	}
 	return null
 }
@@ -256,10 +292,10 @@ function setFrontmatterField(
 }
 
 function findFrontmatterBlock(content: string): FrontmatterBlock | null {
-	let opening = content.match(/^---(\r?\n)/)
+	let opening = content.match(/^---[ \t]*(\r?\n)/)
 	if (!opening) return null
 
-	let closingPattern = /^---(\r?\n|$)/gm
+	let closingPattern = /^---[ \t]*(\r?\n|$)/gm
 	closingPattern.lastIndex = opening[0].length
 	let closing = closingPattern.exec(content)
 	if (!closing) return null

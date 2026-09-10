@@ -67,6 +67,7 @@ import {
 	type EditorSettingsData,
 } from "@/app/features/editor"
 import { Footer } from "@/app/components/footer"
+import { waitForLocalJazzStorage } from "@/app/lib/local-jazz-poke"
 import { usePWA, PWAInstallDialog } from "@/app/lib/pwa"
 import { useIsPWAInstalled } from "@/app/lib/platform"
 import { BackupSettings } from "@/app/features/backup"
@@ -472,9 +473,10 @@ function ThemesSection({ me }: ThemesSectionProps) {
 			assets.push(themeAsset)
 		}
 
-		let thumbnail = parsed.thumbnail
-			? await createImage(parsed.thumbnail, { owner, maxSize: 256 })
-			: undefined
+		let thumbnail =
+			parsed.thumbnail && !parsed.thumbnailDataUrl
+				? await createImage(parsed.thumbnail, { owner, maxSize: 256 })
+				: undefined
 
 		let now = new Date()
 		let theme = Theme.create(
@@ -497,6 +499,7 @@ function ThemesSection({ me }: ThemesSectionProps) {
 						? co.list(ThemeAsset).create(assets, owner)
 						: undefined,
 				thumbnail,
+				thumbnailDataUrl: parsed.thumbnailDataUrl,
 				createdAt: now,
 				updatedAt: now,
 			},
@@ -515,10 +518,13 @@ function ThemesSection({ me }: ThemesSectionProps) {
 		})
 		theme.$jazz.set("sourceDocId", source.$jazz.id)
 
+		await waitForLocalJazzStorage(me)
+
 		if (!me.root.themes) {
 			me.root.$jazz.set("themes", co.list(Theme).create([], owner))
 		}
 		me.root.themes!.$jazz.push(theme)
+		await waitForLocalJazzStorage(me)
 
 		setIsUploading(false)
 	}

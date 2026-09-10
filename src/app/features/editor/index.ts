@@ -39,6 +39,8 @@ export {
 	getPath,
 	getTags,
 	getFrontmatterRange,
+	getFrontmatterInsertion,
+	getFrontmatterFieldValueRange,
 	togglePinned,
 	addTag,
 	getBacklinks,

@@ -2,7 +2,7 @@ import JSZip from "jszip"
 import { z } from "zod"
 import { ThemeType, ThemePreset } from "./schema"
 import { sanitizeCss, sanitizeHtml } from "./sanitize"
-import { parseThemeSource } from "./source"
+import { parseThemeSource, hasThemeDefinition } from "./source"
 
 export {
 	parseThemeMarkdown,
@@ -48,6 +48,7 @@ interface ParsedTheme {
 	slideTemplate?: string
 	presets?: z.infer<typeof ThemePreset>[]
 	assets: ParsedThemeAsset[]
+	thumbnailDataUrl?: string
 	thumbnail?: File
 	source?: string
 }
@@ -74,13 +75,15 @@ type ParseResult =
 async function parseThemeMarkdown(file: File): Promise<ParseResult> {
 	let content = await readFileText(file)
 	let source = parseThemeSource(content)
-	if (source.errors.length > 0 || !source.css.trim())
+	if (source.errors.length > 0 || !hasThemeDefinition(source))
 		return {
 			ok: false,
 			error: {
 				type: "invalid_markdown",
 				message: "Theme source is invalid.",
-				errors: source.errors.map(error => error.message),
+				errors: source.errors.length
+					? source.errors.map(error => error.message)
+					: ["Theme source needs a CSS, HTML, or theme metadata fence"],
 			},
 		}
 	let thumbnail = source.metadata?.thumbnail
@@ -114,6 +117,7 @@ async function parseThemeMarkdown(file: File): Promise<ParseResult> {
 			presets: source.metadata?.presets,
 			assets: [],
 			thumbnail,
+			thumbnailDataUrl: source.metadata?.thumbnail,
 			source: content,
 		},
 	}
