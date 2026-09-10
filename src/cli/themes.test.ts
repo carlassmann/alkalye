@@ -19,14 +19,21 @@ import {
 describe("CLI theme source compiler", () => {
 	afterEach(() => vi.unstubAllGlobals())
 
-	test("compiles the entire Syntwin theme with embedded fonts and logo", () => {
+	test.each([
+		{ file: "syntwin", name: "Syntwin", fonts: 2 },
+		{ file: "bundeswehr", name: "Bundeswehr", fonts: 4 },
+	])("compiles the portable $name theme", ({ file, name, fonts }) => {
 		let compiled = compileThemeSource(
-			readFileSync("themes/syntwin.theme.md", "utf8"),
+			readFileSync(`themes/${file}.theme.md`, "utf8"),
 		)
-		expect(compiled.css.match(/data:font\/woff2;base64,/g)).toHaveLength(2)
-		expect(compiled.css).toContain("data:image/svg+xml;base64,")
-		expect(compiled.css).not.toContain("asset:")
-		expect(compiled.metadata?.name).toBe("Syntwin")
+		expect(compiled.css.match(/data:font\/woff2;base64,/g)).toHaveLength(fonts)
+		expect(compiled.css + compiled.template).toContain(
+			"data:image/svg+xml;base64,",
+		)
+		expect(
+			compiled.css + compiled.template + compiled.slideTemplate,
+		).not.toContain("asset:")
+		expect(compiled.metadata?.name).toBe(name)
 	})
 
 	test("compiles CSS and HTML source", () => {
