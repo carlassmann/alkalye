@@ -125,7 +125,7 @@ import { HelpMenu } from "@/app/components/help-menu"
 import { EditorStatsBadge } from "@/app/features/editor"
 import { useTrackLastOpened } from "../hooks/use-track-last-opened"
 import { printToPdf } from "@/app/features/import-export"
-import { loadThemesForPdf } from "@/app/features/themes"
+import { loadThemesForPdf, syncThemeFromSource } from "@/app/features/themes"
 import { testIds } from "@/app/lib/test-ids"
 import { useIntl } from "@/shared/intl/setup"
 import { makeFolderDocumentContent } from "../lib/folders"
@@ -465,9 +465,16 @@ function SpaceEditorContent({
 			openFind: () => editor.current?.openFind(),
 			onPrintPdf: async () => {
 				if (!me.$isLoaded) return
-				let { themes, defaultPreviewTheme } = await loadThemesForPdf(me)
+				let { themes, defaultPreviewTheme, defaultSyntaxTheme } =
+					await loadThemesForPdf(me)
 				let assets = getLoadedAssets(liveDoc?.assets).map(toPrintableAsset)
-				void printToPdf({ content, themes, defaultPreviewTheme, assets })
+				void printToPdf({
+					content: editor.current?.getContent() ?? content,
+					themes,
+					defaultPreviewTheme,
+					defaultSyntaxTheme,
+					assets,
+				})
 			},
 			onPreview: () => {
 				navigate({
@@ -478,7 +485,7 @@ function SpaceEditorContent({
 			},
 			onDownload: () => {
 				let title = getDocumentTitle(doc)
-				saveDocumentAs(content, title)
+				saveDocumentAs(editor.current?.getContent() ?? content, title)
 			},
 			labels: {
 				autosaveTitle: t("editor.autosave.title"),
@@ -520,6 +527,7 @@ function SpaceEditorContent({
 					current === pendingContent ? null : current,
 				)
 				syncBacklinks(appliedContent)
+				if (me.$isLoaded) void syncThemeFromSource(me, docId, appliedContent)
 				if (cursor) updateCursor(cursor.from, cursor.to)
 				signalDocumentSaved(docId, appliedContent)
 			})
@@ -558,6 +566,7 @@ function SpaceEditorContent({
 			baseContent,
 		)
 		syncBacklinks(appliedContent)
+		if (me.$isLoaded) void syncThemeFromSource(me, docId, appliedContent)
 		if (cursor) updateCursor(cursor.from, cursor.to)
 		return appliedContent
 	}

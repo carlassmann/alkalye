@@ -18,6 +18,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TutorSlugRouteImport } from './routes/tutor.$slug'
 import { Route as SpacesSpaceIdIndexRouteImport } from './routes/spaces.$spaceId.index'
 import { Route as DocIdIndexRouteImport } from './routes/doc.$id.index'
+import { Route as ThemesIdWorkbenchRouteImport } from './routes/themes.$id.workbench'
 import { Route as SpacesSpaceIdSettingsRouteImport } from './routes/spaces.$spaceId.settings'
 import { Route as DocIdTimemachineRouteImport } from './routes/doc.$id.timemachine'
 import { Route as DocIdTeleprompterRouteImport } from './routes/doc.$id.teleprompter'
@@ -70,6 +71,11 @@ const DocIdIndexRoute = DocIdIndexRouteImport.update({
   path: '/doc/$id/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ThemesIdWorkbenchRoute = ThemesIdWorkbenchRouteImport.update({
+  id: '/themes/$id/workbench',
+  path: '/themes/$id/workbench',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SpacesSpaceIdSettingsRoute = SpacesSpaceIdSettingsRouteImport.update({
   id: '/spaces/$spaceId/settings',
   path: '/spaces/$spaceId/settings',
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/doc/$id/teleprompter': typeof DocIdTeleprompterRoute
   '/doc/$id/timemachine': typeof DocIdTimemachineRoute
   '/spaces/$spaceId/settings': typeof SpacesSpaceIdSettingsRoute
+  '/themes/$id/workbench': typeof ThemesIdWorkbenchRoute
   '/doc/$id/': typeof DocIdIndexRoute
   '/spaces/$spaceId/': typeof SpacesSpaceIdIndexRoute
   '/spaces/$spaceId/doc/$id/': typeof SpacesSpaceIdDocIdIndexRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/doc/$id/teleprompter': typeof DocIdTeleprompterRoute
   '/doc/$id/timemachine': typeof DocIdTimemachineRoute
   '/spaces/$spaceId/settings': typeof SpacesSpaceIdSettingsRoute
+  '/themes/$id/workbench': typeof ThemesIdWorkbenchRoute
   '/doc/$id': typeof DocIdIndexRoute
   '/spaces/$spaceId': typeof SpacesSpaceIdIndexRoute
   '/spaces/$spaceId/doc/$id': typeof SpacesSpaceIdDocIdIndexRoute
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/doc/$id/teleprompter': typeof DocIdTeleprompterRoute
   '/doc/$id/timemachine': typeof DocIdTimemachineRoute
   '/spaces/$spaceId/settings': typeof SpacesSpaceIdSettingsRoute
+  '/themes/$id/workbench': typeof ThemesIdWorkbenchRoute
   '/doc/$id/': typeof DocIdIndexRoute
   '/spaces/$spaceId/': typeof SpacesSpaceIdIndexRoute
   '/spaces/$spaceId/doc/$id/': typeof SpacesSpaceIdDocIdIndexRoute
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/doc/$id/teleprompter'
     | '/doc/$id/timemachine'
     | '/spaces/$spaceId/settings'
+    | '/themes/$id/workbench'
     | '/doc/$id/'
     | '/spaces/$spaceId/'
     | '/spaces/$spaceId/doc/$id/'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/doc/$id/teleprompter'
     | '/doc/$id/timemachine'
     | '/spaces/$spaceId/settings'
+    | '/themes/$id/workbench'
     | '/doc/$id'
     | '/spaces/$spaceId'
     | '/spaces/$spaceId/doc/$id'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/doc/$id/teleprompter'
     | '/doc/$id/timemachine'
     | '/spaces/$spaceId/settings'
+    | '/themes/$id/workbench'
     | '/doc/$id/'
     | '/spaces/$spaceId/'
     | '/spaces/$spaceId/doc/$id/'
@@ -220,6 +232,7 @@ export interface RootRouteChildren {
   DocIdTeleprompterRoute: typeof DocIdTeleprompterRoute
   DocIdTimemachineRoute: typeof DocIdTimemachineRoute
   SpacesSpaceIdSettingsRoute: typeof SpacesSpaceIdSettingsRoute
+  ThemesIdWorkbenchRoute: typeof ThemesIdWorkbenchRoute
   DocIdIndexRoute: typeof DocIdIndexRoute
   SpacesSpaceIdIndexRoute: typeof SpacesSpaceIdIndexRoute
   SpacesSpaceIdDocIdIndexRoute: typeof SpacesSpaceIdDocIdIndexRoute
@@ -290,6 +303,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/themes/$id/workbench': {
+      id: '/themes/$id/workbench'
+      path: '/themes/$id/workbench'
+      fullPath: '/themes/$id/workbench'
+      preLoaderRoute: typeof ThemesIdWorkbenchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/spaces/$spaceId/settings': {
       id: '/spaces/$spaceId/settings'
       path: '/spaces/$spaceId/settings'
@@ -348,6 +368,7 @@ const rootRouteChildren: RootRouteChildren = {
   DocIdTeleprompterRoute: DocIdTeleprompterRoute,
   DocIdTimemachineRoute: DocIdTimemachineRoute,
   SpacesSpaceIdSettingsRoute: SpacesSpaceIdSettingsRoute,
+  ThemesIdWorkbenchRoute: ThemesIdWorkbenchRoute,
   DocIdIndexRoute: DocIdIndexRoute,
   SpacesSpaceIdIndexRoute: SpacesSpaceIdIndexRoute,
   SpacesSpaceIdDocIdIndexRoute: SpacesSpaceIdDocIdIndexRoute,

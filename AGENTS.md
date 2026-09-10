@@ -32,6 +32,7 @@ Offline-capable PWA built with Jazz (local-first sync), Astro, and React.
 - [React Components](docs/react-components.md) - handler factories, routes, forms
 - [Jazz Patterns](docs/jazz.md) - CoValue types, queries
 - [File Organization](docs/file-organization.md) - module structure, exports
+- [Theme authoring](public/docs/theming-guide.md) - Markdown theme sources, styling hooks, templates, and validation
 
 <!-- effect-solutions:start -->
 

@@ -95,7 +95,12 @@ let themesResolve = {
 	root: {
 		settings: true,
 		themes: {
-			$each: { css: true, template: true, assets: { $each: { data: true } } },
+			$each: {
+				css: true,
+				template: true,
+				slideTemplate: true,
+				assets: { $each: { data: true } },
+			},
 		},
 	},
 } as const
@@ -174,6 +179,9 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 						: undefined,
 					defaultPreviewTheme: meWithThemes.$isLoaded
 						? (meWithThemes.root?.settings?.defaultPreviewTheme ?? null)
+						: null,
+					defaultSyntaxTheme: meWithThemes.$isLoaded
+						? (meWithThemes.root?.settings?.syntaxTheme ?? null)
 						: null,
 				})
 				return

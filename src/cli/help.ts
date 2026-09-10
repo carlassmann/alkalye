@@ -4,6 +4,7 @@ let descriptions = {
 	auth: "Passphrase authentication.",
 	account: "Account profile.",
 	doc: "Personal and shared document workflows.",
+	theme: "Create and manage document and slideshow themes.",
 	docComment: "Document comments.",
 	docShare: "Document sharing.",
 	docPublic: "Document public access.",
@@ -45,6 +46,25 @@ type LeafDef = {
 }
 
 let groups: Record<string, GroupDef> = {
+	theme: {
+		description: descriptions.theme,
+		sections: [
+			{
+				heading: "Commands",
+				items: [
+					["list", "List your themes"],
+					["get", "Read a theme and its editable source"],
+					["create", "Create and compile a Markdown theme source"],
+					["update", "Update and compile an existing theme"],
+					["delete", "Remove a theme from your library"],
+				],
+			},
+		],
+		examples: [
+			'alkalye theme create --name "My theme" --source theme.md --json',
+			"alkalye theme update co_xyz --source theme.md --json",
+		],
+	},
 	auth: {
 		description: descriptions.auth,
 		sections: [
@@ -230,6 +250,35 @@ let groups: Record<string, GroupDef> = {
 }
 
 let leaves: Record<string, LeafDef> = {
+	"theme list": {
+		summary: "List your themes.",
+		usage: "alkalye theme list",
+	},
+	"theme get": {
+		summary: "Read a theme, compiled styles, and editable Markdown source.",
+		usage: "alkalye theme get <theme-id>",
+	},
+	"theme create": {
+		summary: "Create a theme and compile its Markdown source immediately.",
+		usage: "alkalye theme create --source <file> [--name <name>]",
+		options: [
+			"--source <file>       Markdown with css theme and optional html document/slide fences",
+			"--name <name>         Theme display name",
+		],
+	},
+	"theme update": {
+		summary:
+			"Update an existing theme and compile its Markdown source immediately.",
+		usage: "alkalye theme update <theme-id> --source <file> [--name <name>]",
+		options: [
+			"--source <file>       Updated Markdown theme source",
+			"--name <name>         Rename while preserving theme assignments",
+		],
+	},
+	"theme delete": {
+		summary: "Remove a theme from your library.",
+		usage: "alkalye theme delete <theme-id>",
+	},
 	// auth
 	"auth signup": {
 		summary: "Create account and store credentials locally.",
@@ -570,6 +619,7 @@ let rootCommands: [name: string, summary: string][] = [
 	["auth", descriptions.auth],
 	["account", descriptions.account],
 	["doc", descriptions.doc],
+	["theme", descriptions.theme],
 	["space", descriptions.space],
 	["invite", descriptions.invite],
 	["sync", descriptions.sync],

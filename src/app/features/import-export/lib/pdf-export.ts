@@ -1,10 +1,13 @@
 import { Marked } from "marked"
+import markedShiki from "marked-shiki"
 import { type co } from "jazz-tools"
 import { type Theme, type ThemeAsset } from "@/schema"
 import { parseFrontmatter } from "@/app/features/editor/lib/frontmatter"
 import {
 	findThemeByName,
+	findThemeById,
 	getThemeName,
+	getThemeId,
 	getPresetName,
 	findPresetByName,
 	getThemePresets,
@@ -13,11 +16,17 @@ import {
 	type ThemesQuery,
 	type ThemePresetType,
 } from "@/app/features/themes/lib/document-theme"
+import { scopeThemeCss } from "@/app/features/themes/lib/renderer"
 import { getDocumentTitle } from "@/app/features/documents/lib/title"
 import type { PrintableAsset } from "@/app/features/assets"
 import { replaceAssetSources } from "./print-media"
+import {
+	loadSyntaxHighlighter,
+	resolveSyntaxTheme,
+	type SyntaxTheme,
+} from "@/app/features/syntax-highlighting"
 
-export { printToPdf }
+export { printToPdf, renderPrintableMarkdown }
 
 type LoadedTheme = co.loaded<typeof Theme, ThemesQuery["$each"]>
 type LoadedAsset = co.loaded<typeof ThemeAsset, { data: true }>
@@ -26,13 +35,16 @@ async function printToPdf(params: {
 	content: string
 	themes: LoadedThemes | undefined
 	defaultPreviewTheme: string | null
+	defaultSyntaxTheme: string | null
 	assets: PrintableAsset[]
 }) {
-	let { content, themes, defaultPreviewTheme, assets } = params
+	let { content, themes, defaultPreviewTheme, defaultSyntaxTheme, assets } =
+		params
 	let { body } = parseFrontmatter(content)
 	let title = getDocumentTitle(content)
 
 	let themeName = getThemeName(content)
+	let themeId = getThemeId(content)
 	let presetName = getPresetName(content)
 
 	let isAppearanceOnlyTheme = themeName === "light" || themeName === "dark"
@@ -42,9 +54,12 @@ async function printToPdf(params: {
 		effectiveThemeName = defaultPreviewTheme
 	}
 
-	let theme = effectiveThemeName
-		? findThemeByName(themes ?? null, effectiveThemeName)
-		: null
+	let theme = themeId
+		? findThemeById(themes ?? null, themeId)
+		: effectiveThemeName
+			? (findThemeById(themes ?? null, effectiveThemeName) ??
+				findThemeByName(themes ?? null, effectiveThemeName))
+			: null
 	let preset = null
 
 	if (theme && presetName) {
@@ -57,10 +72,12 @@ async function printToPdf(params: {
 		}
 	}
 
-	let marked = new Marked()
-	marked.setOptions({ gfm: true, breaks: true })
-	let parsedHtml = await marked.parse(body)
-	let htmlContent = await replaceAssetSources(parsedHtml, assets)
+	let syntaxTheme = resolveSyntaxTheme({
+		content,
+		defaultFamilyId: defaultSyntaxTheme,
+		appearance: "light",
+	})
+	let htmlContent = await renderPrintableMarkdown(body, assets, syntaxTheme)
 
 	let printableHtml = await buildPrintableHtml({
 		title,
@@ -70,6 +87,29 @@ async function printToPdf(params: {
 	})
 
 	openPrintWindow(printableHtml)
+}
+
+async function renderPrintableMarkdown(
+	content: string,
+	assets: PrintableAsset[],
+	syntaxTheme: SyntaxTheme,
+): Promise<string> {
+	let highlighter = await loadSyntaxHighlighter(syntaxTheme)
+	let marked = new Marked()
+	marked.use(
+		markedShiki({
+			highlight(code, language) {
+				return highlighter.highlight({
+					code,
+					language,
+					theme: syntaxTheme,
+				})
+			},
+		}),
+	)
+	marked.setOptions({ gfm: true, breaks: true })
+	let parsedHtml = await marked.parse(content)
+	return replaceAssetSources(parsedHtml, assets)
 }
 
 async function buildPrintableHtml(params: {
@@ -84,6 +124,7 @@ async function buildPrintableHtml(params: {
 	let presetVariables = ""
 	let themeCss = ""
 	let bodyContent = ""
+	let documentContent = `<article class="content">${htmlContent}</article>`
 
 	if (theme) {
 		fontFaceRules = await buildFontFaceRulesBase64(theme)
@@ -94,15 +135,18 @@ async function buildPrintableHtml(params: {
 
 		// Get CSS if loaded
 		if (theme.css?.$isLoaded) {
-			themeCss = theme.css.toString()
+			let css = theme.css.toString()
+			themeCss = theme.sourceDocId
+				? scopeThemeCss(css, `[data-theme-scope="print"]`)
+				: css
 		}
 
 		// Try to render with theme template
 		if (theme.template?.$isLoaded) {
 			let templateHtml = theme.template.toString()
-			let rendered = renderTemplateWithContent(templateHtml, htmlContent)
+			let rendered = renderTemplateWithContent(templateHtml, documentContent)
 			if (rendered) {
-				bodyContent = `<div data-theme="${theme.name}">${rendered}</div>`
+				bodyContent = createPrintableThemeRoot(theme.name, rendered)
 			}
 		}
 	}
@@ -110,7 +154,7 @@ async function buildPrintableHtml(params: {
 	// Fall back to default structure if no template or template failed
 	if (!bodyContent) {
 		let themeName = theme?.name ?? ""
-		bodyContent = `<div data-theme="${themeName}"><article>${htmlContent}</article></div>`
+		bodyContent = createPrintableThemeRoot(themeName, documentContent)
 	}
 
 	let html = `<!DOCTYPE html>
@@ -302,6 +346,10 @@ async function buildPrintableHtml(params: {
 	return html
 }
 
+function createPrintableThemeRoot(themeName: string, content: string): string {
+	return `<div data-theme-scope="print" data-appearance="light"><div class="theme document" data-theme="${themeName}" data-appearance="light">${content}</div></div>`
+}
+
 function openPrintWindow(html: string): void {
 	let printWindow = window.open("", "_blank")
 	if (!printWindow) {
@@ -356,7 +404,7 @@ function renderTemplateWithContent(
 	let parser = new DOMParser()
 	let doc = parser.parseFromString(template, "text/html")
 
-	let placeholder = doc.querySelector("[data-document]")
+	let placeholder = doc.querySelector("[data-content], [data-document]")
 	if (!placeholder) return null
 
 	placeholder.innerHTML = content

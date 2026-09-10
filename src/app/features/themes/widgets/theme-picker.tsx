@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "@tanstack/react-router"
 import { useAccount, Image } from "jazz-tools/react"
 import { co } from "jazz-tools"
 import { Button } from "@/app/components/ui/button"
@@ -30,11 +31,17 @@ type LoadedTheme = co.loaded<
 
 interface ThemePickerProps {
 	content: string
+	getContent: () => string
 	onThemeChange: (newContent: string) => void
 	disabled?: boolean
 }
 
-function ThemePicker({ content, onThemeChange, disabled }: ThemePickerProps) {
+function ThemePicker({
+	content,
+	getContent,
+	onThemeChange,
+	disabled,
+}: ThemePickerProps) {
 	let me = useAccount(UserAccount, { resolve: themesResolve })
 
 	let themes: LoadedTheme[] = []
@@ -56,6 +63,9 @@ function ThemePicker({ content, onThemeChange, disabled }: ThemePickerProps) {
 	)
 
 	let hasThemes = themes.length > 0
+	let selectedTheme = themes.find(theme =>
+		isThemeSelected(currentThemeName, theme),
+	)
 
 	if (!hasThemes) {
 		return null
@@ -93,11 +103,9 @@ function ThemePicker({ content, onThemeChange, disabled }: ThemePickerProps) {
 							<ThemeMenuItem
 								key={theme.$jazz.id}
 								theme={theme}
-								isSelected={
-									currentThemeName?.toLowerCase() === theme.name.toLowerCase()
-								}
+								isSelected={isThemeSelected(currentThemeName, theme)}
 								onSelect={() => {
-									let newContent = setTheme(content, theme.name)
+									let newContent = setTheme(getContent(), theme.$jazz.id)
 									onThemeChange(newContent)
 								}}
 							/>
@@ -114,11 +122,9 @@ function ThemePicker({ content, onThemeChange, disabled }: ThemePickerProps) {
 							<ThemeMenuItem
 								key={theme.$jazz.id}
 								theme={theme}
-								isSelected={
-									currentThemeName?.toLowerCase() === theme.name.toLowerCase()
-								}
+								isSelected={isThemeSelected(currentThemeName, theme)}
 								onSelect={() => {
-									let newContent = setTheme(content, theme.name)
+									let newContent = setTheme(getContent(), theme.$jazz.id)
 									onThemeChange(newContent)
 								}}
 							/>
@@ -130,7 +136,7 @@ function ThemePicker({ content, onThemeChange, disabled }: ThemePickerProps) {
 						<DropdownMenuSeparator />
 						<DropdownMenuItem
 							onClick={() => {
-								let newContent = setTheme(content, null)
+								let newContent = setTheme(getContent(), null)
 								onThemeChange(newContent)
 							}}
 						>
@@ -138,8 +144,34 @@ function ThemePicker({ content, onThemeChange, disabled }: ThemePickerProps) {
 						</DropdownMenuItem>
 					</>
 				)}
+				{selectedTheme?.sourceDocId && (
+					<>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem
+							render={
+								<Link
+									to="/themes/$id/workbench"
+									params={{ id: selectedTheme.$jazz.id }}
+								/>
+							}
+						>
+							Edit theme
+						</DropdownMenuItem>
+					</>
+				)}
 			</DropdownMenuContent>
 		</DropdownMenu>
+	)
+}
+
+function isThemeSelected(
+	themeReference: string | undefined,
+	theme: LoadedTheme,
+): boolean {
+	if (!themeReference) return false
+	return (
+		themeReference === theme.$jazz.id ||
+		themeReference.toLowerCase() === theme.name.toLowerCase()
 	)
 }
 
@@ -154,7 +186,8 @@ function ThemeMenuItem({
 }) {
 	let [isHovered, setIsHovered] = useState(false)
 	let thumbnailId = theme.thumbnail?.$jazz.id
-	let hasPreviewContent = thumbnailId || theme.description
+	let thumbnailDataUrl = theme.thumbnailDataUrl
+	let hasPreviewContent = thumbnailId || thumbnailDataUrl || theme.description
 
 	return (
 		<Tooltip open={hasPreviewContent ? isHovered : false}>
@@ -176,11 +209,19 @@ function ThemeMenuItem({
 					sideOffset={8}
 					className="bg-popover text-popover-foreground ring-foreground/10 w-56 p-0 ring-1"
 				>
-					{thumbnailId && (
+					{thumbnailId ? (
 						<div className="bg-muted aspect-video w-full overflow-hidden">
 							<Image imageId={thumbnailId} className="size-full object-cover" />
 						</div>
-					)}
+					) : thumbnailDataUrl ? (
+						<div className="bg-muted aspect-video w-full overflow-hidden">
+							<img
+								src={thumbnailDataUrl}
+								alt=""
+								className="size-full object-cover"
+							/>
+						</div>
+					) : null}
 					<div className="p-3">
 						<div className="font-medium">{theme.name}</div>
 						{theme.author && (

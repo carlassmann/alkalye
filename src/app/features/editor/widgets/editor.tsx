@@ -4,6 +4,7 @@ import { ImageOff, Maximize2, Minimize2, PenTool } from "lucide-react"
 import { toast } from "sonner"
 import {
 	EditorState,
+	EditorSelection,
 	Compartment,
 	type Extension,
 	Prec,
@@ -952,28 +953,7 @@ function MarkdownEditor(
 
 		let currentContent = view.state.doc.toString()
 		if (value !== currentContent && value !== lastExternalValue.current) {
-			// Same document with remote changes - diff to preserve cursor
-			let cursorPos = view.state.selection.main.head
-			let anchorPos = view.state.selection.main.anchor
-
-			let changes: { from: number; to: number; insert: string }[] = []
-			for (let [fromA, toA, fromB, toB] of diff(currentContent, value)) {
-				changes.push({
-					from: fromA,
-					to: toA,
-					insert: value.slice(fromB, toB),
-				})
-			}
-
-			if (changes.length > 0) {
-				let tr = view.state.update({ changes })
-				let newCursorPos = tr.changes.mapPos(cursorPos, 1)
-				let newAnchorPos = tr.changes.mapPos(anchorPos, 1)
-				view.dispatch({
-					changes,
-					selection: { anchor: newAnchorPos, head: newCursorPos },
-				})
-			}
+			applyContentPreservingSelection(view, value)
 		}
 		lastExternalValue.current = value
 	}, [value, view])
@@ -1046,9 +1026,7 @@ function MarkdownEditor(
 
 	function setContent(content: string) {
 		if (!view) return
-		view.dispatch({
-			changes: { from: 0, to: view.state.doc.length, insert: content },
-		})
+		applyContentPreservingSelection(view, content)
 	}
 
 	function focus() {
@@ -1904,4 +1882,31 @@ function editorAriaShortcuts(): string {
 	return getShortcutDefinitions()
 		.map(definition => getAriaShortcut(definition.id))
 		.join(" ")
+}
+
+function applyContentPreservingSelection(view: EditorView, content: string) {
+	let currentContent = view.state.doc.toString()
+	let selection = view.state.selection
+	let changes: { from: number; to: number; insert: string }[] = []
+
+	for (let [fromA, toA, fromB, toB] of diff(currentContent, content)) {
+		changes.push({
+			from: fromA,
+			to: toA,
+			insert: content.slice(fromB, toB),
+		})
+	}
+	if (changes.length === 0) return
+
+	let transaction = view.state.update({ changes })
+	let mappedRanges = selection.ranges.map(range =>
+		EditorSelection.range(
+			transaction.changes.mapPos(range.anchor, 1),
+			transaction.changes.mapPos(range.head, 1),
+		),
+	)
+	view.dispatch({
+		changes,
+		selection: EditorSelection.create(mappedRanges, selection.mainIndex),
+	})
 }

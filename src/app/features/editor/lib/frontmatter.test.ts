@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest"
+import { EditorState } from "@codemirror/state"
 import {
 	parseFrontmatter,
 	getBacklinks,
@@ -11,6 +12,10 @@ import {
 	addTag,
 	setTheme,
 	setPreset,
+	setSyntaxTheme,
+	getFrontmatterRange,
+	getFrontmatterInsertion,
+	getFrontmatterFieldValueRange,
 } from "./frontmatter"
 
 describe("parseFrontmatter", () => {
@@ -248,6 +253,13 @@ Content`
 			expect(body).toBe("Content")
 		})
 
+		it("stops at the empty closing delimiter before later thematic rules", () => {
+			let content = `---\n---\n# Theme source\n\n---\nLicense text`
+			let parsed = parseFrontmatter(content)
+			expect(parsed.frontmatter).toEqual({})
+			expect(parsed.body).toBe("# Theme source\n\n---\nLicense text")
+		})
+
 		it("adds backlinks to empty frontmatter", () => {
 			let content = `---
 ---
@@ -277,6 +289,13 @@ Some text`
 			// This should not be parsed as frontmatter since there's no closing ---
 			expect(frontmatter).toBeNull()
 			expect(body).toBe(content)
+		})
+
+		it("does not discover frontmatter after body content", () => {
+			let content = "Body text\n---\ntags: wrong\n---\nMore body"
+			let parsed = parseFrontmatter(content)
+			expect(parsed.frontmatter).toBeNull()
+			expect(parsed.body).toBe(content)
 		})
 	})
 
@@ -545,6 +564,75 @@ Content`
 	})
 })
 
+describe("setSyntaxTheme", () => {
+	it("sets and removes a document syntax theme without disturbing metadata", () => {
+		let content = `---
+title: Doc
+---
+Content`
+		let themed = setSyntaxTheme(content, "catppuccin")
+
+		expect(parseFrontmatter(themed).frontmatter).toEqual({
+			"syntax-theme": "catppuccin",
+			title: "Doc",
+		})
+		expect(setSyntaxTheme(themed, null)).toBe(content)
+	})
+
+	it("does not collide with the document theme field", () => {
+		let content = `---
+syntax-theme: catppuccin
+theme: OldTheme
+---
+Content`
+
+		expect(parseFrontmatter(setTheme(content, "NewTheme")).frontmatter).toEqual(
+			{
+				"syntax-theme": "catppuccin",
+				theme: "NewTheme",
+			},
+		)
+		expect(parseFrontmatter(setTheme(content, null)).frontmatter).toEqual({
+			"syntax-theme": "catppuccin",
+		})
+	})
+
+	it("replaces an empty syntax theme field", () => {
+		let content = `---
+syntax-theme:
+---
+Content`
+		let result = setSyntaxTheme(content, "github")
+
+		expect(result.match(/^syntax-theme:/gm)).toHaveLength(1)
+		expect(parseFrontmatter(result).frontmatter?.["syntax-theme"]).toBe(
+			"github",
+		)
+	})
+
+	it("only updates fields inside frontmatter", () => {
+		let content = `---
+theme: OldTheme
+---
+
+theme: ExampleTheme`
+		let updated = setTheme(content, "NewTheme")
+
+		expect(updated).toContain("theme: NewTheme\n---")
+		expect(updated).toContain("\ntheme: ExampleTheme")
+	})
+
+	it("preserves CRLF line endings", () => {
+		let content =
+			"---\r\nsyntax-theme: github\r\ntheme: OldTheme\r\n---\r\nBody"
+		let updated = setTheme(content, "NewTheme")
+
+		expect(updated).toBe(
+			"---\r\nsyntax-theme: github\r\ntheme: NewTheme\r\n---\r\nBody",
+		)
+	})
+})
+
 describe("setPreset", () => {
 	it("adds preset to content without frontmatter", () => {
 		let result = setPreset("Content", "Dark")
@@ -646,5 +734,137 @@ Content`
 			preset: "NewPreset",
 			pinned: true,
 		})
+	})
+})
+
+describe("scalar frontmatter updates", () => {
+	it("does not match field names as substrings", () => {
+		let content = `---
+autotags: keep
+tags: old
+mybacklinks: keep
+backlinks: old
+unpinned: true
+pinned: true
+---
+Content`
+
+		let updated = addTag(content, "new")
+		updated = setBacklinks(updated, ["new"])
+		updated = togglePinned(updated)
+
+		expect(parseFrontmatter(updated).frontmatter).toEqual({
+			autotags: "keep",
+			tags: "old, new",
+			mybacklinks: "keep",
+			backlinks: "new",
+			unpinned: true,
+		})
+	})
+
+	it("updates the last duplicate field read by the parser", () => {
+		let content = `---
+syntax-theme: github
+syntax-theme: vitesse
+---
+Content`
+		let updated = setSyntaxTheme(content, "catppuccin")
+
+		expect(parseFrontmatter(updated).frontmatter?.["syntax-theme"]).toBe(
+			"catppuccin",
+		)
+		expect(updated.match(/^syntax-theme:/gm)).toHaveLength(1)
+		expect(setSyntaxTheme(content, null)).not.toContain("syntax-theme:")
+	})
+
+	it("preserves a missing newline after the closing delimiter", () => {
+		let content = "---\nsyntax-theme: github\n---"
+
+		expect(setSyntaxTheme(content, "vitesse")).toBe(
+			"---\nsyntax-theme: vitesse\n---",
+		)
+	})
+
+	it("round-trips a sole syntax theme without adding whitespace", () => {
+		let content = "# Title\n"
+		let themed = setSyntaxTheme(content, "github")
+
+		expect(setSyntaxTheme(themed, null)).toBe(content)
+	})
+
+	it("adds a field to empty frontmatter without a blank YAML line", () => {
+		let content = "---\n---\nBody"
+
+		expect(setSyntaxTheme(content, "github")).toBe(
+			"---\nsyntax-theme: github\n---\nBody",
+		)
+	})
+
+	it("accepts trailing whitespace on frontmatter delimiters", () => {
+		let content = "--- \ntitle: Visible text\n---\nBody"
+
+		expect(parseFrontmatter(content)).toEqual({
+			frontmatter: { title: "Visible text" },
+			body: "Body",
+		})
+		expect(getFrontmatterRange(EditorState.create({ doc: content }))).toEqual({
+			from: 4,
+			to: 28,
+		})
+	})
+
+	it("preserves uniform root indentation", () => {
+		let content = "---\n title: Doc\n syntax-theme: github\n---\nBody"
+		let updated = setSyntaxTheme(content, "vitesse")
+
+		expect(updated).toBe("---\n title: Doc\n syntax-theme: vitesse\n---\nBody")
+		expect(getFrontmatterInsertion(content)).toEqual({
+			position: 4,
+			indentation: " ",
+		})
+		expect(getFrontmatterFieldValueRange(content, "title")).toEqual({
+			from: 12,
+			to: 15,
+		})
+	})
+
+	it("requires the closing delimiter on its own line", () => {
+		let content = `---
+title: Foo --- Bar
+theme: OldTheme
+---
+Body`
+		let updated = setTheme(content, "NewTheme")
+
+		expect(parseFrontmatter(updated).frontmatter).toEqual({
+			title: "Foo --- Bar",
+			theme: "NewTheme",
+		})
+		expect(updated).toContain("\nBody")
+	})
+
+	it("does not reinterpret thematic breaks as frontmatter", () => {
+		let content = "---\nJust a rule\n---\nText"
+		let updated = setSyntaxTheme(content, "github")
+
+		expect(updated).toBe(
+			"---\nsyntax-theme: github\n---\n\n---\nJust a rule\n---\nText",
+		)
+	})
+
+	it("does not edit keys or delimiters inside YAML block scalars", () => {
+		let content = `---
+syntax-theme: github
+notes: |
+  syntax-theme: prose
+  ---
+---
+Body`
+		let updated = setSyntaxTheme(content, "vitesse")
+
+		expect(updated).toContain("  syntax-theme: prose\n  ---")
+		expect(parseFrontmatter(updated).frontmatter?.["syntax-theme"]).toBe(
+			"vitesse",
+		)
 	})
 })

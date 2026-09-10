@@ -2,8 +2,10 @@ import JSZip from "jszip"
 import { z } from "zod"
 import { ThemeType, ThemePreset } from "./schema"
 import { sanitizeCss, sanitizeHtml } from "./sanitize"
+import { parseThemeSource, hasThemeDefinition } from "./source"
 
 export {
+	parseThemeMarkdown,
 	parseThemeZip,
 	validateThemeJson,
 	ThemeJsonSchema,
@@ -20,6 +22,8 @@ let ThemeJsonSchema = z.object({
 	type: ThemeType,
 	css: z.string().min(1, "CSS file path is required"),
 	template: z.string().optional(),
+	slideTemplate: z.string().optional(),
+	source: z.string().optional(),
 	presets: z.string().optional(),
 	fonts: z
 		.array(
@@ -41,9 +45,12 @@ interface ParsedTheme {
 	type: z.infer<typeof ThemeType>
 	css: string
 	template?: string
+	slideTemplate?: string
 	presets?: z.infer<typeof ThemePreset>[]
 	assets: ParsedThemeAsset[]
+	thumbnailDataUrl?: string
 	thumbnail?: File
+	source?: string
 }
 
 interface ParsedThemeAsset {
@@ -53,6 +60,7 @@ interface ParsedThemeAsset {
 }
 
 type ThemeUploadError =
+	| { type: "invalid_markdown"; message: string; errors: string[] }
 	| { type: "invalid_zip"; message: string }
 	| { type: "missing_manifest"; message: string }
 	| { type: "invalid_manifest"; message: string; errors: string[] }
@@ -63,6 +71,88 @@ type ThemeUploadError =
 type ParseResult =
 	| { ok: true; theme: ParsedTheme }
 	| { ok: false; error: ThemeUploadError }
+
+async function parseThemeMarkdown(file: File): Promise<ParseResult> {
+	let content = await readFileText(file)
+	let source = parseThemeSource(content)
+	if (source.errors.length > 0 || !hasThemeDefinition(source))
+		return {
+			ok: false,
+			error: {
+				type: "invalid_markdown",
+				message: "Theme source is invalid.",
+				errors: source.errors.length
+					? source.errors.map(error => error.message)
+					: ["Theme source needs a CSS, HTML, or theme metadata fence"],
+			},
+		}
+	let thumbnail = source.metadata?.thumbnail
+		? dataUrlToFile(source.metadata.thumbnail, "thumbnail")
+		: undefined
+	if (source.metadata?.thumbnail && !thumbnail)
+		return {
+			ok: false,
+			error: {
+				type: "invalid_markdown",
+				message: "Theme thumbnail is invalid.",
+				errors: [
+					"Thumbnail must be a base64 PNG, JPEG, WebP, GIF, or safe SVG",
+				],
+			},
+		}
+	return {
+		ok: true,
+		theme: {
+			name: source.metadata?.name ?? getMarkdownName(content, file.name),
+			author: source.metadata?.author,
+			description: source.metadata?.description,
+			type: source.metadata?.type ?? "both",
+			css: sanitizeCss(source.css).sanitized,
+			template: source.documentTemplate
+				? sanitizeHtml(source.documentTemplate).sanitized
+				: undefined,
+			slideTemplate: source.slideTemplate
+				? sanitizeHtml(source.slideTemplate).sanitized
+				: undefined,
+			presets: source.metadata?.presets,
+			assets: [],
+			thumbnail,
+			thumbnailDataUrl: source.metadata?.thumbnail,
+			source: content,
+		},
+	}
+}
+
+function dataUrlToFile(dataUrl: string, name: string): File | undefined {
+	let match = dataUrl.match(
+		/^data:(image\/(?:png|jpeg|webp|gif|svg\+xml));base64,([A-Za-z0-9+/=]+)$/,
+	)
+	if (!match) return undefined
+	try {
+		let binary = atob(match[2])
+		if (binary.length > 2_000_000) return undefined
+		let bytes = Uint8Array.from(binary, character => character.charCodeAt(0))
+		return new File([bytes], name, { type: match[1] })
+	} catch {
+		return undefined
+	}
+}
+
+async function readFileText(file: File): Promise<string> {
+	return await new Promise((resolve, reject) => {
+		let reader = new FileReader()
+		reader.onload = () => resolve(String(reader.result))
+		reader.onerror = () => reject(reader.error)
+		reader.readAsText(file)
+	})
+}
+
+function getMarkdownName(content: string, filename: string): string {
+	let heading = content.match(/^#\s+(.+)$/m)?.[1]?.trim()
+	return (
+		heading || filename.replace(/\.theme\.md$|\.md$/i, "") || "Imported theme"
+	)
+}
 
 async function parseThemeZip(file: File): Promise<ParseResult> {
 	let zip: JSZip
@@ -167,6 +257,39 @@ async function parseThemeZip(file: File): Promise<ParseResult> {
 				template = templateResult.sanitized
 			} catch {
 				// Template is optional, continue without it
+			}
+		}
+	}
+
+	let slideTemplate: string | undefined
+	if (themeJson.slideTemplate) {
+		let slideTemplateFile = zip.file(basePath + themeJson.slideTemplate)
+		if (slideTemplateFile) {
+			try {
+				let rawSlideTemplate = await slideTemplateFile.async("string")
+				slideTemplate = sanitizeHtml(rawSlideTemplate).sanitized
+			} catch {
+				// Optional slideshow template
+			}
+		}
+	}
+
+	if (themeJson.source) {
+		let sourceFile = zip.file(basePath + themeJson.source)
+		if (sourceFile) {
+			try {
+				let source = parseThemeSource(await sourceFile.async("string"))
+				if (source.errors.length === 0) {
+					css = sanitizeCss(source.css).sanitized
+					template = source.documentTemplate
+						? sanitizeHtml(source.documentTemplate).sanitized
+						: undefined
+					slideTemplate = source.slideTemplate
+						? sanitizeHtml(source.slideTemplate).sanitized
+						: undefined
+				}
+			} catch {
+				// Keep the compiled files when source.md is unavailable or invalid
 			}
 		}
 	}
@@ -282,6 +405,7 @@ async function parseThemeZip(file: File): Promise<ParseResult> {
 			type: themeJson.type,
 			css,
 			template,
+			slideTemplate,
 			presets,
 			assets,
 			thumbnail,

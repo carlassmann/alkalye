@@ -38,6 +38,7 @@ import {
 	type ShortcutId,
 } from "@/app/lib/shortcut-registry"
 import { ThemePicker, PresetPicker } from "@/app/features/themes"
+import { SyntaxThemePicker } from "@/app/features/syntax-highlighting"
 import { cn } from "@/app/lib/cn"
 import { useIntl, T } from "@/shared/intl/setup"
 
@@ -70,6 +71,22 @@ function EditorToolbar({
 }: EditorToolbarProps) {
 	let t = useIntl()
 	let isAtTop = useEditorScrollTopState(editor)
+	let [pickerContent, setPickerContent] = useState(content ?? "")
+	let [previousContent, setPreviousContent] = useState(content)
+	if (content !== previousContent) {
+		setPreviousContent(content)
+		setPickerContent(content ?? "")
+	}
+
+	function getCurrentContent() {
+		return editor.current?.getContent() ?? content ?? ""
+	}
+
+	function applyContentChange(newContent: string) {
+		setPickerContent(newContent)
+		editor.current?.setContent(newContent)
+		onThemeChange?.(newContent)
+	}
 
 	function scrollToTop() {
 		let view = editor.current?.getEditor()
@@ -229,18 +246,28 @@ function EditorToolbar({
 							{content !== undefined && onThemeChange && (
 								<>
 									<ThemePicker
-										content={content}
-										onThemeChange={onThemeChange}
+										content={pickerContent}
+										getContent={getCurrentContent}
+										onThemeChange={applyContentChange}
 										disabled={readOnly}
 									/>
 									<PresetPicker
-										content={content}
-										onPresetChange={onThemeChange}
+										content={pickerContent}
+										getContent={getCurrentContent}
+										onPresetChange={applyContentChange}
 										disabled={readOnly}
 									/>
 								</>
 							)}
 						</span>
+						{content !== undefined && onThemeChange && (
+							<SyntaxThemePicker
+								content={pickerContent}
+								getContent={getCurrentContent}
+								onThemeChange={applyContentChange}
+								disabled={readOnly}
+							/>
+						)}
 					</>
 				)}
 				<ToolbarButton

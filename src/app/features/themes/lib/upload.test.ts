@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
 import JSZip from "jszip"
-import { parseThemeZip, validateThemeJson } from "./upload"
+import { parseThemeMarkdown, parseThemeZip, validateThemeJson } from "./upload"
 
 // Helper to create a zip file from object mapping paths to contents
 async function createZip(
@@ -121,6 +121,40 @@ describe("validateThemeJson", () => {
 		})
 		let result = validateThemeJson(json)
 		expect(result.ok).toBe(true)
+	})
+})
+
+describe("parseThemeMarkdown", () => {
+	it("imports metadata, editable source, and base64 assets", async () => {
+		let source = `# Portable\n\nprose\n\n\`\`\`css theme\nbody { color: red; } @font-face { font-family: Test; src: url(asset:assets/0-font.woff2); }\n\`\`\`\n\n\`\`\`json theme metadata\n{"name":"Portable","type":"preview","presets":[]}\n\`\`\`\n\n\`\`\`base64 asset assets/0-font.woff2 font/woff2\nZm9udA==\n\`\`\``
+		let result = await parseThemeMarkdown(
+			new File([source], "portable.theme.md"),
+		)
+		expect(result.ok).toBe(true)
+		if (result.ok) {
+			expect(result.theme.name).toBe("Portable")
+			expect(result.theme.css).toContain("color: red")
+			expect(result.theme.source).toBe(source)
+			expect(result.theme.css).toContain("data:font/woff2;base64,Zm9udA==")
+			expect(result.theme.assets).toHaveLength(0)
+		}
+	})
+
+	it("uses a heading when metadata is omitted", async () => {
+		let source = "# Heading Theme\n\n```css theme\nbody {}\n```"
+		let result = await parseThemeMarkdown(new File([source], "theme.md"))
+		expect(result.ok).toBe(true)
+		if (result.ok) expect(result.theme.name).toBe("Heading Theme")
+	})
+
+	it("imports a portable thumbnail data URL", async () => {
+		let source = `# Thumb\n\n\`\`\`json theme metadata\n{"name":"Thumb","type":"preview","thumbnail":"data:image/png;base64,aGVsbG8="}\n\`\`\`\n\n\`\`\`css theme\nbody {}\n\`\`\``
+		let result = await parseThemeMarkdown(new File([source], "thumb.theme.md"))
+		expect(result.ok).toBe(true)
+		if (result.ok) {
+			expect(result.theme.thumbnail?.type).toBe("image/png")
+			expect(result.theme.thumbnail?.size).toBe(5)
+		}
 	})
 })
 

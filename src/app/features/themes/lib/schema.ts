@@ -44,9 +44,12 @@ let Theme = co.map({
 	type: ThemeType,
 	css: co.plainText(),
 	template: co.optional(co.plainText()),
+	slideTemplate: co.optional(co.plainText()),
+	sourceDocId: z.string().optional(),
 	presets: z.string().optional(),
 	assets: co.optional(co.list(ThemeAsset)),
 	thumbnail: co.optional(co.image()),
+	thumbnailDataUrl: z.string().optional(),
 	createdAt: z.date(),
 	updatedAt: z.date(),
 })

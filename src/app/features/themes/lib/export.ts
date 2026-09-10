@@ -1,152 +1,162 @@
-import JSZip from "jszip"
-import { type co, FileStream } from "jazz-tools"
-import { z } from "zod"
-import { Theme, ThemeAsset, ThemePreset, ThemeType } from "./schema"
+import { type co, FileStream, z } from "jazz-tools"
+import { Theme, ThemePreset } from "./schema"
 import { sanitizeFilename } from "@/app/features/import-export/lib/export"
+import { Document } from "@/app/features/documents/lib/schema"
+import { setFrontmatterField } from "@/app/features/editor/lib/frontmatter"
+import {
+	serializeThemeSource,
+	parseThemeSource,
+	withThemeSourceMetadata,
+	type ThemeSourceMetadata,
+} from "./source"
+import { serializePortableAssetFence } from "./portable-assets"
 
-export { exportTheme, type ThemeExportQuery }
+export { exportTheme, serializePortableTheme, type ThemeExportQuery }
 
-// Query to load all theme data needed for export
 type ThemeExportQuery = {
 	css: true
 	template: true
+	slideTemplate: true
 	thumbnail: { original: true }
 	assets: { $each: { data: true } }
 }
 
 type LoadedThemeForExport = co.loaded<typeof Theme, ThemeExportQuery>
-type LoadedAsset = co.loaded<typeof ThemeAsset, { data: true }>
 
-interface ThemeManifest {
-	version: 1
-	name: string
-	author?: string
-	description?: string
-	type: z.infer<typeof ThemeType>
-	css: string
-	template?: string
-	presets?: string
-	fonts?: { name: string; path: string }[]
-	thumbnail?: string
+async function serializePortableTheme(
+	theme: LoadedThemeForExport,
+	sourceOverride?: string,
+	validateSource?: (source: string) => unknown,
+): Promise<string> {
+	let source = sourceOverride ?? (await loadEditableSource(theme))
+	let metadata: ThemeSourceMetadata = {
+		name: theme.name,
+		type: theme.type,
+		author: theme.author,
+		description: theme.description,
+	}
+	let sourceMetadata = parseThemeSource(source, {
+		validateTemplate: () => null,
+	}).metadata
+	if (sourceMetadata) {
+		if (sourceMetadata.thumbnail) metadata.thumbnail = sourceMetadata.thumbnail
+	} else if (theme.thumbnailDataUrl) {
+		metadata.thumbnail = theme.thumbnailDataUrl
+	} else if (
+		theme.thumbnail?.$isLoaded &&
+		theme.thumbnail.original?.$isLoaded
+	) {
+		let thumbnail = theme.thumbnail.original.toBlob()
+		if (!thumbnail) throw new Error("Unable to read theme thumbnail")
+		metadata.thumbnail = fileStreamToDataUrl(
+			theme.thumbnail.original,
+			thumbnail.type || "image/png",
+		)
+	}
+	if (theme.presets) {
+		let presets = z
+			.union([
+				z.array(ThemePreset),
+				z.object({ presets: z.array(ThemePreset) }),
+			])
+			.parse(JSON.parse(theme.presets))
+		metadata.presets = Array.isArray(presets) ? presets : presets.presets
+	}
+	let sections = [stripThemeSourceId(source).trimEnd()]
+	let fontFaces: string[] = []
+	if (theme.assets && !theme.assets.$isLoaded)
+		throw new Error("Theme assets are not loaded")
+	for (let asset of theme.assets ?? []) {
+		if (!asset?.$isLoaded || !asset.data?.$isLoaded)
+			throw new Error("Theme asset is unavailable")
+		let data = asset.data.getChunks()
+		if (!data?.finished)
+			throw new Error(`Unable to read theme asset: ${asset.name}`)
+		let path = `legacy/${asset.$jazz.id}`
+		while (source.includes(path)) path += "-copy"
+		let binary = ""
+		for (let bytes of data.chunks)
+			for (let index = 0; index < bytes.length; index += 0x8000)
+				binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000))
+		sections.push(
+			serializePortableAssetFence({
+				path,
+				mimeType: asset.mimeType,
+				base64: btoa(binary),
+			}),
+		)
+		if (asset.mimeType.startsWith("font/"))
+			fontFaces.push(
+				`@font-face {\n  font-family: ${JSON.stringify(asset.name)};\n  src: url("asset:${path}");\n  font-display: swap;\n}`,
+			)
+	}
+	if (fontFaces.length)
+		sections.push("```css theme\n" + fontFaces.join("\n\n") + "\n```")
+	let portable = withThemeSourceMetadata(sections.join("\n\n"), metadata)
+	let validation = parseThemeSource(
+		portable,
+		validateSource ? { validateTemplate: () => null } : undefined,
+	)
+	if (validation.errors.length > 0)
+		throw new Error(
+			`Theme export is not portable: ${validation.errors[0]?.message}`,
+		)
+	validateSource?.(portable)
+	return portable
+}
+
+function fileStreamToDataUrl(fileStream: FileStream, mimeType: string): string {
+	let data = fileStream.getChunks()
+	if (!data?.finished) throw new Error("Unable to read theme thumbnail")
+	if (
+		!(
+			"image/png" === mimeType ||
+			"image/jpeg" === mimeType ||
+			"image/webp" === mimeType ||
+			"image/gif" === mimeType ||
+			"image/svg+xml" === mimeType
+		)
+	)
+		throw new Error(`Unsupported theme thumbnail MIME type: ${mimeType}`)
+	let byteLength = data.chunks.reduce((total, bytes) => total + bytes.length, 0)
+	if (byteLength > 2_000_000) throw new Error("Theme thumbnail exceeds 2 MB")
+	let binary = ""
+	for (let bytes of data.chunks)
+		for (let index = 0; index < bytes.length; index += 0x8000)
+			binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000))
+	return `data:${mimeType};base64,${btoa(binary)}`
+}
+
+async function loadEditableSource(
+	theme: LoadedThemeForExport,
+): Promise<string> {
+	if (theme.sourceDocId) {
+		let source = await Document.load(theme.sourceDocId, {
+			resolve: { content: true },
+			loadAs: theme.$jazz.loadedAs,
+		})
+		if (!source.$isLoaded || !source.content?.$isLoaded)
+			throw new Error("Theme source is unavailable")
+		return source.content.toString()
+	}
+	return serializeThemeSource({
+		css: theme.css.toString(),
+		documentTemplate: theme.template?.toString(),
+		slideTemplate: theme.slideTemplate?.toString(),
+	})
+}
+
+function stripThemeSourceId(source: string): string {
+	return setFrontmatterField(source, "theme-source", null)
 }
 
 async function exportTheme(theme: LoadedThemeForExport): Promise<void> {
-	let zip = new JSZip()
-
-	// Build theme.json manifest
-	let fonts: { name: string; path: string }[] = []
-	let manifest: ThemeManifest = {
-		version: 1,
-		name: theme.name,
-		type: theme.type,
-		css: "styles.css",
-	}
-
-	if (theme.author) manifest.author = theme.author
-	if (theme.description) manifest.description = theme.description
-
-	// Add CSS file
-	let cssContent = theme.css?.toString() ?? ""
-	zip.file("styles.css", cssContent)
-
-	// Add template if present
-	if (theme.template) {
-		let templateContent = theme.template.toString()
-		if (templateContent) {
-			zip.file("template.html", templateContent)
-			manifest.template = "template.html"
-		}
-	}
-
-	// Add presets if present
-	if (theme.presets) {
-		try {
-			let presetsArray = JSON.parse(theme.presets) as z.infer<
-				typeof ThemePreset
-			>[]
-			// Write presets in the standard format: { presets: [...] }
-			zip.file(
-				"presets.json",
-				JSON.stringify({ presets: presetsArray }, null, 2),
-			)
-			manifest.presets = "presets.json"
-		} catch {
-			// Skip invalid presets
-		}
-	}
-
-	// Add font assets
-	if (theme.assets?.$isLoaded && theme.assets.length > 0) {
-		let fontsFolder = zip.folder("fonts")!
-		for (let asset of Array.from(theme.assets)) {
-			if (!asset?.$isLoaded) continue
-			let themeAsset = asset as LoadedAsset
-			if (!themeAsset.data?.$isLoaded) continue
-
-			let fontData = await readFileStreamAsArrayBuffer(themeAsset.data)
-			if (fontData) {
-				let extension = getExtensionFromMimeType(themeAsset.mimeType)
-				let fileName = `${themeAsset.name}${extension}`
-				fontsFolder.file(fileName, fontData)
-				fonts.push({
-					name: themeAsset.name,
-					path: `fonts/${fileName}`,
-				})
-			}
-		}
-	}
-
-	if (fonts.length > 0) {
-		manifest.fonts = fonts
-	}
-
-	// Add thumbnail if present
-	if (theme.thumbnail?.$isLoaded && theme.thumbnail.original?.$isLoaded) {
-		let thumbnailBlob = theme.thumbnail.original.toBlob()
-		if (thumbnailBlob) {
-			let extension = getExtensionFromMimeType(thumbnailBlob.type)
-			let fileName = `thumbnail${extension}`
-			zip.file(fileName, thumbnailBlob)
-			manifest.thumbnail = fileName
-		}
-	}
-
-	// Add theme.json manifest
-	zip.file("theme.json", JSON.stringify(manifest, null, 2))
-
-	// Generate and download zip
-	let blob = await zip.generateAsync({ type: "blob" })
+	let content = await serializePortableTheme(theme)
+	let blob = new Blob([content], { type: "text/markdown" })
 	let url = URL.createObjectURL(blob)
-	let a = document.createElement("a")
-	a.href = url
-	a.download = `${sanitizeFilename(theme.name)}.zip`
-	a.click()
+	let link = document.createElement("a")
+	link.href = url
+	link.download = `${sanitizeFilename(theme.name)}.theme.md`
+	link.click()
 	URL.revokeObjectURL(url)
-}
-
-async function readFileStreamAsArrayBuffer(
-	fileStream: FileStream,
-): Promise<ArrayBuffer | null> {
-	try {
-		let blob = fileStream.toBlob()
-		if (!blob) return null
-		return await blob.arrayBuffer()
-	} catch {
-		return null
-	}
-}
-
-function getExtensionFromMimeType(mimeType: string): string {
-	let mimeToExt: Record<string, string> = {
-		"font/woff2": ".woff2",
-		"font/woff": ".woff",
-		"font/ttf": ".ttf",
-		"font/otf": ".otf",
-		"image/png": ".png",
-		"image/jpeg": ".jpg",
-		"image/gif": ".gif",
-		"image/webp": ".webp",
-		"image/svg+xml": ".svg",
-	}
-	return mimeToExt[mimeType] || ""
 }

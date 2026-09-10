@@ -1,5 +1,17 @@
-import { describe, it, expect } from "vitest"
-import { getThemeName, getPresetName, findThemeByName } from "./document-theme"
+import { beforeEach, describe, it, expect } from "vitest"
+import { createJazzTestAccount, setupJazzTestSync } from "jazz-tools/testing"
+import { UserAccount } from "@/schema"
+import { createDefaultTheme } from "./default-theme"
+import {
+	getThemeName,
+	getPresetName,
+	findThemeByName,
+	resolveDocumentTheme,
+} from "./document-theme"
+
+beforeEach(async () => {
+	await setupJazzTestSync()
+})
 
 describe("getThemeName", () => {
 	it("returns null when no frontmatter", () => {
@@ -129,6 +141,55 @@ describe("findThemeByName", () => {
 		expect(findThemeByName(themes, "Unloaded")).toBeNull()
 		expect(findThemeByName(themes, "Elegant")).toBe(loadedTheme)
 	})
+})
+
+describe("resolveDocumentTheme", () => {
+	let appearanceCases: {
+		mode: "light" | "dark"
+		appearance: "light" | "dark"
+	}[] = [
+		{ mode: "light", appearance: "light" },
+		{ mode: "dark", appearance: "dark" },
+	]
+	it.each(appearanceCases)(
+		"applies the default theme for appearance-only $mode documents",
+		async ({
+			mode,
+			appearance,
+		}: {
+			mode: "light" | "dark"
+			appearance: "light" | "dark"
+		}) => {
+			let account = await createJazzTestAccount({
+				isCurrentActiveAccount: true,
+				AccountSchema: UserAccount,
+			})
+			let theme = await createDefaultTheme(account)
+			let loaded = await account.$jazz.ensureLoaded({
+				resolve: {
+					root: {
+						themes: {
+							$each: {
+								css: true,
+								template: true,
+								slideTemplate: true,
+								assets: { $each: { data: true } },
+							},
+						},
+					},
+				},
+			})
+			let themes = loaded.root?.themes
+			if (!themes) throw new Error("Themes did not load")
+			let resolved = resolveDocumentTheme({
+				content: `---\ntheme: ${mode}\n---\n\n# Hello`,
+				themes,
+				defaultThemeName: theme.$jazz.id,
+				appearance,
+			})
+			expect(resolved.theme?.$jazz.id).toBe(theme.$jazz.id)
+		},
+	)
 })
 
 /**

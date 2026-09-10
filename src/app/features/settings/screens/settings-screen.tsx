@@ -41,8 +41,12 @@ import { Textarea } from "@/app/components/ui/textarea"
 import { Switch } from "@/app/components/ui/switch"
 import { UserAccount, Theme, ThemeAsset, Settings } from "@/schema"
 import {
+	parseThemeMarkdown,
 	parseThemeZip,
+	createDefaultTheme,
 	exportTheme,
+	createThemeSourceDocument,
+	serializeThemeSource,
 	type ThemeUploadError,
 	type ThemeExportQuery,
 } from "@/app/features/themes"
@@ -63,6 +67,7 @@ import {
 	type EditorSettingsData,
 } from "@/app/features/editor"
 import { Footer } from "@/app/components/footer"
+import { waitForLocalJazzStorage } from "@/app/lib/local-jazz-poke"
 import { usePWA, PWAInstallDialog } from "@/app/lib/pwa"
 import { useIsPWAInstalled } from "@/app/lib/platform"
 import { BackupSettings } from "@/app/features/backup"
@@ -72,6 +77,7 @@ import {
 	TooltipContent,
 } from "@/app/components/ui/tooltip"
 import { useIsOnline } from "@/app/hooks/use-online"
+import { SYNTAX_THEME_FAMILIES } from "@/app/features/syntax-highlighting"
 import { testIds } from "@/app/lib/test-ids"
 import {
 	collectStorageDiagnostics,
@@ -93,6 +99,7 @@ let settingsQuery = {
 			$each: {
 				css: true,
 				template: true,
+				slideTemplate: true,
 				thumbnail: { original: true },
 				assets: { $each: { data: true } },
 			},
@@ -169,6 +176,7 @@ function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 								<T k="settings.appearance" />
 							</h2>
 							<ThemeToggle theme={theme} setTheme={setTheme} showLabel />
+							<SyntaxThemeSetting settings={me?.root?.settings} />
 						</section>
 						<LanguageSection me={me} />
 						<ThemesSection me={me} />
@@ -181,6 +189,46 @@ function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 				</div>
 			</div>
 		</>
+	)
+}
+
+function SyntaxThemeSetting({
+	settings,
+}: {
+	settings: co.loaded<typeof Settings> | null | undefined
+}) {
+	let t = useIntl()
+	let selectedFamily = SYNTAX_THEME_FAMILIES.find(
+		family => family.id === settings?.syntaxTheme,
+	)
+	let selectedFamilyId = selectedFamily?.id ?? "github"
+
+	function handleChange(value: string | null) {
+		if (!settings || !value) return
+		settings.$jazz.set("syntaxTheme", value === "github" ? undefined : value)
+	}
+
+	return (
+		<div className="mt-3 flex items-center justify-between gap-4">
+			<span className="text-sm">
+				<T k="settings.appearance.syntaxTheme" />
+			</span>
+			<Select value={selectedFamilyId} onValueChange={handleChange}>
+				<SelectTrigger
+					className="w-40"
+					aria-label={t("settings.appearance.syntaxTheme")}
+				>
+					<SelectValue>{selectedFamily?.name ?? "GitHub"}</SelectValue>
+				</SelectTrigger>
+				<SelectContent>
+					{SYNTAX_THEME_FAMILIES.map(family => (
+						<SelectItem key={family.id} value={family.id}>
+							{family.name}
+						</SelectItem>
+					))}
+				</SelectContent>
+			</Select>
+		</div>
 	)
 }
 
@@ -394,7 +442,9 @@ function ThemesSection({ me }: ThemesSectionProps) {
 		setIsUploading(true)
 		setUploadError(null)
 
-		let result = await parseThemeZip(file)
+		let result = file.name.toLowerCase().endsWith(".md")
+			? await parseThemeMarkdown(file)
+			: await parseThemeZip(file)
 
 		if (!result.ok) {
 			setUploadError(result.error)
@@ -423,9 +473,10 @@ function ThemesSection({ me }: ThemesSectionProps) {
 			assets.push(themeAsset)
 		}
 
-		let thumbnail = parsed.thumbnail
-			? await createImage(parsed.thumbnail, { owner, maxSize: 256 })
-			: undefined
+		let thumbnail =
+			parsed.thumbnail && !parsed.thumbnailDataUrl
+				? await createImage(parsed.thumbnail, { owner, maxSize: 256 })
+				: undefined
 
 		let now = new Date()
 		let theme = Theme.create(
@@ -439,24 +490,48 @@ function ThemesSection({ me }: ThemesSectionProps) {
 				template: parsed.template
 					? co.plainText().create(parsed.template, owner)
 					: undefined,
+				slideTemplate: parsed.slideTemplate
+					? co.plainText().create(parsed.slideTemplate, owner)
+					: undefined,
 				presets: parsed.presets ? JSON.stringify(parsed.presets) : undefined,
 				assets:
 					assets.length > 0
 						? co.list(ThemeAsset).create(assets, owner)
 						: undefined,
 				thumbnail,
+				thumbnailDataUrl: parsed.thumbnailDataUrl,
 				createdAt: now,
 				updatedAt: now,
 			},
 			owner,
 		)
+		let source = await createThemeSourceDocument(me, {
+			themeId: theme.$jazz.id,
+			name: parsed.name,
+			source:
+				parsed.source ??
+				serializeThemeSource({
+					css: parsed.css,
+					documentTemplate: parsed.template,
+					slideTemplate: parsed.slideTemplate,
+				}),
+		})
+		theme.$jazz.set("sourceDocId", source.$jazz.id)
+
+		await waitForLocalJazzStorage(me)
 
 		if (!me.root.themes) {
 			me.root.$jazz.set("themes", co.list(Theme).create([], owner))
 		}
 		me.root.themes!.$jazz.push(theme)
+		await waitForLocalJazzStorage(me)
 
 		setIsUploading(false)
+	}
+
+	async function handleCreateTheme() {
+		if (!me?.root) return
+		await createDefaultTheme(me)
 	}
 
 	function handleDeleteTheme() {
@@ -544,6 +619,22 @@ function ThemesSection({ me }: ThemesSectionProps) {
 													` • ${t("settings.themes.by")} ${theme.author}`}
 											</div>
 										</div>
+										{theme.sourceDocId && (
+											<Button
+												variant="ghost"
+												size="icon-sm"
+												nativeButton={false}
+												render={
+													<Link
+														to="/themes/$id/workbench"
+														params={{ id: theme.$jazz.id }}
+													/>
+												}
+												aria-label={`Edit ${theme.name} in workbench`}
+											>
+												<Pencil className="size-4" />
+											</Button>
+										)}
 										<Button
 											variant="ghost"
 											size="icon-sm"
@@ -579,28 +670,34 @@ function ThemesSection({ me }: ThemesSectionProps) {
 				<input
 					ref={fileInputRef}
 					type="file"
-					accept=".zip"
+					accept=".md,.theme.md,.zip"
 					className="hidden"
 					onChange={handleFileSelect}
 				/>
-				<Button
-					onClick={() => fileInputRef.current?.click()}
-					variant="outline"
-					size="sm"
-					disabled={isUploading}
-				>
-					{isUploading ? (
-						<>
-							<Loader2 className="mr-1.5 size-3.5 animate-spin" />
-							<T k="settings.themes.uploading" />
-						</>
-					) : (
-						<>
-							<Upload className="mr-1.5 size-3.5" />
-							<T k="settings.themes.uploadTheme" />
-						</>
-					)}
-				</Button>
+				<div className="flex gap-2">
+					<Button onClick={handleCreateTheme} variant="outline" size="sm">
+						<Plus className="mr-1.5 size-3.5" />
+						New custom theme
+					</Button>
+					<Button
+						onClick={() => fileInputRef.current?.click()}
+						variant="outline"
+						size="sm"
+						disabled={isUploading}
+					>
+						{isUploading ? (
+							<>
+								<Loader2 className="mr-1.5 size-3.5 animate-spin" />
+								<T k="settings.themes.uploading" />
+							</>
+						) : (
+							<>
+								<Upload className="mr-1.5 size-3.5" />
+								<T k="settings.themes.uploadTheme" />
+							</>
+						)}
+					</Button>
+				</div>
 			</div>
 
 			<ConfirmDialog

@@ -5,31 +5,10 @@ import {
 	useRef,
 	useState,
 	useLayoutEffect,
+	useId,
 } from "react"
+import { createPortal } from "react-dom"
 import { Image as JazzImage } from "jazz-tools/react"
-import { createHighlighterCore, type HighlighterCore } from "shiki/core"
-import { createJavaScriptRegexEngine } from "shiki/engine/javascript"
-import astroLanguage from "shiki/dist/langs/astro.mjs"
-import cssLanguage from "shiki/dist/langs/css.mjs"
-import diffLanguage from "shiki/dist/langs/diff.mjs"
-import goLanguage from "shiki/dist/langs/go.mjs"
-import htmlLanguage from "shiki/dist/langs/html.mjs"
-import javascriptLanguage from "shiki/dist/langs/javascript.mjs"
-import jsonLanguage from "shiki/dist/langs/json.mjs"
-import jsxLanguage from "shiki/dist/langs/jsx.mjs"
-import markdownLanguage from "shiki/dist/langs/markdown.mjs"
-import pythonLanguage from "shiki/dist/langs/python.mjs"
-import rustLanguage from "shiki/dist/langs/rust.mjs"
-import shellscriptLanguage from "shiki/dist/langs/shellscript.mjs"
-import sqlLanguage from "shiki/dist/langs/sql.mjs"
-import svelteLanguage from "shiki/dist/langs/svelte.mjs"
-import tomlLanguage from "shiki/dist/langs/toml.mjs"
-import tsxLanguage from "shiki/dist/langs/tsx.mjs"
-import typescriptLanguage from "shiki/dist/langs/typescript.mjs"
-import vueLanguage from "shiki/dist/langs/vue.mjs"
-import yamlLanguage from "shiki/dist/langs/yaml.mjs"
-import githubLightTheme from "shiki/dist/themes/github-light.mjs"
-import vesperTheme from "shiki/dist/themes/vesper.mjs"
 import {
 	parsePresentationSize,
 	parsePresentationTheme,
@@ -52,11 +31,20 @@ import { useResolvedTheme } from "@/app/components/appearance"
 import { EllipsisIcon, TriangleAlert } from "lucide-react"
 import {
 	useDocumentTheme,
+	getSlideshowBaseCss,
+	sanitizeHtml,
+	scopeThemeCss,
 	tryCachedThemeStylesAsync,
 	type ResolvedTheme,
 	type ThemeStyles,
 } from "@/app/features/themes"
 import { T, useIntl } from "@/shared/intl/setup"
+import {
+	loadSyntaxHighlighter,
+	useSyntaxTheme,
+	type SyntaxDecoration,
+	type SyntaxTheme,
+} from "@/app/features/syntax-highlighting"
 
 export { Slideshow }
 export type { Slide, HighlightRange }
@@ -78,6 +66,7 @@ let ThemeContext = createContext<PresentationTheme | null>(null)
 let WikilinkContext = createContext<Map<string, ResolvedWikilink>>(new Map())
 let HighlightContext = createContext<ScopedHighlight | null>(null)
 let ContentContext = createContext<string>("")
+let SyntaxThemeContext = createContext<SyntaxTheme>("github-light")
 
 type Asset = {
 	$jazz: { id: string }
@@ -87,6 +76,7 @@ type Asset = {
 	video?: { $isLoaded?: boolean; toBlob?: () => Blob | undefined }
 	muteAudio?: boolean
 	revision?: {
+		$isLoaded?: boolean
 		lightPreview?: { $jazz: { id: string } }
 		darkPreview?: { $jazz: { id: string } }
 	}
@@ -106,6 +96,9 @@ interface SlideshowProps {
 	onSlideChange?: (slideNumber: number) => void
 	onExit?: () => void
 	onGoToTeleprompter?: () => void
+	embedded?: boolean
+	themeOverrideId?: string
+	appearanceOverride?: "light" | "dark"
 }
 
 function Slideshow({
@@ -118,20 +111,26 @@ function Slideshow({
 	onSlideChange,
 	onExit,
 	onGoToTeleprompter,
+	embedded = false,
+	themeOverrideId,
+	appearanceOverride,
 }: SlideshowProps) {
 	let size = parsePresentationSize(content)
 	let appearanceTheme = parsePresentationTheme(content)
 	let systemTheme = useResolvedTheme()
 
-	let effectiveAppearance = appearanceTheme ?? systemTheme
+	let effectiveAppearance = appearanceOverride ?? appearanceTheme ?? systemTheme
+	let syntaxTheme = useSyntaxTheme(content, effectiveAppearance)
 
 	let documentTheme = useDocumentTheme(
 		content,
 		"slideshow",
 		effectiveAppearance,
+		themeOverrideId,
 	)
 	let themeStylesResult = useThemeStyles(documentTheme)
 	let themeStyles = themeStylesResult.styles
+	let themeScopeId = useId()
 
 	let currentSlide = slides.find(s => s.slideNumber === currentSlideNumber)
 	let currentSlideIdx = slides.findIndex(
@@ -156,10 +155,9 @@ function Slideshow({
 
 	let slideshowBaseCss = getSlideshowBaseCss()
 
-	let injectedStyles = themeStyles
+	let themeRules = themeStyles
 		? [
 				transitionStyles,
-				themeStyles.fontFaceRules,
 				themeStyles.presetVariables,
 				slideshowBaseCss,
 				themeStyles.css,
@@ -167,70 +165,143 @@ function Slideshow({
 				.filter(Boolean)
 				.join("\n")
 		: [transitionStyles, slideshowBaseCss].filter(Boolean).join("\n")
+	let isSourceTheme = Boolean(documentTheme.theme?.sourceDocId)
+	let scopedThemeRules = isSourceTheme
+		? scopeThemeCss(themeRules, `[data-theme-scope="${themeScopeId}"]`)
+		: themeRules
+	let injectedStyles = themeStyles
+		? [scopedThemeRules, themeStyles.fontFaceRules].filter(Boolean).join("\n")
+		: scopedThemeRules
+	let slideTemplate = documentTheme.theme?.slideTemplate?.toString() ?? null
+	let safeSlideTemplate = slideTemplate
+		? sanitizeHtml(slideTemplate).sanitized
+		: null
+	let slideTemplateHasSlot = safeSlideTemplate
+		? Boolean(
+				new DOMParser()
+					.parseFromString(safeSlideTemplate, "text/html")
+					.querySelector("[data-content], [data-document]"),
+			)
+		: false
 
 	return (
 		<AssetContext.Provider value={assets}>
 			<WikilinkContext.Provider value={wikilinks}>
-				<ThemeContext.Provider value={appearanceTheme}>
-					<HighlightContext.Provider value={scopedHighlight}>
-						<ContentContext.Provider value={content}>
-							{/* Inject theme styles */}
-							{injectedStyles && <style>{injectedStyles}</style>}
+				<ThemeContext.Provider value={effectiveAppearance}>
+					<SyntaxThemeContext.Provider value={syntaxTheme}>
+						<HighlightContext.Provider value={scopedHighlight}>
+							<ContentContext.Provider value={content}>
+								{/* Inject theme styles */}
+								{injectedStyles && <style>{injectedStyles}</style>}
 
-							<div
-								data-mode="slideshow"
-								data-theme={documentTheme.theme?.name ?? undefined}
-								data-appearance={effectiveAppearance}
-								className="fixed inset-0 flex flex-col"
-							>
-								{/* Theme warning banner */}
-								{documentTheme.warning && (
-									<div className="absolute top-4 left-1/2 z-50 -translate-x-1/2">
-										<div className="bg-warning/90 text-warning-foreground flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-lg">
-											<TriangleAlert className="size-4 shrink-0" />
-											<span>{documentTheme.warning}</span>
+								<div
+									data-mode="slideshow"
+									data-theme={
+										isSourceTheme
+											? undefined
+											: (documentTheme.theme?.name ?? undefined)
+									}
+									data-appearance={
+										isSourceTheme ? undefined : effectiveAppearance
+									}
+									className={
+										isSourceTheme
+											? embedded
+												? "relative flex h-full min-h-0 min-w-0 flex-1 flex-col"
+												: "fixed inset-0 flex flex-col"
+											: embedded
+												? "theme relative flex h-full min-h-0 min-w-0 flex-1 flex-col"
+												: "theme fixed inset-0 flex flex-col"
+									}
+								>
+									{/* Theme warning banner */}
+									{documentTheme.warning && (
+										<div className="absolute top-4 left-1/2 z-50 -translate-x-1/2">
+											<div className="bg-warning/90 text-warning-foreground flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-lg">
+												<TriangleAlert className="size-4 shrink-0" />
+												<span>{documentTheme.warning}</span>
+											</div>
 										</div>
-									</div>
-								)}
-
-								{/* Theme error banner (corrupted theme data) */}
-								{themeStylesResult.error && (
-									<div className="absolute top-4 left-1/2 z-50 -translate-x-1/2">
-										<div className="bg-destructive/90 text-destructive-foreground flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-lg">
-											<TriangleAlert className="size-4 shrink-0" />
-											<span>
-												Theme error: {themeStylesResult.error}. Using default
-												styles.
-											</span>
-										</div>
-									</div>
-								)}
-
-								<article className="flex min-h-0 flex-1 flex-col">
-									{documentTheme.isLoading ||
-									themeStylesResult.isLoading ? null : (
-										<ScaledSlideContainer
-											key={currentSlideNumber}
-											blocks={visibleBlocks}
-											size={size}
-											onClick={goToNextSlide}
-											measureKey={getThemeMeasureKey(
-												documentTheme,
-												themeStyles,
-											)}
-										/>
 									)}
-								</article>
-								<SlideControls
-									slides={slides}
-									currentSlideNumber={currentSlideNumber}
-									onSlideChange={onSlideChange}
-									onExit={onExit}
-									onGoToTeleprompter={onGoToTeleprompter}
-								/>
-							</div>
-						</ContentContext.Provider>
-					</HighlightContext.Provider>
+
+									{/* Theme error banner (corrupted theme data) */}
+									{themeStylesResult.error && (
+										<div className="absolute top-4 left-1/2 z-50 -translate-x-1/2">
+											<div className="bg-destructive/90 text-destructive-foreground flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-lg">
+												<TriangleAlert className="size-4 shrink-0" />
+												<span>
+													Theme error: {themeStylesResult.error}. Using default
+													styles.
+												</span>
+											</div>
+										</div>
+									)}
+
+									<div
+										data-theme-scope={themeScopeId}
+										data-mode={isSourceTheme ? "slideshow" : undefined}
+										data-appearance={
+											isSourceTheme ? effectiveAppearance : undefined
+										}
+										className="flex min-h-0 flex-1 flex-col"
+									>
+										<article
+											data-mode={isSourceTheme ? "slideshow" : undefined}
+											data-theme={
+												isSourceTheme
+													? (documentTheme.theme?.name ?? undefined)
+													: undefined
+											}
+											data-appearance={
+												isSourceTheme ? effectiveAppearance : undefined
+											}
+											className={
+												isSourceTheme
+													? "theme flex min-h-0 flex-1 flex-col"
+													: "flex min-h-0 flex-1 flex-col"
+											}
+										>
+											{documentTheme.isLoading ||
+											themeStylesResult.isLoading ? null : safeSlideTemplate &&
+											  slideTemplateHasSlot ? (
+												<SlideTemplate
+													key={currentSlideNumber}
+													templateHtml={safeSlideTemplate}
+													currentSlideNumber={currentSlideNumber}
+													blocks={visibleBlocks}
+													size={size}
+													onClick={goToNextSlide}
+													measureKey={getThemeMeasureKey(
+														documentTheme,
+														themeStyles,
+													)}
+												/>
+											) : (
+												<ScaledSlideContainer
+													key={currentSlideNumber}
+													blocks={visibleBlocks}
+													size={size}
+													onClick={goToNextSlide}
+													measureKey={getThemeMeasureKey(
+														documentTheme,
+														themeStyles,
+													)}
+												/>
+											)}
+										</article>
+									</div>
+									<SlideControls
+										slides={slides}
+										currentSlideNumber={currentSlideNumber}
+										onSlideChange={onSlideChange}
+										onExit={onExit}
+										onGoToTeleprompter={onGoToTeleprompter}
+										embedded={embedded}
+									/>
+								</div>
+							</ContentContext.Provider>
+						</HighlightContext.Provider>
+					</SyntaxThemeContext.Provider>
 				</ThemeContext.Provider>
 			</WikilinkContext.Provider>
 		</AssetContext.Provider>
@@ -243,14 +314,17 @@ function SlideControls({
 	onSlideChange,
 	onExit,
 	onGoToTeleprompter,
+	embedded = false,
 }: {
 	slides: Slide[]
 	currentSlideNumber: number
 	onSlideChange?: (slideNumber: number) => void
 	onExit?: () => void
 	onGoToTeleprompter?: () => void
+	embedded?: boolean
 }) {
 	let t = useIntl()
+	let controlsRef = useRef<HTMLDivElement>(null)
 	let currentSlideIdx = slides.findIndex(
 		s => s.slideNumber === currentSlideNumber,
 	)
@@ -277,6 +351,8 @@ function SlideControls({
 
 	useEffect(() => {
 		function handleKeyDown(e: KeyboardEvent) {
+			if (embedded && !controlsRef.current?.getClientRects().length) return
+			if (isEditableTarget(e.target)) return
 			if (e.key === "Escape") {
 				if (document.fullscreenElement) {
 					document.exitFullscreen()
@@ -311,7 +387,12 @@ function SlideControls({
 
 	return (
 		<div
-			className="fixed right-4 bottom-4 z-50"
+			ref={controlsRef}
+			className={
+				embedded
+					? "absolute right-3 bottom-3 z-20"
+					: "fixed right-4 bottom-4 z-50"
+			}
 			style={{ paddingBottom: "max(0px, env(safe-area-inset-bottom))" }}
 		>
 			<DropdownMenu>
@@ -355,6 +436,14 @@ function SlideControls({
 	)
 }
 
+function isEditableTarget(target: EventTarget | null): boolean {
+	if (!(target instanceof HTMLElement)) return false
+	return (
+		target.isContentEditable ||
+		["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)
+	)
+}
+
 let baseSizes: Record<PresentationSize, { h1: number; body: number }> = {
 	S: { h1: 72, body: 36 },
 	M: { h1: 96, body: 48 },
@@ -365,6 +454,56 @@ type SlideContainerStyle = React.CSSProperties & {
 	"--slide-h1-size": string
 	"--slide-body-size": string
 	"--slide-scale": string
+}
+
+function SlideTemplate({
+	templateHtml,
+	currentSlideNumber,
+	blocks,
+	size,
+	onClick,
+	measureKey,
+}: {
+	templateHtml: string
+	currentSlideNumber: number
+	blocks: VisualBlock[]
+	size: PresentationSize
+	onClick: () => void
+	measureKey: string
+}) {
+	let [slot, setSlot] = useState<HTMLElement | null>(null)
+
+	useEffect(() => {
+		if (!slot) return
+		for (let footer of slot.parentElement?.querySelectorAll(
+			"[data-slide-number]",
+		) ?? []) {
+			footer.textContent = String(currentSlideNumber)
+		}
+	}, [slot, currentSlideNumber])
+
+	return (
+		<>
+			<div
+				ref={node => {
+					let target = node?.querySelector("[data-content], [data-document]")
+					setSlot(target instanceof HTMLElement ? target : null)
+				}}
+				className="slide size-full"
+				dangerouslySetInnerHTML={{ __html: templateHtml }}
+			/>
+			{slot &&
+				createPortal(
+					<ScaledSlideContainer
+						blocks={blocks}
+						size={size}
+						onClick={onClick}
+						measureKey={measureKey}
+					/>,
+					slot,
+				)}
+		</>
+	)
 }
 
 function ScaledSlideContainer({
@@ -660,7 +799,7 @@ function ScaledSlideContainer({
 	return (
 		<div
 			ref={containerRef}
-			className="flex min-h-0 min-w-0 flex-1 cursor-pointer items-center justify-center overflow-hidden"
+			className="slide flex min-h-0 min-w-0 flex-1 cursor-pointer items-center justify-center overflow-hidden"
 			onClick={onClick}
 			onLoadCapture={() => setMediaLoadVersion(version => version + 1)}
 			onLoadedMetadataCapture={() =>
@@ -669,7 +808,7 @@ function ScaledSlideContainer({
 		>
 			<div
 				ref={contentRef}
-				className="slideshow-grid grid min-h-0 min-w-0 gap-8"
+				className="content slideshow-grid grid min-h-0 min-w-0 gap-8"
 				style={contentStyle}
 			>
 				{blocks.map((block, i) => (
@@ -887,7 +1026,8 @@ function SlideContentItem({ item }: { item: SlideContent }) {
 
 function SlideImage({ src, alt }: { src: string; alt: string }) {
 	let assets = useContext(AssetContext)
-	let colorScheme = useResolvedTheme()
+	let systemTheme = useResolvedTheme()
+	let colorScheme = useContext(ThemeContext) ?? systemTheme
 
 	let assetMatch = src.match(/^asset:(.+)$/)
 	if (assetMatch) {
@@ -1020,14 +1160,10 @@ function HighlightedCode({
 	code: string
 	language?: string
 }) {
-	let presentationTheme = useContext(ThemeContext)
-	let systemTheme = useResolvedTheme()
 	let highlight = useContext(HighlightContext)
 	let content = useContext(ContentContext)
+	let syntaxTheme = useContext(SyntaxThemeContext)
 	let [html, setHtml] = useState<string | null>(null)
-
-	let effectiveTheme = presentationTheme ?? systemTheme
-	let shikiTheme = effectiveTheme === "light" ? "github-light" : "vesper"
 
 	// Stable key for decorations
 	let decorationKey = highlight?.range
@@ -1038,12 +1174,12 @@ function HighlightedCode({
 		let cancelled = false
 		let decorations = computeCodeDecorations(code, content, highlight)
 
-		getSlideshowHighlighter()
+		loadSyntaxHighlighter(syntaxTheme)
 			.then(highlighter => {
-				let lang = resolveCodeLanguage(language)
-				return highlighter.codeToHtml(code, {
-					lang,
-					theme: shikiTheme,
+				return highlighter.highlight({
+					code,
+					language,
+					theme: syntaxTheme,
 					decorations,
 				})
 			})
@@ -1056,7 +1192,7 @@ function HighlightedCode({
 		return () => {
 			cancelled = true
 		}
-	}, [code, language, shikiTheme, decorationKey, content, highlight])
+	}, [code, language, syntaxTheme, decorationKey, content, highlight])
 
 	if (html) {
 		return (
@@ -1074,97 +1210,11 @@ function HighlightedCode({
 	)
 }
 
-let slideshowHighlighterPromise: Promise<HighlighterCore> | null = null
-
-function getSlideshowHighlighter(): Promise<HighlighterCore> {
-	if (!slideshowHighlighterPromise) {
-		slideshowHighlighterPromise = createHighlighterCore({
-			themes: [githubLightTheme, vesperTheme],
-			langs: [
-				astroLanguage,
-				cssLanguage,
-				diffLanguage,
-				goLanguage,
-				htmlLanguage,
-				javascriptLanguage,
-				jsonLanguage,
-				jsxLanguage,
-				markdownLanguage,
-				pythonLanguage,
-				rustLanguage,
-				shellscriptLanguage,
-				sqlLanguage,
-				svelteLanguage,
-				tomlLanguage,
-				tsxLanguage,
-				typescriptLanguage,
-				vueLanguage,
-				yamlLanguage,
-			],
-			engine: createJavaScriptRegexEngine(),
-		})
-	}
-	return slideshowHighlighterPromise
-}
-
-let slideshowLanguages = new Set([
-	"astro",
-	"bash",
-	"cjs",
-	"css",
-	"cts",
-	"diff",
-	"go",
-	"html",
-	"javascript",
-	"js",
-	"json",
-	"jsx",
-	"markdown",
-	"mjs",
-	"mts",
-	"python",
-	"rust",
-	"sh",
-	"shell",
-	"shellscript",
-	"sql",
-	"svelte",
-	"toml",
-	"ts",
-	"tsx",
-	"typescript",
-	"vue",
-	"yaml",
-	"zsh",
-])
-
-function resolveCodeLanguage(language: string | undefined): string {
-	let normalized = normalizeCodeLanguage(language)
-	if (!normalized) return "text"
-	if (!slideshowLanguages.has(normalized)) return "text"
-	return normalized
-}
-
-function normalizeCodeLanguage(
-	language: string | undefined,
-): string | undefined {
-	let firstToken = language?.trim().split(/\s+/, 1)[0]?.toLowerCase()
-	if (!firstToken || firstToken.startsWith("{")) return undefined
-	return firstToken
-}
-
-type ShikiDecoration = {
-	start: number
-	end: number
-	properties: { class: string }
-}
-
 function computeCodeDecorations(
 	code: string,
 	content: string,
 	highlight: ScopedHighlight | null,
-): ShikiDecoration[] {
+): SyntaxDecoration[] {
 	if (!highlight) return []
 
 	let { range, slideSearchStart } = highlight
@@ -1235,7 +1285,11 @@ function useThemeStyles(documentTheme: ResolvedTheme): ThemeStylesResult {
 		return () => {
 			cancelled = true
 		}
-	}, [documentTheme.theme, documentTheme.preset])
+	}, [
+		documentTheme.theme,
+		documentTheme.preset,
+		documentTheme.theme?.updatedAt,
+	])
 
 	useEffect(() => {
 		if (!styles) return
@@ -1265,225 +1319,17 @@ function getThemeMeasureKey(
 	let themeId = documentTheme.theme?.$jazz.id ?? "__none__"
 	let preset = documentTheme.preset?.name ?? "__none__"
 	if (!styles) return `${themeId}:${preset}:__loading__`
-	let stylesKey = `${styles.presetVariables.length}:${styles.fontFaceRules.length}:${styles.css.length}`
+	let stylesKey = hashThemeStyles(styles)
 	return `${themeId}:${preset}:${stylesKey}`
 }
 
-function getSlideshowBaseCss(): string {
-	return `
-:where([data-mode="slideshow"]) {
-	background: var(--preset-background, var(--background));
-	color: var(--preset-foreground, var(--foreground));
-}
-
-:where([data-mode="slideshow"][data-appearance="light"]) {
-	background: var(--preset-background, #ffffff);
-	color: var(--preset-foreground, #000000);
-}
-
-:where([data-mode="slideshow"][data-appearance="dark"]) {
-	background: var(--preset-background, #000000);
-	color: var(--preset-foreground, #ffffff);
-}
-
-:where([data-mode="slideshow"] .slideshow-grid) {
-	font-size: var(--slide-body-size);
-}
-
-:where([data-mode="slideshow"] .slideshow-cell) {
-	display: flex;
-	min-height: 0;
-	min-width: 0;
-	max-width: 100%;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	text-align: center;
-	overflow-wrap: normal;
-	word-break: normal;
-}
-
-:where([data-mode="slideshow"] a) {
-	color: var(--preset-link, var(--preset-accent, currentColor));
-	text-decoration: underline;
-}
-
-:where([data-mode="slideshow"] code) {
-	font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
-	font-size: 0.85em;
-	background: var(--preset-code-background, rgba(127, 127, 127, 0.15));
-	padding: 0.15em 0.4em;
-	border-radius: 0.25rem;
-}
-
-:where([data-mode="slideshow"] pre code) {
-	background: none;
-	padding: 0;
-}
-
-:where([data-mode="slideshow"] h1) {
-	font-size: calc(var(--slide-h1-size) * 1);
-	margin: 0 0 0.3em;
-	line-height: 1.2;
-}
-
-:where([data-mode="slideshow"] h2) {
-	font-size: calc(var(--slide-h1-size) * 0.85);
-	margin: 0 0 0.3em;
-	line-height: 1.2;
-}
-
-:where([data-mode="slideshow"] h3) {
-	font-size: calc(var(--slide-h1-size) * 0.7);
-	margin: 0 0 0.3em;
-	line-height: 1.2;
-}
-
-:where([data-mode="slideshow"] h4) {
-	font-size: calc(var(--slide-h1-size) * 0.6);
-	margin: 0 0 0.3em;
-	line-height: 1.2;
-}
-
-:where([data-mode="slideshow"] h5) {
-	font-size: calc(var(--slide-h1-size) * 0.5);
-	margin: 0 0 0.3em;
-	line-height: 1.2;
-}
-
-:where([data-mode="slideshow"] h6) {
-	font-size: calc(var(--slide-h1-size) * 0.45);
-	margin: 0 0 0.3em;
-	line-height: 1.2;
-}
-
-:where([data-mode="slideshow"] p) {
-	font-size: var(--slide-body-size);
-	margin: 0 0 0.3em;
-	line-height: 1.4;
-}
-
-:where([data-mode="slideshow"] ol) {
-	list-style: decimal;
-	list-style-position: outside;
-}
-
-:where([data-mode="slideshow"] ul) {
-	list-style: disc;
-	list-style-position: outside;
-}
-
-:where([data-mode="slideshow"] :is(ol, ul)) {
-	font-size: var(--slide-body-size);
-	margin: 0.5em 0;
-	padding-left: 1.2em;
-	line-height: 1.4;
-	text-align: left;
-}
-
-:where([data-mode="slideshow"] li) {
-	margin: 0 0 0.2em;
-}
-
-:where([data-mode="slideshow"] blockquote) {
-	font-size: var(--slide-body-size);
-	margin: 0.5em 0;
-	padding-left: 0.5em;
-	line-height: 1.4;
-	text-align: left;
-	font-style: italic;
-	border-left: calc(4px * var(--slide-scale, 1)) solid var(--preset-accent, currentColor);
-}
-
-:where([data-mode="slideshow"] table) {
-	width: 100%;
-	border-collapse: collapse;
-	text-align: left;
-	font-size: calc(var(--slide-body-size) * 0.8);
-	margin: 0.5em 0;
-	line-height: 1.2;
-	white-space: nowrap;
-}
-
-:where([data-mode="slideshow"] table tr) {
-	border-bottom-width: calc(1px * var(--slide-scale, 1));
-	border-bottom-style: solid;
-	border-bottom-color: var(--border);
-}
-
-:where([data-mode="slideshow"] table :is(th, td)) {
-	padding: 0.3em 0.5em;
-	white-space: nowrap;
-	word-break: normal;
-	vertical-align: top;
-}
-
-:where([data-mode="slideshow"] th) {
-	font-weight: 600;
-}
-
-:where([data-mode="slideshow"] .slideshow-codeblock) {
-	font-size: calc(var(--slide-body-size) * 0.6);
-	margin: 0.5em 0;
-	max-width: 100%;
-	text-align: left;
-}
-
-:where([data-mode="slideshow"] .slideshow-codeblock pre) {
-	margin: 0;
-	max-width: 100%;
-	white-space: pre;
-	padding: 0.6em;
-	border-radius: 0.5rem;
-	background: var(--preset-code-background, rgba(127, 127, 127, 0.15));
-	border: 1px solid rgba(127, 127, 127, 0.3);
-}
-
-:where([data-mode="slideshow"] pre.slideshow-codeblock) {
-	max-width: 100%;
-	white-space: pre;
-	padding: 0.6em;
-	border-radius: 0.5rem;
-	background: var(--preset-code-background, rgba(127, 127, 127, 0.15));
-	border: 1px solid rgba(127, 127, 127, 0.3);
-}
-
-:where([data-mode="slideshow"] .slideshow-image-container) {
-	flex: 1 1 auto;
-	width: 100%;
-	min-height: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	overflow: hidden;
-}
-
-:where([data-mode="slideshow"] .slideshow-image-placeholder) {
-	background: var(--preset-code-background, rgba(127, 127, 127, 0.15));
-}
-
-:where([data-mode="slideshow"] .slideshow-image) {
-	width: 100%;
-	height: 100%;
-	object-fit: contain;
-}
-
-:where([data-mode="slideshow"] video.slideshow-image) {
-	width: 100%;
-	height: 100%;
-}
-
-:where([data-mode="slideshow"] .highlighted),
-:where([data-mode="slideshow"] mark.highlighted) {
-	background: var(--highlight-background, oklch(from var(--brand, #6366f1) l c h / 0.15));
-	border: 1px solid var(--highlight-border, var(--brand, #6366f1));
-	border-radius: 0.15em;
-	padding: 0.05em 0.1em;
-	box-decoration-break: clone;
-	-webkit-box-decoration-break: clone;
-	color: inherit;
-}
-`
+function hashThemeStyles(styles: ThemeStyles): string {
+	let content = `${styles.presetVariables}\n${styles.fontFaceRules}\n${styles.css}`
+	let hash = 5381
+	for (let index = 0; index < content.length; index++) {
+		hash = (hash * 33) ^ content.charCodeAt(index)
+	}
+	return (hash >>> 0).toString(36)
 }
 
 function getSlideContentRange(

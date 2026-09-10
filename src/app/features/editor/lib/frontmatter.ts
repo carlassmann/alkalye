@@ -14,6 +14,10 @@ export {
 	removeBacklink,
 	setTheme,
 	setPreset,
+	setSyntaxTheme,
+	setFrontmatterField,
+	getFrontmatterInsertion,
+	getFrontmatterFieldValueRange,
 }
 
 export type { Frontmatter }
@@ -26,21 +30,37 @@ interface Frontmatter {
 	[key: string]: string | boolean | undefined
 }
 
+type FrontmatterBlock = {
+	yaml: string
+	yamlStart: number
+	end: number
+	newline: string
+	closingNewline: string
+}
+
+type FrontmatterInsertion = { position: number; indentation: string }
+type FrontmatterFieldValueRange = { from: number; to: number }
+
 function parseFrontmatter(content: string): {
 	frontmatter: Frontmatter | null
 	body: string
 } {
-	let match = content.match(/^---\r?\n([\s\S]*?)(?:\r?\n)?---(?:\r?\n)?/)
-	if (!match) return { frontmatter: null, body: content }
+	let block = findFrontmatterBlock(content)
+	if (!block) return { frontmatter: null, body: content }
 
-	let yaml = match[1]
-	let body = content.slice(match[0].length)
+	let body = content.slice(block.end)
 	let frontmatter: Frontmatter = {}
+	let foundField = false
+	let rootIndent = getFrontmatterRootIndent(block.yaml)
 
-	for (let line of yaml.split(/\r?\n/)) {
+	for (let line of block.yaml.split(/\r?\n/)) {
 		let colonIdx = line.indexOf(":")
 		if (colonIdx === -1) continue
-		let key = line.slice(0, colonIdx).trim()
+		let rawKey = line.slice(0, colonIdx)
+		let key = rawKey.trim()
+		let indentation = rawKey.slice(0, rawKey.length - rawKey.trimStart().length)
+		if (!key || indentation !== rootIndent) continue
+		foundField = true
 		let value = line.slice(colonIdx + 1).trim()
 		if (value.startsWith('"') && value.endsWith('"')) {
 			value = value.slice(1, -1)
@@ -55,6 +75,9 @@ function parseFrontmatter(content: string): {
 			frontmatter[key] = value
 		}
 	}
+	if (!foundField && block.yaml.trim()) {
+		return { frontmatter: null, body: content }
+	}
 
 	return { frontmatter, body }
 }
@@ -62,19 +85,7 @@ function parseFrontmatter(content: string): {
 function togglePinned(content: string): string {
 	let { frontmatter } = parseFrontmatter(content)
 	let isPinned = frontmatter?.pinned === true
-
-	if (isPinned) {
-		return content.replace(
-			/^(---\r?\n[\s\S]*?)pinned:\s*true\r?\n([\s\S]*?---)/,
-			"$1$2",
-		)
-	}
-
-	if (!frontmatter) {
-		return `---\npinned: true\n---\n\n${content}`
-	}
-
-	return content.replace(/^(---\r?\n)/, "$1pinned: true\n")
+	return setFrontmatterField(content, "pinned", isPinned ? null : "true")
 }
 
 function getTags(content: string): string[] {
@@ -95,25 +106,13 @@ function getPath(content: string): string | null {
 }
 
 function addTag(content: string, tag: string): string {
-	let { frontmatter } = parseFrontmatter(content)
 	let existingTags = getTags(content)
 
 	if (existingTags.includes(tag)) return content
 
 	let newTags = [...existingTags, tag].join(", ")
 
-	if (!frontmatter) {
-		return `---\ntags: ${newTags}\n---\n\n${content}`
-	}
-
-	if (!frontmatter.tags) {
-		return content.replace(/^(---\r?\n)/, `$1tags: ${newTags}\n`)
-	}
-
-	return content.replace(
-		/^(---\r?\n[\s\S]*?)tags:\s*[^\r\n]*/,
-		`$1tags: ${newTags}`,
-	)
+	return setFrontmatterField(content, "tags", newTags)
 }
 
 function getBacklinks(content: string): string[] {
@@ -135,14 +134,11 @@ type BacklinksWithRange = {
 }
 
 function getBacklinksWithRange(content: string): BacklinksWithRange | null {
-	let match = content.match(/^---\r?\n([\s\S]*?)(?:\r?\n)?---/)
-	if (!match) return null
+	let block = findFrontmatterBlock(content)
+	if (!block) return null
 
-	let frontmatter = match[1]
-	let frontmatterStart = content.indexOf("\n") + 1
-
-	let lines = frontmatter.split(/\r?\n/)
-	let offset = frontmatterStart
+	let lines = block.yaml ? block.yaml.split(/\r?\n/) : []
+	let offset = block.yamlStart
 
 	for (let line of lines) {
 		let backlinkMatch = line.match(/^backlinks:\s*(.*)$/)
@@ -167,31 +163,8 @@ function getBacklinksWithRange(content: string): BacklinksWithRange | null {
 }
 
 function setBacklinks(content: string, ids: string[]): string {
-	let { frontmatter } = parseFrontmatter(content)
 	let newBacklinks = ids.filter(Boolean).join(", ")
-
-	if (!frontmatter) {
-		if (!newBacklinks) return content
-		return `---\nbacklinks: ${newBacklinks}\n---\n\n${content}`
-	}
-
-	if (!frontmatter.backlinks) {
-		if (!newBacklinks) return content
-		return content.replace(/^(---\r?\n)/, `$1backlinks: ${newBacklinks}\n`)
-	}
-
-	if (!newBacklinks) {
-		let result = content.replace(
-			/^(---\r?\n[\s\S]*?)backlinks:\s*[^\r\n]*\r?\n/,
-			"$1",
-		)
-		return removeEmptyFrontmatter(result)
-	}
-
-	return content.replace(
-		/^(---\r?\n[\s\S]*?)backlinks:\s*[^\r\n]*/,
-		`$1backlinks: ${newBacklinks}`,
-	)
+	return setFrontmatterField(content, "backlinks", newBacklinks || null)
 }
 
 function addBacklink(content: string, id: string): string {
@@ -210,57 +183,16 @@ function removeBacklink(content: string, id: string): string {
 }
 
 function setTheme(content: string, themeName: string | null): string {
-	let { frontmatter } = parseFrontmatter(content)
-
-	if (!themeName) {
-		if (!frontmatter?.theme) return content
-		let result = content.replace(
-			/^(---\r?\n[\s\S]*?)theme:\s*[^\r\n]*\r?\n/,
-			"$1",
-		)
-		result = removeEmptyFrontmatter(result)
-		// Also remove preset when removing theme
-		return setPreset(result, null)
-	}
-
-	if (!frontmatter) {
-		return `---\ntheme: ${themeName}\n---\n\n${content}`
-	}
-
-	if (!frontmatter.theme) {
-		return content.replace(/^(---\r?\n)/, `$1theme: ${themeName}\n`)
-	}
-
-	return content.replace(
-		/^(---\r?\n[\s\S]*?)theme:\s*[^\r\n]*/,
-		`$1theme: ${themeName}`,
-	)
+	let result = setFrontmatterField(content, "theme", themeName)
+	return themeName ? result : setPreset(result, null)
 }
 
 function setPreset(content: string, presetName: string | null): string {
-	let { frontmatter } = parseFrontmatter(content)
+	return setFrontmatterField(content, "preset", presetName)
+}
 
-	if (!presetName) {
-		if (!frontmatter?.preset) return content
-		let result = content.replace(
-			/^(---\r?\n[\s\S]*?)preset:\s*[^\r\n]*\r?\n/,
-			"$1",
-		)
-		return removeEmptyFrontmatter(result)
-	}
-
-	if (!frontmatter) {
-		return `---\npreset: ${presetName}\n---\n\n${content}`
-	}
-
-	if (!frontmatter.preset) {
-		return content.replace(/^(---\r?\n)/, `$1preset: ${presetName}\n`)
-	}
-
-	return content.replace(
-		/^(---\r?\n[\s\S]*?)preset:\s*[^\r\n]*/,
-		`$1preset: ${presetName}`,
-	)
+function setSyntaxTheme(content: string, familyId: string | null): string {
+	return setFrontmatterField(content, "syntax-theme", familyId)
 }
 
 function getFrontmatterRange(
@@ -269,19 +201,127 @@ function getFrontmatterRange(
 	let doc = state.doc
 	let firstLine = doc.line(1)
 
-	if (firstLine.text !== "---") return null
+	if (!/^---[ \t]*$/.test(firstLine.text)) return null
 
 	for (let i = 2; i <= doc.lines; i++) {
 		let line = doc.line(i)
-		if (line.text === "---") {
+		if (/^---[ \t]*$/.test(line.text)) {
 			return { from: firstLine.to, to: line.to }
 		}
 	}
 	return null
 }
 
+function getFrontmatterInsertion(content: string): FrontmatterInsertion | null {
+	let block = findFrontmatterBlock(content)
+	if (!block) return null
+	return {
+		position: block.yamlStart,
+		indentation: getFrontmatterRootIndent(block.yaml) ?? "",
+	}
+}
+
+function getFrontmatterFieldValueRange(
+	content: string,
+	key: string,
+): FrontmatterFieldValueRange | null {
+	let block = findFrontmatterBlock(content)
+	if (!block) return null
+	let rootIndent = getFrontmatterRootIndent(block.yaml) ?? ""
+	let offset = block.yamlStart
+	for (let line of block.yaml.split(/\r?\n/)) {
+		let colonIndex = line.indexOf(":")
+		let rawKey = colonIndex < 0 ? "" : line.slice(0, colonIndex)
+		if (rawKey === `${rootIndent}${key}`) {
+			let valueStart = colonIndex + 1
+			while (line[valueStart] === " " || line[valueStart] === "\t") valueStart++
+			return { from: offset + valueStart, to: offset + line.length }
+		}
+		offset += line.length + block.newline.length
+	}
+	return null
+}
+
 // Helpers
 
-function removeEmptyFrontmatter(content: string): string {
-	return content.replace(/^---\r?\n\s*---\r?\n?/, "")
+function setFrontmatterField(
+	content: string,
+	key: string,
+	value: string | null,
+): string {
+	let { frontmatter } = parseFrontmatter(content)
+
+	if (!frontmatter) {
+		if (!value) return content
+		return `---\n${key}: ${value}\n---\n\n${content}`
+	}
+
+	let block = findFrontmatterBlock(content)
+	if (!block) return content
+
+	let lines = block.yaml ? block.yaml.split(/\r?\n/) : []
+	let rootIndent = getFrontmatterRootIndent(block.yaml) ?? ""
+	let fieldIndexes: number[] = []
+	for (let index = 0; index < lines.length; index++) {
+		let line = lines[index] ?? ""
+		let colonIndex = line.indexOf(":")
+		if (colonIndex < 0) continue
+		let rawKey = line.slice(0, colonIndex)
+		let indentation = rawKey.slice(0, rawKey.length - rawKey.trimStart().length)
+		if (indentation !== rootIndent || rawKey.trim() !== key) continue
+		fieldIndexes.push(index)
+	}
+
+	if (fieldIndexes.length === 0) {
+		if (!value) return content
+		lines.unshift(`${rootIndent}${key}: ${value}`)
+	} else {
+		let fieldIndex = fieldIndexes[fieldIndexes.length - 1] ?? 0
+		if (value) lines[fieldIndex] = `${rootIndent}${key}: ${value}`
+		for (let index = fieldIndexes.length - 1; index >= 0; index--) {
+			let duplicateIndex = fieldIndexes[index]
+			if (value && duplicateIndex === fieldIndex) continue
+			if (duplicateIndex !== undefined) lines.splice(duplicateIndex, 1)
+		}
+	}
+
+	let remainingFields = lines.some(line => line.trim())
+	let body = content.slice(block.end)
+	if (!remainingFields) return body.replace(/^\r?\n/, "")
+	return `---${block.newline}${lines.join(block.newline)}${block.newline}---${block.closingNewline}${body}`
+}
+
+function findFrontmatterBlock(content: string): FrontmatterBlock | null {
+	let opening = content.match(/^---[ \t]*(\r?\n)/)
+	if (!opening) return null
+
+	let closingPattern = /^---[ \t]*(\r?\n|$)/gm
+	closingPattern.lastIndex = opening[0].length
+	let closing = closingPattern.exec(content)
+	if (!closing) return null
+
+	let yamlStart = opening[0].length
+	let yaml = content.slice(yamlStart, closing.index).replace(/\r?\n$/, "")
+	return {
+		yaml,
+		yamlStart,
+		end: closing.index + closing[0].length,
+		newline: opening[1],
+		closingNewline: closing[1],
+	}
+}
+
+function getFrontmatterRootIndent(yaml: string): string | null {
+	let rootIndent: string | null = null
+	for (let line of yaml.split(/\r?\n/)) {
+		let colonIndex = line.indexOf(":")
+		if (colonIndex < 0) continue
+		let rawKey = line.slice(0, colonIndex)
+		if (!rawKey.trim()) continue
+		let indentation = rawKey.slice(0, rawKey.length - rawKey.trimStart().length)
+		if (rootIndent === null || indentation.length < rootIndent.length) {
+			rootIndent = indentation
+		}
+	}
+	return rootIndent
 }
