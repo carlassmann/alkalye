@@ -39,6 +39,7 @@ describe("MCP OAuth", () => {
 			vi.fn().mockResolvedValue(
 				Response.json({
 					client_id: "https://chatgpt.example/client.json",
+					client_name: "ChatGPT",
 					redirect_uris: ["https://chatgpt.example/callback"],
 				}),
 			),
@@ -109,6 +110,8 @@ describe("MCP OAuth", () => {
 			"fetch",
 			vi.fn().mockResolvedValue(
 				Response.json({
+					client_id: "https://chatgpt.example/client.json",
+					client_name: "ChatGPT",
 					redirect_uris: ["https://chatgpt.example/callback"],
 				}),
 			),
@@ -159,6 +162,8 @@ describe("MCP OAuth", () => {
 			"fetch",
 			vi.fn().mockResolvedValue(
 				Response.json({
+					client_id: "https://chatgpt.example/client.json",
+					client_name: "ChatGPT",
 					redirect_uris: ["https://chatgpt.example/callback"],
 				}),
 			),
@@ -170,6 +175,28 @@ describe("MCP OAuth", () => {
 				["chatgpt.example"],
 			),
 		).rejects.toThrow("invalid_redirect_uri")
+		vi.unstubAllGlobals()
+	})
+
+	test("requires an exact non-redirected client metadata document", async () => {
+		let mockedFetch = vi.fn().mockResolvedValue(
+			Response.json({
+				client_name: "ChatGPT",
+				redirect_uris: ["https://chatgpt.example/callback"],
+			}),
+		)
+		vi.stubGlobal("fetch", mockedFetch)
+		await expect(
+			validateClientRedirect(
+				"https://chatgpt.example/client.json",
+				"https://chatgpt.example/callback",
+				["chatgpt.example"],
+			),
+		).rejects.toThrow()
+		expect(mockedFetch).toHaveBeenCalledWith(
+			new URL("https://chatgpt.example/client.json"),
+			expect.objectContaining({ redirect: "error" }),
+		)
 		vi.unstubAllGlobals()
 	})
 })

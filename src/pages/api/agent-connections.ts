@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto"
 import type { APIRoute } from "astro"
 import { z } from "zod"
 import { getMcpConfig } from "@/mcp/config"
@@ -16,6 +17,10 @@ let POST: APIRoute = async ({ request }) => {
 		let body: unknown = await request.json()
 		let { provider } = requestSchema.parse(body)
 		let config = getMcpConfig()
+		let requester = provisioningKey(request)
+		if (!(await config.replayStore.consume(requester, 60_000))) {
+			return json({ error: "Please wait before creating another agent" }, 429)
+		}
 		let agent = await createAgentAccount(
 			config.syncServer,
 			provider === "openai" ? "My ChatGPT" : "My Claude",
@@ -35,6 +40,16 @@ let POST: APIRoute = async ({ request }) => {
 		console.error("[agent-connections] provisioning failed", error)
 		return json({ error: "Could not create agent connection" }, 400)
 	}
+}
+
+function provisioningKey(request: Request) {
+	let forwardedFor =
+		request.headers.get("x-vercel-forwarded-for") ??
+		request.headers.get("x-forwarded-for") ??
+		"unknown"
+	let address = forwardedFor.split(",")[0]?.trim() ?? "unknown"
+	let digest = createHash("sha256").update(address).digest("base64url")
+	return `provision:${digest}`
 }
 
 function json(body: unknown, status: number = 200) {

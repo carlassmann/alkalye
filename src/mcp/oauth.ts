@@ -169,7 +169,14 @@ async function validateClientRedirect(
 ) {
 	let clientUrl = new URL(clientId)
 	let redirectUrl = new URL(redirectUri)
-	if (clientUrl.protocol !== "https:" || redirectUrl.protocol !== "https:") {
+	if (
+		clientUrl.protocol !== "https:" ||
+		clientUrl.pathname === "/" ||
+		clientUrl.username ||
+		clientUrl.password ||
+		clientUrl.hash ||
+		redirectUrl.protocol !== "https:"
+	) {
 		throw new Error("invalid_client")
 	}
 	let clientHost = clientUrl.hostname.toLowerCase()
@@ -182,16 +189,18 @@ async function validateClientRedirect(
 	}
 	let response = await fetch(clientUrl, {
 		headers: { accept: "application/json" },
+		redirect: "error",
 		signal: AbortSignal.timeout(5_000),
 	})
 	if (!response.ok) throw new Error("invalid_client")
 	let metadataSchema = z.object({
-		client_id: z.string().optional(),
+		client_id: z.url(),
+		client_name: z.string().min(1),
 		redirect_uris: z.array(z.url()),
 	})
 	let body: unknown = await response.json()
 	let metadata = metadataSchema.parse(body)
-	if (metadata.client_id && metadata.client_id !== clientId) {
+	if (metadata.client_id !== clientId) {
 		throw new Error("invalid_client")
 	}
 	if (!metadata.redirect_uris.includes(redirectUri)) {

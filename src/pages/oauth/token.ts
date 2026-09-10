@@ -27,9 +27,23 @@ let tokenRequestSchema = z.discriminatedUnion("grant_type", [
 ])
 
 let POST: APIRoute = async ({ request }) => {
+	let form: FormData
 	try {
-		let form = await request.formData()
-		let input = tokenRequestSchema.parse(Object.fromEntries(form))
+		form = await request.formData()
+	} catch {
+		return oauthError("invalid_request")
+	}
+	let raw = Object.fromEntries(form)
+	if (
+		raw.grant_type !== "authorization_code" &&
+		raw.grant_type !== "refresh_token"
+	) {
+		return oauthError("unsupported_grant_type")
+	}
+	let parsed = tokenRequestSchema.safeParse(raw)
+	if (!parsed.success) return oauthError("invalid_request")
+	let input = parsed.data
+	try {
 		let config = getMcpConfig()
 		let resource = new URL("/mcp", config.baseUrl).toString()
 		if (input.resource !== resource) return oauthError("invalid_target")

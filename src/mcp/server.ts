@@ -446,8 +446,15 @@ function createAlkalyeServer(credential: string | undefined) {
 		},
 		async ({ spaceId, name }) =>
 			withAgent(credential, async (account, sync) => {
+				let loaded = await account.$jazz.ensureLoaded({
+					resolve: { root: { spaces: true } },
+				})
+				let reference = (loaded.root.spaces ?? []).find(
+					space => space?.$jazz.id === spaceId,
+				)
+				if (!reference) throw new Error("Space not found")
 				let space = await Space.load(spaceId, { loadAs: account })
-				if (!space.$isLoaded) throw new Error("Space not found")
+				if (!space.$isLoaded) throw new Error("Space is unavailable")
 				space.$jazz.set("name", name)
 				space.$jazz.set("updatedAt", new Date())
 				await sync()
