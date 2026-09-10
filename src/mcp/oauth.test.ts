@@ -5,14 +5,25 @@ import { createInMemoryReplayStore } from "./replay-store"
 import {
 	authorizationRequestSchema,
 	approveAuthorization,
+	credentialRevocationKey,
 	exchangeAuthorizationCode,
 	exchangeRefreshToken,
+	pkceVerifierSchema,
 	validateClientRedirect,
 } from "./oauth"
 
 let tokens = createTokenCodec(Buffer.alloc(32, 3).toString("base64url"))
 
 describe("MCP OAuth", () => {
+	test("requires an RFC 7636 PKCE verifier", () => {
+		expect(pkceVerifierSchema.safeParse("x").success).toBe(false)
+		expect(pkceVerifierSchema.safeParse("a".repeat(43)).success).toBe(true)
+		expect(pkceVerifierSchema.safeParse("a".repeat(129)).success).toBe(false)
+		expect(pkceVerifierSchema.safeParse("a".repeat(42) + "!").success).toBe(
+			false,
+		)
+	})
+
 	test("rejects scopes outside the Alkalye grant", () => {
 		expect(() =>
 			authorizationRequestSchema.parse({
@@ -155,6 +166,29 @@ describe("MCP OAuth", () => {
 			"invalid_grant",
 		)
 		vi.unstubAllGlobals()
+	})
+
+	test("rejects refresh tokens after their connection is revoked", async () => {
+		let replayStore = createInMemoryReplayStore()
+		let credential = "wrapped-agent"
+		let refreshToken = await tokens.seal("refresh_token", {
+			jti: crypto.randomUUID(),
+			clientId: "https://chatgpt.example/client.json",
+			resource: "https://www.alkalye.com/mcp",
+			scope: "alkalye",
+			credential,
+		})
+		await replayStore.revoke(credentialRevocationKey(credential), 60_000)
+
+		await expect(
+			exchangeRefreshToken({
+				tokens,
+				replayStore,
+				refreshToken,
+				clientId: "https://chatgpt.example/client.json",
+				resource: "https://www.alkalye.com/mcp",
+			}),
+		).rejects.toThrow("invalid_grant")
 	})
 
 	test("rejects unregistered redirect URIs", async () => {

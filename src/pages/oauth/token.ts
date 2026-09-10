@@ -1,7 +1,11 @@
 import type { APIRoute } from "astro"
 import { z } from "zod"
 import { getMcpConfig } from "@/mcp/config"
-import { exchangeAuthorizationCode, exchangeRefreshToken } from "@/mcp/oauth"
+import {
+	exchangeAuthorizationCode,
+	exchangeRefreshToken,
+	pkceVerifierSchema,
+} from "@/mcp/oauth"
 
 export { POST, OPTIONS }
 
@@ -10,7 +14,7 @@ export const prerender = false
 let authorizationCodeRequestSchema = z.object({
 	grant_type: z.literal("authorization_code"),
 	code: z.string(),
-	code_verifier: z.string(),
+	code_verifier: pkceVerifierSchema,
 	client_id: z.string(),
 	redirect_uri: z.string(),
 	resource: z.string(),

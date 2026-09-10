@@ -48,6 +48,7 @@ function AgentConnectionsSection({
 	let connection = account?.root.agentConnections?.find(
 		item => item?.$isLoaded && item.provider === "openai",
 	)
+	let authorization = oauth ? decodeAuthorization(oauth) : undefined
 
 	async function connect() {
 		if (!account) return
@@ -61,7 +62,9 @@ function AgentConnectionsSection({
 			})
 			let result: unknown = await response.json()
 			if (!response.ok || !isProvisionedConnection(result)) {
-				throw new Error("Could not create the ChatGPT connection")
+				throw new Error(
+					readApiError(result, "Could not create the ChatGPT connection"),
+				)
 			}
 			let list = account.root.agentConnections
 			if (!list) {
@@ -87,23 +90,23 @@ function AgentConnectionsSection({
 	}
 
 	async function authorize() {
-		if (!connection?.$isLoaded || !oauth) return
+		if (!connection?.$isLoaded || !authorization) return
 		setBusy("authorize")
 		setError(undefined)
 		try {
-			let authorization = decodeAuthorization(oauth)
 			let response = await fetch("/api/oauth-approve", {
 				method: "POST",
 				headers: { "content-type": "application/json" },
 				body: JSON.stringify({
 					credential: connection.credential,
-					authorization,
+					authorization: authorization.authorization,
 				}),
 			})
 			let result: unknown = await response.json()
 			if (!response.ok || !hasRedirect(result)) {
 				throw new Error("Could not authorize ChatGPT")
 			}
+			window.history.replaceState(null, "", "/app/settings")
 			window.location.assign(result.redirectTo)
 		} catch (cause) {
 			setError(cause instanceof Error ? cause.message : "Authorization failed")
@@ -117,17 +120,44 @@ function AgentConnectionsSection({
 		setError(undefined)
 		try {
 			let agent = await UserAccount.load(connection.accountId)
-			if (agent.$isLoaded) {
-				account.root.documents.forEach(document => {
-					if (document?.$isLoaded) document.$jazz.owner.removeMember(agent)
-				})
-				account.root.inactiveDocuments?.forEach(document => {
-					if (document?.$isLoaded) document.$jazz.owner.removeMember(agent)
-				})
-				account.root.spaces?.forEach(space => {
-					if (space?.$isLoaded) space.$jazz.owner.removeMember(agent)
-				})
+			if (!agent.$isLoaded) throw new Error("Agent account is unavailable")
+			let allResources = [
+				...account.root.documents.values(),
+				...(account.root.inactiveDocuments?.values() ?? []),
+				...(account.root.spaces?.values() ?? []),
+			]
+			if (allResources.some(resource => !resource?.$isLoaded)) {
+				throw new Error("Some shared items are still loading. Try again shortly.")
 			}
+			let resources = [
+				...account.root.documents.flatMap(document =>
+					document?.$isLoaded
+						? [{ kind: "document" as const, value: document }]
+						: [],
+				),
+				...(account.root.inactiveDocuments ?? []).flatMap(document =>
+					document?.$isLoaded
+						? [{ kind: "document" as const, value: document }]
+						: [],
+				),
+				...(account.root.spaces ?? []).flatMap(space =>
+					space?.$isLoaded ? [{ kind: "space" as const, value: space }] : [],
+				),
+			]
+			for (let resource of resources) {
+				await removeAgentGrant(
+					connection.credential,
+					resource.kind,
+					resource.value.$jazz.id,
+				)
+				resource.value.$jazz.owner.removeMember(agent)
+			}
+			let revokeResponse = await fetch("/api/agent-connections", {
+				method: "DELETE",
+				headers: { "content-type": "application/json" },
+				body: JSON.stringify({ credential: connection.credential }),
+			})
+			if (!revokeResponse.ok) throw new Error("Could not revoke the connection")
 			let index = account.root.agentConnections?.findIndex(
 				item => item?.$jazz.id === connection.$jazz.id,
 			)
@@ -179,19 +209,32 @@ function AgentConnectionsSection({
 								</Button>
 							)}
 						</div>
-						{oauth && (
-							<div className="border-brand/30 bg-brand/5 mt-4 flex items-center justify-between gap-3 border p-3">
-								<p className="text-xs">
-									ChatGPT is waiting for this Alkalye connection.
+						{authorization && (
+							<div className="border-brand/30 bg-brand/5 mt-4 border p-3">
+								<p className="text-sm font-medium">
+									Authorize {authorization.client.name}
 								</p>
-								<Button
-									variant="brand"
-									size="sm"
-									onClick={authorize}
-									disabled={!connection?.$isLoaded || Boolean(busy)}
-								>
-									Authorize
-								</Button>
+								<p className="text-muted-foreground mt-1 text-xs/relaxed">
+									This client can read or change only the personal documents and spaces granted below. OAuth scope: alkalye. Return destination: {authorization.client.redirectHost}.
+								</p>
+								<div className="mt-3 flex justify-end gap-2">
+									<Button
+										variant="ghost"
+										size="sm"
+										onClick={() => window.location.assign("/app/settings")}
+										disabled={Boolean(busy)}
+									>
+										Deny
+									</Button>
+									<Button
+										variant="brand"
+										size="sm"
+										onClick={authorize}
+										disabled={!connection?.$isLoaded || Boolean(busy)}
+									>
+										Authorize
+									</Button>
+								</div>
 							</div>
 						)}
 					</div>
@@ -281,8 +324,9 @@ function PersonalDocumentsAccessRow({
 		setBusy(id)
 		setError(undefined)
 		try {
+			if (roleNext) connection.$jazz.set("personalDocumentsRole", roleNext)
 			await reconcilePersonalDocumentAccess(account, connection, roleNext)
-			connection.$jazz.set("personalDocumentsRole", roleNext)
+			if (!roleNext) connection.$jazz.set("personalDocumentsRole", undefined)
 		} catch (cause) {
 			setError(
 				cause instanceof Error
@@ -359,11 +403,19 @@ function ResourceAccessRow({
 	async function updateAccess(enabledNext: boolean, roleNext: Role = role) {
 		setBusy(id)
 		setError(undefined)
+		let restoreMembership: (() => void) | undefined
 		try {
 			let agent = await UserAccount.load(connection.accountId)
 			if (!agent.$isLoaded) throw new Error("Agent account is unavailable")
 			if (enabledNext) owner.addMember(agent, roleNext)
 			else owner.removeMember(agent)
+			restoreMembership = () => {
+				if (currentRole === "reader" || currentRole === "writer") {
+					owner.addMember(agent, currentRole)
+				} else {
+					owner.removeMember(agent)
+				}
+			}
 			let response = await fetch("/api/agent-grants", {
 				method: "POST",
 				headers: { "content-type": "application/json" },
@@ -373,11 +425,9 @@ function ResourceAccessRow({
 					resource: { kind: resource.kind, id },
 				}),
 			})
-			if (!response.ok) {
-				if (enabledNext) owner.removeMember(agent)
-				throw new Error("Could not update agent access")
-			}
+			if (!response.ok) throw new Error("Could not update agent access")
 		} catch (cause) {
+			restoreMembership?.()
 			setError(cause instanceof Error ? cause.message : "Access update failed")
 		} finally {
 			setBusy(undefined)
@@ -419,10 +469,31 @@ function ResourceAccessRow({
 	)
 }
 
-function decodeAuthorization(value: string): unknown {
-	let normalized = value.replaceAll("-", "+").replaceAll("_", "/")
-	let padding = "=".repeat((4 - (normalized.length % 4)) % 4)
-	return JSON.parse(atob(normalized + padding))
+function decodeAuthorization(value: string):
+	| {
+			authorization: unknown
+			client: { name: string; redirectHost: string }
+	  }
+	| undefined {
+	try {
+		let normalized = value.replaceAll("-", "+").replaceAll("_", "/")
+		let padding = "=".repeat((4 - (normalized.length % 4)) % 4)
+		let decoded: unknown = JSON.parse(atob(normalized + padding))
+		if (!decoded || typeof decoded !== "object") return undefined
+		if (!("authorization" in decoded) || !("client" in decoded)) return undefined
+		let client = decoded.client
+		if (!client || typeof client !== "object") return undefined
+		if (!("name" in client) || typeof client.name !== "string") return undefined
+		if (!("redirectHost" in client) || typeof client.redirectHost !== "string") {
+			return undefined
+		}
+		return {
+			authorization: decoded.authorization,
+			client: { name: client.name, redirectHost: client.redirectHost },
+		}
+	} catch {
+		return undefined
+	}
 }
 
 function isProvisionedConnection(value: unknown): value is {
@@ -451,4 +522,33 @@ function hasRedirect(value: unknown): value is { redirectTo: string } {
 			"redirectTo" in value &&
 			typeof value.redirectTo === "string",
 	)
+}
+
+async function removeAgentGrant(
+	credential: string,
+	kind: "document" | "space",
+	id: string,
+) {
+	let response = await fetch("/api/agent-grants", {
+		method: "POST",
+		headers: { "content-type": "application/json" },
+		body: JSON.stringify({
+			credential,
+			action: "remove",
+			resource: { kind, id },
+		}),
+	})
+	if (!response.ok) throw new Error("Could not remove all agent access")
+}
+
+function readApiError(value: unknown, fallback: string) {
+	if (
+		value &&
+		typeof value === "object" &&
+		"error" in value &&
+		typeof value.error === "string"
+	) {
+		return value.error
+	}
+	return fallback
 }

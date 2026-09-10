@@ -50,4 +50,34 @@ describe("personal document agent access", () => {
 		expect(sendGrant).toHaveBeenCalled()
 		vi.unstubAllGlobals()
 	})
+
+	test("restores document access when the grant service rejects an update", async () => {
+		let account = await createJazzTestAccount({
+			isCurrentActiveAccount: true,
+			AccountSchema: UserAccount,
+		})
+		let agent = await createJazzTestAccount({ AccountSchema: UserAccount })
+		setActiveAccount(account)
+		let connection = AgentConnection.create(
+			{
+				provider: "openai",
+				accountId: agent.$jazz.id,
+				credential: "wrapped-agent",
+				createdAt: new Date(),
+			},
+			account.root.$jazz.owner,
+		)
+		let document = await createPersonalDocument(account, "Protected")
+		document.$jazz.owner.addMember(agent, "reader")
+		vi.stubGlobal(
+			"fetch",
+			vi.fn().mockResolvedValue(Response.json({}, { status: 500 })),
+		)
+
+		await expect(
+			reconcilePersonalDocumentAccess(account, connection, "writer"),
+		).rejects.toThrow()
+		expect(document.$jazz.owner.getRoleOf(agent.$jazz.id)).toBe("reader")
+		vi.unstubAllGlobals()
+	})
 })
