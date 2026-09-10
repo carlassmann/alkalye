@@ -141,18 +141,23 @@ function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 	let me = subscribedMe.$isLoaded ? subscribedMe : loaderData.me
 	let isAuthenticated = useIsAuthenticated()
 	let pageRef = useRef<HTMLDivElement>(null)
+	let [announcedCategory, setAnnouncedCategory] = useState("")
 	let [category, setCategory] = useState<SettingsCategory>(
 		search.oauth ? "connections" : "general",
 	)
 
 	function handleCategoryChange(nextCategory: SettingsCategory) {
 		setCategory(nextCategory)
+		setAnnouncedCategory(categoryLabel(nextCategory, t))
 		pageRef.current?.scrollTo({ top: 0 })
 	}
 
 	return (
 		<>
 			<title>{t("settings.title")}</title>
+			<p className="sr-only" role="status" aria-live="polite">
+				{announcedCategory}
+			</p>
 			<div
 				ref={pageRef}
 				className="bg-background fixed inset-0 overflow-auto"
@@ -238,6 +243,16 @@ function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 			</div>
 		</>
 	)
+}
+
+function categoryLabel(
+	category: SettingsCategory,
+	t: ReturnType<typeof useIntl>,
+) {
+	if (category === "general") return t("settings.category.general")
+	if (category === "editor") return t("settings.category.editor")
+	if (category === "connections") return t("settings.category.connections")
+	return t("settings.category.app")
 }
 
 function SyntaxThemeSetting({

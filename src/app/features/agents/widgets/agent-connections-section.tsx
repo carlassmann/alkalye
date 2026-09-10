@@ -45,6 +45,7 @@ function AgentConnectionsSection({
 }: AgentConnectionsSectionProps) {
 	let [busy, setBusy] = useState<string>()
 	let [error, setError] = useState<string>()
+	let [status, setStatus] = useState<string>()
 	let [loadedAuthorization, setLoadedAuthorization] =
 		useState<LoadedAuthorization>()
 	let connection = account?.root.agentConnections?.find(
@@ -83,6 +84,7 @@ function AgentConnectionsSection({
 		if (!account) return
 		setBusy("connect")
 		setError(undefined)
+		setStatus(undefined)
 		try {
 			let response = await fetch("/api/agent-connections", {
 				method: "POST",
@@ -111,6 +113,7 @@ function AgentConnectionsSection({
 					account.root.$jazz.owner,
 				),
 			)
+			setStatus("ChatGPT connected")
 		} catch (cause) {
 			setError(cause instanceof Error ? cause.message : "Connection failed")
 		} finally {
@@ -170,6 +173,7 @@ function AgentConnectionsSection({
 		if (!account || !connection?.$isLoaded) return
 		setBusy("disconnect")
 		setError(undefined)
+		setStatus(undefined)
 		try {
 			let revokeResponse = await fetch("/api/agent-connections", {
 				method: "DELETE",
@@ -309,6 +313,9 @@ function AgentConnectionsSection({
 					{error}
 				</p>
 			)}
+			<p className="sr-only" role="status" aria-live="polite">
+				{status}
+			</p>
 		</section>
 	)
 }
