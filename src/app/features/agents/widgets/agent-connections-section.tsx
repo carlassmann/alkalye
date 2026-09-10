@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Bot, Loader2, ShieldCheck, Unplug } from "lucide-react"
 import { co } from "jazz-tools"
 import { Button } from "@/app/components/ui/button"
@@ -45,10 +45,39 @@ function AgentConnectionsSection({
 }: AgentConnectionsSectionProps) {
 	let [busy, setBusy] = useState<string>()
 	let [error, setError] = useState<string>()
+	let [loadedAuthorization, setLoadedAuthorization] =
+		useState<LoadedAuthorization>()
 	let connection = account?.root.agentConnections?.find(
 		item => item?.$isLoaded && item.provider === "openai",
 	)
-	let authorization = oauth ? decodeAuthorization(oauth) : undefined
+	let authorization =
+		loadedAuthorization && loadedAuthorization.token === oauth
+			? loadedAuthorization.authorization
+			: undefined
+
+	useEffect(() => {
+		if (!oauth) {
+			setLoadedAuthorization(undefined)
+			return
+		}
+		setLoadedAuthorization(undefined)
+		let controller = new AbortController()
+		fetch(`/api/oauth-consent?token=${encodeURIComponent(oauth)}`, {
+			signal: controller.signal,
+		})
+			.then(response => response.json())
+			.then((value: unknown) => {
+				if (isAuthorizationConsent(value)) {
+					setLoadedAuthorization({ token: oauth, authorization: value })
+				}
+				else setError("This authorization request is invalid or expired")
+			})
+			.catch(cause => {
+				if (cause instanceof Error && cause.name === "AbortError") return
+				setError("Could not load the authorization request")
+			})
+		return () => controller.abort()
+	}, [oauth])
 
 	async function connect() {
 		if (!account) return
@@ -90,7 +119,7 @@ function AgentConnectionsSection({
 	}
 
 	async function authorize() {
-		if (!connection?.$isLoaded || !authorization) return
+		if (!connection?.$isLoaded || !authorization || !oauth) return
 		setBusy("authorize")
 		setError(undefined)
 		try {
@@ -98,8 +127,9 @@ function AgentConnectionsSection({
 				method: "POST",
 				headers: { "content-type": "application/json" },
 				body: JSON.stringify({
+					decision: "approve",
 					credential: connection.credential,
-					authorization: authorization.authorization,
+					consent: oauth,
 				}),
 			})
 			let result: unknown = await response.json()
@@ -114,11 +144,39 @@ function AgentConnectionsSection({
 		}
 	}
 
+	async function deny() {
+		if (!authorization || !oauth) return
+		setBusy("authorize")
+		setError(undefined)
+		try {
+			let response = await fetch("/api/oauth-approve", {
+				method: "POST",
+				headers: { "content-type": "application/json" },
+				body: JSON.stringify({ decision: "deny", consent: oauth }),
+			})
+			let result: unknown = await response.json()
+			if (!response.ok || !hasRedirect(result)) {
+				throw new Error("Could not deny authorization")
+			}
+			window.history.replaceState(null, "", "/app/settings")
+			window.location.assign(result.redirectTo)
+		} catch (cause) {
+			setError(cause instanceof Error ? cause.message : "Authorization failed")
+			setBusy(undefined)
+		}
+	}
+
 	async function disconnect() {
 		if (!account || !connection?.$isLoaded) return
 		setBusy("disconnect")
 		setError(undefined)
 		try {
+			let revokeResponse = await fetch("/api/agent-connections", {
+				method: "DELETE",
+				headers: { "content-type": "application/json" },
+				body: JSON.stringify({ credential: connection.credential }),
+			})
+			if (!revokeResponse.ok) throw new Error("Could not revoke the connection")
 			let agent = await UserAccount.load(connection.accountId)
 			if (!agent.$isLoaded) throw new Error("Agent account is unavailable")
 			let allResources = [
@@ -152,12 +210,6 @@ function AgentConnectionsSection({
 				)
 				resource.value.$jazz.owner.removeMember(agent)
 			}
-			let revokeResponse = await fetch("/api/agent-connections", {
-				method: "DELETE",
-				headers: { "content-type": "application/json" },
-				body: JSON.stringify({ credential: connection.credential }),
-			})
-			if (!revokeResponse.ok) throw new Error("Could not revoke the connection")
 			let index = account.root.agentConnections?.findIndex(
 				item => item?.$jazz.id === connection.$jazz.id,
 			)
@@ -221,7 +273,7 @@ function AgentConnectionsSection({
 									<Button
 										variant="ghost"
 										size="sm"
-										onClick={() => window.location.assign("/app/settings")}
+									onClick={deny}
 										disabled={Boolean(busy)}
 									>
 										Deny
@@ -469,31 +521,27 @@ function ResourceAccessRow({
 	)
 }
 
-function decodeAuthorization(value: string):
-	| {
-			authorization: unknown
-			client: { name: string; redirectHost: string }
-	  }
-	| undefined {
-	try {
-		let normalized = value.replaceAll("-", "+").replaceAll("_", "/")
-		let padding = "=".repeat((4 - (normalized.length % 4)) % 4)
-		let decoded: unknown = JSON.parse(atob(normalized + padding))
-		if (!decoded || typeof decoded !== "object") return undefined
-		if (!("authorization" in decoded) || !("client" in decoded)) return undefined
-		let client = decoded.client
-		if (!client || typeof client !== "object") return undefined
-		if (!("name" in client) || typeof client.name !== "string") return undefined
-		if (!("redirectHost" in client) || typeof client.redirectHost !== "string") {
-			return undefined
-		}
-		return {
-			authorization: decoded.authorization,
-			client: { name: client.name, redirectHost: client.redirectHost },
-		}
-	} catch {
-		return undefined
-	}
+interface AuthorizationConsent {
+	authorization: unknown
+	client: { name: string; redirectHost: string }
+}
+
+interface LoadedAuthorization {
+	token: string
+	authorization: AuthorizationConsent
+}
+
+function isAuthorizationConsent(value: unknown): value is AuthorizationConsent {
+	if (!value || typeof value !== "object") return false
+	if (!("authorization" in value) || !("client" in value)) return false
+	let client = value.client
+	if (!client || typeof client !== "object") return false
+	return (
+		"name" in client &&
+		typeof client.name === "string" &&
+		"redirectHost" in client &&
+		typeof client.redirectHost === "string"
+	)
 }
 
 function isProvisionedConnection(value: unknown): value is {

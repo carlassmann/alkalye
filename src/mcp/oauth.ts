@@ -6,6 +6,7 @@ import type { TokenCodec } from "./token"
 
 export {
 	authorizationRequestSchema,
+	consentRequestSchema,
 	pkceVerifierSchema,
 	approveAuthorization,
 	credentialRevocationKey,
@@ -27,6 +28,14 @@ let authorizationRequestSchema = z.object({
 })
 
 let pkceVerifierSchema = z.string().regex(/^[A-Za-z0-9._~-]{43,128}$/)
+
+let consentRequestSchema = z.object({
+	authorization: authorizationRequestSchema,
+	client: z.object({
+		name: z.string().min(1),
+		redirectHost: z.string().min(1),
+	}),
+})
 
 let authorizationCodeSchema = z.object({
 	jti: z.string(),

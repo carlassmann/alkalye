@@ -1,4 +1,3 @@
-import { Buffer } from "node:buffer"
 import type { APIRoute } from "astro"
 import { authorizationRequestSchema, validateClientRedirect } from "@/mcp/oauth"
 import { getMcpConfig } from "@/mcp/config"
@@ -19,15 +18,17 @@ let GET: APIRoute = async ({ request }) => {
 			parsed.redirect_uri,
 			config.allowedClientHosts,
 		)
-		let oauth = Buffer.from(
-			JSON.stringify({
+		let oauth = await config.tokens.seal(
+			"consent",
+			{
 				authorization: parsed,
 				client: {
 					name: client.client_name,
 					redirectHost: new URL(parsed.redirect_uri).host,
 				},
-			}),
-		).toString("base64url")
+			},
+			Date.now() + 10 * 60_000,
+		)
 		return Response.redirect(
 			new URL(`/app/settings?oauth=${oauth}`, config.baseUrl),
 			302,
