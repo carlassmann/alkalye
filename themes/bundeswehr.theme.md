@@ -17,6 +17,7 @@ Import this complete Markdown file. All fonts and images are embedded; nothing n
 
 ```css theme
 :scope {
+	--bw-ribbon-height: 21px;
 	--bw-polygon: url("asset:polygon-ribbon.svg");
 }
 :scope[data-appearance="light"] {
@@ -104,7 +105,7 @@ Import this complete Markdown file. All fonts and images are embedded; nothing n
 .bw-ribbon {
 	position: absolute;
 	inset: 0 0 auto;
-	height: 7px;
+	height: var(--bw-ribbon-height);
 	background: #334811 var(--bw-polygon) center / 720px auto repeat-x;
 	pointer-events: none;
 }
@@ -117,7 +118,7 @@ Import this complete Markdown file. All fonts and images are embedded; nothing n
 	position: relative;
 }
 .document .bw-document-header {
-	padding: 1.5rem 0 1.25rem;
+	padding: calc(var(--bw-ribbon-height) + 1rem) 0 1.25rem;
 	margin-bottom: 2rem;
 	border-bottom: 1px solid var(--bw-rule);
 }
@@ -244,7 +245,7 @@ Import this complete Markdown file. All fonts and images are embedded; nothing n
 	flex: 1;
 	min-width: 0;
 	min-height: 0;
-	padding: 1rem 1rem 4rem;
+	padding: calc(var(--bw-ribbon-height) + 0.5rem) 1rem 4rem;
 }
 .theme[data-mode="slideshow"] .bw-slide-footer {
 	position: absolute;
