@@ -3,6 +3,7 @@ import { Settings } from "@/app/features/settings/lib/schema"
 import { Theme } from "@/app/features/themes/lib/schema"
 import { Document } from "@/app/features/documents/lib/schema"
 import { Space } from "@/app/features/spaces/lib/schema"
+import { AgentConnection } from "@/app/features/agents/lib/schema"
 import { runAccountMigration } from "@/schema/migrations"
 
 export {
@@ -46,6 +47,7 @@ export {
 } from "@/app/features/themes/lib/schema"
 
 export { UserProfile, UserRoot, UserAccount }
+export { AgentConnection } from "@/app/features/agents/lib/schema"
 
 let UserProfile = co.profile({
 	name: z.string(),
@@ -57,6 +59,7 @@ let UserRoot = co.map({
 	spaces: co.optional(co.list(Space)),
 	settings: co.optional(Settings),
 	themes: co.optional(co.list(Theme)),
+	agentConnections: co.optional(co.list(AgentConnection)),
 	language: z.enum(["de", "en"]).optional(),
 	migrationVersion: z.number().optional(),
 	lastOpenedDocId: z.string().optional(),

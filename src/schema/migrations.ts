@@ -12,6 +12,7 @@ import {
 	writeLastOpenedDocument,
 } from "@/app/features/documents/lib/last-opened-document"
 import { Space } from "@/app/features/spaces/lib/schema"
+import { AgentConnection } from "@/app/features/agents/lib/schema"
 import { recordStartupTrace } from "@/app/lib/reload-diagnostics"
 import { UserRoot, UserProfile, type UserAccount } from "@/schema"
 
@@ -27,6 +28,7 @@ let compactableRootResolve = {
 	spaces: true,
 	settings: true,
 	themes: true,
+	agentConnections: true,
 } as const satisfies ResolveQuery<typeof UserRoot>
 
 function setMigrationFullDownloadTimeout(ms: number) {
@@ -188,6 +190,8 @@ function compactUserRoot(
 			root.settings ??
 			Settings.create({ editor: DEFAULT_EDITOR_SETTINGS }, owner),
 		themes: root.themes ?? co.list(Theme).create([], owner),
+		agentConnections:
+			root.agentConnections ?? co.list(AgentConnection).create([], owner),
 		migrationVersion: currentRootMigrationVersion,
 	}
 	if (root.language) values.language = root.language
@@ -213,6 +217,12 @@ function addMissingRootCollections(root: co.loaded<typeof UserRoot>) {
 	}
 	if (!root.$jazz.has("themes")) {
 		root.$jazz.set("themes", co.list(Theme).create([], owner))
+	}
+	if (!root.$jazz.has("agentConnections")) {
+		root.$jazz.set(
+			"agentConnections",
+			co.list(AgentConnection).create([], owner),
+		)
 	}
 }
 

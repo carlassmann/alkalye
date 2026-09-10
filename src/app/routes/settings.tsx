@@ -5,9 +5,12 @@ import { startStartupSpan } from "@/app/lib/reload-diagnostics"
 export { Route }
 
 let Route = createFileRoute("/settings")({
-	validateSearch: (search: Record<string, unknown>) => ({
-		from: typeof search.from === "string" ? search.from : undefined,
-	}),
+	validateSearch: (search: Record<string, unknown>) => {
+		let result: { from?: string; oauth?: string } = {}
+		if (typeof search.from === "string") result.from = search.from
+		if (typeof search.oauth === "string") result.oauth = search.oauth
+		return result
+	},
 	loader: async ({ context }) => {
 		let { me } = context
 		if (!me) return { me: null }

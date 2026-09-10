@@ -5,7 +5,7 @@ import LegalDoc from "@/layouts/LegalDoc.astro"
 <LegalDoc 
 	title="Privacy Policy" 
 	description="Privacy policy and data handling practices for Alkalye."
-	subtitle="Last updated: December 2025"
+	subtitle="Last updated: September 2026"
 >
 	<h2>Data Storage</h2>
 	<p>Your documents are stored:</p>
@@ -18,13 +18,25 @@ import LegalDoc from "@/layouts/LegalDoc.astro"
 	<p>Your data is end-to-end encrypted:</p>
 	<ul>
 		<li>Encryption keys are derived from your passphrase</li>
-		<li>Your passphrase is the only key to decrypt your data</li>
-		<li>Neither we nor Jazz can access your documents</li>
+		<li>Your passphrase unlocks your personal Alkalye account</li>
+		<li>Neither Alkalye nor Jazz can decrypt documents you have not shared with another participant</li>
 		<li>When you share documents, collaborators can decrypt them using their own passphrases</li>
 	</ul>
 
+	<h2>AI agent connections</h2>
+	<p>When you connect ChatGPT or another supported AI provider:</p>
+	<ul>
+		<li>Alkalye creates a separate agent account; your personal account key and passphrase are never shared</li>
+		<li>The agent can decrypt only documents and spaces you explicitly grant to it</li>
+		<li>Content returned by an agent tool is sent to the AI provider and is then subject to that provider's terms and privacy policy</li>
+		<li>Removing a grant revokes the agent account's cryptographic access to that item</li>
+		<li>Disconnecting removes the agent from all documents and spaces visible in your account</li>
+	</ul>
+	<p>The hosted connector processes granted content in memory to answer tool calls. Its stored agent credential is encrypted with a server-held key.</p>
+	<p>Depending on the tool, shared data may include document and space names and identifiers, Markdown content, revisions, timestamps, comments, comment status, and collaborator display names. OAuth access and refresh tokens contain the encrypted agent credential and expire. The connector stores short-lived replay-prevention identifiers, not document content, for used authorization codes and refresh tokens.</p>
+
 	<h2>Analytics</h2>
-	<p>We do not track you or collect analytics data.</p>
+	<p>We use privacy-preserving, aggregate product analytics. We do not use document contents for analytics.</p>
 
 	<h2>Contact</h2>
 	<p>For privacy concerns: <a href="mailto:assmann@hey.com" class="text-brand hover:underline">assmann@hey.com</a></p>

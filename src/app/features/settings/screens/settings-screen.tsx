@@ -87,6 +87,10 @@ import {
 } from "@/app/lib/reload-diagnostics"
 import { useIntl, T } from "@/shared/intl/setup"
 import { makeProfileNameSchema } from "../lib/profile-name"
+import {
+	AgentConnectionsSection,
+	agentConnectionsQuery,
+} from "@/app/features/agents"
 
 export { SettingsScreen, settingsQuery }
 export type { LoadedAccount, SettingsLoaderData, SettingsSearch }
@@ -94,6 +98,7 @@ export type { LoadedAccount, SettingsLoaderData, SettingsSearch }
 let settingsQuery = {
 	profile: true,
 	root: {
+		...agentConnectionsQuery.root,
 		settings: true,
 		themes: {
 			$each: {
@@ -115,6 +120,7 @@ interface SettingsLoaderData {
 
 interface SettingsSearch {
 	from?: string
+	oauth?: string
 }
 
 interface SettingsScreenProps {
@@ -169,6 +175,7 @@ function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 				<div className="mx-auto max-w-2xl px-4 py-8">
 					<div className="space-y-8">
 						<ProfileSection me={me} />
+						<AgentConnectionsSection account={me} oauth={search.oauth} />
 						<SyncSection isAuthenticated={isAuthenticated} />
 						<BackupSettings />
 						<section>
