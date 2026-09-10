@@ -61,6 +61,7 @@ async function waitForEditorBoot(page: Page, args: WaitForEditorBootArgs = {}) {
 async function openSettings(page: Page, args: OpenSettingsArgs = {}) {
 	let fromPath = args.fromPath ?? "/app/settings"
 	await page.goto(fromPath)
+	await page.getByRole("button", { name: "Connections", exact: true }).click()
 	await expect(page.getByText("Cloud Sync & Backup")).toBeVisible()
 
 	return {

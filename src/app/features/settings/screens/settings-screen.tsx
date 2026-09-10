@@ -91,6 +91,11 @@ import {
 	AgentConnectionsSection,
 	agentConnectionsQuery,
 } from "@/app/features/agents"
+import {
+	SettingsCategoryNavigation,
+	SettingsCategoryPicker,
+	type SettingsCategory,
+} from "../widgets/settings-category-navigation"
 
 export { SettingsScreen, settingsQuery }
 export type { LoadedAccount, SettingsLoaderData, SettingsSearch }
@@ -135,11 +140,21 @@ function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 	let subscribedMe = useAccount(UserAccount, { resolve: settingsQuery })
 	let me = subscribedMe.$isLoaded ? subscribedMe : loaderData.me
 	let isAuthenticated = useIsAuthenticated()
+	let pageRef = useRef<HTMLDivElement>(null)
+	let [category, setCategory] = useState<SettingsCategory>(
+		search.oauth ? "connections" : "general",
+	)
+
+	function handleCategoryChange(nextCategory: SettingsCategory) {
+		setCategory(nextCategory)
+		pageRef.current?.scrollTo({ top: 0 })
+	}
 
 	return (
 		<>
 			<title>{t("settings.title")}</title>
 			<div
+				ref={pageRef}
 				className="bg-background fixed inset-0 overflow-auto"
 				style={{
 					paddingTop: "calc(48px + env(safe-area-inset-top))",
@@ -157,7 +172,7 @@ function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 						height: "calc(48px + env(safe-area-inset-top))",
 					}}
 				>
-					<div className="flex w-full max-w-2xl items-center gap-3 px-4">
+					<div className="flex w-full max-w-4xl items-center gap-3 px-4">
 						<Link to={from ?? "/"}>
 							<Button
 								variant="ghost"
@@ -172,27 +187,53 @@ function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 						</h1>
 					</div>
 				</div>
-				<div className="mx-auto max-w-2xl px-4 py-8">
-					<div className="space-y-8">
-						<ProfileSection me={me} />
-						<AgentConnectionsSection account={me} oauth={search.oauth} />
-						<SyncSection isAuthenticated={isAuthenticated} />
-						<BackupSettings />
-						<section>
-							<h2 className="text-muted-foreground mb-3 text-sm font-medium">
-								<T k="settings.appearance" />
-							</h2>
-							<ThemeToggle theme={theme} setTheme={setTheme} showLabel />
-							<SyntaxThemeSetting settings={me?.root?.settings} />
-						</section>
-						<LanguageSection me={me} />
-						<ThemesSection me={me} />
-						<EditorSection settings={me?.root?.settings ?? null} />
-						<InstallationSection />
-						<AppSection />
-						<ReloadDiagnosticsSection />
+				<div className="mx-auto max-w-4xl px-4 py-6 sm:py-8">
+					<SettingsCategoryPicker
+						category={category}
+						onCategoryChange={handleCategoryChange}
+					/>
+					<div className="mt-6 grid items-start gap-8 md:mt-0 md:grid-cols-[10rem_minmax(0,1fr)]">
+						<SettingsCategoryNavigation
+							category={category}
+							onCategoryChange={handleCategoryChange}
+						/>
+						<div id={`settings-${category}`} className="min-w-0 space-y-8">
+							{category === "general" && (
+								<>
+									<ProfileSection me={me} />
+									<section>
+										<h2 className="text-muted-foreground mb-3 text-sm font-medium">
+											<T k="settings.appearance" />
+										</h2>
+										<ThemeToggle theme={theme} setTheme={setTheme} showLabel />
+										<SyntaxThemeSetting settings={me?.root?.settings} />
+									</section>
+									<LanguageSection me={me} />
+								</>
+							)}
+							{category === "editor" && (
+								<>
+									<EditorSection settings={me?.root?.settings ?? null} />
+									<ThemesSection me={me} />
+								</>
+							)}
+							{category === "connections" && (
+								<>
+									<AgentConnectionsSection account={me} oauth={search.oauth} />
+									<SyncSection isAuthenticated={isAuthenticated} />
+								</>
+							)}
+							{category === "app" && (
+								<>
+									<BackupSettings />
+									<InstallationSection />
+									<AppSection />
+									<ReloadDiagnosticsSection />
+								</>
+							)}
+							<Footer />
+						</div>
 					</div>
-					<Footer />
 				</div>
 			</div>
 		</>
