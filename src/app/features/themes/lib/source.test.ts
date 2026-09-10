@@ -288,7 +288,7 @@ describe("theme source sync", () => {
 		expect(reloadedTheme.$isLoaded).toBe(true)
 		if (!reloadedTheme.$isLoaded) throw new Error("Default theme did not load")
 		expect(reloadedTheme.css.toString()).toBe("h1 { color: blue; }")
-	}, 15_000)
+	})
 })
 
 describe("getThemeSourceId", () => {

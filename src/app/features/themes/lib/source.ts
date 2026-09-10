@@ -441,7 +441,7 @@ async function syncThemeFromSource(
 		let currentCss = theme.css.toString()
 		let changed = currentCss !== css
 		if (changed) {
-			if (getDeletedCssLength(currentCss, css) > 2_000) {
+			if (getChangedCssLength(currentCss, css) > 2_000) {
 				theme.$jazz.set("css", co.plainText().create(css, theme.$jazz.owner))
 			} else {
 				theme.css.$jazz.applyDiff(css)
@@ -512,7 +512,7 @@ async function syncThemeFromSource(
 	}
 }
 
-function getDeletedCssLength(currentCss: string, css: string) {
+function getChangedCssLength(currentCss: string, css: string) {
 	let prefixLength = 0
 	while (
 		prefixLength < currentCss.length &&
@@ -531,7 +531,7 @@ function getDeletedCssLength(currentCss: string, css: string) {
 		suffixLength++
 	}
 
-	return currentCss.length - prefixLength - suffixLength
+	return Math.max(currentCss.length, css.length) - prefixLength - suffixLength
 }
 
 function clearLatestSourceContent(documentId: string, content: string) {
