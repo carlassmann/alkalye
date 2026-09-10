@@ -180,6 +180,9 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 					defaultPreviewTheme: meWithThemes.$isLoaded
 						? (meWithThemes.root?.settings?.defaultPreviewTheme ?? null)
 						: null,
+					defaultSyntaxTheme: meWithThemes.$isLoaded
+						? (meWithThemes.root?.settings?.syntaxTheme ?? null)
+						: null,
 				})
 				return
 			}

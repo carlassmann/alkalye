@@ -294,9 +294,10 @@ describe("theme source sync", () => {
 describe("getThemeSourceId", () => {
 	it("keeps pasted sources bound to the destination theme without discarding metadata", () => {
 		let source =
-			"---\ntitle: Imported\ntheme-source: original\ntags: branding\n---\n\n```css theme\nh1 {}\n```"
+			"--- \n title: Imported\n theme-source: original\n tags: branding\n--- \n\n```css theme\nh1 {}\n```"
 		let bound = bindThemeSource(source, "destination")
 		expect(getThemeSourceId(bound)).toBe("destination")
+		expect(bound).not.toContain("theme-source: original")
 		expect(bound).toContain("title: Imported")
 		expect(bound).toContain("tags: branding")
 		expect(parseThemeSource(bound).css).toBe("h1 {}")

@@ -2,6 +2,7 @@ import { type co, FileStream, z } from "jazz-tools"
 import { Theme, ThemePreset } from "./schema"
 import { sanitizeFilename } from "@/app/features/import-export/lib/export"
 import { Document } from "@/app/features/documents/lib/schema"
+import { setFrontmatterField } from "@/app/features/editor/lib/frontmatter"
 import {
 	serializeThemeSource,
 	parseThemeSource,
@@ -146,13 +147,7 @@ async function loadEditableSource(
 }
 
 function stripThemeSourceId(source: string): string {
-	return source.replace(
-		/^(---\r?\n[\s\S]*?\r?\n---(?:\r?\n)?)/,
-		(block: string) => {
-			let withoutId = block.replace(/^theme-source\s*:.*\r?\n/gm, "")
-			return /^---\r?\n\s*---(?:\r?\n)?$/.test(withoutId) ? "" : withoutId
-		},
-	)
+	return setFrontmatterField(source, "theme-source", null)
 }
 
 async function exportTheme(theme: LoadedThemeForExport): Promise<void> {

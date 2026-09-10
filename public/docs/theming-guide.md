@@ -232,6 +232,16 @@ theme: My theme
 
 Do not confuse a document's `theme` selection with the theme source's `theme-source` link. Settings can choose separate default document and slideshow themes; explicit document selections override defaults. Existing `theme-id` values should be preserved alongside their `theme` selection. Names and IDs do not grant another account access to a theme.
 
+Syntax highlighting uses a separate curated family. Choose the global default in Settings or override one document from its editor toolbar. The override applies to document preview, slideshow, and PDF export:
+
+```yaml
+---
+syntax-theme: catppuccin
+---
+```
+
+Supported family IDs are `alkalye`, `catppuccin`, `catppuccin-frappe`, `catppuccin-macchiato`, `everforest`, `github`, `github-default`, `github-dimmed`, `github-high-contrast`, `gruvbox`, `gruvbox-hard`, `gruvbox-soft`, `kanagawa`, `kanagawa-dragon`, `material`, `material-darker`, `material-ocean`, `material-palenight`, `min`, `one`, `rose-pine`, `rose-pine-moon`, `slack`, `solarized`, `vitesse`, `vitesse-black`, and `vs-code`. Alkalye matches the editor's restrained two-tone code palette. PDF export uses the family's light variant.
+
 Export from Settings to download one `.theme.md` file. It contains the editable CSS/HTML fences, embedded assets, and theme metadata. Import creates a new theme and linked source document while preserving the source prose and fence grouping. Account-specific source IDs are removed from exports. Older ZIP themes remain importable; export them as Markdown to make them portable.
 
 An optional `json theme metadata` fence preserves the theme name, author, description, type (`preview`, `slideshow`, or `both`), and color presets. An optional `thumbnail` stores a base64 PNG, JPEG, WebP, GIF, or safe SVG data URL (up to 2 MB). CLI `--name` overrides its name. Changing or removing `thumbnail` in an existing metadata fence updates the picker and export.

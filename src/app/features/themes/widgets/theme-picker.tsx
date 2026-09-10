@@ -31,11 +31,17 @@ type LoadedTheme = co.loaded<
 
 interface ThemePickerProps {
 	content: string
+	getContent: () => string
 	onThemeChange: (newContent: string) => void
 	disabled?: boolean
 }
 
-function ThemePicker({ content, onThemeChange, disabled }: ThemePickerProps) {
+function ThemePicker({
+	content,
+	getContent,
+	onThemeChange,
+	disabled,
+}: ThemePickerProps) {
 	let me = useAccount(UserAccount, { resolve: themesResolve })
 
 	let themes: LoadedTheme[] = []
@@ -99,7 +105,7 @@ function ThemePicker({ content, onThemeChange, disabled }: ThemePickerProps) {
 								theme={theme}
 								isSelected={isThemeSelected(currentThemeName, theme)}
 								onSelect={() => {
-									let newContent = setTheme(content, theme.$jazz.id)
+									let newContent = setTheme(getContent(), theme.$jazz.id)
 									onThemeChange(newContent)
 								}}
 							/>
@@ -118,7 +124,7 @@ function ThemePicker({ content, onThemeChange, disabled }: ThemePickerProps) {
 								theme={theme}
 								isSelected={isThemeSelected(currentThemeName, theme)}
 								onSelect={() => {
-									let newContent = setTheme(content, theme.$jazz.id)
+									let newContent = setTheme(getContent(), theme.$jazz.id)
 									onThemeChange(newContent)
 								}}
 							/>
@@ -130,7 +136,7 @@ function ThemePicker({ content, onThemeChange, disabled }: ThemePickerProps) {
 						<DropdownMenuSeparator />
 						<DropdownMenuItem
 							onClick={() => {
-								let newContent = setTheme(content, null)
+								let newContent = setTheme(getContent(), null)
 								onThemeChange(newContent)
 							}}
 						>

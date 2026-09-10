@@ -1,8 +1,20 @@
 import { describe, expect, it, vi } from "vitest"
 import type { PrintableAsset } from "@/app/features/assets"
 import { replaceAssetSources } from "./print-media"
+import { renderPrintableMarkdown } from "./pdf-export"
 
 describe("print media", () => {
+	it("renders fenced code with the selected syntax theme", async () => {
+		let html = await renderPrintableMarkdown(
+			"```ts\nlet answer = 42\n```",
+			[],
+			"catppuccin-latte",
+		)
+
+		expect(html).toContain('class="shiki catppuccin-latte"')
+		expect(html).toContain("<span style=")
+	})
+
 	it("inlines image and whiteboard assets while preserving external images", async () => {
 		let image = printableAsset("image-1", "image", "image/png", "image")
 		let whiteboard = printableAsset(

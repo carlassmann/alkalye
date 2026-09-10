@@ -3,7 +3,10 @@ import { ThemeType, ThemePreset } from "./schema"
 import { Group, co } from "jazz-tools"
 import { Document, CommentThread } from "@/app/features/documents/lib/schema"
 import { createDocumentMetadata } from "@/app/features/documents/lib/metadata"
-import { parseFrontmatter } from "@/app/features/editor/lib/frontmatter"
+import {
+	parseFrontmatter,
+	setFrontmatterField,
+} from "@/app/features/editor/lib/frontmatter"
 import { sanitizeCss, sanitizeHtml } from "./sanitize"
 import {
 	parsePortableAssetFence,
@@ -554,13 +557,7 @@ async function loadThemes(account: co.loaded<typeof UserAccount>) {
 }
 
 function bindThemeSource(content: string, themeId: string): string {
-	if (getThemeSourceId(content) === themeId) return content
-	let frontmatter = content.match(/^---\r?\n([\s\S]*?)(?:\r?\n)?---(?:\r?\n)?/)
-	if (!frontmatter) return `---\ntheme-source: ${themeId}\n---\n\n${content}`
-	let lines = frontmatter[1]
-		.split(/\r?\n/)
-		.filter(line => !/^\s*theme-source\s*:/.test(line))
-	return `---\n${lines.filter(Boolean).join("\n")}\ntheme-source: ${themeId}\n---\n${content.slice(frontmatter[0].length)}`
+	return setFrontmatterField(content, "theme-source", themeId)
 }
 
 function withThemeSourceMetadata(

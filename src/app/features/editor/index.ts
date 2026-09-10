@@ -39,6 +39,8 @@ export {
 	getPath,
 	getTags,
 	getFrontmatterRange,
+	getFrontmatterInsertion,
+	getFrontmatterFieldValueRange,
 	togglePinned,
 	addTag,
 	getBacklinks,
@@ -48,6 +50,7 @@ export {
 	removeBacklink,
 	setTheme,
 	setPreset,
+	setSyntaxTheme,
 	type Frontmatter,
 } from "./lib/frontmatter"
 

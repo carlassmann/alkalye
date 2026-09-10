@@ -465,9 +465,16 @@ function SpaceEditorContent({
 			openFind: () => editor.current?.openFind(),
 			onPrintPdf: async () => {
 				if (!me.$isLoaded) return
-				let { themes, defaultPreviewTheme } = await loadThemesForPdf(me)
+				let { themes, defaultPreviewTheme, defaultSyntaxTheme } =
+					await loadThemesForPdf(me)
 				let assets = getLoadedAssets(liveDoc?.assets).map(toPrintableAsset)
-				void printToPdf({ content, themes, defaultPreviewTheme, assets })
+				void printToPdf({
+					content: editor.current?.getContent() ?? content,
+					themes,
+					defaultPreviewTheme,
+					defaultSyntaxTheme,
+					assets,
+				})
 			},
 			onPreview: () => {
 				navigate({
@@ -478,7 +485,7 @@ function SpaceEditorContent({
 			},
 			onDownload: () => {
 				let title = getDocumentTitle(doc)
-				saveDocumentAs(content, title)
+				saveDocumentAs(editor.current?.getContent() ?? content, title)
 			},
 			labels: {
 				autosaveTitle: t("editor.autosave.title"),
