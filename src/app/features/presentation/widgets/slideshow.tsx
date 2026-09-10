@@ -1174,7 +1174,7 @@ function HighlightedCode({
 		let cancelled = false
 		let decorations = computeCodeDecorations(code, content, highlight)
 
-		loadSyntaxHighlighter()
+		loadSyntaxHighlighter(syntaxTheme)
 			.then(highlighter => {
 				return highlighter.highlight({
 					code,

@@ -1,9 +1,10 @@
-import { Check, CodeXml } from "lucide-react"
+import { CodeXml } from "lucide-react"
 import { Button } from "@/app/components/ui/button"
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuItem,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
 	DropdownMenuTrigger,
 } from "@/app/components/ui/dropdown-menu"
 import {
@@ -69,19 +70,21 @@ function SyntaxThemePicker({
 				</TooltipContent>
 			</Tooltip>
 			<DropdownMenuContent align="center">
-				<DropdownMenuItem onClick={() => selectTheme(null)}>
-					<T k="editor.toolbar.useGlobalSyntaxTheme" />
-					{!selectedFamilyId && <Check className="ml-auto" />}
-				</DropdownMenuItem>
-				{SYNTAX_THEME_FAMILIES.map(family => (
-					<DropdownMenuItem
-						key={family.id}
-						onClick={() => selectTheme(family.id)}
-					>
-						{family.name}
-						{selectedFamilyId === family.id && <Check className="ml-auto" />}
-					</DropdownMenuItem>
-				))}
+				<DropdownMenuRadioGroup
+					value={selectedFamilyId ?? "global"}
+					onValueChange={value =>
+						selectTheme(value === "global" ? null : value)
+					}
+				>
+					<DropdownMenuRadioItem value="global">
+						<T k="editor.toolbar.useGlobalSyntaxTheme" />
+					</DropdownMenuRadioItem>
+					{SYNTAX_THEME_FAMILIES.map(family => (
+						<DropdownMenuRadioItem key={family.id} value={family.id}>
+							{family.name}
+						</DropdownMenuRadioItem>
+					))}
+				</DropdownMenuRadioGroup>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	)

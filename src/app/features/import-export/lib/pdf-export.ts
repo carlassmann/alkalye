@@ -94,7 +94,7 @@ async function renderPrintableMarkdown(
 	assets: PrintableAsset[],
 	syntaxTheme: SyntaxTheme,
 ): Promise<string> {
-	let highlighter = await loadSyntaxHighlighter()
+	let highlighter = await loadSyntaxHighlighter(syntaxTheme)
 	let marked = new Marked()
 	marked.use(
 		markedShiki({

@@ -742,7 +742,7 @@ function useMarked(
 
 	useEffect(() => {
 		let cancelled = false
-		loadSyntaxHighlighter().then(highlighter => {
+		loadSyntaxHighlighter(syntaxTheme).then(highlighter => {
 			if (cancelled) return
 			let instance = createMarkedInstance(highlighter, syntaxTheme, id =>
 				resolverRef.current(id),

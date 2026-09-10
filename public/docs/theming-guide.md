@@ -240,7 +240,7 @@ syntax-theme: catppuccin
 ---
 ```
 
-Supported family IDs are `alkalye`, `github`, `catppuccin`, and `vitesse`. PDF export uses the family's light variant.
+Supported family IDs are `alkalye`, `catppuccin`, `catppuccin-frappe`, `catppuccin-macchiato`, `everforest`, `github`, `github-default`, `github-dimmed`, `github-high-contrast`, `gruvbox`, `gruvbox-hard`, `gruvbox-soft`, `kanagawa`, `kanagawa-dragon`, `material`, `material-darker`, `material-ocean`, `material-palenight`, `min`, `one`, `rose-pine`, `rose-pine-moon`, `slack`, `solarized`, `vitesse`, `vitesse-black`, and `vs-code`. Alkalye matches the editor's restrained two-tone code palette. PDF export uses the family's light variant.
 
 Export from Settings to download one `.theme.md` file. It contains the editable CSS/HTML fences, embedded assets, and theme metadata. Import creates a new theme and linked source document while preserving the source prose and fence grouping. Account-specific source IDs are removed from exports. Older ZIP themes remain importable; export them as Markdown to make them portable.
 
