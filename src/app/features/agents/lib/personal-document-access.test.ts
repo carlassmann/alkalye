@@ -35,6 +35,7 @@ describe("personal document agent access", () => {
 		let first = await createPersonalDocument(account, "First")
 		await reconcilePersonalDocumentAccess(account, connection, "reader")
 		expect(first.$jazz.owner.getRoleOf(agent.$jazz.id)).toBe("reader")
+		expect(sendGrant).toHaveBeenCalledTimes(1)
 
 		let future = await createPersonalDocument(account, "Future")
 		await reconcilePersonalDocumentAccess(account, connection, "reader")
@@ -48,6 +49,41 @@ describe("personal document agent access", () => {
 		expect(first.$jazz.owner.getRoleOf(agent.$jazz.id)).toBeUndefined()
 		expect(future.$jazz.owner.getRoleOf(agent.$jazz.id)).toBeUndefined()
 		expect(sendGrant).toHaveBeenCalled()
+		vi.unstubAllGlobals()
+	})
+
+	test("removes access when a personal document is archived", async () => {
+		let account = await createJazzTestAccount({
+			isCurrentActiveAccount: true,
+			AccountSchema: UserAccount,
+		})
+		let agent = await createJazzTestAccount({ AccountSchema: UserAccount })
+		setActiveAccount(account)
+		let connection = AgentConnection.create(
+			{
+				provider: "openai",
+				accountId: agent.$jazz.id,
+				credential: "wrapped-agent",
+				createdAt: new Date(),
+			},
+			account.root.$jazz.owner,
+		)
+		vi.stubGlobal(
+			"fetch",
+			vi.fn().mockResolvedValue(Response.json({ ok: true })),
+		)
+		let document = await createPersonalDocument(account, "Archived")
+		await reconcilePersonalDocumentAccess(account, connection, "writer")
+		document.$jazz.set("deletedAt", new Date())
+		account.root.documents.$jazz.splice(
+			account.root.documents.findIndex(item => item?.$jazz.id === document.$jazz.id),
+			1,
+		)
+		account.root.inactiveDocuments?.$jazz.push(document)
+
+		await reconcilePersonalDocumentAccess(account, connection, "writer")
+
+		expect(document.$jazz.owner.getRoleOf(agent.$jazz.id)).toBeUndefined()
 		vi.unstubAllGlobals()
 	})
 

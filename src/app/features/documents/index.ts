@@ -7,6 +7,7 @@ export {
 	ArchivedDocumentContent,
 } from "./lib/schema"
 export { createSpaceDocument } from "./lib/create-space-document"
+export { replaceDocumentContent } from "./lib/replace-document-content"
 
 // lib — document CRUD
 export {

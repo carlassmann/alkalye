@@ -4,7 +4,7 @@ import { z } from "zod"
 import { getMcpConfig } from "@/mcp/config"
 import { agentCredentialsSchema } from "@/mcp/credentials"
 import { credentialRevocationKey } from "@/mcp/oauth"
-import { createAgentAccount } from "@/mcp/jazz"
+import { closeAgentAccountRuntime, createAgentAccount } from "@/mcp/jazz"
 
 export { POST, DELETE }
 
@@ -20,7 +20,7 @@ let POST: APIRoute = async ({ request }) => {
 		let { provider } = requestSchema.parse(body)
 		let config = getMcpConfig()
 		let requester = provisioningKey(request)
-		if (!(await config.replayStore.consume(requester, 60_000))) {
+		if (!(await config.replayStore.allow(requester, 5, 60_000))) {
 			return json({ error: "Please wait before creating another agent" }, 429)
 		}
 		let agent = await createAgentAccount(
@@ -49,11 +49,18 @@ let DELETE: APIRoute = async ({ request }) => {
 		let body: unknown = await request.json()
 		let { credential } = z.object({ credential: z.string() }).parse(body)
 		let config = getMcpConfig()
-		await config.tokens.open("connection", credential, agentCredentialsSchema)
+		let credentials = await config.tokens.open(
+			"connection",
+			credential,
+			agentCredentialsSchema,
+		)
 		await config.replayStore.revoke(
 			credentialRevocationKey(credential),
 			30 * 24 * 60 * 60_000,
 		)
+		void closeAgentAccountRuntime(credentials.accountId).catch(error => {
+			console.error("[agent-connections] runtime cleanup failed", error)
+		})
 		return json({ ok: true })
 	} catch (error) {
 		console.error("[agent-connections] revocation failed", error)

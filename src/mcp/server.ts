@@ -1,8 +1,10 @@
 import { createHash } from "node:crypto"
 import { McpServer, createMcpHandler } from "@modelcontextprotocol/server"
 import { z } from "zod"
-import { getDocumentTitle } from "@/app/features/documents"
-import { replaceCliDocumentContent } from "@/cli/runtime"
+import {
+	getDocumentTitle,
+	replaceDocumentContent,
+} from "@/app/features/documents"
 import { createSpaceDocument, Space } from "@/schema"
 import {
 	addCommentReply,
@@ -15,7 +17,7 @@ import {
 import { setDocumentTitle } from "@/cli/document-title"
 import { agentCredentialsSchema } from "./credentials"
 import { getMcpConfig } from "./config"
-import { openAgentAccount } from "./jazz"
+import { openAgentAccount, runWithAgentAccount } from "./jazz"
 import { toolSecurityMetadata } from "./metadata"
 
 export { createAlkalyeServer, mcpHandler }
@@ -102,7 +104,9 @@ function createAlkalyeServer(credential: string | undefined) {
 					},
 				})
 				let personal = loaded.root.documents.flatMap(document =>
-					document?.$isLoaded ? [documentSummary(document, undefined)] : [],
+					document?.$isLoaded && !document.deletedAt
+						? [documentSummary(document, undefined)]
+						: [],
 				)
 				let spaces = (loaded.root.spaces ?? []).flatMap(space =>
 					space?.$isLoaded
@@ -111,7 +115,7 @@ function createAlkalyeServer(credential: string | undefined) {
 									spaceId: space.$jazz.id,
 									name: space.name,
 									documents: space.documents.flatMap(document =>
-										document?.$isLoaded
+										document?.$isLoaded && !document.deletedAt
 											? [documentSummary(document, space.$jazz.id)]
 											: [],
 									),
@@ -194,7 +198,9 @@ function createAlkalyeServer(credential: string | undefined) {
 						"Document changed since it was read. Read it again before editing.",
 					)
 				}
-				await replaceCliDocumentContent(document, content)
+				if (!(await replaceDocumentContent(document, content))) {
+					return toolError("Document is being edited. Try again shortly.")
+				}
 				document.$jazz.set("updatedAt", new Date())
 				await sync()
 				return toolResult({
@@ -290,7 +296,9 @@ function createAlkalyeServer(credential: string | undefined) {
 					)
 				}
 				let nextContent = setDocumentTitle(content, title)
-				await replaceCliDocumentContent(document, nextContent)
+				if (!(await replaceDocumentContent(document, nextContent))) {
+					return toolError("Document is being edited. Try again shortly.")
+				}
 				document.$jazz.set("updatedAt", new Date())
 				await sync()
 				return toolResult({
@@ -474,21 +482,25 @@ async function withAgent(
 ) {
 	if (!credential) return authenticationRequired()
 	let config = getMcpConfig()
-	let credentials = await config.tokens.open(
-		"connection",
-		credential,
-		agentCredentialsSchema,
-	)
-	let agent = await openAgentAccount(config.syncServer, credentials)
 	try {
-		return await operation(agent.account, async () => {
-			await agent.account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
-		})
+		let credentials = await config.tokens.open(
+			"connection",
+			credential,
+			agentCredentialsSchema,
+		)
+		return await runWithAgentAccount(
+			config.syncServer,
+			credentials,
+			async agent => {
+				await agent.account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
+				return operation(agent.account, async () => {
+					await agent.account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
+				})
+			},
+		)
 	} catch (error) {
-		console.error("[mcp] tool failed", error)
+		if (!isPublicToolError(error)) console.error("[mcp] tool failed", error)
 		return toolError(publicToolError(error))
-	} finally {
-		await agent.close()
 	}
 }
 
@@ -516,6 +528,7 @@ async function findAgentDocument(
 		resolve: { content: true, comments: { $each: { replies: true } } },
 	})
 	if (!document.$isLoaded) throw new Error("Document is unavailable")
+	if (document.deletedAt) throw new Error("Document is archived")
 	return document
 }
 
@@ -538,16 +551,23 @@ function documentSummary(
 }
 
 function publicToolError(error: unknown) {
-	if (!(error instanceof Error)) return "The requested action failed."
+	if (!isPublicToolError(error)) {
+		return "The requested action could not be completed. Check the agent's access and try again."
+	}
+	return error.message
+}
+
+function isPublicToolError(error: unknown): error is Error {
+	if (!(error instanceof Error)) return false
 	let safeMessages = new Set([
 		"Space not found",
 		"Space is unavailable",
 		"Document not found",
 		"Document is unavailable",
+		"Document is archived",
 		"Comment not found",
 	])
-	if (safeMessages.has(error.message)) return error.message
-	return "The requested action could not be completed. Check the agent's access and try again."
+	return safeMessages.has(error.message)
 }
 
 function documentRevision(content: string) {

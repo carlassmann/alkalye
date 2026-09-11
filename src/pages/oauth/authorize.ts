@@ -33,7 +33,8 @@ let GET: APIRoute = async ({ request }) => {
 			new URL(`/app/settings?oauth=${oauth}`, config.baseUrl),
 			302,
 		)
-	} catch {
+	} catch (error) {
+		console.error("[oauth] authorization request rejected", error)
 		return new Response("Invalid OAuth authorization request", { status: 400 })
 	}
 }

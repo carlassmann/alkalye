@@ -11,6 +11,9 @@ import {
 	SelectValue,
 } from "@/app/components/ui/select"
 import { AgentConnection, Document, Space, UserAccount } from "@/schema"
+import { getDocumentTitle } from "@/app/features/documents"
+import { useIntl } from "@/shared/intl/setup"
+import { updateAgentGrants } from "../lib/agent-api"
 import {
 	reconcilePersonalDocumentAccess,
 	type AgentDocumentRole,
@@ -21,8 +24,8 @@ export { AgentConnectionsSection, agentConnectionsQuery }
 let agentConnectionsQuery = {
 	root: {
 		agentConnections: { $each: true },
-		documents: { $each: true },
-		inactiveDocuments: { $each: true },
+		documents: { $each: { content: true } },
+		inactiveDocuments: { $each: { content: true } },
 		spaces: { $each: true },
 	},
 } as const
@@ -31,18 +34,24 @@ type AgentAccount = co.loaded<typeof UserAccount, typeof agentConnectionsQuery>
 
 interface AgentConnectionsSectionProps {
 	account: AgentAccount | null
+	isAuthenticated: boolean
 	oauth?: string
 }
 
 type Role = AgentDocumentRole
 type SharedResource =
-	| { kind: "document"; value: co.loaded<typeof Document> }
+	| {
+			kind: "document"
+			value: co.loaded<typeof Document, { content: true }>
+	  }
 	| { kind: "space"; value: co.loaded<typeof Space> }
 
 function AgentConnectionsSection({
 	account,
+	isAuthenticated,
 	oauth,
 }: AgentConnectionsSectionProps) {
+	let t = useIntl()
 	let [busy, setBusy] = useState<string>()
 	let [error, setError] = useState<string>()
 	let [status, setStatus] = useState<string>()
@@ -55,6 +64,9 @@ function AgentConnectionsSection({
 		loadedAuthorization && loadedAuthorization.token === oauth
 			? loadedAuthorization.authorization
 			: undefined
+	let hasAccess = account && connection?.$isLoaded
+		? hasAgentAccess(account, connection)
+		: false
 
 	useEffect(() => {
 		if (!oauth) {
@@ -81,7 +93,7 @@ function AgentConnectionsSection({
 	}, [oauth])
 
 	async function connect() {
-		if (!account) return
+		if (!account || !isAuthenticated) return
 		setBusy("connect")
 		setError(undefined)
 		setStatus(undefined)
@@ -113,7 +125,7 @@ function AgentConnectionsSection({
 					account.root.$jazz.owner,
 				),
 			)
-			setStatus("ChatGPT connected")
+			setStatus(t("settings.agents.ready"))
 		} catch (cause) {
 			setError(cause instanceof Error ? cause.message : "Connection failed")
 		} finally {
@@ -174,23 +186,9 @@ function AgentConnectionsSection({
 		setBusy("disconnect")
 		setError(undefined)
 		setStatus(undefined)
+		let cleanupError: unknown
 		try {
-			let revokeResponse = await fetch("/api/agent-connections", {
-				method: "DELETE",
-				headers: { "content-type": "application/json" },
-				body: JSON.stringify({ credential: connection.credential }),
-			})
-			if (!revokeResponse.ok) throw new Error("Could not revoke the connection")
 			let agent = await UserAccount.load(connection.accountId)
-			if (!agent.$isLoaded) throw new Error("Agent account is unavailable")
-			let allResources = [
-				...account.root.documents.values(),
-				...(account.root.inactiveDocuments?.values() ?? []),
-				...(account.root.spaces?.values() ?? []),
-			]
-			if (allResources.some(resource => !resource?.$isLoaded)) {
-				throw new Error("Some shared items are still loading. Try again shortly.")
-			}
 			let resources = [
 				...account.root.documents.flatMap(document =>
 					document?.$isLoaded
@@ -206,20 +204,42 @@ function AgentConnectionsSection({
 					space?.$isLoaded ? [{ kind: "space" as const, value: space }] : [],
 				),
 			]
-			for (let resource of resources) {
-				await removeAgentGrant(
-					connection.credential,
-					resource.kind,
-					resource.value.$jazz.id,
-				)
-				resource.value.$jazz.owner.removeMember(agent)
+			await updateAgentGrants(
+				connection.credential,
+				resources.map(resource => ({
+					action: "remove",
+					resource: { kind: resource.kind, id: resource.value.$jazz.id },
+				})),
+			)
+			if (agent.$isLoaded) {
+				for (let resource of resources) {
+					let owner = resource.value.$jazz.owner
+					if (owner.getRoleOf(account.$jazz.id) === "admin") {
+						owner.removeMember(agent)
+					}
+				}
 			}
+		} catch (cause) {
+			cleanupError = cause
+		}
+		try {
+			let revokeResponse = await fetch("/api/agent-connections", {
+				method: "DELETE",
+				headers: { "content-type": "application/json" },
+				body: JSON.stringify({ credential: connection.credential }),
+			})
+			if (!revokeResponse.ok) throw new Error("Could not revoke the connection")
 			let index = account.root.agentConnections?.findIndex(
 				item => item?.$jazz.id === connection.$jazz.id,
 			)
 			if (index !== undefined && index !== -1) {
 				account.root.agentConnections?.$jazz.splice(index, 1)
 			}
+			setStatus(
+				cleanupError
+					? t("settings.agents.disconnectedWithCleanup")
+					: t("settings.agents.disconnected"),
+			)
 		} catch (cause) {
 			setError(cause instanceof Error ? cause.message : "Disconnect failed")
 		} finally {
@@ -230,7 +250,7 @@ function AgentConnectionsSection({
 	return (
 		<section>
 			<h2 className="text-muted-foreground mb-3 text-sm font-medium">
-				Agent connections
+				{t("settings.agents.title")}
 			</h2>
 			<div className="border-border bg-muted/20 border">
 				<div className="flex items-start gap-3 p-4">
@@ -238,52 +258,77 @@ function AgentConnectionsSection({
 						<Bot className="size-4" />
 					</div>
 					<div className="min-w-0 flex-1">
-						<div className="flex flex-wrap items-center justify-between gap-3">
-							<div>
+						<div className="flex items-start justify-between gap-3">
+							<div className="min-w-0">
 								<div className="font-medium">My ChatGPT</div>
 								<p className="text-muted-foreground mt-1 text-xs/relaxed">
-									A separate encrypted collaborator. It sees only items you grant below.
+									{t("settings.agents.description")}
 								</p>
 							</div>
 							{connection?.$isLoaded ? (
 								<Button
 									variant="ghost"
 									size="sm"
+									className="shrink-0"
 									onClick={disconnect}
 									disabled={Boolean(busy)}
 								>
-									<Unplug /> Disconnect
+									<Unplug /> {t("settings.agents.disconnect")}
 								</Button>
 							) : (
-								<Button onClick={connect} disabled={!account || Boolean(busy)}>
+								<Button
+									onClick={connect}
+									disabled={!account || !isAuthenticated || Boolean(busy)}
+								>
 									{busy === "connect" ? (
 										<Loader2 className="animate-spin" />
 									) : (
 										<ShieldCheck />
 									)}
-									Connect ChatGPT
+									{t("settings.agents.setup")}
 								</Button>
 							)}
 						</div>
+						{!isAuthenticated && !connection?.$isLoaded && (
+							<p className="text-muted-foreground mt-3 text-xs/relaxed">
+								{t("settings.agents.signIn")}
+							</p>
+						)}
+						{status && (
+							<p className="text-muted-foreground mt-3 text-xs/relaxed">
+								{status}
+							</p>
+						)}
 						{authorization && (
 							<div className="border-brand/30 bg-brand/5 mt-4 border p-3">
 								<p className="sr-only" role="status" aria-live="polite">
-									Authorization request ready for {authorization.client.name}.
+									{t("settings.agents.authorizationReady", {
+										client: authorization.client.name,
+									})}
 								</p>
 								<p className="text-sm font-medium">
-									Authorize {authorization.client.name}
+									{t("settings.agents.authorize", {
+										client: authorization.client.name,
+									})}
 								</p>
 								<p className="text-muted-foreground mt-1 text-xs/relaxed">
-									This client can read or change only the personal documents and spaces granted below. OAuth scope: alkalye. Return destination: {authorization.client.redirectHost}.
+									{t("settings.agents.consent", {
+										host: authorization.client.redirectHost,
+									})}
 								</p>
+								{!hasAccess && (
+									<p className="text-destructive mt-2 text-xs/relaxed">
+										{t("settings.agents.noAccess")}
+									</p>
+								)}
 								<div className="mt-3 flex justify-end gap-2">
 									<Button
 										variant="ghost"
 										size="sm"
-									onClick={deny}
+										onClick={deny}
 										disabled={Boolean(busy)}
 									>
-										Deny
+										{t("settings.agents.deny")}
 									</Button>
 									<Button
 										variant="brand"
@@ -291,7 +336,7 @@ function AgentConnectionsSection({
 										onClick={authorize}
 										disabled={!connection?.$isLoaded || Boolean(busy)}
 									>
-										Authorize
+										{t("settings.agents.authorizeAndReturn")}
 									</Button>
 								</div>
 							</div>
@@ -335,6 +380,7 @@ function ResourceAccess({
 	setBusy,
 	setError,
 }: ResourceAccessProps) {
+	let t = useIntl()
 	let personalDocuments = account.root.documents.flatMap(document =>
 		document?.$isLoaded
 			? [{ kind: "document" as const, value: document }]
@@ -349,10 +395,10 @@ function ResourceAccess({
 
 	return (
 		<div className="border-border border-t">
-			<div className="text-muted-foreground grid grid-cols-[1fr_6rem_3rem] gap-2 px-4 py-2 text-[11px] font-medium tracking-wide uppercase">
-				<span>Personal documents or space</span>
-				<span>Role</span>
-				<span className="sr-only">Access</span>
+			<div className="text-muted-foreground grid grid-cols-[minmax(0,1fr)_4.5rem_2.5rem] gap-2 px-4 py-2 text-[11px] font-medium tracking-wide uppercase sm:grid-cols-[minmax(0,1fr)_6rem_3rem]">
+				<span>{t("settings.agents.resources")}</span>
+				<span>{t("settings.agents.role")}</span>
+				<span className="sr-only">{t("settings.agents.access")}</span>
 			</div>
 			<PersonalDocumentsAccessRow
 				account={account}
@@ -371,6 +417,11 @@ function ResourceAccess({
 					setError={setError}
 				/>
 			))}
+			{resources.some(resource => resource.kind === "space") && (
+				<p className="text-muted-foreground border-border border-t px-4 py-3 text-xs/relaxed">
+					{t("settings.agents.spaceDisclosure")}
+				</p>
+			)}
 		</div>
 	)
 }
@@ -382,6 +433,7 @@ function PersonalDocumentsAccessRow({
 	setBusy,
 	setError,
 }: ResourceAccessProps) {
+	let t = useIntl()
 	let id = "personal-documents"
 	let enabled = Boolean(connection.personalDocumentsRole)
 	let role: Role = connection.personalDocumentsRole ?? "reader"
@@ -389,11 +441,12 @@ function PersonalDocumentsAccessRow({
 	async function updateAccess(roleNext: Role | undefined) {
 		setBusy(id)
 		setError(undefined)
+		let previousRole = connection.personalDocumentsRole
 		try {
-			if (roleNext) connection.$jazz.set("personalDocumentsRole", roleNext)
+			connection.$jazz.set("personalDocumentsRole", roleNext)
 			await reconcilePersonalDocumentAccess(account, connection, roleNext)
-			if (!roleNext) connection.$jazz.set("personalDocumentsRole", undefined)
 		} catch (cause) {
+			connection.$jazz.set("personalDocumentsRole", previousRole)
 			setError(
 				cause instanceof Error
 					? cause.message
@@ -405,11 +458,13 @@ function PersonalDocumentsAccessRow({
 	}
 
 	return (
-		<div className="border-border grid grid-cols-[1fr_6rem_3rem] items-center gap-2 border-t px-4 py-3">
+		<div className="border-border grid grid-cols-[minmax(0,1fr)_4.5rem_2.5rem] items-center gap-2 border-t px-4 py-3 sm:grid-cols-[minmax(0,1fr)_6rem_3rem]">
 			<div className="min-w-0">
-				<div className="truncate text-sm">Personal documents</div>
+				<div className="truncate text-sm">
+					{t("settings.agents.personalDocuments")}
+				</div>
 				<div className="text-muted-foreground text-[11px]">
-					All current and future documents
+					{t("settings.agents.personalDocumentsDescription")}
 				</div>
 			</div>
 			<Select
@@ -421,12 +476,20 @@ function PersonalDocumentsAccessRow({
 				}}
 				disabled={!enabled || busy === id}
 			>
-				<SelectTrigger aria-label="Role for personal documents">
-					<SelectValue />
+			<SelectTrigger
+				aria-label={t("settings.agents.roleFor", {
+					name: t("settings.agents.personalDocuments"),
+				})}
+			>
+				<SelectValue>
+					{t(
+						role === "reader" ? "settings.agents.read" : "settings.agents.write",
+					)}
+				</SelectValue>
 				</SelectTrigger>
 				<SelectContent>
-					<SelectItem value="reader">Read</SelectItem>
-					<SelectItem value="writer">Write</SelectItem>
+				<SelectItem value="reader">{t("settings.agents.read")}</SelectItem>
+				<SelectItem value="writer">{t("settings.agents.write")}</SelectItem>
 				</SelectContent>
 			</Select>
 			<Switch
@@ -435,7 +498,12 @@ function PersonalDocumentsAccessRow({
 					void updateAccess(checked ? role : undefined)
 				}
 				disabled={busy === id}
-				aria-label={`${enabled ? "Remove" : "Grant"} ChatGPT access to all personal documents`}
+				aria-label={t(
+					enabled
+						? "settings.agents.removeAccess"
+						: "settings.agents.grantAccess",
+					{ name: t("settings.agents.personalDocuments") },
+				)}
 			/>
 		</div>
 	)
@@ -456,15 +524,17 @@ function ResourceAccessRow({
 	setBusy,
 	setError,
 }: ResourceAccessRowProps) {
+	let t = useIntl()
 	let id = resource.value.$jazz.id
 	let owner = resource.value.$jazz.owner
 	let currentRole = owner.getRoleOf(connection.accountId)
+	let canManage = owner.myRole() === "admin"
 	let role: Role = currentRole === "writer" ? "writer" : "reader"
 	let enabled = currentRole === "reader" || currentRole === "writer"
 	let label =
 		resource.kind === "space"
 			? resource.value.name
-			: resource.value.title || "Untitled document"
+			: getDocumentTitle(resource.value) || t("settings.agents.untitled")
 
 	async function updateAccess(enabledNext: boolean, roleNext: Role = role) {
 		setBusy(id)
@@ -482,16 +552,12 @@ function ResourceAccessRow({
 					owner.removeMember(agent)
 				}
 			}
-			let response = await fetch("/api/agent-grants", {
-				method: "POST",
-				headers: { "content-type": "application/json" },
-				body: JSON.stringify({
-					credential: connection.credential,
+			await updateAgentGrants(connection.credential, [
+				{
 					action: enabledNext ? "add" : "remove",
 					resource: { kind: resource.kind, id },
-				}),
-			})
-			if (!response.ok) throw new Error("Could not update agent access")
+				},
+			])
 		} catch (cause) {
 			restoreMembership?.()
 			setError(cause instanceof Error ? cause.message : "Access update failed")
@@ -501,11 +567,15 @@ function ResourceAccessRow({
 	}
 
 	return (
-		<div className="border-border grid grid-cols-[1fr_6rem_3rem] items-center gap-2 border-t px-4 py-3 first:border-t-0">
+		<div className="border-border grid grid-cols-[minmax(0,1fr)_4.5rem_2.5rem] items-center gap-2 border-t px-4 py-3 sm:grid-cols-[minmax(0,1fr)_6rem_3rem]">
 			<div className="min-w-0">
 				<div className="truncate text-sm">{label}</div>
 				<div className="text-muted-foreground text-[11px]">
-					{resource.kind === "space" ? "Space" : "Document"}
+					{!canManage
+						? t("settings.agents.adminRequired")
+						: resource.kind === "space"
+						? t("settings.agents.space")
+						: t("settings.agents.document")}
 				</div>
 			</div>
 			<Select
@@ -515,21 +585,32 @@ function ResourceAccessRow({
 						void updateAccess(true, value)
 					}
 				}}
-				disabled={!enabled || busy === id}
+				disabled={!canManage || !enabled || busy === id}
 			>
-				<SelectTrigger aria-label={`Role for ${label}`}>
-					<SelectValue />
+			<SelectTrigger
+				aria-label={t("settings.agents.roleFor", { name: label })}
+			>
+				<SelectValue>
+					{t(
+						role === "reader" ? "settings.agents.read" : "settings.agents.write",
+					)}
+				</SelectValue>
 				</SelectTrigger>
 				<SelectContent>
-					<SelectItem value="reader">Read</SelectItem>
-					<SelectItem value="writer">Write</SelectItem>
+				<SelectItem value="reader">{t("settings.agents.read")}</SelectItem>
+				<SelectItem value="writer">{t("settings.agents.write")}</SelectItem>
 				</SelectContent>
 			</Select>
 			<Switch
 				checked={enabled}
 				onCheckedChange={checked => void updateAccess(checked)}
-				disabled={busy === id}
-				aria-label={`${enabled ? "Remove" : "Grant"} ChatGPT access to ${label}`}
+				disabled={!canManage || busy === id}
+				aria-label={t(
+					enabled
+						? "settings.agents.removeAccess"
+						: "settings.agents.grantAccess",
+					{ name: label },
+				)}
 			/>
 		</div>
 	)
@@ -586,23 +667,6 @@ function hasRedirect(value: unknown): value is { redirectTo: string } {
 	)
 }
 
-async function removeAgentGrant(
-	credential: string,
-	kind: "document" | "space",
-	id: string,
-) {
-	let response = await fetch("/api/agent-grants", {
-		method: "POST",
-		headers: { "content-type": "application/json" },
-		body: JSON.stringify({
-			credential,
-			action: "remove",
-			resource: { kind, id },
-		}),
-	})
-	if (!response.ok) throw new Error("Could not remove all agent access")
-}
-
 function readApiError(value: unknown, fallback: string) {
 	if (
 		value &&
@@ -613,4 +677,20 @@ function readApiError(value: unknown, fallback: string) {
 		return value.error
 	}
 	return fallback
+}
+
+function hasAgentAccess(
+	account: AgentAccount,
+	connection: co.loaded<typeof AgentConnection>,
+) {
+	if (connection.personalDocumentsRole) return true
+	let resources = [
+		...account.root.documents.values(),
+		...(account.root.spaces?.values() ?? []),
+	]
+	return resources.some(resource => {
+		if (!resource?.$isLoaded) return false
+		let role = resource.$jazz.owner.getRoleOf(connection.accountId)
+		return role === "reader" || role === "writer"
+	})
 }

@@ -9,7 +9,11 @@ export const prerender = false
 
 let handle: APIRoute = async ({ request }) => {
 	let config = getMcpConfig()
-	let rejected = validateRequestOrigin(request, config.baseUrl)
+	let rejected = validateRequestOrigin(
+		request,
+		config.baseUrl,
+		config.allowedClientHosts,
+	)
 	if (rejected) return rejected
 	let bearer = readBearer(request)
 	if (!bearer) return unauthorized(config.baseUrl)
@@ -75,7 +79,11 @@ function unauthorized(baseUrl: URL) {
 	)
 }
 
-function validateRequestOrigin(request: Request, baseUrl: URL) {
+function validateRequestOrigin(
+	request: Request,
+	baseUrl: URL,
+	allowedClientHosts: string[],
+) {
 	let forwardedHost = request.headers
 		.get("x-forwarded-host")
 		?.split(",")[0]
@@ -89,8 +97,24 @@ function validateRequestOrigin(request: Request, baseUrl: URL) {
 		return Response.json({ error: "invalid_host" }, { status: 403 })
 	}
 	let origin = request.headers.get("origin")
-	if (origin && origin !== baseUrl.origin) {
+	let originHost = readOriginHost(origin)
+	let allowedOrigin =
+		!origin ||
+		origin === baseUrl.origin ||
+		allowedClientHosts.some(
+			host => originHost === host || originHost?.endsWith(`.${host}`),
+		)
+	if (!allowedOrigin) {
 		return Response.json({ error: "invalid_origin" }, { status: 403 })
 	}
 	return undefined
+}
+
+function readOriginHost(origin: string | null) {
+	if (!origin) return undefined
+	try {
+		return new URL(origin).hostname.toLowerCase()
+	} catch {
+		return undefined
+	}
 }

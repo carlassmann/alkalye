@@ -11,6 +11,43 @@ let baseSettingsMessages = messages({
 	"settings.category.editor": "Editor",
 	"settings.category.connections": "Connections",
 	"settings.category.app": "App & data",
+	"settings.agents.title": "Agent connections",
+	"settings.agents.description":
+		"A separate encrypted collaborator. It sees only items you grant below.",
+	"settings.agents.setup": "Set up ChatGPT",
+	"settings.agents.disconnect": "Disconnect",
+	"settings.agents.signIn": "Sign in to create a durable ChatGPT connection.",
+	"settings.agents.ready":
+		"Alkalye access is ready. Finish connecting from ChatGPT.",
+	"settings.agents.disconnected": "ChatGPT disconnected",
+	"settings.agents.disconnectedWithCleanup":
+		"ChatGPT disconnected. Some old collaborator entries may remain visible.",
+	"settings.agents.authorize": "Authorize {$client}",
+	"settings.agents.authorizationReady":
+		"Authorization request ready for {$client}.",
+	"settings.agents.consent":
+		"This client can use only the personal documents and spaces granted below. Return destination: {$host}.",
+	"settings.agents.noAccess":
+		"Grant at least one document or space before authorizing, or ChatGPT will have nothing to work with.",
+	"settings.agents.deny": "Deny",
+	"settings.agents.authorizeAndReturn": "Authorize and return to ChatGPT",
+	"settings.agents.resources": "Personal documents or space",
+	"settings.agents.role": "Role",
+	"settings.agents.access": "Access",
+	"settings.agents.personalDocuments": "Personal documents",
+	"settings.agents.personalDocumentsDescription":
+		"All current and future active documents",
+	"settings.agents.space": "Space",
+	"settings.agents.document": "Document",
+	"settings.agents.untitled": "Untitled document",
+	"settings.agents.read": "Read",
+	"settings.agents.write": "Write",
+	"settings.agents.adminRequired": "Admin required",
+	"settings.agents.spaceDisclosure":
+		"Space access includes every document in that space. Other members may see My ChatGPT as a collaborator.",
+	"settings.agents.roleFor": "Role for {$name}",
+	"settings.agents.grantAccess": "Grant ChatGPT access to {$name}",
+	"settings.agents.removeAccess": "Remove ChatGPT access from {$name}",
 	"settings.appearance": "Appearance",
 	"settings.appearance.syntaxTheme": "Syntax theme",
 	"settings.profile": "Profile",
@@ -132,6 +169,45 @@ let deSettingsMessages = translate(baseSettingsMessages, {
 	"settings.category.editor": "Editor",
 	"settings.category.connections": "Verbindungen",
 	"settings.category.app": "App & Daten",
+	"settings.agents.title": "Agent-Verbindungen",
+	"settings.agents.description":
+		"Ein separater, verschlüsselter Mitarbeiter. Er sieht nur freigegebene Inhalte.",
+	"settings.agents.setup": "ChatGPT einrichten",
+	"settings.agents.disconnect": "Trennen",
+	"settings.agents.signIn":
+		"Melde dich an, um eine dauerhafte ChatGPT-Verbindung zu erstellen.",
+	"settings.agents.ready":
+		"Der Alkalye-Zugriff ist bereit. Schließe die Verbindung in ChatGPT ab.",
+	"settings.agents.disconnected": "ChatGPT wurde getrennt",
+	"settings.agents.disconnectedWithCleanup":
+		"ChatGPT wurde getrennt. Einige alte Mitarbeiter-Einträge können sichtbar bleiben.",
+	"settings.agents.authorize": "{$client} autorisieren",
+	"settings.agents.authorizationReady":
+		"Autorisierungsanfrage für {$client} ist bereit.",
+	"settings.agents.consent":
+		"Dieser Client kann nur die unten freigegebenen persönlichen Dokumente und Bereiche verwenden. Rückkehrziel: {$host}.",
+	"settings.agents.noAccess":
+		"Gib vor der Autorisierung mindestens ein Dokument oder einen Bereich frei, sonst kann ChatGPT auf nichts zugreifen.",
+	"settings.agents.deny": "Ablehnen",
+	"settings.agents.authorizeAndReturn":
+		"Autorisieren und zu ChatGPT zurückkehren",
+	"settings.agents.resources": "Persönliche Dokumente oder Bereich",
+	"settings.agents.role": "Rolle",
+	"settings.agents.access": "Zugriff",
+	"settings.agents.personalDocuments": "Persönliche Dokumente",
+	"settings.agents.personalDocumentsDescription":
+		"Alle aktuellen und zukünftigen aktiven Dokumente",
+	"settings.agents.space": "Bereich",
+	"settings.agents.document": "Dokument",
+	"settings.agents.untitled": "Unbenanntes Dokument",
+	"settings.agents.read": "Lesen",
+	"settings.agents.write": "Schreiben",
+	"settings.agents.adminRequired": "Adminrechte erforderlich",
+	"settings.agents.spaceDisclosure":
+		"Der Bereichszugriff umfasst alle Dokumente in diesem Bereich. Andere Mitglieder können My ChatGPT als Mitarbeiter sehen.",
+	"settings.agents.roleFor": "Rolle für {$name}",
+	"settings.agents.grantAccess": "ChatGPT Zugriff auf {$name} geben",
+	"settings.agents.removeAccess": "ChatGPT-Zugriff auf {$name} entfernen",
 	"settings.appearance": "Erscheinungsbild",
 	"settings.appearance.syntaxTheme": "Syntax-Design",
 	"settings.profile": "Profil",

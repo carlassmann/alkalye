@@ -6,7 +6,7 @@ export { Footer }
 function Footer() {
 	return (
 		<footer className="text-muted-foreground mx-auto max-w-2xl px-3 py-6 text-center text-xs">
-			<div className="flex items-center justify-center gap-4">
+			<div className="flex flex-wrap items-center justify-center gap-4">
 				<a
 					href="https://twitter.com/carlassmann"
 					target="_blank"
@@ -49,6 +49,18 @@ function Footer() {
 					className="hover:text-foreground p-1 transition-colors"
 				>
 					<T k="footer.imprint" />
+				</a>
+				<a
+					href="/terms"
+					className="hover:text-foreground p-1 transition-colors"
+				>
+					<T k="footer.terms" />
+				</a>
+				<a
+					href="/support"
+					className="hover:text-foreground p-1 transition-colors"
+				>
+					<T k="footer.support" />
 				</a>
 			</div>
 		</footer>

@@ -126,6 +126,7 @@ interface SettingsLoaderData {
 interface SettingsSearch {
 	from?: string
 	oauth?: string
+	category?: SettingsCategory
 }
 
 interface SettingsScreenProps {
@@ -135,6 +136,7 @@ interface SettingsScreenProps {
 
 function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 	let t = useIntl()
+	let navigate = useNavigate()
 	let { theme, setTheme } = useTheme()
 	let { from } = search
 	let subscribedMe = useAccount(UserAccount, { resolve: settingsQuery })
@@ -143,11 +145,16 @@ function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 	let pageRef = useRef<HTMLDivElement>(null)
 	let [announcedCategory, setAnnouncedCategory] = useState("")
 	let [category, setCategory] = useState<SettingsCategory>(
-		search.oauth ? "connections" : "general",
+		search.oauth ? "connections" : (search.category ?? "general"),
 	)
 
 	function handleCategoryChange(nextCategory: SettingsCategory) {
 		setCategory(nextCategory)
+		void navigate({
+			to: "/settings",
+			search: previous => ({ ...previous, category: nextCategory }),
+			replace: true,
+		})
 		setAnnouncedCategory(categoryLabel(nextCategory, t))
 		pageRef.current?.scrollTo({ top: 0 })
 	}
@@ -224,7 +231,11 @@ function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 							)}
 							{category === "connections" && (
 								<>
-									<AgentConnectionsSection account={me} oauth={search.oauth} />
+									<AgentConnectionsSection
+										account={me}
+										isAuthenticated={isAuthenticated}
+										oauth={search.oauth}
+									/>
 									<SyncSection isAuthenticated={isAuthenticated} />
 								</>
 							)}

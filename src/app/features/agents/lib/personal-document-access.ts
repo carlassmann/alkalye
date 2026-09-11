@@ -1,12 +1,16 @@
 import { co } from "jazz-tools"
-import { AgentConnection, UserAccount } from "@/schema"
+import { AgentConnection, Document, UserAccount } from "@/schema"
+import { updateAgentGrants } from "./agent-api"
 
 export { personalDocumentAccessQuery, reconcilePersonalDocumentAccess }
 export type { AgentDocumentRole }
 
 type AgentDocumentRole = "reader" | "writer"
 let personalDocumentAccessQuery = {
-	root: { documents: { $each: true } },
+	root: {
+		documents: { $each: true },
+		inactiveDocuments: { $each: true },
+	},
 } as const
 type PersonalDocumentAccount = co.loaded<
 	typeof UserAccount,
@@ -21,12 +25,25 @@ async function reconcilePersonalDocumentAccess(
 	let agent = await UserAccount.load(connection.accountId)
 	if (!agent.$isLoaded) throw new Error("Agent account is unavailable")
 
-	for (let document of account.root.documents.values()) {
+	let activeDocuments = Array.from(account.root.documents.values())
+	let inactiveDocuments = Array.from(
+		account.root.inactiveDocuments?.values() ?? [],
+	)
+	let membershipChanges: MembershipChange[] = []
+	for (let document of [...activeDocuments, ...inactiveDocuments]) {
 		if (!document?.$isLoaded) continue
 		let owner = document.$jazz.owner
 		let currentRole = owner.getRoleOf(connection.accountId)
-		if (role && currentRole === role) continue
-		if (!role && currentRole !== "reader" && currentRole !== "writer") continue
+		let isActive = activeDocuments.includes(document) && !document.deletedAt
+		let desiredRole = isActive ? role : undefined
+		if (desiredRole && currentRole === desiredRole) continue
+		if (
+			!desiredRole &&
+			currentRole !== "reader" &&
+			currentRole !== "writer"
+		) {
+			continue
+		}
 		if (
 			currentRole !== undefined &&
 			currentRole !== "reader" &&
@@ -35,34 +52,32 @@ async function reconcilePersonalDocumentAccess(
 			continue
 		}
 
-		if (role) owner.addMember(agent, role)
+		if (desiredRole) owner.addMember(agent, desiredRole)
 		else owner.removeMember(agent)
-		try {
-			await updateAgentGrant(connection.credential, document.$jazz.id, role)
-		} catch (error) {
-			if (currentRole === "reader" || currentRole === "writer") {
-				owner.addMember(agent, currentRole)
-			} else {
-				owner.removeMember(agent)
-			}
-			throw error
+		membershipChanges.push({ document, currentRole, desiredRole })
+	}
+
+	try {
+		await updateAgentGrants(
+			connection.credential,
+			membershipChanges.map(change => ({
+				action: change.desiredRole ? "add" : "remove",
+				resource: { kind: "document", id: change.document.$jazz.id },
+			})),
+		)
+	} catch (error) {
+		for (let change of membershipChanges) {
+			let owner = change.document.$jazz.owner
+			if (change.currentRole === "reader" || change.currentRole === "writer") {
+				owner.addMember(agent, change.currentRole)
+			} else owner.removeMember(agent)
 		}
+		throw error
 	}
 }
 
-async function updateAgentGrant(
-	credential: string,
-	documentId: string,
-	role: AgentDocumentRole | undefined,
-) {
-	let response = await fetch("/api/agent-grants", {
-		method: "POST",
-		headers: { "content-type": "application/json" },
-		body: JSON.stringify({
-			credential,
-			action: role ? "add" : "remove",
-			resource: { kind: "document", id: documentId },
-		}),
-	})
-	if (!response.ok) throw new Error("Could not update personal document access")
+interface MembershipChange {
+	document: co.loaded<typeof Document>
+	currentRole: string | undefined
+	desiredRole: AgentDocumentRole | undefined
 }

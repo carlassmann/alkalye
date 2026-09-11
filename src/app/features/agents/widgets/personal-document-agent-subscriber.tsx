@@ -12,6 +12,7 @@ let subscriberQuery = {
 let activeSubscriberQuery = {
 	root: {
 		documents: { $each: true },
+		inactiveDocuments: { $each: true },
 		agentConnections: { $each: true },
 	},
 } as const
@@ -31,7 +32,12 @@ function ActivePersonalDocumentAgentSubscriber() {
 	let reconciliationKey = account.$isLoaded
 		? [
 				...account.root.documents.flatMap(document =>
-					document?.$isLoaded ? [document.$jazz.id] : [],
+					document?.$isLoaded
+						? [`${document.$jazz.id}:${document.deletedAt?.toISOString() ?? "active"}`]
+						: [],
+				),
+				...(account.root.inactiveDocuments ?? []).flatMap(document =>
+					document?.$isLoaded ? [`archived:${document.$jazz.id}`] : [],
 				),
 				...(account.root.agentConnections ?? []).flatMap(connection =>
 					connection?.$isLoaded && connection.personalDocumentsRole
@@ -55,21 +61,28 @@ function ActivePersonalDocumentAgentSubscriber() {
 
 		let cancelled = false
 		let retry: ReturnType<typeof setTimeout> | undefined
+		let attempt = 0
 		async function reconcile() {
-			try {
-				for (let connection of connections) {
+			let failures = 0
+			for (let connection of connections) {
+				try {
 					await reconcilePersonalDocumentAccess(
 						loadedAccount,
 						connection,
 						connection.personalDocumentsRole,
 					)
+				} catch (error) {
+					failures++
+					console.error("[agent-connections] personal access sync failed", error)
 				}
-			} catch (error) {
-				console.error("[agent-connections] personal access sync failed", error)
-				if (!cancelled) retry = setTimeout(reconcile, 5_000)
 			}
+			if (failures === 0 || cancelled || attempt >= 3) return
+			let delay = 2_000 * 2 ** attempt
+			attempt++
+			retry = setTimeout(reconcile, delay)
 		}
 		function retryOnline() {
+			attempt = 0
 			if (retry) clearTimeout(retry)
 			void reconcile()
 		}

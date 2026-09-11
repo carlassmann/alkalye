@@ -4,19 +4,27 @@ import { co } from "jazz-tools"
 import { Document, Space, UserAccount } from "@/schema"
 import { agentCredentialsSchema } from "@/mcp/credentials"
 import { getMcpConfig } from "@/mcp/config"
-import { openAgentAccount } from "@/mcp/jazz"
+import { runWithAgentAccount } from "@/mcp/jazz"
 
 export { POST }
 
 export const prerender = false
 
+let resourceSchema = z.discriminatedUnion("kind", [
+	z.object({ kind: z.literal("document"), id: z.string() }),
+	z.object({ kind: z.literal("space"), id: z.string() }),
+])
 let requestSchema = z.object({
 	credential: z.string(),
-	action: z.enum(["add", "remove"]),
-	resource: z.discriminatedUnion("kind", [
-		z.object({ kind: z.literal("document"), id: z.string() }),
-		z.object({ kind: z.literal("space"), id: z.string() }),
-	]),
+	updates: z
+		.array(
+			z.object({
+				action: z.enum(["add", "remove"]),
+				resource: resourceSchema,
+			}),
+		)
+		.min(1)
+		.max(500),
 })
 
 type AgentGrantAccount = co.loaded<
@@ -34,21 +42,20 @@ let POST: APIRoute = async ({ request }) => {
 			input.credential,
 			agentCredentialsSchema,
 		)
-		let agent = await openAgentAccount(config.syncServer, credentials)
-		try {
+		await runWithAgentAccount(config.syncServer, credentials, async agent => {
 			let account = await agent.account.$jazz.ensureLoaded({
 				resolve: { root: { documents: true, spaces: true } },
 			})
-			if (input.resource.kind === "document") {
-				await updateDocumentGrant(account, input.action, input.resource.id)
-			} else {
-				await updateSpaceGrant(account, input.action, input.resource.id)
+			for (let update of input.updates) {
+				if (update.resource.kind === "document") {
+					await updateDocumentGrant(account, update.action, update.resource.id)
+				} else {
+					await updateSpaceGrant(account, update.action, update.resource.id)
+				}
 			}
 			await agent.account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
-			return json({ ok: true })
-		} finally {
-			await agent.close()
-		}
+		})
+		return json({ ok: true })
 	} catch (error) {
 		console.error("[agent-grants] update failed", error)
 		return json({ error: "Could not update agent access" }, 400)

@@ -1,11 +1,7 @@
 import type { APIRoute } from "astro"
 import { z } from "zod"
 import { getMcpConfig } from "@/mcp/config"
-import {
-	approveAuthorization,
-	consentRequestSchema,
-	validateClientRedirect,
-} from "@/mcp/oauth"
+import { approveAuthorization, consentRequestSchema } from "@/mcp/oauth"
 
 export { POST }
 
@@ -35,11 +31,6 @@ let POST: APIRoute = async ({ request }) => {
 			return oauthError("invalid_target", 400)
 		}
 		if (input.decision === "deny") {
-			await validateClientRedirect(
-				consent.authorization.client_id,
-				consent.authorization.redirect_uri,
-				config.allowedClientHosts,
-			)
 			let redirect = new URL(consent.authorization.redirect_uri)
 			redirect.searchParams.set("error", "access_denied")
 			redirect.searchParams.set("state", consent.authorization.state)
@@ -50,6 +41,7 @@ let POST: APIRoute = async ({ request }) => {
 			request: consent.authorization,
 			credential: input.credential,
 			allowedClientHosts: config.allowedClientHosts,
+			clientValidated: true,
 		})
 		return Response.json({ redirectTo: redirect.toString() })
 	} catch (error) {

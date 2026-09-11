@@ -10,7 +10,25 @@ import {
 import { UserAccount } from "@/schema"
 import type { AgentCredentials } from "./credentials"
 
-export { createAgentAccount, openAgentAccount }
+export {
+	createAgentAccount,
+	openAgentAccount,
+	runWithAgentAccount,
+	closeAgentAccountRuntime,
+}
+
+type OpenAgent = Awaited<ReturnType<typeof openAgentAccount>>
+interface AgentRuntime {
+	agent: Promise<OpenAgent>
+	tail: Promise<void>
+	active: number
+	lastUsedAt: number
+}
+
+let agentRuntimes = new Map<string, AgentRuntime>()
+let agentOperationTimeout = 20_000
+let agentRuntimeIdleTimeout = 5 * 60_000
+let maximumAgentRuntimes = 32
 
 async function createAgentAccount(syncServer: string, name: string) {
 	let cryptoProvider = await WasmCrypto.create()
@@ -68,6 +86,91 @@ async function openAgentAccount(
 			context.done()
 			peer.close()
 		},
+	}
+}
+
+async function runWithAgentAccount<Result>(
+	syncServer: string,
+	credentials: AgentCredentials,
+	operation: (agent: OpenAgent) => Promise<Result>,
+) {
+	await evictIdleAgentRuntimes()
+	let key = credentials.accountId
+	let runtime = agentRuntimes.get(key)
+	if (!runtime) {
+		runtime = {
+			agent: openAgentAccount(syncServer, credentials),
+			tail: Promise.resolve(),
+			active: 0,
+			lastUsedAt: Date.now(),
+		}
+		agentRuntimes.set(key, runtime)
+	}
+
+	let release: () => void = () => undefined
+	let previous = runtime.tail
+	runtime.tail = new Promise<void>(resolve => {
+		release = resolve
+	})
+	runtime.active++
+	await previous
+	try {
+		let agent = await withDeadline(runtime.agent, agentOperationTimeout)
+		return await withDeadline(operation(agent), agentOperationTimeout)
+	} catch (error) {
+		agentRuntimes.delete(key)
+		void runtime.agent.then(agent => agent.close()).catch(() => undefined)
+		throw error
+	} finally {
+		runtime.active--
+		runtime.lastUsedAt = Date.now()
+		release()
+	}
+}
+
+async function evictIdleAgentRuntimes() {
+	let now = Date.now()
+	let idle = [...agentRuntimes.entries()]
+		.filter(([, runtime]) => runtime.active === 0)
+		.sort((left, right) => left[1].lastUsedAt - right[1].lastUsedAt)
+	for (let [key, runtime] of idle) {
+		if (
+			now - runtime.lastUsedAt < agentRuntimeIdleTimeout &&
+			agentRuntimes.size <= maximumAgentRuntimes
+		) {
+			continue
+		}
+		agentRuntimes.delete(key)
+		void runtime.agent.then(agent => agent.close()).catch(() => undefined)
+	}
+}
+
+async function closeAgentAccountRuntime(accountId: string) {
+	let runtime = agentRuntimes.get(accountId)
+	if (!runtime) return
+	agentRuntimes.delete(accountId)
+	await runtime.tail
+	let agent = await runtime.agent
+	await agent.close()
+}
+
+async function withDeadline<Result>(
+	promise: Promise<Result>,
+	timeoutMs: number,
+) {
+	let timeout: ReturnType<typeof setTimeout> | undefined
+	try {
+		return await Promise.race([
+			promise,
+			new Promise<never>((_, reject) => {
+				timeout = setTimeout(
+					() => reject(new Error("Agent operation timed out")),
+					timeoutMs,
+				)
+			}),
+		])
+	} finally {
+		if (timeout) clearTimeout(timeout)
 	}
 }
 

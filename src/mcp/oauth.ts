@@ -62,12 +62,15 @@ async function approveAuthorization(args: {
 	request: AuthorizationRequest
 	credential: string
 	allowedClientHosts?: string[]
+	clientValidated?: boolean
 }) {
-	await validateClientRedirect(
-		args.request.client_id,
-		args.request.redirect_uri,
-		args.allowedClientHosts,
-	)
+	if (!args.clientValidated) {
+		await validateClientRedirect(
+			args.request.client_id,
+			args.request.redirect_uri,
+			args.allowedClientHosts,
+		)
+	}
 	let code = await args.tokens.seal(
 		"authorization_code",
 		{
