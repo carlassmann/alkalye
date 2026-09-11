@@ -8,7 +8,10 @@ export let onRequest = defineMiddleware((context, next) => {
 		!context.url.pathname.includes(".")
 
 	if (isAppDeepLink) {
-		return context.rewrite("/app/")
+		if (import.meta.env.DEV) {
+			let appShellUrl = new URL("/app/", context.url)
+			return fetch(new Request(appShellUrl, context.request))
+		}
 	}
 
 	return next()

@@ -25,8 +25,10 @@ function writeWorkspaceEnv() {
 	let workspaceEnvPath = join(root, ".env")
 	let envFile = readFileSync(sourceEnvPath, "utf-8")
 	let syncServer = `wss://sync.${workspace}.alkalye.localhost`
+	let mcpBaseUrl = `https://${workspace}.alkalye.localhost`
 
 	envFile = setEnvValue(envFile, "PUBLIC_JAZZ_SYNC_SERVER", syncServer)
+	envFile = setEnvValue(envFile, "ALKALYE_MCP_BASE_URL", mcpBaseUrl)
 
 	mkdirSync(dirname(workspaceEnvPath), { recursive: true })
 	writeFileSync(workspaceEnvPath, envFile)

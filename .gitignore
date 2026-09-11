@@ -9,5 +9,5 @@ test-results
 example
 .claude
 .vercel
-agents
+/agents
 tsconfig.tsbuildinfo

@@ -21,6 +21,7 @@ import { IntlProvider } from "@/shared/intl/setup"
 import { messagesDe } from "@/shared/intl/messages"
 import { recordStartupTraceOnce } from "@/app/lib/reload-diagnostics"
 import { finishBrowserStartupInstrumentation } from "@/app/lib/browser-startup-instrumentation"
+import { PersonalDocumentAgentSubscriber } from "@/app/features/agents"
 
 export { PWA, buildSyncConfig }
 
@@ -141,6 +142,7 @@ function RouterWithJazz() {
 			<RecoveryConsole />
 			<BackupSubscriber />
 			<SpacesBackupSubscriber />
+			<PersonalDocumentAgentSubscriber />
 			<SplashScreen show={showSplash} />
 			{/* Mount the router only once the account root is resolved: loaders
 			    read context.me at navigation time and never re-run when it

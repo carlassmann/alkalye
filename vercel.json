@@ -24,16 +24,6 @@
 			"permanent": true
 		},
 		{
-			"source": "/privacy",
-			"destination": "/app/privacy",
-			"permanent": true
-		},
-		{
-			"source": "/imprint",
-			"destination": "/app/imprint",
-			"permanent": true
-		},
-		{
 			"source": "/welcome",
 			"destination": "/app/welcome",
 			"permanent": true

@@ -96,6 +96,8 @@ let baseCommonMessages = messages({
 	"help.website": "Website",
 
 	"footer.privacy": "Privacy",
+	"footer.terms": "Terms",
+	"footer.support": "Support",
 	"footer.imprint": "Imprint",
 
 	"sync.syncing": "Syncing",
@@ -261,6 +263,8 @@ let deCommonMessages = translate(baseCommonMessages, {
 	"help.website": "Website",
 
 	"footer.privacy": "Datenschutz",
+	"footer.terms": "Bedingungen",
+	"footer.support": "Support",
 	"footer.imprint": "Impressum",
 
 	"sync.syncing": "Synchronisiere",

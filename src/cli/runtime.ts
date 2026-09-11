@@ -6,11 +6,8 @@ import * as Option from "effect/Option"
 import { co } from "jazz-tools"
 import { createPersonalDocument } from "@/app/features/documents"
 import { getDocumentTitle } from "@/app/features/documents"
-import { applyContentDiffWithCommentAnchors } from "@/app/features/comments"
-import {
-	compactDocumentContent,
-	replaceDocumentContentGeneration,
-} from "@/app/features/documents/lib/document-generations"
+import { compactDocumentContent } from "@/app/features/documents/lib/document-generations"
+import { replaceDocumentContent } from "@/app/features/documents"
 import { moveDocumentToSpace } from "@/app/features/documents"
 import { parseInviteLink } from "@/app/features/sharing"
 import { parseSpaceInviteLink } from "@/app/features/spaces"
@@ -204,18 +201,12 @@ async function replaceCliDocumentContent(
 	doc: LoadedCliDocument,
 	content: string,
 ) {
-	let currentContent = doc.content.toString()
-	if (currentContent === content) return
-	if (getChangedContentSpan(currentContent, content) > 4_000) {
-		let compactable = await loadCompactableCliDocument(doc)
-		if (await replaceDocumentContentGeneration(compactable, content)) return
+	if (!(await replaceDocumentContent(doc, content))) {
 		throw new SyncPeerError({
 			message:
 				"Large document replacement could not establish a safe generation cutover. Retry after sync completes and collaborators disconnect.",
 		})
 	}
-	applyContentDiffWithCommentAnchors(doc, content)
-	await compactCliDocument(doc)
 }
 
 async function loadCompactableCliDocument(doc: LoadedCliDocument) {
@@ -227,30 +218,6 @@ async function loadCompactableCliDocument(doc: LoadedCliDocument) {
 			archivedContent: { $each: true, $onError: "catch" },
 		},
 	})
-}
-
-function getChangedContentSpan(currentContent: string, nextContent: string) {
-	let prefix = 0
-	let sharedLength = Math.min(currentContent.length, nextContent.length)
-	while (
-		prefix < sharedLength &&
-		currentContent[prefix] === nextContent[prefix]
-	) {
-		prefix++
-	}
-
-	let suffix = 0
-	while (
-		suffix < sharedLength - prefix &&
-		currentContent[currentContent.length - suffix - 1] ===
-			nextContent[nextContent.length - suffix - 1]
-	) {
-		suffix++
-	}
-	return Math.max(
-		currentContent.length - prefix - suffix,
-		nextContent.length - prefix - suffix,
-	)
 }
 
 async function loadDocumentMetadata(
