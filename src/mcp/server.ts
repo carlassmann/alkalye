@@ -110,8 +110,15 @@ function createAlkalyeServer(credential: string | undefined) {
 						},
 					},
 				})
+				let sharedSpaceIds = new Set(
+					(loaded.root.spaces ?? []).flatMap(space =>
+						space?.$isLoaded ? [space.$jazz.id] : [],
+					),
+				)
 				let personal = loaded.root.documents.flatMap(document =>
-					document?.$isLoaded && !document.deletedAt
+					document?.$isLoaded &&
+					!document.deletedAt &&
+					(!document.spaceId || !sharedSpaceIds.has(document.spaceId))
 						? [documentSummary(document, undefined)]
 						: [],
 				)

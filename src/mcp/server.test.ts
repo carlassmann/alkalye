@@ -8,7 +8,7 @@ import {
 	setupJazzTestSync,
 } from "jazz-tools/testing"
 import { createPersonalDocument } from "@/app/features/documents"
-import { UserAccount } from "@/schema"
+import { UserAccount, createSpace } from "@/schema"
 
 let jazzMocks = vi.hoisted(() => ({ runWithAgentAccount: vi.fn() }))
 
@@ -90,6 +90,19 @@ describe("Alkalye MCP tool catalog", () => {
 		let active = await createPersonalDocument(account, "# Active\n\nHello")
 		let archived = await createPersonalDocument(account, "# Archived")
 		archived.$jazz.set("deletedAt", new Date())
+		let spaceDocument = await createPersonalDocument(
+			account,
+			"# Space document",
+		)
+		let loaded = await account.$jazz.ensureLoaded({
+			resolve: { root: { documents: true, spaces: true } },
+		})
+		let space = createSpace("Team", loaded.root)
+		spaceDocument.$jazz.set("spaceId", space.$jazz.id)
+		let loadedSpace = await space.$jazz.ensureLoaded({
+			resolve: { documents: { $each: { content: true } } },
+		})
+		loadedSpace.documents.$jazz.push(spaceDocument)
 		jazzMocks.runWithAgentAccount.mockImplementation(
 			async (
 				_syncServer: string,
@@ -127,6 +140,19 @@ describe("Alkalye MCP tool catalog", () => {
 		expect(JSON.stringify(listed.structuredContent)).not.toContain(
 			archived.$jazz.id,
 		)
+		expect(listed.structuredContent).toMatchObject({
+			personal: expect.not.arrayContaining([
+				expect.objectContaining({ documentId: spaceDocument.$jazz.id }),
+			]),
+			spaces: [
+				expect.objectContaining({
+					spaceId: space.$jazz.id,
+					documents: expect.arrayContaining([
+						expect.objectContaining({ documentId: spaceDocument.$jazz.id }),
+					]),
+				}),
+			],
+		})
 		let read = await client.callTool({
 			name: "get_document",
 			arguments: { documentId: active.$jazz.id },

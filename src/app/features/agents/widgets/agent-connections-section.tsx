@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
-import { Bot, Loader2, ShieldCheck, Unplug } from "lucide-react"
+import { useEffect, useState, type ReactNode } from "react"
+import { Bot, ChevronRight, Loader2, ShieldCheck, Unplug } from "lucide-react"
 import { co } from "jazz-tools"
 import { Button } from "@/app/components/ui/button"
 import { Switch } from "@/app/components/ui/switch"
@@ -14,6 +14,7 @@ import { AgentConnection, Document, Space, UserAccount } from "@/schema"
 import { getDocumentTitle } from "@/app/features/documents"
 import { useIntl } from "@/shared/intl/setup"
 import { readJsonResponse, updateAgentGrants } from "../lib/agent-api"
+import { canAdministerGroup } from "../lib/resource-permissions"
 import {
 	reconcilePersonalDocumentAccess,
 	type AgentDocumentRole,
@@ -26,7 +27,7 @@ let agentConnectionsQuery = {
 		agentConnections: { $each: true },
 		documents: { $each: { content: true } },
 		inactiveDocuments: { $each: { content: true } },
-		spaces: { $each: true },
+		spaces: { $each: { documents: { $each: { content: true } } } },
 	},
 } as const
 
@@ -375,55 +376,57 @@ function ResourceAccess({
 }: ResourceAccessProps) {
 	let t = useIntl()
 	let personalDocuments = account.root.documents.flatMap(document =>
-		document?.$isLoaded ? [{ kind: "document" as const, value: document }] : [],
+		document?.$isLoaded ? [document] : [],
 	)
-	let resources: SharedResource[] = [
-		...(connection.personalDocumentsRole ? [] : personalDocuments),
-		...(account.root.spaces ?? []).flatMap(space =>
-			space?.$isLoaded ? [{ kind: "space" as const, value: space }] : [],
-		),
-	]
+	let spaces = (account.root.spaces ?? []).flatMap(space =>
+		space?.$isLoaded ? [space] : [],
+	)
 
 	return (
 		<div className="border-border border-t">
-			<div className="text-muted-foreground grid grid-cols-[minmax(0,1fr)_4.5rem_2.5rem] gap-2 px-4 py-2 text-[11px] font-medium tracking-wide uppercase sm:grid-cols-[minmax(0,1fr)_6rem_3rem]">
-				<span>{t("settings.agents.resources")}</span>
-				<span>{t("settings.agents.role")}</span>
-				<span className="sr-only">{t("settings.agents.access")}</span>
+			<div className="px-4 py-3">
+				<div className="text-sm font-medium">
+					{t("settings.agents.resources")}
+				</div>
+				<p className="text-muted-foreground mt-1 text-base/6 text-pretty sm:text-sm/5">
+					{t("settings.agents.spaceDisclosure")}
+				</p>
 			</div>
-			<PersonalDocumentsAccessRow
+			<PersonalSpaceAccess
 				account={account}
 				connection={connection}
+				documents={personalDocuments}
 				busy={busy}
 				setBusy={setBusy}
 				setError={setError}
 			/>
-			{resources.map(resource => (
-				<ResourceAccessRow
-					key={`${resource.kind}:${resource.value.$jazz.id}`}
-					resource={resource}
+			{spaces.map(space => (
+				<SpaceAccess
+					key={space.$jazz.id}
+					account={account}
+					space={space}
 					connection={connection}
 					busy={busy}
 					setBusy={setBusy}
 					setError={setError}
 				/>
 			))}
-			{resources.some(resource => resource.kind === "space") && (
-				<p className="text-muted-foreground border-border border-t px-4 py-3 text-xs/relaxed">
-					{t("settings.agents.spaceDisclosure")}
-				</p>
-			)}
 		</div>
 	)
 }
 
-function PersonalDocumentsAccessRow({
+interface PersonalSpaceAccessProps extends ResourceAccessProps {
+	documents: co.loaded<typeof Document, { content: true }>[]
+}
+
+function PersonalSpaceAccess({
 	account,
 	connection,
+	documents,
 	busy,
 	setBusy,
 	setError,
-}: ResourceAccessProps) {
+}: PersonalSpaceAccessProps) {
 	let t = useIntl()
 	let id = "personal-documents"
 	let enabled = Boolean(connection.personalDocumentsRole)
@@ -449,79 +452,211 @@ function PersonalDocumentsAccessRow({
 	}
 
 	return (
-		<div className="border-border grid grid-cols-[minmax(0,1fr)_4.5rem_2.5rem] items-center gap-2 border-t px-4 py-3 sm:grid-cols-[minmax(0,1fr)_6rem_3rem]">
-			<div className="min-w-0">
-				<div className="truncate text-sm">
-					{t("settings.agents.personalDocuments")}
+		<AccessLocation
+			account={account}
+			connection={connection}
+			label={t("settings.agents.personalDocuments")}
+			description={t("settings.agents.personalDocumentsDescription")}
+			documents={documents}
+			inheritedRole={connection.personalDocumentsRole}
+			busy={busy}
+			setBusy={setBusy}
+			setError={setError}
+			controls={
+				<AccessControls
+					label={t("settings.agents.personalDocuments")}
+					role={role}
+					enabled={enabled}
+					disabled={busy === id}
+					onUpdate={updateAccess}
+				/>
+			}
+		/>
+	)
+}
+
+interface SpaceAccessProps extends ResourceAccessProps {
+	space: co.loaded<typeof Space, { documents: { $each: { content: true } } }>
+}
+
+function SpaceAccess({
+	account,
+	space,
+	connection,
+	busy,
+	setBusy,
+	setError,
+}: SpaceAccessProps) {
+	let t = useIntl()
+	let owner = space.$jazz.owner
+	let canManage = canAdministerGroup(owner, account)
+	let currentRole = owner.getRoleOf(connection.accountId)
+	let inheritedRole: Role | undefined =
+		currentRole === "reader" || currentRole === "writer"
+			? currentRole
+			: undefined
+	let documents = space.documents.flatMap(document =>
+		document?.$isLoaded ? [document] : [],
+	)
+
+	return (
+		<AccessLocation
+			account={account}
+			connection={connection}
+			label={space.name}
+			description={t(
+				canManage ? "settings.agents.space" : "settings.agents.adminRequired",
+			)}
+			documents={documents}
+			inheritedRole={inheritedRole}
+			busy={busy}
+			setBusy={setBusy}
+			setError={setError}
+			controls={
+				<ResourceAccessControls
+					account={account}
+					resource={{ kind: "space", value: space }}
+					connection={connection}
+					busy={busy}
+					setBusy={setBusy}
+					setError={setError}
+				/>
+			}
+		/>
+	)
+}
+
+interface AccessLocationProps extends ResourceAccessProps {
+	label: string
+	description: string
+	documents: co.loaded<typeof Document, { content: true }>[]
+	inheritedRole: Role | undefined
+	controls: ReactNode
+}
+
+function AccessLocation({
+	account,
+	connection,
+	label,
+	description,
+	documents,
+	inheritedRole,
+	controls,
+	busy,
+	setBusy,
+	setError,
+}: AccessLocationProps) {
+	let t = useIntl()
+	return (
+		<section className="border-border border-t">
+			<div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3">
+				<div className="min-w-0">
+					<div className="truncate text-base font-medium sm:text-sm">
+						{label}
+					</div>
+					<div className="text-muted-foreground text-sm sm:text-xs">
+						{description}
+					</div>
 				</div>
-				<div className="text-muted-foreground text-[11px]">
-					{t("settings.agents.personalDocumentsDescription")}
-				</div>
+				{controls}
 			</div>
-			<Select
-				value={role}
-				onValueChange={value => {
-					if ((value === "reader" || value === "writer") && enabled) {
-						void updateAccess(value)
-					}
-				}}
-				disabled={!enabled || busy === id}
-			>
-				<SelectTrigger
-					aria-label={t("settings.agents.roleFor", {
-						name: t("settings.agents.personalDocuments"),
-					})}
-				>
-					<SelectValue>
-						{t(
-							role === "reader"
-								? "settings.agents.read"
-								: "settings.agents.write",
-						)}
-					</SelectValue>
-				</SelectTrigger>
-				<SelectContent>
-					<SelectItem value="reader">{t("settings.agents.read")}</SelectItem>
-					<SelectItem value="writer">{t("settings.agents.write")}</SelectItem>
-				</SelectContent>
-			</Select>
-			<Switch
-				checked={enabled}
-				onCheckedChange={checked =>
-					void updateAccess(checked ? role : undefined)
-				}
-				disabled={busy === id}
-				aria-label={t(
-					enabled
-						? "settings.agents.removeAccess"
-						: "settings.agents.grantAccess",
-					{ name: t("settings.agents.personalDocuments") },
-				)}
-			/>
-		</div>
+			{documents.length > 0 && (
+				<details className="group border-border border-t">
+					<summary className="text-muted-foreground pointer-fine:hover:text-foreground flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-base sm:py-2 sm:text-sm">
+						<ChevronRight className="size-4 shrink-0 group-open:rotate-90" />
+						{t("settings.agents.documents", {
+							count: documents.length.toString(),
+						})}
+					</summary>
+					<div className="bg-muted/20 border-border border-t">
+						{documents.map(document => (
+							<ResourceAccessRow
+								key={document.$jazz.id}
+								account={account}
+								resource={{ kind: "document", value: document }}
+								connection={connection}
+								inheritedFrom={inheritedRole ? label : undefined}
+								busy={busy}
+								setBusy={setBusy}
+								setError={setError}
+							/>
+						))}
+					</div>
+				</details>
+			)}
+		</section>
 	)
 }
 
 interface ResourceAccessRowProps {
+	account: AgentAccount
 	resource: SharedResource
 	connection: co.loaded<typeof AgentConnection>
+	inheritedFrom?: string
 	busy?: string
 	setBusy(value: string | undefined): void
 	setError(value: string | undefined): void
 }
 
 function ResourceAccessRow({
+	account,
 	resource,
 	connection,
+	inheritedFrom,
 	busy,
 	setBusy,
 	setError,
 }: ResourceAccessRowProps) {
 	let t = useIntl()
+	let label =
+		resource.kind === "space"
+			? resource.value.name
+			: getDocumentTitle(resource.value) || t("settings.agents.untitled")
+	let canManage = canAdministerGroup(resource.value.$jazz.owner, account)
+
+	return (
+		<div className="border-border grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-t px-4 py-3 first:border-t-0 sm:py-2">
+			<div className="min-w-0 pl-6">
+				<div className="truncate text-base sm:text-sm">{label}</div>
+				<div className="text-muted-foreground text-sm sm:text-xs">
+					{!canManage
+						? t("settings.agents.adminRequired")
+						: inheritedFrom
+							? t("settings.agents.includedThrough", { name: inheritedFrom })
+							: t("settings.agents.document")}
+				</div>
+			</div>
+			<ResourceAccessControls
+				account={account}
+				resource={resource}
+				connection={connection}
+				inherited={Boolean(inheritedFrom)}
+				busy={busy}
+				setBusy={setBusy}
+				setError={setError}
+			/>
+		</div>
+	)
+}
+
+interface ResourceAccessControlsProps extends ResourceAccessRowProps {
+	inherited?: boolean
+}
+
+function ResourceAccessControls({
+	account,
+	resource,
+	connection,
+	inherited,
+	busy,
+	setBusy,
+	setError,
+}: ResourceAccessControlsProps) {
+	let t = useIntl()
 	let id = resource.value.$jazz.id
 	let owner = resource.value.$jazz.owner
 	let currentRole = owner.getRoleOf(connection.accountId)
-	let canManage = owner.myRole() === "admin"
+	let canManage = canAdministerGroup(owner, account)
 	let role: Role = currentRole === "writer" ? "writer" : "reader"
 	let enabled = currentRole === "reader" || currentRole === "writer"
 	let label =
@@ -529,14 +664,14 @@ function ResourceAccessRow({
 			? resource.value.name
 			: getDocumentTitle(resource.value) || t("settings.agents.untitled")
 
-	async function updateAccess(enabledNext: boolean, roleNext: Role = role) {
+	async function updateAccess(roleNext: Role | undefined) {
 		setBusy(id)
 		setError(undefined)
 		let restoreMembership: (() => void) | undefined
 		try {
 			let agent = await UserAccount.load(connection.accountId)
 			if (!agent.$isLoaded) throw new Error("Agent account is unavailable")
-			if (enabledNext) owner.addMember(agent, roleNext)
+			if (roleNext) owner.addMember(agent, roleNext)
 			else owner.removeMember(agent)
 			restoreMembership = () => {
 				if (currentRole === "reader" || currentRole === "writer") {
@@ -547,7 +682,7 @@ function ResourceAccessRow({
 			}
 			await updateAgentGrants(connection.credential, [
 				{
-					action: enabledNext ? "add" : "remove",
+					action: roleNext ? "add" : "remove",
 					resource: { kind: resource.kind, id },
 				},
 			])
@@ -560,25 +695,44 @@ function ResourceAccessRow({
 	}
 
 	return (
-		<div className="border-border grid grid-cols-[minmax(0,1fr)_4.5rem_2.5rem] items-center gap-2 border-t px-4 py-3 sm:grid-cols-[minmax(0,1fr)_6rem_3rem]">
-			<div className="min-w-0">
-				<div className="truncate text-sm">{label}</div>
-				<div className="text-muted-foreground text-[11px]">
-					{!canManage
-						? t("settings.agents.adminRequired")
-						: resource.kind === "space"
-							? t("settings.agents.space")
-							: t("settings.agents.document")}
-				</div>
-			</div>
+		<div className="flex shrink-0 items-center gap-2">
+			<AccessControls
+				label={label}
+				role={role}
+				enabled={enabled}
+				disabled={!canManage || inherited || busy === id}
+				onUpdate={updateAccess}
+			/>
+		</div>
+	)
+}
+
+interface AccessControlsProps {
+	label: string
+	role: Role
+	enabled: boolean
+	disabled: boolean
+	onUpdate(role: Role | undefined): void | Promise<void>
+}
+
+function AccessControls({
+	label,
+	role,
+	enabled,
+	disabled,
+	onUpdate,
+}: AccessControlsProps) {
+	let t = useIntl()
+	return (
+		<div className="flex shrink-0 items-center gap-2">
 			<Select
 				value={role}
 				onValueChange={value => {
 					if ((value === "reader" || value === "writer") && enabled) {
-						void updateAccess(true, value)
+						void onUpdate(value)
 					}
 				}}
-				disabled={!canManage || !enabled || busy === id}
+				disabled={!enabled || disabled}
 			>
 				<SelectTrigger
 					aria-label={t("settings.agents.roleFor", { name: label })}
@@ -598,8 +752,8 @@ function ResourceAccessRow({
 			</Select>
 			<Switch
 				checked={enabled}
-				onCheckedChange={checked => void updateAccess(checked)}
-				disabled={!canManage || busy === id}
+				onCheckedChange={checked => void onUpdate(checked ? role : undefined)}
+				disabled={disabled}
 				aria-label={t(
 					enabled
 						? "settings.agents.removeAccess"
