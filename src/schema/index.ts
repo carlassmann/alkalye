@@ -60,6 +60,7 @@ let UserRoot = co.map({
 	settings: co.optional(Settings),
 	themes: co.optional(co.list(Theme)),
 	agentConnections: co.optional(co.list(AgentConnection)),
+	revokedAt: z.date().optional(),
 	language: z.enum(["de", "en"]).optional(),
 	migrationVersion: z.number().optional(),
 	lastOpenedDocId: z.string().optional(),

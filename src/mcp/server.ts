@@ -267,6 +267,7 @@ function createAlkalyeServer(credential: string | undefined) {
 					writableSpace.$jazz.owner,
 					writableSpace.$jazz.id,
 					content,
+					account,
 				)
 				writableSpace.documents.$jazz.push(document)
 				await sync()
@@ -578,6 +579,7 @@ function publicToolError(error: unknown) {
 function isPublicToolError(error: unknown): error is Error {
 	if (!(error instanceof Error)) return false
 	let safeMessages = new Set([
+		"Agent connection is disconnected",
 		"Space not found",
 		"Space is unavailable",
 		"Document not found",

@@ -5,7 +5,6 @@ import { Document, Space, UserAccount } from "@/schema"
 import { agentCredentialsSchema } from "@/mcp/credentials"
 import { getMcpConfig } from "@/mcp/config"
 import { runWithAgentAccount } from "@/mcp/jazz"
-import { credentialRevocationKey } from "@/mcp/oauth"
 
 export { POST }
 
@@ -43,13 +42,6 @@ let POST: APIRoute = async ({ request }) => {
 			input.credential,
 			agentCredentialsSchema,
 		)
-		if (
-			await config.replayStore.isRevoked(
-				credentialRevocationKey(input.credential),
-			)
-		) {
-			throw new Error("Agent connection is revoked")
-		}
 		await runWithAgentAccount(
 			config.syncServer,
 			credentials,

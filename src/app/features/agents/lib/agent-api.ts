@@ -1,9 +1,21 @@
-export { updateAgentGrants }
+export { readJsonResponse, updateAgentGrants }
 export type { AgentGrantUpdate }
 
 interface AgentGrantUpdate {
 	action: "add" | "remove"
 	resource: { kind: "document" | "space"; id: string }
+}
+
+async function readJsonResponse(response: Response): Promise<unknown> {
+	let body = await response.text()
+	if (!body) return undefined
+
+	try {
+		let value: unknown = JSON.parse(body)
+		return value
+	} catch {
+		return undefined
+	}
 }
 
 async function updateAgentGrants(

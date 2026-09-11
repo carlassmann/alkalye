@@ -1,5 +1,4 @@
 import { Buffer } from "node:buffer"
-import { createHash } from "node:crypto"
 import { z } from "zod"
 import type { TokenReplayStore } from "./replay-store"
 import type { TokenCodec } from "./token"
@@ -9,7 +8,6 @@ export {
 	consentRequestSchema,
 	pkceVerifierSchema,
 	approveAuthorization,
-	credentialRevocationKey,
 	exchangeAuthorizationCode,
 	exchangeRefreshToken,
 	readAccessToken,
@@ -105,11 +103,6 @@ async function exchangeAuthorizationCode(args: {
 		authorizationCodeSchema,
 	)
 	if (
-		await args.replayStore.isRevoked(credentialRevocationKey(code.credential))
-	) {
-		throw new Error("invalid_grant")
-	}
-	if (
 		code.clientId !== args.clientId ||
 		code.redirectUri !== args.redirectUri ||
 		code.resource !== args.resource ||
@@ -135,11 +128,6 @@ async function exchangeRefreshToken(args: {
 		args.refreshToken,
 		refreshTokenSchema,
 	)
-	if (
-		await args.replayStore.isRevoked(credentialRevocationKey(token.credential))
-	) {
-		throw new Error("invalid_grant")
-	}
 	if (token.clientId !== args.clientId || token.resource !== args.resource) {
 		throw new Error("invalid_grant")
 	}
@@ -179,10 +167,6 @@ async function mintTokens(
 
 function readAccessToken(tokens: TokenCodec, token: string) {
 	return tokens.open("access_token", token, accessTokenSchema)
-}
-
-function credentialRevocationKey(credential: string) {
-	return createHash("sha256").update(credential).digest("base64url")
 }
 
 async function matchesCodeChallenge(verifier: string, expected: string) {

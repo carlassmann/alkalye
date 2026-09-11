@@ -93,7 +93,7 @@ Every tool has a title, model-facing description, exact input/output schema, OAu
 - [x] Stable MCP, OAuth discovery, authorization, token, and domain-challenge routes.
 - [x] Dedicated Jazz agent account per user and provider.
 - [x] Per-space reader/writer grants and personal-document reader/writer policy.
-- [x] PKCE S256, exact scope, client redirect validation, one-time codes, refresh rotation, and bearer challenges.
+- [x] PKCE S256, exact scope, client redirect validation, instance-local replay protection, refresh rotation, and bearer challenges.
 - [x] Exact output schemas, security metadata, safe errors, revision checks, and tool annotations.
 - [x] Public Privacy, Terms, and Support pages.
 - [x] Automated metadata, OAuth, MCP catalog, permission, migration, and UI tests.

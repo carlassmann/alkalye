@@ -63,8 +63,6 @@ PUBLIC_JAZZ_SYNC_SERVER=wss://your-sync-server.example
 ALKALYE_MCP_BASE_URL=https://www.alkalye.com
 ALKALYE_MCP_TOKEN_KEY=<32 random bytes encoded as base64url>
 ALKALYE_MCP_ALLOWED_CLIENT_HOSTS=chatgpt.com,openai.com
-ALKALYE_MCP_REDIS_URL=<Upstash Redis REST URL>
-ALKALYE_MCP_REDIS_TOKEN=<Upstash Redis REST token>
 ALKALYE_OPENAI_APPS_CHALLENGE=<OpenAI portal challenge token>
 ```
 
@@ -76,9 +74,11 @@ openssl rand -base64 32 | tr '+/' '-_' | tr -d '='
 
 Use the same token key across every deployment instance. Rotating it disconnects every agent and invalidates outstanding OAuth tokens.
 
-## Production requirements
+## Replay and revocation
 
-Set `ALKALYE_MCP_REDIS_URL` and `ALKALYE_MCP_REDIS_TOKEN`. The replay store atomically enforces one-time authorization codes and refresh-token rotation across server instances. Localhost uses an in-memory store for development only.
+Authorization codes and refresh tokens are protected against immediate reuse within one warm server instance. PKCE binds authorization codes to the requesting client. Because Vercel can run multiple instances, replay detection is best-effort rather than globally serialized.
+
+Access revocation does not depend on server memory. Disconnect marks the dedicated Jazz agent account as revoked and clears its grant index. Every MCP and grant operation rejects revoked accounts, so old access and refresh tokens become inert.
 
 Then exercise provisioning, grants, OAuth, MCP discovery, read, concurrent-edit rejection, comment, revoke, and disconnect against the deployed origin.
 

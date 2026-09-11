@@ -14,7 +14,7 @@ export {
 	createAgentAccount,
 	openAgentAccount,
 	runWithAgentAccount,
-	closeAgentAccountRuntime,
+	revokeAgentAccount,
 }
 
 type OpenAgent = Awaited<ReturnType<typeof openAgentAccount>>
@@ -78,7 +78,7 @@ async function openAgentAccount(
 		crypto: cryptoProvider,
 		AccountSchema: UserAccount,
 		sessionProvider: new MockSessionProvider(),
-		asActiveAccount: true,
+		asActiveAccount: false,
 	})
 	peer.attach(context.node)
 
@@ -96,7 +96,56 @@ async function runWithAgentAccount<Result>(
 	credentials: AgentCredentials,
 	operation: (agent: OpenAgent) => Promise<Result>,
 	operationTimeoutMs: number | false = agentToolTimeout,
+): Promise<Result> {
+	return runWithAgentAccountState(
+		syncServer,
+		credentials,
+		operation,
+		operationTimeoutMs,
+		false,
+	)
+}
+
+async function revokeAgentAccount(
+	syncServer: string,
+	credentials: AgentCredentials,
 ) {
+	await runWithAgentAccountState(
+		syncServer,
+		credentials,
+		async agent => {
+			let account = await agent.account.$jazz.ensureLoaded({
+				resolve: {
+					root: {
+						documents: true,
+						inactiveDocuments: true,
+						spaces: true,
+					},
+				},
+			})
+			account.root.$jazz.set("revokedAt", new Date())
+			await account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
+			account.root.documents.$jazz.splice(0, account.root.documents.length)
+			account.root.inactiveDocuments?.$jazz.splice(
+				0,
+				account.root.inactiveDocuments.length,
+			)
+			account.root.spaces?.$jazz.splice(0, account.root.spaces.length)
+			await account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
+		},
+		agentToolTimeout,
+		true,
+	)
+	await closeAgentAccountRuntime(credentials.accountId)
+}
+
+async function runWithAgentAccountState<Result>(
+	syncServer: string,
+	credentials: AgentCredentials,
+	operation: (agent: OpenAgent) => Promise<Result>,
+	operationTimeoutMs: number | false,
+	allowRevoked: boolean,
+): Promise<Result> {
 	await evictIdleAgentRuntimes()
 	let key = credentials.accountId
 	let runtime = agentRuntimes.get(key)
@@ -121,11 +170,12 @@ async function runWithAgentAccount<Result>(
 	if (runtime.invalidated) {
 		runtime.active--
 		release()
-		return runWithAgentAccount(
+		return runWithAgentAccountState(
 			syncServer,
 			credentials,
 			operation,
 			operationTimeoutMs,
+			allowRevoked,
 		)
 	}
 	try {
@@ -135,6 +185,12 @@ async function runWithAgentAccount<Result>(
 		} catch (error) {
 			invalidateAgentRuntime(key, runtime)
 			throw error
+		}
+		let account = await agent.account.$jazz.ensureLoaded({
+			resolve: { root: true },
+		})
+		if (!allowRevoked && account.root.revokedAt) {
+			throw new Error("Agent connection is disconnected")
 		}
 		try {
 			let result = operation(agent)

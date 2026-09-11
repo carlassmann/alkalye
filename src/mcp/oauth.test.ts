@@ -1,11 +1,10 @@
 import { Buffer } from "node:buffer"
 import { describe, expect, test, vi } from "vitest"
 import { createTokenCodec } from "./token"
-import { createInMemoryReplayStore } from "./replay-store"
+import { createEphemeralReplayStore } from "./replay-store"
 import {
 	authorizationRequestSchema,
 	approveAuthorization,
-	credentialRevocationKey,
 	exchangeAuthorizationCode,
 	exchangeRefreshToken,
 	pkceVerifierSchema,
@@ -40,7 +39,7 @@ describe("MCP OAuth", () => {
 	})
 
 	test("binds and consumes authorization codes exactly once", async () => {
-		let replayStore = createInMemoryReplayStore()
+		let replayStore = createEphemeralReplayStore()
 		let verifier = "a".repeat(48)
 		let challenge = Buffer.from(
 			await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier)),
@@ -112,7 +111,7 @@ describe("MCP OAuth", () => {
 	})
 
 	test("rotates refresh tokens", async () => {
-		let replayStore = createInMemoryReplayStore()
+		let replayStore = createEphemeralReplayStore()
 		let verifier = "a".repeat(48)
 		let challenge = Buffer.from(
 			await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier)),
@@ -166,29 +165,6 @@ describe("MCP OAuth", () => {
 			"invalid_grant",
 		)
 		vi.unstubAllGlobals()
-	})
-
-	test("rejects refresh tokens after their connection is revoked", async () => {
-		let replayStore = createInMemoryReplayStore()
-		let credential = "wrapped-agent"
-		let refreshToken = await tokens.seal("refresh_token", {
-			jti: crypto.randomUUID(),
-			clientId: "https://chatgpt.example/client.json",
-			resource: "https://www.alkalye.com/mcp",
-			scope: "alkalye",
-			credential,
-		})
-		await replayStore.revoke(credentialRevocationKey(credential), 60_000)
-
-		await expect(
-			exchangeRefreshToken({
-				tokens,
-				replayStore,
-				refreshToken,
-				clientId: "https://chatgpt.example/client.json",
-				resource: "https://www.alkalye.com/mcp",
-			}),
-		).rejects.toThrow("invalid_grant")
 	})
 
 	test("rejects unregistered redirect URIs", async () => {

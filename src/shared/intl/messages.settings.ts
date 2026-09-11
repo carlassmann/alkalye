@@ -20,8 +20,6 @@ let baseSettingsMessages = messages({
 	"settings.agents.ready":
 		"Alkalye access is ready. Finish connecting from ChatGPT.",
 	"settings.agents.disconnected": "ChatGPT disconnected",
-	"settings.agents.disconnectedWithCleanup":
-		"ChatGPT disconnected. Some old collaborator entries may remain visible.",
 	"settings.agents.authorize": "Authorize {$client}",
 	"settings.agents.authorizationReady":
 		"Authorization request ready for {$client}.",
@@ -179,8 +177,6 @@ let deSettingsMessages = translate(baseSettingsMessages, {
 	"settings.agents.ready":
 		"Der Alkalye-Zugriff ist bereit. Schließe die Verbindung in ChatGPT ab.",
 	"settings.agents.disconnected": "ChatGPT wurde getrennt",
-	"settings.agents.disconnectedWithCleanup":
-		"ChatGPT wurde getrennt. Einige alte Mitarbeiter-Einträge können sichtbar bleiben.",
 	"settings.agents.authorize": "{$client} autorisieren",
 	"settings.agents.authorizationReady":
 		"Autorisierungsanfrage für {$client} ist bereit.",

@@ -2,19 +2,14 @@ import { PUBLIC_JAZZ_SYNC_SERVER } from "astro:env/client"
 import {
 	ALKALYE_MCP_ALLOWED_CLIENT_HOSTS,
 	ALKALYE_MCP_BASE_URL,
-	ALKALYE_MCP_REDIS_TOKEN,
-	ALKALYE_MCP_REDIS_URL,
 	ALKALYE_MCP_TOKEN_KEY,
 } from "astro:env/server"
 import { createTokenCodec } from "./token"
-import {
-	createInMemoryReplayStore,
-	createRedisReplayStore,
-} from "./replay-store"
+import { createEphemeralReplayStore } from "./replay-store"
 
 export { getMcpConfig }
 
-let developmentReplayStore = createInMemoryReplayStore()
+let replayStore = createEphemeralReplayStore()
 
 function getMcpConfig() {
 	let baseUrl = requiredUrl(ALKALYE_MCP_BASE_URL, "ALKALYE_MCP_BASE_URL")
@@ -33,26 +28,8 @@ function getMcpConfig() {
 			.split(",")
 			.map(host => host.trim().toLowerCase())
 			.filter(Boolean),
-		replayStore: createReplayStore(baseUrl),
+		replayStore,
 	}
-}
-
-function createReplayStore(baseUrl: URL) {
-	if (ALKALYE_MCP_REDIS_URL && ALKALYE_MCP_REDIS_TOKEN) {
-		return createRedisReplayStore({
-			url: ALKALYE_MCP_REDIS_URL,
-			token: ALKALYE_MCP_REDIS_TOKEN,
-		})
-	}
-	if (
-		baseUrl.hostname === "localhost" ||
-		baseUrl.hostname.endsWith(".localhost")
-	) {
-		return developmentReplayStore
-	}
-	throw new Error(
-		"ALKALYE_MCP_REDIS_URL and ALKALYE_MCP_REDIS_TOKEN are required in production",
-	)
 }
 
 function requiredUrl(input: string, name: string): URL {

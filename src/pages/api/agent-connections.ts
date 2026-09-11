@@ -3,8 +3,7 @@ import type { APIRoute } from "astro"
 import { z } from "zod"
 import { getMcpConfig } from "@/mcp/config"
 import { agentCredentialsSchema } from "@/mcp/credentials"
-import { credentialRevocationKey } from "@/mcp/oauth"
-import { closeAgentAccountRuntime, createAgentAccount } from "@/mcp/jazz"
+import { createAgentAccount, revokeAgentAccount } from "@/mcp/jazz"
 
 export { POST, DELETE }
 
@@ -54,17 +53,11 @@ let DELETE: APIRoute = async ({ request }) => {
 			credential,
 			agentCredentialsSchema,
 		)
-		await config.replayStore.revoke(
-			credentialRevocationKey(credential),
-			30 * 24 * 60 * 60_000,
-		)
-		void closeAgentAccountRuntime(credentials.accountId).catch(error => {
-			console.error("[agent-connections] runtime cleanup failed", error)
-		})
+		await revokeAgentAccount(config.syncServer, credentials)
 		return json({ ok: true })
 	} catch (error) {
-		console.error("[agent-connections] revocation failed", error)
-		return json({ error: "Could not revoke agent connection" }, 400)
+		console.error("[agent-connections] disconnect failed", error)
+		return json({ error: "Could not disconnect agent connection" }, 400)
 	}
 }
 

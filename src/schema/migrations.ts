@@ -77,15 +77,18 @@ async function initializeNewAccount(
 	if (!account.$jazz.has("root")) {
 		account.$jazz.set(
 			"root",
-			UserRoot.create({
-				documents: co.list(Document).create([]),
-				migrationVersion: currentRootMigrationVersion,
-			}),
+			UserRoot.create(
+				{
+					documents: co.list(Document).create([], account),
+					migrationVersion: currentRootMigrationVersion,
+				},
+				account,
+			),
 		)
 	}
 
 	if (!account.$jazz.has("profile")) {
-		let profileGroup = Group.create()
+		let profileGroup = Group.create(account)
 		profileGroup.makePublic()
 		account.$jazz.set(
 			"profile",
@@ -98,7 +101,7 @@ async function initializeNewAccount(
 	})
 
 	if (root.documents.length === 0) {
-		root.documents.$jazz.push(await createWelcomeDocument())
+		root.documents.$jazz.push(await createWelcomeDocument(account))
 	}
 
 	addMissingRootCollections(root)
@@ -197,6 +200,7 @@ function compactUserRoot(
 	if (root.language) values.language = root.language
 	if (root.lastOpenedDocId) values.lastOpenedDocId = root.lastOpenedDocId
 	if (root.lastOpenedSpaceId) values.lastOpenedSpaceId = root.lastOpenedSpaceId
+	if (root.revokedAt) values.revokedAt = root.revokedAt
 	return UserRoot.create(values, owner)
 }
 
@@ -226,10 +230,10 @@ function addMissingRootCollections(root: co.loaded<typeof UserRoot>) {
 	}
 }
 
-async function createWelcomeDocument() {
+async function createWelcomeDocument(account: co.loaded<typeof UserAccount>) {
 	let welcomeContent = await fetchWelcomeContent()
 	let now = new Date()
-	let group = Group.create()
+	let group = Group.create(account)
 	return Document.create(
 		{
 			version: 1,

@@ -281,6 +281,8 @@ describe("runAccountMigration - idempotency on a fully loaded account", () => {
 			oldRoot.$jazz.set("lastOpenedDocId", `document-${index}`)
 		}
 		oldRoot.$jazz.set("language", "de")
+		let revokedAt = new Date("2026-09-11T12:00:00.000Z")
+		oldRoot.$jazz.set("revokedAt", revokedAt)
 		oldRoot.$jazz.set("migrationVersion", 1)
 		let oldReplaySize =
 			oldRoot.$jazz.raw.core.getValidSortedTransactions().length
@@ -309,6 +311,7 @@ describe("runAccountMigration - idempotency on a fully loaded account", () => {
 		expect(after.root.settings?.$jazz.id).toBe(settingsId)
 		expect(after.root.themes?.$jazz.id).toBe(themesId)
 		expect(after.root.language).toBe("de")
+		expect(after.root.revokedAt).toEqual(revokedAt)
 		expect(after.root.migrationVersion).toBe(2)
 		expect(newReplaySize).toBeLessThanOrEqual(2)
 		expect(readLastOpenedDocument(account.$jazz.id)).toEqual({

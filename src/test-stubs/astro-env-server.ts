@@ -1,6 +1,4 @@
 export let ALKALYE_MCP_ALLOWED_CLIENT_HOSTS = "chatgpt.com,openai.com"
 export let ALKALYE_MCP_BASE_URL = "https://www.alkalye.com"
-export let ALKALYE_MCP_REDIS_TOKEN = ""
-export let ALKALYE_MCP_REDIS_URL = ""
 export let ALKALYE_MCP_TOKEN_KEY = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 export let ALKALYE_OPENAI_APPS_CHALLENGE = ""

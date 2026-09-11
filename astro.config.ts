@@ -115,16 +115,6 @@ export default defineConfig({
 				access: "secret",
 				optional: true,
 			}),
-			ALKALYE_MCP_REDIS_URL: envField.string({
-				context: "server",
-				access: "secret",
-				optional: true,
-			}),
-			ALKALYE_MCP_REDIS_TOKEN: envField.string({
-				context: "server",
-				access: "secret",
-				optional: true,
-			}),
 			ALKALYE_OPENAI_APPS_CHALLENGE: envField.string({
 				context: "server",
 				access: "secret",

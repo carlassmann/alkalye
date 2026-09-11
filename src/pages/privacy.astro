@@ -30,10 +30,10 @@ import LegalDoc from "@/layouts/LegalDoc.astro"
 		<li>The agent can decrypt only documents and spaces you explicitly grant to it</li>
 		<li>Content returned by an agent tool is sent to the AI provider and is then subject to that provider's terms and privacy policy</li>
 		<li>Removing a grant revokes the agent account's cryptographic access to that item</li>
-		<li>Disconnecting removes the agent from all documents and spaces visible in your account</li>
+		<li>Disconnecting revokes the agent account and removes grants you can administer</li>
 	</ul>
 	<p>The hosted connector processes granted content in memory to answer tool calls. Its stored agent credential is encrypted with a server-held key.</p>
-	<p>Depending on the tool, shared data may include document and space names and identifiers, Markdown content, revisions, timestamps, comments, comment status, and collaborator display names. OAuth access and refresh tokens contain the encrypted agent credential and expire. The connector stores short-lived replay-prevention identifiers, not document content, for used authorization codes and refresh tokens.</p>
+	<p>Depending on the tool, shared data may include document and space names and identifiers, Markdown content, revisions, timestamps, comments, comment status, and collaborator display names. OAuth access and refresh tokens contain the encrypted agent credential and expire. The connector temporarily keeps short-lived replay-prevention identifiers in server memory, not document content.</p>
 
 	<h2>Analytics</h2>
 	<p>We use privacy-preserving, aggregate product analytics. We do not use document contents for analytics.</p>

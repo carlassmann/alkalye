@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro"
 import { getMcpConfig } from "@/mcp/config"
-import { credentialRevocationKey, readAccessToken } from "@/mcp/oauth"
+import { readAccessToken } from "@/mcp/oauth"
 import { mcpHandler } from "@/mcp/server"
 
 export { GET, POST, DELETE, OPTIONS }
@@ -22,10 +22,7 @@ let handle: APIRoute = async ({ request }) => {
 		let resource = new URL("/mcp", config.baseUrl).toString()
 		if (
 			access.resource !== resource ||
-			!access.scope.split(" ").includes("alkalye") ||
-			(await config.replayStore.isRevoked(
-				credentialRevocationKey(access.credential),
-			))
+			!access.scope.split(" ").includes("alkalye")
 		) {
 			return unauthorized(config.baseUrl)
 		}

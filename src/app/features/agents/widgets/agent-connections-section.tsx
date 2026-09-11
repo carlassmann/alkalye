@@ -13,7 +13,7 @@ import {
 import { AgentConnection, Document, Space, UserAccount } from "@/schema"
 import { getDocumentTitle } from "@/app/features/documents"
 import { useIntl } from "@/shared/intl/setup"
-import { updateAgentGrants } from "../lib/agent-api"
+import { readJsonResponse, updateAgentGrants } from "../lib/agent-api"
 import {
 	reconcilePersonalDocumentAccess,
 	type AgentDocumentRole,
@@ -79,7 +79,7 @@ function AgentConnectionsSection({
 		fetch(`/api/oauth-consent?token=${encodeURIComponent(oauth)}`, {
 			signal: controller.signal,
 		})
-			.then(response => response.json())
+			.then(readJsonResponse)
 			.then((value: unknown) => {
 				if (isAuthorizationConsent(value)) {
 					setLoadedAuthorization({ token: oauth, authorization: value })
@@ -103,7 +103,7 @@ function AgentConnectionsSection({
 				headers: { "content-type": "application/json" },
 				body: JSON.stringify({ provider: "openai" }),
 			})
-			let result: unknown = await response.json()
+			let result = await readJsonResponse(response)
 			if (!response.ok || !isProvisionedConnection(result)) {
 				throw new Error(
 					readApiError(result, "Could not create the ChatGPT connection"),
@@ -147,7 +147,7 @@ function AgentConnectionsSection({
 					consent: oauth,
 				}),
 			})
-			let result: unknown = await response.json()
+			let result = await readJsonResponse(response)
 			if (!response.ok || !hasRedirect(result)) {
 				throw new Error("Could not authorize ChatGPT")
 			}
@@ -169,7 +169,7 @@ function AgentConnectionsSection({
 				headers: { "content-type": "application/json" },
 				body: JSON.stringify({ decision: "deny", consent: oauth }),
 			})
-			let result: unknown = await response.json()
+			let result = await readJsonResponse(response)
 			if (!response.ok || !hasRedirect(result)) {
 				throw new Error("Could not deny authorization")
 			}
@@ -186,9 +186,9 @@ function AgentConnectionsSection({
 		setBusy("disconnect")
 		setError(undefined)
 		setStatus(undefined)
-		let cleanupError: unknown
 		try {
 			let agent = await UserAccount.load(connection.accountId)
+			if (!agent.$isLoaded) throw new Error("Agent account is unavailable")
 			let resources = [
 				...account.root.documents.flatMap(document =>
 					document?.$isLoaded
@@ -211,35 +211,28 @@ function AgentConnectionsSection({
 					resource: { kind: resource.kind, id: resource.value.$jazz.id },
 				})),
 			)
-			if (agent.$isLoaded) {
-				for (let resource of resources) {
-					let owner = resource.value.$jazz.owner
-					if (owner.getRoleOf(account.$jazz.id) === "admin") {
-						owner.removeMember(agent)
-					}
+			for (let resource of resources) {
+				let owner = resource.value.$jazz.owner
+				if (owner.getRoleOf(account.$jazz.id) === "admin") {
+					owner.removeMember(agent)
 				}
-			} else cleanupError = new Error("Agent account is unavailable")
-		} catch (cause) {
-			cleanupError = cause
-		}
-		try {
-			let revokeResponse = await fetch("/api/agent-connections", {
+			}
+			await account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
+			let disconnectResponse = await fetch("/api/agent-connections", {
 				method: "DELETE",
 				headers: { "content-type": "application/json" },
 				body: JSON.stringify({ credential: connection.credential }),
 			})
-			if (!revokeResponse.ok) throw new Error("Could not revoke the connection")
+			if (!disconnectResponse.ok) {
+				throw new Error("Could not disconnect ChatGPT")
+			}
 			let index = account.root.agentConnections?.findIndex(
 				item => item?.$jazz.id === connection.$jazz.id,
 			)
 			if (index !== undefined && index !== -1) {
 				account.root.agentConnections?.$jazz.splice(index, 1)
 			}
-			setStatus(
-				cleanupError
-					? t("settings.agents.disconnectedWithCleanup")
-					: t("settings.agents.disconnected"),
-			)
+			setStatus(t("settings.agents.disconnected"))
 		} catch (cause) {
 			setError(cause instanceof Error ? cause.message : "Disconnect failed")
 		} finally {
