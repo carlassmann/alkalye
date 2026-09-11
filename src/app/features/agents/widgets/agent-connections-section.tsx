@@ -13,6 +13,10 @@ import {
 import { AgentConnection, Document, Space, UserAccount } from "@/schema"
 import { getDocumentTitle } from "@/app/features/documents"
 import { useIntl } from "@/shared/intl/setup"
+import {
+	SettingsSection,
+	SettingsPanel,
+} from "@/app/components/ui/settings-layout"
 import { readJsonResponse, updateAgentGrants } from "../lib/agent-api"
 import { canAdministerGroup } from "../lib/resource-permissions"
 import {
@@ -242,11 +246,8 @@ function AgentConnectionsSection({
 	}
 
 	return (
-		<section>
-			<h2 className="text-muted-foreground mb-3 text-sm font-medium">
-				{t("settings.agents.title")}
-			</h2>
-			<div className="border-border bg-muted/20 border">
+		<SettingsSection title={t("settings.agents.title")}>
+			<SettingsPanel>
 				<div className="flex items-start gap-3 p-4">
 					<div className="bg-background border-border flex size-9 shrink-0 items-center justify-center border">
 						<Bot className="size-4" />
@@ -346,16 +347,16 @@ function AgentConnectionsSection({
 						setError={setError}
 					/>
 				)}
-			</div>
+			</SettingsPanel>
 			{error && (
-				<p className="text-destructive mt-2 text-xs" role="alert">
+				<p className="text-destructive text-sm sm:text-xs" role="alert">
 					{error}
 				</p>
 			)}
 			<p className="sr-only" role="status" aria-live="polite">
 				{status}
 			</p>
-		</section>
+		</SettingsSection>
 	)
 }
 
@@ -383,9 +384,9 @@ function ResourceAccess({
 	)
 
 	return (
-		<div className="border-border border-t">
+		<div>
 			<div className="px-4 py-3">
-				<div className="text-sm font-medium">
+				<div className="text-base font-medium sm:text-sm">
 					{t("settings.agents.resources")}
 				</div>
 				<p className="text-muted-foreground mt-1 text-base/6 text-pretty sm:text-sm/5">

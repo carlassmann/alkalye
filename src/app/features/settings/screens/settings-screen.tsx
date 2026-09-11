@@ -24,6 +24,9 @@ import {
 	Palette,
 	Loader2,
 	AlertCircle,
+	Sun,
+	Moon,
+	SunMoon,
 } from "lucide-react"
 import { useForm } from "@tanstack/react-form"
 import { z } from "zod"
@@ -59,7 +62,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/app/components/ui/select"
-import { useTheme, ThemeToggle } from "@/app/components/appearance"
+import { useTheme } from "@/app/components/appearance"
 import { AuthDialog, wordlist } from "@/app/features/auth"
 import {
 	useEditorSettings,
@@ -96,6 +99,16 @@ import {
 	SettingsCategoryPicker,
 	type SettingsCategory,
 } from "../widgets/settings-category-navigation"
+import {
+	SettingsSection,
+	SettingsPanel,
+	SettingsRow,
+	SettingsBlock,
+	SettingsGroupLabel,
+	SettingsStatus,
+	SettingsActions,
+	SettingsEmpty,
+} from "@/app/components/ui/settings-layout"
 
 export { SettingsScreen, settingsQuery }
 export type { LoadedAccount, SettingsLoaderData, SettingsSearch }
@@ -199,28 +212,26 @@ function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 						</h1>
 					</div>
 				</div>
-				<div className="mx-auto max-w-4xl px-4 py-6 sm:py-8">
+				<div className="mx-auto max-w-4xl px-4 py-6 sm:py-10">
 					<SettingsCategoryPicker
 						category={category}
 						onCategoryChange={handleCategoryChange}
 					/>
-					<div className="mt-6 grid items-start gap-8 md:mt-0 md:grid-cols-[10rem_minmax(0,1fr)]">
+					<div className="mt-6 grid items-start gap-8 md:mt-0 md:grid-cols-[11rem_minmax(0,1fr)] md:gap-10">
 						<SettingsCategoryNavigation
 							category={category}
 							onCategoryChange={handleCategoryChange}
 						/>
-						<div id={`settings-${category}`} className="min-w-0 space-y-8">
+						<div id={`settings-${category}`} className="min-w-0 space-y-10">
 							{category === "general" && (
 								<>
 									<ProfileSection me={me} />
-									<section>
-										<h2 className="text-muted-foreground mb-3 text-sm font-medium">
-											<T k="settings.appearance" />
-										</h2>
-										<ThemeToggle theme={theme} setTheme={setTheme} showLabel />
-										<SyntaxThemeSetting settings={me?.root?.settings} />
-									</section>
-									<LanguageSection me={me} />
+									<SyncSection isAuthenticated={isAuthenticated} />
+									<AppearanceSection
+										theme={theme}
+										setTheme={setTheme}
+										me={me}
+									/>
 								</>
 							)}
 							{category === "editor" && (
@@ -236,7 +247,6 @@ function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 										isAuthenticated={isAuthenticated}
 										oauth={search.oauth}
 									/>
-									<SyncSection isAuthenticated={isAuthenticated} />
 								</>
 							)}
 							{category === "app" && (
@@ -266,6 +276,58 @@ function categoryLabel(
 	return t("settings.category.app")
 }
 
+type AppTheme = ReturnType<typeof useTheme>["theme"]
+
+interface AppearanceSectionProps {
+	theme: AppTheme
+	setTheme: (theme: AppTheme) => void
+	me: LoadedAccount | null
+}
+
+function AppearanceSection({ theme, setTheme, me }: AppearanceSectionProps) {
+	let t = useIntl()
+
+	function handleThemeChange(value: string | null) {
+		if (value === "light" || value === "dark" || value === "system") {
+			setTheme(value)
+		}
+	}
+
+	return (
+		<SettingsSection
+			title={<T k="settings.appearance" />}
+			description={<T k="settings.appearance.description" />}
+		>
+			<SettingsPanel>
+				<SettingsRow htmlFor="theme" label={t("appearance.theme")}>
+					<Select value={theme} onValueChange={handleThemeChange}>
+						<SelectTrigger
+							id="theme"
+							className="w-40"
+							aria-label={t("appearance.theme")}
+						>
+							<SelectValue>{t(`appearance.${theme}`)}</SelectValue>
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="light">
+								<Sun className="size-4" /> {t("appearance.light")}
+							</SelectItem>
+							<SelectItem value="dark">
+								<Moon className="size-4" /> {t("appearance.dark")}
+							</SelectItem>
+							<SelectItem value="system">
+								<SunMoon className="size-4" /> {t("appearance.system")}
+							</SelectItem>
+						</SelectContent>
+					</Select>
+				</SettingsRow>
+				<SyntaxThemeSetting settings={me?.root?.settings} />
+				<LanguageSetting me={me} />
+			</SettingsPanel>
+		</SettingsSection>
+	)
+}
+
 function SyntaxThemeSetting({
 	settings,
 }: {
@@ -283,12 +345,13 @@ function SyntaxThemeSetting({
 	}
 
 	return (
-		<div className="mt-3 flex items-center justify-between gap-4">
-			<span className="text-sm">
-				<T k="settings.appearance.syntaxTheme" />
-			</span>
+		<SettingsRow
+			htmlFor="syntax-theme"
+			label={<T k="settings.appearance.syntaxTheme" />}
+		>
 			<Select value={selectedFamilyId} onValueChange={handleChange}>
 				<SelectTrigger
+					id="syntax-theme"
 					className="w-40"
 					aria-label={t("settings.appearance.syntaxTheme")}
 				>
@@ -302,7 +365,7 @@ function SyntaxThemeSetting({
 					))}
 				</SelectContent>
 			</Select>
-		</div>
+		</SettingsRow>
 	)
 }
 
@@ -328,18 +391,13 @@ function ProfileSection({ me }: ProfileSectionProps) {
 	let name = me.profile?.name ?? t("common.anonymous")
 
 	return (
-		<section>
-			<h2 className="text-muted-foreground mb-3 text-sm font-medium">
-				<T k="settings.profile" />
-			</h2>
-			<div className="bg-muted/30 rounded-lg p-4">
-				<div className="flex items-center justify-between">
-					<div>
-						<div className="text-muted-foreground mb-1 text-xs">
-							<T k="settings.profile.displayName" />
-						</div>
-						<div className="text-lg font-medium">{name}</div>
-					</div>
+		<SettingsSection
+			title={<T k="settings.profile" />}
+			description={<T k="settings.profile.description" />}
+		>
+			<SettingsPanel>
+				<SettingsRow label={<T k="settings.profile.displayName" />}>
+					<span className="truncate font-medium">{name}</span>
 					<Button
 						onClick={() => setDialogOpen(true)}
 						variant="ghost"
@@ -348,8 +406,8 @@ function ProfileSection({ me }: ProfileSectionProps) {
 					>
 						<Pencil className="size-4" />
 					</Button>
-				</div>
-			</div>
+				</SettingsRow>
+			</SettingsPanel>
 			<EditNameDialog
 				open={dialogOpen}
 				onOpenChange={setDialogOpen}
@@ -359,7 +417,7 @@ function ProfileSection({ me }: ProfileSectionProps) {
 					me.profile.$jazz.set("name", newName)
 				}}
 			/>
-		</section>
+		</SettingsSection>
 	)
 }
 
@@ -449,11 +507,7 @@ function EditNameDialog({
 	)
 }
 
-interface LanguageSectionProps {
-	me: LoadedAccount | null
-}
-
-function LanguageSection({ me }: LanguageSectionProps) {
+function LanguageSetting({ me }: { me: LoadedAccount | null }) {
 	let t = useIntl()
 	let currentLanguage = me?.root?.language || "en"
 
@@ -464,12 +518,13 @@ function LanguageSection({ me }: LanguageSectionProps) {
 	}
 
 	return (
-		<section>
-			<h2 className="text-muted-foreground mb-3 text-sm font-medium">
-				<T k="settings.language" />
-			</h2>
+		<SettingsRow htmlFor="language" label={<T k="settings.language" />}>
 			<Select value={currentLanguage} onValueChange={handleLanguageChange}>
-				<SelectTrigger aria-label={t("settings.language")}>
+				<SelectTrigger
+					id="language"
+					className="w-40"
+					aria-label={t("settings.language")}
+				>
 					<SelectValue>
 						{currentLanguage === "de"
 							? t("settings.language.de")
@@ -485,7 +540,7 @@ function LanguageSection({ me }: LanguageSectionProps) {
 					</SelectItem>
 				</SelectContent>
 			</Select>
-		</section>
+		</SettingsRow>
 	)
 }
 
@@ -621,119 +676,115 @@ function ThemesSection({ me }: ThemesSectionProps) {
 	}
 
 	return (
-		<section>
-			<h2 className="text-muted-foreground mb-3 text-sm font-medium">
-				<T k="settings.themes" />
-			</h2>
-			<div className="bg-muted/30 rounded-lg p-4">
-				{uploadError && (
-					<div className="bg-destructive/10 text-destructive mb-4 flex items-start gap-2 rounded-md p-3 text-sm">
-						<AlertCircle className="mt-0.5 size-4 shrink-0" />
-						<div>
-							<div className="font-medium">{uploadError.message}</div>
-							{"errors" in uploadError && uploadError.errors.length > 0 && (
-								<ul className="mt-1 list-inside list-disc text-xs opacity-80">
-									{uploadError.errors.slice(0, 3).map((err, i) => (
-										<li key={i}>{err}</li>
-									))}
-									{uploadError.errors.length > 3 && (
-										<li>
-											{t("settings.themes.moreErrors", {
-												count: String(uploadError.errors.length - 3),
-											})}
-										</li>
-									)}
-								</ul>
-							)}
-						</div>
-						<Button
-							variant="ghost"
-							size="icon-sm"
-							className="-mt-1 -mr-1 ml-auto"
-							onClick={() => setUploadError(null)}
-						>
-							<span className="sr-only">
-								<T k="settings.themes.dismiss" />
-							</span>
-							<span aria-hidden>×</span>
-						</Button>
+		<SettingsSection
+			title={<T k="settings.themes" />}
+			description={<T k="settings.themes.description" />}
+		>
+			{uploadError && (
+				<div className="border-destructive/30 bg-destructive/5 text-destructive flex items-start gap-2 border p-3 text-base/6 sm:text-sm/5">
+					<AlertCircle className="mt-0.5 size-4 shrink-0" />
+					<div className="min-w-0 flex-1">
+						<div className="font-medium">{uploadError.message}</div>
+						{"errors" in uploadError && uploadError.errors.length > 0 && (
+							<ul className="mt-1 list-inside list-disc text-sm opacity-80 sm:text-xs">
+								{uploadError.errors.slice(0, 3).map((err, i) => (
+									<li key={i}>{err}</li>
+								))}
+								{uploadError.errors.length > 3 && (
+									<li>
+										{t("settings.themes.moreErrors", {
+											count: String(uploadError.errors.length - 3),
+										})}
+									</li>
+								)}
+							</ul>
+						)}
 					</div>
-				)}
+					<Button
+						variant="ghost"
+						size="icon-sm"
+						className="-mt-1 -mr-1 shrink-0"
+						onClick={() => setUploadError(null)}
+					>
+						<span className="sr-only">
+							<T k="settings.themes.dismiss" />
+						</span>
+						<span aria-hidden>×</span>
+					</Button>
+				</div>
+			)}
 
+			<SettingsPanel>
 				{themes.length === 0 ? (
-					<div className="text-muted-foreground py-4 text-center text-sm">
-						<Palette className="mx-auto mb-2 size-8 opacity-50" />
-						<p>
-							<T k="settings.themes.noThemes" />
-						</p>
-						<p className="mt-1 text-xs opacity-70">
-							<T k="settings.themes.uploadHint" />
-						</p>
-					</div>
+					<SettingsEmpty
+						icon={<Palette className="size-8" />}
+						title={<T k="settings.themes.noThemes" />}
+						description={<T k="settings.themes.uploadHint" />}
+					/>
 				) : (
 					<>
-						<div className="mb-4 space-y-2">
-							{themes.map(theme => {
-								if (!theme) return null
-								return (
-									<div
-										key={theme.$jazz.id}
-										className="bg-background flex items-center gap-3 rounded-md border p-3"
-									>
-										<Palette className="text-muted-foreground size-4 shrink-0" />
-										<div className="min-w-0 flex-1">
-											<div className="truncate font-medium">{theme.name}</div>
-											<div className="text-muted-foreground text-xs">
-												{theme.type === "both"
-													? t("settings.themes.previewAndSlideshow")
-													: theme.type === "preview"
-														? t("settings.themes.preview")
-														: t("settings.themes.slideshow")}
-												{theme.author &&
-													` • ${t("settings.themes.by")} ${theme.author}`}
-											</div>
+						{themes.map(theme => {
+							if (!theme) return null
+							return (
+								<div
+									key={theme.$jazz.id}
+									className="flex items-center gap-3 px-4 py-2.5"
+								>
+									<Palette className="text-muted-foreground size-4 shrink-0" />
+									<div className="min-w-0 flex-1">
+										<div className="truncate text-base font-medium sm:text-sm">
+											{theme.name}
 										</div>
-										{theme.sourceDocId && (
-											<Button
-												variant="ghost"
-												size="icon-sm"
-												nativeButton={false}
-												render={
-													<Link
-														to="/themes/$id/workbench"
-														params={{ id: theme.$jazz.id }}
-													/>
-												}
-												aria-label={`Edit ${theme.name} in workbench`}
-											>
-												<Pencil className="size-4" />
-											</Button>
-										)}
-										<Button
-											variant="ghost"
-											size="icon-sm"
-											onClick={makeExportTheme(theme, setExportingThemeId)}
-											disabled={exportingThemeId === theme.$jazz.id}
-											aria-label={`Export ${theme.name}`}
-										>
-											{exportingThemeId === theme.$jazz.id ? (
-												<Loader2 className="size-4 animate-spin" />
-											) : (
-												<Download className="size-4" />
-											)}
-										</Button>
-										<Button
-											variant="ghost"
-											size="icon-sm"
-											onClick={() => setThemeToDelete(theme)}
-											aria-label={`Delete ${theme.name}`}
-										>
-											<Trash2 className="size-4" />
-										</Button>
+										<div className="text-muted-foreground truncate text-sm sm:text-xs">
+											{theme.type === "both"
+												? t("settings.themes.previewAndSlideshow")
+												: theme.type === "preview"
+													? t("settings.themes.preview")
+													: t("settings.themes.slideshow")}
+											{theme.author &&
+												` • ${t("settings.themes.by")} ${theme.author}`}
+										</div>
 									</div>
-								)
-							})}
-						</div>
+									{theme.sourceDocId && (
+										<Button
+											variant="ghost"
+											size="icon-sm"
+											nativeButton={false}
+											render={
+												<Link
+													to="/themes/$id/workbench"
+													params={{ id: theme.$jazz.id }}
+												/>
+											}
+											aria-label={`Edit ${theme.name} in workbench`}
+										>
+											<Pencil className="size-4" />
+										</Button>
+									)}
+									<Button
+										variant="ghost"
+										size="icon-sm"
+										onClick={makeExportTheme(theme, setExportingThemeId)}
+										disabled={exportingThemeId === theme.$jazz.id}
+										aria-label={`Export ${theme.name}`}
+									>
+										{exportingThemeId === theme.$jazz.id ? (
+											<Loader2 className="size-4 animate-spin" />
+										) : (
+											<Download className="size-4" />
+										)}
+									</Button>
+									<Button
+										variant="ghost"
+										size="icon-sm"
+										onClick={() => setThemeToDelete(theme)}
+										aria-label={`Delete ${theme.name}`}
+									>
+										<Trash2 className="size-4" />
+									</Button>
+								</div>
+							)
+						})}
 						<DefaultThemeSettings
 							settings={me.root.settings}
 							themes={me.root.themes}
@@ -741,17 +792,17 @@ function ThemesSection({ me }: ThemesSectionProps) {
 					</>
 				)}
 
-				<input
-					ref={fileInputRef}
-					type="file"
-					accept=".md,.theme.md,.zip"
-					className="hidden"
-					onChange={handleFileSelect}
-				/>
-				<div className="flex gap-2">
+				<SettingsActions>
+					<input
+						ref={fileInputRef}
+						type="file"
+						accept=".md,.theme.md,.zip"
+						className="hidden"
+						onChange={handleFileSelect}
+					/>
 					<Button onClick={handleCreateTheme} variant="outline" size="sm">
 						<Plus className="mr-1.5 size-3.5" />
-						New custom theme
+						<T k="settings.themes.newTheme" />
 					</Button>
 					<Button
 						onClick={() => fileInputRef.current?.click()}
@@ -771,8 +822,8 @@ function ThemesSection({ me }: ThemesSectionProps) {
 							</>
 						)}
 					</Button>
-				</div>
-			</div>
+				</SettingsActions>
+			</SettingsPanel>
 
 			<ConfirmDialog
 				open={!!themeToDelete}
@@ -785,7 +836,7 @@ function ThemesSection({ me }: ThemesSectionProps) {
 				onConfirm={handleDeleteTheme}
 				variant="destructive"
 			/>
-		</section>
+		</SettingsSection>
 	)
 }
 
@@ -837,20 +888,20 @@ function DefaultThemeSettings({ settings, themes }: DefaultThemeSettingsProps) {
 	}
 
 	return (
-		<div className="border-border/50 mb-4 space-y-3 border-t pt-4">
-			<div className="text-muted-foreground text-xs font-medium">
+		<>
+			<SettingsGroupLabel>
 				<T k="settings.themes.defaultThemes" />
-			</div>
+			</SettingsGroupLabel>
 			{previewThemes.length > 0 && (
-				<div className="flex items-center justify-between gap-4">
-					<span className="text-sm">
-						<T k="settings.themes.preview" />
-					</span>
+				<SettingsRow
+					htmlFor="default-preview-theme"
+					label={<T k="settings.themes.preview" />}
+				>
 					<Select
 						value={settings?.defaultPreviewTheme ?? "__none__"}
 						onValueChange={handlePreviewThemeChange}
 					>
-						<SelectTrigger className="w-40">
+						<SelectTrigger id="default-preview-theme" className="w-40">
 							<SelectValue>
 								{getThemeSelectLabel(
 									settings?.defaultPreviewTheme ?? "__none__",
@@ -869,18 +920,18 @@ function DefaultThemeSettings({ settings, themes }: DefaultThemeSettingsProps) {
 							))}
 						</SelectContent>
 					</Select>
-				</div>
+				</SettingsRow>
 			)}
 			{slideshowThemes.length > 0 && (
-				<div className="flex items-center justify-between gap-4">
-					<span className="text-sm">
-						<T k="settings.themes.slideshow" />
-					</span>
+				<SettingsRow
+					htmlFor="default-slideshow-theme"
+					label={<T k="settings.themes.slideshow" />}
+				>
 					<Select
 						value={settings?.defaultSlideshowTheme ?? "__none__"}
 						onValueChange={handleSlideshowThemeChange}
 					>
-						<SelectTrigger className="w-40">
+						<SelectTrigger id="default-slideshow-theme" className="w-40">
 							<SelectValue>
 								{getThemeSelectLabel(
 									settings?.defaultSlideshowTheme ?? "__none__",
@@ -899,9 +950,9 @@ function DefaultThemeSettings({ settings, themes }: DefaultThemeSettingsProps) {
 							))}
 						</SelectContent>
 					</Select>
-				</div>
+				</SettingsRow>
 			)}
-		</div>
+		</>
 	)
 }
 
@@ -921,30 +972,28 @@ function SignInView() {
 	let [authOpen, setAuthOpen] = useState(false)
 
 	return (
-		<section>
-			<h2 className="text-muted-foreground mb-3 text-sm font-medium">
-				<T k="settings.sync.title" />
-			</h2>
-			<div className="text-muted-foreground mb-4 flex items-center gap-2">
-				<CloudOff className="size-4" />
-				<span className="text-sm">
+		<SettingsSection title={<T k="settings.sync.title" />}>
+			<SettingsPanel>
+				<SettingsStatus icon={<CloudOff className="size-4 shrink-0" />}>
 					<T k="settings.sync.localOnly" />
-				</span>
-			</div>
-			<Button
-				onClick={() => setAuthOpen(true)}
-				size="sm"
-				variant="outline"
-				data-testid={testIds.auth.settingsSignIn}
-			>
-				<T k="settings.sync.signIn" />
-			</Button>
+				</SettingsStatus>
+				<SettingsActions>
+					<Button
+						onClick={() => setAuthOpen(true)}
+						size="sm"
+						variant="outline"
+						data-testid={testIds.auth.settingsSignIn}
+					>
+						<T k="settings.sync.signIn" />
+					</Button>
+				</SettingsActions>
+			</SettingsPanel>
 			<AuthDialog
 				open={authOpen}
 				onOpenChange={setAuthOpen}
 				onSuccess={() => navigate({ to: "/" })}
 			/>
-		</section>
+		</SettingsSection>
 	)
 }
 
@@ -957,21 +1006,24 @@ function EditorSection({ settings: jazzSettings }: EditorSectionProps) {
 	let { settings, setSettings, resetSettings } = useEditorSettings(jazzSettings)
 
 	return (
-		<section>
-			<div className="mb-3 flex items-center justify-between">
-				<h2 className="text-muted-foreground text-sm font-medium">
-					<T k="settings.editor" />
-				</h2>
+		<SettingsSection
+			title={<T k="settings.editor" />}
+			description={<T k="settings.editor.description" />}
+			action={
 				<Button
 					variant="ghost"
 					size="sm"
 					onClick={resetSettings}
-					className="text-muted-foreground h-auto px-2 py-1 text-xs"
+					className="text-muted-foreground"
 				>
 					<T k="settings.editor.resetDefaults" />
 				</Button>
-			</div>
-			<div className="bg-muted/30 space-y-3 rounded-lg p-4">
+			}
+		>
+			<SettingsPanel>
+				<SettingsGroupLabel>
+					<T k="settings.editor.typography" />
+				</SettingsGroupLabel>
 				<NumericSetting
 					label={t("settings.editor.lineWidth")}
 					value={settings.lineWidth}
@@ -1017,164 +1069,161 @@ function EditorSection({ settings: jazzSettings }: EditorSectionProps) {
 					decimals={2}
 				/>
 
-				<div className="border-border/50 space-y-3 border-t pt-3">
-					<ToggleSetting
-						id="strikethrough-toggle"
-						label={
-							<>
-								<span
-									className={
-										settings.strikethroughDoneTasks ? "line-through" : ""
-									}
-								>
-									<T k="settings.editor.strikethrough" />
-								</span>{" "}
-								<T k="settings.editor.doneTasks" />
-							</>
-						}
-						checked={settings.strikethroughDoneTasks}
-						onChange={v => setSettings({ strikethroughDoneTasks: v })}
-					/>
-
-					<ToggleSetting
-						id="fade-toggle"
-						label={
-							<>
-								<span className={settings.fadeDoneTasks ? "opacity-50" : ""}>
-									<T k="settings.editor.fade" />
-								</span>{" "}
-								<T k="settings.editor.doneTasks" />
-							</>
-						}
-						checked={settings.fadeDoneTasks}
-						onChange={v => setSettings({ fadeDoneTasks: v })}
-					/>
-
-					<ToggleSetting
-						id="highlight-line-toggle"
-						label={<T k="settings.editor.highlightLine" />}
-						checked={settings.highlightCurrentLine}
-						onChange={v => setSettings({ highlightCurrentLine: v })}
-						className={
-							settings.highlightCurrentLine
-								? "bg-foreground/5 -mx-4 rounded px-4"
-								: ""
-						}
-					/>
-
-					<ToggleSetting
-						id="auto-sort-toggle"
-						label={<T k="settings.editor.autoSortTasks" />}
-						checked={settings.autoSortTasks}
-						onChange={v => setSettings({ autoSortTasks: v })}
-					/>
-
-					<ToggleSetting
-						id="spellcheck-toggle"
-						label={<T k="settings.editor.spellcheck" />}
-						checked={settings.spellcheck ?? true}
-						onChange={v => setSettings({ spellcheck: v })}
-					/>
-
-					<div className="flex min-h-8 items-center justify-between gap-4">
-						<label htmlFor="spellcheck-language" className="text-sm">
-							<T k="settings.editor.spellcheckLanguage" />
-						</label>
-						<Select
-							value={settings.spellcheckLanguage || "system"}
-							onValueChange={value => {
-								if (value === "system" || value === "en" || value === "de") {
-									setSettings({
-										spellcheckLanguage: value === "system" ? "" : value,
-									})
+				<SettingsGroupLabel>
+					<T k="settings.editor.display" />
+				</SettingsGroupLabel>
+				<ToggleSetting
+					id="strikethrough-toggle"
+					label={
+						<>
+							<span
+								className={
+									settings.strikethroughDoneTasks ? "line-through" : ""
 								}
-							}}
-						>
-							<SelectTrigger id="spellcheck-language" className="w-40">
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="system">
-									<T k="settings.editor.spellcheckLanguage.system" />
-								</SelectItem>
-								<SelectItem value="en">
-									<T k="settings.editor.spellcheckLanguage.english" />
-								</SelectItem>
-								<SelectItem value="de">
-									<T k="settings.editor.spellcheckLanguage.german" />
-								</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
+							>
+								<T k="settings.editor.strikethrough" />
+							</span>{" "}
+							<T k="settings.editor.doneTasks" />
+						</>
+					}
+					checked={settings.strikethroughDoneTasks}
+					onChange={v => setSettings({ strikethroughDoneTasks: v })}
+				/>
 
-					<div className="flex min-h-8 items-center justify-between gap-4">
-						<label htmlFor="stats-badge-unit" className="text-sm">
-							<T k="settings.editor.statsBadge" />
-						</label>
-						<Select
-							value={getStatsBadgeSelectValue(settings)}
-							onValueChange={makeHandleStatsBadgeUnitChange(setSettings)}
-						>
-							<SelectTrigger id="stats-badge-unit" className="w-40">
-								<SelectValue>
-									{getStatsBadgeSelectLabel(settings, t)}
-								</SelectValue>
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="words">
-									<T k="settings.editor.statsBadge.words" />
-								</SelectItem>
-								<SelectItem value="sentences">
-									<T k="settings.editor.statsBadge.sentences" />
-								</SelectItem>
-								<SelectItem value="tasks">
-									<T k="settings.editor.statsBadge.tasks" />
-								</SelectItem>
-								<SelectItem value="hide">
-									<T k="settings.editor.statsBadge.hide" />
-								</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
+				<ToggleSetting
+					id="fade-toggle"
+					label={
+						<>
+							<span className={settings.fadeDoneTasks ? "opacity-50" : ""}>
+								<T k="settings.editor.fade" />
+							</span>{" "}
+							<T k="settings.editor.doneTasks" />
+						</>
+					}
+					checked={settings.fadeDoneTasks}
+					onChange={v => setSettings({ fadeDoneTasks: v })}
+				/>
 
-					<div className="border-border/50 space-y-3 border-t pt-3">
-						<div className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-							<T k="settings.editor.behavior" />
-						</div>
-						<ToggleSetting
-							id="smart-pairs-toggle"
-							label={<T k="settings.editor.smartPairs" />}
-							checked={settings.smartPairs ?? true}
-							onChange={value => setSettings({ smartPairs: value })}
-						/>
-						<ToggleSetting
-							id="marker-wrapping-toggle"
-							label={<T k="settings.editor.markerWrapping" />}
-							checked={settings.markerWrapping ?? true}
-							onChange={value => setSettings({ markerWrapping: value })}
-						/>
-						<ToggleSetting
-							id="tab-indent-toggle"
-							label={<T k="settings.editor.tabIndent" />}
-							checked={settings.tabIndent ?? true}
-							onChange={value => setSettings({ tabIndent: value })}
-						/>
-						<ToggleSetting
-							id="smart-paste-toggle"
-							label={<T k="settings.editor.smartPaste" />}
-							checked={settings.smartPaste ?? true}
-							onChange={value => setSettings({ smartPaste: value })}
-						/>
-						<ToggleSetting
-							id="autocomplete-toggle"
-							label={<T k="settings.editor.autocomplete" />}
-							checked={settings.autocomplete ?? true}
-							onChange={value => setSettings({ autocomplete: value })}
-						/>
-					</div>
-				</div>
-			</div>
-		</section>
+				<ToggleSetting
+					id="highlight-line-toggle"
+					label={<T k="settings.editor.highlightLine" />}
+					checked={settings.highlightCurrentLine}
+					onChange={v => setSettings({ highlightCurrentLine: v })}
+					className={
+						settings.highlightCurrentLine ? "bg-foreground/5" : undefined
+					}
+				/>
+
+				<ToggleSetting
+					id="auto-sort-toggle"
+					label={<T k="settings.editor.autoSortTasks" />}
+					checked={settings.autoSortTasks}
+					onChange={v => setSettings({ autoSortTasks: v })}
+				/>
+
+				<ToggleSetting
+					id="spellcheck-toggle"
+					label={<T k="settings.editor.spellcheck" />}
+					checked={settings.spellcheck ?? true}
+					onChange={v => setSettings({ spellcheck: v })}
+				/>
+
+				<SettingsRow
+					htmlFor="spellcheck-language"
+					label={<T k="settings.editor.spellcheckLanguage" />}
+				>
+					<Select
+						value={settings.spellcheckLanguage || "system"}
+						onValueChange={value => {
+							if (value === "system" || value === "en" || value === "de") {
+								setSettings({
+									spellcheckLanguage: value === "system" ? "" : value,
+								})
+							}
+						}}
+					>
+						<SelectTrigger id="spellcheck-language" className="w-40">
+							<SelectValue>
+								{spellcheckLanguageLabel(settings.spellcheckLanguage, t)}
+							</SelectValue>
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="system">
+								<T k="settings.editor.spellcheckLanguage.system" />
+							</SelectItem>
+							<SelectItem value="en">
+								<T k="settings.editor.spellcheckLanguage.english" />
+							</SelectItem>
+							<SelectItem value="de">
+								<T k="settings.editor.spellcheckLanguage.german" />
+							</SelectItem>
+						</SelectContent>
+					</Select>
+				</SettingsRow>
+
+				<SettingsRow
+					htmlFor="stats-badge-unit"
+					label={<T k="settings.editor.statsBadge" />}
+				>
+					<Select
+						value={getStatsBadgeSelectValue(settings)}
+						onValueChange={makeHandleStatsBadgeUnitChange(setSettings)}
+					>
+						<SelectTrigger id="stats-badge-unit" className="w-40">
+							<SelectValue>{getStatsBadgeSelectLabel(settings, t)}</SelectValue>
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="words">
+								<T k="settings.editor.statsBadge.words" />
+							</SelectItem>
+							<SelectItem value="sentences">
+								<T k="settings.editor.statsBadge.sentences" />
+							</SelectItem>
+							<SelectItem value="tasks">
+								<T k="settings.editor.statsBadge.tasks" />
+							</SelectItem>
+							<SelectItem value="hide">
+								<T k="settings.editor.statsBadge.hide" />
+							</SelectItem>
+						</SelectContent>
+					</Select>
+				</SettingsRow>
+
+				<SettingsGroupLabel>
+					<T k="settings.editor.behavior" />
+				</SettingsGroupLabel>
+				<ToggleSetting
+					id="smart-pairs-toggle"
+					label={<T k="settings.editor.smartPairs" />}
+					checked={settings.smartPairs ?? true}
+					onChange={value => setSettings({ smartPairs: value })}
+				/>
+				<ToggleSetting
+					id="marker-wrapping-toggle"
+					label={<T k="settings.editor.markerWrapping" />}
+					checked={settings.markerWrapping ?? true}
+					onChange={value => setSettings({ markerWrapping: value })}
+				/>
+				<ToggleSetting
+					id="tab-indent-toggle"
+					label={<T k="settings.editor.tabIndent" />}
+					checked={settings.tabIndent ?? true}
+					onChange={value => setSettings({ tabIndent: value })}
+				/>
+				<ToggleSetting
+					id="smart-paste-toggle"
+					label={<T k="settings.editor.smartPaste" />}
+					checked={settings.smartPaste ?? true}
+					onChange={value => setSettings({ smartPaste: value })}
+				/>
+				<ToggleSetting
+					id="autocomplete-toggle"
+					label={<T k="settings.editor.autocomplete" />}
+					checked={settings.autocomplete ?? true}
+					onChange={value => setSettings({ autocomplete: value })}
+				/>
+			</SettingsPanel>
+		</SettingsSection>
 	)
 }
 
@@ -1224,49 +1273,48 @@ function NumericSetting({
 	}
 
 	return (
-		<div className="flex min-h-8 items-center justify-between gap-4">
-			<span className="text-sm">{label}</span>
-			<div className="flex items-center gap-2">
-				{!isDefault && (
-					<span className="text-muted-foreground text-xs">
-						{t("settings.numericDefault", {
-							value: defaultValue.toFixed(decimals),
-						})}
-					</span>
-				)}
-				{unit && <span className="text-muted-foreground text-xs">{unit}</span>}
-				<div className="flex items-center">
-					<Button
-						variant="outline"
-						size="icon-sm"
-						onClick={decrement}
-						disabled={value <= min}
-						aria-label={t("settings.numericDecrease", { label })}
-						className="size-7 rounded-r-none border-r-0"
-					>
-						<Minus className="size-3" />
-					</Button>
-					<Input
-						type="number"
-						aria-label={label}
-						value={value.toFixed(decimals)}
-						onChange={handleInputChange}
-						step={step}
-						className="h-7 w-16 [appearance:textfield] rounded-none border-x-0 text-center text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-					/>
-					<Button
-						variant="outline"
-						size="icon-sm"
-						onClick={increment}
-						disabled={value >= max}
-						aria-label={t("settings.numericIncrease", { label })}
-						className="size-7 rounded-l-none border-l-0"
-					>
-						<Plus className="size-3" />
-					</Button>
-				</div>
+		<SettingsRow
+			label={label}
+			description={
+				isDefault
+					? undefined
+					: t("settings.numericDefault", {
+							value: `${defaultValue.toFixed(decimals)}${unit}`,
+						})
+			}
+		>
+			<span className="text-muted-foreground w-6 text-right text-sm sm:text-xs">
+				{unit}
+			</span>
+			<div className="border-input focus-within:border-ring flex h-9 items-stretch border sm:h-8">
+				<Button
+					variant="ghost"
+					onClick={decrement}
+					disabled={value <= min}
+					aria-label={t("settings.numericDecrease", { label })}
+					className="h-auto w-9 rounded-none p-0 sm:w-8"
+				>
+					<Minus className="size-3" />
+				</Button>
+				<Input
+					type="number"
+					aria-label={label}
+					value={value.toFixed(decimals)}
+					onChange={handleInputChange}
+					step={step}
+					className="border-input h-auto w-14 [appearance:textfield] rounded-none border-x border-y-0 bg-transparent px-0 text-center text-base tabular-nums focus-visible:ring-0 sm:text-sm dark:bg-transparent [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+				/>
+				<Button
+					variant="ghost"
+					onClick={increment}
+					disabled={value >= max}
+					aria-label={t("settings.numericIncrease", { label })}
+					className="h-auto w-9 rounded-none p-0 sm:w-8"
+				>
+					<Plus className="size-3" />
+				</Button>
 			</div>
-		</div>
+		</SettingsRow>
 	)
 }
 
@@ -1286,20 +1334,24 @@ function ToggleSetting({
 	className,
 }: ToggleSettingProps) {
 	return (
-		<div
-			className={`flex min-h-8 items-center justify-between gap-4 ${className ?? ""}`}
-		>
-			<span id={`${id}-label`} className="text-sm">
-				{label}
-			</span>
+		<SettingsRow label={label} labelId={`${id}-label`} className={className}>
 			<Switch
 				id={id}
 				aria-labelledby={`${id}-label`}
 				checked={checked}
 				onCheckedChange={onChange}
 			/>
-		</div>
+		</SettingsRow>
 	)
+}
+
+function spellcheckLanguageLabel(
+	value: string | undefined,
+	t: ReturnType<typeof useIntl>,
+): string {
+	if (value === "en") return t("settings.editor.spellcheckLanguage.english")
+	if (value === "de") return t("settings.editor.spellcheckLanguage.german")
+	return t("settings.editor.spellcheckLanguage.system")
 }
 
 function getThemeSelectLabel(
@@ -1416,46 +1468,39 @@ function SignedInView() {
 	}
 
 	return (
-		<section>
-			<h2 className="text-muted-foreground mb-3 text-sm font-medium">
-				<T k="settings.sync.title" />
-			</h2>
-			<div className="bg-muted/30 rounded-lg p-4">
+		<SettingsSection title={<T k="settings.sync.title" />}>
+			<SettingsPanel>
 				{isOnline ? (
-					<div className="mb-4 flex items-center gap-2 text-green-600 dark:text-green-400">
-						<Cloud className="size-4" />
-						<span className="flex-1 text-sm font-medium">
-							<T k="settings.sync.syncing" />
-						</span>
-						<SyncNowSection />
-					</div>
+					<SettingsStatus
+						tone="ok"
+						icon={<Cloud className="size-4 shrink-0" />}
+						action={<SyncNowSection />}
+						description={<T k="settings.sync.notesSynced" />}
+					>
+						<T k="settings.sync.syncing" />
+					</SettingsStatus>
 				) : (
-					<div className="text-muted-foreground mb-4 flex items-center gap-2">
-						<WifiOff className="size-4" />
-						<span className="text-sm font-medium">
-							<T k="settings.sync.offline" />
-						</span>
-					</div>
+					<SettingsStatus
+						icon={<WifiOff className="size-4 shrink-0" />}
+						description={<T k="settings.sync.offlineMessage" />}
+					>
+						<T k="settings.sync.offline" />
+					</SettingsStatus>
 				)}
-				<p className="text-muted-foreground mb-4 text-sm">
-					{isOnline ? (
-						<T k="settings.sync.notesSynced" />
-					) : (
-						<T k="settings.sync.offlineMessage" />
-					)}
-				</p>
 				{showPassphrase ? (
 					<>
-						<div className="text-muted-foreground mb-2 text-xs">
-							<T k="settings.sync.recoveryPhrase" />
-						</div>
-						<Textarea
-							readOnly
-							value={auth.passphrase}
-							className="bg-background border-border mb-3 w-full resize-none rounded-md border p-3 font-mono text-sm"
-							minRows={3}
-						/>
-						<div className="flex gap-2">
+						<SettingsBlock className="space-y-2">
+							<div className="text-muted-foreground text-sm sm:text-xs">
+								<T k="settings.sync.recoveryPhrase" />
+							</div>
+							<Textarea
+								readOnly
+								value={auth.passphrase}
+								className="bg-background border-border w-full resize-none border p-3 font-mono text-base/6 sm:text-sm/5"
+								minRows={3}
+							/>
+						</SettingsBlock>
+						<SettingsActions>
 							<Button onClick={handleCopy} variant="outline" size="sm">
 								{isCopied ? (
 									<>
@@ -1476,10 +1521,10 @@ function SignedInView() {
 							>
 								<T k="settings.sync.hide" />
 							</Button>
-						</div>
+						</SettingsActions>
 					</>
 				) : (
-					<div className="flex gap-2">
+					<SettingsActions>
 						<Button
 							onClick={() => setShowPassphrase(true)}
 							variant="outline"
@@ -1495,10 +1540,10 @@ function SignedInView() {
 						>
 							<T k="settings.sync.signOut" />
 						</Button>
-					</div>
+					</SettingsActions>
 				)}
-			</div>
-		</section>
+			</SettingsPanel>
+		</SettingsSection>
 	)
 }
 
@@ -1509,23 +1554,25 @@ function InstallationSection() {
 	if (isPWAInstalled) return null
 
 	return (
-		<section>
-			<h2 className="text-muted-foreground mb-3 text-sm font-medium">
-				<T k="settings.installation" />
-			</h2>
-			<div className="bg-muted/30 rounded-lg p-4">
-				<div className="text-foreground mb-2 text-sm font-medium">
+		<SettingsSection title={<T k="settings.installation" />}>
+			<SettingsPanel>
+				<SettingsStatus
+					description={<T k="settings.installation.installDescription" />}
+				>
 					<T k="settings.installation.notInstalled" />
-				</div>
-				<p className="text-muted-foreground mb-4 text-sm">
-					<T k="settings.installation.installDescription" />
-				</p>
-				<Button onClick={() => setDialogOpen(true)} variant="outline" size="sm">
-					<T k="settings.installation.showInstructions" />
-				</Button>
-			</div>
+				</SettingsStatus>
+				<SettingsActions>
+					<Button
+						onClick={() => setDialogOpen(true)}
+						variant="outline"
+						size="sm"
+					>
+						<T k="settings.installation.showInstructions" />
+					</Button>
+				</SettingsActions>
+			</SettingsPanel>
 			<PWAInstallDialog open={dialogOpen} onOpenChange={setDialogOpen} />
-		</section>
+		</SettingsSection>
 	)
 }
 
@@ -1540,51 +1587,49 @@ function AppSection() {
 	}
 
 	return (
-		<section>
-			<h2 className="text-muted-foreground mb-3 text-sm font-medium">
-				<T k="settings.app" />
-			</h2>
-			<div className="bg-muted/30 rounded-lg p-4">
+		<SettingsSection title={<T k="settings.app" />}>
+			<SettingsPanel>
 				{needRefresh ? (
 					<>
-						<div className="text-foreground mb-2 text-sm font-medium">
+						<SettingsStatus
+							tone="ok"
+							description={<T k="settings.app.newVersionReady" />}
+						>
 							<T k="settings.app.updateAvailable" />
-						</div>
-						<p className="text-muted-foreground mb-4 text-sm">
-							<T k="settings.app.newVersionReady" />
-						</p>
-						<Button onClick={updateServiceWorker} size="sm">
-							<RefreshCw className="mr-1.5 size-3.5" />
-							<T k="settings.app.reloadToUpdate" />
-						</Button>
+						</SettingsStatus>
+						<SettingsActions>
+							<Button onClick={updateServiceWorker} size="sm">
+								<RefreshCw className="mr-1.5 size-3.5" />
+								<T k="settings.app.reloadToUpdate" />
+							</Button>
+						</SettingsActions>
 					</>
 				) : (
 					<>
-						<div className="text-foreground mb-2 text-sm font-medium">
+						<SettingsStatus description={<T k="settings.app.noUpdates" />}>
 							<T k="settings.app.latestVersion" />
-						</div>
-						<p className="text-muted-foreground mb-4 text-sm">
-							<T k="settings.app.noUpdates" />
-						</p>
-						<Button
-							onClick={handleCheckForUpdates}
-							variant="outline"
-							size="sm"
-							disabled={isChecking}
-						>
-							<RefreshCw
-								className={`mr-1.5 size-3.5 ${isChecking ? "animate-spin" : ""}`}
-							/>
-							{isChecking ? (
-								<T k="settings.app.checking" />
-							) : (
-								<T k="settings.app.checkForUpdates" />
-							)}
-						</Button>
+						</SettingsStatus>
+						<SettingsActions>
+							<Button
+								onClick={handleCheckForUpdates}
+								variant="outline"
+								size="sm"
+								disabled={isChecking}
+							>
+								<RefreshCw
+									className={`mr-1.5 size-3.5 ${isChecking ? "animate-spin" : ""}`}
+								/>
+								{isChecking ? (
+									<T k="settings.app.checking" />
+								) : (
+									<T k="settings.app.checkForUpdates" />
+								)}
+							</Button>
+						</SettingsActions>
 					</>
 				)}
-			</div>
-		</section>
+			</SettingsPanel>
+		</SettingsSection>
 	)
 }
 
@@ -1614,33 +1659,34 @@ function ReloadDiagnosticsSection() {
 	}
 
 	return (
-		<section>
-			<h2 className="text-muted-foreground mb-3 text-sm font-medium">
-				<T k="settings.reloadDiagnostics" />
-			</h2>
-			<div className="bg-muted/30 rounded-lg p-4">
-				<p className="text-muted-foreground mb-4 text-sm">
-					<T k="settings.reloadDiagnostics.description" />
-				</p>
-				<div className="bg-background border-border mb-4 rounded-md border p-3 font-mono text-xs">
-					{latest ? (
-						<>
-							<div className="flex items-center justify-between gap-3">
-								<span>{latest.event}</span>
-								<span className="text-muted-foreground tabular-nums">
-									{latest.elapsedMs} ms
-								</span>
-							</div>
-							<div className="text-muted-foreground mt-1">{latest.at}</div>
-							<div className="text-muted-foreground mt-1">
-								{entries.length} events
-							</div>
-						</>
-					) : (
-						<T k="settings.reloadDiagnostics.empty" />
-					)}
-				</div>
-				<div className="flex gap-2">
+		<SettingsSection
+			title={<T k="settings.reloadDiagnostics" />}
+			description={<T k="settings.reloadDiagnostics.description" />}
+		>
+			<SettingsPanel>
+				<SettingsBlock>
+					<div className="bg-background border-border border p-3 font-mono text-sm sm:text-xs">
+						{latest ? (
+							<>
+								<div className="flex items-center justify-between gap-3">
+									<span className="truncate">{latest.event}</span>
+									<span className="text-muted-foreground shrink-0 tabular-nums">
+										{latest.elapsedMs} ms
+									</span>
+								</div>
+								<div className="text-muted-foreground mt-1">{latest.at}</div>
+								<div className="text-muted-foreground mt-1 tabular-nums">
+									{entries.length} events
+								</div>
+							</>
+						) : (
+							<span className="text-muted-foreground">
+								<T k="settings.reloadDiagnostics.empty" />
+							</span>
+						)}
+					</div>
+				</SettingsBlock>
+				<SettingsActions>
 					<Button
 						onClick={handleCopy}
 						variant="outline"
@@ -1679,9 +1725,9 @@ function ReloadDiagnosticsSection() {
 						<Trash2 className="mr-1.5 size-3.5" />
 						<T k="settings.reloadDiagnostics.clear" />
 					</Button>
-				</div>
-			</div>
-		</section>
+				</SettingsActions>
+			</SettingsPanel>
+		</SettingsSection>
 	)
 }
 

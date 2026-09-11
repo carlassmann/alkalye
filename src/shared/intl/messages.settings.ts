@@ -49,8 +49,12 @@ let baseSettingsMessages = messages({
 	"settings.agents.grantAccess": "Grant ChatGPT access to {$name}",
 	"settings.agents.removeAccess": "Remove ChatGPT access from {$name}",
 	"settings.appearance": "Appearance",
+	"settings.appearance.description":
+		"Theme, code highlighting, and interface language.",
 	"settings.appearance.syntaxTheme": "Syntax theme",
 	"settings.profile": "Profile",
+	"settings.profile.description":
+		"The name collaborators see on shared documents.",
 	"settings.profile.displayName": "Display name",
 	"settings.profile.editName": "Edit name",
 	"settings.profile.nameRequired": "Name is required",
@@ -74,6 +78,8 @@ let baseSettingsMessages = messages({
 	"settings.sync.copy": "Copy",
 	"settings.sync.copied": "Copied",
 	"settings.themes": "Themes",
+	"settings.themes.description": "Custom styling for previews and slideshows.",
+	"settings.themes.newTheme": "New custom theme",
 	"settings.themes.uploadTheme": "Upload theme",
 	"settings.themes.uploading": "Uploading...",
 	"settings.themes.noThemes": "No themes yet",
@@ -91,6 +97,10 @@ let baseSettingsMessages = messages({
 	"settings.themes.by": "by",
 	"settings.themes.moreErrors": "and {$count} more...",
 	"settings.editor": "Editor",
+	"settings.editor.description":
+		"How writing feels — spacing, task display, and typing behavior.",
+	"settings.editor.typography": "Typography",
+	"settings.editor.display": "Display",
 	"settings.editor.lineWidth": "Line width",
 	"settings.editor.fontSize": "Font size",
 	"settings.editor.lineHeight": "Line height",
@@ -209,8 +219,12 @@ let deSettingsMessages = translate(baseSettingsMessages, {
 	"settings.agents.grantAccess": "ChatGPT Zugriff auf {$name} geben",
 	"settings.agents.removeAccess": "ChatGPT-Zugriff auf {$name} entfernen",
 	"settings.appearance": "Erscheinungsbild",
+	"settings.appearance.description":
+		"Design, Code-Hervorhebung und Sprache der Oberfläche.",
 	"settings.appearance.syntaxTheme": "Syntax-Design",
 	"settings.profile": "Profil",
+	"settings.profile.description":
+		"Der Name, den Mitarbeitende an geteilten Dokumenten sehen.",
 	"settings.profile.displayName": "Anzeigename",
 	"settings.profile.editName": "Namen bearbeiten",
 	"settings.profile.nameRequired": "Name ist erforderlich",
@@ -235,6 +249,9 @@ let deSettingsMessages = translate(baseSettingsMessages, {
 	"settings.sync.copy": "Kopieren",
 	"settings.sync.copied": "Kopiert",
 	"settings.themes": "Designs",
+	"settings.themes.description":
+		"Eigene Gestaltung für Vorschau und Präsentation.",
+	"settings.themes.newTheme": "Neues Design",
 	"settings.themes.uploadTheme": "Design hochladen",
 	"settings.themes.uploading": "Wird hochgeladen...",
 	"settings.themes.noThemes": "Noch keine Designs",
@@ -252,6 +269,10 @@ let deSettingsMessages = translate(baseSettingsMessages, {
 	"settings.themes.by": "von",
 	"settings.themes.moreErrors": "und {$count} weitere...",
 	"settings.editor": "Editor",
+	"settings.editor.description":
+		"Wie sich das Schreiben anfühlt — Abstände, Aufgabenanzeige und Tippverhalten.",
+	"settings.editor.typography": "Typografie",
+	"settings.editor.display": "Anzeige",
 	"settings.editor.lineWidth": "Zeilenbreite",
 	"settings.editor.fontSize": "Schriftgröße",
 	"settings.editor.lineHeight": "Zeilenhöhe",

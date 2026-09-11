@@ -2,7 +2,6 @@ import { useState } from "react"
 import { FolderOpen, AlertCircle } from "lucide-react"
 import { Button } from "@/app/components/ui/button"
 import { Switch } from "@/app/components/ui/switch"
-import { Label } from "@/app/components/ui/label"
 import {
 	useBackupStore,
 	enableBackup,
@@ -15,6 +14,15 @@ import {
 	isBackupSupported,
 } from "../lib/storage"
 import { T, useIntl } from "@/shared/intl/setup"
+import {
+	SettingsSection,
+	SettingsPanel,
+	SettingsRow,
+	SettingsStatus,
+	SettingsActions,
+	SettingsBlock,
+	SettingsHint,
+} from "@/app/components/ui/settings-layout"
 
 export { BackupSettings, SpaceBackupSettings }
 
@@ -84,83 +92,77 @@ function BackupSettings() {
 	let formattedLastPull = lastPullDate ? lastPullDate.toLocaleString() : null
 
 	return (
-		<section>
-			<h2 className="text-muted-foreground mb-3 text-sm font-medium">
-				<T k="backup.title" />
-			</h2>
-			<div className="bg-muted/30 rounded-lg p-4">
+		<SettingsSection title={<T k="backup.title" />}>
+			<SettingsPanel>
 				{enabled ? (
 					<>
-						<div className="mb-2 flex items-center gap-2 text-green-600 dark:text-green-400">
-							<FolderOpen className="size-4" />
-							<span className="text-sm font-medium">
-								{t(
-									bidirectional
-										? "backup.enabled.statusBidirectional"
-										: "backup.enabled.status",
-								)}{" "}
-								{t("backup.enabled.folder")}
-							</span>
-						</div>
-						<p className="text-muted-foreground mb-1 text-sm">
-							<T k="backup.enabled.folder" />{" "}
-							<span
-								className="inline-block max-w-56 truncate align-bottom font-medium"
-								title={directoryName ?? undefined}
-							>
-								{directoryName}
-							</span>
-						</p>
-						{formattedLastBackup && (
-							<p className="text-muted-foreground mb-1 text-xs">
-								{t("backup.enabled.lastBackup", { date: formattedLastBackup })}
-							</p>
-						)}
-						{bidirectional && formattedLastPull && (
-							<p className="text-muted-foreground mb-3 text-xs">
-								{t("backup.enabled.lastSync", { date: formattedLastPull })}
-							</p>
-						)}
+						<SettingsStatus
+							tone="ok"
+							icon={<FolderOpen className="size-4 shrink-0" />}
+							description={
+								<>
+									<div className="truncate">
+										<T k="backup.enabled.folder" />{" "}
+										<span
+											className="font-medium"
+											title={directoryName ?? undefined}
+										>
+											{directoryName}
+										</span>
+									</div>
+									{formattedLastBackup && (
+										<div className="mt-0.5 text-sm sm:text-xs">
+											{t("backup.enabled.lastBackup", {
+												date: formattedLastBackup,
+											})}
+										</div>
+									)}
+									{bidirectional && formattedLastPull && (
+										<div className="mt-0.5 text-sm sm:text-xs">
+											{t("backup.enabled.lastSync", {
+												date: formattedLastPull,
+											})}
+										</div>
+									)}
+								</>
+							}
+						>
+							{t(
+								bidirectional
+									? "backup.enabled.statusBidirectional"
+									: "backup.enabled.status",
+							)}
+						</SettingsStatus>
 						{lastError && (
-							<div className="text-destructive mb-3 flex items-center gap-1.5 text-sm">
-								<AlertCircle className="size-4" />
-								{lastError}
-							</div>
-						)}
-						<div className="border-border/50 mb-3 border-t pt-3">
-							<div
-								className={
-									!canWatchFileSystem
-										? "flex items-start justify-between gap-3 opacity-50"
-										: "flex items-start justify-between gap-3"
-								}
+							<SettingsStatus
+								tone="error"
+								icon={<AlertCircle className="size-4 shrink-0" />}
 							>
-								<div className="space-y-1">
-									<Label
-										htmlFor="backup-bidirectional"
-										className="text-sm leading-5"
-									>
-										<T k="backup.enabled.syncChanges" />
-									</Label>
-									<p className="text-muted-foreground text-xs">
-										<T
-											k={
-												canWatchFileSystem
-													? "backup.enabled.syncDescription.supported"
-													: "backup.enabled.syncDescription.unsupported"
-											}
-										/>
-									</p>
-								</div>
-								<Switch
-									id="backup-bidirectional"
-									checked={bidirectional}
-									onCheckedChange={setBidirectional}
-									disabled={!canWatchFileSystem || isLoading}
+								{lastError}
+							</SettingsStatus>
+						)}
+						<SettingsRow
+							htmlFor="backup-bidirectional"
+							label={<T k="backup.enabled.syncChanges" />}
+							description={
+								<T
+									k={
+										canWatchFileSystem
+											? "backup.enabled.syncDescription.supported"
+											: "backup.enabled.syncDescription.unsupported"
+									}
 								/>
-							</div>
-						</div>
-						<div className="flex gap-2">
+							}
+							className={canWatchFileSystem ? undefined : "opacity-50"}
+						>
+							<Switch
+								id="backup-bidirectional"
+								checked={bidirectional}
+								onCheckedChange={setBidirectional}
+								disabled={!canWatchFileSystem || isLoading}
+							/>
+						</SettingsRow>
+						<SettingsActions>
 							<Button
 								onClick={handleChangeDirectory}
 								variant="outline"
@@ -181,31 +183,30 @@ function BackupSettings() {
 									? t("backup.enabled.disabling")
 									: t("backup.enabled.disable")}
 							</Button>
-						</div>
+						</SettingsActions>
 					</>
 				) : (
 					<>
-						<div className="text-foreground mb-2 text-sm font-medium">
+						<SettingsStatus description={<T k="backup.disabled.description" />}>
 							<T k="backup.disabled.status" />
-						</div>
-						<p className="text-muted-foreground mb-4 text-sm">
-							<T k="backup.disabled.description" />
-						</p>
-						<Button
-							onClick={handleEnable}
-							variant="outline"
-							size="sm"
-							disabled={isLoading}
-						>
-							<FolderOpen className="mr-1.5 size-3.5" />
-							{pendingAction === "enable"
-								? t("backup.disabled.choosing")
-								: t("backup.disabled.choose")}
-						</Button>
+						</SettingsStatus>
+						<SettingsActions>
+							<Button
+								onClick={handleEnable}
+								variant="outline"
+								size="sm"
+								disabled={isLoading}
+							>
+								<FolderOpen className="mr-1.5 size-3.5" />
+								{pendingAction === "enable"
+									? t("backup.disabled.choosing")
+									: t("backup.disabled.choose")}
+							</Button>
+						</SettingsActions>
 					</>
 				)}
-			</div>
-		</section>
+			</SettingsPanel>
+		</SettingsSection>
 	)
 }
 
@@ -275,35 +276,33 @@ function SpaceBackupSettings({ spaceId, isAdmin }: SpaceBackupSettingsProps) {
 	}
 
 	return (
-		<section>
-			<h2 className="text-muted-foreground mb-3 text-sm font-medium">
-				<T k="backup.space.title" />
-			</h2>
-			<div className="bg-muted/30 rounded-lg p-4">
+		<SettingsSection title={<T k="backup.space.title" />}>
+			<SettingsPanel>
 				{directoryName ? (
 					<>
-						<div className="mb-2 flex items-center gap-2 text-green-600 dark:text-green-400">
-							<FolderOpen className="size-4" />
-							<span className="text-sm font-medium">
-								<T k="backup.space.set" />
-							</span>
-						</div>
-						<p className="text-muted-foreground mb-3 text-sm">
-							<T k="backup.space.folder" />{" "}
-							<span
-								className="inline-block max-w-56 truncate align-bottom font-medium"
-								title={directoryName}
-							>
-								{directoryName}
-							</span>
-						</p>
+						<SettingsStatus
+							tone="ok"
+							icon={<FolderOpen className="size-4 shrink-0" />}
+							description={
+								<span className="truncate">
+									<T k="backup.space.folder" />{" "}
+									<span className="font-medium" title={directoryName}>
+										{directoryName}
+									</span>
+								</span>
+							}
+						>
+							<T k="backup.space.set" />
+						</SettingsStatus>
 						{error && (
-							<div className="text-destructive mb-3 flex items-center gap-1.5 text-sm">
-								<AlertCircle className="size-4" />
+							<SettingsStatus
+								tone="error"
+								icon={<AlertCircle className="size-4 shrink-0" />}
+							>
 								{error}
-							</div>
+							</SettingsStatus>
 						)}
-						<div className="flex gap-2">
+						<SettingsActions>
 							<Button
 								onClick={handleChangeFolder}
 								variant="outline"
@@ -324,69 +323,67 @@ function SpaceBackupSettings({ spaceId, isAdmin }: SpaceBackupSettingsProps) {
 									? t("backup.space.clearing")
 									: t("backup.space.clear")}
 							</Button>
-						</div>
+						</SettingsActions>
 						{!isAdmin && (
-							<p className="text-muted-foreground mt-2 text-xs">
+							<SettingsHint>
 								<T k="backup.space.adminOnly" />
-							</p>
+							</SettingsHint>
 						)}
 					</>
 				) : (
 					<>
-						<div className="text-foreground mb-2 text-sm font-medium">
+						<SettingsStatus description={<T k="backup.space.description" />}>
 							<T k="backup.space.notSet" />
-						</div>
-						<p className="text-muted-foreground mb-4 text-sm">
-							<T k="backup.space.description" />
-						</p>
+						</SettingsStatus>
 						{error && (
-							<div className="text-destructive mb-3 flex items-center gap-1.5 text-sm">
-								<AlertCircle className="size-4" />
+							<SettingsStatus
+								tone="error"
+								icon={<AlertCircle className="size-4 shrink-0" />}
+							>
 								{error}
-							</div>
+							</SettingsStatus>
 						)}
-						<Button
-							onClick={handleChooseFolder}
-							variant="outline"
-							size="sm"
-							disabled={isLoading || !isAdmin}
-						>
-							<FolderOpen className="mr-1.5 size-3.5" />
-							{pendingAction === "choose"
-								? t("backup.space.choosing")
-								: t("backup.space.choose")}
-						</Button>
+						<SettingsActions>
+							<Button
+								onClick={handleChooseFolder}
+								variant="outline"
+								size="sm"
+								disabled={isLoading || !isAdmin}
+							>
+								<FolderOpen className="mr-1.5 size-3.5" />
+								{pendingAction === "choose"
+									? t("backup.space.choosing")
+									: t("backup.space.choose")}
+							</Button>
+						</SettingsActions>
 						{!isAdmin && (
-							<p className="text-muted-foreground mt-2 text-xs">
+							<SettingsHint>
 								<T k="backup.space.adminOnlySet" />
-							</p>
+							</SettingsHint>
 						)}
 					</>
 				)}
-			</div>
-		</section>
+			</SettingsPanel>
+		</SettingsSection>
 	)
 }
 
 function UnsupportedBrowserCallout() {
 	return (
-		<section>
-			<h2 className="text-muted-foreground mb-3 text-sm font-medium">
-				<T k="backup.title" />
-			</h2>
-			<div className="bg-muted/30 rounded-lg p-4">
-				<div className="flex items-start gap-2">
-					<AlertCircle className="text-muted-foreground mt-0.5 size-4" />
-					<div>
-						<p className="text-muted-foreground text-sm">
+		<SettingsSection title={<T k="backup.title" />}>
+			<SettingsPanel>
+				<SettingsBlock>
+					<div className="text-muted-foreground flex items-start gap-2 text-base/6 text-pretty sm:text-sm/5">
+						<AlertCircle className="mt-0.5 size-4 shrink-0" />
+						<div>
 							<T k="backup.unsupported.description" />
-						</p>
-						<p className="text-muted-foreground mt-1 text-xs">
-							<T k="backup.unsupported.note" />
-						</p>
+							<div className="mt-1 text-sm sm:text-xs">
+								<T k="backup.unsupported.note" />
+							</div>
+						</div>
 					</div>
-				</div>
-			</div>
-		</section>
+				</SettingsBlock>
+			</SettingsPanel>
+		</SettingsSection>
 	)
 }
