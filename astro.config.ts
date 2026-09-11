@@ -8,6 +8,7 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite"
 export default defineConfig({
 	site: "https://www.alkalye.com",
 	adapter: vercel(),
+	security: { checkOrigin: false },
 	devToolbar: { enabled: false },
 	i18n: {
 		locales: ["en", "de"],

@@ -38,6 +38,18 @@ await checkJson(
 	},
 )
 
+let token = await fetch(new URL("/oauth/token", baseUrl), {
+	method: "POST",
+	headers: { "content-type": "application/x-www-form-urlencoded" },
+	body: new URLSearchParams({ grant_type: "invalid" }),
+})
+expect(token.status === 400, `OAuth token request returned ${token.status}`)
+expect(
+	(await token.json()).error === "unsupported_grant_type",
+	"OAuth token request did not reach the authorization server",
+)
+passed("OAuth cross-origin token request")
+
 let mcp = await fetch(new URL("/mcp", baseUrl))
 expect(mcp.status === 401, `MCP without authentication returned ${mcp.status}`)
 expect(
