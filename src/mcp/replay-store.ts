@@ -26,7 +26,9 @@ function createRedisReplayStore(args: {
 		async allow(id, limit, windowMs) {
 			let key = `alkalye:mcp:rate:${id}`
 			let count = await redis.incr(key)
-			if (count === 1) await redis.pexpire(key, windowMs)
+			if (count === 1 || (await redis.pttl(key)) < 0) {
+				await redis.pexpire(key, windowMs)
+			}
 			return count <= limit
 		},
 		async revoke(id, ttlMs) {

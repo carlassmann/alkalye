@@ -5,6 +5,7 @@ import { Document, Space, UserAccount } from "@/schema"
 import { agentCredentialsSchema } from "@/mcp/credentials"
 import { getMcpConfig } from "@/mcp/config"
 import { runWithAgentAccount } from "@/mcp/jazz"
+import { credentialRevocationKey } from "@/mcp/oauth"
 
 export { POST }
 
@@ -24,7 +25,7 @@ let requestSchema = z.object({
 			}),
 		)
 		.min(1)
-		.max(500),
+		.max(5_000),
 })
 
 type AgentGrantAccount = co.loaded<
@@ -42,19 +43,48 @@ let POST: APIRoute = async ({ request }) => {
 			input.credential,
 			agentCredentialsSchema,
 		)
-		await runWithAgentAccount(config.syncServer, credentials, async agent => {
-			let account = await agent.account.$jazz.ensureLoaded({
-				resolve: { root: { documents: true, spaces: true } },
-			})
-			for (let update of input.updates) {
-				if (update.resource.kind === "document") {
-					await updateDocumentGrant(account, update.action, update.resource.id)
-				} else {
-					await updateSpaceGrant(account, update.action, update.resource.id)
+		if (
+			await config.replayStore.isRevoked(
+				credentialRevocationKey(input.credential),
+			)
+		) {
+			throw new Error("Agent connection is revoked")
+		}
+		await runWithAgentAccount(
+			config.syncServer,
+			credentials,
+			async agent => {
+				let account = await withDeadline(
+					agent.account.$jazz.ensureLoaded({
+						resolve: { root: { documents: true, spaces: true } },
+					}),
+					20_000,
+				)
+				let rollbacks: (() => void)[] = []
+				try {
+					let updates = await withDeadline(
+						Promise.all(
+							input.updates.map(update => resolveGrantUpdate(account, update)),
+						),
+						20_000,
+					)
+					for (let update of updates) {
+						let rollback = applyGrantUpdate(account, update)
+						if (rollback) rollbacks.push(rollback)
+					}
+					await agent.account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
+				} catch (error) {
+					for (let rollback of rollbacks.reverse()) rollback()
+					if (rollbacks.length > 0) {
+						await agent.account.$jazz
+							.waitForAllCoValuesSync({ timeout: 10_000 })
+							.catch(() => undefined)
+					}
+					throw error
 				}
-			}
-			await agent.account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
-		})
+			},
+			false,
+		)
 		return json({ ok: true })
 	} catch (error) {
 		console.error("[agent-grants] update failed", error)
@@ -62,40 +92,134 @@ let POST: APIRoute = async ({ request }) => {
 	}
 }
 
-async function updateDocumentGrant(
+type GrantUpdate = z.infer<typeof requestSchema>["updates"][number]
+type ResolvedGrantUpdate =
+	| {
+			kind: "document"
+			action: "add" | "remove"
+			id: string
+			addition?: co.loaded<typeof Document>
+	  }
+	| {
+			kind: "space"
+			action: "add" | "remove"
+			id: string
+			addition?: co.loaded<typeof Space>
+	  }
+
+async function resolveGrantUpdate(
 	account: AgentGrantAccount,
-	action: "add" | "remove",
-	documentId: string,
-) {
-	let index = account.root.documents.findIndex(
-		document => document?.$jazz.id === documentId,
-	)
-	if (action === "remove") {
-		if (index !== -1) account.root.documents.$jazz.splice(index, 1)
-		return
+	update: GrantUpdate,
+): Promise<ResolvedGrantUpdate> {
+	if (update.resource.kind === "document") {
+		let existing = account.root.documents.some(
+			document => document?.$jazz.id === update.resource.id,
+		)
+		if (update.action === "remove" || existing) {
+			return {
+				kind: "document",
+				action: update.action,
+				id: update.resource.id,
+			}
+		}
+		let document = await Document.load(update.resource.id, { loadAs: account })
+		if (!document.$isLoaded)
+			throw new Error("Document is not shared with agent")
+		return {
+			kind: "document",
+			action: update.action,
+			id: update.resource.id,
+			addition: document,
+		}
 	}
-	if (index !== -1) return
-	let document = await Document.load(documentId, { loadAs: account })
-	if (!document.$isLoaded) throw new Error("Document is not shared with agent")
-	account.root.documents.$jazz.push(document)
+	let existing = account.root.spaces?.some(
+		space => space?.$jazz.id === update.resource.id,
+	)
+	if (update.action === "remove" || existing) {
+		return { kind: "space", action: update.action, id: update.resource.id }
+	}
+	let space = await Space.load(update.resource.id, { loadAs: account })
+	if (!space.$isLoaded) throw new Error("Space is not shared with agent")
+	return {
+		kind: "space",
+		action: update.action,
+		id: update.resource.id,
+		addition: space,
+	}
 }
 
-async function updateSpaceGrant(
+function applyGrantUpdate(
 	account: AgentGrantAccount,
-	action: "add" | "remove",
-	spaceId: string,
+	update: ResolvedGrantUpdate,
+) {
+	if (update.kind === "document") {
+		return applyDocumentGrant(account, update)
+	}
+	return applySpaceGrant(account, update)
+}
+
+function applyDocumentGrant(
+	account: AgentGrantAccount,
+	update: Extract<ResolvedGrantUpdate, { kind: "document" }>,
+) {
+	let documents = account.root.documents
+	let index = documents.findIndex(document => document?.$jazz.id === update.id)
+	if (update.action === "remove") {
+		let document = index === -1 ? undefined : documents[index]
+		if (!document) return undefined
+		documents.$jazz.splice(index, 1)
+		return () =>
+			documents.$jazz.splice(Math.min(index, documents.length), 0, document)
+	}
+	if (index !== -1 || !update.addition) return undefined
+	documents.$jazz.push(update.addition)
+	return () => {
+		let addedIndex = documents.findIndex(
+			document => document?.$jazz.id === update.id,
+		)
+		if (addedIndex !== -1) documents.$jazz.splice(addedIndex, 1)
+	}
+}
+
+function applySpaceGrant(
+	account: AgentGrantAccount,
+	update: Extract<ResolvedGrantUpdate, { kind: "space" }>,
 ) {
 	let spaces = account.root.spaces
 	if (!spaces) throw new Error("Agent spaces are unavailable")
-	let index = spaces.findIndex(space => space?.$jazz.id === spaceId)
-	if (action === "remove") {
-		if (index !== -1) spaces.$jazz.splice(index, 1)
-		return
+	let index = spaces.findIndex(space => space?.$jazz.id === update.id)
+	if (update.action === "remove") {
+		let space = index === -1 ? undefined : spaces[index]
+		if (!space) return undefined
+		spaces.$jazz.splice(index, 1)
+		return () => spaces.$jazz.splice(Math.min(index, spaces.length), 0, space)
 	}
-	if (index !== -1) return
-	let space = await Space.load(spaceId, { loadAs: account })
-	if (!space.$isLoaded) throw new Error("Space is not shared with agent")
-	spaces.$jazz.push(space)
+	if (index !== -1 || !update.addition) return undefined
+	spaces.$jazz.push(update.addition)
+	return () => {
+		let addedIndex = spaces.findIndex(space => space?.$jazz.id === update.id)
+		if (addedIndex !== -1) spaces.$jazz.splice(addedIndex, 1)
+	}
+}
+
+async function withDeadline<Result>(
+	promise: Promise<Result>,
+	timeoutMs: number,
+) {
+	let timeout: ReturnType<typeof setTimeout> | undefined
+	try {
+		return await Promise.race([
+			promise,
+			new Promise<never>((_, reject) => {
+				timeout = setTimeout(
+					() => reject(new Error("Grant validation timed out")),
+					timeoutMs,
+				)
+			}),
+		])
+	} finally {
+		if (timeout) clearTimeout(timeout)
+	}
 }
 
 function json(body: unknown, status: number = 200) {

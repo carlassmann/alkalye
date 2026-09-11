@@ -30,34 +30,33 @@ async function reconcilePersonalDocumentAccess(
 		account.root.inactiveDocuments?.values() ?? [],
 	)
 	let membershipChanges: MembershipChange[] = []
-	for (let document of [...activeDocuments, ...inactiveDocuments]) {
-		if (!document?.$isLoaded) continue
-		let owner = document.$jazz.owner
-		let currentRole = owner.getRoleOf(connection.accountId)
-		let isActive = activeDocuments.includes(document) && !document.deletedAt
-		let desiredRole = isActive ? role : undefined
-		if (desiredRole && currentRole === desiredRole) continue
-		if (
-			!desiredRole &&
-			currentRole !== "reader" &&
-			currentRole !== "writer"
-		) {
-			continue
-		}
-		if (
-			currentRole !== undefined &&
-			currentRole !== "reader" &&
-			currentRole !== "writer"
-		) {
-			continue
-		}
-
-		if (desiredRole) owner.addMember(agent, desiredRole)
-		else owner.removeMember(agent)
-		membershipChanges.push({ document, currentRole, desiredRole })
-	}
-
 	try {
+		for (let document of [...activeDocuments, ...inactiveDocuments]) {
+			if (!document?.$isLoaded) continue
+			let owner = document.$jazz.owner
+			let currentRole = owner.getRoleOf(connection.accountId)
+			let isActive = activeDocuments.includes(document) && !document.deletedAt
+			let desiredRole = isActive ? role : undefined
+			if (desiredRole && currentRole === desiredRole) continue
+			if (
+				!desiredRole &&
+				currentRole !== "reader" &&
+				currentRole !== "writer"
+			) {
+				continue
+			}
+			if (
+				currentRole !== undefined &&
+				currentRole !== "reader" &&
+				currentRole !== "writer"
+			) {
+				continue
+			}
+
+			if (desiredRole) owner.addMember(agent, desiredRole)
+			else owner.removeMember(agent)
+			membershipChanges.push({ document, currentRole, desiredRole })
+		}
 		await updateAgentGrants(
 			connection.credential,
 			membershipChanges.map(change => ({

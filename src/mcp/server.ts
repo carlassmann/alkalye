@@ -96,9 +96,16 @@ function createAlkalyeServer(credential: string | undefined) {
 				let loaded = await account.$jazz.ensureLoaded({
 					resolve: {
 						root: {
-							documents: { $each: { content: true } },
+							documents: {
+								$each: { content: true, $onError: "catch" },
+							},
 							spaces: {
-								$each: { documents: { $each: { content: true } } },
+								$each: {
+									documents: {
+										$each: { content: true, $onError: "catch" },
+									},
+									$onError: "catch",
+								},
 							},
 						},
 					},
@@ -239,7 +246,13 @@ function createAlkalyeServer(credential: string | undefined) {
 		async ({ spaceId, content }) =>
 			withAgent(credential, async (account, sync) => {
 				let loaded = await account.$jazz.ensureLoaded({
-					resolve: { root: { spaces: { $each: { documents: true } } } },
+					resolve: {
+						root: {
+							spaces: {
+								$each: { documents: true, $onError: "catch" },
+							},
+						},
+					},
 				})
 				let space = (loaded.root.spaces ?? []).find(
 					candidate => candidate?.$jazz.id === spaceId,
@@ -511,19 +524,24 @@ async function findAgentDocument(
 	let loaded = await account.$jazz.ensureLoaded({
 		resolve: {
 			root: {
-				documents: true,
-				spaces: { $each: { documents: true } },
+				documents: { $each: { $onError: "catch" } },
+				spaces: {
+					$each: {
+						documents: { $each: { $onError: "catch" } },
+						$onError: "catch",
+					},
+				},
 			},
 		},
 	})
 	let candidates = [
-		...loaded.root.documents,
+		...loaded.root.documents.values(),
 		...(loaded.root.spaces ?? []).flatMap(space =>
-			space?.$isLoaded ? [...space.documents] : [],
+			space?.$isLoaded ? [...space.documents.values()] : [],
 		),
 	]
 	let reference = candidates.find(document => document?.$jazz.id === documentId)
-	if (!reference) throw new Error("Document not found")
+	if (!reference?.$isLoaded) throw new Error("Document not found")
 	let document = await reference.$jazz.ensureLoaded({
 		resolve: { content: true, comments: { $each: { replies: true } } },
 	})

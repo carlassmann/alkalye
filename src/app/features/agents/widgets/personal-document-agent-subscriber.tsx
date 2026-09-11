@@ -33,7 +33,9 @@ function ActivePersonalDocumentAgentSubscriber() {
 		? [
 				...account.root.documents.flatMap(document =>
 					document?.$isLoaded
-						? [`${document.$jazz.id}:${document.deletedAt?.toISOString() ?? "active"}`]
+						? [
+								`${document.$jazz.id}:${document.deletedAt?.toISOString() ?? "active"}`,
+							]
 						: [],
 				),
 				...(account.root.inactiveDocuments ?? []).flatMap(document =>
@@ -41,9 +43,7 @@ function ActivePersonalDocumentAgentSubscriber() {
 				),
 				...(account.root.agentConnections ?? []).flatMap(connection =>
 					connection?.$isLoaded && connection.personalDocumentsRole
-						? [
-								`${connection.$jazz.id}:${connection.personalDocumentsRole}`,
-							]
+						? [`${connection.$jazz.id}:${connection.personalDocumentsRole}`]
 						: [],
 				),
 			].join("|")
@@ -52,10 +52,11 @@ function ActivePersonalDocumentAgentSubscriber() {
 	useEffect(() => {
 		if (!account.$isLoaded) return
 		let loadedAccount = account
-		let connections = (loadedAccount.root.agentConnections ?? []).flatMap(connection =>
-			connection?.$isLoaded && connection.personalDocumentsRole
-				? [connection]
-				: [],
+		let connections = (loadedAccount.root.agentConnections ?? []).flatMap(
+			connection =>
+				connection?.$isLoaded && connection.personalDocumentsRole
+					? [connection]
+					: [],
 		)
 		if (connections.length === 0) return
 
@@ -73,7 +74,10 @@ function ActivePersonalDocumentAgentSubscriber() {
 					)
 				} catch (error) {
 					failures++
-					console.error("[agent-connections] personal access sync failed", error)
+					console.error(
+						"[agent-connections] personal access sync failed",
+						error,
+					)
 				}
 			}
 			if (failures === 0 || cancelled || attempt >= 3) return

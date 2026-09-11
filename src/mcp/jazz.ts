@@ -23,10 +23,12 @@ interface AgentRuntime {
 	tail: Promise<void>
 	active: number
 	lastUsedAt: number
+	invalidated: boolean
 }
 
 let agentRuntimes = new Map<string, AgentRuntime>()
 let agentOperationTimeout = 20_000
+let agentToolTimeout = 60_000
 let agentRuntimeIdleTimeout = 5 * 60_000
 let maximumAgentRuntimes = 32
 
@@ -93,6 +95,7 @@ async function runWithAgentAccount<Result>(
 	syncServer: string,
 	credentials: AgentCredentials,
 	operation: (agent: OpenAgent) => Promise<Result>,
+	operationTimeoutMs: number | false = agentToolTimeout,
 ) {
 	await evictIdleAgentRuntimes()
 	let key = credentials.accountId
@@ -103,6 +106,7 @@ async function runWithAgentAccount<Result>(
 			tail: Promise.resolve(),
 			active: 0,
 			lastUsedAt: Date.now(),
+			invalidated: false,
 		}
 		agentRuntimes.set(key, runtime)
 	}
@@ -114,18 +118,46 @@ async function runWithAgentAccount<Result>(
 	})
 	runtime.active++
 	await previous
+	if (runtime.invalidated) {
+		runtime.active--
+		release()
+		return runWithAgentAccount(
+			syncServer,
+			credentials,
+			operation,
+			operationTimeoutMs,
+		)
+	}
 	try {
-		let agent = await withDeadline(runtime.agent, agentOperationTimeout)
-		return await withDeadline(operation(agent), agentOperationTimeout)
-	} catch (error) {
-		agentRuntimes.delete(key)
-		void runtime.agent.then(agent => agent.close()).catch(() => undefined)
-		throw error
+		let agent: OpenAgent
+		try {
+			agent = await withDeadline(runtime.agent, agentOperationTimeout)
+		} catch (error) {
+			invalidateAgentRuntime(key, runtime)
+			throw error
+		}
+		try {
+			let result = operation(agent)
+			return operationTimeoutMs === false
+				? await result
+				: await withDeadline(result, operationTimeoutMs)
+		} catch (error) {
+			if (error instanceof AgentRuntimeTimeoutError) {
+				invalidateAgentRuntime(key, runtime)
+			}
+			throw error
+		}
 	} finally {
 		runtime.active--
 		runtime.lastUsedAt = Date.now()
 		release()
 	}
+}
+
+function invalidateAgentRuntime(key: string, runtime: AgentRuntime) {
+	runtime.invalidated = true
+	if (agentRuntimes.get(key) === runtime) agentRuntimes.delete(key)
+	void runtime.agent.then(agent => agent.close()).catch(() => undefined)
 }
 
 async function evictIdleAgentRuntimes() {
@@ -164,13 +196,20 @@ async function withDeadline<Result>(
 			promise,
 			new Promise<never>((_, reject) => {
 				timeout = setTimeout(
-					() => reject(new Error("Agent operation timed out")),
+					() => reject(new AgentRuntimeTimeoutError(timeoutMs)),
 					timeoutMs,
 				)
 			}),
 		])
 	} finally {
 		if (timeout) clearTimeout(timeout)
+	}
+}
+
+class AgentRuntimeTimeoutError extends Error {
+	constructor(timeoutMs: number) {
+		super(`Agent operation timed out after ${timeoutMs}ms`)
+		this.name = "AgentRuntimeTimeoutError"
 	}
 }
 

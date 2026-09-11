@@ -76,7 +76,9 @@ describe("personal document agent access", () => {
 		await reconcilePersonalDocumentAccess(account, connection, "writer")
 		document.$jazz.set("deletedAt", new Date())
 		account.root.documents.$jazz.splice(
-			account.root.documents.findIndex(item => item?.$jazz.id === document.$jazz.id),
+			account.root.documents.findIndex(
+				item => item?.$jazz.id === document.$jazz.id,
+			),
 			1,
 		)
 		account.root.inactiveDocuments?.$jazz.push(document)

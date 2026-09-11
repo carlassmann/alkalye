@@ -64,9 +64,10 @@ function AgentConnectionsSection({
 		loadedAuthorization && loadedAuthorization.token === oauth
 			? loadedAuthorization.authorization
 			: undefined
-	let hasAccess = account && connection?.$isLoaded
-		? hasAgentAccess(account, connection)
-		: false
+	let hasAccess =
+		account && connection?.$isLoaded
+			? hasAgentAccess(account, connection)
+			: false
 
 	useEffect(() => {
 		if (!oauth) {
@@ -82,8 +83,7 @@ function AgentConnectionsSection({
 			.then((value: unknown) => {
 				if (isAuthorizationConsent(value)) {
 					setLoadedAuthorization({ token: oauth, authorization: value })
-				}
-				else setError("This authorization request is invalid or expired")
+				} else setError("This authorization request is invalid or expired")
 			})
 			.catch(cause => {
 				if (cause instanceof Error && cause.name === "AbortError") return
@@ -218,7 +218,7 @@ function AgentConnectionsSection({
 						owner.removeMember(agent)
 					}
 				}
-			}
+			} else cleanupError = new Error("Agent account is unavailable")
 		} catch (cause) {
 			cleanupError = cause
 		}
@@ -382,9 +382,7 @@ function ResourceAccess({
 }: ResourceAccessProps) {
 	let t = useIntl()
 	let personalDocuments = account.root.documents.flatMap(document =>
-		document?.$isLoaded
-			? [{ kind: "document" as const, value: document }]
-			: [],
+		document?.$isLoaded ? [{ kind: "document" as const, value: document }] : [],
 	)
 	let resources: SharedResource[] = [
 		...(connection.personalDocumentsRole ? [] : personalDocuments),
@@ -476,20 +474,22 @@ function PersonalDocumentsAccessRow({
 				}}
 				disabled={!enabled || busy === id}
 			>
-			<SelectTrigger
-				aria-label={t("settings.agents.roleFor", {
-					name: t("settings.agents.personalDocuments"),
-				})}
-			>
-				<SelectValue>
-					{t(
-						role === "reader" ? "settings.agents.read" : "settings.agents.write",
-					)}
-				</SelectValue>
+				<SelectTrigger
+					aria-label={t("settings.agents.roleFor", {
+						name: t("settings.agents.personalDocuments"),
+					})}
+				>
+					<SelectValue>
+						{t(
+							role === "reader"
+								? "settings.agents.read"
+								: "settings.agents.write",
+						)}
+					</SelectValue>
 				</SelectTrigger>
 				<SelectContent>
-				<SelectItem value="reader">{t("settings.agents.read")}</SelectItem>
-				<SelectItem value="writer">{t("settings.agents.write")}</SelectItem>
+					<SelectItem value="reader">{t("settings.agents.read")}</SelectItem>
+					<SelectItem value="writer">{t("settings.agents.write")}</SelectItem>
 				</SelectContent>
 			</Select>
 			<Switch
@@ -574,8 +574,8 @@ function ResourceAccessRow({
 					{!canManage
 						? t("settings.agents.adminRequired")
 						: resource.kind === "space"
-						? t("settings.agents.space")
-						: t("settings.agents.document")}
+							? t("settings.agents.space")
+							: t("settings.agents.document")}
 				</div>
 			</div>
 			<Select
@@ -587,18 +587,20 @@ function ResourceAccessRow({
 				}}
 				disabled={!canManage || !enabled || busy === id}
 			>
-			<SelectTrigger
-				aria-label={t("settings.agents.roleFor", { name: label })}
-			>
-				<SelectValue>
-					{t(
-						role === "reader" ? "settings.agents.read" : "settings.agents.write",
-					)}
-				</SelectValue>
+				<SelectTrigger
+					aria-label={t("settings.agents.roleFor", { name: label })}
+				>
+					<SelectValue>
+						{t(
+							role === "reader"
+								? "settings.agents.read"
+								: "settings.agents.write",
+						)}
+					</SelectValue>
 				</SelectTrigger>
 				<SelectContent>
-				<SelectItem value="reader">{t("settings.agents.read")}</SelectItem>
-				<SelectItem value="writer">{t("settings.agents.write")}</SelectItem>
+					<SelectItem value="reader">{t("settings.agents.read")}</SelectItem>
+					<SelectItem value="writer">{t("settings.agents.write")}</SelectItem>
 				</SelectContent>
 			</Select>
 			<Switch
@@ -661,9 +663,9 @@ function isProvisionedConnection(value: unknown): value is {
 function hasRedirect(value: unknown): value is { redirectTo: string } {
 	return Boolean(
 		value &&
-			typeof value === "object" &&
-			"redirectTo" in value &&
-			typeof value.redirectTo === "string",
+		typeof value === "object" &&
+		"redirectTo" in value &&
+		typeof value.redirectTo === "string",
 	)
 }
 
