@@ -1,4 +1,10 @@
-import { useImperativeHandle, useEffect, useRef, useState } from "react"
+import {
+	useImperativeHandle,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react"
 import { diff } from "fast-myers-diff"
 import { ImageOff, Maximize2, Minimize2, PenTool } from "lucide-react"
 import { toast } from "sonner"
@@ -948,7 +954,7 @@ function MarkdownEditor(
 		}
 	}, [view, t])
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (!view) return
 
 		let currentContent = view.state.doc.toString()

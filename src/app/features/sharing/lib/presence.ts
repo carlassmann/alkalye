@@ -159,7 +159,7 @@ let remoteCursorsField = StateField.define<CursorFieldState>({
 	update(state, tr) {
 		for (let effect of tr.effects) {
 			if (effect.is(setRemoteCursorsEffect)) {
-				return reconcileIncomingCursors(state, effect.value)
+				return reconcileIncomingCursors(state, effect.value, tr.newDoc.length)
 			}
 		}
 		if (tr.docChanged && state.cursors.length > 0) {
@@ -175,6 +175,7 @@ let remoteCursorsField = StateField.define<CursorFieldState>({
 function reconcileIncomingCursors(
 	prev: CursorFieldState,
 	incoming: RemoteCursor[],
+	documentLength: number,
 ): CursorFieldState {
 	let sourcePositions = new Map<string, CursorPosition>()
 
@@ -201,7 +202,7 @@ function reconcileIncomingCursors(
 			}
 		}
 
-		return cursor
+		return clampCursor(cursor, documentLength)
 	})
 
 	return { cursors, sourcePositions }
@@ -211,14 +212,28 @@ function mapCursorsThroughChanges(
 	cursors: RemoteCursor[],
 	changes: ChangeSet,
 ): RemoteCursor[] {
-	return cursors.map(cursor => ({
+	return cursors.map(cursor => {
+		let validCursor = clampCursor(cursor, changes.length)
+		return {
+			...validCursor,
+			position: changes.mapPos(validCursor.position, 1),
+			selectionEnd:
+				validCursor.selectionEnd !== undefined
+					? changes.mapPos(validCursor.selectionEnd, 1)
+					: undefined,
+		}
+	})
+}
+
+function clampCursor(cursor: RemoteCursor, documentLength: number) {
+	return {
 		...cursor,
-		position: changes.mapPos(cursor.position, 1),
+		position: Math.max(0, Math.min(cursor.position, documentLength)),
 		selectionEnd:
-			cursor.selectionEnd !== undefined
-				? changes.mapPos(cursor.selectionEnd, 1)
-				: undefined,
-	}))
+			cursor.selectionEnd === undefined
+				? undefined
+				: Math.max(0, Math.min(cursor.selectionEnd, documentLength)),
+	}
 }
 
 let cursorDecorationPlugin = ViewPlugin.fromClass(

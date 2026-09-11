@@ -114,8 +114,8 @@ test("simultaneous writers converge without rolling back local text", async ({
 		})
 		let ownerEditor = editorFor(page)
 		let collaboratorEditor = editorFor(collaborator.page)
-		let ownerMarker = "owner ending"
-		let collaboratorMarker = "collaborator beginning"
+		let ownerMarker = "owner sequential ending ".repeat(4)
+		let collaboratorMarker = "collaborator sequential beginning ".repeat(4)
 		await observeLocalRollback(page, ownerMarker)
 		await observeLocalRollback(collaborator.page, collaboratorMarker)
 
@@ -124,8 +124,8 @@ test("simultaneous writers converge without rolling back local text", async ({
 		await collaboratorEditor.click()
 		await collaboratorEditor.press("ControlOrMeta+Home")
 		await Promise.all([
-			page.keyboard.insertText(`\n${ownerMarker}`),
-			collaborator.page.keyboard.insertText(`${collaboratorMarker}\n`),
+			page.keyboard.type(`\n${ownerMarker}`, { delay: 12 }),
+			collaborator.page.keyboard.type(`${collaboratorMarker}\n`, { delay: 17 }),
 		])
 
 		await expect(ownerEditor).toContainText(collaboratorMarker, {
