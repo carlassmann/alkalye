@@ -765,7 +765,28 @@ function MarkdownEditor(
 
 		setView(editorView)
 
+		function handleScrollerPointerDown(event: PointerEvent) {
+			if (event.target !== editorView.scrollDOM) return
+			event.preventDefault()
+			let coords = { x: event.clientX, y: event.clientY }
+			let pos = editorView.posAtCoords(coords) ?? editorView.state.doc.length
+			editorView.dispatch({
+				selection: EditorSelection.cursor(pos),
+				scrollIntoView: true,
+			})
+			editorView.focus()
+		}
+
+		editorView.scrollDOM.addEventListener(
+			"pointerdown",
+			handleScrollerPointerDown,
+		)
+
 		return () => {
+			editorView.scrollDOM.removeEventListener(
+				"pointerdown",
+				handleScrollerPointerDown,
+			)
 			editorView.destroy()
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally run once
