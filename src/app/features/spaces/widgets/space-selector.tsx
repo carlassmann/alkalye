@@ -8,21 +8,10 @@ import {
 } from "jazz-tools/react"
 import { useParams, useNavigate, Link } from "@tanstack/react-router"
 import { useIntl, T } from "@/shared/intl/setup"
+import { User, Users, Check, Plus, SettingsIcon, UserPlus } from "lucide-react"
 import {
-	ChevronDown,
-	User,
-	Users,
-	Check,
-	Plus,
-	SettingsIcon,
-	UserPlus,
-} from "lucide-react"
-import {
-	DropdownMenu,
-	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
-	DropdownMenuTrigger,
 } from "@/app/components/ui/dropdown-menu"
 import {
 	Dialog,
@@ -38,6 +27,7 @@ import { Label } from "@/app/components/ui/label"
 import { UserAccount, Space, createSpace } from "@/schema"
 import { getSpaceGroup } from "../lib/spaces"
 import { testIds } from "@/app/lib/test-ids"
+import { WorkspaceSelector } from "@/app/components/workspace-selector"
 
 export { SpaceSelector, SpaceInitials }
 
@@ -87,108 +77,96 @@ function SpaceSelector() {
 
 	return (
 		<>
-			<DropdownMenu>
-				<div className="flex items-center gap-1 border-b p-2">
-					<DropdownMenuTrigger
-						render={
+			<WorkspaceSelector
+				label={displayName}
+				icon={
+					isInSpace && currentSpace.$isLoaded ? (
+						<SpaceAvatar space={currentSpace} />
+					) : (
+						<User />
+					)
+				}
+				triggerTestId={testIds.space.selectorTrigger}
+				actions={
+					<>
+						{currentSpaceInList && (
 							<Button
 								variant="ghost"
-								className="flex-1 justify-between"
-								nativeButton
-								data-testid={testIds.space.selectorTrigger}
+								size="icon"
+								data-testid={testIds.space.settingsButton}
+								render={
+									<Link
+										to="/spaces/$spaceId/settings"
+										params={{ spaceId: currentSpaceInList.$jazz.id }}
+									/>
+								}
 							>
-								<span className="inline-flex items-center gap-3">
-									{isInSpace && currentSpace.$isLoaded ? (
-										<SpaceAvatar space={currentSpace} />
-									) : (
-										<User />
-									)}
-									<span className="truncate">{displayName}</span>
+								<SettingsIcon />
+								<span className="sr-only">
+									<T k="spaces.selector.settings" />
 								</span>
-								<ChevronDown />
 							</Button>
-						}
-					/>
-					{currentSpaceInList && (
-						<Button
-							variant="ghost"
-							size="icon"
-							data-testid={testIds.space.settingsButton}
-							render={
-								<Link
-									to="/spaces/$spaceId/settings"
-									params={{ spaceId: currentSpaceInList.$jazz.id }}
-								/>
-							}
-						>
-							<SettingsIcon />
-							<span className="sr-only">
-								<T k="spaces.selector.settings" />
-							</span>
-						</Button>
-					)}
-				</div>
-				<DropdownMenuContent align="center" sideOffset={4}>
+						)}
+					</>
+				}
+			>
+				<DropdownMenuItem
+					onClick={() => navigate({ to: "/", search: { personal: true } })}
+				>
+					<User className="size-4" />
+					<span>
+						<T k="spaces.selector.personal" />
+					</span>
+					{!spaceId && <Check className="ml-auto size-4" />}
+				</DropdownMenuItem>
+				{spaces.map(space => (
 					<DropdownMenuItem
-						onClick={() => navigate({ to: "/", search: { personal: true } })}
+						key={space.$jazz.id}
+						data-testid={testIds.space.listItem}
+						data-space-id={space.$jazz.id}
+						render={
+							<Link
+								to="/spaces/$spaceId"
+								params={{ spaceId: space.$jazz.id }}
+							/>
+						}
 					>
-						<User className="size-4" />
-						<span>
-							<T k="spaces.selector.personal" />
-						</span>
-						{!spaceId && <Check className="ml-auto size-4" />}
+						<SpaceAvatar space={space} />
+						<span>{space.name}</span>
+						{spaceId === space.$jazz.id && <Check className="ml-auto size-4" />}
 					</DropdownMenuItem>
-					{spaces.map(space => (
-						<DropdownMenuItem
-							key={space.$jazz.id}
-							data-testid={testIds.space.listItem}
-							data-space-id={space.$jazz.id}
-							render={
-								<Link
-									to="/spaces/$spaceId"
-									params={{ spaceId: space.$jazz.id }}
-								/>
-							}
-						>
-							<SpaceAvatar space={space} />
-							<span>{space.name}</span>
-							{spaceId === space.$jazz.id && (
-								<Check className="ml-auto size-4" />
-							)}
+				))}
+				{isViewingPublicSpace && currentSpaceFromUrl?.$isLoaded && (
+					<>
+						<DropdownMenuSeparator />
+						<div className="text-muted-foreground px-2 py-1.5 text-xs">
+							<T k="spaces.selector.viewingPublic" />
+						</div>
+						<DropdownMenuItem disabled>
+							<Users className="size-4" />
+							<span>{currentSpaceFromUrl.name}</span>
+							<Check className="ml-auto size-4" />
 						</DropdownMenuItem>
-					))}
-					{isViewingPublicSpace && currentSpaceFromUrl?.$isLoaded && (
-						<>
-							<DropdownMenuSeparator />
-							<div className="text-muted-foreground px-2 py-1.5 text-xs">
-								<T k="spaces.selector.viewingPublic" />
-							</div>
-							<DropdownMenuItem disabled>
-								<Users className="size-4" />
-								<span>{currentSpaceFromUrl.name}</span>
-								<Check className="ml-auto size-4" />
-							</DropdownMenuItem>
-						</>
-					)}
-					{isAuthenticated && (
-						<>
-							<DropdownMenuSeparator />
-							{canAddToSpaces && (
-								<AddToSpacesMenuItem space={currentSpaceFromUrl!} me={me} />
-							)}
-							<DropdownMenuItem
-								onClick={() => setDialogOpen(true)}
-								data-testid={testIds.space.createButton}
-							>
-								<Plus className="size-4" />
-								<span>
-									<T k="spaces.selector.newSpace" />
-								</span>
-							</DropdownMenuItem>
-						</>
-					)}
-				</DropdownMenuContent>
-			</DropdownMenu>
+					</>
+				)}
+				{isAuthenticated && (
+					<>
+						<DropdownMenuSeparator />
+						{canAddToSpaces && (
+							<AddToSpacesMenuItem space={currentSpaceFromUrl!} me={me} />
+						)}
+						<DropdownMenuItem
+							onClick={() => setDialogOpen(true)}
+							data-testid={testIds.space.createButton}
+						>
+							<Plus className="size-4" />
+							<span>
+								<T k="spaces.selector.newSpace" />
+							</span>
+						</DropdownMenuItem>
+					</>
+				)}
+			</WorkspaceSelector>
 			<CreateSpaceDialog
 				open={dialogOpen}
 				onOpenChange={setDialogOpen}

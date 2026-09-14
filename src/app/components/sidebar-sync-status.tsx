@@ -24,17 +24,20 @@ import {
 	Cloud,
 	CloudOff,
 	Globe,
+	HardDrive,
 	LogOut,
 	Settings,
 	WifiOff,
 } from "lucide-react"
 import { T, useIntl } from "@/shared/intl/setup"
+import { StorageModeMenuItems } from "./storage-mode-menu"
 
 export { SidebarSyncStatus }
 
 function SidebarSyncStatus() {
 	let navigate = useNavigate()
 	let location = useLocation()
+	let isFilesystem = location.pathname === "/local"
 	let logOut = useLogOut()
 	let isAuthenticated = useIsAuthenticated()
 	let me = useAccount(UserAccount, { resolve: { profile: true, root: true } })
@@ -51,14 +54,23 @@ function SidebarSyncStatus() {
 			? t("sync.syncing")
 			: t("sync.offline")
 		: t("sync.localOnly")
-	let accountLabel =
-		name ?? (isAuthenticated ? t("sync.signedIn") : t("sync.localOnly"))
-	let StatusIcon = isAuthenticated ? (isOnline ? Cloud : WifiOff) : CloudOff
-	let statusIconClassName = isAuthenticated
-		? isOnline
-			? "text-green-600 dark:text-green-400"
-			: "text-muted-foreground"
-		: "text-destructive"
+	let accountLabel = isFilesystem
+		? "File System Mode"
+		: (name ?? (isAuthenticated ? t("sync.signedIn") : t("sync.localOnly")))
+	let StatusIcon = isFilesystem
+		? HardDrive
+		: isAuthenticated
+			? isOnline
+				? Cloud
+				: WifiOff
+			: CloudOff
+	let statusIconClassName = isFilesystem
+		? "text-muted-foreground"
+		: isAuthenticated
+			? isOnline
+				? "text-green-600 dark:text-green-400"
+				: "text-muted-foreground"
+			: "text-destructive"
 
 	return (
 		<DropdownMenu>
@@ -74,9 +86,11 @@ function SidebarSyncStatus() {
 							<span className="truncate text-sm font-medium">
 								{accountLabel}
 							</span>
-							<span className="text-muted-foreground truncate text-xs">
-								{statusLabel}
-							</span>
+							{!isFilesystem && (
+								<span className="text-muted-foreground truncate text-xs">
+									{statusLabel}
+								</span>
+							)}
 						</div>
 						<ChevronUp className="text-muted-foreground size-4" />
 						{needRefresh && (
@@ -112,6 +126,8 @@ function SidebarSyncStatus() {
 						}
 					}}
 				/>
+				<DropdownMenuSeparator />
+				<StorageModeMenuItems />
 				{isAuthenticated && (
 					<>
 						<DropdownMenuSeparator />

@@ -20,13 +20,8 @@ import { needsMetadataBackfill, syncDocumentMetadata } from "../lib/metadata"
 import { useMetadataBackfillQueue } from "../hooks/use-metadata-backfill"
 import { getDaysUntilPermanentDelete } from "../lib/delete-covalue"
 import { permanentlyDeletePersonalDocument } from "../lib/documents"
-import { Input } from "@/app/components/ui/input"
 import { Button } from "@/app/components/ui/button"
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/app/components/ui/tooltip"
+import { Input } from "@/app/components/ui/input"
 import {
 	SidebarMenuButton,
 	SidebarMenuItem,
@@ -62,9 +57,6 @@ import {
 	Folder,
 	FolderInput,
 	ArrowRightLeft,
-	Search,
-	SlidersHorizontal,
-	List,
 	Plus,
 	FolderPlus,
 } from "lucide-react"
@@ -82,6 +74,12 @@ import {
 	leavePersonalDocument,
 } from "@/app/features/sharing"
 import { useFolderStore, FolderRow } from "./folder"
+import {
+	SidebarSearchFilterBar,
+	type SortMode,
+	type TypeFilter,
+} from "./sidebar-search-filter-bar"
+import { SidebarFileRowContent } from "./sidebar-file-row-content"
 import {
 	exportDocument,
 	canShareDocument,
@@ -116,8 +114,6 @@ export { SidebarDocumentList, matchesSearchTerms, matchesTypeFilter }
 export type { SidebarDoc }
 
 type SidebarDoc = co.loaded<typeof Document>
-type SortMode = "latest" | "alphabetical"
-type TypeFilter = "all" | "document" | "presentation" | "deleted"
 type FilterableSidebarDoc = {
 	title?: string
 	tags?: string[]
@@ -189,6 +185,7 @@ function SidebarDocumentList({
 	let [search, setSearch] = useState("")
 	let [sort, setSort] = useState<SortMode>("latest")
 	let [typeFilter, setTypeFilter] = useState<TypeFilter>("all")
+	let { viewMode, setViewMode } = useFolderStore()
 
 	let deferredSearch = useDeferredValue(search)
 	let deferredSort = useDeferredValue(sort)
@@ -224,12 +221,10 @@ function SidebarDocumentList({
 		? sortedDocs.filter(d => matchesSearchTerms(d, deferredSearch))
 		: sortedDocs
 
-	let hasNonDefaultFilters = sort !== "latest" || typeFilter !== "all"
-
 	return (
 		<>
 			<MetadataBackfillTasks docs={docs} />
-			<SearchFilterBar
+			<SidebarSearchFilterBar
 				search={search}
 				onSearchChange={setSearch}
 				sort={sort}
@@ -237,8 +232,10 @@ function SidebarDocumentList({
 				typeFilter={typeFilter}
 				onTypeChange={setTypeFilter}
 				deletedCount={deletedDocs.length}
-				hasNonDefaultFilters={hasNonDefaultFilters}
-				t={t}
+				onDeletedSelect={() => setTypeFilter("deleted")}
+				viewMode={viewMode}
+				onViewModeChange={setViewMode}
+				searchTestId={testIds.doc.searchInput}
 			/>
 			<SidebarGroup
 				className="flex-1"
@@ -270,130 +267,6 @@ function SidebarDocumentList({
 function MetadataBackfillTasks({ docs }: { docs: SidebarDoc[] }) {
 	useMetadataBackfillQueue(docs)
 	return null
-}
-
-function SearchFilterBar({
-	search,
-	onSearchChange,
-	sort,
-	onSortChange,
-	typeFilter,
-	onTypeChange,
-	deletedCount,
-	hasNonDefaultFilters,
-	t,
-}: {
-	search: string
-	onSearchChange: (value: string) => void
-	sort: SortMode
-	onSortChange: (value: SortMode) => void
-	typeFilter: TypeFilter
-	onTypeChange: (value: TypeFilter) => void
-	deletedCount: number
-	hasNonDefaultFilters: boolean
-	t: ReturnType<typeof useIntl>
-}) {
-	let { viewMode, setViewMode } = useFolderStore()
-
-	return (
-		<div className="border-border flex items-center gap-1 border-b p-2">
-			<div className="relative flex-1">
-				<Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-				<Input
-					data-testid={testIds.doc.searchInput}
-					placeholder={t("doc.find")}
-					value={search}
-					onChange={e => onSearchChange(e.target.value)}
-					className="h-10 pl-8 pointer-fine:h-9"
-				/>
-			</div>
-			<Tooltip>
-				<TooltipTrigger
-					render={
-						<Button
-							size="icon-sm"
-							variant="ghost"
-							onClick={() =>
-								setViewMode(viewMode === "folders" ? "flat" : "folders")
-							}
-						>
-							{viewMode === "folders" ? (
-								<Folder className="size-4" />
-							) : (
-								<List className="size-4" />
-							)}
-						</Button>
-					}
-				/>
-				<TooltipContent side="bottom">
-					{viewMode === "folders"
-						? t("doc.sidebar.switchToFlatView")
-						: t("doc.sidebar.switchToFolderView")}
-				</TooltipContent>
-			</Tooltip>
-			<DropdownMenu>
-				<DropdownMenuTrigger
-					render={
-						<Button
-							size="icon-sm"
-							variant={hasNonDefaultFilters ? "secondary" : "ghost"}
-						>
-							<SlidersHorizontal className="size-4" />
-						</Button>
-					}
-				/>
-				<DropdownMenuContent align="end" className="w-48">
-					<div className="px-2 py-1.5 text-xs font-medium">
-						{t("doc.sidebar.sort")}
-					</div>
-					<DropdownMenuItem
-						onClick={() => onSortChange("latest")}
-						className={sort === "latest" ? "bg-accent" : ""}
-					>
-						{t("doc.sidebar.sortLatest")}
-					</DropdownMenuItem>
-					<DropdownMenuItem
-						onClick={() => onSortChange("alphabetical")}
-						className={sort === "alphabetical" ? "bg-accent" : ""}
-					>
-						{t("doc.sidebar.sortAlphabetical")}
-					</DropdownMenuItem>
-					<DropdownMenuSeparator />
-					<div className="px-2 py-1.5 text-xs font-medium">
-						{t("doc.sidebar.type")}
-					</div>
-					<DropdownMenuItem
-						onClick={() => onTypeChange("all")}
-						className={typeFilter === "all" ? "bg-accent" : ""}
-					>
-						{t("doc.sidebar.typeAll")}
-					</DropdownMenuItem>
-					<DropdownMenuItem
-						onClick={() => onTypeChange("document")}
-						className={typeFilter === "document" ? "bg-accent" : ""}
-					>
-						<FileText className="size-4" />
-						{t("doc.sidebar.typeDocuments")}
-					</DropdownMenuItem>
-					<DropdownMenuItem
-						onClick={() => onTypeChange("presentation")}
-						className={typeFilter === "presentation" ? "bg-accent" : ""}
-					>
-						<Presentation className="size-4" />
-						{t("doc.sidebar.typePresentations")}
-					</DropdownMenuItem>
-					<DropdownMenuItem
-						onClick={() => onTypeChange("deleted")}
-						className={typeFilter === "deleted" ? "bg-accent" : ""}
-					>
-						<Trash2 className="size-4" />
-						{t("doc.sidebar.typeDeleted")}
-						{deletedCount > 0 ? ` (${deletedCount})` : ""}
-					</DropdownMenuItem>
-				</DropdownMenuContent>
-			</DropdownMenu>
-		</div>
-	)
 }
 
 function DocumentListContent({
@@ -960,60 +833,62 @@ function DocumentItem({
 								depth > 0 ? { paddingLeft: `${8 + depth * 12}px` } : undefined
 							}
 						>
-							<div className="flex min-w-0 flex-1 flex-col gap-0.5">
-								<div className="flex items-center gap-1.5">
-									<span
-										className={
-											isActive
-												? "text-xs opacity-70"
-												: "text-muted-foreground text-xs"
-										}
-									>
-										{date}
-									</span>
-									{isPinned && (
-										<span className={isActive ? "opacity-70" : "text-brand"}>
-											<Pin className="size-3" />
-										</span>
-									)}
-									{isPresentation && (
-										<span className={isActive ? "opacity-70" : "text-brand"}>
-											<Presentation className="size-3" />
-										</span>
-									)}
-									{hasIndicator && (
-										<span className={isActive ? "opacity-70" : "text-brand"}>
-											{isPublic ? (
-												<Globe className="size-3" />
-											) : (
-												<Users className="size-3" />
-											)}
-										</span>
-									)}
-									{path && (
+							<SidebarFileRowContent
+								title={<TextHighlight text={title} query={searchQuery} />}
+								metadata={
+									<>
 										<span
 											className={
 												isActive
-													? "bg-background/20 inline-flex items-center gap-1 rounded px-1 text-xs"
-													: "bg-muted text-muted-foreground inline-flex items-center gap-1 rounded px-1 text-xs"
+													? "text-xs opacity-70"
+													: "text-muted-foreground text-xs"
 											}
 										>
-											<Folder className="size-3" />
-											{path}
+											{date}
 										</span>
-									)}
-								</div>
-								<span className="truncate text-sm font-medium">
-									<TextHighlight text={title} query={searchQuery} />
-								</span>
-								{tags.length > 0 && (
-									<TagsRow
-										tags={tags}
-										isActive={isActive}
-										searchQuery={searchQuery}
-									/>
-								)}
-							</div>
+										{isPinned && (
+											<span className={isActive ? "opacity-70" : "text-brand"}>
+												<Pin className="size-3" />
+											</span>
+										)}
+										{isPresentation && (
+											<span className={isActive ? "opacity-70" : "text-brand"}>
+												<Presentation className="size-3" />
+											</span>
+										)}
+										{hasIndicator && (
+											<span className={isActive ? "opacity-70" : "text-brand"}>
+												{isPublic ? (
+													<Globe className="size-3" />
+												) : (
+													<Users className="size-3" />
+												)}
+											</span>
+										)}
+										{path && (
+											<span
+												className={
+													isActive
+														? "bg-background/20 inline-flex items-center gap-1 rounded px-1 text-xs"
+														: "bg-muted text-muted-foreground inline-flex items-center gap-1 rounded px-1 text-xs"
+												}
+											>
+												<Folder className="size-3" />
+												{path}
+											</span>
+										)}
+									</>
+								}
+								description={
+									tags.length > 0 && (
+										<TagsRow
+											tags={tags}
+											isActive={isActive}
+											searchQuery={searchQuery}
+										/>
+									)
+								}
+							/>
 						</SidebarMenuButton>
 					}
 				/>

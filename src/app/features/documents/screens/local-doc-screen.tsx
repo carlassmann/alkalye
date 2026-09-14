@@ -1,21 +1,34 @@
 import { useEffect, useRef, useState } from "react"
 import React from "react"
-import { Link, useBlocker, useNavigate } from "@tanstack/react-router"
+import { Link } from "@tanstack/react-router"
 import { useAccount } from "jazz-tools/react"
 import { UserAccount } from "@/schema"
 import {
 	MarkdownEditor,
 	useMarkdownEditorRef,
 	SidebarEditorNavigation,
-	type WikilinkDoc,
 } from "@/app/features/editor"
-import { presentationExtensions } from "@/app/features/presentation"
+import {
+	getPresentationMode,
+	presentationExtensions,
+} from "@/app/features/presentation"
 import { useEditorSettings } from "@/app/features/editor"
 import { getDocumentTitle } from "../lib/title"
 import { EditorToolbar } from "@/app/features/editor"
 import { DocumentSidebar } from "../widgets/document-sidebar"
 import { ListSidebar } from "../widgets/list-sidebar"
-import { SidebarSyncStatus } from "@/app/components/sidebar-sync-status"
+import { WorkspaceSelector } from "@/app/components/workspace-selector"
+import { SidebarSearchFilterBar } from "../widgets/sidebar-search-filter-bar"
+import { SidebarFileRowContent } from "../widgets/sidebar-file-row-content"
+import { SidebarFolderButton } from "../widgets/sidebar-folder-button"
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuSeparator,
+	ContextMenuTrigger,
+} from "@/app/components/ui/context-menu"
+import { useLocalSidebarState } from "../widgets/local-sidebar-state"
 import {
 	Empty,
 	EmptyHeader,
@@ -29,16 +42,10 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
+	SidebarMenuAction,
 	SidebarSeparator,
 } from "@/app/components/ui/sidebar"
 import { SidebarProvider, useSidebar } from "@/app/components/ui/sidebar"
-import {
-	ContextMenu,
-	ContextMenuContent,
-	ContextMenuItem,
-	ContextMenuSeparator,
-	ContextMenuTrigger,
-} from "@/app/components/ui/context-menu"
 import {
 	HelpCircle,
 	FileUp,
@@ -49,11 +56,12 @@ import {
 	Plus,
 	Download,
 	Cloud,
-	ChevronRight,
 	Eye,
 	Pencil,
 	EllipsisIcon,
 	X,
+	FolderOpen,
+	RefreshCw,
 } from "lucide-react"
 import {
 	ThemeToggle,
@@ -75,12 +83,19 @@ import {
 	openLocalFile,
 	saveLocalFile,
 	saveLocalFileAs,
-	readFileFromHandle,
 	consumeLaunchQueue,
 	isFileSystemAccessSupported,
 	closeLocalFile,
+	resolveLocalFileConflict,
+	restoreLocalFileRecovery,
 	type LocalFileEntry,
 	getHandleFromDB,
+	openLocalDirectory,
+	selectLocalWorkspace,
+	refreshLocalDirectory,
+	openDirectoryFile,
+	readDirectoryFile,
+	refreshLocalFile,
 } from "@/app/lib/local-file"
 import { CopyToSyncedDialog } from "@/app/features/spaces"
 import {
@@ -97,13 +112,11 @@ import {
 	isShortcutTargetBlocked,
 } from "@/app/lib/shortcut-registry"
 import { Preview } from "../widgets/preview"
-import { parseWikiLinks } from "@/app/features/editor"
-import { useDocTitles, type ResolvedDoc } from "../lib/wikilink-titles"
-import { useWikilinkResolver } from "../lib/use-wikilink-resolver"
+import { writeStorageMode } from "@/app/lib/storage-mode"
+import { type ResolvedDoc } from "../lib/wikilink-titles"
 import { toast } from "sonner"
 import { tryCatch } from "@/app/lib/try-catch"
 import { useIntl } from "@/shared/intl/setup"
-import { useHasFinePointer } from "@/app/hooks/use-fine-pointer"
 import { exitFocusMode, toggleFocusMode } from "@/app/lib/focus-mode"
 
 export { LocalDocScreen }
@@ -144,6 +157,7 @@ function LocalDocScreen() {
 					id: result.value.id,
 					filename: result.value.filename,
 					lastOpened: Date.now(),
+					lastModified: result.value.lastModified,
 					content: result.value.content,
 					lastSavedContent: result.value.content,
 					hasUnsavedChanges: false,
@@ -154,6 +168,21 @@ function LocalDocScreen() {
 		}
 		void init()
 	}, [t])
+
+	useEffect(() => {
+		if (!initialized) return
+		function refresh() {
+			if (document.visibilityState === "visible")
+				void refreshFilesystemWorkspace()
+		}
+		refresh()
+		window.addEventListener("focus", refresh)
+		document.addEventListener("visibilitychange", refresh)
+		return () => {
+			window.removeEventListener("focus", refresh)
+			document.removeEventListener("visibilitychange", refresh)
+		}
+	}, [initialized])
 
 	if (!initialized) {
 		return (
@@ -167,17 +196,17 @@ function LocalDocScreen() {
 
 	let activeFile = store.getActiveFile()
 
-	if (!activeFile) {
-		return <LocalFileEmptyState />
-	}
-
 	return (
 		<SidebarProvider>
-			<LocalEditorContent
-				isPreview={isPreview}
-				setIsPreview={setIsPreview}
-				activeFile={activeFile}
-			/>
+			{activeFile ? (
+				<LocalEditorContent
+					isPreview={isPreview}
+					setIsPreview={setIsPreview}
+					activeFile={activeFile}
+				/>
+			) : (
+				<LocalFileEmptyState />
+			)}
 		</SidebarProvider>
 	)
 }
@@ -198,7 +227,6 @@ async function saveCurrentFile(
 	state.setSaveStatus("saving")
 	let success = await saveLocalFile(fileId, file.content)
 	if (success) {
-		state.setFileSavedContent(fileId, file.content)
 		state.setSaveStatus("saved")
 		setTimeout(() => state.setSaveStatus("idle"), 1500)
 	} else {
@@ -210,6 +238,11 @@ async function saveCurrentFile(
 
 function LocalFileEmptyState() {
 	let t = useIntl()
+	let store = useLocalFileStore()
+	let workspace = store.directoryWorkspaces.find(
+		item => item.id === store.selectedWorkspaceId,
+	)
+	let { toggleLeft } = useSidebar()
 	async function handleOpenFile() {
 		let result = await openLocalFile()
 		if (result) {
@@ -229,6 +262,7 @@ function LocalFileEmptyState() {
 				id: result.id,
 				filename: result.filename,
 				lastOpened: Date.now(),
+				lastModified: result.lastModified,
 				content: result.content,
 				lastSavedContent: result.content,
 				hasUnsavedChanges: false,
@@ -263,6 +297,7 @@ function LocalFileEmptyState() {
 			id: crypto.randomUUID(),
 			filename: file.name,
 			lastOpened: Date.now(),
+			lastModified: file.lastModified,
 			content: contentResult.value,
 			lastSavedContent: contentResult.value,
 			hasUnsavedChanges: false,
@@ -273,62 +308,549 @@ function LocalFileEmptyState() {
 	let supportsFileSystem = isFileSystemAccessSupported()
 
 	return (
-		<Empty className="h-screen">
-			<EmptyHeader>
-				<FileText className="text-muted-foreground size-12" />
-				<EmptyTitle>Open a Local File</EmptyTitle>
-			</EmptyHeader>
-			<EmptyDescription className="max-w-md">
-				Edit a markdown file from your computer without syncing it to cloud.
-				Changes are saved directly to the file.
-			</EmptyDescription>
-			<div className="mt-6 flex flex-col gap-3">
-				{supportsFileSystem ? (
-					<Button onClick={handleOpenFile} size="lg" nativeButton>
-						<FileUp className="mr-2 size-4" />
-						Open File
-					</Button>
-				) : (
-					<>
-						<label className="cursor-pointer">
-							<span className="bg-primary text-primary-foreground inline-flex h-11 items-center justify-center gap-1.5 rounded-none border border-transparent px-3 text-sm font-medium transition-all active:scale-97 md:h-9 md:px-2.5 md:text-xs">
-								<FileUp className="mr-2 size-4" />
-								Upload File
-							</span>
-							<input
-								type="file"
-								accept=".md,.markdown,.txt"
-								className="hidden"
-								onChange={handleUploadFile}
-							/>
-						</label>
-						<EmptyDescription>
-							For auto-save support, use Chrome or Edge
-						</EmptyDescription>
-					</>
-				)}
-			</div>
-			<div className="mt-8 flex items-center gap-2">
+		<>
+			<ListSidebar>
+				<LocalWorkspaceSelector />
+			</ListSidebar>
+			<Empty className="relative h-screen min-w-0 flex-1">
 				<Button
-					variant="ghost"
+					className="absolute top-3 left-3"
 					size="sm"
-					nativeButton={false}
-					render={<Link to="/" />}
+					variant="outline"
+					onClick={toggleLeft}
 				>
-					<Cloud className="mr-1.5 size-4" />
-					Go to synced documents
+					Workspaces
 				</Button>
-			</div>
-		</Empty>
+				<EmptyHeader>
+					{workspace ? (
+						<FolderOpen className="text-muted-foreground size-12" />
+					) : (
+						<FileText className="text-muted-foreground size-12" />
+					)}
+					<EmptyTitle>
+						{workspace ? workspace.name : "Individually opened files"}
+					</EmptyTitle>
+				</EmptyHeader>
+				<EmptyDescription className="max-w-md">
+					{workspace
+						? "Choose a file in the sidebar. Changes save directly to the folder."
+						: "Open a Markdown or text file from your computer. Changes save directly to the file."}
+				</EmptyDescription>
+				<div className="mt-6 flex flex-col gap-3">
+					{workspace && (
+						<Button
+							onClick={() => void refreshFilesystemWorkspace(true)}
+							variant="outline"
+						>
+							<RefreshCw className="size-4" />
+							Refresh folder
+						</Button>
+					)}
+					{supportsFileSystem ? (
+						<Button onClick={handleOpenFile} size="lg" nativeButton>
+							<FileUp className="mr-2 size-4" />
+							Open File
+						</Button>
+					) : (
+						<>
+							<label className="cursor-pointer">
+								<span className="bg-primary text-primary-foreground inline-flex h-11 items-center justify-center gap-1.5 rounded-none border border-transparent px-3 text-sm font-medium transition-all active:scale-97 md:h-9 md:px-2.5 md:text-xs">
+									<FileUp className="mr-2 size-4" />
+									Upload File
+								</span>
+								<input
+									type="file"
+									accept=".md,.markdown,.txt"
+									className="hidden"
+									onChange={handleUploadFile}
+								/>
+							</label>
+							<EmptyDescription>
+								For auto-save support, use Chrome or Edge
+							</EmptyDescription>
+						</>
+					)}
+				</div>
+				<div className="mt-8 flex items-center gap-2">
+					<Button
+						variant="ghost"
+						size="sm"
+						nativeButton={false}
+						render={
+							<Link
+								to="/"
+								search={{ personal: true }}
+								onClick={() => writeStorageMode("synced")}
+							/>
+						}
+					>
+						<Cloud className="mr-1.5 size-4" />
+						Go to synced documents
+					</Button>
+				</div>
+			</Empty>
+		</>
 	)
 }
 
-let meResolve = {
-	root: {
-		documents: { $each: { content: true } },
-		settings: true,
-	},
-} as const
+interface LocalTreeNode {
+	name: string
+	path: string
+	lastModified?: number
+	folders: LocalTreeNode[]
+	files: { id: string; name: string; path: string; lastModified?: number }[]
+}
+
+function buildLocalTree(
+	files: { id: string; name: string; path: string; lastModified?: number }[],
+	sort: "latest" | "alphabetical",
+): LocalTreeNode {
+	let root: LocalTreeNode = { name: "", path: "", folders: [], files: [] }
+	for (let file of files) {
+		let parts = file.path.split("/")
+		let node = root
+		for (let folder of parts.slice(0, -1)) {
+			let path = node.path ? `${node.path}/${folder}` : folder
+			let child = node.folders.find(item => item.name === folder)
+			if (!child) {
+				child = { name: folder, path, folders: [], files: [] }
+				node.folders.push(child)
+			}
+			node = child
+			node.lastModified = Math.max(
+				node.lastModified ?? 0,
+				file.lastModified ?? 0,
+			)
+		}
+		node.files.push(file)
+	}
+	function sortNode(node: LocalTreeNode) {
+		node.folders.sort((a, b) =>
+			sort === "latest"
+				? (b.lastModified ?? 0) - (a.lastModified ?? 0) ||
+					a.name.localeCompare(b.name)
+				: a.name.localeCompare(b.name),
+		)
+		node.files.sort((a, b) =>
+			sort === "latest"
+				? (b.lastModified ?? 0) - (a.lastModified ?? 0) ||
+					a.name.localeCompare(b.name)
+				: a.name.localeCompare(b.name),
+		)
+		for (let child of node.folders) sortNode(child)
+	}
+	sortNode(root)
+	return root
+}
+
+function LocalWorkspaceSelector() {
+	let t = useIntl()
+	let supportsDirectories = typeof window.showDirectoryPicker === "function"
+	let store = useLocalFileStore()
+	let workspace = store.directoryWorkspaces.find(
+		w => w.id === store.selectedWorkspaceId,
+	)
+	let sidebarState = useLocalSidebarState()
+	let workspaceKey = workspace?.id ?? "individual-files"
+	let search = sidebarState.searchByWorkspace[workspaceKey] ?? ""
+	let sort = sidebarState.sortByWorkspace[workspaceKey] ?? "latest"
+	let type = sidebarState.typeByWorkspace[workspaceKey] ?? "all"
+	let terms = search.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean)
+	let searching = terms.length > 0
+	let matches = (value: string) =>
+		terms.every(term => value.toLocaleLowerCase().includes(term))
+	let files =
+		workspace?.files.filter(
+			file =>
+				(!searching || matches(file.path)) &&
+				(type === "all" ||
+					(file.isPresentation === true) === (type === "presentation")),
+		) ?? []
+	let tree = buildLocalTree(files, sort)
+	let individualFiles = store.files
+		.filter(
+			file =>
+				!file.workspaceId &&
+				(!searching || matches(file.filename)) &&
+				(type === "all" ||
+					(!/\.txt$/i.test(file.filename) &&
+						getPresentationMode(file.content)) ===
+						(type === "presentation")),
+		)
+		.sort((a, b) =>
+			sort === "latest"
+				? (b.lastModified ?? 0) - (a.lastModified ?? 0) ||
+					a.filename.localeCompare(b.filename)
+				: a.filename.localeCompare(b.filename),
+		)
+
+	async function handleSelectDirectory(id: string | null) {
+		selectLocalWorkspace(id)
+		await refreshFilesystemWorkspace(true)
+	}
+
+	function toggleFolder(path: string) {
+		sidebarState.toggleFolder(workspaceKey, path)
+	}
+
+	function renderTree(node: LocalTreeNode, depth: number): React.ReactNode {
+		return (
+			<React.Fragment key={node.path}>
+				{node.folders.map(folder => {
+					let isCollapsed =
+						!searching && sidebarState.isCollapsed(workspaceKey, folder.path)
+					return (
+						<React.Fragment key={folder.path}>
+							<SidebarMenuItem>
+								<ContextMenu>
+									<ContextMenuTrigger
+										render={
+											<SidebarFolderButton
+												path={folder.path}
+												depth={depth}
+												style={{ paddingLeft: `${8 + depth * 16}px` }}
+												isCollapsed={isCollapsed}
+												onClick={() => {
+													if (!searching) toggleFolder(folder.path)
+												}}
+											/>
+										}
+									/>
+									<ContextMenuContent>
+										<ContextMenuItem
+											disabled={searching}
+											onClick={() => toggleFolder(folder.path)}
+										>
+											{isCollapsed ? "Expand" : "Collapse"}
+										</ContextMenuItem>
+										<ContextMenuItem
+											onClick={() => void refreshFilesystemWorkspace(true)}
+										>
+											<RefreshCw className="size-4" />
+											Refresh folder
+										</ContextMenuItem>
+									</ContextMenuContent>
+								</ContextMenu>
+							</SidebarMenuItem>
+							{!isCollapsed && renderTree(folder, depth + 1)}
+						</React.Fragment>
+					)
+				})}
+				{node.files.map(file => (
+					<SidebarMenuItem key={file.path}>
+						<LocalFileContextMenu
+							workspaceId={workspace?.id}
+							path={file.path}
+							onOpen={() =>
+								workspace && void openDirectoryFile(workspace.id, file.path)
+							}
+						>
+							<SidebarMenuButton
+								isActive={
+									store.activeFileId === `${workspace?.id}:${file.path}`
+								}
+								onClick={() =>
+									workspace && void openDirectoryFile(workspace.id, file.path)
+								}
+								style={{ paddingLeft: `${8 + depth * 16}px` }}
+								nativeButton
+							>
+								<SidebarFileRowContent
+									leading={<FileText className="size-4 shrink-0" />}
+									title={<span title={file.path}>{file.name}</span>}
+								/>
+							</SidebarMenuButton>
+						</LocalFileContextMenu>
+					</SidebarMenuItem>
+				))}
+			</React.Fragment>
+		)
+	}
+
+	return (
+		<>
+			<WorkspaceSelector
+				label={workspace?.name ?? "Individually opened files"}
+				icon={workspace ? <FolderOpen /> : <FileText />}
+			>
+				<DropdownMenuItem onClick={() => void handleSelectDirectory(null)}>
+					<FileText className="size-4" />
+					<span>Individually opened files</span>
+					{!workspace && <Check className="ml-auto size-4" />}
+				</DropdownMenuItem>
+				{store.directoryWorkspaces.map(directory => (
+					<DropdownMenuItem
+						key={directory.id}
+						onClick={() => void handleSelectDirectory(directory.id)}
+					>
+						<FolderOpen className="size-4" />
+						<span className="truncate">{directory.name}</span>
+						{directory.status !== "ready" && (
+							<AlertCircle className="size-4 text-amber-600" />
+						)}
+						{workspace?.id === directory.id && (
+							<Check className="ml-auto size-4" />
+						)}
+					</DropdownMenuItem>
+				))}
+				<DropdownMenuSeparator />
+				<DropdownMenuItem
+					disabled={!supportsDirectories}
+					onClick={() => void openLocalDirectory()}
+				>
+					<Plus className="size-4" />
+					<span>Open folder…</span>
+				</DropdownMenuItem>
+			</WorkspaceSelector>
+			<SidebarSearchFilterBar
+				search={search}
+				onSearchChange={value => sidebarState.setSearch(workspaceKey, value)}
+				sort={sort}
+				onSortChange={value => sidebarState.setSort(workspaceKey, value)}
+				typeFilter={type}
+				onTypeChange={value => sidebarState.setType(workspaceKey, value)}
+				searchLabel="Search local files"
+				searchPlaceholder="Search files"
+				filterLabel="Sort and filter local files"
+			/>
+			<SidebarGroup className="flex-1">
+				<SidebarGroupContent>
+					{workspace && (
+						<div className="flex items-center justify-between px-2 py-1">
+							<span className="text-muted-foreground text-xs">Files</span>
+							<Button
+								size="icon"
+								variant="ghost"
+								aria-label="Refresh folder"
+								onClick={() => void refreshFilesystemWorkspace(true)}
+							>
+								<RefreshCw className="size-4" />
+							</Button>
+						</div>
+					)}
+					{workspace?.status !== undefined && workspace.status !== "ready" && (
+						<p className="text-muted-foreground px-2 text-xs">
+							Folder access needs reconnecting. Reopen the folder to continue.
+						</p>
+					)}
+					<SidebarMenu>
+						{workspace
+							? renderTree(tree, 0)
+							: individualFiles.map(file => (
+									<SidebarMenuItem key={file.id}>
+										<LocalFileContextMenu
+											fileId={file.id}
+											onOpen={() =>
+												void refreshLocalFile(file.id).then(() =>
+													store.markFileActive(file.id),
+												)
+											}
+										>
+											<SidebarMenuButton
+												isActive={store.activeFileId === file.id}
+												onClick={() => {
+													void refreshLocalFile(file.id).then(() =>
+														store.markFileActive(file.id),
+													)
+												}}
+												nativeButton
+											>
+												<SidebarFileRowContent
+													leading={<FileText className="size-4 shrink-0" />}
+													title={file.filename}
+													trailing={
+														file.conflict && (
+															<AlertCircle className="text-destructive size-4 shrink-0" />
+														)
+													}
+												/>
+											</SidebarMenuButton>
+										</LocalFileContextMenu>
+										<SidebarMenuAction
+											aria-label={`Close ${file.filename}`}
+											onClick={() =>
+												void closeFileWithUnsavedChanges(file.id, t)
+											}
+										>
+											<X className="size-4" />
+										</SidebarMenuAction>
+									</SidebarMenuItem>
+								))}
+					</SidebarMenu>
+					{(searching || type !== "all") &&
+						(workspace ? files.length === 0 : individualFiles.length === 0) && (
+							<p className="text-muted-foreground px-2 py-3 text-sm">
+								No matching files
+							</p>
+						)}
+				</SidebarGroupContent>
+			</SidebarGroup>
+		</>
+	)
+}
+
+async function refreshFilesystemWorkspace(requestPermission = false) {
+	let state = useLocalFileStore.getState()
+	let workspaceId = state.selectedWorkspaceId
+	if (
+		workspaceId &&
+		!(await refreshLocalDirectory(workspaceId, requestPermission))
+	)
+		return
+	let current = useLocalFileStore.getState()
+	if (current.selectedWorkspaceId !== workspaceId) return
+	let file = current.getActiveFile()
+	if (file) await refreshLocalFile(file.id)
+}
+
+async function closeFileWithUnsavedChanges(
+	id: string,
+	t: ReturnType<typeof useIntl>,
+) {
+	let file = useLocalFileStore.getState().getFileById(id)
+	if (!file) return
+	if (
+		file.hasUnsavedChanges &&
+		!window.confirm(t("doc.localFile.confirmCloseFile"))
+	)
+		return
+	await closeLocalFile(id)
+}
+
+function LocalFileContextMenu({
+	children,
+	fileId,
+	workspaceId,
+	path,
+	onOpen,
+}: {
+	children: React.ReactElement
+	fileId?: string
+	workspaceId?: string
+	path?: string
+	onOpen: () => void
+}) {
+	let t = useIntl()
+	let [prepared, setPrepared] = useState<{
+		content: string
+		filename: string
+	} | null>(null)
+	let supportsSaveAs =
+		isFileSystemAccessSupported() && !!window.showSaveFilePicker
+
+	async function readClickedFile() {
+		if (fileId) {
+			let file = useLocalFileStore.getState().getFileById(fileId)
+			return file ? { content: file.content, filename: file.filename } : null
+		}
+		if (workspaceId && path) return readDirectoryFile(workspaceId, path)
+		return null
+	}
+
+	function handleOpenChange(open: boolean) {
+		if (!open) return
+		let current = fileId
+			? useLocalFileStore.getState().getFileById(fileId)
+			: workspaceId && path
+				? useLocalFileStore.getState().getFileById(`${workspaceId}:${path}`)
+				: null
+		if (current) {
+			setPrepared({ content: current.content, filename: current.filename })
+			return
+		}
+		setPrepared(null)
+		void readClickedFile().then(file => {
+			setPrepared(file)
+			if (!file) toast.error("Unable to read this file")
+		})
+	}
+
+	async function handleDownloadClicked() {
+		let file = (await readClickedFile()) ?? prepared
+		if (!file) {
+			toast.error("Unable to read this file")
+			return
+		}
+		downloadLocalContent(file.content, file.filename)
+	}
+
+	async function handleSaveAsClicked() {
+		let current = fileId
+			? useLocalFileStore.getState().getFileById(fileId)
+			: workspaceId && path
+				? useLocalFileStore.getState().getFileById(`${workspaceId}:${path}`)
+				: null
+		let file = current
+			? { content: current.content, filename: current.filename }
+			: prepared
+		if (!file) return
+		let result = await tryCatch(saveLocalCopy(file.content, file.filename))
+		if (!result.ok) toast.error("Unable to save a copy of this file")
+	}
+
+	return (
+		<ContextMenu onOpenChange={handleOpenChange}>
+			<ContextMenuTrigger render={children} />
+			<ContextMenuContent>
+				<ContextMenuItem onClick={onOpen}>
+					<FileText className="size-4" />
+					Open
+				</ContextMenuItem>
+				{supportsSaveAs && (
+					<ContextMenuItem
+						disabled={!prepared}
+						onClick={() => void handleSaveAsClicked()}
+					>
+						<Download className="size-4" />
+						Save As…
+					</ContextMenuItem>
+				)}
+				<ContextMenuItem onClick={() => void handleDownloadClicked()}>
+					<Download className="size-4" />
+					Download
+				</ContextMenuItem>
+				{fileId && (
+					<>
+						<ContextMenuSeparator />
+						<ContextMenuItem
+							onClick={() => void closeFileWithUnsavedChanges(fileId, t)}
+						>
+							<X className="size-4" />
+							Close
+						</ContextMenuItem>
+					</>
+				)}
+			</ContextMenuContent>
+		</ContextMenu>
+	)
+}
+
+async function saveLocalCopy(content: string, filename: string) {
+	let result = await saveLocalFileAs(content, filename)
+	if (!result) return
+	useLocalFileStore.getState().addFile({
+		id: result.id,
+		filename: result.handle.name,
+		lastOpened: Date.now(),
+		lastModified: result.lastModified,
+		content,
+		lastSavedContent: content,
+		hasUnsavedChanges: false,
+		isActive: true,
+	})
+}
+
+function downloadLocalContent(content: string, filename: string) {
+	let blob = new Blob([content], { type: "text/markdown;charset=utf-8" })
+	let url = URL.createObjectURL(blob)
+	let link = document.createElement("a")
+	link.href = url
+	link.download = filename
+	link.click()
+	URL.revokeObjectURL(url)
+}
+
+let meResolve = { root: { settings: true } } as const
 
 function LocalEditorContent({
 	isPreview,
@@ -342,18 +864,11 @@ function LocalEditorContent({
 	let t = useIntl()
 	let editor = useMarkdownEditorRef()
 	let saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-	let navigate = useNavigate()
 
 	let store = useLocalFileStore()
 	let { theme, setTheme } = useTheme()
 	let resolvedTheme = useResolvedTheme()
-	let {
-		toggleLeft,
-		toggleRight,
-		isMobile,
-		setLeftOpenMobile,
-		setRightOpenMobile,
-	} = useSidebar()
+	let { toggleLeft, toggleRight, isMobile, setRightOpenMobile } = useSidebar()
 	let [copyDialogOpen, setCopyDialogOpen] = useState(false)
 
 	let me = useAccount(UserAccount, { resolve: meResolve })
@@ -363,35 +878,15 @@ function LocalEditorContent({
 	useEditorSettings(editorSettings)
 
 	let content = activeFile.content
+	useEffect(() => {
+		if (editor.current && editor.current.getContent() !== activeFile.content) {
+			editor.current.setExternalContent(activeFile.content)
+		}
+	}, [activeFile.content, editor])
 	let isDirty = activeFile.hasUnsavedChanges
 	let docTitle = getDocumentTitle(content) || activeFile.filename || "Untitled"
 
-	let documents: WikilinkDoc[] = []
-	if (me.$isLoaded && me.root?.documents?.$isLoaded) {
-		documents = Array.from(me.root.documents.values()).flatMap(d => {
-			if (!d?.$isLoaded || !d.content?.$isLoaded || d.deletedAt) return []
-			return [
-				{
-					id: d.$jazz.id,
-					title: getDocumentTitle(d.content.toString()),
-				},
-			]
-		})
-	}
-
-	let resolveWikilink = useWikilinkResolver(content, documents)
-	let handleWikilinkClick = (id: string, newTab: boolean) => {
-		if (newTab) {
-			window.open(`/app/doc/${id}`, "_blank")
-		} else {
-			navigate({ to: "/doc/$id", params: { id } })
-		}
-	}
-
-	useBlocker({
-		shouldBlockFn: () => isDirty,
-		enableBeforeUnload: isDirty,
-	})
+	let documents: { id: string; title: string }[] = []
 
 	function handleChange(newContent: string) {
 		store.setFileContent(activeFile.id, newContent)
@@ -411,7 +906,6 @@ function LocalEditorContent({
 			currentState.setSaveStatus("saving")
 			let success = await saveLocalFile(activeFile.id, currentFile.content)
 			if (success) {
-				currentState.setFileSavedContent(activeFile.id, currentFile.content)
 				currentState.setSaveStatus("saved")
 				setTimeout(() => currentState.setSaveStatus("idle"), 1500)
 			} else {
@@ -434,20 +928,9 @@ function LocalEditorContent({
 	}, [])
 
 	async function handleSaveAs(file: LocalFileEntry) {
-		let title = getDocumentTitle(file.content) || file.filename || "Untitled"
-		let suggestedName = file.filename || title + ".md"
-		let result = await saveLocalFileAs(file.content, suggestedName)
-		if (!result) return
-
-		useLocalFileStore.getState().addFile({
-			id: result.id,
-			filename: suggestedName,
-			lastOpened: Date.now(),
-			content: file.content,
-			lastSavedContent: file.content,
-			hasUnsavedChanges: false,
-			isActive: true,
-		})
+		let filename =
+			file.filename || `${getDocumentTitle(file.content) || "Untitled"}.md`
+		await saveLocalCopy(file.content, filename)
 	}
 
 	let handlersRef = useRef({
@@ -551,6 +1034,7 @@ function LocalEditorContent({
 				id: result.id,
 				filename: result.filename,
 				lastOpened: Date.now(),
+				lastModified: result.lastModified,
 				content: result.content,
 				lastSavedContent: result.content,
 				hasUnsavedChanges: false,
@@ -562,54 +1046,8 @@ function LocalEditorContent({
 	function handleDownload(file: LocalFileEntry) {
 		let title = getDocumentTitle(file.content) || "Untitled"
 		let filename = file.filename || title + ".md"
-		let blob = new Blob([file.content], {
-			type: "text/markdown;charset=utf-8",
-		})
-		let url = URL.createObjectURL(blob)
-		let a = document.createElement("a")
-		a.href = url
-		a.download = filename
-		a.click()
-		URL.revokeObjectURL(url)
+		downloadLocalContent(file.content, filename)
 	}
-
-	async function handleSwitchFile(fileId: string) {
-		if (isDirty) {
-			let confirmed = window.confirm(t("doc.localFile.confirmSwitchFile"))
-			if (!confirmed) return
-		}
-
-		await saveCurrentFile(activeFile.id, t)
-
-		let handle = await getHandleFromDB(fileId)
-		if (!handle) {
-			toast.error(t("doc.localFile.fileHandleNotFound"))
-			return
-		}
-
-		let result = await readFileFromHandle(handle)
-		if (!result) {
-			toast.error(t("doc.localFile.failedToRead"))
-			return
-		}
-
-		let state = useLocalFileStore.getState()
-		state.markFileActive(fileId)
-		state.setFileContent(fileId, result.content)
-		state.setFileSavedContent(fileId, result.content)
-	}
-
-	async function handleCloseFile(fileId: string) {
-		if (activeFile.id === fileId && isDirty) {
-			let confirmed = window.confirm(t("doc.localFile.confirmCloseFile"))
-			if (!confirmed) return
-		}
-
-		await closeLocalFile(fileId)
-	}
-
-	let wikilinkIds = parseWikiLinks(content).map(w => w.id)
-	let wikilinkCache = useDocTitles(wikilinkIds)
 
 	if (isPreview) {
 		return (
@@ -617,7 +1055,7 @@ function LocalEditorContent({
 				filename={activeFile.filename}
 				docTitle={docTitle}
 				content={content}
-				wikilinks={wikilinkCache}
+				wikilinks={new Map<string, ResolvedDoc>()}
 				theme={resolvedTheme}
 				setTheme={setTheme}
 				onExit={() => setIsPreview(false)}
@@ -632,51 +1070,78 @@ function LocalEditorContent({
 				header={
 					<Button
 						size="sm"
-						variant="ghost"
 						nativeButton
 						onClick={handleOpenFile}
+						aria-label={t("doc.new")}
 					>
-						<Plus className="size-4" />
-						{t("doc.sidebar.newLocalFile")}
+						<FileUp className="size-4" />
+						{t("doc.new")}
 					</Button>
 				}
-				footer={<SidebarSyncStatus />}
 			>
-				<SidebarGroup>
-					<SidebarGroupContent>
-						<SidebarMenu>
-							<SidebarMenuItem>
-								<SidebarMenuButton
-									nativeButton={false}
-									render={<Link to="/" />}
-									onClick={() => isMobile && setLeftOpenMobile(false)}
-								>
-									<Cloud className="size-4" />
-									Synced Documents
-									<ChevronRight className="ml-auto size-4" />
-								</SidebarMenuButton>
-							</SidebarMenuItem>
-						</SidebarMenu>
-					</SidebarGroupContent>
-				</SidebarGroup>
-				<SidebarSeparator />
-				<SidebarGroup className="flex-1">
-					<SidebarGroupContent>
-						<LocalFilesList
-							files={store.files}
-							activeFileId={activeFile.id}
-							onSwitchFile={handleSwitchFile}
-							onCloseFile={handleCloseFile}
-							onSaveAs={file => void handleSaveAs(file)}
-							onDownload={handleDownload}
-							isMobile={isMobile}
-							setLeftOpenMobile={setLeftOpenMobile}
-						/>
-					</SidebarGroupContent>
-				</SidebarGroup>
+				<LocalWorkspaceSelector />
 			</ListSidebar>
 
 			<div className="markdown-editor flex-1">
+				{activeFile.conflict && (
+					<div
+						role="alert"
+						className="border-destructive bg-destructive/10 flex flex-wrap items-center gap-2 border-b p-2 text-sm"
+					>
+						<AlertCircle className="size-4" />
+						<span className="flex-1">
+							This file changed on disk while you edited it. Choose which
+							version to keep.
+						</span>
+						<Button
+							size="sm"
+							variant="outline"
+							onClick={() => handleDownload(activeFile)}
+						>
+							Download draft
+						</Button>
+						<Button
+							size="sm"
+							variant="outline"
+							onClick={() =>
+								void resolveLocalFileConflict(activeFile.id, "disk")
+							}
+						>
+							Use disk
+						</Button>
+						<Button
+							size="sm"
+							onClick={() =>
+								void resolveLocalFileConflict(activeFile.id, "local")
+							}
+						>
+							Keep mine
+						</Button>
+					</div>
+				)}
+				{activeFile.recovery && !activeFile.conflict && (
+					<div className="bg-muted flex flex-wrap items-center gap-2 border-b p-2 text-sm">
+						<span className="flex-1">
+							Previous{" "}
+							{activeFile.recovery.source === "disk" ? "disk version" : "draft"}{" "}
+							available.
+						</span>
+						<Button
+							size="sm"
+							variant="outline"
+							onClick={() => {
+								if (
+									activeFile.hasUnsavedChanges &&
+									!window.confirm(t("doc.localFile.confirmUnsaved"))
+								)
+									return
+								void restoreLocalFileRecovery(activeFile.id)
+							}}
+						>
+							Restore as draft
+						</Button>
+					</div>
+				)}
 				<MarkdownEditor
 					key={activeFile.id}
 					ref={editor}
@@ -684,8 +1149,6 @@ function LocalEditorContent({
 					onChange={handleEditorChange}
 					placeholder={t("doc.startWriting")}
 					documents={documents}
-					resolveWikilink={resolveWikilink}
-					onWikilinkClick={handleWikilinkClick}
 					autoSortTasks={editorSettings?.editor?.autoSortTasks}
 					spellcheck={editorSettings?.editor?.spellcheck ?? true}
 					spellcheckLanguage={editorSettings?.editor?.spellcheckLanguage}
@@ -780,95 +1243,6 @@ function LocalEditorContent({
 				onOpenChange={setCopyDialogOpen}
 			/>
 		</>
-	)
-}
-
-function LocalFilesList({
-	files,
-	activeFileId,
-	onSwitchFile,
-	onCloseFile,
-	onSaveAs,
-	onDownload,
-	isMobile,
-	setLeftOpenMobile,
-}: {
-	files: LocalFileEntry[]
-	activeFileId: string
-	onSwitchFile: (fileId: string) => void
-	onCloseFile: (fileId: string) => void
-	onSaveAs: (file: LocalFileEntry) => void
-	onDownload: (file: LocalFileEntry) => void
-	isMobile: boolean
-	setLeftOpenMobile: (open: boolean) => void
-}) {
-	let t = useIntl()
-	let hasFinePointer = useHasFinePointer()
-	let sortedFiles = [...files].sort((a, b) => b.lastOpened - a.lastOpened)
-	let supportsFileSystem = isFileSystemAccessSupported()
-
-	return (
-		<SidebarMenu>
-			{sortedFiles.map(file => (
-				<ContextMenu key={file.id} disabled={!hasFinePointer}>
-					<ContextMenuTrigger
-						onTouchStart={event => event.preventBaseUIHandler()}
-						render={
-							<SidebarMenuButton
-								isActive={file.id === activeFileId}
-								nativeButton
-								onClick={() => {
-									if (file.id !== activeFileId) {
-										void onSwitchFile(file.id)
-									}
-									if (isMobile) {
-										setLeftOpenMobile(false)
-									}
-								}}
-							>
-								<FileText
-									className={`size-4 ${
-										file.id === activeFileId
-											? "text-primary"
-											: "text-muted-foreground"
-									}`}
-								/>
-								<span
-									className={`truncate ${
-										file.id === activeFileId ? "font-medium" : ""
-									}`}
-								>
-									{file.filename}
-									{file.hasUnsavedChanges && (
-										<span className="ml-1 text-amber-500">•</span>
-									)}
-								</span>
-							</SidebarMenuButton>
-						}
-					/>
-					<ContextMenuContent>
-						{supportsFileSystem && (
-							<ContextMenuItem onClick={() => onSaveAs(file)}>
-								<Check />
-								{t("doc.saveAs")}
-							</ContextMenuItem>
-						)}
-						<ContextMenuItem onClick={() => onDownload(file)}>
-							<Download />
-							{t("doc.download")}
-						</ContextMenuItem>
-						<ContextMenuSeparator />
-						<ContextMenuItem
-							onClick={() => void onCloseFile(file.id)}
-							className="gap-2"
-						>
-							<X />
-							{t("doc.sidebar.closeFile")}
-						</ContextMenuItem>
-					</ContextMenuContent>
-				</ContextMenu>
-			))}
-		</SidebarMenu>
 	)
 }
 

@@ -5,7 +5,6 @@ import {
 	useRef,
 	useState,
 } from "react"
-import { diff } from "fast-myers-diff"
 import { ImageOff, Maximize2, Minimize2, PenTool } from "lucide-react"
 import { toast } from "sonner"
 import {
@@ -51,6 +50,10 @@ import {
 import { bracketMatching, syntaxTree } from "@codemirror/language"
 import { Image as JazzImage } from "jazz-tools/react"
 import { editorBaseExtensions, richMarkdownExtensions } from "../lib/extensions"
+import {
+	applyContentPreservingSelection,
+	externalContentChange,
+} from "../lib/replace-editor-content"
 import {
 	insertCodeBlock,
 	insertBlankLineAbove,
@@ -257,6 +260,7 @@ type VideoUploadState = {
 interface MarkdownEditorRef {
 	getContent(): string
 	setContent(markdown: string): void
+	setExternalContent(markdown: string): void
 	focus(): void
 	insertText(text: string): void
 	insertBlock(text: string): void
@@ -687,7 +691,12 @@ function MarkdownEditor(
 			}),
 			EditorView.updateListener.of(update => {
 				if (update.docChanged) {
-					if (callbacksRef.current.onChange) {
+					if (
+						callbacksRef.current.onChange &&
+						!update.transactions.some(transaction =>
+							transaction.annotation(externalContentChange),
+						)
+					) {
 						callbacksRef.current.onChange(() => update.state.doc.toString())
 					}
 					// Keep in-flight drop targets aligned with the live doc so
@@ -1056,6 +1065,11 @@ function MarkdownEditor(
 		applyContentPreservingSelection(view, content)
 	}
 
+	function setExternalContent(content: string) {
+		if (!view) return
+		applyContentPreservingSelection(view, content, true)
+	}
+
 	function focus() {
 		view?.focus()
 	}
@@ -1260,6 +1274,7 @@ function MarkdownEditor(
 	useImperativeHandle(ref, () => ({
 		getContent,
 		setContent,
+		setExternalContent,
 		focus,
 		insertText,
 		insertBlock,
@@ -1349,6 +1364,7 @@ function MarkdownEditor(
 		internalRef.current = {
 			getContent,
 			setContent,
+			setExternalContent,
 			focus,
 			insertText,
 			insertBlock,
@@ -1909,31 +1925,4 @@ function editorAriaShortcuts(): string {
 	return getShortcutDefinitions()
 		.map(definition => getAriaShortcut(definition.id))
 		.join(" ")
-}
-
-function applyContentPreservingSelection(view: EditorView, content: string) {
-	let currentContent = view.state.doc.toString()
-	let selection = view.state.selection
-	let changes: { from: number; to: number; insert: string }[] = []
-
-	for (let [fromA, toA, fromB, toB] of diff(currentContent, content)) {
-		changes.push({
-			from: fromA,
-			to: toA,
-			insert: content.slice(fromB, toB),
-		})
-	}
-	if (changes.length === 0) return
-
-	let transaction = view.state.update({ changes })
-	let mappedRanges = selection.ranges.map(range =>
-		EditorSelection.range(
-			transaction.changes.mapPos(range.anchor, 1),
-			transaction.changes.mapPos(range.head, 1),
-		),
-	)
-	view.dispatch({
-		changes,
-		selection: EditorSelection.create(mappedRanges, selection.mainIndex),
-	})
 }

@@ -20,13 +20,14 @@ import {
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
+	DropdownMenuSeparator,
 } from "@/app/components/ui/dropdown-menu"
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipTrigger,
 } from "@/app/components/ui/tooltip"
-import { Download, FileUp, MoreHorizontal, Upload } from "lucide-react"
+import { Download, MoreHorizontal, Upload } from "lucide-react"
 import {
 	importMarkdownFiles,
 	resolveWikilinksForImport,
@@ -51,7 +52,7 @@ import {
 	type ImportProgress,
 } from "./import-progress-dialog"
 import type { SidebarDoc } from "@/app/features/documents"
-import { Link } from "@tanstack/react-router"
+import { StorageModeMenuItems } from "@/app/components/storage-mode-menu"
 import { T, useIntl } from "@/shared/intl/setup"
 
 export { SidebarImportExport, handleImportFiles }
@@ -138,20 +139,21 @@ function SidebarImportExport({
 						render={
 							<DropdownMenuTrigger
 								render={
-									<Button size="icon-sm" variant="ghost" nativeButton>
+									<Button
+										size="icon-sm"
+										variant="ghost"
+										nativeButton
+										aria-label="File options"
+									>
 										<MoreHorizontal className="size-4" />
 									</Button>
 								}
 							/>
 						}
 					/>
-					<TooltipContent side="bottom">Import & Export</TooltipContent>
+					<TooltipContent side="bottom">File options</TooltipContent>
 				</Tooltip>
 				<DropdownMenuContent align="end">
-					<DropdownMenuItem render={<Link to="/local" />}>
-						<FileUp />
-						<T k="importExport.openLocalFile" />
-					</DropdownMenuItem>
 					<DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
 						<Download />
 						<T k="importExport.import" />
@@ -162,6 +164,8 @@ function SidebarImportExport({
 							<T k="importExport.exportAll" />
 						</DropdownMenuItem>
 					)}
+					<DropdownMenuSeparator />
+					<StorageModeMenuItems />
 				</DropdownMenuContent>
 			</DropdownMenu>
 			{importProgress && (

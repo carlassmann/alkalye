@@ -4,6 +4,7 @@ import { Space, UserAccount } from "@/schema"
 import { CommentThread, Document } from "../lib/schema"
 import { createDocumentMetadata } from "../lib/metadata"
 import { startStartupSpan } from "@/app/lib/reload-diagnostics"
+import { readStorageMode } from "@/app/lib/storage-mode"
 import {
 	clearLastOpenedDocument,
 	readLastOpenedDocument,
@@ -30,6 +31,10 @@ type FallbackHomeDocument = {
 }
 
 async function homeLoader({ context, deps }: HomeLoaderArgs) {
+	if (!deps.personal && readStorageMode() === "filesystem") {
+		throw redirect({ to: "/local" })
+	}
+
 	let { me } = context
 	if (!me) return null
 

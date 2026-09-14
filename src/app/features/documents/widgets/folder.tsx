@@ -3,15 +3,7 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import { Combobox } from "@base-ui/react/combobox"
 import { co } from "jazz-tools"
-import {
-	Folder,
-	ChevronRight,
-	ChevronDown,
-	Pencil,
-	FolderInput,
-	Trash2,
-	Plus,
-} from "lucide-react"
+import { Folder, Pencil, FolderInput, Trash2, Plus } from "lucide-react"
 import {
 	ContextMenu,
 	ContextMenuContent,
@@ -34,6 +26,8 @@ import { parseFrontmatter } from "@/app/features/editor"
 import { applyContentDiffLoadingCommentAnchors } from "@/app/features/comments"
 import { syncDocumentMetadata } from "../lib/metadata"
 import { useIntl } from "@/shared/intl/setup"
+
+import { SidebarFolderButton } from "./sidebar-folder-button"
 
 export { FolderRow, useFolderStore }
 export type { FolderState }
@@ -138,7 +132,6 @@ function FolderRow({
 	onDeleteDocs,
 }: FolderRowProps) {
 	let t = useIntl()
-	let folderName = path.split("/").pop() || path
 	let { renameFolder, removeFolder } = useFolderStore()
 
 	let [renameOpen, setRenameOpen] = useState(false)
@@ -150,22 +143,13 @@ function FolderRow({
 			<ContextMenu>
 				<ContextMenuTrigger
 					render={
-						<button
+						<SidebarFolderButton
+							path={path}
+							depth={depth}
+							count={docCount}
+							isCollapsed={isCollapsed}
 							onClick={onToggle}
-							className="hover:bg-accent flex w-full items-center gap-1.5 px-2 py-2 text-left"
-							style={{ paddingLeft: `${8 + depth * 8}px` }}
-						>
-							{isCollapsed ? (
-								<ChevronRight className="text-muted-foreground size-4 shrink-0" />
-							) : (
-								<ChevronDown className="text-muted-foreground size-4 shrink-0" />
-							)}
-							<Folder className="text-muted-foreground size-4 shrink-0" />
-							<span className="truncate text-sm font-medium">{folderName}</span>
-							<span className="text-muted-foreground ml-auto text-xs">
-								{docCount}
-							</span>
-						</button>
+						/>
 					}
 				/>
 				<ContextMenuContent>
