@@ -13,3 +13,10 @@ if (typeof window !== "undefined" && !window.matchMedia) {
 		dispatchEvent: vi.fn(),
 	}))
 }
+
+// On Node ≥21 the experimental localStorage built-in is undefined without
+// --localstorage-file and shadows jsdom's implementation for bare `localStorage`
+// references in modules evaluated at import time.
+if (typeof localStorage === "undefined" || localStorage === undefined) {
+	vi.stubGlobal("localStorage", { getItem: () => null, setItem: () => {} })
+}
