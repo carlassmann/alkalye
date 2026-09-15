@@ -28,6 +28,9 @@ import { UserAccount, Space, createSpace } from "@/schema"
 import { getSpaceGroup } from "../lib/spaces"
 import { testIds } from "@/app/lib/test-ids"
 import { WorkspaceSelector } from "@/app/components/workspace-selector"
+import { waitForLocalJazzStorage } from "@/app/lib/local-jazz-poke"
+import { tryCatch } from "@/app/lib/try-catch"
+import { toast } from "sonner"
 
 export { SpaceSelector, SpaceInitials }
 
@@ -240,20 +243,33 @@ function CreateSpaceDialog({
 	let t = useIntl()
 	let navigate = useNavigate()
 	let [name, setName] = useState("")
+	let [saving, setSaving] = useState(false)
 	let inputRef = useRef<HTMLInputElement>(null)
+	let pendingSpace = useRef<ReturnType<typeof createSpace> | null>(null)
 
 	function handleOpenChangeComplete(open: boolean) {
 		if (!open) setName("")
 	}
 
-	function handleSubmit(e: React.FormEvent) {
+	async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault()
 		let trimmed = name.trim()
-		if (!trimmed || !me.$isLoaded || !me.root) return
+		if (!trimmed || saving || !me.$isLoaded || !me.root) return
 
-		let space = createSpace(trimmed, me.root)
+		setSaving(true)
+		let space = pendingSpace.current ?? createSpace(trimmed, me.root)
+		pendingSpace.current = space
+		if (space.name !== trimmed) space.$jazz.set("name", trimmed)
+		let saved = await tryCatch(waitForLocalJazzStorage(me))
+		if (!saved.ok) {
+			setSaving(false)
+			toast.error(t("spaces.create.saveFailed"))
+			return
+		}
 		onOpenChange(false)
+		setSaving(false)
 		setName("")
+		pendingSpace.current = null
 		navigate({ to: "/spaces/$spaceId", params: { spaceId: space.$jazz.id } })
 	}
 
@@ -295,16 +311,17 @@ function CreateSpaceDialog({
 							variant="outline"
 							size="sm"
 							onClick={() => onOpenChange(false)}
+							disabled={saving}
 						>
 							<T k="spaces.create.cancel" />
 						</Button>
 						<Button
 							type="submit"
 							size="sm"
-							disabled={!name.trim()}
+							disabled={!name.trim() || saving}
 							data-testid={testIds.space.createSubmit}
 						>
-							<T k="spaces.create.submit" />
+							<T k={saving ? "spaces.create.saving" : "spaces.create.submit"} />
 						</Button>
 					</DialogFooter>
 				</form>

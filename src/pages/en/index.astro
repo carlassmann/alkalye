@@ -25,8 +25,8 @@ let workflow = [
 		time: "At your desk",
 		device: "Laptop",
 		title: "Deep work, uninterrupted",
-		body: "Beautiful typography, zero chrome. Just you and your words. Export to your file system to collaborate with Claude Code or OpenCode.",
-		features: ["File system sync", "AI collaboration"],
+		body: "Beautiful typography, zero chrome. Just you and your words. On supported browsers, open a local Markdown folder to write alongside Claude Code or OpenCode.",
+		features: ["Local folders", "AI collaboration"],
 	},
 	{
 		time: "Team meeting",
@@ -73,16 +73,16 @@ let capabilities = [
 
 let aiWorkflow = [
 	{
-		title: "Sync to your file system",
-		body: "Mirror documents as markdown files for backup, versioning, and external editing.",
+		title: "Open a folder on your disk",
+		body: "In browsers with folder access, edit Markdown files where they already live: your notes vault, repo, or Dropbox.",
 	},
 	{
 		title: "Collaborate with Claude Code / OpenCode",
-		body: "Point your AI agent at your synced files for drafting, rewrites, structure, and critique.",
+		body: "Point your AI agent at the same folder for drafting, rewrites, structure, and critique.",
 	},
 	{
 		title: "Keep writing in Alkalye",
-		body: "Changes flow back into your workspace, with backlinks and history still intact.",
+		body: "Reopen the folder and keep writing in the same Markdown files.",
 	},
 ]
 ---
@@ -258,13 +258,13 @@ let aiWorkflow = [
 					<div class="mb-12 space-y-4">
 						<h2 class="text-[clamp(1.75rem,3vw,2.25rem)] tracking-tight font-semibold">Your AI pair writer, without lock-in</h2>
 						<p class="max-w-[60ch] text-lg text-muted-foreground leading-relaxed">
-							Alkalye can sync documents to your file system, so Claude Code or OpenCode can help with blog posts, talks, and technical writing whenever you need it.
+							In a browser with folder access, open a local Markdown folder in Alkalye. Claude Code or OpenCode can edit the same files for blog posts, talks, and technical writing.
 						</p>
 					</div>
 					<div class="overflow-hidden rounded-none border border-border/60 bg-card shadow-xl shadow-black/5 dark:shadow-black/20">
 						<div class="relative bg-gradient-to-r from-brand/5 via-transparent to-brand/5 px-6 py-5 border-b border-border/60">
 							<p class="text-sm leading-6 text-muted-foreground">
-								Keep your markdown local. Let your agent propose edits. Bring improvements back into the same collaborative document with full history.
+								Keep your Markdown in your own folder. Let your agent edit the files, then reopen them in Alkalye to keep writing.
 							</p>
 						</div>
 						<div class="grid">

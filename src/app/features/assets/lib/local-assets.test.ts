@@ -6,7 +6,7 @@ import {
 	MockDirectoryHandle,
 	readFileAtPath,
 	readBlobBytes,
-} from "@/app/features/backup/lib/test-helpers"
+} from "@/test-helpers/mock-filesystem"
 import {
 	loadLocalAssets,
 	localDiskContent,

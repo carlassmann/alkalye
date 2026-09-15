@@ -31,7 +31,7 @@ import {
 import {
 	MockDirectoryHandle,
 	readFileAtPath,
-} from "../features/backup/lib/test-helpers"
+} from "@/test-helpers/mock-filesystem"
 
 class TestWritable
 	extends WritableStream

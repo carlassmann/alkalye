@@ -5,6 +5,7 @@ import { CommentThread, Document } from "../lib/schema"
 import { createDocumentMetadata } from "../lib/metadata"
 import { startStartupSpan } from "@/app/lib/reload-diagnostics"
 import { readStorageMode } from "@/app/lib/storage-mode"
+import { waitForLocalJazzStorage } from "@/app/lib/local-jazz-poke"
 import {
 	clearLastOpenedDocument,
 	readLastOpenedDocument,
@@ -115,6 +116,7 @@ async function homeLoader({ context, deps }: HomeLoaderArgs) {
 		group,
 	)
 	docs.$jazz.push(newDoc)
+	await waitForLocalJazzStorage(me)
 
 	throw redirect({
 		to: "/doc/$id",

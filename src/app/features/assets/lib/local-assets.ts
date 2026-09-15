@@ -3,10 +3,6 @@ import {
 	type LocalFileEntry,
 } from "@/app/lib/local-file"
 import {
-	transformContentForBackup,
-	transformContentForImport,
-} from "@/app/features/backup/lib/sync"
-import {
 	classifyAssetFile,
 	assetExtensionFromMimeType,
 	isAssetFileName,
@@ -56,12 +52,11 @@ class MissingLocalAssetError extends Error {
 }
 
 function localEditorContent(content: string, assets: LocalAsset[]) {
-	let files = new Map(assets.map(asset => [asset.id, asset.id]))
-	let normalized = content.replace(
-		/!\[([^\]]*)\]\(\.\/assets\/([^)]+)\)/g,
-		(match, alt, id) => (files.has(id) ? `![${alt}](assets/${id})` : match),
+	let available = new Set(assets.map(asset => asset.id))
+	return content.replace(
+		/!\[([^\]]*)\]\((?:\.\/)?assets\/([^)]+)\)/g,
+		(match, alt, id) => (available.has(id) ? `![${alt}](asset:${id})` : match),
 	)
-	return transformContentForImport(normalized, files)
 }
 
 function localDiskContent(
@@ -69,12 +64,11 @@ function localDiskContent(
 	assets: LocalAsset[],
 	originalContent = "",
 ) {
-	let files = new Map(assets.map(asset => [asset.id, asset.id]))
-	let transformed = transformContentForBackup(content, files)
-	let diskContent = transformed.replace(
+	let available = new Set(assets.map(asset => asset.id))
+	let diskContent = content.replace(
 		/!\[([^\]]*)\]\(asset:([^)]+)\)/g,
 		(match, alt, id) =>
-			isAssetFileName(id) && !id.includes("/")
+			available.has(id) || (isAssetFileName(id) && !id.includes("/"))
 				? `![${alt}](assets/${id})`
 				: match,
 	)

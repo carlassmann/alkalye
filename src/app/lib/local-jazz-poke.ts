@@ -1,7 +1,11 @@
 import { z } from "zod"
 import type { Account } from "jazz-tools"
 
-export { connectLocalJazzPoke, waitForLocalJazzStorage }
+export {
+	connectLocalJazzPoke,
+	waitForLocalJazzStorage,
+	waitForLocalJazzNodeStorage,
+}
 
 type LocalNode = Account["$jazz"]["localNode"]
 type CoValueId = Parameters<LocalNode["getCoValue"]>[0]
@@ -62,7 +66,10 @@ function connectLocalJazzPoke(account: Account) {
 }
 
 async function waitForLocalJazzStorage(account: Account) {
-	let node = account.$jazz.localNode
+	await waitForLocalJazzNodeStorage(account.$jazz.localNode)
+}
+
+async function waitForLocalJazzNodeStorage(node: LocalNode) {
 	let storage = node.storage
 	if (!storage) return
 

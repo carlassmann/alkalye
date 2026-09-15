@@ -31,7 +31,6 @@ import {
 	SelectValue,
 } from "@/app/components/ui/select"
 import { SpaceNotFound, SpaceUnauthorized } from "@/app/components/error-states"
-import { SpaceBackupSettings } from "@/app/features/backup"
 import {
 	getSpaceGroup,
 	leaveSpace,
@@ -143,7 +142,6 @@ function SpaceSettingsContent({
 						<div className="space-y-8">
 							<SpaceNameSection space={space} />
 							<SpaceMembersSection space={space} />
-							<SpaceBackupSettingsSection space={space} spaceId={spaceId} />
 							<DangerZoneSection space={space} />
 						</div>
 					)}
@@ -240,19 +238,6 @@ function SpaceNameSection({ space }: { space: LoadedSpace }) {
 			</div>
 		</section>
 	)
-}
-
-function SpaceBackupSettingsSection({
-	space,
-	spaceId,
-}: {
-	space: LoadedSpace
-	spaceId: string
-}) {
-	let spaceGroup = getSpaceGroup(space)
-	let isAdmin = spaceGroup?.myRole() === "admin"
-
-	return <SpaceBackupSettings spaceId={spaceId} isAdmin={isAdmin} />
 }
 
 function SpaceAvatarUpload({

@@ -73,7 +73,6 @@ import { Footer } from "@/app/components/footer"
 import { waitForLocalJazzStorage } from "@/app/lib/local-jazz-poke"
 import { usePWA, PWAInstallDialog } from "@/app/lib/pwa"
 import { useIsPWAInstalled } from "@/app/lib/platform"
-import { BackupSettings } from "@/app/features/backup"
 import {
 	Tooltip,
 	TooltipTrigger,
@@ -251,7 +250,6 @@ function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 							)}
 							{category === "app" && (
 								<>
-									<BackupSettings />
 									<InstallationSection />
 									<AppSection />
 									<ReloadDiagnosticsSection />

@@ -9,7 +9,6 @@ import {
 import { baseEditorMessages, deEditorMessages } from "./messages.editor"
 import { baseSharingMessages, deSharingMessages } from "./messages.sharing"
 import { baseSpacesMessages, deSpacesMessages } from "./messages.spaces"
-import { baseBackupMessages, deBackupMessages } from "./messages.backup"
 import {
 	baseImportExportMessages,
 	deImportExportMessages,
@@ -35,7 +34,6 @@ let enHalf1 = merge(
 )
 let enHalf2 = merge(
 	baseSpacesMessages,
-	baseBackupMessages,
 	baseImportExportMessages,
 	baseSettingsMessages,
 	basePresentationMessages,
@@ -52,7 +50,6 @@ let messagesDe = check(
 	deEditorMessages,
 	deSharingMessages,
 	deSpacesMessages,
-	deBackupMessages,
 	deImportExportMessages,
 	deSettingsMessages,
 	dePresentationMessages,

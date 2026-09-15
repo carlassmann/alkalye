@@ -2,6 +2,7 @@ import { redirect } from "@tanstack/react-router"
 import { co, Group, type ResolveQuery } from "jazz-tools"
 import { Document, Space, createSpaceDocument } from "@/schema"
 import { SpaceNotFound, SpaceUnauthorized } from "@/app/components/error-states"
+import { waitForLocalJazzNodeStorage } from "@/app/lib/local-jazz-poke"
 
 export { SpaceListScreen, spaceListLoader, spaceListResolve }
 
@@ -51,6 +52,7 @@ async function spaceListLoader(spaceId: string): Promise<SpaceListLoaderData> {
 
 	let newDoc = createSpaceDocument(space.$jazz.owner, spaceId, "")
 	space.documents.$jazz.push(newDoc)
+	await waitForLocalJazzNodeStorage(space.$jazz.localNode)
 
 	throw redirect({
 		to: "/spaces/$spaceId/doc/$id",

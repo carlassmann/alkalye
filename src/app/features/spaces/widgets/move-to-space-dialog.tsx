@@ -26,6 +26,7 @@ import { Input } from "@/app/components/ui/input"
 import { Document, UserAccount, createSpace } from "@/schema"
 import { getSpaceGroup } from "../lib/spaces"
 import { moveDocumentToSpace } from "@/app/features/documents"
+import { waitForLocalJazzStorage } from "@/app/lib/local-jazz-poke"
 
 export { MoveToSpaceDialog }
 export type { MoveToSpaceDialogProps }
@@ -109,6 +110,7 @@ function MoveToSpaceDialog({
 					currentSpaceId,
 					me,
 				})
+				if (destination === "__new__") await waitForLocalJazzStorage(me)
 
 				onMove?.(selectedSpace)
 				onOpenChange(false)
