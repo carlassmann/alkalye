@@ -31,6 +31,7 @@ startup must therefore have bounded history, independent of total editing time.
 - Never carry a migration version between roots during recovery. The version
   describes the physical replay history of that specific CoValue.
 - Load document content, comments, assets, and presence only after routing.
+- Wait for local storage before navigating away from newly created spaces or documents. An immediate reload can otherwise miss their list membership.
 
 Tests for startup CoValues should create large histories, rotate them, and assert
 that the replacement's transaction count stays within a fixed replay budget.

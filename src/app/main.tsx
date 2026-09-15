@@ -12,7 +12,6 @@ import {
 	useSplashDelay,
 } from "@/app/features/onboarding"
 import { PWAContext, usePWAProvider, PWAInstallHint } from "@/app/lib/pwa"
-import { BackupSubscriber, SpacesBackupSubscriber } from "@/app/features/backup"
 import { useCleanupDeleted } from "@/app/features/documents"
 import { connectLocalJazzPoke } from "@/app/lib/local-jazz-poke"
 import { installRecoveryConsole } from "@/app/features/recovery"
@@ -140,8 +139,6 @@ function RouterWithJazz() {
 			<PWAInstallHint />
 			<LocalJazzPoke />
 			<RecoveryConsole />
-			<BackupSubscriber />
-			<SpacesBackupSubscriber />
 			<PersonalDocumentAgentSubscriber />
 			<SplashScreen show={showSplash} />
 			{/* Mount the router only once the account root is resolved: loaders

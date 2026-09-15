@@ -48,6 +48,10 @@ import { ListSidebar } from "../widgets/list-sidebar"
 import { SidebarDocumentList } from "../widgets/sidebar-document-list"
 import { SpaceSelector } from "@/app/features/spaces"
 import { SidebarSyncStatus } from "@/app/components/sidebar-sync-status"
+import {
+	waitForLocalJazzStorage,
+	waitForLocalJazzNodeStorage,
+} from "@/app/lib/local-jazz-poke"
 
 import {
 	SidebarImportExport,
@@ -1063,6 +1067,7 @@ function makeCreateDocument(me: LoadedMe, space?: SpaceWithDocuments) {
 				`# ${title}\n\n`,
 			)
 			space.documents.$jazz.push(newDoc)
+			await waitForLocalJazzNodeStorage(space.$jazz.localNode)
 			return newDoc.$jazz.id
 		}
 
@@ -1081,6 +1086,7 @@ function makeCreateDocument(me: LoadedMe, space?: SpaceWithDocuments) {
 			group,
 		)
 		me.root.documents.$jazz.push(newDoc)
+		await waitForLocalJazzStorage(me)
 		return newDoc.$jazz.id
 	}
 }
@@ -1101,6 +1107,7 @@ function makeCreateFolderDocument(
 			me,
 			makeFolderDocumentContent(path),
 		)
+		await waitForLocalJazzStorage(me)
 		if (isMobile) setLeftOpenMobile(false)
 		navigate({ to: "/doc/$id", params: { id: newDoc.$jazz.id }, search: {} })
 	}
@@ -1137,6 +1144,7 @@ async function handleDuplicateDocument(
 		return
 	}
 	me.root.documents.$jazz.push(newDoc)
+	await waitForLocalJazzStorage(me)
 	if (isMobile) setLeftOpenMobile(false)
 	navigate({ to: "/doc/$id", params: { id: newDoc.$jazz.id }, search: {} })
 }

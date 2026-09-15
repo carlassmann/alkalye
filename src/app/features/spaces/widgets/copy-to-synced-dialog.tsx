@@ -33,6 +33,7 @@ import {
 } from "@/schema"
 import { getSpaceGroup } from "../lib/spaces"
 import { createDocumentMetadata } from "@/app/features/documents"
+import { waitForLocalJazzStorage } from "@/app/lib/local-jazz-poke"
 import {
 	prepareLocalAssetCopy,
 	attachLocalAssetCopy,
@@ -97,6 +98,7 @@ function CopyToSyncedDialog({
 		newDoc.$jazz.applyDiff(createDocumentMetadata(copy.content, new Date()))
 		attachLocalAssetCopy(newDoc, copy.assets, newDoc.$jazz.owner)
 		space.documents.$jazz.push(newDoc)
+		await waitForLocalJazzStorage(me)
 
 		onCopy?.({ id: space.$jazz.id, name: newSpaceName })
 		handleOpenChange(false)
@@ -131,6 +133,7 @@ function CopyToSyncedDialog({
 			me.root.$jazz.set("documents", docs)
 		}
 		docs.$jazz.push(newDoc)
+		await waitForLocalJazzStorage(me)
 
 		onCopy?.({ id: "personal", name: t("spaces.copy.personal") })
 		handleOpenChange(false)
@@ -157,6 +160,7 @@ function CopyToSyncedDialog({
 		newDoc.$jazz.applyDiff(createDocumentMetadata(copy.content, new Date()))
 		attachLocalAssetCopy(newDoc, copy.assets, newDoc.$jazz.owner)
 		space.documents.$jazz.push(newDoc)
+		await waitForLocalJazzStorage(me)
 
 		onCopy?.({ id: space.$jazz.id, name: space.name })
 		handleOpenChange(false)

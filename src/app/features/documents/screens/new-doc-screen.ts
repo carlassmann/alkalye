@@ -3,6 +3,10 @@ import { type ResolveQuery } from "jazz-tools"
 import { UserAccount, Space } from "@/schema"
 import { createSpaceDocument } from "../lib/create-space-document"
 import { createPersonalDocument } from "./../lib/documents"
+import {
+	waitForLocalJazzStorage,
+	waitForLocalJazzNodeStorage,
+} from "@/app/lib/local-jazz-poke"
 
 export { newDocLoader, newDocSpaceQuery, newDocDocumentsQuery }
 
@@ -34,6 +38,7 @@ async function newDocLoader({ context, spaceId }: NewDocLoaderArgs) {
 
 		let newDoc = createSpaceDocument(space.$jazz.owner, spaceId, "")
 		space.documents.$jazz.push(newDoc)
+		await waitForLocalJazzNodeStorage(space.$jazz.localNode)
 
 		throw redirect({
 			to: "/spaces/$spaceId/doc/$id",
@@ -47,6 +52,7 @@ async function newDocLoader({ context, spaceId }: NewDocLoaderArgs) {
 	if (!docs?.$isLoaded) throw redirect({ to: "/" })
 
 	let newDoc = await createPersonalDocument(loadedMe, "")
+	await waitForLocalJazzStorage(me)
 
 	throw redirect({
 		to: "/doc/$id",

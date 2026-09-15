@@ -3,7 +3,7 @@ import { createJazzTestAccount, setupJazzTestSync } from "jazz-tools/testing"
 import { UserAccount } from "@/schema"
 import { Document } from "@/app/features/documents/lib/schema"
 import { createPersonalDocument } from "@/app/features/documents/lib/documents"
-import { createMockBlob } from "@/app/features/backup/lib/test-helpers"
+import { createMockBlob } from "@/test-helpers/mock-filesystem"
 import { attachLocalAssetCopy, prepareLocalAssetCopy } from "./local-asset-copy"
 
 describe("copying local assets to a synced document", () => {

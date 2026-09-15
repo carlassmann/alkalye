@@ -48,6 +48,7 @@ import { ListSidebar } from "../widgets/list-sidebar"
 import { SidebarDocumentList } from "../widgets/sidebar-document-list"
 import { SpaceSelector } from "@/app/features/spaces"
 import { SidebarSyncStatus } from "@/app/components/sidebar-sync-status"
+import { waitForLocalJazzNodeStorage } from "@/app/lib/local-jazz-poke"
 
 import {
 	SidebarImportExport,
@@ -1077,6 +1078,7 @@ function makeCreateDocument(space: LoadedSpace) {
 			`# ${title}\n\n`,
 		)
 		space.documents.$jazz.push(newDoc)
+		await waitForLocalJazzNodeStorage(space.$jazz.localNode)
 		return newDoc.$jazz.id
 	}
 }
@@ -1099,6 +1101,7 @@ function makeCreateFolderDocument(
 			makeFolderDocumentContent(path),
 		)
 		space.documents.$jazz.push(newDoc)
+		await waitForLocalJazzNodeStorage(space.$jazz.localNode)
 		if (isMobile) setLeftOpenMobile(false)
 		navigate({
 			to: "/spaces/$spaceId/doc/$id",
@@ -1129,6 +1132,7 @@ async function handleDuplicateDocument(
 		return
 	}
 	space.documents.$jazz.push(newDoc)
+	await waitForLocalJazzNodeStorage(space.$jazz.localNode)
 	if (isMobile) setLeftOpenMobile(false)
 	navigate({
 		to: "/spaces/$spaceId/doc/$id",

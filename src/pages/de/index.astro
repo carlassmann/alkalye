@@ -25,8 +25,8 @@ let workflow = [
 		time: "Am Schreibtisch",
 		device: "Laptop",
 		title: "Fokussiert schreiben, ungestört",
-		body: "Schöne Typografie, kein Schnickschnack. Nur du und deine Worte. Synchronisiere ins Dateisystem, um mit Claude Code oder OpenCode zusammenzuarbeiten.",
-		features: ["Dateisystem-Sync", "KI-Zusammenarbeit"],
+		body: "Schöne Typografie, kein Schnickschnack. Nur du und deine Worte. In unterstützten Browsern kannst du einen lokalen Markdown-Ordner öffnen und neben Claude Code oder OpenCode schreiben.",
+		features: ["Lokale Ordner", "KI-Zusammenarbeit"],
 	},
 	{
 		time: "Team-Meeting",
@@ -73,16 +73,16 @@ let capabilities = [
 
 let aiWorkflow = [
 	{
-		title: "Synchronisiere ins Dateisystem",
-		body: "Spiegele Dokumente als Markdown-Dateien für Backup, Versionierung und externe Bearbeitung.",
+		title: "Öffne einen Ordner auf deiner Festplatte",
+		body: "In Browsern mit Ordnerzugriff bearbeitest du Markdown-Dateien dort, wo sie schon liegen: in deinem Notizen-Vault, Repo oder Dropbox.",
 	},
 	{
 		title: "Zusammenarbeit mit Claude Code / OpenCode",
-		body: "Richte deinen KI-Agenten auf deine synchronisierten Dateien aus — für Entwürfe, Umschreibungen, Struktur und Kritik.",
+		body: "Richte deinen KI-Agenten auf denselben Ordner aus — für Entwürfe, Umschreibungen, Struktur und Kritik.",
 	},
 	{
 		title: "Weiterschreiben in Alkalye",
-		body: "Änderungen fließen zurück in deinen Arbeitsbereich, mit Backlinks und Historie intakt.",
+		body: "Öffne den Ordner erneut und schreib in denselben Markdown-Dateien weiter.",
 	},
 ]
 ---
@@ -258,13 +258,13 @@ let aiWorkflow = [
 					<div class="mb-12 space-y-4">
 						<h2 class="text-[clamp(1.75rem,3vw,2.25rem)] tracking-tight font-semibold">Dein KI-Schreibpartner, ohne Lock-in</h2>
 						<p class="max-w-[60ch] text-lg text-muted-foreground leading-relaxed">
-							Alkalye kann Dokumente in dein Dateisystem synchronisieren, damit Claude Code oder OpenCode dir bei Blogposts, Vorträgen und technischen Texten helfen können, wann immer du es brauchst.
+							In einem Browser mit Ordnerzugriff kannst du einen lokalen Markdown-Ordner in Alkalye öffnen. Claude Code oder OpenCode können dieselben Dateien für Blogposts, Vorträge und technische Texte bearbeiten.
 						</p>
 					</div>
 					<div class="overflow-hidden rounded-none border border-border/60 bg-card shadow-xl shadow-black/5 dark:shadow-black/20">
 						<div class="relative bg-gradient-to-r from-brand/5 via-transparent to-brand/5 px-6 py-5 border-b border-border/60">
 							<p class="text-sm leading-6 text-muted-foreground">
-								Behalte dein Markdown lokal. Lass deinen Agenten Änderungen vorschlagen. Bringe Verbesserungen zurück in dasselbe kollaborative Dokument mit voller Historie.
+								Behalte dein Markdown in deinem eigenen Ordner. Lass deinen Agenten die Dateien bearbeiten und öffne sie danach wieder in Alkalye.
 							</p>
 						</div>
 						<div class="grid">

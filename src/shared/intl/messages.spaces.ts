@@ -15,6 +15,8 @@ let baseSpacesMessages = messages({
 	"spaces.create.namePlaceholder": "My Space",
 	"spaces.create.cancel": "Cancel",
 	"spaces.create.submit": "Create",
+	"spaces.create.saving": "Saving...",
+	"spaces.create.saveFailed": "Could not save space locally",
 	"spaces.move.title": "Move to space",
 	"spaces.move.description":
 		"Move this document to a different space or your personal documents.",
@@ -119,6 +121,8 @@ let deSpacesMessages = translate(baseSpacesMessages, {
 	"spaces.create.namePlaceholder": "Mein Bereich",
 	"spaces.create.cancel": "Abbrechen",
 	"spaces.create.submit": "Erstellen",
+	"spaces.create.saving": "Speichern...",
+	"spaces.create.saveFailed": "Bereich konnte lokal nicht gespeichert werden",
 	"spaces.move.title": "In Bereich verschieben",
 	"spaces.move.description":
 		"Verschiebe dieses Dokument in einen anderen Bereich oder deine persönlichen Dokumente.",
