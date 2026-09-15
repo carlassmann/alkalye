@@ -14,7 +14,6 @@ import {
 import { PWAContext, usePWAProvider, PWAInstallHint } from "@/app/lib/pwa"
 import { useCleanupDeleted } from "@/app/features/documents"
 import { connectLocalJazzPoke } from "@/app/lib/local-jazz-poke"
-import { installRecoveryConsole } from "@/app/features/recovery"
 import { init } from "@plausible-analytics/tracker"
 import { IntlProvider } from "@/shared/intl/setup"
 import { messagesDe } from "@/shared/intl/messages"
@@ -138,7 +137,6 @@ function RouterWithJazz() {
 			<Toaster />
 			<PWAInstallHint />
 			<LocalJazzPoke />
-			<RecoveryConsole />
 			<PersonalDocumentAgentSubscriber />
 			<SplashScreen show={showSplash} />
 			{/* Mount the router only once the account root is resolved: loaders
@@ -178,17 +176,6 @@ function LocalJazzPoke() {
 	useEffect(() => {
 		if (!me.$isLoaded) return
 		return connectLocalJazzPoke(me)
-	}, [me])
-
-	return null
-}
-
-function RecoveryConsole() {
-	let me = useAccount(UserAccount)
-
-	useEffect(() => {
-		if (!me.$isLoaded) return
-		installRecoveryConsole()
 	}, [me])
 
 	return null
