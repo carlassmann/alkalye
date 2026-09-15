@@ -8,13 +8,32 @@ import {
 	type LocalAsset,
 } from "./local-assets"
 
-export { prepareLocalAssetCopy, attachLocalAssetCopy }
+export {
+	prepareLocalAssetCopy,
+	attachLocalAssetCopy,
+	assertLocalAssetReferencesAvailable,
+}
+
+function assertLocalAssetReferencesAvailable(
+	content: string,
+	files: LocalAsset[],
+) {
+	let references = referencedLocalAssetIds(content)
+	let available = new Set(files.map(file => file.id))
+	for (let id of references) {
+		if (!available.has(id))
+			throw new Error(
+				`Local asset ${id} is unavailable; restore it before copying`,
+			)
+	}
+}
 
 async function prepareLocalAssetCopy(
 	content: string,
 	files: LocalAsset[],
 	owner: Group,
 ) {
+	assertLocalAssetReferencesAvailable(content, files)
 	let assets: Awaited<ReturnType<typeof createAssetFromFile>>[] = []
 	let ids = new Map<string, string>()
 	let referencedFiles = referencedLocalAssetIds(content)

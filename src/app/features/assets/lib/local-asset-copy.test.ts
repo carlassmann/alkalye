@@ -49,4 +49,20 @@ describe("copying local assets to a synced document", () => {
 		expect(asset.$jazz.owner.$jazz.id).toBe(doc.$jazz.owner.$jazz.id)
 		expect(loaded.content.toString()).toBe(`![Clip](asset:${asset.$jazz.id})`)
 	})
+
+	it("refuses to copy a document whose local asset is missing", async () => {
+		await setupJazzTestSync()
+		let account = await createJazzTestAccount({
+			isCurrentActiveAccount: true,
+			AccountSchema: UserAccount,
+		})
+		let doc = await createPersonalDocument(account, "")
+		await expect(
+			prepareLocalAssetCopy(
+				"![Missing](./assets/missing.png)",
+				[],
+				doc.$jazz.owner,
+			),
+		).rejects.toThrow("missing.png is unavailable")
+	})
 })

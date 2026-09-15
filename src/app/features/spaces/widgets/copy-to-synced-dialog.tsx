@@ -36,6 +36,7 @@ import { createDocumentMetadata } from "@/app/features/documents"
 import {
 	prepareLocalAssetCopy,
 	attachLocalAssetCopy,
+	assertLocalAssetReferencesAvailable,
 	type LocalAsset,
 } from "@/app/features/assets"
 
@@ -179,6 +180,7 @@ function CopyToSyncedDialog({
 			let newSpaceName = value.newSpaceName.trim()
 
 			try {
+				assertLocalAssetReferencesAvailable(content, localAssets)
 				let success: boolean
 				if (destination === "__new__") {
 					success = await copyToNewSpace(newSpaceName)
