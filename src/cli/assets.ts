@@ -20,21 +20,42 @@ import {
 	replaceCliDocumentContent,
 	runCommand,
 	syncMutation,
+	withTimeout,
 } from "@/cli/runtime"
 import type { JazzContext } from "@/cli/runtime"
 import { Document } from "@/schema"
 import { ImageAsset, VideoAsset } from "@/schema"
 
-export { docAssetCommand, addAssetFromFile, listDocAssets, removeAsset }
+export {
+	docAssetCommand,
+	addAssetFromFile,
+	listDocAssets,
+	removeAsset,
+	listableAssetDocumentResolve,
+}
+
+let mutableAssetDocumentResolve = {
+	content: true,
+	comments: { $each: { replies: true } },
+	cursors: true,
+	assets: true,
+} as const
+
+// Listing reads each asset's own fields, and jazz autoloads list items asynchronously,
+// so a one-shot CLI has to resolve them up front. Catching per item keeps an asset the
+// account cannot read from failing the whole command.
+let listableAssetDocumentResolve = {
+	...mutableAssetDocumentResolve,
+	assets: { $each: { $onError: "catch" } },
+} as const
 
 type LoadedAssetDocument = co.loaded<
 	typeof Document,
-	{
-		content: true
-		comments: { $each: { replies: true } }
-		cursors: true
-		assets: true
-	}
+	typeof mutableAssetDocumentResolve
+>
+type ListableAssetDocument = co.loaded<
+	typeof Document,
+	typeof listableAssetDocumentResolve
 >
 type LoadedAsset = co.loaded<typeof ImageAsset> | co.loaded<typeof VideoAsset>
 type AssetSummary = {
@@ -45,6 +66,17 @@ type AssetSummary = {
 	inContent: boolean
 	createdAt: string
 }
+
+// jazz's server-side createImage maps sharp's decoded format onto a fixed mime set, so
+// svg is rejected there; bmp fails earlier, inside sharp's decoder. The browser encoder
+// accepts both, so app-created assets are not limited to these.
+let serverEncodableImageMimeTypes = new Set([
+	"image/avif",
+	"image/gif",
+	"image/jpeg",
+	"image/png",
+	"image/webp",
+])
 
 let assetIdArg = Args.text({ name: "asset-id" }).pipe(
 	Args.withDescription("Asset ID."),
@@ -86,7 +118,7 @@ let docAssetList = Command.make(
 	args =>
 		runCommand("doc.asset.list", args, async config => {
 			let jazz = await createAuthenticatedJazz(config)
-			let doc = await loadMutableAssetDocument(
+			let doc = await loadListableAssetDocument(
 				jazz,
 				args.docId,
 				config.timeoutMs,
@@ -127,14 +159,24 @@ async function loadMutableAssetDocument(
 	timeoutMs: number,
 ): Promise<LoadedAssetDocument> {
 	let doc = await loadDocumentForMutation(jazz, docId, timeoutMs)
-	return doc.$jazz.ensureLoaded({
-		resolve: {
-			content: true,
-			comments: { $each: { replies: true } },
-			cursors: true,
-			assets: true,
-		},
-	})
+	return withTimeout(
+		doc.$jazz.ensureLoaded({ resolve: mutableAssetDocumentResolve }),
+		timeoutMs,
+		`Remote sync timed out while loading document ${docId} after ${timeoutMs}ms.`,
+	)
+}
+
+async function loadListableAssetDocument(
+	jazz: JazzContext,
+	docId: string,
+	timeoutMs: number,
+): Promise<ListableAssetDocument> {
+	let doc = await loadDocumentForMutation(jazz, docId, timeoutMs)
+	return withTimeout(
+		doc.$jazz.ensureLoaded({ resolve: listableAssetDocumentResolve }),
+		timeoutMs,
+		`Remote sync timed out while loading assets for document ${docId} after ${timeoutMs}ms.`,
+	)
 }
 
 function requireAssetEdit(doc: LoadedAssetDocument) {
@@ -158,6 +200,13 @@ async function addAssetFromFile(
 	if (kind === "tldraw") {
 		throw new ValidationError({
 			message: "Tldraw assets are not supported by the CLI yet",
+		})
+	}
+	if (kind === "image" && !serverEncodableImageMimeTypes.has(mimeType)) {
+		throw new ValidationError({
+			message:
+				`Unsupported image format: ${fileName}. ` +
+				"Supported: avif, gif, jpg, png, webp. Convert svg or bmp first.",
 		})
 	}
 
@@ -193,7 +242,7 @@ async function addAssetFromFile(
 	return summarizeAsset(doc, asset)
 }
 
-function listDocAssets(doc: LoadedAssetDocument): AssetSummary[] {
+function listDocAssets(doc: ListableAssetDocument): AssetSummary[] {
 	return (doc.assets ?? []).flatMap(asset =>
 		asset?.$isLoaded ? [summarizeAsset(doc, asset)] : [],
 	)

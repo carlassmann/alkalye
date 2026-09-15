@@ -436,7 +436,7 @@ let leaves: Record<string, LeafDef> = {
 		summary: "Upload an image or video file and attach it to the document.",
 		usage: "alkalye doc asset add <doc-id> --file <path> [--name <name>]",
 		options: [
-			"--file <path>     Image or video file to upload (png, jpg, gif, webp, svg, bmp, mp4, webm, mov)",
+			"--file <path>     Image or video file to upload (png, jpg, gif, webp, mp4, webm, mov)",
 			"--name <name>     Asset display name (defaults to file name without extension)",
 		],
 		examples: [

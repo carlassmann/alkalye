@@ -161,7 +161,8 @@ alkalye doc purge <doc-id>
 Documents can carry attached images and videos, referenced from markdown as `![name](asset:<asset-id>)`.
 
 ```bash
-# Upload an image or video (png, jpg, gif, webp, svg, bmp, mp4, webm, mov)
+# Upload an image or video (png, jpg, gif, webp, mp4, webm, mov)
+# svg and bmp are rejected - convert them first
 alkalye doc asset add <doc-id> --file photo.png --json
 
 # List attached assets (includes the markdown reference for each)
