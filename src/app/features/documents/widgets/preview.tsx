@@ -56,6 +56,7 @@ type Asset = {
 interface PreviewProps {
 	content: string
 	assets?: Asset[]
+	localAssets?: LocalPreviewAsset[]
 	wikilinks: Map<string, ResolvedDoc>
 	onExit?: () => void
 	comments?: PreviewComment[]
@@ -64,6 +65,14 @@ interface PreviewProps {
 	themeOverrideId?: string
 	appearanceOverride?: "light" | "dark"
 	embedded?: boolean
+}
+
+interface LocalPreviewAsset {
+	id: string
+	type: "image" | "video" | "tldraw"
+	url: string
+	lightUrl?: string
+	darkUrl?: string
 }
 
 type PreviewComment = {
@@ -90,6 +99,7 @@ type PreviewTextSelection = {
 function Preview({
 	content,
 	assets,
+	localAssets,
 	wikilinks,
 	onExit,
 	comments = [],
@@ -121,6 +131,7 @@ function Preview({
 		<PreviewContent
 			content={content}
 			assets={assets}
+			localAssets={localAssets}
 			marked={marked}
 			colorScheme={previewAppearance}
 			cacheVersion={wikilinks.size}
@@ -138,10 +149,13 @@ type Segment =
 	| { type: "text"; html: string }
 	| { type: "image"; imageId: string; alt: string }
 	| { type: "video"; asset: Asset; alt: string }
+	| { type: "local-image"; url: string; alt: string }
+	| { type: "local-video"; url: string; alt: string }
 
 function PreviewContent({
 	content,
 	assets,
+	localAssets,
 	marked,
 	colorScheme,
 	cacheVersion,
@@ -154,6 +168,7 @@ function PreviewContent({
 }: {
 	content: string
 	assets?: Asset[]
+	localAssets?: LocalPreviewAsset[]
 	marked: Marked
 	colorScheme: "light" | "dark"
 	cacheVersion: number
@@ -185,7 +200,7 @@ function PreviewContent({
 		let { body } = parseFrontmatter(content)
 		let cancelled = false
 
-		void parseSegments(body, assets, marked, colorScheme)
+		void parseSegments(body, assets, localAssets, marked, colorScheme)
 			.then(result => {
 				if (!cancelled) setSegments(result)
 			})
@@ -194,7 +209,7 @@ function PreviewContent({
 		return () => {
 			cancelled = true
 		}
-	}, [content, assets, marked, cacheVersion, colorScheme])
+	}, [content, assets, localAssets, marked, cacheVersion, colorScheme])
 
 	useEffect(() => {
 		document.title = getDocumentTitle(content)
@@ -490,6 +505,24 @@ function PreviewSegments({ segments }: { segments: Segment[] }) {
 									{segment.alt}
 								</figcaption>
 							)}
+						</figure>
+					)
+				}
+				if (segment.type === "local-image") {
+					return (
+						<figure key={i} className="my-4">
+							<img
+								src={segment.url}
+								alt={segment.alt}
+								className="w-full rounded-lg"
+							/>
+						</figure>
+					)
+				}
+				if (segment.type === "local-video") {
+					return (
+						<figure key={i} className="my-4">
+							<video src={segment.url} controls className="w-full rounded-lg" />
 						</figure>
 					)
 				}
@@ -794,16 +827,21 @@ type RawSegment =
 	| { type: "text"; content: string }
 	| { type: "image"; imageId: string; alt: string }
 	| { type: "video"; asset: Asset; alt: string }
+	| { type: "local-image"; url: string; alt: string }
+	| { type: "local-video"; url: string; alt: string }
 
 async function parseSegments(
 	content: string,
 	assets: Asset[] | undefined,
+	localAssets: LocalPreviewAsset[] | undefined,
 	marked: Marked,
 	colorScheme: "light" | "dark",
 ): Promise<Segment[]> {
 	let rawSegments: RawSegment[] = []
 	let lastIndex = 0
-	let regex = /!\[([^\]]*)\]\(asset:([^)]+)\)/g
+	let regex = localAssets
+		? /!\[([^\]]*)\]\((asset:|(?:\.\/)?assets\/)([^)]+)\)/g
+		: /!\[([^\]]*)\]\((asset:)([^)]+)\)/g
 	let match
 
 	while ((match = regex.exec(content)) !== null) {
@@ -815,10 +853,19 @@ async function parseSegments(
 		}
 
 		let alt = match[1]
-		let assetId = match[2]
+		let assetId = match[3]
+		let local = localAssets?.find(asset => asset.id === assetId)
 		let asset = assets?.find(a => a?.$jazz.id === assetId)
 
-		if (asset?.$isLoaded && asset.type === "image" && asset.image) {
+		if (local?.type === "image") {
+			rawSegments.push({ type: "local-image", url: local.url, alt })
+		} else if (local?.type === "tldraw") {
+			let url = colorScheme === "dark" ? local.darkUrl : local.lightUrl
+			if (url) rawSegments.push({ type: "local-image", url, alt })
+			else rawSegments.push({ type: "text", content: match[0] })
+		} else if (local?.type === "video") {
+			rawSegments.push({ type: "local-video", url: local.url, alt })
+		} else if (asset?.$isLoaded && asset.type === "image" && asset.image) {
 			rawSegments.push({
 				type: "image",
 				imageId: asset.image.$jazz.id,
@@ -865,6 +912,7 @@ async function parseSegments(
 		rawSegments.map(async seg => {
 			if (seg.type === "image") return seg
 			if (seg.type === "video") return seg
+			if (seg.type === "local-image" || seg.type === "local-video") return seg
 			let html = await marked.parse(seg.content)
 			return { type: "text" as const, html }
 		}),

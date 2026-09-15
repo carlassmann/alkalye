@@ -6,6 +6,7 @@ export {
 	removeFileAtPath,
 	writeFileAtPath,
 	basename,
+	readBlobBytes,
 }
 
 interface StoredFile {
@@ -156,8 +157,16 @@ async function readBlobBytes(blob: Blob): Promise<Uint8Array<ArrayBuffer>> {
 		let text = await blob.text()
 		return encodeText(text)
 	}
-
-	throw new Error("Blob cannot be read in this environment")
+	return new Promise((resolve, reject) => {
+		let reader = new FileReader()
+		reader.onload = () => {
+			if (reader.result instanceof ArrayBuffer)
+				resolve(new Uint8Array(reader.result))
+			else reject(new Error("Blob cannot be read in this environment"))
+		}
+		reader.onerror = () => reject(reader.error)
+		reader.readAsArrayBuffer(blob)
+	})
 }
 
 class MockWritableFileStream implements FileSystemWritableFileStream {
@@ -207,7 +216,7 @@ class MockWritableFileStream implements FileSystemWritableFileStream {
 		}
 
 		if (data instanceof Blob) {
-			this.saveContent(await data.text())
+			this.saveContent(decodeBytes(await readBlobBytes(data)))
 			return
 		}
 
@@ -236,7 +245,7 @@ class MockWritableFileStream implements FileSystemWritableFileStream {
 					return
 				}
 				if (nestedData instanceof Blob) {
-					this.saveContent(await nestedData.text())
+					this.saveContent(decodeBytes(await readBlobBytes(nestedData)))
 					return
 				}
 				if (nestedData instanceof ArrayBuffer) {

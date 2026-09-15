@@ -24,11 +24,6 @@ import {
 	ContextMenuTrigger,
 } from "@/app/components/ui/context-menu"
 import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/app/components/ui/tooltip"
-import {
 	Dialog,
 	DialogContent,
 	DialogFooter,
@@ -306,27 +301,19 @@ function SidebarAssets({
 					<T k="assets.title" />
 				</span>
 				<DropdownMenu>
-					<Tooltip>
-						<DropdownMenuTrigger
-							disabled={readOnly}
-							render={
-								<TooltipTrigger
-									render={
-										<button
-											disabled={readOnly}
-											aria-label={t("assets.addAsset")}
-											className="text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent flex size-8 touch-manipulation items-center justify-center rounded disabled:pointer-events-none disabled:opacity-50"
-										>
-											<Plus className="size-4" />
-										</button>
-									}
-								/>
-							}
-						/>
-						<TooltipContent>
-							<T k="assets.addAsset" />
-						</TooltipContent>
-					</Tooltip>
+					<DropdownMenuTrigger
+						nativeButton
+						disabled={readOnly}
+						render={
+							<button
+								disabled={readOnly}
+								aria-label={t("assets.addAsset")}
+								className="text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent flex size-8 touch-manipulation items-center justify-center rounded disabled:pointer-events-none disabled:opacity-50"
+							>
+								<Plus className="size-4" />
+							</button>
+						}
+					/>
 					<DropdownMenuContent align="end">
 						{onCreateTldraw && (
 							<DropdownMenuItem onClick={createTldraw}>
@@ -393,13 +380,33 @@ function SidebarAssets({
 										>
 											<DropdownMenu>
 												<DropdownMenuTrigger
+													nativeButton
 													disabled={readOnly}
 													render={
 														<SidebarMenuButton disabled={readOnly} nativeButton>
 															<div className="bg-muted size-8 shrink-0 overflow-hidden rounded">
-																{asset.type === "image" && asset.imageId ? (
+																{asset.type === "image" && asset.imageUrl ? (
+																	<img
+																		src={asset.imageUrl}
+																		alt=""
+																		className="size-full object-cover"
+																	/>
+																) : asset.type === "image" && asset.imageId ? (
 																	<JazzImage
 																		imageId={asset.imageId}
+																		className="size-full object-cover"
+																	/>
+																) : asset.type === "tldraw" &&
+																  (colorScheme === "dark"
+																		? asset.darkPreviewUrl
+																		: asset.lightPreviewUrl) ? (
+																	<img
+																		src={
+																			colorScheme === "dark"
+																				? asset.darkPreviewUrl
+																				: asset.lightPreviewUrl
+																		}
+																		alt=""
 																		className="size-full object-cover"
 																	/>
 																) : asset.type === "tldraw" &&

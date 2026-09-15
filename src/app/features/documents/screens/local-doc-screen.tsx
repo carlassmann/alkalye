@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import React from "react"
+import type { Extension } from "@codemirror/state"
 import { Link } from "@tanstack/react-router"
 import { useAccount } from "jazz-tools/react"
 import { UserAccount } from "@/schema"
@@ -116,6 +117,28 @@ import {
 	refreshLocalFile,
 } from "@/app/lib/local-file"
 import { CopyToSyncedDialog } from "@/app/features/spaces"
+import {
+	imageExtensions,
+	SidebarAssets,
+	useTldrawEditor,
+	type EditorAsset,
+	type SidebarAsset,
+	loadLocalAssets,
+	writeLocalAsset,
+	writeLocalWhiteboard,
+	readLocalWhiteboard,
+	removeLocalAsset,
+	copyLocalAssetForRename,
+	localEditorContent,
+	localDiskContent,
+	updateLocalAssetReferences,
+	createLocalAssetArchive,
+	isLocalAssetReferencedElsewhere,
+	referencedLocalAssetIds,
+	assertLocalAssetReferencesAvailable,
+	MissingLocalAssetError,
+	type LocalAsset,
+} from "@/app/features/assets"
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -482,6 +505,10 @@ function buildLocalTree(
 	return root
 }
 
+function isAssetDirectoryPath(path: string) {
+	return path.split("/").some(part => part.toLocaleLowerCase() === "assets")
+}
+
 function LocalWorkspaceSelector() {
 	let t = useIntl()
 	let supportsDirectories = typeof window.showDirectoryPicker === "function"
@@ -503,13 +530,14 @@ function LocalWorkspaceSelector() {
 	let files =
 		workspace?.files.filter(
 			file =>
+				!isAssetDirectoryPath(file.path.split("/").slice(0, -1).join("/")) &&
 				(!searching || matches(file.path)) &&
 				(type === "all" ||
 					(file.isPresentation === true) === (type === "presentation")),
 		) ?? []
-	let visibleFolders = searching
-		? (workspace?.folders?.filter(folder => matches(folder)) ?? [])
-		: (workspace?.folders ?? [])
+	let visibleFolders = (workspace?.folders ?? []).filter(
+		folder => !isAssetDirectoryPath(folder) && (!searching || matches(folder)),
+	)
 	let tree = buildLocalTree(files, visibleFolders, sort)
 	let individualFiles = store.files
 		.filter(
@@ -862,8 +890,9 @@ function LocalDirectoryActionDialog({
 	let [pending, setPending] = useState(false)
 	let destinations = ["", ...folders].filter(
 		folder =>
-			action.kind !== "move-folder" ||
-			(folder !== action.path && !folder.startsWith(`${action.path}/`)),
+			!isAssetDirectoryPath(folder) &&
+			(action.kind !== "move-folder" ||
+				(folder !== action.path && !folder.startsWith(`${action.path}/`))),
 	)
 	let title = {
 		"create-file": "New file",
@@ -885,8 +914,12 @@ function LocalDirectoryActionDialog({
 							"File created, but it could not be opened. Refresh the folder.",
 						)
 				} else if (action.kind === "create-folder") {
+					if (isAssetDirectoryPath(name.trim()))
+						throw Error("The assets folder is reserved")
 					await createDirectoryFolder(workspaceId, action.path, name)
 				} else if (action.kind === "rename-folder") {
+					if (isAssetDirectoryPath(name.trim()))
+						throw Error("The assets folder is reserved")
 					let parent = action.path.split("/").slice(0, -1).join("/")
 					await moveDirectoryEntry(
 						workspaceId,
@@ -895,6 +928,26 @@ function LocalDirectoryActionDialog({
 						"folder",
 					)
 				} else {
+					if (action.kind === "move-file") {
+						let sourceFolder = action.path.split("/").slice(0, -1).join("/")
+						if (destination !== sourceFolder) {
+							let file = await readDirectoryFile(workspaceId, action.path)
+							if (!file) throw Error("Unable to read this file")
+							let openFile = useLocalFileStore
+								.getState()
+								.getFileById(`${workspaceId}:${action.path}`)
+							let unsavedContent = openFile
+								? localDiskContent(openFile.content, [])
+								: ""
+							if (
+								referencedLocalAssetIds(file.content).size > 0 ||
+								referencedLocalAssetIds(unsavedContent).size > 0
+							)
+								throw Error(
+									"Files with assets cannot be moved to another folder",
+								)
+						}
+					}
 					let path = [destination, nameFromPath].filter(Boolean).join("/")
 					await moveDirectoryEntry(
 						workspaceId,
@@ -1027,12 +1080,21 @@ function LocalFileContextMenu({
 		content: string
 		filename: string
 	} | null>(null)
+	let [preparedLocation, setPreparedLocation] = useState<
+		Pick<LocalFileEntry, "workspaceId" | "path"> | undefined
+	>()
+	let [preparedAssets, setPreparedAssets] = useState<LocalAsset[] | null>(null)
+	let preparationId = useRef(0)
 	let [renameOpen, setRenameOpen] = useState(false)
 	let [renameName, setRenameName] = useState("")
 	let [renameError, setRenameError] = useState("")
 	let [renaming, setRenaming] = useState(false)
 	let supportsSaveAs =
 		isFileSystemAccessSupported() && !!window.showSaveFilePicker
+	let exportAsZip =
+		!!prepared &&
+		referencedLocalAssetIds(prepared.content).size > 0 &&
+		!!preparedLocation?.workspaceId
 
 	async function readClickedFile() {
 		if (fileId) {
@@ -1044,18 +1106,35 @@ function LocalFileContextMenu({
 	}
 
 	function handleOpenChange(open: boolean) {
+		let request = ++preparationId.current
 		if (!open) return
 		let current = fileId
 			? useLocalFileStore.getState().getFileById(fileId)
 			: workspaceId && path
 				? useLocalFileStore.getState().getFileById(`${workspaceId}:${path}`)
 				: null
+		let location = {
+			workspaceId: current?.workspaceId ?? workspaceId,
+			path: current?.path ?? path,
+		}
+		setPreparedLocation(location)
+		setPreparedAssets(null)
+		if (location.workspaceId && location.path) {
+			void loadLocalAssets(location)
+				.then(assets => {
+					if (request === preparationId.current) setPreparedAssets(assets)
+				})
+				.catch(() => {
+					if (request === preparationId.current) setPreparedAssets([])
+				})
+		}
 		if (current) {
 			setPrepared({ content: current.content, filename: current.filename })
 			return
 		}
 		setPrepared(null)
 		void readClickedFile().then(file => {
+			if (request !== preparationId.current) return
 			setPrepared(file)
 			if (!file) toast.error("Unable to read this file")
 		})
@@ -1067,7 +1146,10 @@ function LocalFileContextMenu({
 			toast.error("Unable to read this file")
 			return
 		}
-		downloadLocalContent(file.content, file.filename)
+		let result = await tryCatch(
+			downloadLocalCopy(file.content, file.filename, preparedLocation),
+		)
+		if (!result.ok) toast.error("Unable to download this file")
 	}
 
 	async function handleSaveAsClicked() {
@@ -1080,7 +1162,17 @@ function LocalFileContextMenu({
 			? { content: current.content, filename: current.filename }
 			: prepared
 		if (!file) return
-		let result = await tryCatch(saveLocalCopy(file.content, file.filename))
+		if (exportAsZip && preparedAssets) {
+			try {
+				assertLocalAssetReferencesAvailable(file.content, preparedAssets)
+			} catch (error) {
+				toast.error(assetErrorMessage(error))
+				return
+			}
+		}
+		let result = await tryCatch(
+			saveLocalCopy(file.content, file.filename, preparedLocation),
+		)
 		if (!result.ok) toast.error("Unable to save a copy of this file")
 	}
 
@@ -1136,11 +1228,11 @@ function LocalFileContextMenu({
 					)}
 					{supportsSaveAs && (
 						<ContextMenuItem
-							disabled={!prepared}
+							disabled={!prepared || (exportAsZip && !preparedAssets)}
 							onClick={() => void handleSaveAsClicked()}
 						>
 							<Download className="size-4" />
-							Save As…
+							{exportAsZip ? "Export as ZIP…" : "Save As…"}
 						</ContextMenuItem>
 					)}
 					<ContextMenuItem onClick={() => void handleDownloadClicked()}>
@@ -1198,7 +1290,58 @@ function LocalFileContextMenu({
 	)
 }
 
-async function saveLocalCopy(content: string, filename: string) {
+async function localCopyArchive(
+	content: string,
+	filename: string,
+	location?: Pick<LocalFileEntry, "workspaceId" | "path">,
+) {
+	if (!location?.workspaceId || !location.path) return null
+	let assets = await loadLocalAssets(location)
+	return createLocalAssetArchive(content, filename, assets)
+}
+
+async function saveLocalCopy(
+	content: string,
+	filename: string,
+	location?: Pick<LocalFileEntry, "workspaceId" | "path">,
+) {
+	let hasAssetLinks =
+		location?.workspaceId &&
+		location.path &&
+		referencedLocalAssetIds(content).size > 0
+	if (hasAssetLinks && window.showSaveFilePicker) {
+		let picked = await tryCatch(
+			window.showSaveFilePicker({
+				suggestedName: `${filename.replace(/\.md$/i, "")}.zip`,
+				types: [
+					{
+						description: "ZIP archive",
+						accept: { "application/zip": [".zip"] },
+					},
+				],
+			}),
+		)
+		if (!picked.ok) {
+			if (picked.error.name === "AbortError") return
+			throw picked.error
+		}
+		let archive = await localCopyArchive(content, filename, location)
+		if (!archive) throw new Error("Unable to bundle local assets")
+		let writable = await picked.value.createWritable()
+		try {
+			await writable.write(archive)
+			await writable.close()
+		} catch (error) {
+			await writable.abort().catch(() => undefined)
+			throw error
+		}
+		return
+	}
+	let archive = await localCopyArchive(content, filename, location)
+	if (archive) {
+		downloadLocalBlob(archive)
+		return
+	}
 	let result = await saveLocalFileAs(content, filename)
 	if (!result) return
 	useLocalFileStore.getState().addFile({
@@ -1213,12 +1356,36 @@ async function saveLocalCopy(content: string, filename: string) {
 	})
 }
 
+async function downloadLocalCopy(
+	content: string,
+	filename: string,
+	location?: Pick<LocalFileEntry, "workspaceId" | "path">,
+) {
+	let archive: File | null
+	try {
+		archive = await localCopyArchive(content, filename, location)
+	} catch (error) {
+		if (!(error instanceof MissingLocalAssetError)) throw error
+		downloadLocalContent(content, filename)
+		toast.warning(`${error.message}. Downloaded Markdown only.`)
+		return
+	}
+	if (archive) downloadLocalBlob(archive)
+	else downloadLocalContent(content, filename)
+}
+
 function downloadLocalContent(content: string, filename: string) {
-	let blob = new Blob([content], { type: "text/markdown;charset=utf-8" })
+	let blob = new File([content], filename, {
+		type: "text/markdown;charset=utf-8",
+	})
+	downloadLocalBlob(blob)
+}
+
+function downloadLocalBlob(blob: File) {
 	let url = URL.createObjectURL(blob)
 	let link = document.createElement("a")
 	link.href = url
-	link.download = filename
+	link.download = blob.name
 	link.click()
 	URL.revokeObjectURL(url)
 }
@@ -1243,6 +1410,101 @@ function LocalEditorContent({
 	let resolvedTheme = useResolvedTheme()
 	let { toggleLeft, toggleRight, isMobile, setRightOpenMobile } = useSidebar()
 	let [copyDialogOpen, setCopyDialogOpen] = useState(false)
+	let [assetVersion, setAssetVersion] = useState(0)
+	let [localAssets, setLocalAssets] = useState<LocalAssetView[]>([])
+	let [loadedAssetLocation, setLoadedAssetLocation] = useState("")
+	let assetsRef = useRef(localAssets)
+	let [localImageExtensions, setLocalImageExtensions] = useState<
+		Extension[] | null
+	>(null)
+	useEffect(() => {
+		assetsRef.current = localAssets
+	}, [localAssets])
+	useEffect(() => {
+		setLocalImageExtensions(
+			imageExtensions({
+				resolver: id => {
+					let asset = assetsRef.current.find(candidate => candidate.id === id)
+					return asset ? { url: `asset:${id}`, type: asset.type } : undefined
+				},
+				onPreview: (url, alt) => editor.current?.showImagePreview(url, alt),
+				getAssets: () =>
+					assetsRef.current.map(asset => ({ id: asset.id, name: asset.name })),
+			}),
+		)
+	}, [editor])
+	let { workspaceId, path } = activeFile
+	let assetLocation = `${workspaceId}:${path}`
+
+	useEffect(() => {
+		let cancelled = false
+		void loadLocalAssets({ workspaceId, path })
+			.then(assets => {
+				let loaded = assets.map(toLocalAssetView)
+				if (cancelled) releaseLocalAssetViews(loaded)
+				else {
+					setLocalAssets(loaded)
+					setLoadedAssetLocation(assetLocation)
+				}
+			})
+			.catch(() => {
+				if (!cancelled) {
+					setLocalAssets([])
+					setLoadedAssetLocation(assetLocation)
+				}
+			})
+		return () => {
+			cancelled = true
+		}
+	}, [workspaceId, path, assetVersion, assetLocation])
+	useEffect(() => () => releaseLocalAssetViews(localAssets), [localAssets])
+	useEffect(() => {
+		function refreshAssets() {
+			if (!document.hidden) setAssetVersion(version => version + 1)
+		}
+		document.addEventListener("visibilitychange", refreshAssets)
+		return () => document.removeEventListener("visibilitychange", refreshAssets)
+	}, [])
+
+	let editorAssets: EditorAsset[] = localAssets.map(asset => ({
+		id: asset.id,
+		name: asset.name,
+		type: asset.type,
+		previewUrl:
+			asset.type === "tldraw"
+				? resolvedTheme === "dark"
+					? asset.darkUrl
+					: asset.lightUrl
+				: asset.url,
+		videoUrl: asset.type === "video" ? asset.url : undefined,
+	}))
+	let sidebarAssets: SidebarAsset[] = localAssets.map(asset => ({
+		id: asset.id,
+		name: asset.name,
+		type: asset.type,
+		imageUrl: asset.type === "image" ? asset.url : undefined,
+		lightPreviewUrl: asset.lightUrl,
+		darkPreviewUrl: asset.darkUrl,
+		getVideoBlob: asset.type === "video" ? () => asset.blob : undefined,
+	}))
+
+	let tldrawEditor = useTldrawEditor({
+		assets: sidebarAssets,
+		readOnly: !activeFile.workspaceId,
+		showPresence: false,
+		loadAsset: async id => readLocalWhiteboard(activeFile, id),
+		createAsset: async (name, save) => {
+			let id = await writeLocalWhiteboard(activeFile, name, save)
+			setAssetVersion(version => version + 1)
+			return { id, name }
+		},
+		updateAsset: async (id, save, expectedLastModified) => {
+			if (expectedLastModified === undefined)
+				throw new Error("Whiteboard is unavailable; reopen it before saving")
+			await writeLocalWhiteboard(activeFile, "", save, id, expectedLastModified)
+			setAssetVersion(version => version + 1)
+		},
+	})
 
 	let me = useAccount(UserAccount, { resolve: meResolve })
 	let editorSettings =
@@ -1251,18 +1513,23 @@ function LocalEditorContent({
 	useEditorSettings(editorSettings)
 
 	let content = activeFile.content
+	let editorContent = localEditorContent(content, localAssets)
 	useEffect(() => {
-		if (editor.current && editor.current.getContent() !== activeFile.content) {
-			editor.current.setExternalContent(activeFile.content)
+		if (editor.current && editor.current.getContent() !== editorContent) {
+			editor.current.setExternalContent(editorContent)
 		}
-	}, [activeFile.content, editor])
+	}, [editorContent, editor])
 	let isDirty = activeFile.hasUnsavedChanges
 	let docTitle = getDocumentTitle(content) || activeFile.filename || "Untitled"
 
 	let documents: { id: string; title: string }[] = []
 
 	function handleChange(newContent: string) {
-		store.setFileContent(activeFile.id, newContent)
+		let originalContent = store.getFileById(activeFile.id)?.content
+		store.setFileContent(
+			activeFile.id,
+			localDiskContent(newContent, localAssets, originalContent),
+		)
 
 		if (saveTimeoutRef.current) {
 			clearTimeout(saveTimeoutRef.current)
@@ -1290,6 +1557,46 @@ function LocalEditorContent({
 		handleChange(readContent())
 	}
 
+	async function handleRenameAsset(id: string, name: string) {
+		let next = await copyLocalAssetForRename(activeFile, id, name)
+		if (next === id) return
+		let updatedContent = updateLocalAssetReferences(content, id, next)
+		store.setFileContent(activeFile.id, updatedContent)
+		let saved = await saveLocalFile(activeFile.id, updatedContent)
+		if (!saved) {
+			let current = useLocalFileStore.getState().getFileById(activeFile.id)
+			if (current?.content === updatedContent) {
+				store.setFileContent(activeFile.id, content)
+				await removeLocalAsset(activeFile, next)
+			}
+			setAssetVersion(version => version + 1)
+			throw new Error("Save the Markdown file before completing the rename")
+		}
+		let latest = useLocalFileStore.getState().getFileById(activeFile.id)
+		if (latest?.content.includes(`assets/${id}`))
+			throw new Error("Old asset is still referenced after saving")
+		if (!(await isLocalAssetReferencedElsewhere(activeFile, id)))
+			await removeLocalAsset(activeFile, id)
+		setAssetVersion(version => version + 1)
+	}
+
+	async function handleDeleteAsset(id: string) {
+		if (await isLocalAssetReferencedElsewhere(activeFile, id))
+			throw new Error("Another Markdown file in this folder uses this asset")
+		let updatedContent = updateLocalAssetReferences(content, id)
+		if (updatedContent !== content) {
+			store.setFileContent(activeFile.id, updatedContent)
+			let saved = await saveLocalFile(activeFile.id, updatedContent)
+			if (!saved)
+				throw new Error("Save the Markdown file before deleting the asset")
+		}
+		let latest = useLocalFileStore.getState().getFileById(activeFile.id)
+		if (latest?.content.includes(`assets/${id}`))
+			throw new Error("Asset is still referenced after saving")
+		await removeLocalAsset(activeFile, id)
+		setAssetVersion(version => version + 1)
+	}
+
 	useEffect(() => {
 		return () => {
 			if (saveTimeoutRef.current) {
@@ -1301,7 +1608,21 @@ function LocalEditorContent({
 	async function handleSaveAs(file: LocalFileEntry) {
 		let filename =
 			file.filename || `${getDocumentTitle(file.content) || "Untitled"}.md`
-		await saveLocalCopy(file.content, filename)
+		if (
+			file.workspaceId &&
+			file.path &&
+			loadedAssetLocation === `${file.workspaceId}:${file.path}`
+		) {
+			assertLocalAssetReferencesAvailable(file.content, localAssets)
+		}
+		await saveLocalCopy(file.content, filename, file)
+	}
+
+	async function handleSaveAsActiveFile() {
+		let currentFile = useLocalFileStore.getState().getActiveFile()
+		if (!currentFile) return
+		let result = await tryCatch(handleSaveAs(currentFile))
+		if (!result.ok) toast.error(assetErrorMessage(result.error))
 	}
 
 	let handlersRef = useRef({
@@ -1310,11 +1631,7 @@ function LocalEditorContent({
 			if (!currentFile) return
 			await saveCurrentFile(currentFile.id, t)
 		},
-		handleSaveAs: async () => {
-			let currentFile = useLocalFileStore.getState().getActiveFile()
-			if (!currentFile) return
-			await handleSaveAs(currentFile)
-		},
+		handleSaveAs: handleSaveAsActiveFile,
 		toggleLeft,
 		toggleRight,
 		togglePreview: () => setIsPreview(!isPreview),
@@ -1324,7 +1641,7 @@ function LocalEditorContent({
 	useEffect(() => {
 		handlersRef.current = {
 			handleSave: handlersRef.current.handleSave,
-			handleSaveAs: handlersRef.current.handleSaveAs,
+			handleSaveAs: handleSaveAsActiveFile,
 			toggleLeft,
 			toggleRight,
 			togglePreview: () => setIsPreview(!isPreview),
@@ -1417,7 +1734,9 @@ function LocalEditorContent({
 	function handleDownload(file: LocalFileEntry) {
 		let title = getDocumentTitle(file.content) || "Untitled"
 		let filename = file.filename || title + ".md"
-		downloadLocalContent(file.content, filename)
+		void downloadLocalCopy(file.content, filename, file).catch(error =>
+			toast.error(assetErrorMessage(error)),
+		)
 	}
 
 	if (isPreview) {
@@ -1426,6 +1745,7 @@ function LocalEditorContent({
 				filename={activeFile.filename}
 				docTitle={docTitle}
 				content={content}
+				assets={localAssets}
 				wikilinks={new Map<string, ResolvedDoc>()}
 				theme={resolvedTheme}
 				setTheme={setTheme}
@@ -1513,23 +1833,55 @@ function LocalEditorContent({
 						</Button>
 					</div>
 				)}
-				<MarkdownEditor
-					key={activeFile.id}
-					ref={editor}
-					value={content}
-					onChange={handleEditorChange}
-					placeholder={t("doc.startWriting")}
-					documents={documents}
-					autoSortTasks={editorSettings?.editor?.autoSortTasks}
-					spellcheck={editorSettings?.editor?.spellcheck ?? true}
-					spellcheckLanguage={editorSettings?.editor?.spellcheckLanguage}
-					smartPairs={editorSettings?.editor?.smartPairs ?? true}
-					markerWrapping={editorSettings?.editor?.markerWrapping ?? true}
-					tabIndent={editorSettings?.editor?.tabIndent ?? true}
-					smartPaste={editorSettings?.editor?.smartPaste ?? true}
-					autocomplete={editorSettings?.editor?.autocomplete ?? true}
-					extensions={[...presentationExtensions()]}
-				/>
+				{localImageExtensions && (
+					<MarkdownEditor
+						key={activeFile.id}
+						ref={editor}
+						value={editorContent}
+						onChange={handleEditorChange}
+						assets={editorAssets}
+						onUploadImage={
+							activeFile.workspaceId
+								? async file => {
+										let id = await writeLocalAsset(activeFile, file, file.name)
+										setAssetVersion(version => version + 1)
+										return { id, name: file.name.replace(/\.[^.]+$/, "") }
+									}
+								: undefined
+						}
+						onUploadVideo={
+							activeFile.workspaceId
+								? async (file, options) => {
+										options.onProgress({ phase: "uploading", progress: 0 })
+										let id = await writeLocalAsset(activeFile, file, file.name)
+										options.onProgress({ phase: "done", progress: 1 })
+										setAssetVersion(version => version + 1)
+										return { id, name: file.name.replace(/\.[^.]+$/, "") }
+									}
+								: undefined
+						}
+						onImportTldraw={
+							activeFile.workspaceId ? tldrawEditor.importFile : undefined
+						}
+						onCreateTldraw={
+							activeFile.workspaceId ? tldrawEditor.create : undefined
+						}
+						onEditTldraw={
+							activeFile.workspaceId ? tldrawEditor.edit : undefined
+						}
+						placeholder={t("doc.startWriting")}
+						documents={documents}
+						autoSortTasks={editorSettings?.editor?.autoSortTasks}
+						spellcheck={editorSettings?.editor?.spellcheck ?? true}
+						spellcheckLanguage={editorSettings?.editor?.spellcheckLanguage}
+						smartPairs={editorSettings?.editor?.smartPairs ?? true}
+						markerWrapping={editorSettings?.editor?.markerWrapping ?? true}
+						tabIndent={editorSettings?.editor?.tabIndent ?? true}
+						smartPaste={editorSettings?.editor?.smartPaste ?? true}
+						autocomplete={editorSettings?.editor?.autocomplete ?? true}
+						extensions={[...localImageExtensions, ...presentationExtensions()]}
+					/>
+				)}
 				<EditorToolbar
 					editor={editor}
 					onToggleLeftSidebar={toggleLeft}
@@ -1582,6 +1934,10 @@ function LocalEditorContent({
 								onSaveAs={() => void handlersRef.current.handleSaveAs()}
 								onDownload={() => handleDownload(activeFile)}
 								onCopyToSynced={() => setCopyDialogOpen(true)}
+								exportAsZip={
+									!!activeFile.workspaceId &&
+									referencedLocalAssetIds(content).size > 0
+								}
 								isMobile={isMobile}
 							/>
 							<SidebarEditMenu
@@ -1606,9 +1962,57 @@ function LocalEditorContent({
 						<LocalFileSaveStatus activeFile={activeFile} />
 					</SidebarGroupContent>
 				</SidebarGroup>
+				{activeFile.workspaceId && (
+					<SidebarGroup className="flex-1">
+						<SidebarAssets
+							assets={sidebarAssets}
+							onUploadImages={files => {
+								void Promise.all(
+									Array.from(files)
+										.filter(file => file.type.startsWith("image/"))
+										.map(file => writeLocalAsset(activeFile, file, file.name)),
+								)
+									.then(() => setAssetVersion(version => version + 1))
+									.catch(error => toast.error(assetErrorMessage(error)))
+							}}
+							onUploadVideo={async (file, options) => {
+								if (options.signal.aborted) return
+								options.onProgress({ phase: "uploading", progress: 0 })
+								await writeLocalAsset(activeFile, file, file.name)
+								setAssetVersion(version => version + 1)
+								if (!options.signal.aborted)
+									options.onProgress({ phase: "done", progress: 1 })
+							}}
+							canUploadVideo
+							onRename={(id, name) => {
+								void handleRenameAsset(id, name).catch(error =>
+									toast.error(assetErrorMessage(error)),
+								)
+							}}
+							onDelete={id => {
+								void handleDeleteAsset(id).catch(error =>
+									toast.error(assetErrorMessage(error)),
+								)
+							}}
+							onDownload={id => {
+								let asset = localAssets.find(candidate => candidate.id === id)
+								if (asset) downloadLocalAsset(asset)
+							}}
+							onInsert={(id, name) =>
+								editor.current?.insertBlock(`![${name}](asset:${id})`)
+							}
+							isAssetUsed={id => content.includes(`assets/${id}`)}
+							onImportTldraw={tldrawEditor.importFile}
+							onCreateTldraw={tldrawEditor.create}
+							onEditTldraw={tldrawEditor.edit}
+						/>
+					</SidebarGroup>
+				)}
 			</DocumentSidebar>
+			{tldrawEditor.dialog}
 			<CopyToSyncedDialog
 				content={content}
+				localAssets={localAssets}
 				filename={activeFile.filename}
 				open={copyDialogOpen}
 				onOpenChange={setCopyDialogOpen}
@@ -1617,10 +2021,49 @@ function LocalEditorContent({
 	)
 }
 
+function assetErrorMessage(error: unknown) {
+	return error instanceof Error ? error.message : String(error)
+}
+
+interface LocalAssetView extends LocalAsset {
+	url: string
+	lightUrl?: string
+	darkUrl?: string
+}
+
+function toLocalAssetView(asset: LocalAsset): LocalAssetView {
+	return {
+		...asset,
+		url: URL.createObjectURL(asset.blob),
+		lightUrl: asset.lightPreview
+			? URL.createObjectURL(asset.lightPreview)
+			: undefined,
+		darkUrl: asset.darkPreview
+			? URL.createObjectURL(asset.darkPreview)
+			: undefined,
+	}
+}
+
+function releaseLocalAssetViews(assets: LocalAssetView[]) {
+	for (let asset of assets) {
+		URL.revokeObjectURL(asset.url)
+		if (asset.lightUrl) URL.revokeObjectURL(asset.lightUrl)
+		if (asset.darkUrl) URL.revokeObjectURL(asset.darkUrl)
+	}
+}
+
+function downloadLocalAsset(asset: LocalAssetView) {
+	let link = document.createElement("a")
+	link.href = asset.url
+	link.download = asset.id
+	link.click()
+}
+
 function LocalPreviewView({
 	filename,
 	docTitle,
 	content,
+	assets,
 	wikilinks,
 	theme,
 	setTheme,
@@ -1629,6 +2072,7 @@ function LocalPreviewView({
 	filename: string | null
 	docTitle: string
 	content: string
+	assets: LocalAssetView[]
 	wikilinks: Map<string, ResolvedDoc>
 	theme: Theme
 	setTheme: (theme: Theme) => void
@@ -1643,7 +2087,7 @@ function LocalPreviewView({
 				setTheme={setTheme}
 				onExit={onExit}
 			/>
-			<Preview content={content} wikilinks={wikilinks} />
+			<Preview content={content} localAssets={assets} wikilinks={wikilinks} />
 		</div>
 	)
 }
@@ -1775,12 +2219,14 @@ function LocalFileMenu({
 	onSaveAs,
 	onDownload,
 	onCopyToSynced,
+	exportAsZip,
 	isMobile,
 }: {
 	onOpen: () => void
 	onSaveAs: () => void
 	onDownload: () => void
 	onCopyToSynced: () => void
+	exportAsZip: boolean
 	isMobile: boolean
 }) {
 	let supportsFileSystem = isFileSystemAccessSupported()
@@ -1808,7 +2254,7 @@ function LocalFileMenu({
 					{supportsFileSystem && (
 						<DropdownMenuItem onClick={onSaveAs}>
 							<Check className="size-4" />
-							Save As...
+							{exportAsZip ? "Export as ZIP..." : "Save As..."}
 							<DropdownMenuShortcut>
 								{getShortcutLabel("saveAs")}
 							</DropdownMenuShortcut>

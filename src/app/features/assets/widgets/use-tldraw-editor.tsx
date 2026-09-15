@@ -17,6 +17,7 @@ interface TldrawEditorState {
 	assetId?: string
 	name: string
 	initialJson?: string
+	expectedLastModified?: number
 	mode: "create" | "edit" | "import"
 	onCreated?: (asset: CreatedTldrawAsset) => void
 }
@@ -25,7 +26,15 @@ interface TldrawEditorOptions {
 	assets: SidebarAsset[]
 	readOnly: boolean
 	createAsset: (name: string, save: TldrawSave) => Promise<CreatedTldrawAsset>
-	updateAsset: (assetId: string, save: TldrawSave) => Promise<void>
+	updateAsset: (
+		assetId: string,
+		save: TldrawSave,
+		expectedLastModified?: number,
+	) => Promise<void>
+	loadAsset?: (
+		assetId: string,
+	) => Promise<{ json: string; lastModified: number }>
+	showPresence?: boolean
 }
 
 interface TldrawEditorController {
@@ -40,6 +49,8 @@ function useTldrawEditor({
 	readOnly,
 	createAsset,
 	updateAsset,
+	loadAsset,
+	showPresence = true,
 }: TldrawEditorOptions): TldrawEditorController {
 	let t = useIntl()
 	let [editor, setEditor] = useState<TldrawEditorState | null>(null)
@@ -89,6 +100,21 @@ function useTldrawEditor({
 
 	async function openAsset(assetId: string) {
 		let asset = assets.find(candidate => candidate.id === assetId)
+		if (asset?.type === "tldraw" && loadAsset) {
+			try {
+				let loaded = await loadAsset(assetId)
+				setEditor({
+					assetId,
+					name: asset.name,
+					initialJson: loaded.json,
+					expectedLastModified: loaded.lastModified,
+					mode: "edit",
+				})
+			} catch (error) {
+				toast.error(String(error))
+			}
+			return
+		}
 		if (asset?.type !== "tldraw" || !asset.tldrawRevisionId) return
 		let revision = await TldrawRevision.load(asset.tldrawRevisionId, {
 			resolve: { snapshot: true },
@@ -110,6 +136,7 @@ function useTldrawEditor({
 		<TldrawEditorDialog
 			open={true}
 			assetId={editor.assetId}
+			showPresence={showPresence}
 			name={editor.name}
 			initialJson={editor.initialJson}
 			mode={editor.mode}
@@ -118,7 +145,7 @@ function useTldrawEditor({
 			}}
 			onSave={async save => {
 				if (editor.assetId) {
-					await updateAsset(editor.assetId, save)
+					await updateAsset(editor.assetId, save, editor.expectedLastModified)
 					return
 				}
 				let created = await createAsset(editor.name, save)

@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useForm } from "@tanstack/react-form"
 import { toast } from "sonner"
-import { co } from "jazz-tools"
+import { co, Group } from "jazz-tools"
 import { useAccount } from "jazz-tools/react"
 import { User, Plus, Copy } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
@@ -33,6 +33,12 @@ import {
 } from "@/schema"
 import { getSpaceGroup } from "../lib/spaces"
 import { createDocumentMetadata } from "@/app/features/documents"
+import {
+	prepareLocalAssetCopy,
+	attachLocalAssetCopy,
+	assertLocalAssetReferencesAvailable,
+	type LocalAsset,
+} from "@/app/features/assets"
 
 export { CopyToSyncedDialog }
 export type { CopyToSyncedDialogProps }
@@ -52,6 +58,7 @@ type SpaceOption = {
 
 interface CopyToSyncedDialogProps {
 	content: string
+	localAssets?: LocalAsset[]
 	filename: string | null
 	open: boolean
 	onOpenChange: (open: boolean) => void
@@ -60,6 +67,7 @@ interface CopyToSyncedDialogProps {
 
 function CopyToSyncedDialog({
 	content,
+	localAssets = [],
 	filename,
 	open,
 	onOpenChange,
@@ -79,7 +87,15 @@ function CopyToSyncedDialog({
 		let space = createSpace(newSpaceName, me.root)
 		if (!space.documents?.$isLoaded) return false
 
-		let newDoc = createSpaceDocument(space.$jazz.owner, space.$jazz.id, content)
+		let newDoc = createSpaceDocument(space.$jazz.owner, space.$jazz.id, "")
+		let copy = await prepareLocalAssetCopy(
+			content,
+			localAssets,
+			newDoc.$jazz.owner,
+		)
+		newDoc.content.$jazz.applyDiff(copy.content)
+		newDoc.$jazz.applyDiff(createDocumentMetadata(copy.content, new Date()))
+		attachLocalAssetCopy(newDoc, copy.assets, newDoc.$jazz.owner)
 		space.documents.$jazz.push(newDoc)
 
 		onCopy?.({ id: space.$jazz.id, name: newSpaceName })
@@ -95,16 +111,19 @@ function CopyToSyncedDialog({
 		if (!me?.$isLoaded) return false
 
 		let now = new Date()
+		let owner = Group.create()
+		let copy = await prepareLocalAssetCopy(content, localAssets, owner)
 		let newDoc = Document.create(
 			{
 				version: 1,
-				content: co.plainText().create(content, me.$jazz.owner),
-				...createDocumentMetadata(content, now),
+				content: co.plainText().create(copy.content, owner),
+				...createDocumentMetadata(copy.content, now),
 				createdAt: now,
 				updatedAt: now,
 			},
-			me.$jazz.owner,
+			owner,
 		)
+		attachLocalAssetCopy(newDoc, copy.assets, owner)
 
 		let docs = me.root.documents
 		if (!docs) {
@@ -128,7 +147,15 @@ function CopyToSyncedDialog({
 		let space = spaces.find(s => s.$jazz.id === spaceId)
 		if (!space?.documents?.$isLoaded) return false
 
-		let newDoc = createSpaceDocument(space.$jazz.owner, space.$jazz.id, content)
+		let newDoc = createSpaceDocument(space.$jazz.owner, space.$jazz.id, "")
+		let copy = await prepareLocalAssetCopy(
+			content,
+			localAssets,
+			newDoc.$jazz.owner,
+		)
+		newDoc.content.$jazz.applyDiff(copy.content)
+		newDoc.$jazz.applyDiff(createDocumentMetadata(copy.content, new Date()))
+		attachLocalAssetCopy(newDoc, copy.assets, newDoc.$jazz.owner)
 		space.documents.$jazz.push(newDoc)
 
 		onCopy?.({ id: space.$jazz.id, name: space.name })
@@ -153,6 +180,7 @@ function CopyToSyncedDialog({
 			let newSpaceName = value.newSpaceName.trim()
 
 			try {
+				assertLocalAssetReferencesAvailable(content, localAssets)
 				let success: boolean
 				if (destination === "__new__") {
 					success = await copyToNewSpace(newSpaceName)
@@ -319,8 +347,6 @@ function CopyToSyncedDialog({
 		</Dialog>
 	)
 }
-
-// --- Helpers ---
 
 type LoadedSpaceWithAvatar = NonNullable<
 	NonNullable<LoadedSpaces["root"]["spaces"]>[number]
