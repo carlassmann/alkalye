@@ -45,6 +45,7 @@ import {
 	buildSpacePublicLink,
 } from "@/app/features/sharing"
 import { setDocumentTitle } from "@/cli/document-title"
+import { docAssetCommand } from "@/cli/assets"
 import { docCommentCommand } from "@/cli/doc-comments"
 import { themeCommand } from "@/cli/themes"
 import { CliUsageError, PermissionError } from "@/cli/errors"
@@ -779,6 +780,7 @@ let docCommand = Command.make("doc").pipe(
 		docPurge,
 		docLeave,
 		docCommentCommand,
+		docAssetCommand,
 		docShareCommand,
 		docPublicCommand,
 	]),

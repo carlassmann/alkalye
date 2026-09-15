@@ -49,6 +49,7 @@ export {
 	readSecretInput,
 	inspectInvite,
 	getOptionString,
+	withTimeout,
 }
 export type { JazzContext, LoadedAccount, LoadedCliDocument }
 
@@ -83,7 +84,7 @@ function runCommand<A extends GlobalArgs>(
 	return Effect.tryPromise({
 		try: async () => {
 			let config = await resolveFlags(args)
-			let data = await handler(config)
+			let data = await withLibraryLogsOnStderr(() => handler(config))
 			if (!config.quiet && data !== undefined) {
 				printData({
 					json: config.json,
@@ -536,6 +537,25 @@ async function waitForTargetSync(
 				`Remote sync timed out for target ${label} ${value.$jazz.id} ` +
 				`after ${options.timeoutMs}ms. Pass --offline, --local, or --stale-ok to use cached data.`,
 		})
+	}
+}
+
+// jazz reports upload progress on console.debug, and stdout carries command output only
+async function withLibraryLogsOnStderr<T>(run: () => Promise<T>): Promise<T> {
+	let stdoutLoggers = {
+		log: console.log,
+		debug: console.debug,
+		info: console.info,
+	}
+	Object.assign(console, {
+		log: console.error,
+		debug: console.error,
+		info: console.error,
+	})
+	try {
+		return await run()
+	} finally {
+		Object.assign(console, stdoutLoggers)
 	}
 }
 

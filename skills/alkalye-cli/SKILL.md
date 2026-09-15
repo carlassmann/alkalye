@@ -156,6 +156,24 @@ alkalye doc restore <doc-id>
 alkalye doc purge <doc-id>
 ```
 
+### Assets
+
+Documents can carry attached images and videos, referenced from markdown as `![name](asset:<asset-id>)`.
+
+```bash
+# Upload an image or video (png, jpg, gif, webp, mp4, webm, mov)
+# svg and bmp are rejected - convert them first
+alkalye doc asset add <doc-id> --file photo.png --json
+
+# List attached assets (includes the markdown reference for each)
+alkalye doc asset list <doc-id> --json
+
+# Remove an asset and strip its markdown references
+alkalye doc asset remove <doc-id> <asset-id>
+```
+
+Embed an uploaded asset by inserting its `reference` into the document content with `doc update`. Tldraw (whiteboard) assets are not supported by the CLI yet — create them in the editor.
+
 ## Spaces
 
 Spaces are shared containers for documents with role-based membership.

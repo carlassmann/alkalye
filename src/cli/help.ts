@@ -6,6 +6,7 @@ let descriptions = {
 	doc: "Personal and shared document workflows.",
 	theme: "Create and manage document and slideshow themes.",
 	docComment: "Document comments.",
+	docAsset: "Document attachments (images and videos).",
 	docShare: "Document sharing.",
 	docPublic: "Document public access.",
 	space: "Shared spaces and membership.",
@@ -120,6 +121,7 @@ let groups: Record<string, GroupDef> = {
 				heading: "Groups",
 				items: [
 					["comment", "Inline document comments"],
+					["asset", "Images and videos attached to a document"],
 					["share", "Invite and role management"],
 					["public", "Public/private access controls"],
 				],
@@ -140,6 +142,19 @@ let groups: Record<string, GroupDef> = {
 					["delete", "Delete a comment thread"],
 					["enable", "Enable comments for a document"],
 					["disable", "Disable comments for a document"],
+				],
+			},
+		],
+	},
+	"doc asset": {
+		description: descriptions.docAsset,
+		sections: [
+			{
+				heading: "Commands",
+				items: [
+					["add", "Upload an image or video from a file"],
+					["list", "List document attachments"],
+					["remove", "Remove an attachment and its references"],
 				],
 			},
 		],
@@ -429,6 +444,28 @@ let leaves: Record<string, LeafDef> = {
 	"doc leave": {
 		summary: "Leave a shared personal document.",
 		usage: "alkalye doc leave <doc-id>",
+	},
+	"doc asset add": {
+		summary: "Upload an image or video file and attach it to the document.",
+		usage: "alkalye doc asset add <doc-id> --file <path> [--name <name>]",
+		options: [
+			"--file <path>     Image or video file to upload (png, jpg, gif, webp, mp4, webm, mov)",
+			"--name <name>     Asset display name (defaults to file name without extension)",
+		],
+		examples: [
+			"alkalye doc asset add co_xyz --file photo.png --json",
+			'alkalye doc asset add co_xyz --file clip.mp4 --name "Intro clip"',
+		],
+	},
+	"doc asset list": {
+		summary: "List assets attached to a document.",
+		usage: "alkalye doc asset list <doc-id>",
+		examples: ["alkalye doc asset list co_xyz --json"],
+	},
+	"doc asset remove": {
+		summary:
+			"Remove an asset from a document and strip its references from content.",
+		usage: "alkalye doc asset remove <doc-id> <asset-id>",
 	},
 	"doc comment list": {
 		summary: "List document comments.",
