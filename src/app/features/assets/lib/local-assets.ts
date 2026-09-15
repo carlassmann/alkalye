@@ -45,6 +45,7 @@ interface LocalAsset {
 }
 
 type LocalAssetLocation = Pick<LocalFileEntry, "workspaceId" | "path">
+let assetWriteQueues = new Map<string, Promise<void>>()
 
 function localEditorContent(content: string, assets: LocalAsset[]) {
 	let files = new Map(assets.map(asset => [asset.id, asset.id]))
@@ -148,6 +149,16 @@ async function writeLocalAsset(
 	blob: Blob,
 	fileName: string,
 ) {
+	return queueLocalAssetWrite(file, function write() {
+		return writeLocalAssetUnqueued(file, blob, fileName)
+	})
+}
+
+async function writeLocalAssetUnqueued(
+	file: LocalAssetLocation,
+	blob: Blob,
+	fileName: string,
+) {
 	let directory = await getAssetsDirectory(file, true)
 	if (!directory)
 		throw new Error("Open this file from a local folder to add assets")
@@ -182,6 +193,17 @@ async function writeLocalWhiteboard(
 	let bundle = await createTldrawBackupBundleFromSave(save)
 	if (!assetId)
 		return writeLocalAsset(file, bundle, `${name}${TLDRAW_BACKUP_EXTENSION}`)
+	return queueLocalAssetWrite(file, async function write() {
+		return updateLocalWhiteboard(file, bundle, assetId, expectedLastModified)
+	})
+}
+
+async function updateLocalWhiteboard(
+	file: LocalAssetLocation,
+	bundle: Blob,
+	assetId: string,
+	expectedLastModified?: number,
+) {
 	let directory = await getAssetsDirectory(file)
 	if (!directory) throw new Error("Whiteboard asset is unavailable")
 	let handle = await directory.getFileHandle(assetId)
@@ -207,9 +229,11 @@ async function readLocalWhiteboard(file: LocalAssetLocation, assetId: string) {
 }
 
 async function removeLocalAsset(file: LocalAssetLocation, assetId: string) {
-	let directory = await getAssetsDirectory(file)
-	if (!directory) throw new Error("Asset is unavailable")
-	await directory.removeEntry(assetId)
+	return queueLocalAssetWrite(file, async function remove() {
+		let directory = await getAssetsDirectory(file)
+		if (!directory) throw new Error("Asset is unavailable")
+		await directory.removeEntry(assetId)
+	})
 }
 
 async function isLocalAssetReferencedElsewhere(
@@ -230,6 +254,16 @@ async function isLocalAssetReferencedElsewhere(
 }
 
 async function copyLocalAssetForRename(
+	file: LocalAssetLocation,
+	assetId: string,
+	newName: string,
+) {
+	return queueLocalAssetWrite(file, function copy() {
+		return copyLocalAssetForRenameUnqueued(file, assetId, newName)
+	})
+}
+
+async function copyLocalAssetForRenameUnqueued(
 	file: LocalAssetLocation,
 	assetId: string,
 	newName: string,
@@ -255,6 +289,28 @@ async function copyLocalAssetForRename(
 		throw error
 	}
 	return name
+}
+
+async function queueLocalAssetWrite<Result>(
+	file: LocalAssetLocation,
+	write: () => Promise<Result>,
+) {
+	let directory = file.path?.split("/").slice(0, -1).join("/") ?? ""
+	let key = `${file.workspaceId}:${directory}`
+	let previous = assetWriteQueues.get(key) ?? Promise.resolve()
+	let release: () => void = () => undefined
+	let active = new Promise<void>(resolve => {
+		release = resolve
+	})
+	let queued = previous.then(() => active)
+	assetWriteQueues.set(key, queued)
+	await previous
+	try {
+		return await write()
+	} finally {
+		release()
+		if (assetWriteQueues.get(key) === queued) assetWriteQueues.delete(key)
+	}
 }
 
 async function getAssetsDirectory(file: LocalAssetLocation, create = false) {

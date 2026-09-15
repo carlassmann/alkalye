@@ -758,6 +758,13 @@ function LocalFileContextMenu({
 	} | null>(null)
 	let supportsSaveAs =
 		isFileSystemAccessSupported() && !!window.showSaveFilePicker
+	let exportAsZip =
+		!!prepared &&
+		referencedLocalAssetIds(prepared.content).size > 0 &&
+		!!(
+			workspaceId ||
+			(fileId && useLocalFileStore.getState().getFileById(fileId)?.workspaceId)
+		)
 
 	async function readClickedFile() {
 		if (fileId) {
@@ -837,7 +844,7 @@ function LocalFileContextMenu({
 						onClick={() => void handleSaveAsClicked()}
 					>
 						<Download className="size-4" />
-						Save As…
+						{exportAsZip ? "Export as ZIP…" : "Save As…"}
 					</ContextMenuItem>
 				)}
 				<ContextMenuItem onClick={() => void handleDownloadClicked()}>
@@ -975,9 +982,9 @@ function LocalEditorContent({
 	let [assetVersion, setAssetVersion] = useState(0)
 	let [localAssets, setLocalAssets] = useState<LocalAssetView[]>([])
 	let assetsRef = useRef(localAssets)
-	let [localImageExtensions, setLocalImageExtensions] = useState<Extension[]>(
-		[],
-	)
+	let [localImageExtensions, setLocalImageExtensions] = useState<
+		Extension[] | null
+	>(null)
 	useEffect(() => {
 		assetsRef.current = localAssets
 	}, [localAssets])
@@ -998,10 +1005,9 @@ function LocalEditorContent({
 
 	useEffect(() => {
 		let cancelled = false
-		let loaded: LocalAssetView[] = []
 		void loadLocalAssets({ workspaceId, path })
 			.then(assets => {
-				loaded = assets.map(toLocalAssetView)
+				let loaded = assets.map(toLocalAssetView)
 				if (cancelled) releaseLocalAssetViews(loaded)
 				else setLocalAssets(loaded)
 			})
@@ -1010,9 +1016,9 @@ function LocalEditorContent({
 			})
 		return () => {
 			cancelled = true
-			releaseLocalAssetViews(loaded)
 		}
 	}, [workspaceId, path, assetVersion])
+	useEffect(() => () => releaseLocalAssetViews(localAssets), [localAssets])
 	useEffect(() => {
 		function refreshAssets() {
 			if (!document.hidden) setAssetVersion(version => version + 1)
@@ -1171,7 +1177,8 @@ function LocalEditorContent({
 		handleSaveAs: async () => {
 			let currentFile = useLocalFileStore.getState().getActiveFile()
 			if (!currentFile) return
-			await handleSaveAs(currentFile)
+			let result = await tryCatch(handleSaveAs(currentFile))
+			if (!result.ok) toast.error("Unable to save a copy of this file")
 		},
 		toggleLeft,
 		toggleRight,
@@ -1374,51 +1381,55 @@ function LocalEditorContent({
 						</Button>
 					</div>
 				)}
-				<MarkdownEditor
-					key={`${activeFile.id}:${localImageExtensions.length}`}
-					ref={editor}
-					value={editorContent}
-					onChange={handleEditorChange}
-					assets={editorAssets}
-					onUploadImage={
-						activeFile.workspaceId
-							? async file => {
-									let id = await writeLocalAsset(activeFile, file, file.name)
-									setAssetVersion(version => version + 1)
-									return { id, name: file.name.replace(/\.[^.]+$/, "") }
-								}
-							: undefined
-					}
-					onUploadVideo={
-						activeFile.workspaceId
-							? async (file, options) => {
-									options.onProgress({ phase: "uploading", progress: 0 })
-									let id = await writeLocalAsset(activeFile, file, file.name)
-									options.onProgress({ phase: "done", progress: 1 })
-									setAssetVersion(version => version + 1)
-									return { id, name: file.name.replace(/\.[^.]+$/, "") }
-								}
-							: undefined
-					}
-					onImportTldraw={
-						activeFile.workspaceId ? tldrawEditor.importFile : undefined
-					}
-					onCreateTldraw={
-						activeFile.workspaceId ? tldrawEditor.create : undefined
-					}
-					onEditTldraw={activeFile.workspaceId ? tldrawEditor.edit : undefined}
-					placeholder={t("doc.startWriting")}
-					documents={documents}
-					autoSortTasks={editorSettings?.editor?.autoSortTasks}
-					spellcheck={editorSettings?.editor?.spellcheck ?? true}
-					spellcheckLanguage={editorSettings?.editor?.spellcheckLanguage}
-					smartPairs={editorSettings?.editor?.smartPairs ?? true}
-					markerWrapping={editorSettings?.editor?.markerWrapping ?? true}
-					tabIndent={editorSettings?.editor?.tabIndent ?? true}
-					smartPaste={editorSettings?.editor?.smartPaste ?? true}
-					autocomplete={editorSettings?.editor?.autocomplete ?? true}
-					extensions={[...localImageExtensions, ...presentationExtensions()]}
-				/>
+				{localImageExtensions && (
+					<MarkdownEditor
+						key={activeFile.id}
+						ref={editor}
+						value={editorContent}
+						onChange={handleEditorChange}
+						assets={editorAssets}
+						onUploadImage={
+							activeFile.workspaceId
+								? async file => {
+										let id = await writeLocalAsset(activeFile, file, file.name)
+										setAssetVersion(version => version + 1)
+										return { id, name: file.name.replace(/\.[^.]+$/, "") }
+									}
+								: undefined
+						}
+						onUploadVideo={
+							activeFile.workspaceId
+								? async (file, options) => {
+										options.onProgress({ phase: "uploading", progress: 0 })
+										let id = await writeLocalAsset(activeFile, file, file.name)
+										options.onProgress({ phase: "done", progress: 1 })
+										setAssetVersion(version => version + 1)
+										return { id, name: file.name.replace(/\.[^.]+$/, "") }
+									}
+								: undefined
+						}
+						onImportTldraw={
+							activeFile.workspaceId ? tldrawEditor.importFile : undefined
+						}
+						onCreateTldraw={
+							activeFile.workspaceId ? tldrawEditor.create : undefined
+						}
+						onEditTldraw={
+							activeFile.workspaceId ? tldrawEditor.edit : undefined
+						}
+						placeholder={t("doc.startWriting")}
+						documents={documents}
+						autoSortTasks={editorSettings?.editor?.autoSortTasks}
+						spellcheck={editorSettings?.editor?.spellcheck ?? true}
+						spellcheckLanguage={editorSettings?.editor?.spellcheckLanguage}
+						smartPairs={editorSettings?.editor?.smartPairs ?? true}
+						markerWrapping={editorSettings?.editor?.markerWrapping ?? true}
+						tabIndent={editorSettings?.editor?.tabIndent ?? true}
+						smartPaste={editorSettings?.editor?.smartPaste ?? true}
+						autocomplete={editorSettings?.editor?.autocomplete ?? true}
+						extensions={[...localImageExtensions, ...presentationExtensions()]}
+					/>
+				)}
 				<EditorToolbar
 					editor={editor}
 					onToggleLeftSidebar={toggleLeft}
@@ -1471,6 +1482,10 @@ function LocalEditorContent({
 								onSaveAs={() => void handlersRef.current.handleSaveAs()}
 								onDownload={() => handleDownload(activeFile)}
 								onCopyToSynced={() => setCopyDialogOpen(true)}
+								exportAsZip={
+									!!activeFile.workspaceId &&
+									referencedLocalAssetIds(content).size > 0
+								}
 								isMobile={isMobile}
 							/>
 							<SidebarEditMenu
@@ -1748,12 +1763,14 @@ function LocalFileMenu({
 	onSaveAs,
 	onDownload,
 	onCopyToSynced,
+	exportAsZip,
 	isMobile,
 }: {
 	onOpen: () => void
 	onSaveAs: () => void
 	onDownload: () => void
 	onCopyToSynced: () => void
+	exportAsZip: boolean
 	isMobile: boolean
 }) {
 	let supportsFileSystem = isFileSystemAccessSupported()
@@ -1781,7 +1798,7 @@ function LocalFileMenu({
 					{supportsFileSystem && (
 						<DropdownMenuItem onClick={onSaveAs}>
 							<Check className="size-4" />
-							Save As...
+							{exportAsZip ? "Export as ZIP..." : "Save As..."}
 							<DropdownMenuShortcut>
 								{getShortcutLabel("saveAs")}
 							</DropdownMenuShortcut>

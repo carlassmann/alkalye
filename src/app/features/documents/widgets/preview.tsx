@@ -839,7 +839,9 @@ async function parseSegments(
 ): Promise<Segment[]> {
 	let rawSegments: RawSegment[] = []
 	let lastIndex = 0
-	let regex = /!\[([^\]]*)\]\((asset:|(?:\.\/)?assets\/)([^)]+)\)/g
+	let regex = localAssets
+		? /!\[([^\]]*)\]\((asset:|(?:\.\/)?assets\/)([^)]+)\)/g
+		: /!\[([^\]]*)\]\((asset:)([^)]+)\)/g
 	let match
 
 	while ((match = regex.exec(content)) !== null) {

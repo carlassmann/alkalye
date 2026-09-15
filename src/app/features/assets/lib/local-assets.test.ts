@@ -97,6 +97,25 @@ describe("local asset files", () => {
 		)
 		expect(await readFileAtPath(root, `work/assets/${renamed}`)).toBe("one")
 		expect(await readFileAtPath(root, `work/assets/${second}`)).toBe("two")
+		let concurrent = await Promise.all([
+			writeLocalAsset(
+				location,
+				new Blob(["three"], { type: "image/png" }),
+				"holiday photo.png",
+			),
+			writeLocalAsset(
+				location,
+				new Blob(["four"], { type: "image/png" }),
+				"holiday-photo.png",
+			),
+		])
+		expect(concurrent).toEqual(["holiday-photo.png", "holiday-photo-2.png"])
+		expect(await readFileAtPath(root, `work/assets/${concurrent[0]}`)).toBe(
+			"three",
+		)
+		expect(await readFileAtPath(root, `work/assets/${concurrent[1]}`)).toBe(
+			"four",
+		)
 	})
 
 	it("exports referenced local assets with their original file names", async () => {
