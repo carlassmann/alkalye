@@ -28,6 +28,14 @@ import {
 	ContextMenuSeparator,
 	ContextMenuTrigger,
 } from "@/app/components/ui/context-menu"
+import {
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/app/components/ui/dialog"
+import { Input } from "@/app/components/ui/input"
 import { useLocalSidebarState } from "../widgets/local-sidebar-state"
 import {
 	Empty,
@@ -62,6 +70,9 @@ import {
 	X,
 	FolderOpen,
 	RefreshCw,
+	FolderPlus,
+	FolderInput,
+	Trash2,
 } from "lucide-react"
 import {
 	ThemeToggle,
@@ -80,6 +91,7 @@ import { SidebarEditMenu } from "@/app/features/editor"
 import { SidebarFormatMenu } from "@/app/features/editor"
 import {
 	useLocalFileStore,
+	waitForLocalFileHydration,
 	openLocalFile,
 	saveLocalFile,
 	saveLocalFileAs,
@@ -93,6 +105,12 @@ import {
 	openLocalDirectory,
 	selectLocalWorkspace,
 	refreshLocalDirectory,
+	renameDirectoryFile,
+	resolveLocalFileId,
+	createDirectoryFolder,
+	createDirectoryFile,
+	moveDirectoryEntry,
+	deleteDirectoryEntry,
 	openDirectoryFile,
 	readDirectoryFile,
 	refreshLocalFile,
@@ -129,6 +147,7 @@ function LocalDocScreen() {
 
 	useEffect(() => {
 		async function init() {
+			await waitForLocalFileHydration()
 			let result = await tryCatch(consumeLaunchQueue())
 			if (!result.ok) {
 				toast.error(
@@ -401,24 +420,44 @@ interface LocalTreeNode {
 	files: { id: string; name: string; path: string; lastModified?: number }[]
 }
 
+type LocalDirectoryAction = {
+	kind:
+		| "create-file"
+		| "create-folder"
+		| "rename-folder"
+		| "move-file"
+		| "move-folder"
+	path: string
+}
+
 function buildLocalTree(
 	files: { id: string; name: string; path: string; lastModified?: number }[],
+	folders: string[],
 	sort: "latest" | "alphabetical",
 ): LocalTreeNode {
 	let root: LocalTreeNode = { name: "", path: "", folders: [], files: [] }
-	for (let file of files) {
-		let parts = file.path.split("/")
+	function addFolder(path: string): LocalTreeNode {
 		let node = root
-		for (let folder of parts.slice(0, -1)) {
-			let path = node.path ? `${node.path}/${folder}` : folder
+		for (let folder of path.split("/").filter(Boolean)) {
+			let childPath = node.path ? `${node.path}/${folder}` : folder
 			let child = node.folders.find(item => item.name === folder)
 			if (!child) {
-				child = { name: folder, path, folders: [], files: [] }
+				child = { name: folder, path: childPath, folders: [], files: [] }
 				node.folders.push(child)
 			}
 			node = child
-			node.lastModified = Math.max(
-				node.lastModified ?? 0,
+		}
+		return node
+	}
+	for (let folder of folders) addFolder(folder)
+	for (let file of files) {
+		let parts = file.path.split("/")
+		let node = addFolder(parts.slice(0, -1).join("/"))
+		let parent = root
+		for (let folder of parts.slice(0, -1)) {
+			parent = parent.folders.find(item => item.name === folder) ?? parent
+			parent.lastModified = Math.max(
+				parent.lastModified ?? 0,
 				file.lastModified ?? 0,
 			)
 		}
@@ -451,6 +490,8 @@ function LocalWorkspaceSelector() {
 		w => w.id === store.selectedWorkspaceId,
 	)
 	let sidebarState = useLocalSidebarState()
+	let [directoryAction, setDirectoryAction] =
+		useState<LocalDirectoryAction | null>(null)
 	let workspaceKey = workspace?.id ?? "individual-files"
 	let search = sidebarState.searchByWorkspace[workspaceKey] ?? ""
 	let sort = sidebarState.sortByWorkspace[workspaceKey] ?? "latest"
@@ -466,7 +507,10 @@ function LocalWorkspaceSelector() {
 				(type === "all" ||
 					(file.isPresentation === true) === (type === "presentation")),
 		) ?? []
-	let tree = buildLocalTree(files, sort)
+	let visibleFolders = searching
+		? (workspace?.folders?.filter(folder => matches(folder)) ?? [])
+		: (workspace?.folders ?? [])
+	let tree = buildLocalTree(files, visibleFolders, sort)
 	let individualFiles = store.files
 		.filter(
 			file =>
@@ -491,6 +535,23 @@ function LocalWorkspaceSelector() {
 
 	function toggleFolder(path: string) {
 		sidebarState.toggleFolder(workspaceKey, path)
+	}
+
+	async function deleteEntry(path: string, kind: "file" | "folder") {
+		if (!workspace) return
+		let affected = store.files.filter(
+			file =>
+				file.workspaceId === workspace.id &&
+				file.path &&
+				(file.path === path ||
+					(kind === "folder" && file.path.startsWith(`${path}/`))),
+		)
+		let warning = affected.some(file => file.hasUnsavedChanges)
+			? " Unsaved edits in open files will be lost."
+			: ""
+		if (!window.confirm(`Delete ${kind} “${path}”?${warning}`)) return
+		let result = await tryCatch(deleteDirectoryEntry(workspace.id, path, kind))
+		if (!result.ok) toast.error(result.error.message)
 	}
 
 	function renderTree(node: LocalTreeNode, depth: number): React.ReactNode {
@@ -529,6 +590,57 @@ function LocalWorkspaceSelector() {
 											<RefreshCw className="size-4" />
 											Refresh folder
 										</ContextMenuItem>
+										<ContextMenuSeparator />
+										<ContextMenuItem
+											onClick={() =>
+												setDirectoryAction({
+													kind: "create-file",
+													path: folder.path,
+												})
+											}
+										>
+											<Plus className="size-4" />
+											New file
+										</ContextMenuItem>
+										<ContextMenuItem
+											onClick={() =>
+												setDirectoryAction({
+													kind: "create-folder",
+													path: folder.path,
+												})
+											}
+										>
+											<FolderPlus className="size-4" />
+											New folder
+										</ContextMenuItem>
+										<ContextMenuItem
+											onClick={() =>
+												setDirectoryAction({
+													kind: "rename-folder",
+													path: folder.path,
+												})
+											}
+										>
+											<Pencil className="size-4" />
+											Rename
+										</ContextMenuItem>
+										<ContextMenuItem
+											onClick={() =>
+												setDirectoryAction({
+													kind: "move-folder",
+													path: folder.path,
+												})
+											}
+										>
+											<FolderInput className="size-4" />
+											Move to…
+										</ContextMenuItem>
+										<ContextMenuItem
+											onClick={() => void deleteEntry(folder.path, "folder")}
+										>
+											<Trash2 className="size-4" />
+											Delete folder
+										</ContextMenuItem>
 									</ContextMenuContent>
 								</ContextMenu>
 							</SidebarMenuItem>
@@ -541,6 +653,11 @@ function LocalWorkspaceSelector() {
 						<LocalFileContextMenu
 							workspaceId={workspace?.id}
 							path={file.path}
+							onManage={kind => {
+								if (kind === "move")
+									setDirectoryAction({ kind: "move-file", path: file.path })
+								else void deleteEntry(file.path, "file")
+							}}
 							onOpen={() =>
 								workspace && void openDirectoryFile(workspace.id, file.path)
 							}
@@ -618,14 +735,36 @@ function LocalWorkspaceSelector() {
 					{workspace && (
 						<div className="flex items-center justify-between px-2 py-1">
 							<span className="text-muted-foreground text-xs">Files</span>
-							<Button
-								size="icon"
-								variant="ghost"
-								aria-label="Refresh folder"
-								onClick={() => void refreshFilesystemWorkspace(true)}
-							>
-								<RefreshCw className="size-4" />
-							</Button>
+							<div className="flex items-center">
+								<Button
+									size="icon"
+									variant="ghost"
+									aria-label="New file"
+									onClick={() =>
+										setDirectoryAction({ kind: "create-file", path: "" })
+									}
+								>
+									<Plus className="size-4" />
+								</Button>
+								<Button
+									size="icon"
+									variant="ghost"
+									aria-label="New folder"
+									onClick={() =>
+										setDirectoryAction({ kind: "create-folder", path: "" })
+									}
+								>
+									<FolderPlus className="size-4" />
+								</Button>
+								<Button
+									size="icon"
+									variant="ghost"
+									aria-label="Refresh folder"
+									onClick={() => void refreshFilesystemWorkspace(true)}
+								>
+									<RefreshCw className="size-4" />
+								</Button>
+							</div>
 						</div>
 					)}
 					{workspace?.status !== undefined && workspace.status !== "ready" && (
@@ -685,7 +824,158 @@ function LocalWorkspaceSelector() {
 						)}
 				</SidebarGroupContent>
 			</SidebarGroup>
+			{workspace && directoryAction && (
+				<LocalDirectoryActionDialog
+					key={`${directoryAction.kind}:${directoryAction.path}`}
+					workspaceId={workspace.id}
+					folders={workspace.folders ?? []}
+					action={directoryAction}
+					onClose={() => setDirectoryAction(null)}
+				/>
+			)}
 		</>
+	)
+}
+
+function LocalDirectoryActionDialog({
+	workspaceId,
+	folders,
+	action,
+	onClose,
+}: {
+	workspaceId: string
+	folders: string[]
+	action: LocalDirectoryAction
+	onClose: () => void
+}) {
+	let moving = action.kind === "move-file" || action.kind === "move-folder"
+	let nameFromPath = action.path.split("/").at(-1) ?? ""
+	let [name, setName] = useState(
+		action.kind === "rename-folder"
+			? nameFromPath
+			: action.kind === "create-file"
+				? "Untitled.md"
+				: "",
+	)
+	let [destination, setDestination] = useState("")
+	let [error, setError] = useState("")
+	let [pending, setPending] = useState(false)
+	let destinations = ["", ...folders].filter(
+		folder =>
+			action.kind !== "move-folder" ||
+			(folder !== action.path && !folder.startsWith(`${action.path}/`)),
+	)
+	let title = {
+		"create-file": "New file",
+		"create-folder": "New folder",
+		"rename-folder": "Rename folder",
+		"move-file": "Move file",
+		"move-folder": "Move folder",
+	}[action.kind]
+
+	async function handleSubmit(event: React.FormEvent) {
+		event.preventDefault()
+		setPending(true)
+		let result = await tryCatch(
+			(async () => {
+				if (action.kind === "create-file") {
+					let path = await createDirectoryFile(workspaceId, action.path, name)
+					if (!(await openDirectoryFile(workspaceId, path)))
+						toast.error(
+							"File created, but it could not be opened. Refresh the folder.",
+						)
+				} else if (action.kind === "create-folder") {
+					await createDirectoryFolder(workspaceId, action.path, name)
+				} else if (action.kind === "rename-folder") {
+					let parent = action.path.split("/").slice(0, -1).join("/")
+					await moveDirectoryEntry(
+						workspaceId,
+						action.path,
+						[parent, name.trim()].filter(Boolean).join("/"),
+						"folder",
+					)
+				} else {
+					let path = [destination, nameFromPath].filter(Boolean).join("/")
+					await moveDirectoryEntry(
+						workspaceId,
+						action.path,
+						path,
+						action.kind === "move-file" ? "file" : "folder",
+					)
+				}
+			})(),
+		)
+		setPending(false)
+		if (!result.ok) {
+			setError(result.error.message)
+			return
+		}
+		onClose()
+	}
+
+	return (
+		<Dialog
+			open
+			onOpenChange={open => {
+				if (!open) onClose()
+			}}
+		>
+			<DialogContent className="max-w-sm">
+				<form onSubmit={event => void handleSubmit(event)}>
+					<DialogHeader>
+						<DialogTitle>{title}</DialogTitle>
+					</DialogHeader>
+					{moving ? (
+						<div className="my-4 space-y-2">
+							<label htmlFor="local-move-destination" className="text-sm">
+								Destination folder
+							</label>
+							<select
+								id="local-move-destination"
+								className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+								value={destination}
+								onChange={event => setDestination(event.target.value)}
+							>
+								{destinations.map(folder => (
+									<option key={folder} value={folder}>
+										{folder || "Folder root"}
+									</option>
+								))}
+							</select>
+						</div>
+					) : (
+						<Input
+							className="my-4"
+							aria-label={
+								action.kind === "create-file" ? "File name" : "Folder name"
+							}
+							value={name}
+							onChange={event => {
+								setName(event.target.value)
+								setError("")
+							}}
+							autoFocus
+						/>
+					)}
+					{error && <p className="text-destructive text-sm">{error}</p>}
+					<DialogFooter>
+						<Button type="button" variant="outline" onClick={onClose}>
+							Cancel
+						</Button>
+						<Button
+							type="submit"
+							disabled={pending || (!moving && !name.trim())}
+						>
+							{moving
+								? "Move"
+								: action.kind === "rename-folder"
+									? "Rename"
+									: "Create"}
+						</Button>
+					</DialogFooter>
+				</form>
+			</DialogContent>
+		</Dialog>
 	)
 }
 
@@ -722,12 +1012,14 @@ function LocalFileContextMenu({
 	fileId,
 	workspaceId,
 	path,
+	onManage,
 	onOpen,
 }: {
 	children: React.ReactElement
 	fileId?: string
 	workspaceId?: string
 	path?: string
+	onManage?: (kind: "move" | "delete") => void
 	onOpen: () => void
 }) {
 	let t = useIntl()
@@ -735,6 +1027,10 @@ function LocalFileContextMenu({
 		content: string
 		filename: string
 	} | null>(null)
+	let [renameOpen, setRenameOpen] = useState(false)
+	let [renameName, setRenameName] = useState("")
+	let [renameError, setRenameError] = useState("")
+	let [renaming, setRenaming] = useState(false)
 	let supportsSaveAs =
 		isFileSystemAccessSupported() && !!window.showSaveFilePicker
 
@@ -788,40 +1084,117 @@ function LocalFileContextMenu({
 		if (!result.ok) toast.error("Unable to save a copy of this file")
 	}
 
+	async function handleRename(event: React.FormEvent) {
+		event.preventDefault()
+		if (!workspaceId || !path) return
+		setRenaming(true)
+		let result = await tryCatch(
+			renameDirectoryFile(workspaceId, path, renameName),
+		)
+		setRenaming(false)
+		if (!result.ok) {
+			setRenameError(result.error.message)
+			return
+		}
+		setRenameOpen(false)
+	}
+
 	return (
-		<ContextMenu onOpenChange={handleOpenChange}>
-			<ContextMenuTrigger render={children} />
-			<ContextMenuContent>
-				<ContextMenuItem onClick={onOpen}>
-					<FileText className="size-4" />
-					Open
-				</ContextMenuItem>
-				{supportsSaveAs && (
-					<ContextMenuItem
-						disabled={!prepared}
-						onClick={() => void handleSaveAsClicked()}
-					>
-						<Download className="size-4" />
-						Save As…
+		<>
+			<ContextMenu onOpenChange={handleOpenChange}>
+				<ContextMenuTrigger render={children} />
+				<ContextMenuContent>
+					<ContextMenuItem onClick={onOpen}>
+						<FileText className="size-4" />
+						Open
 					</ContextMenuItem>
-				)}
-				<ContextMenuItem onClick={() => void handleDownloadClicked()}>
-					<Download className="size-4" />
-					Download
-				</ContextMenuItem>
-				{fileId && (
-					<>
-						<ContextMenuSeparator />
+					{workspaceId && path && (
+						<>
+							<ContextMenuItem
+								onClick={() => {
+									setRenameName(path.split("/").at(-1) ?? "")
+									setRenameError("")
+									setRenameOpen(true)
+								}}
+							>
+								<Pencil className="size-4" />
+								Rename
+							</ContextMenuItem>
+							{onManage && (
+								<ContextMenuItem onClick={() => onManage("move")}>
+									<FolderInput className="size-4" />
+									Move to…
+								</ContextMenuItem>
+							)}
+							{onManage && (
+								<ContextMenuItem onClick={() => onManage("delete")}>
+									<Trash2 className="size-4" />
+									Delete file
+								</ContextMenuItem>
+							)}
+						</>
+					)}
+					{supportsSaveAs && (
 						<ContextMenuItem
-							onClick={() => void closeFileWithUnsavedChanges(fileId, t)}
+							disabled={!prepared}
+							onClick={() => void handleSaveAsClicked()}
 						>
-							<X className="size-4" />
-							Close
+							<Download className="size-4" />
+							Save As…
 						</ContextMenuItem>
-					</>
-				)}
-			</ContextMenuContent>
-		</ContextMenu>
+					)}
+					<ContextMenuItem onClick={() => void handleDownloadClicked()}>
+						<Download className="size-4" />
+						Download
+					</ContextMenuItem>
+					{fileId && (
+						<>
+							<ContextMenuSeparator />
+							<ContextMenuItem
+								onClick={() => void closeFileWithUnsavedChanges(fileId, t)}
+							>
+								<X className="size-4" />
+								Close
+							</ContextMenuItem>
+						</>
+					)}
+				</ContextMenuContent>
+			</ContextMenu>
+			<Dialog open={renameOpen} onOpenChange={setRenameOpen}>
+				<DialogContent className="max-w-sm">
+					<form onSubmit={event => void handleRename(event)}>
+						<DialogHeader>
+							<DialogTitle>Rename file</DialogTitle>
+						</DialogHeader>
+						<Input
+							className="my-4"
+							aria-label="File name"
+							value={renameName}
+							onChange={event => {
+								setRenameName(event.target.value)
+								setRenameError("")
+							}}
+							autoFocus
+						/>
+						{renameError && (
+							<p className="text-destructive text-sm">{renameError}</p>
+						)}
+						<DialogFooter>
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => setRenameOpen(false)}
+							>
+								Cancel
+							</Button>
+							<Button type="submit" disabled={renaming || !renameName.trim()}>
+								Rename
+							</Button>
+						</DialogFooter>
+					</form>
+				</DialogContent>
+			</Dialog>
+		</>
 	)
 }
 
@@ -897,14 +1270,12 @@ function LocalEditorContent({
 
 		saveTimeoutRef.current = setTimeout(async () => {
 			let currentState = useLocalFileStore.getState()
-			let currentFile = currentState.getFileById(activeFile.id)
+			let currentId = resolveLocalFileId(activeFile.id)
+			let currentFile = currentState.getFileById(currentId)
 			if (!currentFile || !currentFile.hasUnsavedChanges) return
 
-			let currentHandle = await getHandleFromDB(activeFile.id)
-			if (!currentHandle) return
-
 			currentState.setSaveStatus("saving")
-			let success = await saveLocalFile(activeFile.id, currentFile.content)
+			let success = await saveLocalFile(currentId, currentFile.content)
 			if (success) {
 				currentState.setSaveStatus("saved")
 				setTimeout(() => currentState.setSaveStatus("idle"), 1500)
