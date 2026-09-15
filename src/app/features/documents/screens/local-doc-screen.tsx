@@ -505,6 +505,10 @@ function buildLocalTree(
 	return root
 }
 
+function isAssetDirectoryPath(path: string) {
+	return path.split("/").includes("assets")
+}
+
 function LocalWorkspaceSelector() {
 	let t = useIntl()
 	let supportsDirectories = typeof window.showDirectoryPicker === "function"
@@ -526,13 +530,14 @@ function LocalWorkspaceSelector() {
 	let files =
 		workspace?.files.filter(
 			file =>
+				!isAssetDirectoryPath(file.path.split("/").slice(0, -1).join("/")) &&
 				(!searching || matches(file.path)) &&
 				(type === "all" ||
 					(file.isPresentation === true) === (type === "presentation")),
 		) ?? []
-	let visibleFolders = searching
-		? (workspace?.folders?.filter(folder => matches(folder)) ?? [])
-		: (workspace?.folders ?? [])
+	let visibleFolders = (workspace?.folders ?? []).filter(
+		folder => !isAssetDirectoryPath(folder) && (!searching || matches(folder)),
+	)
 	let tree = buildLocalTree(files, visibleFolders, sort)
 	let individualFiles = store.files
 		.filter(
