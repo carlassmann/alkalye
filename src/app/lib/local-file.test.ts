@@ -14,12 +14,24 @@ vi.mock("idb-keyval", () => ({
 import {
 	resolveLocalFileConflict,
 	readDirectoryFile,
+	resolveLocalFileId,
+	renameDirectoryFile,
+	createDirectoryFolder,
+	createDirectoryFile,
+	moveDirectoryEntry,
+	openDirectoryFile,
+	deleteDirectoryEntry,
+	refreshLocalDirectory,
 	restoreLocalFileRecovery,
 	saveLocalFile,
 	selectLocalWorkspace,
 	switchToLocalFile,
 	useLocalFileStore,
 } from "./local-file"
+import {
+	MockDirectoryHandle,
+	readFileAtPath,
+} from "../features/backup/lib/test-helpers"
 
 class TestWritable
 	extends WritableStream
@@ -92,6 +104,366 @@ beforeEach(() => {
 })
 
 describe("local file saves", () => {
+	it("creates empty folders and files, moves files between folders, then deletes them", async () => {
+		let root = new MockDirectoryHandle("workspace")
+		root.addFile("note.md", "body")
+		records.set("local-directory-handles", { actions: root })
+		useLocalFileStore
+			.getState()
+			.setDirectoryWorkspaces([
+				{ id: "actions", name: "workspace", files: [], status: "ready" },
+			])
+		await refreshLocalDirectory("actions")
+		await createDirectoryFolder("actions", "", "Empty")
+		expect(
+			useLocalFileStore.getState().directoryWorkspaces[0].folders,
+		).toContain("Empty")
+		await createDirectoryFile("actions", "Empty", "New.md")
+		expect(await readFileAtPath(root, "Empty/New.md")).toBe("")
+		await moveDirectoryEntry("actions", "note.md", "Empty/note.md", "file")
+		expect(await readFileAtPath(root, "Empty/note.md")).toBe("body")
+		await expect(readFileAtPath(root, "note.md")).rejects.toThrow()
+		await deleteDirectoryEntry("actions", "Empty/New.md", "file")
+		await expect(readFileAtPath(root, "Empty/New.md")).rejects.toThrow()
+		expect(
+			useLocalFileStore
+				.getState()
+				.directoryWorkspaces[0].files.map(file => file.path),
+		).toContain("Empty/note.md")
+	})
+
+	it("shows a created folder even when the follow-up scan fails", async () => {
+		let root = new MockDirectoryHandle("workspace")
+		records.set("local-directory-handles", { rescan: root })
+		useLocalFileStore
+			.getState()
+			.setDirectoryWorkspaces([
+				{ id: "rescan", name: "workspace", files: [], status: "ready" },
+			])
+		let entries = root.entries.bind(root)
+		vi.spyOn(root, "entries")
+			.mockImplementationOnce(entries)
+			.mockImplementationOnce(() => {
+				throw Error("Scan failed")
+			})
+		expect(await createDirectoryFolder("rescan", "", "Created")).toBe("Created")
+		expect(
+			useLocalFileStore.getState().directoryWorkspaces[0].folders,
+		).toContain("Created")
+		expect((await root.getDirectoryHandle("Created")).name).toBe("Created")
+	})
+
+	it("moves a folder with open drafts and refuses to move it into itself", async () => {
+		let root = new MockDirectoryHandle("workspace")
+		let source = new MockDirectoryHandle("Source")
+		source.addFile("note.md", "disk")
+		root.addDirectory("Source", source)
+		root.addDirectory("Target", new MockDirectoryHandle("Target"))
+		records.set("local-directory-handles", { folders: root })
+		useLocalFileStore
+			.getState()
+			.setDirectoryWorkspaces([
+				{ id: "folders", name: "workspace", files: [], status: "ready" },
+			])
+		await refreshLocalDirectory("folders")
+		useLocalFileStore.getState().addFile({
+			id: "folders:Source/note.md",
+			filename: "note.md",
+			workspaceId: "folders",
+			path: "Source/note.md",
+			lastOpened: Date.now(),
+			content: "draft",
+			lastSavedContent: "disk",
+			hasUnsavedChanges: true,
+			isActive: true,
+		})
+		await expect(
+			moveDirectoryEntry("folders", "Source", "Source/Inside", "folder"),
+		).rejects.toThrow("itself")
+		let remove = vi
+			.spyOn(root, "removeEntry")
+			.mockRejectedValueOnce(Error("Folder is locked"))
+		await expect(
+			moveDirectoryEntry("folders", "Source", "Target/Renamed", "folder"),
+		).rejects.toThrow("locked")
+		remove.mockRestore()
+		expect(await readFileAtPath(root, "Source/note.md")).toBe("disk")
+		await expect(
+			readFileAtPath(root, "Target/Renamed/note.md"),
+		).rejects.toThrow()
+		await moveDirectoryEntry("folders", "Source", "Target/Renamed", "folder")
+		expect(await readFileAtPath(root, "Target/Renamed/note.md")).toBe("draft")
+		expect(useLocalFileStore.getState().getActiveFile()).toMatchObject({
+			id: "folders:Target/Renamed/note.md",
+			content: "draft",
+			hasUnsavedChanges: false,
+		})
+		expect(await saveLocalFile("folders:Target/Renamed/note.md", "draft")).toBe(
+			true,
+		)
+		expect(await readFileAtPath(root, "Target/Renamed/note.md")).toBe("draft")
+		await deleteDirectoryEntry("folders", "Target/Renamed", "folder")
+		expect(useLocalFileStore.getState().getActiveFile()).toBeNull()
+		await expect(
+			readFileAtPath(root, "Target/Renamed/note.md"),
+		).rejects.toThrow()
+	})
+
+	it("uses a native folder move when available", async () => {
+		let root = new MockDirectoryHandle("workspace")
+		let source = new MockDirectoryHandle("Source")
+		source.addFile("note.md", "body")
+		root.addDirectory("Source", source)
+		source.move = async function move(destination, name) {
+			if (!(destination instanceof MockDirectoryHandle))
+				throw Error("Unexpected destination")
+			destination.addDirectory(name, source)
+			await root.removeEntry("Source", { recursive: true })
+		}
+		records.set("local-directory-handles", { native: root })
+		useLocalFileStore
+			.getState()
+			.setDirectoryWorkspaces([
+				{ id: "native", name: "workspace", files: [], status: "ready" },
+			])
+		await moveDirectoryEntry("native", "Source", "Renamed", "folder")
+		expect(await root.getDirectoryHandle("Renamed")).toBe(source)
+		expect(await readFileAtPath(root, "Renamed/note.md")).toBe("body")
+		await expect(readFileAtPath(root, "Source/note.md")).rejects.toThrow()
+	})
+
+	it("copies a folder when native move reports unsupported", async () => {
+		let root = new MockDirectoryHandle("workspace")
+		let source = new MockDirectoryHandle("Source")
+		source.addFile("note.md", "body")
+		root.addDirectory("Source", source)
+		source.move = async function move() {
+			throw new DOMException("Unsupported", "NotSupportedError")
+		}
+		records.set("local-directory-handles", { unsupported: root })
+		useLocalFileStore
+			.getState()
+			.setDirectoryWorkspaces([
+				{ id: "unsupported", name: "workspace", files: [], status: "ready" },
+			])
+		await moveDirectoryEntry("unsupported", "Source", "Renamed", "folder")
+		expect(await readFileAtPath(root, "Renamed/note.md")).toBe("body")
+		await expect(readFileAtPath(root, "Source/note.md")).rejects.toThrow()
+	})
+
+	it("keeps a folder when native move is denied", async () => {
+		let root = new MockDirectoryHandle("workspace")
+		let source = new MockDirectoryHandle("Source")
+		source.addFile("note.md", "body")
+		root.addDirectory("Source", source)
+		source.move = async function move() {
+			throw new DOMException("Denied", "NotAllowedError")
+		}
+		records.set("local-directory-handles", { denied: root })
+		useLocalFileStore
+			.getState()
+			.setDirectoryWorkspaces([
+				{ id: "denied", name: "workspace", files: [], status: "ready" },
+			])
+		await expect(
+			moveDirectoryEntry("denied", "Source", "Renamed", "folder"),
+		).rejects.toThrow("Denied")
+		expect(await readFileAtPath(root, "Source/note.md")).toBe("body")
+		await expect(readFileAtPath(root, "Renamed/note.md")).rejects.toThrow()
+	})
+
+	it("keeps external folder edits made during a move", async () => {
+		let root = new MockDirectoryHandle("workspace")
+		let source = new MockDirectoryHandle("Source")
+		source.addFile("note.md", "original")
+		root.addDirectory("Source", source)
+		records.set("local-directory-handles", { external: root })
+		useLocalFileStore
+			.getState()
+			.setDirectoryWorkspaces([
+				{ id: "external", name: "workspace", files: [], status: "ready" },
+			])
+		let originalEntries = source.entries.bind(source)
+		let scans = 0
+		vi.spyOn(source, "entries").mockImplementation(() => {
+			scans += 1
+			if (scans === 3) {
+				source.addFile("note.md", "external revision")
+				source.addFile("new.md", "added")
+			}
+			return originalEntries()
+		})
+		await expect(
+			moveDirectoryEntry("external", "Source", "Moved", "folder"),
+		).rejects.toThrow("changed")
+		expect(await readFileAtPath(root, "Source/note.md")).toBe(
+			"external revision",
+		)
+		expect(await readFileAtPath(root, "Source/new.md")).toBe("added")
+		await expect(readFileAtPath(root, "Moved/note.md")).rejects.toThrow()
+	})
+
+	it("serializes overlapping moves in one workspace", async () => {
+		let root = new MockDirectoryHandle("workspace")
+		root.addFile("a.md", "body")
+		records.set("local-directory-handles", { overlap: root })
+		useLocalFileStore
+			.getState()
+			.setDirectoryWorkspaces([
+				{ id: "overlap", name: "workspace", files: [], status: "ready" },
+			])
+		let first = moveDirectoryEntry("overlap", "a.md", "b.md", "file")
+		let second = moveDirectoryEntry("overlap", "a.md", "c.md", "file")
+		await first
+		await expect(second).rejects.toThrow()
+		expect(await readFileAtPath(root, "b.md")).toBe("body")
+		await expect(readFileAtPath(root, "c.md")).rejects.toThrow()
+	})
+
+	it("does not save a deleted file after deletion starts", async () => {
+		let root = new MockDirectoryHandle("workspace")
+		root.addFile("note.md", "disk")
+		records.set("local-directory-handles", { deleting: root })
+		useLocalFileStore
+			.getState()
+			.setDirectoryWorkspaces([
+				{ id: "deleting", name: "workspace", files: [], status: "ready" },
+			])
+		await refreshLocalDirectory("deleting")
+		await openDirectoryFile("deleting", "note.md")
+		let releaseRemoval: () => void = () => {}
+		let reachRemoval: () => void = () => {}
+		let removalReached = new Promise<void>(resolve => {
+			reachRemoval = resolve
+		})
+		let original = root.removeEntry.bind(root)
+		vi.spyOn(root, "removeEntry").mockImplementation(async (name, options) => {
+			reachRemoval()
+			await new Promise<void>(release => {
+				releaseRemoval = release
+			})
+			await original(name, options)
+		})
+		let deletion = deleteDirectoryEntry("deleting", "note.md", "file")
+		await removalReached
+		let save = saveLocalFile("deleting:note.md", "late edit")
+		releaseRemoval()
+		await deletion
+		expect(await save).toBe(false)
+		await expect(readFileAtPath(root, "note.md")).rejects.toThrow()
+	})
+
+	it("renames a directory file while keeping an open draft and blocking collisions", async () => {
+		let root = new MockDirectoryHandle("notes")
+		let nested = new MockDirectoryHandle("nested")
+		nested.addFile("old.md", "disk")
+		nested.addFile("taken.md", "other")
+		root.addDirectory("nested", nested)
+		records.set("local-directory-handles", { renamedFolder: root })
+		useLocalFileStore
+			.getState()
+			.setDirectoryWorkspaces([
+				{ id: "renamedFolder", name: "notes", files: [], status: "ready" },
+			])
+		await refreshLocalDirectory("renamedFolder")
+		useLocalFileStore.getState().addFile({
+			id: "renamedFolder:nested/old.md",
+			filename: "old.md",
+			workspaceId: "renamedFolder",
+			path: "nested/old.md",
+			lastOpened: Date.now(),
+			content: "draft",
+			lastSavedContent: "disk",
+			hasUnsavedChanges: true,
+			isActive: true,
+		})
+
+		await expect(
+			renameDirectoryFile("renamedFolder", "nested/old.md", "taken.md"),
+		).rejects.toThrow("already exists")
+		expect(await readFileAtPath(root, "nested/old.md")).toBe("disk")
+		expect(await readFileAtPath(root, "nested/taken.md")).toBe("other")
+
+		await renameDirectoryFile("renamedFolder", "nested/old.md", "new.md")
+		expect(await readFileAtPath(root, "nested/new.md")).toBe("draft")
+		await expect(readFileAtPath(root, "nested/old.md")).rejects.toThrow()
+		expect(useLocalFileStore.getState().getActiveFile()).toMatchObject({
+			id: "renamedFolder:nested/new.md",
+			filename: "new.md",
+			content: "draft",
+			hasUnsavedChanges: false,
+		})
+		expect(
+			useLocalFileStore
+				.getState()
+				.directoryWorkspaces[0].files.map(file => file.path),
+		).toContain("nested/new.md")
+		expect(await saveLocalFile("renamedFolder:nested/new.md", "draft")).toBe(
+			true,
+		)
+		expect(await readFileAtPath(root, "nested/new.md")).toBe("draft")
+	})
+
+	it("supports case-only renames and saves queued during a move", async () => {
+		let root = new MockDirectoryHandle("workspace")
+		root.addFile("note.md", "disk")
+		records.set("local-directory-handles", { timing: root })
+		useLocalFileStore
+			.getState()
+			.setDirectoryWorkspaces([
+				{ id: "timing", name: "workspace", files: [], status: "ready" },
+			])
+		await refreshLocalDirectory("timing")
+		await renameDirectoryFile("timing", "note.md", "Note.md")
+		expect(await readFileAtPath(root, "Note.md")).toBe("disk")
+		useLocalFileStore.getState().addFile({
+			id: "timing:Note.md",
+			filename: "Note.md",
+			workspaceId: "timing",
+			path: "Note.md",
+			lastOpened: Date.now(),
+			content: "disk",
+			lastSavedContent: "disk",
+			hasUnsavedChanges: false,
+			isActive: true,
+		})
+		let releaseRemoval: () => void = () => {}
+		let reachRemoval: () => void = () => {}
+		let removalReached = new Promise<void>(resolve => {
+			reachRemoval = resolve
+		})
+		let original = root.removeEntry.bind(root)
+		let remove = vi
+			.spyOn(root, "removeEntry")
+			.mockImplementation(async (name, options) => {
+				if (name === "Note.md") {
+					reachRemoval()
+					await new Promise<void>(release => {
+						releaseRemoval = release
+					})
+				}
+				await original(name, options)
+			})
+		let move = moveDirectoryEntry("timing", "Note.md", "Moved.md", "file")
+		await removalReached
+		useLocalFileStore.getState().setFileContent("timing:Note.md", "new draft")
+		let save = saveLocalFile("timing:Note.md", "new draft")
+		releaseRemoval()
+		await move
+		expect(await save).toBe(true)
+		remove.mockRestore()
+		expect(await readFileAtPath(root, "Moved.md")).toBe("new draft")
+		await moveDirectoryEntry("timing", "Moved.md", "Note.md", "file")
+		expect(resolveLocalFileId("timing:Note.md")).toBe("timing:Note.md")
+		await moveDirectoryEntry("timing", "Note.md", "Other.md", "file")
+		await createDirectoryFile("timing", "", "Note.md")
+		await openDirectoryFile("timing", "Note.md")
+		useLocalFileStore.getState().setFileContent("timing:Note.md", "replacement")
+		expect(await saveLocalFile("timing:Note.md", "replacement")).toBe(true)
+		expect(await readFileAtPath(root, "Note.md")).toBe("replacement")
+		expect(await readFileAtPath(root, "Other.md")).toBe("new draft")
+	})
+
 	it("reads an unopened directory file without activating it, then prefers its open draft", async () => {
 		let handle = new TestHandle("disk")
 		records.set("local-directory-handles", {

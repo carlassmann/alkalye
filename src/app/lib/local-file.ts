@@ -23,6 +23,13 @@ export {
 	openLocalDirectory,
 	selectLocalWorkspace,
 	refreshLocalDirectory,
+	renameDirectoryFile,
+	resolveLocalFileId,
+	waitForLocalFileHydration,
+	createDirectoryFolder,
+	createDirectoryFile,
+	moveDirectoryEntry,
+	deleteDirectoryEntry,
 	openDirectoryFile,
 	readDirectoryFile,
 	refreshLocalFile,
@@ -72,12 +79,17 @@ declare global {
 	interface FileSystemFileHandle {
 		getFile(): Promise<File>
 		createWritable(): Promise<FileSystemWritableFileStream>
+		move?(directory: FileSystemDirectoryHandle, name: string): Promise<void>
 		queryPermission?(options: {
 			mode: "read" | "readwrite"
 		}): Promise<"granted" | "denied" | "prompt">
 		requestPermission?(options: {
 			mode: "read" | "readwrite"
 		}): Promise<"granted" | "denied" | "prompt">
+	}
+
+	interface FileSystemDirectoryHandle {
+		move?(directory: FileSystemDirectoryHandle, name: string): Promise<void>
 	}
 
 	interface FileSystemWritableFileStream extends WritableStream {
@@ -105,6 +117,7 @@ interface LocalFileEntry {
 interface LocalDirectoryWorkspace {
 	id: string
 	name: string
+	folders?: string[]
 	files: {
 		id: string
 		name: string
@@ -124,6 +137,17 @@ interface LocalFileState {
 	errorMessage: string | null
 
 	setFiles: (files: LocalFileEntry[]) => void
+	relocateFiles: (
+		workspaceId: string,
+		oldPath: string,
+		newPath: string,
+		folder: boolean,
+	) => void
+	removeDirectoryFiles: (
+		workspaceId: string,
+		path: string,
+		folder: boolean,
+	) => void
 	setDirectoryWorkspaces: (workspaces: LocalDirectoryWorkspace[]) => void
 	setSelectedWorkspaceId: (id: string | null) => void
 	setActiveFileId: (id: string | null) => void
@@ -154,6 +178,9 @@ let DIRECTORY_HANDLES_KEY = "local-directory-handles"
 
 let handleCache = new Map<string, FileSystemFileHandle>()
 let directoryHandleCache = new Map<string, FileSystemDirectoryHandle>()
+let fileMutationLocks = new Map<string, Promise<void>>()
+let relocatedFileIds = new Map<string, string>()
+let workspaceMutationQueues = new Map<string, Promise<void>>()
 
 let persistedStateSchema = z.object({
 	files: z.array(
@@ -178,6 +205,7 @@ let persistedStateSchema = z.object({
 				.optional(),
 		}),
 	),
+	folders: z.array(z.string()).optional(),
 	directoryWorkspaces: z
 		.array(
 			z.object({
@@ -224,6 +252,51 @@ let useLocalFileStore = create<LocalFileState>()(
 			errorMessage: null,
 
 			setFiles: files => set({ files }),
+			relocateFiles: (workspaceId, oldPath, newPath, folder) =>
+				set(state => {
+					let files = state.files.map(file => {
+						if (file.workspaceId !== workspaceId || !file.path) return file
+						if (
+							file.path !== oldPath &&
+							!(folder && file.path.startsWith(`${oldPath}/`))
+						)
+							return file
+						let path = `${newPath}${file.path.slice(oldPath.length)}`
+						return {
+							...file,
+							id: `${workspaceId}:${path}`,
+							path,
+							filename: path.split("/").at(-1) ?? file.filename,
+						}
+					})
+					let activeFileId = state.activeFileId
+					let prefix = `${workspaceId}:${oldPath}`
+					if (
+						activeFileId === prefix ||
+						(folder && activeFileId?.startsWith(`${prefix}/`))
+					)
+						activeFileId = `${workspaceId}:${newPath}${activeFileId.slice(prefix.length)}`
+					return { files, activeFileId }
+				}),
+			removeDirectoryFiles: (workspaceId, path, folder) =>
+				set(state => {
+					let files = state.files.filter(
+						file =>
+							file.workspaceId !== workspaceId ||
+							!file.path ||
+							(file.path !== path &&
+								!(folder && file.path.startsWith(`${path}/`))),
+					)
+					let activeFileId = files.some(file => file.id === state.activeFileId)
+						? state.activeFileId
+						: (files
+								.filter(
+									file =>
+										(file.workspaceId ?? null) === state.selectedWorkspaceId,
+								)
+								.sort((a, b) => b.lastOpened - a.lastOpened)[0]?.id ?? null)
+					return { files, activeFileId }
+				}),
 			setDirectoryWorkspaces: directoryWorkspaces =>
 				set({ directoryWorkspaces }),
 			setSelectedWorkspaceId: selectedWorkspaceId =>
@@ -336,7 +409,10 @@ let useLocalFileStore = create<LocalFileState>()(
 					activeFileId: id,
 				})),
 
-			reset: () =>
+			reset: () => {
+				fileMutationLocks.clear()
+				relocatedFileIds.clear()
+				workspaceMutationQueues.clear()
 				set({
 					files: [],
 					directoryWorkspaces: [],
@@ -344,7 +420,8 @@ let useLocalFileStore = create<LocalFileState>()(
 					activeFileId: null,
 					saveStatus: "idle",
 					errorMessage: null,
-				}),
+				})
+			},
 
 			getActiveFile: () => {
 				let state = useLocalFileStore.getState()
@@ -370,6 +447,20 @@ let useLocalFileStore = create<LocalFileState>()(
 		},
 	),
 )
+
+function waitForLocalFileHydration(): Promise<void> {
+	if (useLocalFileStore.persist.hasHydrated()) return Promise.resolve()
+	return new Promise(resolve => {
+		let unsubscribe = useLocalFileStore.persist.onFinishHydration(() => {
+			unsubscribe()
+			resolve()
+		})
+		if (useLocalFileStore.persist.hasHydrated()) {
+			unsubscribe()
+			resolve()
+		}
+	})
+}
 
 async function getHandleFromDB(
 	id: string,
@@ -514,13 +605,520 @@ async function refreshLocalDirectory(
 		.getState()
 		.directoryWorkspaces.find(workspace => workspace.id === id)
 	let previousFiles = new Map(existing?.files.map(file => [file.path, file]))
-	let scan = await tryCatch(scanDirectory(handle, "", previousFiles))
+	let folders: string[] = []
+	let scan = await tryCatch(scanDirectory(handle, "", previousFiles, folders))
 	if (!scan.ok) {
 		updateDirectory(id, [], "error", false)
 		return false
 	}
-	updateDirectory(id, scan.value, "ready", true)
+	updateDirectory(id, scan.value, "ready", true, folders)
 	return true
+}
+
+async function renameDirectoryFile(
+	workspaceId: string,
+	path: string,
+	newName: string,
+): Promise<void> {
+	let parts = path.split("/")
+	parts.pop()
+	await moveDirectoryEntry(
+		workspaceId,
+		path,
+		[...parts, newName.trim()].join("/"),
+		"file",
+	)
+}
+
+async function createDirectoryFolder(
+	workspaceId: string,
+	parentPath: string,
+	name: string,
+): Promise<string> {
+	return withWorkspaceMutation(workspaceId, function perform() {
+		return createDirectoryFolderNow(workspaceId, parentPath, name)
+	})
+}
+
+async function createDirectoryFolderNow(
+	workspaceId: string,
+	parentPath: string,
+	name: string,
+): Promise<string> {
+	validateEntryName(name, "folder")
+	let root = await writableDirectoryRoot(workspaceId)
+	let parent = await directoryAtPath(root, parentPath)
+	await ensureEntryAvailable(parent, name.trim())
+	await parent.getDirectoryHandle(name.trim(), { create: true })
+	let path = [parentPath, name.trim()].filter(Boolean).join("/")
+	if (!(await refreshLocalDirectory(workspaceId))) {
+		let state = useLocalFileStore.getState()
+		state.setDirectoryWorkspaces(
+			state.directoryWorkspaces.map(workspace =>
+				workspace.id === workspaceId
+					? { ...workspace, folders: [...(workspace.folders ?? []), path] }
+					: workspace,
+			),
+		)
+	}
+	return path
+}
+
+async function createDirectoryFile(
+	workspaceId: string,
+	parentPath: string,
+	name: string,
+): Promise<string> {
+	return withWorkspaceMutation(workspaceId, function perform() {
+		return createDirectoryFileNow(workspaceId, parentPath, name)
+	})
+}
+
+async function createDirectoryFileNow(
+	workspaceId: string,
+	parentPath: string,
+	name: string,
+): Promise<string> {
+	validateEntryName(name, "file")
+	let root = await writableDirectoryRoot(workspaceId)
+	let parent = await directoryAtPath(root, parentPath)
+	await ensureEntryAvailable(parent, name.trim())
+	let handle = await parent.getFileHandle(name.trim(), { create: true })
+	let path = [parentPath, name.trim()].filter(Boolean).join("/")
+	if (!(await refreshLocalDirectory(workspaceId))) {
+		let state = useLocalFileStore.getState()
+		let file = await tryCatch(handle.getFile())
+		state.setDirectoryWorkspaces(
+			state.directoryWorkspaces.map(workspace =>
+				workspace.id === workspaceId
+					? {
+							...workspace,
+							files: [
+								...workspace.files,
+								{
+									id: path,
+									path,
+									name: name.trim(),
+									lastModified: file.ok ? file.value.lastModified : undefined,
+									isPresentation: false,
+								},
+							],
+						}
+					: workspace,
+			),
+		)
+	}
+	return path
+}
+
+async function moveDirectoryEntry(
+	workspaceId: string,
+	oldPath: string,
+	newPath: string,
+	kind: "file" | "folder",
+): Promise<void> {
+	return withWorkspaceMutation(workspaceId, function perform() {
+		return moveDirectoryEntryNow(workspaceId, oldPath, newPath, kind)
+	})
+}
+
+async function moveDirectoryEntryNow(
+	workspaceId: string,
+	oldPath: string,
+	newPath: string,
+	kind: "file" | "folder",
+): Promise<void> {
+	let oldParts = oldPath.split("/")
+	let newParts = newPath.split("/")
+	let oldName = oldParts.pop()
+	let newName = newParts.pop()
+	if (!oldName || !newName) throw Error("Entry not found")
+	validateEntryName(newName, kind)
+	if (oldPath === newPath) return
+	if (kind === "folder" && newPath.startsWith(`${oldPath}/`))
+		throw Error("Cannot move a folder into itself")
+	let root = await writableDirectoryRoot(workspaceId)
+	let sourceParent = await directoryAtPath(root, oldParts.join("/"))
+	let destinationParent = await directoryAtPath(root, newParts.join("/"))
+	let affected = useLocalFileStore
+		.getState()
+		.files.filter(
+			file =>
+				file.workspaceId === workspaceId &&
+				file.path &&
+				(file.path === oldPath ||
+					(kind === "folder" && file.path.startsWith(`${oldPath}/`))),
+		)
+	let releaseLock: () => void = () => {}
+	let lock = new Promise<void>(resolve => {
+		releaseLock = resolve
+	})
+	for (let file of affected) fileMutationLocks.set(file.id, lock)
+	try {
+		for (let file of affected) {
+			let pendingSave = saveQueues.get(file.id)
+			if (pendingSave) await pendingSave
+		}
+		let caseOnlyRename =
+			oldParts.join("/") === newParts.join("/") &&
+			oldName.toLocaleLowerCase() === newName.toLocaleLowerCase()
+		if (caseOnlyRename) {
+			let extension =
+				kind === "file"
+					? (oldName.match(/\.(md|markdown|txt)$/i)?.[0] ?? ".md")
+					: ""
+			let temporaryName = `.rename-${crypto.randomUUID()}${extension}`
+			await moveFilesystemEntry(
+				sourceParent,
+				oldName,
+				sourceParent,
+				temporaryName,
+				kind,
+			)
+			try {
+				await moveFilesystemEntry(
+					sourceParent,
+					temporaryName,
+					destinationParent,
+					newName,
+					kind,
+				)
+			} catch (error) {
+				let rollback = await tryCatch(
+					moveFilesystemEntry(
+						sourceParent,
+						temporaryName,
+						sourceParent,
+						oldName,
+						kind,
+					),
+				)
+				if (!rollback.ok)
+					throw Error(
+						`Rename incomplete: ${String(error)}; original-name restore failed: ${rollback.error.message}`,
+					)
+				throw error
+			}
+		} else {
+			await moveFilesystemEntry(
+				sourceParent,
+				oldName,
+				destinationParent,
+				newName,
+				kind,
+			)
+		}
+		let state = useLocalFileStore.getState()
+		state.relocateFiles(workspaceId, oldPath, newPath, kind === "folder")
+		for (let file of affected) {
+			let path = `${newPath}${file.path?.slice(oldPath.length) ?? ""}`
+			let newId = `${workspaceId}:${path}`
+			relocatedFileIds.delete(newId)
+			relocatedFileIds.set(file.id, newId)
+		}
+		await refreshLocalDirectory(workspaceId)
+		for (let file of affected) await removeHandleFromDB(file.id).catch(() => {})
+	} finally {
+		for (let file of affected) fileMutationLocks.delete(file.id)
+		releaseLock()
+	}
+	let current = useLocalFileStore.getState()
+	for (let file of affected) {
+		let relocated = current.getFileById(resolveLocalFileId(file.id))
+		if (
+			relocated?.hasUnsavedChanges &&
+			!(await saveLocalFile(relocated.id, relocated.content))
+		)
+			throw Error("Moved, but unsaved edits still need to be saved")
+	}
+}
+
+async function moveFilesystemEntry(
+	sourceParent: FileSystemDirectoryHandle,
+	oldName: string,
+	destinationParent: FileSystemDirectoryHandle,
+	newName: string,
+	kind: "file" | "folder",
+) {
+	await ensureEntryAvailable(destinationParent, newName)
+	let created = false
+	let folderSnapshot: Map<string, string> | null = null
+	try {
+		if (kind === "file") {
+			let source = await sourceParent.getFileHandle(oldName)
+			if (await moveNativelyIfSupported(source, destinationParent, newName))
+				return
+			let destination = await destinationParent.getFileHandle(newName, {
+				create: true,
+			})
+			if ((await destination.getFile()).size > 0)
+				throw Error("Destination appeared while moving")
+			created = true
+			await copyDirectoryFile(source, destination)
+		} else {
+			let source = await sourceParent.getDirectoryHandle(oldName)
+			if (await moveNativelyIfSupported(source, destinationParent, newName))
+				return
+			folderSnapshot = await snapshotDirectory(source)
+			let destination = await destinationParent.getDirectoryHandle(newName, {
+				create: true,
+			})
+			for await (let [existingName] of destination.entries())
+				throw Error(`Destination appeared while moving: ${existingName}`)
+			created = true
+			await copyDirectoryFolder(source, destination)
+			if (!(await matchesDirectorySnapshot(source, folderSnapshot)))
+				throw Error("Folder changed during move; source was kept")
+			if (!(await matchesDirectorySnapshot(destination, folderSnapshot)))
+				throw Error("Destination changed during move; source was kept")
+		}
+		await sourceParent.removeEntry(oldName, { recursive: kind === "folder" })
+	} catch (error) {
+		if (created) {
+			if (kind === "folder" && folderSnapshot) {
+				let destination = await tryCatch(
+					destinationParent.getDirectoryHandle(newName),
+				)
+				if (
+					!destination.ok ||
+					!(await matchesDirectorySnapshot(destination.value, folderSnapshot))
+				)
+					throw Error(
+						`Move incomplete: ${String(error)}; destination copy needs review`,
+					)
+			}
+			let rollback = await tryCatch(
+				destinationParent.removeEntry(newName, {
+					recursive: kind === "folder",
+				}),
+			)
+			if (!rollback.ok)
+				throw Error(
+					`Move incomplete: ${String(error)}; destination cleanup failed: ${rollback.error.message}`,
+				)
+		}
+		throw error
+	}
+}
+
+async function moveNativelyIfSupported(
+	source: FileSystemFileHandle | FileSystemDirectoryHandle,
+	destinationParent: FileSystemDirectoryHandle,
+	newName: string,
+): Promise<boolean> {
+	if (!source.move) return false
+	try {
+		await source.move(destinationParent, newName)
+		return true
+	} catch (error) {
+		if (
+			typeof error === "object" &&
+			error !== null &&
+			"name" in error &&
+			error.name === "NotSupportedError"
+		)
+			return false
+		throw error
+	}
+}
+
+async function snapshotDirectory(
+	directory: FileSystemDirectoryHandle,
+	prefix = "",
+): Promise<Map<string, string>> {
+	let snapshot = new Map<string, string>()
+	for await (let [name, handle] of directory.entries()) {
+		let path = `${prefix}${name}`
+		if (handle.kind === "directory") {
+			snapshot.set(`folder:${path}`, "")
+			let child = await directory.getDirectoryHandle(name)
+			for (let [childPath, hash] of await snapshotDirectory(child, `${path}/`))
+				snapshot.set(childPath, hash)
+		} else {
+			let file = await (await directory.getFileHandle(name)).getFile()
+			let digest = await crypto.subtle.digest(
+				"SHA-256",
+				await file.arrayBuffer(),
+			)
+			let hash = Array.from(new Uint8Array(digest), byte =>
+				byte.toString(16).padStart(2, "0"),
+			).join("")
+			snapshot.set(`file:${path}`, hash)
+		}
+	}
+	return snapshot
+}
+
+async function matchesDirectorySnapshot(
+	directory: FileSystemDirectoryHandle,
+	expected: Map<string, string>,
+): Promise<boolean> {
+	let current = await tryCatch(snapshotDirectory(directory))
+	if (!current.ok || current.value.size !== expected.size) return false
+	for (let [path, hash] of expected)
+		if (current.value.get(path) !== hash) return false
+	return true
+}
+
+function resolveLocalFileId(id: string): string {
+	if (useLocalFileStore.getState().getFileById(id)) return id
+	let current = id
+	let visited = new Set([id])
+	let next = relocatedFileIds.get(current)
+	while (next && !visited.has(next)) {
+		current = next
+		visited.add(current)
+		next = relocatedFileIds.get(current)
+	}
+	return current
+}
+
+async function deleteDirectoryEntry(
+	workspaceId: string,
+	path: string,
+	kind: "file" | "folder",
+): Promise<void> {
+	return withWorkspaceMutation(workspaceId, function perform() {
+		return deleteDirectoryEntryNow(workspaceId, path, kind)
+	})
+}
+
+async function deleteDirectoryEntryNow(
+	workspaceId: string,
+	path: string,
+	kind: "file" | "folder",
+): Promise<void> {
+	let parts = path.split("/")
+	let name = parts.pop()
+	if (!name) throw Error("Entry not found")
+	let root = await writableDirectoryRoot(workspaceId)
+	let parent = await directoryAtPath(root, parts.join("/"))
+	let affected = useLocalFileStore
+		.getState()
+		.files.filter(
+			file =>
+				file.workspaceId === workspaceId &&
+				file.path &&
+				(file.path === path ||
+					(kind === "folder" && file.path.startsWith(`${path}/`))),
+		)
+	let releaseLock: () => void = () => {}
+	let lock = new Promise<void>(resolve => {
+		releaseLock = resolve
+	})
+	for (let file of affected) fileMutationLocks.set(file.id, lock)
+	try {
+		for (let file of affected) {
+			let pendingSave = saveQueues.get(file.id)
+			if (pendingSave) await pendingSave
+		}
+		await parent.removeEntry(name, { recursive: kind === "folder" })
+		useLocalFileStore
+			.getState()
+			.removeDirectoryFiles(workspaceId, path, kind === "folder")
+		await refreshLocalDirectory(workspaceId)
+		for (let file of affected) await removeHandleFromDB(file.id).catch(() => {})
+	} finally {
+		for (let file of affected) fileMutationLocks.delete(file.id)
+		releaseLock()
+	}
+}
+
+async function withWorkspaceMutation<T>(
+	workspaceId: string,
+	operation: () => Promise<T>,
+): Promise<T> {
+	let previous = workspaceMutationQueues.get(workspaceId) ?? Promise.resolve()
+	let current = previous.then(operation)
+	let tail = current.then(
+		() => {},
+		() => {},
+	)
+	workspaceMutationQueues.set(workspaceId, tail)
+	try {
+		return await current
+	} finally {
+		if (workspaceMutationQueues.get(workspaceId) === tail)
+			workspaceMutationQueues.delete(workspaceId)
+	}
+}
+
+function validateEntryName(name: string, kind: "file" | "folder") {
+	let trimmed = name.trim()
+	if (
+		!trimmed ||
+		trimmed === "." ||
+		trimmed === ".." ||
+		trimmed.includes("/") ||
+		trimmed.includes("\\")
+	)
+		throw Error("Enter a valid name")
+	if (kind === "file" && !/\.(md|markdown|txt)$/i.test(trimmed))
+		throw Error("Use a .md, .markdown, or .txt filename")
+}
+
+async function writableDirectoryRoot(
+	workspaceId: string,
+): Promise<FileSystemDirectoryHandle> {
+	let root = await getDirectoryHandleFromDB(workspaceId)
+	if (!root || !(await hasPermission(root, "readwrite", true)))
+		throw Error("Folder write access is required")
+	return root
+}
+
+async function directoryAtPath(
+	root: FileSystemDirectoryHandle,
+	path: string,
+): Promise<FileSystemDirectoryHandle> {
+	let directory = root
+	for (let part of path.split("/").filter(Boolean))
+		directory = await directory.getDirectoryHandle(part)
+	return directory
+}
+
+async function ensureEntryAvailable(
+	directory: FileSystemDirectoryHandle,
+	name: string,
+) {
+	for await (let [existing] of directory.entries()) {
+		if (existing.toLocaleLowerCase() === name.toLocaleLowerCase())
+			throw Error("An entry with that name already exists")
+	}
+}
+
+async function copyDirectoryFile(
+	source: FileSystemFileHandle,
+	destination: FileSystemFileHandle,
+) {
+	let writable = await destination.createWritable()
+	try {
+		await writable.write(await (await source.getFile()).arrayBuffer())
+		await writable.close()
+	} catch (error) {
+		await writable.abort().catch(() => {})
+		throw error
+	}
+}
+
+async function copyDirectoryFolder(
+	source: FileSystemDirectoryHandle,
+	destination: FileSystemDirectoryHandle,
+) {
+	for await (let [name, handle] of source.entries()) {
+		if (handle.kind === "directory") {
+			let childSource = await source.getDirectoryHandle(name)
+			let childDestination = await destination.getDirectoryHandle(name, {
+				create: true,
+			})
+			await copyDirectoryFolder(childSource, childDestination)
+		} else {
+			let fileSource = await source.getFileHandle(name)
+			let fileDestination = await destination.getFileHandle(name, {
+				create: true,
+			})
+			await copyDirectoryFile(fileSource, fileDestination)
+		}
+	}
 }
 
 function updateDirectory(
@@ -528,6 +1126,7 @@ function updateDirectory(
 	files: LocalDirectoryWorkspace["files"],
 	status: LocalDirectoryWorkspace["status"],
 	replaceFiles: boolean,
+	folders?: string[],
 ) {
 	let state = useLocalFileStore.getState()
 	state.setDirectoryWorkspaces(
@@ -536,6 +1135,7 @@ function updateDirectory(
 				? {
 						...workspace,
 						files: replaceFiles ? files : workspace.files,
+						folders: folders ?? workspace.folders,
 						status,
 					}
 				: workspace,
@@ -547,17 +1147,20 @@ async function scanDirectory(
 	directory: FileSystemDirectoryHandle,
 	prefix: string,
 	previousFiles: Map<string, LocalDirectoryWorkspace["files"][number]>,
+	folders: string[],
 ): Promise<LocalDirectoryWorkspace["files"]> {
 	let files: LocalDirectoryWorkspace["files"] = []
 	for await (let [, handle] of directory.entries()) {
 		if (handle.kind === "directory") {
 			if ([".git", "node_modules"].includes(handle.name)) continue
 			let child = await directory.getDirectoryHandle(handle.name)
+			folders.push(`${prefix}${handle.name}`)
 			files.push(
 				...(await scanDirectory(
 					child,
 					`${prefix}${handle.name}/`,
 					previousFiles,
+					folders,
 				)),
 			)
 		} else if (/\.(md|markdown|txt)$/i.test(handle.name)) {
@@ -882,6 +1485,16 @@ async function restoreLocalFileRecovery(id: string): Promise<boolean> {
 }
 
 async function saveLocalFile(id: string, content: string): Promise<boolean> {
+	let mutation = fileMutationLocks.get(id)
+	if (mutation) await mutation
+	let relocated = resolveLocalFileId(id)
+	if (relocated !== id) {
+		id = relocated
+		let current = useLocalFileStore.getState().getFileById(id)
+		if (!current) return false
+		content = current.content
+	}
+	if (!useLocalFileStore.getState().getFileById(id)) return false
 	let previous = saveQueues.get(id) ?? Promise.resolve(true)
 	let current = previous
 		.catch(() => false)
