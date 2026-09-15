@@ -9,6 +9,8 @@ interface EditorAsset {
 	name: string
 	type: "image" | "video" | "tldraw"
 	previewId?: string
+	previewUrl?: string
+	videoUrl?: string
 	video?: { $isLoaded?: boolean; toBlob?: () => Blob | undefined }
 	muteAudio?: boolean
 }
@@ -18,8 +20,11 @@ interface SidebarAsset {
 	name: string
 	type: "image" | "video" | "tldraw"
 	imageId?: string
+	imageUrl?: string
 	lightPreviewId?: string
+	lightPreviewUrl?: string
 	darkPreviewId?: string
+	darkPreviewUrl?: string
 	tldrawRevisionId?: string
 	getVideoBlob?: () => Blob | undefined
 	muteAudio?: boolean

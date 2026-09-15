@@ -39,6 +39,10 @@ export {
 } from "./lib/asset-transfer"
 export { copyAsset } from "./lib/asset-copy"
 export {
+	prepareLocalAssetCopy,
+	attachLocalAssetCopy,
+} from "./lib/local-asset-copy"
+export {
 	makeUploadImage,
 	makeUploadVideo,
 	makeUploadAssets,
@@ -54,3 +58,16 @@ export {
 	VideoCompressionError,
 } from "./lib/video-conversion"
 export { imageExtensions } from "./lib/editor-extension"
+export {
+	loadLocalAssets,
+	writeLocalAsset,
+	writeLocalWhiteboard,
+	readLocalWhiteboard,
+	removeLocalAsset,
+	copyLocalAssetForRename,
+	localEditorContent,
+	localDiskContent,
+	updateLocalAssetReferences,
+	createLocalAssetArchive,
+	type LocalAsset,
+} from "./lib/local-assets"

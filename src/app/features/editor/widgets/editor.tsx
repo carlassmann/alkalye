@@ -1701,6 +1701,25 @@ function MediaPreviewContent({
 		)
 	}
 
+	if ((asset.type === "image" || asset.type === "tldraw") && asset.previewUrl) {
+		return (
+			<img
+				src={asset.previewUrl}
+				alt={preview.alt}
+				className={cn(
+					"w-full object-contain",
+					expanded ? "h-full" : "max-h-[70vh]",
+				)}
+			/>
+		)
+	}
+
+	if (asset.type === "video" && asset.videoUrl) {
+		return (
+			<video src={asset.videoUrl} controls className="max-h-[70vh] w-full" />
+		)
+	}
+
 	// Image asset
 	if ((asset.type === "image" || asset.type === "tldraw") && asset.previewId) {
 		return (

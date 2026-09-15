@@ -26,6 +26,8 @@ interface TldrawEditorOptions {
 	readOnly: boolean
 	createAsset: (name: string, save: TldrawSave) => Promise<CreatedTldrawAsset>
 	updateAsset: (assetId: string, save: TldrawSave) => Promise<void>
+	loadAsset?: (assetId: string) => Promise<string>
+	showPresence?: boolean
 }
 
 interface TldrawEditorController {
@@ -40,6 +42,8 @@ function useTldrawEditor({
 	readOnly,
 	createAsset,
 	updateAsset,
+	loadAsset,
+	showPresence = true,
 }: TldrawEditorOptions): TldrawEditorController {
 	let t = useIntl()
 	let [editor, setEditor] = useState<TldrawEditorState | null>(null)
@@ -89,6 +93,19 @@ function useTldrawEditor({
 
 	async function openAsset(assetId: string) {
 		let asset = assets.find(candidate => candidate.id === assetId)
+		if (asset?.type === "tldraw" && loadAsset) {
+			try {
+				setEditor({
+					assetId,
+					name: asset.name,
+					initialJson: await loadAsset(assetId),
+					mode: "edit",
+				})
+			} catch (error) {
+				toast.error(String(error))
+			}
+			return
+		}
 		if (asset?.type !== "tldraw" || !asset.tldrawRevisionId) return
 		let revision = await TldrawRevision.load(asset.tldrawRevisionId, {
 			resolve: { snapshot: true },
@@ -110,6 +127,7 @@ function useTldrawEditor({
 		<TldrawEditorDialog
 			open={true}
 			assetId={editor.assetId}
+			showPresence={showPresence}
 			name={editor.name}
 			initialJson={editor.initialJson}
 			mode={editor.mode}

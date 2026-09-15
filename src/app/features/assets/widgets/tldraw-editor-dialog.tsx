@@ -35,6 +35,7 @@ let LazyTldrawCanvas = lazy(() =>
 interface TldrawEditorDialogProps {
 	open: boolean
 	assetId?: string
+	showPresence?: boolean
 	name: string
 	initialJson?: string
 	mode: "create" | "edit" | "import"
@@ -45,6 +46,7 @@ interface TldrawEditorDialogProps {
 function TldrawEditorDialog({
 	open,
 	assetId,
+	showPresence = true,
 	name,
 	initialJson,
 	mode,
@@ -123,7 +125,9 @@ function TldrawEditorDialog({
 									{t("assets.whiteboardEditorDescription")}
 								</DialogDescription>
 							</div>
-							{assetId && <WhiteboardPresence assetId={assetId} />}
+							{assetId && showPresence && (
+								<WhiteboardPresence assetId={assetId} />
+							)}
 						</div>
 						<div className="flex shrink-0 items-center gap-1.5">
 							<Button
