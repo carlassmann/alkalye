@@ -928,7 +928,16 @@ function LocalDirectoryActionDialog({
 						if (destination !== sourceFolder) {
 							let file = await readDirectoryFile(workspaceId, action.path)
 							if (!file) throw Error("Unable to read this file")
-							if (referencedLocalAssetIds(file.content).size > 0)
+							let openFile = useLocalFileStore
+								.getState()
+								.getFileById(`${workspaceId}:${action.path}`)
+							let unsavedContent = openFile
+								? localDiskContent(openFile.content, [])
+								: ""
+							if (
+								referencedLocalAssetIds(file.content).size > 0 ||
+								referencedLocalAssetIds(unsavedContent).size > 0
+							)
 								throw Error(
 									"Files with assets cannot be moved to another folder",
 								)
