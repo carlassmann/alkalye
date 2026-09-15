@@ -116,6 +116,7 @@ import {
 	updateLocalAssetReferences,
 	createLocalAssetArchive,
 	isLocalAssetReferencedElsewhere,
+	referencedLocalAssetIds,
 	type LocalAsset,
 } from "@/app/features/assets"
 import {
@@ -874,15 +875,14 @@ async function saveLocalCopy(
 	filename: string,
 	location?: Pick<LocalFileEntry, "workspaceId" | "path">,
 ) {
-	let archive = await localCopyArchive(content, filename, location)
-	if (archive) {
-		if (!window.showSaveFilePicker) {
-			downloadLocalBlob(archive)
-			return
-		}
+	let hasAssetLinks =
+		location?.workspaceId &&
+		location.path &&
+		referencedLocalAssetIds(content).size > 0
+	if (hasAssetLinks && window.showSaveFilePicker) {
 		let picked = await tryCatch(
 			window.showSaveFilePicker({
-				suggestedName: archive.name,
+				suggestedName: `${filename.replace(/\.md$/i, "")}.zip`,
 				types: [
 					{
 						description: "ZIP archive",
@@ -895,6 +895,8 @@ async function saveLocalCopy(
 			if (picked.error.name === "AbortError") return
 			throw picked.error
 		}
+		let archive = await localCopyArchive(content, filename, location)
+		if (!archive) throw new Error("Unable to bundle local assets")
 		let writable = await picked.value.createWritable()
 		try {
 			await writable.write(archive)
@@ -903,6 +905,11 @@ async function saveLocalCopy(
 			await writable.abort().catch(() => undefined)
 			throw error
 		}
+		return
+	}
+	let archive = await localCopyArchive(content, filename, location)
+	if (archive) {
+		downloadLocalBlob(archive)
 		return
 	}
 	let result = await saveLocalFileAs(content, filename)

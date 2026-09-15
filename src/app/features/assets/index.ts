@@ -70,5 +70,6 @@ export {
 	updateLocalAssetReferences,
 	createLocalAssetArchive,
 	isLocalAssetReferencedElsewhere,
+	referencedLocalAssetIds,
 	type LocalAsset,
 } from "./lib/local-assets"
