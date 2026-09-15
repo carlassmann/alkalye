@@ -286,7 +286,11 @@ async function isLocalAssetReferencedElsewhere(
 	if (!directory) return false
 	let filename = file.path?.split("/").at(-1)
 	for await (let [name, handle] of directory.entries()) {
-		if (handle.kind !== "file" || name === filename || !/\.md$/i.test(name))
+		if (
+			handle.kind !== "file" ||
+			name === filename ||
+			!/\.(md|markdown|txt)$/i.test(name)
+		)
 			continue
 		let content = await (await directory.getFileHandle(name)).getFile()
 		let markdown = await content.text()
