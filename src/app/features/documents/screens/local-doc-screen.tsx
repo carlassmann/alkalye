@@ -761,10 +761,7 @@ function LocalFileContextMenu({
 	let exportAsZip =
 		!!prepared &&
 		referencedLocalAssetIds(prepared.content).size > 0 &&
-		!!(
-			workspaceId ||
-			(fileId && useLocalFileStore.getState().getFileById(fileId)?.workspaceId)
-		)
+		!!workspaceId
 
 	async function readClickedFile() {
 		if (fileId) {
@@ -1086,9 +1083,10 @@ function LocalEditorContent({
 	let documents: { id: string; title: string }[] = []
 
 	function handleChange(newContent: string) {
+		let originalContent = store.getFileById(activeFile.id)?.content
 		store.setFileContent(
 			activeFile.id,
-			localDiskContent(newContent, localAssets),
+			localDiskContent(newContent, localAssets, originalContent),
 		)
 
 		if (saveTimeoutRef.current) {
@@ -1126,8 +1124,13 @@ function LocalEditorContent({
 		store.setFileContent(activeFile.id, updatedContent)
 		let saved = await saveLocalFile(activeFile.id, updatedContent)
 		if (!saved) {
+			let current = useLocalFileStore.getState().getFileById(activeFile.id)
+			if (current?.content === updatedContent) {
+				store.setFileContent(activeFile.id, content)
+				await removeLocalAsset(activeFile, next)
+			}
 			setAssetVersion(version => version + 1)
-			throw new Error("Save the Markdown file before removing the old asset")
+			throw new Error("Save the Markdown file before completing the rename")
 		}
 		let latest = useLocalFileStore.getState().getFileById(activeFile.id)
 		if (latest?.content.includes(`assets/${id}`))
@@ -1283,7 +1286,7 @@ function LocalEditorContent({
 		let title = getDocumentTitle(file.content) || "Untitled"
 		let filename = file.filename || title + ".md"
 		void downloadLocalCopy(file.content, filename, file).catch(error =>
-			toast.error(String(error)),
+			toast.error(assetErrorMessage(error)),
 		)
 	}
 
@@ -1521,7 +1524,7 @@ function LocalEditorContent({
 										.map(file => writeLocalAsset(activeFile, file, file.name)),
 								)
 									.then(() => setAssetVersion(version => version + 1))
-									.catch(error => toast.error(String(error)))
+									.catch(error => toast.error(assetErrorMessage(error)))
 							}}
 							onUploadVideo={async (file, options) => {
 								if (options.signal.aborted) return
@@ -1534,12 +1537,12 @@ function LocalEditorContent({
 							canUploadVideo
 							onRename={(id, name) => {
 								void handleRenameAsset(id, name).catch(error =>
-									toast.error(String(error)),
+									toast.error(assetErrorMessage(error)),
 								)
 							}}
 							onDelete={id => {
 								void handleDeleteAsset(id).catch(error =>
-									toast.error(String(error)),
+									toast.error(assetErrorMessage(error)),
 								)
 							}}
 							onDownload={id => {
@@ -1567,6 +1570,10 @@ function LocalEditorContent({
 			/>
 		</>
 	)
+}
+
+function assetErrorMessage(error: unknown) {
+	return error instanceof Error ? error.message : String(error)
 }
 
 interface LocalAssetView extends LocalAsset {

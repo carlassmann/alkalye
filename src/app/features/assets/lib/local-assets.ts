@@ -31,6 +31,7 @@ export {
 	createLocalAssetArchive,
 	isLocalAssetReferencedElsewhere,
 	referencedLocalAssetIds,
+	assertLocalAssetReferencesAvailable,
 	type LocalAsset,
 }
 
@@ -56,15 +57,30 @@ function localEditorContent(content: string, assets: LocalAsset[]) {
 	return transformContentForImport(normalized, files)
 }
 
-function localDiskContent(content: string, assets: LocalAsset[]) {
+function localDiskContent(
+	content: string,
+	assets: LocalAsset[],
+	originalContent = "",
+) {
 	let files = new Map(assets.map(asset => [asset.id, asset.id]))
 	let transformed = transformContentForBackup(content, files)
-	return transformed.replace(
+	let diskContent = transformed.replace(
 		/!\[([^\]]*)\]\(asset:([^)]+)\)/g,
 		(match, alt, id) =>
 			isAssetFileName(id) && !id.includes("/")
 				? `![${alt}](assets/${id})`
 				: match,
+	)
+	let relativeLinks = new Set(
+		Array.from(
+			originalContent.matchAll(/!\[([^\]]*)\]\(\.\/assets\/([^)]+)\)/g),
+			match => `${match[1]}\0${match[2]}`,
+		),
+	)
+	return diskContent.replace(
+		/!\[([^\]]*)\]\(assets\/([^)]+)\)/g,
+		(match, alt, id) =>
+			relativeLinks.has(`${alt}\0${id}`) ? `![${alt}](./assets/${id})` : match,
 	)
 }
 
@@ -89,6 +105,7 @@ async function createLocalAssetArchive(
 ) {
 	let references = referencedLocalAssetIds(content)
 	if (references.size === 0) return null
+	assertLocalAssetReferencesAvailable(content, assets)
 	let { default: JSZip } = await import("jszip")
 	let zip = new JSZip()
 	let name = filename.replace(/\.md$/i, "")
@@ -110,6 +127,17 @@ function referencedLocalAssetIds(content: string) {
 			match => match[1],
 		),
 	)
+}
+
+function assertLocalAssetReferencesAvailable(
+	content: string,
+	assets: Pick<LocalAsset, "id">[],
+) {
+	let available = new Set(assets.map(asset => asset.id))
+	for (let id of referencedLocalAssetIds(content)) {
+		if (!available.has(id))
+			throw new Error(`Local asset ${id} is unavailable; restore it first`)
+	}
 }
 
 async function loadLocalAssets(

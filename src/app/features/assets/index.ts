@@ -41,7 +41,6 @@ export { copyAsset } from "./lib/asset-copy"
 export {
 	prepareLocalAssetCopy,
 	attachLocalAssetCopy,
-	assertLocalAssetReferencesAvailable,
 } from "./lib/local-asset-copy"
 export {
 	makeUploadImage,
@@ -72,5 +71,6 @@ export {
 	createLocalAssetArchive,
 	isLocalAssetReferencedElsewhere,
 	referencedLocalAssetIds,
+	assertLocalAssetReferencesAvailable,
 	type LocalAsset,
 } from "./lib/local-assets"

@@ -5,28 +5,11 @@ import { createAssetFromFile } from "./asset-transfer"
 import {
 	localEditorContent,
 	referencedLocalAssetIds,
+	assertLocalAssetReferencesAvailable,
 	type LocalAsset,
 } from "./local-assets"
 
-export {
-	prepareLocalAssetCopy,
-	attachLocalAssetCopy,
-	assertLocalAssetReferencesAvailable,
-}
-
-function assertLocalAssetReferencesAvailable(
-	content: string,
-	files: LocalAsset[],
-) {
-	let references = referencedLocalAssetIds(content)
-	let available = new Set(files.map(file => file.id))
-	for (let id of references) {
-		if (!available.has(id))
-			throw new Error(
-				`Local asset ${id} is unavailable; restore it before copying`,
-			)
-	}
-}
+export { prepareLocalAssetCopy, attachLocalAssetCopy }
 
 async function prepareLocalAssetCopy(
 	content: string,

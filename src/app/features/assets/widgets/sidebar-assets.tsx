@@ -380,6 +380,7 @@ function SidebarAssets({
 										>
 											<DropdownMenu>
 												<DropdownMenuTrigger
+													nativeButton
 													disabled={readOnly}
 													render={
 														<SidebarMenuButton disabled={readOnly} nativeButton>

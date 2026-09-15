@@ -54,9 +54,13 @@ describe("local asset files", () => {
 		expect(localEditorContent(diskContent, assets)).toBe(
 			`![Diagram](asset:${id})`,
 		)
-		expect(localEditorContent(`![Diagram](./assets/${id})`, assets)).toBe(
+		let explicitLink = `![Diagram](./assets/${id})`
+		expect(localEditorContent(explicitLink, assets)).toBe(
 			`![Diagram](asset:${id})`,
 		)
+		expect(
+			localDiskContent(`![Diagram](asset:${id})`, assets, explicitLink),
+		).toBe(explicitLink)
 		expect(localDiskContent(`![Diagram](asset:${id})`, assets)).toBe(
 			diskContent,
 		)
@@ -137,6 +141,9 @@ describe("local asset files", () => {
 		expect(await zip.file(`notes/assets/${id}`)?.async("string")).toContain(
 			"alkalye-tldraw-v1",
 		)
+		await expect(
+			createLocalAssetArchive("![Missing](assets/missing.png)", "notes.md", []),
+		).rejects.toThrow("missing.png is unavailable")
 	})
 
 	it("detects when a sibling Markdown file still uses an asset", async () => {
