@@ -9,7 +9,7 @@ import {
 	setActiveAccount,
 	setupJazzTestSync,
 } from "jazz-tools/testing"
-import { NotFoundError, ValidationError } from "@/cli/errors"
+import { FilesystemError, NotFoundError, ValidationError } from "@/cli/errors"
 import { createPersonalDocument } from "@/app/features/documents/lib/documents"
 import {
 	acceptDocumentInvite,
@@ -114,6 +114,10 @@ describe("CLI doc assets", () => {
 		await expect(
 			addAssetFromFile(docLoaded, { filePath: join(dir, "missing.svg") }),
 		).rejects.toThrow(ValidationError)
+
+		await expect(
+			addAssetFromFile(docLoaded, { filePath: join(dir, "missing.png") }),
+		).rejects.toThrow(FilesystemError)
 
 		let textPath = join(dir, "notes.txt")
 		await writeFile(textPath, "text")

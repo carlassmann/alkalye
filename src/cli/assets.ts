@@ -10,7 +10,12 @@ import {
 import { Asset } from "@/app/features/assets/lib/schema"
 import { syncDocumentMetadata } from "@/app/features/documents/lib/metadata"
 import { canEdit } from "@/app/features/sharing"
-import { NotFoundError, PermissionError, ValidationError } from "@/cli/errors"
+import {
+	FilesystemError,
+	NotFoundError,
+	PermissionError,
+	ValidationError,
+} from "@/cli/errors"
 import { descriptions } from "@/cli/help"
 import { createAuthenticatedJazz } from "@/cli/jazz"
 import { docIdArg, globalOptions, nameOption } from "@/cli/options"
@@ -58,6 +63,12 @@ type ListableAssetDocument = co.loaded<
 	typeof listableAssetDocumentResolve
 >
 type LoadedAsset = co.loaded<typeof ImageAsset> | co.loaded<typeof VideoAsset>
+type AssetUpload = {
+	fileName: string
+	mimeType: string
+	kind: "image" | "video"
+	data: Uint8Array<ArrayBuffer>
+}
 type AssetSummary = {
 	assetId: string
 	name: string
@@ -71,7 +82,6 @@ type AssetSummary = {
 // svg is rejected there; bmp fails earlier, inside sharp's decoder. The browser encoder
 // accepts both, so app-created assets are not limited to these.
 let serverEncodableImageMimeTypes = new Set([
-	"image/avif",
 	"image/gif",
 	"image/jpeg",
 	"image/png",
@@ -95,6 +105,7 @@ let docAssetAdd = Command.make(
 	},
 	args =>
 		runCommand("doc.asset.add", args, async config => {
+			let upload = await readAssetUpload(args.file)
 			let jazz = await createAuthenticatedJazz(config)
 			let doc = await loadMutableAssetDocument(
 				jazz,
@@ -102,8 +113,7 @@ let docAssetAdd = Command.make(
 				config.timeoutMs,
 			)
 			requireAssetEdit(doc)
-			let asset = await addAssetFromFile(doc, {
-				filePath: args.file,
+			let asset = await attachAsset(doc, upload, {
 				name: getOptionString(args.name),
 			})
 			await syncMutation(jazz, config.timeoutMs)
@@ -189,7 +199,16 @@ async function addAssetFromFile(
 	doc: LoadedAssetDocument,
 	input: { filePath: string; name?: string; createdAt?: Date },
 ): Promise<AssetSummary> {
-	let fileName = basename(input.filePath)
+	let upload = await readAssetUpload(input.filePath)
+	return attachAsset(doc, upload, {
+		name: input.name,
+		createdAt: input.createdAt,
+	})
+}
+
+// Reading happens before the command authenticates, so bad input fails without paying for a sync
+async function readAssetUpload(filePath: string): Promise<AssetUpload> {
+	let fileName = basename(filePath)
 	let mimeType = assetMimeTypeFromFileName(fileName)
 	let kind = classifyAssetFile({ name: fileName, type: mimeType })
 	if (!kind) {
@@ -206,16 +225,28 @@ async function addAssetFromFile(
 		throw new ValidationError({
 			message:
 				`Unsupported image format: ${fileName}. ` +
-				"Supported: avif, gif, jpg, png, webp. Convert svg or bmp first.",
+				"Supported: gif, jpg, png, webp. Convert svg or bmp first.",
 		})
 	}
 
-	let data = await readFile(input.filePath)
-	let name = input.name?.trim() || fileName.replace(/\.[^.]+$/, "")
+	let data = await readFile(filePath).catch((error: unknown) => {
+		throw new FilesystemError({
+			message: `Cannot read ${filePath}: ${errorMessage(error)}`,
+		})
+	})
+	return { fileName, mimeType, kind, data }
+}
+
+async function attachAsset(
+	doc: LoadedAssetDocument,
+	upload: AssetUpload,
+	input: { name?: string; createdAt?: Date },
+): Promise<AssetSummary> {
+	let name = input.name?.trim() || upload.fileName.replace(/\.[^.]+$/, "")
 	let createdAt = input.createdAt ?? new Date()
 	let asset: LoadedAsset
-	if (kind === "image") {
-		let image = await createImage(data, {
+	if (upload.kind === "image") {
+		let image = await createImage(upload.data, {
 			owner: doc.$jazz.owner,
 			maxSize: 2048,
 		})
@@ -226,11 +257,11 @@ async function addAssetFromFile(
 	} else {
 		let video = await co
 			.fileStream()
-			.createFromBlob(new Blob([data], { type: mimeType }), {
+			.createFromBlob(new Blob([upload.data], { type: upload.mimeType }), {
 				owner: doc.$jazz.owner,
 			})
 		asset = VideoAsset.create(
-			{ type: "video", name, video, mimeType, createdAt },
+			{ type: "video", name, video, mimeType: upload.mimeType, createdAt },
 			doc.$jazz.owner,
 		)
 	}
@@ -240,6 +271,10 @@ async function addAssetFromFile(
 	doc.$jazz.set("updatedAt", new Date())
 	syncDocumentMetadata(doc, { contentChanged: false })
 	return summarizeAsset(doc, asset)
+}
+
+function errorMessage(error: unknown): string {
+	return error instanceof Error ? error.message : String(error)
 }
 
 function listDocAssets(doc: ListableAssetDocument): AssetSummary[] {
