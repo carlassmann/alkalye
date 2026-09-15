@@ -51,7 +51,7 @@ function formatHuman(value: unknown): string {
 	}
 	if (typeof value === "object" && value !== null) {
 		return Object.entries(value)
-			.map(([key, entry]) => `${key}: ${formatScalar(entry)}`)
+			.map(([key, entry]) => formatEntry(key, entry))
 			.join("\n")
 	}
 	return formatScalar(value)
@@ -62,6 +62,19 @@ function formatHumanWithMeta(value: unknown, meta: unknown): string {
 	let body = formatHuman(value)
 	let runtime = formatHuman(meta)
 	return body ? `${body}\n\n${runtime}` : runtime
+}
+
+function formatEntry(key: string, entry: unknown): string {
+	if (!Array.isArray(entry)) return `${key}: ${formatScalar(entry)}`
+	if (entry.length === 0) return `${key}: none`
+	return `${key}:\n${indent(formatHuman(entry))}`
+}
+
+function indent(text: string): string {
+	return text
+		.split("\n")
+		.map(line => (line ? `  ${line}` : line))
+		.join("\n")
 }
 
 function formatScalar(value: unknown): string {

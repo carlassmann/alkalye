@@ -146,6 +146,19 @@ let groups: Record<string, GroupDef> = {
 			},
 		],
 	},
+	"doc asset": {
+		description: descriptions.docAsset,
+		sections: [
+			{
+				heading: "Commands",
+				items: [
+					["add", "Upload an image or video from a file"],
+					["list", "List document attachments"],
+					["remove", "Remove an attachment and its references"],
+				],
+			},
+		],
+	},
 	"doc share": {
 		description: descriptions.docShare,
 		sections: [

@@ -204,6 +204,31 @@ describe("CLI doc assets", () => {
 		})
 	})
 
+	test("keeps surrounding text when stripping an inline reference", async () => {
+		let doc = await createPersonalDocument(account, "# Doc")
+		let docLoaded = await loadDoc(doc.$jazz.id)
+		let path = join(dir, "photo.png")
+		await writeFile(path, pngBytes)
+		let asset = await addAssetFromFile(docLoaded, { filePath: path })
+		docLoaded.content.$jazz.applyDiff(`# Doc\n\nsee ${asset.reference} here\n`)
+
+		await removeAsset(docLoaded, asset.assetId)
+
+		expect(docLoaded.content.toString()).toBe("# Doc\n\nsee  here\n")
+	})
+
+	test("rejects a file whose bytes are not the image its name claims", async () => {
+		let doc = await createPersonalDocument(account, "# Doc")
+		let docLoaded = await loadDoc(doc.$jazz.id)
+		let path = join(dir, "liar.png")
+		await writeFile(path, '<svg xmlns="http://www.w3.org/2000/svg" />')
+
+		await expect(
+			addAssetFromFile(docLoaded, { filePath: path }),
+		).rejects.toThrow(ValidationError)
+		expect(listDocAssets(docLoaded)).toEqual([])
+	})
+
 	test("removes the asset and strips its references", async () => {
 		let doc = await createPersonalDocument(account, "# Doc")
 		let docLoaded = await loadDoc(doc.$jazz.id)
@@ -220,7 +245,7 @@ describe("CLI doc assets", () => {
 			assetId: asset.assetId,
 			removedFromContent: true,
 		})
-		expect(docLoaded.content.toString()).toBe("# Doc\n\nIntro\n\n\n\nEnd")
+		expect(docLoaded.content.toString()).toBe("# Doc\n\nIntro\n\nEnd")
 		expect(listDocAssets(docLoaded)).toEqual([])
 
 		await expect(removeAsset(docLoaded, asset.assetId)).rejects.toThrow(

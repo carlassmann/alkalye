@@ -249,6 +249,10 @@ async function attachAsset(
 		let image = await createImage(upload.data, {
 			owner: doc.$jazz.owner,
 			maxSize: 2048,
+		}).catch((error: unknown) => {
+			throw new ValidationError({
+				message: `Cannot read ${upload.fileName} as an image: ${errorMessage(error)}`,
+			})
 		})
 		asset = ImageAsset.create(
 			{ type: "image", name, image, createdAt },
@@ -307,11 +311,17 @@ async function removeAsset(
 }
 
 function stripAssetReference(content: string, assetId: string) {
-	let pattern = new RegExp(
-		`!\\[[^\\]]*\\]\\(asset:${escapeAssetId(assetId)}\\)`,
-		"g",
+	let reference = `!\\[[^\\]]*\\]\\(asset:${escapeAssetId(assetId)}\\)`
+	let ownParagraph = new RegExp(
+		`^[ \\t]*${reference}[ \\t]*\\n[ \\t]*\\n`,
+		"gm",
 	)
-	return content.replace(pattern, "")
+	let ownLine = new RegExp(`^[ \\t]*${reference}[ \\t]*\\n?`, "gm")
+	let inline = new RegExp(reference, "g")
+	return content
+		.replace(ownParagraph, "")
+		.replace(ownLine, "")
+		.replace(inline, "")
 }
 
 function escapeAssetId(assetId: string) {
