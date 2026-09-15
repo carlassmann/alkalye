@@ -29,6 +29,7 @@ export {
 	localDiskContent,
 	updateLocalAssetReferences,
 	createLocalAssetArchive,
+	isLocalAssetReferencedElsewhere,
 	type LocalAsset,
 }
 
@@ -197,6 +198,25 @@ async function removeLocalAsset(file: LocalAssetLocation, assetId: string) {
 	await directory.removeEntry(assetId)
 }
 
+async function isLocalAssetReferencedElsewhere(
+	file: LocalAssetLocation,
+	assetId: string,
+) {
+	let directory = await getLocalDirectory(file)
+	if (!directory) return false
+	let filename = file.path?.split("/").at(-1)
+	for await (let [name, handle] of directory.entries()) {
+		if (handle.kind !== "file" || name === filename || !/\.md$/i.test(name))
+			continue
+		let content = await (await directory.getFileHandle(name)).getFile()
+		let markdown = await content.text()
+		for (let match of markdown.matchAll(/!\[[^\]]*\]\(assets\/([^)]+)\)/g)) {
+			if (match[1] === assetId) return true
+		}
+	}
+	return false
+}
+
 async function copyLocalAssetForRename(
 	file: LocalAssetLocation,
 	assetId: string,
@@ -226,6 +246,17 @@ async function copyLocalAssetForRename(
 }
 
 async function getAssetsDirectory(file: LocalAssetLocation, create = false) {
+	let directory = await getLocalDirectory(file)
+	if (!directory) return null
+	try {
+		return await directory.getDirectoryHandle("assets", { create })
+	} catch (error) {
+		if (create) throw error
+		return null
+	}
+}
+
+async function getLocalDirectory(file: LocalAssetLocation) {
 	if (!file.workspaceId || !file.path) return null
 	let root = await getDirectoryHandleFromDB(file.workspaceId)
 	if (!root) return null
@@ -235,12 +266,7 @@ async function getAssetsDirectory(file: LocalAssetLocation, create = false) {
 	for (let segment of segments) {
 		directory = await directory.getDirectoryHandle(segment)
 	}
-	try {
-		return await directory.getDirectoryHandle("assets", { create })
-	} catch (error) {
-		if (create) throw error
-		return null
-	}
+	return directory
 }
 
 async function writeBlob(handle: FileSystemFileHandle, blob: Blob) {

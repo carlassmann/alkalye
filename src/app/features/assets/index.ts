@@ -69,5 +69,6 @@ export {
 	localDiskContent,
 	updateLocalAssetReferences,
 	createLocalAssetArchive,
+	isLocalAssetReferencedElsewhere,
 	type LocalAsset,
 } from "./lib/local-assets"

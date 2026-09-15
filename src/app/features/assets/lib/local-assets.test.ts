@@ -17,6 +17,7 @@ import {
 	writeLocalAsset,
 	writeLocalWhiteboard,
 	createLocalAssetArchive,
+	isLocalAssetReferencedElsewhere,
 } from "./local-assets"
 
 vi.mock("@/app/lib/local-file", () => ({
@@ -24,16 +25,17 @@ vi.mock("@/app/lib/local-file", () => ({
 }))
 
 let root: MockDirectoryHandle
+let workDirectory: MockDirectoryHandle
 let assetsDirectory: MockDirectoryHandle
 let location = { workspaceId: "notes", path: "work/notes.md" }
 
 beforeEach(() => {
 	root = new MockDirectoryHandle("notes")
-	let work = new MockDirectoryHandle("work")
+	workDirectory = new MockDirectoryHandle("work")
 	assetsDirectory = new MockDirectoryHandle("assets")
-	work.addDirectory("assets", assetsDirectory)
-	work.addFile("notes.md", "# Notes")
-	root.addDirectory("work", work)
+	workDirectory.addDirectory("assets", assetsDirectory)
+	workDirectory.addFile("notes.md", "# Notes")
+	root.addDirectory("work", workDirectory)
 	vi.mocked(getDirectoryHandleFromDB).mockResolvedValue(root)
 })
 
@@ -113,6 +115,18 @@ describe("local asset files", () => {
 		expect(await zip.file(`notes/assets/${id}`)?.async("string")).toContain(
 			"alkalye-tldraw-v1",
 		)
+	})
+
+	it("detects when a sibling Markdown file still uses an asset", async () => {
+		let id = await writeLocalAsset(
+			location,
+			new Blob(["image"], { type: "image/png" }),
+			"map.png",
+		)
+		workDirectory.addFile("other.md", `![Map](assets/${id})`)
+		expect(await isLocalAssetReferencedElsewhere(location, id)).toBe(true)
+		workDirectory.addFile("other.md", "![Different](assets/map-2.png)")
+		expect(await isLocalAssetReferencedElsewhere(location, id)).toBe(false)
 	})
 })
 

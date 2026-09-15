@@ -115,6 +115,7 @@ import {
 	localDiskContent,
 	updateLocalAssetReferences,
 	createLocalAssetArchive,
+	isLocalAssetReferencedElsewhere,
 	type LocalAsset,
 } from "@/app/features/assets"
 import {
@@ -1119,11 +1120,14 @@ function LocalEditorContent({
 		let latest = useLocalFileStore.getState().getFileById(activeFile.id)
 		if (latest?.content.includes(`assets/${id}`))
 			throw new Error("Old asset is still referenced after saving")
-		await removeLocalAsset(activeFile, id)
+		if (!(await isLocalAssetReferencedElsewhere(activeFile, id)))
+			await removeLocalAsset(activeFile, id)
 		setAssetVersion(version => version + 1)
 	}
 
 	async function handleDeleteAsset(id: string) {
+		if (await isLocalAssetReferencedElsewhere(activeFile, id))
+			throw new Error("Another Markdown file in this folder uses this asset")
 		let updatedContent = updateLocalAssetReferences(content, id)
 		if (updatedContent !== content) {
 			store.setFileContent(activeFile.id, updatedContent)
