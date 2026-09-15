@@ -30,6 +30,7 @@ export {
 	updateLocalAssetReferences,
 	createLocalAssetArchive,
 	isLocalAssetReferencedElsewhere,
+	referencedLocalAssetIds,
 	type LocalAsset,
 }
 
@@ -47,7 +48,11 @@ type LocalAssetLocation = Pick<LocalFileEntry, "workspaceId" | "path">
 
 function localEditorContent(content: string, assets: LocalAsset[]) {
 	let files = new Map(assets.map(asset => [asset.id, asset.id]))
-	return transformContentForImport(content, files)
+	let normalized = content.replace(
+		/!\[([^\]]*)\]\(\.\/assets\/([^)]+)\)/g,
+		(match, alt, id) => (files.has(id) ? `![${alt}](assets/${id})` : match),
+	)
+	return transformContentForImport(normalized, files)
 }
 
 function localDiskContent(content: string, assets: LocalAsset[]) {
@@ -68,7 +73,7 @@ function updateLocalAssetReferences(
 	nextId?: string,
 ) {
 	return content.replace(
-		/!\[([^\]]*)\]\(assets\/([^)]+)\)/g,
+		/!\[([^\]]*)\]\((?:\.\/)?assets\/([^)]+)\)/g,
 		(match, alt, id) => {
 			if (id !== assetId) return match
 			return nextId ? `![${alt}](assets/${nextId})` : ""
@@ -81,9 +86,7 @@ async function createLocalAssetArchive(
 	filename: string,
 	assets: LocalAsset[],
 ) {
-	let references = new Set<string>()
-	for (let match of content.matchAll(/!\[[^\]]*\]\(assets\/([^)]+)\)/g))
-		references.add(match[1])
+	let references = referencedLocalAssetIds(content)
 	if (references.size === 0) return null
 	let { default: JSZip } = await import("jszip")
 	let zip = new JSZip()
@@ -98,6 +101,14 @@ async function createLocalAssetArchive(
 	return new File([blob], `${name}.zip`, {
 		type: "application/zip",
 	})
+}
+
+function referencedLocalAssetIds(content: string) {
+	return new Set(
+		[...content.matchAll(/!\[[^\]]*\]\((?:\.\/)?assets\/([^)]+)\)/g)].map(
+			match => match[1],
+		),
+	)
 }
 
 async function loadLocalAssets(
@@ -189,7 +200,10 @@ async function readLocalWhiteboard(file: LocalAssetLocation, assetId: string) {
 	let directory = await getAssetsDirectory(file)
 	if (!directory) throw new Error("Whiteboard asset is unavailable")
 	let blob = await (await directory.getFileHandle(assetId)).getFile()
-	return decodeTldrawBackupBundle(blob)
+	return {
+		...(await decodeTldrawBackupBundle(blob)),
+		lastModified: blob.lastModified,
+	}
 }
 
 async function removeLocalAsset(file: LocalAssetLocation, assetId: string) {
@@ -210,9 +224,7 @@ async function isLocalAssetReferencedElsewhere(
 			continue
 		let content = await (await directory.getFileHandle(name)).getFile()
 		let markdown = await content.text()
-		for (let match of markdown.matchAll(/!\[[^\]]*\]\(assets\/([^)]+)\)/g)) {
-			if (match[1] === assetId) return true
-		}
+		if (referencedLocalAssetIds(markdown).has(assetId)) return true
 	}
 	return false
 }

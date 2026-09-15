@@ -2,7 +2,11 @@ import { co, type Group } from "jazz-tools"
 import { Document } from "@/app/features/documents/lib/schema"
 import { Asset } from "./schema"
 import { createAssetFromFile } from "./asset-transfer"
-import { localEditorContent, type LocalAsset } from "./local-assets"
+import {
+	localEditorContent,
+	referencedLocalAssetIds,
+	type LocalAsset,
+} from "./local-assets"
 
 export { prepareLocalAssetCopy, attachLocalAssetCopy }
 
@@ -13,11 +17,7 @@ async function prepareLocalAssetCopy(
 ) {
 	let assets: Awaited<ReturnType<typeof createAssetFromFile>>[] = []
 	let ids = new Map<string, string>()
-	let referencedFiles = new Set(
-		[...content.matchAll(/!\[[^\]]*\]\(assets\/([^)]+)\)/g)].map(
-			match => match[1],
-		),
-	)
+	let referencedFiles = referencedLocalAssetIds(content)
 	for (let file of files) {
 		if (!referencedFiles.has(file.id)) continue
 		let asset = await createAssetFromFile(

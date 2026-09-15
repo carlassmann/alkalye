@@ -54,6 +54,9 @@ describe("local asset files", () => {
 		expect(localEditorContent(diskContent, assets)).toBe(
 			`![Diagram](asset:${id})`,
 		)
+		expect(localEditorContent(`![Diagram](./assets/${id})`, assets)).toBe(
+			`![Diagram](asset:${id})`,
+		)
 		expect(localDiskContent(`![Diagram](asset:${id})`, assets)).toBe(
 			diskContent,
 		)
@@ -123,7 +126,7 @@ describe("local asset files", () => {
 			new Blob(["image"], { type: "image/png" }),
 			"map.png",
 		)
-		workDirectory.addFile("other.md", `![Map](assets/${id})`)
+		workDirectory.addFile("other.md", `![Map](./assets/${id})`)
 		expect(await isLocalAssetReferencedElsewhere(location, id)).toBe(true)
 		workDirectory.addFile("other.md", "![Different](assets/map-2.png)")
 		expect(await isLocalAssetReferencedElsewhere(location, id)).toBe(false)

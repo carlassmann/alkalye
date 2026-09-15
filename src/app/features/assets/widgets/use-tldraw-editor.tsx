@@ -17,6 +17,7 @@ interface TldrawEditorState {
 	assetId?: string
 	name: string
 	initialJson?: string
+	expectedLastModified?: number
 	mode: "create" | "edit" | "import"
 	onCreated?: (asset: CreatedTldrawAsset) => void
 }
@@ -25,8 +26,14 @@ interface TldrawEditorOptions {
 	assets: SidebarAsset[]
 	readOnly: boolean
 	createAsset: (name: string, save: TldrawSave) => Promise<CreatedTldrawAsset>
-	updateAsset: (assetId: string, save: TldrawSave) => Promise<void>
-	loadAsset?: (assetId: string) => Promise<string>
+	updateAsset: (
+		assetId: string,
+		save: TldrawSave,
+		expectedLastModified?: number,
+	) => Promise<void>
+	loadAsset?: (
+		assetId: string,
+	) => Promise<{ json: string; lastModified: number }>
 	showPresence?: boolean
 }
 
@@ -95,10 +102,12 @@ function useTldrawEditor({
 		let asset = assets.find(candidate => candidate.id === assetId)
 		if (asset?.type === "tldraw" && loadAsset) {
 			try {
+				let loaded = await loadAsset(assetId)
 				setEditor({
 					assetId,
 					name: asset.name,
-					initialJson: await loadAsset(assetId),
+					initialJson: loaded.json,
+					expectedLastModified: loaded.lastModified,
 					mode: "edit",
 				})
 			} catch (error) {
@@ -136,7 +145,7 @@ function useTldrawEditor({
 			}}
 			onSave={async save => {
 				if (editor.assetId) {
-					await updateAsset(editor.assetId, save)
+					await updateAsset(editor.assetId, save, editor.expectedLastModified)
 					return
 				}
 				let created = await createAsset(editor.name, save)

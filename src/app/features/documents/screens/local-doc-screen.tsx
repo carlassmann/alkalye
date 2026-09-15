@@ -1040,17 +1040,16 @@ function LocalEditorContent({
 		assets: sidebarAssets,
 		readOnly: !activeFile.workspaceId,
 		showPresence: false,
-		loadAsset: async id => (await readLocalWhiteboard(activeFile, id)).json,
+		loadAsset: async id => readLocalWhiteboard(activeFile, id),
 		createAsset: async (name, save) => {
 			let id = await writeLocalWhiteboard(activeFile, name, save)
 			setAssetVersion(version => version + 1)
 			return { id, name }
 		},
-		updateAsset: async (id, save) => {
-			let asset = localAssets.find(candidate => candidate.id === id)
-			if (!asset || asset.lastModified === undefined)
+		updateAsset: async (id, save, expectedLastModified) => {
+			if (expectedLastModified === undefined)
 				throw new Error("Whiteboard is unavailable; reopen it before saving")
-			await writeLocalWhiteboard(activeFile, "", save, id, asset.lastModified)
+			await writeLocalWhiteboard(activeFile, "", save, id, expectedLastModified)
 			setAssetVersion(version => version + 1)
 		},
 	})
