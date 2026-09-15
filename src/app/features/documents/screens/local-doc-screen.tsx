@@ -506,7 +506,7 @@ function buildLocalTree(
 }
 
 function isAssetDirectoryPath(path: string) {
-	return path.split("/").includes("assets")
+	return path.split("/").some(part => part.toLocaleLowerCase() === "assets")
 }
 
 function LocalWorkspaceSelector() {
@@ -914,11 +914,11 @@ function LocalDirectoryActionDialog({
 							"File created, but it could not be opened. Refresh the folder.",
 						)
 				} else if (action.kind === "create-folder") {
-					if (name.trim() === "assets")
+					if (isAssetDirectoryPath(name.trim()))
 						throw Error("The assets folder is reserved")
 					await createDirectoryFolder(workspaceId, action.path, name)
 				} else if (action.kind === "rename-folder") {
-					if (name.trim() === "assets")
+					if (isAssetDirectoryPath(name.trim()))
 						throw Error("The assets folder is reserved")
 					let parent = action.path.split("/").slice(0, -1).join("/")
 					await moveDirectoryEntry(
