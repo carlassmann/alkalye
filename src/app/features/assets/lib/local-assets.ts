@@ -32,6 +32,7 @@ export {
 	isLocalAssetReferencedElsewhere,
 	referencedLocalAssetIds,
 	assertLocalAssetReferencesAvailable,
+	MissingLocalAssetError,
 	type LocalAsset,
 }
 
@@ -47,6 +48,12 @@ interface LocalAsset {
 
 type LocalAssetLocation = Pick<LocalFileEntry, "workspaceId" | "path">
 let assetWriteQueues = new Map<string, Promise<void>>()
+
+class MissingLocalAssetError extends Error {
+	constructor(assetId: string) {
+		super(`Local asset ${assetId} is unavailable; restore it first`)
+	}
+}
 
 function localEditorContent(content: string, assets: LocalAsset[]) {
 	let files = new Map(assets.map(asset => [asset.id, asset.id]))
@@ -71,16 +78,24 @@ function localDiskContent(
 				? `![${alt}](assets/${id})`
 				: match,
 	)
-	let relativeLinks = new Set(
-		Array.from(
-			originalContent.matchAll(/!\[([^\]]*)\]\(\.\/assets\/([^)]+)\)/g),
-			match => `${match[1]}\0${match[2]}`,
-		),
-	)
+	let linkStyles = new Map<string, boolean[]>()
+	for (let match of originalContent.matchAll(
+		/!\[[^\]]*\]\((\.\/)?assets\/([^)]+)\)/g,
+	)) {
+		let styles = linkStyles.get(match[2]) ?? []
+		styles.push(Boolean(match[1]))
+		linkStyles.set(match[2], styles)
+	}
+	let occurrences = new Map<string, number>()
 	return diskContent.replace(
 		/!\[([^\]]*)\]\(assets\/([^)]+)\)/g,
-		(match, alt, id) =>
-			relativeLinks.has(`${alt}\0${id}`) ? `![${alt}](./assets/${id})` : match,
+		(match, alt, id) => {
+			let occurrence = occurrences.get(id) ?? 0
+			occurrences.set(id, occurrence + 1)
+			return linkStyles.get(id)?.[occurrence]
+				? `![${alt}](./assets/${id})`
+				: match
+		},
 	)
 }
 
@@ -135,8 +150,7 @@ function assertLocalAssetReferencesAvailable(
 ) {
 	let available = new Set(assets.map(asset => asset.id))
 	for (let id of referencedLocalAssetIds(content)) {
-		if (!available.has(id))
-			throw new Error(`Local asset ${id} is unavailable; restore it first`)
+		if (!available.has(id)) throw new MissingLocalAssetError(id)
 	}
 }
 

@@ -72,5 +72,6 @@ export {
 	isLocalAssetReferencedElsewhere,
 	referencedLocalAssetIds,
 	assertLocalAssetReferencesAvailable,
+	MissingLocalAssetError,
 	type LocalAsset,
 } from "./lib/local-assets"

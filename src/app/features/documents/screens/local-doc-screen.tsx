@@ -117,6 +117,8 @@ import {
 	createLocalAssetArchive,
 	isLocalAssetReferencedElsewhere,
 	referencedLocalAssetIds,
+	assertLocalAssetReferencesAvailable,
+	MissingLocalAssetError,
 	type LocalAsset,
 } from "@/app/features/assets"
 import {
@@ -756,12 +758,17 @@ function LocalFileContextMenu({
 		content: string
 		filename: string
 	} | null>(null)
+	let [preparedLocation, setPreparedLocation] = useState<
+		Pick<LocalFileEntry, "workspaceId" | "path"> | undefined
+	>()
+	let [preparedAssets, setPreparedAssets] = useState<LocalAsset[] | null>(null)
+	let preparationId = useRef(0)
 	let supportsSaveAs =
 		isFileSystemAccessSupported() && !!window.showSaveFilePicker
 	let exportAsZip =
 		!!prepared &&
 		referencedLocalAssetIds(prepared.content).size > 0 &&
-		!!workspaceId
+		!!preparedLocation?.workspaceId
 
 	async function readClickedFile() {
 		if (fileId) {
@@ -773,18 +780,35 @@ function LocalFileContextMenu({
 	}
 
 	function handleOpenChange(open: boolean) {
+		let request = ++preparationId.current
 		if (!open) return
 		let current = fileId
 			? useLocalFileStore.getState().getFileById(fileId)
 			: workspaceId && path
 				? useLocalFileStore.getState().getFileById(`${workspaceId}:${path}`)
 				: null
+		let location = {
+			workspaceId: current?.workspaceId ?? workspaceId,
+			path: current?.path ?? path,
+		}
+		setPreparedLocation(location)
+		setPreparedAssets(null)
+		if (location.workspaceId && location.path) {
+			void loadLocalAssets(location)
+				.then(assets => {
+					if (request === preparationId.current) setPreparedAssets(assets)
+				})
+				.catch(() => {
+					if (request === preparationId.current) setPreparedAssets([])
+				})
+		}
 		if (current) {
 			setPrepared({ content: current.content, filename: current.filename })
 			return
 		}
 		setPrepared(null)
 		void readClickedFile().then(file => {
+			if (request !== preparationId.current) return
 			setPrepared(file)
 			if (!file) toast.error("Unable to read this file")
 		})
@@ -796,14 +820,8 @@ function LocalFileContextMenu({
 			toast.error("Unable to read this file")
 			return
 		}
-		let current = fileId
-			? useLocalFileStore.getState().getFileById(fileId)
-			: undefined
 		let result = await tryCatch(
-			downloadLocalCopy(file.content, file.filename, {
-				workspaceId: current?.workspaceId ?? workspaceId,
-				path: current?.path ?? path,
-			}),
+			downloadLocalCopy(file.content, file.filename, preparedLocation),
 		)
 		if (!result.ok) toast.error("Unable to download this file")
 	}
@@ -818,11 +836,16 @@ function LocalFileContextMenu({
 			? { content: current.content, filename: current.filename }
 			: prepared
 		if (!file) return
+		if (exportAsZip && preparedAssets) {
+			try {
+				assertLocalAssetReferencesAvailable(file.content, preparedAssets)
+			} catch (error) {
+				toast.error(assetErrorMessage(error))
+				return
+			}
+		}
 		let result = await tryCatch(
-			saveLocalCopy(file.content, file.filename, {
-				workspaceId: current?.workspaceId ?? workspaceId,
-				path: current?.path ?? path,
-			}),
+			saveLocalCopy(file.content, file.filename, preparedLocation),
 		)
 		if (!result.ok) toast.error("Unable to save a copy of this file")
 	}
@@ -837,7 +860,7 @@ function LocalFileContextMenu({
 				</ContextMenuItem>
 				{supportsSaveAs && (
 					<ContextMenuItem
-						disabled={!prepared}
+						disabled={!prepared || (exportAsZip && !preparedAssets)}
 						onClick={() => void handleSaveAsClicked()}
 					>
 						<Download className="size-4" />
@@ -935,7 +958,15 @@ async function downloadLocalCopy(
 	filename: string,
 	location?: Pick<LocalFileEntry, "workspaceId" | "path">,
 ) {
-	let archive = await localCopyArchive(content, filename, location)
+	let archive: File | null
+	try {
+		archive = await localCopyArchive(content, filename, location)
+	} catch (error) {
+		if (!(error instanceof MissingLocalAssetError)) throw error
+		downloadLocalContent(content, filename)
+		toast.warning(`${error.message}. Downloaded Markdown only.`)
+		return
+	}
 	if (archive) downloadLocalBlob(archive)
 	else downloadLocalContent(content, filename)
 }
@@ -978,6 +1009,7 @@ function LocalEditorContent({
 	let [copyDialogOpen, setCopyDialogOpen] = useState(false)
 	let [assetVersion, setAssetVersion] = useState(0)
 	let [localAssets, setLocalAssets] = useState<LocalAssetView[]>([])
+	let [loadedAssetLocation, setLoadedAssetLocation] = useState("")
 	let assetsRef = useRef(localAssets)
 	let [localImageExtensions, setLocalImageExtensions] = useState<
 		Extension[] | null
@@ -999,6 +1031,7 @@ function LocalEditorContent({
 		)
 	}, [editor])
 	let { workspaceId, path } = activeFile
+	let assetLocation = `${workspaceId}:${path}`
 
 	useEffect(() => {
 		let cancelled = false
@@ -1006,15 +1039,21 @@ function LocalEditorContent({
 			.then(assets => {
 				let loaded = assets.map(toLocalAssetView)
 				if (cancelled) releaseLocalAssetViews(loaded)
-				else setLocalAssets(loaded)
+				else {
+					setLocalAssets(loaded)
+					setLoadedAssetLocation(assetLocation)
+				}
 			})
 			.catch(() => {
-				if (!cancelled) setLocalAssets([])
+				if (!cancelled) {
+					setLocalAssets([])
+					setLoadedAssetLocation(assetLocation)
+				}
 			})
 		return () => {
 			cancelled = true
 		}
-	}, [workspaceId, path, assetVersion])
+	}, [workspaceId, path, assetVersion, assetLocation])
 	useEffect(() => () => releaseLocalAssetViews(localAssets), [localAssets])
 	useEffect(() => {
 		function refreshAssets() {
@@ -1168,7 +1207,21 @@ function LocalEditorContent({
 	async function handleSaveAs(file: LocalFileEntry) {
 		let filename =
 			file.filename || `${getDocumentTitle(file.content) || "Untitled"}.md`
+		if (
+			file.workspaceId &&
+			file.path &&
+			loadedAssetLocation === `${file.workspaceId}:${file.path}`
+		) {
+			assertLocalAssetReferencesAvailable(file.content, localAssets)
+		}
 		await saveLocalCopy(file.content, filename, file)
+	}
+
+	async function handleSaveAsActiveFile() {
+		let currentFile = useLocalFileStore.getState().getActiveFile()
+		if (!currentFile) return
+		let result = await tryCatch(handleSaveAs(currentFile))
+		if (!result.ok) toast.error(assetErrorMessage(result.error))
 	}
 
 	let handlersRef = useRef({
@@ -1177,12 +1230,7 @@ function LocalEditorContent({
 			if (!currentFile) return
 			await saveCurrentFile(currentFile.id, t)
 		},
-		handleSaveAs: async () => {
-			let currentFile = useLocalFileStore.getState().getActiveFile()
-			if (!currentFile) return
-			let result = await tryCatch(handleSaveAs(currentFile))
-			if (!result.ok) toast.error("Unable to save a copy of this file")
-		},
+		handleSaveAs: handleSaveAsActiveFile,
 		toggleLeft,
 		toggleRight,
 		togglePreview: () => setIsPreview(!isPreview),
@@ -1192,7 +1240,7 @@ function LocalEditorContent({
 	useEffect(() => {
 		handlersRef.current = {
 			handleSave: handlersRef.current.handleSave,
-			handleSaveAs: handlersRef.current.handleSaveAs,
+			handleSaveAs: handleSaveAsActiveFile,
 			toggleLeft,
 			toggleRight,
 			togglePreview: () => setIsPreview(!isPreview),

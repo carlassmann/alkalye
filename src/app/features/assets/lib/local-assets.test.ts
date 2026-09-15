@@ -61,6 +61,17 @@ describe("local asset files", () => {
 		expect(
 			localDiskContent(`![Diagram](asset:${id})`, assets, explicitLink),
 		).toBe(explicitLink)
+		expect(
+			localDiskContent(`![Sketch](asset:${id})`, assets, explicitLink),
+		).toBe(`![Sketch](./assets/${id})`)
+		let mixedLinks = `![Diagram](assets/${id})\n` + `![Diagram](./assets/${id})`
+		expect(
+			localDiskContent(
+				localEditorContent(mixedLinks, assets),
+				assets,
+				mixedLinks,
+			),
+		).toBe(mixedLinks)
 		expect(localDiskContent(`![Diagram](asset:${id})`, assets)).toBe(
 			diskContent,
 		)
