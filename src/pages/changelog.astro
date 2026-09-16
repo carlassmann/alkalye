@@ -1,0 +1,34 @@
+---
+import LegalDoc from "@/layouts/LegalDoc.astro"
+import changelogSource from "../../public/changelog.json"
+import { readChangelog } from "@/shared/changelog"
+
+let entries = readChangelog(changelogSource)
+
+let formatDate = (date: string) =>
+	new Date(date).toLocaleDateString("en-US", {
+		day: "numeric",
+		month: "long",
+		year: "numeric",
+	})
+---
+
+<LegalDoc
+	title="What's new"
+	description="Recent changes and improvements in Alkalye."
+	subtitle="Everything that changed, newest first."
+>
+	{
+		entries.map(entry => (
+			<section>
+				<h2>{entry.title}</h2>
+				<p class="text-muted-foreground -mt-2 text-sm">{formatDate(entry.date)}</p>
+				<ul>
+					{entry.notes.map(note => (
+						<li>{note}</li>
+					))}
+				</ul>
+			</section>
+		))
+	}
+</LegalDoc>

@@ -7,6 +7,7 @@
 		"alkalye": "./cli.ts"
 	},
 	"scripts": {
+		"ci": "bun scripts/ci.ts",
 		"dev": "portless run astro dev",
 		"dev:sync": "portless alkalye-sync sh -c 'bunx jazz-run sync --port \"$PORT\" --host \"$HOST\"'",
 		"build": "astro check && astro build",

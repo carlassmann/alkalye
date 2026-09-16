@@ -17,6 +17,11 @@ import {
 	useIsPWAInstalled,
 } from "@/app/lib/platform"
 import { useIntl, T } from "@/shared/intl/setup"
+import { countNotes, type ChangelogEntry } from "@/shared/changelog"
+import {
+	markReleaseNotesSeen,
+	fetchPendingReleaseNotes,
+} from "@/app/lib/release-notes"
 
 export { PWAContext, usePWA, usePWAProvider }
 export { PWAInstallHint, PWAInstallDialog }
@@ -55,6 +60,7 @@ function usePWAProvider(): PWAContextValue {
 		updateAvailable: t("pwa.updateAvailable"),
 		updateDescription: t("pwa.updateDescription"),
 		updateAction: t("pwa.updateAction"),
+		whatsNew: t("pwa.whatsNew"),
 		offlineReady: t("pwa.offlineReady"),
 		offlineDescription: t("pwa.offlineDescription"),
 	})
@@ -62,13 +68,24 @@ function usePWAProvider(): PWAContextValue {
 		updateAvailable: t("pwa.updateAvailable"),
 		updateDescription: t("pwa.updateDescription"),
 		updateAction: t("pwa.updateAction"),
+		whatsNew: t("pwa.whatsNew"),
 		offlineReady: t("pwa.offlineReady"),
 		offlineDescription: t("pwa.offlineDescription"),
 	}
+	let moreLabel = (count: number) =>
+		count === 1
+			? t("pwa.updateMoreSingle")
+			: t("pwa.updateMore", { count: String(count) })
+	let moreLabelRef = useRef(moreLabel)
+	moreLabelRef.current = moreLabel
 
 	// virtual:pwa-register is a Vite virtual module. Dynamic-importing it
 	// inside useEffect keeps this file safe to load in non-Vite contexts
 	// (CLI, Node tests). Outside a browser the effect never runs.
+	useEffect(() => {
+		markReleaseNotesSeen()
+	}, [])
+
 	useEffect(() => {
 		let cancelled = false
 		import("virtual:pwa-register")
@@ -89,16 +106,15 @@ function usePWAProvider(): PWAContextValue {
 						console.error("[PWA] Service worker registration error:", error)
 					},
 					onNeedRefresh() {
-						let labels = labelsRef.current
 						setNeedRefresh(true)
-						toast(labels.updateAvailable, {
-							description: labels.updateDescription,
-							duration: Infinity,
-							action: {
-								label: labels.updateAction,
-								onClick: () => updateSW(true),
-							},
-							onDismiss: () => setNeedRefresh(false),
+						fetchPendingReleaseNotes().then(notes => {
+							showUpdateToast({
+								notes,
+								labels: labelsRef.current,
+								moreLabel: moreLabelRef.current,
+								onReload: () => updateSW(true),
+								onDismiss: () => setNeedRefresh(false),
+							})
 						})
 					},
 					onOfflineReady() {
@@ -412,6 +428,82 @@ function GenericInstructions() {
 				</li>
 			</ol>
 		</div>
+	)
+}
+
+type UpdateToastLabels = {
+	updateAvailable: string
+	updateDescription: string
+	updateAction: string
+	whatsNew: string
+}
+
+let CHANGELOG_URL = "/changelog"
+
+// Only the newest entry goes in the toast; the full history lives on the
+// changelog page, which stays readable however far behind the reader is.
+function showUpdateToast({
+	notes,
+	labels,
+	moreLabel,
+	onReload,
+	onDismiss,
+}: {
+	notes: ChangelogEntry[]
+	labels: UpdateToastLabels
+	moreLabel: (count: number) => string
+	onReload: () => void
+	onDismiss: () => void
+}) {
+	let newest = notes[0]
+	if (!newest) {
+		toast(labels.updateAvailable, {
+			description: labels.updateDescription,
+			duration: Infinity,
+			action: { label: labels.updateAction, onClick: onReload },
+			onDismiss,
+		})
+		return
+	}
+
+	let olderNoteCount = countNotes(notes.slice(1))
+
+	toast(
+		<div className="flex flex-col gap-3">
+			<div>
+				<div className="font-medium">{labels.updateAvailable}</div>
+				<ul className="text-muted-foreground mt-1.5 list-disc space-y-1 pl-4 text-sm">
+					{newest.notes.map(note => (
+						<li key={note}>{note}</li>
+					))}
+				</ul>
+				{olderNoteCount > 0 && (
+					<div className="text-muted-foreground mt-1.5 text-sm">
+						{moreLabel(olderNoteCount)}
+					</div>
+				)}
+			</div>
+			<div className="flex flex-row-reverse items-center justify-start gap-3">
+				<Button
+					size="sm"
+					onClick={() => {
+						toast.dismiss()
+						onReload()
+					}}
+				>
+					{labels.updateAction}
+				</Button>
+				<a
+					href={CHANGELOG_URL}
+					target="_blank"
+					rel="noreferrer"
+					className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
+				>
+					{labels.whatsNew}
+				</a>
+			</div>
+		</div>,
+		{ duration: Infinity, onDismiss },
 	)
 }
 

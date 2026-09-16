@@ -55,6 +55,41 @@ alkalye --help
 
 Contributions welcome! Please open an issue or PR.
 
+`main` is protected: no direct pushes, and pull requests land as squash merges.
+
+Every pull request adds exactly one entry at the top of
+[`public/changelog.json`](public/changelog.json) describing what changed for
+readers. Published entries are never edited, reordered or removed — readers
+remember how far they have read by position, so touching an old entry replays
+old notes for everyone. The entries render at
+[alkalye.com/changelog](https://www.alkalye.com/changelog) and drive the
+in-app update prompt.
+
+## Local CI
+
+Pull requests require a local CI signoff on their latest commit. Install the
+pinned signoff extension once:
+
+```bash
+gh extension install basecamp/gh-signoff --pin v0.4.1
+```
+
+Push your commit, then run:
+
+```bash
+bun run ci
+```
+
+The command checks the changelog entry, installs dependencies, runs static
+checks, types and unit tests, the production build, and the end-to-end suite
+against the local `work` services. It signs off only when `HEAD` and the
+working tree still match the state that was tested. The complete run has a
+15-minute timeout. Every new commit requires another run. Do not call
+`gh signoff` directly.
+
+Set `CI_BASE_URL` to test against an already-running server instead of
+restarting the `work` services.
+
 ## License
 
 [MIT](./LICENSE)

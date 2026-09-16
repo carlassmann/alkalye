@@ -1,0 +1,769 @@
+[
+	{
+		"date": "2026-09-16",
+		"title": "See what changed when you update",
+		"notes": [
+			"The update prompt now lists what changed since the version you were running",
+			"Every release is written up at alkalye.com/changelog"
+		]
+	},
+	{
+		"date": "2026-09-15",
+		"title": "Local folders drop the mirrored backup",
+		"notes": [
+			"Files in an opened folder are written directly, without a second mirrored copy"
+		]
+	},
+	{
+		"date": "2026-09-15",
+		"title": "Whiteboards in local folders",
+		"notes": [
+			"Whiteboard drawings save alongside your Markdown when you work in a local folder"
+		]
+	},
+	{
+		"date": "2026-09-15",
+		"title": "Document assets from the CLI",
+		"notes": [
+			"List, add and remove a document's images and videos with the alkalye command"
+		]
+	},
+	{
+		"date": "2026-09-15",
+		"title": "Create and organize files in a local folder",
+		"notes": [
+			"Add, rename, move and delete files and folders directly in an opened folder"
+		]
+	},
+	{
+		"date": "2026-09-14",
+		"title": "Open a folder of Markdown files",
+		"notes": [
+			"Work on a folder from your disk in the sidebar, next to your synced documents"
+		]
+	},
+	{
+		"date": "2026-09-13",
+		"title": "Tap below the text to start writing",
+		"notes": [
+			"On mobile, tapping the empty space under a document now puts the cursor in it"
+		]
+	},
+	{
+		"date": "2026-09-11",
+		"title": "Settings, rebuilt",
+		"notes": [
+			"Every settings screen now shares one layout, so options sit where you expect them"
+		]
+	},
+	{
+		"date": "2026-09-11",
+		"title": "Sign in to connected apps with OAuth",
+		"notes": ["Apps and agents authorize through a standard OAuth exchange"]
+	},
+	{
+		"date": "2026-09-11",
+		"title": "Finer control over agent access",
+		"notes": [
+			"Choose more precisely what a connected agent may read and change"
+		]
+	},
+	{
+		"date": "2026-09-11",
+		"title": "Use Alkalye from ChatGPT",
+		"notes": [
+			"Connect Alkalye as an MCP app and let ChatGPT read and write your documents"
+		]
+	},
+	{
+		"date": "2026-09-11",
+		"title": "Fixed dropped keystrokes while syncing",
+		"notes": ["Typing during a sync no longer loses characters"]
+	},
+	{
+		"date": "2026-09-10",
+		"title": "Choose a syntax highlighting theme",
+		"notes": ["Code blocks can follow a highlighting theme of your choice"]
+	},
+	{
+		"date": "2026-09-10",
+		"title": "Bundeswehr document and slideshow theme",
+		"notes": [
+			"A portable theme for documents and slideshows, including its own banner artwork"
+		]
+	},
+	{
+		"date": "2026-09-10",
+		"title": "A simpler starting point for themes",
+		"notes": [
+			"The theme starter is easier to read, with several rough edges smoothed out"
+		]
+	},
+	{
+		"date": "2026-09-09",
+		"title": "A bigger theme editor",
+		"notes": [
+			"The theme source editor fills its pane instead of sitting in a small box"
+		]
+	},
+	{
+		"date": "2026-09-09",
+		"title": "Theme exports are checked before you download them",
+		"notes": [
+			"Incomplete exports are caught, and SVG thumbnails are kept safe to open"
+		]
+	},
+	{
+		"date": "2026-09-09",
+		"title": "Theme thumbnails survive an export",
+		"notes": [
+			"Exported themes keep their preview images and carry their assets with them"
+		]
+	},
+	{
+		"date": "2026-09-09",
+		"title": "Themes are portable Markdown files",
+		"notes": [
+			"A theme is one Markdown file with its assets embedded, so it can be shared anywhere"
+		]
+	},
+	{
+		"date": "2026-09-09",
+		"title": "Pasting a large theme no longer freezes",
+		"notes": [
+			"Big theme sources paste instantly and stay bound to their source"
+		]
+	},
+	{
+		"date": "2026-09-08",
+		"title": "Fixed slide colors and PDF themes",
+		"notes": [
+			"Slides use the right default colors, and PDF export picks the theme you selected"
+		]
+	},
+	{
+		"date": "2026-09-08",
+		"title": "Write your own themes",
+		"notes": [
+			"Edit themes as Markdown in a workbench, or manage them from the CLI"
+		]
+	},
+	{
+		"date": "2026-09-07",
+		"title": "Fixed invites to documents in a space",
+		"notes": [
+			"An invite to a space document now grants access on the first try"
+		]
+	},
+	{
+		"date": "2026-09-06",
+		"title": "Share with the system share sheet",
+		"notes": ["Send a document to any app your device can share to"]
+	},
+	{
+		"date": "2026-09-06",
+		"title": "Fixed indentation for custom task states",
+		"notes": ["Custom task markers keep their indentation"]
+	},
+	{
+		"date": "2026-09-06",
+		"title": "Fixed ligature rendering",
+		"notes": ["Ligatures no longer smear as you type"]
+	},
+	{
+		"date": "2026-09-05",
+		"title": "Fixed keyboard selection in the command palette",
+		"notes": ["Arrow keys move through results reliably"]
+	},
+	{
+		"date": "2026-09-05",
+		"title": "Fixed line movement and find highlights",
+		"notes": ["Moving lines and highlighting matches behave correctly again"]
+	},
+	{
+		"date": "2026-09-05",
+		"title": "Search lives in the sidebar",
+		"notes": ["One place to search your documents instead of two"]
+	},
+	{
+		"date": "2026-09-05",
+		"title": "Large documents stay responsive",
+		"notes": ["Typing, scrolling and selecting keep up in very long documents"]
+	},
+	{
+		"date": "2026-09-01",
+		"title": "Fixed external profile links",
+		"notes": ["Links to profiles outside Alkalye open correctly"]
+	},
+	{
+		"date": "2026-08-31",
+		"title": "Fixed images that failed to appear",
+		"notes": [
+			"Documents load their images even when the relation resolves late"
+		]
+	},
+	{
+		"date": "2026-08-31",
+		"title": "Insert a whiteboard from the editor",
+		"notes": ["New Whiteboard is in the editor's Insert menu"]
+	},
+	{
+		"date": "2026-08-31",
+		"title": "Fixed typing in whiteboard text",
+		"notes": ["Text on a whiteboard accepts input again"]
+	},
+	{
+		"date": "2026-08-31",
+		"title": "Fixed printing images",
+		"notes": ["Printed documents include their media"]
+	},
+	{
+		"date": "2026-08-31",
+		"title": "Fixed command palette navigation",
+		"notes": [
+			"The palette lays out correctly and moves between results as expected"
+		]
+	},
+	{
+		"date": "2026-08-22",
+		"title": "Complete Markdown shortcuts",
+		"notes": [
+			"The editor's keyboard shortcuts now cover the full set of Markdown constructs"
+		]
+	},
+	{
+		"date": "2026-08-20",
+		"title": "More authoring tools",
+		"notes": ["Extra editor commands for shaping documents as you write"]
+	},
+	{
+		"date": "2026-08-20",
+		"title": "Better editor shortcuts",
+		"notes": ["Shortcuts respond more predictably across the editor"]
+	},
+	{
+		"date": "2026-08-19",
+		"title": "See who else is on a whiteboard",
+		"notes": ["Viewers appear on a shared whiteboard while they watch"]
+	},
+	{
+		"date": "2026-08-18",
+		"title": "Cleaner mobile sidebar",
+		"notes": [
+			"The redundant close button is gone; swipe or tap outside instead"
+		]
+	},
+	{
+		"date": "2026-08-18",
+		"title": "Better context menus",
+		"notes": [
+			"Context menus across the editor offer the right actions in the right places"
+		]
+	},
+	{
+		"date": "2026-08-18",
+		"title": "Right-click in the editor",
+		"notes": ["A context menu with the actions you need where you clicked"]
+	},
+	{
+		"date": "2026-08-17",
+		"title": "CLI improvements",
+		"notes": ["Clearer output and smoother handling across the alkalye command"]
+	},
+	{
+		"date": "2026-08-15",
+		"title": "Softer sidebar highlight",
+		"notes": ["The active document stands out without shouting"]
+	},
+	{
+		"date": "2026-08-14",
+		"title": "Faster startup for long-lived accounts",
+		"notes": [
+			"Startup no longer slows down as your account grows, and document history is preserved"
+		]
+	},
+	{
+		"date": "2026-08-08",
+		"title": "Fixed teleprompter flicker",
+		"notes": ["Slides stay steady while the teleprompter scrolls"]
+	},
+	{
+		"date": "2026-07-14",
+		"title": "Jump from preview to the editor",
+		"notes": ["A link in the document preview takes you straight to editing"]
+	},
+	{
+		"date": "2026-07-14",
+		"title": "Whiteboards",
+		"notes": ["Draw on an infinite canvas and embed it in a document"]
+	},
+	{
+		"date": "2026-07-13",
+		"title": "Fixed space invites",
+		"notes": ["Accepting an invite uses the right account"]
+	},
+	{
+		"date": "2026-07-10",
+		"title": "Faster startup",
+		"notes": ["Document metadata loads first, so the app is usable sooner"]
+	},
+	{
+		"date": "2026-07-08",
+		"title": "Fixed data loss when signing in on a new device",
+		"notes": [
+			"Signing in on a second device no longer wipes what was already there"
+		]
+	},
+	{
+		"date": "2026-06-29",
+		"title": "Fixed CLI document freshness",
+		"notes": ["The CLI reads the current version of a document"]
+	},
+	{
+		"date": "2026-06-29",
+		"title": "Scrollbars match your theme",
+		"notes": ["Scrollbars follow light and dark mode"]
+	},
+	{
+		"date": "2026-06-29",
+		"title": "Fixed slideshow code highlighting",
+		"notes": ["Code on slides is highlighted again"]
+	},
+	{
+		"date": "2026-06-29",
+		"title": "Fixed image grids on slides",
+		"notes": ["Images in a grid size themselves correctly"]
+	},
+	{
+		"date": "2026-06-29",
+		"title": "Comment on a document",
+		"notes": ["Leave inline comments and discuss a document in place"]
+	},
+	{
+		"date": "2026-06-19",
+		"title": "Install the CLI with Bun",
+		"notes": ["bun link makes the alkalye command available everywhere"]
+	},
+	{
+		"date": "2026-06-15",
+		"title": "Fixed the iOS home screen layout",
+		"notes": [
+			"No more gap at the bottom, and the keyboard no longer covers the action button"
+		]
+	},
+	{
+		"date": "2026-06-14",
+		"title": "Fixed the iOS keyboard layout",
+		"notes": ["The editor resizes correctly when the keyboard opens"]
+	},
+	{
+		"date": "2026-06-08",
+		"title": "Sidebar context menu",
+		"notes": ["Right-click a document or folder in the sidebar for its actions"]
+	},
+	{
+		"date": "2026-06-07",
+		"title": "Fixed navigation after deleting",
+		"notes": ["Deleting a document in a space takes you somewhere sensible"]
+	},
+	{
+		"date": "2026-05-19",
+		"title": "German translation",
+		"notes": ["Alkalye speaks German, and follows your browser's language"]
+	},
+	{
+		"date": "2026-05-18",
+		"title": "Fixed text selection on iOS",
+		"notes": ["Selecting text in the editor is stable on iPhone and iPad"]
+	},
+	{
+		"date": "2026-05-15",
+		"title": "Fixed the white bar on iPhone",
+		"notes": ["The home screen app fills the screen properly"]
+	},
+	{
+		"date": "2026-05-15",
+		"title": "Fixed the overflowing sign-in button",
+		"notes": ["The auth button fits its container"]
+	},
+	{
+		"date": "2026-05-15",
+		"title": "Slideshow images fill the slide",
+		"notes": ["Images use the full space available to them"]
+	},
+	{
+		"date": "2026-05-15",
+		"title": "Fixed the hidden cursor on iOS",
+		"notes": ["The keyboard no longer covers the cursor in short documents"]
+	},
+	{
+		"date": "2026-05-14",
+		"title": "Fixed the find panel",
+		"notes": ["Searching inside a document works again"]
+	},
+	{
+		"date": "2026-05-08",
+		"title": "Reopening a document opens its space",
+		"notes": ["The most recent document arrives with the right space selected"]
+	},
+	{
+		"date": "2026-05-06",
+		"title": "Fixed the lingering drop cursor",
+		"notes": ["The drop indicator disappears after you drop a file"]
+	},
+	{
+		"date": "2026-05-06",
+		"title": "Fixed text shifting under remote cursors",
+		"notes": [
+			"Paragraphs stay put while someone else's cursor moves through them"
+		]
+	},
+	{
+		"date": "2026-05-06",
+		"title": "Fixed dragging images into the editor",
+		"notes": ["Dropped images land where you dropped them"]
+	},
+	{
+		"date": "2026-03-24",
+		"title": "Smoother remote cursors",
+		"notes": ["Collaborators' cursors move fluidly instead of jumping"]
+	},
+	{
+		"date": "2026-03-18",
+		"title": "The Alkalye CLI",
+		"notes": ["Read, write and manage your documents from the terminal"]
+	},
+	{
+		"date": "2026-03-18",
+		"title": "Clearer CLI help",
+		"notes": ["Running alkalye with no arguments explains what it can do"]
+	},
+	{
+		"date": "2026-03-15",
+		"title": "Word and character count",
+		"notes": ["A stats badge in the editor tracks the size of your document"]
+	},
+	{
+		"date": "2026-03-11",
+		"title": "Scroll to top and bottom",
+		"notes": ["Buttons to jump to either end of a long document"]
+	},
+	{
+		"date": "2026-03-11",
+		"title": "Better wrapping for indented text",
+		"notes": [
+			"Wrapped lines in lists and indented blocks line up with their content"
+		]
+	},
+	{
+		"date": "2026-03-09",
+		"title": "Search opens with your last query",
+		"notes": ["Opening a document with an active search shows the find panel"]
+	},
+	{
+		"date": "2026-03-02",
+		"title": "Bigger touch targets",
+		"notes": ["Buttons and menu items are easier to hit on a phone"]
+	},
+	{
+		"date": "2026-03-02",
+		"title": "Properly sized text fields",
+		"notes": ["Multi-line inputs grow to fit what you type"]
+	},
+	{
+		"date": "2026-03-02",
+		"title": "Clear message when access is denied",
+		"notes": [
+			"A space you cannot open explains why instead of failing silently"
+		]
+	},
+	{
+		"date": "2026-03-02",
+		"title": "Sign in when access is denied",
+		"notes": ["If you are signed out, the denial offers you the sign-in flow"]
+	},
+	{
+		"date": "2026-02-23",
+		"title": "No more light mode flash",
+		"notes": ["Dark mode applies before the first paint"]
+	},
+	{
+		"date": "2026-02-18",
+		"title": "A new landing page",
+		"notes": ["alkalye.com introduces the app before you open it"]
+	},
+	{
+		"date": "2026-02-16",
+		"title": "Two-way filesystem sync",
+		"notes": ["Personal documents and spaces stay in step with files on disk"]
+	},
+	{
+		"date": "2026-02-15",
+		"title": "Better save and palette shortcuts",
+		"notes": ["Cmd+S and Cmd+P behave the way you expect"]
+	},
+	{
+		"date": "2026-02-04",
+		"title": "Open local Markdown files",
+		"notes": ["Edit a file from your disk without importing it"]
+	},
+	{
+		"date": "2026-01-30",
+		"title": "Fixed the find button",
+		"notes": ["The button opens search, not just the keyboard shortcut"]
+	},
+	{
+		"date": "2026-01-30",
+		"title": "Search inside a document",
+		"notes": ["Cmd+F finds and highlights text as you type"]
+	},
+	{
+		"date": "2026-01-25",
+		"title": "Permanent deletion",
+		"notes": ["Remove a document for good instead of only archiving it"]
+	},
+	{
+		"date": "2026-01-20",
+		"title": "Videos in documents",
+		"notes": ["Upload and play video alongside images"]
+	},
+	{
+		"date": "2026-01-18",
+		"title": "Custom wikilink titles",
+		"notes": ["Link to a document under a name of your choosing"]
+	},
+	{
+		"date": "2026-01-17",
+		"title": "Sidebar closes for the time machine",
+		"notes": ["Entering history gives the document the full width"]
+	},
+	{
+		"date": "2026-01-16",
+		"title": "Highlight slides from the teleprompter",
+		"notes": ["Selecting text in the teleprompter highlights it on the slide"]
+	},
+	{
+		"date": "2026-01-16",
+		"title": "Faster loading of your last document",
+		"notes": ["Alkalye remembers where you were and opens it first"]
+	},
+	{
+		"date": "2026-01-16",
+		"title": "Fixed blank lines in lists",
+		"notes": ["Adding an item to a loose list no longer inserts an empty line"]
+	},
+	{
+		"date": "2026-01-16",
+		"title": "Fewer loading spinners",
+		"notes": ["Content appears in place instead of behind a spinner"]
+	},
+	{
+		"date": "2026-01-16",
+		"title": "Fixed images followed by text",
+		"notes": ["An image and the text after it share a block correctly"]
+	},
+	{
+		"date": "2026-01-16",
+		"title": "Create a space while moving",
+		"notes": ["Move to space can make the space you need on the spot"]
+	},
+	{
+		"date": "2026-01-16",
+		"title": "Moving a document brings its assets",
+		"notes": ["Images and videos follow the document into its new space"]
+	},
+	{
+		"date": "2026-01-16",
+		"title": "Hold to sweep through history",
+		"notes": ["A visual hint shows that holding next or previous keeps moving"]
+	},
+	{
+		"date": "2026-01-16",
+		"title": "Readable links in the teleprompter",
+		"notes": ["Links no longer disappear against the background"]
+	},
+	{
+		"date": "2026-01-16",
+		"title": "Fixed dragging document links",
+		"notes": ["Links in the document list stopped starting accidental drags"]
+	},
+	{
+		"date": "2026-01-14",
+		"title": "Fixed slide flicker",
+		"notes": ["Advancing a slide no longer flashes"]
+	},
+	{
+		"date": "2026-01-14",
+		"title": "Sidebar closes for a tutor",
+		"notes": ["Opening a tutor gives it the full screen"]
+	},
+	{
+		"date": "2026-01-14",
+		"title": "Fixed the image preview",
+		"notes": ["Previews load their assets instead of showing a gap"]
+	},
+	{
+		"date": "2026-01-14",
+		"title": "Fixed theme and preset buttons",
+		"notes": ["Selecting a theme or preset applies it"]
+	},
+	{
+		"date": "2026-01-13",
+		"title": "Better image styling",
+		"notes": ["Images size themselves sensibly and are no longer clipped"]
+	},
+	{
+		"date": "2026-01-13",
+		"title": "Hold delay in the time machine",
+		"notes": ["Next and previous need a deliberate hold before sweeping"]
+	},
+	{
+		"date": "2026-01-13",
+		"title": "Screen stays awake while presenting",
+		"notes": ["Slideshow and teleprompter hold a wake lock"]
+	},
+	{
+		"date": "2026-01-12",
+		"title": "Fixed switching between documents",
+		"notes": [
+			"The editor resets fully, so changes never land in the wrong document"
+		]
+	},
+	{
+		"date": "2026-01-12",
+		"title": "Drag and drop assets",
+		"notes": ["Drop images and videos straight into a document"]
+	},
+	{
+		"date": "2026-01-12",
+		"title": "Drop files anywhere in the list",
+		"notes": ["The drop zone covers the whole document list"]
+	},
+	{
+		"date": "2026-01-12",
+		"title": "Download an asset",
+		"notes": ["Save an image or video back out of a document"]
+	},
+	{
+		"date": "2026-01-12",
+		"title": "Frontmatter stays open",
+		"notes": ["Document settings no longer fold themselves away"]
+	},
+	{
+		"date": "2026-01-12",
+		"title": "Themes for slideshows and preview",
+		"notes": ["Style presentations and the reading view"]
+	},
+	{
+		"date": "2026-01-12",
+		"title": "Time machine",
+		"notes": ["Browse a document's history and restore any earlier version"]
+	},
+	{
+		"date": "2026-01-09",
+		"title": "Fixed the settings back button",
+		"notes": ["It returns to the document you came from"]
+	},
+	{
+		"date": "2026-01-09",
+		"title": "Fixed images in slideshows",
+		"notes": ["Slides show the assets you embedded"]
+	},
+	{
+		"date": "2026-01-09",
+		"title": "Sort checked tasks to the bottom",
+		"notes": ["Manually, or automatically as you tick them off"]
+	},
+	{
+		"date": "2026-01-08",
+		"title": "Fixed remote cursors in Safari",
+		"notes": ["Other people's cursors repaint as they move"]
+	},
+	{
+		"date": "2026-01-08",
+		"title": "Sync now, and an offline indicator",
+		"notes": ["See when you are offline and trigger a sync yourself"]
+	},
+	{
+		"date": "2026-01-08",
+		"title": "Move and duplicate into a space",
+		"notes": ["Duplicates land in the space with (copy) in the title"]
+	},
+	{
+		"date": "2026-01-08",
+		"title": "Fixed launching from the iOS home screen",
+		"notes": ["The app opens at the right place every time"]
+	},
+	{
+		"date": "2026-01-07",
+		"title": "Fixed navigation after signing in",
+		"notes": ["Logging in takes you into the app"]
+	},
+	{
+		"date": "2026-01-07",
+		"title": "Cursors follow incoming changes",
+		"notes": ["Your cursor and selection stay put as other people edit"]
+	},
+	{
+		"date": "2026-01-07",
+		"title": "Document spaces",
+		"notes": ["Group documents into spaces and share a whole space at once"]
+	},
+	{
+		"date": "2026-01-04",
+		"title": "Nested lists",
+		"notes": ["Indent list items to any depth"]
+	},
+	{
+		"date": "2026-01-03",
+		"title": "Toggle formatting without a selection",
+		"notes": ["Bold, italic and code turn on and off at the cursor"]
+	},
+	{
+		"date": "2026-01-02",
+		"title": "Editor settings apply before the first paint",
+		"notes": ["No flash of the wrong font or width"]
+	},
+	{
+		"date": "2026-01-02",
+		"title": "Automatic on-device backup",
+		"notes": ["Your documents are backed up locally as you work"]
+	},
+	{
+		"date": "2026-01-02",
+		"title": "Presentation polish",
+		"notes": ["Small improvements throughout the slideshow"]
+	},
+	{
+		"date": "2026-01-02",
+		"title": "Wikilinks",
+		"notes": ["Link documents with [[double brackets]]"]
+	},
+	{
+		"date": "2026-01-01",
+		"title": "Empty documents clean themselves up",
+		"notes": ["Navigating away from an untouched document removes it"]
+	},
+	{
+		"date": "2026-01-01",
+		"title": "Rename and delete folders",
+		"notes": ["Folders can be managed from the sidebar"]
+	},
+	{
+		"date": "2026-01-01",
+		"title": "Clearer error states",
+		"notes": ["Errors explain what happened instead of offering a dead end"]
+	},
+	{
+		"date": "2026-01-01",
+		"title": "Folders in the document list",
+		"notes": ["Documents and folders read as one clear list"]
+	},
+	{
+		"date": "2025-12-31",
+		"title": "Alkalye",
+		"notes": [
+			"An end-to-end encrypted Markdown editor that works offline and syncs when you are back"
+		]
+	}
+]

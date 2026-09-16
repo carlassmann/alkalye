@@ -86,6 +86,10 @@ export default defineConfig({
 			},
 			workbox: {
 				globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2,woff,ttf}"],
+				// The update prompt links to /changelog, so it must always come
+				// from the network: a precached copy would describe the build
+				// the reader is already running.
+				globIgnores: ["**/changelog/index.html"],
 				navigateFallback: "app",
 				navigateFallbackAllowlist: [/^\/app(?:\/.*)?(?:\?.*)?$/],
 				maximumFileSizeToCacheInBytes: 5.5 * 1024 * 1024,
