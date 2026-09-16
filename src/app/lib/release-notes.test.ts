@@ -18,9 +18,9 @@ function respondWith(body: unknown, ok = true) {
 }
 
 let served = [
-	{ date: "2026-09-17", title: "Newer", notes: ["Third"] },
-	{ date: "2026-09-16", title: "Newest bundled", notes: ["Second"] },
-	{ date: "2026-09-10", title: "Older", notes: ["First"] },
+	{ id: 3, date: "2026-09-17", title: "Newer", notes: ["Third"] },
+	{ id: 2, date: "2026-09-16", title: "Newest bundled", notes: ["Second"] },
+	{ id: 1, date: "2026-09-10", title: "Older", notes: ["First"] },
 ]
 
 beforeEach(() => localStorage.removeItem(LAST_SEEN_KEY))
@@ -75,7 +75,10 @@ describe("fetchPendingReleaseNotes", () => {
 	it("drops malformed entries instead of rendering them", async () => {
 		let { fetchPendingReleaseNotes } = await freshReleaseNotes()
 		localStorage.setItem(LAST_SEEN_KEY, "0")
-		respondWith([{ date: "nonsense", title: "ok", notes: ["a"] }, ...served])
+		respondWith([
+			{ id: 4, date: "nonsense", title: "ok", notes: ["a"] },
+			...served,
+		])
 		expect(await fetchPendingReleaseNotes()).toHaveLength(3)
 	})
 
@@ -104,7 +107,7 @@ describe("when localStorage refuses writes", () => {
 		})
 		markReleaseNotesSeen()
 		respondWith([
-			{ date: "2026-09-20", title: "New", notes: ["Fresh"] },
+			{ id: 9_999, date: "2026-09-20", title: "New", notes: ["Fresh"] },
 			...shipped,
 		])
 		let pending = await fetchPendingReleaseNotes()

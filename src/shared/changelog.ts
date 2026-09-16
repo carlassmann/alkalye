@@ -1,15 +1,17 @@
 import { z } from "zod"
 
 export { readChangelog, isChangelogEntry, entriesSince, countNotes }
-export { prependedEntryCount, sourceUrl, sourceLabel }
-export { REPOSITORY_URL }
+export { addedEntryIds, newestEntryId, duplicateEntryIds }
+export { sourceUrl, sourceLabel, REPOSITORY_URL }
 export type { ChangelogEntry }
 
-type ChangelogEntry = z.infer<typeof entrySchema> & { id: number }
+type ChangelogEntry = z.infer<typeof entrySchema>
 
-// An unparseable date would reach the changelog page as "Invalid Date", and an
-// entry with no notes as an empty bullet list under "Update available".
+// The id is what a reader's "last seen" marker points at, so it belongs to the
+// entry rather than to its position: entries can be rewritten, reordered or
+// removed afterwards without moving anybody's marker.
 let entrySchema = z.object({
+	id: z.number().int().positive(),
 	date: z.iso.date(),
 	title: z.string().min(1),
 	notes: z.array(z.string().min(1)).min(1),
@@ -22,34 +24,21 @@ let entrySchema = z.object({
 		.optional(),
 })
 
+let REPOSITORY_URL = "https://github.com/carlassmann/alkalye"
+
 function isChangelogEntry(value: unknown): boolean {
 	return entrySchema.safeParse(value).success
 }
 
 // public/changelog.json is hand-written, so entries are validated rather than
-// trusted. Ids are positions counted from the oldest RAW entry, never from the
-// surviving ones: renumbering on a malformed entry would shift every id above
-// it and silently swallow a release for readers whose marker sits in between.
+// trusted. An entry that does not parse is dropped instead of reaching a reader
+// as an empty bullet list or an "Invalid Date".
 function readChangelog(value: unknown): ChangelogEntry[] {
 	if (!Array.isArray(value)) return []
-	return value.flatMap((entry, index) => {
+	return value.flatMap(entry => {
 		let parsed = entrySchema.safeParse(entry)
-		return parsed.success ? [{ ...parsed.data, id: value.length - index }] : []
+		return parsed.success ? [parsed.data] : []
 	})
-}
-
-let REPOSITORY_URL = "https://github.com/carlassmann/alkalye"
-
-function sourceUrl(entry: ChangelogEntry): string | undefined {
-	if (entry.pr) return `${REPOSITORY_URL}/pull/${entry.pr}`
-	if (entry.commit) return `${REPOSITORY_URL}/commit/${entry.commit}`
-	return undefined
-}
-
-function sourceLabel(entry: ChangelogEntry): string | undefined {
-	if (entry.pr) return `#${entry.pr}`
-	if (entry.commit) return entry.commit.slice(0, 7)
-	return undefined
 }
 
 function entriesSince(
@@ -63,28 +52,39 @@ function countNotes(entries: ChangelogEntry[]): number {
 	return entries.reduce((total, entry) => total + entry.notes.length, 0)
 }
 
-// Ids are positions, so a published entry must never be edited, reordered or
-// removed. Returns how many entries were prepended, or null when the entries
-// they were prepended to no longer match. Counts raw positions so a malformed
-// entry cannot slip through as an invisible release.
-function prependedEntryCount(previous: unknown, next: unknown): number | null {
-	if (!Array.isArray(previous) || !Array.isArray(next)) return null
-	if (!next.every(isChangelogEntry)) return null
-	let added = next.length - previous.length
-	if (added < 0) return null
-	let kept = next.slice(added)
-	let unchanged = kept.every(
-		(entry, index) => fingerprint(entry) === fingerprint(previous[index]),
-	)
-	return unchanged ? added : null
+function newestEntryId(value: unknown): number {
+	if (!Array.isArray(value)) return 0
+	let ids = value.map(entry => (typeof entry?.id === "number" ? entry.id : 0))
+	return ids.length > 0 ? Math.max(...ids) : 0
 }
 
-function fingerprint(entry: unknown): string {
-	let parsed = entrySchema.safeParse(entry)
-	if (!parsed.success) return ""
-	return JSON.stringify([
-		parsed.data.date,
-		parsed.data.title,
-		parsed.data.notes,
-	])
+// Which ids this revision introduced. Rewording or dropping an existing entry
+// changes nothing here, which is the point.
+function addedEntryIds(previous: unknown, next: unknown): number[] {
+	let before = new Set(readChangelog(previous).map(entry => entry.id))
+	return readChangelog(next)
+		.map(entry => entry.id)
+		.filter(id => !before.has(id))
+}
+
+function duplicateEntryIds(value: unknown): number[] {
+	let seen = new Set<number>()
+	let duplicates = new Set<number>()
+	for (let entry of readChangelog(value)) {
+		if (seen.has(entry.id)) duplicates.add(entry.id)
+		seen.add(entry.id)
+	}
+	return [...duplicates]
+}
+
+function sourceUrl(entry: ChangelogEntry): string | undefined {
+	if (entry.pr) return `${REPOSITORY_URL}/pull/${entry.pr}`
+	if (entry.commit) return `${REPOSITORY_URL}/commit/${entry.commit}`
+	return undefined
+}
+
+function sourceLabel(entry: ChangelogEntry): string | undefined {
+	if (entry.pr) return `#${entry.pr}`
+	if (entry.commit) return entry.commit.slice(0, 7)
+	return undefined
 }

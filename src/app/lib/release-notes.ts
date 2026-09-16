@@ -2,6 +2,7 @@ import changelogSource from "../../../public/changelog.json"
 import {
 	readChangelog,
 	entriesSince,
+	newestEntryId,
 	type ChangelogEntry,
 } from "@/shared/changelog"
 import { tryCatch } from "@/app/lib/try-catch"
@@ -16,10 +17,9 @@ let FETCH_TIMEOUT_MS = 5_000
 // entire backlog.
 let lastSeenFallback = 0
 
-// Ids are positions from the oldest entry, so the newest id is the entry count.
-// Reading it this way avoids validating all 140 entries on the boot path.
+// Reads the ids only, which avoids validating every entry on the boot path.
 function newestBundledEntryId(): number {
-	return Array.isArray(changelogSource) ? changelogSource.length : 0
+	return newestEntryId(changelogSource)
 }
 
 // Called on startup so a reader only ever sees notes written after the build

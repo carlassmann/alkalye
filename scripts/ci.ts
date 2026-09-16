@@ -2,7 +2,12 @@ import { spawnSync } from "node:child_process"
 import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
 import { setTimeout as delay } from "node:timers/promises"
-import { prependedEntryCount, isChangelogEntry } from "@/shared/changelog"
+import {
+	addedEntryIds,
+	duplicateEntryIds,
+	isChangelogEntry,
+	newestEntryId,
+} from "@/shared/changelog"
 
 let ROOT = resolve(import.meta.dirname ?? ".", "..")
 let CI_TIMEOUT_MS = 15 * 60 * 1_000
@@ -83,8 +88,9 @@ function readJsonAt(ref: string, path: string): unknown {
 	return JSON.parse(capture(["git", "show", `${ref}:${path}`]))
 }
 
-// Readers learn what changed from the changelog, so every pull request adds
-// exactly one entry describing itself, and leaves published entries alone.
+// Readers learn what changed from the changelog, so every pull request adds one
+// entry describing itself. Published entries may be reworded or removed freely:
+// a reader's marker points at an id, not at a position.
 export function requireSingleChangelogEntry() {
 	capture(["git", "fetch", "--quiet", "origin", "main"])
 	let headSha = capture(["git", "rev-parse", "HEAD"])
@@ -96,24 +102,35 @@ export function requireSingleChangelogEntry() {
 
 	let mergeBase = capture(["git", "merge-base", "origin/main", "HEAD"])
 	let base = readJsonAt(mergeBase, CHANGELOG_PATH)
+	let head = readChangelogFile()
+	requireEveryEntryReadable(head)
+
+	let duplicates = duplicateEntryIds(head)
+	if (duplicates.length > 0) {
+		throw new Error(
+			`${CHANGELOG_PATH} reuses id ${duplicates.join(", ")}. Every entry needs its own id, because that is what readers remember.`,
+		)
+	}
+
 	if (base === undefined) {
 		process.stdout.write("\n── Changelog entry: skipped, changelog is new ──\n")
 		return
 	}
-	let head = readChangelogFile()
-	requireEveryEntryReadable(head)
-	let added = prependedEntryCount(base, head)
-	if (added === null) {
+
+	let added = addedEntryIds(base, head)
+	if (added.length !== 1) {
 		throw new Error(
-			`${CHANGELOG_PATH} edited, reordered or removed published entries. Readers track entries by position, so only add new ones at the top.`,
+			`Expected exactly 1 new entry in ${CHANGELOG_PATH}, found ${added.length}. Describe this pull request in a single entry with id ${newestEntryId(base) + 1}.`,
 		)
 	}
-	if (added !== 1) {
+
+	let highestBefore = newestEntryId(base)
+	if (added[0] <= highestBefore) {
 		throw new Error(
-			`Expected exactly 1 new entry in ${CHANGELOG_PATH}, found ${added}. Describe this pull request in a single entry at the top.`,
+			`The new entry has id ${added[0]}, which readers past that id will never see. Use ${highestBefore + 1}.`,
 		)
 	}
-	process.stdout.write("\n── Changelog entry: 1 added ──\n")
+	process.stdout.write(`\n── Changelog entry: 1 added (id ${added[0]}) ──\n`)
 }
 
 // Without this, a malformed new entry is reported as if the author had edited

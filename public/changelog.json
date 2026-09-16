@@ -1,5 +1,6 @@
 [
 	{
+		"id": 140,
 		"date": "2026-09-16",
 		"title": "See what changed when you update",
 		"notes": [
@@ -9,6 +10,7 @@
 		"pr": 41
 	},
 	{
+		"id": 139,
 		"date": "2026-09-15",
 		"title": "Local folders drop the mirrored backup",
 		"notes": [
@@ -17,6 +19,7 @@
 		"commit": "9a6ca85f"
 	},
 	{
+		"id": 138,
 		"date": "2026-09-15",
 		"title": "Whiteboards in local folders",
 		"notes": [
@@ -25,6 +28,7 @@
 		"commit": "5fdcda21"
 	},
 	{
+		"id": 137,
 		"date": "2026-09-15",
 		"title": "Document assets from the CLI",
 		"notes": [
@@ -33,6 +37,7 @@
 		"commit": "ca62541d"
 	},
 	{
+		"id": 136,
 		"date": "2026-09-15",
 		"title": "Create and organize files in a local folder",
 		"notes": [
@@ -41,6 +46,7 @@
 		"commit": "38cb93bf"
 	},
 	{
+		"id": 135,
 		"date": "2026-09-14",
 		"title": "Open a folder of Markdown files",
 		"notes": [
@@ -49,6 +55,7 @@
 		"commit": "af8cdc9e"
 	},
 	{
+		"id": 134,
 		"date": "2026-09-13",
 		"title": "Tap below the text to start writing",
 		"notes": [
@@ -57,6 +64,7 @@
 		"commit": "fc92d7cc"
 	},
 	{
+		"id": 133,
 		"date": "2026-09-11",
 		"title": "Settings, rebuilt",
 		"notes": [
@@ -65,12 +73,14 @@
 		"commit": "99c00477"
 	},
 	{
+		"id": 132,
 		"date": "2026-09-11",
 		"title": "Sign in to connected apps with OAuth",
 		"notes": ["Apps and agents authorize through a standard OAuth exchange"],
 		"commit": "3608abde"
 	},
 	{
+		"id": 131,
 		"date": "2026-09-11",
 		"title": "Finer control over agent access",
 		"notes": [
@@ -79,6 +89,7 @@
 		"commit": "2713d7eb"
 	},
 	{
+		"id": 130,
 		"date": "2026-09-11",
 		"title": "Use Alkalye from ChatGPT",
 		"notes": [
@@ -87,18 +98,21 @@
 		"commit": "bf3964b9"
 	},
 	{
+		"id": 129,
 		"date": "2026-09-11",
 		"title": "Fixed dropped keystrokes while syncing",
 		"notes": ["Typing during a sync no longer loses characters"],
 		"commit": "e7516765"
 	},
 	{
+		"id": 128,
 		"date": "2026-09-10",
 		"title": "Choose a syntax highlighting theme",
 		"notes": ["Code blocks can follow a highlighting theme of your choice"],
 		"commit": "cc90884a"
 	},
 	{
+		"id": 127,
 		"date": "2026-09-10",
 		"title": "Bundeswehr document and slideshow theme",
 		"notes": [
@@ -107,6 +121,7 @@
 		"commit": "a2640219"
 	},
 	{
+		"id": 126,
 		"date": "2026-09-10",
 		"title": "A simpler starting point for themes",
 		"notes": [
@@ -115,6 +130,7 @@
 		"commit": "3ee2fd27"
 	},
 	{
+		"id": 125,
 		"date": "2026-09-09",
 		"title": "A bigger theme editor",
 		"notes": [
@@ -123,6 +139,7 @@
 		"commit": "91561b9b"
 	},
 	{
+		"id": 124,
 		"date": "2026-09-09",
 		"title": "Theme exports are checked before you download them",
 		"notes": [
@@ -131,6 +148,7 @@
 		"commit": "00ee51e3"
 	},
 	{
+		"id": 123,
 		"date": "2026-09-09",
 		"title": "Theme thumbnails survive an export",
 		"notes": [
@@ -139,6 +157,7 @@
 		"commit": "725712e2"
 	},
 	{
+		"id": 122,
 		"date": "2026-09-09",
 		"title": "Themes are portable Markdown files",
 		"notes": [
@@ -147,6 +166,7 @@
 		"commit": "4fbb88a7"
 	},
 	{
+		"id": 121,
 		"date": "2026-09-09",
 		"title": "Pasting a large theme no longer freezes",
 		"notes": [
@@ -155,6 +175,7 @@
 		"commit": "0f1932f8"
 	},
 	{
+		"id": 120,
 		"date": "2026-09-08",
 		"title": "Fixed slide colors and PDF themes",
 		"notes": [
@@ -163,6 +184,7 @@
 		"commit": "0a37de6c"
 	},
 	{
+		"id": 119,
 		"date": "2026-09-08",
 		"title": "Write your own themes",
 		"notes": [
@@ -171,6 +193,7 @@
 		"commit": "1cb8aff1"
 	},
 	{
+		"id": 118,
 		"date": "2026-09-07",
 		"title": "Fixed invites to documents in a space",
 		"notes": [
@@ -179,54 +202,63 @@
 		"commit": "146f89a8"
 	},
 	{
+		"id": 117,
 		"date": "2026-09-06",
 		"title": "Share with the system share sheet",
 		"notes": ["Send a document to any app your device can share to"],
 		"commit": "01408e40"
 	},
 	{
+		"id": 116,
 		"date": "2026-09-06",
 		"title": "Fixed indentation for custom task states",
 		"notes": ["Custom task markers keep their indentation"],
 		"commit": "c0285342"
 	},
 	{
+		"id": 115,
 		"date": "2026-09-06",
 		"title": "Fixed ligature rendering",
 		"notes": ["Ligatures no longer smear as you type"],
 		"commit": "c7df2cbf"
 	},
 	{
+		"id": 114,
 		"date": "2026-09-05",
 		"title": "Fixed keyboard selection in the command palette",
 		"notes": ["Arrow keys move through results reliably"],
 		"commit": "a2332217"
 	},
 	{
+		"id": 113,
 		"date": "2026-09-05",
 		"title": "Fixed line movement and find highlights",
 		"notes": ["Moving lines and highlighting matches behave correctly again"],
 		"commit": "f89c6878"
 	},
 	{
+		"id": 112,
 		"date": "2026-09-05",
 		"title": "Search lives in the sidebar",
 		"notes": ["One place to search your documents instead of two"],
 		"commit": "64279a9e"
 	},
 	{
+		"id": 111,
 		"date": "2026-09-05",
 		"title": "Large documents stay responsive",
 		"notes": ["Typing, scrolling and selecting keep up in very long documents"],
 		"commit": "ff29fda9"
 	},
 	{
+		"id": 110,
 		"date": "2026-09-01",
 		"title": "Fixed external profile links",
 		"notes": ["Links to profiles outside Alkalye open correctly"],
 		"commit": "f24c8c53"
 	},
 	{
+		"id": 109,
 		"date": "2026-08-31",
 		"title": "Fixed images that failed to appear",
 		"notes": [
@@ -235,24 +267,28 @@
 		"commit": "ec06c9c7"
 	},
 	{
+		"id": 108,
 		"date": "2026-08-31",
 		"title": "Insert a whiteboard from the editor",
 		"notes": ["New Whiteboard is in the editor's Insert menu"],
 		"commit": "06d8efee"
 	},
 	{
+		"id": 107,
 		"date": "2026-08-31",
 		"title": "Fixed typing in whiteboard text",
 		"notes": ["Text on a whiteboard accepts input again"],
 		"commit": "4940ea5f"
 	},
 	{
+		"id": 106,
 		"date": "2026-08-31",
 		"title": "Fixed printing images",
 		"notes": ["Printed documents include their media"],
 		"commit": "5f4da53f"
 	},
 	{
+		"id": 105,
 		"date": "2026-08-31",
 		"title": "Fixed command palette navigation",
 		"notes": [
@@ -261,6 +297,7 @@
 		"commit": "f3b170c1"
 	},
 	{
+		"id": 104,
 		"date": "2026-08-22",
 		"title": "Complete Markdown shortcuts",
 		"notes": [
@@ -269,24 +306,28 @@
 		"commit": "e87bcaa4"
 	},
 	{
+		"id": 103,
 		"date": "2026-08-20",
 		"title": "More authoring tools",
 		"notes": ["Extra editor commands for shaping documents as you write"],
 		"commit": "8a8305a9"
 	},
 	{
+		"id": 102,
 		"date": "2026-08-20",
 		"title": "Better editor shortcuts",
 		"notes": ["Shortcuts respond more predictably across the editor"],
 		"commit": "4d1e2486"
 	},
 	{
+		"id": 101,
 		"date": "2026-08-19",
 		"title": "See who else is on a whiteboard",
 		"notes": ["Viewers appear on a shared whiteboard while they watch"],
 		"commit": "f106f5ea"
 	},
 	{
+		"id": 100,
 		"date": "2026-08-18",
 		"title": "Cleaner mobile sidebar",
 		"notes": [
@@ -295,6 +336,7 @@
 		"commit": "8f885367"
 	},
 	{
+		"id": 99,
 		"date": "2026-08-18",
 		"title": "Better context menus",
 		"notes": [
@@ -303,12 +345,14 @@
 		"commit": "a762bbe7"
 	},
 	{
+		"id": 98,
 		"date": "2026-08-18",
 		"title": "Right-click in the editor",
 		"notes": ["A context menu with the actions you need where you clicked"],
 		"commit": "83281e6b"
 	},
 	{
+		"id": 97,
 		"date": "2026-08-17",
 		"title": "CLI improvements",
 		"notes": [
@@ -317,12 +361,14 @@
 		"commit": "8ec9c683"
 	},
 	{
+		"id": 96,
 		"date": "2026-08-15",
 		"title": "Softer sidebar highlight",
 		"notes": ["The active document stands out without shouting"],
 		"commit": "32db6c61"
 	},
 	{
+		"id": 95,
 		"date": "2026-08-14",
 		"title": "Faster startup for long-lived accounts",
 		"notes": [
@@ -331,36 +377,42 @@
 		"commit": "b2f969fa"
 	},
 	{
+		"id": 94,
 		"date": "2026-08-08",
 		"title": "Fixed teleprompter flicker",
 		"notes": ["Slides stay steady while the teleprompter scrolls"],
 		"commit": "02203520"
 	},
 	{
+		"id": 93,
 		"date": "2026-07-14",
 		"title": "Jump from preview to the editor",
 		"notes": ["A link in the document preview takes you straight to editing"],
 		"commit": "f0c3bda7"
 	},
 	{
+		"id": 92,
 		"date": "2026-07-14",
 		"title": "Whiteboards",
 		"notes": ["Draw on an infinite canvas and embed it in a document"],
 		"commit": "8d3d5352"
 	},
 	{
+		"id": 91,
 		"date": "2026-07-13",
 		"title": "Fixed space invites",
 		"notes": ["Accepting an invite uses the right account"],
 		"commit": "be8d0972"
 	},
 	{
+		"id": 90,
 		"date": "2026-07-10",
 		"title": "Faster startup",
 		"notes": ["Document metadata loads first, so the app is usable sooner"],
 		"commit": "02114c92"
 	},
 	{
+		"id": 89,
 		"date": "2026-07-08",
 		"title": "Fixed data loss when signing in on a new device",
 		"notes": [
@@ -369,42 +421,49 @@
 		"commit": "ce283294"
 	},
 	{
+		"id": 88,
 		"date": "2026-06-29",
 		"title": "Fixed CLI document freshness",
 		"notes": ["The CLI reads the current version of a document"],
 		"commit": "81b41822"
 	},
 	{
+		"id": 87,
 		"date": "2026-06-29",
 		"title": "Scrollbars match your theme",
 		"notes": ["Scrollbars follow light and dark mode"],
 		"commit": "44808c96"
 	},
 	{
+		"id": 86,
 		"date": "2026-06-29",
 		"title": "Fixed slideshow code highlighting",
 		"notes": ["Code on slides is highlighted again"],
 		"commit": "614693c4"
 	},
 	{
+		"id": 85,
 		"date": "2026-06-29",
 		"title": "Fixed image grids on slides",
 		"notes": ["Images in a grid size themselves correctly"],
 		"commit": "8c5b5eef"
 	},
 	{
+		"id": 84,
 		"date": "2026-06-29",
 		"title": "Comment on a document",
 		"notes": ["Leave inline comments and discuss a document in place"],
 		"commit": "0613ccce"
 	},
 	{
+		"id": 83,
 		"date": "2026-06-19",
 		"title": "Install the CLI with Bun",
 		"notes": ["bun link makes the alkalye command available everywhere"],
 		"commit": "42e9f9a0"
 	},
 	{
+		"id": 82,
 		"date": "2026-06-15",
 		"title": "Fixed the iOS home screen layout",
 		"notes": [
@@ -413,12 +472,14 @@
 		"commit": "dff73ebc"
 	},
 	{
+		"id": 81,
 		"date": "2026-06-14",
 		"title": "Fixed the iOS keyboard layout",
 		"notes": ["The editor resizes correctly when the keyboard opens"],
 		"commit": "7b66703f"
 	},
 	{
+		"id": 80,
 		"date": "2026-06-08",
 		"title": "Sidebar context menu",
 		"notes": [
@@ -427,66 +488,77 @@
 		"commit": "defbcaf2"
 	},
 	{
+		"id": 79,
 		"date": "2026-06-07",
 		"title": "Fixed navigation after deleting",
 		"notes": ["Deleting a document in a space takes you somewhere sensible"],
 		"commit": "f3ea8535"
 	},
 	{
+		"id": 78,
 		"date": "2026-05-19",
 		"title": "German translation",
 		"notes": ["Alkalye speaks German, and follows your browser's language"],
 		"commit": "6a7185ed"
 	},
 	{
+		"id": 77,
 		"date": "2026-05-18",
 		"title": "Fixed text selection on iOS",
 		"notes": ["Selecting text in the editor is stable on iPhone and iPad"],
 		"commit": "295df804"
 	},
 	{
+		"id": 76,
 		"date": "2026-05-15",
 		"title": "Fixed the white bar on iPhone",
 		"notes": ["The home screen app fills the screen properly"],
 		"commit": "06842244"
 	},
 	{
+		"id": 75,
 		"date": "2026-05-15",
 		"title": "Fixed the overflowing sign-in button",
 		"notes": ["The auth button fits its container"],
 		"commit": "62708ab2"
 	},
 	{
+		"id": 74,
 		"date": "2026-05-15",
 		"title": "Slideshow images fill the slide",
 		"notes": ["Images use the full space available to them"],
 		"commit": "397a8355"
 	},
 	{
+		"id": 73,
 		"date": "2026-05-15",
 		"title": "Fixed the hidden cursor on iOS",
 		"notes": ["The keyboard no longer covers the cursor in short documents"],
 		"commit": "f36d6f9b"
 	},
 	{
+		"id": 72,
 		"date": "2026-05-14",
 		"title": "Fixed the find panel",
 		"notes": ["Searching inside a document works again"],
 		"commit": "538dcab0"
 	},
 	{
+		"id": 71,
 		"date": "2026-05-08",
 		"title": "Reopening a document opens its space",
 		"notes": ["The most recent document arrives with the right space selected"],
 		"commit": "e2a82861"
 	},
 	{
+		"id": 70,
 		"date": "2026-05-06",
 		"title": "Fixed the lingering drop cursor",
 		"notes": ["The drop indicator disappears after you drop a file"],
 		"commit": "25d460bd"
 	},
 	{
+		"id": 69,
 		"date": "2026-05-06",
 		"title": "Fixed text shifting under remote cursors",
 		"notes": [
@@ -495,42 +567,49 @@
 		"commit": "dfb2c464"
 	},
 	{
+		"id": 68,
 		"date": "2026-05-06",
 		"title": "Fixed dragging images into the editor",
 		"notes": ["Dropped images land where you dropped them"],
 		"commit": "194789a3"
 	},
 	{
+		"id": 67,
 		"date": "2026-03-24",
 		"title": "Smoother remote cursors",
 		"notes": ["Collaborators' cursors move fluidly instead of jumping"],
 		"commit": "5bd73409"
 	},
 	{
+		"id": 66,
 		"date": "2026-03-18",
 		"title": "The Alkalye CLI",
 		"notes": ["Read, write and manage your documents from the terminal"],
 		"commit": "d7e5292f"
 	},
 	{
+		"id": 65,
 		"date": "2026-03-18",
 		"title": "Clearer CLI help",
 		"notes": ["Running alkalye with no arguments explains what it can do"],
 		"commit": "cbe4857c"
 	},
 	{
+		"id": 64,
 		"date": "2026-03-15",
 		"title": "Word and character count",
 		"notes": ["A stats badge in the editor tracks the size of your document"],
 		"commit": "c8c329d9"
 	},
 	{
+		"id": 63,
 		"date": "2026-03-11",
 		"title": "Scroll to top and bottom",
 		"notes": ["Buttons to jump to either end of a long document"],
 		"commit": "d315eef3"
 	},
 	{
+		"id": 62,
 		"date": "2026-03-11",
 		"title": "Better wrapping for indented text",
 		"notes": [
@@ -539,24 +618,28 @@
 		"commit": "14d7b15e"
 	},
 	{
+		"id": 61,
 		"date": "2026-03-09",
 		"title": "Search opens with your last query",
 		"notes": ["Opening a document with an active search shows the find panel"],
 		"commit": "1801fdc1"
 	},
 	{
+		"id": 60,
 		"date": "2026-03-02",
 		"title": "Bigger touch targets",
 		"notes": ["Buttons and menu items are easier to hit on a phone"],
 		"commit": "826ec6a6"
 	},
 	{
+		"id": 59,
 		"date": "2026-03-02",
 		"title": "Properly sized text fields",
 		"notes": ["Multi-line inputs grow to fit what you type"],
 		"commit": "fbf78431"
 	},
 	{
+		"id": 58,
 		"date": "2026-03-02",
 		"title": "Clear message when access is denied",
 		"notes": [
@@ -565,180 +648,210 @@
 		"commit": "6cc207f3"
 	},
 	{
+		"id": 57,
 		"date": "2026-03-02",
 		"title": "Sign in when access is denied",
 		"notes": ["If you are signed out, the denial offers you the sign-in flow"],
 		"commit": "414ec1fa"
 	},
 	{
+		"id": 56,
 		"date": "2026-02-23",
 		"title": "No more light mode flash",
 		"notes": ["Dark mode applies before the first paint"],
 		"commit": "3abb7ae6"
 	},
 	{
+		"id": 55,
 		"date": "2026-02-18",
 		"title": "A new landing page",
 		"notes": ["alkalye.com introduces the app before you open it"],
 		"commit": "24f6e6a4"
 	},
 	{
+		"id": 54,
 		"date": "2026-02-16",
 		"title": "Two-way filesystem sync",
 		"notes": ["Personal documents and spaces stay in step with files on disk"],
 		"commit": "d3888381"
 	},
 	{
+		"id": 53,
 		"date": "2026-02-15",
 		"title": "Better save and palette shortcuts",
 		"notes": ["Cmd+S and Cmd+P behave the way you expect"],
 		"commit": "bd834bd9"
 	},
 	{
+		"id": 52,
 		"date": "2026-02-04",
 		"title": "Open local Markdown files",
 		"notes": ["Edit a file from your disk without importing it"],
 		"commit": "ae4cfb77"
 	},
 	{
+		"id": 51,
 		"date": "2026-01-30",
 		"title": "Fixed the find button",
 		"notes": ["The button opens search, not just the keyboard shortcut"],
 		"commit": "019c4775"
 	},
 	{
+		"id": 50,
 		"date": "2026-01-30",
 		"title": "Search inside a document",
 		"notes": ["Cmd+F finds and highlights text as you type"],
 		"commit": "9ca6fdb6"
 	},
 	{
+		"id": 49,
 		"date": "2026-01-25",
 		"title": "Permanent deletion",
 		"notes": ["Remove a document for good instead of only archiving it"],
 		"commit": "06f7b6a0"
 	},
 	{
+		"id": 48,
 		"date": "2026-01-20",
 		"title": "Videos in documents",
 		"notes": ["Upload and play video alongside images"],
 		"commit": "70960902"
 	},
 	{
+		"id": 47,
 		"date": "2026-01-18",
 		"title": "Custom wikilink titles",
 		"notes": ["Link to a document under a name of your choosing"],
 		"commit": "c8971580"
 	},
 	{
+		"id": 46,
 		"date": "2026-01-17",
 		"title": "Sidebar closes for the time machine",
 		"notes": ["Entering history gives the document the full width"],
 		"commit": "f6628dfe"
 	},
 	{
+		"id": 45,
 		"date": "2026-01-16",
 		"title": "Highlight slides from the teleprompter",
 		"notes": ["Selecting text in the teleprompter highlights it on the slide"],
 		"commit": "57669bab"
 	},
 	{
+		"id": 44,
 		"date": "2026-01-16",
 		"title": "Faster loading of your last document",
 		"notes": ["Alkalye remembers where you were and opens it first"],
 		"commit": "2a524d87"
 	},
 	{
+		"id": 43,
 		"date": "2026-01-16",
 		"title": "Fixed blank lines in lists",
 		"notes": ["Adding an item to a loose list no longer inserts an empty line"],
 		"commit": "1a0ecef2"
 	},
 	{
+		"id": 42,
 		"date": "2026-01-16",
 		"title": "Fewer loading spinners",
 		"notes": ["Content appears in place instead of behind a spinner"],
 		"commit": "d39a5d19"
 	},
 	{
+		"id": 41,
 		"date": "2026-01-16",
 		"title": "Fixed images followed by text",
 		"notes": ["An image and the text after it share a block correctly"],
 		"commit": "7e01605d"
 	},
 	{
+		"id": 40,
 		"date": "2026-01-16",
 		"title": "Create a space while moving",
 		"notes": ["Move to space can make the space you need on the spot"],
 		"commit": "ffc5a649"
 	},
 	{
+		"id": 39,
 		"date": "2026-01-16",
 		"title": "Moving a document brings its assets",
 		"notes": ["Images and videos follow the document into its new space"],
 		"commit": "66d6519c"
 	},
 	{
+		"id": 38,
 		"date": "2026-01-16",
 		"title": "Hold to sweep through history",
 		"notes": ["A visual hint shows that holding next or previous keeps moving"],
 		"commit": "70c9b069"
 	},
 	{
+		"id": 37,
 		"date": "2026-01-16",
 		"title": "Readable links in the teleprompter",
 		"notes": ["Links no longer disappear against the background"],
 		"commit": "81d78a84"
 	},
 	{
+		"id": 36,
 		"date": "2026-01-16",
 		"title": "Fixed dragging document links",
 		"notes": ["Links in the document list stopped starting accidental drags"],
 		"commit": "d1d6c40f"
 	},
 	{
+		"id": 35,
 		"date": "2026-01-14",
 		"title": "Fixed slide flicker",
 		"notes": ["Advancing a slide no longer flashes"],
 		"commit": "8e85078c"
 	},
 	{
+		"id": 34,
 		"date": "2026-01-14",
 		"title": "Sidebar closes for a tutor",
 		"notes": ["Opening a tutor gives it the full screen"],
 		"commit": "f29963da"
 	},
 	{
+		"id": 33,
 		"date": "2026-01-14",
 		"title": "Fixed the image preview",
 		"notes": ["Previews load their assets instead of showing a gap"],
 		"commit": "c6a7aaf0"
 	},
 	{
+		"id": 32,
 		"date": "2026-01-14",
 		"title": "Fixed theme and preset buttons",
 		"notes": ["Selecting a theme or preset applies it"],
 		"commit": "e9ce565d"
 	},
 	{
+		"id": 31,
 		"date": "2026-01-13",
 		"title": "Better image styling",
 		"notes": ["Images size themselves sensibly and are no longer clipped"],
 		"commit": "58a9c903"
 	},
 	{
+		"id": 30,
 		"date": "2026-01-13",
 		"title": "Hold delay in the time machine",
 		"notes": ["Next and previous need a deliberate hold before sweeping"],
 		"commit": "e871b5f8"
 	},
 	{
+		"id": 29,
 		"date": "2026-01-13",
 		"title": "Screen stays awake while presenting",
 		"notes": ["Slideshow and teleprompter hold a wake lock"],
 		"commit": "e25141fd"
 	},
 	{
+		"id": 28,
 		"date": "2026-01-12",
 		"title": "Fixed switching between documents",
 		"notes": [
@@ -747,162 +860,189 @@
 		"commit": "a16eb1f2"
 	},
 	{
+		"id": 27,
 		"date": "2026-01-12",
 		"title": "Drag and drop assets",
 		"notes": ["Drop images and videos straight into a document"],
 		"commit": "9973a833"
 	},
 	{
+		"id": 26,
 		"date": "2026-01-12",
 		"title": "Drop files anywhere in the list",
 		"notes": ["The drop zone covers the whole document list"],
 		"commit": "1a6c4e6d"
 	},
 	{
+		"id": 25,
 		"date": "2026-01-12",
 		"title": "Download an asset",
 		"notes": ["Save an image or video back out of a document"],
 		"commit": "123c5829"
 	},
 	{
+		"id": 24,
 		"date": "2026-01-12",
 		"title": "Frontmatter stays open",
 		"notes": ["Document settings no longer fold themselves away"],
 		"commit": "4eea3677"
 	},
 	{
+		"id": 23,
 		"date": "2026-01-12",
 		"title": "Themes for slideshows and preview",
 		"notes": ["Style presentations and the reading view"],
 		"commit": "5ed4ffa9"
 	},
 	{
+		"id": 22,
 		"date": "2026-01-12",
 		"title": "Time machine",
 		"notes": ["Browse a document's history and restore any earlier version"],
 		"commit": "79741ccc"
 	},
 	{
+		"id": 21,
 		"date": "2026-01-09",
 		"title": "Fixed the settings back button",
 		"notes": ["It returns to the document you came from"],
 		"commit": "5ac1be56"
 	},
 	{
+		"id": 20,
 		"date": "2026-01-09",
 		"title": "Fixed images in slideshows",
 		"notes": ["Slides show the assets you embedded"],
 		"commit": "7bb2f518"
 	},
 	{
+		"id": 19,
 		"date": "2026-01-09",
 		"title": "Sort checked tasks to the bottom",
 		"notes": ["Manually, or automatically as you tick them off"],
 		"commit": "73667925"
 	},
 	{
+		"id": 18,
 		"date": "2026-01-08",
 		"title": "Fixed remote cursors in Safari",
 		"notes": ["Other people's cursors repaint as they move"],
 		"commit": "c563f63a"
 	},
 	{
+		"id": 17,
 		"date": "2026-01-08",
 		"title": "Sync now, and an offline indicator",
 		"notes": ["See when you are offline and trigger a sync yourself"],
 		"commit": "48f111ab"
 	},
 	{
+		"id": 16,
 		"date": "2026-01-08",
 		"title": "Move and duplicate into a space",
 		"notes": ["Duplicates land in the space with (copy) in the title"],
 		"commit": "382b3e90"
 	},
 	{
+		"id": 15,
 		"date": "2026-01-08",
 		"title": "Fixed launching from the iOS home screen",
 		"notes": ["The app opens at the right place every time"],
 		"commit": "9354b8fe"
 	},
 	{
+		"id": 14,
 		"date": "2026-01-07",
 		"title": "Fixed navigation after signing in",
 		"notes": ["Logging in takes you into the app"],
 		"commit": "71dec2ad"
 	},
 	{
+		"id": 13,
 		"date": "2026-01-07",
 		"title": "Cursors follow incoming changes",
 		"notes": ["Your cursor and selection stay put as other people edit"],
 		"commit": "7819b5b0"
 	},
 	{
+		"id": 12,
 		"date": "2026-01-07",
 		"title": "Document spaces",
 		"notes": ["Group documents into spaces and share a whole space at once"],
 		"commit": "0e1372cb"
 	},
 	{
+		"id": 11,
 		"date": "2026-01-04",
 		"title": "Nested lists",
 		"notes": ["Indent list items to any depth"],
 		"commit": "beba3fd1"
 	},
 	{
+		"id": 10,
 		"date": "2026-01-03",
 		"title": "Toggle formatting without a selection",
 		"notes": ["Bold, italic and code turn on and off at the cursor"],
 		"commit": "8ecf2f65"
 	},
 	{
+		"id": 9,
 		"date": "2026-01-02",
 		"title": "Editor settings apply before the first paint",
 		"notes": ["No flash of the wrong font or width"],
 		"commit": "5ad626d1"
 	},
 	{
+		"id": 8,
 		"date": "2026-01-02",
 		"title": "Automatic on-device backup",
 		"notes": ["Your documents are backed up locally as you work"],
 		"commit": "946b3c83"
 	},
 	{
+		"id": 7,
 		"date": "2026-01-02",
 		"title": "Presentation polish",
 		"notes": ["Small improvements throughout the slideshow"],
 		"commit": "a00a49e1"
 	},
 	{
+		"id": 6,
 		"date": "2026-01-02",
 		"title": "Wikilinks",
 		"notes": ["Link documents with [[double brackets]]"],
 		"commit": "7428f763"
 	},
 	{
+		"id": 5,
 		"date": "2026-01-01",
 		"title": "Empty documents clean themselves up",
 		"notes": ["Navigating away from an untouched document removes it"],
 		"commit": "7e4c201d"
 	},
 	{
+		"id": 4,
 		"date": "2026-01-01",
 		"title": "Rename and delete folders",
 		"notes": ["Folders can be managed from the sidebar"],
 		"commit": "9a1d21be"
 	},
 	{
+		"id": 3,
 		"date": "2026-01-01",
 		"title": "Clearer error states",
 		"notes": ["Errors explain what happened instead of offering a dead end"],
 		"commit": "3111704c"
 	},
 	{
+		"id": 2,
 		"date": "2026-01-01",
 		"title": "Folders in the document list",
 		"notes": ["Documents and folders read as one clear list"],
 		"commit": "c6bbb454"
 	},
 	{
+		"id": 1,
 		"date": "2025-12-31",
 		"title": "Alkalye",
 		"notes": [

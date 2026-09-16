@@ -59,9 +59,10 @@ Contributions welcome! Please open an issue or PR.
 
 Every pull request adds exactly one entry at the top of
 [`public/changelog.json`](public/changelog.json) describing what changed for
-readers, with `"pr": <number>` so the entry links back to it. Published entries are never edited, reordered or removed — readers
-remember how far they have read by position, so touching an old entry replays
-old notes for everyone. The entries render at
+readers, carrying the next `id` and `"pr": <number>` so the entry links back to
+it. Readers remember the highest `id` they have seen, so a published entry can
+be reworded, reordered or removed afterwards without replaying old notes for
+anyone — just never reuse an `id`. The entries render at
 [alkalye.com/changelog](https://www.alkalye.com/changelog) and drive the
 in-app update prompt.
 
