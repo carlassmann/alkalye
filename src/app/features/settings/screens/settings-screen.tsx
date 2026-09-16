@@ -1600,6 +1600,19 @@ function AppSection() {
 								<RefreshCw className="mr-1.5 size-3.5" />
 								<T k="settings.app.reloadToUpdate" />
 							</Button>
+							<Button
+								variant="outline"
+								size="sm"
+								render={
+									<a
+										href="/changelog"
+										target="_blank"
+										rel="noopener noreferrer"
+									/>
+								}
+							>
+								<T k="settings.app.whatsNew" />
+							</Button>
 						</SettingsActions>
 					</>
 				) : (
@@ -1608,6 +1621,19 @@ function AppSection() {
 							<T k="settings.app.latestVersion" />
 						</SettingsStatus>
 						<SettingsActions>
+							<Button
+								variant="outline"
+								size="sm"
+								render={
+									<a
+										href="/changelog"
+										target="_blank"
+										rel="noopener noreferrer"
+									/>
+								}
+							>
+								<T k="settings.app.whatsNew" />
+							</Button>
 							<Button
 								onClick={handleCheckForUpdates}
 								variant="outline"

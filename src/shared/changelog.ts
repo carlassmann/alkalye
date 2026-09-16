@@ -1,7 +1,8 @@
 import { z } from "zod"
 
 export { readChangelog, isChangelogEntry, entriesSince, countNotes }
-export { prependedEntryCount }
+export { prependedEntryCount, sourceUrl, sourceLabel }
+export { REPOSITORY_URL }
 export type { ChangelogEntry }
 
 type ChangelogEntry = z.infer<typeof entrySchema> & { id: number }
@@ -12,6 +13,13 @@ let entrySchema = z.object({
 	date: z.iso.date(),
 	title: z.string().min(1),
 	notes: z.array(z.string().min(1)).min(1),
+	// Where the change came from. A pull request survives a squash merge; a
+	// commit is how the backfilled history points at itself.
+	pr: z.number().int().positive().optional(),
+	commit: z
+		.string()
+		.regex(/^[0-9a-f]{7,40}$/)
+		.optional(),
 })
 
 function isChangelogEntry(value: unknown): boolean {
@@ -28,6 +36,20 @@ function readChangelog(value: unknown): ChangelogEntry[] {
 		let parsed = entrySchema.safeParse(entry)
 		return parsed.success ? [{ ...parsed.data, id: value.length - index }] : []
 	})
+}
+
+let REPOSITORY_URL = "https://github.com/carlassmann/alkalye"
+
+function sourceUrl(entry: ChangelogEntry): string | undefined {
+	if (entry.pr) return `${REPOSITORY_URL}/pull/${entry.pr}`
+	if (entry.commit) return `${REPOSITORY_URL}/commit/${entry.commit}`
+	return undefined
+}
+
+function sourceLabel(entry: ChangelogEntry): string | undefined {
+	if (entry.pr) return `#${entry.pr}`
+	if (entry.commit) return entry.commit.slice(0, 7)
+	return undefined
 }
 
 function entriesSince(

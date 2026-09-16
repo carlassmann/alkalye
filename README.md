@@ -59,7 +59,7 @@ Contributions welcome! Please open an issue or PR.
 
 Every pull request adds exactly one entry at the top of
 [`public/changelog.json`](public/changelog.json) describing what changed for
-readers. Published entries are never edited, reordered or removed — readers
+readers, with `"pr": <number>` so the entry links back to it. Published entries are never edited, reordered or removed — readers
 remember how far they have read by position, so touching an old entry replays
 old notes for everyone. The entries render at
 [alkalye.com/changelog](https://www.alkalye.com/changelog) and drive the

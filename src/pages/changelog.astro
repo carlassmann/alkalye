@@ -1,7 +1,12 @@
 ---
 import LegalDoc from "@/layouts/LegalDoc.astro"
 import changelogSource from "../../public/changelog.json"
-import { readChangelog, type ChangelogEntry } from "@/shared/changelog"
+import {
+	readChangelog,
+	sourceUrl,
+	sourceLabel,
+	type ChangelogEntry,
+} from "@/shared/changelog"
 
 // Date-only strings parse as UTC midnight, so formatting them in the build
 // host's zone renders every date a day early west of UTC.
@@ -40,7 +45,25 @@ let days = groupByDay(readChangelog(changelogSource))
 				</h2>
 				{day.entries.map(entry => (
 					<div class="mt-6 first-of-type:mt-0">
-						<h3 class="!mt-0 !mb-2 text-base font-semibold">{entry.title}</h3>
+						<h3 class="!mt-0 !mb-2 text-base font-semibold">
+							{
+								sourceUrl(entry) ? (
+									<a
+										href={sourceUrl(entry)}
+										target="_blank"
+										rel="noopener noreferrer"
+										class="!text-foreground !no-underline hover:!underline"
+									>
+										{entry.title}
+										<span class="text-muted-foreground ml-1.5 text-xs font-normal">
+											{sourceLabel(entry)}
+										</span>
+									</a>
+								) : (
+									entry.title
+								)
+							}
+						</h3>
 						<ul class="!my-0">
 							{entry.notes.map(note => (
 								<li>{note}</li>

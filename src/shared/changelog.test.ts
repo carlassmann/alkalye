@@ -5,6 +5,8 @@ import {
 	entriesSince,
 	countNotes,
 	prependedEntryCount,
+	sourceUrl,
+	sourceLabel,
 } from "./changelog"
 
 let sample = [
@@ -66,6 +68,14 @@ describe("readChangelog", () => {
 		expect(
 			entriesSince(readChangelog(withBroken), 3).map(e => e.title),
 		).toEqual(["Newest"])
+	})
+
+	it("points every shipped entry at a distinct commit or pull request", () => {
+		let entries = readChangelog(shippedChangelog)
+		let refs = entries.map(entry => sourceLabel(entry))
+		expect(refs.filter(ref => ref === undefined)).toEqual([])
+		expect(new Set(refs).size).toBe(refs.length)
+		expect(sourceUrl(entries[0]!)?.startsWith("https://github.com/")).toBe(true)
 	})
 
 	it("accepts the changelog we actually ship", () => {
