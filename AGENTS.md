@@ -7,6 +7,9 @@ Offline-capable PWA built with Jazz (local-first sync), Astro, and React.
 - **Bun** - use `bun install`, `bun add`, `bun run` (no npm/yarn)
 - **Verify:** `bun run check` (lint, types, format, tests)
 - **React Compiler** - never use `useMemo`, `useCallback`, `React.memo`
+- **Never commit to `main`** - branch, open a PR, land it as a squash merge
+- **Changelog** - every PR adds exactly one entry at the top of `public/changelog.json`, written for readers, carrying the next `id` and `"pr": <number>`. Published entries can be edited or removed later; never reuse an `id`
+- **Signoff** - after the final push, run `bun run ci`. A PR is incomplete until its exact remote head has `signoff: success`; fix failures and rerun before reporting completion
 
 ## Architecture
 

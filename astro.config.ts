@@ -86,6 +86,12 @@ export default defineConfig({
 			},
 			workbox: {
 				globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2,woff,ttf}"],
+				// The update prompt links to /changelog, so it must always come
+				// from the network: a precached copy would describe the build
+				// the reader is already running.
+				// Passing globIgnores replaces workbox's default, which must be
+				// kept or every node_modules file is swept into the precache.
+				globIgnores: ["**/node_modules/**/*", "**/changelog/index.html"],
 				navigateFallback: "app",
 				navigateFallbackAllowlist: [/^\/app(?:\/.*)?(?:\?.*)?$/],
 				maximumFileSizeToCacheInBytes: 5.5 * 1024 * 1024,

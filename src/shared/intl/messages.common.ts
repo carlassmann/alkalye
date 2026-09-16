@@ -141,6 +141,9 @@ let baseCommonMessages = messages({
 	"pwa.updateAvailable": "Update available",
 	"pwa.updateDescription": "Reload to update to the latest version",
 	"pwa.updateAction": "Reload",
+	"pwa.updateMore":
+		".input {$count :number} .match $count one {{and 1 more change}} * {{and {$count} more changes}}",
+	"pwa.whatsNew": "What's new",
 	"pwa.offlineReady": "Ready to work offline",
 	"pwa.offlineDescription": "App has been cached for offline use",
 
@@ -315,6 +318,9 @@ let deCommonMessages = translate(baseCommonMessages, {
 	"pwa.updateDescription":
 		"Lade neu, um auf die neueste Version zu aktualisieren",
 	"pwa.updateAction": "Neu laden",
+	"pwa.updateMore":
+		".input {$count :number} .match $count one {{und 1 weitere Änderung}} * {{und {$count} weitere Änderungen}}",
+	"pwa.whatsNew": "Was ist neu",
 	"pwa.offlineReady": "Bereit für Offline-Arbeit",
 	"pwa.offlineDescription": "App wurde für Offline-Nutzung gecacht",
 

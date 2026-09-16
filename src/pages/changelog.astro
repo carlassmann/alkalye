@@ -1,0 +1,77 @@
+---
+import LegalDoc from "@/layouts/LegalDoc.astro"
+import changelogSource from "../../public/changelog.json"
+import {
+	readChangelog,
+	sourceUrl,
+	sourceLabel,
+	type ChangelogEntry,
+} from "@/shared/changelog"
+
+// Date-only strings parse as UTC midnight, so formatting them in the build
+// host's zone renders every date a day early west of UTC.
+let dateFormat = new Intl.DateTimeFormat(undefined, {
+	day: "numeric",
+	month: "long",
+	year: "numeric",
+	timeZone: "UTC",
+})
+
+// Groups runs of entries rather than every entry sharing a date, so a file that
+// is not in date order reads as written instead of being silently reordered.
+function groupByDay(entries: ChangelogEntry[]) {
+	let days: { date: string; entries: ChangelogEntry[] }[] = []
+	for (let entry of entries) {
+		let current = days.at(-1)
+		if (current?.date === entry.date) current.entries.push(entry)
+		else days.push({ date: entry.date, entries: [entry] })
+	}
+	return days
+}
+
+let days = groupByDay(readChangelog(changelogSource))
+---
+
+<LegalDoc
+	title="What's new"
+	description="Recent changes and improvements in Alkalye."
+	subtitle="Everything that changed, newest first."
+>
+	{
+		days.map(day => (
+			<section class="border-border/60 mt-12 scroll-mt-20 border-t pt-6 first:mt-0">
+				<h2 class="text-muted-foreground !mt-0 !mb-6 text-sm font-medium tracking-wide">
+					{dateFormat.format(new Date(day.date))}
+				</h2>
+				{day.entries.map(entry => (
+					<div class="mt-6 first-of-type:mt-0">
+						<h3 class="!mt-0 !mb-2 text-base font-semibold">
+							{
+								sourceUrl(entry) ? (
+									<a
+										href={sourceUrl(entry)}
+										target="_blank"
+										rel="noopener noreferrer"
+										class="!text-foreground !no-underline hover:!underline"
+									>
+										{entry.title}
+										<span class="text-muted-foreground ml-1.5 text-xs font-normal">
+											{sourceLabel(entry)}
+										</span>
+									</a>
+								) : (
+									entry.title
+								)
+							}
+						</h3>
+						<ul class="!my-0">
+							{entry.notes.map(note => (
+								<li>{note}</li>
+							))}
+						</ul>
+					</div>
+				))}
+			</section>
+		))
+	}
+</LegalDoc>
