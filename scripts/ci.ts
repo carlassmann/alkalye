@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process"
 import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
 import { setTimeout as delay } from "node:timers/promises"
-import { prependedEntryCount, readChangelog } from "@/shared/changelog"
+import { prependedEntryCount, isChangelogEntry } from "@/shared/changelog"
 
 let ROOT = resolve(import.meta.dirname ?? ".", "..")
 let CI_TIMEOUT_MS = 15 * 60 * 1_000
@@ -79,15 +79,7 @@ function requireTestedState(testedSha: string) {
 }
 
 function readJsonAt(ref: string, path: string): unknown {
-	let listed = spawnSync("git", ["ls-tree", "--name-only", ref, path], {
-		cwd: ROOT,
-		encoding: "utf8",
-		timeout: CAPTURE_TIMEOUT_MS,
-	})
-	if (listed.status !== 0) {
-		throw new Error(`Could not read ${path} at ${ref}: ${listed.stderr ?? ""}`)
-	}
-	if (!listed.stdout.trim()) return undefined
+	if (!capture(["git", "ls-tree", "--name-only", ref, path])) return undefined
 	return JSON.parse(capture(["git", "show", `${ref}:${path}`]))
 }
 
@@ -130,12 +122,9 @@ function requireEveryEntryReadable(head: unknown) {
 	if (!Array.isArray(head)) {
 		throw new Error(`${CHANGELOG_PATH} must be an array of entries.`)
 	}
-	let readable = new Set(
-		readChangelog(head).map(entry => head.length - entry.id),
+	let unreadable = head.flatMap((entry, index) =>
+		isChangelogEntry(entry) ? [] : [index],
 	)
-	let unreadable = head
-		.map((_, index) => index)
-		.filter(index => !readable.has(index))
 	if (unreadable.length === 0) return
 	throw new Error(
 		`${CHANGELOG_PATH} has unreadable entries at position ${unreadable.join(", ")}. Every entry needs an ISO date (2026-09-16), a title, and at least one note.`,
@@ -228,7 +217,8 @@ async function main() {
 			["bun", "run", "check"],
 			ciEnvironment,
 		)
-		run("Production build", ["bun", "run", "build"], ciEnvironment)
+		// `bun run build` reruns astro check, which `bun run check` just did.
+		run("Production build", ["bunx", "astro", "build"], ciEnvironment)
 		run("Install browser", [
 			"bunx",
 			"playwright",

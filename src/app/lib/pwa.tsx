@@ -56,28 +56,17 @@ function usePWAProvider(): PWAContextValue {
 		Promise.resolve(),
 	)
 	let t = useIntl()
-	let labelsRef = useRef({
+	let labels = {
 		updateAvailable: t("pwa.updateAvailable"),
 		updateDescription: t("pwa.updateDescription"),
 		updateAction: t("pwa.updateAction"),
 		whatsNew: t("pwa.whatsNew"),
 		offlineReady: t("pwa.offlineReady"),
 		offlineDescription: t("pwa.offlineDescription"),
-	})
-	labelsRef.current = {
-		updateAvailable: t("pwa.updateAvailable"),
-		updateDescription: t("pwa.updateDescription"),
-		updateAction: t("pwa.updateAction"),
-		whatsNew: t("pwa.whatsNew"),
-		offlineReady: t("pwa.offlineReady"),
-		offlineDescription: t("pwa.offlineDescription"),
+		moreLabel: (count: number) => t("pwa.updateMore", { count }),
 	}
-	let moreLabel = (count: number) =>
-		count === 1
-			? t("pwa.updateMoreSingle")
-			: t("pwa.updateMore", { count: String(count) })
-	let moreLabelRef = useRef(moreLabel)
-	moreLabelRef.current = moreLabel
+	let labelsRef = useRef(labels)
+	labelsRef.current = labels
 
 	useEffect(markReleaseNotesSeen, [])
 
@@ -109,7 +98,6 @@ function usePWAProvider(): PWAContextValue {
 							showUpdateToast({
 								notes,
 								labels: labelsRef.current,
-								moreLabel: moreLabelRef.current,
 								onReload: () => updateSW(true),
 								onDismiss: () => setNeedRefresh(false),
 							})
@@ -434,6 +422,7 @@ type UpdateToastLabels = {
 	updateDescription: string
 	updateAction: string
 	whatsNew: string
+	moreLabel: (count: number) => string
 }
 
 let CHANGELOG_URL = "/changelog"
@@ -444,13 +433,11 @@ let UPDATE_TOAST_ID = "pwa-update"
 function showUpdateToast({
 	notes,
 	labels,
-	moreLabel,
 	onReload,
 	onDismiss,
 }: {
 	notes: ChangelogEntry[]
 	labels: UpdateToastLabels
-	moreLabel: (count: number) => string
 	onReload: () => void
 	onDismiss: () => void
 }) {
@@ -479,7 +466,7 @@ function showUpdateToast({
 				</ul>
 				{olderNoteCount > 0 && (
 					<div className="text-muted-foreground mt-1.5 text-sm">
-						{moreLabel(olderNoteCount)}
+						{labels.moreLabel(olderNoteCount)}
 					</div>
 				)}
 			</div>
@@ -493,14 +480,16 @@ function showUpdateToast({
 				>
 					{labels.updateAction}
 				</Button>
-				<a
-					href={CHANGELOG_URL}
-					target="_blank"
-					rel="noopener noreferrer"
-					className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
+				<Button
+					variant="link"
+					size="sm"
+					className="text-muted-foreground"
+					render={
+						<a href={CHANGELOG_URL} target="_blank" rel="noopener noreferrer" />
+					}
 				>
 					{labels.whatsNew}
-				</a>
+				</Button>
 			</div>
 		</div>,
 		{ id: UPDATE_TOAST_ID, duration: Infinity, onDismiss },

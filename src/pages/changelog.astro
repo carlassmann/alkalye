@@ -7,14 +7,12 @@ let entries = readChangelog(changelogSource)
 
 // Date-only strings parse as UTC midnight, so formatting them in the build
 // host's zone renders every date a day early west of UTC.
-function formatDate(date: string) {
-	return new Date(date).toLocaleDateString(undefined, {
-		day: "numeric",
-		month: "long",
-		year: "numeric",
-		timeZone: "UTC",
-	})
-}
+let dateFormat = new Intl.DateTimeFormat(undefined, {
+	day: "numeric",
+	month: "long",
+	year: "numeric",
+	timeZone: "UTC",
+})
 ---
 
 <LegalDoc
@@ -26,7 +24,7 @@ function formatDate(date: string) {
 		entries.map(entry => (
 			<section>
 				<h2>{entry.title}</h2>
-				<p class="text-muted-foreground -mt-2 text-sm">{formatDate(entry.date)}</p>
+				<p class="text-muted-foreground -mt-2 text-sm">{dateFormat.format(new Date(entry.date))}</p>
 				<ul>
 					{entry.notes.map(note => (
 						<li>{note}</li>

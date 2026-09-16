@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest"
+import shipped from "../../../public/changelog.json"
 
 let LAST_SEEN_KEY = "changelog-last-seen-entry"
 
@@ -27,11 +28,11 @@ afterEach(() => vi.unstubAllGlobals())
 
 describe("markReleaseNotesSeen", () => {
 	it("marks the bundled changelog as seen so a fresh install skips the backlog", async () => {
-		let { markReleaseNotesSeen, bundledReleaseNotes } =
+		let { markReleaseNotesSeen, newestBundledEntryId } =
 			await freshReleaseNotes()
 		markReleaseNotesSeen()
 		expect(localStorage.getItem(LAST_SEEN_KEY)).toBe(
-			String(bundledReleaseNotes[0]?.id),
+			String(newestBundledEntryId()),
 		)
 	})
 
@@ -92,11 +93,8 @@ describe("fetchPendingReleaseNotes", () => {
 
 describe("when localStorage refuses writes", () => {
 	it("still remembers the marker for this session", async () => {
-		let {
-			markReleaseNotesSeen,
-			fetchPendingReleaseNotes,
-			bundledReleaseNotes,
-		} = await freshReleaseNotes()
+		let { markReleaseNotesSeen, fetchPendingReleaseNotes } =
+			await freshReleaseNotes()
 		vi.stubGlobal("localStorage", {
 			getItem: () => null,
 			setItem: () => {
@@ -107,11 +105,7 @@ describe("when localStorage refuses writes", () => {
 		markReleaseNotesSeen()
 		respondWith([
 			{ date: "2026-09-20", title: "New", notes: ["Fresh"] },
-			...bundledReleaseNotes.map(({ date, title, notes }) => ({
-				date,
-				title,
-				notes,
-			})),
+			...shipped,
 		])
 		let pending = await fetchPendingReleaseNotes()
 		expect(pending.map(entry => entry.title)).toEqual(["New"])
