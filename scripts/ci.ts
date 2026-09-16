@@ -2,10 +2,11 @@ import { spawnSync } from "node:child_process"
 import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
 import { setTimeout as delay } from "node:timers/promises"
-import { prependedEntryCount } from "@/shared/changelog"
+import { prependedEntryCount, readChangelog } from "@/shared/changelog"
 
 let ROOT = resolve(import.meta.dirname ?? ".", "..")
 let CI_TIMEOUT_MS = 15 * 60 * 1_000
+let CAPTURE_TIMEOUT_MS = 60 * 1_000
 let CHANGELOG_PATH = "public/changelog.json"
 let SIGNOFF_INSTALL_COMMAND =
 	"gh extension install basecamp/gh-signoff --pin v0.4.1"
@@ -15,8 +16,12 @@ function capture(command: string[]): string {
 	let result = spawnSync(command[0], command.slice(1), {
 		cwd: ROOT,
 		encoding: "utf8",
+		timeout: CAPTURE_TIMEOUT_MS,
 	})
-	if (result.status !== 0) throw new Error(result.stderr.trim())
+	if (result.status !== 0) {
+		let reason = result.stderr?.trim() || String(result.error ?? "")
+		throw new Error(`${command.join(" ")} failed: ${reason || "no output"}`)
+	}
 	return result.stdout.trim()
 }
 
@@ -74,12 +79,16 @@ function requireTestedState(testedSha: string) {
 }
 
 function readJsonAt(ref: string, path: string): unknown {
-	let result = spawnSync("git", ["show", `${ref}:${path}`], {
+	let listed = spawnSync("git", ["ls-tree", "--name-only", ref, path], {
 		cwd: ROOT,
 		encoding: "utf8",
+		timeout: CAPTURE_TIMEOUT_MS,
 	})
-	if (result.status !== 0) return undefined
-	return JSON.parse(result.stdout)
+	if (listed.status !== 0) {
+		throw new Error(`Could not read ${path} at ${ref}: ${listed.stderr ?? ""}`)
+	}
+	if (!listed.stdout.trim()) return undefined
+	return JSON.parse(capture(["git", "show", `${ref}:${path}`]))
 }
 
 // Readers learn what changed from the changelog, so every pull request adds
@@ -99,10 +108,9 @@ export function requireSingleChangelogEntry() {
 		process.stdout.write("\n── Changelog entry: skipped, changelog is new ──\n")
 		return
 	}
-	let added = prependedEntryCount(
-		base,
-		JSON.parse(readFileSync(resolve(ROOT, CHANGELOG_PATH), "utf8")),
-	)
+	let head = readChangelogFile()
+	requireEveryEntryReadable(head)
+	let added = prependedEntryCount(base, head)
 	if (added === null) {
 		throw new Error(
 			`${CHANGELOG_PATH} edited, reordered or removed published entries. Readers track entries by position, so only add new ones at the top.`,
@@ -114,6 +122,34 @@ export function requireSingleChangelogEntry() {
 		)
 	}
 	process.stdout.write("\n── Changelog entry: 1 added ──\n")
+}
+
+// Without this, a malformed new entry is reported as if the author had edited
+// somebody else's published entry.
+function requireEveryEntryReadable(head: unknown) {
+	if (!Array.isArray(head)) {
+		throw new Error(`${CHANGELOG_PATH} must be an array of entries.`)
+	}
+	let readable = new Set(
+		readChangelog(head).map(entry => head.length - entry.id),
+	)
+	let unreadable = head
+		.map((_, index) => index)
+		.filter(index => !readable.has(index))
+	if (unreadable.length === 0) return
+	throw new Error(
+		`${CHANGELOG_PATH} has unreadable entries at position ${unreadable.join(", ")}. Every entry needs an ISO date (2026-09-16), a title, and at least one note.`,
+	)
+}
+
+function readChangelogFile(): unknown {
+	let contents = readFileSync(resolve(ROOT, CHANGELOG_PATH), "utf8")
+	try {
+		return JSON.parse(contents)
+	} catch (error) {
+		let message = error instanceof Error ? error.message : String(error)
+		throw new Error(`${CHANGELOG_PATH} is not valid JSON: ${message}`)
+	}
 }
 
 function previewUrl(): string {
@@ -149,6 +185,8 @@ async function requireReadyPreview(url: string) {
 	throw new Error(`${url} did not become ready. Inspect \`work logs web\`.`)
 }
 
+// Only failures after the suite starts describe the commit; setup and policy
+// errors would otherwise leave a permanent red mark on healthy code.
 function reportFailure(testedSha: string) {
 	process.stderr.write(`\nReporting failed CI for ${testedSha}\n`)
 	let result = spawnSync(
@@ -172,6 +210,7 @@ function reportFailure(testedSha: string) {
 
 async function main() {
 	let testedSha: string | undefined
+	let suiteStarted = false
 	try {
 		requireSignoffExtension()
 		requireCleanWorkingTree()
@@ -179,6 +218,7 @@ async function main() {
 		ciDeadline = Date.now() + CI_TIMEOUT_MS
 
 		requireSingleChangelogEntry()
+		suiteStarted = true
 		run("Install dependencies", ["bun", "install", "--frozen-lockfile"])
 		requireTestedState(testedSha)
 
@@ -197,11 +237,11 @@ async function main() {
 			"chromium",
 		])
 
-		let url = previewUrl()
 		if (!process.env.CI_BASE_URL?.trim()) {
 			run("Restart local sync", ["work", "restart", "sync"])
 			run("Restart local web", ["work", "restart", "web"])
 		}
+		let url = previewUrl()
 		await requireReadyPreview(url)
 		run("End-to-end tests", ["bun", "run", "test:e2e", "--", "--forbid-only"], {
 			...ciEnvironment,
@@ -212,7 +252,7 @@ async function main() {
 		run("Sign off tested commit", ["gh", "signoff", "--commit", testedSha])
 		process.stdout.write(`\n✓ Local CI passed and signed off ${testedSha}\n`)
 	} catch (error) {
-		if (testedSha) reportFailure(testedSha)
+		if (testedSha && suiteStarted) reportFailure(testedSha)
 		let message = error instanceof Error ? error.message : String(error)
 		process.stderr.write(`\n✗ ${message}\n`)
 		process.exitCode = 1

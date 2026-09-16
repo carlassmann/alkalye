@@ -5,12 +5,16 @@ import { readChangelog } from "@/shared/changelog"
 
 let entries = readChangelog(changelogSource)
 
-let formatDate = (date: string) =>
-	new Date(date).toLocaleDateString("en-US", {
+// Date-only strings parse as UTC midnight, so formatting them in the build
+// host's zone renders every date a day early west of UTC.
+function formatDate(date: string) {
+	return new Date(date).toLocaleDateString(undefined, {
 		day: "numeric",
 		month: "long",
 		year: "numeric",
+		timeZone: "UTC",
 	})
+}
 ---
 
 <LegalDoc

@@ -38,6 +38,36 @@ describe("readChangelog", () => {
 		expect(readChangelog([{ date: "x", title: "y", notes: [1] }])).toEqual([])
 	})
 
+	it("rejects dates that would render as Invalid Date", () => {
+		expect(
+			readChangelog([{ date: "16.09.2026", title: "t", notes: ["n"] }]),
+		).toEqual([])
+		expect(
+			readChangelog([{ date: "2026-13-45", title: "t", notes: ["n"] }]),
+		).toEqual([])
+	})
+
+	it("rejects entries with nothing to tell the reader", () => {
+		expect(
+			readChangelog([{ date: "2026-09-16", title: "t", notes: [] }]),
+		).toEqual([])
+		expect(
+			readChangelog([{ date: "2026-09-16", title: "", notes: ["n"] }]),
+		).toEqual([])
+	})
+
+	it("numbers entries by raw position so a malformed entry cannot renumber the rest", () => {
+		let withBroken = [
+			{ date: "2026-09-20", title: "Newest", notes: ["new"] },
+			{ date: "broken", title: "Malformed", notes: ["x"] },
+			...sample,
+		]
+		expect(readChangelog(withBroken)[0]?.id).toBe(4)
+		expect(
+			entriesSince(readChangelog(withBroken), 3).map(e => e.title),
+		).toEqual(["Newest"])
+	})
+
 	it("accepts the changelog we actually ship", () => {
 		let entries = readChangelog(shippedChangelog)
 		expect(entries).toHaveLength(shippedChangelog.length)
@@ -76,7 +106,11 @@ describe("prependedEntryCount", () => {
 		expect(prependedEntryCount(sample, [sample[1], sample[0]])).toBeNull()
 	})
 
-	it("treats a missing base file as empty", () => {
-		expect(prependedEntryCount(undefined, sample)).toBe(2)
+	it("refuses a prepended entry that readers would never see", () => {
+		let malformed = { date: "not-a-date", title: "Bad", notes: ["n"] }
+		expect(prependedEntryCount(sample, [malformed, ...sample])).toBeNull()
+		expect(
+			prependedEntryCount(sample, [malformed, added, ...sample]),
+		).toBeNull()
 	})
 })

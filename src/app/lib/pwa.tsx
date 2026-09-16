@@ -79,13 +79,11 @@ function usePWAProvider(): PWAContextValue {
 	let moreLabelRef = useRef(moreLabel)
 	moreLabelRef.current = moreLabel
 
+	useEffect(markReleaseNotesSeen, [])
+
 	// virtual:pwa-register is a Vite virtual module. Dynamic-importing it
 	// inside useEffect keeps this file safe to load in non-Vite contexts
 	// (CLI, Node tests). Outside a browser the effect never runs.
-	useEffect(() => {
-		markReleaseNotesSeen()
-	}, [])
-
 	useEffect(() => {
 		let cancelled = false
 		import("virtual:pwa-register")
@@ -107,7 +105,7 @@ function usePWAProvider(): PWAContextValue {
 					},
 					onNeedRefresh() {
 						setNeedRefresh(true)
-						fetchPendingReleaseNotes().then(notes => {
+						let show = (notes: ChangelogEntry[]) =>
 							showUpdateToast({
 								notes,
 								labels: labelsRef.current,
@@ -115,7 +113,7 @@ function usePWAProvider(): PWAContextValue {
 								onReload: () => updateSW(true),
 								onDismiss: () => setNeedRefresh(false),
 							})
-						})
+						fetchPendingReleaseNotes().then(show, () => show([]))
 					},
 					onOfflineReady() {
 						let labels = labelsRef.current
@@ -439,6 +437,7 @@ type UpdateToastLabels = {
 }
 
 let CHANGELOG_URL = "/changelog"
+let UPDATE_TOAST_ID = "pwa-update"
 
 // Only the newest entry goes in the toast; the full history lives on the
 // changelog page, which stays readable however far behind the reader is.
@@ -458,6 +457,7 @@ function showUpdateToast({
 	let newest = notes[0]
 	if (!newest) {
 		toast(labels.updateAvailable, {
+			id: UPDATE_TOAST_ID,
 			description: labels.updateDescription,
 			duration: Infinity,
 			action: { label: labels.updateAction, onClick: onReload },
@@ -473,8 +473,8 @@ function showUpdateToast({
 			<div>
 				<div className="font-medium">{labels.updateAvailable}</div>
 				<ul className="text-muted-foreground mt-1.5 list-disc space-y-1 pl-4 text-sm">
-					{newest.notes.map(note => (
-						<li key={note}>{note}</li>
+					{newest.notes.map((note, index) => (
+						<li key={`${newest.id}-${index}`}>{note}</li>
 					))}
 				</ul>
 				{olderNoteCount > 0 && (
@@ -487,7 +487,7 @@ function showUpdateToast({
 				<Button
 					size="sm"
 					onClick={() => {
-						toast.dismiss()
+						toast.dismiss(UPDATE_TOAST_ID)
 						onReload()
 					}}
 				>
@@ -496,14 +496,14 @@ function showUpdateToast({
 				<a
 					href={CHANGELOG_URL}
 					target="_blank"
-					rel="noreferrer"
+					rel="noopener noreferrer"
 					className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
 				>
 					{labels.whatsNew}
 				</a>
 			</div>
 		</div>,
-		{ duration: Infinity, onDismiss },
+		{ id: UPDATE_TOAST_ID, duration: Infinity, onDismiss },
 	)
 }
 
