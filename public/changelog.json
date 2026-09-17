@@ -1,5 +1,15 @@
 [
 	{
+		"id": 141,
+		"date": "2026-09-17",
+		"title": "Links in lists line up",
+		"notes": [
+			"Wiki links and links inside checklists and lists no longer overlap the marker or their icon",
+			"A task is only marked done when its own checkbox is checked"
+		],
+		"pr": 42
+	},
+	{
 		"id": 140,
 		"date": "2026-09-16",
 		"title": "See what changed when you update",
