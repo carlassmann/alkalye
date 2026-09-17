@@ -183,6 +183,7 @@ function createWikilinkDecorations(
 			alignItems: "center",
 			gap: "2px",
 			verticalAlign: "baseline",
+			textIndent: "0",
 		},
 		".cm-wikilink:hover": {
 			textDecorationColor: "currentColor",
