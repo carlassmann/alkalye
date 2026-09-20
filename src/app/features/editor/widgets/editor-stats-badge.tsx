@@ -21,13 +21,18 @@ type EditorSettings = NonNullable<SettingsCoMap["editor"]>
 
 interface EditorStatsBadgeProps {
 	content: string
+	selectionCount?: number
 	settings: SettingsCoMap | null | undefined
 }
 
 let FRONTMATTER_RE = /^---\r?\n[\s\S]*?\r?\n---\r?\n?/
 let TASK_RE = /^\s*[-*+]\s\[([ xX])\]/gm
 
-function EditorStatsBadge({ content, settings }: EditorStatsBadgeProps) {
+function EditorStatsBadge({
+	content,
+	settings,
+	selectionCount = 1,
+}: EditorStatsBadgeProps) {
 	let t = useIntl()
 	let { leftOpen, isMobile } = useSidebar()
 	let editorSettings = { ...DEFAULT_EDITOR_SETTINGS, ...settings?.editor }
@@ -38,7 +43,7 @@ function EditorStatsBadge({ content, settings }: EditorStatsBadgeProps) {
 		{ value: "tasks", label: t("editor.stats.tasks") },
 	]
 
-	if (!editorSettings.showStatsBadge) return null
+	if (!editorSettings.showStatsBadge && selectionCount < 2) return null
 
 	return (
 		<div
@@ -58,7 +63,9 @@ function EditorStatsBadge({ content, settings }: EditorStatsBadgeProps) {
 							variant="outline"
 							className="bg-background rounded-none select-none"
 						>
-							{formatStat(editorSettings.statsBadgeUnit, stats, t)}
+							{selectionCount > 1
+								? t("editor.stats.selections", { count: `${selectionCount}` })
+								: formatStat(editorSettings.statsBadgeUnit, stats, t)}
 						</Badge>
 					}
 				/>

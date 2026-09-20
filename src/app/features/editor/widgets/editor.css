@@ -38,6 +38,18 @@
 	--editor-code-definition: var(--foreground);
 }
 
+.markdown-editor .cm-selectionBackground {
+	background-color: var(--brand-subtle) !important;
+}
+
+.markdown-editor .cm-cursor-primary {
+	border-left: 2px solid var(--brand) !important;
+}
+
+.markdown-editor .cm-cursor-secondary {
+	border-left: 2px solid var(--chart-2) !important;
+}
+
 /* ========================================
    Editor Container
    ======================================== */
@@ -316,4 +328,10 @@
 	vertical-align: -0.125rem;
 	background: color-mix(in srgb, var(--color-brand, #2563eb) 70%, transparent);
 	cursor: pointer;
+}
+
+.markdown-editor .cm-selectionMatch {
+	background-color: transparent;
+	outline: 1px solid var(--brand);
+	outline-offset: -1px;
 }

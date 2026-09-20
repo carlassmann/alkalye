@@ -269,6 +269,7 @@ function SpaceEditorContent({
 	let [saveCopyState, setSaveCopyState] = useState<"idle" | "saving" | "saved">(
 		"idle",
 	)
+	let [selectionCount, setSelectionCount] = useState(1)
 	let [rightTab, setRightTab] = useState("tools")
 	let [selectedCommentThreadId, setSelectedCommentThreadId] = useState<
 		string | null
@@ -599,7 +600,8 @@ function SpaceEditorContent({
 		queueSave(() => newContent)
 	}
 
-	function handleCursorChange(from: number, to?: number) {
+	function handleCursorChange(from: number, to: number, count: number) {
+		setSelectionCount(count)
 		if (pendingSave.current) {
 			pendingSave.current.cursor = { from, to }
 		} else {
@@ -879,7 +881,11 @@ function SpaceEditorContent({
 					content={content}
 					onThemeChange={handleContentChange}
 				/>
-				<EditorStatsBadge content={content} settings={editorSettings} />
+				<EditorStatsBadge
+					content={content}
+					settings={editorSettings}
+					selectionCount={selectionCount}
+				/>
 			</div>
 			<DocumentSidebar
 				tabs={[

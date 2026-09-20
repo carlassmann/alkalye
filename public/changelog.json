@@ -1,22 +1,14 @@
 [
 	{
-		"id": 144,
+		"id": 145,
 		"date": "2026-09-20",
-		"title": "Reliable agent access updates",
+		"title": "Clearer multicursor editing",
 		"notes": [
-			"Personal-space access updates skip documents you cannot manage",
-			"Stale agent resources no longer make the whole access update fail"
+			"Matching text is outlined before you add cursors",
+			"Each cursor stays visible while you edit",
+			"The editor shows how many selections are active"
 		],
-		"pr": 47
-	},
-	{
-		"id": 143,
-		"date": "2026-09-20",
-		"title": "Make whiteboard typing reliable in production",
-		"notes": [
-			"Vercel installs now use the committed dependency lockfile, preventing duplicate ProseMirror packages from breaking whiteboard text input"
-		],
-		"pr": 45
+		"pr": 48
 	},
 	{
 		"id": 141,
