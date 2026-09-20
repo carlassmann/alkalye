@@ -1,5 +1,15 @@
 [
 	{
+		"id": 143,
+		"date": "2026-09-20",
+		"title": "Reliable agent access updates",
+		"notes": [
+			"Personal-space access updates skip documents you cannot manage",
+			"Stale agent resources no longer make the whole access update fail"
+		],
+		"pr": 47
+	},
+	{
 		"id": 141,
 		"date": "2026-09-20",
 		"title": "Native shortcuts in installed Alkalye",
