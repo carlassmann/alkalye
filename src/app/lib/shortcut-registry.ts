@@ -1,4 +1,4 @@
-import { isMac } from "./platform"
+import { isMac, isStandaloneDisplayMode } from "./platform"
 
 export {
 	getCodeMirrorShortcut,
@@ -6,16 +6,18 @@ export {
 	getShortcutLabel,
 	getShortcutDefinitions,
 	getActiveShortcutPlatform,
+	getActiveShortcutSurface,
 	isShortcutId,
 	isShortcutTargetBlocked,
 	isShortcutEvent,
 	isModEnterEvent,
 	replaceShortcutTokens,
 }
-export type { ShortcutId, ShortcutPlatform }
+export type { ShortcutId, ShortcutPlatform, ShortcutSurface }
 
 type ShortcutModifier = "Alt" | "Ctrl" | "Mod" | "Shift"
 type ShortcutPlatform = "mac" | "other"
+type ShortcutSurface = "browser" | "standalone"
 
 interface ShortcutChord {
 	key: string
@@ -26,6 +28,7 @@ interface ShortcutDefinition {
 	id: string
 	default: ShortcutChord
 	mac?: ShortcutChord
+	standalone?: ShortcutChord
 }
 
 let shortcutDefinitions = [
@@ -91,8 +94,10 @@ let shortcutDefinitions = [
 	},
 	{
 		id: "selectLine",
-		default: { key: "l", modifiers: ["Alt"] },
+		default: { key: "l", modifiers: ["Mod"] },
+		// Cmd+L is reserved by the browser, but available to an installed PWA.
 		mac: { key: "l", modifiers: ["Ctrl"] },
+		standalone: { key: "l", modifiers: ["Mod"] },
 	},
 	{ id: "indentSelection", default: { key: "]", modifiers: ["Mod"] } },
 	{ id: "outdentSelection", default: { key: "[", modifiers: ["Mod"] } },
@@ -123,10 +128,12 @@ let shortcutDefinitions = [
 	{
 		id: "expandSelection",
 		default: { key: "ArrowRight", modifiers: ["Alt", "Shift"] },
+		mac: { key: "ArrowRight", modifiers: ["Alt", "Ctrl", "Shift"] },
 	},
 	{
 		id: "shrinkSelection",
 		default: { key: "ArrowLeft", modifiers: ["Alt", "Shift"] },
+		mac: { key: "ArrowLeft", modifiers: ["Alt", "Ctrl", "Shift"] },
 	},
 	{ id: "hardBreak", default: { key: "Enter", modifiers: ["Shift"] } },
 	{ id: "rawPaste", default: { key: "v", modifiers: ["Mod", "Shift"] } },
@@ -160,19 +167,25 @@ function getActiveShortcutPlatform(): ShortcutPlatform {
 	return isMac ? "mac" : "other"
 }
 
+function getActiveShortcutSurface(): ShortcutSurface {
+	return isStandaloneDisplayMode() ? "standalone" : "browser"
+}
+
 function getCodeMirrorShortcut(
 	id: ShortcutId,
 	platform: ShortcutPlatform = getActiveShortcutPlatform(),
+	surface: ShortcutSurface = getActiveShortcutSurface(),
 ): { key: string } {
 	let definition = findShortcut(id)
-	return { key: toCodeMirrorKey(getChord(definition, platform)) }
+	return { key: toCodeMirrorKey(getChord(definition, platform, surface)) }
 }
 
 function getShortcutLabel(
 	id: ShortcutId,
 	platform: ShortcutPlatform = getActiveShortcutPlatform(),
+	surface: ShortcutSurface = getActiveShortcutSurface(),
 ): string {
-	let chord = getChord(findShortcut(id), platform)
+	let chord = getChord(findShortcut(id), platform, surface)
 	let modifierOrder: ShortcutModifier[] =
 		platform === "mac"
 			? ["Alt", "Ctrl", "Mod", "Shift"]
@@ -192,8 +205,9 @@ function getShortcutDefinitions() {
 function getAriaShortcut(
 	id: ShortcutId,
 	platform: ShortcutPlatform = getActiveShortcutPlatform(),
+	surface: ShortcutSurface = getActiveShortcutSurface(),
 ): string {
-	let chord = getChord(findShortcut(id), platform)
+	let chord = getChord(findShortcut(id), platform, surface)
 	let modifiers = (chord.modifiers ?? []).map(modifier => {
 		if (modifier === "Mod") return platform === "mac" ? "Meta" : "Control"
 		if (modifier === "Ctrl") return "Control"
@@ -206,10 +220,11 @@ function isShortcutEvent(
 	event: KeyboardEvent,
 	id: ShortcutId,
 	platform: ShortcutPlatform = getActiveShortcutPlatform(),
+	surface: ShortcutSurface = getActiveShortcutSurface(),
 ): boolean {
 	if (event.isComposing || event.getModifierState("AltGraph")) return false
 
-	let chord = getChord(findShortcut(id), platform)
+	let chord = getChord(findShortcut(id), platform, surface)
 	let modifiers = chord.modifiers ?? []
 	let expectsMeta = platform === "mac" && modifiers.includes("Mod")
 	let expectsControl =
@@ -273,7 +288,10 @@ function findShortcut(id: ShortcutId): ShortcutDefinition {
 function getChord(
 	definition: ShortcutDefinition,
 	platform: ShortcutPlatform,
+	surface: ShortcutSurface,
 ): ShortcutChord {
+	if (surface === "standalone" && definition.standalone)
+		return definition.standalone
 	return platform === "mac" && definition.mac
 		? definition.mac
 		: definition.default
