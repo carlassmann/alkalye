@@ -11,6 +11,7 @@ export {
 	isMobileDevice,
 	useIsPWAInstalled,
 	getPWAInstalledSnapshot,
+	isStandaloneDisplayMode,
 }
 
 let isMac = typeof navigator !== "undefined" && /Mac/.test(navigator.userAgent)
@@ -58,9 +59,15 @@ function useIsPWAInstalled(): boolean {
 }
 
 function getPWAInstalledSnapshot() {
+	return isStandaloneDisplayMode()
+}
+
+function isStandaloneDisplayMode(): boolean {
+	if (typeof window === "undefined") return false
 	let isStandalone = window.matchMedia("(display-mode: standalone)").matches
 	let isIOSStandalone =
-		(window.navigator as unknown as { standalone: boolean }).standalone === true
+		(window.navigator as unknown as { standalone?: boolean }).standalone ===
+		true
 	return isStandalone || isIOSStandalone
 }
 

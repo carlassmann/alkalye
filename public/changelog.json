@@ -1,12 +1,21 @@
 [
 	{
-		"id": 141,
+		"id": 142,
 		"date": "2026-09-20",
 		"title": "Make whiteboard typing reliable in production",
 		"notes": [
 			"Vercel installs now use the committed dependency lockfile, preventing duplicate ProseMirror packages from breaking whiteboard text input"
 		],
 		"pr": 45
+	},
+	{
+		"id": 141,
+		"date": "2026-09-20",
+		"title": "Native shortcuts in installed Alkalye",
+		"notes": [
+			"Installed Alkalye now uses shortcuts that would otherwise be reserved by the browser"
+		],
+		"pr": 46
 	},
 	{
 		"id": 140,
