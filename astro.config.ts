@@ -37,6 +37,12 @@ export default defineConfig({
 			tailwindcss(),
 		] as any,
 		resolve: {
+			dedupe: [
+				"prosemirror-model",
+				"prosemirror-state",
+				"prosemirror-transform",
+				"prosemirror-view",
+			],
 			alias: {
 				"@": new URL("./src", import.meta.url).pathname,
 				"#app": new URL("./src/app", import.meta.url).pathname,
