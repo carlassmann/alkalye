@@ -1,5 +1,14 @@
 [
 	{
+		"id": 141,
+		"date": "2026-09-20",
+		"title": "Native shortcuts in installed Alkalye",
+		"notes": [
+			"Installed Alkalye now uses shortcuts that would otherwise be reserved by the browser"
+		],
+		"pr": 46
+	},
+	{
 		"id": 140,
 		"date": "2026-09-16",
 		"title": "See what changed when you update",

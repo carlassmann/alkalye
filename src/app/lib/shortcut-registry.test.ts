@@ -29,11 +29,34 @@ describe("shortcut registry", () => {
 		expect(conflicts(bindings)).toEqual([])
 	})
 
+	it("has no standalone macOS conflicts", () => {
+		let bindings = getShortcutDefinitions().map(definition => ({
+			id: definition.id,
+			key: getCodeMirrorShortcut(definition.id, "mac", "standalone").key,
+		}))
+
+		expect(conflicts(bindings)).toEqual([])
+	})
+
 	it("derives platform labels", () => {
 		expect(getShortcutLabel("preview", "mac")).toBe("⌥⌘R")
 		expect(getShortcutLabel("preview", "other")).toBe("Ctrl+Alt+R")
 		expect(getShortcutLabel("redo", "mac")).toBe("⌘⇧Z")
 		expect(getShortcutLabel("redo", "other")).toBe("Ctrl+Y")
+		expect(getShortcutLabel("expandSelection", "mac")).toBe("⌥⌃⇧→")
+		expect(getShortcutLabel("expandSelection", "other")).toBe("Alt+Shift+→")
+		expect(getShortcutLabel("selectLine", "other")).toBe("Ctrl+L")
+		expect(getShortcutLabel("selectLine", "mac")).toBe("⌃L")
+		expect(getShortcutLabel("selectLine", "mac", "standalone")).toBe("⌘L")
+	})
+
+	it("uses native editor shortcuts when standalone", () => {
+		expect(getCodeMirrorShortcut("selectLine", "mac", "browser")).toEqual({
+			key: "Ctrl-l",
+		})
+		expect(getCodeMirrorShortcut("selectLine", "mac", "standalone")).toEqual({
+			key: "Mod-l",
+		})
 	})
 
 	it("derives aria-keyshortcuts values", () => {
@@ -47,6 +70,27 @@ describe("shortcut registry", () => {
 
 		expect(isShortcutEvent(exact, "bold", "other")).toBe(true)
 		expect(isShortcutEvent(extra, "bold", "other")).toBe(false)
+	})
+
+	it("keeps macOS word selection free from syntax expansion", () => {
+		expect(
+			isShortcutEvent(
+				keyboardEvent("ArrowRight", { altKey: true, shiftKey: true }),
+				"expandSelection",
+				"mac",
+			),
+		).toBe(false)
+		expect(
+			isShortcutEvent(
+				keyboardEvent("ArrowRight", {
+					altKey: true,
+					ctrlKey: true,
+					shiftKey: true,
+				}),
+				"expandSelection",
+				"mac",
+			),
+		).toBe(true)
 	})
 
 	it("ignores composition and AltGraph", () => {
