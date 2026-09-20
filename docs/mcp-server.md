@@ -1,6 +1,6 @@
 # Alkalye MCP server
 
-Alkalye exposes an OAuth-protected remote MCP server at `https://www.alkalye.com/mcp`. It uses MCP TypeScript SDK v2 and the `2026-07-28` protocol, with the SDK's 2025 compatibility path enabled.
+Alkalye exposes an OAuth-protected remote MCP server at `https://www.alkalye.com/mcp`. Paste this URL into ChatGPT, Claude, Cursor, or any other MCP-compatible client. It uses MCP TypeScript SDK v2 and the `2026-07-28` protocol, with the SDK's 2025 compatibility path enabled.
 
 ## Security model
 
