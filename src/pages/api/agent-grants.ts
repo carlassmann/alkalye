@@ -146,6 +146,7 @@ function applyGrantUpdate(
 	account: AgentGrantAccount,
 	update: ResolvedGrantUpdate,
 ) {
+	if (!update) return undefined
 	if (update.kind === "document") {
 		return applyDocumentGrant(account, update)
 	}
