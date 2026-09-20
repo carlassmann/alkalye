@@ -188,6 +188,52 @@ describe("MCP OAuth", () => {
 		vi.unstubAllGlobals()
 	})
 
+	test("allows native-app loopback redirect ports", async () => {
+		vi.stubGlobal(
+			"fetch",
+			vi.fn().mockResolvedValue(
+				Response.json({
+					client_id: "https://chatgpt.example/client.json",
+					client_name: "ChatGPT",
+					redirect_uris: ["http://127.0.0.1/callback"],
+				}),
+			),
+		)
+
+		await expect(
+			validateClientRedirect(
+				"https://chatgpt.example/client.json",
+				"http://127.0.0.1:64648/callback",
+				["chatgpt.example"],
+			),
+		).resolves.toMatchObject({ client_name: "ChatGPT" })
+
+		vi.unstubAllGlobals()
+	})
+
+	test("does not broaden loopback redirect matching", async () => {
+		vi.stubGlobal(
+			"fetch",
+			vi.fn().mockResolvedValue(
+				Response.json({
+					client_id: "https://chatgpt.example/client.json",
+					client_name: "ChatGPT",
+					redirect_uris: ["http://127.0.0.1/callback"],
+				}),
+			),
+		)
+
+		await expect(
+			validateClientRedirect(
+				"https://chatgpt.example/client.json",
+				"http://127.0.0.1:64648/other",
+				["chatgpt.example"],
+			),
+		).rejects.toThrow("invalid_redirect_uri")
+
+		vi.unstubAllGlobals()
+	})
+
 	test("requires an exact non-redirected client metadata document", async () => {
 		let mockedFetch = vi.fn().mockResolvedValue(
 			Response.json({
