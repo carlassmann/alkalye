@@ -1,6 +1,7 @@
 import { co } from "jazz-tools"
 import { AgentConnection, Document, UserAccount } from "@/schema"
 import { updateAgentGrants } from "./agent-api"
+import { canAdministerGroup } from "./resource-permissions"
 
 export { personalDocumentAccessQuery, reconcilePersonalDocumentAccess }
 export type { AgentDocumentRole }
@@ -34,6 +35,7 @@ async function reconcilePersonalDocumentAccess(
 		for (let document of [...activeDocuments, ...inactiveDocuments]) {
 			if (!document?.$isLoaded) continue
 			let owner = document.$jazz.owner
+			if (!canAdministerGroup(owner, account)) continue
 			let currentRole = owner.getRoleOf(connection.accountId)
 			let isActive = activeDocuments.includes(document) && !document.deletedAt
 			let desiredRole = isActive ? role : undefined
