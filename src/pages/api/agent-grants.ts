@@ -60,7 +60,9 @@ let POST: APIRoute = async ({ request }) => {
 						),
 						20_000,
 					)
-					for (let update of updates) {
+					for (let update of updates.flatMap(update =>
+						update ? [update] : [],
+					)) {
 						let rollback = applyGrantUpdate(account, update)
 						if (rollback) rollbacks.push(rollback)
 					}
@@ -86,6 +88,7 @@ let POST: APIRoute = async ({ request }) => {
 
 type GrantUpdate = z.infer<typeof requestSchema>["updates"][number]
 type ResolvedGrantUpdate =
+	| null
 	| {
 			kind: "document"
 			action: "add" | "remove"
@@ -115,8 +118,7 @@ async function resolveGrantUpdate(
 			}
 		}
 		let document = await Document.load(update.resource.id, { loadAs: account })
-		if (!document.$isLoaded)
-			throw new Error("Document is not shared with agent")
+		if (!document.$isLoaded) return null
 		return {
 			kind: "document",
 			action: update.action,
@@ -131,7 +133,7 @@ async function resolveGrantUpdate(
 		return { kind: "space", action: update.action, id: update.resource.id }
 	}
 	let space = await Space.load(update.resource.id, { loadAs: account })
-	if (!space.$isLoaded) throw new Error("Space is not shared with agent")
+	if (!space.$isLoaded) return null
 	return {
 		kind: "space",
 		action: update.action,

@@ -89,6 +89,61 @@ describe("personal document agent access", () => {
 		vi.unstubAllGlobals()
 	})
 
+	test.each(["reader", "writer"] as const)(
+		"skips documents shared as %s while updating owned documents",
+		async sharedRole => {
+			let account = await createJazzTestAccount({
+				isCurrentActiveAccount: true,
+				AccountSchema: UserAccount,
+			})
+			let other = await createJazzTestAccount({ AccountSchema: UserAccount })
+			let agent = await createJazzTestAccount({ AccountSchema: UserAccount })
+			setActiveAccount(other)
+			let shared = await createPersonalDocument(other, "Shared")
+			shared.$jazz.owner.addMember(account, sharedRole)
+			shared.$jazz.owner.addMember(agent, "reader")
+			setActiveAccount(account)
+			account.root.documents.$jazz.splice(0, account.root.documents.length)
+			let connection = AgentConnection.create(
+				{
+					provider: "openai",
+					accountId: agent.$jazz.id,
+					credential: "wrapped-agent",
+					createdAt: new Date(),
+				},
+				account.root.$jazz.owner,
+			)
+			let first = await createPersonalDocument(account, "First")
+			account.root.documents.$jazz.push(shared)
+			let last = await createPersonalDocument(account, "Last")
+			let sendGrant = vi.fn().mockResolvedValue(Response.json({ ok: true }))
+			vi.stubGlobal("fetch", sendGrant)
+
+			try {
+				for (let role of ["reader", "writer", undefined] as const) {
+					await reconcilePersonalDocumentAccess(account, connection, role)
+					expect(first.$jazz.owner.getRoleOf(agent.$jazz.id)).toBe(role)
+					expect(last.$jazz.owner.getRoleOf(agent.$jazz.id)).toBe(role)
+					expect(shared.$jazz.owner.getRoleOf(agent.$jazz.id)).toBe("reader")
+					expect(sendGrant).toHaveBeenLastCalledWith(
+						"/api/agent-grants",
+						expect.objectContaining({
+							body: JSON.stringify({
+								credential: connection.credential,
+								updates: [first, last].map(document => ({
+									action: role ? "add" : "remove",
+									resource: { kind: "document", id: document.$jazz.id },
+								})),
+							}),
+						}),
+					)
+				}
+			} finally {
+				vi.unstubAllGlobals()
+			}
+		},
+	)
+
 	test("restores document access when the grant service rejects an update", async () => {
 		let account = await createJazzTestAccount({
 			isCurrentActiveAccount: true,
