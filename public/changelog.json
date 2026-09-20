@@ -1,6 +1,6 @@
 [
 	{
-		"id": 143,
+		"id": 144,
 		"date": "2026-09-20",
 		"title": "Reliable agent access updates",
 		"notes": [
@@ -8,6 +8,15 @@
 			"Stale agent resources no longer make the whole access update fail"
 		],
 		"pr": 47
+	},
+	{
+		"id": 143,
+		"date": "2026-09-20",
+		"title": "Make whiteboard typing reliable in production",
+		"notes": [
+			"Vercel installs now use the committed dependency lockfile, preventing duplicate ProseMirror packages from breaking whiteboard text input"
+		],
+		"pr": 45
 	},
 	{
 		"id": 141,

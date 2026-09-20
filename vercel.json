@@ -1,6 +1,6 @@
 {
 	"framework": "astro",
-	"installCommand": "bun install",
+	"installCommand": "bun install --frozen-lockfile",
 	"buildCommand": "bun run build",
 	"redirects": [
 		{
