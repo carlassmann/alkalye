@@ -219,9 +219,12 @@ async function validateClientRedirect(
 		throw new Error("invalid_client")
 	}
 	if (
-		!metadata.redirect_uris.some(registeredUri =>
-			matchesRedirectUri(new URL(registeredUri), redirectUrl),
-		)
+		!metadata.redirect_uris.some(registeredUri => {
+			let registeredUrl = new URL(registeredUri)
+			return isLoopbackRedirectUri(registeredUrl)
+				? matchesRedirectUri(registeredUrl, redirectUrl)
+				: registeredUri === redirectUri
+		})
 	) {
 		throw new Error("invalid_redirect_uri")
 	}
@@ -251,6 +254,8 @@ function matchesRedirectUri(registeredUri: URL, requestedUri: URL) {
 	}
 	return (
 		registeredUri.hostname === requestedUri.hostname &&
+		registeredUri.username === requestedUri.username &&
+		registeredUri.password === requestedUri.password &&
 		registeredUri.pathname === requestedUri.pathname &&
 		registeredUri.search === requestedUri.search &&
 		registeredUri.hash === requestedUri.hash
