@@ -12,6 +12,10 @@ let baseSettingsMessages = messages({
 	"settings.category.connections": "Connections",
 	"settings.category.app": "App & data",
 	"settings.agents.title": "Agent connections",
+	"settings.agents.mcpTitle": "Connect any MCP client",
+	"settings.agents.mcpDescription":
+		"Use this URL in ChatGPT, Claude, Cursor, or any other MCP-compatible client.",
+	"settings.agents.copyMcpEndpoint": "Copy MCP URL",
 	"settings.agents.description":
 		"A separate encrypted collaborator. It sees only items you grant below.",
 	"settings.agents.setup": "Set up ChatGPT",
@@ -181,6 +185,10 @@ let deSettingsMessages = translate(baseSettingsMessages, {
 	"settings.category.connections": "Verbindungen",
 	"settings.category.app": "App & Daten",
 	"settings.agents.title": "Agent-Verbindungen",
+	"settings.agents.mcpTitle": "Jeden MCP-Client verbinden",
+	"settings.agents.mcpDescription":
+		"Verwende diese URL in ChatGPT, Claude, Cursor oder jedem anderen MCP-kompatiblen Client.",
+	"settings.agents.copyMcpEndpoint": "MCP-URL kopieren",
 	"settings.agents.description":
 		"Ein separater, verschlüsselter Mitarbeiter. Er sieht nur freigegebene Inhalte.",
 	"settings.agents.setup": "ChatGPT einrichten",

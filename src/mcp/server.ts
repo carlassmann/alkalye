@@ -49,7 +49,7 @@ let commentSchema = z.object({
 
 let mcpHandler = createMcpHandler(
 	context => createAlkalyeServer(context.authInfo?.token),
-	{ responseMode: "json" },
+	{ legacy: "reject", responseMode: "json" },
 )
 
 function createAlkalyeServer(credential: string | undefined) {

@@ -3,7 +3,7 @@ import { getMcpConfig } from "@/mcp/config"
 import { readAccessToken } from "@/mcp/oauth"
 import { mcpHandler } from "@/mcp/server"
 
-export { GET, POST, DELETE, OPTIONS }
+export { POST, OPTIONS }
 
 export const prerender = false
 
@@ -39,17 +39,15 @@ let handle: APIRoute = async ({ request }) => {
 	}
 }
 
-let GET = handle
 let POST = handle
-let DELETE = handle
 let OPTIONS: APIRoute = () =>
 	new Response(null, {
 		status: 204,
 		headers: {
 			"access-control-allow-origin": "*",
-			"access-control-allow-methods": "GET, POST, DELETE, OPTIONS",
+			"access-control-allow-methods": "POST, OPTIONS",
 			"access-control-allow-headers":
-				"authorization, content-type, mcp-protocol-version, mcp-session-id",
+				"authorization, content-type, mcp-protocol-version, mcp-method, mcp-name",
 		},
 	})
 
