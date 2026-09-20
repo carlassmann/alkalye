@@ -55,7 +55,14 @@ describe("Alkalye MCP tool catalog", () => {
 					},
 				}),
 			}),
-			{ authInfo: { token: "credential" } },
+			{
+				authInfo: {
+					token: "credential",
+					clientId: "https://chatgpt.com/client.json",
+					scopes: ["alkalye"],
+					resource: new URL("https://www.alkalye.com/mcp"),
+				},
+			},
 		)
 
 		expect(response.status).toBe(400)
