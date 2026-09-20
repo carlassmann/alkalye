@@ -81,6 +81,7 @@ let baseEditorMessages = messages({
 	"editor.find.matchCount": "{$current} of {$total}",
 	"editor.find.shortcutOr": "or",
 
+	"editor.stats.selections": "{$count} selections",
 	"editor.stats.words": "Words",
 	"editor.stats.sentences": "Sentences",
 	"editor.stats.tasks": "Tasks",
@@ -214,6 +215,7 @@ let deEditorMessages = translate(baseEditorMessages, {
 	"editor.find.matchCount": "{$current} von {$total}",
 	"editor.find.shortcutOr": "oder",
 
+	"editor.stats.selections": "{$count} Auswahlen",
 	"editor.stats.words": "Wörter",
 	"editor.stats.sentences": "Sätze",
 	"editor.stats.tasks": "Aufgaben",
