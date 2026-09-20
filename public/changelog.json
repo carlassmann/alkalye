@@ -1,5 +1,14 @@
 [
 	{
+		"id": 141,
+		"date": "2026-09-20",
+		"title": "Make whiteboard typing reliable in production",
+		"notes": [
+			"Vercel installs now use the committed dependency lockfile, preventing duplicate ProseMirror packages from breaking whiteboard text input"
+		],
+		"pr": 45
+	},
+	{
 		"id": 140,
 		"date": "2026-09-16",
 		"title": "See what changed when you update",
