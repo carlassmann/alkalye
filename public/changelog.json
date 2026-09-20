@@ -14,6 +14,7 @@
 		"title": "Connect any MCP client",
 		"notes": [
 			"The MCP URL is always visible in Settings so you can connect ChatGPT or any MCP-compatible client",
+			"The endpoint now serves modern stateless MCP HTTP only",
 			"Native apps can complete OAuth using local loopback callbacks"
 		],
 		"pr": 44

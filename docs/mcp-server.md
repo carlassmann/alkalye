@@ -1,6 +1,6 @@
 # Alkalye MCP server
 
-Alkalye exposes an OAuth-protected remote MCP server at `https://www.alkalye.com/mcp`. Paste this URL into ChatGPT, Claude, Cursor, or any other MCP-compatible client. It uses MCP TypeScript SDK v2 and the `2026-07-28` protocol, with the SDK's 2025 compatibility path enabled.
+Alkalye exposes an OAuth-protected remote MCP server at `https://www.alkalye.com/mcp`. Paste this URL into ChatGPT, Claude, Cursor, or any other MCP-compatible client. It uses MCP TypeScript SDK v2 and the modern `2026-07-28` protocol. Legacy 2025-era HTTP traffic is rejected.
 
 ## Security model
 
@@ -27,16 +27,16 @@ Document or space Group
 
 ## Endpoints
 
-| Endpoint                                  | Purpose                                         |
-| ----------------------------------------- | ----------------------------------------------- |
-| `/mcp`                                    | Streamable HTTP MCP                             |
-| `/.well-known/oauth-protected-resource`   | RFC 9728 resource metadata                      |
-| `/.well-known/oauth-authorization-server` | RFC 8414 server metadata                        |
-| `/.well-known/openai-apps-challenge`      | OpenAI domain-verification token                |
-| `/oauth/authorize`                        | Authorization entry                             |
-| `/oauth/token`                            | Code and refresh-token exchange                 |
-| `/api/agent-connections`                  | Provision an isolated Jazz agent                |
-| `/api/agent-grants`                       | Maintain the agent's discoverable resource list |
+| Endpoint                                  | Purpose                                           |
+| ----------------------------------------- | ------------------------------------------------- |
+| `/mcp`                                    | Modern stateless Streamable HTTP MCP (2026-07-28) |
+| `/.well-known/oauth-protected-resource`   | RFC 9728 resource metadata                        |
+| `/.well-known/oauth-authorization-server` | RFC 8414 server metadata                          |
+| `/.well-known/openai-apps-challenge`      | OpenAI domain-verification token                  |
+| `/oauth/authorize`                        | Authorization entry                               |
+| `/oauth/token`                            | Code and refresh-token exchange                   |
+| `/api/agent-connections`                  | Provision an isolated Jazz agent                  |
+| `/api/agent-grants`                       | Maintain the agent's discoverable resource list   |
 
 ## Tool surface
 
