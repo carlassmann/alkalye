@@ -1,3 +1,4 @@
+import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useState, useEffect, useSyncExternalStore } from "react"
 import { useIntl } from "@/shared/intl/setup"
 import { Sun, Moon, SunMoon } from "lucide-react"
@@ -72,8 +73,12 @@ interface ThemeToggleProps {
 
 function ThemeToggle({ theme, setTheme, showLabel }: ThemeToggleProps) {
 	let t = useIntl()
-	let icon =
-		theme === "light" ? <Sun /> : theme === "dark" ? <Moon /> : <SunMoon />
+	let icon = (
+		<IconTransition
+			active={theme}
+			icons={{ light: <Sun />, dark: <Moon />, system: <SunMoon /> }}
+		/>
+	)
 
 	let trigger = showLabel ? (
 		<Button
@@ -111,8 +116,12 @@ function ThemeToggle({ theme, setTheme, showLabel }: ThemeToggleProps) {
 
 function ThemeSubmenu({ theme, setTheme }: ThemeToggleProps) {
 	let t = useIntl()
-	let icon =
-		theme === "light" ? <Sun /> : theme === "dark" ? <Moon /> : <SunMoon />
+	let icon = (
+		<IconTransition
+			active={theme}
+			icons={{ light: <Sun />, dark: <Moon />, system: <SunMoon /> }}
+		/>
+	)
 
 	return (
 		<DropdownMenuSub>

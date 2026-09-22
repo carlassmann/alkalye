@@ -1,3 +1,4 @@
+import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useState, useRef } from "react"
 import { Link, useNavigate } from "@tanstack/react-router"
 import {
@@ -1500,16 +1501,18 @@ function SignedInView() {
 						</SettingsBlock>
 						<SettingsActions>
 							<Button onClick={handleCopy} variant="outline" size="sm">
+								<IconTransition
+									active={isCopied ? "copied" : "copy"}
+									icons={{
+										copied: <Check className="size-3.5" />,
+										copy: <Copy className="size-3.5" />,
+									}}
+									className="mr-1 size-3.5"
+								/>
 								{isCopied ? (
-									<>
-										<Check className="mr-1 size-3.5" />
-										<T k="settings.sync.copied" />
-									</>
+									<T k="settings.sync.copied" />
 								) : (
-									<>
-										<Copy className="mr-1 size-3.5" />
-										<T k="settings.sync.copy" />
-									</>
+									<T k="settings.sync.copy" />
 								)}
 							</Button>
 							<Button
@@ -1718,26 +1721,26 @@ function ReloadDiagnosticsSection() {
 						disabled={copyState === "preparing"}
 						className="min-w-36"
 					>
+						<IconTransition
+							active={copyState}
+							icons={{
+								idle: <Copy className="size-3.5" />,
+								preparing: (
+									<Loader2 className="size-3.5 animate-spin motion-reduce:animate-none" />
+								),
+								copied: <Check className="size-3.5" />,
+								failed: <AlertCircle className="size-3.5" />,
+							}}
+							className="mr-1.5 size-3.5"
+						/>
 						{copyState === "preparing" ? (
-							<>
-								<Loader2 className="mr-1.5 size-3.5 animate-spin" />
-								<T k="settings.reloadDiagnostics.preparing" />
-							</>
+							<T k="settings.reloadDiagnostics.preparing" />
 						) : copyState === "copied" ? (
-							<>
-								<Check className="mr-1.5 size-3.5" />
-								<T k="settings.reloadDiagnostics.copied" />
-							</>
+							<T k="settings.reloadDiagnostics.copied" />
 						) : copyState === "failed" ? (
-							<>
-								<AlertCircle className="mr-1.5 size-3.5" />
-								<T k="settings.reloadDiagnostics.copyFailed" />
-							</>
+							<T k="settings.reloadDiagnostics.copyFailed" />
 						) : (
-							<>
-								<Copy className="mr-1.5 size-3.5" />
-								<T k="settings.reloadDiagnostics.copy" />
-							</>
+							<T k="settings.reloadDiagnostics.copy" />
 						)}
 					</Button>
 					<Button
