@@ -21,6 +21,8 @@ let baseEditorMessages = messages({
 	"editor.toolbar.cloning": "Cloning...",
 	"editor.toolbar.clone": "Clone",
 	"editor.toolbar.documents": "Documents",
+	"editor.toolbar.closeDocuments": "Close documents sidebar",
+	"editor.toolbar.closeDocumentTools": "Close document tools sidebar",
 	"editor.navigation.commandPalette": "Command palette",
 	"editor.navigation.documentOutline": "Document outline",
 
@@ -155,6 +157,8 @@ let deEditorMessages = translate(baseEditorMessages, {
 	"editor.toolbar.cloning": "Klone...",
 	"editor.toolbar.clone": "Klonen",
 	"editor.toolbar.documents": "Dokumente",
+	"editor.toolbar.closeDocuments": "Dokumenten-Seitenleiste schließen",
+	"editor.toolbar.closeDocumentTools": "Dokument-Tools-Seitenleiste schließen",
 	"editor.navigation.commandPalette": "Befehlspalette",
 	"editor.navigation.documentOutline": "Dokumentgliederung",
 

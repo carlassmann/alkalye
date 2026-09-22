@@ -1,3 +1,4 @@
+import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useEffect, useRef, useState } from "react"
 import {
 	useNavigate,
@@ -954,11 +955,14 @@ function SpaceEditorContent({
 												}
 												nativeButton
 											>
-												{commentsEnabled ? (
-													<MessageSquareOff className="size-4" />
-												) : (
-													<MessageSquare className="size-4" />
-												)}
+												<IconTransition
+													active={commentsEnabled ? "on" : "off"}
+													icons={{
+														on: <MessageSquareOff className="size-4" />,
+														off: <MessageSquare className="size-4" />,
+													}}
+													className="size-4"
+												/>
 												{commentsEnabled
 													? t("comments.disable")
 													: t("comments.enable")}

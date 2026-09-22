@@ -1,3 +1,4 @@
+import { IconTransition } from "@/app/components/ui/icon-transition"
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
 import {
@@ -103,11 +104,14 @@ function SidebarSearchFilterBar({
 									onViewModeChange(viewMode === "folders" ? "flat" : "folders")
 								}
 							>
-								{viewMode === "folders" ? (
-									<Folder className="size-4" />
-								) : (
-									<List className="size-4" />
-								)}
+								<IconTransition
+									active={viewMode === "folders" ? "on" : "off"}
+									icons={{
+										on: <Folder className="size-4" />,
+										off: <List className="size-4" />,
+									}}
+									className="size-4"
+								/>
 							</Button>
 						}
 					/>

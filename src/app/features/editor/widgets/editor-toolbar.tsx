@@ -1,7 +1,9 @@
+import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useEffect, useState } from "react"
 import { Link } from "@tanstack/react-router"
 import type { MarkdownEditorRef } from "./editor"
 import { Button } from "@/app/components/ui/button"
+import { useSidebar } from "@/app/components/ui/sidebar"
 import {
 	Tooltip,
 	TooltipContent,
@@ -28,6 +30,8 @@ import {
 	Check,
 	ListIcon,
 	Wrench,
+	PanelLeftClose,
+	PanelRightClose,
 	ArrowUpToLine,
 	ArrowDownToLine,
 } from "lucide-react"
@@ -70,6 +74,9 @@ function EditorToolbar({
 	onThemeChange,
 }: EditorToolbarProps) {
 	let t = useIntl()
+	let sidebar = useSidebar()
+	let leftOpen = sidebar.isMobile ? sidebar.leftOpenMobile : sidebar.leftOpen
+	let rightOpen = sidebar.isMobile ? sidebar.rightOpenMobile : sidebar.rightOpen
 	let isAtTop = useEditorScrollTopState(editor)
 	let [pickerContent, setPickerContent] = useState(content ?? "")
 	let [previousContent, setPreviousContent] = useState(content)
@@ -116,8 +123,13 @@ function EditorToolbar({
 		>
 			<div className="border-border flex shrink-0 items-center gap-1 border-r p-2 md:border-r-0">
 				<ToolbarButton
-					icon={<ListIcon />}
-					label={t("editor.toolbar.documents")}
+					icon={<SidebarToggleIcon side="left" open={leftOpen} />}
+					label={t(
+						leftOpen
+							? "editor.toolbar.closeDocuments"
+							: "editor.toolbar.documents",
+					)}
+					expanded={leftOpen}
 					shortcutId="leftSidebar"
 					onClick={onToggleLeftSidebar}
 				/>
@@ -144,20 +156,20 @@ function EditorToolbar({
 									className="shrink-0"
 									nativeButton
 								>
+									<IconTransition
+										active={saveCopyState === "saved" ? "copied" : "copy"}
+										icons={{
+											copied: <Check className="size-4" />,
+											copy: <Copy className="size-4" />,
+										}}
+										className="mr-1 size-4"
+									/>
 									{saveCopyState === "saved" ? (
-										<>
-											<Check className="mr-1 size-4" />
-											<T k="editor.toolbar.cloned" />
-										</>
+										<T k="editor.toolbar.cloned" />
+									) : saveCopyState === "saving" ? (
+										<T k="editor.toolbar.cloning" />
 									) : (
-										<>
-											<Copy className="mr-1 size-4" />
-											{saveCopyState === "saving" ? (
-												<T k="editor.toolbar.cloning" />
-											) : (
-												<T k="editor.toolbar.clone" />
-											)}
-										</>
+										<T k="editor.toolbar.clone" />
 									)}
 								</Button>
 							</>
@@ -314,13 +326,36 @@ function EditorToolbar({
 
 			<div className="border-border flex shrink-0 items-center gap-1 border-l p-2 md:border-l-0">
 				<ToolbarButton
-					icon={<Wrench />}
-					label={t("editor.toolbar.documentTools")}
+					icon={<SidebarToggleIcon side="right" open={rightOpen} />}
+					label={t(
+						rightOpen
+							? "editor.toolbar.closeDocumentTools"
+							: "editor.toolbar.documentTools",
+					)}
+					expanded={rightOpen}
 					shortcutId="rightSidebar"
 					onClick={onToggleRightSidebar}
 				/>
 			</div>
 		</div>
+	)
+}
+
+function SidebarToggleIcon({
+	side,
+	open,
+}: {
+	side: "left" | "right"
+	open: boolean
+}) {
+	let OpenIcon = side === "left" ? ListIcon : Wrench
+	let CloseIcon = side === "left" ? PanelLeftClose : PanelRightClose
+
+	return (
+		<IconTransition
+			active={open ? "close" : "open"}
+			icons={{ open: <OpenIcon />, close: <CloseIcon /> }}
+		/>
 	)
 }
 
@@ -377,6 +412,7 @@ function useEditorScrollTopState(
 interface ToolbarButtonProps {
 	icon: React.ReactNode
 	label: string
+	expanded?: boolean
 	shortcutId?: ShortcutId
 	onClick: () => void
 	className?: string
@@ -386,6 +422,7 @@ function ToolbarButton({
 	icon,
 	label,
 	shortcutId,
+	expanded,
 	onClick,
 	className,
 }: ToolbarButtonProps) {
@@ -398,6 +435,7 @@ function ToolbarButton({
 						size="icon"
 						onClick={onClick}
 						aria-label={label}
+						aria-expanded={expanded}
 						aria-keyshortcuts={
 							shortcutId ? getAriaShortcut(shortcutId) : undefined
 						}

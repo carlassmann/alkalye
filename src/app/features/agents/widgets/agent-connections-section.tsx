@@ -1,3 +1,4 @@
+import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useEffect, useState, type ReactNode } from "react"
 import {
 	Bot,
@@ -288,17 +289,15 @@ function AgentConnectionsSection({
 								onClick={copyEndpoint}
 								aria-label={t("settings.agents.copyMcpEndpoint")}
 							>
-								{endpointCopied ? (
-									<>
-										<Check className="size-3" />
-										{t("common.copied")}
-									</>
-								) : (
-									<>
-										<Copy className="size-3" />
-										{t("common.copy")}
-									</>
-								)}
+								<IconTransition
+									active={endpointCopied ? "copied" : "copy"}
+									icons={{
+										copied: <Check className="size-3" />,
+										copy: <Copy className="size-3" />,
+									}}
+									className="size-3"
+								/>
+								{endpointCopied ? t("common.copied") : t("common.copy")}
 							</Button>
 						</div>
 					</div>
