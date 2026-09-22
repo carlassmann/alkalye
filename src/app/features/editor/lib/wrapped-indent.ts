@@ -193,6 +193,9 @@ let wrappedIndentTheme = EditorView.baseTheme({
 		paddingInlineStart: "calc(var(--cm-hanging-indent-columns) * 1ch)",
 		textIndent: "calc(var(--cm-hanging-indent-columns) * -1ch)",
 	},
+	".cm-line.cm-hanging-indent-line > *": {
+		textIndent: "0",
+	},
 })
 
 let wrappedIndent: Extension = [wrappedIndentPlugin, wrappedIndentTheme]
