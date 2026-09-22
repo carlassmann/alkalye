@@ -1,5 +1,16 @@
 [
 	{
+		"id": 146,
+		"date": "2026-09-22",
+		"title": "Clearer sidebar controls and smoother button changes",
+		"notes": [
+			"Open sidebars show distinct close-panel buttons with clear labels",
+			"Button icons blend smoothly when copying, changing themes or views, expanding media, and toggling comments",
+			"Icon transitions respect reduced-motion preferences"
+		],
+		"pr": 49
+	},
+	{
 		"id": 145,
 		"date": "2026-09-20",
 		"title": "Clearer multicursor editing",

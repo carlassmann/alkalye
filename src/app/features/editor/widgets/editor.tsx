@@ -1,3 +1,4 @@
+import { IconTransition } from "@/app/components/ui/icon-transition"
 import {
 	useImperativeHandle,
 	useEffect,
@@ -1628,11 +1629,14 @@ function MarkdownEditor(
 						}
 						onClick={() => setMediaPreviewExpanded(expanded => !expanded)}
 					>
-						{mediaPreviewExpanded ? (
-							<Minimize2 className="size-4" />
-						) : (
-							<Maximize2 className="size-4" />
-						)}
+						<IconTransition
+							active={mediaPreviewExpanded ? "on" : "off"}
+							icons={{
+								on: <Minimize2 className="size-4" />,
+								off: <Maximize2 className="size-4" />,
+							}}
+							className="size-4"
+						/>
 					</Button>
 					<div
 						className={cn(

@@ -1,3 +1,4 @@
+import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useState } from "react"
 import { usePassphraseAuth } from "jazz-tools/react"
 import { Copy, Check, RefreshCw } from "lucide-react"
@@ -159,16 +160,18 @@ function AuthForm({ onSuccess }: AuthFormProps) {
 							className="flex-1"
 							data-testid={testIds.auth.createCopy}
 						>
+							<IconTransition
+								active={isCopied ? "copied" : "copy"}
+								icons={{
+									copied: <Check className="size-3.5" />,
+									copy: <Copy className="size-3.5" />,
+								}}
+								className="mr-1 size-3.5"
+							/>
 							{isCopied ? (
-								<>
-									<Check className="mr-1 size-3.5" />
-									<T k="auth.create.copied" />
-								</>
+								<T k="auth.create.copied" />
 							) : (
-								<>
-									<Copy className="mr-1 size-3.5" />
-									<T k="auth.create.copy" />
-								</>
+								<T k="auth.create.copy" />
 							)}
 						</Button>
 						<Button

@@ -1,3 +1,4 @@
+import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useState } from "react"
 import type { ReactNode } from "react"
 import { AlertTriangle, Copy, Check } from "lucide-react"
@@ -77,17 +78,15 @@ function ErrorUI({
 										{t("error.errorDetails")}
 									</p>
 									<Button variant="ghost" size="xs" onClick={handleCopyError}>
-										{copied ? (
-											<>
-												<Check className="size-3" />
-												{t("common.copied")}
-											</>
-										) : (
-											<>
-												<Copy className="size-3" />
-												{t("common.copy")}
-											</>
-										)}
+										<IconTransition
+											active={copied ? "copied" : "copy"}
+											icons={{
+												copied: <Check className="size-3" />,
+												copy: <Copy className="size-3" />,
+											}}
+											className="size-3"
+										/>
+										{copied ? t("common.copied") : t("common.copy")}
 									</Button>
 								</div>
 								<div>
