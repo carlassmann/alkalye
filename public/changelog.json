@@ -1,5 +1,12 @@
 [
 	{
+		"id": 146,
+		"date": "2026-09-22",
+		"title": "Readable links in lists",
+		"notes": ["Links in lists no longer overlap their icons or nearby text."],
+		"pr": 50
+	},
+	{
 		"id": 145,
 		"date": "2026-09-20",
 		"title": "Clearer multicursor editing",
