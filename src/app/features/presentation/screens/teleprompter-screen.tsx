@@ -21,6 +21,7 @@ import {
 	useDocTitles,
 	type ResolvedDoc,
 } from "@/app/features/documents"
+import { LaserPreview } from "../widgets/laser-pointer"
 import { Teleprompter, groupBySlide } from "../widgets/teleprompter"
 import { parsePresentation } from "../lib/presentation"
 import { useScreenWakeLock } from "../lib/screen-wake-lock"
@@ -129,17 +130,18 @@ function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 				currentSlideIdx={currentSlideIdx}
 				totalSlides={slideGroups.length}
 			/>
-			<Teleprompter
-				items={items}
-				content={content}
-				wikilinks={wikilinks}
-				presentationIndex={doc.presentationLine}
-				onIndexChange={index => doc.$jazz.set("presentationLine", index)}
-				onHighlightChange={range =>
-					doc.$jazz.set("highlightRange", range ?? undefined)
-				}
-				onExit={() => navigate({ to: "/doc/$id", params: { id } })}
-			/>
+			<div className="flex min-h-0 flex-1 flex-col md:flex-row">
+				<div className="flex min-h-0 min-w-0 flex-1 flex-col">
+					<Teleprompter
+						items={items}
+						wikilinks={wikilinks}
+						presentationIndex={doc.presentationLine}
+						onIndexChange={index => doc.$jazz.set("presentationLine", index)}
+						onExit={() => navigate({ to: "/doc/$id", params: { id } })}
+					/>
+				</div>
+				<LaserPreview key={id} docId={id} />
+			</div>
 		</div>
 	)
 }

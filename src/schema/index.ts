@@ -1,3 +1,4 @@
+import { LaserHub } from "@/app/features/presentation/lib/laser-schema"
 import { co, z } from "jazz-tools"
 import { Settings } from "@/app/features/settings/lib/schema"
 import { Theme } from "@/app/features/themes/lib/schema"
@@ -54,6 +55,7 @@ let UserProfile = co.profile({
 })
 
 let UserRoot = co.map({
+	laserHub: co.optional(LaserHub),
 	documents: co.list(Document),
 	inactiveDocuments: co.optional(co.list(Document)),
 	spaces: co.optional(co.list(Space)),

@@ -18,9 +18,7 @@ import { cn } from "@/app/lib/cn"
 import { T, useIntl } from "@/shared/intl/setup"
 
 export { Teleprompter, groupBySlide }
-export type { SlideGroup, HighlightRange }
-
-type HighlightRange = { start: number; end: number } | null
+export type { SlideGroup }
 
 let WikilinkContext = createContext<Map<string, ResolvedDoc>>(new Map())
 
@@ -28,21 +26,17 @@ type SlideGroup = { slideNumber: number; items: PresentationItem[] }
 
 interface TeleprompterProps {
 	items: PresentationItem[]
-	content: string
 	wikilinks: Map<string, ResolvedDoc>
 	presentationIndex: number | undefined
 	onIndexChange: (index: number) => void
-	onHighlightChange?: (range: HighlightRange) => void
 	onExit?: () => void
 }
 
 function Teleprompter({
 	items,
-	content,
 	wikilinks,
 	presentationIndex,
 	onIndexChange,
-	onHighlightChange,
 	onExit,
 }: TeleprompterProps) {
 	let t = useIntl()
@@ -55,8 +49,6 @@ function Teleprompter({
 	let currentSlideIdx = slideGroups.findIndex(
 		s => s.slideNumber === currentSlideNumber,
 	)
-
-	useSelectionHighlight(content, onHighlightChange)
 
 	return (
 		<WikilinkContext.Provider value={wikilinks}>
@@ -137,70 +129,6 @@ function groupBySlide(items: PresentationItem[]): SlideGroup[] {
 	return Array.from(slideMap.entries())
 		.sort((a, b) => a[0] - b[0])
 		.map(([slideNumber, items]) => ({ slideNumber, items }))
-}
-
-// --- Helpers ---
-
-function useSelectionHighlight(
-	content: string,
-	onHighlightChange?: (range: HighlightRange) => void,
-) {
-	useEffect(() => {
-		if (!onHighlightChange) return
-
-		let callback = onHighlightChange
-
-		function handleSelectionChange() {
-			let selection = document.getSelection()
-			if (!selection || selection.isCollapsed) {
-				callback(null)
-				return
-			}
-
-			let selectedText = selection.toString()
-			if (!selectedText.trim()) {
-				callback(null)
-				return
-			}
-
-			let searchStart = getLineOffset(selection.anchorNode, content)
-			let start = content.indexOf(selectedText, searchStart)
-			if (start === -1) start = content.indexOf(selectedText)
-			if (start === -1) {
-				callback(null)
-				return
-			}
-
-			callback({ start, end: start + selectedText.length })
-		}
-
-		document.addEventListener("selectionchange", handleSelectionChange)
-		return () =>
-			document.removeEventListener("selectionchange", handleSelectionChange)
-	}, [content, onHighlightChange])
-}
-
-function getLineOffset(anchorNode: Node | null, content: string): number {
-	let node: Node | null = anchorNode
-	while (node) {
-		if (node instanceof Element) {
-			let lineElement = node.closest("[data-line]")
-			if (lineElement) {
-				let lineNumber = lineElement.getAttribute("data-line")
-				if (lineNumber) {
-					let lines = content.split("\n")
-					let lineIdx = parseInt(lineNumber, 10)
-					let offset = 0
-					for (let i = 0; i < lineIdx && i < lines.length; i++) {
-						offset += lines[i].length + 1
-					}
-					return offset
-				}
-			}
-		}
-		node = node.parentNode
-	}
-	return 0
 }
 
 function ProgressBar({

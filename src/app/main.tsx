@@ -1,3 +1,4 @@
+import { isLaserPreview } from "@/app/features/presentation"
 import { StrictMode, useEffect } from "react"
 import { JazzReactProvider, useAccount } from "jazz-tools/react"
 import { co } from "jazz-tools"
@@ -134,8 +135,12 @@ function RouterWithJazz() {
 
 	let content = (
 		<>
-			<Toaster />
-			<PWAInstallHint />
+			{!isLaserPreview() && (
+				<>
+					<Toaster />
+					<PWAInstallHint />
+				</>
+			)}
 			<LocalJazzPoke />
 			<PersonalDocumentAgentSubscriber />
 			<SplashScreen show={showSplash} />
