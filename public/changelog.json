@@ -1,5 +1,12 @@
 [
 	{
+		"id": 148,
+		"date": "2026-09-24",
+		"title": "Accurate task completion styling",
+		"notes": ["Unchecked tasks stay open when their text contains [x]."],
+		"pr": 42
+	},
+	{
 		"id": 147,
 		"date": "2026-09-22",
 		"title": "Readable links in lists",

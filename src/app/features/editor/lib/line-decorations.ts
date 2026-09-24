@@ -94,7 +94,10 @@ function buildLineDecorations(view: EditorView): DecorationSet {
 					while (child) {
 						if (child.name === "Task") {
 							isTask = true
-							let taskMarker = view.state.sliceDoc(child.from, child.to)
+							let marker = child.node.getChild("TaskMarker")
+							let taskMarker = marker
+								? view.state.sliceDoc(marker.from, marker.to)
+								: view.state.sliceDoc(child.from, child.to)
 							isDone = /\[x\]/i.test(taskMarker)
 							break
 						}
