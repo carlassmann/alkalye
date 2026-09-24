@@ -14,6 +14,9 @@ import {
 } from "./wikilink-autocomplete"
 import { createImageAutocomplete } from "@/app/features/assets/lib/image-autocomplete"
 import { insertSmartDelimiter } from "./autocomplete-brackets"
+import { refreshDocumentLinks } from "./refresh-document-links"
+import { createCodeLanguageAutocomplete } from "./code-language-autocomplete"
+import { createWikilinkDecorations } from "./wikilink-decorations"
 import { combinedAutocompletion } from "@/app/lib/completion-sources"
 
 let views: EditorView[] = []
@@ -29,6 +32,107 @@ afterEach(() => {
 })
 
 describe("wikilink autocomplete", () => {
+	it("keeps explicit language completion until the fence is deleted", async () => {
+		let view = createView("```", 3, [
+			combinedAutocompletion(),
+			createCodeLanguageAutocomplete(),
+		])
+		startCompletion(view)
+		await waitForCompletion(view)
+		expect(currentCompletions(view.state).length).toBeGreaterThan(0)
+		view.dispatch({
+			changes: { from: 3, insert: "py" },
+			selection: { anchor: 5 },
+			userEvent: "input.type",
+		})
+		view.dispatch({
+			changes: { from: 3, to: 5 },
+			selection: { anchor: 3 },
+			userEvent: "delete.backward",
+		})
+		expect(currentCompletions(view.state).length).toBeGreaterThan(0)
+		view.dispatch({
+			changes: { from: 2, to: 3 },
+			selection: { anchor: 2 },
+			userEvent: "delete.backward",
+		})
+		await waitForCompletion(view)
+		expect(currentCompletions(view.state)).toEqual([])
+	})
+
+	it.each(["```", "~~~"])(
+		"waits for a language prefix after %s",
+		async fence => {
+			let view = createView("", 0, [
+				combinedAutocompletion(),
+				createCodeLanguageAutocomplete(),
+			])
+			view.dispatch({
+				changes: { from: 0, insert: fence },
+				selection: { anchor: fence.length },
+				userEvent: "input.type",
+			})
+			await waitForCompletion(view)
+			expect(currentCompletions(view.state)).toEqual([])
+
+			view.dispatch({
+				changes: { from: fence.length, insert: "py" },
+				selection: { anchor: fence.length + 2 },
+				userEvent: "input.type",
+			})
+			await waitForCompletion(view)
+			expect(
+				currentCompletions(view.state).map(option => option.label),
+			).toContain("python")
+
+			view.dispatch({
+				changes: { from: fence.length, to: fence.length + 2 },
+				selection: { anchor: fence.length },
+				userEvent: "delete.backward",
+			})
+			await waitForCompletion(view)
+			expect(currentCompletions(view.state)).toEqual([])
+		},
+	)
+
+	it.each(["[[", "![", "```"])(
+		"keeps %s suggestions open when document links refresh",
+		async content => {
+			let view = createView(content, content.length, [
+				combinedAutocompletion(),
+				createWikilinkAutocomplete(() => [{ id: "co_notes", title: "Notes" }]),
+				createImageAutocomplete(() => [{ id: "co_image", name: "Photo" }]),
+				createCodeLanguageAutocomplete(),
+			])
+			startCompletion(view)
+			await waitForCompletion(view)
+			let suggestions = currentCompletions(view.state)
+			expect(suggestions.length).toBeGreaterThan(0)
+
+			view.dispatch({ effects: refreshDocumentLinks.of(null) })
+
+			expect(currentCompletions(view.state)).toEqual(suggestions)
+		},
+	)
+
+	it("refreshes document titles without moving the selection", () => {
+		let title = "Old title"
+		let view = createView("[[co_notes]]\n", 13, [
+			markdown({ base: markdownLanguage, addKeymap: false }),
+			createWikilinkDecorations(
+				() => ({ title, exists: true }),
+				() => {},
+			),
+		])
+		expect(view.dom.querySelector(".cm-wikilink")?.textContent).toBe(title)
+		title = "New title"
+
+		view.dispatch({ effects: refreshDocumentLinks.of(null) })
+
+		expect(view.dom.querySelector(".cm-wikilink")?.textContent).toBe(title)
+		expect(view.state.selection.main.head).toBe(13)
+	})
+
 	it("searches titles, paths, ids, and tags", () => {
 		let documents = [
 			{

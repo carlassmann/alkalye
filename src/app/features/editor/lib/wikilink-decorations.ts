@@ -10,6 +10,8 @@ import {
 import { syntaxTree } from "@codemirror/language"
 import { parseWikiLinks, type WikiLink } from "./wikilink-parser"
 
+import { hasDocumentLinksRefresh } from "./refresh-document-links"
+
 export { createWikilinkDecorations }
 export type { WikilinkResolver }
 
@@ -119,7 +121,8 @@ function createWikilinkDecorations(
 				if (
 					update.docChanged ||
 					update.viewportChanged ||
-					update.selectionSet
+					update.selectionSet ||
+					hasDocumentLinksRefresh(update)
 				) {
 					this.decorations = this.buildDecorations(update.view)
 				}
