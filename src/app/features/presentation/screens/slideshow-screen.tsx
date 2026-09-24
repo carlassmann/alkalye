@@ -1,3 +1,4 @@
+import { isLaserPreview } from "../lib/laser-preview"
 import { useNavigate } from "@tanstack/react-router"
 import { useCoState } from "jazz-tools/react"
 import { type ResolveQuery, co } from "jazz-tools"
@@ -13,6 +14,7 @@ import {
 	type ResolvedDoc,
 } from "@/app/features/documents"
 import { canEdit } from "@/app/features/sharing"
+import { LaserReceiver } from "../widgets/laser-pointer"
 import { Slideshow, type Slide } from "../widgets/slideshow"
 import { parsePresentation, type PresentationItem } from "../lib/presentation"
 import { useScreenWakeLock } from "../lib/screen-wake-lock"
@@ -93,27 +95,37 @@ function SlideshowScreen({ id, loaderData }: SlideshowScreenProps) {
 		? doc.assets.filter(asset => asset?.$isLoaded)
 		: []
 	let canEditDoc = canEdit(doc)
+	let previewAppearance = isLaserPreview()
+		? new URLSearchParams(window.location.search).get("laserAppearance")
+		: null
 
 	return (
-		<Slideshow
-			content={content}
-			slides={slides}
-			assets={assets}
-			wikilinks={wikilinks}
-			currentSlideNumber={currentSlideNumber}
-			highlightRange={doc.highlightRange ?? null}
-			onSlideChange={canEditDoc ? makeSlideChange(doc, items) : undefined}
-			onExit={
-				canEditDoc
-					? () => navigate({ to: "/doc/$id", params: { id } })
-					: undefined
-			}
-			onGoToTeleprompter={
-				canEditDoc
-					? () => navigate({ to: "/doc/$id/teleprompter", params: { id } })
-					: undefined
-			}
-		/>
+		<>
+			<LaserReceiver docId={id} slideNumber={currentSlideNumber} />
+			<Slideshow
+				appearanceOverride={
+					previewAppearance === "dark" || previewAppearance === "light"
+						? previewAppearance
+						: undefined
+				}
+				content={content}
+				slides={slides}
+				assets={assets}
+				wikilinks={wikilinks}
+				currentSlideNumber={currentSlideNumber}
+				onSlideChange={canEditDoc ? makeSlideChange(doc, items) : undefined}
+				onExit={
+					canEditDoc
+						? () => navigate({ to: "/doc/$id", params: { id } })
+						: undefined
+				}
+				onGoToTeleprompter={
+					canEditDoc
+						? () => navigate({ to: "/doc/$id/teleprompter", params: { id } })
+						: undefined
+				}
+			/>
+		</>
 	)
 }
 

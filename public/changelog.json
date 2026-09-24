@@ -1,5 +1,16 @@
 [
 	{
+		"id": 150,
+		"date": "2026-09-25",
+		"title": "Point at slides from your teleprompter",
+		"notes": [
+			"Hold and drag on a slide preview to point from your laptop or phone.",
+			"Choose a slideshow on another screen or device signed into the same account.",
+			"Selecting teleprompter text no longer highlights the slideshow."
+		],
+		"pr": 52
+	},
+	{
 		"id": 149,
 		"date": "2026-09-24",
 		"title": "Calmer editor suggestions",

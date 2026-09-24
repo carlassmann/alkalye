@@ -52,3 +52,35 @@ that the replacement's transaction count stays within a fixed replay budget.
   Machine.
 - Write document timestamps on editing idle, not for every content transaction.
   Derived title/path/tag fields may write only when their values actually change.
+
+### Presentation pointers
+
+Presentation discovery and laser positions live under `UserRoot.laserHub`, in a
+private group owned by the account. Document sharing never grants access to this
+group. Load it only while presenting or using the teleprompter.
+
+Each mounted display or controller gets a new writer ID and its own `LaserSender`.
+This avoids reusing a busy transaction stream when Jazz restores a browser session
+after reload. Suspend writes on `pagehide`; never flush pointer state during unload.
+
+Rotate sender streams, the discovery record, and its hub after 256 transactions.
+Keep at most 64 sender references and prune inactive senders when a new session
+starts. Root compaction must preserve the hub reference. Rotation bounds replay;
+it does not delete encrypted historical transactions from storage. Queue the latest
+message while a replacement is loading. After replacing a hub or registry, read
+back the winning reference before publishing; another device's timestamp can win.
+
+A controller must receive a response to its own discovery request before offering
+a display. Selecting a display stays fixed until the user changes it, including
+when that display disconnects. Never redirect a held pointer to another screen.
+
+The display issues short-lived tokens tied to its slide, dimensions, and
+appearance. It validates them using its own monotonic clock. Remote timestamps
+are only cleanup hints, never proof that a pointer is live. This prevents replayed
+positions after reconnect and supports devices with different wall clocks.
+
+The preview uses a separate iframe viewport at the target dimensions and
+appearance. Its explicit `laserPreview` flag suppresses display registration and
+app prompts, and mutes video. Video playback is independent of the projector.
+
+Written with GPT-6 in Codex.

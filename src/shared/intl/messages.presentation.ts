@@ -3,6 +3,17 @@ import { messages, translate } from "@ccssmnn/intl"
 export { basePresentationMessages, dePresentationMessages }
 
 let basePresentationMessages = messages({
+	"presentation.laser.label": "Laser pointer",
+	"presentation.laser.preview": "Slide preview",
+	"presentation.laser.target": "Target display",
+	"presentation.laser.choose": "Choose display",
+	"presentation.laser.display": "Display {$number} · {$width} × {$height}",
+	"presentation.laser.instructions":
+		"Hold and drag on the preview to laser-point. Release to hide.",
+	"presentation.laser.chooseHint": "Choose the slideshow you want to point at.",
+	"presentation.laser.connectHint":
+		"Open this slideshow on another screen or device signed into the same account.",
+
 	"presentation.slideshow.label": "Slideshow",
 	"presentation.slideshow.options": "Slideshow options",
 	"presentation.slideshow.previous": "Previous slide",
@@ -32,6 +43,18 @@ let basePresentationMessages = messages({
 })
 
 let dePresentationMessages = translate(basePresentationMessages, {
+	"presentation.laser.label": "Laserpointer",
+	"presentation.laser.preview": "Folienvorschau",
+	"presentation.laser.target": "Zielbildschirm",
+	"presentation.laser.choose": "Bildschirm auswählen",
+	"presentation.laser.display": "Bildschirm {$number} · {$width} × {$height}",
+	"presentation.laser.instructions":
+		"Auf der Vorschau gedrückt halten und ziehen, um zu zeigen. Zum Ausblenden loslassen.",
+	"presentation.laser.chooseHint":
+		"Wähle die Präsentation, auf die du zeigen möchtest.",
+	"presentation.laser.connectHint":
+		"Öffne diese Präsentation auf einem anderen Bildschirm oder Gerät mit demselben Konto.",
+
 	"presentation.slideshow.label": "Präsentation",
 	"presentation.slideshow.options": "Präsentationsoptionen",
 	"presentation.slideshow.previous": "Vorherige Folie",

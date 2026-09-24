@@ -432,7 +432,6 @@ function Workbench({
 									assets={assets}
 									wikilinks={wikilinks}
 									currentSlideNumber={currentSlideNumber}
-									highlightRange={null}
 									onSlideChange={setSlideNumber}
 									embedded
 									themeOverrideId={theme.$jazz.id}
