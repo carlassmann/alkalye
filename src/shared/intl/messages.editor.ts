@@ -21,6 +21,8 @@ let baseEditorMessages = messages({
 	"editor.toolbar.cloning": "Cloning...",
 	"editor.toolbar.clone": "Clone",
 	"editor.toolbar.documents": "Documents",
+	"editor.toolbar.closeDocuments": "Close documents sidebar",
+	"editor.toolbar.closeDocumentTools": "Close document tools sidebar",
 	"editor.navigation.commandPalette": "Command palette",
 	"editor.navigation.documentOutline": "Document outline",
 
@@ -81,6 +83,7 @@ let baseEditorMessages = messages({
 	"editor.find.matchCount": "{$current} of {$total}",
 	"editor.find.shortcutOr": "or",
 
+	"editor.stats.selections": "{$count} selections",
 	"editor.stats.words": "Words",
 	"editor.stats.sentences": "Sentences",
 	"editor.stats.tasks": "Tasks",
@@ -154,6 +157,8 @@ let deEditorMessages = translate(baseEditorMessages, {
 	"editor.toolbar.cloning": "Klone...",
 	"editor.toolbar.clone": "Klonen",
 	"editor.toolbar.documents": "Dokumente",
+	"editor.toolbar.closeDocuments": "Dokumenten-Seitenleiste schließen",
+	"editor.toolbar.closeDocumentTools": "Dokument-Tools-Seitenleiste schließen",
 	"editor.navigation.commandPalette": "Befehlspalette",
 	"editor.navigation.documentOutline": "Dokumentgliederung",
 
@@ -214,6 +219,7 @@ let deEditorMessages = translate(baseEditorMessages, {
 	"editor.find.matchCount": "{$current} von {$total}",
 	"editor.find.shortcutOr": "oder",
 
+	"editor.stats.selections": "{$count} Auswahlen",
 	"editor.stats.words": "Wörter",
 	"editor.stats.sentences": "Sätze",
 	"editor.stats.tasks": "Aufgaben",

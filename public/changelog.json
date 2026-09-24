@@ -1,13 +1,59 @@
 [
 	{
-		"id": 141,
-		"date": "2026-09-17",
-		"title": "Links in lists line up",
-		"notes": [
-			"Wiki links and links inside checklists and lists no longer overlap the marker or their icon",
-			"A task is only marked done when its own checkbox is checked"
-		],
+		"id": 148,
+		"date": "2026-09-24",
+		"title": "Accurate task completion styling",
+		"notes": ["Unchecked tasks stay open when their text contains [x]."],
 		"pr": 42
+	},
+	{
+		"id": 147,
+		"date": "2026-09-22",
+		"title": "Readable links in lists",
+		"notes": ["Links in lists no longer overlap their icons or nearby text."],
+		"pr": 50
+	},
+	{
+		"id": 146,
+		"date": "2026-09-22",
+		"title": "Clearer sidebar controls and smoother button changes",
+		"notes": [
+			"Open sidebars show distinct close-panel buttons with clear labels",
+			"Button icons blend smoothly when copying, changing themes or views, expanding media, and toggling comments",
+			"Icon transitions respect reduced-motion preferences"
+		],
+		"pr": 49
+	},
+	{
+		"id": 145,
+		"date": "2026-09-20",
+		"title": "Clearer multicursor editing",
+		"notes": [
+			"Matching text is outlined before you add cursors",
+			"Each cursor stays visible while you edit",
+			"The editor shows how many selections are active"
+		],
+		"pr": 48
+	},
+	{
+		"id": 141,
+		"date": "2026-09-20",
+		"title": "Native shortcuts in installed Alkalye",
+		"notes": [
+			"Installed Alkalye now uses shortcuts that would otherwise be reserved by the browser"
+		],
+		"pr": 46
+	},
+	{
+		"id": 142,
+		"date": "2026-09-20",
+		"title": "Connect any MCP client",
+		"notes": [
+			"The MCP URL is always visible in Settings so you can connect ChatGPT or any MCP-compatible client",
+			"The endpoint now serves modern stateless MCP HTTP only",
+			"Native apps can complete OAuth using local loopback callbacks"
+		],
+		"pr": 44
 	},
 	{
 		"id": 140,

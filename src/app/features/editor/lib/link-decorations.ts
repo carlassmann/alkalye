@@ -64,7 +64,6 @@ function createLinkDecorations(): Extension {
 			alignItems: "center",
 			gap: "2px",
 			verticalAlign: "baseline",
-			textIndent: "0",
 		},
 		".cm-md-link:hover": {
 			textDecorationColor: "currentColor",

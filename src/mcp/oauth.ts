@@ -190,7 +190,7 @@ async function validateClientRedirect(
 		clientUrl.username ||
 		clientUrl.password ||
 		clientUrl.hash ||
-		redirectUrl.protocol !== "https:"
+		!isSecureRedirectUri(redirectUrl)
 	) {
 		throw new Error("invalid_client")
 	}
@@ -218,8 +218,46 @@ async function validateClientRedirect(
 	if (metadata.client_id !== clientId) {
 		throw new Error("invalid_client")
 	}
-	if (!metadata.redirect_uris.includes(redirectUri)) {
+	if (
+		!metadata.redirect_uris.some(registeredUri => {
+			let registeredUrl = new URL(registeredUri)
+			return isLoopbackRedirectUri(registeredUrl)
+				? matchesRedirectUri(registeredUrl, redirectUrl)
+				: registeredUri === redirectUri
+		})
+	) {
 		throw new Error("invalid_redirect_uri")
 	}
 	return metadata
+}
+
+function isSecureRedirectUri(uri: URL) {
+	return uri.protocol === "https:" || isLoopbackRedirectUri(uri)
+}
+
+function isLoopbackRedirectUri(uri: URL) {
+	return (
+		uri.protocol === "http:" &&
+		(uri.hostname === "localhost" ||
+			uri.hostname === "127.0.0.1" ||
+			uri.hostname === "[::1]")
+	)
+}
+
+function matchesRedirectUri(registeredUri: URL, requestedUri: URL) {
+	if (registeredUri.toString() === requestedUri.toString()) return true
+	if (
+		!isLoopbackRedirectUri(registeredUri) ||
+		!isLoopbackRedirectUri(requestedUri)
+	) {
+		return false
+	}
+	return (
+		registeredUri.hostname === requestedUri.hostname &&
+		registeredUri.username === requestedUri.username &&
+		registeredUri.password === requestedUri.password &&
+		registeredUri.pathname === requestedUri.pathname &&
+		registeredUri.search === requestedUri.search &&
+		registeredUri.hash === requestedUri.hash
+	)
 }

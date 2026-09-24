@@ -202,7 +202,6 @@ function createBacklinkDecorations(
 			alignItems: "center",
 			gap: "2px",
 			verticalAlign: "baseline",
-			textIndent: "0",
 		},
 		".cm-backlink:hover": {
 			textDecorationColor: "currentColor",

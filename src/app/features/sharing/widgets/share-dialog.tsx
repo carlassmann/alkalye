@@ -1,3 +1,4 @@
+import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useState, useEffect, useRef } from "react"
 import { useAccount, useIsAuthenticated, useCoState } from "jazz-tools/react"
 import { useNavigate, Link, useLocation } from "@tanstack/react-router"
@@ -287,11 +288,14 @@ function ShareDialog({
 										onClick={handleCopy}
 										aria-label={t("sharing.document.link.copyLabel")}
 									>
-										{copied ? (
-											<Check className="size-3.5" />
-										) : (
-											<Copy className="size-3.5" />
-										)}
+										<IconTransition
+											active={copied ? "on" : "off"}
+											icons={{
+												on: <Check className="size-3.5" />,
+												off: <Copy className="size-3.5" />,
+											}}
+											className="size-3.5"
+										/>
 									</Button>
 								</div>
 								{canShareInvite && (
@@ -364,11 +368,14 @@ function ShareDialog({
 											onClick={handleCopyPublicLink}
 											aria-label={t("sharing.document.link.copyLabel")}
 										>
-											{publicCopied ? (
-												<Check className="size-3.5" />
-											) : (
-												<Copy className="size-3.5" />
-											)}
+											<IconTransition
+												active={publicCopied ? "on" : "off"}
+												icons={{
+													on: <Check className="size-3.5" />,
+													off: <Copy className="size-3.5" />,
+												}}
+												className="size-3.5"
+											/>
 										</Button>
 									</div>
 									<p className="text-muted-foreground text-xs">

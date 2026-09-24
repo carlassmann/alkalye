@@ -1,5 +1,15 @@
+import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useEffect, useState, type ReactNode } from "react"
-import { Bot, ChevronRight, Loader2, ShieldCheck, Unplug } from "lucide-react"
+import {
+	Bot,
+	Check,
+	ChevronRight,
+	Copy,
+	Globe2,
+	Loader2,
+	ShieldCheck,
+	Unplug,
+} from "lucide-react"
 import { co } from "jazz-tools"
 import { Button } from "@/app/components/ui/button"
 import { Switch } from "@/app/components/ui/switch"
@@ -44,6 +54,7 @@ interface AgentConnectionsSectionProps {
 }
 
 type Role = AgentDocumentRole
+let mcpEndpoint = "https://www.alkalye.com/mcp"
 type SharedResource =
 	| {
 			kind: "document"
@@ -60,6 +71,7 @@ function AgentConnectionsSection({
 	let [busy, setBusy] = useState<string>()
 	let [error, setError] = useState<string>()
 	let [status, setStatus] = useState<string>()
+	let [endpointCopied, setEndpointCopied] = useState(false)
 	let [loadedAuthorization, setLoadedAuthorization] =
 		useState<LoadedAuthorization>()
 	let connection = account?.root.agentConnections?.find(
@@ -73,6 +85,16 @@ function AgentConnectionsSection({
 		account && connection?.$isLoaded
 			? hasAgentAccess(account, connection)
 			: false
+
+	function copyEndpoint() {
+		navigator.clipboard.writeText(mcpEndpoint).then(
+			() => {
+				setEndpointCopied(true)
+				setTimeout(() => setEndpointCopied(false), 2000)
+			},
+			() => {},
+		)
+	}
 
 	useEffect(() => {
 		if (!oauth) {
@@ -248,6 +270,38 @@ function AgentConnectionsSection({
 	return (
 		<SettingsSection title={t("settings.agents.title")}>
 			<SettingsPanel>
+				<div className="bg-background flex items-start gap-3 p-4">
+					<div className="bg-muted border-border flex size-9 shrink-0 items-center justify-center border">
+						<Globe2 className="size-4" />
+					</div>
+					<div className="min-w-0 flex-1">
+						<p className="font-medium">{t("settings.agents.mcpTitle")}</p>
+						<p className="text-muted-foreground mt-1 text-xs/relaxed">
+							{t("settings.agents.mcpDescription")}
+						</p>
+						<div className="border-border bg-muted/40 mt-3 flex min-w-0 items-center gap-2 border p-2">
+							<code className="min-w-0 flex-1 overflow-auto text-xs select-all">
+								{mcpEndpoint}
+							</code>
+							<Button
+								variant="ghost"
+								size="xs"
+								onClick={copyEndpoint}
+								aria-label={t("settings.agents.copyMcpEndpoint")}
+							>
+								<IconTransition
+									active={endpointCopied ? "copied" : "copy"}
+									icons={{
+										copied: <Check className="size-3" />,
+										copy: <Copy className="size-3" />,
+									}}
+									className="size-3"
+								/>
+								{endpointCopied ? t("common.copied") : t("common.copy")}
+							</Button>
+						</div>
+					</div>
+				</div>
 				<div className="flex items-start gap-3 p-4">
 					<div className="bg-background border-border flex size-9 shrink-0 items-center justify-center border">
 						<Bot className="size-4" />

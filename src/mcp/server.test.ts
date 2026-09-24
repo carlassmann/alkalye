@@ -35,6 +35,42 @@ afterEach(async () => {
 })
 
 describe("Alkalye MCP tool catalog", () => {
+	it("rejects legacy HTTP protocol traffic", async () => {
+		let { mcpHandler } = await import("./server")
+		let response = await mcpHandler.fetch(
+			new Request("https://www.alkalye.com/mcp", {
+				method: "POST",
+				headers: {
+					"content-type": "application/json",
+					authorization: "Bearer test-token",
+				},
+				body: JSON.stringify({
+					jsonrpc: "2.0",
+					id: 1,
+					method: "initialize",
+					params: {
+						protocolVersion: "2025-03-26",
+						capabilities: {},
+						clientInfo: { name: "legacy-client", version: "1.0.0" },
+					},
+				}),
+			}),
+			{
+				authInfo: {
+					token: "credential",
+					clientId: "https://chatgpt.com/client.json",
+					scopes: ["alkalye"],
+					resource: new URL("https://www.alkalye.com/mcp"),
+				},
+			},
+		)
+
+		expect(response.status).toBe(400)
+		expect(await response.json()).toMatchObject({
+			error: { code: -32022 },
+		})
+	})
+
 	it("publishes review-ready schemas, auth, and safety annotations", async () => {
 		let { createAlkalyeServer } = await import("./server")
 		let server = createAlkalyeServer(undefined)

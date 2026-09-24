@@ -1,3 +1,4 @@
+import { IconTransition } from "@/app/components/ui/icon-transition"
 import {
 	useImperativeHandle,
 	useEffect,
@@ -20,6 +21,7 @@ import {
 	type KeyBinding,
 	placeholder as placeholderExt,
 	highlightActiveLine,
+	drawSelection,
 } from "@codemirror/view"
 import {
 	deleteMarkupBackward,
@@ -44,9 +46,10 @@ import {
 	undo,
 } from "@codemirror/commands"
 import {
-	selectNextOccurrence,
+	highlightSelectionMatches,
 	selectSelectionMatches,
 } from "@codemirror/search"
+import { selectNextOccurrence } from "../lib/multiple-selections"
 import { bracketMatching, syntaxTree } from "@codemirror/language"
 import { Image as JazzImage } from "jazz-tools/react"
 import { editorBaseExtensions, richMarkdownExtensions } from "../lib/extensions"
@@ -200,7 +203,7 @@ interface MarkdownEditorProps {
 	onChange: (readContent: () => string) => void
 
 	// Cursor/focus callbacks
-	onCursorChange?: (from: number, to: number) => void
+	onCursorChange?: (from: number, to: number, selectionCount: number) => void
 	onFocus?: () => void
 	onBlur?: () => void
 
@@ -527,6 +530,8 @@ function MarkdownEditor(
 		let extensions: Extension[] = [
 			history(),
 			keymap.of([...defaultKeymap, ...historyKeymap]),
+			drawSelection(),
+			highlightSelectionMatches({ minSelectionLength: 1 }),
 			Prec.highest(
 				keymap.of([
 					shortcutEventTracker(),
@@ -708,7 +713,11 @@ function MarkdownEditor(
 				}
 				if (update.selectionSet && callbacksRef.current.onCursorChange) {
 					let { from, to } = update.state.selection.main
-					callbacksRef.current.onCursorChange(from, to)
+					callbacksRef.current.onCursorChange(
+						from,
+						to,
+						update.state.selection.ranges.length,
+					)
 				}
 				if (update.focusChanged) {
 					let focused = update.view.hasFocus
@@ -1620,11 +1629,14 @@ function MarkdownEditor(
 						}
 						onClick={() => setMediaPreviewExpanded(expanded => !expanded)}
 					>
-						{mediaPreviewExpanded ? (
-							<Minimize2 className="size-4" />
-						) : (
-							<Maximize2 className="size-4" />
-						)}
+						<IconTransition
+							active={mediaPreviewExpanded ? "on" : "off"}
+							icons={{
+								on: <Minimize2 className="size-4" />,
+								off: <Maximize2 className="size-4" />,
+							}}
+							className="size-4"
+						/>
 					</Button>
 					<div
 						className={cn(

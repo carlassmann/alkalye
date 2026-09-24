@@ -1,3 +1,4 @@
+import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useEffect, useRef, useState } from "react"
 import {
 	useNavigate,
@@ -269,6 +270,7 @@ function SpaceEditorContent({
 	let [saveCopyState, setSaveCopyState] = useState<"idle" | "saving" | "saved">(
 		"idle",
 	)
+	let [selectionCount, setSelectionCount] = useState(1)
 	let [rightTab, setRightTab] = useState("tools")
 	let [selectedCommentThreadId, setSelectedCommentThreadId] = useState<
 		string | null
@@ -599,7 +601,8 @@ function SpaceEditorContent({
 		queueSave(() => newContent)
 	}
 
-	function handleCursorChange(from: number, to?: number) {
+	function handleCursorChange(from: number, to: number, count: number) {
+		setSelectionCount(count)
 		if (pendingSave.current) {
 			pendingSave.current.cursor = { from, to }
 		} else {
@@ -879,7 +882,11 @@ function SpaceEditorContent({
 					content={content}
 					onThemeChange={handleContentChange}
 				/>
-				<EditorStatsBadge content={content} settings={editorSettings} />
+				<EditorStatsBadge
+					content={content}
+					settings={editorSettings}
+					selectionCount={selectionCount}
+				/>
 			</div>
 			<DocumentSidebar
 				tabs={[
@@ -948,11 +955,14 @@ function SpaceEditorContent({
 												}
 												nativeButton
 											>
-												{commentsEnabled ? (
-													<MessageSquareOff className="size-4" />
-												) : (
-													<MessageSquare className="size-4" />
-												)}
+												<IconTransition
+													active={commentsEnabled ? "on" : "off"}
+													icons={{
+														on: <MessageSquareOff className="size-4" />,
+														off: <MessageSquare className="size-4" />,
+													}}
+													className="size-4"
+												/>
 												{commentsEnabled
 													? t("comments.disable")
 													: t("comments.enable")}
