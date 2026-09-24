@@ -1,10 +1,23 @@
-import { afterEach, beforeEach, describe, expect, test } from "vitest"
-import { createJazzTestAccount, setupJazzTestSync } from "jazz-tools/testing"
-import { type co } from "jazz-tools"
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
+import {
+	createJazzTestAccount,
+	setupJazzTestSync,
+	getPeerConnectedToTestSyncServer,
+} from "jazz-tools/testing"
+import {
+	type co,
+	createJazzContextFromExistingCredentials,
+	MockSessionProvider,
+} from "jazz-tools"
 import { UserAccount } from "@/schema"
 import { runAccountMigration } from "@/schema/migrations"
 import { createLaserChannel, publishLaserMessage } from "./laser-channel"
-import { LaserHub, type LaserMessage } from "./laser-schema"
+import {
+	LaserHub,
+	LaserState,
+	LaserSender,
+	type LaserMessage,
+} from "./laser-schema"
 
 let channels: ReturnType<typeof createLaserChannel>[] = []
 let account: co.loaded<typeof UserAccount>
@@ -178,4 +191,107 @@ describe("account-private laser transport", () => {
 				initialRootTransactions,
 		).toBe(1)
 	})
+})
+
+test("publishes into the winning registry when clock skew prevents rotation", async () => {
+	let { root } = await account.$jazz.ensureLoaded({
+		resolve: { root: { laserHub: { current: { $each: true } } } },
+	})
+	let now = Date.now()
+	publishLaserMessage(root, account, "display", {
+		docId: "doc",
+		sequence: 1,
+		sentAt: now,
+		message: { type: "discover", request: "initial" },
+	})
+	let hub = root.laserHub
+	if (!hub) throw new Error("Missing hub")
+	let clock = vi
+		.spyOn(account.$jazz.localNode, "stampNow")
+		.mockReturnValue(now + 60_000)
+	try {
+		let state = LaserState.create({}, { owner: hub.$jazz.owner })
+		hub.$jazz.set("current", state)
+		let sender = LaserSender.create(
+			{
+				value: {
+					docId: "doc",
+					sequence: 1,
+					sentAt: now + 60_000,
+					message: { type: "discover", request: "display" },
+				},
+			},
+			{ owner: hub.$jazz.owner },
+		)
+		for (let index = 0; index < 256; index++) state.$jazz.set("display", sender)
+		clock.mockReturnValue(now + 30_000)
+		publishLaserMessage(root, account, "controller", {
+			docId: "doc",
+			sequence: 1,
+			sentAt: now + 30_000,
+			message: { type: "discover", request: "controller" },
+		})
+		expect(hub.current.controller?.value.message).toEqual({
+			type: "discover",
+			request: "controller",
+		})
+	} finally {
+		clock.mockRestore()
+	}
+})
+
+test("queues the latest message while a remote registry loads", async () => {
+	let channel = createLaserChannel(account, "doc", () => {})
+	channels.push(channel)
+	channel.postMessage({ type: "discover", request: "before" })
+	let { root } = await account.$jazz.ensureLoaded({
+		resolve: { root: { laserHub: { current: { $each: true } } } },
+	})
+	await expect.poll(() => root.laserHub).toBeDefined()
+	await account.$jazz.waitForAllCoValuesSync()
+	let remote = await createJazzContextFromExistingCredentials({
+		credentials: {
+			accountID: account.$jazz.id,
+			secret: account.$jazz.localNode.getCurrentAgent().agentSecret,
+		},
+		AccountSchema: UserAccount,
+		peers: [getPeerConnectedToTestSyncServer()],
+		crypto: account.$jazz.localNode.crypto,
+		sessionProvider: new MockSessionProvider(),
+		asActiveAccount: false,
+	})
+	try {
+		let remoteRoot = (
+			await remote.account.$jazz.ensureLoaded({
+				resolve: { root: { laserHub: { current: { $each: true } } } },
+			})
+		).root
+		let hub = root.laserHub
+		let remoteHub = remoteRoot.laserHub
+		if (!hub || !remoteHub) throw new Error("Missing hub")
+		for (let id of Object.keys(account.$jazz.localNode.syncManager.peers))
+			account.$jazz.localNode.syncManager.removePeer(id)
+		let next = LaserState.create({}, { owner: remoteHub.$jazz.owner })
+		hub.$jazz.raw.set("current", next.$jazz.id)
+		await expect.poll(() => hub.current.$isLoaded).toBe(false)
+		expect(() =>
+			channel.postMessage({ type: "discover", request: "while-loading" }),
+		).not.toThrow()
+		channel.postMessage({ type: "discover", request: "latest" })
+		account.$jazz.localNode.syncManager.addPeer(
+			getPeerConnectedToTestSyncServer(),
+		)
+		await expect.poll(() => hub.current.$isLoaded).toBe(true)
+		await expect
+			.poll(() =>
+				Object.values(hub.current).some(
+					sender =>
+						sender.value.message.type === "discover" &&
+						sender.value.message.request === "latest",
+				),
+			)
+			.toBe(true)
+	} finally {
+		await remote.done()
+	}
 })

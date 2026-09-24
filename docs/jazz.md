@@ -66,7 +66,9 @@ after reload. Suspend writes on `pagehide`; never flush pointer state during unl
 Rotate sender streams, the discovery record, and its hub after 256 transactions.
 Keep at most 64 sender references and prune inactive senders when a new session
 starts. Root compaction must preserve the hub reference. Rotation bounds replay;
-it does not delete encrypted historical transactions from storage.
+it does not delete encrypted historical transactions from storage. Queue the latest
+message while a replacement is loading. After replacing a hub or registry, read
+back the winning reference before publishing; another device's timestamp can win.
 
 A controller must receive a response to its own discovery request before offering
 a display. Selecting a display stays fixed until the user changes it, including

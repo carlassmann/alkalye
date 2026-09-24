@@ -7,6 +7,7 @@ import {
 	laserLayoutKey,
 	laserTiming,
 	type LaserDisplay,
+	type LaserPoint,
 } from "../lib/laser-session"
 import { isLaserPreview } from "../lib/laser-preview"
 import { useIntl } from "@/shared/intl/setup"
@@ -14,8 +15,7 @@ import { type LaserMessage } from "../lib/laser-schema"
 
 export { LaserPreview, LaserReceiver }
 
-type Display = Extract<LaserMessage, { type: "display" }> & { seenAt: number }
-type Point = Extract<LaserMessage, { type: "point" }>
+type Display = LaserDisplay & { seenAt: number }
 
 function LaserReceiver({
 	docId,
@@ -145,7 +145,7 @@ function LaserPreview({ docId }: { docId: string }) {
 	let containerRef = useRef<HTMLDivElement>(null)
 	let iframeRef = useRef<HTMLIFrameElement>(null)
 	let dotRef = useRef<HTMLDivElement>(null)
-	let pointRef = useRef<Point | null>(null)
+	let pointRef = useRef<LaserPoint | null>(null)
 	let activePointer = useRef<number | null>(null)
 	let lastSentAt = useRef(0)
 	let target =
@@ -263,7 +263,7 @@ function LaserPreview({ docId }: { docId: string }) {
 		let x = (event.clientX - bounds.left) / bounds.width
 		let y = (event.clientY - bounds.top) / bounds.height
 		if (x < 0 || x > 1 || y < 0 || y > 1) return stopPointing()
-		let point: Point = {
+		let point: LaserPoint = {
 			type: "point",
 			target: target.id,
 			lease: target.lease,

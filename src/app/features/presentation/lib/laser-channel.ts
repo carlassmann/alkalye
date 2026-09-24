@@ -80,12 +80,13 @@ function createLaserChannel(
 			pending = message
 			return
 		}
-		publishLaserMessage(root, account, source, {
+		let published = publishLaserMessage(root, account, source, {
 			docId,
 			sequence: ++sequence,
 			sentAt: Date.now(),
 			message,
 		})
+		pending = published ? undefined : message
 	}
 
 	return {
@@ -106,6 +107,7 @@ function publishLaserMessage(
 	envelope: Envelope,
 ) {
 	let hub = root.laserHub
+	if (hub && !hub.$isLoaded) return false
 	if (!hub) {
 		let owner = Group.create({ owner: account })
 		hub = LaserHub.create(
@@ -113,9 +115,13 @@ function publishLaserMessage(
 			{ owner },
 		)
 		root.$jazz.set("laserHub", hub)
+		hub = root.laserHub
 	}
+	if (!hub?.$isLoaded) return false
 	let state = hub.current
+	if (!state.$isLoaded) return false
 	let entries = Object.entries(state)
+	if (entries.some(([, sender]) => !sender.$isLoaded)) return false
 	let hasExpiredSenders =
 		!state[source] &&
 		entries.some(([, sender]) => envelope.sentAt - sender.value.sentAt > maxAge)
@@ -138,8 +144,13 @@ function publishLaserMessage(
 		} else {
 			hub.$jazz.set("current", state)
 		}
+		// A concurrent or future-dated edit can win over our replacement.
+		hub = root.laserHub
+		if (!hub?.$isLoaded || !hub.current.$isLoaded) return false
+		state = hub.current
 	}
 	let sender = state[source]
+	if (sender && !sender.$isLoaded) return false
 	// A fresh writer per mounted controller avoids reusing a high-frequency
 	// transaction stream when Jazz restores a browser session after reload.
 	if (!sender || transactionCount(sender) >= stateBudget) {
@@ -150,6 +161,7 @@ function publishLaserMessage(
 	} else {
 		sender.$jazz.set("value", envelope)
 	}
+	return true
 }
 
 function transactionCount(
