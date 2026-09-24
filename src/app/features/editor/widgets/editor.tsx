@@ -114,6 +114,7 @@ import {
 import { getDocumentHeadings } from "../lib/document-navigation"
 import { createWikilinkAutocomplete } from "../lib/wikilink-autocomplete"
 import { createLinkDecorations } from "../lib/link-decorations"
+import { refreshDocumentLinks } from "../lib/refresh-document-links"
 import { createWikilinkDecorations } from "../lib/wikilink-decorations"
 import { createBacklinkDecorations } from "../lib/backlink-decorations"
 import { findExtension, selectMatch } from "../lib/find-extension"
@@ -305,7 +306,6 @@ interface MarkdownEditorRef {
 
 	getLinkAtCursor(): string | null
 	getEditor(): EditorView | null
-	refreshDecorations(): void
 
 	openFind(initialQuery?: string): void
 	closeFind(): void
@@ -490,6 +490,7 @@ function MarkdownEditor(
 		smartPairs,
 		markerWrapping,
 		autocomplete,
+		hasFinePointer,
 		isMobile,
 		externalExtensions,
 	})
@@ -745,7 +746,7 @@ function MarkdownEditor(
 				}),
 			),
 			autocompleteCompartment.current.of(
-				initRef.current.autocomplete
+				initRef.current.autocomplete && initRef.current.hasFinePointer
 					? [
 							createCodeLanguageAutocomplete(),
 							createSlashCommands(),
@@ -1005,7 +1006,7 @@ function MarkdownEditor(
 
 	useEffect(() => {
 		if (view) {
-			view.dispatch({ selection: view.state.selection })
+			view.dispatch({ effects: refreshDocumentLinks.of(null) })
 		}
 	}, [view, documents, resolveWikilink])
 
@@ -1053,7 +1054,7 @@ function MarkdownEditor(
 		if (!view) return
 		view.dispatch({
 			effects: autocompleteCompartment.current.reconfigure(
-				autocomplete
+				autocomplete && hasFinePointer
 					? [
 							createCodeLanguageAutocomplete(),
 							createSlashCommands(),
@@ -1063,7 +1064,7 @@ function MarkdownEditor(
 					: [],
 			),
 		})
-	}, [view, autocomplete])
+	}, [view, autocomplete, hasFinePointer])
 
 	function getContent() {
 		return view?.state.doc.toString() ?? ""
@@ -1129,29 +1130,6 @@ function MarkdownEditor(
 			node = node.parent
 		}
 		return null
-	}
-
-	function refreshDecorations() {
-		if (view) {
-			view.dispatch({ selection: view.state.selection })
-		}
-	}
-
-	async function handleUploadAndInsert(
-		file: File,
-		replaceRange: { from: number; to: number },
-	) {
-		if (!onUploadImage || !view) return
-
-		let result = await onUploadImage(file)
-		let newText = `![${result.name}](asset:${result.id})`
-		view.dispatch({
-			changes: {
-				from: replaceRange.from,
-				to: replaceRange.to,
-				insert: newText,
-			},
-		})
 	}
 
 	function getSelectedText() {
@@ -1360,7 +1338,6 @@ function MarkdownEditor(
 		sortTasks: () => runCommand(sortTasks),
 		getLinkAtCursor,
 		getEditor: () => view,
-		refreshDecorations,
 		openFind,
 		closeFind,
 		openCommandPalette,
@@ -1423,7 +1400,6 @@ function MarkdownEditor(
 			sortTasks: () => runCommand(sortTasks),
 			getLinkAtCursor,
 			getEditor: () => view,
-			refreshDecorations,
 			openFind,
 			closeFind,
 			openCommandPalette,

@@ -36,6 +36,7 @@ function getCodeLanguageCompletions(
 	if (!match) return null
 
 	let typed = match[2]
+	if (!typed && !context.explicit) return null
 	let options = languageOptions().filter(option =>
 		option.label.toLowerCase().includes(typed.toLowerCase()),
 	)
@@ -44,7 +45,7 @@ function getCodeLanguageCompletions(
 	return {
 		from: context.pos - typed.length,
 		options,
-		validFor: /^[\w+-]*$/,
+		validFor: context.explicit ? /^[\w+-]*$/ : /^[\w+-]+$/,
 	}
 }
 

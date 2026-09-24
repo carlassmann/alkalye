@@ -9,6 +9,8 @@ import {
 } from "@codemirror/view"
 import { getFrontmatterRange, getBacklinksWithRange } from "./frontmatter"
 
+import { hasDocumentLinksRefresh } from "./refresh-document-links"
+
 export { createBacklinkDecorations }
 export type { BacklinkResolver }
 
@@ -114,7 +116,8 @@ function createBacklinkDecorations(
 				if (
 					update.docChanged ||
 					update.viewportChanged ||
-					update.selectionSet
+					update.selectionSet ||
+					hasDocumentLinksRefresh(update)
 				) {
 					this.decorations = this.buildDecorations(update.view)
 				}
