@@ -1132,6 +1132,23 @@ function MarkdownEditor(
 		return null
 	}
 
+	async function handleUploadAndInsert(
+		file: File,
+		replaceRange: { from: number; to: number },
+	) {
+		if (!onUploadImage || !view) return
+
+		let result = await onUploadImage(file)
+		let newText = `![${result.name}](asset:${result.id})`
+		view.dispatch({
+			changes: {
+				from: replaceRange.from,
+				to: replaceRange.to,
+				insert: newText,
+			},
+		})
+	}
+
 	function getSelectedText() {
 		if (!view) return ""
 		let { from, to } = view.state.selection.main
