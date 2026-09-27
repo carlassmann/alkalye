@@ -1,7 +1,8 @@
+import { useState } from "react"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { useCoState } from "jazz-tools/react"
 import { type ResolveQuery, co } from "jazz-tools"
-import { FileText } from "lucide-react"
+import { FileText, PanelRightClose, PanelRightOpen } from "lucide-react"
 import { Document } from "@/schema"
 import {
 	DocumentNotFound,
@@ -58,6 +59,7 @@ interface TeleprompterScreenProps {
 
 function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 	let navigate = useNavigate()
+	let [previewVisible, setPreviewVisible] = useState(true)
 
 	useScreenWakeLock()
 
@@ -127,6 +129,8 @@ function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 		<div className="bg-background fixed inset-0 flex flex-col">
 			<TopBar
 				id={id}
+				previewVisible={previewVisible}
+				onTogglePreview={() => setPreviewVisible(!previewVisible)}
 				currentSlideIdx={currentSlideIdx}
 				totalSlides={slideGroups.length}
 			/>
@@ -140,7 +144,7 @@ function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 						onExit={() => navigate({ to: "/doc/$id", params: { id } })}
 					/>
 				</div>
-				<LaserPreview key={id} docId={id} />
+				<LaserPreview key={id} docId={id} visible={previewVisible} />
 			</div>
 		</div>
 	)
@@ -148,10 +152,14 @@ function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 
 function TopBar({
 	id,
+	previewVisible,
+	onTogglePreview,
 	currentSlideIdx,
 	totalSlides,
 }: {
 	id: string
+	previewVisible: boolean
+	onTogglePreview: () => void
 	currentSlideIdx: number
 	totalSlides: number
 }) {
@@ -179,20 +187,35 @@ function TopBar({
 					total: String(totalSlides),
 				})}
 			</span>
-			<Button
-				variant="ghost"
-				size="sm"
-				nativeButton={false}
-				render={
-					<a
-						href={`/doc/${id}/slideshow`}
-						target="_blank"
-						rel="noopener noreferrer"
-					/>
-				}
-			>
-				<T k="presentation.teleprompter.slideshow" />
-			</Button>
+			<div className="flex items-center gap-1">
+				<Button
+					variant="ghost"
+					size="icon-sm"
+					aria-label={t(
+						previewVisible
+							? "presentation.laser.hide"
+							: "presentation.laser.show",
+					)}
+					aria-pressed={previewVisible}
+					onClick={onTogglePreview}
+				>
+					{previewVisible ? <PanelRightClose /> : <PanelRightOpen />}
+				</Button>
+				<Button
+					variant="ghost"
+					size="sm"
+					nativeButton={false}
+					render={
+						<a
+							href={`/doc/${id}/slideshow`}
+							target="_blank"
+							rel="noopener noreferrer"
+						/>
+					}
+				>
+					<T k="presentation.teleprompter.slideshow" />
+				</Button>
+			</div>
 		</div>
 	)
 }

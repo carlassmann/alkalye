@@ -132,3 +132,23 @@ test("ignores secondary touches and clears pointing on cancellation", () => {
 	surface.dispatchEvent(pointer("pointermove", 1))
 	expect(transport.sent).toHaveLength(count)
 })
+
+test("hiding and showing the preview preserves the chosen display", async () => {
+	let { LaserPreview } = await import("./laser-pointer")
+	advertise("first")
+	advertise("second")
+	flushSync(() =>
+		root.render(
+			React.createElement(LaserPreview, { docId: "doc", visible: false }),
+		),
+	)
+	expect(container.querySelector("iframe")).toBeNull()
+	expect(container.querySelector("aside")).toBeNull()
+	flushSync(() =>
+		root.render(
+			React.createElement(LaserPreview, { docId: "doc", visible: true }),
+		),
+	)
+	expect(container.querySelector("iframe")).not.toBeNull()
+	expect(container.querySelector("select")?.value).toBe("first")
+})

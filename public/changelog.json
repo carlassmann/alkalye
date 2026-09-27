@@ -4,8 +4,9 @@
 		"date": "2026-09-25",
 		"title": "Point at slides from your teleprompter",
 		"notes": [
-			"Hold and drag on a slide preview to point from your laptop or phone.",
+			"Draw a fading laser trail from the teleprompter on your laptop or phone.",
 			"Choose a slideshow on another screen or device signed into the same account.",
+			"Hide the slide preview to give your notes more room.",
 			"Selecting teleprompter text no longer highlights the slideshow."
 		],
 		"pr": 52

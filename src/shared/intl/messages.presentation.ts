@@ -4,12 +4,14 @@ export { basePresentationMessages, dePresentationMessages }
 
 let basePresentationMessages = messages({
 	"presentation.laser.label": "Laser pointer",
+	"presentation.laser.hide": "Hide slide preview",
+	"presentation.laser.show": "Show slide preview",
 	"presentation.laser.preview": "Slide preview",
 	"presentation.laser.target": "Target display",
 	"presentation.laser.choose": "Choose display",
 	"presentation.laser.display": "Display {$number} · {$width} × {$height}",
 	"presentation.laser.instructions":
-		"Hold and drag on the preview to laser-point. Release to hide.",
+		"Hold and drag to draw a laser trail. It fades after you release.",
 	"presentation.laser.chooseHint": "Choose the slideshow you want to point at.",
 	"presentation.laser.connectHint":
 		"Open this slideshow on another screen or device signed into the same account.",
@@ -44,12 +46,14 @@ let basePresentationMessages = messages({
 
 let dePresentationMessages = translate(basePresentationMessages, {
 	"presentation.laser.label": "Laserpointer",
+	"presentation.laser.hide": "Folienvorschau ausblenden",
+	"presentation.laser.show": "Folienvorschau anzeigen",
 	"presentation.laser.preview": "Folienvorschau",
 	"presentation.laser.target": "Zielbildschirm",
 	"presentation.laser.choose": "Bildschirm auswählen",
 	"presentation.laser.display": "Bildschirm {$number} · {$width} × {$height}",
 	"presentation.laser.instructions":
-		"Auf der Vorschau gedrückt halten und ziehen, um zu zeigen. Zum Ausblenden loslassen.",
+		"Auf der Vorschau gedrückt halten und ziehen. Die Laserspur verblasst nach dem Loslassen.",
 	"presentation.laser.chooseHint":
 		"Wähle die Präsentation, auf die du zeigen möchtest.",
 	"presentation.laser.connectHint":

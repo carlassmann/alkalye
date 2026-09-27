@@ -16,6 +16,7 @@ let laserMessageSchema = z.discriminatedUnion("type", [
 	}),
 	z.object({
 		type: z.literal("point"),
+		stroke: z.string().optional(),
 		target: z.string(),
 		lease: z.string(),
 		layout: z.string(),

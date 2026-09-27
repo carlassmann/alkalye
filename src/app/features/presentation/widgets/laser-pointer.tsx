@@ -13,6 +13,8 @@ import { isLaserPreview } from "../lib/laser-preview"
 import { useIntl } from "@/shared/intl/setup"
 import { type LaserMessage } from "../lib/laser-schema"
 
+import { LaserTrail, type LaserTrailController } from "./laser-trail"
+
 export { LaserPreview, LaserReceiver }
 
 type Display = LaserDisplay & { seenAt: number }
@@ -25,14 +27,14 @@ function LaserReceiver({
 	slideNumber: number
 }) {
 	let me = useAccount(UserAccount)
-	let dotRef = useRef<HTMLDivElement>(null)
+	let trailRef = useRef<LaserTrailController | null>(null)
 	let idRef = useRef(crypto.randomUUID())
 	let slideRef = useRef(slideNumber)
 	let announceRef = useRef<(() => void) | null>(null)
 
 	useEffect(() => {
 		slideRef.current = slideNumber
-		if (dotRef.current) dotRef.current.hidden = true
+		trailRef.current?.clear()
 		announceRef.current?.()
 	}, [slideNumber])
 
@@ -41,12 +43,10 @@ function LaserReceiver({
 		if (isLaserPreview() || !me.$isLoaded) return
 		let leases = createLaserLease()
 		let requests = new Set<string>()
-		let lastPointAt = 0
 		let announcedLayout = ""
 		let id = idRef.current
-		let dot = dotRef.current
 		function hide() {
-			if (dot && !dot.hidden) dot.hidden = true
+			trailRef.current?.clear()
 		}
 		function displayLayout(): Pick<
 			LaserDisplay,
@@ -85,26 +85,20 @@ function LaserReceiver({
 				}
 				announce()
 			}
-			if (message.type !== "point" || message.target !== id || !dot) return
+			if (message.type !== "point" || message.target !== id) return
 			let layout = laserLayoutKey(displayLayout())
 			if (message.layout !== layout || !leases.accepts(message.lease, layout))
 				return
-			if (!message.visible || message.slideNumber !== slideRef.current) {
+			if (message.slideNumber !== slideRef.current) {
 				hide()
 				return
 			}
-			lastPointAt = performance.now()
-			dot.style.left = `${message.x * 100}%`
-			dot.style.top = `${message.y * 100}%`
-			dot.hidden = false
+			trailRef.current?.add(message)
 		}
 		let channel = createLaserChannel(me, docId, handleMessage)
 		announceRef.current = announce
 		announce()
 		let heartbeat = window.setInterval(announce, laserTiming.announce)
-		let expiry = window.setInterval(() => {
-			if (performance.now() - lastPointAt > laserTiming.pointExpiry) hide()
-		}, 100)
 		window.addEventListener("resize", announce)
 		window.addEventListener("pagehide", hide)
 		return () => {
@@ -113,29 +107,21 @@ function LaserReceiver({
 			channel.postMessage({ type: "closed", id })
 			channel.close()
 			clearInterval(heartbeat)
-			clearInterval(expiry)
 			window.removeEventListener("resize", announce)
 			window.removeEventListener("pagehide", hide)
 		}
 	}, [docId, me])
 
-	return <div ref={dotRef} hidden data-laser-pointer style={dotStyle} />
+	return <LaserTrail controllerRef={trailRef} fixed />
 }
 
-let dotStyle = {
-	position: "fixed",
-	pointerEvents: "none",
-	zIndex: 100,
-	width: 14,
-	height: 14,
-	borderRadius: "50%",
-	background: "#ff304f",
-	border: "2px solid white",
-	boxShadow: "0 0 8px #ff304f, 0 0 20px #ff304f",
-	transform: "translate(-50%, -50%)",
-} satisfies React.CSSProperties
-
-function LaserPreview({ docId }: { docId: string }) {
+function LaserPreview({
+	docId,
+	visible = true,
+}: {
+	docId: string
+	visible?: boolean
+}) {
 	let t = useIntl()
 	let me = useAccount(UserAccount)
 	let [displays, setDisplays] = useState<Display[]>([])
@@ -144,10 +130,11 @@ function LaserPreview({ docId }: { docId: string }) {
 	let channelRef = useRef<ReturnType<typeof createLaserChannel> | null>(null)
 	let containerRef = useRef<HTMLDivElement>(null)
 	let iframeRef = useRef<HTMLIFrameElement>(null)
-	let dotRef = useRef<HTMLDivElement>(null)
+	let trailRef = useRef<LaserTrailController | null>(null)
 	let pointRef = useRef<LaserPoint | null>(null)
 	let activePointer = useRef<number | null>(null)
 	let lastSentAt = useRef(0)
+	let strokeRef = useRef("")
 	let target =
 		displays.find(display => display.id === selectedId) ??
 		(selectedId === null && displays.length === 1 ? displays[0] : undefined)
@@ -162,9 +149,12 @@ function LaserPreview({ docId }: { docId: string }) {
 	function stopPointing() {
 		activePointer.current = null
 		let point = pointRef.current
-		if (point) channelRef.current?.postMessage({ ...point, visible: false })
+		if (point) {
+			let end = { ...point, visible: false }
+			channelRef.current?.postMessage(end)
+			trailRef.current?.add(end)
+		}
 		pointRef.current = null
-		if (dotRef.current) dotRef.current.hidden = true
 	}
 
 	useEffect(() => {
@@ -207,7 +197,10 @@ function LaserPreview({ docId }: { docId: string }) {
 			if (!pointRef.current) channel.postMessage({ type: "discover", request })
 		}, 2000)
 		let heartbeat = window.setInterval(() => {
-			if (pointRef.current) channel.postMessage(pointRef.current)
+			if (pointRef.current) {
+				channel.postMessage(pointRef.current)
+				trailRef.current?.add(pointRef.current)
+			}
 		}, laserTiming.pointHeartbeat)
 		function stop() {
 			stopPointing()
@@ -228,7 +221,9 @@ function LaserPreview({ docId }: { docId: string }) {
 
 	useEffect(() => {
 		stopPointing()
+		trailRef.current?.clear()
 	}, [
+		visible,
 		target?.id,
 		target?.slideNumber,
 		target?.width,
@@ -247,10 +242,12 @@ function LaserPreview({ docId }: { docId: string }) {
 		)
 		observer.observe(container)
 		return () => observer.disconnect()
-	}, [])
+	}, [visible])
 
 	function endPointer(event: PointerEvent<HTMLDivElement>) {
-		if (activePointer.current === event.pointerId) stopPointing()
+		if (activePointer.current !== event.pointerId) return
+		if (event.type === "pointerup") pointAt(event)
+		stopPointing()
 	}
 
 	function pointAt(event: PointerEvent<HTMLDivElement>) {
@@ -265,6 +262,7 @@ function LaserPreview({ docId }: { docId: string }) {
 		if (x < 0 || x > 1 || y < 0 || y > 1) return stopPointing()
 		let point: LaserPoint = {
 			type: "point",
+			stroke: strokeRef.current,
 			target: target.id,
 			lease: target.lease,
 			layout: laserLayoutKey(target),
@@ -278,13 +276,10 @@ function LaserPreview({ docId }: { docId: string }) {
 			channelRef.current?.postMessage(point)
 			lastSentAt.current = performance.now()
 		}
-		let dot = dotRef.current
-		if (dot) {
-			dot.hidden = false
-			dot.style.left = `${x * 100}%`
-			dot.style.top = `${y * 100}%`
-		}
+		trailRef.current?.add(point)
 	}
+
+	if (!visible) return null
 
 	return (
 		<aside
@@ -357,6 +352,7 @@ function LaserPreview({ docId }: { docId: string }) {
 									(event.pointerType === "mouse" && event.button !== 0)
 								)
 									return
+								strokeRef.current = crypto.randomUUID()
 								activePointer.current = event.pointerId
 								lastSentAt.current = -Infinity
 								event.preventDefault()
@@ -368,16 +364,7 @@ function LaserPreview({ docId }: { docId: string }) {
 							onPointerCancel={endPointer}
 							onLostPointerCapture={endPointer}
 						>
-							<div
-								ref={dotRef}
-								hidden
-								style={{
-									...dotStyle,
-									position: "absolute",
-									width: 10,
-									height: 10,
-								}}
-							/>
+							<LaserTrail controllerRef={trailRef} />
 						</div>
 					</div>
 				) : (

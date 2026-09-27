@@ -83,4 +83,11 @@ The preview uses a separate iframe viewport at the target dimensions and
 appearance. Its explicit `laserPreview` flag suppresses display registration and
 app prompts, and mutes video. Video playback is independent of the projector.
 
+Laser strokes carry IDs so separate gestures never join. Each renderer retains
+at most 2,048 points and uses its own monotonic clock. Like tldraw, a stroke stays
+visible while drawing, then waits 1,200 ms and fades over 500 ms. Heartbeats keep
+a held stroke alive; lost connections still expire. Slide and layout changes clear
+the trail immediately. Hiding the preview releases the gesture and preserves the
+chosen display for reopening.
+
 Written with GPT-6 in Codex.
