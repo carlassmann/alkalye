@@ -1,0 +1,101 @@
+[
+	{
+		"mode": "cold-http",
+		"cpu": 4,
+		"run": 0,
+		"loadedAsset": "/_astro/main.BPJDHMeN.js",
+		"controlled": false,
+		"interactive": 2573.400000035763,
+		"paint": 1939,
+		"ready": 768.6000000238419,
+		"start": 0
+	},
+	{
+		"mode": "cold-http",
+		"cpu": 4,
+		"run": 1,
+		"loadedAsset": "/_astro/main.BPJDHMeN.js",
+		"controlled": false,
+		"interactive": 2480.800000011921,
+		"paint": 1638.5,
+		"ready": 638.8999999761581,
+		"start": 0
+	},
+	{
+		"mode": "cold-http",
+		"cpu": 4,
+		"run": 2,
+		"loadedAsset": "/_astro/main.BPJDHMeN.js",
+		"controlled": false,
+		"interactive": 2257.399999976158,
+		"paint": 1441.5999999642372,
+		"ready": 572.6999999880791,
+		"start": 0
+	},
+	{
+		"mode": "cached-http",
+		"cpu": 4,
+		"run": 0,
+		"loadedAsset": "/_astro/main.BPJDHMeN.js",
+		"controlled": false,
+		"interactive": 2453.2999999523163,
+		"paint": 1634.199999988079,
+		"ready": 677.0999999642372,
+		"start": 0
+	},
+	{
+		"mode": "cached-http",
+		"cpu": 4,
+		"run": 1,
+		"loadedAsset": "/_astro/main.BPJDHMeN.js",
+		"controlled": false,
+		"interactive": 2572.399999976158,
+		"paint": 1823.399999976158,
+		"ready": 551,
+		"start": 0
+	},
+	{
+		"mode": "cached-http",
+		"cpu": 4,
+		"run": 2,
+		"loadedAsset": "/_astro/main.BPJDHMeN.js",
+		"controlled": false,
+		"interactive": 2454.699999988079,
+		"paint": 1801.199999988079,
+		"ready": 537.9000000357628,
+		"start": 0
+	},
+	{
+		"mode": "service-worker",
+		"cpu": 4,
+		"run": 0,
+		"loadedAsset": "/_astro/main.BPJDHMeN.js",
+		"controlled": true,
+		"interactive": 2538.100000023842,
+		"paint": 1800.800000011921,
+		"ready": 718,
+		"start": 0
+	},
+	{
+		"mode": "service-worker",
+		"cpu": 4,
+		"run": 1,
+		"loadedAsset": "/_astro/main.BPJDHMeN.js",
+		"controlled": true,
+		"interactive": 2597.699999988079,
+		"paint": 1864.899999976158,
+		"ready": 554.1999999880791,
+		"start": 0
+	},
+	{
+		"mode": "service-worker",
+		"cpu": 4,
+		"run": 2,
+		"loadedAsset": "/_astro/main.BPJDHMeN.js",
+		"controlled": true,
+		"interactive": 2432.699999988079,
+		"paint": 1690.5,
+		"ready": 491.10000002384186,
+		"start": 0
+	}
+]

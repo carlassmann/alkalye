@@ -239,7 +239,7 @@ function DocScreen({ id, loaderData }: DocScreenProps) {
 
 	return (
 		<SidebarProvider>
-			<EditorContent key={id} doc={doc} liveDoc={liveDoc} docId={id} />
+			<PersonalDocumentScreen doc={doc} liveDoc={liveDoc} docId={id} />
 		</SidebarProvider>
 	)
 }
@@ -262,7 +262,22 @@ type LoadedMe = ReturnType<
 	typeof useAccount<typeof UserAccount, typeof personalMeResolve>
 >
 
-function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
+function PersonalDocumentScreen(props: EditorContentProps) {
+	let me = useAccount(UserAccount, { resolve: personalMeResolve })
+	return (
+		<>
+			<PersonalDocumentSidebar me={me} docId={props.docId} />
+			<EditorContent key={props.docId} {...props} me={me} />
+		</>
+	)
+}
+
+function EditorContent({
+	doc,
+	liveDoc,
+	docId,
+	me,
+}: EditorContentProps & { me: LoadedMe }) {
 	let accountDataStartedAt = useRef(performance.now())
 	let t = useIntl()
 	let navigate = useNavigate()
@@ -306,17 +321,10 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 
 	let { theme, setTheme } = useTheme()
 	let resolvedTheme = useResolvedTheme()
-	let {
-		toggleLeft,
-		toggleRight,
-		isMobile,
-		setLeftOpenMobile,
-		setRightOpenMobile,
-		setRightOpen,
-	} = useSidebar()
+	let { toggleLeft, toggleRight, isMobile, setRightOpenMobile, setRightOpen } =
+		useSidebar()
 
 	let isAuthenticated = useIsAuthenticated()
-	let me = useAccount(UserAccount, { resolve: personalMeResolve })
 	useEffect(() => {
 		if (!me.$isLoaded) return
 		recordStartupTraceOnce("personal-account-data-loaded", {
@@ -502,11 +510,6 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 		editor,
 		t,
 	])
-
-	let allDocs = getPersonalDocs(me)
-
-	let personalDocs =
-		me.$isLoaded && me.root?.documents?.$isLoaded ? me.root.documents : null
 
 	function persistContent(
 		pendingContent: string,
@@ -744,69 +747,7 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 				true, window.__alkalyeReady is true, and window.__alkalyeReadyRoute is
 				personal-doc.
 			</p>
-			<ListSidebar
-				header={
-					<>
-						<SidebarImportExport
-							docs={allDocs.filter(d => !d.deletedAt)}
-							onImport={async files => {
-								if (personalDocs) await handleImportFiles(files, personalDocs)
-							}}
-						/>
-						<Button
-							size="sm"
-							nativeButton={false}
-							data-testid={testIds.doc.newButton}
-							render={
-								<Link
-									to="/new"
-									onClick={() => isMobile && setLeftOpenMobile(false)}
-								/>
-							}
-						>
-							<Plus />
-							{t("doc.new")}
-						</Button>
-					</>
-				}
-				footer={<SidebarSyncStatus />}
-				onImport={async files => {
-					if (personalDocs) await handleImportFiles(files, personalDocs)
-				}}
-			>
-				<SpaceSelector />
-				<SidebarDocumentList
-					docs={allDocs}
-					currentDocId={docId}
-					isLoading={!me.$isLoaded}
-					onDocClick={() => isMobile && setLeftOpenMobile(false)}
-					onDuplicate={docToDuplicate =>
-						handleDuplicateDocument(
-							docToDuplicate,
-							me,
-							isMobile,
-							setLeftOpenMobile,
-							navigate,
-						)
-					}
-					onDelete={docToDelete => {
-						deletePersonalDocument(docToDelete)
-						if (docToDelete.$jazz.id === docId) {
-							navigate({ to: "/" })
-						}
-					}}
-					onCreateFolder={makeCreateFolderDocument(
-						me,
-						isMobile,
-						setLeftOpenMobile,
-						navigate,
-					)}
-					onImport={async (files, options) => {
-						if (personalDocs)
-							await handleImportFiles(files, personalDocs, options)
-					}}
-				/>
-			</ListSidebar>
+
 			<div className="markdown-editor flex-1" data-testid={testIds.doc.editor}>
 				<MarkdownEditor
 					key={docId}
@@ -1025,6 +966,87 @@ function EditorContent({ doc, liveDoc, docId }: EditorContentProps) {
 			</DocumentSidebar>
 			{tldrawEditor.dialog}
 		</>
+	)
+}
+
+function PersonalDocumentSidebar({
+	docId,
+	me,
+}: {
+	docId: string
+	me: LoadedMe
+}) {
+	let t = useIntl()
+	let navigate = useNavigate()
+	let { isMobile, setLeftOpenMobile } = useSidebar()
+	let allDocs = getPersonalDocs(me)
+
+	let personalDocs =
+		me.$isLoaded && me.root?.documents?.$isLoaded ? me.root.documents : null
+	return (
+		<ListSidebar
+			header={
+				<>
+					<SidebarImportExport
+						docs={allDocs.filter(d => !d.deletedAt)}
+						onImport={async files => {
+							if (personalDocs) await handleImportFiles(files, personalDocs)
+						}}
+					/>
+					<Button
+						size="sm"
+						nativeButton={false}
+						data-testid={testIds.doc.newButton}
+						render={
+							<Link
+								to="/new"
+								onClick={() => isMobile && setLeftOpenMobile(false)}
+							/>
+						}
+					>
+						<Plus />
+						{t("doc.new")}
+					</Button>
+				</>
+			}
+			footer={<SidebarSyncStatus />}
+			onImport={async files => {
+				if (personalDocs) await handleImportFiles(files, personalDocs)
+			}}
+		>
+			<SpaceSelector />
+			<SidebarDocumentList
+				docs={allDocs}
+				currentDocId={docId}
+				isLoading={!me.$isLoaded}
+				onDocClick={() => isMobile && setLeftOpenMobile(false)}
+				onDuplicate={docToDuplicate =>
+					handleDuplicateDocument(
+						docToDuplicate,
+						me,
+						isMobile,
+						setLeftOpenMobile,
+						navigate,
+					)
+				}
+				onDelete={docToDelete => {
+					deletePersonalDocument(docToDelete)
+					if (docToDelete.$jazz.id === docId) {
+						navigate({ to: "/" })
+					}
+				}}
+				onCreateFolder={makeCreateFolderDocument(
+					me,
+					isMobile,
+					setLeftOpenMobile,
+					navigate,
+				)}
+				onImport={async (files, options) => {
+					if (personalDocs)
+						await handleImportFiles(files, personalDocs, options)
+				}}
+			/>
+		</ListSidebar>
 	)
 }
 
