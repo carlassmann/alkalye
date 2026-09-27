@@ -83,7 +83,6 @@ try {
 	)
 		throw Error("Sidebar/search remounted")
 	console.log("Sidebar node and search survive document switch")
-	browser("fill", '[data-testid="doc-search-input"]', "")
 } finally {
 	await restoreOriginal()
 }
