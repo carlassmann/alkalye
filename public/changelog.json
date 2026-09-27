@@ -1,5 +1,14 @@
 [
 	{
+		"id": 152,
+		"date": "2026-09-27",
+		"title": "Keep your place while switching documents",
+		"notes": [
+			"Switching documents keeps the library sidebar and its search state in place, reducing repeated loading in larger libraries."
+		],
+		"pr": 55
+	},
+	{
 		"id": 151,
 		"date": "2026-09-27",
 		"title": "Load writing tools when needed",
