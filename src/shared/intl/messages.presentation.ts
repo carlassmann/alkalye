@@ -4,6 +4,8 @@ export { basePresentationMessages, dePresentationMessages }
 
 let basePresentationMessages = messages({
 	"presentation.laser.label": "Laser pointer",
+	"presentation.laser.open": "Preview",
+	"presentation.laser.notes": "Text only",
 	"presentation.laser.hide": "Hide slide preview",
 	"presentation.laser.show": "Show slide preview",
 	"presentation.laser.preview": "Slide preview",
@@ -46,6 +48,8 @@ let basePresentationMessages = messages({
 
 let dePresentationMessages = translate(basePresentationMessages, {
 	"presentation.laser.label": "Laserpointer",
+	"presentation.laser.open": "Vorschau",
+	"presentation.laser.notes": "Nur Text",
 	"presentation.laser.hide": "Folienvorschau ausblenden",
 	"presentation.laser.show": "Folienvorschau anzeigen",
 	"presentation.laser.preview": "Folienvorschau",

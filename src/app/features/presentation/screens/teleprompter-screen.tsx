@@ -2,7 +2,12 @@ import { useState } from "react"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { useCoState } from "jazz-tools/react"
 import { type ResolveQuery, co } from "jazz-tools"
-import { FileText, PanelRightClose, PanelRightOpen } from "lucide-react"
+import {
+	FileText,
+	PanelRightClose,
+	PanelRightOpen,
+	Presentation,
+} from "lucide-react"
 import { Document } from "@/schema"
 import {
 	DocumentNotFound,
@@ -59,7 +64,11 @@ interface TeleprompterScreenProps {
 
 function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 	let navigate = useNavigate()
-	let [previewVisible, setPreviewVisible] = useState(true)
+	let [previewVisible, setPreviewVisible] = useState(
+		() =>
+			typeof window !== "undefined" &&
+			window.matchMedia("(min-width: 768px)").matches,
+	)
 
 	useScreenWakeLock()
 
@@ -181,7 +190,7 @@ function TopBar({
 			>
 				<T k="presentation.teleprompter.editor" />
 			</Button>
-			<span className="text-muted-foreground absolute left-1/2 -translate-x-1/2 text-sm">
+			<span className="text-muted-foreground text-sm">
 				{t("presentation.teleprompter.slideIndicator", {
 					index: String(currentSlideIdx + 1),
 					total: String(totalSlides),
@@ -190,7 +199,7 @@ function TopBar({
 			<div className="flex items-center gap-1">
 				<Button
 					variant="ghost"
-					size="icon-sm"
+					size="sm"
 					aria-label={t(
 						previewVisible
 							? "presentation.laser.hide"
@@ -200,6 +209,13 @@ function TopBar({
 					onClick={onTogglePreview}
 				>
 					{previewVisible ? <PanelRightClose /> : <PanelRightOpen />}
+					<span className="md:hidden">
+						{t(
+							previewVisible
+								? "presentation.laser.notes"
+								: "presentation.laser.open",
+						)}
+					</span>
 				</Button>
 				<Button
 					variant="ghost"
@@ -213,7 +229,10 @@ function TopBar({
 						/>
 					}
 				>
-					<T k="presentation.teleprompter.slideshow" />
+					<Presentation className="md:hidden" />
+					<span className="sr-only md:not-sr-only">
+						<T k="presentation.teleprompter.slideshow" />
+					</span>
 				</Button>
 			</div>
 		</div>
