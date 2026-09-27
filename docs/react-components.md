@@ -58,7 +58,7 @@ function makeRename(editor: EditorRef) {
 
 Keep the library sidebar outside the document-keyed editor. Search, list position, and the personal account subscription survive document switches. The space sidebar is keyed by space ID so switching libraries resets its state.
 
-Keep editor history, pending saves, optimistic content, comments, permissions, and assets inside the document-keyed subtree. Pending saves must stay bound to their source document after navigation; undo must never cross documents. `scripts/sidebar-benchmark/runtime.mjs` checks save destination, undo isolation, and retained search in the currently open library. Run it separately in personal and space libraries with disposable fixtures.
+Keep editor history, pending saves, optimistic content, comments, permissions, and assets inside the document-keyed subtree. Pending saves must stay bound to their source document after navigation; undo must never cross documents.
 
 written with gpt-6 in Codex
 
