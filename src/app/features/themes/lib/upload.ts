@@ -1,4 +1,4 @@
-import JSZip from "jszip"
+import type JSZip from "jszip"
 import { z } from "zod"
 import { ThemeType, ThemePreset } from "./schema"
 import { sanitizeCss, sanitizeHtml } from "./sanitize"
@@ -157,7 +157,7 @@ function getMarkdownName(content: string, filename: string): string {
 async function parseThemeZip(file: File): Promise<ParseResult> {
 	let zip: JSZip
 	try {
-		zip = await JSZip.loadAsync(file)
+		zip = await (await import("jszip")).default.loadAsync(file)
 	} catch {
 		return {
 			ok: false,
