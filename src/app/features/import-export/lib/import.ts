@@ -1,4 +1,4 @@
-import JSZip from "jszip"
+import type JSZip from "jszip"
 import {
 	assetMimeTypeFromFileName,
 	isAssetFileName,
@@ -260,6 +260,7 @@ function resolveWikilinksForImport(
 }
 
 async function importZipFile(file: File): Promise<ImportedFile[]> {
+	let { default: JSZip } = await import("jszip")
 	let zip = await JSZip.loadAsync(file)
 	let results: ImportedFile[] = []
 

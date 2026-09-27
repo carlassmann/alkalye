@@ -1,5 +1,24 @@
 [
 	{
+		"id": 151,
+		"date": "2026-09-27",
+		"title": "Load writing tools when needed",
+		"notes": [
+			"Opening a document loads less JavaScript. Syntax highlighting, video conversion and ZIP tools load when you use them.",
+			"Previews stay readable while syntax highlighting loads, including when it cannot load."
+		],
+		"pr": 54
+	},
+	{
+		"id": 150,
+		"date": "2026-09-27",
+		"title": "Start writing sooner",
+		"notes": [
+			"The startup splash disappears as soon as your screen is ready, without an extra delay or fade blocking the editor."
+		],
+		"pr": 53
+	},
+	{
 		"id": 149,
 		"date": "2026-09-24",
 		"title": "Calmer editor suggestions",
