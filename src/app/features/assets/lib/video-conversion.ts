@@ -66,7 +66,7 @@ async function checkVideoEncodingSupport(): Promise<boolean> {
 }
 
 async function canEncodeVideoFrame(
-	config: VideoEncoderConfig,
+	config: Parameters<typeof VideoEncoder.isConfigSupported>[0],
 ): Promise<boolean> {
 	let encoder: VideoEncoder | undefined
 	let frame: VideoFrame | undefined
