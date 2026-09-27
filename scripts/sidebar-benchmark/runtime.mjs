@@ -45,6 +45,14 @@ try {
 		`document.querySelector('.cm-content').cmTile.view.state.doc.toString()`,
 	)
 	browser("focus", ".cm-content")
+	browser("keyboard", "inserttext", "DESTINATION_UNDO")
+	await wait(
+		`document.querySelector('.cm-content').textContent.includes('DESTINATION_UNDO')`,
+	)
+	browser("press", "Meta+z")
+	await wait(
+		`document.querySelector('.cm-content').cmTile.view.state.doc.toString()===${JSON.stringify(secondContent)}`,
+	)
 	browser("press", "Meta+z")
 	if (
 		evaluate(

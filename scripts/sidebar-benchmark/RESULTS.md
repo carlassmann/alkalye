@@ -1,5 +1,7 @@
 # Results
 
+Historical experiment: baseline `9e82548`, sidebar extraction `2cc3a2b`. These timings predate the splash and lazy-loading changes merged from `main` during delivery; they are not measurements of the final PR head.
+
 Retain the sidebar extraction. In the 205-document library, observed median unobstructed destination times improved by 69–80% at normal CPU and 61–72% at 4× CPU. Typing confirmation improved by 28–40%, including browser-driver overhead. The list root remained mounted on every measured changed switch; the repeated baseline replaced it on every switch.
 
 Small-library results were mixed. At 4× CPU, ordinary-document median paint regressed from 199.3 to 225.8 ms, while large-document median paint improved from 316.6 to 174.8 ms. These runs do not establish a universal navigation speedup.
