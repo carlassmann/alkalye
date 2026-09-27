@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react"
-import { AnimatePresence, motion } from "motion/react"
+import { useEffect } from "react"
 
-export { SplashScreen, SplashScreenStatic, useSplashDelay }
+export { SplashScreen, SplashScreenStatic }
 
 declare global {
 	interface Window {
@@ -20,27 +19,6 @@ declare global {
 	}
 }
 
-function useSplashDelay(minDurationMs = 1000) {
-	let [ready, setReady] = useState(() => {
-		let loadTime = window.__pageLoadTime ?? Date.now()
-		let elapsed = Date.now() - loadTime
-		return elapsed >= minDurationMs
-	})
-
-	useEffect(() => {
-		if (ready) return
-
-		let loadTime = window.__pageLoadTime ?? Date.now()
-		let elapsed = Date.now() - loadTime
-		let remaining = Math.max(0, minDurationMs - elapsed)
-
-		let timer = setTimeout(() => setReady(true), remaining)
-		return () => clearTimeout(timer)
-	}, [minDurationMs, ready])
-
-	return ready
-}
-
 function SplashScreenStatic() {
 	useEffect(() => {
 		document.getElementById("splash")?.remove()
@@ -54,25 +32,11 @@ function SplashScreenStatic() {
 }
 
 function SplashScreen({ show }: { show: boolean }) {
-	return (
-		<AnimatePresence>
-			{show && (
-				<motion.div
-					className="bg-background fixed inset-0 z-50 flex items-center justify-center"
-					initial={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
-					transition={{ duration: 0.3, ease: "easeOut" }}
-				>
-					<motion.div
-						exit={{ scale: 0.9, opacity: 0 }}
-						transition={{ duration: 0.3, ease: "easeOut" }}
-					>
-						<SplashIcon />
-					</motion.div>
-				</motion.div>
-			)}
-		</AnimatePresence>
-	)
+	useEffect(() => {
+		document.getElementById("splash")?.remove()
+	}, [])
+
+	return show ? <SplashScreenStatic /> : null
 }
 
 function SplashIcon() {
