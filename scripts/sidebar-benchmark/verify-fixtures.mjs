@@ -1,24 +1,7 @@
-import { execFileSync } from "node:child_process"
-import { Buffer } from "node:buffer"
+import { evaluate } from "./browser.mjs"
 import { setTimeout as sleep } from "node:timers/promises"
 import console from "node:console"
 
-function evaluate(source) {
-	return JSON.parse(
-		execFileSync(
-			"agent-browser",
-			[
-				"--session",
-				"sidebar2",
-				"--json",
-				"eval",
-				"-b",
-				Buffer.from(source).toString("base64"),
-			],
-			{ encoding: "utf8" },
-		),
-	).data.result
-}
 for (let index = 1; index <= 4; index++) {
 	evaluate(
 		`document.querySelector('[data-doc-title="Sidebar ${index}"] a').click()`,

@@ -263,7 +263,21 @@ type LoadedMe = ReturnType<
 >
 
 function PersonalDocumentScreen(props: EditorContentProps) {
+	let accountDataStartedAt = useRef(0)
+	useEffect(() => {
+		accountDataStartedAt.current = performance.now()
+	}, [])
 	let me = useAccount(UserAccount, { resolve: personalMeResolve })
+	useEffect(() => {
+		if (!me.$isLoaded) return
+		recordStartupTraceOnce("personal-account-data-loaded", {
+			documentCount: me.root.documents?.length ?? 0,
+			hasSettings: Boolean(me.root.settings?.$isLoaded),
+			durationMs:
+				Math.round((performance.now() - accountDataStartedAt.current) * 10) /
+				10,
+		})
+	}, [me])
 	return (
 		<>
 			<PersonalDocumentSidebar me={me} docId={props.docId} />
@@ -278,7 +292,6 @@ function EditorContent({
 	docId,
 	me,
 }: EditorContentProps & { me: LoadedMe }) {
-	let accountDataStartedAt = useRef(performance.now())
 	let t = useIntl()
 	let navigate = useNavigate()
 	let editor = useMarkdownEditorRef()
@@ -325,16 +338,6 @@ function EditorContent({
 		useSidebar()
 
 	let isAuthenticated = useIsAuthenticated()
-	useEffect(() => {
-		if (!me.$isLoaded) return
-		recordStartupTraceOnce("personal-account-data-loaded", {
-			documentCount: me.root.documents?.length ?? 0,
-			hasSettings: Boolean(me.root.settings?.$isLoaded),
-			durationMs:
-				Math.round((performance.now() - accountDataStartedAt.current) * 10) /
-				10,
-		})
-	}, [me])
 
 	let editorSettings =
 		me.$isLoaded && me.root?.settings?.$isLoaded ? me.root.settings : undefined

@@ -45,6 +45,8 @@ After the navigation runs, `runtime.mjs` checks rapid-save navigation, undo isol
 
 The native driver did not reliably center-click tall editors, so the scripts explicitly focus the editor before native text insertion. Native contenteditable fill appended rather than replaced CodeMirror content; restoration therefore selects all and inserts the original text. Always pass absolute file paths to agent-browser uploads.
 
+Browser commands and CDP requests time out after 20 seconds. Measurement scripts restore CPU throttling and service-worker bypass on exit; startup also removes its injected observer. Runtime checks restore the edited fixture in cleanup. Navigation summaries exclude the first run per document size, including the console output.
+
 See `RESULTS.md` for measurements and validation. Raw samples are in `results/`.
 
 written with gpt-6 in Codex

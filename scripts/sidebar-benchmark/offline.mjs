@@ -1,38 +1,7 @@
-import { execFileSync } from "node:child_process"
-import { Buffer } from "node:buffer"
+import { browser, evaluate, wait } from "./browser.mjs"
 import { setTimeout as sleep } from "node:timers/promises"
 import console from "node:console"
 
-function browser(...args) {
-	return execFileSync(
-		"agent-browser",
-		["--session", "sidebar2", "--json", ...args],
-		{ encoding: "utf8", timeout: 20000 },
-	)
-}
-async function wait(source) {
-	for (let attempt = 0; attempt < 100; attempt++) {
-		if (evaluate(`Boolean(${source})`)) return
-		await sleep(50)
-	}
-	throw Error("Condition timed out: " + source)
-}
-function evaluate(source) {
-	return JSON.parse(
-		execFileSync(
-			"agent-browser",
-			[
-				"--session",
-				"sidebar2",
-				"--json",
-				"eval",
-				"-b",
-				Buffer.from(source).toString("base64"),
-			],
-			{ encoding: "utf8" },
-		),
-	).data.result
-}
 let path = evaluate("location.pathname")
 let original = evaluate(
 	`document.querySelector('.cm-content').cmTile.view.state.doc.toString()`,

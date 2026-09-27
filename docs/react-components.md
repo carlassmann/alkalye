@@ -54,6 +54,14 @@ function makeRename(editor: EditorRef) {
 <BottomToolbar onPrevSlide={...} onNextSlide={...} />
 ```
 
+## Document screen lifetimes
+
+Keep the library sidebar outside the document-keyed editor. Search, list position, and the personal account subscription survive document switches. The space sidebar is keyed by space ID so switching libraries resets its state.
+
+Keep editor history, pending saves, optimistic content, comments, permissions, and assets inside the document-keyed subtree. Pending saves must flush to their source document on unmount; undo must never cross documents. `scripts/sidebar-benchmark/runtime.mjs` exercises these boundaries against disposable fixtures in personal and space libraries.
+
+written with gpt-6 in Codex
+
 ## Forms
 
 Use `@tanstack/react-form`:
