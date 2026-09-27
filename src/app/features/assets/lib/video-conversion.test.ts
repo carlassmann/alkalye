@@ -44,6 +44,22 @@ describe("video encoding capabilities", () => {
 		expect(await canEncodeVideo()).toBe(true)
 	})
 
+	it("rejects Firefox support claims when an encoder cannot be created", async () => {
+		vi.stubGlobal("navigator", { userAgent: "Firefox/143.0" })
+		class UnavailableEncoder {
+			static isConfigSupported = vi.fn().mockResolvedValue({ supported: true })
+			constructor() {
+				throw new Error("Encoder unavailable")
+			}
+		}
+		vi.stubGlobal("VideoEncoder", UnavailableEncoder)
+		vi.stubGlobal("AudioEncoder", {
+			isConfigSupported: vi.fn().mockResolvedValue({ supported: true }),
+		})
+		let { canEncodeVideo } = await import("./video-conversion")
+		expect(await canEncodeVideo()).toBe(false)
+	})
+
 	it("rejects invalid input before loading the converter", async () => {
 		await expect(
 			compressVideo(new File(["text"], "notes.txt", { type: "text/plain" })),

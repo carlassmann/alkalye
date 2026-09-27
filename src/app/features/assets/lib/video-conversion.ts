@@ -43,13 +43,14 @@ async function checkVideoEncodingSupport(): Promise<boolean> {
 	)
 		return false
 	// Probe the AVC/AAC formats the converter writes, without loading the converter.
+	let videoConfig = {
+		codec: "avc1.640028",
+		width: MAX_WIDTH,
+		height: MAX_HEIGHT,
+		bitrate: VIDEO_BITRATE,
+	}
 	let [video, audio] = await Promise.all([
-		VideoEncoder.isConfigSupported({
-			codec: "avc1.640028",
-			width: MAX_WIDTH,
-			height: MAX_HEIGHT,
-			bitrate: VIDEO_BITRATE,
-		}),
+		VideoEncoder.isConfigSupported(videoConfig),
 		AudioEncoder.isConfigSupported({
 			codec: "mp4a.40.2",
 			numberOfChannels: 2,
@@ -57,7 +58,42 @@ async function checkVideoEncodingSupport(): Promise<boolean> {
 			bitrate: AUDIO_BITRATE,
 		}),
 	])
-	return video.supported === true && audio.supported === true
+	if (!video.supported || !audio.supported) return false
+	// Firefox can report support even when encoding fails; retain Mediabunny's frame probe.
+	return /firefox/i.test(navigator.userAgent)
+		? canEncodeVideoFrame(videoConfig)
+		: true
+}
+
+async function canEncodeVideoFrame(
+	config: VideoEncoderConfig,
+): Promise<boolean> {
+	let encoder: VideoEncoder | undefined
+	let frame: VideoFrame | undefined
+	let failed = false
+	try {
+		encoder = new VideoEncoder({
+			output() {},
+			error() {
+				failed = true
+			},
+		})
+		encoder.configure(config)
+		frame = new VideoFrame(new Uint8Array(config.width * config.height * 4), {
+			format: "RGBA",
+			codedWidth: config.width,
+			codedHeight: config.height,
+			timestamp: 0,
+		})
+		encoder.encode(frame)
+		await encoder.flush()
+		return !failed
+	} catch {
+		return false
+	} finally {
+		frame?.close()
+		if (encoder && encoder.state !== "closed") encoder.close()
+	}
 }
 
 let encodingSupportPromise: Promise<boolean> | undefined
