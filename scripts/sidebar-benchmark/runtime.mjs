@@ -27,7 +27,7 @@ let original = evaluate(
 )
 try {
 	browser("focus", ".cm-content")
-	browser("press", "Control+Home")
+	browser("press", "Control+End")
 	evaluate(
 		`(()=>{let editor=document.querySelector('.cm-content');editor.addEventListener('input',()=>{window.__saveInputAt=performance.now();setTimeout(()=>{window.__saveNavigationAt=performance.now();document.querySelector('a[href="${second.path}"]').click()},0)},{once:true})})()`,
 	)
@@ -45,6 +45,7 @@ try {
 		`document.querySelector('.cm-content').cmTile.view.state.doc.toString()`,
 	)
 	browser("focus", ".cm-content")
+	browser("press", "Control+End")
 	browser("keyboard", "inserttext", "DESTINATION_UNDO")
 	await wait(
 		`document.querySelector('.cm-content').textContent.includes('DESTINATION_UNDO')`,
