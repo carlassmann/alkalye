@@ -148,6 +148,10 @@ function LaserPreview({
 
 	function stopPointing() {
 		activePointer.current = null
+		pausePointing()
+	}
+
+	function pausePointing() {
 		let point = pointRef.current
 		if (point) {
 			let end = { ...point, visible: false }
@@ -259,7 +263,11 @@ function LaserPreview({
 		let bounds = event.currentTarget.getBoundingClientRect()
 		let x = (event.clientX - bounds.left) / bounds.width
 		let y = (event.clientY - bounds.top) / bounds.height
-		if (x < 0 || x > 1 || y < 0 || y > 1) return stopPointing()
+		if (x < 0 || x > 1 || y < 0 || y > 1) return pausePointing()
+		if (!pointRef.current) {
+			strokeRef.current = crypto.randomUUID()
+			lastSentAt.current = -Infinity
+		}
 		let point: LaserPoint = {
 			type: "point",
 			stroke: strokeRef.current,
@@ -352,9 +360,7 @@ function LaserPreview({
 									(event.pointerType === "mouse" && event.button !== 0)
 								)
 									return
-								strokeRef.current = crypto.randomUUID()
 								activePointer.current = event.pointerId
-								lastSentAt.current = -Infinity
 								event.preventDefault()
 								event.currentTarget.setPointerCapture(event.pointerId)
 								pointAt(event)

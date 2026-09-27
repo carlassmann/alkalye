@@ -75,16 +75,22 @@ function advertise(id: string, confirmed = true) {
 	return display
 }
 
-function pointer(type: string, id: number, primary = true) {
+function pointer(
+	type: string,
+	id: number,
+	primary = true,
+	x = 100,
+	pointerType = "touch",
+) {
 	let event = new MouseEvent(type, {
 		bubbles: true,
-		clientX: 100,
+		clientX: x,
 		clientY: 50,
 		button: 0,
 	})
 	Object.defineProperties(event, {
 		pointerId: { value: id },
-		pointerType: { value: "touch" },
+		pointerType: { value: pointerType },
 		isPrimary: { value: primary },
 	})
 	return event
@@ -152,3 +158,40 @@ test("hiding and showing the preview preserves the chosen display", async () => 
 	expect(container.querySelector("iframe")).not.toBeNull()
 	expect(container.querySelector("select")?.value).toBe("first")
 })
+
+test.each(["mouse", "touch"])(
+	"resumes %s drags after re-entry, but not after release outside",
+	pointerType => {
+		advertise("screen")
+		let frame = container.querySelector("iframe")
+		let surface = container.querySelector("[data-laser-surface]")
+		if (!(surface instanceof HTMLElement) || !frame?.contentDocument)
+			throw new Error("Preview missing")
+		let slide = frame.contentDocument.createElement("div")
+		slide.setAttribute("data-current-slide", "1")
+		frame.contentDocument.append(slide)
+		surface.setPointerCapture = vi.fn()
+		surface.getBoundingClientRect = () => new DOMRect(0, 0, 200, 100)
+		function move(type: string, x: number) {
+			surface.dispatchEvent(pointer(type, 1, true, x, pointerType))
+		}
+		move("pointerdown", 100)
+		let first = transport.sent.at(-1)
+		if (first?.type !== "point") throw new Error("Point missing")
+		move("pointermove", 250)
+		expect(transport.sent.at(-1)).toMatchObject({ visible: false })
+		let count = transport.sent.length
+		move("pointermove", 260)
+		expect(transport.sent).toHaveLength(count)
+		move("pointermove", 150)
+		let resumed = transport.sent.at(-1)
+		expect(resumed).toMatchObject({ visible: true, x: 0.75 })
+		if (resumed?.type !== "point") throw new Error("Point missing")
+		expect(resumed.stroke).not.toBe(first.stroke)
+		move("pointermove", 250)
+		move("pointerup", 250)
+		count = transport.sent.length
+		move("pointermove", 100)
+		expect(transport.sent).toHaveLength(count)
+	},
+)
