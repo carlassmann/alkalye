@@ -1,4 +1,4 @@
-import JSZip from "jszip"
+import type JSZip from "jszip"
 import { assetExtensionFromMimeType } from "@/app/features/assets"
 import type { ExportComment } from "@/app/features/comments"
 
@@ -55,6 +55,7 @@ async function createDocumentExport(
 	if ((!assets || assets.length === 0) && !hasComments)
 		return createDocumentFile(content, safeName)
 
+	let { default: JSZip } = await import("jszip")
 	let zip = new JSZip()
 	let docFolder = zip.folder(safeName)!
 	let assetNameMap = new Map<string, string>()
@@ -210,6 +211,7 @@ function getExtensionFromBlob(blob: Blob): string {
 // - Has assets, has path: {path}/{title}/{title}.md + {path}/{title}/assets/
 
 async function exportDocumentsAsZip(docs: ExportDoc[]) {
+	let { default: JSZip } = await import("jszip")
 	let zip = new JSZip()
 	let usedNames = new Map<string, Set<string>>() // parentPath -> used names
 

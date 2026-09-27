@@ -2,16 +2,16 @@ import { isLaserPreview } from "@/app/features/presentation"
 import { StrictMode, useEffect } from "react"
 import { JazzReactProvider, useAccount } from "jazz-tools/react"
 import { co } from "jazz-tools"
-import { createRouter, RouterProvider } from "@tanstack/react-router"
+import {
+	createRouter,
+	RouterProvider,
+	useRouterState,
+} from "@tanstack/react-router"
 import { PUBLIC_JAZZ_SYNC_SERVER } from "astro:env/client"
 import { Toaster } from "sonner"
 import { routeTree } from "#app/routeTree.gen"
 import { UserAccount, migrateAnonymousData } from "@/schema"
-import {
-	SplashScreen,
-	SplashScreenStatic,
-	useSplashDelay,
-} from "@/app/features/onboarding"
+import { SplashScreen, SplashScreenStatic } from "@/app/features/onboarding"
 import { PWAContext, usePWAProvider, PWAInstallHint } from "@/app/lib/pwa"
 import { useCleanupDeleted } from "@/app/features/documents"
 import { connectLocalJazzPoke } from "@/app/lib/local-jazz-poke"
@@ -92,8 +92,11 @@ function ContextPWAProvider({ children }: { children: React.ReactNode }) {
 
 function RouterWithJazz() {
 	let me = useAccount(UserAccount, { resolve: { root: true } })
-	let splashReady = useSplashDelay(700)
-	let showSplash = me.$jazz.loadingState === "loading" || !splashReady
+	let initialRouteResolved = useRouterState({
+		router,
+		select: state => Boolean(state.resolvedLocation),
+	})
+	let showSplash = !me.$isLoaded || !initialRouteResolved
 	let requestedLocale = getRequestedLocale()
 
 	useCleanupDeleted()

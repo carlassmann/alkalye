@@ -1,15 +1,3 @@
-import {
-	Input,
-	Output,
-	Conversion,
-	ALL_FORMATS,
-	BlobSource,
-	Mp4OutputFormat,
-	BufferTarget,
-	getFirstEncodableVideoCodec,
-	getFirstEncodableAudioCodec,
-} from "mediabunny"
-
 export { compressVideo, canEncodeVideo, VideoCompressionError }
 
 type CompressionProgress = {
@@ -48,16 +36,74 @@ class VideoCompressionError extends Error {
 	}
 }
 
-async function canEncodeVideo(): Promise<boolean> {
-	let mp4 = new Mp4OutputFormat()
-	let videoCodec = await getFirstEncodableVideoCodec(
-		mp4.getSupportedVideoCodecs(),
-		{ width: MAX_WIDTH, height: MAX_HEIGHT },
+async function checkVideoEncodingSupport(): Promise<boolean> {
+	if (
+		typeof VideoEncoder === "undefined" ||
+		typeof AudioEncoder === "undefined"
 	)
-	let audioCodec = await getFirstEncodableAudioCodec(
-		mp4.getSupportedAudioCodecs(),
-	)
-	return videoCodec !== null && audioCodec !== null
+		return false
+	// Probe the AVC/AAC formats the converter writes, without loading the converter.
+	let videoConfig = {
+		codec: "avc1.640028",
+		width: MAX_WIDTH,
+		height: MAX_HEIGHT,
+		bitrate: VIDEO_BITRATE,
+	}
+	let [video, audio] = await Promise.all([
+		VideoEncoder.isConfigSupported(videoConfig),
+		AudioEncoder.isConfigSupported({
+			codec: "mp4a.40.2",
+			numberOfChannels: 2,
+			sampleRate: 48000,
+			bitrate: AUDIO_BITRATE,
+		}),
+	])
+	if (!video.supported || !audio.supported) return false
+	// Firefox can report support even when encoding fails; retain Mediabunny's frame probe.
+	return /firefox/i.test(navigator.userAgent)
+		? canEncodeVideoFrame(videoConfig)
+		: true
+}
+
+async function canEncodeVideoFrame(
+	config: Parameters<typeof VideoEncoder.isConfigSupported>[0],
+): Promise<boolean> {
+	let encoder: VideoEncoder | undefined
+	let frame: VideoFrame | undefined
+	let failed = false
+	try {
+		encoder = new VideoEncoder({
+			output() {},
+			error() {
+				failed = true
+			},
+		})
+		encoder.configure(config)
+		frame = new VideoFrame(new Uint8Array(config.width * config.height * 4), {
+			format: "RGBA",
+			codedWidth: config.width,
+			codedHeight: config.height,
+			timestamp: 0,
+		})
+		encoder.encode(frame)
+		await encoder.flush()
+		return !failed
+	} catch {
+		return false
+	} finally {
+		frame?.close()
+		if (encoder && encoder.state !== "closed") encoder.close()
+	}
+}
+
+let encodingSupportPromise: Promise<boolean> | undefined
+
+function canEncodeVideo(): Promise<boolean> {
+	encodingSupportPromise ??= checkVideoEncodingSupport().catch(() => {
+		encodingSupportPromise = undefined
+		return false
+	})
+	return encodingSupportPromise
 }
 
 async function compressVideo(
@@ -84,6 +130,18 @@ async function compressVideo(
 			"unsupported",
 		)
 	}
+
+	if (signal?.aborted) throw new VideoCompressionError("Cancelled", "cancelled")
+	let {
+		Input,
+		Output,
+		Conversion,
+		ALL_FORMATS,
+		BlobSource,
+		Mp4OutputFormat,
+		BufferTarget,
+	} = await import("mediabunny")
+	if (signal?.aborted) throw new VideoCompressionError("Cancelled", "cancelled")
 
 	let input = new Input({
 		formats: ALL_FORMATS,
