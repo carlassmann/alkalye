@@ -1,0 +1,12 @@
+[
+	{
+		"archive": "baseline-1.zip",
+		"entries": 101,
+		"contentSha256": "5571a1333721ceb5880934cd1c4395d6ad3f2624c57f100c5000262e0bfe9846"
+	},
+	{
+		"archive": "documents.zip",
+		"entries": 101,
+		"contentSha256": "5571a1333721ceb5880934cd1c4395d6ad3f2624c57f100c5000262e0bfe9846"
+	}
+]

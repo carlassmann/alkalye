@@ -1,0 +1,128 @@
+[
+	{
+		"cpu": 1,
+		"run": 1,
+		"ready": 286.5,
+		"uncovered": 286.5,
+		"interactive": 713.5999999642372,
+		"edited": true,
+		"destination": true
+	},
+	{
+		"cpu": 1,
+		"run": 2,
+		"ready": 133.79999995231628,
+		"uncovered": 133.89999997615814,
+		"interactive": 566.6999999880791,
+		"edited": true,
+		"destination": true
+	},
+	{
+		"cpu": 1,
+		"run": 3,
+		"ready": 180.9000000357628,
+		"uncovered": 180.9000000357628,
+		"interactive": 653.5,
+		"edited": true,
+		"destination": true
+	},
+	{
+		"cpu": 1,
+		"run": 4,
+		"ready": 151.70000004768372,
+		"uncovered": 151.70000004768372,
+		"interactive": 596.9000000357628,
+		"edited": true,
+		"destination": true
+	},
+	{
+		"cpu": 1,
+		"run": 5,
+		"ready": 133.0999999642372,
+		"uncovered": 133.19999998807907,
+		"interactive": 564.8000000119209,
+		"edited": true,
+		"destination": true
+	},
+	{
+		"cpu": 1,
+		"run": 6,
+		"ready": 114.90000003576279,
+		"uncovered": 115,
+		"interactive": 535.3000000119209,
+		"edited": true,
+		"destination": true
+	},
+	{
+		"cpu": 1,
+		"run": 7,
+		"ready": 158.9000000357628,
+		"uncovered": 159,
+		"interactive": 696.8000000119209,
+		"edited": true,
+		"destination": true
+	},
+	{
+		"cpu": 4,
+		"run": 1,
+		"ready": 10.900000035762787,
+		"uncovered": 11,
+		"interactive": 509.4000000357628,
+		"edited": true,
+		"destination": true
+	},
+	{
+		"cpu": 4,
+		"run": 2,
+		"ready": 609.5,
+		"uncovered": 609.5,
+		"interactive": 1105.9000000357628,
+		"edited": true,
+		"destination": true
+	},
+	{
+		"cpu": 4,
+		"run": 3,
+		"ready": 620.6999999880791,
+		"uncovered": 620.8000000119209,
+		"interactive": 1101.4000000357628,
+		"edited": true,
+		"destination": true
+	},
+	{
+		"cpu": 4,
+		"run": 4,
+		"ready": 574.6000000238419,
+		"uncovered": 574.6999999880791,
+		"interactive": 1046.300000011921,
+		"edited": true,
+		"destination": true
+	},
+	{
+		"cpu": 4,
+		"run": 5,
+		"ready": 626.3000000119209,
+		"uncovered": 626.6999999880791,
+		"interactive": 1186.300000011921,
+		"edited": true,
+		"destination": true
+	},
+	{
+		"cpu": 4,
+		"run": 6,
+		"ready": 639.8999999761581,
+		"uncovered": 639.8999999761581,
+		"interactive": 1167.0999999642372,
+		"edited": true,
+		"destination": true
+	},
+	{
+		"cpu": 4,
+		"run": 7,
+		"ready": 651.0999999642372,
+		"uncovered": 651.1999999880791,
+		"interactive": 1119.199999988079,
+		"edited": true,
+		"destination": true
+	}
+]

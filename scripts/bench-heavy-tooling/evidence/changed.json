@@ -1,0 +1,3134 @@
+[
+	{
+		"cpu": 1,
+		"mode": "cold-http",
+		"run": 1,
+		"ready": 356.89999997615814,
+		"uncovered": 1071,
+		"interactive": 1889.6000000238419,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 1812
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 453
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 1185
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 2431
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 1260902
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 4764
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 57791
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 898
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 2674
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 17815
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "cold-http",
+		"run": 2,
+		"ready": 297.69999998807907,
+		"uncovered": 1063.4000000357628,
+		"interactive": 1870.699999988079,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 1812
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 453
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 1185
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 2431
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 1260902
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 4764
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 57791
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 898
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 2674
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 17815
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "cold-http",
+		"run": 3,
+		"ready": 261.80000001192093,
+		"uncovered": 1042.300000011921,
+		"interactive": 1827.6000000238419,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 1812
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 453
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 1185
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 2431
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 4764
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 1260902
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 57791
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 898
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 2674
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 17815
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "cold-http",
+		"run": 4,
+		"ready": 265.5999999642372,
+		"uncovered": 1049.800000011921,
+		"interactive": 1868.3999999761581,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 1812
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 453
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 1185
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 2431
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 4764
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 1260902
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 57791
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 898
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 2674
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 17815
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "cold-http",
+		"run": 5,
+		"ready": 291.5,
+		"uncovered": 1057.300000011921,
+		"interactive": 1918.3999999761581,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 1812
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 453
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 1185
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 2431
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 4764
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 1260902
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 57791
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 898
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 2674
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 17815
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "cold-http",
+		"run": 6,
+		"ready": 326.10000002384186,
+		"uncovered": 1049.300000011921,
+		"interactive": 1846.1000000238419,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 1812
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 453
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 1185
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 2431
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 4764
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 1260902
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 57791
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 898
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 2674
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 17815
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "cold-http",
+		"run": 7,
+		"ready": 231.5999999642372,
+		"uncovered": 1040.800000011921,
+		"interactive": 1832.3999999761581,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 1812
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 453
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 1185
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 2431
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 1260902
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 4764
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 57791
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 898
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 2674
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 17815
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "cached-http",
+		"run": 1,
+		"ready": 308,
+		"uncovered": 1072.800000011921,
+		"interactive": 1897.199999988079,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "cached-http",
+		"run": 2,
+		"ready": 223.5,
+		"uncovered": 1066.800000011921,
+		"interactive": 1863.3999999761581,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "cached-http",
+		"run": 3,
+		"ready": 250.5,
+		"uncovered": 1072,
+		"interactive": 1879,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "cached-http",
+		"run": 4,
+		"ready": 223.39999997615814,
+		"uncovered": 1063.0999999642372,
+		"interactive": 1873.0999999642372,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "cached-http",
+		"run": 5,
+		"ready": 250.30000001192093,
+		"uncovered": 1072.800000011921,
+		"interactive": 1884.300000011921,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "cached-http",
+		"run": 6,
+		"ready": 190.29999995231628,
+		"uncovered": 1057.5,
+		"interactive": 1826.2999999523163,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "cached-http",
+		"run": 7,
+		"ready": 254,
+		"uncovered": 1071.6000000238419,
+		"interactive": 1863.800000011921,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "service-worker",
+		"run": 1,
+		"ready": 254.30000001192093,
+		"uncovered": 1051.8999999761581,
+		"interactive": 1827.6000000238419,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": true,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 174,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 1744,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 6359,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 12347,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 3841290,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 180962,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 1013,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 5761,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 0,
+				"decoded": 0,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "service-worker",
+		"run": 2,
+		"ready": 211,
+		"uncovered": 1070.5,
+		"interactive": 1837.300000011921,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": true,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 174,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 1744,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 3841290,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 12347,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 6359,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 180962,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 1013,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 5761,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 0,
+				"decoded": 0,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "service-worker",
+		"run": 3,
+		"ready": 201.4000000357628,
+		"uncovered": 1065.800000011921,
+		"interactive": 1828.300000011921,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": true,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 174,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 1744,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 3841290,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 12347,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 6359,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 180962,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 1013,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 5761,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 0,
+				"decoded": 0,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "service-worker",
+		"run": 4,
+		"ready": 215.19999998807907,
+		"uncovered": 1063.8999999761581,
+		"interactive": 1892.0999999642372,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": true,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 174,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 1744,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 3841290,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 12347,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 6359,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 180962,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 1013,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 5761,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 0,
+				"decoded": 0,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "service-worker",
+		"run": 5,
+		"ready": 216.69999998807907,
+		"uncovered": 1079,
+		"interactive": 1884.800000011921,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": true,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 174,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 1744,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 3841290,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 12347,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 6359,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 180962,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 1013,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 5761,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 0,
+				"decoded": 0,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "service-worker",
+		"run": 6,
+		"ready": 200.5,
+		"uncovered": 1065,
+		"interactive": 1890.8999999761581,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": true,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 174,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 1744,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 3841290,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 12347,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 6359,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 180962,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 1013,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 5761,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 0,
+				"decoded": 0,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 1,
+		"mode": "service-worker",
+		"run": 7,
+		"ready": 256.10000002384186,
+		"uncovered": 1072.5,
+		"interactive": 1844.6000000238419,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": true,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 174,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 1744,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 3841290,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 12347,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 6359,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 180962,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 1013,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 5761,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 0,
+				"decoded": 0,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "cold-http",
+		"run": 1,
+		"ready": 796.5,
+		"uncovered": 1409.8999999761581,
+		"interactive": 2205,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 1812
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 453
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 1185
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 2431
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 1260902
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 4764
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 57791
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 898
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 2674
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 17815
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "cold-http",
+		"run": 2,
+		"ready": 793.3999999761581,
+		"uncovered": 1422.5,
+		"interactive": 2218.5,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 1812
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 453
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 1185
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 2431
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 1260902
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 4764
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 57791
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 898
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 2674
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 17815
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "cold-http",
+		"run": 3,
+		"ready": 799.2000000476837,
+		"uncovered": 1435.7000000476837,
+		"interactive": 2251.2000000476837,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 1812
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 453
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 1185
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 2431
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 1260902
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 4764
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 57791
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 898
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 2674
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 17815
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "cold-http",
+		"run": 4,
+		"ready": 773.3000000119209,
+		"uncovered": 1429.6000000238419,
+		"interactive": 2202.600000023842,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 1812
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 453
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 1185
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 2431
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 4764
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 1260902
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 57791
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 898
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 2674
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 17815
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "cold-http",
+		"run": 5,
+		"ready": 832.6000000238419,
+		"uncovered": 1267,
+		"interactive": 2436.199999988079,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 1812
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 453
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 1185
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 2431
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 4764
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 57791
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 1260902
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 898
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 2674
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 17815
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "cold-http",
+		"run": 6,
+		"ready": 895.0999999642372,
+		"uncovered": 1565.0999999642372,
+		"interactive": 2377.5,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 1812
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 453
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 1185
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 2431
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 4764
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 1260902
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 57791
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 898
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 2674
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 17815
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "cold-http",
+		"run": 7,
+		"ready": 766.5,
+		"uncovered": 1435.3999999761581,
+		"interactive": 2233.5,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 1812
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 453
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 1185
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 2431
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 4764
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 57791
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 1260902
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 898
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 2674
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 17815
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "cached-http",
+		"run": 1,
+		"ready": 871,
+		"uncovered": 1615.300000011921,
+		"interactive": 2411.900000035763,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "cached-http",
+		"run": 2,
+		"ready": 740.6999999880791,
+		"uncovered": 1415.8999999761581,
+		"interactive": 2221.600000023842,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "cached-http",
+		"run": 3,
+		"ready": 785.4000000357628,
+		"uncovered": 1501.5,
+		"interactive": 2345.2000000476837,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "cached-http",
+		"run": 4,
+		"ready": 910.9000000357628,
+		"uncovered": 1663,
+		"interactive": 2482.800000011921,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "cached-http",
+		"run": 5,
+		"ready": 764,
+		"uncovered": 1525.300000011921,
+		"interactive": 2348.199999988079,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "cached-http",
+		"run": 6,
+		"ready": 769.6999999880791,
+		"uncovered": 1379.699999988079,
+		"interactive": 2161.7999999523163,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "cached-http",
+		"run": 7,
+		"ready": 747.3000000119209,
+		"uncovered": 1320.1000000238419,
+		"interactive": 2132.100000023842,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": false,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 1512,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 153,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 885,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 1260602,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 4464,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 2131,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 57491,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 598,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 2374,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 17515,
+				"decoded": 45728,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "service-worker",
+		"run": 1,
+		"ready": 788.8000000119209,
+		"uncovered": 1477.699999988079,
+		"interactive": 2294,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": true,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 174,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 1744,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 3841290,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 12347,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 6359,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 180962,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 1013,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 5761,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 0,
+				"decoded": 0,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "service-worker",
+		"run": 2,
+		"ready": 798.5,
+		"uncovered": 1487.699999988079,
+		"interactive": 2268.599999964237,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": true,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 174,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 1744,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 3841290,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 12347,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 6359,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 180962,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 1013,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 5761,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 0,
+				"decoded": 0,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "service-worker",
+		"run": 3,
+		"ready": 718.1000000238419,
+		"uncovered": 1432.1000000238419,
+		"interactive": 2223.100000023842,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": true,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 174,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 1744,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 3841290,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 12347,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 6359,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 180962,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 1013,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 5761,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 0,
+				"decoded": 0,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "service-worker",
+		"run": 4,
+		"ready": 713.0999999642372,
+		"uncovered": 1381,
+		"interactive": 2179.800000011921,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": true,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 174,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 1744,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 3841290,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 12347,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 6359,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 180962,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 1013,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 5761,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 0,
+				"decoded": 0,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "service-worker",
+		"run": 5,
+		"ready": 791.1000000238419,
+		"uncovered": 1573.6000000238419,
+		"interactive": 2419.699999988079,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": true,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 174,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 1744,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 3841290,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 12347,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 6359,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 180962,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 1013,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 5761,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 0,
+				"decoded": 0,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "service-worker",
+		"run": 6,
+		"ready": 761.8999999761581,
+		"uncovered": 1361,
+		"interactive": 2164.899999976158,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": true,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 174,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 1744,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 3841290,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 12347,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 6359,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 180962,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 1013,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 5761,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 0,
+				"decoded": 0,
+				"transfer": 0
+			}
+		]
+	},
+	{
+		"cpu": 4,
+		"mode": "service-worker",
+		"run": 7,
+		"ready": 725.2000000476837,
+		"uncovered": 1318.9000000357628,
+		"interactive": 2086.5,
+		"edited": true,
+		"url": "/app/doc/co_zAxmdyxPmeGw1pYWA96faLaDsA2",
+		"controlled": true,
+		"resources": [
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.RXbpzhSV.js",
+				"encoded": 174,
+				"decoded": 174,
+				"transfer": 0
+			},
+			{
+				"name": "client.CMSwgtGj.js",
+				"encoded": 1744,
+				"decoded": 1744,
+				"transfer": 0
+			},
+			{
+				"name": "index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"encoded": 3464,
+				"decoded": 3464,
+				"transfer": 0
+			},
+			{
+				"name": "main.ywEHGIxA.js",
+				"encoded": 3841290,
+				"decoded": 3841290,
+				"transfer": 0
+			},
+			{
+				"name": "index.BJJFgUIs.js",
+				"encoded": 12347,
+				"decoded": 12347,
+				"transfer": 0
+			},
+			{
+				"name": "browser-startup-instrumentation.hp2BeFIz.js",
+				"encoded": 6359,
+				"decoded": 6359,
+				"transfer": 0
+			},
+			{
+				"name": "client.-iLz22eX.js",
+				"encoded": 180962,
+				"decoded": 180962,
+				"transfer": 0
+			},
+			{
+				"name": "virtual_pwa-register.C-ODbOFP.js",
+				"encoded": 1013,
+				"decoded": 1013,
+				"transfer": 0
+			},
+			{
+				"name": "workbox-window.prod.es5.BIl4cyR9.js",
+				"encoded": 5761,
+				"decoded": 5761,
+				"transfer": 0
+			},
+			{
+				"name": "document-save.worker-BQTqGf7x.js",
+				"encoded": 0,
+				"decoded": 0,
+				"transfer": 0
+			}
+		]
+	}
+]

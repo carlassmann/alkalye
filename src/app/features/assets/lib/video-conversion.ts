@@ -1,15 +1,3 @@
-import {
-	Input,
-	Output,
-	Conversion,
-	ALL_FORMATS,
-	BlobSource,
-	Mp4OutputFormat,
-	BufferTarget,
-	getFirstEncodableVideoCodec,
-	getFirstEncodableAudioCodec,
-} from "mediabunny"
-
 export { compressVideo, canEncodeVideo, VideoCompressionError }
 
 type CompressionProgress = {
@@ -48,16 +36,38 @@ class VideoCompressionError extends Error {
 	}
 }
 
-async function canEncodeVideo(): Promise<boolean> {
-	let mp4 = new Mp4OutputFormat()
-	let videoCodec = await getFirstEncodableVideoCodec(
-		mp4.getSupportedVideoCodecs(),
-		{ width: MAX_WIDTH, height: MAX_HEIGHT },
+async function checkVideoEncodingSupport(): Promise<boolean> {
+	if (
+		typeof VideoEncoder === "undefined" ||
+		typeof AudioEncoder === "undefined"
 	)
-	let audioCodec = await getFirstEncodableAudioCodec(
-		mp4.getSupportedAudioCodecs(),
-	)
-	return videoCodec !== null && audioCodec !== null
+		return false
+	// Probe the AVC/AAC formats the converter writes, without loading the converter.
+	let [video, audio] = await Promise.all([
+		VideoEncoder.isConfigSupported({
+			codec: "avc1.640028",
+			width: MAX_WIDTH,
+			height: MAX_HEIGHT,
+			bitrate: VIDEO_BITRATE,
+		}),
+		AudioEncoder.isConfigSupported({
+			codec: "mp4a.40.2",
+			numberOfChannels: 2,
+			sampleRate: 48000,
+			bitrate: AUDIO_BITRATE,
+		}),
+	])
+	return video.supported === true && audio.supported === true
+}
+
+let encodingSupportPromise: Promise<boolean> | undefined
+
+function canEncodeVideo(): Promise<boolean> {
+	encodingSupportPromise ??= checkVideoEncodingSupport().catch(() => {
+		encodingSupportPromise = undefined
+		return false
+	})
+	return encodingSupportPromise
 }
 
 async function compressVideo(
@@ -84,6 +94,18 @@ async function compressVideo(
 			"unsupported",
 		)
 	}
+
+	if (signal?.aborted) throw new VideoCompressionError("Cancelled", "cancelled")
+	let {
+		Input,
+		Output,
+		Conversion,
+		ALL_FORMATS,
+		BlobSource,
+		Mp4OutputFormat,
+		BufferTarget,
+	} = await import("mediabunny")
+	if (signal?.aborted) throw new VideoCompressionError("Cancelled", "cancelled")
 
 	let input = new Input({
 		formats: ALL_FORMATS,

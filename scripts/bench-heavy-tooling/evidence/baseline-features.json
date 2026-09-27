@@ -1,0 +1,261 @@
+[
+	{
+		"feature": "syntax",
+		"run": 1,
+		"ms": 214.80000001192093,
+		"correct": true,
+		"resources": [
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.aaPKGHfc.js",
+			"client.CMSwgtGj.js",
+			"main.BGNtTCNs.js",
+			"index.BJJFgUIs.js",
+			"browser-startup-instrumentation.hp2BeFIz.js",
+			"client.-iLz22eX.js",
+			"virtual_pwa-register.xF1zYT3Q.js",
+			"workbox-window.prod.es5.BIl4cyR9.js",
+			"document-save.worker-BQTqGf7x.js",
+			"github-dark.DHJKELXO.js"
+		]
+	},
+	{
+		"feature": "syntax",
+		"run": 2,
+		"ms": 181.80000001192093,
+		"correct": true,
+		"resources": [
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.aaPKGHfc.js",
+			"client.CMSwgtGj.js",
+			"main.BGNtTCNs.js",
+			"index.BJJFgUIs.js",
+			"browser-startup-instrumentation.hp2BeFIz.js",
+			"client.-iLz22eX.js",
+			"virtual_pwa-register.xF1zYT3Q.js",
+			"workbox-window.prod.es5.BIl4cyR9.js",
+			"document-save.worker-BQTqGf7x.js",
+			"github-dark.DHJKELXO.js"
+		]
+	},
+	{
+		"feature": "syntax",
+		"run": 3,
+		"ms": 137.0999999642372,
+		"correct": true,
+		"resources": [
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.aaPKGHfc.js",
+			"client.CMSwgtGj.js",
+			"main.BGNtTCNs.js",
+			"index.BJJFgUIs.js",
+			"browser-startup-instrumentation.hp2BeFIz.js",
+			"client.-iLz22eX.js",
+			"virtual_pwa-register.xF1zYT3Q.js",
+			"workbox-window.prod.es5.BIl4cyR9.js",
+			"document-save.worker-BQTqGf7x.js",
+			"github-dark.DHJKELXO.js"
+		]
+	},
+	{
+		"feature": "syntax",
+		"run": 4,
+		"ms": 143.19999998807907,
+		"correct": true,
+		"resources": [
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.aaPKGHfc.js",
+			"client.CMSwgtGj.js",
+			"main.BGNtTCNs.js",
+			"index.BJJFgUIs.js",
+			"browser-startup-instrumentation.hp2BeFIz.js",
+			"client.-iLz22eX.js",
+			"virtual_pwa-register.xF1zYT3Q.js",
+			"workbox-window.prod.es5.BIl4cyR9.js",
+			"document-save.worker-BQTqGf7x.js",
+			"github-dark.DHJKELXO.js"
+		]
+	},
+	{
+		"feature": "syntax",
+		"run": 5,
+		"ms": 137.30000001192093,
+		"correct": true,
+		"resources": [
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.aaPKGHfc.js",
+			"client.CMSwgtGj.js",
+			"main.BGNtTCNs.js",
+			"index.BJJFgUIs.js",
+			"browser-startup-instrumentation.hp2BeFIz.js",
+			"client.-iLz22eX.js",
+			"virtual_pwa-register.xF1zYT3Q.js",
+			"workbox-window.prod.es5.BIl4cyR9.js",
+			"document-save.worker-BQTqGf7x.js",
+			"github-dark.DHJKELXO.js"
+		]
+	},
+	{
+		"feature": "syntax",
+		"run": 6,
+		"ms": 141.30000001192093,
+		"correct": true,
+		"resources": [
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.aaPKGHfc.js",
+			"client.CMSwgtGj.js",
+			"main.BGNtTCNs.js",
+			"index.BJJFgUIs.js",
+			"browser-startup-instrumentation.hp2BeFIz.js",
+			"client.-iLz22eX.js",
+			"virtual_pwa-register.xF1zYT3Q.js",
+			"workbox-window.prod.es5.BIl4cyR9.js",
+			"document-save.worker-BQTqGf7x.js",
+			"github-dark.DHJKELXO.js"
+		]
+	},
+	{
+		"feature": "syntax",
+		"run": 7,
+		"ms": 141.60000002384186,
+		"correct": true,
+		"resources": [
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.aaPKGHfc.js",
+			"client.CMSwgtGj.js",
+			"main.BGNtTCNs.js",
+			"index.BJJFgUIs.js",
+			"browser-startup-instrumentation.hp2BeFIz.js",
+			"client.-iLz22eX.js",
+			"virtual_pwa-register.xF1zYT3Q.js",
+			"workbox-window.prod.es5.BIl4cyR9.js",
+			"document-save.worker-BQTqGf7x.js",
+			"github-dark.DHJKELXO.js"
+		]
+	},
+	{
+		"feature": "zip-export",
+		"run": 1,
+		"ms": 4134.400000035763,
+		"size": 446842,
+		"resources": [
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.aaPKGHfc.js",
+			"client.CMSwgtGj.js",
+			"main.BGNtTCNs.js",
+			"index.BJJFgUIs.js",
+			"browser-startup-instrumentation.hp2BeFIz.js",
+			"client.-iLz22eX.js",
+			"virtual_pwa-register.xF1zYT3Q.js",
+			"workbox-window.prod.es5.BIl4cyR9.js",
+			"document-save.worker-BQTqGf7x.js"
+		]
+	},
+	{
+		"feature": "zip-export",
+		"run": 2,
+		"ms": 3165.699999988079,
+		"size": 446842,
+		"resources": [
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.aaPKGHfc.js",
+			"client.CMSwgtGj.js",
+			"main.BGNtTCNs.js",
+			"index.BJJFgUIs.js",
+			"browser-startup-instrumentation.hp2BeFIz.js",
+			"client.-iLz22eX.js",
+			"virtual_pwa-register.xF1zYT3Q.js",
+			"workbox-window.prod.es5.BIl4cyR9.js",
+			"document-save.worker-BQTqGf7x.js"
+		]
+	},
+	{
+		"feature": "zip-export",
+		"run": 3,
+		"ms": 2658.300000011921,
+		"size": 446842,
+		"resources": [
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.aaPKGHfc.js",
+			"client.CMSwgtGj.js",
+			"main.BGNtTCNs.js",
+			"index.BJJFgUIs.js",
+			"browser-startup-instrumentation.hp2BeFIz.js",
+			"client.-iLz22eX.js",
+			"virtual_pwa-register.xF1zYT3Q.js",
+			"workbox-window.prod.es5.BIl4cyR9.js",
+			"document-save.worker-BQTqGf7x.js"
+		]
+	},
+	{
+		"feature": "zip-export",
+		"run": 4,
+		"ms": 2090.300000011921,
+		"size": 446842,
+		"resources": [
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.aaPKGHfc.js",
+			"client.CMSwgtGj.js",
+			"main.BGNtTCNs.js",
+			"index.BJJFgUIs.js",
+			"browser-startup-instrumentation.hp2BeFIz.js",
+			"client.-iLz22eX.js",
+			"virtual_pwa-register.xF1zYT3Q.js",
+			"workbox-window.prod.es5.BIl4cyR9.js",
+			"document-save.worker-BQTqGf7x.js"
+		]
+	},
+	{
+		"feature": "zip-export",
+		"run": 5,
+		"ms": 2264.300000011921,
+		"size": 446842,
+		"resources": [
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.aaPKGHfc.js",
+			"client.CMSwgtGj.js",
+			"main.BGNtTCNs.js",
+			"index.BJJFgUIs.js",
+			"browser-startup-instrumentation.hp2BeFIz.js",
+			"client.-iLz22eX.js",
+			"virtual_pwa-register.xF1zYT3Q.js",
+			"workbox-window.prod.es5.BIl4cyR9.js",
+			"document-save.worker-BQTqGf7x.js"
+		]
+	},
+	{
+		"feature": "zip-export",
+		"run": 6,
+		"ms": 2351.899999976158,
+		"size": 446842,
+		"resources": [
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.aaPKGHfc.js",
+			"client.CMSwgtGj.js",
+			"main.BGNtTCNs.js",
+			"index.BJJFgUIs.js",
+			"browser-startup-instrumentation.hp2BeFIz.js",
+			"client.-iLz22eX.js",
+			"virtual_pwa-register.xF1zYT3Q.js",
+			"workbox-window.prod.es5.BIl4cyR9.js",
+			"document-save.worker-BQTqGf7x.js"
+		]
+	},
+	{
+		"feature": "zip-export",
+		"run": 7,
+		"ms": 2255,
+		"size": 446842,
+		"resources": [
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.aaPKGHfc.js",
+			"client.CMSwgtGj.js",
+			"main.BGNtTCNs.js",
+			"index.BJJFgUIs.js",
+			"browser-startup-instrumentation.hp2BeFIz.js",
+			"client.-iLz22eX.js",
+			"virtual_pwa-register.xF1zYT3Q.js",
+			"workbox-window.prod.es5.BIl4cyR9.js",
+			"document-save.worker-BQTqGf7x.js"
+		]
+	}
+]

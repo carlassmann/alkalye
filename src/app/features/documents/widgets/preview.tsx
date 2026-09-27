@@ -125,8 +125,6 @@ function Preview({
 
 	let marked = useMarked(wikilinkResolver, syntaxTheme)
 
-	if (!marked) return null
-
 	return (
 		<PreviewContent
 			content={content}
@@ -767,46 +765,50 @@ function useMarked(
 	wikilinkResolver: WikilinkTitleResolver,
 	syntaxTheme: SyntaxTheme,
 ) {
-	let [marked, setMarked] = useState<Marked | null>(null)
-	let resolverRef = useRef(wikilinkResolver)
-	useEffect(() => {
-		resolverRef.current = wikilinkResolver
-	})
+	let [loaded, setLoaded] = useState<{
+		theme: SyntaxTheme
+		highlighter: SyntaxHighlighter
+	} | null>(null)
 
 	useEffect(() => {
 		let cancelled = false
-		loadSyntaxHighlighter(syntaxTheme).then(highlighter => {
-			if (cancelled) return
-			let instance = createMarkedInstance(highlighter, syntaxTheme, id =>
-				resolverRef.current(id),
-			)
-			setMarked(instance)
-		})
+		loadSyntaxHighlighter(syntaxTheme)
+			.then(highlighter => {
+				if (!cancelled) setLoaded({ theme: syntaxTheme, highlighter })
+			})
+			.catch(() => {
+				if (!cancelled) setLoaded(null)
+			})
 		return () => {
 			cancelled = true
 		}
 	}, [syntaxTheme])
 
-	return marked
+	return createMarkedInstance(
+		loaded?.theme === syntaxTheme ? loaded.highlighter : null,
+		syntaxTheme,
+		wikilinkResolver,
+	)
 }
 
 function createMarkedInstance(
-	highlighter: SyntaxHighlighter,
+	highlighter: SyntaxHighlighter | null,
 	theme: SyntaxTheme,
 	wikilinkResolver: WikilinkTitleResolver,
 ) {
 	let instance = new Marked()
-	instance.use(
-		markedShiki({
-			highlight(code, lang) {
-				return highlighter.highlight({
-					code,
-					language: lang,
-					theme,
-				})
-			},
-		}),
-	)
+	if (highlighter)
+		instance.use(
+			markedShiki({
+				highlight(code, lang) {
+					return highlighter.highlight({
+						code,
+						language: lang,
+						theme,
+					})
+				},
+			}),
+		)
 	instance.use(createWikilinkExtension(wikilinkResolver))
 	instance.use({
 		renderer: {

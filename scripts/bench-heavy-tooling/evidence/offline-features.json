@@ -1,0 +1,42 @@
+[
+	{
+		"feature": "syntax",
+		"run": 1,
+		"ms": 122.59999996423721,
+		"correct": true,
+		"resources": [
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.RXbpzhSV.js",
+			"client.CMSwgtGj.js",
+			"main.ywEHGIxA.js",
+			"index.BJJFgUIs.js",
+			"browser-startup-instrumentation.hp2BeFIz.js",
+			"client.-iLz22eX.js",
+			"virtual_pwa-register.C-ODbOFP.js",
+			"workbox-window.prod.es5.BIl4cyR9.js",
+			"document-save.worker-BQTqGf7x.js",
+			"syntax-highlighter.CVr00Ptv.js",
+			"github-dark.DHJKELXO.js"
+		]
+	},
+	{
+		"feature": "zip-export",
+		"run": 1,
+		"ms": 981.3999999761581,
+		"size": 446842,
+		"resources": [
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.RXbpzhSV.js",
+			"client.CMSwgtGj.js",
+			"index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+			"main.ywEHGIxA.js",
+			"index.BJJFgUIs.js",
+			"browser-startup-instrumentation.hp2BeFIz.js",
+			"client.-iLz22eX.js",
+			"virtual_pwa-register.C-ODbOFP.js",
+			"workbox-window.prod.es5.BIl4cyR9.js",
+			"document-save.worker-BQTqGf7x.js",
+			"jszip.min.CKDIplGq.js"
+		]
+	}
+]
