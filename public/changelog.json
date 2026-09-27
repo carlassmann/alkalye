@@ -1,11 +1,20 @@
 [
 	{
+		"id": 152,
+		"date": "2026-09-27",
+		"title": "Keep your search when switching documents",
+		"notes": [
+			"Switch between documents without losing your search in the document list."
+		],
+		"pr": 55
+	},
+	{
 		"id": 151,
 		"date": "2026-09-27",
-		"title": "Load writing tools when needed",
+		"title": "Less waiting when opening documents",
 		"notes": [
-			"Opening a document loads less JavaScript. Syntax highlighting, video conversion and ZIP tools load when you use them.",
-			"Previews stay readable while syntax highlighting loads, including when it cannot load."
+			"Opening a document has less to download before you can start writing.",
+			"Code in previews stays readable even when its colors take longer to appear."
 		],
 		"pr": 54
 	},
@@ -14,26 +23,28 @@
 		"date": "2026-09-27",
 		"title": "Start writing sooner",
 		"notes": [
-			"The startup splash disappears as soon as your screen is ready, without an extra delay or fade blocking the editor."
+			"The loading screen gets out of your way as soon as your document is ready."
 		],
 		"pr": 53
 	},
 	{
 		"id": 149,
 		"date": "2026-09-24",
-		"title": "Calmer editor suggestions",
+		"title": "Suggestions that stay out of your way",
 		"notes": [
-			"Link and asset suggestions stay open while documents update.",
-			"Code fences show language suggestions only after a language prefix or an explicit request.",
-			"Suggestion popups stay off on devices without a mouse, trackpad, or other fine pointer."
+			"Link and attachment suggestions stay open while your document updates.",
+			"When adding a code block, language suggestions appear after you start typing a language or ask for suggestions.",
+			"Suggestion popups no longer interrupt writing on touch-only devices."
 		],
 		"pr": 51
 	},
 	{
 		"id": 148,
 		"date": "2026-09-24",
-		"title": "Accurate task completion styling",
-		"notes": ["Unchecked tasks stay open when their text contains [x]."],
+		"title": "Tasks stay unchecked until you complete them",
+		"notes": [
+			"Writing [x] inside a task no longer makes the task look completed."
+		],
 		"pr": 42
 	},
 	{
@@ -46,11 +57,11 @@
 	{
 		"id": 146,
 		"date": "2026-09-22",
-		"title": "Clearer sidebar controls and smoother button changes",
+		"title": "Clearer sidebar buttons",
 		"notes": [
-			"Open sidebars show distinct close-panel buttons with clear labels",
-			"Button icons blend smoothly when copying, changing themes or views, expanding media, and toggling comments",
-			"Icon transitions respect reduced-motion preferences"
+			"Open sidebars have clearly labeled close buttons.",
+			"Icons change smoothly when you copy, switch views or themes, and show or hide document tools.",
+			"These animations follow your device's reduced-motion setting."
 		],
 		"pr": 49
 	},
@@ -77,11 +88,11 @@
 	{
 		"id": 142,
 		"date": "2026-09-20",
-		"title": "Connect any MCP client",
+		"title": "Connect your AI apps",
 		"notes": [
-			"The MCP URL is always visible in Settings so you can connect ChatGPT or any MCP-compatible client",
-			"The endpoint now serves modern stateless MCP HTTP only",
-			"Native apps can complete OAuth using local loopback callbacks"
+			"Find the connection address in Settings to connect ChatGPT or another app that supports MCP.",
+			"Connections now require the current MCP connection format. Older SSE connections are no longer supported.",
+			"Desktop apps can now finish signing in to Alkalye."
 		],
 		"pr": 44
 	},
@@ -98,9 +109,9 @@
 	{
 		"id": 139,
 		"date": "2026-09-15",
-		"title": "Local folders drop the mirrored backup",
+		"title": "Local edits save directly to your files",
 		"notes": [
-			"Files in an opened folder are written directly, without a second mirrored copy"
+			"Changes to files in an opened folder save straight to that folder. Alkalye no longer keeps a separate backup copy of those files."
 		],
 		"commit": "9a6ca85f"
 	},
@@ -116,9 +127,9 @@
 	{
 		"id": 137,
 		"date": "2026-09-15",
-		"title": "Document assets from the CLI",
+		"title": "Manage images and videos from the terminal",
 		"notes": [
-			"List, add and remove a document's images and videos with the alkalye command"
+			"Use the alkalye command to list, add or remove a document's images and videos."
 		],
 		"commit": "ca62541d"
 	},
@@ -152,17 +163,19 @@
 	{
 		"id": 133,
 		"date": "2026-09-11",
-		"title": "Settings, rebuilt",
+		"title": "Settings are easier to navigate",
 		"notes": [
-			"Every settings screen now shares one layout, so options sit where you expect them"
+			"Settings screens now use a consistent layout, making options easier to find."
 		],
 		"commit": "99c00477"
 	},
 	{
 		"id": 132,
 		"date": "2026-09-11",
-		"title": "Sign in to connected apps with OAuth",
-		"notes": ["Apps and agents authorize through a standard OAuth exchange"],
+		"title": "Sign in to connected apps",
+		"notes": [
+			"You can now sign in to authorize an app or AI assistant to use Alkalye."
+		],
 		"commit": "3608abde"
 	},
 	{
@@ -179,7 +192,7 @@
 		"date": "2026-09-11",
 		"title": "Use Alkalye from ChatGPT",
 		"notes": [
-			"Connect Alkalye as an MCP app and let ChatGPT read and write your documents"
+			"Connect Alkalye to ChatGPT so you can ask it to read and update your documents."
 		],
 		"commit": "bf3964b9"
 	},
@@ -193,71 +206,71 @@
 	{
 		"id": 128,
 		"date": "2026-09-10",
-		"title": "Choose a syntax highlighting theme",
-		"notes": ["Code blocks can follow a highlighting theme of your choice"],
+		"title": "Choose colors for code blocks",
+		"notes": [
+			"Choose the color theme used to highlight code in your documents."
+		],
 		"commit": "cc90884a"
 	},
 	{
 		"id": 127,
 		"date": "2026-09-10",
-		"title": "Bundeswehr document and slideshow theme",
+		"title": "Bundeswehr theme for documents and slides",
 		"notes": [
-			"A portable theme for documents and slideshows, including its own banner artwork"
+			"Give documents and slides a Bundeswehr design, complete with banner artwork."
 		],
 		"commit": "a2640219"
 	},
 	{
 		"id": 126,
 		"date": "2026-09-10",
-		"title": "A simpler starting point for themes",
+		"title": "An easier starting point for your own themes",
 		"notes": [
-			"The theme starter is easier to read, with several rough edges smoothed out"
+			"The starter theme is easier to read and adapt when creating your own design."
 		],
 		"commit": "3ee2fd27"
 	},
 	{
 		"id": 125,
 		"date": "2026-09-09",
-		"title": "A bigger theme editor",
+		"title": "More room to edit themes",
 		"notes": [
-			"The theme source editor fills its pane instead of sitting in a small box"
+			"The theme editor now uses the full panel, giving you more room to work."
 		],
 		"commit": "91561b9b"
 	},
 	{
 		"id": 124,
 		"date": "2026-09-09",
-		"title": "Theme exports are checked before you download them",
+		"title": "More reliable theme downloads",
 		"notes": [
-			"Incomplete exports are caught, and SVG thumbnails are kept safe to open"
+			"Alkalye checks for missing parts before you download a theme and removes unsafe content from its preview image."
 		],
 		"commit": "00ee51e3"
 	},
 	{
 		"id": 123,
 		"date": "2026-09-09",
-		"title": "Theme thumbnails survive an export",
+		"title": "Shared themes keep their preview images",
 		"notes": [
-			"Exported themes keep their preview images and carry their assets with them"
+			"Downloaded themes include their preview images and other files, so they stay together when you share them."
 		],
 		"commit": "725712e2"
 	},
 	{
 		"id": 122,
 		"date": "2026-09-09",
-		"title": "Themes are portable Markdown files",
+		"title": "Share a theme as one file",
 		"notes": [
-			"A theme is one Markdown file with its assets embedded, so it can be shared anywhere"
+			"Download a theme as a single Markdown file with its images included."
 		],
 		"commit": "4fbb88a7"
 	},
 	{
 		"id": 121,
 		"date": "2026-09-09",
-		"title": "Pasting a large theme no longer freezes",
-		"notes": [
-			"Big theme sources paste instantly and stay bound to their source"
-		],
+		"title": "Paste large themes without freezing",
+		"notes": ["Pasting a large theme no longer freezes the editor."],
 		"commit": "0f1932f8"
 	},
 	{
@@ -272,9 +285,9 @@
 	{
 		"id": 119,
 		"date": "2026-09-08",
-		"title": "Write your own themes",
+		"title": "Create your own document themes",
 		"notes": [
-			"Edit themes as Markdown in a workbench, or manage them from the CLI"
+			"Write and edit your own themes in the theme editor, or manage them from the terminal."
 		],
 		"commit": "1cb8aff1"
 	},
@@ -297,15 +310,19 @@
 	{
 		"id": 116,
 		"date": "2026-09-06",
-		"title": "Fixed indentation for custom task states",
-		"notes": ["Custom task markers keep their indentation"],
+		"title": "Task indentation stays in place",
+		"notes": [
+			"Tasks keep their indentation when you use a custom task marker."
+		],
 		"commit": "c0285342"
 	},
 	{
 		"id": 115,
 		"date": "2026-09-06",
-		"title": "Fixed ligature rendering",
-		"notes": ["Ligatures no longer smear as you type"],
+		"title": "Clearer text while typing",
+		"notes": [
+			"Characters that join together no longer leave smears as you type."
+		],
 		"commit": "c7df2cbf"
 	},
 	{
@@ -346,9 +363,9 @@
 	{
 		"id": 109,
 		"date": "2026-08-31",
-		"title": "Fixed images that failed to appear",
+		"title": "Images appear reliably",
 		"notes": [
-			"Documents load their images even when the relation resolves late"
+			"Images no longer stay missing when they take longer than the rest of the document to load."
 		],
 		"commit": "ec06c9c7"
 	},
@@ -385,9 +402,9 @@
 	{
 		"id": 104,
 		"date": "2026-08-22",
-		"title": "Complete Markdown shortcuts",
+		"title": "More formatting shortcuts",
 		"notes": [
-			"The editor's keyboard shortcuts now cover the full set of Markdown constructs"
+			"Use keyboard shortcuts for more of the formatting available in the editor."
 		],
 		"commit": "e87bcaa4"
 	},
@@ -440,25 +457,27 @@
 	{
 		"id": 97,
 		"date": "2026-08-17",
-		"title": "CLI improvements",
+		"title": "Clearer command-line output",
 		"notes": [
-			"Clearer output and smoother handling across the alkalye command"
+			"The alkalye command gives clearer output when you work from the terminal."
 		],
 		"commit": "8ec9c683"
 	},
 	{
 		"id": 96,
 		"date": "2026-08-15",
-		"title": "Softer sidebar highlight",
-		"notes": ["The active document stands out without shouting"],
+		"title": "A subtler highlight for the selected document",
+		"notes": [
+			"The selected document is easier to spot without a distracting highlight."
+		],
 		"commit": "32db6c61"
 	},
 	{
 		"id": 95,
 		"date": "2026-08-14",
-		"title": "Faster startup for long-lived accounts",
+		"title": "Faster startup for accounts with a long history",
 		"notes": [
-			"Startup no longer slows down as your account grows, and document history is preserved"
+			"Alkalye opens faster for accounts with a long history of edits, while keeping document history available."
 		],
 		"commit": "b2f969fa"
 	},
@@ -493,8 +512,8 @@
 	{
 		"id": 90,
 		"date": "2026-07-10",
-		"title": "Faster startup",
-		"notes": ["Document metadata loads first, so the app is usable sooner"],
+		"title": "Start working sooner",
+		"notes": ["You can start using Alkalye sooner while your documents load."],
 		"commit": "02114c92"
 	},
 	{
@@ -509,8 +528,8 @@
 	{
 		"id": 88,
 		"date": "2026-06-29",
-		"title": "Fixed CLI document freshness",
-		"notes": ["The CLI reads the current version of a document"],
+		"title": "Read up-to-date documents from the terminal",
+		"notes": ["The alkalye command reads the latest version of your document."],
 		"commit": "81b41822"
 	},
 	{
@@ -544,8 +563,10 @@
 	{
 		"id": 83,
 		"date": "2026-06-19",
-		"title": "Install the CLI with Bun",
-		"notes": ["bun link makes the alkalye command available everywhere"],
+		"title": "Run Alkalye from any terminal folder",
+		"notes": [
+			"When installing the command-line tool with Bun, use bun link to make the alkalye command available from any folder."
+		],
 		"commit": "42e9f9a0"
 	},
 	{
@@ -576,8 +597,10 @@
 	{
 		"id": 79,
 		"date": "2026-06-07",
-		"title": "Fixed navigation after deleting",
-		"notes": ["Deleting a document in a space takes you somewhere sensible"],
+		"title": "Stay in your space after deleting a document",
+		"notes": [
+			"Deleting the document you are viewing in a space keeps you in that space."
+		],
 		"commit": "f3ea8535"
 	},
 	{
@@ -604,8 +627,8 @@
 	{
 		"id": 75,
 		"date": "2026-05-15",
-		"title": "Fixed the overflowing sign-in button",
-		"notes": ["The auth button fits its container"],
+		"title": "A sign-in button that fits",
+		"notes": ["The sign-in button no longer extends beyond its panel."],
 		"commit": "62708ab2"
 	},
 	{
@@ -639,16 +662,18 @@
 	{
 		"id": 70,
 		"date": "2026-05-06",
-		"title": "Fixed the lingering drop cursor",
-		"notes": ["The drop indicator disappears after you drop a file"],
+		"title": "No lingering marker after dropping a file",
+		"notes": [
+			"The marker showing where a file will land disappears after you drop it."
+		],
 		"commit": "25d460bd"
 	},
 	{
 		"id": 69,
 		"date": "2026-05-06",
-		"title": "Fixed text shifting under remote cursors",
+		"title": "Text stays still while others edit",
 		"notes": [
-			"Paragraphs stay put while someone else's cursor moves through them"
+			"Paragraphs no longer shift as another person's cursor moves through them."
 		],
 		"commit": "dfb2c464"
 	},
@@ -662,29 +687,33 @@
 	{
 		"id": 67,
 		"date": "2026-03-24",
-		"title": "Smoother remote cursors",
-		"notes": ["Collaborators' cursors move fluidly instead of jumping"],
+		"title": "Smoother cursors when working together",
+		"notes": ["Other people's cursors move smoothly instead of jumping."],
 		"commit": "5bd73409"
 	},
 	{
 		"id": 66,
 		"date": "2026-03-18",
-		"title": "The Alkalye CLI",
-		"notes": ["Read, write and manage your documents from the terminal"],
+		"title": "Use Alkalye from the terminal",
+		"notes": [
+			"Read, write and manage your documents with the alkalye command."
+		],
 		"commit": "d7e5292f"
 	},
 	{
 		"id": 65,
 		"date": "2026-03-18",
-		"title": "Clearer CLI help",
-		"notes": ["Running alkalye with no arguments explains what it can do"],
+		"title": "Find help for terminal commands",
+		"notes": ["Run alkalye without a command to see what you can do."],
 		"commit": "cbe4857c"
 	},
 	{
 		"id": 64,
 		"date": "2026-03-15",
 		"title": "Word and character count",
-		"notes": ["A stats badge in the editor tracks the size of your document"],
+		"notes": [
+			"See how many words and characters are in your document as you write."
+		],
 		"commit": "c8c329d9"
 	},
 	{
@@ -713,15 +742,17 @@
 	{
 		"id": 60,
 		"date": "2026-03-02",
-		"title": "Bigger touch targets",
-		"notes": ["Buttons and menu items are easier to hit on a phone"],
+		"title": "Buttons are easier to tap",
+		"notes": ["Buttons and menu items are easier to tap on a phone."],
 		"commit": "826ec6a6"
 	},
 	{
 		"id": 59,
 		"date": "2026-03-02",
-		"title": "Properly sized text fields",
-		"notes": ["Multi-line inputs grow to fit what you type"],
+		"title": "Text fields grow as you type",
+		"notes": [
+			"Text fields with multiple lines expand so you can see more of what you have written."
+		],
 		"commit": "fbf78431"
 	},
 	{
@@ -736,15 +767,19 @@
 	{
 		"id": 57,
 		"date": "2026-03-02",
-		"title": "Sign in when access is denied",
-		"notes": ["If you are signed out, the denial offers you the sign-in flow"],
+		"title": "Sign in to open a shared space",
+		"notes": [
+			"If you are signed out when you try to open a restricted space, you can sign in from that screen."
+		],
 		"commit": "414ec1fa"
 	},
 	{
 		"id": 56,
 		"date": "2026-02-23",
-		"title": "No more light mode flash",
-		"notes": ["Dark mode applies before the first paint"],
+		"title": "No bright flash in dark mode",
+		"notes": [
+			"Opening Alkalye in dark mode no longer briefly shows a light screen."
+		],
 		"commit": "3abb7ae6"
 	},
 	{
@@ -757,8 +792,10 @@
 	{
 		"id": 54,
 		"date": "2026-02-16",
-		"title": "Two-way filesystem sync",
-		"notes": ["Personal documents and spaces stay in step with files on disk"],
+		"title": "Keep documents and local files in sync",
+		"notes": [
+			"Changes to your personal documents and spaces can sync to files on your computer, and changes to those files sync back."
+		],
 		"commit": "d3888381"
 	},
 	{
@@ -806,15 +843,17 @@
 	{
 		"id": 47,
 		"date": "2026-01-18",
-		"title": "Custom wikilink titles",
-		"notes": ["Link to a document under a name of your choosing"],
+		"title": "Choose the text for a document link",
+		"notes": ["Link to another document using your own label."],
 		"commit": "c8971580"
 	},
 	{
 		"id": 46,
 		"date": "2026-01-17",
-		"title": "Sidebar closes for the time machine",
-		"notes": ["Entering history gives the document the full width"],
+		"title": "More room to browse document history",
+		"notes": [
+			"The sidebar closes when you open document history, giving the document more room."
+		],
 		"commit": "f6628dfe"
 	},
 	{
@@ -834,8 +873,10 @@
 	{
 		"id": 43,
 		"date": "2026-01-16",
-		"title": "Fixed blank lines in lists",
-		"notes": ["Adding an item to a loose list no longer inserts an empty line"],
+		"title": "No extra blank lines when adding list items",
+		"notes": [
+			"Adding an item to a list with spaced-out entries no longer inserts an unwanted blank line."
+		],
 		"commit": "1a0ecef2"
 	},
 	{
@@ -848,8 +889,8 @@
 	{
 		"id": 41,
 		"date": "2026-01-16",
-		"title": "Fixed images followed by text",
-		"notes": ["An image and the text after it share a block correctly"],
+		"title": "Text displays correctly after images",
+		"notes": ["Text following an image now appears in the right place."],
 		"commit": "7e01605d"
 	},
 	{
@@ -862,8 +903,10 @@
 	{
 		"id": 39,
 		"date": "2026-01-16",
-		"title": "Moving a document brings its assets",
-		"notes": ["Images and videos follow the document into its new space"],
+		"title": "Images and videos move with your document",
+		"notes": [
+			"Moving a document to another space brings its images and videos with it."
+		],
 		"commit": "66d6519c"
 	},
 	{
@@ -925,52 +968,60 @@
 	{
 		"id": 30,
 		"date": "2026-01-13",
-		"title": "Hold delay in the time machine",
-		"notes": ["Next and previous need a deliberate hold before sweeping"],
+		"title": "More control when browsing document history",
+		"notes": [
+			"A quick press moves one step through history. Hold the button to keep moving through versions."
+		],
 		"commit": "e871b5f8"
 	},
 	{
 		"id": 29,
 		"date": "2026-01-13",
 		"title": "Screen stays awake while presenting",
-		"notes": ["Slideshow and teleprompter hold a wake lock"],
+		"notes": [
+			"Your screen stays on during slideshows and while you use the teleprompter."
+		],
 		"commit": "e25141fd"
 	},
 	{
 		"id": 28,
 		"date": "2026-01-12",
-		"title": "Fixed switching between documents",
+		"title": "Edits stay with the right document",
 		"notes": [
-			"The editor resets fully, so changes never land in the wrong document"
+			"Switching documents no longer sends your edits to the wrong document."
 		],
 		"commit": "a16eb1f2"
 	},
 	{
 		"id": 27,
 		"date": "2026-01-12",
-		"title": "Drag and drop assets",
-		"notes": ["Drop images and videos straight into a document"],
+		"title": "Drag images and videos into a document",
+		"notes": [
+			"Add images and videos by dropping them straight into your document."
+		],
 		"commit": "9973a833"
 	},
 	{
 		"id": 26,
 		"date": "2026-01-12",
-		"title": "Drop files anywhere in the list",
-		"notes": ["The drop zone covers the whole document list"],
+		"title": "Drop files anywhere in the document list",
+		"notes": ["Import files by dropping them anywhere in the document list."],
 		"commit": "1a6c4e6d"
 	},
 	{
 		"id": 25,
 		"date": "2026-01-12",
-		"title": "Download an asset",
-		"notes": ["Save an image or video back out of a document"],
+		"title": "Download images and videos",
+		"notes": ["Save an image or video from a document to your device."],
 		"commit": "123c5829"
 	},
 	{
 		"id": 24,
 		"date": "2026-01-12",
-		"title": "Frontmatter stays open",
-		"notes": ["Document settings no longer fold themselves away"],
+		"title": "Document settings stay visible",
+		"notes": [
+			"The settings at the top of a document no longer collapse on their own."
+		],
 		"commit": "4eea3677"
 	},
 	{
@@ -997,8 +1048,10 @@
 	{
 		"id": 20,
 		"date": "2026-01-09",
-		"title": "Fixed images in slideshows",
-		"notes": ["Slides show the assets you embedded"],
+		"title": "Images appear in slideshows",
+		"notes": [
+			"Images you add to a document now appear correctly on its slides."
+		],
 		"commit": "7bb2f518"
 	},
 	{
@@ -1011,8 +1064,8 @@
 	{
 		"id": 18,
 		"date": "2026-01-08",
-		"title": "Fixed remote cursors in Safari",
-		"notes": ["Other people's cursors repaint as they move"],
+		"title": "See other people's cursors in Safari",
+		"notes": ["Other people's cursors now update correctly as they move."],
 		"commit": "c563f63a"
 	},
 	{
@@ -1046,8 +1099,10 @@
 	{
 		"id": 13,
 		"date": "2026-01-07",
-		"title": "Cursors follow incoming changes",
-		"notes": ["Your cursor and selection stay put as other people edit"],
+		"title": "Keep your place while others edit",
+		"notes": [
+			"Your cursor and selected text stay in the right place as other people edit the document."
+		],
 		"commit": "7819b5b0"
 	},
 	{
@@ -1074,8 +1129,10 @@
 	{
 		"id": 9,
 		"date": "2026-01-02",
-		"title": "Editor settings apply before the first paint",
-		"notes": ["No flash of the wrong font or width"],
+		"title": "Your preferred layout appears right away",
+		"notes": [
+			"Documents open with your chosen font and width, without briefly showing the wrong layout."
+		],
 		"commit": "5ad626d1"
 	},
 	{
@@ -1095,8 +1152,8 @@
 	{
 		"id": 6,
 		"date": "2026-01-02",
-		"title": "Wikilinks",
-		"notes": ["Link documents with [[double brackets]]"],
+		"title": "Link your documents together",
+		"notes": ["Use [[double brackets]] to link to another document."],
 		"commit": "7428f763"
 	},
 	{
@@ -1116,8 +1173,8 @@
 	{
 		"id": 3,
 		"date": "2026-01-01",
-		"title": "Clearer error states",
-		"notes": ["Errors explain what happened instead of offering a dead end"],
+		"title": "Clearer error messages",
+		"notes": ["Error messages explain what went wrong."],
 		"commit": "3111704c"
 	},
 	{

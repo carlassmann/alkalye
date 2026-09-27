@@ -235,6 +235,12 @@ function SpaceDocScreen({ spaceId, id, loaderData }: SpaceDocScreenProps) {
 
 	return (
 		<SidebarProvider>
+			<SpaceDocumentSidebar
+				key={spaceId}
+				space={loadedSpace}
+				spaceId={spaceId}
+				docId={id}
+			/>
 			<SpaceEditorContent
 				key={id}
 				space={loadedSpace}
@@ -308,14 +314,8 @@ function SpaceEditorContent({
 
 	let { theme, setTheme } = useTheme()
 	let resolvedTheme = useResolvedTheme()
-	let {
-		toggleLeft,
-		toggleRight,
-		isMobile,
-		setLeftOpenMobile,
-		setRightOpenMobile,
-		setRightOpen,
-	} = useSidebar()
+	let { toggleLeft, toggleRight, isMobile, setRightOpenMobile, setRightOpen } =
+		useSidebar()
 
 	let isAuthenticated = useIsAuthenticated()
 	let me = useAccount(UserAccount, { resolve: spaceMeResolve })
@@ -508,9 +508,6 @@ function SpaceEditorContent({
 		editor,
 		t,
 	])
-
-	let allDocs = getSpaceDocs(space)
-	let spaceDocs = space.documents?.$isLoaded ? space.documents : null
 
 	function persistContent(
 		pendingContent: string,
@@ -748,76 +745,7 @@ function SpaceEditorContent({
 				true, window.__alkalyeReady is true, and window.__alkalyeReadyRoute is
 				space-doc.
 			</p>
-			<ListSidebar
-				header={
-					<>
-						<SidebarImportExport
-							docs={allDocs.filter(d => !d.deletedAt)}
-							onImport={async files => {
-								if (spaceDocs) await handleImportFiles(files, spaceDocs)
-							}}
-						/>
-						<Button
-							size="sm"
-							nativeButton={false}
-							data-testid={testIds.doc.newButton}
-							render={
-								<Link
-									to="/new"
-									search={{ spaceId }}
-									onClick={() => isMobile && setLeftOpenMobile(false)}
-								/>
-							}
-						>
-							<Plus />
-							{t("doc.new")}
-						</Button>
-					</>
-				}
-				footer={<SidebarSyncStatus />}
-				onImport={async files => {
-					if (spaceDocs) await handleImportFiles(files, spaceDocs)
-				}}
-			>
-				<SpaceSelector />
-				<SidebarDocumentList
-					docs={allDocs}
-					currentDocId={docId}
-					isLoading={
-						!space.documents?.$isLoaded ||
-						(space.documents.length > 0 && allDocs.length === 0)
-					}
-					onDocClick={() => isMobile && setLeftOpenMobile(false)}
-					onDuplicate={docToDuplicate =>
-						handleDuplicateDocument(
-							docToDuplicate,
-							space,
-							isMobile,
-							setLeftOpenMobile,
-							navigate,
-							spaceId,
-						)
-					}
-					onDelete={docToDelete => {
-						docToDelete.$jazz.set("deletedAt", new Date())
-						if (docToDelete.$jazz.id === docId) {
-							navigate({ to: "/spaces/$spaceId", params: { spaceId } })
-						}
-					}}
-					onCreateFolder={makeCreateFolderDocument(
-						space,
-						spaceId,
-						isMobile,
-						setLeftOpenMobile,
-						navigate,
-					)}
-					onImport={async (files, options) => {
-						if (spaceDocs) await handleImportFiles(files, spaceDocs, options)
-					}}
-					spaceId={spaceId}
-					spaceGroupId={space.$jazz.owner.$jazz.id}
-				/>
-			</ListSidebar>
+
 			<div className="markdown-editor flex-1" data-testid={testIds.doc.editor}>
 				<MarkdownEditor
 					key={docId}
@@ -1045,6 +973,94 @@ function SpaceEditorContent({
 			</DocumentSidebar>
 			{tldrawEditor.dialog}
 		</>
+	)
+}
+
+function SpaceDocumentSidebar({
+	space,
+	spaceId,
+	docId,
+}: {
+	space: LoadedSpace
+	spaceId: string
+	docId: string
+}) {
+	let t = useIntl()
+	let navigate = useNavigate()
+	let { isMobile, setLeftOpenMobile } = useSidebar()
+	let allDocs = getSpaceDocs(space)
+	let spaceDocs = space.documents?.$isLoaded ? space.documents : null
+	return (
+		<ListSidebar
+			header={
+				<>
+					<SidebarImportExport
+						docs={allDocs.filter(d => !d.deletedAt)}
+						onImport={async files => {
+							if (spaceDocs) await handleImportFiles(files, spaceDocs)
+						}}
+					/>
+					<Button
+						size="sm"
+						nativeButton={false}
+						data-testid={testIds.doc.newButton}
+						render={
+							<Link
+								to="/new"
+								search={{ spaceId }}
+								onClick={() => isMobile && setLeftOpenMobile(false)}
+							/>
+						}
+					>
+						<Plus />
+						{t("doc.new")}
+					</Button>
+				</>
+			}
+			footer={<SidebarSyncStatus />}
+			onImport={async files => {
+				if (spaceDocs) await handleImportFiles(files, spaceDocs)
+			}}
+		>
+			<SpaceSelector />
+			<SidebarDocumentList
+				docs={allDocs}
+				currentDocId={docId}
+				isLoading={
+					!space.documents?.$isLoaded ||
+					(space.documents.length > 0 && allDocs.length === 0)
+				}
+				onDocClick={() => isMobile && setLeftOpenMobile(false)}
+				onDuplicate={docToDuplicate =>
+					handleDuplicateDocument(
+						docToDuplicate,
+						space,
+						isMobile,
+						setLeftOpenMobile,
+						navigate,
+						spaceId,
+					)
+				}
+				onDelete={docToDelete => {
+					docToDelete.$jazz.set("deletedAt", new Date())
+					if (docToDelete.$jazz.id === docId) {
+						navigate({ to: "/spaces/$spaceId", params: { spaceId } })
+					}
+				}}
+				onCreateFolder={makeCreateFolderDocument(
+					space,
+					spaceId,
+					isMobile,
+					setLeftOpenMobile,
+					navigate,
+				)}
+				onImport={async (files, options) => {
+					if (spaceDocs) await handleImportFiles(files, spaceDocs, options)
+				}}
+				spaceId={spaceId}
+				spaceGroupId={space.$jazz.owner.$jazz.id}
+			/>
+		</ListSidebar>
 	)
 }
 
