@@ -172,8 +172,9 @@ test.each(["mouse", "touch"])(
 		frame.contentDocument.append(slide)
 		surface.setPointerCapture = vi.fn()
 		surface.getBoundingClientRect = () => new DOMRect(0, 0, 200, 100)
+		let pointerSurface = surface
 		function move(type: string, x: number) {
-			surface.dispatchEvent(pointer(type, 1, true, x, pointerType))
+			pointerSurface.dispatchEvent(pointer(type, 1, true, x, pointerType))
 		}
 		move("pointerdown", 100)
 		let first = transport.sent.at(-1)
