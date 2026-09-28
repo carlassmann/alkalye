@@ -260,15 +260,35 @@ function LaserPreview({
 			?.querySelector("[data-current-slide]")
 			?.getAttribute("data-current-slide")
 		if (previewSlide !== String(target.slideNumber)) return stopPointing()
-		let bounds = event.currentTarget.getBoundingClientRect()
-		let x = (event.clientX - bounds.left) / bounds.width
-		let y = (event.clientY - bounds.top) / bounds.height
+		let samples = event.nativeEvent.getCoalescedEvents?.() ?? []
+		for (let sample of [...samples, event.nativeEvent]) {
+			pointAtPosition(event.currentTarget, sample.clientX, sample.clientY)
+		}
+	}
+
+	function pointAtPosition(
+		surface: HTMLDivElement,
+		clientX: number,
+		clientY: number,
+	) {
+		if (!target) return
+		let bounds = surface.getBoundingClientRect()
+		let x = (clientX - bounds.left) / bounds.width
+		let y = (clientY - bounds.top) / bounds.height
 		if (x < 0 || x > 1 || y < 0 || y > 1) return pausePointing()
 		if (!pointRef.current) {
 			strokeRef.current = crypto.randomUUID()
 			lastSentAt.current = -Infinity
 		}
+		let samples = pointRef.current?.samples ?? []
+		let previous = samples.at(-1)
+		if (!previous || previous.x !== x || previous.y !== y)
+			samples = [
+				...samples,
+				{ index: (previous?.index ?? -1) + 1, x, y },
+			].slice(-128)
 		let point: LaserPoint = {
+			samples,
 			type: "point",
 			stroke: strokeRef.current,
 			target: target.id,

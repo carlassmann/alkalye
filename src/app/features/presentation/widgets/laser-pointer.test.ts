@@ -196,3 +196,44 @@ test.each(["mouse", "touch"])(
 		expect(transport.sent).toHaveLength(count)
 	},
 )
+
+test("retains coalesced fast movement in the final synced message", () => {
+	advertise("screen")
+	let frame = container.querySelector("iframe")
+	let surface = container.querySelector("[data-laser-surface]")
+	if (!(surface instanceof HTMLElement) || !frame?.contentDocument)
+		throw new Error("Preview missing")
+	let slide = frame.contentDocument.createElement("div")
+	slide.setAttribute("data-current-slide", "1")
+	frame.contentDocument.append(slide)
+	surface.setPointerCapture = vi.fn()
+	surface.getBoundingClientRect = () => new DOMRect(0, 0, 200, 100)
+	let clock = vi.spyOn(performance, "now").mockReturnValue(0)
+	try {
+		surface.dispatchEvent(pointer("pointerdown", 1))
+		let move = pointer("pointermove", 1)
+		let samples = Array.from({ length: 60 }, (_, index) => ({
+			clientX: 100 + Math.cos((index / 59) * Math.PI * 2) * 40,
+			clientY: 50 + Math.sin((index / 59) * Math.PI * 2) * 40,
+		}))
+		Object.defineProperty(move, "getCoalescedEvents", { value: () => samples })
+		surface.dispatchEvent(move)
+		expect(
+			transport.sent.filter(message => message.type === "point"),
+		).toHaveLength(1)
+		surface.dispatchEvent(pointer("pointerup", 1))
+		let end = transport.sent.at(-1)
+		if (end?.type !== "point") throw new Error("Point missing")
+		expect(end.visible).toBe(false)
+		expect(end.samples).toHaveLength(62)
+		expect(end.samples?.slice(1, 61)).toEqual(
+			samples.map((sample, index) => ({
+				index: index + 1,
+				x: sample.clientX / 200,
+				y: sample.clientY / 100,
+			})),
+		)
+	} finally {
+		clock.mockRestore()
+	}
+})

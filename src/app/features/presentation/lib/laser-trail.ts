@@ -11,45 +11,64 @@ function createLaserTrailState(now = () => performance.now()) {
 	let lastActivity = -Infinity
 	let drawing = false
 	let legacyStroke = 0
+	let sampledStroke: string | undefined
+	let sampleIndex = -1
 
 	function clear() {
 		points = []
 		lastActivity = -Infinity
 		drawing = false
+		sampledStroke = undefined
+		sampleIndex = -1
+	}
+
+	function addPoint(point: LaserPoint) {
+		let time = now()
+		if (!point.visible) {
+			let previous = points.at(-1)
+			if (
+				drawing &&
+				previous &&
+				(previous.x !== point.x || previous.y !== point.y)
+			) {
+				points.push({ x: point.x, y: point.y, stroke: previous.stroke })
+				if (points.length > pointLimit) points.shift()
+			}
+			if (drawing) lastActivity = time
+			drawing = false
+			return
+		}
+		if (!drawing) legacyStroke++
+		drawing = true
+		lastActivity = time
+		let stroke = point.stroke ?? String(legacyStroke)
+		let previous = points.at(-1)
+		if (
+			previous?.stroke === stroke &&
+			previous.x === point.x &&
+			previous.y === point.y
+		)
+			return
+		points.push({ x: point.x, y: point.y, stroke })
+		if (points.length > pointLimit) points.shift()
 	}
 
 	return {
 		clear,
 		add(point: LaserPoint) {
-			let time = now()
-			if (time - lastActivity >= delay + fadeDuration) clear()
-			if (!point.visible) {
-				let previous = points.at(-1)
-				if (
-					drawing &&
-					previous &&
-					(previous.x !== point.x || previous.y !== point.y)
-				) {
-					points.push({ x: point.x, y: point.y, stroke: previous.stroke })
-					if (points.length > pointLimit) points.shift()
+			if (now() - lastActivity >= delay + fadeDuration) clear()
+			if (point.stroke && point.samples) {
+				if (sampledStroke !== point.stroke) {
+					sampledStroke = point.stroke
+					sampleIndex = -1
 				}
-				if (drawing) lastActivity = time
-				drawing = false
-				return
+				for (let sample of point.samples) {
+					if (sample.index <= sampleIndex) continue
+					addPoint({ ...point, x: sample.x, y: sample.y, visible: true })
+					sampleIndex = sample.index
+				}
 			}
-			if (!drawing) legacyStroke++
-			drawing = true
-			lastActivity = time
-			let stroke = point.stroke ?? String(legacyStroke)
-			let previous = points.at(-1)
-			if (
-				previous?.stroke === stroke &&
-				previous.x === point.x &&
-				previous.y === point.y
-			)
-				return
-			points.push({ x: point.x, y: point.y, stroke })
-			if (points.length > pointLimit) points.shift()
+			addPoint(point)
 		},
 		frame() {
 			let elapsed = Math.max(0, now() - lastActivity - delay)
