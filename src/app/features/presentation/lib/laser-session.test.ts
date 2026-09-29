@@ -53,3 +53,22 @@ describe("laser display leases", () => {
 		}
 	})
 })
+
+test("accepts continuously renewed tokens with 750 ms latency in each direction", () => {
+	let now = 0
+	let leases = createLaserLease(() => now)
+	let announcements: { sent: number; token: string }[] = []
+	let accepted = 0
+	let attempted = 0
+	for (now = 0; now < 10_000; now += 50) {
+		if (now % laserTiming.announce === 0)
+			announcements.push({ sent: now, token: leases.issue("slide") })
+		let latest = announcements
+			.filter(message => message.sent <= now - 1500)
+			.at(-1)
+		if (!latest) continue
+		attempted++
+		if (leases.accepts(latest.token, "slide")) accepted++
+	}
+	expect(accepted).toBe(attempted)
+})

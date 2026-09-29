@@ -9,11 +9,10 @@ type LaserPoint = Extract<LaserMessage, { type: "point" }>
 let laserTiming = {
 	announce: 500,
 	disconnect: 5000,
-	pointHeartbeat: 100,
+	pointHeartbeat: 500,
 	pointThrottle: 50,
-	pointExpiry: 1200,
 	leaseRotation: 750,
-	leaseExpiry: 2000,
+	leaseExpiry: 5000,
 }
 
 function laserLayoutKey(

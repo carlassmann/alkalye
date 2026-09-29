@@ -2,7 +2,7 @@ import React from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { flushSync } from "react-dom"
 import { afterEach, beforeEach, expect, test, vi } from "vitest"
-import type { LaserMessage } from "../lib/laser-schema"
+import { packLaserMessage, type LaserMessage } from "../lib/laser-schema"
 import { laserLayoutKey } from "../lib/laser-session"
 
 let transport = vi.hoisted(() => {
@@ -237,4 +237,56 @@ test("pauses when the preview has no area, then resumes with valid coordinates",
 	surface.getBoundingClientRect = () => new DOMRect(0, 0, 200, 100)
 	surface.dispatchEvent(pointer("pointermove", 1))
 	expect(transport.sent.at(-1)).toMatchObject({ visible: true, x: 0.5, y: 0.5 })
+})
+
+test("bounds stationary heartbeat traffic after drawing a full sample window", async () => {
+	let { LaserPreview } = await import("./laser-pointer")
+	flushSync(() => root.render(null))
+	transport.sent = []
+	vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] })
+	let time = 0
+	let clock = vi.spyOn(performance, "now").mockImplementation(() => time)
+	try {
+		flushSync(() =>
+			root.render(React.createElement(LaserPreview, { docId: "doc" })),
+		)
+		let display = advertise("screen")
+		let surface = prepareSurface()
+		surface.dispatchEvent(pointer("pointerdown", 1))
+		let move = pointer("pointermove", 1)
+		Object.defineProperty(move, "getCoalescedEvents", {
+			value: () =>
+				Array.from({ length: 128 }, (_, index) => ({
+					clientX: 100 + Math.cos(index) * 40,
+					clientY: 50 + Math.sin(index) * 40,
+				})),
+		})
+		surface.dispatchEvent(move)
+		transport.sent = []
+		for (let tick = 0; tick < 600; tick++) {
+			flushSync(() => transport.receive?.(display))
+			time += 100
+			vi.advanceTimersByTime(100)
+		}
+		let points = transport.sent.filter(message => message.type === "point")
+		let bytes = new TextEncoder().encode(
+			JSON.stringify(points.map(packLaserMessage)),
+		).length
+		expect(points.length).toBeLessThanOrEqual(120)
+		expect(bytes).toBeLessThan(350_000)
+		transport.sent = []
+		for (let tick = 0; tick < 120; tick++) {
+			flushSync(() => transport.receive?.(display))
+			time += 50
+			vi.advanceTimersByTime(50)
+			surface.dispatchEvent(pointer("pointermove", 1, true, 100 + (tick % 50)))
+		}
+		expect(
+			transport.sent.filter(message => message.type === "point"),
+		).toHaveLength(120)
+	} finally {
+		flushSync(() => root.render(null))
+		clock.mockRestore()
+		vi.useRealTimers()
+	}
 })

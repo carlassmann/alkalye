@@ -15,6 +15,7 @@ let localPokeMessageSchema = z.object({
 	type: z.literal("poke"),
 	from: z.string(),
 	accountId: z.string(),
+	ids: z.array(z.string()).max(256).optional(),
 })
 
 function connectLocalJazzPoke(account: Account) {
@@ -25,6 +26,7 @@ function connectLocalJazzPoke(account: Account) {
 	let node = account.$jazz.localNode
 	let channel = new BroadcastChannel(channelName)
 	let pokeQueued = false
+	let pendingIds = new Set<CoValueId>()
 	let closed = false
 	let disconnectLocalWrites = observeLocalWrites(node, schedulePokeAfterStorage)
 
@@ -35,26 +37,31 @@ function connectLocalJazzPoke(account: Account) {
 		let message = result.data
 		if (message.from === tabId || message.accountId !== accountId) return
 
-		loadKnownLocalState(account)
+		loadKnownLocalState(account, message.ids)
 	}
 
 	function schedulePokeAfterStorage(coValueId: CoValueId) {
 		let storage = node.storage
 		if (!storage) return
 
-		void storage
-			.waitForSync(coValueId, node.getCoValue(coValueId))
-			.then(queuePoke, () => undefined)
+		void storage.waitForSync(coValueId, node.getCoValue(coValueId)).then(
+			() => queuePoke(coValueId),
+			() => undefined,
+		)
 	}
 
-	function queuePoke() {
-		if (closed || pokeQueued) return
+	function queuePoke(coValueId: CoValueId) {
+		if (closed) return
+		pendingIds.add(coValueId)
+		if (pokeQueued) return
 
 		pokeQueued = true
 		queueMicrotask(() => {
 			pokeQueued = false
 			if (closed) return
-			channel.postMessage({ type: "poke", from: tabId, accountId })
+			let ids = pendingIds.size <= 256 ? [...pendingIds] : undefined
+			pendingIds.clear()
+			channel.postMessage({ type: "poke", from: tabId, accountId, ids })
 		})
 	}
 
@@ -105,12 +112,14 @@ function observeLocalWrites(
 	}
 }
 
-function loadKnownLocalState(account: Account) {
+function loadKnownLocalState(account: Account, ids?: string[]) {
 	let node = account.$jazz.localNode
 	let storage = node.storage
 	if (!storage) return
 
+	let changed = ids ? new Set(ids) : undefined
 	for (let coValue of node.allCoValues()) {
+		if (changed && !changed.has(coValue.id)) continue
 		storage.load(coValue.id, data => {
 			node.syncManager.handleNewContent(data, "storage")
 		})

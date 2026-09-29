@@ -83,3 +83,30 @@ test("recovers skipped updates from overlapping samples without retracing", () =
 	trail.add({ ...message(59), visible: false })
 	expect(trail.frame().path).toBe(expected.frame().path)
 })
+
+test("does not replay old samples when two controllers alternate heartbeats", () => {
+	let trail = createLaserTrailState(() => 0)
+	let first = {
+		...point,
+		samples: [
+			{ index: 0, x: 0.1, y: 0.2 },
+			{ index: 1, x: 0.2, y: 0.2 },
+		],
+		x: 0.2,
+	}
+	let second = {
+		...point,
+		stroke: "second",
+		samples: [
+			{ index: 0, x: 0.7, y: 0.2 },
+			{ index: 1, x: 0.8, y: 0.2 },
+		],
+		x: 0.8,
+	}
+	trail.add(first)
+	trail.add(second)
+	let drawn = trail.frame().path
+	trail.add(first)
+	trail.add(second)
+	expect(trail.frame().path).toBe(drawn)
+})

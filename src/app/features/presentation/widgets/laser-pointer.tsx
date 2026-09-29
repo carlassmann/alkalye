@@ -200,7 +200,11 @@ function LaserPreview({
 			if (!pointRef.current) channel.postMessage({ type: "discover", request })
 		}, 2000)
 		let heartbeat = window.setInterval(() => {
-			if (pointRef.current) {
+			if (
+				pointRef.current &&
+				performance.now() - lastSentAt.current >= laserTiming.pointHeartbeat
+			) {
+				lastSentAt.current = performance.now()
 				channel.postMessage(pointRef.current)
 				trailRef.current?.add(pointRef.current)
 			}

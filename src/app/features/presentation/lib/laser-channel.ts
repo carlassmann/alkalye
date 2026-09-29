@@ -5,6 +5,8 @@ import {
 	LaserState,
 	LaserSender,
 	laserMessageSchema,
+	packLaserMessage,
+	unpackLaserMessage,
 	type LaserMessage,
 } from "./laser-schema"
 
@@ -14,7 +16,9 @@ let stateBudget = 256
 let hubBudget = 256
 let senderLimit = 64
 let maxAge = 15_000
-let resolve = { laserHub: { current: { $each: true } } } as const
+let resolve = {
+	laserHub: { current: { $each: { $onError: "catch" } } },
+} as const
 
 type Root = co.loaded<typeof UserRoot, typeof resolve>
 type Envelope = Parameters<typeof LaserSender.create>[0]["value"]
@@ -53,12 +57,13 @@ function createLaserChannel(
 			let state = loaded.root.laserHub?.current
 			if (state) {
 				for (let [sender, entry] of Object.entries(state)) {
+					if (!entry.$isLoaded) continue
 					let envelope = entry.value
 					if (sender === source || envelope.docId !== docId) continue
 					if ((seen.get(sender) ?? 0) >= envelope.sequence) continue
 					seen.set(sender, envelope.sequence)
 					let parsed = laserMessageSchema.safeParse(envelope.message)
-					if (parsed.success) onMessage(parsed.data)
+					if (parsed.success) onMessage(unpackLaserMessage(parsed.data))
 				}
 			}
 			if (pending && !scheduled) {
@@ -84,7 +89,7 @@ function createLaserChannel(
 			docId,
 			sequence: ++sequence,
 			sentAt: Date.now(),
-			message,
+			message: packLaserMessage(message),
 		})
 		pending = published ? undefined : message
 	}
@@ -120,15 +125,18 @@ function publishLaserMessage(
 	if (!hub?.$isLoaded) return false
 	let state = hub.current
 	if (!state.$isLoaded) return false
-	let entries = Object.entries(state)
-	if (entries.some(([, sender]) => !sender.$isLoaded)) return false
+	let allEntries = Object.entries(state)
+	let entries = allEntries.filter(
+		(entry): entry is [string, co.loaded<typeof LaserSender>] =>
+			entry[1].$isLoaded,
+	)
 	let hasExpiredSenders =
 		!state[source] &&
 		entries.some(([, sender]) => envelope.sentAt - sender.value.sentAt > maxAge)
 	if (
 		transactionCount(state) >= stateBudget ||
 		hasExpiredSenders ||
-		(!state[source] && entries.length >= senderLimit)
+		(!state[source] && allEntries.length >= senderLimit)
 	) {
 		let snapshot: Parameters<typeof LaserState.create>[0] = {}
 		for (let [sender, value] of entries

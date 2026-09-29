@@ -295,3 +295,72 @@ test("queues the latest message while a remote registry loads", async () => {
 		await remote.done()
 	}
 })
+
+test("continues publishing when an offline sender reference is unavailable", async () => {
+	let { root } = await account.$jazz.ensureLoaded({
+		resolve: { root: { laserHub: { current: { $each: true } } } },
+	})
+	publishLaserMessage(root, account, "initial", {
+		docId: "doc",
+		sequence: 1,
+		sentAt: Date.now(),
+		message: { type: "discover", request: "initial" },
+	})
+	await account.$jazz.waitForAllCoValuesSync()
+	let remote = await createJazzContextFromExistingCredentials({
+		credentials: {
+			accountID: account.$jazz.id,
+			secret: account.$jazz.localNode.getCurrentAgent().agentSecret,
+		},
+		AccountSchema: UserAccount,
+		peers: [getPeerConnectedToTestSyncServer()],
+		crypto: account.$jazz.localNode.crypto,
+		sessionProvider: new MockSessionProvider(),
+		asActiveAccount: false,
+	})
+	try {
+		let loaded = await remote.account.$jazz.ensureLoaded({
+			resolve: { root: { laserHub: { current: true } } },
+		})
+		let remoteHub = loaded.root.laserHub
+		let hub = root.laserHub
+		if (!remoteHub || !hub) throw new Error("Missing hub")
+		for (let id of Object.keys(
+			remote.account.$jazz.localNode.syncManager.peers,
+		))
+			remote.account.$jazz.localNode.syncManager.removePeer(id)
+		let missing = LaserSender.create(
+			{
+				value: {
+					docId: "doc",
+					sequence: 1,
+					sentAt: Date.now(),
+					message: { type: "discover", request: "offline" },
+				},
+			},
+			{ owner: remoteHub.$jazz.owner },
+		)
+		hub.current.$jazz.raw.set("offline", missing.$jazz.id)
+		let unavailable = await LaserSender.load(missing.$jazz.id, {
+			loadAs: account,
+		})
+		expect(unavailable.$jazz.loadingState).toBe("unavailable")
+		let channel = createLaserChannel(account, "doc", () => {})
+		channels.push(channel)
+		channel.postMessage({ type: "discover", request: "survivor" })
+		await expect
+			.poll(
+				() =>
+					Object.values(hub.current).some(
+						sender =>
+							sender.$isLoaded &&
+							sender.value.message.type === "discover" &&
+							sender.value.message.request === "survivor",
+					),
+				{ timeout: 6000 },
+			)
+			.toBe(true)
+	} finally {
+		await remote.done()
+	}
+}, 10000)

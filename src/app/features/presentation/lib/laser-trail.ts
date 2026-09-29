@@ -12,16 +12,14 @@ function createLaserTrailState(now = () => performance.now()) {
 	let lastActivity = -Infinity
 	let drawing = false
 	let legacyStroke = 0
-	let sampledStroke: string | undefined
-	let sampleIndex = -1
+	let sampleIndices = new Map<string, number>()
 
 	function clear() {
 		points = []
 		path = ""
 		lastActivity = -Infinity
 		drawing = false
-		sampledStroke = undefined
-		sampleIndex = -1
+		sampleIndices.clear()
 	}
 
 	function addPoint(point: LaserPoint) {
@@ -61,16 +59,25 @@ function createLaserTrailState(now = () => performance.now()) {
 		clear,
 		add(point: LaserPoint) {
 			if (now() - lastActivity >= delay + fadeDuration) clear()
-			if (point.stroke && point.samples) {
-				if (sampledStroke !== point.stroke) {
-					sampledStroke = point.stroke
-					sampleIndex = -1
-				}
+			if (point.stroke && point.samples?.length) {
+				let sampleIndex = sampleIndices.get(point.stroke) ?? -1
 				for (let sample of point.samples) {
 					if (sample.index <= sampleIndex) continue
 					addPoint({ ...point, x: sample.x, y: sample.y, visible: true })
 					sampleIndex = sample.index
 				}
+				sampleIndices.set(point.stroke, sampleIndex)
+				if (sampleIndices.size > pointLimit) {
+					let oldest = sampleIndices.keys().next().value
+					if (oldest !== undefined) sampleIndices.delete(oldest)
+				}
+				if (point.visible) {
+					lastActivity = now()
+					drawing = true
+				} else if (points.at(-1)?.stroke === point.stroke) {
+					addPoint(point)
+				}
+				return
 			}
 			addPoint(point)
 		},
