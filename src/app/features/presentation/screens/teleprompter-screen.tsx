@@ -7,6 +7,7 @@ import {
 	PanelRightClose,
 	PanelRightOpen,
 	Presentation,
+	Scan,
 } from "lucide-react"
 import { Document } from "@/schema"
 import {
@@ -27,6 +28,7 @@ import {
 	useDocTitles,
 	type ResolvedDoc,
 } from "@/app/features/documents"
+import { useWidePresentation } from "../lib/presentation-layout"
 import { LaserPreview } from "../widgets/laser-pointer"
 import { Teleprompter, groupBySlide } from "../widgets/teleprompter"
 import { parsePresentation } from "../lib/presentation"
@@ -64,11 +66,14 @@ interface TeleprompterScreenProps {
 
 function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 	let navigate = useNavigate()
-	let [previewVisible, setPreviewVisible] = useState(
-		() =>
-			typeof window !== "undefined" &&
-			window.matchMedia("(min-width: 768px)").matches,
-	)
+	let wide = useWidePresentation()
+	let [desktopPreview, setDesktopPreview] = useState(true)
+	let [mobilePreview, setMobilePreview] = useState(false)
+	let previewVisible = wide ? desktopPreview : mobilePreview
+	function setPreviewVisible(visible: boolean) {
+		if (wide) setDesktopPreview(visible)
+		else setMobilePreview(visible)
+	}
 
 	useScreenWakeLock()
 
@@ -138,6 +143,7 @@ function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 		<div className="bg-background fixed inset-0 flex flex-col">
 			<TopBar
 				id={id}
+				wide={wide}
 				previewVisible={previewVisible}
 				onTogglePreview={() => setPreviewVisible(!previewVisible)}
 				currentSlideIdx={currentSlideIdx}
@@ -146,6 +152,7 @@ function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 			<div className="flex min-h-0 flex-1 flex-col md:flex-row">
 				<div className="flex min-h-0 min-w-0 flex-1 flex-col">
 					<Teleprompter
+						inactive={!wide && mobilePreview}
 						items={items}
 						wikilinks={wikilinks}
 						presentationIndex={doc.presentationLine}
@@ -153,7 +160,13 @@ function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 						onExit={() => navigate({ to: "/doc/$id", params: { id } })}
 					/>
 				</div>
-				<LaserPreview key={id} docId={id} visible={previewVisible} />
+				<LaserPreview
+					key={id}
+					docId={id}
+					visible={previewVisible}
+					dialog={!wide}
+					onClose={() => setMobilePreview(false)}
+				/>
 			</div>
 		</div>
 	)
@@ -161,12 +174,14 @@ function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 
 function TopBar({
 	id,
+	wide,
 	previewVisible,
 	onTogglePreview,
 	currentSlideIdx,
 	totalSlides,
 }: {
 	id: string
+	wide: boolean
 	previewVisible: boolean
 	onTogglePreview: () => void
 	currentSlideIdx: number
@@ -205,10 +220,15 @@ function TopBar({
 							? "presentation.laser.hide"
 							: "presentation.laser.show",
 					)}
-					aria-pressed={previewVisible}
+					aria-pressed={wide ? previewVisible : undefined}
+					aria-haspopup={wide ? undefined : "dialog"}
+					aria-expanded={wide ? undefined : previewVisible}
 					onClick={onTogglePreview}
 				>
-					{previewVisible ? <PanelRightClose /> : <PanelRightOpen />}
+					<Scan className="md:hidden" />
+					<span className="hidden md:inline-flex">
+						{previewVisible ? <PanelRightClose /> : <PanelRightOpen />}
+					</span>
 					<span className="md:hidden">
 						{t(
 							previewVisible

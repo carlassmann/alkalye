@@ -214,8 +214,8 @@ test("retains coalesced fast movement in the final synced message", () => {
 })
 
 function prepareSurface() {
-	let frame = container.querySelector("iframe")
-	let surface = container.querySelector("[data-laser-surface]")
+	let frame = document.querySelector("iframe")
+	let surface = document.querySelector("[data-laser-surface]")
 	if (!(surface instanceof HTMLElement) || !frame?.contentDocument)
 		throw new Error("Preview missing")
 	let slide = frame.contentDocument.createElement("div")
@@ -289,4 +289,39 @@ test("bounds stationary heartbeat traffic after drawing a full sample window", a
 		clock.mockRestore()
 		vi.useRealTimers()
 	}
+})
+
+test("closing the preview dialog releases a held gesture and preserves its target", async () => {
+	let { LaserPreview } = await import("./laser-pointer")
+	function render(visible: boolean) {
+		flushSync(() =>
+			root.render(
+				React.createElement(LaserPreview, {
+					docId: "doc",
+					visible,
+					dialog: true,
+					onClose: () => render(false),
+				}),
+			),
+		)
+	}
+	render(true)
+	advertise("first")
+	advertise("second")
+	await vi.waitFor(() =>
+		expect(document.querySelector("[role=dialog]")).not.toBeNull(),
+	)
+	let surface = prepareSurface()
+	surface.dispatchEvent(pointer("pointerdown", 1))
+	let close = document.querySelector("[data-slot=dialog-close]")
+	if (!(close instanceof HTMLElement)) throw new Error("Close control missing")
+	close.click()
+	await vi.waitFor(() =>
+		expect(document.querySelector("[role=dialog]")).toBeNull(),
+	)
+	expect(transport.sent.at(-1)).toMatchObject({ type: "point", visible: false })
+	render(true)
+	await vi.waitFor(() =>
+		expect(document.querySelector("select")?.value).toBe("first"),
+	)
 })

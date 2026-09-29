@@ -109,6 +109,12 @@ Deduplicate samples per stroke, including when controllers alternate. Slide and 
 the trail immediately. Cache the SVG path until its points change; fading only
 changes opacity. Hiding the preview preserves the chosen display for reopening.
 
+Below 768 px, the preview occupies a dialog instead of sharing space with the
+teleprompter. Keep the teleprompter mounted to preserve its scroll and timer, but
+suspend its keyboard shortcuts while the dialog is open. Wider viewports use an
+inline preview. Mobile dialog state and desktop visibility are independent so
+resizing never opens a mobile dialog merely because the desktop preview was shown.
+
 Local storage notifications include the changed CoValue IDs. Reload only matching
 known values; notifications from older tabs without IDs still trigger a full reload.
 

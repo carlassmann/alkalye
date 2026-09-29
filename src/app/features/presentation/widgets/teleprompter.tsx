@@ -25,6 +25,7 @@ let WikilinkContext = createContext<Map<string, ResolvedDoc>>(new Map())
 type SlideGroup = { slideNumber: number; items: PresentationItem[] }
 
 interface TeleprompterProps {
+	inactive?: boolean
 	items: PresentationItem[]
 	wikilinks: Map<string, ResolvedDoc>
 	presentationIndex: number | undefined
@@ -33,6 +34,7 @@ interface TeleprompterProps {
 }
 
 function Teleprompter({
+	inactive = false,
 	items,
 	wikilinks,
 	presentationIndex,
@@ -109,6 +111,7 @@ function Teleprompter({
 				</div>
 			</div>
 			<BottomToolbar
+				inactive={inactive}
 				items={items}
 				slideGroups={slideGroups}
 				presentationIndex={presentationIndex}
@@ -172,12 +175,14 @@ function ProgressBar({
 }
 
 function BottomToolbar({
+	inactive,
 	items,
 	slideGroups,
 	presentationIndex,
 	onIndexChange,
 	onExit,
 }: {
+	inactive: boolean
 	items: PresentationItem[]
 	slideGroups: SlideGroup[]
 	presentationIndex: number | undefined
@@ -228,6 +233,7 @@ function BottomToolbar({
 	}
 
 	useEffect(() => {
+		if (inactive) return
 		function handleKeyDown(e: KeyboardEvent) {
 			if (e.key === "Escape" && onExit) {
 				e.preventDefault()

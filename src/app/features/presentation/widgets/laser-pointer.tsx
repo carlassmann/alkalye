@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState, type PointerEvent } from "react"
 import { useAccount } from "jazz-tools/react"
+import {
+	Dialog,
+	DialogContent,
+	DialogTitle,
+	DialogClose,
+} from "@/app/components/ui/dialog"
+import { Button } from "@/app/components/ui/button"
+import { X } from "lucide-react"
 import { UserAccount } from "@/schema"
 import { createLaserChannel } from "../lib/laser-channel"
 import {
@@ -118,9 +126,13 @@ function LaserReceiver({
 function LaserPreview({
 	docId,
 	visible = true,
+	dialog = false,
+	onClose,
 }: {
 	docId: string
 	visible?: boolean
+	dialog?: boolean
+	onClose?: () => void
 }) {
 	let t = useIntl()
 	let me = useAccount(UserAccount)
@@ -128,7 +140,6 @@ function LaserPreview({
 	let [selectedId, setSelectedId] = useState<string | null>(null)
 	let [previewSize, setPreviewSize] = useState({ width: 0, height: 0 })
 	let channelRef = useRef<ReturnType<typeof createLaserChannel> | null>(null)
-	let containerRef = useRef<HTMLDivElement>(null)
 	let iframeRef = useRef<HTMLIFrameElement>(null)
 	let trailRef = useRef<LaserTrailController | null>(null)
 	let pointRef = useRef<LaserPoint | null>(null)
@@ -231,6 +242,7 @@ function LaserPreview({
 		trailRef.current?.clear()
 	}, [
 		visible,
+		dialog,
 		target?.id,
 		target?.slideNumber,
 		target?.width,
@@ -238,18 +250,22 @@ function LaserPreview({
 		target?.appearance,
 	])
 
-	useEffect(() => {
-		let container = containerRef.current
+	function observePreview(container: HTMLDivElement | null) {
 		if (!container) return
-		let observer = new ResizeObserver(() =>
-			setPreviewSize({
-				width: container.clientWidth,
-				height: container.clientHeight,
-			}),
-		)
+		function measure() {
+			if (!container) return
+			let width = container.clientWidth
+			let height = container.clientHeight
+			setPreviewSize(current =>
+				current.width === width && current.height === height
+					? current
+					: { width, height },
+			)
+		}
+		let observer = new ResizeObserver(measure)
 		observer.observe(container)
 		return () => observer.disconnect()
-	}, [visible])
+	}
 
 	function endPointer(event: PointerEvent<HTMLDivElement>) {
 		if (activePointer.current !== event.pointerId) return
@@ -314,13 +330,17 @@ function LaserPreview({
 
 	if (!visible) return null
 
-	return (
+	let preview = (
 		<aside
-			className="bg-muted/30 order-first flex shrink-0 flex-col gap-2 border-b p-3 md:order-last md:w-[42%] md:border-b-0 md:border-l md:p-4"
+			className={
+				dialog
+					? "flex min-h-0 flex-1 flex-col justify-center gap-3"
+					: "bg-muted/30 flex w-[42%] shrink-0 flex-col gap-2 border-l p-4"
+			}
 			aria-label={t("presentation.laser.label")}
 		>
 			<div className="flex items-center justify-between gap-2 text-sm">
-				<strong>{t("presentation.laser.preview")}</strong>
+				{!dialog && <strong>{t("presentation.laser.preview")}</strong>}
 				{(displays.length > 1 || (!target && displays.length > 0)) && (
 					<select
 						aria-label={t("presentation.laser.target")}
@@ -344,8 +364,12 @@ function LaserPreview({
 				)}
 			</div>
 			<div
-				ref={containerRef}
-				className="flex max-h-[30svh] w-full items-center justify-center md:max-h-[65svh]"
+				ref={observePreview}
+				className={
+					dialog
+						? "flex max-h-[75svh] w-full items-center justify-center"
+						: "flex max-h-[65svh] w-full items-center justify-center"
+				}
 				style={{
 					aspectRatio: target
 						? `${target.width} / ${target.height}`
@@ -412,5 +436,35 @@ function LaserPreview({
 				</p>
 			)}
 		</aside>
+	)
+	if (!dialog) return preview
+	return (
+		<Dialog
+			open={visible}
+			onOpenChange={open => {
+				if (!open) onClose?.()
+			}}
+			disablePointerDismissal
+		>
+			<DialogContent
+				showCloseButton={false}
+				style={{
+					paddingTop: "max(1rem, env(safe-area-inset-top))",
+					paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
+					paddingLeft: "max(1rem, env(safe-area-inset-left))",
+					paddingRight: "max(1rem, env(safe-area-inset-right))",
+				}}
+				className="inset-0 top-0 left-0 flex h-dvh max-w-none translate-x-0 flex-col sm:top-0 sm:max-w-none sm:translate-y-0"
+			>
+				<div className="flex shrink-0 items-center justify-between gap-2">
+					<DialogTitle>{t("presentation.laser.preview")}</DialogTitle>
+					<DialogClose render={<Button variant="ghost" size="sm" />}>
+						<X />
+						{t("presentation.laser.notes")}
+					</DialogClose>
+				</div>
+				{preview}
+			</DialogContent>
+		</Dialog>
 	)
 }
