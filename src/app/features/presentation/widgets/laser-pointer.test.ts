@@ -110,15 +110,7 @@ test("requires live discovery and keeps the chosen display when another connects
 
 test("ignores secondary touches and clears pointing on cancellation", () => {
 	let display = advertise("screen")
-	let frame = container.querySelector("iframe")
-	let surface = container.querySelector("[data-laser-surface]")
-	if (!(surface instanceof HTMLElement) || !frame?.contentDocument)
-		throw new Error("Preview missing")
-	let slide = frame.contentDocument.createElement("div")
-	slide.setAttribute("data-current-slide", "1")
-	frame.contentDocument.append(slide)
-	surface.setPointerCapture = vi.fn()
-	surface.getBoundingClientRect = () => new DOMRect(0, 0, 200, 100)
+	let surface = prepareSurface()
 	surface.dispatchEvent(pointer("pointerdown", 1))
 	let first = transport.sent.at(-1)
 	expect(first).toMatchObject({
@@ -163,18 +155,9 @@ test.each(["mouse", "touch"])(
 	"resumes %s drags after re-entry, but not after release outside",
 	pointerType => {
 		advertise("screen")
-		let frame = container.querySelector("iframe")
-		let surface = container.querySelector("[data-laser-surface]")
-		if (!(surface instanceof HTMLElement) || !frame?.contentDocument)
-			throw new Error("Preview missing")
-		let slide = frame.contentDocument.createElement("div")
-		slide.setAttribute("data-current-slide", "1")
-		frame.contentDocument.append(slide)
-		surface.setPointerCapture = vi.fn()
-		surface.getBoundingClientRect = () => new DOMRect(0, 0, 200, 100)
-		let pointerSurface = surface
+		let surface = prepareSurface()
 		function move(type: string, x: number) {
-			pointerSurface.dispatchEvent(pointer(type, 1, true, x, pointerType))
+			surface.dispatchEvent(pointer(type, 1, true, x, pointerType))
 		}
 		move("pointerdown", 100)
 		let first = transport.sent.at(-1)
@@ -199,15 +182,7 @@ test.each(["mouse", "touch"])(
 
 test("retains coalesced fast movement in the final synced message", () => {
 	advertise("screen")
-	let frame = container.querySelector("iframe")
-	let surface = container.querySelector("[data-laser-surface]")
-	if (!(surface instanceof HTMLElement) || !frame?.contentDocument)
-		throw new Error("Preview missing")
-	let slide = frame.contentDocument.createElement("div")
-	slide.setAttribute("data-current-slide", "1")
-	frame.contentDocument.append(slide)
-	surface.setPointerCapture = vi.fn()
-	surface.getBoundingClientRect = () => new DOMRect(0, 0, 200, 100)
+	let surface = prepareSurface()
 	let clock = vi.spyOn(performance, "now").mockReturnValue(0)
 	try {
 		surface.dispatchEvent(pointer("pointerdown", 1))
@@ -236,4 +211,30 @@ test("retains coalesced fast movement in the final synced message", () => {
 	} finally {
 		clock.mockRestore()
 	}
+})
+
+function prepareSurface() {
+	let frame = container.querySelector("iframe")
+	let surface = container.querySelector("[data-laser-surface]")
+	if (!(surface instanceof HTMLElement) || !frame?.contentDocument)
+		throw new Error("Preview missing")
+	let slide = frame.contentDocument.createElement("div")
+	slide.setAttribute("data-current-slide", "1")
+	frame.contentDocument.append(slide)
+	surface.setPointerCapture = vi.fn()
+	surface.getBoundingClientRect = () => new DOMRect(0, 0, 200, 100)
+	return surface
+}
+
+test("pauses when the preview has no area, then resumes with valid coordinates", () => {
+	advertise("screen")
+	let surface = prepareSurface()
+	surface.getBoundingClientRect = () => new DOMRect(0, 0, 0, 100)
+	surface.dispatchEvent(pointer("pointerdown", 1, true, 0))
+	expect(
+		transport.sent.filter(message => message.type === "point"),
+	).toHaveLength(0)
+	surface.getBoundingClientRect = () => new DOMRect(0, 0, 200, 100)
+	surface.dispatchEvent(pointer("pointermove", 1))
+	expect(transport.sent.at(-1)).toMatchObject({ visible: true, x: 0.5, y: 0.5 })
 })

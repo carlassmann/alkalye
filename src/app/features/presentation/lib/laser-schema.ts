@@ -1,7 +1,15 @@
 import { co, z } from "jazz-tools"
 
-export { laserMessageSchema, LaserState, LaserHub, LaserSender }
+export {
+	laserMessageSchema,
+	laserSampleLimit,
+	LaserState,
+	LaserHub,
+	LaserSender,
+}
 export type { LaserMessage }
+
+let laserSampleLimit = 128
 
 let laserMessageSchema = z.discriminatedUnion("type", [
 	z.object({
@@ -25,7 +33,7 @@ let laserMessageSchema = z.discriminatedUnion("type", [
 					y: z.number().min(0).max(1),
 				}),
 			)
-			.max(128)
+			.max(laserSampleLimit)
 			.optional(),
 		target: z.string(),
 		lease: z.string(),

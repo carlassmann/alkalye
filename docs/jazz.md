@@ -83,11 +83,21 @@ The preview uses a separate iframe viewport at the target dimensions and
 appearance. Its explicit `laserPreview` flag suppresses display registration and
 app prompts, and mutes video. Video playback is independent of the projector.
 
-Laser strokes carry IDs so separate gestures never join. Each renderer retains
+Laser sync uses latest-value CoMaps, not a CoFeed. We need the current position
+and a short recovery window, not an append-only event history. Each update carries
+up to 128 indexed samples from its stroke, including browser-coalesced movement.
+Keep the sample limit shared by validation and publishing. Receivers deduplicate
+overlapping batches so missed intermediate updates do not flatten fast curves.
+This window is bounded: a longer gap can still lose older samples.
+
+Laser strokes carry IDs so separate gestures never join. Leaving the preview
+pauses drawing; re-entry starts a new segment within the captured drag. Release,
+cancellation, hiding the preview, or a slide/layout change ends the gesture.
+Zero-area previews must not publish coordinates. Each renderer retains
 at most 2,048 points and uses its own monotonic clock. Like tldraw, a stroke stays
 visible while drawing, then waits 1,200 ms and fades over 500 ms. Heartbeats keep
 a held stroke alive; lost connections still expire. Slide and layout changes clear
-the trail immediately. Hiding the preview releases the gesture and preserves the
-chosen display for reopening.
+the trail immediately. Cache the SVG path until its points change; fading only
+changes opacity. Hiding the preview preserves the chosen display for reopening.
 
 Written with GPT-6 in Codex.

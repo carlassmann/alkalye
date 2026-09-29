@@ -11,7 +11,7 @@ import {
 } from "../lib/laser-session"
 import { isLaserPreview } from "../lib/laser-preview"
 import { useIntl } from "@/shared/intl/setup"
-import { type LaserMessage } from "../lib/laser-schema"
+import { laserSampleLimit, type LaserMessage } from "../lib/laser-schema"
 
 import { LaserTrail, type LaserTrailController } from "./laser-trail"
 
@@ -134,7 +134,6 @@ function LaserPreview({
 	let pointRef = useRef<LaserPoint | null>(null)
 	let activePointer = useRef<number | null>(null)
 	let lastSentAt = useRef(0)
-	let strokeRef = useRef("")
 	let target =
 		displays.find(display => display.id === selectedId) ??
 		(selectedId === null && displays.length === 1 ? displays[0] : undefined)
@@ -260,37 +259,39 @@ function LaserPreview({
 			?.querySelector("[data-current-slide]")
 			?.getAttribute("data-current-slide")
 		if (previewSlide !== String(target.slideNumber)) return stopPointing()
+		let bounds = event.currentTarget.getBoundingClientRect()
 		let samples = event.nativeEvent.getCoalescedEvents?.() ?? []
 		for (let sample of [...samples, event.nativeEvent]) {
-			pointAtPosition(event.currentTarget, sample.clientX, sample.clientY)
+			pointAtPosition(bounds, sample.clientX, sample.clientY)
 		}
 	}
 
-	function pointAtPosition(
-		surface: HTMLDivElement,
-		clientX: number,
-		clientY: number,
-	) {
+	function pointAtPosition(bounds: DOMRect, clientX: number, clientY: number) {
 		if (!target) return
-		let bounds = surface.getBoundingClientRect()
+		if (bounds.width <= 0 || bounds.height <= 0) return pausePointing()
 		let x = (clientX - bounds.left) / bounds.width
 		let y = (clientY - bounds.top) / bounds.height
-		if (x < 0 || x > 1 || y < 0 || y > 1) return pausePointing()
-		if (!pointRef.current) {
-			strokeRef.current = crypto.randomUUID()
-			lastSentAt.current = -Infinity
-		}
+		if (
+			!Number.isFinite(x) ||
+			!Number.isFinite(y) ||
+			x < 0 ||
+			x > 1 ||
+			y < 0 ||
+			y > 1
+		)
+			return pausePointing()
+		if (!pointRef.current) lastSentAt.current = -Infinity
 		let samples = pointRef.current?.samples ?? []
 		let previous = samples.at(-1)
 		if (!previous || previous.x !== x || previous.y !== y)
 			samples = [
 				...samples,
 				{ index: (previous?.index ?? -1) + 1, x, y },
-			].slice(-128)
+			].slice(-laserSampleLimit)
 		let point: LaserPoint = {
 			samples,
 			type: "point",
-			stroke: strokeRef.current,
+			stroke: pointRef.current?.stroke ?? crypto.randomUUID(),
 			target: target.id,
 			lease: target.lease,
 			layout: laserLayoutKey(target),

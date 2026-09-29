@@ -8,6 +8,7 @@ let pointLimit = 2048
 
 function createLaserTrailState(now = () => performance.now()) {
 	let points: { x: number; y: number; stroke: string }[] = []
+	let path: string | undefined = ""
 	let lastActivity = -Infinity
 	let drawing = false
 	let legacyStroke = 0
@@ -16,6 +17,7 @@ function createLaserTrailState(now = () => performance.now()) {
 
 	function clear() {
 		points = []
+		path = ""
 		lastActivity = -Infinity
 		drawing = false
 		sampledStroke = undefined
@@ -32,6 +34,7 @@ function createLaserTrailState(now = () => performance.now()) {
 				(previous.x !== point.x || previous.y !== point.y)
 			) {
 				points.push({ x: point.x, y: point.y, stroke: previous.stroke })
+				path = undefined
 				if (points.length > pointLimit) points.shift()
 			}
 			if (drawing) lastActivity = time
@@ -50,6 +53,7 @@ function createLaserTrailState(now = () => performance.now()) {
 		)
 			return
 		points.push({ x: point.x, y: point.y, stroke })
+		path = undefined
 		if (points.length > pointLimit) points.shift()
 	}
 
@@ -73,7 +77,7 @@ function createLaserTrailState(now = () => performance.now()) {
 		frame() {
 			let elapsed = Math.max(0, now() - lastActivity - delay)
 			if (elapsed >= fadeDuration) clear()
-			let path = points
+			path ??= points
 				.map((point, index) => {
 					let start = index === 0 || points[index - 1].stroke !== point.stroke
 					let position = `${point.x * 1000} ${point.y * 1000}`
