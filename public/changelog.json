@@ -1,5 +1,14 @@
 [
 	{
+		"id": 153,
+		"date": "2026-09-29",
+		"title": "Start writing sooner on slower connections",
+		"notes": [
+			"Opening the app starts downloading what you need sooner, reducing the wait before you can write on slower connections."
+		],
+		"pr": 56
+	},
+	{
 		"id": 152,
 		"date": "2026-09-27",
 		"title": "Keep your search when switching documents",
