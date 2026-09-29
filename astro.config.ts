@@ -4,6 +4,7 @@ import vercel from "@astrojs/vercel"
 import pwa from "@vite-pwa/astro"
 import tailwindcss from "@tailwindcss/vite"
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
+import { criticalAppPreload } from "./scripts/critical-app-preload"
 
 export default defineConfig({
 	site: "https://www.alkalye.com",
@@ -51,6 +52,7 @@ export default defineConfig({
 		},
 	},
 	integrations: [
+		criticalAppPreload(),
 		react({ babel: { plugins: ["babel-plugin-react-compiler"] } }),
 		pwa({
 			registerType: "prompt",
