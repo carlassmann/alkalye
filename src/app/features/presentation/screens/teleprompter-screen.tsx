@@ -1,7 +1,14 @@
+import { useState } from "react"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { useCoState } from "jazz-tools/react"
 import { type ResolveQuery, co } from "jazz-tools"
-import { FileText } from "lucide-react"
+import {
+	FileText,
+	PanelRightClose,
+	PanelRightOpen,
+	Presentation,
+	Scan,
+} from "lucide-react"
 import { Document } from "@/schema"
 import {
 	DocumentNotFound,
@@ -21,6 +28,8 @@ import {
 	useDocTitles,
 	type ResolvedDoc,
 } from "@/app/features/documents"
+import { useWidePresentation } from "../lib/presentation-layout"
+import { LaserPreview } from "../widgets/laser-pointer"
 import { Teleprompter, groupBySlide } from "../widgets/teleprompter"
 import { parsePresentation } from "../lib/presentation"
 import { useScreenWakeLock } from "../lib/screen-wake-lock"
@@ -57,6 +66,14 @@ interface TeleprompterScreenProps {
 
 function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 	let navigate = useNavigate()
+	let wide = useWidePresentation()
+	let [desktopPreview, setDesktopPreview] = useState(true)
+	let [mobilePreview, setMobilePreview] = useState(false)
+	let previewVisible = wide ? desktopPreview : mobilePreview
+	function setPreviewVisible(visible: boolean) {
+		if (wide) setDesktopPreview(visible)
+		else setMobilePreview(visible)
+	}
 
 	useScreenWakeLock()
 
@@ -126,30 +143,47 @@ function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 		<div className="bg-background fixed inset-0 flex flex-col">
 			<TopBar
 				id={id}
+				wide={wide}
+				previewVisible={previewVisible}
+				onTogglePreview={() => setPreviewVisible(!previewVisible)}
 				currentSlideIdx={currentSlideIdx}
 				totalSlides={slideGroups.length}
 			/>
-			<Teleprompter
-				items={items}
-				content={content}
-				wikilinks={wikilinks}
-				presentationIndex={doc.presentationLine}
-				onIndexChange={index => doc.$jazz.set("presentationLine", index)}
-				onHighlightChange={range =>
-					doc.$jazz.set("highlightRange", range ?? undefined)
-				}
-				onExit={() => navigate({ to: "/doc/$id", params: { id } })}
-			/>
+			<div className="flex min-h-0 flex-1 flex-col md:flex-row">
+				<div className="flex min-h-0 min-w-0 flex-1 flex-col">
+					<Teleprompter
+						inactive={!wide && mobilePreview}
+						items={items}
+						wikilinks={wikilinks}
+						presentationIndex={doc.presentationLine}
+						onIndexChange={index => doc.$jazz.set("presentationLine", index)}
+						onExit={() => navigate({ to: "/doc/$id", params: { id } })}
+					/>
+				</div>
+				<LaserPreview
+					key={id}
+					docId={id}
+					visible={previewVisible}
+					dialog={!wide}
+					onClose={() => setMobilePreview(false)}
+				/>
+			</div>
 		</div>
 	)
 }
 
 function TopBar({
 	id,
+	wide,
+	previewVisible,
+	onTogglePreview,
 	currentSlideIdx,
 	totalSlides,
 }: {
 	id: string
+	wide: boolean
+	previewVisible: boolean
+	onTogglePreview: () => void
 	currentSlideIdx: number
 	totalSlides: number
 }) {
@@ -171,26 +205,56 @@ function TopBar({
 			>
 				<T k="presentation.teleprompter.editor" />
 			</Button>
-			<span className="text-muted-foreground absolute left-1/2 -translate-x-1/2 text-sm">
+			<span className="text-muted-foreground text-sm">
 				{t("presentation.teleprompter.slideIndicator", {
 					index: String(currentSlideIdx + 1),
 					total: String(totalSlides),
 				})}
 			</span>
-			<Button
-				variant="ghost"
-				size="sm"
-				nativeButton={false}
-				render={
-					<a
-						href={`/doc/${id}/slideshow`}
-						target="_blank"
-						rel="noopener noreferrer"
-					/>
-				}
-			>
-				<T k="presentation.teleprompter.slideshow" />
-			</Button>
+			<div className="flex items-center gap-1">
+				<Button
+					variant="ghost"
+					size="sm"
+					aria-label={t(
+						previewVisible
+							? "presentation.laser.hide"
+							: "presentation.laser.show",
+					)}
+					aria-pressed={wide ? previewVisible : undefined}
+					aria-haspopup={wide ? undefined : "dialog"}
+					aria-expanded={wide ? undefined : previewVisible}
+					onClick={onTogglePreview}
+				>
+					<Scan className="md:hidden" />
+					<span className="hidden md:inline-flex">
+						{previewVisible ? <PanelRightClose /> : <PanelRightOpen />}
+					</span>
+					<span className="md:hidden">
+						{t(
+							previewVisible
+								? "presentation.laser.notes"
+								: "presentation.laser.open",
+						)}
+					</span>
+				</Button>
+				<Button
+					variant="ghost"
+					size="sm"
+					nativeButton={false}
+					render={
+						<a
+							href={`/doc/${id}/slideshow`}
+							target="_blank"
+							rel="noopener noreferrer"
+						/>
+					}
+				>
+					<Presentation className="md:hidden" />
+					<span className="sr-only md:not-sr-only">
+						<T k="presentation.teleprompter.slideshow" />
+					</span>
+				</Button>
+			</div>
 		</div>
 	)
 }

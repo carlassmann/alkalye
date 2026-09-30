@@ -15,7 +15,7 @@ export type {
 export { useScreenWakeLock } from "./lib/screen-wake-lock"
 export { presentationExtensions } from "./lib/editor-extension"
 export { Slideshow } from "./widgets/slideshow"
-export type { Slide, HighlightRange } from "./widgets/slideshow"
+export type { Slide } from "./widgets/slideshow"
 export { Teleprompter, groupBySlide } from "./widgets/teleprompter"
 export type { SlideGroup } from "./widgets/teleprompter"
 export { SidebarPresentationLinks } from "./widgets/sidebar-presentation-links"
@@ -31,3 +31,4 @@ export {
 	loadWikilinkCache as loadTeleprompterWikilinkCache,
 } from "./screens/teleprompter-screen"
 export type { LoaderData as TeleprompterLoaderData } from "./screens/teleprompter-screen"
+export { isLaserPreview } from "./lib/laser-preview"

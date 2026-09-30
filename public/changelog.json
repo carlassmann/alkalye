@@ -1,5 +1,17 @@
 [
 	{
+		"id": 154,
+		"date": "2026-09-29",
+		"title": "Point at slides from your teleprompter",
+		"notes": [
+			"Draw smooth, fading laser trails from the teleprompter on your laptop or phone.",
+			"Choose a slideshow on another screen or device signed into the same account.",
+			"On phones, switch between your teleprompter and a full-screen slide preview.",
+			"Selecting teleprompter text no longer highlights the slideshow."
+		],
+		"pr": 52
+	},
+	{
 		"id": 153,
 		"date": "2026-09-29",
 		"title": "Start writing sooner on slower connections",

@@ -1,3 +1,4 @@
+import { isLaserPreview } from "../lib/laser-preview"
 import {
 	createContext,
 	useContext,
@@ -42,14 +43,11 @@ import { T, useIntl } from "@/shared/intl/setup"
 import {
 	loadSyntaxHighlighter,
 	useSyntaxTheme,
-	type SyntaxDecoration,
 	type SyntaxTheme,
 } from "@/app/features/syntax-highlighting"
 
 export { Slideshow }
-export type { Slide, HighlightRange }
-
-type HighlightRange = { start: number; end: number } | null
+export type { Slide }
 
 type ResolvedWikilink = {
 	title: string
@@ -57,15 +55,8 @@ type ResolvedWikilink = {
 	isPresentation: boolean
 }
 
-type ScopedHighlight = {
-	range: NonNullable<HighlightRange>
-	slideSearchStart: number
-}
-
 let ThemeContext = createContext<PresentationTheme | null>(null)
 let WikilinkContext = createContext<Map<string, ResolvedWikilink>>(new Map())
-let HighlightContext = createContext<ScopedHighlight | null>(null)
-let ContentContext = createContext<string>("")
 let SyntaxThemeContext = createContext<SyntaxTheme>("github-light")
 
 type Asset = {
@@ -92,7 +83,6 @@ interface SlideshowProps {
 	assets?: Asset[]
 	wikilinks: Map<string, ResolvedWikilink>
 	currentSlideNumber: number
-	highlightRange: HighlightRange
 	onSlideChange?: (slideNumber: number) => void
 	onExit?: () => void
 	onGoToTeleprompter?: () => void
@@ -107,7 +97,6 @@ function Slideshow({
 	assets,
 	wikilinks,
 	currentSlideNumber,
-	highlightRange,
 	onSlideChange,
 	onExit,
 	onGoToTeleprompter,
@@ -138,10 +127,6 @@ function Slideshow({
 	)
 
 	let visibleBlocks = currentSlide?.blocks ?? []
-
-	// Compute content offset range for current slide to scope highlighting
-	let slideContentRange = getSlideContentRange(content, visibleBlocks)
-	let scopedHighlight = scopeHighlightToSlide(highlightRange, slideContentRange)
 
 	function goToNextSlide() {
 		if (currentSlideIdx < slides.length - 1 && onSlideChange) {
@@ -189,118 +174,113 @@ function Slideshow({
 			<WikilinkContext.Provider value={wikilinks}>
 				<ThemeContext.Provider value={effectiveAppearance}>
 					<SyntaxThemeContext.Provider value={syntaxTheme}>
-						<HighlightContext.Provider value={scopedHighlight}>
-							<ContentContext.Provider value={content}>
-								{/* Inject theme styles */}
-								{injectedStyles && <style>{injectedStyles}</style>}
+						{/* Inject theme styles */}
+						{injectedStyles && <style>{injectedStyles}</style>}
 
-								<div
-									data-mode="slideshow"
+						<div
+							data-current-slide={currentSlideNumber}
+							data-mode="slideshow"
+							data-theme={
+								isSourceTheme
+									? undefined
+									: (documentTheme.theme?.name ?? undefined)
+							}
+							data-appearance={isSourceTheme ? undefined : effectiveAppearance}
+							className={
+								isSourceTheme
+									? embedded
+										? "relative flex h-full min-h-0 min-w-0 flex-1 flex-col"
+										: "fixed inset-0 flex flex-col"
+									: embedded
+										? "theme relative flex h-full min-h-0 min-w-0 flex-1 flex-col"
+										: "theme fixed inset-0 flex flex-col"
+							}
+						>
+							{/* Theme warning banner */}
+							{documentTheme.warning && (
+								<div className="absolute top-4 left-1/2 z-50 -translate-x-1/2">
+									<div className="bg-warning/90 text-warning-foreground flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-lg">
+										<TriangleAlert className="size-4 shrink-0" />
+										<span>{documentTheme.warning}</span>
+									</div>
+								</div>
+							)}
+
+							{/* Theme error banner (corrupted theme data) */}
+							{themeStylesResult.error && (
+								<div className="absolute top-4 left-1/2 z-50 -translate-x-1/2">
+									<div className="bg-destructive/90 text-destructive-foreground flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-lg">
+										<TriangleAlert className="size-4 shrink-0" />
+										<span>
+											Theme error: {themeStylesResult.error}. Using default
+											styles.
+										</span>
+									</div>
+								</div>
+							)}
+
+							<div
+								data-theme-scope={themeScopeId}
+								data-mode={isSourceTheme ? "slideshow" : undefined}
+								data-appearance={
+									isSourceTheme ? effectiveAppearance : undefined
+								}
+								className="flex min-h-0 flex-1 flex-col"
+							>
+								<article
+									data-mode={isSourceTheme ? "slideshow" : undefined}
 									data-theme={
 										isSourceTheme
-											? undefined
-											: (documentTheme.theme?.name ?? undefined)
+											? (documentTheme.theme?.name ?? undefined)
+											: undefined
 									}
 									data-appearance={
-										isSourceTheme ? undefined : effectiveAppearance
+										isSourceTheme ? effectiveAppearance : undefined
 									}
 									className={
 										isSourceTheme
-											? embedded
-												? "relative flex h-full min-h-0 min-w-0 flex-1 flex-col"
-												: "fixed inset-0 flex flex-col"
-											: embedded
-												? "theme relative flex h-full min-h-0 min-w-0 flex-1 flex-col"
-												: "theme fixed inset-0 flex flex-col"
+											? "theme flex min-h-0 flex-1 flex-col"
+											: "flex min-h-0 flex-1 flex-col"
 									}
 								>
-									{/* Theme warning banner */}
-									{documentTheme.warning && (
-										<div className="absolute top-4 left-1/2 z-50 -translate-x-1/2">
-											<div className="bg-warning/90 text-warning-foreground flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-lg">
-												<TriangleAlert className="size-4 shrink-0" />
-												<span>{documentTheme.warning}</span>
-											</div>
-										</div>
-									)}
-
-									{/* Theme error banner (corrupted theme data) */}
-									{themeStylesResult.error && (
-										<div className="absolute top-4 left-1/2 z-50 -translate-x-1/2">
-											<div className="bg-destructive/90 text-destructive-foreground flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-lg">
-												<TriangleAlert className="size-4 shrink-0" />
-												<span>
-													Theme error: {themeStylesResult.error}. Using default
-													styles.
-												</span>
-											</div>
-										</div>
-									)}
-
-									<div
-										data-theme-scope={themeScopeId}
-										data-mode={isSourceTheme ? "slideshow" : undefined}
-										data-appearance={
-											isSourceTheme ? effectiveAppearance : undefined
-										}
-										className="flex min-h-0 flex-1 flex-col"
-									>
-										<article
-											data-mode={isSourceTheme ? "slideshow" : undefined}
-											data-theme={
-												isSourceTheme
-													? (documentTheme.theme?.name ?? undefined)
-													: undefined
-											}
-											data-appearance={
-												isSourceTheme ? effectiveAppearance : undefined
-											}
-											className={
-												isSourceTheme
-													? "theme flex min-h-0 flex-1 flex-col"
-													: "flex min-h-0 flex-1 flex-col"
-											}
-										>
-											{documentTheme.isLoading ||
-											themeStylesResult.isLoading ? null : safeSlideTemplate &&
-											  slideTemplateHasSlot ? (
-												<SlideTemplate
-													key={currentSlideNumber}
-													templateHtml={safeSlideTemplate}
-													currentSlideNumber={currentSlideNumber}
-													blocks={visibleBlocks}
-													size={size}
-													onClick={goToNextSlide}
-													measureKey={getThemeMeasureKey(
-														documentTheme,
-														themeStyles,
-													)}
-												/>
-											) : (
-												<ScaledSlideContainer
-													key={currentSlideNumber}
-													blocks={visibleBlocks}
-													size={size}
-													onClick={goToNextSlide}
-													measureKey={getThemeMeasureKey(
-														documentTheme,
-														themeStyles,
-													)}
-												/>
+									{documentTheme.isLoading ||
+									themeStylesResult.isLoading ? null : safeSlideTemplate &&
+									  slideTemplateHasSlot ? (
+										<SlideTemplate
+											key={currentSlideNumber}
+											templateHtml={safeSlideTemplate}
+											currentSlideNumber={currentSlideNumber}
+											blocks={visibleBlocks}
+											size={size}
+											onClick={goToNextSlide}
+											measureKey={getThemeMeasureKey(
+												documentTheme,
+												themeStyles,
 											)}
-										</article>
-									</div>
-									<SlideControls
-										slides={slides}
-										currentSlideNumber={currentSlideNumber}
-										onSlideChange={onSlideChange}
-										onExit={onExit}
-										onGoToTeleprompter={onGoToTeleprompter}
-										embedded={embedded}
-									/>
-								</div>
-							</ContentContext.Provider>
-						</HighlightContext.Provider>
+										/>
+									) : (
+										<ScaledSlideContainer
+											key={currentSlideNumber}
+											blocks={visibleBlocks}
+											size={size}
+											onClick={goToNextSlide}
+											measureKey={getThemeMeasureKey(
+												documentTheme,
+												themeStyles,
+											)}
+										/>
+									)}
+								</article>
+							</div>
+							<SlideControls
+								slides={slides}
+								currentSlideNumber={currentSlideNumber}
+								onSlideChange={onSlideChange}
+								onExit={onExit}
+								onGoToTeleprompter={onGoToTeleprompter}
+								embedded={embedded}
+							/>
+						</div>
 					</SyntaxThemeContext.Provider>
 				</ThemeContext.Provider>
 			</WikilinkContext.Provider>
@@ -835,18 +815,10 @@ function RenderSegments({ segments }: { segments: TextSegment[] }) {
 
 function RenderSegment({ segment }: { segment: TextSegment }) {
 	let wikilinks = useContext(WikilinkContext)
-	let highlight = useContext(HighlightContext)
-	let content = useContext(ContentContext)
 
 	switch (segment.type) {
 		case "text":
-			return (
-				<HighlightedText
-					text={segment.text}
-					content={content}
-					highlight={highlight}
-				/>
-			)
+			return <>{segment.text}</>
 		case "link":
 			return (
 				<a
@@ -855,11 +827,7 @@ function RenderSegment({ segment }: { segment: TextSegment }) {
 					rel="noopener noreferrer"
 					onClick={e => e.stopPropagation()}
 				>
-					<HighlightedText
-						text={segment.text}
-						content={content}
-						highlight={highlight}
-					/>
+					{segment.text}
 				</a>
 			)
 		case "wikilink": {
@@ -894,15 +862,7 @@ function RenderSegment({ segment }: { segment: TextSegment }) {
 				</em>
 			)
 		case "codespan":
-			return (
-				<code>
-					<HighlightedText
-						text={segment.text}
-						content={content}
-						highlight={highlight}
-					/>
-				</code>
-			)
+			return <code>{segment.text}</code>
 		case "del":
 			return (
 				<del>
@@ -910,45 +870,6 @@ function RenderSegment({ segment }: { segment: TextSegment }) {
 				</del>
 			)
 	}
-}
-
-function HighlightedText({
-	text,
-	content,
-	highlight,
-}: {
-	text: string
-	content: string
-	highlight: ScopedHighlight | null
-}) {
-	if (!highlight) return <>{text}</>
-
-	let { range, slideSearchStart } = highlight
-
-	let textIndex = content.indexOf(text, slideSearchStart)
-	if (textIndex === -1) return <>{text}</>
-
-	let textStart = textIndex
-	let textEnd = textIndex + text.length
-
-	let noOverlap = range.end <= textStart || range.start >= textEnd
-	if (noOverlap) return <>{text}</>
-
-	let relStart = Math.max(0, range.start - textStart)
-	let relEnd = Math.min(text.length, range.end - textStart)
-	if (relStart >= relEnd) return <>{text}</>
-
-	let before = text.slice(0, relStart)
-	let highlighted = text.slice(relStart, relEnd)
-	let after = text.slice(relEnd)
-
-	return (
-		<>
-			{before}
-			<mark className="highlighted">{highlighted}</mark>
-			{after}
-		</>
-	)
 }
 
 function SlideContentItem({ item }: { item: SlideContent }) {
@@ -1101,7 +1022,7 @@ function SlideVideo({ asset }: { asset: Asset }) {
 		<video
 			src={url}
 			controls
-			muted={asset.muteAudio}
+			muted={isLaserPreview() || asset.muteAudio}
 			className="slideshow-image"
 			style={{ width: "100%", height: "100%", objectFit: "contain" }}
 			onClick={e => e.stopPropagation()}
@@ -1160,19 +1081,11 @@ function HighlightedCode({
 	code: string
 	language?: string
 }) {
-	let highlight = useContext(HighlightContext)
-	let content = useContext(ContentContext)
 	let syntaxTheme = useContext(SyntaxThemeContext)
 	let [html, setHtml] = useState<string | null>(null)
 
-	// Stable key for decorations
-	let decorationKey = highlight?.range
-		? `${highlight.range.start}-${highlight.range.end}`
-		: "none"
-
 	useEffect(() => {
 		let cancelled = false
-		let decorations = computeCodeDecorations(code, content, highlight)
 
 		loadSyntaxHighlighter(syntaxTheme)
 			.then(highlighter => {
@@ -1180,7 +1093,6 @@ function HighlightedCode({
 					code,
 					language,
 					theme: syntaxTheme,
-					decorations,
 				})
 			})
 			.then(result => {
@@ -1192,7 +1104,7 @@ function HighlightedCode({
 		return () => {
 			cancelled = true
 		}
-	}, [code, language, syntaxTheme, decorationKey, content, highlight])
+	}, [code, language, syntaxTheme])
 
 	if (html) {
 		return (
@@ -1208,32 +1120,6 @@ function HighlightedCode({
 			<code>{code}</code>
 		</pre>
 	)
-}
-
-function computeCodeDecorations(
-	code: string,
-	content: string,
-	highlight: ScopedHighlight | null,
-): SyntaxDecoration[] {
-	if (!highlight) return []
-
-	let { range, slideSearchStart } = highlight
-
-	let codeStart = content.indexOf(code, slideSearchStart)
-	if (codeStart === -1) return []
-
-	let codeEnd = codeStart + code.length
-
-	let noOverlap = range.end <= codeStart || range.start >= codeEnd
-	if (noOverlap) return []
-
-	let relStart = Math.max(0, range.start - codeStart)
-	let relEnd = Math.min(code.length, range.end - codeStart)
-	if (relStart >= relEnd) return []
-
-	return [
-		{ start: relStart, end: relEnd, properties: { class: "highlighted" } },
-	]
 }
 
 type ThemeStylesResult = {
@@ -1330,41 +1216,4 @@ function hashThemeStyles(styles: ThemeStyles): string {
 		hash = (hash * 33) ^ content.charCodeAt(index)
 	}
 	return (hash >>> 0).toString(36)
-}
-
-function getSlideContentRange(
-	content: string,
-	blocks: VisualBlock[],
-): { start: number; end: number } | null {
-	if (blocks.length === 0) return null
-
-	let minLine = Math.min(...blocks.map(b => b.startLine))
-	let maxLine = Math.max(...blocks.map(b => b.endLine))
-
-	let lines = content.split("\n")
-	let start = 0
-	for (let i = 0; i < minLine && i < lines.length; i++) {
-		start += lines[i].length + 1
-	}
-
-	let end = start
-	for (let i = minLine; i <= maxLine && i < lines.length; i++) {
-		end += lines[i].length + 1
-	}
-
-	return { start, end }
-}
-
-function scopeHighlightToSlide(
-	highlightRange: HighlightRange,
-	slideRange: { start: number; end: number } | null,
-): ScopedHighlight | null {
-	if (!highlightRange || !slideRange) return null
-
-	let noOverlap =
-		highlightRange.end <= slideRange.start ||
-		highlightRange.start >= slideRange.end
-	if (noOverlap) return null
-
-	return { range: highlightRange, slideSearchStart: slideRange.start }
 }

@@ -23,6 +23,7 @@ let currentRootMigrationVersion = 2
 // Stale clients can keep writing current roots, so version alone cannot bound replay.
 let rootReplayTransactionBudget = 1_000
 let compactableRootResolve = {
+	laserHub: true,
 	documents: true,
 	inactiveDocuments: true,
 	spaces: true,
@@ -197,6 +198,7 @@ function compactUserRoot(
 			root.agentConnections ?? co.list(AgentConnection).create([], owner),
 		migrationVersion: currentRootMigrationVersion,
 	}
+	if (root.laserHub) values.laserHub = root.laserHub
 	if (root.language) values.language = root.language
 	if (root.lastOpenedDocId) values.lastOpenedDocId = root.lastOpenedDocId
 	if (root.lastOpenedSpaceId) values.lastOpenedSpaceId = root.lastOpenedSpaceId

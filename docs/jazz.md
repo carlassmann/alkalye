@@ -52,3 +52,70 @@ that the replacement's transaction count stays within a fixed replay budget.
   Machine.
 - Write document timestamps on editing idle, not for every content transaction.
   Derived title/path/tag fields may write only when their values actually change.
+
+### Presentation pointers
+
+Presentation discovery and laser positions live under `UserRoot.laserHub`, in a
+private group owned by the account. Document sharing never grants access to this
+group. Load it only while presenting or using the teleprompter.
+
+Each mounted display or controller gets a new writer ID and its own `LaserSender`.
+This avoids reusing a busy transaction stream when Jazz restores a browser session
+after reload. Suspend writes on `pagehide`; never flush pointer state during unload.
+
+Rotate sender streams, the discovery record, and its hub after 256 transactions.
+Keep at most 64 sender references and prune inactive senders when a new session
+starts. Root compaction must preserve the hub reference. Rotation bounds replay;
+it does not delete encrypted historical transactions from storage. Queue the latest
+message while a replacement is loading. After replacing a hub or registry, read
+back the winning reference before publishing; another device's timestamp can win.
+Catch unavailable sender references individually so they cannot block healthy
+writers. A loading hub or registry still queues writes rather than replacing data.
+
+A controller must receive a response to its own discovery request before offering
+a display. Selecting a display stays fixed until the user changes it, including
+when that display disconnects. Never redirect a held pointer to another screen.
+
+The display issues short-lived tokens tied to its slide, dimensions, and
+appearance. It validates them using its own monotonic clock. Remote timestamps
+are only cleanup hints, never proof that a pointer is live. This prevents replayed
+positions after reconnect and supports devices with different wall clocks. Tokens
+expire after five seconds, allowing renewal over a 1.5-second round trip; this also
+permits delayed points within that window. Layout changes invalidate tokens immediately.
+
+The preview uses a separate iframe viewport at the target dimensions and
+appearance. Its explicit `laserPreview` flag suppresses display registration and
+app prompts, and mutes video. Video playback is independent of the projector.
+
+Laser sync uses latest-value CoMaps, not a CoFeed. We need the current position
+and a short recovery window, not an append-only event history. Each update carries
+up to 128 indexed samples from its stroke, including browser-coalesced movement.
+On the wire, samples are integer triples with coordinates scaled by 10,000. This
+keeps the recovery window with at most 0.00005 normalized coordinate error.
+The channel decodes samples before delivering them to the renderer.
+Keep the sample limit shared by validation and publishing. Receivers deduplicate
+overlapping batches so missed intermediate updates do not flatten fast curves.
+This window is bounded: a longer gap can still lose older samples.
+
+Laser strokes carry IDs so separate gestures never join. Leaving the preview
+pauses drawing; re-entry starts a new segment within the captured drag. Release,
+cancellation, hiding the preview, or a slide/layout change ends the gesture.
+Zero-area previews must not publish coordinates. Each renderer retains
+at most 2,048 points and uses its own monotonic clock. Like tldraw, a stroke stays
+visible while drawing, then waits 1,200 ms and fades over 500 ms. Heartbeats keep
+a held stroke alive; lost connections still expire. Heartbeats publish only after
+500 ms without a point update, so moving strokes do not also send heartbeats.
+Deduplicate samples per stroke, including when controllers alternate. Slide and layout changes clear
+the trail immediately. Cache the SVG path until its points change; fading only
+changes opacity. Hiding the preview preserves the chosen display for reopening.
+
+Below 768 px, the preview occupies a dialog instead of sharing space with the
+teleprompter. Keep the teleprompter mounted to preserve its scroll and timer, but
+suspend its keyboard shortcuts while the dialog is open. Wider viewports use an
+inline preview. Mobile dialog state and desktop visibility are independent so
+resizing never opens a mobile dialog merely because the desktop preview was shown.
+
+Local storage notifications include the changed CoValue IDs. Reload only matching
+known values; notifications from older tabs without IDs still trigger a full reload.
+
+Written with GPT-6 in Codex.
