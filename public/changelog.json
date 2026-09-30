@@ -1,5 +1,14 @@
 [
 	{
+		"id": 155,
+		"date": "2026-09-30",
+		"title": "Connect your preferred MCP client",
+		"notes": [
+			"MCP connections now accept clients from any provider, including Claude, Cursor, and custom clients"
+		],
+		"pr": 57
+	},
+	{
 		"id": 154,
 		"date": "2026-09-29",
 		"title": "Point at slides from your teleprompter",

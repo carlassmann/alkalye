@@ -16,7 +16,6 @@ let GET: APIRoute = async ({ request }) => {
 		let client = await validateClientRedirect(
 			parsed.client_id,
 			parsed.redirect_uri,
-			config.allowedClientHosts,
 		)
 		let oauth = await config.tokens.seal(
 			"consent",

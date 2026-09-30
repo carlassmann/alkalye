@@ -40,7 +40,6 @@ let POST: APIRoute = async ({ request }) => {
 			tokens: config.tokens,
 			request: consent.authorization,
 			credential: input.credential,
-			allowedClientHosts: config.allowedClientHosts,
 			clientValidated: true,
 		})
 		return Response.json({ redirectTo: redirect.toString() })

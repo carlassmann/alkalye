@@ -125,11 +125,6 @@ export default defineConfig({
 				context: "server",
 				access: "secret",
 			}),
-			ALKALYE_MCP_ALLOWED_CLIENT_HOSTS: envField.string({
-				context: "server",
-				access: "secret",
-				optional: true,
-			}),
 			ALKALYE_OPENAI_APPS_CHALLENGE: envField.string({
 				context: "server",
 				access: "secret",

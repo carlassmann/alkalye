@@ -23,7 +23,7 @@ Document or space Group
 - Removing membership blocks future decryption. It cannot erase content already disclosed to a provider.
 - The credential stored in the user's Jazz root and OAuth tokens is AES-256-GCM wrapped with `ALKALYE_MCP_TOKEN_KEY`.
 - OAuth authorization codes use PKCE S256 and bind client ID, redirect URI, resource, and scope.
-- CIMD client metadata is fetched only from configured client-host suffixes and its registered redirect URI is enforced.
+- Clients from any provider can authorize. CIMD metadata must use HTTPS, resolve to public network addresses, and register the requested redirect URI.
 
 ## Endpoints
 
@@ -62,7 +62,6 @@ Set:
 PUBLIC_JAZZ_SYNC_SERVER=wss://your-sync-server.example
 ALKALYE_MCP_BASE_URL=https://www.alkalye.com
 ALKALYE_MCP_TOKEN_KEY=<32 random bytes encoded as base64url>
-ALKALYE_MCP_ALLOWED_CLIENT_HOSTS=chatgpt.com,openai.com
 ALKALYE_OPENAI_APPS_CHALLENGE=<OpenAI portal challenge token>
 ```
 
