@@ -54,6 +54,7 @@ export { UserProfile, UserRoot, UserAccount }
 export {
 	AgentConnection,
 	McpConnection,
+	createMcpConnections,
 } from "@/app/features/agents/lib/schema"
 
 let UserProfile = co.profile({

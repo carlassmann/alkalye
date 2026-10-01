@@ -9,7 +9,7 @@ import {
 	SettingsSection,
 	SettingsPanel,
 } from "@/app/components/ui/settings-layout"
-import { readJsonResponse } from "../lib/agent-api"
+import { readJsonResponse, disconnectMcpConnection } from "../lib/agent-api"
 
 export { AgentConnectionsSection, agentConnectionsQuery }
 
@@ -24,6 +24,7 @@ interface AgentConnectionsSectionProps {
 	oauth?: string
 }
 interface Consent {
+	authorization: { client_id: string }
 	client: { name: string; redirectHost: string }
 }
 
@@ -36,6 +37,7 @@ function AgentConnectionsSection({
 	let [busy, setBusy] = useState(false)
 	let [authOpen, setAuthOpen] = useState(false)
 	let [error, setError] = useState<string>()
+	let [status, setStatus] = useState<string>()
 	let [consent, setConsent] = useState<{ token: string; value: Consent }>()
 	let [copied, setCopied] = useState(false)
 	let endpoint = `${window.location.origin}/mcp`
@@ -109,13 +111,11 @@ function AgentConnectionsSection({
 			setBusy(true)
 			setError(undefined)
 			try {
-				let response = await fetch("/api/mcp-connections", {
-					method: "DELETE",
-					headers: { "content-type": "application/json" },
-					body: JSON.stringify({ credential: connection.credential }),
+				await disconnectMcpConnection(connection, async () => {
+					if (account)
+						await account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
 				})
-				if (!response.ok) throw new Error("Could not disconnect client")
-				connection.$jazz.set("revokedAt", new Date())
+				setStatus(t("settings.agents.revoked"))
 			} catch (cause) {
 				setError(cause instanceof Error ? cause.message : "Disconnect failed")
 			} finally {
@@ -176,8 +176,16 @@ function AgentConnectionsSection({
 					<div className="border-border space-y-3 border-t p-4">
 						<p className="font-medium">
 							{t("settings.agents.authorize", {
-								client: authorization.client.name,
+								client: new URL(authorization.authorization.client_id).host,
 							})}
+						</p>
+						<p className="text-muted-foreground text-sm">
+							{t("settings.agents.clientName", {
+								name: authorization.client.name,
+							})}
+						</p>
+						<p className="font-mono text-xs break-all">
+							{authorization.authorization.client_id}
 						</p>
 						<p className="text-muted-foreground text-xs/relaxed">
 							{t("settings.agents.consent", {
@@ -190,7 +198,7 @@ function AgentConnectionsSection({
 								onClick={handleAuthorize}
 							>
 								{t("settings.agents.authorize", {
-									client: authorization.client.name,
+									client: new URL(authorization.authorization.client_id).host,
 								})}
 							</Button>
 							<Button variant="outline" disabled={busy} onClick={handleDeny}>
@@ -207,7 +215,14 @@ function AgentConnectionsSection({
 							className="border-border flex items-center justify-between gap-3 border-t p-4"
 						>
 							<div className="min-w-0">
-								<p className="font-medium">{connection.clientName}</p>
+								<p className="font-medium">
+									{new URL(connection.clientId).host}
+								</p>
+								<p className="text-muted-foreground text-xs">
+									{t("settings.agents.clientName", {
+										name: connection.clientName,
+									})}
+								</p>
 								<p className="text-muted-foreground truncate text-xs">
 									{connection.clientId}
 								</p>
@@ -222,6 +237,11 @@ function AgentConnectionsSection({
 							</Button>
 						</div>
 					))}
+				{status && (
+					<p role="status" className="text-muted-foreground p-4 text-sm">
+						{status}
+					</p>
+				)}
 				{error && (
 					<p role="alert" className="text-destructive p-4 text-sm">
 						{error}
@@ -238,17 +258,38 @@ function AgentConnectionsSection({
 }
 
 function isConsent(value: unknown): value is Consent {
-	if (!value || typeof value !== "object" || !("client" in value)) return false
-	let client = value.client
-	return Boolean(
-		client &&
-		typeof client === "object" &&
-		"name" in client &&
-		typeof client.name === "string" &&
-		"redirectHost" in client &&
-		typeof client.redirectHost === "string",
+	if (
+		!value ||
+		typeof value !== "object" ||
+		!("client" in value) ||
+		!("authorization" in value)
 	)
+		return false
+	let client = value.client
+	let authorization = value.authorization
+	if (
+		!client ||
+		typeof client !== "object" ||
+		!("name" in client) ||
+		typeof client.name !== "string" ||
+		!("redirectHost" in client) ||
+		typeof client.redirectHost !== "string"
+	)
+		return false
+	if (
+		!authorization ||
+		typeof authorization !== "object" ||
+		!("client_id" in authorization) ||
+		typeof authorization.client_id !== "string"
+	)
+		return false
+	try {
+		return new URL(authorization.client_id).protocol === "https:"
+	} catch {
+		return false
+	}
 }
+
 function hasRedirect(value: unknown): value is { redirectTo: string } {
 	return Boolean(
 		value &&

@@ -6,7 +6,7 @@
 		"notes": [
 			"Connect any compatible MCP client, including Claude, Cursor, and custom clients.",
 			"Connected clients use your existing document and space permissions. No separate agent accounts or access grants to manage.",
-			"Disconnect individual clients from Settings. Create personal documents through MCP, too."
+			"Check each client’s host before connecting. Disconnect individual clients even when the MCP server is unavailable. Create personal documents through MCP, too."
 		],
 		"pr": 57
 	},

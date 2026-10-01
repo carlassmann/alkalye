@@ -19,6 +19,9 @@ let baseSettingsMessages = messages({
 	"settings.agents.description":
 		"Connected clients act as you, with your Jazz permissions. Disconnect a client to stop its access.",
 	"settings.agents.disconnect": "Disconnect",
+	"settings.agents.revoked":
+		"Connection revoked locally. Revocation syncs when connected.",
+	"settings.agents.clientName": "Client-provided name: {$name}",
 	"settings.agents.signIn": "Sign in to authorize an MCP client.",
 	"settings.agents.authorize": "Authorize {$client}",
 	"settings.agents.consent":
@@ -164,6 +167,9 @@ let deSettingsMessages = translate(baseSettingsMessages, {
 	"settings.agents.description":
 		"Verbundene Clients handeln als du, mit deinen Jazz-Berechtigungen. Trenne einen Client, um seinen Zugriff zu beenden.",
 	"settings.agents.disconnect": "Trennen",
+	"settings.agents.revoked":
+		"Verbindung lokal widerrufen. Der Widerruf wird bei bestehender Verbindung synchronisiert.",
+	"settings.agents.clientName": "Vom Client angegebener Name: {$name}",
 	"settings.agents.signIn":
 		"Melde dich an, um einen MCP-Client zu autorisieren.",
 	"settings.agents.authorize": "{$client} autorisieren",

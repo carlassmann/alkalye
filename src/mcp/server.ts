@@ -620,7 +620,7 @@ function requireWriteAccess(
 	accountId: string,
 ) {
 	let role = group.getRoleOf(accountId)
-	if (role !== "admin" && role !== "writer")
+	if (role !== "admin" && role !== "manager" && role !== "writer")
 		throw new Error("You do not have write access")
 }
 

@@ -1,3 +1,4 @@
+import { InvalidGrantError } from "./errors"
 import { Buffer } from "node:buffer"
 import { z } from "zod"
 import { fetchClientMetadata } from "./client-metadata"
@@ -95,8 +96,10 @@ async function exchangeAuthorizationCode(args: {
 	clientId: string
 	redirectUri: string
 	resource: string
+	validateConnection: (credential: string, clientId: string) => Promise<void>
 }) {
-	let code = await args.tokens.open(
+	let code = await readGrant(
+		args.tokens,
 		"authorization_code",
 		args.code,
 		authorizationCodeSchema,
@@ -107,10 +110,11 @@ async function exchangeAuthorizationCode(args: {
 		code.resource !== args.resource ||
 		!(await matchesCodeChallenge(args.codeVerifier, code.codeChallenge))
 	) {
-		throw new Error("invalid_grant")
+		throw new InvalidGrantError()
 	}
+	await args.validateConnection(code.credential, args.clientId)
 	if (!(await args.replayStore.consume(`code:${code.jti}`, 5 * 60_000))) {
-		throw new Error("invalid_grant")
+		throw new InvalidGrantError()
 	}
 	return mintTokens(args.tokens, code)
 }
@@ -121,24 +125,40 @@ async function exchangeRefreshToken(args: {
 	refreshToken: string
 	clientId: string
 	resource: string
+	validateConnection: (credential: string, clientId: string) => Promise<void>
 }) {
-	let token = await args.tokens.open(
+	let token = await readGrant(
+		args.tokens,
 		"refresh_token",
 		args.refreshToken,
 		refreshTokenSchema,
 	)
 	if (token.clientId !== args.clientId || token.resource !== args.resource) {
-		throw new Error("invalid_grant")
+		throw new InvalidGrantError()
 	}
+	await args.validateConnection(token.credential, args.clientId)
 	if (
 		!(await args.replayStore.consume(
 			`refresh:${token.jti}`,
 			30 * 24 * 60 * 60_000,
 		))
 	) {
-		throw new Error("invalid_grant")
+		throw new InvalidGrantError()
 	}
 	return mintTokens(args.tokens, token)
+}
+
+async function readGrant<T>(
+	tokens: TokenCodec,
+	type: string,
+	value: string,
+	schema: z.ZodType<T>,
+) {
+	try {
+		return await tokens.open(type, value, schema)
+	} catch {
+		throw new InvalidGrantError()
+	}
 }
 
 async function mintTokens(

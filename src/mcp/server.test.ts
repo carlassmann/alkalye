@@ -270,6 +270,26 @@ describe("Alkalye MCP tool catalog", () => {
 		})
 		expect(readerUpdate.isError).toBe(true)
 		expect(reader.content.toString()).toBe("Reader content")
+		setActiveAccount(other)
+		sharedWriter.$jazz.owner.addMember(account, "manager")
+		setActiveAccount(account)
+		let managerRead = await client.callTool({
+			name: "get_document",
+			arguments: { documentId: writer.$jazz.id },
+		})
+		let managerRevision = z
+			.object({ revision: z.string() })
+			.parse(managerRead.structuredContent).revision
+		let managerUpdate = await client.callTool({
+			name: "update_document",
+			arguments: {
+				documentId: writer.$jazz.id,
+				content: "Updated as manager",
+				expectedRevision: managerRevision,
+			},
+		})
+		expect(managerUpdate.isError).not.toBe(true)
+		expect(writer.content.toString()).toBe("Updated as manager")
 		let writerArchive = await client.callTool({
 			name: "archive_document",
 			arguments: { documentId: writer.$jazz.id },

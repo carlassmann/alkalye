@@ -1,13 +1,19 @@
+import { InvalidConnectionError } from "./errors"
 import { WasmCrypto } from "cojson/crypto/WasmCrypto"
 import { WebSocketPeerWithReconnection } from "cojson-transport-ws"
 import {
 	MockSessionProvider,
-	createJazzContextFromExistingCredentials,
 	co,
+	createJazzContextFromExistingCredentials,
 	type Loaded,
 	type Peer,
 } from "jazz-tools"
-import { UserAccount, McpConnection } from "@/schema"
+import {
+	UserAccount,
+	UserRoot,
+	McpConnection,
+	createMcpConnections,
+} from "@/schema"
 import {
 	accountCredentialsSchema,
 	type ConnectionCredentials,
@@ -49,13 +55,17 @@ async function createUserConnection(
 		credentials,
 		async user => {
 			let account = await user.account.$jazz.ensureLoaded({
-				resolve: { root: { mcpConnections: true } },
+				resolve: { root: true },
 			})
-			let list = account.root.mcpConnections
-			if (!list) {
-				list = co.list(McpConnection).create([], account.root.$jazz.owner)
-				account.root.$jazz.set("mcpConnections", list)
-			}
+			let existingId = account.root.mcpConnections?.$jazz.id
+			let list = existingId
+				? await co
+						.list(McpConnection)
+						.load(existingId, { loadAs: user.account })
+				: await createMcpConnections(account.root.$jazz.owner)
+			if (!list.$isLoaded) throw new Error("MCP connections are unavailable")
+			let root: co.loaded<typeof UserRoot> = account.root
+			if (!existingId) root.$jazz.set("mcpConnections", list)
 			let connection = McpConnection.create(
 				{
 					clientId: client.id,
@@ -137,7 +147,7 @@ async function revokeUserConnection(
 			let connection = account.root.mcpConnections?.find(
 				item => item.$jazz.id === credentials.connectionId,
 			)
-			if (!connection) throw new Error("MCP connection is disconnected")
+			if (!connection) throw new InvalidConnectionError()
 			connection.$jazz.set("revokedAt", new Date())
 			await account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
 		},
@@ -214,7 +224,7 @@ async function runWithUserAccountState<Result>(
 				connection.clientId !== credentials.clientId ||
 				(!allowRevoked && connection.revokedAt)
 			) {
-				throw new Error("MCP connection is disconnected")
+				throw new InvalidConnectionError()
 			}
 		}
 		let result = operation(user)

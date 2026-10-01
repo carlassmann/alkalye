@@ -1,3 +1,4 @@
+import { McpUnavailableError } from "./errors"
 import { Buffer } from "node:buffer"
 import { describe, expect, test, vi } from "vitest"
 import { fetchClientMetadata } from "./client-metadata"
@@ -108,6 +109,7 @@ describe("MCP OAuth", () => {
 			exchangeAuthorizationCode({
 				tokens,
 				replayStore,
+				validateConnection: async () => undefined,
 				code,
 				codeVerifier: "wrong".repeat(12),
 				clientId: "https://chatgpt.example/client.json",
@@ -119,6 +121,7 @@ describe("MCP OAuth", () => {
 		let result = await exchangeAuthorizationCode({
 			tokens,
 			replayStore,
+			validateConnection: async () => undefined,
 			code,
 			codeVerifier: verifier,
 			clientId: "https://chatgpt.example/client.json",
@@ -131,6 +134,7 @@ describe("MCP OAuth", () => {
 			exchangeAuthorizationCode({
 				tokens,
 				replayStore,
+				validateConnection: async () => undefined,
 				code,
 				codeVerifier: verifier,
 				clientId: "https://chatgpt.example/client.json",
@@ -171,6 +175,7 @@ describe("MCP OAuth", () => {
 		let issued = await exchangeAuthorizationCode({
 			tokens,
 			replayStore,
+			validateConnection: async () => undefined,
 			code,
 			codeVerifier: verifier,
 			clientId: "https://chatgpt.example/client.json",
@@ -180,6 +185,7 @@ describe("MCP OAuth", () => {
 		let refreshArgs = {
 			tokens,
 			replayStore,
+			validateConnection: async () => undefined,
 			refreshToken: issued.refresh_token,
 			clientId: "https://chatgpt.example/client.json",
 			resource: "https://www.alkalye.com/mcp",
@@ -190,6 +196,70 @@ describe("MCP OAuth", () => {
 			"invalid_grant",
 		)
 		vi.resetAllMocks()
+	})
+
+	test("retains authorization codes and refresh tokens across transient connection failures", async () => {
+		let replayStore = createEphemeralReplayStore()
+		let verifier = "a".repeat(48)
+		let challenge = Buffer.from(
+			await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier)),
+		).toString("base64url")
+		let redirect = await approveAuthorization({
+			tokens,
+			credential: "wrapped-user",
+			clientValidated: true,
+			request: {
+				client_id: "https://custom.example/client.json",
+				redirect_uri: "https://custom.example/callback",
+				response_type: "code",
+				code_challenge: challenge,
+				code_challenge_method: "S256",
+				state: "state",
+				resource: "https://www.alkalye.com/mcp",
+				scope: "alkalye",
+			},
+		})
+		let code = redirect.searchParams.get("code")
+		if (!code) throw new Error("Missing code")
+		let validateConnection = vi
+			.fn()
+			.mockRejectedValueOnce(new McpUnavailableError())
+			.mockResolvedValue(undefined)
+		let codeArgs = {
+			tokens,
+			replayStore,
+			validateConnection,
+			code,
+			codeVerifier: verifier,
+			clientId: "https://custom.example/client.json",
+			redirectUri: "https://custom.example/callback",
+			resource: "https://www.alkalye.com/mcp",
+		}
+		await expect(exchangeAuthorizationCode(codeArgs)).rejects.toBeInstanceOf(
+			McpUnavailableError,
+		)
+		let issued = await exchangeAuthorizationCode(codeArgs)
+		validateConnection.mockRejectedValueOnce(new McpUnavailableError())
+		let refreshArgs = {
+			tokens,
+			replayStore,
+			validateConnection,
+			refreshToken: issued.refresh_token,
+			clientId: codeArgs.clientId,
+			resource: codeArgs.resource,
+		}
+		await expect(exchangeRefreshToken(refreshArgs)).rejects.toBeInstanceOf(
+			McpUnavailableError,
+		)
+		let refreshed = await exchangeRefreshToken(refreshArgs)
+		expect(refreshed.refresh_token).not.toBe(issued.refresh_token)
+		await expect(exchangeRefreshToken(refreshArgs)).rejects.toThrow(
+			"invalid_grant",
+		)
+		expect(validateConnection).toHaveBeenCalledWith(
+			"wrapped-user",
+			codeArgs.clientId,
+		)
 	})
 
 	test("rejects unregistered redirect URIs", async () => {

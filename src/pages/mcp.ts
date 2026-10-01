@@ -1,3 +1,4 @@
+import { InvalidConnectionError } from "@/mcp/errors"
 import type { APIRoute } from "astro"
 import { validateConnection } from "@/mcp/connection"
 import { getMcpConfig } from "@/mcp/config"
@@ -14,16 +15,26 @@ let handle: APIRoute = async ({ request }) => {
 	if (rejected) return rejected
 	let bearer = readBearer(request)
 	if (!bearer) return unauthorized(config.baseUrl)
+	let access
 	try {
-		let access = await readAccessToken(config.tokens, bearer)
-		let resource = new URL("/mcp", config.baseUrl).toString()
-		if (
-			access.resource !== resource ||
-			!access.scope.split(" ").includes("alkalye")
-		) {
-			return unauthorized(config.baseUrl)
-		}
+		access = await readAccessToken(config.tokens, bearer)
+	} catch {
+		return unauthorized(config.baseUrl)
+	}
+	let resource = new URL("/mcp", config.baseUrl).toString()
+	if (
+		access.resource !== resource ||
+		!access.scope.split(" ").includes("alkalye")
+	)
+		return unauthorized(config.baseUrl)
+	try {
 		await validateConnection(access.credential, access.clientId)
+	} catch (error) {
+		return error instanceof InvalidConnectionError
+			? unauthorized(config.baseUrl)
+			: unavailable()
+	}
+	try {
 		let response = await mcpHandler.fetch(request, {
 			authInfo: {
 				token: access.credential,
@@ -35,7 +46,7 @@ let handle: APIRoute = async ({ request }) => {
 		response.headers.set("access-control-allow-origin", "*")
 		return response
 	} catch {
-		return unauthorized(config.baseUrl)
+		return unavailable()
 	}
 }
 
@@ -70,6 +81,16 @@ function unauthorized(baseUrl: URL) {
 				"www-authenticate": `Bearer resource_metadata="${metadata}"`,
 				"access-control-allow-origin": "*",
 			},
+		},
+	)
+}
+
+function unavailable() {
+	return Response.json(
+		{ error: "temporarily_unavailable" },
+		{
+			status: 503,
+			headers: { "access-control-allow-origin": "*", "retry-after": "5" },
 		},
 	)
 }

@@ -339,6 +339,24 @@ describe("runAccountMigration - idempotency on a fully loaded account", () => {
 		clearLastOpenedDocument(account.$jazz.id)
 	})
 
+	test("backfills MCP connections on an existing current root without replacing it", async () => {
+		let account = await createJazzTestAccount({
+			AccountSchema: UserAccount,
+			isCurrentActiveAccount: true,
+		})
+		let { root } = await account.$jazz.ensureLoaded({ resolve: { root: true } })
+		root.$jazz.delete("mcpConnections")
+		let rootId = root.$jazz.id
+		let documentsId = root.documents.$jazz.id
+		await runAccountMigration(account)
+		let loaded = await account.$jazz.ensureLoaded({
+			resolve: { root: { mcpConnections: true } },
+		})
+		expect(loaded.root.$jazz.id).toBe(rootId)
+		expect(loaded.root.documents.$jazz.id).toBe(documentsId)
+		expect(loaded.root.mcpConnections?.$isLoaded).toBe(true)
+	})
+
 	test("recompacts a current root that exceeds the replay budget", async () => {
 		let account = await createJazzTestAccount({
 			isCurrentActiveAccount: true,

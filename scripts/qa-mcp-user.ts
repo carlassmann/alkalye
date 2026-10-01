@@ -173,16 +173,26 @@ let readerDocument = await createPersonalDocument(
 	owner.account,
 	"Reader document",
 )
+let managerDocument = await createPersonalDocument(
+	owner.account,
+	"Manager document",
+)
+managerDocument.$jazz.owner.addMember(context.account, "manager")
 writerDocument.$jazz.owner.addMember(context.account, "writer")
 readerDocument.$jazz.owner.addMember(context.account, "reader")
 await owner.account.$jazz.waitForAllCoValuesSync({ timeout: 10000 })
 let indexed = await context.account.$jazz.ensureLoaded({
 	resolve: { root: { documents: true } },
 })
-indexed.root.documents.$jazz.push(writerDocument, readerDocument)
+indexed.root.documents.$jazz.push(
+	writerDocument,
+	readerDocument,
+	managerDocument,
+)
 await context.account.$jazz.waitForAllCoValuesSync({ timeout: 10000 })
 for (let [shared, writable] of [
 	[writerDocument, true],
+	[managerDocument, true],
 	[readerDocument, false],
 ] as const) {
 	let sharedRead = await call("tools/call", {
@@ -205,7 +215,7 @@ for (let [shared, writable] of [
 			.parse(sharedWrite.body).result.isError === true
 	if (failed === writable) throw new Error("Shared user permission mismatch")
 }
-console.log("PASS non-admin writer editing and reader rejection")
+console.log("PASS non-admin writer and manager editing, reader rejection")
 owner.done()
 let created = await call("tools/call", {
 	name: "create_document",

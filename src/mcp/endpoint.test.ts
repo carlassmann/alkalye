@@ -1,5 +1,8 @@
+import { InvalidConnectionError } from "./errors"
 import { createContext } from "astro/middleware"
 import { describe, expect, test, vi } from "vitest"
+import { mcpHandler } from "@/mcp/server"
+import { McpUnavailableError } from "./errors"
 import { getMcpConfig } from "@/mcp/config"
 import { validateConnection } from "@/mcp/connection"
 import { POST } from "../pages/mcp"
@@ -47,7 +50,7 @@ describe("MCP client connections", () => {
 
 	test("rejects a disconnected connection before dispatch", async () => {
 		vi.mocked(validateConnection).mockRejectedValueOnce(
-			new Error("MCP connection is disconnected"),
+			new InvalidConnectionError(),
 		)
 		let token = await getMcpConfig().tokens.seal(
 			"access_token",
@@ -68,6 +71,42 @@ describe("MCP client connections", () => {
 		)
 		expect(response.status).toBe(401)
 	})
+
+	test.each(["connection", "handler"])(
+		"returns 503 for %s failures without challenging authentication",
+		async failure => {
+			if (failure === "connection")
+				vi.mocked(validateConnection).mockRejectedValueOnce(
+					new McpUnavailableError(),
+				)
+			else
+				vi.mocked(mcpHandler.fetch).mockRejectedValueOnce(
+					new Error("Handler failed"),
+				)
+			let token = await getMcpConfig().tokens.seal(
+				"access_token",
+				{
+					clientId: "https://custom.example/client.json",
+					resource: "https://www.alkalye.com/mcp",
+					scope: "alkalye",
+					credential: "active",
+				},
+				Date.now() + 60_000,
+			)
+			let response = await POST(
+				createContext({
+					request: new Request("https://www.alkalye.com/mcp", {
+						method: "POST",
+						headers: { authorization: `Bearer ${token}` },
+					}),
+					defaultLocale: "en",
+					locals: {},
+				}),
+			)
+			expect(response.status).toBe(503)
+			expect(response.headers.get("www-authenticate")).toBeNull()
+		},
+	)
 
 	test("still requires authentication from arbitrary origins", async () => {
 		let request = new Request("https://www.alkalye.com/mcp", {
