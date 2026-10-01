@@ -9,3 +9,13 @@ let AgentConnection = co.map({
 	personalDocumentsRole: z.enum(["reader", "writer"]).optional(),
 	createdAt: z.date(),
 })
+
+export { McpConnection }
+
+let McpConnection = co.map({
+	clientId: z.string(),
+	clientName: z.string(),
+	credential: z.string(),
+	createdAt: z.date(),
+	revokedAt: z.date().optional(),
+})

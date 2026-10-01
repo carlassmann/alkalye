@@ -1,7 +1,10 @@
 import { createContext } from "astro/middleware"
 import { describe, expect, test, vi } from "vitest"
 import { getMcpConfig } from "@/mcp/config"
+import { validateConnection } from "@/mcp/connection"
 import { POST } from "../pages/mcp"
+
+vi.mock("@/mcp/connection", () => ({ validateConnection: vi.fn() }))
 
 vi.mock("@/mcp/server", () => ({
 	mcpHandler: { fetch: vi.fn(() => Response.json({ connected: true })) },
@@ -40,6 +43,30 @@ describe("MCP client connections", () => {
 		expect(response.status).toBe(200)
 		expect(response.headers.get("access-control-allow-origin")).toBe("*")
 		expect(await response.json()).toEqual({ connected: true })
+	})
+
+	test("rejects a disconnected connection before dispatch", async () => {
+		vi.mocked(validateConnection).mockRejectedValueOnce(
+			new Error("MCP connection is disconnected"),
+		)
+		let token = await getMcpConfig().tokens.seal(
+			"access_token",
+			{
+				clientId: "https://custom.example/client.json",
+				resource: "https://www.alkalye.com/mcp",
+				scope: "alkalye",
+				credential: "revoked",
+			},
+			Date.now() + 60_000,
+		)
+		let request = new Request("https://www.alkalye.com/mcp", {
+			method: "POST",
+			headers: { authorization: `Bearer ${token}` },
+		})
+		let response = await POST(
+			createContext({ request, defaultLocale: "en", locals: {} }),
+		)
+		expect(response.status).toBe(401)
 	})
 
 	test("still requires authentication from arbitrary origins", async () => {

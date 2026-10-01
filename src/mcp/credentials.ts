@@ -3,8 +3,8 @@ import type { AgentSecret } from "cojson"
 import type { ID } from "jazz-tools"
 import { UserAccount } from "@/schema"
 
-export { agentCredentialsSchema }
-export type { AgentCredentials }
+export { connectionCredentialsSchema, accountCredentialsSchema }
+export type { ConnectionCredentials }
 
 let accountIdSchema = z.custom<ID<typeof UserAccount>>(
 	value => typeof value === "string" && value.startsWith("co_z"),
@@ -16,9 +16,14 @@ let agentSecretSchema = z.custom<AgentSecret>(
 		value.includes("/signerSecret_z"),
 )
 
-let agentCredentialsSchema = z.object({
+let accountCredentialsSchema = z.object({
 	accountId: accountIdSchema,
 	accountSecret: agentSecretSchema,
 })
 
-type AgentCredentials = z.infer<typeof agentCredentialsSchema>
+let connectionCredentialsSchema = accountCredentialsSchema.extend({
+	connectionId: z.string().startsWith("co_z"),
+	clientId: z.url(),
+})
+
+type ConnectionCredentials = z.infer<typeof connectionCredentialsSchema>

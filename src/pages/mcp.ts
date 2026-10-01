@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro"
+import { validateConnection } from "@/mcp/connection"
 import { getMcpConfig } from "@/mcp/config"
 import { readAccessToken } from "@/mcp/oauth"
 import { mcpHandler } from "@/mcp/server"
@@ -22,6 +23,7 @@ let handle: APIRoute = async ({ request }) => {
 		) {
 			return unauthorized(config.baseUrl)
 		}
+		await validateConnection(access.credential, access.clientId)
 		let response = await mcpHandler.fetch(request, {
 			authInfo: {
 				token: access.credential,

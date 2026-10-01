@@ -2,70 +2,87 @@ import { WasmCrypto } from "cojson/crypto/WasmCrypto"
 import { WebSocketPeerWithReconnection } from "cojson-transport-ws"
 import {
 	MockSessionProvider,
-	createJazzContextForNewAccount,
 	createJazzContextFromExistingCredentials,
+	co,
 	type Loaded,
 	type Peer,
 } from "jazz-tools"
-import { UserAccount } from "@/schema"
-import type { AgentCredentials } from "./credentials"
+import { UserAccount, McpConnection } from "@/schema"
+import {
+	accountCredentialsSchema,
+	type ConnectionCredentials,
+} from "./credentials"
+import type { z } from "zod"
+import type { TokenCodec } from "./token"
+import { createHash } from "node:crypto"
 
 export {
-	createAgentAccount,
-	openAgentAccount,
-	runWithAgentAccount,
-	revokeAgentAccount,
+	createUserConnection,
+	openUserAccount,
+	runWithUserAccount,
+	revokeUserConnection,
 }
 
-type OpenAgent = Awaited<ReturnType<typeof openAgentAccount>>
-interface AgentRuntime {
-	agent: Promise<OpenAgent>
+type OpenUser = Awaited<ReturnType<typeof openUserAccount>>
+interface UserRuntime {
+	user: Promise<OpenUser>
 	tail: Promise<void>
 	active: number
 	lastUsedAt: number
 	invalidated: boolean
 }
 
-let agentRuntimes = new Map<string, AgentRuntime>()
-let agentOperationTimeout = 20_000
-let agentToolTimeout = 60_000
-let agentRuntimeIdleTimeout = 5 * 60_000
-let maximumAgentRuntimes = 32
+let userRuntimes = new Map<string, UserRuntime>()
+let userOperationTimeout = 20_000
+let userToolTimeout = 60_000
+let userRuntimeIdleTimeout = 5 * 60_000
+let maximumUserRuntimes = 32
 
-async function createAgentAccount(syncServer: string, name: string) {
-	let cryptoProvider = await WasmCrypto.create()
-	let peer = createPeer(syncServer)
-	let context = await createJazzContextForNewAccount({
-		creationProps: { name },
-		peers: peer.peers,
-		crypto: cryptoProvider,
-		AccountSchema: UserAccount,
-		sessionProvider: new MockSessionProvider(),
-	})
-	peer.attach(context.node)
-	let account = await context.account.$jazz.ensureLoaded({
-		resolve: {
-			root: { documents: true, inactiveDocuments: true, spaces: true },
+async function createUserConnection(
+	syncServer: string,
+	credentials: z.infer<typeof accountCredentialsSchema>,
+	client: { id: string; name: string },
+	tokens: TokenCodec,
+) {
+	return runWithUserAccountState(
+		syncServer,
+		credentials,
+		async user => {
+			let account = await user.account.$jazz.ensureLoaded({
+				resolve: { root: { mcpConnections: true } },
+			})
+			let list = account.root.mcpConnections
+			if (!list) {
+				list = co.list(McpConnection).create([], account.root.$jazz.owner)
+				account.root.$jazz.set("mcpConnections", list)
+			}
+			let connection = McpConnection.create(
+				{
+					clientId: client.id,
+					clientName: client.name,
+					credential: "",
+					createdAt: new Date(),
+				},
+				account.root.$jazz.owner,
+			)
+			let credential = await tokens.seal("connection", {
+				...credentials,
+				connectionId: connection.$jazz.id,
+				clientId: client.id,
+			})
+			connection.$jazz.set("credential", credential)
+			list.$jazz.push(connection)
+			await account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
+			return credential
 		},
-	})
-	account.root.documents.$jazz.splice(0, account.root.documents.length)
-	await context.account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
-
-	return {
-		credentials: {
-			accountId: context.account.$jazz.id,
-			accountSecret: context.node.getCurrentAgent().agentSecret,
-		},
-		async close() {
-			context.done()
-			peer.close()
-		},
-	}
+		userToolTimeout,
+		false,
+	)
 }
 
-async function openAgentAccount(
+async function openUserAccount(
 	syncServer: string,
-	credentials: AgentCredentials,
+	credentials: z.infer<typeof accountCredentialsSchema>,
 ) {
 	let cryptoProvider = await WasmCrypto.create()
 	let peer = createPeer(syncServer)
@@ -91,13 +108,13 @@ async function openAgentAccount(
 	}
 }
 
-async function runWithAgentAccount<Result>(
+async function runWithUserAccount<Result>(
 	syncServer: string,
-	credentials: AgentCredentials,
-	operation: (agent: OpenAgent) => Promise<Result>,
-	operationTimeoutMs: number | false = agentToolTimeout,
+	credentials: ConnectionCredentials,
+	operation: (user: OpenUser) => Promise<Result>,
+	operationTimeoutMs: number | false = userToolTimeout,
 ): Promise<Result> {
-	return runWithAgentAccountState(
+	return runWithUserAccountState(
 		syncServer,
 		credentials,
 		operation,
@@ -106,58 +123,54 @@ async function runWithAgentAccount<Result>(
 	)
 }
 
-async function revokeAgentAccount(
+async function revokeUserConnection(
 	syncServer: string,
-	credentials: AgentCredentials,
+	credentials: ConnectionCredentials,
 ) {
-	await runWithAgentAccountState(
+	await runWithUserAccountState(
 		syncServer,
 		credentials,
-		async agent => {
-			let account = await agent.account.$jazz.ensureLoaded({
-				resolve: {
-					root: {
-						documents: true,
-						inactiveDocuments: true,
-						spaces: true,
-					},
-				},
+		async user => {
+			let account = await user.account.$jazz.ensureLoaded({
+				resolve: { root: { mcpConnections: { $each: true } } },
 			})
-			account.root.$jazz.set("revokedAt", new Date())
-			await account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
-			account.root.documents.$jazz.splice(0, account.root.documents.length)
-			account.root.inactiveDocuments?.$jazz.splice(
-				0,
-				account.root.inactiveDocuments.length,
+			let connection = account.root.mcpConnections?.find(
+				item => item.$jazz.id === credentials.connectionId,
 			)
-			account.root.spaces?.$jazz.splice(0, account.root.spaces.length)
+			if (!connection) throw new Error("MCP connection is disconnected")
+			connection.$jazz.set("revokedAt", new Date())
 			await account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
 		},
-		agentToolTimeout,
+		userToolTimeout,
 		true,
 	)
-	await closeAgentAccountRuntime(credentials.accountId)
 }
 
-async function runWithAgentAccountState<Result>(
+async function runWithUserAccountState<Result>(
 	syncServer: string,
-	credentials: AgentCredentials,
-	operation: (agent: OpenAgent) => Promise<Result>,
+	credentials: z.infer<typeof accountCredentialsSchema> | ConnectionCredentials,
+	operation: (user: OpenUser) => Promise<Result>,
 	operationTimeoutMs: number | false,
 	allowRevoked: boolean,
 ): Promise<Result> {
-	await evictIdleAgentRuntimes()
-	let key = credentials.accountId
-	let runtime = agentRuntimes.get(key)
+	await evictIdleUserRuntimes()
+	let key = createHash("sha256")
+		.update(syncServer)
+		.update(credentials.accountId)
+		.update(credentials.accountSecret)
+		.digest("hex")
+	let runtime = userRuntimes.get(key)
 	if (!runtime) {
+		if (userRuntimes.size >= maximumUserRuntimes)
+			throw new Error("MCP server is busy")
 		runtime = {
-			agent: openAgentAccount(syncServer, credentials),
+			user: openUserAccount(syncServer, credentials),
 			tail: Promise.resolve(),
 			active: 0,
 			lastUsedAt: Date.now(),
 			invalidated: false,
 		}
-		agentRuntimes.set(key, runtime)
+		userRuntimes.set(key, runtime)
 	}
 
 	let release: () => void = () => undefined
@@ -170,7 +183,7 @@ async function runWithAgentAccountState<Result>(
 	if (runtime.invalidated) {
 		runtime.active--
 		release()
-		return runWithAgentAccountState(
+		return runWithUserAccountState(
 			syncServer,
 			credentials,
 			operation,
@@ -179,30 +192,39 @@ async function runWithAgentAccountState<Result>(
 		)
 	}
 	try {
-		let agent: OpenAgent
+		let user: OpenUser
 		try {
-			agent = await withDeadline(runtime.agent, agentOperationTimeout)
+			user = await withDeadline(runtime.user, userOperationTimeout)
 		} catch (error) {
-			invalidateAgentRuntime(key, runtime)
+			invalidateUserRuntime(key, runtime)
 			throw error
 		}
-		let account = await agent.account.$jazz.ensureLoaded({
-			resolve: { root: true },
-		})
-		if (!allowRevoked && account.root.revokedAt) {
-			throw new Error("Agent connection is disconnected")
-		}
-		try {
-			let result = operation(agent)
-			return operationTimeoutMs === false
-				? await result
-				: await withDeadline(result, operationTimeoutMs)
-		} catch (error) {
-			if (error instanceof AgentRuntimeTimeoutError) {
-				invalidateAgentRuntime(key, runtime)
+		let account = await withDeadline(
+			user.account.$jazz.ensureLoaded({
+				resolve: { root: { mcpConnections: { $each: true } } },
+			}),
+			userOperationTimeout,
+		)
+		if ("connectionId" in credentials) {
+			let connection = account.root.mcpConnections?.find(
+				item => item.$jazz.id === credentials.connectionId,
+			)
+			if (
+				!connection ||
+				connection.clientId !== credentials.clientId ||
+				(!allowRevoked && connection.revokedAt)
+			) {
+				throw new Error("MCP connection is disconnected")
 			}
-			throw error
 		}
+		let result = operation(user)
+		return operationTimeoutMs === false
+			? await result
+			: await withDeadline(result, operationTimeoutMs)
+	} catch (error) {
+		if (error instanceof UserRuntimeTimeoutError)
+			invalidateUserRuntime(key, runtime)
+		throw error
 	} finally {
 		runtime.active--
 		runtime.lastUsedAt = Date.now()
@@ -210,36 +232,28 @@ async function runWithAgentAccountState<Result>(
 	}
 }
 
-function invalidateAgentRuntime(key: string, runtime: AgentRuntime) {
+function invalidateUserRuntime(key: string, runtime: UserRuntime) {
+	if (runtime.invalidated) return
 	runtime.invalidated = true
-	if (agentRuntimes.get(key) === runtime) agentRuntimes.delete(key)
-	void runtime.agent.then(agent => agent.close()).catch(() => undefined)
+	if (userRuntimes.get(key) === runtime) userRuntimes.delete(key)
+	void runtime.user.then(user => user.close()).catch(() => undefined)
 }
 
-async function evictIdleAgentRuntimes() {
+async function evictIdleUserRuntimes() {
 	let now = Date.now()
-	let idle = [...agentRuntimes.entries()]
+	let idle = [...userRuntimes.entries()]
 		.filter(([, runtime]) => runtime.active === 0)
 		.sort((left, right) => left[1].lastUsedAt - right[1].lastUsedAt)
 	for (let [key, runtime] of idle) {
 		if (
-			now - runtime.lastUsedAt < agentRuntimeIdleTimeout &&
-			agentRuntimes.size <= maximumAgentRuntimes
+			now - runtime.lastUsedAt < userRuntimeIdleTimeout &&
+			userRuntimes.size < maximumUserRuntimes
 		) {
 			continue
 		}
-		agentRuntimes.delete(key)
-		void runtime.agent.then(agent => agent.close()).catch(() => undefined)
+		userRuntimes.delete(key)
+		void runtime.user.then(user => user.close()).catch(() => undefined)
 	}
-}
-
-async function closeAgentAccountRuntime(accountId: string) {
-	let runtime = agentRuntimes.get(accountId)
-	if (!runtime) return
-	agentRuntimes.delete(accountId)
-	await runtime.tail
-	let agent = await runtime.agent
-	await agent.close()
 }
 
 async function withDeadline<Result>(
@@ -252,7 +266,7 @@ async function withDeadline<Result>(
 			promise,
 			new Promise<never>((_, reject) => {
 				timeout = setTimeout(
-					() => reject(new AgentRuntimeTimeoutError(timeoutMs)),
+					() => reject(new UserRuntimeTimeoutError(timeoutMs)),
 					timeoutMs,
 				)
 			}),
@@ -262,10 +276,10 @@ async function withDeadline<Result>(
 	}
 }
 
-class AgentRuntimeTimeoutError extends Error {
+class UserRuntimeTimeoutError extends Error {
 	constructor(timeoutMs: number) {
-		super(`Agent operation timed out after ${timeoutMs}ms`)
-		this.name = "AgentRuntimeTimeoutError"
+		super(`User operation timed out after ${timeoutMs}ms`)
+		this.name = "UserRuntimeTimeoutError"
 	}
 }
 

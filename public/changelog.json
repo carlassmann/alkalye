@@ -1,10 +1,12 @@
 [
 	{
 		"id": 155,
-		"date": "2026-09-30",
-		"title": "Connect your preferred MCP client",
+		"date": "2026-10-01",
+		"title": "MCP clients use your Alkalye permissions",
 		"notes": [
-			"MCP connections now accept clients from any provider, including Claude, Cursor, and custom clients"
+			"Connect any compatible MCP client, including Claude, Cursor, and custom clients.",
+			"Connected clients use your existing document and space permissions. No separate agent accounts or access grants to manage.",
+			"Disconnect individual clients from Settings. Create personal documents through MCP, too."
 		],
 		"pr": 57
 	},

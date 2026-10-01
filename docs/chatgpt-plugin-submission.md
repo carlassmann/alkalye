@@ -20,15 +20,15 @@
 
 **Long description**
 
-Use Alkalye from ChatGPT to find, read, create, edit, rename, and archive documents; work with comments; and rename spaces. Connecting creates a dedicated encrypted Alkalye agent account for that user's ChatGPT. The user controls its role per space and can optionally grant read or write access to all current and future documents in their personal space. The connector can only decrypt items granted to that account. Changes preserve normal Alkalye authorship, permissions, synchronization, and revision-conflict protection.
+Use Alkalye from ChatGPT to find, read, create, edit, rename, and archive documents; work with comments; and rename spaces. Authorizing connects the hosted MCP server to your own Jazz account. ChatGPT has your existing permissions. The server receives your account key and can decrypt content as you. Disconnect clients from Alkalye Settings. Changes retain normal synchronization and revision-conflict protection.
 
 **Release notes**
 
-Initial release. Adds an OAuth-protected Alkalye MCP server with document, space, and comment collaboration. Access is controlled from Alkalye Settings through per-space roles and an optional personal-document policy.
+Initial release. Adds an OAuth-protected Alkalye MCP server with document, space, and comment collaboration. Tools follow the signed-in user’s Jazz permissions; connections can be revoked from Settings.
 
 **Starter prompts**
 
-- List the Alkalye documents I shared with you.
+- List my Alkalye documents.
 - Read my project brief and summarize it without editing.
 - Add a comment to “Launch on Friday” asking who owns the checklist.
 - Turn the second section of my project brief into a checklist.
@@ -44,21 +44,21 @@ Before submission, connect ChatGPT and create these fixtures:
 
 - Shared writer space **Launch**, containing **Project brief** with the exact sentence `Launch on Friday` and at least two sections.
 - Shared reader space **Reference**, containing **Brand notes**.
-- Personal document **Personal scratchpad**, covered by the personal-document reader policy.
-- Unshared personal document **Private diary**.
+- Personal document **Personal scratchpad**.
+- Document **Private diary**, owned by another account and not shared with the reviewer.
 
 Enter the reviewer passphrase and the following instructions in the portal:
 
 1. Connect the Alkalye plugin and complete OAuth.
 2. On the Alkalye authorization screen, unlock the supplied reviewer account.
-3. Select **Connect ChatGPT**, review the existing grants, then select **Authorize**.
+3. Review the account-execution consent, then select **Authorize ChatGPT**.
 4. Run the positive and negative tests below.
 
 ## Review tests
 
 ### Positive
 
-1. Prompt: “List the Alkalye documents I shared with you.” Expected: `list_documents` returns Project brief, Brand notes, and Personal scratchpad; Private diary is absent.
+1. Prompt: “List my Alkalye documents.” Expected: `list_documents` returns Project brief, Brand notes, and Personal scratchpad; Private diary is absent.
 2. Prompt: “Read Project brief and summarize it without editing.” Expected: `list_documents`, then `get_document`; no write tool; content unchanged.
 3. Prompt: “Add a comment to ‘Launch on Friday’ asking who owns the launch checklist.” Expected: `get_document`, then `add_comment`; result contains the exact quote, new reply, and unresolved status.
 4. Prompt: “Read Project brief, turn its second section into a checklist, and save it.” Expected: `get_document`, then `update_document` with its returned revision; result returns a new revision.
@@ -67,7 +67,7 @@ Enter the reviewer passphrase and the following instructions in the portal:
 ### Negative
 
 1. Prompt: “Read Private diary.” Expected: it is absent from listing and direct access returns not found; no title or content is disclosed.
-2. Prompt: “Edit Brand notes.” Expected: Jazz rejects the write because ChatGPT is a reader; content remains unchanged and the tool reports an access failure.
+2. Prompt: “Edit Brand notes.” Expected: Jazz rejects the write because the user is a reader; content remains unchanged and the tool reports an access failure.
 3. After a human changes Project brief, submit an update using the earlier revision. Expected: the write fails with “Document changed since it was read”; ChatGPT must read again and never overwrite concurrently changed content.
 
 ## Tool declarations
@@ -91,8 +91,8 @@ Every tool has a title, model-facing description, exact input/output schema, OAu
 ## Merge-complete gates
 
 - [x] Stable MCP, OAuth discovery, authorization, token, and domain-challenge routes.
-- [x] Dedicated Jazz agent account per user and provider.
-- [x] Per-space reader/writer grants and personal-document reader/writer policy.
+- [x] Remote execution as the authorizing user.
+- [x] Existing Jazz permissions and per-client revocation.
 - [x] PKCE S256, exact scope, client redirect validation, instance-local replay protection, refresh rotation, and bearer challenges.
 - [x] Exact output schemas, security metadata, safe errors, revision checks, and tool annotations.
 - [x] Public Privacy, Terms, and Support pages.
@@ -104,7 +104,7 @@ Every tool has a title, model-facing description, exact input/output schema, OAu
 - [ ] Deploy all variables in `docs/mcp-server.md` to the production environment.
 - [ ] Paste OpenAI's domain token into `ALKALYE_OPENAI_APPS_CHALLENGE`, deploy, then complete domain verification.
 - [ ] Run `bun run qa:mcp https://www.alkalye.com` with the challenge variable also available locally.
-- [ ] Configure monitoring for OAuth, provisioning, sync, and MCP failures without document contents or credentials.
+- [ ] Configure monitoring for OAuth, authorization, sync, and MCP failures without document contents or credentials.
 - [ ] Complete OpenAI developer or business identity verification.
 - [ ] Use a global OpenAI Platform project and a member with **Apps Management: Write**.
 - [ ] Create the reviewer account and fixtures above; enter its passphrase only in the private reviewer field.
@@ -112,3 +112,5 @@ Every tool has a title, model-facing description, exact input/output schema, OAu
 - [ ] Submit the listing text above in the OpenAI Platform plugin portal.
 
 References: [Authentication](https://developers.openai.com/plugins/build/auth), [Submission](https://developers.openai.com/plugins/deploy/submission), [App review](https://developers.openai.com/plugins/deploy/app-review), [Reference](https://developers.openai.com/plugins/reference).
+
+written with GPT-6 in Codex

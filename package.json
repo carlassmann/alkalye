@@ -24,6 +24,7 @@
 		"test:e2e:doc": "playwright test e2e/doc.spec.ts",
 		"test:e2e:headed": "playwright test --headed",
 		"qa:mcp": "bun scripts/qa-mcp-production.ts",
+		"qa:mcp:user": "bun scripts/qa-mcp-user.ts",
 		"bench:launch": "bun scripts/benchmark-launch.ts",
 		"bench:responsiveness": "bun scripts/benchmark-responsiveness.ts",
 		"bench:responsiveness:assert": "bun scripts/benchmark-responsiveness.ts --cpu 4 --assert",

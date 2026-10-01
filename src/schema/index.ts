@@ -4,7 +4,10 @@ import { Settings } from "@/app/features/settings/lib/schema"
 import { Theme } from "@/app/features/themes/lib/schema"
 import { Document } from "@/app/features/documents/lib/schema"
 import { Space } from "@/app/features/spaces/lib/schema"
-import { AgentConnection } from "@/app/features/agents/lib/schema"
+import {
+	AgentConnection,
+	McpConnection,
+} from "@/app/features/agents/lib/schema"
 import { runAccountMigration } from "@/schema/migrations"
 
 export {
@@ -48,7 +51,10 @@ export {
 } from "@/app/features/themes/lib/schema"
 
 export { UserProfile, UserRoot, UserAccount }
-export { AgentConnection } from "@/app/features/agents/lib/schema"
+export {
+	AgentConnection,
+	McpConnection,
+} from "@/app/features/agents/lib/schema"
 
 let UserProfile = co.profile({
 	name: z.string(),
@@ -62,6 +68,7 @@ let UserRoot = co.map({
 	settings: co.optional(Settings),
 	themes: co.optional(co.list(Theme)),
 	agentConnections: co.optional(co.list(AgentConnection)),
+	mcpConnections: co.optional(co.list(McpConnection)),
 	revokedAt: z.date().optional(),
 	language: z.enum(["de", "en"]).optional(),
 	migrationVersion: z.number().optional(),
