@@ -1,9 +1,5 @@
 import { PUBLIC_JAZZ_SYNC_SERVER } from "astro:env/client"
-import {
-	ALKALYE_MCP_ALLOWED_CLIENT_HOSTS,
-	ALKALYE_MCP_BASE_URL,
-	ALKALYE_MCP_TOKEN_KEY,
-} from "astro:env/server"
+import { ALKALYE_MCP_BASE_URL, ALKALYE_MCP_TOKEN_KEY } from "astro:env/server"
 import { createTokenCodec } from "./token"
 import { createEphemeralReplayStore } from "./replay-store"
 
@@ -22,12 +18,6 @@ function getMcpConfig() {
 		baseUrl,
 		syncServer,
 		tokens: createTokenCodec(ALKALYE_MCP_TOKEN_KEY),
-		allowedClientHosts: (
-			ALKALYE_MCP_ALLOWED_CLIENT_HOSTS ?? "chatgpt.com,openai.com"
-		)
-			.split(",")
-			.map(host => host.trim().toLowerCase())
-			.filter(Boolean),
 		replayStore,
 	}
 }

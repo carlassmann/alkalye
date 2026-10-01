@@ -1,5 +1,16 @@
 [
 	{
+		"id": 155,
+		"date": "2026-10-01",
+		"title": "MCP clients use your Alkalye permissions",
+		"notes": [
+			"Connect any compatible MCP client, including Claude, Cursor, and custom clients.",
+			"Connected clients use your existing document and space permissions. No separate agent accounts or access grants to manage.",
+			"Check each client’s host before connecting. Disconnect individual clients even when the MCP server is unavailable. Create personal documents through MCP, too."
+		],
+		"pr": 57
+	},
+	{
 		"id": 154,
 		"date": "2026-09-29",
 		"title": "Point at slides from your teleprompter",

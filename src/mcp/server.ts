@@ -2,6 +2,8 @@ import { createHash } from "node:crypto"
 import { McpServer, createMcpHandler } from "@modelcontextprotocol/server"
 import { z } from "zod"
 import {
+	createPersonalDocument,
+	deletePersonalDocument,
 	getDocumentTitle,
 	replaceDocumentContent,
 } from "@/app/features/documents"
@@ -15,9 +17,9 @@ import {
 	resolveCommentThread,
 } from "@/app/features/comments"
 import { setDocumentTitle } from "@/cli/document-title"
-import { agentCredentialsSchema } from "./credentials"
+import { connectionCredentialsSchema } from "./credentials"
 import { getMcpConfig } from "./config"
-import { openAgentAccount, runWithAgentAccount } from "./jazz"
+import { openUserAccount, runWithUserAccount } from "./jazz"
 import { toolSecurityMetadata } from "./metadata"
 
 export { createAlkalyeServer, mcpHandler }
@@ -61,7 +63,7 @@ function createAlkalyeServer(credential: string | undefined) {
 		},
 		{
 			instructions:
-				"Collaborate only in documents and spaces explicitly shared with this agent. Read before editing and pass the returned revision to every update.",
+				"Act as the connected user, with their existing Jazz permissions. Read before editing and pass the returned revision to every update.",
 		},
 	)
 
@@ -69,8 +71,7 @@ function createAlkalyeServer(credential: string | undefined) {
 		"list_documents",
 		{
 			title: "List documents",
-			description:
-				"List documents and spaces the user explicitly shared with this Alkalye agent.",
+			description: "List the connected user’s documents and spaces.",
 			inputSchema: z.object({}),
 			...toolMetadata(
 				z.object({
@@ -92,7 +93,7 @@ function createAlkalyeServer(credential: string | undefined) {
 			},
 		},
 		async () =>
-			withAgent(credential, async account => {
+			withUser(credential, async account => {
 				let loaded = await account.$jazz.ensureLoaded({
 					resolve: {
 						root: {
@@ -165,8 +166,8 @@ function createAlkalyeServer(credential: string | undefined) {
 			},
 		},
 		async ({ documentId }) =>
-			withAgent(credential, async account => {
-				let document = await findAgentDocument(account, documentId)
+			withUser(credential, async account => {
+				let document = await findUserDocument(account, documentId)
 				let content = document.content.toString()
 				return toolResult({
 					documentId,
@@ -204,8 +205,9 @@ function createAlkalyeServer(credential: string | undefined) {
 			},
 		},
 		async ({ documentId, content, expectedRevision }) =>
-			withAgent(credential, async (account, sync) => {
-				let document = await findAgentDocument(account, documentId)
+			withUser(credential, async (account, sync) => {
+				let document = await findUserDocument(account, documentId)
+				requireWriteAccess(document.$jazz.owner, account.$jazz.id)
 				let currentContent = document.content.toString()
 				if (documentRevision(currentContent) !== expectedRevision) {
 					return toolError(
@@ -230,15 +232,15 @@ function createAlkalyeServer(credential: string | undefined) {
 		{
 			title: "Create document",
 			description:
-				"Create a document in a shared space. The agent cannot create outside spaces the user granted.",
+				"Create a personal document, or pass spaceId to create in one of the user’s spaces.",
 			inputSchema: z.object({
-				spaceId: z.string(),
+				spaceId: z.string().optional(),
 				content: z.string(),
 			}),
 			...toolMetadata(
 				z.object({
 					documentId: z.string(),
-					spaceId: z.string(),
+					spaceId: z.string().optional(),
 					title: z.string(),
 					revision: z.string(),
 				}),
@@ -251,7 +253,16 @@ function createAlkalyeServer(credential: string | undefined) {
 			},
 		},
 		async ({ spaceId, content }) =>
-			withAgent(credential, async (account, sync) => {
+			withUser(credential, async (account, sync) => {
+				if (!spaceId) {
+					let document = await createPersonalDocument(account, content)
+					await sync()
+					return toolResult({
+						documentId: document.$jazz.id,
+						title: getDocumentTitle(content),
+						revision: documentRevision(content),
+					})
+				}
 				let loaded = await account.$jazz.ensureLoaded({
 					resolve: {
 						root: {
@@ -270,6 +281,7 @@ function createAlkalyeServer(credential: string | undefined) {
 					loadAs: account,
 				})
 				if (!writableSpace.$isLoaded) throw new Error("Space is unavailable")
+				requireWriteAccess(writableSpace.$jazz.owner, account.$jazz.id)
 				let document = createSpaceDocument(
 					writableSpace.$jazz.owner,
 					writableSpace.$jazz.id,
@@ -308,8 +320,9 @@ function createAlkalyeServer(credential: string | undefined) {
 			annotations: writeAnnotations(false),
 		},
 		async ({ documentId, title, expectedRevision }) =>
-			withAgent(credential, async (account, sync) => {
-				let document = await findAgentDocument(account, documentId)
+			withUser(credential, async (account, sync) => {
+				let document = await findUserDocument(account, documentId)
+				requireWriteAccess(document.$jazz.owner, account.$jazz.id)
 				let content = document.content.toString()
 				if (documentRevision(content) !== expectedRevision) {
 					return toolError(
@@ -334,8 +347,7 @@ function createAlkalyeServer(credential: string | undefined) {
 		"archive_document",
 		{
 			title: "Archive document",
-			description:
-				"Archive a shared document. The document remains recoverable by an administrator.",
+			description: "Archive a document you administer. It remains recoverable.",
 			inputSchema: z.object({ documentId: z.string() }),
 			...toolMetadata(
 				z.object({ documentId: z.string(), archived: z.literal(true) }),
@@ -343,10 +355,11 @@ function createAlkalyeServer(credential: string | undefined) {
 			annotations: writeAnnotations(true),
 		},
 		async ({ documentId }) =>
-			withAgent(credential, async (account, sync) => {
-				let document = await findAgentDocument(account, documentId)
-				document.$jazz.set("deletedAt", new Date())
-				document.$jazz.set("updatedAt", new Date())
+			withUser(credential, async (account, sync) => {
+				let document = await findUserDocument(account, documentId)
+				requireWriteAccess(document.$jazz.owner, account.$jazz.id)
+				let result = await deletePersonalDocument(document)
+				if (result.type === "error") return toolError(result.error)
 				await sync()
 				return toolResult({ documentId, archived: true })
 			}),
@@ -368,8 +381,8 @@ function createAlkalyeServer(credential: string | undefined) {
 			annotations: readAnnotations(),
 		},
 		async ({ documentId }) =>
-			withAgent(credential, async account => {
-				let document = await findAgentDocument(account, documentId)
+			withUser(credential, async account => {
+				let document = await findUserDocument(account, documentId)
 				return toolResult({
 					documentId,
 					comments: getVisibleCommentThreads(document).map(thread =>
@@ -394,8 +407,9 @@ function createAlkalyeServer(credential: string | undefined) {
 			annotations: writeAnnotations(false),
 		},
 		async ({ documentId, quote, body }) =>
-			withAgent(credential, async (account, sync) => {
-				let document = await findAgentDocument(account, documentId)
+			withUser(credential, async (account, sync) => {
+				let document = await findUserDocument(account, documentId)
+				requireWriteAccess(document.$jazz.owner, account.$jazz.id)
 				let profile = await account.$jazz.ensureLoaded({
 					resolve: { profile: true },
 				})
@@ -425,8 +439,9 @@ function createAlkalyeServer(credential: string | undefined) {
 			annotations: writeAnnotations(false),
 		},
 		async ({ documentId, commentId, body }) =>
-			withAgent(credential, async (account, sync) => {
-				let document = await findAgentDocument(account, documentId)
+			withUser(credential, async (account, sync) => {
+				let document = await findUserDocument(account, documentId)
+				requireWriteAccess(document.$jazz.owner, account.$jazz.id)
 				let thread = findComment(document, commentId)
 				let profile = await account.$jazz.ensureLoaded({
 					resolve: { profile: true },
@@ -451,8 +466,9 @@ function createAlkalyeServer(credential: string | undefined) {
 			annotations: writeAnnotations(false),
 		},
 		async ({ documentId, commentId, resolved }) =>
-			withAgent(credential, async (account, sync) => {
-				let document = await findAgentDocument(account, documentId)
+			withUser(credential, async (account, sync) => {
+				let document = await findUserDocument(account, documentId)
+				requireWriteAccess(document.$jazz.owner, account.$jazz.id)
 				let thread = findComment(document, commentId)
 				if (resolved) resolveCommentThread(thread)
 				else reopenCommentThread(thread)
@@ -465,7 +481,7 @@ function createAlkalyeServer(credential: string | undefined) {
 		"rename_space",
 		{
 			title: "Rename space",
-			description: "Rename a shared space when the agent has write access.",
+			description: "Rename a space when you have write access.",
 			inputSchema: z.object({
 				spaceId: z.string(),
 				name: z.string().min(1).max(100),
@@ -474,7 +490,7 @@ function createAlkalyeServer(credential: string | undefined) {
 			annotations: writeAnnotations(false),
 		},
 		async ({ spaceId, name }) =>
-			withAgent(credential, async (account, sync) => {
+			withUser(credential, async (account, sync) => {
 				let loaded = await account.$jazz.ensureLoaded({
 					resolve: { root: { spaces: true } },
 				})
@@ -484,6 +500,7 @@ function createAlkalyeServer(credential: string | undefined) {
 				if (!reference) throw new Error("Space not found")
 				let space = await Space.load(spaceId, { loadAs: account })
 				if (!space.$isLoaded) throw new Error("Space is unavailable")
+				requireWriteAccess(space.$jazz.owner, account.$jazz.id)
 				space.$jazz.set("name", name)
 				space.$jazz.set("updatedAt", new Date())
 				await sync()
@@ -494,10 +511,10 @@ function createAlkalyeServer(credential: string | undefined) {
 	return server
 }
 
-async function withAgent(
+async function withUser(
 	credential: string | undefined,
 	operation: (
-		account: Awaited<ReturnType<typeof openAgentAccount>>["account"],
+		account: Awaited<ReturnType<typeof openUserAccount>>["account"],
 		sync: () => Promise<void>,
 	) => Promise<ReturnType<typeof toolResult> | ReturnType<typeof toolError>>,
 ) {
@@ -507,15 +524,15 @@ async function withAgent(
 		let credentials = await config.tokens.open(
 			"connection",
 			credential,
-			agentCredentialsSchema,
+			connectionCredentialsSchema,
 		)
-		return await runWithAgentAccount(
+		return await runWithUserAccount(
 			config.syncServer,
 			credentials,
-			async agent => {
-				await agent.account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
-				return operation(agent.account, async () => {
-					await agent.account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
+			async user => {
+				await user.account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
+				return operation(user.account, async () => {
+					await user.account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
 				})
 			},
 		)
@@ -525,8 +542,8 @@ async function withAgent(
 	}
 }
 
-async function findAgentDocument(
-	account: Awaited<ReturnType<typeof openAgentAccount>>["account"],
+async function findUserDocument(
+	account: Awaited<ReturnType<typeof openUserAccount>>["account"],
 	documentId: string,
 ) {
 	let loaded = await account.$jazz.ensureLoaded({
@@ -578,7 +595,7 @@ function documentSummary(
 
 function publicToolError(error: unknown) {
 	if (!isPublicToolError(error)) {
-		return "The requested action could not be completed. Check the agent's access and try again."
+		return "The requested action could not be completed. Check your permissions and try again."
 	}
 	return error.message
 }
@@ -586,7 +603,8 @@ function publicToolError(error: unknown) {
 function isPublicToolError(error: unknown): error is Error {
 	if (!(error instanceof Error)) return false
 	let safeMessages = new Set([
-		"Agent connection is disconnected",
+		"You do not have write access",
+		"MCP connection is disconnected",
 		"Space not found",
 		"Space is unavailable",
 		"Document not found",
@@ -597,12 +615,21 @@ function isPublicToolError(error: unknown): error is Error {
 	return safeMessages.has(error.message)
 }
 
+function requireWriteAccess(
+	group: { getRoleOf(id: string): string | undefined },
+	accountId: string,
+) {
+	let role = group.getRoleOf(accountId)
+	if (role !== "admin" && role !== "manager" && role !== "writer")
+		throw new Error("You do not have write access")
+}
+
 function documentRevision(content: string) {
 	return createHash("sha256").update(content).digest("base64url")
 }
 
 function findComment(
-	document: Awaited<ReturnType<typeof findAgentDocument>>,
+	document: Awaited<ReturnType<typeof findUserDocument>>,
 	commentId: string,
 ) {
 	let thread = getVisibleCommentThreads(document).find(
@@ -613,7 +640,7 @@ function findComment(
 }
 
 function summarizeComment(
-	document: Awaited<ReturnType<typeof findAgentDocument>>,
+	document: Awaited<ReturnType<typeof findUserDocument>>,
 	thread: ReturnType<typeof getVisibleCommentThreads>[number],
 ) {
 	let range = getCommentRange(document, thread.anchor)

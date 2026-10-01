@@ -1,4 +1,6 @@
+import { InvalidConnectionError } from "@/mcp/errors"
 import type { APIRoute } from "astro"
+import { validateConnection } from "@/mcp/connection"
 import { getMcpConfig } from "@/mcp/config"
 import { readAccessToken } from "@/mcp/oauth"
 import { mcpHandler } from "@/mcp/server"
@@ -9,24 +11,31 @@ export const prerender = false
 
 let handle: APIRoute = async ({ request }) => {
 	let config = getMcpConfig()
-	let rejected = validateRequestOrigin(
-		request,
-		config.baseUrl,
-		config.allowedClientHosts,
-	)
+	let rejected = validateRequestHost(request, config.baseUrl)
 	if (rejected) return rejected
 	let bearer = readBearer(request)
 	if (!bearer) return unauthorized(config.baseUrl)
+	let access
 	try {
-		let access = await readAccessToken(config.tokens, bearer)
-		let resource = new URL("/mcp", config.baseUrl).toString()
-		if (
-			access.resource !== resource ||
-			!access.scope.split(" ").includes("alkalye")
-		) {
-			return unauthorized(config.baseUrl)
-		}
-		return mcpHandler.fetch(request, {
+		access = await readAccessToken(config.tokens, bearer)
+	} catch {
+		return unauthorized(config.baseUrl)
+	}
+	let resource = new URL("/mcp", config.baseUrl).toString()
+	if (
+		access.resource !== resource ||
+		!access.scope.split(" ").includes("alkalye")
+	)
+		return unauthorized(config.baseUrl)
+	try {
+		await validateConnection(access.credential, access.clientId)
+	} catch (error) {
+		return error instanceof InvalidConnectionError
+			? unauthorized(config.baseUrl)
+			: unavailable()
+	}
+	try {
+		let response = await mcpHandler.fetch(request, {
 			authInfo: {
 				token: access.credential,
 				clientId: access.clientId,
@@ -34,8 +43,10 @@ let handle: APIRoute = async ({ request }) => {
 				resource: new URL(access.resource),
 			},
 		})
+		response.headers.set("access-control-allow-origin", "*")
+		return response
 	} catch {
-		return unauthorized(config.baseUrl)
+		return unavailable()
 	}
 }
 
@@ -74,11 +85,17 @@ function unauthorized(baseUrl: URL) {
 	)
 }
 
-function validateRequestOrigin(
-	request: Request,
-	baseUrl: URL,
-	allowedClientHosts: string[],
-) {
+function unavailable() {
+	return Response.json(
+		{ error: "temporarily_unavailable" },
+		{
+			status: 503,
+			headers: { "access-control-allow-origin": "*", "retry-after": "5" },
+		},
+	)
+}
+
+function validateRequestHost(request: Request, baseUrl: URL) {
 	let forwardedHost = request.headers
 		.get("x-forwarded-host")
 		?.split(",")[0]
@@ -91,25 +108,5 @@ function validateRequestOrigin(
 	) {
 		return Response.json({ error: "invalid_host" }, { status: 403 })
 	}
-	let origin = request.headers.get("origin")
-	let originHost = readOriginHost(origin)
-	let allowedOrigin =
-		!origin ||
-		origin === baseUrl.origin ||
-		allowedClientHosts.some(
-			host => originHost === host || originHost?.endsWith(`.${host}`),
-		)
-	if (!allowedOrigin) {
-		return Response.json({ error: "invalid_origin" }, { status: 403 })
-	}
 	return undefined
-}
-
-function readOriginHost(origin: string | null) {
-	if (!origin) return undefined
-	try {
-		return new URL(origin).hostname.toLowerCase()
-	} catch {
-		return undefined
-	}
 }

@@ -19,6 +19,7 @@ import {
 	Space,
 	Settings,
 	Theme,
+	McpConnection,
 } from "@/schema"
 import { HighlightRange } from "@/app/features/documents/lib/schema"
 import {
@@ -266,10 +267,23 @@ describe("runAccountMigration - idempotency on a fully loaded account", () => {
 					spaces: true,
 					settings: true,
 					themes: true,
+					mcpConnections: { $each: true },
 				},
 			},
 		})
 		let oldRoot = before.root
+		let connection = McpConnection.create(
+			{
+				clientId: "https://custom.example/client.json",
+				clientName: "Custom",
+				credential: "wrapped",
+				createdAt: new Date(),
+				revokedAt: new Date(),
+			},
+			before.root.$jazz.owner,
+		)
+		before.root.mcpConnections?.$jazz.push(connection)
+		let connectionsId = before.root.mcpConnections?.$jazz.id
 		let documentsId = oldRoot.documents.$jazz.id
 		let inactiveDocumentsId = oldRoot.inactiveDocuments?.$jazz.id
 		let spacesId = oldRoot.spaces?.$jazz.id
@@ -297,6 +311,7 @@ describe("runAccountMigration - idempotency on a fully loaded account", () => {
 					spaces: true,
 					settings: true,
 					themes: true,
+					mcpConnections: { $each: true },
 				},
 			},
 		})
@@ -310,6 +325,10 @@ describe("runAccountMigration - idempotency on a fully loaded account", () => {
 		expect(after.root.spaces?.$jazz.id).toBe(spacesId)
 		expect(after.root.settings?.$jazz.id).toBe(settingsId)
 		expect(after.root.themes?.$jazz.id).toBe(themesId)
+		expect(after.root.mcpConnections?.$jazz.id).toBe(connectionsId)
+		expect(after.root.mcpConnections?.[0]?.revokedAt).toEqual(
+			connection.revokedAt,
+		)
 		expect(after.root.language).toBe("de")
 		expect(after.root.revokedAt).toEqual(revokedAt)
 		expect(after.root.migrationVersion).toBe(2)
@@ -318,6 +337,24 @@ describe("runAccountMigration - idempotency on a fully loaded account", () => {
 			documentId: "document-999",
 		})
 		clearLastOpenedDocument(account.$jazz.id)
+	})
+
+	test("backfills MCP connections on an existing current root without replacing it", async () => {
+		let account = await createJazzTestAccount({
+			AccountSchema: UserAccount,
+			isCurrentActiveAccount: true,
+		})
+		let { root } = await account.$jazz.ensureLoaded({ resolve: { root: true } })
+		root.$jazz.delete("mcpConnections")
+		let rootId = root.$jazz.id
+		let documentsId = root.documents.$jazz.id
+		await runAccountMigration(account)
+		let loaded = await account.$jazz.ensureLoaded({
+			resolve: { root: { mcpConnections: true } },
+		})
+		expect(loaded.root.$jazz.id).toBe(rootId)
+		expect(loaded.root.documents.$jazz.id).toBe(documentsId)
+		expect(loaded.root.mcpConnections?.$isLoaded).toBe(true)
 	})
 
 	test("recompacts a current root that exceeds the replay budget", async () => {

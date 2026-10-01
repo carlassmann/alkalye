@@ -12,7 +12,10 @@ import {
 	writeLastOpenedDocument,
 } from "@/app/features/documents/lib/last-opened-document"
 import { Space } from "@/app/features/spaces/lib/schema"
-import { AgentConnection } from "@/app/features/agents/lib/schema"
+import {
+	AgentConnection,
+	createMcpConnections,
+} from "@/app/features/agents/lib/schema"
 import { recordStartupTrace } from "@/app/lib/reload-diagnostics"
 import { UserRoot, UserProfile, type UserAccount } from "@/schema"
 
@@ -30,6 +33,7 @@ let compactableRootResolve = {
 	settings: true,
 	themes: true,
 	agentConnections: true,
+	mcpConnections: true,
 } as const satisfies ResolveQuery<typeof UserRoot>
 
 function setMigrationFullDownloadTimeout(ms: number) {
@@ -105,7 +109,7 @@ async function initializeNewAccount(
 		root.documents.$jazz.push(await createWelcomeDocument(account))
 	}
 
-	addMissingRootCollections(root)
+	await addMissingRootCollections(root)
 }
 
 async function backfillExistingAccount(
@@ -147,7 +151,14 @@ async function backfillExistingAccount(
 		replayTransactions,
 		replayIsBounded,
 	})
-	if (migrationIsCurrent && replayIsBounded) return "current"
+	if (migrationIsCurrent && replayIsBounded) {
+		if (!root.$jazz.has("mcpConnections"))
+			root.$jazz.set(
+				"mcpConnections",
+				await createMcpConnections(root.$jazz.owner),
+			)
+		return "current"
+	}
 
 	let referencesLoadStartedAt = performance.now()
 	recordMigrationTrace("account-migration-root-references-load:start")
@@ -164,7 +175,7 @@ async function backfillExistingAccount(
 	if (!compactable.ok || !compactable.value.root)
 		return "root-references-timeout"
 
-	let compactedRoot = compactUserRoot(compactable.value.root)
+	let compactedRoot = await compactUserRoot(compactable.value.root)
 	account.$jazz.set("root", compactedRoot)
 	return migrationIsCurrent ? "recompacted" : "compacted"
 }
@@ -181,7 +192,7 @@ function preserveLastOpenedDocument(
 	)
 }
 
-function compactUserRoot(
+async function compactUserRoot(
 	root: co.loaded<typeof UserRoot, typeof compactableRootResolve>,
 ) {
 	let owner = root.$jazz.owner
@@ -196,6 +207,7 @@ function compactUserRoot(
 		themes: root.themes ?? co.list(Theme).create([], owner),
 		agentConnections:
 			root.agentConnections ?? co.list(AgentConnection).create([], owner),
+		mcpConnections: root.mcpConnections ?? (await createMcpConnections(owner)),
 		migrationVersion: currentRootMigrationVersion,
 	}
 	if (root.laserHub) values.laserHub = root.laserHub
@@ -206,7 +218,7 @@ function compactUserRoot(
 	return UserRoot.create(values, owner)
 }
 
-function addMissingRootCollections(root: co.loaded<typeof UserRoot>) {
+async function addMissingRootCollections(root: co.loaded<typeof UserRoot>) {
 	let owner = root.$jazz.owner
 
 	if (!root.$jazz.has("settings")) {
@@ -223,6 +235,9 @@ function addMissingRootCollections(root: co.loaded<typeof UserRoot>) {
 	}
 	if (!root.$jazz.has("themes")) {
 		root.$jazz.set("themes", co.list(Theme).create([], owner))
+	}
+	if (!root.$jazz.has("mcpConnections")) {
+		root.$jazz.set("mcpConnections", await createMcpConnections(owner))
 	}
 	if (!root.$jazz.has("agentConnections")) {
 		root.$jazz.set(

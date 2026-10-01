@@ -1,5 +1,7 @@
 import type { APIRoute } from "astro"
+import { InvalidConnectionError, InvalidGrantError } from "@/mcp/errors"
 import { z } from "zod"
+import { validateConnection } from "@/mcp/connection"
 import { getMcpConfig } from "@/mcp/config"
 import {
 	exchangeAuthorizationCode,
@@ -56,6 +58,7 @@ let POST: APIRoute = async ({ request }) => {
 				? await exchangeAuthorizationCode({
 						tokens: config.tokens,
 						replayStore: config.replayStore,
+						validateConnection,
 						code: input.code,
 						codeVerifier: input.code_verifier,
 						clientId: input.client_id,
@@ -65,22 +68,25 @@ let POST: APIRoute = async ({ request }) => {
 				: await exchangeRefreshToken({
 						tokens: config.tokens,
 						replayStore: config.replayStore,
+						validateConnection,
 						refreshToken: input.refresh_token,
 						clientId: input.client_id,
 						resource: input.resource,
 					})
 		return Response.json(tokens, { headers: noStoreHeaders() })
 	} catch (error) {
-		console.error("[oauth] token exchange failed", error)
-		return oauthError("invalid_grant")
+		return error instanceof InvalidConnectionError ||
+			error instanceof InvalidGrantError
+			? oauthError("invalid_grant")
+			: oauthError("temporarily_unavailable", 503)
 	}
 }
 
 let OPTIONS: APIRoute = () =>
 	new Response(null, { status: 204, headers: corsHeaders() })
 
-function oauthError(error: string) {
-	return Response.json({ error }, { status: 400, headers: noStoreHeaders() })
+function oauthError(error: string, status = 400) {
+	return Response.json({ error }, { status, headers: noStoreHeaders() })
 }
 
 function noStoreHeaders() {

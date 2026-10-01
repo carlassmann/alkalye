@@ -22,7 +22,7 @@ async function createPersonalDocument(
 	account: co.loaded<typeof UserAccount>,
 	content: string = "",
 ) {
-	let group = Group.create()
+	let group = Group.create(account)
 	let now = new Date()
 	let doc = Document.create(
 		{
@@ -154,7 +154,7 @@ async function copyDocumentToMyList(
 ): Promise<{ $jazz: { id: string } }> {
 	if (!me.root?.documents) throw new Error("User documents list not loaded")
 
-	let group = Group.create()
+	let group = Group.create(me)
 
 	let now = new Date()
 	let sourceContent = doc.content?.toString() ?? ""

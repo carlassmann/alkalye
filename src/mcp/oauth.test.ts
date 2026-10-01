@@ -1,5 +1,7 @@
+import { McpUnavailableError } from "./errors"
 import { Buffer } from "node:buffer"
 import { describe, expect, test, vi } from "vitest"
+import { fetchClientMetadata } from "./client-metadata"
 import { createTokenCodec } from "./token"
 import { createEphemeralReplayStore } from "./replay-store"
 import {
@@ -11,9 +13,45 @@ import {
 	validateClientRedirect,
 } from "./oauth"
 
+vi.mock("./client-metadata", () => ({ fetchClientMetadata: vi.fn() }))
+
 let tokens = createTokenCodec(Buffer.alloc(32, 3).toString("base64url"))
 
 describe("MCP OAuth", () => {
+	test.each([
+		"chatgpt.com",
+		"claude.ai",
+		"cursor.com",
+		"custom-client.example",
+	])("accepts client metadata from %s", async host => {
+		let clientId = `https://${host}/client.json`
+		let redirectUri = `https://${host}/callback`
+		vi.mocked(fetchClientMetadata).mockResolvedValue({
+			client_id: clientId,
+			client_name: "MCP client",
+			redirect_uris: [redirectUri],
+		})
+		await expect(
+			validateClientRedirect(clientId, redirectUri),
+		).resolves.toMatchObject({ client_id: clientId })
+		vi.resetAllMocks()
+	})
+
+	test("rejects mismatched client IDs", async () => {
+		vi.mocked(fetchClientMetadata).mockResolvedValue({
+			client_id: "https://other.example/client.json",
+			client_name: "MCP client",
+			redirect_uris: ["https://client.example/callback"],
+		})
+		await expect(
+			validateClientRedirect(
+				"https://client.example/client.json",
+				"https://client.example/callback",
+			),
+		).rejects.toThrow("invalid_client")
+		vi.resetAllMocks()
+	})
+
 	test("requires an RFC 7636 PKCE verifier", () => {
 		expect(pkceVerifierSchema.safeParse("x").success).toBe(false)
 		expect(pkceVerifierSchema.safeParse("a".repeat(43)).success).toBe(true)
@@ -44,20 +82,14 @@ describe("MCP OAuth", () => {
 		let challenge = Buffer.from(
 			await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier)),
 		).toString("base64url")
-		vi.stubGlobal(
-			"fetch",
-			vi.fn().mockResolvedValue(
-				Response.json({
-					client_id: "https://chatgpt.example/client.json",
-					client_name: "ChatGPT",
-					redirect_uris: ["https://chatgpt.example/callback"],
-				}),
-			),
-		)
+		vi.mocked(fetchClientMetadata).mockResolvedValue({
+			client_id: "https://chatgpt.example/client.json",
+			client_name: "ChatGPT",
+			redirect_uris: ["https://chatgpt.example/callback"],
+		})
 		let redirect = await approveAuthorization({
 			tokens,
 			credential: "wrapped-agent",
-			allowedClientHosts: ["chatgpt.example"],
 			request: {
 				client_id: "https://chatgpt.example/client.json",
 				redirect_uri: "https://chatgpt.example/callback",
@@ -77,6 +109,7 @@ describe("MCP OAuth", () => {
 			exchangeAuthorizationCode({
 				tokens,
 				replayStore,
+				validateConnection: async () => undefined,
 				code,
 				codeVerifier: "wrong".repeat(12),
 				clientId: "https://chatgpt.example/client.json",
@@ -88,6 +121,7 @@ describe("MCP OAuth", () => {
 		let result = await exchangeAuthorizationCode({
 			tokens,
 			replayStore,
+			validateConnection: async () => undefined,
 			code,
 			codeVerifier: verifier,
 			clientId: "https://chatgpt.example/client.json",
@@ -100,6 +134,7 @@ describe("MCP OAuth", () => {
 			exchangeAuthorizationCode({
 				tokens,
 				replayStore,
+				validateConnection: async () => undefined,
 				code,
 				codeVerifier: verifier,
 				clientId: "https://chatgpt.example/client.json",
@@ -107,7 +142,7 @@ describe("MCP OAuth", () => {
 				resource: "https://www.alkalye.com/mcp",
 			}),
 		).rejects.toThrow("invalid_grant")
-		vi.unstubAllGlobals()
+		vi.resetAllMocks()
 	})
 
 	test("rotates refresh tokens", async () => {
@@ -116,20 +151,14 @@ describe("MCP OAuth", () => {
 		let challenge = Buffer.from(
 			await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier)),
 		).toString("base64url")
-		vi.stubGlobal(
-			"fetch",
-			vi.fn().mockResolvedValue(
-				Response.json({
-					client_id: "https://chatgpt.example/client.json",
-					client_name: "ChatGPT",
-					redirect_uris: ["https://chatgpt.example/callback"],
-				}),
-			),
-		)
+		vi.mocked(fetchClientMetadata).mockResolvedValue({
+			client_id: "https://chatgpt.example/client.json",
+			client_name: "ChatGPT",
+			redirect_uris: ["https://chatgpt.example/callback"],
+		})
 		let redirect = await approveAuthorization({
 			tokens,
 			credential: "wrapped-agent",
-			allowedClientHosts: ["chatgpt.example"],
 			request: {
 				client_id: "https://chatgpt.example/client.json",
 				redirect_uri: "https://chatgpt.example/callback",
@@ -146,6 +175,7 @@ describe("MCP OAuth", () => {
 		let issued = await exchangeAuthorizationCode({
 			tokens,
 			replayStore,
+			validateConnection: async () => undefined,
 			code,
 			codeVerifier: verifier,
 			clientId: "https://chatgpt.example/client.json",
@@ -155,6 +185,7 @@ describe("MCP OAuth", () => {
 		let refreshArgs = {
 			tokens,
 			replayStore,
+			validateConnection: async () => undefined,
 			refreshToken: issued.refresh_token,
 			clientId: "https://chatgpt.example/client.json",
 			resource: "https://www.alkalye.com/mcp",
@@ -164,141 +195,167 @@ describe("MCP OAuth", () => {
 		await expect(exchangeRefreshToken(refreshArgs)).rejects.toThrow(
 			"invalid_grant",
 		)
-		vi.unstubAllGlobals()
+		vi.resetAllMocks()
+	})
+
+	test("retains authorization codes and refresh tokens across transient connection failures", async () => {
+		let replayStore = createEphemeralReplayStore()
+		let verifier = "a".repeat(48)
+		let challenge = Buffer.from(
+			await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier)),
+		).toString("base64url")
+		let redirect = await approveAuthorization({
+			tokens,
+			credential: "wrapped-user",
+			clientValidated: true,
+			request: {
+				client_id: "https://custom.example/client.json",
+				redirect_uri: "https://custom.example/callback",
+				response_type: "code",
+				code_challenge: challenge,
+				code_challenge_method: "S256",
+				state: "state",
+				resource: "https://www.alkalye.com/mcp",
+				scope: "alkalye",
+			},
+		})
+		let code = redirect.searchParams.get("code")
+		if (!code) throw new Error("Missing code")
+		let validateConnection = vi
+			.fn()
+			.mockRejectedValueOnce(new McpUnavailableError())
+			.mockResolvedValue(undefined)
+		let codeArgs = {
+			tokens,
+			replayStore,
+			validateConnection,
+			code,
+			codeVerifier: verifier,
+			clientId: "https://custom.example/client.json",
+			redirectUri: "https://custom.example/callback",
+			resource: "https://www.alkalye.com/mcp",
+		}
+		await expect(exchangeAuthorizationCode(codeArgs)).rejects.toBeInstanceOf(
+			McpUnavailableError,
+		)
+		let issued = await exchangeAuthorizationCode(codeArgs)
+		validateConnection.mockRejectedValueOnce(new McpUnavailableError())
+		let refreshArgs = {
+			tokens,
+			replayStore,
+			validateConnection,
+			refreshToken: issued.refresh_token,
+			clientId: codeArgs.clientId,
+			resource: codeArgs.resource,
+		}
+		await expect(exchangeRefreshToken(refreshArgs)).rejects.toBeInstanceOf(
+			McpUnavailableError,
+		)
+		let refreshed = await exchangeRefreshToken(refreshArgs)
+		expect(refreshed.refresh_token).not.toBe(issued.refresh_token)
+		await expect(exchangeRefreshToken(refreshArgs)).rejects.toThrow(
+			"invalid_grant",
+		)
+		expect(validateConnection).toHaveBeenCalledWith(
+			"wrapped-user",
+			codeArgs.clientId,
+		)
 	})
 
 	test("rejects unregistered redirect URIs", async () => {
-		vi.stubGlobal(
-			"fetch",
-			vi.fn().mockResolvedValue(
-				Response.json({
-					client_id: "https://chatgpt.example/client.json",
-					client_name: "ChatGPT",
-					redirect_uris: ["https://chatgpt.example/callback"],
-				}),
-			),
-		)
+		vi.mocked(fetchClientMetadata).mockResolvedValue({
+			client_id: "https://chatgpt.example/client.json",
+			client_name: "ChatGPT",
+			redirect_uris: ["https://chatgpt.example/callback"],
+		})
 		await expect(
 			validateClientRedirect(
 				"https://chatgpt.example/client.json",
 				"https://attacker.example/callback",
-				["chatgpt.example"],
 			),
 		).rejects.toThrow("invalid_redirect_uri")
-		vi.unstubAllGlobals()
+		vi.resetAllMocks()
 	})
 
 	test("allows native-app loopback redirect ports", async () => {
-		vi.stubGlobal(
-			"fetch",
-			vi.fn().mockResolvedValue(
-				Response.json({
-					client_id: "https://chatgpt.example/client.json",
-					client_name: "ChatGPT",
-					redirect_uris: ["http://127.0.0.1/callback"],
-				}),
-			),
-		)
+		vi.mocked(fetchClientMetadata).mockResolvedValue({
+			client_id: "https://chatgpt.example/client.json",
+			client_name: "ChatGPT",
+			redirect_uris: ["http://127.0.0.1/callback"],
+		})
 
 		await expect(
 			validateClientRedirect(
 				"https://chatgpt.example/client.json",
 				"http://127.0.0.1:64648/callback",
-				["chatgpt.example"],
 			),
 		).resolves.toMatchObject({ client_name: "ChatGPT" })
 
-		vi.unstubAllGlobals()
+		vi.resetAllMocks()
 	})
 
 	test("does not broaden loopback redirect matching", async () => {
-		vi.stubGlobal(
-			"fetch",
-			vi.fn().mockResolvedValue(
-				Response.json({
-					client_id: "https://chatgpt.example/client.json",
-					client_name: "ChatGPT",
-					redirect_uris: ["http://127.0.0.1/callback"],
-				}),
-			),
-		)
+		vi.mocked(fetchClientMetadata).mockResolvedValue({
+			client_id: "https://chatgpt.example/client.json",
+			client_name: "ChatGPT",
+			redirect_uris: ["http://127.0.0.1/callback"],
+		})
 
 		await expect(
 			validateClientRedirect(
 				"https://chatgpt.example/client.json",
 				"http://127.0.0.1:64648/other",
-				["chatgpt.example"],
 			),
 		).rejects.toThrow("invalid_redirect_uri")
 
-		vi.unstubAllGlobals()
+		vi.resetAllMocks()
 	})
 
 	test("keeps non-loopback redirect matching exact", async () => {
-		vi.stubGlobal(
-			"fetch",
-			vi.fn().mockResolvedValue(
-				Response.json({
-					client_id: "https://chatgpt.example/client.json",
-					client_name: "ChatGPT",
-					redirect_uris: ["https://chatgpt.example/callback"],
-				}),
-			),
-		)
+		vi.mocked(fetchClientMetadata).mockResolvedValue({
+			client_id: "https://chatgpt.example/client.json",
+			client_name: "ChatGPT",
+			redirect_uris: ["https://chatgpt.example/callback"],
+		})
 
 		await expect(
 			validateClientRedirect(
 				"https://chatgpt.example/client.json",
 				"https://chatgpt.example:443/callback",
-				["chatgpt.example"],
 			),
 		).rejects.toThrow("invalid_redirect_uri")
 
-		vi.unstubAllGlobals()
+		vi.resetAllMocks()
 	})
 
 	test("keeps loopback redirect userinfo exact", async () => {
-		vi.stubGlobal(
-			"fetch",
-			vi.fn().mockResolvedValue(
-				Response.json({
-					client_id: "https://chatgpt.example/client.json",
-					client_name: "ChatGPT",
-					redirect_uris: ["http://127.0.0.1/callback"],
-				}),
-			),
-		)
+		vi.mocked(fetchClientMetadata).mockResolvedValue({
+			client_id: "https://chatgpt.example/client.json",
+			client_name: "ChatGPT",
+			redirect_uris: ["http://127.0.0.1/callback"],
+		})
 
 		await expect(
 			validateClientRedirect(
 				"https://chatgpt.example/client.json",
 				"http://attacker:secret@127.0.0.1:64648/callback",
-				["chatgpt.example"],
 			),
 		).rejects.toThrow("invalid_redirect_uri")
 
-		vi.unstubAllGlobals()
+		vi.resetAllMocks()
 	})
 
-	test("requires an exact non-redirected client metadata document", async () => {
-		let mockedFetch = vi.fn().mockResolvedValue(
-			Response.json({
-				client_name: "ChatGPT",
-				redirect_uris: ["https://chatgpt.example/callback"],
-			}),
-		)
-		vi.stubGlobal("fetch", mockedFetch)
+	test("requires a client ID in the metadata document", async () => {
+		vi.mocked(fetchClientMetadata).mockResolvedValue({
+			client_name: "ChatGPT",
+			redirect_uris: ["https://chatgpt.example/callback"],
+		})
 		await expect(
 			validateClientRedirect(
 				"https://chatgpt.example/client.json",
 				"https://chatgpt.example/callback",
-				["chatgpt.example"],
 			),
 		).rejects.toThrow()
-		expect(mockedFetch).toHaveBeenCalledWith(
-			new URL("https://chatgpt.example/client.json"),
-			expect.objectContaining({ redirect: "error" }),
-		)
-		vi.unstubAllGlobals()
+		vi.resetAllMocks()
 	})
 })

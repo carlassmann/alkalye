@@ -1,5 +1,7 @@
+import { InvalidGrantError } from "./errors"
 import { Buffer } from "node:buffer"
 import { z } from "zod"
+import { fetchClientMetadata } from "./client-metadata"
 import type { TokenReplayStore } from "./replay-store"
 import type { TokenCodec } from "./token"
 
@@ -59,14 +61,12 @@ async function approveAuthorization(args: {
 	tokens: TokenCodec
 	request: AuthorizationRequest
 	credential: string
-	allowedClientHosts?: string[]
 	clientValidated?: boolean
 }) {
 	if (!args.clientValidated) {
 		await validateClientRedirect(
 			args.request.client_id,
 			args.request.redirect_uri,
-			args.allowedClientHosts,
 		)
 	}
 	let code = await args.tokens.seal(
@@ -96,8 +96,10 @@ async function exchangeAuthorizationCode(args: {
 	clientId: string
 	redirectUri: string
 	resource: string
+	validateConnection: (credential: string, clientId: string) => Promise<void>
 }) {
-	let code = await args.tokens.open(
+	let code = await readGrant(
+		args.tokens,
 		"authorization_code",
 		args.code,
 		authorizationCodeSchema,
@@ -108,10 +110,11 @@ async function exchangeAuthorizationCode(args: {
 		code.resource !== args.resource ||
 		!(await matchesCodeChallenge(args.codeVerifier, code.codeChallenge))
 	) {
-		throw new Error("invalid_grant")
+		throw new InvalidGrantError()
 	}
+	await args.validateConnection(code.credential, args.clientId)
 	if (!(await args.replayStore.consume(`code:${code.jti}`, 5 * 60_000))) {
-		throw new Error("invalid_grant")
+		throw new InvalidGrantError()
 	}
 	return mintTokens(args.tokens, code)
 }
@@ -122,24 +125,40 @@ async function exchangeRefreshToken(args: {
 	refreshToken: string
 	clientId: string
 	resource: string
+	validateConnection: (credential: string, clientId: string) => Promise<void>
 }) {
-	let token = await args.tokens.open(
+	let token = await readGrant(
+		args.tokens,
 		"refresh_token",
 		args.refreshToken,
 		refreshTokenSchema,
 	)
 	if (token.clientId !== args.clientId || token.resource !== args.resource) {
-		throw new Error("invalid_grant")
+		throw new InvalidGrantError()
 	}
+	await args.validateConnection(token.credential, args.clientId)
 	if (
 		!(await args.replayStore.consume(
 			`refresh:${token.jti}`,
 			30 * 24 * 60 * 60_000,
 		))
 	) {
-		throw new Error("invalid_grant")
+		throw new InvalidGrantError()
 	}
 	return mintTokens(args.tokens, token)
+}
+
+async function readGrant<T>(
+	tokens: TokenCodec,
+	type: string,
+	value: string,
+	schema: z.ZodType<T>,
+) {
+	try {
+		return await tokens.open(type, value, schema)
+	} catch {
+		throw new InvalidGrantError()
+	}
 }
 
 async function mintTokens(
@@ -177,11 +196,7 @@ async function matchesCodeChallenge(verifier: string, expected: string) {
 	return Buffer.from(digest).toString("base64url") === expected
 }
 
-async function validateClientRedirect(
-	clientId: string,
-	redirectUri: string,
-	allowedClientHosts: string[] = ["chatgpt.com", "openai.com"],
-) {
+async function validateClientRedirect(clientId: string, redirectUri: string) {
 	let clientUrl = new URL(clientId)
 	let redirectUrl = new URL(redirectUri)
 	if (
@@ -194,26 +209,12 @@ async function validateClientRedirect(
 	) {
 		throw new Error("invalid_client")
 	}
-	let clientHost = clientUrl.hostname.toLowerCase()
-	if (
-		!allowedClientHosts.some(
-			host => clientHost === host || clientHost.endsWith(`.${host}`),
-		)
-	) {
-		throw new Error("invalid_client")
-	}
-	let response = await fetch(clientUrl, {
-		headers: { accept: "application/json" },
-		redirect: "error",
-		signal: AbortSignal.timeout(5_000),
-	})
-	if (!response.ok) throw new Error("invalid_client")
+	let body = await fetchClientMetadata(clientUrl)
 	let metadataSchema = z.object({
 		client_id: z.url(),
 		client_name: z.string().min(1),
 		redirect_uris: z.array(z.url()),
 	})
-	let body: unknown = await response.json()
 	let metadata = metadataSchema.parse(body)
 	if (metadata.client_id !== clientId) {
 		throw new Error("invalid_client")

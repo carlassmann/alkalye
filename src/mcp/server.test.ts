@@ -8,13 +8,13 @@ import {
 	setupJazzTestSync,
 } from "jazz-tools/testing"
 import { createPersonalDocument } from "@/app/features/documents"
-import { UserAccount, createSpace } from "@/schema"
+import { UserAccount, Document, createSpace } from "@/schema"
 
-let jazzMocks = vi.hoisted(() => ({ runWithAgentAccount: vi.fn() }))
+let jazzMocks = vi.hoisted(() => ({ runWithUserAccount: vi.fn() }))
 
 vi.mock("./jazz", () => ({
-	openAgentAccount: vi.fn(),
-	runWithAgentAccount: jazzMocks.runWithAgentAccount,
+	openUserAccount: vi.fn(),
+	runWithUserAccount: jazzMocks.runWithUserAccount,
 }))
 
 vi.mock("./config", () => ({
@@ -116,7 +116,7 @@ describe("Alkalye MCP tool catalog", () => {
 		}
 	})
 
-	it("executes document tools against Jazz and hides archived documents", async () => {
+	it("uses the user’s Jazz permissions, hides archived documents, and creates personally", async () => {
 		await setupJazzTestSync()
 		let account = await createJazzTestAccount({
 			isCurrentActiveAccount: true,
@@ -139,7 +139,7 @@ describe("Alkalye MCP tool catalog", () => {
 			resolve: { documents: { $each: { content: true } } },
 		})
 		loadedSpace.documents.$jazz.push(spaceDocument)
-		jazzMocks.runWithAgentAccount.mockImplementation(
+		jazzMocks.runWithUserAccount.mockImplementation(
 			async (
 				_syncServer: string,
 				_credentials: unknown,
@@ -215,5 +215,111 @@ describe("Alkalye MCP tool catalog", () => {
 			arguments: { documentId: archived.$jazz.id },
 		})
 		expect(archivedRead.isError).toBe(true)
+
+		let other = await createJazzTestAccount({ AccountSchema: UserAccount })
+		setActiveAccount(other)
+		let sharedWriter = await createPersonalDocument(other, "Writer content")
+		let sharedReader = await createPersonalDocument(other, "Reader content")
+		let privateDocument = await createPersonalDocument(other, "Private content")
+		sharedWriter.$jazz.owner.addMember(account, "writer")
+		sharedReader.$jazz.owner.addMember(account, "reader")
+		setActiveAccount(account)
+		let writer = await Document.load(sharedWriter.$jazz.id, {
+			loadAs: account,
+			resolve: { content: true },
+		})
+		let reader = await Document.load(sharedReader.$jazz.id, {
+			loadAs: account,
+			resolve: { content: true },
+		})
+		if (!writer.$isLoaded || !reader.$isLoaded)
+			throw new Error("Shared documents unavailable")
+		loaded.root.documents.$jazz.push(sharedWriter, sharedReader)
+		expect(writer.$jazz.owner.myRole()).toBe("writer")
+		let writerRead = await client.callTool({
+			name: "get_document",
+			arguments: { documentId: writer.$jazz.id },
+		})
+		let writerRevision = z
+			.object({ revision: z.string() })
+			.parse(writerRead.structuredContent).revision
+		let writerUpdate = await client.callTool({
+			name: "update_document",
+			arguments: {
+				documentId: writer.$jazz.id,
+				content: "Updated as user",
+				expectedRevision: writerRevision,
+			},
+		})
+		expect(writerUpdate.isError).not.toBe(true)
+		expect(writer.content.toString()).toBe("Updated as user")
+		let readerRead = await client.callTool({
+			name: "get_document",
+			arguments: { documentId: reader.$jazz.id },
+		})
+		let readerRevision = z
+			.object({ revision: z.string() })
+			.parse(readerRead.structuredContent).revision
+		let readerUpdate = await client.callTool({
+			name: "update_document",
+			arguments: {
+				documentId: reader.$jazz.id,
+				content: "Unauthorized change",
+				expectedRevision: readerRevision,
+			},
+		})
+		expect(readerUpdate.isError).toBe(true)
+		expect(reader.content.toString()).toBe("Reader content")
+		setActiveAccount(other)
+		sharedWriter.$jazz.owner.addMember(account, "manager")
+		setActiveAccount(account)
+		let managerRead = await client.callTool({
+			name: "get_document",
+			arguments: { documentId: writer.$jazz.id },
+		})
+		let managerRevision = z
+			.object({ revision: z.string() })
+			.parse(managerRead.structuredContent).revision
+		let managerUpdate = await client.callTool({
+			name: "update_document",
+			arguments: {
+				documentId: writer.$jazz.id,
+				content: "Updated as manager",
+				expectedRevision: managerRevision,
+			},
+		})
+		expect(managerUpdate.isError).not.toBe(true)
+		expect(writer.content.toString()).toBe("Updated as manager")
+		let writerArchive = await client.callTool({
+			name: "archive_document",
+			arguments: { documentId: writer.$jazz.id },
+		})
+		expect(writerArchive.isError).toBe(true)
+		expect(writer.deletedAt).toBeUndefined()
+		let privateRead = await client.callTool({
+			name: "get_document",
+			arguments: { documentId: privateDocument.$jazz.id },
+		})
+		expect(privateRead.isError).toBe(true)
+		// The server has no global active account; creation must use its explicit user.
+		setActiveAccount(other)
+		let created = await client.callTool({
+			name: "create_document",
+			arguments: { content: "# Created personally" },
+		})
+		expect(created.isError).not.toBe(true)
+		let createdId = z
+			.object({ documentId: z.string() })
+			.parse(created.structuredContent).documentId
+		let createdDocument = await Document.load(createdId, { loadAs: account })
+		if (!createdDocument.$isLoaded)
+			throw new Error("Created document unavailable")
+		expect(createdDocument.$jazz.owner.getRoleOf(account.$jazz.id)).toBe(
+			"admin",
+		)
+		expect(
+			createdDocument.$jazz.owner.getRoleOf(other.$jazz.id),
+		).toBeUndefined()
+		setActiveAccount(account)
 	})
 })

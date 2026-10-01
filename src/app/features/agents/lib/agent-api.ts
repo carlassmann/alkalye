@@ -1,10 +1,7 @@
-export { readJsonResponse, updateAgentGrants }
-export type { AgentGrantUpdate }
+import type { co } from "jazz-tools"
+import { McpConnection } from "./schema"
 
-interface AgentGrantUpdate {
-	action: "add" | "remove"
-	resource: { kind: "document" | "space"; id: string }
-}
+export { readJsonResponse, disconnectMcpConnection }
 
 async function readJsonResponse(response: Response): Promise<unknown> {
 	let body = await response.text()
@@ -18,16 +15,19 @@ async function readJsonResponse(response: Response): Promise<unknown> {
 	}
 }
 
-async function updateAgentGrants(
-	credential: string,
-	updates: AgentGrantUpdate[],
+async function disconnectMcpConnection(
+	connection: co.loaded<typeof McpConnection>,
+	sync: () => Promise<void>,
 ) {
-	if (updates.length === 0) return
-	let response = await fetch("/api/agent-grants", {
-		method: "POST",
-		headers: { "content-type": "application/json" },
-		body: JSON.stringify({ credential, updates }),
-		signal: AbortSignal.timeout(150_000),
-	})
-	if (!response.ok) throw new Error("Could not update agent access")
+	connection.$jazz.set("revokedAt", new Date())
+	// Local revocation must survive server outages and token-key rotation.
+	await Promise.allSettled([
+		sync(),
+		fetch("/api/mcp-connections", {
+			method: "DELETE",
+			headers: { "content-type": "application/json" },
+			body: JSON.stringify({ credential: connection.credential }),
+			signal: AbortSignal.timeout(5_000),
+		}),
+	])
 }

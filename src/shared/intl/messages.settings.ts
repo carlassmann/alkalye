@@ -11,47 +11,22 @@ let baseSettingsMessages = messages({
 	"settings.category.editor": "Editor",
 	"settings.category.connections": "Connections",
 	"settings.category.app": "App & data",
-	"settings.agents.title": "Agent connections",
+	"settings.agents.title": "MCP connections",
 	"settings.agents.mcpTitle": "Connect any MCP client",
 	"settings.agents.mcpDescription":
 		"Use this URL in ChatGPT, Claude, Cursor, or any other MCP-compatible client.",
 	"settings.agents.copyMcpEndpoint": "Copy MCP URL",
 	"settings.agents.description":
-		"A separate encrypted collaborator. It sees only items you grant below.",
-	"settings.agents.setup": "Set up ChatGPT",
+		"Connected clients act as you, with your Jazz permissions. Disconnect a client to stop its access.",
 	"settings.agents.disconnect": "Disconnect",
-	"settings.agents.signIn": "Sign in to create a durable ChatGPT connection.",
-	"settings.agents.ready":
-		"Alkalye access is ready. Finish connecting from ChatGPT.",
-	"settings.agents.disconnected": "ChatGPT disconnected",
+	"settings.agents.revoked":
+		"Connection revoked locally. Revocation syncs when connected.",
+	"settings.agents.clientName": "Client-provided name: {$name}",
+	"settings.agents.signIn": "Sign in to authorize an MCP client.",
 	"settings.agents.authorize": "Authorize {$client}",
-	"settings.agents.authorizationReady":
-		"Authorization request ready for {$client}.",
 	"settings.agents.consent":
-		"This client can use only the personal documents and spaces granted below. Return destination: {$host}.",
-	"settings.agents.noAccess":
-		"Grant at least one document or space before authorizing, or ChatGPT will have nothing to work with.",
+		"This client can read and edit what you can. Alkalye’s server uses your encrypted account credentials to act as you, even while the app is closed. Return destination: {$host}.",
 	"settings.agents.deny": "Deny",
-	"settings.agents.authorizeAndReturn": "Authorize and return to ChatGPT",
-	"settings.agents.resources": "Spaces",
-	"settings.agents.role": "Role",
-	"settings.agents.access": "Access",
-	"settings.agents.personalDocuments": "Personal",
-	"settings.agents.personalDocumentsDescription":
-		"All current and future personal documents",
-	"settings.agents.documents": "Documents ({$count})",
-	"settings.agents.includedThrough": "Included through {$name} access",
-	"settings.agents.space": "Space",
-	"settings.agents.document": "Document",
-	"settings.agents.untitled": "Untitled document",
-	"settings.agents.read": "Read",
-	"settings.agents.write": "Write",
-	"settings.agents.adminRequired": "Admin required",
-	"settings.agents.spaceDisclosure":
-		"Grant a whole space, or expand it to choose individual documents.",
-	"settings.agents.roleFor": "Role for {$name}",
-	"settings.agents.grantAccess": "Grant ChatGPT access to {$name}",
-	"settings.agents.removeAccess": "Remove ChatGPT access from {$name}",
 	"settings.appearance": "Appearance",
 	"settings.appearance.description":
 		"Theme, code highlighting, and interface language.",
@@ -184,49 +159,23 @@ let deSettingsMessages = translate(baseSettingsMessages, {
 	"settings.category.editor": "Editor",
 	"settings.category.connections": "Verbindungen",
 	"settings.category.app": "App & Daten",
-	"settings.agents.title": "Agent-Verbindungen",
+	"settings.agents.title": "MCP-Verbindungen",
 	"settings.agents.mcpTitle": "Jeden MCP-Client verbinden",
 	"settings.agents.mcpDescription":
 		"Verwende diese URL in ChatGPT, Claude, Cursor oder jedem anderen MCP-kompatiblen Client.",
 	"settings.agents.copyMcpEndpoint": "MCP-URL kopieren",
 	"settings.agents.description":
-		"Ein separater, verschlüsselter Mitarbeiter. Er sieht nur freigegebene Inhalte.",
-	"settings.agents.setup": "ChatGPT einrichten",
+		"Verbundene Clients handeln als du, mit deinen Jazz-Berechtigungen. Trenne einen Client, um seinen Zugriff zu beenden.",
 	"settings.agents.disconnect": "Trennen",
+	"settings.agents.revoked":
+		"Verbindung lokal widerrufen. Der Widerruf wird bei bestehender Verbindung synchronisiert.",
+	"settings.agents.clientName": "Vom Client angegebener Name: {$name}",
 	"settings.agents.signIn":
-		"Melde dich an, um eine dauerhafte ChatGPT-Verbindung zu erstellen.",
-	"settings.agents.ready":
-		"Der Alkalye-Zugriff ist bereit. Schließe die Verbindung in ChatGPT ab.",
-	"settings.agents.disconnected": "ChatGPT wurde getrennt",
+		"Melde dich an, um einen MCP-Client zu autorisieren.",
 	"settings.agents.authorize": "{$client} autorisieren",
-	"settings.agents.authorizationReady":
-		"Autorisierungsanfrage für {$client} ist bereit.",
 	"settings.agents.consent":
-		"Dieser Client kann nur die unten freigegebenen persönlichen Dokumente und Bereiche verwenden. Rückkehrziel: {$host}.",
-	"settings.agents.noAccess":
-		"Gib vor der Autorisierung mindestens ein Dokument oder einen Bereich frei, sonst kann ChatGPT auf nichts zugreifen.",
+		"Dieser Client kann lesen und bearbeiten, was du kannst. Alkalyes Server verwendet deine verschlüsselten Kontozugangsdaten, um als du zu handeln, auch bei geschlossener App. Rückkehrziel: {$host}.",
 	"settings.agents.deny": "Ablehnen",
-	"settings.agents.authorizeAndReturn":
-		"Autorisieren und zu ChatGPT zurückkehren",
-	"settings.agents.resources": "Bereiche",
-	"settings.agents.role": "Rolle",
-	"settings.agents.access": "Zugriff",
-	"settings.agents.personalDocuments": "Persönlich",
-	"settings.agents.personalDocumentsDescription":
-		"Alle aktuellen und zukünftigen persönlichen Dokumente",
-	"settings.agents.documents": "Dokumente ({$count})",
-	"settings.agents.includedThrough": "Über {$name} freigegeben",
-	"settings.agents.space": "Bereich",
-	"settings.agents.document": "Dokument",
-	"settings.agents.untitled": "Unbenanntes Dokument",
-	"settings.agents.read": "Lesen",
-	"settings.agents.write": "Schreiben",
-	"settings.agents.adminRequired": "Adminrechte erforderlich",
-	"settings.agents.spaceDisclosure":
-		"Gib einen ganzen Bereich frei oder wähle einzelne Dokumente aus.",
-	"settings.agents.roleFor": "Rolle für {$name}",
-	"settings.agents.grantAccess": "ChatGPT Zugriff auf {$name} geben",
-	"settings.agents.removeAccess": "ChatGPT-Zugriff auf {$name} entfernen",
 	"settings.appearance": "Erscheinungsbild",
 	"settings.appearance.description":
 		"Design, Code-Hervorhebung und Sprache der Oberfläche.",
