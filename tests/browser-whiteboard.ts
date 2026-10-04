@@ -231,6 +231,23 @@ try {
 		),
 		"reopening an embedded drawing keeps its shapes and offers Done",
 	)
+	browser(session, "click", '[data-tool="text"]')
+	browser(session, "mouse", "move", "200", "150")
+	browser(session, "mouse", "down")
+	browser(session, "mouse", "up")
+	wait(session, '!document.querySelector("#drawing-text").hidden')
+	browser(session, "fill", "#drawing-text", "Closing preserves this draft")
+	evaluate(session, 'document.querySelector("#dialog").close();true')
+	wait(session, '!document.querySelector("#dialog").open')
+	browser(session, "click", '[data-action^="drawing:"]')
+	wait(
+		session,
+		'document.querySelector("#whiteboard")?.textContent.includes("Closing preserves this draft")',
+	)
+	assert(
+		true,
+		"Closing the whiteboard commits its active text draft before releasing writes",
+	)
 } finally {
 	try {
 		browser(session, "close")

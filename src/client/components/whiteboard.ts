@@ -438,10 +438,15 @@ export class WhiteboardElement extends HTMLElement {
 		this.lifetime = Effect.runFork(
 			Effect.scoped(
 				Effect.gen(function* () {
-					let run = yield* FiberSet.makeRuntimePromise<never>()
+					let writes = yield* FiberSet.make()
+					let run = yield* FiberSet.runtimePromise(writes)<never>()
 					let view = yield* Effect.acquireRelease(
 						Effect.sync(() => createWhiteboardView(options, run)),
-						view => Effect.sync(view.dispose),
+						view =>
+							Effect.sync(() => {
+								view.finish()
+								view.dispose()
+							}).pipe(Effect.andThen(FiberSet.awaitEmpty(writes))),
 					)
 					yield* Stream.merge(
 						options.session.changes,
@@ -1654,6 +1659,7 @@ function createWhiteboardView(
 	board.focus({ preventScroll: true })
 	return {
 		paint,
+		finish: commitText,
 		dispose() {
 			events.abort()
 			resizes.disconnect()
