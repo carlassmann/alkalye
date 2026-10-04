@@ -1,0 +1,7 @@
+[data-theme-picker] {
+	display: grid;
+	gap: 16px;
+}
+[data-theme-picker] > .button-row {
+	flex-wrap: wrap;
+}

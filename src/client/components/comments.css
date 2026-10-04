@@ -1,0 +1,91 @@
+[data-comments] .comments-header {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 10px 4px;
+	margin: 0 -8px 8px;
+	padding-inline: 12px 8px;
+	border-bottom: 1px solid var(--line);
+}
+[data-comments] .comments-header strong {
+	flex: 1;
+	font-size: 14px;
+	font-weight: 500;
+}
+[data-comments] .comment-count {
+	min-width: 20px;
+	padding: 0 6px;
+	border: 1px solid var(--line);
+	border-radius: 999px;
+	font-size: 11px;
+	text-align: center;
+}
+[data-comments] .comments-header button {
+	padding: 4px;
+	color: var(--muted);
+}
+[data-comments] .comments-empty {
+	display: grid;
+	justify-items: center;
+	gap: 4px;
+	padding: 30vh 12px 0;
+	color: var(--muted);
+	text-align: center;
+}
+[data-comments] .comments-empty svg {
+	width: 22px;
+	height: 22px;
+}
+[data-comments] .comments-empty p {
+	margin: 4px 0 0;
+	font-size: 13px;
+}
+[data-comments] .comments-empty small {
+	font-size: 12px;
+}
+[data-comments] .comment {
+	margin: 0 0 8px;
+	padding: 10px;
+	border: 1px solid var(--line);
+	font-size: 13px;
+}
+[data-comments] .comment blockquote {
+	border-left: 2px solid var(--line);
+	padding: 0 8px;
+	margin: 0 0 8px;
+	color: var(--muted);
+}
+[data-comments] .comment strong {
+	font-size: 12px;
+	font-weight: 600;
+}
+[data-comments] .comment.resolved {
+	opacity: 0.55;
+}
+[data-comments] .comment p {
+	white-space: pre-wrap;
+	line-height: 1.5;
+	margin: 4px 0 8px;
+}
+[data-comments] .comment > button {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 2px 0;
+	font-size: 12px;
+	color: var(--muted);
+}
+[data-comments] .comment > button svg {
+	width: 12px;
+	height: 12px;
+}
+[data-comments] .comment > footer {
+	display: flex;
+	gap: 2px;
+	margin: 0 -4px -4px;
+}
+[data-comments] .comment > footer button {
+	font-size: 12px;
+	padding: 4px;
+	color: var(--muted);
+}

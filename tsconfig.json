@@ -1,40 +1,24 @@
 {
-	"extends": "astro/tsconfigs/strict",
 	"compilerOptions": {
 		"target": "ES2022",
-		"lib": ["ES2022", "DOM", "DOM.Iterable"],
-		"module": "preserve",
-		"types": ["vite/client", "vite-plugin-pwa/client", "bun"],
-		"skipLibCheck": true,
-		"incremental": true,
-		"jsx": "react-jsx",
-		"jsxImportSource": "react",
-		"moduleResolution": "bundler",
-		"allowImportingTsExtensions": true,
-		"verbatimModuleSyntax": true,
-		"moduleDetection": "force",
-		"noEmit": true,
+		"lib": ["ES2022", "DOM", "DOM.Iterable", "DOM.AsyncIterable"],
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
 		"strict": true,
+		"noUncheckedIndexedAccess": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
-		"erasableSyntaxOnly": true,
-		"noFallthroughCasesInSwitch": true,
-		"noUncheckedSideEffectImports": true,
-		"baseUrl": ".",
-		"paths": {
-			"@/*": ["./src/*"],
-			"#app/*": ["./src/app/*"],
-			"#www/*": ["./src/www/*"]
-		},
-		"plugins": [
-			{
-				"name": "@astrojs/ts-plugin"
-			},
-			{
-				"name": "@effect/language-service"
-			}
-		]
+		"noEmit": true,
+		"allowImportingTsExtensions": true,
+		"types": ["bun"],
+		"skipLibCheck": true
 	},
-	"include": [".astro/types.d.ts", "**/*"],
-	"exclude": ["dist", ".reference"]
+	"include": [
+		"src/**/*.ts",
+		"tests/**/*.ts",
+		"scripts/**/*.ts",
+		"experiments/**/*.ts",
+		"build.ts",
+		"cli.ts"
+	]
 }

@@ -1,0 +1,24 @@
+[data-progress] {
+	position: fixed;
+	z-index: 40;
+	right: 16px;
+	bottom: 48px;
+	width: min(320px, calc(100vw - 32px));
+	display: grid;
+	gap: 8px;
+	padding: 16px;
+	border: 1px solid var(--line);
+	border-radius: 0;
+	background: var(--surface);
+	box-shadow: var(--shadow);
+	font-size: 12px;
+}
+[data-progress] span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+[data-progress] progress {
+	width: 100%;
+	accent-color: var(--brand);
+}

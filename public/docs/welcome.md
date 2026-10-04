@@ -1,47 +1,40 @@
 # Welcome to Alkalye
 
-A beautiful markdown editor. Private by design.
+Your words, on your devices.
 
-**Currently in free public beta. Self-host anytime.**
+## Write anywhere
 
----
+Documents save on this device. Keep writing offline; changes sync when you reconnect. Install Alkalye from your browser for a dedicated window or home screen icon.
 
-## Built for the web
+## Write together
 
-Alkalye is a beautiful web app, made to work and look great on any device and OS. **It even works offline.**. Install it on your phone, tablet, or desktop. Your documents sync automatically across all your devices.
-
-## Your words, encrypted
-
-Everything you write is **end-to-end encrypted**. Not even we can read your documents. Your thoughts stay yours.
-
-## Write together, in real-time
-
-Share a document link and collaborate instantly. Just like you would expect.
-
-## Organize with Spaces
-
-Create Spaces to organize documents for yourself, your team, or the public. Invite collaborators to entire collections instead of individual docs. Admin, manager, writer, and reader roles give you fine-grained control.
+Share one document or an entire workspace. Create a workspace from the workspace menu at the top of the library; its settings button manages names, members and invitation links. Grant access to readers and writers, change their access, and discuss selected passages with comments. Concurrent edits merge when devices reconnect.
 
 ## Connect your thoughts
 
-Link documents together with `[[wikilinks]]`. Type `[[` to search and link. Backlinks update automatically—see what's referencing each note.
+Type `[[` to link documents. Use folders and spaces to organize them. Backlinks show which notes refer to the current document.
 
-## Present your ideas
+## Present from your notes
 
-Turn any document into a presentation with `mode: present` in the frontmatter. Use `---` to create slides. Present directly from your notes. Use your phone as a teleprompter.
+Separate slides with `---`. Headings, code, images, tables and indented text appear on the slide. Other paragraphs become speaker notes. Slideshow shows the audience view; teleprompter adds notes and scrolling controls.
 
-## No Lock-in
+## Keep your history
 
-Settings like title, tags, and presentation mode are stored directly in your markdown via frontmatter. Export anytime as a standard `.md` file—no lock-in, no proprietary formats.
+Undo your edits without removing another writer’s work. Time machine lets you browse, copy and restore earlier versions.
 
-## Open Source
+## Make it yours
 
-Alkalye is MIT licensed and on [GitHub](https://github.com/carlassmann/alkalye). Take the code, host it yourself, make it yours.
+Choose syntax colors and writing preferences in Settings, from your name at the bottom of the library. Create document and slide themes from CSS and HTML in the theme workbench. Add images, video, audio or an SVG whiteboard.
 
-## Pricing
+## Keep your files
 
-I can provide Alkalye for free while the underlying sync service [Jazz](https://jazz.tools) is in free public alpha.
+Import Markdown files and download Markdown copies of your documents. Copy your recovery key from Settings to reopen your account on another device.
 
----
+## Connect an agent
 
-**Get started:** Edit this document, create a new one, or open a tutor from the Help menu to learn more.
+Open Settings → Connections and copy the MCP URL into ChatGPT, Claude, Cursor or any other MCP client, or create a connection token for the command line. Agents can read documents, make revision-checked edits and work with comments using your workspace permissions.
+
+**Start writing:** edit this document, create a new one, or open a tutor from Help.
+
+written with GPT-6 in Codex
+written with claude-opus-5-5 in Claude Code

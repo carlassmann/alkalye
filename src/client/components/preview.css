@@ -1,0 +1,105 @@
+[data-preview].preview-header {
+	position: sticky;
+	top: 0;
+	background: var(--paper);
+	display: flex;
+	justify-content: space-between;
+	padding: 10px 20px;
+	z-index: 2;
+	border-bottom: 1px solid var(--line);
+}
+[data-preview].preview-paper {
+	max-width: 800px;
+	margin: auto;
+	padding: 40px 50px 120px;
+	font-size: 17px;
+}
+@media (max-width: 700px) {
+	[data-preview].preview-paper {
+		padding: 20px 24px 80px;
+		font-size: 16px;
+	}
+}
+@media print {
+	[data-preview].preview-header {
+		display: none !important;
+	}
+}
+@media print {
+	[data-preview].preview-paper {
+		max-width: none;
+		padding: 0;
+		font-size: 12pt;
+	}
+}
+
+[data-preview].preview-screen {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	background: var(--paper);
+}
+[data-preview] .preview-header {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	min-height: 48px;
+	padding: 8px max(16px, env(safe-area-inset-right)) 8px
+		max(16px, env(safe-area-inset-left));
+	border-bottom: 1px solid var(--line);
+	flex-shrink: 0;
+}
+[data-preview] .preview-back {
+	color: var(--ink);
+	text-decoration: none;
+	padding: 6px 10px;
+	font-size: 14px;
+}
+[data-preview] .preview-back:hover {
+	background: var(--raised);
+}
+[data-preview] .preview-title {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	max-width: 50%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: var(--muted);
+	font-weight: 500;
+}
+[data-preview] .preview-actions {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+[data-preview] .preview-actions > button,
+[data-preview] .preview-actions > alkalye-menu > button {
+	display: grid;
+	place-items: center;
+	width: 32px;
+	height: 32px;
+}
+[data-preview] .preview-scroll {
+	flex: 1;
+	min-height: 0;
+	overflow: auto;
+}
+[data-preview] .menu-popover a {
+	display: block;
+	padding: 8px 10px;
+	color: var(--ink);
+	text-decoration: none;
+}
+@media print {
+	[data-preview] .preview-header {
+		display: none;
+	}
+	[data-preview].preview-screen,
+	[data-preview] .preview-scroll {
+		height: auto;
+		overflow: visible;
+	}
+}

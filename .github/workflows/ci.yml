@@ -35,19 +35,22 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
-      - run: bunx playwright install --with-deps chromium
+      - run: bun add --global agent-browser@0.26.0
 
-      - name: Start app and sync server
+      - run: agent-browser install --with-deps
+
+      - run: bun run build
+
+      - name: Start Bun server
         run: |
-          bunx jazz-run sync --port 4200 --host 127.0.0.1 > /tmp/alkalye-sync.log 2>&1 &
-          PUBLIC_JAZZ_SYNC_SERVER=ws://127.0.0.1:4200 bun astro dev --port 4321 --host 127.0.0.1 > /tmp/alkalye-web.log 2>&1 &
+          PORT=3000 bun run start > /tmp/alkalye-web.log 2>&1 &
           for attempt in {1..60}; do
-            curl --fail --silent http://127.0.0.1:4321/app >/dev/null && exit 0
+            curl --fail --silent http://127.0.0.1:3000/app >/dev/null && exit 0
             sleep 1
           done
           cat /tmp/alkalye-web.log
           exit 1
 
-      - run: bunx playwright test --workers=1
+      - run: bun run test:e2e
         env:
-          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4321
+          TEST_URL: http://127.0.0.1:3000/app

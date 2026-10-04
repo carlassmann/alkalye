@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, viewport-fit=cover"
+		/>
+		<meta
+			name="theme-color"
+			media="(prefers-color-scheme: light)"
+			content="#ffffff"
+		/>
+		<meta
+			name="theme-color"
+			media="(prefers-color-scheme: dark)"
+			content="#0a0a0a"
+		/>
+		<link
+			rel="preload"
+			href="/fonts/geist-mono-latin.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
+		/>
+		<meta
+			name="description"
+			content="Your words. On your devices. A local-first Markdown workspace."
+		/>
+		<title>Alkalye</title>
+		<link rel="icon" href="/icons/alkalye-icon.png" />
+		<link rel="manifest" href="/manifest.webmanifest" />
+		<link rel="stylesheet" href="/app.css" />
+		<script type="module" src="/app.js"></script>
+	</head>
+	<body>
+		<alkalye-app data-app id="app" aria-busy="true">
+			<!-- APP_BOOT -->
+		</alkalye-app>
+		<dialog data-dialog id="dialog"></dialog>
+		<div data-toast id="toast" role="status" aria-live="polite"></div>
+	</body>
+</html>

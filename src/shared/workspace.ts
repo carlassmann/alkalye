@@ -1,0 +1,125 @@
+import * as Context from "effect/Context"
+import * as Schema from "effect/Schema"
+import { IdentifierSchema } from "./model"
+import { DocumentMetadataSchema } from "./document-metadata"
+import { PreferencePatchSchema } from "./preferences"
+export let personalWorkspaceRequest = "personal-v1"
+// `access:public` lets any signed-in account read a document by its link.
+// Account subjects are digests, so this member name can never be a person.
+export let publicMember = "public"
+// 32 random bytes or their SHA-256 digest, both in unpadded base64url.
+export let InvitationDigestSchema = Schema.String.check(
+	Schema.isPattern(/^[\w-]{42}[AEIMQUYcgkosw048]$/),
+)
+
+export let WorkspaceChangeSchema = Schema.Union([
+	Schema.Struct({
+		kind: Schema.Literal("preferences"),
+		patch: PreferencePatchSchema,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("renamed"),
+		name: Schema.NonEmptyString,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("created"),
+		name: Schema.NonEmptyString,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("membership"),
+		member: IdentifierSchema,
+		role: Schema.NullOr(Schema.Literals(["writer", "reader"])),
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("documentAdded"),
+		document: IdentifierSchema,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("invitationCreated"),
+		invitation: IdentifierSchema,
+		document: Schema.NullOr(IdentifierSchema),
+		role: Schema.Literals(["writer", "reader"]),
+		digest: InvitationDigestSchema,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("invitationAccepted"),
+		invitation: IdentifierSchema,
+		member: IdentifierSchema,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("invitationRevoked"),
+		invitation: IdentifierSchema,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("invitationLeft"),
+		invitation: IdentifierSchema,
+		member: IdentifierSchema,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("documentMoved"),
+		document: IdentifierSchema,
+		from: IdentifierSchema,
+	}),
+])
+export let WorkspaceFactSchema = Schema.Struct({
+	id: Schema.NonEmptyString,
+	workspace: IdentifierSchema,
+	subject: IdentifierSchema,
+	change: WorkspaceChangeSchema,
+})
+export type WorkspaceFact = typeof WorkspaceFactSchema.Type
+export type AccessRole = "owner" | "writer" | "reader"
+export interface AccessAuthority {
+	workspaces: "all" | ReadonlyArray<string>
+	ceiling: AccessRole
+}
+export let AccessRoleSchema = Schema.Literals(["owner", "writer", "reader"])
+export class Identity extends Context.Service<
+	Identity,
+	{ subject: string; actors: ReadonlyArray<string>; access?: AccessAuthority }
+>()("WorkspaceIdentity") {}
+export let SidebarDocumentSchema = Schema.Struct({
+	document: IdentifierSchema,
+	workspace: IdentifierSchema,
+	owner: IdentifierSchema,
+	log: IdentifierSchema,
+	position: Schema.Natural,
+	deleted: Schema.Boolean,
+	metadata: DocumentMetadataSchema,
+})
+export type SidebarDocument = typeof SidebarDocumentSchema.Type
+export let MembershipSchema = Schema.Struct({
+	member: IdentifierSchema,
+	role: Schema.Literals(["writer", "reader"]),
+})
+export let WorkspaceSnapshotSchema = Schema.Struct({
+	workspace: IdentifierSchema,
+	name: Schema.String,
+	owner: IdentifierSchema,
+	position: Schema.Natural,
+	members: Schema.Array(MembershipSchema),
+	documents: Schema.Array(SidebarDocumentSchema),
+})
+export type WorkspaceSnapshot = typeof WorkspaceSnapshotSchema.Type
+export let LibraryWorkspaceSchema = Schema.Struct({
+	workspace: IdentifierSchema,
+	name: Schema.String,
+	owner: IdentifierSchema,
+	position: Schema.Natural,
+	role: AccessRoleSchema,
+})
+export let LibraryDocumentSchema = Schema.Struct({
+	...SidebarDocumentSchema.fields,
+	role: AccessRoleSchema,
+	kind: Schema.Literals(["document", "slides", "whiteboard"]),
+	excerpt: Schema.String,
+	updated: Schema.Natural,
+	created: Schema.Natural,
+	links: Schema.optionalKey(Schema.Array(Schema.String)),
+})
+export let LibrarySnapshotSchema = Schema.Struct({
+	workspaces: Schema.Array(LibraryWorkspaceSchema),
+	documents: Schema.Array(LibraryDocumentSchema),
+})
+export type LibrarySnapshot = typeof LibrarySnapshotSchema.Type
+export type LibraryDocument = typeof LibraryDocumentSchema.Type

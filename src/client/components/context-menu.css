@@ -1,0 +1,78 @@
+[data-context-menu] {
+	position: fixed;
+	inset: auto;
+	margin: 0;
+	min-width: 180px;
+	padding: 4px;
+	border: 1px solid var(--line);
+	border-radius: 0;
+	background: var(--paper);
+	color: var(--ink);
+	box-shadow: var(--shadow);
+	opacity: 0;
+	transform: translateY(-4px) scale(0.95);
+	transform-origin: top left;
+	transition:
+		opacity 100ms ease-out,
+		transform 100ms ease-out,
+		display 100ms allow-discrete,
+		overlay 100ms allow-discrete;
+}
+[data-context-menu]:popover-open {
+	opacity: 1;
+	transform: none;
+}
+@starting-style {
+	[data-context-menu]:popover-open {
+		opacity: 0;
+		transform: translateY(-4px) scale(0.95);
+	}
+}
+[data-context-menu] button {
+	display: flex;
+	gap: 16px;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	text-align: left;
+	padding: 8px 12px;
+	font-size: 12px;
+}
+[data-context-menu] button:disabled {
+	opacity: 0.45;
+}
+[data-context-menu] kbd {
+	font: inherit;
+	opacity: 0.6;
+}
+[data-context-menu] button[data-submenu]::after {
+	content: "›";
+	opacity: 0.6;
+}
+[data-context-menu] button[aria-expanded="true"] {
+	background: var(--brand-soft);
+	color: var(--brand);
+}
+[data-context-menu] hr {
+	margin: 4px 0;
+	border: 0;
+	border-top: 1px solid var(--line);
+}
+[data-context-menu] p {
+	max-width: 240px;
+	margin: 0;
+	padding: 6px 12px;
+	font-size: 11px;
+	opacity: 0.6;
+}
+[data-context-menu] button:focus-visible,
+[data-context-menu] button:not(:disabled):hover {
+	outline: none;
+	background: var(--brand-soft);
+	color: var(--brand);
+}
+@media (pointer: coarse) {
+	[data-context-menu] button {
+		min-height: 44px;
+	}
+}

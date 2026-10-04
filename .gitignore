@@ -11,3 +11,5 @@ example
 .vercel
 /agents
 tsconfig.tsbuildinfo
+
+.data

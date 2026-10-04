@@ -1,0 +1,68 @@
+[data-line-actions] {
+	--action-brand: oklch(59.6% 0.145 163.225);
+	position: fixed;
+	right: 16px;
+	bottom: var(--floating-bottom, 16px);
+	z-index: 50;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding-right: env(safe-area-inset-right);
+	padding-bottom: env(safe-area-inset-bottom);
+	transition:
+		bottom 220ms cubic-bezier(0.215, 0.61, 0.355, 1),
+		right 200ms ease-in;
+}
+:root[data-appearance="dark"] [data-line-actions] {
+	--action-brand: oklch(65% 0.145 163.225);
+}
+[data-line-actions][data-keyboard] {
+	padding-bottom: 0;
+}
+[data-line-actions] :is(button, a) {
+	display: grid;
+	place-items: center;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border: 1px solid transparent;
+	border-radius: 0;
+	background: var(--action-brand);
+	color: #fff;
+	box-shadow:
+		0 4px 6px -1px rgb(0 0 0 / 10%),
+		0 2px 4px -2px rgb(0 0 0 / 10%);
+	text-decoration: none;
+}
+[data-line-actions] svg {
+	width: 16px;
+	height: 16px;
+}
+[data-line-actions] :is(button, a):focus-visible {
+	outline-color: var(--action-brand);
+}
+@media (pointer: fine) {
+	[data-line-actions] :is(button, a) {
+		width: 32px;
+		height: 32px;
+	}
+	[data-line-actions] :is(button, a):hover {
+		background: color-mix(in oklch, var(--action-brand) 90%, transparent);
+	}
+}
+@media (min-width: 1101px) {
+	:root:has([data-app]#app.tools-open) [data-line-actions] {
+		right: 240px;
+	}
+}
+@media (max-width: 1100px) {
+	:root:has([data-app]#app.library-open, [data-app]#app.tools-open)
+		[data-line-actions] {
+		display: none;
+	}
+}
+@media print {
+	[data-line-actions] {
+		display: none !important;
+	}
+}

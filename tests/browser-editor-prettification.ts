@@ -1,0 +1,393 @@
+import {
+	assert,
+	browser,
+	currentDocument,
+	evaluate,
+	wait,
+} from "./browser-driver"
+
+// Source reads go through the documented EditorElement API; #editor.value is
+// the projection the native textarea shows.
+let editor = 'document.querySelector("alkalye-editor").source'
+let native = 'document.querySelector("#editor")'
+let source = [
+	"# Links",
+	"Read [Example](https://example.org/a_(b)) and [[Welcome to Alkalye]].",
+	"`[code](https://c.example)` ![Icon](/i.png)",
+	"last",
+].join("\n")
+let projected = source
+	.replace("[Example](https://example.org/a_(b))", "Example")
+	.replace("[[Welcome to Alkalye]]", "Welcome to Alkalye")
+let expanded = `${native}.value.includes("[Example](")`
+let collapsed = `${native}.value.includes("Read Example and Welcome to Alkalye")`
+
+let server = Bun.spawn(["bun", "tests/browser-document-app.ts", "--serve"], {
+	stdout: "pipe",
+	stderr: "inherit",
+})
+let session = "editor-prettification-" + Date.now()
+try {
+	let output = await server.stdout.getReader().read()
+	if (!output.value) throw new Error("Missing app URL")
+	let url = new URL("/app", new TextDecoder().decode(output.value).trim()).href
+	console.log(url)
+	browser(session, "set", "viewport", "1280", "800")
+	browser(session, "open", url)
+	wait(session, `Boolean(${native})`)
+	browser(session, "click", '[data-action="new"]')
+	browser(session, "fill", "#editor", source)
+	wait(session, `${editor}.value === ${JSON.stringify(source)}`)
+	wait(session, `${native}.value === ${JSON.stringify(projected)}`)
+	assert(
+		evaluate(
+			session,
+			`document.querySelector("#highlight").textContent === ${native}.value + "\\n" && [...document.querySelectorAll("#highlight .syntax-link")].map(link => link.textContent).join("|") === "Example|Welcome to Alkalye"`,
+		),
+		"inactive links and wiki-links collapse in the textarea and its overlay alike",
+	)
+
+	wait(
+		session,
+		'document.querySelector("#save-status").textContent === "Saved"',
+	)
+	let id = evaluate(session, currentDocument)
+	browser(session, "reload")
+	wait(
+		session,
+		`${currentDocument} === ${JSON.stringify(id)} && ${editor}?.value === ${JSON.stringify(source)}`,
+	)
+	assert(
+		evaluate(session, collapsed),
+		"saving and reopening keeps the Markdown source, not the projection",
+	)
+
+	wait(
+		session,
+		'document.querySelector("[data-editor-links] a[data-kind=link]")?.getAttribute("aria-label") === "Example"',
+	)
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("[data-editor-links] a[data-kind=link]").href === "https://example.org/a_(b)"',
+		),
+		"compact web links retain native anchor semantics and their destination",
+	)
+	browser(session, "set", "viewport", "600", "800")
+	wait(
+		session,
+		`(() => { let span = document.querySelector('#highlight .syntax-link'); let range = document.createRange(); range.selectNodeContents(span); let expected = range.getClientRects()[0]; let actual = document.querySelector('[data-editor-links] a[data-kind="link"]')?.getBoundingClientRect(); return actual && Math.abs(actual.left - expected.left) < 1 && Math.abs(actual.top - expected.top) < 1 && Math.abs(actual.width - expected.width) < 1 })()`,
+	)
+	assert(
+		true,
+		"compact link hit areas follow text wrapping after a viewport resize",
+	)
+	browser(session, "set", "viewport", "1280", "800")
+	assert(
+		evaluate(
+			session,
+			`(() => { let anchor = document.querySelector('[data-editor-links] a[data-kind="link"]'); anchor.focus(); ${native}.dispatchEvent(new Event("scroll")); return document.activeElement?.tagName === "A" && document.activeElement.href === anchor.href })()`,
+		),
+		"repainting compact links preserves keyboard focus",
+	)
+	selectSource(0)
+	assert(
+		evaluate(
+			session,
+			`(() => { let anchor = document.querySelector('[data-editor-links] a[data-kind="link"]'); let rect = anchor.getBoundingClientRect(); anchor.dispatchEvent(new PointerEvent("pointerdown", { pointerType:"mouse", shiftKey:true, bubbles:true, cancelable:true, clientX:rect.left + 3, clientY:rect.top + 3 })); let cancelled = !anchor.dispatchEvent(new MouseEvent("click", { shiftKey:true, bubbles:true, cancelable:true })); return cancelled && ${editor}.selectionStart === 0 && ${editor}.selectionEnd > 0 })()`,
+		),
+		"Shift-click extends source selection without opening the link",
+	)
+	selectSource(source.length)
+	wait(session, collapsed)
+	assert(
+		evaluate(
+			session,
+			`(() => { let offset = ${native}.value.indexOf("Welcome to Alkalye") + 3; ${native}.setSelectionRange(offset, offset); return ${editor}.selectionStart === ${editor}.selectionEnd })()`,
+		),
+		"a caret in a resolved wiki label stays empty in source coordinates",
+	)
+	selectSource(source.length)
+	wait(session, collapsed)
+	evaluate(
+		session,
+		`(() => { let link = document.querySelector('[data-editor-links] a[data-kind="link"]'); let bounds = link.getBoundingClientRect(); link.dispatchEvent(new MouseEvent('contextmenu', { bubbles:true, cancelable:true, clientX:bounds.left + 2, clientY:bounds.top + 2 })) })()`,
+	)
+	wait(
+		session,
+		`[...document.querySelectorAll('[role="menuitem"]')].some(item => item.checkVisibility() && item.textContent.includes("Copy link"))`,
+	)
+	assert(true, "compact links retain the editor context menu")
+	browser(session, "press", "Escape")
+	selectSource(source.length)
+	wait(session, collapsed)
+	browser(session, "click", '[data-editor-links] a[data-kind="wiki"]')
+	wait(session, `${currentDocument} !== ${JSON.stringify(id)}`)
+	assert(true, "clicking a compact wiki-link opens its document")
+	browser(session, "back")
+	wait(
+		session,
+		`${currentDocument} === ${JSON.stringify(id)} && ${editor}?.value === ${JSON.stringify(source)}`,
+	)
+
+	let destination = source.indexOf("example.org")
+	evaluate(
+		session,
+		`${native}.focus(); ${editor}.setSelectionRange(${destination}, ${destination + 11})`,
+	)
+	assert(
+		evaluate(
+			session,
+			`${expanded} && ${editor}.value.slice(${editor}.selectionStart, ${editor}.selectionEnd) === "example.org" && ${native}.value.slice(${native}.selectionStart, ${native}.selectionEnd) === "example.org"`,
+		),
+		"source selections inside hidden destinations reveal the link",
+	)
+
+	let last = source.indexOf("last")
+	selectSource(last)
+	wait(session, collapsed)
+	browser(session, "press", "ArrowUp")
+	browser(session, "press", "ArrowUp")
+	assert(
+		evaluate(session, collapsed),
+		"links stay compact when the cursor is elsewhere on their line",
+	)
+	selectSource(source.indexOf("[Example]") - 1)
+	browser(session, "press", "ArrowRight")
+	browser(session, "press", "ArrowRight")
+	wait(session, expanded)
+	assert(
+		evaluate(
+			session,
+			`${editor}.selectionStart >= ${source.indexOf("Read")} && ${editor}.selectionStart < ${source.indexOf("\n`")}`,
+		),
+		"moving the caret into a link shows its Markdown",
+	)
+	selectSource(source.indexOf(" and ") + 1)
+	wait(session, collapsed)
+	assert(true, "leaving the link collapses it on the same line")
+
+	selectSource(source.length)
+	browser(session, "keyboard", "type", " more")
+	wait(session, `${editor}.value === ${JSON.stringify(source + " more")}`)
+	assert(
+		evaluate(session, collapsed),
+		"typing elsewhere edits the source while links stay collapsed",
+	)
+	undoUntil(source)
+	assert(evaluate(session, collapsed), "undo restores the exact source")
+
+	let lineEnd = source.indexOf("\n`")
+	selectSource(lineEnd)
+	browser(session, "keyboard", "type", "!")
+	wait(session, `${editor}.value.includes("[[Welcome to Alkalye]].!")`)
+	browser(session, "press", "ArrowDown")
+	wait(
+		session,
+		`${native}.value.includes("Read Example and Welcome to Alkalye.!")`,
+	)
+	assert(true, "edits on a raw link line are kept when it collapses")
+	undoUntil(source)
+
+	selectSource(last)
+	wait(session, collapsed)
+	evaluate(
+		session,
+		`${native}.dispatchEvent(new CompositionEvent("compositionstart", {bubbles: true})); ${native}.setSelectionRange(${native}.value.indexOf("Example") + 2, ${native}.value.indexOf("Example") + 2)`,
+	)
+	browser(session, "wait", "300")
+	assert(
+		evaluate(session, collapsed),
+		"composition keeps the textarea unchanged",
+	)
+	evaluate(
+		session,
+		`${native}.dispatchEvent(new CompositionEvent("compositionend", {bubbles: true, data: ""}))`,
+	)
+	wait(session, expanded)
+	assert(
+		evaluate(
+			session,
+			`${editor}.selectionStart === ${source.indexOf("Example") + 2}`,
+		),
+		"composition end reprojects around the caret's source offset",
+	)
+
+	selectSource(last)
+	evaluate(
+		session,
+		`{
+		${native}.dispatchEvent(new CompositionEvent("compositionstart", {bubbles:true}));
+		let from = ${native}.value.indexOf("last");
+		${native}.setRangeText("日本語", from, from + 4, "end");
+		${native}.dispatchEvent(new CompositionEvent("compositionend", {bubbles:true, data:"日本語"}));
+	}`,
+	)
+	wait(
+		session,
+		`${editor}.value === ${JSON.stringify(source.replace("last", "日本語"))}`,
+	)
+	assert(
+		true,
+		"composition end accepts final native text before the final input event",
+	)
+	undoUntil(source)
+
+	selectSource(last)
+	wait(session, collapsed)
+	evaluate(
+		session,
+		`${native}.dispatchEvent(new PointerEvent("pointerdown", {bubbles: true})); ${native}.setSelectionRange(0, ${native}.value.indexOf("last"))`,
+	)
+	browser(session, "wait", "300")
+	assert(evaluate(session, collapsed), "a pointer drag keeps the text under it")
+	assert(
+		evaluate(
+			session,
+			`(() => { let clipboardData = new DataTransfer(); let event = new ClipboardEvent("copy", {bubbles: true, cancelable: true, clipboardData}); ${native}.dispatchEvent(event); return event.defaultPrevented && clipboardData.getData("text/plain") === ${JSON.stringify(source.slice(0, last))} })()`,
+		),
+		"copying collapsed text puts its Markdown source on the clipboard",
+	)
+	evaluate(session, `dispatchEvent(new PointerEvent("pointerup"))`)
+	wait(session, `${native}.value === ${JSON.stringify(source)}`)
+	assert(
+		evaluate(
+			session,
+			`${editor}.selectionStart === 0 && ${editor}.selectionEnd === ${last}`,
+		),
+		"releasing the pointer expands the selected lines and keeps the selection",
+	)
+
+	selectSource(last)
+	wait(session, collapsed)
+	evaluate(
+		session,
+		`${native}.dispatchEvent(new PointerEvent("pointerdown", {bubbles: true})); ${native}.setSelectionRange(${native}.value.indexOf("Read"), ${native}.value.indexOf("last"))`,
+	)
+	evaluate(
+		session,
+		`${native}.dispatchEvent(new ClipboardEvent("cut", {bubbles: true, cancelable: true, clipboardData: new DataTransfer()}))`,
+	)
+	wait(
+		session,
+		`${editor}.value === ${JSON.stringify(source.slice(0, source.indexOf("Read")) + "last")}`,
+	)
+	evaluate(session, `dispatchEvent(new PointerEvent("pointerup"))`)
+	assert(true, "cutting collapsed text removes its whole Markdown source")
+	undoUntil(source)
+
+	selectSource(last)
+	wait(session, collapsed)
+	browser(session, "press", "Control+Alt+ArrowUp")
+	wait(session, `${native}.value === ${JSON.stringify(source)}`)
+	assert(true, "multiple selections show raw Markdown")
+	browser(session, "press", "Escape")
+	wait(session, collapsed)
+	assert(true, "clearing extra selections collapses links again")
+
+	evaluate(
+		session,
+		`${native}.focus(); ${editor}.setSelectionRange(${source.indexOf("example.org")}, ${source.indexOf("example.org") + 7})`,
+	)
+	browser(session, "press", "Control+Shift+l")
+	wait(session, `${native}.value === ${JSON.stringify(source)}`)
+	assert(
+		evaluate(
+			session,
+			`document.querySelector("#highlight").textContent === ${native}.value + "\\n"`,
+		),
+		"select-all-occurrences switches both the native textarea and overlay to source",
+	)
+	browser(session, "press", "Escape")
+	selectSource(last)
+	browser(session, "press", "Control+f")
+	wait(session, "Boolean(document.querySelector('#find-text'))")
+	browser(session, "fill", "#find-text", "example.org")
+	browser(session, "click", "#find-next")
+	wait(
+		session,
+		`${expanded} && ${editor}.value.slice(${editor}.selectionStart, ${editor}.selectionEnd) === "example.org"`,
+	)
+	assert(true, "find matches text inside hidden link destinations")
+	browser(session, "fill", "#replace-text", "example.com")
+	browser(session, "click", "#replace-one")
+	wait(
+		session,
+		`${editor}.value.includes("[Example](https://example.com/a_(b))")`,
+	)
+	assert(true, "replace edits the source of a link")
+	browser(session, "click", "#close-find")
+	undoUntil(source)
+
+	selectSource(source.indexOf("Read"))
+	wait(
+		session,
+		'Boolean(document.querySelector("[data-line-actions] [aria-label^=\\"Open document\\"]"))',
+	)
+	assert(true, "line actions read the source of the current line")
+
+	selectSource(last)
+	wait(session, collapsed)
+	browser(session, "tab", "new", "--label", "peer", url + "/doc/" + id)
+	wait(session, `${editor}?.value === ${JSON.stringify(source)}`)
+	evaluate(session, `${native}.focus(); ${editor}.setSelectionRange(0, 0)`)
+	browser(session, "keyboard", "type", "Top ")
+	wait(
+		session,
+		'document.querySelector("#save-status").textContent === "Saved"',
+	)
+	browser(session, "tab", "t1")
+	wait(session, `${editor}.value === ${JSON.stringify("Top " + source)}`)
+	assert(
+		evaluate(
+			session,
+			`${editor}.selectionStart === ${last + 4} && ${collapsed}`,
+		),
+		"remote edits keep the local source selection and collapsed links",
+	)
+	let long =
+		Array.from(
+			{ length: 30 },
+			(_, index) =>
+				`[link ${index}](https://example.org/${"long/".repeat(10)})`,
+		).join("\n") +
+		"\n# Jump here\n" +
+		"tail\n".repeat(100)
+	browser(session, "fill", "#editor", long)
+	wait(session, `${editor}.value === ${JSON.stringify(long)}`)
+	let heading = long.indexOf("# Jump here")
+	evaluate(
+		session,
+		`document.querySelector("alkalye-editor").selectRange(${heading})`,
+	)
+	assert(
+		evaluate(
+			session,
+			`(() => { let walker = document.createTreeWalker(document.querySelector("#highlight"), NodeFilter.SHOW_TEXT), offset = ${native}.selectionStart, node; while(node = walker.nextNode()){ if(offset < node.textContent.length) break; offset -= node.textContent.length } let range = document.createRange(); range.setStart(node, offset); range.collapse(true); let rect = range.getBoundingClientRect(), viewport = ${native}.getBoundingClientRect(); return ${editor}.selectionStart === ${heading} && rect.top >= viewport.top && rect.bottom <= viewport.bottom })()`,
+		),
+		"source navigation scrolls to its projected position below many compact links",
+	)
+} finally {
+	try {
+		browser(session, "close")
+	} finally {
+		server.kill()
+		await server.exited
+	}
+}
+
+function selectSource(offset: number) {
+	evaluate(
+		session,
+		`(() => { ${native}.focus(); ${editor}.setSelectionRange(${offset}, ${offset}); return true })()`,
+	)
+}
+function undoUntil(expected: string) {
+	for (let attempt = 0; attempt < 10; attempt++) {
+		if (evaluate(session, `${editor}.value === ${JSON.stringify(expected)}`))
+			return
+		browser(session, "press", "Control+z")
+		browser(session, "wait", "100")
+	}
+	wait(session, `${editor}.value === ${JSON.stringify(expected)}`)
+}

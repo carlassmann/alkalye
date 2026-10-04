@@ -1,0 +1,143 @@
+[data-dialog] .muted {
+	color: var(--muted);
+	font-size: 12px;
+	line-height: 1.65;
+}
+[data-dialog] .padded {
+	padding: 16px;
+}
+[data-dialog] {
+	background: var(--paper);
+	color: var(--ink);
+	border: 1px solid var(--line);
+	border-radius: 0;
+	width: min(620px, calc(100vw - 24px));
+	padding: 0;
+	max-height: 90dvh;
+	box-shadow: var(--dialog-shadow);
+	opacity: 0;
+	transform: scale(0.95);
+	transition:
+		opacity 100ms ease-out,
+		transform 100ms ease-out,
+		display 100ms allow-discrete,
+		overlay 100ms allow-discrete;
+}
+[data-dialog][open] {
+	opacity: 1;
+	transform: none;
+}
+[data-dialog]::backdrop {
+	background: color-mix(in oklch, var(--ink) 20%, transparent);
+	backdrop-filter: blur(4px);
+	opacity: 0;
+	transition:
+		opacity 100ms ease-out,
+		display 100ms allow-discrete,
+		overlay 100ms allow-discrete;
+}
+[data-dialog][open]::backdrop {
+	opacity: 1;
+}
+@starting-style {
+	[data-dialog][open] {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+	[data-dialog][open]::backdrop {
+		opacity: 0;
+	}
+}
+[data-dialog] header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 16px 22px;
+	border-bottom: 1px solid var(--line);
+}
+[data-dialog] h2 {
+	font-size: 18px;
+	font-weight: 600;
+	letter-spacing: -0.4px;
+	margin: 0;
+}
+[data-dialog] h3 {
+	font-size: 13px;
+	margin: 22px 0 8px;
+}
+[data-dialog] header button {
+	font-size: 20px;
+}
+[data-dialog] .dialog-body {
+	padding: 20px 24px;
+}
+[data-dialog] footer {
+	display: flex;
+	justify-content: end;
+	gap: 8px;
+	padding: 16px 24px;
+	border-top: 1px solid var(--line);
+}
+[data-dialog] label {
+	display: flex;
+	flex-direction: column;
+	gap: 7px;
+	font-size: 11px;
+	margin: 10px 0;
+}
+[data-dialog] textarea {
+	width: 100%;
+}
+[data-dialog] input {
+	width: 100%;
+}
+[data-dialog] .primary {
+	background: var(--brand);
+	color: var(--brand-ink);
+	padding: 9px 15px;
+	font-weight: 600;
+	text-align: center;
+}
+[data-dialog] .primary {
+	background: var(--brand);
+	color: var(--brand-ink);
+	padding: 9px 15px;
+	font-weight: 600;
+	text-align: center;
+}
+[data-dialog] .button-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 10px 0;
+}
+[data-dialog] .button-row button {
+	border: 1px solid var(--line);
+	font-size: 11px;
+}
+[data-dialog] pre {
+	overflow: auto;
+	white-space: pre-wrap;
+	font-size: 11px;
+}
+[data-dialog].wide {
+	width: min(1200px, calc(100vw - 24px));
+}
+@media (max-width: 700px) {
+	[data-dialog] .dialog-body {
+		padding: 16px !important;
+	}
+}
+@media print {
+	[data-dialog] {
+		display: none !important;
+	}
+}
+
+[data-dialog] [data-image-preview] {
+	display: block;
+	max-width: 100%;
+	max-height: 70dvh;
+	margin: auto;
+	object-fit: contain;
+}

@@ -1,0 +1,9 @@
+[data-palette]#commands {
+	margin-top: 12px;
+}
+[data-palette]#commands button {
+	display: block;
+	width: 100%;
+	padding: 12px;
+	border-bottom: 1px solid var(--line);
+}

@@ -1,0 +1,299 @@
+[data-library].library {
+	position: relative;
+	background: var(--surface);
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	border-right: 1px solid var(--line);
+	overflow: hidden;
+}
+[data-library] .library-header {
+	height: 48px;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 8px 0 16px;
+	border-bottom: 1px solid var(--line);
+}
+[data-library] .brand {
+	color: var(--ink);
+	font-weight: 600;
+	font-size: 14px;
+	text-decoration: none;
+}
+[data-library] .library-actions {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+[data-library] .library-actions > button,
+[data-library] .library-actions > alkalye-menu > button {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	height: 28px;
+	padding: 0 8px;
+	font-weight: 500;
+	font-size: 13px;
+}
+[data-library] .library-actions > button svg,
+[data-library] .library-actions > alkalye-menu > button svg {
+	width: 14px;
+	height: 14px;
+}
+[data-library] .library-menu:not([popover]) {
+	position: absolute;
+	top: 44px;
+	right: 8px;
+	z-index: 5;
+	display: grid;
+	min-width: 180px;
+	padding: 4px;
+	border: 1px solid var(--line);
+	background: var(--paper);
+	box-shadow: var(--shadow);
+	opacity: 1;
+	transform: none;
+	transform-origin: top right;
+	transition:
+		opacity 100ms ease-out,
+		transform 100ms ease-out,
+		display 100ms allow-discrete;
+}
+[data-library] .library-menu[hidden] {
+	opacity: 0;
+	transform: translateY(-4px) scale(0.95);
+}
+@starting-style {
+	[data-library] .library-menu:not([hidden]) {
+		opacity: 0;
+		transform: translateY(-4px) scale(0.95);
+	}
+}
+[data-library] .library-menu button {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 8px 10px;
+	font-size: 13px;
+}
+[data-library] .workspace-row {
+	height: 48px;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 0 8px;
+	border-bottom: 1px solid var(--line);
+}
+[data-library] .workspace-row alkalye-workspace-menu {
+	flex: 1;
+}
+[data-library] .workspace-row button {
+	padding: 6px;
+	color: var(--muted);
+}
+[data-library] .search-row {
+	height: 52px;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 0 8px;
+	border-bottom: 1px solid var(--line);
+}
+[data-library] .search {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	border: 1px solid var(--line);
+	padding: 0 10px;
+	height: 36px;
+	color: var(--muted);
+}
+[data-library] .search:focus-within {
+	outline: 2px solid var(--ring);
+	outline-offset: -1px;
+}
+[data-library] .search input {
+	flex: 1;
+	min-width: 0;
+	border: 0;
+	padding: 0;
+	background: transparent;
+	font-size: 13px;
+	outline: 0;
+}
+[data-library] .search-row > button {
+	padding: 8px;
+}
+[data-library] .search-row > button[aria-pressed="false"] {
+	color: var(--muted);
+}
+[data-library] .library-options {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	padding: 8px;
+	border-bottom: 1px solid var(--line);
+}
+[data-library] .library-options alkalye-picker {
+	flex: 1 1 45%;
+	min-width: 0;
+	font-size: 12px;
+}
+[data-library] .library-options button {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	padding: 6px 8px;
+	border: 1px solid var(--line);
+}
+[data-library] .document-list {
+	overflow: auto;
+	flex: 1;
+	padding: 8px;
+}
+[data-library] .document-list section + section {
+	margin-top: 4px;
+}
+[data-library] .folder-label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	color: var(--muted);
+	padding: 6px 8px;
+	margin: 0;
+	font-weight: 500;
+}
+[data-library] .document-row {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	width: 100%;
+	padding: 8px;
+	margin: 0 0 2px;
+	align-items: center;
+}
+[data-library] .document-row.active {
+	background: var(--raised);
+}
+[data-library] .document-row strong {
+	grid-column: 1;
+	font-weight: 400;
+	font-size: 14px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+[data-library] .document-date {
+	grid-column: 1;
+	font-size: 12px;
+	color: var(--muted);
+	margin-bottom: 2px;
+}
+[data-library] .document-pin {
+	grid-column: 2;
+	grid-row: 1 / 3;
+	color: var(--muted);
+}
+[data-library] .document-tags {
+	grid-column: 1;
+	font-size: 11px;
+	color: var(--muted);
+	margin-top: 2px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+[data-library] .empty-list {
+	padding: 16px 8px;
+	color: var(--muted);
+	font-size: 13px;
+}
+[data-library] .folder-header {
+	display: flex;
+	align-items: center;
+	padding-inline-start: calc(var(--folder-depth, 0) * 12px);
+}
+[data-library] .folder-header .folder-label {
+	flex: 1;
+	text-align: left;
+	color: var(--ink);
+	font-weight: 400;
+	font-size: 13px;
+}
+[data-library] .folder-header [data-folder] {
+	padding: 4px 6px;
+	color: var(--muted);
+}
+[data-library] .folder-status {
+	margin: 8px 8px 0;
+	padding: 10px;
+	border: 1px solid var(--line);
+	display: grid;
+	gap: 6px;
+	color: var(--muted);
+	font-size: 13px;
+}
+[data-library] .folder-status p {
+	margin: 0;
+}
+[data-library] .folder-status button {
+	justify-self: start;
+	padding: 6px 10px;
+	border: 1px solid var(--line);
+	color: var(--ink);
+}
+[data-library] .profile {
+	flex-shrink: 0;
+	padding: 12px 8px;
+	border-top: 1px solid var(--line);
+}
+[data-library] .profile button {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 8px;
+}
+[data-library] .avatar {
+	display: grid;
+	place-items: center;
+	color: var(--muted);
+}
+[data-library] .profile[data-offline] .avatar {
+	color: var(--danger);
+}
+[data-library] .profile-name {
+	flex: 1;
+	min-width: 0;
+	font-size: 14px;
+	font-weight: 500;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+[data-library] .profile-name small {
+	display: block;
+	color: var(--muted);
+	font-size: 12px;
+	font-weight: 400;
+}
+[data-library] .profile-name small:empty {
+	display: none;
+}
+@media print {
+	[data-library].library {
+		display: none !important;
+	}
+}
+
+[data-library] [popover].library-menu {
+	top: auto;
+	right: auto;
+}

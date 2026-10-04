@@ -1,0 +1,56 @@
+[data-attachments] h3 {
+	display: flex !important;
+	align-items: center;
+	justify-content: space-between;
+}
+[data-attachments] h3 button {
+	width: auto !important;
+	min-height: 0 !important;
+	padding: 4px !important;
+	color: var(--muted);
+}
+[data-attachments] .asset-row {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: center;
+}
+[data-attachments] .asset-row > button span,
+[data-attachments] .asset-name span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+[data-attachments] .asset-name {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 8px;
+	font-size: 14px;
+}
+[data-attachments] .asset-actions {
+	display: flex;
+}
+[data-attachments] .asset-actions button {
+	width: auto !important;
+	padding: 6px !important;
+	color: var(--muted);
+}
+[data-attachments] .assets-empty {
+	display: grid;
+	justify-items: center;
+	gap: 8px;
+	margin: 24px 0;
+	color: var(--muted);
+	font-size: 12px;
+}
+[data-attachments] .assets-empty svg {
+	width: 24px;
+	height: 24px;
+}
+[data-attachments] [data-asset-failure] {
+	grid-column: 1 / -1;
+	display: block;
+	padding: 4px 8px;
+	color: var(--muted);
+	overflow-wrap: anywhere;
+}

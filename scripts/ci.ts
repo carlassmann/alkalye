@@ -7,7 +7,7 @@ import {
 	duplicateEntryIds,
 	isChangelogEntry,
 	newestEntryId,
-} from "@/shared/changelog"
+} from "../src/shared/changelog"
 
 let ROOT = resolve(import.meta.dirname ?? ".", "..")
 let CI_TIMEOUT_MS = 15 * 60 * 1_000
@@ -18,7 +18,7 @@ let SIGNOFF_INSTALL_COMMAND =
 let ciDeadline: number
 
 function capture(command: string[]): string {
-	let result = spawnSync(command[0], command.slice(1), {
+	let result = spawnSync(command[0] ?? "", command.slice(1), {
 		cwd: ROOT,
 		encoding: "utf8",
 		timeout: CAPTURE_TIMEOUT_MS,
@@ -33,7 +33,7 @@ function capture(command: string[]): string {
 function run(name: string, command: string[], env = process.env) {
 	process.stdout.write(`\n── ${name} ──\n\n`)
 	let timeout = Math.max(ciDeadline - Date.now(), 1)
-	let result = spawnSync(command[0], command.slice(1), {
+	let result = spawnSync(command[0] ?? "", command.slice(1), {
 		cwd: ROOT,
 		env,
 		stdio: "inherit",
@@ -125,7 +125,7 @@ export function requireSingleChangelogEntry() {
 	}
 
 	let highestBefore = newestEntryId(base)
-	if (added[0] <= highestBefore) {
+	if ((added[0] ?? 0) <= highestBefore) {
 		throw new Error(
 			`The new entry has id ${added[0]}, which readers past that id will never see. Use ${highestBefore + 1}.`,
 		)
@@ -164,7 +164,7 @@ function previewUrl(): string {
 	let routed = capture(["work", "urls"])
 	for (let line of routed.split("\n")) {
 		let [, command, url] = line.trim().split(/\s+/)
-		if (command === "web" && /^https?:\/\//.test(url ?? "")) return url
+		if (command === "web" && /^https?:\/\//.test(url ?? "")) return url ?? ""
 	}
 	throw new Error("work did not provide a web URL. Set CI_BASE_URL instead.")
 }
@@ -234,25 +234,16 @@ async function main() {
 			["bun", "run", "check"],
 			ciEnvironment,
 		)
-		// `bun run build` reruns astro check, which `bun run check` just did.
-		run("Production build", ["bunx", "astro", "build"], ciEnvironment)
-		run("Install browser", [
-			"bunx",
-			"playwright",
-			"install",
-			"--only-shell",
-			"chromium",
-		])
+		run("Production build", ["bun", "run", "build"], ciEnvironment)
 
 		if (!process.env.CI_BASE_URL?.trim()) {
-			run("Restart local sync", ["work", "restart", "sync"])
 			run("Restart local web", ["work", "restart", "web"])
 		}
 		let url = previewUrl()
 		await requireReadyPreview(url)
-		run("End-to-end tests", ["bun", "run", "test:e2e", "--", "--forbid-only"], {
+		run("End-to-end tests", ["bun", "run", "test:e2e"], {
 			...ciEnvironment,
-			PLAYWRIGHT_BASE_URL: url,
+			TEST_URL: new URL("/app", url).toString(),
 		})
 
 		requireTestedState(testedSha)

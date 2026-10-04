@@ -1,0 +1,159 @@
+[data-teleprompter] {
+	display: block;
+	flex: 1;
+	min-width: 0;
+	overflow: auto;
+	padding: 24px max(16px, env(safe-area-inset-left)) 55vh;
+	font-size: 28px;
+	line-height: 1.55;
+	overscroll-behavior: contain;
+}
+[data-teleprompter] > * {
+	max-width: 26em;
+	margin-inline: auto;
+}
+[data-teleprompter].mirror {
+	transform: scaleX(-1);
+}
+[data-teleprompter] .prompter-start {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 12px;
+	padding: 32px 0;
+	font-size: 14px;
+	color: var(--muted);
+}
+[data-teleprompter] .prompter-start p {
+	margin: 0;
+}
+[data-teleprompter] .prompter-start button {
+	padding: 8px 20px;
+	border-radius: 6px;
+	background: var(--brand);
+	color: var(--brand-ink);
+}
+[data-teleprompter][data-started] .prompter-start {
+	display: none;
+}
+[data-teleprompter] .prompter-empty {
+	padding: 20vh 0;
+	text-align: center;
+	font-size: 14px;
+	color: var(--muted);
+}
+[data-teleprompter] .prompter-empty strong {
+	font-size: 18px;
+	color: var(--ink);
+}
+[data-teleprompter] .prompter-slide {
+	padding-bottom: 24px;
+	margin-bottom: 24px;
+	border-bottom: 1px solid var(--line);
+}
+[data-teleprompter] .prompter-slide:last-child {
+	border-bottom: 0;
+}
+[data-teleprompter] .prompter-slide-label {
+	margin: 0 0 8px;
+	padding-inline: 16px;
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--muted);
+	font-variant-numeric: tabular-nums;
+}
+[data-teleprompter] .prompter-slide[data-current] .prompter-slide-label {
+	color: var(--prompter-accent, var(--ring));
+}
+[data-teleprompter] .prompter-item {
+	margin: 0;
+	padding: 0.15em 16px;
+	border-radius: 6px;
+	cursor: pointer;
+	scroll-margin-block: 20vh;
+	transition:
+		background-color 150ms ease-out,
+		color 150ms ease-out;
+}
+[data-teleprompter] .prompter-note {
+	color: var(--muted);
+}
+[data-teleprompter] .prompter-visual {
+	margin-block: 0.15em;
+	padding-block: 0.3em;
+	border-left: 4px solid var(--ink);
+	border-radius: 0 6px 6px 0;
+	color: var(--ink);
+}
+[data-teleprompter] .prompter-item:hover {
+	background: var(--raised);
+}
+[data-teleprompter] .prompter-item[aria-current] {
+	background: var(--prompter-accent, var(--ring));
+	color: #fff;
+}
+[data-teleprompter] .prompter-visual[aria-current] {
+	border-left-color: color-mix(
+		in oklch,
+		var(--prompter-accent, var(--ring)) 60%,
+		#000
+	);
+}
+[data-teleprompter] .prompter-visual > * {
+	margin: 0;
+}
+[data-teleprompter] .prompter-visual :is(h1, h2, h3, h4, h5, h6) {
+	margin: 0;
+	font-size: 1em;
+	font-weight: 600;
+	line-height: inherit;
+}
+[data-teleprompter] .prompter-visual :is(ul, ol) {
+	padding-left: 1.2em;
+}
+[data-teleprompter] .prompter-visual li > p {
+	margin: 0;
+}
+[data-teleprompter] .prompter-visual blockquote {
+	padding-left: 0.6em;
+	border-left: 3px solid currentColor;
+	font-style: italic;
+}
+[data-teleprompter] .prompter-visual pre {
+	overflow-x: auto;
+	padding: 0.5em 0.7em;
+	border-radius: 6px;
+	background: color-mix(in oklch, var(--raised) 70%, transparent);
+	color: var(--ink);
+	font: 0.6em/1.5 var(--mono);
+}
+[data-teleprompter] .prompter-visual table {
+	border-collapse: collapse;
+	font-size: 0.7em;
+}
+[data-teleprompter] .prompter-visual :is(th, td) {
+	padding: 0.2em 0.6em;
+	border-bottom: 1px solid currentColor;
+	text-align: left;
+}
+[data-teleprompter] :is(.prompter-visual, .prompter-note) :not(pre) > code {
+	padding: 0 0.2em;
+	border-radius: 4px;
+	background: color-mix(in oklch, currentColor 12%, transparent);
+	font-family: var(--mono);
+	font-size: 0.85em;
+}
+[data-teleprompter] .prompter-image {
+	font-size: 0.7em;
+	opacity: 0.8;
+}
+[data-teleprompter] a {
+	color: inherit;
+	text-decoration: underline;
+}
+@media (max-width: 767px) {
+	[data-teleprompter] {
+		padding-top: 12px;
+		font-size: 24px;
+	}
+}

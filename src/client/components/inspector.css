@@ -1,0 +1,173 @@
+[data-inspector].inspector {
+	position: relative;
+	background: var(--surface);
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	border-left: 1px solid var(--line);
+	overflow: hidden;
+}
+[data-inspector] .inspector-title {
+	height: 48px;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 0 8px 0 12px;
+	border-bottom: 1px solid var(--line);
+}
+[data-inspector] .inspector-title strong {
+	flex: 1;
+	font-weight: 500;
+	font-size: 14px;
+}
+[data-inspector] .inspector-title button {
+	padding: 6px;
+}
+[data-inspector].inspector > header {
+	display: flex;
+	gap: 0;
+	padding: 6px;
+	border-bottom: 1px solid var(--line);
+}
+[data-inspector].inspector > header button {
+	flex: 1;
+	text-align: center;
+	font-size: 13px;
+	font-weight: 500;
+	padding: 6px;
+}
+[data-inspector].inspector > header .selected {
+	background: var(--brand);
+	color: var(--brand-ink);
+}
+[data-inspector] #inspector-body {
+	overflow: auto;
+	flex: 1;
+	padding: 0 8px;
+}
+[data-inspector] .tool-section {
+	padding: 6px 0;
+	border-bottom: 1px solid var(--line);
+}
+[data-inspector] .tool-section:last-child {
+	border-bottom: 0;
+}
+[data-inspector] .tool-section h3 {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--muted);
+	margin: 8px 8px 4px;
+}
+[data-inspector] .tool-section h3 button {
+	padding: 4px;
+	color: var(--muted);
+}
+[data-inspector] .section-heading {
+	font-size: 12px;
+	color: var(--muted);
+	margin: 0 0 8px;
+}
+[data-inspector] .tool-section > button,
+[data-inspector] .asset-row > button {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	font-size: 14px;
+	min-height: 36px;
+	padding: 8px;
+}
+[data-inspector] .tool-section button span {
+	flex: 1;
+	min-width: 0;
+}
+[data-inspector] .tool-section kbd {
+	font-size: 10px;
+	color: var(--muted);
+}
+[data-inspector].inspector > footer {
+	flex-shrink: 0;
+	border-top: 1px solid var(--line);
+	padding: 8px;
+	display: flex;
+	justify-content: center;
+}
+[data-inspector].inspector > footer button {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	font-weight: 500;
+}
+[data-inspector].inspector > footer svg {
+	width: 14px;
+	height: 14px;
+}
+@media print {
+	[data-inspector].inspector {
+		display: none !important;
+	}
+}
+[data-inspector] .muted {
+	color: var(--muted);
+	font-size: 13px;
+	line-height: 1.6;
+}
+[data-inspector] .padded {
+	padding: 16px 8px;
+}
+[data-inspector] [data-local-file] .file-path {
+	margin: 0 8px 4px;
+	color: var(--muted);
+	font-size: 12px;
+	overflow-wrap: anywhere;
+}
+[data-inspector] [data-local-file] .file-conflict {
+	margin: 0 8px 4px;
+	color: var(--danger);
+	font-size: 13px;
+}
+[data-inspector] .tool-group > summary {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	min-height: 36px;
+	padding: 8px;
+	font-size: 14px;
+	cursor: pointer;
+	list-style: none;
+}
+[data-inspector] .tool-group > summary::-webkit-details-marker {
+	display: none;
+}
+[data-inspector] .tool-group > summary:hover {
+	background: var(--raised);
+}
+[data-inspector] .tool-group > summary span {
+	flex: 1;
+}
+[data-inspector] .tool-group > summary svg:last-child {
+	color: var(--muted);
+	transition: transform 0.12s;
+}
+[data-inspector] .tool-group[open] > summary svg:last-child {
+	transform: rotate(90deg);
+}
+[data-inspector] .tool-group > button {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	font-size: 14px;
+	min-height: 34px;
+	padding: 7px 8px 7px 34px;
+}
+[data-inspector] .tool-group > button svg {
+	width: 14px;
+	height: 14px;
+	color: var(--muted);
+}

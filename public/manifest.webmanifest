@@ -1,18 +1,36 @@
 {
 	"name": "Alkalye",
 	"short_name": "Alkalye",
-	"description": "Write anywhere. Stay in flow.",
+	"description": "Local-first Markdown, together.",
 	"start_url": "/app",
+	"scope": "/",
 	"display": "standalone",
-	"background_color": "#ffffff",
-	"theme_color": "#f97316",
-	"orientation": "any",
+	"background_color": "#101110",
+	"theme_color": "#101110",
 	"icons": [
 		{
 			"src": "/icons/alkalye-icon.png",
 			"sizes": "512x512",
 			"type": "image/png",
 			"purpose": "any maskable"
+		}
+	],
+	"share_target": {
+		"action": "/app/share",
+		"method": "GET",
+		"params": {
+			"title": "title",
+			"text": "text",
+			"url": "url"
+		}
+	},
+	"file_handlers": [
+		{
+			"action": "/app",
+			"accept": {
+				"text/markdown": [".md", ".markdown"],
+				"text/plain": [".txt"]
+			}
 		}
 	]
 }

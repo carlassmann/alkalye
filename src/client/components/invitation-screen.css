@@ -1,0 +1,55 @@
+[data-invitation-screen] {
+	display: grid;
+	place-items: center;
+	min-height: 100%;
+	padding: 32px 16px;
+}
+[data-invitation-screen] .invitation-card {
+	display: grid;
+	gap: 12px;
+	width: min(100%, 380px);
+	text-align: center;
+}
+[data-invitation-screen] h1 {
+	margin: 0;
+	font-size: 18px;
+	font-weight: 600;
+}
+[data-invitation-screen] p {
+	margin: 0;
+	line-height: 1.5;
+}
+[data-invitation-screen] .muted {
+	color: var(--muted);
+}
+[data-invitation-screen] .invitation-mark {
+	font-size: 40px;
+	color: var(--brand);
+}
+[data-invitation-screen] .invitation-actions {
+	display: grid;
+	gap: 8px;
+	margin-top: 8px;
+}
+[data-invitation-screen] .invitation-actions button {
+	text-align: center;
+	border: 1px solid var(--line);
+}
+[data-invitation-screen] .invitation-actions .primary {
+	background: var(--brand);
+	border-color: var(--brand);
+	color: var(--brand-ink);
+}
+[data-invitation-screen] .invitation-error {
+	font-family: ui-monospace, monospace;
+	font-size: 12px;
+	border: 1px solid var(--line);
+	padding: 6px;
+}
+[data-invitation-screen] .button {
+	justify-self: center;
+	padding: 8px 14px;
+	border: 1px solid var(--line);
+	border-radius: 0;
+	text-decoration: none;
+}

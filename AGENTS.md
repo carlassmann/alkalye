@@ -1,24 +1,32 @@
 # Agent Instructions
 
-Offline-capable PWA built with Jazz (local-first sync), Astro, and React.
+Local-first PWA built from TypeScript, HTML and CSS. Bun provides the server, bundler, test runner and SQLite. Effect 4 is the sole runtime package dependency.
 
 ## Essentials
 
 - **Bun** - use `bun install`, `bun add`, `bun run` (no npm/yarn)
 - **Verify:** `bun run check` (lint, types, format, tests)
-- **React Compiler** - never use `useMemo`, `useCallback`, `React.memo`
+- **Runtime dependencies** - exactly Effect 4, pinned, with no transitive dependencies. Use browser APIs and Bun built-ins for infrastructure; other packages are dev-only.
 - **Never commit to `main`** - branch, open a PR, land it as a squash merge
 - **Changelog** - every PR adds exactly one entry at the top of `public/changelog.json`, written for readers, carrying the next `id` and `"pr": <number>`. Published entries can be edited or removed later; never reuse an `id`. Describe what users can do or notice, not implementation details.
 - **Signoff** - after the final push, run `bun run ci`. A PR is incomplete until its exact remote head has `signoff: success`; fix failures and rerun before reporting completion
 
 ## Architecture
 
-- **Framework:** Astro 5 with React 19 integration
-- **Routing:** Tanstack Router (auto-generated route tree)
-- **Data:** Jazz (CoValues for documents, spaces, themes, presence)
-- **Storage:** IndexedDB via idb-keyval + Jazz sync
-- **PWA:** vite-plugin-pwa with offline caching and file handlers
-- **Testing:** Vitest + happy-dom/jsdom
+- **Browser:** native DOM, textarea editing with syntax overlay, Shadow DOM previews
+- **Data:** operation-based text CRDT and metadata registers in IndexedDB
+- **Sync:** Bun WebSocket relay, durable SQLite operation log
+- **Privacy:** Web Crypto AES-GCM, scoped bearer capabilities
+- **PWA:** handwritten service worker, manifest, offline app shell
+- **Agents:** native JSON-RPC MCP, OAuth authorization code with PKCE
+- **Testing:** Bun tests; agent-browser for background browser verification
+
+## Effect
+
+- Prefer Effect’s built-in services and patterns before adding an abstraction: HttpClient, Schema, Config, Scope, FiberSet/FiberHandle, ScopedCache/RcMap, Stream, SubscriptionRef, Queue and Schedule.
+- Custom services describe application capabilities or adapt IndexedDB, Web Crypto, DOM and Bun. Avoid rebuilding Effect infrastructure.
+- Import Effect modules through subpaths (`effect/Effect`, `effect/http/HttpClient`), so Bun can remove unused code. Runtime barrel imports are rejected by `check`.
+- Verify APIs against installed Effect 4; test interruption, resource release, concurrency and typed failures.
 
 ## Style
 
@@ -32,28 +40,5 @@ Offline-capable PWA built with Jazz (local-first sync), Astro, and React.
 ## Detailed Guides
 
 - [TypeScript](docs/typescript.md) - general coding style, types, tryCatch
-- [React Components](docs/react-components.md) - handler factories, routes, forms
-- [Jazz Patterns](docs/jazz.md) - CoValue types, queries
 - [File Organization](docs/file-organization.md) - module structure, exports
 - [Theme authoring](public/docs/theming-guide.md) - Markdown theme sources, styling hooks, templates, and validation
-
-<!-- effect-solutions:start -->
-
-## Effect Best Practices
-
-**IMPORTANT:** Always consult effect-solutions before writing Effect code.
-
-1. Run `effect-solutions list` to see available guides
-2. Run `effect-solutions show <topic>...` for relevant patterns (supports multiple topics)
-3. Search `.reference/effect/` for real implementations (run `effect-solutions setup` first)
-
-Topics: quick-start, project-setup, tsconfig, basics, services-and-layers, data-modeling, error-handling, config, testing, cli.
-
-Never guess at Effect patterns - check the guide first.
-
-## Local Effect Source
-
-The Effect repository is cloned to `.reference/effect/` for reference.
-Use this to explore APIs, find usage examples, and understand implementation details when docs aren't enough.
-
-<!-- effect-solutions:end -->

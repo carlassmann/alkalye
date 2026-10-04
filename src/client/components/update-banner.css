@@ -1,0 +1,35 @@
+[data-update] {
+	position: fixed;
+	left: 50%;
+	bottom: calc(16px + env(safe-area-inset-bottom));
+	z-index: 40;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	max-width: calc(100vw - 32px);
+	padding: 8px 8px 8px 16px;
+	transform: translateX(-50%);
+	border: 1px solid var(--line);
+	background: var(--paper);
+	color: var(--ink);
+	box-shadow: var(--shadow);
+	font-size: 13px;
+}
+[data-update] p {
+	margin: 0;
+}
+[data-update] button {
+	display: inline-flex;
+	align-items: center;
+	padding: 6px 12px;
+	white-space: nowrap;
+}
+[data-update] [data-update-dismiss] {
+	padding: 6px;
+	color: var(--muted);
+}
+@media print {
+	[data-update] {
+		display: none !important;
+	}
+}
