@@ -60,6 +60,15 @@ export function previewMarkup(
 						aria-label="Preview options"
 					>
 						<a href="${editorHref}" role="menuitem"><span>Editor</span></a>
+						<button type="button" data-action="toggle-tools">
+							<span>Document tools</span>
+						</button>
+						<button type="button" data-action="slideshow">
+							<span>Slideshow</span>
+						</button>
+						<button type="button" data-action="teleprompter">
+							<span>Teleprompter</span>
+						</button>
 						<hr />
 						<button type="button" data-action="appearance-light">
 							<span>Light appearance</span>

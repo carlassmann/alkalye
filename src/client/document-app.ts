@@ -1,5 +1,5 @@
 import { bootMarkup } from "./components/boot"
-import { saveIndicator } from "../shared/save-status"
+import { makeSaveFeedback, saveIndicator } from "../shared/save-status"
 import * as Cause from "effect/Cause"
 import * as Crypto from "effect/Crypto"
 import { webCryptoLayer } from "../platform/web-crypto"
@@ -134,6 +134,8 @@ class ApplicationElement extends HTMLElement {
 			Layer.launch(application).pipe(
 				Effect.catchCause(cause =>
 					Effect.sync(() => {
+						this.removeAttribute("aria-busy")
+						this.setAttribute("role", "alert")
 						this.textContent =
 							"Could not open your workspace. " + String(Cause.squash(cause))
 					}),
@@ -236,8 +238,19 @@ function mountApplication() {
 					hidden
 				/>`,
 		)
+		let saveFeedback = yield* makeSaveFeedback(indicator => {
+			let hint = element("#save-status")
+			hint.textContent = translate(indicator.text)
+			hint.dataset.state = indicator.state
+			hint.toggleAttribute("data-quiet", indicator.state === "quiet")
+			hint.setAttribute(
+				"role",
+				indicator.state === "error" ? "alert" : "presentation",
+			)
+		})
 		app.dataset.documentApp = ""
 		let enabled = new Set([
+			"retry-save",
 			"new",
 			"new-workspace",
 			"manage-workspace",
@@ -390,7 +403,7 @@ function mountApplication() {
 					matchMedia("(max-width: 1100px)").matches &&
 					(doc ||
 						!event.target.closest(
-							"[data-library], [data-inspector], [data-toolbar]",
+							"[data-library], [data-inspector], [data-toolbar], .preview-header",
 						))
 				) {
 					setLayout("library", false)
@@ -491,7 +504,10 @@ function mountApplication() {
 		if (stats instanceof StatsElement)
 			stats.addEventListener(
 				"change",
-				() => launch(preferences.save({ editor: { statsUnit: stats.value } })),
+				() => {
+					launch(preferences.save({ editor: { statsUnit: stats.value } }))
+					if (stats.value === "hidden") editor?.source?.focus()
+				},
 				{ signal: events.signal },
 			)
 		let router = startRouter(events.signal, route => show(route))
@@ -1348,6 +1364,14 @@ function mountApplication() {
 			}
 		}
 		function mountDocument() {
+			let stats = app.querySelector("alkalye-stats")
+			if (stats instanceof StatsElement) stats.clear()
+			launch(
+				saveFeedback.update(currentDocument()?.id ?? "", {
+					text: "Saved",
+					state: "quiet",
+				}),
+			)
 			let find = element("#find-bar")
 			find.hidden = true
 			find.replaceChildren()
@@ -1799,6 +1823,14 @@ function mountApplication() {
 					writable(),
 				)
 				if (mode === "preview") {
+					app
+						.querySelector('[data-action="preview-comments"]')
+						?.setAttribute(
+							"aria-expanded",
+							String(
+								panel === "comments" && app.classList.contains("tools-open"),
+							),
+						)
 					element("#preview-title").textContent = doc.title
 					let selected = selection
 					renderPreview(
@@ -1823,10 +1855,8 @@ function mountApplication() {
 					syncFailed: Boolean(failures.synchronization),
 					file: state,
 				})
-				let hint = element("#save-status")
-				hint.textContent = translate(indicator.text)
-				hint.dataset.state = indicator.state
-				hint.toggleAttribute("data-quiet", indicator.state === "quiet")
+				launch(saveFeedback.update(doc.id, indicator))
+				element("#retry-save").hidden = !failures.save
 				let stats = app.querySelector("alkalye-stats")
 				if (stats instanceof StatsElement)
 					stats.update(
@@ -2251,6 +2281,10 @@ function mountApplication() {
 									? "dark"
 									: "system",
 					})
+					return
+				}
+				if (action === "retry-save") {
+					yield* selection?.opened.session.flush ?? Effect.void
 					return
 				}
 				if (action === "preview-comments") {

@@ -1,3 +1,5 @@
+import * as Effect from "effect/Effect"
+import * as FiberHandle from "effect/FiberHandle"
 export interface SaveState {
 	unsaved: boolean
 	pending: boolean
@@ -34,4 +36,35 @@ export function saveIndicator(value: SaveState): SaveIndicator {
 		}
 	if (value.pending) return { text: "Saved on this device", state: "notice" }
 	return { text: "Saved", state: "quiet" }
+}
+
+export function makeSaveFeedback(render: (value: SaveIndicator) => void) {
+	return Effect.gen(function* () {
+		let pending = yield* FiberHandle.make<void>()
+		let document = ""
+		let requested: SaveIndicator | undefined
+		return {
+			update(key: string, value: SaveIndicator) {
+				return Effect.suspend(() => {
+					if (document !== key) {
+						document = key
+						requested = undefined
+						render({ text: "Saved", state: "quiet" })
+					}
+					if (requested?.text === value.text && requested.state === value.state)
+						return Effect.void
+					requested = value
+					let display = Effect.sync(() => render(value))
+					return FiberHandle.run(
+						pending,
+						value.state === "error"
+							? display
+							: Effect.sleep(value.state === "quiet" ? 1000 : 800).pipe(
+									Effect.andThen(display),
+								),
+					).pipe(Effect.asVoid)
+				})
+			},
+		}
+	})
 }

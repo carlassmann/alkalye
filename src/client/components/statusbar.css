@@ -25,7 +25,6 @@
 }
 [data-statusbar] #save-status[data-quiet] {
 	opacity: 0;
-	transition-delay: 1000ms;
 	pointer-events: none;
 }
 [data-statusbar] #save-status {
@@ -57,10 +56,6 @@
 	display: none;
 }
 
-[data-statusbar] #save-status[data-state="busy"],
-[data-statusbar] #save-status[data-state="notice"] {
-	transition-delay: 800ms;
-}
 [data-statusbar] #save-status[data-state="error"] {
 	opacity: 1;
 	transition: none;

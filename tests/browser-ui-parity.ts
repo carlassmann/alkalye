@@ -98,6 +98,44 @@ try {
 		),
 		"Fast typing keeps the save indicator invisible",
 	)
+	evaluate(
+		session,
+		`(() => {
+		let picker = document.createElement("alkalye-picker");
+		picker.id = "test-picker";
+		picker.setChoices([{ value: "a", label: "Alpha" }, { value: "b", label: "Beta" }, { value: "g", label: "Gamma" }], "b");
+		picker.style.cssText = "position:fixed;top:80px;left:80px;z-index:100";
+		document.body.append(picker);
+		return true;
+	})()`,
+	)
+	assert(
+		evaluate(session, 'document.querySelector("#test-picker").value === "b"'),
+		"Picker respects a value configured before connection",
+	)
+	browser(session, "click", "#test-picker .menu-trigger")
+	browser(session, "press", "End")
+	evaluate(
+		session,
+		'document.querySelector("#test-picker").setChoices([{value:"a",label:"Alpha"},{value:"b",label:"Beta"},{value:"g",label:"Gamma updated"}],"b");true',
+	)
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("#test-picker .menu-popover").matches(":popover-open") && document.activeElement.dataset.value === "g"',
+		),
+		"Updating picker choices preserves an open menu and its focus",
+	)
+	browser(session, "press", "Escape")
+	evaluate(
+		session,
+		'(() => {let picker=document.querySelector("#test-picker");picker.remove();document.body.append(picker);return picker.value})()',
+	)
+	assert(
+		evaluate(session, 'document.querySelector("#test-picker").value === "b"'),
+		"Reconnecting a picker preserves its selected value",
+	)
+	evaluate(session, 'document.querySelector("#test-picker").remove();true')
 	browser(session, "click", '[data-action="preview"]')
 	wait(
 		session,

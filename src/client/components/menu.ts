@@ -30,6 +30,7 @@ export class PickerElement extends HTMLElement {
 	private internals = this.attachInternals()
 	private choices: MenuChoice[] = []
 	private selected = ""
+	private initialized = false
 	private events: AbortController | undefined
 	connectedCallback() {
 		this.dataset.picker = ""
@@ -38,7 +39,10 @@ export class PickerElement extends HTMLElement {
 				value: option.value,
 				label: option.textContent?.trim() ?? option.value,
 			}))
-		this.selected = this.getAttribute("value") ?? this.choices[0]?.value ?? ""
+		if (!this.initialized) {
+			this.selected = this.getAttribute("value") ?? this.choices[0]?.value ?? ""
+			this.initialized = true
+		}
 		this.render()
 	}
 	disconnectedCallback() {
@@ -48,7 +52,12 @@ export class PickerElement extends HTMLElement {
 	get value() {
 		return this.selected
 	}
+	connectedMoveCallback() {}
+	focus(options?: FocusOptions) {
+		this.querySelector<HTMLButtonElement>(".menu-trigger")?.focus(options)
+	}
 	set value(value: string) {
+		this.initialized = true
 		this.selected = value
 		this.internals.setFormValue(value)
 		this.update()
@@ -57,11 +66,22 @@ export class PickerElement extends HTMLElement {
 		return this.getAttribute("name") ?? ""
 	}
 	setChoices(choices: readonly MenuChoice[], value = this.selected) {
+		this.initialized = true
+		let changed = JSON.stringify(choices) !== JSON.stringify(this.choices)
 		this.choices = [...choices]
 		this.selected = value
-		if (this.isConnected) this.render()
+		if (this.isConnected && changed) this.render()
+		else this.update()
 	}
 	private render() {
+		let previous = this.querySelector<HTMLElement>(".menu-popover")
+		let reopen = previous?.matches(":popover-open") ?? false
+		let active =
+			document.activeElement instanceof HTMLElement &&
+			previous?.contains(document.activeElement)
+				? (document.activeElement.dataset.value ??
+					document.activeElement.dataset.action)
+				: undefined
 		this.events?.abort()
 		let events = new AbortController()
 		this.events = events
@@ -92,7 +112,7 @@ export class PickerElement extends HTMLElement {
 		let trigger = this.querySelector<HTMLButtonElement>(".menu-trigger")
 		let popover = this.querySelector<HTMLElement>(".menu-popover")
 		if (!trigger || !popover) return
-		connectPopover(trigger, popover, events.signal, {
+		let control = connectPopover(trigger, popover, events.signal, {
 			items: () => [...popover.querySelectorAll<HTMLElement>("[role=option]")],
 			selected: () =>
 				popover.querySelector<HTMLElement>('[aria-selected="true"]') ??
@@ -105,11 +125,29 @@ export class PickerElement extends HTMLElement {
 		})
 		this.internals.setFormValue(this.selected)
 		this.update()
+		this.addEventListener(
+			"click",
+			event => {
+				if (event.target === this) trigger.click()
+			},
+			{ signal: events.signal },
+		)
+		if (reopen) {
+			control.show()
+			let item = [
+				...popover.querySelectorAll<HTMLElement>("[data-value]"),
+			].find(item => item.dataset.value === active)
+			item?.focus({ preventScroll: true })
+		}
 	}
 	private update() {
 		let current = this.choices.find(choice => choice.value === this.selected)
 		let value = this.querySelector(".menu-value")
 		if (value) value.textContent = current?.label ?? ""
+		this.querySelector(".menu-trigger")?.setAttribute(
+			"aria-label",
+			(this.getAttribute("label") ?? this.name) + ": " + (current?.label ?? ""),
+		)
 		for (let item of this.querySelectorAll<HTMLElement>("[role=option]"))
 			item.setAttribute(
 				"aria-selected",
@@ -154,6 +192,10 @@ export class WorkspaceMenuElement extends HTMLElement {
 		let trigger = this.querySelector(".menu-trigger")
 		let label = trigger?.querySelector(".menu-value")
 		if (label) label.textContent = current?.label ?? "Personal"
+		trigger?.setAttribute(
+			"aria-label",
+			"Workspace: " + (current?.label ?? "Personal"),
+		)
 		let leading = trigger?.querySelector(".menu-icon")
 		if (leading) setMarkup(leading, icon(current?.icon ?? "user"))
 		for (let item of this.querySelectorAll<HTMLElement>("[role=menuitemradio]"))
@@ -163,6 +205,14 @@ export class WorkspaceMenuElement extends HTMLElement {
 			)
 	}
 	private render() {
+		let previous = this.querySelector<HTMLElement>(".menu-popover")
+		let reopen = previous?.matches(":popover-open") ?? false
+		let active =
+			document.activeElement instanceof HTMLElement &&
+			previous?.contains(document.activeElement)
+				? (document.activeElement.dataset.value ??
+					document.activeElement.dataset.action)
+				: undefined
 		this.events?.abort()
 		let events = new AbortController()
 		this.events = events
@@ -196,7 +246,7 @@ export class WorkspaceMenuElement extends HTMLElement {
 		let trigger = this.querySelector<HTMLButtonElement>(".menu-trigger")
 		let popover = this.querySelector<HTMLElement>(".menu-popover")
 		if (!trigger || !popover) return
-		connectPopover(trigger, popover, events.signal, {
+		let control = connectPopover(trigger, popover, events.signal, {
 			items: () => [
 				...popover.querySelectorAll<HTMLElement>(
 					"[role=menuitemradio], [role=menuitem]",
@@ -213,6 +263,13 @@ export class WorkspaceMenuElement extends HTMLElement {
 			},
 		})
 		this.update()
+		if (reopen) {
+			control.show()
+			let item = [
+				...popover.querySelectorAll<HTMLElement>("[data-value], [data-action]"),
+			].find(item => (item.dataset.value ?? item.dataset.action) === active)
+			item?.focus({ preventScroll: true })
+		}
 	}
 }
 

@@ -1,6 +1,8 @@
 import { expect, test } from "bun:test"
 import { documentStats, statValue } from "../src/shared/document-stats"
-import { saveIndicator } from "../src/shared/save-status"
+import * as Effect from "effect/Effect"
+import { TestClock } from "effect/testing"
+import { makeSaveFeedback, saveIndicator } from "../src/shared/save-status"
 import { fitPanel, placePanel } from "../src/client/ui/placement"
 
 test("statistics exclude frontmatter and count unfinished sentences", () => {
@@ -87,4 +89,41 @@ test("panels flip above the trigger and stay within narrow viewports", () => {
 		x: 8,
 		y: 372,
 	})
+})
+
+test("save feedback coalesces rapid writes, reports failures immediately, and releases timers", async () => {
+	let rendered: string[] = []
+	await Effect.runPromise(
+		Effect.gen(function* () {
+			yield* Effect.scoped(
+				Effect.gen(function* () {
+					let feedback = yield* makeSaveFeedback(value =>
+						rendered.push(value.text),
+					)
+					yield* feedback.update("one", { text: "Saving…", state: "busy" })
+					yield* TestClock.adjust("400 millis")
+					yield* feedback.update("one", { text: "Saved", state: "quiet" })
+					yield* TestClock.adjust("400 millis")
+					expect(rendered).toEqual(["Saved"])
+					yield* feedback.update("one", { text: "Saving…", state: "busy" })
+					yield* TestClock.adjust("800 millis")
+					expect(rendered.at(-1)).toBe("Saving…")
+					yield* feedback.update("one", { text: "Saved", state: "quiet" })
+					yield* TestClock.adjust("500 millis")
+					expect(rendered.at(-1)).toBe("Saving…")
+					yield* feedback.update("one", { text: "Failed", state: "error" })
+					yield* Effect.yieldNow
+					expect(rendered.at(-1)).toBe("Failed")
+					yield* feedback.update("two", {
+						text: "Saving next document",
+						state: "busy",
+					})
+					expect(rendered.at(-1)).toBe("Saved")
+				}),
+			)
+			let count = rendered.length
+			yield* TestClock.adjust("10 seconds")
+			expect(rendered.length).toBe(count)
+		}).pipe(Effect.provide(TestClock.layer())),
+	)
 })

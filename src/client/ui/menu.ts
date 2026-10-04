@@ -176,9 +176,9 @@ export function connectPopover(
 	if (supported) trigger.popoverTargetElement = panel
 	trigger.addEventListener(
 		"click",
-		() => {
-			openingFocus = "selected"
-			if (!supported) isOpen() ? close() : show()
+		event => {
+			event.preventDefault()
+			isOpen() ? close() : show()
 		},
 		{ signal },
 	)
@@ -196,8 +196,12 @@ export function connectPopover(
 		"toggle",
 		event => {
 			if (!(event instanceof ToggleEvent) || event.target !== panel) return
-			if (event.newState === "open" && isOpen()) show(openingFocus)
-			else trigger.setAttribute("aria-expanded", "false")
+			if (event.newState === "open" && isOpen()) {
+				place()
+				if (trigger.getAttribute("aria-expanded") !== "true")
+					navigation.focus(openingFocus)
+				trigger.setAttribute("aria-expanded", "true")
+			} else trigger.setAttribute("aria-expanded", "false")
 		},
 		{ signal },
 	)
@@ -214,7 +218,10 @@ export function connectPopover(
 			)
 				return
 			options.choose?.(item)
-			close(item.dataset.action === undefined)
+			close(
+				item.dataset.action === undefined &&
+					!(item instanceof HTMLAnchorElement),
+			)
 		},
 		{ signal },
 	)

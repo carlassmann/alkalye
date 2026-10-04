@@ -293,6 +293,7 @@
 [data-whiteboard] .panel .menu-items button,
 [data-whiteboard] .menu-items label {
 	display: flex;
+	flex-direction: row;
 	align-items: center;
 	justify-content: flex-start;
 	gap: 10px;
@@ -389,6 +390,7 @@
 	inset: 8px;
 	border-radius: 50%;
 	background: var(--swatch);
+	box-shadow: 0 0 0 1px color-mix(in oklch, var(--ink) 18%, transparent);
 }
 [data-whiteboard] .panel .swatches button[aria-pressed="true"] {
 	background: var(--raised);

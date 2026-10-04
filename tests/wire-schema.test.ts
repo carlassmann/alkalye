@@ -2,6 +2,7 @@ import { expect, test } from "bun:test"
 import * as Effect from "effect/Effect"
 import * as Exit from "effect/Exit"
 import * as Schema from "effect/Schema"
+import { LivePresenceSchema } from "../src/shared/document-live"
 import {
 	PacketSchema,
 	RoleSchema,
@@ -131,6 +132,26 @@ test("presence uses finite coordinates and compatible defaults for older clients
 					),
 				),
 			).toBe(true)
+})
+
+test("teleprompter presence carries an optional item without changing legacy slide positions", () => {
+	let presence = {
+		actor: "actor",
+		name: "Writer",
+		document: "doc",
+		cursor: 0,
+		slide: 1,
+		x: -1,
+		y: -1,
+		time: 10,
+		presenting: true,
+	}
+	let decode = Schema.decodeUnknownSync(LivePresenceSchema)
+	expect(decode(presence).item).toBeUndefined()
+	expect(decode({ ...presence, item: 4 }).item).toBe(4)
+	expect(parsePresence({ ...presence, item: 4 }).item).toBe(4)
+	for (let item of [-1, 1.5, Infinity, "4"])
+		expect(() => decode({ ...presence, item })).toThrow()
 })
 
 test("operation schema accepts compact Unicode runs and rejects invalid deletion envelopes", async () => {

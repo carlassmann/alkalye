@@ -219,7 +219,6 @@
 	display: none !important;
 }
 [data-app].mode-preview .inspector-title,
-[data-app].mode-preview .inspector > header,
 [data-app].mode-preview .inspector > footer {
 	display: none;
 }

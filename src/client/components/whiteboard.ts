@@ -2,6 +2,7 @@ import * as Effect from "effect/Effect"
 import * as Fiber from "effect/Fiber"
 import * as FiberSet from "effect/FiberSet"
 import * as Stream from "effect/Stream"
+import { menuNavigation } from "../ui/menu"
 import type { Replica } from "../../shared/crdt"
 import type { Presence } from "../../shared/model"
 import type { Camera, Viewport } from "../drawing-camera"
@@ -1458,11 +1459,66 @@ function createWhiteboardView(
 		menu.open = false
 	}
 
+	let menuPanel = menu.querySelector<HTMLElement>(".menu-items")
+	let menuTrigger = menu.querySelector("summary")
+	if (!menuPanel || !(menuTrigger instanceof HTMLElement))
+		throw new Error("Missing drawing menu")
+	let itemsPanel = menuPanel
+	let trigger = menuTrigger
+	let navigation = menuNavigation(
+		menuPanel,
+		{
+			items: () => [...menu.querySelectorAll<HTMLElement>('[role="menuitem"]')],
+			close: (restore = true) => {
+				closeMenu()
+				if (restore) trigger.focus({ preventScroll: true })
+			},
+		},
+		signal,
+	)
+	for (let item of menuPanel.querySelectorAll<HTMLElement>('[role="menuitem"]'))
+		item.tabIndex = -1
+	itemsPanel.addEventListener(
+		"click",
+		event => {
+			if (
+				event.target instanceof Element &&
+				event.target.closest('[role="menuitem"]')
+			)
+				closeMenu()
+		},
+		{ signal },
+	)
+	menu.addEventListener(
+		"toggle",
+		() => {
+			if (menu.open) navigation.focus("first")
+		},
+		{ signal },
+	)
+	trigger.addEventListener(
+		"keydown",
+		event => {
+			if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return
+			event.preventDefault()
+			event.stopPropagation()
+			menu.open = true
+			navigation.focus(event.key === "ArrowUp" ? "last" : "first")
+		},
+		{ signal },
+	)
+
 	function handleKey(event: KeyboardEvent) {
 		if (
 			event.defaultPrevented ||
 			event.isComposing ||
 			isFormField(event.target)
+		)
+			return
+		if (
+			menu.open &&
+			event.target instanceof Node &&
+			itemsPanel.contains(event.target)
 		)
 			return
 		let handled = handleShortcut(event)

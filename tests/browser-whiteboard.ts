@@ -155,12 +155,26 @@ try {
 		session,
 		'document.querySelector("#whiteboard").getAttribute("viewBox")',
 	)
-	browser(session, "mouse", "wheel", "120")
-	wait(
-		session,
-		`document.querySelector("#whiteboard").getAttribute("viewBox") !== ${JSON.stringify(viewBox)} && ${zoom} === "100%"`,
+	// agent-browser wheels at the page origin, so the wheel is dispatched on the canvas.
+	let wheel = (options: string) =>
+		evaluate(
+			session,
+			`document.querySelector("#whiteboard").dispatchEvent(new WheelEvent("wheel", { clientX: ${center.x}, clientY: ${center.y}, bubbles: true, cancelable: true, ${options} }))`,
+		)
+	wheel("deltaY: 120")
+	assert(
+		evaluate(
+			session,
+			`document.querySelector("#whiteboard").getAttribute("viewBox") !== ${JSON.stringify(viewBox)} && ${zoom} === "100%"`,
+		),
+		"scrolling pans the canvas without zooming",
 	)
-	assert(true, "scrolling pans the canvas without zooming")
+	wheel("deltaY: -50, ctrlKey: true")
+	assert(
+		evaluate(session, zoom) !== "100%",
+		"pinching a trackpad or ctrl-scrolling zooms at the pointer",
+	)
+	browser(session, "click", "#reset-board")
 	evaluate(
 		session,
 		`(() => { let board = document.querySelector("#whiteboard"), rect = board.getBoundingClientRect(); let touch = (type, id, x, y) => board.dispatchEvent(new PointerEvent(type, { pointerId: id, pointerType: "touch", clientX: rect.left + x, clientY: rect.top + y, bubbles: true, cancelable: true, isPrimary: id === 11 })); touch("pointerdown", 11, 500, 300); touch("pointerdown", 12, 600, 300); touch("pointermove", 11, 400, 300); touch("pointermove", 12, 700, 300); touch("pointerup", 11, 400, 300); touch("pointerup", 12, 700, 300) })()`,
@@ -179,6 +193,16 @@ try {
 			'document.querySelector("#drawing-menu").open && ["#export-drawing", "#export-svg", "#import-drawing", "#clear-board"].every(selector => document.querySelector(selector))',
 		),
 		"the drawing menu offers export, import and clearing",
+	)
+	browser(session, "press", "End")
+	assert(
+		evaluate(session, 'document.activeElement.id === "clear-board"'),
+		"Drawing menu uses the shared keyboard navigation",
+	)
+	browser(session, "press", "Home")
+	assert(
+		evaluate(session, 'document.activeElement.id === "export-drawing"'),
+		"Drawing menu Home returns to the first item",
 	)
 	browser(session, "press", "Escape")
 	assert(

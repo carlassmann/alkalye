@@ -12,6 +12,8 @@ export class StatsElement extends MenuElement {
 	private content = ""
 	private counts = documentStats("")
 	private unit: StatsUnit = "words"
+	private pending: StatsUnit | undefined
+	private available = false
 	connectedCallback() {
 		this.dataset.stats = ""
 		setMarkup(
@@ -40,6 +42,7 @@ export class StatsElement extends MenuElement {
 					.statsUnit
 			let unit = statsUnits.find(unit => unit === value)
 			if (!unit) return
+			this.pending = unit
 			this.unit = unit
 			this.paint()
 			this.dispatchEvent(new Event("change", { bubbles: true }))
@@ -53,20 +56,35 @@ export class StatsElement extends MenuElement {
 	get value() {
 		return this.unit
 	}
+	clear() {
+		this.available = false
+		this.paint()
+	}
 	update(content: string, unit: StatsUnit) {
+		this.available = true
+		if (unit === this.pending) this.pending = undefined
 		if (content !== this.content) {
 			this.content = content
 			this.counts = documentStats(content)
 		}
-		this.unit = unit
+		this.unit = this.pending ?? unit
 		this.paint()
 	}
 	private paint() {
-		this.hidden = this.unit === "hidden"
+		this.hidden = this.unit === "hidden" || !this.available
 		let label = this.querySelector("#stats")
-		if (label)
+		if (label) {
+			label.setAttribute(
+				"aria-label",
+				translate("Document statistics") +
+					": " +
+					statValue(this.counts, this.unit) +
+					" " +
+					translate(this.unit),
+			)
 			label.textContent =
 				statValue(this.counts, this.unit) + " " + translate(this.unit)
+		}
 		for (let item of this.querySelectorAll<HTMLElement>("[data-stats-unit]")) {
 			item.setAttribute(
 				"aria-checked",
@@ -83,7 +101,7 @@ customElements.define("alkalye-stats", StatsElement)
 export function statusbarMarkup() {
 	return html` <footer data-statusbar class="statusbar">
 		<alkalye-stats></alkalye-stats>
-		<span id="save-status"> </span>
+		<span id="save-status" data-quiet data-state="quiet">Saved</span>
 		<button id="retry-save" data-action="retry-save" hidden>
 			Retry local save
 		</button>
