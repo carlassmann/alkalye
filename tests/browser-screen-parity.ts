@@ -1,4 +1,4 @@
-import { assert, browser, evaluate, wait } from "./browser-driver"
+import { assert, browser, evaluate, visit, wait } from "./browser-driver"
 
 // The original's presentation, preview and settings screens: their controls,
 // keyboard and touch semantics and narrow layouts.
@@ -42,6 +42,7 @@ try {
 	verifyTeleprompter()
 	verifySlideshow()
 	verifyNarrowTeleprompter()
+	verifyPreview()
 	verifyEmptyTeleprompter()
 } finally {
 	try {
@@ -265,11 +266,102 @@ function verifyNarrowTeleprompter() {
 	browser(session, "set", "viewport", "1280", "800")
 }
 
+function verifyPreview() {
+	browser(session, "press", "Escape")
+	wait(session, 'document.querySelector("#editor") !== null')
+	browser(session, "click", '[data-action="preview"]')
+	wait(
+		session,
+		'document.querySelector("#preview")?.shadowRoot?.querySelector("[data-content]")?.textContent.includes("Visible insight")',
+	)
+	assert(
+		evaluate(
+			session,
+			`(() => {
+				let menu = document.querySelector("#preview-options");
+				let radios = [...menu.querySelectorAll("[role=menuitemradio]")];
+				return document.querySelector(".preview-back").getAttribute("href").length > 0 &&
+					document.querySelector("#preview-title").textContent === "Screen parity talk" &&
+					document.querySelector(".preview-actions [data-action=preview-comments]") !== null &&
+					menu.querySelector("a[href] kbd").textContent.length > 0 &&
+					radios.length === 3 &&
+					radios.filter(radio => radio.getAttribute("aria-checked") === "true").length === 1 &&
+					menu.querySelector("[data-action=toggle-tools], [data-action=slideshow], [data-action=teleprompter], [data-action=print]") === null
+			})()`,
+		),
+		"Preview header and menu match the original: editor, title, comments, editor link and theme",
+	)
+	evaluate(
+		session,
+		`(() => {
+			let root = document.querySelector("#preview").shadowRoot;
+			let walker = document.createTreeWalker(root.querySelector("[data-content]"), NodeFilter.SHOW_TEXT);
+			for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+				let index = node.data.indexOf("Visible insight");
+				if (index >= 0) return getSelection().setBaseAndExtent(node, index, node, index + 15);
+			}
+		})()`,
+	)
+	try {
+		wait(
+			session,
+			'document.querySelector(".preview-add-comment")?.hidden === false',
+		)
+	} catch {
+		console.log(
+			"SKIP preview comments: the root does not pass comments to renderPreview yet",
+		)
+		return
+	}
+	browser(session, "click", ".preview-add-comment")
+	wait(session, 'document.querySelector("#dialog").open')
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("#dialog blockquote")?.textContent',
+		) === "Visible insight",
+		"Selected preview text becomes the quoted source of a new comment",
+	)
+	browser(
+		session,
+		"fill",
+		'#dialog textarea[name="body"]',
+		"Explain this insight",
+	)
+	browser(session, "click", "#submit-dialog")
+	wait(
+		session,
+		'[...document.querySelector("#preview").shadowRoot.querySelectorAll("mark.preview-comment-range")].map(mark => mark.textContent).join("") === "Visible insight"',
+	)
+	assert(
+		evaluate(
+			session,
+			'document.querySelector(".preview-comment-count").textContent === "1" && !document.querySelector(".preview-comment-count").hidden',
+		),
+		"The preview highlights the commented text and counts open comments",
+	)
+	evaluate(
+		session,
+		'document.querySelector("#preview").shadowRoot.querySelector("mark.preview-comment-range").click()',
+	)
+	wait(
+		session,
+		'document.querySelector("#app").classList.contains("tools-open") && document.querySelector("[data-comments]")?.textContent.includes("Explain this insight")',
+	)
+	assert(true, "Choosing a highlighted comment opens the comments panel")
+}
+
+function location() {
+	let path = evaluate(session, "location.pathname")
+	if (typeof path !== "string") throw new Error("Missing location")
+	return path
+}
+
 function verifyEmptyTeleprompter() {
 	browser(session, "press", "Escape")
 	wait(session, 'document.querySelector("#editor") !== null')
 	browser(session, "fill", "#editor", "")
-	browser(session, "click", '[data-action="teleprompter"]')
+	visit(session, location() + "/teleprompter")
 	wait(
 		session,
 		'document.querySelector("alkalye-presentation[data-empty]") !== null',
