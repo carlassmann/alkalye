@@ -2,6 +2,7 @@ import { afterAll, beforeAll, expect, test } from "bun:test"
 import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
+import { DEFAULT_EMBED_DEFINITIONS } from "tldraw"
 import { build } from "../build"
 
 let directory = await mkdtemp(join(tmpdir(), "alkalye-tldraw-build-"))
@@ -42,8 +43,9 @@ test("the offline shell caches every local tldraw asset", async () => {
 	for (let path of [
 		"/tldraw/tldraw.css",
 		"/tldraw/icons/0_merged.svg",
-		"/tldraw/embed-icons/tldraw.png",
-		"/tldraw/embed-icons/figma.png",
+		...DEFAULT_EMBED_DEFINITIONS.map(
+			definition => "/tldraw/embed-icons/" + definition.type + ".png",
+		),
 		"/tldraw/translations/en.json",
 		"/tldraw/translations/de.json",
 	]) {
