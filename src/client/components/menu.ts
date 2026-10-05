@@ -113,6 +113,8 @@ export class PickerElement extends HTMLElement {
 		let popover = this.querySelector<HTMLElement>(".menu-popover")
 		if (!trigger || !popover) return
 		let control = connectPopover(trigger, popover, events.signal, {
+			alignSelected: true,
+			minWidth: 144,
 			items: () => [...popover.querySelectorAll<HTMLElement>("[role=option]")],
 			selected: () =>
 				popover.querySelector<HTMLElement>('[aria-selected="true"]') ??

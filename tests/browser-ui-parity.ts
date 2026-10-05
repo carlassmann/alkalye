@@ -114,6 +114,18 @@ try {
 		"Picker respects a value configured before connection",
 	)
 	browser(session, "click", "#test-picker .menu-trigger")
+	browser(session, "wait", "150")
+	assert(
+		evaluate(
+			session,
+			`(() => {
+			let trigger = document.querySelector("#test-picker .menu-trigger").getBoundingClientRect();
+			let selected = document.querySelector('#test-picker [aria-selected="true"]').getBoundingClientRect();
+			return Math.abs(trigger.top + trigger.height / 2 - selected.top - selected.height / 2) < 2;
+		})()`,
+		),
+		"Select aligns its selected item with the trigger",
+	)
 	browser(session, "press", "End")
 	evaluate(
 		session,
@@ -136,6 +148,29 @@ try {
 		"Reconnecting a picker preserves its selected value",
 	)
 	evaluate(session, 'document.querySelector("#test-picker").remove();true')
+	browser(session, "click", '[data-action="new-workspace"]')
+	wait(session, 'document.querySelector("#dialog").open')
+	browser(session, "wait", "150")
+	assert(
+		evaluate(
+			session,
+			`(() => {
+			let dialog = document.querySelector("#dialog");
+			let style = getComputedStyle(dialog);
+			return dialog.getBoundingClientRect().width === 384 && style.boxShadow === "none" && document.activeElement.name === "name";
+		})()`,
+		),
+		"Dialog matches original width and focuses its main input",
+	)
+	browser(session, "press", "Escape")
+	wait(session, '!document.querySelector("#dialog").open')
+	browser(session, "click", '[data-action="new-workspace"]')
+	wait(session, 'document.querySelector("#dialog").open')
+	browser(session, "mouse", "move", "4", "4")
+	browser(session, "mouse", "down")
+	browser(session, "mouse", "up")
+	wait(session, '!document.querySelector("#dialog").open')
+	assert(true, "Dialog dismisses on an outside click")
 	browser(session, "click", '[data-action="preview"]')
 	wait(
 		session,

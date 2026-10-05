@@ -46,22 +46,28 @@ alkalye-picker > option {
 	position: fixed;
 	inset: auto;
 	margin: 0;
-	max-height: min(60vh, 420px);
+	max-height: calc(100dvh - 16px);
 	overflow: auto;
 	padding: 4px;
 	border: 1px solid var(--line);
-	background: var(--paper);
+	background: var(--popover);
 	color: var(--ink);
 	box-shadow: var(--shadow);
 	font-size: 14px;
 }
-:is([data-picker], [data-workspace-menu], [data-menu]) .menu-popover button {
+:is([data-picker], [data-workspace-menu], [data-menu])
+	.menu-popover
+	:is(button, a) {
 	display: flex;
 	align-items: center;
-	gap: 10px;
+	gap: 8px;
 	width: 100%;
-	min-height: 36px;
-	padding: 8px 10px;
+	min-height: 32px;
+	padding: 8px;
+	font-size: 12px;
+	line-height: 16px;
+	color: inherit;
+	text-decoration: none;
 	text-align: left;
 }
 :is([data-picker], [data-workspace-menu], [data-menu])
@@ -76,11 +82,11 @@ alkalye-picker > option {
 }
 :is([data-picker], [data-workspace-menu], [data-menu])
 	.menu-popover
-	button:focus-visible,
+	:is(button, a):focus-visible,
 :is([data-picker], [data-workspace-menu], [data-menu])
 	.menu-popover
-	button:hover {
-	background: var(--raised);
+	:is(button, a):hover {
+	background: var(--accent);
 	outline: 0;
 }
 :is([data-picker], [data-workspace-menu], [data-menu])
@@ -111,8 +117,12 @@ alkalye-picker > option {
 	margin: 4px -4px;
 }
 @media (pointer: coarse) {
-	:is([data-picker], [data-workspace-menu], [data-menu]) .menu-popover button {
+	:is([data-picker], [data-workspace-menu], [data-menu])
+		.menu-popover
+		:is(button, a) {
 		min-height: 44px;
+		padding: 12px;
+		font-size: 14px;
 	}
 }
 [data-picker] .menu-popover,
@@ -154,4 +164,14 @@ alkalye-picker > option {
 [data-menu] .menu-popover[data-side="top"] {
 	--menu-origin: bottom center;
 	--menu-offset: 4px;
+}
+
+[data-picker] .menu-trigger {
+	font-size: 12px;
+	min-height: 32px;
+}
+@media (pointer: coarse) {
+	[data-picker] .menu-trigger {
+		min-height: 40px;
+	}
 }

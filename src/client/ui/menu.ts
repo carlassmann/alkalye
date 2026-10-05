@@ -1,4 +1,4 @@
-import { placePanel } from "./placement"
+import { fitPanel, placePanel } from "./placement"
 export interface MenuNavigationOptions {
 	items(): HTMLElement[]
 	selected?(): HTMLElement | undefined
@@ -34,6 +34,18 @@ export function menuNavigation(
 		item?.focus({ preventScroll: true })
 		item?.scrollIntoView({ block: "nearest" })
 	}
+	panel.addEventListener(
+		"pointermove",
+		event => {
+			if (event.pointerType !== "mouse" || !(event.target instanceof Element))
+				return
+			let target = event.target
+			let item = items().find(item => item.contains(target))
+			if (item && document.activeElement !== item)
+				item.focus({ preventScroll: true })
+		},
+		{ signal },
+	)
 	panel.addEventListener(
 		"keydown",
 		event => {
@@ -118,6 +130,8 @@ export interface PopoverOptions {
 	choose?(item: HTMLElement): void
 	side?: "top" | "bottom"
 	align?: "start" | "end"
+	alignSelected?: boolean
+	minWidth?: number
 }
 
 export function connectPopover(
@@ -136,7 +150,10 @@ export function connectPopover(
 	}
 	function place() {
 		let bounds = trigger.getBoundingClientRect()
-		let width = Math.min(Math.max(bounds.width, 200), innerWidth - 16)
+		let width = Math.min(
+			Math.max(bounds.width, options.minWidth ?? 128),
+			innerWidth - 16,
+		)
 		panel.style.minWidth = width + "px"
 		panel.style.maxWidth = "calc(100vw - 16px)"
 		let position = placePanel(
@@ -145,6 +162,25 @@ export function connectPopover(
 			{ width: innerWidth, height: innerHeight },
 			options,
 		)
+		if (options.alignSelected) {
+			let selected = options.selected?.()
+			if (selected) {
+				let aligned = fitPanel(
+					{
+						x: position.x,
+						y:
+							(bounds.top + bounds.bottom) / 2 -
+							selected.offsetTop -
+							selected.offsetHeight / 2 +
+							panel.scrollTop -
+							panel.clientTop,
+					},
+					{ width: panel.offsetWidth, height: panel.offsetHeight },
+					{ width: innerWidth, height: innerHeight },
+				)
+				position.y = aligned.y
+			}
+		}
 		panel.style.left = position.x + "px"
 		panel.style.top = position.y + "px"
 		panel.dataset.side = position.side
@@ -171,6 +207,7 @@ export function connectPopover(
 		place()
 		trigger.setAttribute("aria-expanded", "true")
 		navigation.focus(focus)
+		if (options.alignSelected) place()
 	}
 	panel.hidden = !supported
 	if (supported) trigger.popoverTargetElement = panel
@@ -218,10 +255,7 @@ export function connectPopover(
 			)
 				return
 			options.choose?.(item)
-			close(
-				item.dataset.action === undefined &&
-					!(item instanceof HTMLAnchorElement),
-			)
+			close(!(item instanceof HTMLAnchorElement))
 		},
 		{ signal },
 	)

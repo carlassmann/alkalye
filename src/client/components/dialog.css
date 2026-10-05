@@ -11,7 +11,7 @@
 	color: var(--ink);
 	border: 1px solid var(--line);
 	border-radius: 0;
-	width: min(620px, calc(100vw - 24px));
+	width: min(384px, calc(100vw - 32px));
 	padding: 0;
 	max-height: 90dvh;
 	box-shadow: var(--dialog-shadow);
@@ -28,7 +28,7 @@
 	transform: none;
 }
 [data-dialog]::backdrop {
-	background: color-mix(in oklch, var(--ink) 20%, transparent);
+	background: rgb(0 0 0 / 20%);
 	backdrop-filter: blur(4px);
 	opacity: 0;
 	transition:
@@ -125,7 +125,7 @@
 }
 @media (max-width: 700px) {
 	[data-dialog] .dialog-body {
-		padding: 16px !important;
+		padding: 16px;
 	}
 }
 @media print {
@@ -140,4 +140,53 @@
 	max-height: 70dvh;
 	margin: auto;
 	object-fit: contain;
+}
+
+[data-dialog]:not(.wide):not(:has([data-whiteboard])) {
+	box-shadow: none;
+	border-color: color-mix(in oklch, var(--ink) 10%, transparent);
+	font-size: 12px;
+	line-height: 1.625;
+}
+[data-dialog]:not(.wide):not(:has([data-whiteboard])) > form {
+	display: grid;
+	gap: 16px;
+	padding: 16px;
+	padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+[data-dialog]:not(.wide):not(:has([data-whiteboard]))
+	:is(header, .dialog-body, footer) {
+	padding: 0;
+	border: 0;
+}
+[data-dialog]:not(.wide):not(:has([data-whiteboard])) h2 {
+	font-size: 14px;
+	font-weight: 500;
+	letter-spacing: normal;
+	padding-right: 28px;
+}
+[data-dialog]:not(.wide):not(:has([data-whiteboard])) .dialog-close {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	width: 28px;
+	height: 28px;
+	display: grid;
+	place-items: center;
+}
+[data-dialog]:not(.wide):not(:has([data-whiteboard])) .dialog-close svg {
+	width: 16px;
+	height: 16px;
+}
+[data-dialog]:not(.wide):not(:has([data-whiteboard])) .dialog-close:hover {
+	background: var(--accent);
+}
+@media (max-width: 639px) {
+	[data-dialog]:not(.wide):not(:has([data-whiteboard])) {
+		margin: max(16px, env(safe-area-inset-top)) auto auto;
+	}
+	[data-dialog]:not(.wide):not(:has([data-whiteboard])) footer {
+		flex-direction: column-reverse;
+		align-items: stretch;
+	}
 }

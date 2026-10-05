@@ -2,11 +2,11 @@
 	position: fixed;
 	inset: auto;
 	margin: 0;
-	min-width: 180px;
+	min-width: 144px;
 	padding: 4px;
 	border: 1px solid var(--line);
 	border-radius: 0;
-	background: var(--paper);
+	background: var(--popover);
 	color: var(--ink);
 	box-shadow: var(--shadow);
 	opacity: 0;
@@ -30,12 +30,14 @@
 }
 [data-context-menu] button {
 	display: flex;
-	gap: 16px;
+	gap: 8px;
 	justify-content: space-between;
 	align-items: center;
 	width: 100%;
 	text-align: left;
-	padding: 8px 12px;
+	padding: 8px;
+	min-height: 32px;
+	line-height: 16px;
 	font-size: 12px;
 }
 [data-context-menu] button:disabled {
@@ -50,8 +52,8 @@
 	opacity: 0.6;
 }
 [data-context-menu] button[aria-expanded="true"] {
-	background: var(--brand-soft);
-	color: var(--brand);
+	background: var(--accent);
+	color: var(--ink);
 }
 [data-context-menu] hr {
 	margin: 4px 0;
@@ -68,11 +70,13 @@
 [data-context-menu] button:focus-visible,
 [data-context-menu] button:not(:disabled):hover {
 	outline: none;
-	background: var(--brand-soft);
-	color: var(--brand);
+	background: var(--accent);
+	color: var(--ink);
 }
 @media (pointer: coarse) {
 	[data-context-menu] button {
 		min-height: 44px;
+		padding: 12px;
+		font-size: 14px;
 	}
 }

@@ -82,6 +82,8 @@
 	--paper: #fff;
 	--surface: #fff;
 	--raised: oklch(97% 0 0);
+	--popover: oklch(100% 0 0);
+	--accent: oklch(97% 0 0);
 	--ink: oklch(14.5% 0 0);
 	--muted: oklch(55.6% 0 0);
 	--line: oklch(92.2% 0 0);
@@ -90,7 +92,7 @@
 	--brand-soft: oklch(97% 0 0);
 	--ring: oklch(59.6% 0.145 163.225);
 	--danger: oklch(58% 0.22 27);
-	--shadow: 0 8px 24px rgb(0 0 0 / 16%), 0 2px 6px rgb(0 0 0 / 8%);
+	--shadow: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -2px rgb(0 0 0 / 10%);
 	--dialog-shadow: 0 16px 48px rgb(0 0 0 / 24%);
 	--editor-size: 18px;
 	--sans: "Geist", ui-sans-serif, system-ui, sans-serif;
@@ -103,13 +105,15 @@
 	--paper: oklch(14.5% 0 0);
 	--surface: oklch(14.5% 0 0);
 	--raised: oklch(26.9% 0 0);
+	--popover: oklch(20.5% 0 0);
+	--accent: oklch(37.1% 0 0);
 	--ink: oklch(98.5% 0 0);
 	--muted: oklch(70.8% 0 0);
 	--line: oklch(100% 0 0 / 12%);
 	--brand: oklch(92.2% 0 0);
 	--brand-ink: oklch(20.5% 0 0);
 	--brand-soft: oklch(26.9% 0 0);
-	--shadow: 0 8px 24px rgb(0 0 0 / 45%), 0 2px 6px rgb(0 0 0 / 24%);
+	--shadow: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -2px rgb(0 0 0 / 10%);
 	--dialog-shadow: 0 16px 48px rgb(0 0 0 / 60%);
 }
 /* Before preferences load, follow the system so dark systems never flash. */
@@ -119,13 +123,15 @@
 		--paper: oklch(14.5% 0 0);
 		--surface: oklch(14.5% 0 0);
 		--raised: oklch(26.9% 0 0);
+		--popover: oklch(20.5% 0 0);
+		--accent: oklch(37.1% 0 0);
 		--ink: oklch(98.5% 0 0);
 		--muted: oklch(70.8% 0 0);
 		--line: oklch(100% 0 0 / 12%);
 		--brand: oklch(92.2% 0 0);
 		--brand-ink: oklch(20.5% 0 0);
 		--brand-soft: oklch(26.9% 0 0);
-		--shadow: 0 8px 24px rgb(0 0 0 / 45%), 0 2px 6px rgb(0 0 0 / 24%);
+		--shadow: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -2px rgb(0 0 0 / 10%);
 		--dialog-shadow: 0 16px 48px rgb(0 0 0 / 60%);
 	}
 }
