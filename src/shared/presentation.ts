@@ -127,16 +127,18 @@ function sectionItems(lines: SourceLine[], slide: number) {
 	for (let line of lines) {
 		let opened = fence
 		fence = nextFence(fence, line.text)
-		if (opened || fence || isVisual(line.text))
+		if (!opened && !fence && !line.text.trim()) flush()
+		else if (opened || fence || isVisual(line.text))
 			block.push({ ...line, text: outdent(line.text) })
-		else if (!line.text.trim()) flush()
 		else {
 			flush()
+			let text = spoken(line.text)
+			if (!text) continue
 			items.push({
 				kind: "note",
 				slide,
 				line: line.number,
-				text: spoken(line.text),
+				text,
 			})
 		}
 	}

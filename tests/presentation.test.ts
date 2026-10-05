@@ -61,6 +61,38 @@ describe("slide content follows iA Presenter rules", () => {
 		])
 	})
 
+	test("whitespace separators are never selectable items or visual source ranges", () => {
+		for (let separator of ["", " ", "  ", "\t", " \t  ", "\r"]) {
+			let items = presentationItems(
+				`# Title\n${separator}\nFirst note\n${separator}\nSecond note\n${separator}`,
+			)
+			expect(items).toEqual([
+				{ kind: "visual", slide: 0, start: 0, end: 0, source: "# Title" },
+				{ kind: "note", slide: 0, line: 2, text: "First note" },
+				{ kind: "note", slide: 0, line: 4, text: "Second note" },
+			])
+			expect(stepItem(items, 0, 1)).toBe(1)
+			expect(itemProgress(items, 1)).toBe(2 / 3)
+		}
+	})
+
+	test("indented whitespace separates visual blocks without extending their ranges", () => {
+		expect(visuals(presentationItems("# First\n  \n\t\n# Second"))).toEqual([
+			{ kind: "visual", slide: 0, start: 0, end: 0, source: "# First" },
+			{ kind: "visual", slide: 0, start: 3, end: 3, source: "# Second" },
+		])
+	})
+	test("blank lines inside fences remain part of their visual block", () => {
+		for (let marker of ["```", "~~~"]) {
+			let source = `${marker}txt\nfirst\n\n \nlast\n${marker}`
+			expect(presentationItems(source)).toEqual([
+				{ kind: "visual", slide: 0, start: 0, end: 5, source },
+			])
+		}
+	})
+	test("empty spoken quote markers do not become selectable notes", () => {
+		expect(notes(presentationItems("# Title\n> \nSpoken"))).toEqual(["Spoken"])
+	})
 	test("empty and whitespace documents have no items", () => {
 		expect(presentationItems("")).toEqual([])
 		expect(presentationItems("   \n\t")).toEqual([])

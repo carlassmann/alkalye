@@ -22,7 +22,7 @@ Let me explain the first insight.
 
 # Closing
 
-Thank you!`
+Thank you!`.replaceAll("\n\n", "\n \t  \n")
 
 let server = Bun.spawn(["bun", "tests/browser-document-app.ts", "--serve"], {
 	stdout: "pipe",
@@ -56,6 +56,14 @@ try {
 			})()`,
 		),
 		"Teleprompter groups visual blocks and spoken lines by slide",
+	)
+
+	assert(
+		evaluate(
+			session,
+			'[...document.querySelectorAll("#speaker-notes [data-item]")].every(item=>item.textContent.trim().length > 0)',
+		),
+		"Whitespace separators produce no empty clickable or highlighted teleprompter items",
 	)
 	assert(
 		evaluate(
