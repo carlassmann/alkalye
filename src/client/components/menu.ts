@@ -331,15 +331,144 @@ export class MenuElement extends HTMLElement {
 							}
 						return result
 					}
-					connectPopover(trigger, panel, events.signal, {
+					let control = connectPopover(trigger, panel, events.signal, {
+						submenu: host.hasAttribute("data-submenu"),
+						matchTriggerWidth: !host.classList.contains("tool-group"),
+						minWidth: host.classList.contains("tool-group") ? 192 : undefined,
 						items,
 						selected: () =>
 							items().find(
 								item => item.getAttribute("aria-checked") === "true",
 							),
-						side: host.getAttribute("side") === "top" ? "top" : "bottom",
+						side: () =>
+							host.hasAttribute("data-submenu")
+								? host.parentElement
+										?.closest("[popover]")
+										?.getAttribute("data-side") === "left"
+									? "left"
+									: "right"
+								: host.getAttribute("side") === "left"
+									? matchMedia("(max-width: 1100px)").matches
+										? "bottom"
+										: "left"
+									: host.getAttribute("side") === "right"
+										? "right"
+										: host.getAttribute("side") === "top"
+											? "top"
+											: "bottom",
+						choose: () => {
+							let ancestor = host.parentElement?.closest("alkalye-menu")
+							while (ancestor) {
+								ancestor
+									.querySelector<HTMLElement>(":scope > [popover]")
+									?.hidePopover()
+								ancestor
+									.querySelector<HTMLButtonElement>(":scope > button")
+									?.focus()
+								ancestor = ancestor.parentElement?.closest("alkalye-menu")
+							}
+						},
 						align: host.getAttribute("align") === "end" ? "end" : "start",
 					})
+
+					panel.addEventListener(
+						"pointermove",
+						event => {
+							if (
+								event.pointerType !== "mouse" ||
+								!(event.target instanceof Element) ||
+								event.target.closest("[popover]") !== panel
+							)
+								return
+							for (let submenu of panel.querySelectorAll<HTMLElement>(
+								"[data-submenu]",
+							)) {
+								let childTrigger = submenu.querySelector(":scope > button")
+								if (!childTrigger?.contains(event.target))
+									submenu
+										.querySelector<HTMLElement>(
+											":scope > [popover]:popover-open",
+										)
+										?.hidePopover()
+							}
+						},
+						{ signal: events.signal },
+					)
+					panel.addEventListener(
+						"focusin",
+						event => {
+							if (
+								!(event.target instanceof Element) ||
+								event.target.closest("[popover]") !== panel
+							)
+								return
+							for (let submenu of panel.querySelectorAll<HTMLElement>(
+								"[data-submenu]",
+							)) {
+								if (
+									!submenu
+										.querySelector(":scope > button")
+										?.contains(event.target)
+								)
+									submenu
+										.querySelector<HTMLElement>(
+											":scope > [popover]:popover-open",
+										)
+										?.hidePopover()
+							}
+						},
+						{ signal: events.signal },
+					)
+					panel.addEventListener(
+						"keydown",
+						event => {
+							if (event.key !== "Tab") return
+							panel.hidePopover()
+							let ancestor = host.parentElement?.closest("alkalye-menu")
+							while (ancestor) {
+								ancestor
+									.querySelector<HTMLElement>(":scope > [popover]")
+									?.hidePopover()
+								ancestor = ancestor.parentElement?.closest("alkalye-menu")
+							}
+						},
+						{ signal: events.signal },
+					)
+					if (host.hasAttribute("data-submenu")) {
+						trigger.addEventListener(
+							"pointerenter",
+							event => {
+								if (
+									event.pointerType === "mouse" &&
+									!trigger.disabled &&
+									!panel.matches(":popover-open")
+								)
+									control.show("first", false)
+							},
+							{ signal: events.signal },
+						)
+						trigger.addEventListener(
+							"keydown",
+							event => {
+								if (event.key !== "ArrowRight") return
+								event.preventDefault()
+								event.stopPropagation()
+								control.show("first")
+							},
+							{ signal: events.signal },
+						)
+						panel.addEventListener(
+							"keydown",
+							event => {
+								if (event.key !== "ArrowLeft" || event.defaultPrevented) return
+								event.preventDefault()
+								event.stopPropagation()
+								panel.hidePopover()
+								trigger.focus()
+							},
+							{ signal: events.signal },
+						)
+					}
 					return yield* Effect.never
 				}),
 			),

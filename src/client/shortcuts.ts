@@ -23,7 +23,7 @@ let shortcuts: Shortcut[] = [
 		mod: true,
 		alt: true,
 	})),
-	{ id: "body", action: "clear", key: "0", mod: true, alt: true },
+	{ id: "body", action: "body", key: "0", mod: true, alt: true },
 	{ id: "bulletList", action: "bullet", key: "l", mod: true, alt: true },
 	{ id: "orderedList", action: "ordered", key: "o", mod: true, alt: true },
 	{
@@ -99,6 +99,14 @@ export function shortcutAction(
 			Boolean(shortcut.alt) === event.altKey &&
 			Boolean(shortcut.shift) === event.shiftKey,
 	)?.action
+}
+
+export function actionShortcutLabel(action: string, platform: string) {
+	let clipboard = { cut: "X", "copy-text": "C", paste: "V" }
+	if (action === "cut" || action === "copy-text" || action === "paste")
+		return (platform === "mac" ? "⌘" : "Ctrl+") + clipboard[action]
+	let shortcut = shortcuts.find(shortcut => shortcut.action === action)
+	return shortcut ? shortcutLabel(shortcut.id, platform) : undefined
 }
 
 export function shortcutLabel(id: string, platform = "mac") {

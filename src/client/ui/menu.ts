@@ -125,13 +125,20 @@ export function menuNavigation(
 }
 
 export interface PopoverOptions {
+	submenu?: boolean
 	items(): HTMLElement[]
 	selected?(): HTMLElement | undefined
 	choose?(item: HTMLElement): void
-	side?: "top" | "bottom"
+	side?:
+		| "top"
+		| "bottom"
+		| "left"
+		| "right"
+		| (() => "top" | "bottom" | "left" | "right")
 	align?: "start" | "end"
 	alignSelected?: boolean
 	minWidth?: number
+	matchTriggerWidth?: boolean
 }
 
 export function connectPopover(
@@ -151,7 +158,10 @@ export function connectPopover(
 	function place() {
 		let bounds = trigger.getBoundingClientRect()
 		let width = Math.min(
-			Math.max(bounds.width, options.minWidth ?? 128),
+			Math.max(
+				options.matchTriggerWidth === false ? 0 : bounds.width,
+				options.minWidth ?? 128,
+			),
 			innerWidth - 16,
 		)
 		panel.style.minWidth = width + "px"
@@ -160,7 +170,11 @@ export function connectPopover(
 			bounds,
 			{ width: panel.offsetWidth, height: panel.offsetHeight },
 			{ width: innerWidth, height: innerHeight },
-			options,
+			{
+				...options,
+				side:
+					typeof options.side === "function" ? options.side() : options.side,
+			},
 		)
 		if (options.alignSelected) {
 			let selected = options.selected?.()
@@ -198,7 +212,10 @@ export function connectPopover(
 		{ items: options.items, selected: options.selected, close },
 		signal,
 	)
-	function show(focus: "selected" | "first" | "last" = "selected") {
+	function show(
+		focus: "selected" | "first" | "last" = "selected",
+		moveFocus = true,
+	) {
 		openingFocus = focus
 		if (!isOpen()) {
 			if (supported) panel.showPopover()
@@ -206,7 +223,7 @@ export function connectPopover(
 		}
 		place()
 		trigger.setAttribute("aria-expanded", "true")
-		navigation.focus(focus)
+		if (moveFocus) navigation.focus(focus)
 		if (options.alignSelected) place()
 	}
 	panel.hidden = !supported
@@ -215,14 +232,18 @@ export function connectPopover(
 		"click",
 		event => {
 			event.preventDefault()
-			isOpen() ? close() : show()
+			isOpen() && !options.submenu ? close() : show()
 		},
 		{ signal },
 	)
 	trigger.addEventListener(
 		"keydown",
 		event => {
-			if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return
+			if (
+				trigger.closest("[popover]") ||
+				(event.key !== "ArrowDown" && event.key !== "ArrowUp")
+			)
+				return
 			event.preventDefault()
 			event.stopPropagation()
 			show(event.key === "ArrowUp" ? "last" : "selected")

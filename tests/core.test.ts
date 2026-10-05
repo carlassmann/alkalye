@@ -726,3 +726,23 @@ test("distant body edits retain comment anchors and a concurrent insertion betwe
 	a.inverse(edit)
 	expect(a.text("doc")).toBe("---\ntitle: T\n---\nred\nAnchor peer text\nblue")
 })
+
+test("body formatting removes block prefixes but keeps indentation and inline markup", async () => {
+	let { formatSelection } = await import("../src/shared/authoring")
+	let source = "###### **Title**\n  - [x] *Task*\n> Quote\n12. Ordered\nPlain"
+	expect(
+		formatSelection(source, { start: 0, end: source.length }, "body").source,
+	).toBe("**Title**\n  *Task*\nQuote\nOrdered\nPlain")
+})
+
+test("image insertion selects the URL and preserves selected alt text", async () => {
+	let { formatSelection } = await import("../src/shared/authoring")
+	expect(formatSelection("caption", { start: 0, end: 7 }, "image")).toEqual({
+		source: "![caption](url)",
+		selection: { start: 11, end: 14 },
+	})
+	expect(formatSelection("", { start: 0, end: 0 }, "image")).toEqual({
+		source: "![alt](url)",
+		selection: { start: 7, end: 10 },
+	})
+})

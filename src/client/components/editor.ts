@@ -19,7 +19,7 @@ import { mountLineActions } from "./line-actions"
 import { icon } from "../icons"
 import type { IconName } from "../icons"
 
-import { formatSelection } from "../../shared/authoring"
+import { formatSelection, sortTasks } from "../../shared/authoring"
 import { escape, safeUrl } from "../../shared/markdown"
 import { iconPrefix } from "../../shared/projection"
 import type { ProjectedLink } from "../../shared/projection"
@@ -107,6 +107,9 @@ export class EditorElement extends HTMLElement {
 	}
 	update(content: string, atoms: Atom[], editable: boolean) {
 		this.view?.update(content, atoms, editable)
+	}
+	command(action: string) {
+		this.view?.command(action)
 	}
 	format(action: string) {
 		this.view?.format(action)
@@ -386,6 +389,7 @@ function createEditorView(
 		},
 		update,
 		format,
+		command,
 		insert,
 		insertCodeBlock,
 		chooseCompletion,
@@ -696,6 +700,25 @@ function createEditorView(
 			position = selection.end
 		}
 		setMarkup(highlight, html + escape(editor.value.slice(position)) + "\n")
+	}
+	function command(action: string) {
+		if (listeners.signal.aborted || composing || !inSync()) return
+		if (action === "copy-text") {
+			if (text.selectionStart === text.selectionEnd) return
+			writeClipboard(text.value.slice(text.selectionStart, text.selectionEnd))
+			return
+		}
+		if (!editable || composing || !inSync()) return
+		if (action === "cut") return cut()
+		if (action === "paste") return paste()
+		if (action === "body") return format("body")
+		if (action === "sort-tasks") {
+			let sorted = sortTasks(text.value)
+			if (sorted === text.value) return
+			text.replace(sorted, text.selectionStart, text.selectionEnd)
+			textarea.dispatchEvent(new Event("input"))
+		} else applyLineEdit(action)
+		textarea.focus()
 	}
 	function format(action: string) {
 		let editor = text

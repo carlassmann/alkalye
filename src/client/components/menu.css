@@ -175,3 +175,16 @@ alkalye-picker > option {
 		min-height: 40px;
 	}
 }
+
+[data-menu] .menu-popover kbd {
+	color: var(--muted);
+	font-family: inherit;
+	font-size: 11px;
+	white-space: nowrap;
+}
+[data-menu] .menu-popover[data-side="left"] {
+	--menu-origin: right top;
+}
+[data-menu] .menu-popover[data-side="right"] {
+	--menu-origin: left top;
+}

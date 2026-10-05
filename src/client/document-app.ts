@@ -103,7 +103,7 @@ import { fetchResponse } from "../platform/http"
 import * as HttpClientResponse from "effect/http/HttpClientResponse"
 import type { IconName } from "./icons"
 import { BrowserStorage } from "./storage"
-import { shortcutAction } from "./shortcuts"
+import { actionShortcutLabel, shortcutAction } from "./shortcuts"
 import { ThemeLibrary } from "./theme-library"
 import { libraryThemes, resolveTheme } from "../shared/theme-library"
 
@@ -215,7 +215,6 @@ function mountApplication() {
 		let showArchive = false
 		let showTrash = false
 		let pointer = { x: -1, y: -1, time: 0 }
-		let openGroups = new Set<string>()
 		let folders = true
 		let collapsed = new Set<string>()
 		let slideIndex = 0
@@ -319,16 +318,6 @@ function mountApplication() {
 		app.classList.toggle("library-open", layout.library)
 		app.classList.toggle("tools-open", layout.tools)
 		let events = new AbortController()
-		element("#inspector-body").addEventListener(
-			"toggle",
-			event => {
-				if (!(event.target instanceof HTMLDetailsElement)) return
-				let id = event.target.dataset.group ?? ""
-				if (event.target.open) openGroups.add(id)
-				else openGroups.delete(id)
-			},
-			{ capture: true, signal: events.signal },
-		)
 		dialog.addEventListener(
 			"close",
 			() => {
@@ -2126,8 +2115,7 @@ function mountApplication() {
 				)
 				return
 			}
-			updateMarkup(
-				element("#inspector-body"),
+			updateTools(
 				html`<div class="tool-section">
 						${tool("find", "Find", "search")}${tool("palette", "Command palette", "command")}${doc ? tool("outline", "Document outline", "list-tree") : ""}
 					</div>
@@ -2146,12 +2134,30 @@ function mountApplication() {
 										"edit",
 										"Edit",
 										"undo-2",
-										html`${tool("undo", "Undo", "undo-2")}${tool("redo", "Redo", "redo-2")}${tool("find", "Find and replace", "search")}`,
+										html`${tool("undo", "Undo", "undo-2")}${tool("redo", "Redo", "redo-2")}
+											<hr />
+											${tool("cut", "Cut", "scissors")}${tool("copy-text", "Copy", "copy")}${tool("paste", "Paste", "clipboard")}
+											<hr />
+											${tool("find", "Find and replace", "search")}${tool("complete", "Toggle task completion", "list-todo")}${tool("sort-tasks", "Sort tasks", "list")}`,
 									)}${group(
 										"format",
 										"Format",
 										"type",
-										html`${tool("h1", "Heading 1", "heading")}${tool("h2", "Heading 2", "heading")}${tool("h3", "Heading 3", "heading")}${tool("quote", "Quote", "message-square")}${tool("ordered", "Numbered list", "list")}${tool("strike", "Strikethrough", "type")}${tool("clear", "Clear formatting", "x")}`,
+										html`${group("headings", "Headings", "heading", joinMarkup([1, 2, 3, 4, 5, 6].map(level => tool("h" + level, "Heading " + level, "heading"))), true)}${group("lists", "Lists", "list", html`${tool("bullet", "Bullet list", "list")}${tool("ordered", "Numbered list", "list")}${tool("task", "Task list", "list-todo")}${tool("complete", "Toggle task completion", "list-todo")}`, true)}${tool("quote", "Quote", "message-square")}${tool("body", "Body text", "type")}${group(
+												"structure",
+												"Structure",
+												"type",
+												html`${tool("indent", "Indent", "chevron-right")}${tool("outdent", "Outdent", "chevron-left")}
+													<hr />
+													${tool("move-up", "Move line up", "chevron-up")}${tool("move-down", "Move line down", "chevron-down")}`,
+												true,
+											)}
+											<hr />
+											${tool("bold", "Bold", "bold")}${tool("italic", "Italic", "italic")}${tool("strike", "Strikethrough", "type")}
+											<hr />
+											${tool("code", "Inline code", "code")}${tool("code-block", "Code block", "code")}${tool("link", "Link", "link")}${tool("image", "Image", "image")}${tool("wikilink", "Link to document", "file-symlink")}
+											<hr />
+											${tool("clear", "Clear formatting", "x")}`,
 									)}
 								</div>`
 							: ""
@@ -2206,17 +2212,78 @@ function mountApplication() {
 					</div>`,
 			)
 		}
-		function group(id: string, label: string, name: IconName, content: Markup) {
-			return html`<details
+
+		function updateTools(markup: Markup) {
+			let host = element("#inspector-body")
+			let opened = [
+				...host.querySelectorAll<HTMLElement>(
+					".tool-group > [popover]:popover-open",
+				),
+			]
+			let active = document.activeElement
+			let action =
+				active instanceof HTMLElement ? active.dataset.action : undefined
+			let controls = active?.getAttribute("aria-controls")
+			let panel = active?.closest("[popover]")?.id
+			let selected = selection
+			updateMarkup(host, markup)
+			if (!opened.some(panel => !panel.isConnected)) return
+			queueMicrotask(() => {
+				if (selection !== selected || !host.isConnected) return
+				for (let previous of opened) {
+					let trigger = host.querySelector<HTMLButtonElement>(
+						'[aria-controls="' + CSS.escape(previous.id) + '"]',
+					)
+					if (trigger && !trigger.disabled) trigger.click()
+				}
+				let restored = panel
+					? host.querySelector<HTMLElement>("#" + CSS.escape(panel))
+					: undefined
+				let target = action
+					? restored?.querySelector<HTMLElement>(
+							'[data-action="' + CSS.escape(action) + '"]',
+						)
+					: controls
+						? restored?.querySelector<HTMLElement>(
+								'[aria-controls="' + CSS.escape(controls) + '"]',
+							)
+						: undefined
+				if (target && !target.hasAttribute("disabled"))
+					target.focus({ preventScroll: true })
+			})
+		}
+		function group(
+			id: string,
+			label: string,
+			name: IconName,
+			content: Markup,
+			submenu = false,
+		) {
+			return html`<alkalye-menu
 				class="tool-group"
 				data-group="${id}"
-				${openGroups.has(id) ? "open" : ""}
+				side="${submenu ? "right" : "left"}"
+				${submenu ? html`data-submenu` : ""}
 			>
-				<summary>
+				<button
+					type="button"
+					class="menu-trigger"
+					aria-controls="tools-${id}"
+					${id !== "file" && (mode !== "edit" || (id !== "edit" && !writable())) ? "disabled" : ""}
+					aria-haspopup="menu"
+				>
 					${icon(name)}<span>${label}</span>${icon("chevron-right")}
-				</summary>
-				${content}
-			</details>`
+				</button>
+				<div
+					id="tools-${id}"
+					class="menu-popover"
+					popover
+					role="menu"
+					aria-label="${label}"
+				>
+					${content}
+				</div>
+			</alkalye-menu>`
 		}
 		function backlinksMarkup(doc: DocumentRecord) {
 			let linking = library.state
@@ -2246,7 +2313,33 @@ function mountApplication() {
 			</div>`
 		}
 		function tool(action: string, label: string, name: IconName) {
-			return button(action, label, html`${icon(name)}<span>${label}</span>`)
+			let shortcut = actionShortcutLabel(
+				action,
+				/Mac/i.test(navigator.platform) ? "mac" : "other",
+			)
+			let changesSource =
+				formattingCommands.includes(action) ||
+				[
+					"undo",
+					"redo",
+					"cut",
+					"paste",
+					"body",
+					"sort-tasks",
+					"indent",
+					"outdent",
+					"move-up",
+					"move-down",
+					"code-block",
+					"image",
+					"wikilink",
+				].includes(action)
+			return button(
+				action,
+				label,
+				html`${icon(name)}<span>${label}</span>${shortcut ? html`<kbd>${shortcut}</kbd>` : ""}`,
+				changesSource && (mode !== "edit" || !writable()) ? "disabled" : "",
+			)
 		}
 		function sharedWith(document: string) {
 			return Object.entries(
@@ -2364,6 +2457,30 @@ function mountApplication() {
 				}
 				if (formattingCommands.includes(action)) {
 					editor?.format(action)
+					return
+				}
+				if (
+					[
+						"cut",
+						"copy-text",
+						"paste",
+						"sort-tasks",
+						"body",
+						"indent",
+						"outdent",
+						"move-up",
+						"move-down",
+					].includes(action)
+				) {
+					editor?.command(action)
+					return
+				}
+				if (action === "image") {
+					editor?.format("image")
+					return
+				}
+				if (action === "wikilink") {
+					editor?.insert("[[")
 					return
 				}
 				if (action === "code-block") {

@@ -127,3 +127,32 @@ test("save feedback coalesces rapid writes, reports failures immediately, and re
 		}).pipe(Effect.provide(TestClock.layer())),
 	)
 })
+
+test("side menus flip away from viewport edges", () => {
+	let panel = { width: 200, height: 100 }
+	let viewport = { width: 1000, height: 600 }
+	expect(
+		placePanel(
+			{ left: 700, right: 900, top: 100, bottom: 136 },
+			panel,
+			viewport,
+			{ side: "left" },
+		),
+	).toEqual({ x: 496, y: 100, side: "left" })
+	expect(
+		placePanel(
+			{ left: 700, right: 900, top: 550, bottom: 586 },
+			panel,
+			viewport,
+			{ side: "right" },
+		),
+	).toEqual({ x: 496, y: 492, side: "left" })
+	expect(
+		placePanel(
+			{ left: 10, right: 110, top: 100, bottom: 136 },
+			panel,
+			viewport,
+			{ side: "left" },
+		),
+	).toEqual({ x: 114, y: 100, side: "right" })
+})

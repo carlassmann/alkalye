@@ -28,6 +28,15 @@ export function formatSelection(
 	command: string,
 ) {
 	let { start, end } = selection
+	if (command === "image") {
+		let alt = source.slice(start, end) || "alt"
+		let markup = `![${alt}](url)`
+		let urlStart = start + alt.length + 4
+		return {
+			source: source.slice(0, start) + markup + source.slice(end),
+			selection: { start: urlStart, end: urlStart + 3 },
+		}
+	}
 	let wrappers: Record<string, [string, string]> = {
 		bold: ["**", "**"],
 		italic: ["*", "*"],
@@ -97,6 +106,11 @@ export function formatSelection(
 			if (command === "complete")
 				return line.replace(/\[([ xX])\]/, (_, checked: string) =>
 					checked === " " ? "[x]" : "[ ]",
+				)
+			if (command === "body")
+				return line.replace(
+					/^(\s*)(?:#{1,6}\s+|>\s?|[-*+]\s+(?:\[[ xX]\]\s+)?|\d+[.)]\s+)/,
+					"$1",
 				)
 			if (command === "clear")
 				return line

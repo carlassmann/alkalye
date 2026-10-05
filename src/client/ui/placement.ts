@@ -13,7 +13,7 @@ export interface Anchor {
 	bottom: number
 }
 export interface PlacementOptions {
-	side?: "top" | "bottom"
+	side?: "top" | "bottom" | "left" | "right"
 	align?: "start" | "end"
 }
 
@@ -34,6 +34,23 @@ export function placePanel(
 	viewport: Size,
 	options: PlacementOptions = {},
 ) {
+	if (options.side === "left" || options.side === "right") {
+		let left = options.side === "left"
+		if (left && anchor.left - panel.width - 4 < 8) left = false
+		else if (!left && anchor.right + panel.width + 4 > viewport.width - 8)
+			left = true
+		return {
+			...fitPanel(
+				{
+					x: left ? anchor.left - panel.width - 4 : anchor.right + 4,
+					y: anchor.top,
+				},
+				panel,
+				viewport,
+			),
+			side: left ? "left" : "right",
+		}
+	}
 	let roomAbove = anchor.top - panel.height - 4 >= 8
 	let above =
 		options.side === "top"

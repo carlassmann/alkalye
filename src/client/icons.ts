@@ -4,6 +4,10 @@ import { rawMarkup } from "../shared/html"
 // the same set the original application used. Inline SVG keeps them free of
 // requests and of runtime dependencies.
 let icons = {
+	scissors:
+		'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="m8.12 8.12 12.76 12.76M14 14l6.88-6.88M8.12 15.88 12 12"/>',
+	clipboard:
+		'<rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>',
 	archive:
 		'<rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>',
 	"archive-restore":
