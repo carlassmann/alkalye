@@ -1,3 +1,4 @@
+import * as Duration from "effect/Duration"
 import * as Effect from "effect/Effect"
 import * as Fiber from "effect/Fiber"
 import * as FiberSet from "effect/FiberSet"
@@ -12,6 +13,11 @@ import type {
 } from "../../shared/preferences"
 import { routeHref, settingsCategories } from "../../shared/routes"
 import type { SettingsCategory } from "../../shared/routes"
+import {
+	startupEvents,
+	startupReport,
+	type StartupEvent,
+} from "../../shared/startup-diagnostics"
 import { syntaxFamilies } from "../../shared/syntax"
 import type { BrowserAccount } from "../browser-account"
 import type { BrowserLibrary } from "../browser-library"
@@ -22,7 +28,9 @@ import type { IconName } from "../icons"
 import { html, joinMarkup, translate } from "../language"
 import type { Markup } from "../language"
 import { AccountAgentsElement } from "./account-agents"
-import { pickerMarkup } from "./menu"
+import { openDialog } from "./dialog"
+import { PickerElement, pickerMarkup } from "./menu"
+import { screenIcon } from "./screen-icons"
 
 export interface SettingsPageOptions {
 	readonly category: SettingsCategory
@@ -38,6 +46,8 @@ export interface SettingsPageOptions {
 	readonly importFiles: () => void
 	readonly install: (() => Promise<unknown>) | undefined
 	readonly report: (error: unknown) => void
+	// The shared application dialog; found in the document when omitted.
+	readonly dialog?: HTMLDialogElement
 }
 
 let categories: Record<SettingsCategory, { label: string; icon: IconName }> = {
@@ -46,30 +56,59 @@ let categories: Record<SettingsCategory, { label: string; icon: IconName }> = {
 	connections: { label: "Connections", icon: "plug-zap" },
 	app: { label: "App & data", icon: "hard-drive" },
 }
+// The original's steppers, within what the preference schema accepts.
 let numbers = {
 	lineWidth: {
 		label: "Line width",
-		unit: "characters",
-		min: 40,
+		unit: "ch",
+		min: 60,
 		max: 120,
-		step: 1,
+		step: 5,
+		decimals: 0,
 	},
-	fontSize: { label: "Font size", unit: "px", min: 12, max: 36, step: 1 },
-	lineHeight: { label: "Line height", unit: "", min: 1.2, max: 2.5, step: 0.1 },
+	fontSize: {
+		label: "Font size",
+		unit: "px",
+		min: 12,
+		max: 30,
+		step: 1,
+		decimals: 0,
+	},
+	lineHeight: {
+		label: "Line height",
+		unit: "",
+		min: 1.2,
+		max: 2,
+		step: 0.1,
+		decimals: 1,
+	},
 	letterSpacing: {
 		label: "Letter spacing",
 		unit: "em",
 		min: -0.1,
 		max: 0.1,
 		step: 0.01,
+		decimals: 2,
 	},
 }
-let display: { key: keyof EditorPreferences; label: string }[] = [
-	{ key: "strikethroughDoneTasks", label: "Strike through done tasks" },
-	{ key: "fadeDoneTasks", label: "Fade done tasks" },
-	{ key: "highlightCurrentLine", label: "Highlight current line" },
-	{ key: "autoSortTasks", label: "Auto-sort tasks" },
-	{ key: "spellcheck", label: "Spellcheck" },
+let defaultFontSize = 18
+let display: { key: keyof EditorPreferences; label: Markup }[] = [
+	{
+		key: "strikethroughDoneTasks",
+		label: html`<span class="label-strike">${translate("Strikethrough")}</span>
+			${translate("done tasks")}`,
+	},
+	{
+		key: "fadeDoneTasks",
+		label: html`<span class="label-fade">${translate("Fade")}</span>
+			${translate("done tasks")}`,
+	},
+	{
+		key: "highlightCurrentLine",
+		label: html`${translate("Highlight current line")}`,
+	},
+	{ key: "autoSortTasks", label: html`${translate("Auto-sort tasks")}` },
+	{ key: "spellcheck", label: html`${translate("Spellcheck")}` },
 ]
 let authoring: { key: keyof EditorPreferences; label: string }[] = [
 	{ key: "smartPairs", label: "Smart bracket and quote pairs" },
@@ -90,6 +129,9 @@ export class SettingsPageElement extends HTMLElement {
 	private lifetime: Fiber.Fiber<void, never> | undefined
 	private run: ((work: Effect.Effect<unknown, unknown>) => void) | undefined
 	private content: AbortController | undefined
+	private syncing = false
+	private syncError = ""
+	private diagnosticsCleared = 0
 	configure(options: SettingsPageOptions) {
 		let previous = this.options
 		this.options = options
@@ -120,6 +162,14 @@ export class SettingsPageElement extends HTMLElement {
 								),
 							),
 						)
+					let events = yield* Effect.acquireRelease(
+						Effect.sync(() => new AbortController()),
+						events => Effect.sync(() => events.abort()),
+					)
+					for (let type of ["online", "offline"])
+						window.addEventListener(type, () => host.syncStatus(), {
+							signal: events.signal,
+						})
 					yield* Effect.addFinalizer(() =>
 						Effect.sync(() => {
 							host.content?.abort()
@@ -186,12 +236,7 @@ export class SettingsPageElement extends HTMLElement {
 			"change",
 			event => {
 				let picker = event.currentTarget
-				if (
-					picker instanceof HTMLElement &&
-					"value" in picker &&
-					typeof picker.value === "string" &&
-					isCategory(picker.value)
-				)
+				if (picker instanceof PickerElement && isCategory(picker.value))
 					this.options?.choose(picker.value)
 			},
 		)
@@ -220,22 +265,32 @@ export class SettingsPageElement extends HTMLElement {
 			),
 		)
 		let picker = this.querySelector(".settings-picker alkalye-picker")
-		if (picker && "value" in picker) picker.value = options.category
+		if (picker instanceof PickerElement) picker.value = options.category
 		content.id = "settings-" + options.category
 		let value = options.preferences.state.current().value
 		setMarkup(
 			content,
 			options.category === "general"
-				? generalMarkup(value, options.account.subject)
+				? generalMarkup(value)
 				: options.category === "editor"
 					? editorMarkup(value)
 					: options.category === "connections"
 						? html`<alkalye-account-agents
 								data-account-agents
 							></alkalye-account-agents>`
-						: appMarkup(Boolean(options.install)),
+						: appMarkup(),
 		)
 		content.insertAdjacentHTML("beforeend", String(footerMarkup()))
+		let theme = content.querySelector('alkalye-picker[name="appearance"]')
+		if (theme instanceof PickerElement)
+			theme.setChoices(
+				[
+					{ value: "light", label: translate("Light"), icon: "sun" },
+					{ value: "dark", label: translate("Dark"), icon: "moon" },
+					{ value: "system", label: translate("System"), icon: "sun-moon" },
+				],
+				value.appearance,
+			)
 		let announcement = this.querySelector("[data-settings-announcement]")
 		if (announcement)
 			announcement.textContent = translate(categories[options.category].label)
@@ -255,18 +310,10 @@ export class SettingsPageElement extends HTMLElement {
 		content.addEventListener("click", event => this.clicked(event), {
 			signal: events.signal,
 		})
-		content.addEventListener(
-			"submit",
-			event => {
-				if (!(event.target instanceof HTMLFormElement)) return
-				if (!event.target.matches("[data-name-form]")) return
-				event.preventDefault()
-				let name = String(new FormData(event.target).get("name") ?? "").trim()
-				if (!name) return
-				this.save({ name }, () => this.editName(false))
-			},
-			{ signal: events.signal },
-		)
+		if (options.category === "app") {
+			this.checkUpdates(false)
+			this.showDiagnostics()
+		}
 		this.syncStatus()
 	}
 	private changed(event: Event) {
@@ -276,11 +323,8 @@ export class SettingsPageElement extends HTMLElement {
 			target instanceof HTMLInputElement
 				? target.name
 				: (target.getAttribute("name") ?? "")
-		if (
-			target.closest("[data-account-agents]") ||
-			target.closest("[data-name-form]")
-		)
-			return
+		if (target.closest("[data-account-agents]")) return
+		if (name === "recovery-key") return
 		let value =
 			target instanceof HTMLInputElement && target.type === "checkbox"
 				? target.checked
@@ -291,21 +335,9 @@ export class SettingsPageElement extends HTMLElement {
 		if (name === "appearance" || name === "language")
 			return this.save({ [name]: value })
 		if (isNumberSetting(name) && typeof value === "string") {
-			let limits = numbers[name]
 			let number = Number(value)
-			if (
-				!Number.isFinite(number) ||
-				number < limits.min ||
-				number > limits.max
-			) {
-				this.options?.report(
-					translate(limits.label) + ": " + limits.min + "–" + limits.max,
-				)
-				return
-			}
-			return name === "fontSize"
-				? this.save({ fontSize: number })
-				: this.save({ editor: { [name]: number } })
+			if (!Number.isFinite(number)) return this.showNumber(name)
+			return this.saveNumber(name, number)
 		}
 		this.save({ editor: { [name]: value } })
 	}
@@ -314,20 +346,21 @@ export class SettingsPageElement extends HTMLElement {
 		if (!options || !(event.target instanceof Element)) return
 		let control = event.target.closest<HTMLButtonElement>("button")
 		if (!control || control.disabled) return
-		let action = control.dataset.preferenceAction ?? control.dataset.settings
-		if (action === "edit-name") this.editName(true)
-		else if (action === "cancel-name") this.editName(false)
-		else if (action === "show-key") {
-			let output = this.querySelector<HTMLOutputElement>("[data-recovery-key]")
-			if (!output) return
-			output.hidden = !output.hidden
-			output.textContent = output.hidden
-				? ""
-				: Redacted.value(options.account.recovery)
-			control.textContent = translate(
-				output.hidden ? "Show recovery key" : "Hide recovery key",
+		let step = control.dataset.step
+		let setting = control.dataset.setting ?? ""
+		if (step && isNumberSetting(setting)) {
+			let current = this.numberValue(setting)
+			return this.saveNumber(
+				setting,
+				current + Number(step) * numbers[setting].step,
 			)
-		} else if (action === "restore-account") {
+		}
+		let action = control.dataset.preferenceAction ?? control.dataset.settings
+		if (action === "edit-name") this.editName()
+		else if (action === "show-key") this.toggleKey()
+		else if (action === "copy-key")
+			this.copy(Redacted.value(options.account.recovery), control)
+		else if (action === "restore-account") {
 			let key =
 				this.querySelector<HTMLInputElement>(
 					'[name="recovery-key"]',
@@ -346,9 +379,11 @@ export class SettingsPageElement extends HTMLElement {
 				),
 			)
 		} else if (action === "recovery") this.downloadRejected()
+		else if (action === "sync-now") this.syncNow()
 		else if (action === "reset")
-			this.save({ editor: editorPreferences(undefined), fontSize: 18 }, () =>
-				this.showCategory(),
+			this.save(
+				{ editor: editorPreferences(undefined), fontSize: defaultFontSize },
+				() => this.showCategory(),
 			)
 		else if (action === "sign-in")
 			this.run?.(
@@ -359,11 +394,15 @@ export class SettingsPageElement extends HTMLElement {
 		else if (action === "sign-out") this.run?.(options.account.logout)
 		else if (action === "backup") options.backup()
 		else if (action === "import") options.importFiles()
-		else if (action === "install")
-			this.run?.(
-				Effect.tryPromise(() => options.install?.() ?? Promise.resolve()),
-			)
-		else if (action === "check-updates") this.checkUpdates(control)
+		else if (action === "install-instructions") this.showInstall()
+		else if (action === "check-updates") this.checkUpdates(true)
+		else if (action === "reload-update") this.applyUpdate()
+		else if (action === "copy-diagnostics") this.copyDiagnostics(control)
+		else if (action === "clear-diagnostics") {
+			this.diagnosticsCleared = performance.now()
+			performance.clearMarks()
+			this.showDiagnostics()
+		}
 	}
 	private save(patch: PreferencePatch, done?: () => void) {
 		let options = this.options
@@ -374,18 +413,147 @@ export class SettingsPageElement extends HTMLElement {
 				.pipe(Effect.tap(() => Effect.sync(() => done?.()))),
 		)
 	}
-	private editName(editing: boolean) {
-		let form = this.querySelector<HTMLFormElement>("[data-name-form]")
-		let row = this.querySelector<HTMLElement>("[data-name-row]")
-		if (!form || !row) return
-		form.hidden = !editing
-		row.hidden = editing
-		let input = form.querySelector<HTMLInputElement>("input")
-		if (editing && input) {
-			input.value = this.options?.preferences.state.current().value.name ?? ""
-			input.focus()
-			input.select()
+	private numberValue(name: NumberSetting) {
+		let value = this.options?.preferences.state.current().value
+		if (!value) return 0
+		return name === "fontSize" ? value.fontSize : value.editor[name]
+	}
+	private saveNumber(name: NumberSetting, number: number) {
+		let limits = numbers[name]
+		let value = Math.max(
+			limits.min,
+			Math.min(limits.max, Math.round(number * 1000) / 1000),
+		)
+		this.showNumber(name, value)
+		if (name === "fontSize") this.save({ fontSize: value })
+		else this.save({ editor: { [name]: value } })
+	}
+	// The stepper shows the clamped value and, away from the default, what
+	// the default is.
+	private showNumber(name: NumberSetting, value = this.numberValue(name)) {
+		let row = this.querySelector<HTMLElement>(`[data-number="${name}"]`)
+		if (!row) return
+		let limits = numbers[name]
+		let input = row.querySelector<HTMLInputElement>("input")
+		if (input) input.value = value.toFixed(limits.decimals)
+		for (let button of row.querySelectorAll<HTMLButtonElement>("[data-step]"))
+			button.disabled =
+				button.dataset.step === "-1" ? value <= limits.min : value >= limits.max
+		let fallback = name === "fontSize" ? defaultFontSize : editorDefault(name)
+		let hint = row.querySelector<HTMLElement>(".row-description")
+		if (hint) {
+			hint.hidden = Math.abs(value - fallback) < 0.001
+			hint.textContent =
+				translate("default:") +
+				" " +
+				fallback.toFixed(limits.decimals) +
+				limits.unit
 		}
+	}
+	private editName() {
+		let options = this.options
+		let dialog = this.dialog()
+		if (!options || !dialog) return
+		let name = options.preferences.state.current().value.name
+		openDialog(
+			dialog,
+			options.report,
+			() => {},
+			translate("Edit name"),
+			html`<div data-name-form>
+				<input
+					name="name"
+					value="${name}"
+					maxlength="50"
+					required
+					autocomplete="name"
+					placeholder="${translate("Your name")}"
+					aria-label="${translate("Your name")}"
+				/>
+			</div>`,
+			form => {
+				let next = String(form.get("name") ?? "").trim()
+				if (!next)
+					return Promise.reject(new Error(translate("Name is required")))
+				return Effect.runPromise(options.preferences.save({ name: next }))
+			},
+		)
+		dialog.querySelector<HTMLInputElement>("[data-name-form] input")?.select()
+	}
+	private toggleKey() {
+		let options = this.options
+		let output = this.querySelector<HTMLTextAreaElement>("[data-recovery-key]")
+		let block = this.querySelector<HTMLElement>("[data-key-block]")
+		let actions = this.querySelector<HTMLElement>("[data-key-actions]")
+		if (!options || !output || !block || !actions) return
+		let showing = output.hidden
+		output.hidden = !showing
+		block.hidden = !showing
+		actions.hidden = showing
+		output.textContent = showing ? Redacted.value(options.account.recovery) : ""
+		let next = this.querySelector<HTMLElement>(
+			showing
+				? '[data-key-block] [data-settings="copy-key"]'
+				: "[data-key-actions] button",
+		)
+		next?.focus()
+	}
+	private copy(text: string, control: HTMLButtonElement) {
+		let label = control.querySelector("span")
+		this.run?.(
+			Effect.tryPromise(() => navigator.clipboard.writeText(text)).pipe(
+				Effect.andThen(
+					Effect.sync(() => {
+						if (label) label.textContent = translate("Copied")
+					}),
+				),
+				Effect.andThen(Effect.sleep("2 seconds")),
+				Effect.ensuring(
+					Effect.sync(() => {
+						if (label) label.textContent = translate("Copy")
+					}),
+				),
+			),
+		)
+	}
+	private syncNow() {
+		let options = this.options
+		if (!options || this.syncing) return
+		this.syncing = true
+		this.syncError = ""
+		this.syncStatus()
+		this.run?.(
+			options.library.refresh.pipe(
+				Effect.timeout(Duration.seconds(10)),
+				Effect.catch(() =>
+					Effect.sync(() => {
+						this.syncError = translate("Sync timeout")
+					}),
+				),
+				Effect.ensuring(
+					Effect.sync(() => {
+						this.syncing = false
+						this.syncStatus()
+					}),
+				),
+				Effect.andThen(
+					Effect.sync(() => (this.syncError ? 5 : 0)).pipe(
+						Effect.flatMap(seconds =>
+							seconds
+								? Effect.sleep(Duration.seconds(seconds)).pipe(
+										Effect.andThen(
+											Effect.sync(() => {
+												this.syncError = ""
+												this.syncStatus()
+											}),
+										),
+									)
+								: Effect.void,
+						),
+					),
+				),
+			),
+		)
 	}
 	private syncStatus() {
 		let options = this.options
@@ -397,18 +565,65 @@ export class SettingsPageElement extends HTMLElement {
 			'[data-preference-action="recovery"]',
 		)
 		if (recovery) recovery.hidden = state.rejected.length === 0
-		let status = this.querySelector("[data-preferences-status]")
-		if (status)
-			status.textContent =
-				state.message ||
-				(state.rejected.length
-					? state.rejected.length + " unsynced changes preserved for recovery"
-					: "") ||
-				(state.pending
-					? "Saved on this device; waiting to sync"
-					: state.status === "saved"
-						? "Synced"
-						: "Settings are saved on this device first")
+		let status = this.querySelector<HTMLElement>("[data-sync-status]")
+		let label = status?.querySelector("[data-preferences-status]")
+		let description = status?.querySelector<HTMLElement>(
+			"[data-sync-description]",
+		)
+		let symbol = status?.querySelector<HTMLElement>("[data-sync-icon]")
+		let button = status?.querySelector<HTMLButtonElement>(
+			'[data-settings="sync-now"]',
+		)
+		if (!status || !label || !description || !symbol || !button) return
+		let online = navigator.onLine
+		let rejected = state.rejected.length
+		let [tone, text, detail, glyph] = state.message
+			? ["error", state.message, "", icon("circle-alert")]
+			: rejected
+				? [
+						"error",
+						rejected +
+							" " +
+							translate("unsynced changes preserved for recovery"),
+						"",
+						icon("circle-alert"),
+					]
+				: !online
+					? [
+							"muted",
+							translate("Offline"),
+							translate(
+								"You're offline. Changes will sync when you reconnect.",
+							),
+							screenIcon("wifi-off"),
+						]
+					: state.pending
+						? [
+								"muted",
+								translate("Saved on this device; waiting to sync"),
+								"",
+								icon("cloud"),
+							]
+						: [
+								"ok",
+								translate("Syncing to cloud"),
+								translate("Your notes are synced to the cloud"),
+								icon("cloud"),
+							]
+		status.dataset.tone = String(tone)
+		label.textContent = String(text)
+		description.textContent = this.syncError || String(detail)
+		description.classList.toggle("error", Boolean(this.syncError))
+		description.hidden = !description.textContent
+		setMarkup(symbol, glyph)
+		button.hidden = !online
+		button.disabled = this.syncing
+		button.classList.toggle("spinning", this.syncing)
+		let buttonLabel = button.querySelector("span")
+		if (buttonLabel)
+			buttonLabel.textContent = translate(
+				this.syncing ? "Syncing..." : "Sync now",
+			)
 	}
 	private downloadRejected() {
 		let rejected = this.options?.preferences.state.current().rejected ?? []
@@ -432,277 +647,595 @@ export class SettingsPageElement extends HTMLElement {
 			),
 		)
 	}
-	private checkUpdates(control: HTMLButtonElement) {
-		let status = this.querySelector("[data-update-status]")
-		control.disabled = true
-		if (status) status.textContent = translate("Checking…")
+	private showInstall() {
+		let options = this.options
+		let dialog = this.dialog()
+		if (!options || !dialog) return
+		let install = options.install
+		openDialog(
+			dialog,
+			options.report,
+			() => {},
+			translate("Install Alkalye"),
+			installMarkup(Boolean(install)),
+		)
+		let button = dialog.querySelector<HTMLButtonElement>("[data-install-app]")
+		if (button && install)
+			button.onclick = () =>
+				this.run?.(
+					Effect.tryPromise(() => install()).pipe(
+						Effect.andThen(Effect.sync(() => dialog.close())),
+					),
+				)
+	}
+	private checkUpdates(manual: boolean) {
+		let panel = this.querySelector<HTMLElement>("[data-app-status]")
+		if (!panel) return
+		let control = panel.querySelector<HTMLButtonElement>(
+			'[data-settings="check-updates"]',
+		)
+		if (manual && control) {
+			control.disabled = true
+			control.classList.add("spinning")
+			let label = control.querySelector("span")
+			if (label) label.textContent = translate("Checking...")
+		}
 		this.run?.(
 			Effect.tryPromise(async () => {
 				let registration = await navigator.serviceWorker?.getRegistration()
-				await registration?.update()
-				return Boolean(registration?.waiting || registration?.installing)
+				if (manual) await registration?.update()
+				return Boolean(registration?.waiting)
 			}).pipe(
+				Effect.catch(() => Effect.succeed(false)),
+				Effect.tap(() => (manual ? Effect.sleep("1500 millis") : Effect.void)),
 				Effect.tap(ready =>
 					Effect.sync(() => {
-						if (status)
-							status.textContent = translate(
-								ready
-									? "A new version is ready; choose Reload below"
-									: "You're using the latest version",
-							)
-					}),
-				),
-				Effect.ensuring(
-					Effect.sync(() => {
-						control.disabled = false
+						let current = this.querySelector<HTMLElement>("[data-app-status]")
+						if (current) setMarkup(current, appStatusMarkup(ready))
 					}),
 				),
 			),
 		)
 	}
+	private applyUpdate() {
+		this.run?.(
+			Effect.tryPromise(async () => {
+				let registration = await navigator.serviceWorker?.getRegistration()
+				let waiting = registration?.waiting
+				if (!waiting) return location.reload()
+				navigator.serviceWorker.addEventListener(
+					"controllerchange",
+					() => location.reload(),
+					{ once: true },
+				)
+				waiting.postMessage("activate")
+			}),
+		)
+	}
+	private diagnostics() {
+		return startupEvents(
+			[
+				...performance.getEntriesByType("navigation"),
+				...performance.getEntriesByType("paint"),
+				...performance.getEntriesByType("mark"),
+			].filter(entry => entry.startTime >= this.diagnosticsCleared),
+		)
+	}
+	private showDiagnostics() {
+		let block = this.querySelector<HTMLElement>("[data-diagnostics]")
+		if (block) setMarkup(block, diagnosticsMarkup(this.diagnostics()))
+	}
+	private copyDiagnostics(control: HTMLButtonElement) {
+		let label = control.querySelector("span")
+		let events = this.diagnostics()
+		let set = (text: string) => {
+			if (label) label.textContent = translate(text)
+		}
+		control.disabled = true
+		set("Preparing report...")
+		this.run?.(
+			Effect.gen(function* () {
+				let storage = yield* Effect.tryPromise(
+					() => navigator.storage?.estimate() ?? Promise.resolve(undefined),
+				).pipe(Effect.catch(() => Effect.succeed(undefined)))
+				let worker = navigator.serviceWorker?.controller
+				let report = startupReport(events, {
+					at: new Date().toISOString(),
+					userAgent: navigator.userAgent,
+					online: navigator.onLine,
+					standalone: matchMedia("(display-mode: standalone)").matches,
+					serviceWorker: worker ? worker.state : "none",
+					...(storage?.usage !== undefined && storage.quota !== undefined
+						? { storage: { usage: storage.usage, quota: storage.quota } }
+						: {}),
+				})
+				let copied = yield* Effect.tryPromise(() =>
+					navigator.clipboard.writeText(report),
+				).pipe(
+					Effect.as(true),
+					Effect.catch(() => Effect.succeed(false)),
+				)
+				set(copied ? "Copied" : "Copy failed")
+				control.disabled = false
+				yield* Effect.sleep("2 seconds")
+				set("Copy report")
+			}),
+		)
+	}
+	private dialog() {
+		return (
+			this.options?.dialog ??
+			document.querySelector<HTMLDialogElement>("dialog[data-dialog]") ??
+			undefined
+		)
+	}
 }
 customElements.define("alkalye-settings", SettingsPageElement)
 
-function generalMarkup(value: AccountPreferences, subject: string) {
+function generalMarkup(value: AccountPreferences) {
 	return html`${section(
 		"Profile",
 		"The name collaborators see on shared documents.",
-		html`<div class="settings-row" data-name-row>
-				<span class="row-label">${translate("Display name")}</span
-				><span class="row-value" data-name>${value.name}</span
-				><button
-					type="button"
-					data-settings="edit-name"
-					aria-label="${translate("Edit name")}"
-				>
-					${icon("pencil")}
-				</button>
-			</div>
-			<form class="settings-row" data-name-form hidden>
-				<input
-					name="name"
-					maxlength="100"
-					required
-					aria-label="${translate("Your name")}"
-				/><button class="primary">${translate("Save")}</button
-				><button type="button" data-settings="cancel-name">
-					${translate("Cancel")}
-				</button>
-			</form>`,
+		panel(
+			html`<div class="settings-row">
+				<div class="row-text">${translate("Display name")}</div>
+				<div class="row-controls">
+					<span class="row-value" data-name>${value.name}</span
+					><button
+						type="button"
+						class="icon-button"
+						data-settings="edit-name"
+						aria-label="${translate("Edit name")}"
+						title="${translate("Edit name")}"
+					>
+						${icon("pencil")}
+					</button>
+				</div>
+			</div>`,
+		),
 	)}${section(
-		"Account & sync",
-		"Documents save on this device first and sync to your account.",
-		html`<div class="settings-row">
-				${icon("cloud")}<span
-					class="row-label"
-					data-preferences-status
-					role="status"
-				></span
-				><button hidden type="button" data-preference-action="recovery">
-					${translate("Download unsynced changes")}
-				</button>
-			</div>
-			<div class="settings-row stacked">
-				<label class="field"
-					>${translate("Account ID")}<input readonly value="${subject}"
-				/></label>
-			</div>
-			<div class="settings-row stacked">
-				<p class="row-title">${translate("Recovery key")}</p>
-				<p class="muted">
-					${translate("Use your recovery key to open this account on another device or in the CLI.")}
-				</p>
-				<button type="button" data-preference-action="show-key">
-					${translate("Show recovery key")}</button
-				><output data-recovery-key hidden></output>
-			</div>
-			<div class="settings-row stacked">
-				<label class="field"
-					>${translate("Restore another account")}<input
+		"Cloud Sync & Backup",
+		"",
+		panel(
+			html`<div class="settings-status" data-sync-status>
+					<div class="status-line">
+						<span class="status-label"
+							><span data-sync-icon></span
+							><span data-preferences-status role="status"></span></span
+						><button type="button" class="outline" data-settings="sync-now">
+							${icon("refresh-cw")}<span>${translate("Sync now")}</span>
+						</button>
+					</div>
+					<p class="status-description" data-sync-description></p>
+				</div>
+				<div class="settings-actions" data-key-actions>
+					<button
+						type="button"
+						class="outline"
+						data-preference-action="show-key"
+					>
+						${translate("Show recovery key")}</button
+					><button
+						type="button"
+						class="ghost"
+						data-settings="sign-out"
+						data-action="sign-out"
+					>
+						${translate("Sign out")}</button
+					><button
+						hidden
+						type="button"
+						class="outline"
+						data-preference-action="recovery"
+					>
+						${translate("Download unsynced changes")}
+					</button>
+				</div>
+				<div data-key-block hidden>
+					<div class="settings-block">
+						<div class="block-label">${translate("Recovery key")}</div>
+						<textarea
+							readonly
+							rows="2"
+							data-recovery-key
+							hidden
+							aria-label="${translate("Recovery key")}"
+						></textarea>
+					</div>
+					<div class="settings-actions">
+						<button type="button" class="outline" data-settings="copy-key">
+							${icon("copy")}<span>${translate("Copy")}</span></button
+						><button
+							type="button"
+							class="ghost"
+							data-preference-action="show-key"
+						>
+							${translate("Hide")}
+						</button>
+					</div>
+				</div>
+				<div class="settings-block">
+					<label class="block-label" for="recovery-key"
+						>${translate("Restore another account")}</label
+					>
+					<p class="block-description">
+						${translate("Use your recovery key to open this account on another device or in the CLI.")}
+					</p>
+					<input
+						id="recovery-key"
 						type="password"
 						name="recovery-key"
 						autocomplete="off"
-				/></label>
-				<button type="button" data-preference-action="restore-account">
-					${translate("Restore account")}
-				</button>
-			</div>
-			<div class="settings-row">
-				<button type="button" data-settings="sign-in" data-action="sign-in">
-					${translate("Sign in to another account")}</button
-				><button type="button" data-settings="sign-out" data-action="sign-out">
-					${translate("Sign out")}
-				</button>
-			</div>`,
+					/>
+				</div>
+				<div class="settings-actions">
+					<button
+						type="button"
+						class="outline"
+						data-preference-action="restore-account"
+					>
+						${translate("Restore account")}</button
+					><button
+						type="button"
+						class="ghost"
+						data-settings="sign-in"
+						data-action="sign-in"
+					>
+						${translate("Sign in to another account")}
+					</button>
+				</div>`,
+		),
 	)}${section(
 		"Appearance",
 		"Theme, code highlighting, and interface language.",
-		html`${row(
-			"Theme",
-			pickerMarkup(
-				"appearance",
-				translate("Theme"),
-				[
-					{ value: "system", label: translate("System") },
-					{ value: "light", label: translate("Light") },
-					{ value: "dark", label: translate("Dark") },
-				],
-				value.appearance,
-			),
-		)}${row(
-			"Syntax theme",
-			pickerMarkup(
-				"syntaxTheme",
-				translate("Syntax theme"),
-				syntaxFamilies.map(family => ({
-					value: family.id,
-					label: family.name,
-				})),
-				value.editor.syntaxTheme,
-			),
-		)}${row(
-			"Language",
-			pickerMarkup(
-				"language",
-				translate("Language"),
-				[
-					{ value: "system", label: translate("System") },
-					{ value: "en", label: "English" },
-					{ value: "de", label: "Deutsch" },
-				],
-				value.language,
-			),
-		)}`,
+		panel(
+			html`${row(
+				"Theme",
+				pickerMarkup(
+					"appearance",
+					translate("Theme"),
+					[
+						{ value: "light", label: translate("Light") },
+						{ value: "dark", label: translate("Dark") },
+						{ value: "system", label: translate("System") },
+					],
+					value.appearance,
+				),
+			)}${row(
+				"Syntax theme",
+				pickerMarkup(
+					"syntaxTheme",
+					translate("Syntax theme"),
+					syntaxFamilies.map(family => ({
+						value: family.id,
+						label: family.name,
+					})),
+					value.editor.syntaxTheme,
+				),
+			)}${row(
+				"Language",
+				pickerMarkup(
+					"language",
+					translate("Language"),
+					[
+						{ value: "system", label: translate("System") },
+						{ value: "en", label: "English" },
+						{ value: "de", label: "Deutsch" },
+					],
+					value.language,
+				),
+			)}`,
+		),
 	)}`
 }
 
 function editorMarkup(value: AccountPreferences) {
-	let numberValue = {
-		lineWidth: value.editor.lineWidth,
-		fontSize: value.fontSize,
-		lineHeight: value.editor.lineHeight,
-		letterSpacing: value.editor.letterSpacing,
-	}
-	return html`${section(
+	return section(
 		"Editor",
 		"How writing feels — spacing, task display, and typing behavior.",
-		html`<h3>${translate("Typography")}</h3>
-			${joinMarkup(
-				numberSettings.map(name =>
-					row(
-						numbers[name].label,
-						html`<span class="number-field"
-							><input
-								type="number"
-								name="${name}"
-								value="${numberValue[name]}"
-								min="${numbers[name].min}"
-								max="${numbers[name].max}"
-								step="${numbers[name].step}"
-								inputmode="decimal"
-								aria-label="${translate(numbers[name].label)}"
-							/>${numbers[name].unit ? html`<small>${translate(numbers[name].unit)}</small>` : ""}</span
-						>`,
+		panel(
+			html`<div class="group-label">${translate("Typography")}</div>
+				${joinMarkup(
+					numberSettings.map(name =>
+						numberRow(
+							name,
+							name === "fontSize" ? value.fontSize : value.editor[name],
+						),
 					),
-				),
-			)}
-			<h3>${translate("Display")}</h3>
-			${joinMarkup(display.map(item => toggle(item.key, item.label, value.editor[item.key] === true)))}
-			${row(
-				"Spellcheck language",
-				pickerMarkup(
-					"spellcheckLanguage",
-					translate("Spellcheck language"),
-					[
-						{ value: "", label: translate("System default") },
-						{ value: "en", label: "English" },
-						{ value: "de", label: "Deutsch" },
-					],
-					value.editor.spellcheckLanguage,
-				),
-			)}
-			${row(
-				"Stats badge",
-				pickerMarkup(
-					"statsUnit",
-					translate("Stats badge"),
-					[
-						{ value: "words", label: translate("Words") },
-						{ value: "sentences", label: translate("Sentences") },
-						{ value: "tasks", label: translate("Tasks") },
-						{ value: "hidden", label: translate("Hide") },
-					],
-					value.editor.statsUnit,
-				),
-			)}
-			<h3>${translate("Authoring behavior")}</h3>
-			${joinMarkup(authoring.map(item => toggle(item.key, item.label, value.editor[item.key] === true)))}
-			<div class="settings-actions">
-				<button type="button" data-preference-action="reset">
-					${translate("Reset to defaults")}
-				</button>
-			</div>`,
-	)}`
+				)}
+				<div class="group-label">${translate("Display")}</div>
+				${joinMarkup(
+					display.map(item =>
+						toggle(item.key, item.label, value.editor[item.key] === true),
+					),
+				)}
+				${row(
+					"Spellcheck language",
+					pickerMarkup(
+						"spellcheckLanguage",
+						translate("Spellcheck language"),
+						[
+							{ value: "", label: translate("System default") },
+							{ value: "en", label: translate("English") },
+							{ value: "de", label: translate("German") },
+						],
+						value.editor.spellcheckLanguage,
+					),
+				)}
+				${row(
+					"Stats badge",
+					pickerMarkup(
+						"statsUnit",
+						translate("Stats badge"),
+						[
+							{ value: "words", label: translate("Words") },
+							{ value: "sentences", label: translate("Sentences") },
+							{ value: "tasks", label: translate("Tasks") },
+							{ value: "hidden", label: translate("Hide") },
+						],
+						value.editor.statsUnit,
+					),
+				)}
+				<div class="group-label">${translate("Authoring behavior")}</div>
+				${joinMarkup(
+					authoring.map(item =>
+						toggle(
+							item.key,
+							html`${translate(item.label)}`,
+							value.editor[item.key] === true,
+						),
+					),
+				)}`,
+		),
+		html`<button
+			type="button"
+			class="ghost muted"
+			data-preference-action="reset"
+		>
+			${translate("Reset to defaults")}
+		</button>`,
+	)
 }
 
-function appMarkup(installable: boolean) {
+function numberRow(name: NumberSetting, value: number) {
+	let limits = numbers[name]
+	let label = translate(limits.label)
+	let fallback = name === "fontSize" ? defaultFontSize : editorDefault(name)
+	let changed = Math.abs(value - fallback) >= 0.001
+	return html`<div class="settings-row" data-number="${name}">
+		<div class="row-text">
+			<label for="setting-${name}">${label}</label>
+			<p class="row-description" ${changed ? "" : "hidden"}>
+				${translate("default:")}
+				${fallback.toFixed(limits.decimals)}${limits.unit}
+			</p>
+		</div>
+		<div class="row-controls">
+			<span class="number-unit">${limits.unit}</span>
+			<div class="stepper">
+				<button
+					type="button"
+					data-step="-1"
+					data-setting="${name}"
+					aria-label="${translate("Decrease")} ${label}"
+					${value <= limits.min ? "disabled" : ""}
+				>
+					${screenIcon("minus")}</button
+				><input
+					id="setting-${name}"
+					type="number"
+					name="${name}"
+					value="${value.toFixed(limits.decimals)}"
+					min="${limits.min}"
+					max="${limits.max}"
+					step="${limits.step}"
+					inputmode="decimal"
+					aria-label="${label}"
+				/><button
+					type="button"
+					data-step="1"
+					data-setting="${name}"
+					aria-label="${translate("Increase")} ${label}"
+					${value >= limits.max ? "disabled" : ""}
+				>
+					${icon("plus")}
+				</button>
+			</div>
+		</div>
+	</div>`
+}
+
+function appMarkup() {
 	let installed = matchMedia("(display-mode: standalone)").matches
-	return html`${section(
-		"Installation",
-		"Install as an app on your device for offline access and better integration.",
-		html`<div class="settings-row">
-			${icon("smartphone")}<span class="row-label"
-				>${translate(installed ? "Installed" : "Not installed")}</span
-			>${
-				installed
-					? ""
-					: installable
-						? html`<button
-								type="button"
-								class="primary"
-								data-settings="install"
-							>
-								${translate("Install")}
-							</button>`
-						: html`<span class="muted"
-								>${translate("Use your browser's Share or Install menu")}</span
-							>`
-			}
-		</div>`,
-	)}${section(
+	return html`${
+		installed
+			? ""
+			: section(
+					"Installation",
+					"",
+					panel(
+						html`<div class="settings-status" data-tone="muted">
+								<div class="status-line">
+									<span class="status-label"
+										>${translate("Not installed")}</span
+									>
+								</div>
+								<p class="status-description">
+									${translate("Install as an app on your device for offline access and better integration")}
+								</p>
+							</div>
+							<div class="settings-actions">
+								<button
+									type="button"
+									class="outline"
+									data-settings="install-instructions"
+								>
+									${translate("Show instructions")}
+								</button>
+							</div>`,
+					),
+				)
+	}${section(
 		"App",
 		"",
-		html`<div class="settings-row">
-				<span class="row-label">${translate("What's new")}</span
-				><a href="/changelog" target="_blank" rel="noopener"
-					>${translate("Changelog")} ↗</a
-				>
-			</div>
-			<div class="settings-row">
-				<span class="row-label" data-update-status
-					>${translate("Latest version")}</span
-				><button type="button" data-settings="check-updates">
-					${translate("Check for updates")}
-				</button>
-			</div>`,
+		html`<div class="settings-panel" data-app-status>
+			${appStatusMarkup(false)}
+		</div>`,
+	)}${section(
+		"Startup diagnostics",
+		"Timing trace for recent app launches. Copy it after a slow startup.",
+		panel(
+			html`<div class="settings-block">
+					<div class="diagnostics" data-diagnostics></div>
+				</div>
+				<div class="settings-actions">
+					<button
+						type="button"
+						class="outline diagnostics-copy"
+						data-settings="copy-diagnostics"
+					>
+						${icon("copy")}<span>${translate("Copy report")}</span></button
+					><button
+						type="button"
+						class="ghost"
+						data-settings="clear-diagnostics"
+					>
+						${icon("trash-2")}<span>${translate("Clear")}</span>
+					</button>
+				</div>`,
+		),
 	)}${section(
 		"Data",
 		"Back up every document with its attachments, drawings, themes and comments, or import Markdown and backups.",
-		html`<div class="settings-row">
-				${icon("download")}<span class="row-label"
-					>${translate("Back up all documents")}</span
-				><button type="button" data-settings="backup">
-					${translate("Download ZIP")}
-				</button>
-			</div>
-			<div class="settings-row">
-				${icon("upload")}<span class="row-label"
-					>${translate("Import documents")}</span
-				><button type="button" data-settings="import">
-					${translate("Choose files")}
+		panel(
+			html`<div class="settings-actions">
+				<button type="button" class="outline" data-settings="backup">
+					${icon("download")}<span
+						>${translate("Back up all documents")}</span
+					></button
+				><button type="button" class="outline" data-settings="import">
+					${icon("upload")}<span>${translate("Import documents")}</span>
 				</button>
 			</div>`,
+		),
 	)}`
+}
+
+function appStatusMarkup(ready: boolean) {
+	let changelog = html`<a
+		class="button outline"
+		href="/changelog"
+		target="_blank"
+		rel="noopener noreferrer"
+		>${translate("What's new")}</a
+	>`
+	return ready
+		? html`<div class="settings-status" data-tone="ok">
+					<div class="status-line">
+						<span class="status-label">${translate("Update available")}</span>
+					</div>
+					<p class="status-description">
+						${translate("A new version is ready to use")}
+					</p>
+				</div>
+				<div class="settings-actions">
+					<button type="button" class="primary" data-settings="reload-update">
+						${icon("refresh-cw")}<span
+							>${translate("Reload to update")}</span
+						></button
+					>${changelog}
+				</div>`
+		: html`<div class="settings-status" data-tone="muted">
+					<div class="status-line">
+						<span class="status-label">${translate("Latest version")}</span>
+					</div>
+					<p class="status-description">
+						${translate("You're using the latest version")}
+					</p>
+				</div>
+				<div class="settings-actions">
+					${changelog}<button
+						type="button"
+						class="outline"
+						data-settings="check-updates"
+					>
+						${icon("refresh-cw")}<span>${translate("Check for updates")}</span>
+					</button>
+				</div>`
+}
+
+function diagnosticsMarkup(events: readonly StartupEvent[]) {
+	let latest = events.at(-1)
+	return latest
+		? html`<div class="diagnostics-line">
+					<span>${latest.event}</span
+					><span class="muted">${latest.elapsedMs} ms</span>
+				</div>
+				<div class="muted">${new Date().toLocaleString()}</div>
+				<div class="muted">${events.length} ${translate("events")}</div>`
+		: html`<span class="muted">${translate("No events captured yet")}</span>`
+}
+
+function installMarkup(installable: boolean) {
+	let mobile = matchMedia("(pointer: coarse)").matches
+	let ios = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+	let android = /Android/i.test(navigator.userAgent)
+	let steps = (title: string, items: string[]) =>
+		html`<p class="muted">${translate(title)}</p>
+			<ol class="install-steps">
+				${joinMarkup(items.map(item => html`<li>${translate(item)}</li>`))}
+			</ol>`
+	return html`<p>
+			${translate(
+				mobile
+					? "Add Alkalye to your homescreen for instant access and the best experience."
+					: "Install Alkalye as an app for quick access and a better experience.",
+			)}
+		</p>
+		<div class="install-instructions">
+			${
+				installable
+					? html`<p class="muted">
+								${translate("Your browser supports direct installation:")}
+							</p>
+							<button type="button" class="primary" data-install-app>
+								${translate("Install App")}
+							</button>`
+					: ios
+						? html`${steps(
+									"To install on iOS, use Safari and follow these steps:",
+									[
+										"Tap the Share button at the bottom of Safari",
+										'Scroll down and tap "Add to Home Screen"',
+										'Tap "Add" in the top right corner',
+									],
+								)}
+								<p class="muted">
+									${translate("Note: This only works in Safari, not other browsers on iOS.")}
+								</p>`
+						: android || mobile
+							? steps("To install, follow these steps:", [
+									"Tap the menu button in your browser",
+									'Select "Add to Home screen" or "Install app"',
+									"Confirm the installation",
+								])
+							: html`<p class="muted">
+										${translate("Install instructions vary by browser:")}
+									</p>
+									<dl class="install-browsers">
+										<dt>Chrome / Edge</dt>
+										<dd>
+											${translate('Look for the install icon in the address bar, or use the menu and select "Install app"')}
+										</dd>
+										<dt>Safari (macOS)</dt>
+										<dd>${translate("Click File > Add to Dock")}</dd>
+										<dt>Firefox</dt>
+										<dd>
+											${translate("Firefox doesn't support PWA installation. Use Chrome or Edge instead.")}
+										</dd>
+									</dl>`
+			}
+		</div>`
 }
 
 function footerMarkup() {
@@ -714,27 +1247,46 @@ function footerMarkup() {
 	</footer>`
 }
 
-function section(title: string, description: string, content: Markup) {
+function section(
+	title: string,
+	description: string,
+	content: Markup,
+	action?: Markup,
+) {
 	return html`<section class="settings-section">
-		<h2>${translate(title)}</h2>
-		${description ? html`<p class="section-description">${translate(description)}</p>` : ""}
-		<div class="settings-panel">${content}</div>
+		<div class="section-heading">
+			<div>
+				<h2>${translate(title)}</h2>
+				${
+					description
+						? html`<p class="section-description">${translate(description)}</p>`
+						: ""
+				}
+			</div>
+			${action ?? ""}
+		</div>
+		${content}
 	</section>`
+}
+function panel(content: Markup) {
+	return html`<div class="settings-panel">${content}</div>`
 }
 function row(label: string, control: Markup) {
 	return html`<div class="settings-row">
-		<span class="row-label">${translate(label)}</span>${control}
+		<div class="row-text">${translate(label)}</div>
+		<div class="row-controls">${control}</div>
 	</div>`
 }
-function toggle(name: string, label: string, checked: boolean) {
+function toggle(name: string, label: Markup, checked: boolean) {
 	return html`<label class="settings-row toggle"
-		><span class="row-label">${translate(label)}</span
-		><input
-			type="checkbox"
-			role="switch"
-			name="${name}"
-			${checked ? "checked" : ""}
-	/></label>`
+		><span class="row-text">${label}</span
+		><span class="row-controls"
+			><input
+				type="checkbox"
+				role="switch"
+				name="${name}"
+				${checked ? "checked" : ""} /></span
+	></label>`
 }
 type NumberSetting = keyof typeof numbers
 let numberSettings: NumberSetting[] = [
@@ -745,6 +1297,9 @@ let numberSettings: NumberSetting[] = [
 ]
 function isNumberSetting(name: string): name is NumberSetting {
 	return numberSettings.some(setting => setting === name)
+}
+function editorDefault(name: Exclude<NumberSetting, "fontSize">) {
+	return editorPreferences(undefined)[name]
 }
 function isCategory(value: string): value is SettingsCategory {
 	return settingsCategories.some(category => category === value)

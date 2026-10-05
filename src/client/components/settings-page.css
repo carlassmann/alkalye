@@ -4,28 +4,27 @@
 	inset: 0;
 	z-index: 30;
 	overflow: auto;
+	padding: calc(48px + env(safe-area-inset-top)) env(safe-area-inset-right)
+		env(safe-area-inset-bottom) env(safe-area-inset-left);
 	background: var(--paper);
 	color: var(--ink);
-	padding-top: calc(48px + env(safe-area-inset-top));
-	padding-bottom: env(safe-area-inset-bottom);
 	font-size: 14px;
 }
-[data-settings-page] .settings-header,
-[data-workspace-settings] .settings-header {
+:is([data-settings-page], [data-workspace-settings]) .settings-header {
 	position: fixed;
 	top: 0;
-	left: 0;
 	right: 0;
+	left: 0;
 	z-index: 1;
-	height: calc(48px + env(safe-area-inset-top));
-	padding-top: env(safe-area-inset-top);
 	display: flex;
 	justify-content: center;
+	height: calc(48px + env(safe-area-inset-top));
+	padding: env(safe-area-inset-top) env(safe-area-inset-right) 0
+		env(safe-area-inset-left);
 	border-bottom: 1px solid var(--line);
 	background: var(--paper);
 }
-[data-settings-page] .settings-header > div,
-[data-workspace-settings] .settings-header > div {
+:is([data-settings-page], [data-workspace-settings]) .settings-header > div {
 	display: flex;
 	align-items: center;
 	gap: 12px;
@@ -33,20 +32,21 @@
 	max-width: 56rem;
 	padding: 0 16px;
 }
-[data-settings-page] .settings-back,
-[data-workspace-settings] .settings-back {
+[data-workspace-settings] .settings-header > div {
+	max-width: 42rem;
+}
+:is([data-settings-page], [data-workspace-settings]) .settings-back {
 	display: grid;
 	place-items: center;
-	width: 32px;
-	height: 32px;
+	width: 36px;
+	height: 36px;
+	border-radius: 6px;
 	color: var(--ink);
 }
-[data-settings-page] .settings-back:hover,
-[data-workspace-settings] .settings-back:hover {
+:is([data-settings-page], [data-workspace-settings]) .settings-back:hover {
 	background: var(--raised);
 }
-[data-settings-page] h1,
-[data-workspace-settings] h1 {
+:is([data-settings-page], [data-workspace-settings]) h1 {
 	margin: 0;
 	font-size: 18px;
 	font-weight: 600;
@@ -54,8 +54,8 @@
 [data-settings-page] .settings-body {
 	display: grid;
 	grid-template-columns: 11rem minmax(0, 1fr);
-	gap: 40px;
 	align-items: start;
+	gap: 40px;
 	max-width: 56rem;
 	margin: 0 auto;
 	padding: 40px 16px;
@@ -73,200 +73,578 @@
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	padding: 6px 12px;
+	height: 32px;
+	padding: 0 12px;
+	border-radius: 6px;
 	color: var(--muted);
+	font-size: 14px;
 	text-decoration: none;
-	font-size: 13px;
 }
 [data-settings-page] .settings-nav a:hover,
 [data-settings-page] .settings-nav a[aria-current="page"] {
 	background: var(--raised);
 	color: var(--ink);
 }
-[data-settings-page] .settings-content,
-[data-workspace-settings] .settings-content {
+:is([data-settings-page], [data-workspace-settings]) .settings-content {
 	display: grid;
 	gap: 40px;
 	min-width: 0;
 }
 [data-workspace-settings] .settings-content {
-	max-width: 44rem;
+	gap: 32px;
+	max-width: 42rem;
 	margin: 0 auto;
-	padding: 40px 16px;
+	padding: 32px 16px;
 }
-[data-workspace-settings] [data-invitation-slot] {
-	padding: 12px 16px;
-}
-[data-workspace-settings] [data-invitations] {
-	padding-bottom: 0;
-	border-bottom: 0;
-}
-[data-workspace-settings] [data-invitations] h3 {
-	display: none;
-}
-.settings-section {
+:is([data-settings-page], [data-workspace-settings]) .settings-section {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
 	gap: 12px;
 	margin: 0;
 }
-.settings-section h2 {
+:is([data-settings-page], [data-workspace-settings]) .section-heading {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: start;
+	gap: 12px;
+}
+:is([data-settings-page], [data-workspace-settings]) .settings-section h2 {
 	margin: 0;
 	font-size: 14px;
 	font-weight: 600;
 }
-.settings-section h3 {
-	margin: 12px 0 4px;
-	font-size: 12px;
-	font-weight: 500;
-	color: var(--muted);
-}
-.settings-section .section-description {
-	margin: -8px 0 0;
+:is([data-settings-page], [data-workspace-settings]) .section-description {
 	max-width: 60ch;
+	margin: 4px 0 0;
 	color: var(--muted);
-	font-size: 13px;
-	line-height: 1.5;
+	font-size: 14px;
+	line-height: 20px;
+	text-wrap: pretty;
 }
-.settings-panel {
+:is([data-settings-page], [data-workspace-settings]) .settings-panel {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
 	border: 1px solid var(--line);
-	background: color-mix(in oklch, var(--raised) 35%, var(--paper));
+	background: color-mix(in oklch, var(--raised) 20%, transparent);
 }
-.settings-panel > h3 {
-	padding: 12px 16px 0;
-	margin: 0;
+:is([data-settings-page], [data-workspace-settings])
+	.settings-panel
+	> :not(:first-child, .group-label, [hidden]) {
+	border-top: 1px solid var(--line);
 }
-.settings-row {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	min-height: 52px;
-	padding: 10px 16px;
-	border-bottom: 1px solid var(--line);
-	margin: 0;
-}
-.settings-row:last-child {
-	border-bottom: 0;
-}
-.settings-row[hidden] {
+:is([data-settings-page], [data-workspace-settings]) .settings-panel [hidden] {
 	display: none;
 }
-.settings-row.stacked {
-	align-items: start;
-	flex-wrap: wrap;
+:is([data-settings-page], [data-workspace-settings]) .group-label {
+	padding: 12px 16px 4px;
+	color: var(--muted);
+	font-size: 12px;
+	font-weight: 500;
 }
-.settings-row.stacked > div {
-	flex: 1;
-	min-width: 0;
+:is([data-settings-page], [data-workspace-settings])
+	.settings-panel
+	> .group-label:not(:first-child) {
+	border-top: 1px solid var(--line);
+}
+:is([data-settings-page], [data-workspace-settings])
+	.group-label
+	+ .settings-row {
+	border-top: 0;
+}
+:is([data-settings-page], [data-workspace-settings]) .settings-row {
 	display: grid;
-	grid-template-columns: minmax(0, 1fr);
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: center;
+	gap: 12px;
+	min-height: 48px;
+	margin: 0;
+	padding: 10px 16px;
+}
+:is([data-settings-page], [data-workspace-settings]) .row-text {
+	min-width: 0;
+}
+:is([data-settings-page], [data-workspace-settings]) .row-description {
+	margin: 2px 0 0;
+	color: var(--muted);
+	font-size: 12px;
+}
+:is([data-settings-page], [data-workspace-settings]) .row-controls {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
 	gap: 8px;
 }
-.settings-row .row-label {
-	flex: 1;
-	min-width: 0;
-}
-.settings-row .row-value {
-	font-weight: 500;
+:is([data-settings-page], [data-workspace-settings]) .row-value {
 	overflow: hidden;
+	font-weight: 500;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
-.settings-row .row-title {
-	margin: 0;
-	font-weight: 500;
+:is([data-settings-page], [data-workspace-settings]) .settings-block {
+	display: grid;
+	gap: 8px;
+	padding: 12px 16px;
 }
-.settings-row .muted,
-.settings-section .muted {
+:is([data-settings-page], [data-workspace-settings]) .block-label {
+	color: var(--muted);
+	font-size: 12px;
+}
+:is([data-settings-page], [data-workspace-settings]) .block-description {
 	margin: 0;
 	color: var(--muted);
 	font-size: 12px;
 	line-height: 1.5;
 }
-.settings-row > svg:first-child {
-	color: var(--muted);
+:is([data-settings-page], [data-workspace-settings]) .settings-block input,
+:is([data-settings-page], [data-workspace-settings]) .settings-block textarea {
+	width: 100%;
+	color: var(--ink);
 }
-.settings-row button,
-.settings-actions button {
+:is([data-settings-page], [data-workspace-settings])
+	textarea[data-recovery-key] {
+	padding: 12px;
+	border: 1px solid var(--line);
+	background: var(--paper);
+	font: 14px/20px var(--mono);
+	overflow-wrap: anywhere;
+	resize: none;
+}
+:is([data-settings-page], [data-workspace-settings]) .settings-status {
+	padding: 12px 16px;
+}
+:is([data-settings-page], [data-workspace-settings]) .status-line {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+:is([data-settings-page], [data-workspace-settings]) .status-label {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+	color: var(--muted);
+	font-weight: 500;
+}
+:is([data-settings-page], [data-workspace-settings]) .status-label > span {
+	display: inline-flex;
+	min-width: 0;
+}
+:is([data-settings-page], [data-workspace-settings])
+	[data-tone="ok"]
+	.status-label {
+	color: var(--brand);
+}
+:is([data-settings-page], [data-workspace-settings])
+	[data-tone="error"]
+	.status-label,
+:is([data-settings-page], [data-workspace-settings]) .status-description.error {
+	color: var(--danger);
+}
+:is([data-settings-page], [data-workspace-settings]) .status-description {
+	max-width: 70ch;
+	margin: 4px 0 0;
+	color: var(--muted);
+	line-height: 20px;
+	text-wrap: pretty;
+}
+:is([data-settings-page], [data-workspace-settings])
+	.status-description[hidden] {
+	display: none;
+}
+:is([data-settings-page], [data-workspace-settings]) .settings-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	padding: 12px 16px;
+}
+:is([data-settings-page], [data-workspace-settings])
+	:is(button.outline, button.ghost, button.primary, button.danger, a.button) {
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
-	border: 1px solid var(--line);
-	padding: 6px 12px;
+	height: 32px;
+	padding: 0 12px;
+	border: 1px solid transparent;
+	border-radius: 6px;
+	color: var(--ink);
 	font-size: 13px;
+	font-weight: 500;
+	text-decoration: none;
+	white-space: nowrap;
 }
-.settings-row button.primary,
-.settings-section button.primary {
-	border-color: var(--brand);
+:is([data-settings-page], [data-workspace-settings])
+	:is(button.outline, a.button.outline) {
+	border-color: var(--line);
+	background: var(--paper);
 }
-.settings-row alkalye-picker {
-	width: min(14rem, 50%);
+:is([data-settings-page], [data-workspace-settings])
+	:is(button.outline, button.ghost, a.button.outline):hover {
+	background: var(--raised);
 }
-.settings-row .field,
-.settings-section .field {
-	display: grid;
-	gap: 6px;
-	width: 100%;
-	margin: 0;
-	font-size: 12px;
+:is([data-settings-page], [data-workspace-settings]) button.ghost.muted {
 	color: var(--muted);
 }
-.settings-row .field input,
-.settings-section .field input {
-	color: var(--ink);
-	font-size: 14px;
+:is([data-settings-page], [data-workspace-settings]) button.primary {
+	background: var(--brand);
+	color: var(--brand-ink);
 }
-.settings-row.toggle {
+:is([data-settings-page], [data-workspace-settings]) button.danger {
+	background: var(--danger);
+	color: #fff;
+}
+:is([data-settings-page], [data-workspace-settings]) button:disabled {
+	opacity: 0.5;
+	pointer-events: none;
+}
+:is([data-settings-page], [data-workspace-settings]) button .icon {
+	width: 14px;
+	height: 14px;
+}
+:is([data-settings-page], [data-workspace-settings]) button.spinning .icon {
+	animation: settings-spin 1s linear infinite;
+}
+@keyframes settings-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	:is([data-settings-page], [data-workspace-settings]) button.spinning .icon {
+		animation: none;
+	}
+}
+:is([data-settings-page], [data-workspace-settings]) .icon-button {
+	display: grid;
+	place-items: center;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border-radius: 6px;
+}
+:is([data-settings-page], [data-workspace-settings]) .icon-button:hover {
+	background: var(--raised);
+}
+:is([data-settings-page], [data-workspace-settings])
+	.settings-row
+	alkalye-picker {
+	width: 10rem;
+}
+:is([data-settings-page], [data-workspace-settings]) .settings-row.toggle {
 	cursor: pointer;
 }
-.settings-row.toggle input {
-	width: 36px;
-	height: 20px;
-	accent-color: var(--brand);
+:is([data-settings-page], [data-workspace-settings]) input[role="switch"] {
+	position: relative;
+	flex-shrink: 0;
+	width: 32px;
+	height: 18px;
+	margin: 0;
+	border-radius: 9px;
+	background: var(--line);
+	appearance: none;
+	cursor: pointer;
+	transition: background-color 150ms ease-out;
 }
-.settings-row .number-field {
-	display: flex;
-	align-items: center;
-	gap: 6px;
+:is([data-settings-page], [data-workspace-settings])
+	input[role="switch"]::before {
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background: var(--paper);
+	box-shadow: 0 1px 2px oklch(0% 0 0 / 20%);
+	content: "";
+	transition: transform 150ms ease-out;
+}
+:is([data-settings-page], [data-workspace-settings])
+	input[role="switch"]:checked {
+	background: var(--brand);
+}
+:is([data-settings-page], [data-workspace-settings])
+	input[role="switch"]:checked::before {
+	transform: translateX(14px);
+}
+:is([data-settings-page], [data-workspace-settings])
+	input[role="switch"]:focus-visible {
+	outline: 2px solid var(--ring);
+	outline-offset: 2px;
+}
+[data-settings-page] .settings-row:has(:checked) .label-strike {
+	text-decoration: line-through;
+}
+[data-settings-page] .settings-row:has(:checked) .label-fade {
+	opacity: 0.5;
+}
+[data-settings-page] .number-unit {
+	width: 24px;
 	color: var(--muted);
-}
-.settings-row .number-field input {
-	width: 6rem;
+	font-size: 12px;
 	text-align: right;
 }
-.settings-row output {
-	display: block;
-	width: 100%;
-	font-family: var(--mono);
-	font-size: 12px;
-	overflow-wrap: anywhere;
-	user-select: all;
-}
-.settings-actions {
+[data-settings-page] .stepper {
 	display: flex;
-	justify-content: end;
-	padding: 12px 16px;
+	align-items: stretch;
+	height: 32px;
+	border: 1px solid var(--line);
 }
-.settings-footer {
+[data-settings-page] .stepper:focus-within {
+	border-color: var(--ring);
+}
+[data-settings-page] .stepper button {
+	display: grid;
+	place-items: center;
+	width: 32px;
+	padding: 0;
+	border-radius: 0;
+}
+[data-settings-page] .stepper button:hover {
+	background: var(--raised);
+}
+[data-settings-page] .stepper button .icon {
+	width: 12px;
+	height: 12px;
+}
+[data-settings-page] .stepper input {
+	width: 56px;
+	padding: 0;
+	border: 0;
+	border-inline: 1px solid var(--line);
+	background: transparent;
+	color: var(--ink);
+	font-variant-numeric: tabular-nums;
+	text-align: center;
+	appearance: textfield;
+}
+[data-settings-page] .stepper input:focus {
+	outline: none;
+}
+[data-settings-page] .stepper input::-webkit-inner-spin-button,
+[data-settings-page] .stepper input::-webkit-outer-spin-button {
+	appearance: none;
+	margin: 0;
+}
+[data-settings-page] .diagnostics {
+	padding: 12px;
+	border: 1px solid var(--line);
+	background: var(--paper);
+	font: 12px/18px var(--mono);
+}
+[data-settings-page] .diagnostics .muted {
+	margin-top: 4px;
+	color: var(--muted);
+	font-variant-numeric: tabular-nums;
+}
+[data-settings-page] .diagnostics-line {
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+}
+[data-settings-page] .diagnostics-copy {
+	min-width: 9rem;
+}
+:is([data-settings-page], [data-workspace-settings]) .settings-footer {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
 	gap: 16px;
-	padding: 16px 0;
+	padding: 24px 12px;
+	color: var(--muted);
 	font-size: 12px;
 }
-.settings-footer a {
-	color: var(--muted);
+:is([data-settings-page], [data-workspace-settings]) .settings-footer a {
+	padding: 4px;
+	color: inherit;
 }
-.visually-hidden {
+:is([data-settings-page], [data-workspace-settings]) .settings-footer a:hover {
+	color: var(--ink);
+}
+:is([data-settings-page], [data-workspace-settings]) .visually-hidden {
 	position: absolute;
 	width: 1px;
 	height: 1px;
 	overflow: hidden;
 	clip-path: inset(50%);
 	white-space: nowrap;
+}
+[data-workspace-settings] .space-section {
+	display: grid;
+	gap: 12px;
+}
+[data-workspace-settings] .space-section h2 {
+	margin: 0;
+	color: var(--muted);
+	font-size: 14px;
+	font-weight: 500;
+}
+[data-workspace-settings] .space-heading {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+[data-workspace-settings] .space-description,
+[data-workspace-settings] .space-loading {
+	margin: 0;
+	color: var(--muted);
+	font-size: 13px;
+	line-height: 1.5;
+}
+[data-workspace-settings] .space-panel {
+	display: grid;
+	gap: 16px;
+	padding: 16px;
+	border-radius: 8px;
+	background: color-mix(in oklch, var(--raised) 30%, transparent);
+}
+[data-workspace-settings] .space-label {
+	display: block;
+	margin-bottom: 4px;
+	color: var(--muted);
+	font-size: 12px;
+}
+[data-workspace-settings] .space-name {
+	width: 100%;
+	color: var(--ink);
+	font-size: 18px;
+	font-weight: 500;
+}
+[data-workspace-settings] .space-name:disabled {
+	opacity: 0.7;
+}
+[data-workspace-settings] .space-members {
+	display: grid;
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+[data-workspace-settings] .space-member,
+[data-workspace-settings] .space-folder {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	min-height: 32px;
+}
+[data-workspace-settings] .member-name {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+}
+[data-workspace-settings] .member-name code {
+	overflow: hidden;
+	font-size: 13px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+[data-workspace-settings] .badge {
+	flex-shrink: 0;
+	padding: 1px 8px;
+	border-radius: 999px;
+	background: var(--raised);
+	font-size: 12px;
+	font-weight: 500;
+}
+[data-workspace-settings] .member-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+[data-workspace-settings] .member-role {
+	width: 56px;
+	color: var(--muted);
+	font-size: 12px;
+	text-align: right;
+}
+[data-workspace-settings] .space-danger {
+	display: grid;
+	gap: 12px;
+	padding: 16px;
+	border: 1px solid oklch(88% 0.06 25);
+	border-radius: 8px;
+	background: oklch(97% 0.02 25);
+}
+:root[data-appearance="dark"] [data-workspace-settings] .space-danger {
+	border-color: oklch(35% 0.1 25);
+	background: oklch(25% 0.05 25 / 30%);
+}
+[data-workspace-settings] .danger-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+[data-workspace-settings] .danger-title {
+	font-size: 14px;
+	font-weight: 500;
+}
+[data-workspace-settings] .danger-description {
+	color: var(--muted);
+	font-size: 12px;
+}
+[data-dialog] .space-invitations:empty {
+	display: none;
+}
+[data-dialog] .space-add-member {
+	display: grid;
+	gap: 8px;
+	margin-top: 16px;
+}
+[data-dialog] .space-add-member label {
+	display: grid;
+	gap: 6px;
+}
+[data-dialog] .space-add-row {
+	display: flex;
+	gap: 8px;
+}
+[data-dialog] .space-add-row alkalye-picker {
+	flex: 1;
+}
+[data-dialog] .space-role-label {
+	display: grid;
+	gap: 6px;
+	margin: 12px 0;
+}
+[data-dialog] button.danger {
+	width: 100%;
+	padding: 8px 12px;
+	background: var(--danger);
+	color: #fff;
+}
+[data-dialog] [data-name-form] input {
+	width: 100%;
+}
+[data-dialog] .install-instructions {
+	display: grid;
+	gap: 12px;
+	font-size: 12px;
+}
+[data-dialog] .install-instructions button {
+	width: 100%;
+}
+[data-dialog] .install-steps {
+	display: grid;
+	gap: 8px;
+	margin: 0;
+	padding-left: 16px;
+	color: var(--muted);
+}
+[data-dialog] .install-browsers {
+	display: grid;
+	gap: 4px;
+	margin: 0;
+}
+[data-dialog] .install-browsers dt {
+	font-weight: 500;
+}
+[data-dialog] .install-browsers dd {
+	margin: 0 0 8px;
+	color: var(--muted);
 }
 @media (max-width: 767px) {
 	[data-settings-page] .settings-body {
@@ -280,7 +658,8 @@
 	[data-settings-page] .settings-picker {
 		display: block;
 	}
-	.settings-row alkalye-picker {
-		width: 55%;
+	:is([data-settings-page], [data-workspace-settings]) .settings-row,
+	:is([data-settings-page], [data-workspace-settings]) .status-line {
+		font-size: 16px;
 	}
 }

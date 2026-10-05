@@ -207,11 +207,16 @@ function presentationView(host: HTMLElement, options: PresentationOptions) {
 			})
 			on("#preview-close", closeMobilePreview)
 			let dialog = part(".prompter-preview-dialog")
-			// The dialog's Escape closes it; it must not also leave the screen.
+			// Escape closes only the preview, not the screen. Closing it here
+			// rather than through the dialog's own cancel keeps the browser's
+			// close request handling for the application's dialogs intact.
 			dialog.addEventListener(
 				"keydown",
 				event => {
-					if (event.key === "Escape") event.stopPropagation()
+					if (event.key !== "Escape") return
+					event.preventDefault()
+					event.stopPropagation()
+					closeMobilePreview()
 				},
 				{ signal },
 			)

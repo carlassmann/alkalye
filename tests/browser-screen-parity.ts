@@ -44,6 +44,8 @@ try {
 	verifyNarrowTeleprompter()
 	verifyPreview()
 	verifyEmptyTeleprompter()
+	verifySettings()
+	verifySpaceSettings()
 } finally {
 	try {
 		browser(session, "close")
@@ -375,4 +377,273 @@ function verifyEmptyTeleprompter() {
 	)
 	browser(session, "click", '.prompter-empty [data-action="edit"]')
 	wait(session, 'document.querySelector("#editor") !== null')
+}
+
+function verifySettings() {
+	visit(session, "/app/settings")
+	wait(
+		session,
+		'document.querySelector("#settings-general [data-sync-status]") !== null',
+	)
+	assert(
+		evaluate(
+			session,
+			`(() => {
+				let titles = [...document.querySelectorAll("#settings-general .settings-section h2")].map(title => title.textContent.trim());
+				let themes = [...document.querySelectorAll('alkalye-picker[name="appearance"] [role=option]')];
+				return titles.join() === "Profile,Cloud Sync & Backup,Appearance" &&
+					themes.map(option => option.dataset.value).join() === "light,dark,system" &&
+					themes.every(option => option.querySelector("svg")) &&
+					document.querySelector("#settings-general input[readonly]") === null
+			})()`,
+		),
+		"General settings keep the original's sections and theme choices",
+	)
+	browser(session, "click", '[data-settings="edit-name"]')
+	wait(session, 'document.querySelector("#dialog").open')
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("#dialog-title").textContent === "Edit name" && document.querySelector("#dialog [data-name-form] input").maxLength === 50',
+		),
+		"Editing the display name opens the original's name dialog",
+	)
+	browser(
+		session,
+		"fill",
+		'#dialog [data-name-form] input[name="name"]',
+		"Parity writer",
+	)
+	browser(session, "press", "Enter")
+	wait(
+		session,
+		'!document.querySelector("#dialog").open && document.querySelector("[data-name]").textContent === "Parity writer"',
+	)
+	assert(true, "The name dialog saves on Enter")
+	browser(session, "click", '[data-preference-action="show-key"]')
+	assert(
+		evaluate(
+			session,
+			'(() => { let key = document.querySelector("[data-recovery-key]"); return !key.hidden && key.value.length === 43 && document.querySelector("[data-key-actions]").hidden && document.querySelector(\'[data-settings="copy-key"]\').checkVisibility() })()',
+		),
+		"The recovery key shows with copy and hide in place of the account actions",
+	)
+	browser(
+		session,
+		"click",
+		'[data-key-block] [data-preference-action="show-key"]',
+	)
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("[data-recovery-key]").hidden && !document.querySelector("[data-key-actions]").hidden',
+		),
+		"Hide returns to the account actions",
+	)
+
+	browser(session, "click", '.settings-nav a[href*="category=editor"]')
+	wait(
+		session,
+		'document.querySelector("#settings-editor [data-number=fontSize]") !== null',
+	)
+	assert(
+		evaluate(
+			session,
+			`(() => {
+				let heading = document.querySelector("#settings-editor .section-heading");
+				let groups = [...document.querySelectorAll("#settings-editor .group-label")].map(label => label.textContent.trim());
+				return heading.querySelector("[data-preference-action=reset]") !== null &&
+					groups.join() === "Typography,Display,Authoring behavior" &&
+					document.querySelectorAll("#settings-editor input[role=switch]").length === 10 &&
+					document.querySelector("[data-number=lineWidth] .number-unit").textContent === "ch" &&
+					document.querySelector("[data-number=fontSize] .row-description").hidden
+			})()`,
+		),
+		"Editor settings use the original's groups, switches, units and header reset",
+	)
+	let size = Number(
+		evaluate(session, 'document.querySelector("[name=fontSize]").value'),
+	)
+	browser(session, "click", '[data-step="1"][data-setting="fontSize"]')
+	wait(
+		session,
+		`document.querySelector("[name=fontSize]").value === "${size + 1}" && document.documentElement.style.getPropertyValue("--editor-size") === "${size + 1}px"`,
+	)
+	assert(
+		evaluate(
+			session,
+			'!document.querySelector("[data-number=fontSize] .row-description").hidden',
+		),
+		"The stepper saves immediately and shows the default once changed",
+	)
+	evaluate(
+		session,
+		'{let input = document.querySelector("[name=lineWidth]"); input.value = "500"; input.dispatchEvent(new Event("change", {bubbles: true}))}',
+	)
+	wait(session, 'document.querySelector("[name=lineWidth]").value === "120"')
+	assert(
+		evaluate(
+			session,
+			'document.querySelector(\'[data-step="1"][data-setting="lineWidth"]\').disabled',
+		),
+		"Typed values clamp to the original's range",
+	)
+	browser(session, "click", '[data-preference-action="reset"]')
+	wait(session, 'document.querySelector("[name=lineWidth]").value === "65"')
+
+	browser(session, "click", '.settings-nav a[href*="category=app"]')
+	wait(
+		session,
+		'document.querySelector("#settings-app [data-app-status] .status-label") !== null',
+	)
+	assert(
+		evaluate(
+			session,
+			`(() => {
+				let titles = [...document.querySelectorAll("#settings-app .settings-section h2")].map(title => title.textContent.trim());
+				return titles.slice(0, 3).join() === "Installation,App,Startup diagnostics" &&
+					document.querySelector("[data-app-status] a[href='/changelog']") !== null &&
+					document.querySelector('[data-settings="check-updates"]') !== null &&
+					document.querySelector("[data-diagnostics]").textContent.trim().length > 0
+			})()`,
+		),
+		"App settings show installation, version and startup diagnostics",
+	)
+	browser(session, "click", '[data-settings="install-instructions"]')
+	wait(session, 'document.querySelector("#dialog").open')
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("#dialog-title").textContent === "Install Alkalye" && document.querySelector("#dialog .install-instructions") !== null',
+		),
+		"Installation instructions open in a dialog",
+	)
+	browser(session, "press", "Escape")
+	wait(session, '!document.querySelector("#dialog").open')
+
+	browser(session, "set", "viewport", "390", "844")
+	assert(
+		evaluate(
+			session,
+			'document.querySelector(".settings-picker").checkVisibility() && !document.querySelector(".settings-nav").checkVisibility()',
+		),
+		"Narrow settings replace the category list with a picker",
+	)
+	browser(session, "set", "viewport", "1280", "800")
+	browser(session, "click", ".settings-back")
+	wait(session, '!document.querySelector("[data-settings-page]")')
+}
+
+function verifySpaceSettings() {
+	browser(session, "click", '[data-action="new-workspace"]')
+	browser(session, "fill", '#dialog input[name="name"]', "Parity team")
+	browser(session, "press", "Enter")
+	wait(session, '!document.querySelector("#dialog").open')
+	browser(session, "click", '[data-action="manage-workspace"]')
+	wait(
+		session,
+		'document.querySelector("[data-workspace-settings] #space-name") !== null',
+	)
+	assert(
+		evaluate(
+			session,
+			`(() => {
+				let page = document.querySelector("[data-workspace-settings]");
+				let owner = page.querySelector(".space-member");
+				return page.querySelector("h1").textContent === "Space Settings" &&
+					page.querySelector("#space-name").value === "Parity team" &&
+					!page.querySelector("#space-name").disabled &&
+					owner.querySelector(".badge").textContent === "You" &&
+					owner.querySelector(".member-role").textContent === "Owner" &&
+					page.querySelector('[data-workspace="invite"]') !== null &&
+					page.querySelector("[data-add-member], [data-invitations]") === null
+			})()`,
+		),
+		"Space settings show the name, members with roles and an Invite action",
+	)
+	browser(session, "click", '[data-workspace="invite"]')
+	wait(
+		session,
+		'document.querySelector("#dialog").open && document.querySelector("#dialog [data-invitations]") !== null',
+	)
+	browser(
+		session,
+		"fill",
+		'#dialog [data-add-member] input[name="member"]',
+		"parity-member-1",
+	)
+	browser(
+		session,
+		"click",
+		'#dialog [data-add-member] [role=option][data-value="reader"]',
+	)
+	browser(session, "click", "#dialog [data-add]")
+	wait(
+		session,
+		'!document.querySelector("#dialog").open && document.querySelector(\'[data-member-row="parity-member-1"] .member-role\')?.textContent === "Reader"',
+	)
+	assert(true, "Invite adds a member with the chosen role")
+	browser(
+		session,
+		"click",
+		'[data-member-row="parity-member-1"] [data-workspace="edit-member"]',
+	)
+	wait(
+		session,
+		'document.querySelector("#dialog-title")?.textContent === "Edit member"',
+	)
+	browser(session, "click", '#dialog [role=option][data-value="writer"]')
+	browser(session, "click", "#submit-dialog")
+	wait(
+		session,
+		'!document.querySelector("#dialog").open && document.querySelector(\'[data-member-row="parity-member-1"] .member-role\')?.textContent === "Writer"',
+	)
+	assert(true, "Editing a member changes their role")
+	browser(
+		session,
+		"click",
+		'[data-member-row="parity-member-1"] [data-workspace="edit-member"]',
+	)
+	wait(
+		session,
+		'document.querySelector("#dialog [data-remove-member]") !== null',
+	)
+	browser(session, "click", "#dialog [data-remove-member]")
+	wait(
+		session,
+		'!document.querySelector("#dialog").open && !document.querySelector("[data-member-row]")',
+	)
+	assert(true, "Editing a member can remove them from the space")
+	browser(session, "fill", "#space-name", "Parity renamed")
+	browser(session, "press", "Enter")
+	wait(
+		session,
+		'document.querySelector("#toast")?.textContent.includes("Workspace renamed")',
+	)
+	assert(true, "The space name saves from its field")
+	wait(
+		session,
+		"document.querySelector('[data-workspace=\"delete\"]') !== null",
+	)
+	browser(session, "click", '[data-workspace="delete"]')
+	wait(
+		session,
+		'document.querySelector("#dialog-title")?.textContent === "Delete space permanently"',
+	)
+	browser(session, "fill", '#dialog input[name="name"]', "Parity renamed")
+	browser(session, "fill", '#dialog input[name="phrase"]', "yes, delete")
+	browser(session, "click", "#submit-dialog")
+	wait(
+		session,
+		'document.querySelector("#dialog").open && document.querySelector("[data-workspace-settings]") !== null',
+	)
+	browser(
+		session,
+		"fill",
+		'#dialog input[name="phrase"]',
+		"yes, delete permanently",
+	)
+	browser(session, "click", "#submit-dialog")
+	wait(session, '!document.querySelector("[data-workspace-settings]")')
+	assert(true, "Deleting a space requires its name and the confirmation phrase")
 }

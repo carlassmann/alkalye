@@ -339,4 +339,157 @@ export let german: Record<string, string> = {
 	"Slide preview": "Folienvorschau",
 	"Hold and drag to draw a laser trail. It fades after you release.":
 		"Auf der Vorschau gedrückt halten und ziehen. Die Laserspur verblasst nach dem Loslassen.",
+	"done tasks": "erledigte Aufgaben",
+	Fade: "Ausblenden",
+	"Auto-sort tasks": "Aufgaben automatisch sortieren",
+	"Settings categories": "Einstellungskategorien",
+	"default:": "Standard:",
+	"Edit name": "Namen bearbeiten",
+	"Name is required": "Name ist erforderlich",
+	Copied: "Kopiert",
+	"Sync timeout": "Synchronisierungs-Timeout",
+	"unsynced changes preserved for recovery":
+		"nicht synchronisierte Änderungen zur Wiederherstellung aufbewahrt",
+	"You're offline. Changes will sync when you reconnect.":
+		"Du bist offline. Änderungen werden synchronisiert, wenn du wieder verbunden bist.",
+	"Saved on this device; waiting to sync":
+		"Auf diesem Gerät gespeichert; wartet auf Synchronisierung",
+	"Syncing to cloud": "Mit Cloud synchronisieren",
+	"Your notes are synced to the cloud":
+		"Deine Notizen werden mit der Cloud synchronisiert",
+	"Checking...": "Überprüfe...",
+	"Syncing...": "Synchronisiere...",
+	"Display name": "Anzeigename",
+	"Sync now": "Jetzt synchronisieren",
+	"Show recovery key": "Wiederherstellungsschlüssel anzeigen",
+	"Download unsynced changes": "Nicht synchronisierte Änderungen herunterladen",
+	Hide: "Verstecken",
+	"Restore another account": "Anderes Konto wiederherstellen",
+	"Use your recovery key to open this account on another device or in the CLI.":
+		"Mit dem Wiederherstellungsschlüssel öffnest du dieses Konto auf einem anderen Gerät oder in der CLI.",
+	"Restore account": "Konto wiederherstellen",
+	"Sign in to another account": "Bei einem anderen Konto anmelden",
+	"Syntax theme": "Syntax-Design",
+	Typography: "Typografie",
+	Display: "Anzeige",
+	"System default": "Systemstandard",
+	German: "Deutsch",
+	"Stats badge": "Statistik-Badge",
+	"Authoring behavior": "Schreibverhalten",
+	"Reset to defaults": "Auf Standard zurücksetzen",
+	Decrease: "Verringern",
+	Increase: "Erhöhen",
+	"Not installed": "Nicht installiert",
+	"Install as an app on your device for offline access and better integration":
+		"Installiere als App auf deinem Gerät für Offline-Zugriff und bessere Integration",
+	"Show instructions": "Anleitung anzeigen",
+	"Copy report": "Bericht kopieren",
+	"Preparing report...": "Bericht wird erstellt...",
+	"Copy failed": "Kopieren fehlgeschlagen",
+	"Back up all documents": "Alle Dokumente sichern",
+	"Import documents": "Dokumente importieren",
+	"What's new": "Was ist neu",
+	"Update available": "Update verfügbar",
+	"A new version is ready to use": "Eine neue Version ist verfügbar",
+	"Reload to update": "Neu laden zum Aktualisieren",
+	"Latest version": "Neueste Version",
+	"You're using the latest version": "Du verwendest die neueste Version",
+	events: "Ereignisse",
+	"No events captured yet": "Noch keine Ereignisse erfasst",
+	"Add Alkalye to your homescreen for instant access and the best experience.":
+		"Füge Alkalye zu deinem Startbildschirm hinzu für sofortigen Zugriff und das beste Erlebnis.",
+	"Install Alkalye as an app for quick access and a better experience.":
+		"Installiere Alkalye als App für schnellen Zugriff und ein besseres Erlebnis.",
+	"Your browser supports direct installation:":
+		"Dein Browser unterstützt direkte Installation:",
+	"Install App": "App installieren",
+	"To install on iOS, use Safari and follow these steps:":
+		"Um auf iOS zu installieren, nutze Safari und folge diesen Schritten:",
+	"Tap the Share button at the bottom of Safari":
+		"Tippe unten in Safari auf die Share-Schaltfläche",
+	'Scroll down and tap "Add to Home Screen"':
+		'Scrolle nach unten und tippe auf "Zum Startbildschirm hinzufügen"',
+	'Tap "Add" in the top right corner':
+		'Tippe "Hinzufügen" in der oberen rechten Ecke',
+	"Note: This only works in Safari, not other browsers on iOS.":
+		"Hinweis: Das funktioniert nur in Safari, nicht in anderen Browsern auf iOS.",
+	"To install, follow these steps:": "Zum Installieren folge diesen Schritten:",
+	"Tap the menu button in your browser":
+		"Tippe in deinem Browser auf die Menü-Schaltfläche",
+	'Select "Add to Home screen" or "Install app"':
+		'Wähle "Zum Startbildschirm hinzufügen" oder "App installieren"',
+	"Confirm the installation": "Bestätige die Installation",
+	"Install instructions vary by browser:":
+		"Installationsanweisungen variieren je nach Browser:",
+	'Look for the install icon in the address bar, or use the menu and select "Install app"':
+		'Suche nach dem Installationssymbol in der Adressleiste oder nutze das Menü und wähle "App installieren"',
+	"Click File > Add to Dock": "Klicke Datei > Zum Dock hinzufügen",
+	"Firefox doesn't support PWA installation. Use Chrome or Edge instead.":
+		"Firefox unterstützt keine PWA-Installation. Nutze stattdessen Chrome oder Edge.",
+	General: "Allgemein",
+	"App & data": "App & Daten",
+	"Line width": "Zeilenbreite",
+	"Font size": "Schriftgröße",
+	"Letter spacing": "Buchstabenabstand",
+	"Smart bracket and quote pairs":
+		"Intelligente Klammer- und Anführungszeichenpaare",
+	"Wrap selections in Markdown markers":
+		"Auswahl mit Markdown-Markierungen umschließen",
+	"Use Tab to indent Markdown blocks": "Markdown-Blöcke mit Tab einrücken",
+	"Convert rich text and URLs on paste":
+		"Rich Text und URLs beim Einfügen umwandeln",
+	"Slash, link, asset, and language suggestions":
+		"Vorschläge für Slash, Links, Medien und Sprachen",
+	Profile: "Profil",
+	"The name collaborators see on shared documents.":
+		"Der Name, den Mitarbeitende an geteilten Dokumenten sehen.",
+	"Theme, code highlighting, and interface language.":
+		"Design, Code-Hervorhebung und Sprache der Oberfläche.",
+	"How writing feels — spacing, task display, and typing behavior.":
+		"Wie sich das Schreiben anfühlt — Abstände, Aufgabenanzeige und Tippverhalten.",
+	"Cloud Sync & Backup": "Cloud-Synchronisierung & Sicherung",
+	Installation: "Installation",
+	"Startup diagnostics": "Startdiagnose",
+	"Timing trace for recent app launches. Copy it after a slow startup.":
+		"Zeitprotokoll der letzten App-Starts. Kopiere es nach einem langsamen Start.",
+	Data: "Daten",
+	"Back up every document with its attachments, drawings, themes and comments, or import Markdown and backups.":
+		"Sichere jedes Dokument mit Anhängen, Zeichnungen, Designs und Kommentaren, oder importiere Markdown und Sicherungen.",
+	"Space Settings": "Bereichseinstellungen",
+	"Add by account ID": "Per Konto-ID hinzufügen",
+	Add: "Hinzufügen",
+	"Edit member": "Mitglied bearbeiten",
+	"Change permissions or remove": "Ändere Berechtigungen oder entferne",
+	"from this space.": "aus diesem Bereich.",
+	"Remove from space": "Aus Bereich entfernen",
+	"You will lose access to": "Du verlierst den Zugriff auf",
+	"and all its documents. You'll need a new invite to rejoin.":
+		"und alle seine Dokumente. Du benötigst eine neue Einladung, um beizutreten.",
+	"yes, delete permanently": "ja, dauerhaft löschen",
+	"Delete space permanently": "Bereich dauerhaft löschen",
+	"This action is irreversible. All documents in this space will be permanently deleted and cannot be recovered.":
+		"Diese Aktion kann nicht rückgängig gemacht werden. Alle Dokumente in diesem Bereich werden dauerhaft gelöscht und können nicht wiederhergestellt werden.",
+	"Type the space name to confirm:":
+		"Gib den Bereichsnamen ein, um zu bestätigen:",
+	"to confirm:": "ein, um zu bestätigen:",
+	"The confirmation does not match": "Die Bestätigung stimmt nicht überein",
+	"Remove this folder from Alkalye? Its files stay on disk.":
+		"Diesen Ordner aus Alkalye entfernen? Die Dateien bleiben auf dem Datenträger.",
+	"Remove from Alkalye": "Aus Alkalye entfernen",
+	"Loading space...": "Bereich wird geladen...",
+	"Space name": "Name des Bereichs",
+	Members: "Mitglieder",
+	"Danger Zone": "Gefahrenzone",
+	"Permanently delete this space and all its documents":
+		"Lösche diesen Bereich und alle seine Dokumente dauerhaft",
+	"Remove yourself from this space": "Entferne dich selbst aus diesem Bereich",
+	Folder: "Ordner",
+	"Files are read from and saved to this folder on this device. They are not synchronized to your account.":
+		"Dateien werden auf diesem Gerät aus diesem Ordner gelesen und dort gespeichert. Sie werden nicht mit deinem Konto synchronisiert.",
+	documents: "Dokumente",
+	"Read the folder again": "Ordner erneut lesen",
+	Refresh: "Aktualisieren",
+	"Stop showing this folder in Alkalye":
+		"Diesen Ordner nicht mehr in Alkalye anzeigen",
+	Owner: "Eigentümer",
 }
