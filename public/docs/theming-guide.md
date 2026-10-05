@@ -2,9 +2,15 @@
 
 A theme is a Markdown file containing CSS, optional HTML wrappers, and embedded assets. Write explanations alongside the code. Import or export a `.theme.md` file to carry the complete source between accounts.
 
+## Theme library
+
+**Settings › Editor › Themes** keeps your account's themes. **New custom theme** starts one in the workbench; **Upload theme** imports a `.theme.md` file or a ZIP theme. Each theme can be edited, exported as Markdown or deleted. Under **Default themes**, choose the theme that previews and slideshows use when a document names none.
+
+A document names a theme in frontmatter with `theme: Paper` (matched by name, ignoring case) or `theme-id`, which the document's **Theme** dialog writes. `theme: light` or `theme: dark` only sets the appearance and keeps the default theme. A named theme that is missing, or a preset the theme lacks, shows a warning above the preview.
+
 ## Workbench
 
-Open **Theme** in the document tools, choose **New custom theme**, and edit its source. **Open workbench** edits an existing theme. Changes save locally and affect documents using that theme.
+Open **Theme** in the document tools, choose **New custom theme**, and edit its source. **Open workbench** edits an existing theme, including library themes, which preview sample content. Changes save locally and affect documents using that theme.
 
 Preview the current document, sample content, or another document. Switch between Document and Slideshow, Light and Dark, and source/preview/split layouts. The Split slider changes pane width. Previous and Next browse sample slides. These controls change the preview independently of the application's appearance.
 
@@ -53,6 +59,8 @@ System fonts keep this theme available offline.
 ````
 
 ## Presets
+
+Metadata may also give an `author` and a `type`: `preview`, `slideshow` or `both` (the default), which decides where Settings offers the theme as a default.
 
 Presets pair colors and fonts with a light or dark appearance. Select one in the document's Theme dialog, or set `preset: Paper` in frontmatter. Automatic selection follows appearance.
 

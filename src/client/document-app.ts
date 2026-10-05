@@ -35,6 +35,7 @@ import {
 import type { DocumentRecord } from "../shared/model"
 import { BrowserPreferences } from "./browser-preferences"
 import { SettingsPageElement } from "./components/settings-page"
+import { openLibraryWorkbench } from "./components/settings-themes"
 import { WorkspaceSettingsElement } from "./components/workspace-settings"
 import { BrowserAccount } from "./browser-account"
 import { DocumentLive } from "./document-live"
@@ -101,6 +102,8 @@ import * as HttpClientResponse from "effect/http/HttpClientResponse"
 import type { IconName } from "./icons"
 import { BrowserStorage } from "./storage"
 import { shortcutAction } from "./shortcuts"
+import { ThemeLibrary } from "./theme-library"
+import { libraryThemes, resolveTheme } from "../shared/theme-library"
 
 type Mode = "edit" | "preview" | "slideshow" | "teleprompter" | "history"
 // Chromium's install prompt, which the standard DOM types do not describe.
@@ -132,8 +135,9 @@ let live = DocumentLive.layer.pipe(Layer.provideMerge(account))
 let folders = LocalDirectories.layer.pipe(Layer.provideMerge(live))
 let library = BrowserLibrary.layer.pipe(Layer.provideMerge(folders))
 let preferences = BrowserPreferences.layer.pipe(Layer.provideMerge(library))
+let themes = ThemeLibrary.layer.pipe(Layer.provideMerge(preferences))
 let application = Layer.effectDiscard(mountApplication()).pipe(
-	Layer.provide(preferences),
+	Layer.provide(themes),
 	Layer.provide(FetchHttpClient.layer),
 	Layer.provide(webCryptoLayer),
 )
@@ -174,6 +178,7 @@ function mountApplication() {
 		let random = yield* Crypto.Crypto
 		let library = yield* BrowserLibrary
 		let preferences = yield* BrowserPreferences
+		let themeLibrary = yield* ThemeLibrary
 		let account = yield* BrowserAccount
 		let storage = yield* BrowserStorage
 		let parent = yield* Scope.Scope
@@ -621,6 +626,10 @@ function mountApplication() {
 			Stream.runForEach(() => Effect.sync(refreshSafely)),
 			Effect.forkScoped({ startImmediately: true }),
 		)
+		yield* themeLibrary.state.changes.pipe(
+			Stream.runForEach(() => Effect.sync(refreshSafely)),
+			Effect.forkScoped({ startImmediately: true }),
+		)
 		yield* library.live.presence.changes.pipe(
 			Stream.runForEach(() =>
 				Effect.sync(() => {
@@ -896,6 +905,7 @@ function mountApplication() {
 						preferences,
 						account,
 						library,
+						themes: themeLibrary,
 						prepareRestore: selection?.opened.session.flush ?? Effect.void,
 						choose: (category: SettingsCategory) =>
 							router.go(
@@ -1276,7 +1286,11 @@ function mountApplication() {
 			let current = currentDocument()
 			return library.state
 				.current()
-				.library.documents.filter(doc => doc.deleted === showTrash)
+				.library.documents.filter(
+					doc =>
+						doc.deleted === showTrash &&
+						doc.document !== preferences.state.current().value.themeLibrary,
+				)
 				.map(doc => {
 					if (doc.document === current?.id)
 						return {
@@ -1904,17 +1918,29 @@ function mountApplication() {
 		function rendering(doc: DocumentRecord) {
 			let header = frontmatter(doc.content).values
 			let requested = header["theme-id"] || header.theme || ""
-			let theme = selection?.opened.session.replica
-				.records("theme")
-				.find(
-					theme => theme.id === requested || theme.fields.name === requested,
-				)
+			let replica = selection?.opened.session.replica
+			let editor = preferences.state.current().value.editor
+			let appearance =
+				requested === "light" || requested === "dark"
+					? requested
+					: document.documentElement.dataset.appearance
+			let theme = resolveTheme({
+				header,
+				document: libraryThemes(
+					replica?.records("theme") ?? [],
+					id => replica?.text(id) ?? "",
+				),
+				library: themeLibrary.state.current().themes,
+				fallback:
+					mode === "slideshow" || mode === "teleprompter"
+						? editor.slideshowTheme
+						: editor.previewTheme,
+				...(appearance ? { appearance } : {}),
+			})
 			return {
-				theme: theme ? selection?.opened.session.replica.text(theme.id) : "",
-				appearance:
-					requested === "light" || requested === "dark"
-						? requested
-						: document.documentElement.dataset.appearance,
+				theme: theme.source,
+				...(theme.warning ? { warning: theme.warning } : {}),
+				appearance,
 				size: header.size,
 				preset: header.preset,
 				syntaxTheme:
@@ -2521,6 +2547,7 @@ function mountApplication() {
 					dialogOwner = selected
 					openDocumentThemePicker({
 						document: selected.document,
+						library: themeLibrary.state.current().themes,
 						session: selected.opened.session,
 						dialog,
 						writable: () => selection === selected && writable(),
@@ -2528,7 +2555,12 @@ function mountApplication() {
 						run: task => selected.tasks.run(task),
 						report,
 						changed: refreshSafely,
-						workbench: id => launch(openThemeWorkbench(selected, id)),
+						workbench: id =>
+							themeLibrary.state.current().themes.some(theme => theme.id === id)
+								? launch(
+										openLibraryWorkbench(themeLibrary, id, { dialog, report }),
+									)
+								: launch(openThemeWorkbench(selected, id)),
 					})
 					return
 				}

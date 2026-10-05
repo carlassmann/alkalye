@@ -5,14 +5,29 @@ export interface ThemePreset {
 	appearance: "light" | "dark"
 	variables: Record<string, string>
 }
+// Which views a theme styles, as the original's theme `type` declared.
+export type ThemeKind = "preview" | "slideshow" | "both"
 export interface ThemeMetadata {
 	name: string
+	author?: string
+	type?: ThemeKind
 	presets: ThemePreset[]
 }
 export function themeMetadata(value: unknown): ThemeMetadata {
 	let metadata = object(value)
+	if (
+		metadata.type !== undefined &&
+		metadata.type !== "preview" &&
+		metadata.type !== "slideshow" &&
+		metadata.type !== "both"
+	)
+		throw new Error("A theme type is preview, slideshow or both")
 	return {
 		name: typeof metadata.name === "string" ? metadata.name : "",
+		...(typeof metadata.author === "string" && metadata.author.trim()
+			? { author: metadata.author.trim() }
+			: {}),
+		...(metadata.type ? { type: metadata.type } : {}),
 		presets:
 			metadata.presets === undefined
 				? []

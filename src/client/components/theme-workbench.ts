@@ -1,3 +1,4 @@
+import { themeName, withThemeName } from "../../shared/theme-source"
 import * as Effect from "effect/Effect"
 import * as Fiber from "effect/Fiber"
 import * as Stream from "effect/Stream"
@@ -18,10 +19,12 @@ interface ThemeOptions {
 			build: (staged: Replica) => (Operation | null)[],
 		): Effect.Effect<unknown, unknown>
 	}
+	onDispose?(): void
 	writable(): boolean
 	run(task: Effect.Effect<unknown, unknown>): Promise<unknown>
 	report(error: unknown): void
-	content: string
+	// The open document; the account's library themes preview sample content.
+	content?: string
 	dialog: HTMLDialogElement
 	showDialog(title: string, body: string | Markup): void
 	download(filename: string, content: string | Blob, type: string): void
@@ -59,7 +62,8 @@ A second column with a different thought.
 These notes stay with the speaker.`
 export function openThemeWorkbench(id: string, options: ThemeOptions) {
 	let { session, dialog, showDialog } = options
-	let documents = session.replica.documents("")
+	let current = options.content !== undefined
+	let documents = current ? session.replica.documents("") : []
 	showDialog(
 		"Theme workbench",
 		html`<alkalye-theme-workbench data-theme-workbench>
@@ -67,18 +71,20 @@ export function openThemeWorkbench(id: string, options: ThemeOptions) {
 				<label
 					>Name<input
 						id="theme-name"
-						value="${session.replica.fields(id).name ?? "Custom theme"}"
+						value="${themeName(session.replica.text(id), session.replica.fields(id).name ?? "Custom theme")}"
 				/></label>
 				<label
 					>Preview${pickerMarkup(
 						"theme-target",
 						"Preview",
 						[
-							{ value: "current", label: "Current document" },
+							...(current
+								? [{ value: "current", label: "Current document" }]
+								: []),
 							{ value: "sample", label: "Sample content" },
 							...documents.map(doc => ({ value: doc.id, label: doc.title })),
 						],
-						"current",
+						current ? "current" : "sample",
 					)}</label
 				>
 				<label
@@ -161,6 +167,9 @@ export class ThemeWorkbenchElement extends HTMLElement {
 		this.lifetime = Effect.runFork(
 			Effect.scoped(
 				Effect.gen(function* () {
+					yield* Effect.addFinalizer(() =>
+						Effect.sync(() => configuration.options.onDispose?.()),
+					)
 					let view = yield* Effect.acquireRelease(
 						Effect.sync(() =>
 							createThemeWorkbench(configuration.id, configuration.options),
@@ -256,7 +265,7 @@ function createThemeWorkbench(id: string, options: ThemeOptions) {
 		return target.value === "sample"
 			? sample
 			: target.value === "current"
-				? options.content
+				? (options.content ?? sample)
 				: session.replica.text(target.value)
 	}
 	function preview() {
@@ -294,7 +303,11 @@ function createThemeWorkbench(id: string, options: ThemeOptions) {
 	}
 	name.onchange = () => {
 		let value = name.value
-		write("Rename theme", staged => [staged.set(id, "name", value)])
+		write("Rename theme", staged => {
+			let updated = withThemeName(staged.text(id), value)
+			editor.value = updated
+			return [staged.edit(id, updated), staged.set(id, "name", value)]
+		})
 	}
 
 	for (let control of [mode, target, appearance]) control.onchange = preview

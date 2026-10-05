@@ -159,6 +159,7 @@ function makeLibrary() {
 				source: string,
 				workspace = "personal-" + account.subject,
 				identity?: string,
+				creationActor?: string,
 			) => {
 				if (isLocalWorkspace(workspace)) return createFile(source, workspace)
 				let prepared = Ref.makeUnsafe<LocalDocumentCreation | undefined>(
@@ -180,12 +181,20 @@ function makeLibrary() {
 								}),
 							)
 						let document = identity ?? (yield* randomness.randomUUIDv4)
-						let actor = account.subject + "-" + (yield* randomness.randomUUIDv4)
+						let actor =
+							creationActor ??
+							account.subject + "-" + (yield* randomness.randomUUIDv4)
 						let action = yield* buildAction(
 							new Replica(actor),
 							document,
 							"Create document",
-							staged => newDocument(staged, document, "Untitled", source),
+							staged =>
+								newDocument(staged, document, "Untitled", source).map(
+									operation =>
+										creationActor && operation
+											? { ...operation, time: 0 }
+											: operation,
+								),
 						)
 						intent = {
 							workspace,

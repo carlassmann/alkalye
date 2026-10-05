@@ -1,4 +1,5 @@
 import { compileTheme, frontmatter } from "../../shared/markdown"
+import { libraryThemes } from "../../shared/theme-library"
 import { html } from "../language"
 import { PickerElement, pickerMarkup } from "./menu"
 import type { MenuChoice } from "./menu"
@@ -11,6 +12,8 @@ import { openDialog } from "./dialog"
 
 interface DocumentThemeOptions {
 	document: string
+	// The account's theme library, offered beside the document's own themes.
+	library?: readonly { id: string; name: string; source: string }[]
 	session: Context.Service.Shape<typeof DocumentSession>
 	dialog: HTMLDialogElement
 	writable(): boolean
@@ -23,11 +26,19 @@ interface DocumentThemeOptions {
 
 export function openDocumentThemePicker(options: DocumentThemeOptions) {
 	let { session, document, dialog } = options
-	let themes = session.replica
-		.records("theme")
-		.map(theme => ({ ...theme, source: session.replica.text(theme.id) }))
+	let themes = [
+		...libraryThemes(session.replica.records("theme"), id =>
+			session.replica.text(id),
+		),
+		...(options.library ?? []),
+	]
 	let header = frontmatter(session.replica.text(document)).values
-	let selected = header["theme-id"] || header.theme || ""
+	let requested = header["theme-id"] || header.theme || ""
+	let selected =
+		themes.find(theme => theme.id === requested)?.id ??
+		themes.find(theme => theme.name.toLowerCase() === requested.toLowerCase())
+			?.id ??
+		requested
 	openDialog(
 		dialog,
 		options.report,
@@ -42,7 +53,7 @@ export function openDocumentThemePicker(options: DocumentThemeOptions) {
 						{ value: "", label: "Alkalye default" },
 						...themes.map(theme => ({
 							value: theme.id,
-							label: theme.fields.name || "Custom theme",
+							label: theme.name,
 						})),
 					],
 					selected,

@@ -3,6 +3,7 @@ import { resolvePreset } from "../../shared/themes"
 import { setMarkup } from "../dom"
 import { html, joinMarkup, localizeMarkup, rawMarkup } from "../language"
 import { readVideoDuration } from "../video-duration"
+import { screenIcon } from "./screen-icons"
 
 import {
 	compileTheme,
@@ -22,6 +23,8 @@ export interface DocumentOptions {
 	assets?: Map<string, string>
 	mutedAssets?: string[]
 	resolve?: (id: string) => string
+	// A missing theme or preset, shown above the content as in the original.
+	warning?: string
 }
 let previousRender = new WeakMap<
 	HTMLElement,
@@ -66,6 +69,7 @@ export function renderDocument(
 		options.preset,
 		options.syntaxTheme,
 		options.slideNumber,
+		options.warning,
 		[...source.matchAll(/\[\[([^\]]+)\]\]/g)].map(match =>
 			options.resolve?.(match[1] ?? ""),
 		),
@@ -184,7 +188,20 @@ export function renderDocument(
 			link.textContent
 	for (let number of wrapper.querySelectorAll("[data-slide-number]"))
 		number.textContent = String(options.slideNumber ?? 1)
-	root.replaceChildren(stylesheet, style, wrapper)
+	let warning = document.createElement("div")
+	if (options.warning) {
+		warning.className = "theme-warning"
+		warning.setAttribute("role", "status")
+		setMarkup(warning, html`${screenIcon("triangle-alert")}<span></span>`)
+		let text = warning.querySelector("span")
+		if (text) text.textContent = options.warning
+	}
+	root.replaceChildren(
+		stylesheet,
+		style,
+		...(options.warning ? [warning] : []),
+		wrapper,
+	)
 	previousRender.set(host, { source, settings, assets })
 	if (options.mode === "slideshow") {
 		stylesheet.onload = () => fitSlide(host, options.size)

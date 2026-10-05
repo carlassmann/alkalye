@@ -33,6 +33,8 @@ export let AccountPreferencesSchema = Schema.Struct({
 	appearance: Schema.Literals(["light", "dark", "system"]),
 	language: Schema.Literals(["en", "de", "system"]),
 	fontSize: Schema.Finite.check(Schema.isBetween({ minimum: 12, maximum: 36 })),
+	// The personal document holding the account's theme library.
+	themeLibrary: Schema.String.check(Schema.isPattern(/^(?:[\w:.-]{1,200})?$/)),
 	editor: EditorPreferencesSchema,
 })
 export let PreferencePatchSchema = AccountPreferencesSchema.mapFields(
@@ -146,6 +148,11 @@ export function accountPreferences(value: unknown): AccountPreferences {
 			typeof source.fontSize === "number" && Number.isFinite(source.fontSize)
 				? Math.max(12, Math.min(36, source.fontSize))
 				: 18,
+		themeLibrary:
+			typeof source.themeLibrary === "string" &&
+			/^[\w:.-]{1,200}$/.test(source.themeLibrary)
+				? source.themeLibrary
+				: "",
 		editor: editorPreferences(source.editor),
 	}
 }

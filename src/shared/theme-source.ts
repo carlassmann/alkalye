@@ -1,0 +1,40 @@
+import * as Schema from "effect/Schema"
+import { compileTheme } from "./markdown"
+
+let metadataBlock =
+	/^(`{3,}|~{3,})json theme metadata[^\S\r\n]*\r?\n([\s\S]*?)^\1[^\S\r\n]*(?=\r?\n|$)/m
+let metadataJson = Schema.fromJsonString(
+	Schema.Record(Schema.String, Schema.Unknown),
+)
+
+export function themeName(source: string, fallback = "Custom theme") {
+	try {
+		return compileTheme(source).metadata.name.trim() || fallback
+	} catch {
+		return fallback
+	}
+}
+
+export function withThemeName(source: string, name: string) {
+	let block = metadataBlock.exec(source)
+	if (!block)
+		return (
+			source.trimEnd() +
+			"\n\n```json theme metadata\n" +
+			JSON.stringify({ name }, null, 2) +
+			"\n```\n"
+		)
+	let metadata = Schema.decodeUnknownSync(metadataJson)(block[2] ?? "{}")
+	let fence = block[1] ?? "```"
+	let updated =
+		fence +
+		"json theme metadata\n" +
+		JSON.stringify({ ...metadata, name }, null, 2) +
+		"\n" +
+		fence
+	return (
+		source.slice(0, block.index) +
+		updated +
+		source.slice(block.index + block[0].length)
+	)
+}

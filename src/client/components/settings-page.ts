@@ -22,6 +22,7 @@ import { syntaxFamilies } from "../../shared/syntax"
 import type { BrowserAccount } from "../browser-account"
 import type { BrowserLibrary } from "../browser-library"
 import type { BrowserPreferences } from "../browser-preferences"
+import type { ThemeLibrary } from "../theme-library"
 import { setMarkup } from "../dom"
 import { icon } from "../icons"
 import type { IconName } from "../icons"
@@ -31,6 +32,7 @@ import { AccountAgentsElement } from "./account-agents"
 import { openDialog } from "./dialog"
 import { PickerElement, pickerMarkup } from "./menu"
 import { screenIcon } from "./screen-icons"
+import { SettingsThemesElement } from "./settings-themes"
 
 export interface SettingsPageOptions {
 	readonly category: SettingsCategory
@@ -40,6 +42,7 @@ export interface SettingsPageOptions {
 	readonly preferences: Context.Service.Shape<typeof BrowserPreferences>
 	readonly account: Context.Service.Shape<typeof BrowserAccount>
 	readonly library: Context.Service.Shape<typeof BrowserLibrary>
+	readonly themes: Context.Service.Shape<typeof ThemeLibrary>
 	readonly prepareRestore: Effect.Effect<unknown, unknown>
 	readonly choose: (category: SettingsCategory) => void
 	readonly backup: () => void
@@ -273,7 +276,8 @@ export class SettingsPageElement extends HTMLElement {
 			options.category === "general"
 				? generalMarkup(value, options.account.subject)
 				: options.category === "editor"
-					? editorMarkup(value)
+					? html`${editorMarkup(value)}<alkalye-settings-themes
+							></alkalye-settings-themes>`
 					: options.category === "connections"
 						? html`<alkalye-account-agents
 								data-account-agents
@@ -295,6 +299,14 @@ export class SettingsPageElement extends HTMLElement {
 		if (announcement)
 			announcement.textContent = translate(categories[options.category].label)
 		this.scrollTop = 0
+		let themes = content.querySelector("alkalye-settings-themes")
+		if (themes instanceof SettingsThemesElement)
+			themes.configure({
+				themes: options.themes,
+				preferences: options.preferences,
+				dialog: () => this.dialog(),
+				report: options.report,
+			})
 		let agents = content.querySelector("alkalye-account-agents")
 		if (agents instanceof AccountAgentsElement)
 			agents.configure({
@@ -323,7 +335,7 @@ export class SettingsPageElement extends HTMLElement {
 			target instanceof HTMLInputElement
 				? target.name
 				: (target.getAttribute("name") ?? "")
-		if (target.closest("[data-account-agents]")) return
+		if (target.closest("[data-account-agents], [data-settings-themes]")) return
 		if (name === "recovery-key") return
 		let value =
 			target instanceof HTMLInputElement && target.type === "checkbox"
@@ -380,12 +392,24 @@ export class SettingsPageElement extends HTMLElement {
 			)
 		} else if (action === "recovery") this.downloadRejected()
 		else if (action === "sync-now") this.syncNow()
-		else if (action === "reset")
+		else if (action === "reset") {
+			// As in the original, resetting the editor keeps the syntax and
+			// default themes, which live in their own sections.
+			let { syntaxTheme, previewTheme, slideshowTheme } =
+				options.preferences.state.current().value.editor
 			this.save(
-				{ editor: editorPreferences(undefined), fontSize: defaultFontSize },
+				{
+					editor: {
+						...editorPreferences(undefined),
+						syntaxTheme,
+						previewTheme,
+						slideshowTheme,
+					},
+					fontSize: defaultFontSize,
+				},
 				() => this.showCategory(),
 			)
-		else if (action === "sign-in")
+		} else if (action === "sign-in")
 			this.run?.(
 				options.account.switchAccount.pipe(
 					Effect.andThen(options.library.refresh),
