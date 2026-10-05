@@ -34,7 +34,7 @@ export class TeleprompterElement extends HTMLElement {
 			for (let image of template.content.querySelectorAll("img"))
 				image.replaceWith(imageLabel(image))
 			this.replaceChildren(template.content)
-			this.paint()
+			this.current = undefined
 		}
 		this.select(selected)
 	}
@@ -44,15 +44,7 @@ export class TeleprompterElement extends HTMLElement {
 		this.paint()
 		if (reveal) this.reveal()
 	}
-	// The item under the reading line, so auto-scroll can carry the selection.
-	readingItem() {
-		let line = this.getBoundingClientRect().top + this.clientHeight * 0.25
-		let found = this.current
-		for (let item of this.querySelectorAll<HTMLElement>("[data-item]"))
-			if (item.getBoundingClientRect().top <= line)
-				found = Number(item.dataset.item)
-		return found
-	}
+	// The original kept the selected item a header's height below the top.
 	reveal() {
 		let item = this.itemElement(this.current)
 		if (!item) return
@@ -60,7 +52,7 @@ export class TeleprompterElement extends HTMLElement {
 			this.scrollTop +
 			item.getBoundingClientRect().top -
 			this.getBoundingClientRect().top -
-			this.clientHeight * 0.2
+			48
 		this.scrollTo({
 			top,
 			behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -95,23 +87,20 @@ export class TeleprompterElement extends HTMLElement {
 customElements.define("alkalye-teleprompter", TeleprompterElement)
 
 function scriptMarkup(items: PresentationItem[]) {
-	if (!items.length)
-		return html`<div class="prompter-empty">
-			<strong>No slides yet</strong>
-			<p>Add a heading or indented text to put something on a slide.</p>
-		</div>`
-	let groups = groupBySlide(items)
-	return html`<div class="prompter-start">
-			<p>Select a line or start from the top.</p>
-			<button type="button" data-start>Start</button>
+	return html`<div class="prompter-script">
+		<div class="prompter-start">
+			<p>${translate("Press any arrow key or click an item to start")}</p>
+			<button type="button" data-start>
+				${translate("Start Presentation")}
+			</button>
 		</div>
 		${joinMarkup(
-			groups.map(
+			groupBySlide(items).map(
 				group =>
 					html`<section class="prompter-slide" data-slide="${group.slide}">
-						<h2 class="prompter-slide-label">
+						<div class="prompter-slide-label">
 							${translate("Slide")} ${group.slide + 1}
-						</h2>
+						</div>
 						${joinMarkup(
 							group.items.map((item, offset) =>
 								itemMarkup(item, group.first + offset),
@@ -119,7 +108,8 @@ function scriptMarkup(items: PresentationItem[]) {
 						)}
 					</section>`,
 			),
-		)}`
+		)}
+	</div>`
 }
 
 function itemMarkup(item: PresentationItem, index: number) {
@@ -131,18 +121,18 @@ function itemMarkup(item: PresentationItem, index: number) {
 			>
 				${rawMarkup(markdown(item.source))}
 			</div>`
-		: html`<p
+		: html`<div
 				class="prompter-item prompter-note"
 				data-item="${index}"
 				data-line="${item.line}"
 			>
 				${rawMarkup(inline(item.text))}
-			</p>`
+			</div>`
 }
 
 function imageLabel(image: HTMLImageElement) {
 	let label = document.createElement("span")
 	label.className = "prompter-image"
-	label.textContent = `${translate("Image")}: ${image.alt || image.getAttribute("src") || ""}`
+	label.textContent = `[${translate("Image")}: ${image.alt || image.getAttribute("src") || ""}]`
 	return label
 }

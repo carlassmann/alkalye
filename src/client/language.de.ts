@@ -316,4 +316,27 @@ export let german: Record<string, string> = {
 	"Light appearance": "Helles Erscheinungsbild",
 	"Dark appearance": "Dunkles Erscheinungsbild",
 	"System appearance": "Systemdarstellung",
+	"Press any arrow key or click an item to start":
+		"Beliebige Pfeiltaste drücken oder Element anklicken zum Starten",
+	"Start Presentation": "Präsentation starten",
+	Slide: "Folie",
+	Image: "Bild",
+	"No slides found": "Keine Folien gefunden",
+	"Add headings (# or ##) to create slides":
+		"Überschriften (# oder ##) hinzufügen, um Folien zu erstellen",
+	"Back to Editor": "Zurück zum Editor",
+	"Text only": "Nur Text",
+	"Slideshow options": "Präsentationsoptionen",
+	"Toggle fullscreen": "Vollbild umschalten",
+	"Go to editor": "Zum Editor",
+	"Go to teleprompter": "Zur Sprechunterstützung",
+	"Prev Slide (←)": "Vorherige Folie (←)",
+	"Prev Item (↑)": "Vorheriges Element (↑)",
+	"Next Item (↓)": "Nächstes Element (↓)",
+	"Next Slide (→)": "Nächste Folie (→)",
+	"Click to reset timer": "Zum Zurücksetzen klicken",
+	"Laser pointer": "Laserpointer",
+	"Slide preview": "Folienvorschau",
+	"Hold and drag to draw a laser trail. It fades after you release.":
+		"Auf der Vorschau gedrückt halten und ziehen. Die Laserspur verblasst nach dem Loslassen.",
 }
