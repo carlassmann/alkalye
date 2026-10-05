@@ -7,13 +7,14 @@ import {
 	legalPage,
 } from "./src/client/components/site"
 import { readChangelog } from "./src/shared/changelog"
-export async function build() {
+export async function build(directory = resolve(import.meta.dir, "dist")) {
 	let root = import.meta.dir
-	await rm(resolve(root, "dist"), { recursive: true, force: true })
-	await mkdir(resolve(root, "dist"), { recursive: true })
+	let output = resolve(directory)
+	await rm(output, { recursive: true, force: true })
+	await mkdir(output, { recursive: true })
 	let result = await Bun.build({
 		entrypoints: [resolve(root, "src/client/document-app.ts")],
-		outdir: resolve(root, "dist"),
+		outdir: output,
 		target: "browser",
 		naming: { entry: "app.js", chunk: "chunks/[name]-[hash].[ext]" },
 		splitting: true,
@@ -21,13 +22,13 @@ export async function build() {
 		sourcemap: "external",
 	})
 	if (!result.success) throw new AggregateError(result.logs, "Build failed")
-	await cp(resolve(root, "public"), resolve(root, "dist"), { recursive: true })
-	let appHtml = (await Bun.file(resolve(root, "dist/app.html")).text()).replace(
+	await cp(resolve(root, "public"), output, { recursive: true })
+	let appHtml = (await Bun.file(resolve(output, "app.html")).text()).replace(
 		"<!-- APP_BOOT -->",
 		String(bootMarkup()),
 	)
 	for (let entry of ["app"]) {
-		let script = await Bun.file(resolve(root, "dist/" + entry + ".js")).text()
+		let script = await Bun.file(resolve(output, entry + ".js")).text()
 		let preloads = new Bun.Transpiler({ loader: "js" })
 			.scanImports(script)
 			.filter(imported => imported.kind === "import-statement")
@@ -37,15 +38,15 @@ export async function build() {
 			)
 			.join("\n")
 		await Bun.write(
-			resolve(root, "dist/" + entry + ".html"),
+			resolve(output, entry + ".html"),
 			appHtml
 				.replace('src="/app.js"', 'src="/' + entry + '.js"')
 				.replace("</head>", preloads + "\n</head>"),
 		)
 	}
-	await Bun.write(resolve(root, "dist/index.html"), landingPage())
-	await Bun.write(resolve(root, "dist/en.html"), landingPage())
-	await Bun.write(resolve(root, "dist/de.html"), landingPage("de"))
+	await Bun.write(resolve(output, "index.html"), landingPage())
+	await Bun.write(resolve(output, "en.html"), landingPage())
+	await Bun.write(resolve(output, "de.html"), landingPage("de"))
 	for (let [name, title] of [
 		["privacy", "Privacy Policy"],
 		["terms", "Terms of Use"],
@@ -53,7 +54,7 @@ export async function build() {
 		["support", "Support"],
 	]) {
 		await Bun.write(
-			resolve(root, `dist/${name}.html`),
+			resolve(output, `${name}.html`),
 			legalPage(
 				title ?? "",
 				await Bun.file(resolve(root, `public/docs/${name}.md`)).text(),
@@ -61,7 +62,7 @@ export async function build() {
 		)
 	}
 	await Bun.write(
-		resolve(root, "dist/changelog.html"),
+		resolve(output, "changelog.html"),
 		changelogPage(
 			readChangelog(
 				await Bun.file(resolve(root, "public/changelog.json")).json(),
@@ -74,7 +75,7 @@ export async function build() {
 	)) {
 		let path = "/components/" + file
 		await Bun.write(
-			resolve(root, "dist" + path),
+			resolve(output, "." + path),
 			Bun.file(resolve(root, "src/client/components", file)),
 		)
 		componentStyles.push(path)
@@ -82,7 +83,7 @@ export async function build() {
 	let versionHasher = new Bun.CryptoHasher("sha256")
 	let assets = [
 		...new Bun.Glob("**/*").scanSync({
-			cwd: resolve(root, "dist"),
+			cwd: output,
 			onlyFiles: true,
 		}),
 	]
@@ -91,11 +92,11 @@ export async function build() {
 	for (let path of assets)
 		versionHasher
 			.update(path)
-			.update(await Bun.file(resolve(root, "dist", path)).arrayBuffer())
+			.update(await Bun.file(resolve(output, path)).arrayBuffer())
 	let version = versionHasher.digest("hex").slice(0, 16)
 	let worker = await Bun.file(resolve(root, "public/sw.js")).text()
 	await Bun.write(
-		resolve(root, "dist/sw.js"),
+		resolve(output, "sw.js"),
 		worker
 			.replace("BUILD_VERSION", version)
 			.replace('"BUILD_STYLES"', "..." + JSON.stringify(componentStyles))
@@ -113,9 +114,9 @@ export async function build() {
 		/\.(?:js|css|html|json|webmanifest|md)$/.test(path),
 	)) {
 		let bytes = new Uint8Array(
-			await Bun.file(resolve(root, "dist", path)).arrayBuffer(),
+			await Bun.file(resolve(output, path)).arrayBuffer(),
 		)
-		await Bun.write(resolve(root, "dist", path + ".gz"), Bun.gzipSync(bytes))
+		await Bun.write(resolve(output, path + ".gz"), Bun.gzipSync(bytes))
 	}
 }
 if (import.meta.main) await build()

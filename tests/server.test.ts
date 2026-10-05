@@ -57,3 +57,34 @@ test("fresh server databases contain document and agent storage without room rel
 		database.close()
 	}
 })
+
+test("servers can serve an isolated app shell without replacing another server's assets", async () => {
+	let assets = join(directory, "isolated-shell")
+	await Bun.write(
+		join(assets, "app.html"),
+		'<script src="/app.js"></script>isolated shell',
+	)
+	await Bun.write(join(assets, "app.js"), 'console.log("isolated app")')
+	let isolated = await Effect.runPromise(
+		startServer({
+			port: 0,
+			data: join(directory, "isolated-data"),
+			assets,
+			build: false,
+		}),
+	)
+	try {
+		let markup = await (
+			await fetch(new URL("/app", isolated.server.url))
+		).text()
+		expect(markup).toContain("isolated shell")
+		expect(
+			await (await fetch(new URL("/app.js", isolated.server.url))).text(),
+		).toContain("isolated app")
+		expect(
+			await (await fetch(new URL("/app", instance.server.url))).text(),
+		).not.toContain("isolated shell")
+	} finally {
+		await Effect.runPromise(isolated.close())
+	}
+})

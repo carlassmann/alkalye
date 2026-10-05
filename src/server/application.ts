@@ -50,7 +50,7 @@ function makeApplication() {
 		let handleMcp = yield* makeMcpHandler(mcp, documents, settings.publicOrigin)
 		let oauth = new OAuth(database.oauth, mcp, cipher, settings.publicOrigin)
 		yield* startOAuthMaintenance(database.oauth.cleanup())
-		let dist = resolve(import.meta.dir, "../../dist")
+		let dist = settings.assets
 		function messages(socket: ServerWebSocket<Connection>) {
 			let gate = inbound.get(socket)
 			if (!gate) {

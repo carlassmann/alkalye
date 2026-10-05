@@ -97,6 +97,7 @@ if (process.argv.includes("--serve")) {
 		startServer({
 			port: 0,
 			data: directory,
+			assets: join(directory, "app-shell"),
 			build: true,
 			publicOrigin: proxy.url.origin,
 		}),

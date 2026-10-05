@@ -13,6 +13,7 @@ export interface ServerOptions {
 	port?: number
 	hostname?: string
 	data?: string
+	assets?: string
 	build?: boolean
 	publicOrigin?: string
 }
@@ -20,6 +21,7 @@ export interface Settings {
 	port: number
 	hostname: string
 	data: string
+	assets: string
 	build: boolean
 	publicOrigin: string | undefined
 	resetLog: boolean
@@ -45,6 +47,9 @@ export class RelaySettings extends Context.Service<RelaySettings, Settings>()(
 					port,
 					hostname,
 					data: options.data ?? resolve(import.meta.dir, "../../.data"),
+					assets: resolve(
+						options.assets ?? resolve(import.meta.dir, "../../dist"),
+					),
 					build: options.build !== false,
 					publicOrigin:
 						options.publicOrigin ??
@@ -64,7 +69,7 @@ export class RelaySecrets extends Context.Service<
 		Effect.gen(function* () {
 			let settings = yield* RelaySettings
 			let cipher = yield* Cipher
-			if (settings.build) yield* promise("build", () => build())
+			if (settings.build) yield* promise("build", () => build(settings.assets))
 			yield* promise("data directory", () =>
 				mkdir(settings.data, { recursive: true, mode: 0o700 }),
 			)
