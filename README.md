@@ -9,7 +9,7 @@ bun install
 bun run dev
 ```
 
-Open http://127.0.0.1:3000/app. `PORT` and `HOST` configure the server. For an HTTPS proxy, set `PUBLIC_ORIGIN` and preserve the public Host header. Set `PUBLIC_TLDRAW_LICENSE_KEY` for your tldraw license. Whiteboard styles, icons, translations and fonts are served locally and cached offline. Back up `.data/`, including `master.key`. Use the exact public origin for CLI connections.
+Open http://127.0.0.1:3000/app. `PORT` and `HOST` configure the server. For an HTTPS proxy, set `PUBLIC_ORIGIN` and preserve the public Host header. Development servers build tldraw in development mode; production builds and `bun run start` use production mode. Set `PUBLIC_TLDRAW_LICENSE_KEY` before building for production. Whiteboard styles, icons, translations and fonts are served locally and cached offline. Back up `.data/`, including `master.key`. Use the exact public origin for CLI connections.
 
 ```sh
 bun run check
