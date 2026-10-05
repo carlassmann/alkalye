@@ -85,10 +85,12 @@
 }
 [data-editor] .syntax-link {
 	color: var(--ink);
-	text-decoration: underline;
-	text-decoration-color: var(--line);
 }
-[data-editor] .syntax-link-broken {
+[data-editor] .syntax-link-label {
+	text-decoration: underline;
+	text-decoration-color: var(--muted);
+}
+[data-editor] .syntax-link-broken .syntax-link-label {
 	text-decoration: underline wavy;
 	text-decoration-color: var(--danger);
 }
@@ -225,4 +227,23 @@
 	[data-editor] [data-editor-links] {
 		animation: none;
 	}
+}
+
+[data-editor] .syntax-link-icon {
+	position: relative;
+	color: transparent;
+	text-decoration: none;
+}
+[data-editor] .syntax-link-icon svg {
+	position: absolute;
+	left: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	width: min(14px, 0.8em);
+	height: min(14px, 0.8em);
+	color: var(--ink);
+	opacity: 0.5;
+}
+[data-editor] [data-editor-links] a:hover {
+	box-shadow: inset 0 -1px var(--ink);
 }

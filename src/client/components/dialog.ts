@@ -127,7 +127,66 @@ export function openDialog(
 			'.dialog-body input:not([type="hidden"]), .dialog-body textarea, .dialog-body button, footer button',
 		)
 		?.focus({ preventScroll: true })
+	return events.signal
 }
+export function mediaPreviewDialog(
+	dialog: HTMLDialogElement,
+	report: (error: unknown) => void,
+	source: string,
+	alt: string,
+	kind: "image" | "video" | "audio",
+) {
+	return Effect.acquireUseRelease(
+		Effect.sync(() => {
+			let body =
+				kind === "video"
+					? html`<video
+							data-image-preview
+							src="${source}"
+							aria-label="${alt}"
+							controls
+							playsinline
+						></video>`
+					: kind === "audio"
+						? html`<audio
+								data-image-preview
+								src="${source}"
+								aria-label="${alt}"
+								controls
+							></audio>`
+						: html`<img data-image-preview src="${source}" alt="${alt}" />`
+			let title =
+				kind === "image"
+					? "Preview image"
+					: kind === "video"
+						? "Preview video"
+						: "Preview audio"
+			let signal = openDialog(dialog, report, () => {}, title, body)
+			return { signal, form: dialog.querySelector("form") }
+		}),
+		({ signal }) =>
+			Effect.callback<void>(resume => {
+				function closed() {
+					resume(Effect.void)
+				}
+				if (signal.aborted) closed()
+				else signal.addEventListener("abort", closed, { once: true })
+				return Effect.sync(() => signal.removeEventListener("abort", closed))
+			}),
+		({ form }) =>
+			Effect.sync(() => {
+				if (dialog.open && dialog.querySelector("form") === form) dialog.close()
+				let media = form?.querySelector("[data-image-preview]")
+				if (media instanceof HTMLMediaElement) {
+					media.pause()
+					media.removeAttribute("src")
+					media.load()
+				}
+				media?.remove()
+			}),
+	)
+}
+
 export function field(label: string, name: string, value = "", type = "text") {
 	return html`<label
 		>${label}<input name="${name}" type="${type}" value="${value}"

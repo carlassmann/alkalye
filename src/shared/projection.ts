@@ -1,10 +1,13 @@
 import { safeUrl } from "./markdown"
 import type { DocumentLink } from "./model"
 
+export let iconPrefix = "\u2003\u2060"
+
 export interface ProjectedLink {
-	kind: "link" | "wiki"
+	kind: "link" | "wiki" | "media"
 	target: string
 	broken: boolean
+	iconSpace?: true
 	source: { start: number; end: number }
 	view: { start: number; end: number }
 	parts: { source: number; view: number; length: number }[]
@@ -17,6 +20,7 @@ export interface Projection {
 export interface ProjectionOptions {
 	active?: { start: number; end: number }
 	documents?: readonly DocumentLink[]
+	iconSpace?: boolean
 }
 
 export function identity(source: string): Projection {
@@ -37,16 +41,18 @@ export function project(
 			continue
 		text += source.slice(copied, token.start)
 		let view = text.length
+		let prefix = options.iconSpace ? iconPrefix : ""
 		let parts = token.parts.map(part => ({
 			source: part.start,
-			view: view + part.offset,
+			view: view + prefix.length + part.offset,
 			length: part.end - part.start,
 		}))
-		text += token.label
+		text += prefix + token.label
 		links.push({
 			kind: token.kind,
 			target: token.target,
 			broken: token.broken,
+			...(options.iconSpace ? { iconSpace: true } : {}),
 			source: { start: token.start, end: token.end },
 			view: { start: view, end: text.length },
 			parts,
@@ -121,6 +127,23 @@ export function applyViewEdit(
 	let viewEnd = previous.length - suffix
 	let start = toSource(projection, prefix, "start"),
 		end = Math.max(start, toSource(projection, viewEnd, "end"))
+	for (let link of projection.links) {
+		if (!link.iconSpace) continue
+		if (
+			viewEnd === prefix &&
+			prefix > link.view.start &&
+			prefix < link.view.start + iconPrefix.length
+		)
+			start = end = link.source.start
+		else if (
+			viewEnd > prefix &&
+			prefix < link.view.start + iconPrefix.length &&
+			viewEnd > link.view.start
+		) {
+			start = Math.min(start, link.source.start)
+			end = Math.max(end, link.source.end)
+		}
+	}
 	let inserted = next.slice(prefix, next.length - suffix)
 	let source =
 		projection.source.slice(0, start) + inserted + projection.source.slice(end)
@@ -159,13 +182,14 @@ export function sameProjection(left: Projection, right: Projection) {
 				link.target === right.links[index]?.target &&
 				link.source.start === right.links[index]?.source.start &&
 				link.source.end === right.links[index]?.source.end &&
-				link.broken === right.links[index]?.broken,
+				link.broken === right.links[index]?.broken &&
+				link.iconSpace === right.links[index]?.iconSpace,
 		)
 	)
 }
 
 interface LinkToken {
-	kind: "link" | "wiki"
+	kind: ProjectedLink["kind"]
 	start: number
 	end: number
 	label: string
@@ -275,7 +299,22 @@ function lineTokens(
 			continue
 		}
 		if (character === "!" && line[index + 1] === "[") {
-			index = markdownLink(line, index + 1)?.end ?? index + 2
+			let media = markdownLink(line, index + 1)
+			if (media) {
+				if (media.target.startsWith("asset:") || safeUrl(media.target) !== "#")
+					tokens.push(
+						shift(
+							{
+								...media,
+								kind: "media",
+								start: index,
+								label: media.parts.length ? media.label : "Media",
+							},
+							base,
+						),
+					)
+				index = media.end
+			} else index += 2
 			continue
 		}
 		if (character === "[" && line[index + 1] === "[") {

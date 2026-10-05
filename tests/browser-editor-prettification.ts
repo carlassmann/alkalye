@@ -17,10 +17,11 @@ let source = [
 	"last",
 ].join("\n")
 let projected = source
-	.replace("[Example](https://example.org/a_(b))", "Example")
-	.replace("[[Welcome to Alkalye]]", "Welcome to Alkalye")
+	.replace("[Example](https://example.org/a_(b))", "\u2003\u2060Example")
+	.replace("[[Welcome to Alkalye]]", "\u2003\u2060Welcome to Alkalye")
+	.replace("![Icon](/i.png)", "\u2003\u2060Icon")
 let expanded = `${native}.value.includes("[Example](")`
-let collapsed = `${native}.value.includes("Read Example and Welcome to Alkalye")`
+let collapsed = `${native}.value.includes("Read \u2003\u2060Example and \u2003\u2060Welcome to Alkalye")`
 
 let server = Bun.spawn(["bun", "tests/browser-document-app.ts", "--serve"], {
 	stdout: "pipe",
@@ -42,7 +43,7 @@ try {
 	assert(
 		evaluate(
 			session,
-			`document.querySelector("#highlight").textContent === ${native}.value + "\\n" && [...document.querySelectorAll("#highlight .syntax-link")].map(link => link.textContent).join("|") === "Example|Welcome to Alkalye"`,
+			`document.querySelector("#highlight").textContent === ${native}.value + "\\n" && [...document.querySelectorAll("#highlight .syntax-link")].map(link => link.textContent).join("|") === "\u2003\u2060Example|\u2003\u2060Welcome to Alkalye|\u2003\u2060Icon"`,
 		),
 		"inactive links and wiki-links collapse in the textarea and its overlay alike",
 	)
@@ -184,7 +185,7 @@ try {
 	browser(session, "press", "ArrowDown")
 	wait(
 		session,
-		`${native}.value.includes("Read Example and Welcome to Alkalye.!")`,
+		`${native}.value.includes("Read \u2003\u2060Example and \u2003\u2060Welcome to Alkalye.!")`,
 	)
 	assert(true, "edits on a raw link line are kept when it collapses")
 	undoUntil(source)
@@ -366,6 +367,72 @@ try {
 			`(() => { let walker = document.createTreeWalker(document.querySelector("#highlight"), NodeFilter.SHOW_TEXT), offset = ${native}.selectionStart, node; while(node = walker.nextNode()){ if(offset < node.textContent.length) break; offset -= node.textContent.length } let range = document.createRange(); range.setStart(node, offset); range.collapse(true); let rect = range.getBoundingClientRect(), viewport = ${native}.getBoundingClientRect(); return ${editor}.selectionStart === ${heading} && rect.top >= viewport.top && rect.bottom <= viewport.bottom })()`,
 		),
 		"source navigation scrolls to its projected position below many compact links",
+	)
+	let wrapped =
+		"# Icons\nA long line just before [" +
+		"wrapped label ".repeat(12) +
+		"](https://example.org)\n![Photo](./photo.png)\ntail"
+	browser(session, "set", "viewport", "1280", "800")
+	for (let [panel, action] of [
+		["library-open", "library"],
+		["tools-open", "toggle-tools"],
+	])
+		if (
+			evaluate(
+				session,
+				`document.querySelector("#app").classList.contains(${JSON.stringify(panel)})`,
+			)
+		)
+			browser(session, "click", `[data-action="${action}"]`)
+	browser(session, "set", "viewport", "390", "844")
+	browser(session, "fill", "#editor", wrapped)
+	evaluate(
+		session,
+		'document.documentElement.style.setProperty("--editor-size", "12px")',
+	)
+	wait(
+		session,
+		'document.querySelectorAll("#highlight .syntax-link-icon").length === 2',
+	)
+	assert(
+		evaluate(
+			session,
+			`(() => { let icons = [...document.querySelectorAll(".syntax-link-icon")]; return icons.every(icon => icon.querySelector("svg").getBoundingClientRect().width <= icon.getBoundingClientRect().width) && ${native}.scrollHeight === document.querySelector("#highlight").scrollHeight && document.querySelector("#highlight").textContent === ${native}.value + "\\n" })()`,
+		),
+		"Small mobile text reserves icon space while wrapping stays aligned with the textarea",
+	)
+	browser(session, "fill", "#editor", "# Missing\n[[missing]]\ntail")
+	wait(session, 'document.querySelector(".syntax-link-broken") !== null')
+	assert(
+		evaluate(
+			session,
+			'!document.querySelector("[data-editor-links] a[data-kind=wiki]")',
+		),
+		"A broken document link cannot navigate to a missing document",
+	)
+	evaluate(
+		session,
+		`${editor}.setSelectionRange(0,0); ${native}.scrollTop = 0; ${native}.dispatchEvent(new Event("scroll"))`,
+	)
+	let broken = evaluate(
+		session,
+		'JSON.stringify((() => {let bounds = document.querySelector(".syntax-link-broken").getBoundingClientRect(); return [bounds.left + bounds.width / 2, bounds.top + bounds.height / 2]})())',
+	)
+	if (typeof broken !== "string") throw new Error("Missing broken-link bounds")
+	let [x, y] = JSON.parse(broken)
+	browser(
+		session,
+		"mouse",
+		"move",
+		String(Math.round(x)),
+		String(Math.round(y)),
+	)
+	browser(session, "mouse", "down")
+	browser(session, "mouse", "up")
+	wait(session, `${native}.value.includes("[[missing]]")`)
+	assert(
+		true,
+		"Clicking a broken document label reveals its source for editing",
 	)
 } finally {
 	try {

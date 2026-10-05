@@ -153,7 +153,11 @@ export class SourceTextarea {
 		active: { start: number; end: number },
 	) {
 		if (this.options.mode() === "raw") return identity(source)
-		return project(source, { active, documents: this.options.documents() })
+		return project(source, {
+			active,
+			documents: this.options.documents(),
+			iconSpace: true,
+		})
 	}
 	// Rewriting the value collapses or expands text above the caret, so the
 	// caret's vertical position in the content is held steady.

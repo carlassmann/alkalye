@@ -64,12 +64,32 @@ export function verifyNativeDrawings(session: string, original: string) {
 	browser(session, "click", "#embed-board")
 	wait(
 		session,
-		'!document.querySelector("#dialog").open && document.querySelector("#editor").value.includes("asset:") && document.querySelector("#save-status").textContent === "Saved"',
+		'!document.querySelector("#dialog").open && document.querySelector("alkalye-editor").source.value.includes("asset:") && document.querySelector("#save-status").textContent === "Saved"',
 	)
 	assert(
 		true,
 		"native drawing embedding records the drawing name and source reference together",
 	)
+	evaluate(
+		session,
+		'document.querySelector("alkalye-editor").source.setSelectionRange(0,0)',
+	)
+	wait(
+		session,
+		'document.querySelector("[data-editor-links] a[data-kind=media]") !== null',
+	)
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("#highlight .syntax-link-icon[data-icon=pencil]") !== null',
+		),
+		"Editor whiteboards use the original pencil icon and their name",
+	)
+	browser(session, "click", "[data-editor-links] a[data-kind=media]")
+	wait(session, boardMounted)
+	assert(true, "Clicking a whiteboard label opens its existing drawing")
+	browser(session, "click", ".dialog-close")
+	wait(session, '!document.querySelector("#dialog").open')
 	browser(session, "click", '[data-action="preview"]')
 	wait(
 		session,
@@ -103,7 +123,7 @@ export function verifyNativeDrawings(session: string, original: string) {
 	browser(session, "click", "#restore-history")
 	wait(
 		session,
-		'document.querySelector("#editor")?.value.startsWith("# Drawing journal") && !document.querySelector("#editor").value.includes("asset:")',
+		'document.querySelector("#editor")?.value.startsWith("# Drawing journal") && !document.querySelector("alkalye-editor").source.value.includes("asset:")',
 	)
 	assert(
 		true,
@@ -113,7 +133,7 @@ export function verifyNativeDrawings(session: string, original: string) {
 	browser(session, "press", "Control+z")
 	wait(
 		session,
-		'document.querySelector("#editor").value.includes("asset:") && document.querySelector("#save-status").textContent === "Saved"',
+		'document.querySelector("alkalye-editor").source.value.includes("asset:") && document.querySelector("#save-status").textContent === "Saved"',
 	)
 	assert(
 		true,
@@ -167,7 +187,7 @@ export function verifyNativeDrawings(session: string, original: string) {
 	)
 	wait(
 		session,
-		`${currentDocument} !== ${JSON.stringify(drawingDocument)} && document.querySelector("#editor")?.value.includes("asset:")`,
+		`${currentDocument} !== ${JSON.stringify(drawingDocument)} && document.querySelector("alkalye-editor")?.source.value.includes("asset:")`,
 	)
 	assert(
 		evaluate(

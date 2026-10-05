@@ -16,7 +16,7 @@ export function verifyNativeAssets(session: string, source: string) {
 	browser(session, "click", '[data-action="asset"]')
 	evaluate(
 		session,
-		`window.previewRevokeViolations = []; window.originalRevoke = URL.revokeObjectURL; URL.revokeObjectURL = function(url) { function contains(root) { for (let node of root.querySelectorAll('*')) { if ((node.getAttribute('src') ?? '').split('#')[0] === url) return true; if (node.shadowRoot && contains(node.shadowRoot)) return true } return false }; if (contains(document)) window.previewRevokeViolations.push(url); return window.originalRevoke(url) }`,
+		`window.previewRevocations = []; window.previewRevokeViolations = []; window.originalRevoke = URL.revokeObjectURL; URL.revokeObjectURL = function(url) { window.previewRevocations.push(url); function contains(root) { for (let node of root.querySelectorAll('*')) { if ((node.getAttribute('src') ?? '').split('#')[0] === url) return true; if (node.shadowRoot && contains(node.shadowRoot)) return true } return false }; if (contains(document)) window.previewRevokeViolations.push(url); return window.originalRevoke(url) }`,
 	)
 	evaluate(
 		session,
@@ -39,9 +39,63 @@ export function verifyNativeAssets(session: string, source: string) {
 	assert(
 		evaluate(
 			session,
-			'document.querySelector("#editor").value.includes("asset:")',
+			'document.querySelector("alkalye-editor").source.value.includes("asset:")',
 		),
 		"native picker durably attaches the image and its anchored source reference",
+	)
+	evaluate(
+		session,
+		'document.querySelector("alkalye-editor").source.setSelectionRange(0,0)',
+	)
+	wait(
+		session,
+		'document.querySelector("[data-editor-links] a[data-kind=media]") !== null',
+	)
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("#highlight .syntax-link-icon svg") !== null && !document.querySelector("#editor").value.includes("asset:")',
+		),
+		"Editor image references become icon labels outside the cursor",
+	)
+	browser(session, "click", "[data-editor-links] a[data-kind=media]")
+	wait(
+		session,
+		'document.querySelector("#dialog img[data-image-preview]")?.naturalWidth === 2048',
+	)
+	evaluate(
+		session,
+		'window.previousPreviewForm = document.querySelector("#dialog form"); document.querySelector("[data-editor-links] a[data-kind=media]").click()',
+	)
+	wait(
+		session,
+		'document.querySelector("#dialog").open && document.querySelector("#dialog form") !== window.previousPreviewForm && document.querySelector("#dialog img[data-image-preview]")?.naturalWidth === 2048',
+	)
+	assert(
+		true,
+		"Replacing an editor preview releases the old form without closing the new dialog",
+	)
+	let inlineUrl = String(
+		evaluate(
+			session,
+			'document.querySelector("#dialog img[data-image-preview]").src',
+		),
+	).split("#")[0]
+	assert(
+		true,
+		"An image opens directly from its editor label before visiting Preview",
+	)
+	browser(session, "click", ".dialog-close")
+	wait(
+		session,
+		`window.previewRevocations.includes(${JSON.stringify(inlineUrl)})`,
+	)
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("#dialog [data-image-preview]") === null && window.previewRevokeViolations.length === 0',
+		),
+		"Closing an editor preview removes its media before releasing the blob URL",
 	)
 	browser(session, "click", '[data-action="preview"]')
 	wait(
@@ -125,6 +179,36 @@ export function verifyNativeAssets(session: string, source: string) {
 		true,
 		"native paste stores a video through the same whole-document attachment producer",
 	)
+	evaluate(
+		session,
+		'document.querySelector("alkalye-editor").source.setSelectionRange(0,0)',
+	)
+	wait(
+		session,
+		'document.querySelector(".syntax-link-icon[data-icon=film]") !== null',
+	)
+	browser(
+		session,
+		"click",
+		'[data-editor-links] a[aria-label="Native-video.webm"]',
+	)
+	wait(
+		session,
+		'document.querySelector("#dialog video[data-image-preview]")?.controls === true',
+	)
+	evaluate(
+		session,
+		'window.editorPreviewVideo = document.querySelector("#dialog video"); true',
+	)
+	browser(session, "click", ".dialog-close")
+	wait(
+		session,
+		'window.editorPreviewVideo.paused && !window.editorPreviewVideo.isConnected && !window.editorPreviewVideo.hasAttribute("src")',
+	)
+	assert(
+		true,
+		"Video labels use the stored MIME type and closing their preview stops playback",
+	)
 	browser(session, "click", '[data-action="preview"]')
 	wait(
 		session,
@@ -206,7 +290,7 @@ export function verifyNativeAssets(session: string, source: string) {
 	}
 	wait(
 		session,
-		'document.querySelectorAll("[data-attachments] .asset-row").length === 0 && !document.querySelector("#editor").value.includes("asset:")',
+		'document.querySelectorAll("[data-attachments] .asset-row").length === 0 && !document.querySelector("alkalye-editor").source.value.includes("asset:")',
 	)
 	assert(
 		true,

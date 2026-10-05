@@ -16,9 +16,12 @@ import { shortcutLabel } from "../shortcuts"
 import { openContextMenu } from "./context-menu"
 import type { MenuEntry } from "./context-menu"
 import { mountLineActions } from "./line-actions"
+import { icon } from "../icons"
+import type { IconName } from "../icons"
 
 import { formatSelection } from "../../shared/authoring"
 import { escape, safeUrl } from "../../shared/markdown"
+import { iconPrefix } from "../../shared/projection"
 import type { ProjectedLink } from "../../shared/projection"
 import { SourceTextarea } from "../source-textarea"
 import type {
@@ -38,6 +41,7 @@ export interface EditorOptions {
 	documents(): readonly DocumentLink[]
 	openDocument(id: string, newTab?: boolean): void
 	previewImage?(url: string, alt: string): void
+	mediaIcon?(url: string): IconName
 	canComment?(): boolean
 	createLinkedDocument(title: string): Promise<string>
 	report(error: unknown): void
@@ -493,12 +497,16 @@ function createEditorView(
 		let count = 0
 		let bounds = wrapper.getBoundingClientRect()
 		for (let link of text.projection.links) {
+			if (link.broken) continue
 			let from = point(link.view.start),
 				to = point(link.view.end)
 			let range = document.createRange()
 			range.setStart(from.node, from.offset)
 			range.setEnd(to.node, to.offset)
-			let label = text.projection.text.slice(link.view.start, link.view.end)
+			let label = text.projection.text.slice(
+				link.view.start + (link.iconSpace ? iconPrefix.length : 0),
+				link.view.end,
+			)
 			let first = true
 			for (let rectangle of range.getClientRects()) {
 				if (!rectangle.width || !rectangle.height) continue
@@ -507,9 +515,14 @@ function createEditorView(
 				anchor.href =
 					link.kind === "wiki"
 						? "/app/doc/" + encodeURIComponent(link.target)
-						: safeUrl(link.target)
+						: link.kind === "media"
+							? "#"
+							: safeUrl(link.target)
 				anchor.rel = "noopener noreferrer"
 				if (link.kind === "link") anchor.target = "_blank"
+				else anchor.removeAttribute("target")
+				if (link.kind === "media") anchor.setAttribute("role", "button")
+				else anchor.removeAttribute("role")
 				anchor.setAttribute("aria-label", label)
 				anchor.title = link.kind === "link" ? link.target : label
 				anchor.tabIndex = first ? 0 : -1
@@ -537,6 +550,11 @@ function createEditorView(
 				anchor.onclick = event => {
 					if (event.shiftKey) {
 						event.preventDefault()
+						return
+					}
+					if (link.kind === "media") {
+						event.preventDefault()
+						options.previewImage?.(link.target, label)
 						return
 					}
 					if (
@@ -623,7 +641,7 @@ function createEditorView(
 				position(start, nextAtoms),
 				position(end, nextAtoms),
 			)
-		} else text.sync()
+		} else if (!text.sync()) updateHighlight()
 		atoms = nextAtoms
 		lineActions.update()
 		paintPresence()
@@ -659,7 +677,10 @@ function createEditorView(
 		let editor = text
 		if (!secondarySelections.length) {
 			let { text: view, links } = editor.projection
-			setMarkup(highlight, sourceHighlight(view, options.documents(), links))
+			setMarkup(
+				highlight,
+				sourceHighlight(view, options.documents(), links, options.mediaIcon),
+			)
 			return
 		}
 		let position = 0,
@@ -1432,6 +1453,7 @@ export function sourceHighlight(
 	source: string,
 	documents: readonly DocumentLink[] = [],
 	links: readonly ProjectedLink[] = [],
+	mediaIcon?: (target: string) => IconName,
 ) {
 	let offset = 0
 	return (
@@ -1443,7 +1465,7 @@ export function sourceHighlight(
 				let collapsed = links.filter(
 					link => link.view.start >= start && link.view.end <= offset - 1,
 				)
-				let content = lineMarkup(line, start, collapsed)
+				let content = lineMarkup(line, start, collapsed, undefined, mediaIcon)
 				if (/^\s*[-*+] \[x\]/i.test(line))
 					return html`<span class="done-task">${rawMarkup(content)}</span>`
 				let heading = content.match(/^(#{1,6})(\s.*)$/)
@@ -1456,7 +1478,7 @@ export function sourceHighlight(
 					return html`<span class="syntax-marker">${rawMarkup(content)}</span>`
 				if (/^>/.test(line))
 					return html`<span class="syntax-quote">${rawMarkup(content)}</span>`
-				return lineMarkup(line, start, collapsed, documents)
+				return lineMarkup(line, start, collapsed, documents, mediaIcon)
 			})
 			.join("\n") + "\n"
 	)
@@ -1468,6 +1490,7 @@ function lineMarkup(
 	start: number,
 	links: readonly ProjectedLink[],
 	documents?: readonly DocumentLink[],
+	mediaIcon?: (target: string) => IconName,
 ) {
 	let content = "",
 		position = 0
@@ -1477,10 +1500,25 @@ function lineMarkup(
 		)
 		content += documents ? decorate(raw, documents) : raw
 		if (!link) break
+		let name: IconName =
+			link.kind === "wiki"
+				? link.broken
+					? "file-warning"
+					: "file-symlink"
+				: link.kind === "media"
+					? (mediaIcon?.(link.target) ?? "image")
+					: "link"
+		let label = line.slice(
+			link.view.start - start + (link.iconSpace ? iconPrefix.length : 0),
+			link.view.end - start,
+		)
 		content += html`<span
 			class="${link.broken ? "syntax-link syntax-link-broken" : "syntax-link"}"
 			title="${link.target}"
-			>${line.slice(link.view.start - start, link.view.end - start)}</span
+			>${link.iconSpace ? html`<span class="syntax-link-icon" data-icon="${name}" aria-hidden="true">${iconPrefix}${icon(name)}</span>` : ""}<span
+				class="syntax-link-label"
+				>${label}</span
+			></span
 		>`.value
 		position = link.view.end - start
 	}

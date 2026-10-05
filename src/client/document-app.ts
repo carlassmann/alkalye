@@ -21,6 +21,7 @@ import * as FetchHttpClient from "effect/http/FetchHttpClient"
 import type * as HttpClient from "effect/http/HttpClient"
 import { TaskGroup } from "../platform/tasks"
 import { formattingCommands } from "../shared/authoring"
+import { blobContentType } from "../shared/document-blobs"
 import { metadataSource } from "../shared/document-metadata"
 import type { MetadataPatch } from "../shared/document-metadata"
 import { folderPath } from "../shared/folders"
@@ -73,6 +74,7 @@ import {
 	confirmDialog,
 	field,
 	openDialog,
+	mediaPreviewDialog,
 	promptDialog,
 } from "./components/dialog"
 import { openFind } from "./components/find"
@@ -185,6 +187,7 @@ function mountApplication() {
 		let tasks = yield* TaskGroup.make
 		let selecting = yield* Semaphore.make(1)
 		let acquiring = yield* FiberHandle.make<OpenDocument, unknown>()
+		let mediaPreview = yield* FiberHandle.make<void, unknown>()
 		let requests = yield* Ref.make(0)
 		let selection: Selection | undefined
 		let undoWaiting = new WeakSet<Selection>()
@@ -1485,6 +1488,24 @@ function mountApplication() {
 				return
 			}
 			finishOpening()
+			let selectedReplica = selected.opened.session.replica
+			function mediaIcon(url: string) {
+				let id = url.startsWith("asset:") ? url.slice(6) : undefined
+				let fields = id ? selectedReplica.fields(id) : undefined
+				if (fields?.type === "whiteboard") return "pencil"
+				let type = blobContentType(fields?.data ?? "") ?? ""
+				if (
+					type.startsWith("video/") ||
+					/\.(mp4|webm|mov)(?:[?#]|$)/i.test(url)
+				)
+					return "film"
+				if (
+					type.startsWith("audio/") ||
+					/\.(mp3|wav|ogg|m4a)(?:[?#]|$)/i.test(url)
+				)
+					return "music"
+				return "image"
+			}
 			if (mode === "edit") {
 				editor = mountEditor(element("#main"), {
 					content: doc.content,
@@ -1514,21 +1535,50 @@ function mountApplication() {
 							launch(openDrawing(selected, id))
 							return
 						}
-						let source = id
-							? (selected.opened.localMedia?.current().get(id) ??
-								selected.media.current().urls.get(id))
-							: safeUrl(url)
-						if (!source || source === "#")
-							return report("Image is not available yet")
-						dialogOwner = selected
-						openDialog(
-							dialog,
-							report,
-							() => {},
-							"Preview image",
-							html`<img data-image-preview src="${source}" alt="${alt}" />`,
+						launch(
+							FiberHandle.run(
+								mediaPreview,
+								Effect.scoped(
+									Effect.gen(function* () {
+										let source =
+											selected.opened.localMedia?.current().get(id ?? url) ??
+											(id ? undefined : safeUrl(url))
+										if (id && !source) {
+											let reference = selected.opened.media
+												.references(`![media](${url})`)
+												.find(([asset]) => asset === id)?.[1]
+											if (reference)
+												source = yield* selected.opened.media.acquire(reference)
+										}
+										if (selection !== selected) return
+										if (!source || source === "#")
+											return report("Image is not available yet")
+										dialogOwner = selected
+										let name = mediaIcon(url)
+										yield* mediaPreviewDialog(
+											dialog,
+											report,
+											source,
+											alt,
+											name === "film"
+												? "video"
+												: name === "music"
+													? "audio"
+													: "image",
+										)
+									}),
+								).pipe(
+									Effect.catchCause(cause =>
+										selection === selected &&
+										(Cause.hasFails(cause) || Cause.hasDies(cause))
+											? Effect.sync(() => report(Cause.squash(cause)))
+											: Effect.void,
+									),
+								),
+							),
 						)
 					},
+					mediaIcon,
 					createLinkedDocument: title =>
 						tasks.run(library.create(metadataSource("", { title }))),
 					isDrawing: id =>

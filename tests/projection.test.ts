@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test"
 import {
 	applyViewEdit,
+	iconPrefix,
 	project,
 	sameProjection,
 	toSource,
@@ -65,7 +66,7 @@ test("balanced destinations, angle brackets and titles collapse whole", () => {
 	)
 })
 
-test("code, frontmatter, images, unsafe and asset links stay raw", () => {
+test("code, frontmatter, unsafe and non-media asset links stay raw", () => {
 	let source = [
 		"---",
 		"link: [x](https://example.org)",
@@ -80,9 +81,12 @@ test("code, frontmatter, images, unsafe and asset links stay raw", () => {
 	].join("\n")
 	let projection = project(source, { documents })
 	expect(projection.text).toBe(
-		source.slice(0, source.lastIndexOf("\n") + 1) + "Field guide",
+		(source.slice(0, source.lastIndexOf("\n") + 1) + "Field guide").replace(
+			"![image](https://example.org/a.png)",
+			"image",
+		),
 	)
-	expect(projection.links).toHaveLength(1)
+	expect(projection.links).toHaveLength(2)
 })
 
 test("offsets round-trip through raw text and label characters", () => {
@@ -186,4 +190,85 @@ test("a changed wiki destination invalidates an otherwise identical projection",
 	})
 	expect(first.text).toBe(second.text)
 	expect(sameProjection(first, second)).toBe(false)
+})
+
+test("media collapses to labels while source selections reveal its syntax", () => {
+	let source =
+		'Intro\n![Photo](asset:photo) ![](./image.png) ![Board](asset:board) ![Video](https://example.org/movie.mp4 "Film")\ntail'
+	let projection = project(source)
+	expect(projection.text).toBe("Intro\nPhoto Media Board Video\ntail")
+	expect(projection.links.map(link => [link.kind, link.target])).toEqual([
+		["media", "asset:photo"],
+		["media", "./image.png"],
+		["media", "asset:board"],
+		["media", "https://example.org/movie.mp4"],
+	])
+	let caret = source.indexOf("photo)")
+	expect(
+		project(source, { active: { start: caret, end: caret } }).text,
+	).toContain("![Photo](asset:photo)")
+	expect(project("![bad](javascript:alert(1))").text).toBe(
+		"![bad](javascript:alert(1))",
+	)
+	expect(
+		project("[![Photo](./image.png)](https://example.org)").links.map(
+			link => link.kind,
+		),
+	).toEqual(["link"])
+})
+
+test("icon spacing preserves label offsets and source-only clipboard selections", () => {
+	let source =
+		"Intro\n![Photo](asset:photo) and [link](https://example.org)\ntail"
+	let projection = project(source, { iconSpace: true })
+	expect(projection.text).toBe(
+		`Intro\n${iconPrefix}Photo and ${iconPrefix}link\ntail`,
+	)
+	let label = source.indexOf("Photo"),
+		view = projection.text.indexOf("Photo")
+	for (let offset = 0; offset < 5; offset++) {
+		expect(toSource(projection, view + offset)).toBe(label + offset)
+		expect(toView(projection, label + offset)).toBe(view + offset)
+	}
+	let start = toSource(projection, projection.text.indexOf(iconPrefix)),
+		end = toSource(projection, projection.text.indexOf(" and"), "end")
+	expect(source.slice(start, end)).toBe("![Photo](asset:photo)")
+	let typed = applyViewEdit(
+		projection,
+		projection.text.replace("Photo", "Ph日本oto"),
+		view + 4,
+	)
+	expect(typed.source).toContain("![Ph日本oto](asset:photo)")
+	expect(sameProjection(projection, project(source))).toBe(false)
+})
+
+test("deleting synthetic icon space removes its complete token without corrupting Markdown", () => {
+	for (let token of [
+		"![Photo](asset:photo)",
+		"[link](https://example.org)",
+		"[[doc-1]]",
+	]) {
+		let source = `Intro\n${token} end`,
+			projection = project(source, { documents, iconSpace: true })
+		let prefix = projection.text.indexOf(iconPrefix)
+		for (let index = 0; index < iconPrefix.length; index++) {
+			let next =
+				projection.text.slice(0, prefix + index) +
+				projection.text.slice(prefix + index + 1)
+			expect(applyViewEdit(projection, next, prefix + index).source).toBe(
+				"Intro\n end",
+			)
+		}
+	}
+})
+
+test("composition insertions inside synthetic icon space preserve the token", () => {
+	let source = "Intro\n![Photo](asset:photo) end",
+		projection = project(source, { iconSpace: true })
+	let offset = projection.text.indexOf(iconPrefix) + 1
+	let next =
+		projection.text.slice(0, offset) + "日本" + projection.text.slice(offset)
+	expect(applyViewEdit(projection, next, offset + 2).source).toBe(
+		"Intro\n日本![Photo](asset:photo) end",
+	)
 })
