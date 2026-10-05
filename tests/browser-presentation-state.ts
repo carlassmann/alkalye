@@ -58,6 +58,17 @@ try {
 		),
 		"Teleprompter resumes the persisted document position",
 	)
+	browser(session, "press", "Escape")
+	wait(session, 'document.querySelector("#editor") !== null')
+	browser(session, "press", "Meta+z")
+	wait(session, 'document.querySelector("alkalye-editor").source.value === ""')
+	assert(true, "Editing undo skips presentation navigation events")
+	browser(session, "press", "Meta+Shift+z")
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.value.includes("# Third")',
+	)
+	assert(true, "Presentation navigation preserves editing redo")
 } finally {
 	browser(session, "close")
 	server.kill()

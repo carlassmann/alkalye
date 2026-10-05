@@ -98,13 +98,6 @@
 	font-weight: 600;
 	text-align: center;
 }
-[data-dialog] .primary {
-	background: var(--brand);
-	color: var(--brand-ink);
-	padding: 9px 15px;
-	font-weight: 600;
-	text-align: center;
-}
 [data-dialog] .button-row {
 	display: flex;
 	flex-wrap: wrap;
@@ -189,4 +182,19 @@
 		flex-direction: column-reverse;
 		align-items: stretch;
 	}
+}
+
+[data-dialog]:not(.wide):not(:has([data-whiteboard])) footer button {
+	min-height: 32px;
+	padding: 6px 10px;
+	font-size: 12px;
+	line-height: 16px;
+	font-weight: 500;
+}
+[data-dialog] .primary.destructive {
+	background: color-mix(in oklch, var(--danger) 10%, transparent);
+	color: var(--danger);
+}
+[data-dialog] .primary.destructive:hover {
+	background: color-mix(in oklch, var(--danger) 20%, transparent);
 }

@@ -1,3 +1,4 @@
+import type { DocumentAction } from "./document-actions"
 import * as Effect from "effect/Effect"
 import * as Graph from "effect/Graph"
 import { DocumentConflict, UndoUnavailable } from "./document-errors"
@@ -11,6 +12,7 @@ export interface UndoEntry {
 	birth: boolean
 	active: boolean
 	eligible?: boolean
+	undoable?: boolean
 }
 
 export function selectDocumentUndo(
@@ -63,7 +65,8 @@ export function documentUndoCandidates(
 					entry.local &&
 					entry.subject === subject &&
 					!entry.undoOf &&
-					!entry.birth,
+					!entry.birth &&
+					entry.undoable !== false,
 			)
 			let roots = normal.filter(entry => entry.eligible !== false)
 			let latestNormal = normal.reduce(
@@ -113,4 +116,15 @@ export function documentUndoCandidates(
 							cause instanceof Error ? cause.message : "Invalid undo history",
 					}),
 	})
+}
+
+export function undoableDocumentAction(
+	action: Pick<DocumentAction, "document" | "changes">,
+) {
+	return !action.changes.every(
+		change =>
+			change.kind === "set" &&
+			change.target === action.document &&
+			change.field === "presentationItem",
+	)
 }

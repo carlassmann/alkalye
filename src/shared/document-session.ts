@@ -34,7 +34,7 @@ import type { DocumentFailure } from "./document-failures"
 import { encode } from "./base64"
 import { hasBlobReferences } from "./document-blobs"
 import { isBlobFailure, UndoUnavailable } from "./document-errors"
-import { documentUndoCandidates } from "./document-undo"
+import { undoableDocumentAction, documentUndoCandidates } from "./document-undo"
 import type { UndoEntry } from "./document-undo"
 import { partitionDocumentActions } from "./document-dependencies"
 import { validateTextCausality } from "./document-causality"
@@ -1209,6 +1209,7 @@ function makeProjection(options: DocumentSessionOptions) {
 									order: ++undoOrder,
 									local: true,
 									birth: value.kind === "localCreated",
+									undoable: undoableDocumentAction(action),
 								})
 						} else if (value.kind === "published") {
 							yield* indexReceipt(entry.idString, 0, value.publication.initial)
@@ -1280,6 +1281,7 @@ function makeProjection(options: DocumentSessionOptions) {
 					return yield* conflict("Undo receipt differs from its proposal")
 				undoEntries.set(action.id, {
 					id: action.id,
+					undoable: undoableDocumentAction(action),
 					subject: action.subject,
 					undoOf: action.undoOf,
 					order: existing?.order ?? ++undoOrder,

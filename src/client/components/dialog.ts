@@ -1,3 +1,4 @@
+import * as Effect from "effect/Effect"
 import { icon } from "../icons"
 import { setMarkup } from "../dom"
 import type { Markup } from "../language"
@@ -47,10 +48,15 @@ export function openDialog(
 		},
 		{ signal: events.signal },
 	)
-	dialog.addEventListener("close", () => events.abort(), {
-		once: true,
-		signal: events.signal,
-	})
+	dialog.addEventListener(
+		"close",
+		() => {
+			if (!dialog.open) events.abort()
+		},
+		{
+			signal: events.signal,
+		},
+	)
 	dialog.classList.remove("wide")
 	setMarkup(
 		dialog,
@@ -126,4 +132,76 @@ export function field(label: string, name: string, value = "", type = "text") {
 	return html`<label
 		>${label}<input name="${name}" type="${type}" value="${value}"
 	/></label>`
+}
+
+export function confirmDialog(
+	dialog: HTMLDialogElement,
+	message: string,
+	label = "Continue",
+) {
+	return requestDialog(
+		dialog,
+		translate(label === "Continue" ? "Confirm" : label),
+		html`<p>${message}</p>`,
+		() => true,
+		label,
+		true,
+	)
+}
+
+export function promptDialog(
+	dialog: HTMLDialogElement,
+	label: string,
+	value = "",
+) {
+	return requestDialog(
+		dialog,
+		label,
+		field(label, "value", value),
+		form => String(form.get("value") ?? ""),
+		"Save",
+	)
+}
+
+function requestDialog<A>(
+	dialog: HTMLDialogElement,
+	title: string,
+	body: Markup,
+	read: (form: FormData) => A,
+	label: string,
+	destructive = false,
+) {
+	return Effect.callback<A | undefined>(resume => {
+		let result: A | undefined
+		openDialog(
+			dialog,
+			() => resume(Effect.succeed(undefined)),
+			() => resume(Effect.succeed(result)),
+			title,
+			body,
+			form => {
+				result = read(form)
+				return Promise.resolve()
+			},
+			label,
+		)
+		if (destructive)
+			dialog.querySelector("#submit-dialog")?.classList.add("destructive")
+		let form = dialog.querySelector("form")
+		let events = new AbortController()
+		dialog.addEventListener(
+			"close",
+			() => {
+				if (!dialog.open) resume(Effect.succeed(result))
+			},
+			{
+				signal: events.signal,
+			},
+		)
+		return Effect.sync(() => {
+			events.abort()
+			if (dialog.open && dialog.querySelector("form") === form)
+				dialog.close("cancel")
+		})
+	})
 }
