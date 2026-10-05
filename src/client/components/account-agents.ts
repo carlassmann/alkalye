@@ -30,6 +30,7 @@ export class AccountAgentsElement extends HTMLElement {
 		if (this.isConnected) this.connectedCallback()
 	}
 	connectedCallback() {
+		this.dataset.accountAgents = ""
 		let configured = this.options
 		if (!configured || this.lifetime) return
 		let options = configured

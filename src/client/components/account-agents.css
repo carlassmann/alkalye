@@ -58,3 +58,57 @@
 [data-account-agents] #agent-token {
 	font-family: var(--mono);
 }
+
+[data-account-agents] {
+	min-width: 0;
+	font-size: 14px;
+	line-height: 20px;
+}
+[data-account-agents] .settings-row.stacked {
+	grid-template-columns: 16px minmax(0, 1fr);
+	align-items: start;
+	padding: 16px;
+}
+[data-account-agents] .settings-row.stacked > svg {
+	margin-top: 4px;
+}
+[data-account-agents] .settings-row.stacked > div {
+	min-width: 0;
+}
+[data-account-agents] .row-title {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 500;
+}
+[data-account-agents] .muted {
+	margin: 4px 0 12px;
+	color: var(--muted);
+	font-size: 12px;
+	line-height: 20px;
+	overflow-wrap: anywhere;
+}
+[data-account-agents] .copy-field + .muted {
+	margin: 12px 0 0;
+}
+[data-account-agents] .copy-field button {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	flex-shrink: 0;
+	font-size: 12px;
+}
+[data-account-agents] .field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin: 12px 0;
+	font-size: 12px;
+}
+[data-account-agents] .field > input {
+	width: 100%;
+}
+[data-account-agents] fieldset {
+	min-width: 0;
+	margin-top: 12px;
+	font-size: 12px;
+}

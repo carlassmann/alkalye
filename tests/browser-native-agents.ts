@@ -25,6 +25,15 @@ export function verifyNativeAgents(session: string, url: string) {
 		),
 		"native agent connections use a registered Web Component",
 	)
+	browser(session, "set", "viewport", "390", "844")
+	assert(
+		evaluate(
+			session,
+			`(() => {let host=document.querySelector("[data-account-agents]");let panel=host.querySelector(".settings-panel").getBoundingClientRect();let field=host.querySelector(".copy-field").getBoundingClientRect();return panel.right <= innerWidth && field.right <= panel.right && getComputedStyle(host.querySelector(".field")).flexDirection === "column"})()`,
+		),
+		"MCP endpoint and token controls fit the mobile settings screen",
+	)
+	browser(session, "set", "viewport", "1280", "800")
 	browser(session, "fill", '[name="agent-name"]', "Browser agent")
 	browser(session, "click", '[data-agent="create"]')
 	wait(
