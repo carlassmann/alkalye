@@ -11,9 +11,12 @@ export function commentsMarkup(
 	}[],
 	disabled = false,
 	editable = true,
+	selected?: string,
 ) {
 	let discussion = joinMarkup(
-		comments.map(comment => commentMarkup(comment, disabled, editable)),
+		comments.map(comment =>
+			commentMarkup(comment, disabled, editable, selected === comment.id),
+		),
 		"\n",
 	)
 	return html`<section data-comments>
@@ -47,6 +50,7 @@ function commentMarkup(
 	},
 	disabled: boolean,
 	editable: boolean,
+	selected: boolean,
 ) {
 	let { id, fields } = comment
 	let replies = Object.entries(fields)
@@ -57,6 +61,7 @@ function commentMarkup(
 	return html`<article
 		class="comment ${fields.resolved === "true" ? "resolved" : ""}"
 		data-comment="${id}"
+		data-selected="${String(selected)}"
 	>
 		<blockquote>${fields.quote ?? ""}</blockquote>
 		${comment.orphaned ? html`<small class="muted">Commented text deleted</small>` : fields.quote ? button(`jump-comment:${id}`, "Go to text", html`${icon("external-link")}<span>${translate("Go to text")}</span>`) : ""}

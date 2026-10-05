@@ -1,3 +1,4 @@
+import { submitDialog } from "./browser-driver"
 import { object, string } from "../src/shared/model"
 import {
 	assert,
@@ -6,6 +7,7 @@ import {
 	currentDocument,
 	evaluate,
 	wait,
+	visit,
 	workspaceLabel,
 	workspaceValue,
 } from "./browser-driver"
@@ -160,8 +162,8 @@ try {
 		evaluate(guest, 'document.querySelector("[data-action=delete]") === null'),
 		"collaborators are offered Leave instead of Delete",
 	)
-	evaluate(guest, "window.confirm = () => true")
 	browser(guest, "click", '[data-action="leave"]')
+	submitDialog(guest)
 	wait(
 		guest,
 		`fetch("/api/library").then(response => response.json()).then(library => !library.documents.some(entry => entry.document === ${JSON.stringify(document)})) && !location.pathname.includes("/doc/")`,
@@ -209,8 +211,21 @@ try {
 	)
 	evaluate(session, 'document.querySelector("#dialog").close()')
 	assert(true, "making the document private again revokes link readers")
-	evaluate(session, "window.confirm = () => true")
 	browser(session, "click", '[data-action="delete"]')
+	wait(session, 'document.querySelector("#dialog").open')
+	visit(session, "/app")
+	wait(session, '!document.querySelector("#dialog").open')
+	assert(
+		evaluate(
+			session,
+			`fetch("/api/library").then(response => response.json()).then(library => library.documents.some(entry => entry.document === ${JSON.stringify(document)} && !entry.deleted))`,
+		),
+		"Leaving the document cancels its pending deletion",
+	)
+	browser(session, "click", `[data-doc="${document}"]`)
+	wait(session, 'document.querySelector("#editor")?.readOnly === false')
+	browser(session, "click", '[data-action="delete"]')
+	submitDialog(session)
 	wait(
 		session,
 		`!location.pathname.includes("/doc/") && ![...document.querySelectorAll("[data-doc]")].some(row => row.dataset.doc === ${JSON.stringify(document)})`,

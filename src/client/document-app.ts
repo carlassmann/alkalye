@@ -68,14 +68,24 @@ import { restoreDocumentState } from "../shared/document-history"
 import { mountDocumentHistory } from "./components/history"
 import type { AttachmentSelection } from "./document-assets"
 import { prepareAttachment } from "./document-upload"
-import { field, openDialog } from "./components/dialog"
+import {
+	confirmDialog,
+	field,
+	openDialog,
+	promptDialog,
+} from "./components/dialog"
 import { openFind } from "./components/find"
 import { openHelp } from "./components/help"
 import { openPalette } from "./components/palette"
 import { libraryMarkup, updateLibrary } from "./components/library"
 import type { DocumentSummary } from "./components/library"
 import { mountPresentation } from "./components/presentation"
-import { previewMarkup, renderPreview } from "./components/preview"
+import {
+	disposePreview,
+	previewCommentSelection,
+	previewMarkup,
+	renderPreview,
+} from "./components/preview"
 import { clearDocument } from "./components/document-renderer"
 import { printDocument } from "./components/print"
 import { StatsElement, statusbarMarkup } from "./components/statusbar"
@@ -205,6 +215,7 @@ function mountApplication() {
 			{ selected: Selection; captured?: AttachmentSelection } | undefined
 		let editor: ReturnType<typeof mountEditor> | undefined
 		let presentation: ReturnType<typeof mountPresentation> | undefined
+		let selectedComment: string | undefined
 		let app = element("#app")
 		let archives = Effect.tryPromise(() => import("./document-archives"))
 		setMarkup(
@@ -391,6 +402,8 @@ function mountApplication() {
 		yield* Effect.addFinalizer(() =>
 			Effect.sync(() => {
 				events.abort()
+				let preview = app.querySelector<HTMLElement>("#preview")
+				if (preview) disposePreview(preview)
 				presentation?.dispose()
 			}),
 		)
@@ -981,6 +994,27 @@ function mountApplication() {
 									),
 						),
 					),
+					remove: name => {
+						let request = Effect.runSync(random.randomUUIDv4)
+						return account
+							.request(
+								account.api.workspaces.remove({
+									params: { workspace: id },
+									payload: { name, request },
+								}),
+							)
+							.pipe(
+								Effect.andThen(library.refresh),
+								Effect.andThen(
+									Effect.sync(() => {
+										workspace = ""
+										refreshLibrary()
+										router.go({ kind: "library" }, { replace: true })
+										toast(translate("Workspace deleted"))
+									}),
+								),
+							)
+					},
 					invitations: invitationPanel({ workspace: id }),
 					report,
 				})
@@ -1364,6 +1398,8 @@ function mountApplication() {
 			}
 		}
 		function mountDocument() {
+			let preview = app.querySelector<HTMLElement>("#preview")
+			if (preview) disposePreview(preview)
 			let stats = app.querySelector("alkalye-stats")
 			if (stats instanceof StatsElement) stats.clear()
 			launch(
@@ -1511,6 +1547,7 @@ function mountApplication() {
 						routeHref({ ...documentRoute(doc.id), mode: "edit" }),
 						selected.opened.session.replica.metadata(doc.id)
 							.commentsDisabled !== true,
+						preferences.state.current().value.appearance,
 					),
 				)
 				renderPreview(
@@ -1519,6 +1556,7 @@ function mountApplication() {
 					rendering(doc),
 					id => launch(open(id)),
 					id => launch(openDrawing(selected, id)),
+					previewComments(selected),
 				)
 			} else if (mode === "history") {
 				let copies = new Map<
@@ -1793,6 +1831,38 @@ function mountApplication() {
 				})
 				.pipe(Effect.ignore)
 		}
+		function askDocument<A>(
+			selected: Selection,
+			question: Effect.Effect<A | undefined>,
+		) {
+			return Effect.gen(function* () {
+				dialogOwner = selected
+				let answer = yield* question
+				return selection === selected ? answer : undefined
+			})
+		}
+		function previewComments(selected: Selection) {
+			return {
+				comments: selected.opened.discussion.current(),
+				selected: selectedComment,
+				commentable:
+					writable() &&
+					selected.opened.session.replica.metadata(selected.document)
+						.commentsDisabled !== true,
+				select: (id: string) => {
+					selectedComment = selectedComment === id ? undefined : id
+					panel = "comments"
+					setLayout("tools", true)
+					refreshDocument()
+					if (selectedComment)
+						app
+							.querySelector<HTMLElement>(
+								'[data-comment="' + CSS.escape(selectedComment) + '"]',
+							)
+							?.scrollIntoView({ block: "nearest" })
+				},
+			}
+		}
 		function rendering(doc: DocumentRecord) {
 			let header = frontmatter(doc.content).values
 			let requested = header["theme-id"] || header.theme || ""
@@ -1856,6 +1926,7 @@ function mountApplication() {
 						rendering(doc),
 						id => launch(open(id)),
 						id => launch(openDrawing(selected, id)),
+						previewComments(selected),
 					)
 				}
 				editor?.presence(library.live.presence.current(doc.id))
@@ -1895,6 +1966,7 @@ function mountApplication() {
 									.commentsDisabled
 							: false,
 						writable() && Boolean(selection?.opened.discussion.canWrite()),
+						selectedComment,
 					),
 				)
 				return
@@ -2487,24 +2559,32 @@ function mountApplication() {
 					let located = library.folders.locate(selected.document)
 					if (!located) return
 					if (action === "file-move") {
-						let path = window.prompt(
-							"File name or path inside " + located.directory.name,
-							located.file.path,
+						let path = yield* askDocument(
+							selected,
+							promptDialog(
+								dialog,
+								"File name or path inside " + located.directory.name,
+								located.file.path,
+							),
 						)
-						if (path === null || path.trim() === located.file.path) return
+						if (path === undefined || path.trim() === located.file.path) return
 						yield* selected.opened.session.flush
 						yield* file.reconcile
 						yield* library.folders.move(selected.document, path.trim())
 						return
 					}
 					if (
-						!window.confirm(
-							"Delete " +
-								located.file.path +
-								" from " +
-								located.directory.name +
-								"?",
-						)
+						!(yield* askDocument(
+							selected,
+							confirmDialog(
+								dialog,
+								"Delete " +
+									located.file.path +
+									" from " +
+									located.directory.name +
+									"?",
+							),
+						))
 					)
 						return
 					yield* closeSelection(selected)
@@ -2752,7 +2832,14 @@ function mountApplication() {
 						return report("Only the document owner can delete it")
 					if (
 						action === "delete" &&
-						!window.confirm("Move " + doc.title + " to the trash?")
+						!(yield* askDocument(
+							selected,
+							confirmDialog(
+								dialog,
+								"Move " + doc.title + " to the trash?",
+								"Delete",
+							),
+						))
 					)
 						return
 					yield* selected.opened.session.change(
@@ -2831,7 +2918,13 @@ function mountApplication() {
 					return
 				}
 				if (action === "leave") {
-					if (!window.confirm("Leave " + doc.title + "?")) return
+					if (
+						!(yield* askDocument(
+							selected,
+							confirmDialog(dialog, "Leave " + doc.title + "?", "Leave"),
+						))
+					)
+						return
 					let request = yield* random.randomUUIDv4
 					let left = yield* account.request(
 						account.api.invitations.leaveTarget({
@@ -2978,26 +3071,44 @@ function mountApplication() {
 							}
 							if (action.startsWith("asset-rename:")) {
 								let id = action.slice("asset-rename:".length)
-								let name = window.prompt(
-									"Attachment name",
-									selected.opened.session.replica.fields(id).name ?? "",
+								let name = yield* askDocument(
+									selected,
+									promptDialog(
+										dialog,
+										"Attachment name",
+										selected.opened.session.replica.fields(id).name ?? "",
+									),
 								)
-								if (name !== null)
+								if (name !== undefined)
 									yield* selected.opened.assets.rename(id, name)
 								return
 							}
 							if (action.startsWith("asset-delete:")) {
 								let id = action.slice("asset-delete:".length)
 								if (
-									window.confirm(
-										"Remove this attachment and its source references?",
+									yield* askDocument(
+										selected,
+										confirmDialog(
+											dialog,
+											"Remove this attachment and its source references?",
+											"Remove",
+										),
 									)
 								)
 									yield* selected.opened.assets.delete(id)
 								return
 							}
 							if (action === "comment" || action.startsWith("reply:")) {
-								let captured = editor?.selectionAnchor()
+								let captured =
+									mode === "preview"
+										? previewCommentSelection(
+												element("#preview"),
+												selected.opened.session.replica.visible(
+													selected.document,
+												),
+												doc.content,
+											)
+										: editor?.selectionAnchor()
 								if (action === "comment" && !captured)
 									return report("Finish editing before adding a comment")
 								let composer =
@@ -3078,9 +3189,12 @@ function mountApplication() {
 							) {
 								let title =
 									action === "rename"
-										? window.prompt("Document title", doc.title)
+										? yield* askDocument(
+												selected,
+												promptDialog(dialog, "Document title", doc.title),
+											)
 										: undefined
-								if (title === null) return
+								if (title === undefined && action === "rename") return
 								yield* selected.opened.session.change(
 									action === "rename"
 										? "Rename document"

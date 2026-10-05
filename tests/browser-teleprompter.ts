@@ -1,3 +1,4 @@
+import { object } from "../src/shared/model"
 import { assert, browser, evaluate, wait } from "./browser-driver"
 
 let source = `---
@@ -60,8 +61,7 @@ try {
 		evaluate(
 			session,
 			`document.querySelector(".prompter-start").checkVisibility() &&
-			document.querySelector("#prompter-title").textContent === "Teleprompter talk" &&
-			document.querySelector("#slide-count").textContent.trim().endsWith("1 / 3") &&
+			document.querySelector("#slide-count").textContent.trim().endsWith("0 / 3") &&
 			document.querySelector(".prompter-preview").checkVisibility() &&
 			document.querySelector("#slide").shadowRoot.querySelector(".theme").dataset.mode === "slideshow"`,
 		),
@@ -76,9 +76,9 @@ try {
 	assert(
 		evaluate(
 			session,
-			'document.querySelector("#presentation-timer").classList.contains("active") && !document.querySelector(".prompter-start").checkVisibility()',
+			'/^\\d+:\\d\\d$/.test(document.querySelector("#presentation-timer").textContent) && !document.querySelector(".prompter-start").checkVisibility()',
 		),
-		"Starting selects the first block and starts the timer",
+		"Starting selects the first block with the timer running",
 	)
 
 	browser(session, "press", "ArrowDown")
@@ -123,7 +123,7 @@ try {
 	assert(
 		evaluate(
 			session,
-			'document.querySelector("#next-note").disabled === false && document.querySelector(\'.prompter-navigation [data-action="next"]\').disabled',
+			'document.querySelector("#next-item").disabled === false && document.querySelector(\'.prompter-navigation [data-action="next"]\').disabled',
 		),
 		"Slide jumps land on each slide's first visual block",
 	)
@@ -161,7 +161,7 @@ try {
 		evaluate(
 			session,
 			`(() => {
-				let preview = document.querySelector(".prompter-preview").getBoundingClientRect();
+				let preview = document.querySelector(".prompter-preview-dialog").getBoundingClientRect();
 				return preview.width === innerWidth && preview.height === innerHeight &&
 					document.querySelector("#preview-toggle").getAttribute("aria-expanded") === "true";
 			})()`,
@@ -176,18 +176,29 @@ try {
 		),
 		"Script keys pause while the mobile slide overlay is open",
 	)
-	evaluate(
+	let point = evaluate(
 		session,
-		`(() => {
-			let canvas = document.querySelector(".prompter-preview .presentation-canvas");
-			let bounds = document.querySelector("#slide").getBoundingClientRect();
-			canvas.dispatchEvent(new PointerEvent("pointerdown", {bubbles: true, pointerType: "touch", buttons: 1, clientX: bounds.left + bounds.width / 2, clientY: bounds.top + bounds.height / 2}));
-		})()`,
+		'(() => {let bounds=document.querySelector("#slide").getBoundingClientRect();return JSON.stringify({x:Math.round(bounds.left+bounds.width/2),y:Math.round(bounds.top+bounds.height/2)})})()',
+	)
+	if (typeof point !== "string") throw new Error("Missing laser position")
+	let location = object(JSON.parse(point))
+	browser(session, "mouse", "move", String(location.x), String(location.y))
+	browser(session, "mouse", "down")
+	browser(
+		session,
+		"mouse",
+		"move",
+		String(Number(location.x) + 20),
+		String(Number(location.y) + 20),
 	)
 	assert(
-		evaluate(session, 'document.querySelector("#laser").hidden === false'),
-		"Touching the overlay slide shows the laser pointer",
+		evaluate(
+			session,
+			'document.querySelector(".laser-trail path").getAttribute("d")?.length > 0',
+		),
+		"Dragging the overlay slide draws a laser trail",
 	)
+	browser(session, "mouse", "up")
 	browser(session, "click", "#preview-close")
 	wait(
 		session,
@@ -195,16 +206,12 @@ try {
 	)
 	browser(session, "set", "viewport", "1280", "800")
 
-	browser(session, "click", "#scroll-toggle")
-	wait(session, 'document.querySelector("#speaker-notes").scrollTop > 0')
-	browser(session, "click", "#scroll-toggle")
-	assert(
-		evaluate(
-			session,
-			'document.querySelector("#scroll-toggle").getAttribute("aria-pressed") === "false"',
-		),
-		"Auto-scroll plays and pauses",
+	browser(session, "click", "#presentation-timer")
+	wait(
+		session,
+		'document.querySelector("#presentation-timer").textContent === "0:00"',
 	)
+	assert(true, "Clicking the timer resets its elapsed time")
 
 	browser(session, "press", "Escape")
 	wait(session, 'document.querySelector("#editor") !== null')

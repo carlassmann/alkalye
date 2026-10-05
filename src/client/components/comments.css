@@ -89,3 +89,8 @@
 	padding: 4px;
 	color: var(--muted);
 }
+
+[data-comments] .comment[data-selected="true"] {
+	border-color: var(--ink);
+	background: var(--accent);
+}

@@ -1,4 +1,4 @@
-/* Sonner's default toaster, scoped to the popover host. */
+/* Styles adapted from Sonner; MIT notice in public/notices.txt. */
 [data-toast] {
 	--width: 356px;
 	--gap: 14px;

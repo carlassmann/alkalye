@@ -15,6 +15,11 @@ for (let path of [
 	"tests/browser-editor-context-menu.ts",
 	"tests/browser-editor-prettification.ts",
 	"tests/browser-ui-parity.ts",
+	"tests/browser-dialog.ts",
+	"tests/browser-toasts.ts",
+	"tests/browser-screen-parity.ts",
+	"tests/browser-presentation-state.ts",
+	"tests/browser-workspace-deletion.ts",
 	"tests/browser-teleprompter.ts",
 	"tests/browser-whiteboard.ts",
 ]) {

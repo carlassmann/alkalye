@@ -61,7 +61,12 @@ export function verifyNativeWorkspaces(
 	browser(owner, "click", '[data-action="manage-workspace"]')
 	wait(
 		owner,
-		`location.pathname === ${JSON.stringify(`/app/spaces/${workspace}/settings`)} && document.querySelector("[data-workspace-settings] [data-add-member]") !== null && document.querySelector("[data-workspace-settings] [data-invitations]") !== null`,
+		`location.pathname === ${JSON.stringify(`/app/spaces/${workspace}/settings`)} && document.querySelector('[data-workspace="invite"]') !== null`,
+	)
+	browser(owner, "click", '[data-workspace="invite"]')
+	wait(
+		owner,
+		'document.querySelector("#dialog [data-add-member]") !== null && document.querySelector("#dialog [data-invitations]") !== null',
 	)
 	browser(owner, "fill", '[data-add-member] input[name="member"]', subject)
 	browser(
@@ -72,7 +77,7 @@ export function verifyNativeWorkspaces(
 	browser(owner, "click", "[data-add-member] button.primary")
 	wait(
 		owner,
-		`document.querySelector('[data-member-row="${subject}"] alkalye-picker')?.value === "reader"`,
+		`document.querySelector('[data-member-row="${subject}"] .member-role')?.textContent.trim() === "Reader"`,
 	)
 	browser(reader, "open", url + "/doc/" + document)
 	wait(
@@ -102,26 +107,32 @@ export function verifyNativeWorkspaces(
 	)
 	assert(true, "Back leaves workspace settings for the open document")
 
-	// A member's role changes from the keyboard through the picker.
 	browser(
 		owner,
-		"focus",
-		`[data-member-row="${subject}"] alkalye-picker .menu-trigger`,
+		"click",
+		`[data-member-row="${subject}"] [data-workspace="edit-member"]`,
 	)
+	wait(owner, 'document.querySelector("#dialog alkalye-picker") !== null')
+	browser(owner, "focus", "#dialog alkalye-picker .menu-trigger")
 	browser(owner, "press", "Enter")
 	wait(
 		owner,
-		`document.querySelector('[data-member-row="${subject}"] .menu-popover:popover-open') !== null && document.activeElement?.dataset.value === "reader"`,
+		'document.querySelector("#dialog .menu-popover:popover-open") !== null && document.activeElement?.dataset.value === "reader"',
 	)
 	browser(owner, "press", "ArrowUp")
 	browser(owner, "press", "Enter")
+	browser(owner, "click", "#submit-dialog")
 	wait(
 		owner,
-		`document.querySelector('[data-member-row="${subject}"] alkalye-picker')?.value === "writer" && document.activeElement?.closest("[data-member-row]")?.dataset.memberRow === ${JSON.stringify(subject)}`,
+		`!document.querySelector("#dialog").open && document.querySelector('[data-member-row="${subject}"] .member-role')?.textContent.trim() === "Writer"`,
 	)
 	wait(reader, 'document.querySelector("#editor")?.readOnly === false')
-	assert(true, "the role picker works from the keyboard and keeps focus")
-	browser(owner, "click", '[data-member-row] [data-workspace="remove-member"]')
+	assert(
+		true,
+		"the member dialog changes roles through its keyboard-operated picker",
+	)
+	browser(owner, "click", '[data-member-row] [data-workspace="edit-member"]')
+	browser(owner, "click", "#dialog [data-remove-member]")
 	wait(owner, "!document.querySelector('[data-member-row]')")
 	wait(reader, 'document.querySelector("#editor")?.readOnly !== false')
 	assert(true, "removing a workspace member ends their access")
@@ -130,7 +141,7 @@ export function verifyNativeWorkspaces(
 	browser(owner, "press", "Enter")
 	wait(
 		owner,
-		`${workspaceLabel} === "Renamed team" && document.querySelector("#toast")?.textContent === "Workspace renamed"`,
+		`${workspaceLabel} === "Renamed team" && document.querySelector("#toast")?.textContent.includes("Workspace renamed")`,
 	)
 	browser(owner, "click", ".settings-back")
 	wait(

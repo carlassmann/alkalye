@@ -105,6 +105,11 @@ export function renderPreview(
 		}
 	}
 }
+export function disposePreview(host: HTMLElement) {
+	events.get(host)?.abort()
+	events.delete(host)
+	states.delete(host)
+}
 let events = new WeakMap<HTMLElement, AbortController>()
 function replaceEvents(host: HTMLElement) {
 	events.get(host)?.abort()

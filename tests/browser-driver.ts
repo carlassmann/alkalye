@@ -37,7 +37,7 @@ function reveal(session: string, selector: string) {
 	let steps = browser(
 		session,
 		"eval",
-		`(() => { let matches = [...document.querySelectorAll(${JSON.stringify(selector)})]; if (!matches.length || matches.some(node => node.checkVisibility() && !node.closest('#app:not(.library-open) [data-library], #app:not(.tools-open) [data-inspector]'))) return "[]"; let node = matches[0], app = document.querySelector("#app"), steps = []; if (node.closest("[data-library]") && !app?.classList.contains("library-open")) steps.push(['[data-action="library"]', "[data-library] *"]); if (node.closest(".library-menu")) steps.push(['[data-action="library-menu"]', ".library-menu"]); if (node.closest(".library-options")) steps.push(['[data-action="library-options"]', ".library-options"]); if (node.closest("[data-inspector]") && !app?.classList.contains("tools-open")) { if (app?.classList.contains("mode-preview")) steps.push(['[aria-controls="preview-options"]', "#preview-options:popover-open"]); steps.push([app?.classList.contains("mode-preview") ? '#preview-options [data-action="toggle-tools"]' : '[data-action="toggle-tools"]', "[data-inspector] *"]); } let popover = node.closest("[popover]:not(:popover-open)"); if (popover) steps.push(['[aria-controls="' + popover.id + '"]', '[id="' + popover.id + '"]:popover-open']); let group = node.closest("details:not([open])"); if (group) steps.push(['details[data-group="' + group.dataset.group + '"] > summary', 'details[data-group="' + group.dataset.group + '"][open] > *']); return JSON.stringify(steps) })()`,
+		`(() => { let matches = [...document.querySelectorAll(${JSON.stringify(selector)})]; if (!matches.length || matches.some(node => node.checkVisibility() && !node.closest('#app:not(.library-open) [data-library], #app:not(.tools-open) [data-inspector]'))) return "[]"; let node = matches.find(node => node.closest("alkalye-workspace-menu")) ?? matches[0], app = document.querySelector("#app"), steps = []; if (node.closest("[data-library]") && !app?.classList.contains("library-open")) steps.push(['[data-action="library"]', "[data-library] *"]); if (node.closest(".library-menu")) steps.push(['[data-action="library-menu"]', ".library-menu"]); if (node.closest(".library-options")) steps.push(['[data-action="library-options"]', ".library-options"]); if (node.closest("[data-inspector]") && !app?.classList.contains("tools-open")) { if (app?.classList.contains("mode-preview")) steps.push(['.preview-back', '#editor']); steps.push(['[data-action="toggle-tools"]', "[data-inspector] *"]); } let popover = node.closest("[popover]:not(:popover-open)"); if (popover) { let scope = popover.closest('alkalye-workspace-menu, alkalye-picker'); steps.push([scope ? scope.localName + ' > .menu-trigger' : '[aria-controls="' + popover.id + '"]', scope ? scope.localName + ' > [popover]:popover-open' : '[id="' + popover.id + '"]:popover-open']); } let group = node.closest("details:not([open])"); if (group) steps.push(['details[data-group="' + group.dataset.group + '"] > summary', 'details[data-group="' + group.dataset.group + '"][open] > *']); return JSON.stringify(steps) })()`,
 	).result
 	for (let step of JSON.parse(typeof steps === "string" ? steps : "[]")) {
 		if (!Array.isArray(step)) continue
@@ -47,12 +47,24 @@ function reveal(session: string, selector: string) {
 			"eval",
 			`[...document.querySelectorAll(${JSON.stringify(toggle)})].find(node => node.checkVisibility())?.click()`,
 		)
-		browser(
-			session,
-			"wait",
-			"--fn",
-			`[...document.querySelectorAll(${JSON.stringify(revealed)})].some(node => node.checkVisibility())`,
-		)
+		try {
+			browser(
+				session,
+				"wait",
+				"--fn",
+				`[...document.querySelectorAll(${JSON.stringify(revealed)})].some(node => node.checkVisibility())`,
+			)
+		} catch (error) {
+			console.error({
+				toggle,
+				revealed,
+				state: evaluate(
+					session,
+					'({app:document.querySelector("#app")?.className, workspace:document.querySelector("alkalye-workspace-menu")?.outerHTML, popovers:[...document.querySelectorAll(":popover-open")].map(node=>node.id), toast:document.querySelector("#toast")?.textContent})',
+				),
+			})
+			throw error
+		}
 	}
 }
 // The open document's identifier from the path, written without quotes so it
@@ -105,4 +117,15 @@ export function wait(session: string, source: string) {
 export function assert(condition: unknown, message: string) {
 	if (!condition) throw new Error(message)
 	console.log(`PASS ${message}`)
+}
+
+export function submitDialog(session: string, value?: string) {
+	wait(
+		session,
+		'document.querySelector("#dialog").open && document.querySelector("#submit-dialog") !== null',
+	)
+	if (value !== undefined)
+		browser(session, "fill", '#dialog [name="value"]', value)
+	browser(session, "click", "#submit-dialog")
+	wait(session, '!document.querySelector("#dialog").open')
 }

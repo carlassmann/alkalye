@@ -9,6 +9,7 @@ import {
 	browser,
 	evaluate,
 	wait,
+	visit,
 	currentDocument,
 } from "./browser-driver"
 import { verifyNativeAssets } from "./browser-native-assets"
@@ -211,13 +212,13 @@ if (process.argv.includes("--serve")) {
 		browser(session, "click", '[data-action="slideshow"]')
 		wait(
 			session,
-			'document.querySelector("#slide-count")?.textContent === "1 / 2"',
+			'document.querySelector("alkalye-presentation")?.dataset.slide === "1"',
 		)
 		browser(session, "press", "ArrowRight")
 		assert(
 			evaluate(
 				session,
-				'document.querySelector("#slide-count")?.textContent === "2 / 2"',
+				'document.querySelector("alkalye-presentation")?.dataset.slide === "2"',
 			),
 			"native slideshow reuses the presentation controls and keyboard navigation",
 		)
@@ -226,9 +227,9 @@ if (process.argv.includes("--serve")) {
 		assert(
 			evaluate(
 				session,
-				'document.querySelector("#scroll-speed") !== null && document.querySelector("#speaker-notes") !== null',
+				'document.querySelector("#presentation-timer") !== null && document.querySelector("#speaker-notes") !== null',
 			),
-			"native teleprompter mounts its speed controls and speaker notes",
+			"native teleprompter mounts its timer and speaker notes",
 		)
 		browser(session, "press", "Escape")
 		evaluate(
@@ -680,14 +681,27 @@ if (process.argv.includes("--serve")) {
 			true,
 			"native live channel renders another writer's cursor and selection",
 		)
-		browser(session, "click", '[data-action="slideshow"]')
-		browser(reader, "click", '[data-action="slideshow"]')
-		browser(reader, "click", '[data-action="follow"]')
-		evaluate(
-			session,
-			'{let canvas = document.querySelector(".presentation-canvas"), bounds = document.querySelector("#slide").getBoundingClientRect(); canvas.dispatchEvent(new PointerEvent("pointermove", {bubbles:true, shiftKey:true, clientX:bounds.left + bounds.width*.3, clientY:bounds.top + bounds.height*.6}))}',
+		browser(session, "click", '[data-action="teleprompter"]')
+		browser(session, "click", '#speaker-notes [data-item="0"]')
+		let presentingDocument = String(evaluate(session, currentDocument))
+		visit(reader, "/app/doc/" + presentingDocument + "/slideshow?follow=1")
+		wait(reader, 'document.querySelector("alkalye-presentation") !== null')
+		let laserBounds = object(
+			evaluate(
+				session,
+				'(() => {let bounds=document.querySelector("#slide").getBoundingClientRect();return {x:bounds.left+40,y:bounds.top+40}})()',
+			),
 		)
-		wait(reader, 'document.querySelector("#laser").hidden === false')
+		let laserX = Math.round(Number(laserBounds.x)),
+			laserY = Math.round(Number(laserBounds.y))
+		browser(session, "mouse", "move", String(laserX), String(laserY))
+		browser(session, "mouse", "down")
+		browser(session, "mouse", "move", String(laserX + 80), String(laserY + 45))
+		wait(
+			reader,
+			'document.querySelector(".laser-trail path").getAttribute("d")?.length > 0',
+		)
+		browser(session, "mouse", "up")
 		assert(
 			true,
 			"native presentation broadcasts the laser pointer through the same live channel",
@@ -695,7 +709,7 @@ if (process.argv.includes("--serve")) {
 		browser(session, "press", "ArrowRight")
 		wait(
 			reader,
-			'document.querySelector("#slide-count").textContent === "2 / 2"',
+			'document.querySelector("alkalye-presentation")?.dataset.slide === "2"',
 		)
 		assert(true, "native audience follows the presenter's selected slide")
 		browser(session, "click", '[data-action="edit"]')

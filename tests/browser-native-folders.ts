@@ -1,3 +1,4 @@
+import { submitDialog } from "./browser-driver"
 import { string } from "../src/shared/model"
 import {
 	assert,
@@ -187,16 +188,12 @@ try {
 	)
 	browser(session, "press", "Escape")
 
-	evaluate(
-		session,
-		'window.originalPrompt = window.prompt; window.prompt = () => "Archive/Renamed plan.md"',
-	)
 	browser(session, "click", '[data-action="file-move"]')
+	submitDialog(session, "Archive/Renamed plan.md")
 	wait(
 		session,
 		'window.diskEntries().then(names => names.includes("Archive/Renamed plan.md") && !names.includes("Projects/Plan.md")) && document.querySelector("#document-list").textContent.includes("Renamed plan")',
 	)
-	evaluate(session, "window.prompt = window.originalPrompt")
 	assert(
 		string(evaluate(session, currentDocument)) === plan,
 		"renaming or moving a file keeps its open editing session",
@@ -261,17 +258,13 @@ try {
 		"after a reload the folder reopens and shows changes made while Alkalye was closed",
 	)
 
-	evaluate(
-		session,
-		"window.originalConfirm = window.confirm; window.confirm = () => true",
-	)
 	browser(session, "click", '[data-action="tools"]')
 	browser(session, "click", '[data-action="file-delete"]')
+	submitDialog(session)
 	wait(
 		session,
 		'!document.querySelector("#document-list").textContent.includes("Welcome") && window.readDisk("Welcome.md").then(() => false, () => true)',
 	)
-	evaluate(session, "window.confirm = window.originalConfirm")
 	assert(true, "deleting a file removes it from disk and from the sidebar")
 
 	evaluate(

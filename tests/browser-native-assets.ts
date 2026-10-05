@@ -1,3 +1,4 @@
+import { submitDialog } from "./browser-driver"
 import {
 	assert,
 	browser,
@@ -57,21 +58,18 @@ export function verifyNativeAssets(session: string, source: string) {
 			'document.querySelector("#preview").shadowRoot.querySelector("img").src',
 		),
 	)
-	evaluate(
-		session,
-		'window.originalPrompt = window.prompt; window.prompt = () => "Renamed image"',
-	)
+	let imageDigest = `fetch(document.querySelector("#preview").shadowRoot.querySelector("img").src).then(response => response.arrayBuffer()).then(bytes => crypto.subtle.digest("SHA-256", bytes)).then(hash => Array.from(new Uint8Array(hash)).join(","))`
+	let firstDigest = evaluate(session, imageDigest)
 	browser(session, "click", `[data-action="asset-rename:${asset}"]`)
+	submitDialog(session, "Renamed image")
+	browser(session, "click", '[data-action="preview"]')
 	wait(
 		session,
-		'document.querySelector("[data-attachments] .asset-row").textContent.includes("Renamed image")',
+		'document.querySelector("[data-attachments] .asset-row").textContent.includes("Renamed image") && document.querySelector("#preview").shadowRoot.querySelector("img")?.naturalWidth === 2048',
 	)
 	assert(
-		evaluate(
-			session,
-			'document.querySelector("#preview").shadowRoot.querySelector("img").src',
-		) === firstUrl,
-		"native attachment renaming preserves its preview URL",
+		evaluate(session, imageDigest) === firstDigest,
+		"native attachment renaming preserves its image contents",
 	)
 	assert(
 		evaluate(
@@ -80,10 +78,7 @@ export function verifyNativeAssets(session: string, source: string) {
 		),
 		"image attachments expose no audio-mute control",
 	)
-	evaluate(
-		session,
-		"window.prompt = window.originalPrompt; delete window.originalPrompt",
-	)
+	browser(session, "click", ".preview-back")
 	browser(session, "click", '[data-action="slideshow"]')
 	browser(session, "press", "ArrowRight")
 	wait(
@@ -139,7 +134,10 @@ export function verifyNativeAssets(session: string, source: string) {
 		session,
 		'window.previewVideo = document.querySelector("#preview").shadowRoot.querySelector("video")',
 	)
-	browser(session, "click", `[data-action="asset-mute:${video}"]`)
+	evaluate(
+		session,
+		`document.querySelector('[data-action="asset-mute:${video}"]').click()`,
+	)
 	wait(
 		session,
 		'document.querySelector("#preview").shadowRoot.querySelector("video").muted === true',
@@ -203,12 +201,10 @@ export function verifyNativeAssets(session: string, source: string) {
 		`window.previewRevokeViolations = []; window.originalRevoke = URL.revokeObjectURL; URL.revokeObjectURL = function(url) { function contains(root) { for (let node of root.querySelectorAll('*')) { if ((node.getAttribute('src') ?? '').split('#')[0] === url) return true; if (node.shadowRoot && contains(node.shadowRoot)) return true } return false }; if (contains(document)) window.previewRevokeViolations.push(url); return window.originalRevoke(url) }`,
 	)
 	browser(session, "press", "Escape")
-	evaluate(
-		session,
-		"window.originalConfirm = window.confirm; window.confirm = () => true",
-	)
-	for (let id of [asset, video])
+	for (let id of [asset, video]) {
 		browser(session, "click", `[data-action="asset-delete:${id}"]`)
+		submitDialog(session)
+	}
 	wait(
 		session,
 		'document.querySelectorAll("[data-attachments] .asset-row").length === 0 && !document.querySelector("#editor").value.includes("asset:")',
@@ -224,7 +220,7 @@ export function verifyNativeAssets(session: string, source: string) {
 	)
 	evaluate(
 		session,
-		"window.confirm = window.originalConfirm; URL.revokeObjectURL = window.originalRevoke; delete window.originalConfirm; delete window.originalRevoke; delete window.previewVideo",
+		"URL.revokeObjectURL = window.originalRevoke; delete window.originalRevoke; delete window.previewVideo",
 	)
 	browser(session, "fill", "#editor", source)
 	wait(
