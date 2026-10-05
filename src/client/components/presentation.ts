@@ -424,15 +424,19 @@ function presentationView(host: HTMLElement, options: PresentationOptions) {
 			if (document.fullscreenElement) void document.exitFullscreen()
 			else void document.documentElement.requestFullscreen()
 		}
+		// Readers follow the shared position and cannot move it.
 		function updateNavigation(count: number, position: number) {
+			let editable = writable()
 			for (let [selector, enabled] of [
 				['[data-action="previous"]', position > 0],
 				['[data-action="next"]', position < count - 1],
 				["#previous-item", item !== undefined && item > 0],
 				["#next-item", item !== undefined && item < items.length - 1],
+				["[data-start]", true],
 			] satisfies [string, boolean][]) {
 				let control = host.querySelector(selector)
-				if (control instanceof HTMLButtonElement) control.disabled = !enabled
+				if (control instanceof HTMLButtonElement)
+					control.disabled = !enabled || !editable
 			}
 		}
 		function layout() {

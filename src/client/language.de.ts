@@ -492,4 +492,7 @@ export let german: Record<string, string> = {
 	"Stop showing this folder in Alkalye":
 		"Diesen Ordner nicht mehr in Alkalye anzeigen",
 	Owner: "Eigentümer",
+	"Share it to be added to a space by its owner.":
+		"Teile sie, damit dich der Eigentümer eines Bereichs hinzufügen kann.",
+	"Account ID": "Konto-ID",
 }

@@ -42,6 +42,7 @@ try {
 	verifyTeleprompter()
 	verifySlideshow()
 	verifyNarrowTeleprompter()
+	verifyAudience()
 	verifyPreview()
 	verifyEmptyTeleprompter()
 	verifySettings()
@@ -268,6 +269,69 @@ function verifyNarrowTeleprompter() {
 	browser(session, "set", "viewport", "1280", "800")
 }
 
+// A second window on the same document shows the presenter's slide and
+// laser, as the original's audience slideshow did.
+function verifyAudience() {
+	let audience = new URL(
+		location().replace(/\/teleprompter$/, "/slideshow"),
+		url(),
+	).href
+	let presenter = activeTab()
+	browser(session, "tab", "new")
+	let watcher = activeTab()
+	browser(session, "open", audience)
+	wait(session, 'document.querySelector(".slideshow-options") !== null')
+	browser(session, "tab", presenter)
+	browser(session, "click", '#speaker-notes [data-slide="1"] .prompter-visual')
+	wait(
+		session,
+		'document.querySelector("#slide-count").textContent.trim() === "Slide 2 / 3"',
+	)
+	browser(session, "tab", watcher)
+	wait(
+		session,
+		'document.querySelector("alkalye-presentation").dataset.slide === "2"',
+	)
+	assert(true, "An audience slideshow follows the teleprompter's selection")
+	browser(session, "tab", presenter)
+	evaluate(
+		session,
+		`(() => {
+			let surface = document.querySelector(".prompter-preview .presentation-canvas");
+			let bounds = document.querySelector("#slide").getBoundingClientRect();
+			let at = (type, fx, fy) => surface.dispatchEvent(new PointerEvent(type, {bubbles: true, isPrimary: true, pointerId: 9, pointerType: "mouse", button: 0, buttons: 1, clientX: bounds.left + bounds.width * fx, clientY: bounds.top + bounds.height * fy}));
+			at("pointerdown", .3, .4);
+			at("pointermove", .5, .5);
+		})()`,
+	)
+	browser(session, "tab", watcher)
+	wait(
+		session,
+		'(document.querySelector(".laser-trail path").getAttribute("d") || "").startsWith("M")',
+	)
+	assert(true, "The presenter's laser reaches the audience slideshow")
+	browser(session, "tab", "close", watcher)
+	browser(session, "tab", presenter)
+}
+
+function activeTab() {
+	let tabs = browser(session, "tab").tabs
+	let active = Array.isArray(tabs)
+		? tabs.find(
+				tab => tab && typeof tab === "object" && "active" in tab && tab.active,
+			)
+		: undefined
+	if (!active || !("tabId" in active) || typeof active.tabId !== "string")
+		throw new Error("Missing active tab")
+	return active.tabId
+}
+
+function url() {
+	let origin = evaluate(session, "location.origin")
+	if (typeof origin !== "string") throw new Error("Missing origin")
+	return origin
+}
+
 function verifyPreview() {
 	browser(session, "press", "Escape")
 	wait(session, 'document.querySelector("#editor") !== null')
@@ -394,7 +458,7 @@ function verifySettings() {
 				return titles.join() === "Profile,Cloud Sync & Backup,Appearance" &&
 					themes.map(option => option.dataset.value).join() === "light,dark,system" &&
 					themes.every(option => option.querySelector("svg")) &&
-					document.querySelector("#settings-general input[readonly]") === null
+					document.querySelector("#settings-general #account-id").readOnly
 			})()`,
 		),
 		"General settings keep the original's sections and theme choices",

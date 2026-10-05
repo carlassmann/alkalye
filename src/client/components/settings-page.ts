@@ -271,7 +271,7 @@ export class SettingsPageElement extends HTMLElement {
 		setMarkup(
 			content,
 			options.category === "general"
-				? generalMarkup(value)
+				? generalMarkup(value, options.account.subject)
 				: options.category === "editor"
 					? editorMarkup(value)
 					: options.category === "connections"
@@ -772,7 +772,7 @@ export class SettingsPageElement extends HTMLElement {
 }
 customElements.define("alkalye-settings", SettingsPageElement)
 
-function generalMarkup(value: AccountPreferences) {
+function generalMarkup(value: AccountPreferences, subject: string) {
 	return html`${section(
 		"Profile",
 		"The name collaborators see on shared documents.",
@@ -853,6 +853,15 @@ function generalMarkup(value: AccountPreferences) {
 							${translate("Hide")}
 						</button>
 					</div>
+				</div>
+				<div class="settings-block">
+					<label class="block-label" for="account-id"
+						>${translate("Account ID")}</label
+					>
+					<p class="block-description">
+						${translate("Share it to be added to a space by its owner.")}
+					</p>
+					<input id="account-id" readonly value="${subject}" />
 				</div>
 				<div class="settings-block">
 					<label class="block-label" for="recovery-key"

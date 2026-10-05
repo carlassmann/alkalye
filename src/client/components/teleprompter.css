@@ -36,6 +36,10 @@
 	font-weight: 500;
 	line-height: 20px;
 }
+[data-teleprompter] .prompter-start button:disabled {
+	opacity: 0.5;
+	pointer-events: none;
+}
 [data-teleprompter] .prompter-start button:hover {
 	background: color-mix(in oklch, var(--brand) 80%, transparent);
 }
