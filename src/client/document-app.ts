@@ -2223,7 +2223,7 @@ function mountApplication() {
 						doc && !file
 							? html`<div class="tool-section">
 									<h3>Collaboration</h3>
-									${tool("share", sharedWith(doc.id) ? "Shared with " + sharedWith(doc.id) : "Private", sharedWith(doc.id) ? "users" : "lock")}
+									${tool("share", "Invite collaborators", "users")}
 								</div>`
 							: ""
 					}
@@ -2397,11 +2397,6 @@ function mountApplication() {
 				html`${icon(name)}<span>${label}</span>${shortcut ? html`<kbd>${shortcut}</kbd>` : ""}`,
 				changesSource && (mode !== "edit" || !writable()) ? "disabled" : "",
 			)
-		}
-		function sharedWith(document: string) {
-			return Object.entries(
-				selection?.opened.session.replica.fields(document) ?? {},
-			).filter(([field, value]) => field.startsWith("access:") && value).length
 		}
 		function refreshSafely() {
 			try {
@@ -2938,7 +2933,7 @@ function mountApplication() {
 						dialog,
 						report,
 						refreshSafely,
-						"Document permissions",
+						"Share document",
 						documentAccessMarkup(
 							entry.owner,
 							selected.opened.session.replica.fields(selected.document),

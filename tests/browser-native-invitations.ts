@@ -39,6 +39,13 @@ try {
 	browser(owner, "fill", "#editor", "# Harbour plan\n\nShared by link.")
 	wait(owner, 'document.querySelector("#save-status").textContent === "Saved"')
 	browser(owner, "click", '[data-action="tools"]')
+	assert(
+		evaluate(
+			owner,
+			'document.querySelector("[data-action=share]").textContent.includes("Invite collaborators")',
+		),
+		"document invitations have a visible, explicit sidebar entry",
+	)
 	browser(owner, "click", '[data-action="share"]')
 	wait(owner, 'document.querySelector("#dialog alkalye-invitations") !== null')
 	browser(owner, "click", '[data-invite-role="writer"]')
@@ -163,10 +170,8 @@ try {
 	wait(owner, `${workspaceLabel} === "Harbour crew"`)
 	let workspace = string(evaluate(owner, workspaceValue))
 	browser(owner, "click", '[data-action="manage-workspace"]')
-	wait(
-		owner,
-		'document.querySelector("[data-workspace-settings] alkalye-invitations") !== null',
-	)
+	browser(owner, "click", '[data-workspace="invite"]')
+	wait(owner, 'document.querySelector("#dialog alkalye-invitations") !== null')
 	browser(owner, "click", '[data-invite-role="writer"]')
 	wait(
 		owner,
