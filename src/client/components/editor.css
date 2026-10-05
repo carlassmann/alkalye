@@ -2,7 +2,11 @@
 	display: block;
 	position: relative;
 	font: var(--editor-size)/var(--editor-line-height, 1.8) var(--mono);
-	max-width: var(--editor-width, 65ch);
+	--editor-padding: max(
+		24px,
+		calc((100% - var(--editor-width, 65ch)) / 2 + 24px)
+	);
+	width: 100%;
 	height: 100%;
 	margin: auto;
 }
@@ -10,7 +14,7 @@
 	font: var(--editor-size)/var(--editor-line-height, 1.8) var(--mono);
 	letter-spacing: var(--editor-letter-spacing, 0em);
 	tab-size: 2;
-	padding: 48px 24px 20vh;
+	padding: 48px var(--editor-padding) 20vh;
 	margin: 0;
 	width: 100%;
 	height: 100%;
@@ -27,7 +31,7 @@
 	font: var(--editor-size)/var(--editor-line-height, 1.8) var(--mono);
 	letter-spacing: var(--editor-letter-spacing, 0em);
 	tab-size: 2;
-	padding: 48px 24px 20vh;
+	padding: 48px var(--editor-padding) 20vh;
 	margin: 0;
 	width: 100%;
 	height: 100%;
@@ -93,32 +97,16 @@
 }
 @media (max-width: 1100px) {
 	[data-editor].editor-wrap {
-		max-width: 750px;
-	}
-}
-@media (max-width: 1100px) {
-	[data-editor] #editor {
-		padding: 48px 24px 20vh;
-	}
-}
-@media (max-width: 1100px) {
-	[data-editor] #highlight {
-		padding: 48px 24px 20vh;
+		--editor-padding: max(24px, calc((100% - 750px) / 2 + 24px));
 	}
 }
 @media (max-width: 700px) {
 	[data-editor].editor-wrap {
-		max-width: 100%;
+		--editor-padding: 16px;
 	}
-}
-@media (max-width: 700px) {
-	[data-editor] #editor {
-		padding: 16px 16px 30vh;
-	}
-}
-@media (max-width: 700px) {
+	[data-editor] #editor,
 	[data-editor] #highlight {
-		padding: 16px 16px 30vh;
+		padding: 16px var(--editor-padding) 30vh;
 	}
 }
 @media print {
@@ -133,8 +121,8 @@
 }
 [data-editor] .completion-menu {
 	position: absolute;
-	left: 46px;
-	right: 46px;
+	left: calc(var(--editor-padding) + 22px);
+	right: calc(var(--editor-padding) + 22px);
 	bottom: 30px;
 	z-index: 4;
 	max-height: 260px;
@@ -192,7 +180,7 @@
 
 [data-editor] .active-line {
 	position: absolute;
-	inset-inline: 24px;
+	inset-inline: var(--editor-padding);
 	background: color-mix(in oklch, var(--ink) 4%, transparent);
 	pointer-events: none;
 }
@@ -201,11 +189,6 @@
 }
 [data-editor][data-fade="true"] .done-task {
 	opacity: 0.5;
-}
-@media (max-width: 700px) {
-	[data-editor] .active-line {
-		inset-inline: 16px;
-	}
 }
 
 [data-editor] [data-editor-links] {
