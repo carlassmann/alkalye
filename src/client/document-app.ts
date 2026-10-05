@@ -1583,6 +1583,23 @@ function mountApplication() {
 					index: slideIndex,
 					documentId: doc.id,
 					document: currentDocument,
+					writable: () => selection === selected && writable(),
+					position: () => {
+						let value = selected.opened.session.replica.fields(
+							doc.id,
+						).presentationItem
+						if (!value) return undefined
+						let index = Number(value)
+						return Number.isSafeInteger(index) && index >= 0 ? index : undefined
+					},
+					present: index => {
+						if (selection !== selected || !writable()) return
+						launch(
+							selected.opened.session.change("Move presentation", staged => [
+								staged.set(doc.id, "presentationItem", String(index)),
+							]),
+						)
+					},
 					presence: () => library.live.presence.current(doc.id),
 					render: (host, source, slideshow, number) =>
 						renderPreview(
