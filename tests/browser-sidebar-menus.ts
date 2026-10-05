@@ -15,6 +15,56 @@ try {
 		session,
 		'Boolean(document.querySelector("#editor")) && !document.querySelector("#app").hasAttribute("aria-busy")',
 	)
+	if (
+		!evaluate(
+			session,
+			'document.querySelector("#app").classList.contains("library-open")',
+		)
+	)
+		browser(session, "click", '[data-action="library"]')
+	let libraryTop = evaluate(
+		session,
+		'document.querySelector("#document-list").getBoundingClientRect().top',
+	)
+	browser(session, "click", '[data-action="library-options"]')
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("#library-options").matches(":popover-open")',
+		),
+		"Library filters open as a dropdown",
+	)
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("#document-list").getBoundingClientRect().top',
+		) === libraryTop,
+		"Opening filters does not move the document list",
+	)
+	browser(session, "press", "ArrowDown")
+	browser(session, "press", "ArrowDown")
+	browser(session, "press", "Enter")
+	assert(
+		evaluate(
+			session,
+			`document.querySelector('[data-library-filter="order"][data-value="created"]').getAttribute("aria-checked") === "true" && !document.querySelector("#library-options").matches(":popover-open")`,
+		),
+		"Keyboard selection changes sorting and closes the dropdown",
+	)
+	browser(session, "click", '[data-action="library-options"]')
+	browser(session, "press", "Home")
+	browser(session, "press", "ArrowDown")
+	browser(session, "press", "ArrowDown")
+	browser(session, "press", "ArrowDown")
+	browser(session, "press", "ArrowDown")
+	browser(session, "press", "Enter")
+	assert(
+		evaluate(
+			session,
+			`document.querySelector('[data-library-filter="type"][data-value="document"]').getAttribute("aria-checked") === "true"`,
+		),
+		"Keyboard selection changes document type",
+	)
 	browser(session, "click", '[data-action="new"]')
 	browser(session, "fill", "#editor", "hello world")
 	browser(session, "click", '[data-action="toggle-tools"]')

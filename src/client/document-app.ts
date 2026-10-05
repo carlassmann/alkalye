@@ -59,11 +59,7 @@ import type { AppRoute, SettingsCategory } from "../shared/routes"
 import { startRouter } from "./router"
 import { watchUpdates } from "./updates"
 import { UpdateBannerElement } from "./components/update-banner"
-import {
-	PickerElement,
-	pickerMarkup,
-	WorkspaceMenuElement,
-} from "./components/menu"
+import { pickerMarkup, WorkspaceMenuElement } from "./components/menu"
 import type { MenuChoice } from "./components/menu"
 import type { InvitationTarget } from "./invitations"
 import { restoreDocumentState } from "../shared/document-history"
@@ -424,6 +420,16 @@ function mountApplication() {
 					launch(open(doc))
 					return
 				}
+				let choice = event.target.closest<HTMLElement>("[data-library-filter]")
+				if (choice) {
+					for (let item of app.querySelectorAll<HTMLElement>(
+						"[data-library-filter]",
+					))
+						if (item.dataset.libraryFilter === choice.dataset.libraryFilter)
+							item.setAttribute("aria-checked", String(item === choice))
+					refreshLibrary()
+					return
+				}
 				let action =
 					event.target.closest<HTMLElement>("[data-action]")?.dataset.action
 				if (action) launch(act(action))
@@ -507,9 +513,6 @@ function mountApplication() {
 			},
 			{ signal: events.signal },
 		)
-		element(".library-options").addEventListener("change", refreshLibrary, {
-			signal: events.signal,
-		})
 
 		let stats = app.querySelector("alkalye-stats")
 		if (stats instanceof StatsElement)
@@ -1404,15 +1407,14 @@ function mountApplication() {
 					},
 				],
 			)
-			let order = "updated"
-			let type = "all"
-			for (let picker of app.querySelectorAll(
-				".library-options alkalye-picker",
-			))
-				if (picker instanceof PickerElement) {
-					if (picker.name === "order") order = picker.value
-					else type = picker.value
-				}
+			let order =
+				app.querySelector<HTMLElement>(
+					'[data-library-filter="order"][aria-checked="true"]',
+				)?.dataset.value ?? "updated"
+			let type =
+				app.querySelector<HTMLElement>(
+					'[data-library-filter="type"][aria-checked="true"]',
+				)?.dataset.value ?? "all"
 			updateLibrary(
 				summaries().filter(doc =>
 					workspace ? doc.room === workspace : !isLocalWorkspace(doc.room),

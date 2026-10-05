@@ -3,7 +3,6 @@ import { html, joinMarkup, translate } from "../language"
 import type { DocumentRecord } from "../../shared/model"
 import { button, element, updateMarkup } from "../dom"
 import { icon } from "../icons"
-import { PickerElement, pickerMarkup } from "./menu"
 export type DocumentSummary = Omit<DocumentRecord, "content"> & {
 	excerpt: string
 }
@@ -48,29 +47,43 @@ export function libraryMarkup(name: string, filter: string) {
 					aria-label="${translate("Find documents")}"
 					value="${filter}"
 			/></label>
-			${button("folders", "Folder / flat view", icon("folder"))}${button("library-options", "Sort and filter", icon("sliders-horizontal"), 'aria-expanded="false"')}
-		</div>
-		<div class="library-options" hidden>
-			${pickerMarkup(
-				"order",
-				translate("Sort documents"),
-				[
-					{ value: "updated", label: translate("Recently edited") },
-					{ value: "title", label: translate("Title") },
-					{ value: "created", label: translate("Created") },
-				],
-				"updated",
-			)}${pickerMarkup(
-				"type",
-				translate("Document type"),
-				[
-					{ value: "all", label: translate("All types") },
-					{ value: "document", label: translate("Documents") },
-					{ value: "slides", label: translate("Slides") },
-					{ value: "whiteboard", label: translate("Whiteboards") },
-				],
-				"all",
-			)}${button("archive-toggle", "Show archive", html`${icon("archive")}<span>${translate("Archive")}</span>`)}${button("trash-toggle", "Show trash", html`${icon("trash-2")}<span>${translate("Trash")}</span>`)}${button("new-folder", "Create folder", icon("folder-plus"))}
+			${button("folders", "Folder / flat view", icon("folder"))}
+			<alkalye-menu align="end">
+				${button("library-options", "Sort and filter", icon("sliders-horizontal"), 'aria-expanded="false"')}
+				<div
+					id="library-options"
+					class="library-options menu-popover"
+					popover
+					role="menu"
+					aria-label="Sort and filter"
+				>
+					${filterMenu(
+						"order",
+						"Sort documents",
+						[
+							["updated", "Recently edited"],
+							["title", "Title"],
+							["created", "Created"],
+						],
+						"updated",
+					)}
+					${filterMenu(
+						"type",
+						"Document type",
+						[
+							["all", "All types"],
+							["document", "Documents"],
+							["slides", "Slides"],
+							["whiteboard", "Whiteboards"],
+						],
+						"all",
+					)}
+					<hr />
+					${button("archive-toggle", "Show archive", html`${icon("archive")}<span>${translate("Archive")}</span>`)}
+					${button("trash-toggle", "Show trash", html`${icon("trash-2")}<span>${translate("Trash")}</span>`)}
+					${button("new-folder", "Create folder", html`${icon("folder-plus")}<span>${translate("Create folder")}</span>`)}
+				</div>
+			</alkalye-menu>
 		</div>
 		<div id="folder-status" class="folder-status" hidden></div>
 		<div id="document-list" class="document-list"></div>
@@ -147,12 +160,22 @@ export function updateLibrary(
 							),
 				)
 		: [""]
-	for (let picker of document.querySelectorAll(
-		".library-options alkalye-picker",
-	))
-		if (picker instanceof PickerElement)
-			picker.value =
-				picker.name === "order" ? options.order : options.type || "all"
+	for (let choice of document.querySelectorAll<HTMLElement>(
+		"[data-library-filter]",
+	)) {
+		let value =
+			choice.dataset.libraryFilter === "order"
+				? options.order
+				: options.type || "all"
+		choice.setAttribute("aria-checked", String(choice.dataset.value === value))
+	}
+	document
+		.querySelector('[data-action="library-options"]')
+		?.setAttribute(
+			"aria-pressed",
+			String(options.order !== "updated" || (options.type ?? "all") !== "all"),
+		)
+
 	document
 		.querySelector("[data-action=folders]")
 		?.setAttribute("aria-pressed", String(options.folders))
@@ -236,4 +259,15 @@ function relativeDate(time: number) {
 			? {}
 			: { year: "numeric" }),
 	})
+}
+
+function filterMenu(
+	name: string,
+	label: string,
+	choices: readonly (readonly [string, string])[],
+	selected: string,
+) {
+	return html`<div class="filter-label">${translate(label)}</div>
+		${joinMarkup(choices.map(([value, title]) => html`<button type="button" role="menuitemradio" data-library-filter="${name}" data-value="${value}" aria-checked="${value === selected}"><span>${translate(title)}</span>${icon("check")}</button>`))}
+		${name === "order" ? html`<hr />` : html``}`
 }

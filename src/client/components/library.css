@@ -134,24 +134,25 @@
 	color: var(--muted);
 }
 [data-library] .library-options {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 6px;
-	padding: 8px;
-	border-bottom: 1px solid var(--line);
+	width: 192px;
+	text-align: left;
 }
-[data-library] .library-options alkalye-picker {
-	flex: 1 1 45%;
-	min-width: 0;
-	font-size: 12px;
-}
-[data-library] .library-options button {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	font-size: 12px;
+[data-library] .filter-label {
 	padding: 6px 8px;
-	border: 1px solid var(--line);
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--muted);
+}
+[data-library] .library-options [aria-checked="true"] {
+	background: var(--accent);
+}
+[data-library] [data-action="library-options"][aria-pressed="true"] {
+	background: var(--accent);
+}
+[data-library] .library-options hr {
+	border: 0;
+	border-top: 1px solid var(--line);
+	margin: 4px 0;
 }
 [data-library] .document-list {
 	overflow: auto;
