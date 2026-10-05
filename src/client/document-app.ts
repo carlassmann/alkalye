@@ -1503,7 +1503,7 @@ function mountApplication() {
 					},
 				})
 			} else if (mode === "preview") {
-				if (panel !== "comments") setLayout("tools", false)
+				if (panel !== "comments") setLayout("tools", false, false)
 				setMarkup(
 					element("#main"),
 					previewMarkup(
@@ -3135,7 +3135,12 @@ function mountApplication() {
 				}),
 			)
 		}
-		function setLayout(part: "library" | "tools", open: boolean) {
+		function setLayout(
+			part: "library" | "tools",
+			open: boolean,
+			animate = true,
+		) {
+			if (animate) app.dataset.layoutMotion = ""
 			app.classList.toggle(part + "-open", open)
 			let narrow = matchMedia("(max-width: 1100px)").matches
 			if (open && narrow)

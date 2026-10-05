@@ -12,7 +12,42 @@ try {
 	console.log(url)
 	browser(session, "set", "viewport", "390", "844")
 	browser(session, "open", url)
-	wait(session, "Boolean(document.querySelector('#editor'))")
+	wait(
+		session,
+		"Boolean(document.querySelector('#editor')) && Boolean(document.querySelector('[data-action=library]'))",
+	)
+	for (let width of [1280, 390]) {
+		browser(session, "set", "viewport", String(width), "844")
+		evaluate(
+			session,
+			'localStorage.setItem("alkalye-layout", JSON.stringify({library:true,tools:false}));true',
+		)
+		evaluate(session, "window.motionReloadMarker = true; true")
+		browser(session, "reload")
+		wait(
+			session,
+			"!window.motionReloadMarker && Boolean(document.querySelector('#editor')) && Boolean(document.querySelector('[data-action=library]'))",
+		)
+		assert(
+			evaluate(
+				session,
+				`(() => {
+			let app = document.querySelector("#app");
+			return app.classList.contains("library-open") && !app.hasAttribute("data-layout-motion") &&
+				[app, app.querySelector("[data-library]"), app.querySelector("[data-inspector]"), app.querySelector(".workspace")].every(node => getComputedStyle(node).transitionDuration === "0s" && node.getAnimations().length === 0);
+		})()`,
+			),
+			"Restored sidebars appear without animation at " + width + "px",
+		)
+	}
+	evaluate(
+		session,
+		`document.querySelector('[data-action="library"]').click();true`,
+	)
+	wait(
+		session,
+		'document.querySelector("[data-library]").getAnimations().length === 0',
+	)
 	assert(
 		evaluate(
 			session,

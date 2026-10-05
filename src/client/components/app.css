@@ -227,3 +227,9 @@
 		grid-template-columns: 0 minmax(0, 1fr) 0;
 	}
 }
+
+[data-app]#app:not([data-layout-motion]),
+[data-app]#app:not([data-layout-motion])
+	> :is([data-library], [data-inspector], .workspace) {
+	transition: none;
+}
