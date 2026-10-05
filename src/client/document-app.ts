@@ -1672,7 +1672,8 @@ function mountApplication() {
 						)
 					},
 					presence: () => library.live.presence.current(doc.id),
-					render: (host, source, slideshow, number) =>
+					actor: () => library.live.actor(),
+					render: (host, source, slideshow, number, appearance) =>
 						renderPreview(
 							host,
 							source,
@@ -1680,6 +1681,7 @@ function mountApplication() {
 								...rendering(currentDocument() ?? doc),
 								mode: slideshow ? "slideshow" : undefined,
 								slideNumber: number,
+								...(appearance ? { appearance } : {}),
 							},
 							id => launch(open(id)),
 							id => launch(openDrawing(selected, id)),
@@ -1857,6 +1859,9 @@ function mountApplication() {
 					y,
 					time: Date.now(),
 					presenting: Boolean(presentation && !presentation.following),
+					movedAt: presentation?.movedAt,
+					display: presentation?.display,
+					target: presentation?.target,
 					scroll: notes
 						? notes.scrollTop /
 							Math.max(1, notes.scrollHeight - notes.clientHeight)

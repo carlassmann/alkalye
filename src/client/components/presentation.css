@@ -269,6 +269,29 @@
 }
 [data-presentation] .prompter-preview .slide-host {
 	pointer-events: none;
+	transform-origin: 0 0;
+}
+[data-presentation] .prompter-preview-frame {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	max-height: 65svh;
+}
+[data-presentation] .prompter-preview .presentation-canvas[hidden],
+[data-presentation] .prompter-preview [hidden] {
+	display: none;
+}
+[data-presentation] .prompter-preview-bar select {
+	max-width: 60%;
+	height: 32px;
+	padding: 0 8px;
+	border: 1px solid var(--line);
+	border-radius: 6px;
+	background: var(--paper);
+	color: var(--ink);
+	font: inherit;
+	font-size: 14px;
 }
 [data-presentation] .prompter-hint {
 	margin: 0;
@@ -311,10 +334,15 @@
 	gap: 12px;
 	min-height: 0;
 }
-[data-presentation] .prompter-preview-dialog .prompter-preview-bar {
+[data-presentation] .prompter-preview-dialog .prompter-preview-bar strong,
+[data-presentation]
+	.prompter-preview-dialog
+	.prompter-preview-bar:has(select[hidden]) {
 	display: none;
 }
-[data-presentation] .prompter-preview-dialog .presentation-canvas {
+[data-presentation]
+	.prompter-preview-dialog
+	:is(.presentation-canvas, .prompter-preview-frame) {
 	max-height: 75svh;
 }
 [data-presentation] .prompter-empty {

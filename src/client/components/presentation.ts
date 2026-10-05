@@ -7,7 +7,11 @@ import { screenIcon } from "./screen-icons"
 import { TeleprompterElement } from "./teleprompter"
 
 import { slides } from "../../shared/markdown"
-import type { DocumentRecord, Presence } from "../../shared/model"
+import type {
+	DocumentRecord,
+	Presence,
+	PresenceDisplay,
+} from "../../shared/model"
 import {
 	groupBySlide,
 	itemProgress,
@@ -15,8 +19,18 @@ import {
 	slideStart,
 	type PresentationItem,
 } from "../../shared/presentation"
-import { presenterMoves } from "../../shared/presentation-follow"
-import { laserTrail, laserUpdates } from "../../shared/presentation-laser"
+import {
+	leads,
+	nextMove,
+	presentationLeader,
+	presenterMoves,
+} from "../../shared/presentation-follow"
+import {
+	laserDisplays,
+	laserTrail,
+	laserUpdates,
+} from "../../shared/presentation-laser"
+import type { LaserDisplay } from "../../shared/presentation-laser"
 
 export interface PresentationOptions {
 	mode: string
@@ -29,6 +43,8 @@ export interface PresentationOptions {
 		source: string,
 		slideshow?: boolean,
 		number?: number,
+		// The audience display's appearance, for the laser preview.
+		appearance?: "light" | "dark",
 	): void
 	announce(x?: number, y?: number): Promise<void>
 	changed(index: number): void
@@ -38,6 +54,9 @@ export interface PresentationOptions {
 	// `presentationLine`. Without it the position lives for this session.
 	position?(): number | undefined
 	present?(item: number): void
+	// This window's live actor: settles simultaneous moves and receives a
+	// laser aimed at it.
+	actor?(): string
 }
 type PresentationView = Effect.Success<ReturnType<typeof presentationView>>
 export class PresentationElement extends HTMLElement {
@@ -97,6 +116,17 @@ export class PresentationElement extends HTMLElement {
 	get item() {
 		return this.view?.item
 	}
+	get movedAt() {
+		return this.view?.movedAt
+	}
+	// What a slideshow window offers to laser pointers.
+	get display() {
+		return this.view?.display
+	}
+	// The display the teleprompter's laser aims at.
+	get target() {
+		return this.view?.target
+	}
 	change(delta: number) {
 		this.view?.change(delta)
 	}
@@ -151,6 +181,9 @@ function presentationView(host: HTMLElement, options: PresentationOptions) {
 			following = !writable(),
 			movedAt = 0,
 			moved = false
+		let displays = new Map<string, LaserDisplay>()
+		let chosenDisplay: string | undefined
+		let target: LaserDisplay | undefined
 		if (prompting && item === undefined && slideIndex > 0) {
 			let start = slideStart(items, slideIndex)
 			item = start >= 0 ? start : undefined
@@ -172,6 +205,7 @@ function presentationView(host: HTMLElement, options: PresentationOptions) {
 		let slide = part("#slide"),
 			surface = part(".presentation-canvas"),
 			trailPath = part(".laser-trail path")
+		let frame = host.querySelector<HTMLElement>(".prompter-preview-frame")
 		let trail = laserTrail()
 		let trailFrame = 0
 
@@ -232,8 +266,50 @@ function presentationView(host: HTMLElement, options: PresentationOptions) {
 			document.addEventListener("visibilitychange", releasePointer, {
 				signal,
 			})
+			part("#laser-target").addEventListener(
+				"change",
+				event => {
+					if (!(event.target instanceof HTMLSelectElement)) return
+					releasePointer()
+					chosenDisplay = event.target.value || undefined
+					updatePresence()
+				},
+				{ signal },
+			)
+			if (frame) {
+				let observed = frame
+				yield* Effect.acquireRelease(
+					Effect.sync(() => {
+						let observer = new ResizeObserver(fitPreview)
+						observer.observe(observed)
+						return observer
+					}),
+					observer => Effect.sync(() => observer.disconnect()),
+				)
+			}
 			layout()
-		} else surface.addEventListener("click", advance, { signal })
+			showTarget()
+		} else {
+			surface.addEventListener("click", advance, { signal })
+			// A resized audience window offers its new shape, and a stroke drawn
+			// for the old one no longer lines up.
+			let resizing = 0
+			window.addEventListener(
+				"resize",
+				() => {
+					clearTimeout(resizing)
+					resizing = window.setTimeout(() => {
+						trail.clear()
+						paintTrail()
+						void options.announce()
+					}, 100)
+				},
+				{ signal },
+			)
+			yield* Effect.addFinalizer(() =>
+				Effect.sync(() => clearTimeout(resizing)),
+			)
+		}
 		update()
 		tick()
 		if (item !== undefined) prompter?.reveal()
@@ -249,6 +325,15 @@ function presentationView(host: HTMLElement, options: PresentationOptions) {
 			},
 			get item() {
 				return item
+			},
+			get movedAt() {
+				return movedAt || undefined
+			},
+			get display() {
+				return prompting ? undefined : display()
+			},
+			get target() {
+				return target?.actor
 			},
 			change,
 			stepNotes,
@@ -299,6 +384,7 @@ function presentationView(host: HTMLElement, options: PresentationOptions) {
 				parsed[slideIndex]?.content ?? "",
 				true,
 				slideIndex + 1,
+				target?.appearance,
 			)
 			if (shownSlide !== slideIndex) {
 				trail.clear()
@@ -323,7 +409,7 @@ function presentationView(host: HTMLElement, options: PresentationOptions) {
 			if (!writable()) return
 			following = false
 			moved = true
-			movedAt = Date.now()
+			movedAt = nextMove(Date.now(), options.presence(), movedAt)
 			let previousSlide = slideIndex
 			item = index
 			slideIndex = slideTarget
@@ -496,6 +582,7 @@ function presentationView(host: HTMLElement, options: PresentationOptions) {
 			}
 		}
 		function pointerDown(event: PointerEvent) {
+			if (!writable()) return
 			if (!event.isPrimary || (event.pointerType === "mouse" && event.button))
 				return
 			event.preventDefault()
@@ -558,21 +645,21 @@ function presentationView(host: HTMLElement, options: PresentationOptions) {
 		}
 		function updatePresence() {
 			let people = options.presence()
-			let { moved: move, joined } = presenterMoves(
-				seenPresenters,
-				people,
-				documentId,
-				Date.now(),
-			)
-			// Simultaneous moves keep their own position instead of trading places.
-			let leader =
-				move && Date.now() - movedAt > 750
-					? move
-					: joined &&
-						  (following || (!moved && !options.position)) &&
-						  (joined.slide > 0 || joined.item !== undefined)
-						? joined
-						: undefined
+			let now = Date.now()
+			let { joined } = presenterMoves(seenPresenters, people, documentId, now)
+			let newest = presentationLeader(people, documentId, now)
+			let watching = following || !writable()
+			// The newest move leads everywhere, so presenters who move at once
+			// settle on the same position instead of keeping their own.
+			let leader = newest
+				? watching || leads(newest, { movedAt, actor: options.actor?.() ?? "" })
+					? newest
+					: undefined
+				: joined &&
+					  (watching || (!moved && !options.position)) &&
+					  (joined.slide > 0 || joined.item !== undefined)
+					? joined
+					: undefined
 			if (leader) {
 				let index =
 					leader.item !== undefined &&
@@ -582,15 +669,113 @@ function presentationView(host: HTMLElement, options: PresentationOptions) {
 				if (index !== item || leader.slide !== slideIndex)
 					adopt(index ?? startOf(leader.slide), leader.slide)
 			}
-			if (prompter) return
+			if (prompter) return chooseDisplay(people, now)
 			for (let point of laserUpdates(
 				seenPointers,
 				people,
 				documentId,
 				slideIndex,
+				options.actor?.(),
 			))
 				trail.add(point)
 			paintTrail()
+		}
+		function display(): PresenceDisplay {
+			let rendered = slide.shadowRoot?.querySelector<HTMLElement>(
+				"[data-document-renderer]",
+			)
+			return {
+				width: Math.max(1, Math.round(window.innerWidth)),
+				height: Math.max(1, Math.round(window.innerHeight)),
+				appearance: rendered?.dataset.appearance === "dark" ? "dark" : "light",
+			}
+		}
+		// The original's display picker: one audience display is chosen
+		// automatically; with several, the presenter picks one.
+		function chooseDisplay(people: readonly Presence[], now: number) {
+			let available = laserDisplays(people, documentId, now)
+			for (let actor of [...displays.keys()])
+				if (!available.some(display => display.actor === actor))
+					displays.delete(actor)
+			for (let display of available) displays.set(display.actor, display)
+			if (chosenDisplay && !displays.has(chosenDisplay))
+				chosenDisplay = undefined
+			if (!chosenDisplay && displays.size === 1)
+				chosenDisplay = displays.keys().next().value
+			let next = chosenDisplay ? displays.get(chosenDisplay) : undefined
+			let changed = JSON.stringify(next) !== JSON.stringify(target)
+			target = next
+			if (changed) {
+				releasePointer()
+				trail.clear()
+				paintTrail()
+				update()
+				void options.announce()
+			}
+			showTarget()
+		}
+		function showTarget() {
+			let picker = host.querySelector<HTMLSelectElement>("#laser-target")
+			let status = host.querySelector<HTMLElement>("#laser-status")
+			let hint = host.querySelector<HTMLElement>("#laser-hint")
+			if (!picker || !status || !hint) return
+			let choices = [...displays.values()]
+			picker.hidden = !(choices.length > 1 || (!target && choices.length))
+			let options = [
+				{ value: "", label: translate("Choose display") },
+				...choices.map((display, index) => ({
+					value: display.actor,
+					label: translate("Display {number} · {width} × {height}")
+						.replace("{number}", String(index + 1))
+						.replace("{width}", String(display.width))
+						.replace("{height}", String(display.height)),
+				})),
+			]
+			if (
+				JSON.stringify(options) !==
+				JSON.stringify(
+					[...picker.options].map(option => ({
+						value: option.value,
+						label: option.text,
+					})),
+				)
+			)
+				picker.replaceChildren(
+					...options.map(choice => new Option(choice.label, choice.value)),
+				)
+			picker.value = target?.actor ?? ""
+			let choosing = !target && choices.length > 0
+			surface.hidden = choosing
+			hint.hidden = choosing
+			status.hidden = Boolean(target)
+			status.textContent = translate(
+				choosing
+					? "Choose the slideshow you want to point at."
+					: "Open this slideshow on another screen or device signed into the same account.",
+			)
+			fitPreview()
+		}
+		// The preview lays the slide out at the audience display's size and
+		// scales it down, so a pointed spot lands on the same content there.
+		function fitPreview() {
+			if (!frame) return
+			if (!target) {
+				for (let element of [frame, surface, slide])
+					element.removeAttribute("style")
+				return
+			}
+			frame.style.aspectRatio = `${target.width} / ${target.height}`
+			let scale = Math.min(
+				frame.clientWidth / target.width,
+				frame.clientHeight / target.height,
+			)
+			if (!Number.isFinite(scale) || scale <= 0) return
+			surface.style.width = `${target.width * scale}px`
+			surface.style.height = `${target.height * scale}px`
+			surface.style.aspectRatio = "auto"
+			slide.style.width = `${target.width}px`
+			slide.style.height = `${target.height}px`
+			slide.style.transform = `scale(${scale})`
 		}
 		function follow() {
 			following = !following || !writable()
@@ -730,18 +915,26 @@ function prompterMarkup() {
 			>
 				<div class="prompter-preview-bar">
 					<strong>${translate("Slide preview")}</strong>
+					<select
+						id="laser-target"
+						aria-label="${translate("Target display")}"
+						hidden
+					></select>
 				</div>
-				<div
-					class="presentation-canvas"
-					role="img"
-					aria-label="${translate("Hold and drag to draw a laser trail. It fades after you release.")}"
-				>
-					<div id="slide" class="slide-host"></div>
-					${laserMarkup()}
+				<div class="prompter-preview-frame">
+					<div
+						class="presentation-canvas"
+						role="img"
+						aria-label="${translate("Hold and drag to draw a laser trail. It fades after you release.")}"
+					>
+						<div id="slide" class="slide-host"></div>
+						${laserMarkup()}
+					</div>
 				</div>
-				<p class="prompter-hint">
+				<p id="laser-hint" class="prompter-hint">
 					${translate("Hold and drag to draw a laser trail. It fades after you release.")}
 				</p>
+				<p id="laser-status" class="prompter-hint"></p>
 			</aside>
 		</div>
 		<dialog
