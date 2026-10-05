@@ -42,6 +42,8 @@ test("the offline shell caches every local tldraw asset", async () => {
 	for (let path of [
 		"/tldraw/tldraw.css",
 		"/tldraw/icons/0_merged.svg",
+		"/tldraw/embed-icons/tldraw.png",
+		"/tldraw/embed-icons/figma.png",
 		"/tldraw/translations/en.json",
 		"/tldraw/translations/de.json",
 	]) {
