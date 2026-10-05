@@ -72,6 +72,19 @@ export interface Presence {
 	x: number
 	y: number
 	time: number
+	// When the shown presentation position was chosen; the newest move leads.
+	movedAt?: number
+	// A slideshow window offers itself to laser pointers with its size.
+	display?: PresenceDisplay
+	// The display a laser pointer aims at.
+	target?: string
+	// Set by the relay: the peer is signed into the receiving account.
+	own?: boolean
+}
+export interface PresenceDisplay {
+	width: number
+	height: number
+	appearance: "light" | "dark"
 }
 export function object(value: unknown): Record<string, unknown> {
 	if (!value || typeof value !== "object" || Array.isArray(value))
@@ -136,6 +149,16 @@ export let PresenceSchema = Schema.Struct({
 	x: Schema.Finite,
 	y: Schema.Finite,
 	time: Schema.Finite,
+	movedAt: Schema.optional(Schema.Finite),
+	display: Schema.optional(
+		Schema.Struct({
+			width: Schema.Finite,
+			height: Schema.Finite,
+			appearance: Schema.Literals(["light", "dark"]),
+		}),
+	),
+	target: Schema.optional(Schema.String),
+	own: Schema.optional(Schema.Boolean),
 })
 export let TextOperationIdSchema = Schema.String.check(
 	Schema.isPattern(/^\d{16}:[\w-]{1,100}$/),

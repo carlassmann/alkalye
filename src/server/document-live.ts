@@ -9,6 +9,7 @@ import { Cipher } from "../platform/cipher"
 import { sessionCookie } from "../shared/authentication"
 import { LiveClientMessageSchema } from "../shared/document-live"
 import type { LivePresence, LiveServerMessage } from "../shared/document-live"
+import { presentationPresence } from "./presentation-presence"
 import { Identity } from "../shared/workspace"
 import type { Connection } from "./application"
 import { WorkspaceStore } from "./document-store"
@@ -145,7 +146,8 @@ export function makeDocumentLive() {
 					})
 					return
 				}
-				if (!(yield* canRead(live, document))) {
+				let role = yield* accessRole(live, document)
+				if (!role) {
 					send(socket, { type: "unavailable", document })
 					return
 				}
@@ -156,7 +158,13 @@ export function makeDocumentLive() {
 					for (let peer of clients) {
 						let presence = peer.data.live?.presence.get(document)
 						if (peer !== socket && presence)
-							send(socket, { type: "presence", presence })
+							send(socket, {
+								type: "presence",
+								presence: {
+									...presence,
+									own: peer.data.live?.subject === live.subject,
+								},
+							})
 					}
 					return
 				}
@@ -164,7 +172,11 @@ export function makeDocumentLive() {
 				let now = yield* Clock.currentTimeMillis
 				if (now - live.lastPresence < 40) return
 				live.lastPresence = now
-				let presence = { ...message.presence, actor: live.actor, time: now }
+				let presence = {
+					...presentationPresence(message.presence, role, now),
+					actor: live.actor,
+					time: now,
+				}
 				live.presence.set(document, presence)
 				yield* broadcast(socket, document, { type: "presence", presence })
 			}).pipe(
@@ -199,11 +211,15 @@ export function makeDocumentLive() {
 				return live
 			})
 		}
-		function canRead(live: LiveConnection, document: string) {
+		function accessRole(live: LiveConnection, document: string) {
 			return store.accessRole(document, live.subject).pipe(
 				Effect.provideService(Identity, { subject: live.subject, actors: [] }),
+				Effect.catchTag("ResourceUnavailable", () => Effect.succeed(undefined)),
+			)
+		}
+		function canRead(live: LiveConnection, document: string) {
+			return accessRole(live, document).pipe(
 				Effect.map(role => role !== undefined),
-				Effect.catchTag("ResourceUnavailable", () => Effect.succeed(false)),
 			)
 		}
 		function broadcast(
@@ -217,11 +233,23 @@ export function makeDocumentLive() {
 					let live = peer.data.live
 					if (peer === sender || !live?.documents.has(document))
 						return Effect.void
+					// Whether a peer shares the account is told per recipient, so
+					// presence never reveals other accounts' identities.
+					let delivered =
+						message.type === "presence"
+							? {
+									...message,
+									presence: {
+										...message.presence,
+										own: live.subject === sender.data.live?.subject,
+									},
+								}
+							: message
 					return authorize(peer).pipe(
 						Effect.andThen(canRead(live, document)),
 						Effect.tap(allowed =>
 							Effect.sync(() => {
-								if (allowed) send(peer, message)
+								if (allowed) send(peer, delivered)
 							}),
 						),
 						Effect.catchCause(() =>

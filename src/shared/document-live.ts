@@ -4,6 +4,9 @@ import { IdentifierSchema } from "./model"
 let coordinate = Schema.Finite.check(
 	Schema.isBetween({ minimum: -1_000_000, maximum: 1_000_000 }),
 )
+let dimension = Schema.Int.check(
+	Schema.isBetween({ minimum: 1, maximum: 100_000 }),
+)
 export let LivePresenceSchema = Schema.Struct({
 	actor: Schema.String.check(Schema.isMaxLength(100)),
 	name: Schema.String.check(Schema.isMaxLength(100)),
@@ -22,6 +25,16 @@ export let LivePresenceSchema = Schema.Struct({
 	board: Schema.optional(IdentifierSchema),
 	boardOpen: Schema.optional(Schema.Boolean),
 	drawingActive: Schema.optional(Schema.Boolean),
+	movedAt: Schema.optional(Schema.Natural),
+	display: Schema.optional(
+		Schema.Struct({
+			width: dimension,
+			height: dimension,
+			appearance: Schema.Literals(["light", "dark"]),
+		}),
+	),
+	target: Schema.optional(Schema.String.check(Schema.isMaxLength(100))),
+	own: Schema.optional(Schema.Boolean),
 })
 export type LivePresence = typeof LivePresenceSchema.Type
 export let LiveClientMessageSchema = Schema.Union([

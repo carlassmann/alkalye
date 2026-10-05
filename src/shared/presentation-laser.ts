@@ -1,4 +1,4 @@
-import type { Presence } from "./model"
+import type { Presence, PresenceDisplay } from "./model"
 
 // The original's laser: a presenter drags on the slide preview and every
 // audience slideshow draws the stroke, which fades once the pointer is
@@ -82,16 +82,20 @@ export function laserTrail(now = () => performance.now()) {
 
 // Presence carries one pointer position per heartbeat; consecutive positions
 // from the same presenter on the shown slide form a stroke. A presenter with
-// no position (x < 0) has released the pointer.
+// no position (x < 0) has released the pointer. A pointer aimed at another
+// display is not drawn; one aimed at none reaches every audience window.
 export function laserUpdates(
 	seen: Map<string, { time: number; stroke: number; visible: boolean }>,
 	people: readonly Presence[],
 	document: string,
 	slide: number,
+	actor = "",
 ) {
 	let updates: LaserPoint[] = []
 	for (let person of people) {
-		if (person.board || person.document !== document) continue
+		if (!person.presenting || person.board || person.document !== document)
+			continue
+		if (person.own && person.target && person.target !== actor) continue
 		let previous = seen.get(person.actor)
 		if (previous?.time === person.time) continue
 		let visible = person.x >= 0 && person.slide === slide
@@ -119,4 +123,26 @@ export function laserUpdates(
 				})
 		}
 	return updates
+}
+
+export interface LaserDisplay extends PresenceDisplay {
+	actor: string
+}
+
+// The original's "choose display": slideshow windows of the same account
+// offer themselves, with their size and appearance, to the teleprompter.
+export function laserDisplays(
+	people: readonly Presence[],
+	document: string,
+	now: number,
+): LaserDisplay[] {
+	return people.flatMap(person =>
+		person.display &&
+		person.own &&
+		!person.board &&
+		person.document === document &&
+		now - person.time <= 10000
+			? [{ actor: person.actor, ...person.display }]
+			: [],
+	)
 }
