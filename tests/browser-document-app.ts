@@ -146,7 +146,7 @@ if (process.argv.includes("--serve")) {
 			evaluate(session, 'document.querySelector("#editor").value'),
 		)
 		let source =
-			"---\ntitle: Native journal\npath: Projects\ntags: [platform]\n---\n# First slide\n\nHello from a document event stream.\n\n---\n\n# Second slide\n\nSnapshot first, history later."
+			"---\ntitle: Native journal\nmode: present\npath: Projects\ntags: [platform]\n---\n# First slide\n\nHello from a document event stream.\n\n---\n\n# Second slide\n\nSnapshot first, history later."
 		browser(session, "fill", "#editor", source)
 		wait(
 			session,

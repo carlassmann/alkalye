@@ -469,7 +469,7 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 					.records("whiteboard")
 					.some(board => board.fields.document === document)
 					? "whiteboard"
-					: mode.startsWith("present") || mode === "slideshow"
+					: mode === "present"
 						? "slides"
 						: "document",
 			excerpt: header.body

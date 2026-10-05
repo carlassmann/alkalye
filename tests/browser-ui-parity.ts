@@ -17,23 +17,26 @@ try {
 	browser(session, "set", "viewport", "1280", "800")
 	browser(session, "network", "route", new URL("/app.js", url).href, "--abort")
 	browser(session, "open", url)
-	wait(session, 'document.querySelector("[data-boot] [data-toolbar]") !== null')
+	wait(session, 'document.querySelector("[data-boot]") !== null')
 	assert(
 		evaluate(
 			session,
-			'!document.querySelector(".boot-line, .boot-page, #editor") && document.querySelector("[data-boot]").textContent.trim() === "" && document.querySelector("[data-toolbar]").closest("[inert]") !== null',
+			'!document.querySelector(".boot-line, .boot-page, #editor, [data-toolbar]") && document.querySelector("[data-boot]").textContent.trim() === ""',
 		),
-		"Before JavaScript, the editor shows its real toolbar and an empty page",
+		"Before JavaScript, no document-dependent controls or placeholder text render",
 	)
-	let toolbarGeometry = `JSON.stringify([...document.querySelectorAll("[data-toolbar] button")].map(button => {let bounds = button.getBoundingClientRect(); return [button.dataset.action, bounds.x, bounds.y, bounds.width, bounds.height]}))`
-	let initialToolbar = evaluate(session, toolbarGeometry)
 	browser(session, "network", "unroute", new URL("/app.js", url).href)
 	browser(session, "reload")
-	wait(session, 'document.querySelector("[data-document-app]") !== null')
-	wait(session, 'document.querySelector("#editor") !== null')
+	wait(
+		session,
+		'document.querySelector("#editor") !== null && !document.querySelector("#app").hasAttribute("aria-busy")',
+	)
 	assert(
-		evaluate(session, toolbarGeometry) === initialToolbar,
-		"Opening the document keeps every toolbar control in place",
+		evaluate(
+			session,
+			`document.querySelector("#app").hasAttribute("data-document-ready") && !document.querySelector('[data-action="slideshow"], [data-action="teleprompter"]')`,
+		),
+		"A loaded regular document shows its UI without presentation tools",
 	)
 	assert(
 		evaluate(
@@ -42,6 +45,100 @@ try {
 		),
 		"Document text has a brief entrance without animating the layout",
 	)
+	let documentPath = evaluate(session, "location.pathname")
+	assert(typeof documentPath === "string", "Document has a route")
+	browser(session, "click", '[data-action="toggle-tools"]')
+	browser(session, "open", new URL("/app/doc/never-answer", url).href)
+	wait(session, 'document.querySelector("[data-document-app]") !== null')
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("#app").getAttribute("aria-busy") === "true" && !document.querySelector("[data-toolbar]").checkVisibility({visibilityProperty: true}) && !document.querySelector("[data-inspector]").checkVisibility({visibilityProperty: true}) && document.querySelector("#inspector-body").textContent === ""',
+		),
+		"While the document snapshot is pending, chrome and tools stay invisible",
+	)
+	browser(session, "open", new URL(String(documentPath), url).href)
+	wait(session, 'document.querySelector("#editor") !== null')
+	browser(session, "click", '[data-action="palette"]')
+	assert(
+		evaluate(
+			session,
+			'!document.querySelector(\'[data-command="slideshow"], [data-command="teleprompter"]\')',
+		),
+		"Regular documents have no presentation commands in the palette",
+	)
+	browser(session, "press", "Escape")
+
+	browser(
+		session,
+		"open",
+		new URL(String(documentPath) + "/slideshow", url).href,
+	)
+	wait(
+		session,
+		'document.querySelector("#editor") !== null && !location.pathname.endsWith("/slideshow")',
+	)
+	assert(
+		evaluate(session, '!document.querySelector("alkalye-presentation")'),
+		"Direct presentation URLs return regular documents to the editor",
+	)
+	browser(session, "fill", "#editor", "---\nmode: present\n---\n# Slide")
+	wait(
+		session,
+		"document.querySelector('[data-action=\"slideshow\"]') !== null && document.querySelector('[data-action=\"teleprompter\"]') !== null",
+	)
+	browser(session, "click", '[data-action="slideshow"]')
+	wait(session, 'document.querySelector("alkalye-presentation") !== null')
+	evaluate(session, "document.querySelector('[data-action=\"new\"]').click()")
+	wait(
+		session,
+		'document.querySelector("#editor") !== null && !location.pathname.endsWith("/slideshow")',
+	)
+	browser(session, "back")
+	wait(
+		session,
+		'document.querySelector("alkalye-presentation") !== null && location.pathname.endsWith("/slideshow")',
+	)
+	assert(
+		true,
+		"Opening a regular document from a slideshow preserves the presentation in Back history",
+	)
+
+	browser(session, "press", "Escape")
+	wait(session, 'document.querySelector("#editor") !== null')
+	browser(
+		session,
+		"fill",
+		"#editor",
+		"---\nmode: presentation\n---\n# Regular document",
+	)
+	wait(
+		session,
+		'!document.querySelector(\'[data-action="slideshow"], [data-action="teleprompter"]\')',
+	)
+	assert(
+		true,
+		"Presentation controls follow the exact mode frontmatter as it changes",
+	)
+	browser(
+		session,
+		"open",
+		new URL("/app/doc/missing-document/teleprompter", url).href,
+	)
+	wait(
+		session,
+		'document.querySelector(".empty") !== null && !document.querySelector("#app").hasAttribute("aria-busy")',
+	)
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("[data-toolbar]").checkVisibility({visibilityProperty: true}) && !location.pathname.endsWith("/teleprompter")',
+		),
+		"A failed presentation load keeps navigation available",
+	)
+	browser(session, "open", new URL(String(documentPath), url).href)
+	wait(session, 'document.querySelector("#editor") !== null')
+
 	browser(session, "click", '[data-action="new"]')
 	wait(session, '!document.querySelector("#editor").readOnly')
 	browser(

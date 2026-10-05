@@ -470,7 +470,7 @@ export class Replica {
 					kind:
 						fields.whiteboard || drawings.has(id)
 							? "whiteboard"
-							: mode?.startsWith("present") || mode === "slideshow"
+							: mode === "present"
 								? "slides"
 								: "document",
 					title: metadata.title,

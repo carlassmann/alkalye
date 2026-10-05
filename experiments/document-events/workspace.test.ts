@@ -1180,7 +1180,7 @@ test("access preconditions cannot be omitted or duplicated; unrelated edits do n
 	)
 })
 
-test("library kind follows whiteboard toggles without a source edit and restores frontmatter slideshow mode", async () => {
+test("library kind follows whiteboard toggles without a source edit and restores frontmatter presentation mode", async () => {
 	await Effect.runPromise(
 		Effect.gen(function* () {
 			let store = yield* WorkspaceStore
@@ -1192,7 +1192,7 @@ test("library kind follows whiteboard toggles without a source edit and restores
 				staged => [
 					staged.edit(
 						"doc",
-						"---\ntitle: Slides\nmode: slideshow\n---\n# First slide",
+						"---\ntitle: Slides\nmode: present\n---\n# First slide",
 					),
 				],
 			)
@@ -1218,6 +1218,23 @@ test("library kind follows whiteboard toggles without a source edit and restores
 				)
 				expect(current.documents[0]?.excerpt).toBe(slides.documents[0]?.excerpt)
 			}
+			for (let mode of ["presentation", "slideshow", "present"]) {
+				let action = yield* buildAction(
+					yield* as("owner", load()),
+					"doc",
+					"Change mode",
+					staged => [staged.edit("doc", `---\nmode: ${mode}\n---\n# Title`)],
+				)
+				yield* as("owner", store.commit(action))
+				let expected: "slides" | "document" =
+					mode === "present" ? "slides" : "document"
+				expect((yield* as("owner", store.library())).documents[0]?.kind).toBe(
+					expected,
+				)
+				expect((yield* as("owner", load())).documents("doc")[0]?.kind).toBe(
+					expected,
+				)
+			}
 		}).pipe(Effect.provide(layer("library-whiteboard"))),
 	)
 })
@@ -1234,7 +1251,7 @@ test("reopening repairs an already upgraded catalogue from checkpoint and tail w
 				staged => [
 					staged.edit(
 						"doc",
-						"---\ntitle: Presentation\nmode: slideshow\n---\n# Opening",
+						"---\ntitle: Presentation\nmode: present\n---\n# Opening",
 					),
 				],
 			)

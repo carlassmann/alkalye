@@ -233,7 +233,7 @@ function mountApplication() {
 				<div data-app class="workspace">
 					${toolbarMarkup()}
 					<div data-find id="find-bar" hidden></div>
-					<main id="main">${bootMarkup(false)}</main>
+					<main id="main">${bootMarkup()}</main>
 					${statusbarMarkup()}
 				</div>
 				<aside data-inspector class="inspector" aria-label="Document tools">
@@ -837,8 +837,14 @@ function mountApplication() {
 				...(inside ? { workspace } : {}),
 			}
 		}
+		function presenting() {
+			let doc = currentDocument()
+			return Boolean(doc && frontmatter(doc.content).values.mode === "present")
+		}
 		// Mode changes are history entries, so Back leaves a slideshow.
 		function changeMode(next: Mode, replace = false) {
+			if ((next === "slideshow" || next === "teleprompter") && !presenting())
+				return
 			mode = next
 			mountDocument()
 			if (selection)
@@ -1472,8 +1478,18 @@ function mountApplication() {
 				"mode-teleprompter",
 				"mode-history",
 			)
-			app.classList.add("mode-" + mode)
 			let doc = currentDocument()
+			app.toggleAttribute("data-document-ready", Boolean(doc))
+			if ((mode === "slideshow" || mode === "teleprompter") && !presenting()) {
+				mode = "edit"
+				let route = router.current()
+				if (
+					route.kind === "document" &&
+					(!selection || route.document === selection.document)
+				)
+					router.record({ ...route, mode }, { replace: true })
+			}
+			app.classList.add("mode-" + mode)
 			let selected = selection
 			if (!doc || !selected) {
 				if (opening) return
@@ -2009,6 +2025,21 @@ function mountApplication() {
 		function refreshDocument() {
 			selection?.media.refresh()
 			let doc = currentDocument()
+			if (!doc) {
+				element("#document-title").textContent = ""
+				element("#inspector-body").replaceChildren()
+				return
+			}
+			let route = router.current()
+			if (
+				route.kind === "document" &&
+				route.document === doc.id &&
+				(mode === "slideshow" || mode === "teleprompter") &&
+				!presenting()
+			) {
+				changeMode("edit", true)
+				return
+			}
 			let file = selection?.opened.file
 			let located = selection && library.folders.locate(selection.document)
 			let entry = library.state
@@ -2090,7 +2121,7 @@ function mountApplication() {
 						${tool("find", "Find", "search")}${tool("palette", "Command palette", "command")}${doc ? tool("outline", "Document outline", "list-tree") : ""}
 					</div>
 					<div class="tool-section">
-						${mode === "edit" ? tool("preview", "Preview", "eye") : tool("edit", "Write", "pencil")}${tool("slideshow", "Slideshow", "presentation")}${tool("teleprompter", "Teleprompter", "scroll-text")}${doc && !file && writable() ? tool("toggle-comments", selection?.opened.session.replica.metadata(doc.id).commentsDisabled ? "Enable comments" : "Disable comments", "message-square-off") : ""}
+						${mode === "edit" ? tool("preview", "Preview", "eye") : tool("edit", "Write", "pencil")}${presenting() ? html`${tool("slideshow", "Slideshow", "presentation")}${tool("teleprompter", "Teleprompter", "scroll-text")}` : ""}${doc && !file && writable() ? tool("toggle-comments", selection?.opened.session.replica.metadata(doc.id).commentsDisabled ? "Enable comments" : "Disable comments", "message-square-off") : ""}
 					</div>
 					${
 						doc
@@ -2099,7 +2130,7 @@ function mountApplication() {
 										"file",
 										"File",
 										"file-text",
-										html`${tool("properties", "Properties", "pencil")}${tool("present", /^present|^slideshow/.test(frontmatter(doc.content).values.mode ?? "") ? "Turn into document" : "Turn into presentation", "presentation")}${tool("pin", doc.pinned ? "Unpin" : "Pin", doc.pinned ? "pin-off" : "pin")}${tool("archive", doc.archived ? "Restore" : "Archive", doc.archived ? "archive-restore" : "archive")}${file ? "" : tool("history", "Time machine", "history")}${tool("theme", "Theme", "palette")}${tool("download", "Export", "download")}${window.showSaveFilePicker ? tool("save-as", "Save as…", "save") : ""}${typeof navigator.canShare === "function" ? tool("share-copy", "Share a copy", "share") : ""}${tool("print", "Print or PDF", "printer")}${tool("duplicate", "Duplicate", "copy")}${file ? "" : role === "owner" ? html`${tool("move", "Move to workspace", "folder-input")}${entry?.deleted ? tool("restore-document", "Restore from trash", "archive-restore") : tool("delete", "Delete", "trash-2")}` : tool("leave", "Leave document", "log-out")}`,
+										html`${tool("properties", "Properties", "pencil")}${tool("present", presenting() ? "Turn into document" : "Turn into presentation", "presentation")}${tool("pin", doc.pinned ? "Unpin" : "Pin", doc.pinned ? "pin-off" : "pin")}${tool("archive", doc.archived ? "Restore" : "Archive", doc.archived ? "archive-restore" : "archive")}${file ? "" : tool("history", "Time machine", "history")}${tool("theme", "Theme", "palette")}${tool("download", "Export", "download")}${window.showSaveFilePicker ? tool("save-as", "Save as…", "save") : ""}${typeof navigator.canShare === "function" ? tool("share-copy", "Share a copy", "share") : ""}${tool("print", "Print or PDF", "printer")}${tool("duplicate", "Duplicate", "copy")}${file ? "" : role === "owner" ? html`${tool("move", "Move to workspace", "folder-input")}${entry?.deleted ? tool("restore-document", "Restore from trash", "archive-restore") : tool("delete", "Delete", "trash-2")}` : tool("leave", "Leave document", "log-out")}`,
 									)}${group(
 										"edit",
 										"Edit",
@@ -2277,8 +2308,7 @@ function mountApplication() {
 						report,
 						new Set([
 							...enabled,
-							"slideshow",
-							"teleprompter",
+							...(presenting() ? ["slideshow", "teleprompter"] : []),
 							"find",
 							"comment",
 							"undo",
@@ -2617,7 +2647,7 @@ function mountApplication() {
 					presentation?.follow()
 					return
 				}
-				if (action === "presenter" && selection) {
+				if (action === "presenter" && selection && presenting()) {
 					window.open(
 						routeHref({
 							kind: "document",
@@ -2868,16 +2898,14 @@ function mountApplication() {
 				}
 				if (action === "present") {
 					if (!writable()) return
-					let presenting = /^present|^slideshow/.test(
-						frontmatter(doc.content).values.mode ?? "",
-					)
+					let presentation = presenting()
 					yield* selected.opened.session.change(
-						presenting ? "Turn into document" : "Turn into presentation",
+						presentation ? "Turn into document" : "Turn into presentation",
 						staged => [
 							staged.edit(
 								selected.document,
 								withFrontmatter(staged.text(selected.document), {
-									mode: presenting ? undefined : "present",
+									mode: presentation ? undefined : "present",
 								}),
 							),
 						],

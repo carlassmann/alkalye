@@ -233,3 +233,17 @@
 	> :is([data-library], [data-inspector], .workspace) {
 	transition: none;
 }
+
+[data-app]#app[aria-busy="true"] > * {
+	visibility: hidden;
+}
+
+[data-app]#app:not([data-document-ready])
+	:is(
+		[data-toolbar] .formatting,
+		[data-statusbar],
+		[data-inspector] > header,
+		#inspector-body
+	) {
+	visibility: hidden;
+}
