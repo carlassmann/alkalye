@@ -2,9 +2,11 @@ import {
 	DocumentRecordType,
 	PageRecordType,
 	TLDOCUMENT_ID,
+	createBindingId,
 	createTLStore,
 	getIndexAbove,
 	parseTldrawJsonFile,
+	transact,
 } from "tldraw"
 import type { TLRecord, TLSchema, TLStore } from "tldraw"
 import type { TldrawFile } from "../shared/whiteboard"
@@ -31,6 +33,8 @@ import { legacyRecords } from "./whiteboard-legacy"
 // in tldraw are collected by record and written as register fields; register
 // changes from peers, undo and redo are merged back as remote changes, and
 // whatever tldraw derives from them is not written back, so nothing echoes.
+// tldraw reports changes on the next animation frame, which a background tab
+// may never reach, so every step first collects what it has not reported yet.
 export interface BoardSync {
 	readonly store: TLStore
 	// Applies the register to the store; local edits not yet written win.
@@ -41,14 +45,31 @@ export interface BoardSync {
 	settle(values: ReadonlyArray<[string, string]>): void
 	restore(values: ReadonlyArray<[string, string]>): void
 	pending(): boolean
-	// The records not yet written, for keeping them past a failed close.
-	unsaved(): TLRecord[]
+	// The records not yet written and the ids deleted but not yet written, for
+	// keeping them past a failed close.
+	unsaved(): Draft
 	// A board saved by a newer version is shown but never written.
 	newer(): boolean
 	// Drops edits that can no longer be written, such as after losing write
 	// access, and shows the register again.
 	discard(): void
 	dispose(): void
+}
+
+export interface Draft {
+	readonly records: TLRecord[]
+	readonly removed: string[]
+}
+
+// Puts back a draft as the person's own edits, so they are written again.
+export function restoreDraft(store: TLStore, draft: Draft) {
+	let removed = new Set(draft.removed)
+	let gone = store
+		.allRecords()
+		.filter(record => removed.has(record.id))
+		.map(record => record.id)
+	if (gone.length) store.remove(gone)
+	if (draft.records.length) store.put(draft.records)
 }
 
 // The document and page tldraw needs exist from the start, so mounting an
@@ -81,18 +102,17 @@ export function createBoardSync(
 	let rejected = new Map<string, string>()
 	let dirty = new Set<string>()
 	let flight = new Set<string>()
-	// What applying the register produced, including what tldraw derived from
-	// it after the merge (bindings, groups), which it reports as user changes.
-	let echoes = new Map<string, TLRecord | undefined>()
+	// Set while the register is applied: tldraw reports what it derives from
+	// a merge (bindings, groups) as user changes, which must not be written.
+	let applying = false
 	let retry = false
 	let newer = false
 	pull()
 	let stop = store.listen(
 		({ changes }) => {
-			for (let [id, record] of Object.entries(changes.added)) mark(id, record)
-			for (let [id, [, after]] of Object.entries(changes.updated))
-				mark(id, after)
-			for (let id of Object.keys(changes.removed)) mark(id, undefined)
+			for (let id of Object.keys(changes.added)) mark(id)
+			for (let id of Object.keys(changes.updated)) mark(id)
+			for (let id of Object.keys(changes.removed)) mark(id)
 		},
 		{ source: "user", scope: "document" },
 	)
@@ -101,6 +121,7 @@ export function createBoardSync(
 		pull,
 		take,
 		settle(values) {
+			collect()
 			for (let [field, value] of values) {
 				if (!field.startsWith(recordPrefix)) continue
 				let id = field.slice(recordPrefix.length)
@@ -121,29 +142,42 @@ export function createBoardSync(
 				dirty.add(id)
 			}
 		},
-		pending: () => dirty.size > 0 || flight.size > 0 || retry,
-		unsaved: () =>
-			store
+		pending() {
+			collect()
+			return dirty.size > 0 || flight.size > 0 || retry
+		},
+		unsaved() {
+			collect()
+			let records = store
 				.allRecords()
-				.filter(
-					record =>
-						documentTypes.has(record.typeName) &&
-						(dirty.has(record.id) || flight.has(record.id)),
+				.filter(record => documentTypes.has(record.typeName))
+			let present = new Set<string>(records.map(record => record.id))
+			return {
+				records: records.filter(
+					record => dirty.has(record.id) || flight.has(record.id),
 				),
+				removed: [...new Set([...dirty, ...flight])].filter(
+					id => !present.has(id),
+				),
+			}
+		},
 		newer: () => newer,
 		discard,
 		dispose: stop,
 	}
 
-	function mark(id: string, record: TLRecord | undefined) {
-		let echo = echoes.has(id)
-		let expected = echoes.get(id)
-		echoes.delete(id)
-		if (echo && expected === record) return
-		dirty.add(id)
+	// tldraw's user record is document scoped but not part of a board.
+	function mark(id: string) {
+		if (!applying && documentTypes.has(id.slice(0, id.indexOf(":"))))
+			dirty.add(id)
+	}
+
+	function collect() {
+		store._flushHistory()
 	}
 
 	function discard() {
+		collect()
 		retry = false
 		if (!dirty.size) return
 		let current = stored(fields()).records
@@ -190,7 +224,10 @@ export function createBoardSync(
 	}
 
 	function pull() {
-		let current = stored(fields())
+		collect()
+		let register = fields()
+		let current = stored(register)
+		let deleted = deletedRecords(register)
 		newer = current.relation === "newer"
 		let changed = new Map<string, { value: string; schema: string }>()
 		for (let [id, entry] of current.records)
@@ -228,7 +265,19 @@ export function createBoardSync(
 			let result = source
 				? readRecords(store.schema, source, values)
 				: { records: [], failed: [...values.keys()] }
-			updates.push(...result.records)
+			// Bindings an older arrow derives yield to stored and deleted ones.
+			updates.push(
+				...result.records.filter(
+					record =>
+						values.has(record.id) ||
+						!(
+							current.records.has(record.id) ||
+							deleted.has(record.id) ||
+							dirty.has(record.id) ||
+							flight.has(record.id)
+						),
+				),
+			)
 			for (let id of result.failed) {
 				rejected.set(id, source + values.get(id))
 				unreadable++
@@ -253,26 +302,33 @@ export function createBoardSync(
 		}
 	}
 
+	// Local edits are collected before the merge, and what tldraw derives from
+	// it right after: at once in tests, on the next frame in browsers. One
+	// transaction lets the editor see the store only once tldraw has restored
+	// what the merge removed, such as the page and its camera.
 	function apply(removals: TLRecord["id"][], updates: TLRecord[]) {
-		let diff = store.extractingChanges(() =>
-			store.mergeRemoteChanges(() => {
-				if (removals.length) store.remove(removals)
-				for (let record of updates) {
-					let existing = store.get(record.id)
-					if (existing && JSON.stringify(existing) === JSON.stringify(record))
-						continue
-					try {
-						store.put([record])
-					} catch (error) {
-						failed(error)
+		collect()
+		applying = true
+		try {
+			transact(() =>
+				store.mergeRemoteChanges(() => {
+					if (removals.length) store.remove(removals)
+					for (let record of updates) {
+						let existing = store.get(record.id)
+						if (existing && JSON.stringify(existing) === JSON.stringify(record))
+							continue
+						try {
+							store.put([record])
+						} catch (error) {
+							failed(error)
+						}
 					}
-				}
-			}),
-		)
-		for (let [id, record] of Object.entries(diff.added)) echoes.set(id, record)
-		for (let [id, [, after]] of Object.entries(diff.updated))
-			echoes.set(id, after)
-		for (let id of Object.keys(diff.removed)) echoes.set(id, undefined)
+				}),
+			)
+			collect()
+		} finally {
+			applying = false
+		}
 	}
 
 	// Opening a board never writes. The first edit writes the document and
@@ -281,6 +337,7 @@ export function createBoardSync(
 	// or records of an older schema. Each record names its schema, so a rewrite
 	// cut short leaves a board that still reads correctly.
 	function take(): [string, string][] {
+		collect()
 		if (newer || (!dirty.size && !retry)) return []
 		retry = false
 		let current = fields()
@@ -319,6 +376,13 @@ export function createBoardSync(
 		}
 		let tombstones = legacy ? legacyTombstones(current) : []
 		if (!values.length && !tombstones.length) return []
+		// Bindings land before their arrows: an older arrow still stored derives
+		// the same bindings, but a rewritten arrow no longer does.
+		values.sort(
+			([a], [b]) =>
+				Number(!a.startsWith(recordField("binding:"))) -
+				Number(!b.startsWith(recordField("binding:"))),
+		)
 		if (
 			values.some(([, value]) => value) &&
 			current[schemaField(key)] !== schema
@@ -402,8 +466,33 @@ function load(
 		schema: target,
 	})
 	if (!result.ok) return undefined
-	let ids = new Set(entries.map(([id]) => id))
-	let records = result.value.allRecords().filter(record => ids.has(record.id))
+	let migrated = result.value.allRecords()
 	result.value.dispose()
-	return records.length === ids.size ? records : undefined
+	let ids = new Set(entries.map(([id]) => id))
+	let records: TLRecord[] = []
+	let found = 0
+	for (let record of migrated) {
+		if (ids.has(record.id)) {
+			found++
+			records.push(record)
+			continue
+		}
+		// tldraw adds the document and page every store needs.
+		if (record.typeName !== "shape" && record.typeName !== "binding") continue
+		// Migrating arrows from before bindings creates a binding per bound end
+		// with a random id. Naming it after its arrow and end lets every peer
+		// derive the same record; anything else unrequested is not understood.
+		if (
+			record.typeName !== "binding" ||
+			!ids.has(record.fromId) ||
+			(record.props.terminal !== "start" && record.props.terminal !== "end")
+		)
+			return undefined
+		let id = createBindingId(
+			record.fromId.slice("shape:".length) + "." + record.props.terminal,
+		)
+		if (ids.has(id)) return undefined
+		records.push({ ...record, id })
+	}
+	return found === ids.size ? records : undefined
 }

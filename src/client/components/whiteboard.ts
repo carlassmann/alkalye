@@ -22,7 +22,6 @@ import type {
 	Editor,
 	TLEventInfo,
 	TLInstancePresence,
-	TLRecord,
 	TLUiAssetUrlOverrides,
 	TLUiOverrides,
 	TldrawOptions,
@@ -42,8 +41,12 @@ import { icon } from "../icons"
 import type { Markup } from "../language"
 import { html, locale, translate } from "../language"
 import { editorPreview, previewFonts, textOptions } from "../whiteboard-preview"
-import { createBoardStore, createBoardSync } from "../whiteboard-store"
-import type { BoardSync } from "../whiteboard-store"
+import {
+	createBoardStore,
+	createBoardSync,
+	restoreDraft,
+} from "../whiteboard-store"
+import type { BoardSync, Draft } from "../whiteboard-store"
 
 export interface DrawingSession {
 	readonly replica: Pick<Replica, "fields" | "text">
@@ -120,7 +123,7 @@ let heartbeat = 2000
 // Edits a failed close could not write, by board, restored when the board
 // opens again in this tab so a lost connection or permission does not lose
 // them.
-let drafts = new Map<string, TLRecord[]>()
+let drafts = new Map<string, Draft>()
 
 export function openWhiteboard(
 	options: Omit<WhiteboardOptions, "boardId"> & { boardId?: string },
@@ -143,6 +146,7 @@ function whiteboardMarkup(
 	id: string,
 ) {
 	let embedded = session.replica.text(documentId).includes(`asset:${id}`)
+	let embedLabel = translate(embedded ? "Done" : "Embed drawing")
 	return html`<alkalye-whiteboard data-whiteboard>
 		<div class="board-bar" role="toolbar" aria-label="Drawing">
 			<button
@@ -190,10 +194,14 @@ function whiteboardMarkup(
 					accept=".tldr,application/json"
 				/>
 			</label>
-			<button type="button" class="primary" id="embed-board" data-writes>
-				${icon(embedded ? "check" : "image-plus")}<span
-					>${embedded ? "Done" : "Embed drawing"}</span
-				>
+			<button
+				type="button"
+				class="primary"
+				id="embed-board"
+				aria-label="${embedLabel}"
+				data-writes
+			>
+				${icon(embedded ? "check" : "image-plus")}<span>${embedLabel}</span>
 			</button>
 		</div>
 		<div class="board-canvas" data-board-canvas></div>
@@ -281,7 +289,7 @@ function mountBoard(
 		)
 		let draft = drafts.get(boardId)
 		drafts.delete(boardId)
-		if (draft?.length && session.writable()) store.put(draft)
+		if (draft && session.writable() && !sync.newer()) restoreDraft(store, draft)
 		let ready = yield* Deferred.make<Editor>()
 		let dark = darkPage(root)
 		yield* Effect.acquireRelease(
@@ -359,7 +367,11 @@ function mountBoard(
 				Effect.andThen(
 					Effect.sync(() => {
 						let unsaved = sync.unsaved()
-						if (unsaved.length && session.writable()) {
+						if (
+							(unsaved.records.length || unsaved.removed.length) &&
+							session.writable() &&
+							!sync.newer()
+						) {
 							drafts.set(boardId, unsaved)
 							options.report(
 								new Error(
@@ -397,8 +409,7 @@ function mountBoard(
 		yield* Effect.addFinalizer(() => Effect.sync(controls.dispose))
 		refresh()
 		editor.zoomToFit()
-		if (draft?.length)
-			schedule(flushSoon().pipe(Effect.catchCause(reportCause)))
+		if (draft) schedule(flushSoon().pipe(Effect.catchCause(reportCause)))
 		yield* Stream.merge(session.changes, session.presenceChanges).pipe(
 			Stream.runForEach(() => Effect.sync(refresh)),
 			Effect.forkScoped({ startImmediately: true }),
@@ -410,12 +421,12 @@ function mountBoard(
 		)
 
 		function refresh() {
-			let writable = session.writable()
+			sync.pull()
+			let writable = session.writable() && !sync.newer()
 			if (editor.getIsReadonly() === writable) {
 				if (!writable) sync.discard()
 				editor.updateInstanceState({ isReadonly: !writable })
 			}
-			sync.pull()
 			presence.paint()
 			controls.paint(writable)
 		}

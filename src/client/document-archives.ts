@@ -186,7 +186,11 @@ export function importPlan(
 			[
 				document.drawing,
 				...document.assets.map(asset => asset.drawing),
-			].flatMap(drawing => (drawing?.kind === "tldraw" ? [drawing.file] : [])),
+			].flatMap(drawing =>
+				drawing?.kind === "tldraw" || drawing?.kind === "register"
+					? [drawing.file]
+					: [],
+			),
 		)
 		if (drawings.length) {
 			let { checkBoardFile } = yield* Effect.tryPromise(

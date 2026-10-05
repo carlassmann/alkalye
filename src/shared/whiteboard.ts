@@ -1,5 +1,5 @@
 import { maximumActionText } from "./document-actions"
-import { isLegacyField } from "./legacy-drawing"
+import { isLegacyField, parseShape } from "./legacy-drawing"
 import { array, object, string } from "./model"
 
 // A whiteboard is one `type: whiteboard` register. Every tldraw document
@@ -188,6 +188,77 @@ export function boardFile(fields: Record<string, string>) {
 	return JSON.stringify(
 		files.length === 1 ? files[0] : { format: "alkalye-tldraw-v2", files },
 	)
+}
+
+// A board whose conversion from a pre-tldraw drawing was cut short holds
+// legacy shapes, tldraw records and tombstones hiding converted legacy shapes.
+// No `.tldr` file holds all three, so its backup keeps those register fields
+// as they are and the board finishes converting when next edited.
+export let boardRegisterFormat = "alkalye-drawing-v2"
+
+export function boardRegister(fields: Record<string, string>) {
+	if (!hasLegacyDrawing(fields) || !isTldrawBoard(fields)) return undefined
+	let kept: Record<string, string> = {}
+	for (let [key, value] of Object.entries(fields))
+		if (
+			key.startsWith(recordPrefix) ||
+			(key.startsWith(schemaPrefix) && value) ||
+			(isLegacyField(key) && value)
+		)
+			kept[key] = value
+	return JSON.stringify({ format: boardRegisterFormat, fields: kept })
+}
+
+// Every field must be one a mixed board holds, each value what its field
+// names; the tldraw records are then checked by tldraw like any `.tldr` file.
+export function parseBoardRegister(value: unknown) {
+	let source = object(value)
+	if (source.format !== boardRegisterFormat)
+		throw new Error("Unsupported drawing format")
+	let fields: [string, string][] = []
+	for (let [key, entry] of Object.entries(object(source.fields))) {
+		let text = string(entry)
+		if (text.length > maximumActionText)
+			throw new Error("A drawing shape is too large")
+		fields.push([key, text])
+	}
+	let register = Object.fromEntries(fields)
+	let schemas = boardSchemas(register)
+	let records = new Map<string, string>()
+	let pages = 0
+	for (let [key, text] of fields) {
+		if (key.startsWith(schemaPrefix)) {
+			if (key !== schemaField(schemaKey(text)))
+				throw new Error("Drawing contains an invalid identity")
+			object(JSON.parse(text))
+			continue
+		}
+		if (isLegacyField(key)) {
+			if (!/^[\w:.-]{1,200}$/.test(key))
+				throw new Error("Drawing contains an invalid identity")
+			parseShape(text)
+			continue
+		}
+		let id = key.slice(recordPrefix.length)
+		if (!key.startsWith(recordPrefix) || !/^[\w:.-]{1,200}$/.test(id))
+			throw new Error("Drawing contains an invalid identity")
+		if (!text) continue
+		let stored = storedRecord(id, text)
+		if (!stored || !schemas.has(stored.schema))
+			throw new Error("A drawing could not be read")
+		let { typeName, type } = stored.record
+		if (typeName === "shape" && unsupportedShapes.has(String(type)))
+			throw new Error("Embedded media is not supported in drawings")
+		if (typeName === "document" && id !== "document:document")
+			throw new Error("Drawing contains an invalid identity")
+		if (typeName === "page") pages++
+		records.set(id, text)
+	}
+	if (pages > 1) throw new Error("Import a drawing with one page")
+	if (!hasLegacyDrawing(register) || !records.size)
+		throw new Error("Unsupported drawing format")
+	let file: TldrawFile = { schemas, records }
+	return { fields, file }
 }
 
 // Checks what tldraw cannot check without loading: one page, record

@@ -13,7 +13,14 @@ import { blobContentType, maximumDocumentBlobBytes } from "./document-blobs"
 import { maximumActionText } from "./document-actions"
 import { legacyOrder, legacyShapes, parseLegacyDrawing } from "./legacy-drawing"
 import type { Shape } from "./legacy-drawing"
-import { boardFile, boardFileFields, parseTldrawFile } from "./whiteboard"
+import {
+	boardFile,
+	boardFileFields,
+	boardRegister,
+	boardRegisterFormat,
+	parseBoardRegister,
+	parseTldrawFile,
+} from "./whiteboard"
 import type { TldrawFile } from "./whiteboard"
 import { compileTheme, frontmatter, withFrontmatter } from "./markdown"
 import type { Operation } from "./model"
@@ -82,9 +89,15 @@ export interface ImportedAsset {
 }
 // A board restored from a `.tldr` file keeps its records as written; an old
 // `alkalye-drawing-v1` sidecar restores the legacy shapes tldraw converts
-// when the board is next edited.
+// when the board is next edited, and an `alkalye-drawing-v2` one the fields
+// of a board whose conversion was cut short.
 export type ImportedDrawing =
 	| { readonly kind: "tldraw"; readonly file: TldrawFile }
+	| {
+			readonly kind: "register"
+			readonly fields: ReadonlyArray<[string, string]>
+			readonly file: TldrawFile
+	  }
 	| { readonly kind: "legacy"; readonly shapes: ReadonlyArray<Shape> }
 export interface ImportedTheme {
 	readonly path: string
@@ -283,15 +296,21 @@ export function exportArchive(
 				pairs.push(["asset:" + board, "assets/" + file])
 				entries.push({ name: path, data: bytes })
 				let tldr = boardFile(fields)
+				let mixed = boardRegister(fields)
 				entries.push(
-					tldr === undefined
-						? json(path + ".alkalye-drawing.json", {
-								format: "alkalye-drawing-v1",
-								shapes: [...legacyShapes(fields).values()].map(
-									({ order: _order, ...shape }) => shape,
-								),
-							})
-						: { name: path + ".tldr", data: encoder.encode(tldr) },
+					mixed !== undefined
+						? {
+								name: path + ".alkalye-drawing.json",
+								data: encoder.encode(mixed),
+							}
+						: tldr === undefined
+							? json(path + ".alkalye-drawing.json", {
+									format: "alkalye-drawing-v1",
+									shapes: [...legacyShapes(fields).values()].map(
+										({ order: _order, ...shape }) => shape,
+									),
+								})
+							: { name: path + ".tldr", data: encoder.encode(tldr) },
 				)
 				assetMetadata.push({
 					path,
@@ -744,6 +763,12 @@ export function importSteps(
 }
 
 function drawingRecords(board: string, drawing: ImportedDrawing) {
+	if (drawing.kind === "register")
+		return drawing.fields.map(([field, value]) => ({
+			cost: 1,
+			text: value.length,
+			build: (staged: Replica) => [staged.set(board, field, value)],
+		}))
 	if (drawing.kind === "tldraw")
 		return boardFileFields({}, drawing.file).map(([field, value]) => ({
 			cost: 1,
@@ -886,6 +911,8 @@ function drawing(entry: ZipEntry) {
 						value && typeof value === "object" && !Array.isArray(value)
 							? Object.fromEntries(Object.entries(value)).format
 							: undefined
+					if (format === boardRegisterFormat)
+						return { kind: "register", ...parseBoardRegister(value) }
 					return format === "alkalye-drawing-v1"
 						? { kind: "legacy", shapes: parseLegacyDrawing(value) }
 						: { kind: "tldraw", file: parseTldrawFile(value) }

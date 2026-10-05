@@ -2,6 +2,7 @@ import { expect, test } from "bun:test"
 import * as Effect from "effect/Effect"
 import {
 	PageRecordType,
+	createBindingId,
 	createShapeId,
 	getIndexAbove,
 	toRichText,
@@ -11,6 +12,7 @@ import {
 	checkBoardFile,
 	createBoardStore,
 	createBoardSync,
+	restoreDraft,
 } from "../src/client/whiteboard-store"
 import { legacyRecords } from "../src/client/whiteboard-legacy"
 import { Replica } from "../src/shared/crdt"
@@ -24,11 +26,13 @@ import {
 	parseArchive,
 } from "../src/shared/document-archive"
 import { newDocument } from "../src/shared/documents"
+import { object } from "../src/shared/model"
 import type { ZipEntry } from "../src/shared/zip"
 import {
 	boardFile,
 	boardFileFields,
 	boardRecords,
+	boardRegister,
 	boardSchemas,
 	isTldrawBoard,
 	parseTldrawFile,
@@ -711,6 +715,305 @@ test("malformed and mismatched register values only lose themselves", () => {
 	expect(shapes(reader.store)).toEqual([])
 	expect(reader.errors).toHaveLength(1)
 	expect(reader.store.query.records("page").get()).toHaveLength(1)
+})
+
+// tldraw reports changes to listeners on the next animation frame, which a
+// background tab never reaches; tests otherwise report them at once.
+function withoutFrames(run: () => void) {
+	let frames: FrameRequestCallback[] = []
+	let previous = globalThis.requestAnimationFrame
+	globalThis.requestAnimationFrame = callback => frames.push(callback)
+	Reflect.set(globalThis, "__FORCE_RAF_IN_TESTS__", true)
+	try {
+		run()
+	} finally {
+		Reflect.deleteProperty(globalThis, "__FORCE_RAF_IN_TESTS__")
+		for (let attempt = 0; frames.length && attempt < 20; attempt++) {
+			Bun.sleepSync(10)
+			for (let frame of frames.splice(0)) frame(performance.now())
+		}
+		globalThis.requestAnimationFrame = previous
+	}
+}
+
+// Marks what a remote merge creates, as tldraw does when it binds or groups.
+function deriving(store: ReturnType<typeof createBoardStore>) {
+	store.sideEffects.registerAfterCreateHandler("shape", (shape, source) => {
+		if (source === "remote")
+			store.update(shape.id, record => ({ ...record, meta: { seen: true } }))
+	})
+}
+
+for (let deferred of [false, true])
+	test(`edits not yet reported are written, kept and win over the register${deferred ? " before the next frame" : ""}`, () => {
+		;(deferred ? withoutFrames : (run: () => void) => run())(() => {
+			let board = register()
+			let writer = peer(board)
+			let reader = peer(board)
+			deriving(reader.store)
+			writer.store.put([geo("a", 10), geo("b", 20)])
+			expect(writer.sync.pending()).toBe(true)
+			let values = writer.flush()
+			expect(values.map(([field]) => field)).toContain(recordField("shape:a"))
+			reader.sync.pull()
+			reader.sync.pull()
+			expect(reader.store.get(createShapeId("a"))?.meta).toEqual({ seen: true })
+			expect(reader.sync.pending()).toBe(false)
+			expect(reader.sync.take()).toEqual([])
+
+			writer.store.update(createShapeId("a"), shape => ({ ...shape, x: 20 }))
+			let stored = storedRecord(
+				"shape:a",
+				board.fields()[recordField("shape:a")] ?? "",
+			)
+			board.write([
+				[
+					recordField("shape:a"),
+					storedValue(stored?.schema ?? "", { ...stored?.record, x: 99 }),
+				],
+			])
+			writer.sync.pull()
+			expect(writer.store.get(createShapeId("a"))?.x).toBe(20)
+			writer.store.remove([createShapeId("b")])
+			let draft = writer.sync.unsaved()
+			expect(draft.records.map(record => String(record.id))).toEqual([
+				"shape:a",
+			])
+			expect(draft.removed).toEqual(["shape:b"])
+		})
+	})
+
+test("a failed close keeps deletions as well as edits for the next open", () => {
+	let board = register()
+	let writer = peer(board)
+	writer.store.put([geo("a", 10), geo("b", 20)])
+	writer.flush()
+	writer.store.remove([createShapeId("a")])
+	writer.store.update(createShapeId("b"), shape => ({ ...shape, x: 5 }))
+	writer.sync.restore(writer.sync.take())
+	let draft = writer.sync.unsaved()
+	expect(draft.removed).toEqual(["shape:a"])
+
+	let reopened = peer(board)
+	expect(shapes(reopened.store)).toHaveLength(2)
+	restoreDraft(reopened.store, draft)
+	expect(reopened.store.get(createShapeId("a"))).toBeUndefined()
+	expect(reopened.store.get(createShapeId("b"))?.x).toBe(5)
+	reopened.flush()
+	expect(board.fields()[recordField("shape:a")]).toBe("")
+	expect(
+		shapes(peer(board).store).map(shape => [String(shape.id), shape.x]),
+	).toEqual([["shape:b", 5]])
+})
+
+// An arrow as tldraw stored it before bindings were records: each bound end
+// names the shape it is attached to.
+function olderArrowBoard() {
+	let source = createBoardStore()
+	let current = source.schema.serialize()
+	let sequences = Object.fromEntries(
+		Object.entries(current.sequences).filter(
+			([name]) => name !== "com.tldraw.binding.arrow",
+		),
+	)
+	let schema = JSON.stringify({
+		...current,
+		sequences: { ...sequences, "com.tldraw.shape.arrow": 3 },
+	})
+	let key = schemaKey(schema)
+	let fields: Record<string, string> = { [schemaField(key)]: schema }
+	source.put([geo("a", 0), geo("b", 300)])
+	for (let record of source.allRecords())
+		if (["document", "page", "shape"].includes(record.typeName))
+			fields[recordField(record.id)] = storedValue(key, record)
+	let end = (shape: string) => ({
+		type: "binding",
+		boundShapeId: "shape:" + shape,
+		normalizedAnchor: { x: 0.5, y: 0.5 },
+		isExact: false,
+		isPrecise: false,
+	})
+	fields[recordField("shape:arrow")] = storedValue(key, {
+		id: "shape:arrow",
+		typeName: "shape",
+		type: "arrow",
+		parentId: "page:page",
+		index: "a2",
+		x: 100,
+		y: 25,
+		rotation: 0,
+		isLocked: false,
+		opacity: 1,
+		meta: {},
+		props: {
+			dash: "draw",
+			size: "m",
+			fill: "none",
+			color: "black",
+			labelColor: "black",
+			bend: 0,
+			start: end("a"),
+			end: end("b"),
+			arrowheadStart: "none",
+			arrowheadEnd: "arrow",
+			text: "",
+			labelPosition: 0.5,
+			font: "draw",
+		},
+	})
+	return fields
+}
+
+function bindings(store: ReturnType<typeof createBoardStore>) {
+	return store
+		.allRecords()
+		.filter(record => record.typeName === "binding")
+		.sort((a, b) => (a.id < b.id ? -1 : 1))
+}
+
+test("arrows bound before bindings were records keep their bindings on every peer", () => {
+	let initial = olderArrowBoard()
+	let board = register(initial)
+	let first = peer(board)
+	let second = peer(board)
+	expect(first.errors).toEqual([])
+	let derived = bindings(first.store)
+	expect(
+		derived.map(binding =>
+			binding.type === "arrow"
+				? [String(binding.id), binding.toId, binding.props.terminal]
+				: [],
+		),
+	).toEqual([
+		["binding:arrow.end", "shape:b", "end"],
+		["binding:arrow.start", "shape:a", "start"],
+	])
+	expect(bindings(second.store)).toEqual(derived)
+	expect(first.sync.take()).toEqual([])
+	checkBoardFile({
+		schemas: boardSchemas(initial),
+		records: boardRecords(initial),
+	})
+
+	first.store.update(createShapeId("a"), shape => ({ ...shape, x: 10 }))
+	let values = first.sync.take()
+	let fields = values.map(([field]) => field)
+	expect(fields.indexOf(recordField("binding:arrow.end"))).toBeLessThan(
+		fields.indexOf(recordField("shape:arrow")),
+	)
+	let early = register(initial)
+	early.write(values.filter(([field]) => !field.startsWith("record:shape:")))
+	expect(bindings(peer(early).store)).toEqual(derived)
+
+	board.write(values)
+	first.sync.settle(values)
+	second.sync.pull()
+	expect(bindings(second.store)).toEqual(derived)
+	expect(second.sync.take()).toEqual([])
+	let reopened = peer(board)
+	expect(reopened.errors).toEqual([])
+	expect(bindings(reopened.store)).toEqual(derived)
+	let arrow = reopened.store.get(createShapeId("arrow"))
+	expect(arrow?.type === "arrow" && arrow.props.end).toEqual({ x: 0, y: 0 })
+
+	reopened.store.remove([createBindingId("arrow.start")])
+	reopened.flush()
+	expect(board.fields()[recordField("binding:arrow.start")]).toBe("")
+	expect(bindings(peer(board).store)).toHaveLength(1)
+})
+
+test("a backup of a legacy board cut short keeps its legacy shapes and tombstones", async () => {
+	let legacy = Object.fromEntries(
+		Array.from({ length: 950 }, (_, index) => [
+			"shape:" + index,
+			JSON.stringify({
+				kind: "rectangle",
+				color: "#e03131",
+				width: 4,
+				points: [
+					{ x: index, y: 0 },
+					{ x: index + 20, y: 20 },
+				],
+				text: "",
+				order: String(index).padStart(4, "0"),
+			}),
+		]),
+	)
+	let board = register(legacy)
+	let writer = peer(board)
+	writer.store.remove([createShapeId("legacy-shape-3")])
+	let [first = []] = writeBatches(writer.sync.take(), board.fields())
+	board.write(first)
+	let fields = board.fields()
+	expect(boardFile(fields)).toBeDefined()
+	let sidecar = boardRegister(fields) ?? ""
+
+	let replica = new Replica("author")
+	newDocument(replica, "doc", "Untitled", "# Plan\n\n![Plan](asset:board)\n")
+	for (let [field, value] of Object.entries({
+		...fields,
+		document: "doc",
+		name: "Plan",
+	}))
+		replica.set("board", field, value)
+	let entries = await Effect.runPromise(
+		exportArchive([
+			{
+				document: "doc",
+				replica,
+				media: new Map([["board", new TextEncoder().encode("<svg/>")]]),
+			},
+		]),
+	)
+	let names = entries.map(entry => entry.name)
+	expect(names.some(name => name.endsWith(".tldr"))).toBe(false)
+	let exported = entries.find(entry =>
+		entry.name.endsWith(".svg.alkalye-drawing.json"),
+	)
+	expect(new TextDecoder().decode(exported?.data)).toBe(sidecar)
+
+	let restored = await restore(entries)
+	let [restoredBoard] = archiveContents(
+		restored.replica,
+		restored.id,
+	).whiteboards
+	let copy = restored.replica.fields(restoredBoard ?? "")
+	for (let [key, value] of Object.entries(fields))
+		if (
+			key.startsWith("record:") ||
+			key.startsWith("schema:") ||
+			key.startsWith("shape:")
+		)
+			expect(copy[key]).toBe(value)
+	let reader = peer(register(copy))
+	expect(reader.errors).toEqual([])
+	expect(shapes(reader.store)).toHaveLength(949)
+	expect(reader.store.get(createShapeId("legacy-shape-3"))).toBeUndefined()
+
+	let tampered = object(JSON.parse(sidecar))
+	let cases: [Record<string, string>, string][] = [
+		[{ "record:shape:x": "{}" }, "could not be read"],
+		[{ "shape:9": '{"kind":"blob"}' }, "Unknown drawing shape"],
+		[{ other: "x" }, "identity"],
+	]
+	for (let [change, message] of cases) {
+		let broken = {
+			...tampered,
+			fields: { ...object(tampered.fields), ...change },
+		}
+		await expect(
+			restore(
+				entries.map(entry =>
+					entry === exported
+						? {
+								...entry,
+								data: new TextEncoder().encode(JSON.stringify(broken)),
+							}
+						: entry,
+				),
+			),
+		).rejects.toThrow(message)
+	}
 })
 
 async function restore(entries: ReadonlyArray<ZipEntry>) {

@@ -173,6 +173,55 @@ try {
 		"edits a failed close could not save return when the board reopens and are then saved",
 	)
 
+	// tldraw reports edits on the next animation frame, which a background tab
+	// never reaches; holding frames closes the board before that report.
+	let holdFrames =
+		"window.heldFrames = []; window.originalFrame = window.requestAnimationFrame; window.requestAnimationFrame = callback => window.heldFrames.push(callback)"
+	let releaseFrames =
+		"window.requestAnimationFrame = window.originalFrame; window.heldFrames.forEach(frame => frame(performance.now()))"
+	evaluate(
+		session,
+		`(() => { ${holdFrames}; ${editor}.createShape({ type: "geo", x: 900, y: 500, props: { w: 40, h: 40 } }); document.querySelector("#dialog .dialog-close").click() })()`,
+	)
+	wait(session, '!document.querySelector("#dialog").open')
+	evaluate(session, releaseFrames)
+	browser(session, "reload")
+	browser(session, "click", '[data-action="tools"]')
+	browser(session, "click", '[data-action^="drawing:"]')
+	wait(session, `${mounted} && ${shapes} === 5`)
+	assert(
+		true,
+		"a shape drawn just before closing is saved before tldraw reports it",
+	)
+
+	evaluate(
+		session,
+		'window.originalAdd = IDBObjectStore.prototype.add; IDBObjectStore.prototype.add = function () { throw new DOMException("The disk is full", "QuotaExceededError") }',
+	)
+	evaluate(
+		session,
+		`(() => { ${holdFrames}; let board = ${editor}; board.deleteShapes([board.getCurrentPageShapesSorted().at(-1).id]); document.querySelector("#dialog .dialog-close").click() })()`,
+	)
+	wait(
+		session,
+		'!document.querySelector("#dialog").open && document.querySelector("#toast")?.textContent.includes("return when you open it again")',
+	)
+	evaluate(
+		session,
+		`${releaseFrames}; IDBObjectStore.prototype.add = window.originalAdd; delete window.originalAdd`,
+	)
+	browser(session, "click", '[data-action^="drawing:"]')
+	wait(session, `${mounted} && ${shapes} === 4 && ${saved}`)
+	browser(session, "click", "#dialog .dialog-close")
+	browser(session, "reload")
+	browser(session, "click", '[data-action="tools"]')
+	browser(session, "click", '[data-action^="drawing:"]')
+	wait(session, `${mounted} && ${shapes} === 4`)
+	assert(
+		true,
+		"a deletion a failed close could not save returns when the board reopens and is then saved",
+	)
+
 	let snapshot = object(
 		evaluate(
 			session,
@@ -258,6 +307,42 @@ try {
 		`${editor}.store.query.records("instance_presence").get().length === 0`,
 	)
 	assert(true, "closing the board withdraws the collaborator's presence")
+
+	// The owner's tab pretends to run a newer tldraw, so its next shape names
+	// a schema the reader's tab cannot write.
+	browser(session, "click", "#dialog .dialog-close")
+	wait(session, '!document.querySelector("#dialog").open')
+	browser(session, "click", '[data-action^="drawing:"]')
+	wait(session, mounted)
+	evaluate(
+		session,
+		`(() => { let schema = Object.getPrototypeOf(${editor}.store.schema), serialize = schema.serialize; schema.serialize = function () { let value = serialize.call(this); return { ...value, sequences: { ...value.sequences, "com.tldraw.shape.future": 1 } } } })()`,
+	)
+	browser(session, "click", "#dialog .dialog-close")
+	wait(session, '!document.querySelector("#dialog").open')
+	browser(session, "click", '[data-action^="drawing:"]')
+	wait(session, `${mounted} && ${shapes} === 5`)
+	browser(session, "click", '[data-testid="tools.rectangle"]')
+	drag(session, [0.75, 0.15], [0.85, 0.25])
+	wait(session, `${shapes} === 6 && ${saved}`)
+	browser(reader, "click", '[data-action^="drawing:"]')
+	wait(reader, `${mounted} && ${shapes} === 6`)
+	assert(
+		evaluate(
+			reader,
+			`${editor}.getIsReadonly() && !document.querySelector("[data-read-only]").hidden && document.querySelector("#drawing-undo").disabled && document.querySelector("#import-drawing").disabled && document.querySelector("#embed-board").getAttribute("aria-label") !== ""`,
+		),
+		"a writer sees a board saved by a newer version read-only",
+	)
+	browser(reader, "click", "#dialog .dialog-close")
+	wait(reader, '!document.querySelector("#dialog").open')
+	assert(
+		!evaluate(
+			reader,
+			'document.querySelector("#toast")?.textContent.includes("return when you open it again") ?? false',
+		),
+		"closing a newer board keeps no edits that could never be saved",
+	)
 } finally {
 	for (let name of [session, reader])
 		try {
