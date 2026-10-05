@@ -15,8 +15,33 @@ try {
 		"Initial HTML includes the startup frame before JavaScript",
 	)
 	browser(session, "set", "viewport", "1280", "800")
+	browser(session, "network", "route", new URL("/app.js", url).href, "--abort")
 	browser(session, "open", url)
+	wait(session, 'document.querySelector("[data-boot] [data-toolbar]") !== null')
+	assert(
+		evaluate(
+			session,
+			'!document.querySelector(".boot-line, .boot-page, #editor") && document.querySelector("[data-boot]").textContent.trim() === "" && document.querySelector("[data-toolbar]").closest("[inert]") !== null',
+		),
+		"Before JavaScript, the editor shows its real toolbar and an empty page",
+	)
+	let toolbarGeometry = `JSON.stringify([...document.querySelectorAll("[data-toolbar] button")].map(button => {let bounds = button.getBoundingClientRect(); return [button.dataset.action, bounds.x, bounds.y, bounds.width, bounds.height]}))`
+	let initialToolbar = evaluate(session, toolbarGeometry)
+	browser(session, "network", "unroute", new URL("/app.js", url).href)
+	browser(session, "reload")
 	wait(session, 'document.querySelector("[data-document-app]") !== null')
+	wait(session, 'document.querySelector("#editor") !== null')
+	assert(
+		evaluate(session, toolbarGeometry) === initialToolbar,
+		"Opening the document keeps every toolbar control in place",
+	)
+	assert(
+		evaluate(
+			session,
+			'getComputedStyle(document.querySelector("#highlight")).animationDuration === "0.12s"',
+		),
+		"Document text has a brief entrance without animating the layout",
+	)
 	browser(session, "click", '[data-action="new"]')
 	wait(session, '!document.querySelector("#editor").readOnly')
 	browser(
@@ -216,6 +241,14 @@ try {
 		'!location.pathname.endsWith("/preview") && document.querySelector("#editor") !== null',
 	)
 	assert(true, "Preview links back to the document editor")
+	browser(session, "set", "media", "dark", "reduced-motion")
+	assert(
+		evaluate(
+			session,
+			'getComputedStyle(document.querySelector("#highlight")).animationName === "none"',
+		),
+		"Reduced motion opens document text without an entrance animation",
+	)
 } finally {
 	browser(session, "close")
 	server.kill()

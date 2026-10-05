@@ -10,7 +10,7 @@ export function setLanguage(language: string) {
 }
 export function locale() {
 	return selected === "system"
-		? navigator.language.startsWith("de")
+		? typeof window !== "undefined" && navigator.language.startsWith("de")
 			? "de"
 			: "en"
 		: selected

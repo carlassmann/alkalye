@@ -230,7 +230,7 @@ function mountApplication() {
 				<div data-app class="workspace">
 					${toolbarMarkup()}
 					<div data-find id="find-bar" hidden></div>
-					<main id="main">${bootMarkup()}</main>
+					<main id="main">${bootMarkup(false)}</main>
 					${statusbarMarkup()}
 				</div>
 				<aside data-inspector class="inspector" aria-label="Document tools">
