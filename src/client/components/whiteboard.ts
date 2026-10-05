@@ -288,6 +288,22 @@ function mountBoard(
 			sync => Effect.sync(sync.dispose),
 		)
 		let draft = drafts.get(boardId)
+		// A refresh can arrive before tldraw delivers its next frame of edits.
+		yield* Effect.acquireRelease(
+			Effect.sync(() => {
+				function protectDrawing(event: BeforeUnloadEvent) {
+					if (!session.writable() || !sync.pending()) return
+					event.preventDefault()
+					event.returnValue = ""
+				}
+				window.addEventListener("beforeunload", protectDrawing)
+				return protectDrawing
+			}),
+			protectDrawing =>
+				Effect.sync(() =>
+					window.removeEventListener("beforeunload", protectDrawing),
+				),
+		)
 		drafts.delete(boardId)
 		if (draft && session.writable() && !sync.newer()) restoreDraft(store, draft)
 		let ready = yield* Deferred.make<Editor>()

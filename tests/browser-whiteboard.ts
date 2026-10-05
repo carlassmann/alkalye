@@ -70,6 +70,13 @@ try {
 		true,
 		"tldraw's undo and redo shortcuts travel through document history",
 	)
+	assert(
+		evaluate(
+			session,
+			`(() => { let board = ${editor}, shape = board.getCurrentPageShapes()[0], originalFrame = window.requestAnimationFrame, frames = []; window.requestAnimationFrame = callback => frames.push(callback); try { board.updateShapes([{ id: shape.id, opacity: 0.5 }]); let event = new Event("beforeunload", { cancelable: true }); window.dispatchEvent(event); board.updateShapes([{ id: shape.id, opacity: shape.opacity }]); return event.defaultPrevented; } finally { window.requestAnimationFrame = originalFrame; frames.forEach(frame => frame(performance.now())); } })()`,
+		),
+		"refreshing before the next frame protects the unsaved drawing",
+	)
 
 	evaluate(
 		session,

@@ -1016,6 +1016,44 @@ test("a backup of a legacy board cut short keeps its legacy shapes and tombstone
 	}
 })
 
+test("a backup preserves a legacy deletion before any converted record lands", async () => {
+	let replica = new Replica("author")
+	newDocument(replica, "doc", "Untitled", "![Plan](asset:board)\n")
+	let fields = {
+		type: "whiteboard",
+		document: "doc",
+		"shape:deleted": JSON.stringify({
+			kind: "rectangle",
+			color: "#e03131",
+			width: 4,
+			points: [
+				{ x: 0, y: 0 },
+				{ x: 20, y: 20 },
+			],
+			text: "",
+		}),
+		[recordField("shape:legacy-shape-deleted")]: "",
+	}
+	for (let [field, value] of Object.entries(fields))
+		replica.set("board", field, value)
+	let entries = await Effect.runPromise(
+		exportArchive([
+			{
+				document: "doc",
+				replica,
+				media: new Map([["board", new TextEncoder().encode("<svg/>")]]),
+			},
+		]),
+	)
+	let restored = await restore(entries)
+	let [id] = archiveContents(restored.replica, restored.id).whiteboards
+	let copy = restored.replica.fields(id ?? "")
+	expect(copy[recordField("shape:legacy-shape-deleted")]).toBe("")
+	let reopened = peer(register(copy))
+	expect(reopened.errors).toEqual([])
+	expect(shapes(reopened.store)).toHaveLength(0)
+})
+
 async function restore(entries: ReadonlyArray<ZipEntry>) {
 	let plan = await Effect.runPromise(parseArchive(entries))
 	let identities = new Map(

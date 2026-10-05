@@ -197,7 +197,11 @@ export function boardFile(fields: Record<string, string>) {
 export let boardRegisterFormat = "alkalye-drawing-v2"
 
 export function boardRegister(fields: Record<string, string>) {
-	if (!hasLegacyDrawing(fields) || !isTldrawBoard(fields)) return undefined
+	if (
+		!hasLegacyDrawing(fields) ||
+		!Object.keys(fields).some(field => field.startsWith(recordPrefix))
+	)
+		return undefined
 	let kept: Record<string, string> = {}
 	for (let [key, value] of Object.entries(fields))
 		if (
@@ -255,7 +259,10 @@ export function parseBoardRegister(value: unknown) {
 		records.set(id, text)
 	}
 	if (pages > 1) throw new Error("Import a drawing with one page")
-	if (!hasLegacyDrawing(register) || !records.size)
+	if (
+		!hasLegacyDrawing(register) ||
+		!fields.some(([field]) => field.startsWith(recordPrefix))
+	)
 		throw new Error("Unsupported drawing format")
 	let file: TldrawFile = { schemas, records }
 	return { fields, file }
