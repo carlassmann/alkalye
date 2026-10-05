@@ -43,6 +43,7 @@ try {
 		),
 		"native find selects an exact source occurrence",
 	)
+	browser(session, "click", '[data-find-action="toggle-replace"]')
 	browser(session, "fill", "#replace-text", "gamma")
 	browser(session, "click", "#replace-all")
 	wait(
@@ -61,6 +62,7 @@ try {
 	)
 	browser(session, "press", "Control+f")
 	browser(session, "fill", "#find-text", "alpha")
+	browser(session, "click", '[data-find-action="toggle-replace"]')
 	browser(session, "fill", "#replace-text", "forbidden")
 	assert(
 		evaluate(

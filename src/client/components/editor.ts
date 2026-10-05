@@ -14,7 +14,7 @@ import {
 import { pasteMarkdown } from "../paste"
 import { shortcutLabel } from "../shortcuts"
 import { openContextMenu } from "./context-menu"
-import type { MenuEntry } from "./context-menu"
+import type { MenuEntry, MenuItem } from "./context-menu"
 import { mountLineActions } from "./line-actions"
 import { icon } from "../icons"
 import type { IconName } from "../icons"
@@ -279,7 +279,7 @@ function createEditorView(
 	document.addEventListener(
 		"selectionchange",
 		() => {
-			if (document.activeElement === textarea) text.sync()
+			if (document.activeElement === textarea && !text.sync()) paintActiveLine()
 		},
 		{ signal: listeners.signal },
 	)
@@ -437,8 +437,15 @@ function createEditorView(
 			range = document.createRange()
 		range.setStart(from.node, from.offset)
 		range.collapse(true)
-		let bounds = range.getBoundingClientRect(),
-			view = wrapper.getBoundingClientRect()
+		let bounds = range.getBoundingClientRect()
+		if (!bounds.height) {
+			let length = from.node.textContent?.length ?? 0
+			if (from.offset < length) range.setEnd(from.node, from.offset + 1)
+			else if (from.offset) range.setStart(from.node, from.offset - 1)
+			bounds = range.getClientRects()[0] ?? range.getBoundingClientRect()
+		}
+		if (!bounds.height) return
+		let view = wrapper.getBoundingClientRect()
 		activeLine.style.top = `${bounds.top - view.top}px`
 		activeLine.style.height = `${bounds.height || parseFloat(getComputedStyle(textarea).lineHeight)}px`
 	}
@@ -781,7 +788,20 @@ function createEditorView(
 		let key = (id: string) => shortcutLabel(id, platform)
 		let clipboardKey = (letter: string) =>
 			platform === "mac" ? "⌘" + letter : "Ctrl+" + letter
-		let action = (label: string, command: string, id?: string) => ({
+		let formattingIcons: Record<string, IconName> = {
+			bold: "bold",
+			italic: "italic",
+			strike: "type",
+			code: "code",
+			bullet: "list",
+			ordered: "list",
+			task: "list-todo",
+			quote: "message-square",
+			clear: "type",
+			link: "link",
+		}
+		let action = (label: string, command: string, id?: string): MenuItem => ({
+			icon: formattingIcons[command] ?? "heading",
 			label,
 			shortcut: id && key(id),
 			run: () => format(command),
@@ -792,9 +812,10 @@ function createEditorView(
 			entries.push(
 				{
 					label: "Open link",
+					icon: "external-link",
 					run: () => void window.open(url, "_blank", "noopener,noreferrer"),
 				},
-				{ label: "Copy link", run: () => writeClipboard(url) },
+				{ label: "Copy link", icon: "copy", run: () => writeClipboard(url) },
 			)
 		let wiki = context.wiki
 		if (wiki) {
@@ -802,9 +823,14 @@ function createEditorView(
 				options.documents().find(doc => doc.id === wiki || doc.title === wiki)
 					?.id ?? wiki
 			entries.push(
-				{ label: "Open document", run: () => options.openDocument(id) },
+				{
+					label: "Open document",
+					icon: "file-text",
+					run: () => options.openDocument(id),
+				},
 				{
 					label: "Open document in new tab",
+					icon: "external-link",
 					run: () => options.openDocument(id, true),
 				},
 			)
@@ -813,11 +839,13 @@ function createEditorView(
 		if (image && options.previewImage)
 			entries.push({
 				label: "Preview image",
+				icon: "image",
 				run: () => options.previewImage?.(image.url, image.alt),
 			})
 		if (context.task && editable)
 			entries.push({
 				label: "Toggle complete",
+				icon: "check",
 				shortcut: key("toggleTask"),
 				run: () => {
 					let offset = anchorOffset(clickedAnchor)
@@ -837,12 +865,14 @@ function createEditorView(
 		entries.push(
 			{
 				label: "Cut",
+				icon: "scissors",
 				shortcut: clipboardKey("X"),
 				disabled: !editable || !selected,
 				run: cut,
 			},
 			{
 				label: "Copy",
+				icon: "copy",
 				shortcut: clipboardKey("C"),
 				disabled: !selected,
 				run: () =>
@@ -852,6 +882,7 @@ function createEditorView(
 			},
 			{
 				label: "Paste",
+				icon: "clipboard",
 				shortcut: clipboardKey("V"),
 				disabled:
 					!editable || typeof navigator.clipboard?.readText !== "function",
@@ -863,11 +894,13 @@ function createEditorView(
 			if (editable && (options.canComment?.() ?? true))
 				entries.push({
 					label: "Add comment",
+					icon: "message-square-plus",
 					shortcut: key("comment"),
 					run: () => options.command("comment"),
 				})
 			entries.push({
 				label: "Find selection",
+				icon: "search",
 				shortcut: key("find"),
 				run: () => options.find(selected),
 			})
@@ -877,6 +910,7 @@ function createEditorView(
 				"separator",
 				{
 					label: "Format",
+					icon: "type",
 					items: [
 						action("Bold", "bold", "bold"),
 						action("Italic", "italic", "italic"),
@@ -885,12 +919,14 @@ function createEditorView(
 						"separator",
 						{
 							label: "Headings",
+							icon: "heading",
 							items: [1, 2, 3, 4, 5, 6].map(level =>
 								action(`Heading ${level}`, `h${level}`, `heading${level}`),
 							),
 						},
 						{
 							label: "Lists",
+							icon: "list",
 							items: [
 								action("Bullet list", "bullet", "bulletList"),
 								action("Numbered list", "ordered", "orderedList"),
@@ -903,20 +939,24 @@ function createEditorView(
 				},
 				{
 					label: "Insert",
+					icon: "plus",
 					items: [
 						action("Link", "link", "link"),
 						{
 							label: "Attachment",
+							icon: "image-plus",
 							shortcut: key("image"),
 							run: () => options.command("asset"),
 						},
 						{
 							label: "Code block",
+							icon: "code-xml",
 							shortcut: key("codeBlock"),
 							run: insertCodeBlock,
 						},
 						{
 							label: "Whiteboard",
+							icon: "pen-tool",
 							run: () => options.command("new-whiteboard"),
 						},
 					],
@@ -1039,7 +1079,7 @@ function createEditorView(
 			(event.metaKey || event.ctrlKey) &&
 			event.shiftKey &&
 			event.key.toLowerCase() === "v"
-		if (event.key === "Escape" && options.editable) {
+		if (event.key === "Escape") {
 			event.preventDefault()
 			event.stopPropagation()
 			releaseTab = true

@@ -255,7 +255,7 @@
 	padding: 12px 8px;
 	border-top: 1px solid var(--line);
 }
-[data-library] .profile button {
+[data-library] .profile alkalye-menu > button {
 	width: 100%;
 	display: flex;
 	align-items: center;
@@ -297,4 +297,8 @@
 [data-library] [popover].library-menu {
 	top: auto;
 	right: auto;
+}
+
+[data-library] .profile-menu {
+	width: 224px;
 }

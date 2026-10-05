@@ -1,20 +1,26 @@
 import * as Effect from "effect/Effect"
 import * as Fiber from "effect/Fiber"
 import { element, setMarkup } from "../dom"
+import { icon } from "../icons"
 import { html } from "../language"
 import { toast } from "./toast"
 import { replaceSelectedMatch } from "../../shared/find"
 import type { SourceTextarea } from "../source-textarea"
 import { EditorElement } from "./editor"
 
-export function openFind(query = "") {
+export function openFind(query = "", replace = false) {
 	let host = document.querySelector("alkalye-editor")
 	let editor = host instanceof EditorElement ? host.source : undefined
 	if (!editor) return
 	let bar = element("#find-bar")
+	let app = document.querySelector("#app")
+	if (app && bar.parentElement !== app) app.append(bar)
 	bar.hidden = false
 	let existing = bar.querySelector("alkalye-find")
-	if (existing instanceof FindElement) return existing.focusSearch(query)
+	if (existing instanceof FindElement) {
+		existing.showReplacement(replace)
+		return existing.focusSearch(query)
+	}
 	let component = new FindElement()
 	component.configure(
 		editor,
@@ -26,6 +32,7 @@ export function openFind(query = "") {
 		query,
 	)
 	bar.replaceChildren(component)
+	component.showReplacement(replace)
 }
 
 export class FindElement extends HTMLElement {
@@ -42,6 +49,7 @@ export class FindElement extends HTMLElement {
 		let input = this.querySelector<HTMLInputElement>("#find-text")
 		if (input && query) input.value = query
 		input?.select()
+		this.refreshCount()
 	}
 	connectedCallback() {
 		let configured = this.editor
@@ -58,46 +66,88 @@ export class FindElement extends HTMLElement {
 					)
 					setMarkup(
 						host,
-						html`<input
-								id="find-text"
-								placeholder="Find in document"
-								aria-label="Find in document"
-							/>
-							<input
-								id="replace-text"
-								placeholder="Replace with"
-								aria-label="Replace with"
-							/>
-							<label><input id="find-case" type="checkbox" /> Match case</label>
-							<label><input id="find-regex" type="checkbox" /> Regex</label>
-							<button type="button" data-find-action="next" id="find-next">
-								Next
-							</button>
-							<button
-								type="button"
-								data-find-action="previous"
-								id="find-previous"
-							>
-								Previous
-							</button>
-							<button type="button" data-find-action="replace" id="replace-one">
-								Replace
-							</button>
-							<button
-								type="button"
-								data-find-action="replace-all"
-								id="replace-all"
-							>
-								Replace all
-							</button>
-							<button
-								type="button"
-								data-find-action="close"
-								id="close-find"
-								aria-label="Close find"
-							>
-								×
-							</button>`,
+						html`<div class="find-query-row">
+								<input
+									id="find-text"
+									type="text"
+									placeholder="Find in document"
+									aria-label="Find in document"
+								/>
+								<button
+									type="button"
+									data-find-action="toggle-replace"
+									aria-label="Toggle replace"
+									title="Find and replace"
+								>
+									${icon("chevron-down")}
+								</button>
+								<button
+									type="button"
+									data-find-action="close"
+									id="close-find"
+									aria-label="Close find"
+									title="Close find (Esc)"
+								>
+									${icon("x")}
+								</button>
+							</div>
+							<div class="find-replace-row" hidden>
+								<input
+									id="replace-text"
+									type="text"
+									placeholder="Replace with…"
+									aria-label="Replace with"
+								/>
+								<button
+									type="button"
+									data-find-action="replace"
+									id="replace-one"
+								>
+									Replace
+								</button>
+								<button
+									type="button"
+									data-find-action="replace-all"
+									id="replace-all"
+								>
+									Replace all
+								</button>
+							</div>
+							<div class="find-controls">
+								<label class="find-toggle" title="Match case"
+									><input
+										id="find-case"
+										type="checkbox"
+										aria-label="Match case"
+									/><span>Aa</span></label
+								>
+								<label class="find-toggle" title="Regular expression"
+									><input
+										id="find-regex"
+										type="checkbox"
+										aria-label="Regular expression"
+									/><span>.*</span></label
+								>
+								<output class="find-count" aria-live="polite"></output>
+								<button
+									type="button"
+									data-find-action="previous"
+									id="find-previous"
+									aria-label="Previous match"
+									title="Previous match (⇧Enter)"
+								>
+									${icon("chevron-up")}
+								</button>
+								<button
+									type="button"
+									data-find-action="next"
+									id="find-next"
+									aria-label="Next match"
+									title="Next match (Enter)"
+								>
+									${icon("chevron-down")}
+								</button>
+							</div>`,
 					)
 					host.addEventListener(
 						"click",
@@ -110,6 +160,26 @@ export class FindElement extends HTMLElement {
 						},
 						{ signal: events.signal },
 					)
+					host.addEventListener("input", () => host.refreshCount(), {
+						signal: events.signal,
+					})
+					editor.element.addEventListener("select", () => host.refreshCount(), {
+						signal: events.signal,
+					})
+					document.addEventListener(
+						"keydown",
+						event => {
+							if (
+								event.key === "Escape" &&
+								!event.defaultPrevented &&
+								!document.querySelector("dialog[open]")
+							) {
+								event.preventDefault()
+								host.close()
+							}
+						},
+						{ signal: events.signal },
+					)
 					host.addEventListener(
 						"keydown",
 						event => {
@@ -119,7 +189,14 @@ export class FindElement extends HTMLElement {
 								host.close()
 							} else if (event.key === "Enter") {
 								event.preventDefault()
-								host.perform(event.shiftKey ? "previous" : "next")
+								host.perform(
+									event.target instanceof HTMLInputElement &&
+										event.target.id === "replace-text"
+										? "replace"
+										: event.shiftKey
+											? "previous"
+											: "next",
+								)
 							}
 						},
 						{ signal: events.signal },
@@ -149,6 +226,11 @@ export class FindElement extends HTMLElement {
 		let editor = this.editor
 		if (!editor || !this.isConnected) return
 		if (action === "close") return this.close()
+		if (action === "toggle-replace")
+			return this.showReplacement(
+				this.querySelector(".find-replace-row")?.hasAttribute("hidden") ??
+					false,
+			)
 		let pattern = this.expression()
 		if (!pattern) return
 		if (action === "next" || action === "previous") {
@@ -164,7 +246,6 @@ export class FindElement extends HTMLElement {
 							.filter(match => match.index < editor.selectionStart)
 							.at(-1) ?? matches.at(-1))
 			if (!match) return toast("No match")
-			editor.focus()
 			editor.setSelectionRange(match.index, match.index + match[0].length)
 			editor.dispatchEvent(new Event("select"))
 			return
@@ -191,6 +272,31 @@ export class FindElement extends HTMLElement {
 			)
 		} else return
 		editor.dispatchEvent(new Event("input"))
+		this.refreshCount()
+	}
+	showReplacement(show: boolean) {
+		let row = this.querySelector<HTMLElement>(".find-replace-row")
+		if (row) row.hidden = !show
+		this.toggleAttribute("data-replace", show)
+		this.querySelector('[data-find-action="toggle-replace"]')?.setAttribute(
+			"aria-expanded",
+			String(show),
+		)
+	}
+	private refreshCount() {
+		let count = this.querySelector(".find-count")
+		if (!count || !this.editor) return
+		let pattern = this.expression(false)
+		let matches = pattern ? [...this.editor.value.matchAll(pattern)] : []
+		let current = matches.findIndex(
+			match => match.index === this.editor?.selectionStart,
+		)
+		count.textContent = pattern
+			? matches.length
+				? `${Math.max(0, current + 1)} of ${matches.length}`
+				: "No results"
+			: ""
+		count.toggleAttribute("data-empty", Boolean(pattern && !matches.length))
 	}
 	disconnectedCallback() {
 		let lifetime = this.lifetime
@@ -198,7 +304,7 @@ export class FindElement extends HTMLElement {
 		if (lifetime) Effect.runFork(Fiber.interrupt(lifetime))
 	}
 	connectedMoveCallback() {}
-	private expression() {
+	private expression(report = true) {
 		let input = this.querySelector<HTMLInputElement>("#find-text")
 		if (!input?.value) return
 		let regex = this.querySelector<HTMLInputElement>("#find-regex")?.checked
@@ -211,7 +317,7 @@ export class FindElement extends HTMLElement {
 				sensitive ? "gu" : "giu",
 			)
 		} catch {
-			toast("Invalid regular expression")
+			if (report) toast("Invalid regular expression")
 		}
 	}
 }

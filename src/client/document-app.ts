@@ -26,6 +26,7 @@ import { metadataSource } from "../shared/document-metadata"
 import type { MetadataPatch } from "../shared/document-metadata"
 import { folderPath } from "../shared/folders"
 import { openContextMenu } from "./components/context-menu"
+import type { MenuEntry } from "./components/context-menu"
 import { PermissionDenied } from "../shared/document-actions"
 import {
 	compileTheme,
@@ -289,6 +290,17 @@ function mountApplication() {
 			"import",
 			"export-all",
 			"library-menu",
+			"profile-menu",
+			"appearance-light",
+			"appearance-dark",
+			"appearance-system",
+			"language-en",
+			"language-de",
+			"language-system",
+			"open-file",
+			"open-folder",
+			"sign-in",
+			"sign-out",
 			"library-options",
 			"syntax-theme",
 			"appearance",
@@ -446,37 +458,44 @@ function mountApplication() {
 					.current()
 					.library.documents.find(doc => doc.document === id)
 				if (!doc) return
-				openContextMenu(event, [
-					{ label: "Open document", run: () => launch(open(id)) },
-					...(!isLocalWorkspace(doc.workspace)
-						? [
-								{
-									label: "Invite collaborators",
-									disabled: doc.owner !== account.subject,
-									run: () =>
-										launch(
-											open(id).pipe(
-												Effect.andThen(() =>
-													selection?.document === id
-														? act("share")
-														: Effect.void,
-												),
+				let invitations: MenuEntry[] = isLocalWorkspace(doc.workspace)
+					? []
+					: [
+							{
+								label: "Invite collaborators",
+								icon: "users",
+								disabled: doc.owner !== account.subject,
+								run: () =>
+									launch(
+										open(id).pipe(
+											Effect.andThen(() =>
+												selection?.document === id ? act("share") : Effect.void,
 											),
 										),
-								},
-							]
-						: []),
+									),
+							},
+						]
+				openContextMenu(event, [
+					{
+						label: "Open document",
+						icon: "file-text",
+						run: () => launch(open(id)),
+					},
+					...invitations,
 					{
 						label: "Document properties",
+						icon: "pencil",
 						disabled: doc.role === "reader",
 						run: () => launch(open(id).pipe(Effect.andThen(act("properties")))),
 					},
 					{
 						label: "Duplicate document",
+						icon: "copy",
 						run: () => launch(open(id).pipe(Effect.andThen(act("duplicate")))),
 					},
 					{
 						label: doc.metadata.pinned ? "Unpin document" : "Pin document",
+						icon: doc.metadata.pinned ? "pin-off" : "pin",
 						disabled: doc.role === "reader",
 						run: () => launch(open(id).pipe(Effect.andThen(act("pin")))),
 					},
@@ -484,15 +503,18 @@ function mountApplication() {
 						label: doc.metadata.archived
 							? "Restore document"
 							: "Archive document",
+						icon: "archive",
 						disabled: doc.role === "reader",
 						run: () => launch(open(id).pipe(Effect.andThen(act("archive")))),
 					},
 					{
 						label: "Export document",
+						icon: "download",
 						run: () => launch(open(id).pipe(Effect.andThen(act("download")))),
 					},
 					{
 						label: "Time machine",
+						icon: "history",
 						run: () => launch(open(id).pipe(Effect.andThen(act("history")))),
 					},
 				])
@@ -619,6 +641,17 @@ function mountApplication() {
 				String(value.editor.lineHeight),
 			)
 			root.style.setProperty("--editor-size", `${value.fontSize}px`)
+			for (let choice of app.querySelectorAll<HTMLElement>(
+				"#profile-appearance [data-action], #profile-language [data-action]",
+			)) {
+				choice.setAttribute(
+					"aria-checked",
+					String(
+						choice.dataset.action === "appearance-" + value.appearance ||
+							choice.dataset.action === "language-" + value.language,
+					),
+				)
+			}
 			setLanguage(value.language)
 			editor?.preferences(value.editor)
 			let label = app.querySelector(".profile-name")?.firstChild
@@ -2183,6 +2216,7 @@ function mountApplication() {
 						preferences.state.current().value.editor.statsUnit,
 					)
 			}
+			app.toggleAttribute("data-comments-panel", panel === "comments")
 			for (let tab of app.querySelectorAll<HTMLButtonElement>(
 				"[data-inspector] > header [data-action]",
 			))
@@ -2225,7 +2259,7 @@ function mountApplication() {
 											<hr />
 											${tool("cut", "Cut", "scissors")}${tool("copy-text", "Copy", "copy")}${tool("paste", "Paste", "clipboard")}
 											<hr />
-											${tool("find", "Find and replace", "search")}${tool("complete", "Toggle task completion", "list-todo")}${tool("sort-tasks", "Sort tasks", "list")}`,
+											${tool("find-replace", "Find and replace", "search")}${tool("complete", "Toggle task completion", "list-todo")}${tool("sort-tasks", "Sort tasks", "list")}`,
 									)}${group(
 										"format",
 										"Format",
@@ -2519,12 +2553,12 @@ function mountApplication() {
 						report,
 					)
 				}
-				if (action === "find") {
+				if (action === "find" || action === "find-replace") {
 					if (mode !== "edit") {
 						mode = "edit"
 						mountDocument()
 					}
-					openFind()
+					openFind("", action === "find-replace")
 					return
 				}
 				if (action === "find-next" || action === "find-previous") {
@@ -2701,13 +2735,32 @@ function mountApplication() {
 					setLayout("library", !app.classList.contains("library-open"))
 					return
 				}
-				if (action === "library-menu" || action === "library-options") {
+				if (
+					action === "library-menu" ||
+					action === "library-options" ||
+					action === "profile-menu"
+				) {
 					let panel = element("." + action)
 					if (panel.hasAttribute("popover")) return
 					panel.hidden = !panel.hidden
 					app
 						.querySelector(`[data-action="${action}"]`)
 						?.setAttribute("aria-expanded", String(!panel.hidden))
+					return
+				}
+				if (
+					action === "language-en" ||
+					action === "language-de" ||
+					action === "language-system"
+				) {
+					yield* preferences.save({
+						language:
+							action === "language-en"
+								? "en"
+								: action === "language-de"
+									? "de"
+									: "system",
+					})
 					return
 				}
 				if (

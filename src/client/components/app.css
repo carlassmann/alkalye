@@ -16,10 +16,10 @@
 	grid-template-columns: 224px minmax(0, 1fr) 0;
 }
 [data-app]#app.tools-open {
-	grid-template-columns: 0 minmax(0, 1fr) 224px;
+	grid-template-columns: 0 minmax(0, 1fr) var(--inspector-width, 224px);
 }
 [data-app]#app.library-open.tools-open {
-	grid-template-columns: 224px minmax(0, 1fr) 224px;
+	grid-template-columns: 224px minmax(0, 1fr) var(--inspector-width, 224px);
 }
 [data-app]#app:not(.library-open) .library,
 [data-app]#app:not(.tools-open) .inspector {
@@ -37,6 +37,7 @@
 	justify-self: end;
 }
 [data-app]#app > [data-inspector] {
+	width: var(--inspector-width, 224px);
 	justify-self: start;
 }
 [data-app].workspace {
@@ -222,7 +223,7 @@
 	grid-template-columns: 0 minmax(0, 1fr) 0;
 }
 [data-app]#app.mode-preview.tools-open {
-	grid-template-columns: 0 minmax(0, 1fr) 224px;
+	grid-template-columns: 0 minmax(0, 1fr) var(--inspector-width, 224px);
 }
 [data-app].mode-preview > .library,
 [data-app].mode-preview .toolbar {
@@ -266,4 +267,10 @@
 }
 [data-app].mode-history #main {
 	overflow: hidden;
+}
+
+@media (min-width: 1101px) {
+	[data-app][data-comments-panel] {
+		--inspector-width: 352px;
+	}
 }

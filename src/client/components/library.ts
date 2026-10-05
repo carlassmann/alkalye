@@ -3,6 +3,7 @@ import { html, joinMarkup, translate } from "../language"
 import type { DocumentRecord } from "../../shared/model"
 import { button, element, updateMarkup } from "../dom"
 import { icon } from "../icons"
+import type { IconName } from "../icons"
 export type DocumentSummary = Omit<DocumentRecord, "content"> & {
 	excerpt: string
 }
@@ -72,9 +73,9 @@ export function libraryMarkup(name: string, filter: string) {
 						"Document type",
 						[
 							["all", "All types"],
-							["document", "Documents"],
-							["slides", "Slides"],
-							["whiteboard", "Whiteboards"],
+							["document", "Documents", "file-text"],
+							["slides", "Slides", "presentation"],
+							["whiteboard", "Whiteboards", "pen-tool"],
 						],
 						"all",
 					)}
@@ -88,15 +89,42 @@ export function libraryMarkup(name: string, filter: string) {
 		<div id="folder-status" class="folder-status" hidden></div>
 		<div id="document-list" class="document-list"></div>
 		<footer class="profile">
-			${button(
-				"settings",
-				name,
-				html`<span class="avatar">${icon("cloud")}</span>
-					<span class="profile-name"
-						>${name}<small id="sync-status"> </small>
-					</span>
-					${icon("chevron-up")}`,
-			)}
+			<alkalye-menu side="top">
+				${button(
+					"profile-menu",
+					name,
+					html`<span class="avatar">${icon("cloud")}</span>
+						<span class="profile-name"
+							>${name}<small id="sync-status"> </small>
+						</span>
+						${icon("chevron-up")}`,
+				)}
+				<div
+					id="profile-menu"
+					class="profile-menu menu-popover"
+					popover
+					role="menu"
+					aria-label="Account"
+				>
+					${button("settings", "Settings", html`${icon("settings")}<span>Settings</span>`)}
+					${profileChoices("appearance", "Theme", "palette", [
+						["light", "Light", "sun"],
+						["dark", "Dark", "moon"],
+						["system", "System", "monitor"],
+					])}
+					${profileChoices("language", "Language", "globe", [
+						["en", "English", "globe"],
+						["de", "Deutsch", "globe"],
+						["system", "System", "monitor"],
+					])}
+					<hr />
+					${button("open-folder", "Open folder", html`${icon("folder-open")}<span>Open folder</span>`)}
+					${button("open-file", "Open file", html`${icon("file-text")}<span>Open file</span>`)}
+					<hr />
+					${button("sign-in", "Sign in", html`${icon("log-in")}<span>Sign in</span>`)}
+					${button("sign-out", "Log out", html`${icon("log-out")}<span>Log out</span>`)}
+				</div></alkalye-menu
+			>
 		</footer>
 	</aside>`
 }
@@ -264,10 +292,32 @@ function relativeDate(time: number) {
 function filterMenu(
 	name: string,
 	label: string,
-	choices: readonly (readonly [string, string])[],
+	choices: readonly (readonly [string, string, IconName?])[],
 	selected: string,
 ) {
 	return html`<div class="filter-label">${translate(label)}</div>
-		${joinMarkup(choices.map(([value, title]) => html`<button type="button" role="menuitemradio" data-library-filter="${name}" data-value="${value}" aria-checked="${value === selected}"><span>${translate(title)}</span>${icon("check")}</button>`))}
+		${joinMarkup(choices.map(([value, title, symbol]) => html`<button type="button" role="menuitemradio" data-library-filter="${name}" data-value="${value}" aria-checked="${value === selected}">${symbol ? icon(symbol) : ""}<span>${translate(title)}</span>${icon("check")}</button>`))}
 		${name === "order" ? html`<hr />` : html``}`
+}
+
+function profileChoices(
+	name: string,
+	label: string,
+	symbol: IconName,
+	choices: readonly (readonly [string, string, IconName])[],
+) {
+	return html`<alkalye-menu data-submenu
+		><button type="button">
+			${icon(symbol)}<span>${label}</span>${icon("chevron-right")}
+		</button>
+		<div
+			id="profile-${name}"
+			class="menu-popover"
+			popover
+			role="menu"
+			aria-label="${label}"
+		>
+			${joinMarkup(choices.map(([value, title, symbol]) => html`<button type="button" role="menuitemradio" aria-checked="false" data-action="${name}-${value}">${icon(symbol)}<span>${title}</span>${icon("check")}</button>`))}
+		</div></alkalye-menu
+	>`
 }

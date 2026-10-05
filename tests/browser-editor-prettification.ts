@@ -310,6 +310,7 @@ try {
 		`${expanded} && ${editor}.value.slice(${editor}.selectionStart, ${editor}.selectionEnd) === "example.org"`,
 	)
 	assert(true, "find matches text inside hidden link destinations")
+	browser(session, "click", '[data-find-action="toggle-replace"]')
 	browser(session, "fill", "#replace-text", "example.com")
 	browser(session, "click", "#replace-one")
 	wait(

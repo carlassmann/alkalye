@@ -17,6 +17,7 @@ for (let path of [
 	"tests/browser-editor-context-menu.ts",
 	"tests/browser-editor-prettification.ts",
 	"tests/browser-ui-parity.ts",
+	"tests/browser-ui-leftovers.ts",
 	"tests/browser-sidebar-menus.ts",
 	"tests/browser-dialog.ts",
 	"tests/browser-toasts.ts",

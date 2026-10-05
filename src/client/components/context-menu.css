@@ -80,3 +80,7 @@
 		font-size: 14px;
 	}
 }
+
+[data-context-menu] button > span {
+	flex: 1;
+}

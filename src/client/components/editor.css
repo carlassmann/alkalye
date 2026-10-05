@@ -1,4 +1,6 @@
 [data-editor].editor-wrap {
+	--editor-caret: oklch(59.6% 0.145 163.225);
+	--editor-selection: 10%;
 	display: block;
 	position: relative;
 	font: var(--editor-size)/var(--editor-line-height, 1.8) var(--mono);
@@ -48,11 +50,15 @@
 	position: absolute;
 	inset: 0;
 	color: transparent;
-	caret-color: var(--ink);
+	caret-color: var(--editor-caret);
 	outline: 0;
 }
 [data-editor] #editor::selection {
-	background: color-mix(in oklch, var(--ring) 28%, transparent);
+	background: color-mix(
+		in oklch,
+		var(--editor-caret) var(--editor-selection),
+		transparent
+	);
 	color: transparent;
 }
 [data-editor] #editor::placeholder {
@@ -144,7 +150,11 @@
 	background: var(--brand-soft);
 }
 [data-editor] #highlight mark {
-	background: color-mix(in oklch, var(--ring) 28%, transparent);
+	background: color-mix(
+		in oklch,
+		var(--editor-caret) var(--editor-selection),
+		transparent
+	);
 	color: inherit;
 }
 
@@ -183,7 +193,7 @@
 [data-editor] .active-line {
 	position: absolute;
 	inset-inline: var(--editor-padding);
-	background: color-mix(in oklch, var(--ink) 4%, transparent);
+	background: color-mix(in oklch, var(--ink) 3%, transparent);
 	pointer-events: none;
 }
 [data-editor][data-strikethrough="true"] .done-task {
@@ -252,4 +262,15 @@
 	[data-editor]
 	:is(#highlight, [data-editor-links]) {
 	animation: none;
+}
+
+:root[data-appearance="dark"] [data-editor] {
+	--editor-caret: oklch(65% 0.145 163.225);
+	--editor-selection: 15%;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-appearance="light"]) [data-editor] {
+		--editor-caret: oklch(65% 0.145 163.225);
+		--editor-selection: 15%;
+	}
 }

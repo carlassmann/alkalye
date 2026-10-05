@@ -54,6 +54,10 @@
 	:root:has([data-app]#app.tools-open) [data-line-actions] {
 		right: 240px;
 	}
+	:root:has([data-app]#app.tools-open[data-comments-panel])
+		[data-line-actions] {
+		right: 368px;
+	}
 }
 @media (max-width: 1100px) {
 	:root:has([data-app]#app.library-open, [data-app]#app.tools-open)

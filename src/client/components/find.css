@@ -1,30 +1,107 @@
 [data-find]#find-bar {
-	padding: 8px 16px;
-	border-bottom: 1px solid var(--line);
-	display: flex;
-	gap: 8px;
-	flex-wrap: wrap;
+	position: fixed;
+	z-index: 50;
+	top: calc(48px + env(safe-area-inset-top) + 12px);
+	right: 12px;
+	max-width: calc(100vw - 24px);
+	padding: 6px 8px;
+	border: 1px solid var(--line);
+	border-radius: 4px;
+	background: var(--paper);
+	box-shadow: var(--shadow);
+}
+[data-app].tools-open #find-bar {
+	right: calc(var(--inspector-width, 224px) + 12px);
 }
 [data-find]:is(alkalye-find) {
 	display: flex;
-	gap: 8px;
-	flex-wrap: wrap;
-	width: 100%;
+	align-items: center;
+	gap: 6px;
 }
-[data-find]#find-bar input[type="text"],
-[data-find]#find-bar input:not([type]) {
-	flex: 1;
-	min-width: 100px;
+[data-find][data-replace] {
+	flex-direction: column;
+	align-items: stretch;
 }
-
-[data-find] label {
+[data-find] :is(.find-query-row, .find-replace-row, .find-controls) {
 	display: flex;
 	align-items: center;
-	gap: 4px;
-	white-space: nowrap;
+	gap: 6px;
 }
-[data-find] input[type="checkbox"] {
+[data-find] .find-replace-row[hidden] {
+	display: none;
+}
+[data-find] input[type="text"] {
+	width: 192px;
 	min-width: 0;
-	flex: none;
-	width: auto;
+	height: 28px;
+	padding: 0 8px;
+	font-size: 12px;
+}
+[data-find] button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 28px;
+	min-height: 28px;
+	padding: 0 6px;
+	font-size: 12px;
+}
+[data-find] button svg {
+	width: 14px;
+	height: 14px;
+}
+[data-find] .find-replace-row button {
+	border: 1px solid var(--line);
+}
+[data-find] .find-replace-row input {
+	flex: 1;
+}
+[data-find] .find-toggle {
+	position: relative;
+	display: grid;
+	place-items: center;
+	width: 28px;
+	height: 28px;
+	font-size: 12px;
+	cursor: pointer;
+}
+[data-find] .find-toggle input {
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	cursor: pointer;
+}
+[data-find] .find-toggle:has(:checked) {
+	background: var(--accent);
+}
+[data-find] .find-toggle:has(:focus-visible) {
+	outline: 1px solid var(--brand);
+}
+[data-find] .find-count {
+	min-width: 64px;
+	flex: 1;
+	text-align: center;
+	font-size: 12px;
+	color: var(--muted);
+	font-variant-numeric: tabular-nums;
+}
+[data-find] .find-count[data-empty] {
+	color: var(--danger);
+}
+@media (max-width: 1100px) {
+	[data-find]#find-bar,
+	[data-app].tools-open #find-bar {
+		left: 12px;
+		right: 12px;
+	}
+	[data-find]:is(alkalye-find) {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	[data-find] .find-query-row input {
+		flex: 1;
+	}
 }

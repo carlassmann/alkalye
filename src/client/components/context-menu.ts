@@ -1,14 +1,18 @@
 import { menuNavigation } from "../ui/menu"
 import { fitPanel } from "../ui/placement"
+import { icon } from "../icons"
+import type { IconName } from "../icons"
 import { translate } from "../language"
 
 export interface MenuItem {
+	icon?: IconName
 	label: string
 	shortcut?: string
 	disabled?: boolean
 	run(): void
 }
 export interface MenuGroup {
+	icon?: IconName
 	label: string
 	items: MenuEntry[]
 }
@@ -77,6 +81,8 @@ function renderMenu(
 		let button = document.createElement("button")
 		button.type = "button"
 		button.setAttribute("role", "menuitem")
+		if ("icon" in entry && entry.icon)
+			button.insertAdjacentHTML("beforeend", icon(entry.icon).value)
 		let label = document.createElement("span")
 		label.textContent = translate(entry.label)
 		button.append(label)
