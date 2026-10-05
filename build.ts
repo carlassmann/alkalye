@@ -7,7 +7,10 @@ import {
 	legalPage,
 } from "./src/client/components/site"
 import { readChangelog } from "./src/shared/changelog"
-export async function build(directory = resolve(import.meta.dir, "dist")) {
+export async function build(
+	directory = resolve(import.meta.dir, "dist"),
+	development = false,
+) {
 	let root = import.meta.dir
 	let output = resolve(directory)
 	await rm(output, { recursive: true, force: true })
@@ -20,9 +23,22 @@ export async function build(directory = resolve(import.meta.dir, "dist")) {
 		splitting: true,
 		minify: true,
 		sourcemap: "external",
+		metafile: true,
+		define: {
+			"process.env.NODE_ENV": JSON.stringify(
+				development ? "development" : "production",
+			),
+			"process.env.PUBLIC_TLDRAW_LICENSE_KEY": JSON.stringify(
+				process.env.PUBLIC_TLDRAW_LICENSE_KEY ?? "",
+			),
+		},
 	})
 	if (!result.success) throw new AggregateError(result.logs, "Build failed")
 	await cp(resolve(root, "public"), output, { recursive: true })
+	await Bun.write(
+		resolve(output, "tldraw/tldraw.css"),
+		Bun.file(resolve(root, "node_modules/tldraw/tldraw.css")),
+	)
 	let appHtml = (await Bun.file(resolve(output, "app.html")).text()).replace(
 		"<!-- APP_BOOT -->",
 		String(bootMarkup()),
@@ -101,6 +117,15 @@ export async function build(directory = resolve(import.meta.dir, "dist")) {
 			.replace("BUILD_VERSION", version)
 			.replace('"BUILD_STYLES"', "..." + JSON.stringify(componentStyles))
 			.replace(
+				'"BUILD_TLDRAW"',
+				"..." +
+					JSON.stringify(
+						assets
+							.filter(path => path.startsWith("tldraw/"))
+							.map(path => "/" + path),
+					),
+			)
+			.replace(
 				'"BUILD_SCRIPTS"',
 				"..." +
 					JSON.stringify(
@@ -118,5 +143,6 @@ export async function build(directory = resolve(import.meta.dir, "dist")) {
 		)
 		await Bun.write(resolve(output, path + ".gz"), Bun.gzipSync(bytes))
 	}
+	return result.metafile
 }
 if (import.meta.main) await build()

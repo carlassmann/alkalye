@@ -8,8 +8,22 @@ let manifest: {
 	optionalDependencies?: Record<string, string>
 	peerDependencies?: Record<string, string>
 } = await Bun.file("package.json").json()
-if (Object.keys(manifest.dependencies ?? {}).join() !== "effect")
-	throw new Error("Only Effect is allowed as a runtime dependency")
+let runtimeDependencies = new Map([
+	["effect", "4.0.0"],
+	["tldraw", "5.2.2"],
+	["react", "19.2.3"],
+	["react-dom", "19.2.3"],
+])
+let dependencies = Object.entries(manifest.dependencies ?? {})
+if (
+	dependencies.length !== runtimeDependencies.size ||
+	dependencies.some(
+		([name, version]) => runtimeDependencies.get(name) !== version,
+	)
+)
+	throw new Error(
+		"Runtime dependencies must match the pinned Effect and tldraw island",
+	)
 for (let dependencies of [
 	manifest.optionalDependencies,
 	manifest.peerDependencies,
@@ -47,6 +61,11 @@ async function inspect(path: string) {
 			specifier.startsWith(".") ||
 			specifier === "effect" ||
 			specifier.startsWith("effect/")
+		)
+			continue
+		if (
+			path.includes("/client/") &&
+			["tldraw", "react", "react-dom/client"].includes(specifier)
 		)
 			continue
 		if (

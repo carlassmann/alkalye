@@ -2,6 +2,7 @@ let cacheName = "alkalye-BUILD_VERSION"
 let shell = [
 	"BUILD_STYLES",
 	"BUILD_SCRIPTS",
+	"BUILD_TLDRAW",
 	"/",
 	"/app",
 	"/index.html",

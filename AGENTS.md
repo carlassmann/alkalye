@@ -1,12 +1,12 @@
 # Agent Instructions
 
-Local-first PWA built from TypeScript, HTML and CSS. Bun provides the server, bundler, test runner and SQLite. Effect 4 is the sole runtime package dependency.
+Local-first PWA built from TypeScript, HTML and CSS. Bun provides the server, bundler, test runner and SQLite. Effect 4 powers the application. A lazy tldraw island uses tldraw and its required React packages.
 
 ## Essentials
 
 - **Bun** - use `bun install`, `bun add`, `bun run` (no npm/yarn)
 - **Verify:** `bun run check` (lint, types, format, tests)
-- **Runtime dependencies** - exactly Effect 4, pinned, with no transitive dependencies. Use browser APIs and Bun built-ins for infrastructure; other packages are dev-only.
+- **Runtime dependencies** - pinned Effect 4 (no transitive dependencies), plus pinned tldraw, React and React DOM for the whiteboard only. Keep tldraw and React out of the initial app bundle and server. Use browser APIs and Bun built-ins elsewhere; other packages are dev-only.
 - **Never commit to `main`** - branch, open a PR, land it as a squash merge
 - **Changelog** - every PR adds exactly one entry at the top of `public/changelog.json`, written for readers, carrying the next `id` and `"pr": <number>`. Published entries can be edited or removed later; never reuse an `id`. Describe what users can do or notice, not implementation details.
 - **Signoff** - after the final push, run `bun run ci`. A PR is incomplete until its exact remote head has `signoff: success`; fix failures and rerun before reporting completion

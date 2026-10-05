@@ -207,6 +207,17 @@ test("Effect config rejects invalid ports and origins before server startup", as
 	expect(settings.port).toBe(0)
 	expect(settings.publicOrigin).toBe("https://alkalye.example")
 	expect(settings.resetLog).toBe(true)
+	expect(settings.development).toBe(true)
+	let production = await Effect.runPromise(
+		RelaySettings.pipe(
+			Effect.provide(RelaySettings.layer({ build: false })),
+			Effect.provideService(
+				ConfigProvider.ConfigProvider,
+				ConfigProvider.fromUnknown({ NODE_ENV: "production" }),
+			),
+		),
+	)
+	expect(production.development).toBe(false)
 })
 
 test("native callback runners give acquired resources their own task scope", async () => {

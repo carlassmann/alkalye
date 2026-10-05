@@ -4,7 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "bun --watch src/server/index.ts",
-		"start": "bun src/server/index.ts",
+		"start": "NODE_ENV=production bun src/server/index.ts",
 		"build": "bun build.ts",
 		"check": "bun scripts/check.ts",
 		"check:types": "tsc --noEmit",
@@ -17,13 +17,18 @@
 	},
 	"devDependencies": {
 		"@types/bun": "^1.3.11",
-		"typescript": "~5.9.3",
-		"prettier": "^3.8.1"
+		"@types/react": "19.2.9",
+		"@types/react-dom": "19.2.3",
+		"prettier": "^3.8.1",
+		"typescript": "~5.9.3"
 	},
 	"bin": {
 		"alkalye": "./cli.ts"
 	},
 	"dependencies": {
-		"effect": "4.0.0"
+		"effect": "4.0.0",
+		"react": "19.2.3",
+		"react-dom": "19.2.3",
+		"tldraw": "5.2.2"
 	}
 }

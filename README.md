@@ -1,6 +1,6 @@
 # Alkalye
 
-A local-first Markdown PWA written in TypeScript, HTML and CSS. Effect 4 is the sole pinned runtime dependency, with no transitive dependencies. Bun supplies HTTP, WebSockets, SQLite, bundling and tests. The browser supplies Web Components, editing, IndexedDB, Web Crypto and offline caching.
+A local-first Markdown PWA written in TypeScript, HTML and CSS. Effect 4 powers the application with no transitive dependencies. The whiteboard uses a lazy tldraw island with React and React DOM; those are the only runtime exceptions. Bun supplies HTTP, WebSockets, SQLite, bundling and tests. The browser supplies Web Components, editing, IndexedDB, Web Crypto and offline caching.
 
 ## Run
 
@@ -9,12 +9,12 @@ bun install
 bun run dev
 ```
 
-Open http://127.0.0.1:3000/app. `PORT` and `HOST` configure the server. For an HTTPS proxy, set `PUBLIC_ORIGIN` and preserve the public Host header. Back up `.data/`, including `master.key`. Use the exact public origin for CLI connections.
+Open http://127.0.0.1:3000/app. `PORT` and `HOST` configure the server. For an HTTPS proxy, set `PUBLIC_ORIGIN` and preserve the public Host header. Set `PUBLIC_TLDRAW_LICENSE_KEY` for your tldraw license. Whiteboard styles, icons, translations and fonts are served locally and cached offline. Back up `.data/`, including `master.key`. Use the exact public origin for CLI connections.
 
 ```sh
 bun run check
 bun run build
-bun run start
+NODE_ENV=production bun run start
 ```
 
 ## One document architecture
@@ -63,9 +63,11 @@ Profiles and document journals live in `~/.config/alkalye-native`. `--home` sele
 bun run test:e2e
 ```
 
-Browser tests use background `agent-browser` sessions against real Bun servers. They exercise IndexedDB, offline reload and publication, collaboration, comments, assets, drawings, themes, workspaces, presentations, MCP and OAuth. Browser tests must run sequentially because they build into the same directory.
+Browser tests use background `agent-browser` sessions against real Bun servers. They exercise IndexedDB, offline reload and publication, collaboration, comments, assets, drawings, themes, workspaces, presentations, MCP and OAuth. Each browser test server builds into its own temporary asset directory.
 
 The original app remains available in Git at `a749728`. Its known differences are listed in [docs/portability-sharing-and-folders.md](docs/portability-sharing-and-folders.md). Run `bun run ci` after the final PR push for the required exact-commit signoff; never push directly to `main`.
 
 written with GPT-6 in Codex
 written with claude-opus-5-5 in Claude Code
+
+written with gpt-6 in codex

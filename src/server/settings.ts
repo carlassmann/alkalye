@@ -15,6 +15,7 @@ export interface ServerOptions {
 	data?: string
 	assets?: string
 	build?: boolean
+	development?: boolean
 	publicOrigin?: string
 }
 export interface Settings {
@@ -23,6 +24,7 @@ export interface Settings {
 	data: string
 	assets: string
 	build: boolean
+	development: boolean
 	publicOrigin: string | undefined
 	resetLog: boolean
 }
@@ -40,6 +42,9 @@ export class RelaySettings extends Context.Service<RelaySettings, Settings>()(
 					options.hostname ??
 					(yield* Config.String("HOST").pipe(Config.withDefault("127.0.0.1")))
 				let publicOrigin = yield* Config.option(Config.URL("PUBLIC_ORIGIN"))
+				let environment = yield* Config.String("NODE_ENV").pipe(
+					Config.withDefault("development"),
+				)
 				let resetLog = yield* Config.Boolean("ALKALYE_RESET_LOG").pipe(
 					Config.withDefault(false),
 				)
@@ -51,6 +56,7 @@ export class RelaySettings extends Context.Service<RelaySettings, Settings>()(
 						options.assets ?? resolve(import.meta.dir, "../../dist"),
 					),
 					build: options.build !== false,
+					development: options.development ?? environment !== "production",
 					publicOrigin:
 						options.publicOrigin ??
 						Option.getOrUndefined(Option.map(publicOrigin, url => url.origin)),
@@ -69,7 +75,10 @@ export class RelaySecrets extends Context.Service<
 		Effect.gen(function* () {
 			let settings = yield* RelaySettings
 			let cipher = yield* Cipher
-			if (settings.build) yield* promise("build", () => build(settings.assets))
+			if (settings.build)
+				yield* promise("build", () =>
+					build(settings.assets, settings.development),
+				)
 			yield* promise("data directory", () =>
 				mkdir(settings.data, { recursive: true, mode: 0o700 }),
 			)
