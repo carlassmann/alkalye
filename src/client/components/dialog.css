@@ -198,3 +198,18 @@
 [data-dialog] .primary.destructive:hover {
 	background: color-mix(in oklch, var(--danger) 20%, transparent);
 }
+
+[data-dialog] footer button.outline {
+	border: 1px solid var(--line);
+	background: var(--paper);
+	text-align: center;
+}
+[data-dialog] footer button.outline:hover {
+	background: var(--accent);
+}
+@media (pointer: coarse) {
+	[data-dialog]:not(.wide):not(:has([data-whiteboard])) footer button {
+		min-height: 40px;
+		font-size: 14px;
+	}
+}

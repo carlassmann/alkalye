@@ -73,7 +73,7 @@ export function openDialog(
 				</button>
 			</header>
 			<div class="dialog-body">${rawMarkup(body)}</div>
-			${onSubmit ? html`<footer><button type="button" value="cancel">${translate("Cancel")}</button><button class="primary" id="submit-dialog" value="save">${translate(submitLabel)}</button></footer>` : ""}
+			${onSubmit ? html`<footer><button type="button" class="outline" value="cancel">${translate("Cancel")}</button><button class="primary" id="submit-dialog" value="save">${translate(submitLabel)}</button></footer>` : ""}
 		</form>`,
 	)
 	let form = dialog.querySelector("form")
