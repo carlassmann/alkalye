@@ -106,9 +106,6 @@ export class PresentationElement extends HTMLElement {
 	follow() {
 		return this.view?.follow() ?? false
 	}
-	// The original teleprompter has no auto-scroll; kept until the root's
-	// `scroll` action is removed.
-	toggleScroll() {}
 	receive(index: number) {
 		this.view?.receive(index)
 	}

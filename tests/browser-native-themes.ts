@@ -28,7 +28,7 @@ export function verifyNativeThemes(session: string, original: string) {
 		true,
 		"native document rendering derives appearance directly from frontmatter",
 	)
-	browser(session, "press", "Escape")
+	browser(session, "click", ".preview-back")
 	browser(session, "click", '[data-action="theme"]')
 	wait(session, 'document.querySelector("#new-theme") !== null')
 	browser(session, "click", "#new-theme")
@@ -68,7 +68,7 @@ export function verifyNativeThemes(session: string, original: string) {
 		true,
 		"native preview compiles the theme record saved in its document stream",
 	)
-	browser(session, "press", "Escape")
+	browser(session, "click", ".preview-back")
 	wait(session, "!!navigator.serviceWorker.controller")
 	browser(session, "set", "offline", "on")
 	browser(session, "reload")
@@ -85,7 +85,7 @@ export function verifyNativeThemes(session: string, original: string) {
 		true,
 		"native offline snapshots retain theme source and its frontmatter binding",
 	)
-	browser(session, "press", "Escape")
+	browser(session, "click", ".preview-back")
 	let themed = String(evaluate(session, currentDocument))
 	let previous = String(
 		evaluate(
@@ -111,7 +111,7 @@ export function verifyNativeThemes(session: string, original: string) {
 		'getComputedStyle(document.querySelector("#preview").shadowRoot.querySelector(".content")).color === "rgb(18, 52, 86)"',
 	)
 	assert(true, "offline document copies preserve their custom theme")
-	browser(session, "press", "Escape")
+	browser(session, "click", ".preview-back")
 	browser(session, "set", "offline", "off")
 	evaluate(session, 'window.dispatchEvent(new Event("focus"))')
 	browser(session, "click", `[data-doc="${original}"]`)

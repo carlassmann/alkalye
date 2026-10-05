@@ -415,6 +415,14 @@ function verifyPreview() {
 		'document.querySelector("#app").classList.contains("tools-open") && document.querySelector("[data-comments]")?.textContent.includes("Explain this insight")',
 	)
 	assert(true, "Choosing a highlighted comment opens the comments panel")
+	browser(session, "press", "Escape")
+	assert(
+		evaluate(
+			session,
+			'location.pathname.endsWith("/preview") && document.querySelector("#preview").shadowRoot.querySelector("mark.preview-comment-range-selected") === null',
+		),
+		"Escape clears the selected comment without leaving preview",
+	)
 }
 
 function location() {
@@ -424,7 +432,7 @@ function location() {
 }
 
 function verifyEmptyTeleprompter() {
-	browser(session, "press", "Escape")
+	browser(session, "click", ".preview-back")
 	wait(session, 'document.querySelector("#editor") !== null')
 	browser(session, "fill", "#editor", "")
 	visit(session, location() + "/teleprompter")

@@ -13,7 +13,7 @@ export function verifyNativePreferences(session: string, url: string) {
 	browser(session, "click", '.profile [data-action="settings"]')
 	wait(
 		session,
-		'location.pathname === "/app/settings" && document.querySelector("[data-preferences-status]")?.textContent === "Synced"',
+		'location.pathname === "/app/settings" && document.querySelector("[data-preferences-status]")?.textContent === "Syncing to cloud"',
 	)
 	assert(
 		evaluate(

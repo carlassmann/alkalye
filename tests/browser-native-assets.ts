@@ -176,7 +176,7 @@ export function verifyNativeAssets(session: string, source: string) {
 		"native offline snapshot restores attachment manifests, verified bytes and mute state without downloading history",
 	)
 	let original = String(evaluate(session, currentDocument))
-	browser(session, "press", "Escape")
+	browser(session, "click", ".preview-back")
 	browser(session, "click", '[data-action="duplicate"]')
 	wait(
 		session,
@@ -191,7 +191,7 @@ export function verifyNativeAssets(session: string, source: string) {
 		true,
 		"offline document copies retain verified attachment bytes in their independent cache",
 	)
-	browser(session, "press", "Escape")
+	browser(session, "click", ".preview-back")
 	browser(session, "click", `[data-doc="${original}"]`)
 	wait(session, `${currentDocument} === ${JSON.stringify(original)}`)
 	browser(session, "set", "offline", "off")
@@ -200,7 +200,6 @@ export function verifyNativeAssets(session: string, source: string) {
 		session,
 		`window.previewRevokeViolations = []; window.originalRevoke = URL.revokeObjectURL; URL.revokeObjectURL = function(url) { function contains(root) { for (let node of root.querySelectorAll('*')) { if ((node.getAttribute('src') ?? '').split('#')[0] === url) return true; if (node.shadowRoot && contains(node.shadowRoot)) return true } return false }; if (contains(document)) window.previewRevokeViolations.push(url); return window.originalRevoke(url) }`,
 	)
-	browser(session, "press", "Escape")
 	for (let id of [asset, video]) {
 		browser(session, "click", `[data-action="asset-delete:${id}"]`)
 		submitDialog(session)

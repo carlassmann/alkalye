@@ -649,6 +649,18 @@ if (process.argv.includes("--serve")) {
 			"native readers see discussion and source navigation without mutation controls",
 		)
 		browser(reader, "click", '[data-action="tools"]')
+		visit(reader, "/app/doc/" + first + "/slideshow")
+		wait(reader, 'document.querySelector("alkalye-presentation") !== null')
+		browser(reader, "press", "Escape")
+		assert(
+			evaluate(
+				reader,
+				'location.pathname.endsWith("/slideshow") && document.querySelector("alkalye-presentation") !== null',
+			),
+			"Escape keeps a reader in the audience slideshow",
+		)
+		visit(reader, "/app/doc/" + first)
+		wait(reader, 'document.querySelector("#editor")?.readOnly === true')
 		assert(
 			evaluate(
 				session,

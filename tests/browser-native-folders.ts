@@ -186,7 +186,7 @@ try {
 		true,
 		"attachments are written beside the file in assets/ and render from the folder",
 	)
-	browser(session, "press", "Escape")
+	browser(session, "click", ".preview-back")
 
 	browser(session, "click", '[data-action="file-move"]')
 	submitDialog(session, "Archive/Renamed plan.md")

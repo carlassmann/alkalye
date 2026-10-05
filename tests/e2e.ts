@@ -20,6 +20,7 @@ for (let path of [
 	"tests/browser-screen-parity.ts",
 	"tests/browser-presentation-state.ts",
 	"tests/browser-workspace-deletion.ts",
+	"tests/browser-mcp.ts",
 	"tests/browser-teleprompter.ts",
 	"tests/browser-whiteboard.ts",
 ]) {

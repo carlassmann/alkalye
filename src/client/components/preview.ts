@@ -105,6 +105,16 @@ export function renderPreview(
 		}
 	}
 }
+export function clearPreviewSelection(host: HTMLElement) {
+	let state = states.get(host)
+	if (state) state.selection = undefined
+	host.ownerDocument.getSelection()?.removeAllRanges()
+	let add = host.parentElement?.querySelector<HTMLElement>(
+		".preview-add-comment",
+	)
+	if (add) add.hidden = true
+}
+
 export function disposePreview(host: HTMLElement) {
 	events.get(host)?.abort()
 	events.delete(host)

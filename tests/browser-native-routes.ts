@@ -74,7 +74,7 @@ export async function verifyNativeRoutes(session: string, url: string) {
 		`location.pathname.endsWith("/preview") && document.querySelector("#preview") !== null`,
 	)
 	assert(true, "back and forward move between documents and modes")
-	browser(session, "press", "Escape")
+	browser(session, "click", ".preview-back")
 	wait(
 		session,
 		`location.pathname === ${JSON.stringify("/app/doc/" + second)} && document.querySelector("#editor") !== null`,

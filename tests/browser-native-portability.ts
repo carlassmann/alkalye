@@ -165,7 +165,7 @@ try {
 		true,
 		"the restored document renders its theme, stored image and whiteboard preview",
 	)
-	browser(session, "press", "Escape")
+	browser(session, "click", ".preview-back")
 	browser(
 		session,
 		"click",

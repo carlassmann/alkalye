@@ -81,6 +81,7 @@ import { libraryMarkup, updateLibrary } from "./components/library"
 import type { DocumentSummary } from "./components/library"
 import { mountPresentation } from "./components/presentation"
 import {
+	clearPreviewSelection,
 	disposePreview,
 	previewCommentSelection,
 	previewMarkup,
@@ -527,7 +528,7 @@ function mountApplication() {
 		window.addEventListener(
 			"keydown",
 			event => {
-				if (dialog.open || page) return
+				if (event.defaultPrevented || dialog.open || page) return
 				let action = shortcutAction(event)
 				if (
 					(action === "undo" || action === "redo") &&
@@ -548,7 +549,17 @@ function mountApplication() {
 				}
 				if (event.key === "Escape" && mode !== "edit") {
 					event.preventDefault()
-					changeMode("edit")
+					if (mode === "preview") {
+						if (app.classList.contains("focus-mode")) {
+							app.classList.remove("focus-mode")
+							return
+						}
+						selectedComment = undefined
+						clearPreviewSelection(element("#preview"))
+						refreshDocument()
+					} else if (document.fullscreenElement) {
+						launch(Effect.tryPromise(() => document.exitFullscreen()))
+					} else if (mode === "history" || writable()) changeMode("edit")
 				} else if (
 					(mode === "slideshow" || mode === "teleprompter") &&
 					["ArrowRight", "ArrowLeft", "PageDown", "PageUp"].includes(event.key)
@@ -2524,10 +2535,6 @@ function mountApplication() {
 				}
 				if (action === "next" || action === "previous") {
 					presentation?.change(action === "next" ? 1 : -1)
-					return
-				}
-				if (action === "scroll") {
-					presentation?.toggleScroll()
 					return
 				}
 				if (action === "fullscreen") {

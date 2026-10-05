@@ -61,7 +61,7 @@ export function verifyNativeDrawings(session: string, original: string) {
 		true,
 		"native preview resolves a whiteboard directly from the document snapshot",
 	)
-	browser(session, "press", "Escape")
+	browser(session, "click", ".preview-back")
 	browser(session, "click", '[data-action="history"]')
 	wait(
 		session,
@@ -167,7 +167,7 @@ export function verifyNativeDrawings(session: string, original: string) {
 		true,
 		"native historical copies preserve independent drawing previews offline",
 	)
-	browser(session, "press", "Escape")
+	browser(session, "click", ".preview-back")
 	browser(session, "set", "offline", "off")
 	evaluate(session, 'window.dispatchEvent(new Event("focus"))')
 	browser(session, "click", `[data-doc="${original}"]`)
