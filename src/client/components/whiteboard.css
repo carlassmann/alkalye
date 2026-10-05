@@ -32,9 +32,20 @@
 	--selection: #2f80ed;
 	--canvas: #f8f9fa;
 	--canvas-dot: #d3d6db;
+	--handle: #fff;
+	--guide: #e03131;
 	position: absolute;
 	inset: 0;
 	display: block;
+}
+/* The component reads the page's colour scheme and recolours inks to match;
+   the canvas follows the same flag so both always agree. */
+[data-whiteboard][data-ink="dark"] {
+	--selection: #4f8ff7;
+	--canvas: #101011;
+	--canvas-dot: #2e2f33;
+	--handle: #1b1b1d;
+	--guide: #ff6b6b;
 }
 [data-whiteboard] .whiteboard-stage {
 	position: absolute;
@@ -113,11 +124,42 @@
 	vector-effect: non-scaling-stroke;
 	pointer-events: none;
 }
-[data-whiteboard] .resize-handle {
-	fill: #fff;
+[data-whiteboard] .resize-handle,
+[data-whiteboard] .rotate-handle,
+[data-whiteboard] .endpoint-handle {
+	fill: var(--handle);
 	stroke: var(--selection);
 	stroke-width: 1.5px;
 	vector-effect: non-scaling-stroke;
+}
+[data-whiteboard] [data-bound] .endpoint-handle {
+	fill: var(--selection);
+}
+[data-whiteboard] .rotate-stem {
+	stroke: var(--selection);
+	stroke-width: 1px;
+	vector-effect: non-scaling-stroke;
+	pointer-events: none;
+}
+[data-whiteboard] [data-handle="rotate"] {
+	cursor: grab;
+}
+[data-whiteboard] [data-handle="start"],
+[data-whiteboard] [data-handle="end"] {
+	cursor: move;
+}
+[data-whiteboard] .binding-target {
+	fill: color-mix(in srgb, var(--selection) 10%, transparent);
+	stroke: var(--selection);
+	stroke-width: 2px;
+	vector-effect: non-scaling-stroke;
+	pointer-events: none;
+}
+[data-whiteboard] .snap-guide {
+	stroke: var(--guide);
+	stroke-width: 1px;
+	vector-effect: non-scaling-stroke;
+	pointer-events: none;
 }
 [data-whiteboard] .handle-reach {
 	fill: transparent;
@@ -156,6 +198,14 @@
 	caret-color: var(--selection);
 	outline: none;
 	box-shadow: 0 0 0 4px color-mix(in srgb, var(--selection) 12%, transparent);
+}
+[data-whiteboard] .text-editor[data-mode="label"] {
+	min-width: 0;
+	field-sizing: content;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+	text-align: center;
+	background: transparent;
 }
 [data-whiteboard] .text-editor:focus-visible {
 	outline: none;
@@ -442,7 +492,7 @@
 }
 [data-whiteboard] .selection-actions {
 	display: grid;
-	grid-template-columns: repeat(4, 1fr);
+	grid-template-columns: repeat(5, 1fr);
 	gap: 2px;
 	padding-top: 8px;
 	border-top: 1px solid var(--line);
@@ -454,6 +504,53 @@
 }
 [data-whiteboard] #delete-shape:hover {
 	color: var(--danger);
+}
+[data-whiteboard] .arrange-menu {
+	position: fixed;
+	inset: auto;
+	margin: 0;
+	min-width: 248px;
+	padding: 4px;
+	background: var(--paper);
+	color: var(--ink);
+	border: 1px solid var(--line);
+	border-radius: 12px;
+	box-shadow:
+		0 1px 2px rgb(0 0 0 / 6%),
+		0 10px 30px rgb(0 0 0 / 12%);
+}
+[data-whiteboard] .arrange-menu:popover-open {
+	display: flex;
+	flex-direction: column;
+}
+[data-whiteboard] .panel .arrange-menu button {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	height: 32px;
+	padding: 0 10px;
+	border-radius: 8px;
+	font-size: 13px;
+	font-weight: 400;
+	text-align: left;
+}
+[data-whiteboard] .arrange-menu button:not(:disabled):hover,
+[data-whiteboard] .arrange-menu button:focus-visible {
+	background: var(--raised);
+	outline: none;
+}
+[data-whiteboard] .arrange-menu kbd {
+	margin-left: auto;
+	color: var(--muted);
+	font-family: inherit;
+	font-size: 12px;
+}
+[data-whiteboard] .arrange-menu hr {
+	width: 100%;
+	margin: 4px 0;
+	border: 0;
+	border-top: 1px solid var(--line);
 }
 
 @media (max-width: 640px) {

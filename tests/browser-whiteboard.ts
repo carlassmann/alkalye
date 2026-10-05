@@ -1,4 +1,5 @@
 import { assert, browser, evaluate, wait } from "./browser-driver"
+import { verifyWhiteboardParity } from "./browser-whiteboard-parity"
 
 let server = Bun.spawn(["bun", "tests/browser-document-app.ts", "--serve"], {
 	stdout: "pipe",
@@ -51,9 +52,15 @@ try {
 	wait(session, `${shapes} === 1 && ${saved}`)
 	assert(
 		evaluate(session, pressed('[data-tool="select"]')) &&
-			evaluate(session, 'document.querySelectorAll("[data-handle]").length') ===
-				8,
-		"a drawn rectangle is selected with resize handles and the tool returns to select",
+			evaluate(
+				session,
+				'document.querySelectorAll("[data-handle]:not([data-handle=rotate])").length',
+			) === 8 &&
+			evaluate(
+				session,
+				'document.querySelectorAll("[data-handle=rotate]").length',
+			) === 1,
+		"a drawn rectangle is selected with resize and rotation handles and the tool returns to select",
 	)
 
 	browser(session, "click", '[data-color="#e03131"]')
@@ -248,6 +255,7 @@ try {
 		true,
 		"Closing the whiteboard commits its active text draft before releasing writes",
 	)
+	verifyWhiteboardParity(session)
 } finally {
 	try {
 		browser(session, "close")

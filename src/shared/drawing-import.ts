@@ -1,15 +1,28 @@
-import type { Point, Shape } from "./drawing"
+import type { Binding, DrawingEntry, Point, Shape } from "./drawing"
 import { parseShape } from "./drawing"
 import { array, number, object, string } from "./model"
 
 export function importDrawing(value: unknown): Shape[] {
+	return importDrawingEntries(value).map(entry => entry.shape)
+}
+
+// Imported shapes keep the identity they had in their file, so arrows stay
+// attached to their targets once the caller assigns fresh register keys.
+export function importDrawingEntries(value: unknown): DrawingEntry[] {
 	let document = object(value)
 	if (document.format === "alkalye-drawing-v1")
-		return array(document.shapes).map(shape =>
-			parseShape(JSON.stringify(shape)),
-		)
+		return array(document.shapes).map((shape, index) => {
+			let record = object(shape)
+			return {
+				id:
+					typeof record.id === "string" && record.id
+						? record.id
+						: `import:${index}`,
+				shape: parseShape(JSON.stringify(shape)),
+			}
+		})
 	if (document.format === "alkalye-tldraw-v1")
-		return importDrawing(JSON.parse(string(document.snapshot)))
+		return importDrawingEntries(JSON.parse(string(document.snapshot)))
 	if (document.tldrawFileFormatVersion !== 1)
 		throw new Error("Unsupported drawing format")
 	let records = array(document.records).map(object)
@@ -24,7 +37,7 @@ export function importDrawing(value: unknown): Shape[] {
 	)
 		throw new Error("Embedded media is not supported in drawings")
 	let byId = new Map(records.map(record => [string(record.id), record]))
-	let result: Shape[] = []
+	let result: DrawingEntry[] = []
 	let shapes = records.filter(record => record.typeName === "shape")
 	let ordered: Record<string, unknown>[] = []
 	let visited = new Set<string>()
@@ -57,6 +70,7 @@ export function importDrawing(value: unknown): Shape[] {
 				: richText(props.richText).trimEnd()
 		let label: Shape | undefined
 		let points: Point[] = [],
+			placed: Point[] | undefined,
 			kind: Shape["kind"] = "pen"
 		if (type === "draw" || type === "highlight") {
 			points = array(props.segments).flatMap(segment =>
@@ -85,17 +99,13 @@ export function importDrawing(value: unknown): Shape[] {
 					number(props.h ?? (type === "note" ? 200 : 0)) +
 					number(props.growY ?? 0)
 			let form = type === "geo" ? String(props.geo) : "rectangle"
-			if (form === "rectangle" && !rotation(record)) {
-				kind = "rectangle"
-				points = [
-					{ x: 0, y: 0 },
-					{ x: w, y: h },
+			if (["rectangle", "ellipse", "oval"].includes(form)) {
+				kind = form === "rectangle" ? "rectangle" : "ellipse"
+				let center = world(record, { x: w / 2, y: h / 2 })
+				placed = [
+					{ x: center.x - w / 2, y: center.y - h / 2 },
+					{ x: center.x + w / 2, y: center.y + h / 2 },
 				]
-			} else if (["ellipse", "oval"].includes(form)) {
-				points = Array.from({ length: 65 }, (_, index) => ({
-					x: w / 2 + (w / 2) * Math.cos((index / 64) * Math.PI * 2),
-					y: h / 2 + (h / 2) * Math.sin((index / 64) * Math.PI * 2),
-				}))
 			} else if (form === "triangle")
 				points = [
 					{ x: w / 2, y: 0 },
@@ -135,16 +145,8 @@ export function importDrawing(value: unknown): Shape[] {
 								Math.sin((index / sides) * Math.PI * 2 - Math.PI / 2),
 					}
 				})
-			} else if (form === "rectangle")
-				points = [
-					{ x: 0, y: 0 },
-					{ x: w, y: 0 },
-					{ x: w, y: h },
-					{ x: 0, y: h },
-					{ x: 0, y: 0 },
-				]
-			else throw new Error(`Unsupported drawing geometry: ${form}`)
-			if (text)
+			} else throw new Error(`Unsupported drawing geometry: ${form}`)
+			if (text && !placed)
 				label = {
 					kind: "text",
 					color,
@@ -153,19 +155,61 @@ export function importDrawing(value: unknown): Shape[] {
 					text,
 				}
 		} else throw new Error(`Unsupported drawing shape: ${type}`)
+		let id = string(record.id)
 		let shape: Shape = {
 			kind,
 			color,
 			width,
-			points: points.map(point => world(record, point)),
-			text: kind === "text" ? text : "",
+			points: placed ?? points.map(point => world(record, point)),
+			text: kind === "text" || placed ? text : "",
 		}
+		if (kind === "text" || placed) shape.rotation = rotation(record)
 		if (props.fill && props.fill !== "none" && kind !== "text")
 			shape.fill = color
-		result.push(parseShape(JSON.stringify(shape)))
-		if (label) result.push(label)
+		if (kind === "arrow") {
+			let start = arrowBinding(record, "start"),
+				end = arrowBinding(record, "end")
+			if (start) shape.start = start
+			if (end) shape.end = end
+		}
+		result.push({ id, shape: parseShape(JSON.stringify(shape)) })
+		if (label) result.push({ id: id + ":label", shape: label })
 	}
 	return result
+	// Only targets imported as boxes or text can hold an arrow; anything else
+	// keeps the arrow at the position the file recorded.
+	function arrowBinding(
+		record: Record<string, unknown>,
+		terminal: string,
+	): Binding | undefined {
+		let props = object(record.props),
+			endpoint = object(props[terminal])
+		let binding = records.find(
+			binding =>
+				binding.typeName === "binding" &&
+				binding.type === "arrow" &&
+				binding.fromId === record.id &&
+				object(binding.props).terminal === terminal,
+		)
+		let target = byId.get(String(binding?.toId ?? endpoint.boundShapeId))
+		if (!target || target.typeName !== "shape") return undefined
+		let targetProps = object(target.props)
+		let bindable =
+			target.type === "text" ||
+			target.type === "note" ||
+			target.type === "frame" ||
+			(target.type === "geo" &&
+				["rectangle", "ellipse", "oval"].includes(String(targetProps.geo)))
+		if (!bindable) return undefined
+		let details = binding ? object(binding.props) : endpoint
+		let anchor = object(details.normalizedAnchor ?? { x: 0.5, y: 0.5 })
+		let precise = details.isPrecise === true || details.isExact === true
+		return {
+			shape: string(target.id),
+			x: precise ? number(anchor.x) : 0.5,
+			y: precise ? number(anchor.y) : 0.5,
+		}
+	}
 	function rotation(
 		record: Record<string, unknown>,
 		visiting = new Set<string>(),

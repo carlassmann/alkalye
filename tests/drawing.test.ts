@@ -6,6 +6,7 @@ import {
 	orderedDrawing,
 	resizeShape,
 	shapeBounds,
+	shapeCorners,
 } from "../src/shared/drawing"
 import { importDrawing } from "../src/shared/drawing-import"
 import { parseOperation, parseRole, parseRoom } from "../src/shared/model"
@@ -60,12 +61,18 @@ test("drawing import flattens rotated groups and preserves rich text spaces", ()
 			},
 		]),
 	)
-	expect(imported[1]?.text).toBe("Hello world")
-	expect(imported[0]?.kind).toBe("pen")
-	expect(imported[0]?.points[0]?.x).toBeCloseTo(100)
-	expect(imported[0]?.points[0]?.y).toBeCloseTo(60)
-	expect(imported[0]?.points[2]?.x).toBeCloseTo(90)
-	expect(imported[0]?.points[2]?.y).toBeCloseTo(80)
+	expect(imported).toHaveLength(1)
+	let [rectangle] = imported
+	expect(rectangle?.kind).toBe("rectangle")
+	expect(rectangle?.text).toBe("Hello world")
+	expect(rectangle?.rotation).toBeCloseTo(Math.PI / 2)
+	expect(rectangle?.points[0]?.x).toBeCloseTo(85)
+	expect(rectangle?.points[0]?.y).toBeCloseTo(65)
+	expect(rectangle?.points[1]?.x).toBeCloseTo(105)
+	expect(rectangle?.points[1]?.y).toBeCloseTo(75)
+	let corners = rectangle ? shapeCorners(rectangle) : []
+	expect(corners[0]?.x).toBeCloseTo(100)
+	expect(corners[0]?.y).toBeCloseTo(60)
 	expect(
 		importDrawing({ format: "alkalye-drawing-v1", shapes: imported }),
 	).toEqual(imported)

@@ -2,7 +2,7 @@ import * as Effect from "effect/Effect"
 import * as Fiber from "effect/Fiber"
 import * as FiberSet from "effect/FiberSet"
 import * as Stream from "effect/Stream"
-import { menuNavigation } from "../ui/menu"
+import { connectPopover, menuNavigation } from "../ui/menu"
 import type { Replica } from "../../shared/crdt"
 import type { Presence } from "../../shared/model"
 import type { Camera, Viewport } from "../drawing-camera"
@@ -15,7 +15,15 @@ import {
 	worldToScreen,
 	zoomAt,
 } from "../drawing-camera"
-import { drawingFont, drawingPreview, shapeElement, svg } from "../drawing-svg"
+import type { DrawingPalette } from "../drawing-svg"
+import {
+	drawingFont,
+	drawingImage,
+	labelCenter,
+	shapeContent,
+	shapeTransform,
+	svg,
+} from "../drawing-svg"
 import type { Markup } from "../language"
 import { html, joinMarkup, rawMarkup, translate } from "../language"
 import { drawingPresence } from "./drawing-presence"
@@ -24,6 +32,7 @@ import { drawingIcon } from "./whiteboard-icons"
 
 import type {
 	Bounds,
+	DrawingEntry,
 	DrawingTool,
 	Point,
 	ResizeHandle,
@@ -31,23 +40,69 @@ import type {
 	ShapeDash,
 } from "../../shared/drawing"
 import {
+	boundsCenter,
 	boundsContain,
 	boundsFromCorners,
+	boundsIntersect,
 	canFill,
+	canLabel,
 	drawingOrder,
 	drawingShapes,
+	flipShape,
+	labelSize,
+	labelWidth,
+	localBounds,
 	orderBelow,
+	orderedDrawing,
 	resizeBounds,
+	resizeRotatedShape,
+	rotateShape,
+	rotates,
 	scaleShape,
 	shapeBounds,
+	shapeCenter,
+	shapeCorners,
 	shapesInBounds,
+	terminals,
 	textLineHeight,
 	textSize,
 	tintColor,
+	toWorld,
 	translateShape,
 	unionBounds,
 } from "../../shared/drawing"
-import { importDrawing } from "../../shared/drawing-import"
+import {
+	bindingAt,
+	boundArrows,
+	keepBindings,
+	releaseArrows,
+	resolveArrow,
+	resolveDrawing,
+} from "../../shared/drawing-arrows"
+import {
+	clipboardText,
+	drawingClipboardType,
+	drawingDocument,
+	rekeyShapes,
+} from "../../shared/drawing-clipboard"
+import { importDrawingEntries } from "../../shared/drawing-import"
+import { hasPressure } from "../../shared/drawing-ink"
+import type {
+	Alignment,
+	Distribution,
+	Guide,
+} from "../../shared/drawing-layout"
+import {
+	alignmentOffsets,
+	distributionOffsets,
+	snapBounds,
+} from "../../shared/drawing-layout"
+import {
+	contrastInk,
+	darkCanvas,
+	inkColor,
+	lightCanvas,
+} from "../../shared/drawing-palette"
 
 export interface DrawingSession {
 	readonly replica: Pick<Replica, "fields" | "text" | "clock" | "actor">
@@ -83,6 +138,15 @@ interface Change {
 }
 type FillMode = "none" | "tint" | "solid"
 type DashMode = "solid" | ShapeDash
+type Terminal = "start" | "end"
+type ArrangeAction =
+	| Alignment
+	| Distribution
+	| "rotate"
+	| "flip-horizontal"
+	| "flip-vertical"
+	| "group"
+	| "ungroup"
 interface DrawingStyle {
 	color: string
 	width: number
@@ -96,22 +160,43 @@ interface ToolChoice {
 }
 // Shapes keyed by register; `undefined` marks a shape that is being removed.
 type ShapeOverlay = Map<string, Shape | undefined>
+// Transforming gestures wait for the pointer to travel a few pixels, so a
+// click that only selects never rewrites the shapes it lands on.
+interface Drag {
+	pointerId: number
+	down: Point
+	started: boolean
+}
 type Gesture =
 	| { kind: "draw"; pointerId: number; key: string; shape: Shape; from: Point }
-	| {
+	| (Drag & {
 			kind: "move"
-			pointerId: number
 			from: Point
+			bounds: Bounds
 			originals: Map<string, Shape>
-	  }
-	| {
+			targets: Bounds[]
+	  })
+	| (Drag & {
 			kind: "resize"
-			pointerId: number
 			handle: ResizeHandle
 			from: Point
 			bounds: Bounds
 			originals: Map<string, Shape>
-	  }
+			targets: Bounds[]
+	  })
+	| (Drag & {
+			kind: "rotate"
+			center: Point
+			from: number
+			base: number | undefined
+			originals: Map<string, Shape>
+	  })
+	| (Drag & {
+			kind: "endpoint"
+			key: string
+			terminal: Terminal
+			original: Shape
+	  })
 	| {
 			kind: "marquee"
 			pointerId: number
@@ -126,6 +211,7 @@ interface TextEditing {
 	key: string
 	shape: Shape
 	created: boolean
+	label: boolean
 }
 
 let toolChoices: ToolChoice[] = [
@@ -166,6 +252,29 @@ let dashes: [DashMode, string][] = [
 	["dashed", "Dashed"],
 	["dotted", "Dotted"],
 ]
+let arrangeChoices: [ArrangeAction, DrawingIcon, string, string][] = [
+	["left", "align-left", "Align left", "⌥A"],
+	["center", "align-center", "Align centre", "⌥H"],
+	["right", "align-right", "Align right", "⌥D"],
+	["top", "align-top", "Align top", "⌥W"],
+	["middle", "align-middle", "Align middle", "⌥V"],
+	["bottom", "align-bottom", "Align bottom", "⌥S"],
+	["horizontal", "distribute-horizontal", "Distribute horizontally", "⌥⇧H"],
+	["vertical", "distribute-vertical", "Distribute vertically", "⌥⇧V"],
+	["rotate", "rotate", "Rotate 90°", ""],
+	["flip-horizontal", "flip-horizontal", "Flip horizontally", "⇧H"],
+	["flip-vertical", "flip-vertical", "Flip vertically", "⇧V"],
+	["group", "group", "Group", "⌘G"],
+	["ungroup", "ungroup", "Ungroup", "⇧⌘G"],
+]
+let alignKeys: Record<string, Alignment> = {
+	KeyA: "left",
+	KeyH: "center",
+	KeyD: "right",
+	KeyW: "top",
+	KeyV: "middle",
+	KeyS: "bottom",
+}
 let creationTools: DrawingTool[] = [
 	"pen",
 	"rectangle",
@@ -175,6 +284,7 @@ let creationTools: DrawingTool[] = [
 	"text",
 ]
 let handles: ResizeHandle[] = ["nw", "n", "ne", "e", "se", "s", "sw", "w"]
+let rotationStep = Math.PI / 12
 
 export function openWhiteboard(options: WhiteboardOptions) {
 	let { session, documentId, dialog, showDialog } = options
@@ -391,6 +501,36 @@ function stylePanelMarkup() {
 			${actionButton("back-shape", "back", "Send to back ([)")}
 			${actionButton("front-shape", "front", "Bring to front (])")}
 			${actionButton("delete-shape", "trash", "Delete (⌫)")}
+			${actionButton("arrange-shape", "more", "Arrange")}
+		</div>
+		<div
+			id="drawing-arrange"
+			class="arrange-menu"
+			role="menu"
+			aria-label="Arrange"
+			popover="auto"
+		>
+			${joinMarkup(
+				arrangeChoices.map(
+					([action, icon, label, shortcut]) =>
+						html`${
+								action === "horizontal" ||
+								action === "rotate" ||
+								action === "group"
+									? rawMarkup('<hr role="separator" />')
+									: ""
+							}<button
+								type="button"
+								role="menuitem"
+								data-arrange="${action}"
+								tabindex="-1"
+							>
+								${drawingIcon(icon)}<span>${translate(label)}</span
+								><kbd>${shortcut}</kbd>
+							</button>`,
+				),
+				"",
+			)}
 		</div>
 	</section>`
 }
@@ -516,21 +656,25 @@ function createWhiteboardView(
 	let colorElement = root.querySelector("#ink-color")
 	let menuElement = root.querySelector("#drawing-menu")
 	let importElement = root.querySelector("#import-drawing")
+	let arrangeElement = root.querySelector("#arrange-shape")
 	if (
 		!(canvasElement instanceof SVGSVGElement) ||
 		!(textElement instanceof HTMLTextAreaElement) ||
 		!(colorElement instanceof HTMLInputElement) ||
 		!(menuElement instanceof HTMLDetailsElement) ||
-		!(importElement instanceof HTMLInputElement)
+		!(importElement instanceof HTMLInputElement) ||
+		!(arrangeElement instanceof HTMLButtonElement)
 	)
 		throw new Error("Drawing controls missing")
 	let board = canvasElement,
 		textEditor = textElement,
 		customColor = colorElement,
 		menu = menuElement,
-		drawingInput = importElement
+		drawingInput = importElement,
+		arrangeTrigger = arrangeElement
 	let stage = element(".whiteboard-stage"),
 		stylePanel = element("#drawing-style"),
+		arrangePanel = element("#drawing-arrange"),
 		emptyHint = element("[data-empty-hint]"),
 		zoomLabel = element("#reset-board"),
 		embedButton = element("#embed-board")
@@ -543,17 +687,22 @@ function createWhiteboardView(
 		dash: "solid",
 	}
 	let selected = new Set<string>()
+	let focusedGroup: string | undefined
 	let camera: Camera = { x: 0, y: 0, zoom: 1 }
 	let viewport: Viewport = { width: 0, height: 0 }
 	let fitted = false
 	let gesture: Gesture | undefined
+	let guides: Guide[] = []
+	let bindingHint: string | undefined
 	let overlay: ShapeOverlay = new Map()
 	let pending: ShapeOverlay = new Map()
 	let editing: TextEditing | undefined
 	let touches = new Map<number, Point>()
+	let pointer: Point | undefined
 	let penSeen = false
 	let spaceHeld = false
 	let lastTap = { time: 0, point: { x: 0, y: 0 } }
+	let clipboardSource = { payload: "", count: -1 }
 	let undo: Change[][] = [],
 		redo: Change[][] = []
 	let shapeFields: Record<string, string> | undefined
@@ -563,6 +712,7 @@ function createWhiteboardView(
 	let groups = new Map<string, SVGElement>()
 	let hidden = new Set<string>()
 	let fading = new Set<string>()
+	let palette: DrawingPalette = { ink: color => color, canvas: lightCanvas }
 	let baseLayer = svg("g", {}),
 		draftLayer = svg("g", { "data-drafts": "" }),
 		selectionLayer = svg("g", { "data-selection": "" })
@@ -579,6 +729,36 @@ function createWhiteboardView(
 	})
 	let resizes = new ResizeObserver(measure)
 	resizes.observe(stage)
+	// The page's appearance can change while the board is open, from the
+	// app's preference or from the system; both arrive as a colour scheme.
+	let appearance = new MutationObserver(updateAppearance)
+	appearance.observe(document.documentElement, {
+		attributes: true,
+		attributeFilter: ["data-appearance"],
+	})
+	matchMedia("(prefers-color-scheme: dark)").addEventListener(
+		"change",
+		updateAppearance,
+		{ signal },
+	)
+	updateAppearance()
+
+	function updateAppearance() {
+		let dark = getComputedStyle(root).colorScheme.includes("dark")
+		if (root.dataset.ink === (dark ? "dark" : "light")) return
+		root.dataset.ink = dark ? "dark" : "light"
+		palette = {
+			ink: color => inkColor(color, dark),
+			canvas: dark ? darkCanvas : lightCanvas,
+		}
+		for (let control of elements("[data-color]"))
+			control.style.setProperty(
+				"--swatch",
+				palette.ink(control.dataset.color ?? ""),
+			)
+		paintedFields = undefined
+		if (viewport.width) paint()
+	}
 
 	function shapes() {
 		let version = session.version()
@@ -589,21 +769,51 @@ function createWhiteboardView(
 		}
 		return cachedShapes
 	}
+	// Stored shapes with this view's unsaved drafts applied.
+	function view() {
+		let base = shapes()
+		if (!overlay.size && !pending.size) return base
+		let result = new Map(base),
+			added = false
+		for (let [key, shape] of [...pending, ...overlay]) {
+			if (!shape) {
+				result.delete(key)
+				continue
+			}
+			if (!result.has(key)) added = true
+			result.set(key, shape)
+		}
+		return added ? orderedDrawing(result) : result
+	}
 	function currentShape(key: string) {
 		if (overlay.has(key)) return overlay.get(key)
 		if (pending.has(key)) return pending.get(key)
 		return shapes().get(key)
 	}
-	function selectedShapes() {
+	// A shape as it is drawn, with arrow terminals resolved against targets.
+	function shown(key: string, values = view()) {
+		let shape = values.get(key)
+		return (
+			shape &&
+			resolveArrow(shape, target =>
+				target === key ? undefined : values.get(target),
+			)
+		)
+	}
+	function selectedShapes(values = view()) {
 		let result = new Map<string, Shape>()
-		for (let key of selected) {
-			let shape = currentShape(key)
+		for (let [key] of values) {
+			if (!selected.has(key)) continue
+			let shape = shown(key, values)
 			if (shape) result.set(key, shape)
 		}
 		return result
 	}
-	function selectionBounds() {
-		return unionBounds([...selectedShapes().values()].map(shapeBounds))
+	function selectionBounds(values = view()) {
+		return unionBounds([...selectedShapes(values).values()].map(shapeBounds))
+	}
+	function travels(key: string) {
+		return selected.has(key)
 	}
 
 	function measure() {
@@ -615,7 +825,15 @@ function createWhiteboardView(
 		paint()
 	}
 	function contentBounds() {
-		return unionBounds([...shapes().values()].map(shapeBounds))
+		return unionBounds([...resolveDrawing(shapes()).values()].map(shapeBounds))
+	}
+	function visibleBounds(): Bounds {
+		return {
+			x: camera.x,
+			y: camera.y,
+			width: viewport.width / camera.zoom,
+			height: viewport.height / camera.zoom,
+		}
 	}
 
 	function paint() {
@@ -628,10 +846,11 @@ function createWhiteboardView(
 		board.toggleAttribute("data-panning", gesture?.kind === "pan")
 		paintGrid()
 		let values = shapes()
-		pruneSelection(values)
+		let drafts = view()
+		pruneSelection(drafts)
 		paintShapes(values)
-		paintDrafts()
-		paintSelection()
+		paintDrafts(drafts)
+		paintSelection(drafts)
 		positionTextEditor()
 		emptyHint.hidden = values.size > 0 || pending.size > 0 || Boolean(gesture)
 		presence.paint()
@@ -645,9 +864,15 @@ function createWhiteboardView(
 		zoomLabel.textContent = `${Math.round(camera.zoom * 100)}%`
 	}
 	function pruneSelection(values: Map<string, Shape>) {
-		for (let key of selected)
-			if (!values.has(key) && !pending.get(key) && !overlay.get(key))
-				selected.delete(key)
+		for (let key of selected) if (!values.has(key)) selected.delete(key)
+		if (!selected.size) focusedGroup = undefined
+	}
+	function shapeGroup(attribute: string, key: string, shape: Shape) {
+		let group = svg("g", { [attribute]: key })
+		let transform = shapeTransform(shape)
+		if (transform) group.setAttribute("transform", transform)
+		group.append(shapeContent(shape, palette), hitArea(shape))
+		return group
 	}
 	function paintShapes(values: Map<string, Shape>) {
 		if (paintedFields === shapeFields) return
@@ -656,61 +881,103 @@ function createWhiteboardView(
 		groups.clear()
 		hidden.clear()
 		fading.clear()
-		for (let [key, shape] of values) {
-			let group = svg("g", { "data-shape": key })
-			group.append(shapeElement(shape), hitArea(shape))
+		for (let [key, shape] of resolveDrawing(values)) {
+			let group = shapeGroup("data-shape", key, shape)
 			baseLayer.append(group)
 			groups.set(key, group)
 		}
 	}
-	function paintDrafts() {
-		let drafts = new Map([...pending, ...overlay])
-		let nextHidden = new Set(drafts.keys())
-		if (editing) nextHidden.add(editing.key)
+	// Drafts cover the shapes being changed and every arrow attached to them,
+	// so arrows follow a dragged target before anything is saved.
+	function paintDrafts(values: Map<string, Shape>) {
+		let changed = new Set([...pending.keys(), ...overlay.keys()])
+		let drafts = new Set([...changed, ...boundArrows(values, changed)])
+		if (editing) drafts.add(editing.key)
 		for (let key of hidden)
-			if (!nextHidden.has(key)) groups.get(key)?.removeAttribute("display")
-		for (let key of nextHidden) groups.get(key)?.setAttribute("display", "none")
-		hidden = nextHidden
+			if (!drafts.has(key)) groups.get(key)?.removeAttribute("display")
+		for (let key of drafts) groups.get(key)?.setAttribute("display", "none")
+		hidden = drafts
 		let erasing = gesture?.kind === "erase" ? gesture.erased : new Set<string>()
 		for (let key of fading)
 			if (!erasing.has(key)) groups.get(key)?.removeAttribute("data-erasing")
 		for (let key of erasing) groups.get(key)?.setAttribute("data-erasing", "")
 		fading = new Set(erasing)
 		draftLayer.replaceChildren()
-		for (let [key, shape] of drafts) {
-			if (!shape || key === editing?.key) continue
-			let group = svg("g", { "data-draft": key })
-			group.append(shapeElement(shape), hitArea(shape))
-			draftLayer.append(group)
+		if (!drafts.size) return
+		for (let key of values.keys()) {
+			if (!drafts.has(key)) continue
+			let shape = shown(key, values)
+			if (!shape) continue
+			if (key === editing?.key) {
+				if (!editing.label) continue
+				shape = { ...shape, text: "" }
+			}
+			draftLayer.append(shapeGroup("data-draft", key, shape))
 		}
 	}
 	function hitArea(shape: Shape) {
 		if (shape.kind === "text" || canFill(shape))
-			return svg("rect", { ...shapeBounds(shape), class: "hit-area" })
+			return svg("rect", { ...localBounds(shape), class: "hit-area" })
 		return svg("polyline", {
 			points: shape.points.map(point => `${point.x},${point.y}`).join(" "),
 			class: "hit-stroke",
 		})
 	}
-	function paintSelection() {
+	function paintSelection(values: Map<string, Shape>) {
 		selectionLayer.replaceChildren()
 		let scale = 1 / camera.zoom
-		let shown = selectedShapes()
-		if (shown.size > 1)
-			for (let shape of shown.values())
+		let target = bindingHint ? shown(bindingHint, values) : undefined
+		if (target)
+			selectionLayer.append(
+				svg("polygon", {
+					points: pointList(shapeCorners(target)),
+					class: "binding-target",
+				}),
+			)
+		for (let guide of guides)
+			selectionLayer.append(
+				svg(
+					"line",
+					guide.axis === "x"
+						? { x1: guide.at, x2: guide.at, y1: guide.from, y2: guide.to }
+						: { y1: guide.at, y2: guide.at, x1: guide.from, x2: guide.to },
+				),
+			)
+		for (let line of selectionLayer.querySelectorAll("line"))
+			line.setAttribute("class", "snap-guide")
+		let shownShapes = selectedShapes(values)
+		if (shownShapes.size > 1)
+			for (let shape of shownShapes.values())
 				selectionLayer.append(
-					svg("rect", {
-						...padded(shapeBounds(shape), 2 * scale),
+					svg("polygon", {
+						points: pointList(shapeCorners(shape)),
 						class: "outline",
 					}),
 				)
-		let bounds = unionBounds([...shown.values()].map(shapeBounds))
-		if (bounds && gesture?.kind !== "draw") {
-			let box = padded(bounds, 4 * scale)
-			selectionLayer.append(svg("rect", { ...box, class: "selection" }))
-			if (session.writable() && !editing)
-				for (let handle of handles)
-					selectionLayer.append(handleElement(box, handle, scale))
+		let handlesShown = session.writable() && !editing
+		let [single] = shownShapes.size === 1 ? [...shownShapes.values()] : []
+		if (gesture?.kind !== "draw" && single && isSegment(single)) {
+			if (handlesShown)
+				for (let terminal of terminals)
+					selectionLayer.append(endpointHandle(single, terminal, scale, values))
+		} else if (gesture?.kind !== "draw" && shownShapes.size) {
+			let frame =
+				single?.rotation && rotates(single)
+					? svg("g", { transform: shapeTransform(single) ?? "" })
+					: svg("g", {})
+			let bounds = single?.rotation
+				? localBounds(single)
+				: unionBounds([...shownShapes.values()].map(shapeBounds))
+			if (bounds) {
+				let box = padded(bounds, 4 * scale)
+				frame.append(svg("rect", { ...box, class: "selection" }))
+				if (handlesShown) {
+					for (let handle of handles)
+						frame.append(handleElement(box, handle, scale))
+					frame.append(rotateHandle(box, scale))
+				}
+				selectionLayer.append(frame)
+			}
 		}
 		if (gesture?.kind === "marquee")
 			selectionLayer.append(
@@ -752,6 +1019,52 @@ function createWhiteboardView(
 		)
 		return group
 	}
+	function rotateHandle(box: Bounds, scale: number) {
+		let x = box.x + box.width / 2,
+			y = box.y - 22 * scale
+		let group = svg("g", { "data-handle": "rotate" })
+		group.append(
+			svg("line", {
+				x1: x,
+				x2: x,
+				y1: box.y,
+				y2: y,
+				class: "rotate-stem",
+			}),
+			svg("circle", { cx: x, cy: y, r: 11 * scale, class: "handle-reach" }),
+			svg("circle", { cx: x, cy: y, r: 5 * scale, class: "rotate-handle" }),
+		)
+		return group
+	}
+	function endpointHandle(
+		shape: Shape,
+		terminal: Terminal,
+		scale: number,
+		values: Map<string, Shape>,
+	) {
+		let point =
+			terminal === "start"
+				? shape.points[0]
+				: shape.points[shape.points.length - 1]
+		let bound = shape[terminal] && values.has(shape[terminal]?.shape ?? "")
+		let group = svg("g", { "data-handle": terminal })
+		group.toggleAttribute("data-bound", Boolean(bound))
+		group.append(
+			svg("circle", {
+				cx: point?.x ?? 0,
+				cy: point?.y ?? 0,
+				r: 12 * scale,
+				class: "handle-reach",
+			}),
+			svg("circle", {
+				cx: point?.x ?? 0,
+				cy: point?.y ?? 0,
+				r: 5 * scale,
+				class: "endpoint-handle",
+			}),
+		)
+		return group
+	}
 
 	function paintControls() {
 		let writable = session.writable()
@@ -776,17 +1089,26 @@ function createWhiteboardView(
 		paintStylePanel(writable)
 	}
 	function paintStylePanel(writable: boolean) {
-		let shown = [...selectedShapes().values()]
-		let visible = writable && (shown.length > 0 || creationTools.includes(tool))
+		let values = view()
+		let chosen = [...selected]
+			.map(key => values.get(key))
+			.filter(shape => shape !== undefined)
+		let visible =
+			writable && (chosen.length > 0 || creationTools.includes(tool))
 		stylePanel.hidden = !visible
-		if (!visible) return
-		let current = shown[0] ? shapeStyle(shown[0]) : style
-		let kinds = shown.length ? shown.map(shape => shape.kind) : [toolKind(tool)]
+		if (!visible) {
+			if (arrangeMenu.isOpen()) arrangeMenu.close(false)
+			return
+		}
+		let current = chosen[0] ? shapeStyle(chosen[0]) : style
+		let kinds = chosen.length
+			? chosen.map(shape => shape.kind)
+			: [toolKind(tool)]
 		element("[data-fill-styles]").hidden = !kinds.some(kind =>
 			canFill({ kind }),
 		)
 		element("[data-dash-styles]").hidden = kinds.every(kind => kind === "text")
-		element("[data-selection-actions]").hidden = shown.length === 0
+		element("[data-selection-actions]").hidden = chosen.length === 0
 		for (let control of elements("[data-color]"))
 			control.setAttribute(
 				"aria-pressed",
@@ -809,25 +1131,75 @@ function createWhiteboardView(
 			)
 		if (document.activeElement !== customColor)
 			customColor.value = current.color
+		let units = arrangeUnits(values).size
+		for (let control of elements("[data-arrange]")) {
+			let action = control.dataset.arrange
+			let enabled =
+				action === "horizontal" || action === "vertical"
+					? units >= 3
+					: action === "group"
+						? chosen.length >= 2
+						: action === "ungroup"
+							? chosen.some(shape => shape.group)
+							: action === "rotate" ||
+								  action === "flip-horizontal" ||
+								  action === "flip-vertical"
+								? chosen.length > 0
+								: units >= 2
+			if (control instanceof HTMLButtonElement) control.disabled = !enabled
+		}
 	}
 
 	function positionTextEditor() {
 		if (!editing) return
-		let anchor = editing.shape.points[0] ?? { x: 0, y: 0 }
-		let screen = worldToScreen(camera, anchor),
-			size = textSize(editing.shape) * camera.zoom
-		textEditor.style.left = `${screen.x}px`
-		textEditor.style.top = `${screen.y - (textLineHeight(editing.shape) * camera.zoom - size) / 2}px`
-		textEditor.style.fontSize = `${size}px`
-		textEditor.style.color = editing.shape.color
+		let shape = (editing.label && shown(editing.key)) || editing.shape
+		let rotation = shape.rotation ?? 0
+		textEditor.dataset.mode = editing.label ? "label" : "text"
 		textEditor.style.fontFamily = drawingFont
+		if (editing.label) {
+			let center = worldToScreen(camera, toWorld(shape, labelCenter(shape)))
+			let solid = shape.fill && shape.fill === shape.color
+			textEditor.style.left = `${center.x}px`
+			textEditor.style.top = `${center.y}px`
+			textEditor.style.width = `${labelWidth(shape) * camera.zoom}px`
+			textEditor.style.fontSize = `${labelSize(shape) * camera.zoom}px`
+			textEditor.style.color = solid
+				? contrastInk(palette.ink(shape.fill ?? shape.color))
+				: palette.ink(shape.color)
+			textEditor.style.transformOrigin = "50% 50%"
+			textEditor.style.transform = `translate(-50%, -50%) rotate(${rotation}rad)`
+			return
+		}
+		let anchor = shape.points[0] ?? { x: 0, y: 0 }
+		let screen = worldToScreen(camera, anchor),
+			size = textSize(shape) * camera.zoom,
+			offset = (textLineHeight(shape) * camera.zoom - size) / 2
+		textEditor.style.left = `${screen.x}px`
+		textEditor.style.top = `${screen.y - offset}px`
+		textEditor.style.width = ""
+		textEditor.style.fontSize = `${size}px`
+		textEditor.style.color = palette.ink(shape.color)
+		textEditor.style.transformOrigin = `0 ${offset}px`
+		textEditor.style.transform = rotation ? `rotate(${rotation}rad)` : ""
 	}
 
+	// A fallback history for sessions without document undo. It only reverts a
+	// register still holding the value this view wrote, so it never rewinds a
+	// collaborator's later edit.
 	function apply(changes: Change[], backwards = false, settle?: () => void) {
-		let values: [string, string][] = changes.map(change => [
-			change.key,
-			backwards ? change.before : change.after,
-		])
+		let fields = session.replica.fields(id)
+		let values: [string, string][] = changes
+			.filter(
+				change =>
+					(fields[change.key] ?? "") ===
+					(backwards ? change.after : change.before),
+			)
+			.map(change => [change.key, backwards ? change.before : change.after])
+		if (!values.length) {
+			settle?.()
+			paint()
+			return
+		}
 		queue(() =>
 			run(session.write(id, values)).finally(() => {
 				settle?.()
@@ -852,14 +1224,25 @@ function createWhiteboardView(
 	// or new shape never flickers back to its previous state.
 	function commit(entries: [string, Shape | undefined][]) {
 		if (!session.writable() || !entries.length) return
-		for (let [key, shape] of entries) pending.set(key, shape)
+		let unique = new Map(entries)
+		for (let [key, shape] of unique) pending.set(key, shape)
 		remember(
-			entries.map(([key, shape]) => [key, shape ? JSON.stringify(shape) : ""]),
+			[...unique].map(([key, shape]) => [
+				key,
+				shape ? JSON.stringify(shape) : "",
+			]),
 			() => {
-				for (let [key, shape] of entries)
+				for (let [key, shape] of unique)
 					if (pending.get(key) === shape) pending.delete(key)
 			},
 		)
+	}
+	function remove(keys: Iterable<string>) {
+		let deleted = new Set(keys)
+		commit([
+			...[...deleted].map((key): [string, undefined] => [key, undefined]),
+			...releaseArrows(view(), deleted),
+		])
 	}
 	function travel(backwards: boolean) {
 		if (!session.writable()) return
@@ -894,6 +1277,9 @@ function createWhiteboardView(
 	function newKey() {
 		return `shape:${Effect.runSync(session.uuid)}`
 	}
+	function newGroup() {
+		return `group:${Effect.runSync(session.uuid)}`
+	}
 	function nextOrder(index = 0) {
 		return drawingOrder(session.replica.clock + 1, session.replica.actor, index)
 	}
@@ -920,6 +1306,21 @@ function createWhiteboardView(
 	}
 	function select(keys: Iterable<string>) {
 		selected = new Set(keys)
+	}
+	// Grouped shapes are picked as one, unless the group was entered with a
+	// double click.
+	function members(key: string, values = view()) {
+		let group = values.get(key)?.group
+		if (!group || group === focusedGroup) return [key]
+		return [...values]
+			.filter(([, shape]) => shape.group === group)
+			.map(([member]) => member)
+	}
+	function withGroups(keys: Iterable<string>, values = view()) {
+		let result = new Set<string>()
+		for (let key of keys)
+			for (let member of members(key, values)) result.add(member)
+		return result
 	}
 
 	board.onpointerdown = event => {
@@ -997,43 +1398,65 @@ function createWhiteboardView(
 				document.elementFromPoint(event.clientX, event.clientY),
 			),
 			shape = key ? currentShape(key) : undefined
+		if (shape?.group && shape.group !== focusedGroup && tool === "select") {
+			focusedGroup = shape.group
+			select([key])
+			paint()
+			return
+		}
 		if (shape?.kind === "text") editText(key, shape)
+		else if (shape && canLabel(shape) && tool === "select")
+			editLabel(key, shape)
 		else if (!key) editText(newKey(), newShape("text", point), true)
+	}
+	function drag(event: PointerEvent): Drag {
+		return {
+			pointerId: event.pointerId,
+			down: localPoint(event),
+			started: false,
+		}
 	}
 	function beginSelection(event: PointerEvent, point: Point) {
 		let handle =
 			event.target instanceof Element
 				? event.target.closest("[data-handle]")?.getAttribute("data-handle")
 				: undefined
-		let resize = handles.find(value => value === handle)
-		let bounds = selectionBounds()
-		if (resize && bounds && session.writable()) {
-			gesture = {
-				kind: "resize",
-				pointerId: event.pointerId,
-				handle: resize,
-				from: point,
-				bounds,
-				originals: selectedShapes(),
-			}
+		let values = view()
+		let originals = selectedShapes(values)
+		let bounds = selectionBounds(values)
+		if (
+			handle &&
+			bounds &&
+			session.writable() &&
+			beginHandle(event, handle, point, originals, bounds, values)
+		)
 			return
-		}
 		let key = shapeKeyAt(event.target)
+		if (key && values.get(key)?.group !== focusedGroup) focusedGroup = undefined
+		let unit = key ? members(key, values) : []
 		if (key && event.shiftKey) {
-			if (selected.has(key)) selected.delete(key)
-			else selected.add(key)
-		} else if (key && !selected.has(key)) select([key])
+			let adding = !selected.has(key)
+			for (let member of unit)
+				if (adding) selected.add(member)
+				else selected.delete(member)
+		} else if (key && !selected.has(key)) select(unit)
 		let insideSelection =
 			!key && bounds && boundsContain(bounds, point) && !event.shiftKey
-		if ((key || insideSelection) && selected.size && session.writable())
+		if ((key || insideSelection) && selected.size && session.writable()) {
+			let moving = selectedShapes(values)
 			gesture = {
+				...drag(event),
 				kind: "move",
-				pointerId: event.pointerId,
 				from: point,
-				originals: selectedShapes(),
+				bounds: selectionBounds(values) ?? { ...point, width: 1, height: 1 },
+				originals: moving,
+				targets: snapTargets(values),
 			}
-		else if (!key && !insideSelection) {
-			if (!event.shiftKey) selected.clear()
+		} else if (!key && !insideSelection) {
+			if (!event.shiftKey) {
+				selected.clear()
+				focusedGroup = undefined
+			}
 			gesture = {
 				kind: "marquee",
 				pointerId: event.pointerId,
@@ -1043,6 +1466,62 @@ function createWhiteboardView(
 			}
 		}
 		paint()
+	}
+	function beginHandle(
+		event: PointerEvent,
+		handle: string,
+		point: Point,
+		originals: Map<string, Shape>,
+		bounds: Bounds,
+		values: Map<string, Shape>,
+	) {
+		let [single] = originals.size === 1 ? [...originals] : []
+		if (handle === "rotate") {
+			let center = single ? shapeCenter(single[1]) : boundsCenter(bounds)
+			gesture = {
+				...drag(event),
+				kind: "rotate",
+				center,
+				from: Math.atan2(point.y - center.y, point.x - center.x),
+				base:
+					single && rotates(single[1]) ? (single[1].rotation ?? 0) : undefined,
+				originals,
+			}
+			return true
+		}
+		if ((handle === "start" || handle === "end") && single) {
+			gesture = {
+				...drag(event),
+				kind: "endpoint",
+				key: single[0],
+				terminal: handle,
+				original: single[1],
+			}
+			return true
+		}
+		let resize = handles.find(value => value === handle)
+		if (!resize) return false
+		gesture = {
+			...drag(event),
+			kind: "resize",
+			handle: resize,
+			from: point,
+			bounds,
+			originals,
+			targets: snapTargets(values),
+		}
+		return true
+	}
+	// Other shapes in view, as the edges a moving selection can snap to.
+	function snapTargets(values: Map<string, Shape>) {
+		let area = padded(visibleBounds(), 200 / camera.zoom)
+		let targets: Bounds[] = []
+		for (let [key, shape] of values) {
+			if (selected.has(key) || shape.kind === "arrow") continue
+			let box = shapeBounds(shape)
+			if (boundsIntersect(box, area)) targets.push(box)
+		}
+		return targets
 	}
 	function beginErasing(event: PointerEvent) {
 		if (!session.writable()) return
@@ -1069,15 +1548,23 @@ function createWhiteboardView(
 		if (!session.writable()) return
 		let kind = toolKind(tool)
 		let shape = newShape(kind, point)
-		if (kind === "pen") shape.points = [point]
+		if (kind === "pen") {
+			shape.points = [point]
+			if (event.pointerType === "pen") shape.pressure = [pressureOf(event)]
+		}
+		let key = newKey()
+		if (kind === "arrow" && !(event.metaKey || event.ctrlKey)) {
+			let start = bindingAt(view(), point, { precise: event.altKey })
+			if (start) shape.start = start
+		}
 		gesture = {
 			kind: "draw",
 			pointerId: event.pointerId,
-			key: newKey(),
+			key,
 			shape,
 			from: localPoint(event),
 		}
-		overlay.set(gesture.key, shape)
+		overlay.set(key, shape)
 		paintCanvas()
 	}
 	function startPinch() {
@@ -1096,12 +1583,18 @@ function createWhiteboardView(
 		if (touches.has(event.pointerId))
 			touches.set(event.pointerId, localPoint(event))
 		let point = worldPoint(event)
+		pointer = point
 		presence.move(point)
 		if (gesture?.kind === "pinch") {
 			pinch(gesture)
 			return
 		}
 		if (!gesture || gesture.pointerId !== event.pointerId) return
+		if ("started" in gesture && !gesture.started) {
+			let screen = localPoint(event)
+			if (distance(screen, gesture.down) < 3) return
+			gesture.started = true
+		}
 		if (gesture.kind === "pan") {
 			let next = localPoint(event)
 			camera = panBy(camera, {
@@ -1110,12 +1603,18 @@ function createWhiteboardView(
 			})
 			gesture.last = next
 		} else if (gesture.kind === "draw") draw(gesture, event, point)
-		else if (gesture.kind === "move") move(gesture, point, event.shiftKey)
-		else if (gesture.kind === "resize") resize(gesture, point, event.shiftKey)
+		else if (gesture.kind === "move") move(gesture, point, event)
+		else if (gesture.kind === "resize") resize(gesture, point, event)
+		else if (gesture.kind === "rotate") rotate(gesture, point, event.shiftKey)
+		else if (gesture.kind === "endpoint") moveEndpoint(gesture, point, event)
 		else if (gesture.kind === "marquee") {
 			gesture.to = point
 			let area = boundsFromCorners(gesture.from, point)
-			select([...gesture.base, ...shapesInBounds(shapes(), area)])
+			let values = view()
+			select([
+				...gesture.base,
+				...withGroups(shapesInBounds(resolveDrawing(values), area), values),
+			])
 		} else if (gesture.kind === "erase") eraseAt(event)
 		paintCanvas()
 	}
@@ -1148,15 +1647,29 @@ function createWhiteboardView(
 				if (
 					!last ||
 					Math.hypot(next.x - last.x, next.y - last.y) > 1 / camera.zoom
-				)
+				) {
 					shape.points.push(next)
+					shape.pressure?.push(pressureOf(sample))
+				}
 			}
 		} else {
 			let start = shape.points[0] ?? point
-			shape.points = [
-				start,
-				event.shiftKey ? constrain(shape.kind, start, point) : point,
-			]
+			let end = event.shiftKey ? constrain(shape.kind, start, point) : point
+			shape.points = [start, end]
+			if (shape.kind === "arrow") {
+				let binding =
+					event.metaKey || event.ctrlKey
+						? undefined
+						: bindingAt(view(), end, {
+								exclude: new Set(
+									[current.key, shape.start?.shape ?? ""].filter(Boolean),
+								),
+								precise: event.altKey,
+							})
+				if (binding) shape.end = binding
+				else delete shape.end
+				bindingHint = binding?.shape
+			}
 		}
 		current.shape = { ...shape }
 		overlay.set(current.key, current.shape)
@@ -1164,33 +1677,136 @@ function createWhiteboardView(
 	function move(
 		current: Extract<Gesture, { kind: "move" }>,
 		point: Point,
-		axis: boolean,
+		event: PointerEvent,
 	) {
 		let delta = { x: point.x - current.from.x, y: point.y - current.from.y }
-		if (axis) {
-			if (Math.abs(delta.x) > Math.abs(delta.y)) delta.y = 0
+		let axis: "x" | "y" | undefined
+		if (event.shiftKey) {
+			axis = Math.abs(delta.x) > Math.abs(delta.y) ? "x" : "y"
+			if (axis === "x") delta.y = 0
 			else delta.x = 0
 		}
+		guides = []
+		if (!(event.metaKey || event.ctrlKey)) {
+			let moved = {
+				...current.bounds,
+				x: current.bounds.x + delta.x,
+				y: current.bounds.y + delta.y,
+			}
+			let snap = snapBounds(moved, current.targets, 8 / camera.zoom, {
+				x: axis === "y" ? [] : [0, 0.5, 1],
+				y: axis === "x" ? [] : [0, 0.5, 1],
+			})
+			delta = { x: delta.x + snap.offset.x, y: delta.y + snap.offset.y }
+			guides = snap.guides
+		}
 		for (let [key, shape] of current.originals)
-			overlay.set(key, translateShape(shape, delta))
+			overlay.set(key, keepBindings(translateShape(shape, delta), travels))
 	}
 	function resize(
 		current: Extract<Gesture, { kind: "resize" }>,
 		point: Point,
-		keepAspect: boolean,
+		event: PointerEvent,
 	) {
 		let delta = { x: point.x - current.from.x, y: point.y - current.from.y }
-		let texts = [...current.originals.values()].some(
-			shape => shape.kind === "text",
-		)
-		let next = resizeBounds(
-			current.bounds,
-			current.handle,
-			delta,
-			keepAspect || texts,
-		)
+		let originals = [...current.originals]
+		let texts = originals.some(([, shape]) => shape.kind === "text")
+		let [single] = originals.length === 1 ? originals : []
+		guides = []
+		if (single?.[1].rotation) {
+			overlay.set(
+				single[0],
+				resizeRotatedShape(
+					single[1],
+					current.handle,
+					delta,
+					event.shiftKey || texts,
+				),
+			)
+			return
+		}
+		// A turned shape cannot stretch along page axes, so a selection holding
+		// one scales uniformly.
+		let keepAspect =
+			event.shiftKey || texts || originals.some(([, shape]) => shape.rotation)
+		let next = resizeBounds(current.bounds, current.handle, delta, keepAspect)
+		if (!keepAspect && !(event.metaKey || event.ctrlKey)) {
+			let snap = snapBounds(next, current.targets, 8 / camera.zoom, {
+				x: current.handle.includes("w")
+					? [0]
+					: current.handle.includes("e")
+						? [1]
+						: [],
+				y: current.handle.includes("n")
+					? [0]
+					: current.handle.includes("s")
+						? [1]
+						: [],
+			})
+			next = resizeBounds(
+				current.bounds,
+				current.handle,
+				{ x: delta.x + snap.offset.x, y: delta.y + snap.offset.y },
+				false,
+			)
+			guides = snap.guides
+		}
+		for (let [key, shape] of originals)
+			overlay.set(
+				key,
+				keepBindings(scaleShape(shape, current.bounds, next), travels),
+			)
+	}
+	function rotate(
+		current: Extract<Gesture, { kind: "rotate" }>,
+		point: Point,
+		snapping: boolean,
+	) {
+		let angle =
+			Math.atan2(point.y - current.center.y, point.x - current.center.x) -
+			current.from
+		if (snapping)
+			angle =
+				current.base === undefined
+					? Math.round(angle / rotationStep) * rotationStep
+					: Math.round((current.base + angle) / rotationStep) * rotationStep -
+						current.base
 		for (let [key, shape] of current.originals)
-			overlay.set(key, scaleShape(shape, current.bounds, next))
+			overlay.set(
+				key,
+				keepBindings(rotateShape(shape, current.center, angle), travels),
+			)
+	}
+	function moveEndpoint(
+		current: Extract<Gesture, { kind: "endpoint" }>,
+		point: Point,
+		event: PointerEvent,
+	) {
+		let original = current.original
+		let start = current.terminal === "start"
+		let other =
+			(start
+				? original.points[original.points.length - 1]
+				: original.points[0]) ?? point
+		let next = event.shiftKey ? constrain("line", other, point) : point
+		let shape: Shape = {
+			...original,
+			points: start ? [next, other] : [other, next],
+		}
+		delete shape[current.terminal]
+		bindingHint = undefined
+		if (original.kind === "arrow" && !(event.metaKey || event.ctrlKey)) {
+			let opposite = original[start ? "end" : "start"]
+			let binding = bindingAt(view(), next, {
+				exclude: new Set([current.key, opposite?.shape ?? ""]),
+				precise: event.altKey,
+			})
+			if (binding) {
+				shape[current.terminal] = binding
+				bindingHint = binding.shape
+			}
+		}
+		overlay.set(current.key, shape)
 	}
 
 	board.onpointerup = event => {
@@ -1209,16 +1825,26 @@ function createWhiteboardView(
 		paint()
 	}
 	board.onpointerleave = event => {
-		if (!gesture) presence.move()
+		if (!gesture) {
+			presence.move()
+			pointer = undefined
+		}
 		if (event.pointerType === "touch") touches.delete(event.pointerId)
 	}
 	function finishGesture(current: Gesture, event: PointerEvent) {
 		gesture = undefined
+		guides = []
+		bindingHint = undefined
 		if (current.kind === "draw") finishDrawing(current, event)
-		else if (current.kind === "move" || current.kind === "resize")
+		else if (
+			current.kind === "move" ||
+			current.kind === "resize" ||
+			current.kind === "rotate"
+		)
 			commit([...overlay].filter(([key]) => current.originals.has(key)))
-		else if (current.kind === "erase")
-			commit([...current.erased].map(key => [key, undefined]))
+		else if (current.kind === "endpoint")
+			commit([...overlay].filter(([key]) => key === current.key))
+		else if (current.kind === "erase") remove(current.erased)
 		overlay.clear()
 		paint()
 	}
@@ -1231,6 +1857,21 @@ function createWhiteboardView(
 		let tiny = Math.hypot(end.x - current.from.x, end.y - current.from.y) < 4
 		if (tiny && (shape.kind === "line" || shape.kind === "arrow")) return
 		if (tiny && canFill(shape)) shape = defaultSizedShape(shape)
+		if (shape.pressure && !hasPressure(shape.pressure)) {
+			shape = { ...shape }
+			delete shape.pressure
+		}
+		// Bound arrows also record where they were drawn, so a client that cannot
+		// see the target, or a target deleted elsewhere, leaves them in place.
+		if (shape.kind === "arrow") {
+			let values = view()
+			shape = {
+				...shape,
+				points: resolveArrow(shape, key =>
+					key === current.key ? undefined : values.get(key),
+				).points,
+			}
+		}
 		commit([[current.key, shape]])
 		if (shape.kind !== "pen") {
 			tool = "select"
@@ -1249,6 +1890,8 @@ function createWhiteboardView(
 	}
 	function cancelGesture() {
 		gesture = undefined
+		guides = []
+		bindingHint = undefined
 		overlay.clear()
 	}
 
@@ -1285,7 +1928,7 @@ function createWhiteboardView(
 
 	function editText(key: string, shape: Shape, created = false) {
 		cancelGesture()
-		editing = { key, shape, created }
+		editing = { key, shape, created, label: false }
 		select([key])
 		textEditor.value = shape.text
 		textEditor.hidden = false
@@ -1293,6 +1936,25 @@ function createWhiteboardView(
 		textEditor.focus({ preventScroll: true })
 		if (!created) textEditor.select()
 	}
+	function editLabel(key: string, shape: Shape) {
+		cancelGesture()
+		editing = { key, shape, created: false, label: true }
+		select([key])
+		textEditor.value = shape.text
+		textEditor.hidden = false
+		paint()
+		textEditor.focus({ preventScroll: true })
+		textEditor.select()
+	}
+	function editSelected() {
+		let [key] = selected
+		let shape = key && selected.size === 1 ? currentShape(key) : undefined
+		if (!key || !shape) return
+		if (shape.kind === "text") editText(key, shape)
+		else if (canLabel(shape)) editLabel(key, shape)
+	}
+	// Text commits onto the shape's latest register, so a collaborator who
+	// moved or restyled it while this view was typing keeps that change.
 	function commitText() {
 		let current = editing
 		if (!current) return
@@ -1300,10 +1962,14 @@ function createWhiteboardView(
 		let text = textEditor.value.replace(/\s+$/, "")
 		textEditor.hidden = true
 		textEditor.value = ""
-		if (!text && current.created) selected.delete(current.key)
-		else if (!text) commit([[current.key, undefined]])
-		else if (text !== current.shape.text || current.created)
-			commit([[current.key, { ...current.shape, text }]])
+		let latest = current.created ? current.shape : currentShape(current.key)
+		if (current.label) {
+			if (latest && text !== latest.text)
+				commit([[current.key, { ...latest, text }]])
+		} else if (!text && current.created) selected.delete(current.key)
+		else if (!text) remove([current.key])
+		else if (latest && (text !== latest.text || current.created))
+			commit([[current.key, { ...latest, text }]])
 		if (tool === "text") tool = "select"
 		board.focus({ preventScroll: true })
 		paint()
@@ -1318,9 +1984,15 @@ function createWhiteboardView(
 		event.stopPropagation()
 		commitText()
 	}
+	textEditor.oninput = () => positionTextEditor()
 
 	function styleSelection(change: (shape: Shape) => Shape) {
-		commit([...selectedShapes()].map(([key, shape]) => [key, change(shape)]))
+		commit(
+			[...selected].flatMap(key => {
+				let shape = currentShape(key)
+				return shape ? [[key, change(shape)]] : []
+			}),
+		)
 		paint()
 	}
 	function chooseColor(color: string) {
@@ -1351,20 +2023,36 @@ function createWhiteboardView(
 	}
 
 	function deleteSelection() {
-		commit([...selected].map(key => [key, undefined]))
+		remove(selected)
 		selected.clear()
 		paint()
 	}
-	function duplicateSelection() {
-		let copies: [string, Shape][] = orderedSelection().map(
-			([, shape], index) => [
-				newKey(),
-				{ ...translateShape(shape, { x: 24, y: 24 }), order: nextOrder(index) },
-			],
-		)
-		commit(copies)
-		select(copies.map(([key]) => key))
+	function orderedSelection(values = view()): [string, Shape][] {
+		return [...selectedShapes(values)]
+	}
+	// New shapes from the clipboard or a duplicate land above everything, with
+	// fresh keys and groups, as one action.
+	function place(entries: DrawingEntry[], offset: Point) {
+		let placed: [string, Shape][] = rekeyShapes(
+			entries.map(entry => ({
+				id: entry.id,
+				shape: translateShape(entry.shape, offset),
+			})),
+			newKey,
+			newGroup,
+		).map(([key, shape], index) => [key, { ...shape, order: nextOrder(index) }])
+		commit(placed)
+		tool = "select"
+		focusedGroup = undefined
+		select(placed.map(([key]) => key))
 		paint()
+		return placed
+	}
+	function duplicateSelection() {
+		place(
+			orderedSelection().map(([id, shape]) => ({ id, shape })),
+			{ x: 24, y: 24 },
+		)
 	}
 	function bringToFront() {
 		reorder((_, index) => nextOrder(index))
@@ -1377,27 +2065,108 @@ function createWhiteboardView(
 	}
 	function reorder(order: (shape: Shape, index: number) => string) {
 		commit(
-			orderedSelection().map(([key, shape], index) => [
-				key,
-				{ ...shape, order: order(shape, index) },
-			]),
+			[...shapes()]
+				.filter(([key]) => selected.has(key))
+				.flatMap(([key], index) => {
+					let shape = currentShape(key)
+					return shape ? [[key, { ...shape, order: order(shape, index) }]] : []
+				}),
 		)
 		paint()
 	}
-	function orderedSelection() {
-		return [...shapes()].filter(([key]) => selected.has(key))
+	function transformSelection(change: (shape: Shape, center: Point) => Shape) {
+		let values = view()
+		let center = boundsCenter(
+			selectionBounds(values) ?? { x: 0, y: 0, width: 0, height: 0 },
+		)
+		commit(
+			orderedSelection(values).map(([key, shape]) => [
+				key,
+				keepBindings(change(shape, center), travels),
+			]),
+		)
+		paint()
 	}
 	function nudge(delta: Point) {
+		transformSelection(shape => translateShape(shape, delta))
+	}
+	// The things that line up: a group moves as one, and an arrow whose ends
+	// are both held by selected shapes simply follows them.
+	function arrangeUnits(values = view()) {
+		let units = new Map<string, { keys: string[]; bounds: Bounds[] }>()
+		function held(binding: Shape["start"]) {
+			return Boolean(
+				binding && selected.has(binding.shape) && values.has(binding.shape),
+			)
+		}
+		for (let [key, shape] of selectedShapes(values)) {
+			if (shape.kind === "arrow" && held(shape.start) && held(shape.end))
+				continue
+			let unit = shape.group ?? key
+			let entry = units.get(unit) ?? { keys: [], bounds: [] }
+			entry.keys.push(key)
+			entry.bounds.push(shapeBounds(shape))
+			units.set(unit, entry)
+		}
+		return units
+	}
+	function arrange(action: ArrangeAction) {
+		if (!session.writable() || !selected.size) return
+		if (action === "group") return groupSelection()
+		if (action === "ungroup") return ungroupSelection()
+		if (action === "rotate")
+			return transformSelection((shape, center) =>
+				rotateShape(shape, center, Math.PI / 2),
+			)
+		if (action === "flip-horizontal" || action === "flip-vertical")
+			return transformSelection((shape, center) =>
+				flipShape(
+					shape,
+					center,
+					action === "flip-horizontal" ? "horizontal" : "vertical",
+				),
+			)
+		let values = view()
+		let units = arrangeUnits(values)
+		let boxes = new Map<string, Bounds>()
+		for (let [unit, entry] of units) {
+			let box = unionBounds(entry.bounds)
+			if (box) boxes.set(unit, box)
+		}
+		let offsets =
+			action === "horizontal" || action === "vertical"
+				? distributionOffsets(boxes, action)
+				: alignmentOffsets(boxes, action)
+		let shownShapes = selectedShapes(values)
 		commit(
-			[...selectedShapes()].map(([key, shape]) => [
-				key,
-				translateShape(shape, delta),
-			]),
+			[...offsets].flatMap(([unit, offset]) =>
+				(units.get(unit)?.keys ?? []).flatMap((key): [string, Shape][] => {
+					let shape = shownShapes.get(key)
+					return shape
+						? [[key, keepBindings(translateShape(shape, offset), travels)]]
+						: []
+				}),
+			),
 		)
 		paint()
+	}
+	function groupSelection() {
+		if (selected.size < 2) return
+		let group = newGroup()
+		styleSelection(shape => ({ ...shape, group }))
+		focusedGroup = undefined
+	}
+	function ungroupSelection() {
+		styleSelection(shape => {
+			let next = { ...shape }
+			delete next.group
+			return next
+		})
+		focusedGroup = undefined
 	}
 	function selectAll() {
 		tool = "select"
+		focusedGroup = undefined
 		select(shapes().keys())
 		paint()
 	}
@@ -1405,6 +2174,97 @@ function createWhiteboardView(
 		commit([...shapes().keys()].map(key => [key, undefined]))
 		selected.clear()
 		paint()
+	}
+
+	// The clipboard belongs to the board only while the board has focus and no
+	// text field does; everywhere else the page keeps its usual behaviour.
+	function ownsClipboard() {
+		let active = document.activeElement
+		return (
+			dialog.open &&
+			!editing &&
+			active instanceof Element &&
+			root.contains(active) &&
+			!isFormField(active)
+		)
+	}
+	function copySelection(event: ClipboardEvent, cut: boolean) {
+		let data = event.clipboardData
+		if (!data || !ownsClipboard() || !selected.size) return
+		let values = view()
+		let entries = orderedSelection(values)
+		let payload = JSON.stringify(drawingDocument(entries))
+		data.setData(drawingClipboardType, payload)
+		data.setData("text/html", clipboardMarkup(entries, payload))
+		let text = clipboardText(entries.map(([, shape]) => shape))
+		if (text) data.setData("text/plain", text)
+		event.preventDefault()
+		clipboardSource = { payload, count: cut ? -1 : 0 }
+		if (cut && session.writable()) deleteSelection()
+	}
+	function clipboardMarkup(entries: [string, Shape][], payload: string) {
+		let image = document.createElement("img")
+		image.alt = clipboardText(entries.map(([, shape]) => shape)) || "Drawing"
+		image.src =
+			"data:image/svg+xml;charset=utf-8," +
+			encodeURIComponent(drawingImage(new Map(entries)))
+		image.dataset.alkalyeDrawing = payload
+		return image.outerHTML
+	}
+	function pasteClipboard(event: ClipboardEvent) {
+		let data = event.clipboardData
+		if (!data || !ownsClipboard() || !session.writable()) return
+		let payload =
+			data.getData(drawingClipboardType) ||
+			embeddedDrawing(data.getData("text/html"))
+		let text = data.getData("text/plain")
+		let source = payload || (/^\s*\{/.test(text) ? text : "")
+		let entries = source
+			? clipboardEntries(source, Boolean(payload))
+			: undefined
+		if (entries?.length) {
+			event.preventDefault()
+			pasteEntries(entries, source)
+		} else if (text.trim()) {
+			event.preventDefault()
+			pasteText(text)
+		}
+	}
+	function clipboardEntries(source: string, required: boolean) {
+		try {
+			return importDrawingEntries(JSON.parse(source))
+		} catch (error) {
+			if (required) options.report(error)
+			return undefined
+		}
+	}
+	// Repeated pastes of one copy step down and right, so each stays visible; a
+	// cut or a copy from elsewhere lands where it was, or mid-screen when that
+	// place is out of view.
+	function pasteEntries(entries: DrawingEntry[], payload: string) {
+		let count =
+			(clipboardSource.payload === payload ? clipboardSource.count : -1) + 1
+		clipboardSource = { payload, count }
+		let bounds = unionBounds(entries.map(entry => shapeBounds(entry.shape)))
+		let visible = visibleBounds()
+		let offset =
+			!bounds || boundsIntersect(bounds, visible)
+				? { x: 24 * count, y: 24 * count }
+				: {
+						x: visible.x + visible.width / 2 - bounds.x - bounds.width / 2,
+						y: visible.y + visible.height / 2 - bounds.y - bounds.height / 2,
+					}
+		place(entries, offset)
+	}
+	function pasteText(text: string) {
+		let visible = visibleBounds()
+		let at = pointer ?? {
+			x: visible.x + visible.width / 2,
+			y: visible.y + visible.height / 2,
+		}
+		let shape = { ...newShape("text", at), text: text.slice(0, 2000) }
+		shape.points = [at]
+		place([{ id: "paste", shape }], { x: 0, y: 0 })
 	}
 
 	function download(file: Blob, name: string) {
@@ -1415,35 +2275,30 @@ function createWhiteboardView(
 		link.click()
 		setTimeout(() => URL.revokeObjectURL(url), 1000)
 	}
+	// Exports keep register keys, so arrows stay attached when the file comes
+	// back, and record where bound arrows currently point.
 	function exportDrawing() {
 		download(
 			new Blob(
-				[
-					JSON.stringify(
-						{ format: "alkalye-drawing-v1", shapes: [...shapes().values()] },
-						null,
-						2,
-					),
-				],
+				[JSON.stringify(drawingDocument(resolveDrawing(shapes())), null, 2)],
 				{ type: "application/json" },
 			),
 			"drawing.alkalye-drawing.json",
 		)
 	}
 	function exportImage() {
-		download(drawingPreview(session.replica.fields(id)), "drawing.svg")
+		download(
+			new Blob([drawingImage(shapes())], { type: "image/svg+xml" }),
+			"drawing.svg",
+		)
 	}
 	function importFile() {
 		let file = drawingInput.files?.[0]
 		drawingInput.value = ""
 		if (!file) return
 		queue(async () => {
-			let imported: [string, Shape][] = importDrawing(
-				JSON.parse(await file.text()),
-			).map((shape, index) => [newKey(), { ...shape, order: nextOrder(index) }])
-			commit(imported)
-			tool = "select"
-			select(imported.map(([key]) => key))
+			let entries = importDrawingEntries(JSON.parse(await file.text()))
+			let imported = place(entries, { x: 0, y: 0 })
 			zoomToFit(unionBounds(imported.map(([, shape]) => shapeBounds(shape))))
 			paint()
 		})
@@ -1512,6 +2367,18 @@ function createWhiteboardView(
 		},
 		{ signal },
 	)
+	let arrangeMenu = connectPopover(arrangeTrigger, arrangePanel, signal, {
+		items: () => elements("[data-arrange]"),
+		side: "bottom",
+		align: "end",
+	})
+	for (let item of elements("[data-arrange]"))
+		item.onclick = () => {
+			let action = arrangeChoices.find(
+				([value]) => value === item.dataset.arrange,
+			)?.[0]
+			if (action) arrange(action)
+		}
 
 	function handleKey(event: KeyboardEvent) {
 		if (
@@ -1521,9 +2388,9 @@ function createWhiteboardView(
 		)
 			return
 		if (
-			menu.open &&
 			event.target instanceof Node &&
-			itemsPanel.contains(event.target)
+			((menu.open && itemsPanel.contains(event.target)) ||
+				arrangePanel.contains(event.target))
 		)
 			return
 		let handled = handleShortcut(event)
@@ -1531,8 +2398,18 @@ function createWhiteboardView(
 	}
 	function handleShortcut(event: KeyboardEvent) {
 		let key = event.key.toLowerCase()
+		let writable = session.writable()
 		if (event.metaKey || event.ctrlKey) return commandShortcut(event, key)
-		if (event.altKey) return false
+		if (event.altKey) {
+			if (!writable || !selected.size) return false
+			if (event.shiftKey && event.code === "KeyH")
+				return handled(() => arrange("horizontal"))
+			if (event.shiftKey && event.code === "KeyV")
+				return handled(() => arrange("vertical"))
+			let alignment = alignKeys[event.code]
+			if (alignment && !event.shiftKey) return handled(() => arrange(alignment))
+			return false
+		}
 		if (key === "escape") return escape()
 		if (key === " " && !(event.target instanceof HTMLButtonElement)) {
 			spaceHeld = true
@@ -1543,12 +2420,17 @@ function createWhiteboardView(
 		if (event.shiftKey && event.code === "Digit0") return handled(resetZoom)
 		if (key === "=" || key === "+") return handled(() => zoomBy(1))
 		if (key === "-") return handled(() => zoomBy(-1))
-		let writable = session.writable()
 		if (writable && selected.size) {
 			if (key === "delete" || key === "backspace")
 				return handled(deleteSelection)
 			if (key === "]") return handled(bringToFront)
 			if (key === "[") return handled(sendToBack)
+			if (key === "enter" && !(event.target instanceof HTMLButtonElement))
+				return handled(editSelected)
+			if (event.shiftKey && event.code === "KeyH")
+				return handled(() => arrange("flip-horizontal"))
+			if (event.shiftKey && event.code === "KeyV")
+				return handled(() => arrange("flip-vertical"))
 			let step = event.shiftKey ? 10 : 1
 			let arrows: Record<string, Point> = {
 				arrowleft: { x: -step, y: 0 },
@@ -1566,17 +2448,29 @@ function createWhiteboardView(
 		return false
 	}
 	function commandShortcut(event: KeyboardEvent, key: string) {
+		let writable = session.writable()
 		if (key === "z") return handled(() => travel(!event.shiftKey))
 		if (key === "y") return handled(() => travel(false))
 		if (key === "a") return handled(selectAll)
-		if (key === "d" && selected.size && session.writable())
+		if (key === "d" && selected.size && writable)
 			return handled(duplicateSelection)
+		if (key === "g" && selected.size && writable)
+			return handled(() => arrange(event.shiftKey ? "ungroup" : "group"))
 		return false
 	}
 	function escape() {
 		if (menu.open) closeMenu()
+		else if (arrangeMenu.isOpen()) arrangeMenu.close()
 		else if (gesture) cancelGesture()
-		else if (selected.size) selected.clear()
+		else if (focusedGroup) {
+			let group = focusedGroup
+			focusedGroup = undefined
+			select(
+				[...view()]
+					.filter(([, shape]) => shape.group === group)
+					.map(([key]) => key),
+			)
+		} else if (selected.size) selected.clear()
 		else if (tool !== "select") tool = "select"
 		else return false
 		paint()
@@ -1596,6 +2490,15 @@ function createWhiteboardView(
 		},
 		{ signal },
 	)
+	// Clipboard events target the document body when nothing is selected, so
+	// they are observed there and claimed only by `ownsClipboard`.
+	document.addEventListener("copy", event => copySelection(event, false), {
+		signal,
+	})
+	document.addEventListener("cut", event => copySelection(event, true), {
+		signal,
+	})
+	document.addEventListener("paste", pasteClipboard, { signal })
 	root.addEventListener(
 		"pointerdown",
 		event => {
@@ -1663,6 +2566,7 @@ function createWhiteboardView(
 		dispose() {
 			events.abort()
 			resizes.disconnect()
+			appearance.disconnect()
 			for (let node of [root, ...root.querySelectorAll("*")]) {
 				if (!(node instanceof HTMLElement) && !(node instanceof SVGElement))
 					continue
@@ -1714,13 +2618,24 @@ function fillColor(fill: FillMode, color: string) {
 	return undefined
 }
 
+function isSegment(shape: Shape) {
+	return (
+		(shape.kind === "arrow" || shape.kind === "line") &&
+		shape.points.length === 2
+	)
+}
+
+// Mice report a constant half pressure; only pens are read.
+function pressureOf(event: PointerEvent) {
+	return Math.round(Math.min(1, Math.max(0, event.pressure)) * 1000) / 1000
+}
+
 // Shift snaps lines to 15° steps and boxes to squares and circles.
 function constrain(kind: Shape["kind"], start: Point, point: Point): Point {
 	let dx = point.x - start.x,
 		dy = point.y - start.y
 	if (kind === "line" || kind === "arrow") {
-		let step = Math.PI / 12
-		let angle = Math.round(Math.atan2(dy, dx) / step) * step,
+		let angle = Math.round(Math.atan2(dy, dx) / rotationStep) * rotationStep,
 			length = Math.hypot(dx, dy)
 		return {
 			x: start.x + Math.cos(angle) * length,
@@ -1743,12 +2658,26 @@ function padded(bounds: Bounds, amount: number): Bounds {
 	}
 }
 
+function pointList(points: readonly Point[]) {
+	return points.map(point => `${point.x},${point.y}`).join(" ")
+}
+
 function distance(first: Point, second: Point) {
 	return Math.hypot(second.x - first.x, second.y - first.y)
 }
 
 function midpoint(first: Point, second: Point): Point {
 	return { x: (first.x + second.x) / 2, y: (first.y + second.y) / 2 }
+}
+
+function embeddedDrawing(markup: string) {
+	if (!markup.includes("data-alkalye-drawing")) return ""
+	let parsed = new DOMParser().parseFromString(markup, "text/html")
+	return (
+		parsed
+			.querySelector("[data-alkalye-drawing]")
+			?.getAttribute("data-alkalye-drawing") ?? ""
+	)
 }
 
 function isFormField(target: EventTarget | null) {
