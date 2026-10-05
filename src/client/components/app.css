@@ -199,9 +199,17 @@
 	[data-app]#app.tools-open .inspector {
 		backdrop-filter: none;
 	}
-	[data-app]#app.library-open:not(.mode-slideshow, .mode-teleprompter)
+	[data-app]#app.library-open:not(
+			.mode-slideshow,
+			.mode-teleprompter,
+			.mode-history
+		)
 		.workspace,
-	[data-app]#app.tools-open:not(.mode-slideshow, .mode-teleprompter)
+	[data-app]#app.tools-open:not(
+			.mode-slideshow,
+			.mode-teleprompter,
+			.mode-history
+		)
 		.workspace {
 		filter: blur(2px);
 	}
@@ -248,4 +256,14 @@
 		#inspector-body
 	) {
 	visibility: hidden;
+}
+
+[data-app].mode-history {
+	grid-template-columns: 0 minmax(0, 1fr) 0 !important;
+}
+[data-app].mode-history :is(.library, .inspector, .toolbar, .statusbar) {
+	display: none;
+}
+[data-app].mode-history #main {
+	overflow: hidden;
 }

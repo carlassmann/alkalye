@@ -1498,7 +1498,9 @@ function mountApplication() {
 			}
 			app.classList.add("mode-" + mode)
 			if (
-				(mode === "slideshow" || mode === "teleprompter") &&
+				(mode === "slideshow" ||
+					mode === "teleprompter" ||
+					mode === "history") &&
 				matchMedia("(max-width: 1100px)").matches
 			) {
 				setLayout("library", false, false)
@@ -1691,6 +1693,30 @@ function mountApplication() {
 				>()
 				mountDocumentHistory(element("#main"), {
 					document: selected.document,
+					author: subject =>
+						subject === account.subject ? "You" : "Another writer",
+					mountSource: (host, historical) =>
+						mountEditor(host, {
+							content: historical.text(selected.document),
+							atoms: historical.visible(selected.document),
+							editable: false,
+							preferences: preferences.state.current().value.editor,
+							documents: summaries,
+							isDrawing: id => historical.fields(id).type === "whiteboard",
+							openDrawing: () => {},
+							openDocument: id => launch(open(id)),
+							createLinkedDocument: () =>
+								Promise.reject(new Error("History is read-only")),
+							comments: () => [],
+							change: () => undefined,
+							undo: () => {},
+							select: () => {},
+							requestAsset: () => {},
+							attach: () => {},
+							command: () => {},
+							find: () => {},
+							report,
+						}),
 					run: command => tasks.run(command),
 					load: loadDocumentHistory(
 						selected.opened.session,
@@ -1699,20 +1725,37 @@ function mountApplication() {
 					).pipe(Effect.provideService(BrowserStorage, storage)),
 					writable: () => selection === selected && writable(),
 					restore: (historical, position) =>
-						selected.opened.session
-							.change("Restore moment " + position, staged =>
-								restoreDocumentState(staged, historical, selected.document),
-							)
-							.pipe(
-								Effect.tap(() =>
-									Effect.sync(() => {
-										if (selection === selected) {
-											mode = "edit"
-											mountDocument()
-										}
-									}),
-								),
+						askDocument(
+							selected,
+							confirmDialog(
+								dialog,
+								"Restore this version? Your current document will remain in history.",
+								"Restore",
+								"Restore this version",
 							),
+						).pipe(
+							Effect.flatMap(confirmed =>
+								confirmed && writable()
+									? selected.opened.session
+											.change("Restore moment " + position, staged =>
+												restoreDocumentState(
+													staged,
+													historical,
+													selected.document,
+												),
+											)
+											.pipe(
+												Effect.tap(() =>
+													Effect.sync(() => {
+														if (selection === selected) {
+															changeMode("edit", true)
+														}
+													}),
+												),
+											)
+									: Effect.void,
+							),
+						),
 					createCopy: (historical, position) => {
 						let command = copies.get(position)
 						if (!command) {

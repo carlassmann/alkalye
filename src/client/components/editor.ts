@@ -1039,7 +1039,7 @@ function createEditorView(
 			(event.metaKey || event.ctrlKey) &&
 			event.shiftKey &&
 			event.key.toLowerCase() === "v"
-		if (event.key === "Escape") {
+		if (event.key === "Escape" && options.editable) {
 			event.preventDefault()
 			event.stopPropagation()
 			releaseTab = true

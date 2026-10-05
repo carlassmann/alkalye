@@ -4,6 +4,7 @@ import {
 	evaluate,
 	wait,
 	currentDocument,
+	submitDialog,
 } from "./browser-driver"
 
 let boardEditor = 'document.querySelector("alkalye-whiteboard")?.editor'
@@ -103,8 +104,24 @@ export function verifyNativeDrawings(session: string, original: string) {
 	browser(session, "click", '[data-action="history"]')
 	wait(
 		session,
-		'document.querySelector("#history-source") !== null && document.querySelectorAll("[data-version]").length > 0',
+		'document.querySelector("alkalye-history alkalye-editor")?.source.value.includes("asset:")',
 	)
+	assert(
+		evaluate(
+			session,
+			`document.querySelector("alkalye-history #editor").readOnly && getComputedStyle(document.querySelector(".toolbar")).display === "none" && getComputedStyle(document.querySelector(".inspector")).display === "none" && document.querySelector("#history-position").value === document.querySelector("#history-position").max`,
+		),
+		"time machine uses the read-only editor, fullscreen chrome and newest-at-right timeline",
+	)
+	browser(session, "set", "viewport", "504", "842")
+	assert(
+		evaluate(
+			session,
+			`document.querySelector("#history-position").getBoundingClientRect().bottom < document.querySelector("#history-older").getBoundingClientRect().top && getComputedStyle(document.querySelector(".workspace")).filter === "none"`,
+		),
+		"mobile history puts the timeline above its controls without sidebar blur",
+	)
+	browser(session, "set", "viewport", "1280", "900")
 	assert(
 		evaluate(
 			session,
@@ -114,16 +131,26 @@ export function verifyNativeDrawings(session: string, original: string) {
 	)
 	evaluate(
 		session,
-		'[...document.querySelectorAll("[data-version]")].find(button => button.querySelector("strong").textContent === "Draw").click()',
+		'{let slider = document.querySelector("#history-position"); slider.value = "1"; slider.dispatchEvent(new Event("change"))}',
 	)
 	wait(
 		session,
-		'!document.querySelector("#history-source").textContent.includes("asset:") && document.querySelector("#restore-history").disabled === false',
+		'!document.querySelector("alkalye-history alkalye-editor").source.value.includes("asset:") && document.querySelector("#restore-history").disabled === false',
 	)
 	browser(session, "click", "#restore-history")
+	wait(session, 'document.querySelector("#dialog").open')
+	browser(session, "press", "BracketRight")
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("#history-position").value === "1"',
+		),
+		"restore confirmation freezes history shortcuts",
+	)
+	submitDialog(session)
 	wait(
 		session,
-		'document.querySelector("#editor")?.value.startsWith("# Drawing journal") && !document.querySelector("alkalye-editor").source.value.includes("asset:")',
+		'!location.pathname.endsWith("/timemachine") && document.querySelector("alkalye-history") === null && document.querySelector("#editor")?.value.startsWith("# Drawing journal") && !document.querySelector("alkalye-editor").source.value.includes("asset:")',
 	)
 	assert(
 		true,
@@ -142,9 +169,20 @@ export function verifyNativeDrawings(session: string, original: string) {
 	browser(session, "click", '[data-action="history"]')
 	wait(
 		session,
-		'document.querySelector("#history-source")?.textContent.includes("asset:")',
+		'document.querySelector("alkalye-history alkalye-editor")?.source.value.includes("asset:")',
+	)
+	evaluate(session, 'document.querySelector("alkalye-history #editor").focus()')
+	browser(session, "press", "[")
+	wait(
+		session,
+		'document.querySelector("#history-position").value !== document.querySelector("#history-position").max',
 	)
 	browser(session, "press", "Escape")
+	wait(session, 'document.querySelector("alkalye-history") === null')
+	assert(
+		true,
+		"history shortcuts and Escape work while the read-only editor has focus",
+	)
 	wait(session, "!!navigator.serviceWorker.controller")
 	browser(session, "set", "offline", "on")
 	browser(session, "reload")
@@ -174,7 +212,7 @@ export function verifyNativeDrawings(session: string, original: string) {
 	browser(session, "click", '[data-action="history"]')
 	wait(
 		session,
-		'document.querySelector("#history-source")?.textContent.includes("asset:")',
+		'document.querySelector("alkalye-history alkalye-editor")?.source.value.includes("asset:")',
 	)
 	assert(
 		true,
