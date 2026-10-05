@@ -60,6 +60,9 @@ export let WorkspaceChangeSchema = Schema.Union([
 		document: IdentifierSchema,
 		from: IdentifierSchema,
 	}),
+	// A tombstone: the journal keeps the workspace's history for audit, while
+	// the projection stops granting any access through it.
+	Schema.Struct({ kind: Schema.Literal("deleted") }),
 ])
 export let WorkspaceFactSchema = Schema.Struct({
 	id: Schema.NonEmptyString,
@@ -68,6 +71,13 @@ export let WorkspaceFactSchema = Schema.Struct({
 	change: WorkspaceChangeSchema,
 })
 export type WorkspaceFact = typeof WorkspaceFactSchema.Type
+export class WorkspaceDeletionRefused extends Schema.TaggedError<WorkspaceDeletionRefused>()(
+	"WorkspaceDeletionRefused",
+	{
+		reason: Schema.Literals(["Personal", "NameMismatch"]),
+		message: Schema.String,
+	},
+) {}
 export type AccessRole = "owner" | "writer" | "reader"
 export interface AccessAuthority {
 	workspaces: "all" | ReadonlyArray<string>

@@ -24,6 +24,7 @@ import { IdentifierSchema } from "./model"
 import {
 	InvitationDigestSchema,
 	LibrarySnapshotSchema,
+	WorkspaceDeletionRefused,
 	WorkspaceSnapshotSchema,
 } from "./workspace"
 import {
@@ -355,6 +356,18 @@ export let DocumentApi = HttpApi.make("DocumentApi").add(
 				}),
 				success: Schema.Natural,
 				error: errors,
+			}),
+			HttpApiEndpoint.post("remove", "/api/workspaces/:workspace/deletion", {
+				params: { workspace: IdentifierSchema },
+				payload: Schema.Struct({
+					name: Schema.String,
+					request: IdentifierSchema,
+				}),
+				success: Schema.Natural,
+				error: [
+					...errors,
+					WorkspaceDeletionRefused.pipe(HttpApiSchema.status(409)),
+				],
 			}),
 			HttpApiEndpoint.put(
 				"membership",

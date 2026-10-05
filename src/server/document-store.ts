@@ -68,7 +68,11 @@ import {
 	maximumDocumentBlobBytes,
 } from "../shared/document-blobs"
 import type { BlobChunkDescriptor } from "../shared/document-blobs"
-import { Identity, WorkspaceFactSchema } from "../shared/workspace"
+import {
+	Identity,
+	WorkspaceDeletionRefused,
+	WorkspaceFactSchema,
+} from "../shared/workspace"
 import type { WorkspaceFact } from "../shared/workspace"
 import type {
 	CommittedAction,
@@ -560,6 +564,7 @@ function makeDocumentStore() {
 				getBlob: Effect.fn("WorkspaceStore.getBlob")(getBlob),
 				create: Effect.fn("WorkspaceStore.create")(createWorkspace),
 				rename: Effect.fn("WorkspaceStore.rename")(renameWorkspace),
+				remove: Effect.fn("WorkspaceStore.remove")(deleteWorkspace),
 				membership: Effect.fn("WorkspaceStore.membership")(changeMembership),
 				moveDocument: Effect.fn("WorkspaceStore.moveDocument")(moveDocument),
 				leave: Effect.fn("WorkspaceStore.leave")(leave),
@@ -1009,6 +1014,45 @@ function makeDocumentStore() {
 							)) !== "owner"
 						)
 							return yield* forbidden()
+						return yield* writeWorkspace(fact)
+					}),
+					finishWorkspace,
+				)
+			})
+		}
+		// Deletion tombstones the workspace: its documents leave every library and
+		// stop granting access, while the journal keeps their history. Confirming
+		// the current name refuses a deletion aimed at a workspace renamed since.
+		function deleteWorkspace(id: string, name: string, request: string) {
+			return Effect.gen(function* () {
+				let identity = yield* Identity
+				if (identity.access) return yield* forbidden()
+				let fact = yield* Schema.decodeUnknownEffect(WorkspaceFactSchema)({
+					id: "workspace-deleted:" + request,
+					workspace: id,
+					subject: identity.subject,
+					change: { kind: "deleted" },
+				})
+				return yield* transact(
+					Effect.gen(function* () {
+						// A retried deletion returns its original receipt.
+						if (Option.isSome(yield* workspace.receipt(fact)))
+							return yield* writeWorkspace(fact)
+						let role = yield* workspace.workspaceRole(id, identity.subject)
+						if (!role) return yield* unavailable()
+						if (role !== "owner") return yield* forbidden()
+						let record = yield* workspace.workspace(id)
+						if (Option.isNone(record)) return yield* unavailable()
+						if (id === "personal-" + record.value.owner)
+							return yield* new WorkspaceDeletionRefused({
+								reason: "Personal",
+								message: "The personal workspace cannot be deleted",
+							})
+						if (name !== record.value.name)
+							return yield* new WorkspaceDeletionRefused({
+								reason: "NameMismatch",
+								message: "Type the workspace's current name to delete it",
+							})
 						return yield* writeWorkspace(fact)
 					}),
 					finishWorkspace,
@@ -1469,10 +1513,10 @@ function makeDocumentStore() {
 						return yield* conflict("Workspace action identity is immutable")
 					return { position: previous.value.position, fact, fresh: false }
 				}
-				if (
-					fact.change.kind === "created" &&
-					Option.isSome(yield* workspace.workspace(fact.workspace))
-				)
+				let existing = yield* workspace.workspaceRecord(fact.workspace)
+				if (Option.isSome(existing) && existing.value.deleted)
+					return yield* unavailable()
+				if (fact.change.kind === "created" && Option.isSome(existing))
 					return yield* conflict("Workspace already exists")
 				if (
 					fact.change.kind === "documentAdded" &&

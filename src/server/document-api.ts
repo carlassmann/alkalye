@@ -10,7 +10,7 @@ import {
 	PermissionDenied,
 	ResourceUnavailable,
 } from "../shared/document-actions"
-import { Identity } from "../shared/workspace"
+import { Identity, WorkspaceDeletionRefused } from "../shared/workspace"
 import { InvitationRevoked } from "../shared/invitations"
 import { WorkspaceStore } from "./document-store"
 import {
@@ -129,6 +129,11 @@ export let workspaceHandlers = HttpApiBuilder.group(
 				.handle("create", ({ payload }) =>
 					asAccount(
 						store.create(payload.workspace, payload.name, payload.request),
+					),
+				)
+				.handle("remove", ({ params, payload }) =>
+					asAccount(
+						store.remove(params.workspace, payload.name, payload.request),
 					),
 				)
 				.handle("snapshot", ({ params }) =>
@@ -268,7 +273,8 @@ function expected<E>(error: E) {
 		error instanceof DocumentHistoryUnavailable ||
 		error instanceof PermissionDenied ||
 		error instanceof ResourceUnavailable ||
-		error instanceof InvitationRevoked
+		error instanceof InvitationRevoked ||
+		error instanceof WorkspaceDeletionRefused
 	)
 }
 function missing() {

@@ -38,6 +38,10 @@ let WorkspaceSchema = Schema.Struct({
 	owner: IdentifierSchema,
 	position: Schema.Natural,
 })
+let WorkspaceRecordSchema = Schema.Struct({
+	...WorkspaceSchema.fields,
+	deleted: Schema.Natural,
+})
 let DocumentSchema = Schema.Struct({
 	workspace: IdentifierSchema,
 	owner: IdentifierSchema,
@@ -75,7 +79,14 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 		Request: Schema.String,
 		Result: WorkspaceSchema,
 		execute: id =>
-			sql`SELECT name,owner,position FROM workspaces WHERE workspace=${id}`,
+			sql`SELECT name,owner,position FROM workspaces WHERE workspace=${id} AND deleted=0`,
+	})
+	// Includes tombstones, so deleted identities are never reused or rewritten.
+	let workspaceRecord = SqlSchema.findOneOption({
+		Request: Schema.String,
+		Result: WorkspaceRecordSchema,
+		execute: id =>
+			sql`SELECT name,owner,position,deleted FROM workspaces WHERE workspace=${id}`,
 	})
 	let document = SqlSchema.findOneOption({
 		Request: Schema.String,
@@ -123,6 +134,10 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 					sql`SELECT m.invitation FROM invitation_members m JOIN invitations i ON i.invitation=m.invitation WHERE m.member=${member} AND i.workspace=${workspace} AND i.document IS ${document} ORDER BY m.invitation`,
 			})(undefined),
 		workspace,
+		workspaceRecord: (id: string) =>
+			workspaceRecord(id).pipe(
+				Effect.map(Option.map(row => ({ ...row, deleted: row.deleted === 1 }))),
+			),
 		document,
 		receipt,
 		workspaceRole,
@@ -187,6 +202,13 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 						yield* sql`ALTER TABLE document_summaries ADD COLUMN links TEXT NOT NULL DEFAULT '[]'`
 					yield* sql`UPDATE document_summaries SET details_ready=0`
 				}),
+				"008_workspace_tombstones": Effect.gen(function* () {
+					let columns = yield* sql<{
+						name: string
+					}>`SELECT name FROM pragma_table_info('workspaces') WHERE name='deleted'`
+					if (!columns.length)
+						yield* sql`ALTER TABLE workspaces ADD COLUMN deleted INTEGER NOT NULL DEFAULT 0`
+				}),
 			}),
 		}).pipe(Effect.provideService(SqlClient.SqlClient, sql))
 	}
@@ -201,6 +223,9 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 			let stored = yield* receipt(fact)
 			if (Option.isNone(stored))
 				return yield* conflict("Missing workspace receipt")
+			let existing = yield* workspaceRecord(fact.workspace)
+			if (Option.isSome(existing) && existing.value.deleted === 1)
+				return yield* conflict("Workspace was deleted")
 			let change = fact.change
 			switch (change.kind) {
 				case "preferences":
@@ -213,7 +238,7 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 					yield* sql`UPDATE workspaces SET name=${change.name} WHERE workspace=${fact.workspace}`
 					break
 				case "created":
-					yield* sql`INSERT INTO workspaces VALUES (${fact.workspace},${change.name},${fact.subject},${stored.value.position})`
+					yield* sql`INSERT INTO workspaces(workspace,name,owner,position) VALUES (${fact.workspace},${change.name},${fact.subject},${stored.value.position})`
 					break
 				case "membership":
 					if (change.role === null)
@@ -238,6 +263,9 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 					yield* sql`UPDATE invitations SET workspace=${fact.workspace} WHERE document=${change.document}`
 					break
 				}
+				case "deleted":
+					yield* sql`UPDATE workspaces SET deleted=1 WHERE workspace=${fact.workspace}`
+					break
 				case "invitationLeft":
 					yield* sql`DELETE FROM invitation_members WHERE invitation=${change.invitation} AND member=${change.member}`
 					break
@@ -331,6 +359,8 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 			let record = yield* document(id)
 			if (Option.isNone(record)) return undefined
 			if (!allowsWorkspace(record.value.workspace, access)) return undefined
+			if (Option.isNone(yield* workspace(record.value.workspace)))
+				return undefined
 			if (record.value.owner === subject) return attenuateRole("owner", access)
 			let inherited = yield* workspaceRole(record.value.workspace, subject)
 			if (inherited === "owner" || inherited === "writer")
@@ -440,7 +470,7 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 			Request: Schema.String,
 			Result: SummaryRowSchema,
 			execute: id =>
-				sql`SELECT d.document,d.workspace,d.owner,s.log,s.position,s.deleted,s.metadata FROM workspace_documents d JOIN document_summaries s ON s.document=d.document WHERE d.document=${id}`,
+				sql`SELECT d.document,d.workspace,d.owner,s.log,s.position,s.deleted,s.metadata FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace AND w.deleted=0 JOIN document_summaries s ON s.document=d.document WHERE d.document=${id}`,
 		})(id).pipe(
 			Effect.map(result =>
 				Option.map(result, row => ({ ...row, deleted: row.deleted === 1 })),
@@ -480,7 +510,7 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 			Request: Schema.String,
 			Result: SummaryRowSchema,
 			execute: subject =>
-				sql`SELECT d.document,d.workspace,d.owner,s.log,s.position,s.deleted,s.metadata FROM workspace_documents d JOIN document_summaries s ON s.document=d.document WHERE d.owner=${subject} OR EXISTS (SELECT 1 FROM document_grants a WHERE a.document=d.document AND a.member=${subject}) ORDER BY d.document`,
+				sql`SELECT d.document,d.workspace,d.owner,s.log,s.position,s.deleted,s.metadata FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace AND w.deleted=0 JOIN document_summaries s ON s.document=d.document WHERE (d.owner=${subject} OR EXISTS (SELECT 1 FROM document_grants a WHERE a.document=d.document AND a.member=${subject})) ORDER BY d.document`,
 		})(subject).pipe(
 			Effect.map(rows =>
 				rows.map(row => ({ ...row, deleted: row.deleted === 1 })),
@@ -493,7 +523,7 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 				Request: Schema.String,
 				Result: LibraryWorkspaceSchema,
 				execute: subject =>
-					sql`SELECT w.workspace,w.name,w.owner,w.position,CASE WHEN w.owner=${subject} THEN 'owner' ELSE m.role END AS role FROM workspaces w LEFT JOIN workspace_grants m ON m.workspace=w.workspace AND m.member=${subject} WHERE w.owner=${subject} OR m.role IS NOT NULL ORDER BY w.workspace`,
+					sql`SELECT w.workspace,w.name,w.owner,w.position,CASE WHEN w.owner=${subject} THEN 'owner' ELSE m.role END AS role FROM workspaces w LEFT JOIN workspace_grants m ON m.workspace=w.workspace AND m.member=${subject} WHERE w.deleted=0 AND (w.owner=${subject} OR m.role IS NOT NULL) ORDER BY w.workspace`,
 			})(subject)
 			let documents = yield* SqlSchema.findAll({
 				Request: Schema.String,
@@ -507,7 +537,7 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 					created: Schema.Natural,
 				}),
 				execute: subject =>
-					sql`SELECT d.document,d.workspace,d.owner,s.log,s.position,s.deleted,s.metadata,s.kind,s.excerpt,s.links,s.updated,s.created,CASE WHEN d.owner=${subject} OR w.owner=${subject} THEN 'owner' WHEN m.role='writer' OR a.role='writer' THEN 'writer' WHEN m.role='reader' OR a.role='reader' THEN 'reader' END AS role FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace JOIN document_summaries s ON s.document=d.document LEFT JOIN workspace_grants m ON m.workspace=d.workspace AND m.member=${subject} LEFT JOIN document_grants a ON a.document=d.document AND a.member=${subject} WHERE d.owner=${subject} OR w.owner=${subject} OR m.role IS NOT NULL OR a.role IS NOT NULL ORDER BY d.workspace,d.document`,
+					sql`SELECT d.document,d.workspace,d.owner,s.log,s.position,s.deleted,s.metadata,s.kind,s.excerpt,s.links,s.updated,s.created,CASE WHEN d.owner=${subject} OR w.owner=${subject} THEN 'owner' WHEN m.role='writer' OR a.role='writer' THEN 'writer' WHEN m.role='reader' OR a.role='reader' THEN 'reader' END AS role FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace JOIN document_summaries s ON s.document=d.document LEFT JOIN workspace_grants m ON m.workspace=d.workspace AND m.member=${subject} LEFT JOIN document_grants a ON a.document=d.document AND a.member=${subject} WHERE w.deleted=0 AND (d.owner=${subject} OR w.owner=${subject} OR m.role IS NOT NULL OR a.role IS NOT NULL) ORDER BY d.workspace,d.document`,
 			})(subject)
 			return {
 				workspaces,
