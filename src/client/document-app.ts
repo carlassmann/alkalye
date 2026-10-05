@@ -1744,7 +1744,6 @@ function mountApplication() {
 						replica: session.replica,
 						uuid: random.randomUUIDv4,
 						writable,
-						version: session.version,
 						changes: Stream.merge(session.changes, library.state.changes),
 						presenceChanges: library.live.presence.changes,
 						people: () => library.live.presence.current(selected.document),

@@ -7,6 +7,11 @@ import {
 	wait,
 	currentDocument,
 } from "./browser-driver"
+import {
+	boardMounted,
+	boardShapes,
+	drawRectangle,
+} from "./browser-native-drawings"
 
 let server = Bun.spawn(["bun", "tests/browser-document-app.ts", "--serve"], {
 	stdout: "pipe",
@@ -56,15 +61,11 @@ try {
 		'document.querySelector("#asset-files").click = window.originalPickerClick',
 	)
 	browser(session, "click", '[data-action="new-whiteboard"]')
-	wait(session, 'document.querySelector("#whiteboard") !== null')
-	browser(session, "click", '[data-tool="rectangle"]')
-	evaluate(
-		session,
-		'{let board=document.querySelector("#whiteboard"),bounds=board.getBoundingClientRect();board.setPointerCapture=()=>{};let event=(type,x,y)=>new PointerEvent(type,{clientX:bounds.left+bounds.width*x,clientY:bounds.top+bounds.height*y,pointerId:1,bubbles:true});board.dispatchEvent(event("pointerdown",.2,.2));board.dispatchEvent(event("pointermove",.5,.5));board.dispatchEvent(event("pointerup",.5,.5))}',
-	)
+	wait(session, boardMounted)
+	drawRectangle(session)
 	wait(
 		session,
-		'document.querySelectorAll("#whiteboard [data-shape]").length === 1 && document.querySelector("#save-status").textContent === "Saved"',
+		`${boardShapes} === 1 && document.querySelector("#save-status").textContent === "Saved"`,
 	)
 	browser(session, "click", "#embed-board")
 	wait(
@@ -115,7 +116,8 @@ try {
 	assert(
 		names.includes("Travel/Notes/Portable source/Portable source.md") &&
 			names.some(name => /assets\/Harbour[^/]*\.(webp|png)$/.test(name)) &&
-			names.some(name => name.endsWith(".svg.alkalye-drawing.json")) &&
+			names.some(name => name.endsWith(".svg.tldr")) &&
+			!names.some(name => name.endsWith(".alkalye-drawing.json")) &&
 			names.includes(
 				"Travel/Notes/Portable source/Portable source.comments.json",
 			) &&
@@ -178,12 +180,10 @@ try {
 			) +
 			'"]',
 	)
-	wait(
-		session,
-		'document.querySelectorAll("#whiteboard [data-shape]").length === 1',
-	)
-	assert(true, "the restored whiteboard remains editable vector shapes")
-	evaluate(session, 'document.querySelector("#dialog").close()')
+	wait(session, `${boardMounted} && ${boardShapes} === 1`)
+	assert(true, "the restored whiteboard opens its .tldr shapes in tldraw")
+	browser(session, "click", "#dialog .dialog-close")
+	wait(session, '!document.querySelector("#dialog").open')
 
 	browser(session, "click", '[data-action="export-all"]')
 	let backup = await unzip(await download(".zip"))
@@ -272,6 +272,24 @@ try {
 		true,
 		"offline imports persist their documents and comments across a reload",
 	)
+	let sketch = string(
+		evaluate(
+			session,
+			'[...document.querySelectorAll("[data-doc]")].find(item => item.textContent.includes("Offline sketch"))?.dataset.doc ?? ""',
+		),
+	)
+	browser(session, "click", `[data-doc="${sketch}"]`)
+	wait(session, `${currentDocument} === ${JSON.stringify(sketch)}`)
+	browser(session, "click", '[data-action="tools"]')
+	browser(session, "click", '[data-action^="drawing:"]')
+	wait(
+		session,
+		`${boardMounted} && ${boardShapes} === 1 && document.querySelector("alkalye-whiteboard").editor.getCurrentPageShapes()[0].props.geo === "ellipse"`,
+	)
+	assert(true, "an imported pre-tldraw drawing opens offline as tldraw shapes")
+	browser(session, "click", "#dialog .dialog-close")
+	browser(session, "click", `[data-doc="${offlineNote}"]`)
+	wait(session, `${currentDocument} === ${JSON.stringify(offlineNote)}`)
 	browser(session, "set", "offline", "off")
 	wait(
 		session,

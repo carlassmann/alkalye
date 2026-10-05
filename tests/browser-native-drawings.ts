@@ -6,13 +6,41 @@ import {
 	currentDocument,
 } from "./browser-driver"
 
+let boardEditor = 'document.querySelector("alkalye-whiteboard")?.editor'
+export let boardShapes = `(${boardEditor}?.getCurrentPageShapes().length ?? -1)`
+export let boardMounted = `(${boardEditor} !== undefined && document.querySelector(".tl-canvas") !== null)`
+
+// Draws a rectangle the way a person would: tldraw's tool, then a drag.
+export function drawRectangle(session: string) {
+	browser(session, "click", '[data-testid="tools.rectangle"]')
+	let value = evaluate(
+		session,
+		'JSON.stringify((() => { let bounds = document.querySelector(".tl-canvas").getBoundingClientRect(); return [bounds.left + bounds.width * 0.3, bounds.top + bounds.height * 0.3, bounds.left + bounds.width * 0.5, bounds.top + bounds.height * 0.5].map(Math.round) })())',
+	)
+	let [x1 = 0, y1 = 0, x2 = 0, y2 = 0] = String(value)
+		.slice(1, -1)
+		.split(",")
+		.map(Number)
+	browser(session, "mouse", "move", String(x1), String(y1))
+	browser(session, "mouse", "down")
+	for (let step of [0.25, 0.5, 0.75, 1])
+		browser(
+			session,
+			"mouse",
+			"move",
+			String(Math.round(x1 + (x2 - x1) * step)),
+			String(Math.round(y1 + (y2 - y1) * step)),
+		)
+	browser(session, "mouse", "up")
+}
+
 export function verifyNativeDrawings(session: string, original: string) {
 	browser(session, "click", '[data-action="new"]')
 	wait(session, `${currentDocument} !== ${JSON.stringify(original)}`)
 	browser(session, "fill", "#editor", "# Drawing journal\n")
 	browser(session, "click", '[data-action="tools"]')
 	browser(session, "click", '[data-action="new-whiteboard"]')
-	wait(session, 'document.querySelector("#whiteboard") !== null')
+	wait(session, boardMounted)
 	assert(
 		evaluate(
 			session,
@@ -20,25 +48,15 @@ export function verifyNativeDrawings(session: string, original: string) {
 		),
 		"native drawing uses a registered Custom Element",
 	)
-	browser(session, "click", '[data-tool="rectangle"]')
-	evaluate(
-		session,
-		'{let board=document.querySelector("#whiteboard"),bounds=board.getBoundingClientRect();board.setPointerCapture=()=>{};let event=(type,x,y)=>new PointerEvent(type,{clientX:bounds.left+bounds.width*x,clientY:bounds.top+bounds.height*y,pointerId:1,bubbles:true});board.dispatchEvent(event("pointerdown",.2,.2));board.dispatchEvent(event("pointermove",.5,.5));board.dispatchEvent(event("pointerup",.5,.5))}',
-	)
+	drawRectangle(session)
 	wait(
 		session,
-		'document.querySelectorAll("#whiteboard [data-shape]").length === 1 && document.querySelector("#save-status").textContent === "Saved"',
+		`${boardShapes} === 1 && document.querySelector("#save-status").textContent === "Saved"`,
 	)
 	browser(session, "click", "#drawing-undo")
-	wait(
-		session,
-		'document.querySelectorAll("#whiteboard [data-shape]").length === 0',
-	)
+	wait(session, `${boardShapes} === 0`)
 	browser(session, "click", "#drawing-redo")
-	wait(
-		session,
-		'document.querySelectorAll("#whiteboard [data-shape]").length === 1',
-	)
+	wait(session, `${boardShapes} === 1`)
 	assert(
 		true,
 		"native whole-document undo and redo include drawing creation and its shapes",
@@ -116,22 +134,22 @@ export function verifyNativeDrawings(session: string, original: string) {
 	)
 	browser(session, "click", '[data-action="tools"]')
 	browser(session, "click", '[data-action^="drawing:"]')
-	wait(
-		session,
-		'document.querySelectorAll("#whiteboard [data-shape]").length === 1',
-	)
+	wait(session, `${boardMounted} && ${boardShapes} === 1`)
 	assert(
 		true,
 		"native offline reload opens the drawing without fetching its event history",
 	)
 	evaluate(
 		session,
-		'window.oldBoard = document.querySelector("#whiteboard"); document.querySelector("#dialog").close()',
+		'window.oldBoard = document.querySelector("alkalye-whiteboard"); document.querySelector("#dialog .dialog-close").click()',
 	)
-	wait(session, "window.oldBoard.onpointerdown === null")
+	wait(
+		session,
+		'window.oldBoard.editor === undefined && !window.oldBoard.querySelector(".tl-container")',
+	)
 	assert(
 		true,
-		"closing a native drawing releases its pointer handlers and scoped presence",
+		"closing a native drawing unmounts tldraw and releases its scoped presence",
 	)
 	browser(session, "click", '[data-action="history"]')
 	wait(

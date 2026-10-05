@@ -11,9 +11,10 @@ import {
 } from "./document-metadata"
 import { blobContentType, maximumDocumentBlobBytes } from "./document-blobs"
 import { maximumActionText } from "./document-actions"
-import { drawingOrder, drawingShapes } from "./drawing"
-import type { Shape } from "./drawing"
-import { importDrawing } from "./drawing-import"
+import { legacyOrder, legacyShapes, parseLegacyDrawing } from "./legacy-drawing"
+import type { Shape } from "./legacy-drawing"
+import { boardFile, boardFileFields, parseTldrawFile } from "./whiteboard"
+import type { TldrawFile } from "./whiteboard"
 import { compileTheme, frontmatter, withFrontmatter } from "./markdown"
 import type { Operation } from "./model"
 import {
@@ -65,7 +66,7 @@ export interface ImportedDocument {
 	readonly comments: ReadonlyArray<ImportedComment>
 	readonly themes: ReadonlyArray<ImportedTheme>
 	readonly selectedTheme?: string
-	readonly drawing?: ReadonlyArray<Shape>
+	readonly drawing?: ImportedDrawing
 	readonly drawingAsset?: string
 	readonly id?: string
 }
@@ -77,8 +78,14 @@ export interface ImportedAsset {
 	readonly muted: boolean
 	readonly data: Uint8Array<ArrayBuffer>
 	readonly destinations: ReadonlyArray<string>
-	readonly shapes?: ReadonlyArray<Shape>
+	readonly drawing?: ImportedDrawing
 }
+// A board restored from a `.tldr` file keeps its records as written; an old
+// `alkalye-drawing-v1` sidecar restores the legacy shapes tldraw converts
+// when the board is next edited.
+export type ImportedDrawing =
+	| { readonly kind: "tldraw"; readonly file: TldrawFile }
+	| { readonly kind: "legacy"; readonly shapes: ReadonlyArray<Shape> }
 export interface ImportedTheme {
 	readonly path: string
 	readonly name: string
@@ -275,18 +282,16 @@ export function exportArchive(
 				let path = place.directory + "assets/" + file
 				pairs.push(["asset:" + board, "assets/" + file])
 				entries.push({ name: path, data: bytes })
+				let tldr = boardFile(fields)
 				entries.push(
-					json(path + ".alkalye-drawing.json", {
-						format: "alkalye-drawing-v1",
-						shapes: [...drawingShapes(fields).values()].map(shape => ({
-							kind: shape.kind,
-							color: shape.color,
-							width: shape.width,
-							points: shape.points,
-							text: shape.text,
-							...(shape.fill ? { fill: shape.fill } : {}),
-						})),
-					}),
+					tldr === undefined
+						? json(path + ".alkalye-drawing.json", {
+								format: "alkalye-drawing-v1",
+								shapes: [...legacyShapes(fields).values()].map(
+									({ order: _order, ...shape }) => shape,
+								),
+							})
+						: { name: path + ".tldr", data: encoder.encode(tldr) },
 				)
 				assetMetadata.push({
 					path,
@@ -492,10 +497,11 @@ export function parseArchive(entries: ReadonlyArray<ZipEntry>) {
 					source,
 				})
 			}
-			let drawingPath =
-				declared?.drawing ??
-				path.replace(/\.(md|markdown|txt)$/i, ".alkalye-drawing.json")
-			let drawingEntry = files.get(drawingPath)
+			let stem = path.replace(/\.(md|markdown|txt)$/i, "")
+			let drawingEntry = declared?.drawing
+				? files.get(declared.drawing)
+				: (files.get(stem + ".tldr") ??
+					files.get(stem + ".alkalye-drawing.json"))
 			if (declared?.drawing && !drawingEntry)
 				return yield* invalid("Missing document drawing")
 			let commentsEntry = files.get(
@@ -604,8 +610,8 @@ export function importSteps(
 			[]
 		for (let asset of document.assets) {
 			let target = yield* identity(identities, assetKey(document, asset))
-			let shapes = asset.shapes
-			if (shapes) {
+			let drawing = asset.drawing
+			if (drawing) {
 				records.push({
 					cost: 3,
 					text: 0,
@@ -618,7 +624,7 @@ export function importSteps(
 							: []),
 					],
 				})
-				records.push(...shapeRecords(target, shapes))
+				records.push(...drawingRecords(target, drawing))
 				continue
 			}
 			let reference = references.get(asset.path)
@@ -648,7 +654,7 @@ export function importSteps(
 					staged.set(id, "whiteboard", board),
 				],
 			})
-			records.push(...shapeRecords(board, document.drawing))
+			records.push(...drawingRecords(board, document.drawing))
 		}
 		for (let theme of document.themes) {
 			let target = yield* identity(identities, themeKey(document, theme))
@@ -737,8 +743,14 @@ export function importSteps(
 	})
 }
 
-function shapeRecords(board: string, shapes: ReadonlyArray<Shape>) {
-	return shapes.map((shape, index) => ({
+function drawingRecords(board: string, drawing: ImportedDrawing) {
+	if (drawing.kind === "tldraw")
+		return boardFileFields({}, drawing.file).map(([field, value]) => ({
+			cost: 1,
+			text: value.length,
+			build: (staged: Replica) => [staged.set(board, field, value)],
+		}))
+	return drawing.shapes.map((shape, index) => ({
 		cost: 1,
 		text: 0,
 		build: (staged: Replica) => [
@@ -747,7 +759,7 @@ function shapeRecords(board: string, shapes: ReadonlyArray<Shape>) {
 				"shape:imported-" + String(index).padStart(6, "0"),
 				JSON.stringify({
 					...shape,
-					order: drawingOrder(staged.clock + 1, staged.actor, index),
+					order: legacyOrder(staged.clock + 1, staged.actor, index),
 				}),
 			),
 		],
@@ -794,10 +806,13 @@ function documentAssets(
 			)
 				continue
 			if (/\.(json|md|markdown|txt)$/i.test(entry.name)) continue
+			if (/\.tldr$/i.test(entry.name) && files.has(entry.name.slice(0, -5)))
+				continue
 			let declared = metadata.find(value => value.path === entry.name)
-			let drawingEntry = files.get(entry.name + ".alkalye-drawing.json")
-			let tldraw = /\.tldr$/i.test(entry.name) ? entry : undefined
-			let sidecar = drawingEntry ?? tldraw
+			let sidecar =
+				files.get(entry.name + ".tldr") ??
+				files.get(entry.name + ".alkalye-drawing.json") ??
+				(/\.tldr$/i.test(entry.name) ? entry : undefined)
 			assets.push({
 				path: entry.name,
 				name: declared?.name || entry.name.split("/").at(-1) || "Attachment",
@@ -806,7 +821,7 @@ function documentAssets(
 				data: entry.data,
 				destinations: [...new Set(destinations.get(entry.name) ?? [])],
 				...(declared?.id ? { id: declared.id } : {}),
-				...(sidecar ? { shapes: yield* drawing(sidecar) } : {}),
+				...(sidecar ? { drawing: yield* drawing(sidecar) } : {}),
 			})
 		}
 		return assets
@@ -866,7 +881,15 @@ function drawing(entry: ZipEntry) {
 	return decodeJson(entry, Schema.Unknown).pipe(
 		Effect.flatMap(value =>
 			Effect.try({
-				try: () => importDrawing(value),
+				try: (): ImportedDrawing => {
+					let format =
+						value && typeof value === "object" && !Array.isArray(value)
+							? Object.fromEntries(Object.entries(value)).format
+							: undefined
+					return format === "alkalye-drawing-v1"
+						? { kind: "legacy", shapes: parseLegacyDrawing(value) }
+						: { kind: "tldraw", file: parseTldrawFile(value) }
+				},
 				catch: error =>
 					new ArchiveInvalid({
 						message:

@@ -1,20 +1,22 @@
+import { object, string } from "../src/shared/model"
 import { assert, browser, evaluate, wait } from "./browser-driver"
-import { verifyWhiteboardParity } from "./browser-whiteboard-parity"
 
 let server = Bun.spawn(["bun", "tests/browser-document-app.ts", "--serve"], {
 	stdout: "pipe",
 	stderr: "inherit",
 })
 let session = "whiteboard-" + Date.now()
-let shapes = 'document.querySelectorAll("#whiteboard [data-shape]").length'
+let reader = "whiteboard-reader-" + Date.now()
+let editor = 'document.querySelector("alkalye-whiteboard")?.editor'
+let shapes = `(${editor}?.getCurrentPageShapes().length ?? -1)`
 let saved = 'document.querySelector("#save-status").textContent === "Saved"'
-let pressed = (selector: string) =>
-	`document.querySelector(${JSON.stringify(selector)}).getAttribute("aria-pressed") === "true"`
+let mounted = `${editor} !== undefined && document.querySelector(".tl-canvas") !== null`
 
 try {
 	let output = await server.stdout.getReader().read()
 	if (!output.value) throw new Error("Missing app URL")
-	let url = new URL("/app", new TextDecoder().decode(output.value).trim()).href
+	let origin = new TextDecoder().decode(output.value).trim()
+	let url = new URL("/app", origin).href
 	console.log(url)
 	browser(session, "set", "viewport", "1280", "800")
 	browser(session, "open", url)
@@ -22,306 +24,272 @@ try {
 	browser(session, "click", '[data-action="new"]')
 	wait(session, '!document.querySelector("#editor").readOnly')
 	browser(session, "fill", "#editor", "# Board journal\n")
+	wait(session, saved)
+	let documentId = String(
+		evaluate(session, "location.pathname.match(/[/]doc[/]([^/]+)/)[1]"),
+	)
 	browser(session, "click", '[data-action="tools"]')
 	browser(session, "click", '[data-action="new-whiteboard"]')
-	wait(session, 'document.querySelector("#whiteboard") !== null')
-
-	assert(
-		evaluate(
-			session,
-			`(() => { let dialog = document.querySelector("#dialog").getBoundingClientRect(); return dialog.width >= innerWidth - 1 && dialog.height >= innerHeight - 1 })()`,
-		),
-		"the whiteboard fills the viewport",
+	wait(session, mounted)
+	let remote = evaluate(
+		session,
+		'JSON.stringify(performance.getEntriesByType("resource").map(entry => entry.name).filter(name => /^https?:/.test(name) && new URL(name).origin !== location.origin))',
 	)
 	assert(
-		evaluate(session, pressed('[data-tool="select"]')) &&
-			evaluate(session, 'document.querySelector("#drawing-style").hidden') &&
+		remote === "[]" &&
 			evaluate(
 				session,
-				'[...document.querySelectorAll(".tool-palette [data-tool]")].every(button => button.querySelector("svg.icon") && button.getAttribute("aria-label"))',
+				'[...document.querySelectorAll("link[data-tldraw]")].every(link => link.href.startsWith(location.origin + "/tldraw/"))',
 			),
-		"selection is the default tool and the palette shows labelled icons",
+		"the tldraw island loads only local assets" +
+			(remote === "[]" ? "" : " " + String(remote)),
 	)
 
-	browser(session, "click", '[data-tool="rectangle"]')
-	assert(
-		!evaluate(session, 'document.querySelector("#drawing-style").hidden'),
-		"choosing a drawing tool shows the style inspector",
-	)
-	drag(session, [0.3, 0.3], [0.45, 0.5])
+	browser(session, "click", '[data-testid="tools.rectangle"]')
+	drag(session, [0.35, 0.35], [0.5, 0.55])
 	wait(session, `${shapes} === 1 && ${saved}`)
 	assert(
-		evaluate(session, pressed('[data-tool="select"]')) &&
-			evaluate(
-				session,
-				'document.querySelectorAll("[data-handle]:not([data-handle=rotate])").length',
-			) === 8 &&
-			evaluate(
-				session,
-				'document.querySelectorAll("[data-handle=rotate]").length',
-			) === 1,
-		"a drawn rectangle is selected with resize and rotation handles and the tool returns to select",
+		evaluate(session, `${editor}.getCurrentPageShapes()[0].type === "geo"`),
+		"drawing with tldraw's rectangle tool saves a geo shape",
 	)
 
-	browser(session, "click", '[data-color="#e03131"]')
-	browser(session, "click", '[data-fill="solid"]')
-	browser(session, "click", '[data-dash="dashed"]')
-	wait(
-		session,
-		`(() => { let rect = document.querySelector("#whiteboard [data-shape] rect"); return rect?.getAttribute("stroke") === "#e03131" && rect.getAttribute("fill") === "#e03131" && rect.hasAttribute("stroke-dasharray") })() && ${saved}`,
-	)
-	assert(true, "the inspector restyles the selection's colour, fill and dash")
-
-	let before = shapeWidth(session)
-	let handle = point(
-		session,
-		'document.querySelector("[data-handle=se] .resize-handle")',
-	)
-	mouseDrag(session, handle, { x: handle.x + 120, y: handle.y + 60 })
-	wait(session, `${saved}`)
-	wait(
-		session,
-		`document.querySelector("#whiteboard [data-shape] rect").getBoundingClientRect().width > ${before + 100}`,
-	)
-	assert(true, "dragging a corner handle resizes the shape")
-
-	browser(session, "press", "o")
-	assert(evaluate(session, pressed('[data-tool="ellipse"]')), "O picks ellipse")
-	drag(session, [0.6, 0.3], [0.75, 0.5])
-	wait(session, `${shapes} === 2 && ${saved}`)
-	browser(session, "press", "Escape")
-	assert(
-		evaluate(session, 'document.querySelector("#dialog").open') &&
-			evaluate(session, 'document.querySelectorAll("[data-handle]").length') ===
-				0,
-		"Escape clears the selection without closing the whiteboard",
-	)
-	drag(session, [0.15, 0.15], [0.9, 0.85])
-	assert(
-		evaluate(
-			session,
-			'document.querySelectorAll("[data-selection] .outline").length',
-		) === 2,
-		"a marquee selects several shapes",
-	)
-	browser(session, "press", "Delete")
+	browser(session, "click", "#drawing-undo")
 	wait(session, `${shapes} === 0 && ${saved}`)
-	browser(session, "press", "Control+z")
-	wait(session, `${shapes} === 2`)
-	assert(true, "delete removes the selection and undo restores it")
-
-	browser(session, "press", "t")
-	click(session, [0.3, 0.75])
-	wait(
-		session,
-		'!document.querySelector("#drawing-text").hidden && document.activeElement === document.querySelector("#drawing-text")',
-	)
-	browser(session, "keyboard", "type", "Hello r")
-	assert(
-		evaluate(session, pressed('[data-tool="text"]')) &&
-			evaluate(session, 'document.querySelector("#drawing-text").value') ===
-				"Hello r",
-		"typing in the text editor never triggers tool shortcuts",
-	)
-	browser(session, "press", "Escape")
-	wait(
-		session,
-		`${shapes} === 3 && document.querySelector("#drawing-text").hidden && [...document.querySelectorAll("#whiteboard [data-shape] text")].some(text => text.textContent === "Hello r") && ${saved}`,
-	)
-	assert(
-		evaluate(session, 'document.querySelector("#dialog").open'),
-		"inline text is created on the canvas and Escape commits it",
-	)
-	evaluate(
-		session,
-		'[...document.querySelectorAll("#whiteboard [data-shape] text")].find(text => text.textContent === "Hello r").parentElement.querySelector(".hit-area").dataset.label = ""',
-	)
-	browser(session, "dblclick", "#whiteboard [data-label]")
-	wait(
-		session,
-		'!document.querySelector("#drawing-text").hidden && document.querySelector("#drawing-text").value === "Hello r"',
-	)
-	browser(session, "press", "End")
-	browser(session, "press", "Shift+Enter")
-	browser(session, "keyboard", "type", "world")
-	browser(session, "press", "Escape")
-	wait(
-		session,
-		`[...document.querySelectorAll("#whiteboard [data-shape] text")].some(text => text.querySelectorAll("tspan").length === 2 && text.textContent === "Hello rworld") && ${saved}`,
-	)
-	assert(true, "double-clicking text edits it in place across several lines")
-
-	let zoom = 'document.querySelector("#reset-board").textContent.trim()'
-	browser(session, "click", "#zoom-board-in")
-	assert(evaluate(session, zoom) !== "100%", "zoom in changes the zoom level")
-	browser(session, "click", "#reset-board")
-	assert(evaluate(session, zoom) === "100%", "the zoom label resets to 100%")
-	let center = canvasPoint(session, [0.5, 0.5])
-	browser(session, "mouse", "move", String(center.x), String(center.y))
-	let viewBox = evaluate(
-		session,
-		'document.querySelector("#whiteboard").getAttribute("viewBox")',
-	)
-	// agent-browser wheels at the page origin, so the wheel is dispatched on the canvas.
-	let wheel = (options: string) =>
-		evaluate(
-			session,
-			`document.querySelector("#whiteboard").dispatchEvent(new WheelEvent("wheel", { clientX: ${center.x}, clientY: ${center.y}, bubbles: true, cancelable: true, ${options} }))`,
-		)
-	wheel("deltaY: 120")
-	assert(
-		evaluate(
-			session,
-			`document.querySelector("#whiteboard").getAttribute("viewBox") !== ${JSON.stringify(viewBox)} && ${zoom} === "100%"`,
-		),
-		"scrolling pans the canvas without zooming",
-	)
-	wheel("deltaY: -50, ctrlKey: true")
-	assert(
-		evaluate(session, zoom) !== "100%",
-		"pinching a trackpad or ctrl-scrolling zooms at the pointer",
-	)
-	browser(session, "click", "#reset-board")
-	evaluate(
-		session,
-		`(() => { let board = document.querySelector("#whiteboard"), rect = board.getBoundingClientRect(); let touch = (type, id, x, y) => board.dispatchEvent(new PointerEvent(type, { pointerId: id, pointerType: "touch", clientX: rect.left + x, clientY: rect.top + y, bubbles: true, cancelable: true, isPrimary: id === 11 })); touch("pointerdown", 11, 500, 300); touch("pointerdown", 12, 600, 300); touch("pointermove", 11, 400, 300); touch("pointermove", 12, 700, 300); touch("pointerup", 11, 400, 300); touch("pointerup", 12, 700, 300) })()`,
-	)
-	assert(
-		evaluate(session, zoom) === "300%" && evaluate(session, shapes) === 3,
-		"a two-finger pinch zooms without drawing",
-	)
-	browser(session, "press", "Shift+Digit1")
-	assert(evaluate(session, zoom) !== "300%", "Shift+1 zooms to fit the drawing")
-
-	browser(session, "click", "#drawing-menu > summary")
-	assert(
-		evaluate(
-			session,
-			'document.querySelector("#drawing-menu").open && ["#export-drawing", "#export-svg", "#import-drawing", "#clear-board"].every(selector => document.querySelector(selector))',
-		),
-		"the drawing menu offers export, import and clearing",
-	)
-	browser(session, "press", "End")
-	assert(
-		evaluate(session, 'document.activeElement.id === "clear-board"'),
-		"Drawing menu uses the shared keyboard navigation",
-	)
-	browser(session, "press", "Home")
-	assert(
-		evaluate(session, 'document.activeElement.id === "export-drawing"'),
-		"Drawing menu Home returns to the first item",
-	)
-	browser(session, "press", "Escape")
-	assert(
-		!evaluate(session, 'document.querySelector("#drawing-menu").open') &&
-			evaluate(session, 'document.querySelector("#dialog").open'),
-		"Escape closes the menu before the whiteboard",
-	)
-	browser(session, "screenshot", "/tmp/alkalye-whiteboard.png")
-
-	browser(session, "click", "#embed-board")
-	wait(
-		session,
-		`!document.querySelector("#dialog").open && document.querySelector("#editor").value.includes("asset:") && ${saved}`,
-	)
+	browser(session, "click", "#drawing-redo")
+	wait(session, `${shapes} === 1 && ${saved}`)
 	assert(
 		true,
-		"embedding closes the whiteboard and references it from the text",
+		"the toolbar undoes and redoes the drawing through document history",
+	)
+	evaluate(session, 'document.querySelector(".tl-container").focus()')
+	browser(session, "press", "Meta+z")
+	wait(session, `${shapes} === 0 && ${saved}`)
+	browser(session, "press", "Meta+Shift+z")
+	wait(session, `${shapes} === 1 && ${saved}`)
+	assert(
+		true,
+		"tldraw's undo and redo shortcuts travel through document history",
+	)
+
+	evaluate(
+		session,
+		"window.downloads = []; HTMLAnchorElement.prototype.click = function () { window.downloads.push(fetch(this.href).then(response => response.text()).then(text => ({ name: this.download, text }))) }",
+	)
+	browser(session, "click", "#export-drawing")
+	wait(session, "window.downloads.length === 1")
+	let exported = object(
+		evaluate(session, "window.downloads[0].then(file => file)"),
+	)
+	let file = object(JSON.parse(string(exported.text)))
+	assert(
+		string(exported.name).endsWith(".tldr") &&
+			file.tldrawFileFormatVersion === 1 &&
+			Array.isArray(file.records) &&
+			file.records.some(record => object(record).typeName === "shape"),
+		"the board downloads as a tldraw .tldr file",
+	)
+	evaluate(
+		session,
+		`(() => { let input = document.querySelector("#import-drawing"), data = new DataTransfer(); data.items.add(new File([${JSON.stringify(string(exported.text))}], "copy.tldr", { type: "application/json" })); input.files = data.files; input.dispatchEvent(new Event("change")) })()`,
+	)
+	wait(session, `${shapes} === 2 && ${saved}`)
+	assert(
+		true,
+		"importing a .tldr file adds its shapes to the board and saves them",
+	)
+	evaluate(
+		session,
+		`(() => { let input = document.querySelector("#import-drawing"), data = new DataTransfer(); let records = ${JSON.stringify(file.records)}; let shape = records.find(record => record.typeName === "shape"); data.items.add(new File([JSON.stringify({ ...${JSON.stringify(file)}, records: [...records, shape] })], "twice.tldr")); input.files = data.files; input.dispatchEvent(new Event("change")) })()`,
+	)
+	wait(
+		session,
+		'document.querySelector("#toast")?.textContent.includes("twice")',
+	)
+	assert(
+		evaluate(session, `${shapes} === 2`),
+		"a .tldr file holding a record twice is rejected without changing the board",
+	)
+
+	browser(session, "click", "#dialog .dialog-close")
+	wait(session, '!document.querySelector("#dialog").open')
+	browser(session, "click", '[data-action^="drawing:"]')
+	wait(session, `${mounted} && ${shapes} === 2`)
+	assert(true, "closing and reopening the board shows the saved shapes")
+	browser(session, "click", "#dialog .dialog-close")
+	browser(session, "reload")
+	wait(
+		session,
+		'document.querySelector("#editor")?.value.startsWith("# Board journal")',
+	)
+	wait(session, "!!navigator.serviceWorker.controller")
+	browser(session, "set", "offline", "on")
+	browser(session, "reload")
+	wait(
+		session,
+		'document.querySelector("#editor")?.value.startsWith("# Board journal")',
 	)
 	browser(session, "click", '[data-action="tools"]')
 	browser(session, "click", '[data-action^="drawing:"]')
-	wait(session, `${shapes} === 3`)
-	assert(
-		evaluate(
-			session,
-			'document.querySelector("#embed-board span").textContent === "Done"',
-		),
-		"reopening an embedded drawing keeps its shapes and offers Done",
-	)
-	browser(session, "click", '[data-tool="text"]')
-	browser(session, "mouse", "move", "200", "150")
-	browser(session, "mouse", "down")
-	browser(session, "mouse", "up")
-	wait(session, '!document.querySelector("#drawing-text").hidden')
-	browser(session, "fill", "#drawing-text", "Closing preserves this draft")
-	evaluate(session, 'document.querySelector("#dialog").close();true')
-	wait(session, '!document.querySelector("#dialog").open')
-	browser(session, "click", '[data-action^="drawing:"]')
+	wait(session, `${mounted} && ${shapes} === 2`)
+	browser(session, "click", '[data-testid="tools.rectangle"]')
+	drag(session, [0.6, 0.6], [0.7, 0.7])
 	wait(
 		session,
-		'document.querySelector("#whiteboard")?.textContent.includes("Closing preserves this draft")',
+		`${shapes} === 3 && document.querySelector("#save-status").textContent === "Saved on this device"`,
 	)
 	assert(
 		true,
-		"Closing the whiteboard commits its active text draft before releasing writes",
+		"offline the board opens from local assets and keeps new shapes on the device",
 	)
-	verifyWhiteboardParity(session)
+	browser(session, "set", "offline", "off")
+	evaluate(session, 'window.dispatchEvent(new Event("focus"))')
+	wait(session, saved)
+
+	evaluate(
+		session,
+		'window.originalAdd = IDBObjectStore.prototype.add; IDBObjectStore.prototype.add = function () { throw new DOMException("The disk is full", "QuotaExceededError") }',
+	)
+	browser(session, "click", '[data-testid="tools.rectangle"]')
+	drag(session, [0.2, 0.6], [0.3, 0.7])
+	wait(session, `${shapes} === 4`)
+	browser(session, "click", "#dialog .dialog-close")
+	wait(
+		session,
+		'!document.querySelector("#dialog").open && document.querySelector("#toast")?.textContent.includes("return when you open it again")',
+	)
+	evaluate(
+		session,
+		"IDBObjectStore.prototype.add = window.originalAdd; delete window.originalAdd",
+	)
+	browser(session, "click", '[data-action^="drawing:"]')
+	wait(session, `${mounted} && ${shapes} === 4 && ${saved}`)
+	browser(session, "click", "#dialog .dialog-close")
+	browser(session, "reload")
+	browser(session, "click", '[data-action="tools"]')
+	browser(session, "click", '[data-action^="drawing:"]')
+	wait(session, `${mounted} && ${shapes} === 4`)
+	assert(
+		true,
+		"edits a failed close could not save return when the board reopens and are then saved",
+	)
+
+	let snapshot = object(
+		evaluate(
+			session,
+			'fetch("/api/library").then(response => response.json())',
+		),
+	)
+	let workspaces = snapshot.workspaces
+	if (!Array.isArray(workspaces) || !workspaces[0])
+		throw new Error("Missing personal workspace")
+	let workspace = string(object(workspaces[0]).workspace)
+	browser(reader, "set", "viewport", "1280", "800")
+	browser(reader, "open", url)
+	wait(reader, 'document.querySelector("[data-document-app]") !== null')
+	wait(reader, 'fetch("/api/accounts/session").then(response => response.ok)')
+	let account = object(
+		evaluate(
+			reader,
+			'fetch("/api/accounts/session").then(response => response.json())',
+		),
+	)
+	if (typeof account.subject !== "string") {
+		browser(reader, "click", '[data-action="sign-in"]')
+		wait(reader, 'document.querySelector("#toast")?.textContent === ""')
+	}
+	let subject = string(
+		object(
+			evaluate(
+				reader,
+				'fetch("/api/accounts/session").then(response => response.json())',
+			),
+		).subject,
+	)
+	let membership = new URL(
+		`/api/workspaces/${workspace}/members/${subject}`,
+		origin,
+	).href
+	let grant = (role: string) =>
+		evaluate(
+			session,
+			`fetch(${JSON.stringify(membership)}, {method:"PUT",headers:{"content-type":"application/json"},body:JSON.stringify({role:${JSON.stringify(role)},request:${JSON.stringify(role + "-v1")}})}).then(response=>response.ok)`,
+		)
+	assert(grant("reader"), "the owner grants reader access")
+	browser(reader, "open", url + "/doc/" + documentId)
+	wait(
+		reader,
+		'document.querySelector("#editor")?.value.startsWith("# Board journal")',
+	)
+	browser(reader, "click", '[data-action="tools"]')
+	browser(reader, "click", '[data-action^="drawing:"]')
+	wait(reader, `${mounted} && ${shapes} === 4`)
+	assert(
+		evaluate(
+			reader,
+			`${editor}.getIsReadonly() && !document.querySelector("[data-read-only]").hidden && document.querySelector("#drawing-undo").disabled && document.querySelector("#import-drawing").disabled`,
+		),
+		"a reader sees the board read-only without writing controls",
+	)
+
+	assert(grant("writer"), "the owner promotes the member to writer")
+	evaluate(reader, 'window.dispatchEvent(new Event("focus"))')
+	wait(
+		reader,
+		`!${editor}.getIsReadonly() && !document.querySelector("#drawing-undo").disabled`,
+	)
+	browser(session, "click", '[data-action^="drawing:"]')
+	wait(session, `${mounted} && ${shapes} === 4`)
+	browser(reader, "click", '[data-testid="tools.rectangle"]')
+	drag(reader, [0.4, 0.15], [0.5, 0.25])
+	wait(reader, `${shapes} === 5 && ${saved}`)
+	wait(session, `${shapes} === 5`)
+	assert(true, "a collaborator's shape appears on the open board")
+	let target = canvasPoint(reader, [0.55, 0.5])
+	browser(reader, "mouse", "move", String(target.x), String(target.y))
+	browser(reader, "mouse", "move", String(target.x + 20), String(target.y + 10))
+	wait(
+		session,
+		`${editor}.store.query.records("instance_presence").get().some(peer => peer.cursor) && document.querySelector("[data-drawing-people]").textContent.includes("1 other")`,
+	)
+	assert(true, "a collaborator's cursor shows as a tldraw collaborator")
+	browser(reader, "click", "#dialog .dialog-close")
+	wait(
+		session,
+		`${editor}.store.query.records("instance_presence").get().length === 0`,
+	)
+	assert(true, "closing the board withdraws the collaborator's presence")
 } finally {
-	try {
-		browser(session, "close")
-	} catch {}
+	for (let name of [session, reader])
+		try {
+			browser(name, "close")
+		} catch {}
 	server.kill("SIGTERM")
 	await server.exited
 }
 
-function canvasPoint(session: string, [x, y]: [number, number]) {
-	let result = evaluate(
-		session,
-		`(() => { let rect = document.querySelector("#whiteboard").getBoundingClientRect(); return JSON.stringify({ x: Math.round(rect.left + rect.width * ${x}), y: Math.round(rect.top + rect.height * ${y}) }) })()`,
+function canvasPoint(name: string, [x, y]: [number, number]) {
+	let value = evaluate(
+		name,
+		`JSON.stringify((() => { let bounds = document.querySelector(".tl-canvas").getBoundingClientRect(); return { x: Math.round(bounds.left + bounds.width * ${x}), y: Math.round(bounds.top + bounds.height * ${y}) } })())`,
 	)
-	return parsePoint(result)
-}
-function point(session: string, element: string) {
-	let result = evaluate(
-		session,
-		`(() => { let rect = (${element}).getBoundingClientRect(); return JSON.stringify({ x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top + rect.height / 2) }) })()`,
-	)
-	return parsePoint(result)
-}
-function parsePoint(value: unknown) {
-	let parsed: unknown = JSON.parse(String(value))
-	if (
-		!parsed ||
-		typeof parsed !== "object" ||
-		!("x" in parsed) ||
-		!("y" in parsed) ||
-		typeof parsed.x !== "number" ||
-		typeof parsed.y !== "number"
-	)
+	let point = object(JSON.parse(String(value)))
+	if (typeof point.x !== "number" || typeof point.y !== "number")
 		throw new Error("Expected a point")
-	return { x: parsed.x, y: parsed.y }
+	return { x: point.x, y: point.y }
 }
-function shapeWidth(session: string) {
-	return Number(
-		evaluate(
-			session,
-			'document.querySelector("#whiteboard [data-shape] rect").getBoundingClientRect().width',
-		),
-	)
-}
-function mouseDrag(
-	session: string,
-	from: { x: number; y: number },
-	to: { x: number; y: number },
-) {
-	browser(session, "mouse", "move", String(from.x), String(from.y))
-	browser(session, "mouse", "down")
+
+function drag(name: string, from: [number, number], to: [number, number]) {
+	let start = canvasPoint(name, from),
+		end = canvasPoint(name, to)
+	browser(name, "mouse", "move", String(start.x), String(start.y))
+	browser(name, "mouse", "down")
 	for (let step of [0.25, 0.5, 0.75, 1])
 		browser(
-			session,
+			name,
 			"mouse",
 			"move",
-			String(Math.round(from.x + (to.x - from.x) * step)),
-			String(Math.round(from.y + (to.y - from.y) * step)),
+			String(Math.round(start.x + (end.x - start.x) * step)),
+			String(Math.round(start.y + (end.y - start.y) * step)),
 		)
-	browser(session, "mouse", "up")
-}
-function drag(session: string, from: [number, number], to: [number, number]) {
-	mouseDrag(session, canvasPoint(session, from), canvasPoint(session, to))
-}
-function click(session: string, at: [number, number]) {
-	let target = canvasPoint(session, at)
-	browser(session, "mouse", "move", String(target.x), String(target.y))
-	browser(session, "mouse", "down")
-	browser(session, "mouse", "up")
+	browser(name, "mouse", "up")
 }

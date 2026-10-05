@@ -22,7 +22,7 @@ import { unzip, zip } from "../shared/zip"
 import type { ZipEntry } from "../shared/zip"
 import type { BrowserLibrary } from "./browser-library"
 import { showProgress } from "./components/progress"
-import { drawingPreview } from "./drawing-svg"
+import { drawingSvg } from "./document-media"
 
 type Library = Context.Service.Shape<typeof BrowserLibrary>
 type OpenedDocument = Effect.Success<ReturnType<Library["open"]>>
@@ -182,6 +182,18 @@ export function importPlan(
 	workspace?: string,
 ) {
 	return Effect.gen(function* () {
+		let drawings = plan.documents.flatMap(document =>
+			[
+				document.drawing,
+				...document.assets.map(asset => asset.drawing),
+			].flatMap(drawing => (drawing?.kind === "tldraw" ? [drawing.file] : [])),
+		)
+		if (drawings.length) {
+			let { checkBoardFile } = yield* Effect.tryPromise(
+				() => import("./whiteboard-store"),
+			)
+			yield* Effect.try(() => drawings.forEach(checkBoardFile))
+		}
 		let random = yield* Crypto.Crypto
 		let identities = new Map<string, string>()
 		for (let key of archiveIdentityKeys(plan))
@@ -199,7 +211,7 @@ export function importPlan(
 						let opened = yield* library.open(id)
 						let references = new Map<string, string>()
 						for (let asset of document.assets)
-							if (!asset.shapes)
+							if (!asset.drawing)
 								references.set(
 									asset.path,
 									yield* opened.blobs.store(
@@ -266,10 +278,8 @@ function archiveSnapshot(
 			{ concurrency: 4, discard: true },
 		)
 		for (let board of contents.whiteboards) {
-			let buffer = yield* Effect.tryPromise(() =>
-				drawingPreview(replica.fields(board)).arrayBuffer(),
-			)
-			media.set(board, new Uint8Array(buffer))
+			let svg = yield* drawingSvg(replica.fields(board))
+			media.set(board, new TextEncoder().encode(svg))
 		}
 		let snapshot: ArchiveSnapshot = {
 			document,
@@ -314,6 +324,11 @@ function drawingDocument(name: string, data: Uint8Array<ArrayBuffer>) {
 			name: image + ".svg",
 			data: encoder.encode('<svg xmlns="http://www.w3.org/2000/svg"/>'),
 		},
-		{ name: image + ".svg.alkalye-drawing.json", data },
+		{
+			name:
+				image +
+				(/\.tldr$/i.test(name) ? ".svg.tldr" : ".svg.alkalye-drawing.json"),
+			data,
+		},
 	]
 }

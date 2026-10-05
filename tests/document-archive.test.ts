@@ -17,7 +17,7 @@ import type { ArchivePlan } from "../src/shared/document-archive"
 import { buildAction } from "../src/shared/document-actions"
 import { blobContentType, blobReference } from "../src/shared/document-blobs"
 import { commentRange, newDocument } from "../src/shared/documents"
-import { drawingShapes } from "../src/shared/drawing"
+import { legacyShapes } from "../src/shared/legacy-drawing"
 import { frontmatter } from "../src/shared/markdown"
 import { unzip, zip } from "../src/shared/zip"
 import type { ZipEntry } from "../src/shared/zip"
@@ -103,7 +103,7 @@ test("a document archive round-trips text, assets, whiteboards, themes, comments
 		name: "Sketch",
 	})
 	expect(
-		[...drawingShapes(result.fields(board ?? "")).values()].map(shape => ({
+		[...legacyShapes(result.fields(board ?? "")).values()].map(shape => ({
 			kind: shape.kind,
 			text: shape.text,
 		})),
@@ -350,7 +350,7 @@ test("large whiteboards and discussions import in actions within the server limi
 		step.build(replica)
 	}
 	let board = archiveContents(replica, id).whiteboards[0] ?? ""
-	expect(drawingShapes(replica.fields(board)).size).toBe(2300)
+	expect(legacyShapes(replica.fields(board)).size).toBe(2300)
 	let discussion = archiveContents(replica, id).comments
 	expect(discussion).toHaveLength(150)
 	let last = replica.fields(discussion.at(-1) ?? "")
