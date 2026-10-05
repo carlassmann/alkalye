@@ -564,6 +564,7 @@ function makeDocumentStore() {
 				getBlob: Effect.fn("WorkspaceStore.getBlob")(getBlob),
 				create: Effect.fn("WorkspaceStore.create")(createWorkspace),
 				rename: Effect.fn("WorkspaceStore.rename")(renameWorkspace),
+				avatar: Effect.fn("WorkspaceStore.avatar")(changeAvatar),
 				remove: Effect.fn("WorkspaceStore.remove")(deleteWorkspace),
 				membership: Effect.fn("WorkspaceStore.membership")(changeMembership),
 				moveDocument: Effect.fn("WorkspaceStore.moveDocument")(moveDocument),
@@ -1003,6 +1004,33 @@ function makeDocumentStore() {
 					workspace: id,
 					subject: identity.subject,
 					change: { kind: "renamed", name },
+				})
+				return yield* transact(
+					Effect.gen(function* () {
+						if (
+							(yield* workspace.workspaceRole(
+								id,
+								identity.subject,
+								identity.access,
+							)) !== "owner"
+						)
+							return yield* forbidden()
+						return yield* writeWorkspace(fact)
+					}),
+					finishWorkspace,
+				)
+			})
+		}
+		// Only an owner changes a space's avatar; personal workspaces have none.
+		function changeAvatar(id: string, image: string | null, request: string) {
+			return Effect.gen(function* () {
+				let identity = yield* Identity
+				if (id.startsWith("personal-")) return yield* forbidden()
+				let fact = yield* Schema.decodeUnknownEffect(WorkspaceFactSchema)({
+					id: request,
+					workspace: id,
+					subject: identity.subject,
+					change: { kind: "avatar", image },
 				})
 				return yield* transact(
 					Effect.gen(function* () {

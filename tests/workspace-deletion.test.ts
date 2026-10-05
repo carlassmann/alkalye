@@ -388,8 +388,9 @@ test("deletions survive restarts and the tombstone migration upgrades existing d
 		let database = new Database(join(data, "documents.sqlite"))
 		database.run("UPDATE workspaces SET deleted=0")
 		database.run("ALTER TABLE workspaces DROP COLUMN deleted")
+		// Later migrations postdate tombstones, so they roll back as well.
 		database.run(
-			"DELETE FROM document_projection_migrations WHERE name='workspace_tombstones'",
+			"DELETE FROM document_projection_migrations WHERE name IN ('workspace_tombstones','workspace_avatars')",
 		)
 		database.close()
 		let upgraded = await Effect.runPromise(

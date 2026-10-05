@@ -339,6 +339,14 @@ export let german: Record<string, string> = {
 	"Slide preview": "Folienvorschau",
 	"Hold and drag to draw a laser trail. It fades after you release.":
 		"Auf der Vorschau gedrückt halten und ziehen. Die Laserspur verblasst nach dem Loslassen.",
+	"Target display": "Zielbildschirm",
+	"Choose display": "Bildschirm auswählen",
+	"Display {number} · {width} × {height}":
+		"Bildschirm {number} · {width} × {height}",
+	"Choose the slideshow you want to point at.":
+		"Wähle die Präsentation, auf die du zeigen möchtest.",
+	"Open this slideshow on another screen or device signed into the same account.":
+		"Öffne diese Präsentation auf einem anderen Bildschirm oder Gerät mit demselben Konto.",
 	"done tasks": "erledigte Aufgaben",
 	Fade: "Ausblenden",
 	"Auto-sort tasks": "Aufgaben automatisch sortieren",
@@ -495,4 +503,38 @@ export let german: Record<string, string> = {
 	"Share it to be added to a space by its owner.":
 		"Teile sie, damit dich der Eigentümer eines Bereichs hinzufügen kann.",
 	"Account ID": "Konto-ID",
+	Themes: "Designs",
+	"Custom styling for previews and slideshows.":
+		"Eigene Gestaltung für Vorschau und Präsentation.",
+	"Upload theme": "Design hochladen",
+	"Uploading...": "Wird hochgeladen...",
+	"No themes yet": "Noch keine Designs",
+	"Upload a theme file to customize the appearance":
+		"Lade ein Design hoch, um das Erscheinungsbild anzupassen",
+	"Preview & Slideshow": "Vorschau & Präsentation",
+	"Delete theme": "Design löschen",
+	'Are you sure you want to delete "{name}"? Documents using this theme will fall back to default styles.':
+		'Möchtest du "{name}" wirklich löschen? Dokumente, die dieses Design verwenden, fallen auf Standardstile zurück.',
+	Dismiss: "Verwerfen",
+	None: "Keines",
+	"and {count} more...": "und {count} weitere...",
+	"in workbench": "in der Werkbank",
+	Export: "Exportieren",
+	"This theme could not be read": "Dieses Design konnte nicht gelesen werden",
+	"This ZIP file could not be opened":
+		"Diese ZIP-Datei konnte nicht geöffnet werden",
+	"This ZIP file does not contain a theme":
+		"Diese ZIP-Datei enthält kein Design",
+	"Space avatar": "Bereich-Avatar",
+	Upload: "Hochladen",
+	"Crop avatar": "Avatar zuschneiden",
+	"Drag to reposition, scroll or pinch to zoom.":
+		"Ziehe zum Verschieben, scrolle oder ziehe mit zwei Fingern zum Zoomen.",
+	"Remove avatar?": "Avatar entfernen?",
+	"The space avatar will be removed and replaced with initials.":
+		"Der Avatar wird entfernt und durch Initialen ersetzt.",
+	"This browser cannot crop images":
+		"Dieser Browser kann keine Bilder zuschneiden",
+	"This image is too detailed for an avatar":
+		"Dieses Bild ist für einen Avatar zu detailreich",
 }

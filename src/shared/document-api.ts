@@ -25,6 +25,7 @@ import {
 	InvitationDigestSchema,
 	LibrarySnapshotSchema,
 	WorkspaceDeletionRefused,
+	WorkspaceAvatarSchema,
 	WorkspaceSnapshotSchema,
 } from "./workspace"
 import {
@@ -352,6 +353,15 @@ export let DocumentApi = HttpApi.make("DocumentApi").add(
 				params: { workspace: IdentifierSchema },
 				payload: Schema.Struct({
 					name: Schema.NonEmptyString,
+					request: Schema.NonEmptyString,
+				}),
+				success: Schema.Natural,
+				error: errors,
+			}),
+			HttpApiEndpoint.put("avatar", "/api/workspaces/:workspace/avatar", {
+				params: { workspace: IdentifierSchema },
+				payload: Schema.Struct({
+					image: Schema.NullOr(WorkspaceAvatarSchema),
 					request: Schema.NonEmptyString,
 				}),
 				success: Schema.Natural,

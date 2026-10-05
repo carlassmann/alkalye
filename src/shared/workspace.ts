@@ -12,6 +12,14 @@ export let InvitationDigestSchema = Schema.String.check(
 	Schema.isPattern(/^[\w-]{42}[AEIMQUYcgkosw048]$/),
 )
 
+// A space's avatar: a small square image, kept inline so libraries stay
+// complete offline.
+export let WorkspaceAvatarSchema = Schema.String.check(
+	Schema.isMaxLength(120_000),
+	Schema.isPattern(
+		/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/,
+	),
+)
 export let WorkspaceChangeSchema = Schema.Union([
 	Schema.Struct({
 		kind: Schema.Literal("preferences"),
@@ -24,6 +32,10 @@ export let WorkspaceChangeSchema = Schema.Union([
 	Schema.Struct({
 		kind: Schema.Literal("created"),
 		name: Schema.NonEmptyString,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("avatar"),
+		image: Schema.NullOr(WorkspaceAvatarSchema),
 	}),
 	Schema.Struct({
 		kind: Schema.Literal("membership"),
@@ -107,6 +119,7 @@ export let WorkspaceSnapshotSchema = Schema.Struct({
 	name: Schema.String,
 	owner: IdentifierSchema,
 	position: Schema.Natural,
+	avatar: Schema.optionalKey(WorkspaceAvatarSchema),
 	members: Schema.Array(MembershipSchema),
 	documents: Schema.Array(SidebarDocumentSchema),
 })
@@ -117,6 +130,7 @@ export let LibraryWorkspaceSchema = Schema.Struct({
 	owner: IdentifierSchema,
 	position: Schema.Natural,
 	role: AccessRoleSchema,
+	avatar: Schema.optionalKey(WorkspaceAvatarSchema),
 })
 export let LibraryDocumentSchema = Schema.Struct({
 	...SidebarDocumentSchema.fields,

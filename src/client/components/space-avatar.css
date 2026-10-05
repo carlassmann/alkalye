@@ -1,0 +1,52 @@
+.space-avatar {
+	display: inline-grid;
+	flex-shrink: 0;
+	place-items: center;
+	width: 16px;
+	height: 16px;
+	overflow: hidden;
+	border-radius: 4px;
+	background: var(--raised);
+	color: var(--muted);
+	font-size: 8px;
+	font-weight: 500;
+	line-height: 1;
+	object-fit: cover;
+}
+.space-avatar[data-size="md"] {
+	width: 48px;
+	height: 48px;
+	border-radius: 8px;
+	font-size: 16px;
+}
+[data-avatar-cropper] {
+	position: relative;
+	height: 256px;
+	overflow: hidden;
+	border-radius: 6px;
+	background: #111;
+	cursor: grab;
+	touch-action: none;
+	user-select: none;
+}
+[data-avatar-cropper]:active {
+	cursor: grabbing;
+}
+[data-avatar-cropper]:focus-visible {
+	outline: 2px solid var(--brand);
+	outline-offset: 2px;
+}
+[data-avatar-cropper] img {
+	position: absolute;
+	max-width: none;
+	pointer-events: none;
+}
+[data-avatar-cropper] .avatar-crop-window {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	border: 1px solid rgb(255 255 255 / 0.8);
+	box-shadow: 0 0 0 9999px rgb(0 0 0 / 0.5);
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}

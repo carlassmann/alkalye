@@ -25,6 +25,7 @@ import {
 	WorkspaceFactSchema,
 	MembershipSchema,
 	LibraryWorkspaceSchema,
+	WorkspaceAvatarSchema,
 	AccessRoleSchema,
 } from "../shared/workspace"
 import { publicMember } from "../shared/workspace"
@@ -87,6 +88,12 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 		Result: WorkspaceRecordSchema,
 		execute: id =>
 			sql`SELECT name,owner,position,deleted FROM workspaces WHERE workspace=${id}`,
+	})
+	let workspaceAvatar = SqlSchema.findOneOption({
+		Request: Schema.String,
+		Result: Schema.Struct({ image: WorkspaceAvatarSchema }),
+		execute: id =>
+			sql`SELECT image FROM workspace_avatars WHERE workspace=${id}`,
 	})
 	let document = SqlSchema.findOneOption({
 		Request: Schema.String,
@@ -209,6 +216,7 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 					if (!columns.length)
 						yield* sql`ALTER TABLE workspaces ADD COLUMN deleted INTEGER NOT NULL DEFAULT 0`
 				}),
+				"009_workspace_avatars": sql`CREATE TABLE IF NOT EXISTS workspace_avatars(workspace TEXT PRIMARY KEY,image TEXT NOT NULL,FOREIGN KEY(workspace) REFERENCES workspaces(workspace))`,
 			}),
 		}).pipe(Effect.provideService(SqlClient.SqlClient, sql))
 	}
@@ -236,6 +244,12 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 					break
 				case "renamed":
 					yield* sql`UPDATE workspaces SET name=${change.name} WHERE workspace=${fact.workspace}`
+					break
+				case "avatar":
+					if (change.image === null)
+						yield* sql`DELETE FROM workspace_avatars WHERE workspace=${fact.workspace}`
+					else
+						yield* sql`INSERT INTO workspace_avatars VALUES (${fact.workspace},${change.image}) ON CONFLICT(workspace) DO UPDATE SET image=excluded.image`
 					break
 				case "created":
 					yield* sql`INSERT INTO workspaces(workspace,name,owner,position) VALUES (${fact.workspace},${change.name},${fact.subject},${stored.value.position})`
@@ -493,10 +507,12 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 				execute: id =>
 					sql`SELECT d.document,d.workspace,d.owner,s.log,s.position,s.deleted,s.metadata FROM workspace_documents d JOIN document_summaries s ON s.document=d.document WHERE d.workspace=${id} ORDER BY d.document`,
 			})(id)
+			let avatar = yield* workspaceAvatar(id)
 
 			return {
 				workspace: id,
 				...record.value,
+				...(Option.isSome(avatar) ? { avatar: avatar.value.image } : {}),
 				members,
 				documents: documents.map(row => ({
 					...row,
@@ -521,10 +537,17 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 		return Effect.gen(function* () {
 			let workspaces = yield* SqlSchema.findAll({
 				Request: Schema.String,
-				Result: LibraryWorkspaceSchema,
+				Result: Schema.Struct({
+					...LibraryWorkspaceSchema.fields,
+					avatar: Schema.NullOr(WorkspaceAvatarSchema),
+				}),
 				execute: subject =>
-					sql`SELECT w.workspace,w.name,w.owner,w.position,CASE WHEN w.owner=${subject} THEN 'owner' ELSE m.role END AS role FROM workspaces w LEFT JOIN workspace_grants m ON m.workspace=w.workspace AND m.member=${subject} WHERE w.deleted=0 AND (w.owner=${subject} OR m.role IS NOT NULL) ORDER BY w.workspace`,
-			})(subject)
+					sql`SELECT w.workspace,w.name,w.owner,w.position,CASE WHEN w.owner=${subject} THEN 'owner' ELSE m.role END AS role,v.image AS avatar FROM workspaces w LEFT JOIN workspace_grants m ON m.workspace=w.workspace AND m.member=${subject} LEFT JOIN workspace_avatars v ON v.workspace=w.workspace WHERE w.deleted=0 AND (w.owner=${subject} OR m.role IS NOT NULL) ORDER BY w.workspace`,
+			})(subject).pipe(
+				Effect.map(rows =>
+					rows.map(({ avatar, ...row }) => (avatar ? { ...row, avatar } : row)),
+				),
+			)
 			let documents = yield* SqlSchema.findAll({
 				Request: Schema.String,
 				Result: Schema.Struct({

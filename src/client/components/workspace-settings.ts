@@ -8,6 +8,7 @@ import { html, joinMarkup, translate } from "../language"
 import { confirmDialog, openDialog } from "./dialog"
 import { PickerElement, pickerMarkup } from "./menu"
 import { screenIcon } from "./screen-icons"
+import { avatarLayout, cropAvatar, spaceAvatar } from "./space-avatar"
 
 export interface WorkspaceSettingsOptions {
 	readonly workspace: string
@@ -23,6 +24,8 @@ export interface WorkspaceSettingsOptions {
 	}
 	readonly load: Effect.Effect<WorkspaceSnapshot, unknown>
 	readonly rename: (name: string) => Effect.Effect<unknown, unknown>
+	// Sets or, with null, removes the space's avatar.
+	readonly avatar?: (image: string | null) => Effect.Effect<unknown, unknown>
 	readonly member: (
 		member: string,
 		role: "writer" | "reader" | null,
@@ -66,6 +69,7 @@ export class WorkspaceSettingsElement extends HTMLElement {
 						abort => Effect.sync(() => abort.abort()),
 					)
 					let space: WorkspaceSnapshot | undefined
+					let uploading = false
 					let dialog = () =>
 						options.dialog ??
 						document.querySelector<HTMLDialogElement>("dialog[data-dialog]") ??
@@ -101,7 +105,7 @@ export class WorkspaceSettingsElement extends HTMLElement {
 					let render = Effect.gen(function* () {
 						if (options.local) return frame(localMarkup(options))
 						space = yield* options.load
-						frame(spaceMarkup(space, options))
+						frame(spaceMarkup(space, options, uploading))
 					})
 					function frame(content: ReturnType<typeof html>) {
 						setMarkup(
@@ -255,6 +259,86 @@ export class WorkspaceSettingsElement extends HTMLElement {
 								)
 							}
 					}
+					function chooseAvatar(file: File) {
+						let target = dialog()
+						let save = options.avatar
+						if (!target || !save) return
+						let saveAvatar = save
+						let url = URL.createObjectURL(file)
+						openDialog(
+							target,
+							options.report,
+							() => {},
+							translate("Crop avatar"),
+							html`<p class="muted">
+									${translate("Drag to reposition, scroll or pinch to zoom.")}
+								</p>
+								<div
+									data-avatar-cropper
+									tabindex="0"
+									role="img"
+									aria-label="${translate("Drag to reposition, scroll or pinch to zoom.")}"
+								>
+									<img alt="" src="${url}" /><span
+										class="avatar-crop-window"
+									></span>
+								</div>`,
+							() => {
+								let image = cropper.crop()
+								uploading = true
+								if (space) frame(spaceMarkup(space, options, uploading))
+								run(
+									saveAvatar(image).pipe(
+										Effect.ensuring(
+											Effect.sync(() => {
+												uploading = false
+											}),
+										),
+										Effect.andThen(render),
+										Effect.catch(error =>
+											Effect.sync(() => {
+												options.report(error)
+												if (space) frame(spaceMarkup(space, options, uploading))
+											}),
+										),
+									),
+								)
+								return Promise.resolve()
+							},
+						)
+						let cropper = avatarCropper(target)
+						target.addEventListener(
+							"close",
+							() => {
+								cropper.dispose()
+								URL.revokeObjectURL(url)
+							},
+							{ once: true },
+						)
+					}
+					function removeAvatar() {
+						let target = dialog()
+						let save = options.avatar
+						if (!target || !save) return
+						let saveAvatar = save
+						run(
+							confirmDialog(
+								target,
+								translate(
+									"The space avatar will be removed and replaced with initials.",
+								),
+								translate("Remove"),
+								translate("Remove avatar?"),
+							).pipe(
+								Effect.flatMap(confirmed =>
+									confirmed
+										? saveAvatar(null).pipe(Effect.andThen(render))
+										: Effect.void,
+								),
+								Effect.catch(error => Effect.sync(() => options.report(error))),
+							),
+						)
+					}
 					function leave() {
 						let target = dialog()
 						if (!target || !space) return
@@ -343,6 +427,15 @@ export class WorkspaceSettingsElement extends HTMLElement {
 					host.addEventListener(
 						"change",
 						event => {
+							if (
+								event.target instanceof HTMLInputElement &&
+								event.target.matches("[data-avatar-file]")
+							) {
+								let file = event.target.files?.[0]
+								event.target.value = ""
+								if (file) chooseAvatar(file)
+								return
+							}
 							let form =
 								event.target instanceof Element
 									? event.target.closest("form[data-rename]")
@@ -369,6 +462,11 @@ export class WorkspaceSettingsElement extends HTMLElement {
 							else if (action === "edit-member" && control.dataset.member)
 								editMember(control.dataset.member)
 							else if (action === "leave") leave()
+							else if (action === "avatar-upload")
+								host
+									.querySelector<HTMLInputElement>("[data-avatar-file]")
+									?.click()
+							else if (action === "avatar-remove") removeAvatar()
 							else if (action === "delete") remove()
 							else if (action === "refresh" && options.local)
 								perform(options.local.refresh)
@@ -425,6 +523,7 @@ function roleLabel(role: "owner" | "writer" | "reader") {
 function spaceMarkup(
 	space: WorkspaceSnapshot,
 	options: WorkspaceSettingsOptions,
+	uploading: boolean,
 ) {
 	let owner = space.owner === options.subject
 	let editable = owner && !options.personal
@@ -457,6 +556,47 @@ function spaceMarkup(
 									value="${space.name}"
 									disabled
 								/>`
+				}${
+					options.personal || !options.avatar
+						? ""
+						: html`<div class="space-avatar-field">
+								<div class="space-label">${translate("Space avatar")}</div>
+								<div class="space-avatar-row">
+									${spaceAvatar(space.name, space.avatar, "md")}<button
+										type="button"
+										class="outline${uploading ? " spinning" : ""}"
+										data-workspace="avatar-upload"
+										${editable && !uploading ? "" : "disabled"}
+									>
+										${
+											uploading
+												? html`${icon("refresh-cw")}<span
+															>${translate("Uploading...")}</span
+														>`
+												: html`${icon("upload")}<span
+															>${translate(space.avatar ? "Change" : "Upload")}</span
+														>`
+										}</button
+									>${
+										space.avatar
+											? html`<button
+													type="button"
+													class="outline"
+													data-workspace="avatar-remove"
+													${editable && !uploading ? "" : "disabled"}
+												>
+													${icon("trash-2")}<span>${translate("Remove")}</span>
+												</button>`
+											: ""
+									}<input
+										type="file"
+										accept="image/*"
+										hidden
+										data-avatar-file
+										aria-label="${translate("Space avatar")}"
+									/>
+								</div>
+							</div>`
 				}
 			</div>
 		</section>
@@ -605,4 +745,119 @@ function localMarkup(options: WorkspaceSettingsOptions) {
 				</div>
 			</div>
 		</section>`
+}
+
+// Drag moves the image under the square window; the wheel, a pinch, or the
+// keyboard (arrows move, + and - zoom) changes the zoom.
+function avatarCropper(dialog: HTMLDialogElement) {
+	let stage = dialog.querySelector<HTMLElement>("[data-avatar-cropper]")
+	let image = stage?.querySelector("img")
+	let frame = stage?.querySelector<HTMLElement>(".avatar-crop-window")
+	if (!stage || !image || !frame) throw new Error("Avatar cropper missing")
+	let surface = stage,
+		picture = image,
+		square = frame
+	let events = new AbortController()
+	let view = { zoom: 1, x: 0, y: 0 }
+	let pointers = new Map<number, { x: number; y: number }>()
+	let pinch = 0
+	function layout() {
+		let natural = {
+			width: picture.naturalWidth || 1,
+			height: picture.naturalHeight || 1,
+		}
+		return avatarLayout({
+			width: surface.clientWidth,
+			height: surface.clientHeight,
+			image: natural,
+			...view,
+		})
+	}
+	function paint() {
+		let current = layout()
+		view = { zoom: current.zoom, x: current.x, y: current.y }
+		square.style.width = square.style.height = current.size + "px"
+		picture.style.width = picture.naturalWidth * current.scale + "px"
+		picture.style.height = picture.naturalHeight * current.scale + "px"
+		picture.style.left = current.left + "px"
+		picture.style.top = current.top + "px"
+	}
+	picture.addEventListener("load", paint, { signal: events.signal })
+	if (picture.complete) paint()
+	surface.addEventListener(
+		"pointerdown",
+		event => {
+			pointers.set(event.pointerId, { x: event.clientX, y: event.clientY })
+			pinch = spread()
+			if (event.isTrusted) surface.setPointerCapture(event.pointerId)
+		},
+		{ signal: events.signal },
+	)
+	surface.addEventListener(
+		"pointermove",
+		event => {
+			let previous = pointers.get(event.pointerId)
+			if (!previous) return
+			pointers.set(event.pointerId, { x: event.clientX, y: event.clientY })
+			if (pointers.size > 1) {
+				let distance = spread()
+				if (pinch > 0) view.zoom *= distance / pinch
+				pinch = distance
+			} else {
+				view.x += event.clientX - previous.x
+				view.y += event.clientY - previous.y
+			}
+			paint()
+		},
+		{ signal: events.signal },
+	)
+	for (let type of ["pointerup", "pointercancel"])
+		surface.addEventListener(
+			type,
+			event => {
+				if (event instanceof PointerEvent) pointers.delete(event.pointerId)
+				pinch = spread()
+			},
+			{ signal: events.signal },
+		)
+	surface.addEventListener(
+		"wheel",
+		event => {
+			event.preventDefault()
+			view.zoom *= Math.exp(-event.deltaY * 0.002)
+			paint()
+		},
+		{ signal: events.signal, passive: false },
+	)
+	surface.addEventListener(
+		"keydown",
+		event => {
+			let step = event.shiftKey ? 40 : 10
+			let moves: Record<string, () => void> = {
+				ArrowLeft: () => (view.x += step),
+				ArrowRight: () => (view.x -= step),
+				ArrowUp: () => (view.y += step),
+				ArrowDown: () => (view.y -= step),
+				"+": () => (view.zoom *= 1.1),
+				"=": () => (view.zoom *= 1.1),
+				"-": () => (view.zoom /= 1.1),
+			}
+			let move = moves[event.key]
+			if (!move) return
+			event.preventDefault()
+			move()
+			paint()
+		},
+		{ signal: events.signal },
+	)
+	function spread() {
+		let [first, second] = [...pointers.values()]
+		return first && second
+			? Math.hypot(first.x - second.x, first.y - second.y)
+			: 0
+	}
+	return {
+		crop: () => cropAvatar(picture, layout().crop),
+		dispose: () => events.abort(),
+	}
 }

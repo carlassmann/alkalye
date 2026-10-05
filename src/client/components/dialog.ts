@@ -138,10 +138,11 @@ export function confirmDialog(
 	dialog: HTMLDialogElement,
 	message: string,
 	label = "Continue",
+	title = translate(label === "Continue" ? "Confirm" : label),
 ) {
 	return requestDialog(
 		dialog,
-		translate(label === "Continue" ? "Confirm" : label),
+		title,
 		html`<p>${message}</p>`,
 		() => true,
 		label,

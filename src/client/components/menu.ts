@@ -3,6 +3,7 @@ import * as Fiber from "effect/Fiber"
 import { connectPopover } from "../ui/menu"
 import { icon } from "../icons"
 import type { IconName } from "../icons"
+import { spaceAvatar } from "./space-avatar"
 import { html, joinMarkup } from "../language"
 import type { Markup } from "../language"
 import { setMarkup } from "../dom"
@@ -16,6 +17,8 @@ export interface MenuChoice {
 	readonly value: string
 	readonly label: string
 	readonly icon?: IconName
+	// A space shows its avatar or initials instead of an icon.
+	readonly avatar?: { readonly name: string; readonly image?: string }
 }
 export interface MenuCommand {
 	readonly action: string
@@ -199,7 +202,13 @@ export class WorkspaceMenuElement extends HTMLElement {
 			"Workspace: " + (current?.label ?? "Personal"),
 		)
 		let leading = trigger?.querySelector(".menu-icon")
-		if (leading) setMarkup(leading, icon(current?.icon ?? "user"))
+		if (leading)
+			setMarkup(
+				leading,
+				current?.avatar
+					? spaceAvatar(current.avatar.name, current.avatar.image)
+					: icon(current?.icon ?? "user"),
+			)
 		for (let item of this.querySelectorAll<HTMLElement>("[role=menuitemradio]"))
 			item.setAttribute(
 				"aria-checked",
@@ -240,7 +249,7 @@ export class WorkspaceMenuElement extends HTMLElement {
 					role="menu"
 					aria-label="Workspaces"
 				>
-					${joinMarkup(this.choices.map(choice => html`<button type="button" role="menuitemradio" data-value="${choice.value}" aria-checked="false" tabindex="-1">${icon(choice.icon ?? "users")}<span>${choice.label}</span>${icon("check")}</button>`))}
+					${joinMarkup(this.choices.map(choice => html`<button type="button" role="menuitemradio" data-value="${choice.value}" aria-checked="false" tabindex="-1">${choice.avatar ? spaceAvatar(choice.avatar.name, choice.avatar.image) : icon(choice.icon ?? "users")}<span>${choice.label}</span>${icon("check")}</button>`))}
 					<hr />
 					${joinMarkup(this.commands.map(command => html`<button type="button" role="menuitem" data-action="${command.action}" tabindex="-1">${icon(command.icon)}<span>${command.label}</span></button>`))}
 				</div>`,

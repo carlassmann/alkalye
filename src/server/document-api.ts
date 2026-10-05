@@ -131,6 +131,11 @@ export let workspaceHandlers = HttpApiBuilder.group(
 						store.create(payload.workspace, payload.name, payload.request),
 					),
 				)
+				.handle("avatar", ({ params, payload }) =>
+					asAccount(
+						store.avatar(params.workspace, payload.image, payload.request),
+					),
+				)
 				.handle("remove", ({ params, payload }) =>
 					asAccount(
 						store.remove(params.workspace, payload.name, payload.request),

@@ -952,6 +952,18 @@ function mountApplication() {
 					load: account.request(
 						account.api.workspaces.snapshot({ params: { workspace: id } }),
 					),
+					avatar: image =>
+						random.randomUUIDv4.pipe(
+							Effect.flatMap(request =>
+								account.request(
+									account.api.workspaces.avatar({
+										params: { workspace: id },
+										payload: { request, image },
+									}),
+								),
+							),
+							Effect.andThen(library.refresh),
+						),
 					rename: name =>
 						random.randomUUIDv4.pipe(
 							Effect.flatMap(request =>
@@ -1322,6 +1334,16 @@ function mountApplication() {
 									: space.workspace === "personal-" + account.subject
 										? "user"
 										: "users",
+						...(isLocalWorkspace(space.workspace) ||
+						space.workspace === openedFiles ||
+						space.workspace === "personal-" + account.subject
+							? {}
+							: {
+									avatar: {
+										name: space.name,
+										...(space.avatar ? { image: space.avatar } : {}),
+									},
+								}),
 					})),
 				],
 				[
