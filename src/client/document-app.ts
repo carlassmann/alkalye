@@ -448,6 +448,24 @@ function mountApplication() {
 				if (!doc) return
 				openContextMenu(event, [
 					{ label: "Open document", run: () => launch(open(id)) },
+					...(!isLocalWorkspace(doc.workspace)
+						? [
+								{
+									label: "Invite collaborators",
+									disabled: doc.owner !== account.subject,
+									run: () =>
+										launch(
+											open(id).pipe(
+												Effect.andThen(() =>
+													selection?.document === id
+														? act("share")
+														: Effect.void,
+												),
+											),
+										),
+								},
+							]
+						: []),
 					{
 						label: "Document properties",
 						disabled: doc.role === "reader",
@@ -2929,6 +2947,10 @@ function mountApplication() {
 					return
 				}
 				if (action === "share") {
+					if (selected.opened.file)
+						return report(
+							"Move this local file to a synced workspace to invite collaborators",
+						)
 					let entry = library.state
 						.current()
 						.library.documents.find(

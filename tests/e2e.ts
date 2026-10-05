@@ -7,6 +7,8 @@ for (let path of [
 	"tests/browser-native-tools.ts",
 	"tests/browser-native-portability.ts",
 	"tests/browser-native-invitations.ts",
+	"tests/browser-document-sharing.ts",
+	"tests/browser-library-filters.ts",
 	"tests/browser-native-folders.ts",
 	"tests/browser-native-commands.ts",
 	"tests/browser-storage.ts",
