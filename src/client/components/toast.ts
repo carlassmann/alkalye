@@ -37,6 +37,15 @@ export class ToasterElement extends HTMLElement {
 	private returnFocus: HTMLElement | undefined
 
 	show(text: string) {
+		let content = document.createElement("div")
+		let title = document.createElement("div")
+		title.dataset.title = ""
+		title.textContent = text
+		content.dataset.content = ""
+		content.append(title)
+		return this.showContent(content)
+	}
+	showContent(content: HTMLElement, persistent = false) {
 		let run = this.run
 		if (!run) return
 		if (this.list.parentNode !== this) {
@@ -45,12 +54,6 @@ export class ToasterElement extends HTMLElement {
 			this.replaceChildren(this.list)
 		}
 		let node = document.createElement("li")
-		let content = document.createElement("div")
-		let title = document.createElement("div")
-		title.dataset.title = ""
-		title.textContent = text
-		content.dataset.content = ""
-		content.append(title)
 		node.append(content)
 		Object.assign(node.dataset, {
 			sonnerToast: "",
@@ -64,7 +67,9 @@ export class ToasterElement extends HTMLElement {
 			xPosition: "right",
 		})
 		node.tabIndex = 0
-		run({ node, height: 0, removed: false, offset: 0 })
+		let item: Toast = { node, height: 0, removed: false, offset: 0, persistent }
+		run(item)
+		return () => item.dismiss?.()
 	}
 
 	connectedCallback() {
@@ -126,8 +131,34 @@ export class ToasterElement extends HTMLElement {
 				),
 				() => Effect.sync(() => host.unmount(item)),
 			)
+
+			let content = item.node.firstElementChild
+			if (content instanceof HTMLElement) {
+				yield* Effect.acquireRelease(
+					Effect.sync(() => {
+						let observer = new ResizeObserver(entries => {
+							let style = getComputedStyle(item.node)
+							let height =
+								(entries[0]?.borderBoxSize[0]?.blockSize ??
+									content.offsetHeight) +
+								[
+									style.paddingTop,
+									style.paddingBottom,
+									style.borderTopWidth,
+									style.borderBottomWidth,
+								].reduce((total, value) => total + parseFloat(value), 0)
+							if (height === item.height) return
+							item.height = height
+							host.layout()
+						})
+						observer.observe(content)
+						return observer
+					}),
+					observer => Effect.sync(() => observer.disconnect()),
+				)
+			}
 			yield* Effect.raceFirst(
-				countdown(paused, toastLifetime),
+				item.persistent ? Effect.never : countdown(paused, toastLifetime),
 				Deferred.await(dismissed),
 			)
 			host.retire(item)
@@ -303,6 +334,8 @@ export class ToasterElement extends HTMLElement {
 	}
 
 	private swipe(start: PointerEvent) {
+		if (start.target instanceof Element && start.target.closest("button, a"))
+			return
 		let node =
 			start.target instanceof Element ? start.target.closest("li") : null
 		let item = this.toasts.find(other => other.node === node)
@@ -365,6 +398,7 @@ export class ToasterElement extends HTMLElement {
 customElements.define("alkalye-toaster", ToasterElement)
 
 type Toast = {
+	persistent: boolean
 	node: HTMLLIElement
 	height: number
 	removed: boolean

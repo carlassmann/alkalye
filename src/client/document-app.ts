@@ -93,7 +93,7 @@ import {
 import { clearDocument } from "./components/document-renderer"
 import { printDocument } from "./components/print"
 import { StatsElement, statusbarMarkup } from "./components/statusbar"
-import { toast } from "./components/toast"
+import { toast, ToasterElement } from "./components/toast"
 import { toolbarMarkup } from "./components/toolbar"
 import { button, element, setMarkup, updateMarkup } from "./dom"
 import { html, joinMarkup, setLanguage, translate } from "./language"
@@ -707,10 +707,17 @@ function mountApplication() {
 						launch(
 							(selection?.opened.session.flush ?? Effect.void).pipe(
 								Effect.andThen(Effect.sync(apply)),
+								Effect.onError(() => Effect.sync(() => banner.enableReload())),
 							),
 						),
 					)
-					document.body.append(banner)
+					let notifications = element("#toast")
+					if (notifications instanceof ToasterElement) {
+						let dismiss = notifications.showContent(banner, true)
+						events.signal.addEventListener("abort", () => dismiss?.(), {
+							once: true,
+						})
+					}
 				}),
 			)
 		function finishOpening() {

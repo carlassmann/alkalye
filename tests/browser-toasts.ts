@@ -280,6 +280,65 @@ try {
 		"Reduced motion shows toasts without transitions",
 	)
 	settle()
+
+	evaluate(
+		session,
+		`(() => {
+  let notice = document.createElement("alkalye-update");
+  window.updateApplications = 0;
+  notice.offer(() => {window.updateApplications++});
+  window.dismissUpdateToast = document.querySelector("#toast").showContent(notice, true);
+  return true;
+ })()`,
+	)
+	wait(
+		session,
+		'Boolean(document.querySelector("#toast [data-sonner-toast] [data-update]"))',
+	)
+	assert(
+		evaluate(
+			session,
+			`(() => {
+  let notice=document.querySelector("[data-update]"), item=notice.closest("[data-sonner-toast]");
+  return notice.querySelector("[data-title]").textContent === "Update available" && notice.textContent.includes("Reload to update to the latest version") && getComputedStyle(item).borderRadius === "8px" && getComputedStyle(notice).position === "static";
+ })()`,
+		),
+		"Update notices use the original toast frame and copy instead of a floating banner",
+	)
+	pause(4500)
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("[data-update]").closest("[data-sonner-toast]").dataset.removed === "false" && window.updateApplications === 0',
+		),
+		"Updates persist without interrupting the open document",
+	)
+	browser(session, "click", "[data-update-apply]")
+	assert(
+		evaluate(
+			session,
+			'window.updateApplications === 1 && document.querySelector("[data-update-apply]").disabled',
+		),
+		"Reload remains clickable and applies an update only once",
+	)
+	evaluate(
+		session,
+		'document.querySelector("[data-update-description]").textContent = "Longer update details ".repeat(20);true',
+	)
+	wait(
+		session,
+		'parseFloat(document.querySelector("#toast ol").style.getPropertyValue("--front-toast-height")) > 100',
+	)
+	assert(
+		true,
+		"Persistent toast measurements follow content and wrapping changes",
+	)
+	evaluate(session, "window.dismissUpdateToast();true")
+	settle()
+	assert(
+		evaluate(session, '!document.querySelector("[data-update]")'),
+		"Dismissing a persistent update releases its toast",
+	)
 } finally {
 	browser(session, "close")
 	rmSync(screenshots, { recursive: true, force: true })
