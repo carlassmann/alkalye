@@ -1490,6 +1490,13 @@ function mountApplication() {
 					router.record({ ...route, mode }, { replace: true })
 			}
 			app.classList.add("mode-" + mode)
+			if (
+				(mode === "slideshow" || mode === "teleprompter") &&
+				matchMedia("(max-width: 1100px)").matches
+			) {
+				setLayout("library", false, false)
+				setLayout("tools", false, false)
+			}
 			let selected = selection
 			if (!doc || !selected) {
 				if (opening) return

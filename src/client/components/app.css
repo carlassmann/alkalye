@@ -199,8 +199,10 @@
 	[data-app]#app.tools-open .inspector {
 		backdrop-filter: none;
 	}
-	[data-app]#app.library-open .workspace,
-	[data-app]#app.tools-open .workspace {
+	[data-app]#app.library-open:not(.mode-slideshow, .mode-teleprompter)
+		.workspace,
+	[data-app]#app.tools-open:not(.mode-slideshow, .mode-teleprompter)
+		.workspace {
 		filter: blur(2px);
 	}
 	[data-app]#app .workspace {

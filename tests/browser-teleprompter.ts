@@ -241,6 +241,52 @@ try {
 		),
 		"Back to editor releases the presentation",
 	)
+
+	browser(session, "set", "viewport", "504", "842")
+	for (let mode of ["teleprompter", "slideshow"]) {
+		if (
+			!evaluate(
+				session,
+				'document.querySelector("#app").classList.contains("tools-open")',
+			)
+		)
+			browser(session, "click", '[data-action="toggle-tools"]')
+		wait(
+			session,
+			'document.querySelector("#app").classList.contains("tools-open") && getComputedStyle(document.querySelector(".workspace")).filter.includes("blur")',
+		)
+		browser(session, "click", '#inspector-body [data-action="' + mode + '"]')
+		wait(
+			session,
+			'document.querySelector("#app").classList.contains("mode-' +
+				mode +
+				'") && getComputedStyle(document.querySelector(".workspace")).filter === "none"',
+		)
+		assert(
+			evaluate(
+				session,
+				'!document.querySelector("#app").matches(".tools-open,.library-open")',
+			),
+			"Entering " +
+				mode +
+				" from the mobile sidebar dismisses it and removes blur",
+		)
+		browser(session, "press", "Escape")
+		wait(session, 'Boolean(document.querySelector("#editor"))')
+	}
+	browser(session, "set", "viewport", "1280", "800")
+	browser(session, "click", '[data-action="toggle-tools"]')
+	browser(session, "click", '#inspector-body [data-action="teleprompter"]')
+	wait(session, 'Boolean(document.querySelector("alkalye-teleprompter"))')
+	browser(session, "set", "viewport", "504", "842")
+	wait(
+		session,
+		'getComputedStyle(document.querySelector(".workspace")).filter === "none"',
+	)
+	assert(
+		true,
+		"Resizing a presentation to mobile never applies hidden-sidebar blur",
+	)
 } finally {
 	browser(session, "close")
 	server.kill()
