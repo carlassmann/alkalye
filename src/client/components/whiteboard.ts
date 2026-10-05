@@ -133,7 +133,10 @@ export function openWhiteboard(
 		options.boardId ||
 		session.replica.fields(documentId).whiteboard ||
 		Effect.runSync(session.uuid)
-	showDialog(translate("Whiteboard"), whiteboardMarkup(session, documentId, id))
+	showDialog(
+		session.replica.fields(id).name || translate("Whiteboard"),
+		whiteboardMarkup(session, documentId, id),
+	)
 	let component = options.dialog.querySelector("alkalye-whiteboard")
 	if (!(component instanceof WhiteboardElement))
 		throw new Error("Whiteboard element is not registered")
@@ -146,54 +149,82 @@ function whiteboardMarkup(
 	id: string,
 ) {
 	let embedded = session.replica.text(documentId).includes(`asset:${id}`)
-	let embedLabel = translate(embedded ? "Done" : "Embed drawing")
+	let embedLabel = translate(embedded ? "Save" : "Embed drawing")
+	let title = session.replica.fields(id).name || translate("Whiteboard")
 	return html`<alkalye-whiteboard data-whiteboard>
 		<div class="board-bar" role="toolbar" aria-label="Drawing">
-			<button
-				type="button"
-				id="drawing-undo"
-				aria-label="Undo"
-				title="Undo (⌘Z)"
-				data-writes
-			>
-				${icon("undo-2")}
-			</button>
-			<button
-				type="button"
-				id="drawing-redo"
-				aria-label="Redo"
-				title="Redo (⇧⌘Z)"
-				data-writes
-			>
-				${icon("redo-2")}
-			</button>
+			<strong class="board-title">${title}</strong>
 			<span class="board-people" data-drawing-people aria-live="polite"></span>
 			<span class="read-only" data-read-only hidden>Read only</span>
 			<span class="board-spacer"></span>
+			<alkalye-menu align="end"
+				><button
+					type="button"
+					aria-label="Drawing options"
+					title="Drawing options"
+				>
+					${icon("ellipsis")}
+				</button>
+				<div
+					id="whiteboard-actions"
+					class="menu-popover"
+					popover
+					role="menu"
+					aria-label="Drawing options"
+				>
+					<button
+						type="button"
+						id="drawing-undo"
+						aria-label="Undo"
+						title="Undo (⌘Z)"
+						data-writes
+					>
+						${icon("undo-2")}<span>Undo</span>
+					</button>
+					<button
+						type="button"
+						id="drawing-redo"
+						aria-label="Redo"
+						title="Redo (⇧⌘Z)"
+						data-writes
+					>
+						${icon("redo-2")}<span>Redo</span>
+					</button>
+					<hr />
+					<button
+						type="button"
+						id="export-drawing"
+						title="Download editable drawing"
+						aria-label="Download editable drawing"
+					>
+						${icon("download")}<span>.tldr</span>
+					</button>
+					<button
+						type="button"
+						id="export-svg"
+						title="Download as SVG image"
+						aria-label="Download as SVG image"
+					>
+						${icon("image")}<span>SVG</span>
+					</button>
+					<button type="button" id="choose-drawing" data-writes>
+						${icon("upload")}<span>Import drawing</span>
+					</button>
+					<input
+						id="import-drawing"
+						type="file"
+						accept=".tldr,application/json"
+						hidden
+					/></div
+			></alkalye-menu>
 			<button
 				type="button"
-				id="export-drawing"
-				title="Download editable drawing"
-				aria-label="Download editable drawing"
+				id="close-board"
+				class="dialog-close"
+				title="Close whiteboard"
 			>
-				${icon("download")}<span>.tldr</span>
+				${icon("x")}<span>Close</span>
 			</button>
-			<button
-				type="button"
-				id="export-svg"
-				title="Download as SVG image"
-				aria-label="Download as SVG image"
-			>
-				${icon("image")}<span>SVG</span>
-			</button>
-			<label class="board-import" title="Import drawing" data-writes>
-				${icon("upload")}<span>Import drawing</span>
-				<input
-					id="import-drawing"
-					type="file"
-					accept=".tldr,application/json"
-				/>
-			</label>
 			<button
 				type="button"
 				class="primary"
@@ -201,7 +232,7 @@ function whiteboardMarkup(
 				aria-label="${embedLabel}"
 				data-writes
 			>
-				${icon(embedded ? "check" : "image-plus")}<span>${embedLabel}</span>
+				${icon("save")}<span>${embedLabel}</span>
 			</button>
 		</div>
 		<div class="board-canvas" data-board-canvas></div>
@@ -609,6 +640,12 @@ function boardControls(
 			),
 		{ signal },
 	)
+	part(root, "#choose-drawing").addEventListener("click", () => input.click(), {
+		signal,
+	})
+	part(root, "#close-board").addEventListener("click", () => dialog.close(), {
+		signal,
+	})
 	input.addEventListener(
 		"change",
 		() => {
@@ -798,10 +835,15 @@ function boardPresence(
 			.getContainer()
 			.closest("alkalye-whiteboard")
 			?.querySelector("[data-drawing-people]")
-		if (status)
-			status.textContent = peers.length
-				? `${peers.length} ${peers.length === 1 ? "other" : "others"} on this whiteboard`
-				: ""
+		if (status) {
+			status.replaceChildren()
+			status.setAttribute("aria-label", `${peers.length} other collaborators`)
+		}
+		if (status && peers.length)
+			status.insertAdjacentHTML(
+				"beforeend",
+				html`${icon("users")}<span>${peers.length}</span>`.value,
+			)
 		let page = editor.getCurrentPageId()
 		let records: TLInstancePresence[] = peers.map(person =>
 			InstancePresenceRecordType.create({

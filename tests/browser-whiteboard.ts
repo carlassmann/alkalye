@@ -305,7 +305,7 @@ try {
 	browser(reader, "mouse", "move", String(target.x + 20), String(target.y + 10))
 	wait(
 		session,
-		`${editor}.store.query.records("instance_presence").get().some(peer => peer.cursor) && document.querySelector("[data-drawing-people]").textContent.includes("1 other")`,
+		`${editor}.store.query.records("instance_presence").get().some(peer => peer.cursor) && document.querySelector("[data-drawing-people]").textContent.trim() === "1" && Boolean(document.querySelector("[data-drawing-people] svg"))`,
 	)
 	assert(true, "a collaborator's cursor shows as a tldraw collaborator")
 	browser(reader, "click", "#dialog .dialog-close")

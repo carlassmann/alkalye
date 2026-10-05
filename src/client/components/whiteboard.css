@@ -13,13 +13,7 @@
 	height: 100%;
 }
 [data-dialog]:has([data-whiteboard]) > form > header {
-	padding: 6px 8px 6px 16px;
-	padding-top: max(6px, env(safe-area-inset-top));
-}
-[data-dialog]:has([data-whiteboard]) > form > header h2 {
-	font-size: 14px;
-	font-weight: 500;
-	letter-spacing: 0;
+	display: none;
 }
 [data-dialog]:has([data-whiteboard]) .dialog-body {
 	position: relative;
@@ -38,10 +32,11 @@
 	display: flex;
 	align-items: center;
 	gap: 4px;
-	padding: 4px 8px;
-	border-block: 1px solid var(--line);
+	min-height: 56px;
+	padding: 0 12px;
+	border-bottom: 1px solid var(--line);
 	background: var(--paper);
-	overflow-x: auto;
+	overflow: visible;
 }
 [data-whiteboard] .board-bar > button,
 [data-whiteboard] .board-import {
@@ -51,7 +46,7 @@
 	flex: none;
 	height: 32px;
 	padding: 0 10px;
-	border-radius: 8px;
+	border-radius: 0;
 	color: inherit;
 	font-size: 12px;
 	font-weight: 500;
@@ -118,9 +113,39 @@
 [data-whiteboard] .board-error[hidden] {
 	display: none;
 }
-@media (max-width: 640px) {
-	[data-whiteboard] .board-bar > button > span,
-	[data-whiteboard] .board-import > span {
+[data-whiteboard] .board-bar > .board-title {
+	font-size: 16px;
+	font-weight: 500;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+[data-whiteboard] .board-bar > button[hidden] {
+	display: none;
+}
+[data-whiteboard] .board-bar > alkalye-menu > button {
+	display: grid;
+	place-items: center;
+	width: 36px;
+	height: 36px;
+}
+[data-whiteboard] .board-people {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+[data-whiteboard] .board-people:empty {
+	display: none;
+}
+@media (max-width: 600px) {
+	[data-whiteboard] .board-bar {
+		padding: 0 8px;
+		padding-top: env(safe-area-inset-top);
+	}
+	[data-whiteboard] .board-bar > .board-title {
+		font-size: 14px;
+	}
+	[data-whiteboard] #close-board span {
 		display: none;
 	}
 }
