@@ -83,7 +83,7 @@
 }
 [data-teleprompter] .prompter-item[aria-current] {
 	background: var(--brand);
-	color: #fff;
+	color: var(--brand-ink);
 }
 [data-teleprompter] .prompter-item[aria-current]:hover {
 	background: color-mix(in oklch, var(--brand) 80%, transparent);
