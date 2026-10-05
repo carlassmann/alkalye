@@ -171,7 +171,34 @@ try {
 	browser(session, "mouse", "up")
 	wait(session, '!document.querySelector("#dialog").open')
 	assert(true, "Dialog dismisses on an outside click")
-	browser(session, "click", '[data-action="preview"]')
+	browser(session, "click", '[data-action="palette"]')
+	wait(session, 'document.querySelector("#command-search") !== null')
+	browser(session, "wait", "150")
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("#dialog").getBoundingClientRect().width === 512 && document.activeElement.id === "command-search"',
+		),
+		"Command palette matches original width and keeps search focused",
+	)
+	browser(session, "press", "ArrowDown")
+	assert(
+		evaluate(
+			session,
+			'document.activeElement.id === "command-search" && document.querySelector("#command-search").getAttribute("aria-activedescendant") === "command-preview"',
+		),
+		"Command palette arrows select commands without moving focus",
+	)
+	browser(session, "fill", "#command-search", "does-not-exist")
+	assert(
+		evaluate(
+			session,
+			'!document.querySelector("#command-search").hasAttribute("aria-activedescendant") && document.querySelector(".command-empty") !== null',
+		),
+		"An empty command search clears its active option",
+	)
+	browser(session, "fill", "#command-search", "Preview")
+	browser(session, "press", "Enter")
 	wait(
 		session,
 		'location.pathname.endsWith("/preview") && document.querySelector("#preview")?.shadowRoot !== null',

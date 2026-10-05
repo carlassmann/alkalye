@@ -1,9 +1,69 @@
+[data-dialog]:has([data-palette]) {
+	width: min(512px, calc(100vw - 32px));
+	margin: 96px auto auto;
+}
+[data-dialog]:has([data-palette]) form {
+	padding: 8px;
+	gap: 8px;
+}
+[data-dialog]:has([data-palette]) header {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+}
+[data-palette].command-search {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	height: 44px;
+	padding: 0 8px;
+	border: 1px solid var(--line);
+}
+[data-palette].command-search input {
+	flex: 1;
+	min-width: 0;
+	border: 0;
+	padding: 0;
+	font-size: 14px;
+	outline: none;
+	background: transparent;
+}
+[data-palette].command-search button {
+	display: grid;
+	place-items: center;
+	width: 28px;
+	height: 28px;
+}
 [data-palette]#commands {
-	margin-top: 12px;
+	max-height: min(28rem, 70dvh);
+	overflow: auto;
+	padding: 4px 0;
 }
 [data-palette]#commands button {
-	display: block;
+	display: flex;
+	align-items: center;
 	width: 100%;
-	padding: 12px;
-	border-bottom: 1px solid var(--line);
+	min-height: 44px;
+	padding: 0 12px;
+	font-size: 14px;
+	text-align: left;
+}
+[data-palette]#commands button:is(:hover, [data-active="true"]) {
+	background: var(--accent);
+}
+[data-palette] .command-empty {
+	padding: 32px 12px;
+	text-align: center;
+	font-size: 14px;
+	color: var(--muted);
+}
+@media (max-width: 639px) {
+	[data-dialog]:has([data-palette]) {
+		margin-top: max(16px, env(safe-area-inset-top));
+	}
+	[data-palette].command-search input {
+		font-size: 16px;
+	}
 }

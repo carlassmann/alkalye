@@ -1,6 +1,7 @@
+import { icon } from "../icons"
 import { element, setMarkup } from "../dom"
 import type { Markup } from "../language"
-import { html, joinMarkup, localizeMarkup, translate } from "../language"
+import { html, joinMarkup, translate } from "../language"
 
 export function openPalette(
 	dialog: HTMLDialogElement,
@@ -43,12 +44,44 @@ export function openPalette(
 	]
 	showDialog(
 		translate("Command palette"),
-		localizeMarkup(
-			'<input id="command-search" placeholder="Type a command…" aria-label="Search commands"><div data-palette id="commands"></div>',
-		),
+		html`<div data-palette class="command-search">
+				${icon("search")}<input
+					type="search"
+					id="command-search"
+					placeholder="${translate("Type a command…")}"
+					aria-label="${translate("Search commands")}"
+					role="combobox"
+					aria-controls="commands"
+					aria-expanded="true"
+					spellcheck="false"
+				/><button
+					type="button"
+					value="cancel"
+					aria-label="${translate("Close")}"
+				>
+					${icon("x")}
+				</button>
+			</div>
+			<div data-palette id="commands" role="listbox"></div>`,
 	)
 	let search = dialog.querySelector("#command-search")
 	if (!(search instanceof HTMLInputElement)) return
+	let selected = 0
+	function select(index: number) {
+		let items = [
+			...dialog.querySelectorAll<HTMLButtonElement>("[data-command]"),
+		]
+		selected = items.length ? (index + items.length) % items.length : -1
+		for (let [position, item] of items.entries()) {
+			item.setAttribute("aria-selected", String(position === selected))
+			item.dataset.active = String(position === selected)
+		}
+		let active = items[selected]
+		if (active) {
+			search?.setAttribute("aria-activedescendant", active.id)
+			active.scrollIntoView({ block: "nearest" })
+		} else search?.removeAttribute("aria-activedescendant")
+	}
 	function show() {
 		setMarkup(
 			element("#commands"),
@@ -67,7 +100,13 @@ export function openPalette(
 					)
 					.map(
 						value =>
-							html`<button type="button" data-command="${value.action}">
+							html`<button
+								type="button"
+								role="option"
+								tabindex="-1"
+								id="command-${value.action}"
+								data-command="${value.action}"
+							>
 								${value.label}
 							</button>`,
 					),
@@ -81,12 +120,27 @@ export function openPalette(
 				dialog.close()
 				void run(button.dataset.command ?? "").catch(report)
 			}
+		for (let [index, button] of [
+			...dialog.querySelectorAll<HTMLButtonElement>("[data-command]"),
+		].entries())
+			button.onpointermove = () => select(index)
+		if (!dialog.querySelector("[data-command]"))
+			setMarkup(
+				element("#commands"),
+				html`<p class="command-empty">${translate("No results")}</p>`,
+			)
+		select(0)
 	}
 	search.oninput = show
 	search.onkeydown = event => {
 		if (event.key === "Enter") {
 			event.preventDefault()
-			dialog.querySelector<HTMLButtonElement>("[data-command]")?.click()
+			dialog
+				.querySelectorAll<HTMLButtonElement>("[data-command]")
+				[selected]?.click()
+		} else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+			event.preventDefault()
+			select(selected + (event.key === "ArrowDown" ? 1 : -1))
 		}
 	}
 	show()
