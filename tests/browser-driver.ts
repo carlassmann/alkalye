@@ -72,14 +72,14 @@ function reveal(session: string, selector: string) {
 export let currentDocument =
 	"(location.pathname.match(/[/]doc[/]([^/]+)/) || [0, String()])[1]"
 export let workspaceLabel =
-	'document.querySelector("#workspace").textContent.trim()'
+	'document.querySelector("#workspace .menu-value").textContent.trim()'
 export let workspaceValue =
 	'document.querySelector("alkalye-workspace-menu").value'
 // Chooses a workspace from the library's workspace menu by its label.
 export function chooseWorkspace(session: string, label: string) {
 	let value = evaluate(
 		session,
-		`[...document.querySelectorAll("alkalye-workspace-menu [role=menuitemradio]")].find(item => item.textContent.trim() === ${JSON.stringify(label)})?.dataset.value`,
+		`[...document.querySelectorAll("alkalye-workspace-menu [role=menuitemradio]")].find(item => item.querySelector(":scope > span:not(.space-avatar)")?.textContent.trim() === ${JSON.stringify(label)})?.dataset.value`,
 	)
 	if (typeof value !== "string") throw new Error("No workspace " + label)
 	browser(

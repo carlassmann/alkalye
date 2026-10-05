@@ -22,6 +22,9 @@ for (let path of [
 	"tests/browser-workspace-deletion.ts",
 	"tests/browser-mcp.ts",
 	"tests/browser-teleprompter.ts",
+	"tests/browser-theme-library.ts",
+	"tests/browser-laser-displays.ts",
+	"tests/browser-workspace-avatars.ts",
 	"tests/browser-whiteboard.ts",
 ]) {
 	let test = Bun.spawn(["bun", path], {

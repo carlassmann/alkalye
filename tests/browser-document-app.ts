@@ -17,6 +17,7 @@ import { verifyNativeDrawings } from "./browser-native-drawings"
 import { verifyNativeThemes } from "./browser-native-themes"
 import { verifyNativeWorkspaces } from "./browser-native-workspaces"
 import { verifyNativeAgents } from "./browser-native-agents"
+import { verifyReaderPresence } from "./browser-native-presence"
 import { verifyNativeRoutes } from "./browser-native-routes"
 import {
 	verifyNativeComments,
@@ -637,6 +638,7 @@ if (process.argv.includes("--serve")) {
 			evaluate(reader, 'document.querySelector("#editor").readOnly'),
 			"native controller enforces reader access on the actual editor",
 		)
+		verifyReaderPresence(session, reader, first)
 		browser(reader, "click", '[data-action="comments"]')
 		wait(
 			reader,
