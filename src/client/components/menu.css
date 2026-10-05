@@ -73,7 +73,7 @@ alkalye-picker > option {
 :is([data-picker], [data-workspace-menu], [data-menu])
 	.menu-popover
 	button
-	span {
+	> span:not(.space-avatar) {
 	flex: 1;
 	min-width: 0;
 	overflow: hidden;

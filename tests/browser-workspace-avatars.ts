@@ -37,6 +37,15 @@ try {
 		),
 		"A space without an avatar shows its initials in the workspace menu",
 	)
+	browser(session, "click", "alkalye-workspace-menu > .menu-trigger")
+	assert(
+		evaluate(
+			session,
+			`(() => {let item=document.querySelector('alkalye-workspace-menu [data-value="${workspace}"]');let avatar=item.querySelector(".space-avatar").getBoundingClientRect();let label=item.querySelector("span:not(.space-avatar)").getBoundingClientRect();return avatar.width===16 && avatar.height===16 && label.width>avatar.width})()`,
+		),
+		"Initials stay square while the workspace label fills the menu row",
+	)
+	browser(session, "press", "Escape")
 	browser(session, "click", '[data-action="manage-workspace"]')
 	wait(
 		session,
