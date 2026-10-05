@@ -711,3 +711,67 @@ function run<A, E>(
 		),
 	)
 }
+
+test("workspace snapshots include named invite members and effective grant sources", () =>
+	run(
+		Effect.gen(function* () {
+			let owner = yield* client(91)
+			let member = yield* client(92)
+			yield* owner.api.preferences.save({
+				payload: { request: "owner-profile", patch: { name: "Harbour owner" } },
+			})
+			yield* member.api.preferences.save({
+				payload: {
+					request: "member-profile",
+					patch: { name: "Invited writer" },
+				},
+			})
+			yield* createWorkspace(owner, "named-team")
+			let link = yield* invite(owner, { workspace: "named-team" }, "writer")
+			yield* accept(member, link, "join-named-team")
+			let snapshot = yield* owner.api.workspaces.snapshot({
+				params: { workspace: "named-team" },
+			})
+			expect(snapshot.ownerName).toBe("Harbour owner")
+			expect(snapshot.members).toEqual([
+				{
+					member: member.subject,
+					role: "writer",
+					name: "Invited writer",
+					source: "invitation",
+				},
+			])
+			yield* owner.api.workspaces.membership({
+				params: { workspace: "named-team", member: member.subject },
+				payload: { role: "reader", request: "named-direct-reader" },
+			})
+			expect(
+				(yield* owner.api.workspaces.snapshot({
+					params: { workspace: "named-team" },
+				})).members[0],
+			).toMatchObject({ role: "writer", source: "both" })
+			yield* owner.api.invitations.revoke({
+				params: { invitation: link.invitation },
+			})
+			expect(
+				(yield* owner.api.workspaces.snapshot({
+					params: { workspace: "named-team" },
+				})).members[0],
+			).toMatchObject({
+				role: "reader",
+				source: "direct",
+				name: "Invited writer",
+			})
+			yield* member.api.preferences.save({
+				payload: {
+					request: "renamed-member",
+					patch: { name: "Renamed writer" },
+				},
+			})
+			expect(
+				(yield* owner.api.workspaces.snapshot({
+					params: { workspace: "named-team" },
+				})).members[0]?.name,
+			).toBe("Renamed writer")
+		}),
+	))

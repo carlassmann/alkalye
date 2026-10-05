@@ -72,7 +72,9 @@ if (process.argv.includes("--serve")) {
 			// Every app address is served the same shell, so instrument them all.
 			let shell =
 				request.method === "GET" &&
-				(url.pathname === "/app" || url.pathname.startsWith("/app/"))
+				(url.pathname === "/app" ||
+					url.pathname.startsWith("/app/") ||
+					url.pathname === "/invite")
 			let headers = new Headers(request.headers)
 			headers.set("host", proxy.url.host)
 			let response = await fetch(

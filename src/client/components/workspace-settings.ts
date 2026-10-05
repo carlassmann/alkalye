@@ -1,5 +1,7 @@
 import * as Effect from "effect/Effect"
 import * as Fiber from "effect/Fiber"
+import * as Semaphore from "effect/Semaphore"
+import * as Stream from "effect/Stream"
 import * as FiberSet from "effect/FiberSet"
 import type { WorkspaceSnapshot } from "../../shared/workspace"
 import { setMarkup } from "../dom"
@@ -22,6 +24,7 @@ export interface WorkspaceSettingsOptions {
 		readonly refresh: Effect.Effect<unknown, unknown>
 		readonly forget: Effect.Effect<unknown, unknown>
 	}
+	readonly changes?: Stream.Stream<unknown>
 	readonly load: Effect.Effect<WorkspaceSnapshot, unknown>
 	readonly rename: (name: string) => Effect.Effect<unknown, unknown>
 	// Sets or, with null, removes the space's avatar.
@@ -64,6 +67,7 @@ export class WorkspaceSettingsElement extends HTMLElement {
 			Effect.scoped(
 				Effect.gen(function* () {
 					let run = yield* FiberSet.makeRuntime<never>()
+					let rendering = yield* Semaphore.make(1)
 					let events = yield* Effect.acquireRelease(
 						Effect.sync(() => new AbortController()),
 						abort => Effect.sync(() => abort.abort()),
@@ -102,11 +106,13 @@ export class WorkspaceSettingsElement extends HTMLElement {
 							),
 						)
 					}
-					let render = Effect.gen(function* () {
-						if (options.local) return frame(localMarkup(options))
-						space = yield* options.load
-						frame(spaceMarkup(space, options, uploading))
-					})
+					let render = rendering.withPermits(1)(
+						Effect.gen(function* () {
+							if (options.local) return frame(localMarkup(options))
+							space = yield* options.load
+							frame(spaceMarkup(space, options, uploading))
+						}),
+					)
 					function frame(content: ReturnType<typeof html>) {
 						setMarkup(
 							host,
@@ -210,7 +216,10 @@ export class WorkspaceSettingsElement extends HTMLElement {
 							translate("Edit member"),
 							html`<p class="muted">
 									${translate("Change permissions or remove")}
-									<code>${member}</code> ${translate("from this space.")}
+									<span title="${member}"
+										>${space?.members.find(person => person.member === member)?.name || "Anonymous writer"}</span
+									>
+									${translate("from this space.")}
 								</p>
 								<label class="space-role-label"
 									>${translate("Role")}
@@ -500,6 +509,24 @@ export class WorkspaceSettingsElement extends HTMLElement {
 					yield* render.pipe(
 						Effect.catch(error => Effect.sync(() => options.report(error))),
 					)
+					if (options.changes)
+						yield* options.changes.pipe(
+							Stream.runForEach(() => {
+								if (
+									uploading ||
+									(document.activeElement instanceof HTMLInputElement &&
+										host.contains(document.activeElement))
+								)
+									return Effect.void
+								return render.pipe(
+									Effect.catch(error =>
+										Effect.sync(() => options.report(error)),
+									),
+								)
+							}),
+							Effect.forkScoped(),
+						)
+
 					yield* Effect.never
 				}),
 			),
@@ -527,8 +554,13 @@ function spaceMarkup(
 ) {
 	let owner = space.owner === options.subject
 	let editable = owner && !options.personal
-	let members: { member: string; role: "owner" | "writer" | "reader" }[] = [
-		{ member: space.owner, role: "owner" },
+	let members: {
+		member: string
+		name?: string
+		source?: string
+		role: "owner" | "writer" | "reader"
+	}[] = [
+		{ member: space.owner, name: space.ownerName, role: "owner" },
 		...space.members,
 	]
 	return html`<section class="space-section">
@@ -627,14 +659,18 @@ function spaceMarkup(
 									${member.role === "owner" ? "" : html`data-member-row="${member.member}"`}
 								>
 									<span class="member-name"
-										><code title="${member.member}">${member.member}</code>${
+										><span title="${member.member}"
+											>${member.name || "Anonymous writer"}</span
+										>${
 											member.member === options.subject
 												? html`<span class="badge">${translate("You")}</span>`
 												: ""
 										}</span
 									><span class="member-actions"
 										>${
-											editable && member.role !== "owner"
+											editable &&
+											member.role !== "owner" &&
+											(!member.source || member.source === "direct")
 												? html`<button
 														type="button"
 														class="outline"
@@ -645,7 +681,7 @@ function spaceMarkup(
 													</button>`
 												: ""
 										}<span class="member-role"
-											>${roleLabel(member.role)}</span
+											>${roleLabel(member.role)}${member.source === "invitation" || member.source === "both" ? html`<small> · ${translate("via invitation")}</small>` : ""}</span
 										></span
 									>
 								</li>`,

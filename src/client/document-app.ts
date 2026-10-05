@@ -628,9 +628,12 @@ function mountApplication() {
 					let people = library.live.presence.current(selection?.document ?? "")
 					editor?.presence(people)
 					presentation?.presence()
-					element("#presence").textContent = people
-						.map(person => person.name)
-						.join(" · ")
+					element("#presence").textContent = people.length
+						? "Editing with " +
+							people
+								.map(person => (person.own ? "your other device" : person.name))
+								.join(" · ")
+						: ""
 				}),
 			),
 			Effect.forkScoped({ startImmediately: true }),
@@ -975,6 +978,13 @@ function mountApplication() {
 								},
 							}
 						: {}),
+					changes: library.live.changes.pipe(
+						Stream.filter(
+							message =>
+								message.type === "advanced" || message.type === "connected",
+						),
+						Stream.buffer({ capacity: 1, strategy: "sliding" }),
+					),
 					load: account.request(
 						account.api.workspaces.snapshot({ params: { workspace: id } }),
 					),

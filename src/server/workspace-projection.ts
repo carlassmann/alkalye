@@ -497,9 +497,14 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 			if (Option.isNone(record)) return undefined
 			let members = yield* SqlSchema.findAll({
 				Request: Schema.String,
-				Result: MembershipSchema,
+				Result: Schema.Struct({
+					...MembershipSchema.fields,
+					name: Schema.NullOr(Schema.String),
+					direct: Schema.Natural,
+					invited: Schema.Natural,
+				}),
 				execute: id =>
-					sql`SELECT member,role FROM workspace_members WHERE workspace=${id} ORDER BY member`,
+					sql`SELECT g.member,g.role,p.value AS name,EXISTS(SELECT 1 FROM workspace_members d WHERE d.workspace=g.workspace AND d.member=g.member) AS direct,EXISTS(SELECT 1 FROM invitation_members m JOIN invitations i ON i.invitation=m.invitation WHERE m.member=g.member AND i.workspace=g.workspace AND i.document IS NULL AND i.revoked=0) AS invited FROM workspace_grants g LEFT JOIN workspace_preferences p ON p.workspace='personal-'||g.member AND p.field='preference:name' WHERE g.workspace=${id} AND g.member<>${record.value.owner} ORDER BY g.member`,
 			})(id)
 			let documents = yield* SqlSchema.findAll({
 				Request: Schema.String,
@@ -508,12 +513,19 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 					sql`SELECT d.document,d.workspace,d.owner,s.log,s.position,s.deleted,s.metadata FROM workspace_documents d JOIN document_summaries s ON s.document=d.document WHERE d.workspace=${id} ORDER BY d.document`,
 			})(id)
 			let avatar = yield* workspaceAvatar(id)
+			let ownerProfile = yield* preferences(record.value.owner)
 
 			return {
 				workspace: id,
 				...record.value,
 				...(Option.isSome(avatar) ? { avatar: avatar.value.image } : {}),
-				members,
+				ownerName: ownerProfile.name,
+				members: members.map(member => ({
+					member: member.member,
+					role: member.role,
+					name: displayName(member.name),
+					source: membershipSource(member.direct, member.invited),
+				})),
 				documents: documents.map(row => ({
 					...row,
 					deleted: row.deleted === 1,
@@ -623,4 +635,11 @@ function displayName(value: string | null) {
 }
 function conflict(message: string) {
 	return Effect.fail(new DocumentConflict({ message }))
+}
+
+function membershipSource(
+	direct: number,
+	invited: number,
+): "direct" | "invitation" | "both" {
+	return direct ? (invited ? "both" : "direct") : "invitation"
 }

@@ -5,6 +5,10 @@ export function verifyReaderPresence(
 	reader: string,
 	document: string,
 ) {
+	let readerName = evaluate(
+		reader,
+		'fetch("/api/accounts/preferences").then(response => response.json()).then(profile => profile.name)',
+	)
 	try {
 		for (let session of [owner, reader]) {
 			evaluate(
@@ -35,19 +39,35 @@ export function verifyReaderPresence(
 			movedAt:Number.MAX_SAFE_INTEGER, own:true, target:"other-display"
 		}}))`,
 		)
+		let readerActor = evaluate(
+			reader,
+			'window.presenceProbeMessages.find(message => message.type === "connected").actor',
+		)
 		wait(
 			owner,
-			'window.presenceProbeMessages.some(message => message.type === "presence" && message.presence.name === "Forged presenter")',
+			`window.presenceProbeMessages.some(message => message.type === "presence" && message.presence.actor === ${JSON.stringify(readerActor)})`,
 		)
 		assert(
 			evaluate(
 				owner,
 				`(() => {
-			let presence = window.presenceProbeMessages.find(message => message.type === "presence" && message.presence.name === "Forged presenter").presence;
-			return presence.presenting === false && presence.movedAt === undefined && presence.target === undefined && presence.x === -1 && presence.y === -1 && presence.own === false && presence.actor !== "forged";
+			let presence = window.presenceProbeMessages.find(message => message.type === "presence" && message.presence.actor === ${JSON.stringify(readerActor)}).presence;
+			return presence.name === ${JSON.stringify(readerName)} && presence.presenting === false && presence.movedAt === undefined && presence.target === undefined && presence.x === -1 && presence.y === -1 && presence.own === false && presence.actor !== "forged";
 		})()`,
 			),
-			"The relay strips a reader's forged presenter, laser and account identity",
+			"The relay supplies the saved name and strips forged presenter, laser and account identity",
+		)
+		evaluate(
+			reader,
+			'fetch("/api/accounts/preferences", {method:"PUT", headers:{"content-type":"application/json"}, body:JSON.stringify({request:"presence-profile-rename", patch:{name:"Renamed reader"}})}).then(response => response.ok)',
+		)
+		wait(
+			owner,
+			`window.presenceProbeMessages.some(message => message.type === "presence" && message.presence.actor === ${JSON.stringify(readerActor)} && message.presence.name === "Renamed reader")`,
+		)
+		assert(
+			true,
+			"renaming a profile updates existing cursor labels without reconnecting",
 		)
 	} finally {
 		for (let session of [owner, reader])

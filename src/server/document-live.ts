@@ -19,6 +19,7 @@ export interface LiveConnection {
 	session: string
 	subject: string
 	actor: string
+	name: string
 	documents: Set<string>
 	presence: Map<string, LivePresence>
 	lastPresence: number
@@ -41,8 +42,18 @@ export function makeDocumentLive() {
 									let live = socket.data.live
 									if (!live) return
 									if (subject !== undefined) {
-										if (subject === live.subject)
+										if (subject === live.subject) {
+											live.name = yield* profileName(live.subject)
+											for (let [document, previous] of live.presence) {
+												let presence = { ...previous, name: live.name }
+												live.presence.set(document, presence)
+												yield* broadcast(socket, document, {
+													type: "presence",
+													presence,
+												})
+											}
 											send(socket, { type: "preferences" })
+										}
 										return
 									}
 									for (let document of live.documents) {
@@ -93,6 +104,7 @@ export function makeDocumentLive() {
 				if (url.searchParams.get("account") !== account.subject)
 					return new Response("Account changed", { status: 409 })
 				let actor = yield* cipher.uuid()
+				let name = yield* profileName(account.subject)
 				if (
 					server.upgrade(request, {
 						data: {
@@ -100,6 +112,7 @@ export function makeDocumentLive() {
 								session: account.session,
 								subject: account.subject,
 								actor,
+								name,
 								documents: new Set(),
 								presence: new Map(),
 								lastPresence: 0,
@@ -175,6 +188,7 @@ export function makeDocumentLive() {
 				let presence = {
 					...presentationPresence(message.presence, role, now),
 					actor: live.actor,
+					name: live.name,
 					time: now,
 				}
 				live.presence.set(document, presence)
@@ -200,6 +214,12 @@ export function makeDocumentLive() {
 						{ discard: true },
 					)
 				: Effect.void
+		}
+		function profileName(subject: string) {
+			return store.preferences().pipe(
+				Effect.provideService(Identity, { subject, actors: [] }),
+				Effect.map(profile => profile.name),
+			)
 		}
 		function authorize(socket: ServerWebSocket<Connection>) {
 			return Effect.gen(function* () {

@@ -1,3 +1,4 @@
+import { verifyReaderPresence } from "./browser-native-presence"
 import { object, string } from "../src/shared/model"
 import {
 	assert,
@@ -28,6 +29,20 @@ try {
 		wait(
 			session,
 			'fetch("/api/accounts/session").then(response => response.ok)',
+		)
+	}
+	for (let [session, name] of [
+		[owner, "Harbour owner"],
+		[guest, "Invited writer"],
+		[reader, "Invited reader"],
+	]) {
+		if (!session || !name) continue
+		assert(
+			evaluate(
+				session,
+				`fetch("/api/accounts/preferences", {method:"PUT", headers:{"content-type":"application/json"}, body:JSON.stringify({request:"invite-profile-name",patch:{name:${JSON.stringify(name)}}})}).then(response => response.ok)`,
+			),
+			"saved account display name",
 		)
 	}
 	browser(owner, "click", '[data-action="new"]')
@@ -127,6 +142,7 @@ try {
 		"a reader link opens the document read-only",
 	)
 
+	verifyReaderPresence(owner, reader, document)
 	let writerInvitation = string(
 		evaluate(
 			owner,
@@ -189,6 +205,18 @@ try {
 	wait(
 		guest,
 		`${workspaceValue} === ${JSON.stringify(workspace)} && location.pathname === ${JSON.stringify("/app/spaces/" + workspace)}`,
+	)
+	evaluate(owner, 'document.querySelector("#dialog").close()')
+	wait(
+		owner,
+		'document.querySelector(".space-members").textContent.includes("Invited writer")',
+	)
+	assert(
+		evaluate(
+			owner,
+			'document.querySelector(".space-members").textContent.includes("Harbour owner") && document.querySelector(".space-members").textContent.includes("via invitation")',
+		),
+		"space settings show invite members and saved names without requiring a reload",
 	)
 	browser(guest, "click", '[data-action="new"]')
 	wait(

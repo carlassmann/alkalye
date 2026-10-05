@@ -114,13 +114,19 @@ export let MembershipSchema = Schema.Struct({
 	member: IdentifierSchema,
 	role: Schema.Literals(["writer", "reader"]),
 })
+export let WorkspaceMemberSchema = Schema.Struct({
+	...MembershipSchema.fields,
+	name: Schema.optionalKey(Schema.String),
+	source: Schema.optionalKey(Schema.Literals(["direct", "invitation", "both"])),
+})
 export let WorkspaceSnapshotSchema = Schema.Struct({
 	workspace: IdentifierSchema,
 	name: Schema.String,
 	owner: IdentifierSchema,
 	position: Schema.Natural,
 	avatar: Schema.optionalKey(WorkspaceAvatarSchema),
-	members: Schema.Array(MembershipSchema),
+	ownerName: Schema.optionalKey(Schema.String),
+	members: Schema.Array(WorkspaceMemberSchema),
 	documents: Schema.Array(SidebarDocumentSchema),
 })
 export type WorkspaceSnapshot = typeof WorkspaceSnapshotSchema.Type
