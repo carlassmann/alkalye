@@ -7,6 +7,7 @@ export function documentAccessMarkup(
 	fields: Record<string, string>,
 	subject: string,
 	link: string,
+	name: (subject: string) => string,
 ) {
 	let published = Boolean(fields["access:" + publicMember])
 	return html`<section data-access>
@@ -28,11 +29,7 @@ export function documentAccessMarkup(
 				${published ? "Make private" : "Make public"}
 			</button>
 		</div>
-		<p>Owner <code>${owner}</code></p>
-		<p>
-			Your account
-			<input readonly value="${subject}" aria-label="Your account ID" />
-		</p>
+		<p>Owner <span>${owner === subject ? "You" : name(owner)}</span></p>
 		<p>Workspace members also retain their workspace permissions.</p>
 		<ul>
 			${joinMarkup(
@@ -46,29 +43,33 @@ export function documentAccessMarkup(
 					.map(
 						([field, value]) =>
 							html`<li>
-								<code>${field.slice(7)}</code><span>${value}</span>
+								<span data-access-person="${field.slice(7)}"
+									>${name(field.slice(7))}</span
+								><span>${value}</span
+								><button type="button" data-remove-access="${field.slice(7)}">
+									Remove
+								</button>
 							</li>`,
 					),
 			)}
 		</ul>
-		<label
-			>Account ID<input
-				name="member"
-				required
-				pattern="[\\w-]+"
-				autocomplete="off"
-		/></label>
-		<label
-			>Permission${pickerMarkup(
-				"role",
-				"Permission",
-				[
-					{ value: "writer", label: "Writer" },
-					{ value: "reader", label: "Reader" },
-					{ value: "remove", label: "Remove document access" },
-				],
-				"writer",
-			)}</label
-		>
+		<details>
+			<summary>Add by account ID</summary>
+			<label
+				>Account ID<input name="member" pattern="[\\w-]+" autocomplete="off"
+			/></label>
+			<label
+				>Permission${pickerMarkup(
+					"role",
+					"Permission",
+					[
+						{ value: "writer", label: "Writer" },
+						{ value: "reader", label: "Reader" },
+						{ value: "remove", label: "Remove document access" },
+					],
+					"writer",
+				)}</label
+			>
+		</details>
 	</section>`
 }

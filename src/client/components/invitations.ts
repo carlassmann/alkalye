@@ -210,8 +210,7 @@ export class InvitationsElement extends HTMLElement {
 																		summary.members.map(
 																			member =>
 																				html`<li>
-																					<span title="${member.member}"
-																						>${member.name}</span
+																					<span>${member.name}</span
 																					><button
 																						type="button"
 																						data-from="${summary.invitation}"

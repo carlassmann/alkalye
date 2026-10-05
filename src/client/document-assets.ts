@@ -315,7 +315,7 @@ function makeAssets(options: AssetOptions) {
 			let fields = staged.fields(id)
 			if (
 				id === document ||
-				fields.type !== "asset" ||
+				(fields.type !== "asset" && fields.type !== "whiteboard") ||
 				fields.document !== document
 			)
 				throw new DocumentConflict({

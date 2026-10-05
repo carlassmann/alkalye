@@ -200,6 +200,10 @@ try {
 		"Whiteboard uses one compact header",
 	)
 	browser(session, "screenshot", "/tmp/alkalye-whiteboard-header.png")
+	evaluate(
+		session,
+		'(() => { document.querySelector("alkalye-whiteboard").editor.createShapes([{type:"geo",x:0,y:0,props:{geo:"rectangle",w:100,h:80}}]); return true })()',
+	)
 	browser(session, "click", "#embed-board")
 	wait(
 		session,
@@ -219,6 +223,87 @@ try {
 		"An embedded drawing offers Save when reopened",
 	)
 	browser(session, "click", "#close-board")
+	let board = String(
+		evaluate(
+			session,
+			'document.querySelector("[data-attachments] [data-asset-id]").dataset.assetId',
+		),
+	)
+	assert(
+		evaluate(
+			session,
+			'![...document.querySelectorAll("#inspector-body h3")].some(heading=>heading.textContent.includes("Drawings"))',
+		),
+		"Whiteboards appear in the Assets list",
+	)
+	wait(
+		session,
+		'Boolean(document.querySelector("[data-attachments] .asset-thumbnail img"))',
+	)
+	browser(session, "click", `[data-action="asset-rename:${board}"]`)
+	assert(
+		evaluate(
+			session,
+			`getComputedStyle(document.querySelector('#dialog footer [value="cancel"]')).borderTopStyle === "solid"`,
+		),
+		"Cancel uses the original outline button",
+	)
+	browser(session, "fill", '#dialog input[name="value"]', "Renamed board")
+	browser(session, "click", '#dialog footer [value="cancel"]')
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("[data-attachments] .asset-row > button").textContent.includes("Whiteboard")',
+		),
+		"Cancel keeps the drawing name unchanged",
+	)
+	browser(session, "click", `[data-action="asset-rename:${board}"]`)
+	browser(session, "fill", '#dialog input[name="value"]', "Renamed board")
+	browser(session, "click", "#submit-dialog")
+	wait(
+		session,
+		'document.querySelector("[data-attachments] .asset-row > button").textContent.includes("Renamed board")',
+	)
+	assert(true, "Whiteboards can be renamed through the asset menu")
+	evaluate(
+		session,
+		"window.assetDownload = undefined; HTMLAnchorElement.prototype.click = function(){ window.assetDownload=fetch(this.href).then(response=>response.json()).then(file=>({name:this.download,file})); }",
+	)
+	browser(session, "click", `[data-action="asset-download:${board}"]`)
+	wait(session, "Boolean(window.assetDownload)")
+	assert(
+		evaluate(
+			session,
+			'window.assetDownload.then(result=>result.name === "Renamed board.tldr" && result.file.tldrawFileFormatVersion===1 && result.file.records.some(record=>record.typeName==="page"))',
+		),
+		"The asset menu downloads an editable tldraw file",
+	)
+	browser(session, "click", `[data-action="asset-delete:${board}"]`)
+	browser(session, "click", "#submit-dialog")
+	wait(
+		session,
+		`!document.querySelector('[data-asset-id="${board}"]') && !document.querySelector("alkalye-editor").source.value.includes("asset:${board}")`,
+	)
+	evaluate(session, 'document.querySelector("#editor").focus()')
+	browser(session, "press", "Control+z")
+	wait(
+		session,
+		`Boolean(document.querySelector('[data-asset-id="${board}"]')) && document.querySelector("alkalye-editor").source.value.includes("asset:${board}")`,
+	)
+	assert(
+		true,
+		"Deleting and undoing a whiteboard restores its asset and source reference together",
+	)
+	browser(session, "click", '[data-action="share"]')
+	wait(session, 'Boolean(document.querySelector("[data-access]"))')
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("[data-access]").textContent.includes("Owner You") && !document.querySelector("[data-access] code") && !document.querySelector("[data-access] details").open',
+		),
+		"Sharing shows names and keeps technical identifiers collapsed",
+	)
+	browser(session, "click", "#dialog .dialog-close")
 	console.log("UI leftovers browser checks passed")
 } finally {
 	try {

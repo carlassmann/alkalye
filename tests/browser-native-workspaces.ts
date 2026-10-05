@@ -68,6 +68,7 @@ export function verifyNativeWorkspaces(
 		owner,
 		'document.querySelector("#dialog [data-add-member]") !== null && document.querySelector("#dialog [data-invitations]") !== null',
 	)
+	browser(owner, "click", "[data-add-member] > summary")
 	browser(owner, "fill", '[data-add-member] input[name="member"]', subject)
 	browser(
 		owner,
@@ -150,6 +151,7 @@ export function verifyNativeWorkspaces(
 	)
 	browser(owner, "click", '[data-action="share"]')
 	wait(owner, 'document.querySelector("#dialog input[name=member]") !== null')
+	browser(owner, "click", "[data-access] details > summary")
 	browser(owner, "fill", '#dialog input[name="member"]', subject)
 	browser(owner, "click", '#dialog [role=option][data-value="writer"]')
 	browser(owner, "click", "#submit-dialog")

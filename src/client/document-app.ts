@@ -24,6 +24,7 @@ import { formattingCommands } from "../shared/authoring"
 import { blobContentType } from "../shared/document-blobs"
 import { metadataSource } from "../shared/document-metadata"
 import type { MetadataPatch } from "../shared/document-metadata"
+import { boardFile, boardRegister } from "../shared/whiteboard"
 import { folderPath } from "../shared/folders"
 import { openContextMenu } from "./components/context-menu"
 import type { MenuEntry } from "./components/context-menu"
@@ -2337,18 +2338,7 @@ function mountApplication() {
 							: ""
 					}
 					${doc && !file ? backlinksMarkup(doc) : ""}
-					${doc && selection ? attachmentsMarkup(selection.opened.assets.current(), writable() && located?.directory.id !== openedFiles, selection.media.current().failures) : ""}
-					${
-						doc
-							? html`<div class="tool-section">
-									<h3>
-										<span>Drawings</span
-										>${file ? "" : button("new-whiteboard", "New drawing", icon("plus"))}
-									</h3>
-									${joinMarkup((selection?.opened.session.replica.records("whiteboard") ?? []).filter(board => board.fields.document === doc?.id).map(board => tool("drawing:" + board.id, board.fields.name || "Drawing", "pen-tool")))}
-								</div>`
-							: ""
-					}
+					${doc && selection ? attachmentsMarkup(selection.opened.assets.current(), file ? [] : selection.opened.session.replica.records("whiteboard").filter(board => board.fields.document === doc.id), writable() && located?.directory.id !== openedFiles, selection.media.current().failures, !file) : ""}
 					<div class="tool-section">
 						${tool("sign-in", "Sign in", "log-in")}${tool("sign-out", "Sign out", "log-out")}
 					</div>`,
@@ -2358,9 +2348,7 @@ function mountApplication() {
 		function updateTools(markup: Markup) {
 			let host = element("#inspector-body")
 			let opened = [
-				...host.querySelectorAll<HTMLElement>(
-					".tool-group > [popover]:popover-open",
-				),
+				...host.querySelectorAll<HTMLElement>("[popover]:popover-open"),
 			]
 			let active = document.activeElement
 			let action =
@@ -3035,6 +3023,7 @@ function mountApplication() {
 					let invitations = yield* invitationPanel({
 						document: selected.document,
 					})
+
 					if (selection !== selected) return
 					dialogOwner = selected
 					openDialog(
@@ -3052,9 +3041,14 @@ function mountApplication() {
 									document: selected.document,
 									mode: "edit",
 								}),
+							subject =>
+								subject === account.subject
+									? preferences.state.current().value.name
+									: "Collaborator",
 						),
 						form => {
-							let member = String(form.get("member") ?? "")
+							let member = String(form.get("member") ?? "").trim()
+							if (!member) return Promise.resolve()
 							let role = form.get("role")
 							return selected.tasks.run(
 								selected.opened.session
@@ -3070,6 +3064,66 @@ function mountApplication() {
 						},
 					)
 					dialog.querySelector(".dialog-body")?.prepend(invitations)
+					selected.tasks.fork(
+						account
+							.request(
+								account.api.workspaces.snapshot({
+									params: { workspace: entry.workspace },
+								}),
+							)
+							.pipe(
+								Effect.tap(space =>
+									Effect.sync(() => {
+										if (
+											selection !== selected ||
+											dialogOwner !== selected ||
+											!dialog.open
+										)
+											return
+										for (let label of dialog.querySelectorAll<HTMLElement>(
+											"[data-access-person]",
+										)) {
+											let person = space.members.find(
+												member => member.member === label.dataset.accessPerson,
+											)
+											if (person)
+												label.textContent = person.name || "Collaborator"
+										}
+									}),
+								),
+								Effect.ignore,
+							),
+					)
+					for (let control of dialog.querySelectorAll<HTMLButtonElement>(
+						"[data-remove-access]",
+					)) {
+						control.onclick = () => {
+							let member = control.dataset.removeAccess
+							if (!member) return
+							control.disabled = true
+							selected.tasks
+								.run(
+									selected.opened.session
+										.change("Remove document access", staged => [
+											staged.set(selected.document, "access:" + member, ""),
+										])
+										.pipe(Effect.andThen(selected.opened.session.sync)),
+								)
+								.then(() => {
+									if (
+										selection === selected &&
+										dialogOwner === selected &&
+										dialog.open
+									)
+										control.closest("li")?.remove()
+								})
+								.catch(report)
+								.finally(() => {
+									control.disabled = false
+								})
+						}
+					}
+
 					let toggle = dialog.querySelector<HTMLButtonElement>(
 						"[data-public-toggle]",
 					)
@@ -3412,6 +3466,32 @@ function mountApplication() {
 								return
 							}
 							if (action.startsWith("asset-download:")) {
+								let id = action.slice("asset-download:".length)
+								let board = selected.opened.session.replica.fields(id)
+								if (
+									board.type === "whiteboard" &&
+									board.document === selected.document
+								) {
+									let data = boardFile(board) ?? boardRegister(board)
+									let { downloadFile } = yield* archives
+									if (!data) {
+										let { drawingSvg } = yield* Effect.tryPromise(
+											() => import("./document-media"),
+										)
+										yield* downloadFile({
+											name: (board.name || "Whiteboard") + ".svg",
+											blob: new Blob([yield* drawingSvg(board)], {
+												type: "image/svg+xml",
+											}),
+										})
+										return
+									}
+									yield* downloadFile({
+										name: (board.name || "Whiteboard") + ".tldr",
+										blob: new Blob([data], { type: "application/json" }),
+									})
+									return
+								}
 								let asset = selected.opened.assets
 									.current()
 									.find(

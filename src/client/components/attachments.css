@@ -3,37 +3,19 @@
 	align-items: center;
 	justify-content: space-between;
 }
-[data-attachments] h3 button {
+[data-attachments] h3 alkalye-menu > button {
 	width: auto !important;
 	min-height: 0 !important;
 	padding: 4px !important;
 	color: var(--muted);
 }
 [data-attachments] .asset-row {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) auto;
-	align-items: center;
+	display: block;
 }
-[data-attachments] .asset-row > button span,
-[data-attachments] .asset-name span {
+[data-attachments] .asset-row > button span {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-}
-[data-attachments] .asset-name {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	padding: 8px;
-	font-size: 14px;
-}
-[data-attachments] .asset-actions {
-	display: flex;
-}
-[data-attachments] .asset-actions button {
-	width: auto !important;
-	padding: 6px !important;
-	color: var(--muted);
 }
 [data-attachments] .assets-empty {
 	display: grid;
@@ -53,4 +35,29 @@
 	padding: 4px 8px;
 	color: var(--muted);
 	overflow-wrap: anywhere;
+}
+
+[data-attachments] .asset-row > button {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	min-width: 0;
+}
+[data-attachments] .asset-thumbnail {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 32px;
+	height: 32px;
+	overflow: hidden;
+	background: var(--accent);
+}
+[data-attachments] .asset-thumbnail img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+[data-attachments] .asset-row > button > span:last-child {
+	min-width: 0;
 }

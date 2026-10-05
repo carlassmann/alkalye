@@ -638,6 +638,7 @@ function verifySpaceSettings() {
 		session,
 		'document.querySelector("#dialog").open && document.querySelector("#dialog [data-invitations]") !== null',
 	)
+	browser(session, "click", "[data-add-member] > summary")
 	browser(
 		session,
 		"fill",

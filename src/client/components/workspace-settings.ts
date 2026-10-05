@@ -139,7 +139,8 @@ export class WorkspaceSettingsElement extends HTMLElement {
 							() => {},
 							translate("Invite"),
 							html`<div class="space-invitations" data-invitation-slot></div>
-								<div class="space-add-member" data-add-member>
+								<details class="space-add-member" data-add-member>
+									<summary>Add by account ID</summary>
 									<label
 										>${translate("Add by account ID")}<input
 											name="member"
@@ -159,7 +160,7 @@ export class WorkspaceSettingsElement extends HTMLElement {
 											${translate("Add")}
 										</button>
 									</div>
-								</div>`,
+								</details>`,
 						)
 						let form = target.querySelector<HTMLElement>("[data-add-member]")
 						let add = form?.querySelector<HTMLButtonElement>("[data-add]")
@@ -216,7 +217,7 @@ export class WorkspaceSettingsElement extends HTMLElement {
 							translate("Edit member"),
 							html`<p class="muted">
 									${translate("Change permissions or remove")}
-									<span title="${member}"
+									<span
 										>${space?.members.find(person => person.member === member)?.name || "Anonymous writer"}</span
 									>
 									${translate("from this space.")}
@@ -659,9 +660,7 @@ function spaceMarkup(
 									${member.role === "owner" ? "" : html`data-member-row="${member.member}"`}
 								>
 									<span class="member-name"
-										><span title="${member.member}"
-											>${member.name || "Anonymous writer"}</span
-										>${
+										><span>${member.name || "Anonymous writer"}</span>${
 											member.member === options.subject
 												? html`<span class="badge">${translate("You")}</span>`
 												: ""

@@ -5,10 +5,6 @@
 [data-access] p {
 	margin: 0;
 }
-[data-access] code {
-	overflow-wrap: anywhere;
-	font-size: 11px;
-}
 [data-access] ul {
 	list-style: none;
 	padding: 0;
@@ -20,4 +16,14 @@
 	gap: 12px;
 	padding: 8px 0;
 	border-bottom: 1px solid var(--line);
+}
+
+[data-access] li > span:first-child {
+	flex: 1;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+[data-access] [data-remove-access] {
+	color: var(--danger);
+	padding: 0 6px;
 }

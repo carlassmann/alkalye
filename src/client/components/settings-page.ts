@@ -879,13 +879,16 @@ function generalMarkup(value: AccountPreferences, subject: string) {
 					</div>
 				</div>
 				<div class="settings-block">
-					<label class="block-label" for="account-id"
-						>${translate("Account ID")}</label
-					>
-					<p class="block-description">
-						${translate("Share it to be added to a space by its owner.")}
-					</p>
-					<input id="account-id" readonly value="${subject}" />
+					<details>
+						<summary>Technical account details</summary>
+						<label class="block-label" for="account-id"
+							>${translate("Account ID")}</label
+						>
+						<p class="block-description">
+							${translate("Share it to be added to a space by its owner.")}
+						</p>
+						<input id="account-id" readonly value="${subject}" />
+					</details>
 				</div>
 				<div class="settings-block">
 					<label class="block-label" for="recovery-key"
