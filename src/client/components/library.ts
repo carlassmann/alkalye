@@ -308,16 +308,19 @@ function profileChoices(
 ) {
 	return html`<alkalye-menu data-submenu
 		><button type="button">
-			${icon(symbol)}<span>${label}</span>${icon("chevron-right")}
+			${icon(symbol)}<span data-profile-label="${label}"
+				>${translate(label)}</span
+			>${icon("chevron-right")}
 		</button>
 		<div
 			id="profile-${name}"
 			class="menu-popover"
 			popover
 			role="menu"
-			aria-label="${label}"
+			aria-label="${translate(label)}"
+			data-profile-menu-label="${label}"
 		>
-			${joinMarkup(choices.map(([value, title, symbol]) => html`<button type="button" role="menuitemradio" aria-checked="false" data-action="${name}-${value}">${icon(symbol)}<span>${title}</span>${icon("check")}</button>`))}
+			${joinMarkup(choices.map(([value, title, symbol]) => html`<button type="button" role="menuitemradio" aria-checked="false" data-action="${name}-${value}">${icon(symbol)}<span data-profile-label="${title}">${translate(title)}</span>${icon("check")}</button>`))}
 		</div></alkalye-menu
 	>`
 }

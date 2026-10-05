@@ -34,6 +34,13 @@ try {
 		),
 		"Account dropdown entries have icons",
 	)
+	assert(
+		evaluate(
+			session,
+			'[...document.querySelectorAll(\'#profile-menu [data-action="sign-in"], #profile-menu [data-action="sign-out"]\')].filter(button=>!button.hidden).length === 1',
+		),
+		"Account menu shows one authentication action",
+	)
 	browser(session, "screenshot", "/tmp/alkalye-account-menu.png")
 	browser(session, "press", "Escape")
 	browser(session, "click", '[data-action="appearance-dark"]')
@@ -45,6 +52,19 @@ try {
 		),
 		"Account theme choices save and reflect their state",
 	)
+	browser(session, "click", '[data-action="language-de"]')
+	wait(
+		session,
+		`document.querySelector('[data-profile-label="Theme"]').textContent === "Design"`,
+	)
+	assert(
+		evaluate(
+			session,
+			`document.querySelector('[data-profile-label="Light"]').textContent === "Hell"`,
+		),
+		"Account submenu labels follow the chosen language",
+	)
+	browser(session, "click", '[data-action="language-en"]')
 	browser(session, "click", '[data-action="new"]')
 	browser(session, "fill", "#editor", "First line\nSecond line\nThird line\n")
 	evaluate(
@@ -138,6 +158,25 @@ try {
 		"Editor context menus include icons",
 	)
 	browser(session, "press", "Escape")
+	browser(
+		session,
+		"fill",
+		"#editor",
+		"ordinary line\n".repeat(300) + "distant needle",
+	)
+	evaluate(
+		session,
+		'(() => { let editor=document.querySelector("#editor"); editor.focus(); editor.setSelectionRange(0,0); editor.scrollTop=0; return true })()',
+	)
+	browser(session, "press", "Control+f")
+	browser(session, "fill", "#find-text", "needle")
+	browser(session, "click", "#find-next")
+	wait(
+		session,
+		'document.querySelector("#editor").scrollTop > 100 && document.activeElement.id === "find-text"',
+	)
+	assert(true, "Find scrolls to distant matches while retaining search focus")
+	browser(session, "click", "#close-find")
 	browser(session, "set", "viewport", "504", "842")
 	browser(session, "press", "Control+f")
 	wait(session, 'Boolean(document.querySelector("#find-text"))')
@@ -150,6 +189,36 @@ try {
 	)
 	browser(session, "click", "#close-find")
 	browser(session, "screenshot", "/tmp/alkalye-ui-leftovers.png")
+	browser(session, "set", "viewport", "1440", "900")
+	browser(session, "click", '[data-action="new-whiteboard"]')
+	wait(session, 'Boolean(document.querySelector("alkalye-whiteboard")?.editor)')
+	assert(
+		evaluate(
+			session,
+			'getComputedStyle(document.querySelector("#dialog > form > header")).display === "none" && Math.abs(document.querySelector(".board-bar").getBoundingClientRect().height - 56) < 1',
+		),
+		"Whiteboard uses one compact header",
+	)
+	browser(session, "screenshot", "/tmp/alkalye-whiteboard-header.png")
+	browser(session, "click", "#embed-board")
+	wait(
+		session,
+		'!document.querySelector("#dialog").open && document.querySelector("alkalye-editor").source.value.includes("asset:")',
+	)
+	assert(
+		true,
+		"Embedding a drawing inserts its document reference and closes the board",
+	)
+	browser(session, "click", '[data-action^="drawing:"]')
+	wait(session, 'Boolean(document.querySelector("alkalye-whiteboard")?.editor)')
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("#embed-board").textContent.trim() === "Save"',
+		),
+		"An embedded drawing offers Save when reopened",
+	)
+	browser(session, "click", "#close-board")
 	console.log("UI leftovers browser checks passed")
 } finally {
 	try {

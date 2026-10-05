@@ -223,6 +223,7 @@ function mountApplication() {
 		let selectedComment: string | undefined
 		let app = element("#app")
 		let archives = Effect.tryPromise(() => import("./document-archives"))
+		setLanguage(preferences.state.current().value.language)
 		setMarkup(
 			app,
 			html`${libraryMarkup(preferences.state.current().value.name, "")}
@@ -653,6 +654,17 @@ function mountApplication() {
 				)
 			}
 			setLanguage(value.language)
+			for (let label of app.querySelectorAll<HTMLElement>(
+				"[data-profile-label]",
+			))
+				label.textContent = translate(label.dataset.profileLabel ?? "")
+			for (let menu of app.querySelectorAll<HTMLElement>(
+				"[data-profile-menu-label]",
+			))
+				menu.setAttribute(
+					"aria-label",
+					translate(menu.dataset.profileMenuLabel ?? ""),
+				)
 			editor?.preferences(value.editor)
 			let label = app.querySelector(".profile-name")?.firstChild
 			if (label instanceof Text) label.textContent = value.name
@@ -2143,6 +2155,15 @@ function mountApplication() {
 			}
 		}
 		function refreshDocument() {
+			let signedIn = account.state.current().status === "signedIn"
+			let signIn = app.querySelector<HTMLElement>(
+				'#profile-menu [data-action="sign-in"]',
+			)
+			let signOut = app.querySelector<HTMLElement>(
+				'#profile-menu [data-action="sign-out"]',
+			)
+			if (signIn) signIn.hidden = signedIn
+			if (signOut) signOut.hidden = !signedIn
 			selection?.media.refresh()
 			let doc = currentDocument()
 			if (!doc) {

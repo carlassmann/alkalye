@@ -246,8 +246,14 @@ export class FindElement extends HTMLElement {
 							.filter(match => match.index < editor.selectionStart)
 							.at(-1) ?? matches.at(-1))
 			if (!match) return toast("No match")
-			editor.setSelectionRange(match.index, match.index + match[0].length)
+			let host = document.querySelector("alkalye-editor")
+			if (host instanceof EditorElement)
+				host.selectRange(match.index, match.index + match[0].length)
+			else editor.setSelectionRange(match.index, match.index + match[0].length)
 			editor.dispatchEvent(new Event("select"))
+			this.querySelector<HTMLInputElement>("#find-text")?.focus({
+				preventScroll: true,
+			})
 			return
 		}
 		if (editor.readOnly) return
