@@ -247,3 +247,9 @@
 [data-editor] [data-editor-links] a:hover {
 	box-shadow: inset 0 -1px var(--ink);
 }
+
+[data-app][aria-busy="true"]
+	[data-editor]
+	:is(#highlight, [data-editor-links]) {
+	animation: none;
+}

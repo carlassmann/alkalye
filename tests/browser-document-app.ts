@@ -30,10 +30,19 @@ if (process.argv.includes("--serve")) {
 	let instance: Effect.Success<ReturnType<typeof startServer>>
 	let snapshotWaiting = false
 	let snapshotAborted = false
+	let pauseFonts = false
+	let resumeFonts: Array<() => void> = []
 	let proxy = Bun.serve({
 		port: 0,
 		async fetch(request) {
 			let url = new URL(request.url)
+			if (url.pathname === "/__tests/fonts") {
+				pauseFonts = url.searchParams.get("pause") === "true"
+				if (!pauseFonts) for (let resume of resumeFonts.splice(0)) resume()
+				return Response.json({ paused: pauseFonts })
+			}
+			if (pauseFonts && url.pathname.endsWith(".woff2"))
+				await new Promise<void>(resolve => resumeFonts.push(resolve))
 			if (url.pathname === "/__tests/snapshot-request")
 				return Response.json({
 					waiting: snapshotWaiting,

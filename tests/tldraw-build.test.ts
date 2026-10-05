@@ -53,6 +53,8 @@ test("the offline shell caches every local tldraw asset", async () => {
 		expect(await Bun.file(join(directory, path)).exists()).toBe(true)
 	}
 	expect(worker).not.toContain("BUILD_TLDRAW")
+	expect(worker).toContain("let development = false")
+	expect(worker).not.toContain("BUILD_DEVELOPMENT")
 	let style = await Bun.file(join(directory, "app.css")).text()
 	expect(style).not.toContain("/tldraw/tldraw.css")
 })

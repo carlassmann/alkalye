@@ -5,10 +5,34 @@ let server = Bun.spawn(["bun", "tests/browser-document-app.ts", "--serve"], {
 	stderr: "inherit",
 })
 let session = "ui-parity-" + Date.now()
+let fontSession = session + "-fonts"
 try {
 	let output = await server.stdout.getReader().read()
 	if (!output.value) throw new Error("Missing app URL")
 	let url = new URL("/app", new TextDecoder().decode(output.value).trim()).href
+	await fetch(new URL("/__tests/fonts?pause=true", url))
+	browser(fontSession, "open", "about:blank")
+	evaluate(
+		fontSession,
+		`setTimeout(() => location.assign(${JSON.stringify(url)}), 0); true`,
+	)
+	wait(fontSession, 'document.querySelector("#editor") !== null')
+	assert(
+		evaluate(
+			fontSession,
+			'document.fonts.status === "loading" && document.querySelector("#app").getAttribute("aria-busy") === "true" && !document.querySelector("[data-toolbar]").checkVisibility({visibilityProperty: true}) && getComputedStyle(document.querySelector("#highlight")).animationName === "none"',
+		),
+		"Chrome stays hidden and the text animation waits while fonts load",
+	)
+	await fetch(new URL("/__tests/fonts", url))
+	wait(fontSession, '!document.querySelector("#app").hasAttribute("aria-busy")')
+	assert(
+		evaluate(
+			fontSession,
+			'document.fonts.status === "loaded" && document.querySelector("[data-toolbar]").checkVisibility({visibilityProperty: true})',
+		),
+		"The document and its chrome appear with their final fonts",
+	)
 	let shell = await fetch(url).then(response => response.text())
 	assert(
 		shell.includes("data-boot") && !shell.includes("<!-- APP_BOOT -->"),
@@ -346,7 +370,34 @@ try {
 		),
 		"Reduced motion opens document text without an entrance animation",
 	)
+
+	wait(session, "navigator.serviceWorker.controller !== null")
+	evaluate(
+		session,
+		'caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith("alkalye-")).map(async key => {let cache = await caches.open(key); await cache.put("/app.js", new Response("throw 1", {headers: {"content-type": "text/javascript"}}))})))',
+	)
+	browser(session, "reload")
+	wait(
+		session,
+		'document.querySelector("#editor") !== null && !document.querySelector("#app").hasAttribute("aria-busy")',
+	)
+	assert(
+		evaluate(
+			session,
+			'!document.querySelector(\'[data-action="slideshow"], [data-action="teleprompter"]\')',
+		),
+		"Development reload fetches current code instead of a cached older application",
+	)
+	browser(session, "set", "offline", "on")
+	browser(session, "reload")
+	wait(
+		session,
+		'document.querySelector("#editor") !== null && !document.querySelector("#app").hasAttribute("aria-busy")',
+	)
+	assert(true, "The refreshed development build still opens offline")
+	browser(session, "set", "offline", "off")
 } finally {
+	browser(fontSession, "close")
 	browser(session, "close")
 	server.kill()
 	await server.exited

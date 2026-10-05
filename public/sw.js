@@ -1,4 +1,5 @@
 let cacheName = "alkalye-BUILD_VERSION"
+let development = BUILD_DEVELOPMENT
 let shell = [
 	"BUILD_STYLES",
 	"BUILD_SCRIPTS",
@@ -28,7 +29,10 @@ let shell = [
 ]
 self.addEventListener("install", event => {
 	event.waitUntil(
-		caches.open(cacheName).then(cache => cache.addAll([...new Set(shell)])),
+		caches.open(cacheName).then(async cache => {
+			await cache.addAll([...new Set(shell)])
+			if (development) await self.skipWaiting()
+		}),
 	)
 })
 self.addEventListener("message", event => {
@@ -67,7 +71,23 @@ self.addEventListener("fetch", event => {
 			url.pathname === "/invite")
 	event.respondWith(
 		caches.open(cacheName).then(async cache => {
-			let cached = await cache.match(app ? "/app" : event.request)
+			let key = app ? "/app" : event.request
+			let cached = await cache.match(key)
+			if (development) {
+				try {
+					let response = await fetch(event.request, {
+						cache: "no-store",
+						signal: AbortSignal.timeout(3000),
+					})
+					if (response.ok) {
+						event.waitUntil(cache.put(key, response.clone()).catch(() => {}))
+					}
+					return response
+				} catch (error) {
+					if (cached) return cached
+					throw error
+				}
+			}
 			if (cached) return cached
 			try {
 				let response = await fetch(event.request)

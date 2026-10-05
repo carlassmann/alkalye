@@ -725,9 +725,20 @@ function mountApplication() {
 				}),
 			)
 		function finishOpening() {
+			if (!opening) return
 			opening = false
-			app.removeAttribute("aria-busy")
 			if (!selection) mountDocument()
+			launch(
+				Effect.tryPromise(async () => {
+					await Promise.allSettled([
+						document.fonts.load("14px Geist"),
+						document.fonts.load('18px "Geist Mono"'),
+					])
+					await document.fonts.ready
+				}).pipe(
+					Effect.ensuring(Effect.sync(() => app.removeAttribute("aria-busy"))),
+				),
+			)
 		}
 		function launch<A, E>(
 			work: Effect.Effect<A, E, Scope.Scope | HttpClient.HttpClient>,
@@ -1503,7 +1514,6 @@ function mountApplication() {
 				)
 				return
 			}
-			finishOpening()
 			let selectedReplica = selected.opened.session.replica
 			function mediaIcon(url: string) {
 				let id = url.startsWith("asset:") ? url.slice(6) : undefined
@@ -1781,6 +1791,7 @@ function mountApplication() {
 			selected.media.visible(mode !== "edit")
 			mounted = selected
 			refreshDocument()
+			finishOpening()
 		}
 		function openDrawing(selected: Selection, id: string, create = false) {
 			return Effect.gen(function* () {

@@ -1,7 +1,7 @@
 import * as Effect from "effect/Effect"
 
-// A new build installs in the background and waits. The person chooses when
-// to switch, so an update never reloads the page while they are typing.
+// Updates never reload an open page while someone is typing. Production
+// also waits for permission before activating its new offline cache.
 export function watchUpdates(
 	signal: AbortSignal,
 	offer: (apply: () => void) => void,
@@ -12,7 +12,19 @@ export function watchUpdates(
 		Effect.tap(registration =>
 			Effect.sync(() => {
 				let offered = false
+				let controlled = Boolean(navigator.serviceWorker.controller)
+				let development = process.env.NODE_ENV === "development"
+				navigator.serviceWorker.addEventListener(
+					"controllerchange",
+					() => {
+						if (!development || !controlled || offered) return
+						offered = true
+						offer(() => location.reload())
+					},
+					{ signal },
+				)
 				function check() {
+					if (development) return
 					let waiting = registration.waiting
 					if (offered || !waiting || !navigator.serviceWorker.controller) return
 					offered = true

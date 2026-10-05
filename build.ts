@@ -115,6 +115,7 @@ export async function build(
 		resolve(output, "sw.js"),
 		worker
 			.replace("BUILD_VERSION", version)
+			.replace("BUILD_DEVELOPMENT", JSON.stringify(development))
 			.replace('"BUILD_STYLES"', "..." + JSON.stringify(componentStyles))
 			.replace(
 				'"BUILD_TLDRAW"',
