@@ -1,27 +1,260 @@
-[data-toast]#toast {
+/* Sonner's default toaster, scoped to the popover host. */
+[data-toast] {
+	--width: 356px;
+	--gap: 14px;
+	--border-radius: 8px;
+	--offset-right: 24px;
+	--offset-bottom: 24px;
+	--mobile-offset: 16px;
+	--normal-bg: #fff;
+	--normal-border: hsl(0, 0%, 93%);
+	--normal-text: hsl(0, 0%, 9%);
 	position: fixed;
-	bottom: 45px;
-	left: 50%;
-	transform: translateX(-50%) translateY(10px);
-	background: var(--raised);
-	border: 1px solid var(--line);
-	padding: 12px 20px;
-	border-radius: 0;
-	font-size: 12px;
+	inset: auto;
+	right: var(--offset-right);
+	bottom: var(--offset-bottom);
+	width: var(--width);
+	height: 0;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	color: var(--normal-text);
+	overflow: visible;
+	font-family:
+		ui-sans-serif,
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		Segoe UI,
+		Roboto,
+		Helvetica Neue,
+		Arial,
+		Noto Sans,
+		sans-serif,
+		Apple Color Emoji,
+		Segoe UI Emoji,
+		Segoe UI Symbol,
+		Noto Color Emoji;
+	outline: none;
+}
+[data-toast] [data-sonner-toaster] {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	width: var(--width);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	outline: none;
+}
+[data-toast] [data-sonner-toast] {
+	--y: translateY(100%);
+	--lift: -1;
+	--lift-amount: calc(var(--lift) * var(--gap));
+	z-index: var(--z-index);
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	opacity: 0;
+	transform: var(--y);
+	touch-action: none;
+	transition:
+		transform 400ms,
+		opacity 400ms,
+		height 400ms,
+		box-shadow 200ms;
+	box-sizing: border-box;
+	outline: none;
+	overflow-wrap: anywhere;
+	padding: 16px;
+	background: var(--normal-bg);
+	border: 1px solid var(--normal-border);
+	color: var(--normal-text);
+	border-radius: var(--border-radius);
+	box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+	width: var(--width);
+	font-size: 13px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+[data-toast] [data-sonner-toast]:focus-visible {
+	box-shadow:
+		0px 4px 12px rgba(0, 0, 0, 0.1),
+		0 0 0 2px rgba(0, 0, 0, 0.2);
+}
+[data-toast] [data-sonner-toast] [data-content] {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+[data-toast] [data-sonner-toast] [data-title] {
+	font-weight: 500;
+	line-height: 1.5;
+	color: inherit;
+}
+[data-toast] [data-sonner-toast] > * {
+	transition: opacity 400ms;
+}
+[data-toast] [data-sonner-toast][data-swiping="true"]::before {
+	content: "";
+	position: absolute;
+	left: -100%;
+	right: -100%;
+	height: 100%;
+	z-index: -1;
+	top: 50%;
+	transform: scaleY(3) translateY(-50%);
+}
+[data-toast]
+	[data-sonner-toast][data-swiping="false"][data-removed="true"]::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	transform: scaleY(2);
+}
+[data-toast] [data-sonner-toast][data-expanded="true"]::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	height: calc(var(--gap) + 1px);
+	bottom: 100%;
+	width: 100%;
+}
+[data-toast] [data-sonner-toast][data-mounted="true"] {
+	--y: translateY(0);
+	opacity: 1;
+}
+[data-toast] [data-sonner-toast][data-expanded="false"][data-front="false"] {
+	--scale: var(--toasts-before) * 0.05 + 1;
+	--y: translateY(calc(var(--lift-amount) * var(--toasts-before)))
+		scale(calc(-1 * var(--scale)));
+	height: var(--front-toast-height);
+}
+[data-toast]
+	[data-sonner-toast][data-expanded="false"][data-front="false"]
+	> * {
+	opacity: 0;
+}
+[data-toast] [data-sonner-toast][data-visible="false"] {
 	opacity: 0;
 	pointer-events: none;
-	transition:
-		opacity 0.15s,
-		transform 0.15s;
-	z-index: 20;
-	max-width: 90vw;
 }
-[data-toast]#toast.visible {
-	opacity: 1;
-	transform: translateX(-50%);
+[data-toast] [data-sonner-toast][data-mounted="true"][data-expanded="true"] {
+	--y: translateY(calc(var(--lift) * var(--offset)));
+	height: var(--initial-height);
+}
+[data-toast]
+	[data-sonner-toast][data-removed="true"][data-front="true"][data-swipe-out="false"] {
+	--y: translateY(calc(var(--lift) * -100%));
+	opacity: 0;
+}
+[data-toast]
+	[data-sonner-toast][data-removed="true"][data-front="false"][data-swipe-out="false"][data-expanded="true"] {
+	--y: translateY(calc(var(--lift) * var(--offset) + var(--lift) * -100%));
+	opacity: 0;
+}
+[data-toast]
+	[data-sonner-toast][data-removed="true"][data-front="false"][data-swipe-out="false"][data-expanded="false"] {
+	--y: translateY(40%);
+	opacity: 0;
+	transition:
+		transform 500ms,
+		opacity 200ms;
+}
+[data-toast]
+	[data-sonner-toast][data-removed="true"][data-front="false"]::before {
+	height: calc(var(--initial-height) + 20%);
+}
+[data-toast] [data-sonner-toast][data-swiping="true"] {
+	transform: var(--y) translateY(var(--swipe-amount-y, 0px))
+		translateX(var(--swipe-amount-x, 0px));
+	transition: none;
+}
+[data-toast] [data-sonner-toast][data-swiped="true"] {
+	user-select: none;
+}
+[data-toast] [data-sonner-toast][data-swipe-out="true"] {
+	animation-duration: 200ms;
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+}
+[data-toast] [data-sonner-toast][data-swipe-direction="left"] {
+	animation-name: toast-swipe-out-left;
+}
+[data-toast] [data-sonner-toast][data-swipe-direction="right"] {
+	animation-name: toast-swipe-out-right;
+}
+[data-toast] [data-sonner-toast][data-swipe-direction="up"] {
+	animation-name: toast-swipe-out-up;
+}
+[data-toast] [data-sonner-toast][data-swipe-direction="down"] {
+	animation-name: toast-swipe-out-down;
+}
+@keyframes toast-swipe-out-left {
+	from {
+		transform: var(--y) translateX(var(--swipe-amount-x));
+		opacity: 1;
+	}
+	to {
+		transform: var(--y) translateX(calc(var(--swipe-amount-x) - 100%));
+		opacity: 0;
+	}
+}
+@keyframes toast-swipe-out-right {
+	from {
+		transform: var(--y) translateX(var(--swipe-amount-x));
+		opacity: 1;
+	}
+	to {
+		transform: var(--y) translateX(calc(var(--swipe-amount-x) + 100%));
+		opacity: 0;
+	}
+}
+@keyframes toast-swipe-out-up {
+	from {
+		transform: var(--y) translateY(var(--swipe-amount-y));
+		opacity: 1;
+	}
+	to {
+		transform: var(--y) translateY(calc(var(--swipe-amount-y) - 100%));
+		opacity: 0;
+	}
+}
+@keyframes toast-swipe-out-down {
+	from {
+		transform: var(--y) translateY(var(--swipe-amount-y));
+		opacity: 1;
+	}
+	to {
+		transform: var(--y) translateY(calc(var(--swipe-amount-y) + 100%));
+		opacity: 0;
+	}
+}
+@media (max-width: 600px) {
+	[data-toast] {
+		right: var(--mobile-offset);
+		left: var(--mobile-offset);
+		bottom: var(--mobile-offset);
+		width: auto;
+	}
+	[data-toast] [data-sonner-toaster],
+	[data-toast] [data-sonner-toast] {
+		left: 0;
+		right: 0;
+		width: 100%;
+	}
+}
+@media (prefers-reduced-motion) {
+	[data-toast] [data-sonner-toast],
+	[data-toast] [data-sonner-toast] > * {
+		transition: none !important;
+		animation: none !important;
+	}
 }
 @media print {
-	[data-toast]#toast {
+	[data-toast] {
 		display: none !important;
 	}
 }
