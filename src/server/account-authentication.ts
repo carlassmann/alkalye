@@ -58,7 +58,7 @@ export function authenticationAvailable<A, E, R>(
 			error instanceof AccountChanged ||
 			error instanceof AuthenticationUnavailable
 				? Effect.void
-				: Effect.logError("Account storage failed", error),
+				: Effect.logError("Account storage failed"),
 		),
 		Effect.mapError(error =>
 			error instanceof AuthenticationRequired ||

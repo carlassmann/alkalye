@@ -5,6 +5,7 @@ import * as Option from "effect/Option"
 import * as Schedule from "effect/Schedule"
 import * as Semaphore from "effect/Semaphore"
 import * as SubscriptionRef from "effect/SubscriptionRef"
+import { documentFailureCategory } from "./document-observability"
 import { LocalDocumentFailure, documentFailure } from "./document-failures"
 import type { DocumentFailure } from "./document-failures"
 import type { BlobFailure } from "./document-errors"
@@ -54,7 +55,10 @@ export function makeDocumentRecovery(
 								trackDefault(kind).pipe(
 									Effect.retry({ schedule: policy, while: retryable }),
 									Effect.catch(error =>
-										Effect.logError("Document recovery needs attention", error),
+										Effect.logError("Document recovery needs attention", {
+											category: documentFailureCategory(error),
+											operation: kind,
+										}),
 									),
 								),
 							),
@@ -74,7 +78,10 @@ export function makeDocumentRecovery(
 			run: (kind: RecoveryKind, task?: Effect.Effect<unknown, unknown>) =>
 				attempt(kind, task).pipe(
 					Effect.catch(error =>
-						Effect.logError("Document recovery required", error),
+						Effect.logError("Document recovery required", {
+							category: documentFailureCategory(error),
+							operation: kind,
+						}),
 					),
 				),
 			saveFailure: (failure?: DocumentFailure) => setFailure("save", failure),

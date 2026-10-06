@@ -766,6 +766,13 @@
 							former reader already downloaded. Pending work remains local
 							rather than becoming a silent success.
 						</p>
+						<p>
+							The editor offers recovery when local work cannot sync: save a
+							personal copy, export, or retry after access is restored. The
+							original pending actions remain intact. An attachment never
+							downloaded cannot be recovered after the server denies access;
+							text-only export makes that limitation explicit.
+						</p>
 					</div>
 				</fieldset>
 			</section>
@@ -1005,6 +1012,23 @@
 					HTTP transport → server acceptance → live notification → another
 					session's merge. It is one write path with several adapters.
 				</p>
+				<details>
+					<summary>Observability without logging every edit</summary>
+					<p>
+						Effect spans follow document opening, synchronization and typed HTTP
+						operations. Effect counters record outcomes, and histograms record
+						latency. Labels describe operations and failure categories, never
+						document text, account IDs or keys. Each client or server runtime
+						owns its metrics registry.
+					</p>
+					<p>
+						Routine success updates metrics without logging. Slow operations
+						produce rate-limited warnings; server storage outages and recovery
+						produce transition messages. Settings includes aggregate client
+						counts and timings in the diagnostic report. Client diagnostics stay
+						local; no external telemetry exporter is configured.
+					</p>
+				</details>
 			</section>
 			<section id="boundaries">
 				<div class="eyebrow">08 / what the design does not promise</div>
@@ -1045,8 +1069,9 @@
 						>
 						Definite safe rejection can be recorded and withdrawn. Network
 						failure is not proof of rejection; it keeps pending work.
-						Inserted-text dependency closures and comprehensive recovery
-						controls still need work.
+						Inserted-text dependency closures are preserved for recovery. The
+						recovery UI offers copying, export and retry; it does not
+						automatically rebase rejected work or recover uncached attachments.
 					</li>
 					<li>
 						<strong>Fast opening still has a state cost.</strong> A checkpoint

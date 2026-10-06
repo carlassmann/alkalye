@@ -681,6 +681,20 @@ function verifySettings() {
 		),
 		"App settings show installation, version and startup diagnostics",
 	)
+	wait(
+		session,
+		'document.querySelector(".document-diagnostics")?.textContent.includes("Document operations in this app session")',
+	)
+	assert(
+		evaluate(
+			session,
+			`(() => {
+				let report = document.querySelector(".document-diagnostics").textContent;
+				return report.includes("sync:") && !report.includes("Screen parity talk") && !report.includes("Speaker reference");
+			})()`,
+		),
+		"Document diagnostics report aggregate operations without document content",
+	)
 	browser(session, "click", '[data-settings="install-instructions"]')
 	wait(session, 'document.querySelector("#dialog").open')
 	assert(

@@ -24,6 +24,7 @@ import * as SubscriptionRef from "effect/SubscriptionRef"
 import { DocumentJournal } from "../platform/document-journal"
 import { DocumentLifecycle } from "../platform/document-lifecycle"
 import { webCryptoLayer } from "../platform/web-crypto"
+import { documentFailureCategory } from "./document-observability"
 import { makeDocumentRecovery } from "./document-recovery"
 import {
 	DocumentFailureSchema,
@@ -384,7 +385,9 @@ function makeSession(options: DocumentSessionOptions) {
 				flush.pipe(
 					Effect.andThen(recovery.run("snapshot")),
 					Effect.catch(error =>
-						Effect.logError("Could not save document drafts", error),
+						Effect.logError("Could not save document drafts", {
+							category: documentFailureCategory(error),
+						}),
 					),
 				),
 			),
@@ -408,7 +411,9 @@ function makeSession(options: DocumentSessionOptions) {
 				Effect.andThen(
 					save.pipe(
 						Effect.catch(error =>
-							Effect.logError("Could not cache document state", error),
+							Effect.logError("Could not cache document state", {
+								category: documentFailureCategory(error),
+							}),
 						),
 					),
 				),
@@ -766,7 +771,7 @@ function makeProjection(options: DocumentSessionOptions) {
 			Effect.catch(error =>
 				Effect.logWarning(
 					"Rebuilding unreadable document cache from its journal",
-					error,
+					{ category: documentFailureCategory(error) },
 				).pipe(Effect.as(undefined)),
 			),
 		)
@@ -787,7 +792,7 @@ function makeProjection(options: DocumentSessionOptions) {
 						Effect.andThen(
 							Effect.logWarning(
 								"Rebuilding derived document cache from its journal",
-								error,
+								{ category: documentFailureCategory(error) },
 							),
 						),
 					),

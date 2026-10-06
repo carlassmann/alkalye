@@ -84,8 +84,8 @@ export function downloadDocumentHistory(options: DocumentHistoryOptions) {
 			yield* storage
 				.set(key, moments)
 				.pipe(
-					Effect.catch(error =>
-						Effect.logWarning("Could not cache document history", error),
+					Effect.catch(() =>
+						Effect.logWarning("Could not cache document history"),
 					),
 				)
 		}

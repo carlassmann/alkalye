@@ -446,6 +446,14 @@
 [data-settings-page] .diagnostics-copy {
 	min-width: 9rem;
 }
+[data-settings-page] .document-diagnostics {
+	margin: 12px 0 0;
+	padding-top: 12px;
+	border-top: 1px solid var(--line);
+	font: inherit;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
 :is([data-settings-page], [data-workspace-settings]) .settings-footer {
 	display: flex;
 	flex-wrap: wrap;

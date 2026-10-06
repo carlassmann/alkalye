@@ -5,6 +5,7 @@ import * as FiberSet from "effect/FiberSet"
 import * as Redacted from "effect/Redacted"
 import * as Stream from "effect/Stream"
 import type * as Context from "effect/Context"
+import { documentDiagnostics } from "../../shared/document-diagnostics"
 import { editorPreferences } from "../../shared/preferences"
 import type {
 	AccountPreferences,
@@ -750,10 +751,27 @@ export class SettingsPageElement extends HTMLElement {
 	private showDiagnostics() {
 		let block = this.querySelector<HTMLElement>("[data-diagnostics]")
 		if (block) setMarkup(block, diagnosticsMarkup(this.diagnostics()))
+		let library = this.options?.library
+		if (!library || !block) return
+		this.run?.(
+			library.diagnostics.pipe(
+				Effect.tap(metrics =>
+					Effect.sync(() => {
+						if (!block.isConnected) return
+						block.querySelector(".document-diagnostics")?.remove()
+						let summary = document.createElement("pre")
+						summary.className = "document-diagnostics"
+						summary.textContent = documentDiagnostics(metrics)
+						block.append(summary)
+					}),
+				),
+			),
+		)
 	}
 	private copyDiagnostics(control: HTMLButtonElement) {
 		let label = control.querySelector("span")
 		let events = this.diagnostics()
+		let library = this.options?.library
 		let set = (text: string) => {
 			if (label) label.textContent = translate(text)
 		}
@@ -765,7 +783,7 @@ export class SettingsPageElement extends HTMLElement {
 					() => navigator.storage?.estimate() ?? Promise.resolve(undefined),
 				).pipe(Effect.catch(() => Effect.succeed(undefined)))
 				let worker = navigator.serviceWorker?.controller
-				let report = startupReport(events, {
+				let startup = startupReport(events, {
 					at: new Date().toISOString(),
 					userAgent: navigator.userAgent,
 					online: navigator.onLine,
@@ -775,6 +793,8 @@ export class SettingsPageElement extends HTMLElement {
 						? { storage: { usage: storage.usage, quota: storage.quota } }
 						: {}),
 				})
+				let metrics = library ? yield* library.diagnostics : []
+				let report = startup + "\n\n" + documentDiagnostics(metrics)
 				let copied = yield* Effect.tryPromise(() =>
 					navigator.clipboard.writeText(report),
 				).pipe(

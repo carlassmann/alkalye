@@ -1,22 +1,24 @@
 # ChatGPT plugin submission package
 
+Historical submission draft for the Jazz implementation. The Effect rewrite's document log is not end-to-end encrypted. This draft requires revision and production verification before submission; see [the current MCP server guide](mcp-server.md).
+
 ## Portal listing
 
-| Field             | Value                                                                                  |
-| ----------------- | -------------------------------------------------------------------------------------- |
-| Name              | Alkalye                                                                                |
-| Category          | Productivity                                                                           |
-| Short description | Collaborate in end-to-end encrypted Alkalye documents and spaces you explicitly share. |
-| Website           | `https://www.alkalye.com`                                                              |
-| Support           | `https://www.alkalye.com/support`                                                      |
-| Privacy           | `https://www.alkalye.com/privacy`                                                      |
-| Terms             | `https://www.alkalye.com/terms`                                                        |
-| Icon              | `public/icons/alkalye-icon.png`                                                        |
-| Integration type  | Remote MCP server                                                                      |
-| MCP endpoint      | `https://www.alkalye.com/mcp`                                                          |
-| Authentication    | OAuth 2.1, authorization code, PKCE S256, CIMD public client                           |
-| Embedded UI       | No                                                                                     |
-| Availability      | All portal-supported countries where Alkalye is available                              |
+| Field             | Value                                                             |
+| ----------------- | ----------------------------------------------------------------- |
+| Name              | Alkalye                                                           |
+| Category          | Productivity                                                      |
+| Short description | Collaborate in Alkalye documents and spaces you explicitly share. |
+| Website           | `https://www.alkalye.com`                                         |
+| Support           | `https://www.alkalye.com/support`                                 |
+| Privacy           | `https://www.alkalye.com/privacy`                                 |
+| Terms             | `https://www.alkalye.com/terms`                                   |
+| Icon              | `public/icons/alkalye-icon.png`                                   |
+| Integration type  | Remote MCP server                                                 |
+| MCP endpoint      | `https://www.alkalye.com/mcp`                                     |
+| Authentication    | OAuth 2.1, authorization code, PKCE S256, CIMD public client      |
+| Embedded UI       | No                                                                |
+| Availability      | All portal-supported countries where Alkalye is available         |
 
 **Long description**
 
