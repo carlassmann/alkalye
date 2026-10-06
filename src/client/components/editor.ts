@@ -1403,7 +1403,7 @@ function createEditorView(
 					(marker !== "`" || selected)) ||
 				(options.preferences.markerWrapping &&
 					selected &&
-					["*", "_", "~", "`"].includes(marker))
+					["*", "_", "~", "`", "="].includes(marker))
 			) {
 				if (
 					!selected &&

@@ -64,6 +64,32 @@ try {
 		condition(`${source} === "left atc right" && ${saved}`),
 		["click", "#close-find"],
 	])
+	journey("equals wraps the selection without replacing it", [
+		...edit("marker"),
+		[
+			"eval",
+			'(() => { let editor = document.querySelector("alkalye-editor").source; editor.focus(); editor.setSelectionRange(0, 6); })()',
+		],
+		versionMarker(),
+		["keyboard", "type", "="],
+		condition(
+			`${source} === "=marker=" && ${saved} && document.querySelector("alkalye-editor").source.selectionStart === 1 && document.querySelector("alkalye-editor").source.selectionEnd === 7`,
+		),
+		versionMarker(),
+		["keyboard", "type", "="],
+		condition(
+			`${source} === "==marker==" && ${saved} && document.querySelector("#highlight .syntax-highlight")?.textContent === "==marker=="`,
+		),
+		[
+			"eval",
+			'(() => { let editor = document.querySelector("alkalye-editor").source; editor.setSelectionRange(editor.value.length, editor.value.length); })()',
+		],
+		versionMarker(),
+		["keyboard", "type", "="],
+		condition(`${source} === "==marker===" && ${saved}`),
+		...edit("left atc right"),
+	])
+
 	journey("offline edits survive reload and reconnect", [
 		condition("navigator.serviceWorker.controller !== null"),
 		[
