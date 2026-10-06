@@ -1,6 +1,7 @@
 import { frontmatterBlock, frontmatterKey } from "./markdown"
 import type { Atom } from "./model"
 import * as Schema from "effect/Schema"
+import * as Yaml from "effect/encoding/Yaml"
 
 interface Entry {
 	key: string | undefined
@@ -20,6 +21,7 @@ interface SourceEdit {
 	anchor?: string
 	replace?: boolean
 	order?: string[]
+	observed?: string[]
 	chain?: boolean
 	ending?: "eof"
 	deleted?: string[]
@@ -50,6 +52,11 @@ export function sourceUndo(
 			? { ending: "eof" }
 			: {}),
 	}
+}
+
+export function sourceObserved(atoms: Atom[]) {
+	let header = sourceHeaders(atoms)[0]
+	return header ? observedEntries(header) : []
 }
 
 export function inverseHeader(
@@ -115,7 +122,10 @@ function literalAtoms(source: string): Atom[] {
 		value,
 	}))
 }
-export function sourceAtoms(raw: Atom[]) {
+export function sourceAtoms(
+	raw: Atom[],
+	originalFrames: () => readonly Atom[][] = () => [],
+) {
 	let headers = sourceHeaders(raw)
 	if (!headers.length) return raw
 	let winners = new Map<
@@ -126,15 +136,15 @@ export function sourceAtoms(raw: Atom[]) {
 		let opening = header.open[0]
 		if (!opening) continue
 		for (let entry of header.entries) {
-			if (!entry.key) continue
+			let key = entry.key ?? ""
 			let candidate = {
 				entry,
 				id: entry.atoms[0]?.id ?? "",
 				migration: Boolean(opening.migration),
 			}
-			let previous = winners.get(entry.key)
+			let previous = winners.get(key)
 			if (!previous || outranks(candidate, previous))
-				winners.set(entry.key, candidate)
+				winners.set(key, candidate)
 		}
 		for (let key of opening.deleted ?? []) {
 			let candidate = { id: opening.id, migration: false }
@@ -155,16 +165,15 @@ export function sourceAtoms(raw: Atom[]) {
 			header.entries.flatMap(entry => (entry.key ? [entry.key] : [])),
 		)
 	let entries = headers.flatMap(header =>
-		header.entries.filter(
-			entry =>
-				!entry.key ||
-				sameOperation(
-					winners.get(entry.key)?.entry?.atoms[0]?.id,
-					entry.atoms[0]?.id,
-				),
+		header.entries.filter(entry =>
+			sameOperation(
+				winners.get(entry.key ?? "")?.entry?.atoms[0]?.id,
+				entry.atoms[0]?.id,
+			),
 		),
 	)
 	entries.sort((a, b) => entryPosition(a, order) - entryPosition(b, order))
+	entries = withoutLostAliases(entries, headers, originalFrames)
 	let body: Atom[] = [],
 		position = 0
 	for (let header of headers) {
@@ -177,11 +186,11 @@ export function sourceAtoms(raw: Atom[]) {
 		headers.some(header => header.open[0]?.deleted?.length)
 	)
 		return body
-	let close = last.close
+	let close = format?.close ?? last.close
 	if (!body.length && format?.open[0]?.ending === "eof")
 		close = close.filter(atom => atom.value !== "\n" && atom.value !== "\r")
 	return [
-		...first.open,
+		...(format?.open ?? first.open),
 		...entries.flatMap(entry => entry.atoms),
 		...close,
 		...body,
@@ -243,6 +252,7 @@ export function sourceEdits(
 				replace: true,
 				order: [],
 				deleted: headerKeys(previous),
+				observed: observedEntries(previous),
 			},
 			{ atoms: [], next: prefix, remove: [], anchor: "", replace: true },
 			{
@@ -290,18 +300,7 @@ export function sourceEdits(
 			following.open.map(atom => atom.value).join("") ||
 		previous.close.map(atom => atom.value).join("") !==
 			following.close.map(atom => atom.value).join("")
-	if (
-		previousDecoration !== nextDecoration ||
-		fencesChanged ||
-		/(?:^|[\s:,[{-])[&*][^\s,[\]{}]/m.test(
-			previous.entries
-				.flatMap(entry => entry.atoms)
-				.map(atom => atom.value)
-				.join(""),
-		) ||
-		duplicateKeys(previous.entries) ||
-		duplicateKeys(following.entries)
-	)
+	if (duplicateKeys(previous.entries) || duplicateKeys(following.entries))
 		return [
 			{
 				atoms: atoms.slice(0, previous.end),
@@ -313,6 +312,7 @@ export function sourceEdits(
 				anchor: "",
 				replace: true,
 				order: headerKeys(following),
+				observed: observedEntries(previous),
 				ending: headerEnding(following),
 			},
 			body,
@@ -324,8 +324,15 @@ export function sourceEdits(
 	)
 	let rawEntries = sourceHeaders(raw).flatMap(header => header.entries)
 	let remaining = new Set(entries.keys())
-	let changed: Atom[] = []
-	let removed: Atom[] = []
+	let decorationChanged = previousDecoration !== nextDecoration
+	let changed: Atom[] = decorationChanged
+		? following.entries
+				.filter(entry => !entry.key)
+				.flatMap(entry => entry.atoms)
+		: []
+	let removed: Atom[] = decorationChanged
+		? rawEntries.filter(entry => !entry.key).flatMap(entry => entry.atoms)
+		: []
 	for (let entry of following.entries) {
 		if (!entry.key) continue
 		let old = entries.get(entry.key)
@@ -348,11 +355,11 @@ export function sourceEdits(
 					.flatMap(entry => entry.atoms),
 			)
 	}
-	if (changed.length || removed.length)
+	if (changed.length || removed.length || fencesChanged)
 		edits.push({
 			atoms: [],
 			next:
-				changed.length || remaining.size
+				changed.length || remaining.size || fencesChanged
 					? frameText({
 							...following,
 							entries: [{ key: undefined, atoms: changed }],
@@ -360,6 +367,7 @@ export function sourceEdits(
 					: "",
 			remove: removed,
 			deleted: [...remaining].flatMap(key => (key ? [key] : [])),
+			observed: observedEntries(previous),
 			anchor: "",
 			replace: true,
 			order: headerKeys(following),
@@ -389,12 +397,18 @@ function sourceHeaders(atoms: Atom[]) {
 			(atom.value !== "-" && atom.value !== "\uFEFF")
 		)
 			continue
-		// Root frames survive concurrent body prepends and never consume slide separators.
+		// A body separator must not consume a declared header from another root.
 		let match = frontmatterBlock(source.slice(candidate))
 		if (!match) continue
 		let openLength = Array.from(match[1] ?? "").length
 		let headerLength = Array.from(match[2] ?? "").length
 		let end = offset + Array.from(match[0]).length
+		if (
+			atoms
+				.slice(offset + 1, end)
+				.some(atom => atom.after === "" && atom.order !== undefined)
+		)
+			continue
 		let entries: Entry[] = []
 		let position = offset + openLength
 		for (let line of (match[2] ?? "").match(/.*(?:\r?\n|$)/g) ?? []) {
@@ -477,4 +491,83 @@ function outranks(
 }
 function sameOperation(first: string | undefined, second: string | undefined) {
 	return Boolean(first && second && first.slice(0, -9) === second.slice(0, -9))
+}
+
+function withoutLostAliases(
+	entries: Entry[],
+	headers: Header[],
+	originalFrames: () => readonly Atom[][],
+) {
+	let candidates = headers.flatMap(header => header.entries)
+	let originalEntries: Entry[] | undefined
+	if (
+		!sourceText(entries.flatMap(entry => entry.atoms)).includes("*") ||
+		parsesEntries(entries)
+	)
+		return entries
+	let kept: Entry[] = []
+	for (let entry of entries) {
+		let prefix = [...kept, entry]
+		let dependsOnLoser =
+			parsesEntries(kept) &&
+			!parsesEntries(prefix) &&
+			kept.some((previous, index) =>
+				candidates.some(
+					candidate =>
+						candidate.key === previous.key &&
+						candidate !== previous &&
+						parsesEntries([
+							...kept.slice(0, index),
+							candidate,
+							...kept.slice(index + 1),
+							entry,
+						]),
+				),
+			)
+		let dependsOnDeletion = false
+		if (!dependsOnLoser && parsesEntries(kept) && !parsesEntries(prefix)) {
+			let owner = headers.find(header => header.entries.includes(entry))
+			// Key names alone cannot show whether a writer saw a concurrent value replacement.
+			let unseenDeletions = headers.flatMap(header =>
+				(header.open[0]?.deleted ?? []).filter(
+					key =>
+						owner?.open[0]?.order?.includes(key) &&
+						entry.key !== undefined &&
+						(header.open[0]?.observed !== undefined
+							? !header.open[0].observed.includes(entry.atoms[0]?.id ?? "")
+							: !header.open[0]?.order?.includes(entry.key)),
+				),
+			)
+			if (unseenDeletions.length) {
+				originalEntries ??= originalFrames().flatMap(frame =>
+					sourceHeaders(frame).flatMap(header => header.entries),
+				)
+				dependsOnDeletion = originalEntries.some(
+					candidate =>
+						candidate.key !== undefined &&
+						unseenDeletions.includes(candidate.key) &&
+						(owner?.open[0]?.observed?.includes(candidate.atoms[0]?.id ?? "") ||
+							sameOperation(candidate.atoms[0]?.id, entry.atoms[0]?.id)) &&
+						parsesEntries([...kept, candidate, entry]),
+				)
+			}
+		}
+		if (!dependsOnLoser && !dependsOnDeletion) kept.push(entry)
+	}
+	return kept
+}
+
+function parsesEntries(entries: Entry[]) {
+	try {
+		Yaml.parse(sourceText(entries.flatMap(entry => entry.atoms)))
+		return true
+	} catch {
+		return false
+	}
+}
+
+function observedEntries(header: Header) {
+	return header.entries.flatMap(entry =>
+		entry.key && entry.atoms[0] ? [entry.atoms[0].id] : [],
+	)
 }

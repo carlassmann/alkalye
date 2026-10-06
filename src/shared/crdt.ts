@@ -10,6 +10,7 @@ import {
 	sourceAtoms,
 	sourceEdits,
 	sourceUndo,
+	sourceObserved,
 	inverseHeader,
 	SourceUndoSchema,
 } from "./frontmatter-merge"
@@ -211,6 +212,9 @@ export class Replica {
 						after: anchor,
 						value,
 						...(anchor === "" && edit.order ? { order: edit.order } : {}),
+						...(anchor === "" && edit.observed
+							? { observed: edit.observed }
+							: {}),
 						...(anchor === "" && edit.ending ? { ending: edit.ending } : {}),
 						...(anchor === "" && edit.order && options.migration
 							? { migration: options.migration }
@@ -283,7 +287,9 @@ export class Replica {
 				id,
 				after: anchor,
 				value: atom.value,
-				...(anchor === "" && restoration ? { order: restoration.order } : {}),
+				...(anchor === "" && restoration
+					? { order: restoration.order, observed: sourceObserved(before) }
+					: {}),
 				...(anchor === "" && ending ? { ending } : {}),
 			})
 			anchor = id
@@ -326,10 +332,32 @@ export class Replica {
 		let cached = until === Infinity ? this.sourceCache.get(target) : undefined
 		if (cached) return cached
 		let raw = this.rawVisible(target, until)
-		let atoms = sourceAtoms(raw)
+		let atoms = sourceAtoms(raw, () => this.originalFrames(target, until))
 		sourceViews.set(atoms, raw)
 		if (until === Infinity) this.sourceCache.set(target, atoms)
 		return atoms
+	}
+	private originalFrames(target: string, until: number | string) {
+		let frames = new Map<string, Atom[]>()
+		for (let atoms of this.children.get(target)?.values() ?? []) {
+			for (let atom of atoms) {
+				let operation = atom.id.slice(0, -9)
+				if (
+					typeof until === "string"
+						? operation > until
+						: Number(operation.slice(0, 16)) > until
+				)
+					continue
+				let frame = frames.get(operation) ?? []
+				frame.push(atom)
+				frames.set(operation, frame)
+			}
+		}
+		return [...frames.values()].map(frame =>
+			frame.sort((first, second) =>
+				first.id < second.id ? -1 : first.id > second.id ? 1 : 0,
+			),
+		)
 	}
 	private rawVisible(
 		target: string,
@@ -501,6 +529,7 @@ export class Replica {
 				atom.after,
 				atom.value,
 				atom.order ?? null,
+				atom.observed ?? null,
 				atom.ending ?? null,
 				atom.migration ?? false,
 				atom.deleted ?? null,
@@ -846,6 +875,7 @@ function atomIdentity(atom: Atom) {
 		atom.after,
 		atom.value,
 		atom.order ?? null,
+		atom.observed ?? null,
 		atom.ending ?? null,
 		atom.migration ?? false,
 		atom.deleted ?? null,
@@ -856,6 +886,7 @@ function copyAtom(atom: Atom): Atom {
 	return {
 		...atom,
 		...(atom.order ? { order: [...atom.order] } : {}),
+		...(atom.observed ? { observed: [...atom.observed] } : {}),
 		...(atom.deleted ? { deleted: [...atom.deleted] } : {}),
 	}
 }

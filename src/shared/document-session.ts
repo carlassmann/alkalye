@@ -1756,6 +1756,7 @@ function freezeRejected(item: RejectedAction) {
 }
 function freezeAtom(atom: Atom) {
 	if (atom.order) Object.freeze(atom.order)
+	if (atom.observed) Object.freeze(atom.observed)
 	if (atom.deleted) Object.freeze(atom.deleted)
 	return Object.freeze(atom)
 }

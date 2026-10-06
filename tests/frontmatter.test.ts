@@ -696,64 +696,162 @@ test("first full-source write migrates legacy metadata before marking its source
 	})
 })
 
-test.todo(
-	"replace frame strategy: header comments must preserve concurrent untouched keys",
-	() => {
-		let base = new Replica("base")
-		base.edit("doc", "---\n# c\ntitle: T\n---\nBody")
-		base.set("doc", "metadata", "frontmatter-v1")
-		let a = fork(base, "b"),
-			z = fork(base, "z")
-		changeMetadata(a, "doc", { title: "Peer" })
-		z.edit("doc", "---\n# d\ntitle: T\n---\nBody")
-		a.apply([...z.operations.values()])
-		expect(a.metadata("doc").title).toBe("Peer")
-	},
-)
+test("header comments must preserve concurrent untouched keys", () => {
+	let base = new Replica("base")
+	base.edit("doc", "---\n# c\ntitle: T\n---\nBody")
+	base.set("doc", "metadata", "frontmatter-v1")
+	let a = fork(base, "b"),
+		z = fork(base, "z")
+	changeMetadata(a, "doc", { title: "Peer" })
+	z.edit("doc", "---\n# d\ntitle: T\n---\nBody")
+	a.apply([...z.operations.values()])
+	expectSourceConvergence(a, z)
+	expect(a.metadata("doc").title).toBe("Peer")
+})
 
-test.todo(
-	"replace frame strategy: EOF formatting must preserve concurrent untouched keys",
-	() => {
-		let base = new Replica("base")
-		base.edit("doc", "---\ntitle: T\n---")
-		base.set("doc", "metadata", "frontmatter-v1")
-		let a = fork(base, "b"),
-			z = fork(base, "z")
-		changeMetadata(a, "doc", { title: "Peer" })
-		z.edit("doc", "---\ntitle: T\n---\n")
-		a.apply([...z.operations.values()])
-		expect(a.metadata("doc").title).toBe("Peer")
-	},
-)
+test("EOF formatting must preserve concurrent untouched keys", () => {
+	let base = new Replica("base")
+	base.edit("doc", "---\ntitle: T\n---")
+	base.set("doc", "metadata", "frontmatter-v1")
+	let a = fork(base, "b"),
+		z = fork(base, "z")
+	changeMetadata(a, "doc", { title: "Peer" })
+	z.edit("doc", "---\ntitle: T\n---\n")
+	a.apply([...z.operations.values()])
+	expectSourceConvergence(a, z)
+	expect(a.metadata("doc").title).toBe("Peer")
+})
 
-test.todo(
-	"replace frame strategy: concurrent body separators cannot swallow a new header",
-	() => {
-		let base = new Replica("base")
-		base.edit("doc", "Body")
-		base.set("doc", "metadata", "frontmatter-v1")
-		let a = fork(base, "a"),
-			z = fork(base, "z")
-		changeMetadata(a, "doc", { title: "X" })
-		z.edit("doc", "---\nBody")
-		a.apply([...z.operations.values()])
-		expect(a.metadata("doc").title).toBe("X")
-		expect(frontmatter(a.text("doc")).body).toBe("---\nBody")
-	},
-)
+test("concurrent body separators cannot swallow a new header", () => {
+	let base = new Replica("base")
+	base.edit("doc", "Body")
+	base.set("doc", "metadata", "frontmatter-v1")
+	let a = fork(base, "a"),
+		z = fork(base, "z")
+	changeMetadata(a, "doc", { title: "X" })
+	z.edit("doc", "---\nBody")
+	a.apply([...z.operations.values()])
+	expectSourceConvergence(a, z)
+	expect(a.metadata("doc").title).toBe("X")
+	expect(frontmatter(a.text("doc")).body).toBe("---\nBody")
+})
 
-test.todo(
-	"replace frame strategy: concurrent source edits cannot leave dangling YAML aliases",
-	() => {
+test("concurrent source edits cannot leave dangling YAML aliases", () => {
+	let base = new Replica("base")
+	base.edit("doc", "---\ntitle: T\n---\nBody")
+	base.set("doc", "metadata", "frontmatter-v1")
+	let a = fork(base, "a"),
+		z = fork(base, "z")
+	a.edit("doc", "---\ntitle: &n T\nalias: *n\n---\nBody")
+	let rename = changeMetadata(z, "doc", { title: "Z" }).at(-1)
+	if (!rename) throw new Error("Missing metadata rename")
+	a.apply([...z.operations.values()])
+	expectSourceConvergence(a, z)
+	expect(() => Yaml.parse(frontmatterBlockText(a.text("doc")))).not.toThrow()
+	expect(a.metadata("doc").title).toBe("Z")
+	let undo = z.inverse(rename)
+	a.apply([...z.operations.values()])
+	expectSourceConvergence(a, z)
+	expect(a.metadata("doc").title).toBe("T")
+	expect(() => Yaml.parse(frontmatterBlockText(a.text("doc")))).not.toThrow()
+	z.inverse(undo)
+	a.apply([...z.operations.values()])
+	expectSourceConvergence(a, z)
+	expect(() => Yaml.parse(frontmatterBlockText(a.text("doc")))).not.toThrow()
+	expect(a.metadata("doc").title).toBe("Z")
+})
+
+function expectSourceConvergence(first: Replica, second: Replica) {
+	second.apply([...first.operations.values()].reverse())
+	expect(second.text("doc")).toBe(first.text("doc"))
+	let replay = new Replica("replay")
+	let operations = [...first.operations.values()].map(operation =>
+		parseOperation(compactOperation(operation)),
+	)
+	replay.apply([...operations].reverse())
+	replay.apply(operations)
+	expect(replay.text("doc")).toBe(first.text("doc"))
+	let reopened = new Replica("reopened")
+	reopened.restore(parseCheckpoint(replay.checkpoint()))
+	expect(reopened.text("doc")).toBe(first.text("doc"))
+	expect(reopened.metadata("doc")).toEqual(first.metadata("doc"))
+}
+
+test("invalid source YAML retains independent concurrent fields and literal asterisks", () => {
+	let base = new Replica("base")
+	base.edit("doc", "---\ntitle: T\n---\nBody")
+	let first = fork(base, "a"),
+		second = fork(base, "z")
+	first.edit(
+		"doc",
+		"---\ntitle: Updated\npinned: true\nsummary: '*'\n---\nBody",
+	)
+	second.edit("doc", "---\ntitle: [\n---\nBody")
+	first.apply([...second.operations.values()])
+	expectSourceConvergence(first, second)
+	expect(first.text("doc")).toContain("title: [")
+	expect(first.text("doc")).toContain("pinned: true")
+	expect(first.text("doc")).toContain("summary: '*'")
+})
+
+test("concurrent deletion of an anchor cannot break an unseen alias", () => {
+	let base = new Replica("base")
+	base.edit("doc", "---\ntitle: &n T\nx: 1\n---\nBody")
+	let first = fork(base, "a"),
+		second = fork(base, "z")
+	first.edit("doc", "---\ntitle: &n T\nx: 1\nalias: *n\n---\nBody")
+	second.edit("doc", "---\nx: 1\n---\nBody")
+	first.apply([...second.operations.values()])
+	expectSourceConvergence(first, second)
+	expect(() =>
+		Yaml.parse(frontmatterBlockText(first.text("doc"))),
+	).not.toThrow()
+	expect(frontmatter(first.text("doc")).data).toEqual({ x: 1 })
+	second.edit("doc", "---\nx: 1\nalias: *n\n---\nBody")
+	expect(second.text("doc")).toContain("alias: *n")
+})
+
+test("concurrent replacement of an existing value by an alias survives anchor deletion as valid source", () => {
+	let base = new Replica("base")
+	base.edit("doc", "---\ntitle: &n T\nx: 1\nalias: 1\n---\nBody")
+	let first = fork(base, "a"),
+		second = fork(base, "z")
+	first.edit("doc", "---\ntitle: &n T\nx: 1\nalias: *n\n---\nBody")
+	second.edit("doc", "---\nx: 1\nalias: 1\n---\nBody")
+	first.apply([...second.operations.values()])
+	expectSourceConvergence(first, second)
+	expect(() =>
+		Yaml.parse(frontmatterBlockText(first.text("doc"))),
+	).not.toThrow()
+	expect(frontmatter(first.text("doc")).data).toEqual({ x: 1 })
+})
+
+test("removing an anchor after reading its alias preserves deliberately invalid source", () => {
+	let replica = new Replica("writer")
+	replica.edit("doc", "---\ntitle: &n T\nx: 1\nalias: *n\n---\nBody")
+	let invalid = "---\nx: 1\nalias: *n\n---\nBody"
+	replica.edit("doc", invalid)
+	expect(replica.text("doc")).toBe(invalid)
+	let restored = new Replica("reopened")
+	restored.restore(parseCheckpoint(replica.checkpoint()))
+	expect(restored.text("doc")).toBe(invalid)
+})
+
+test("an undone anchor cannot justify hiding newly typed invalid aliases", () => {
+	for (let undo of ["cancel", "inverse"]) {
 		let base = new Replica("base")
-		base.edit("doc", "---\ntitle: T\n---\nBody")
-		base.set("doc", "metadata", "frontmatter-v1")
-		let a = fork(base, "a"),
-			z = fork(base, "z")
-		a.edit("doc", "---\ntitle: &n T\nalias: *n\n---\nBody")
-		changeMetadata(z, "doc", { title: "Z" })
-		a.apply([...z.operations.values()])
-		expect(() => Yaml.parse(frontmatterBlockText(a.text("doc")))).not.toThrow()
-		expect(a.metadata("doc").title).toBe("Z")
-	},
-)
+		base.edit("doc", "---\ntitle: T\nx: 1\n---\nBody")
+		let anchored = base.edit("doc", "---\ntitle: &n T\nx: 1\n---\nBody")
+		if (!anchored) throw new Error("Missing anchor edit")
+		if (undo === "cancel") base.cancel("doc", anchored.id)
+		else base.inverse(anchored)
+		expect(base.text("doc")).not.toContain("&n")
+		let first = fork(base, "a"),
+			second = fork(base, "z")
+		first.edit("doc", "---\ntitle: T\nx: 1\nalias: *n\n---\nBody")
+		second.edit("doc", "---\nx: 1\n---\nBody")
+		first.apply([...second.operations.values()])
+		expectSourceConvergence(first, second)
+		expect(first.text("doc")).toContain("alias: *n")
+	}
+})

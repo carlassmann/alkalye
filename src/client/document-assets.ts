@@ -18,6 +18,7 @@ export interface AttachmentSelection {
 	atoms: Atom[]
 	start: number
 	end: number
+	inline?: boolean
 }
 interface AttachmentFile {
 	blob: Blob
@@ -239,7 +240,9 @@ function makeAssets(options: AssetOptions) {
 				.join("\n")
 			return staged.edit(
 				document,
-				source.slice(0, start) + `\n${references}\n` + source.slice(end),
+				source.slice(0, start) +
+					(selection?.inline ? references : `\n${references}\n`) +
+					source.slice(end),
 				selection?.atoms,
 			)
 		}

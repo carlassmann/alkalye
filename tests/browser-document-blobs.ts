@@ -419,6 +419,79 @@ export function verifyDocumentBlobs(
 					)).length === maximumBlobChunkBytes,
 				"attachment deletion removes its manifest and source reference together while retaining historical bytes",
 			)
+			yield* session.edit("Before selected After").saved
+			yield* session.sync
+			let captured = {
+				atoms: session.replica.visible(document).map(atom => ({ ...atom })),
+				start: 7,
+				end: 15,
+				inline: true,
+			}
+			let peer = Context.get(
+				yield* Layer.build(
+					browserDocumentSessionLayer({
+						document,
+						subject: account.subject,
+						transport: remote,
+					}),
+				),
+				DocumentSession,
+			)
+			yield* peer.edit("Peer: Before selected After").saved
+			yield* peer.sync
+			yield* session.sync
+			yield* assets.link(
+				[{ source: "https://example.com/media.png", name: "Picture" }],
+				captured,
+			)
+			check(
+				session.replica.text(document) ===
+					"Peer: Before ![Picture](https://example.com/media.png) After",
+				"inline media insertion preserves concurrent peer text and replaces only the remembered Atom selection",
+			)
+			yield* session.change("Create whiteboard", staged => [
+				staged.set("picker-board", "type", "whiteboard"),
+				staged.set("picker-board", "document", document),
+				staged.set("picker-board", "name", "Board"),
+			])
+			yield* session.edit("Before selected After").saved
+			yield* assets.insert("picker-board", {
+				atoms: session.replica.visible(document),
+				start: 7,
+				end: 15,
+				inline: true,
+			})
+			check(
+				session.replica.text(document) ===
+					"Before ![Board](asset:picker-board) After",
+				"the asset module reuses a same-document whiteboard inline without splitting surrounding paragraphs",
+			)
+			let unchanged = session.replica.text(document)
+			let invalidRange = yield* assets
+				.insert("picker-board", {
+					atoms: session.replica.visible(document),
+					start: -1,
+					end: 0,
+					inline: true,
+				})
+				.pipe(Effect.result)
+			check(
+				invalidRange._tag === "Failure" &&
+					invalidRange.failure._tag === "DocumentConflict" &&
+					session.replica.text(document) === unchanged,
+				"a media picker with an invalid saved range cannot append an attachment action",
+			)
+			writable = false
+			let revoked = yield* assets
+				.insert("picker-board", captured)
+				.pipe(Effect.result)
+			check(
+				revoked._tag === "Failure" &&
+					revoked.failure._tag === "PermissionDenied" &&
+					session.replica.text(document) === unchanged,
+				"revoking write access after a media picker opens prevents its saved insertion",
+			)
+			writable = true
 		}),
 	)
 }

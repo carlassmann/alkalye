@@ -5,6 +5,7 @@ export interface Atom {
 	after: string
 	value: string
 	order?: readonly string[]
+	observed?: readonly string[]
 	ending?: "eof"
 	migration?: true
 	deleted?: readonly string[]
@@ -55,7 +56,10 @@ export interface DocumentRecord {
 	pinned?: boolean
 	created?: number
 }
-export type DocumentLink = Pick<DocumentRecord, "id" | "title" | "archived">
+export type DocumentLink = Pick<DocumentRecord, "id" | "title" | "archived"> & {
+	folder?: string
+	tags?: string[]
+}
 export interface Presence {
 	presenting?: boolean
 	boardOpen?: boolean
@@ -177,6 +181,7 @@ export let AtomSchema = Schema.Struct({
 	after: Schema.String,
 	value: Schema.String,
 	order: Schema.optional(Schema.Array(Schema.String)),
+	observed: Schema.optional(Schema.Array(TextAtomIdSchema)),
 	ending: Schema.optional(Schema.Literal("eof")),
 	migration: Schema.optional(Schema.Literal(true)),
 	deleted: Schema.optional(Schema.Array(Schema.String)),
@@ -242,6 +247,7 @@ export function parseOperation(value: unknown): Operation {
 						after,
 						value: content,
 						...(atom.order ? { order: [...atom.order] } : {}),
+						...(atom.observed ? { observed: [...atom.observed] } : {}),
 						...(atom.ending ? { ending: atom.ending } : {}),
 						...(atom.migration ? { migration: atom.migration } : {}),
 						...(atom.deleted ? { deleted: [...atom.deleted] } : {}),
@@ -258,6 +264,9 @@ export function parseOperation(value: unknown): Operation {
 					: after,
 				value,
 				...(index === 0 && atom.order ? { order: [...atom.order] } : {}),
+				...(index === 0 && atom.observed
+					? { observed: [...atom.observed] }
+					: {}),
 				...(index === 0 && atom.ending ? { ending: atom.ending } : {}),
 				...(index === 0 && atom.migration ? { migration: atom.migration } : {}),
 				...(index === 0 && atom.deleted ? { deleted: [...atom.deleted] } : {}),
@@ -333,6 +342,7 @@ export function compactOperation(operation: Operation) {
 			previous &&
 			last &&
 			!atom.order &&
+			!atom.observed &&
 			!atom.ending &&
 			!atom.migration &&
 			!atom.deleted &&
