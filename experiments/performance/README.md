@@ -82,9 +82,9 @@ Open the apps and wait for their service workers to control the pages before run
 bun experiments/performance/compare.ts /tmp/alkalye-benchmark/config.json /tmp/alkalye-benchmark/results.json
 ```
 
-The runner appends text to the fixtures. It collects nine reload samples and twelve input samples per document. Each browser command has a timeout. A failed document does not stop measurements of the remaining documents.
+The runner collects nine reload samples and twelve append samples per document. Documents of 32 KiB and above also receive twelve edits near the beginning and twelve in the middle. Optional fixtures cover prose, fenced code and a long wrapped paragraph. Each browser command has a timeout. A failed document does not stop measurements of the remaining documents.
 
-The probe excludes automation command overhead. It starts at a trusted input event, checks the required state, and finishes at an animation-frame paint opportunity. It does not measure pixel presentation or completed animations. Local save acknowledgements only pace iterations; their timings are not compared as durable disk commits.
+The probe excludes automation command overhead. It starts at a trusted input event, checks the required state, and finishes at an animation-frame paint opportunity. It does not measure pixel presentation or completed animations. Local save acknowledgements only pace iterations; their timings are not compared as durable disk commits. The probe also sums JavaScript animation-frame callbacks per frame. This excludes event handlers, layout, rasterization and compositing; it cannot prove an 8.3ms total frame budget or 120fps on a 60Hz headless browser.
 
 For peer sync, start at the producer's trusted `beforeinput` event and finish two animation frames after the peer source contains a unique marker. Compare `performance.timeOrigin + performance.now()` on the same host. For offline runs, confirm the peer does not receive the edit, reload the producer offline, then start reconnect timing at its `online` event. Use visible menu actions for shortcuts that macOS browser automation cannot dispatch reliably.
 
@@ -101,6 +101,18 @@ bun experiments/performance/session.ts > /tmp/alkalye-benchmark/session.json
 PROFILE_FREEZE=1 bun experiments/performance/session.ts > /tmp/alkalye-benchmark/freezing.json
 ```
 
-Initial and cached open timings cover graph hydration; first source materialization is a separate phase. Prototype counters and optional freeze instrumentation run only in this disposable process. Results are exploratory single samples, not regression thresholds. The source used by the browser benchmark is still subject to Chromium's argument limit at 128 KiB; Bun's successful module probe does not prove browser compatibility.
+Initial and cached open timings cover graph hydration; first source materialization is a separate phase. Prototype counters and optional freeze instrumentation run only in this disposable process. Results are exploratory single samples, not regression thresholds. The browser integration suite now exercises 200,000-character checkpoints and deletion, 128 KiB local-file merging and 512 Unicode cursors. The previous Chromium argument-limit crash is fixed. Bun module timings remain separate from browser timings.
 
-The follow-up profiling samples and causal editor experiments are in `public/docs/performance-diagnosis.json`. Experimental editor builds remain temporary; no optimized production editor was introduced by the analysis.
+The follow-up profiling samples and causal editor experiments are in `public/docs/performance-diagnosis.json`. The follow-up implementation and measured gains are recorded in `public/docs/performance-improvements.html` and its JSON companion. Discarded editor/CSS experiments remain temporary.
+
+Before measuring a changed build, activate its service worker or clear only the disposable benchmark profile's worker and shell caches. Confirm the loaded app bundle matches the build; keep account data intact. Allow an edit to populate the compact derived cache before comparing steady-state reopening. Measure migration from the expanded cache separately.
+
+The mixed-transport collaboration scenario in `tests/document-live-poll.test.ts` runs 24 real persisted sessions, eight rounds of append/top/middle/deletion, cursor updates, offline recovery and permission rejection. Its throughput includes all same-process client work, two synchronization barriers and assertions; it is not a server capacity benchmark.
+
+Repeat in-app switching without reloading between selections:
+
+```sh
+bun experiments/performance/switch.ts /tmp/alkalye-benchmark/rewrite-config.json /tmp/alkalye-benchmark/switch-results.json
+```
+
+The rewrite-only configuration needs the 2, 32 and 128 KiB routes. Nine selections per large document include one initial cold selection and eight warm revisits.

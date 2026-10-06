@@ -1,0 +1,5215 @@
+{
+	"at": "2026-10-06T21:30:31.196598+00:00",
+	"measuredSource": "134f86a",
+	"baseline": "performance-comparison.json",
+	"environment": {
+		"machine": "Apple M5 Pro, 18 logical CPUs, 64 GiB RAM",
+		"os": "macOS 27.0.1",
+		"browser": "Chrome 154.0.8037.58, headless",
+		"runtime": "Bun 1.4.0",
+		"viewport": "1280 x 900",
+		"throttling": "None",
+		"originalCommit": "a749728a8f9a1cb984c980a5ea2daf984d60ae68",
+		"rewriteCommit": "b4556e83d2db31302f7942ffe826d73fc3bbfd24",
+		"originalSync": "jazz-run 0.20.18, local SQLite relay",
+		"rewriteSync": "native Bun server, local SQLite",
+		"cache": "Warm cache; active service workers",
+		"sharedHost": true
+	},
+	"methodology": {
+		"samples": "9 reloads/switches; 12 inserts per position; no throttling; background Chrome on same host",
+		"endpoint": "trusted input to completed source state and animation-frame paint opportunity; excludes command overhead, not pixel presentation",
+		"sizes": "2/32/128 KiB generated rich Markdown; fixtures retain appended benchmark markers",
+		"cache": "service-worker build verified; derived cache packed before steady-state reload; first switch sample cold, subsequent samples reuse passive state",
+		"frameWork": "summed RAF callback JavaScript only; excludes input handlers, layout, paint and compositor; does not establish 120fps",
+		"original": "32/128KiB reload and top/middle/end typing repeated against original local production build plus local Jazz relay; other original references from earlier report"
+	},
+	"after": {
+		"results": [
+			{
+				"version": "rewrite",
+				"name": "warm document reload",
+				"kb": 2,
+				"values": [
+					78.59999999403954, 92, 73.7999999821186, 88.60000002384186, 73,
+					72.90000000596046, 70.69999998807907, 80.7000000178814,
+					113.19999998807909
+				],
+				"medianMs": 78.59999999403954,
+				"minMs": 70.69999998807907,
+				"maxMs": 113.19999998807909
+			},
+			{
+				"version": "rewrite",
+				"name": "insert text to paint opportunity",
+				"kb": 2,
+				"values": [
+					27.299999982118607, 8, 10.599999994039536, 3.5999999940395355,
+					8.400000005960464, 11.200000017881392, 14.800000011920927,
+					16.400000005960464, 18.80000001192093, 4.4000000059604645, 12,
+					9.699999988079073
+				],
+				"medianMs": 10.900000005960464,
+				"minMs": 3.5999999940395355,
+				"maxMs": 27.299999982118607,
+				"maxFrameCallbackWorkMs": [
+					0.7999999821186066, 0.7000000178813934, 0.800000011920929,
+					0.800000011920929, 0.699999988079071, 0.5999999940395355,
+					0.800000011920929, 0.7000000178813934, 1, 1, 0.800000011920929,
+					0.8999999761581421
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "warm document reload",
+				"kb": 32,
+				"values": [
+					138.59999999403954, 140.90000000596046, 144.90000000596046,
+					142.7999999821186, 140.30000001192093, 141.59999999403954,
+					142.19999998807907, 143.40000000596046, 139.09999999403954
+				],
+				"medianMs": 141.59999999403954,
+				"minMs": 138.59999999403954,
+				"maxMs": 144.90000000596046
+			},
+			{
+				"version": "rewrite",
+				"name": "insert text to paint opportunity",
+				"kb": 32,
+				"values": [
+					19.19999998807907, 16.69999998807907, 8.599999994039536,
+					16.19999998807907, 14.199999988079073, 8.199999988079071,
+					8.600000023841858, 16.30000001192093, 18, 11.400000005960464, 12.5,
+					11.5
+				],
+				"medianMs": 13.349999994039536,
+				"minMs": 8.199999988079071,
+				"maxMs": 19.19999998807907,
+				"maxFrameCallbackWorkMs": [
+					1, 1.0999999940395355, 0.7999999821186066, 0.8999999761581421,
+					0.8999999761581421, 0.9000000059604645, 0.9000000059604645,
+					0.9000000059604645, 1, 1.2000000178813934, 1.5999999940395355,
+					1.199999988079071
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "insert at start to paint opportunity",
+				"kb": 32,
+				"values": [
+					15.400000005960464, 13.299999982118608, 30.400000005960464,
+					14.599999994039536, 13.699999988079073, 13.800000011920927, 12,
+					31.200000017881393, 11.300000011920927, 13.5, 12.599999994039536,
+					11.600000023841858
+				],
+				"medianMs": 13.599999994039536,
+				"minMs": 11.300000011920927,
+				"maxMs": 31.200000017881393,
+				"maxFrameCallbackWorkMs": [
+					3, 3, 2.7000000178813934, 2, 2.899999976158142, 3.800000011920929,
+					2.5999999940395355, 1.2999999821186066, 2.699999988079071,
+					2.800000011920929, 2.800000011920929, 3
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "insert at middle to paint opportunity",
+				"kb": 32,
+				"values": [
+					28.30000001192093, 17.5, 12.199999988079073, 14.699999988079073,
+					30.400000005960464, 13.400000005960464, 14.799999982118608,
+					14.700000017881392, 13.099999994039536, 13.099999994039536, 12, 13
+				],
+				"medianMs": 14.049999997019768,
+				"minMs": 12,
+				"maxMs": 30.400000005960464,
+				"maxFrameCallbackWorkMs": [
+					1.5, 3.0999999940395355, 2.9000000059604645, 3.4000000059604645,
+					2.7999999821186066, 2.800000011920929, 3.199999988079071,
+					3.699999988079071, 3.300000011920929, 2.9000000059604645,
+					2.9000000059604645, 3.199999988079071
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "warm document reload",
+				"kb": 128,
+				"values": [
+					369.7000000178814, 372.09999999403954, 373.699999988079,
+					375.699999988079, 374.60000002384186, 369.10000002384186,
+					366.699999988079, 365.5, 399.40000000596046
+				],
+				"medianMs": 372.09999999403954,
+				"minMs": 365.5,
+				"maxMs": 399.40000000596046
+			},
+			{
+				"version": "rewrite",
+				"name": "insert text to paint opportunity",
+				"kb": 128,
+				"values": [
+					45.19999998807907, 43.80000001192093, 52.099999994039536, 43.5,
+					43.19999998807907, 44.29999998211861, 54.099999994039536,
+					53.900000005960464, 48.400000005960464, 55.30000001192093,
+					52.39999997615814, 52.89999997615814
+				],
+				"medianMs": 50.25,
+				"minMs": 43.19999998807907,
+				"maxMs": 55.30000001192093,
+				"maxFrameCallbackWorkMs": [
+					2.5999999940395355, 2.300000011920929, 2.5, 2.4000000059604645,
+					2.399999976158142, 2.5, 2.4000000059604645, 2.4000000059604645, 2.5,
+					2.800000011920929, 2.699999988079071, 2.5999999940395355
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "insert at start to paint opportunity",
+				"kb": 128,
+				"values": [
+					33.70000001788139, 22.899999976158146, 27.80000001192093,
+					29.19999998807907, 31.400000005960464, 28.80000001192093,
+					28.80000001192093, 24.80000001192093, 31.5, 35.099999994039536,
+					29.30000001192093, 31.099999994039536
+				],
+				"medianMs": 29.25,
+				"minMs": 22.899999976158146,
+				"maxMs": 35.099999994039536,
+				"maxFrameCallbackWorkMs": [
+					6.0999999940395355, 4.899999976158142, 6.9000000059604645, 7,
+					6.300000011920929, 6.200000017881393, 6.300000011920929,
+					5.600000023841858, 6, 2.5999999940395355, 7, 6.5999999940395355
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "insert at middle to paint opportunity",
+				"kb": 128,
+				"values": [
+					42.099999994039536, 38.70000001788139, 32.400000005960464,
+					31.100000023841854, 31.799999982118607, 35.69999998807907,
+					31.400000005960464, 31.900000005960464, 31.400000005960464,
+					29.099999994039536, 33.80000001192093, 35.19999998807907
+				],
+				"medianMs": 32.150000005960464,
+				"minMs": 29.099999994039536,
+				"maxMs": 42.099999994039536,
+				"maxFrameCallbackWorkMs": [
+					7.0999999940395355, 6.699999988079071, 3.0999999940395355,
+					2.5999999940395355, 3, 3.600000023841858, 2.5999999940395355, 3,
+					2.9000000059604645, 2.699999988079071, 3.0999999940395355,
+					3.5999999940395355
+				]
+			}
+		],
+		"failures": []
+	},
+	"originalRepeated": {
+		"results": [
+			{
+				"version": "original",
+				"name": "warm document reload",
+				"kb": 32,
+				"values": [
+					188.5, 191.5999999940395, 194.0999999940395, 190.9000000059605,
+					191.7999999821186, 192, 193.5, 196.2999999821186, 189.5
+				],
+				"medianMs": 191.7999999821186,
+				"minMs": 188.5,
+				"maxMs": 196.2999999821186
+			},
+			{
+				"version": "original",
+				"name": "insert text to paint opportunity",
+				"kb": 32,
+				"values": [
+					21.099999994039536, 19.599999994039536, 20.700000017881393,
+					29.900000005960464, 29.600000023841854, 20.69999998807907,
+					24.099999994039536, 18, 30.80000001192093, 22.5, 17.5,
+					22.200000017881393
+				],
+				"medianMs": 21.650000005960464,
+				"minMs": 17.5,
+				"maxMs": 30.80000001192093,
+				"maxFrameCallbackWorkMs": []
+			},
+			{
+				"version": "original",
+				"name": "insert at start to paint opportunity",
+				"kb": 32,
+				"values": [
+					29.099999994039536, 33.79999998211861, 34, 19.299999982118607,
+					28.899999976158146, 33.400000005960464, 33.30000001192093,
+					19.69999998807907, 25.80000001192093, 15.700000017881392,
+					27.899999976158146, 18.599999994039536
+				],
+				"medianMs": 28.399999976158146,
+				"minMs": 15.700000017881392,
+				"maxMs": 34,
+				"maxFrameCallbackWorkMs": []
+			},
+			{
+				"version": "original",
+				"name": "insert at middle to paint opportunity",
+				"kb": 32,
+				"values": [
+					23.700000017881393, 19.69999998807907, 29.700000017881393,
+					18.900000005960464, 31.299999982118607, 23.19999998807907,
+					32.20000001788139, 27.599999994039536, 19.19999998807907,
+					24.19999998807907, 28.30000001192093, 28
+				],
+				"medianMs": 25.899999991059303,
+				"minMs": 18.900000005960464,
+				"maxMs": 32.20000001788139,
+				"maxFrameCallbackWorkMs": []
+			},
+			{
+				"version": "original",
+				"name": "warm document reload",
+				"kb": 128,
+				"values": [
+					389, 394.10000002384186, 391.40000000596046, 395.800000011921,
+					393.2000000178814, 398.699999988079, 393.2999999821186,
+					392.2000000178814, 403.7999999821186
+				],
+				"medianMs": 393.2999999821186,
+				"minMs": 389,
+				"maxMs": 403.7999999821186
+			},
+			{
+				"version": "original",
+				"name": "insert text to paint opportunity",
+				"kb": 128,
+				"values": [
+					22.30000001192093, 27.599999994039536, 25.900000005960464, 23,
+					22.19999998807907, 27.599999994039536, 27.099999994039536, 20,
+					31.200000017881393, 23.299999982118607, 23.200000017881393,
+					19.900000005960464
+				],
+				"medianMs": 23.25,
+				"minMs": 19.900000005960464,
+				"maxMs": 31.200000017881393,
+				"maxFrameCallbackWorkMs": []
+			},
+			{
+				"version": "original",
+				"name": "insert at start to paint opportunity",
+				"kb": 128,
+				"values": [
+					31.200000017881393, 26, 25.399999976158146, 32.69999998807907,
+					19.400000005960464, 32.19999998807907, 22.19999998807907,
+					29.30000001192093, 22.19999998807907, 21.900000005960464,
+					16.400000005960464, 22.30000001192093
+				],
+				"medianMs": 23.849999994039536,
+				"minMs": 16.400000005960464,
+				"maxMs": 32.69999998807907,
+				"maxFrameCallbackWorkMs": []
+			},
+			{
+				"version": "original",
+				"name": "insert at middle to paint opportunity",
+				"kb": 128,
+				"values": [
+					26.599999994039536, 24.799999982118607, 19.099999994039536, 19.5,
+					19.900000005960464, 31.600000023841854, 15.800000011920927,
+					29.19999998807907, 19, 27.399999976158146, 31.599999994039536,
+					29.19999998807907
+				],
+				"medianMs": 25.69999998807907,
+				"minMs": 15.800000011920927,
+				"maxMs": 31.600000023841854,
+				"maxFrameCallbackWorkMs": []
+			}
+		],
+		"failures": []
+	},
+	"switch": {
+		"results": [
+			{
+				"name": "switch existing document",
+				"version": "rewrite",
+				"kb": 32,
+				"values": [
+					109, 67.7999999821186, 72.7000000178814, 76.19999998807907,
+					78.19999998807907, 72.30000001192093, 64, 72.5, 86.7000000178814
+				],
+				"medianMs": 72.7000000178814,
+				"minMs": 64,
+				"maxMs": 109
+			},
+			{
+				"name": "switch existing document",
+				"version": "rewrite",
+				"kb": 128,
+				"values": [
+					350.80000001192093, 213.69999998807907, 218.19999998807907,
+					212.4000000059605, 219.5999999940395, 228.7999999821186, 229,
+					215.9000000059605, 210.4000000059605
+				],
+				"medianMs": 218.19999998807907,
+				"minMs": 210.4000000059605,
+				"maxMs": 350.80000001192093
+			}
+		]
+	},
+	"packing": [
+		{
+			"compactBytes": 33804,
+			"expandedBytes": 8684292,
+			"kb": 32,
+			"runs": 1,
+			"samples": [
+				{
+					"parseCompact": 0,
+					"parseOld": 2.699999988079071,
+					"validateCompact": 17.400000005960464,
+					"validateOld": 37.30000001192093
+				},
+				{
+					"parseCompact": 0,
+					"parseOld": 2.800000011920929,
+					"validateCompact": 22.900000005960464,
+					"validateOld": 33.69999998807907
+				},
+				{
+					"parseCompact": 0,
+					"parseOld": 1.699999988079071,
+					"validateCompact": 13.199999988079073,
+					"validateOld": 33.400000005960464
+				},
+				{
+					"parseCompact": 0.10000002384185792,
+					"parseOld": 1.699999988079071,
+					"validateCompact": 11.5,
+					"validateOld": 35.099999994039536
+				},
+				{
+					"parseCompact": 0,
+					"parseOld": 1.699999988079071,
+					"validateCompact": 11.599999994039536,
+					"validateOld": 35.30000001192093
+				}
+			]
+		},
+		{
+			"compactBytes": 134056,
+			"expandedBytes": 34736800,
+			"kb": 128,
+			"runs": 1,
+			"samples": [
+				{
+					"parseCompact": 0.19999998807907104,
+					"parseOld": 12.200000017881392,
+					"validateCompact": 53.20000001788139,
+					"validateOld": 150.69999998807907
+				},
+				{
+					"parseCompact": 0,
+					"parseOld": 15.5,
+					"validateCompact": 59.19999998807907,
+					"validateOld": 164
+				},
+				{
+					"parseCompact": 0,
+					"parseOld": 14.400000005960464,
+					"validateCompact": 58.80000001192093,
+					"validateOld": 143.5
+				},
+				{
+					"parseCompact": 0.10000002384185792,
+					"parseOld": 13.099999994039536,
+					"validateCompact": 56.39999997615814,
+					"validateOld": 144
+				},
+				{
+					"parseCompact": 0.09999999403953552,
+					"parseOld": 14.200000017881392,
+					"validateCompact": 56.400000005960464,
+					"validateOld": 147.19999998807907
+				}
+			]
+		}
+	],
+	"cssExperiments": [
+		{
+			"round": 0,
+			"name": "baseline",
+			"samples": [
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 31,
+							"total": 0.09999999403953552
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.5
+						},
+						"editor-overlay.ts:visible": {
+							"count": 2,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 3,
+							"total": 0.5999999940395355
+						},
+						"editor.ts:paintLinks": {
+							"count": 2,
+							"total": 0.5
+						},
+						"editor.ts:paintPresence": {
+							"count": 2,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 31,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.5
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.800000011920929
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 1.2000000178813934
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.800000011920929
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 1.2000000178813934
+						}
+					},
+					"latency": 40.5
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.4000000059604645
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.5
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.5
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.5999999940395355
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.5999999940395355
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.5999999940395355
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.9000000059604645
+						}
+					},
+					"latency": 52.400000005960464
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.2000000178813934
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.300000011920929
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.5999999940395355
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.5999999940395355
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.7999999821186066
+						}
+					},
+					"latency": 47
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.300000011920929
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.300000011920929
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.9000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.9000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 1.2000000178813934
+						}
+					},
+					"latency": 50.30000001192093
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.2999999821186066
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.2999999821186066
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.9000000357627869
+						}
+					},
+					"latency": 52
+				}
+			]
+		},
+		{
+			"round": 0,
+			"name": "line-paint",
+			"samples": [
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.7000000178813934
+						},
+						"editor-overlay.ts:visible": {
+							"count": 2,
+							"total": 0.10000002384185792
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 3,
+							"total": 0.5
+						},
+						"editor.ts:paintLinks": {
+							"count": 2,
+							"total": 0.5
+						},
+						"editor.ts:paintPresence": {
+							"count": 2,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 31,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.7000000178813934
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.9000000059604645
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.699999988079071
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.9000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.699999988079071
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.8999999761581421
+						}
+					},
+					"latency": 56.60000002384186
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.199999988079071
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.199999988079071
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.9000000059604645
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.5
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.9000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.5999999940395355
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.7999999821186066
+						}
+					},
+					"latency": 57.70000001788139
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.199999988079071
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.199999988079071
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.800000011920929
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.800000011920929
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.6000000238418579
+						}
+					},
+					"latency": 47.20000001788139
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.5
+						}
+					},
+					"latency": 44.5
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.699999988079071
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.5
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.699999988079071
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.6000000238418579
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.6000000238418579
+						}
+					},
+					"latency": 46.099999994039536
+				}
+			]
+		},
+		{
+			"round": 0,
+			"name": "overlay-layer",
+			"samples": [
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.5999999940395355
+						},
+						"editor-overlay.ts:visible": {
+							"count": 2,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 3,
+							"total": 0.7999999821186066
+						},
+						"editor.ts:paintLinks": {
+							"count": 2,
+							"total": 0.5
+						},
+						"editor.ts:paintPresence": {
+							"count": 2,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.5999999940395355
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.7000000178813934
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.6000000238418579
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.800000011920929
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.6000000238418579
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 1.0999999940395355
+						}
+					},
+					"latency": 55.20000001788139
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 0.9000000059604645
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 0.9000000059604645
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 1
+						}
+					},
+					"latency": 54.10000002384186
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.100000023841858
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.100000023841858
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.800000011920929
+						}
+					},
+					"latency": 56
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0.09999999403953552
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.3999999761581421
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.29999998211860657
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.9000000059604645
+						}
+					},
+					"latency": 54.30000001192093
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.9000000059604645
+						}
+					},
+					"latency": 56.5
+				}
+			]
+		},
+		{
+			"round": 0,
+			"name": "textarea-layer",
+			"samples": [
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.5
+						},
+						"editor-overlay.ts:visible": {
+							"count": 2,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 3,
+							"total": 0.4999999701976776
+						},
+						"editor.ts:paintLinks": {
+							"count": 2,
+							"total": 0.3999999761581421
+						},
+						"editor.ts:paintPresence": {
+							"count": 2,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.5
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.800000011920929
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.699999988079071
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.800000011920929
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.699999988079071
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 1.0999999940395355
+						}
+					},
+					"latency": 51.89999997615814
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 0.9000000059604645
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 0.9000000059604645
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.7999999821186066
+						}
+					},
+					"latency": 47.5
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.699999988079071
+						}
+					},
+					"latency": 49.599999994039536
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0.10000002384185792
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0.10000002384185792
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.5
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.5
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.800000011920929
+						}
+					},
+					"latency": 54.099999994039536
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.5
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.5
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.699999988079071
+						}
+					},
+					"latency": 52.5
+				}
+			]
+		},
+		{
+			"round": 1,
+			"name": "textarea-layer",
+			"samples": [
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.5
+						},
+						"editor-overlay.ts:visible": {
+							"count": 2,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 3,
+							"total": 0.7999999821186066
+						},
+						"editor.ts:paintLinks": {
+							"count": 2,
+							"total": 0.3999999761581421
+						},
+						"editor.ts:paintPresence": {
+							"count": 2,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.5
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.800000011920929
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.5999999940395355
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.9000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.5999999940395355
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 1.4000000059604645
+						}
+					},
+					"latency": 58.80000001192093
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.9000000059604645
+						}
+					},
+					"latency": 54.60000002384186
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.7000000178813934
+						}
+					},
+					"latency": 54.89999997615814
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0.10000002384185792
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.3999999761581421
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.5
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.5
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.9000000059604645
+						}
+					},
+					"latency": 57.79999998211861
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.100000023841858
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.100000023841858
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.3999999761581421
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.5
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.5
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.9000000059604645
+						}
+					},
+					"latency": 53.5
+				}
+			]
+		},
+		{
+			"round": 1,
+			"name": "overlay-layer",
+			"samples": [
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.5999999940395355
+						},
+						"editor-overlay.ts:visible": {
+							"count": 2,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 3,
+							"total": 0.5000000298023224
+						},
+						"editor.ts:paintLinks": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintPresence": {
+							"count": 2,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.5999999940395355
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.7999999821186066
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.800000011920929
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.9000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.800000011920929
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 1
+						}
+					},
+					"latency": 51.30000001192093
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.199999988079071
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.5
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.5
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.800000011920929
+						}
+					},
+					"latency": 51
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.29999998211860657
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.5
+						}
+					},
+					"latency": 45.599999994039536
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.6000000238418579
+						}
+					},
+					"latency": 46.900000005960464
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.699999988079071
+						}
+					},
+					"latency": 51.29999998211861
+				}
+			]
+		},
+		{
+			"round": 1,
+			"name": "line-paint",
+			"samples": [
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.4000000059604645
+						},
+						"editor-overlay.ts:visible": {
+							"count": 2,
+							"total": 0.20000001788139343
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 3,
+							"total": 0.6000000238418579
+						},
+						"editor.ts:paintLinks": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"editor.ts:paintPresence": {
+							"count": 2,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.4000000059604645
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.800000011920929
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.699999988079071
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.9000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.699999988079071
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 1.0999999940395355
+						}
+					},
+					"latency": 53.69999998807907
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.9000000059604645
+						}
+					},
+					"latency": 45.400000005960464
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.6000000238418579
+						}
+					},
+					"latency": 44.5
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.5999999940395355
+						}
+					},
+					"latency": 44.39999997615814
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.5
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.3999999761581421
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.800000011920929
+						}
+					},
+					"latency": 46.79999998211861
+				}
+			]
+		},
+		{
+			"round": 1,
+			"name": "baseline",
+			"samples": [
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.5
+						},
+						"editor-overlay.ts:visible": {
+							"count": 2,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 3,
+							"total": 0.6000000238418579
+						},
+						"editor.ts:paintLinks": {
+							"count": 2,
+							"total": 0.3999999761581421
+						},
+						"editor.ts:paintPresence": {
+							"count": 2,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.5
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.7999999821186066
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.699999988079071
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.8999999761581421
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.699999988079071
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 1.0999999940395355
+						}
+					},
+					"latency": 56
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.5
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.5999999940395355
+						}
+					},
+					"latency": 48.400000005960464
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.100000023841858
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.5
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.100000023841858
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.29999998211860657
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.7999999821186066
+						}
+					},
+					"latency": 59
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.6000000238418579
+						}
+					},
+					"latency": 55.900000005960464
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.699999988079071
+						}
+					},
+					"latency": 48.400000005960464
+				}
+			]
+		},
+		{
+			"round": 2,
+			"name": "baseline",
+			"samples": [
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.5
+						},
+						"editor-overlay.ts:visible": {
+							"count": 2,
+							"total": 0.10000002384185792
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 3,
+							"total": 0.5
+						},
+						"editor.ts:paintLinks": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"editor.ts:paintPresence": {
+							"count": 2,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.5
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.800000011920929
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.5999999940395355
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.800000011920929
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.5999999940395355
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.8999999761581421
+						}
+					},
+					"latency": 50.400000005960464
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.7000000178813934
+						}
+					},
+					"latency": 43.599999994039536
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.3999999761581421
+						}
+					},
+					"latency": 43.5
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.6000000238418579
+						}
+					},
+					"latency": 48.099999994039536
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0.10000002384185792
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.3999999761581421
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.5
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.5
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.7000000178813934
+						}
+					},
+					"latency": 48.80000001192093
+				}
+			]
+		},
+		{
+			"round": 2,
+			"name": "line-paint",
+			"samples": [
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.5
+						},
+						"editor-overlay.ts:visible": {
+							"count": 2,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 3,
+							"total": 0.6000000238418579
+						},
+						"editor.ts:paintLinks": {
+							"count": 2,
+							"total": 0.40000003576278687
+						},
+						"editor.ts:paintPresence": {
+							"count": 2,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.5
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.9000000059604645
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.800000011920929
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.9000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.800000011920929
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 1.2000000178813934
+						}
+					},
+					"latency": 56.099999994039536
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.3999999761581421
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.699999988079071
+						}
+					},
+					"latency": 46.400000005960464
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.4999999701976776
+						}
+					},
+					"latency": 42.5
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 0.9000000059604645
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 0.9000000059604645
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.7000000178813934
+						}
+					},
+					"latency": 39.5
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.3999999761581421
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.699999988079071
+						}
+					},
+					"latency": 46.60000002384186
+				}
+			]
+		},
+		{
+			"round": 2,
+			"name": "overlay-layer",
+			"samples": [
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.300000011920929
+						},
+						"editor-overlay.ts:visible": {
+							"count": 2,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 3,
+							"total": 0.6000000238418579
+						},
+						"editor.ts:paintLinks": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"editor.ts:paintPresence": {
+							"count": 2,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.300000011920929
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.7999999821186066
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.5
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.7999999821186066
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.5
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.800000011920929
+						}
+					},
+					"latency": 41.79999998211861
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.5
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.5
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.5
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.8000000417232513
+						}
+					},
+					"latency": 49.099999994039536
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0.09999999403953552
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.699999988079071
+						}
+					},
+					"latency": 48.599999994039536
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.5999999940395355
+						}
+					},
+					"latency": 50.30000001192093
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.29999998211860657
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.5999999940395355
+						}
+					},
+					"latency": 44.900000005960464
+				}
+			]
+		},
+		{
+			"round": 2,
+			"name": "textarea-layer",
+			"samples": [
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.5
+						},
+						"editor-overlay.ts:visible": {
+							"count": 2,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 3,
+							"total": 0.5999999940395355
+						},
+						"editor.ts:paintLinks": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintPresence": {
+							"count": 2,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 31,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.5
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.800000011920929
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.699999988079071
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.800000011920929
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.7999999821186066
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.8999999761581421
+						}
+					},
+					"latency": 50.39999997615814
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.699999988079071
+						}
+					},
+					"latency": 44.89999997615814
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 0.8999999761581421
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 0.8999999761581421
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.3999999761581421
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.5999999940395355
+						}
+					},
+					"latency": 43.70000001788139
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.19999998807907104
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1.0999999940395355
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.30000001192092896
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.699999988079071
+						}
+					},
+					"latency": 45.60000002384186
+				},
+				{
+					"alignment": true,
+					"groups": {
+						"dom.ts:setMarkup": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor-overlay.ts:textPoints": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-overlay.ts:update": {
+							"count": 1,
+							"total": 1
+						},
+						"editor-overlay.ts:visible": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:decorate": {
+							"count": 1,
+							"total": 0
+						},
+						"editor-syntax.ts:highlightLine": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor-syntax.ts:lineMarkup": {
+							"count": 1,
+							"total": 0.09999999403953552
+						},
+						"editor.ts:paintActiveLine": {
+							"count": 2,
+							"total": 0.30000001192092896
+						},
+						"editor.ts:paintLinks": {
+							"count": 1,
+							"total": 0.20000001788139343
+						},
+						"editor.ts:paintPresence": {
+							"count": 1,
+							"total": 0
+						},
+						"editor.ts:point": {
+							"count": 16,
+							"total": 0
+						},
+						"editor.ts:updateHighlight": {
+							"count": 1,
+							"total": 1
+						},
+						"projection.ts:applyViewEdit": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"projection.ts:project": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:input": {
+							"count": 1,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:projectionFor": {
+							"count": 2,
+							"total": 0.4000000059604645
+						},
+						"source-textarea.ts:sync": {
+							"count": 2,
+							"total": 0.7000000178813934
+						}
+					},
+					"latency": 48.19999998807907
+				}
+			]
+		}
+	],
+	"collaboration": {
+		"writers": 24,
+		"websocket": 12,
+		"polling": 12,
+		"documentKiB": 8,
+		"mixedEdits": 192,
+		"rounds": 8,
+		"offlineWriters": 4,
+		"commitRequestMedianMs": 293,
+		"commitRequestP95Ms": 587,
+		"journeyEditsPerSecond": 20.4,
+		"limit": "Clients and server share one Bun process. Includes local SQLite/CRDT work, two sync barriers and cursor assertions. Not a server capacity benchmark."
+	},
+	"verification": {
+		"bunTests": 439,
+		"assertions": 8723,
+		"check": "passed",
+		"browserDocumentAssertions": 280,
+		"multicursors": 512,
+		"largestCheckpointCharacters": 200000
+	},
+	"remaining": [
+		"128KiB typing remains slower than original; 120Hz target not met.",
+		"Large textarea layout/paint, full-array copies/freezing, and cold graph expansion remain costs.",
+		"24-writer convergence is exercised, but 24-browser rendering and isolated server capacity remain unmeasured.",
+		"Prose/code/long-line fixture generation is available; full comparative app matrix used rich Markdown."
+	]
+}

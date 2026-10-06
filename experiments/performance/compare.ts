@@ -20,6 +20,15 @@ let Envelope = Schema.Struct({
 let Sample = Schema.Struct({
 	ms: Schema.optional(Schema.Number),
 	error: Schema.optional(Schema.String),
+	animationWork: Schema.optional(
+		Schema.Array(
+			Schema.Struct({
+				start: Schema.Number,
+				frame: Schema.Number,
+				duration: Schema.Number,
+			}),
+		),
+	),
 })
 type Configuration = typeof Configuration.Type
 type Fixture = typeof Fixture.Type
@@ -31,6 +40,7 @@ interface Measurement {
 	medianMs: number
 	minMs: number
 	maxMs: number
+	maxFrameCallbackWorkMs?: number[]
 }
 
 let configurationPath = process.argv[2]
@@ -50,7 +60,11 @@ for (let configuration of configurations) {
 	for (let fixture of configuration.docs) {
 		try {
 			measureReload(configuration, fixture)
-			measureTyping(configuration, fixture)
+			measureTyping(configuration, fixture, "end")
+			if (fixture.kb >= 32) {
+				measureTyping(configuration, fixture, "start")
+				measureTyping(configuration, fixture, "middle")
+			}
 		} catch (error) {
 			failures.push({
 				version: configuration.kind,
@@ -83,11 +97,16 @@ function measureReload(configuration: Configuration, fixture: Fixture) {
 	evaluate(configuration, "localStorage.removeItem('__benchmarkExpected')")
 }
 
-function measureTyping(configuration: Configuration, fixture: Fixture) {
+function measureTyping(
+	configuration: Configuration,
+	fixture: Fixture,
+	location: "start" | "middle" | "end",
+) {
 	let values: number[] = []
+	let maxFrameCallbackWorkMs: number[] = []
 	for (let iteration = 0; iteration < 12; iteration++) {
-		focusEnd(configuration)
-		let marker = ` perf${fixture.kb}_${iteration}`
+		focusPosition(configuration, location)
+		let marker = ` perf${location}${fixture.kb}_${iteration}`
 		let before = number(configuration, `${source(configuration)}.length`)
 		evaluate(
 			configuration,
@@ -101,14 +120,31 @@ function measureTyping(configuration: Configuration, fixture: Fixture) {
 		if (sample.error || sample.ms === undefined)
 			throw Error(sample.error ?? "Missing input measurement")
 		values.push(sample.ms)
+		let frames = new Map<number, number>()
+		for (let callback of sample.animationWork ?? [])
+			frames.set(
+				callback.frame,
+				(frames.get(callback.frame) ?? 0) + callback.duration,
+			)
+		if (frames.size) maxFrameCallbackWorkMs.push(Math.max(...frames.values()))
 		wait(
 			configuration,
 			configuration.kind === "original"
-				? `window.__benchmark.lastSaved?.content?.endsWith(${JSON.stringify(marker)})`
+				? `window.__benchmark.lastSaved?.content?.includes(${JSON.stringify(marker)})`
 				: `document.querySelector('#save-status')?.getAttribute('aria-busy')==='false' && document.querySelector('#save-status')?.dataset.pending==='0'`,
 		)
 	}
-	collect(configuration, fixture, "insert text to paint opportunity", values)
+	collect(
+		configuration,
+		fixture,
+		location === "end"
+			? "insert text to paint opportunity"
+			: `insert at ${location} to paint opportunity`,
+		values,
+		{
+			maxFrameCallbackWorkMs,
+		},
+	)
 }
 
 function collect(
@@ -116,6 +152,7 @@ function collect(
 	fixture: Fixture,
 	name: string,
 	values: number[],
+	work: { maxFrameCallbackWorkMs?: number[] } = {},
 ) {
 	let sorted = [...values].sort((left, right) => left - right)
 	let lower = sorted[Math.floor((sorted.length - 1) / 2)]
@@ -134,17 +171,27 @@ function collect(
 		medianMs,
 		minMs,
 		maxMs,
+		...work,
 	}
 	results.push(measurement)
 	console.log(JSON.stringify(measurement))
 }
 
-function focusEnd(configuration: Configuration) {
+function focusPosition(
+	configuration: Configuration,
+	location: "start" | "middle" | "end",
+) {
+	let offset =
+		location === "end"
+			? `${source(configuration)}.length`
+			: location === "middle"
+				? `Math.floor(${source(configuration)}.length/2)`
+				: `${source(configuration)}.indexOf(String.fromCharCode(10,10))+2`
 	evaluate(
 		configuration,
 		configuration.kind === "original"
-			? `(()=>{let view=document.querySelector('.cm-content').cmTile.view;view.dispatch({selection:{anchor:view.state.doc.length}});view.focus()})()`
-			: `(()=>{let editor=document.querySelector('alkalye-editor').source;editor.setSelectionRange(editor.value.length,editor.value.length);editor.focus()})()`,
+			? `(()=>{let view=document.querySelector('.cm-content').cmTile.view;view.dispatch({selection:{anchor:${offset}}});view.focus()})()`
+			: `(()=>{let editor=document.querySelector('alkalye-editor').source;editor.setSelectionRange(${offset},${offset});editor.focus()})()`,
 	)
 }
 

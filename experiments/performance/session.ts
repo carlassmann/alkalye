@@ -82,6 +82,7 @@ for (let kilobytes of [2, 32, 128]) {
 			Effect.fail(new Error("This experiment isolates local persistence")),
 		history: () => Effect.succeed([]),
 	}
+	let expected = source
 	let appendBytes = 0
 	let phases: {
 		phase: string
@@ -120,8 +121,7 @@ for (let kilobytes of [2, 32, 128]) {
 						"materialize-source",
 						Effect.sync(() => session.replica.text(document)),
 					)
-					if (restoredSource !== source + (edit ? "" : "x"))
-						throw Error("Source changed")
+					if (restoredSource !== expected) throw Error("Source changed")
 					if (edit) {
 						yield* phase(
 							"editor-capture-base",
@@ -131,8 +131,27 @@ for (let kilobytes of [2, 32, 128]) {
 							"append-optimistic",
 							Effect.sync(() => session.edit(source + "x")),
 						)
+						expected = source + "x"
 						appendBytes = JSON.stringify(result.operation).length
 						yield* phase("append-durable", result.saved)
+						for (let location of ["top", "middle", "delete"]) {
+							let offset =
+								location === "top"
+									? expected.indexOf("# Benchmark")
+									: Math.floor(expected.length / 2)
+							let next =
+								expected.slice(0, offset) +
+								(location === "delete" ? "" : "x") +
+								expected.slice(offset + (location === "delete" ? 1 : 0))
+							let changed = yield* phase(
+								location + "-optimistic",
+								Effect.sync(() => session.edit(next)),
+							)
+							yield* phase(location + "-durable", changed.saved)
+							if (changed.content !== next)
+								throw Error("Incremental edit changed source")
+							expected = next
+						}
 					}
 					yield* phase("save-materialization", session.save)
 				}),

@@ -7,7 +7,23 @@
 		lastSaved: null,
 		samples: [],
 		arm: null,
+		animationWork: [],
 	})
+	let frame = window.requestAnimationFrame.bind(window)
+	window.requestAnimationFrame = callback =>
+		frame(timestamp => {
+			let started = performance.now()
+			try {
+				callback(timestamp)
+			} finally {
+				state.animationWork.push({
+					start: started,
+					frame: timestamp,
+					duration: performance.now() - started,
+				})
+				if (state.animationWork.length > 2000) state.animationWork.shift()
+			}
+		})
 	window.addEventListener("alkalye:document-saved", event => {
 		state.saved++
 		state.lastSaved = event.detail
@@ -82,6 +98,9 @@
 				state.samples.push({
 					name: arm.name,
 					ms: performance.now() - arm.started,
+					animationWork: state.animationWork.filter(
+						sample => sample.start + sample.duration >= arm.started,
+					),
 				})
 				state.arm = null
 			})

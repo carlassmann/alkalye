@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+	<meta charset="utf-8" /><meta
+		name="viewport"
+		content="width=device-width,initial-scale=1"
+	/><title>Alkalye performance improvements</title
+	><style>
+		:root {
+			color-scheme: light dark;
+			font-family: system-ui, sans-serif;
+			background: light-dark(#fafafa, #111);
+			color: light-dark(#151515, #eee);
+			--line: light-dark(#ddd, #333);
+			--muted: light-dark(#555, #aaa);
+			--brand: light-dark(#246342, #7ddba1);
+		}
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			max-width: 1050px;
+			margin: auto;
+			padding: 40px 24px 70px;
+		}
+		h1 {
+			font-size: clamp(28px, 5vw, 44px);
+			line-height: 1.1;
+			letter-spacing: -0.04em;
+		}
+		h2 {
+			margin-top: 40px;
+			font-size: 23px;
+		}
+		p {
+			line-height: 1.55;
+			max-width: 82ch;
+		}
+		a {
+			color: var(--brand);
+		}
+		.muted,
+		small {
+			color: var(--muted);
+		}
+		.lead {
+			font-size: 20px;
+		}
+		.table {
+			overflow: auto;
+			border: 1px solid var(--line);
+		}
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 14px;
+		}
+		th,
+		td {
+			text-align: left;
+			padding: 14px;
+			border-bottom: 1px solid var(--line);
+		}
+		td {
+			font-variant-numeric: tabular-nums;
+			vertical-align: top;
+		}
+		tr:last-child > * {
+			border-bottom: 0;
+		}
+		thead {
+			color: var(--muted);
+		}
+		tbody th {
+			font-weight: 500;
+			white-space: nowrap;
+		}
+		summary {
+			cursor: pointer;
+			white-space: nowrap;
+		}
+		details small {
+			display: block;
+			max-width: 220px;
+			line-height: 1.5;
+			margin-top: 10px;
+		}
+		ul {
+			padding-left: 22px;
+			line-height: 1.7;
+		}
+		.note {
+			border-left: 3px solid var(--brand);
+			padding-left: 18px;
+		}
+		.tiles {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 20px;
+		}
+		.tiles > div {
+			border: 1px solid var(--line);
+			padding: 20px;
+		}
+		.tiles strong {
+			font-size: 25px;
+			display: block;
+			margin-bottom: 8px;
+		}
+		footer {
+			border-top: 1px solid var(--line);
+			padding-top: 20px;
+			margin-top: 40px;
+			font-size: 13px;
+		}
+		@media (max-width: 650px) {
+			body {
+				padding: 24px 15px;
+			}
+			.tiles {
+				grid-template-columns: 1fr;
+			}
+			th,
+			td {
+				padding: 10px;
+			}
+			table {
+				min-width: 650px;
+			}
+		}
+	</style>
+	<body>
+		<p class="muted">Alkalye · measured performance pass · 6 October 2026</p>
+		<h1>Much faster. The 120Hz target remains open.</h1>
+		<p class="lead">
+			32 KiB reload fell from 708ms to roughly 142ms. Typing fell from 204ms to
+			roughly 13ms. Large documents now open, but 128 KiB typing still trails
+			the original.
+		</p>
+		<div class="tiles">
+			<div>
+				<strong>24 writers</strong>192 mixed edits, cursors, offline recovery
+				and permissions
+			</div>
+			<div>
+				<strong>512 cursors</strong>Native Unicode editing and navigation tests
+			</div>
+			<div>
+				<strong>35 MB →134 KB</strong>128 KiB snapshot JSON, before HTTP
+				compression
+			</div>
+		</div>
+		<h2>Application journeys</h2>
+		<p>
+			Median paint-opportunity timing. Expand the new result for all samples.
+			Both builds use local servers. Sizes are generated rich Markdown, not
+			megabytes of plain text.
+		</p>
+		<div class="table">
+			<table>
+				<thead>
+					<tr>
+						<th>Journey</th>
+						<th>Original</th>
+						<th>Rewrite before</th>
+						<th>Rewrite now</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th>Reload · 2 KiB</th>
+						<td>152.8 ms*</td>
+						<td>107.3 ms</td>
+						<td>
+							<details>
+								<summary>78.6 ms</summary>
+								<small
+									>Samples, ms: 78.6, 92.0, 73.8, 88.6, 73.0, 72.9, 70.7, 80.7,
+									113.2</small
+								>
+							</details>
+						</td>
+					</tr>
+					<tr>
+						<th>Reload · 32 KiB</th>
+						<td>191.8 ms</td>
+						<td>708.3 ms</td>
+						<td>
+							<details>
+								<summary>141.6 ms</summary>
+								<small
+									>Samples, ms: 138.6, 140.9, 144.9, 142.8, 140.3, 141.6, 142.2,
+									143.4, 139.1</small
+								>
+							</details>
+						</td>
+					</tr>
+					<tr>
+						<th>Reload · 128 KiB</th>
+						<td>393.3 ms</td>
+						<td>Failed</td>
+						<td>
+							<details>
+								<summary>372.1 ms</summary>
+								<small
+									>Samples, ms: 369.7, 372.1, 373.7, 375.7, 374.6, 369.1, 366.7,
+									365.5, 399.4</small
+								>
+							</details>
+						</td>
+					</tr>
+					<tr>
+						<th>Append · 2 KiB</th>
+						<td>24.2 ms*</td>
+						<td>14.5 ms</td>
+						<td>
+							<details>
+								<summary>10.9 ms</summary>
+								<small
+									>Samples, ms: 27.3, 8.0, 10.6, 3.6, 8.4, 11.2, 14.8, 16.4,
+									18.8, 4.4, 12.0, 9.7</small
+								>
+							</details>
+						</td>
+					</tr>
+					<tr>
+						<th>Append · 32 KiB</th>
+						<td>21.7 ms</td>
+						<td>203.8 ms</td>
+						<td>
+							<details>
+								<summary>13.3 ms</summary>
+								<small
+									>Samples, ms: 19.2, 16.7, 8.6, 16.2, 14.2, 8.2, 8.6, 16.3,
+									18.0, 11.4, 12.5, 11.5</small
+								>
+							</details>
+						</td>
+					</tr>
+					<tr>
+						<th>Append · 128 KiB</th>
+						<td>23.2 ms</td>
+						<td>Failed</td>
+						<td>
+							<details>
+								<summary>50.2 ms</summary>
+								<small
+									>Samples, ms: 45.2, 43.8, 52.1, 43.5, 43.2, 44.3, 54.1, 53.9,
+									48.4, 55.3, 52.4, 52.9</small
+								>
+							</details>
+						</td>
+					</tr>
+					<tr>
+						<th>Edit near top · 32 KiB</th>
+						<td>28.4 ms</td>
+						<td>—</td>
+						<td>
+							<details>
+								<summary>13.6 ms</summary>
+								<small
+									>Samples, ms: 15.4, 13.3, 30.4, 14.6, 13.7, 13.8, 12.0, 31.2,
+									11.3, 13.5, 12.6, 11.6</small
+								>
+							</details>
+						</td>
+					</tr>
+					<tr>
+						<th>Edit near top · 128 KiB</th>
+						<td>23.8 ms</td>
+						<td>—</td>
+						<td>
+							<details>
+								<summary>29.2 ms</summary>
+								<small
+									>Samples, ms: 33.7, 22.9, 27.8, 29.2, 31.4, 28.8, 28.8, 24.8,
+									31.5, 35.1, 29.3, 31.1</small
+								>
+							</details>
+						</td>
+					</tr>
+					<tr>
+						<th>Edit in middle · 32 KiB</th>
+						<td>25.9 ms</td>
+						<td>—</td>
+						<td>
+							<details>
+								<summary>14.0 ms</summary>
+								<small
+									>Samples, ms: 28.3, 17.5, 12.2, 14.7, 30.4, 13.4, 14.8, 14.7,
+									13.1, 13.1, 12.0, 13.0</small
+								>
+							</details>
+						</td>
+					</tr>
+					<tr>
+						<th>Edit in middle · 128 KiB</th>
+						<td>25.7 ms</td>
+						<td>—</td>
+						<td>
+							<details>
+								<summary>32.2 ms</summary>
+								<small
+									>Samples, ms: 42.1, 38.7, 32.4, 31.1, 31.8, 35.7, 31.4, 31.9,
+									31.4, 29.1, 33.8, 35.2</small
+								>
+							</details>
+						</td>
+					</tr>
+					<tr>
+						<th>Switch document · 32 KiB</th>
+						<td>29.6 ms*</td>
+						<td>1216.7 ms</td>
+						<td>
+							<details>
+								<summary>72.7 ms</summary>
+								<small
+									>Samples, ms: 109.0, 67.8, 72.7, 76.2, 78.2, 72.3, 64.0, 72.5,
+									86.7</small
+								>
+							</details>
+						</td>
+					</tr>
+					<tr>
+						<th>Switch document · 128 KiB</th>
+						<td>—</td>
+						<td>—</td>
+						<td>
+							<details>
+								<summary>218.2 ms</summary>
+								<small
+									>Samples, ms: 350.8, 213.7, 218.2, 212.4, 219.6, 228.8, 229.0,
+									215.9, 210.4</small
+								>
+							</details>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<p class="muted">
+			* Original value from the earlier comparison. Other original values were
+			repeated during this pass. Fixtures accumulate small benchmark edits.
+			Browser timing and background host load vary; small differences are not
+			statistical proof.
+		</p>
+		<h2>What changed</h2>
+		<ul>
+			<li>
+				One validated graph on cold open; isolated replica forks and a bounded
+				Effect cache for warm reopening. Live subscriptions still close with
+				their scopes.
+			</li>
+			<li>
+				Compact, validated insertion runs replace repeated per-character
+				snapshot metadata. Older clients receive the legacy format; SQLite heads
+				remain compatible with rollback.
+			</li>
+			<li>
+				Body edits reuse cached normalized text and atom projections.
+				Frontmatter promotion, undo and concurrent edits retain their canonical
+				behavior.
+			</li>
+			<li>
+				Unchanged syntax lines retain their DOM. Link, comment and cursor
+				geometry is measured only where visible, with reads grouped before
+				writes.
+			</li>
+			<li>
+				UI refreshes coalesce per frame. Laser trails retain intermediate
+				points. Multicursor navigation uses indexed offsets and cached grapheme
+				geometry.
+			</li>
+		</ul>
+		<h2>Rendering and the remaining gap</h2>
+		<p class="note">
+			120fps means about 8.3ms for the entire frame. This headless browser does
+			not prove that target. At 128 KiB, isolated overlay/projection/link work
+			is about 1.8ms, but native textarea layout and paint still cost more. App
+			typing takes about 50ms at the end, and around 30ms near the top or
+			middle.
+		</p>
+		<p>
+			Line paint containment reduced an isolated 128 KiB median from 48.8ms to
+			46.4ms across 15 samples. Overlay and textarea layer promotion made it
+			slower and were discarded. Full-array copies/freezing and cold graph
+			expansion also remain costs. A virtualized editing surface deserves a
+			separate architecture experiment.
+		</p>
+		<h2>Collaboration and sync</h2>
+		<p>
+			24 independently persisted sessions used 12 WebSockets and 12 continuously
+			polling connections. Eight rounds mixed append, top/middle edits and
+			overlapping deletions, with cursor updates every round. Four writers
+			edited offline and reconnected. All replicas converged; readers could not
+			mutate.
+		</p>
+		<p>
+			Under this same-process load, commit requests measured a 293ms median and
+			587ms p95. The complete journey processed about 20 edits/second, including
+			client SQLite/CRDT work, two sync barriers and presence assertions. This
+			is a correctness stress test, not isolated server capacity. Sustained
+			24-browser performance remains unmeasured.
+		</p>
+		<h2>Verification and reproducibility</h2>
+		<p>
+			<code>bun run check</code> passes: 439 tests, 8,723 assertions, types,
+			formatting and fast browser journeys. Separate browser module/editor tests
+			cover 200,000-character checkpoints, 128 KiB files, offline recovery,
+			revoked access, IME, Unicode and 512 cursors. Opus reviewed the changes
+			and found frontmatter/Unicode edge cases that were fixed.
+		</p>
+		<p>
+			The probe starts at trusted input and ends after the required source/DOM
+			state at an animation-frame paint opportunity. It excludes command
+			overhead. RAF callback timings cover only those JavaScript callbacks,
+			excluding input handlers, layout, rasterization and compositing.
+			Production bundles and service-worker versions were checked before
+			measuring; compact local caches were populated first.
+		</p>
+		<p>
+			Plain prose, fenced-code and long-line fixtures are available in the
+			runner; this app comparison used the rich fixture. Mobile, throttled
+			hardware and sustained 24-browser rendering are not covered by these
+			numbers.
+		</p>
+		<p>
+			<a href="performance-improvements.json"
+				>All measured samples and experiment evidence</a
+			>
+			· <a href="performance-comparison.html">Earlier comparison</a>
+		</p>
+		<footer>written with gpt-6 in codex</footer>
+	</body>
+</html>
