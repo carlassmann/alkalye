@@ -89,3 +89,24 @@ test("an ineligible normal action still invalidates an older redo branch", () =>
 	]
 	expect(() => select(actions, true)).toThrow("Nothing to redo")
 })
+
+test("text-scoped undo excludes document changes and other theme sources", () => {
+	let actions = [
+		{ ...entry("theme", 1), textTarget: "theme-a" },
+		{ ...entry("other-theme", 2), textTarget: "theme-b" },
+		{ ...entry("body", 3), textTarget: "doc" },
+		entry("asset", 4),
+	]
+	function themeUndo(redo = false) {
+		return Effect.runSync(selectDocumentUndo(actions, "owner", redo, "theme-a"))
+	}
+	expect(themeUndo().tip.id).toBe("theme")
+	expect(select(actions).tip.id).toBe("asset")
+	actions.push({ ...entry("undo-theme", 5, "theme"), textTarget: "theme-a" })
+	expect(() => themeUndo()).toThrow("Nothing to undo")
+	actions.push({ ...entry("body-again", 6), textTarget: "doc" })
+	expect(themeUndo(true).tip.id).toBe("undo-theme")
+	actions.push({ ...entry("theme-again", 7), textTarget: "theme-a" })
+	expect(() => themeUndo(true)).toThrow("Nothing to redo")
+	expect(themeUndo().tip.id).toBe("theme-again")
+})

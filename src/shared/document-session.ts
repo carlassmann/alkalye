@@ -34,7 +34,11 @@ import type { DocumentFailure } from "./document-failures"
 import { encode } from "./base64"
 import { hasBlobReferences } from "./document-blobs"
 import { isBlobFailure, UndoUnavailable } from "./document-errors"
-import { undoableDocumentAction, documentUndoCandidates } from "./document-undo"
+import {
+	undoableDocumentAction,
+	documentUndoCandidates,
+	undoTextTarget,
+} from "./document-undo"
 import type { UndoEntry } from "./document-undo"
 import { partitionDocumentActions } from "./document-dependencies"
 import { validateTextCausality } from "./document-causality"
@@ -423,8 +427,8 @@ function makeSession(options: DocumentSessionOptions) {
 				label: string,
 				build: (staged: Replica) => (Operation | null)[],
 			) => propose(actor => projection.stage(label, build, actor)),
-			undo: () => undo(false),
-			redo: () => undo(true),
+			undo: (textTarget?: string) => undo(false, textTarget),
+			redo: (textTarget?: string) => undo(true, textTarget),
 			compensate: (original: CommittedAction) =>
 				propose(actor => projection.compensate(original, actor)),
 			commit: (action: DocumentAction) =>
@@ -446,15 +450,12 @@ function makeSession(options: DocumentSessionOptions) {
 						),
 					),
 				),
-			edit: (content: string, base?: Atom[]) => {
-				let operation = projection.replica.prepareEdit(
-					options.document,
-					content,
-					base,
-				)
+			// Typing in the document or in one of its texts, such as a theme.
+			edit: (content: string, base?: Atom[], target = options.document) => {
+				let operation = projection.replica.prepareEdit(target, content, base)
 				let unchanged = {
 					operation: null,
-					atoms: view.visible(options.document),
+					atoms: view.visible(target),
 				}
 				if (!operation) return { ...unchanged, saved: Effect.void }
 				let decoded = Schema.decodeUnknownResult(DocumentActionSchema)({
@@ -484,7 +485,7 @@ function makeSession(options: DocumentSessionOptions) {
 				advanceView()
 				return {
 					operation: freezeOperation(operation),
-					atoms: view.visible(options.document),
+					atoms: view.visible(target),
 					saved: flush,
 				}
 			},
@@ -585,10 +586,10 @@ function makeSession(options: DocumentSessionOptions) {
 				),
 			historyCursor: () => Object.freeze(projection.cursor()),
 		}
-		function undo(redo: boolean) {
+		function undo(redo: boolean, textTarget?: string) {
 			let generation = projection.editGeneration()
 			return propose(actor =>
-				projection.undo(redo, actor).pipe(
+				projection.undo(redo, actor, textTarget).pipe(
 					Effect.tap(() =>
 						generation === projection.editGeneration()
 							? Effect.void
@@ -1002,7 +1003,7 @@ function makeProjection(options: DocumentSessionOptions) {
 				build: (staged: Replica) => (Operation | null)[],
 				actor: string,
 			) => buildAction(durable, options.document, label, build, actor),
-			undo: (redo: boolean, actor: string) =>
+			undo: (redo: boolean, actor: string, textTarget?: string) =>
 				Effect.gen(function* () {
 					yield* indexUndoHistory()
 					let excluded = new Set<string>()
@@ -1030,6 +1031,7 @@ function makeProjection(options: DocumentSessionOptions) {
 						})),
 						options.subject,
 						redo,
+						textTarget,
 					)
 					let unavailable: UndoUnavailable | undefined
 					for (let candidate of candidates) {
@@ -1210,6 +1212,7 @@ function makeProjection(options: DocumentSessionOptions) {
 									local: true,
 									birth: value.kind === "localCreated",
 									undoable: undoableDocumentAction(action),
+									textTarget: undoTextTarget(action),
 								})
 						} else if (value.kind === "published") {
 							yield* indexReceipt(entry.idString, 0, value.publication.initial)
@@ -1282,6 +1285,7 @@ function makeProjection(options: DocumentSessionOptions) {
 				undoEntries.set(action.id, {
 					id: action.id,
 					undoable: undoableDocumentAction(action),
+					textTarget: undoTextTarget(action),
 					subject: action.subject,
 					undoOf: action.undoOf,
 					order: existing?.order ?? ++undoOrder,

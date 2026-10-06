@@ -13,14 +13,16 @@ export interface UndoEntry {
 	active: boolean
 	eligible?: boolean
 	undoable?: boolean
+	textTarget?: string
 }
 
 export function selectDocumentUndo(
 	entries: ReadonlyArray<UndoEntry>,
 	subject: string,
 	redo: boolean,
+	textTarget?: string,
 ) {
-	return documentUndoCandidates(entries, subject, redo).pipe(
+	return documentUndoCandidates(entries, subject, redo, textTarget).pipe(
 		Effect.flatMap(candidates =>
 			candidates[0]
 				? Effect.succeed(candidates[0])
@@ -38,6 +40,7 @@ export function documentUndoCandidates(
 	entries: ReadonlyArray<UndoEntry>,
 	subject: string,
 	redo: boolean,
+	textTarget?: string,
 ) {
 	return Effect.try({
 		try: () => {
@@ -66,7 +69,8 @@ export function documentUndoCandidates(
 					entry.subject === subject &&
 					!entry.undoOf &&
 					!entry.birth &&
-					entry.undoable !== false,
+					entry.undoable !== false &&
+					(textTarget === undefined || entry.textTarget === textTarget),
 			)
 			let roots = normal.filter(entry => entry.eligible !== false)
 			let latestNormal = normal.reduce(
@@ -127,4 +131,13 @@ export function undoableDocumentAction(
 			change.target === action.document &&
 			change.field === "presentationItem",
 	)
+}
+
+export function undoTextTarget(action: Pick<DocumentAction, "changes">) {
+	let target = action.changes[0]?.target
+	return action.changes.every(
+		change => change.kind === "text" && change.target === target,
+	)
+		? target
+		: undefined
 }
