@@ -13,7 +13,7 @@ export function toolbarMarkup() {
 			${button("bold", translate("Bold"), icon("bold"))}${button("italic", translate("Italic"), icon("italic"))}${button("code", "Code", icon("code"), 'class="wide-only"')}${button("heading", translate("Heading"), icon("heading"), 'class="wide-only"')}${button("bullet", "Bullet list", icon("list"))}${button("task", "Task list", icon("list-todo"), 'class="wide-only"')}${button("link", "Link", icon("link"), 'class="wide-only"')}${button("syntax-theme", "Syntax colors", icon("code-xml"))}${button("preview", translate("Preview"), icon("eye"))}
 		</nav>
 		<div class="toolbar-side end">
-			${button("toggle-tools", translate("Document tools"), icon("wrench"))}
+			${button("toggle-tools", translate("Document tools"), html`<span class="closed-icon">${icon("wrench")}</span><span class="open-icon">${icon("panel-right")}</span>`)}
 		</div>
 	</header>`
 }

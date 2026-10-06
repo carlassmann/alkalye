@@ -78,11 +78,13 @@
 	opacity: 1;
 	filter: blur(0);
 }
-:root .library-open [data-toolbar] .closed-icon {
+:root .library-open [data-toolbar] [data-action="library"] .closed-icon,
+:root .tools-open [data-toolbar] [data-action="toggle-tools"] .closed-icon {
 	opacity: 0;
 	filter: blur(2px);
 }
-:root .library-open [data-toolbar] .open-icon {
+:root .library-open [data-toolbar] [data-action="library"] .open-icon,
+:root .tools-open [data-toolbar] [data-action="toggle-tools"] .open-icon {
 	opacity: 1;
 	filter: blur(0);
 }
