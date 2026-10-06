@@ -226,6 +226,56 @@ try {
 	browser(session, "uncheck", "#find-regex")
 	browser(session, "click", "#close-find")
 
+	browser(session, "fill", "#editor", "cat cat cat")
+	browser(session, "press", "Control+f")
+	browser(session, "fill", "#find-text", "cat")
+	browser(session, "click", '[data-find-action="toggle-replace"]')
+	browser(session, "fill", "#replace-text", "Cat")
+	browser(session, "click", "#replace-one")
+	browser(session, "click", "#replace-one")
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.value === "Cat Cat cat"',
+	)
+	assert(
+		true,
+		"Repeated replacement advances even when replacement still matches",
+	)
+	browser(session, "click", "#close-find")
+	browser(session, "fill", "#editor", "[x](https://example.com)")
+	browser(session, "press", "Control+f")
+	browser(session, "fill", "#find-text", "example.com")
+	browser(session, "click", '[data-find-action="toggle-replace"]')
+	browser(session, "fill", "#replace-text", "example.org")
+	browser(session, "click", "#replace-one")
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.value === "[x](https://example.org)"',
+	)
+	assert(
+		true,
+		"Replacement targets source inside a collapsed link without destroying its markup",
+	)
+	browser(session, "click", "#close-find")
+	browser(session, "fill", "#editor", "alpha beta alpha")
+	browser(session, "press", "Control+f")
+	evaluate(
+		session,
+		'(() => { let source = document.querySelector("alkalye-editor").source; source.focus(); source.setSelectionRange(11, 16); })()',
+	)
+	browser(session, "press", "Control+f")
+	browser(session, "fill", "#find-text", "alpha")
+	browser(session, "click", '[data-find-action="toggle-replace"]')
+	browser(session, "fill", "#replace-text", "Z")
+	browser(session, "check", "#find-selection-only")
+	browser(session, "click", "#replace-all")
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.value === "alpha beta Z"',
+	)
+	assert(true, "Reopening Find captures a new selection in the existing panel")
+	browser(session, "click", "#close-find")
+
 	evaluate(
 		session,
 		'(() => { let host=document.querySelector("alkalye-editor"), source=host.source; source.focus(); source.setSelectionRange(0,5); document.querySelector("#editor").dispatchEvent(new MouseEvent("contextmenu", {bubbles:true,cancelable:true,clientX:500,clientY:150})); return true })()',
