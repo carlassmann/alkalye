@@ -6,6 +6,7 @@ import { assert, browser, evaluate, wait } from "./browser-driver"
 
 let source = `---
 title: Laser displays
+mode: present
 ---
 # Opening
 

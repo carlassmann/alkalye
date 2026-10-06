@@ -143,7 +143,7 @@ try {
 	browser(session, "click", '[data-action="tools"]')
 	wait(
 		session,
-		'document.querySelectorAll("[data-attachments] .asset-row").length === 1 && document.querySelectorAll(\'[data-action^="drawing:"]\').length === 1 && document.querySelector("#editor").value.match(/asset:/g)?.length === 2 && document.querySelector("#editor").value.includes("theme-id:") && document.querySelector("#editor").value.includes("path: Travel/Notes")',
+		'document.querySelectorAll("[data-attachments] .asset-row").length === 2 && document.querySelectorAll(\'[data-action^="drawing:"]\').length === 1 && document.querySelector("alkalye-editor").source.value.match(/asset:/g)?.length === 2 && document.querySelector("#editor").value.includes("theme-id:") && document.querySelector("#editor").value.includes("path: Travel/Notes")',
 	)
 	browser(session, "click", '[data-action="comments"]')
 	wait(

@@ -5,6 +5,7 @@ import { assert, browser, evaluate, visit, wait } from "./browser-driver"
 
 let source = `---
 title: Screen parity talk
+mode: present
 ---
 # Opening
 
@@ -434,7 +435,7 @@ function location() {
 function verifyEmptyTeleprompter() {
 	browser(session, "click", ".preview-back")
 	wait(session, 'document.querySelector("#editor") !== null')
-	browser(session, "fill", "#editor", "")
+	browser(session, "fill", "#editor", "---\nmode: present\n---\n")
 	visit(session, location() + "/teleprompter")
 	wait(
 		session,

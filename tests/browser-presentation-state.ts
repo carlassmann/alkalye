@@ -17,7 +17,7 @@ try {
 		session,
 		"fill",
 		"#editor",
-		"# First\n\nHello\n\n---\n\n# Second\n\nWorld\n\n---\n\n# Third",
+		"---\nmode: present\n---\n# First\n\nHello\n\n---\n\n# Second\n\nWorld\n\n---\n\n# Third",
 	)
 	browser(session, "click", '[data-action="slideshow"]')
 	wait(session, 'document.querySelector("alkalye-presentation") !== null')
@@ -42,7 +42,7 @@ try {
 	assert(
 		evaluate(
 			session,
-			'document.querySelector("alkalye-editor").source.value === "# First\\n\\nHello\\n\\n---\\n\\n# Second\\n\\nWorld\\n\\n---\\n\\n# Third"',
+			'document.querySelector("alkalye-editor").source.value === "---\\nmode: present\\n---\\n# First\\n\\nHello\\n\\n---\\n\\n# Second\\n\\nWorld\\n\\n---\\n\\n# Third"',
 		),
 		"Presentation events preserve document source",
 	)

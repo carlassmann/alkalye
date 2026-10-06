@@ -171,7 +171,7 @@ try {
 	)
 	wait(
 		session,
-		'document.querySelector("#editor").value.includes("](assets/Map-image.png)") && window.diskEntries().then(names => names.includes("Projects/assets/Map-image.png")) && window.readDisk("Projects/Plan.md").then(text => text.includes("](assets/Map-image.png)"))',
+		'document.querySelector("alkalye-editor").source.value.includes("](assets/Map-image.png)") && window.diskEntries().then(names => names.includes("Projects/assets/Map-image.png")) && window.readDisk("Projects/Plan.md").then(text => text.includes("](assets/Map-image.png)"))',
 	)
 	evaluate(
 		session,

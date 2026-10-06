@@ -2176,7 +2176,7 @@ function mountApplication() {
 			let doc = currentDocument()
 			if (!doc) {
 				element("#document-title").textContent = ""
-				element("#inspector-body").replaceChildren()
+				updateMarkup(element("#inspector-body"), "")
 				return
 			}
 			let route = router.current()
