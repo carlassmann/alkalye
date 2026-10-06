@@ -302,5 +302,5 @@
 
 [data-editor] [data-editor-line] {
 	display: block;
-	contain: layout style;
+	contain: layout style paint;
 }
