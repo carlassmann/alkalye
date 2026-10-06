@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="light dark" />
+		<title>How Alkalye syncs</title>
+		<style>
+			[data-architecture] {
+				--paper: #f7f7f2;
+				--panel: #fff;
+				--ink: #182521;
+				--muted: #52655c;
+				--line: #ccd7d0;
+				--accent: #086c50;
+				--soft: #e4efe8;
+				margin: 0;
+				background: var(--paper);
+				color: var(--ink);
+				font:
+					16px/1.65 system-ui,
+					sans-serif;
+			}
+			[data-architecture] * {
+				box-sizing: border-box;
+			}
+			[data-architecture] a {
+				color: var(--accent);
+				text-underline-offset: 4px;
+			}
+			[data-architecture] :focus-visible {
+				outline: 3px solid var(--accent);
+				outline-offset: 4px;
+			}
+			[data-architecture] header,
+			[data-architecture] main,
+			[data-architecture] footer {
+				max-width: 1120px;
+				margin: auto;
+				padding: 32px;
+			}
+			[data-architecture] header {
+				padding-top: 64px;
+			}
+			[data-architecture] .eyebrow {
+				font:
+					12px/1.5 ui-monospace,
+					monospace;
+				color: var(--accent);
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+			}
+			[data-architecture] h1 {
+				font-size: clamp(38px, 7vw, 76px);
+				line-height: 1.05;
+				letter-spacing: -0.055em;
+				max-width: 820px;
+				margin: 20px 0;
+			}
+			[data-architecture] .lead {
+				font-size: 21px;
+				max-width: 780px;
+			}
+			[data-architecture] nav {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 12px 24px;
+				border-block: 1px solid var(--line);
+				padding: 18px 0;
+				margin-top: 32px;
+			}
+			[data-architecture] nav a {
+				font-size: 14px;
+				text-decoration: none;
+			}
+			[data-architecture] section {
+				scroll-margin-top: 24px;
+				margin-bottom: 64px;
+			}
+			[data-architecture] h2 {
+				font-size: 30px;
+				line-height: 1.2;
+				letter-spacing: -0.035em;
+				margin: 8px 0 20px;
+			}
+			[data-architecture] h3 {
+				line-height: 1.3;
+				font-size: 19px;
+				margin: 0 0 10px;
+			}
+			[data-architecture] p {
+				margin: 0 0 16px;
+				max-width: 80ch;
+			}
+			[data-architecture] .grid {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 16px;
+			}
+			[data-architecture] .card,
+			[data-architecture] details {
+				background: var(--panel);
+				border: 1px solid var(--line);
+				padding: 24px;
+				border-radius: 8px;
+			}
+			[data-architecture] .card p:last-child,
+			[data-architecture] details p:last-child {
+				margin-bottom: 0;
+			}
+			[data-architecture] .note {
+				border-left: 4px solid var(--accent);
+				background: var(--soft);
+				padding: 18px 22px;
+				margin: 24px 0;
+			}
+			[data-architecture] .muted {
+				color: var(--muted);
+			}
+			[data-architecture] code {
+				font:
+					0.88em/1.5 ui-monospace,
+					monospace;
+				overflow-wrap: anywhere;
+			}
+			[data-architecture] pre {
+				margin: 16px 0 0;
+				padding: 18px;
+				background: var(--soft);
+				white-space: pre-wrap;
+				overflow-wrap: anywhere;
+			}
+			[data-architecture] .flow {
+				display: grid;
+				grid-template-columns: 1fr 56px 1fr 56px 1fr;
+				align-items: stretch;
+				gap: 0;
+				margin: 24px 0;
+			}
+			[data-architecture] .arrow {
+				display: grid;
+				place-items: center;
+				font-size: 28px;
+				color: var(--accent);
+			}
+			[data-architecture] .flow .card {
+				padding: 20px;
+			}
+			[data-architecture] .badge {
+				display: inline-block;
+				font:
+					12px/1.5 ui-monospace,
+					monospace;
+				color: var(--accent);
+				background: var(--soft);
+				padding: 4px 8px;
+				margin-bottom: 12px;
+			}
+			[data-architecture] ol {
+				padding-left: 24px;
+			}
+			[data-architecture] li {
+				padding-left: 4px;
+				margin-bottom: 12px;
+			}
+			[data-architecture] table {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: 14px;
+			}
+			[data-architecture] th {
+				text-align: left;
+				color: var(--muted);
+				font-weight: 500;
+			}
+			[data-architecture] th,
+			[data-architecture] td {
+				padding: 14px 12px;
+				border-bottom: 1px solid var(--line);
+				vertical-align: top;
+			}
+			[data-architecture] .table-wrap {
+				overflow-x: auto;
+			}
+			[data-architecture] summary {
+				cursor: pointer;
+				font-weight: 600;
+			}
+			[data-architecture] details[open] summary {
+				margin-bottom: 16px;
+			}
+			[data-architecture] .details-grid {
+				display: grid;
+				gap: 12px;
+			}
+			[data-architecture] fieldset {
+				border: 1px solid var(--line);
+				border-radius: 8px;
+				padding: 24px;
+				margin: 0;
+				background: var(--panel);
+			}
+			[data-architecture] legend {
+				font-weight: 600;
+				padding: 0 8px;
+			}
+			[data-architecture] fieldset > label {
+				display: inline-block;
+				padding: 8px 16px 8px 5px;
+				cursor: pointer;
+			}
+			[data-architecture] input {
+				accent-color: var(--accent);
+			}
+			[data-architecture] .scenario {
+				display: none;
+				padding-top: 24px;
+				border-top: 1px solid var(--line);
+				margin-top: 16px;
+			}
+			[data-architecture] #online:checked ~ .online,
+			[data-architecture] #offline:checked ~ .offline,
+			[data-architecture] #retry:checked ~ .retry,
+			[data-architecture] #revoked:checked ~ .revoked {
+				display: block;
+			}
+			[data-architecture] .state {
+				display: grid;
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+				gap: 12px;
+				margin: 20px 0;
+			}
+			[data-architecture] .state > div {
+				background: var(--soft);
+				padding: 16px;
+			}
+			[data-architecture] .state strong {
+				display: block;
+				font-size: 13px;
+				color: var(--muted);
+				margin-bottom: 8px;
+			}
+			[data-architecture] .state code {
+				font-size: 16px;
+			}
+			[data-architecture] .strip {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+				align-items: center;
+				margin: 20px 0;
+			}
+			[data-architecture] .strip span {
+				padding: 10px 14px;
+				background: var(--soft);
+				font:
+					14px/1.5 ui-monospace,
+					monospace;
+			}
+			[data-architecture] footer {
+				border-top: 1px solid var(--line);
+				font-size: 13px;
+				color: var(--muted);
+			}
+			@media (prefers-color-scheme: dark) {
+				[data-architecture] {
+					--paper: #101714;
+					--panel: #18221c;
+					--ink: #eaf2ec;
+					--muted: #afc2b6;
+					--line: #35463b;
+					--accent: #7de0b6;
+					--soft: #24382c;
+				}
+			}
+			@media (max-width: 740px) {
+				[data-architecture] header,
+				[data-architecture] main,
+				[data-architecture] footer {
+					padding: 24px 18px;
+				}
+				[data-architecture] .grid,
+				[data-architecture] .state {
+					grid-template-columns: 1fr;
+				}
+				[data-architecture] .flow {
+					grid-template-columns: 1fr;
+				}
+				[data-architecture] .arrow {
+					transform: rotate(90deg);
+					height: 48px;
+				}
+				[data-architecture] .card {
+					padding: 20px;
+				}
+			}
+			@media print {
+				[data-architecture] {
+					--paper: white;
+					--panel: white;
+					--ink: black;
+					--muted: #444;
+					--line: #bbb;
+					--accent: #075c43;
+					--soft: #f2f4f2;
+					font-size: 11pt;
+				}
+				[data-architecture] nav,
+				[data-architecture] fieldset > input,
+				[data-architecture] fieldset > label {
+					display: none;
+				}
+				[data-architecture] .scenario {
+					display: block;
+				}
+				[data-architecture] section {
+					margin-bottom: 28px;
+				}
+				[data-architecture] .card,
+				[data-architecture] .state {
+					break-inside: avoid;
+				}
+			}
+		</style>
+	</head>
+	<body data-architecture>
+		<header>
+			<div class="eyebrow">
+				Alkalye / implementation walkthrough / 6 October 2026
+			</div>
+			<h1>Your document lives here.<br />Changes travel.</h1>
+			<p class="lead">
+				The browser keeps a durable local document. The server accepts
+				authorized changes into a shared log. Each device merges those changes
+				into its own state.
+			</p>
+			<p class="muted">
+				Based on the Effect rewrite at commit <code>ef5d01d</code>. This page
+				uses HTML and CSS only. The scenario controls are an explanation, not a
+				connection to your account.
+			</p>
+			<nav aria-label="On this page">
+				<a href="#map">The system</a><a href="#edit">An edit</a
+				><a href="#opening">Opening</a><a href="#merge">Collaboration</a
+				><a href="#scenarios">Failure cases</a><a href="#history">History</a
+				><a href="#code">Code map</a
+				><a href="#boundaries">Current boundaries</a>
+			</nav>
+		</header>
+		<main>
+			<section id="map">
+				<div class="eyebrow">01 / two network jobs</div>
+				<h2>Durable changes and live presence take different paths</h2>
+				<div
+					class="flow"
+					aria-label="Browser A sends durable actions over HTTP to the Bun server. Browser B pulls accepted actions over HTTP."
+				>
+					<div class="card">
+						<span class="badge">Browser A</span>
+						<h3>Local document</h3>
+						<p>
+							Editor, CRDT replica, pending actions, IndexedDB journal and
+							cached state.
+						</p>
+						<p class="muted">Typing works without the server.</p>
+					</div>
+					<div class="arrow" aria-hidden="true">↔</div>
+					<div class="card">
+						<span class="badge">HTTP · durable</span>
+						<h3>Bun + SQLite</h3>
+						<p>
+							Current permissions, accepted actions, receipts, snapshots,
+							library summaries and blob chunks.
+						</p>
+						<p class="muted">
+							One transaction decides whether an action is accepted.
+						</p>
+					</div>
+					<div class="arrow" aria-hidden="true">↔</div>
+					<div class="card">
+						<span class="badge">Browser B</span>
+						<h3>Another local document</h3>
+						<p>
+							Pulls new accepted actions and merges them with its own pending
+							work.
+						</p>
+						<p class="muted">
+							Both devices converge after receiving the same accepted facts.
+						</p>
+					</div>
+				</div>
+				<div class="grid">
+					<div class="card">
+						<h3>HTTP carries the document</h3>
+						<p>
+							Snapshots, action submissions, accepted changes, history and asset
+							bytes use HTTP. Losing a WebSocket does not erase or strand the
+							durable protocol.
+						</p>
+						<code
+							>src/shared/document-transport.ts<br />src/server/document-store.ts</code
+						>
+					</div>
+					<div class="card">
+						<h3>Live messages carry awareness</h3>
+						<p>
+							WebSockets carry cursors, selections, presenter state, laser
+							positions and change notifications. Long polling carries the same
+							message types when sockets repeatedly fail.
+						</p>
+						<code
+							>src/client/document-live.ts<br />src/server/document-live.ts</code
+						>
+					</div>
+				</div>
+				<p class="note">
+					An <code>advanced</code> live message means "check the server." It
+					does not contain the edit. The client runs ordinary HTTP
+					synchronization to retrieve accepted actions.
+				</p>
+			</section>
+			<section id="edit">
+				<div class="eyebrow">02 / follow one keystroke</div>
+				<h2>Visible first, durable locally, then shared</h2>
+				<ol>
+					<li>
+						<strong>The editor produces a source edit.</strong> A native
+						textarea owns input, selection and IME. A syntax overlay paints
+						formatting. The source adapter maps prettified link positions back
+						to Markdown positions.
+					</li>
+					<li>
+						<strong>The session stages operations.</strong> Text inserts and
+						removals refer to character identities. Other document values use
+						registers. One document action can contain several operations, such
+						as an asset manifest plus its Markdown reference.
+					</li>
+					<li>
+						<strong>The local journal records the proposal.</strong> The
+						optimistic view includes the edit immediately. "Saved locally"
+						depends on successful durable persistence. A failed write keeps the
+						unsaved draft available and prevents navigation from silently
+						discarding it.
+					</li>
+					<li>
+						<strong>Synchronization sends pending work.</strong> The session
+						flushes drafts, publishes an offline creation if needed, pulls newer
+						accepted actions, then submits pending actions in order. It pulls
+						again after submissions. New asset chunks upload before the action
+						that references them.
+					</li>
+					<li>
+						<strong>The server accepts or refuses the action.</strong> It checks
+						current authority, schemas, identities, text dependencies and
+						relevant guards. Accepted facts, receipts and projections commit
+						together in SQLite.
+					</li>
+					<li>
+						<strong>Clients settle and merge.</strong> A client removes a
+						pending action only when its exact identity is acknowledged. Other
+						clients receive a notification and pull the accepted tail. Applying
+						duplicate accepted facts does not repeat the edit.
+					</li>
+				</ol>
+				<p class="muted">
+					The selected browser session debounces local-change synchronization by
+					500 ms. Online, focus, live connection and change notifications also
+					wake it. A separate drainer can publish pending work in documents that
+					are no longer selected.
+				</p>
+			</section>
+			<section id="opening">
+				<div class="eyebrow">03 / fast opening</div>
+				<h2>Start with state, then catch up</h2>
+				<div class="grid">
+					<div class="card">
+						<h3>A document you already have</h3>
+						<p>
+							Restore the accepted checkpoint and ordered pending actions from
+							IndexedDB. Replay the local journal after the cache's covered
+							position. Reapply pending work and render. Network synchronization
+							can follow.
+						</p>
+						<p>
+							The cache is a rebuildable projection. A damaged cache can fall
+							back to journal replay; the journal is the durable local evidence.
+						</p>
+					</div>
+					<div class="card">
+						<h3>A document new to this device</h3>
+						<p>
+							Download a current server snapshot. It identifies the document,
+							log and covered position, and contains a full CRDT checkpoint. It
+							includes character identities, tombstones and causal information
+							needed for later merges.
+						</p>
+						<p>
+							Fetching the whole historical event list is unnecessary for
+							opening.
+						</p>
+					</div>
+				</div>
+				<div
+					class="strip"
+					aria-label="Snapshot covers version 120; synchronization retrieves accepted actions after 120; pending local proposals remain separate."
+				>
+					<span>Snapshot through 120</span><b aria-hidden="true">+</b
+					><span>Accepted tail 121, 122…</span><b aria-hidden="true">+</b
+					><span>Pending local proposals</span>
+				</div>
+				<p>
+					Old history is optional to download. The changes after your accepted
+					position are necessary to become current. A checkpoint is more than a
+					plain Markdown string: deleting merge identities from it would break
+					offline reconciliation.
+				</p>
+				<div class="table-wrap">
+					<table>
+						<caption>
+							Three different kinds of ordering
+						</caption>
+						<thead>
+							<tr>
+								<th>Value</th>
+								<th>What it means</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Operation clock + actor identity</td>
+								<td>
+									Names contributions and gives replicas a deterministic
+									ordering. It is not wall-clock time.
+								</td>
+							</tr>
+							<tr>
+								<td>Server log position</td>
+								<td>
+									How far this client has consumed the accepted stream. Used for
+									tail requests.
+								</td>
+							</tr>
+							<tr>
+								<td>Local journal position</td>
+								<td>
+									How far the cached local projection has replayed proposals,
+									receipts and other local facts. It is a different cursor.
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<p class="muted">
+					The server saves durable checkpoints every 100 document versions. A
+					cold server restores a checkpoint and replays its later accepted tail
+					before returning current state. The browser receives the resulting
+					snapshot.
+				</p>
+			</section>
+			<section id="merge">
+				<div class="eyebrow">04 / collaboration</div>
+				<h2>Event sourcing records facts. The CRDT makes them merge.</h2>
+				<div class="grid">
+					<div class="card">
+						<h3>Text has stable character identities</h3>
+						<p>
+							An insertion says which character it follows. A deletion names
+							characters, rather than "delete position 17." Deleted characters
+							remain available as anchors. Concurrent siblings have a
+							deterministic identity order.
+						</p>
+						<p>
+							Two devices can insert at the same place offline and still agree
+							once they receive the same accepted operations.
+						</p>
+						<code>src/shared/crdt.ts<br />src/shared/text-visibility.ts</code>
+					</div>
+					<div class="card">
+						<h3>Other values have winning contributions</h3>
+						<p>
+							Comments, drawings, settings and manifests live in document
+							records. Register writes choose a deterministic winner. Access
+							writes and undo have additional validation; a text merge cannot
+							grant someone permission.
+						</p>
+						<p>
+							Frontmatter is the metadata source. Its merge logic preserves
+							concurrent key changes; sidebar titles and tags are derived
+							copies.
+						</p>
+						<code>src/shared/frontmatter-merge.ts</code>
+					</div>
+				</div>
+				<div class="details-grid" style="margin-top: 16px">
+					<details>
+						<summary>What belongs to a document's history?</summary>
+						<p>
+							Source, comments and replies, attachment references and manifests,
+							whiteboard data, document themes and shared settings, and direct
+							document grants. A multi-record action commits as one unit. Blob
+							bytes are stored separately.
+						</p>
+						<p>
+							Workspace membership has its own facts because it governs many
+							documents. Cursors, selections and presentation progress are
+							transient presence messages.
+						</p>
+					</details>
+					<details>
+						<summary>How do cursors and comments differ?</summary>
+						<p>
+							Live presence broadcasts current source offsets for the caret and
+							selection, plus display or presentation state where relevant. It
+							is refreshed frequently and expires. Browser peer entries older
+							than 10 seconds disappear.
+						</p>
+						<p>
+							Comment selections retain CRDT character anchors. Those anchors
+							belong to durable document state and survive intervening source
+							edits.
+						</p>
+					</details>
+					<details>
+						<summary>What changes when WebSockets stop working?</summary>
+						<p>
+							After three unhealthy socket attempts, the client switches to long
+							polling. The default poll request can wait up to 20 seconds,
+							returning early when a message arrives. Outbound watch and
+							presence messages use a separate HTTP send request.
+						</p>
+						<p>
+							The same server participant logic checks access and broadcasts
+							messages for both transports. While polling, the client probes
+							WebSockets again after 90 seconds. Socket opening has a 10-second
+							deadline; reconnect delays use capped exponential backoff with
+							jitter.
+						</p>
+						<code
+							>/api/live · /api/live/poll · /api/live/send ·
+							/api/live/close</code
+						>
+					</details>
+					<details>
+						<summary>Who decides access?</summary>
+						<p>
+							The server checks current workspace membership and direct document
+							grants. Owners manage access; writers edit; readers read. The
+							browser hides forbidden controls, but the server enforces the
+							boundary.
+						</p>
+						<p>
+							A disconnected writer can still make a local draft using cached
+							information. That draft has not been accepted remotely. If access
+							was revoked, reconnecting cannot turn it into an authorized server
+							action.
+						</p>
+					</details>
+				</div>
+			</section>
+			<section id="scenarios">
+				<div class="eyebrow">05 / try the mental model</div>
+				<h2>What happens when the connection changes?</h2>
+				<fieldset>
+					<legend>Choose a scenario</legend>
+					<input id="online" type="radio" name="scenario" checked /><label
+						for="online"
+						>Connected</label
+					>
+					<input id="offline" type="radio" name="scenario" /><label
+						for="offline"
+						>Offline edit</label
+					>
+					<input id="retry" type="radio" name="scenario" /><label for="retry"
+						>Lost acknowledgement</label
+					>
+					<input id="revoked" type="radio" name="scenario" /><label
+						for="revoked"
+						>Access revoked</label
+					>
+					<div class="scenario online">
+						<h3>Both people are connected</h3>
+						<div class="state">
+							<div>
+								<strong>Your browser</strong><code>Hi!</code>
+								<p>Local proposal X</p>
+							</div>
+							<div>
+								<strong>Server</strong><code>Accept X at 121</code>
+								<p>One durable receipt</p>
+							</div>
+							<div>
+								<strong>Other browser</strong><code>Hi!</code>
+								<p>Pull after 120</p>
+							</div>
+						</div>
+						<p>
+							Your edit reaches the server over HTTP. The other browser receives
+							an <code>advanced</code> notification, pulls X, and merges it.
+							Cursor presence travels separately.
+						</p>
+					</div>
+					<div class="scenario offline">
+						<h3>You keep writing while disconnected</h3>
+						<div class="state">
+							<div>
+								<strong>Your browser</strong><code>Hi!</code>
+								<p>X is durable and pending</p>
+							</div>
+							<div>
+								<strong>Server</strong><code>Hey Hi</code>
+								<p>Peer action Y accepted</p>
+							</div>
+							<div>
+								<strong>After reconnect</strong><code>Hey Hi!</code>
+								<p>Pull Y, submit X, settle</p>
+							</div>
+						</div>
+						<p>
+							In this example, the peer inserts a prefix while you append
+							punctuation. Stable identities let both changes survive. Your
+							local source remains available before the network returns. Reload
+							requires the cached app shell and durable document data.
+						</p>
+					</div>
+					<div class="scenario retry">
+						<h3>The server commits X, but the reply is lost</h3>
+						<div class="state">
+							<div>
+								<strong>Your browser</strong><code>X still pending</code>
+								<p>No acknowledgement yet</p>
+							</div>
+							<div>
+								<strong>Server</strong><code>X accepted once</code>
+								<p>Receipt already exists</p>
+							</div>
+							<div>
+								<strong>Retry</strong><code>Same X, same bytes</code>
+								<p>Original receipt returned</p>
+							</div>
+						</div>
+						<p>
+							The client retains the action's identity. A byte-identical retry
+							resolves to the original accepted result. Giving that same
+							identity different content is a conflict, not a new edit.
+						</p>
+					</div>
+					<div class="scenario revoked">
+						<h3>An owner removes your access</h3>
+						<div class="state">
+							<div>
+								<strong>Your browser</strong><code>Cached copy / draft</code>
+								<p>May already exist locally</p>
+							</div>
+							<div>
+								<strong>Server</strong><code>Current access denied</code>
+								<p>No new authorized writes</p>
+							</div>
+							<div>
+								<strong>Live connection</strong><code>unavailable / gone</code>
+								<p>Stops watching the document</p>
+							</div>
+						</div>
+						<p>
+							The server rechecks access for reads, writes and live activity.
+							Revocation blocks future server access. It cannot erase copies a
+							former reader already downloaded. Pending work remains local
+							rather than becoming a silent success.
+						</p>
+					</div>
+				</fieldset>
+			</section>
+			<section id="history">
+				<div class="eyebrow">06 / undo, time machine and files</div>
+				<h2>One history, several ways to use it</h2>
+				<div class="grid">
+					<div class="card">
+						<h3>Undo appends a compensation</h3>
+						<p>
+							Undo targets a contribution. Text cancellation preserves peer
+							insertions and overlapping peer deletions. Register compensation
+							checks who still owns the affected value. Redo follows the
+							compensation chain.
+						</p>
+						<p>
+							The server revalidates the compensation against current state and
+							authority. Undo is not a replacement of everyone's current source
+							with an old string.
+						</p>
+					</div>
+					<div class="card">
+						<h3>Time machine reconstructs a past state</h3>
+						<p>
+							History loading is separate from ordinary opening. Reconstruct a
+							selected point from a checkpoint at or before it, then replay the
+							retained tail to that point.
+						</p>
+						<p>
+							Restoring content makes a new change in today's document. It does
+							not reinstall historical permissions or delete later history.
+						</p>
+					</div>
+					<div class="card">
+						<h3>Asset bytes have a separate lifetime</h3>
+						<p>
+							The browser stores verified Blob chunks in IndexedDB; the current
+							Bun server stores chunks in SQLite. Actions and snapshots contain
+							manifests and immutable references, not repeated video bytes.
+						</p>
+						<p>
+							Chunks must exist before acceptance of their referencing action.
+							Old history and undo may still need bytes no longer referenced by
+							current content.
+						</p>
+					</div>
+					<div class="card">
+						<h3>Local files reuse the session</h3>
+						<p>
+							A chosen file or directory connects the document session to the
+							File System Access API and file reconciliation. It does not invent
+							another editor or CRDT.
+						</p>
+						<p>
+							The portable CLI also uses the shared session, with SQLite
+							journals and the same HTTP document protocol.
+						</p>
+					</div>
+				</div>
+			</section>
+			<section id="code">
+				<div class="eyebrow">07 / code architecture</div>
+				<h2>Interfaces at the edge, document rules in the middle</h2>
+				<div
+					class="flow"
+					aria-label="Web Components call browser capabilities, which use the shared DocumentSession and replica."
+				>
+					<div class="card">
+						<span class="badge">UI</span>
+						<h3>Web Components</h3>
+						<p>
+							DOM, native input, menus and per-component scoped CSS. Shadow DOM
+							previews. Lazy tldraw island.
+						</p>
+					</div>
+					<div class="arrow" aria-hidden="true">→</div>
+					<div class="card">
+						<span class="badge">Browser capabilities</span>
+						<h3>Library and document tools</h3>
+						<p>
+							Open sessions, assets, comments, media URLs, local files and
+							account coordination.
+						</p>
+					</div>
+					<div class="arrow" aria-hidden="true">→</div>
+					<div class="card">
+						<span class="badge">Shared engine</span>
+						<h3>DocumentSession + Replica</h3>
+						<p>
+							Drafts, journal replay, accepted state, pending actions, merges,
+							synchronization and undo.
+						</p>
+					</div>
+				</div>
+				<p>
+					Browser and CLI share <code>DocumentSession</code>. The server uses
+					the shared action schemas, validation and replica rules, but owns its
+					own authoritative acceptance and SQLite transactions.
+				</p>
+				<div class="table-wrap">
+					<table>
+						<caption>
+							Useful places to read the code
+						</caption>
+						<thead>
+							<tr>
+								<th>Module</th>
+								<th>Responsibility</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><code>src/client/document-app.ts</code></td>
+								<td>
+									Browser composition and UI coordination: routes, selected
+									document, commands and scoped tool lifetimes. This remains a
+									large controller.
+								</td>
+							</tr>
+							<tr>
+								<td><code>src/client/components/</code></td>
+								<td>
+									Web Components and matching CSS files. Editor input, source
+									projection, previews, menus, settings and presentation
+									controls.
+								</td>
+							</tr>
+							<tr>
+								<td><code>src/client/browser-library.ts</code></td>
+								<td>
+									Cached catalogue, session acquisition, synchronization wakeups
+									and document capabilities.
+								</td>
+							</tr>
+							<tr>
+								<td><code>src/shared/document-session.ts</code></td>
+								<td>
+									The browser/CLI engine. Local facts, queued drafts, accepted
+									and optimistic projections, pending actions, sync and undo.
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<code>src/shared/document-actions.ts</code><br /><code
+										>src/shared/crdt.ts</code
+									><br /><code>src/shared/text-visibility.ts</code>
+								</td>
+								<td>
+									Action contracts, atomic changes, register compensation,
+									identified text and causal visibility.
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<code>src/platform/document-journal.ts</code><br /><code
+										>src/platform/indexeddb-journal.ts</code
+									><br /><code>src/platform/sqlite-journal.ts</code>
+								</td>
+								<td>
+									A journal service contract with browser and Bun storage
+									adapters. Transactions and platform locks live behind these
+									contracts.
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<code>src/shared/document-transport.ts</code><br /><code
+										>src/shared/document-api.ts</code
+									>
+								</td>
+								<td>
+									Typed HTTP client and API contracts for snapshots, commits,
+									history and individual actions.
+								</td>
+							</tr>
+							<tr>
+								<td><code>src/server/document-store.ts</code></td>
+								<td>
+									Authoritative accepted state, SQLite event log, deduplicated
+									receipts, projections, checkpoints, authorization and blob
+									storage.
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<code>src/client/document-live.ts</code><br /><code
+										>src/server/document-live.ts</code
+									><br /><code>src/shared/document-live.ts</code>
+								</td>
+								<td>
+									WebSocket/polling transport, participants, watch scopes,
+									presence and message schemas.
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<code>src/server/application.ts</code><br /><code
+										>src/server/account-documents.ts</code
+									><br /><code>src/cli/documents.ts</code>
+								</td>
+								<td>
+									Server routing, MCP document operations under current
+									permissions, and CLI entry into the shared document engine.
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<details style="margin-top: 24px">
+					<summary>What Effect supplies, and what Alkalye supplies</summary>
+					<p>
+						Effect supplies service construction through
+						<code>Context.Service</code> and <code>Layer</code>, validated
+						contracts through <code>Schema</code>, journals through
+						<code>EventLog</code>, typed HTTP clients and APIs, SQL services and
+						migrations, and concurrent work through scoped fibers.
+					</p>
+					<p>
+						<code>Scope</code> owns cancellation and cleanup.
+						<code>RcMap</code> owns shared session or media leases.
+						<code>SubscriptionRef</code> and <code>Stream</code> carry changing
+						state. <code>Queue</code>, <code>Semaphore</code> and
+						<code>Schedule</code> handle buffering, serialization and retry
+						timing. <code>Graph</code> supports dependency and compensation
+						planning.
+					</p>
+					<p>
+						Alkalye supplies the document model, CRDT and cancellation rules,
+						permission policy, frontmatter semantics and product behavior.
+						Platform adapters connect Effect services to IndexedDB, Web Locks,
+						Web Crypto, DOM and Bun SQLite. Effect's event log does not
+						automatically implement collaborative text merging.
+					</p>
+				</details>
+				<p class="note">
+					Read in this order: editor input → shared session → journal adapter →
+					HTTP transport → server acceptance → live notification → another
+					session's merge. It is one write path with several adapters.
+				</p>
+			</section>
+			<section id="boundaries">
+				<div class="eyebrow">08 / what the design does not promise</div>
+				<h2>Important current boundaries</h2>
+				<ul>
+					<li>
+						<strong
+							>Document events are currently plaintext on the server.</strong
+						>
+						HTTPS protects transport. Account authentication uses
+						recovery-key-derived identities; this is not end-to-end encryption
+						of document content.
+					</li>
+					<li>
+						<strong>The live participant registry is in server memory.</strong>
+						Restarting drops presence and connections; durable document state
+						survives in SQLite. Multiple server instances would need shared
+						notification routing and coordinated storage.
+					</li>
+					<li>
+						<strong>Current deployment targets Bun.</strong> Cloudflare
+						deployment would require platform adapters and distributed
+						coordination work. There is no current Worker deployment behind this
+						walkthrough.
+					</li>
+					<li>
+						<strong
+							>History retention and blob cleanup need a complete
+							policy.</strong
+						>
+						Pruning must preserve reconstruction tails, undo needs and offline
+						references. Permanent historical redaction is not implemented.
+					</li>
+					<li>
+						<strong
+							>Some rejected-action recovery is automatic, some is still
+							unfinished.</strong
+						>
+						Definite safe rejection can be recorded and withdrawn. Network
+						failure is not proof of rejection; it keeps pending work.
+						Inserted-text dependency closures and comprehensive recovery
+						controls still need work.
+					</li>
+					<li>
+						<strong>Fast opening still has a state cost.</strong> A checkpoint
+						retains merge identities and tombstones. Its size can grow, and cold
+						offline undo may scan retained local history. Snapshot and history
+						separation removes mandatory old-history downloads, not every
+						performance cost.
+					</li>
+				</ul>
+				<p class="muted">
+					The latest completed verification covered 428 Bun tests and all 37
+					browser suites, including targeted reruns after test-harness fixes.
+					Tests exercise real storage, permission changes, offline reloads,
+					concurrent sessions, assets, undo and live transport fallback. They do
+					not establish a production-scale latency or storage benchmark.
+				</p>
+			</section>
+		</main>
+		<footer>
+			<p>
+				Source references were checked against the implementation. Older
+				architecture notes still mention four frontmatter TODOs; those four
+				cases were resolved in commit <code>1adb465</code>.
+			</p>
+			<p>written with gpt-6 in codex</p>
+		</footer>
+	</body>
+</html>
