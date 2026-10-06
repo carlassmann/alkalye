@@ -504,6 +504,17 @@ function createEditorView(
 		}
 		return { node: last, offset: last.textContent?.length ?? 0 }
 	}
+	function paintLinkHover() {
+		let hovered = new Set(
+			[...links.querySelectorAll<HTMLAnchorElement>("a:hover")].map(
+				anchor => anchor.dataset.editorLink,
+			),
+		)
+		for (let link of highlight.querySelectorAll<HTMLElement>(
+			"[data-editor-link]",
+		))
+			link.classList.toggle("is-hovered", hovered.has(link.dataset.editorLink))
+	}
 	function paintLinks() {
 		let existing = [...links.querySelectorAll("a")]
 		let count = 0
@@ -524,6 +535,7 @@ function createEditorView(
 				if (!rectangle.width || !rectangle.height) continue
 				let anchor = existing[count++] ?? document.createElement("a")
 				anchor.dataset.kind = link.kind
+				anchor.dataset.editorLink = String(link.source.start)
 				anchor.href =
 					link.kind === "wiki"
 						? "/app/doc/" + encodeURIComponent(link.target)
@@ -537,6 +549,8 @@ function createEditorView(
 				else anchor.removeAttribute("role")
 				anchor.setAttribute("aria-label", label)
 				anchor.title = link.kind === "link" ? link.target : label
+				anchor.onpointerenter = paintLinkHover
+				anchor.onpointerleave = paintLinkHover
 				anchor.tabIndex = first ? 0 : -1
 				if (!first) anchor.setAttribute("aria-hidden", "true")
 				else anchor.removeAttribute("aria-hidden")
@@ -586,6 +600,7 @@ function createEditorView(
 			}
 		}
 		for (let anchor of existing.slice(count)) anchor.remove()
+		paintLinkHover()
 	}
 	function paintPresence() {
 		collaborators.replaceChildren()
@@ -1586,6 +1601,7 @@ function lineMarkup(
 		)
 		content += html`<span
 			class="${link.broken ? "syntax-link syntax-link-broken" : "syntax-link"}"
+			data-editor-link="${link.source.start}"
 			title="${link.target}"
 			>${link.iconSpace ? html`<span class="syntax-link-icon" data-icon="${name}" aria-hidden="true">${iconPrefix}${icon(name)}</span>` : ""}<span
 				class="syntax-link-label"

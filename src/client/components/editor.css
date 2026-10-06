@@ -254,8 +254,8 @@
 	color: var(--ink);
 	opacity: 0.5;
 }
-[data-editor] [data-editor-links] a:hover {
-	box-shadow: inset 0 -1px var(--ink);
+[data-editor] .syntax-link.is-hovered .syntax-link-label {
+	text-decoration-color: var(--brand);
 }
 
 [data-app][aria-busy="true"]

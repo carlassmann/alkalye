@@ -74,6 +74,36 @@ try {
 		),
 		"compact web links retain native anchor semantics and their destination",
 	)
+	evaluate(
+		session,
+		'document.querySelector("[data-editor]").style.setProperty("--brand", "rgb(113, 87, 217)")',
+	)
+	for (let kind of ["link", "wiki", "media"]) {
+		browser(session, "hover", `[data-editor-links] a[data-kind="${kind}"]`)
+		assert(
+			evaluate(
+				session,
+				`(() => {
+			let label = document.querySelector(".syntax-link.is-hovered .syntax-link-label");
+			let anchor = document.querySelector('[data-editor-links] a[data-kind="${kind}"]');
+			return label && getComputedStyle(label).textDecorationColor === "rgb(113, 87, 217)" && getComputedStyle(anchor).boxShadow === "none";
+		})()`,
+			),
+			`${kind} hover recolors the existing underline without adding another`,
+		)
+	}
+	browser(session, "mouse", "move", "0", "0")
+	assert(
+		evaluate(
+			session,
+			'document.querySelector(".syntax-link.is-hovered") === null',
+		),
+		"Leaving a link restores its underline color",
+	)
+	evaluate(
+		session,
+		'document.querySelector("[data-editor]").style.removeProperty("--brand")',
+	)
 	browser(session, "set", "viewport", "600", "800")
 	wait(
 		session,
