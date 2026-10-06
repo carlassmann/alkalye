@@ -104,12 +104,27 @@ try {
 
 	journey("preview routing and safe Markdown rendering", [
 		...edit(
-			'# Preview\n\n<script>alert("unsafe")</script>\n\n[Unsafe](javascript:alert(1))',
+			'---\ntitle: ==Literal title==\n---\n# Preview\n\n==Marker== and ==**bold**== and ==[linked](https://example.com)== and ==https://example.org==.\n\n`==inline code==` and \\==escaped==. a === b === c.\n\n```md\n==fenced code==\n```\n\n    ==indented code==\n\n<script>alert("unsafe")</script>\n\n[Unsafe](javascript:alert(1))',
+		),
+		condition(
+			'(() => { let marks = [...document.querySelectorAll("#highlight .syntax-highlight")]; return marks.length === 4 && marks[0].textContent === "==Marker==" && marks[1].textContent === "==**bold**==" && marks[2].querySelector(".syntax-link-label")?.textContent === "linked"; })()',
+		),
+		condition(
+			'getComputedStyle(document.querySelector("#highlight .syntax-highlight")).backgroundColor === "rgb(255, 224, 102)"',
+		),
+		condition(
+			'getComputedStyle(document.querySelector("#highlight .syntax-highlight .syntax-link-label")).color === "rgb(36, 32, 14)"',
 		),
 		["click", '[data-action="preview"]'],
 		condition('location.pathname.endsWith("/preview")'),
 		condition(
 			'document.querySelector("#preview")?.shadowRoot?.querySelector("h1")?.textContent === "Preview"',
+		),
+		condition(
+			'[...document.querySelector("#preview").shadowRoot.querySelectorAll("mark")].map(mark => mark.textContent).join("|") === "Marker|bold|linked|https://example.org"',
+		),
+		condition(
+			'(() => { let mark = document.querySelector("#preview").shadowRoot.querySelector("mark strong"); return mark && getComputedStyle(mark).color === "rgb(36, 32, 14)"; })()',
 		),
 		[
 			"eval",
@@ -123,7 +138,7 @@ try {
 	journey("mobile menus and presentation navigation", [
 		["set", "viewport", "390", "844"],
 		...edit(
-			"---\nmode: present\n---\n# First\n\nSpeaker notes.\n\n```md\n---\n```\n\n---\n# Second\n\nMore notes.\n\n```md\n---",
+			"---\nmode: present\n---\n# ==First==\n\nSpeaker notes.\n\n```md\n---\n```\n\n---\n# Second\n\nMore notes.\n\n```md\n---",
 		),
 		["click", '[data-action="toggle-tools"]'],
 		condition(
@@ -131,6 +146,12 @@ try {
 		),
 		["click", '#inspector-body [data-action="slideshow"]'],
 		condition('document.querySelector("alkalye-presentation") !== null'),
+		condition(
+			'document.querySelector("#slide")?.shadowRoot?.querySelector("mark")?.textContent === "First"',
+		),
+		condition(
+			'(() => { let mark = document.querySelector("#slide").shadowRoot.querySelector("mark"); return getComputedStyle(mark).backgroundColor === "rgb(255, 224, 102)" && getComputedStyle(mark).color === "rgb(36, 32, 14)"; })()',
+		),
 		["press", "ArrowRight"],
 		condition(
 			'document.querySelector("alkalye-presentation").dataset.slide === "2"',

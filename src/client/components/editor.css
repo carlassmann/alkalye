@@ -274,3 +274,14 @@
 		--editor-selection: 15%;
 	}
 }
+
+[data-editor] .syntax-highlight {
+	background: #ffe066;
+	color: #24200e;
+	box-decoration-break: clone;
+}
+[data-editor]
+	.syntax-highlight
+	:is(.syntax-marker, .syntax-link, .syntax-code) {
+	color: inherit;
+}

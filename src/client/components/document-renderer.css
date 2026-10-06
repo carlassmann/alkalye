@@ -327,3 +327,19 @@
 	color: #1c1917;
 	box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 }
+
+@layer theme-base {
+	[data-document-renderer] mark:not(.preview-comment-range) {
+		background: #ffe066;
+		color: #24200e;
+		box-decoration-break: clone;
+	}
+	[data-document-renderer]
+		mark:not(.preview-comment-range)
+		:is(strong, em, a, code),
+	[data-document-renderer].theme[data-preset]
+		mark:not(.preview-comment-range)
+		:is(strong, em, a, code) {
+		color: inherit;
+	}
+}

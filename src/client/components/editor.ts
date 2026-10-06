@@ -20,7 +20,12 @@ import { icon } from "../icons"
 import type { IconName } from "../icons"
 
 import { formatSelection, sortTasks } from "../../shared/authoring"
-import { escape, safeUrl } from "../../shared/markdown"
+import {
+	escape,
+	frontmatterBlock,
+	nextFence,
+	safeUrl,
+} from "../../shared/markdown"
 import { iconPrefix } from "../../shared/projection"
 import type { ProjectedLink } from "../../shared/projection"
 import { SourceTextarea } from "../source-textarea"
@@ -1543,6 +1548,8 @@ export function sourceHighlight(
 	mediaIcon?: (target: string) => IconName,
 ) {
 	let offset = 0
+	let headerEnd = frontmatterBlock(source)?.[0].length ?? 0
+	let fence = ""
 	return (
 		source
 			.split("\n")
@@ -1552,7 +1559,23 @@ export function sourceHighlight(
 				let collapsed = links.filter(
 					link => link.view.start >= start && link.view.end <= offset - 1,
 				)
-				let content = lineMarkup(line, start, collapsed, undefined, mediaIcon)
+				let previousFence = fence
+				if (start >= headerEnd) fence = nextFence(fence, line)
+				let literal =
+					start < headerEnd ||
+					Boolean(previousFence) ||
+					Boolean(fence) ||
+					/^( {4}|\t)/.test(line)
+				let content = lineMarkup(
+					line,
+					start,
+					collapsed,
+					literal ? undefined : documents,
+					mediaIcon,
+				)
+				if (/^---\s*$|^\s*(`{3,}|~{3,})/.test(line))
+					return html`<span class="syntax-marker">${rawMarkup(content)}</span>`
+				if (literal) return content
 				if (/^\s*[-*+] \[x\]/i.test(line))
 					return html`<span class="done-task">${rawMarkup(content)}</span>`
 				let heading = content.match(/^(#{1,6})(\s.*)$/)
@@ -1561,17 +1584,14 @@ export function sourceHighlight(
 						><span class="syntax-marker">${heading[1] ?? ""}</span
 						>${rawMarkup(heading[2] ?? "")}</span
 					>`
-				if (/^---\s*$|^```/.test(line))
-					return html`<span class="syntax-marker">${rawMarkup(content)}</span>`
 				if (/^>/.test(line))
 					return html`<span class="syntax-quote">${rawMarkup(content)}</span>`
-				return lineMarkup(line, start, collapsed, documents, mediaIcon)
+				return content
 			})
 			.join("\n") + "\n"
 	)
 }
-// Inline decoration runs on raw stretches only, so its patterns never reach
-// into the markup of a collapsed link.
+// Hold projected links aside so inline patterns cannot modify their attributes.
 function lineMarkup(
 	line: string,
 	start: number,
@@ -1581,11 +1601,12 @@ function lineMarkup(
 ) {
 	let content = "",
 		position = 0
+	let heldLinks: string[] = []
 	for (let link of [...links, undefined]) {
 		let raw = escape(
 			line.slice(position, link ? link.view.start - start : undefined),
 		)
-		content += documents ? decorate(raw, documents) : raw
+		content += raw
 		if (!link) break
 		let name: IconName =
 			link.kind === "wiki"
@@ -1599,30 +1620,47 @@ function lineMarkup(
 			link.view.start - start + (link.iconSpace ? iconPrefix.length : 0),
 			link.view.end - start,
 		)
-		content += html`<span
-			class="${link.broken ? "syntax-link syntax-link-broken" : "syntax-link"}"
-			data-editor-link="${link.source.start}"
-			title="${link.target}"
-			>${link.iconSpace ? html`<span class="syntax-link-icon" data-icon="${name}" aria-hidden="true">${iconPrefix}${icon(name)}</span>` : ""}<span
-				class="syntax-link-label"
-				>${label}</span
-			></span
-		>`.value
+		heldLinks.push(
+			html`<span
+				class="${link.broken ? "syntax-link syntax-link-broken" : "syntax-link"}"
+				data-editor-link="${link.source.start}"
+				title="${link.target}"
+				>${link.iconSpace ? html`<span class="syntax-link-icon" data-icon="${name}" aria-hidden="true">${iconPrefix}${icon(name)}</span>` : ""}<span
+					class="syntax-link-label"
+					>${label}</span
+				></span
+			>`.value,
+		)
+		content += `\u0001${heldLinks.length - 1}\u0001`
 		position = link.view.end - start
 	}
-	return content
+	return (documents ? decorate(content, documents) : content).replace(
+		/\u0001(\d+)\u0001/g,
+		(_, index: string) => heldLinks[Number(index)] ?? "",
+	)
 }
 function decorate(content: string, documents: readonly DocumentLink[]) {
-	return content
+	let held: string[] = []
+	let protectedContent = content.replace(/\\.|(`+)[\s\S]*?\1/g, value => {
+		held.push(
+			value.startsWith("`")
+				? html`<span class="syntax-code">${rawMarkup(value)}</span>`.value
+				: value,
+		)
+		return `\u0000${held.length - 1}\u0000`
+	})
+	return protectedContent
+		.replace(
+			/(?<!=)==(?!=)(?=\S)(.*?\S)(?<!=)==(?!=)/g,
+			localizeMarkup(
+				'<span class="syntax-highlight"><span class="syntax-marker">==</span>$1<span class="syntax-marker">==</span></span>',
+			),
+		)
 		.replace(
 			/\*\*(.+?)\*\*/g,
 			localizeMarkup(
 				'<span class="syntax-bold"><span class="syntax-marker">**</span>$1<span class="syntax-marker">**</span></span>',
 			),
-		)
-		.replace(
-			/(`[^`]+`)/g,
-			localizeMarkup('<span class="syntax-code">$1</span>'),
 		)
 		.replace(/(\[\[.*?\]\])/g, (value: string) => {
 			let token = value.slice(2, -2).split("|")[0]
@@ -1631,4 +1669,8 @@ function decorate(content: string, documents: readonly DocumentLink[]) {
 				>${rawMarkup(value)}</span
 			>`.value
 		})
+		.replace(
+			/\u0000(\d+)\u0000/g,
+			(_, index: string) => held[Number(index)] ?? "",
+		)
 }

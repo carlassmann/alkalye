@@ -169,7 +169,7 @@ export function inline(
 		return `\u0000${held.length - 1}\u0000`
 	}
 	let text = source.replace(
-		/\\([\\`*{}\[\]()#+.!_>~-])/g,
+		/\\([\\`*{}\[\]()#+.!_>~=-])/g,
 		(_, character: string) => hold(escape(character)),
 	)
 	text = text.replace(
@@ -213,6 +213,10 @@ export function inline(
 			`<a data-wikilink="${escape(id)}"${label.length ? ` data-wikilabel="${escape(label.join("|"))}"` : ""} href="#doc=${encodeURIComponent(id)}">${escape(label.length ? label.join("|") : id)}</a>`,
 		)
 	})
+	text = text.replace(
+		/(?<!=)==(?!=)(?=\S)(.*?\S)(?<!=)==(?!=)/g,
+		(_, content: string) => hold("<mark>") + content + hold("</mark>"),
+	)
 	text = text.replace(/https?:\/\/[^\s<>\u0000]+/g, url => {
 		let clean = url.replace(/[.,;:!?]+$/g, "")
 		return (
@@ -429,7 +433,7 @@ export function markdown(source: string): string {
 	}
 	return html.join("\n")
 }
-function nextFence(current: string, line: string) {
+export function nextFence(current: string, line: string) {
 	if (current)
 		return new RegExp(`^\\s*${current[0]}{${current.length},}\\s*$`).test(line)
 			? ""

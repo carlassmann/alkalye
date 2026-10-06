@@ -15,6 +15,7 @@ Wrap text in symbols to style it:
 - **Bold** - `**bold**` or `__bold__`
 - _Italic_ - `*italic*` or `_italic_`
 - ~~Strikethrough~~ - `~~strikethrough~~`
+- ==Highlight== - `==highlight==`
 - `Code` - surround with backticks
 
 Combine them: **_bold italic_**, ~~**strikethrough bold**~~
