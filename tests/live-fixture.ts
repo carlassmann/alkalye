@@ -14,6 +14,7 @@ export interface LiveLogin {
 	cookie: string
 }
 export interface LivePeerFixture {
+	inbox: LiveMessage[]
 	send: (message: unknown) => void
 	until: (match: (message: LiveMessage) => boolean) => Promise<LiveMessage>
 	close: () => void
@@ -156,7 +157,13 @@ export function liveSocket(login: LiveLogin) {
 					if (!head.includes(" 101 ")) return reject(new Error(head))
 					upgraded = true
 					buffer = buffer.subarray(end + 4)
-					resolve({ send, next, until, close: () => socket.destroy() })
+					resolve({
+						inbox: queued,
+						send,
+						next,
+						until,
+						close: () => socket.destroy(),
+					})
 				}
 				while (buffer.length >= 2) {
 					let length = buffer.readUInt8(1) & 0x7f

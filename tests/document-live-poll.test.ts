@@ -1,3 +1,4 @@
+import { Database } from "bun:sqlite"
 import { afterAll, beforeAll, expect, test } from "bun:test"
 import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
@@ -22,6 +23,7 @@ import {
 import { Replica } from "../src/shared/crdt"
 import { buildAction, restoreSnapshot } from "../src/shared/document-actions"
 import { DocumentApi } from "../src/shared/document-api"
+import { invitationDigest, invitationSecret } from "../src/shared/invitations"
 import { newDocument } from "../src/shared/documents"
 import { cookieLogin, liveSocket, livePoll } from "./live-fixture"
 import type { LiveMessage } from "./live-fixture"
@@ -104,7 +106,13 @@ test("polling and WebSocket peers share notifications, presence and departures",
 
 test("profile edits invalidate shared labels without disclosing another account's preferences", async () => {
 	let owner = await run(client(83))
-	let stranger = await run(client(84))
+	let shared = await run(client(84))
+	let stranger = await run(client(85))
+	await run(createWorkspace(owner, "profile-shared", "Shared profiles"))
+	await run(member(owner, "profile-shared", shared, "reader"))
+	let unrelated = livePoll(await cookieLogin(instance.server.url, 85))
+	await unrelated.open()
+	await unrelated.until(is("connected"))
 	let polling = livePoll(await cookieLogin(instance.server.url, 83))
 	await polling.open()
 	await polling.until(is("connected"))
@@ -113,7 +121,7 @@ test("profile edits invalidate shared labels without disclosing another account'
 		await socket.until(is("connected"))
 		let before = await run(owner.api.preferences.get())
 		await run(
-			stranger.api.preferences.save({
+			shared.api.preferences.save({
 				payload: {
 					request: "private-profile-name",
 					patch: { name: "Private name", appearance: "dark" },
@@ -122,6 +130,22 @@ test("profile edits invalidate shared labels without disclosing another account'
 		)
 		expect(await polling.until(is("advanced"))).toEqual({ type: "advanced" })
 		expect(await socket.until(is("advanced"))).toEqual({ type: "advanced" })
+		expect(await unrelated.poll()).toEqual([])
+		await run(
+			stranger.api.preferences.save({
+				payload: { request: "unrelated-profile", patch: { name: "Unrelated" } },
+			}),
+		)
+		expect(await polling.poll()).toEqual([])
+		await run(
+			shared.api.preferences.save({
+				payload: {
+					request: "private-only-pref",
+					patch: { appearance: "light" },
+				},
+			}),
+		)
+		expect(await polling.poll()).toEqual([])
 		expect(await run(owner.api.preferences.get())).toEqual(before)
 		expect(polling.inbox.some(message => message.type === "preferences")).toBe(
 			false,
@@ -129,6 +153,271 @@ test("profile edits invalidate shared labels without disclosing another account'
 	} finally {
 		socket.close()
 		await polling.close()
+		await unrelated.close()
+	}
+})
+
+test("document and workspace changes wake shared libraries but leave unrelated peers asleep", async () => {
+	let owner = await run(client(91))
+	let shared = await run(client(92))
+	await run(createWorkspace(owner, "scoped-live", "Scoped"))
+	await run(createDocument(owner, "scoped-live", "scoped-document"))
+	await run(member(owner, "scoped-live", shared, "reader"))
+	let library = livePoll(await cookieLogin(instance.server.url, 92))
+	let stranger = livePoll(await cookieLogin(instance.server.url, 93))
+	let socket = await liveSocket(await cookieLogin(instance.server.url, 93))
+	try {
+		await socket.until(is("connected"))
+		for (let peer of [library, stranger]) {
+			await peer.open()
+			await peer.until(is("connected"))
+		}
+		await run(edit(owner, "scoped-document", "Only shared clients"))
+		expect(await library.until(is("advanced"))).toEqual({ type: "advanced" })
+		expect(await stranger.poll()).toEqual([])
+		await run(
+			owner.api.workspaces.rename({
+				params: { workspace: "scoped-live" },
+				payload: { name: "Renamed", request: "rename-scoped" },
+			}),
+		)
+		expect(await library.until(is("advanced"))).toEqual({ type: "advanced" })
+		expect(await stranger.poll()).toEqual([])
+		await run(
+			owner.api.workspaces.membership({
+				params: { workspace: "scoped-live", member: shared.subject },
+				payload: { role: null, request: "remove-scoped-member" },
+			}),
+		)
+		expect(await library.until(is("advanced"))).toEqual({ type: "advanced" })
+		expect(await stranger.poll()).toEqual([])
+		await run(edit(owner, "scoped-document", "Former member excluded"))
+		expect(await library.poll()).toEqual([])
+		expect(await stranger.poll()).toEqual([])
+		expect(
+			socket.inbox.filter(message => message.type !== "heartbeat"),
+		).toEqual([])
+	} finally {
+		socket.close()
+		await library.close()
+		await stranger.close()
+	}
+})
+
+test("a failed postcommit recipient read preserves the durable write and only wakes its watchers", async () => {
+	let owner = await run(client(101))
+	await run(
+		createWorkspace(owner, "notification-failure", "Notification failure"),
+	)
+	await run(
+		createDocument(owner, "notification-failure", "notification-failure-doc"),
+	)
+	let replica = await run(
+		restoreSnapshot(
+			await run(
+				owner.api.documents.snapshot({
+					params: { document: "notification-failure-doc" },
+				}),
+			),
+			owner.subject + "-notification-failure",
+		),
+	)
+	let action = await run(
+		buildAction(
+			replica,
+			"notification-failure-doc",
+			"Durable notification failure",
+			staged => [
+				staged.edit(
+					"notification-failure-doc",
+					staged.text("notification-failure-doc") +
+						"\nDurable despite failed notification",
+				),
+			],
+		),
+	)
+	let watcher = livePoll(await cookieLogin(instance.server.url, 101)),
+		stranger = livePoll(await cookieLogin(instance.server.url, 102))
+	let database = new Database(join(directory, "documents.sqlite"))
+	let view = database
+		.query<{ sql: string }, []>(
+			"SELECT sql FROM sqlite_schema WHERE name='document_grants'",
+		)
+		.get()
+	if (!view) throw new Error("Missing document grants view")
+	try {
+		for (let peer of [watcher, stranger]) {
+			await peer.open()
+			await peer.until(is("connected"))
+		}
+		expect(
+			await watcher.send([
+				{ type: "watch", document: "notification-failure-doc" },
+			]),
+		).toBe(204)
+		database.run("DROP VIEW document_grants")
+		let receipt = await run(
+			owner.api.documents.commit({
+				params: { document: "notification-failure-doc" },
+				payload: action,
+			}),
+		)
+		expect(await watcher.until(is("advanced"))).toEqual({ type: "advanced" })
+		expect(await stranger.poll()).toEqual([])
+		database.run(view.sql)
+		expect(
+			await run(
+				owner.api.documents.commit({
+					params: { document: "notification-failure-doc" },
+					payload: action,
+				}),
+			),
+		).toEqual(receipt)
+		let saved = await run(
+			restoreSnapshot(
+				await run(
+					owner.api.documents.snapshot({
+						params: { document: "notification-failure-doc" },
+					}),
+				),
+				"verify-failed-notification",
+			),
+		)
+		expect(saved.text("notification-failure-doc")).toBe(
+			replica.text("notification-failure-doc") +
+				"\nDurable despite failed notification",
+		)
+	} finally {
+		if (
+			!database
+				.query("SELECT name FROM sqlite_schema WHERE name='document_grants'")
+				.get()
+		)
+			database.run(view.sql)
+		database.close()
+		await watcher.close()
+		await stranger.close()
+	}
+})
+
+test("accepted and revoked invitation members receive their library changes", async () => {
+	let owner = await run(client(96)),
+		joiner = await run(client(97))
+	await run(createWorkspace(owner, "scoped-invite", "Invited"))
+	await run(createDocument(owner, "scoped-invite", "invited-doc"))
+	let link = await run(
+		Effect.gen(function* () {
+			let invitation = "scoped-invitation",
+				secret = yield* invitationSecret
+			yield* owner.api.invitations.create({
+				payload: {
+					invitation,
+					target: { workspace: "scoped-invite" },
+					role: "reader",
+					digest: yield* invitationDigest(secret),
+				},
+			})
+			return { invitation, secret }
+		}),
+	)
+	let peer = livePoll(await cookieLogin(instance.server.url, 97))
+	try {
+		await peer.open()
+		await peer.until(is("connected"))
+		await run(
+			joiner.api.invitations.accept({
+				params: { invitation: link.invitation },
+				payload: { secret: link.secret, request: "join-scoped" },
+			}),
+		)
+		expect(await peer.until(is("advanced"))).toEqual({ type: "advanced" })
+		expect(await peer.send([{ type: "watch", document: "invited-doc" }])).toBe(
+			204,
+		)
+		await run(
+			owner.api.invitations.revoke({ params: { invitation: link.invitation } }),
+		)
+		expect(await peer.until(is("unavailable"))).toEqual({
+			type: "unavailable",
+			document: "invited-doc",
+		})
+	} finally {
+		await peer.close()
+	}
+})
+
+test("moving a document wakes both libraries and retains its creator after workspace access ends", async () => {
+	let host = await run(client(98)),
+		creator = await run(client(99)),
+		reader = await run(client(100))
+	await run(createWorkspace(creator, "scoped-source", "Source"))
+	await run(createWorkspace(host, "scoped-target", "Target"))
+	await run(member(host, "scoped-target", creator, "writer"))
+	await run(member(creator, "scoped-source", reader, "reader"))
+	await run(createDocument(creator, "scoped-source", "moved-scoped-doc"))
+	let author = livePoll(await cookieLogin(instance.server.url, 99)),
+		former = livePoll(await cookieLogin(instance.server.url, 100))
+	try {
+		for (let peer of [author, former]) {
+			await peer.open()
+			await peer.until(is("connected"))
+			expect(
+				await peer.send([{ type: "watch", document: "moved-scoped-doc" }]),
+			).toBe(204)
+		}
+		await run(
+			creator.api.documents.move({
+				params: { document: "moved-scoped-doc" },
+				payload: { workspace: "scoped-target", request: "move-scoped" },
+			}),
+		)
+		expect(await author.until(is("advanced"))).toEqual({ type: "advanced" })
+		expect(await former.until(is("unavailable"))).toEqual({
+			type: "unavailable",
+			document: "moved-scoped-doc",
+		})
+		await run(
+			host.api.workspaces.membership({
+				params: { workspace: "scoped-target", member: creator.subject },
+				payload: { role: null, request: "revoke-moved-creator" },
+			}),
+		)
+		expect(await author.until(is("advanced"))).toEqual({ type: "advanced" })
+		await run(edit(host, "moved-scoped-doc", "Original creator still notified"))
+		expect(await author.until(is("advanced"))).toEqual({ type: "advanced" })
+		expect(author.inbox.some(is("unavailable"))).toBe(false)
+	} finally {
+		await author.close()
+		await former.close()
+	}
+})
+
+test("public document watchers receive advances and lose access on workspace deletion", async () => {
+	let owner = await run(client(94))
+	await run(createWorkspace(owner, "public-scoped", "Public scoped"))
+	await run(createDocument(owner, "public-scoped", "public-scoped-doc"))
+	await run(grant(owner, "public-scoped-doc", "public", "reader"))
+	let reader = livePoll(await cookieLogin(instance.server.url, 95))
+	try {
+		await reader.open()
+		await reader.until(is("connected"))
+		expect(
+			await reader.send([{ type: "watch", document: "public-scoped-doc" }]),
+		).toBe(204)
+		await run(edit(owner, "public-scoped-doc", "Public update"))
+		expect(await reader.until(is("advanced"))).toEqual({ type: "advanced" })
+		await run(
+			owner.api.workspaces.remove({
+				params: { workspace: "public-scoped" },
+				payload: { request: "delete-public-scoped", name: "Public scoped" },
+			}),
+		)
+		expect(await reader.until(is("unavailable"))).toEqual({
+			type: "unavailable",
+			document: "public-scoped-doc",
+		})
+	} finally {
+		await reader.close()
 	}
 })
 
@@ -595,9 +884,9 @@ test("aborted and superseded polls release their waiter and abandoned sessions e
 	expect(instance.liveSessions()).toBe(before)
 
 	let started = Date.now()
-	while (instance.liveSessions() >= before && Date.now() - started < 9000)
+	while (instance.liveSessions() > 0 && Date.now() - started < 9000)
 		await Bun.sleep(200)
-	expect(instance.liveSessions()).toBeLessThan(before)
+	expect(instance.liveSessions()).toBe(0)
 	expect(await polling.poll()).toBe(410)
 }, 15_000)
 

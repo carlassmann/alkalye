@@ -49,6 +49,7 @@ export let LiveClientMessageSchema = Schema.Union([
 	}),
 ])
 export let LiveServerMessageSchema = Schema.Union([
+	Schema.Struct({ type: Schema.Literal("heartbeat") }),
 	Schema.Struct({ type: Schema.Literal("connected"), actor: IdentifierSchema }),
 	Schema.Struct({ type: Schema.Literal("advanced") }),
 	Schema.Struct({ type: Schema.Literal("preferences") }),

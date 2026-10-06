@@ -8,6 +8,7 @@ import * as PubSub from "effect/PubSub"
 import * as Cache from "effect/Cache"
 import * as Semaphore from "effect/Semaphore"
 import * as Redacted from "effect/Redacted"
+import * as Schedule from "effect/Schedule"
 import * as Schema from "effect/Schema"
 import * as SchemaBinary from "effect/encoding/SchemaBinary"
 import * as EventGroup from "effect/eventlog/EventGroup"
@@ -85,6 +86,15 @@ export {
 	PermissionDenied,
 	AccessConflict,
 } from "../shared/document-actions"
+
+type LiveNotice =
+	| { kind: "document"; document: string; subjects: ReadonlySet<string> }
+	| {
+			kind: "workspace"
+			subjects: ReadonlySet<string>
+			documents: ReadonlySet<string>
+	  }
+	| { kind: "preferences"; subject: string; subjects: ReadonlySet<string> }
 
 interface DocumentState {
 	replica: Replica
@@ -537,7 +547,7 @@ function makeDocumentStore() {
 			log: string
 		}>(1)
 		yield* Effect.addFinalizer(() => PubSub.shutdown(notices))
-		let wakeups = yield* PubSub.sliding<string | undefined>(64)
+		let wakeups = yield* PubSub.sliding<LiveNotice>(64)
 		yield* Effect.addFinalizer(() => PubSub.shutdown(wakeups))
 		return {
 			documentFixture: {
@@ -1600,22 +1610,149 @@ function makeDocumentStore() {
 				return { position, fact, fresh: true }
 			})
 		}
+		function publishNotice<E, R>(
+			lookup: Effect.Effect<LiveNotice, E, R>,
+			fallback: LiveNotice,
+		) {
+			return lookup.pipe(
+				Effect.retry({ times: 3, schedule: Schedule.exponential("20 millis") }),
+				Effect.catchCause(cause =>
+					Effect.logWarning(
+						"Committed change notification lookup failed",
+						cause,
+					).pipe(Effect.as(fallback)),
+				),
+				Effect.flatMap(notice => PubSub.publish(wakeups, notice)),
+			)
+		}
 		function finishWorkspace(result: {
 			position: number
 			fact: WorkspaceFact
 			fresh: boolean
 		}) {
+			if (!result.fresh) return Effect.succeed(result.position)
+			let { fact } = result,
+				change = fact.change
+			let subjects = new Set([fact.subject])
+			if ("member" in change) subjects.add(change.member)
+			let fallback: LiveNotice =
+				change.kind === "preferences"
+					? { kind: "preferences", subject: fact.subject, subjects }
+					: {
+							kind: "workspace",
+							subjects,
+							documents: new Set(
+								"document" in change && change.document
+									? [change.document]
+									: [],
+							),
+						}
+			return publishNotice(workspaceNotice(fact), fallback).pipe(
+				Effect.as(result.position),
+			)
+		}
+		function workspaceNotice(fact: WorkspaceFact) {
 			return Effect.gen(function* () {
-				if (result.fresh)
-					yield* PubSub.publish(
-						wakeups,
-						result.fact.change.kind === "preferences"
-							? result.fact.subject
-							: undefined,
-					)
-				return result.position
+				let change = fact.change
+				if (change.kind === "preferences") {
+					let subjects =
+						change.patch.name === undefined
+							? new Set([fact.subject])
+							: yield* profileRecipients(fact.subject)
+					let notice: LiveNotice = {
+						kind: "preferences",
+						subject: fact.subject,
+						subjects,
+					}
+					return notice
+				} else {
+					let subjects = yield* workspaceRecipients(fact.workspace)
+					subjects.add(fact.subject)
+					if ("member" in change) subjects.add(change.member)
+					if (change.kind === "invitationRevoked") {
+						let previous = yield* SqlSchema.findAll({
+							Request: Schema.Void,
+							Result: Schema.Struct({ subject: Schema.String }),
+							execute: () =>
+								readSql`SELECT member AS subject FROM invitation_members WHERE invitation=${change.invitation}`,
+						})(undefined)
+						for (let row of previous) subjects.add(row.subject)
+					}
+					if (change.kind === "documentMoved")
+						for (let subject of yield* workspaceRecipients(change.from))
+							subjects.add(subject)
+					let documents = new Set<string>()
+					if ("document" in change && change.document)
+						documents.add(change.document)
+					if (change.kind === "deleted") {
+						let rows = yield* SqlSchema.findAll({
+							Request: Schema.Void,
+							Result: Schema.Struct({ document: Schema.String }),
+							execute: () =>
+								readSql`SELECT document FROM workspace_documents WHERE workspace=${fact.workspace}`,
+						})(undefined)
+						for (let row of rows) documents.add(row.document)
+					}
+					let notice: LiveNotice = {
+						kind: "workspace",
+						subjects,
+						documents,
+					}
+					return notice
+				}
 			})
 		}
+		function workspaceRecipients(workspace: string) {
+			return SqlSchema.findAll({
+				Request: Schema.Void,
+				Result: Schema.Struct({ subject: Schema.String }),
+				execute: () => readSql`
+					SELECT owner AS subject FROM workspaces WHERE workspace=${workspace}
+					UNION SELECT member FROM workspace_grants WHERE workspace=${workspace}
+					UNION SELECT owner FROM workspace_documents WHERE workspace=${workspace}
+					UNION SELECT g.member FROM document_grants g JOIN workspace_documents d ON d.document=g.document WHERE d.workspace=${workspace}
+				`,
+			})(undefined).pipe(
+				Effect.map(rows => new Set(rows.map(row => row.subject))),
+			)
+		}
+		function documentRecipients(document: string) {
+			return SqlSchema.findAll({
+				Request: Schema.Void,
+				Result: Schema.Struct({ subject: Schema.String }),
+				execute: () => readSql`
+					SELECT owner AS subject FROM workspace_documents WHERE document=${document}
+					UNION SELECT w.owner FROM workspaces w JOIN workspace_documents d ON d.workspace=w.workspace WHERE d.document=${document}
+					UNION SELECT g.member FROM workspace_grants g JOIN workspace_documents d ON d.workspace=g.workspace WHERE d.document=${document}
+					UNION SELECT member FROM document_grants WHERE document=${document}
+				`,
+			})(undefined).pipe(
+				Effect.map(rows => new Set(rows.map(row => row.subject))),
+			)
+		}
+		function profileRecipients(subject: string) {
+			return SqlSchema.findAll({
+				Request: Schema.Void,
+				Result: Schema.Struct({ subject: Schema.String }),
+				execute: () => readSql`
+					WITH spaces AS (
+						SELECT workspace,owner AS subject FROM workspaces WHERE deleted=0
+						UNION SELECT g.workspace,g.member FROM workspace_grants g JOIN workspaces w ON w.workspace=g.workspace WHERE w.deleted=0
+					), viewers AS (
+						SELECT d.document,d.owner AS subject FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace WHERE w.deleted=0
+						UNION SELECT d.document,w.owner FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace WHERE w.deleted=0
+						UNION SELECT d.document,g.member FROM workspace_documents d JOIN workspace_grants g ON g.workspace=d.workspace JOIN workspaces w ON w.workspace=d.workspace WHERE w.deleted=0
+						UNION SELECT d.document,g.member FROM workspace_documents d JOIN document_grants g ON g.document=d.document JOIN workspaces w ON w.workspace=d.workspace WHERE w.deleted=0
+					)
+					SELECT ${subject} AS subject
+					UNION SELECT peer.subject FROM spaces mine JOIN spaces peer ON peer.workspace=mine.workspace WHERE mine.subject=${subject}
+					UNION SELECT peer.subject FROM viewers mine JOIN viewers peer ON peer.document=mine.document WHERE mine.subject=${subject}
+				`,
+			})(undefined).pipe(
+				Effect.map(rows => new Set(rows.map(row => row.subject))),
+			)
+		}
+
 		function workspaceSnapshot(id: string) {
 			return Identity.use(identity =>
 				readSql.withTransaction(
@@ -1707,7 +1844,29 @@ function makeDocumentStore() {
 				}
 				if (result.notice) {
 					yield* PubSub.publish(notices, result.notice)
-					if (managed) yield* PubSub.publish(wakeups, undefined)
+					if (managed) {
+						let subjects = new Set<string>()
+						for (let change of result.accepted?.changes ?? [])
+							if (
+								change.target === document &&
+								change.field.startsWith("access:") &&
+								change.field !== "access:public"
+							)
+								subjects.add(change.field.slice("access:".length))
+						let fallback: LiveNotice = { kind: "document", document, subjects }
+						let lookup = documentRecipients(document).pipe(
+							Effect.map(recipients => {
+								for (let subject of subjects) recipients.add(subject)
+								let notice: LiveNotice = {
+									kind: "document",
+									document,
+									subjects: recipients,
+								}
+								return notice
+							}),
+						)
+						yield* publishNotice(lookup, fallback)
+					}
 				}
 				return result.position
 			})

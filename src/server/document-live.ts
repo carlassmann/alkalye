@@ -80,18 +80,29 @@ export function makeDocumentLive() {
 		let run = yield* FiberSet.makeRuntime()
 		let peers = new Set<LivePeer>()
 		let sockets = new WeakMap<ServerWebSocket<Connection>, LivePeer>()
+		let socketPeers = new Set<LivePeer>()
+		let heartbeatSent = yield* Clock.currentTimeMillis
 		let polls = new Map<string, PollSession>()
 		let changes = yield* store.changes
 		yield* Stream.fromSubscription(changes).pipe(
-			Stream.runForEach(subject =>
+			Stream.runForEach(notice =>
 				Effect.forEach(
-					peers,
+					[...peers].filter(
+						peer =>
+							notice.subjects.has(peer.live.subject) ||
+							(notice.kind === "document" &&
+								peer.live.documents.has(notice.document)) ||
+							(notice.kind === "workspace" &&
+								[...notice.documents].some(document =>
+									peer.live.documents.has(document),
+								)),
+					),
 					peer =>
 						authorize(peer).pipe(
 							Effect.flatMap(live =>
 								Effect.gen(function* () {
-									if (subject !== undefined) {
-										if (subject === live.subject) {
+									if (notice.kind === "preferences") {
+										if (notice.subject === live.subject) {
 											live.name = yield* profileName(live.subject)
 											for (let [document, previous] of live.presence) {
 												let presence = { ...previous, name: live.name }
@@ -106,6 +117,11 @@ export function makeDocumentLive() {
 										return
 									}
 									for (let document of live.documents) {
+										if (
+											notice.kind === "document" &&
+											notice.document !== document
+										)
+											continue
 										let role = yield* accessRole(live, document)
 										let previous = live.presence.get(document)
 										if (!role) {
@@ -151,6 +167,10 @@ export function makeDocumentLive() {
 			Stream.runForEach(() =>
 				Effect.gen(function* () {
 					let now = yield* Clock.currentTimeMillis
+					if (now - heartbeatSent >= 5_000) {
+						heartbeatSent = now
+						for (let peer of socketPeers) peer.send({ type: "heartbeat" })
+					}
 					for (let poll of polls.values())
 						if (!poll.waiter && now - poll.seen > pollAbandoned)
 							poll.peer.close(1001, "Live session abandoned")
@@ -162,6 +182,7 @@ export function makeDocumentLive() {
 			Effect.sync(() => {
 				for (let peer of peers) peer.close(1001, "Server restarting")
 				peers.clear()
+				socketPeers.clear()
 			}),
 		)
 		return {
@@ -200,6 +221,7 @@ export function makeDocumentLive() {
 				close: (code, reason) => socket.close(code, reason),
 			}
 			sockets.set(socket, peer)
+			socketPeers.add(peer)
 			join(peer)
 		}
 		function message(
@@ -228,6 +250,7 @@ export function makeDocumentLive() {
 			let peer = sockets.get(socket)
 			if (!peer) return Effect.void
 			sockets.delete(socket)
+			socketPeers.delete(peer)
 			return peer.gate.withPermit(leave(peer))
 		}
 

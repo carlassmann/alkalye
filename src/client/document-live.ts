@@ -34,7 +34,6 @@ import { BrowserAccount } from "./browser-account"
 export type LiveTransport = "socket" | "poll"
 class LiveUpgrade extends Data.TaggedError("LiveUpgrade") {}
 
-// A socket attempt is healthy once it has stayed connected this long.
 let healthySocket = 15_000
 let socketFailuresBeforePolling = 3
 let socketRetryWhilePolling = 90_000
@@ -158,7 +157,13 @@ function makeLive() {
 						status === "signedOut" ||
 						status === "accountChanged"
 					) {
-						yield* pausedBackoff(undefined)
+						yield* Effect.raceFirst(
+							pausedBackoff(undefined),
+							Stream.fromEventListener(window, "online").pipe(
+								Stream.take(1),
+								Stream.runDrain,
+							),
+						)
 						continue
 					}
 					pausedBackoff = yield* Schedule.toStepWithSleep(reconnectSchedule)
@@ -169,11 +174,12 @@ function makeLive() {
 					let started = now
 					if (!polling) {
 						socketTried = started
-						let opened = { at: 0 }
+						let opened = { at: 0, alive: 0, stalled: false }
 						yield* Effect.exit(session(socketLink(opened)))
 						if (
 							opened.at &&
-							(yield* Clock.currentTimeMillis) - opened.at >= healthySocket
+							!opened.stalled &&
+							opened.alive - opened.at >= healthySocket
 						) {
 							failures = 0
 							socketBackoff = yield* Schedule.toStepWithSleep(reconnectSchedule)
@@ -221,7 +227,11 @@ function makeLive() {
 				}),
 			)
 		}
-		function socketLink(opened: { at: number }) {
+		function socketLink(opened: {
+			at: number
+			alive: number
+			stalled: boolean
+		}) {
 			return Effect.gen(function* () {
 				let reader = yield* socket.reader
 				let current = yield* socket.writer
@@ -230,14 +240,20 @@ function makeLive() {
 				)
 				for (let document of watched) yield* send({ type: "watch", document })
 				while (true) {
-					// Proxies that accept the upgrade but never deliver frames
-					// count as a failed socket.
-					let frames = opened.at
-						? yield* reader.pull
-						: yield* reader.pull.pipe(Effect.timeout("10 seconds"))
+					// A proxy can keep a socket open after it stops delivering frames.
+					let frames = yield* reader.pull.pipe(
+						Effect.timeout(opened.at ? "30 seconds" : "10 seconds"),
+						Effect.tapErrorTag("TimeoutError", () =>
+							Effect.sync(() => {
+								opened.stalled = true
+							}),
+						),
+					)
 					for (let frame of frames) {
 						let message = decodeFrame(frame)
 						if (!message) continue
+						opened.alive = yield* Clock.currentTimeMillis
+						if (message.type === "heartbeat") continue
 						if (message.type === "connected") {
 							opened.at = yield* Clock.currentTimeMillis
 							yield* SubscriptionRef.set(transport, "socket")

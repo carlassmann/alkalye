@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process"
 import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
@@ -40,7 +41,8 @@ if (process.argv.includes("--serve")) {
 			if (!shell) return response
 			let markup = await response.text()
 			let instrumentation = `<script>
-			window.blockLiveSocket = true;
+			window.blockLiveSocket = !new URL(location.href).searchParams.has("socket");
+			window.liveSocketConnections = 0;
 			window.livePollRequests = 0;
 			window.WebSocket = class extends WebSocket {
 				constructor(url, protocols) {
@@ -50,6 +52,16 @@ if (process.argv.includes("--serve")) {
 						target.port = "${instance.server.port}";
 					}
 					super(target.href, protocols);
+					if (target.pathname === "/api/live") {
+						window.activeLiveSocket = this;
+						this.addEventListener("message", event => {
+							if (this === window.frozenLiveSocket) {
+								event.stopImmediatePropagation();
+								return;
+							}
+							if (JSON.parse(event.data).type === "connected") window.liveSocketConnections++;
+						});
+					}
 				}
 			};
 			let originalFetch = fetch;
@@ -169,6 +181,48 @@ if (process.argv.includes("--serve")) {
 		)
 		wait(owner, 'document.querySelectorAll(".remote-selection").length > 0')
 		assert(true, "polling carries cursor previews and selections")
+		browser(owner, "open", origin + "app/doc/" + document + "?socket=enabled")
+		wait(
+			owner,
+			'window.liveSocketConnections === 1 && document.querySelector("#editor")?.value.includes("Written over HTTP.")',
+		)
+		evaluate(owner, "window.frozenLiveSocket = window.activeLiveSocket")
+		browser(
+			writer,
+			"fill",
+			"#editor",
+			"# Polling collaboration\n\nRecovered from a silent socket.",
+		)
+		let recovered = spawnSync(
+			"agent-browser",
+			[
+				"--session",
+				owner,
+				"--json",
+				"wait",
+				"--fn",
+				'window.liveSocketConnections > 1 && document.querySelector("#editor")?.value.includes("Recovered from a silent socket.")',
+			],
+			{
+				encoding: "utf8",
+				timeout: 38000,
+				env: {
+					...process.env,
+					AGENT_BROWSER_HEADED: "false",
+					AGENT_BROWSER_DEFAULT_TIMEOUT: "34000",
+				},
+			},
+		)
+		assert(
+			recovered.status === 0,
+			"silent socket recovery finishes within its bounded timeout: " +
+				recovered.stdout +
+				recovered.stderr,
+		)
+		assert(
+			true,
+			"silent established sockets reconnect and recover remote edits without user interaction",
+		)
 		assert(
 			evaluate(
 				owner,
