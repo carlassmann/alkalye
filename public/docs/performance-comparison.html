@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>Alkalye performance comparison</title>
+		<style>
+			:root {
+				color-scheme: light dark;
+				--background: #fafaf8;
+				--text: #18201d;
+				--muted: #5a635f;
+				--line: #d9dfdb;
+				--panel: #fff;
+				--good: #087449;
+				--bad: #a52f20;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+				background: var(--background);
+				color: var(--text);
+			}
+			[data-performance-report] {
+				max-width: 1120px;
+				margin: auto;
+				padding: 64px 28px;
+				font:
+					16px/1.65 system-ui,
+					sans-serif;
+			}
+			[data-performance-report] h1 {
+				font-size: clamp(32px, 5vw, 52px);
+				line-height: 1.1;
+				letter-spacing: -0.04em;
+				font-weight: 650;
+				margin: 14px 0 22px;
+			}
+			[data-performance-report] h2 {
+				font-size: 24px;
+				line-height: 1.3;
+				margin: 44px 0 12px;
+			}
+			[data-performance-report] p {
+				max-width: 850px;
+			}
+			[data-performance-report] .eyebrow,
+			[data-performance-report] small {
+				color: var(--muted);
+			}
+			[data-performance-report] .eyebrow {
+				font:
+					13px/1.5 ui-monospace,
+					monospace;
+				letter-spacing: 0.05em;
+			}
+			[data-performance-report] .verdict {
+				font-size: 20px;
+				max-width: 850px;
+			}
+			[data-performance-report] .warning {
+				padding: 18px 22px;
+				border-left: 4px solid var(--bad);
+				background: var(--panel);
+				margin: 24px 0;
+			}
+			[data-performance-report] .warning p {
+				margin: 0;
+			}
+			[data-performance-report] .table-scroll {
+				overflow: auto;
+				border: 1px solid var(--line);
+				background: var(--panel);
+			}
+			[data-performance-report] table {
+				width: 100%;
+				border-collapse: collapse;
+				text-align: left;
+				font-variant-numeric: tabular-nums;
+			}
+			[data-performance-report] th,
+			[data-performance-report] td {
+				padding: 16px 18px;
+				border-bottom: 1px solid var(--line);
+				vertical-align: middle;
+			}
+			[data-performance-report] thead {
+				color: var(--muted);
+				font-size: 13px;
+			}
+			[data-performance-report] tbody th {
+				font-weight: 500;
+				min-width: 225px;
+			}
+			[data-performance-report] tr:last-child > * {
+				border-bottom: 0;
+			}
+			[data-performance-report] td {
+				white-space: nowrap;
+			}
+			[data-performance-report] td strong {
+				font-size: 20px;
+				font-weight: 600;
+			}
+			[data-performance-report] small {
+				display: block;
+				font-size: 12px;
+			}
+			[data-performance-report] .good {
+				color: var(--good);
+			}
+			[data-performance-report] .bad,
+			[data-performance-report] .failed {
+				color: var(--bad);
+			}
+			[data-performance-report] details {
+				padding: 18px 0;
+				border-bottom: 1px solid var(--line);
+			}
+			[data-performance-report] summary {
+				cursor: pointer;
+				font-weight: 600;
+			}
+			[data-performance-report] li {
+				margin: 8px 0;
+			}
+			[data-performance-report] code {
+				font:
+					13px/1.6 ui-monospace,
+					monospace;
+				overflow-wrap: anywhere;
+			}
+			[data-performance-report] a {
+				color: var(--good);
+				text-underline-offset: 4px;
+			}
+			[data-performance-report] footer {
+				margin-top: 44px;
+				color: var(--muted);
+				font-size: 13px;
+				border-top: 1px solid var(--line);
+				padding-top: 18px;
+			}
+			@media (prefers-color-scheme: dark) {
+				:root {
+					--background: #111613;
+					--text: #e8efeb;
+					--muted: #a6b4ad;
+					--line: #303c35;
+					--panel: #19211c;
+					--good: #6ed6a5;
+					--bad: #ff9b88;
+				}
+			}
+			@media (max-width: 600px) {
+				[data-performance-report] {
+					padding: 32px 16px;
+				}
+				[data-performance-report] th,
+				[data-performance-report] td {
+					padding: 12px;
+				}
+				[data-performance-report] td strong {
+					font-size: 18px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<main data-performance-report>
+			<div class="eyebrow">6 OCTOBER 2026 · LOCAL PRODUCTION BUILDS</div>
+			<h1>Fast short notes.<br />Slow larger documents.</h1>
+			<p class="verdict">
+				The rewrite wins most short-note interactions and online sync. The
+				original opens existing documents faster, handles larger documents much
+				better, and reconnects faster.
+			</p>
+			<div class="warning">
+				<p>
+					The rewrite could create and save the 128 KB fixture, but could not
+					reopen it. The UI reported
+					<code>Maximum call stack size exceeded</code>. That is a load failure,
+					not a slow timing sample.
+				</p>
+			</div>
+			<h2>A short note, 2 KB initially</h2>
+			<p>
+				Medians. The smaller line gives the observed range and sample count.
+				These are input-to-paint opportunities, not automation command
+				durations.
+			</p>
+			<div class="table-scroll">
+				<table>
+					<thead>
+						<tr>
+							<th>Journey</th>
+							<th>Original</th>
+							<th>Rewrite</th>
+							<th>Rewrite comparison</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th scope="row">Warm reload</th>
+							<td><strong>153 ms</strong><small>150–160 ms · n=9</small></td>
+							<td><strong>107 ms</strong><small>101–116 ms · n=9</small></td>
+							<td><span class="good">1.4× faster</span></td>
+						</tr>
+						<tr>
+							<th scope="row">Append a short phrase</th>
+							<td><strong>24 ms</strong><small>17–33 ms · n=12</small></td>
+							<td><strong>14 ms</strong><small>12–33 ms · n=12</small></td>
+							<td><span class="good">1.7× faster</span></td>
+						</tr>
+						<tr>
+							<th scope="row">Switch to existing document¹</th>
+							<td><strong>31 ms</strong><small>24–38 ms · n=9</small></td>
+							<td><strong>166 ms</strong><small>137–194 ms · n=9</small></td>
+							<td><span class="bad">5.3× slower</span></td>
+						</tr>
+						<tr>
+							<th scope="row">Open find</th>
+							<td><strong>34 ms</strong><small>28–34 ms · n=9</small></td>
+							<td><strong>30 ms</strong><small>24–32 ms · n=9</small></td>
+							<td><span class="good">1.1× faster</span></td>
+						</tr>
+						<tr>
+							<th scope="row">Find 20 matches</th>
+							<td><strong>29 ms</strong><small>20–34 ms · n=9</small></td>
+							<td><strong>15 ms</strong><small>3–18 ms · n=9</small></td>
+							<td><span class="good">1.9× faster</span></td>
+						</tr>
+						<tr>
+							<th scope="row">Open rendered preview</th>
+							<td><strong>63 ms</strong><small>61–71 ms · n=9</small></td>
+							<td><strong>29 ms</strong><small>25–38 ms · n=9</small></td>
+							<td><span class="good">2.2× faster</span></td>
+						</tr>
+						<tr>
+							<th scope="row">Edit reaches another device</th>
+							<td><strong>299 ms</strong><small>291–308 ms · n=9</small></td>
+							<td><strong>156 ms</strong><small>142–162 ms · n=9</small></td>
+							<td><span class="good">1.9× faster</span></td>
+						</tr>
+						<tr>
+							<th scope="row">Reload with an offline edit</th>
+							<td><strong>157 ms</strong><small>152–192 ms · n=3</small></td>
+							<td><strong>119 ms</strong><small>111–124 ms · n=3</small></td>
+							<td><span class="good">1.3× faster</span></td>
+						</tr>
+						<tr>
+							<th scope="row">Reconnect sends the offline edit</th>
+							<td><strong>51 ms</strong><small>47–55 ms · n=3</small></td>
+							<td><strong>129 ms</strong><small>128–140 ms · n=3</small></td>
+							<td><span class="bad">2.5× slower</span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<small
+				>¹ Switch back from the 32 KB fixture. Both implementations had already
+				opened these documents.</small
+			>
+			<h2>Larger Markdown documents</h2>
+			<p>
+				Identical ASCII source with bold text, highlights and links. Sizes mean
+				KiB. The original does not render the added highlight syntax. Edits
+				append approximately 8–11 characters.
+			</p>
+			<div class="table-scroll">
+				<table>
+					<thead>
+						<tr>
+							<th>Journey</th>
+							<th>Original</th>
+							<th>Rewrite</th>
+							<th>Rewrite comparison</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th scope="row">32 KB warm reload</th>
+							<td><strong>203 ms</strong><small>197–246 ms · n=9</small></td>
+							<td><strong>708 ms</strong><small>679–739 ms · n=9</small></td>
+							<td><span class="bad">3.5× slower</span></td>
+						</tr>
+						<tr>
+							<th scope="row">32 KB append a short phrase</th>
+							<td><strong>23 ms</strong><small>18–34 ms · n=12</small></td>
+							<td><strong>204 ms</strong><small>188–246 ms · n=12</small></td>
+							<td><span class="bad">8.9× slower</span></td>
+						</tr>
+						<tr>
+							<th scope="row">Switch to 32 KB document</th>
+							<td><strong>30 ms</strong><small>25–161 ms · n=9</small></td>
+							<td><strong>1217 ms</strong><small>807–1302 ms · n=9</small></td>
+							<td><span class="bad">41.1× slower</span></td>
+						</tr>
+						<tr>
+							<th scope="row">128 KB warm reload</th>
+							<td><strong>492 ms</strong><small>466–530 ms · n=9</small></td>
+							<td class="failed">Failed to open</td>
+							<td><span class="bad">Load failure</span></td>
+						</tr>
+						<tr>
+							<th scope="row">128 KB append a short phrase</th>
+							<td><strong>25 ms</strong><small>19–32 ms · n=12</small></td>
+							<td class="failed">Failed to open</td>
+							<td><span class="bad">Load failure</span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<h2>What these results say</h2>
+			<p>
+				The rewrite's small bundle does not guarantee faster document opening.
+				Its 32 KB switching time is about 41 times the original's median, and
+				its edit response is about nine times slower. Those regressions are much
+				larger than the variation between samples.
+			</p>
+			<p>
+				For short notes, the rewrite reloads faster, renders preview faster and
+				propagates online edits faster. Both implementations saved edits
+				offline, reopened them after reload, and delivered them to a second
+				browser after reconnect. Reconnect results have only three samples each.
+			</p>
+			<details open>
+				<summary>How timing works</summary>
+				<p>
+					A probe starts its clock inside the first trusted pointer, key or
+					input event. It waits for the expected source or DOM state, then
+					records the next animation frame. Reload timing starts at navigation
+					and ends when the correct source exists in a visible editor, plus one
+					animation frame. Neither metric proves that every pixel has appeared
+					or an entrance animation has finished.
+				</p>
+				<p>
+					Peer sync uses two independent browser processes restored to the same
+					disposable account. The producer records
+					<code>performance.timeOrigin + performance.now()</code> at trusted
+					input. The peer records the same epoch clock two animation frames
+					after its source contains the unique marker. These timings include
+					each application's save scheduling and local relay work.
+				</p>
+				<p>
+					Offline runs disable networking, append a unique marker, wait for
+					local save acknowledgement, confirm the peer does not have the marker,
+					and reload while still offline. Reconnect timing starts at the
+					producer's <code>online</code> event and ends at the peer's paint
+					opportunity.
+				</p>
+				<p>
+					Reload, find, preview, switching and online sync have nine samples
+					each. Insertions have twelve. Offline reload and reconnect have three.
+					Medians use the arithmetic midpoint for an even count. The raw JSON
+					includes every sample. Its nearest-rank p95 is the maximum for these
+					small groups, so no reliable tail-latency claim is made.
+				</p>
+			</details>
+			<details>
+				<summary>Environment and builds</summary>
+				<p>
+					Apple M5 Pro, 18 logical CPUs, 64 GiB RAM. macOS 27.0.1. Headless
+					Chrome 154.0.8037.58 at 1280 × 900. Bun 1.4.0. No network or CPU
+					throttling. Other Chrome processes were using CPU on the shared host.
+				</p>
+				<p>
+					Original <code>a749728a8f9a1cb984c980a5ea2daf984d60ae68</code>. Built
+					locally with
+					<code>PUBLIC_JAZZ_SYNC_SERVER=ws://127.0.0.1:4210 bun run build</code
+					>, served over loopback with gzip. A local
+					<code>jazz-run@0.20.18</code> relay used its own SQLite database.
+				</p>
+				<p>
+					Rewrite <code>b4556e83d2db31302f7942ffe826d73fc3bbfd24</code>. Local
+					production build, served by its native Bun server with an isolated
+					SQLite database and asset directory. Both PWAs had active service
+					workers and warm caches.
+				</p>
+				<p>
+					Fixtures started at 2, 32 and 128 KiB. Typing grows them during the
+					run. Initial library sizes differed by one blank document. Tests ran
+					the original before the rewrite within each phase. Local accounts and
+					data were isolated from the app you use.
+				</p>
+			</details>
+			<details>
+				<summary>Excluded attempts and limits</summary>
+				<p>
+					Discarded original runs made before its service worker installed.
+					Discarded an undo shortcut run that stalled browser automation.
+					Repeated the original offline reload with an inline cached probe after
+					the external probe failed to load. Repeated the rewrite find journey
+					after correcting sidebar setup.
+				</p>
+				<ul>
+					<li>
+						Timing measures paint opportunity, not pixel presentation or
+						animation completion
+					</li>
+					<li>Shared host had other Chrome processes consuming CPU</li>
+					<li>
+						No WAN, phone hardware, network throttling, concurrent-edit conflict
+						load, whiteboard, slideshow, cold-cache installation, long-poll-only
+						or asset-load benchmarks
+					</li>
+					<li>
+						Save acknowledgements differ across implementations and are not
+						compared as disk durability
+					</li>
+					<li>
+						Different initial library sizes: original welcome + 3 fixtures;
+						rewrite welcome + blank + 3 fixtures
+					</li>
+					<li>
+						No confidence intervals or randomized version order; narrow timing
+						differences need a controlled rerun
+					</li>
+				</ul>
+			</details>
+			<p>
+				<a href="/docs/performance-comparison.json"
+					>Download raw measurements and methodology</a
+				>
+			</p>
+			<footer>written with gpt-6 in codex</footer>
+		</main>
+	</body>
+</html>
