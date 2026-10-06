@@ -36,6 +36,200 @@ afterAll(async () => {
 	await rm(directory, { recursive: true, force: true })
 })
 
+test("personal workspace identifiers cannot be claimed by another account", () =>
+	run(
+		Effect.gen(function* () {
+			let attacker = yield* client(181)
+			let victim = yield* client(182)
+			let personal = "personal-" + victim.subject
+			expect(yield* failure(createWorkspace(attacker, personal))).toBe(
+				"PermissionDenied",
+			)
+			yield* victim.api.preferences.save({
+				payload: {
+					request: "own-personal-preferences",
+					patch: { name: "Victim" },
+				},
+			})
+			expect(
+				(yield* victim.api.workspaces.snapshot({
+					params: { workspace: personal },
+				})).owner,
+			).toBe(victim.subject)
+			yield* createDocument(victim, personal, "protected-personal-document")
+			expect(yield* roles(victim)).toContainEqual([
+				"protected-personal-document",
+				"owner",
+			])
+			expect(yield* roles(attacker)).not.toContainEqual([
+				"protected-personal-document",
+				"owner",
+			])
+		}),
+	))
+
+test("leaving invitations requires an active membership and retries never grow the owner's journal", () =>
+	run(
+		Effect.gen(function* () {
+			let owner = yield* client(183)
+			let guest = yield* client(184)
+			let stranger = yield* client(185)
+			let workspace = "protected-leave-journal"
+			yield* createWorkspace(owner, workspace)
+			yield* createDocument(owner, workspace, "protected-leave-document")
+			let link = yield* invite(
+				owner,
+				{ document: "protected-leave-document" },
+				"writer",
+			)
+			let position = (yield* owner.api.workspaces.snapshot({
+				params: { workspace },
+			})).position
+			for (let index = 0; index < 3; index++)
+				expect(
+					yield* failure(
+						stranger.api.invitations.leave({
+							params: { invitation: link.invitation, member: stranger.subject },
+							payload: { request: "never-joined-" + index },
+						}),
+					),
+				).toBe("ResourceUnavailable")
+			expect(
+				(yield* owner.api.workspaces.snapshot({ params: { workspace } }))
+					.position,
+			).toBe(position)
+			yield* accept(guest, link, "active-guest")
+			let leaving = guest.api.invitations.leave({
+				params: { invitation: link.invitation, member: guest.subject },
+				payload: { request: "active-guest-leaves" },
+			})
+			let receipt = yield* leaving
+			position = (yield* owner.api.workspaces.snapshot({
+				params: { workspace },
+			})).position
+			expect(yield* leaving).toBe(receipt)
+			expect(
+				(yield* owner.api.workspaces.snapshot({ params: { workspace } }))
+					.position,
+			).toBe(position)
+			expect(
+				yield* failure(
+					guest.api.invitations.leave({
+						params: { invitation: link.invitation, member: guest.subject },
+						payload: { request: "already-left-new-request" },
+					}),
+				),
+			).toBe("ResourceUnavailable")
+			yield* accept(guest, link, "guest-rejoins")
+			yield* owner.api.invitations.revoke({
+				params: { invitation: link.invitation },
+			})
+			position = (yield* owner.api.workspaces.snapshot({
+				params: { workspace },
+			})).position
+			expect(yield* leaving).toBe(receipt)
+			for (let index = 0; index < 3; index++)
+				expect(
+					yield* failure(
+						guest.api.invitations.leave({
+							params: { invitation: link.invitation, member: guest.subject },
+							payload: { request: "revoked-fresh-" + index },
+						}),
+					),
+				).toBe("ResourceUnavailable")
+			expect(
+				(yield* owner.api.workspaces.snapshot({ params: { workspace } }))
+					.position,
+			).toBe(position)
+		}),
+	))
+
+test("moving into another owner's workspace preserves document ownership and inherits destination access", () =>
+	run(
+		Effect.gen(function* () {
+			let mover = yield* client(186)
+			let host = yield* client(187)
+			let reader = yield* client(188)
+			let invited = yield* client(189)
+			yield* createWorkspace(mover, "retained-owner-source")
+			yield* createWorkspace(host, "retained-owner-destination")
+			yield* host.api.workspaces.membership({
+				params: {
+					workspace: "retained-owner-destination",
+					member: mover.subject,
+				},
+				payload: { role: "writer", request: "destination-writer" },
+			})
+			yield* host.api.workspaces.membership({
+				params: {
+					workspace: "retained-owner-destination",
+					member: reader.subject,
+				},
+				payload: { role: "reader", request: "destination-reader" },
+			})
+			yield* createDocument(
+				mover,
+				"retained-owner-source",
+				"retained-owner-document",
+			)
+			let link = yield* invite(
+				mover,
+				{ document: "retained-owner-document" },
+				"writer",
+			)
+			yield* accept(invited, link, "invited-before-move")
+			yield* mover.api.documents.move({
+				params: { document: "retained-owner-document" },
+				payload: {
+					workspace: "retained-owner-destination",
+					request: "move-to-host",
+				},
+			})
+			let document = (yield* mover.api.workspaces.library()).documents.find(
+				entry => entry.document === "retained-owner-document",
+			)
+			expect(document).toMatchObject({
+				owner: mover.subject,
+				role: "owner",
+				workspace: "retained-owner-destination",
+			})
+			expect(yield* roles(host)).toContainEqual([
+				"retained-owner-document",
+				"owner",
+			])
+			expect(yield* roles(reader)).toContainEqual([
+				"retained-owner-document",
+				"reader",
+			])
+			expect(
+				yield* failure(
+					edit(reader, "retained-owner-document", "Reader must not write"),
+				),
+			).toBe("PermissionDenied")
+			yield* edit(host, "retained-owner-document", "Workspace owner can edit")
+			yield* mover.api.invitations.revoke({
+				params: { invitation: link.invitation },
+			})
+			expect(yield* roles(invited)).toEqual([])
+			yield* mover.api.documents.move({
+				params: { document: "retained-owner-document" },
+				payload: { workspace: "retained-owner-source", request: "move-home" },
+			})
+			expect(yield* roles(reader)).toEqual([])
+			expect(yield* roles(host)).toEqual([])
+			yield* remove(
+				mover,
+				"retained-owner-document",
+				"Delete after moving home",
+			)
+			expect(
+				(yield* mover.api.workspaces.library()).documents.find(
+					entry => entry.document === "retained-owner-document",
+				)?.deleted,
+			).toBe(true)
+		}),
+	))
+
 test("invitation links round-trip and reject malformed fragments", async () => {
 	let secret = await run(invitationSecret)
 	let link = invitationLink("https://alkalye.test/", {

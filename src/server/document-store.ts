@@ -945,6 +945,8 @@ function makeDocumentStore() {
 			return Effect.gen(function* () {
 				let identity = yield* Identity
 				if (
+					(id.startsWith("personal-") &&
+						id !== "personal-" + identity.subject) ||
 					!allowsWorkspace(id, identity.access) ||
 					identity.access?.ceiling === "reader"
 				)
@@ -1087,8 +1089,7 @@ function makeDocumentStore() {
 				)
 			})
 		}
-		// A move keeps the document's identity and history; access follows the
-		// destination workspace from then on.
+		// Moving preserves document ownership while inheriting destination access.
 		function moveDocument(
 			document: string,
 			destination: string,
@@ -1404,6 +1405,24 @@ function makeDocumentStore() {
 								invitationTarget(record.value),
 								identity.subject,
 							)
+						let previous = yield* workspace.receipt({
+							workspace: record.value.workspace,
+							id: "invitation-left:" + request,
+						})
+						if (Option.isNone(previous)) {
+							let memberships = yield* workspace.memberships(
+								member,
+								record.value.workspace,
+								record.value.document,
+							)
+							if (
+								record.value.revoked ||
+								!memberships.some(
+									membership => membership.invitation === invitation,
+								)
+							)
+								return yield* unavailable()
+						}
 						return yield* writeWorkspace(
 							yield* Schema.decodeUnknownEffect(WorkspaceFactSchema)({
 								id: "invitation-left:" + request,

@@ -273,7 +273,7 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 					let target = yield* workspace(fact.workspace)
 					if (Option.isNone(target))
 						return yield* conflict("Workspace is unavailable")
-					yield* sql`UPDATE workspace_documents SET workspace=${fact.workspace},owner=${target.value.owner} WHERE document=${change.document} AND workspace=${change.from}`
+					yield* sql`UPDATE workspace_documents SET workspace=${fact.workspace} WHERE document=${change.document} AND workspace=${change.from}`
 					yield* sql`UPDATE invitations SET workspace=${fact.workspace} WHERE document=${change.document}`
 					break
 				}
