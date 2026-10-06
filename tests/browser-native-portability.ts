@@ -6,6 +6,7 @@ import {
 	evaluate,
 	wait,
 	currentDocument,
+	visit,
 } from "./browser-driver"
 import {
 	boardMounted,
@@ -311,6 +312,34 @@ try {
 		true,
 		"documents imported offline publish to the server once the browser reconnects",
 	)
+	let noteRoute = string(evaluate(session, "location.pathname"))
+	visit(session, noteRoute + "/timemachine")
+	wait(
+		session,
+		'document.querySelector("#history-source").getAttribute("aria-busy") === "false" && document.querySelector("alkalye-history alkalye-editor").source.value.includes("Offline note")',
+	)
+	let latestPosition = string(
+		evaluate(session, 'document.querySelector("#history-position").value'),
+	)
+	browser(session, "set", "offline", "on")
+	browser(session, "reload")
+	wait(
+		session,
+		'document.querySelector("#history-source")?.getAttribute("aria-busy") === "false" && document.querySelector("alkalye-history alkalye-editor")?.source.value.includes("Offline note")',
+	)
+	assert(
+		evaluate(
+			session,
+			`document.querySelector("#history-position").value === ${JSON.stringify(latestPosition)} && document.querySelector("alkalye-history #editor").readOnly`,
+		),
+		"Downloaded time-machine history remains readable after a cold offline reload",
+	)
+	browser(session, "press", "Escape")
+	wait(
+		session,
+		'document.querySelector("#editor") && !document.querySelector("alkalye-history")',
+	)
+	browser(session, "set", "offline", "off")
 	console.log("Native portability browser verification passed")
 } finally {
 	try {
