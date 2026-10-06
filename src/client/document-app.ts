@@ -36,7 +36,7 @@ import {
 	safeUrl,
 	withFrontmatter,
 } from "../shared/markdown"
-import type { DocumentRecord } from "../shared/model"
+import type { DocumentLink, DocumentRecord } from "../shared/model"
 import { BrowserPreferences } from "./browser-preferences"
 import { SettingsPageElement } from "./components/settings-page"
 import { WorkspaceSettingsElement } from "./components/workspace-settings"
@@ -341,6 +341,9 @@ function mountApplication() {
 		let libraryRefreshPending = false
 		let documentRefreshPending = false
 		let presenceRefreshPending = false
+		let documentLinkCatalogue = library.state.current().library.documents
+		let documentLinkKey = ""
+		let documentLinkValues: DocumentLink[] = []
 		dialog.addEventListener(
 			"close",
 			() => {
@@ -1462,6 +1465,33 @@ function mountApplication() {
 				.documents(workspace, true)
 				.find(doc => doc.id === current.document)
 		}
+		function documentLinks(): DocumentLink[] {
+			let catalogue = library.state.current().library.documents
+			let current = currentDocument()
+			let key = JSON.stringify([
+				showTrash,
+				preferences.state.current().value.themeLibrary,
+				current?.id,
+				current?.title,
+				current?.archived,
+				current?.folder,
+				current?.tags,
+			])
+			if (catalogue !== documentLinkCatalogue || key !== documentLinkKey) {
+				documentLinkCatalogue = catalogue
+				documentLinkKey = key
+				documentLinkValues = summaries().map(
+					({ id, title, archived, folder, tags }) => ({
+						id,
+						title,
+						archived,
+						folder,
+						tags,
+					}),
+				)
+			}
+			return documentLinkValues
+		}
 		function summaries(): DocumentSummary[] {
 			let current = currentDocument()
 			return library.state
@@ -1706,7 +1736,7 @@ function mountApplication() {
 					atoms: selected.opened.session.replica.visible(doc.id),
 					editable: writable(),
 					preferences: preferences.state.current().value.editor,
-					documents: summaries,
+					documents: documentLinks,
 					openDocument: (id, newTab) => {
 						if (selection !== selected) return
 						if (newTab)
@@ -1863,7 +1893,7 @@ function mountApplication() {
 							atoms: historical.visible(selected.document),
 							editable: false,
 							preferences: preferences.state.current().value.editor,
-							documents: summaries,
+							documents: documentLinks,
 							isDrawing: id => historical.fields(id).type === "whiteboard",
 							openDrawing: () => {},
 							openDocument: id => launch(open(id)),
@@ -2228,6 +2258,7 @@ function mountApplication() {
 			}
 		}
 		function refreshDocument() {
+			let presencePainted = false
 			let signedIn = account.state.current().status === "signedIn"
 			let signIn = app.querySelector<HTMLElement>(
 				'#profile-menu [data-action="sign-in"]',
@@ -2245,7 +2276,7 @@ function mountApplication() {
 				if (recovery instanceof SyncRecoveryElement)
 					recovery.update(false, false, false)
 				updateMarkup(element("#inspector-body"), "")
-				return
+				return presencePainted
 			}
 			let route = router.current()
 			if (
@@ -2255,7 +2286,7 @@ function mountApplication() {
 				!presenting()
 			) {
 				changeMode("edit", true)
-				return
+				return presencePainted
 			}
 			let file = selection?.opened.file
 			let located = selection && library.folders.locate(selection.document)
@@ -2291,6 +2322,7 @@ function mountApplication() {
 					)
 				}
 				editor?.presence(library.live.presence.current(doc.id))
+				presencePainted = Boolean(editor)
 				presentation?.update()
 				let session = selection.opened.session
 				let failures = session.failures.current()
@@ -2357,7 +2389,7 @@ function mountApplication() {
 						selectedComment,
 					),
 				)
-				return
+				return presencePainted
 			}
 			updateTools(
 				html`<div class="tool-section">
@@ -2444,6 +2476,7 @@ function mountApplication() {
 						${tool("sign-in", "Sign in", "log-in")}${tool("sign-out", "Sign out", "log-out")}
 					</div>`,
 			)
+			return presencePainted
 		}
 
 		function updateTools(markup: Markup) {
@@ -2578,6 +2611,8 @@ function mountApplication() {
 			scheduleRefresh()
 		}
 		function requestPresenceRefresh() {
+			// Laser trails consume intermediate points; editor cursors need only the latest frame.
+			presentation?.presence()
 			presenceRefreshPending = true
 			scheduleRefresh()
 		}
@@ -2594,15 +2629,14 @@ function mountApplication() {
 					libraryRefreshPending = false
 					refreshLibrary()
 				}
-				if (refreshDocumentNow) refreshSafely()
-				if (refreshPresenceNow) refreshPresence(refreshDocumentNow)
+				let presencePainted = refreshDocumentNow && refreshSafely()
+				if (refreshPresenceNow) refreshPresence(presencePainted)
 			})
 		}
 		function refreshPresence(documentRefreshed: boolean) {
 			let people = library.live.presence.current(selection?.document ?? "")
 			if (!documentRefreshed) {
 				editor?.presence(people)
-				presentation?.presence()
 			}
 			let label = people.length
 				? "Editing with " +
@@ -2615,9 +2649,10 @@ function mountApplication() {
 		}
 		function refreshSafely() {
 			try {
-				refreshDocument()
+				return refreshDocument()
 			} catch (error) {
 				report(error)
+				return false
 			}
 		}
 		function requestAsset(
