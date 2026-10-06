@@ -1,6 +1,7 @@
 import {
 	assert,
 	browser,
+	browserBatch,
 	evaluate,
 	serverAddress,
 	wait,
@@ -8,10 +9,12 @@ import {
 
 let source = 'document.querySelector("alkalye-editor").source'
 let session = "editor-authoring-" + Date.now()
+let reader = session + "-reader"
 let server = Bun.spawn(["bun", "tests/browser-document-app.ts", "--serve"], {
 	stdout: "pipe",
 	stderr: "inherit",
 })
+let failed = false
 try {
 	let url = new URL("/app", await serverAddress(server.stdout)).href
 	console.log(url)
@@ -249,6 +252,151 @@ try {
 		"Mixed task selections toggle together and exclude the following unselected line",
 	)
 
+	fill("  - nested")
+	select(8)
+	browser(session, "press", "Control+Alt+q")
+	expect("  > nested")
+	assert(
+		evaluate(
+			session,
+			`${source}.selectionStart === 8 && ${source}.selectionEnd === 8`,
+		),
+		"Quote formatting preserves indentation and the caret",
+	)
+	browser(session, "press", "Control+Alt+q")
+	expect("  nested")
+	assert(
+		evaluate(
+			session,
+			`${source}.selectionStart === 6 && ${source}.selectionEnd === 6`,
+		),
+		"Removing a block prefix remaps the caret without selecting the line",
+	)
+	fill("**one** and **two**")
+	select(0, 7)
+	browser(session, "click", '#tools-format [data-action="clear"]')
+	expect("one and **two**")
+	assert(
+		evaluate(
+			session,
+			`${source}.selectionStart === 0 && ${source}.selectionEnd === 3`,
+		),
+		"Clear formatting only changes selected text",
+	)
+	browser(session, "press", "Control+z")
+	expect("**one** and **two**")
+	assert(true, "Scoped clear formatting participates in undo")
+	fill("## **bold** and _italic_ [label](https://example.com)")
+	select(0, "## **bold** and _italic_ [label](https://example.com)".length)
+
+	browser(session, "click", '#tools-format [data-action="clear"]')
+	expect("## bold and italic label")
+	assert(
+		true,
+		"Clear formatting keeps heading structure and removes underscore emphasis and links",
+	)
+	let nested =
+		"## [**bold _nested_**](https://example.com/a(b)) and ==yellow== `**literal**` ![alt](asset:image)"
+	fill(nested)
+	select(0, nested.length)
+	browser(session, "click", '#tools-format [data-action="clear"]')
+	expect("## bold nested and yellow **literal** alt")
+	assert(
+		true,
+		"Clear formatting handles nested labels, balanced destinations, highlights and literal code",
+	)
+	let literalControl = "\u00000\u0000 and `code`"
+	browserBatch(session, [["fill", "#editor", literalControl]])
+	expect(literalControl)
+	select(0, literalControl.length)
+	browser(session, "click", '#tools-format [data-action="clear"]')
+	expect("\u00000\u0000 and code")
+	assert(
+		true,
+		"Clear formatting preserves literal control characters instead of treating them as internal tokens",
+	)
+	let adjacentControl = "\u0000**\u0000**0\u0000**\u0000** and `code`"
+	browserBatch(session, [["fill", "#editor", adjacentControl]])
+	expect(adjacentControl)
+	select(0, adjacentControl.length)
+	browser(session, "click", '#tools-format [data-action="clear"]')
+	expect("\u0000\u00000\u0000\u0000 and code")
+	assert(
+		true,
+		"Clearing markup cannot turn newly adjacent control characters into internal tokens",
+	)
+	fill("**one** and **two**")
+	select(3)
+	browser(session, "click", '#tools-format [data-action="clear"]')
+	expect("**one** and **two**")
+	assert(
+		evaluate(
+			session,
+			`${source}.selectionStart === 3 && ${source}.selectionEnd === 3`,
+		),
+		"Clearing an unformatted current word inside markers preserves the original collapsed-selection behavior",
+	)
+	fill("**one** and **two**")
+	select(2, 5)
+	browser(session, "click", '#tools-format [data-action="clear"]')
+	expect("**one** and **two**")
+	assert(
+		evaluate(
+			session,
+			`${source}.selectionStart === 2 && ${source}.selectionEnd === 5`,
+		),
+		"A partial selection leaves surrounding and unselected formatting untouched",
+	)
+	fill("# Outline heading")
+	browser(session, "press", "Control+Shift+o")
+	wait(
+		session,
+		'document.querySelector("#dialog")?.open && document.querySelector("#dialog").textContent.includes("Document outline")',
+	)
+	assert(true, "The outline shortcut opens the outline dialog")
+	browser(session, "press", "Escape")
+	let id = evaluate(session, "location.pathname.match(/\\/doc\\/([^/]+)/)?.[1]")
+	if (typeof id !== "string") throw new Error("Missing current document ID")
+	fill(`[[${id}]]`)
+	select(5)
+	browser(session, "press", "Control+Space")
+	wait(
+		session,
+		'Boolean(document.querySelector("[data-context-menu]:popover-open"))',
+	)
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("[data-context-menu]:popover-open").textContent.includes("Open document")',
+		),
+		"The context-action shortcut opens the wikilink actions",
+	)
+	browser(session, "press", "Escape")
+	fill("![alt](asset:missing)")
+	select(4)
+	browser(session, "press", "Control+Space")
+	wait(
+		session,
+		'Boolean(document.querySelector("[data-context-menu]:popover-open"))',
+	)
+	assert(
+		evaluate(
+			session,
+			`${source}.selectionStart === 4 && ${source}.selectionEnd === 4`,
+		),
+		"The image context shortcut opens existing actions without replacing the selection",
+	)
+	browser(session, "press", "Escape")
+	fill("[[New linked note]]")
+	select(5)
+	browser(session, "press", "Control+Space")
+	wait(
+		session,
+		'!document.querySelector("#completion-menu").hidden && document.querySelector("#completion-menu").textContent.includes("Create document: New linked note")',
+	)
+	assert(true, "Unknown wikilinks reuse the creation completion flow")
+	browser(session, "press", "Escape")
+
 	fill("Hello")
 	select(0, 5)
 	evaluate(
@@ -299,14 +447,80 @@ try {
 	browser(session, "reload")
 	wait(session, `${source}?.value === ${JSON.stringify(saved)}`)
 	assert(true, "Authoring edits survive durable reopening")
+	fill("[[Read-only unfinished")
+	wait(
+		session,
+		'document.querySelector("#save-status").getAttribute("aria-busy") === "false" && document.querySelector("#save-status").dataset.pending === "0"',
+	)
+	browser(session, "click", '[data-action="share"]')
+	browser(session, "click", '[data-invite-role="reader"]')
+	wait(
+		session,
+		'Boolean(document.querySelector(".invitation-link input")?.value)',
+	)
+	let invitation = evaluate(
+		session,
+		'document.querySelector(".invitation-link input").value',
+	)
+	if (typeof invitation !== "string")
+		throw new Error("Missing reader invitation")
+	browser(reader, "open", invitation)
+	wait(reader, 'Boolean(document.querySelector("[data-invitation-accept]"))')
+	browser(reader, "click", "[data-invitation-accept]")
+	wait(
+		reader,
+		'document.querySelector("#editor")?.readOnly === true && document.querySelector("alkalye-editor").source.value === "[[Read-only unfinished"',
+	)
+	evaluate(
+		reader,
+		'document.querySelector("#editor").focus(); document.querySelector("alkalye-editor").source.setSelectionRange(21,21); true',
+	)
+	browser(reader, "press", "Control+Space")
+	assert(
+		evaluate(
+			reader,
+			'document.querySelector("#completion-menu").hidden && !document.querySelector("#editor").getAttribute("aria-activedescendant")',
+		),
+		"Reader context shortcuts cannot offer unlinked document creation",
+	)
+	browser(session, "press", "Escape")
+	fill("/")
+	wait(
+		session,
+		'document.querySelector("#save-status").getAttribute("aria-busy") === "false" && document.querySelector("#save-status").dataset.pending === "0"',
+	)
+	wait(reader, 'document.querySelector("alkalye-editor").source.value === "/"')
+	evaluate(
+		reader,
+		'document.querySelector("#editor").focus(); document.querySelector("alkalye-editor").source.setSelectionRange(1,1); true',
+	)
+	browser(reader, "press", "Control+Space")
+	assert(
+		evaluate(
+			reader,
+			'document.querySelector("#completion-menu").hidden && document.querySelector("alkalye-editor").source.value === "/"',
+		),
+		"Reader context shortcuts do not offer editing slash commands",
+	)
+} catch (error) {
+	failed = true
+	throw error
 } finally {
-	try {
-		browser(session, "close")
-	} finally {
-		server.kill()
-		await server.exited
+	let failures: unknown[] = []
+	for (let peer of [session, reader]) {
+		try {
+			browser(peer, "close")
+		} catch (error) {
+			failures.push(error)
+			console.error(error)
+		}
 	}
+	server.kill()
+	await server.exited
+	if (!failed && failures.length)
+		throw new AggregateError(failures, "Browser cleanup failed")
 }
+
 function fill(text: string) {
 	browser(session, "fill", "#editor", text)
 	expect(text)

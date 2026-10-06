@@ -39,6 +39,22 @@ export function formatSelection(
 			selection: { start: urlStart, end: urlStart + 3 },
 		}
 	}
+	if (command === "clear") {
+		if (start === end) {
+			while (start > 0 && /[\p{L}\p{N}_]/u.test(source[start - 1] ?? ""))
+				start--
+			while (end < source.length && /[\p{L}\p{N}_]/u.test(source[end] ?? ""))
+				end++
+			if (start === end) ({ start, end } = lineBounds(source, selection))
+		}
+		let selected = source.slice(start, end),
+			plain = plainInline(selected)
+		return {
+			source: source.slice(0, start) + plain + source.slice(end),
+			selection:
+				plain === selected ? selection : { start, end: start + plain.length },
+		}
+	}
 	let wrappers: Record<string, [string, string]> = {
 		bold: ["**", "**"],
 		italic: ["*", "*"],
@@ -102,41 +118,126 @@ export function formatSelection(
 							: command === "ordered"
 								? "1. "
 								: ""
-	let remove = lines.every(line => line.startsWith(prefix))
+	let remove = lines.every(line => line.trimStart().startsWith(prefix))
 	let checkAll = lines.some(line => /^\s*[-*+]\s+\[ \]/.test(line))
+	let offsets: { start: number; removed: number; inserted: number }[] = []
+	let offset = start
 	let transformed = lines
 		.map((line, index) => {
+			let indent = line.match(/^[ \t]*/)?.[0] ?? ""
+			let body = line.slice(indent.length)
 			if (command === "complete")
 				return line.replace(
 					/^(\s*[-*+]\s+)\[[ xX]\]/,
 					(_, prefix: string) => prefix + (checkAll ? "[x]" : "[ ]"),
 				)
-			if (command === "body")
-				return line.replace(
-					/^(\s*)(?:#{1,6}\s+|>\s?|[-*+]\s+(?:\[[ xX]\]\s+)?|\d+[.)]\s+)/,
-					"$1",
-				)
-			if (command === "clear")
-				return line
-					.replace(
-						/^\s*(#{1,6}\s+|[-*+]\s+(?:\[[ xX]\]\s+)?|\d+\.\s+|>\s+)/,
-						"",
-					)
-					.replace(/(\*\*|__|~~|`|\*)(.+?)\1/g, "$2")
-			let body = line.replace(
-				/^\s*(#{1,6}\s+|[-*+]\s+(?:\[[ xX]\]\s+)?|\d+\.\s+|>\s+)/,
-				"",
-			)
-			return remove
-				? body
-				: (command === "ordered" ? `${index + 1}. ` : prefix) + body
+			let previous =
+				body.match(
+					/^(?:#{1,6}\s+|>\s?|[-*+]\s+(?:\[[ xX]\]\s+)?|\d+[.)]\s+)/,
+				)?.[0] ?? ""
+			let next =
+				command === "body" || remove
+					? ""
+					: command === "ordered"
+						? `${index + 1}. `
+						: prefix
+			offsets.push({
+				start: offset + indent.length,
+				removed: previous.length,
+				inserted: next.length,
+			})
+			offset += line.length + 1
+			return indent + next + body.slice(previous.length)
 		})
 		.join("\n")
+	function mapped(position: number) {
+		let shift = 0
+		for (let edit of offsets) {
+			if (position < edit.start) break
+			if (position < edit.start + edit.removed)
+				return edit.start + shift + edit.inserted
+			shift += edit.inserted - edit.removed
+		}
+		return position + shift
+	}
 	return {
 		source: source.slice(0, start) + transformed + source.slice(end),
-		selection: { start, end: start + transformed.length },
+		selection: { start: mapped(selection.start), end: mapped(selection.end) },
 	}
 }
+
+function plainInline(source: string): string {
+	let held: string[] = [],
+		occupied = new Set(source),
+		delimiter: string | undefined
+	for (let point = 0xe000; point <= 0xf8ff; point++) {
+		let candidate = String.fromCharCode(point)
+		if (!occupied.has(candidate)) {
+			delimiter = candidate
+			break
+		}
+	}
+	if (!delimiter) return source
+	let placeholder = new RegExp(`${delimiter}(\\d+)${delimiter}`, "g")
+	function hold(text: string) {
+		held.push(text)
+		return `${delimiter}${held.length - 1}${delimiter}`
+	}
+	let text = source.replace(/\\[\\`*{}\[\]()#+.!_>~=-]/g, match => hold(match))
+	text = text.replace(
+		/(`+)([\s\S]*?)\1/g,
+		(_match, _marker: string, content: string) => hold(content),
+	)
+	let result = ""
+	for (let index = 0; index < text.length; index++) {
+		let image = text[index] === "!" && text[index + 1] === "["
+		let open = image ? index + 1 : index
+		if (text[open] === "[" && text[open + 1] !== "[") {
+			let close = closingDelimiter(text, open, "[", "]")
+			let destination =
+				close >= 0 && text[close + 1] === "("
+					? closingDelimiter(text, close + 1, "(", ")")
+					: -1
+			if (destination >= 0) {
+				result += plainInline(text.slice(open + 1, close))
+				index = destination
+				continue
+			}
+		}
+		result += text[index]
+	}
+	text = result
+	for (let previous = ""; previous !== text;) {
+		previous = text
+		text = text
+			.replace(/(\*\*|__|~~|==)(?=\S)([\s\S]*?\S)\1/g, "$2")
+			.replace(/\*([^*\n]+)\*/g, "$1")
+			.replace(/(^|[^\p{L}\p{N}_])_([^_\n]+)_(?=[^\p{L}\p{N}_]|$)/gu, "$1$2")
+	}
+	for (let pass = 0; pass <= held.length; pass++) {
+		let restored = text.replace(
+			placeholder,
+			(match, index: string) => held[Number(index)] ?? match,
+		)
+		if (restored === text) break
+		text = restored
+	}
+	return text
+}
+function closingDelimiter(
+	source: string,
+	start: number,
+	open: string,
+	close: string,
+) {
+	let depth = 0
+	for (let index = start; index < source.length; index++) {
+		if (source[index] === open) depth++
+		if (source[index] === close && --depth === 0) return index
+	}
+	return -1
+}
+
 export function sortTasks(source: string): string {
 	let lines = source.split("\n"),
 		result: string[] = [],

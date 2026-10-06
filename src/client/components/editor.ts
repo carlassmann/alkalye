@@ -797,16 +797,21 @@ function createEditorView(
 		insert((before && !before.endsWith("\n") ? "\n" : "") + "```\n\n```")
 		text.setSelectionRange(text.selectionEnd - 4, text.selectionEnd - 4)
 	}
-	function openEditorMenu(event: MouseEvent, sourcePosition?: number) {
+	function openEditorMenu(
+		event: MouseEvent,
+		sourcePosition?: number,
+		keyboard = false,
+	) {
 		// Alt, touch and IME composition keep the browser menu for spelling,
 		// selection handles and candidate pickers.
 		if (
-			event.altKey ||
 			composing ||
 			!inSync() ||
-			matchMedia("(pointer: coarse)").matches ||
-			Date.now() - lastTouch < 2000 ||
-			(event instanceof PointerEvent && event.pointerType === "touch")
+			(!keyboard &&
+				(event.altKey ||
+					matchMedia("(pointer: coarse)").matches ||
+					Date.now() - lastTouch < 2000 ||
+					(event instanceof PointerEvent && event.pointerType === "touch")))
 		)
 			return
 		let clicked = sourcePosition ?? clickedOffset(event)
@@ -1128,10 +1133,58 @@ function createEditorView(
 			if (atom.id === id) return offset
 		}
 	}
+	function contextAction() {
+		if (!proseAt(text.value, text.selectionStart)) return false
+		let context = editorContext(text.value, text.selectionStart)
+
+		if (context.wiki || context.image) {
+			if (
+				context.wiki &&
+				!options
+					.documents()
+					.some(doc => doc.id === context.wiki || doc.title === context.wiki)
+			) {
+				if (!editable) return false
+				let close = text.value.indexOf("]]", text.selectionStart)
+				if (close >= 0) text.setSelectionRange(close, close)
+				showCompletions()
+				return !menu.hidden
+			}
+			let location = point(textarea.selectionStart),
+				range = document.createRange()
+			range.setStart(location.node, location.offset)
+			range.collapse(true)
+			let bounds = range.getBoundingClientRect()
+			openEditorMenu(
+				new MouseEvent("contextmenu", {
+					clientX: bounds.left,
+					clientY: bounds.bottom,
+				}),
+				text.selectionStart,
+				true,
+			)
+			return true
+		}
+		if (!editable) return false
+		showCompletions()
+		return !menu.hidden
+	}
 	function editorKeydown(event: KeyboardEvent) {
 		if (!(event.currentTarget instanceof HTMLTextAreaElement)) return
 		if (event.isComposing || composing) return
 		let editor = text
+		if (
+			event.ctrlKey &&
+			!event.metaKey &&
+			!event.altKey &&
+			!event.shiftKey &&
+			(event.code === "Space" || event.key === " ") &&
+			contextAction()
+		) {
+			event.preventDefault()
+			event.stopPropagation()
+			return
+		}
 		rawPaste =
 			(event.metaKey || event.ctrlKey) &&
 			event.shiftKey &&
@@ -1320,6 +1373,7 @@ function createEditorView(
 			slash = before.match(/(?:^|\n)\/([\w -]*)$/)
 		completionItems = []
 		if (
+			!editable ||
 			!proseAt(editor.value, editor.selectionStart) ||
 			secondarySelections.length
 		) {
@@ -1430,6 +1484,7 @@ function createEditorView(
 	}
 
 	function chooseCompletion(index: number) {
+		if (!editable || composing || listeners.signal.aborted || !inSync()) return
 		let editor = text,
 			item = completionItems[index]
 		if (!item) return
@@ -1865,7 +1920,12 @@ function editorContext(source: string, offset: number) {
 		url: image ? undefined : (link?.[1] ?? link?.[2]),
 		image:
 			image && image[2] && safeUrl(image[2]) !== "#"
-				? { url: image[2], alt: image[1] ?? "" }
+				? {
+						url: image[2],
+						alt: image[1] ?? "",
+						start: start + image.index,
+						end: start + image.index + image[0].length,
+					}
 				: undefined,
 		wiki: wiki && (wiki[1] ?? "").split("|")[0],
 		task: /^\s*[-*+] \[[ xX]\]/.test(line),
