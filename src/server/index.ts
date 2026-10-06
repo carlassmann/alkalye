@@ -103,6 +103,7 @@ function serve() {
 			cipher: application.cipher,
 			mcp: application.mcp,
 			documents: application.documents,
+			liveSessions: application.liveSessions,
 		}
 	})
 }

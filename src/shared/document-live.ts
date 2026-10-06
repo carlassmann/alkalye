@@ -67,3 +67,25 @@ export let LiveServerMessageSchema = Schema.Union([
 	}),
 ])
 export type LiveServerMessage = typeof LiveServerMessageSchema.Type
+export type LiveClientMessage = typeof LiveClientMessageSchema.Type
+
+let pollAccount = Schema.String.check(Schema.isMaxLength(100))
+let pollSession = Schema.String.check(Schema.isMaxLength(100))
+export let livePollWait = 20_000
+export let LivePollRequestSchema = Schema.Struct({
+	account: pollAccount,
+	session: Schema.optional(pollSession),
+})
+export let LiveSendRequestSchema = Schema.Struct({
+	account: pollAccount,
+	session: pollSession,
+	messages: Schema.Array(LiveClientMessageSchema).check(Schema.isMaxLength(32)),
+})
+export let LiveCloseRequestSchema = Schema.Struct({
+	account: pollAccount,
+	session: pollSession,
+})
+export let LivePollResponseSchema = Schema.Struct({
+	session: pollSession,
+	messages: Schema.Array(LiveServerMessageSchema),
+})

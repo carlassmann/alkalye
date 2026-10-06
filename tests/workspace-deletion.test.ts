@@ -1,14 +1,11 @@
 import { afterAll, beforeAll, expect, test } from "bun:test"
 import { Database } from "bun:sqlite"
 import { mkdtemp, rm } from "node:fs/promises"
-import { createConnection } from "node:net"
-import type { Socket } from "node:net"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import type * as Crypto from "effect/Crypto"
 import * as Effect from "effect/Effect"
 import * as Redacted from "effect/Redacted"
-import * as Schema from "effect/Schema"
 import * as HttpApiClient from "effect/http-api/HttpApiClient"
 import * as FetchHttpClient from "effect/http/FetchHttpClient"
 import * as HttpClient from "effect/http/HttpClient"
@@ -16,13 +13,13 @@ import * as HttpClientRequest from "effect/http/HttpClientRequest"
 import { Signatures } from "../src/platform/signatures"
 import { webCryptoLayer } from "../src/platform/web-crypto"
 import { startServer } from "../src/server/index"
-import { ChallengeSchema } from "../src/shared/authentication"
 import { encode } from "../src/shared/base64"
 import { Replica } from "../src/shared/crdt"
 import { buildAction, restoreSnapshot } from "../src/shared/document-actions"
 import { DocumentApi } from "../src/shared/document-api"
 import { newDocument } from "../src/shared/documents"
 import { invitationDigest, invitationSecret } from "../src/shared/invitations"
+import { cookieLogin, liveSocket as openLiveSocket } from "./live-fixture"
 
 let directory = await mkdtemp(join(tmpdir(), "alkalye-workspace-deletion-"))
 let instance: Effect.Success<ReturnType<typeof startServer>>
@@ -452,124 +449,9 @@ function client(seed: number, base = instance.server.url) {
 	})
 }
 async function liveSocket(seed: number, subject: string) {
-	let base = instance.server.url
-	let identity = await run(
-		Signatures.use(signatures =>
-			signatures.account(Redacted.make(encode(new Uint8Array(32).fill(seed)))),
-		),
-	)
-	let issued = await post(base, "/api/accounts/challenge", {
-		publicKey: identity.publicKey,
-		purpose: "cookie",
-	})
-	let challenge = Schema.decodeUnknownSync(ChallengeSchema)(await issued.json())
-	let signature = await Effect.runPromise(
-		identity.signAuthentication(challenge, {
-			origin: base.origin,
-			purpose: "cookie",
-		}),
-	)
-	let login = await post(base, "/api/accounts/browser-session", {
-		id: challenge.id,
-		publicKey: identity.publicKey,
-		signature,
-	})
-	expect(login.status).toBe(200)
-	let cookie = login.headers.get("set-cookie")?.split(";")[0] ?? ""
-	return upgrade(base, subject, cookie)
-}
-// Bun's WebSocket client cannot send cookies, so this speaks the protocol's
-// few frames the live channel uses: short unmasked text from the server.
-function upgrade(base: URL, subject: string, cookie: string) {
-	return new Promise<{
-		send: (message: unknown) => void
-		next: () => Promise<unknown>
-		close: () => void
-	}>((resolve, reject) => {
-		let buffer = Buffer.alloc(0)
-		let upgraded = false
-		let queued: unknown[] = []
-		let waiting: ((message: unknown) => void)[] = []
-		let socket: Socket = createConnection(
-			{ host: base.hostname, port: Number(base.port) },
-			() =>
-				socket.write(
-					[
-						`GET /api/live?account=${encodeURIComponent(subject)} HTTP/1.1`,
-						`Host: ${base.host}`,
-						`Origin: ${base.origin}`,
-						`Cookie: ${cookie}`,
-						"Connection: Upgrade",
-						"Upgrade: websocket",
-						"Sec-WebSocket-Version: 13",
-						"Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==",
-						"",
-						"",
-					].join("\r\n"),
-				),
-		)
-		socket.on("error", reject)
-		socket.on("data", (bytes: Buffer) => {
-			buffer = Buffer.concat([buffer, bytes])
-			if (!upgraded) {
-				let end = buffer.indexOf("\r\n\r\n")
-				if (end < 0) return
-				let head = buffer.subarray(0, end).toString()
-				if (!head.includes(" 101 ")) return reject(new Error(head))
-				upgraded = true
-				buffer = buffer.subarray(end + 4)
-				resolve({ send, next, close: () => socket.destroy() })
-			}
-			while (buffer.length >= 2) {
-				let length = buffer.readUInt8(1) & 0x7f
-				let offset = 2
-				if (length === 126) {
-					if (buffer.length < 4) return
-					length = buffer.readUInt16BE(2)
-					offset = 4
-				}
-				if (buffer.length < offset + length) return
-				let payload = buffer.subarray(offset, offset + length).toString()
-				let opcode = buffer.readUInt8(0) & 0x0f
-				buffer = buffer.subarray(offset + length)
-				if (opcode !== 1) continue
-				let message: unknown = JSON.parse(payload)
-				let waiter = waiting.shift()
-				if (waiter) waiter(message)
-				else queued.push(message)
-			}
-		})
-		function send(message: unknown) {
-			let payload = Buffer.from(JSON.stringify(message))
-			// A zero mask leaves the payload unchanged.
-			socket.write(
-				Buffer.concat([
-					Buffer.from([0x81, 0x80 | payload.length, 0, 0, 0, 0]),
-					payload,
-				]),
-			)
-		}
-		function next() {
-			if (queued.length) return Promise.resolve(queued.shift())
-			return new Promise<unknown>((resolve, reject) => {
-				let timeout = setTimeout(
-					() => reject(new Error("No live message")),
-					5000,
-				)
-				waiting.push(message => {
-					clearTimeout(timeout)
-					resolve(message)
-				})
-			})
-		}
-	})
-}
-function post(base: URL, path: string, body: unknown) {
-	return fetch(new URL(path, base), {
-		method: "POST",
-		headers: { origin: base.origin, "content-type": "application/json" },
-		body: JSON.stringify(body),
-	})
+	let login = await cookieLogin(instance.server.url, seed)
+	expect(login.subject).toBe(subject)
+	return openLiveSocket(login)
 }
 function createWorkspace(owner: Client, workspace: string, name: string) {
 	return owner.api.workspaces.create({

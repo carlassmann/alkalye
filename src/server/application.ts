@@ -5,7 +5,6 @@ import * as Context from "effect/Context"
 import * as Effect from "effect/Effect"
 import * as FiberSet from "effect/FiberSet"
 import * as Layer from "effect/Layer"
-import * as Semaphore from "effect/Semaphore"
 import { resolve, sep } from "node:path"
 import { Cipher } from "../platform/cipher"
 import { promise } from "../platform/effects"
@@ -41,38 +40,27 @@ function makeApplication() {
 		let cipher = yield* Cipher
 		let settings = yield* RelaySettings
 		let runMessage = yield* FiberSet.makeRuntime<HttpClient.HttpClient>()
-		let inbound = new WeakMap<
-			ServerWebSocket<Connection>,
-			Semaphore.Semaphore
-		>()
 		let mcp = yield* AgentCredentials
 		let documents = yield* makeDocuments()
 		let handleMcp = yield* makeMcpHandler(mcp, documents, settings.publicOrigin)
 		let oauth = new OAuth(database.oauth, mcp, cipher, settings.publicOrigin)
 		yield* startOAuthMaintenance(database.oauth.cleanup())
 		let dist = settings.assets
-		function messages(socket: ServerWebSocket<Connection>) {
-			let gate = inbound.get(socket)
-			if (!gate) {
-				gate = Semaphore.makeUnsafe(1)
-				inbound.set(socket, gate)
-			}
-			return gate
-		}
 		function handleRequest(request: Request, server: Server<Connection>) {
 			return Effect.gen(function* () {
 				let url = new URL(request.url)
 				let origin = request.headers.get("Origin")
 				if (origin && origin !== (settings.publicOrigin || url.origin))
 					return Response.json({ error: "Invalid origin" }, { status: 403 })
-				if (url.pathname === "/api/live") {
+				if (
+					url.pathname === "/api/live" ||
+					url.pathname.startsWith("/api/live/")
+				) {
 					if (origin !== (settings.publicOrigin || url.origin))
 						return new Response("Invalid origin", { status: 403 })
-					return yield* live.upgrade(
-						request,
-						server,
-						settings.publicOrigin || url.origin,
-					)
+					return yield* (
+						url.pathname === "/api/live" ? live.upgrade : live.poll
+					)(request, server, settings.publicOrigin || url.origin)
 				}
 				if (
 					url.pathname.startsWith("/api/accounts/") ||
@@ -163,6 +151,7 @@ function makeApplication() {
 			cipher,
 			mcp,
 			documents,
+			liveSessions: live.polling,
 			handleRequest,
 			websocket: {
 				maxPayloadLength: 8192,
@@ -172,10 +161,10 @@ function makeApplication() {
 					live.open(socket)
 				},
 				message(socket: ServerWebSocket<Connection>, data: string | Buffer) {
-					runMessage(messages(socket).withPermit(live.message(socket, data)))
+					runMessage(live.message(socket, data))
 				},
 				close(socket: ServerWebSocket<Connection>) {
-					runMessage(messages(socket).withPermit(live.close(socket)))
+					runMessage(live.close(socket))
 				},
 			},
 		}

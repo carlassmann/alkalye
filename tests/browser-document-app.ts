@@ -32,10 +32,23 @@ if (process.argv.includes("--serve")) {
 	let snapshotAborted = false
 	let pauseFonts = false
 	let resumeFonts: Array<() => void> = []
+	let blockedSockets = 0
+	let polls = 0
 	let proxy = Bun.serve({
 		port: 0,
+		// Live long polls wait longer than Bun's default idle timeout.
+		idleTimeout: 60,
 		async fetch(request) {
 			let url = new URL(request.url)
+			if (url.pathname === "/__tests/live")
+				return Response.json({ blockedSockets, polls })
+			// Pages that opt in reach the live socket through this proxy,
+			// which refuses upgrades like a restrictive corporate proxy.
+			if (url.pathname === "/api/live") {
+				blockedSockets++
+				return new Response("WebSocket blocked by proxy", { status: 403 })
+			}
+			if (url.pathname === "/api/live/poll") polls++
 			if (url.pathname === "/__tests/fonts") {
 				pauseFonts = url.searchParams.get("pause") === "true"
 				if (!pauseFonts) for (let resume of resumeFonts.splice(0)) resume()
@@ -95,7 +108,17 @@ if (process.argv.includes("--serve")) {
 				let markup = await response.text()
 				let instrumentation =
 					'<script>if (localStorage.getItem("native-preferences-offline")) Object.defineProperty(navigator, "onLine", {value:false, configurable:true})</script>' +
-					`<script>window.WebSocket = class extends WebSocket { constructor(url, protocols) { let target = new URL(url); if (target.pathname === "/api/live") target.port = "${instance.server.port}"; super(target.href, protocols) } }</script>` +
+					`<script>
+					window.liveSocketConnections = 0;
+					window.WebSocket = class extends WebSocket {
+						constructor(url, protocols) {
+							let target = new URL(url);
+							if (target.pathname === "/api/live" && !localStorage.getItem("live-websocket-blocked")) target.port = "${instance.server.port}";
+							super(target.href, protocols);
+							if (target.pathname === "/api/live") this.addEventListener("open", () => window.liveSocketConnections++);
+						}
+					};
+					</script>` +
 					'<script>let originalFetch = fetch; window.fetch = function(input, init) { let url = new URL(input instanceof Request ? input.url : String(input), location.origin); if (url.pathname === "/api/documents/never-answer/snapshot") { window.snapshotStarted = (window.snapshotStarted ?? 0) + 1; init.signal.addEventListener("abort", () => { window.snapshotAborted = true }, {once:true}) }; return originalFetch(input, init) }</script>'
 				return new Response(
 					markup.replace("</head>", instrumentation + "</head>"),

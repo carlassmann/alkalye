@@ -15,7 +15,7 @@ Local-first PWA built from TypeScript, HTML and CSS. Bun provides the server, bu
 
 - **Browser:** native DOM, textarea editing with syntax overlay, Shadow DOM previews
 - **Data:** operation-based text CRDT and metadata registers in IndexedDB
-- **Sync:** Bun WebSocket relay, durable SQLite operation log
+- **Sync:** Bun WebSocket relay with HTTP long-poll fallback, durable SQLite operation log
 - **Privacy:** Web Crypto AES-GCM, scoped bearer capabilities
 - **PWA:** handwritten service worker, manifest, offline app shell
 - **Agents:** native JSON-RPC MCP, OAuth authorization code with PKCE

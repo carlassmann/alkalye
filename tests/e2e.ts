@@ -30,6 +30,8 @@ for (let path of [
 	"tests/browser-laser-displays.ts",
 	"tests/browser-workspace-avatars.ts",
 	"tests/browser-whiteboard.ts",
+	"tests/browser-live-polling.ts",
+	"tests/browser-live-network-fallback.ts",
 ]) {
 	let test = Bun.spawn(["bun", path], {
 		stdout: "inherit",

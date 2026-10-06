@@ -8,6 +8,7 @@ import { resolve } from "node:path"
 import { build } from "../../build"
 import { promise } from "../platform/effects"
 import { Cipher } from "../platform/cipher"
+import { livePollWait } from "../shared/document-live"
 
 export interface ServerOptions {
 	port?: number
@@ -17,6 +18,7 @@ export interface ServerOptions {
 	build?: boolean
 	development?: boolean
 	publicOrigin?: string
+	livePollWait?: number
 }
 export interface Settings {
 	port: number
@@ -26,6 +28,7 @@ export interface Settings {
 	build: boolean
 	development: boolean
 	publicOrigin: string | undefined
+	livePollWait: number
 	resetLog: boolean
 }
 export class RelaySettings extends Context.Service<RelaySettings, Settings>()(
@@ -60,6 +63,10 @@ export class RelaySettings extends Context.Service<RelaySettings, Settings>()(
 					publicOrigin:
 						options.publicOrigin ??
 						Option.getOrUndefined(Option.map(publicOrigin, url => url.origin)),
+					livePollWait: Math.max(
+						1,
+						Math.min(options.livePollWait ?? livePollWait, livePollWait),
+					),
 					resetLog,
 				}
 			}),
