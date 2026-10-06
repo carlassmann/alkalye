@@ -34,7 +34,7 @@ export function attachmentsMarkup(
 								${icon("plus")}
 							</button>
 							<div id="asset-add-menu" class="menu-popover" popover role="menu">
-								${canDraw ? action("new-whiteboard", "New whiteboard", "pen-tool") : ""}${action("asset", "Upload or import", "upload")}
+								${canDraw ? action("new-whiteboard", "New whiteboard", "pen-tool") : ""}${action("asset-upload", "Upload or import", "upload")}
 							</div></alkalye-menu
 						>`
 					: ""

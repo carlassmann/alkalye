@@ -2006,7 +2006,13 @@ function mountApplication() {
 			refreshDocument()
 			finishOpening()
 		}
-		function openDrawing(selected: Selection, id: string, create = false) {
+		function openDrawing(
+			selected: Selection,
+			id: string,
+			create = false,
+			captured?: AttachmentSelection,
+		) {
+			let inserted = false
 			return Effect.gen(function* () {
 				let fields = selected.opened.session.replica.fields(id)
 				if (
@@ -2053,9 +2059,8 @@ function mountApplication() {
 										message: "This document is read-only",
 									}),
 								)
-							return session.change(
-								embed ? "Embed drawing" : "Draw",
-								staged => {
+							return session
+								.change(embed ? "Embed drawing" : "Draw", staged => {
 									let changes =
 										staged.fields(board).type === "whiteboard"
 											? []
@@ -2070,18 +2075,36 @@ function mountApplication() {
 									)
 									if (
 										embed &&
-										!staged.text(selected.document).includes(`asset:${board}`)
+										!inserted &&
+										(captured ||
+											!staged
+												.text(selected.document)
+												.includes(`asset:${board}`))
 									) {
+										let source = captured
+											? captured.atoms.map(atom => atom.value).join("")
+											: staged.text(selected.document)
+										let reference = `![Whiteboard](asset:${board})`
 										let edit = staged.edit(
 											selected.document,
-											staged.text(selected.document) +
-												`\n![Whiteboard](asset:${board})\n`,
+											captured
+												? source.slice(0, captured.start) +
+														reference +
+														source.slice(captured.end)
+												: source + `\n${reference}\n`,
+											captured?.atoms,
 										)
 										if (edit) changes.push(edit)
 									}
 									return changes
-								},
-							)
+								})
+								.pipe(
+									Effect.tap(() =>
+										Effect.sync(() => {
+											if (embed) inserted = true
+										}),
+									),
+								)
 						},
 					},
 				})
@@ -2539,13 +2562,109 @@ function mountApplication() {
 				report(error)
 			}
 		}
-		function requestAsset(selected: Selection) {
+		function requestAsset(
+			selected: Selection,
+			kind: "media" | "whiteboard" = "media",
+		) {
 			if (selection !== selected || !writable()) return
-			let captured = editor?.attachmentSelection()
-			if (mode === "edit" && !captured)
+			let range = editor?.mediaSelection()
+			if (mode === "edit" && !range)
 				return report("Finish editing before attaching a file")
-			fileTarget = { selected, captured }
-			assetInput.click()
+			let captured = range && {
+				...range,
+				atoms: range.atoms.map(atom => ({ ...atom })),
+				inline: true,
+			}
+			launch(
+				Effect.gen(function* () {
+					let { openMediaPicker } = yield* Effect.tryPromise(
+						() => import("./components/media-picker"),
+					)
+					if (selection !== selected || !writable()) return
+					dialogOwner = selected
+					let choices = [
+						...selected.opened.assets.current().flatMap(asset => {
+							let type = blobContentType(asset.fields.data ?? "") ?? ""
+							if (!/^(image|video|audio)\//.test(type)) return []
+							let kind: "image" | "video" | "audio" = type.startsWith("video/")
+								? "video"
+								: type.startsWith("audio/")
+									? "audio"
+									: "image"
+							return [
+								{ id: asset.id, name: asset.fields.name ?? "Asset", kind },
+							]
+						}),
+						...selected.opened.session.replica
+							.records("whiteboard")
+							.filter(
+								board =>
+									!selected.opened.file &&
+									board.fields.document === selected.document,
+							)
+							.map(board => {
+								let kind: "whiteboard" = "whiteboard"
+								return {
+									id: board.id,
+									name: board.fields.name || "Whiteboard",
+									kind,
+								}
+							}),
+					]
+					function run(command: Effect.Effect<unknown, unknown>) {
+						return selected.tasks.run(
+							Effect.suspend(() =>
+								selection === selected && writable()
+									? command
+									: Effect.fail(
+											new PermissionDenied({
+												message: "This document is read-only",
+											}),
+										),
+							),
+						)
+					}
+					openMediaPicker({
+						dialog,
+						choices,
+						kind,
+						canDraw: !selected.opened.file,
+						report,
+						select: id => run(selected.opened.assets.insert(id, captured)),
+						link: url =>
+							run(
+								selected.opened.assets.link(
+									[
+										{
+											source: new URL(url).href.replace(/[()]/g, character =>
+												character === "(" ? "%28" : "%29",
+											),
+											name: "Media",
+										},
+									],
+									captured,
+								),
+							),
+						upload: () => {
+							if (selection !== selected || !writable()) return
+							fileTarget = { selected, captured }
+							assetInput.click()
+						},
+						createDrawing: () =>
+							launch(
+								random.randomUUIDv4.pipe(
+									Effect.flatMap(id =>
+										openDrawing(selected, id, true, captured),
+									),
+								),
+							),
+						closed: () => {
+							if (selection === selected && mode === "edit")
+								editor?.source?.focus()
+						},
+					})
+				}),
+			)
 		}
 		function attachFiles(
 			selected: Selection,
@@ -2662,7 +2781,7 @@ function mountApplication() {
 					return
 				}
 				if (action === "image") {
-					editor?.format("image")
+					if (selection) requestAsset(selection)
 					return
 				}
 				if (action === "wikilink") {
@@ -3625,7 +3744,16 @@ function mountApplication() {
 								return
 							}
 							if (!writable()) return
-							if (action === "asset") {
+							if (action === "asset-upload") {
+								fileTarget = {
+									selected,
+									captured: editor?.attachmentSelection(),
+								}
+								assetInput.click()
+								return
+							}
+
+							if (action === "asset" || action === "image") {
 								requestAsset(selected)
 								return
 							}

@@ -4,6 +4,7 @@ import * as FiberSet from "effect/FiberSet"
 import { proseAt, typingEdit } from "../../shared/typing"
 import { editLines, indentSelections, lineBounds } from "../../shared/lines"
 import { selectionAnchor } from "../../shared/documents"
+import { expandSelections } from "../../shared/selection"
 import { setMarkup } from "../dom"
 import {
 	html,
@@ -21,6 +22,7 @@ import { icon } from "../icons"
 import type { IconName } from "../icons"
 
 import { formatSelection, sortTasks } from "../../shared/authoring"
+import { codeLanguageCompletions } from "../../shared/completions"
 import {
 	escape,
 	frontmatterBlock,
@@ -37,6 +39,8 @@ import type {
 	Presence,
 } from "../../shared/model"
 import type { EditorPreferences } from "../../shared/preferences"
+let lastCodeLanguage = ""
+
 export interface EditorOptions {
 	isDrawing(id: string): boolean
 	openDrawing(id: string): void
@@ -142,6 +146,9 @@ export class EditorElement extends HTMLElement {
 	attachmentSelection() {
 		return this.view?.attachmentSelection()
 	}
+	mediaSelection() {
+		return this.view?.mediaSelection()
+	}
 	selectionAnchor() {
 		return this.view?.selectionAnchor()
 	}
@@ -204,6 +211,8 @@ function createEditorView(
 	let completionIndex = 0
 	let completionItems: {
 		label: string
+		detail?: string
+		language?: boolean
 		start: number
 		end: number
 		value: string
@@ -214,6 +223,11 @@ function createEditorView(
 		end: number
 		direction?: "forward" | "backward" | "none"
 		goalX?: number
+	}[] = []
+	let expansionHistory: {
+		source: string
+		before: ReturnType<typeof selectedRanges>
+		after: ReturnType<typeof selectedRanges>
 	}[] = []
 	let primaryGoalX: number | undefined
 	let text = new SourceTextarea(textarea, options.content, {
@@ -413,6 +427,15 @@ function createEditorView(
 		presence,
 		preferences,
 		selectRange,
+		mediaSelection() {
+			if (composing || !inSync()) return
+			let image = editorContext(text.value, text.selectionStart).image
+			return {
+				atoms,
+				start: image?.start ?? text.selectionStart,
+				end: image?.end ?? text.selectionEnd,
+			}
+		},
 		attachmentSelection() {
 			if (composing || !inSync()) return
 			return {
@@ -718,6 +741,7 @@ function createEditorView(
 		cancelAnimationFrame(paintFrame)
 		paintFrame = requestAnimationFrame(paintActiveLine)
 		let editor = text
+
 		if (!secondarySelections.length) {
 			let { text: view, links } = editor.projection
 			setMarkup(
@@ -792,9 +816,14 @@ function createEditorView(
 		editor.dispatchEvent(new Event("input", { bubbles: true }))
 	}
 	function insertCodeBlock() {
-		if (!editable) return
+		if (!editable || composing || listeners.signal.aborted || !inSync()) return
 		let before = text.value.slice(0, text.selectionStart)
-		insert((before && !before.endsWith("\n") ? "\n" : "") + "```\n\n```")
+		insert(
+			(before && !before.endsWith("\n") ? "\n" : "") +
+				"```" +
+				lastCodeLanguage +
+				"\n\n```",
+		)
 		text.setSelectionRange(text.selectionEnd - 4, text.selectionEnd - 4)
 	}
 	function openEditorMenu(
@@ -1136,6 +1165,10 @@ function createEditorView(
 	function contextAction() {
 		if (!proseAt(text.value, text.selectionStart)) return false
 		let context = editorContext(text.value, text.selectionStart)
+		if (context.image && editable) {
+			options.requestAsset()
+			return true
+		}
 
 		if (context.wiki || context.image) {
 			if (
@@ -1147,7 +1180,7 @@ function createEditorView(
 				if (!editable) return false
 				let close = text.value.indexOf("]]", text.selectionStart)
 				if (close >= 0) text.setSelectionRange(close, close)
-				showCompletions()
+				showCompletions(true)
 				return !menu.hidden
 			}
 			let location = point(textarea.selectionStart),
@@ -1166,13 +1199,26 @@ function createEditorView(
 			return true
 		}
 		if (!editable) return false
-		showCompletions()
+		showCompletions(true)
 		return !menu.hidden
 	}
 	function editorKeydown(event: KeyboardEvent) {
 		if (!(event.currentTarget instanceof HTMLTextAreaElement)) return
 		if (event.isComposing || composing) return
 		let editor = text
+		let mac = /Mac/i.test(navigator.platform)
+		if (
+			event.altKey &&
+			event.shiftKey &&
+			!event.metaKey &&
+			event.ctrlKey === mac &&
+			["ArrowLeft", "ArrowRight"].includes(event.key)
+		) {
+			event.preventDefault()
+			event.stopPropagation()
+			changeStructuralSelection(event.key === "ArrowRight")
+			return
+		}
 		if (
 			event.ctrlKey &&
 			!event.metaKey &&
@@ -1303,18 +1349,25 @@ function createEditorView(
 			return
 		}
 		if (
-			event.ctrlKey &&
-			!event.metaKey &&
 			!event.shiftKey &&
 			!event.altKey &&
-			key === "l"
+			key === "l" &&
+			(mac && !matchMedia("(display-mode: standalone)").matches
+				? event.ctrlKey && !event.metaKey
+				: mac
+					? event.metaKey && !event.ctrlKey
+					: event.ctrlKey && !event.metaKey)
 		) {
 			event.preventDefault()
-			let selection = lineBounds(editor.value, {
-				start: editor.selectionStart,
-				end: editor.selectionEnd,
+			let ranges = selectedRanges().map(range => {
+				let start =
+					range.start === 0
+						? 0
+						: editor.value.lastIndexOf("\n", range.start - 1) + 1
+				let end = editor.value.indexOf("\n", range.end)
+				return { ...range, start, end: end < 0 ? editor.value.length : end + 1 }
 			})
-			editor.setSelectionRange(selection.start, selection.end)
+			restoreRanges(mergeSelections(ranges, true))
 			return
 		}
 		if (mod && ["[", "]"].includes(event.key)) {
@@ -1366,32 +1419,51 @@ function createEditorView(
 		return true
 	}
 
-	function showCompletions() {
+	function showCompletions(explicit = false) {
 		let editor = text
 		let before = editor.value.slice(0, editor.selectionStart),
-			link = before.match(/\[\[([^\]\n]*)$/),
-			slash = before.match(/(?:^|\n)\/([\w -]*)$/)
+			link = before.match(/\[\[([^\[\]\n]*)$/),
+			slash = before.match(/(?:^|\n)\/([\w -]*)$/),
+			code = codeLanguageCompletions(
+				editor.value,
+				editor.selectionStart,
+				explicit,
+			)
 		completionItems = []
 		if (
 			!editable ||
-			!proseAt(editor.value, editor.selectionStart) ||
+			(!code && !proseAt(editor.value, editor.selectionStart)) ||
 			secondarySelections.length
 		) {
 			menu.hidden = true
 			textarea.removeAttribute("aria-activedescendant")
 			return
 		}
-		if (link) {
+		if (code) {
+			completionItems = code.options.map(([label, detail]) => ({
+				label,
+				detail,
+				language: true,
+				value: label,
+				start: code.start,
+				end: code.end,
+			}))
+		} else if (link) {
 			completionItems = options
 				.documents()
 				.filter(
 					doc =>
 						!doc.archived &&
-						doc.title.toLowerCase().includes((link[1] ?? "").toLowerCase()),
+						[doc.title, doc.id, doc.folder ?? "", ...(doc.tags ?? [])].some(
+							value =>
+								value
+									.toLowerCase()
+									.includes((link[1] ?? "").trim().toLowerCase()),
+						),
 				)
-				.slice(0, 8)
 				.map(doc => ({
 					label: doc.title,
+					detail: doc.folder || translate("Document"),
 					start: editor.selectionStart - (link[0]?.length ?? 0),
 					end:
 						editor.selectionStart +
@@ -1455,6 +1527,7 @@ function createEditorView(
 							data-complete="${index}"
 						>
 							${item.label}
+							${item.detail ? html`<small>${item.detail}</small>` : ""}
 						</button>`,
 				),
 				"",
@@ -1509,8 +1582,11 @@ function createEditorView(
 			return
 		}
 		editor.setSelectionRange(item.start, item.end)
+		if (item.language) lastCodeLanguage = item.value
 		insert(item.value)
 		menu.hidden = true
+		completionItems = []
+		textarea.removeAttribute("aria-activedescendant")
 	}
 	function selectNextOccurrence(editor: SourceTextarea) {
 		primaryGoalX = undefined
@@ -1895,6 +1971,101 @@ function createEditorView(
 		if (!secondarySelections.some(range => range.start === offset))
 			secondarySelections.push({ start: offset, end: offset })
 		selectionsChanged()
+	}
+	function selectedRanges() {
+		return [
+			{
+				start: text.selectionStart,
+				end: text.selectionEnd,
+				direction: text.selectionDirection,
+			},
+			...secondarySelections.map(range => ({
+				start: range.start,
+				end: range.end,
+				direction: range.direction ?? "none",
+			})),
+		]
+	}
+	function restoreRanges(ranges: ReturnType<typeof selectedRanges>) {
+		let primary = ranges[0]
+		if (!primary) return
+		primaryGoalX = undefined
+		secondarySelections = ranges.slice(1)
+		text.setSelectionRange(primary.start, primary.end, primary.direction)
+		selectionsChanged()
+		let head =
+			textarea.selectionDirection === "backward"
+				? textarea.selectionStart
+				: textarea.selectionEnd
+		let location = point(head),
+			range = document.createRange()
+		range.setStart(location.node, location.offset)
+		range.collapse(true)
+		let bounds = range.getBoundingClientRect(),
+			viewport = textarea.getBoundingClientRect()
+		if (bounds.top < viewport.top)
+			textarea.scrollTop += bounds.top - viewport.top
+		else if (bounds.bottom > viewport.bottom)
+			textarea.scrollTop += bounds.bottom - viewport.bottom
+		highlight.scrollTop = textarea.scrollTop
+	}
+	function mergeSelections(
+		selections: ReturnType<typeof selectedRanges>,
+		mergeTouching = false,
+	) {
+		let ranges = selections
+			.map((range, index) => ({ ...range, primary: index === 0 }))
+			.sort((a, b) => a.start - b.start)
+		let merged: typeof ranges = []
+		for (let range of ranges) {
+			let previous = merged.at(-1)
+			if (
+				previous &&
+				(range.start < previous.end ||
+					(range.start === previous.end &&
+						(mergeTouching || range.start === range.end)))
+			) {
+				previous.end = Math.max(previous.end, range.end)
+				if (range.primary) {
+					previous.primary = true
+					previous.direction = range.direction
+				}
+			} else merged.push({ ...range })
+		}
+		let primary = merged.find(range => range.primary)
+		return (
+			primary ? [primary, ...merged.filter(range => !range.primary)] : []
+		).map(({ start, end, direction }) => ({ start, end, direction }))
+	}
+	function changeStructuralSelection(expand: boolean) {
+		let before = selectedRanges(),
+			step = expansionHistory.at(-1)
+		if (
+			step &&
+			(step.source !== text.value ||
+				JSON.stringify(step.after) !== JSON.stringify(before))
+		)
+			expansionHistory = []
+		if (!expand) {
+			let previous = expansionHistory.pop()
+			if (previous) restoreRanges(previous.before)
+			return
+		}
+		let expanded: ReturnType<typeof selectedRanges> = expandSelections(
+			text.value,
+			before,
+		).map(range => ({ ...range, direction: "forward" }))
+		let after = mergeSelections(expanded)
+		if (
+			before.every(
+				(range, index) =>
+					range.start === after[index]?.start &&
+					range.end === after[index]?.end,
+			)
+		)
+			return
+		expansionHistory.push({ source: text.value, before, after })
+		restoreRanges(after)
 	}
 	function selectionsChanged() {
 		if (!text.sync()) updateHighlight()

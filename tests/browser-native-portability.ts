@@ -48,7 +48,7 @@ try {
 		session,
 		'let editor=document.querySelector("#editor"); editor.setSelectionRange(editor.value.length,editor.value.length); window.originalPickerClick = document.querySelector("#asset-files").click; document.querySelector("#asset-files").click = () => {}',
 	)
-	browser(session, "click", '[data-action="asset"]')
+	browser(session, "click", '[data-action="asset-upload"]')
 	evaluate(
 		session,
 		'(async()=>{let canvas=document.createElement("canvas");canvas.width=40;canvas.height=20;let context=canvas.getContext("2d");context.fillStyle="#123456";context.fillRect(0,0,40,20);let blob=await new Promise(resolve=>canvas.toBlob(resolve));let transfer=new DataTransfer();transfer.items.add(new File([blob],"Harbour.png",{type:"image/png"}));let input=document.querySelector("#asset-files");input.files=transfer.files;input.dispatchEvent(new Event("change"))})()',

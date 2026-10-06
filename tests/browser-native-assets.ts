@@ -13,7 +13,7 @@ export function verifyNativeAssets(session: string, source: string) {
 		session,
 		'let editor=document.querySelector("#editor"); editor.setSelectionRange(editor.value.length,editor.value.length); let picker=document.querySelector("#asset-files"); window.originalPickerClick = picker.click; picker.click = () => {}',
 	)
-	browser(session, "click", '[data-action="asset"]')
+	browser(session, "click", '[data-action="asset-upload"]')
 	evaluate(
 		session,
 		`window.previewRevocations = []; window.previewRevokeViolations = []; window.originalRevoke = URL.revokeObjectURL; URL.revokeObjectURL = function(url) { window.previewRevocations.push(url); function contains(root) { for (let node of root.querySelectorAll('*')) { if ((node.getAttribute('src') ?? '').split('#')[0] === url) return true; if (node.shadowRoot && contains(node.shadowRoot)) return true } return false }; if (contains(document)) window.previewRevokeViolations.push(url); return window.originalRevoke(url) }`,

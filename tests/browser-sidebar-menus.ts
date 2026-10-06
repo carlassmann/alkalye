@@ -188,14 +188,19 @@ try {
 	browser(session, "click", '#tools-format [data-action="image"]')
 	wait(
 		session,
-		'document.querySelector("alkalye-editor").source.value === "![caption](url)"',
+		'document.querySelector("#dialog")?.open && Boolean(document.querySelector("[data-media-picker]"))',
 	)
 	assert(
 		evaluate(
 			session,
-			'(() => {let text=document.querySelector("alkalye-editor").source;return text.value.slice(text.selectionStart,text.selectionEnd) === "url"})()',
+			'(() => {let text=document.querySelector("alkalye-editor").source;return text.value === "caption" && text.selectionStart === 0 && text.selectionEnd === 7 && !document.querySelector("#tools-format").matches(":popover-open")})()',
 		),
-		"Image insertion keeps selected alt text and selects its URL placeholder",
+		"Image insertion opens the media picker, preserves selected text and dismisses the menu",
+	)
+	browser(session, "press", "Escape")
+	wait(
+		session,
+		'!document.querySelector("#dialog").open && document.activeElement.id === "editor"',
 	)
 	browser(session, "fill", "#editor", "copy me")
 	evaluate(

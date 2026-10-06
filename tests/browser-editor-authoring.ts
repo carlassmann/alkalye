@@ -377,16 +377,20 @@ try {
 	browser(session, "press", "Control+Space")
 	wait(
 		session,
-		'Boolean(document.querySelector("[data-context-menu]:popover-open"))',
+		'document.querySelector("#dialog")?.open && Boolean(document.querySelector("[data-media-picker]"))',
 	)
 	assert(
 		evaluate(
 			session,
 			`${source}.selectionStart === 4 && ${source}.selectionEnd === 4`,
 		),
-		"The image context shortcut opens existing actions without replacing the selection",
+		"The image context shortcut opens the media picker without replacing the selection",
 	)
 	browser(session, "press", "Escape")
+	wait(
+		session,
+		'!document.querySelector("#dialog").open && document.activeElement.id === "editor"',
+	)
 	fill("[[New linked note]]")
 	select(5)
 	browser(session, "press", "Control+Space")

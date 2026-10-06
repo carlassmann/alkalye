@@ -141,10 +141,18 @@
 	box-shadow: var(--shadow);
 }
 [data-editor] .completion-menu button {
-	display: block;
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 16px;
 	width: 100%;
 	font-size: 12px;
 	padding: 10px 15px;
+}
+[data-editor] .completion-menu small {
+	color: var(--muted);
+	font-size: 11px;
+	text-align: right;
 }
 [data-editor] .completion-menu button[aria-selected="true"] {
 	background: var(--brand-soft);

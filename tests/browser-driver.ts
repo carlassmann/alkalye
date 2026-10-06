@@ -1,6 +1,21 @@
 import { spawnSync } from "node:child_process"
 import { object } from "../src/shared/model"
+// macOS Chromium can redispatch a malformed CDP key indefinitely after native
+// dialog dismissal. Suppress only that invalid event; real keys and IME remain native.
+let macCdpKeyboardGuard = `(() => {
+ if (window.macCdpKeyboardGuardInstalled) return;
+ window.macCdpKeyboardGuardInstalled = true;
+ document.addEventListener("keydown", event => {
+  if (event.isTrusted && !event.isComposing && event.key === "Unidentified" &&
+      event.code === "Minus" && event.keyCode === 189 && event.timeStamp === 0) {
+   event.preventDefault();
+   event.stopImmediatePropagation();
+  }
+ }, true);
+})()`
 export function browser(session: string, ...args: string[]) {
+	if (process.platform === "darwin" && args[0] === "press")
+		return browserBatch(session, [args])
 	if (args[0] === "click" && args[1]) {
 		reveal(session, args[1])
 		let target = browser(
@@ -37,12 +52,17 @@ export function browserBatch(
 	session: string,
 	commands: readonly (readonly string[])[],
 ) {
+	let expanded = commands.flatMap(command =>
+		process.platform === "darwin" && command[0] === "press"
+			? [["eval", macCdpKeyboardGuard], command]
+			: [command],
+	)
 	let result = spawnSync(
 		"agent-browser",
 		["--session", session, "--json", "batch", "--bail"],
 		{
 			encoding: "utf8",
-			input: JSON.stringify(commands),
+			input: JSON.stringify(expanded),
 			timeout: 60000,
 			env: {
 				...process.env,
@@ -54,12 +74,15 @@ export function browserBatch(
 	if (result.status !== 0)
 		throw new Error(result.error?.message || result.stderr || result.stdout)
 	let responses: unknown = JSON.parse(result.stdout)
-	if (!Array.isArray(responses) || responses.length !== commands.length)
+	if (!Array.isArray(responses) || responses.length !== expanded.length)
 		throw new Error(`${session}: incomplete browser batch: ${result.stdout}`)
+	let data = object({})
 	for (let response of responses) {
 		let value = object(response)
 		if (!value.success) throw new Error(`${session}: ${JSON.stringify(value)}`)
+		data = object(value.result)
 	}
+	return data
 }
 // Sidebars start closed and some commands live in menus. Open whatever hides
 // a click target by clicking its real toggle, as a person would.
