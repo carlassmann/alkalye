@@ -906,3 +906,33 @@ test("editing a promoted offline header body preserves raw anchors for following
 	expect(first.metadata("document").title).toBe("After")
 	expect(restored.text("document")).toContain("hEllo")
 })
+
+test("body edits promote a header revealed by another writer deleting its prefix", () => {
+	for (let editing of ["append", "middle"]) {
+		let first = new Replica("a"),
+			second = new Replica("b")
+		let prefix = first.edit("document", "x")
+		if (!prefix) throw Error("Missing prefix")
+		second.apply([prefix])
+		let source = "---\nk: 1\n---\nbody"
+		let inserted = first.edit("document", "x" + source)
+		let removed = second.edit("document", "")
+		if (!inserted || !removed) throw Error("Missing concurrent edits")
+		first.apply([removed])
+		second.apply([inserted])
+		expect(first.text("document")).toBe(source)
+		let next =
+			editing === "append" ? source + "!" : source.replace("body", "bOdy")
+		let edited = first.edit("document", next)
+		if (!edited) throw Error("Missing body edit")
+		second.apply([parseOperation(compactOperation(edited))])
+		expect(first.visible("document")[0]?.after).toBe("")
+		expect(first.text("document")).toBe(next)
+		expect(second.text("document")).toBe(next)
+		let restored = new Replica("reader")
+		restored.restore(parseCheckpoint(first.checkpoint()))
+		expect(restored.text("document")).toBe(next)
+		changeMetadata(first, "document", { title: "Promoted" })
+		expect(first.metadata("document").title).toBe("Promoted")
+	}
+})

@@ -1054,6 +1054,7 @@ async function sustainedSwarm() {
 				Effect.gen(function* () {
 					let offline = new Set<number>()
 					let sessions: DocumentSession["Service"][] = []
+					let commitMilliseconds: number[] = []
 					for (let [index, account] of writers.entries()) {
 						function online<A, E>(effect: Effect.Effect<A, E>) {
 							return Effect.suspend<A, E | Error, never>(() =>
@@ -1072,9 +1073,14 @@ async function sustainedSwarm() {
 								),
 							commit: action =>
 								online(
-									account.api.documents.commit({
-										params: { document },
-										payload: action,
+									Effect.gen(function* () {
+										let started = performance.now()
+										let receipt = yield* account.api.documents.commit({
+											params: { document },
+											payload: action,
+										})
+										commitMilliseconds.push(performance.now() - started)
+										return receipt
 									}),
 								),
 							history: (document, after, log, limit) =>
@@ -1166,12 +1172,22 @@ async function sustainedSwarm() {
 						expect(updated.size).toBe(23)
 						burstMilliseconds.push(performance.now() - started)
 					}
+					commitMilliseconds.sort((left, right) => left - right)
 					console.info(
 						"24-writer8KBburst",
 						JSON.stringify({
 							operations: 192,
 							roundMilliseconds: burstMilliseconds,
-							operationsPerSecond:
+							commitRequestMilliseconds: {
+								count: commitMilliseconds.length,
+								median:
+									commitMilliseconds[Math.floor(commitMilliseconds.length / 2)],
+								p95: commitMilliseconds[
+									Math.floor(commitMilliseconds.length * 0.95)
+								],
+								max: commitMilliseconds.at(-1),
+							},
+							journeyOperationsPerSecond:
 								192000 /
 								burstMilliseconds.reduce((sum, duration) => sum + duration, 0),
 						}),

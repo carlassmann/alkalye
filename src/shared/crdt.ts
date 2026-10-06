@@ -270,7 +270,8 @@ export class Replica {
 		let raw = sourceViews.get(atoms) ?? atoms
 		let header = frontmatterBlock(previous)
 		let bodyAppend = header
-			? header[0].length < previous.length || header[0].endsWith("\n")
+			? atoms[0]?.after === "" &&
+				(header[0].length < previous.length || header[0].endsWith("\n"))
 			: !previous.startsWith("-") && !previous.startsWith("\uFEFF")
 		if (
 			atoms.length &&
@@ -323,7 +324,7 @@ export class Replica {
 				raw[start]?.id === atoms[start]?.id &&
 				raw[previousEnd - 1]?.id === atoms[previousEnd - 1]?.id
 			let ordinaryBody = header
-				? start >= bodyStart
+				? bodyAppend && start >= bodyStart
 				: !frontmatterBlock(next) && bodyAppend
 			if (
 				ordinaryBody &&
