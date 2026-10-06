@@ -60,6 +60,13 @@ let server = Bun.argv.includes("--serve")
 						},
 					)
 				}
+				if (path === "/en" || path === "/de")
+					return new Response(
+						`<html lang="${path.slice(1)}"><title>Localized landing</title></html>`,
+						{
+							headers: { "content-type": "text/html" },
+						},
+					)
 				if (
 					path === "/app" ||
 					path.startsWith("/app/") ||
@@ -199,6 +206,14 @@ if (server) {
 			true,
 			"Cold offline navigation loads the current shell rather than an old cached shell",
 		)
+		for (let language of ["en", "de"])
+			assert(
+				evaluate(
+					session,
+					`fetch("/${language}").then(response => response.text()).then(page => page.includes('lang="${language}"'))`,
+				),
+				`The ${language} landing page retains its language offline`,
+			)
 		browser(session, "set", "offline", "off")
 		browser(
 			session,

@@ -7,6 +7,8 @@ let shell = [
 	"BUILD_SCRIPTS",
 	"BUILD_TLDRAW",
 	"/",
+	"/en",
+	"/de",
 	"/app",
 	"/index.html",
 	"/app.html",
