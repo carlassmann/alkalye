@@ -465,6 +465,45 @@ try {
 		true,
 		"Clicking a broken document label reveals its source for editing",
 	)
+	let unicode = "Intro\n[日本語😀](https://example.org) end\ntail"
+	for (let prefix of [0, 1]) {
+		browser(session, "fill", "#editor", unicode)
+		wait(session, `${editor}.value === ${JSON.stringify(unicode)}`)
+		assert(
+			evaluate(
+				session,
+				`(() => {
+		 let start = ${JSON.stringify(unicode)}.indexOf("日本語")
+		 for (let offset = 0; offset <= "日本語😀".length; offset++) {
+		  ${editor}.setSelectionRange(start + offset, start + offset)
+		  if (${editor}.selectionStart !== start + offset || ${editor}.selectionEnd !== start + offset) return false
+		 }
+		 return ${editor}.value === ${JSON.stringify(unicode)}
+		})()`,
+			),
+			"Unicode caret round-trips through the editor's source API",
+		)
+		selectSource(unicode.length)
+		wait(session, `${native}.value.includes("\u2003\u2060日本語😀")`)
+		evaluate(
+			session,
+			`(() => {
+		 let input = ${native}, start = input.value.indexOf("\u2003\u2060") + ${prefix}
+		 input.setRangeText("", start, start + 1, "end")
+		 input.dispatchEvent(new InputEvent("input", {bubbles: true, inputType: "deleteContentBackward"}))
+		})()`,
+		)
+		wait(
+			session,
+			`${editor}.value === "Intro\\n end\\ntail" && document.querySelector("#save-status").getAttribute("aria-busy") === "false"`,
+		)
+		browser(session, "reload")
+		wait(session, `${editor}.value === "Intro\\n end\\ntail"`)
+		assert(
+			true,
+			"Deleting synthetic icon space preserves valid source across a durable reload",
+		)
+	}
 } finally {
 	try {
 		browser(session, "close")

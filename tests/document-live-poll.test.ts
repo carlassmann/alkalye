@@ -13,7 +13,12 @@ import { Signatures } from "../src/platform/signatures"
 import { webCryptoLayer } from "../src/platform/web-crypto"
 import { startServer } from "../src/server/index"
 import { encode } from "../src/shared/base64"
-import { object } from "../src/shared/model"
+import { object, parsePresence } from "../src/shared/model"
+import {
+	nextMove,
+	presentationLeader,
+	maximumPresentationSkew,
+} from "../src/shared/presentation-follow"
 import { Replica } from "../src/shared/crdt"
 import { buildAction, restoreSnapshot } from "../src/shared/document-actions"
 import { DocumentApi } from "../src/shared/document-api"
@@ -94,6 +99,117 @@ test("polling and WebSocket peers share notifications, presence and departures",
 	} finally {
 		socket.close()
 		await polling.close()
+	}
+})
+
+test("real polling presenters converge on ties and clock skew while readers cannot present", async () => {
+	let owner = await run(client(71))
+	let writer = await run(client(72))
+	let reader = await run(client(73))
+	await run(
+		Effect.gen(function* () {
+			yield* createWorkspace(owner, "presenters", "Presenters")
+			yield* createDocument(owner, "presenters", "presented-doc")
+			yield* member(owner, "presenters", writer, "writer")
+			yield* member(owner, "presenters", reader, "reader")
+		}),
+	)
+	let first = livePoll(await cookieLogin(instance.server.url, 71))
+	let second = livePoll(await cookieLogin(instance.server.url, 72))
+	let audience = livePoll(await cookieLogin(instance.server.url, 73))
+	try {
+		for (let peer of [first, second, audience]) {
+			await peer.open()
+			await peer.until(is("connected"))
+			expect(
+				await peer.send([{ type: "watch", document: "presented-doc" }]),
+			).toBe(204)
+		}
+		let now = Date.now()
+		function move(slide: number, movedAt: number) {
+			return {
+				type: "presence",
+				presence: {
+					...cursor("presented-doc", 0),
+					slide,
+					movedAt,
+					own: true,
+					target: "audience-screen",
+				},
+			}
+		}
+		expect(await first.send([move(1, now)])).toBe(204)
+		expect(await second.send([move(2, now)])).toBe(204)
+		let a = parsePresence(
+			(
+				await second.until(
+					message =>
+						message.type === "presence" && object(message.presence).slide === 1,
+				)
+			).presence,
+		)
+		let b = parsePresence(
+			(
+				await first.until(
+					message =>
+						message.type === "presence" && object(message.presence).slide === 2,
+				)
+			).presence,
+		)
+		expect(a.actor).not.toBe(b.actor)
+		let leader = presentationLeader([a, b], "presented-doc", Date.now())
+		expect(leader?.actor).toBe([a.actor, b.actor].sort().at(-1))
+		expect(presentationLeader([b, a], "presented-doc", Date.now())?.actor).toBe(
+			leader?.actor,
+		)
+		expect(a.own).toBe(false)
+		expect(b.own).toBe(false)
+		// The relay intentionally accepts at most one move per 40ms window.
+		await Bun.sleep(Math.max(0, a.time + 40 - Date.now()))
+		let reply = nextMove(now - 2000, [a, b])
+		expect(await first.send([move(3, reply)])).toBe(204)
+		let advanced = parsePresence(
+			(
+				await second.until(
+					message =>
+						message.type === "presence" && object(message.presence).slide === 3,
+				)
+			).presence,
+		)
+		expect(
+			presentationLeader([b, advanced], "presented-doc", Date.now())?.slide,
+		).toBe(3)
+		await Bun.sleep(Math.max(0, advanced.time + 40 - Date.now()))
+		expect(await first.send([move(4, Number.MAX_SAFE_INTEGER)])).toBe(204)
+		let bounded = parsePresence(
+			(
+				await second.until(
+					message =>
+						message.type === "presence" && object(message.presence).slide === 4,
+				)
+			).presence,
+		)
+		expect(bounded.movedAt).toBeLessThanOrEqual(
+			Date.now() + maximumPresentationSkew,
+		)
+		expect(await audience.send([move(5, now + 1)])).toBe(204)
+		let refused = parsePresence(
+			(
+				await first.until(
+					message =>
+						message.type === "presence" && object(message.presence).slide === 5,
+				)
+			).presence,
+		)
+		expect(refused.presenting).toBe(false)
+		expect(refused.movedAt).toBeUndefined()
+		expect(refused.target).toBeUndefined()
+		expect(refused.x).toBe(-1)
+		expect(
+			presentationLeader([refused], "presented-doc", Date.now()),
+		).toBeUndefined()
+	} finally {
+		for (let peer of [first, second, audience]) await peer.close()
 	}
 })
 
@@ -384,6 +500,14 @@ test("polling bounds request size, message count, watched documents and sessions
 			Array.from({ length: 33 }, () => ({ type: "unwatch", document: "a" })),
 		),
 	).toBe(400)
+
+	for (let presence of [
+		{ ...cursor("malformed", 1), x: "NaN" },
+		{ ...cursor("malformed", 1), cursor: -1 },
+		{ ...cursor("malformed", 1), document: "../private" },
+		{ ...cursor("malformed", 1), movedAt: "tomorrow" },
+	])
+		expect(await polling.send([{ type: "presence", presence }])).toBe(400)
 	let huge = await polling.request("/api/live/send", {
 		account: login.subject,
 		session,

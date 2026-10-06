@@ -178,7 +178,10 @@ test("plain documents download as Markdown with wiki links named by title", asyn
 
 test("archives from the original application import folders, assets and comment sidecars", async () => {
 	let entries: ZipEntry[] = [
-		file("Trip/Trip.md", "# Trip\n\n![Map](assets/map.png)\n\nPack the tent."),
+		file(
+			"Trip/Trip.md",
+			"# Trip\r\n\r\n![Map](assets/map.png)\r\n\r\nPack the tent.",
+		),
 		{ name: "Trip/assets/map.png", data: image },
 		{ name: "Trip/assets/unreferenced.png", data: image },
 		file(

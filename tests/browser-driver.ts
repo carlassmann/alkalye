@@ -33,6 +33,34 @@ export function browser(session: string, ...args: string[]) {
 	if (!parsed.success) throw new Error(JSON.stringify(parsed))
 	return object(parsed.data)
 }
+export function browserBatch(
+	session: string,
+	commands: readonly (readonly string[])[],
+) {
+	let result = spawnSync(
+		"agent-browser",
+		["--session", session, "--json", "batch", "--bail"],
+		{
+			encoding: "utf8",
+			input: JSON.stringify(commands),
+			timeout: 60000,
+			env: {
+				...process.env,
+				AGENT_BROWSER_HEADED: "false",
+				AGENT_BROWSER_DEFAULT_TIMEOUT: "10000",
+			},
+		},
+	)
+	if (result.status !== 0)
+		throw new Error(result.error?.message || result.stderr || result.stdout)
+	let responses: unknown = JSON.parse(result.stdout)
+	if (!Array.isArray(responses) || responses.length !== commands.length)
+		throw new Error(`${session}: incomplete browser batch: ${result.stdout}`)
+	for (let response of responses) {
+		let value = object(response)
+		if (!value.success) throw new Error(`${session}: ${JSON.stringify(value)}`)
+	}
+}
 // Sidebars start closed and some commands live in menus. Open whatever hides
 // a click target by clicking its real toggle, as a person would.
 function reveal(session: string, selector: string) {
@@ -110,10 +138,10 @@ export function wait(session: string, source: string) {
 			session,
 			evaluate(
 				session,
-				'({source:document.querySelector("alkalye-editor")?.source?.value,view:document.querySelector("#editor")?.value,status:document.querySelector("#save-status")?.textContent,retry:document.querySelector("#retry-save")?.hidden,toast:document.querySelector("#toast")?.textContent,results:window.documentApiResults?.slice(-8),failure:window.documentApiFailure,discussion:window.documentDiscussionStage,library:document.querySelector("#document-list")?.textContent,path:location.pathname+location.search,page:document.querySelector("[data-settings-page],[data-workspace-settings]")?.querySelector(".settings-content")?.id,appearance:document.documentElement.dataset.appearance,size:document.documentElement.style.getPropertyValue("--editor-size"),profile:document.querySelector(".profile-name")?.textContent.trim()})',
+				'({readOnly:document.querySelector("#editor")?.readOnly,tools:document.querySelector("#inspector-body")?.textContent,source:document.querySelector("alkalye-editor")?.source?.value,view:document.querySelector("#editor")?.value,status:document.querySelector("#save-status")?.textContent,retry:document.querySelector("#retry-save")?.hidden,toast:document.querySelector("#toast")?.textContent,results:window.documentApiResults?.slice(-8),failure:window.documentApiFailure,discussion:window.documentDiscussionStage,library:document.querySelector("#document-list")?.textContent,path:location.pathname+location.search,page:document.querySelector("[data-settings-page],[data-workspace-settings]")?.querySelector(".settings-content")?.id,appearance:document.documentElement.dataset.appearance,size:document.documentElement.style.getPropertyValue("--editor-size"),profile:document.querySelector(".profile-name")?.textContent.trim()})',
 			),
 		)
-		throw error
+		throw new Error("Browser condition failed: " + source, { cause: error })
 	}
 }
 export function assert(condition: unknown, message: string) {
@@ -130,4 +158,33 @@ export function submitDialog(session: string, value?: string) {
 		browser(session, "fill", '#dialog [name="value"]', value)
 	browser(session, "click", "#submit-dialog")
 	wait(session, '!document.querySelector("#dialog").open')
+}
+
+export async function serverAddress(stdout: ReadableStream<Uint8Array>) {
+	let address = Promise.withResolvers<string>()
+	async function drain() {
+		let buffer = ""
+		let found = false
+		try {
+			let decoder = new TextDecoder()
+			for await (let chunk of stdout) {
+				let text = decoder.decode(new Uint8Array(chunk), { stream: true })
+				if (found) {
+					process.stdout.write(text)
+					continue
+				}
+				buffer += text
+				let newline = buffer.indexOf("\n")
+				if (newline < 0) continue
+				address.resolve(new URL(buffer.slice(0, newline).trim()).href)
+				found = true
+				process.stdout.write(buffer.slice(newline + 1))
+			}
+			if (!found) address.reject(new Error("Server exited without an address"))
+		} catch (error) {
+			address.reject(error)
+		}
+	}
+	void drain()
+	return address.promise
 }

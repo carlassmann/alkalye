@@ -230,7 +230,7 @@ async function main() {
 
 		let ciEnvironment = { ...process.env, CI: "1" }
 		run(
-			"Static checks, types and unit tests",
+			"Static checks, module integration and fast app journeys",
 			["bun", "run", "check"],
 			ciEnvironment,
 		)
@@ -241,9 +241,9 @@ async function main() {
 		}
 		let url = previewUrl()
 		await requireReadyPreview(url)
-		run("End-to-end tests", ["bun", "run", "test:e2e"], {
+		run("Full app behavior tests", ["bun", "run", "test:e2e:full"], {
 			...ciEnvironment,
-			TEST_URL: new URL("/app", url).toString(),
+			ALKALYE_TEST_ASSETS: resolve(ROOT, "dist"),
 		})
 
 		requireTestedState(testedSha)

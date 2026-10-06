@@ -13,8 +13,10 @@ import { Replica } from "../src/shared/crdt"
 import {
 	buildAction,
 	ResourceUnavailable,
+	restoreSnapshot,
 } from "../src/shared/document-actions"
-import { newDocument, newComment } from "../src/shared/documents"
+import { newDocument, newComment, setFields } from "../src/shared/documents"
+import { changeMetadata } from "../src/shared/document-metadata"
 import { Identity, personalWorkspaceRequest } from "../src/shared/workspace"
 import { WorkspaceStore } from "../src/server/document-store"
 
@@ -228,7 +230,51 @@ test("the browser document engine creates, edits, undoes and reopens offline in 
 							)
 						}),
 					)
+					yield* withSession(session =>
+						Effect.gen(function* () {
+							yield* session.change("Create theme", staged => [
+								...setFields(staged, "theme", {
+									type: "theme",
+									document: "doc",
+								}),
+								staged.edit("theme", "Base theme"),
+							])
+							yield* session.edit("Theme edit", undefined, "theme").saved
+							yield* session.change("Rename", staged =>
+								changeMetadata(staged, "doc", { title: "Renamed" }),
+							)
+							yield* session.undo("theme")
+							expect(session.replica.text("theme")).toBe("Base theme")
+							expect(session.replica.metadata("doc").title).toBe("Renamed")
+							expect(session.replica.fields("comment").body).toBe(
+								"Offline discussion",
+							)
+							yield* session.redo("theme")
+							expect(session.replica.text("theme")).toBe("Theme edit")
+						}),
+					)
+					let complete = yield* withSession(session =>
+						Effect.gen(function* () {
+							expect(session.replica.text("theme")).toBe("Theme edit")
+							yield* session.undo("theme")
+							expect(session.replica.text("theme")).toBe("Base theme")
+							expect(session.replica.metadata("doc").title).toBe("Renamed")
+							return session.replica.text("doc")
+						}),
+					)
 					expect(requests).toBe(before)
+					offline = false
+					yield* withSession(session => session.sync)
+					let finalSnapshot = yield* request(store.snapshot("doc"))
+					if (!finalSnapshot)
+						return yield* new ResourceUnavailable({
+							message: "Snapshot unavailable",
+						})
+					let restored = yield* restoreSnapshot(finalSnapshot, "cold-reader")
+					expect(restored.text("theme")).toBe("Base theme")
+					expect(restored.text("doc")).toBe(complete)
+					expect(restored.metadata("doc").title).toBe("Renamed")
+					expect(restored.fields("comment").body).toBe("Offline discussion")
 				}),
 			),
 		)

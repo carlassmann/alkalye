@@ -9,11 +9,13 @@
 		"check": "bun scripts/check.ts",
 		"check:types": "tsc --noEmit",
 		"check:format": "prettier --check src tests experiments scripts public/app.html public/app.css public/sw.js public/manifest.webmanifest package.json tsconfig.json build.ts cli.ts work.config.js README.md",
-		"check:test": "bun test ./tests ./experiments/*/*.test.ts",
-		"test": "bun test ./tests ./experiments/*/*.test.ts",
+		"check:test": "bun test ./tests",
+		"test": "bun run test:integration",
 		"test:e2e": "bun tests/e2e.ts",
 		"format": "prettier --write src tests experiments scripts public/app.html public/app.css public/sw.js public/manifest.webmanifest package.json tsconfig.json build.ts cli.ts work.config.js README.md",
-		"ci": "bun scripts/ci.ts"
+		"ci": "bun scripts/ci.ts",
+		"test:integration": "bun scripts/test-integration.ts",
+		"test:e2e:full": "bun tests/e2e.ts --full"
 	},
 	"devDependencies": {
 		"@types/bun": "^1.3.11",

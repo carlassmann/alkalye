@@ -2229,6 +2229,14 @@ function mountApplication() {
 				let state = selection.opened.file?.current()
 				element("#save-status").title =
 					state?.message ?? failures.synchronization?.message ?? ""
+				element("#save-status").setAttribute(
+					"aria-busy",
+					String(Boolean(session.unsaved())),
+				)
+				element("#save-status").dataset.pending = String(
+					session.pending().length,
+				)
+				element("#save-status").dataset.version = String(session.version())
 				let indicator = saveIndicator({
 					unsaved: Boolean(session.unsaved()),
 					pending: session.pending().length > 0,

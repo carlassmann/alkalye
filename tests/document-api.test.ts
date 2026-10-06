@@ -22,7 +22,7 @@ import {
 } from "../src/shared/document-actions"
 import { encode } from "../src/shared/base64"
 import { Replica } from "../src/shared/crdt"
-import { expandDeletions } from "../src/shared/model"
+import { expandDeletions, object } from "../src/shared/model"
 import { newComment, newDocument, setFields } from "../src/shared/documents"
 import {
 	blobDigest,
@@ -203,6 +203,58 @@ test("attachment source and manifest commit atomically only after their bytes ex
 				params: { document },
 			})
 			let replica = yield* restoreSnapshot(snapshot, owner.subject + "-attach")
+
+			let contradictory = yield* blobReference({
+				version: 1,
+				type: "image/png",
+				size: 2,
+				chunks: [{ digest, size: 2 }],
+			})
+			for (let other of [
+				contradictory,
+				'chunks:{"version":1,"type":"image/png","size":5,"chunks":[{"digest":"' +
+					digest +
+					'","size":4}]}',
+			]) {
+				let hostile = yield* buildAction(
+					replica,
+					document,
+					"Malformed attachment",
+					staged => [
+						...setFields(staged, "hostile-first", {
+							type: "asset",
+							document,
+							data: reference,
+						}),
+						...setFields(staged, "hostile-second", {
+							type: "asset",
+							document,
+							data: other,
+						}),
+					],
+				)
+				let response = yield* Effect.tryPromise(() =>
+					fetch(
+						new URL(`/api/documents/${document}/actions`, instance.server.url),
+						{
+							method: "POST",
+							headers: {
+								"content-type": "application/json",
+								authorization: "Bearer " + Redacted.value(owner.token),
+							},
+							body: JSON.stringify(hostile),
+						},
+					),
+				)
+				expect(response.status).toBe(409)
+				expect(
+					object(yield* Effect.tryPromise(() => response.json()))._tag,
+				).toBe("DocumentConflict")
+				expect(
+					(yield* owner.api.documents.snapshot({ params: { document } }))
+						.position,
+				).toBe(snapshot.position)
+			}
 			let source = replica.text(document)
 			let action = yield* buildAction(
 				replica,

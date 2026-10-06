@@ -71,7 +71,8 @@ if (process.argv.includes("--serve")) {
 		startServer({
 			port: 0,
 			data: directory,
-			assets: join(directory, "shell"),
+			assets: process.env.ALKALYE_TEST_ASSETS ?? join(directory, "shell"),
+			build: !process.env.ALKALYE_TEST_ASSETS,
 			publicOrigin: proxy.url.origin,
 		}),
 	)

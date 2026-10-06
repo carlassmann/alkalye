@@ -59,13 +59,16 @@ Profiles and document journals live in `~/.config/alkalye-native`. `--home` sele
 
 ## Verification
 
-`bun run check` checks dependencies, Effect boundaries, types, formatting and Bun tests. Tests cover CRDT convergence, journal recovery, cancellation, permissions, whole-document history, agent scope and real CLI subprocesses. Four concurrent frontmatter cases remain explicitly marked as TODOs.
+`bun run check` checks dependencies, Effect boundaries, types and formatting, then runs module integration tests and fast app journeys. Tests use real SQLite, IndexedDB, HTTP, WebSockets, polling and CLI processes. Four concurrent frontmatter cases remain explicitly marked as TODOs.
 
 ```sh
-bun run test:e2e
+bun run test:integration            # Deep module contracts, Bun and browser
+bun run test:e2e                    # Fast app journeys
+bun run test:e2e:full               # Broader app behavior and visual regression checks
+bun tests/e2e.ts --suite theme-library
 ```
 
-Browser tests use background `agent-browser` sessions against real Bun servers. They exercise IndexedDB, offline reload and publication, collaboration, comments, assets, drawings, themes, workspaces, presentations, MCP and OAuth. Each browser test server builds into its own temporary asset directory.
+Browser tests use background `agent-browser` sessions. Straight-line journeys use native command batches, with condition-based waits. The broader suite builds once and runs a bounded worker pool; each suite keeps its own server, database and browser session. See [testing boundaries and coverage](docs/testing.md).
 
 The original app remains available in Git at `a749728`. Its known differences are listed in [docs/portability-sharing-and-folders.md](docs/portability-sharing-and-folders.md). Run `bun run ci` after the final PR push for the required exact-commit signoff; never push directly to `main`.
 

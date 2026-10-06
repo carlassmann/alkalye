@@ -89,7 +89,7 @@ await inspectDirectory("src")
 await inspect(resolve("cli.ts"))
 if (failures.length) throw new Error(failures.join("\n"))
 checkEffects()
-let checks = ["check:types", "check:format", "check:test"]
+let checks = ["check:types", "check:format", "test:integration", "test:e2e"]
 let results = await Promise.all(
 	checks.map(async script => {
 		let process = Bun.spawn(["bun", "run", script], {
