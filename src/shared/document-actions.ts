@@ -317,7 +317,6 @@ export function validateAction(
 			if (
 				change.kind === "cancel" &&
 				(!action.undoOf ||
-					change.target !== action.document ||
 					replica.textOperationTarget(change.value) !== change.target)
 			)
 				throw new Error(
@@ -552,7 +551,6 @@ function compensatingChanges(
 		)
 			continue
 		if (
-			change.target !== action.document ||
 			!replica.hasTextOperation(change.target, change.id) ||
 			change.clock <= replica.textMigrationFloor(change.target)
 		)

@@ -1019,3 +1019,43 @@ test("canonical before-images replace local preparation when a peer changes a re
 			expect(replica.text("doc")).toBe("Base")
 		}),
 	))
+
+test("theme text undo and redo retain the document and peer edits", () =>
+	run(
+		Effect.gen(function* () {
+			let { replica } = yield* setup("Document body")
+			yield* accept(
+				replica,
+				yield* buildAction(replica, "doc", "Create theme", staged => [
+					...setFields(staged, "theme", { type: "theme", document: "doc" }),
+					staged.edit("theme", "Base"),
+				]),
+			)
+			let typed = yield* accept(
+				replica,
+				yield* buildAction(replica, "doc", "Type theme", staged => [
+					staged.edit("theme", "Base mine"),
+				]),
+			)
+			yield* accept(
+				replica,
+				yield* buildAction(
+					replica,
+					"doc",
+					"Peer theme",
+					staged => [staged.edit("theme", "Base mine peer")],
+					"peer",
+				),
+			)
+			let undo = yield* accept(
+				replica,
+				yield* undoAction(replica, typed),
+				typed,
+			)
+			expect(replica.text("theme")).toBe("Base peer")
+			expect(replica.text("doc")).toBe("Document body")
+			yield* accept(replica, yield* undoAction(replica, undo), undo)
+			expect(replica.text("theme")).toBe("Base mine peer")
+			expect(replica.text("doc")).toBe("Document body")
+		}),
+	))
