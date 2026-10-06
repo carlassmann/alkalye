@@ -313,6 +313,115 @@
 					</tbody>
 				</table>
 			</div>
+			<h2>Why the rewrite is slower</h2>
+			<p>
+				Three subagents reproduced the regressions. Two read-only Opus 5.5
+				reviews checked their conclusions. The dominant costs are repeated DOM
+				geometry work and whole-document data reconstruction. These findings do
+				not require replacing Effect or Web Components.
+			</p>
+			<ul>
+				<li>
+					<code>editor.ts:533</code> walks overlay text nodes from the beginning
+					for each link endpoint. At 32 KB, a native input performs about 1,300
+					lookups. Work grows with links multiplied by text nodes.
+				</li>
+				<li>
+					<code>editor.ts:557</code> measures every link, including offscreen
+					ones. Geometry reads alternate with anchor writes and force repeated
+					layout. A real append produced 969 range-rectangle reads for 323
+					links.
+				</li>
+				<li>
+					One full-app input triggered four document refreshes and six highlight
+					rebuilds. Each rebuild replaces the whole syntax overlay.
+				</li>
+				<li>
+					Checkpoints expand source into per-character objects and long
+					identities. A synthetic 32 KB source produced 6.92 MB of JSON; a
+					browser fixture with tombstoned welcome text produced roughly 9 MB.
+					First graph hydration performed six restores; cached hydration still
+					restored three states.
+				</li>
+				<li>
+					<code>RcMap</code> uses a zero idle lifetime. Switching away disposes
+					a document session, so switching back repeats hydration and remounts
+					the editor.
+				</li>
+				<li>
+					The 128 KB crash comes from passing a whole atom array as function
+					arguments. Similar unbounded spreads appear in paste and deletion
+					paths and need browser coverage.
+				</li>
+			</ul>
+			<p>
+				Effect's scheduler used about 0.2% of self CPU in the deep-module
+				profile. Schema validation contributes substantial traversal of the
+				expanded graph. The correction is smaller data and fewer repeated
+				traversals, while retaining validation at storage and network
+				boundaries.
+			</p>
+			<h2>Experimental editor changes</h2>
+			<p>
+				Five native input samples per cell, editor only. Persistence and
+				full-app callbacks are excluded. These are temporary experiments;
+				production code is unchanged.
+			</p>
+			<div class="table-scroll">
+				<table>
+					<thead>
+						<tr>
+							<th>Rich Markdown</th>
+							<th>Current</th>
+							<th>Indexed offsets</th>
+							<th>Index + batched reads</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th>32 KB</th>
+							<td>107 ms</td>
+							<td>57 ms</td>
+							<td>46 ms</td>
+						</tr>
+						<tr>
+							<th>64 KB</th>
+							<td>344 ms</td>
+							<td>106 ms</td>
+							<td>96 ms</td>
+						</tr>
+						<tr>
+							<th>128 KB</th>
+							<td>1,443 ms</td>
+							<td>301 ms</td>
+							<td>218 ms</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p>
+				The experiments preserved source, projected text, caret selection,
+				overlay HTML and link geometry for typing at the end and inside links.
+				Indexing and batching remove much of the cost, but incremental
+				visible-region rendering and incremental edits are still needed to match
+				the original on larger documents.
+			</p>
+			<p>
+				Fix the argument-limit crashes first. Then index and batch geometry,
+				eliminate redundant repainting, remove repeated graph work, and
+				introduce bounded state retention. Retention must preserve permission
+				updates and release old presence correctly. The current scope also owns
+				realtime watches, sync streams and IndexedDB resources. Increasing its
+				lifetime alone would keep those resources alive. Cache passive state
+				separately from active collaboration. Compact checkpoints are a separate
+				measured change; accepted, durable and optimistic states must remain
+				isolated.
+			</p>
+			<p>
+				<a href="/docs/performance-diagnosis.json"
+					>Download profiling samples and diagnosis</a
+				>
+			</p>
 			<h2>What these results say</h2>
 			<p>
 				The rewrite's small bundle does not guarantee faster document opening.

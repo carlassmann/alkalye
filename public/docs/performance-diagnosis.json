@@ -1,0 +1,4167 @@
+{
+	"author": "written with gpt-6 in codex",
+	"date": "2026-10-06",
+	"productionChanges": false,
+	"editor": {
+		"scope": "Isolated production-minified editor, native trusted input, no persistence or app callbacks. Instrumented timings are exploratory and not additive to the original whole-app benchmark.",
+		"baseline": [
+			{
+				"kb": 2,
+				"rich": false,
+				"n": 5,
+				"medianMs": 9.799999982118608,
+				"samples": [
+					{
+						"latencyMs": 13.799999982118608,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.20000001788139343,
+								"total": 0.20000001788139343
+							},
+							"editor.ts:paintLinks": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.20000001788139343,
+								"total": 0.20000001788139343
+							}
+						}
+					},
+					{
+						"latencyMs": 9.799999982118608,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							}
+						}
+					},
+					{
+						"latencyMs": 10.200000017881392,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.19999998807907104,
+								"total": 0.19999998807907104
+							}
+						}
+					},
+					{
+						"latencyMs": 3.5,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.19999998807907104,
+								"total": 0.19999998807907104
+							}
+						}
+					},
+					{
+						"latencyMs": 4.4000000059604645,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 2,
+				"rich": true,
+				"n": 5,
+				"medianMs": 9.299999982118608,
+				"samples": [
+					{
+						"latencyMs": 16.599999994039536,
+						"links": 20,
+						"overlayNodes": 240,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.30000001192092896,
+								"total": 0.30000001192092896
+							},
+							"editor.ts:paintLinks": {
+								"count": 3,
+								"max": 1.0999999940395355,
+								"total": 2.300000011920929
+							},
+							"editor.ts:point": {
+								"count": 123,
+								"max": 0.10000002384185792,
+								"total": 0.7000000178813934
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.19999998807907104,
+								"total": 0.19999998807907104
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.5,
+								"total": 0.5
+							}
+						}
+					},
+					{
+						"latencyMs": 8.400000005960464,
+						"links": 20,
+						"overlayNodes": 240,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.30000001192092896,
+								"total": 0.30000001192092896
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.7000000178813934,
+								"total": 1.3000000417232511
+							},
+							"editor.ts:point": {
+								"count": 82,
+								"max": 0.10000002384185792,
+								"total": 0.5000000298023224
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.4000000059604645,
+								"total": 0.4000000059604645
+							}
+						}
+					},
+					{
+						"latencyMs": 3.900000005960465,
+						"links": 20,
+						"overlayNodes": 240,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.30000001192092896,
+								"total": 0.30000001192092896
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.7000000178813934,
+								"total": 1.300000011920929
+							},
+							"editor.ts:point": {
+								"count": 82,
+								"max": 0.10000002384185792,
+								"total": 0.6000000238418579
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.4000000059604645,
+								"total": 0.4000000059604645
+							}
+						}
+					},
+					{
+						"latencyMs": 12.399999976158142,
+						"links": 20,
+						"overlayNodes": 240,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.7000000178813934,
+								"total": 1.3000000417232511
+							},
+							"editor.ts:point": {
+								"count": 82,
+								"max": 0.09999999403953552,
+								"total": 0.29999998211860657
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.20000001788139343,
+								"total": 0.20000001788139343
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.30000001192092896,
+								"total": 0.30000001192092896
+							}
+						}
+					},
+					{
+						"latencyMs": 9.299999982118608,
+						"links": 20,
+						"overlayNodes": 240,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.29999998211860657,
+								"total": 0.29999998211860657
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.699999988079071,
+								"total": 1.2999999821186066
+							},
+							"editor.ts:point": {
+								"count": 82,
+								"max": 0.10000002384185792,
+								"total": 0.20000001788139343
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.20000001788139343,
+								"total": 0.20000001788139343
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.5,
+								"total": 0.5
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 16,
+				"rich": false,
+				"n": 5,
+				"medianMs": 12,
+				"samples": [
+					{
+						"latencyMs": 12,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:paintLinks": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.5999999940395355,
+								"total": 0.5999999940395355
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.699999988079071,
+								"total": 0.699999988079071
+							}
+						}
+					},
+					{
+						"latencyMs": 17.69999998807907,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.10000002384185792,
+								"total": 0.10000002384185792
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.3999999761581421,
+								"total": 0.3999999761581421
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.5,
+								"total": 0.5
+							}
+						}
+					},
+					{
+						"latencyMs": 5.5999999940395355,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.5,
+								"total": 0.5
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.5,
+								"total": 0.5
+							}
+						}
+					},
+					{
+						"latencyMs": 12.400000005960464,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.10000002384185792,
+								"total": 0.10000002384185792
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.5,
+								"total": 0.5
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.5999999940395355,
+								"total": 0.5999999940395355
+							}
+						}
+					},
+					{
+						"latencyMs": 3.199999988079071,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.5,
+								"total": 0.5
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.5,
+								"total": 0.5
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 16,
+				"rich": true,
+				"n": 5,
+				"medianMs": 35.80000001192093,
+				"samples": [
+					{
+						"latencyMs": 35.70000001788139,
+						"links": 162,
+						"overlayNodes": 1944,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 1.7999999821186066,
+								"total": 1.7999999821186066
+							},
+							"editor.ts:paintLinks": {
+								"count": 3,
+								"max": 12.299999982118608,
+								"total": 36.49999997019768
+							},
+							"editor.ts:point": {
+								"count": 975,
+								"max": 0.20000001788139343,
+								"total": 22.89999982714653
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1.4000000059604645,
+								"total": 1.4000000059604645
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 3.199999988079071,
+								"total": 3.199999988079071
+							}
+						}
+					},
+					{
+						"latencyMs": 36.80000001192093,
+						"links": 162,
+						"overlayNodes": 1944,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 1.9000000059604645,
+								"total": 1.9000000059604645
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 12.699999988079073,
+								"total": 25.299999982118607
+							},
+							"editor.ts:point": {
+								"count": 650,
+								"max": 0.20000001788139343,
+								"total": 14.59999993443489
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1,
+								"total": 1
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 2.9000000059604645,
+								"total": 2.9000000059604645
+							}
+						}
+					},
+					{
+						"latencyMs": 35.80000001192093,
+						"links": 162,
+						"overlayNodes": 1944,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 2.2000000178813934,
+								"total": 2.2000000178813934
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 12.399999976158142,
+								"total": 24.599999964237213
+							},
+							"editor.ts:point": {
+								"count": 650,
+								"max": 0.20000001788139343,
+								"total": 14.000000059604645
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.8999999761581421,
+								"total": 0.8999999761581421
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 3.0999999940395355,
+								"total": 3.0999999940395355
+							}
+						}
+					},
+					{
+						"latencyMs": 37,
+						"links": 162,
+						"overlayNodes": 1944,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 1.9000000059604645,
+								"total": 1.9000000059604645
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 13.899999976158142,
+								"total": 26.19999998807907
+							},
+							"editor.ts:point": {
+								"count": 650,
+								"max": 0.20000001788139343,
+								"total": 16.000000029802322
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.9000000059604645,
+								"total": 0.9000000059604645
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 2.800000011920929,
+								"total": 2.800000011920929
+							}
+						}
+					},
+					{
+						"latencyMs": 35.79999998211861,
+						"links": 162,
+						"overlayNodes": 1944,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 2,
+								"total": 2
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 12.599999994039536,
+								"total": 24.900000005960464
+							},
+							"editor.ts:point": {
+								"count": 650,
+								"max": 0.19999998807907104,
+								"total": 15.300000011920927
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.8999999761581421,
+								"total": 0.8999999761581421
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 2.899999976158142,
+								"total": 2.899999976158142
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 32,
+				"rich": false,
+				"n": 5,
+				"medianMs": 13.699999988079073,
+				"samples": [
+					{
+						"latencyMs": 17.30000001192093,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.10000002384185792,
+								"total": 0.10000002384185792
+							},
+							"editor.ts:paintLinks": {
+								"count": 3,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:point": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.7999999821186066,
+								"total": 0.7999999821186066
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.9000000059604645,
+								"total": 0.9000000059604645
+							}
+						}
+					},
+					{
+						"latencyMs": 8.700000017881393,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.7999999821186066,
+								"total": 0.7999999821186066
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.7999999821186066,
+								"total": 0.7999999821186066
+							}
+						}
+					},
+					{
+						"latencyMs": 13,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.7999999821186066,
+								"total": 0.7999999821186066
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 1,
+								"total": 1
+							}
+						}
+					},
+					{
+						"latencyMs": 16.299999982118607,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.10000002384185792,
+								"total": 0.10000002384185792
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.7999999821186066,
+								"total": 0.7999999821186066
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.9000000059604645,
+								"total": 0.9000000059604645
+							}
+						}
+					},
+					{
+						"latencyMs": 13.699999988079073,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.699999988079071,
+								"total": 0.699999988079071
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 0.9000000059604645,
+								"total": 0.9000000059604645
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 32,
+				"rich": true,
+				"n": 5,
+				"medianMs": 106.59999999403954,
+				"samples": [
+					{
+						"latencyMs": 110.59999999403954,
+						"links": 324,
+						"overlayNodes": 3891,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 3.900000005960465,
+								"total": 3.900000005960465
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 43.599999994039536,
+								"total": 86.09999999403954
+							},
+							"editor.ts:point": {
+								"count": 1298,
+								"max": 0.29999998211860657,
+								"total": 63.50000020861626
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 2.5,
+								"total": 2.5
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 6.4000000059604645,
+								"total": 6.4000000059604645
+							}
+						}
+					},
+					{
+						"latencyMs": 106.30000001192091,
+						"links": 324,
+						"overlayNodes": 3891,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 4.0999999940395355,
+								"total": 4.0999999940395355
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 42.19999998807907,
+								"total": 83.99999997019768
+							},
+							"editor.ts:point": {
+								"count": 1298,
+								"max": 0.20000001788139343,
+								"total": 61.09999996423721
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 2.4000000059604645,
+								"total": 2.4000000059604645
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 6.5,
+								"total": 6.5
+							}
+						}
+					},
+					{
+						"latencyMs": 109.5,
+						"links": 324,
+						"overlayNodes": 3891,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 3.900000005960465,
+								"total": 3.900000005960465
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 48.400000005960464,
+								"total": 87.60000002384186
+							},
+							"editor.ts:point": {
+								"count": 1298,
+								"max": 0.20000001788139343,
+								"total": 62.30000013113022
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 2.4000000059604645,
+								"total": 2.4000000059604645
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 6.300000011920929,
+								"total": 6.300000011920929
+							}
+						}
+					},
+					{
+						"latencyMs": 105.40000000596046,
+						"links": 324,
+						"overlayNodes": 3891,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 3.4000000059604645,
+								"total": 3.4000000059604645
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 42.599999994039536,
+								"total": 83.89999997615814
+							},
+							"editor.ts:point": {
+								"count": 1298,
+								"max": 0.800000011920929,
+								"total": 63.000000178813934
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 2.5,
+								"total": 2.5
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 5.9000000059604645,
+								"total": 5.9000000059604645
+							}
+						}
+					},
+					{
+						"latencyMs": 106.59999999403954,
+						"links": 324,
+						"overlayNodes": 3891,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 3.399999976158142,
+								"total": 3.399999976158142
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 42,
+								"total": 84
+							},
+							"editor.ts:point": {
+								"count": 1298,
+								"max": 0.20000001788139343,
+								"total": 63.69999998807907
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 2.5,
+								"total": 2.5
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 5.899999976158142,
+								"total": 5.899999976158142
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 64,
+				"rich": false,
+				"n": 5,
+				"medianMs": 16.099999994039536,
+				"samples": [
+					{
+						"latencyMs": 17.099999994039536,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:paintLinks": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1.9000000059604645,
+								"total": 1.9000000059604645
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 2,
+								"total": 2
+							}
+						}
+					},
+					{
+						"latencyMs": 16,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.19999998807907104,
+								"total": 0.19999998807907104
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1.699999988079071,
+								"total": 1.699999988079071
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 1.899999976158142,
+								"total": 1.899999976158142
+							}
+						}
+					},
+					{
+						"latencyMs": 16.099999994039536,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.10000002384185792,
+								"total": 0.10000002384185792
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1.7999999821186066,
+								"total": 1.7999999821186066
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 1.9000000059604645,
+								"total": 1.9000000059604645
+							}
+						}
+					},
+					{
+						"latencyMs": 16.19999998807907,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.19999998807907104,
+								"total": 0.19999998807907104
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1.5999999940395355,
+								"total": 1.5999999940395355
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 1.7999999821186066,
+								"total": 1.7999999821186066
+							}
+						}
+					},
+					{
+						"latencyMs": 15.900000005960464,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.19999998807907104,
+								"total": 0.19999998807907104
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1.9000000059604645,
+								"total": 1.9000000059604645
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 2.0999999940395355,
+								"total": 2.0999999940395355
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 64,
+				"rich": true,
+				"n": 5,
+				"medianMs": 344.2999999821186,
+				"samples": [
+					{
+						"latencyMs": 356.40000000596046,
+						"links": 648,
+						"overlayNodes": 7782,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 3,
+								"max": 7.0999999940395355,
+								"total": 7.299999982118607
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 155.80000001192093,
+								"total": 309.30000001192093
+							},
+							"editor.ts:point": {
+								"count": 2594,
+								"max": 0.30000001192092896,
+								"total": 256.99999967217445
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 6.5999999940395355,
+								"total": 6.5999999940395355
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 13.699999988079073,
+								"total": 13.699999988079073
+							}
+						}
+					},
+					{
+						"latencyMs": 337.19999998807907,
+						"links": 648,
+						"overlayNodes": 7782,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 3,
+								"max": 6.700000017881393,
+								"total": 6.800000011920929
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 146.89999997615814,
+								"total": 292.5999999642372
+							},
+							"editor.ts:point": {
+								"count": 2594,
+								"max": 0.4000000059604645,
+								"total": 243.20000019669533
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 6.199999988079071,
+								"total": 6.199999988079071
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 12.900000005960464,
+								"total": 12.900000005960464
+							}
+						}
+					},
+					{
+						"latencyMs": 348.5,
+						"links": 648,
+						"overlayNodes": 7782,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 3,
+								"max": 6.699999988079071,
+								"total": 6.699999988079071
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 154.7000000178814,
+								"total": 303.7000000178814
+							},
+							"editor.ts:point": {
+								"count": 2594,
+								"max": 0.30000001192092896,
+								"total": 247.60000002384183
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 6.0999999940395355,
+								"total": 6.0999999940395355
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 12.900000005960464,
+								"total": 12.900000005960464
+							}
+						}
+					},
+					{
+						"latencyMs": 344.2999999821186,
+						"links": 648,
+						"overlayNodes": 7782,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 3,
+								"max": 6.299999982118607,
+								"total": 6.5
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 152.19999998807907,
+								"total": 301.19999998807907
+							},
+							"editor.ts:point": {
+								"count": 2594,
+								"max": 0.4000000059604645,
+								"total": 249.89999973773956
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 5.9000000059604645,
+								"total": 5.9000000059604645
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 12.199999988079073,
+								"total": 12.199999988079073
+							}
+						}
+					},
+					{
+						"latencyMs": 341.5,
+						"links": 648,
+						"overlayNodes": 7782,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 3,
+								"max": 7.200000017881393,
+								"total": 7.300000011920929
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 148.39999997615814,
+								"total": 294.5999999642372
+							},
+							"editor.ts:point": {
+								"count": 2594,
+								"max": 0.30000001192092896,
+								"total": 241.39999994635585
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 6.5999999940395355,
+								"total": 6.5999999940395355
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 13.900000005960464,
+								"total": 13.900000005960464
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 128,
+				"rich": false,
+				"n": 5,
+				"medianMs": 56.900000005960464,
+				"samples": [
+					{
+						"latencyMs": 55.599999994039536,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.3999999761581421,
+								"total": 0.3999999761581421
+							},
+							"editor.ts:paintLinks": {
+								"count": 3,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:point": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 4,
+								"total": 4
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 4.399999976158142,
+								"total": 4.399999976158142
+							}
+						}
+					},
+					{
+						"latencyMs": 56.900000005960464,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.5,
+								"total": 0.5
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 3.900000005960465,
+								"total": 3.900000005960465
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 4.4000000059604645,
+								"total": 4.4000000059604645
+							}
+						}
+					},
+					{
+						"latencyMs": 58.19999998807907,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.4000000059604645,
+								"total": 0.4000000059604645
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 3.7999999821186066,
+								"total": 3.7999999821186066
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 4.199999988079071,
+								"total": 4.199999988079071
+							}
+						}
+					},
+					{
+						"latencyMs": 57.400000005960464,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.5,
+								"total": 0.5
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 3.699999988079071,
+								"total": 3.699999988079071
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 4.199999988079071,
+								"total": 4.199999988079071
+							}
+						}
+					},
+					{
+						"latencyMs": 53.20000001788139,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.29999998211860657,
+								"total": 0.29999998211860657
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 3.600000023841858,
+								"total": 3.600000023841858
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 3.900000005960465,
+								"total": 3.900000005960465
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 128,
+				"rich": true,
+				"n": 5,
+				"medianMs": 1443,
+				"samples": [
+					{
+						"latencyMs": 1443,
+						"links": 1297,
+						"overlayNodes": 15570,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 13.699999988079073,
+								"total": 13.699999988079073
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 660.6999999880791,
+								"total": 1310.9000000059605
+							},
+							"editor.ts:point": {
+								"count": 5190,
+								"max": 0.800000011920929,
+								"total": 1124.0000004172325
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 22.30000001192093,
+								"total": 22.30000001192093
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 36,
+								"total": 36
+							}
+						}
+					},
+					{
+						"latencyMs": 1355.0999999940395,
+						"links": 1297,
+						"overlayNodes": 15570,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 12.900000005960464,
+								"total": 12.900000005960464
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 635.8000000119209,
+								"total": 1236.9000000059605
+							},
+							"editor.ts:point": {
+								"count": 5190,
+								"max": 0.7000000178813934,
+								"total": 1049.3000003695488
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 20.900000005960464,
+								"total": 20.900000005960464
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 33.80000001192093,
+								"total": 33.80000001192093
+							}
+						}
+					},
+					{
+						"latencyMs": 1434.600000023842,
+						"links": 1297,
+						"overlayNodes": 15570,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 13.599999994039536,
+								"total": 13.599999994039536
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 668.6000000238419,
+								"total": 1314.2000000178814
+							},
+							"editor.ts:point": {
+								"count": 5190,
+								"max": 0.800000011920929,
+								"total": 1117.400000244379
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 21,
+								"total": 21
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 34.599999994039536,
+								"total": 34.599999994039536
+							}
+						}
+					},
+					{
+						"latencyMs": 1449.4000000059605,
+						"links": 1297,
+						"overlayNodes": 15570,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 13.5,
+								"total": 13.5
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 679.7000000178814,
+								"total": 1330.7000000178814
+							},
+							"editor.ts:point": {
+								"count": 5190,
+								"max": 0.9000000059604645,
+								"total": 1124.599999397993
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 20.30000001192093,
+								"total": 20.30000001192093
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 33.900000005960464,
+								"total": 33.900000005960464
+							}
+						}
+					},
+					{
+						"latencyMs": 1727.7000000178814,
+						"links": 1297,
+						"overlayNodes": 15570,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 17,
+								"total": 17
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 804.3000000119209,
+								"total": 1579.800000011921
+							},
+							"editor.ts:point": {
+								"count": 5190,
+								"max": 1,
+								"total": 1331.4000002741814
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 25.599999994039536,
+								"total": 25.599999994039536
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 42.599999994039536,
+								"total": 42.599999994039536
+							}
+						}
+					}
+				]
+			}
+		],
+		"indexed": [
+			{
+				"kb": 32,
+				"rich": false,
+				"n": 5,
+				"medianMs": 12.800000011920927,
+				"samples": [
+					{
+						"latencyMs": 12.800000011920927,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.19999998807907104,
+								"total": 0.19999998807907104
+							},
+							"editor.ts:paintLinks": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1.5,
+								"total": 1.5
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 1.699999988079071,
+								"total": 1.699999988079071
+							}
+						}
+					},
+					{
+						"latencyMs": 8,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1.2999999821186066,
+								"total": 1.2999999821186066
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 1.399999976158142,
+								"total": 1.399999976158142
+							}
+						}
+					},
+					{
+						"latencyMs": 15.299999982118608,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.19999998807907104,
+								"total": 0.19999998807907104
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1.100000023841858,
+								"total": 1.100000023841858
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 1.300000011920929,
+								"total": 1.300000011920929
+							}
+						}
+					},
+					{
+						"latencyMs": 7.899999976158142,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.19999998807907104,
+								"total": 0.19999998807907104
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1.0999999940395355,
+								"total": 1.0999999940395355
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 1.2999999821186066,
+								"total": 1.2999999821186066
+							}
+						}
+					},
+					{
+						"latencyMs": 16.400000005960464,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.20000001788139343,
+								"total": 0.20000001788139343
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1.2999999821186066,
+								"total": 1.2999999821186066
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 1.5,
+								"total": 1.5
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 32,
+				"rich": true,
+				"n": 5,
+				"medianMs": 57.30000001192093,
+				"samples": [
+					{
+						"latencyMs": 60.5,
+						"links": 324,
+						"overlayNodes": 3891,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 4.699999988079071,
+								"total": 4.699999988079071
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 14,
+								"total": 27.19999998807907
+							},
+							"editor.ts:point": {
+								"count": 1298,
+								"max": 0.4000000059604645,
+								"total": 1.0999999940395355
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 5.5999999940395355,
+								"total": 5.5999999940395355
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 10.299999982118608,
+								"total": 10.299999982118608
+							}
+						}
+					},
+					{
+						"latencyMs": 57.30000001192093,
+						"links": 324,
+						"overlayNodes": 3891,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 4.9000000059604645,
+								"total": 4.9000000059604645
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 13.700000017881392,
+								"total": 26.600000023841854
+							},
+							"editor.ts:point": {
+								"count": 1298,
+								"max": 0.4000000059604645,
+								"total": 0.7999999821186066
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 3.199999988079071,
+								"total": 3.199999988079071
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 8.099999994039536,
+								"total": 8.099999994039536
+							}
+						}
+					},
+					{
+						"latencyMs": 59,
+						"links": 324,
+						"overlayNodes": 3891,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 5.5999999940395355,
+								"total": 5.5999999940395355
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 13.699999988079073,
+								"total": 27.399999976158146
+							},
+							"editor.ts:point": {
+								"count": 1298,
+								"max": 0.4000000059604645,
+								"total": 0.6000000536441803
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 3.5,
+								"total": 3.5
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 9.099999994039536,
+								"total": 9.099999994039536
+							}
+						}
+					},
+					{
+						"latencyMs": 54.80000001192093,
+						"links": 324,
+						"overlayNodes": 3891,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 5.5999999940395355,
+								"total": 5.5999999940395355
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 13.199999988079073,
+								"total": 24.899999976158146
+							},
+							"editor.ts:point": {
+								"count": 1298,
+								"max": 0.30000001192092896,
+								"total": 0.699999988079071
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 3.4000000059604645,
+								"total": 3.4000000059604645
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 9,
+								"total": 9
+							}
+						}
+					},
+					{
+						"latencyMs": 56.69999998807907,
+						"links": 324,
+						"overlayNodes": 3891,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 5.299999982118607,
+								"total": 5.299999982118607
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 14.200000017881392,
+								"total": 26.700000017881393
+							},
+							"editor.ts:point": {
+								"count": 1298,
+								"max": 1.5999999940395355,
+								"total": 1.7999999821186066
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 3.300000011920929,
+								"total": 3.300000011920929
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 8.599999994039536,
+								"total": 8.599999994039536
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 64,
+				"rich": false,
+				"n": 5,
+				"medianMs": 19,
+				"samples": [
+					{
+						"latencyMs": 23,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.20000001788139343,
+								"total": 0.20000001788139343
+							},
+							"editor.ts:paintLinks": {
+								"count": 3,
+								"max": 0.10000002384185792,
+								"total": 0.10000002384185792
+							},
+							"editor.ts:point": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 2.2999999821186066,
+								"total": 2.2999999821186066
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 2.5,
+								"total": 2.5
+							}
+						}
+					},
+					{
+						"latencyMs": 20.19999998807907,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.19999998807907104,
+								"total": 0.19999998807907104
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 2.2000000178813934,
+								"total": 2.2000000178813934
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 2.5,
+								"total": 2.5
+							}
+						}
+					},
+					{
+						"latencyMs": 17.400000005960464,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 2,
+								"total": 2
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 2.0999999940395355,
+								"total": 2.0999999940395355
+							}
+						}
+					},
+					{
+						"latencyMs": 19,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.19999998807907104,
+								"total": 0.19999998807907104
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 2.0999999940395355,
+								"total": 2.0999999940395355
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 2.2999999821186066,
+								"total": 2.2999999821186066
+							}
+						}
+					},
+					{
+						"latencyMs": 17,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.19999998807907104,
+								"total": 0.19999998807907104
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1.9000000059604645,
+								"total": 1.9000000059604645
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 2.0999999940395355,
+								"total": 2.0999999940395355
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 64,
+				"rich": true,
+				"n": 5,
+				"medianMs": 106,
+				"samples": [
+					{
+						"latencyMs": 109.19999998807909,
+						"links": 648,
+						"overlayNodes": 7782,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 3,
+								"max": 8.399999976158142,
+								"total": 8.499999970197678
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 27.400000005960464,
+								"total": 52
+							},
+							"editor.ts:point": {
+								"count": 2594,
+								"max": 0.5,
+								"total": 1.4000000059604645
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 9.400000005960464,
+								"total": 9.400000005960464
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 17.799999982118607,
+								"total": 17.799999982118607
+							}
+						}
+					},
+					{
+						"latencyMs": 110.09999999403954,
+						"links": 648,
+						"overlayNodes": 7782,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 3,
+								"max": 8.299999982118607,
+								"total": 8.400000005960464
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 29.30000001192093,
+								"total": 54.80000001192093
+							},
+							"editor.ts:point": {
+								"count": 2594,
+								"max": 0.4000000059604645,
+								"total": 1.3000000417232511
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 8.099999994039536,
+								"total": 8.099999994039536
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 16.399999976158142,
+								"total": 16.399999976158142
+							}
+						}
+					},
+					{
+						"latencyMs": 106,
+						"links": 648,
+						"overlayNodes": 7782,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 3,
+								"max": 8.699999988079071,
+								"total": 8.799999982118607
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 25.19999998807907,
+								"total": 50.29999998211861
+							},
+							"editor.ts:point": {
+								"count": 2594,
+								"max": 0.5999999940395355,
+								"total": 1.4000000059604645
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 9.700000017881392,
+								"total": 9.700000017881392
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 18.400000005960464,
+								"total": 18.400000005960464
+							}
+						}
+					},
+					{
+						"latencyMs": 102.39999997615814,
+						"links": 648,
+						"overlayNodes": 7782,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 3,
+								"max": 8.300000011920929,
+								"total": 8.600000023841858
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 25.19999998807907,
+								"total": 49.099999994039536
+							},
+							"editor.ts:point": {
+								"count": 2594,
+								"max": 0.5,
+								"total": 0.9000000059604645
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 7.400000005960464,
+								"total": 7.400000005960464
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 15.800000011920927,
+								"total": 15.800000011920927
+							}
+						}
+					},
+					{
+						"latencyMs": 102.59999999403954,
+						"links": 648,
+						"overlayNodes": 7782,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 3,
+								"max": 7.699999988079071,
+								"total": 7.899999976158142
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 25.200000017881393,
+								"total": 49.900000005960464
+							},
+							"editor.ts:point": {
+								"count": 2594,
+								"max": 0.4000000059604645,
+								"total": 1.0999999642372131
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 8.099999994039536,
+								"total": 8.099999994039536
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 15.899999976158142,
+								"total": 15.899999976158142
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 128,
+				"rich": false,
+				"n": 5,
+				"medianMs": 62,
+				"samples": [
+					{
+						"latencyMs": 59.70000001788139,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.5,
+								"total": 0.5999999940395355
+							},
+							"editor.ts:paintLinks": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 4.5,
+								"total": 4.5
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 5,
+								"total": 5
+							}
+						}
+					},
+					{
+						"latencyMs": 62,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.4000000059604645,
+								"total": 0.4000000059604645
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 4.4000000059604645,
+								"total": 4.4000000059604645
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 4.800000011920929,
+								"total": 4.800000011920929
+							}
+						}
+					},
+					{
+						"latencyMs": 61.79999998211861,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.4000000059604645,
+								"total": 0.4000000059604645
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 4.0999999940395355,
+								"total": 4.0999999940395355
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 4.5,
+								"total": 4.5
+							}
+						}
+					},
+					{
+						"latencyMs": 67.80000001192093,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.4000000059604645,
+								"total": 0.4000000059604645
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 4.4000000059604645,
+								"total": 4.4000000059604645
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 4.800000011920929,
+								"total": 4.800000011920929
+							}
+						}
+					},
+					{
+						"latencyMs": 67.2999999821186,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.3999999761581421,
+								"total": 0.3999999761581421
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 4.9000000059604645,
+								"total": 4.9000000059604645
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 5.299999982118607,
+								"total": 5.299999982118607
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 128,
+				"rich": true,
+				"n": 5,
+				"medianMs": 300.80000001192093,
+				"samples": [
+					{
+						"latencyMs": 348.90000000596046,
+						"links": 1297,
+						"overlayNodes": 15570,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 20.899999976158146,
+								"total": 20.99999997019768
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 88.30000001192093,
+								"total": 175.30000001192093
+							},
+							"editor.ts:point": {
+								"count": 5190,
+								"max": 1.4000000059604645,
+								"total": 3
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 35.5,
+								"total": 35.5
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 56.39999997615814,
+								"total": 56.39999997615814
+							}
+						}
+					},
+					{
+						"latencyMs": 351.60000002384186,
+						"links": 1297,
+						"overlayNodes": 15570,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 20.5,
+								"total": 20.5
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 93.80000001192091,
+								"total": 182
+							},
+							"editor.ts:point": {
+								"count": 5190,
+								"max": 1.5999999940395355,
+								"total": 3.299999952316284
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 33.29999998211861,
+								"total": 33.29999998211861
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 53.900000005960464,
+								"total": 53.900000005960464
+							}
+						}
+					},
+					{
+						"latencyMs": 300.80000001192093,
+						"links": 1297,
+						"overlayNodes": 15570,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 17.900000005960464,
+								"total": 17.900000005960464
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 79.90000000596046,
+								"total": 153
+							},
+							"editor.ts:point": {
+								"count": 5190,
+								"max": 1,
+								"total": 2.900000035762787
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 28,
+								"total": 28
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 45.900000005960464,
+								"total": 45.900000005960464
+							}
+						}
+					},
+					{
+						"latencyMs": 262.59999999403954,
+						"links": 1297,
+						"overlayNodes": 15570,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 17,
+								"total": 17
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 67.09999999403954,
+								"total": 131.40000000596046
+							},
+							"editor.ts:point": {
+								"count": 5190,
+								"max": 0.800000011920929,
+								"total": 2.4000001549720764
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 25.099999994039536,
+								"total": 25.099999994039536
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 42.19999998807907,
+								"total": 42.19999998807907
+							}
+						}
+					},
+					{
+						"latencyMs": 254,
+						"links": 1297,
+						"overlayNodes": 15570,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 14.900000005960464,
+								"total": 15
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 66.30000001192093,
+								"total": 130.80000001192093
+							},
+							"editor.ts:point": {
+								"count": 5190,
+								"max": 0.9000000059604645,
+								"total": 2.2000000178813934
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 22,
+								"total": 22
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 36.900000005960464,
+								"total": 36.900000005960464
+							}
+						}
+					}
+				]
+			}
+		],
+		"indexedAndBatched": [
+			{
+				"kb": 32,
+				"rich": false,
+				"n": 5,
+				"medianMs": 8.100000023841858,
+				"samples": [
+					{
+						"latencyMs": 8.700000017881393,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.19999998807907104,
+								"total": 0.19999998807907104
+							},
+							"editor.ts:paintLinks": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1.199999988079071,
+								"total": 1.199999988079071
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 1.399999976158142,
+								"total": 1.399999976158142
+							}
+						}
+					},
+					{
+						"latencyMs": 8.100000023841858,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1.0999999940395355,
+								"total": 1.0999999940395355
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 1.199999988079071,
+								"total": 1.199999988079071
+							}
+						}
+					},
+					{
+						"latencyMs": 19.599999994039536,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1.4000000059604645,
+								"total": 1.4000000059604645
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 1.5,
+								"total": 1.5
+							}
+						}
+					},
+					{
+						"latencyMs": 8,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 1.0999999940395355,
+								"total": 1.0999999940395355
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 1.199999988079071,
+								"total": 1.199999988079071
+							}
+						}
+					},
+					{
+						"latencyMs": 7.600000023841858,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.20000001788139343,
+								"total": 0.20000001788139343
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 0.8999999761581421,
+								"total": 0.8999999761581421
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 1.0999999940395355,
+								"total": 1.0999999940395355
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 32,
+				"rich": true,
+				"n": 5,
+				"medianMs": 46,
+				"samples": [
+					{
+						"latencyMs": 45.30000001192093,
+						"links": 324,
+						"overlayNodes": 3891,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 4.5,
+								"total": 4.5
+							},
+							"editor.ts:paintLinks": {
+								"count": 3,
+								"max": 7.199999988079071,
+								"total": 17.899999976158142
+							},
+							"editor.ts:point": {
+								"count": 1947,
+								"max": 0.30000001192092896,
+								"total": 0.800000011920929
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 3.4000000059604645,
+								"total": 3.4000000059604645
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 7.900000005960464,
+								"total": 7.900000005960464
+							}
+						}
+					},
+					{
+						"latencyMs": 45.69999998807907,
+						"links": 324,
+						"overlayNodes": 3891,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 4.700000017881393,
+								"total": 4.700000017881393
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 6.299999982118607,
+								"total": 11.5
+							},
+							"editor.ts:point": {
+								"count": 1298,
+								"max": 0.20000001788139343,
+								"total": 0.8000000417232513
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 3.199999988079071,
+								"total": 3.199999988079071
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 7.900000005960464,
+								"total": 7.900000005960464
+							}
+						}
+					},
+					{
+						"latencyMs": 46.80000001192093,
+						"links": 324,
+						"overlayNodes": 3891,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 4.800000011920929,
+								"total": 4.800000011920929
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 6.199999988079071,
+								"total": 12.199999988079073
+							},
+							"editor.ts:point": {
+								"count": 1298,
+								"max": 0.10000002384185792,
+								"total": 0.30000001192092896
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 3.5999999940395355,
+								"total": 3.5999999940395355
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 8.400000005960464,
+								"total": 8.400000005960464
+							}
+						}
+					},
+					{
+						"latencyMs": 46.30000001192093,
+						"links": 324,
+						"overlayNodes": 3891,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 4.199999988079071,
+								"total": 4.199999988079071
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 6.799999982118607,
+								"total": 12.899999976158142
+							},
+							"editor.ts:point": {
+								"count": 1298,
+								"max": 0.30000001192092896,
+								"total": 0.5999999940395355
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 3.7000000178813934,
+								"total": 3.7000000178813934
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 7.900000005960464,
+								"total": 7.900000005960464
+							}
+						}
+					},
+					{
+						"latencyMs": 46,
+						"links": 324,
+						"overlayNodes": 3891,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 4.5999999940395355,
+								"total": 4.5999999940395355
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 6.5,
+								"total": 12.300000011920927
+							},
+							"editor.ts:point": {
+								"count": 1298,
+								"max": 0.30000001192092896,
+								"total": 0.30000001192092896
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 3.4000000059604645,
+								"total": 3.4000000059604645
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 8,
+								"total": 8
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 64,
+				"rich": false,
+				"n": 5,
+				"medianMs": 21.400000005960464,
+				"samples": [
+					{
+						"latencyMs": 20,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.19999998807907104,
+								"total": 0.19999998807907104
+							},
+							"editor.ts:paintLinks": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 2.4000000059604645,
+								"total": 2.4000000059604645
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 2.5999999940395355,
+								"total": 2.5999999940395355
+							}
+						}
+					},
+					{
+						"latencyMs": 19.19999998807907,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.30000001192092896,
+								"total": 0.30000001192092896
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 2.0999999940395355,
+								"total": 2.0999999940395355
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 2.4000000059604645,
+								"total": 2.4000000059604645
+							}
+						}
+					},
+					{
+						"latencyMs": 21.400000005960464,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.19999998807907104,
+								"total": 0.19999998807907104
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.10000002384185792,
+								"total": 0.10000002384185792
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 2.5,
+								"total": 2.5
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 2.699999988079071,
+								"total": 2.699999988079071
+							}
+						}
+					},
+					{
+						"latencyMs": 21.69999998807907,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.30000001192092896,
+								"total": 0.30000001192092896
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 2.5,
+								"total": 2.5
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 2.800000011920929,
+								"total": 2.800000011920929
+							}
+						}
+					},
+					{
+						"latencyMs": 22,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.19999998807907104,
+								"total": 0.19999998807907104
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 2.5,
+								"total": 2.5
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 2.699999988079071,
+								"total": 2.699999988079071
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 64,
+				"rich": true,
+				"n": 5,
+				"medianMs": 95.69999998807909,
+				"samples": [
+					{
+						"latencyMs": 98.2999999821186,
+						"links": 648,
+						"overlayNodes": 7782,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 3,
+								"max": 9,
+								"total": 9.099999994039536
+							},
+							"editor.ts:paintLinks": {
+								"count": 3,
+								"max": 12.599999994039536,
+								"total": 33.80000001192093
+							},
+							"editor.ts:point": {
+								"count": 3891,
+								"max": 0.6000000238418579,
+								"total": 1.600000113248825
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 9.599999994039536,
+								"total": 9.599999994039536
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 18.599999994039536,
+								"total": 18.599999994039536
+							}
+						}
+					},
+					{
+						"latencyMs": 99.59999999403954,
+						"links": 648,
+						"overlayNodes": 7782,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 3,
+								"max": 9.399999976158142,
+								"total": 9.499999970197678
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 12.5,
+								"total": 23
+							},
+							"editor.ts:point": {
+								"count": 2594,
+								"max": 0.5999999940395355,
+								"total": 1.7000000178813934
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 8.900000005960464,
+								"total": 8.900000005960464
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 18.299999982118607,
+								"total": 18.299999982118607
+							}
+						}
+					},
+					{
+						"latencyMs": 95.69999998807909,
+						"links": 648,
+						"overlayNodes": 7782,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 3,
+								"max": 9.5,
+								"total": 9.700000017881392
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 12.900000005960464,
+								"total": 23.80000001192093
+							},
+							"editor.ts:point": {
+								"count": 2594,
+								"max": 0.5,
+								"total": 1.2000000476837158
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 8.800000011920929,
+								"total": 8.800000011920929
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 18.30000001192093,
+								"total": 18.30000001192093
+							}
+						}
+					},
+					{
+						"latencyMs": 95,
+						"links": 648,
+						"overlayNodes": 7782,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 3,
+								"max": 9.200000017881392,
+								"total": 9.500000059604645
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 12.5,
+								"total": 23.200000017881393
+							},
+							"editor.ts:point": {
+								"count": 2594,
+								"max": 0.5,
+								"total": 1.4999999403953552
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 9.099999994039536,
+								"total": 9.099999994039536
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 18.30000001192093,
+								"total": 18.30000001192093
+							}
+						}
+					},
+					{
+						"latencyMs": 89.7000000178814,
+						"links": 648,
+						"overlayNodes": 7782,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 3,
+								"max": 9,
+								"total": 9.200000017881392
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 11.599999994039536,
+								"total": 21.799999982118607
+							},
+							"editor.ts:point": {
+								"count": 2594,
+								"max": 0.4000000059604645,
+								"total": 1.100000023841858
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 8,
+								"total": 8
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 17.099999994039536,
+								"total": 17.099999994039536
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 128,
+				"rich": false,
+				"n": 5,
+				"medianMs": 55.70000001788139,
+				"samples": [
+					{
+						"latencyMs": 68.40000000596046,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.4000000059604645,
+								"total": 0.4000000059604645
+							},
+							"editor.ts:paintLinks": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 3,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 5.699999988079071,
+								"total": 5.699999988079071
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 6.0999999940395355,
+								"total": 6.0999999940395355
+							}
+						}
+					},
+					{
+						"latencyMs": 65.40000000596046,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.5,
+								"total": 0.5
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 4.5999999940395355,
+								"total": 4.5999999940395355
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 5.0999999940395355,
+								"total": 5.0999999940395355
+							}
+						}
+					},
+					{
+						"latencyMs": 55.29999998211861,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.5,
+								"total": 0.5
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0.09999999403953552,
+								"total": 0.09999999403953552
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 3.7999999821186066,
+								"total": 3.7999999821186066
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 4.299999982118607,
+								"total": 4.299999982118607
+							}
+						}
+					},
+					{
+						"latencyMs": 53,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.29999998211860657,
+								"total": 0.29999998211860657
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 3.800000011920929,
+								"total": 3.800000011920929
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 4.0999999940395355,
+								"total": 4.0999999940395355
+							}
+						}
+					},
+					{
+						"latencyMs": 55.70000001788139,
+						"links": 0,
+						"overlayNodes": 0,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 0.30000001192092896,
+								"total": 0.30000001192092896
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:point": {
+								"count": 2,
+								"max": 0,
+								"total": 0
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 3.800000011920929,
+								"total": 3.800000011920929
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 4.100000023841858,
+								"total": 4.100000023841858
+							}
+						}
+					}
+				]
+			},
+			{
+				"kb": 128,
+				"rich": true,
+				"n": 5,
+				"medianMs": 218,
+				"samples": [
+					{
+						"latencyMs": 218,
+						"links": 1297,
+						"overlayNodes": 15570,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 17.5,
+								"total": 17.5
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 26,
+								"total": 48.599999994039536
+							},
+							"editor.ts:point": {
+								"count": 5190,
+								"max": 1.100000023841858,
+								"total": 2.5
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 26,
+								"total": 26
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 43.5,
+								"total": 43.5
+							}
+						}
+					},
+					{
+						"latencyMs": 214.2000000178814,
+						"links": 1297,
+						"overlayNodes": 15570,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 17.30000001192093,
+								"total": 17.30000001192093
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 24.5,
+								"total": 47.599999994039536
+							},
+							"editor.ts:point": {
+								"count": 5190,
+								"max": 0.9000000059604645,
+								"total": 1.5
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 26.099999994039536,
+								"total": 26.099999994039536
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 43.400000005960464,
+								"total": 43.400000005960464
+							}
+						}
+					},
+					{
+						"latencyMs": 212.69999998807907,
+						"links": 1297,
+						"overlayNodes": 15570,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 17.5,
+								"total": 17.5
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 27.200000017881393,
+								"total": 48.80000001192093
+							},
+							"editor.ts:point": {
+								"count": 5190,
+								"max": 0.9000000059604645,
+								"total": 2.3999999463558197
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 25.700000017881393,
+								"total": 25.700000017881393
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 43.20000001788139,
+								"total": 43.20000001788139
+							}
+						}
+					},
+					{
+						"latencyMs": 237.69999998807907,
+						"links": 1297,
+						"overlayNodes": 15570,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 18.69999998807907,
+								"total": 18.69999998807907
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 26.700000017881393,
+								"total": 52.70000001788139
+							},
+							"editor.ts:point": {
+								"count": 5190,
+								"max": 1.2000000178813934,
+								"total": 2.2000000178813934
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 31.900000005960464,
+								"total": 31.900000005960464
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 50.599999994039536,
+								"total": 50.599999994039536
+							}
+						}
+					},
+					{
+						"latencyMs": 227.4000000059605,
+						"links": 1297,
+						"overlayNodes": 15570,
+						"hotPaths": {
+							"dom.ts:setMarkup": {
+								"count": 2,
+								"max": 23.399999976158146,
+								"total": 23.399999976158146
+							},
+							"editor.ts:paintLinks": {
+								"count": 2,
+								"max": 26.5,
+								"total": 48.5
+							},
+							"editor.ts:point": {
+								"count": 5190,
+								"max": 1.4000000059604645,
+								"total": 3.1000000834465027
+							},
+							"editor.ts:sourceHighlight": {
+								"count": 1,
+								"max": 12.400000005960464,
+								"total": 12.400000005960464
+							},
+							"editor.ts:updateHighlight": {
+								"count": 1,
+								"max": 35.79999998211861,
+								"total": 35.79999998211861
+							}
+						}
+					}
+				]
+			}
+		],
+		"equivalence": [
+			{
+				"variant": "indexed",
+				"selection": "end",
+				"sameSource": true,
+				"sameView": true,
+				"sameSelection": true,
+				"sameOverlay": true,
+				"sameLinks": true,
+				"links": 1296
+			},
+			{
+				"variant": "batched",
+				"selection": "end",
+				"sameSource": true,
+				"sameView": true,
+				"sameSelection": true,
+				"sameOverlay": true,
+				"sameLinks": true,
+				"links": 1296
+			},
+			{
+				"variant": "indexed",
+				"selection": "link",
+				"sameSource": true,
+				"sameView": true,
+				"sameSelection": true,
+				"sameOverlay": true,
+				"sameLinks": true,
+				"links": 1292
+			},
+			{
+				"variant": "batched",
+				"selection": "link",
+				"sameSource": true,
+				"sameView": true,
+				"sameSelection": true,
+				"sameOverlay": true,
+				"sameLinks": true,
+				"links": 1292
+			}
+		],
+		"wholeAppObservedCounts": {
+			"documentRefreshesPerInput": 4,
+			"highlightRebuildsPerInput": 6,
+			"links": 324,
+			"hitboxes": 1296
+		}
+	},
+	"session": {
+		"scope": "Real DocumentSession and SQLite adapters, static transport isolates network; single exploratory sample per size. Initial/cached open below means graph hydration, not painted UI.",
+		"results": [
+			{
+				"kilobytes": 2,
+				"sourceBytes": 2048,
+				"appendBytes": 504,
+				"snapshotBytes": 432947,
+				"atoms": 2048,
+				"phases": [
+					{
+						"phase": "initial-open",
+						"milliseconds": 89.87387500000001,
+						"metrics": {
+							"apply": {
+								"calls": 6,
+								"milliseconds": 0.3614169999999888
+							},
+							"restore": {
+								"calls": 6,
+								"milliseconds": 14.655623999999989
+							},
+							"checkpoint": {
+								"calls": 6,
+								"milliseconds": 4.627624999999995
+							}
+						}
+					},
+					{
+						"phase": "materialize-source",
+						"milliseconds": 1.6529590000000098,
+						"metrics": {
+							"visible": {
+								"calls": 1,
+								"milliseconds": 1.526959000000005
+							}
+						}
+					},
+					{
+						"phase": "editor-capture-base",
+						"milliseconds": 1.1075419999999951,
+						"metrics": {
+							"visible": {
+								"calls": 1,
+								"milliseconds": 0.002375000000000682
+							}
+						}
+					},
+					{
+						"phase": "append-optimistic",
+						"milliseconds": 6.763458000000014,
+						"metrics": {
+							"visible": {
+								"calls": 4,
+								"milliseconds": 1.3432510000000093
+							},
+							"prepareEdit": {
+								"calls": 1,
+								"milliseconds": 3.508749999999992
+							},
+							"apply": {
+								"calls": 1,
+								"milliseconds": 0.1312910000000045
+							}
+						}
+					},
+					{
+						"phase": "append-durable",
+						"milliseconds": 11.708332999999982,
+						"metrics": {
+							"apply": {
+								"calls": 2,
+								"milliseconds": 0.03458300000002623
+							}
+						}
+					},
+					{
+						"phase": "save-materialization",
+						"milliseconds": 7.048417000000001,
+						"metrics": {
+							"checkpoint": {
+								"calls": 1,
+								"milliseconds": 0.28254100000000903
+							},
+							"visible": {
+								"calls": 1,
+								"milliseconds": 1.1103339999999946
+							}
+						}
+					},
+					{
+						"phase": "cached-open",
+						"milliseconds": 26.302875,
+						"metrics": {
+							"apply": {
+								"calls": 5,
+								"milliseconds": 0.20050000000003365
+							},
+							"restore": {
+								"calls": 3,
+								"milliseconds": 11.772707000000025
+							}
+						}
+					},
+					{
+						"phase": "materialize-source",
+						"milliseconds": 0.8951670000000149,
+						"metrics": {
+							"visible": {
+								"calls": 1,
+								"milliseconds": 0.8507909999999583
+							}
+						}
+					},
+					{
+						"phase": "save-materialization",
+						"milliseconds": 2.312917000000027,
+						"metrics": {
+							"visible": {
+								"calls": 1,
+								"milliseconds": 1.3266669999999863
+							}
+						}
+					}
+				]
+			},
+			{
+				"kilobytes": 32,
+				"sourceBytes": 32768,
+				"appendBytes": 505,
+				"snapshotBytes": 6915478,
+				"atoms": 32768,
+				"phases": [
+					{
+						"phase": "initial-open",
+						"milliseconds": 565.1769999999999,
+						"metrics": {
+							"apply": {
+								"calls": 6,
+								"milliseconds": 0.5565839999999866
+							},
+							"restore": {
+								"calls": 6,
+								"milliseconds": 247.12762500000002
+							},
+							"checkpoint": {
+								"calls": 6,
+								"milliseconds": 33.43270800000005
+							}
+						}
+					},
+					{
+						"phase": "materialize-source",
+						"milliseconds": 17.158792000000062,
+						"metrics": {
+							"visible": {
+								"calls": 1,
+								"milliseconds": 15.884832999999958
+							}
+						}
+					},
+					{
+						"phase": "editor-capture-base",
+						"milliseconds": 18.83949999999993,
+						"metrics": {
+							"visible": {
+								"calls": 1,
+								"milliseconds": 0.020416999999952168
+							}
+						}
+					},
+					{
+						"phase": "append-optimistic",
+						"milliseconds": 103.12908399999992,
+						"metrics": {
+							"visible": {
+								"calls": 4,
+								"milliseconds": 18.020291999999927
+							},
+							"prepareEdit": {
+								"calls": 1,
+								"milliseconds": 66.2059589999999
+							},
+							"apply": {
+								"calls": 1,
+								"milliseconds": 0.056166999999959444
+							}
+						}
+					},
+					{
+						"phase": "append-durable",
+						"milliseconds": 5.38083400000005,
+						"metrics": {
+							"apply": {
+								"calls": 2,
+								"milliseconds": 0.03070900000011534
+							}
+						}
+					},
+					{
+						"phase": "save-materialization",
+						"milliseconds": 65.76191699999981,
+						"metrics": {
+							"checkpoint": {
+								"calls": 1,
+								"milliseconds": 5.353875000000016
+							},
+							"visible": {
+								"calls": 1,
+								"milliseconds": 14.773249999999962
+							}
+						}
+					},
+					{
+						"phase": "cached-open",
+						"milliseconds": 219.62633299999993,
+						"metrics": {
+							"apply": {
+								"calls": 5,
+								"milliseconds": 0.21912599999996019
+							},
+							"restore": {
+								"calls": 3,
+								"milliseconds": 115.62754299999983
+							}
+						}
+					},
+					{
+						"phase": "materialize-source",
+						"milliseconds": 18.838875000000144,
+						"metrics": {
+							"visible": {
+								"calls": 1,
+								"milliseconds": 18.00808300000017
+							}
+						}
+					},
+					{
+						"phase": "save-materialization",
+						"milliseconds": 17.80250000000001,
+						"metrics": {
+							"visible": {
+								"calls": 1,
+								"milliseconds": 16.142417000000023
+							}
+						}
+					}
+				]
+			},
+			{
+				"kilobytes": 128,
+				"sourceBytes": 131072,
+				"appendBytes": 506,
+				"snapshotBytes": 27659573,
+				"atoms": 131072,
+				"phases": [
+					{
+						"phase": "initial-open",
+						"milliseconds": 2666.6252080000004,
+						"metrics": {
+							"apply": {
+								"calls": 6,
+								"milliseconds": 0.4215020000001459
+							},
+							"restore": {
+								"calls": 6,
+								"milliseconds": 1347.5050420000007
+							},
+							"checkpoint": {
+								"calls": 6,
+								"milliseconds": 112.77591699999948
+							}
+						}
+					},
+					{
+						"phase": "materialize-source",
+						"milliseconds": 85.49137500000052,
+						"metrics": {
+							"visible": {
+								"calls": 1,
+								"milliseconds": 81.8177910000004
+							}
+						}
+					},
+					{
+						"phase": "editor-capture-base",
+						"milliseconds": 89.50962499999969,
+						"metrics": {
+							"visible": {
+								"calls": 1,
+								"milliseconds": 0.0033750000002328306
+							}
+						}
+					},
+					{
+						"phase": "append-optimistic",
+						"milliseconds": 425.9631249999993,
+						"metrics": {
+							"visible": {
+								"calls": 4,
+								"milliseconds": 89.12241600000016
+							},
+							"prepareEdit": {
+								"calls": 1,
+								"milliseconds": 251.81804099999954
+							},
+							"apply": {
+								"calls": 1,
+								"milliseconds": 0.052999999999883585
+							}
+						}
+					},
+					{
+						"phase": "append-durable",
+						"milliseconds": 20.936125000000175,
+						"metrics": {
+							"apply": {
+								"calls": 2,
+								"milliseconds": 0.08116699999936827
+							}
+						}
+					},
+					{
+						"phase": "save-materialization",
+						"milliseconds": 232.85179100000005,
+						"metrics": {
+							"checkpoint": {
+								"calls": 1,
+								"milliseconds": 39.42724999999973
+							},
+							"visible": {
+								"calls": 1,
+								"milliseconds": 77.76050000000032
+							}
+						}
+					},
+					{
+						"phase": "cached-open",
+						"milliseconds": 1021.333791,
+						"metrics": {
+							"apply": {
+								"calls": 5,
+								"milliseconds": 0.1967079999985799
+							},
+							"restore": {
+								"calls": 3,
+								"milliseconds": 667.528166
+							}
+						}
+					},
+					{
+						"phase": "materialize-source",
+						"milliseconds": 71.5649999999996,
+						"metrics": {
+							"visible": {
+								"calls": 1,
+								"milliseconds": 67.94295899999997
+							}
+						}
+					},
+					{
+						"phase": "save-materialization",
+						"milliseconds": 76.36533299999974,
+						"metrics": {
+							"visible": {
+								"calls": 1,
+								"milliseconds": 71.87800000000061
+							}
+						}
+					}
+				]
+			}
+		],
+		"restoreCounts": {
+			"initial": 6,
+			"cached": 3
+		},
+		"initialCheckpointCopies": 6,
+		"fullHistoryReplayedOnCachedOpen": false,
+		"schedulerSelfCpuPercent": 0.2
+	},
+	"browserOpenProfile": {
+		"scope": "One production 32KB reload under profiling and shared-host load; inclusive times overlap.",
+		"paintLinksInclusiveMs": 791,
+		"sessionRestoreInclusiveMs": 159,
+		"decodedCheckpointBytes": 8975904,
+		"checkpointIncludesTombstonedWelcomeAtoms": true
+	},
+	"failure": {
+		"sourceBytes": 131072,
+		"site": "src/shared/frontmatter-merge.ts:183",
+		"cause": "body.push(...raw.slice(position)) exceeds Chromium function argument limit; no recursion required."
+	},
+	"cache": {
+		"site": "src/client/browser-library.ts:124",
+		"idleTimeToLive": 0,
+		"effect": "Leaving a document releases its session; reopening revalidates and rehydrates its state. Existing-document switching remains a valid product journey comparison.",
+		"lifecycleCaveat": "RcMap entry scope also owns live.watch, sync streams and IndexedDB resources. Retain passive materialization separately from foreground collaboration scope; increasing TTL alone can retain obsolete watches/presence."
+	},
+	"review": "Two read-only Claude Opus 5.5 reviews corroborated the causes. Predictions such as TTL gains remain unmeasured.",
+	"recommendations": [
+		"Replace unbounded argument spreads within the supported size limit; cover browser open, paste, delete and frontmatter edits.",
+		"Index overlay text offsets and batch geometry reads before DOM writes; coalesce redundant paints.",
+		"Gate overlay updates by source/projection revision; render and measure visible regions.",
+		"Avoid whole-source temporary atom arrays, unnecessary visible-ID sets and repeated freezing of already frozen immutable atoms.",
+		"Decode/validate snapshots once at boundaries; preserve isolation of accepted, durable and optimistic state.",
+		"Retain a bounded number of recent document states through Effect RcMap, reviewing scope, permission, presence and memory behavior.",
+		"Use a compact checkpoint representation instead of expanded per-character JSON; avoid loading whole old snapshots just to compare their positions."
+	]
+}

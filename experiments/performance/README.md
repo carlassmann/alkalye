@@ -91,3 +91,16 @@ For peer sync, start at the producer's trusted `beforeinput` event and finish tw
 These benchmarks are experiments, not CI thresholds. Repeat on a quiet host, randomize version order, and increase sample counts before treating small differences as regressions.
 
 written with gpt-6 in codex
+
+## Diagnose graph work
+
+`session.ts` exercises the real DocumentSession and SQLite adapters through their public boundary. A static transport isolates local hydration and persistence from network latency. It verifies the complete source before and after a durable append and cached reopen.
+
+```sh
+bun experiments/performance/session.ts > /tmp/alkalye-benchmark/session.json
+PROFILE_FREEZE=1 bun experiments/performance/session.ts > /tmp/alkalye-benchmark/freezing.json
+```
+
+Initial and cached open timings cover graph hydration; first source materialization is a separate phase. Prototype counters and optional freeze instrumentation run only in this disposable process. Results are exploratory single samples, not regression thresholds. The source used by the browser benchmark is still subject to Chromium's argument limit at 128 KiB; Bun's successful module probe does not prove browser compatibility.
+
+The follow-up profiling samples and causal editor experiments are in `public/docs/performance-diagnosis.json`. Experimental editor builds remain temporary; no optimized production editor was introduced by the analysis.
