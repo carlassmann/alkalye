@@ -69,6 +69,8 @@ alkalye-picker > option {
 	color: inherit;
 	text-decoration: none;
 	text-align: left;
+	cursor: default;
+	user-select: none;
 }
 :is([data-picker], [data-workspace-menu], [data-menu])
 	.menu-popover
@@ -82,10 +84,10 @@ alkalye-picker > option {
 }
 :is([data-picker], [data-workspace-menu], [data-menu])
 	.menu-popover
-	:is(button, a):focus-visible,
+	:is(button, a):not(:disabled):not([aria-disabled="true"]):focus,
 :is([data-picker], [data-workspace-menu], [data-menu])
 	.menu-popover
-	:is(button, a):hover {
+	:is(button, a):not(:disabled):not([aria-disabled="true"]):hover {
 	background: var(--accent);
 	outline: 0;
 }
@@ -187,4 +189,11 @@ alkalye-picker > option {
 }
 [data-menu] .menu-popover[data-side="right"] {
 	--menu-origin: left top;
+}
+
+:is([data-picker], [data-workspace-menu], [data-menu])
+	.menu-popover
+	:is(button:disabled, [aria-disabled="true"]) {
+	opacity: 0.5;
+	cursor: default;
 }

@@ -18,25 +18,24 @@ export interface MenuGroup {
 }
 export type MenuEntry = MenuItem | MenuGroup | "separator" | { note: string }
 
+let sequence = 0
+
 export function openContextMenu(event: MouseEvent, items: MenuEntry[]) {
 	event.preventDefault()
 	let invoker = document.activeElement
 	let events = new AbortController()
 	document.querySelector("[data-context-menu]")?.remove()
-	let menu = renderMenu(items, () => menu.hidePopover(), events.signal)
+	let menu = renderMenu(items, close, events.signal)
+	function close(restore = false) {
+		menu.hidePopover()
+		if (restore && invoker instanceof HTMLElement && invoker.isConnected)
+			invoker.focus({ preventScroll: true })
+	}
 	document.body.append(menu)
 	menu.showPopover()
 	place(menu, event.clientX, event.clientY)
-	menu.addEventListener("keydown", event => {
-		if (event.key !== "Escape") return
-		event.preventDefault()
-		event.stopPropagation()
-		menu.hidePopover()
-		if (invoker instanceof HTMLElement && invoker.isConnected)
-			invoker.focus({ preventScroll: true })
-	})
 	menu.addEventListener("toggle", event => {
-		if (event.newState === "closed")
+		if (event.target === menu && event.newState === "closed")
 			void Promise.allSettled(
 				menu.getAnimations().map(animation => animation.finished),
 			).then(() => {
@@ -58,11 +57,13 @@ export function openContextMenu(event: MouseEvent, items: MenuEntry[]) {
 
 function renderMenu(
 	entries: MenuEntry[],
-	close: () => void,
+	close: (restore?: boolean) => void,
 	signal: AbortSignal,
+	parentTrigger?: HTMLButtonElement,
 ) {
 	let menu = document.createElement("div")
 	menu.dataset.contextMenu = ""
+	menu.id = "context-menu-" + ++sequence
 	menu.popover = "auto"
 	menu.setAttribute("role", "menu")
 	for (let entry of entries) {
@@ -80,6 +81,7 @@ function renderMenu(
 		}
 		let button = document.createElement("button")
 		button.type = "button"
+		button.tabIndex = -1
 		button.setAttribute("role", "menuitem")
 		if ("icon" in entry && entry.icon)
 			button.insertAdjacentHTML("beforeend", icon(entry.icon).value)
@@ -88,7 +90,8 @@ function renderMenu(
 		button.append(label)
 		menu.append(button)
 		if ("items" in entry) {
-			let submenu = renderMenu(entry.items, close, signal)
+			let submenu = renderMenu(entry.items, close, signal, button)
+			button.setAttribute("aria-controls", submenu.id)
 			button.setAttribute("aria-haspopup", "menu")
 			button.setAttribute("aria-expanded", "false")
 			button.dataset.submenu = ""
@@ -126,7 +129,7 @@ function renderMenu(
 				open(true)
 			}
 			submenu.addEventListener("keydown", event => {
-				if (event.key !== "ArrowLeft" && event.key !== "Escape") return
+				if (event.key !== "ArrowLeft" || event.defaultPrevented) return
 				event.preventDefault()
 				event.stopPropagation()
 				submenu.hidePopover()
@@ -153,19 +156,24 @@ function renderMenu(
 			item.run()
 		}
 	}
+	menu.addEventListener(
+		"scroll",
+		() => {
+			for (let submenu of menu.querySelectorAll<HTMLElement>(
+				":scope > [data-context-menu]:popover-open",
+			))
+				submenu.hidePopover()
+		},
+		{ signal },
+	)
 	menuNavigation(
 		menu,
 		{
 			items: () => [...menu.querySelectorAll<HTMLElement>(":scope > button")],
 			close: restore => {
+				if (!parentTrigger || restore === false) return close(restore !== false)
 				menu.hidePopover()
-				if (
-					restore !== false &&
-					menu.parentElement?.hasAttribute("data-context-menu")
-				)
-					menu.parentElement
-						.querySelector<HTMLElement>('[aria-expanded="true"]')
-						?.focus()
+				parentTrigger.focus({ preventScroll: true })
 			},
 		},
 		signal,

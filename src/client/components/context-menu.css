@@ -3,6 +3,10 @@
 	inset: auto;
 	margin: 0;
 	min-width: 144px;
+	max-width: calc(100vw - 16px);
+	max-height: calc(100dvh - 16px);
+	overflow-x: hidden;
+	overflow-y: auto;
 	padding: 4px;
 	border: 1px solid var(--line);
 	border-radius: 0;
@@ -39,6 +43,8 @@
 	min-height: 32px;
 	line-height: 16px;
 	font-size: 12px;
+	cursor: default;
+	user-select: none;
 }
 [data-context-menu] button:disabled {
 	opacity: 0.45;
@@ -67,7 +73,7 @@
 	font-size: 11px;
 	opacity: 0.6;
 }
-[data-context-menu] button:focus-visible,
+[data-context-menu] button:focus,
 [data-context-menu] button:not(:disabled):hover {
 	outline: none;
 	background: var(--accent);

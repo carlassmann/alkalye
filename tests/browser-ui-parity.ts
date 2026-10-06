@@ -71,6 +71,82 @@ try {
 	)
 	let documentPath = evaluate(session, "location.pathname")
 	assert(typeof documentPath === "string", "Document has a route")
+	browser(session, "click", "#editor")
+	evaluate(
+		session,
+		`(() => {
+			let editor = document.querySelector("#editor");
+			editor.select();
+			let bounds = editor.getBoundingClientRect();
+			editor.dispatchEvent(new MouseEvent("contextmenu", {bubbles:true, cancelable:true, clientX:bounds.left + 32, clientY:bounds.top + 32}));
+			return true;
+		})()`,
+	)
+	wait(
+		session,
+		'document.querySelector("body > [data-context-menu]:popover-open") !== null',
+	)
+	browser(session, "press", "f")
+	browser(session, "press", "o")
+	wait(session, 'document.activeElement?.textContent === "Format"')
+	browser(session, "press", "ArrowRight")
+	wait(session, 'document.activeElement?.textContent.includes("Bold")')
+	browser(session, "press", "h")
+	wait(session, 'document.activeElement?.textContent === "Headings"')
+	browser(session, "press", "ArrowRight")
+	wait(session, 'document.activeElement?.textContent.includes("Heading 1")')
+	browser(session, "press", "Escape")
+	wait(
+		session,
+		'document.activeElement?.textContent === "Headings" && document.querySelectorAll("[data-context-menu]:popover-open").length === 2',
+	)
+	browser(session, "press", "Escape")
+	wait(
+		session,
+		'document.activeElement?.textContent === "Format" && document.querySelectorAll("[data-context-menu]:popover-open").length === 1',
+	)
+	assert(
+		true,
+		"Escape closes one context submenu and restores its owning trigger",
+	)
+	browser(session, "press", "Escape")
+	wait(
+		session,
+		'document.activeElement?.id === "editor" && !document.querySelector("[data-context-menu]:popover-open")',
+	)
+	assert(
+		true,
+		"Dismissing the editor context menu returns keyboard focus to the editor",
+	)
+	evaluate(
+		session,
+		`(() => {
+			let editor = document.querySelector("#editor");
+			editor.select();
+			let bounds = editor.getBoundingClientRect();
+			editor.dispatchEvent(new MouseEvent("contextmenu", {bubbles:true, cancelable:true, clientX:bounds.left + 32, clientY:bounds.top + 32}));
+			return true;
+		})()`,
+	)
+	wait(
+		session,
+		'document.querySelector("body > [data-context-menu]:popover-open") !== null',
+	)
+	browser(session, "press", "f")
+	browser(session, "press", "o")
+	wait(session, 'document.activeElement?.textContent === "Format"')
+	browser(session, "press", "ArrowRight")
+	wait(session, 'document.activeElement?.textContent.includes("Bold")')
+	browser(session, "press", "Tab")
+	wait(
+		session,
+		'!document.querySelector("[data-context-menu]:popover-open") && !document.activeElement?.closest("[data-context-menu]")',
+	)
+	assert(
+		true,
+		"Tab leaves the context menu and dismisses its whole submenu hierarchy",
+	)
+
 	browser(session, "click", '[data-action="toggle-tools"]')
 	browser(session, "open", new URL("/app/doc/never-answer", url).href)
 	wait(session, 'document.querySelector("[data-document-app]") !== null')
@@ -230,6 +306,7 @@ try {
 		'document.querySelector("#stats")?.textContent === "1 / 2 tasks"',
 	)
 	assert(true, "Selected statistic survives a refresh")
+
 	wait(
 		session,
 		'document.querySelector("#save-status").hasAttribute("data-quiet")',
