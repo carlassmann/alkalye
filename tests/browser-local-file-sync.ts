@@ -1,6 +1,7 @@
 import * as Context from "effect/Context"
 import * as Effect from "effect/Effect"
 import * as Layer from "effect/Layer"
+import { downloadDocumentHistory } from "../src/client/document-history"
 import { syncLocalFile } from "../src/client/local-file-sync"
 import {
 	browserDocumentSessionLayer,
@@ -52,6 +53,114 @@ export function verifyLocalFileSync(subject: string, check: Check) {
 			"red BLUE",
 			"red blue",
 		)
+		yield* scenario("insert-race", "ab", "abL", "aab", "ab")
+		yield* verifyHistory()
+		function verifyHistory() {
+			return Effect.gen(function* () {
+				let document = "local-folder-history"
+				let storage = yield* Effect.acquireRelease(Storage.open(), storage =>
+					Effect.sync(() => storage.close()),
+				)
+				let requests = 0
+				let transport = {
+					snapshot: () =>
+						Effect.sync(() => {
+							requests++
+							throw new Error("No network for folder history")
+						}),
+					commit: () =>
+						Effect.sync(() => {
+							requests++
+							throw new Error("No network for folder history")
+						}),
+					history: () =>
+						Effect.sync(() => {
+							requests++
+							return []
+						}),
+				}
+				let creation = yield* buildAction(
+					new Replica(subject + "-history"),
+					document,
+					"Open file",
+					staged =>
+						newDocument(
+							staged,
+							document,
+							"Untitled",
+							"---\ntitle: Local history\nmode: present\n---\nInitial",
+						),
+				)
+				yield* Effect.scoped(
+					Effect.gen(function* () {
+						let context = yield* Layer.build(
+							browserDocumentSessionLayer({
+								document,
+								subject,
+								historyOrigin: "local",
+								transport,
+								initialCreation: {
+									subject,
+									workspace: "folder",
+									action: creation,
+								},
+							}),
+						)
+						let session = Context.get(context, DocumentSession)
+						yield* session.edit(
+							"---\ntitle: Local history\nmode: present\n---\nEdited",
+						).saved
+						yield* session.undo()
+						yield* session.redo()
+						yield* session.flush
+					}),
+				)
+				yield* Effect.scoped(
+					Effect.gen(function* () {
+						let context = yield* Layer.build(
+							browserDocumentSessionLayer({
+								document,
+								subject,
+								historyOrigin: "local",
+								transport,
+							}),
+						)
+						let session = Context.get(context, DocumentSession)
+						let history = yield* downloadDocumentHistory({
+							session,
+							storage,
+							subject,
+							document,
+							online: () => false,
+						})
+						let sources: string[] = []
+						for (let moment of history.moments)
+							sources.push((yield* history.at(moment.position)).text(document))
+						check(
+							history.complete &&
+								history.moments.length === 4 &&
+								history.moments.every(moment => moment.source === "local") &&
+								session.historyCursor().position === 0 &&
+								requests === 0 &&
+								sources.join("|") ===
+									["Initial", "Edited", "Initial", "Edited"]
+										.map(
+											value =>
+												"---\ntitle: Local history\nmode: present\n---\n" +
+												value,
+										)
+										.join("|"),
+							"cold folder history replays creation, edits, undo and redo offline without inventing server positions",
+						)
+						let first = yield* history.at(1)
+						check(
+							first.metadata(document).title === "Local history",
+							"local history restores frontmatter metadata through the same validated document replay",
+						)
+					}),
+				)
+			})
+		}
 		function scenario(
 			name: string,
 			initial: string,
@@ -103,9 +212,15 @@ export function verifyLocalFileSync(subject: string, check: Check) {
 						return session.change(label, command).pipe(
 							Effect.tap(() =>
 								Effect.sync(() => {
-									if (name === "disk-race" && !raced) {
+									if (
+										(name === "disk-race" || name === "insert-race") &&
+										!raced
+									) {
 										raced = true
-										disk = "Alpha\nBeta disk\nGamma external\n"
+										disk =
+											name === "insert-race"
+												? "Zaab"
+												: "Alpha\nBeta disk\nGamma external\n"
 										modified++
 									}
 								}),
@@ -155,7 +270,9 @@ export function verifyLocalFileSync(subject: string, check: Check) {
 						let expected =
 							name === "disk-race"
 								? "Alpha local\nBeta disk\nGamma external\n"
-								: "RED BLUE"
+								: name === "insert-race"
+									? "ZaabL"
+									: "RED BLUE"
 						check(
 							syncing.current().status === "saved" &&
 								disk === expected &&
@@ -164,7 +281,9 @@ export function verifyLocalFileSync(subject: string, check: Check) {
 								(yield* storage.get(baseKey)) === expected,
 							name === "disk-race"
 								? "a disk edit during a durable editor merge is reread and preserved before any disk write"
-								: "independent edits on the same local-file line merge through the durable document session",
+								: name === "insert-race"
+									? "a repeated disk merge does not duplicate already incorporated insertions"
+									: "independent edits on the same local-file line merge through the durable document session",
 						)
 					}
 				}),

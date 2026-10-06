@@ -12,7 +12,8 @@ interface DocumentHistoryOptions {
 	session: Pick<
 		Context.Service.Shape<typeof DocumentSession>,
 		"historyCursor" | "historyPage"
-	>
+	> &
+		Partial<Pick<Context.Service.Shape<typeof DocumentSession>, "localHistory">>
 	storage: Pick<Storage, "get" | "set">
 	subject: string
 	document: string
@@ -46,6 +47,13 @@ export function loadDocumentHistory(
 export function downloadDocumentHistory(options: DocumentHistoryOptions) {
 	return Effect.gen(function* () {
 		let { session, storage, subject, document } = options
+		let local = yield* session.localHistory?.() ?? Effect.succeed(undefined)
+		if (local)
+			return {
+				moments: local,
+				complete: true,
+				at: (position: number) => historicalDocument(document, local, position),
+			}
 		let cursor = session.historyCursor()
 		let key = "document-history:" + subject + ":" + document + ":" + cursor.log
 		let cached = yield* storage

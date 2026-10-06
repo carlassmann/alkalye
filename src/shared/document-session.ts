@@ -67,6 +67,7 @@ import type {
 	DocumentPublication,
 	LocalDocumentCreation,
 } from "./document-actions"
+import type { LocalDocumentMoment } from "./document-history"
 import { compactOperation, parseOperation } from "./model"
 import type { Atom, Operation, DocumentRecord } from "./model"
 
@@ -107,6 +108,7 @@ export interface DocumentSessionOptions {
 	document: string
 	subject: string
 	author?: string
+	historyOrigin?: "local"
 	initialCreation?: LocalDocumentCreation
 	activity?: DocumentActivity
 	transport: DocumentTransport
@@ -585,6 +587,49 @@ function makeSession(options: DocumentSessionOptions) {
 					),
 				),
 			historyCursor: () => Object.freeze(projection.cursor()),
+			localHistory,
+		}
+		function localHistory() {
+			if (options.historyOrigin !== "local") return Effect.succeed(undefined)
+			return flush.pipe(
+				Effect.andThen(
+					gate.withPermit(
+						journal.journal.withLock(
+							StoreId.make(documentDatabaseName(options)),
+						)(readLocalMoments()),
+					),
+				),
+			)
+		}
+		function readLocalMoments() {
+			return Effect.gen(function* () {
+				let moments: LocalDocumentMoment[] = []
+				let position = 0
+				while (true) {
+					let page = yield* journal.readAfter(position, 1000)
+					for (let entry of page.entries) {
+						let recorded = yield* decode(entry)
+						if (
+							recorded.kind !== "localCreated" &&
+							recorded.kind !== "proposed"
+						)
+							return yield* conflict(
+								"Local history contains synchronized or rejected actions",
+							)
+						moments.push({
+							source: "local",
+							position: moments.length + 1,
+							subject: options.subject,
+							action:
+								recorded.kind === "localCreated"
+									? recorded.creation.action
+									: recorded.action,
+						})
+					}
+					if (!page.entries.length) return moments
+					position = page.position
+				}
+			})
 		}
 		function undo(redo: boolean, textTarget?: string) {
 			let generation = projection.editGeneration()

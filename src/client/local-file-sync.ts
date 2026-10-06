@@ -48,19 +48,24 @@ export function syncLocalFile(options: {
 			.withPermit(
 				Effect.gen(function* () {
 					if (SubscriptionRef.getUnsafe(state).status === "conflict") return
+					let agreed = base
 					for (let attempt = 0; attempt < 3; attempt++) {
 						let disk = yield* folders.read(id)
 						let local = session.replica.text(id)
 						if (local === disk.content) return yield* settle(disk.content)
-						if (base === undefined) return yield* conflict()
-						let agreed = base
-						let merged = mergeText(agreed, local, disk.content)
+						if (agreed === undefined) return yield* conflict()
+						let mergeBase = agreed
+						let merged = mergeText(mergeBase, local, disk.content)
 						if (merged.conflict) return yield* conflict()
 						if (merged.content !== local) {
 							let mergeConflict = false
 							yield* session
 								.change("Merge changes from disk", staged => {
-									let result = mergeText(agreed, staged.text(id), disk.content)
+									let result = mergeText(
+										mergeBase,
+										staged.text(id),
+										disk.content,
+									)
 									mergeConflict = result.conflict
 									return mergeConflict ? [] : [staged.edit(id, result.content)]
 								})
@@ -74,7 +79,10 @@ export function syncLocalFile(options: {
 						}
 						// A journal commit can yield while another application writes the file.
 						let latest = yield* folders.read(id)
-						if (latest.content !== disk.content) continue
+						if (latest.content !== disk.content) {
+							agreed = disk.content
+							continue
+						}
 						let content = session.replica.text(id)
 						if (content !== latest.content) {
 							yield* publish({ status: "saving" })

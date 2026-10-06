@@ -1,7 +1,7 @@
 import * as Effect from "effect/Effect"
 import { Replica } from "./crdt"
-import { applyAction } from "./document-actions"
-import type { CommittedAction } from "./document-actions"
+import { applyAction, validateAction } from "./document-actions"
+import type { CommittedAction, DocumentAction } from "./document-actions"
 import {
 	sourceMetadataFields,
 	canonicalDocumentSource,
@@ -10,10 +10,20 @@ import {
 import { commentRange } from "./documents"
 import type { Operation } from "./model"
 
-export interface DocumentMoment {
+export interface LocalDocumentMoment {
+	readonly source: "local"
 	readonly position: number
-	readonly action: CommittedAction
+	readonly subject: string
+	readonly action: DocumentAction
 }
+
+export type DocumentMoment =
+	| LocalDocumentMoment
+	| {
+			readonly source?: undefined
+			readonly position: number
+			readonly action: CommittedAction
+	  }
 
 export function historicalDocument(
 	document: string,
@@ -27,7 +37,9 @@ export function historicalDocument(
 			if (moment.position > position) break
 			if (moment.position <= previous || moment.action.document !== document)
 				return yield* Effect.fail(new Error("Document history is out of order"))
-			yield* applyAction(replica, moment.action)
+			if (moment.source === "local")
+				replica.apply(yield* validateAction(replica, moment.action))
+			else yield* applyAction(replica, moment.action)
 			if (!previous && replica.fields(document).type !== "document")
 				return yield* Effect.fail(
 					new Error("The document creation is not downloaded"),

@@ -349,6 +349,7 @@ function makeLibrary() {
 							document,
 							subject: account.subject,
 							initialCreation,
+							historyOrigin: "local",
 							transport: {
 								snapshot: () =>
 									Effect.fail(

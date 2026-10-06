@@ -243,7 +243,7 @@ export class HistoryElement extends HTMLElement {
 										)
 									else editor = options.mountSource(source, replica)
 									source.setAttribute("aria-busy", "false")
-									date.textContent = `${momentDate(moment).toLocaleString()} by ${options.author(moment.action.subject)}`
+									date.textContent = `${momentDate(moment).toLocaleString()} by ${options.author(moment.source === "local" ? moment.subject : moment.action.subject)}`
 									setMarkup(
 										records,
 										html`${joinMarkup(

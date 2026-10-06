@@ -97,6 +97,37 @@ try {
 		'document.querySelector("#save-status").textContent === "Saved to disk" && window.readDisk("Projects/Plan.md").then(text => text.includes("Edited in Alkalye."))',
 	)
 	assert(true, "editing a folder document saves its Markdown back to disk")
+	browser(session, "click", '[data-action="tools"]')
+	browser(
+		session,
+		"click",
+		"#inspector-body alkalye-menu.tool-group:first-of-type > button",
+	)
+	browser(session, "click", '[data-action="history"]')
+	wait(
+		session,
+		'document.querySelector("#history-position") && document.querySelector("#history-source #editor")?.value.includes("Edited in Alkalye.")',
+	)
+	browser(session, "focus", "#history-position")
+	browser(session, "press", "Home")
+	wait(
+		session,
+		'document.querySelector("#history-source #editor")?.value === "# Plan\\n\\nFirst line\\nSecond line\\nThird line\\n"',
+	)
+	assert(
+		true,
+		"folder Time machine renders its original disk source through the document history screen",
+	)
+	browser(session, "click", '[data-action="edit"]')
+	wait(
+		session,
+		'document.querySelector("#editor")?.value.includes("Edited in Alkalye.") && !document.querySelector("#history-source")',
+	)
+	assert(
+		true,
+		"leaving folder history preserves the current document and disk edits",
+	)
+
 	evaluate(
 		session,
 		'window.savedPlan = document.querySelector("alkalye-editor").source.value; window.writeDisk("Projects/Plan.md", "").then(() => dispatchEvent(new Event("focus")))',

@@ -103,7 +103,7 @@ if (process.argv.includes("--serve")) {
 		if (!Array.isArray(results))
 			throw new Error("Missing browser document results")
 		for (let result of results) assert(true, String(result))
-		assert(results.length === 263, "all document browser assertions ran")
+		assert(results.length === 266, "all document browser assertions ran")
 		console.log(
 			"MEASURE",
 			JSON.stringify(evaluate(session, "window.documentApiMeasurements")),
