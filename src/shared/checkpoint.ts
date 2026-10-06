@@ -6,6 +6,7 @@ import {
 	OperationEnvelopeSchema,
 	TextAtomIdSchema,
 	expandDeletions,
+	compactAtoms,
 } from "./model"
 import { VisibilitySnapshotSchema } from "./text-visibility"
 import type { TextVisibilitySnapshot } from "./text-visibility"
@@ -118,17 +119,102 @@ let CausalCheckpointSchema = Schema.Struct({
 		}),
 	),
 })
+
+let maximumCompactAtoms = 1_000_000
+let CompactAtomSchema = Schema.Struct({
+	...CheckpointAtomSchema.fields,
+	value: Schema.NonEmptyString.check(Schema.isMaxLength(2_000_000)),
+})
+let CompactCheckpointSchema = Schema.Struct({
+	...CommonCheckpointFields,
+	format: Schema.Literal("alkalye-state-v3"),
+	targets: Schema.Array(
+		Schema.Struct({
+			...CommonTargetFields,
+			atoms: Schema.Array(CompactAtomSchema),
+			visibility: VisibilitySnapshotSchema,
+		}),
+	),
+})
+export function compactCheckpoint(
+	snapshot: ReplicaCheckpoint,
+): ReplicaCheckpoint | typeof CompactCheckpointSchema.Type {
+	if (
+		snapshot.format === "alkalye-state-v1" ||
+		snapshot.targets.reduce((count, target) => count + target.atoms.length, 0) >
+			maximumCompactAtoms
+	)
+		return snapshot
+	return {
+		format: "alkalye-state-v3",
+		clock: snapshot.clock,
+		restored: snapshot.restored,
+		targets: snapshot.targets.map(target => ({
+			...target,
+			atoms: compactAtoms(target.atoms),
+		})),
+	}
+}
+function expandCompactCheckpoint(
+	value: typeof CompactCheckpointSchema.Type,
+): CausalReplicaCheckpoint {
+	let count = 0
+	for (let target of value.targets)
+		for (let run of target.atoms)
+			for (let _character of run.value) {
+				count++
+				if (count > maximumCompactAtoms)
+					throw new Error("Checkpoint expansion exceeds its atom limit")
+			}
+	let targets = value.targets.map(target => {
+		let atoms: Atom[] = []
+		for (let run of target.atoms) {
+			let characters = Array.from(run.value)
+			let prefix = run.id.slice(0, -8)
+			let offset = Number(run.id.slice(-8))
+			if (offset + characters.length > 100_000_000)
+				throw new Error("Checkpoint insertion exceeds its atom identity range")
+			let previous = run.after
+			for (let [index, value] of characters.entries()) {
+				let id = prefix + String(offset + index).padStart(8, "0")
+				atoms.push(
+					index === 0 ? { ...run, value } : { id, after: previous, value },
+				)
+				previous = id
+			}
+		}
+		return {
+			id: target.id,
+			created: target.created,
+			updated: target.updated,
+			atoms,
+			fields: target.fields.map(parseOperation),
+			visibility: target.visibility,
+		}
+	})
+	return {
+		format: "alkalye-state-v2",
+		clock: value.clock,
+		restored: value.restored.map(([left, right]) => [left, right]),
+		targets,
+	}
+}
 export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
 	let record = object(value)
 	if (
 		record.format !== "alkalye-state-v1" &&
-		record.format !== "alkalye-state-v2"
+		record.format !== "alkalye-state-v2" &&
+		record.format !== "alkalye-state-v3"
 	)
 		throw new Error("Unknown checkpoint format")
 	let decoded =
-		record.format === "alkalye-state-v1"
-			? Schema.decodeUnknownSync(LegacyCheckpointSchema)(value)
-			: Schema.decodeUnknownSync(CausalCheckpointSchema)(value)
+		record.format === "alkalye-state-v3"
+			? expandCompactCheckpoint(
+					Schema.decodeUnknownSync(CompactCheckpointSchema)(value),
+				)
+			: record.format === "alkalye-state-v1"
+				? Schema.decodeUnknownSync(LegacyCheckpointSchema)(value)
+				: Schema.decodeUnknownSync(CausalCheckpointSchema)(value)
 	let targets = new Set<string>(),
 		owners = new Set<string>()
 	let operations = new Map<string, { target: string; kind: string }>()

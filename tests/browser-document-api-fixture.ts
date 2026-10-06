@@ -32,7 +32,10 @@ import {
 	verifyConcurrentDocumentActions,
 	verifyDocumentActionRecovery,
 } from "./browser-document-actions"
-import { verifyFrontmatterJournal } from "./browser-frontmatter-journal"
+import {
+	verifyFrontmatterJournal,
+	verifyLargeDocumentSources,
+} from "./browser-frontmatter-journal"
 import { verifyLocalFileSync } from "./browser-local-file-sync"
 import { verifyDocumentSessionRecovery } from "./browser-document-recovery"
 import { verifyDocumentSessionClosing } from "./browser-document-closing"
@@ -104,6 +107,7 @@ let test = Effect.scoped(
 		let snapshotStarted = performance.now()
 		let snapshot = yield* api.documents.snapshot({
 			params: { document: "browser-document" },
+			query: {},
 		})
 		let snapshotDownloadMilliseconds = performance.now() - snapshotStarted
 		check(
@@ -134,6 +138,7 @@ let test = Effect.scoped(
 		})
 		let current = yield* api.documents.snapshot({
 			params: { document: "browser-document" },
+			query: {},
 		})
 		let sidebar = yield* api.workspaces.snapshot({
 			params: { workspace: "browser-workspace" },
@@ -795,6 +800,7 @@ let test = Effect.scoped(
 		online = false
 		yield* verifyColdDocumentReplay(options, check, () => snapshotRequests)
 		yield* verifyLocalFileSync(identity.subject, check)
+		verifyLargeDocumentSources(check)
 		yield* verifyFrontmatterJournal(identity.subject, check)
 		yield* verifyDocumentSessionClosing(options, check)
 		let oversized = yield* Effect.scoped(
@@ -858,7 +864,7 @@ let test = Effect.scoped(
 		)
 		check(
 			(yield* api.documents
-				.snapshot({ params: { document: "browser-document" } })
+				.snapshot({ params: { document: "browser-document" }, query: {} })
 				.pipe(Effect.result))._tag === "Failure",
 			"logout revokes cookie access to document snapshots",
 		)

@@ -1,8 +1,12 @@
 import { expect, test } from "bun:test"
 import * as Effect from "effect/Effect"
 import { Replica } from "../src/shared/crdt"
-import { parseCheckpoint } from "../src/shared/checkpoint"
-import { parseOperation, expandDeletions } from "../src/shared/model"
+import { compactCheckpoint, parseCheckpoint } from "../src/shared/checkpoint"
+import {
+	parseOperation,
+	expandDeletions,
+	compactOperation,
+} from "../src/shared/model"
 import type { Operation } from "../src/shared/model"
 import { TextVisibility } from "../src/shared/text-visibility"
 import { validateTextCausality } from "../src/shared/document-causality"
@@ -17,7 +21,9 @@ function setup(source = "ABC") {
 function reopen(replica: Replica, actor = "cold") {
 	let restored = new Replica(actor)
 	restored.restore(
-		parseCheckpoint(JSON.parse(JSON.stringify(replica.checkpoint()))),
+		parseCheckpoint(
+			JSON.parse(JSON.stringify(compactCheckpoint(replica.checkpoint()))),
+		),
 	)
 	return restored
 }
@@ -618,4 +624,78 @@ test("a rejected legacy inverse cannot leave restoration hints or reserve a cloc
 	expect(() => local.inverse(deletion)).toThrow()
 	expect(local.checkpoint()).toEqual(before)
 	expect(parseCheckpoint(local.checkpoint())).toEqual(before)
+})
+
+test("packed checkpoints preserve causal facts, forks and legacy decoding", () => {
+	let { replica } = setup("A😀BC")
+	let deletion = edit(replica, "own", "A😀C")
+	replica.apply([deletion])
+	replica.apply([edit(replica, "peer", "A😀!C")])
+	let original = replica.checkpoint()
+	let packed = compactCheckpoint(original)
+	expect(parseCheckpoint(JSON.parse(JSON.stringify(packed)))).toEqual(original)
+	expect(parseCheckpoint(JSON.parse(JSON.stringify(original)))).toEqual(
+		original,
+	)
+	expect(parseCheckpoint(legacy(replica)).format).toBe("alkalye-state-v1")
+	let cold = reopen(replica)
+	let fork = cold.fork("fork")
+	fork.cancel("document", deletion.id)
+	expect(fork.text("document")).toBe("A😀!BC")
+	expect(cold.text("document")).toBe("A😀!C")
+})
+
+test("packed checkpoints reject overlapping runs, invalid anchors and forged clocks", () => {
+	let { replica } = setup("ABC")
+	let packed = compactCheckpoint(replica.checkpoint())
+	let target = packed.targets[0]
+	let atom = target?.atoms[0]
+	if (!target || !atom) throw new Error("Missing checkpoint fixture")
+	function altered(atoms: (typeof atom)[]) {
+		return { ...packed, targets: [{ ...target, atoms }] }
+	}
+	expect(() => parseCheckpoint(altered([atom, atom]))).toThrow("identity")
+	expect(() => parseCheckpoint(altered([{ ...atom, value: "" }]))).toThrow()
+	expect(() =>
+		parseCheckpoint(
+			altered([
+				{ ...atom, id: atom.id.slice(0, -8) + "99999999", value: "AB" },
+			]),
+		),
+	).toThrow("range")
+	expect(() => parseCheckpoint(altered([{ ...atom, after: atom.id }]))).toThrow(
+		"identity",
+	)
+	expect(() => parseCheckpoint({ ...packed, clock: 0 })).toThrow("clock")
+	expect(() =>
+		parseCheckpoint(
+			altered([
+				{ ...atom, value: "a".repeat(2_000_000) },
+				{ ...atom, value: "a".repeat(2_000_000) },
+				{ ...atom, value: "a" },
+			]),
+		),
+	).toThrow("limit")
+	expect(parseCheckpoint(packed)).toEqual(replica.checkpoint())
+})
+
+test("operation and checkpoint runs preserve adjacent lone surrogate atom identities", () => {
+	let { replica, initial } = setup("ab!")
+	let operation = {
+		...initial,
+		insert: initial.insert.map((atom, index) => ({
+			...atom,
+			value: index === 0 ? "\uD83D" : index === 1 ? "\uDE00" : atom.value,
+		})),
+	}
+	let compact = compactOperation(operation)
+	expect(parseOperation(compact).insert).toEqual(operation.insert)
+	let document = new Replica("surrogates")
+	document.apply([operation])
+	let packed = compactCheckpoint(document.checkpoint())
+	expect(parseCheckpoint(packed)).toEqual(document.checkpoint())
+	let cold = new Replica("cold-surrogates")
+	cold.restore(parseCheckpoint(packed))
+	expect(cold.visible("document")).toEqual(document.visible("document"))
+	expect(replica.text("document")).toBe("ab!")
 })

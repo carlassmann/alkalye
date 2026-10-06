@@ -134,7 +134,7 @@ test("CLI offline creation and updates survive restart and publish through the s
 		restarted = true
 		expect((await cli(home, ["sync"], origin)).status).toBe(0)
 		let snapshot = await run(
-			owner.api.documents.snapshot({ params: { document: id } }),
+			owner.api.documents.snapshot({ params: { document: id }, query: {} }),
 		)
 		let replica = await Effect.runPromise(restoreSnapshot(snapshot, "test"))
 		expect(replica.text(id)).toContain("Second")
@@ -185,7 +185,7 @@ test("two CLI processes and HTTP snapshots share source, history, undo, and curr
 			.status,
 	).toBe(0)
 	let snapshot = await run(
-		owner.api.documents.snapshot({ params: { document: id } }),
+		owner.api.documents.snapshot({ params: { document: id }, query: {} }),
 	)
 	let replica = await Effect.runPromise(restoreSnapshot(snapshot, "test"))
 	expect(replica.text(id)).toContain("Changed")

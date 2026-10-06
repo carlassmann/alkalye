@@ -30,7 +30,11 @@ export function mergeText(
 	for (let edit of combined.sort(
 		(a, b) => b.start - a.start || b.remove - a.remove,
 	))
-		result.splice(edit.start, edit.remove, ...edit.insert)
+		result = [
+			...result.slice(0, edit.start),
+			...edit.insert,
+			...result.slice(edit.start + edit.remove),
+		]
 	return { content: result.join(""), conflict: false }
 }
 

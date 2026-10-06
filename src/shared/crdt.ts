@@ -18,6 +18,16 @@ import type { Atom, DocumentRecord, Operation } from "./model"
 import { textSplices } from "./text-splices"
 
 let sourceViews = new WeakMap<Atom[], Atom[]>()
+interface PreparedTextEdit {
+	id: string
+	target: string
+	generation: number
+	signature: string
+	content: string
+	atoms: Atom[]
+	raw: Atom[]
+	splices: { start: number; remove: number; inserted: string[] }[]
+}
 
 export class Replica {
 	operations = new Map<string, Operation>()
@@ -39,16 +49,86 @@ export class Replica {
 	private sourceCache = new Map<string, Atom[]>()
 	private fieldCache = new Map<string, Record<string, string>>()
 	private metadataCache = new Map<string, DocumentMetadata>()
+	private preparedEdit: PreparedTextEdit | undefined
 	constructor(
 		public actor: string,
 		public author = "Writer",
 	) {}
+	fork(actor = this.actor, author = this.author) {
+		let replica = new Replica(actor, author)
+		for (let operation of this.operations.values()) freezeFact(operation)
+		for (let fields of this.registers.values())
+			for (let operation of fields.values()) freezeFact(operation)
+		replica.operations = new Map(this.operations)
+		replica.clock = this.clock
+		replica.historyLoaded = this.historyLoaded
+		replica.atomIndex = new Map(this.atomIndex)
+		replica.children = new Map(
+			[...this.children].map(([target, children]) => [
+				target,
+				new Map(children),
+			]),
+		)
+		replica.visibility = new Map(
+			[...this.visibility].map(([target, visibility]) => [
+				target,
+				visibility.fork(),
+			]),
+		)
+		replica.textOwners = new Map(this.textOwners)
+		replica.ownedAtomCounts = new Map(this.ownedAtomCounts)
+		replica.stateGeneration = this.stateGeneration
+		replica.registers = new Map(
+			[...this.registers].map(([target, fields]) => [target, new Map(fields)]),
+		)
+		replica.targets = new Map(
+			[...this.targets].map(([target, history]) => [target, [...history]]),
+		)
+		replica.strings = new Map(this.strings)
+		replica.updated = new Map(this.updated)
+		replica.created = new Map(this.created)
+		replica.restored = new Map(this.restored)
+		return replica
+	}
 	get generation() {
 		return this.stateGeneration
 	}
 	apply(input: Operation[]) {
+		let edit = this.preparedEdit
+		this.preparedEdit = undefined
 		this.prepare(input)()
+		let operation = this.operations.get(input[0]?.id ?? "")
+		if (
+			!edit ||
+			input.length !== 1 ||
+			!operation ||
+			operation.id !== edit.id ||
+			this.generation !== edit.generation + 1 ||
+			textEditSignature(operation) !== edit.signature
+		)
+			return
+		let raw = edit.raw,
+			atoms = edit.atoms
+		for (let splice of [...edit.splices].reverse()) {
+			let inserted = splice.inserted.flatMap(id => {
+				let atom = this.atomIndex.get(id)?.atom
+				return atom ? [atom] : []
+			})
+			atoms = atoms
+				.slice(0, splice.start)
+				.concat(inserted, atoms.slice(splice.start + splice.remove))
+			let rawStart =
+				splice.start === edit.atoms.length ? raw.length : splice.start
+			raw = raw
+				.slice(0, rawStart)
+				.concat(inserted, raw.slice(rawStart + splice.remove))
+		}
+		this.textCache.set(edit.target, raw)
+		this.sourceCache.set(edit.target, atoms)
+		sourceViews.set(atoms, raw)
+		this.strings.set(edit.target, edit.content)
 	}
+
 	validate(input: Operation[]) {
 		this.prepare(input)
 	}
@@ -179,10 +259,102 @@ export class Replica {
 		atoms = this.visible(target),
 		options: { migration?: true } = {},
 	) {
-		let previous = atoms.map(atom => atom.value).join("")
+		this.preparedEdit = undefined
+		let previous =
+			atoms === this.sourceCache.get(target)
+				? this.text(target)
+				: atoms.map(atom => atom.value).join("")
 		if (previous === next) return null
 		let operation = this.makeOperation(target, "text", this.clock + 1)
 		let current = this.visible(target)
+		let raw = sourceViews.get(atoms) ?? atoms
+		let header = frontmatterBlock(previous)
+		let bodyAppend = header
+			? header[0].length < previous.length || header[0].endsWith("\n")
+			: !previous.startsWith("-") && !previous.startsWith("\uFEFF")
+		if (
+			atoms.length &&
+			current === atoms &&
+			bodyAppend &&
+			next.startsWith(previous) &&
+			!touchesSourceFence(next, previous.length, next.length) &&
+			raw.at(-1)?.id === atoms.at(-1)?.id
+		) {
+			let anchor = atoms.at(-1)?.id ?? ""
+			for (let value of Array.from(next.slice(previous.length))) {
+				let id = `${operation.id}:${String(operation.insert.length).padStart(8, "0")}`
+				operation.insert.push({ id, after: anchor, value })
+				anchor = id
+			}
+			this.rememberTextEdit(operation, next, atoms, raw, [
+				{
+					start: atoms.length,
+					remove: 0,
+					inserted: operation.insert.map(atom => atom.id),
+				},
+			])
+			return operation
+		}
+		if (
+			current === atoms &&
+			previous.length === atoms.length &&
+			raw.length === atoms.length
+		) {
+			let start = 0,
+				previousEnd = previous.length,
+				nextEnd = next.length
+			while (
+				start < previousEnd &&
+				start < nextEnd &&
+				previous[start] === next[start]
+			)
+				start++
+			while (
+				previousEnd > start &&
+				nextEnd > start &&
+				previous[previousEnd - 1] === next[nextEnd - 1]
+			) {
+				previousEnd--
+				nextEnd--
+			}
+			let bodyStart = header?.[0].length ?? 0
+			let rawAligned =
+				raw[start - 1]?.id === atoms[start - 1]?.id &&
+				raw[start]?.id === atoms[start]?.id &&
+				raw[previousEnd - 1]?.id === atoms[previousEnd - 1]?.id
+			let ordinaryBody = header
+				? start >= bodyStart
+				: !frontmatterBlock(next) && bodyAppend
+			if (
+				ordinaryBody &&
+				rawAligned &&
+				!touchesSourceFence(next, start, nextEnd) &&
+				previousEnd - start + nextEnd - start <= 128
+			) {
+				let splices = textSplices(
+					atoms.slice(start, previousEnd).map(atom => atom.value),
+					Array.from(next.slice(start, nextEnd)),
+				)
+				let cached: PreparedTextEdit["splices"] = []
+				for (let splice of splices) {
+					let position = start + splice.start
+					for (let atom of atoms.slice(position, position + splice.remove))
+						operation.remove.push(atom.id)
+					let anchor = atoms[position - 1]?.id ?? ""
+					let inserted: string[] = []
+					for (let value of splice.insert) {
+						let id = `${operation.id}:${String(operation.insert.length).padStart(8, "0")}`
+						operation.insert.push({ id, after: anchor, value })
+						inserted.push(id)
+						anchor = id
+					}
+					cached.push({ start: position, remove: splice.remove, inserted })
+				}
+				this.rememberTextEdit(operation, next, atoms, raw, cached)
+				return operation
+			}
+		}
+
 		for (let edit of sourceEdits(
 			atoms,
 			next,
@@ -194,13 +366,16 @@ export class Replica {
 			let splices = edit.replace
 				? [{ start: 0, remove: before.length, insert: after }]
 				: textSplices(before, after)
-			operation.remove.push(...edit.remove.map(atom => atom.id))
+			for (let atom of edit.remove) operation.remove.push(atom.id)
 			for (let splice of splices) {
-				operation.remove.push(
-					...edit.atoms
-						.slice(splice.start, splice.start + splice.remove)
-						.map(atom => atom.id),
-				)
+				for (
+					let index = splice.start;
+					index < splice.start + splice.remove;
+					index++
+				) {
+					let atom = edit.atoms[index]
+					if (atom) operation.remove.push(atom.id)
+				}
 				let anchor =
 					edit.atoms[splice.start - 1]?.id ??
 					(edit.chain ? operation.insert.at(-1)?.id : edit.anchor) ??
@@ -228,17 +403,35 @@ export class Replica {
 			}
 		}
 		operation.remove = [...new Set(operation.remove)]
-		let undo = sourceUndo(atoms, operation.remove)
-		if (
-			undo.header.length ||
-			undo.hidden.length ||
-			operation.insert.some(atom => atom.order)
-		) {
-			operation.field = "frontmatter-edit"
-			operation.value = Schema.encodeSync(SourceUndoSchema)(undo)
+		let changesHeader = operation.insert.some(atom => atom.order)
+		if (operation.remove.length || changesHeader) {
+			let undo = sourceUndo(atoms, operation.remove)
+			if (undo.header.length || undo.hidden.length || changesHeader) {
+				operation.field = "frontmatter-edit"
+				operation.value = Schema.encodeSync(SourceUndoSchema)(undo)
+			}
 		}
 		return operation
 	}
+	private rememberTextEdit(
+		operation: Operation,
+		content: string,
+		atoms: Atom[],
+		raw: Atom[],
+		splices: PreparedTextEdit["splices"],
+	) {
+		this.preparedEdit = {
+			id: operation.id,
+			target: operation.target,
+			generation: this.generation,
+			signature: textEditSignature(operation),
+			content,
+			atoms,
+			raw,
+			splices,
+		}
+	}
+
 	inverse(previous: Operation) {
 		let operation = this.makeOperation(previous.target, "text", this.clock + 1)
 		operation.remove = previous.insert.map(atom => this.liveAtom(atom.id))
@@ -401,7 +594,7 @@ export class Replica {
 			for (let atom of operation.insert) {
 				if (known.has(atom.id)) continue
 				known.add(atom.id)
-				let siblings = children.get(atom.after) ?? []
+				let siblings = [...(children.get(atom.after) ?? [])]
 				siblings.push(atom)
 				children.set(atom.after, siblings)
 			}
@@ -854,11 +1047,12 @@ export class Replica {
 	}
 	private indexAtom(target: string, atom: Atom) {
 		if (this.atomIndex.has(atom.id)) return
+		freezeTextAtom(atom)
 		this.atomIndex.set(atom.id, { target, atom })
 		let owner = atom.id.slice(0, -9)
 		this.ownedAtomCounts.set(owner, (this.ownedAtomCounts.get(owner) ?? 0) + 1)
 		let children = this.children.get(target) ?? new Map<string, Atom[]>()
-		let siblings = children.get(atom.after) ?? []
+		let siblings = [...(children.get(atom.after) ?? [])]
 		let index = siblings.findIndex(sibling => sibling.id < atom.id)
 		siblings.splice(index < 0 ? siblings.length : index, 0, atom)
 		children.set(atom.after, siblings)
@@ -889,4 +1083,38 @@ function copyAtom(atom: Atom): Atom {
 		...(atom.observed ? { observed: [...atom.observed] } : {}),
 		...(atom.deleted ? { deleted: [...atom.deleted] } : {}),
 	}
+}
+
+function freezeTextAtom(atom: Atom) {
+	if (Object.isFrozen(atom)) return
+	if (atom.order) Object.freeze(atom.order)
+	if (atom.observed) Object.freeze(atom.observed)
+	if (atom.deleted) Object.freeze(atom.deleted)
+	Object.freeze(atom)
+}
+function freezeFact(operation: Operation) {
+	if (Object.isFrozen(operation)) return
+	for (let atom of operation.insert) freezeTextAtom(atom)
+	Object.freeze(operation.insert)
+	Object.freeze(operation.remove)
+	Object.freeze(operation)
+}
+
+function textEditSignature(operation: Operation) {
+	return JSON.stringify([
+		operation.target,
+		operation.kind,
+		operation.field,
+		operation.value,
+		operation.insert.map(atomIdentity),
+		operation.remove,
+	])
+}
+
+function touchesSourceFence(source: string, start: number, end: number) {
+	let first = source.lastIndexOf("\n", start - 1) + 1
+	let last = source.indexOf("\n", end)
+	return /^---[ \t]*\r?$/m.test(
+		source.slice(first, last < 0 ? source.length : last),
+	)
 }

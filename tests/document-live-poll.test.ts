@@ -1,10 +1,18 @@
 import { Database } from "bun:sqlite"
+import { profile } from "bun:jsc"
 import { afterAll, beforeAll, expect, test } from "bun:test"
 import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import type * as Crypto from "effect/Crypto"
 import * as Effect from "effect/Effect"
+import * as Context from "effect/Context"
+import * as Layer from "effect/Layer"
+import * as Queue from "effect/Queue"
+import { cliDocumentSessionLayer } from "../src/cli/document-platform"
+import { performanceFixture } from "../experiments/performance/fixture"
+import { DocumentSession } from "../src/shared/document-session"
+import type { DocumentTransport } from "../src/shared/document-session"
 import * as Redacted from "effect/Redacted"
 import * as HttpApiClient from "effect/http-api/HttpApiClient"
 import * as FetchHttpClient from "effect/http/FetchHttpClient"
@@ -217,6 +225,7 @@ test("a failed postcommit recipient read preserves the durable write and only wa
 			await run(
 				owner.api.documents.snapshot({
 					params: { document: "notification-failure-doc" },
+					query: {},
 				}),
 			),
 			owner.subject + "-notification-failure",
@@ -278,6 +287,7 @@ test("a failed postcommit recipient read preserves the durable write and only wa
 				await run(
 					owner.api.documents.snapshot({
 						params: { document: "notification-failure-doc" },
+						query: {},
 					}),
 				),
 				"verify-failed-notification",
@@ -923,6 +933,330 @@ test("a restarted server expires old sessions and a new session resynchronizes",
 	}
 })
 
+async function sustainedSwarm() {
+	let accounts = await Promise.all(
+		Array.from({ length: 25 }, (_, index) => run(client(120 + index))),
+	)
+	let owner = accounts[0]
+	let reader = accounts[24]
+	if (!owner || !reader) throw Error("Missing swarm accounts")
+	let writers = accounts.slice(0, 24)
+	let document = "swarm-document"
+	await run(
+		Effect.gen(function* () {
+			yield* createWorkspace(owner, "swarm-workspace", "Swarm")
+			yield* createDocument(
+				owner,
+				"swarm-workspace",
+				document,
+				performanceFixture(8),
+			)
+			for (let account of writers.slice(1))
+				yield* member(owner, "swarm-workspace", account, "writer")
+			yield* member(owner, "swarm-workspace", reader, "reader")
+		}),
+	)
+	let peers: {
+		inbox: LiveMessage[]
+		send(message: unknown): Promise<void>
+		until(match: (message: LiveMessage) => boolean): Promise<LiveMessage>
+		close(): Promise<void>
+	}[] = []
+	async function connect(index: number) {
+		let login = await cookieLogin(instance.server.url, 120 + index)
+		if (index % 2 === 0) {
+			let socket = await liveSocket(login)
+			return {
+				inbox: socket.inbox,
+				async send(message: unknown) {
+					socket.send(message)
+				},
+				until: socket.until,
+				async close() {
+					socket.close()
+				},
+			}
+		}
+		let polling = livePoll(login)
+		await polling.open()
+		let messages = await Effect.runPromise(Queue.unbounded<LiveMessage>())
+		let abort = new AbortController()
+		let failure: unknown
+		function collect() {
+			for (let message of polling.inbox.splice(0))
+				Queue.offerUnsafe(messages, message)
+		}
+		collect()
+		let pump = (async () => {
+			try {
+				while (!abort.signal.aborted) {
+					let response = await polling.poll(abort.signal)
+					if (typeof response === "number")
+						throw Error("Live poll failed: " + response)
+					collect()
+				}
+			} catch (error) {
+				if (!abort.signal.aborted) failure = error
+			} finally {
+				Queue.shutdownUnsafe(messages)
+			}
+		})()
+		return {
+			inbox: polling.inbox,
+			async send(message: unknown) {
+				if (failure) throw failure
+				expect(await polling.send([message])).toBe(204)
+			},
+			async until(match: (message: LiveMessage) => boolean) {
+				return Effect.runPromise(
+					Effect.gen(function* () {
+						while (true) {
+							let message = yield* Queue.take(messages)
+							if (match(message)) return message
+						}
+					}).pipe(Effect.timeout("5 seconds")),
+				)
+			},
+			async close() {
+				abort.abort()
+				await pump
+				await polling.close()
+				if (failure) throw failure
+			},
+		}
+	}
+	try {
+		for (let index = 0; index < writers.length; index++)
+			peers.push(await connect(index))
+		await Promise.all(
+			peers.map(async peer => {
+				await peer.until(is("connected"))
+				await peer.send({ type: "watch", document })
+			}),
+		)
+		await Promise.all(
+			peers.map((peer, index) =>
+				peer.send({ type: "presence", presence: cursor(document, index) }),
+			),
+		)
+		let observer = peers[0]
+		if (!observer) throw Error("Missing observer")
+		let actors = new Set<string>()
+		while (actors.size < writers.length - 1) {
+			let presence = parsePresence(
+				(await observer.until(is("presence"))).presence,
+			)
+			actors.add(presence.actor)
+		}
+		expect(actors.size).toBe(23)
+		await run(
+			Effect.scoped(
+				Effect.gen(function* () {
+					let offline = new Set<number>()
+					let sessions: DocumentSession["Service"][] = []
+					for (let [index, account] of writers.entries()) {
+						function online<A, E>(effect: Effect.Effect<A, E>) {
+							return Effect.suspend<A, E | Error, never>(() =>
+								offline.has(index)
+									? Effect.fail(new Error("Offline writer"))
+									: effect,
+							)
+						}
+						let transport: DocumentTransport = {
+							snapshot: document =>
+								online(
+									account.api.documents.snapshot({
+										params: { document },
+										query: {},
+									}),
+								),
+							commit: action =>
+								online(
+									account.api.documents.commit({
+										params: { document },
+										payload: action,
+									}),
+								),
+							history: (document, after, log, limit) =>
+								online(
+									account.api.documents.history({
+										params: { document },
+										query: { after, log, limit },
+									}),
+								),
+						}
+						let services = yield* Layer.build(
+							cliDocumentSessionLayer(
+								join(directory, "swarm-client-" + index),
+								{ document, subject: account.subject, transport },
+							),
+						)
+						sessions.push(Context.get(services, DocumentSession))
+					}
+
+					let burstMilliseconds: number[] = []
+					for (let round = 0; round < 8; round++) {
+						let started = performance.now()
+						yield* Effect.all(
+							sessions.map((session, index) => {
+								let source = session.replica.text(document)
+								let marker = `\nwriter-${index}-round-${round}\n`
+								let position = source.length,
+									remove = 0
+								if (round % 4 === 1) position = source.indexOf("# Benchmark")
+								if (round % 4 === 2)
+									position = source.indexOf(
+										"A responsiveness",
+										Math.floor(source.length / 3),
+									)
+								if (round % 4 === 3) {
+									position = source.indexOf("A responsiveness")
+									remove = 2
+								}
+								if (position < 0) throw Error("Missing source fixture passage")
+								return session.edit(
+									source.slice(0, position) +
+										marker +
+										source.slice(position + remove),
+								).saved
+							}),
+							{ concurrency: "unbounded" },
+						)
+						yield* Effect.all(
+							sessions.map(session => session.sync),
+							{ concurrency: "unbounded" },
+						)
+						yield* Effect.promise(() =>
+							Promise.all(peers.map(peer => peer.until(is("advanced")))),
+						)
+						yield* Effect.all(
+							sessions.map(session => session.sync),
+							{ concurrency: "unbounded" },
+						)
+						let expected = sessions[0]?.replica.text(document)
+						if (!expected) throw Error("Missing converged source")
+						for (let [index, session] of sessions.entries()) {
+							expect(session.replica.text(document)).toBe(expected)
+							for (let completed = 0; completed <= round; completed++)
+								expect(
+									expected.split(`writer-${index}-round-${completed}\n`),
+								).toHaveLength(2)
+						}
+						yield* Effect.promise(() =>
+							Promise.all(
+								peers.map((peer, index) =>
+									peer.send({
+										type: "presence",
+										presence: cursor(document, round * 100 + index),
+									}),
+								),
+							),
+						)
+						let updated = new Set<string>()
+						while (updated.size < writers.length - 1) {
+							let frame = yield* Effect.promise(() =>
+								observer.until(
+									message =>
+										message.type === "presence" &&
+										Number(object(message.presence).cursor) >= round * 100,
+								),
+							)
+							updated.add(parsePresence(frame.presence).actor)
+						}
+						expect(updated.size).toBe(23)
+						burstMilliseconds.push(performance.now() - started)
+					}
+					console.info(
+						"24-writer8KBburst",
+						JSON.stringify({
+							operations: 192,
+							roundMilliseconds: burstMilliseconds,
+							operationsPerSecond:
+								192000 /
+								burstMilliseconds.reduce((sum, duration) => sum + duration, 0),
+						}),
+					)
+					for (let index = 0; index < 4; index++) {
+						let session = sessions[index],
+							peer = peers[index]
+						if (!session || !peer) throw Error("Missing offline client")
+						offline.add(index)
+						yield* Effect.promise(() => peer.close())
+						yield* session.edit(
+							session.replica.text(document) + `\noffline-${index} 🧠\n`,
+						).saved
+						expect((yield* Effect.exit(session.sync))._tag).toBe("Failure")
+						yield* session.save
+						offline.delete(index)
+						let resumed = yield* Effect.promise(() => connect(index))
+						peers[index] = resumed
+						yield* Effect.promise(() =>
+							resumed.send({ type: "watch", document }),
+						)
+					}
+					yield* Effect.all(
+						sessions.map(session => session.sync),
+						{ concurrency: "unbounded" },
+					)
+					yield* Effect.all(
+						sessions.map(session => session.sync),
+						{ concurrency: "unbounded" },
+					)
+					let expected = sessions[0]?.replica.text(document)
+					if (!expected) throw Error("Missing reconnected source")
+					for (let session of sessions)
+						expect(session.replica.text(document)).toBe(expected)
+					for (let index = 0; index < 4; index++)
+						expect(expected).toContain(`offline-${index} 🧠\n`)
+					let forbidden = yield* buildAction(
+						yield* restoreSnapshot(
+							yield* reader.api.documents.snapshot({
+								params: { document },
+								query: {},
+							}),
+							reader.subject + "-reader",
+						),
+						document,
+						"Reader edit",
+						staged => [staged.edit(document, "Forbidden overwrite")],
+					)
+					let refusal = yield* Effect.flip(
+						reader.api.documents.commit({
+							params: { document },
+							payload: forbidden,
+						}),
+					)
+					expect(refusal._tag).toBe("PermissionDenied")
+					let snapshot = yield* restoreSnapshot(
+						yield* owner.api.documents.snapshot({
+							params: { document },
+							query: {},
+						}),
+						"verification",
+					)
+					expect(snapshot.text(document)).toBe(expected)
+				}),
+			),
+		)
+		let polling = livePoll(await cookieLogin(instance.server.url, 144))
+		await polling.open()
+		let abort = new AbortController()
+		let waiting = polling.poll(abort.signal).catch(() => undefined)
+		abort.abort()
+		await waiting
+		expect(await polling.close()).toBe(204)
+		expect(await polling.poll()).toBe(410)
+	} finally {
+		await Promise.allSettled(peers.map(peer => peer.close()))
+	}
+}
+test("24 independently persisted writers converge over mixed live transports, reconnect and enforce reader permissions", async () => {
+	if (process.env.PROFILE_SWARM === "1") {
+		let result = await profile(sustainedSwarm)
+		await Bun.write("/tmp/alkalye-swarm-profile.txt", result.functions)
+	} else await sustainedSwarm()
+}, 120_000)
+
 function is(type: string) {
 	return (message: LiveMessage) => message.type === type
 }
@@ -985,13 +1319,18 @@ function member(
 		payload: { role, request: "member-" + workspace + "-" + account.subject },
 	})
 }
-function createDocument(owner: Client, workspace: string, document: string) {
+function createDocument(
+	owner: Client,
+	workspace: string,
+	document: string,
+	source = "# Live\n\nBody",
+) {
 	return Effect.gen(function* () {
 		let action = yield* buildAction(
 			new Replica(owner.subject + "-" + document),
 			document,
 			"Create document",
-			staged => newDocument(staged, document, "Untitled", "# Live\n\nBody"),
+			staged => newDocument(staged, document, "Untitled", source),
 		)
 		return yield* owner.api.documents.create({ payload: { workspace, action } })
 	})
@@ -999,7 +1338,10 @@ function createDocument(owner: Client, workspace: string, document: string) {
 function edit(account: Client, document: string, text: string) {
 	return Effect.gen(function* () {
 		let replica = yield* restoreSnapshot(
-			yield* account.api.documents.snapshot({ params: { document } }),
+			yield* account.api.documents.snapshot({
+				params: { document },
+				query: {},
+			}),
 			account.subject + "-" + text.replace(/\W+/g, "-").slice(0, 40),
 		)
 		let action = yield* buildAction(replica, document, "Edit", staged => [
@@ -1014,7 +1356,10 @@ function edit(account: Client, document: string, text: string) {
 function grant(account: Client, document: string, who: string, role: string) {
 	return Effect.gen(function* () {
 		let replica = yield* restoreSnapshot(
-			yield* account.api.documents.snapshot({ params: { document } }),
+			yield* account.api.documents.snapshot({
+				params: { document },
+				query: {},
+			}),
 			account.subject + "-grant-" + who + "-" + (role || "none"),
 		)
 		let action = yield* buildAction(replica, document, "Share", staged => [

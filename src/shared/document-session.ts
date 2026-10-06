@@ -43,7 +43,7 @@ import {
 import type { UndoEntry } from "./document-undo"
 import { partitionDocumentActions } from "./document-dependencies"
 import { validateTextCausality } from "./document-causality"
-import { parseCheckpoint } from "./checkpoint"
+import { parseCheckpoint, compactCheckpoint } from "./checkpoint"
 import { Replica } from "./crdt"
 import {
 	CommittedActionSchema,
@@ -105,7 +105,18 @@ export interface PositionedAction {
 	position: number
 	action: CommittedAction
 }
+export interface PassiveDocumentState {
+	position: number
+	value: unknown
+	replica?: Replica
+	generation?: number
+}
 export interface DocumentSessionOptions {
+	passiveState?: {
+		read: Effect.Effect<PassiveDocumentState | undefined>
+		write(state: PassiveDocumentState): Effect.Effect<void>
+		clear: Effect.Effect<void>
+	}
 	document: string
 	subject: string
 	author?: string
@@ -280,13 +291,18 @@ function makeSession(options: DocumentSessionOptions) {
 		)
 		let saveSnapshot = gate
 			.withPermit(
-				Effect.all([projection.captureSnapshot, projection.captureState]),
+				Effect.all([
+					projection.captureSnapshot,
+					options.activity
+						? projection.captureState
+						: Effect.succeed(undefined),
+				]),
 			)
 			.pipe(
 				Effect.flatMap(([snapshot, state]) =>
 					Effect.gen(function* () {
 						if (snapshot) yield* projection.saveSnapshot(snapshot)
-						if (options.activity && state.localPosition)
+						if (options.activity && state?.localPosition)
 							return yield* options.activity
 								.projected(state)
 								.pipe(Effect.as(Option.some(state)))
@@ -462,6 +478,7 @@ function makeSession(options: DocumentSessionOptions) {
 				let operation = projection.replica.prepareEdit(target, content, base)
 				let unchanged = {
 					operation: null,
+					content: view.text(target),
 					atoms: view.visible(target),
 				}
 				if (!operation) return { ...unchanged, saved: Effect.void }
@@ -492,6 +509,7 @@ function makeSession(options: DocumentSessionOptions) {
 				advanceView()
 				return {
 					operation: freezeOperation(operation),
+					content: view.text(target),
 					atoms: view.visible(target),
 					saved: flush,
 				}
@@ -767,39 +785,53 @@ function makeProjection(options: DocumentSessionOptions) {
 				timeToLive: exit => (Exit.isSuccess(exit) ? "1 minute" : 0),
 			},
 		)
-		let cached = yield* storage.cache.pipe(
-			Effect.catch(error =>
-				Effect.logWarning(
-					"Rebuilding unreadable document cache from its journal",
-					{ category: documentFailureCategory(error) },
-				).pipe(Effect.as(undefined)),
-			),
-		)
+		let passive = yield* options.passiveState?.read ?? Effect.succeed(undefined)
+		let cached =
+			passive ??
+			(yield* storage.cache.pipe(
+				Effect.catch(error =>
+					Effect.logWarning(
+						"Rebuilding unreadable document cache from its journal",
+						{ category: documentFailureCategory(error) },
+					).pipe(Effect.as(undefined)),
+				),
+			))
 		if (cached) {
 			yield* restoreCache(cached).pipe(
 				Effect.catch(error =>
-					Effect.sync(() => {
-						replica = new Replica(actor, options.author)
-						durable = new Replica("local-document", options.author)
-						accepted = new Replica("accepted-document", options.author)
-						pending.clear()
-						rejected.clear()
-						proposals.clear()
-						log = ""
-						creation = undefined
-						remotePosition = localPosition = cachedPosition = 0
-					}).pipe(
-						Effect.andThen(
-							Effect.logWarning(
-								"Rebuilding derived document cache from its journal",
-								{ category: documentFailureCategory(error) },
-							),
-						),
-					),
+					Effect.gen(function* () {
+						yield* options.passiveState?.clear ?? Effect.void
+						resetProjection()
+						if (passive) {
+							let disk = yield* storage.cache.pipe(Effect.option)
+							if (disk._tag === "Some" && disk.value) {
+								let restored = yield* restoreCache(disk.value).pipe(
+									Effect.result,
+								)
+								if (restored._tag === "Success") return
+								resetProjection()
+							}
+						}
+						yield* Effect.logWarning(
+							"Rebuilding derived document cache from its journal",
+							{ category: documentFailureCategory(error) },
+						)
+					}),
 				),
 			)
 		}
-		function restoreCache(cached: { position: number; value: unknown }) {
+		function resetProjection() {
+			replica = new Replica(actor, options.author)
+			durable = new Replica("local-document", options.author)
+			accepted = new Replica("accepted-document", options.author)
+			pending.clear()
+			rejected.clear()
+			proposals.clear()
+			log = ""
+			creation = undefined
+			remotePosition = localPosition = cachedPosition = 0
+		}
+		function restoreCache(cached: PassiveDocumentState) {
 			return Effect.gen(function* () {
 				if (!(yield* storage.containsPosition(cached.position)))
 					return yield* conflict(
@@ -832,10 +864,19 @@ function makeProjection(options: DocumentSessionOptions) {
 					)
 				yield* Effect.try({
 					try: () => {
-						let checkpoint = parseCheckpoint(state.checkpoint)
-						accepted.restore(checkpoint)
-						durable.restore(checkpoint)
-						replica.restore(checkpoint)
+						if (
+							cached.replica &&
+							cached.replica.generation === cached.generation
+						)
+							accepted = cached.replica.fork(
+								"accepted-document",
+								options.author,
+							)
+						else accepted.restore(parseCheckpoint(state.checkpoint))
+						durable = accepted.fork("local-document", options.author)
+						replica = accepted.fork(actor, options.author)
+						cached.replica = accepted
+						cached.generation = accepted.generation
 					},
 					catch: cause => storageFailure("restore document", cause),
 				})
@@ -924,6 +965,7 @@ function makeProjection(options: DocumentSessionOptions) {
 						rejected.get(item.root)?.root !== item.root
 					)
 						return yield* conflict("Saved rejected action lost its root")
+				yield* options.passiveState?.write(cached) ?? Effect.void
 			})
 		}
 		let replay = Effect.gen(function* () {
@@ -952,9 +994,10 @@ function makeProjection(options: DocumentSessionOptions) {
 					} else if (value.kind === "opened") {
 						if (!log && !creation) {
 							let restored = yield* restoreSnapshot(value.snapshot, actor)
-							accepted.restore(restored.checkpoint())
-							durable.restore(restored.checkpoint())
-							replica.restore(restored.checkpoint())
+							accepted = restored.fork("accepted-document", options.author)
+							durable = restored.fork("local-document", options.author)
+							replica = restored
+							replica.author = options.author ?? "Writer"
 							log = value.snapshot.log
 							remotePosition = value.snapshot.position
 						}
@@ -1202,30 +1245,37 @@ function makeProjection(options: DocumentSessionOptions) {
 				remotePosition,
 				record: durable.documents("").find(doc => doc.id === options.document),
 			})),
-			captureSnapshot: Effect.sync(() =>
-				projectionComplete && localPosition && localPosition !== cachedPosition
-					? {
-							position: localPosition,
-							value: Schema.encodeSync(currentMaterialization)({
-								format: "document-local-state-v3",
-								document: options.document,
-								subject: options.subject,
-								checkpoint: accepted.checkpoint(),
-								log,
-								remotePosition,
-								proposals: [...proposals].map(([id, value]) => [
-									id,
-									value.entry,
-									value.settled,
-								]),
-								pending: [...pending.values()],
-								rejected: [...rejected.values()],
-								creation,
-							}),
-						}
-					: undefined,
-			),
-			saveSnapshot: (snapshot: { position: number; value: unknown }) =>
+			captureSnapshot: Effect.sync(() => {
+				if (
+					!projectionComplete ||
+					!localPosition ||
+					localPosition === cachedPosition
+				)
+					return
+				let checkpoint = accepted.checkpoint()
+				return {
+					position: localPosition,
+					replica: options.passiveState ? accepted : undefined,
+					generation: accepted.generation,
+					value: Schema.encodeSync(currentMaterialization)({
+						format: "document-local-state-v3",
+						document: options.document,
+						subject: options.subject,
+						checkpoint: compactCheckpoint(checkpoint),
+						log,
+						remotePosition,
+						proposals: [...proposals].map(([id, value]) => [
+							id,
+							value.entry,
+							value.settled,
+						]),
+						pending: [...pending.values()],
+						rejected: [...rejected.values()],
+						creation,
+					}),
+				}
+			}),
+			saveSnapshot: (snapshot: PassiveDocumentState) =>
 				Effect.gen(function* () {
 					let saved = yield* storage.saveCache(
 						snapshot.position,
@@ -1236,6 +1286,7 @@ function makeProjection(options: DocumentSessionOptions) {
 							"The snapshot's journal position was removed",
 						)
 					cachedPosition = Math.max(cachedPosition, snapshot.position)
+					yield* options.passiveState?.write(snapshot) ?? Effect.void
 				}),
 		}
 
@@ -1712,7 +1763,6 @@ function documentView(current: () => Replica) {
 		visible(target: string, until: number | string = Infinity) {
 			let atoms = current().visible(target, until)
 			if (!protectedViews.has(atoms)) {
-				for (let atom of atoms) freezeAtom(atom)
 				Object.freeze(atoms)
 				protectedViews.add(atoms)
 			}
@@ -1760,6 +1810,7 @@ function freezeRejected(item: RejectedAction) {
 	})
 }
 function freezeAtom(atom: Atom) {
+	if (Object.isFrozen(atom)) return atom
 	if (atom.order) Object.freeze(atom.order)
 	if (atom.observed) Object.freeze(atom.observed)
 	if (atom.deleted) Object.freeze(atom.deleted)

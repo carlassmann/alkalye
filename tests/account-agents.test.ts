@@ -82,7 +82,7 @@ test("account agent tools share document snapshots, discussion history and exact
 		resolved: true,
 	})
 	let snapshot = await run(
-		owner.api.documents.snapshot({ params: { document } }),
+		owner.api.documents.snapshot({ params: { document }, query: {} }),
 	)
 	let history = await run(
 		owner.api.documents.history({

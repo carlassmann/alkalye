@@ -855,3 +855,54 @@ test("an undone anchor cannot justify hiding newly typed invalid aliases", () =>
 		expect(first.text("doc")).toContain("alias: *n")
 	}
 })
+
+test("typing after an EOF header preserves its newline and body across checkpoints", () => {
+	let replica = new Replica("eof-writer")
+	let source = "---\na: 1\n---"
+	replica.edit("document", source)
+	for (let appended of ["\n", "x"]) {
+		source += appended
+		replica.edit("document", source)
+		expect(replica.text("document")).toBe(source)
+		let restored = new Replica("reader")
+		restored.restore(parseCheckpoint(replica.checkpoint()))
+		expect(restored.text("document")).toBe(source)
+	}
+})
+
+test("closing an offline root header cannot leave the incremental view different from its checkpoint", () => {
+	let first = new Replica("a"),
+		second = new Replica("z")
+	let header = first.edit("document", "---\na: 1\n")
+	let body = second.edit("document", "hello\n")
+	if (!header || !body) throw Error("Missing initial edits")
+	first.apply([body])
+	second.apply([header])
+	expect(first.text("document")).toBe("hello\n---\na: 1\n")
+	let close = first.prepareEdit("document", first.text("document") + "---")
+	if (!close) throw Error("Missing closing edit")
+	first.apply([parseOperation(compactOperation(close))])
+	second.apply([close])
+	let restored = new Replica("reader")
+	restored.restore(parseCheckpoint(first.checkpoint()))
+	expect(first.text("document")).toBe(restored.text("document"))
+	expect(second.text("document")).toBe(restored.text("document"))
+})
+
+test("editing a promoted offline header body preserves raw anchors for following metadata edits", () => {
+	let first = new Replica("a"),
+		second = new Replica("z")
+	let header = first.edit("document", "---\ntitle: Before\n---\n")
+	let body = second.edit("document", "hello\n")
+	if (!header || !body) throw Error("Missing initial edits")
+	first.apply([body])
+	second.apply([header])
+	let source = first.text("document")
+	first.edit("document", source.replace("hello", "hEllo"))
+	changeMetadata(first, "document", { title: "After" })
+	let restored = new Replica("reader")
+	restored.restore(parseCheckpoint(first.checkpoint()))
+	expect(first.text("document")).toBe(restored.text("document"))
+	expect(first.metadata("document").title).toBe("After")
+	expect(restored.text("document")).toContain("hEllo")
+})

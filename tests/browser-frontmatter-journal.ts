@@ -10,6 +10,8 @@ import { historicalDocument } from "../src/shared/document-history"
 import { newDocument } from "../src/shared/documents"
 import { Replica } from "../src/shared/crdt"
 import { frontmatter } from "../src/shared/markdown"
+import { parseCheckpoint } from "../src/shared/checkpoint"
+import { mergeText } from "../src/shared/text-merge"
 
 export function verifyFrontmatterJournal(
 	subject: string,
@@ -183,4 +185,33 @@ export function verifyFrontmatterJournal(
 			)
 		}
 	})
+}
+
+export function verifyLargeDocumentSources(
+	check: (value: unknown, message: string) => void,
+) {
+	let source = "---\ntitle: Large document\n---\n".padEnd(200_000, "x")
+	let document = new Replica("large-source")
+	document.edit("doc", source)
+	let restored = new Replica("large-restored")
+	restored.restore(
+		parseCheckpoint(JSON.parse(JSON.stringify(document.checkpoint()))),
+	)
+	check(
+		restored.text("doc") === source,
+		"a 200,000-character frontmatter document survives its checkpoint without exceeding browser argument limits",
+	)
+	restored.edit("doc", "---\ntitle: Large document\n---\n")
+	check(
+		restored.text("doc") === "---\ntitle: Large document\n---\n",
+		"deleting a large body preserves its header without exceeding browser argument limits",
+	)
+	let base = "left\nright"
+	let local = "ours\n" + base
+	let disk = base + "\n" + "x".repeat(131_072)
+	let merged = mergeText(base, local, disk)
+	check(
+		!merged.conflict && merged.content === "ours\n" + disk,
+		"local file merging preserves an independent 128 KB insertion without exceeding browser argument limits",
+	)
 }

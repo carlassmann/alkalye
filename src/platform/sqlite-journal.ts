@@ -193,9 +193,9 @@ function makeJournal(filename: string) {
 					.withTransaction(
 						Effect.gen(function* () {
 							if (Option.isNone(yield* hasPosition(position))) return false
-							let previous = yield* cache.pipe(
-								Effect.catch(() => Effect.succeed(undefined)),
-							)
+							let previous = (yield* sql<{
+								position: number
+							}>`SELECT position FROM document_cache WHERE id=1`)[0]
 							if (
 								previous &&
 								previous.position > position &&

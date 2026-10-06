@@ -328,10 +328,11 @@ export function parsePresence(value: unknown): Presence {
 	}
 }
 
-export function compactOperation(operation: Operation) {
+let loneSurrogate = /[\uD800-\uDFFF]/u
+export function compactAtoms(atoms: readonly Atom[]) {
 	let insert: Atom[] = []
 	let last: Atom | undefined
-	for (let atom of operation.insert) {
+	for (let atom of atoms) {
 		let previous = insert[insert.length - 1]
 
 		let expected = last
@@ -340,7 +341,10 @@ export function compactOperation(operation: Operation) {
 			: ""
 		if (
 			previous &&
+			previous.value.length + atom.value.length <= 2_000_000 &&
 			last &&
+			!loneSurrogate.test(last.value) &&
+			!loneSurrogate.test(atom.value) &&
 			!atom.order &&
 			!atom.observed &&
 			!atom.ending &&
@@ -353,7 +357,15 @@ export function compactOperation(operation: Operation) {
 		else insert.push({ ...atom })
 		last = atom
 	}
-	return { ...operation, insert, remove: compactDeletions(operation.remove) }
+	return insert
+}
+
+export function compactOperation(operation: Operation) {
+	return {
+		...operation,
+		insert: compactAtoms(operation.insert),
+		remove: compactDeletions(operation.remove),
+	}
 }
 
 export function compactDeletions(ids: readonly string[]) {

@@ -117,7 +117,18 @@ test("HTTP refuses orphaned text anchors and unknown removals atomically, then a
 			})
 			let snapshot = yield* owner.api.documents.snapshot({
 				params: { document },
+				query: {},
 			})
+			let compact = yield* owner.api.documents.snapshot({
+				params: { document },
+				query: { encoding: "compact" },
+			})
+			expect(object(JSON.parse(snapshot.state)).format).toBe("alkalye-state-v2")
+			expect(object(JSON.parse(compact.state)).format).toBe("alkalye-state-v3")
+			expect(compact.state.length).toBeLessThan(snapshot.state.length)
+			expect(
+				(yield* restoreSnapshot(compact, "packed-client")).checkpoint(),
+			).toEqual((yield* restoreSnapshot(snapshot, "old-client")).checkpoint())
 			let replica = yield* restoreSnapshot(
 				snapshot,
 				owner.subject + "-causal-editor",
@@ -155,6 +166,7 @@ test("HTTP refuses orphaned text anchors and unknown removals atomically, then a
 				expect(result.failure._tag).toBe("CausalDependencyMissing")
 				let after = yield* owner.api.documents.snapshot({
 					params: { document },
+					query: {},
 				})
 				expect(after.position).toBe(snapshot.position)
 				let restored = yield* restoreSnapshot(after, "inspect")
@@ -171,7 +183,10 @@ test("HTTP refuses orphaned text anchors and unknown removals atomically, then a
 				params: { document },
 				payload: corrected,
 			})
-			let after = yield* owner.api.documents.snapshot({ params: { document } })
+			let after = yield* owner.api.documents.snapshot({
+				params: { document },
+				query: {},
+			})
 			expect(after.position).toBe(position)
 			expect((yield* restoreSnapshot(after, "peer")).text(document)).toBe(
 				replica.text(document) + "!",
@@ -203,6 +218,7 @@ test("attachment source and manifest commit atomically only after their bytes ex
 			})
 			let snapshot = yield* owner.api.documents.snapshot({
 				params: { document },
+				query: {},
 			})
 			let replica = yield* restoreSnapshot(snapshot, owner.subject + "-attach")
 
@@ -253,8 +269,10 @@ test("attachment source and manifest commit atomically only after their bytes ex
 					object(yield* Effect.tryPromise(() => response.json()))._tag,
 				).toBe("DocumentConflict")
 				expect(
-					(yield* owner.api.documents.snapshot({ params: { document } }))
-						.position,
+					(yield* owner.api.documents.snapshot({
+						params: { document },
+						query: {},
+					})).position,
 				).toBe(snapshot.position)
 			}
 			let source = replica.text(document)
@@ -278,7 +296,10 @@ test("attachment source and manifest commit atomically only after their bytes ex
 			expect(rejected._tag).toBe("Failure")
 			if (rejected._tag === "Failure")
 				expect(rejected.failure._tag).toBe("BlobBytesMissing")
-			let after = yield* owner.api.documents.snapshot({ params: { document } })
+			let after = yield* owner.api.documents.snapshot({
+				params: { document },
+				query: {},
+			})
 			expect(after.position).toBe(snapshot.position)
 			let untouched = yield* restoreSnapshot(after, "inspect")
 			expect(untouched.fields("ordered-asset").type).toBeUndefined()
@@ -319,7 +340,10 @@ test("attachment source and manifest commit atomically only after their bytes ex
 				}),
 			).toBe(position)
 			let committed = yield* restoreSnapshot(
-				yield* owner.api.documents.snapshot({ params: { document } }),
+				yield* owner.api.documents.snapshot({
+					params: { document },
+					query: {},
+				}),
 				owner.subject + "-remove",
 			)
 			expect(committed.fields("ordered-asset").data).toBe(reference)
@@ -400,7 +424,7 @@ test("document history pages preserve global cursor gaps and reject unsafe page 
 			for (let index = 0; index < 4; index++) {
 				for (let document of ["paged-document", "interleaved-document"]) {
 					let replica = yield* restoreSnapshot(
-						yield* api.documents.snapshot({ params: { document } }),
+						yield* api.documents.snapshot({ params: { document }, query: {} }),
 						subject + "-" + document,
 					)
 					let action = yield* buildAction(
@@ -415,6 +439,7 @@ test("document history pages preserve global cursor gaps and reject unsafe page 
 			}
 			let snapshot = yield* api.documents.snapshot({
 				params: { document: "paged-document" },
+				query: {},
 			})
 			let seen: string[] = []
 			let positions: number[] = []
@@ -511,6 +536,7 @@ test("whole-document HTTP stream includes text, comments and asset references; s
 			})
 			let snapshot = yield* api.documents.snapshot({
 				params: { document: "whole-doc" },
+				query: {},
 			})
 			expect(snapshot.position).toBe(position)
 			let replica = yield* restoreSnapshot(snapshot, actor)
@@ -533,7 +559,10 @@ test("whole-document HTTP stream includes text, comments and asset references; s
 				payload: comment,
 			})
 			replica = yield* restoreSnapshot(
-				yield* api.documents.snapshot({ params: { document: "whole-doc" } }),
+				yield* api.documents.snapshot({
+					params: { document: "whole-doc" },
+					query: {},
+				}),
 				actor,
 			)
 			let asset = yield* buildAction(
@@ -555,6 +584,7 @@ test("whole-document HTTP stream includes text, comments and asset references; s
 			})
 			let current = yield* api.documents.snapshot({
 				params: { document: "whole-doc" },
+				query: {},
 			})
 			let restored = yield* restoreSnapshot(current, "read-only")
 			expect(restored.fields("whole-comment").body).toBe("Discuss this")
@@ -591,7 +621,10 @@ test("whole-document HTTP stream includes text, comments and asset references; s
 				payload: undo,
 			})
 			let undone = yield* restoreSnapshot(
-				yield* api.documents.snapshot({ params: { document: "whole-doc" } }),
+				yield* api.documents.snapshot({
+					params: { document: "whole-doc" },
+					query: {},
+				}),
 				"reader",
 			)
 			expect(undone.fields("whole-asset").type).toBe("deleted")
@@ -686,6 +719,7 @@ test("HTTP owner/writer/reader permissions are persisted and cannot be supplied 
 			})
 			let snapshot = yield* reader.api.documents.snapshot({
 				params: { document: "roles-doc" },
+				query: {},
 			})
 			let forbidden = yield* buildAction(
 				yield* restoreSnapshot(snapshot, reader.subject + "-reader-producer"),
@@ -743,7 +777,7 @@ test("HTTP owner/writer/reader permissions are persisted and cannot be supplied 
 				payload: { role: null, request: "revoke" },
 			})
 			let denied = yield* writer.api.documents
-				.snapshot({ params: { document: "roles-doc" } })
+				.snapshot({ params: { document: "roles-doc" }, query: {} })
 				.pipe(Effect.result)
 			expect(denied._tag).toBe("Failure")
 			if (denied._tag === "Failure")
@@ -761,7 +795,7 @@ test("unknown documents do not leak existence and history epochs must match", ()
 			let { api } = yield* client(5)
 			for (let document of ["absent-doc", "whole-doc"]) {
 				let response = yield* api.documents
-					.snapshot({ params: { document } })
+					.snapshot({ params: { document }, query: {} })
 					.pipe(Effect.result)
 				expect(response._tag).toBe("Failure")
 				if (response._tag === "Failure")
@@ -876,6 +910,7 @@ test("workspace owner retains control of writer-created documents after membersh
 			expect(sidebar.documents[0]?.owner).toBe(owner.subject)
 			let snapshot = yield* writer.api.documents.snapshot({
 				params: { document: "writer-created-doc" },
+				query: {},
 			})
 			let pending = yield* buildAction(
 				yield* restoreSnapshot(snapshot, actor),
@@ -897,6 +932,7 @@ test("workspace owner retains control of writer-created documents after membersh
 				writer.api.documents
 					.snapshot({
 						params: { document: "writer-created-doc" },
+						query: {},
 					})
 					.pipe(Effect.asVoid),
 				writer.api.documents
@@ -908,6 +944,7 @@ test("workspace owner retains control of writer-created documents after membersh
 				outsider.api.documents
 					.snapshot({
 						params: { document: "writer-created-doc" },
+						query: {},
 					})
 					.pipe(Effect.asVoid),
 			]) {
@@ -919,6 +956,7 @@ test("workspace owner retains control of writer-created documents after membersh
 			expect(
 				(yield* owner.api.documents.snapshot({
 					params: { document: "writer-created-doc" },
+					query: {},
 				})).document,
 			).toBe("writer-created-doc")
 		}),
@@ -955,6 +993,7 @@ test("an account cannot reserve another account's unused producer identity", () 
 			expect(
 				(yield* owner.api.documents.snapshot({
 					params: { document: "unused-actor-doc" },
+					query: {},
 				})).document,
 			).toBe("unused-actor-doc")
 		}),
@@ -1129,7 +1168,10 @@ test("library catalogue lists only current access, includes separate document gr
 			})
 			for (let document of ["library-first", "library-second"]) {
 				let replica = yield* restoreSnapshot(
-					yield* owner.api.documents.snapshot({ params: { document } }),
+					yield* owner.api.documents.snapshot({
+						params: { document },
+						query: {},
+					}),
 					owner.subject + "-grant-" + document,
 				)
 				let grant = yield* buildAction(
@@ -1193,7 +1235,10 @@ test("library catalogue lists only current access, includes separate document gr
 			])
 			let document = "library-second"
 			let replica = yield* restoreSnapshot(
-				yield* owner.api.documents.snapshot({ params: { document } }),
+				yield* owner.api.documents.snapshot({
+					params: { document },
+					query: {},
+				}),
 				owner.subject + "-revoke-library",
 			)
 			let revoke = yield* buildAction(
@@ -1369,6 +1414,7 @@ test("single-action HTTP reads recover register beforeimages without fetching pr
 			})
 			let initial = yield* owner.api.documents.snapshot({
 				params: { document },
+				query: {},
 			})
 			let edit = yield* buildAction(
 				yield* restoreSnapshot(initial, owner.subject + "-lazy-edit"),
@@ -1379,7 +1425,10 @@ test("single-action HTTP reads recover register beforeimages without fetching pr
 			yield* owner.api.documents.commit({ params: { document }, payload: edit })
 			let later = yield* buildAction(
 				yield* restoreSnapshot(
-					yield* owner.api.documents.snapshot({ params: { document } }),
+					yield* owner.api.documents.snapshot({
+						params: { document },
+						query: {},
+					}),
 					owner.subject + "-lazy-later",
 				),
 				document,
@@ -1520,6 +1569,7 @@ test("a pruned single action returns its typed history failure while current sna
 			})
 			let initial = yield* owner.api.documents.snapshot({
 				params: { document },
+				query: {},
 			})
 			let later = yield* buildAction(
 				yield* restoreSnapshot(initial, owner.subject + "-pruned-later"),
@@ -1531,7 +1581,10 @@ test("a pruned single action returns its typed history failure while current sna
 				params: { document },
 				payload: later,
 			})
-			let before = yield* owner.api.documents.snapshot({ params: { document } })
+			let before = yield* owner.api.documents.snapshot({
+				params: { document },
+				query: {},
+			})
 			yield* Effect.acquireUseRelease(
 				Effect.sync(() => new Database(join(directory, "documents.sqlite"))),
 				database =>
@@ -1584,7 +1637,10 @@ test("a pruned single action returns its typed history failure while current sna
 									HttpClientRequest.bearerToken(owner.token),
 								),
 						})
-						return yield* api.documents.snapshot({ params: { document } })
+						return yield* api.documents.snapshot({
+							params: { document },
+							query: {},
+						})
 					}),
 				fresh => fresh.close(),
 			)
@@ -1605,7 +1661,10 @@ test("native document actions refuse unreferenced cancellation and implicit docu
 			yield* owner.api.documents.create({
 				payload: { workspace, action: birth },
 			})
-			let before = yield* owner.api.documents.snapshot({ params: { document } })
+			let before = yield* owner.api.documents.snapshot({
+				params: { document },
+				query: {},
+			})
 			let actor = owner.subject + "-cancel-producer"
 			let replica = yield* restoreSnapshot(before, actor)
 			let original = birth.changes.find(change => change.kind === "text")
@@ -1633,7 +1692,10 @@ test("native document actions refuse unreferenced cancellation and implicit docu
 					undoOf ? "UndoUnavailable" : "DocumentConflict",
 				)
 				expect(
-					yield* owner.api.documents.snapshot({ params: { document } }),
+					yield* owner.api.documents.snapshot({
+						params: { document },
+						query: {},
+					}),
 				).toEqual(before)
 			}
 			let history = yield* owner.api.documents.history({
@@ -1662,6 +1724,7 @@ test("cold native stores migrate a legacy head once and keep its undo boundary a
 			})
 			let initial = yield* owner.api.documents.snapshot({
 				params: { document },
+				query: {},
 			})
 			let current = (yield* restoreSnapshot(initial, "inspect")).checkpoint()
 			let legacyState = JSON.stringify({
@@ -1712,7 +1775,10 @@ test("cold native stores migrate a legacy head once and keep its undo boundary a
 			}
 			let later = yield* cold(api =>
 				Effect.gen(function* () {
-					let snapshot = yield* api.documents.snapshot({ params: { document } })
+					let snapshot = yield* api.documents.snapshot({
+						params: { document },
+						query: {},
+					})
 					let restored = yield* restoreSnapshot(
 						snapshot,
 						owner.subject + "-legacy-head-edit",
@@ -1763,7 +1829,10 @@ test("cold native stores migrate a legacy head once and keep its undo boundary a
 						expect(failed.failure._tag).toBe("DocumentConflict")
 						expect(failed.failure.message).toContain("migration floor")
 						expect(
-							yield* api.documents.snapshot({ params: { document } }),
+							yield* api.documents.snapshot({
+								params: { document },
+								query: {},
+							}),
 						).toEqual(snapshot)
 					}
 
@@ -1779,7 +1848,10 @@ test("cold native stores migrate a legacy head once and keep its undo boundary a
 			)
 			yield* cold(api =>
 				Effect.gen(function* () {
-					let snapshot = yield* api.documents.snapshot({ params: { document } })
+					let snapshot = yield* api.documents.snapshot({
+						params: { document },
+						query: {},
+					})
 					let restored = yield* restoreSnapshot(snapshot, "cold-inspect")
 					expect(restored.text(document)).toBe(
 						(yield* restoreSnapshot(initial, "before")).text(document) + "!",
@@ -1826,7 +1898,10 @@ test("whole-document HTTP compensation lazily fetches one action, retains blobs 
 				size: bytes.length,
 				chunks: [{ digest, size: bytes.length }],
 			})
-			let state = yield* owner.api.documents.snapshot({ params: { document } })
+			let state = yield* owner.api.documents.snapshot({
+				params: { document },
+				query: {},
+			})
 			let action = yield* buildAction(
 				yield* restoreSnapshot(state, owner.subject + "-whole-compose"),
 				document,
@@ -1860,7 +1935,10 @@ test("whole-document HTTP compensation lazily fetches one action, retains blobs 
 			})
 			let peerEdit = yield* buildAction(
 				yield* restoreSnapshot(
-					yield* peer.api.documents.snapshot({ params: { document } }),
+					yield* peer.api.documents.snapshot({
+						params: { document },
+						query: {},
+					}),
 					peer.subject + "-whole-delete",
 				),
 				document,
@@ -1994,7 +2072,10 @@ test("whole-document HTTP compensation lazily fetches one action, retains blobs 
 									position: redoPosition,
 									depth: 2,
 								})
-								return yield* api.documents.snapshot({ params: { document } })
+								return yield* api.documents.snapshot({
+									params: { document },
+									query: {},
+								})
 							}),
 						),
 					),
@@ -2040,7 +2121,10 @@ test("Effect routing accepts encoded document identifiers and native action ids 
 			).toMatchObject({ document, from: birth.id, latest: birth.id })
 			expect(
 				(yield* restoreSnapshot(
-					yield* owner.api.documents.snapshot({ params: { document } }),
+					yield* owner.api.documents.snapshot({
+						params: { document },
+						query: {},
+					}),
 					"inspect",
 				)).text(document),
 			).toBe("Source")

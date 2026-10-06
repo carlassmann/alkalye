@@ -197,6 +197,7 @@ export let DocumentApi = HttpApi.make("DocumentApi").add(
 			}),
 			HttpApiEndpoint.get("snapshot", "/api/documents/:document/snapshot", {
 				params: documentParams,
+				query: { encoding: Schema.optional(Schema.Literal("compact")) },
 				success: DocumentSnapshotSchema,
 				error: errors,
 			}),

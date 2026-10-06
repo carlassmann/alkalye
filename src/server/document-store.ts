@@ -26,6 +26,7 @@ import { decode, encode } from "../shared/base64"
 import { InvitationRevoked } from "../shared/invitations"
 import type { InvitationDescription } from "../shared/invitations"
 import { Replica } from "../shared/crdt"
+import { compactCheckpoint } from "../shared/checkpoint"
 import {
 	ResourceUnavailable,
 	PermissionDenied,
@@ -2473,7 +2474,9 @@ function makeSession() {
 	)
 }
 function snapshotOf(document: string, state: DocumentState): DocumentSnapshot {
-	state.serialized ??= JSON.stringify(state.replica.checkpoint())
+	state.serialized ??= JSON.stringify(
+		compactCheckpoint(state.replica.checkpoint()),
+	)
 	return Schema.decodeUnknownSync(DocumentSnapshotSchema)({
 		format: "document-state-v1",
 		document,

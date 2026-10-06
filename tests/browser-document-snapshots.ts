@@ -1,3 +1,4 @@
+import { makePassiveDocumentCache } from "../src/client/passive-document-cache"
 import * as Effect from "effect/Effect"
 import * as Schema from "effect/Schema"
 import {
@@ -36,6 +37,7 @@ let savedState = Schema.Struct({
 export function verifyAcceptedDocumentSnapshots(subject: string, check: Check) {
 	return Effect.gen(function* () {
 		let remote = yield* makeDocumentTransport(location.origin, subject)
+		let passiveState = yield* makePassiveDocumentCache()
 		let document = "accepted-snapshot-proof"
 		let source = "# Accepted source"
 		let creation = {
@@ -53,6 +55,7 @@ export function verifyAcceptedDocumentSnapshots(subject: string, check: Check) {
 		let historyRequests = 0
 		let invalidHistory: PositionedAction[] | undefined
 		let options: DocumentSessionOptions = {
+			passiveState: passiveState(document),
 			document,
 			subject,
 			transport: {
@@ -170,6 +173,8 @@ export function verifyAcceptedDocumentSnapshots(subject: string, check: Check) {
 				}),
 			).pipe(Effect.provide(browserDocumentSessionLayer(options))),
 		)
+		yield* passiveState(document).clear
+		options.passiveState = undefined
 		yield* BrowserJournal.use(storage =>
 			storage.cache.pipe(
 				Effect.flatMap(cached => {

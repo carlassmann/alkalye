@@ -69,6 +69,7 @@ test("two devices create one theme library and retain both first themes", () =>
 					let replica = yield* restoreSnapshot(
 						yield* account.api.documents.snapshot({
 							params: { document: birth.document },
+							query: {},
 						}),
 						account.subject + "-" + id,
 					)
@@ -94,6 +95,7 @@ test("two devices create one theme library and retain both first themes", () =>
 			let replica = yield* restoreSnapshot(
 				yield* first.api.documents.snapshot({
 					params: { document: birth.document },
+					query: {},
 				}),
 				"observer",
 			)

@@ -177,10 +177,10 @@ export function sourceAtoms(
 	let body: Atom[] = [],
 		position = 0
 	for (let header of headers) {
-		body.push(...raw.slice(position, header.start))
+		for (let atom of raw.slice(position, header.start)) body.push(atom)
 		position = header.end
 	}
-	body.push(...raw.slice(position))
+	for (let atom of raw.slice(position)) body.push(atom)
 	if (
 		!entries.length &&
 		headers.some(header => header.open[0]?.deleted?.length)
@@ -204,6 +204,21 @@ export function sourceEdits(
 	current = atoms,
 ): SourceEdit[] {
 	let previousHeaders = sourceHeaders(atoms)
+	let previousHeader = previousHeaders[0]
+	if (previousHeader?.start === 0 && !headerEnding(previousHeader)) {
+		let header = frameText(previousHeader)
+		if (next.startsWith(header))
+			return [
+				{
+					atoms: atoms.slice(previousHeader.end),
+					next: next.slice(header.length),
+					remove: [],
+					anchor: previousHeader.close.at(-1)?.id ?? "",
+				},
+			]
+	}
+	if (!previousHeader && !frontmatterBlock(next))
+		return [{ atoms, next, remove: [] }]
 	let nextAtoms = Array.from(next).map((value, index) => ({
 		id: `next:${index}`,
 		after: index ? `next:${index - 1}` : "",
@@ -339,12 +354,10 @@ export function sourceEdits(
 		remaining.delete(entry.key)
 		let value = sourceText(entry.atoms)
 		if (old && sourceText(old.atoms) === value) continue
-		removed.push(
-			...rawEntries
-				.filter(candidate => candidate.key === entry.key)
-				.flatMap(candidate => candidate.atoms),
-		)
-		changed.push(...entry.atoms)
+		for (let candidate of rawEntries)
+			if (candidate.key === entry.key)
+				for (let atom of candidate.atoms) removed.push(atom)
+		for (let atom of entry.atoms) changed.push(atom)
 	}
 	for (let key of remaining) {
 		let old = entries.get(key)
@@ -416,7 +429,8 @@ function sourceHeaders(atoms: Atom[]) {
 			let key = frontmatterKey(line)
 			let characters = atoms.slice(position, position + Array.from(line).length)
 			let previous = entries.at(-1)
-			if (!key && previous) previous.atoms.push(...characters)
+			if (!key && previous)
+				for (let atom of characters) previous.atoms.push(atom)
 			else entries.push({ key, atoms: characters })
 			position += characters.length
 		}

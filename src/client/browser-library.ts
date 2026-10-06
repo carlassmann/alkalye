@@ -1,3 +1,4 @@
+import { makePassiveDocumentCache } from "./passive-document-cache"
 import * as Context from "effect/Context"
 import * as Crypto from "effect/Crypto"
 import * as Effect from "effect/Effect"
@@ -119,6 +120,7 @@ function makeLibrary() {
 		)
 		let fetching = yield* Semaphore.make(1)
 		let refresh = refreshLibrary()
+		let passiveState = yield* makePassiveDocumentCache()
 		let documents = yield* RcMap.make({
 			lookup: openDocument,
 			idleTimeToLive: 0,
@@ -448,6 +450,7 @@ function makeLibrary() {
 				let initialCreation = yield* local.creation(document)
 				let context = yield* Layer.build(
 					browserDocumentSessionLayer({
+						passiveState: passiveState(document),
 						document,
 						subject: account.subject,
 						initialCreation,
@@ -461,7 +464,10 @@ function makeLibrary() {
 							snapshot: document =>
 								account
 									.request(
-										account.api.documents.snapshot({ params: { document } }),
+										account.api.documents.snapshot({
+											params: { document },
+											query: { encoding: "compact" },
+										}),
 									)
 									.pipe(transport.observe("snapshot")),
 							commit: action =>

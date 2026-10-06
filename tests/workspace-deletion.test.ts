@@ -60,6 +60,7 @@ test("deleting a workspace removes it and its documents for everyone and denies 
 			])
 			yield* stranger.api.documents.snapshot({
 				params: { document: "doomed-doc" },
+				query: {},
 			})
 
 			yield* remove(owner, "doomed", "Doomed", "delete-doomed")
@@ -79,6 +80,7 @@ test("deleting a workspace removes it and its documents for everyone and denies 
 					yield* failure(
 						account.api.documents.snapshot({
 							params: { document: "doomed-doc" },
+							query: {},
 						}),
 					),
 				).toBe("ResourceUnavailable")
@@ -304,7 +306,10 @@ test("concurrent deletions and writes settle on one tombstone without leaking ac
 				for (let document of ["raced-doc", "raced-new"])
 					expect(
 						yield* failure(
-							account.api.documents.snapshot({ params: { document } }),
+							account.api.documents.snapshot({
+								params: { document },
+								query: {},
+							}),
 						),
 					).toBe("ResourceUnavailable")
 			}
@@ -372,7 +377,10 @@ test("deletions survive restarts and the tombstone migration upgrades existing d
 				])
 				expect(
 					yield* failure(
-						owner.api.documents.snapshot({ params: { document: "short-doc" } }),
+						owner.api.documents.snapshot({
+							params: { document: "short-doc" },
+							query: {},
+						}),
 					),
 				).toBe("ResourceUnavailable")
 				expect(
@@ -406,6 +414,7 @@ test("deletions survive restarts and the tombstone migration upgrades existing d
 						yield* failure(
 							owner.api.documents.snapshot({
 								params: { document: "legacy-doc" },
+								query: {},
 							}),
 						),
 					).toBe("ResourceUnavailable")
@@ -514,7 +523,10 @@ function invite(
 function edit(account: Client, document: string, text: string) {
 	return Effect.gen(function* () {
 		let replica = yield* restoreSnapshot(
-			yield* account.api.documents.snapshot({ params: { document } }),
+			yield* account.api.documents.snapshot({
+				params: { document },
+				query: {},
+			}),
 			account.subject + "-" + text.replace(/\W+/g, "-").slice(0, 40),
 		)
 		let action = yield* buildAction(replica, document, "Edit", staged => [
@@ -529,7 +541,10 @@ function edit(account: Client, document: string, text: string) {
 function grant(account: Client, document: string, who: string, role: string) {
 	return Effect.gen(function* () {
 		let replica = yield* restoreSnapshot(
-			yield* account.api.documents.snapshot({ params: { document } }),
+			yield* account.api.documents.snapshot({
+				params: { document },
+				query: {},
+			}),
 			account.subject + "-grant-" + who + "-" + (role || "none"),
 		)
 		let action = yield* buildAction(replica, document, "Share", staged => [

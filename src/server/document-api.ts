@@ -1,3 +1,4 @@
+import { parseCheckpoint } from "../shared/checkpoint"
 import * as Effect from "effect/Effect"
 import * as Layer from "effect/Layer"
 import * as HttpApiBuilder from "effect/http-api/HttpApiBuilder"
@@ -63,15 +64,24 @@ export let documentHandlers = HttpApiBuilder.group(
 								}),
 							),
 				)
-				.handle("snapshot", ({ params }) =>
+				.handle("snapshot", ({ params, query }) =>
 					asAccount(
-						store
-							.snapshot(params.document)
-							.pipe(
-								Effect.flatMap(snapshot =>
-									snapshot ? Effect.succeed(snapshot) : missing(),
-								),
+						store.snapshot(params.document).pipe(
+							Effect.flatMap(snapshot =>
+								snapshot
+									? Effect.succeed(
+											query.encoding === "compact"
+												? snapshot
+												: {
+														...snapshot,
+														state: JSON.stringify(
+															parseCheckpoint(JSON.parse(snapshot.state)),
+														),
+													},
+										)
+									: missing(),
 							),
+						),
 						[],
 						"snapshot",
 					),

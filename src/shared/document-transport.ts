@@ -54,7 +54,10 @@ export function makeDocumentTransport(origin: string, subject: string) {
 					let position = yield* api.documents.create({
 						payload: { workspace: creation.workspace, action: creation.action },
 					})
-					let snapshot = yield* api.documents.snapshot({ params: { document } })
+					let snapshot = yield* api.documents.snapshot({
+						params: { document },
+						query: { encoding: "compact" },
+					})
 					let facts = yield* api.documents.history({
 						params: { document },
 						query: { after: position - 1, log: snapshot.log, limit: 1 },
@@ -70,7 +73,7 @@ export function makeDocumentTransport(origin: string, subject: string) {
 				}).pipe(Effect.timeout("20 seconds"), observability.observe("create")),
 			snapshot: (document: string) =>
 				api.documents
-					.snapshot({ params: { document } })
+					.snapshot({ params: { document }, query: { encoding: "compact" } })
 					.pipe(
 						Effect.timeout("20 seconds"),
 						observability.observe("snapshot"),

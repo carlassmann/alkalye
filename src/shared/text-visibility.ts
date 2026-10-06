@@ -90,6 +90,24 @@ export class TextVisibility {
 		this.legacyRemoved = new Set(state.removed)
 		this.floor = state.clock
 	}
+	fork() {
+		let visibility = new TextVisibility()
+		visibility.removals = new Map(this.removals)
+		visibility.removers = new Map(
+			[...this.removers].map(([atom, removers]) => [atom, new Set(removers)]),
+		)
+		visibility.cancels = new Map(this.cancels)
+		visibility.cancellers = new Map(
+			[...this.cancellers].map(([operation, cancellers]) => [
+				operation,
+				new Set(cancellers),
+			]),
+		)
+		visibility.activeCache = new Map(this.activeCache)
+		visibility.legacyRemoved = new Set(this.legacyRemoved)
+		visibility.floor = this.floor
+		return visibility
+	}
 	remove(operation: string, atoms: readonly string[]) {
 		let [first, ...rest] = atoms
 		if (first === undefined) return

@@ -344,7 +344,10 @@ test("a document link grants its role until revocation removes everyone who join
 			expect(yield* roles(reader)).toEqual([["invite-doc", "reader"]])
 			expect(
 				yield* failure(
-					writer.api.documents.snapshot({ params: { document: "invite-doc" } }),
+					writer.api.documents.snapshot({
+						params: { document: "invite-doc" },
+						query: {},
+					}),
 				),
 			).toBe("ResourceUnavailable")
 			expect(
@@ -669,6 +672,7 @@ test("public links let any account read without listing or writing, until unpubl
 				yield* failure(
 					stranger.api.documents.snapshot({
 						params: { document: "public-doc" },
+						query: {},
 					}),
 				),
 			).toBe("ResourceUnavailable")
@@ -683,6 +687,7 @@ test("public links let any account read without listing or writing, until unpubl
 			yield* grant(owner, "public-doc", "public", "reader")
 			let snapshot = yield* stranger.api.documents.snapshot({
 				params: { document: "public-doc" },
+				query: {},
 			})
 			expect(snapshot.document).toBe("public-doc")
 			expect(yield* roles(stranger)).toEqual([])
@@ -695,6 +700,7 @@ test("public links let any account read without listing or writing, until unpubl
 				yield* failure(
 					stranger.api.documents.snapshot({
 						params: { document: "public-doc" },
+						query: {},
 					}),
 				),
 			).toBe("ResourceUnavailable")
@@ -846,7 +852,7 @@ function accept(
 function edit(member: Client, document: string, text: string) {
 	return Effect.gen(function* () {
 		let replica = yield* restoreSnapshot(
-			yield* member.api.documents.snapshot({ params: { document } }),
+			yield* member.api.documents.snapshot({ params: { document }, query: {} }),
 			member.subject + "-" + text.replace(/\W+/g, "-").slice(0, 40),
 		)
 		let action = yield* buildAction(replica, document, "Edit", staged => [
@@ -861,7 +867,7 @@ function edit(member: Client, document: string, text: string) {
 function grant(member: Client, document: string, who: string, role: string) {
 	return Effect.gen(function* () {
 		let replica = yield* restoreSnapshot(
-			yield* member.api.documents.snapshot({ params: { document } }),
+			yield* member.api.documents.snapshot({ params: { document }, query: {} }),
 			member.subject + "-grant-" + who + "-" + (role || "none"),
 		)
 		let action = yield* buildAction(replica, document, "Share", staged => [
@@ -876,7 +882,7 @@ function grant(member: Client, document: string, who: string, role: string) {
 function remove(member: Client, document: string, label: string) {
 	return Effect.gen(function* () {
 		let replica = yield* restoreSnapshot(
-			yield* member.api.documents.snapshot({ params: { document } }),
+			yield* member.api.documents.snapshot({ params: { document }, query: {} }),
 			member.subject + "-" + label.replaceAll(" ", "-"),
 		)
 		let action = yield* buildAction(replica, document, label, staged => [
