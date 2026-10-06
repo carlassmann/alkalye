@@ -1,6 +1,8 @@
 import * as Effect from "effect/Effect"
 import * as Layer from "effect/Layer"
 import * as HttpApiBuilder from "effect/http-api/HttpApiBuilder"
+import { DocumentObservability } from "../shared/document-observability"
+import type { DocumentOperation } from "../shared/document-observability"
 import { RequestAccount } from "../shared/authentication"
 import { DocumentApi, StoreUnavailable } from "../shared/document-api"
 import {
@@ -37,13 +39,15 @@ export let documentHandlers = HttpApiBuilder.group(
 					asAccount(store.getBlob(params.document, params.digest)),
 				)
 				.handle("create", ({ payload }) =>
-					asAccount(store.createDocument(payload.workspace, payload.action), [
-						payload.action.actor,
-					]),
+					asAccount(
+						store.createDocument(payload.workspace, payload.action),
+						[payload.action.actor],
+						"create",
+					),
 				)
 				.handle("commit", ({ params, payload }) =>
 					params.document === payload.document
-						? asAccount(store.commit(payload), [payload.actor])
+						? asAccount(store.commit(payload), [payload.actor], "commit")
 						: Effect.fail(
 								new DocumentConflict({
 									message: "The action belongs to another document",
@@ -52,7 +56,7 @@ export let documentHandlers = HttpApiBuilder.group(
 				)
 				.handle("withdraw", ({ params, payload }) =>
 					params.document === payload.document
-						? asAccount(store.withdraw(payload), [payload.actor])
+						? asAccount(store.withdraw(payload), [payload.actor], "withdraw")
 						: Effect.fail(
 								new DocumentConflict({
 									message: "The action belongs to another document",
@@ -60,10 +64,16 @@ export let documentHandlers = HttpApiBuilder.group(
 							),
 				)
 				.handle("snapshot", ({ params }) =>
-					asAccount(store.snapshot(params.document)).pipe(
-						Effect.flatMap(snapshot =>
-							snapshot ? Effect.succeed(snapshot) : missing(),
-						),
+					asAccount(
+						store
+							.snapshot(params.document)
+							.pipe(
+								Effect.flatMap(snapshot =>
+									snapshot ? Effect.succeed(snapshot) : missing(),
+								),
+							),
+						[],
+						"snapshot",
 					),
 				)
 				.handle("move", ({ params, payload }) =>
@@ -83,32 +93,42 @@ export let documentHandlers = HttpApiBuilder.group(
 							query.log,
 							query.limit ?? 100,
 						),
+						[],
+						"history",
 					),
 				)
 				.handle("chain", ({ params }) =>
-					asAccount(store.chain(params.document, params.action)).pipe(
-						Effect.flatMap(chain =>
-							chain
-								? Effect.succeed(chain)
-								: Effect.fail(
-										new ResourceUnavailable({
-											message: "This action is unavailable",
-										}),
-									),
+					asAccount(
+						store.chain(params.document, params.action).pipe(
+							Effect.flatMap(value =>
+								value
+									? Effect.succeed(value)
+									: Effect.fail(
+											new ResourceUnavailable({
+												message: "This action is unavailable",
+											}),
+										),
+							),
 						),
+						[],
+						"chain",
 					),
 				)
 				.handle("action", ({ params }) =>
-					asAccount(store.action(params.document, params.action)).pipe(
-						Effect.flatMap(action =>
-							action
-								? Effect.succeed(action)
-								: Effect.fail(
-										new ResourceUnavailable({
-											message: "This action is unavailable",
-										}),
-									),
+					asAccount(
+						store.action(params.document, params.action).pipe(
+							Effect.flatMap(value =>
+								value
+									? Effect.succeed(value)
+									: Effect.fail(
+											new ResourceUnavailable({
+												message: "This action is unavailable",
+											}),
+										),
+							),
 						),
+						[],
+						"action",
 					),
 				)
 		}),
@@ -241,30 +261,29 @@ export let documentApiHandlers = Layer.mergeAll(
 function asAccount<A, E>(
 	effect: Effect.Effect<A, E, Identity>,
 	actors: ReadonlyArray<string> = [],
+	operation: DocumentOperation = "other",
 ) {
 	return Effect.gen(function* () {
-		let account = yield* RequestAccount
-		if (actors.some(actor => !actor.startsWith(account.subject + "-")))
-			return yield* Effect.fail(
-				new DocumentConflict({
-					message: "Document actors must belong to the authenticated account",
-				}),
+		let observability = yield* DocumentObservability
+		return yield* Effect.gen(function* () {
+			let account = yield* RequestAccount
+			if (actors.some(actor => !actor.startsWith(account.subject + "-")))
+				return yield* Effect.fail(
+					new DocumentConflict({
+						message: "Document actors must belong to the authenticated account",
+					}),
+				)
+			return yield* effect.pipe(
+				Effect.provideService(Identity, { subject: account.subject, actors }),
+				Effect.mapError(error =>
+					expected(error)
+						? error
+						: new StoreUnavailable({
+								message: "Document storage is temporarily unavailable",
+							}),
+				),
 			)
-		return yield* effect.pipe(
-			Effect.tapError(error =>
-				expected(error)
-					? Effect.void
-					: Effect.logError("Document storage failed", error),
-			),
-			Effect.provideService(Identity, { subject: account.subject, actors }),
-			Effect.mapError(error =>
-				expected(error)
-					? error
-					: new StoreUnavailable({
-							message: "Document storage is temporarily unavailable",
-						}),
-			),
-		)
+		}).pipe(observability.observe(operation))
 	})
 }
 function expected<E>(error: E) {

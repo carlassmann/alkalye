@@ -16,6 +16,7 @@ import { AccountApplication } from "./account-api"
 import { RequestOrigin, requestOriginLayer } from "./request-origin"
 import { WorkspaceStore } from "./document-store"
 import { Sessions } from "./sessions"
+import { DocumentObservability } from "../shared/document-observability"
 import { Application } from "./application"
 import { AgentStore } from "./agent-store"
 import type { ServerOptions } from "./settings"
@@ -62,7 +63,10 @@ export function serverLayer(options: ServerOptions = {}) {
 		Layer.provideMerge(FetchHttpClient.layer),
 		Layer.provideMerge(webCryptoLayer),
 	)
-	return BunServer.layer.pipe(Layer.provideMerge(application))
+	return BunServer.layer.pipe(
+		Layer.provideMerge(application),
+		Layer.provideMerge(DocumentObservability.layer("server")),
+	)
 }
 export function startServer(options: ServerOptions = {}) {
 	return Effect.gen(function* () {
@@ -77,6 +81,7 @@ function serve() {
 	return Effect.gen(function* () {
 		let settings = yield* RelaySettings
 		let application = yield* Application
+		let observability = yield* DocumentObservability
 		let origin = yield* RequestOrigin
 		let runRequest = yield* FiberSet.makeRuntimePromise<HttpClient.HttpClient>()
 		let server = yield* Effect.acquireRelease(
@@ -99,6 +104,7 @@ function serve() {
 		yield* origin.bind(server.url.origin)
 		return {
 			server,
+			diagnostics: observability.snapshot,
 			database: application.database,
 			cipher: application.cipher,
 			mcp: application.mcp,

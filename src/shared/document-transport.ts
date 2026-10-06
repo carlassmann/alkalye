@@ -4,6 +4,7 @@ import * as Layer from "effect/Layer"
 import * as HttpApiClient from "effect/http-api/HttpApiClient"
 import * as HttpClient from "effect/http/HttpClient"
 import * as HttpClientRequest from "effect/http/HttpClientRequest"
+import { makeDocumentObservability } from "./document-observability"
 import { DocumentApi } from "./document-api"
 import { accountHeader } from "./authentication"
 import { personalWorkspaceRequest } from "./workspace"
@@ -21,6 +22,7 @@ export class DocumentRemote extends Context.Service<
 }
 export function makeDocumentTransport(origin: string, subject: string) {
 	return Effect.gen(function* () {
+		let observability = yield* makeDocumentObservability("client")
 		let api = yield* HttpApiClient.make(DocumentApi, {
 			baseUrl: origin,
 			transformClient: client =>
@@ -30,6 +32,8 @@ export function makeDocumentTransport(origin: string, subject: string) {
 				),
 		})
 		return {
+			diagnostics: observability.snapshot,
+			observe: observability.observe,
 			create: (creation: LocalDocumentCreation) =>
 				Effect.gen(function* () {
 					if (creation.subject !== subject)
@@ -63,37 +67,43 @@ export function makeDocumentTransport(origin: string, subject: string) {
 							}),
 						)
 					return { log: snapshot.log, initial }
-				}).pipe(Effect.timeout("20 seconds")),
+				}).pipe(Effect.timeout("20 seconds"), observability.observe("create")),
 			snapshot: (document: string) =>
 				api.documents
 					.snapshot({ params: { document } })
-					.pipe(Effect.timeout("20 seconds")),
+					.pipe(
+						Effect.timeout("20 seconds"),
+						observability.observe("snapshot"),
+					),
 			action: (document: string, id: string) =>
 				api.documents
 					.action({ params: { document, action: id } })
-					.pipe(Effect.timeout("20 seconds")),
+					.pipe(Effect.timeout("20 seconds"), observability.observe("action")),
 			chain: (document: string, id: string) =>
 				api.documents
 					.chain({ params: { document, action: id } })
-					.pipe(Effect.timeout("20 seconds")),
+					.pipe(Effect.timeout("20 seconds"), observability.observe("chain")),
 			withdraw: (action: DocumentAction) =>
 				api.documents
 					.withdraw({ params: { document: action.document }, payload: action })
-					.pipe(Effect.timeout("20 seconds")),
+					.pipe(
+						Effect.timeout("20 seconds"),
+						observability.observe("withdraw"),
+					),
 			commit: (action: DocumentAction) =>
 				api.documents
 					.commit({
 						params: { document: action.document },
 						payload: action,
 					})
-					.pipe(Effect.timeout("20 seconds")),
+					.pipe(Effect.timeout("20 seconds"), observability.observe("commit")),
 			history: (document: string, after: number, log: string, limit = 100) =>
 				api.documents
 					.history({
 						params: { document },
 						query: { after, log, limit },
 					})
-					.pipe(Effect.timeout("20 seconds")),
+					.pipe(Effect.timeout("20 seconds"), observability.observe("history")),
 		}
 	})
 }

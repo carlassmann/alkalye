@@ -3,8 +3,10 @@ import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { Database } from "bun:sqlite"
+import { documentDiagnostics } from "../src/shared/document-diagnostics"
 import { makeDocumentTransport } from "../src/client/document-transport"
 import * as Effect from "effect/Effect"
+import * as Fiber from "effect/Fiber"
 import * as Crypto from "effect/Crypto"
 import * as Redacted from "effect/Redacted"
 import * as HttpApiClient from "effect/http-api/HttpApiClient"
@@ -2095,3 +2097,147 @@ test("account preference events merge only changed fields, retry exactly and rem
 			expect((yield* owner.api.preferences.get()).name).toBe("Native writer")
 		}),
 	))
+
+test("document observability measures real HTTP outcomes without document labels and isolates client registries", () =>
+	run(
+		Effect.gen(function* () {
+			let owner = yield* client(113)
+			let http = yield* HttpClient.HttpClient
+			let transport = yield* makeDocumentTransport(
+				instance.server.url.origin,
+				owner.subject,
+			).pipe(
+				Effect.provideService(
+					HttpClient.HttpClient,
+					HttpClient.mapRequest(
+						http,
+						HttpClientRequest.bearerToken(owner.token),
+					),
+				),
+			)
+			let document = "private-observability-document"
+			let creation = yield* createAction(
+				document,
+				owner.subject + "-observability-birth",
+			)
+			yield* owner.api.workspaces.create({
+				payload: {
+					workspace: "observability-space",
+					name: "Private workspace name",
+					request: "observability-create",
+				},
+			})
+			yield* owner.api.documents.create({
+				payload: { workspace: "observability-space", action: creation },
+			})
+			let current = yield* transport.snapshot(document)
+			let replica = yield* restoreSnapshot(
+				current,
+				owner.subject + "-observability-editor",
+			)
+			let edit = yield* buildAction(
+				replica,
+				document,
+				"Private operation description",
+				staged => [
+					staged.set(document, "presentationNote", "Private document content"),
+				],
+			)
+			yield* transport.commit(edit)
+			yield* transport.snapshot("private-missing-document").pipe(Effect.exit)
+			let snapshots = yield* transport.diagnostics
+			let calls = snapshots.filter(item => item.id === "alkalye_document_calls")
+			expect(calls).toHaveLength(3)
+			expect(calls.map(item => item.attributes)).toContainEqual({
+				boundary: "client",
+				operation: "snapshot",
+				outcome: "success",
+			})
+			expect(calls.map(item => item.attributes)).toContainEqual({
+				boundary: "client",
+				operation: "snapshot",
+				outcome: "access",
+			})
+			expect(JSON.stringify(snapshots)).not.toContain(document)
+			expect(JSON.stringify(snapshots)).not.toContain(owner.subject)
+			expect(JSON.stringify(snapshots)).not.toContain("Private workspace name")
+			let report = documentDiagnostics(snapshots)
+			expect(report).toContain("snapshot: 1 success, 1 access; mean")
+			expect(report).toContain("commit: 1 success; mean")
+			expect(report).not.toContain("Private document content")
+			expect(report).not.toContain(document)
+			expect(report).not.toContain(owner.subject)
+			let isolated = yield* makeDocumentTransport(
+				instance.server.url.origin,
+				owner.subject,
+			)
+			expect(yield* isolated.diagnostics).toEqual([])
+			let server = yield* instance.diagnostics
+			expect(
+				server.some(
+					item =>
+						item.id === "alkalye_document_calls" &&
+						item.attributes?.boundary === "server" &&
+						item.attributes.operation === "snapshot",
+				),
+			).toBe(true)
+		}),
+	))
+
+test("interrupting a real document request records cancellation and releases its fetch", async () => {
+	let started = Promise.withResolvers<void>()
+	let aborted = Promise.withResolvers<void>()
+	let traceparent: string | null = null
+	let server = Bun.serve({
+		port: 0,
+		fetch(request) {
+			traceparent = request.headers.get("traceparent")
+			started.resolve()
+			return new Promise<Response>(resolve => {
+				request.signal.addEventListener(
+					"abort",
+					() => {
+						aborted.resolve()
+						resolve(new Response(null, { status: 499 }))
+					},
+					{ once: true },
+				)
+			})
+		},
+	})
+	try {
+		await run(
+			Effect.scoped(
+				Effect.gen(function* () {
+					let transport = yield* makeDocumentTransport(
+						server.url.origin,
+						"local-test-account",
+					)
+					let request = yield* transport
+						.snapshot("private-interrupted-document")
+						.pipe(Effect.forkChild)
+					yield* Effect.promise(() => started.promise)
+					yield* Fiber.interrupt(request)
+					expect(traceparent).toMatch(/^00-[a-f0-9]{32}-[a-f0-9]{16}-0[01]$/)
+					let snapshots = yield* transport.diagnostics
+					let cancellation = snapshots.find(
+						metric =>
+							metric.id === "alkalye_document_calls" &&
+							metric.attributes?.outcome === "interrupted",
+					)
+					expect(cancellation?.type).toBe("Counter")
+					if (cancellation?.type === "Counter")
+						expect(cancellation.state.count).toBe(1)
+					expect(documentDiagnostics(snapshots)).toContain(
+						"snapshot: 1 interrupted",
+					)
+					yield* Effect.promise(() => aborted.promise).pipe(
+						Effect.timeout("2 seconds"),
+					)
+				}),
+			),
+		)
+	} finally {
+		await server.stop(true)
+	}
+})

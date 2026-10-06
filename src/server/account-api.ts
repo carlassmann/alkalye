@@ -15,6 +15,9 @@ import * as HttpRouter from "effect/http/HttpRouter"
 import * as HttpServer from "effect/http/HttpServer"
 import * as HttpServerResponse from "effect/http/HttpServerResponse"
 import { cookieSecurity, secureCookieSecurity } from "../shared/account-api"
+import * as Headers from "effect/http/Headers"
+import { accountHeader } from "../shared/authentication"
+import { DocumentObservability } from "../shared/document-observability"
 import { RequestAccount } from "../shared/authentication"
 import { DocumentApi } from "../shared/document-api"
 import { documentApiHandlers } from "./document-api"
@@ -211,8 +214,17 @@ function makeAccountApplication() {
 			),
 		)
 		let context = yield* Effect.context<
-			RequestOrigin | Layer.Success<typeof HttpServer.layerServices>
+			| RequestOrigin
+			| DocumentObservability
+			| Layer.Success<typeof HttpServer.layerServices>
 		>()
+		context = Context.add(context, Headers.CurrentRedactedNames, [
+			"authorization",
+			"cookie",
+			"set-cookie",
+			"x-api-key",
+			accountHeader,
+		])
 		let app = yield* HttpRouter.toHttpEffect(
 			routes.pipe(Layer.provide(Layer.succeedContext(context))),
 		).pipe(
@@ -226,7 +238,9 @@ function makeAccountApplication() {
 				: app
 		})
 		let handler = HttpEffect.toWebHandlerWith<
-			RequestOrigin | Layer.Success<typeof HttpServer.layerServices>,
+			| RequestOrigin
+			| DocumentObservability
+			| Layer.Success<typeof HttpServer.layerServices>,
 			Effect.Services<typeof compressed>
 		>(context)(
 			Effect.gen(function* () {
