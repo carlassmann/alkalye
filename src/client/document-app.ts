@@ -1,4 +1,5 @@
 import { bootMarkup } from "./components/boot"
+import { SyncRecoveryElement } from "./components/sync-recovery"
 import { makeSaveFeedback, saveIndicator } from "../shared/save-status"
 import * as Cause from "effect/Cause"
 import * as Crypto from "effect/Crypto"
@@ -184,10 +185,13 @@ function mountApplication() {
 		let parent = yield* Scope.Scope
 		let tasks = yield* TaskGroup.make
 		let selecting = yield* Semaphore.make(1)
+		let recovering = yield* Semaphore.make(1)
 		let acquiring = yield* FiberHandle.make<OpenDocument, unknown>()
 		let mediaPreview = yield* FiberHandle.make<void, unknown>()
 		let requests = yield* Ref.make(0)
 		let selection: Selection | undefined
+		let blockedDocuments = new WeakSet<Selection>()
+		let copyingDocuments = new WeakSet<Selection>()
 		let undoWaiting = new WeakSet<Selection>()
 		let mounted: Selection | undefined
 		let switching = false
@@ -231,6 +235,7 @@ function mountApplication() {
 				<div data-app class="workspace">
 					${toolbarMarkup()}
 					<div data-find id="find-bar" hidden></div>
+					<alkalye-sync-recovery></alkalye-sync-recovery>
 					<main id="main">${bootMarkup()}</main>
 					${statusbarMarkup()}
 				</div>
@@ -269,6 +274,10 @@ function mountApplication() {
 		app.dataset.documentApp = ""
 		let enabled = new Set([
 			"retry-save",
+			"retry-sync",
+			"recover-copy",
+			"recover-export",
+			"download",
 			"new",
 			"new-workspace",
 			"manage-workspace",
@@ -2245,6 +2254,9 @@ function mountApplication() {
 			let doc = currentDocument()
 			if (!doc) {
 				element("#document-title").textContent = ""
+				let recovery = app.querySelector("alkalye-sync-recovery")
+				if (recovery instanceof SyncRecoveryElement)
+					recovery.update(false, false, false)
 				updateMarkup(element("#inspector-body"), "")
 				return
 			}
@@ -2295,6 +2307,24 @@ function mountApplication() {
 				presentation?.update()
 				let session = selection.opened.session
 				let failures = session.failures.current()
+				let connection = selection.opened.connection.current()
+				let hasLocalChanges =
+					session.pending().length > 0 || Boolean(session.unsaved())
+				if (!hasLocalChanges) blockedDocuments.delete(selection)
+				else if (!selection.opened.file && connection.status === "unavailable")
+					blockedDocuments.add(selection)
+				let recovery = app.querySelector("alkalye-sync-recovery")
+				if (recovery instanceof SyncRecoveryElement)
+					recovery.update(
+						blockedDocuments.has(selection),
+						connection.status === "syncing",
+						account.state.current().status !== "signedOut" &&
+							account.state.current().status !== "accountChanged",
+						copyingDocuments.has(selection),
+						connection.reason === "authentication" ||
+							account.state.current().status === "signedOut" ||
+							account.state.current().status === "accountChanged",
+					)
 				let state = selection.opened.file?.current()
 				element("#save-status").title =
 					state?.message ?? failures.synchronization?.message ?? ""
@@ -3608,6 +3638,59 @@ function mountApplication() {
 						)
 					yield* closeSelection(selected)
 					yield* library.refresh
+					return
+				}
+				if (action === "recover-export") {
+					let { downloadFile, exportMarkdown } = yield* archives
+					yield* downloadFile(
+						exportMarkdown(selected.opened, selected.document, new Map()),
+					)
+					toast(
+						"Markdown source exported. Attachments and comments are not included.",
+					)
+					return
+				}
+				if (action === "recover-copy") {
+					return yield* recovering.withPermit(
+						Effect.gen(function* () {
+							if (selection !== selected) return
+							copyingDocuments.add(selected)
+							refreshDocument()
+							let copy = duplicateDocumentVersion(
+								library,
+								selected.opened.blobs,
+								selected.opened.session.replica,
+								doc.id,
+								doc.title + " (recovered)",
+								"personal-" + account.subject,
+							).pipe(Effect.provideService(Crypto.Crypto, random))
+							yield* copy.pipe(
+								Effect.flatMap(id => open(id)),
+								Effect.mapError(
+									() =>
+										new Error(
+											"The full copy could not be saved. Keep this document open, or export the Markdown source. Attachments must be available on this device.",
+										),
+								),
+								Effect.ensuring(
+									Effect.sync(() => {
+										copyingDocuments.delete(selected)
+										refreshSafely()
+									}),
+								),
+							)
+							toast(
+								"Personal copy saved. Original edits remain on this device.",
+							)
+						}),
+					)
+				}
+				if (action === "retry-sync") {
+					yield* selected.opened.connection.retry
+					if (selected.opened.connection.current().status === "unavailable")
+						report(
+							"Access has not been restored. Your edits remain on this device.",
+						)
 					return
 				}
 				if (action === "duplicate") {

@@ -1,0 +1,43 @@
+[data-sync-recovery] {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px 24px;
+	align-items: center;
+	padding: 16px 24px;
+	border-bottom: 1px solid var(--line);
+	background: var(--surface);
+	font-size: 13px;
+}
+[data-sync-recovery][hidden] {
+	display: none;
+}
+[data-sync-recovery] p {
+	margin: 4px 0 0;
+	max-width: 64ch;
+	color: var(--muted);
+	line-height: 1.5;
+}
+[data-sync-recovery] .recovery-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+[data-sync-recovery] button {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 10px;
+	border: 1px solid var(--line);
+	white-space: nowrap;
+}
+[data-sync-recovery] button:hover {
+	background: var(--accent);
+}
+[data-sync-recovery] button:disabled {
+	opacity: 0.5;
+	cursor: default;
+}
+[data-sync-recovery] svg {
+	width: 16px;
+	height: 16px;
+}

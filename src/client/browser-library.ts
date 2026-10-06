@@ -9,7 +9,10 @@ import * as Semaphore from "effect/Semaphore"
 import * as Stream from "effect/Stream"
 import * as SubscriptionRef from "effect/SubscriptionRef"
 import { webCryptoLayer } from "../platform/web-crypto"
-import { AccountChanged } from "../shared/authentication"
+import {
+	AuthenticationRequired,
+	AccountChanged,
+} from "../shared/authentication"
 import { Replica } from "../shared/crdt"
 import {
 	buildAction,
@@ -59,6 +62,7 @@ export interface BrowserCatalogue {
 export interface DocumentConnectionState {
 	readonly status: "offline" | "syncing" | "synced" | "unavailable" | "failed"
 	readonly message?: string
+	readonly reason?: "access" | "authentication" | "unavailable"
 }
 export class BrowserLibrary extends Context.Service<
 	BrowserLibrary,
@@ -147,6 +151,7 @@ function makeLibrary() {
 			Effect.forkScoped({ startImmediately: true }),
 		)
 		return Object.freeze({
+			diagnostics: transport.diagnostics,
 			live,
 			folders,
 			state: Object.freeze({
@@ -272,22 +277,20 @@ function makeLibrary() {
 						Effect.gen(function* () {
 							let opened = yield* RcMap.get(documents, row.summary.document)
 							if (navigator.onLine) {
-								yield* opened.session.sync
-								updated = true
+								yield* opened.connection.synchronize
+								updated ||= opened.connection.current().status === "synced"
 							}
 							yield* opened.session.save
 						}),
 					).pipe(
-						Effect.catch(error =>
-							Effect.logWarning("Document remains on this device", error),
+						Effect.catch(() =>
+							Effect.logDebug("Local document synchronization deferred"),
 						),
 					)
 				}
 				if (updated) yield* refreshLibrary()
 			}).pipe(
-				Effect.catch(error =>
-					Effect.logWarning("Could not drain local documents", error),
-				),
+				Effect.catch(() => Effect.logDebug("Local document drain deferred")),
 			)
 		}
 		function createFile(source: string, workspace: string) {
@@ -305,9 +308,11 @@ function makeLibrary() {
 			})
 		}
 		function openDocument(document: string) {
-			return folders.locate(document)
-				? openLocalDocument(document)
-				: openSharedDocument(document)
+			return (
+				folders.locate(document)
+					? openLocalDocument(document)
+					: openSharedDocument(document)
+			).pipe(transport.observe("open"))
 		}
 		// A file in a chosen folder uses the same session as a synchronized
 		// document. Its journal keeps drafts and undo on this device; the disk,
@@ -425,6 +430,8 @@ function makeLibrary() {
 					connection: Object.freeze({
 						current: () => SubscriptionRef.getUnsafe(connection),
 						changes: SubscriptionRef.changes(connection),
+						retry: Effect.void,
+						synchronize: Effect.void,
 					}),
 					file: localFile(file),
 					localMedia: localMediaOf(media),
@@ -452,9 +459,11 @@ function makeLibrary() {
 						transport: {
 							create: creation => account.request(transport.create(creation)),
 							snapshot: document =>
-								account.request(
-									account.api.documents.snapshot({ params: { document } }),
-								),
+								account
+									.request(
+										account.api.documents.snapshot({ params: { document } }),
+									)
+									.pipe(transport.observe("snapshot")),
 							commit: action =>
 								blobs.upload(action).pipe(
 									Effect.andThen(
@@ -465,14 +474,17 @@ function makeLibrary() {
 											}),
 										),
 									),
+									transport.observe("commit"),
 								),
 							history: (document, after, log, limit) =>
-								account.request(
-									account.api.documents.history({
-										params: { document },
-										query: { after, log, limit },
-									}),
-								),
+								account
+									.request(
+										account.api.documents.history({
+											params: { document },
+											query: { after, log, limit },
+										}),
+									)
+									.pipe(transport.observe("history")),
 						},
 					}),
 				)
@@ -480,6 +492,7 @@ function makeLibrary() {
 				let connection = yield* SubscriptionRef.make<DocumentConnectionState>(
 					Object.freeze({ status: "offline" }),
 				)
+				let deniedRole: string | undefined
 				yield* session.changes.pipe(
 					Stream.debounce("500 millis"),
 					Stream.merge(Stream.fromEventListener(window, "online")),
@@ -536,6 +549,10 @@ function makeLibrary() {
 					connection: Object.freeze({
 						current: () => SubscriptionRef.getUnsafe(connection),
 						changes: SubscriptionRef.changes(connection),
+						synchronize: Effect.suspend(synchronize),
+						retry: refresh.pipe(
+							Effect.andThen(Effect.suspend(() => synchronize(true))),
+						),
 					}),
 					file: localFile(undefined),
 					localMedia: localMediaOf(undefined),
@@ -554,12 +571,14 @@ function makeLibrary() {
 						SubscriptionRef.getUnsafe(connection).status !== "unavailable",
 					)
 				}
-				function synchronize() {
+				function synchronize(manual = false) {
+					let entry = SubscriptionRef.getUnsafe(state).library.documents.find(
+						value => value.document === document,
+					)
 					if (
+						!manual &&
 						SubscriptionRef.getUnsafe(connection).status === "unavailable" &&
-						!SubscriptionRef.getUnsafe(state).library.documents.some(
-							entry => entry.document === document,
-						)
+						entry?.role === deniedRole
 					)
 						return Effect.void
 					if (!navigator.onLine)
@@ -571,7 +590,7 @@ function makeLibrary() {
 						connection,
 						Object.freeze({ status: "syncing" }),
 					).pipe(
-						Effect.andThen(session.sync),
+						Effect.andThen(session.sync.pipe(transport.observe("sync"))),
 						Effect.andThen(session.save),
 						Effect.andThen(
 							Effect.suspend(() =>
@@ -586,20 +605,35 @@ function makeLibrary() {
 								),
 							),
 						),
-						Effect.catch(error =>
-							SubscriptionRef.set(
+						Effect.catch(error => {
+							let authentication =
+								error instanceof AuthenticationRequired ||
+								error instanceof AccountChanged
+							let denied =
+								error instanceof PermissionDenied ||
+								error instanceof ResourceUnavailable ||
+								authentication
+							if (denied)
+								deniedRole = SubscriptionRef.getUnsafe(
+									state,
+								).library.documents.find(
+									value => value.document === document,
+								)?.role
+							return SubscriptionRef.set(
 								connection,
 								Object.freeze({
-									status:
-										error instanceof PermissionDenied ||
-										error instanceof ResourceUnavailable ||
-										error instanceof AccountChanged
-											? "unavailable"
-											: "failed",
+									status: denied ? "unavailable" : "failed",
 									message: message(error),
+									reason: authentication
+										? "authentication"
+										: error instanceof PermissionDenied
+											? "access"
+											: error instanceof ResourceUnavailable
+												? "unavailable"
+												: undefined,
 								}),
-							),
-						),
+							)
+						}),
 					)
 				}
 			})

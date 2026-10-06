@@ -19,6 +19,7 @@
 @import url("/components/toolbar.css");
 @import url("/components/editor.css");
 @import url("/components/statusbar.css");
+@import url("/components/sync-recovery.css");
 @import url("/components/inspector.css");
 @import url("/components/preview.css");
 @import url("/components/dialog.css");

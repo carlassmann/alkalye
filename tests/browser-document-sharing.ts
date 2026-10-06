@@ -145,18 +145,196 @@ try {
 		true,
 		"A writer invited from another account edits the owner's live document",
 	)
+	evaluate(
+		collaborator,
+		'Object.defineProperty(navigator, "onLine", {value:false, configurable:true}); dispatchEvent(new Event("offline")); true',
+	)
+	let recoveredSource =
+		"# Shared from the library\n\nOffline work that must survive revoked access."
+	browser(collaborator, "fill", "#editor", recoveredSource)
+	wait(
+		collaborator,
+		'document.querySelector("#save-status").getAttribute("aria-busy") === "false" && Number(document.querySelector("#save-status").dataset.pending) > 0',
+	)
 	browser(session, "click", "[data-revoke]")
 	wait(
 		session,
 		'document.querySelector(".invitation-list")?.textContent.includes("No active links")',
 	)
 	wait(collaborator, 'document.querySelector("#editor")?.readOnly !== false')
+	evaluate(
+		collaborator,
+		'delete navigator.onLine; dispatchEvent(new Event("online")); true',
+	)
+	wait(
+		collaborator,
+		'document.querySelector("alkalye-sync-recovery")?.hidden === false',
+	)
+	assert(
+		evaluate(
+			collaborator,
+			'document.querySelector("alkalye-editor").source.value',
+		) === recoveredSource,
+		"Revoked permission preserves the exact offline source",
+	)
+	let pendingBeforeRecovery = evaluate(
+		collaborator,
+		'document.querySelector("#save-status").dataset.pending',
+	)
+	browser(collaborator, "click", '[data-action="retry-sync"]')
+	wait(
+		collaborator,
+		`document.querySelector("alkalye-sync-recovery")?.hidden === false && !document.querySelector('[data-action="retry-sync"]').disabled`,
+	)
+	assert(
+		evaluate(
+			collaborator,
+			'document.querySelector("#save-status").dataset.pending',
+		) === pendingBeforeRecovery,
+		"Retry without restored access cannot discard pending changes",
+	)
+	evaluate(
+		collaborator,
+		`(() => {
+		let click = HTMLAnchorElement.prototype.click
+		HTMLAnchorElement.prototype.click = function() {
+			if (this.download) { window.recoveredDownload = fetch(this.href).then(response => response.text()); return }
+			return click.call(this)
+		}
+		return true
+	})()`,
+	)
+	browser(
+		collaborator,
+		"click",
+		'alkalye-sync-recovery [data-action="recover-export"]',
+	)
+	wait(collaborator, "Boolean(window.recoveredDownload)")
+	assert(
+		evaluate(collaborator, "window.recoveredDownload") === recoveredSource,
+		"Recovery export works after server access is revoked",
+	)
+	browser(collaborator, "click", '[data-action="recover-copy"]')
+	wait(
+		collaborator,
+		`${currentDocument} !== ${JSON.stringify(sharedDocument)} && !document.querySelector("#app").hasAttribute("aria-busy")`,
+	)
+	assert(
+		evaluate(
+			collaborator,
+			'document.querySelector("alkalye-editor").source.value.includes("Offline work that must survive revoked access.") && document.querySelector("alkalye-sync-recovery").hidden',
+		),
+		"A recovery copy opens with the pending text in the account's personal workspace",
+	)
+	wait(
+		collaborator,
+		'document.querySelector("#save-status").dataset.pending === "0"',
+	)
+	browser(collaborator, "open", new URL("/app/doc/" + sharedDocument, url).href)
+	wait(
+		collaborator,
+		'document.querySelector("alkalye-sync-recovery")?.hidden === false && !document.querySelector("#app").hasAttribute("aria-busy")',
+	)
+	assert(
+		evaluate(
+			collaborator,
+			'document.querySelector("alkalye-editor").source.value',
+		) === recoveredSource &&
+			evaluate(
+				collaborator,
+				'document.querySelector("#save-status").dataset.pending',
+			) === pendingBeforeRecovery,
+		"Saving a personal copy and reloading preserves the original pending journal",
+	)
+
 	assert(
 		evaluate(
 			collaborator,
 			`fetch("/api/documents/${sharedDocument}/snapshot").then(response => response.status === 404)`,
 		),
 		"Revoking the document link immediately blocks the joined account's snapshot access",
+	)
+	browser(session, "click", '[data-invite-role="writer"]')
+	wait(
+		session,
+		`document.querySelector(".invitation-link input")?.value.includes(${JSON.stringify("/doc/" + sharedDocument + "/invite/")})`,
+	)
+	let restoredLink = string(
+		evaluate(session, 'document.querySelector(".invitation-link input").value'),
+	)
+	browser(collaborator, "open", restoredLink)
+	wait(
+		collaborator,
+		'document.querySelector("[data-invitation-accept]") !== null',
+	)
+	browser(collaborator, "click", "[data-invitation-accept]")
+	wait(
+		collaborator,
+		`${currentDocument} === ${JSON.stringify(sharedDocument)} && document.querySelector("#editor")?.readOnly === false && document.querySelector("#save-status").dataset.pending === "0" && document.querySelector("alkalye-sync-recovery").hidden`,
+	)
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.value.includes("Offline work that must survive revoked access.")',
+	)
+	assert(
+		true,
+		"Restored writer access syncs the retained original actions and clears recovery",
+	)
+	evaluate(
+		collaborator,
+		'Object.defineProperty(navigator, "onLine", {value:false, configurable:true}); dispatchEvent(new Event("offline")); true',
+	)
+	let downgradedSource =
+		recoveredSource + "\n\nPending work before a reader downgrade."
+	browser(collaborator, "fill", "#editor", downgradedSource)
+	wait(
+		collaborator,
+		'document.querySelector("#save-status").getAttribute("aria-busy") === "false" && Number(document.querySelector("#save-status").dataset.pending) > 0',
+	)
+	browser(session, "click", "[data-revoke]")
+	wait(
+		session,
+		'document.querySelector(".invitation-list")?.textContent.includes("No active links")',
+	)
+	browser(session, "click", '[data-invite-role="reader"]')
+	wait(
+		session,
+		`document.querySelector(".invitation-link input")?.value.includes(${JSON.stringify("/doc/" + sharedDocument + "/invite/")})`,
+	)
+	let readerLink = string(
+		evaluate(session, 'document.querySelector(".invitation-link input").value'),
+	)
+	browser(collaborator, "open", readerLink)
+	wait(
+		collaborator,
+		'document.querySelector("[data-invitation-accept]") !== null',
+	)
+	browser(collaborator, "click", "[data-invitation-accept]")
+	wait(
+		collaborator,
+		`${currentDocument} === ${JSON.stringify(sharedDocument)} && document.querySelector("alkalye-sync-recovery")?.hidden === false && document.querySelector("#editor")?.readOnly === true`,
+	)
+	assert(
+		evaluate(
+			collaborator,
+			'document.querySelector("alkalye-editor").source.value',
+		) === downgradedSource,
+		"A writer downgraded to reader keeps pending work and sees recovery",
+	)
+	assert(
+		evaluate(
+			collaborator,
+			`fetch("/api/documents/${sharedDocument}/snapshot").then(response => response.status === 200)`,
+		),
+		"Recovery also covers write denial while snapshot read access remains",
+	)
+	browser(collaborator, "set", "viewport", "390", "844")
+	assert(
+		evaluate(
+			collaborator,
+			`document.documentElement.scrollWidth <= innerWidth && document.querySelector('[data-action="recover-export"]').checkVisibility()`,
+		),
+		"Mobile recovery controls remain visible without horizontal overflow",
 	)
 } finally {
 	try {
