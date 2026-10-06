@@ -1,5 +1,6 @@
 import * as Crypto from "effect/Crypto"
 import * as Effect from "effect/Effect"
+import type * as Stream from "effect/Stream"
 import type * as Context from "effect/Context"
 import {
 	invitationDigest,
@@ -20,8 +21,10 @@ export function invitationController(
 	target: InvitationTarget,
 	random: Crypto.Crypto,
 	report: (error: unknown) => void,
+	changes?: Stream.Stream<unknown, unknown>,
 ): InvitationController {
 	return {
+		changes,
 		list: account.request(account.api.invitations.list({ query: target })),
 		create: (role: InvitationRole) =>
 			Effect.gen(function* () {

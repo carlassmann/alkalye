@@ -102,6 +102,36 @@ test("polling and WebSocket peers share notifications, presence and departures",
 	}
 })
 
+test("profile edits invalidate shared labels without disclosing another account's preferences", async () => {
+	let owner = await run(client(83))
+	let stranger = await run(client(84))
+	let polling = livePoll(await cookieLogin(instance.server.url, 83))
+	await polling.open()
+	await polling.until(is("connected"))
+	let socket = await liveSocket(await cookieLogin(instance.server.url, 83))
+	try {
+		await socket.until(is("connected"))
+		let before = await run(owner.api.preferences.get())
+		await run(
+			stranger.api.preferences.save({
+				payload: {
+					request: "private-profile-name",
+					patch: { name: "Private name", appearance: "dark" },
+				},
+			}),
+		)
+		expect(await polling.until(is("advanced"))).toEqual({ type: "advanced" })
+		expect(await socket.until(is("advanced"))).toEqual({ type: "advanced" })
+		expect(await run(owner.api.preferences.get())).toEqual(before)
+		expect(polling.inbox.some(message => message.type === "preferences")).toBe(
+			false,
+		)
+	} finally {
+		socket.close()
+		await polling.close()
+	}
+})
+
 test("real polling presenters converge on ties and clock skew while readers cannot present", async () => {
 	let owner = await run(client(71))
 	let writer = await run(client(72))

@@ -2,6 +2,8 @@ import * as Cause from "effect/Cause"
 import * as Effect from "effect/Effect"
 import * as Fiber from "effect/Fiber"
 import * as FiberSet from "effect/FiberSet"
+import * as Semaphore from "effect/Semaphore"
+import * as Stream from "effect/Stream"
 import type {
 	InvitationRole,
 	InvitationSummary,
@@ -11,6 +13,7 @@ import { html, joinMarkup, translate } from "../language"
 import { toast } from "./toast"
 
 export interface InvitationController {
+	readonly changes?: Stream.Stream<unknown, unknown>
 	readonly list: Effect.Effect<ReadonlyArray<InvitationSummary>, unknown>
 	readonly create: (role: InvitationRole) => Effect.Effect<string, unknown>
 	readonly revoke: (invitation: string) => Effect.Effect<unknown, unknown>
@@ -51,6 +54,7 @@ export class InvitationsElement extends HTMLElement {
 					)
 					let created = ""
 					let summaries: ReadonlyArray<InvitationSummary> = []
+					let reads = yield* Semaphore.make(1)
 					let refresh = Effect.suspend(() => controller.list).pipe(
 						Effect.flatMap(next =>
 							Effect.sync(() => {
@@ -58,6 +62,7 @@ export class InvitationsElement extends HTMLElement {
 								render()
 							}),
 						),
+						reads.withPermits(1),
 					)
 					setMarkup(
 						host,
@@ -136,6 +141,16 @@ export class InvitationsElement extends HTMLElement {
 						},
 						{ signal: events.signal },
 					)
+					if (controller.changes)
+						yield* controller.changes.pipe(
+							Stream.debounce("100 millis"),
+							Stream.runForEach(() =>
+								refresh.pipe(
+									Effect.catchCause(cause => reportFailure(controller, cause)),
+								),
+							),
+							Effect.forkScoped({ startImmediately: true }),
+						)
 					yield* refresh.pipe(
 						Effect.catchCause(cause => reportFailure(controller, cause)),
 					)

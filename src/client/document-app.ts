@@ -1241,7 +1241,20 @@ function mountApplication() {
 						Effect.tryPromise(() => import("./invitations")),
 					])
 				return invitationsElement(
-					invitationController(account, target, random, report),
+					invitationController(
+						account,
+						target,
+						random,
+						report,
+						library.live.changes.pipe(
+							Stream.filter(
+								message =>
+									message.type === "advanced" ||
+									message.type === "preferences" ||
+									message.type === "connected",
+							),
+						),
+					),
 				)
 			})
 		}

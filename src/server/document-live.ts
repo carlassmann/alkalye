@@ -102,7 +102,7 @@ export function makeDocumentLive() {
 												})
 											}
 											peer.send({ type: "preferences" })
-										}
+										} else peer.send({ type: "advanced" })
 										return
 									}
 									for (let document of live.documents) {
