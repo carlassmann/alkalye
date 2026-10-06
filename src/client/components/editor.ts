@@ -210,7 +210,10 @@ function createEditorView(
 	let secondarySelections: {
 		start: number
 		end: number
+		direction?: "forward" | "backward" | "none"
+		goalX?: number
 	}[] = []
+	let primaryGoalX: number | undefined
 	let text = new SourceTextarea(textarea, options.content, {
 		documents: options.documents,
 		mode: () =>
@@ -269,6 +272,9 @@ function createEditorView(
 		"pointerdown",
 		() => {
 			dragging = true
+			secondarySelections = []
+			primaryGoalX = undefined
+			updateHighlight()
 		},
 		{ signal: listeners.signal },
 	)
@@ -722,7 +728,11 @@ function createEditorView(
 		)) {
 			html +=
 				escape(editor.value.slice(position, selection.start)) +
-				localizeMarkup("<mark>") +
+				localizeMarkup(
+					selection.start === selection.end
+						? '<mark class="local-caret">'
+						: "<mark>",
+				) +
 				escape(editor.value.slice(selection.start, selection.end)) +
 				"</mark>"
 			position = selection.end
@@ -1133,6 +1143,34 @@ function createEditorView(
 		}
 		let mod = event.metaKey || event.ctrlKey,
 			key = event.key.toLowerCase()
+		if (
+			secondarySelections.length &&
+			!(event.altKey && ["ArrowUp", "ArrowDown"].includes(event.key)) &&
+			[
+				"ArrowLeft",
+				"ArrowRight",
+				"ArrowUp",
+				"ArrowDown",
+				"Home",
+				"End",
+			].includes(event.key)
+		) {
+			event.preventDefault()
+			moveCursors(
+				event.key,
+				event.shiftKey,
+				event.metaKey
+					? ["ArrowLeft", "ArrowRight"].includes(event.key)
+						? "line"
+						: "document"
+					: event.ctrlKey || event.altKey
+						? ["Home", "End", "ArrowUp", "ArrowDown"].includes(event.key)
+							? "document"
+							: "word"
+						: "character",
+			)
+			return
+		}
 		if (mod && key === "y") {
 			event.preventDefault()
 			options.undo(true)
@@ -1343,6 +1381,7 @@ function createEditorView(
 		menu.hidden = true
 	}
 	function selectNextOccurrence(editor: SourceTextarea) {
+		primaryGoalX = undefined
 		let start = editor.selectionStart,
 			end = editor.selectionEnd
 		if (start === end) {
@@ -1353,13 +1392,194 @@ function createEditorView(
 			return
 		}
 		let selected = editor.value.slice(start, end),
-			last = Math.max(end, ...secondarySelections.map(range => range.end)),
-			next = editor.value.indexOf(selected, last)
-		if (next >= 0)
-			secondarySelections.push({ start: next, end: next + selected.length })
+			ranges = [{ start, end }, ...secondarySelections],
+			last = secondarySelections.at(-1)?.end ?? end
+		let candidates: { start: number; end: number }[] = []
+		for (
+			let index = editor.value.indexOf(selected);
+			index >= 0;
+			index = editor.value.indexOf(selected, index + selected.length)
+		)
+			candidates.push({ start: index, end: index + selected.length })
+		let next = [
+			...candidates.filter(range => range.start >= last),
+			...candidates.filter(range => range.start < last),
+		].find(
+			range =>
+				!ranges.some(
+					existing => range.start < existing.end && range.end > existing.start,
+				),
+		)
+		if (next) secondarySelections.push(next)
 		selectionsChanged()
 	}
+	function moveCursors(
+		key: string,
+		extend: boolean,
+		mode: "character" | "word" | "line" | "document",
+	) {
+		let source = text.value
+		let boundaries = [
+			...Array.from(
+				new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(
+					source,
+				),
+				segment => segment.index,
+			),
+			source.length,
+		]
+		let words =
+			mode === "word"
+				? [
+						...new Intl.Segmenter(undefined, { granularity: "word" }).segment(
+							source,
+						),
+					].filter(segment => segment.isWordLike)
+				: []
+		let backwardWords = [...words].reverse()
+		function rectangle(offset: number) {
+			let cursor = point(offset),
+				range = document.createRange()
+			range.setStart(cursor.node, cursor.offset)
+			range.collapse(true)
+			let bounds = range.getBoundingClientRect()
+			if (bounds.height) return bounds
+			let length = cursor.node.textContent?.length ?? 0
+			if (cursor.offset < length) range.setEnd(cursor.node, cursor.offset + 1)
+			else if (cursor.offset) range.setStart(cursor.node, cursor.offset - 1)
+			return range.getClientRects()[0] ?? bounds
+		}
+		function visualOffset(head: number, key: string, goalX: number) {
+			let current = rectangle(head),
+				lineHeight = parseFloat(getComputedStyle(textarea).lineHeight)
+			let targetTop =
+				current.top +
+				(key === "ArrowDown" ? lineHeight : key === "ArrowUp" ? -lineHeight : 0)
+			let low = 0,
+				high = boundaries.length
+			while (low < high) {
+				let middle = Math.floor((low + high) / 2),
+					offset = boundaries[middle] ?? source.length
+				if (rectangle(offset).top < targetTop - 1) low = middle + 1
+				else high = middle
+			}
+			if (low >= boundaries.length) return source.length
+			let rowTop = rectangle(boundaries[low] ?? 0).top
+			if (key === "ArrowUp" && rowTop > targetTop + 1) return 0
+			let best = boundaries[low] ?? 0,
+				distance = Infinity
+			for (let index = low; index < boundaries.length; index++) {
+				let offset = boundaries[index] ?? source.length,
+					bounds = rectangle(offset)
+				if (Math.abs(bounds.top - rowTop) > 1) break
+				let delta = Math.abs(bounds.left - goalX)
+				if (delta <= distance) {
+					best = offset
+					distance = delta
+				}
+			}
+			return best
+		}
+		function move(range: {
+			start: number
+			end: number
+			direction?: "forward" | "backward" | "none"
+			goalX?: number
+		}): {
+			start: number
+			end: number
+			direction: "forward" | "backward" | "none"
+			goalX?: number
+		} {
+			let backward = range.direction === "backward",
+				anchor = backward ? range.end : range.start,
+				head = backward ? range.start : range.end,
+				offset = head,
+				goalX =
+					["ArrowUp", "ArrowDown"].includes(key) && mode !== "document"
+						? (range.goalX ?? rectangle(head).left)
+						: undefined
+			if (mode === "document")
+				offset = ["ArrowLeft", "ArrowUp", "Home"].includes(key)
+					? 0
+					: source.length
+			else if (key === "ArrowLeft" || key === "ArrowRight") {
+				let right = key === "ArrowRight"
+				if (mode === "line") {
+					offset = visualOffset(
+						head,
+						key,
+						right ? Number.MAX_SAFE_INTEGER : -Number.MAX_SAFE_INTEGER,
+					)
+				} else if (mode === "word") {
+					let word = right
+						? words.find(
+								segment => segment.index + segment.segment.length > head,
+							)
+						: backwardWords.find(segment => segment.index < head)
+					offset = word
+						? word.index + (right ? word.segment.length : 0)
+						: right
+							? source.length
+							: 0
+				} else if (!extend && range.start !== range.end)
+					offset = right ? range.end : range.start
+				else
+					offset = right
+						? (boundaries.find(index => index > head) ?? source.length)
+						: (boundaries.filter(index => index < head).pop() ?? 0)
+			} else {
+				offset = visualOffset(
+					head,
+					key,
+					key === "Home"
+						? -Number.MAX_SAFE_INTEGER
+						: key === "End"
+							? Number.MAX_SAFE_INTEGER
+							: (goalX ?? rectangle(head).left),
+				)
+			}
+			return extend
+				? {
+						start: Math.min(anchor, offset),
+						end: Math.max(anchor, offset),
+						direction: offset < anchor ? "backward" : "forward",
+						goalX,
+					}
+				: { start: offset, end: offset, direction: "none", goalX }
+		}
+		let primary = move({
+			start: text.selectionStart,
+			end: text.selectionEnd,
+			direction: text.selectionDirection,
+			goalX: primaryGoalX,
+		})
+		let ranges = [
+			{ ...primary, primary: true },
+			...secondarySelections.map(range => ({ ...move(range), primary: false })),
+		].sort((a, b) => a.start - b.start)
+		let merged: typeof ranges = []
+		for (let range of ranges) {
+			let previous = merged.at(-1)
+			if (previous && range.start <= previous.end) {
+				previous.end = Math.max(previous.end, range.end)
+				if (range.primary) {
+					previous.primary = true
+					previous.direction = range.direction
+					previous.goalX = range.goalX
+				}
+			} else merged.push({ ...range })
+		}
+		let selected = merged.find(range => range.primary)
+		primaryGoalX = selected?.goalX
+		secondarySelections = merged.filter(range => !range.primary)
+		if (selected)
+			text.setSelectionRange(selected.start, selected.end, selected.direction)
+		selectionsChanged()
+	}
+
 	function multiInput(event: InputEvent) {
+		primaryGoalX = undefined
 		if (
 			event.inputType === "historyUndo" ||
 			event.inputType === "historyRedo"
@@ -1426,6 +1646,7 @@ function createEditorView(
 		let editor = text
 		if (
 			!(event.currentTarget instanceof HTMLTextAreaElement) ||
+			!editable ||
 			!secondarySelections.length ||
 			event.isComposing
 		)
@@ -1443,7 +1664,9 @@ function createEditorView(
 		let ranges = [
 			{ start: editor.selectionStart, end: editor.selectionEnd },
 			...secondarySelections,
-		].sort((a, b) => a.start - b.start)
+		]
+			.map((range, index) => ({ ...range, primary: index === 0 }))
+			.sort((a, b) => a.start - b.start)
 		let typed =
 			event.inputType === "insertLineBreak" ? "\n" : (event.data ?? "")
 		let source = editor.value
@@ -1459,22 +1682,23 @@ function createEditorView(
 				start = boundaries.filter(index => index < start).pop() ?? 0
 			if (start === end && event.inputType === "deleteContentForward")
 				end = boundaries.find(index => index > end) ?? source.length
-			return { start, end }
+			return { start, end, primary: range.primary }
 		})
 		let offset = 0,
 			positions: {
 				start: number
 				end: number
+				primary: boolean
 			}[] = []
 		for (let edit of edits) {
 			let cursor = edit.start + offset + typed.length
-			positions.push({ start: cursor, end: cursor })
+			positions.push({ start: cursor, end: cursor, primary: edit.primary })
 			offset += typed.length - (edit.end - edit.start)
 		}
 		for (let edit of [...edits].reverse())
 			source = source.slice(0, edit.start) + typed + source.slice(edit.end)
-		secondarySelections = positions.slice(1)
-		let primary = positions[0]
+		secondarySelections = positions.filter(position => !position.primary)
+		let primary = positions.find(position => position.primary)
 		editor.replace(source, primary?.start ?? 0, primary?.end ?? 0)
 		editor.dispatchEvent(new Event("input"))
 	}

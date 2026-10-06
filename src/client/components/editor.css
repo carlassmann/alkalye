@@ -285,3 +285,9 @@
 	:is(.syntax-marker, .syntax-link, .syntax-code) {
 	color: inherit;
 }
+
+[data-editor] #highlight .local-caret {
+	border-inline-start: 2px solid var(--editor-caret);
+	margin-inline-start: -1px;
+	margin-inline-end: -1px;
+}

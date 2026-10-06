@@ -19,6 +19,7 @@ let fullSuite = [
 	"tests/browser-floating-actions.ts",
 	"tests/browser-editor-context-menu.ts",
 	"tests/browser-editor-prettification.ts",
+	"tests/browser-multicursor.ts",
 	"tests/browser-ui-parity.ts",
 	"tests/browser-ui-leftovers.ts",
 	"tests/browser-sidebar-menus.ts",

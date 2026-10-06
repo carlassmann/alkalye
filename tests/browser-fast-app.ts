@@ -90,6 +90,25 @@ try {
 		...edit("left atc right"),
 	])
 
+	journey("multicursor wraps and appends at every selected occurrence", [
+		...edit("it it it it"),
+		[
+			"eval",
+			'(() => { let editor = document.querySelector("alkalye-editor").source; editor.focus(); editor.setSelectionRange(4, 4); })()',
+		],
+		["press", "Control+d"],
+		["press", "Control+d"],
+		["press", "Control+d"],
+		["press", "Control+d"],
+		["press", "Control+d"],
+		["press", "ArrowRight"],
+		versionMarker(),
+		["keyboard", "type", "!"],
+		condition(`${source} === "it! it! it! it!" && ${saved}`),
+		["press", "Escape"],
+		...edit("left atc right"),
+	])
+
 	journey("offline edits survive reload and reconnect", [
 		condition("navigator.serviceWorker.controller !== null"),
 		[
