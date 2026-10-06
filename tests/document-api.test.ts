@@ -1306,6 +1306,27 @@ test("native blob HTTP verifies immutable chunks, scopes them to a document and 
 				if (denied._tag === "Failure")
 					expect(denied.failure._tag).toBe("ResourceUnavailable")
 			}
+			for (let malformed of [digest + "=", digest.slice(0, -1) + "B"]) {
+				let response = yield* Effect.tryPromise(() =>
+					fetch(
+						new URL(
+							`/api/documents/${document}/blobs/${malformed}`,
+							instance.server.url,
+						),
+						{
+							method: "PUT",
+							headers: {
+								Authorization: "Bearer " + Redacted.value(owner.token),
+								"Content-Type": "application/octet-stream",
+							},
+							body: bytes,
+						},
+					),
+				)
+				expect(response.status).toBe(400)
+			}
+			expect(yield* owner.api.documents.getBlob({ params })).toEqual(bytes)
+
 			for (let bytes of [
 				new Uint8Array(),
 				new Uint8Array(maximumBlobChunkBytes + 1),

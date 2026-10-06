@@ -25,7 +25,7 @@ Local-first PWA built from TypeScript, HTML and CSS. Bun provides the server, bu
 
 - Prefer thorough integration tests through deep modules' public interfaces, with real storage, transport and Effect scopes. Cover persistence, retries, concurrent writers, permissions, interruption and resource release.
 - Test user behavior in background agent-browser E2E journeys. Batch straight-line browser commands; wait for observable readiness and durable saves, never arbitrary sleeps.
-- `bun run check` runs static checks, module integration and fast app journeys. `bun run test:e2e:full` runs the broader app suite with one build and isolated servers in a bounded worker pool.
+- `bun run check` runs static checks, module integration and fast app journeys. `bun run test:e2e:full` runs the broader app suite with shared builds and isolated servers in a bounded worker pool.
 - Avoid helper-level unit tests, implementation assertions and exploratory test suites. Retain focused algorithm contracts only for risks that cannot reasonably be exercised at module or app boundaries.
 
 ## Effect

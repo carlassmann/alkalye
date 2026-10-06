@@ -64,7 +64,7 @@ Profiles and document journals live in `~/.config/alkalye-native`. `--home` sele
 ```sh
 bun run test:integration            # Deep module contracts, Bun and browser
 bun run test:e2e                    # Fast app journeys
-bun run test:e2e:full               # Broader app behavior and visual regression checks
+bun run test:e2e:full               # Broader app behavior and screen checks
 bun tests/e2e.ts --suite theme-library
 ```
 

@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, rm } from "node:fs/promises"
+import { mkdir, mkdtemp, open, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { build } from "../build"
@@ -109,9 +109,11 @@ async function runWorker() {
 		let path = suites[next++]
 		if (!path) return
 		let start = performance.now()
+		let log = join(logs, path.split("/").at(-1) + ".log")
+		let output = await open(log, "w")
 		let child = Bun.spawn(["bun", path], {
-			stdout: "pipe",
-			stderr: "pipe",
+			stdout: output.fd,
+			stderr: output.fd,
 			detached: true,
 			env: {
 				...process.env,
@@ -126,25 +128,27 @@ async function runWorker() {
 			},
 		})
 		running.add(child.pid)
+		let expired = false
 		let timeout = setTimeout(() => {
+			expired = true
 			console.error(`${path}: exceeded five minutes`)
 			stopProcessGroup(child.pid)
 		}, 300000)
-		let [stdout, stderr, code] = await Promise.all([
-			new Response(child.stdout).text(),
-			new Response(child.stderr).text(),
-			child.exited,
-		])
+		let code = await child.exited
 		clearTimeout(timeout)
 		running.delete(child.pid)
-		let log = join(logs, path.split("/").at(-1) + ".log")
-		await Bun.write(log, stdout + stderr)
+		await output.close()
+		if (expired) code = 1
+
 		console.log(
 			`${code ? "FAIL" : "PASS"} ${path} (${((performance.now() - start) / 1000).toFixed(1)}s)`,
 		)
 		if (code) {
 			failures.push(path)
-			console.error((stdout + stderr).slice(-12000), `Full log: ${log}`)
+			console.error(
+				(await Bun.file(log).text()).slice(-12000),
+				`Full log: ${log}`,
+			)
 		}
 	}
 }
@@ -152,5 +156,11 @@ async function runWorker() {
 function stopProcessGroup(pid: number) {
 	try {
 		process.kill(-pid, "SIGTERM")
+		setTimeout(() => {
+			if (running.has(pid))
+				try {
+					process.kill(-pid, "SIGKILL")
+				} catch {}
+		}, 3000).unref()
 	} catch {}
 }

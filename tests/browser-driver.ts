@@ -132,7 +132,7 @@ export function evaluate(session: string, source: string) {
 }
 export function wait(session: string, source: string) {
 	try {
-		browser(session, "wait", "--fn", source)
+		browser(session, ...browserCondition(source))
 	} catch (error) {
 		console.error(
 			session,
@@ -187,4 +187,27 @@ export async function serverAddress(stdout: ReadableStream<Uint8Array>) {
 	}
 	void drain()
 	return address.promise
+}
+
+let conditionSequence = 0
+export function browserCondition(source: string) {
+	let key = `condition-${++conditionSequence}`
+	return [
+		"wait",
+		"--fn",
+		`(() => {
+ let states = window.browserWaitStates ??= {}, state = states[${JSON.stringify(key)}] ??= {ready: false, pending: false}
+ if (state.ready || state.pending) return state.ready
+ try {
+  let value = (${source})
+  if (!value || typeof value.then !== "function") return Boolean(value)
+  state.pending = true
+  Promise.resolve(value).then(value => {
+   state.ready = Boolean(value)
+   state.pending = false
+  }, () => {state.pending = false})
+ } catch {}
+ return false
+ })()`,
+	]
 }

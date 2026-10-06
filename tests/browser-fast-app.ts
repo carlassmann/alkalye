@@ -1,8 +1,16 @@
+import * as Effect from "effect/Effect"
+import * as Schema from "effect/Schema"
 import {
+	DocumentSnapshotSchema,
+	restoreSnapshot,
+} from "../src/shared/document-actions"
+import {
+	assert,
 	browser,
 	browserBatch,
 	evaluate,
 	serverAddress,
+	browserCondition,
 } from "./browser-driver"
 
 let server = Bun.spawn(["bun", "tests/browser-document-app.ts", "--serve"], {
@@ -12,7 +20,7 @@ let server = Bun.spawn(["bun", "tests/browser-document-app.ts", "--serve"], {
 let session = "fast-app-" + Date.now()
 let source = 'document.querySelector("alkalye-editor").source.value'
 let saved =
-	'document.querySelector("#save-status")?.textContent === "Saved" && document.querySelector("#save-status").getAttribute("aria-busy") === "false"'
+	'document.querySelector("#save-status").dataset.version !== window.previousSaveVersion && document.querySelector("#save-status").getAttribute("aria-busy") === "false"'
 let draft = "---\ntitle: Integration journey\n---\n# Notes\n\nalpha alpha beta"
 let started = performance.now()
 try {
@@ -30,11 +38,14 @@ try {
 		["fill", "#find-text", "alpha"],
 		["click", '[data-find-action="toggle-replace"]'],
 		["fill", "#replace-text", "gamma"],
+		versionMarker(),
 		["click", "#replace-all"],
 		condition(`${source}.endsWith("gamma gamma beta") && ${saved}`),
 		["click", "#close-find"],
+		versionMarker(),
 		["press", "Control+z"],
 		condition(`${source} === ${JSON.stringify(draft)}`),
+		versionMarker(),
 		["press", "Control+Shift+z"],
 		condition(`${source}.endsWith("gamma gamma beta") && ${saved}`),
 		["reload"],
@@ -48,6 +59,7 @@ try {
 		["click", "#find-next"],
 		["click", '[data-find-action="toggle-replace"]'],
 		["fill", "#replace-text", "$2$1"],
+		versionMarker(),
 		["click", '[data-find-action="replace"]'],
 		condition(`${source} === "left atc right" && ${saved}`),
 		["click", "#close-find"],
@@ -74,10 +86,22 @@ try {
 			'localStorage.removeItem("native-preferences-offline"); delete navigator.onLine; dispatchEvent(new Event("online"))',
 		],
 		condition('document.querySelector("#save-status").dataset.pending === "0"'),
-		condition(
-			'fetch(location.pathname.replace("/app/doc/", "/api/documents/") + "/snapshot").then(response => response.json()).then(snapshot => snapshot.state.includes("Written without a network."))',
-		),
 	])
+	let snapshot = Schema.decodeUnknownSync(DocumentSnapshotSchema)(
+		evaluate(
+			session,
+			'fetch(location.pathname.replace("/app/doc/", "/api/documents/") + "/snapshot").then(response => response.json())',
+		),
+	)
+	let published = await Effect.runPromise(
+		restoreSnapshot(snapshot, "e2e-reader"),
+	)
+	assert(
+		published.text(snapshot.document) ===
+			"# Offline\n\nWritten without a network.",
+		"Reconnected edits are durable in the server snapshot",
+	)
+
 	journey("preview routing and safe Markdown rendering", [
 		...edit(
 			'# Preview\n\n<script>alert("unsafe")</script>\n\n[Unsafe](javascript:alert(1))',
@@ -121,7 +145,7 @@ try {
 		),
 		["click", '#inspector-body [data-action="teleprompter"]'],
 		condition(
-			'document.querySelector("#speaker-notes") !== null && document.querySelector("#slide-count")?.textContent.includes("2")',
+			'document.querySelector("#speaker-notes") !== null && document.querySelector("#slide-count")?.textContent.trim().endsWith(" / 2")',
 		),
 		[
 			"eval",
@@ -162,18 +186,22 @@ function journey(name: string, commands: string[][]) {
 	)
 }
 function condition(source: string) {
-	return ["wait", "--fn", source]
+	return browserCondition(source)
 }
 
 function edit(content: string) {
 	return [
-		[
-			"eval",
-			'window.previousSaveVersion = document.querySelector("#save-status").dataset.version',
-		],
+		versionMarker(),
 		["fill", "#editor", content],
 		condition(
 			`${source} === ${JSON.stringify(content)} && document.querySelector("#save-status").dataset.version !== window.previousSaveVersion && document.querySelector("#save-status").getAttribute("aria-busy") === "false"`,
 		),
+	]
+}
+
+function versionMarker() {
+	return [
+		"eval",
+		'window.previousSaveVersion = document.querySelector("#save-status").dataset.version',
 	]
 }
