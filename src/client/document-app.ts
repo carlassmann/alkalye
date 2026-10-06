@@ -337,6 +337,10 @@ function mountApplication() {
 		app.classList.toggle("library-open", layout.library)
 		app.classList.toggle("tools-open", layout.tools)
 		let events = new AbortController()
+		let refreshFrame = 0
+		let libraryRefreshPending = false
+		let documentRefreshPending = false
+		let presenceRefreshPending = false
 		dialog.addEventListener(
 			"close",
 			() => {
@@ -419,6 +423,7 @@ function mountApplication() {
 		yield* Effect.addFinalizer(() =>
 			Effect.sync(() => {
 				events.abort()
+				cancelAnimationFrame(refreshFrame)
 				let preview = app.querySelector<HTMLElement>("#preview")
 				if (preview) disposePreview(preview)
 				presentation?.dispose()
@@ -645,12 +650,7 @@ function mountApplication() {
 			{ signal: events.signal },
 		)
 		yield* library.state.changes.pipe(
-			Stream.runForEach(() =>
-				Effect.sync(() => {
-					refreshLibrary()
-					refreshSafely()
-				}),
-			),
+			Stream.runForEach(() => Effect.sync(() => requestRefresh(true))),
 			Effect.forkScoped({ startImmediately: true }),
 		)
 		let appearance = matchMedia("(prefers-color-scheme: dark)")
@@ -712,27 +712,15 @@ function mountApplication() {
 			Effect.forkScoped({ startImmediately: true }),
 		)
 		yield* account.state.changes.pipe(
-			Stream.runForEach(() => Effect.sync(refreshSafely)),
+			Stream.runForEach(() => Effect.sync(requestRefresh)),
 			Effect.forkScoped({ startImmediately: true }),
 		)
 		yield* themeLibrary.state.changes.pipe(
-			Stream.runForEach(() => Effect.sync(refreshSafely)),
+			Stream.runForEach(() => Effect.sync(requestRefresh)),
 			Effect.forkScoped({ startImmediately: true }),
 		)
 		yield* library.live.presence.changes.pipe(
-			Stream.runForEach(() =>
-				Effect.sync(() => {
-					let people = library.live.presence.current(selection?.document ?? "")
-					editor?.presence(people)
-					presentation?.presence()
-					element("#presence").textContent = people.length
-						? "Editing with " +
-							people
-								.map(person => (person.own ? "your other device" : person.name))
-								.join(" · ")
-						: ""
-				}),
-			),
+			Stream.runForEach(() => Effect.sync(requestPresenceRefresh)),
 			Effect.forkScoped({ startImmediately: true }),
 		)
 		yield* Stream.fromSchedule(Schedule.spaced("3 seconds")).pipe(
@@ -1366,23 +1354,23 @@ function mountApplication() {
 											}),
 										)
 										yield* opened.session.changes.pipe(
-											Stream.runForEach(() => Effect.sync(refreshSafely)),
+											Stream.runForEach(() => Effect.sync(requestRefresh)),
 											Effect.forkScoped({ startImmediately: true }),
 											Effect.provideService(Scope.Scope, scope),
 										)
 										yield* opened.session.failures.changes.pipe(
-											Stream.runForEach(() => Effect.sync(refreshSafely)),
+											Stream.runForEach(() => Effect.sync(requestRefresh)),
 											Effect.forkScoped({ startImmediately: true }),
 											Effect.provideService(Scope.Scope, scope),
 										)
 										yield* opened.connection.changes.pipe(
-											Stream.runForEach(() => Effect.sync(refreshSafely)),
+											Stream.runForEach(() => Effect.sync(requestRefresh)),
 											Effect.forkScoped({ startImmediately: true }),
 											Effect.provideService(Scope.Scope, scope),
 										)
 										if (opened.localMedia)
 											yield* opened.localMedia.changes.pipe(
-												Stream.runForEach(() => Effect.sync(refreshSafely)),
+												Stream.runForEach(() => Effect.sync(requestRefresh)),
 												Effect.forkScoped({ startImmediately: true }),
 												Effect.provideService(Scope.Scope, scope),
 											)
@@ -1836,8 +1824,7 @@ function mountApplication() {
 						}
 						let edit = selected.opened.session.edit(content, base)
 						launch(edit.saved)
-						refreshDocument()
-						refreshLibrary()
+						requestRefresh(true)
 						return edit
 					},
 				})
@@ -2584,6 +2571,47 @@ function mountApplication() {
 				html`${icon(name)}<span>${label}</span>${shortcut ? html`<kbd>${shortcut}</kbd>` : ""}`,
 				changesSource && (mode !== "edit" || !writable()) ? "disabled" : "",
 			)
+		}
+		function requestRefresh(libraryChanged = false) {
+			libraryRefreshPending ||= libraryChanged
+			documentRefreshPending = true
+			scheduleRefresh()
+		}
+		function requestPresenceRefresh() {
+			presenceRefreshPending = true
+			scheduleRefresh()
+		}
+		function scheduleRefresh() {
+			if (refreshFrame) return
+			refreshFrame = requestAnimationFrame(() => {
+				refreshFrame = 0
+				if (events.signal.aborted) return
+				let refreshDocumentNow = documentRefreshPending
+				let refreshPresenceNow = presenceRefreshPending
+				documentRefreshPending = false
+				presenceRefreshPending = false
+				if (libraryRefreshPending) {
+					libraryRefreshPending = false
+					refreshLibrary()
+				}
+				if (refreshDocumentNow) refreshSafely()
+				if (refreshPresenceNow) refreshPresence(refreshDocumentNow)
+			})
+		}
+		function refreshPresence(documentRefreshed: boolean) {
+			let people = library.live.presence.current(selection?.document ?? "")
+			if (!documentRefreshed) {
+				editor?.presence(people)
+				presentation?.presence()
+			}
+			let label = people.length
+				? "Editing with " +
+					people
+						.map(person => (person.own ? "your other device" : person.name))
+						.join(" · ")
+				: ""
+			let presence = element("#presence")
+			if (presence.textContent !== label) presence.textContent = label
 		}
 		function refreshSafely() {
 			try {
