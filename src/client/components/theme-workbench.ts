@@ -594,6 +594,12 @@ function runWorkbench(host: HTMLElement, options: ThemeWorkbenchOptions) {
 		function navigateSlides(event: KeyboardEvent) {
 			if (
 				event.defaultPrevented ||
+				event.altKey ||
+				event.ctrlKey ||
+				event.metaKey ||
+				document.querySelector(
+					'dialog[open], [role="menu"]:popover-open, [role="listbox"]:popover-open',
+				) ||
 				sourceView ||
 				!theme.available() ||
 				state.mode !== "slideshow" ||
@@ -633,7 +639,8 @@ function runWorkbench(host: HTMLElement, options: ThemeWorkbenchOptions) {
 		}
 		function toggleFullscreen() {
 			if (document.fullscreenElement) void document.exitFullscreen()
-			else void frame.requestFullscreen().catch(options.report)
+			else
+				void document.documentElement.requestFullscreen().catch(options.report)
 		}
 		function jumpToLine(line: number) {
 			let text = editor.source?.value ?? theme.text()

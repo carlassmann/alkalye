@@ -38,6 +38,7 @@ export interface PresentationOptions {
 	documentId: string
 	document(): DocumentRecord | undefined
 	presence(): Presence[]
+	resolve?(id: string): string | undefined
 	render(
 		host: HTMLElement,
 		source: string,
@@ -162,6 +163,8 @@ function presentationView(host: HTMLElement, options: PresentationOptions) {
 	return Effect.gen(function* () {
 		let prompting = options.mode === "teleprompter"
 		setMarkup(host, prompting ? prompterMarkup() : slideshowMarkup())
+		host.tabIndex = -1
+		host.focus({ preventScroll: true })
 		let events = yield* Effect.acquireRelease(
 			Effect.sync(() => new AbortController()),
 			controller => Effect.sync(() => controller.abort()),
@@ -229,7 +232,7 @@ function presentationView(host: HTMLElement, options: PresentationOptions) {
 		document.addEventListener("keydown", navigate, { signal })
 		on('[data-command="fullscreen"]', toggleFullscreen)
 		if (prompter) {
-			prompter.configure(index => select(index))
+			prompter.configure(index => select(index), options.resolve)
 			wide.addEventListener("change", layout, { signal })
 			on("#preview-toggle", () => {
 				if (wide.matches) desktopPreview = !desktopPreview

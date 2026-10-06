@@ -589,7 +589,13 @@ function mountApplication() {
 					launch(act(action))
 					return
 				}
-				if (event.key === "Escape" && mode !== "edit") {
+				if (
+					event.key === "Escape" &&
+					mode !== "edit" &&
+					!document.querySelector(
+						'[role="menu"]:popover-open, [role="listbox"]:popover-open',
+					)
+				) {
 					event.preventDefault()
 					if (mode === "preview") {
 						if (app.classList.contains("focus-mode")) {
@@ -601,9 +607,24 @@ function mountApplication() {
 						refreshDocument()
 					} else if (document.fullscreenElement) {
 						launch(Effect.tryPromise(() => document.exitFullscreen()))
-					} else if (mode === "history" || writable()) changeMode("edit")
+					} else if (
+						mode === "history" ||
+						mode === "teleprompter" ||
+						writable()
+					)
+						changeMode("edit")
 				} else if (
 					(mode === "slideshow" || mode === "teleprompter") &&
+					!document.querySelector(
+						'[role="menu"]:popover-open, [role="listbox"]:popover-open',
+					) &&
+					!event.altKey &&
+					!event.metaKey &&
+					!event.ctrlKey &&
+					!(
+						event.target instanceof Element &&
+						event.target.closest("input, textarea, select, [contenteditable]")
+					) &&
 					["ArrowRight", "ArrowLeft", "PageDown", "PageUp"].includes(event.key)
 				) {
 					event.preventDefault()
@@ -1922,6 +1943,7 @@ function mountApplication() {
 					index: slideIndex,
 					documentId: doc.id,
 					document: currentDocument,
+					resolve: documentTitle,
 					writable: () => selection === selected && writable(),
 					position: () => {
 						let value = selected.opened.session.replica.fields(
@@ -2120,6 +2142,16 @@ function mountApplication() {
 				},
 			}
 		}
+		function documentTitle(id: string) {
+			let current = currentDocument()
+			if (current && (current.id === id || current.title === id))
+				return current.title
+			return library.state
+				.current()
+				.library.documents.find(
+					doc => doc.document === id || doc.metadata.title === id,
+				)?.metadata.title
+		}
 		function rendering(doc: DocumentRecord) {
 			let header = frontmatter(doc.content).values
 			let requested = header["theme-id"] || header.theme || ""
@@ -2143,6 +2175,7 @@ function mountApplication() {
 				...(appearance ? { appearance } : {}),
 			})
 			return {
+				resolve: documentTitle,
 				theme: theme.source,
 				...(theme.warning ? { warning: theme.warning } : {}),
 				appearance,

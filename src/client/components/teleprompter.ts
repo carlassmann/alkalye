@@ -10,12 +10,17 @@ export class TeleprompterElement extends HTMLElement {
 	private markup = ""
 	private current: number | undefined
 	private chosen: (index: number) => void = () => {}
+	private resolve: ((id: string) => string | undefined) | undefined
 	constructor() {
 		super()
 		this.addEventListener("click", event => this.choose(event))
 	}
-	configure(chosen: (index: number) => void) {
+	configure(
+		chosen: (index: number) => void,
+		resolve?: (id: string) => string | undefined,
+	) {
 		this.chosen = chosen
+		this.resolve = resolve
 	}
 	connectedCallback() {
 		this.dataset.teleprompter = ""
@@ -25,14 +30,24 @@ export class TeleprompterElement extends HTMLElement {
 	}
 	show(items: PresentationItem[], selected: number | undefined) {
 		this.items = items
-		let markup = String(scriptMarkup(items))
+		// An inert template keeps unresolved asset images from loading.
+		let template = document.createElement("template")
+		template.innerHTML = String(scriptMarkup(items))
+		for (let image of template.content.querySelectorAll("img"))
+			image.replaceWith(imageLabel(image))
+		for (let link of template.content.querySelectorAll("a")) {
+			let id = link.dataset.wikilink
+			if (id) {
+				let title = this.resolve?.(id)
+				let label = document.createElement("span")
+				label.className = title ? "wikilink" : "wikilink wikilink-broken"
+				label.textContent = link.dataset.wikilabel ?? title ?? link.textContent
+				link.replaceWith(label)
+			} else link.target = "_blank"
+		}
+		let markup = template.innerHTML
 		if (markup !== this.markup) {
 			this.markup = markup
-			// An inert template keeps unresolved asset images from loading.
-			let template = document.createElement("template")
-			template.innerHTML = markup
-			for (let image of template.content.querySelectorAll("img"))
-				image.replaceWith(imageLabel(image))
 			this.replaceChildren(template.content)
 			this.current = undefined
 		}

@@ -54,6 +54,7 @@ export class HistoryElement extends HTMLElement {
 			Effect.scoped(
 				Effect.gen(function* () {
 					let replay = yield* FiberHandle.makeRuntime<never, never>()
+					let hold = yield* FiberHandle.makeRuntime<never, never, void>()
 					let events = yield* Effect.acquireRelease(
 						Effect.sync(() => new AbortController()),
 						events => Effect.sync(() => events.abort()),
@@ -286,16 +287,59 @@ export class HistoryElement extends HTMLElement {
 						},
 						{ signal },
 					)
-					older.addEventListener(
-						"click",
-						() => select(Number(slider.value) - 1),
-						{ signal },
-					)
-					newer.addEventListener(
-						"click",
-						() => select(Number(slider.value) + 1),
-						{ signal },
-					)
+					function stopHold() {
+						hold(Effect.void)
+						older.removeAttribute("data-holding")
+						newer.removeAttribute("data-holding")
+					}
+					function bindNavigation(
+						control: HTMLButtonElement,
+						direction: number,
+					) {
+						let pointerHandled = false
+						control.addEventListener(
+							"pointerdown",
+							event => {
+								if (!event.isPrimary || event.button || control.disabled) return
+								stopHold()
+								pointerHandled = true
+								control.setPointerCapture(event.pointerId)
+								control.setAttribute("data-holding", "")
+								select(Number(slider.value) + direction)
+								hold(
+									Effect.gen(function* () {
+										yield* Effect.sleep("1500 millis")
+										control.removeAttribute("data-holding")
+										while (!control.disabled) {
+											select(Number(slider.value) + direction)
+											yield* Effect.sleep("100 millis")
+										}
+									}),
+								)
+							},
+							{ signal },
+						)
+						for (let type of [
+							"pointerup",
+							"pointercancel",
+							"pointerleave",
+							"lostpointercapture",
+						])
+							control.addEventListener(type, stopHold, { signal })
+						control.addEventListener(
+							"click",
+							event => {
+								if (event.detail === 0 || !pointerHandled)
+									select(Number(slider.value) + direction)
+								pointerHandled = false
+							},
+							{ signal },
+						)
+					}
+					bindNavigation(older, -1)
+					bindNavigation(newer, 1)
+					window.addEventListener("blur", stopHold, { signal })
+					document.addEventListener("visibilitychange", stopHold, { signal })
 					restore.addEventListener(
 						"click",
 						() => {
@@ -333,9 +377,9 @@ export class HistoryElement extends HTMLElement {
 								event.altKey ||
 								event.ctrlKey ||
 								event.metaKey ||
-								event.shiftKey ||
-								host.querySelector(":popover-open") ||
-								event.target instanceof HTMLInputElement ||
+								host.querySelector(
+									'[role="menu"]:popover-open, [role="listbox"]:popover-open',
+								) ||
 								(event.target instanceof HTMLTextAreaElement &&
 									!event.target.readOnly)
 							)

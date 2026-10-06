@@ -22,7 +22,7 @@ Let me explain.
 
 # Closing
 
-Thank you!`
+Thank you! [Speaker reference](https://example.com) [[SELF]] [[missing-document]]`
 
 let server = Bun.spawn(["bun", "tests/browser-document-app.ts", "--serve"], {
 	stdout: "pipe",
@@ -39,13 +39,17 @@ try {
 	wait(session, 'document.querySelector("[data-document-app]") !== null')
 	browser(session, "click", '[data-action="new"]')
 	wait(session, '!document.querySelector("#editor").readOnly')
-	browser(session, "fill", "#editor", source)
+	let documentId = String(
+		evaluate(session, 'location.pathname.split("/").at(-1)'),
+	)
+	browser(session, "fill", "#editor", source.replace("SELF", documentId))
 	verifyTeleprompter()
 	verifySlideshow()
 	verifyNarrowTeleprompter()
 	verifyAudience()
 	verifyPreview()
 	verifyEmptyTeleprompter()
+	verifyHistoryNavigation()
 	verifySettings()
 	verifySpaceSettings()
 } finally {
@@ -87,6 +91,19 @@ function verifyTeleprompter() {
 			})()`,
 		),
 		"Teleprompter opens with the original's header, unstarted script, preview and toolbar",
+	)
+	assert(
+		evaluate(
+			session,
+			`(() => {
+		let notes = document.querySelector("#speaker-notes");
+		return notes.querySelector('.prompter-note a[href="https://example.com"]').target === "_blank" &&
+			[...notes.querySelectorAll(".wikilink")].map(link => link.textContent).join() === "Screen parity talk,missing-document" &&
+			notes.querySelector(".wikilink-broken").textContent === "missing-document" &&
+			notes.querySelector("a[data-wikilink]") === null;
+	})()`,
+		),
+		"Teleprompter resolves document titles and opens references without replacing the presentation",
 	)
 	browser(session, "press", "ArrowDown")
 	assert(selected() === "none", "Next item stays disabled until started")
@@ -216,6 +233,14 @@ function verifySlideshow() {
 			})()`,
 		),
 		"The slideshow menu offers previous, next, fullscreen, editor and teleprompter",
+	)
+	browser(session, "press", "ArrowLeft")
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("alkalye-presentation").dataset.slide === "3"',
+		),
+		"Menu arrow navigation does not move the slideshow",
 	)
 	browser(session, "click", '#slideshow-options [data-action="teleprompter"]')
 	wait(session, 'document.querySelector("#speaker-notes [data-item]") !== null')
@@ -450,6 +475,80 @@ function verifyEmptyTeleprompter() {
 	)
 	browser(session, "click", '.prompter-empty [data-action="edit"]')
 	wait(session, 'document.querySelector("#editor") !== null')
+}
+
+function verifyHistoryNavigation() {
+	visit(session, location() + "/timemachine")
+	wait(
+		session,
+		'document.querySelector("#history-position") && !document.querySelector("#history-older").disabled && document.querySelector("#history-source").getAttribute("aria-busy") === "false"',
+	)
+	let latest = Number(
+		evaluate(session, 'document.querySelector("#history-position").value'),
+	)
+	let position = evaluate(
+		session,
+		`(() => {
+		let bounds = document.querySelector("#history-older").getBoundingClientRect();
+		return {x: Math.round(bounds.x + bounds.width / 2), y: Math.round(bounds.y + bounds.height / 2)};
+	})()`,
+	)
+	if (
+		!position ||
+		typeof position !== "object" ||
+		!("x" in position) ||
+		!("y" in position) ||
+		typeof position.x !== "number" ||
+		typeof position.y !== "number"
+	)
+		throw new Error("Missing history button")
+	browser(session, "mouse", "move", String(position.x), String(position.y))
+	browser(session, "mouse", "down")
+	wait(
+		session,
+		`Number(document.querySelector("#history-position").value) <= ${Math.max(0, latest - 2)}`,
+	)
+	browser(session, "mouse", "up")
+	wait(
+		session,
+		'!document.querySelector("[data-history] [data-holding]") && document.querySelector("#history-source").getAttribute("aria-busy") === "false"',
+	)
+	let held = Number(
+		evaluate(session, 'document.querySelector("#history-position").value'),
+	)
+	assert(
+		held < latest - 1,
+		"Holding history navigation moves immediately then repeats across versions",
+	)
+	browser(session, "click", "#history-newer")
+	wait(
+		session,
+		`Number(document.querySelector("#history-position").value) === ${held + 1}`,
+	)
+	assert(true, "A released click advances exactly one history version")
+	browser(session, "click", "#history-position")
+	let focused = Number(
+		evaluate(session, 'document.querySelector("#history-position").value'),
+	)
+	browser(session, "press", "]")
+	wait(
+		session,
+		`Number(document.querySelector("#history-position").value) === ${focused + 1}`,
+	)
+	browser(session, "press", "[")
+	wait(
+		session,
+		`Number(document.querySelector("#history-position").value) === ${focused}`,
+	)
+	assert(
+		true,
+		"Bracket history shortcuts work while the timeline slider is focused",
+	)
+	browser(session, "press", "Escape")
+	wait(
+		session,
+		'document.querySelector("#editor") && !document.querySelector("alkalye-history")',
+	)
 }
 
 function verifySettings() {

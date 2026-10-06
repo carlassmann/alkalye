@@ -22,7 +22,7 @@ export interface DocumentOptions {
 	slideNumber?: number
 	assets?: Map<string, string>
 	mutedAssets?: string[]
-	resolve?: (id: string) => string
+	resolve?: (id: string) => string | undefined
 	// A missing theme or preset, shown above the content as in the original.
 	warning?: string
 }

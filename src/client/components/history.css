@@ -149,3 +149,28 @@ alkalye-history[data-history] {
 		max-width: calc(100% - 110px);
 	}
 }
+
+[data-history] .history-navigation > button {
+	position: relative;
+	overflow: hidden;
+	border: 1px solid var(--line);
+}
+[data-history] .history-navigation > button > * {
+	position: relative;
+}
+[data-history] .history-navigation > button[data-holding]::before {
+	position: absolute;
+	inset: 0;
+	content: "";
+	background: color-mix(in oklch, var(--brand) 20%, transparent);
+	transform-origin: left;
+	animation: history-hold-progress 1500ms linear forwards;
+}
+@keyframes history-hold-progress {
+	from {
+		transform: scaleX(0);
+	}
+	to {
+		transform: scaleX(1);
+	}
+}

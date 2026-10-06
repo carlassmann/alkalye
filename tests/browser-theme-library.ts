@@ -454,6 +454,21 @@ function verifyWorkbenchBehavior(ids: { paper: string; stage: string }) {
 		),
 		"Icon buttons switch to a dark slideshow preview whose slides advance with the keyboard",
 	)
+	browser(session, "press", "f")
+	wait(session, "document.fullscreenElement === document.documentElement")
+	assert(true, "Workbench fullscreen keeps both source and preview visible")
+	browser(session, "press", "f")
+	wait(session, "document.fullscreenElement === null")
+	browser(session, "click", 'alkalye-picker[name="theme-target"] > button')
+	browser(session, "press", "ArrowLeft")
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("#theme-preview").shadowRoot.textContent.includes("A second slide")',
+		),
+		"Picker keyboard navigation does not move the workbench slideshow",
+	)
+	browser(session, "press", "Escape")
 	evaluate(
 		session,
 		"document.querySelector('[aria-label=\"Document preview\"]').click(); document.querySelector('[aria-label=\"Light preview\"]').click()",
