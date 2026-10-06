@@ -146,7 +146,7 @@
 	font-size: 12px;
 	padding: 10px 15px;
 }
-[data-editor] .completion-menu button:first-child {
+[data-editor] .completion-menu button[aria-selected="true"] {
 	background: var(--brand-soft);
 }
 [data-editor] #highlight mark {

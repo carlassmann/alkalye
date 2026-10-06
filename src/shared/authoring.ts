@@ -1,3 +1,5 @@
+import { lineBounds } from "./lines"
+import { nextFence } from "./markdown"
 export interface Selection {
 	start: number
 	end: number
@@ -82,9 +84,9 @@ export function formatSelection(
 			},
 		}
 	}
-	start = source.lastIndexOf("\n", start - 1) + 1
-	let lineEnd = source.indexOf("\n", end)
-	end = lineEnd < 0 ? source.length : lineEnd
+	let bounds = lineBounds(source, { start, end })
+	start = bounds.start
+	end = bounds.end
 	let lines = source.slice(start, end).split("\n")
 	let prefix =
 		command.startsWith("h") && /^h[1-6]$/.test(command)
@@ -101,11 +103,13 @@ export function formatSelection(
 								? "1. "
 								: ""
 	let remove = lines.every(line => line.startsWith(prefix))
+	let checkAll = lines.some(line => /^\s*[-*+]\s+\[ \]/.test(line))
 	let transformed = lines
 		.map((line, index) => {
 			if (command === "complete")
-				return line.replace(/\[([ xX])\]/, (_, checked: string) =>
-					checked === " " ? "[x]" : "[ ]",
+				return line.replace(
+					/^(\s*[-*+]\s+)\[[ xX]\]/,
+					(_, prefix: string) => prefix + (checkAll ? "[x]" : "[ ]"),
 				)
 			if (command === "body")
 				return line.replace(
@@ -136,12 +140,13 @@ export function formatSelection(
 export function sortTasks(source: string): string {
 	let lines = source.split("\n"),
 		result: string[] = [],
-		fence = false
+		fence = ""
 	for (let index = 0; index < lines.length; index++) {
 		let line = lines[index] ?? ""
-		if (/^\s*```/.test(line)) fence = !fence
+		let previousFence = fence
+		fence = nextFence(fence, line)
 		let task = line.match(/^(\s*)[-*+] \[([ xX])\]/)
-		if (fence || !task) {
+		if (fence || previousFence || !task) {
 			result.push(line)
 			continue
 		}

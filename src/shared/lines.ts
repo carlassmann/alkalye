@@ -6,6 +6,45 @@ export function lineBounds(source: string, selection: Selection) {
 	return { start, end: end < 0 ? source.length : end }
 }
 
+export function indentSelections(
+	source: string,
+	selections: readonly Selection[],
+	outdent: boolean,
+) {
+	let targets = selections.map(selection => lineBounds(source, selection))
+	let offset = 0
+	let edits: { start: number; removed: number; inserted: string }[] = []
+	for (let line of source.split("\n")) {
+		if (targets.some(range => offset >= range.start && offset <= range.end)) {
+			let removed = outdent ? (line.match(/^(\t| {1,2})/)?.[0].length ?? 0) : 0
+			edits.push({ start: offset, removed, inserted: outdent ? "" : "  " })
+		}
+		offset += line.length + 1
+	}
+	function position(offset: number) {
+		let shift = 0
+		for (let edit of edits) {
+			if (offset < edit.start) break
+			if (offset < edit.start + edit.removed) return edit.start + shift
+			shift += edit.inserted.length - edit.removed
+		}
+		return offset + shift
+	}
+	let next = source
+	for (let edit of [...edits].reverse())
+		next =
+			next.slice(0, edit.start) +
+			edit.inserted +
+			next.slice(edit.start + edit.removed)
+	return {
+		source: next,
+		selections: selections.map(range => ({
+			start: position(range.start),
+			end: position(range.end),
+		})),
+	}
+}
+
 export function editLines(
 	source: string,
 	selection: Selection,
@@ -18,7 +57,7 @@ export function editLines(
 	if (command === "indent" || command === "outdent") {
 		let lines = block.split("\n")
 		let changedLines = lines.map(line =>
-			command === "indent" ? "\t" + line : line.replace(/^(\t| {1,2})/, ""),
+			command === "indent" ? "  " + line : line.replace(/^(\t| {1,2})/, ""),
 		)
 		let changed = changedLines.join("\n")
 		let firstChange = (changedLines[0]?.length ?? 0) - (lines[0]?.length ?? 0)

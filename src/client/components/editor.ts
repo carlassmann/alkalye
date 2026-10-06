@@ -1,7 +1,8 @@
 import * as Effect from "effect/Effect"
 import * as Fiber from "effect/Fiber"
 import * as FiberSet from "effect/FiberSet"
-import { editLines, lineBounds } from "../../shared/lines"
+import { proseAt, typingEdit } from "../../shared/typing"
+import { editLines, indentSelections, lineBounds } from "../../shared/lines"
 import { selectionAnchor } from "../../shared/documents"
 import { setMarkup } from "../dom"
 import {
@@ -200,6 +201,7 @@ function createEditorView(
 	let rawPaste = false
 	let lastTouch = 0
 	let contextMenu: { close(): void } | undefined
+	let completionIndex = 0
 	let completionItems: {
 		label: string
 		start: number
@@ -227,6 +229,7 @@ function createEditorView(
 	})
 	textarea.readOnly = !editable
 	textarea.oninput = () => {
+		releaseTab = false
 		let source = text.input()
 		updateHighlight()
 		if (composing) return
@@ -240,6 +243,8 @@ function createEditorView(
 		"compositionstart",
 		() => {
 			composing = true
+			menu.hidden = true
+			textarea.removeAttribute("aria-activedescendant")
 		},
 		{ signal: listeners.signal },
 	)
@@ -767,7 +772,11 @@ function createEditorView(
 			action,
 		)
 		editor.focus()
-		editor.replace(result.source, result.selection.start, result.selection.end)
+		let content =
+			action === "complete" && options.preferences.autoSortTasks
+				? sortTasks(result.source)
+				: result.source
+		editor.replace(content, result.selection.start, result.selection.end)
 		editor.dispatchEvent(new Event("input"))
 	}
 	function insert(value: string) {
@@ -1068,7 +1077,16 @@ function createEditorView(
 		if (!range) return
 		fork(
 			Effect.tryPromise(() => navigator.clipboard.readText()).pipe(
-				Effect.tap(pasted => Effect.sync(() => replaceCaptured(range, pasted))),
+				Effect.tap(pasted =>
+					Effect.sync(() =>
+						replaceCaptured(
+							range,
+							options.preferences.smartPaste
+								? pasteMarkdown(pasted, "", range.text)
+								: pasted,
+						),
+					),
+				),
 				Effect.catch(error => Effect.sync(() => options.report(error))),
 			),
 		)
@@ -1112,7 +1130,7 @@ function createEditorView(
 	}
 	function editorKeydown(event: KeyboardEvent) {
 		if (!(event.currentTarget instanceof HTMLTextAreaElement)) return
-		if (event.isComposing) return
+		if (event.isComposing || composing) return
 		let editor = text
 		rawPaste =
 			(event.metaKey || event.ctrlKey) &&
@@ -1123,12 +1141,26 @@ function createEditorView(
 			event.stopPropagation()
 			releaseTab = true
 			menu.hidden = true
+			textarea.removeAttribute("aria-activedescendant")
 			secondarySelections = []
 			selectionsChanged()
 		}
-		if (!menu.hidden && event.key === "Enter") {
+		if (
+			!menu.hidden &&
+			["ArrowDown", "ArrowUp", "Enter", "Tab"].includes(event.key)
+		) {
 			event.preventDefault()
-			chooseCompletion(0)
+			event.stopPropagation()
+			if (event.key === "Enter" || event.key === "Tab")
+				chooseCompletion(completionIndex)
+			else {
+				completionIndex =
+					(completionIndex +
+						(event.key === "ArrowDown" ? 1 : -1) +
+						completionItems.length) %
+					completionItems.length
+				paintCompletionSelection()
+			}
 			return
 		}
 		if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "d") {
@@ -1243,8 +1275,11 @@ function createEditorView(
 				releaseTab = false
 				return
 			}
-			event.preventDefault()
-			applyLineEdit(event.shiftKey ? "outdent" : "indent")
+			if (secondarySelections.length) {
+				event.preventDefault()
+				applyLineEdit(event.shiftKey ? "outdent" : "indent")
+			} else if (applyTyping(event.shiftKey ? "ShiftTab" : "Tab"))
+				event.preventDefault()
 			return
 		}
 		if (event.key === "Enter" && event.shiftKey) {
@@ -1252,32 +1287,46 @@ function createEditorView(
 			insert("  \n")
 			return
 		}
-		if (event.key === "Enter" && !event.shiftKey) {
-			let before = editor.value.slice(0, editor.selectionStart),
-				line = before.slice(before.lastIndexOf("\n") + 1),
-				match = line.match(/^(\s*)([-*+] |\d+\. )(\[[ xX]\] )?/)
-			if (match) {
-				event.preventDefault()
-				let prefix = match[0]
-				if (/^\d/.test(match[2] ?? ""))
-					prefix = (match[1] ?? "") + `${parseInt(match[2] ?? "0") + 1}. `
-				prefix = prefix.replace(/\[[xX]\]/, "[ ]")
-				if (line.trim() === match[0].trim()) {
-					editor.setSelectionRange(
-						editor.selectionStart - match[0].length,
-						editor.selectionStart,
-					)
-					insert("\n")
-				} else insert("\n" + prefix)
-			}
-		}
+		if (
+			event.key === "Enter" &&
+			!event.shiftKey &&
+			!secondarySelections.length &&
+			applyTyping("Enter")
+		)
+			event.preventDefault()
 	}
+	function applyTyping(
+		key: "Enter" | "Tab" | "ShiftTab" | "Backspace" | "Delete",
+	) {
+		if (!editable || composing || listeners.signal.aborted || !inSync())
+			return false
+		let result = typingEdit(
+			text.value,
+			{ start: text.selectionStart, end: text.selectionEnd },
+			key,
+			options.preferences.smartPairs,
+		)
+		if (!result) return false
+		text.replace(result.source, result.selection.start, result.selection.end)
+		if (result.source !== atoms.map(atom => atom.value).join(""))
+			textarea.dispatchEvent(new Event("input"))
+		return true
+	}
+
 	function showCompletions() {
 		let editor = text
 		let before = editor.value.slice(0, editor.selectionStart),
 			link = before.match(/\[\[([^\]\n]*)$/),
 			slash = before.match(/(?:^|\n)\/([\w -]*)$/)
 		completionItems = []
+		if (
+			!proseAt(editor.value, editor.selectionStart) ||
+			secondarySelections.length
+		) {
+			menu.hidden = true
+			textarea.removeAttribute("aria-activedescendant")
+			return
+		}
 		if (link) {
 			completionItems = options
 				.documents()
@@ -1339,25 +1388,53 @@ function createEditorView(
 					end: editor.selectionStart,
 				}))
 		}
+		completionIndex = 0
 		menu.hidden = !completionItems.length
 		setMarkup(
 			menu,
 			joinMarkup(
 				completionItems.map(
 					(item, index) =>
-						html`<button role="option" data-complete="${index}">
+						html`<button
+							role="option"
+							id="completion-${index}"
+							data-complete="${index}"
+						>
 							${item.label}
 						</button>`,
 				),
 				"",
 			),
 		)
+		paintCompletionSelection()
 	}
+	function paintCompletionSelection() {
+		for (let option of menu.querySelectorAll<HTMLButtonElement>(
+			"[data-complete]",
+		))
+			option.setAttribute(
+				"aria-selected",
+				String(Number(option.dataset.complete) === completionIndex),
+			)
+		if (menu.hidden) textarea.removeAttribute("aria-activedescendant")
+		else {
+			textarea.setAttribute("aria-controls", menu.id)
+			textarea.setAttribute(
+				"aria-activedescendant",
+				"completion-" + completionIndex,
+			)
+			menu
+				.querySelector('[aria-selected="true"]')
+				?.scrollIntoView({ block: "nearest" })
+		}
+	}
+
 	function chooseCompletion(index: number) {
 		let editor = text,
 			item = completionItems[index]
 		if (!item) return
 		completionItems = []
+		textarea.removeAttribute("aria-activedescendant")
 		if (item.create) {
 			let source = editor.value
 			menu.hidden = true
@@ -1579,6 +1656,7 @@ function createEditorView(
 	}
 
 	function multiInput(event: InputEvent) {
+		if (composing) return
 		primaryGoalX = undefined
 		if (
 			event.inputType === "historyUndo" ||
@@ -1586,6 +1664,19 @@ function createEditorView(
 		) {
 			event.preventDefault()
 			options.undo(event.inputType === "historyRedo")
+			return
+		}
+		if (
+			!event.isComposing &&
+			!secondarySelections.length &&
+			["deleteContentBackward", "deleteContentForward"].includes(
+				event.inputType,
+			) &&
+			applyTyping(
+				event.inputType === "deleteContentBackward" ? "Backspace" : "Delete",
+			)
+		) {
+			event.preventDefault()
 			return
 		}
 		if (
@@ -1704,6 +1795,21 @@ function createEditorView(
 	}
 	function applyLineEdit(command: string) {
 		if (!editable) return
+		if (secondarySelections.length && ["indent", "outdent"].includes(command)) {
+			let result = indentSelections(
+				text.value,
+				[
+					{ start: text.selectionStart, end: text.selectionEnd },
+					...secondarySelections,
+				],
+				command === "outdent",
+			)
+			let primary = result.selections[0]
+			secondarySelections = result.selections.slice(1)
+			text.replace(result.source, primary?.start ?? 0, primary?.end ?? 0)
+			textarea.dispatchEvent(new Event("input"))
+			return
+		}
 		let result = editLines(
 			text.value,
 			{ start: text.selectionStart, end: text.selectionEnd },
