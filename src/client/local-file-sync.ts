@@ -26,9 +26,15 @@ export interface LocalFileState {
 // still tell which side changed.
 export function syncLocalFile(options: {
 	document: string
-	session: Context.Service.Shape<typeof DocumentSession>
-	folders: Context.Service.Shape<typeof LocalDirectories>
-	storage: Storage
+	session: Pick<
+		Context.Service.Shape<typeof DocumentSession>,
+		"replica" | "change" | "flush" | "changes"
+	>
+	folders: Pick<
+		Context.Service.Shape<typeof LocalDirectories>,
+		"read" | "write"
+	>
+	storage: Pick<Storage, "get" | "set">
 }) {
 	return Effect.gen(function* () {
 		let { session, folders, storage } = options
@@ -42,35 +48,43 @@ export function syncLocalFile(options: {
 			.withPermit(
 				Effect.gen(function* () {
 					if (SubscriptionRef.getUnsafe(state).status === "conflict") return
-					let disk = yield* folders.read(id)
-					let agreed = base ?? disk.content
-					let local = session.replica.text(id)
-					if (local === disk.content) return yield* settle(disk.content)
-					let merged = mergeText(agreed, local, disk.content)
-					if (merged.conflict) return yield* conflict()
-					if (merged.content !== local) {
-						let current = ""
-						yield* session
-							.change("Merge changes from disk", staged => {
-								let result = mergeText(agreed, staged.text(id), disk.content)
-								current = result.conflict ? "" : result.content
-								return current ? [staged.edit(id, current)] : []
-							})
-							.pipe(
-								Effect.catchIf(
-									() => !current,
-									() => Effect.void,
-								),
-							)
-						if (!current) return yield* conflict()
+					for (let attempt = 0; attempt < 3; attempt++) {
+						let disk = yield* folders.read(id)
+						let local = session.replica.text(id)
+						if (local === disk.content) return yield* settle(disk.content)
+						if (base === undefined) return yield* conflict()
+						let agreed = base
+						let merged = mergeText(agreed, local, disk.content)
+						if (merged.conflict) return yield* conflict()
+						if (merged.content !== local) {
+							let mergeConflict = false
+							yield* session
+								.change("Merge changes from disk", staged => {
+									let result = mergeText(agreed, staged.text(id), disk.content)
+									mergeConflict = result.conflict
+									return mergeConflict ? [] : [staged.edit(id, result.content)]
+								})
+								.pipe(
+									Effect.catchIf(
+										() => mergeConflict,
+										() => Effect.void,
+									),
+								)
+							if (mergeConflict) return yield* conflict()
+						}
+						// A journal commit can yield while another application writes the file.
+						let latest = yield* folders.read(id)
+						if (latest.content !== disk.content) continue
+						let content = session.replica.text(id)
+						if (content !== latest.content) {
+							yield* publish({ status: "saving" })
+							yield* folders
+								.write(id, content)
+								.pipe(Effect.andThen(settle(content)), Effect.uninterruptible)
+						} else yield* settle(content)
+						return
 					}
-					let content = session.replica.text(id)
-					if (content !== disk.content) {
-						yield* publish({ status: "saving" })
-						yield* folders
-							.write(id, content)
-							.pipe(Effect.andThen(settle(content)), Effect.uninterruptible)
-					} else yield* settle(content)
+					yield* conflict()
 				}),
 			)
 			.pipe(

@@ -99,6 +99,29 @@ try {
 	assert(true, "editing a folder document saves its Markdown back to disk")
 	evaluate(
 		session,
+		'window.savedPlan = document.querySelector("alkalye-editor").source.value; window.writeDisk("Projects/Plan.md", "").then(() => dispatchEvent(new Event("focus")))',
+	)
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.value === "" && document.querySelector("#save-status").textContent === "Saved to disk"',
+	)
+	assert(
+		evaluate(
+			session,
+			'window.readDisk("Projects/Plan.md").then(content => content === "")',
+		),
+		"Clearing a document on disk clears the editor without a false merge conflict",
+	)
+	evaluate(
+		session,
+		'window.writeDisk("Projects/Plan.md", window.savedPlan).then(() => dispatchEvent(new Event("focus")))',
+	)
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.value === window.savedPlan && document.querySelector("#save-status").textContent === "Saved to disk"',
+	)
+	evaluate(
+		session,
 		'window.writeDisk("Projects/Plan.md", "# Plan\\n\\nFirst line changed elsewhere\\nSecond line\\nThird line\\nEdited in Alkalye.\\n").then(() => window.dispatchEvent(new Event("focus")))',
 	)
 	wait(

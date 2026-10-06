@@ -32,6 +32,7 @@ import {
 	verifyConcurrentDocumentActions,
 	verifyDocumentActionRecovery,
 } from "./browser-document-actions"
+import { verifyLocalFileSync } from "./browser-local-file-sync"
 import { verifyDocumentSessionRecovery } from "./browser-document-recovery"
 import { verifyDocumentSessionClosing } from "./browser-document-closing"
 import { verifyLocalDocumentCreation } from "./browser-document-creation"
@@ -792,6 +793,7 @@ let test = Effect.scoped(
 		)
 		online = false
 		yield* verifyColdDocumentReplay(options, check, () => snapshotRequests)
+		yield* verifyLocalFileSync(identity.subject, check)
 		yield* verifyDocumentSessionClosing(options, check)
 		let oversized = yield* Effect.scoped(
 			DocumentSession.use(() => Effect.void).pipe(

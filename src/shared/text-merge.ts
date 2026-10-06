@@ -6,9 +6,8 @@ export interface MergedText {
 	readonly conflict: boolean
 }
 
-// Three-way merge by line, as version control does: edits from both sides
-// combine when they touch different lines; touching or overlapping edits are a
-// conflict and keep the local text so nothing is silently discarded.
+// Independent character edits merge; competing edits preserve both versions
+// through the file conflict workflow.
 export function mergeText(
 	base: string,
 	local: string,
@@ -17,9 +16,9 @@ export function mergeText(
 	if (local === disk || base === disk)
 		return { content: local, conflict: false }
 	if (base === local) return { content: disk, conflict: false }
-	let lines = splitLines(base)
-	let ours = textSplices(lines, splitLines(local))
-	let theirs = textSplices(lines, splitLines(disk))
+	let characters = Array.from(base)
+	let ours = textSplices(characters, Array.from(local))
+	let theirs = textSplices(characters, Array.from(disk))
 	let combined = [...ours]
 	for (let edit of theirs) {
 		if (ours.some(other => sameEdit(other, edit))) continue
@@ -27,17 +26,19 @@ export function mergeText(
 			return { content: local, conflict: true }
 		combined.push(edit)
 	}
-	let result = [...lines]
-	for (let edit of combined.sort((a, b) => b.start - a.start))
+	let result = [...characters]
+	for (let edit of combined.sort(
+		(a, b) => b.start - a.start || b.remove - a.remove,
+	))
 		result.splice(edit.start, edit.remove, ...edit.insert)
 	return { content: result.join(""), conflict: false }
 }
 
-function splitLines(text: string) {
-	return text ? text.split(/(?<=\n)/) : []
-}
 function touches(a: TextSplice, b: TextSplice) {
-	return a.start <= b.start + b.remove && b.start <= a.start + a.remove
+	if (!a.remove && !b.remove) return a.start === b.start
+	if (!a.remove) return a.start > b.start && a.start < b.start + b.remove
+	if (!b.remove) return b.start > a.start && b.start < a.start + a.remove
+	return a.start < b.start + b.remove && b.start < a.start + a.remove
 }
 function sameEdit(a: TextSplice, b: TextSplice) {
 	return (
