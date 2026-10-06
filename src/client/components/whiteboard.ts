@@ -298,9 +298,7 @@ function mountBoard(
 		dialog.classList.add("wide")
 		yield* Effect.addFinalizer(() =>
 			Effect.sync(() => {
-				let current = dialog.querySelector(
-					"alkalye-whiteboard, alkalye-theme-workbench",
-				)
+				let current = dialog.querySelector("alkalye-whiteboard")
 				if (!current || current === root) dialog.classList.remove("wide")
 			}),
 		)

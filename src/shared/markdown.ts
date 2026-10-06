@@ -483,10 +483,21 @@ export function slides(source: string): Slide[] {
 			return { content: content.join("\n"), notes: notes.join("\n") }
 		})
 }
+// A theme source problem and the source line it starts on.
+export class ThemeSourceError extends Error {
+	constructor(
+		readonly reason: string,
+		readonly line: number,
+	) {
+		super(`${reason} at line ${line}`)
+	}
+}
 export function compileTheme(source: string) {
 	let css: string[] = [],
 		document = "",
-		slide = ""
+		slide = "",
+		documentLine = 0,
+		slideLine = 0
 	let metadata: ThemeMetadata = { name: "", presets: [] }
 	let assets = new Map<string, string>()
 	let lines = source.replaceAll("\r\n", "\n").split("\n")
@@ -516,16 +527,18 @@ export function compileTheme(source: string) {
 		)
 			continue
 		if (index === lines.length)
-			throw new Error(`Unclosed ${kind} fence at line ${start}`)
+			throw new ThemeSourceError(`Unclosed ${kind} fence`, start)
 		let body = content.join("\n")
 		if (kind === "css theme") css.push(body)
 		else if (kind === "html document") {
 			if (document)
-				throw new Error(`Duplicate document template at line ${start}`)
+				throw new ThemeSourceError("Duplicate document template", start)
 			document = body
+			documentLine = start
 		} else if (kind === "html slide") {
-			if (slide) throw new Error(`Duplicate slide template at line ${start}`)
+			if (slide) throw new ThemeSourceError("Duplicate slide template", start)
 			slide = body
+			slideLine = start
 		} else if (kind.startsWith("base64 asset ")) {
 			let [, , path = "", mime = ""] = kind.split(" ")
 			if (
@@ -533,42 +546,53 @@ export function compileTheme(source: string) {
 				path.split("/").includes("..") ||
 				path.startsWith("/")
 			)
-				throw new Error(`Invalid asset path at line ${start}`)
+				throw new ThemeSourceError("Invalid asset path", start)
 			if (
 				!/^(font\/[\w.+-]+|image\/(png|jpeg|gif|webp|avif|svg\+xml)|application\/(font-woff|octet-stream))$/.test(
 					mime,
 				)
 			)
-				throw new Error(`Unsupported theme asset type at line ${start}`)
+				throw new ThemeSourceError("Unsupported theme asset type", start)
 			let base64 = body.replace(/\s/g, "")
 			if (!/^[A-Za-z0-9+/]*={0,2}$/.test(base64))
-				throw new Error(`Invalid base64 at line ${start}`)
+				throw new ThemeSourceError("Invalid base64", start)
 			try {
 				atob(base64)
 			} catch {
-				throw new Error(`Invalid base64 at line ${start}`)
+				throw new ThemeSourceError("Invalid base64", start)
 			}
-			if (assets.has(path)) throw new Error(`Duplicate asset at line ${start}`)
+			if (assets.has(path)) throw new ThemeSourceError("Duplicate asset", start)
 			assets.set(path, `data:${mime};base64,${base64}`)
 		} else {
 			try {
 				metadata = themeMetadata(JSON.parse(body))
 			} catch {
-				throw new Error(`Invalid theme metadata at line ${start}`)
+				throw new ThemeSourceError("Invalid theme metadata", start)
 			}
 		}
 	}
-	for (let template of [document, slide]) {
+	for (let template of [
+		{ body: document, line: documentLine },
+		{ body: slide, line: slideLine },
+	]) {
 		if (
-			template &&
-			(template.match(/data-(content|document)(?=[\s=>])/g)?.length ?? 0) !== 1
+			template.body &&
+			(template.body.match(/data-(content|document)(?=[\s=>])/g)?.length ??
+				0) !== 1
 		)
-			throw new Error("A template needs exactly one data-content slot")
+			throw new ThemeSourceError(
+				"A template needs exactly one data-content slot",
+				template.line,
+			)
 	}
 	function portable(text: string) {
 		return text.replace(/asset:([\w./-]+)/g, (_, path: string) => {
 			let asset = assets.get(path)
-			if (!asset) throw new Error(`Missing theme asset: ${path}`)
+			if (!asset)
+				throw new ThemeSourceError(
+					`Missing theme asset: ${path}`,
+					lines.findIndex(line => line.includes("asset:" + path)) + 1,
+				)
 			return asset
 		})
 	}

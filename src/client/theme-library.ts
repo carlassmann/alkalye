@@ -13,7 +13,7 @@ import type { LibraryTheme } from "../shared/theme-library"
 import { unzip } from "../shared/zip"
 import { BrowserLibrary } from "./browser-library"
 import { BrowserAccount } from "./browser-account"
-import { withThemeName } from "../shared/theme-source"
+import { defaultThemeSource, withThemeName } from "../shared/theme-source"
 import { BrowserPreferences } from "./browser-preferences"
 
 type Library = Context.Service.Shape<typeof BrowserLibrary>
@@ -41,9 +41,6 @@ export class ThemeLibrary extends Context.Service<
 >()("alkalye/ThemeLibrary") {
 	static layer = Layer.effect(ThemeLibrary, makeThemeLibrary())
 }
-
-export let starterTheme =
-	'# Custom theme\n\n```css theme\n.document .content { font-family: Georgia, serif; }\n```\n\n```html document\n<article class="content" data-content></article>\n```'
 
 function makeThemeLibrary() {
 	return Effect.gen(function* () {
@@ -153,7 +150,7 @@ function makeThemeLibrary() {
 				}),
 			)
 		}
-		function create(source = starterTheme, name = "") {
+		function create(source = defaultThemeSource, name = "") {
 			return Effect.scoped(
 				Effect.gen(function* () {
 					let compiled = yield* Effect.try({

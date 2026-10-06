@@ -145,10 +145,147 @@
 }
 
 @layer theme-base {
+	[data-document-renderer].document {
+		--foreground: oklch(14.5% 0 0);
+		--border: oklch(92.2% 0 0);
+		--tw-prose-body: oklch(37.1% 0 0);
+		--tw-prose-headings: oklch(20.5% 0 0);
+		--tw-prose-bullets: oklch(87% 0 0);
+		--tw-prose-quotes: oklch(20.5% 0 0);
+		--tw-prose-code: oklch(20.5% 0 0);
+		--tw-prose-pre-code: oklch(92.2% 0 0);
+		--tw-prose-pre-bg: oklch(26.9% 0 0);
+	}
+	[data-document-renderer].document[data-appearance="dark"] {
+		--foreground: oklch(98.5% 0 0);
+		--border: oklch(100% 0 0 / 10%);
+		--tw-prose-body: oklch(87% 0 0);
+		--tw-prose-headings: #fff;
+		--tw-prose-bullets: oklch(43.9% 0 0);
+		--tw-prose-quotes: oklch(97% 0 0);
+		--tw-prose-code: #fff;
+		--tw-prose-pre-code: oklch(87% 0 0);
+		--tw-prose-pre-bg: rgb(0 0 0 / 50%);
+	}
+	[data-document-renderer].document .content {
+		color: var(--tw-prose-body);
+		font-size: 16px;
+		line-height: 1.75;
+	}
+	[data-document-renderer].document :is(h1, h2, h3, h4, h5, h6, th, strong) {
+		color: var(--tw-prose-headings);
+		font-weight: 600;
+		letter-spacing: normal;
+	}
+	[data-document-renderer].document h1 {
+		font-size: 2.25em;
+		line-height: 1.1111111;
+		margin: 0 0 0.8888889em;
+	}
+	[data-document-renderer].document h2 {
+		font-size: 1.5em;
+		line-height: 1.3333333;
+		margin: 2em 0 1em;
+	}
+	[data-document-renderer].document h3 {
+		font-size: 1.25em;
+		line-height: 1.6;
+		margin: 1.6em 0 0.6em;
+	}
+	[data-document-renderer].document h4 {
+		font-size: 1em;
+		line-height: 1.5;
+		margin: 1.5em 0 0.5em;
+	}
+	[data-document-renderer].document :is(p, ul, ol) {
+		margin: 1.25em 0;
+	}
+	[data-document-renderer].document :is(ul, ol) {
+		padding-inline-start: 1.625em;
+	}
+	[data-document-renderer].document li {
+		margin: 0.5em 0;
+		padding-inline-start: 0.375em;
+	}
+	[data-document-renderer].document li::marker {
+		color: var(--tw-prose-bullets);
+	}
+	[data-document-renderer].document a {
+		color: var(--foreground);
+		font-weight: 500;
+	}
+	[data-document-renderer].document :is(a, blockquote, th) strong {
+		color: inherit;
+	}
+	[data-document-renderer].document blockquote {
+		color: var(--tw-prose-quotes);
+		font-style: italic;
+		font-weight: 500;
+		margin: 1.6em 0;
+		padding: 0 0 0 1em;
+		border-left: 0.25rem solid var(--border);
+		quotes: "\201C" "\201D" "\2018" "\2019";
+	}
+	[data-document-renderer].document blockquote > p:first-child::before {
+		content: open-quote;
+	}
+	[data-document-renderer].document blockquote > p:last-child::after {
+		content: close-quote;
+	}
+	[data-document-renderer].document pre {
+		color: var(--tw-prose-code);
+		background: transparent;
+		border-color: var(--border);
+		border-radius: 0.625rem;
+		padding: 1rem;
+		font-size: 0.875em;
+		line-height: 1.7142857;
+		margin: 1.7142857em 0;
+	}
+	[data-document-renderer].document code {
+		color: var(--tw-prose-code);
+		font-size: 0.875em;
+		font-weight: 600;
+		background: none;
+		padding: 0;
+	}
+	[data-document-renderer].document pre code {
+		color: inherit;
+		font-size: inherit;
+		font-weight: inherit;
+	}
+	[data-document-renderer].document table {
+		font-size: 0.875em;
+		line-height: 1.7142857;
+		margin: 2em 0;
+	}
+	[data-document-renderer].document :is(th, td) {
+		padding: 0.5714286em;
+		border-color: var(--border);
+	}
+	[data-document-renderer].document :is(th, td):first-child {
+		padding-inline-start: 0;
+	}
+	[data-document-renderer].document :is(th, td):last-child {
+		padding-inline-end: 0;
+	}
+	[data-document-renderer].document :is(h2, h3, h4, hr) + * {
+		margin-top: 0;
+	}
+	[data-document-renderer].document .content > :first-child {
+		margin-top: 0;
+	}
+	[data-document-renderer].document .content > :last-child {
+		margin-bottom: 0;
+	}
 	[data-document-renderer].theme[data-preset]:not([data-preset=""]) {
 		background: var(--preset-background);
 		color: var(--preset-foreground);
 		font-family: var(--preset-font-body, inherit);
+		--tw-prose-body: var(--preset-foreground);
+		--tw-prose-headings: var(--preset-heading, var(--preset-foreground));
+		--tw-prose-quotes: var(--preset-foreground);
+		--tw-prose-code: var(--preset-foreground);
 	}
 	[data-document-renderer].theme[data-preset]:not([data-preset=""])
 		:is(h1, h2, h3, h4, h5, h6) {

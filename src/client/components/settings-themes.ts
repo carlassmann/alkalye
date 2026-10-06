@@ -1,5 +1,4 @@
 import type * as Context from "effect/Context"
-import * as Deferred from "effect/Deferred"
 import * as Effect from "effect/Effect"
 import * as Fiber from "effect/Fiber"
 import * as FiberSet from "effect/FiberSet"
@@ -12,13 +11,14 @@ import { icon } from "../icons"
 import { html, joinMarkup, translate } from "../language"
 import type { ThemeLibrary } from "../theme-library"
 import { ThemeUploadInvalid } from "../theme-library"
-import { confirmDialog, openDialog } from "./dialog"
+import { confirmDialog } from "./dialog"
 import { PickerElement, pickerMarkup } from "./menu"
 
 type Themes = Context.Service.Shape<typeof ThemeLibrary>
 interface SettingsThemesOptions {
 	themes: Themes
 	preferences: Context.Service.Shape<typeof BrowserPreferences>
+	workbench(theme: string): void
 	dialog(): HTMLDialogElement | undefined
 	report(error: unknown): void
 }
@@ -108,32 +108,20 @@ export class SettingsThemesElement extends HTMLElement {
 								render()
 							} else if (action === "new")
 								perform(
-									options.themes.create().pipe(
-										Effect.tap(id => {
-											let target = options.dialog()
-											return target
-												? openLibraryWorkbench(options.themes, id, {
-														dialog: target,
-														report: options.report,
-													})
-												: Effect.void
-										}),
-									),
+									options.themes
+										.create()
+										.pipe(
+											Effect.tap(id =>
+												Effect.sync(() => options.workbench(id)),
+											),
+										),
 								)
 							else if (action === "upload")
 								host
 									.querySelector<HTMLInputElement>("[data-theme-file]")
 									?.click()
-							else if (action === "edit" && theme) {
-								let target = options.dialog()
-								if (target)
-									perform(
-										openLibraryWorkbench(options.themes, theme.id, {
-											dialog: target,
-											report: options.report,
-										}),
-									)
-							} else if (action === "export" && theme)
+							else if (action === "edit" && theme) options.workbench(theme.id)
+							else if (action === "export" && theme)
 								perform(downloadTheme(theme))
 							else if (action === "delete" && theme) {
 								let target = options.dialog()
@@ -226,77 +214,6 @@ export class SettingsThemesElement extends HTMLElement {
 	connectedMoveCallback() {}
 }
 customElements.define("alkalye-settings-themes", SettingsThemesElement)
-
-// The library's themes open in the same workbench as a document's themes,
-// previewing sample content.
-export function openLibraryWorkbench(
-	themes: Themes,
-	id: string,
-	options: { dialog: HTMLDialogElement; report(error: unknown): void },
-) {
-	return Effect.scoped(
-		Effect.gen(function* () {
-			let reference = themes.document()
-			if (!reference) return
-			let document = yield* themes.open()
-			let tasks = yield* FiberSet.make()
-			let run = yield* FiberSet.runtimePromise(tasks)<never>()
-			yield* Effect.addFinalizer(() => FiberSet.awaitEmpty(tasks))
-			let disposed = yield* Deferred.make<void>()
-			let { openThemeWorkbench } = yield* Effect.tryPromise(
-				() => import("./theme-workbench"),
-			)
-			if (themes.document() !== reference) return
-			openThemeWorkbench(id, {
-				onDispose: () => Effect.runSync(Deferred.succeed(disposed, undefined)),
-				session: {
-					replica: document.session.replica,
-					change: document.session.change,
-					changes: Stream.merge(
-						document.session.changes,
-						document.connection.changes,
-					),
-				},
-				writable: () => themes.document() === reference && document.canWrite(),
-				run,
-				report: options.report,
-				dialog: options.dialog,
-				showDialog: (title, body) =>
-					openDialog(options.dialog, options.report, () => {}, title, body),
-				download: (filename, content, type) => {
-					void run(
-						download(
-							filename,
-							typeof content === "string"
-								? new Blob([content], { type })
-								: content,
-						),
-					).catch(options.report)
-				},
-				assets: () => new Map(),
-			})
-			let workbench = options.dialog.querySelector("alkalye-theme-workbench")
-			yield* Effect.addFinalizer(() =>
-				Effect.sync(() => {
-					if (
-						options.dialog.open &&
-						options.dialog.querySelector("alkalye-theme-workbench") ===
-							workbench
-					)
-						options.dialog.close("cancel")
-				}),
-			)
-			yield* Effect.race(
-				Deferred.await(disposed),
-				themes.references.pipe(
-					Stream.filter(current => current !== reference),
-					Stream.take(1),
-					Stream.runDrain,
-				),
-			)
-		}),
-	).pipe(Effect.catch(error => Effect.sync(() => options.report(error))))
-}
 
 function downloadTheme(theme: LibraryTheme) {
 	return download(

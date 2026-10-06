@@ -25,8 +25,10 @@ export function browser(session: string, ...args: string[]) {
 			},
 		},
 	)
-	if (result.status !== 0)
-		throw new Error(`${session} ${args[0]}: ${result.stderr || result.stdout}`)
+	if (result.status !== 0) {
+		let failure = result.error?.message || result.stderr || result.stdout
+		throw new Error(`${session} ${args[0]}: ${failure}`)
+	}
 	let parsed = object(JSON.parse(result.stdout))
 	if (!parsed.success) throw new Error(JSON.stringify(parsed))
 	return object(parsed.data)

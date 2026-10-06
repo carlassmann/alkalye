@@ -31,33 +31,49 @@ export function verifyNativeThemes(session: string, original: string) {
 	browser(session, "click", ".preview-back")
 	browser(session, "click", '[data-action="theme"]')
 	wait(session, 'document.querySelector("#new-theme") !== null')
+	let themedDocument = String(evaluate(session, currentDocument))
 	browser(session, "click", "#new-theme")
-	wait(session, 'document.querySelector("#theme-source") !== null')
+	wait(
+		session,
+		'location.pathname.startsWith("/app/themes/") && document.querySelector("alkalye-theme-workbench alkalye-editor") !== null',
+	)
 	assert(
 		evaluate(
 			session,
-			'document.querySelector("[data-theme-workbench]").tagName === "ALKALYE-THEME-WORKBENCH" && document.querySelector("#editor").value.includes("theme-id:")',
+			`(() => {
+				let theme = location.pathname.split("/")[3];
+				let source = document.querySelector("#main alkalye-editor").source.value;
+				return location.pathname.endsWith("/workbench") &&
+					new URLSearchParams(location.search).get("document") === ${JSON.stringify(themedDocument)} &&
+					source.includes("theme-id:") && source.includes(theme) &&
+					!document.querySelector("#dialog").open &&
+					getComputedStyle(document.querySelector("alkalye-theme-workbench")).position === "fixed"
+			})()`,
 		),
-		"native theme creation binds its source through frontmatter and opens a Custom Element workbench",
+		"native theme creation binds its source through frontmatter and opens the full-viewport workbench route",
 	)
 	browser(
 		session,
 		"fill",
-		"#theme-source",
+		"alkalye-theme-workbench #editor",
 		"# Platform theme\n\n```css theme\n.content { font-family: Georgia, serif; color: rgb(18, 52, 86); }\n```",
 	)
 	wait(
 		session,
-		'document.querySelector("#save-status").textContent === "Saved"',
+		'document.querySelector(".workbench-status").textContent === "Saved locally" && document.querySelector(".workbench-name").textContent === "Custom theme"',
 	)
 	evaluate(
 		session,
-		'window.oldThemeEditor = document.querySelector("#theme-source"); document.querySelector("#dialog").close()',
+		'window.oldThemeEditor = document.querySelector("alkalye-theme-workbench #editor")',
 	)
-	wait(session, "window.oldThemeEditor.oninput === null")
+	browser(session, "click", ".workbench-back")
+	wait(
+		session,
+		`location.pathname === "/app/doc/${themedDocument}" && !window.oldThemeEditor.isConnected && document.querySelector("alkalye-theme-workbench") === null && !document.querySelector("#main").hasAttribute("inert")`,
+	)
 	assert(
 		true,
-		"closing the native theme workbench releases its editing handlers",
+		"leaving the native theme workbench returns to its document and releases the workbench",
 	)
 	browser(session, "click", '[data-action="preview"]')
 	wait(

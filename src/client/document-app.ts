@@ -38,7 +38,6 @@ import {
 import type { DocumentRecord } from "../shared/model"
 import { BrowserPreferences } from "./browser-preferences"
 import { SettingsPageElement } from "./components/settings-page"
-import { openLibraryWorkbench } from "./components/settings-themes"
 import { WorkspaceSettingsElement } from "./components/workspace-settings"
 import { BrowserAccount } from "./browser-account"
 import { DocumentLive } from "./document-live"
@@ -52,11 +51,12 @@ import { mountEditor } from "./components/editor"
 import { commentsMarkup } from "./components/comments"
 import { attachmentsMarkup } from "./components/attachments"
 import { makeDocumentMediaView } from "./document-media-view"
+import { themeWorkbenchOptions } from "./theme-workbench-documents"
 import { loadDocumentHistory } from "./document-history"
 import { duplicateDocumentVersion } from "./document-duplicate"
 import { parseInvitationLink } from "../shared/invitations"
 import { publicMember } from "../shared/workspace"
-import { routeHref } from "../shared/routes"
+import { routeHref, sameRoute } from "../shared/routes"
 import type { AppRoute, SettingsCategory } from "../shared/routes"
 import { startRouter } from "./router"
 import { watchUpdates } from "./updates"
@@ -727,19 +727,22 @@ function mountApplication() {
 		let initial =
 			start.kind === "document"
 				? start.document
-				: inviting ||
-					  start.kind === "share" ||
-					  // A workspace's address shows that workspace, not the
-					  // document last open somewhere else.
-					  (start.kind === "library" && start.workspace)
-					? ""
-					: typeof remembered === "string"
-						? remembered
-						: ""
+				: start.kind === "themeWorkbench" && start.document
+					? start.document
+					: inviting ||
+						  start.kind === "share" ||
+						  // A workspace's address shows that workspace, not the
+						  // document last open somewhere else.
+						  (start.kind === "library" && start.workspace)
+						? ""
+						: typeof remembered === "string"
+							? remembered
+							: ""
 		if (inviting) launch(showInvitation())
 		if (start.kind === "share") launch(receiveShare(start))
 		if (start.kind === "settings" || start.kind === "workspaceSettings")
 			launch(showPage(start))
+		if (start.kind === "themeWorkbench") launch(showWorkbench(start))
 		// Opening Markdown files with the installed app lands here.
 		window.launchQueue?.setConsumer(parameters => {
 			for (let handle of parameters.files)
@@ -760,7 +763,9 @@ function mountApplication() {
 			launch(
 				open(
 					initial,
-					start.kind === "settings" || start.kind === "workspaceSettings"
+					start.kind === "settings" ||
+						start.kind === "workspaceSettings" ||
+						start.kind === "themeWorkbench"
 						? "none"
 						: "replace",
 				).pipe(Effect.ensuring(Effect.sync(finishOpening))),
@@ -931,6 +936,7 @@ function mountApplication() {
 		function show(route: AppRoute) {
 			if (route.kind === "settings" || route.kind === "workspaceSettings")
 				return launch(showPage(route))
+			if (route.kind === "themeWorkbench") return launch(showWorkbench(route))
 			closePage()
 			if (route.kind === "invitation") return launch(showInvitation())
 			if (route.kind === "share") return launch(receiveShare(route))
@@ -992,6 +998,8 @@ function mountApplication() {
 						account,
 						library,
 						themes: themeLibrary,
+						workbench: (theme: string) =>
+							router.go({ kind: "themeWorkbench", theme }),
 						prepareRestore: selection?.opened.session.flush ?? Effect.void,
 						choose: (category: SettingsCategory) =>
 							router.go(
@@ -1144,6 +1152,54 @@ function mountApplication() {
 					invitations: invitationPanel({ workspace: id }),
 					report,
 				})
+				mountPage(current)
+			})
+		}
+		// The theme workbench covers the app like Settings, editing the theme
+		// where its records live.
+		function showWorkbench(
+			route: Extract<AppRoute, { kind: "themeWorkbench" }>,
+		) {
+			return Effect.gen(function* () {
+				if (dialog.open) dialog.close()
+				let { ThemeWorkbenchElement } = yield* Effect.tryPromise(
+					() => import("./components/theme-workbench"),
+				)
+				if (!sameRoute(router.current(), route)) return
+				let current = new ThemeWorkbenchElement()
+				current.configure(
+					themeWorkbenchOptions(
+						{
+							library,
+							storage,
+							account,
+							themes: themeLibrary,
+							preferences,
+							current: () => selection?.document,
+							go: next => router.go(next),
+							download: (filename, content) =>
+								launch(
+									Effect.acquireUseRelease(
+										Effect.sync(() =>
+											URL.createObjectURL(
+												new Blob([content], { type: "text/markdown" }),
+											),
+										),
+										url =>
+											Effect.sync(() => {
+												let link = document.createElement("a")
+												link.href = url
+												link.download = filename
+												link.click()
+											}).pipe(Effect.andThen(Effect.sleep("1 second"))),
+										url => Effect.sync(() => URL.revokeObjectURL(url)),
+									),
+								),
+							report,
+						},
+						route,
+					),
+				)
 				mountPage(current)
 			})
 		}
@@ -1992,55 +2048,6 @@ function mountApplication() {
 								},
 							)
 						},
-					},
-				})
-			})
-		}
-		function openThemeWorkbench(selected: Selection, id: string) {
-			return Effect.gen(function* () {
-				let { openThemeWorkbench } = yield* Effect.tryPromise(
-					() => import("./components/theme-workbench"),
-				)
-				if (selection !== selected) return
-				dialogOwner = selected
-				selected.media.visible(true)
-				openThemeWorkbench(id, {
-					session: {
-						replica: selected.opened.session.replica,
-						change: selected.opened.session.change,
-						changes: Stream.merge(
-							selected.opened.session.changes,
-							selected.opened.connection.changes,
-						),
-					},
-					writable: () => selection === selected && writable(),
-					run: task => selected.tasks.run(task),
-					report,
-					content: selected.opened.session.replica.text(selected.document),
-					dialog,
-					showDialog: (title, body) =>
-						openDialog(dialog, report, refreshSafely, title, body),
-					assets: () => selected.media.current().urls,
-					download: (filename, content, type) => {
-						launch(
-							Effect.acquireUseRelease(
-								Effect.sync(() =>
-									URL.createObjectURL(
-										typeof content === "string"
-											? new Blob([content], { type })
-											: content,
-									),
-								),
-								url =>
-									Effect.sync(() => {
-										let link = document.createElement("a")
-										link.href = url
-										link.download = filename
-										link.click()
-									}).pipe(Effect.andThen(Effect.sleep("1 second"))),
-								url => Effect.sync(() => URL.revokeObjectURL(url)),
-							),
-						)
 					},
 				})
 			})
@@ -2906,12 +2913,18 @@ function mountApplication() {
 						run: task => selected.tasks.run(task),
 						report,
 						changed: refreshSafely,
-						workbench: id =>
-							themeLibrary.state.current().themes.some(theme => theme.id === id)
-								? launch(
-										openLibraryWorkbench(themeLibrary, id, { dialog, report }),
-									)
-								: launch(openThemeWorkbench(selected, id)),
+						workbench: theme =>
+							router.go(
+								themeLibrary.state
+									.current()
+									.themes.some(entry => entry.id === theme)
+									? { kind: "themeWorkbench", theme }
+									: {
+											kind: "themeWorkbench",
+											theme,
+											document: selected.document,
+										},
+							),
 					})
 					return
 				}

@@ -1,8 +1,8 @@
 // Every address the app answers, in one place. Paths follow the original
 // application: /app/doc/:id, /app/spaces/:space/doc/:id, a trailing mode
 // segment for preview, slideshow, teleprompter and time machine, and
-// /app/settings. Invitation secrets stay in the fragment so they never reach
-// server logs.
+// /app/settings, and /app/themes/:id/workbench or /source. Invitation
+// secrets stay in the fragment so they never reach server logs.
 export type DocumentMode =
 	"edit" | "preview" | "slideshow" | "teleprompter" | "history"
 export type SettingsCategory = "general" | "editor" | "connections" | "app"
@@ -22,6 +22,15 @@ export type AppRoute =
 			readonly from?: string
 	  }
 	| { readonly kind: "workspaceSettings"; readonly workspace: string }
+	// A theme lives in the account's theme library or, attached to a
+	// document, in that document; `document` names the latter.
+	| {
+			readonly kind: "themeWorkbench"
+			readonly theme: string
+			readonly document?: string
+			// The theme source on its own, without the preview.
+			readonly view?: "source"
+	  }
 	| { readonly kind: "invitation" }
 	// The installed app's share target: text another app shared with it.
 	| { readonly kind: "share"; readonly title: string; readonly text: string }
@@ -74,6 +83,20 @@ export function parseRoute(url: URL): AppRoute {
 				.filter(Boolean)
 				.join("\n\n"),
 		}
+	if (
+		first === "themes" &&
+		identifier(second) &&
+		(third === "workbench" || third === "source") &&
+		parts.length === 3
+	) {
+		let document = url.searchParams.get("document") ?? ""
+		return {
+			kind: "themeWorkbench",
+			theme: second,
+			...(identifier(document) ? { document } : {}),
+			...(third === "source" ? { view: "source" } : {}),
+		}
+	}
 	if (first === "doc" && identifier(second) && parts.length <= 3)
 		return documentRoute(second, undefined, third, url)
 	if (first === "spaces" && identifier(second)) {
@@ -108,6 +131,13 @@ export function routeHref(route: AppRoute): string {
 		}
 		case "workspaceSettings":
 			return "/app/spaces/" + encode(route.workspace) + "/settings"
+		case "themeWorkbench":
+			return (
+				"/app/themes/" +
+				encode(route.theme) +
+				(route.view === "source" ? "/source" : "/workbench") +
+				(route.document ? "?document=" + encode(route.document) : "")
+			)
 		case "invitation":
 			return "/invite"
 		case "share": {

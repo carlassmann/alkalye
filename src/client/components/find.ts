@@ -8,13 +8,18 @@ import { replaceSelectedMatch } from "../../shared/find"
 import type { SourceTextarea } from "../source-textarea"
 import { EditorElement } from "./editor"
 
-export function openFind(query = "", replace = false) {
-	let host = document.querySelector("alkalye-editor")
-	let editor = host instanceof EditorElement ? host.source : undefined
-	if (!editor) return
-	let bar = element("#find-bar")
+// Without a scope, find searches the open document from the app's find bar.
+export function openFind(
+	query = "",
+	replace = false,
+	scope?: { editor: EditorElement; bar: HTMLElement },
+) {
+	let host = scope?.editor ?? document.querySelector("alkalye-editor")
+	if (!(host instanceof EditorElement) || !host.source) return
+	let source = host.source
+	let bar = scope?.bar ?? element("#find-bar")
 	let app = document.querySelector("#app")
-	if (app && bar.parentElement !== app) app.append(bar)
+	if (!scope && app && bar.parentElement !== app) app.append(bar)
 	bar.hidden = false
 	let existing = bar.querySelector("alkalye-find")
 	if (existing instanceof FindElement) {
@@ -23,11 +28,11 @@ export function openFind(query = "", replace = false) {
 	}
 	let component = new FindElement()
 	component.configure(
-		editor,
+		host,
 		() => {
 			bar.hidden = true
 			component.remove()
-			editor.focus()
+			source.focus()
 		},
 		query,
 	)
@@ -36,12 +41,14 @@ export function openFind(query = "", replace = false) {
 }
 
 export class FindElement extends HTMLElement {
+	private host: EditorElement | undefined
 	private editor: SourceTextarea | undefined
 	private close: () => void = () => {}
 	private query = ""
 	private lifetime: Fiber.Fiber<void, never> | undefined
-	configure(editor: SourceTextarea, close: () => void, query = "") {
-		this.editor = editor
+	configure(host: EditorElement, close: () => void, query = "") {
+		this.host = host
+		this.editor = host.source
 		this.close = close
 		this.query = query
 	}
@@ -246,9 +253,8 @@ export class FindElement extends HTMLElement {
 							.filter(match => match.index < editor.selectionStart)
 							.at(-1) ?? matches.at(-1))
 			if (!match) return toast("No match")
-			let host = document.querySelector("alkalye-editor")
-			if (host instanceof EditorElement)
-				host.selectRange(match.index, match.index + match[0].length)
+			if (this.host)
+				this.host.selectRange(match.index, match.index + match[0].length)
 			else editor.setSelectionRange(match.index, match.index + match[0].length)
 			editor.dispatchEvent(new Event("select"))
 			this.querySelector<HTMLInputElement>("#find-text")?.focus({

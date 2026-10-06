@@ -15,6 +15,7 @@ import {
 	prepareAction,
 	PreparedActionSchema,
 	undoAction,
+	validateAction,
 	type CommittedAction,
 	type DocumentAction,
 } from "../src/shared/document-actions"
@@ -1057,5 +1058,27 @@ test("theme text undo and redo retain the document and peer edits", () =>
 			yield* accept(replica, yield* undoAction(replica, undo), undo)
 			expect(replica.text("theme")).toBe("Base mine peer")
 			expect(replica.text("doc")).toBe("Document body")
+		}),
+	))
+
+test("child text cancellation rejects unowned and foreign document records", () =>
+	run(
+		Effect.gen(function* () {
+			for (let owner of ["", "other-document"]) {
+				let { replica } = yield* setup()
+				if (owner) replica.set("child", "document", owner)
+				let text = replica.edit("child", "Foreign text")
+				if (!text) throw new Error("Missing text operation")
+				let cancel = replica.cancel("child", text.id)
+				let result = yield* validateAction(replica, {
+					id: cancel.id,
+					document: "doc",
+					actor: cancel.actor,
+					undoOf: text.id,
+					changes: [cancel],
+				}).pipe(Effect.result)
+				expect(result._tag).toBe("Failure")
+				expect(replica.text("doc")).toBe("Base")
+			}
 		}),
 	))

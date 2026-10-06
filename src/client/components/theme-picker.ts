@@ -1,5 +1,6 @@
 import { compileTheme, frontmatter } from "../../shared/markdown"
 import { libraryThemes } from "../../shared/theme-library"
+import { defaultThemeSource } from "../../shared/theme-source"
 import { html } from "../language"
 import { PickerElement, pickerMarkup } from "./menu"
 import type { MenuChoice } from "./menu"
@@ -114,10 +115,7 @@ export function openDocumentThemePicker(options: DocumentThemeOptions) {
 	if (save) save.disabled = !options.writable()
 	if (create) {
 		create.disabled = !options.writable()
-		create.onclick = () =>
-			createTheme(
-				'# Custom theme\n\n```css theme\n.document .content { font-family: Georgia, serif; }\n```\n\n```html document\n<article class="content" data-content></article>\n```',
-			)
+		create.onclick = () => createTheme(defaultThemeSource)
 	}
 	if (edit)
 		edit.onclick = () => {

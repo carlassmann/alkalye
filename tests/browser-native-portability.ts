@@ -70,23 +70,30 @@ try {
 	browser(session, "click", "#embed-board")
 	wait(
 		session,
-		'!document.querySelector("#dialog").open && document.querySelector("#editor").value.match(/asset:/g)?.length === 2 && document.querySelector("#save-status").textContent === "Saved"',
+		'!document.querySelector("#dialog").open && document.querySelector("alkalye-editor").source.value.match(/asset:/g)?.length === 2 && document.querySelector("#save-status").textContent === "Saved"',
 	)
 	browser(session, "click", '[data-action="theme"]')
 	wait(session, 'document.querySelector("#new-theme") !== null')
 	browser(session, "click", "#new-theme")
-	wait(session, 'document.querySelector("#theme-source") !== null')
+	wait(
+		session,
+		'document.querySelector("alkalye-theme-workbench alkalye-editor") !== null',
+	)
 	browser(
 		session,
 		"fill",
-		"#theme-source",
+		"alkalye-theme-workbench #editor",
 		"# Harbour theme\n\n```css theme\n.content { color: rgb(18, 52, 86); }\n```",
 	)
 	wait(
 		session,
-		'document.querySelector("#save-status").textContent === "Saved"',
+		'document.querySelector(".workbench-status").textContent === "Saved locally"',
 	)
-	evaluate(session, 'document.querySelector("#dialog").close()')
+	browser(session, "click", ".workbench-back")
+	wait(
+		session,
+		'document.querySelector("alkalye-theme-workbench") === null && document.querySelector("#save-status").textContent === "Saved"',
+	)
 	browser(session, "click", '[data-action="comments"]')
 	evaluate(
 		session,

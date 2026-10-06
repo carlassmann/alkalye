@@ -1,4 +1,5 @@
 import { assert, browser, evaluate, visit, wait } from "./browser-driver"
+import { object } from "../src/shared/model"
 import { encode } from "../src/shared/base64"
 import { zip } from "../src/shared/zip"
 
@@ -39,23 +40,33 @@ let server = Bun.spawn(["bun", "tests/browser-document-app.ts", "--serve"], {
 	stderr: "inherit",
 })
 let session = "theme-library-" + Date.now()
+let url = ""
+let plainPath = ""
 try {
 	let output = await server.stdout.getReader().read()
 	if (!output.value) throw new Error("Missing app URL")
-	let url = new URL("/app", new TextDecoder().decode(output.value).trim()).href
+	url = new URL("/app", new TextDecoder().decode(output.value).trim()).href
 	browser(session, "set", "viewport", "1280", "900")
 	browser(session, "open", url)
 	wait(session, 'document.querySelector("[data-document-app]") !== null')
-	let plain = createDocument("---\ntitle: Plain essay\n---\n# Hello\n\nBody")
-	verifyEmptyLibrary()
-	let ids = verifyUploads()
-	verifyDefaults(plain, ids)
-	verifyWarnings()
-	verifyPicker(ids)
-	verifyWorkbench(ids)
-	verifyDeletion(plain, ids)
-	verifyReset(ids)
-	verifyPersistence(ids)
+	let plain = createDocument(
+		"---\ntitle: Plain essay\nmode: present\n---\n# Hello\n\nBody",
+	)
+	plainPath = plain
+	if (Bun.argv.includes("--undo")) {
+		verifyScopedUndo()
+	} else {
+		verifyEmptyLibrary()
+		let ids = verifyUploads()
+		verifyDefaults(plain, ids)
+		verifyWarnings()
+		verifyPicker(ids)
+		verifyWorkbench(ids)
+		verifyDeletion(plain, ids)
+		verifyReset(ids)
+		verifyPersistence(ids)
+		verifyWorkbenchBehavior(ids)
+	}
 } finally {
 	try {
 		browser(session, "close")
@@ -324,19 +335,20 @@ function verifyWorkbench(ids: { paper: string; stage: string }) {
 	)
 	wait(
 		session,
-		'document.querySelector("#dialog alkalye-theme-workbench #theme-source") !== null',
+		`location.pathname === "/app/themes/${ids.paper}/workbench" && document.querySelector("alkalye-theme-workbench alkalye-editor") !== null`,
 	)
 	assert(
 		evaluate(
 			session,
 			`(() => {
-				let targets = [...document.querySelectorAll('#dialog alkalye-picker[name="theme-target"] [role=option]')].map(option => option.dataset.value);
-				return targets.join() === "sample" &&
-					document.querySelector("#theme-source").value.includes("rgb(1, 2, 3)") &&
+				let targets = [...document.querySelectorAll('alkalye-theme-workbench alkalye-picker[name="theme-target"] [role=option]')].map(option => option.textContent.trim());
+				return targets[0] === "Sample content" && targets.includes("Plain essay") && !targets.includes("Themes") &&
+					document.querySelector('alkalye-picker[name="theme-target"]').value === "sample" &&
+					document.querySelector("alkalye-theme-workbench alkalye-editor").source.value.includes("rgb(1, 2, 3)") &&
 					getComputedStyle(document.querySelector("#theme-preview").shadowRoot.querySelector(".content")).color === "rgb(1, 2, 3)"
 			})()`,
 		),
-		"Editing a library theme opens the workbench on sample content",
+		"Editing a library theme opens its workbench route on sample content with the account's documents as targets",
 	)
 	evaluate(
 		session,
@@ -355,21 +367,23 @@ function verifyWorkbench(ids: { paper: string; stage: string }) {
 			}
 			return tx;
 		};
-		let editor = document.querySelector("#theme-source");
-		editor.value += String.fromCharCode(10) + "Closing write regression";
-		editor.dispatchEvent(new Event("input", { bubbles: true }));
+		let source = document.querySelector("alkalye-theme-workbench alkalye-editor").source;
+		let start = source.value.indexOf('"name": "Paper"') + 9;
+		source.setRangeText("Paper Two", start, start + 5);
+		document.querySelector("alkalye-theme-workbench #editor").dispatchEvent(new Event("input", { bubbles: true }));
 	})()`,
 	)
 	wait(session, 'typeof window.releaseThemeWrite === "function"')
-	browser(session, "fill", "#theme-name", "Paper Two")
-	evaluate(
-		session,
-		'document.querySelector("#theme-name").dispatchEvent(new Event("change", {bubbles: true}))',
+	assert(
+		text('document.querySelector(".workbench-name").textContent') ===
+			"Paper Two",
+		"The workbench header names the theme from its source metadata",
 	)
-	// agent-browser's second Escape on a modal dialog leaves the page, so the
-	// workbench closes with its button.
-	browser(session, "click", "#dialog .dialog-close")
-	wait(session, '!document.querySelector("#dialog").open')
+	browser(session, "click", ".workbench-back")
+	wait(
+		session,
+		'location.pathname === "/app/settings" && document.querySelector("alkalye-theme-workbench") === null',
+	)
 	browser(session, "wait", "100")
 	evaluate(
 		session,
@@ -381,7 +395,7 @@ function verifyWorkbench(ids: { paper: string; stage: string }) {
 	)
 	assert(
 		true,
-		"Closing a workbench drains its queued rename behind a held write",
+		"Leaving a workbench drains its queued source edit behind a held write",
 	)
 	assert(
 		evaluate(
@@ -389,6 +403,463 @@ function verifyWorkbench(ids: { paper: string; stage: string }) {
 			`document.querySelector('[data-theme-action="export"][data-theme="${ids.paper}"]').getAttribute("aria-label") === "Export Paper Two"`,
 		),
 		"Each theme offers an export of its Markdown source",
+	)
+}
+
+// The original workbench's controls, at desktop and phone widths.
+function verifyWorkbenchBehavior(ids: { paper: string; stage: string }) {
+	browser(session, "set", "viewport", "1280", "900")
+	visit(session, `/app/themes/${ids.paper}/workbench`)
+	wait(
+		session,
+		'document.querySelector("alkalye-theme-workbench alkalye-editor") !== null',
+	)
+	browser(session, "reload")
+	wait(
+		session,
+		'document.querySelector(".workbench-name")?.textContent === "Paper Two"',
+	)
+	assert(
+		evaluate(
+			session,
+			`(() => {
+				let header = document.querySelector(".workbench-header");
+				let labels = [...header.querySelectorAll("button, a")].map(control => control.getAttribute("aria-label") ?? control.textContent.trim());
+				return header.getBoundingClientRect().height === 48 &&
+					header.querySelector(".workbench-title p").textContent === "Theme workbench" &&
+					header.querySelector(".workbench-back").getAttribute("href") === "/app/settings?category=editor" &&
+					labels.join() === "Back to settings,New from default,Open source" &&
+					document.querySelector(".workbench-status").textContent === "Saved locally"
+			})()`,
+		),
+		"A reloaded workbench route shows the original header and saved-locally source pane",
+	)
+	evaluate(
+		session,
+		"document.querySelector('[aria-label=\"Dark preview\"]').click(); document.querySelector('[aria-label=\"Slideshow preview\"]').click(); document.activeElement.blur()",
+	)
+	wait(
+		session,
+		'document.querySelector(".workbench-preview").dataset.appearance === "dark" && document.querySelector("#theme-preview").shadowRoot.querySelector(".theme.slide") !== null',
+	)
+	browser(session, "press", "ArrowRight")
+	wait(
+		session,
+		'document.querySelector("#theme-preview").shadowRoot.textContent.includes("A second slide")',
+	)
+	assert(
+		evaluate(
+			session,
+			'document.querySelector(\'[aria-label="Slideshow preview"]\').getAttribute("aria-pressed") === "true" && document.querySelector(\'[aria-label="Document preview"]\').getAttribute("aria-pressed") === "false" && document.querySelector(\'[aria-label="Dark preview"]\').getAttribute("aria-pressed") === "true" && document.querySelector(\'[data-workbench-action="next-slide"]\').disabled',
+		),
+		"Icon buttons switch to a dark slideshow preview whose slides advance with the keyboard",
+	)
+	evaluate(
+		session,
+		"document.querySelector('[aria-label=\"Document preview\"]').click(); document.querySelector('[aria-label=\"Light preview\"]').click()",
+	)
+	choose("theme-target", plainDocument())
+	wait(
+		session,
+		'document.querySelector("#theme-preview").shadowRoot.textContent.includes("Hello") && getComputedStyle(document.querySelector("#theme-preview").shadowRoot.querySelector(".content")).color === "rgb(1, 2, 3)"',
+	)
+	assert(true, "Choosing a document previews its content with the theme")
+	evaluate(
+		session,
+		`(() => {
+			let source = document.querySelector("alkalye-theme-workbench alkalye-editor").source;
+			source.setRangeText("\\n\`\`\`css theme\\n.broken {", source.value.length, source.value.length);
+			document.querySelector("alkalye-theme-workbench #editor").dispatchEvent(new Event("input", { bubbles: true }));
+		})()`,
+	)
+	wait(session, '!document.querySelector(".workbench-errors").hidden')
+	let line = Number(
+		evaluate(
+			session,
+			'document.querySelector("alkalye-theme-workbench alkalye-editor").source.value.split("\\n").length - 1',
+		),
+	)
+	assert(
+		text(
+			'document.querySelector(".workbench-errors button").textContent.replace(/\\s+/g, " ").trim()',
+		) ===
+			`Line ${line}: Unclosed css theme fence. Preview keeps the last valid theme.` &&
+			text(
+				'getComputedStyle(document.querySelector("#theme-preview").shadowRoot.querySelector(".content")).color',
+			) === "rgb(1, 2, 3)",
+		"An invalid source names its line while the preview keeps the last valid theme",
+	)
+	wait(
+		session,
+		'document.querySelector(".workbench-status").textContent === "Saved locally"',
+	)
+	browser(session, "reload")
+	wait(
+		session,
+		'!document.querySelector(".workbench-errors")?.hidden && document.querySelector("#theme-preview")?.shadowRoot?.querySelector(".content")',
+	)
+	assert(
+		text(
+			'getComputedStyle(document.querySelector("#theme-preview").shadowRoot.querySelector(".content")).color',
+		) === "rgb(1, 2, 3)",
+		"An invalid saved source retains its last valid preview after reload",
+	)
+	browser(session, "click", ".workbench-errors button")
+	assert(
+		evaluate(
+			session,
+			'(() => { let source = document.querySelector("alkalye-theme-workbench alkalye-editor").source; return source.value.slice(source.selectionStart, source.selectionEnd) === "```css theme" && document.activeElement === document.querySelector("alkalye-theme-workbench #editor") })()',
+		),
+		"Choosing a validation error selects its source line",
+	)
+	evaluate(
+		session,
+		`(() => {
+			let source = document.querySelector("alkalye-theme-workbench alkalye-editor").source;
+			source.setRangeText("", source.value.lastIndexOf("\\n\`\`\`css theme"), source.value.length);
+			document.querySelector("alkalye-theme-workbench #editor").dispatchEvent(new Event("input", { bubbles: true }));
+		})()`,
+	)
+	wait(session, 'document.querySelector(".workbench-errors").hidden')
+	verifyPanes("vertical", "ArrowLeft", 45)
+	browser(session, "set", "viewport", "390", "844")
+	wait(
+		session,
+		'document.querySelector(".workbench-panes").dataset.orientation === "column"',
+	)
+	verifyPanes("horizontal", "ArrowUp", 45)
+	browser(session, "set", "viewport", "1280", "900")
+	browser(session, "click", '[data-workbench-action="new-default"]')
+	wait(
+		session,
+		`location.pathname.startsWith("/app/themes/") && !location.pathname.includes(${JSON.stringify(ids.paper)}) && document.querySelector(".workbench-name")?.textContent === "Custom theme 3"`,
+	)
+	assert(
+		evaluate(
+			session,
+			'document.querySelector(".workbench-errors").hidden && document.querySelector("alkalye-theme-workbench alkalye-editor").source.value.includes(":scope[data-appearance=\\"dark\\"]")',
+		),
+		"New from default creates a valid library theme and opens its workbench",
+	)
+	if (Bun.argv.includes("--screenshots")) {
+		browser(session, "screenshot", "/tmp/alkalye-rewrite-workbench.png")
+		browser(session, "set", "viewport", "504", "842")
+		browser(session, "screenshot", "/tmp/alkalye-rewrite-workbench-mobile.png")
+		browser(session, "set", "viewport", "1280", "900")
+	}
+	browser(session, "click", '[data-workbench-link="source"]')
+	wait(
+		session,
+		'location.pathname.endsWith("/source") && document.querySelector("alkalye-theme-workbench")?.dataset.view === "source" && document.querySelector("alkalye-theme-workbench alkalye-editor") !== null',
+	)
+	let sourcePath = text("location.pathname")
+	browser(session, "reload")
+	wait(
+		session,
+		`location.pathname === ${JSON.stringify(sourcePath)} && document.querySelector(".workbench-name")?.textContent === "Custom theme 3"`,
+	)
+	assert(
+		evaluate(
+			session,
+			`(() => {
+				let host = document.querySelector("alkalye-theme-workbench");
+				let visible = selector => [...host.querySelectorAll(selector)].some(node => node.checkVisibility());
+				return host.dataset.view === "source" &&
+					host.querySelector(".workbench-title p").textContent === "Theme source" &&
+					!visible('[data-pane="preview"]') && !visible("[data-restore]") && !visible('[role="separator"]') &&
+					!visible("[data-layout-controls] button") && !visible('[data-workbench-action="new-default"]') &&
+					host.querySelector('[data-workbench-link="workbench"]').getAttribute("href") === location.pathname.replace(/source$/, "workbench") &&
+					host.querySelector("alkalye-theme-workbench alkalye-editor, alkalye-editor").source.value.includes("Custom theme 3")
+			})()`,
+		),
+		"Open source navigates to a reloadable full source view with an Open workbench link",
+	)
+	browser(session, "back")
+	wait(
+		session,
+		'location.pathname.endsWith("/workbench") && document.querySelector("alkalye-theme-workbench")?.dataset.view === "workbench" && document.querySelector(".workbench-name")?.textContent === "Custom theme 3"',
+	)
+	browser(session, "click", '[data-workbench-link="source"]')
+	wait(session, 'location.pathname.endsWith("/source")')
+	browser(session, "click", '[data-workbench-link="workbench"]')
+	wait(
+		session,
+		`location.pathname.endsWith("/workbench") && document.querySelector('[data-pane="preview"]')?.checkVisibility()`,
+	)
+	assert(true, "Back and Open workbench return from the source view")
+	verifySourceFind()
+	verifyDeletionWhileOpen()
+	browser(session, "back")
+	browser(session, "back")
+	browser(session, "back")
+	wait(
+		session,
+		'document.querySelector(".workbench-name")?.textContent === "Paper Two"',
+	)
+	assert(true, "Back returns to the previous theme's workbench")
+	verifyStaleTargets()
+	verifyScopedUndo()
+	visit(session, "/app/themes/missing-theme/workbench")
+	wait(
+		session,
+		'document.querySelector("alkalye-theme-workbench h1")?.textContent === "Theme unavailable"',
+	)
+	assert(true, "An unknown theme shows the original unavailable state")
+}
+
+// Ctrl/Cmd+F searches the theme source, not the document underneath.
+function verifySourceFind() {
+	evaluate(session, "document.activeElement?.blur()")
+	browser(session, "press", modifier() + "+f")
+	wait(
+		session,
+		'document.querySelector("[data-workbench-find] alkalye-find #find-text") === document.activeElement',
+	)
+	browser(
+		session,
+		"fill",
+		"alkalye-theme-workbench #find-text",
+		"--theme-accent",
+	)
+	browser(session, "press", "Enter")
+	assert(
+		evaluate(
+			session,
+			`(() => {
+				let source = document.querySelector("alkalye-theme-workbench alkalye-editor").source;
+				return source.value.slice(source.selectionStart, source.selectionEnd) === "--theme-accent" &&
+					document.querySelector("#find-bar").hidden &&
+					document.querySelector("#main alkalye-find") === null
+			})()`,
+		),
+		"Find opens in the source pane and selects matches in the theme source only",
+	)
+	browser(session, "press", "Escape")
+	wait(session, 'document.querySelector("[data-workbench-find]").hidden')
+}
+
+// Another tab deletes the theme while it is open here.
+function verifyDeletionWhileOpen() {
+	let name = text('document.querySelector(".workbench-name").textContent')
+	let path = text("location.pathname")
+	let original = activeTab()
+	browser(session, "tab", "new")
+	browser(session, "open", new URL("/app/settings?category=editor", url).href)
+	wait(
+		session,
+		`[...document.querySelectorAll("[data-theme-row] .theme-name")].some(row => row.textContent.trim() === ${JSON.stringify(name)})`,
+	)
+	let id = path.split("/")[3] ?? ""
+	browser(session, "click", `[data-theme-action="delete"][data-theme="${id}"]`)
+	browser(session, "click", "#submit-dialog")
+	wait(session, `document.querySelector('[data-theme-row="${id}"]') === null`)
+	browser(session, "tab", original)
+	wait(
+		session,
+		'document.querySelector("alkalye-theme-workbench")?.dataset.state === "unavailable"',
+	)
+	evaluate(
+		session,
+		'window.workbenchErrors = []; addEventListener("error", event => window.workbenchErrors.push(String(event.message)))',
+	)
+	browser(session, "press", "ArrowRight")
+	wait(
+		session,
+		`(() => {
+			let host = document.querySelector("alkalye-theme-workbench");
+			return host.querySelector(".workbench-unavailable").checkVisibility() &&
+				!host.querySelector(".workbench-panes").checkVisibility() &&
+				host.querySelector(".workbench-header").checkVisibility() &&
+				host.querySelector("#editor").readOnly &&
+				host.querySelector(".workbench-status").textContent === "Read-only" &&
+				window.workbenchErrors.length === 0
+		})()`,
+	)
+	assert(
+		true,
+		"A theme deleted while open turns its workbench read-only and unavailable without errors",
+	)
+}
+
+// Choosing a document and then sample content before it opens keeps sample
+// content.
+function verifyStaleTargets() {
+	let plain = plainDocument()
+	evaluate(
+		session,
+		`(() => {
+			let picker = document.querySelector('alkalye-picker[name="theme-target"]');
+			picker.value = ${JSON.stringify(plain)};
+			picker.dispatchEvent(new Event("change", { bubbles: true }));
+			picker.value = "sample";
+			picker.dispatchEvent(new Event("change", { bubbles: true }));
+		})()`,
+	)
+	browser(session, "wait", "1500")
+	assert(
+		evaluate(
+			session,
+			'(() => { let text = document.querySelector("#theme-preview").shadowRoot.textContent; return text.includes("Use this sample to tune type") && !text.includes("Hello") && document.querySelector(".workbench-preview-message").hidden })()',
+		),
+		"A preview target that finishes opening after another was chosen is ignored",
+	)
+}
+
+// Undo in a theme's source undoes the theme only, never the document text
+// that shares its session.
+function verifyScopedUndo() {
+	visit(session, new URL(plainPath, url).pathname)
+	wait(
+		session,
+		'document.querySelector("#main alkalye-editor")?.source && !document.querySelector("#editor").readOnly',
+	)
+	evaluate(
+		session,
+		`(() => {
+			let source = document.querySelector("#main alkalye-editor").source;
+			source.setRangeText("\\nBody typed before the theme", source.value.length, source.value.length);
+			document.querySelector("#main #editor").dispatchEvent(new Event("input", { bubbles: true }));
+		})()`,
+	)
+	wait(
+		session,
+		'document.querySelector("#save-status")?.textContent === "Saved"',
+	)
+	browser(session, "click", '[data-action="theme"]')
+	wait(session, 'document.querySelector("#new-theme") !== null')
+	browser(session, "click", "#new-theme")
+	wait(
+		session,
+		'location.pathname.endsWith("/workbench") && new URLSearchParams(location.search).has("document") && document.querySelector("alkalye-theme-workbench alkalye-editor") !== null',
+	)
+	if (Bun.argv.includes("--screenshots")) {
+		wait(
+			session,
+			'document.querySelector("#theme-preview").shadowRoot.querySelector(".content") !== null',
+		)
+		assert(
+			text(
+				'getComputedStyle(document.querySelector("#theme-preview").shadowRoot.querySelector(".content")).fontSize',
+			) === "16px",
+			"Preview typography matches the original at 16px",
+		)
+		browser(session, "screenshot", "/tmp/alkalye-rewrite-workbench.png")
+		browser(session, "set", "viewport", "504", "842")
+		browser(session, "screenshot", "/tmp/alkalye-rewrite-workbench-mobile.png")
+		browser(session, "set", "viewport", "1280", "900")
+	}
+	let before = text(
+		'document.querySelector("alkalye-theme-workbench alkalye-editor").source.value',
+	)
+	evaluate(
+		session,
+		'document.querySelector("alkalye-theme-workbench #editor").focus()',
+	)
+	browser(session, "keyboard", "type", "Theme typing")
+	wait(
+		session,
+		'document.querySelector("alkalye-theme-workbench alkalye-editor").source.value.includes("Theme typing") && document.querySelector(".workbench-status").textContent === "Saved locally"',
+	)
+	let themeSource =
+		'document.querySelector("alkalye-theme-workbench alkalye-editor").source.value'
+	for (let step = 0; step < 20 && text(themeSource) !== before; step++) {
+		browser(session, "press", "Control+z")
+		browser(session, "wait", "200")
+	}
+	browser(session, "press", "Control+z")
+	browser(session, "press", "Control+z")
+	browser(session, "wait", "500")
+	assert(
+		evaluate(
+			session,
+			`document.querySelector("alkalye-theme-workbench alkalye-editor").source.value === ${JSON.stringify(before)} && document.querySelector("#main alkalye-editor").source.value.includes("Body typed before the theme")`,
+		),
+		"Undo in an attached theme's source leaves the document's own text intact",
+	)
+	browser(session, "click", ".workbench-back")
+	wait(
+		session,
+		'document.querySelector("alkalye-theme-workbench") === null && document.querySelector("#main alkalye-editor").source.value.includes("Body typed before the theme")',
+	)
+	assert(true, "The document keeps its text after leaving the theme source")
+}
+
+// Resizing, collapsing and restoring the panes at one orientation.
+function verifyPanes(orientation: string, smaller: string, expected: number) {
+	evaluate(session, "document.querySelector('[role=\"separator\"]').focus()")
+	browser(session, "press", "End")
+	browser(session, "press", smaller)
+	browser(session, "press", smaller)
+	browser(session, "press", smaller)
+	browser(session, "press", smaller)
+	browser(session, "press", smaller)
+	browser(session, "press", smaller)
+	assert(
+		evaluate(
+			session,
+			`(() => {
+				let separator = document.querySelector('[role="separator"]');
+				let source = document.querySelector('[data-pane="source"]').getBoundingClientRect();
+				let panes = document.querySelector(".workbench-panes").getBoundingClientRect();
+				let share = ${JSON.stringify(orientation)} === "vertical" ? source.width / (panes.width - 8) : source.height / (panes.height - 8);
+				return separator.getAttribute("aria-orientation") === ${JSON.stringify(orientation)} &&
+					separator.getAttribute("aria-valuenow") === "${expected}" &&
+					separator.getAttribute("aria-valuetext") === "Source pane ${expected}%" &&
+					Math.abs(share - ${expected / 100}) < 0.02
+			})()`,
+		),
+		`The ${orientation} divider resizes the panes from the keyboard within 25-75%`,
+	)
+	browser(session, "press", "Home")
+	assert(
+		text(
+			'document.querySelector(\'[role="separator"]\').getAttribute("aria-valuenow")',
+		) === "25",
+		`Home moves the ${orientation} divider to its minimum`,
+	)
+	browser(session, "click", '[aria-label="Maximize preview"]')
+	assert(
+		evaluate(
+			session,
+			"document.querySelector('[data-pane=\"source\"]').hidden && !document.querySelector('[data-restore=\"source\"]').hidden && document.querySelector('[role=\"separator\"]').hidden",
+		),
+		`Maximizing the ${orientation} preview leaves a source restore strip`,
+	)
+	browser(session, "click", '[aria-label="Restore source pane"]')
+	browser(session, "click", '[aria-label="Minimize preview"]')
+	assert(
+		evaluate(
+			session,
+			"document.querySelector('[data-pane=\"preview\"]').hidden && !document.querySelector('[data-restore=\"preview\"]').hidden && document.querySelector('[aria-label=\"Restore split view\"]') !== null",
+		),
+		`Minimizing the ${orientation} preview leaves a preview restore strip`,
+	)
+	browser(session, "click", '[aria-label="Restore split view"]')
+	wait(
+		session,
+		'document.querySelector(".workbench-panes").dataset.layout === "split"',
+	)
+}
+
+function activeTab() {
+	let tabs = browser(session, "tab", "list").tabs
+	let active = Array.isArray(tabs)
+		? tabs.find(tab => object(tab).active === true)
+		: undefined
+	let id = active ? object(active).tabId : undefined
+	if (typeof id !== "string") throw new Error("No active tab")
+	return id
+}
+
+function modifier() {
+	return evaluate(session, "/Mac/i.test(navigator.platform)")
+		? "Meta"
+		: "Control"
+}
+
+function plainDocument() {
+	return text(
+		'[...document.querySelectorAll(\'alkalye-picker[name="theme-target"] [role=option]\')].find(option => option.textContent.trim() === "Plain essay")?.dataset.value ?? ""',
 	)
 }
 
@@ -435,16 +906,10 @@ function verifyReset(ids: { paper: string; stage: string }) {
 	browser(session, "click", '[data-theme-action="new"]')
 	wait(
 		session,
-		'document.querySelector("#dialog alkalye-theme-workbench") !== null',
+		'location.pathname.startsWith("/app/themes/") && document.querySelector(".workbench-name")?.textContent === "Custom theme 2"',
 	)
-	assert(
-		text('document.querySelector("#theme-name").value') === "Custom theme 2",
-		"A new custom theme is numbered and opens in the workbench",
-	)
-	// agent-browser's second Escape on a modal dialog leaves the page, so the
-	// workbench closes with its button.
-	browser(session, "click", "#dialog .dialog-close")
-	wait(session, '!document.querySelector("#dialog").open')
+	assert(true, "A new custom theme is numbered and opens in the workbench")
+	browser(session, "click", ".workbench-back")
 	wait(session, 'document.querySelectorAll("[data-theme-row]").length === 2')
 }
 

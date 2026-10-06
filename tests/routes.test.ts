@@ -112,3 +112,19 @@ test("the share target keeps shared text and links", () => {
 		text: "Pack light\n\nhttps://example.com",
 	})
 })
+
+test("theme workbench paths name the theme and an attached theme's document", () => {
+	let routes: AppRoute[] = [
+		{ kind: "themeWorkbench", theme: "theme-1" },
+		{ kind: "themeWorkbench", theme: "theme-1", document: "doc-1" },
+	]
+	for (let value of routes) expect(route(routeHref(value))).toEqual(value)
+	expect(routeHref(routes[1] ?? { kind: "unknown" })).toBe(
+		"/app/themes/theme-1/workbench?document=doc-1",
+	)
+	expect(route("/app/themes/theme-1")).toEqual({ kind: "unknown" })
+	expect(route("/app/themes/theme-1/workbench?document=%2F..")).toEqual({
+		kind: "themeWorkbench",
+		theme: "theme-1",
+	})
+})

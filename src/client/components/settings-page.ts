@@ -43,6 +43,7 @@ export interface SettingsPageOptions {
 	readonly account: Context.Service.Shape<typeof BrowserAccount>
 	readonly library: Context.Service.Shape<typeof BrowserLibrary>
 	readonly themes: Context.Service.Shape<typeof ThemeLibrary>
+	readonly workbench: (theme: string) => void
 	readonly prepareRestore: Effect.Effect<unknown, unknown>
 	readonly choose: (category: SettingsCategory) => void
 	readonly backup: () => void
@@ -304,6 +305,7 @@ export class SettingsPageElement extends HTMLElement {
 			themes.configure({
 				themes: options.themes,
 				preferences: options.preferences,
+				workbench: options.workbench,
 				dialog: () => this.dialog(),
 				report: options.report,
 			})

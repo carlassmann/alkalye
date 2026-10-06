@@ -10,7 +10,13 @@ A document names a theme in frontmatter with `theme: Paper` (matched by name, ig
 
 ## Workbench
 
-Open **Theme** in the document tools, choose **New custom theme**, and edit its source. **Open workbench** edits an existing theme, including library themes, which preview sample content. Changes save locally and affect documents using that theme.
+Open **Theme** in the document tools, choose **New custom theme**, and edit its source. **Open workbench** edits an existing document or library theme. Changes save locally and affect documents using that theme.
+
+The source and preview appear side by side on desktop and stack on smaller screens. Drag the divider to resize them, or focus it and use arrow keys. Home and End select the smallest and largest source panes. Each pane can be minimized, maximized or restored.
+
+Preview sample content or choose one of your documents. Switch between document and slideshow previews, and between light and dark appearances. Previewing a document does not change it. Invalid source still saves; the open workbench keeps its last valid preview and shows a clickable error that selects the source line.
+
+**Open source** opens the source editor on its own page. **Open workbench** returns to the preview. Both pages support reload and browser navigation. Find and replace searches the theme source; Undo changes that source without undoing edits to its surrounding document. **New from default** creates another theme from Alkalye’s starter source.
 
 Preview the current document, sample content, or another document. Switch between Document and Slideshow, Light and Dark, and source/preview/split layouts. The Split slider changes pane width. Previous and Next browse sample slides. These controls change the preview independently of the application's appearance.
 

@@ -43,6 +43,7 @@ export interface EditorOptions {
 	previewImage?(url: string, alt: string): void
 	mediaIcon?(url: string): IconName
 	canComment?(): boolean
+	canAttach?(): boolean
 	createLinkedDocument(title: string): Promise<string>
 	report(error: unknown): void
 	comments(): { start: number; end: number }[]
@@ -942,23 +943,31 @@ function createEditorView(
 					icon: "plus",
 					items: [
 						action("Link", "link", "link"),
-						{
-							label: "Attachment",
-							icon: "image-plus",
-							shortcut: key("image"),
-							run: () => options.command("asset"),
-						},
+						...((options.canAttach?.() ?? true)
+							? ([
+									{
+										label: "Attachment",
+										icon: "image-plus",
+										shortcut: key("image"),
+										run: () => options.command("asset"),
+									},
+								] satisfies MenuItem[])
+							: []),
 						{
 							label: "Code block",
 							icon: "code-xml",
 							shortcut: key("codeBlock"),
 							run: insertCodeBlock,
 						},
-						{
-							label: "Whiteboard",
-							icon: "pen-tool",
-							run: () => options.command("new-whiteboard"),
-						},
+						...((options.canAttach?.() ?? true)
+							? ([
+									{
+										label: "Whiteboard",
+										icon: "pen-tool",
+										run: () => options.command("new-whiteboard"),
+									},
+								] satisfies MenuItem[])
+							: []),
 					],
 				},
 			)
