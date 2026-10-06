@@ -1410,6 +1410,22 @@ function makeDocumentStore() {
 							id: "invitation-left:" + request,
 						})
 						if (Option.isNone(previous)) {
+							for (let receipt of yield* workspace.actionReceipts(
+								"invitation-left:" + request,
+							)) {
+								let fact = yield* Schema.decodeUnknownEffect(
+									WorkspaceFactSchema,
+								)({
+									id: "invitation-left:" + request,
+									workspace: receipt.workspace,
+									subject: identity.subject,
+									change: { kind: "invitationLeft", invitation, member },
+								})
+								if (
+									receipt.fingerprint === (yield* hashWorkspace(crypto, fact))
+								)
+									return { position: receipt.position, fact, fresh: false }
+							}
 							let memberships = yield* workspace.memberships(
 								member,
 								record.value.workspace,

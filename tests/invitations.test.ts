@@ -178,6 +178,12 @@ test("moving into another owner's workspace preserves document ownership and inh
 				"writer",
 			)
 			yield* accept(invited, link, "invited-before-move")
+			let leave = invited.api.invitations.leave({
+				params: { invitation: link.invitation, member: invited.subject },
+				payload: { request: "leave-before-move" },
+			})
+			let receipt = yield* leave
+			yield* accept(invited, link, "rejoin-before-move")
 			yield* mover.api.documents.move({
 				params: { document: "retained-owner-document" },
 				payload: {
@@ -185,6 +191,11 @@ test("moving into another owner's workspace preserves document ownership and inh
 					request: "move-to-host",
 				},
 			})
+			expect(yield* leave).toEqual(receipt)
+			expect(yield* roles(invited)).toContainEqual([
+				"retained-owner-document",
+				"writer",
+			])
 			let document = (yield* mover.api.workspaces.library()).documents.find(
 				entry => entry.document === "retained-owner-document",
 			)

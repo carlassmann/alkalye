@@ -133,6 +133,15 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 				Effect.map(Option.map(row => ({ ...row, revoked: row.revoked === 1 }))),
 			),
 		invitations,
+		actionReceipts: SqlSchema.findAll({
+			Request: Schema.String,
+			Result: Schema.Struct({
+				...ReceiptSchema.fields,
+				workspace: IdentifierSchema,
+			}),
+			execute: action =>
+				sql`SELECT workspace,position,fingerprint FROM workspace_actions WHERE action=${action}`,
+		}),
 		memberships: (member: string, workspace: string, document: string | null) =>
 			SqlSchema.findAll({
 				Request: Schema.Void,
@@ -217,6 +226,7 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 						yield* sql`ALTER TABLE workspaces ADD COLUMN deleted INTEGER NOT NULL DEFAULT 0`
 				}),
 				"009_workspace_avatars": sql`CREATE TABLE IF NOT EXISTS workspace_avatars(workspace TEXT PRIMARY KEY,image TEXT NOT NULL,FOREIGN KEY(workspace) REFERENCES workspaces(workspace))`,
+				"010_workspace_receipt_lookup": sql`CREATE INDEX IF NOT EXISTS workspace_action_lookup ON workspace_actions(action)`,
 			}),
 		}).pipe(Effect.provideService(SqlClient.SqlClient, sql))
 	}
