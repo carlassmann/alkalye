@@ -8,6 +8,8 @@ import { replaceSelectedMatch } from "../../shared/find"
 import type { SourceTextarea } from "../source-textarea"
 import { EditorElement } from "./editor"
 
+let lastSearch = { query: "", replacement: "", sensitive: false, regex: false }
+
 // Without a scope, find searches the open document from the app's find bar.
 export function openFind(
 	query = "",
@@ -45,12 +47,20 @@ export class FindElement extends HTMLElement {
 	private editor: SourceTextarea | undefined
 	private close: () => void = () => {}
 	private query = ""
+	private selectionScope: { start: number; end: number } | undefined
+	private scopeSource = ""
 	private lifetime: Fiber.Fiber<void, never> | undefined
 	configure(host: EditorElement, close: () => void, query = "") {
 		this.host = host
 		this.editor = host.source
 		this.close = close
-		this.query = query
+		this.query = query || lastSearch.query
+		let source = host.source
+		this.scopeSource = source?.value ?? ""
+		this.selectionScope =
+			source && source.selectionStart !== source.selectionEnd
+				? { start: source.selectionStart, end: source.selectionEnd }
+				: undefined
 	}
 	focusSearch(query = "") {
 		let input = this.querySelector<HTMLInputElement>("#find-text")
@@ -119,6 +129,10 @@ export class FindElement extends HTMLElement {
 								>
 									Replace all
 								</button>
+								<label class="find-selection-only"
+									><input id="find-selection-only" type="checkbox" />Selection
+									only</label
+								>
 							</div>
 							<div class="find-controls">
 								<label class="find-toggle" title="Match case"
@@ -170,6 +184,9 @@ export class FindElement extends HTMLElement {
 					host.addEventListener("input", () => host.refreshCount(), {
 						signal: events.signal,
 					})
+					editor.element.addEventListener("input", () => host.refreshCount(), {
+						signal: events.signal,
+					})
 					editor.element.addEventListener("select", () => host.refreshCount(), {
 						signal: events.signal,
 					})
@@ -179,7 +196,10 @@ export class FindElement extends HTMLElement {
 							if (
 								event.key === "Escape" &&
 								!event.defaultPrevented &&
-								!document.querySelector("dialog[open]")
+								!document.querySelector("dialog[open]") &&
+								!document.querySelector(
+									'[role="menu"]:popover-open, [role="listbox"]:popover-open',
+								)
 							) {
 								event.preventDefault()
 								host.close()
@@ -204,6 +224,7 @@ export class FindElement extends HTMLElement {
 											? "previous"
 											: "next",
 								)
+								if (event.metaKey || event.ctrlKey) editor.focus()
 							}
 						},
 						{ signal: events.signal },
@@ -223,6 +244,17 @@ export class FindElement extends HTMLElement {
 						attributeFilter: ["readonly"],
 					})
 					refresh()
+					let replacement =
+						host.querySelector<HTMLInputElement>("#replace-text")
+					let sensitive = host.querySelector<HTMLInputElement>("#find-case")
+					let regex = host.querySelector<HTMLInputElement>("#find-regex")
+					let selectionOnly = host.querySelector<HTMLInputElement>(
+						"#find-selection-only",
+					)
+					if (replacement) replacement.value = lastSearch.replacement
+					if (sensitive) sensitive.checked = lastSearch.sensitive
+					if (regex) regex.checked = lastSearch.regex
+					if (selectionOnly) selectionOnly.disabled = !host.selectionScope
 					host.focusSearch(host.query)
 					return yield* Effect.never
 				}),
@@ -265,24 +297,97 @@ export class FindElement extends HTMLElement {
 		if (editor.readOnly) return
 		let replacement = this.querySelector<HTMLInputElement>("#replace-text")
 		if (!replacement) return
-		if (action === "replace-all")
-			editor.value = editor.value.replace(pattern, replacement.value)
-		else if (action === "replace") {
-			let changed = replaceSelectedMatch(
-				editor.value,
-				pattern,
-				replacement.value,
-				editor.selectionStart,
-				editor.selectionEnd,
+		let selectionOnly = this.querySelector<HTMLInputElement>(
+			"#find-selection-only",
+		)?.checked
+		let scope = selectionOnly ? this.selectionScope : undefined
+		if (action === "replace-all") {
+			if (scope) {
+				let original = editor.value
+				let changed = original.slice(scope.start, scope.end)
+				let scopedPattern = new RegExp(pattern)
+				scopedPattern.lastIndex = scope.start
+				let matches = [...original.matchAll(scopedPattern)].filter(
+					match =>
+						match.index >= scope.start &&
+						match.index + match[0].length <= scope.end,
+				)
+				for (let match of matches.reverse()) {
+					let inserted = this.querySelector<HTMLInputElement>("#find-regex")
+						?.checked
+						? replaceSelectedMatch(
+								original,
+								pattern,
+								replacement.value,
+								match.index,
+								match.index + match[0].length,
+							)
+						: replacement.value
+					if (inserted === undefined) continue
+					let offset = match.index - scope.start
+					changed =
+						changed.slice(0, offset) +
+						inserted +
+						changed.slice(offset + match[0].length)
+				}
+				editor.setRangeText(changed, scope.start, scope.end, "preserve")
+				this.selectionScope = {
+					start: scope.start,
+					end: scope.start + changed.length,
+				}
+			} else {
+				let changed = this.querySelector<HTMLInputElement>("#find-regex")
+					?.checked
+					? editor.value.replace(pattern, replacement.value)
+					: editor.value.replace(pattern, () => replacement.value)
+				editor.setRangeText(changed, 0, editor.value.length, "preserve")
+			}
+		} else if (action === "replace") {
+			let scopedPattern = new RegExp(pattern)
+			if (scope) scopedPattern.lastIndex = scope.start
+			let matches = [...editor.value.matchAll(scopedPattern)].filter(
+				match =>
+					!scope ||
+					(match.index >= scope.start &&
+						match.index + match[0].length <= scope.end),
 			)
+			let match =
+				matches.find(
+					match =>
+						match.index === editor.selectionStart &&
+						match.index + match[0].length === editor.selectionEnd,
+				) ??
+				matches.find(match => match.index >= editor.selectionEnd) ??
+				matches[0]
+			if (!match) return
+			editor.setSelectionRange(match.index, match.index + match[0].length)
+			let changed = this.querySelector<HTMLInputElement>("#find-regex")?.checked
+				? replaceSelectedMatch(
+						editor.value,
+						pattern,
+						replacement.value,
+						editor.selectionStart,
+						editor.selectionEnd,
+					)
+				: replacement.value
 			if (changed === undefined) return
+			if (scope)
+				this.selectionScope = {
+					start: scope.start,
+					end: scope.end + changed.length - match[0].length,
+				}
 			editor.setRangeText(
 				changed,
 				editor.selectionStart,
 				editor.selectionEnd,
-				"end",
+				"select",
 			)
+			let focused = document.activeElement
+			this.host?.selectRange(editor.selectionStart, editor.selectionEnd)
+			if (focused instanceof HTMLElement && this.contains(focused))
+				focused.focus({ preventScroll: true })
 		} else return
+		this.scopeSource = editor.value
 		editor.dispatchEvent(new Event("input"))
 		this.refreshCount()
 	}
@@ -298,6 +403,16 @@ export class FindElement extends HTMLElement {
 	private refreshCount() {
 		let count = this.querySelector(".find-count")
 		if (!count || !this.editor) return
+		lastSearch = {
+			query: this.querySelector<HTMLInputElement>("#find-text")?.value ?? "",
+			replacement:
+				this.querySelector<HTMLInputElement>("#replace-text")?.value ?? "",
+			sensitive:
+				this.querySelector<HTMLInputElement>("#find-case")?.checked ?? false,
+			regex:
+				this.querySelector<HTMLInputElement>("#find-regex")?.checked ?? false,
+		}
+		this.trackScope()
 		let pattern = this.expression(false)
 		let matches = pattern ? [...this.editor.value.matchAll(pattern)] : []
 		let current = matches.findIndex(
@@ -308,8 +423,45 @@ export class FindElement extends HTMLElement {
 				? `${Math.max(0, current + 1)} of ${matches.length}`
 				: "No results"
 			: ""
+		for (let button of this.querySelectorAll<HTMLButtonElement>(
+			"#find-next, #find-previous",
+		))
+			button.disabled = matches.length === 0
 		count.toggleAttribute("data-empty", Boolean(pattern && !matches.length))
 	}
+	private trackScope() {
+		let source = this.editor?.value ?? ""
+		let previous = this.scopeSource
+		this.scopeSource = source
+		let scope = this.selectionScope
+		if (!scope || source === previous) return
+		let start = 0
+		while (
+			start < source.length &&
+			start < previous.length &&
+			source[start] === previous[start]
+		)
+			start++
+		let beforeEnd = previous.length,
+			afterEnd = source.length
+		while (
+			beforeEnd > start &&
+			afterEnd > start &&
+			previous[beforeEnd - 1] === source[afterEnd - 1]
+		) {
+			beforeEnd--
+			afterEnd--
+		}
+		function map(offset: number) {
+			return offset <= start
+				? offset
+				: offset >= beforeEnd
+					? offset + afterEnd - beforeEnd
+					: afterEnd
+		}
+		this.selectionScope = { start: map(scope.start), end: map(scope.end) }
+	}
+
 	disconnectedCallback() {
 		let lifetime = this.lifetime
 		this.lifetime = undefined

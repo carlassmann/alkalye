@@ -132,9 +132,17 @@ try {
 		),
 		"Find floats above the editor with replacement collapsed",
 	)
-	browser(session, "click", "#find-next")
 	browser(session, "click", '[data-find-action="toggle-replace"]')
 	browser(session, "fill", "#replace-text", "gamma")
+	browser(session, "click", "#replace-one")
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.value === "gamma alpha beta"',
+	)
+	assert(
+		true,
+		"Replace finds the first match without requiring prior navigation",
+	)
 	browser(session, "click", "#replace-all")
 	wait(
 		session,
@@ -146,6 +154,78 @@ try {
 		evaluate(session, 'document.activeElement.id === "editor"'),
 		"Closing Find restores editor focus",
 	)
+	browser(session, "press", "Control+f")
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("#find-text").value === "alpha" && document.querySelector("#replace-text").value === "gamma" && document.querySelector("#find-next").disabled && document.querySelector("#find-previous").disabled',
+		),
+		"Find remembers search and replacement and disables empty navigation",
+	)
+	browser(session, "click", "#close-find")
+	browser(session, "fill", "#editor", "alpha alpha alpha")
+	evaluate(
+		session,
+		'(() => { let source = document.querySelector("alkalye-editor").source; source.focus(); source.setSelectionRange(0, 11); })()',
+	)
+	browser(session, "press", "Control+f")
+	browser(session, "click", '[data-find-action="toggle-replace"]')
+	browser(session, "fill", "#replace-text", "delta")
+	browser(session, "check", "#find-selection-only")
+	browser(session, "click", "#replace-all")
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.value === "delta delta alpha"',
+	)
+	assert(
+		true,
+		"Selection-only replacement leaves matches outside the opening selection intact",
+	)
+	browser(session, "click", "#close-find")
+
+	browser(session, "fill", "#editor", "aaa")
+	evaluate(
+		session,
+		'(() => { let source = document.querySelector("alkalye-editor").source; source.focus(); source.setSelectionRange(1, 3); })()',
+	)
+	browser(session, "press", "Control+f")
+	browser(session, "fill", "#find-text", "aa")
+	browser(session, "click", '[data-find-action="toggle-replace"]')
+	browser(session, "fill", "#replace-text", "$&")
+	browser(session, "check", "#find-selection-only")
+	browser(session, "click", "#replace-all")
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.value === "a$&"',
+	)
+	assert(
+		true,
+		"Scoped literal replacement starts at the selection and preserves dollar characters",
+	)
+	browser(session, "click", "#close-find")
+	browser(session, "fill", "#editor", "left cat right")
+	evaluate(
+		session,
+		'(() => { let source = document.querySelector("alkalye-editor").source; source.focus(); source.setSelectionRange(5, 8); })()',
+	)
+	browser(session, "press", "Control+f")
+	browser(session, "fill", "#find-text", "(?<=left )(c)(at)(?= right)")
+	browser(session, "check", "#find-regex")
+	browser(session, "click", '[data-find-action="toggle-replace"]')
+	browser(session, "fill", "#replace-text", "$2$1")
+	browser(session, "check", "#find-selection-only")
+	browser(session, "click", "#replace-all")
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.value === "left atc right"',
+	)
+	assert(
+		true,
+		"Scoped regex replacement retains surrounding lookbehind and captures",
+	)
+	browser(session, "uncheck", "#find-regex")
+	browser(session, "click", "#close-find")
+
 	evaluate(
 		session,
 		'(() => { let host=document.querySelector("alkalye-editor"), source=host.source; source.focus(); source.setSelectionRange(0,5); document.querySelector("#editor").dispatchEvent(new MouseEvent("contextmenu", {bubbles:true,cancelable:true,clientX:500,clientY:150})); return true })()',

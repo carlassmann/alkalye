@@ -105,3 +105,22 @@
 		flex: 1;
 	}
 }
+
+[data-find] .find-selection-only {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	min-height: 28px;
+	padding: 0 4px;
+	font-size: 12px;
+	white-space: nowrap;
+}
+[data-find] .find-selection-only input {
+	width: 14px;
+	height: 14px;
+	margin: 0;
+	accent-color: var(--brand);
+}
+[data-find] .find-replace-row {
+	flex-wrap: wrap;
+}
