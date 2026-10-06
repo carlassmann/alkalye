@@ -504,6 +504,79 @@ try {
 			"Deleting synthetic icon space preserves valid source across a durable reload",
 		)
 	}
+	browser(session, "set", "viewport", "1280", "800")
+	browser(session, "click", '[data-action="library"]')
+	browser(session, "click", '[data-action="new"]')
+	let large =
+		"# Large note\n\n" +
+		"Paragraph **bold** [Example](https://example.org) and ==marker==.\n\n".repeat(
+			2048,
+		)
+	evaluate(
+		session,
+		`(() => { ${editor}.value = ${JSON.stringify(large)}; ${native}.dispatchEvent(new Event("input", { bubbles:true })); return true })()`,
+	)
+	wait(
+		session,
+		`${editor}.value === ${JSON.stringify(large)} && document.querySelector("#save-status").getAttribute("aria-busy") === "false"`,
+	)
+	selectSource(large.length)
+	browser(session, "keyboard", "inserttext", "Last paragraph.")
+	wait(
+		session,
+		`${editor}.value.endsWith("Last paragraph.") && document.querySelector("#save-status").getAttribute("aria-busy") === "false"`,
+	)
+	assert(
+		evaluate(
+			session,
+			`${native}.scrollHeight === document.querySelector("#highlight").scrollHeight && document.querySelector("#highlight").textContent === ${native}.value + "\\n"`,
+		),
+		"Large wrapped documents keep projected text and scrolling aligned",
+	)
+	browser(session, "reload")
+	wait(
+		session,
+		`${editor}.value === ${JSON.stringify(large + "Last paragraph.")}`,
+	)
+	selectSource(large.indexOf("Paragraph"))
+	browser(session, "keyboard", "inserttext", "Introduction.\n\n")
+	wait(
+		session,
+		`${editor}.value.includes("Introduction.\\n\\nParagraph") && document.querySelector("#save-status").getAttribute("aria-busy") === "false"`,
+	)
+	assert(
+		evaluate(
+			session,
+			`document.querySelector("#highlight").textContent === ${native}.value + "\\n" && ${native}.scrollHeight === document.querySelector("#highlight").scrollHeight`,
+		),
+		"Inserting lines before thousands of links preserves their offsets and wrapping",
+	)
+	selectSource(0)
+	evaluate(
+		session,
+		`(() => { ${native}.scrollTop = 0; ${native}.dispatchEvent(new Event("scroll")); return true })()`,
+	)
+	wait(
+		session,
+		`Boolean(document.querySelector('[data-editor-links] a[data-kind="link"]'))`,
+	)
+	let focusedLink = evaluate(
+		session,
+		`(() => { let anchor = document.querySelector('[data-editor-links] a[data-kind="link"]'); anchor.focus(); let source = anchor.dataset.editorLink; ${native}.scrollTop = ${native}.scrollHeight; ${native}.dispatchEvent(new Event("scroll")); return source })()`,
+	)
+	wait(
+		session,
+		`document.activeElement?.dataset.editorLink === ${JSON.stringify(focusedLink)} && document.activeElement.style.left === "-10000px"`,
+	)
+	browser(session, "press", "Tab")
+	wait(
+		session,
+		`document.activeElement?.tagName === "A" && document.activeElement.dataset.editorLink !== ${JSON.stringify(focusedLink)} && document.activeElement.getBoundingClientRect().top > 0 && document.activeElement.getBoundingClientRect().bottom < window.innerHeight`,
+	)
+	assert(
+		true,
+		"Focused links keep their destination while scrolling, and Tab reaches offscreen links",
+	)
 } finally {
 	try {
 		browser(session, "close")

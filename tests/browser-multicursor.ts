@@ -222,6 +222,50 @@ try {
 			"Multicursor wrapping and sticky columns match native textarea navigation",
 		)
 	}
+	browser(session, "press", "Escape")
+	let many = "😀it line\n".repeat(512)
+	browser(session, "fill", "#editor", many)
+	wait(session, `${editor}.value === ${JSON.stringify(many)}`)
+	selectSource(many.indexOf("it") + 1)
+	browser(session, "press", "Control+Shift+l")
+	browser(session, "press", "ArrowRight")
+	browser(session, "keyboard", "inserttext", "!")
+	wait(
+		session,
+		`${editor}.value === ${JSON.stringify(many.replaceAll("it", "it!"))}`,
+	)
+	browser(session, "keyboard", "inserttext", "?")
+	browser(session, "press", "Backspace")
+	wait(
+		session,
+		`${editor}.value === ${JSON.stringify(many.replaceAll("it", "it!"))} && document.querySelector("#save-status").getAttribute("aria-busy") === "false"`,
+	)
+	browser(session, "press", "Escape")
+	browser(session, "reload")
+	wait(
+		session,
+		`${editor}.value === ${JSON.stringify(many.replaceAll("it", "it!"))}`,
+	)
+	assert(
+		true,
+		"Repeated typing and deletion at 512 Unicode cursors persists every edit",
+	)
+	browser(session, "fill", "#editor", "e\u0301it\ne\u0301it")
+	wait(session, `${editor}.value === "e\\u0301it\\ne\\u0301it"`)
+	evaluate(
+		session,
+		`(() => { ${native}.focus(); ${editor}.setSelectionRange(2,4); return true })()`,
+	)
+	browser(session, "press", "Control+Shift+l")
+	browser(session, "press", "ArrowLeft")
+	browser(session, "press", "ArrowLeft")
+	browser(session, "press", "ArrowRight")
+	browser(session, "press", "Backspace")
+	wait(session, `${editor}.value === "it\\nit"`)
+	assert(
+		true,
+		"Multicursor arrows and deletion treat combining marks as one grapheme",
+	)
 } finally {
 	try {
 		browser(session, "close")

@@ -2,7 +2,7 @@ import type { DocumentLink } from "../shared/model"
 import {
 	applyViewEdit,
 	identity,
-	project,
+	Projector,
 	sameProjection,
 	toSource,
 	toView,
@@ -24,6 +24,17 @@ export class SourceTextarea {
 	readonly element: HTMLTextAreaElement
 	private options: SourceTextareaOptions
 	private current: Projection
+	private projector = new Projector()
+	private projected:
+		| {
+				source: string
+				start: number
+				end: number
+				documents: string
+				mode: ProjectionMode
+				value: Projection
+		  }
+		| undefined
 
 	constructor(
 		element: HTMLTextAreaElement,
@@ -152,12 +163,34 @@ export class SourceTextarea {
 		source: string,
 		active: { start: number; end: number },
 	) {
-		if (this.options.mode() === "raw") return identity(source)
-		return project(source, {
-			active,
-			documents: this.options.documents(),
-			iconSpace: true,
-		})
+		let mode = this.options.mode()
+		let documents = this.options.documents()
+		let key = documents
+			.map(document => document.id + ":" + document.title)
+			.join("\n")
+		let previous = this.projected
+		if (
+			previous &&
+			previous.source === source &&
+			previous.start === active.start &&
+			previous.end === active.end &&
+			previous.documents === key &&
+			previous.mode === mode
+		)
+			return previous.value
+		let value =
+			mode === "raw"
+				? identity(source)
+				: this.projector.project(source, { active, documents, iconSpace: true })
+		this.projected = {
+			source,
+			start: active.start,
+			end: active.end,
+			documents: key,
+			mode,
+			value,
+		}
+		return value
 	}
 	// Rewriting the value collapses or expands text above the caret, so the
 	// caret's vertical position in the content is held steady.

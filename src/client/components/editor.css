@@ -299,3 +299,8 @@
 	margin-inline-start: -1px;
 	margin-inline-end: -1px;
 }
+
+[data-editor] [data-editor-line] {
+	display: block;
+	contain: layout style;
+}

@@ -6,32 +6,20 @@ import { editLines, indentSelections, lineBounds } from "../../shared/lines"
 import { selectionAnchor } from "../../shared/documents"
 import { expandSelections } from "../../shared/selection"
 import { setMarkup } from "../dom"
-import {
-	html,
-	joinMarkup,
-	localizeMarkup,
-	rawMarkup,
-	translate,
-} from "../language"
+import { html, joinMarkup, translate } from "../language"
 import { pasteMarkdown } from "../paste"
 import { shortcutLabel } from "../shortcuts"
 import { openContextMenu } from "./context-menu"
 import type { MenuEntry, MenuItem } from "./context-menu"
 import { mountLineActions } from "./line-actions"
-import { icon } from "../icons"
 import type { IconName } from "../icons"
 
 import { formatSelection, sortTasks } from "../../shared/authoring"
 import { codeLanguageCompletions } from "../../shared/completions"
-import {
-	escape,
-	frontmatterBlock,
-	nextFence,
-	safeUrl,
-} from "../../shared/markdown"
+import { safeUrl } from "../../shared/markdown"
 import { iconPrefix } from "../../shared/projection"
-import type { ProjectedLink } from "../../shared/projection"
 import { SourceTextarea } from "../source-textarea"
+import { EditorOverlay } from "./editor-overlay"
 import type {
 	Atom,
 	DocumentLink,
@@ -60,7 +48,7 @@ export interface EditorOptions {
 	change(
 		content: string,
 		base?: Atom[],
-	): { atoms: Atom[]; operation: Operation | null } | undefined
+	): { atoms: Atom[]; content: string; operation: Operation | null } | undefined
 	undo(redo: boolean): void
 	select(): void
 	requestAsset(): void
@@ -199,6 +187,8 @@ function createEditorView(
 	activeLine.className = "active-line"
 	activeLine.setAttribute("aria-hidden", "true")
 	wrapper.append(activeLine, highlight, menu, textarea, collaborators, links)
+	let overlay = new EditorOverlay(highlight)
+	let geometryDirty = true
 	let people: Presence[] = []
 	let editable = options.editable
 	let atoms = options.atoms
@@ -230,6 +220,8 @@ function createEditorView(
 		after: ReturnType<typeof selectedRanges>
 	}[] = []
 	let primaryGoalX: number | undefined
+	let segmentedSource = ""
+	let graphemeLines = new Map<string, number[]>()
 	let text = new SourceTextarea(textarea, options.content, {
 		documents: options.documents,
 		mode: () =>
@@ -248,8 +240,7 @@ function createEditorView(
 		updateHighlight()
 		if (composing) return
 		let edit = options.change(source, atoms)
-		if (edit)
-			update(edit.atoms.map(atom => atom.value).join(""), edit.atoms, editable)
+		if (edit) update(edit.content, edit.atoms, editable)
 		else text.sync()
 		if (options.preferences.autocomplete) showCompletions()
 	}
@@ -277,11 +268,7 @@ function createEditorView(
 				let index = after ? local.findIndex(atom => atom.id === after) + 1 : 0
 				local.splice(index, 0, ...inserted)
 				atoms = local
-				update(
-					edit.atoms.map(atom => atom.value).join(""),
-					edit.atoms,
-					editable,
-				)
+				update(edit.content, edit.atoms, editable)
 			} else text.sync()
 		},
 		{ signal: listeners.signal },
@@ -323,8 +310,8 @@ function createEditorView(
 	textarea.onscroll = () => {
 		highlight.scrollTop = textarea.scrollTop
 		highlight.scrollLeft = textarea.scrollLeft
-		paintPresence()
-		paintActiveLine()
+		geometryDirty = true
+		schedulePaint()
 	}
 	textarea.onclick = event => {
 		if (!(event.metaKey || event.ctrlKey)) return
@@ -381,15 +368,15 @@ function createEditorView(
 		documents: options.documents,
 	})
 	let layout = new ResizeObserver(() => {
-		paintPresence()
-		paintActiveLine()
+		geometryDirty = true
+		schedulePaint()
 	})
 	layout.observe(textarea)
 	document.fonts.addEventListener(
 		"loadingdone",
 		() => {
-			paintPresence()
-			paintActiveLine()
+			geometryDirty = true
+			schedulePaint()
 		},
 		{ signal: listeners.signal },
 	)
@@ -470,7 +457,10 @@ function createEditorView(
 		paintActiveLine()
 	}
 	function paintActiveLine() {
-		paintLinks()
+		if (geometryDirty) {
+			paintLinks()
+			geometryDirty = false
+		}
 		activeLine.hidden = !options.preferences.highlightCurrentLine
 		if (activeLine.hidden) return
 		let from = point(textarea.selectionStart),
@@ -495,11 +485,12 @@ function createEditorView(
 		textarea.lang = next.spellcheckLanguage
 		wrapper.dataset.strikethrough = String(next.strikethroughDoneTasks)
 		wrapper.dataset.fade = String(next.fadeDoneTasks)
+		geometryDirty = true
 		updateHighlight()
 	}
 	function presence(next: Presence[]) {
 		people = next
-		paintPresence()
+		schedulePaint()
 	}
 	function caretTop() {
 		if (!highlight.isConnected) return
@@ -531,50 +522,65 @@ function createEditorView(
 		textarea.dispatchEvent(new Event("input"))
 	}
 	function point(offset: number) {
-		let walker = document.createTreeWalker(highlight, NodeFilter.SHOW_TEXT)
-		let last: Node = highlight
-		let node = walker.nextNode()
-		while (node) {
-			let length = node.textContent?.length ?? 0
-			if (offset < length) return { node, offset }
-			offset -= length
-			last = node
-			node = walker.nextNode()
-		}
-		return { node: last, offset: last.textContent?.length ?? 0 }
+		return overlay.point(offset)
 	}
 	function paintLinkHover() {
-		let hovered = new Set(
-			[...links.querySelectorAll<HTMLAnchorElement>("a:hover")].map(
-				anchor => anchor.dataset.editorLink,
+		overlay.hover(
+			[...links.querySelectorAll<HTMLAnchorElement>("a:hover")].map(anchor =>
+				Number(anchor.dataset.editorView),
 			),
 		)
-		for (let link of highlight.querySelectorAll<HTMLElement>(
-			"[data-editor-link]",
-		))
-			link.classList.toggle("is-hovered", hovered.has(link.dataset.editorLink))
 	}
 	function paintLinks() {
 		let existing = [...links.querySelectorAll("a")]
-		let count = 0
+		let used = new Set<HTMLAnchorElement>()
+		let available = new Map(
+			existing.map(anchor => [anchor.dataset.editorHit, anchor]),
+		)
 		let bounds = wrapper.getBoundingClientRect()
-		for (let link of text.projection.links) {
+		let visible = overlay.visible(bounds.top, bounds.bottom)
+		let geometry = []
+		let low = 0,
+			high = text.projection.links.length
+		while (low < high) {
+			let middle = (low + high) >>> 1
+			if ((text.projection.links[middle]?.view.end ?? 0) < visible.start)
+				low = middle + 1
+			else high = middle
+		}
+		for (let index = low; index < text.projection.links.length; index++) {
+			let link = text.projection.links[index]
+			if (!link || link.view.start > visible.end) break
 			if (link.broken) continue
 			let from = point(link.view.start),
-				to = point(link.view.end)
-			let range = document.createRange()
+				to = point(link.view.end),
+				range = document.createRange()
 			range.setStart(from.node, from.offset)
 			range.setEnd(to.node, to.offset)
+			geometry.push({
+				link,
+				rectangles: [...range.getClientRects()].filter(
+					rectangle =>
+						rectangle.bottom >= bounds.top && rectangle.top <= bounds.bottom,
+				),
+			})
+		}
+		for (let { link, rectangles } of geometry) {
 			let label = text.projection.text.slice(
 				link.view.start + (link.iconSpace ? iconPrefix.length : 0),
 				link.view.end,
 			)
 			let first = true
-			for (let rectangle of range.getClientRects()) {
+			let fragment = 0
+			for (let rectangle of rectangles) {
 				if (!rectangle.width || !rectangle.height) continue
-				let anchor = existing[count++] ?? document.createElement("a")
+				let key = `${link.kind}:${link.target}:${link.source.start}:${fragment++}`
+				let anchor = available.get(key) ?? document.createElement("a")
+				used.add(anchor)
+				anchor.dataset.editorHit = key
 				anchor.dataset.kind = link.kind
 				anchor.dataset.editorLink = String(link.source.start)
+				anchor.dataset.editorView = String(link.view.start)
 				anchor.href =
 					link.kind === "wiki"
 						? "/app/doc/" + encodeURIComponent(link.target)
@@ -594,7 +600,11 @@ function createEditorView(
 				if (!first) anchor.setAttribute("aria-hidden", "true")
 				else anchor.removeAttribute("aria-hidden")
 				first = false
-				anchor.style.cssText = `left:${rectangle.left - bounds.left}px;top:${rectangle.top - bounds.top}px;width:${rectangle.width}px;height:${rectangle.height}px`
+				let style = `left:${rectangle.left - bounds.left}px;top:${rectangle.top - bounds.top}px;width:${rectangle.width}px;height:${rectangle.height}px`
+				if (anchor.dataset.editorStyle !== style) {
+					anchor.style.cssText = style
+					anchor.dataset.editorStyle = style
+				}
 				anchor.onpointerdown = event => {
 					if (event.pointerType === "mouse") event.preventDefault()
 					if (!event.shiftKey) return
@@ -633,29 +643,84 @@ function createEditorView(
 					event.preventDefault()
 					options.openDocument(link.target)
 				}
+				anchor.onkeydown = event => {
+					if (
+						event.key !== "Tab" ||
+						event.ctrlKey ||
+						event.metaKey ||
+						event.altKey
+					)
+						return
+					let candidates = text.projection.links
+					let index = candidates.findIndex(
+						candidate => candidate.source.start === link.source.start,
+					)
+					let direction = event.shiftKey ? -1 : 1
+					let next = candidates[index + direction]
+					while (next?.broken) {
+						index += direction
+						next = candidates[index + direction]
+					}
+					if (!next) return
+					event.preventDefault()
+					let position = point(next.view.start),
+						range = document.createRange()
+					range.setStart(position.node, position.offset)
+					range.collapse(true)
+					let rectangle = range.getBoundingClientRect()
+					if (rectangle.top < bounds.top || rectangle.bottom > bounds.bottom) {
+						textarea.scrollTop += rectangle.top - bounds.top - 48
+						highlight.scrollTop = textarea.scrollTop
+					}
+					paintLinks()
+					links
+						.querySelector<HTMLAnchorElement>(
+							`a[data-editor-link="${next.source.start}"][tabindex="0"]`,
+						)
+						?.focus({ preventScroll: true })
+				}
 				anchor.oncontextmenu = event =>
 					openEditorMenu(event, link.parts[0]?.source ?? link.source.start)
 				if (anchor.parentElement !== links) links.append(anchor)
 			}
 		}
-		for (let anchor of existing.slice(count)) anchor.remove()
+		for (let anchor of existing) {
+			if (used.has(anchor)) continue
+			if (document.activeElement === anchor) {
+				anchor.style.cssText = "left:-10000px;top:0;width:0;height:0"
+				delete anchor.dataset.editorStyle
+			} else anchor.remove()
+		}
 		paintLinkHover()
 	}
 	function paintPresence() {
-		collaborators.replaceChildren()
+		let comments = options.comments()
+		if (!comments.length && !people.length) {
+			if (collaborators.childNodes.length) collaborators.replaceChildren()
+			return
+		}
 		let bounds = wrapper.getBoundingClientRect()
-		for (let comment of options.comments()) {
+		let visible = overlay.visible(bounds.top, bounds.bottom)
+		let fragment = document.createDocumentFragment()
+		let measurements = []
+		for (let comment of comments) {
+			if (
+				text.toView(comment.end) < visible.start ||
+				text.toView(comment.start) > visible.end
+			)
+				continue
 			let from = point(text.toView(comment.start)),
 				to = point(text.toView(comment.end)),
 				range = document.createRange()
 			range.setStart(from.node, from.offset)
 			range.setEnd(to.node, to.offset)
-			for (let rectangle of range.getClientRects()) {
-				let mark = document.createElement("span")
-				mark.className = "comment-highlight"
-				mark.style.cssText = `left:${rectangle.left - bounds.left}px;top:${rectangle.top - bounds.top}px;width:${rectangle.width}px;height:${rectangle.height}px`
-				collaborators.append(mark)
-			}
+			measurements.push({
+				kind: "comment",
+				rectangles: [...range.getClientRects()],
+				hue: 0,
+				name: "",
+				caret: undefined,
+			})
 		}
 		for (let person of people) {
 			let start = Math.max(0, Math.min(text.value.length, person.cursor))
@@ -663,35 +728,60 @@ function createEditorView(
 				start,
 				Math.min(text.value.length, person.selectionEnd ?? start),
 			)
+			if (text.toView(end) < visible.start || text.toView(start) > visible.end)
+				continue
 			let from = point(text.toView(start)),
-				to = point(text.toView(end))
-			let range = document.createRange()
+				to = point(text.toView(end)),
+				range = document.createRange()
 			range.setStart(from.node, from.offset)
 			range.setEnd(to.node, to.offset)
-			let hue =
-				[...person.actor].reduce(
-					(sum, character) => sum + character.charCodeAt(0),
-					0,
-				) % 360
 			let rectangles = [...range.getClientRects()]
-			for (let rectangle of rectangles) {
-				if (!rectangle.width) continue
-				let selection = document.createElement("span")
-				selection.className = "remote-selection"
-				selection.style.cssText = `left:${rectangle.left - bounds.left}px;top:${rectangle.top - bounds.top}px;width:${rectangle.width}px;height:${rectangle.height}px;--person:hsl(${hue} 65% 65%)`
-				collaborators.append(selection)
-			}
 			range.collapse(true)
-			let rectangle = range.getBoundingClientRect()
-			if (!rectangle.height) continue
+			measurements.push({
+				kind: "person",
+				rectangles,
+				hue:
+					[...person.actor].reduce(
+						(sum, character) => sum + character.charCodeAt(0),
+						0,
+					) % 360,
+				name: person.name,
+				caret: range.getBoundingClientRect(),
+			})
+		}
+		for (let measurement of measurements) {
+			let { hue } = measurement
+			for (let rectangle of measurement.rectangles) {
+				if (
+					!rectangle.width ||
+					rectangle.bottom < bounds.top ||
+					rectangle.top > bounds.bottom
+				)
+					continue
+				let mark = document.createElement("span")
+				mark.className =
+					measurement.kind === "comment"
+						? "comment-highlight"
+						: "remote-selection"
+				mark.style.cssText = `left:${rectangle.left - bounds.left}px;top:${rectangle.top - bounds.top}px;width:${rectangle.width}px;height:${rectangle.height}px;--person:hsl(${hue} 65% 65%)`
+				fragment.append(mark)
+			}
+			let rectangle = measurement.caret
+			if (
+				!rectangle?.height ||
+				rectangle.bottom < bounds.top ||
+				rectangle.top > bounds.bottom
+			)
+				continue
 			let caret = document.createElement("span")
 			caret.className = "remote-caret"
 			caret.style.cssText = `left:${rectangle.left - bounds.left}px;top:${rectangle.top - bounds.top}px;height:${rectangle.height}px;--person:hsl(${hue} 65% 65%)`
 			let name = document.createElement("small")
-			name.textContent = person.name
+			name.textContent = measurement.name
 			caret.append(name)
-			collaborators.append(caret)
+			fragment.append(caret)
 		}
+		collaborators.replaceChildren(fragment)
 	}
 	function update(content: string, nextAtoms: Atom[], nextEditable: boolean) {
 		editable = nextEditable
@@ -707,66 +797,58 @@ function createEditorView(
 				position(start, nextAtoms),
 				position(end, nextAtoms),
 			)
-		} else if (!text.sync()) updateHighlight()
+		} else text.sync()
 		atoms = nextAtoms
 		lineActions.update()
-		paintPresence()
+		schedulePaint()
 	}
 	function anchor(offset: number) {
-		let length = 0,
-			previous = ""
-		for (let atom of atoms) {
-			if (length >= offset) break
-			length += atom.value.length
-			previous = atom.id
+		if (!offset) return ""
+		let index = atomPositions(atoms),
+			low = 0,
+			high = index.ends.length
+		while (low < high) {
+			let middle = (low + high) >>> 1
+			if ((index.ends[middle] ?? Infinity) < offset) low = middle + 1
+			else high = middle
 		}
-		return previous
+		return atoms[Math.min(low, atoms.length - 1)]?.id ?? ""
 	}
 	function position(id: string, nextAtoms: Atom[]) {
 		if (!id) return 0
-		let offset = 0
-		for (let atom of nextAtoms) {
-			offset += atom.value.length
-			if (atom.id === id) return offset
-		}
-		let previous = atoms.findIndex(atom => atom.id === id)
+		let next = atomPositions(nextAtoms)
+		let index = next.indices.get(id)
+		if (index !== undefined) return next.ends[index] ?? 0
+		let previous = atomPositions(atoms).indices.get(id) ?? -1
 		for (let index = previous - 1; index >= 0; index--) {
 			let old = atoms[index]
-			if (old && nextAtoms.some(atom => atom.id === old.id))
-				return position(old.id, nextAtoms)
+			let found = old && next.indices.get(old.id)
+			if (found !== undefined) return next.ends[found] ?? 0
 		}
 		return 0
 	}
 	function updateHighlight() {
-		cancelAnimationFrame(paintFrame)
-		paintFrame = requestAnimationFrame(paintActiveLine)
-		let editor = text
-
-		if (!secondarySelections.length) {
-			let { text: view, links } = editor.projection
-			setMarkup(
-				highlight,
-				sourceHighlight(view, options.documents(), links, options.mediaIcon),
+		let ranges = [...secondarySelections].sort(
+			(left, right) => left.start - right.start,
+		)
+		if (
+			overlay.update(
+				text.projection,
+				options.documents(),
+				options.mediaIcon,
+				ranges,
 			)
-			return
-		}
-		let position = 0,
-			html = ""
-		for (let selection of [...secondarySelections].sort(
-			(a, b) => a.start - b.start,
-		)) {
-			html +=
-				escape(editor.value.slice(position, selection.start)) +
-				localizeMarkup(
-					selection.start === selection.end
-						? '<mark class="local-caret">'
-						: "<mark>",
-				) +
-				escape(editor.value.slice(selection.start, selection.end)) +
-				"</mark>"
-			position = selection.end
-		}
-		setMarkup(highlight, html + escape(editor.value.slice(position)) + "\n")
+		)
+			geometryDirty = true
+		schedulePaint()
+	}
+	function schedulePaint() {
+		if (!paintFrame)
+			paintFrame = requestAnimationFrame(() => {
+				paintFrame = 0
+				paintActiveLine()
+				paintPresence()
+			})
 	}
 	function command(action: string) {
 		if (listeners.signal.aborted || composing || !inSync()) return
@@ -1600,26 +1682,97 @@ function createEditorView(
 			return
 		}
 		let selected = editor.value.slice(start, end),
-			ranges = [{ start, end }, ...secondarySelections],
+			ranges = [{ start, end }, ...secondarySelections].sort(
+				(left, right) => left.start - right.start,
+			),
 			last = secondarySelections.at(-1)?.end ?? end
-		let candidates: { start: number; end: number }[] = []
-		for (
-			let index = editor.value.indexOf(selected);
-			index >= 0;
-			index = editor.value.indexOf(selected, index + selected.length)
-		)
-			candidates.push({ start: index, end: index + selected.length })
-		let next = [
-			...candidates.filter(range => range.start >= last),
-			...candidates.filter(range => range.start < last),
-		].find(
-			range =>
-				!ranges.some(
-					existing => range.start < existing.end && range.end > existing.start,
-				),
-		)
+		let next: { start: number; end: number } | undefined
+		for (let [from = 0, limit = 0] of [
+			[last, editor.value.length],
+			[0, last],
+		]) {
+			for (
+				let index = editor.value.indexOf(selected, from);
+				index >= 0 && index < limit;
+				index = editor.value.indexOf(selected, index + selected.length)
+			) {
+				let low = 0,
+					high = ranges.length
+				while (low < high) {
+					let middle = (low + high) >>> 1
+					if ((ranges[middle]?.end ?? Infinity) <= index) low = middle + 1
+					else high = middle
+				}
+				if ((ranges[low]?.start ?? Infinity) >= index + selected.length) {
+					next = { start: index, end: index + selected.length }
+					break
+				}
+			}
+			if (next) break
+		}
 		if (next) secondarySelections.push(next)
 		selectionsChanged()
+	}
+	function graphemeLine(offset: number) {
+		let source = text.value
+		if (segmentedSource !== source) {
+			segmentedSource = source
+			graphemeLines.clear()
+		}
+		let bounds = overlay.lineBounds(offset)
+		let line = source.slice(bounds.start, Math.min(source.length, bounds.end))
+		let positions = graphemeLines.get(line)
+		if (!positions) {
+			positions = [
+				...Array.from(
+					new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(
+						line,
+					),
+					segment => segment.index,
+				),
+				line.length,
+			]
+			graphemeLines.set(line, positions)
+		}
+		return { start: bounds.start, positions }
+	}
+	function stepGrapheme(offset: number, forward: boolean) {
+		let source = text.value
+		if (forward && offset >= source.length) return source.length
+		if (!forward && offset <= 0) return 0
+		if (!forward && source[offset - 1] === "\n")
+			return source[offset - 2] === "\r" ? offset - 2 : offset - 1
+		let from = forward ? offset - 1 : offset - 2,
+			to = offset + (forward ? 2 : 1)
+		if (!/[^\x00-\x7f]|\r/.test(source.slice(Math.max(0, from), to)))
+			return forward ? offset + 1 : offset - 1
+		let line = graphemeLine(offset)
+		return (
+			line.start +
+			boundaryAt(
+				line.positions,
+				offset - line.start,
+				forward,
+				source.length - line.start,
+			)
+		)
+	}
+	function graphemeFloor(offset: number) {
+		let source = text.value
+		if (offset <= 0 || offset >= source.length) return offset
+		if (
+			!/[^\x00-\x7f]|\r/.test(source.slice(Math.max(0, offset - 1), offset + 1))
+		)
+			return offset
+		let line = graphemeLine(offset),
+			local = offset - line.start
+		let next = boundaryAt(
+			line.positions,
+			local,
+			true,
+			source.length - line.start,
+		)
+		return line.start + boundaryAt(line.positions, next, false)
 	}
 	function moveCursors(
 		key: string,
@@ -1627,15 +1780,11 @@ function createEditorView(
 		mode: "character" | "word" | "line" | "document",
 	) {
 		let source = text.value
-		let boundaries = [
-			...Array.from(
-				new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(
-					source,
-				),
-				segment => segment.index,
-			),
-			source.length,
-		]
+		let boundaryCount = source.length + 1
+		function boundary(index: number) {
+			return graphemeFloor(Math.min(index, source.length))
+		}
+
 		let words =
 			mode === "word"
 				? [
@@ -1645,17 +1794,25 @@ function createEditorView(
 					].filter(segment => segment.isWordLike)
 				: []
 		let backwardWords = [...words].reverse()
+		let rectangles = new Map<number, DOMRect>()
 		function rectangle(offset: number) {
+			let cached = rectangles.get(offset)
+			if (cached) return cached
 			let cursor = point(offset),
 				range = document.createRange()
 			range.setStart(cursor.node, cursor.offset)
 			range.collapse(true)
 			let bounds = range.getBoundingClientRect()
-			if (bounds.height) return bounds
+			if (bounds.height) {
+				rectangles.set(offset, bounds)
+				return bounds
+			}
 			let length = cursor.node.textContent?.length ?? 0
 			if (cursor.offset < length) range.setEnd(cursor.node, cursor.offset + 1)
 			else if (cursor.offset) range.setStart(cursor.node, cursor.offset - 1)
-			return range.getClientRects()[0] ?? bounds
+			let measured = range.getClientRects()[0] ?? bounds
+			rectangles.set(offset, measured)
+			return measured
 		}
 		function visualOffset(head: number, key: string, goalX: number) {
 			let current = rectangle(head),
@@ -1664,20 +1821,48 @@ function createEditorView(
 				current.top +
 				(key === "ArrowDown" ? lineHeight : key === "ArrowUp" ? -lineHeight : 0)
 			let low = 0,
-				high = boundaries.length
+				high = boundaryCount
 			while (low < high) {
 				let middle = Math.floor((low + high) / 2),
-					offset = boundaries[middle] ?? source.length
+					offset = boundary(middle)
 				if (rectangle(offset).top < targetTop - 1) low = middle + 1
 				else high = middle
 			}
-			if (low >= boundaries.length) return source.length
-			let rowTop = rectangle(boundaries[low] ?? 0).top
+			if (low >= boundaryCount) return source.length
+			let rowTop = rectangle(boundary(low)).top
 			if (key === "ArrowUp" && rowTop > targetTop + 1) return 0
-			let best = boundaries[low] ?? 0,
+			let line = overlay.lineBounds(boundary(low))
+			if (
+				!/[\u0590-\u08ff\u202a-\u202e\u2066-\u2069]/.test(
+					source.slice(line.start, line.end),
+				)
+			) {
+				let first = low,
+					last = boundaryCount
+				while (low < last) {
+					let middle = (low + last) >>> 1
+					if (rectangle(boundary(middle)).top <= rowTop + 1) low = middle + 1
+					else last = middle
+				}
+				let end = low - 1
+				low = first
+				let high = end + 1
+				while (low < high) {
+					let middle = (low + high) >>> 1
+					if (rectangle(boundary(middle)).left < goalX) low = middle + 1
+					else high = middle
+				}
+				let right = boundary(Math.min(low, end)),
+					left = boundary(Math.max(first, low - 1))
+				return Math.abs(rectangle(right).left - goalX) <=
+					Math.abs(rectangle(left).left - goalX)
+					? right
+					: left
+			}
+			let best = boundary(low),
 				distance = Infinity
-			for (let index = low; index < boundaries.length; index++) {
-				let offset = boundaries[index] ?? source.length,
+			for (let index = low; index < boundaryCount; index++) {
+				let offset = boundary(index),
 					bounds = rectangle(offset)
 				if (Math.abs(bounds.top - rowTop) > 1) break
 				let delta = Math.abs(bounds.left - goalX)
@@ -1732,10 +1917,7 @@ function createEditorView(
 							: 0
 				} else if (!extend && range.start !== range.end)
 					offset = right ? range.end : range.start
-				else
-					offset = right
-						? (boundaries.find(index => index > head) ?? source.length)
-						: (boundaries.filter(index => index < head).pop() ?? 0)
+				else offset = stepGrapheme(head, right)
 			} else {
 				offset = visualOffset(
 					head,
@@ -1892,18 +2074,13 @@ function createEditorView(
 		let typed =
 			event.inputType === "insertLineBreak" ? "\n" : (event.data ?? "")
 		let source = editor.value
-		let boundaries = Array.from(
-			new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(
-				source,
-			),
-			segment => segment.index,
-		)
+
 		let edits = ranges.map(range => {
 			let { start, end } = range
 			if (start === end && event.inputType === "deleteContentBackward")
-				start = boundaries.filter(index => index < start).pop() ?? 0
+				start = stepGrapheme(start, false)
 			if (start === end && event.inputType === "deleteContentForward")
-				end = boundaries.find(index => index > end) ?? source.length
+				end = stepGrapheme(end, true)
 			return { start, end, primary: range.primary }
 		})
 		let offset = 0,
@@ -1917,8 +2094,14 @@ function createEditorView(
 			positions.push({ start: cursor, end: cursor, primary: edit.primary })
 			offset += typed.length - (edit.end - edit.start)
 		}
-		for (let edit of [...edits].reverse())
-			source = source.slice(0, edit.start) + typed + source.slice(edit.end)
+		let pieces: string[] = [],
+			copied = 0
+		for (let edit of edits) {
+			pieces.push(source.slice(copied, edit.start), typed)
+			copied = edit.end
+		}
+		pieces.push(source.slice(copied))
+		source = pieces.join("")
 		secondarySelections = positions.filter(position => !position.primary)
 		let primary = positions.find(position => position.primary)
 		editor.replace(source, primary?.start ?? 0, primary?.end ?? 0)
@@ -2102,136 +2285,47 @@ function editorContext(source: string, offset: number) {
 		task: /^\s*[-*+] \[[ xX]\]/.test(line),
 	}
 }
-export function sourceHighlight(
-	source: string,
-	documents: readonly DocumentLink[] = [],
-	links: readonly ProjectedLink[] = [],
-	mediaIcon?: (target: string) => IconName,
+
+export { sourceHighlight } from "./editor-syntax"
+
+function boundaryAt(
+	boundaries: number[],
+	offset: number,
+	forward: boolean,
+	end = 0,
 ) {
-	let offset = 0
-	let headerEnd = frontmatterBlock(source)?.[0].length ?? 0
-	let fence = ""
-	return (
-		source
-			.split("\n")
-			.map(line => {
-				let start = offset
-				offset += line.length + 1
-				let collapsed = links.filter(
-					link => link.view.start >= start && link.view.end <= offset - 1,
-				)
-				let previousFence = fence
-				if (start >= headerEnd) fence = nextFence(fence, line)
-				let literal =
-					start < headerEnd ||
-					Boolean(previousFence) ||
-					Boolean(fence) ||
-					/^( {4}|\t)/.test(line)
-				let content = lineMarkup(
-					line,
-					start,
-					collapsed,
-					literal ? undefined : documents,
-					mediaIcon,
-				)
-				if (/^---\s*$|^\s*(`{3,}|~{3,})/.test(line))
-					return html`<span class="syntax-marker">${rawMarkup(content)}</span>`
-				if (literal) return content
-				if (/^\s*[-*+] \[x\]/i.test(line))
-					return html`<span class="done-task">${rawMarkup(content)}</span>`
-				let heading = content.match(/^(#{1,6})(\s.*)$/)
-				if (heading)
-					return html`<span class="syntax-heading"
-						><span class="syntax-marker">${heading[1] ?? ""}</span
-						>${rawMarkup(heading[2] ?? "")}</span
-					>`
-				if (/^>/.test(line))
-					return html`<span class="syntax-quote">${rawMarkup(content)}</span>`
-				return content
-			})
-			.join("\n") + "\n"
-	)
-}
-// Hold projected links aside so inline patterns cannot modify their attributes.
-function lineMarkup(
-	line: string,
-	start: number,
-	links: readonly ProjectedLink[],
-	documents?: readonly DocumentLink[],
-	mediaIcon?: (target: string) => IconName,
-) {
-	let content = "",
-		position = 0
-	let heldLinks: string[] = []
-	for (let link of [...links, undefined]) {
-		let raw = escape(
-			line.slice(position, link ? link.view.start - start : undefined),
+	let low = 0,
+		high = boundaries.length
+	while (low < high) {
+		let middle = (low + high) >>> 1
+		if (
+			(boundaries[middle] ?? Infinity) < offset ||
+			(forward && boundaries[middle] === offset)
 		)
-		content += raw
-		if (!link) break
-		let name: IconName =
-			link.kind === "wiki"
-				? link.broken
-					? "file-warning"
-					: "file-symlink"
-				: link.kind === "media"
-					? (mediaIcon?.(link.target) ?? "image")
-					: "link"
-		let label = line.slice(
-			link.view.start - start + (link.iconSpace ? iconPrefix.length : 0),
-			link.view.end - start,
-		)
-		heldLinks.push(
-			html`<span
-				class="${link.broken ? "syntax-link syntax-link-broken" : "syntax-link"}"
-				data-editor-link="${link.source.start}"
-				title="${link.target}"
-				>${link.iconSpace ? html`<span class="syntax-link-icon" data-icon="${name}" aria-hidden="true">${iconPrefix}${icon(name)}</span>` : ""}<span
-					class="syntax-link-label"
-					>${label}</span
-				></span
-			>`.value,
-		)
-		content += `\u0001${heldLinks.length - 1}\u0001`
-		position = link.view.end - start
+			low = middle + 1
+		else high = middle
 	}
-	return (documents ? decorate(content, documents) : content).replace(
-		/\u0001(\d+)\u0001/g,
-		(_, index: string) => heldLinks[Number(index)] ?? "",
-	)
+	return forward ? (boundaries[low] ?? end) : (boundaries[low - 1] ?? 0)
 }
-function decorate(content: string, documents: readonly DocumentLink[]) {
-	let held: string[] = []
-	let protectedContent = content.replace(/\\.|(`+)[\s\S]*?\1/g, value => {
-		held.push(
-			value.startsWith("`")
-				? html`<span class="syntax-code">${rawMarkup(value)}</span>`.value
-				: value,
-		)
-		return `\u0000${held.length - 1}\u0000`
-	})
-	return protectedContent
-		.replace(
-			/(?<!=)==(?!=)(?=\S)(.*?\S)(?<!=)==(?!=)/g,
-			localizeMarkup(
-				'<span class="syntax-highlight"><span class="syntax-marker">==</span>$1<span class="syntax-marker">==</span></span>',
-			),
-		)
-		.replace(
-			/\*\*(.+?)\*\*/g,
-			localizeMarkup(
-				'<span class="syntax-bold"><span class="syntax-marker">**</span>$1<span class="syntax-marker">**</span></span>',
-			),
-		)
-		.replace(/(\[\[.*?\]\])/g, (value: string) => {
-			let token = value.slice(2, -2).split("|")[0]
-			let doc = documents.find(doc => doc.id === token || doc.title === token)
-			return html`<span class="syntax-link" title="${doc?.title ?? token}"
-				>${rawMarkup(value)}</span
-			>`.value
-		})
-		.replace(
-			/\u0000(\d+)\u0000/g,
-			(_, index: string) => held[Number(index)] ?? "",
-		)
+
+let positionIndexes = new WeakMap<
+	Atom[],
+	{ ends: number[]; indices: Map<string, number> }
+>()
+function atomPositions(atoms: Atom[]) {
+	let indexed = positionIndexes.get(atoms)
+	if (indexed) return indexed
+	let ends: number[] = [],
+		indices = new Map<string, number>(),
+		offset = 0
+	for (let index = 0; index < atoms.length; index++) {
+		let atom = atoms[index]
+		if (!atom) continue
+		offset += atom.value.length
+		ends.push(offset)
+		indices.set(atom.id, index)
+	}
+	indexed = { ends, indices }
+	positionIndexes.set(atoms, indexed)
+	return indexed
 }

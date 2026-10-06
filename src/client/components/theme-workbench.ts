@@ -39,6 +39,7 @@ export interface ThemeSource {
 	):
 		| {
 				atoms: Atom[]
+				content: string
 				operation: Operation | null
 				saved: Effect.Effect<void, unknown>
 		  }

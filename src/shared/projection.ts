@@ -32,11 +32,108 @@ export function project(
 	source: string,
 	options: ProjectionOptions = {},
 ): Projection {
+	return new Projector().project(source, options)
+}
+
+interface TokenLine {
+	text: string
+	start: number
+	literal: boolean
+	tokens: LinkToken[]
+}
+export class Projector {
+	private lines: TokenLine[] = []
+	private documents = ""
+	project(source: string, options: ProjectionOptions = {}) {
+		let documents = options.documents ?? []
+		let key = documents.map(doc => doc.id + ":" + doc.title).join("\n")
+		let changed = key !== this.documents
+		this.documents = key
+		let texts = source.split("\n"),
+			offset = 0,
+			first = true
+		let prefix = 0,
+			suffix = 0
+		while (prefix < texts.length && this.lines[prefix]?.text === texts[prefix])
+			prefix++
+		while (
+			suffix < texts.length - prefix &&
+			suffix < this.lines.length - prefix &&
+			this.lines[this.lines.length - suffix - 1]?.text ===
+				texts[texts.length - suffix - 1]
+		)
+			suffix++
+		let fence: { marker: string; length: number } | undefined
+		let frontmatter = /^---\r?\n/.test(source)
+		let lines: TokenLine[] = [],
+			tokens: LinkToken[] = []
+		for (let index = 0; index < texts.length; index++) {
+			let text = texts[index] ?? "",
+				previousFence = fence,
+				start = offset
+			offset += text.length + 1
+			let literal = frontmatter
+			if (frontmatter) {
+				if (!first && /^(---|\.\.\.)\s*$/.test(text)) frontmatter = false
+				first = false
+			} else {
+				let opening = /^ {0,3}(`{3,}|~{3,})/.exec(text)
+				if (fence) {
+					if (
+						opening?.[1]?.[0] === fence.marker &&
+						(opening[1]?.length ?? 0) >= fence.length &&
+						!text.slice(opening[0].length).trim()
+					)
+						fence = undefined
+				} else if (opening?.[1])
+					fence = { marker: opening[1][0] ?? "`", length: opening[1].length }
+				literal =
+					Boolean(previousFence) || Boolean(fence) || /^( {4}|\t)/.test(text)
+			}
+			let previous =
+				index >= texts.length - suffix
+					? this.lines[this.lines.length - (texts.length - index)]
+					: this.lines[index]
+			let reusable =
+				previous &&
+				previous.text === text &&
+				previous.literal === literal &&
+				!(changed && text.includes("[["))
+			let line =
+				reusable && previous
+					? previous.start === start
+						? previous
+						: {
+								...previous,
+								start,
+								tokens: previous.tokens.map(token =>
+									shift(token, start - previous.start),
+								),
+							}
+					: {
+							text,
+							start,
+							literal,
+							tokens: literal ? [] : lineTokens(text, start, documents),
+						}
+			lines.push(line)
+			for (let token of line.tokens) tokens.push(token)
+		}
+		this.lines = lines
+		return projectTokens(source, options, tokens)
+	}
+}
+
+function projectTokens(
+	source: string,
+	options: ProjectionOptions,
+	tokens: LinkToken[],
+) {
 	let active = options.active && selectionBounds(source, options.active)
 	let links: ProjectedLink[] = []
 	let text = "",
 		copied = 0
-	for (let token of linkTokens(source, options.documents ?? [])) {
+	for (let token of tokens) {
 		if (active && token.end >= active.start && token.start <= active.end)
 			continue
 		text += source.slice(copied, token.start)
@@ -62,42 +159,58 @@ export function project(
 	return { source, text: text + source.slice(copied), links }
 }
 
-export function toView(projection: Projection, offset: number) {
-	let delta = 0
-	for (let link of projection.links) {
-		if (offset <= link.source.start) break
-		if (offset >= link.source.end) {
-			delta = link.view.end - link.source.end
-			continue
-		}
-		let view = link.view.start
-		for (let part of link.parts)
-			if (offset >= part.source)
-				view = part.view + Math.min(offset - part.source, part.length)
-		return view
+function linkBefore(
+	projection: Projection,
+	offset: number,
+	coordinates: "source" | "view",
+) {
+	let low = 0,
+		high = projection.links.length
+	while (low < high) {
+		let middle = (low + high) >>> 1
+		if ((projection.links[middle]?.[coordinates].start ?? Infinity) < offset)
+			low = middle + 1
+		else high = middle
 	}
-	return Math.max(0, Math.min(projection.text.length, offset + delta))
+	return projection.links[low - 1]
 }
-
+export function toView(projection: Projection, offset: number) {
+	let link = linkBefore(projection, offset, "source")
+	if (!link) return Math.max(0, Math.min(projection.text.length, offset))
+	if (offset >= link.source.end)
+		return Math.max(
+			0,
+			Math.min(
+				projection.text.length,
+				offset + link.view.end - link.source.end,
+			),
+		)
+	let view = link.view.start
+	for (let part of link.parts)
+		if (offset >= part.source)
+			view = part.view + Math.min(offset - part.source, part.length)
+	return view
+}
 export function toSource(
 	projection: Projection,
 	offset: number,
 	bias: "start" | "end" = "start",
 ) {
-	let delta = 0
-	for (let link of projection.links) {
-		if (offset <= link.view.start) break
-		if (offset >= link.view.end) {
-			delta = link.source.end - link.view.end
-			continue
-		}
-		let part = link.parts.find(
-			part => offset >= part.view && offset <= part.view + part.length,
+	let link = linkBefore(projection, offset, "view")
+	if (!link) return Math.max(0, Math.min(projection.source.length, offset))
+	if (offset >= link.view.end)
+		return Math.max(
+			0,
+			Math.min(
+				projection.source.length,
+				offset + link.source.end - link.view.end,
+			),
 		)
-		if (part) return part.source + offset - part.view
-		return bias === "start" ? link.source.start : link.source.end
-	}
-	return Math.max(0, Math.min(projection.source.length, offset + delta))
+	let part = link.parts.find(
+		part => offset >= part.view && offset <= part.view + part.length,
+	)
+	if (part) return part.source + offset - part.view
+	return bias === "start" ? link.source.start : link.source.end
 }
 
 // Applies a native textarea edit to the source. The edit is anchored at the
@@ -242,41 +355,6 @@ function moved(
 					: part,
 		),
 	}
-}
-
-function linkTokens(source: string, documents: readonly DocumentLink[]) {
-	let tokens: LinkToken[] = []
-	let offset = 0
-	let fence: { marker: string; length: number } | undefined
-	let frontmatter = /^---\r?\n/.test(source)
-	let first = true
-	for (let line of source.split("\n")) {
-		let start = offset
-		offset += line.length + 1
-		if (frontmatter) {
-			if (!first && /^(---|\.\.\.)\s*$/.test(line)) frontmatter = false
-			first = false
-			continue
-		}
-		let opening = /^ {0,3}(`{3,}|~{3,})/.exec(line)
-		if (fence) {
-			let marker = fence.marker
-			if (
-				opening?.[1]?.[0] === marker &&
-				(opening[1]?.length ?? 0) >= fence.length &&
-				!line.slice(opening[0].length).trim()
-			)
-				fence = undefined
-			continue
-		}
-		if (opening?.[1]) {
-			fence = { marker: opening[1][0] ?? "`", length: opening[1].length }
-			continue
-		}
-		if (/^( {4}|\t)/.test(line)) continue
-		tokens.push(...lineTokens(line, start, documents))
-	}
-	return tokens
 }
 
 function lineTokens(
