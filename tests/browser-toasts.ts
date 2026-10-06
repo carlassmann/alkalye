@@ -1,7 +1,7 @@
 import { mkdtempSync, readFileSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { assert, browser, evaluate, wait } from "./browser-driver"
+import { assert, browser, browserBatch, evaluate, wait } from "./browser-driver"
 
 let server = Bun.spawn(["bun", "tests/browser-document-app.ts", "--serve"], {
 	stdout: "pipe",
@@ -207,18 +207,22 @@ try {
 		),
 		"A short swipe against the dismiss direction springs back",
 	)
-	browser(session, "mouse", "move", String(x), String(y))
-	browser(session, "mouse", "down")
-	for (let step = 1; step <= 6; step++)
-		browser(session, "mouse", "move", String(x + step * 15), String(y))
-	browser(session, "mouse", "up")
-	assert(
-		evaluate(
-			session,
+	let swipe = browserBatch(session, [
+		["mouse", "move", String(x), String(y)],
+		["mouse", "down"],
+		...Array.from({ length: 6 }, (_, index) => [
+			"mouse",
+			"move",
+			String(x + (index + 1) * 15),
+			String(y),
+		]),
+		["mouse", "up"],
+		[
+			"eval",
 			`(() => { let item = document.querySelector("#toast [data-sonner-toast]"); return item.dataset.swipeOut === "true" && item.dataset.swipeDirection === "right" && item.dataset.removed === "true" })()`,
-		),
-		"Swiping right past the threshold dismisses the toast",
-	)
+		],
+	])
+	assert(swipe.result, "Swiping right past the threshold dismisses the toast")
 	settle()
 	browser(session, "mouse", "move", "10", "10")
 

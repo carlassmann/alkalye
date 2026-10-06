@@ -1,13 +1,12 @@
 import { spawnSync } from "node:child_process"
 import { object } from "../src/shared/model"
-// macOS Chromium can redispatch a malformed CDP key indefinitely after native
-// dialog dismissal. Suppress only that invalid event; real keys and IME remain native.
+// macOS Chromium can redispatch corrupt CDP keys indefinitely after native
+// shortcuts. Those trusted events lack timestamps; normal keys and IME stay native.
 let macCdpKeyboardGuard = `(() => {
  if (window.macCdpKeyboardGuardInstalled) return;
  window.macCdpKeyboardGuardInstalled = true;
  document.addEventListener("keydown", event => {
-  if (event.isTrusted && !event.isComposing && event.key === "Unidentified" &&
-      event.code === "Minus" && event.keyCode === 189 && event.timeStamp === 0) {
+  if (event.isTrusted && !event.isComposing && event.timeStamp === 0) {
    event.preventDefault();
    event.stopImmediatePropagation();
   }
