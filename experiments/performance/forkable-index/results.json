@@ -1,0 +1,418 @@
+{
+	"scope": "Eight single-sample public Replica V8 probes. Fresh closed context per sample. One sample per variant/size, no statistical inference. Heap readings after complete journey include fixtures, copies, validation and restored replica; no allocation proof. Only final both/1MiB trace retained because stop flag was initially misused; no cross-variant main-task comparison available.",
+	"samples": [
+		{
+			"variant": "native",
+			"size": 131072,
+			"result": {
+				"characters": 131104,
+				"phases": [
+					{
+						"milliseconds": 13.600000023841858,
+						"name": "first fork"
+					},
+					{
+						"milliseconds": 12,
+						"name": "second fork"
+					},
+					{
+						"milliseconds": 9.699999988079073,
+						"name": "third fork"
+					},
+					{
+						"milliseconds": 18.900000035762787,
+						"name": "cold source"
+					},
+					{
+						"milliseconds": 0.5999999642372131,
+						"name": "fork edit"
+					},
+					{
+						"milliseconds": 1,
+						"name": "owner edit"
+					},
+					{
+						"milliseconds": 0.10000002384185792,
+						"name": "merge"
+					},
+					{
+						"milliseconds": 0.3999999761581421,
+						"name": "undo"
+					},
+					{
+						"milliseconds": 70.59999996423721,
+						"name": "checkpoint restore"
+					}
+				],
+				"yielding": true
+			},
+			"memory": {
+				"limit": 4395630592,
+				"total": 243019220,
+				"used": 167827180
+			}
+		},
+		{
+			"variant": "native",
+			"size": 1048576,
+			"result": {
+				"characters": 1048608,
+				"phases": [
+					{
+						"milliseconds": 119.30000001192091,
+						"name": "first fork"
+					},
+					{
+						"milliseconds": 95.80000001192091,
+						"name": "second fork"
+					},
+					{
+						"milliseconds": 97,
+						"name": "third fork"
+					},
+					{
+						"milliseconds": 143.79999995231628,
+						"name": "cold source"
+					},
+					{
+						"milliseconds": 1.2000000476837158,
+						"name": "fork edit"
+					},
+					{
+						"milliseconds": 3.299999952316284,
+						"name": "owner edit"
+					},
+					{
+						"milliseconds": 0,
+						"name": "merge"
+					},
+					{
+						"milliseconds": 0.5,
+						"name": "undo"
+					},
+					{
+						"milliseconds": 660.6999999880791,
+						"name": "checkpoint restore"
+					}
+				],
+				"yielding": true
+			},
+			"memory": {
+				"limit": 4395630592,
+				"total": 1793535444,
+				"used": 1712188716
+			}
+		},
+		{
+			"variant": "atoms",
+			"size": 131072,
+			"result": {
+				"characters": 131104,
+				"phases": [
+					{
+						"milliseconds": 10,
+						"name": "first fork"
+					},
+					{
+						"milliseconds": 7.699999988079071,
+						"name": "second fork"
+					},
+					{
+						"milliseconds": 4.900000035762787,
+						"name": "third fork"
+					},
+					{
+						"milliseconds": 18.5,
+						"name": "cold source"
+					},
+					{
+						"milliseconds": 0.699999988079071,
+						"name": "fork edit"
+					},
+					{
+						"milliseconds": 1.100000023841858,
+						"name": "owner edit"
+					},
+					{
+						"milliseconds": 0.09999996423721312,
+						"name": "merge"
+					},
+					{
+						"milliseconds": 0.30000001192092896,
+						"name": "undo"
+					},
+					{
+						"milliseconds": 81.10000002384186,
+						"name": "checkpoint restore"
+					}
+				],
+				"yielding": true
+			},
+			"memory": {
+				"limit": 4395630592,
+				"total": 226835036,
+				"used": 170491700
+			}
+		},
+		{
+			"variant": "atoms",
+			"size": 1048576,
+			"result": {
+				"characters": 1048608,
+				"phases": [
+					{
+						"milliseconds": 72,
+						"name": "first fork"
+					},
+					{
+						"milliseconds": 59.5,
+						"name": "second fork"
+					},
+					{
+						"milliseconds": 54.69999998807907,
+						"name": "third fork"
+					},
+					{
+						"milliseconds": 179.70000004768372,
+						"name": "cold source"
+					},
+					{
+						"milliseconds": 1.199999988079071,
+						"name": "fork edit"
+					},
+					{
+						"milliseconds": 3.600000023841858,
+						"name": "owner edit"
+					},
+					{
+						"milliseconds": 0,
+						"name": "merge"
+					},
+					{
+						"milliseconds": 0.5,
+						"name": "undo"
+					},
+					{
+						"milliseconds": 700.9000000357628,
+						"name": "checkpoint restore"
+					}
+				],
+				"yielding": true
+			},
+			"memory": {
+				"limit": 4395630592,
+				"total": 1625799260,
+				"used": 1545047124
+			}
+		},
+		{
+			"variant": "children",
+			"size": 131072,
+			"result": {
+				"characters": 131104,
+				"phases": [
+					{
+						"milliseconds": 9.600000023841858,
+						"name": "first fork"
+					},
+					{
+						"milliseconds": 9,
+						"name": "second fork"
+					},
+					{
+						"milliseconds": 5.100000023841858,
+						"name": "third fork"
+					},
+					{
+						"milliseconds": 18.399999976158146,
+						"name": "cold source"
+					},
+					{
+						"milliseconds": 0.699999988079071,
+						"name": "fork edit"
+					},
+					{
+						"milliseconds": 1.100000023841858,
+						"name": "owner edit"
+					},
+					{
+						"milliseconds": 0.10000002384185792,
+						"name": "merge"
+					},
+					{
+						"milliseconds": 0.3999999761581421,
+						"name": "undo"
+					},
+					{
+						"milliseconds": 84.60000002384186,
+						"name": "checkpoint restore"
+					}
+				],
+				"yielding": true
+			},
+			"memory": {
+				"limit": 4395630592,
+				"total": 232192674,
+				"used": 182589246
+			}
+		},
+		{
+			"variant": "children",
+			"size": 1048576,
+			"result": {
+				"characters": 1048608,
+				"phases": [
+					{
+						"milliseconds": 69.60000002384186,
+						"name": "first fork"
+					},
+					{
+						"milliseconds": 50.19999998807907,
+						"name": "second fork"
+					},
+					{
+						"milliseconds": 51.39999997615814,
+						"name": "third fork"
+					},
+					{
+						"milliseconds": 139.10000002384186,
+						"name": "cold source"
+					},
+					{
+						"milliseconds": 1.300000011920929,
+						"name": "fork edit"
+					},
+					{
+						"milliseconds": 3.5,
+						"name": "owner edit"
+					},
+					{
+						"milliseconds": 0.09999996423721312,
+						"name": "merge"
+					},
+					{
+						"milliseconds": 0.30000001192092896,
+						"name": "undo"
+					},
+					{
+						"milliseconds": 736.5,
+						"name": "checkpoint restore"
+					}
+				],
+				"yielding": true
+			},
+			"memory": {
+				"limit": 4395630592,
+				"total": 1645492898,
+				"used": 1568271626
+			}
+		},
+		{
+			"variant": "both",
+			"size": 131072,
+			"result": {
+				"characters": 131104,
+				"phases": [
+					{
+						"milliseconds": 4.300000011920929,
+						"name": "first fork"
+					},
+					{
+						"milliseconds": 0.30000001192092896,
+						"name": "second fork"
+					},
+					{
+						"milliseconds": 0.19999998807907104,
+						"name": "third fork"
+					},
+					{
+						"milliseconds": 21.600000023841854,
+						"name": "cold source"
+					},
+					{
+						"milliseconds": 0.699999988079071,
+						"name": "fork edit"
+					},
+					{
+						"milliseconds": 1.199999988079071,
+						"name": "owner edit"
+					},
+					{
+						"milliseconds": 0.10000002384185792,
+						"name": "merge"
+					},
+					{
+						"milliseconds": 0.3999999761581421,
+						"name": "undo"
+					},
+					{
+						"milliseconds": 92.60000002384186,
+						"name": "checkpoint restore"
+					}
+				],
+				"yielding": true
+			},
+			"memory": {
+				"limit": 4395630592,
+				"total": 217283136,
+				"used": 146332700
+			}
+		},
+		{
+			"variant": "both",
+			"size": 1048576,
+			"result": {
+				"characters": 1048608,
+				"phases": [
+					{
+						"milliseconds": 15.5,
+						"name": "first fork"
+					},
+					{
+						"milliseconds": 0.40000003576278687,
+						"name": "second fork"
+					},
+					{
+						"milliseconds": 0.09999996423721312,
+						"name": "third fork"
+					},
+					{
+						"milliseconds": 144.4000000357628,
+						"name": "cold source"
+					},
+					{
+						"milliseconds": 1.2000000476837158,
+						"name": "fork edit"
+					},
+					{
+						"milliseconds": 3.5,
+						"name": "owner edit"
+					},
+					{
+						"milliseconds": 0.19999998807907104,
+						"name": "merge"
+					},
+					{
+						"milliseconds": 0.2999999523162842,
+						"name": "undo"
+					},
+					{
+						"milliseconds": 799.1999999880791,
+						"name": "checkpoint restore"
+					}
+				],
+				"yielding": true
+			},
+			"memory": {
+				"limit": 4395630592,
+				"total": 1482914368,
+				"used": 1406013848
+			}
+		}
+	],
+	"finalTrace": {
+		"mainTasks": 104,
+		"largestMilliseconds": 1542.833,
+		"includesSynchronousValidationReadsAndCheckpointRestore": true
+	}
+}
