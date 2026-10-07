@@ -55,3 +55,36 @@ At 1MiB, checkpoint plus restore improved from 811.4 ms to 768.7 ms but remained
 The membership set is bounded by distinct replaced keys in the initial native base, but that bound can be document-sized. Copying it remains synchronous. Persistent additions continue accumulating. Neither these single samples nor the 4,096-key probe establish safe worst-case task bounds. Production remains unchanged.
 
 written with gpt-6 in codex
+
+## Rejected child-value traversal, then empty-overlay guard
+
+The public journey now times checkpoint creation and restoration separately. First-fork measurements start from a live edit with a large insertion operation to freeze. They do not attribute freeze cost in an actual cache-hydrated app session, which may retain different operation facts.
+
+`child-values-index.ts` derives child-map keys from the first sibling's immutable `after`, preserving the empty-string root key. This avoids entry tuples when iterating base values. Child arrays must be nonempty, with all siblings sharing that parent. Existing public contracts and Opus review found no invariant violation. Generic iteration remains available for other indexes.
+
+```sh
+bun experiments/performance/forkable-index/prepare.ts /tmp/alkalye-child-values-experiment experiments/performance/forkable-index/child-values-index.ts . --child-parent
+bun test /tmp/alkalye-child-values-experiment/contracts.test.ts
+```
+
+Eight fresh-context V8 samples used the frozen `8d2a063` source, comparing four variants at 128KiB and 1MiB. Each phase is a single sample, not a significance test. Types and 109 public tests with 1,026 assertions passed.
+
+| 1MiB phase |   Native | Previous shared | Membership | Child-key values |
+| ---------- | -------: | --------------: | ---------: | ---------------: |
+| Checkpoint |  71.2 ms |        160.6 ms |   118.1 ms |         117.3 ms |
+| Restore    | 585.1 ms |        655.3 ms |   647.8 ms |         659.1 ms |
+
+Child-key traversal did not remove the regression. Reject that added complexity. The remaining checkpoint penalty is distinct from restoration cost; source inspection suggests generator and membership work per retained parent, but these phase timings do not establish CPU attribution.
+
+`empty-overlay-index.ts` adds one guard to the membership variant: avoid Effect `HashMap.has` when the overlay is empty. Installed Effect hashes the key unconditionally in `has`, so the earlier prototype hashed every long insertion identity during initial native restoration. This change preserves the existing membership representation.
+
+```sh
+bun experiments/performance/forkable-index/prepare.ts /tmp/alkalye-empty-overlay-experiment experiments/performance/forkable-index/empty-overlay-index.ts
+bun test /tmp/alkalye-empty-overlay-experiment/contracts.test.ts
+```
+
+Six fresh-context 1MiB journeys ran in two rounds of native, membership and guarded membership. Same frozen source and fixture; public contracts and types passed. Restore time was 585.9 / 583.1 ms native, 636.7 / 649.5 ms membership, and 593.5 / 603.3 ms guarded. The guard removed most of the restoration penalty. Checkpoint remained slower: 71.7 / 70.9 ms native versus 117.7 / 128.2 ms guarded. Two observations do not establish statistical confidence or task bounds.
+
+Raw results are in `child-values-results.json` and `empty-overlay-results.json`. Large traces remain outside Git. Production keeps native indexes. Do not adopt the shared representation before resolving its checkpoint regression and measuring actual accepted/passive-cache reopening.
+
+written with gpt-6 in codex

@@ -6,6 +6,7 @@ if (!destination) throw new Error("Temporary output directory required")
 destination = resolve(destination)
 let project = resolve(Bun.argv[4] ?? process.cwd())
 let indexPath = Bun.argv[3] ?? import.meta.dir + "/index.ts"
+let deriveChildParent = Bun.argv[5] === "--child-parent"
 let original = await Bun.file("src/shared/crdt.ts").text()
 
 function replace(source: string, before: string, after: string) {
@@ -50,9 +51,22 @@ for (let variant of ["native", "atoms", "children", "both"]) {
 			throw new Error("Child index fallback anchors changed")
 		source = source.replaceAll(
 			fallback,
-			"this.children.get(target) ?? new ForkableIndex<Atom[]>()",
+			deriveChildParent
+				? "this.children.get(target) ?? new ForkableIndex<Atom[]>(siblingParent)"
+				: "this.children.get(target) ?? new ForkableIndex<Atom[]>()",
 		)
 	}
+	if (deriveChildParent && (variant === "children" || variant === "both"))
+		source = replace(
+			source,
+			"export class Replica {",
+			`function siblingParent(siblings: Atom[]) {
+ let first = siblings[0]
+ if(!first) throw new Error("Child arrays must be nonempty")
+ return first.after
+}
+export class Replica {`,
+		)
 	await Bun.write(directory + "/src/shared/crdt.ts", source)
 	await cp(indexPath, directory + "/src/shared/forkable-index.ts")
 	let journey = await Bun.file(import.meta.dir + "/journey.ts").text()

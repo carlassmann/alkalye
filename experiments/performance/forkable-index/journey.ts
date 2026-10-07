@@ -75,9 +75,8 @@ async function run(yielding: boolean) {
 	)
 	equal(second.text("document"), source)
 	let restored = new Replica("restored")
-	await measure("checkpoint restore", () =>
-		restored.restore(first.checkpoint()),
-	)
+	let checkpoint = await measure("checkpoint", () => first.checkpoint())
+	await measure("restore", () => restored.restore(checkpoint))
 	equal(restored.text("document"), first.text("document"))
 	if (restored.metadata("document").title !== "Index experiment")
 		throw new Error("Frontmatter metadata changed")
