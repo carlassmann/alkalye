@@ -114,3 +114,13 @@ bun experiments/performance/forkable-index/app-journey.ts /tmp/config.json /tmp/
 Current-source types and 131 public tests with 1,123 assertions passed, including SQLite passive-session isolation, interruption, frontmatter, recovery and a 64-edit Unicode branch/checkpoint comparison. Opus 5.5 found no correctness blocker; it flagged permanently growing overlays, synchronous override-set copying, mutation during iteration and unmeasured server behavior. Keep this experimental until those tradeoffs are consciously reviewed.
 
 written with gpt-6 in codex
+
+## Undo acceptance attribution
+
+One separate V8-sampled diagnostic per variant used the same frozen client/backend fixtures. These sampler timings are excluded from the three-pair opening comparison. `app-profile-results.json` records source-mapped self and inclusive samples from the longest renderer task after undo began.
+
+Native's 966 ms task resumes inside `indexeddb-journal.ts:585`, then enters `buildOptionalAction`: 821 ms inclusive, of which checkpoint cloning takes 662 ms and `Replica.restore` 628 ms. Building the inverse then reads a cold view for another 159 ms. GC contributes 113 ms of sampled self time. The prototype's corresponding task is 976 ms: clone 701 ms, restore 623 ms and inverse/view 148 ms. Checkpoint collection copying costs 219 ms versus native's 184 ms.
+
+The direct target is synchronous full-state staging through `restore(checkpoint())`, followed by cold materialization. Replacing that staging with an independently forked replica can preserve isolation while removing unnecessary checkpoint copying, restoration and cold scans. That change requires its own public contracts and matched app measurement. Neither the shared-index cutover nor automatic compaction follows from this diagnosis.
+
+written with gpt-6 in codex

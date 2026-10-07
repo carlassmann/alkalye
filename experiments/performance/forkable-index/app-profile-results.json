@@ -1,0 +1,549 @@
+{
+  "source": "660423c",
+  "server": "native current-source backend for both clients",
+  "fixture": "1MiB,512longparagraphs",
+  "method": "One diagnostic V8-sampled accepted edit and undo per variant; identical restored disposable DB/profile and frozen assets. Select longest renderer task after accepted-undo:start. Filter sampler by matching main-thread Profile process/id, then source-map node locations. Timings are diagnostic and not merged into n3 app timing results.",
+  "result": "Both longest tasks resume from IndexedDB transaction completion into buildOptionalAction, cloning the full checkpoint and restoring it, then scanning a cold inverse view. Prototype adds checkpoint-copy work. No background-cache compaction attribution.",
+  "samples": [
+    {
+      "variant": "baseline",
+      "longestTaskMilliseconds": 966.108,
+      "sampledMilliseconds": 966.166,
+      "self": [
+        {
+          "source": "../src/shared/crdt.ts:1463:indexAtom",
+          "milliseconds": 323.48
+        },
+        {
+          "source": "../src/shared/crdt.ts:1131:restoreStateSteps",
+          "milliseconds": 214.62
+        },
+        {
+          "source": "(garbage collector)",
+          "milliseconds": 112.76
+        },
+        {
+          "source": "../src/shared/crdt.ts:787:rawVisibleSteps",
+          "milliseconds": 43.24
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:375:ee",
+          "milliseconds": 38.48
+        },
+        {
+          "source": "../src/shared/crdt.ts:1292:validateSnapshotOwnerSteps",
+          "milliseconds": 35.29
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:219:active",
+          "milliseconds": 34.15
+        },
+        {
+          "source": "(program)",
+          "milliseconds": 31.0
+        },
+        {
+          "source": "../src/shared/crdt.ts:1520:qr",
+          "milliseconds": 23.2
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:245:hidden",
+          "milliseconds": 22.4
+        },
+        {
+          "source": "../src/shared/crdt.ts:1511:Lt",
+          "milliseconds": 20.39
+        },
+        {
+          "source": "../src/shared/crdt.ts:1049:checkpointSteps",
+          "milliseconds": 19.05
+        },
+        {
+          "source": "../src/shared/crdt.ts:1127:restoreState",
+          "milliseconds": 10.19
+        },
+        {
+          "source": "../src/shared/collection-copy.ts:35:D",
+          "milliseconds": 9.24
+        },
+        {
+          "source": "../src/shared/atom-sequence.ts:52:c",
+          "milliseconds": 4.95
+        },
+        {
+          "source": "../src/shared/atom-sequence.ts:63:l",
+          "milliseconds": 3.88
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaAST.js:2310:Fl.ci.expected",
+          "milliseconds": 2.89
+        },
+        {
+          "source": "../src/shared/crdt.ts:895:text",
+          "milliseconds": 2.49
+        },
+        {
+          "source": "../src/shared/model.ts:413:Pe",
+          "milliseconds": 1.98
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:400:Ke",
+          "milliseconds": 1.88
+        },
+        {
+          "source": "../src/shared/model.ts:395:je",
+          "milliseconds": 1.83
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:170:s",
+          "milliseconds": 0.81
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/schema/interpreter.js:87:d",
+          "milliseconds": 0.76
+        },
+        {
+          "source": "../src/shared/atom-sequence.ts:70:",
+          "milliseconds": 0.61
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:352:removeSteps",
+          "milliseconds": 0.54
+        }
+      ],
+      "inclusive": [
+        {
+          "source": "(root)",
+          "milliseconds": 966.17
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:441:runLoop",
+          "milliseconds": 822.1
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:406:evaluate",
+          "milliseconds": 822.1
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:812:",
+          "milliseconds": 822.1
+        },
+        {
+          "source": "../src/platform/indexeddb-journal.ts:585:s.oncomplete",
+          "milliseconds": 822.1
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:717:mt",
+          "milliseconds": 821.5
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:766:",
+          "milliseconds": 821.35
+        },
+        {
+          "source": "../src/shared/document-actions.ts:264:",
+          "milliseconds": 820.9
+        },
+        {
+          "source": "../src/shared/document-actions.ts:762:vn",
+          "milliseconds": 661.91
+        },
+        {
+          "source": "../src/shared/crdt.ts:1127:restoreState",
+          "milliseconds": 628.32
+        },
+        {
+          "source": "../src/shared/crdt.ts:1098:restore",
+          "milliseconds": 628.32
+        },
+        {
+          "source": "../src/shared/crdt.ts:1131:restoreStateSteps",
+          "milliseconds": 617.82
+        },
+        {
+          "source": "../src/shared/crdt.ts:1463:indexAtom",
+          "milliseconds": 346.67
+        },
+        {
+          "source": "../src/shared/collection-copy.ts:35:D",
+          "milliseconds": 184.41
+        },
+        {
+          "source": "../src/shared/document-actions.ts:543:yn",
+          "milliseconds": 158.7
+        },
+        {
+          "source": "../src/shared/document-actions.ts:363:",
+          "milliseconds": 158.7
+        },
+        {
+          "source": "../src/shared/crdt.ts:895:text",
+          "milliseconds": 158.25
+        },
+        {
+          "source": "../src/shared/crdt.ts:747:visible",
+          "milliseconds": 150.36
+        },
+        {
+          "source": "../src/shared/crdt.ts:781:rawVisible",
+          "milliseconds": 145.47
+        },
+        {
+          "source": "../src/shared/crdt.ts:787:rawVisibleSteps",
+          "milliseconds": 138.26
+        },
+        {
+          "source": "(garbage collector)",
+          "milliseconds": 112.76
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:245:hidden",
+          "milliseconds": 95.03
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:219:active",
+          "milliseconds": 72.62
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:375:ee",
+          "milliseconds": 38.48
+        },
+        {
+          "source": "../src/shared/crdt.ts:1292:validateSnapshotOwnerSteps",
+          "milliseconds": 35.29
+        },
+        {
+          "source": "../src/shared/crdt.ts:1036:checkpoint",
+          "milliseconds": 33.59
+        },
+        {
+          "source": "../src/shared/crdt.ts:1049:checkpointSteps",
+          "milliseconds": 31.75
+        },
+        {
+          "source": "(program)",
+          "milliseconds": 31.0
+        },
+        {
+          "source": "../src/shared/crdt.ts:1520:qr",
+          "milliseconds": 23.2
+        },
+        {
+          "source": "../src/shared/crdt.ts:1511:Lt",
+          "milliseconds": 20.39
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:301:restoreSteps",
+          "milliseconds": 7.31
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaParser.js:829:",
+          "milliseconds": 6.42
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Schema.js:942:",
+          "milliseconds": 6.27
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaAST.js:1581:",
+          "milliseconds": 6.08
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaAST.js:2009:",
+          "milliseconds": 6.08
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:352:removeSteps",
+          "milliseconds": 6.06
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/schema/interpreter.js:87:d",
+          "milliseconds": 5.97
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaAST.js:1268:onItem",
+          "milliseconds": 5.88
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2214:o",
+          "milliseconds": 5.88
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaAST.js:1180:p",
+          "milliseconds": 5.88
+        }
+      ]
+    },
+    {
+      "variant": "prototype",
+      "longestTaskMilliseconds": 975.858,
+      "sampledMilliseconds": 975.838,
+      "self": [
+        {
+          "source": "../src/shared/crdt.ts:1132:restoreStateSteps",
+          "milliseconds": 219.44
+        },
+        {
+          "source": "../src/shared/crdt.ts:1464:indexAtom",
+          "milliseconds": 105.73
+        },
+        {
+          "source": "../src/shared/forkable-index.ts:19:get",
+          "milliseconds": 104.51
+        },
+        {
+          "source": "(garbage collector)",
+          "milliseconds": 104.07
+        },
+        {
+          "source": "../src/shared/forkable-index.ts:27:has",
+          "milliseconds": 68.09
+        },
+        {
+          "source": "../src/shared/forkable-index.ts:33:set",
+          "milliseconds": 63.9
+        },
+        {
+          "source": "../src/shared/forkable-index.ts:74:updatedValues",
+          "milliseconds": 44.13
+        },
+        {
+          "source": "../src/shared/crdt.ts:1293:validateSnapshotOwnerSteps",
+          "milliseconds": 36.83
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:219:active",
+          "milliseconds": 32.95
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:375:ee",
+          "milliseconds": 32.62
+        },
+        {
+          "source": "../src/shared/crdt.ts:1521:ai",
+          "milliseconds": 28.45
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:245:hidden",
+          "milliseconds": 24.55
+        },
+        {
+          "source": "../src/shared/crdt.ts:1512:Vt",
+          "milliseconds": 21.32
+        },
+        {
+          "source": "(program)",
+          "milliseconds": 20.18
+        },
+        {
+          "source": "../src/shared/crdt.ts:1050:checkpointSteps",
+          "milliseconds": 19.32
+        },
+        {
+          "source": "../src/shared/collection-copy.ts:35:D",
+          "milliseconds": 8.68
+        },
+        {
+          "source": "../src/shared/crdt.ts:1128:restoreState",
+          "milliseconds": 8.04
+        },
+        {
+          "source": "../src/shared/crdt.ts:788:rawVisibleSteps",
+          "milliseconds": 7.41
+        },
+        {
+          "source": "../src/shared/atom-sequence.ts:52:c",
+          "milliseconds": 4.26
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaAST.js:2310:Gl.Ei.expected",
+          "milliseconds": 2.58
+        },
+        {
+          "source": "../src/shared/crdt.ts:896:text",
+          "milliseconds": 2.57
+        },
+        {
+          "source": "../src/shared/atom-sequence.ts:63:l",
+          "milliseconds": 2.44
+        },
+        {
+          "source": "../src/shared/model.ts:413:Pe",
+          "milliseconds": 1.67
+        },
+        {
+          "source": "../src/shared/model.ts:395:je",
+          "milliseconds": 1.6
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:400:Qe",
+          "milliseconds": 1.37
+        }
+      ],
+      "inclusive": [
+        {
+          "source": "(root)",
+          "milliseconds": 975.84
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:441:runLoop",
+          "milliseconds": 850.64
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:406:evaluate",
+          "milliseconds": 850.64
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:812:",
+          "milliseconds": 850.64
+        },
+        {
+          "source": "../src/platform/indexeddb-journal.ts:585:s.oncomplete",
+          "milliseconds": 850.64
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:717:ht",
+          "milliseconds": 850.34
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:766:",
+          "milliseconds": 850.18
+        },
+        {
+          "source": "../src/shared/document-actions.ts:264:",
+          "milliseconds": 849.74
+        },
+        {
+          "source": "../src/shared/document-actions.ts:762:Un",
+          "milliseconds": 701.08
+        },
+        {
+          "source": "../src/shared/crdt.ts:1128:restoreState",
+          "milliseconds": 622.66
+        },
+        {
+          "source": "../src/shared/crdt.ts:1099:restore",
+          "milliseconds": 622.66
+        },
+        {
+          "source": "../src/shared/crdt.ts:1132:restoreStateSteps",
+          "milliseconds": 614.17
+        },
+        {
+          "source": "../src/shared/crdt.ts:1464:indexAtom",
+          "milliseconds": 336.56
+        },
+        {
+          "source": "../src/shared/collection-copy.ts:35:D",
+          "milliseconds": 218.99
+        },
+        {
+          "source": "../src/shared/document-actions.ts:363:",
+          "milliseconds": 148.5
+        },
+        {
+          "source": "../src/shared/document-actions.ts:543:On",
+          "milliseconds": 148.35
+        },
+        {
+          "source": "../src/shared/crdt.ts:896:text",
+          "milliseconds": 148.04
+        },
+        {
+          "source": "../src/shared/crdt.ts:748:visible",
+          "milliseconds": 140.45
+        },
+        {
+          "source": "../src/shared/crdt.ts:782:rawVisible",
+          "milliseconds": 136.4
+        },
+        {
+          "source": "../src/shared/crdt.ts:788:rawVisibleSteps",
+          "milliseconds": 130.02
+        },
+        {
+          "source": "../src/shared/forkable-index.ts:19:get",
+          "milliseconds": 104.51
+        },
+        {
+          "source": "(garbage collector)",
+          "milliseconds": 104.07
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:245:hidden",
+          "milliseconds": 90.12
+        },
+        {
+          "source": "../src/shared/crdt.ts:1037:checkpoint",
+          "milliseconds": 78.35
+        },
+        {
+          "source": "../src/shared/crdt.ts:1050:checkpointSteps",
+          "milliseconds": 76.2
+        },
+        {
+          "source": "../src/shared/forkable-index.ts:27:has",
+          "milliseconds": 68.09
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:219:active",
+          "milliseconds": 65.57
+        },
+        {
+          "source": "../src/shared/forkable-index.ts:33:set",
+          "milliseconds": 63.9
+        },
+        {
+          "source": "../src/shared/forkable-index.ts:74:updatedValues",
+          "milliseconds": 44.13
+        },
+        {
+          "source": "../src/shared/crdt.ts:1293:validateSnapshotOwnerSteps",
+          "milliseconds": 36.83
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:375:ee",
+          "milliseconds": 32.62
+        },
+        {
+          "source": "../src/shared/crdt.ts:1521:ai",
+          "milliseconds": 28.45
+        },
+        {
+          "source": "../src/shared/crdt.ts:1512:Vt",
+          "milliseconds": 21.32
+        },
+        {
+          "source": "(program)",
+          "milliseconds": 20.18
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:301:restoreSteps",
+          "milliseconds": 6.59
+        },
+        {
+          "source": "../src/shared/text-visibility.ts:352:removeSteps",
+          "milliseconds": 5.54
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaParser.js:829:",
+          "milliseconds": 5.41
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Schema.js:942:",
+          "milliseconds": 5.27
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaAST.js:1581:",
+          "milliseconds": 5.03
+        },
+        {
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaAST.js:1180:p",
+          "milliseconds": 5.03
+        }
+      ]
+    }
+  ],
+  "rawTraces": "/tmp/alkalye-guarded-app-660/{baseline,prototype}-profile-0/1m-512-checkpoint.trace.json",
+  "author": "written with gpt-6 in codex"
+}
