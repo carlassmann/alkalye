@@ -1,4 +1,3 @@
-import { spawnSync } from "node:child_process"
 import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
@@ -193,26 +192,17 @@ if (process.argv.includes("--serve")) {
 			"#editor",
 			"# Polling collaboration\n\nRecovered from a silent socket.",
 		)
-		let recovered = spawnSync(
-			"agent-browser",
-			[
-				"--session",
-				owner,
-				"--json",
-				"eval",
-				'new Promise((resolve,reject)=>{let deadline=Date.now()+34000;function check(){if(window.liveSocketConnections>1&&document.querySelector("#editor")?.value.includes("Recovered from a silent socket.")){resolve(true);return}if(Date.now()>=deadline){reject(new Error("Silent socket recovery timed out"));return}requestAnimationFrame(check)}check()})',
-			],
-			{
-				encoding: "utf8",
-				timeout: 38000,
-				env: {
-					...process.env,
-					AGENT_BROWSER_HEADED: "false",
-					AGENT_BROWSER_DEFAULT_TIMEOUT: "20000",
-				},
-			},
-		)
-		if (recovered.status !== 0)
+		let recovered = false
+		let recoveryDeadline = Date.now() + 34000
+		while (!recovered && Date.now() < recoveryDeadline) {
+			let remaining = Math.min(10000, recoveryDeadline - Date.now())
+			recovered =
+				evaluate(
+					owner,
+					`new Promise(resolve=>{let deadline=Date.now()+${remaining};function check(){if(window.liveSocketConnections>1&&document.querySelector("#editor")?.value.includes("Recovered from a silent socket.")){resolve(true);return}if(Date.now()>=deadline){resolve(false);return}requestAnimationFrame(check)}check()})`,
+				) === true
+		}
+		if (!recovered)
 			console.log(
 				"Silent socket recovery state",
 				evaluate(
@@ -221,11 +211,8 @@ if (process.argv.includes("--serve")) {
 				),
 			)
 		assert(
-			recovered.status === 0,
-			"silent socket recovery finishes within its bounded timeout" +
-				(recovered.status === 0
-					? ""
-					: ": " + recovered.stdout + recovered.stderr),
+			recovered,
+			"silent socket recovery finishes within its bounded timeout",
 		)
 		assert(
 			true,
