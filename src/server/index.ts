@@ -1,3 +1,5 @@
+import { EmailAuthentication } from "./email-authentication"
+import { EmailDelivery } from "./email-delivery"
 import * as HttpClient from "effect/http/HttpClient"
 import * as FetchHttpClient from "effect/http/FetchHttpClient"
 import * as Context from "effect/Context"
@@ -45,7 +47,13 @@ export function serverLayer(options: ServerOptions = {}) {
 			return Sessions.layer(resolve(settings.data, "accounts.sqlite"))
 		}),
 	).pipe(Layer.provideMerge(secrets))
-	let origins = requestOriginLayer.pipe(Layer.provideMerge(sessions))
+	let emails = Layer.unwrap(
+		Effect.gen(function* () {
+			let settings = yield* RelaySettings
+			return EmailAuthentication.layer(resolve(settings.data, "email.sqlite"))
+		}),
+	).pipe(Layer.provideMerge(Layer.merge(sessions, EmailDelivery.layer)))
+	let origins = requestOriginLayer.pipe(Layer.provideMerge(emails))
 	let documents = Layer.unwrap(
 		Effect.gen(function* () {
 			let settings = yield* RelaySettings

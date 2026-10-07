@@ -1,3 +1,4 @@
+import { emailApiHandlers } from "./email-api"
 import * as Context from "effect/Context"
 import * as Effect from "effect/Effect"
 import * as Layer from "effect/Layer"
@@ -200,6 +201,7 @@ function makeAccountApplication() {
 			Layer.provide(
 				Layer.mergeAll(
 					login,
+					emailApiHandlers,
 					account,
 					agents,
 					documentApiHandlers.pipe(

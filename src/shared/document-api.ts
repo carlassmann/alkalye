@@ -1,3 +1,7 @@
+import {
+	emailAuthenticationGroup,
+	accountEmailGroup,
+} from "./email-authentication"
 import * as HttpApi from "effect/http-api/HttpApi"
 import * as HttpApiEndpoint from "effect/http-api/HttpApiEndpoint"
 import * as HttpApiGroup from "effect/http-api/HttpApiGroup"
@@ -73,6 +77,8 @@ let documentParams = { document: IdentifierSchema }
 export let DocumentApi = HttpApi.make("DocumentApi").add(
 	AccountApi.groups.authentication,
 	AccountApi.groups.account,
+	emailAuthenticationGroup,
+	accountEmailGroup,
 	HttpApiGroup.make("preferences")
 		.add(
 			HttpApiEndpoint.get("get", "/api/accounts/preferences", {
