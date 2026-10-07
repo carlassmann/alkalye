@@ -55,6 +55,8 @@ export class EditorViewport {
 	private fragmentLayout = ""
 	private prefix = ""
 	private directions = new Map<number, "ltr" | "rtl">()
+	private measuredHostStyle = ""
+	private measuringContext = document.createElement("canvas").getContext("2d")
 	private dragging = false
 	private lastScroll = 0
 	private pointerDocument = false
@@ -202,7 +204,16 @@ export class EditorViewport {
 			this.paint()
 		})
 		this.resize.observe(host)
-		this.mutation = new MutationObserver(() => this.remeasure())
+		this.mutation = new MutationObserver(records => {
+			if (
+				records.some(
+					record =>
+						record.target !== host ||
+						(host.getAttribute("style") ?? "") !== this.measuredHostStyle,
+				)
+			)
+				this.remeasure()
+		})
 		this.mutation.observe(document.documentElement, {
 			attributes: true,
 			attributeFilter: ["class", "style"],
@@ -216,6 +227,9 @@ export class EditorViewport {
 			() => {
 				this.layoutKey = ""
 				this.fragmentHeight = 0
+				this.measuringContext = document
+					.createElement("canvas")
+					.getContext("2d")
 				this.remeasure()
 			},
 			{
@@ -440,21 +454,20 @@ export class EditorViewport {
 		delete this.scrollElement.dataset.editorViewport
 	}
 	private styleMeasurement() {
+		let outerWidth = this.scrollElement.clientWidth
+		let before = getComputedStyle(this.element)
+		let paddingLeft = parseFloat(before.paddingLeft)
+		let paddingRight = parseFloat(before.paddingRight)
 		this.element.style.removeProperty("line-height")
 		let style = getComputedStyle(this.element)
-		let requested =
-			parseFloat(style.lineHeight) || parseFloat(style.fontSize) * 1.8
+		let font = style.font
+		let fontSize = parseFloat(style.fontSize)
+		let requested = parseFloat(style.lineHeight) || fontSize * 1.8
 		let height = Math.round(requested * 64) / 64 + "px"
-		this.element.style.lineHeight = height
-		if (
-			this.scrollElement.style.getPropertyValue(
-				"--editor-native-line-height",
-			) !== height
-		)
-			this.scrollElement.style.setProperty(
-				"--editor-native-line-height",
-				height,
-			)
+		let letterSpacing = style.letterSpacing
+		let direction = style.direction
+		let width = Math.max(1, outerWidth - paddingLeft - paddingRight)
+		let properties: [string, string][] = []
 		for (let property of [
 			"font",
 			"letter-spacing",
@@ -466,30 +479,30 @@ export class EditorViewport {
 			"text-align",
 			"unicode-bidi",
 		])
-			this.measure.style.setProperty(property, style.getPropertyValue(property))
-		let width = Math.max(
-			1,
-			this.scrollElement.clientWidth -
-				parseFloat(style.paddingLeft) -
-				parseFloat(style.paddingRight),
+			properties.push([property, style.getPropertyValue(property)])
+		this.element.style.lineHeight = height
+		if (
+			this.scrollElement.style.getPropertyValue(
+				"--editor-native-line-height",
+			) !== height
 		)
+			this.scrollElement.style.setProperty(
+				"--editor-native-line-height",
+				height,
+			)
+		this.measuredHostStyle = this.scrollElement.getAttribute("style") ?? ""
+		for (let [property, value] of properties)
+			this.measure.style.setProperty(property, value)
+		this.measure.style.lineHeight = height
 		this.measure.style.width = width + "px"
 		this.contentWidth = width
-		this.lineHeight =
-			parseFloat(style.lineHeight) || parseFloat(style.fontSize) * 1.8
-		let canvas = document.createElement("canvas").getContext("2d")
-		if (canvas) canvas.font = style.font
+		this.lineHeight = parseFloat(height)
+		if (this.measuringContext) this.measuringContext.font = font
 		this.averageWidth =
-			(canvas?.measureText("M").width ?? parseFloat(style.fontSize)) +
-			(parseFloat(style.letterSpacing) || 0)
+			(this.measuringContext?.measureText("M").width ?? fontSize) +
+			(parseFloat(letterSpacing) || 0)
 		return (
-			width +
-			":" +
-			style.font +
-			":" +
-			style.letterSpacing +
-			":" +
-			style.direction
+			width + ":" + font + ":" + height + ":" + letterSpacing + ":" + direction
 		)
 	}
 	private blockBoundary(offset: number, start: number) {

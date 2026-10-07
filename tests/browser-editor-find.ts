@@ -158,6 +158,33 @@ try {
 		true,
 		"Replacing dense text restores bounded native windows and document scrolling",
 	)
+	evaluate(
+		session,
+		`(() => {
+		window.previousEditorLineHeight = document.documentElement.style.getPropertyValue("--editor-line-height");
+		window.lineHeightSelection = document.querySelector("alkalye-editor").source.selectionStart;
+		document.documentElement.style.setProperty("--editor-line-height", "2.25");
+	})()`,
+	)
+	wait(
+		session,
+		'(() => {let native=document.querySelector("#editor"), line=document.querySelector("[data-editor-line]"), height=Math.round(parseFloat(getComputedStyle(native).fontSize)*2.25*64)/64; return parseFloat(getComputedStyle(native).lineHeight)===height && parseFloat(getComputedStyle(line).lineHeight)===height})()',
+	)
+	assert(
+		evaluate(
+			session,
+			`document.querySelector("alkalye-editor").source.value === ${JSON.stringify(ordinary)} && document.querySelector("alkalye-editor").source.selectionStart === window.lineHeightSelection`,
+		),
+		"Changing line spacing keeps native and painted rows aligned without moving the source selection",
+	)
+	evaluate(
+		session,
+		'(() => {let root=document.documentElement; if(window.previousEditorLineHeight)root.style.setProperty("--editor-line-height",window.previousEditorLineHeight);else root.style.removeProperty("--editor-line-height")})()',
+	)
+	wait(
+		session,
+		'(() => {let native=document.querySelector("#editor"), height=Math.round(parseFloat(getComputedStyle(native).fontSize)*Number(window.previousEditorLineHeight || "1.8")*64)/64;return Math.abs(parseFloat(getComputedStyle(native).lineHeight)-height)<0.001})()',
+	)
 } finally {
 	try {
 		browser(session, "close")

@@ -1618,14 +1618,17 @@ function createEditorView(
 		)
 		if (!result) return false
 		text.replace(result.source, result.selection.start, result.selection.end)
-		if (result.source !== atoms.map(atom => atom.value).join(""))
+		if (result.source !== acceptedSource)
 			textarea.dispatchEvent(new Event("input"))
 		return true
 	}
 
 	function showCompletions(explicit = false) {
 		let editor = text
-		let before = editor.value.slice(0, editor.selectionStart),
+		let lineStart = editor.sourceIndex.offsetAtLine(
+			editor.sourceIndex.lineAt(editor.selectionStart),
+		)
+		let before = editor.value.slice(lineStart, editor.selectionStart),
 			link = before.match(/\[\[([^\[\]\n]*)$/),
 			slash = before.match(/(?:^|\n)\/([\w -]*)$/),
 			code = codeLanguageCompletions(
@@ -1636,6 +1639,7 @@ function createEditorView(
 		completionItems = []
 		if (
 			!editable ||
+			(!code && !link && !slash) ||
 			(!code && !proseAt(editor.value, editor.selectionStart)) ||
 			secondarySelections.length
 		) {
