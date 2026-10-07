@@ -98,6 +98,27 @@ function makeBrowserAccount(server: string) {
 				changes: SubscriptionRef.changes(state),
 			}),
 			connect,
+			email: Object.freeze({
+				availability: api.emailAuthentication.availability(),
+				unlink: connect.pipe(Effect.andThen(api.accountEmail.unlink())),
+				status: () => connect.pipe(Effect.andThen(api.accountEmail.status())),
+				requestLink: (email: string) =>
+					connect.pipe(
+						Effect.andThen(
+							api.accountEmail.request({
+								payload: { email, recovery: Redacted.value(recovery) },
+							}),
+						),
+					),
+				verifyLink: (id: string, code: string) =>
+					connect.pipe(
+						Effect.andThen(api.accountEmail.verify({ payload: { id, code } })),
+					),
+				requestSignIn: (email: string) =>
+					api.emailAuthentication.request({ payload: { email } }),
+				verifySignIn: (id: string, code: string) =>
+					api.emailAuthentication.verify({ payload: { id, code } }),
+			}),
 			switchAccount: serialized(login(true), true),
 			restore: (key: string) =>
 				withAccountLock(

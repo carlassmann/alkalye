@@ -1,3 +1,4 @@
+import { AccountEmailElement } from "./account-email"
 import * as Duration from "effect/Duration"
 import * as Effect from "effect/Effect"
 import * as Fiber from "effect/Fiber"
@@ -280,7 +281,8 @@ export class SettingsPageElement extends HTMLElement {
 		setMarkup(
 			content,
 			options.category === "general"
-				? generalMarkup(value, options.account.subject)
+				? html`${generalMarkup(value, options.account.subject)}<alkalye-account-email
+						></alkalye-account-email>`
 				: options.category === "editor"
 					? html`${editorMarkup(value)}<alkalye-settings-themes
 							></alkalye-settings-themes>`
@@ -314,6 +316,12 @@ export class SettingsPageElement extends HTMLElement {
 				dialog: () => this.dialog(),
 				report: options.report,
 			})
+		let email = content.querySelector("alkalye-account-email")
+		if (email instanceof AccountEmailElement)
+			email.configure({
+				account: options.account,
+				prepareRestore: options.prepareRestore,
+			})
 		let agents = content.querySelector("alkalye-account-agents")
 		if (agents instanceof AccountAgentsElement)
 			agents.configure({
@@ -342,7 +350,12 @@ export class SettingsPageElement extends HTMLElement {
 			target instanceof HTMLInputElement
 				? target.name
 				: (target.getAttribute("name") ?? "")
-		if (target.closest("[data-account-agents], [data-settings-themes]")) return
+		if (
+			target.closest(
+				"[data-account-agents], [data-settings-themes], [data-account-email]",
+			)
+		)
+			return
 		if (name === "recovery-key") return
 		let value =
 			target instanceof HTMLInputElement && target.type === "checkbox"
@@ -943,7 +956,7 @@ function generalMarkup(value: AccountPreferences, subject: string) {
 						data-settings="sign-in"
 						data-action="sign-in"
 					>
-						${translate("Sign in to another account")}
+						${translate("Reconnect this account")}
 					</button>
 				</div>`,
 		),
