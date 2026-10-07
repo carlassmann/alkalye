@@ -1341,13 +1341,18 @@ function makeProjection(options: DocumentSessionOptions) {
 							: Effect.void,
 					),
 				),
-			captureState: Effect.sync((): DocumentProjectionState => ({
-				document: options.document,
-				localPosition,
-				remoteLog: log,
-				remotePosition,
-				record: durable.documents("").find(doc => doc.id === options.document),
-			})),
+			captureState: Effect.gen(function* () {
+				yield* materializeDocument(durable)
+				return {
+					document: options.document,
+					localPosition,
+					remoteLog: log,
+					remotePosition,
+					record: durable
+						.documents("")
+						.find(doc => doc.id === options.document),
+				} satisfies DocumentProjectionState
+			}),
 			captureSnapshot: Effect.gen(function* () {
 				if (
 					!projectionComplete ||

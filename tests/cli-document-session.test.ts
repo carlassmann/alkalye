@@ -9,7 +9,10 @@ import * as Layer from "effect/Layer"
 import { makePassiveDocumentCache } from "../src/client/passive-document-cache"
 import { cliDocumentSessionLayer } from "../src/cli/document-platform"
 import { DocumentSession } from "../src/shared/document-session"
-import type { DocumentTransport } from "../src/shared/document-session"
+import type {
+	DocumentTransport,
+	DocumentProjectionState,
+} from "../src/shared/document-session"
 import { Replica } from "../src/shared/crdt"
 import {
 	buildAction,
@@ -32,6 +35,7 @@ test.each([
 		let directory = await mkdtemp(join(tmpdir(), "alkalye-cli-document-"))
 		let offline = true
 		let requests = 0
+		let projected: DocumentProjectionState | undefined
 		try {
 			await Effect.runPromise(
 				Effect.scoped(
@@ -148,6 +152,14 @@ test.each([
 											document: "doc",
 											passiveState: cached ? passiveState("doc") : undefined,
 											cooperativeWork: cooperative,
+											activity: {
+												proposing: Effect.void,
+												settled: Effect.void,
+												projected: state =>
+													Effect.sync(() => {
+														projected = state
+													}),
+											},
 											subject,
 											transport,
 											initialCreation: initial ? initialCreation : undefined,
@@ -289,6 +301,9 @@ test.each([
 						let restored = yield* restoreSnapshot(finalSnapshot, "cold-reader")
 						expect(restored.text("theme")).toBe("Base theme")
 						expect(restored.text("doc")).toBe(complete)
+						expect(projected?.record?.content).toBe(complete)
+						expect(projected?.record?.title).toBe("Renamed")
+						expect(projected?.remotePosition).toBe(finalSnapshot.position)
 						expect(restored.metadata("doc").title).toBe("Renamed")
 						expect(restored.fields("comment").body).toBe("Offline discussion")
 					}),
