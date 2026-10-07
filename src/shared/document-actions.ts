@@ -236,7 +236,7 @@ export {
 } from "./document-errors"
 
 export function buildAction(
-	replica: Pick<Replica, "actor" | "author" | "checkpoint" | "register">,
+	replica: Pick<Replica, "actor" | "forkEffect" | "register">,
 	document: string,
 	label: string,
 	build: (staged: Replica) => (Operation | null)[],
@@ -255,44 +255,48 @@ export function buildAction(
 	)
 }
 export function buildOptionalAction(
-	replica: Pick<Replica, "actor" | "author" | "checkpoint" | "register">,
+	replica: Pick<Replica, "actor" | "forkEffect" | "register">,
 	document: string,
 	label: string,
 	build: (staged: Replica) => (Operation | null)[],
 	actor = replica.actor,
 ) {
-	return attempt(() => {
-		let staged = clone(replica, actor)
-		let changes = build(staged)
-			.filter(change => change !== null)
-			.map(compactOperation)
-		let last = changes.at(-1)
-		if (!last) return Option.none<DocumentAction>()
-		return Option.some(
-			Schema.decodeUnknownSync(DocumentActionSchema)({
-				id: last.id,
-				document,
-				actor,
-				label,
-				changes,
-				guards: [],
-				accessGuards: [
-					...new Set(
-						changes
-							.filter(
-								change =>
-									change.target === document &&
-									change.field.startsWith("access:"),
-							)
-							.map(change => change.field),
-					),
-				].map(field => ({
-					field,
-					observed: replica.register(document, field)?.id ?? "",
-				})),
+	return replica.forkEffect(actor).pipe(
+		Effect.mapError(cause => new DocumentConflict({ message: cause.message })),
+		Effect.flatMap(staged =>
+			attempt(() => {
+				let changes = build(staged)
+					.filter(change => change !== null)
+					.map(compactOperation)
+				let last = changes.at(-1)
+				if (!last) return Option.none<DocumentAction>()
+				return Option.some(
+					Schema.decodeUnknownSync(DocumentActionSchema)({
+						id: last.id,
+						document,
+						actor,
+						label,
+						changes,
+						guards: [],
+						accessGuards: [
+							...new Set(
+								changes
+									.filter(
+										change =>
+											change.target === document &&
+											change.field.startsWith("access:"),
+									)
+									.map(change => change.field),
+							),
+						].map(field => ({
+							field,
+							observed: replica.register(document, field)?.id ?? "",
+						})),
+					}),
+				)
 			}),
-		)
-	})
+		),
+	)
 }
 
 export function applyAction(replica: Replica, action: CommittedAction) {
@@ -759,11 +763,6 @@ function semanticChanges(action: DocumentAction) {
 	)
 }
 
-function clone(replica: Pick<Replica, "author" | "checkpoint">, actor: string) {
-	let staged = new Replica(actor, replica.author)
-	staged.restore(replica.checkpoint())
-	return staged
-}
 function targetState(replica: Replica, target: string) {
 	return Crypto.Crypto.pipe(
 		Effect.flatMap(crypto =>

@@ -558,7 +558,10 @@ function makeSession(options: DocumentSessionOptions) {
 					)
 				} catch (error) {
 					if (!(error instanceof RangeError)) throw error
-					return { ...submitEdit(null, target), saved: conflict(error.message) }
+					return {
+						...submitEdit(null, target),
+						saved: conflict(error.message),
+					}
 				}
 			},
 			replay: recovery.attempt("projection"),
@@ -1901,6 +1904,8 @@ function documentView(current: () => Replica) {
 		documents: (room: string, includeDeleted = false) =>
 			structuredClone(current().documents(room, includeDeleted)),
 		checkpoint: () => structuredClone(current().checkpoint()),
+		forkEffect: (actor?: string, author?: string) =>
+			current().forkEffect(actor, author),
 	})
 }
 function canReject(
