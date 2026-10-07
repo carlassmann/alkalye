@@ -15,6 +15,7 @@ let fullSuite = [
 	"tests/browser-native-folders.ts",
 	"tests/browser-native-commands.ts",
 	"tests/browser-storage.ts",
+	"tests/browser-library-sync.ts",
 	"tests/browser-service-worker.ts",
 	"tests/browser-motion.ts",
 	"tests/browser-floating-actions.ts",
@@ -51,6 +52,7 @@ let moduleSuite = [
 	"tests/browser-document-api.ts",
 	"tests/browser-native-eventlog.ts",
 	"tests/browser-storage.ts",
+	"tests/browser-library-sync.ts",
 ]
 let mode = Bun.argv.includes("--modules")
 	? "modules"

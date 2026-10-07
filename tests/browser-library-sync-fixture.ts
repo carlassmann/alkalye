@@ -1,0 +1,183 @@
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
+import * as Layer from "effect/Layer"
+import * as PubSub from "effect/PubSub"
+import * as Scope from "effect/Scope"
+import * as Stream from "effect/Stream"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import * as HttpClient from "effect/http/HttpClient"
+import { BrowserStorage, Storage } from "../src/client/storage"
+import { BrowserAccount } from "../src/client/browser-account"
+import { BrowserLibrary } from "../src/client/browser-library"
+import { DocumentLive } from "../src/client/document-live"
+import { LocalDirectories } from "../src/client/local-directories"
+import type { LiveServerMessage } from "../src/shared/document-live"
+
+interface Counts {
+	pulls: number
+	projections: number
+	catalogues: number
+	projectionWrites: number
+}
+interface Probe {
+	edit(text: string): Promise<void>
+	sync(): Promise<void>
+	startSync(): Promise<void>
+	retry(): Promise<void>
+	pending(): number
+	reconnect(): Promise<void>
+	close(): Promise<void>
+	source(): string
+	status(): string
+	reset(): void
+	counts: Counts
+}
+declare global {
+	interface Window {
+		librarySync?: Probe
+		librarySyncFailure?: string
+	}
+}
+let counts: Counts = {
+	pulls: 0,
+	projections: 0,
+	catalogues: 0,
+	projectionWrites: 0,
+}
+let countedHttp = Layer.effect(
+	HttpClient.HttpClient,
+	Effect.gen(function* () {
+		let client = yield* HttpClient.HttpClient
+		return client.pipe(
+			HttpClient.tapRequest(request =>
+				Effect.sync(() => {
+					if (
+						request.url.endsWith("/snapshot") ||
+						request.url.endsWith("/history")
+					)
+						counts.pulls++
+					if (request.url.endsWith("/api/library")) counts.catalogues++
+				}),
+			),
+		)
+	}),
+).pipe(Layer.provide(FetchHttpClient.layer))
+
+Effect.runPromise(
+	Effect.gen(function* () {
+		let scope = yield* Scope.make()
+		let storage = yield* Effect.acquireRelease(Storage.open(), storage =>
+			Effect.sync(() => storage.close()),
+		).pipe(Effect.provideService(Scope.Scope, scope))
+		let counted = new Proxy(storage, {
+			get(target, property, receiver) {
+				if (property === "modify")
+					return function (key: string, update: (value: unknown) => unknown) {
+						return target.modify(key, update).pipe(
+							Effect.tap(changed =>
+								Effect.sync(() => {
+									if (key.startsWith("document-summary:")) {
+										counts.projections++
+										if (changed) counts.projectionWrites++
+									}
+								}),
+							),
+						)
+					}
+				return Reflect.get(target, property, receiver)
+			},
+		})
+		let accountContext = yield* Layer.build(
+			BrowserAccount.layer(location.origin).pipe(
+				Layer.provide(Layer.succeed(BrowserStorage, counted)),
+				Layer.provide(countedHttp),
+			),
+		).pipe(Effect.provideService(Scope.Scope, scope))
+		let account = Context.get(accountContext, BrowserAccount)
+		if (navigator.onLine) yield* account.connect
+		let messages = yield* PubSub.unbounded<LiveServerMessage>()
+		yield* Scope.addFinalizer(scope, PubSub.shutdown(messages))
+		let live: Context.Service.Shape<typeof DocumentLive> = {
+			watch: () => Effect.void,
+			actor: () => "",
+			connected: () => true,
+			transport: () => "socket",
+			changes: Stream.fromPubSub(messages),
+			presence: { current: () => [], changes: Stream.never },
+			announce: () => Effect.void,
+		}
+		let base = Layer.mergeAll(
+			Layer.succeed(BrowserStorage, counted),
+			Layer.succeed(BrowserAccount, account),
+			Layer.succeed(DocumentLive, live),
+			countedHttp,
+		)
+		let libraryContext = yield* Layer.build(
+			BrowserLibrary.layer.pipe(
+				Layer.provideMerge(
+					LocalDirectories.layer.pipe(Layer.provideMerge(base)),
+				),
+			),
+		).pipe(Effect.provideService(Scope.Scope, scope))
+		let library = Context.get(libraryContext, BrowserLibrary)
+		if (navigator.onLine) yield* library.refresh
+		let document = sessionStorage.getItem("sync-document")
+		if (!document) {
+			yield* Effect.promise(() =>
+				fetch("/test/shared", { method: "POST", body: account.subject }).then(
+					response => {
+						if (!response.ok) throw new Error("Shared fixture setup failed")
+					},
+				),
+			)
+			document = "sync-proof"
+			sessionStorage.setItem("sync-document", document)
+			yield* library.refresh
+		}
+
+		let opened = yield* library
+			.open(document)
+			.pipe(Effect.provideService(Scope.Scope, scope))
+		yield* opened.connection.synchronize
+		function run<A, E>(effect: Effect.Effect<A, E>) {
+			return Effect.runPromise(effect)
+		}
+		window.librarySync = {
+			counts,
+			reset() {
+				counts.pulls = 0
+				counts.projections = 0
+				counts.catalogues = 0
+				counts.projectionWrites = 0
+			},
+			source: () => opened.session.replica.text(document),
+			status: () => opened.connection.current().status,
+			pending: () => opened.session.pending().length,
+			retry() {
+				return run(opened.connection.retry)
+			},
+			edit(text) {
+				return run(opened.session.edit(text).saved).then(() => {})
+			},
+			sync() {
+				return run(opened.connection.synchronize)
+			},
+			startSync() {
+				return run(Effect.forkIn(opened.connection.synchronize, scope)).then(
+					() => {},
+				)
+			},
+			reconnect() {
+				return run(
+					PubSub.publish(messages, { type: "connected", actor: "probe" }),
+				).then(() => {})
+			},
+			close() {
+				return run(Scope.close(scope, Exit.void))
+			},
+		}
+	}),
+).catch(error => {
+	window.librarySyncFailure = String(error)
+})

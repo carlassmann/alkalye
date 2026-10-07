@@ -279,11 +279,15 @@ function makeLibrary() {
 					yield* Effect.scoped(
 						Effect.gen(function* () {
 							let opened = yield* RcMap.get(documents, row.summary.document)
+							let alreadySaved = false
 							if (navigator.onLine) {
 								yield* opened.connection.synchronize
-								updated ||= opened.connection.current().status === "synced"
+								let synchronized =
+									opened.connection.current().status === "synced"
+								alreadySaved = synchronized && !opened.session.unsaved()
+								updated ||= synchronized
 							}
-							yield* opened.session.save
+							if (!alreadySaved) yield* opened.session.save
 						}),
 					).pipe(
 						Effect.catch(() =>
