@@ -33,11 +33,30 @@ let empty: Summary = {
 	startsLow: false,
 	endsHigh: false,
 }
+// Unicode regex mode would hide paired UTF-16 code units.
+let surrogatePairPattern = /[\uD800-\uDBFF][\uDC00-\uDFFF]/
+
+function codePointLength(text: string) {
+	let firstPair = text.search(surrogatePairPattern)
+	if (firstPair < 0) return text.length
+	let length = text.length - 1
+	for (let offset = firstPair + 2; offset + 1 < text.length; offset++) {
+		let high = text.charCodeAt(offset)
+		if (high < 0xd800 || high > 0xdbff) continue
+		let low = text.charCodeAt(offset + 1)
+		if (low >= 0xdc00 && low <= 0xdfff) {
+			length--
+			offset++
+		}
+	}
+	return length
+}
+
 function summary(text: string): Summary {
 	let lines = text.split("\n")
 	return {
 		length: text.length,
-		codePoints: Array.from(text).length,
+		codePoints: codePointLength(text),
 		startsLow: text.charCodeAt(0) >= 0xdc00 && text.charCodeAt(0) <= 0xdfff,
 		endsHigh:
 			text.charCodeAt(text.length - 1) >= 0xd800 &&
