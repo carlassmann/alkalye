@@ -4287,6 +4287,28 @@
 				"max": 293.2238749999997
 			},
 			"journeyOperationsPerSecond": 52.09544956705108
+		},
+		"recoveredMulticursor": {
+			"results": [
+				{
+					"version": "rewrite",
+					"name": "replace all occurrences",
+					"kb": 128,
+					"n": 3,
+					"values": [46.30000001192093, 40.60000002384186, 53.69999998807907],
+					"cursors": [1298, 1298, 1298],
+					"medianMs": 46.30000001192093,
+					"p95Ms": 53.69999998807907,
+					"selectionSetup": "Select all occurrences shortcut",
+					"restoration": "Complete original source through public editor boundary; excluded from replacement timing"
+				}
+			],
+			"failures": [],
+			"provenance": {
+				"assetSource": "aa89506de66bcceea235d51ec9606f76c6a79068",
+				"reason": "Recovered only the previously missing rewrite cell after fixing benchmark driver timeout mismatch. Normal and batch commands consistently use20000ms; changing daemon launch configuration had reopened about:blank. Original failed observation retained.",
+				"selectionOccurrences": 1298
+			}
 		}
 	},
 	"traceSummary": {
@@ -4329,7 +4351,7 @@
 		"Final reload cells n3 and insertion cells n6;1MiB insertion n3. Descriptive p95, not stable population estimate.",
 		"Normal source fixtures began equivalent; retained history grew during experimentation and differs from the earlier be48 comparison. Both libraries contain a1MiB document. Old-to-new reload totals are not a controlled code-only comparison.",
 		"Main1MiB beginning edit failed the required source-change deadline; middle was skipped. This is an unverified automation result, not evidence of an app crash.",
-		"Main document switching required-state deadline expired. Final rewrite multicursor observation lost its injected probe after daemon restart; final timing missing. Earlier rewrite multicursor measurements remain in previous report.",
+		"Main document switching required-state deadline expired. The initial final rewrite multicursor observation lost its injected probe after daemon restart. The same frozen assets were remeasured successfully after stabilizing driver timeout configuration; original failure remains recorded.",
 		"Save-status exact-label gate incorrectly expected Saved. Diagnostic reported Saved on this device, pending0, aria-busy false, version76 after3s; this is a quiet local-save acknowledgement. It does not by itself prove server convergence.",
 		"Continuous edits are synthetic canonical-editor changes, not trusted input latency. Frame cadence and task traces include background persistence.",
 		"24writer test runs client, server, storage, barriers and assertions together. Pure server capacity and20writer browser frame rates remain unmeasured.",

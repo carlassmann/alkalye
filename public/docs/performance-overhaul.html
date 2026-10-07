@@ -333,13 +333,24 @@
 				versus 304.0 ms.
 			</li>
 			<li>
-				Main switching missed the required-state deadline. Final rewrite
-				multicursor timing lost the injected probe after a browser-daemon
-				restart. Main replaced 1,298 selections in 84.2 ms, p95 90.0 ms. The
-				previous report retains earlier rewrite multicursor evidence; this final
-				cell is missing.
+				Main switching missed the required-state deadline. The first final
+				rewrite multicursor run lost its probe because changing the
+				browser-driver timeout restarted the daemon. With a stable timeout, the
+				same frozen assets replaced 1,298 occurrences in 46.3 ms median, p95
+				53.7 ms, versus main 84.2 ms, p95 90.0 ms. Three samples verified every
+				replacement and restored the original source through the public editor.
+				Selection setup is excluded; main uses its public selection API, rewrite
+				uses its select-all-occurrences shortcut. The original failed
+				observation remains in the raw report.
 			</li>
 		</ul>
+		<h2>Recovered multicursor comparison</h2>
+		<p>
+			The bounded rerun uses the unchanged aa89506 production assets. Replacing
+			all 1,298 selections is 46.3 ms median and 53.7 ms p95 in the rewrite,
+			compared with 84.2 ms and 90.0 ms in main. These are total
+			edit-to-paint-opportunity times, not an 8.3 ms frame-work claim.
+		</p>
 		<h2>Input and frame work</h2>
 		<p>
 			Native input spans trusted beforeinput through bubbling input. Frame work
