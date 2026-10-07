@@ -5,12 +5,12 @@ Action builders copied every atom through synchronous checkpoint encoding and re
 A matched production-browser comparison used the 1 MiB document with 512 lines. Each of six phases restored the same disposable SQLite/blob data and browser profile. Phase order alternated. Both clients used the same native `660423c` server. The candidate changed only action staging and the document view's detached-copy capability.
 
 | Trusted undo, milliseconds | Baseline median / max | Fork median / max |
-| --- | --- | --- |
-| Two paint opportunities | 1259.8 / 1312.0 | 626.6 / 700.7 |
-| Fully accepted checkpoint | 3008.3 / 3207.6 | 2605.1 / 2985.3 |
-| Largest main-thread task | 853.7 / 867.7 | 290.3 / 361.5 |
-| Layout phase sum | 4.2 / 4.4 | 4.5 / 4.8 |
-| Paint phase sum | 2.9 / 3.2 | 3.0 / 3.3 |
+| -------------------------- | --------------------- | ----------------- |
+| Two paint opportunities    | 1259.8 / 1312.0       | 626.6 / 700.7     |
+| Fully accepted checkpoint  | 3008.3 / 3207.6       | 2605.1 / 2985.3   |
+| Largest main-thread task   | 853.7 / 867.7         | 290.3 / 361.5     |
+| Layout phase sum           | 4.2 / 4.4             | 4.5 / 4.8         |
+| Paint phase sum            | 2.9 / 3.2             | 3.0 / 3.3         |
 
 All six phases verified trusted undo, exact original text, a strictly newer accepted checkpoint, zero pending/rejected actions and durable save readiness. No failed samples. This removes one large JavaScript stall. The remaining tasks exceed the 8.33 ms frame budget by a wide margin. Headless Chromium supplies approximately 60 Hz frame opportunities; these measurements do not prove 120 fps.
 
