@@ -14,6 +14,7 @@ import {
 	sourceAtoms,
 	sourceAtomsSteps,
 	sourceEdits,
+	sourceBodyAnchor,
 	sourceUndo,
 	sourceObserved,
 	inverseHeader,
@@ -33,6 +34,7 @@ export interface TextReplacement {
 let sourceViews = new WeakMap<Atom[], Atom[]>()
 let sourceOffsets = new WeakMap<Atom[], TextIndex>()
 interface PreparedSplice {
+	after: string
 	start: number
 	remove: number
 	inserted: string[]
@@ -415,8 +417,9 @@ export class Replica {
 			}
 			let anchor =
 				header && replacement.start === header[0].length
-					? (atoms[start]?.after ?? atoms[start - 1]?.id ?? "")
+					? sourceBodyAnchor(atoms, start)
 					: (atoms[start - 1]?.id ?? "")
+			let after = anchor
 			let inserted: string[] = []
 			for (let value of replacement.text) {
 				let id = `${operation.id}:${String(operation.insert.length).padStart(8, "0")}`
@@ -431,7 +434,7 @@ export class Replica {
 				inserted.push(id)
 				anchor = id
 			}
-			cached.push({ start, remove: stop - start, inserted })
+			cached.push({ after, start, remove: stop - start, inserted })
 		}
 		let raw = sourceViews.get(atoms) ?? atoms
 		if (current === atoms)
@@ -475,6 +478,7 @@ export class Replica {
 			}
 			this.rememberTextEdit(operation, next, atoms, raw, [
 				{
+					after: atoms.at(-1)?.id ?? "",
 					start: atoms.length,
 					remove: 0,
 					inserted: operation.insert.map(atom => atom.id),
@@ -528,6 +532,7 @@ export class Replica {
 					for (let atom of atoms.slice(position, position + splice.remove))
 						operation.remove.push(atom.id)
 					let anchor = atoms[position - 1]?.id ?? ""
+					let after = anchor
 					let inserted: string[] = []
 					for (let value of splice.insert) {
 						let id = `${operation.id}:${String(operation.insert.length).padStart(8, "0")}`
@@ -535,7 +540,12 @@ export class Replica {
 						inserted.push(id)
 						anchor = id
 					}
-					cached.push({ start: position, remove: splice.remove, inserted })
+					cached.push({
+						after,
+						start: position,
+						remove: splice.remove,
+						inserted,
+					})
 				}
 				this.rememberTextEdit(operation, next, atoms, raw, cached)
 				return operation
@@ -609,6 +619,8 @@ export class Replica {
 		raw: Atom[],
 		splices: PreparedTextEdit["splices"],
 	) {
+		let header = sourceHeader(content)
+		if (header && content.length === header[0].length) return
 		let rawSplices = rawEditSplices(atoms, raw, splices)
 		if (!rawSplices) return
 		this.preparedEdit = {
@@ -1535,7 +1547,6 @@ function sourceHeader(source: string) {
 
 // Merged headers can reorder or discard raw atoms while leaving the body suffix intact.
 function rawEditSplices(atoms: Atom[], raw: Atom[], splices: PreparedSplice[]) {
-	if (raw === atoms) return splices
 	let displacement = raw.length - atoms.length
 	let changes: PreparedSplice[] = []
 	for (let splice of splices) {
@@ -1543,13 +1554,15 @@ function rawEditSplices(atoms: Atom[], raw: Atom[], splices: PreparedSplice[]) {
 		if (
 			start < 0 ||
 			start + splice.remove > raw.length ||
+			(splice.inserted.length > 0 &&
+				splice.after !== (raw[start - 1]?.id ?? "")) ||
 			raw[start - 1]?.id !== atoms[splice.start - 1]?.id ||
 			raw[start + splice.remove]?.id !== atoms[splice.start + splice.remove]?.id
 		)
 			return
 		for (let offset = 0; offset < splice.remove; offset++)
 			if (raw[start + offset]?.id !== atoms[splice.start + offset]?.id) return
-		changes.push({ ...splice, start })
+		changes.push(raw === atoms ? splice : { ...splice, start })
 	}
 	return changes
 }

@@ -277,6 +277,22 @@ test("large body transactions after merged frontmatter retain exact source, Unic
 		expect(reopened.text("doc")).toBe(expected)
 		expect(reopened.metadata("doc")).toEqual(replica.metadata("doc"))
 	}
+	let original = replica.text("doc")
+	let audit = replica.fork("audit")
+	let marked = replica.prepareReplacements("doc", [
+		{ start: original.indexOf("==marker=="), remove: 10, text: "==bright==" },
+		{ start: original.indexOf("Whiteboard"), remove: 10, text: "Drawing" },
+	])
+	if (!marked) throw Error("Missing multiple body replacements")
+	replica.apply([marked])
+	audit.apply([marked])
+	let markedSource = original
+		.replace("==marker==", "==bright==")
+		.replace("Whiteboard", "Drawing")
+	expect(replica.text("doc")).toBe(markedSource)
+	expect(audit.text("doc")).toBe(markedSource)
+	replica.cancel("doc", marked.id)
+	expect(replica.text("doc")).toBe(original)
 	let before = replica.text("doc")
 	let base = replica.visible("doc")
 	let peer = replica.fork("peer")
@@ -310,3 +326,133 @@ test("large body transactions after merged frontmatter retain exact source, Unic
 	expect(reopened.metadata("doc").title).toBe("Renamed")
 	expect(frontmatter(reopened.text("doc")).data.mode).toBe("present")
 })
+
+test("body-boundary edits after adding a header match replayed and reopened documents", () => {
+	let replica = new Replica("birth")
+	newDocument(replica, "doc", "", "foo 😀 tail")
+	replica.edit("doc", "---\ntitle: Added\n---\n" + replica.text("doc"))
+	for (let text of ["First ", "Second "]) {
+		let before = replica.text("doc")
+		let start = before.indexOf("foo")
+		let audit = replica.fork("audit")
+		let operation = replica.prepareReplacements("doc", [
+			{ start, remove: 0, text },
+		])
+		if (!operation) throw Error("Missing boundary edit")
+		replica.apply([operation])
+		audit.apply([operation])
+		let expected = before.slice(0, start) + text + before.slice(start)
+		expect(replica.text("doc")).toBe(expected)
+		expect(audit.text("doc")).toBe(expected)
+		let reopened = new Replica("reopened")
+		reopened.restore(replica.checkpoint())
+		expect(reopened.text("doc")).toBe(expected)
+		let remote = reopened.edit("doc", expected.replace("tail", "remote tail"))
+		if (!remote) throw Error("Missing remote edit")
+		replica.apply([remote])
+		audit.apply([remote])
+		expect(replica.text("doc")).toBe(reopened.text("doc"))
+		expect(audit.text("doc")).toBe(reopened.text("doc"))
+	}
+})
+
+test.each([false, true])(
+	"empty body under an EOF header stays canonical through deletion, undo and reopening (precise=%s)",
+	precise => {
+		let replica = new Replica("birth")
+		newDocument(replica, "doc", "", "---\na: 1\n---\n")
+		let header = replica.fork("header")
+		let writer = replica.fork("writer")
+		let rewrite = header.edit("doc", "---\na: 1\na: 2\n---")
+		let append = writer.edit("doc", writer.text("doc") + "y")
+		if (!rewrite || !append)
+			throw Error("Missing concurrent header and body edits")
+		replica.apply([rewrite, append])
+		let before = replica.text("doc")
+		expect(before.endsWith("\ny")).toBe(true)
+		let audit = replica.fork("audit")
+		let operation = precise
+			? replica.prepareReplacements("doc", [
+					{ start: before.length - 1, remove: 1, text: "" },
+				])
+			: replica.prepareEdit("doc", before.slice(0, -1))
+		if (!operation) throw Error("Missing body deletion")
+		replica.apply([operation])
+		audit.apply([operation])
+		let expected = "---\na: 1\na: 2\n---"
+		expect(audit.text("doc")).toBe(expected)
+		expect(replica.text("doc")).toBe(expected)
+		let reopened = new Replica("reopened")
+		reopened.restore(replica.checkpoint())
+		expect(reopened.text("doc")).toBe(expected)
+		let undo = replica.cancel("doc", operation.id)
+		expect(replica.text("doc")).toBe(before)
+		replica.cancel("doc", undo.id)
+		expect(replica.text("doc")).toBe(expected)
+	},
+)
+
+test.each([false, true])(
+	"body-boundary insertion keeps a closing newline restored below a tombstoned anchor (precise=%s)",
+	precise => {
+		let replica = new Replica("birth")
+		newDocument(replica, "doc", "", "---\ntitle: Notes\n---\nfoo")
+		let before = replica.text("doc")
+		let start = before.indexOf("foo")
+		let newline = replica.visible("doc")[start - 1]
+		let replacement = replica.prepareEdit("doc", before + "unused")
+		if (!newline || !replacement) throw Error("Missing closing newline fixture")
+		let repair = {
+			...replacement,
+			insert: [
+				{ id: `${replacement.id}:00000000`, after: newline.id, value: "\n" },
+			],
+			remove: [newline.id],
+		}
+		replica.apply([repair])
+		expect(replica.text("doc")).toBe(before)
+		let audit = replica.fork("audit")
+		let text = "New ".repeat(40)
+		let expected = before.slice(0, start) + text + before.slice(start)
+		let operation = precise
+			? replica.prepareReplacements("doc", [{ start, remove: 0, text }])
+			: replica.prepareEdit("doc", expected)
+		if (!operation) throw Error("Missing boundary insertion")
+		replica.apply([operation])
+		audit.apply([operation])
+		expect(audit.text("doc")).toBe(expected)
+		expect(replica.text("doc")).toBe(expected)
+		let reopened = new Replica("reopened")
+		reopened.restore(replica.checkpoint())
+		expect(reopened.text("doc")).toBe(expected)
+		expect(reopened.metadata("doc").title).toBe("Notes")
+		let peer = reopened.edit("doc", expected + " peer")
+		if (!peer) throw Error("Missing concurrent contribution")
+		replica.apply([peer])
+		let undo = replica.cancel("doc", operation.id)
+		expect(replica.text("doc")).toBe(before + " peer")
+		replica.cancel("doc", undo.id)
+		expect(replica.text("doc")).toBe(expected + " peer")
+	},
+)
+
+test.each([false, true])(
+	"adding a body to an EOF header preserves one canonical header (precise=%s)",
+	precise => {
+		let replica = new Replica("birth")
+		newDocument(replica, "doc", "", "---\na: 1\n---")
+		let before = replica.text("doc")
+		let expected = before + "\nfoo"
+		let operation = precise
+			? replica.prepareReplacements("doc", [
+					{ start: before.length, remove: 0, text: "\nfoo" },
+				])
+			: replica.prepareEdit("doc", expected)
+		if (!operation) throw Error("Missing EOF body insertion")
+		replica.apply([operation])
+		expect(replica.text("doc")).toBe(expected)
+		let reopened = new Replica("reopened")
+		reopened.restore(replica.checkpoint())
+		expect(reopened.text("doc")).toBe(expected)
+	},
+)

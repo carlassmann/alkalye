@@ -222,6 +222,24 @@ export function* sourceAtomsSteps(
 	]
 }
 
+// Root body atoms stay outside header frames; other inserts follow the visible fence.
+export function sourceBodyAnchor(atoms: Atom[], start: number, raw = atoms) {
+	let original = atoms[start]?.after
+	if (original === "") return ""
+	let previous = atoms[start - 1]
+	if (!original && previous && !previous.value.endsWith("\n")) {
+		let position = raw.findIndex(atom => atom.id === previous.id)
+		let anchor = previous.id
+		for (let atom of raw.slice(position + 1, position + 3)) {
+			if (atom.after !== anchor || (atom.value !== "\r" && atom.value !== "\n"))
+				break
+			anchor = atom.id
+		}
+		return anchor
+	}
+	return previous?.id || original || ""
+}
+
 export function sourceEdits(
 	atoms: Atom[],
 	next: string,
@@ -239,10 +257,7 @@ export function sourceEdits(
 					body: true,
 					next: next.slice(header.length),
 					remove: [],
-					anchor:
-						atoms[previousHeader.end]?.after ??
-						previousHeader.close.at(-1)?.id ??
-						"",
+					anchor: sourceBodyAnchor(atoms, previousHeader.end, raw),
 				},
 			]
 	}
@@ -305,7 +320,7 @@ export function sourceEdits(
 				body: true,
 				next: next.slice(prefix.length),
 				remove: [],
-				anchor: atoms[previous.end]?.after ?? previous.close.at(-1)?.id,
+				anchor: sourceBodyAnchor(atoms, previous.end, raw),
 			},
 		]
 	}
@@ -319,7 +334,7 @@ export function sourceEdits(
 			.map(atom => atom.value)
 			.join(""),
 		remove: [],
-		anchor: atoms[previous.end]?.after ?? previous.close.at(-1)?.id ?? "",
+		anchor: sourceBodyAnchor(atoms, previous.end, raw),
 	}
 	if (
 		atoms
