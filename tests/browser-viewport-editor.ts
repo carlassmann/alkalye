@@ -19,6 +19,10 @@ try {
 	browser(session, "open", new URL("/app", origin).href)
 	wait(session, "Boolean(document.querySelector('#editor'))")
 	browser(session, "click", '[data-action="new"]')
+	wait(
+		session,
+		`${source}.value === '' && !document.querySelector('#editor').readOnly`,
+	)
 	evaluate(
 		session,
 		`(()=>{${source}.value='😀😃😀';${source}.dispatchEvent(new Event('input',{bubbles:true}));${source}.focus();${source}.setSelectionRange(4,4);return true})()`,
@@ -123,6 +127,10 @@ try {
 	assert(typeof documentPath === "string", "Document routing stays stable")
 	browser(session, "set", "viewport", "1280", "800")
 	browser(session, "click", '[data-action="new"]')
+	wait(
+		session,
+		`${source}.value === '' && !document.querySelector('#editor').readOnly`,
+	)
 	evaluate(
 		session,
 		`(()=>{window.viewportMegabyte='alpha beta gamma '.repeat(65536).slice(0,1048576);${source}.value=window.viewportMegabyte;${source}.dispatchEvent(new Event('input',{bubbles:true}));return true})()`,

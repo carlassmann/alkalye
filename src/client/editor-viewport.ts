@@ -58,7 +58,7 @@ export class EditorViewport {
 	private measuredHostStyle = ""
 	private measuringContext = document.createElement("canvas").getContext("2d")
 	private dragging = false
-	private lastScroll = 0
+	private lastInteraction = 0
 	private pointerDocument = false
 	private selectionDocument = false
 	private nativeAcknowledgement = false
@@ -93,7 +93,7 @@ export class EditorViewport {
 		host.addEventListener(
 			"scroll",
 			() => {
-				this.lastScroll = performance.now()
+				this.lastInteraction = performance.now()
 				this.schedule()
 			},
 			{ signal },
@@ -102,6 +102,19 @@ export class EditorViewport {
 			signal,
 		})
 		host.addEventListener("keydown", event => this.keydown(event), { signal })
+		for (let type of [
+			"beforeinput",
+			"keydown",
+			"pointerdown",
+			"compositionupdate",
+		])
+			host.addEventListener(
+				type,
+				() => {
+					this.lastInteraction = performance.now()
+				},
+				{ signal },
+			)
 		host.addEventListener("copy", event => this.copy(event, false), { signal })
 		host.addEventListener("cut", event => this.copy(event, true), { signal })
 		host.addEventListener("paste", event => this.paste(event), { signal })
@@ -665,7 +678,7 @@ export class EditorViewport {
 			if (
 				!this.composing &&
 				!this.dragging &&
-				performance.now() - this.lastScroll > 150
+				performance.now() - this.lastInteraction > 150
 			) {
 				let index = this.blocks.findIndex(block => !block.measured)
 				if (index < 0) return

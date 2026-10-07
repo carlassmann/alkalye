@@ -19,6 +19,7 @@ import * as Layer from "effect/Layer"
 import * as SqlError from "effect/sql/SqlError"
 import * as Schema from "effect/Schema"
 import * as Semaphore from "effect/Semaphore"
+import { BackgroundWork } from "../platform/background-work"
 import * as Stream from "effect/Stream"
 import * as SubscriptionRef from "effect/SubscriptionRef"
 import { DocumentJournal } from "../platform/document-journal"
@@ -268,6 +269,7 @@ interface UndoReceipt {
 function makeSession(options: DocumentSessionOptions) {
 	return Effect.gen(function* () {
 		let projection = yield* DocumentProjection
+		let backgroundWork = yield* BackgroundWork
 		let journal = yield* DocumentJournal
 		let lifecycle = yield* DocumentLifecycle
 		let cryptography = yield* Crypto.Crypto
@@ -322,6 +324,7 @@ function makeSession(options: DocumentSessionOptions) {
 				notification: notify,
 			},
 			{ save: gate, projection: gate, snapshot: cacheWrites },
+			{ snapshot: backgroundWork.beforeSnapshot },
 		).pipe(Effect.provideService(Scope.Scope, background))
 		let drafts = yield* lifecycle.protect(
 			() =>
@@ -360,7 +363,10 @@ function makeSession(options: DocumentSessionOptions) {
 		)
 		let flushUnlocked = recovery.attempt("save", rawFlushUnlocked)
 		let flush = recovery.attempt("save")
-		let save = recovery.attempt("snapshot")
+		let save = recovery.attempt(
+			"snapshot",
+			cacheWrites.withPermit(saveSnapshot),
+		)
 		yield* recovery.failures.changes.pipe(
 			Stream.runForEach(() => Effect.sync(drafts.update)),
 			Effect.forkScoped({ startImmediately: true }),
@@ -395,6 +401,7 @@ function makeSession(options: DocumentSessionOptions) {
 			Stream.debounce("500 millis"),
 			Stream.merge(Stream.fromSchedule(Schedule.spaced("2 seconds"))),
 			Stream.filter(() => !recovery.failures.current().snapshot),
+			Stream.buffer({ capacity: 1, strategy: "sliding" }),
 			Stream.runForEach(() => recovery.run("snapshot")),
 			Effect.forkScoped({ startImmediately: true }),
 			Effect.provideService(Scope.Scope, background),
@@ -402,7 +409,9 @@ function makeSession(options: DocumentSessionOptions) {
 		yield* lifecycle.hidden.pipe(
 			Stream.runForEach(() =>
 				flush.pipe(
-					Effect.andThen(recovery.run("snapshot")),
+					Effect.andThen(
+						recovery.run("snapshot", cacheWrites.withPermit(saveSnapshot)),
+					),
 					Effect.catch(error =>
 						Effect.logError("Could not save document drafts", {
 							category: documentFailureCategory(error),

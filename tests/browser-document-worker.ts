@@ -88,6 +88,34 @@ try {
 	evaluate(
 		session,
 		`(() => {
+		window.workerTransfers = [];
+		window.interactionFrameProof = undefined;
+		document.dispatchEvent(new KeyboardEvent("keydown", {key:"Shift", bubbles:true}));
+		let stats = document.querySelector("#worker-proof");
+		stats.update("An obsolete count.", "words");
+		window.workerSource = "Newest values only.";
+		stats.update(window.workerSource, "words");
+		requestAnimationFrame(() => requestAnimationFrame(() => {
+			window.interactionFrameProof = window.workerTransfers.length === 0 && stats.querySelector("#stats").textContent === "32770 words";
+		}));
+	})()`,
+	)
+	wait(session, "window.interactionFrameProof !== undefined")
+	assert(
+		evaluate(session, "window.interactionFrameProof"),
+		"Input gets two frame opportunities before deferred statistics transfer or repaint",
+	)
+	wait(
+		session,
+		'document.querySelector("#worker-proof #stats").textContent === "3 words"',
+	)
+	assert(
+		evaluate(session, "window.workerTransfers.length === 1"),
+		"Statistics coalesce superseded updates while interaction holds the background gate",
+	)
+	evaluate(
+		session,
+		`(() => {
 		window.workerSource = "One two.\\n".repeat(131072);
 		document.querySelector("#worker-proof").update(window.workerSource, "words");
 	})()`,

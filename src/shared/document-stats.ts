@@ -1,4 +1,5 @@
 import * as Effect from "effect/Effect"
+import { BackgroundWork } from "../platform/background-work"
 import { frontmatter } from "./markdown"
 
 export type StatsUnit = "words" | "sentences" | "tasks" | "hidden"
@@ -22,10 +23,12 @@ export function documentStats(source: string): DocumentStats {
 }
 export function documentStatsEffect(source: string) {
 	return Effect.gen(function* () {
+		let background = yield* BackgroundWork
 		let steps = countDocument(source)
 		let step = steps.next()
 		while (!step.done) {
 			yield* Effect.yieldNow
+			yield* background.betweenChunks
 			step = steps.next()
 		}
 		return step.value

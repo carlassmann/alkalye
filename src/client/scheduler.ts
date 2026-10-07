@@ -1,8 +1,9 @@
 import * as Effect from "effect/Effect"
 import * as Layer from "effect/Layer"
 import * as Scheduler from "effect/Scheduler"
+import { browserBackgroundWorkLayer } from "./background-work"
 
-export let browserSchedulerLayer = Layer.effect(
+let nativeSchedulerLayer = Layer.effect(
 	Scheduler.Scheduler,
 	Effect.gen(function* () {
 		let callbacks = new Map<number, () => void>()
@@ -40,4 +41,9 @@ export let browserSchedulerLayer = Layer.effect(
 			return () => callbacks.delete(id)
 		})
 	}),
+)
+
+export let browserSchedulerLayer = Layer.merge(
+	nativeSchedulerLayer,
+	browserBackgroundWorkLayer,
 )

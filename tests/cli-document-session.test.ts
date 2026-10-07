@@ -6,6 +6,9 @@ import * as Context from "effect/Context"
 import * as Effect from "effect/Effect"
 import * as Schedule from "effect/Schedule"
 import * as Layer from "effect/Layer"
+import * as Latch from "effect/Latch"
+import * as Deferred from "effect/Deferred"
+import { BackgroundWork } from "../src/platform/background-work"
 import { makePassiveDocumentCache } from "../src/client/passive-document-cache"
 import { cliDocumentSessionLayer } from "../src/cli/document-platform"
 import { DocumentSession } from "../src/shared/document-session"
@@ -139,6 +142,9 @@ test.each([
 							subject,
 							action,
 						}
+						let snapshotIdle = yield* Latch.make(true)
+						let snapshotWaiting = yield* Deferred.make<void>()
+						let interacting = false
 						function withSession<A, E>(
 							work: (
 								session: DocumentSession["Service"],
@@ -164,6 +170,18 @@ test.each([
 											transport,
 											initialCreation: initial ? initialCreation : undefined,
 										}),
+									).pipe(
+										Effect.provideService(BackgroundWork, {
+											beforeSnapshot: Effect.suspend(() =>
+												interacting
+													? Deferred.succeed(snapshotWaiting, undefined).pipe(
+															Effect.andThen(snapshotIdle.await),
+														)
+													: Effect.void,
+											),
+											beforeDerived: Effect.void,
+											betweenChunks: Effect.void,
+										}),
 									)
 									return yield* work(Context.get(services, DocumentSession))
 								}),
@@ -173,6 +191,11 @@ test.each([
 							session =>
 								Effect.gen(function* () {
 									yield* session.edit("Second source").saved
+									interacting = true
+									yield* snapshotIdle.close
+									yield* Deferred.await(snapshotWaiting).pipe(
+										Effect.timeout("3 seconds"),
+									)
 									yield* session.change("Comment", staged =>
 										newComment(
 											staged,
@@ -184,6 +207,7 @@ test.each([
 										),
 									)
 									expect(session.replica.text("doc")).toBe("Second source")
+									expect(session.unsaved()).toBe(0)
 								}),
 							true,
 						)

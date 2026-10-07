@@ -23,6 +23,7 @@ type RecoveryWork = Record<RecoveryKind, Effect.Effect<unknown, unknown>>
 export function makeDocumentRecovery(
 	work: RecoveryWork,
 	locks: Partial<Record<RecoveryKind, Semaphore.Semaphore>> = {},
+	ready: Partial<Record<RecoveryKind, Effect.Effect<void>>> = {},
 ) {
 	return Effect.gen(function* () {
 		let failures = yield* SubscriptionRef.make<DocumentFailures>(
@@ -106,7 +107,9 @@ export function makeDocumentRecovery(
 		}
 		function trackDefault(kind: RecoveryKind) {
 			let task = track(kind, work[kind])
-			return locks[kind]?.withPermit(task) ?? task
+			return (ready[kind] ?? Effect.void).pipe(
+				Effect.andThen(locks[kind]?.withPermit(task) ?? task),
+			)
 		}
 		function track(kind: RecoveryKind, task: Effect.Effect<unknown, unknown>) {
 			return Effect.suspend(() => {

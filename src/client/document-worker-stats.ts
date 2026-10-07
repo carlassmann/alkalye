@@ -8,6 +8,7 @@ import * as Stream from "effect/Stream"
 import { documentStatsEffect } from "../shared/document-stats"
 import type { DocumentStats } from "../shared/document-stats"
 import { createDocumentWorker } from "./document-worker-client"
+import { BackgroundWork } from "../platform/background-work"
 
 export interface DerivedDocumentStats {
 	revision: number
@@ -18,6 +19,7 @@ export function makeDocumentWorkerStats(
 	url = new URL("/document-worker.js", location.origin).href,
 ) {
 	return Effect.gen(function* () {
+		let background = yield* BackgroundWork
 		let updates = yield* Queue.make<{ revision: number; source: string }>({
 			capacity: 1,
 			strategy: "sliding",
@@ -33,6 +35,8 @@ export function makeDocumentWorkerStats(
 		yield* Stream.fromQueue(updates).pipe(
 			Stream.runForEach(input =>
 				Effect.gen(function* () {
+					yield* background.beforeDerived
+					input = (yield* Queue.clear(updates)).at(-1) ?? input
 					let result: DerivedDocumentStats
 					if (worker._tag === "None") {
 						result = {
@@ -67,19 +71,22 @@ export function makeDocumentWorkerStats(
 					}
 					source = input.source
 					revision = input.revision
+					yield* background.betweenChunks
 					yield* Effect.sync(() => publish(result))
 				}),
 			),
 			Effect.forkScoped({ startImmediately: true }),
 		)
 		return {
-			update: (revision: number, source: string) =>
-				Queue.offerUnsafe(updates, { revision, source }),
+			update(revision: number, source: string) {
+				return Queue.offerUnsafe(updates, { revision, source })
+			},
 		}
 	})
 }
 function replacement(before: string, after: string) {
 	return Effect.gen(function* () {
+		let background = yield* BackgroundWork
 		let start = 0
 		let chunks = 0
 		let deadline = (yield* Clock.currentTimeMillis) + 1
@@ -94,6 +101,7 @@ function replacement(before: string, after: string) {
 			let now = yield* Clock.currentTimeMillis
 			if (now >= deadline || ++chunks === 4) {
 				yield* Effect.yieldNow
+				yield* background.betweenChunks
 				chunks = 0
 				deadline = (yield* Clock.currentTimeMillis) + 1
 			}
@@ -113,6 +121,7 @@ function replacement(before: string, after: string) {
 			let now = yield* Clock.currentTimeMillis
 			if (now >= deadline || ++chunks === 4) {
 				yield* Effect.yieldNow
+				yield* background.betweenChunks
 				chunks = 0
 				deadline = (yield* Clock.currentTimeMillis) + 1
 			}
