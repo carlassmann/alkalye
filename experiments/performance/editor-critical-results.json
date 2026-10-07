@@ -1,0 +1,693 @@
+{
+	"provenance": {
+		"baseline": "1bbe9dae675e72f73027559e65b23faae0b049ca",
+		"candidate": "Same baseline plus bd54e62 Replica.applyTogether and document-session applyChanges only; unrelated mobile/cache changes excluded.",
+		"server": "Frozen baseline for both phases; fixed localhost58167 origin; four consistent Bun SQLite VACUUM INTO snapshots plus copied blobs restored before each phase.",
+		"client": "Identical quiet disposable profile safety-copy cloned per phase. Default ephemeral original profile was deleted on close; clones recovered copied LevelDB logs. SW/HTTP/code caches removed. 1280x800 Chromium background.",
+		"fixture": "1MiB ASCII; 2048 TOKEN occurrences in equally spaced lines. Each trusted Control+Shift+L followed by trusted insertText X, durable save and exact undo. Five ordered trials per version.",
+		"trace": "Main thread identified by each performance marker pid/tid. Top-level complete RunTask intervals overlapping the phase, including enclosing native key/beforeinput task. Replacement observes three seconds after exact visible source becomes available. No CPU profiler in matched timings.",
+		"limits": "Small n; before then after order; headless approximately60Hz frame opportunities are not measured120Hz presentation. No peer collaboration or server capacity claim."
+	},
+	"initialObservations": {
+		"validTrials": 10,
+		"failures": [
+			{
+				"fixture": "128k-512",
+				"trial": 0,
+				"error": "Error: critical-current-1791410387805 wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n"
+			},
+			{
+				"fixture": "128k-2048",
+				"trial": 0,
+				"error": "Error: critical-current-1791410387805 wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n"
+			}
+		],
+		"correction": "Initial select-all marker could start at Control modifier while primary token was already selected; initial selection performance not claimed. Earlier inputTaskMs0 was unavailable synthetic input timing, not zero cost. Replacement traces remain valid but not the same-history A/B."
+	},
+	"comparison": {
+		"before": {
+			"loadedEntryBytes": 252795,
+			"entrySha256": "7b2838ceccde8b916fc8129c7418fcf52b8b56484b8558420202454904764c81",
+			"rows": [
+				{
+					"fixture": "1m-2048",
+					"trial": 0,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 1.453,
+							"inputTaskMs": 1.453,
+							"tasksOverBudget": 0,
+							"taskCount": 13
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 80.666,
+							"inputTaskMs": 35.771,
+							"tasksOverBudget": 10,
+							"taskCount": 3283
+						}
+					],
+					"observations": [
+						{
+							"name": "selection",
+							"readyMs": 14.899999976158142,
+							"observedMs": 31.399999976158142,
+							"eventHandlersMs": null,
+							"frameOpportunityGapMedianMs": 16.649999999999864,
+							"frameOpportunityGapP95Ms": 16.59999999999991,
+							"frameOpportunityGapMaxMs": 16.699999999999818,
+							"trustedTrigger": {
+								"code": "KeyL",
+								"ctrl": true,
+								"key": "l",
+								"meta": false,
+								"shift": true,
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						},
+						{
+							"name": "replacement",
+							"readyMs": 36.0,
+							"observedMs": 3036.399999976158,
+							"eventHandlersMs": 35.39999997615814,
+							"frameOpportunityGapMedianMs": 16.699999999999818,
+							"frameOpportunityGapP95Ms": 16.800000000000182,
+							"frameOpportunityGapMaxMs": 66.59999999999945,
+							"trustedTrigger": {
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				},
+				{
+					"fixture": "1m-2048",
+					"trial": 1,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 1.263,
+							"inputTaskMs": 0.788,
+							"tasksOverBudget": 0,
+							"taskCount": 12
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 71.537,
+							"inputTaskMs": 32.946,
+							"tasksOverBudget": 10,
+							"taskCount": 3299
+						}
+					],
+					"observations": [
+						{
+							"name": "selection",
+							"readyMs": 2.80000001191911,
+							"observedMs": 18.5,
+							"eventHandlersMs": null,
+							"frameOpportunityGapMedianMs": 16.649999999999636,
+							"frameOpportunityGapP95Ms": 16.600000000000364,
+							"frameOpportunityGapMaxMs": 16.69999999999891,
+							"trustedTrigger": {
+								"code": "KeyL",
+								"ctrl": true,
+								"key": "l",
+								"meta": false,
+								"shift": true,
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						},
+						{
+							"name": "replacement",
+							"readyMs": 33.200000047683716,
+							"observedMs": 3035.100000023838,
+							"eventHandlersMs": 32.700000047683716,
+							"frameOpportunityGapMedianMs": 16.69999999999891,
+							"frameOpportunityGapP95Ms": 16.700000000000728,
+							"frameOpportunityGapMaxMs": 66.70000000000073,
+							"trustedTrigger": {
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				},
+				{
+					"fixture": "1m-2048",
+					"trial": 2,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 0.715,
+							"inputTaskMs": 0.715,
+							"tasksOverBudget": 0,
+							"taskCount": 13
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 76.503,
+							"inputTaskMs": 29.54,
+							"tasksOverBudget": 11,
+							"taskCount": 3412
+						}
+					],
+					"observations": [
+						{
+							"name": "selection",
+							"readyMs": 5.900000035762787,
+							"observedMs": 22.30000001192093,
+							"eventHandlersMs": null,
+							"frameOpportunityGapMedianMs": 16.649999999999636,
+							"frameOpportunityGapP95Ms": 16.599999999998545,
+							"frameOpportunityGapMaxMs": 16.700000000000728,
+							"trustedTrigger": {
+								"code": "KeyL",
+								"ctrl": true,
+								"key": "l",
+								"meta": false,
+								"shift": true,
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						},
+						{
+							"name": "replacement",
+							"readyMs": 29.799999952316284,
+							"observedMs": 3031.1999999880754,
+							"eventHandlersMs": 29.299999952316284,
+							"frameOpportunityGapMedianMs": 16.69999999999709,
+							"frameOpportunityGapP95Ms": 16.799999999999272,
+							"frameOpportunityGapMaxMs": 66.70000000000073,
+							"trustedTrigger": {
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				},
+				{
+					"fixture": "1m-2048",
+					"trial": 3,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 0.68,
+							"inputTaskMs": 0.68,
+							"tasksOverBudget": 0,
+							"taskCount": 13
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 72.285,
+							"inputTaskMs": 29.03,
+							"tasksOverBudget": 7,
+							"taskCount": 2908
+						}
+					],
+					"observations": [
+						{
+							"name": "selection",
+							"readyMs": 10.300000011920929,
+							"observedMs": 26.80000001192093,
+							"eventHandlersMs": null,
+							"frameOpportunityGapMedianMs": 16.649999999999636,
+							"frameOpportunityGapP95Ms": 16.599999999998545,
+							"frameOpportunityGapMaxMs": 16.700000000000728,
+							"trustedTrigger": {
+								"code": "KeyL",
+								"ctrl": true,
+								"key": "l",
+								"meta": false,
+								"shift": true,
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						},
+						{
+							"name": "replacement",
+							"readyMs": 29.30000001192093,
+							"observedMs": 3031.900000035759,
+							"eventHandlersMs": 28.80000001192093,
+							"frameOpportunityGapMedianMs": 16.69999999999709,
+							"frameOpportunityGapP95Ms": 16.799999999999272,
+							"frameOpportunityGapMaxMs": 50,
+							"trustedTrigger": {
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				},
+				{
+					"fixture": "1m-2048",
+					"trial": 4,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 0.687,
+							"inputTaskMs": 0.687,
+							"tasksOverBudget": 0,
+							"taskCount": 12
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 74.768,
+							"inputTaskMs": 28.437,
+							"tasksOverBudget": 12,
+							"taskCount": 4113
+						}
+					],
+					"observations": [
+						{
+							"name": "selection",
+							"readyMs": 3.5,
+							"observedMs": 19.5,
+							"eventHandlersMs": null,
+							"frameOpportunityGapMedianMs": 16.649999999999636,
+							"frameOpportunityGapP95Ms": 16.599999999998545,
+							"frameOpportunityGapMaxMs": 16.700000000000728,
+							"trustedTrigger": {
+								"code": "KeyL",
+								"ctrl": true,
+								"key": "l",
+								"meta": false,
+								"shift": true,
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						},
+						{
+							"name": "replacement",
+							"readyMs": 28.80000001192093,
+							"observedMs": 3030.5,
+							"eventHandlersMs": 28.100000023841854,
+							"frameOpportunityGapMedianMs": 16.69999999999709,
+							"frameOpportunityGapP95Ms": 16.700000000004366,
+							"frameOpportunityGapMaxMs": 66.70000000000073,
+							"trustedTrigger": {
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				}
+			],
+			"failures": []
+		},
+		"after": {
+			"loadedEntryBytes": 252795,
+			"entrySha256": "2f71efc0a42c5f8fff78a81c9b727957ddbf3e9fa9e423bcc2125cb83f918c6b",
+			"rows": [
+				{
+					"fixture": "1m-2048",
+					"trial": 0,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 1.414,
+							"inputTaskMs": 1.414,
+							"tasksOverBudget": 0,
+							"taskCount": 13
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 58.296,
+							"inputTaskMs": 35.511,
+							"tasksOverBudget": 9,
+							"taskCount": 3969
+						}
+					],
+					"observations": [
+						{
+							"name": "selection",
+							"readyMs": 14.199999988079071,
+							"observedMs": 31.5,
+							"eventHandlersMs": null,
+							"frameOpportunityGapMedianMs": 16.649999999999864,
+							"frameOpportunityGapP95Ms": 16.59999999999991,
+							"frameOpportunityGapMaxMs": 16.699999999999818,
+							"trustedTrigger": {
+								"code": "KeyL",
+								"ctrl": true,
+								"key": "l",
+								"meta": false,
+								"shift": true,
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						},
+						{
+							"name": "replacement",
+							"readyMs": 36.0,
+							"observedMs": 3037.5,
+							"eventHandlersMs": 35.30000001192093,
+							"frameOpportunityGapMedianMs": 16.699999999999818,
+							"frameOpportunityGapP95Ms": 16.799999999999272,
+							"frameOpportunityGapMaxMs": 33.5,
+							"trustedTrigger": {
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				},
+				{
+					"fixture": "1m-2048",
+					"trial": 1,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 0.858,
+							"inputTaskMs": 0.858,
+							"tasksOverBudget": 0,
+							"taskCount": 14
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 57.041,
+							"inputTaskMs": 32.508,
+							"tasksOverBudget": 8,
+							"taskCount": 3312
+						}
+					],
+					"observations": [
+						{
+							"name": "selection",
+							"readyMs": 10.69999998808089,
+							"observedMs": 26.399999976158142,
+							"eventHandlersMs": null,
+							"frameOpportunityGapMedianMs": 16.649999999999636,
+							"frameOpportunityGapP95Ms": 16.600000000000364,
+							"frameOpportunityGapMaxMs": 16.69999999999891,
+							"trustedTrigger": {
+								"code": "KeyL",
+								"ctrl": true,
+								"key": "l",
+								"meta": false,
+								"shift": true,
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						},
+						{
+							"name": "replacement",
+							"readyMs": 32.899999976154504,
+							"observedMs": 3033.800000011919,
+							"eventHandlersMs": 32.30000001192093,
+							"frameOpportunityGapMedianMs": 16.69999999999891,
+							"frameOpportunityGapP95Ms": 16.799999999999272,
+							"frameOpportunityGapMaxMs": 33.29999999999927,
+							"trustedTrigger": {
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				},
+				{
+					"fixture": "1m-2048",
+					"trial": 2,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 0.74,
+							"inputTaskMs": 0.74,
+							"tasksOverBudget": 0,
+							"taskCount": 15
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 58.351,
+							"inputTaskMs": 30.073,
+							"tasksOverBudget": 7,
+							"taskCount": 2922
+						}
+					],
+					"observations": [
+						{
+							"name": "selection",
+							"readyMs": 13.699999988079071,
+							"observedMs": 31.100000023841858,
+							"eventHandlersMs": null,
+							"frameOpportunityGapMedianMs": 16.599999999998545,
+							"frameOpportunityGapP95Ms": 16.599999999998545,
+							"frameOpportunityGapMaxMs": 16.599999999998545,
+							"trustedTrigger": {
+								"code": "KeyL",
+								"ctrl": true,
+								"key": "l",
+								"meta": false,
+								"shift": true,
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						},
+						{
+							"name": "replacement",
+							"readyMs": 30.400000035762787,
+							"observedMs": 3032.100000023838,
+							"eventHandlersMs": 29.80000001192093,
+							"frameOpportunityGapMedianMs": 16.69999999999709,
+							"frameOpportunityGapP95Ms": 16.700000000000728,
+							"frameOpportunityGapMaxMs": 33.30000000000291,
+							"trustedTrigger": {
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				},
+				{
+					"fixture": "1m-2048",
+					"trial": 3,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 0.687,
+							"inputTaskMs": 0.687,
+							"tasksOverBudget": 0,
+							"taskCount": 15
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 56.124,
+							"inputTaskMs": 29.291,
+							"tasksOverBudget": 7,
+							"taskCount": 2921
+						}
+					],
+					"observations": [
+						{
+							"name": "selection",
+							"readyMs": 15.10000002383822,
+							"observedMs": 31.60000002383822,
+							"eventHandlersMs": null,
+							"frameOpportunityGapMedianMs": 16.649999999999636,
+							"frameOpportunityGapP95Ms": 16.599999999998545,
+							"frameOpportunityGapMaxMs": 16.700000000000728,
+							"trustedTrigger": {
+								"code": "KeyL",
+								"ctrl": true,
+								"key": "l",
+								"meta": false,
+								"shift": true,
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						},
+						{
+							"name": "replacement",
+							"readyMs": 29.599999964237213,
+							"observedMs": 3030.3999999761545,
+							"eventHandlersMs": 29.099999964237213,
+							"frameOpportunityGapMedianMs": 16.69999999999709,
+							"frameOpportunityGapP95Ms": 16.799999999999272,
+							"frameOpportunityGapMaxMs": 33.400000000001455,
+							"trustedTrigger": {
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				},
+				{
+					"fixture": "1m-2048",
+					"trial": 4,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 0.669,
+							"inputTaskMs": 0.669,
+							"tasksOverBudget": 0,
+							"taskCount": 13
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 55.326,
+							"inputTaskMs": 28.53,
+							"tasksOverBudget": 12,
+							"taskCount": 3329
+						}
+					],
+					"observations": [
+						{
+							"name": "selection",
+							"readyMs": 6.599999964237213,
+							"observedMs": 24.399999976158142,
+							"eventHandlersMs": null,
+							"frameOpportunityGapMedianMs": 16.649999999999636,
+							"frameOpportunityGapP95Ms": 16.599999999998545,
+							"frameOpportunityGapMaxMs": 16.700000000000728,
+							"trustedTrigger": {
+								"code": "KeyL",
+								"ctrl": true,
+								"key": "l",
+								"meta": false,
+								"shift": true,
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						},
+						{
+							"name": "replacement",
+							"readyMs": 28.899999976154504,
+							"observedMs": 3031.5,
+							"eventHandlersMs": 28.399999976158146,
+							"frameOpportunityGapMedianMs": 16.69999999999709,
+							"frameOpportunityGapP95Ms": 16.700000000004366,
+							"frameOpportunityGapMaxMs": 33.400000000001455,
+							"trustedTrigger": {
+								"sourceEnd": 5,
+								"sourceStart": 0,
+								"trusted": true
+							}
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				}
+			],
+			"failures": []
+		}
+	}
+}
