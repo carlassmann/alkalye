@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>Alkalye performance overhaul — 7 October 2026</title>
+		<style>
+			:root {
+				color-scheme: light dark;
+				font-family: system-ui;
+				background: light-dark(#fafafa, #111);
+				color: light-dark(#171717, #eee);
+			}
+			body {
+				max-width: 1100px;
+				margin: 3rem auto;
+				padding: 0 1.3rem;
+			}
+			h1 {
+				font-size: 2rem;
+				line-height: 1.15;
+			}
+			p {
+				max-width: 82ch;
+				line-height: 1.6;
+			}
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				font-variant-numeric: tabular-nums;
+			}
+			td,
+			th {
+				text-align: right;
+				padding: 1rem 0.7rem;
+				border-bottom: 1px solid light-dark(#ddd, #333);
+			}
+			td:first-child,
+			th:first-child {
+				text-align: left;
+			}
+			small {
+				display: block;
+				color: light-dark(#666, #aaa);
+				margin-top: 0.3rem;
+			}
+			.fast td:last-child {
+				color: light-dark(#097343, #74d5a3);
+			}
+			.slow td:last-child {
+				color: light-dark(#ab3d24, #ffa18c);
+			}
+			.scroll {
+				overflow: auto;
+			}
+			code {
+				overflow-wrap: anywhere;
+			}
+			li {
+				margin: 0.7rem 0;
+				line-height: 1.5;
+			}
+			a {
+				color: inherit;
+				text-underline-offset: 3px;
+			}
+			.notice {
+				border-left: 3px solid #b99a40;
+				padding: 0.7rem 1rem;
+				background: light-dark(#f5efdf, #272318);
+			}
+			@media (max-width: 650px) {
+				td,
+				th {
+					padding: 0.6rem 0.3rem;
+					font-size: 0.8rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Performance overhaul</h1>
+		<p>
+			The final rewrite improves typing, preview and live edits. History-heavy
+			reloads, large paragraphs and reconnect are still slower than main. Frozen
+			production builds, local sync servers and disposable accounts were used
+			throughout.
+		</p>
+		<p class="notice">
+			<strong>120 fps is not established.</strong> The final continuous 128 KiB
+			trace had one 9.23 ms main-thread task, mostly garbage collection, versus
+			29.04 ms in main. The earlier rewrite's 162 ms persistence stall is gone.
+			This headless browser presents near 60 Hz, so it cannot certify 120 Hz
+			presentation.
+		</p>
+		<h2>Final journeys</h2>
+		<p>
+			Milliseconds. Before is the earlier be48 rewrite report. Main and after
+			are the final round. Before used different retained histories, so
+			old-to-new reload totals are not a controlled code-only comparison.
+			Reloads use three samples, typing six, preview/search nine; 1 MiB typing
+			uses three.
+		</p>
+		<div class="scroll">
+			<table>
+				<thead>
+					<tr>
+						<th>Journey</th>
+						<th>Before median</th>
+						<th>Main median</th>
+						<th>After median</th>
+						<th>After p95</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>2 KiB · warm document reload<small>n = 3</small></td>
+						<td>81.8 ms</td>
+						<td>153.9 ms</td>
+						<td>86.2 ms</td>
+						<td>93.4 ms</td>
+					</tr>
+					<tr>
+						<td>
+							2 KiB · insert text to paint opportunity<small>n = 6</small>
+						</td>
+						<td>10.3 ms</td>
+						<td>25.7 ms</td>
+						<td>13.9 ms</td>
+						<td>22.7 ms</td>
+					</tr>
+					<tr>
+						<td>32 KiB · warm document reload<small>n = 3</small></td>
+						<td>176.3 ms</td>
+						<td>362.0 ms</td>
+						<td>234.7 ms</td>
+						<td>241.5 ms</td>
+					</tr>
+					<tr>
+						<td>
+							32 KiB · insert text to paint opportunity<small>n = 6</small>
+						</td>
+						<td>15.7 ms</td>
+						<td>18.2 ms</td>
+						<td>8.1 ms</td>
+						<td>27.9 ms</td>
+					</tr>
+					<tr>
+						<td>
+							32 KiB · insert at start to paint opportunity<small>n = 6</small>
+						</td>
+						<td>30.3 ms</td>
+						<td>20.7 ms</td>
+						<td>12.3 ms</td>
+						<td>19.4 ms</td>
+					</tr>
+					<tr>
+						<td>
+							32 KiB · insert at middle to paint opportunity<small>n = 6</small>
+						</td>
+						<td>31.1 ms</td>
+						<td>21.4 ms</td>
+						<td>12.3 ms</td>
+						<td>22.6 ms</td>
+					</tr>
+					<tr>
+						<td>128 KiB · warm document reload<small>n = 3</small></td>
+						<td>297.9 ms</td>
+						<td>993.6 ms</td>
+						<td>1079.7 ms</td>
+						<td>1086.5 ms</td>
+					</tr>
+					<tr>
+						<td>
+							128 KiB · insert text to paint opportunity<small>n = 6</small>
+						</td>
+						<td>11.3 ms</td>
+						<td>26.1 ms</td>
+						<td>13.4 ms</td>
+						<td>22.8 ms</td>
+					</tr>
+					<tr>
+						<td>
+							128 KiB · insert at start to paint opportunity<small>n = 6</small>
+						</td>
+						<td>18.7 ms</td>
+						<td>19.4 ms</td>
+						<td>15.8 ms</td>
+						<td>33.0 ms</td>
+					</tr>
+					<tr>
+						<td>
+							128 KiB · insert at middle to paint opportunity<small
+								>n = 6</small
+							>
+						</td>
+						<td>22.4 ms</td>
+						<td>29.8 ms</td>
+						<td>10.2 ms</td>
+						<td>18.7 ms</td>
+					</tr>
+					<tr>
+						<td>1024 KiB · warm document reload<small>n = 3</small></td>
+						<td>Unmeasured</td>
+						<td>2723.0 ms</td>
+						<td>3162.2 ms</td>
+						<td>3164.4 ms</td>
+					</tr>
+					<tr>
+						<td>
+							1024 KiB · insert text to paint opportunity<small>n = 3</small>
+						</td>
+						<td>Unmeasured</td>
+						<td>27.7 ms</td>
+						<td>31.5 ms</td>
+						<td>39.5 ms</td>
+					</tr>
+					<tr>
+						<td>
+							1024 KiB · insert at start to paint opportunity<small
+								>n = 3</small
+							>
+						</td>
+						<td>Unmeasured</td>
+						<td>Unmeasured</td>
+						<td>29.9 ms</td>
+						<td>30.2 ms</td>
+					</tr>
+					<tr>
+						<td>
+							1024 KiB · insert at middle to paint opportunity<small
+								>n = 3</small
+							>
+						</td>
+						<td>Unmeasured</td>
+						<td>Unmeasured</td>
+						<td>27.3 ms</td>
+						<td>29.6 ms</td>
+					</tr>
+					<tr>
+						<td>2 KiB · open find panel<small>n = 9</small></td>
+						<td>30.6 ms</td>
+						<td>32.6 ms</td>
+						<td>28.1 ms</td>
+						<td>34.1 ms</td>
+					</tr>
+					<tr>
+						<td>2 KiB · find all reference matches<small>n = 9</small></td>
+						<td>25.3 ms</td>
+						<td>28.7 ms</td>
+						<td>29.3 ms</td>
+						<td>33.1 ms</td>
+					</tr>
+					<tr>
+						<td>2 KiB · open rendered preview<small>n = 9</small></td>
+						<td>33.0 ms</td>
+						<td>56.6 ms</td>
+						<td>22.0 ms</td>
+						<td>30.4 ms</td>
+					</tr>
+					<tr>
+						<td>128 KiB · open find panel<small>n = 9</small></td>
+						<td>31.3 ms</td>
+						<td>33.7 ms</td>
+						<td>29.3 ms</td>
+						<td>34.6 ms</td>
+					</tr>
+					<tr>
+						<td>128 KiB · find all reference matches<small>n = 9</small></td>
+						<td>31.1 ms</td>
+						<td>25.5 ms</td>
+						<td>29.0 ms</td>
+						<td>42.9 ms</td>
+					</tr>
+					<tr>
+						<td>128 KiB · open rendered preview<small>n = 9</small></td>
+						<td>476.8 ms</td>
+						<td>66.4 ms</td>
+						<td>34.1 ms</td>
+						<td>45.9 ms</td>
+					</tr>
+					<tr>
+						<td>
+							128 KiB · switch existing128KiB document<small>n = 9</small>
+						</td>
+						<td>153.7 ms</td>
+						<td>Unmeasured</td>
+						<td>219.6 ms</td>
+						<td>1055.3 ms</td>
+					</tr>
+					<tr>
+						<td>
+							2 KiB · edit to other device paint opportunity<small>n = 9</small>
+						</td>
+						<td>86.5 ms</td>
+						<td>304.0 ms</td>
+						<td>79.5 ms</td>
+						<td>84.9 ms</td>
+					</tr>
+					<tr>
+						<td>
+							2 KiB · offline reconnect to other device paint opportunity<small
+								>n = 3</small
+							>
+						</td>
+						<td>84.5 ms</td>
+						<td>46.8 ms</td>
+						<td>80.4 ms</td>
+						<td>87.5 ms</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h2>What still needs work</h2>
+		<ul>
+			<li>
+				A retained-history 128 KiB reload takes 1,079.7 ms versus main's 993.6
+				ms. The earlier cache held 286,548 character atoms for about 131,000
+				visible characters. Cooperative decoding spreads this work across tasks;
+				it does not eliminate the work.
+			</li>
+			<li>
+				A 1 MiB paragraph reload takes 3,162.2 ms versus 2,723.0 ms. End typing
+				reaches a paint opportunity in 31.5 ms versus 27.7 ms. Native input
+				often approaches or exceeds the 8.3 ms budget. Main's beginning edit did
+				not reach the required source-change state before the deadline; middle
+				was skipped. That result is unverified automation, not an app-crash
+				claim.
+			</li>
+			<li>
+				128 KiB find takes 29.0 ms versus 25.5 ms. Offline reconnect to peer
+				takes 80.4 ms versus 46.8 ms. Normal live edits are faster at 79.5 ms
+				versus 304.0 ms.
+			</li>
+			<li>
+				Main switching missed the required-state deadline. Final rewrite
+				multicursor timing lost the injected probe after a browser-daemon
+				restart. Main replaced 1,298 selections in 84.2 ms, p95 90.0 ms. The
+				previous report retains earlier rewrite multicursor evidence; this final
+				cell is missing.
+			</li>
+		</ul>
+		<h2>Input and frame work</h2>
+		<p>
+			Native input spans trusted beforeinput through bubbling input. Frame work
+			sums measured application callbacks for a frame. Neither includes every
+			deferred browser task or guarantees pixel presentation. Do not add or
+			compare these columns as complete frame costs.
+		</p>
+		<div class="scroll">
+			<table>
+				<thead>
+					<tr>
+						<th>Rewrite journey</th>
+						<th>Native median / p95</th>
+						<th>Callback work p95</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>2 KiB · insert text to paint opportunity</td>
+						<td>2.1 / 2.6 ms</td>
+						<td>0.9 ms</td>
+					</tr>
+					<tr>
+						<td>32 KiB · insert text to paint opportunity</td>
+						<td>2.3 / 2.4 ms</td>
+						<td>1.1 ms</td>
+					</tr>
+					<tr>
+						<td>32 KiB · insert at start to paint opportunity</td>
+						<td>2.6 / 6.3 ms</td>
+						<td>1.2 ms</td>
+					</tr>
+					<tr>
+						<td>32 KiB · insert at middle to paint opportunity</td>
+						<td>2.8 / 5.0 ms</td>
+						<td>1.6 ms</td>
+					</tr>
+					<tr>
+						<td>128 KiB · insert text to paint opportunity</td>
+						<td>2.6 / 3.0 ms</td>
+						<td>1.6 ms</td>
+					</tr>
+					<tr>
+						<td>128 KiB · insert at start to paint opportunity</td>
+						<td>3.0 / 11.8 ms</td>
+						<td>1.5 ms</td>
+					</tr>
+					<tr>
+						<td>128 KiB · insert at middle to paint opportunity</td>
+						<td>3.6 / 8.0 ms</td>
+						<td>2.1 ms</td>
+					</tr>
+					<tr>
+						<td>1024 KiB · insert text to paint opportunity</td>
+						<td>8.7 / 32.1 ms</td>
+						<td>6.1 ms</td>
+					</tr>
+					<tr>
+						<td>1024 KiB · insert at start to paint opportunity</td>
+						<td>7.0 / 7.2 ms</td>
+						<td>6.1 ms</td>
+					</tr>
+					<tr>
+						<td>1024 KiB · insert at middle to paint opportunity</td>
+						<td>8.2 / 8.4 ms</td>
+						<td>6.2 ms</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<p>
+			During 25 synthetic canonical edits at 40 ms intervals, the final 128 KiB
+			frame intervals were 16.7 ms median and p95, 16.8 ms maximum. The largest
+			rewrite task was 9.23 ms, including 8.86 ms minor collection. Main's
+			largest task was 29.04 ms. These three-second traces include background
+			persistence.
+		</p>
+		<p>
+			The original exact-label save gate reported false because the current
+			status reads "Saved on this device". An explicit diagnostic after three
+			seconds showed pending 0 and aria-busy false. Local persistence had
+			acknowledged the edits. Separate peer checks verify delivery.
+		</p>
+		<h2>Measured causes and changes</h2>
+		<ul>
+			<li>
+				Rich 32 KiB text mounted too much native text and overlay DOM. Bounded
+				windows and batched geometry removed repeated write/read layout work.
+				Search reuses match lists. Final beginning typing is 12.3 ms versus the
+				earlier rewrite's 30.3 ms.
+			</li>
+			<li>
+				Preview waited for comment alignment. Rendering before alignment reduced
+				128 KiB preview from 476.8 ms to 34.1 ms; main takes 66.4 ms. The
+				rendered 1,297 reference links were verified during the preceding patch
+				comparison.
+			</li>
+			<li>
+				Checkpoint decoding and Replica.restore produced an 822 ms IndexedDB
+				callback. Bounded cooperative hydration reduced the largest callback to
+				22.26 ms in the intermediate no-profiler trace, while total reload time
+				remained around one second.
+			</li>
+			<li>
+				Snapshot capture synchronously materialized cold durable text.
+				Cooperative capture and warming durable materialization removed the 162
+				ms and then 81 ms continuous-typing stalls. The final remaining largest
+				task is mostly collection.
+			</li>
+			<li>
+				Immutable atom storage now uses Effect Chunk; SQLite statements reuse
+				Bun's query cache. The module test below exercises the combined
+				resulting sync path.
+			</li>
+		</ul>
+		<p>
+			An apparent 197 ms animation callback in an early CPU trace was profiler
+			startup: its first sample consumed 195.975 ms. It is excluded from
+			application-cost claims. Final continuous traces use no CPU-profiler
+			category.
+		</p>
+		<h2>Collaboration and fallback</h2>
+		<p>
+			The forced HTTP polling path was verified by rejecting WebSocket
+			construction in disposable profiles and observing the live HTTP route.
+			Polling edit-to-peer median was 75.9 ms, p95 85.7 ms; reconnect median
+			71.0 ms, p95 71.6 ms. These local figures do not predict internet polling
+			latency.
+		</p>
+		<p>
+			A separate continuous sync behavior probe sent 25 edits every 40 ms. Its
+			first peer update arrived after 46.5 ms and 23 updates arrived before
+			typing ended. No focus or online events occurred. Local activity
+			immediately drains and synchronizes; the session's separate 500 ms
+			debounce does not block this path.
+		</p>
+		<p>
+			The public-boundary 24-writer test passed 1,267 assertions. It committed
+			192 operations across eight rounds using mixed live transports, persisted
+			clients, reconnect and reader permissions. Commit-request median fell from
+			258.5 to 118.7 ms, p95 from 508.5 to 247.1 ms. Complete journey throughput
+			rose from 24.9 to 52.1 operations/second. Clients, server, convergence
+			barriers and assertions run together; pure server capacity and 20-writer
+			browser frame rates remain unmeasured.
+		</p>
+		<p>
+			A clean fallback-parser probe measured actual message-handler slices. A
+			1.125 MiB prose source used 202 turns with maximum 0.6 ms, previously 10.8
+			ms. Large unmatched links, unclosed fences and many small fences stayed at
+			or below 0.6 ms. This is a module scheduling result, not an E2E frame-rate
+			result.
+		</p>
+		<h2>Production bundle sizes</h2>
+		<p>
+			Raw / gzip, per-file gzip level 9. Static imports and HTML preloads define
+			initial JavaScript. Maps, probes, HTML, fonts and images are excluded.
+			Whiteboard is the lazy static dependency closure, not a precise
+			tldraw-package attribution. Main includes tldraw CSS initially; the
+			rewrite loads it lazily.
+		</p>
+		<div class="scroll">
+			<table>
+				<thead>
+					<tr>
+						<th>Group</th>
+						<th>Main raw / gzip</th>
+						<th>Rewrite raw / gzip</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Initial JavaScript</td>
+						<td>3838.2 / 1250.3 KiB</td>
+						<td>1014.7 / 335.9 KiB</td>
+					</tr>
+					<tr>
+						<td>Initial CSS</td>
+						<td>208.0 / 35.7 KiB</td>
+						<td>117.4 / 31.2 KiB</td>
+					</tr>
+					<tr>
+						<td>Lazy whiteboard JavaScript</td>
+						<td>1651.3 / 502.0 KiB</td>
+						<td>1915.9 / 578.3 KiB</td>
+					</tr>
+					<tr>
+						<td>Lazy whiteboard CSS</td>
+						<td>0.0 / 0.0 KiB</td>
+						<td>96.1 / 18.8 KiB</td>
+					</tr>
+					<tr>
+						<td>Document worker</td>
+						<td>0.0 / 0.0 KiB</td>
+						<td>152.2 / 50.0 KiB</td>
+					</tr>
+					<tr>
+						<td>All emitted JavaScript</td>
+						<td>9209.8 / 2629.8 KiB</td>
+						<td>3170.1 / 997.2 KiB</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h2>Reproduction and limits</h2>
+		<p>
+			Apple M5 Pro, 64 GiB RAM, Bun 1.4.0, headless Chrome 154. Main
+			a749728a8f9a1cb984c980a5ea2daf984d60ae68; rewrite
+			aa89506de66bcceea235d51ec9606f76c6a79068. Frozen assets were built before
+			timing. Both libraries contain equivalent 2, 32 and 128 KiB rich Markdown
+			fixtures plus a 1 MiB paragraph. Edits, undo and source restoration grow
+			different retained histories. Import/setup is excluded. p95 at these
+			sample counts is descriptive.
+		</p>
+		<p>
+			This round does not certify every scrolling interaction, remote 128 KiB
+			delivery task or 1 MiB fenced-code journey. It identifies remaining
+			regressions without asserting universal 120 fps. Exact raw samples,
+			failures, source/build hashes and intermediate traces summaries are
+			retained below.
+		</p>
+		<p>
+			<a href="performance-overhaul.json">Raw samples and provenance</a> ·
+			<a href="performance-rebench.html">Earlier comparison</a>
+		</p>
+	</body>
+</html>

@@ -142,3 +142,19 @@ The runner follows static JavaScript imports from the app HTML's scripts, hydrat
 Each file is gzip compressed separately at level 9 with Bun, then summed. Every group records its file list and exact raw and gzip bytes. Totals count emitted JavaScript and CSS once, including lazy features, syntax grammars and service workers. Exclude source maps, benchmark probes, HTML, inline scripts, fonts, images, WASM, documents and compression sidecars. These figures do not measure network traffic or service-worker precaching.
 
 The published comparison uses main `a749728` and frozen rewrite `be48f8b`. It separately records current rewrite `700f9f4`, including email authentication. Main already loads React and tldraw CSS at startup; the rewrite loads React and tldraw CSS with the whiteboard. Chunk sharing and library versions also differ, so the whiteboard group is not pure tldraw package attribution.
+
+## Performance overhaul follow-up
+
+`seed-large.ts CONFIG.json OUTPUT.json` creates a disposable 1 MiB long-line document through each app's editor boundary and waits for the complete source and durable-save acknowledgement. Setup is excluded from load measurements. If automation times out, independently verify exact source equality and the save acknowledgement before using that document; a timeout alone does not establish an application failure.
+
+`compare.ts` accepts `BENCHMARK_RELOAD_SAMPLES` and `BENCHMARK_INPUT_SAMPLES` (3–30). It separately records synchronous `beforeinput` to bubbling `input`, then the complete required state to a later paint opportunity. The synchronous span omits deferred work. A small animation callback does not establish a complete frame budget.
+
+`peer.ts` accepts optional `transport: "poll"` on rewrite entries. The injected probe deliberately rejects WebSocket construction for that disposable profile and waits for the HTTP presence path. Resource samples record path, initiation, response and duration relative to the trusted edit or reconnect event; WebSocket samples record direction and time, never payloads. Default transport remains WebSocket. Confirm the fallback really became active before interpreting results.
+
+Preserve the history and library composition when comparing hydration changes. Replacing the whole visible source does not reset retained CRDT atoms, event history or undo state. A new 1 MiB document can also change unrelated library work. Record canonical source hashes, checkpoint bytes, packed runs and expanded character atoms where those differences affect a result.
+
+The follow-up report is `public/docs/performance-overhaul.html`, with raw samples in its JSON companion. Intermediate measurements retain their build and dataset labels; they are not interchangeable with the final build.
+
+`continuous.ts CONFIG.json OUTPUT.json` observes 25 canonical edits scheduled at 40 ms intervals over three seconds, including the background persistence window. It records completed edits, synchronous edit spans, frame intervals and whether a durable-save acknowledgement appeared. These edits are synthetic, so this is a behavior/task observation rather than trusted input latency. Each version receives a separate Chrome timeline trace without the CPU-profiler category. Analyze all main-thread tasks, collection, layout and frame gaps; do not infer responsiveness from the synchronous edit span alone.
+
+Final overhaul measurements and limitations are published at `public/docs/performance-overhaul.html`, with raw samples in the adjacent JSON. The final frozen editor source is `aa89506`; both servers use production assets. Reload and input setup remain outside the measured span. The three-second continuous probe accepts both quiet local-save labels and records explicit pending, busy and version fields. A local-save acknowledgement does not prove server convergence.

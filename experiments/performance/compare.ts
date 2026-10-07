@@ -42,10 +42,13 @@ interface Measurement {
 	minMs: number
 	maxMs: number
 	maxFrameCallbackWorkMs?: number[]
+	nativeInputMs?: number[]
 }
 
 let configurationPath = process.argv[2]
 let outputPath = process.argv[3]
+let reloadSamples = sampleCount(Bun.env.BENCHMARK_RELOAD_SAMPLES, 9)
+let inputSamples = sampleCount(Bun.env.BENCHMARK_INPUT_SAMPLES, 12)
 if (!configurationPath || !outputPath)
 	throw Error(
 		"Usage: bun experiments/performance/compare.ts CONFIG.json RESULTS.json",
@@ -95,7 +98,7 @@ function measureReload(configuration: Configuration, fixture: Fixture) {
 	browser(configuration, "reload")
 	wait(configuration, "window.__benchmark.readyMs!==null")
 	let values: number[] = []
-	for (let iteration = 0; iteration < 9; iteration++) {
+	for (let iteration = 0; iteration < reloadSamples; iteration++) {
 		browser(configuration, "reload")
 		wait(configuration, "window.__benchmark.readyMs!==null")
 		if (
@@ -115,13 +118,18 @@ function measureTyping(
 ) {
 	let values: number[] = []
 	let maxFrameCallbackWorkMs: number[] = []
-	for (let iteration = 0; iteration < 12; iteration++) {
+	let nativeInputMs: number[] = []
+	for (let iteration = 0; iteration < inputSamples; iteration++) {
 		focusPosition(configuration, location)
 		let marker = ` perf${location}${fixture.kb}_${iteration}`
 		let before = number(configuration, `${source(configuration)}.length`)
 		evaluate(
 			configuration,
 			`window.__benchmark.armJourney('typing',()=>(${source(configuration)}.length===${before + marker.length}));true`,
+		)
+		evaluate(
+			configuration,
+			"(()=>{window.__benchmarkNativeMs=null;let started;document.addEventListener('beforeinput',()=>started=performance.now(),{once:true,capture:true});document.addEventListener('input',()=>window.__benchmarkNativeMs=performance.now()-started,{once:true});return true})()",
 		)
 		browser(configuration, "keyboard", "inserttext", marker)
 		wait(configuration, "window.__benchmark.arm===null")
@@ -131,6 +139,7 @@ function measureTyping(
 		if (sample.error || sample.ms === undefined)
 			throw Error(sample.error ?? "Missing input measurement")
 		values.push(sample.ms)
+		nativeInputMs.push(number(configuration, "window.__benchmarkNativeMs"))
 		let frames = new Map<number, number>()
 		for (let callback of sample.animationWork ?? [])
 			frames.set(
@@ -154,8 +163,16 @@ function measureTyping(
 		values,
 		{
 			maxFrameCallbackWorkMs,
+			nativeInputMs,
 		},
 	)
+}
+
+function sampleCount(value: string | undefined, fallback: number) {
+	let count = value === undefined ? fallback : Number(value)
+	if (!Number.isInteger(count) || count < 3 || count > 30)
+		throw Error("Benchmark sample count must be an integer from 3 to 30")
+	return count
 }
 
 function collect(
@@ -163,7 +180,7 @@ function collect(
 	fixture: Fixture,
 	name: string,
 	values: number[],
-	work: { maxFrameCallbackWorkMs?: number[] } = {},
+	work: { maxFrameCallbackWorkMs?: number[]; nativeInputMs?: number[] } = {},
 ) {
 	let sorted = [...values].sort((left, right) => left - right)
 	let lower = sorted[Math.floor((sorted.length - 1) / 2)]

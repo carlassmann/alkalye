@@ -8,7 +8,29 @@
 		samples: [],
 		arm: null,
 		animationWork: [],
+		socketFrames: [],
 	})
+	let NativeWebSocket = window.WebSocket
+	window.WebSocket = class extends NativeWebSocket {
+		constructor(url, protocols) {
+			if (localStorage.getItem("__benchmarkTransport") === "poll")
+				throw new Error("Benchmark deliberately blocks WebSockets")
+			super(url, protocols)
+			this.addEventListener("message", () => recordSocket(this, "receive"))
+		}
+		send(data) {
+			recordSocket(this, "send")
+			return super.send(data)
+		}
+	}
+	function recordSocket(socket, direction) {
+		state.socketFrames.push({
+			path: new URL(socket.url).pathname,
+			direction,
+			time: performance.timeOrigin + performance.now(),
+		})
+		if (state.socketFrames.length > 2000) state.socketFrames.shift()
+	}
 	let frame = window.requestAnimationFrame.bind(window)
 	window.requestAnimationFrame = callback =>
 		frame(timestamp => {
