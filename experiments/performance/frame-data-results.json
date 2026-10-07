@@ -1,0 +1,90 @@
+{
+	"runtime": "1.4.0",
+	"note": "Bun worker/SQLite experiment; not browser IndexedDB or a rendering measurement. Main projection stores UTF16 blocks, not CRDT atoms. Worker retains current full-source session.edit API.",
+	"results": [
+		{
+			"phase": "bounded-main-projection",
+			"kilobytes": 128,
+			"milliseconds": {
+				"count": 500,
+				"median": 0.0014159999999989736,
+				"p95": 0.004125000000001933,
+				"max": 0.2060419999999965
+			},
+			"messageBytes": {
+				"count": 500,
+				"median": 66,
+				"p95": 68,
+				"max": 68
+			}
+		},
+		{
+			"phase": "bounded-main-projection",
+			"kilobytes": 1024,
+			"milliseconds": {
+				"count": 500,
+				"median": 0.0031250000000042633,
+				"p95": 0.0050829999999990605,
+				"max": 0.7145419999999945
+			},
+			"messageBytes": {
+				"count": 500,
+				"median": 67,
+				"p95": 69,
+				"max": 69
+			}
+		},
+		{
+			"phase": "real-session-worker",
+			"kilobytes": 128,
+			"openMilliseconds": 942.3500829999999,
+			"localMilliseconds": {
+				"count": 24,
+				"median": 0.0008750000000645741,
+				"p95": 0.009708000000046013,
+				"max": 0.016041999999970358
+			},
+			"workerDurableMilliseconds": {
+				"count": 24,
+				"median": 74.50312499999973,
+				"p95": 101.87045899999998,
+				"max": 119.02220800000009
+			},
+			"mainEightMillisecondTimerDelay": {
+				"count": 152,
+				"median": 2.0072499999998854,
+				"p95": 2.0157500000000255,
+				"max": 2.0372500000000855
+			},
+			"drainedMilliseconds": 1468.3725839999997,
+			"persistedReopen": true,
+			"forceKilledAfterDurableAck": true
+		},
+		{
+			"phase": "real-session-worker",
+			"kilobytes": 1024,
+			"openMilliseconds": 9749.817833000001,
+			"localMilliseconds": {
+				"count": 24,
+				"median": 0.003582999999707681,
+				"p95": 0.01316699999915727,
+				"max": 0.017916999999215477
+			},
+			"workerDurableMilliseconds": {
+				"count": 24,
+				"median": 1051.4573750000018,
+				"p95": 1470.0297499999979,
+				"max": 1478.2458330000009
+			},
+			"mainEightMillisecondTimerDelay": {
+				"count": 2021,
+				"median": 2.0101250000006985,
+				"p95": 2.0181660000016564,
+				"max": 2.677000000003318
+			},
+			"drainedMilliseconds": 19600.958333000002,
+			"persistedReopen": true,
+			"forceKilledAfterDurableAck": true
+		}
+	]
+}

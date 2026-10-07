@@ -1,0 +1,826 @@
+[
+	{
+		"size": 131072,
+		"fixture": "paragraphs",
+		"mode": "bare",
+		"samples": [
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 1.5999999940395355,
+				"handler": 1.5,
+				"kind": "insertText",
+				"nativeCharacters": 131073,
+				"position": 0
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 1.2000000178813934,
+				"handler": 1.2000000178813934,
+				"kind": "insertText",
+				"nativeCharacters": 131074,
+				"position": 0
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 1.300000011920929,
+				"handler": 1.300000011920929,
+				"kind": "insertText",
+				"nativeCharacters": 131075,
+				"position": 0
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 14.599999994039536,
+				"handler": 14.5,
+				"kind": "insertText",
+				"nativeCharacters": 131076,
+				"position": 65536
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 15.599999994039536,
+				"handler": 14.699999988079073,
+				"kind": "insertText",
+				"nativeCharacters": 131077,
+				"position": 65536
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 22.19999998807907,
+				"handler": 22.099999994039536,
+				"kind": "insertText",
+				"nativeCharacters": 131078,
+				"position": 65536
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 68.30000001192093,
+				"handler": 68.2000000178814,
+				"kind": "insertText",
+				"nativeCharacters": 131079,
+				"position": 131072
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 70.60000002384186,
+				"handler": 70.5,
+				"kind": "insertText",
+				"nativeCharacters": 131080,
+				"position": 131072
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 67.5,
+				"handler": 67.40000000596046,
+				"kind": "insertText",
+				"nativeCharacters": 131081,
+				"position": 131072
+			}
+		],
+		"scrolling": {
+			"nativeCharacters": 131081,
+			"sample": {
+				"characters": 0,
+				"frame": 0,
+				"handler": 0,
+				"kind": "scroll"
+			},
+			"window": {
+				"end": 131081,
+				"rows": 0,
+				"start": 0
+			}
+		},
+		"selection": true
+	},
+	{
+		"size": 131072,
+		"fixture": "paragraphs",
+		"mode": "bounded",
+		"samples": [
+			{
+				"characters": 1705,
+				"correct": true,
+				"frame": 0.800000011920929,
+				"handler": 0.7000000178813934,
+				"kind": "insertText",
+				"nativeCharacters": 1705,
+				"position": 0
+			},
+			{
+				"characters": 1706,
+				"correct": true,
+				"frame": 0.5999999940395355,
+				"handler": 0.5,
+				"kind": "insertText",
+				"nativeCharacters": 1706,
+				"position": 0
+			},
+			{
+				"characters": 1707,
+				"correct": true,
+				"frame": 0.5999999940395355,
+				"handler": 0.5999999940395355,
+				"kind": "insertText",
+				"nativeCharacters": 1707,
+				"position": 0
+			},
+			{
+				"characters": 1705,
+				"correct": true,
+				"frame": 0.5,
+				"handler": 0.4000000059604645,
+				"kind": "insertText",
+				"nativeCharacters": 1705,
+				"position": 65536
+			},
+			{
+				"characters": 1706,
+				"correct": true,
+				"frame": 0.4000000059604645,
+				"handler": 0.4000000059604645,
+				"kind": "insertText",
+				"nativeCharacters": 1706,
+				"position": 65536
+			},
+			{
+				"characters": 1707,
+				"correct": true,
+				"frame": 0.699999988079071,
+				"handler": 0.5999999940395355,
+				"kind": "insertText",
+				"nativeCharacters": 1707,
+				"position": 65536
+			},
+			{
+				"characters": 1073,
+				"correct": true,
+				"frame": 0.5,
+				"handler": 0.4000000059604645,
+				"kind": "insertText",
+				"nativeCharacters": 1073,
+				"position": 131072
+			},
+			{
+				"characters": 576,
+				"correct": true,
+				"frame": 0.6000000238418579,
+				"handler": 0.5,
+				"kind": "insertText",
+				"nativeCharacters": 576,
+				"position": 131072
+			},
+			{
+				"characters": 577,
+				"correct": true,
+				"frame": 0.699999988079071,
+				"handler": 0.5999999940395355,
+				"kind": "insertText",
+				"nativeCharacters": 577,
+				"position": 131072
+			}
+		],
+		"scrolling": {
+			"nativeCharacters": 1704,
+			"sample": {
+				"characters": 1704,
+				"frame": 0,
+				"handler": 0,
+				"kind": "scroll"
+			},
+			"window": {
+				"end": 67597,
+				"rows": 3693,
+				"start": 65893
+			}
+		},
+		"selection": true
+	},
+	{
+		"size": 131072,
+		"fixture": "long",
+		"mode": "bare",
+		"samples": [
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 2.7000000178813934,
+				"handler": 2.5999999940395355,
+				"kind": "insertText",
+				"nativeCharacters": 131073,
+				"position": 0
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 3.800000011920929,
+				"handler": 3.7000000178813934,
+				"kind": "insertText",
+				"nativeCharacters": 131074,
+				"position": 0
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 3.5,
+				"handler": 3.4000000059604645,
+				"kind": "insertText",
+				"nativeCharacters": 131075,
+				"position": 0
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 3.900000005960465,
+				"handler": 3.900000005960465,
+				"kind": "insertText",
+				"nativeCharacters": 131076,
+				"position": 65536
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 6.699999988079071,
+				"handler": 2.699999988079071,
+				"kind": "insertText",
+				"nativeCharacters": 131077,
+				"position": 65536
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 3.600000023841858,
+				"handler": 3.5,
+				"kind": "insertText",
+				"nativeCharacters": 131078,
+				"position": 65536
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 1.7000000178813934,
+				"handler": 1.600000023841858,
+				"kind": "insertText",
+				"nativeCharacters": 131079,
+				"position": 131072
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 7.599999994039536,
+				"handler": 2.800000011920929,
+				"kind": "insertText",
+				"nativeCharacters": 131080,
+				"position": 131072
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 1.7999999821186066,
+				"handler": 1.7999999821186066,
+				"kind": "insertText",
+				"nativeCharacters": 131081,
+				"position": 131072
+			}
+		],
+		"scrolling": {
+			"nativeCharacters": 131081,
+			"sample": {
+				"characters": 0,
+				"frame": 0,
+				"handler": 0,
+				"kind": "scroll"
+			},
+			"window": {
+				"end": 131081,
+				"rows": 0,
+				"start": 0
+			}
+		},
+		"selection": true
+	},
+	{
+		"size": 131072,
+		"fixture": "long",
+		"mode": "bounded",
+		"samples": [
+			{
+				"characters": 3456,
+				"correct": true,
+				"frame": 0.9000000059604645,
+				"handler": 0.800000011920929,
+				"kind": "insertText",
+				"nativeCharacters": 3456,
+				"position": 0
+			},
+			{
+				"characters": 3456,
+				"correct": true,
+				"frame": 1.0999999940395355,
+				"handler": 0.9000000059604645,
+				"kind": "insertText",
+				"nativeCharacters": 3456,
+				"position": 0
+			},
+			{
+				"characters": 3456,
+				"correct": true,
+				"frame": 1.0999999940395355,
+				"handler": 1,
+				"kind": "insertText",
+				"nativeCharacters": 3456,
+				"position": 0
+			},
+			{
+				"characters": 3456,
+				"correct": true,
+				"frame": 0.9000000059604645,
+				"handler": 0.9000000059604645,
+				"kind": "insertText",
+				"nativeCharacters": 3456,
+				"position": 65536
+			},
+			{
+				"characters": 3456,
+				"correct": true,
+				"frame": 0.5999999940395355,
+				"handler": 0.5,
+				"kind": "insertText",
+				"nativeCharacters": 3456,
+				"position": 65536
+			},
+			{
+				"characters": 3456,
+				"correct": true,
+				"frame": 0.699999988079071,
+				"handler": 0.5999999940395355,
+				"kind": "insertText",
+				"nativeCharacters": 3456,
+				"position": 65536
+			},
+			{
+				"characters": 2271,
+				"correct": true,
+				"frame": 0.30000001192092896,
+				"handler": 0.30000001192092896,
+				"kind": "insertText",
+				"nativeCharacters": 2271,
+				"position": 131072
+			},
+			{
+				"characters": 1192,
+				"correct": true,
+				"frame": 0.4000000059604645,
+				"handler": 0.4000000059604645,
+				"kind": "insertText",
+				"nativeCharacters": 1192,
+				"position": 131072
+			},
+			{
+				"characters": 1193,
+				"correct": true,
+				"frame": 0.30000001192092896,
+				"handler": 0.30000001192092896,
+				"kind": "insertText",
+				"nativeCharacters": 1193,
+				"position": 131072
+			}
+		],
+		"scrolling": {
+			"nativeCharacters": 3456,
+			"sample": {
+				"characters": 3456,
+				"frame": 0,
+				"handler": 0.09999999403953552,
+				"kind": "scroll"
+			},
+			"window": {
+				"end": 69624,
+				"rows": 1821,
+				"start": 66168
+			}
+		},
+		"selection": true
+	},
+	{
+		"size": 1048576,
+		"fixture": "paragraphs",
+		"mode": "bare",
+		"samples": [
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 11.199999988079073,
+				"handler": 11.099999994039536,
+				"kind": "insertText",
+				"nativeCharacters": 1048577,
+				"position": 0
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 9.599999994039536,
+				"handler": 9.5,
+				"kind": "insertText",
+				"nativeCharacters": 1048578,
+				"position": 0
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 9.900000005960464,
+				"handler": 9.900000005960464,
+				"kind": "insertText",
+				"nativeCharacters": 1048579,
+				"position": 0
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 857.8000000119209,
+				"handler": 857.7000000178814,
+				"kind": "insertText",
+				"nativeCharacters": 1048580,
+				"position": 524288
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 826.6999999880791,
+				"handler": 826.6999999880791,
+				"kind": "insertText",
+				"nativeCharacters": 1048581,
+				"position": 524288
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 834.9000000059605,
+				"handler": 834.9000000059605,
+				"kind": "insertText",
+				"nativeCharacters": 1048582,
+				"position": 524288
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 3293.199999988079,
+				"handler": 3293.0999999940395,
+				"kind": "insertText",
+				"nativeCharacters": 1048583,
+				"position": 1048576
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 3296.5,
+				"handler": 3296.4000000059605,
+				"kind": "insertText",
+				"nativeCharacters": 1048584,
+				"position": 1048576
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 3291.5,
+				"handler": 3291.2999999821186,
+				"kind": "insertText",
+				"nativeCharacters": 1048585,
+				"position": 1048576
+			}
+		],
+		"scrolling": {
+			"nativeCharacters": 1048585,
+			"sample": {
+				"characters": 0,
+				"frame": 0,
+				"handler": 0,
+				"kind": "scroll"
+			},
+			"window": {
+				"end": 1048585,
+				"rows": 0,
+				"start": 0
+			}
+		},
+		"selection": true
+	},
+	{
+		"size": 1048576,
+		"fixture": "paragraphs",
+		"mode": "bounded",
+		"samples": [
+			{
+				"characters": 1705,
+				"correct": true,
+				"frame": 1.2999999821186066,
+				"handler": 1.2999999821186066,
+				"kind": "insertText",
+				"nativeCharacters": 1705,
+				"position": 0
+			},
+			{
+				"characters": 1706,
+				"correct": true,
+				"frame": 1.100000023841858,
+				"handler": 1,
+				"kind": "insertText",
+				"nativeCharacters": 1706,
+				"position": 0
+			},
+			{
+				"characters": 1707,
+				"correct": true,
+				"frame": 1.9000000059604645,
+				"handler": 1.800000011920929,
+				"kind": "insertText",
+				"nativeCharacters": 1707,
+				"position": 0
+			},
+			{
+				"characters": 1705,
+				"correct": true,
+				"frame": 1.4000000059604645,
+				"handler": 1.4000000059604645,
+				"kind": "insertText",
+				"nativeCharacters": 1705,
+				"position": 524288
+			},
+			{
+				"characters": 1706,
+				"correct": true,
+				"frame": 2.5,
+				"handler": 2.5,
+				"kind": "insertText",
+				"nativeCharacters": 1706,
+				"position": 524288
+			},
+			{
+				"characters": 1707,
+				"correct": true,
+				"frame": 1.399999976158142,
+				"handler": 1.399999976158142,
+				"kind": "insertText",
+				"nativeCharacters": 1707,
+				"position": 524288
+			},
+			{
+				"characters": 1115,
+				"correct": true,
+				"frame": 1.300000011920929,
+				"handler": 1.2000000178813934,
+				"kind": "insertText",
+				"nativeCharacters": 1115,
+				"position": 1048576
+			},
+			{
+				"characters": 618,
+				"correct": true,
+				"frame": 1.300000011920929,
+				"handler": 1.2000000178813934,
+				"kind": "insertText",
+				"nativeCharacters": 618,
+				"position": 1048576
+			},
+			{
+				"characters": 619,
+				"correct": true,
+				"frame": 1,
+				"handler": 0.9000000059604645,
+				"kind": "insertText",
+				"nativeCharacters": 619,
+				"position": 1048576
+			}
+		],
+		"scrolling": {
+			"nativeCharacters": 1704,
+			"sample": {
+				"characters": 1704,
+				"frame": 0,
+				"handler": 0.19999998807907104,
+				"kind": "scroll"
+			},
+			"window": {
+				"end": 526328,
+				"rows": 29537,
+				"start": 524624
+			}
+		},
+		"selection": true
+	},
+	{
+		"size": 1048576,
+		"fixture": "long",
+		"mode": "bare",
+		"samples": [
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 27,
+				"handler": 27,
+				"kind": "insertText",
+				"nativeCharacters": 1048577,
+				"position": 0
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 19.099999994039536,
+				"handler": 19,
+				"kind": "insertText",
+				"nativeCharacters": 1048578,
+				"position": 0
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 20.400000005960464,
+				"handler": 20.30000001192093,
+				"kind": "insertText",
+				"nativeCharacters": 1048579,
+				"position": 0
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 17.200000017881393,
+				"handler": 17.100000023841858,
+				"kind": "insertText",
+				"nativeCharacters": 1048580,
+				"position": 524288
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 17.799999982118607,
+				"handler": 17.599999994039536,
+				"kind": "insertText",
+				"nativeCharacters": 1048581,
+				"position": 524288
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 19.5,
+				"handler": 19.5,
+				"kind": "insertText",
+				"nativeCharacters": 1048582,
+				"position": 524288
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 12.599999994039536,
+				"handler": 12.599999994039536,
+				"kind": "insertText",
+				"nativeCharacters": 1048583,
+				"position": 1048576
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 22.099999994039536,
+				"handler": 12.799999982118608,
+				"kind": "insertText",
+				"nativeCharacters": 1048584,
+				"position": 1048576
+			},
+			{
+				"characters": 0,
+				"correct": true,
+				"frame": 12.899999976158142,
+				"handler": 12.799999982118608,
+				"kind": "insertText",
+				"nativeCharacters": 1048585,
+				"position": 1048576
+			}
+		],
+		"scrolling": {
+			"nativeCharacters": 1048585,
+			"sample": {
+				"characters": 0,
+				"frame": 0,
+				"handler": 0,
+				"kind": "scroll"
+			},
+			"window": {
+				"end": 1048585,
+				"rows": 0,
+				"start": 0
+			}
+		},
+		"selection": true
+	},
+	{
+		"size": 1048576,
+		"fixture": "long",
+		"mode": "bounded",
+		"samples": [
+			{
+				"characters": 3456,
+				"correct": true,
+				"frame": 0.699999988079071,
+				"handler": 0.699999988079071,
+				"kind": "insertText",
+				"nativeCharacters": 3456,
+				"position": 0
+			},
+			{
+				"characters": 3456,
+				"correct": true,
+				"frame": 0.800000011920929,
+				"handler": 0.7000000178813934,
+				"kind": "insertText",
+				"nativeCharacters": 3456,
+				"position": 0
+			},
+			{
+				"characters": 3456,
+				"correct": true,
+				"frame": 0.800000011920929,
+				"handler": 0.800000011920929,
+				"kind": "insertText",
+				"nativeCharacters": 3456,
+				"position": 0
+			},
+			{
+				"characters": 3456,
+				"correct": true,
+				"frame": 0.9000000059604645,
+				"handler": 0.9000000059604645,
+				"kind": "insertText",
+				"nativeCharacters": 3456,
+				"position": 524288
+			},
+			{
+				"characters": 3456,
+				"correct": true,
+				"frame": 0.9000000059604645,
+				"handler": 0.800000011920929,
+				"kind": "insertText",
+				"nativeCharacters": 3456,
+				"position": 524288
+			},
+			{
+				"characters": 3456,
+				"correct": true,
+				"frame": 0.800000011920929,
+				"handler": 0.7000000178813934,
+				"kind": "insertText",
+				"nativeCharacters": 3456,
+				"position": 524288
+			},
+			{
+				"characters": 2279,
+				"correct": true,
+				"frame": 0.5999999940395355,
+				"handler": 0.5,
+				"kind": "insertText",
+				"nativeCharacters": 2279,
+				"position": 1048576
+			},
+			{
+				"characters": 1200,
+				"correct": true,
+				"frame": 0.6000000238418579,
+				"handler": 0.5,
+				"kind": "insertText",
+				"nativeCharacters": 1200,
+				"position": 1048576
+			},
+			{
+				"characters": 1201,
+				"correct": true,
+				"frame": 0.5,
+				"handler": 0.3999999761581421,
+				"kind": "insertText",
+				"nativeCharacters": 1201,
+				"position": 1048576
+			}
+		],
+		"scrolling": {
+			"nativeCharacters": 3456,
+			"sample": {
+				"characters": 3456,
+				"frame": 0,
+				"handler": 0.09999999403953552,
+				"kind": "scroll"
+			},
+			"window": {
+				"end": 528336,
+				"rows": 14564,
+				"start": 524880
+			}
+		},
+		"selection": true
+	}
+]

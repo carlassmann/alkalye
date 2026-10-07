@@ -1,0 +1,33 @@
+[data-viewport-editor] {
+	position: relative;
+	height: 600px;
+	width: calc(72ch + 16px);
+	font:
+		16px/24px "Courier New",
+		monospace;
+	overflow: auto;
+	border: 1px solid #444;
+}
+[data-viewport-editor] .spacer {
+	width: 1px;
+	pointer-events: none;
+}
+[data-viewport-editor] textarea {
+	position: absolute;
+	left: 0;
+	margin: 0;
+	border: 0;
+	padding: 0;
+	width: 72ch;
+	font: inherit;
+	line-height: 24px;
+	background: #090909;
+	color: #eee;
+	resize: none;
+	overflow: hidden;
+	white-space: pre-wrap;
+	word-break: break-all;
+	overflow-wrap: anywhere;
+	outline: 0;
+	caret-color: #45c793;
+}

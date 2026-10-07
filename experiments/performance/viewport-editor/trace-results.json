@@ -1,0 +1,120 @@
+[
+	{
+		"size": 131072,
+		"mode": "bare",
+		"groups": {
+			"EventDispatch": {
+				"count": 10,
+				"total": 3.3069999999999995,
+				"max": 2.876
+			},
+			"Layout": {
+				"count": 1,
+				"total": 0.865,
+				"max": 0.865
+			},
+			"FireAnimationFrame": {
+				"count": 1,
+				"total": 0.012,
+				"max": 0.012
+			},
+			"Paint": {
+				"count": 2,
+				"total": 0.46799999999999997,
+				"max": 0.242
+			}
+		},
+		"path": "/tmp/alkalye-viewport-131072-bare-trace.json"
+	},
+	{
+		"size": 131072,
+		"mode": "bounded",
+		"groups": {
+			"EventDispatch": {
+				"count": 5,
+				"total": 0.8250000000000001,
+				"max": 0.393
+			},
+			"Layout": {
+				"count": 2,
+				"total": 0.175,
+				"max": 0.101
+			},
+			"UpdateLayoutTree": {
+				"count": 1,
+				"total": 0.065,
+				"max": 0.065
+			},
+			"FireAnimationFrame": {
+				"count": 1,
+				"total": 0.014,
+				"max": 0.014
+			},
+			"Paint": {
+				"count": 2,
+				"total": 0.126,
+				"max": 0.072
+			}
+		},
+		"path": "/tmp/alkalye-viewport-131072-bounded-trace.json"
+	},
+	{
+		"size": 1048576,
+		"mode": "bare",
+		"groups": {
+			"EventDispatch": {
+				"count": 10,
+				"total": 22.329000000000004,
+				"max": 20.511
+			},
+			"Layout": {
+				"count": 1,
+				"total": 6.938,
+				"max": 6.938
+			},
+			"FireAnimationFrame": {
+				"count": 1,
+				"total": 0.007,
+				"max": 0.007
+			},
+			"Paint": {
+				"count": 2,
+				"total": 0.759,
+				"max": 0.388
+			}
+		},
+		"path": "/tmp/alkalye-viewport-1048576-bare-trace.json"
+	},
+	{
+		"size": 1048576,
+		"mode": "bounded",
+		"groups": {
+			"EventDispatch": {
+				"count": 5,
+				"total": 1.524,
+				"max": 0.997
+			},
+			"Layout": {
+				"count": 2,
+				"total": 0.273,
+				"max": 0.175
+			},
+			"UpdateLayoutTree": {
+				"count": 1,
+				"total": 0.072,
+				"max": 0.072
+			},
+			"FireAnimationFrame": {
+				"count": 1,
+				"total": 0.012,
+				"max": 0.012
+			},
+			"Paint": {
+				"count": 2,
+				"total": 0.134,
+				"max": 0.077
+			}
+		},
+		"path": "/tmp/alkalye-viewport-1048576-bounded-trace.json"
+	}
+]
