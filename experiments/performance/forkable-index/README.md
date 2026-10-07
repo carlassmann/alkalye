@@ -124,3 +124,21 @@ Native's 966 ms task resumes inside `indexeddb-journal.ts:585`, then enters `bui
 The direct target is synchronous full-state staging through `restore(checkpoint())`, followed by cold materialization. Replacing that staging with an independently forked replica can preserve isolation while removing unnecessary checkpoint copying, restoration and cold scans. That change requires its own public contracts and matched app measurement. Neither the shared-index cutover nor automatic compaction follows from this diagnosis.
 
 written with gpt-6 in codex
+
+## Combined fork-staging and shared indexes
+
+Frozen source `41716e4` replaces action staging through checkpoint restoration with an independent replica fork. The same guarded index patch was applied only to the copied client candidate. Both phases used the native fork-only backend. Three fresh paired phases repeated the strict accepted edit/undo and warm-opening journey without changing its assertions or instrumentation. Current-source types and 124 public tests with 1,091 assertions passed.
+
+| Median                                 | Fork-only native | Fork plus shared indexes |
+| -------------------------------------- | ---------------: | -----------------------: |
+| 128KiB warm ready                      |          65.9 ms |                  32.5 ms |
+| 1MiB warm ready                        |         434.2 ms |                  30.9 ms |
+| 1MiB largest opening task              |          11.3 ms |                   6.5 ms |
+| 1MiB undo accepted-cache delay         |         2,157 ms |                 1,857 ms |
+| 1MiB largest edit/undo acceptance task |           291 ms |                   335 ms |
+
+All complete-source, cursor, pending and rejection checks passed. The largest acceptance tasks ranged from 288–337 ms for native and 286–354 ms for the prototype. Its median still regressed about 15%. Cache delay includes scheduling, so its decrease does not establish faster processing of every acceptance stage. Largest sampled 1MiB heaps per phase were 1.71–2.39 GB versus 1.19–1.46 GB. This remains sampled rather than peak memory.
+
+`app-fork-results.json` retains exact metrics, hashes and scope. Timeline traces remain outside Git at `/tmp/alkalye-guarded-app-fork`. Staging through a fork removes the earlier full-checkpoint clone penalty, but it does not clear the shared index's residual main-task tradeoff. Keep indexes experimental pending attribution and a conscious adoption decision.
+
+written with gpt-6 in codex

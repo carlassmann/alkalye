@@ -1,0 +1,538 @@
+{
+	"source": "41716e4",
+	"serverVariant": "native baseline for both clients",
+	"trials": [
+		{
+			"phase": "baseline-exact-0",
+			"asset": {
+				"assetHash": "88efac6b9ebb153106eec0079254f038ad54511a1db8a0afb27ff5cc413e9ccd",
+				"loadedBytes": 252795,
+				"expectedBytes": 252795
+			},
+			"samples": [
+				{
+					"journey": "results",
+					"name": "128k-512",
+					"metrics": {
+						"firstFrameOpportunityMilliseconds": 82.69999998807907,
+						"heap": 935605125,
+						"readyMilliseconds": 64.60000002384186,
+						"secondFrameOpportunityMilliseconds": 99
+					},
+					"maximumTaskMilliseconds": 4.602,
+					"taskCount": 431,
+					"trace": "/tmp/alkalye-guarded-app-fork/baseline-exact-0/128k-512.trace.json"
+				},
+				{
+					"journey": "results",
+					"name": "1m-512",
+					"metrics": {
+						"firstFrameOpportunityMilliseconds": 446.800000011921,
+						"heap": 2386159132,
+						"readyMilliseconds": 436,
+						"secondFrameOpportunityMilliseconds": 465.9000000357628
+					},
+					"maximumTaskMilliseconds": 13.149,
+					"taskCount": 1372,
+					"trace": "/tmp/alkalye-guarded-app-fork/baseline-exact-0/1m-512.trace.json"
+				},
+				{
+					"journey": "checkpoints",
+					"name": "128k-512",
+					"metrics": [
+						{
+							"delayMilliseconds": 291.9000000357628,
+							"heap": 820427088,
+							"pending": 0,
+							"position": 34,
+							"rejected": 0,
+							"stage": "edit"
+						},
+						{
+							"delayMilliseconds": 241.60000002384183,
+							"heap": 842034480,
+							"pending": 0,
+							"position": 36,
+							"rejected": 0,
+							"stage": "undo"
+						}
+					],
+					"maximumTaskMilliseconds": 33.034,
+					"taskCount": 3057,
+					"trace": "/tmp/alkalye-guarded-app-fork/baseline-exact-0/128k-512-checkpoint.trace.json"
+				},
+				{
+					"journey": "checkpoints",
+					"name": "1m-512",
+					"metrics": [
+						{
+							"delayMilliseconds": 2455.399999976158,
+							"heap": 1676767223,
+							"pending": 0,
+							"position": 54,
+							"rejected": 0,
+							"stage": "edit"
+						},
+						{
+							"delayMilliseconds": 2490.600000023842,
+							"heap": 2033976051,
+							"pending": 0,
+							"position": 56,
+							"rejected": 0,
+							"stage": "undo"
+						}
+					],
+					"maximumTaskMilliseconds": 287.982,
+					"taskCount": 16347,
+					"trace": "/tmp/alkalye-guarded-app-fork/baseline-exact-0/1m-512-checkpoint.trace.json"
+				}
+			]
+		},
+		{
+			"phase": "prototype-exact-0",
+			"asset": {
+				"assetHash": "eb2ed746a5aeed3eae3dae113620000a572c735e909fe6048fb9f0398516e588",
+				"loadedBytes": 252795,
+				"expectedBytes": 252795
+			},
+			"samples": [
+				{
+					"journey": "results",
+					"name": "128k-512",
+					"metrics": {
+						"firstFrameOpportunityMilliseconds": 48.19999998807907,
+						"heap": 665032908,
+						"readyMilliseconds": 32,
+						"secondFrameOpportunityMilliseconds": 64.79999995231628
+					},
+					"maximumTaskMilliseconds": 4.789,
+					"taskCount": 328,
+					"trace": "/tmp/alkalye-guarded-app-fork/prototype-exact-0/128k-512.trace.json"
+				},
+				{
+					"journey": "results",
+					"name": "1m-512",
+					"metrics": {
+						"firstFrameOpportunityMilliseconds": 49.30000001192093,
+						"heap": 1456107698,
+						"readyMilliseconds": 30.69999998807907,
+						"secondFrameOpportunityMilliseconds": 63.60000002384186
+					},
+					"maximumTaskMilliseconds": 6.544,
+					"taskCount": 339,
+					"trace": "/tmp/alkalye-guarded-app-fork/prototype-exact-0/1m-512.trace.json"
+				},
+				{
+					"journey": "checkpoints",
+					"name": "128k-512",
+					"metrics": [
+						{
+							"delayMilliseconds": 308.39999997615814,
+							"heap": 582493076,
+							"pending": 0,
+							"position": 34,
+							"rejected": 0,
+							"stage": "edit"
+						},
+						{
+							"delayMilliseconds": 234.79999995231628,
+							"heap": 629705483,
+							"pending": 0,
+							"position": 36,
+							"rejected": 0,
+							"stage": "undo"
+						}
+					],
+					"maximumTaskMilliseconds": 34.359,
+					"taskCount": 3035,
+					"trace": "/tmp/alkalye-guarded-app-fork/prototype-exact-0/128k-512-checkpoint.trace.json"
+				},
+				{
+					"journey": "checkpoints",
+					"name": "1m-512",
+					"metrics": [
+						{
+							"delayMilliseconds": 2413.5,
+							"heap": 1166499389,
+							"pending": 0,
+							"position": 54,
+							"rejected": 0,
+							"stage": "edit"
+						},
+						{
+							"delayMilliseconds": 1857.300000011921,
+							"heap": 1417307028,
+							"pending": 0,
+							"position": 56,
+							"rejected": 0,
+							"stage": "undo"
+						}
+					],
+					"maximumTaskMilliseconds": 353.882,
+					"taskCount": 15817,
+					"trace": "/tmp/alkalye-guarded-app-fork/prototype-exact-0/1m-512-checkpoint.trace.json"
+				}
+			]
+		},
+		{
+			"phase": "baseline-exact-1",
+			"asset": {
+				"assetHash": "88efac6b9ebb153106eec0079254f038ad54511a1db8a0afb27ff5cc413e9ccd",
+				"loadedBytes": 252795,
+				"expectedBytes": 252795
+			},
+			"samples": [
+				{
+					"journey": "results",
+					"name": "128k-512",
+					"metrics": {
+						"firstFrameOpportunityMilliseconds": 83.30000001192093,
+						"heap": 871073137,
+						"readyMilliseconds": 65.90000003576279,
+						"secondFrameOpportunityMilliseconds": 98.80000001192091
+					},
+					"maximumTaskMilliseconds": 4.72,
+					"taskCount": 424,
+					"trace": "/tmp/alkalye-guarded-app-fork/baseline-exact-1/128k-512.trace.json"
+				},
+				{
+					"journey": "results",
+					"name": "1m-512",
+					"metrics": {
+						"firstFrameOpportunityMilliseconds": 431.39999997615814,
+						"heap": 2253729740,
+						"readyMilliseconds": 416.10000002384186,
+						"secondFrameOpportunityMilliseconds": 447
+					},
+					"maximumTaskMilliseconds": 10.709,
+					"taskCount": 1371,
+					"trace": "/tmp/alkalye-guarded-app-fork/baseline-exact-1/1m-512.trace.json"
+				},
+				{
+					"journey": "checkpoints",
+					"name": "128k-512",
+					"metrics": [
+						{
+							"delayMilliseconds": 300.0999999642372,
+							"heap": 756902112,
+							"pending": 0,
+							"position": 34,
+							"rejected": 0,
+							"stage": "edit"
+						},
+						{
+							"delayMilliseconds": 247.5,
+							"heap": 779332956,
+							"pending": 0,
+							"position": 36,
+							"rejected": 0,
+							"stage": "undo"
+						}
+					],
+					"maximumTaskMilliseconds": 34.613,
+					"taskCount": 3059,
+					"trace": "/tmp/alkalye-guarded-app-fork/baseline-exact-1/128k-512-checkpoint.trace.json"
+				},
+				{
+					"journey": "checkpoints",
+					"name": "1m-512",
+					"metrics": [
+						{
+							"delayMilliseconds": 2387,
+							"heap": 1554024451,
+							"pending": 0,
+							"position": 54,
+							"rejected": 0,
+							"stage": "edit"
+						},
+						{
+							"delayMilliseconds": 1845.899999976158,
+							"heap": 1908835504,
+							"pending": 0,
+							"position": 56,
+							"rejected": 0,
+							"stage": "undo"
+						}
+					],
+					"maximumTaskMilliseconds": 337.273,
+					"taskCount": 15905,
+					"trace": "/tmp/alkalye-guarded-app-fork/baseline-exact-1/1m-512-checkpoint.trace.json"
+				}
+			]
+		},
+		{
+			"phase": "prototype-exact-1",
+			"asset": {
+				"assetHash": "eb2ed746a5aeed3eae3dae113620000a572c735e909fe6048fb9f0398516e588",
+				"loadedBytes": 252795,
+				"expectedBytes": 252795
+			},
+			"samples": [
+				{
+					"journey": "results",
+					"name": "128k-512",
+					"metrics": {
+						"firstFrameOpportunityMilliseconds": 48.59999996423721,
+						"heap": 583078941,
+						"readyMilliseconds": 32.5,
+						"secondFrameOpportunityMilliseconds": 64
+					},
+					"maximumTaskMilliseconds": 4.878,
+					"taskCount": 327,
+					"trace": "/tmp/alkalye-guarded-app-fork/prototype-exact-1/128k-512.trace.json"
+				},
+				{
+					"journey": "results",
+					"name": "1m-512",
+					"metrics": {
+						"firstFrameOpportunityMilliseconds": 49.5,
+						"heap": 1220694322,
+						"readyMilliseconds": 32.10000002384186,
+						"secondFrameOpportunityMilliseconds": 67.10000002384186
+					},
+					"maximumTaskMilliseconds": 6.582,
+					"taskCount": 342,
+					"trace": "/tmp/alkalye-guarded-app-fork/prototype-exact-1/1m-512.trace.json"
+				},
+				{
+					"journey": "checkpoints",
+					"name": "128k-512",
+					"metrics": [
+						{
+							"delayMilliseconds": 308.69999998807907,
+							"heap": 530748331,
+							"pending": 0,
+							"position": 34,
+							"rejected": 0,
+							"stage": "edit"
+						},
+						{
+							"delayMilliseconds": 247.60000002384183,
+							"heap": 541197840,
+							"pending": 0,
+							"position": 36,
+							"rejected": 0,
+							"stage": "undo"
+						}
+					],
+					"maximumTaskMilliseconds": 33.67,
+					"taskCount": 3037,
+					"trace": "/tmp/alkalye-guarded-app-fork/prototype-exact-1/128k-512-checkpoint.trace.json"
+				},
+				{
+					"journey": "checkpoints",
+					"name": "1m-512",
+					"metrics": [
+						{
+							"delayMilliseconds": 2444.800000011921,
+							"heap": 931028419,
+							"pending": 0,
+							"position": 54,
+							"rejected": 0,
+							"stage": "edit"
+						},
+						{
+							"delayMilliseconds": 2447.199999988079,
+							"heap": 1188501163,
+							"pending": 0,
+							"position": 56,
+							"rejected": 0,
+							"stage": "undo"
+						}
+					],
+					"maximumTaskMilliseconds": 285.797,
+					"taskCount": 16131,
+					"trace": "/tmp/alkalye-guarded-app-fork/prototype-exact-1/1m-512-checkpoint.trace.json"
+				}
+			]
+		},
+		{
+			"phase": "baseline-exact-2",
+			"asset": {
+				"assetHash": "88efac6b9ebb153106eec0079254f038ad54511a1db8a0afb27ff5cc413e9ccd",
+				"loadedBytes": 252795,
+				"expectedBytes": 252795
+			},
+			"samples": [
+				{
+					"journey": "results",
+					"name": "128k-512",
+					"metrics": {
+						"firstFrameOpportunityMilliseconds": 81.19999998807907,
+						"heap": 641001723,
+						"readyMilliseconds": 65.89999997615814,
+						"secondFrameOpportunityMilliseconds": 99.0999999642372
+					},
+					"maximumTaskMilliseconds": 4.837,
+					"taskCount": 431,
+					"trace": "/tmp/alkalye-guarded-app-fork/baseline-exact-2/128k-512.trace.json"
+				},
+				{
+					"journey": "results",
+					"name": "1m-512",
+					"metrics": {
+						"firstFrameOpportunityMilliseconds": 448.300000011921,
+						"heap": 1235736268,
+						"readyMilliseconds": 434.2000000476837,
+						"secondFrameOpportunityMilliseconds": 466.10000002384186
+					},
+					"maximumTaskMilliseconds": 11.301,
+					"taskCount": 3809,
+					"trace": "/tmp/alkalye-guarded-app-fork/baseline-exact-2/1m-512.trace.json"
+				},
+				{
+					"journey": "checkpoints",
+					"name": "128k-512",
+					"metrics": [
+						{
+							"delayMilliseconds": 299.60000002384186,
+							"heap": 823156756,
+							"pending": 0,
+							"position": 34,
+							"rejected": 0,
+							"stage": "edit"
+						},
+						{
+							"delayMilliseconds": 249,
+							"heap": 851426816,
+							"pending": 0,
+							"position": 36,
+							"rejected": 0,
+							"stage": "undo"
+						}
+					],
+					"maximumTaskMilliseconds": 32.516,
+					"taskCount": 3063,
+					"trace": "/tmp/alkalye-guarded-app-fork/baseline-exact-2/128k-512-checkpoint.trace.json"
+				},
+				{
+					"journey": "checkpoints",
+					"name": "1m-512",
+					"metrics": [
+						{
+							"delayMilliseconds": 2409.2000000476837,
+							"heap": 1713179665,
+							"pending": 0,
+							"position": 54,
+							"rejected": 0,
+							"stage": "edit"
+						},
+						{
+							"delayMilliseconds": 2157.2000000476837,
+							"heap": 2066802026,
+							"pending": 0,
+							"position": 56,
+							"rejected": 0,
+							"stage": "undo"
+						}
+					],
+					"maximumTaskMilliseconds": 290.992,
+					"taskCount": 16113,
+					"trace": "/tmp/alkalye-guarded-app-fork/baseline-exact-2/1m-512-checkpoint.trace.json"
+				}
+			]
+		},
+		{
+			"phase": "prototype-exact-2",
+			"asset": {
+				"assetHash": "eb2ed746a5aeed3eae3dae113620000a572c735e909fe6048fb9f0398516e588",
+				"loadedBytes": 252795,
+				"expectedBytes": 252795
+			},
+			"samples": [
+				{
+					"journey": "results",
+					"name": "128k-512",
+					"metrics": {
+						"firstFrameOpportunityMilliseconds": 49.69999998807907,
+						"heap": 580334525,
+						"readyMilliseconds": 32.89999997615814,
+						"secondFrameOpportunityMilliseconds": 66.19999998807907
+					},
+					"maximumTaskMilliseconds": 4.853,
+					"taskCount": 322,
+					"trace": "/tmp/alkalye-guarded-app-fork/prototype-exact-2/128k-512.trace.json"
+				},
+				{
+					"journey": "results",
+					"name": "1m-512",
+					"metrics": {
+						"firstFrameOpportunityMilliseconds": 47.60000002384186,
+						"heap": 1194592794,
+						"readyMilliseconds": 30.900000035762787,
+						"secondFrameOpportunityMilliseconds": 65.90000003576279
+					},
+					"maximumTaskMilliseconds": 6.351,
+					"taskCount": 340,
+					"trace": "/tmp/alkalye-guarded-app-fork/prototype-exact-2/1m-512.trace.json"
+				},
+				{
+					"journey": "checkpoints",
+					"name": "128k-512",
+					"metrics": [
+						{
+							"delayMilliseconds": 310.19999998807907,
+							"heap": 497552089,
+							"pending": 0,
+							"position": 34,
+							"rejected": 0,
+							"stage": "edit"
+						},
+						{
+							"delayMilliseconds": 241.69999998807907,
+							"heap": 544301348,
+							"pending": 0,
+							"position": 36,
+							"rejected": 0,
+							"stage": "undo"
+						}
+					],
+					"maximumTaskMilliseconds": 34.51,
+					"taskCount": 3042,
+					"trace": "/tmp/alkalye-guarded-app-fork/prototype-exact-2/128k-512-checkpoint.trace.json"
+				},
+				{
+					"journey": "checkpoints",
+					"name": "1m-512",
+					"metrics": [
+						{
+							"delayMilliseconds": 2408.5,
+							"heap": 886395935,
+							"pending": 0,
+							"position": 54,
+							"rejected": 0,
+							"stage": "edit"
+						},
+						{
+							"delayMilliseconds": 1810.9000000357628,
+							"heap": 1160238431,
+							"pending": 0,
+							"position": 56,
+							"rejected": 0,
+							"stage": "undo"
+						}
+					],
+					"maximumTaskMilliseconds": 334.781,
+					"taskCount": 15686,
+					"trace": "/tmp/alkalye-guarded-app-fork/prototype-exact-2/1m-512-checkpoint.trace.json"
+				}
+			]
+		}
+	],
+	"prototype": "Same source plus app-index.patch: guarded atom and child indexes",
+	"samplesPerVariantAndSize": 3,
+	"readiness": [
+		"exact original full fixture source before edit and after undo",
+		"accepted edit at latest journal cursor with pending=0,rejected=0",
+		"accepted undo cache strictly newer than edit cursor with pending=0,rejected=0",
+		"base document selected before passive target reopen"
+	],
+	"limitations": [
+		"same native fork-only backend for both client phases; server index changes not measured",
+		"fresh identical disposable backend/profile per phase, code/service-worker caches cleared and loaded asset verified",
+		"heap is sampled at cache commits and ready, not a measured allocation or peak",
+		"largest acceptance task covers edit plus undo; undo cache delay includes checkpoint scheduling",
+		"headless frame opportunities do not prove120Hz"
+	],
+	"author": "written with gpt-6 in codex"
+}
