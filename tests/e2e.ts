@@ -24,6 +24,7 @@ let fullSuite = [
 	"tests/browser-editor-authoring.ts",
 	"tests/browser-editor-completions.ts",
 	"tests/browser-editor-selection.ts",
+	"tests/browser-editor-find.ts",
 	"tests/browser-document-worker.ts",
 	"tests/browser-viewport-editor.ts",
 	"tests/browser-media-picker.ts",

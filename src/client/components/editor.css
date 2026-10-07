@@ -318,3 +318,13 @@
 [data-editor-viewport] #highlight {
 	unicode-bidi: plaintext;
 }
+
+[data-editor] .search-match {
+	position: absolute;
+	background: #eab30840;
+	border-radius: 2px;
+}
+[data-editor] .search-match[data-active] {
+	background: #eab30866;
+	outline: 1px solid var(--brand);
+}

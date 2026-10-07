@@ -101,15 +101,6 @@ export class FindElement extends HTMLElement {
 								>
 									${icon("chevron-down")}
 								</button>
-								<button
-									type="button"
-									data-find-action="close"
-									id="close-find"
-									aria-label="Close find"
-									title="Close find (Esc)"
-								>
-									${icon("x")}
-								</button>
 							</div>
 							<div class="find-replace-row" hidden>
 								<input
@@ -170,6 +161,15 @@ export class FindElement extends HTMLElement {
 									title="Next match (Enter)"
 								>
 									${icon("chevron-down")}
+								</button>
+								<button
+									type="button"
+									data-find-action="close"
+									id="close-find"
+									aria-label="Close find"
+									title="Close find (Esc)"
+								>
+									${icon("x")}
 								</button>
 							</div>`,
 					)
@@ -456,6 +456,7 @@ export class FindElement extends HTMLElement {
 		}
 		this.trackScope()
 		let pattern = this.expression(false)
+		this.host?.search(pattern)
 		let matches = pattern ? [...this.editor.value.matchAll(pattern)] : []
 		let current = matches.findIndex(
 			match => match.index === this.editor?.selectionStart,
@@ -525,6 +526,7 @@ export class FindElement extends HTMLElement {
 	}
 
 	disconnectedCallback() {
+		this.host?.search(undefined)
 		let lifetime = this.lifetime
 		this.lifetime = undefined
 		if (lifetime) Effect.runFork(Fiber.interrupt(lifetime))

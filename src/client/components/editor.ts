@@ -131,6 +131,9 @@ export class EditorElement extends HTMLElement {
 	preferences(preferences: EditorPreferences) {
 		this.view?.preferences(preferences)
 	}
+	search(pattern: RegExp | undefined) {
+		this.view?.search(pattern)
+	}
 	selectRange(start: number, end = start) {
 		this.view?.selectRange(start, end)
 	}
@@ -192,6 +195,9 @@ function createEditorView(
 	wrapper.append(activeLine, highlight, menu, textarea, collaborators, links)
 	let overlay = new EditorOverlay(highlight)
 	let geometryDirty = true
+	let searchPattern: RegExp | undefined
+	let searchSource = ""
+	let searchMatches: { start: number; end: number }[] = []
 	let people: Presence[] = []
 	let editable = options.editable
 	let atoms = options.atoms
@@ -429,6 +435,17 @@ function createEditorView(
 		presence,
 		preferences,
 		selectRange,
+		search(pattern: RegExp | undefined) {
+			if (
+				searchPattern?.source === pattern?.source &&
+				searchPattern?.flags === pattern?.flags
+			)
+				return schedulePaint()
+			searchPattern = pattern
+			searchSource = ""
+			searchMatches = []
+			schedulePaint()
+		},
 		mediaSelection() {
 			if (composing || !inSync()) return
 			let image = editorContext(text.value, text.selectionStart).image
@@ -711,9 +728,18 @@ function createEditorView(
 		}
 		paintLinkHover()
 	}
-	function paintPresence() {
+	function paintDecorations() {
 		let comments = options.comments()
-		if (!comments.length && !people.length) {
+		if (searchPattern && searchSource !== text.value) {
+			searchSource = text.value
+			searchMatches = [...searchSource.matchAll(searchPattern)]
+				.filter(match => match[0].length > 0)
+				.map(match => ({
+					start: match.index,
+					end: match.index + match[0].length,
+				}))
+		}
+		if (!comments.length && !people.length && !searchMatches.length) {
 			if (collaborators.childNodes.length) collaborators.replaceChildren()
 			return
 		}
@@ -721,6 +747,42 @@ function createEditorView(
 		let visible = overlay.visible(bounds.top, bounds.bottom)
 		let fragment = document.createDocumentFragment()
 		let measurements = []
+		let sourceStart = text.toSource(visible.start)
+		let sourceEnd = text.toSource(visible.end, "end")
+		let low = 0,
+			high = searchMatches.length
+		while (low < high) {
+			let middle = (low + high) >>> 1
+			if ((searchMatches[middle]?.end ?? 0) <= sourceStart) low = middle + 1
+			else high = middle
+		}
+		for (let index = low; index < searchMatches.length; index++) {
+			let match = searchMatches[index]
+			if (!match || match.start >= sourceEnd) break
+			let start = Math.max(visible.start, text.toView(match.start))
+			let end = Math.min(visible.end, text.toView(match.end))
+			if (start >= end) continue
+			let from = point(start),
+				to = point(end)
+			let range = document.createRange()
+			range.setStart(from.node, from.offset)
+			range.setEnd(to.node, to.offset)
+			let active =
+				match.start === text.selectionStart && match.end === text.selectionEnd
+			for (let rectangle of range.getClientRects()) {
+				if (
+					!rectangle.width ||
+					rectangle.bottom < bounds.top ||
+					rectangle.top > bounds.bottom
+				)
+					continue
+				let mark = document.createElement("span")
+				mark.className = "search-match"
+				mark.toggleAttribute("data-active", active)
+				mark.style.cssText = `left:${rectangle.left - bounds.left}px;top:${rectangle.top - bounds.top + text.viewport.scrollTop}px;width:${rectangle.width}px;height:${rectangle.height}px`
+				fragment.append(mark)
+			}
+		}
 		for (let comment of comments) {
 			if (
 				text.toView(comment.end) < visible.start ||
@@ -890,7 +952,7 @@ function createEditorView(
 			paintFrame = requestAnimationFrame(() => {
 				paintFrame = 0
 				paintActiveLine()
-				paintPresence()
+				paintDecorations()
 			})
 	}
 	function command(action: string) {
