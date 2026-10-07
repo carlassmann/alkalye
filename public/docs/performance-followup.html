@@ -197,6 +197,15 @@
 		</p>
 		<h2>Changes kept and rejected</h2>
 		<p>
+			Deletion-history removal and cancellation sets now use copy-on-write:
+			forks share read-only sets, while edits replace only touched sets.
+			Independent undo and partially interrupted copies remain isolated. In a
+			fully deleted 128KiB public Replica probe, native Bun fork median fell
+			from 13.39ms to 0.47ms; cooperative copying on Bun fell from 16.60ms to
+			11.01ms. These three-sample module measurements do not establish browser
+			loading performance or gains for clean histories.
+		</p>
+		<p>
 			Library synchronization now skips a second save after a successful, clean
 			synchronization. Real IndexedDB and authenticated HTTP tests cover offline
 			reloads, revoked access, retries, and interruption during concurrent
@@ -215,7 +224,9 @@
 			<code>experiments/performance/</code>: <code>replica-body-edits.ts</code>,
 			<code>body-edits.ts</code>, <code>body-edits-results.json</code>,
 			<code>search-highlights.ts</code>,
-			<code>search-highlights-results.json</code>, and
+			<code>search-highlights-results.json</code>,
+			<code>visibility-fork-probe.ts</code>,
+			<code>visibility-fork-results.json</code>, and
 			<code>hash-map-probe.ts</code>. Search trace phases include enclosing
 			input tasks; nested task durations are not added.
 		</p>

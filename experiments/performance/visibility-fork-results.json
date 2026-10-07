@@ -1,0 +1,45 @@
+{
+	"description": "Public Replica fork over deletion-heavy 128KiB history; three ordered samples after one warmup, Bun only. Cooperative mode is browser-style yielding on Bun scheduler, not a browser measurement. Does not characterize clean-document loading.",
+	"writtenBy": "written with gpt-6 in codex",
+	"results": [
+		{
+			"label": "baseline",
+			"characters": 131072,
+			"runtime": "Bun",
+			"scope": "Public Replica fork over 128KiB fully deleted history; cooperative mode uses Bun scheduler, not browser timing",
+			"samples": [
+				{
+					"cooperative": false,
+					"milliseconds": [
+						14.003958999999952, 12.191832999999974, 13.388041999999984
+					]
+				},
+				{
+					"cooperative": true,
+					"milliseconds": [17.530709, 16.602708000000007, 16.313041999999996]
+				}
+			]
+		},
+		{
+			"label": "cow",
+			"characters": 131072,
+			"runtime": "Bun",
+			"scope": "Public Replica fork over 128KiB fully deleted history; cooperative mode uses Bun scheduler, not browser timing",
+			"samples": [
+				{
+					"cooperative": false,
+					"milliseconds": [
+						0.669667000000004, 0.44079099999999016, 0.4712499999999977
+					]
+				},
+				{
+					"cooperative": true,
+					"milliseconds": [
+						12.046625000000006, 10.846416999999974, 11.00995899999998
+					]
+				}
+			]
+		}
+	],
+	"baselineCommit": "0c8c32f38af5fde93e64e755878195160458a2c7"
+}

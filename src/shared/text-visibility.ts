@@ -67,9 +67,9 @@ export type TextVisibilitySnapshot = typeof VisibilitySnapshotSchema.Type
 
 export class TextVisibility {
 	private removals = new Map<string, readonly string[]>()
-	private removers = new Map<string, Set<string>>()
+	private removers = new Map<string, ReadonlySet<string>>()
 	private cancels = new Map<string, string>()
-	private cancellers = new Map<string, Set<string>>()
+	private cancellers = new Map<string, ReadonlySet<string>>()
 	private activeCache = new Map<string, boolean>()
 	private legacyRemoved: Set<string>
 	private floor: number
@@ -84,25 +84,9 @@ export class TextVisibility {
 	*forkSteps(cooperative: boolean) {
 		let visibility = new TextVisibility()
 		visibility.removals = yield* copyMapSteps(this.removals, cooperative)
-		let count = 0
-		for (let [atom, removers] of this.removers) {
-			visibility.removers.set(atom, yield* copySetSteps(removers, cooperative))
-			if (cooperative && ++count === 1024) {
-				count = 0
-				yield
-			}
-		}
+		visibility.removers = yield* copyMapSteps(this.removers, cooperative)
 		visibility.cancels = yield* copyMapSteps(this.cancels, cooperative)
-		for (let [operation, cancellers] of this.cancellers) {
-			visibility.cancellers.set(
-				operation,
-				yield* copySetSteps(cancellers, cooperative),
-			)
-			if (cooperative && ++count === 1024) {
-				count = 0
-				yield
-			}
-		}
+		visibility.cancellers = yield* copyMapSteps(this.cancellers, cooperative)
 		visibility.activeCache = yield* copyMapSteps(this.activeCache, cooperative)
 		visibility.legacyRemoved = yield* copySetSteps(
 			this.legacyRemoved,
@@ -183,7 +167,7 @@ export class TextVisibility {
 				if (visibility.removals.has(id)) continue
 				visibility.removals.set(id, atoms)
 				for (let atom of atoms) {
-					let removers = visibility.removers.get(atom) ?? new Set<string>()
+					let removers = new Set(visibility.removers.get(atom))
 					removers.add(id)
 					visibility.removers.set(atom, removers)
 					if (cooperative && ++work % 512 === 0) yield
@@ -192,7 +176,7 @@ export class TextVisibility {
 			for (let [id, target] of cancels) {
 				if (visibility.cancels.has(id)) continue
 				visibility.cancels.set(id, target)
-				let cancellers = visibility.cancellers.get(target) ?? new Set<string>()
+				let cancellers = new Set(visibility.cancellers.get(target))
 				cancellers.add(id)
 				visibility.cancellers.set(target, cancellers)
 				visibility.activeCache.clear()

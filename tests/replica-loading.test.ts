@@ -147,3 +147,78 @@ test("synchronous reads during cooperative materialization share the same source
 	expect(result).toBe(source)
 	expect(cold.visible("document").length).toBe(Array.from(source).length)
 })
+
+for (let cooperative of [false, true]) {
+	test(`forked deletion histories independently remove and undo the same atom (cooperative=${cooperative})`, async () => {
+		let owner = new Replica("owner", "Owner")
+		owner.edit("document", "ABC")
+		let removal = owner.edit("document", "AC")
+		if (!removal) throw new Error("Missing removal")
+		let peer = cooperative
+			? await Effect.runPromise(owner.forkEffect("peer", "Peer"))
+			: owner.fork("peer", "Peer")
+		let peerUndo = peer.cancel("document", removal.id)
+		expect(peer.text("document")).toBe("ABC")
+		expect(owner.text("document")).toBe("AC")
+		let peerRemoval = peer.edit("document", "AC")
+		if (!peerRemoval || !peerUndo) throw new Error("Missing peer edits")
+		let ownerUndo = owner.cancel("document", removal.id)
+		if (!ownerUndo) throw new Error("Missing owner undo")
+		expect(owner.text("document")).toBe("ABC")
+		expect(peer.text("document")).toBe("AC")
+		let ownerRedo = owner.cancel("document", ownerUndo.id)
+		expect(owner.text("document")).toBe("AC")
+		let peerRedo = peer.cancel("document", peerRemoval.id)
+		expect(peer.text("document")).toBe("ABC")
+		if (!ownerRedo || !peerRedo) throw new Error("Missing repeated undo")
+		owner.apply([peerUndo, peerRemoval, peerRedo])
+		peer.apply([ownerUndo, ownerRedo])
+		expect(peer.text("document")).toBe(owner.text("document"))
+	})
+}
+
+for (let cooperative of [false, true]) {
+	test(`forked cancellation chains keep repeated undo isolated (cooperative=${cooperative})`, async () => {
+		let owner = new Replica("owner", "Owner")
+		owner.edit("document", "ABC")
+		let removal = owner.edit("document", "AC")
+		if (!removal) throw new Error("Missing removal")
+		let undo = owner.cancel("document", removal.id)
+		if (!undo) throw new Error("Missing undo")
+		let peer = cooperative
+			? await Effect.runPromise(owner.forkEffect("peer", "Peer"))
+			: owner.fork("peer", "Peer")
+		let ownerRedo = owner.cancel("document", undo.id)
+		expect(owner.text("document")).toBe("AC")
+		expect(peer.text("document")).toBe("ABC")
+		let peerRedo = peer.cancel("document", undo.id)
+		let peerUndo = peer.cancel("document", removal.id)
+		expect(peer.text("document")).toBe("ABC")
+		expect(owner.text("document")).toBe("AC")
+		if (!ownerRedo || !peerUndo || !peerRedo)
+			throw new Error("Missing repeated cancellations")
+		owner.apply([peerUndo, peerRedo])
+		peer.apply([ownerRedo])
+		expect(peer.text("document")).toBe("ABC")
+		expect(owner.text("document")).toBe("ABC")
+	})
+}
+
+test("a concurrent deletion undo rejects a partially copied replica", async () => {
+	let { replica, source } = largeReplica()
+	let removal = replica.edit("document", "")
+	if (!removal) throw new Error("Missing removal")
+	let outcome = await Effect.runPromise(
+		Effect.gen(function* () {
+			let copying = yield* Effect.forkChild(replica.forkEffect("concurrent"), {
+				startImmediately: true,
+			})
+			replica.cancel("document", removal.id)
+			return yield* Fiber.await(copying)
+		}),
+	)
+	expect(outcome._tag).toBe("Failure")
+	expect(replica.text("document")).toBe(source)
+	let retry = await Effect.runPromise(replica.forkEffect("retry"))
+	expect(retry.text("document")).toBe(source)
+})
