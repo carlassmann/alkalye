@@ -48,7 +48,7 @@ export class AccountAgentsElement extends HTMLElement {
 					setMarkup(
 						host,
 						html`<form class="settings-section" data-agent-root>
-							<h2>MCP connections</h2>
+							<h2>API keys &amp; MCP</h2>
 							<div class="settings-panel">
 								<div class="settings-row stacked">
 									${icon("globe")}
@@ -75,10 +75,10 @@ export class AccountAgentsElement extends HTMLElement {
 									${icon(options.consent ? "key-round" : "plug-zap")}
 									<div>
 										<p class="row-title" id="agent-description">
-											${options.consent ? "Loading agent request…" : "Create a connection token"}
+											${options.consent ? "Loading agent request…" : "Create an API key"}
 										</p>
 										<p class="muted">
-											${options.consent ? "Choose what this client may open. Your own permissions still apply." : "For the command line and clients without OAuth: ALKALYE_MCP_TOKEN=… bun cli.ts mcp"}
+											${options.consent ? "Choose what this client may open. Your own permissions still apply." : "Use the same key for the CLI and MCP clients without OAuth. Keys keep the workspace access and permission limit below."}
 										</p>
 										${options.consent ? "" : html`<label class="field">Name<input name="agent-name" value="Agent" maxlength="256" required /></label>`}
 										<fieldset>
@@ -107,12 +107,39 @@ export class AccountAgentsElement extends HTMLElement {
 										>
 										<div class="agent-buttons">
 											<button type="button" class="primary" data-agent="create">
-												${options.consent ? "Allow access" : "Create connection"}</button
+												${options.consent ? "Allow access" : "Create API key"}</button
 											>${options.consent ? html`<button type="button" data-agent="deny">Deny</button>` : ""}
 										</div>
-										${options.consent ? "" : html`<label hidden id="agent-token-label" class="field">Connection token<input id="agent-token" readonly /></label><button hidden type="button" data-agent="copy">${icon("copy")}<span>Copy token</span></button>`}
+										${options.consent ? "" : html`<label hidden id="agent-token-label" class="field">API key (shown once)<input id="agent-token" readonly /></label><button hidden type="button" data-agent="copy">${icon("copy")}<span>Copy key</span></button>`}
 									</div>
 								</div>
+								${
+									options.consent
+										? ""
+										: html`<div class="settings-row stacked">
+												${icon("key-round")}
+												<div>
+													<p class="row-title">Use your API key</p>
+													<p class="muted">
+														Set ALKALYE_API_KEY in your environment. You can
+														revoke the key below.
+													</p>
+													<pre
+														class="agent-cli"
+													><code>export ALKALYE_SERVER=${options.account.origin}
+export ALKALYE_API_KEY=YOUR_KEY
+bun cli.ts doc list
+bun cli.ts doc get DOCUMENT_ID
+bun cli.ts doc update DOCUMENT_ID --file note.md --expected-revision REVISION
+bun cli.ts mcp</code></pre>
+													<p class="muted">
+														The CLI uses the same scoped MCP tools. API-key
+														commands run online; account login adds offline
+														editing and local undo.
+													</p>
+												</div>
+											</div>`
+								}
 								<ul id="agent-connections" class="agent-connections"></ul>
 							</div>
 						</form>`,
@@ -160,7 +187,7 @@ export class AccountAgentsElement extends HTMLElement {
 															<div>
 																<p class="row-title">${connection.name}</p>
 																<p class="muted">
-																	Connected
+																	API key / MCP
 																	${new Date(connection.created).toLocaleDateString()}
 																</p>
 															</div>

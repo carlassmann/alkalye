@@ -14,5 +14,27 @@ Connection credentials are encrypted at rest with `.data/master.key`. The MCP se
 
 For a stdio client, set `ALKALYE_SERVER` and `ALKALYE_MCP_TOKEN`, then run `bun cli.ts mcp`. The proxy forwards JSON-RPC responses, retains negotiated legacy sessions and supplies modern transport headers from request metadata. It silently reinitializes expired legacy sessions and retries their request once.
 
-written with GPT-6 in Codex
-written with claude-opus-5-5 in Claude Code
+## API keys for the CLI
+
+Create an API key in Settings → Connections. Choose its workspaces and maximum permission. API keys and MCP connection tokens share the same credential and revoke button. The key appears once; copy it before leaving Settings.
+
+```sh
+export ALKALYE_SERVER=https://your-server.example
+export ALKALYE_API_KEY=YOUR_KEY
+bun cli.ts doc list
+bun cli.ts doc get DOCUMENT_ID
+bun cli.ts doc content DOCUMENT_ID
+bun cli.ts --scope space:WORKSPACE_ID doc create --title "New note" --file note.md
+bun cli.ts doc update DOCUMENT_ID --file note.md --expected-revision REVISION
+bun cli.ts doc rename DOCUMENT_ID "New title"
+bun cli.ts doc delete DOCUMENT_ID
+bun cli.ts mcp
+```
+
+A workspace-limited key needs `--scope space:WORKSPACE_ID` when creating documents outside Personal. `doc delete` archives the document. Updates return a new revision. Pass the revision from `doc get` to reject an update if someone changed the document meanwhile. Without `--expected-revision`, the CLI reads the current revision immediately before updating. It never retries a rejected revision check.
+
+API-key commands run online through the same MCP tools and current account permissions. They do not open a local account profile. Reader keys cannot write; revoked keys fail immediately. History, undo, redo, restore and sync require account login. `--api-key KEY` overrides the environment value, but environment configuration keeps the key out of process arguments. The CLI sends keys only over HTTPS or loopback HTTP and refuses redirects.
+
+An exported API key selects online mode even when a local account is signed in. For existing stdio integrations, `ALKALYE_MCP_TOKEN` remains supported when no API key is configured. An explicit `--api-key` wins over `ALKALYE_API_KEY`, which wins over the legacy MCP token.
+
+written with gpt-6 in codex

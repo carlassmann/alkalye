@@ -1,3 +1,4 @@
+import * as HttpClient from "effect/http/HttpClient"
 import * as Config from "effect/Config"
 import * as Console from "effect/Console"
 import * as Effect from "effect/Effect"
@@ -27,6 +28,7 @@ import {
 import * as FileSystem from "effect/FileSystem"
 import { cliPlatform } from "./platform"
 import { proxyMcp } from "./mcp"
+import { apiDocuments, apiFailure } from "./api-documents"
 import { IdentifierSchema } from "../shared/model"
 
 export function runNativeCli(args: string[], sensitiveArguments = false) {
@@ -43,7 +45,7 @@ export function runNativeCli(args: string[], sensitiveArguments = false) {
 				Effect.fail(
 					new ApplicationError({
 						operation: "cli.parse",
-						cause: new Error("Invalid command arguments; use auth --help"),
+						cause: new Error("Invalid command arguments; use --help"),
 					}),
 				),
 		),
@@ -53,6 +55,12 @@ export function runNativeCli(args: string[], sensitiveArguments = false) {
 }
 let root = Command.make("alkalye").pipe(
 	Command.withSharedFlags({
+		apiKey: Flag.Redacted("api-key").pipe(
+			Flag.withDescription(
+				"Scoped API key; prefer ALKALYE_API_KEY in your environment",
+			),
+			Flag.withDefault(Redacted.make("")),
+		),
 		home: Flag.String("home").pipe(Flag.withDefault("")),
 		server: Flag.String("server").pipe(Flag.withDefault("")),
 		scope: Flag.String("scope").pipe(
@@ -177,7 +185,7 @@ let auth = Command.make("auth").pipe(
 let mcp = Command.make("mcp", {}, () =>
 	Effect.gen(function* () {
 		let settings = yield* commandSettings
-		yield* proxyMcp(settings.server)
+		yield* proxyMcp(settings.server, yield* apiKey)
 	}),
 )
 let sync = Command.make("sync", {}, () =>
@@ -197,6 +205,10 @@ let documentList = Command.make("list", {}, () =>
 				JSON.stringify(yield* (yield* CliDocuments).list(flags.scope), null, 2),
 			)
 		}),
+		api =>
+			api.list.pipe(
+				Effect.flatMap(result => Console.log(JSON.stringify(result, null, 2))),
+			),
 	),
 )
 function readCommand(mode: "get" | "content" | "history" | "undo" | "redo") {
@@ -224,6 +236,24 @@ function readCommand(mode: "get" | "content" | "history" | "undo" | "redo") {
 					)
 				}
 			}),
+			api =>
+				mode === "get" || mode === "content"
+					? api
+							.read(config.id)
+							.pipe(
+								Effect.flatMap(result =>
+									Console.log(
+										mode === "content"
+											? result.content
+											: JSON.stringify(result, null, 2),
+									),
+								),
+							)
+					: Effect.fail(
+							apiFailure(
+								"API keys support online list, get, content, create, update, rename and delete. History and local undo require an account login.",
+							),
+						),
 		),
 	)
 }
@@ -264,11 +294,32 @@ let documentCreate = Command.make(
 				if (config.sync) yield* created.session.sync
 				else yield* allowOffline(created.session.sync)
 			}),
+			api =>
+				readContent(config).pipe(
+					Effect.flatMap(source => api.create(source, config.title)),
+					Effect.flatMap(result =>
+						Console.log(
+							JSON.stringify({
+								id: result.documentId,
+								revision: result.revision,
+							}),
+						),
+					),
+				),
 		),
 )
 let documentUpdate = Command.make(
 	"update",
-	{ ...documentInputFlags(), id: documentIdentifier() },
+	{
+		...documentInputFlags(),
+		id: documentIdentifier(),
+		expected: Flag.String("expected-revision").pipe(
+			Flag.withDescription(
+				"Revision from doc get; reject concurrent changes in API-key mode",
+			),
+			Flag.withDefault(""),
+		),
+	},
 	config =>
 		withDocuments(
 			Effect.gen(function* () {
@@ -281,6 +332,13 @@ let documentUpdate = Command.make(
 				if (config.sync) yield* session.sync
 				else yield* allowOffline(session.sync)
 			}),
+			api =>
+				readContent(config, true).pipe(
+					Effect.flatMap(source =>
+						api.update(config.id, source, config.expected),
+					),
+					Effect.flatMap(result => Console.log(JSON.stringify(result))),
+				),
 		),
 )
 let documentRename = Command.make(
@@ -302,6 +360,10 @@ let documentRename = Command.make(
 				)
 				yield* allowOffline(session.sync)
 			}),
+			api =>
+				api
+					.rename(config.id, config.title || config.name)
+					.pipe(Effect.flatMap(result => Console.log(JSON.stringify(result)))),
 		),
 )
 function documentChangeCommand(mode: "delete" | "restore") {
@@ -317,6 +379,18 @@ function documentChangeCommand(mode: "delete" | "restore") {
 				)
 				yield* allowOffline(session.sync)
 			}),
+			api =>
+				mode === "delete"
+					? api
+							.archive(config.id)
+							.pipe(
+								Effect.flatMap(result => Console.log(JSON.stringify(result))),
+							)
+					: Effect.fail(
+							apiFailure(
+								"Restoring archived documents requires an account login",
+							),
+						),
 		),
 	)
 }
@@ -335,9 +409,26 @@ let documentCommands = document.pipe(
 		readCommand("redo"),
 	]),
 )
-function withDocuments<A, E, R>(task: Effect.Effect<A, E, R | CliDocuments>) {
+function withDocuments<A, E, R>(
+	task: Effect.Effect<A, E, R | CliDocuments>,
+	remote?: (
+		api: ReturnType<typeof apiDocuments>,
+	) => Effect.Effect<
+		void,
+		unknown,
+		HttpClient.HttpClient | FileSystem.FileSystem | Stdio.Stdio
+	>,
+) {
 	return Effect.gen(function* () {
 		let settings = yield* commandSettings
+		let key = yield* apiKey
+		if (Redacted.value(key)) {
+			if (!remote)
+				return yield* apiFailure("This command requires an account login")
+			return yield* remote(
+				apiDocuments(settings.server, key, (yield* root).scope),
+			)
+		}
 		return yield* task.pipe(
 			Effect.scoped,
 			Effect.provide(CliDocuments.layer(settings.directory, settings.server)),
@@ -414,3 +505,12 @@ function error(message: string) {
 		cause: new Error(message),
 	})
 }
+
+let apiKey = Effect.gen(function* () {
+	let flags = yield* root
+	return Redacted.value(flags.apiKey)
+		? flags.apiKey
+		: yield* Config.Redacted("ALKALYE_API_KEY").pipe(
+				Config.withDefault(Redacted.make("")),
+			)
+})

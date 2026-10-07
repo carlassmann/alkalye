@@ -16,7 +16,14 @@ export function verifyNativeAgents(session: string, url: string) {
 	browser(session, "click", '.settings-nav a[href*="category=connections"]')
 	wait(
 		session,
-		'location.search.includes("category=connections") && document.querySelector("#settings-connections h2")?.textContent === "MCP connections" && document.querySelector("[data-agent=create]")?.disabled === false',
+		'location.search.includes("category=connections") && document.querySelector("#settings-connections h2")?.textContent === "API keys & MCP" && document.querySelector("[data-agent=create]")?.disabled === false',
+	)
+	assert(
+		evaluate(
+			session,
+			'document.querySelector(".agent-cli")?.textContent.includes("ALKALYE_API_KEY") && document.querySelector(".agent-cli")?.textContent.includes("--expected-revision")',
+		),
+		"Connections explains scoped CLI keys and revision checks",
 	)
 	assert(
 		evaluate(

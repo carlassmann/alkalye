@@ -112,3 +112,15 @@
 	margin-top: 12px;
 	font-size: 12px;
 }
+
+[data-account-agents] .agent-cli {
+	margin: 12px 0;
+	padding: 12px;
+	border: 1px solid var(--line);
+	background: var(--paper);
+	font-family: var(--mono);
+	font-size: 11px;
+	line-height: 18px;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}

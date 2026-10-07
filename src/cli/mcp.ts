@@ -15,6 +15,7 @@ import * as Stream from "effect/Stream"
 import * as Sse from "effect/encoding/Sse"
 import * as McpSchema from "effect/ai/McpSchema"
 import * as HttpClient from "effect/http/HttpClient"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
 import * as HttpClientRequest from "effect/http/HttpClientRequest"
 
 let requestSchema = Schema.Struct({
@@ -37,9 +38,10 @@ let responseSchema = Schema.Union([
 ])
 let envelopeSchema = Schema.Union([requestSchema, responseSchema])
 let frameSchema = Schema.Union([envelopeSchema, Schema.Array(envelopeSchema)])
-export function proxyMcp(origin: string) {
+export function proxyMcp(origin: string, apiKey?: Redacted.Redacted<string>) {
 	return Effect.scoped(
 		Effect.gen(function* () {
+			let endpoint = yield* mcpEndpoint(origin)
 			let tasks = yield* FiberMap.make<
 				string | number | symbol,
 				void,
@@ -54,7 +56,10 @@ export function proxyMcp(origin: string) {
 				yield* Deferred.succeed(next.start, undefined)
 				yield* Fiber.await(next.fiber)
 			}).pipe(Effect.forever, Effect.forkScoped)
-			let token = yield* Config.Redacted("ALKALYE_MCP_TOKEN")
+			let token =
+				apiKey && Redacted.value(apiKey)
+					? apiKey
+					: yield* Config.Redacted("ALKALYE_MCP_TOKEN")
 			let stdio = yield* Stdio.Stdio
 			let http = yield* HttpClient.HttpClient
 			let session = yield* Ref.make<
@@ -198,9 +203,7 @@ export function proxyMcp(origin: string) {
 			}
 			function post(body: string, legacy?: { id: string; version: string }) {
 				return http.execute(
-					HttpClientRequest.post(
-						new URL("mcp", origin.endsWith("/") ? origin : origin + "/"),
-					).pipe(
+					HttpClientRequest.post(endpoint).pipe(
 						HttpClientRequest.setHeaders({
 							Authorization: `Bearer ${Redacted.value(token)}`,
 							Accept: "application/json, text/event-stream",
@@ -260,9 +263,7 @@ export function proxyMcp(origin: string) {
 							yield* recoverSession("")
 							state = yield* Ref.get(session)
 						}
-						let request = HttpClientRequest.post(
-							new URL("mcp", origin.endsWith("/") ? origin : origin + "/"),
-						).pipe(
+						let request = HttpClientRequest.post(endpoint).pipe(
 							HttpClientRequest.setHeaders({
 								Authorization: `Bearer ${Redacted.value(token)}`,
 								Accept: "application/json, text/event-stream",
@@ -378,9 +379,11 @@ export function proxyMcp(origin: string) {
 				}
 			}
 		}),
+	).pipe(
+		Effect.provideService(FetchHttpClient.RequestInit, { redirect: "error" }),
 	)
 }
-function metadataHeaders(
+export function metadataHeaders(
 	frame: typeof frameSchema.Type,
 ): Record<string, string> {
 	let request = Schema.decodeUnknownOption(requestSchema)(frame)
@@ -444,4 +447,28 @@ function requestIds(frame: typeof frameSchema.Type) {
 			ids.push(request.value.id)
 	}
 	return ids
+}
+
+export function mcpEndpoint(origin: string) {
+	return Effect.try({
+		try: () => {
+			let endpoint = new URL(
+				"mcp",
+				origin.endsWith("/") ? origin : origin + "/",
+			)
+			if (
+				endpoint.username ||
+				endpoint.password ||
+				(endpoint.protocol !== "https:" &&
+					!(
+						endpoint.protocol === "http:" &&
+						["localhost", "127.0.0.1", "[::1]"].includes(endpoint.hostname)
+					))
+			)
+				throw new Error("Use HTTPS for API keys, or HTTP on localhost")
+			return endpoint
+		},
+		catch: () =>
+			failure("Use a valid HTTPS server URL, or HTTP on localhost", 400),
+	})
 }

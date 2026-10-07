@@ -284,3 +284,209 @@ test("concurrent signup admits one private profile and logout preserves document
 	expect((await cli(home, ["auth", "whoami"])).status).toBe(1)
 	await login(home, recovery)
 })
+
+test("API-key CLI shares scoped MCP permissions, revisions and revocation without opening an account profile", async () => {
+	let owner = await run(account(18))
+	let workspace = "cli-api-allowed"
+	for (let space of [workspace, "cli-api-other"])
+		await run(
+			owner.api.workspaces.create({
+				payload: { workspace: space, name: space, request: "create-" + space },
+			}),
+		)
+	let writer = await run(
+		owner.api.agents.create({
+			payload: {
+				name: "CLI writer",
+				workspaces: [workspace],
+				ceiling: "writer",
+			},
+		}),
+	)
+	let reader = await run(
+		owner.api.agents.create({
+			payload: {
+				name: "CLI reader",
+				workspaces: [workspace],
+				ceiling: "reader",
+			},
+		}),
+	)
+	let blockedHome = join(directory, "api-profile-blocked")
+	await Bun.write(blockedHome, "API keys must never open this profile")
+	async function keyed(token: string, args: string[], flag = false) {
+		let child = Bun.spawn(
+			[
+				"bun",
+				"cli.ts",
+				"--home",
+				blockedHome,
+				"--server",
+				instance.server.url.origin,
+				...(flag ? ["--api-key=" + token] : []),
+				...args,
+			],
+			{
+				env: {
+					...process.env,
+					ALKALYE_API_KEY: flag ? "" : token,
+					ALKALYE_MCP_TOKEN: "",
+				},
+				stdin: "ignore",
+				stdout: "pipe",
+				stderr: "pipe",
+			},
+		)
+		let [output, error, status] = await Promise.all([
+			new Response(child.stdout).text(),
+			new Response(child.stderr).text(),
+			child.exited,
+		])
+		expect(output + error).not.toContain(token)
+		return { output, error, status }
+	}
+	let created = await keyed(writer.token, [
+		"--scope",
+		"space:" + workspace,
+		"doc",
+		"create",
+		"--title",
+		"API note",
+		"--content",
+		"Written with a scoped key",
+	])
+	if (created.status !== 0) throw new Error(created.error + created.output)
+	expect(created.status).toBe(0)
+	let document = string(object(JSON.parse(created.output)).id)
+	let read = await keyed(reader.token, ["doc", "get", document], true)
+	if (read.status !== 0) throw new Error(read.error + read.output)
+	expect(read.status).toBe(0)
+	let revision = string(object(JSON.parse(read.output)).revision)
+	let denied = await keyed(reader.token, [
+		"doc",
+		"update",
+		document,
+		"--content",
+		"Forbidden",
+	])
+	expect(denied.status).toBe(1)
+	let updated = await keyed(writer.token, [
+		"doc",
+		"update",
+		document,
+		"--content",
+		"Accepted",
+		"--expected-revision",
+		revision,
+	])
+	expect(updated.status).toBe(0)
+	expect(string(object(JSON.parse(updated.output)).revision)).not.toBe(revision)
+	let stale = await keyed(writer.token, [
+		"doc",
+		"update",
+		document,
+		"--content",
+		"Lost change",
+		"--expected-revision",
+		revision,
+	])
+	expect(stale.status).toBe(1)
+	let outside = await keyed(writer.token, [
+		"--scope",
+		"space:cli-api-other",
+		"doc",
+		"create",
+		"--content",
+		"Forbidden workspace",
+	])
+	expect(outside.status).toBe(1)
+	let listed = await keyed(reader.token, ["doc", "list"])
+	expect(listed.status).toBe(0)
+	expect(listed.output).toContain(document)
+	expect(listed.output).not.toContain("cli-api-other")
+	expect(
+		(await keyed(reader.token, ["doc", "content", document])).output.trim(),
+	).toBe("Accepted")
+	expect((await keyed(writer.token, ["doc", "undo", document])).status).toBe(1)
+	expect(
+		(await keyed(reader.token, ["--scope", "personal", "doc", "get", document]))
+			.status,
+	).toBe(1)
+	expect(
+		(
+			await keyed(writer.token, [
+				"doc",
+				"create",
+				"--content",
+				"Requires an allowed workspace",
+			])
+		).status,
+	).toBe(1)
+	expect(
+		(await keyed(writer.token, ["doc", "rename", document, "Renamed API note"]))
+			.status,
+	).toBe(0)
+	expect((await keyed(writer.token, ["doc", "delete", document])).status).toBe(
+		0,
+	)
+
+	let connection = (await run(owner.api.agents.list())).find(
+		item => item.name === "CLI writer",
+	)
+	if (!connection) throw new Error("Missing CLI connection")
+	await run(owner.api.agents.revoke({ params: { id: connection.id } }))
+	expect((await keyed(writer.token, ["doc", "get", document])).status).toBe(1)
+	let parseFailure = await keyed(
+		writer.token,
+		["doc", "get", "--unknown-flag"],
+		true,
+	)
+	expect(parseFailure.status).toBe(1)
+}, 20_000)
+
+test("API-key CLI refuses remote HTTP and redirects before exposing its credential", async () => {
+	let token = "cli-key-that-must-not-leak"
+	let received = 0
+	let destination = Bun.serve({
+		port: 0,
+		hostname: "127.0.0.1",
+		fetch() {
+			received++
+			return Response.json({})
+		},
+	})
+	let redirect = Bun.serve({
+		port: 0,
+		hostname: "127.0.0.1",
+		fetch() {
+			return new Response(null, {
+				status: 302,
+				headers: { Location: destination.url.href },
+			})
+		},
+	})
+	try {
+		for (let origin of ["http://example.invalid", redirect.url.href]) {
+			let child = Bun.spawn(
+				["bun", "cli.ts", "--server", origin, "doc", "list"],
+				{
+					env: { ...process.env, ALKALYE_API_KEY: token },
+					stdin: "ignore",
+					stdout: "pipe",
+					stderr: "pipe",
+				},
+			)
+			let [output, error, status] = await Promise.all([
+				new Response(child.stdout).text(),
+				new Response(child.stderr).text(),
+				child.exited,
+			])
+			expect(status).toBe(1)
+			expect(output + error).not.toContain(token)
+		}
+		expect(received).toBe(0)
+	} finally {
+		redirect.stop(true)
+		destination.stop(true)
+	}
+})

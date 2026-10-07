@@ -83,7 +83,7 @@ export async function verifyNativeRoutes(session: string, url: string) {
 	browser(session, "open", url + "/settings?category=connections")
 	wait(
 		session,
-		'document.querySelector("#settings-connections h2")?.textContent === "MCP connections" && document.querySelector(".settings-nav [aria-current=page]")?.textContent.trim() === "Connections"',
+		'document.querySelector("#settings-connections h2")?.textContent === "API keys & MCP" && document.querySelector(".settings-nav [aria-current=page]")?.textContent.trim() === "Connections"',
 	)
 	browser(session, "click", ".settings-back")
 	wait(

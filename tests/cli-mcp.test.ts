@@ -39,9 +39,14 @@ async function proxy(
 	input: string,
 	credential = token,
 	server = instance.server.url.href,
+	apiKey = false,
 ) {
 	let child = Bun.spawn(["bun", "cli.ts", "--server", server, "mcp"], {
-		env: { ...process.env, ALKALYE_MCP_TOKEN: credential },
+		env: {
+			...process.env,
+			ALKALYE_API_KEY: apiKey ? credential : "",
+			ALKALYE_MCP_TOKEN: apiKey ? "" : credential,
+		},
 		stdin: new Blob([input]),
 		stdout: "pipe",
 		stderr: "pipe",
@@ -53,33 +58,39 @@ async function proxy(
 	])
 	return { output, error, status }
 }
-test("Effect MCP proxy initializes, skips notifications and forwards the final unframed request", async () => {
-	let result = await proxy(
-		[
-			JSON.stringify({
-				jsonrpc: "2.0",
-				id: 1,
-				method: "initialize",
-				params: {
-					protocolVersion: "2025-06-18",
-					capabilities: {},
-					clientInfo: { name: "CLI test", version: "1" },
-				},
-			}),
-			JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }),
-			JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list" }),
-		].join("\n"),
-	)
-	expect(result.status).toBe(0)
-	let replies = result.output
-		.trim()
-		.split("\n")
-		.map(line => object(JSON.parse(line)))
-	expect(replies.map(reply => reply.id)).toEqual([1, 2])
-	let tools = object(replies[1]?.result).tools
-	if (!Array.isArray(tools)) throw new Error("Expected MCP tools")
-	expect(tools).toHaveLength(11)
-})
+test.each([false, true])(
+	"Effect MCP proxy initializes with shared API key %s, skips notifications and forwards the final unframed request",
+	async apiKey => {
+		let result = await proxy(
+			[
+				JSON.stringify({
+					jsonrpc: "2.0",
+					id: 1,
+					method: "initialize",
+					params: {
+						protocolVersion: "2025-06-18",
+						capabilities: {},
+						clientInfo: { name: "CLI test", version: "1" },
+					},
+				}),
+				JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }),
+				JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list" }),
+			].join("\n"),
+			token,
+			instance.server.url.href,
+			apiKey,
+		)
+		expect(result.status).toBe(0)
+		let replies = result.output
+			.trim()
+			.split("\n")
+			.map(line => object(JSON.parse(line)))
+		expect(replies.map(reply => reply.id)).toEqual([1, 2])
+		let tools = object(replies[1]?.result).tools
+		if (!Array.isArray(tools)) throw new Error("Expected MCP tools")
+		expect(tools).toHaveLength(11)
+	},
+)
 test("malformed and invalid MCP frames produce distinct errors and preserve the next request", async () => {
 	let result = await proxy(
 		'{broken\n{"jsonrpc":"2.0","id":3}\n{"jsonrpc":"2.0","id":4,"method":"tools/list"}',
@@ -679,5 +690,57 @@ test("a failed recovery notification leaves the old session available for anothe
 		expect(initializations).toBe(3)
 	} finally {
 		await server.stop(true)
+	}
+})
+
+test("MCP API-key transport preserves a server path prefix and refuses redirects", async () => {
+	let paths: string[] = []
+	let destinationRequests = 0
+	let destination = Bun.serve({
+		port: 0,
+		hostname: "127.0.0.1",
+		fetch() {
+			destinationRequests++
+			return Response.json({})
+		},
+	})
+	let redirect = false
+	let gateway = Bun.serve({
+		port: 0,
+		hostname: "127.0.0.1",
+		fetch(request) {
+			paths.push(new URL(request.url).pathname)
+			return redirect
+				? new Response(null, {
+						status: 302,
+						headers: { Location: destination.url.href },
+					})
+				: Response.json({ jsonrpc: "2.0", id: 1, result: { tools: [] } })
+		},
+	})
+	let request = JSON.stringify({
+		jsonrpc: "2.0",
+		id: 1,
+		method: "tools/list",
+		params: {
+			_meta: {
+				"io.modelcontextprotocol/protocolVersion": "2026-07-28",
+				"io.modelcontextprotocol/clientCapabilities": {},
+			},
+		},
+	})
+	try {
+		let result = await proxy(request, token, gateway.url.href + "prefix", true)
+		expect(result.status).toBe(0)
+		expect(object(JSON.parse(result.output)).result).toEqual({ tools: [] })
+		expect(paths).toEqual(["/prefix/mcp"])
+		redirect = true
+		let refused = await proxy(request, token, gateway.url.href + "prefix", true)
+		expect(object(JSON.parse(refused.output)).error).toBeDefined()
+		expect(destinationRequests).toBe(0)
+		expect(refused.output + refused.error).not.toContain(token)
+	} finally {
+		gateway.stop(true)
+		destination.stop(true)
 	}
 })
