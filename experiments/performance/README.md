@@ -128,3 +128,17 @@ For synchronous input spans, capture `performance.now()` at document `beforeinpu
 The multicursor stress starts from the 128 KiB fixture, selects every `responsiveness` occurrence, then times trusted insertion of `MULTIX` until all replacement counts are verified and a later frame occurs. Selection setup is outside timing. Main uses CodeMirror's public `EditorSelection.create` / `range` API because the initial macOS shortcut attempt selected incorrectly; the rewrite uses its select-all-occurrences shortcut. Restore the complete saved fixture between three repetitions. The counts and this setup difference are retained in the report.
 
 The 1 MiB long-paragraph setup was aborted; it provides no valid load or input comparison. Do not substitute isolated renderer or module timings for a complete app journey.
+
+## Bundle sizes
+
+Measure the production asset directories with the same compression for both:
+
+```sh
+bun experiments/performance/bundles.ts MAIN_ASSETS REWRITE_ASSETS OUTPUT.json
+```
+
+The runner follows static JavaScript imports from the app HTML's scripts, hydration entries and module preloads. It follows CSS imports from the linked stylesheets. Dynamic imports stay out of the initial graph. The whiteboard group is its editor's static dependency closure minus the initial graph. The document worker is separate; the report includes it in the first-document code estimate.
+
+Each file is gzip compressed separately at level 9 with Bun, then summed. Every group records its file list and exact raw and gzip bytes. Totals count emitted JavaScript and CSS once, including lazy features, syntax grammars and service workers. Exclude source maps, benchmark probes, HTML, inline scripts, fonts, images, WASM, documents and compression sidecars. These figures do not measure network traffic or service-worker precaching.
+
+The published comparison uses main `a749728` and frozen rewrite `be48f8b`. It separately records current rewrite `700f9f4`, including email authentication. Main already loads React and tldraw CSS at startup; the rewrite loads React and tldraw CSS with the whiteboard. Chunk sharing and library versions also differ, so the whiteboard group is not pure tldraw package attribution.

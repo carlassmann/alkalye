@@ -304,6 +304,120 @@
 			</tbody>
 		</table>
 	</div>
+	<h2>Bundle sizes</h2>
+	<p>
+		The same frozen production builds used for the latency comparison. Sizes are
+		KiB, with 1 KiB = 1,024 bytes. Gzip compresses each asset independently at
+		level 9, then sums its size.
+	</p>
+	<div class="scroll">
+		<table>
+			<thead>
+				<tr>
+					<th>Code</th>
+					<th>Main raw</th>
+					<th>Main gzip</th>
+					<th>Rewrite raw</th>
+					<th>Rewrite gzip</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Initial JavaScript</td>
+					<td>3838.2</td>
+					<td>1250.3</td>
+					<td>989.4</td>
+					<td>328.3</td>
+				</tr>
+				<tr>
+					<td>Document worker JavaScript</td>
+					<td>0.0</td>
+					<td>0.0</td>
+					<td>150.5</td>
+					<td>49.3</td>
+				</tr>
+				<tr>
+					<td>Initial CSS</td>
+					<td>208.0</td>
+					<td>35.7</td>
+					<td>116.7</td>
+					<td>30.9</td>
+				</tr>
+				<tr>
+					<td>First-document code estimate</td>
+					<td>4046.2</td>
+					<td>1286.0</td>
+					<td>1256.6</td>
+					<td>408.5</td>
+				</tr>
+				<tr>
+					<td>Additional whiteboard JavaScript</td>
+					<td>1651.3</td>
+					<td>502.0</td>
+					<td>1915.9</td>
+					<td>578.3</td>
+				</tr>
+				<tr>
+					<td>Additional whiteboard CSS</td>
+					<td>0.0</td>
+					<td>0.0</td>
+					<td>96.1</td>
+					<td>18.8</td>
+				</tr>
+				<tr>
+					<td>All emitted JavaScript</td>
+					<td>9209.8</td>
+					<td>2629.8</td>
+					<td>3143.0</td>
+					<td>988.8</td>
+				</tr>
+				<tr>
+					<td>All emitted CSS</td>
+					<td>208.0</td>
+					<td>35.7</td>
+					<td>224.7</td>
+					<td>52.9</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<p>
+		The first-document code estimate falls from
+		<strong>1286.0 KiB to 408.5 KiB gzip</strong>, a 68% reduction. It includes
+		initial JavaScript, initial CSS and the rewrite's document worker. Other
+		rows overlap; do not add them all.
+	</p>
+	<p>
+		The rewrite's lazy whiteboard is larger. It brings in React on demand, while
+		main already uses React. Library versions and chunk layouts also differ.
+		Main loads tldraw CSS at startup; the rewrite loads another 18.8 KiB gzip
+		when the whiteboard opens. These numbers measure the whiteboard import
+		graph, not tldraw alone.
+	</p>
+	<p>
+		After the later email-authentication changes, the current rewrite build
+		<code>700f9f4</code> has <strong>330.7 KiB gzip initial JavaScript</strong>,
+		31.2 KiB initial CSS and 49.3 KiB for the worker. Its total emitted
+		JavaScript is 991.3 KiB gzip. The latency measurements above remain for the
+		frozen build.
+	</p>
+	<p>
+		Initial JavaScript follows static imports and HTML preloads; dynamic imports
+		are excluded. Initial CSS follows stylesheet links and CSS imports. All
+		emitted code includes lazy features, syntax grammars and service workers.
+		Benchmark probes and source maps are excluded. Fonts, images, HTML, WASM,
+		documents, inline Astro startup scripts and HTTP framing are outside these
+		figures. Bundle sizes do not measure service-worker precaching or actual
+		network traffic.
+	</p>
+	<p>
+		Reproduce with
+		<code
+			>bun experiments/performance/bundles.ts MAIN_ASSETS REWRITE_ASSETS
+			OUTPUT.json</code
+		>. The JSON report includes exact byte counts and the files belonging to
+		each group.
+	</p>
 	<h2>Where the rewrite remains inferior</h2>
 	<ul>
 		<li>
