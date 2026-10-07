@@ -1,0 +1,237 @@
+{
+	"baseline": "41716e4",
+	"candidate": "41716e4 + one-line empty register inverse source guard; adopted as 2d95381",
+	"server": "native 660423c, unchanged both phases",
+	"date": "2026-10-08",
+	"samplesPerPhase": 3,
+	"phaseOrder": ["before", "after", "after", "before", "before", "after"],
+	"fixture": {
+		"characters": 1048576,
+		"occurrences": 512
+	},
+	"method": "Same strict trusted append/accepted checkpoint/trusted undo harness and identical backend/profile resets as fork A/B. Existing fork-only assets frozen; candidate changes only compensatingChanges source argument. No index. No CPU sampling profiler in timing runs. Main-thread RunTask overlaps undo:start through undo:cache.",
+	"provenance": {
+		"before": {
+			"appSha256": "88efac6b9ebb153106eec0079254f038ad54511a1db8a0afb27ff5cc413e9ccd",
+			"modules": [
+				{
+					"path": "chunks/document-app-1rz9jn00.js",
+					"sha256": "155e5eeb180b5ddee82635e9c18cd8728788acca229a93e387c33fd41a04f37c",
+					"bytes": 211373,
+					"sources": ["../src/shared/document-session.ts"],
+					"loadedDecodedBytes": [211373, 211373, 211373],
+					"allObservedSizesMatch": true
+				},
+				{
+					"path": "chunks/document-app-m31hh21z.js",
+					"sha256": "beed3b44de1d69b998561a95d3b161f4e7ad45d581ddf7d050f78532a7ff0aed",
+					"bytes": 73270,
+					"sources": ["../src/shared/document-actions.ts"],
+					"loadedDecodedBytes": [73270, 73270, 73270],
+					"allObservedSizesMatch": true
+				}
+			]
+		},
+		"after": {
+			"appSha256": "1f63ab523e2bdf1bc5d44849bd661e6eefded714a604dfb224e380a1aa9a59b4",
+			"modules": [
+				{
+					"path": "chunks/document-app-m3x0fwpz.js",
+					"sha256": "6a9d287c2d805241fa4270e149474fd602003f73840ced8fb61a2ac25612f9fc",
+					"bytes": 73282,
+					"sources": ["../src/shared/document-actions.ts"],
+					"loadedDecodedBytes": [73282, 73282, 73282],
+					"allObservedSizesMatch": true
+				},
+				{
+					"path": "chunks/document-app-bnjkv660.js",
+					"sha256": "0401786ba21602e4b2bf7867c8ece2aeb78570836f4b889e81c1d8dd4ed83990",
+					"bytes": 211373,
+					"sources": ["../src/shared/document-session.ts"],
+					"loadedDecodedBytes": [211373, 211373, 211373],
+					"allObservedSizesMatch": true
+				}
+			]
+		}
+	},
+	"provenanceLimit": "Frozen file SHA values; observed hashed module URLs and decoded sizes match all three trials. Not cryptographic retrieval of loaded bytes.",
+	"failures": [],
+	"results": [
+		{
+			"phase": "before",
+			"trial": 0,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 699.1999999880791,
+			"undoAcceptedCheckpointMs": 2546.099999964237,
+			"editAcceptedCheckpointMs": 2468.2999999523163,
+			"largestUndoTaskMs": 343.752,
+			"largestBeforePaintTaskMs": 343.752,
+			"layoutMs": 4.586,
+			"paintMs": 3.019
+		},
+		{
+			"phase": "after",
+			"trial": 0,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 545.5999999642372,
+			"undoAcceptedCheckpointMs": 2241.399999976158,
+			"editAcceptedCheckpointMs": 2495.100000023842,
+			"largestUndoTaskMs": 331.145,
+			"largestBeforePaintTaskMs": 331.145,
+			"layoutMs": 4.031,
+			"paintMs": 2.685
+		},
+		{
+			"phase": "after",
+			"trial": 1,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 540.0,
+			"undoAcceptedCheckpointMs": 2240.199999988079,
+			"editAcceptedCheckpointMs": 2493.899999976158,
+			"largestUndoTaskMs": 332.301,
+			"largestBeforePaintTaskMs": 332.301,
+			"layoutMs": 3.881,
+			"paintMs": 2.47
+		},
+		{
+			"phase": "before",
+			"trial": 1,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 656.0,
+			"undoAcceptedCheckpointMs": 2659.599999964237,
+			"editAcceptedCheckpointMs": 2387.800000011921,
+			"largestUndoTaskMs": 316.13,
+			"largestBeforePaintTaskMs": 316.13,
+			"layoutMs": 4.49,
+			"paintMs": 2.919
+		},
+		{
+			"phase": "before",
+			"trial": 2,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 672.0,
+			"undoAcceptedCheckpointMs": 3000.800000011921,
+			"editAcceptedCheckpointMs": 2412,
+			"largestUndoTaskMs": 288.811,
+			"largestBeforePaintTaskMs": 288.811,
+			"layoutMs": 5.221,
+			"paintMs": 3.432
+		},
+		{
+			"phase": "after",
+			"trial": 2,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 560.6999999880791,
+			"undoAcceptedCheckpointMs": 2284.399999976158,
+			"editAcceptedCheckpointMs": 2407.599999964237,
+			"largestUndoTaskMs": 358.901,
+			"largestBeforePaintTaskMs": 358.901,
+			"layoutMs": 4.047,
+			"paintMs": 2.516
+		}
+	],
+	"moduleResults": [
+		{
+			"characters": 131072,
+			"trial": 0,
+			"phase": "before",
+			"duration": 26.100666999999987
+		},
+		{
+			"characters": 131072,
+			"trial": 0,
+			"phase": "after",
+			"duration": 9.688499999999976
+		},
+		{
+			"characters": 131072,
+			"trial": 1,
+			"phase": "after",
+			"duration": 9.085167000000013
+		},
+		{
+			"characters": 131072,
+			"trial": 1,
+			"phase": "before",
+			"duration": 17.96274999999997
+		},
+		{
+			"characters": 131072,
+			"trial": 2,
+			"phase": "before",
+			"duration": 21.49920800000001
+		},
+		{
+			"characters": 131072,
+			"trial": 2,
+			"phase": "after",
+			"duration": 12.000374999999963
+		},
+		{
+			"characters": 1048576,
+			"trial": 0,
+			"phase": "before",
+			"duration": 349.6415420000003
+		},
+		{
+			"characters": 1048576,
+			"trial": 0,
+			"phase": "after",
+			"duration": 187.34529199999997
+		},
+		{
+			"characters": 1048576,
+			"trial": 1,
+			"phase": "after",
+			"duration": 197.64154099999996
+		},
+		{
+			"characters": 1048576,
+			"trial": 1,
+			"phase": "before",
+			"duration": 404.21508300000005
+		},
+		{
+			"characters": 1048576,
+			"trial": 2,
+			"phase": "before",
+			"duration": 345.2565420000001
+		},
+		{
+			"characters": 1048576,
+			"trial": 2,
+			"phase": "after",
+			"duration": 230.5837500000007
+		}
+	]
+}

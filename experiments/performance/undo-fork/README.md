@@ -21,3 +21,17 @@ Independent Bun module trials, three per phase, measured 128 KiB undo at 70.29â†
 Run `bun experiments/performance/undo-fork/journey.ts CONFIG OUTPUT` against an already launched background `agent-browser` session. CONFIG contains `url`, `session`, `path`, `characters`, and `occurrences`. Copy isolated data/profile seeds and clear service-worker/HTTP/code caches before every phase. Use `AGENT_BROWSER_HEADED=false` and `AGENT_BROWSER_DEFAULT_TIMEOUT=20000` for every browser command. Shared example fixture preparation lives in `editor-critical-setup.ts`; never use the live app's data.
 
 The owned-operation token experiment was rejected. Its final bounded issuer variant regressed module medians and required six source files. `rejected-command.json` retains the final samples. No runtime bypass or token architecture was adopted.
+
+## Empty register inverse
+
+A second, independent pair compared the adopted fork `41716e4` with one guarded argument. When a text undo has no register inverses, `protectedRecords` still checks provenance but receives an empty source. Its returned protection set is unused. This avoids materializing the whole staged document only to discard the result.
+
+| Trusted undo, milliseconds | Fork median / max | Fork + guard median / max |
+| --- | --- | --- |
+| Two paint opportunities | 672.0 / 699.2 | 545.6 / 560.7 |
+| Fully accepted checkpoint | 2659.6 / 3000.8 | 2241.4 / 2284.4 |
+| Largest main-thread task | 316.1 / 343.8 | 332.3 / 358.9 |
+
+The guard reduces total undo latency. It does not improve the largest task, which remains far above 8.33 ms. Each phase restored identical backend/profile seeds, three trials per variant, no index changes. Every trusted/exact/accepted-checkpoint check passed. `empty-inverse-results.json` retains samples, hashes and the independent module comparison. Do not add medians from the two separate rounds.
+
+The 32 undo/register/history integration contracts passed with 170 assertions; types passed. Opus 5.5 confirmed that BirthRoot, BelowFloor and error ordering remain intact. Production commit `2d95381` changes one argument only. The staged source is still read when register inverses need asset protection.
