@@ -22,6 +22,7 @@ import { iconPrefix } from "../../shared/projection"
 import { SourceTextarea } from "../source-textarea"
 import type { SourceReplacement } from "../source-textarea"
 import { EditorOverlay } from "./editor-overlay"
+import { nativeSearchHighlights } from "./editor-search"
 import type {
 	Atom,
 	DocumentLink,
@@ -198,6 +199,7 @@ function createEditorView(
 	activeLine.setAttribute("aria-hidden", "true")
 	wrapper.append(activeLine, highlight, menu, textarea, collaborators, links)
 	let overlay = new EditorOverlay(highlight)
+	let nativeSearch = nativeSearchHighlights()
 	let geometryDirty = true
 	let searchPattern: RegExp | undefined
 	let searchSource = ""
@@ -419,6 +421,7 @@ function createEditorView(
 			contextMenu?.close()
 			cancelAnimationFrame(paintFrame)
 			lineActions.dispose()
+			nativeSearch?.replace([])
 			text.dispose()
 			for (let node of [textarea, menu]) {
 				node.oninput = null
@@ -746,6 +749,7 @@ function createEditorView(
 		paintLinkHover()
 	}
 	function paintDecorations() {
+		if (listeners.signal.aborted) return
 		let comments = options.comments()
 		if (searchPattern && searchSource !== text.value) {
 			searchSource = text.value
@@ -757,6 +761,7 @@ function createEditorView(
 				}))
 		}
 		if (!comments.length && !people.length && !searchMatches.length) {
+			nativeSearch?.replace([])
 			if (collaborators.childNodes.length) collaborators.replaceChildren()
 			return
 		}
@@ -764,6 +769,7 @@ function createEditorView(
 		let visible = overlay.visible(bounds.top, bounds.bottom)
 		let fragment = document.createDocumentFragment()
 		let measurements = []
+		let searchRanges: Range[] = []
 		let sourceStart = text.toSource(visible.start)
 		let sourceEnd = text.toSource(visible.end, "end")
 		let low = 0,
@@ -786,6 +792,10 @@ function createEditorView(
 			range.setEnd(to.node, to.offset)
 			let active =
 				match.start === text.selectionStart && match.end === text.selectionEnd
+			if (nativeSearch && !active) {
+				searchRanges.push(range)
+				continue
+			}
 			for (let rectangle of range.getClientRects()) {
 				if (
 					!rectangle.width ||
@@ -800,6 +810,7 @@ function createEditorView(
 				fragment.append(mark)
 			}
 		}
+		nativeSearch?.replace(searchRanges)
 		for (let comment of comments) {
 			if (
 				text.toView(comment.end) < visible.start ||
@@ -965,6 +976,7 @@ function createEditorView(
 		schedulePaint()
 	}
 	function schedulePaint() {
+		if (listeners.signal.aborted) return
 		if (!paintFrame)
 			paintFrame = requestAnimationFrame(() => {
 				paintFrame = 0

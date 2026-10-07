@@ -5,6 +5,11 @@ import {
 	serverAddress,
 	wait,
 } from "./browser-driver"
+import {
+	searchHighlightCount,
+	searchHighlightsVisible,
+} from "./browser-search-highlights"
+import { editorPreferences } from "../src/shared/preferences"
 
 let session = "editor-find-" + Date.now()
 let server = Bun.spawn(["bun", "tests/browser-document-app.ts", "--serve"], {
@@ -15,8 +20,15 @@ try {
 	let url = new URL("/app", await serverAddress(server.stdout)).href
 	browser(session, "set", "viewport", "1280", "800")
 	browser(session, "open", url)
-	wait(session, 'Boolean(document.querySelector("#editor"))')
+	wait(
+		session,
+		'document.querySelector("#editor") && !document.querySelector("#editor").readOnly',
+	)
 	browser(session, "click", '[data-action="new"]')
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.value === "" && !document.querySelector("#editor").readOnly',
+	)
 	fill("Needle needle\n**needle** [needle](https://example.com)")
 	browser(session, "press", "Control+f")
 	browser(session, "fill", "#find-text", "needle")
@@ -27,12 +39,17 @@ try {
 		),
 		"Close is the rightmost Find control",
 	)
-	wait(session, 'document.querySelectorAll(".search-match").length === 4')
+	wait(session, `${searchHighlightCount} === 4`)
+	if (Bun.env.TEST_SEARCH_HIGHLIGHTS === "fallback")
+		assert(
+			evaluate(
+				session,
+				'!CSS.highlights?.has("alkalye-search") && document.querySelectorAll(".search-match").length === 4',
+			),
+			"Unsupported browsers render every match through the overlay fallback",
+		)
 	assert(
-		evaluate(
-			session,
-			'[...document.querySelectorAll(".search-match")].every(mark => {let rect = mark.getBoundingClientRect(); return rect.width > 0 && rect.height > 0 && getComputedStyle(mark).backgroundColor !== "rgba(0, 0, 0, 0)"})',
-		),
+		evaluate(session, searchHighlightsVisible),
 		"Plain and projected Markdown matches have visible highlights",
 	)
 	browser(session, "click", "#find-next")
@@ -45,24 +62,24 @@ try {
 		"Navigation highlights the active match without stealing search focus",
 	)
 	browser(session, "check", "#find-case")
-	wait(session, 'document.querySelectorAll(".search-match").length === 3')
+	wait(session, `${searchHighlightCount} === 3`)
 	browser(session, "check", "#find-regex")
 	browser(session, "fill", "#find-text", "[Nn]eedle")
-	wait(session, 'document.querySelectorAll(".search-match").length === 4')
+	wait(session, `${searchHighlightCount} === 4`)
 	browser(session, "fill", "#find-text", "[")
-	wait(session, 'document.querySelectorAll(".search-match").length === 0')
+	wait(session, `${searchHighlightCount} === 0`)
 	browser(session, "fill", "#find-text", "(?=needle)")
 	wait(
 		session,
-		'document.querySelector(".find-count").textContent.includes("3") && document.querySelectorAll(".search-match").length === 0',
+		`document.querySelector(".find-count").textContent.includes("3") && ${searchHighlightCount} === 0`,
 	)
 	browser(session, "uncheck", "#find-regex")
 	browser(session, "fill", "#find-text", "needle")
-	wait(session, 'document.querySelectorAll(".search-match").length === 3')
+	wait(session, `${searchHighlightCount} === 3`)
 	fill("needle changed needle")
 	wait(
 		session,
-		'document.querySelector(".find-count").textContent.endsWith("of 2") && document.querySelectorAll(".search-match").length === 2',
+		`document.querySelector(".find-count").textContent.endsWith("of 2") && ${searchHighlightCount} === 2`,
 	)
 	browser(session, "click", "#find-next")
 	wait(
@@ -84,11 +101,54 @@ try {
 		"Editing invalidates cached matches; repeated navigation wraps through the new source",
 	)
 	browser(session, "click", "#close-find")
-	wait(session, 'document.querySelectorAll(".search-match").length === 0')
+	wait(session, `${searchHighlightCount} === 0`)
 	assert(
 		true,
 		"Case, regex, invalid and zero-width searches update or clear highlights",
 	)
+	if (
+		evaluate(
+			session,
+			'typeof Highlight === "function" && Boolean(CSS.highlights)',
+		)
+	) {
+		browser(session, "press", "Control+f")
+		browser(session, "fill", "#find-text", "needle")
+		wait(session, `${searchHighlightCount} === 2`)
+		evaluate(
+			session,
+			`(() => {
+				let Editor = customElements.get("alkalye-editor"), second = new Editor();
+				second.dataset.searchOwner = "second";
+				second.style.cssText = "position:fixed;inset:300px 20px auto auto;width:300px;height:100px";
+				second.configure({
+					content: "Second needle", atoms: [], editable: false,
+					preferences: ${JSON.stringify(editorPreferences({}))},
+					isDrawing: () => false, openDrawing() {}, documents: () => [], openDocument() {},
+					createLinkedDocument: async () => "", report(error) {throw error}, comments: () => [],
+					change: () => undefined, undo() {}, select() {}, requestAsset() {}, attach() {}, command() {}, find() {}
+				});
+				document.body.append(second);
+				second.search(/needle/g);
+			})()`,
+		)
+		wait(session, `${searchHighlightCount} === 3`)
+		browser(session, "click", "#close-find")
+		wait(session, `${searchHighlightCount} === 1`)
+		assert(
+			evaluate(
+				session,
+				'[...CSS.highlights.get("alkalye-search")].every(range => document.querySelector("[data-search-owner=second]").contains(range.startContainer))',
+			),
+			"Closing one search preserves the other editor's native highlights",
+		)
+		evaluate(
+			session,
+			'document.querySelector("[data-search-owner=second]").remove()',
+		)
+		wait(session, `${searchHighlightCount} === 0`)
+		assert(true, "Removing an editor releases its native search ranges")
+	}
 
 	browser(session, "set", "viewport", "504", "842")
 	browser(session, "press", "Control+f")
@@ -103,7 +163,7 @@ try {
 	browser(session, "press", "Escape")
 	wait(
 		session,
-		'document.querySelector("#find-bar").hidden && document.querySelectorAll(".search-match").length === 0',
+		`document.querySelector("#find-bar").hidden && ${searchHighlightCount} === 0`,
 	)
 	browser(session, "set", "viewport", "1280", "800")
 
@@ -114,7 +174,7 @@ try {
 	)
 	browser(session, "press", "Control+f")
 	browser(session, "fill", "#find-text", "needle")
-	wait(session, 'document.querySelectorAll(".search-match").length === 1')
+	wait(session, `${searchHighlightCount} === 1`)
 	browser(session, "click", "#find-previous")
 	wait(
 		session,
@@ -128,7 +188,7 @@ try {
 		"Distant matches paint after crossing viewport windows",
 	)
 	browser(session, "click", "#close-find")
-	wait(session, 'document.querySelectorAll(".search-match").length === 0')
+	wait(session, `${searchHighlightCount} === 0`)
 	let dense = ("a" + "\u0301".repeat(400)).repeat(40)
 	fill(dense)
 	evaluate(

@@ -324,6 +324,10 @@
 	background: #eab30840;
 	border-radius: 2px;
 }
+[data-editor] #highlight::highlight(alkalye-search),
+[data-editor] #highlight *::highlight(alkalye-search) {
+	background-color: #eab30840;
+}
 [data-editor] .search-match[data-active] {
 	background: #eab30866;
 	outline: 1px solid var(--brand);

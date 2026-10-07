@@ -176,7 +176,7 @@ function measureFind(configuration: Configuration, fixture: Fixture) {
 			"find matches",
 			original
 				? `document.body.innerText.includes('1 of ${count}')`
-				: `document.querySelector('.find-count')?.textContent?.includes('${count}') && !!document.querySelector('.search-match')`,
+				: `document.querySelector('.find-count')?.textContent?.includes('${count}') && (document.querySelector('.search-match') || CSS.highlights?.get('alkalye-search')?.size)`,
 		)
 		browser(session, "keyboard", "inserttext", "reference")
 		matching.push(sample(configuration))

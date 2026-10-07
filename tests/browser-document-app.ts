@@ -107,6 +107,9 @@ if (process.argv.includes("--serve")) {
 			if (shell) {
 				let markup = await response.text()
 				let instrumentation =
+					(Bun.env.TEST_SEARCH_HIGHLIGHTS === "fallback"
+						? '<script>Object.defineProperty(window, "Highlight", {value:undefined, configurable:true})</script>'
+						: "") +
 					'<script>if (localStorage.getItem("native-preferences-offline")) Object.defineProperty(navigator, "onLine", {value:false, configurable:true})</script>' +
 					`<script>
 					window.liveSocketConnections = 0;

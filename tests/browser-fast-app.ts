@@ -11,7 +11,9 @@ import {
 	evaluate,
 	serverAddress,
 	browserCondition,
+	clickTargetReady,
 } from "./browser-driver"
+import { searchHighlightCount } from "./browser-search-highlights"
 
 let server = Bun.spawn(["bun", "tests/browser-document-app.ts", "--serve"], {
 	stdout: "pipe",
@@ -29,14 +31,19 @@ try {
 		["set", "viewport", "1280", "800"],
 		["open", url],
 		condition('document.querySelector("[data-document-app]") !== null'),
-		["click", '[data-action="new"]'],
 		condition(
 			'document.querySelector("#editor") && !document.querySelector("#editor").readOnly',
+		),
+		["click", '[data-action="library"]'],
+		condition(clickTargetReady('[data-action="new"]')),
+		["click", '[data-action="new"]'],
+		condition(
+			'document.querySelector("alkalye-editor").source.value === "" && !document.querySelector("#editor").readOnly',
 		),
 		...edit(draft),
 		["press", "Control+f"],
 		["fill", "#find-text", "alpha"],
-		condition('document.querySelectorAll(".search-match").length === 2'),
+		condition(`${searchHighlightCount} === 2`),
 		["click", "#find-next"],
 		condition(
 			'document.querySelectorAll(".search-match[data-active]").length === 1',
@@ -46,10 +53,10 @@ try {
 		versionMarker(),
 		["click", "#replace-all"],
 		condition(
-			`${source}.endsWith("gamma gamma beta") && ${saved} && document.querySelectorAll(".search-match").length === 0`,
+			`${source}.endsWith("gamma gamma beta") && ${saved} && ${searchHighlightCount} === 0`,
 		),
 		["click", "#close-find"],
-		condition('document.querySelectorAll(".search-match").length === 0'),
+		condition(`${searchHighlightCount} === 0`),
 		versionMarker(),
 		["press", "Control+z"],
 		condition(`${source} === ${JSON.stringify(draft)}`),
