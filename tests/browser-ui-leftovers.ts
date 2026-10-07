@@ -303,7 +303,7 @@ try {
 	browser(session, "click", "#find-next")
 	wait(
 		session,
-		'document.querySelector("#editor").scrollTop > 100 && document.activeElement.id === "find-text"',
+		'(() => { let host=document.querySelector("alkalye-editor"), source=host.source, match=document.querySelector(".search-match[data-active]"); if (!match || source.value.slice(source.selectionStart,source.selectionEnd) !== "needle") return false; let bounds=match.getBoundingClientRect(), viewport=host.getBoundingClientRect(); return bounds.width>0 && bounds.top>=viewport.top && bounds.bottom<=viewport.bottom && bounds.top>=0 && bounds.bottom<=innerHeight && document.activeElement.id === "find-text" })()',
 	)
 	assert(true, "Find scrolls to distant matches while retaining search focus")
 	browser(session, "click", "#close-find")

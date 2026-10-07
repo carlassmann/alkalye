@@ -528,7 +528,7 @@ export class EditorViewport {
 		top: number,
 		limit = this.text.length,
 	): Block {
-		let end = this.blockBoundary(Math.min(limit, start + 4096), start)
+		let end = this.blockBoundary(Math.min(limit, start + 1024), start)
 		end = this.blockBoundary(end, start)
 		let part = this.text.slice(start, end)
 		let newline = part.lastIndexOf("\n")
@@ -574,7 +574,7 @@ export class EditorViewport {
 	private estimatedBlock(
 		start: number,
 		top: number,
-		end = Math.min(this.text.length, start + 4096),
+		end = Math.min(this.text.length, start + 1024),
 	): Block {
 		end = this.blockBoundary(end, start)
 		let part = this.text.slice(start, end)

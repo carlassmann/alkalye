@@ -499,27 +499,33 @@ function createEditorView(
 		paintActiveLine()
 	}
 	function paintActiveLine() {
+		let hidden = !options.preferences.highlightCurrentLine
+		let bounds: DOMRect | undefined
+		let view: DOMRect | undefined
+		let scrollTop = 0
+		if (!hidden) {
+			let from = point(text.toView(text.selectionStart)),
+				range = document.createRange()
+			range.setStart(from.node, from.offset)
+			range.collapse(true)
+			bounds = range.getBoundingClientRect()
+			if (!bounds.height) {
+				let length = from.node.textContent?.length ?? 0
+				if (from.offset < length) range.setEnd(from.node, from.offset + 1)
+				else if (from.offset) range.setStart(from.node, from.offset - 1)
+				bounds = range.getClientRects()[0] ?? range.getBoundingClientRect()
+			}
+			view = wrapper.getBoundingClientRect()
+			scrollTop = text.viewport.scrollTop
+		}
 		if (geometryDirty) {
 			paintLinks()
 			geometryDirty = false
 		}
-		activeLine.hidden = !options.preferences.highlightCurrentLine
-		if (activeLine.hidden) return
-		let from = point(text.toView(text.selectionStart)),
-			range = document.createRange()
-		range.setStart(from.node, from.offset)
-		range.collapse(true)
-		let bounds = range.getBoundingClientRect()
-		if (!bounds.height) {
-			let length = from.node.textContent?.length ?? 0
-			if (from.offset < length) range.setEnd(from.node, from.offset + 1)
-			else if (from.offset) range.setStart(from.node, from.offset - 1)
-			bounds = range.getClientRects()[0] ?? range.getBoundingClientRect()
-		}
-		if (!bounds.height) return
-		let view = wrapper.getBoundingClientRect()
-		activeLine.style.top = `${bounds.top - view.top + text.viewport.scrollTop}px`
-		activeLine.style.height = `${bounds.height || parseFloat(getComputedStyle(textarea).lineHeight)}px`
+		activeLine.hidden = hidden
+		if (!bounds?.height || !view) return
+		activeLine.style.top = `${bounds.top - view.top + scrollTop}px`
+		activeLine.style.height = `${bounds.height}px`
 	}
 	function preferences(next: EditorPreferences) {
 		options.preferences = next
@@ -582,6 +588,7 @@ function createEditorView(
 			existing.map(anchor => [anchor.dataset.editorHit, anchor]),
 		)
 		let bounds = wrapper.getBoundingClientRect()
+		let scrollTop = text.viewport.scrollTop
 		let visible = overlay.visible(bounds.top, bounds.bottom)
 		let geometry = []
 		let low = 0,
@@ -644,7 +651,7 @@ function createEditorView(
 				if (!first) anchor.setAttribute("aria-hidden", "true")
 				else anchor.removeAttribute("aria-hidden")
 				first = false
-				let style = `left:${rectangle.left - bounds.left}px;top:${rectangle.top - bounds.top + text.viewport.scrollTop}px;width:${rectangle.width}px;height:${rectangle.height}px`
+				let style = `left:${rectangle.left - bounds.left}px;top:${rectangle.top - bounds.top + scrollTop}px;width:${rectangle.width}px;height:${rectangle.height}px`
 				if (anchor.dataset.editorStyle !== style) {
 					anchor.style.cssText = style
 					anchor.dataset.editorStyle = style
