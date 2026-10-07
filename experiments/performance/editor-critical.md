@@ -16,13 +16,25 @@ A separate CPU profile of the original implementation attributed the longest tas
 
 `Replica.applyTogether` prepares each distinct replica once, then commits only after every replica validates. Prepared edit caches survive rejected preparation. Public contracts cover conflict in the last replica without partial publication, duplicate instances, privately owned operation facts, concurrent text/frontmatter edits, replay, causal undo and copy-on-write removal histories. Opus 5.5 found no blocking issue; raised cache-failure and shared-history concerns were reviewed against the existing guards and public tests.
 
-The next experiment should slice pure preparation while keeping publication synchronous and atomic. Generation checks must reject concurrent mutations and interruption must leave every replica unchanged. The remaining 30 ms native input task needs its own profile; this change does not solve it.
+Any later experiment that slices pure preparation must keep publication synchronous and atomic. Generation checks must reject concurrent mutations and interruption must leave every replica unchanged. The remaining 30 ms native input task needs its own profile; this change does not solve it.
 
 ## The synchronous input cost
 
 A separate V8 attribution pass after the batch change found a 39 ms instrumented input task. `DocumentSession.replace` accounted for 25.5 ms of inclusive samples: preparing the precise edit, decoding `DocumentActionSchema`, then applying the optimistic replica synchronously. `Replica.apply` accounted for 15.2 ms within that path. Editor projection/render accounted for 8.4 ms, with 5.3 ms sampled in `TextIndex.summary`, which allocates `Array.from(text)` to count code points. These nested inclusive figures must not be added.
 
 The worst deferred task in that profile still resumed from IndexedDB completion into Effect and replica/schema preparation. Prepared visibility facts could avoid another repeated validation pass; pure cooperative preparation remains a subsequent experiment. The synchronous optimistic edit path requires separate work. Profile samples and mapped source locations: `editor-input-attribution.json`. Profile overhead means its 39/65 ms task durations are attribution evidence, not replacements for the matched timings above.
+
+## Allocation-free code-point counting
+
+A narrow TextIndex change (`4a14e3c`) replaces repeated `Array.from(text).length` allocations with UTF-16 length minus valid surrogate pairs. ASCII takes a native regex fast path; paired and lone surrogates retain exact code-point and UTF-16 offset semantics. Public TextIndex/replacement/causal integration contracts passed, including surrogate pairs across leaf boundaries and a 1 MiB replacement. Opus reviewed the change; its boundary and regex-mode concerns were addressed.
+
+Matched five-trial A/B against the batch-only version used the same restored histories and fixture. The whole trusted replacement task improved from **31.8 → 27.4 ms median**, **35.0 → 31.7 ms maximum**. The largest task across the three-second aftermath remained **57.5 → 59.1 ms median** (65.8 → 60.9 ms maximum). All ten trials replaced exactly 2,048 ranges, saved durably and undid to the exact original source. This improves input without meeting the 8.33 ms budget or reducing the deferred validation bottleneck. Samples and exact build hashes: `editor-codepoint-results.json`.
+
+## Prepared visibility facts
+
+A second narrow change (`155bc33`) retains privately owned, prevalidated removal/cancellation facts for synchronous Replica publication. Previously the same visibility facts were parsed during validation and parsed again during commit. The public prepared commit rejects stale or repeated publication before mutation. Existing atomic batch, fork, concurrent metadata and causal undo contracts remain covered; new contracts cover input mutation, fork-after-prepare, double commit, intervening apply/restore and a raised migration floor. Opus found no blocker under the existing synchronous, privately owned Replica path. Introducing yields later would require preflight checks across all replicas before any publication.
+
+A separate restored-history five-trial pair against the TextIndex version measured **26.6 → 25.6 ms median trusted input**, **31.0 → 29.4 ms maximum**. The largest task across the three-second aftermath improved **56.2 → 49.4 ms median**, **57.2 → 51.4 ms maximum**. All ten trials replaced exactly 2,048 ranges, saved durably and undid exactly. Both phases remain above the 8.33 ms budget. Each pair stands independently; their median improvements must not be added. Samples and exact build hashes: `editor-visibility-results.json`.
 
 ## Method and provenance
 

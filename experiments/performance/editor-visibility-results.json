@@ -1,0 +1,322 @@
+{
+	"provenance": {
+		"baseline": "1bbe9dae675e72f73027559e65b23faae0b049ca plus bd54e62 batch application and 4a14e3c TextIndex only",
+		"candidate": "Same baseline plus 155bc33 guarded prepared visibility only",
+		"method": "Same isolated baseline Bun server, origin 58167, backend SQLite snapshots and quiet profile safety-copies restored before each phase; identical 1 MiB ASCII fixture / 2,048 TOKEN occurrences; five ordered trusted select-all/replacement/save/undo trials. No CPU profiler. Headless approximately 60 Hz does not prove 120 Hz presentation. Full enclosing trusted input task and maximum top-level task across three-second aftermath reported separately. This pair is independent from previous pairs; do not add their median gains.",
+		"loadedEntryBytes": 252795
+	},
+	"comparison": {
+		"before": {
+			"entrySha256": "e64d54ab1463539f04b71b7fb645f7c30ab89aedd1f3aa19d1c8a5c5b1b2137f",
+			"rows": [
+				{
+					"fixture": "1m-2048",
+					"trial": 0,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 1.311,
+							"inputTaskMs": 1.311,
+							"tasksOverBudget": 0,
+							"taskCount": 14
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 56.838,
+							"inputTaskMs": 31.028,
+							"tasksOverBudget": 10,
+							"taskCount": 3291
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				},
+				{
+					"fixture": "1m-2048",
+					"trial": 1,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 0.756,
+							"inputTaskMs": 0.756,
+							"tasksOverBudget": 0,
+							"taskCount": 13
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 55.329,
+							"inputTaskMs": 28.491,
+							"tasksOverBudget": 8,
+							"taskCount": 3310
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				},
+				{
+					"fixture": "1m-2048",
+					"trial": 2,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 1.072,
+							"inputTaskMs": 0.784,
+							"tasksOverBudget": 0,
+							"taskCount": 61
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 57.229,
+							"inputTaskMs": 26.557,
+							"tasksOverBudget": 8,
+							"taskCount": 2911
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				},
+				{
+					"fixture": "1m-2048",
+					"trial": 3,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 0.68,
+							"inputTaskMs": 0.68,
+							"tasksOverBudget": 0,
+							"taskCount": 16
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 56.156,
+							"inputTaskMs": 25.158,
+							"tasksOverBudget": 9,
+							"taskCount": 2924
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				},
+				{
+					"fixture": "1m-2048",
+					"trial": 4,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 0.693,
+							"inputTaskMs": 0.693,
+							"tasksOverBudget": 0,
+							"taskCount": 17
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 55.335,
+							"inputTaskMs": 26.385,
+							"tasksOverBudget": 7,
+							"taskCount": 2920
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				}
+			],
+			"failures": []
+		},
+		"after": {
+			"entrySha256": "b6cb63654127653e447b68bb3cc9f5a262fe52dac6897b77dfda9a85443eef45",
+			"rows": [
+				{
+					"fixture": "1m-2048",
+					"trial": 0,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 1.295,
+							"inputTaskMs": 1.295,
+							"tasksOverBudget": 0,
+							"taskCount": 15
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 51.377,
+							"inputTaskMs": 29.406,
+							"tasksOverBudget": 10,
+							"taskCount": 3294
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				},
+				{
+					"fixture": "1m-2048",
+					"trial": 1,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 0.784,
+							"inputTaskMs": 0.784,
+							"tasksOverBudget": 0,
+							"taskCount": 12
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 48.749,
+							"inputTaskMs": 26.47,
+							"tasksOverBudget": 10,
+							"taskCount": 3315
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				},
+				{
+					"fixture": "1m-2048",
+					"trial": 2,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 0.769,
+							"inputTaskMs": 0.769,
+							"tasksOverBudget": 0,
+							"taskCount": 13
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 50.471,
+							"inputTaskMs": 25.596,
+							"tasksOverBudget": 8,
+							"taskCount": 3303
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				},
+				{
+					"fixture": "1m-2048",
+					"trial": 3,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 1.286,
+							"inputTaskMs": 0.672,
+							"tasksOverBudget": 0,
+							"taskCount": 59
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 49.176,
+							"inputTaskMs": 24.225,
+							"tasksOverBudget": 9,
+							"taskCount": 3319
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				},
+				{
+					"fixture": "1m-2048",
+					"trial": 4,
+					"phases": [
+						{
+							"name": "selection",
+							"largestTaskMs": 0.796,
+							"inputTaskMs": 0.796,
+							"tasksOverBudget": 0,
+							"taskCount": 17
+						},
+						{
+							"name": "replacement",
+							"largestTaskMs": 49.392,
+							"inputTaskMs": 24.131,
+							"tasksOverBudget": 8,
+							"taskCount": 2926
+						}
+					],
+					"correctness": {
+						"busy": "false",
+						"characters": 1040384,
+						"exact": true,
+						"observedEditCount": 2048,
+						"pending": "0",
+						"remaining": 0,
+						"replacements": 2048
+					},
+					"undoExact": true
+				}
+			],
+			"failures": []
+		}
+	}
+}
