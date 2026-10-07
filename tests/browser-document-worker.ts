@@ -248,6 +248,82 @@ try {
 		evaluate(session, "window.workerCreations") === failedCreations,
 		"An unavailable worker scope closes; later updates use idle fallback without retry loops",
 	)
+	evaluate(
+		session,
+		`(() => {
+		window.workerFallbackTask = undefined;
+		window.workerFallbackChannel = window.workerSchedulerChannels.at(-1);
+		window.workerFallbackChannel.turns = 0;
+		document.querySelector("#worker-fallback-proof").update("One two.\\n".repeat(131072), "words");
+		setTimeout(() => {window.workerFallbackTask = document.querySelector("#worker-fallback-proof #stats").textContent !== "262144 words"}, 0);
+	})()`,
+	)
+	wait(
+		session,
+		'document.querySelector("#worker-fallback-proof #stats").textContent === "262144 words"',
+	)
+	assert(
+		evaluate(
+			session,
+			"window.workerFallbackTask && window.workerFallbackChannel.turns >= 8",
+		),
+		"Large unavailable-worker counts yield across browser tasks with exact counts",
+	)
+	let incompleteSources = [
+		{
+			source: '"`".repeat(200)+"\\n"+"One two. ".repeat(32768)',
+			sentences: 32768,
+		},
+		{ source: '"[".repeat(131072)', sentences: 1 },
+		{ source: '"![".repeat(65536)', sentences: 1 },
+		{ source: '"[a](".repeat(32768)', sentences: 1 },
+		{ source: '".".repeat(131072)+"x"', sentences: 1 },
+	]
+	for (let [index, { source, sentences }] of incompleteSources.entries()) {
+		evaluate(
+			session,
+			`document.querySelector("#worker-fallback-proof").update("Lead. ".repeat(${index + 1})+(${source}), "sentences")`,
+		)
+		wait(
+			session,
+			`document.querySelector("#worker-fallback-proof #stats").textContent === "${sentences + index + 1} sentences"`,
+		)
+	}
+	assert(
+		true,
+		"Unavailable-worker fallback handles large incomplete fences, links and punctuation",
+	)
+
+	evaluate(
+		session,
+		`(() => {
+		let stats = document.querySelector("#worker-fallback-proof");
+		window.workerFallbackCancelledChannel = window.workerSchedulerChannels.at(-1);
+		stats.update("One two.\\n".repeat(131072) + "Pending.", "words");
+		setTimeout(() => {stats.clear(); stats.update("Fresh fallback.", "words")}, 0);
+	})()`,
+	)
+	wait(
+		session,
+		'document.querySelector("#worker-fallback-proof #stats").textContent === "2 words" && window.workerFallbackCancelledChannel.first && window.workerFallbackCancelledChannel.second',
+	)
+	let cancelledTurns = evaluate(
+		session,
+		"window.workerFallbackCancelledChannel.turns",
+	)
+	evaluate(
+		session,
+		'document.querySelector("#worker-fallback-proof").update("Fresh fallback continues.", "words")',
+	)
+	wait(
+		session,
+		'document.querySelector("#worker-fallback-proof #stats").textContent === "3 words"',
+	)
+	assert(
+		evaluate(session, "window.workerFallbackCancelledChannel.turns") ===
+			cancelledTurns,
+		"Interrupted fallback work schedules no further turns while replacement counts continue",
+	)
 } finally {
 	try {
 		browser(session, "close")

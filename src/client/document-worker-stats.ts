@@ -5,7 +5,7 @@ import * as Exit from "effect/Exit"
 import * as Option from "effect/Option"
 import * as Queue from "effect/Queue"
 import * as Stream from "effect/Stream"
-import { documentStats } from "../shared/document-stats"
+import { documentStatsEffect } from "../shared/document-stats"
 import type { DocumentStats } from "../shared/document-stats"
 import { createDocumentWorker } from "./document-worker-client"
 
@@ -37,7 +37,7 @@ export function makeDocumentWorkerStats(
 					if (worker._tag === "None") {
 						result = {
 							revision: input.revision,
-							counts: yield* idleCounts(input.source),
+							counts: yield* fallbackCounts(input.source),
 						}
 					} else {
 						let client = worker.value
@@ -59,7 +59,7 @@ export function makeDocumentWorkerStats(
 									yield* Scope.close(workerScope, Exit.void)
 									return {
 										revision: input.revision,
-										counts: yield* idleCounts(input.source),
+										counts: yield* fallbackCounts(input.source),
 									}
 								}),
 							),
@@ -121,16 +121,6 @@ function replacement(before: string, after: string) {
 	})
 }
 
-function idleCounts(source: string) {
-	return Effect.callback<DocumentStats>(resume => {
-		if (typeof requestIdleCallback !== "undefined") {
-			let id = requestIdleCallback(
-				() => resume(Effect.succeed(documentStats(source))),
-				{ timeout: 250 },
-			)
-			return Effect.sync(() => cancelIdleCallback(id))
-		}
-		let id = setTimeout(() => resume(Effect.succeed(documentStats(source))), 0)
-		return Effect.sync(() => clearTimeout(id))
-	})
+function fallbackCounts(source: string) {
+	return Effect.yieldNow.pipe(Effect.andThen(documentStatsEffect(source)))
 }
