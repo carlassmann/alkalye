@@ -585,7 +585,7 @@ function compensatingChanges(
 		replica,
 		action,
 		inverse,
-		staged.text(action.document),
+		inverse.length ? staged.text(action.document) : "",
 	)
 	for (let field of inverse) {
 		if (!protectedTargets.has(field.target))
