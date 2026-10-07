@@ -120,7 +120,7 @@ let CausalCheckpointSchema = Schema.Struct({
 	),
 })
 
-let maximumCompactAtoms = 1_000_000
+let maximumCompactAtoms = 2_000_000
 let CompactAtomSchema = Schema.Struct({
 	...CheckpointAtomSchema.fields,
 	value: Schema.NonEmptyString.check(Schema.isMaxLength(2_000_000)),

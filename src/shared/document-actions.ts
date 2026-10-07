@@ -21,7 +21,7 @@ import {
 import type { Operation } from "./model"
 
 export let maximumActionChanges = 1024
-export let maximumActionText = 200_000
+export let maximumActionText = 2_000_000
 export let maximumActionIdentityCharacters = 4_000_000
 let AtomIdentitySchema = Schema.String.check(Schema.isMaxLength(160))
 let FieldNameSchema = Schema.String.check(Schema.isMaxLength(256))

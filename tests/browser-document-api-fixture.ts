@@ -348,7 +348,7 @@ let test = Effect.scoped(
 				"the next input retries earlier unsaved edits in order before saving itself",
 			)
 			let beforeLargePaste = session.replica.text(options.document)
-			editor.value += "x".repeat(200_001)
+			editor.value += "x".repeat(2_000_001)
 			editor.dispatchEvent(new Event("input", { bubbles: true }))
 			yield* FiberSet.awaitEmpty(writes)
 			check(

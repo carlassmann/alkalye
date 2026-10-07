@@ -45,10 +45,12 @@ import { partitionDocumentActions } from "./document-dependencies"
 import { validateTextCausality } from "./document-causality"
 import { parseCheckpoint, compactCheckpoint } from "./checkpoint"
 import { Replica } from "./crdt"
+import type { TextReplacement } from "./crdt"
 import {
 	CommittedActionSchema,
 	AccessConflict,
 	DocumentActionSchema,
+	maximumActionText,
 	DocumentConflict,
 	DocumentHistoryUnavailable,
 	DocumentSnapshotSchema,
@@ -437,6 +439,54 @@ function makeSession(options: DocumentSessionOptions) {
 			),
 		)
 		let view = documentView(() => projection.replica)
+		function oversizedEdit(target: string) {
+			return {
+				...submitEdit(null, target),
+				saved: conflict(
+					"This edit exceeds the action limits; split large changes into smaller edits",
+				),
+			}
+		}
+		function submitEdit(operation: Operation | null, target: string) {
+			let unchanged = {
+				operation: null,
+				content: view.text(target),
+				atoms: view.visible(target),
+			}
+			if (!operation) return { ...unchanged, saved: Effect.void }
+			let decoded = Schema.decodeUnknownResult(DocumentActionSchema)({
+				id: operation.id,
+				document: options.document,
+				actor: projection.replica.actor,
+				label: "Type",
+				changes: [compactOperation(operation)],
+				guards: [],
+				accessGuards: [],
+			})
+			if (decoded._tag === "Failure")
+				return {
+					...unchanged,
+					saved: conflict(
+						"This edit exceeds the action limits; split large changes into smaller edits",
+					),
+				}
+			if (!Queue.offerUnsafe(unsaved, decoded.success))
+				return {
+					...unchanged,
+					saved: conflict("This document session is closed"),
+				}
+			projection.replica.apply([operation])
+			projection.addDraft(decoded.success)
+			drafts.update()
+			advanceView()
+			return {
+				operation: freezeOperation(operation),
+				content: view.text(target),
+				atoms: view.visible(target),
+				saved: flush,
+			}
+		}
+
 		return {
 			replica: view,
 			version: () => SubscriptionRef.getUnsafe(revision),
@@ -473,45 +523,32 @@ function makeSession(options: DocumentSessionOptions) {
 						),
 					),
 				),
-			// Typing in the document or in one of its texts, such as a theme.
 			edit: (content: string, base?: Atom[], target = options.document) => {
-				let operation = projection.replica.prepareEdit(target, content, base)
-				let unchanged = {
-					operation: null,
-					content: view.text(target),
-					atoms: view.visible(target),
-				}
-				if (!operation) return { ...unchanged, saved: Effect.void }
-				let decoded = Schema.decodeUnknownResult(DocumentActionSchema)({
-					id: operation.id,
-					document: options.document,
-					actor: projection.replica.actor,
-					label: "Type",
-					changes: [compactOperation(operation)],
-					guards: [],
-					accessGuards: [],
-				})
-				if (decoded._tag === "Failure")
-					return {
-						...unchanged,
-						saved: conflict(
-							"This edit exceeds the action limits; split large changes into smaller edits",
-						),
-					}
-				if (!Queue.offerUnsafe(unsaved, decoded.success))
-					return {
-						...unchanged,
-						saved: conflict("This document session is closed"),
-					}
-				projection.replica.apply([operation])
-				projection.addDraft(decoded.success)
-				drafts.update()
-				advanceView()
-				return {
-					operation: freezeOperation(operation),
-					content: view.text(target),
-					atoms: view.visible(target),
-					saved: flush,
+				if (content.length - view.text(target).length > maximumActionText)
+					return oversizedEdit(target)
+				return submitEdit(
+					projection.replica.prepareEdit(target, content, base),
+					target,
+				)
+			},
+			replace: (
+				replacements: readonly TextReplacement[],
+				base?: Atom[],
+				target = options.document,
+			) => {
+				if (
+					replacements.reduce((size, change) => size + change.text.length, 0) >
+					maximumActionText
+				)
+					return oversizedEdit(target)
+				try {
+					return submitEdit(
+						projection.replica.prepareReplacements(target, replacements, base),
+						target,
+					)
+				} catch (error) {
+					if (!(error instanceof RangeError)) throw error
+					return { ...submitEdit(null, target), saved: conflict(error.message) }
 				}
 			},
 			replay: recovery.attempt("projection"),
@@ -1747,7 +1784,6 @@ function makeProjection(options: DocumentSessionOptions) {
 	})
 }
 function documentView(current: () => Replica) {
-	let protectedViews = new WeakSet<Atom[]>()
 	return Object.freeze({
 		get actor() {
 			return current().actor
@@ -1761,12 +1797,7 @@ function documentView(current: () => Replica) {
 		text: (target: string, until: number | string = Infinity) =>
 			current().text(target, until),
 		visible(target: string, until: number | string = Infinity) {
-			let atoms = current().visible(target, until)
-			if (!protectedViews.has(atoms)) {
-				Object.freeze(atoms)
-				protectedViews.add(atoms)
-			}
-			return atoms
+			return current().visible(target, until)
 		},
 		records: (type: string) => current().records(type),
 		register: (target: string, field: string) =>

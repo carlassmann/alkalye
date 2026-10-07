@@ -15,9 +15,18 @@ import {
 	SourceUndoSchema,
 } from "./frontmatter-merge"
 import type { Atom, DocumentRecord, Operation } from "./model"
+import { TextIndex } from "./text-index"
+import { immutableAtoms, replaceAtoms } from "./atom-sequence"
 import { textSplices } from "./text-splices"
 
+export interface TextReplacement {
+	start: number
+	remove: number
+	text: string
+}
+
 let sourceViews = new WeakMap<Atom[], Atom[]>()
+let sourceOffsets = new WeakMap<Atom[], TextIndex>()
 interface PreparedTextEdit {
 	id: string
 	target: string
@@ -107,21 +116,38 @@ export class Replica {
 			textEditSignature(operation) !== edit.signature
 		)
 			return
-		let raw = edit.raw,
-			atoms = edit.atoms
-		for (let splice of [...edit.splices].reverse()) {
-			let inserted = splice.inserted.flatMap(id => {
+		let replacements = edit.splices.map(splice => ({
+			start: splice.start,
+			remove: splice.remove,
+			inserted: splice.inserted.flatMap(id => {
 				let atom = this.atomIndex.get(id)?.atom
 				return atom ? [atom] : []
-			})
-			atoms = atoms
-				.slice(0, splice.start)
-				.concat(inserted, atoms.slice(splice.start + splice.remove))
-			let rawStart =
-				splice.start === edit.atoms.length ? raw.length : splice.start
-			raw = raw
-				.slice(0, rawStart)
-				.concat(inserted, raw.slice(rawStart + splice.remove))
+			}),
+		}))
+		let atoms = replaceAtoms(edit.atoms, replacements)
+		let raw =
+			edit.raw === edit.atoms
+				? atoms
+				: replaceAtoms(
+						edit.raw,
+						replacements.map(change => ({
+							...change,
+							start:
+								change.start === edit.atoms.length
+									? edit.raw.length
+									: change.start,
+						})),
+					)
+		let previousIndex = sourceOffsets.get(edit.atoms)
+		if (previousIndex) {
+			let index = previousIndex.fork()
+			for (let change of [...replacements].reverse())
+				index.replace({
+					start: previousIndex.offsetAtCodePoint(change.start),
+					end: previousIndex.offsetAtCodePoint(change.start + change.remove),
+					insert: change.inserted.map(atom => atom.value).join(""),
+				})
+			sourceOffsets.set(atoms, index)
 		}
 		this.textCache.set(edit.target, raw)
 		this.sourceCache.set(edit.target, atoms)
@@ -253,6 +279,130 @@ export class Replica {
 		if (operation) this.apply([operation])
 		return operation
 	}
+	prepareReplacements(
+		target: string,
+		replacements: readonly TextReplacement[],
+		atoms = this.visible(target),
+	) {
+		this.preparedEdit = undefined
+		let current = this.visible(target)
+		let previous =
+			atoms === current
+				? this.text(target)
+				: atoms.map(atom => atom.value).join("")
+		let end = 0
+		let lastStart = -1
+		for (let replacement of replacements) {
+			if (
+				/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/u.test(
+					replacement.text,
+				)
+			)
+				throw new RangeError(
+					"Text replacements must contain complete Unicode characters",
+				)
+			let stop = replacement.start + replacement.remove
+			if (
+				!Number.isSafeInteger(replacement.start) ||
+				!Number.isSafeInteger(replacement.remove) ||
+				replacement.remove < 0 ||
+				replacement.start < end ||
+				replacement.start === lastStart ||
+				stop > previous.length
+			)
+				throw new RangeError(
+					"Text replacements must be ordered, disjoint and within their base",
+				)
+			for (let offset of [replacement.start, stop]) {
+				let before = previous.charCodeAt(offset - 1),
+					after = previous.charCodeAt(offset)
+				if (
+					before >= 0xd800 &&
+					before <= 0xdbff &&
+					after >= 0xdc00 &&
+					after <= 0xdfff
+				)
+					throw new RangeError(
+						"Text replacements cannot split a Unicode character",
+					)
+			}
+			end = stop
+			lastStart = replacement.start
+		}
+		let pieces: string[] = []
+		let cursor = 0
+		for (let replacement of replacements) {
+			pieces.push(previous.slice(cursor, replacement.start), replacement.text)
+			cursor = replacement.start + replacement.remove
+		}
+		pieces.push(previous.slice(cursor))
+		let next = pieces.join("")
+		if (next === previous) return null
+		let header = sourceHeader(previous)
+		let displacement = 0
+		let changesFence = false
+		for (let change of replacements) {
+			let nextStart = change.start + displacement
+			changesFence ||=
+				touchesSourceFence(
+					previous,
+					change.start,
+					change.start + change.remove,
+				) || touchesSourceFence(next, nextStart, nextStart + change.text.length)
+			displacement += change.text.length - change.remove
+		}
+		if (
+			(header &&
+				(atoms[0]?.after !== "" ||
+					!header[0].endsWith("\n") ||
+					replacements.some(change => change.start < header[0].length))) ||
+			(!header && sourceHeader(next)) ||
+			changesFence
+		)
+			return this.prepareEdit(target, next, atoms)
+		let offsets = sourceOffsets.get(atoms)
+		if (previous.length !== atoms.length && !offsets) {
+			offsets = new TextIndex(previous)
+			sourceOffsets.set(atoms, offsets)
+		}
+		function position(offset: number) {
+			return offsets ? offsets.codePointOffset(offset) : offset
+		}
+		let operation = this.makeOperation(target, "text", this.clock + 1)
+		let cached: PreparedTextEdit["splices"] = []
+		for (let replacement of replacements) {
+			let start = position(replacement.start),
+				stop = position(replacement.start + replacement.remove)
+			for (let index = start; index < stop; index++) {
+				let atom = atoms[index]
+				if (atom) operation.remove.push(atom.id)
+			}
+			let anchor = atoms[start - 1]?.id ?? ""
+			let inserted: string[] = []
+			for (let value of replacement.text) {
+				let id = `${operation.id}:${String(operation.insert.length).padStart(8, "0")}`
+				operation.insert.push({ id, after: anchor, value })
+				inserted.push(id)
+				anchor = id
+			}
+			cached.push({ start, remove: stop - start, inserted })
+		}
+		let raw = sourceViews.get(atoms) ?? atoms
+		if (
+			current === atoms &&
+			raw.length === atoms.length &&
+			cached.every(
+				change =>
+					raw[change.start - 1]?.id === atoms[change.start - 1]?.id &&
+					raw[change.start]?.id === atoms[change.start]?.id &&
+					raw[change.start + change.remove - 1]?.id ===
+						atoms[change.start + change.remove - 1]?.id,
+			)
+		)
+			this.rememberTextEdit(operation, next, atoms, raw, cached)
+		return operation
+	}
+
 	prepareEdit(
 		target: string,
 		next: string,
@@ -268,7 +418,7 @@ export class Replica {
 		let operation = this.makeOperation(target, "text", this.clock + 1)
 		let current = this.visible(target)
 		let raw = sourceViews.get(atoms) ?? atoms
-		let header = frontmatterBlock(previous)
+		let header = sourceHeader(previous)
 		let bodyAppend = header
 			? atoms[0]?.after === "" &&
 				(header[0].length < previous.length || header[0].endsWith("\n"))
@@ -325,7 +475,7 @@ export class Replica {
 				raw[previousEnd - 1]?.id === atoms[previousEnd - 1]?.id
 			let ordinaryBody = header
 				? bodyAppend && start >= bodyStart
-				: !frontmatterBlock(next) && bodyAppend
+				: !sourceHeader(next) && bodyAppend
 			if (
 				ordinaryBody &&
 				rawAligned &&
@@ -525,8 +675,11 @@ export class Replica {
 	visible(target: string, until: number | string = Infinity): Atom[] {
 		let cached = until === Infinity ? this.sourceCache.get(target) : undefined
 		if (cached) return cached
-		let raw = this.rawVisible(target, until)
-		let atoms = sourceAtoms(raw, () => this.originalFrames(target, until))
+		let raw = immutableAtoms(this.rawVisible(target, until))
+		let atoms = immutableAtoms(
+			sourceAtoms(raw, () => this.originalFrames(target, until)),
+		)
+		if (until === Infinity) this.textCache.set(target, raw)
 		sourceViews.set(atoms, raw)
 		if (until === Infinity) this.sourceCache.set(target, atoms)
 		return atoms
@@ -615,11 +768,21 @@ export class Replica {
 	}
 	text(target: string, until: number | string = Infinity) {
 		let cached = this.strings.get(target)
-		if (until === Infinity && cached !== undefined) return cached
+		if (until === Infinity && cached !== undefined) {
+			let atoms = this.sourceCache.get(target)
+			if (atoms && atoms.length !== cached.length && !sourceOffsets.has(atoms))
+				sourceOffsets.set(atoms, new TextIndex(cached))
+			return cached
+		}
 		let text = this.visible(target, until)
 			.map(atom => atom.value)
 			.join("")
-		if (until === Infinity) this.strings.set(target, text)
+		if (until === Infinity) {
+			this.strings.set(target, text)
+			let atoms = this.sourceCache.get(target)
+			if (atoms && atoms.length !== text.length)
+				sourceOffsets.set(atoms, new TextIndex(text))
+		}
 		return text
 	}
 	fields(target: string, until = "") {
@@ -1118,4 +1281,10 @@ function touchesSourceFence(source: string, start: number, end: number) {
 	return /^---[ \t]*\r?$/m.test(
 		source.slice(first, last < 0 ? source.length : last),
 	)
+}
+
+function sourceHeader(source: string) {
+	return source.startsWith("---") || source.startsWith("\uFEFF---")
+		? frontmatterBlock(source)
+		: undefined
 }

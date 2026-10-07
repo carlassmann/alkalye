@@ -1,0 +1,685 @@
+{
+	"runtime": "Bun 1.4, real SQLite DocumentSession, one writer, 15 persisted top/middle/end replacements per scenario",
+	"includes": "Optimistic public API elapsed time; initial document load and subsequent saved-effect time measured separately",
+	"limitations": "Bulk creation, remote reconciliation, browser rendering and 24-writer throughput are not measured here. Source strings still materialize. Fifteen samples make p95 the maximum; GC/JIT outliers remain included.",
+	"beforeDenseArrays": [
+		{
+			"characters": 131072,
+			"samples": 15,
+			"optimisticP95": 66.87062500000002,
+			"timings": [
+				{
+					"preparation": 0.2828339999999798,
+					"application": 4.37195799999995,
+					"location": "top",
+					"optimistic": 66.87062500000002,
+					"durable": 4.2076660000000174
+				},
+				{
+					"preparation": 0.03224999999997635,
+					"application": 3.65949999999998,
+					"location": "middle",
+					"optimistic": 36.31854099999998,
+					"durable": 1.9759169999999813
+				},
+				{
+					"preparation": 0.04033300000003237,
+					"application": 4.313333000000057,
+					"location": "end",
+					"optimistic": 39.76462499999991,
+					"durable": 2.520750000000021
+				},
+				{
+					"preparation": 0.05733300000008512,
+					"application": 4.241167000000019,
+					"location": "top",
+					"optimistic": 40.22058300000003,
+					"durable": 6.864667000000054
+				},
+				{
+					"preparation": 0.04712500000005093,
+					"application": 4.042832999999973,
+					"location": "middle",
+					"optimistic": 42.166582999999946,
+					"durable": 2.0329169999999976
+				},
+				{
+					"preparation": 0.027917000000115877,
+					"application": 3.34112499999992,
+					"location": "end",
+					"optimistic": 32.21129199999996,
+					"durable": 1.2709159999999429
+				},
+				{
+					"preparation": 0.033834000000069864,
+					"application": 2.580165999999963,
+					"location": "top",
+					"optimistic": 30.406999999999925,
+					"durable": 1.1698340000000371
+				},
+				{
+					"preparation": 0.03270799999995688,
+					"application": 2.6059999999999945,
+					"location": "middle",
+					"optimistic": 30.75133300000016,
+					"durable": 2.9579590000000735
+				},
+				{
+					"preparation": 0.028833999999960724,
+					"application": 2.802415999999994,
+					"location": "end",
+					"optimistic": 30.933958000000075,
+					"durable": 1.3699169999999867
+				},
+				{
+					"preparation": 0.024458000000095126,
+					"application": 2.708499999999958,
+					"location": "top",
+					"optimistic": 31.229125000000067,
+					"durable": 1.4493330000000242
+				},
+				{
+					"preparation": 0.030584000000089873,
+					"application": 2.744083000000046,
+					"location": "middle",
+					"optimistic": 31.363708000000088,
+					"durable": 4.105374999999867
+				},
+				{
+					"preparation": 0.027166000000079293,
+					"application": 2.866457999999966,
+					"location": "end",
+					"optimistic": 30.492124999999987,
+					"durable": 1.3353329999999914
+				},
+				{
+					"preparation": 0.026959000000033484,
+					"application": 2.6879579999999805,
+					"location": "top",
+					"optimistic": 31.194332999999915,
+					"durable": 1.2607919999998103
+				},
+				{
+					"preparation": 0.02529200000003584,
+					"application": 2.762749999999869,
+					"location": "middle",
+					"optimistic": 31.54595900000004,
+					"durable": 1.1172500000000127
+				},
+				{
+					"preparation": 0.026292000000012195,
+					"application": 2.9113750000001346,
+					"location": "end",
+					"optimistic": 32.53620799999999,
+					"durable": 1.2543749999999818
+				}
+			]
+		},
+		{
+			"characters": 1048576,
+			"samples": 15,
+			"optimisticP95": 842.1426659999997,
+			"timings": [
+				{
+					"preparation": 2.188458000000537,
+					"application": 36.61458300000049,
+					"location": "top",
+					"optimistic": 842.1426659999997,
+					"durable": 2.347583000000668
+				},
+				{
+					"preparation": 0.16462500000125146,
+					"application": 32.830166000001554,
+					"location": "middle",
+					"optimistic": 459.46108300000014,
+					"durable": 1.37354200000118
+				},
+				{
+					"preparation": 0.12720900000022084,
+					"application": 33.790915999999925,
+					"location": "end",
+					"optimistic": 451.2529169999998,
+					"durable": 1.9428340000013122
+				},
+				{
+					"preparation": 0.15345800000068266,
+					"application": 31.201874999998836,
+					"location": "top",
+					"optimistic": 420.61616700000013,
+					"durable": 18.436125000000175
+				},
+				{
+					"preparation": 0.1398750000007567,
+					"application": 32.23125000000073,
+					"location": "middle",
+					"optimistic": 435.2910839999986,
+					"durable": 1.3100409999988187
+				},
+				{
+					"preparation": 0.12687499999992724,
+					"application": 31.37554199999977,
+					"location": "end",
+					"optimistic": 416.5611250000002,
+					"durable": 1.140292000000045
+				},
+				{
+					"preparation": 0.14754100000027393,
+					"application": 31.361500000000888,
+					"location": "top",
+					"optimistic": 415.01704099999915,
+					"durable": 1.2830840000005992
+				},
+				{
+					"preparation": 0.09608400000070105,
+					"application": 31.40020799999911,
+					"location": "middle",
+					"optimistic": 416.06483299999854,
+					"durable": 13.187332999999853
+				},
+				{
+					"preparation": 0.109375,
+					"application": 36.6088749999999,
+					"location": "end",
+					"optimistic": 432.74145900000076,
+					"durable": 3.2982089999986783
+				},
+				{
+					"preparation": 0.10195899999962421,
+					"application": 31.466459000001123,
+					"location": "top",
+					"optimistic": 417.00395899999967,
+					"durable": 1.1205840000002354
+				},
+				{
+					"preparation": 0.11920900000041001,
+					"application": 31.099625000000742,
+					"location": "middle",
+					"optimistic": 409.7517090000001,
+					"durable": 12.492625000000771
+				},
+				{
+					"preparation": 0.14975000000049477,
+					"application": 32.42191699999967,
+					"location": "end",
+					"optimistic": 457.0415000000012,
+					"durable": 1.6379999999990105
+				},
+				{
+					"preparation": 0.10458400000061374,
+					"application": 35.03337500000089,
+					"location": "top",
+					"optimistic": 466.2582910000001,
+					"durable": 1.1848750000008295
+				},
+				{
+					"preparation": 0.1391249999996944,
+					"application": 31.546875,
+					"location": "middle",
+					"optimistic": 471.02429199999824,
+					"durable": 12.16112499999872
+				},
+				{
+					"preparation": 0.11420800000269082,
+					"application": 33.74029199999859,
+					"location": "end",
+					"optimistic": 423.83245800000077,
+					"durable": 1.6078329999982088
+				}
+			]
+		}
+	],
+	"afterEffectChunk": [
+		{
+			"characters": 131072,
+			"unicode": false,
+			"samples": 15,
+			"optimisticP95": 1.1649170000000595,
+			"timings": [
+				{
+					"preparation": 0.2987500000000409,
+					"application": 0.21629199999995308,
+					"location": "top",
+					"optimistic": 1.1649170000000595,
+					"durable": 5.611250000000041
+				},
+				{
+					"preparation": 0.05700000000001637,
+					"application": 0.039166000000022905,
+					"location": "middle",
+					"optimistic": 0.16345799999999144,
+					"durable": 1.6807919999999967
+				},
+				{
+					"preparation": 0.03441699999996217,
+					"application": 0.02687500000001819,
+					"location": "end",
+					"optimistic": 0.12458300000002964,
+					"durable": 1.5812919999999622
+				},
+				{
+					"preparation": 0.04141700000002402,
+					"application": 0.023749999999949978,
+					"location": "top",
+					"optimistic": 0.12445900000000165,
+					"durable": 2.0739999999999554
+				},
+				{
+					"preparation": 0.043959000000086235,
+					"application": 0.04583299999990231,
+					"location": "middle",
+					"optimistic": 0.1717919999998685,
+					"durable": 5.286333000000013
+				},
+				{
+					"preparation": 0.09833300000013878,
+					"application": 0.030250000000023647,
+					"location": "end",
+					"optimistic": 0.19612500000016553,
+					"durable": 1.9643750000000182
+				},
+				{
+					"preparation": 0.03625000000010914,
+					"application": 0.7912499999999909,
+					"location": "top",
+					"optimistic": 0.928957999999966,
+					"durable": 3.886041999999861
+				},
+				{
+					"preparation": 0.035959000000048036,
+					"application": 0.041707999999971435,
+					"location": "middle",
+					"optimistic": 0.1501659999998992,
+					"durable": 1.4357919999999922
+				},
+				{
+					"preparation": 0.01995899999997164,
+					"application": 0.027417000000014013,
+					"location": "end",
+					"optimistic": 0.08658399999990252,
+					"durable": 0.9634169999999358
+				},
+				{
+					"preparation": 0.08166699999992488,
+					"application": 0.025666000000001077,
+					"location": "top",
+					"optimistic": 0.1455829999999878,
+					"durable": 0.8336249999999836
+				},
+				{
+					"preparation": 0.0281249999998181,
+					"application": 0.024666999999908512,
+					"location": "middle",
+					"optimistic": 0.07958299999995688,
+					"durable": 0.7265409999999974
+				},
+				{
+					"preparation": 0.023083999999926164,
+					"application": 0.03150000000005093,
+					"location": "end",
+					"optimistic": 0.08387500000003456,
+					"durable": 0.7016250000001492
+				},
+				{
+					"preparation": 0.02074999999990723,
+					"application": 0.028874999999970896,
+					"location": "top",
+					"optimistic": 0.0941659999998592,
+					"durable": 1.3177080000000387
+				},
+				{
+					"preparation": 0.0310829999998532,
+					"application": 0.02233299999988958,
+					"location": "middle",
+					"optimistic": 0.08495900000002621,
+					"durable": 0.63149999999996
+				},
+				{
+					"preparation": 0.025624999999990905,
+					"application": 0.020874999999932697,
+					"location": "end",
+					"optimistic": 0.06975000000011278,
+					"durable": 0.659458000000086
+				}
+			]
+		},
+		{
+			"characters": 1048576,
+			"unicode": false,
+			"samples": 15,
+			"optimisticP95": 0.581040999999459,
+			"timings": [
+				{
+					"preparation": 0.14754199999879347,
+					"application": 0.099833000000217,
+					"location": "top",
+					"optimistic": 0.4690409999984695,
+					"durable": 13.923832999998922
+				},
+				{
+					"preparation": 0.1125000000010914,
+					"application": 0.09141599999929895,
+					"location": "middle",
+					"optimistic": 0.30308400000103575,
+					"durable": 1.9054999999989377
+				},
+				{
+					"preparation": 0.10062500000094587,
+					"application": 0.03391600000031758,
+					"location": "end",
+					"optimistic": 0.18766599999980826,
+					"durable": 2.2744579999998678
+				},
+				{
+					"preparation": 0.0943329999990965,
+					"application": 0.06045800000174495,
+					"location": "top",
+					"optimistic": 0.2654579999998532,
+					"durable": 2.3035410000011325
+				},
+				{
+					"preparation": 0.11095800000111922,
+					"application": 0.06279200000062701,
+					"location": "middle",
+					"optimistic": 0.2400000000016007,
+					"durable": 1.6896669999987353
+				},
+				{
+					"preparation": 0.06537500000013097,
+					"application": 0.03258300000015879,
+					"location": "end",
+					"optimistic": 0.1589590000003227,
+					"durable": 6.264124999999694
+				},
+				{
+					"preparation": 0.061041999999360996,
+					"application": 0.12954200000058336,
+					"location": "top",
+					"optimistic": 0.3299590000005992,
+					"durable": 1.1917079999984708
+				},
+				{
+					"preparation": 0.04287499999918509,
+					"application": 0.036249999999199645,
+					"location": "middle",
+					"optimistic": 0.11724999999933061,
+					"durable": 9.813000000000102
+				},
+				{
+					"preparation": 0.0657919999994192,
+					"application": 0.042250000000422006,
+					"location": "end",
+					"optimistic": 0.17570899999918765,
+					"durable": 1.3901660000010452
+				},
+				{
+					"preparation": 0.10791600000084145,
+					"application": 0.05891700000029232,
+					"location": "top",
+					"optimistic": 0.2650420000009035,
+					"durable": 1.3486659999998665
+				},
+				{
+					"preparation": 0.11379200000010314,
+					"application": 0.029209000000264496,
+					"location": "middle",
+					"optimistic": 0.19204100000024482,
+					"durable": 0.9282079999993584
+				},
+				{
+					"preparation": 0.10012499999902502,
+					"application": 0.027791000000433996,
+					"location": "end",
+					"optimistic": 0.17537500000071304,
+					"durable": 1.563624999998865
+				},
+				{
+					"preparation": 0.14216699999997218,
+					"application": 0.03570899999976973,
+					"location": "top",
+					"optimistic": 0.24158400000123947,
+					"durable": 1.6446670000004815
+				},
+				{
+					"preparation": 0.15737499999886495,
+					"application": 0.28620800000135205,
+					"location": "middle",
+					"optimistic": 0.581040999999459,
+					"durable": 2.2669170000008307
+				},
+				{
+					"preparation": 0.18187500000021828,
+					"application": 0.06420799999978044,
+					"location": "end",
+					"optimistic": 0.37062500000138243,
+					"durable": 2.1210829999999987
+				}
+			]
+		},
+		{
+			"characters": 131072,
+			"unicode": true,
+			"samples": 15,
+			"optimisticP95": 0.4785830000000715,
+			"timings": [
+				{
+					"preparation": 0.11037500000020373,
+					"application": 0.21349999999983993,
+					"location": "top",
+					"optimistic": 0.4785830000000715,
+					"durable": 2.2120839999988675
+				},
+				{
+					"preparation": 0.13770799999838346,
+					"application": 0.19070900000042457,
+					"location": "middle",
+					"optimistic": 0.39562499999919964,
+					"durable": 1.2938329999997222
+				},
+				{
+					"preparation": 0.06508299999950395,
+					"application": 0.050583000000187894,
+					"location": "end",
+					"optimistic": 0.17550000000119326,
+					"durable": 1.7630000000008295
+				},
+				{
+					"preparation": 0.0660410000000411,
+					"application": 0.13179200000013225,
+					"location": "top",
+					"optimistic": 0.2849999999998545,
+					"durable": 11.955291999998735
+				},
+				{
+					"preparation": 0.0657919999994192,
+					"application": 0.07837500000096043,
+					"location": "middle",
+					"optimistic": 0.2384170000004815,
+					"durable": 1.608541999999943
+				},
+				{
+					"preparation": 0.0638329999983398,
+					"application": 0.22254199999952107,
+					"location": "end",
+					"optimistic": 0.39470799999980954,
+					"durable": 1.237916000000041
+				},
+				{
+					"preparation": 0.058082999999896856,
+					"application": 0.05349999999998545,
+					"location": "top",
+					"optimistic": 0.1525420000016311,
+					"durable": 0.8276249999998981
+				},
+				{
+					"preparation": 0.08908300000075542,
+					"application": 0.06462499999906868,
+					"location": "middle",
+					"optimistic": 0.2052079999994021,
+					"durable": 0.8687499999996362
+				},
+				{
+					"preparation": 0.02395799999976589,
+					"application": 0.05645800000093004,
+					"location": "end",
+					"optimistic": 0.10341599999992468,
+					"durable": 0.5303339999991294
+				},
+				{
+					"preparation": 0.036833000000115135,
+					"application": 0.023917000000437838,
+					"location": "top",
+					"optimistic": 0.07754199999908451,
+					"durable": 0.47541699999965203
+				},
+				{
+					"preparation": 0.01749999999992724,
+					"application": 0.026915999998891493,
+					"location": "middle",
+					"optimistic": 0.0614160000004631,
+					"durable": 0.45099999999911233
+				},
+				{
+					"preparation": 0.03466699999989942,
+					"application": 0.03220899999905669,
+					"location": "end",
+					"optimistic": 0.09708399999908579,
+					"durable": 1.2430420000000595
+				},
+				{
+					"preparation": 0.046583000001191976,
+					"application": 0.04754200000024866,
+					"location": "top",
+					"optimistic": 0.13029199999982666,
+					"durable": 1.0547910000004777
+				},
+				{
+					"preparation": 0.0717079999994894,
+					"application": 0.06475000000136788,
+					"location": "middle",
+					"optimistic": 0.19204200000058336,
+					"durable": 0.9152919999996811
+				},
+				{
+					"preparation": 0.02162500000122236,
+					"application": 0.03404199999931734,
+					"location": "end",
+					"optimistic": 0.07699999999931606,
+					"durable": 0.592040999999881
+				}
+			]
+		},
+		{
+			"characters": 1048576,
+			"unicode": true,
+			"samples": 15,
+			"optimisticP95": 5.755957999997918,
+			"timings": [
+				{
+					"preparation": 0.2984999999971478,
+					"application": 0.2203750000007858,
+					"location": "top",
+					"optimistic": 0.7171250000028522,
+					"durable": 2.645583000001352
+				},
+				{
+					"preparation": 0.19970900000043912,
+					"application": 0.11804100000153994,
+					"location": "middle",
+					"optimistic": 0.4141249999993306,
+					"durable": 1.4511249999995925
+				},
+				{
+					"preparation": 0.13908299999820883,
+					"application": 0.053916999997454695,
+					"location": "end",
+					"optimistic": 0.2303329999995185,
+					"durable": 0.81104200000118
+				},
+				{
+					"preparation": 0.21329100000002654,
+					"application": 0.10758400000122492,
+					"location": "top",
+					"optimistic": 0.3736659999995027,
+					"durable": 11.787916000001132
+				},
+				{
+					"preparation": 0.1578750000007858,
+					"application": 0.12683300000207964,
+					"location": "middle",
+					"optimistic": 0.40854100000069593,
+					"durable": 1.6314579999998386
+				},
+				{
+					"preparation": 0.3268339999995078,
+					"application": 0.09604200000103447,
+					"location": "end",
+					"optimistic": 0.5100830000010319,
+					"durable": 2.1016249999993306
+				},
+				{
+					"preparation": 0.17679100000168546,
+					"application": 0.07270900000003166,
+					"location": "top",
+					"optimistic": 0.3077499999999418,
+					"durable": 2.2965000000003783
+				},
+				{
+					"preparation": 0.195584000000963,
+					"application": 0.07091600000057952,
+					"location": "middle",
+					"optimistic": 0.3255409999983385,
+					"durable": 1.122708999999304
+				},
+				{
+					"preparation": 0.17779200000222772,
+					"application": 0.04737500000192085,
+					"location": "end",
+					"optimistic": 0.2649170000004233,
+					"durable": 0.7090830000015558
+				},
+				{
+					"preparation": 0.2165839999979653,
+					"application": 0.06533399999898393,
+					"location": "top",
+					"optimistic": 0.3572910000002594,
+					"durable": 0.9479999999966822
+				},
+				{
+					"preparation": 0.1633750000000873,
+					"application": 0.046916999999666587,
+					"location": "middle",
+					"optimistic": 0.2530000000006112,
+					"durable": 0.8473330000015267
+				},
+				{
+					"preparation": 0.15949999999793363,
+					"application": 0.04145799999969313,
+					"location": "end",
+					"optimistic": 0.2302079999972193,
+					"durable": 0.5909170000013546
+				},
+				{
+					"preparation": 0.22845800000141026,
+					"application": 0.0571669999990263,
+					"location": "top",
+					"optimistic": 0.34645799999998417,
+					"durable": 1.4176660000011907
+				},
+				{
+					"preparation": 0.27087500000197906,
+					"application": 0.14945799999986775,
+					"location": "middle",
+					"optimistic": 0.5371250000025611,
+					"durable": 1.807875000002241
+				},
+				{
+					"preparation": 4.032042000002548,
+					"application": 0.39766600000075414,
+					"location": "end",
+					"optimistic": 5.755957999997918,
+					"durable": 1.1989580000008573
+				}
+			]
+		}
+	]
+}

@@ -24,7 +24,7 @@ import {
 } from "../src/shared/document-actions"
 import { encode } from "../src/shared/base64"
 import { Replica } from "../src/shared/crdt"
-import { expandDeletions, object } from "../src/shared/model"
+import { expandDeletions, object, parseOperation } from "../src/shared/model"
 import { newComment, newDocument, setFields } from "../src/shared/documents"
 import {
 	blobDigest,
@@ -1019,14 +1019,19 @@ test("HTTP rejects excessive actions and compact text expansions before durable 
 			if (!register) return yield* Effect.die("Missing register operation")
 			for (let changes of [
 				Array.from({ length: 1025 }, () => action.changes[0]),
-				[{ ...register, value: "x".repeat(200_001) }],
+				[{ ...register, value: "x".repeat(2_000_001) }],
 				[{ ...register, field: "x".repeat(257) }],
 				[{ ...register, author: "x".repeat(257) }],
 				[
-					{ ...register, value: "x".repeat(100_001) },
-					{ ...register, value: "y".repeat(100_001) },
+					{ ...register, value: "x".repeat(1_000_001) },
+					{ ...register, value: "y".repeat(1_000_001) },
 				],
-				[{ ...text, remove: [{ id: text.id + ":00000000", count: 200_001 }] }],
+				[
+					{
+						...text,
+						remove: [{ id: text.id + ":00000000", count: 2_000_001 }],
+					},
+				],
 				[
 					{
 						...text,
@@ -1034,7 +1039,7 @@ test("HTTP rejects excessive actions and compact text expansions before durable 
 							{
 								id: text.id + ":00000000",
 								after: "",
-								value: "x".repeat(200_001),
+								value: "x".repeat(2_000_001),
 							},
 						],
 					},
@@ -1047,7 +1052,7 @@ test("HTTP rejects excessive actions and compact text expansions before durable 
 								id: text.id + ":00000000",
 								after: "",
 								value: "x",
-								order: Array.from({ length: 200_001 }, () => "x"),
+								order: Array.from({ length: 2_000_001 }, () => "x"),
 							},
 						],
 					},
@@ -1098,7 +1103,7 @@ test("HTTP rejects excessive actions and compact text expansions before durable 
 				{
 					...action,
 					undoOf: action.id,
-					guards: [{ target: action.document, state: "x".repeat(200_001) }],
+					guards: [{ target: action.document, state: "x".repeat(2_000_001) }],
 				},
 			]) {
 				let response = yield* Effect.tryPromise(() =>
@@ -2325,3 +2330,144 @@ test("interrupting a real document request records cancellation and releases its
 		await server.stop(true)
 	}
 })
+
+test(
+	"a one MiB document syncs bounded actions and downloads a compact editable snapshot",
+	() =>
+		run(
+			Effect.gen(function* () {
+				let owner = yield* client(116)
+				let document = "large-synchronized-document"
+				let replica = new Replica(owner.subject + "-large-producer")
+				let source = "A paragraph with several words.\n"
+					.repeat(34_000)
+					.slice(0, 1_048_576)
+				yield* owner.api.workspaces.create({
+					payload: {
+						workspace: "large-space",
+						name: "Large",
+						request: "large-create",
+					},
+				})
+				let created = yield* buildAction(
+					replica,
+					document,
+					"Create large document",
+					staged => newDocument(staged, document, "", source.slice(0, 65_536)),
+				)
+				yield* owner.api.documents.create({
+					payload: { workspace: "large-space", action: created },
+				})
+				replica.apply(created.changes.map(parseOperation))
+				for (let end = 65_536; end < source.length;) {
+					end = Math.min(source.length, end + 65_536)
+					let action = yield* buildAction(
+						replica,
+						document,
+						"Append bounded source",
+						staged => [staged.prepareEdit(document, source.slice(0, end))],
+					)
+					yield* owner.api.documents.commit({
+						params: { document },
+						payload: action,
+					})
+					replica.apply(action.changes.map(parseOperation))
+				}
+				let snapshot = yield* owner.api.documents.snapshot({
+					params: { document },
+					query: { encoding: "compact" },
+				})
+				expect(JSON.parse(snapshot.state).format).toBe("alkalye-state-v3")
+				expect(snapshot.state.length).toBeLessThan(source.length + 100_000)
+				let restored = yield* restoreSnapshot(
+					snapshot,
+					owner.subject + "-large-restored",
+				)
+				expect(restored.text(document)).toBe(source)
+				let edit = yield* buildAction(
+					restored,
+					document,
+					"Edit restored source",
+					staged => [staged.prepareEdit(document, source + "!")],
+				)
+				yield* owner.api.documents.commit({
+					params: { document },
+					payload: edit,
+				})
+				let later = yield* owner.api.documents.snapshot({
+					params: { document },
+					query: { encoding: "compact" },
+				})
+				expect(
+					(yield* restoreSnapshot(later, "large-verify")).text(document),
+				).toBe(source + "!")
+			}),
+		),
+	120_000,
+)
+
+test(
+	"a one MiB paste is one durable HTTP contribution and one undo, with bounded aggregate rejection",
+	() =>
+		run(
+			Effect.gen(function* () {
+				let owner = yield* client(117)
+				let document = "one-paste-document",
+					workspace = "one-paste-space"
+				yield* owner.api.workspaces.create({
+					payload: { workspace, name: "Paste", request: "create" },
+				})
+				let replica = new Replica(owner.subject + "-paste")
+				let birth = yield* buildAction(replica, document, "Create", staged =>
+					newDocument(staged, document, "", ""),
+				)
+				yield* owner.api.documents.create({
+					payload: { workspace, action: birth },
+				})
+				replica.apply(birth.changes.map(parseOperation))
+				let source = "Large paste paragraph.\n"
+					.repeat(50_000)
+					.slice(0, 1_048_576)
+				let paste = yield* buildAction(replica, document, "Paste", staged => [
+					staged.prepareReplacements(document, [
+						{ start: 0, remove: 0, text: source },
+					]),
+				])
+				let receipt = yield* owner.api.documents.commit({
+					params: { document },
+					payload: paste,
+				})
+				expect(paste.changes.length).toBe(1)
+				let snapshot = yield* owner.api.documents.snapshot({
+					params: { document },
+					query: { encoding: "compact" },
+				})
+				let restored = yield* restoreSnapshot(
+					snapshot,
+					owner.subject + "-paste-undo",
+				)
+				expect(restored.text(document)).toBe(source)
+				let original = yield* owner.api.documents.action({
+					params: { document, action: paste.id },
+				})
+				expect(original.id).toBe(paste.id)
+				expect(receipt).toBeGreaterThan(0)
+				let undo = yield* undoAction(restored, original)
+				yield* owner.api.documents.commit({
+					params: { document },
+					payload: undo,
+				})
+				let undone = yield* owner.api.documents.snapshot({
+					params: { document },
+					query: { encoding: "compact" },
+				})
+				expect(
+					(yield* restoreSnapshot(
+						undone,
+						owner.subject + "-paste-reader",
+					)).text(document),
+				).toBe("")
+			}),
+		),
+	90000,
+)

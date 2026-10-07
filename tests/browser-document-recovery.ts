@@ -152,9 +152,15 @@ export function verifyDocumentSessionRecovery(check: Check) {
 			} catch {
 				mutated = true
 			}
+			let protectedArray = false
+			try {
+				atoms.push(atoms[0] ?? { id: "", after: "", value: "" })
+			} catch {
+				protectedArray = true
+			}
 			check(
 				mutated &&
-					Object.isFrozen(atoms) &&
+					protectedArray &&
 					session.replica.text("browser-document") === before,
 				"the native read facade protects tracked atom arrays and atom values from mutation",
 			)
