@@ -1,5 +1,8 @@
 import { spawnSync } from "node:child_process"
 import { object } from "../src/shared/model"
+
+// Changing daemon defaults between commands can restart the browser and lose its tab.
+let browserTimeout = "20000"
 // macOS Chromium can redispatch corrupt CDP keys indefinitely after native
 // shortcuts. Those trusted events lack timestamps; normal keys and IME stay native.
 let macCdpKeyboardGuard = `(() => {
@@ -35,7 +38,7 @@ export function browser(session: string, ...args: string[]) {
 			env: {
 				...process.env,
 				AGENT_BROWSER_HEADED: "false",
-				AGENT_BROWSER_DEFAULT_TIMEOUT: "20000",
+				AGENT_BROWSER_DEFAULT_TIMEOUT: browserTimeout,
 			},
 		},
 	)
@@ -66,7 +69,7 @@ export function browserBatch(
 			env: {
 				...process.env,
 				AGENT_BROWSER_HEADED: "false",
-				AGENT_BROWSER_DEFAULT_TIMEOUT: "10000",
+				AGENT_BROWSER_DEFAULT_TIMEOUT: browserTimeout,
 			},
 		},
 	)
