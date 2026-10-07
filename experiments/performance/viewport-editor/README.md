@@ -2,7 +2,7 @@
 
 Unshipped prototype. No production editor changes.
 
-Question: can a full-document native textarea fit an 8.3ms interaction budget, or must native input contain only the visible document region?
+Question: can bounded native input keep typing below 8.3ms while a worker persists real document edits?
 
 Run `bun experiments/performance/viewport-editor/serve.ts`, then open http://127.0.0.1:4331/?size=1048576&fixture=long&mode=bounded in a background agent-browser session. `measure.ts` runs trusted input, scrolling and source-offset selection checks. `trace.ts` records Chrome traces through agent-browser.
 
@@ -38,14 +38,36 @@ A full textarea is viable for the 128KiB long-paragraph fixture, but native edit
 
 The bounded editor keeps canonical source outside the DOM, computes a virtual scroll height and places one native textarea over a window of 48 visual rows with overscan. Trusted edits update the canonical source; scrolling replaces only the window. CSS is scoped with `data-viewport-editor`.
 
+## Connected slice
+
+Open http://127.0.0.1:4331/?mode=session&size=131072 after starting `serve.ts`. This uses the real Bun backend, browser account, IndexedDB journal and DocumentSession. Production code is unchanged.
+
+The main thread owns a balanced UTF16 text index and a bounded native textarea. It sends replacement ranges through Effect Worker/RPC. The worker owns the document session and acknowledges strictly durable writes. Effect scopes own workers, fibers and callbacks. Initial 1MiB sources are seeded in bounded, durable chunks.
+
+`connected-journey.ts` exercises nine trusted edits at the beginning, middle and end, checks exact source equality and reloads from IndexedDB. `--local-large` measures 1MiB local persistence separately.
+
+| Source | Native input median / maximum | Worker durable median / maximum | Reload | Server sync               |
+| ------ | ----------------------------- | ------------------------------- | ------ | ------------------------- |
+| 128KiB | 0.3 / 0.5ms                   | 5.4 / 9.5ms                     | Passed | Passed                    |
+| 1MiB   | 0.7 / 1.5ms                   | 30.8 / 62.7ms                   | Passed | Not measured successfully |
+
+Each row has nine samples. `connected-results.json` and `connected-large-local-results.json` contain the samples. Both ran concurrently on the same machine. RAF delays still reach 16.3ms in headless Chrome; these results establish a small input path, not displayed 120fps.
+
+The public text-index integration has 2,812 assertions over Unicode edits and 1MiB documents. The renderer journey checks canonical select-all/copy/delete, external caret shifts, repeated-character edit offsets, viewport boundary navigation, grapheme deletion and readonly guards.
+
+Two real workers sharing one journal pass 13 checks, including stale revision rejection and durable reopen after termination. Foreign edits cause an explicit rejection before unsafe offsets are applied. The UI keeps the rejected draft and can save it as a separate document. The recovery journey verifies that copy survives reload.
+
 ## Prototype limits
 
-- Wrapping assumes 72 monospace ASCII characters per visual row. Zoom, proportional text, tabs, bidi and Unicode grapheme widths need measured layout and a viewport index.
-- `index()` scans every paragraph after each edit. This O(n) scan and string slicing are prototype accidents; an incremental text/paragraph index is required for production bounds.
-- Only short selections within one window are tested. Cross-window selections, keyboard boundary navigation, multicursor and undo need a canonical selection model independent of the native fragment.
-- Composition pauses window replacement, but real IME interaction is unverified. Accessibility currently exposes only the fragment; whole-document reading/navigation is unresolved.
-- Syntax overlays, CRDT, persistence, collaboration, decorations, links and application lifecycle are absent. This measures a native input floor, not app parity.
+- Wrapping assumes 72 monospace columns. Proportional fonts, bidi, tabs and actual grapheme widths need measured layout.
+- The worker still uses whole-source CRDT APIs. A 1MiB durable write takes up to 62.7ms here. Keeping it off the input path does not solve sustained edit throughput.
+- A 1MiB server sync did not complete within the journey's 20-second readiness deadline. Local persistence passed; large-document sync remains unresolved.
+- Foreign edits are rejected, not rebased. Remote collaboration, multicursor and undo still need a canonical selection and transaction model.
+- Real IME and accessibility remain unverified. Synthetic composition preparation is not an IME test.
+- Explicit sync returns a full snapshot and resets the viewport. Automatic reconnect, idempotent retry and worker crash recovery are not implemented.
+- Pending edits are protected by an unload prompt, not a durable main-thread outbox. A rejected draft becomes durable only when its recovered copy is saved.
+- Syntax overlays, links and application parity are outside this slice.
 
-Continue as a reversible editor-input slice, with IME, accessibility, cross-window selections and real font/wrap geometry as acceptance gates. Keep the production editor until those gates pass. No production cutover follows from this benchmark.
+Next experiment: patch-oriented CRDT writes with durable group commit, then remote edit rebasing. Keep the production editor until composition, accessibility, collaboration and real 120Hz display tests pass.
 
 written with gpt-6 in codex
