@@ -4,6 +4,7 @@ import { rawMarkup } from "../shared/html"
 // the same set the original application used. Inline SVG keeps them free of
 // requests and of runtime dependencies.
 let icons = {
+	mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
 	monitor:
 		'<rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/>',
 	scissors:

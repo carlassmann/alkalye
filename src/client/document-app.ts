@@ -311,6 +311,7 @@ function mountApplication() {
 			"open-file",
 			"open-folder",
 			"sign-in",
+			"email-sign-in",
 			"sign-out",
 			"library-options",
 			"syntax-theme",
@@ -2798,7 +2799,7 @@ function mountApplication() {
 				if (action === "toggle-preview") action = "preview"
 				if (action === "save-as" && !window.showSaveFilePicker)
 					action = "download"
-				if (action === "settings") {
+				if (action === "settings" || action === "email-sign-in") {
 					router.go({ kind: "settings", category: "general", from: here() })
 					return
 				}

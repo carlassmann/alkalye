@@ -121,6 +121,7 @@ export function libraryMarkup(name: string, filter: string) {
 					${button("open-folder", "Open folder", html`${icon("folder-open")}<span>Open folder</span>`)}
 					${button("open-file", "Open file", html`${icon("file-text")}<span>Open file</span>`)}
 					<hr />
+					${button("email-sign-in", "Sign in with email", html`${icon("mail")}<span>Sign in with email</span>`)}
 					${button("sign-in", "Sign in", html`${icon("log-in")}<span>Sign in</span>`)}
 					${button("sign-out", "Log out", html`${icon("log-out")}<span>Log out</span>`)}
 				</div></alkalye-menu
