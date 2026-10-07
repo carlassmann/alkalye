@@ -178,7 +178,15 @@ function expandCompactCheckpoint(
 			for (let [index, value] of characters.entries()) {
 				let id = prefix + String(offset + index).padStart(8, "0")
 				atoms.push(
-					index === 0 ? { ...run, value } : { id, after: previous, value },
+					index === 0
+						? {
+								...run,
+								value,
+								...(run.order ? { order: [...run.order] } : {}),
+								...(run.observed ? { observed: [...run.observed] } : {}),
+								...(run.deleted ? { deleted: [...run.deleted] } : {}),
+							}
+						: { id, after: previous, value },
 				)
 				previous = id
 			}
@@ -207,16 +215,19 @@ export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
 		record.format !== "alkalye-state-v3"
 	)
 		throw new Error("Unknown checkpoint format")
-	let decoded =
+	let expanded =
 		record.format === "alkalye-state-v3"
 			? expandCompactCheckpoint(
 					Schema.decodeUnknownSync(CompactCheckpointSchema)(value),
 				)
-			: record.format === "alkalye-state-v1"
-				? Schema.decodeUnknownSync(LegacyCheckpointSchema)(value)
-				: Schema.decodeUnknownSync(CausalCheckpointSchema)(value)
+			: undefined
+	let decoded =
+		expanded ??
+		(record.format === "alkalye-state-v1"
+			? Schema.decodeUnknownSync(LegacyCheckpointSchema)(value)
+			: Schema.decodeUnknownSync(CausalCheckpointSchema)(value))
 	let targets = new Set<string>(),
-		owners = new Set<string>()
+		owners = new Map<string, string>()
 	let operations = new Map<string, { target: string; kind: string }>()
 	function claim(operation: string, target: string, kind: string) {
 		let previous = operations.get(operation)
@@ -227,7 +238,7 @@ export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
 			throw new Error("Checkpoint operation identity is ambiguous")
 		operations.set(operation, { target, kind })
 	}
-	let snapshots = decoded.targets.map(target => {
+	let snapshots = decoded.targets.map((target, index) => {
 		let id = identifier(target.id)
 		if (targets.has(id)) throw new Error("Duplicate checkpoint target")
 		targets.add(id)
@@ -238,12 +249,20 @@ export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
 		)
 			throw new Error("Invalid checkpoint registers")
 		for (let field of fields) claim(field.id, id, "set")
-		let atoms = target.atoms.map(atom => ({ ...atom }))
+		let expandedTarget = expanded?.targets[index]
+		let atoms = expandedTarget
+			? expandedTarget.atoms
+			: target.atoms.map(atom => ({
+					...atom,
+					...(atom.order ? { order: [...atom.order] } : {}),
+					...(atom.observed ? { observed: [...atom.observed] } : {}),
+					...(atom.deleted ? { deleted: [...atom.deleted] } : {}),
+				}))
 		let indexed = new Map(atoms.map(atom => [atom.id, atom]))
 		for (let atom of atoms) {
 			if (owners.has(atom.id) || atom.id === atom.after)
 				throw new Error("Invalid checkpoint atom identity")
-			owners.add(atom.id)
+			owners.set(atom.id, id)
 			claim(atom.id.slice(0, -9), id, "text")
 			if (atom.after && !indexed.has(atom.after))
 				throw new Error("Checkpoint anchor belongs to no atom in this target")
@@ -252,6 +271,7 @@ export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
 		}
 		let complete = new Set<string>()
 		for (let atom of atoms) {
+			if (complete.has(atom.id)) continue
 			let path = new Set<string>(),
 				next = atom.id
 			while (next && !complete.has(next)) {
@@ -275,7 +295,25 @@ export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
 				throw new Error("Unknown legacy checkpoint deletion")
 			return { ...common, removed: [...target.removed] }
 		}
-		let visibility = target.visibility
+		let visibility: TextVisibilitySnapshot = {
+			floor: target.visibility.floor,
+			legacyRemoved: target.visibility.legacyRemoved.map(run =>
+				typeof run === "string" ? run : { ...run },
+			),
+			removals: target.visibility.removals.map(([id, runs]) => [
+				id,
+				[
+					typeof runs[0] === "string" ? runs[0] : { ...runs[0] },
+					...runs
+						.slice(1)
+						.map(run => (typeof run === "string" ? run : { ...run })),
+				],
+			]),
+			cancels: target.visibility.cancels.map(([id, original]) => [
+				id,
+				original,
+			]),
+		}
 		let known = new Set(atoms.map(atom => atom.id.slice(0, -9)))
 		let removers = new Set<string>(),
 			cancels = new Set<string>()
@@ -324,6 +362,8 @@ export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
 	for (let [previous, current] of restored) {
 		if (!owners.has(previous) || !owners.has(current))
 			throw new Error("Unknown restored atom identity")
+		if (owners.get(previous) !== owners.get(current))
+			throw new Error("Restored atom identities belong to different targets")
 		let path = new Set<string>(),
 			next = previous
 		while (next && !checked.has(next)) {
@@ -359,6 +399,7 @@ export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
 		}),
 	}
 }
+
 export function sealCheckpoint(
 	key: string,
 	id: string,

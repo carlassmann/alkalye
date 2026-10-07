@@ -645,6 +645,76 @@ test("packed checkpoints preserve causal facts, forks and legacy decoding", () =
 	expect(cold.text("document")).toBe("A😀!C")
 })
 
+test("checkpoint hydration owns its input across restores and fork edits", () => {
+	let source = "---\ntitle: Name\n---\nA😀BC"
+	let { replica } = setup(source)
+	let deletion = replica.edit("document", source.replace("BC", "C"))
+	if (!deletion) throw Error("Missing deletion")
+	for (let packed of [false, true]) {
+		let raw = replica.checkpoint()
+		let input = packed ? compactCheckpoint(raw) : raw
+		let parsed = parseCheckpoint(input)
+		let saved = JSON.stringify(parsed)
+		let cold = new Replica("cold-cache")
+		cold.restoreCheckpoint(input)
+		let nested = input.targets[0]?.atoms.find(atom => atom.order)
+		if (!nested?.order) throw Error("Missing ordered frontmatter")
+		expect(Reflect.set(nested.order, "0", "changed after validation")).toBe(
+			true,
+		)
+		expect(JSON.stringify(parsed)).toBe(saved)
+		let inputAtom = input.targets[0]?.atoms[0]
+		if (!inputAtom) throw Error("Missing input atom")
+		expect(Reflect.set(inputAtom, "value", "Changed")).toBe(true)
+		let plain = new Replica("plain-cache")
+		plain.restore(structuredClone(parsed))
+		expect(cold.checkpoint()).toEqual(plain.checkpoint())
+		expect(cold.generation).toBe(plain.generation)
+		expect(cold.canCancel("document", deletion.id)).toBe(
+			plain.canCancel("document", deletion.id),
+		)
+		expect(cold.text("document")).toBe(replica.text("document"))
+		let held = cold.visible("document")
+		let fork = cold.fork("unicode-cache")
+		let offset = cold.text("document").indexOf("😀") + 2
+		let replacement = fork.prepareReplacements("document", [
+			{ start: offset, remove: 1, text: "!" },
+		])
+		if (!replacement) throw Error("Missing precise fork replacement")
+		fork.apply([parseOperation(compactOperation(replacement))])
+		expect(fork.text("document")).toBe(source.replace("BC", "!"))
+		expect(cold.text("document")).toBe(source.replace("BC", "C"))
+		expect(cold.visible("document")).toBe(held)
+		expect(held.map(atom => atom.value).join("")).toBe(cold.text("document"))
+		cold.cancel("document", deletion.id)
+		expect(cold.text("document")).toBe(source)
+		expect(fork.text("document")).toBe(source.replace("BC", "!"))
+		expect(JSON.stringify(parsed)).toBe(saved)
+		let altered = structuredClone(parsed)
+		let changed = altered.targets[0]?.atoms[0]
+		if (!changed) throw Error("Missing altered atom")
+		changed.value = "x"
+		expect(() => cold.restore(altered)).toThrow("immutable")
+		expect(() => cold.restoreCheckpoint(altered)).toThrow("immutable")
+	}
+})
+
+test("checkpoint aliases cannot restore an atom into another target", () => {
+	let replica = new Replica("alias-scope")
+	replica.edit("first", "one")
+	replica.edit("second", "two")
+	let checkpoint = replica.checkpoint()
+	let first = checkpoint.targets.find(target => target.id === "first")?.atoms[0]
+	let second = checkpoint.targets.find(target => target.id === "second")
+		?.atoms[0]
+	if (!first || !second) throw Error("Missing separate targets")
+	checkpoint.restored = [[first.id, second.id]]
+	expect(() => parseCheckpoint(checkpoint)).toThrow("different targets")
+	expect(() => new Replica("raw-restore").restore(checkpoint)).toThrow(
+		"foreign",
+	)
+})
+
 test("packed checkpoints reject overlapping runs, invalid anchors and forged clocks", () => {
 	let { replica } = setup("ABC")
 	let packed = compactCheckpoint(replica.checkpoint())

@@ -43,7 +43,7 @@ import {
 import type { UndoEntry } from "./document-undo"
 import { partitionDocumentActions } from "./document-dependencies"
 import { validateTextCausality } from "./document-causality"
-import { parseCheckpoint, compactCheckpoint } from "./checkpoint"
+import { compactCheckpoint } from "./checkpoint"
 import { Replica } from "./crdt"
 import type { TextReplacement } from "./crdt"
 import {
@@ -909,7 +909,8 @@ function makeProjection(options: DocumentSessionOptions) {
 								"accepted-document",
 								options.author,
 							)
-						else accepted.restore(parseCheckpoint(state.checkpoint))
+						else accepted.restoreCheckpoint(state.checkpoint)
+						accepted.text(options.document)
 						durable = accepted.fork("local-document", options.author)
 						replica = accepted.fork(actor, options.author)
 						cached.replica = accepted
@@ -1031,6 +1032,7 @@ function makeProjection(options: DocumentSessionOptions) {
 					} else if (value.kind === "opened") {
 						if (!log && !creation) {
 							let restored = yield* restoreSnapshot(value.snapshot, actor)
+							restored.text(options.document)
 							accepted = restored.fork("accepted-document", options.author)
 							durable = restored.fork("local-document", options.author)
 							replica = restored

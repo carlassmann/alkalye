@@ -8,7 +8,6 @@ import { requiredBlobChunks } from "./document-blobs"
 import * as Schema from "effect/Schema"
 import { encode } from "./base64"
 import { Replica } from "./crdt"
-import { parseCheckpoint } from "./checkpoint"
 import {
 	IdentifierSchema,
 	AtomSchema,
@@ -369,11 +368,11 @@ export function undoAction(
 export function restoreSnapshot(snapshot: DocumentSnapshot, actor: string) {
 	return attempt(() => {
 		let replica = new Replica(actor)
-		replica.restore(parseCheckpoint(JSON.parse(snapshot.state)))
-		for (let target of replica.checkpoint().targets)
+		replica.restoreCheckpoint(JSON.parse(snapshot.state))
+		for (let target of replica.targetIds())
 			if (
-				target.id !== snapshot.document &&
-				replica.fields(target.id).document !== snapshot.document
+				target !== snapshot.document &&
+				replica.fields(target).document !== snapshot.document
 			)
 				throw new Error("Snapshot contains another document")
 		return replica

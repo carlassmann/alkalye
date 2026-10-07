@@ -1,4 +1,5 @@
 import type { CausalReplicaCheckpoint, ReplicaCheckpoint } from "./checkpoint"
+import { parseCheckpoint } from "./checkpoint"
 import { TextVisibility } from "./text-visibility"
 import type { VisibilityFact } from "./text-visibility"
 import { parseOperation, expandDeletions } from "./model"
@@ -96,6 +97,13 @@ export class Replica {
 			[...this.targets].map(([target, history]) => [target, [...history]]),
 		)
 		replica.strings = new Map(this.strings)
+		replica.textCache = new Map(
+			[...this.textCache].map(([target, atoms]) => [
+				target,
+				immutableAtoms(atoms),
+			]),
+		)
+		replica.sourceCache = new Map(this.sourceCache)
 		replica.updated = new Map(this.updated)
 		replica.created = new Map(this.created)
 		replica.restored = new Map(this.restored)
@@ -921,6 +929,9 @@ export class Replica {
 	atomTarget(id: string) {
 		return this.atomIndex.get(id)?.target
 	}
+	targetIds() {
+		return this.targets.keys()
+	}
 	checkpoint(): CausalReplicaCheckpoint {
 		return {
 			format: "alkalye-state-v2",
@@ -945,6 +956,12 @@ export class Replica {
 		}
 	}
 	restore(snapshot: ReplicaCheckpoint) {
+		this.restoreState(snapshot, false)
+	}
+	restoreCheckpoint(value: unknown) {
+		this.restoreState(parseCheckpoint(value), true)
+	}
+	private restoreState(snapshot: ReplicaCheckpoint, shareAtoms: boolean) {
 		if (!Number.isSafeInteger(snapshot.clock) || snapshot.clock < 0)
 			throw new Error("Invalid checkpoint clock")
 		if (
@@ -973,14 +990,14 @@ export class Replica {
 					cancels: [],
 				})
 			} else visibility.restore(target.visibility)
-			return { target, visibility }
+			return { target, visibility, state: visibility.checkpoint() }
 		})
 		this.validateSnapshotOwners(snapshot)
 		let aliases = this.mergedAliases(snapshot)
 		let atoms = new Map<string, { target: string; atom: Atom }>()
 		let owners = new Map(this.textOwners)
 		let fields: Operation[] = []
-		for (let { target, visibility } of incoming) {
+		for (let { target, state } of incoming) {
 			if (
 				target.fields.some(
 					field =>
@@ -1018,7 +1035,6 @@ export class Replica {
 				owners.set(owner, target.id)
 				atoms.set(atom.id, { target: target.id, atom })
 			}
-			let state = visibility.checkpoint()
 			for (let id of [
 				...state.removals.map(([id]) => id),
 				...state.cancels.map(([id]) => id),
@@ -1035,8 +1051,7 @@ export class Replica {
 			if (previous && (previous.kind === "set" || previous.target !== target))
 				throw new Error("Checkpoint operation identity is ambiguous")
 		}
-		for (let { target, visibility } of incoming) {
-			let state = visibility.checkpoint()
+		for (let { target, state } of incoming) {
 			for (let [, original] of state.cancels)
 				if (owners.get(original) !== target.id)
 					throw new Error("Invalid checkpoint cancellation target")
@@ -1059,7 +1074,8 @@ export class Replica {
 		for (let { target, visibility } of incoming) {
 			if (!this.targets.has(target.id)) this.targets.set(target.id, [])
 			this.visibility.set(target.id, visibility)
-			for (let atom of target.atoms) this.indexAtom(target.id, copyAtom(atom))
+			for (let atom of target.atoms)
+				this.indexAtom(target.id, shareAtoms ? atom : copyAtom(atom))
 			this.created.set(
 				target.id,
 				Math.min(target.created, this.created.get(target.id) ?? Infinity),
@@ -1122,6 +1138,8 @@ export class Replica {
 		}
 	}
 	private mergedAliases(snapshot: ReplicaCheckpoint) {
+		if (!this.restored.size && !snapshot.restored.length)
+			return new Map<string, string>()
 		let aliases = new Map(this.restored)
 		let atoms = new Map<string, string>()
 		for (let [id, entry] of this.atomIndex) atoms.set(id, entry.target)
