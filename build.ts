@@ -34,6 +34,24 @@ export async function build(
 		},
 	})
 	if (!result.success) throw new AggregateError(result.logs, "Build failed")
+	let documentWorker = await Bun.build({
+		entrypoints: [resolve(root, "src/client/document-worker.ts")],
+		outdir: output,
+		target: "browser",
+		naming: { entry: "document-worker.js" },
+		define: {
+			"process.env.NODE_ENV": JSON.stringify(
+				development ? "development" : "production",
+			),
+		},
+		minify: true,
+		sourcemap: "external",
+	})
+	if (!documentWorker.success)
+		throw new AggregateError(
+			documentWorker.logs,
+			"Document worker build failed",
+		)
 	await cp(resolve(root, "public"), output, { recursive: true })
 	await Bun.write(
 		resolve(output, "tldraw/tldraw.css"),

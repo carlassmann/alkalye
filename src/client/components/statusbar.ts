@@ -1,3 +1,7 @@
+import * as Effect from "effect/Effect"
+import * as Layer from "effect/Layer"
+import * as ManagedRuntime from "effect/ManagedRuntime"
+import type { makeDocumentWorkerStats } from "../document-worker-stats"
 import {
 	documentStats,
 	statValue,
@@ -9,11 +13,18 @@ import { html, joinMarkup, translate } from "../language"
 import { MenuElement } from "./menu"
 
 export class StatsElement extends MenuElement {
+	private runtime: ManagedRuntime.ManagedRuntime<never, unknown> | undefined
+	private worker:
+		Effect.Success<ReturnType<typeof makeDocumentWorkerStats>> | undefined
+	private revision = 0
+	private paintedRevision = -1
+	private clearedRevision = -1
 	private content = ""
 	private counts = documentStats("")
 	private unit: StatsUnit = "words"
 	private pending: StatsUnit | undefined
 	private available = false
+	private requested = false
 	connectedCallback() {
 		this.dataset.stats = ""
 		setMarkup(
@@ -49,25 +60,80 @@ export class StatsElement extends MenuElement {
 		}
 		this.paint()
 	}
+	private startWorker() {
+		if (this.runtime || this.unit === "hidden") return
+		let owner = this
+		let runtime = ManagedRuntime.make(
+			Layer.effectDiscard(
+				Effect.gen(function* () {
+					let { makeDocumentWorkerStats } = yield* Effect.promise(
+						() => import("../document-worker-stats"),
+					)
+					return yield* makeDocumentWorkerStats(result => {
+						if (
+							!owner.isConnected ||
+							!owner.requested ||
+							owner.runtime !== runtime ||
+							result.revision <=
+								Math.max(owner.clearedRevision, owner.paintedRevision)
+						)
+							return
+						owner.paintedRevision = result.revision
+						owner.counts = result.counts
+						owner.available = true
+						owner.paint()
+					}).pipe(
+						Effect.tap(worker =>
+							Effect.sync(() => {
+								if (owner.runtime !== runtime) return
+								owner.worker = worker
+								if (owner.requested)
+									worker.update(owner.revision, owner.content)
+							}),
+						),
+					)
+				}),
+			),
+		)
+		this.runtime = runtime
+		runtime.runFork(Effect.void)
+	}
+
 	disconnectedCallback() {
+		this.stopWorker()
 		this.onclick = null
 		super.disconnectedCallback()
 	}
+	private stopWorker() {
+		this.worker = undefined
+		let runtime = this.runtime
+		this.runtime = undefined
+		if (runtime) void runtime.dispose()
+	}
+
 	get value() {
 		return this.unit
 	}
 	clear() {
+		this.stopWorker()
+		this.requested = false
+		this.revision++
+		this.clearedRevision = this.revision
+		this.content = ""
 		this.available = false
 		this.paint()
 	}
 	update(content: string, unit: StatsUnit) {
-		this.available = true
+		this.requested = true
+		if (unit === "hidden") this.stopWorker()
 		if (unit === this.pending) this.pending = undefined
-		if (content !== this.content) {
+		if (content !== this.content || !this.available) {
 			this.content = content
-			this.counts = documentStats(content)
+			this.revision++
+			this.worker?.update(this.revision, content)
 		}
 		this.unit = this.pending ?? unit
+		this.startWorker()
 		this.paint()
 	}
 	private paint() {
