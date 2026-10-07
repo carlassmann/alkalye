@@ -88,3 +88,29 @@ Six fresh-context 1MiB journeys ran in two rounds of native, membership and guar
 Raw results are in `child-values-results.json` and `empty-overlay-results.json`. Large traces remain outside Git. Production keeps native indexes. Do not adopt the shared representation before resolving its checkpoint regression and measuring actual accepted/passive-cache reopening.
 
 written with gpt-6 in codex
+
+## Actual app warm opening
+
+Frozen source `660423c`. `app-index.patch` applies the empty-overlay guard variant to the two Replica indexes in a copied source tree. Both client builds used the same native current-source backend. Server index changes were not measured. Each of three pairs restored the same disposable server dataset and browser profile, removed browser/service-worker caches, and verified the loaded bundle hash and byte size. No production changes.
+
+Before opening, the journey validates the complete original fixture source, types an `X`, waits for an accepted cache at the newest journal cursor, undoes it, then requires an accepted cache at a strictly newer cursor and the complete original source. Pending and rejected actions must both be empty. It selects the base document, then measures reopening the target. Earlier samples with a late-edit-cache readiness race are excluded.
+
+| Median                                 |   Native | Shared-index prototype |
+| -------------------------------------- | -------: | ---------------------: |
+| 128KiB warm ready                      |  65.8 ms |                33.1 ms |
+| 1MiB warm ready                        | 416.1 ms |                32.5 ms |
+| 1MiB largest opening task              |  10.2 ms |                 6.5 ms |
+| 1MiB undo accepted-cache delay         | 2,999 ms |               3,369 ms |
+| 1MiB largest edit/undo acceptance task |   839 ms |                 881 ms |
+
+Opening improved; accepted undo regressed. The acceptance window includes transport, validation, persistence, materialization and collection work, so these timings do not attribute the regression to compaction. Largest opening tasks were 9.7–26.6 ms for native and 6.4–6.6 ms for the prototype. The largest sampled 1MiB heap per pair was 2.16–2.26 GB versus 1.62–1.94 GB; these are samples, not peak-memory or allocation measurements. Headless animation callbacks indicate frame opportunities, not sustained 120Hz.
+
+`app-results.json` retains all six exact phases. Full timeline traces remain outside Git at `/tmp/alkalye-guarded-app-660`. `app-journey.ts` accepts the existing fixture configuration and an output directory, with `--fresh-echo`. Restore identical backend/profile fixtures before every phase, and verify matching frozen assets before running it.
+
+```sh
+bun experiments/performance/forkable-index/app-journey.ts /tmp/config.json /tmp/results --fresh-echo
+```
+
+Current-source types and 131 public tests with 1,123 assertions passed, including SQLite passive-session isolation, interruption, frontmatter, recovery and a 64-edit Unicode branch/checkpoint comparison. Opus 5.5 found no correctness blocker; it flagged permanently growing overlays, synchronous override-set copying, mutation during iteration and unmeasured server behavior. Keep this experimental until those tradeoffs are consciously reviewed.
+
+written with gpt-6 in codex

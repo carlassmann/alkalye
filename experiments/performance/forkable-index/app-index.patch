@@ -1,0 +1,135 @@
+--- a/src/shared/crdt.ts
++++ b/src/shared/crdt.ts
+@@ -1,3 +1,4 @@
++import { ForkableIndex } from "./forkable-index"
+ import type { CausalReplicaCheckpoint, ReplicaCheckpoint } from "./checkpoint"
+ import { parseCheckpoint, parseCheckpointEffect } from "./checkpoint"
+ import * as Effect from "effect/Effect"
+@@ -55,8 +56,8 @@
+ 	operations = new Map<string, Operation>()
+ 	clock = 0
+ 	historyLoaded = true
+-	private atomIndex = new Map<string, { target: string; atom: Atom }>()
+-	private children = new Map<string, Map<string, Atom[]>>()
++	private atomIndex = new ForkableIndex<{ target: string; atom: Atom }>()
++	private children = new Map<string, ForkableIndex<Atom[]>>()
+ 	private visibility = new Map<string, TextVisibility>()
+ 	private textOwners = new Map<string, string>()
+ 	private ownedAtomCounts = new Map<string, number>()
+@@ -109,9 +110,9 @@
+ 			this.legacyTextTargets,
+ 			cooperative,
+ 		)
+-		replica.atomIndex = yield* copyMapSteps(this.atomIndex, cooperative)
++		replica.atomIndex = this.atomIndex.fork()
+ 		for (let [target, children] of this.children)
+-			replica.children.set(target, yield* copyMapSteps(children, cooperative))
++			replica.children.set(target, children.fork())
+ 		for (let [target, visibility] of this.visibility)
+ 			replica.visibility.set(target, yield* visibility.forkSteps(cooperative))
+ 		replica.textOwners = yield* copyMapSteps(this.textOwners, cooperative)
+@@ -792,7 +793,7 @@
+ 		let cached = this.textCache.get(target)
+ 		if (until === Infinity && cached) return cached
+ 		if (until === Infinity) {
+-			let children = this.children.get(target) ?? new Map<string, Atom[]>()
++			let children = this.children.get(target) ?? new ForkableIndex<Atom[]>()
+ 			let visibility = this.visibility.get(target)
+ 			let result: Atom[] = [],
+ 				stack = [...(children.get("") ?? [])].reverse()
+@@ -1480,7 +1481,7 @@
+ 		this.atomIndex.set(atom.id, { target, atom })
+ 		let owner = atom.id.slice(0, -9)
+ 		this.ownedAtomCounts.set(owner, (this.ownedAtomCounts.get(owner) ?? 0) + 1)
+-		let children = this.children.get(target) ?? new Map<string, Atom[]>()
++		let children = this.children.get(target) ?? new ForkableIndex<Atom[]>()
+ 		let siblings = [...(children.get(atom.after) ?? [])]
+ 		let index = siblings.findIndex(sibling => sibling.id < atom.id)
+ 		siblings.splice(index < 0 ? siblings.length : index, 0, atom)
+--- /dev/null
++++ b/src/shared/forkable-index.ts
+@@ -0,0 +1,84 @@
++import * as Chunk from "effect/Chunk"
++import * as HashMap from "effect/HashMap"
++import * as Option from "effect/Option"
++
++export class ForkableIndex<V> implements Iterable<[string, V]> {
++	private mutable: Map<string, V> | undefined
++	private base: ReadonlyMap<string, V>
++	private updates = HashMap.empty<string, V>()
++	private additions = Chunk.empty<string>()
++	private overrides = new Set<string>()
++	constructor() {
++		let initial = new Map<string, V>()
++		this.mutable = initial
++		this.base = initial
++	}
++	get size() {
++		return this.base.size + Chunk.size(this.additions)
++	}
++	get(key: string): V | undefined {
++		if (!HashMap.size(this.updates)) return this.base.get(key)
++		if (this.overrides.has(key)) return HashMap.getUnsafe(this.updates, key)
++		let value = this.base.get(key)
++		if (value !== undefined || this.base.has(key)) return value
++		let updated = HashMap.get(this.updates, key)
++		return Option.isSome(updated) ? updated.value : undefined
++	}
++	has(key: string) {
++		return (
++			this.base.has(key) ||
++			(HashMap.size(this.updates) > 0 && HashMap.has(this.updates, key))
++		)
++	}
++	set(key: string, value: V) {
++		if (this.mutable) {
++			this.mutable.set(key, value)
++			return this
++		}
++		let inBase = this.base.has(key)
++		if (!inBase && !HashMap.has(this.updates, key))
++			this.additions = Chunk.append(this.additions, key)
++		if (inBase) this.overrides.add(key)
++		this.updates = HashMap.set(this.updates, key, value)
++		return this
++	}
++	fork() {
++		this.mutable = undefined
++		let copied = new ForkableIndex<V>()
++		copied.mutable = undefined
++		copied.base = this.base
++		copied.updates = this.updates
++		copied.additions = this.additions
++		copied.overrides = new Set(this.overrides)
++		return copied
++	}
++	entries(): IterableIterator<[string, V]> {
++		return HashMap.size(this.updates)
++			? this.updatedEntries()
++			: this.base.entries()
++	}
++	private *updatedEntries(): Generator<[string, V], void, void> {
++		for (let [key, value] of this.base)
++			yield [
++				key,
++				this.overrides.has(key) ? HashMap.getUnsafe(this.updates, key) : value,
++			]
++		for (let key of this.additions)
++			yield [key, HashMap.getUnsafe(this.updates, key)]
++	}
++	values(): IterableIterator<V> {
++		return HashMap.size(this.updates)
++			? this.updatedValues()
++			: this.base.values()
++	}
++	private *updatedValues(): Generator<V, void, void> {
++		for (let [key, value] of this.base)
++			yield this.overrides.has(key)
++				? HashMap.getUnsafe(this.updates, key)
++				: value
++		for (let key of this.additions) yield HashMap.getUnsafe(this.updates, key)
++	}
++	[Symbol.iterator]() {
++		return this.entries()
++	}
++}
