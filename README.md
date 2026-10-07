@@ -17,6 +17,16 @@ bun run build
 NODE_ENV=production bun run start
 ```
 
+## Email sign-in
+
+Keep writing without an account setup step. To open the same account on another device, choose **Sign in with email** in the account menu, then **Link this account**. Enter the code sent to your email. On the other device, choose **Sign in to another account** and use the linked email. Codes expire after five minutes, work once, and belong to the browser that requested them.
+
+The server sends codes through Resend's HTTP API. Configure `RESEND_API_KEY` and `EMAIL_FROM` in the server environment; the sender must be verified with Resend. Without these settings, email sign-in stays disabled and the recovery-key workflow remains available. Production needs HTTPS and `PUBLIC_ORIGIN`.
+
+Email recovery stores your account recovery key encrypted under `.data/master.key`. Protect and back up that key together with the databases. The server and anyone who can access your email can recover the account; this is not end-to-end encryption. Linking preserves document ownership. Switching accounts preserves the previous recovery key and its local data on the device.
+
+Integration tests use an injected delivery service or an explicitly enabled `ALKALYE_TEST_EMAIL_MAILBOX` directory. This local mailbox writes private test codes to disk and is forbidden with `NODE_ENV=production`; never configure it on an exposed server.
+
 ## One document architecture
 
 The browser, CLI and MCP use the same document protocol. Each document has one event stream for source, comments, attachment references, drawings, themes and access changes. Opening downloads a current snapshot; older history loads on demand. Frontmatter owns document metadata. Sidebar entries cache its derived values.
@@ -42,6 +52,20 @@ ALKALYE_SERVER=http://127.0.0.1:3000 ALKALYE_MCP_TOKEN=... bun cli.ts mcp
 ```
 
 ## CLI
+
+Create an API key in Settings → Connections, choosing its workspaces and permission ceiling. The same key works with the CLI and MCP; disconnecting it revokes both. API keys use the server's current account permissions and never require copying your recovery key.
+
+```sh
+export ALKALYE_SERVER=https://your-alkalye-server.example
+export ALKALYE_API_KEY=YOUR_API_KEY
+bun cli.ts doc list
+bun cli.ts doc content DOCUMENT_ID
+bun cli.ts --scope space:WORKSPACE_ID doc create --title Notes --file notes.md
+bun cli.ts doc update DOCUMENT_ID --file notes.md --expected-revision REVISION
+bun cli.ts mcp
+```
+
+`--api-key` also accepts a key. Prefer the environment variable to keep it out of shell history. API-key commands run online and use revision checks; a stale revision fails without overwriting a collaborator's work. History, undo, redo, restore and offline synchronization require the recovery-key account workflow below. Invalid or revoked API keys fail without falling back to a local account.
 
 ```sh
 bun cli.ts --help
