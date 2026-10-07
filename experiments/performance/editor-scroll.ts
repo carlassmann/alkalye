@@ -1,81 +1,92 @@
-import * as Schema from "effect/Schema"
-import { browser, browserBatch, evaluate } from "../../tests/browser-driver"
-
-let Configuration = Schema.Struct({
-	url: Schema.String,
-	session: Schema.String,
-	fixtures: Schema.Array(
-		Schema.Struct({
-			name: Schema.String,
-			path: Schema.String,
-			characters: Schema.Number,
-		}),
-	),
-})
-let input = Bun.argv[2],
-	output = Bun.argv[3]
-if (!input || !output) throw Error("Configuration and output required")
-let configuration = Schema.decodeUnknownSync(Configuration)(
-	await Bun.file(input).json(),
+import {
+	assert,
+	browser,
+	browserBatch,
+	evaluate,
+	wait,
+} from "../../tests/browser-driver"
+let [session, profile, url, out, device, expected] = Bun.argv.slice(2)
+if (
+	!session ||
+	!profile ||
+	!url ||
+	!out ||
+	!expected ||
+	!Number.isSafeInteger(Number(expected))
 )
-let results = [],
-	failures = []
-for (let fixture of configuration.fixtures) {
-	let session = configuration.session
-	browser(session, "open", new URL(fixture.path, configuration.url).href)
+	throw Error(
+		"session profile url output [desktop|coarse] expectedCharacters required",
+	)
+let source = 'document.querySelector("alkalye-editor").source'
+let rows = []
+try {
 	browser(
 		session,
-		"wait",
-		"--fn",
-		`document.querySelector('alkalye-editor')?.source.value.length===${fixture.characters} && !document.querySelector('alkalye-editor').source.readOnly`,
+		"--profile",
+		profile,
+		...(device === "coarse"
+			? [
+					"--args",
+					"--touch-events=enabled,--blink-settings=primaryPointerType=2",
+				]
+			: []),
+		"open",
+		"about:blank",
+	)
+	if (device === "coarse") browser(session, "set", "device", "iPhone 15")
+	else browser(session, "set", "viewport", "1280", "800")
+	browser(session, "open", url)
+	wait(
+		session,
+		`${source}?.value.length${expected ? "===" + Number(expected) : ">30000"}&&!document.querySelector('#editor').readOnly&&document.querySelector('#save-status').textContent==='Saved'`,
 	)
 	evaluate(
 		session,
-		"window.__scrollSource=document.querySelector('alkalye-editor').source.value;true",
+		`(()=>{let app=document.querySelector('#app');if(app.classList.contains('library-open'))document.querySelector('[data-action=library]').click();if(app.classList.contains('tools-open'))document.querySelector('[data-action=toggle-tools]').click();window.scrollOriginal=${source}.value;return true})()`,
 	)
-	for (let trial = 0; trial < 5; trial++) {
-		let tracePath =
-			output.replace(/\.json$/, "") + `-${fixture.name}-${trial}.trace.json`
-		try {
+	for (let trial = 0; trial < 3; trial++) {
+		let ready = evaluate(
+			session,
+			`(()=>{let viewport=${source}.viewport.scrollElement;${source}.setSelectionRange(0,0);viewport.scrollTop=${trial === 0 ? "0" : trial === 1 ? "Math.floor((viewport.scrollHeight-viewport.clientHeight)/2)" : "Math.max(0,viewport.scrollHeight-viewport.clientHeight-8000)"};return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve({top:viewport.scrollTop,height:viewport.scrollHeight,sourceCharacters:${source}.value.length,nativeCharacters:document.querySelector('#editor').value.length,nodes:document.querySelector('#highlight').querySelectorAll('*').length,coarse:matchMedia('(pointer:coarse)').matches}))))})()`,
+		)
+		browser(
+			session,
+			"profiler",
+			"start",
+			"--categories",
+			"devtools.timeline,disabled-by-default-devtools.timeline,toplevel,blink.user_timing,v8",
+		)
+		evaluate(
+			session,
+			`(()=>{let host=${source}.viewport.scrollElement,controller=new AbortController(),state=window.scrollProbe={start:performance.now(),frames:[],scrolls:0,wheels:0,trusted:0,lastTop:host.scrollTop,controller,raf:0};let previous=0;document.addEventListener('wheel',event=>{state.wheels++;if(event.isTrusted)state.trusted++},{capture:true,passive:true,signal:controller.signal});host.addEventListener('scroll',()=>state.scrolls++,{passive:true,signal:controller.signal});function frame(time){if(previous)state.frames.push(time-previous);previous=time;state.raf=requestAnimationFrame(frame)}state.raf=requestAnimationFrame(frame);performance.mark('critical:scroll:start');return true})()`,
+		)
+		browser(
+			session,
+			"mouse",
+			"move",
+			device === "coarse" ? "190" : "640",
+			"350",
+		)
+		browserBatch(
+			session,
+			Array.from({ length: 8 }, () => ["mouse", "wheel", "600"]),
+		)
+		let observation = evaluate(
+			session,
+			`(()=>{let host=${source}.viewport.scrollElement,state=window.scrollProbe,started=performance.now(),previous=host.scrollTop,stable=0;return new Promise(resolve=>{function settled(){let now=host.scrollTop;if(now===previous)stable++;else stable=0;previous=now;if(stable>=4||performance.now()-started>2000){state.controller.abort();cancelAnimationFrame(state.raf);performance.mark('critical:scroll:end');resolve({duration:performance.now()-state.start,frames:state.frames,scrolls:state.scrolls,wheels:state.wheels,trusted:state.trusted,settled:stable>=4,top:host.scrollTop,sourceExact:${source}.value===window.scrollOriginal,nativeCharacters:document.querySelector('#editor').value.length,nodes:document.querySelector('#highlight').querySelectorAll('*').length});return}requestAnimationFrame(settled)}requestAnimationFrame(settled)})})()`,
+		)
+		assert(
 			evaluate(
 				session,
-				`(()=>{let source=document.querySelector('alkalye-editor').source;source.setSelectionRange(0,0);let viewport=document.querySelector('[data-editor-viewport]');source.viewport.scrollTop=${trial % 3 === 0 ? "0" : trial % 3 === 1 ? "viewport.scrollHeight/2" : "viewport.scrollHeight-viewport.clientHeight-8000"};return true})()`,
-			)
-			browser(
-				session,
-				"profiler",
-				"start",
-				"--categories",
-				"devtools.timeline,disabled-by-default-devtools.timeline,toplevel,blink.user_timing,v8",
-			)
-			evaluate(
-				session,
-				"(()=>{let state=window.__scrollObservation={start:performance.now(),end:0,frames:[],events:[],wheels:0},previous=0;performance.mark('critical:scroll:start');document.addEventListener('wheel',()=>state.wheels++);document.querySelector('[data-editor-viewport]').addEventListener('scroll',()=>state.events.push(performance.now()));function frame(time){if(previous)state.frames.push(time-previous);previous=time;if(!state.end)requestAnimationFrame(frame)}requestAnimationFrame(frame);return true})()",
-			)
-			browserBatch(
-				session,
-				Array.from({ length: 12 }, () => [
-					"scroll",
-					"down",
-					"600",
-					"--selector",
-					"[data-editor-viewport]",
-				]),
-			)
-			evaluate(
-				session,
-				"new Promise(resolve=>setTimeout(()=>{window.__scrollObservation.end=performance.now();performance.mark('critical:scroll:end');resolve(true)},3000))",
-			)
-			browser(session, "profiler", "stop", tracePath)
-			let observation = evaluate(
-				session,
-				"({...window.__scrollObservation,sourceExact:document.querySelector('alkalye-editor').source.value===window.__scrollSource,nativeCharacters:document.querySelector('#editor').value.length,scrollTop:document.querySelector('alkalye-editor').source.viewport.scrollTop})",
-			)
-			results.push({ fixture: fixture.name, trial, observation, tracePath })
-		} catch (error) {
-			failures.push({ fixture: fixture.name, trial, error: String(error) })
-			break
-		}
-		await Bun.write(output, JSON.stringify({ results, failures }, null, 2))
+				`${source}.value===window.scrollOriginal&&window.scrollProbe.trusted===8&&window.scrollProbe.wheels===8`,
+			),
+			"Trusted wheel events preserve the exact document",
+		)
+		let trace = out.replace(/\.json$/, "") + "-" + trial + ".trace.json"
+		browser(session, "profiler", "stop", trace)
+		rows.push({ trial, ready, observation, trace })
+		await Bun.write(out, JSON.stringify(rows, null, 2))
 	}
+} finally {
+	browser(session, "close")
 }

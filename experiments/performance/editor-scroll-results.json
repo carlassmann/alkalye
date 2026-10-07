@@ -1,0 +1,1412 @@
+{
+	"assetSHA256": "136aa095eb4b500cd2a6acce14248615a3f3e2c9ef5443f855d2ade2fa5800f4",
+	"sourceHead": "660423c",
+	"runtime": "Background agent-browser0.38.1 Chromium on macOS arm64; desktop1280\u00d7800; coarse iPhone15 emulation393px",
+	"method": "24 trials, three initial scroll positions per fixture/device; eight trusted wheel commands pertrial. Scope starts/ends with UserTiming marks; task metrics restricted to same renderer main thread. Source editable and Saved, viewport settled before input. Four unchanged RAF scroll positions signal end, bounded2second failure deadline. Profiling includes tracing overhead.",
+	"fixtures": "128KiB TOKEN512 and1MiB TOKEN2048 reopened from history-bearing cloned account profile/database.32KiB rich mixed Hebrew/Arabic/English replaces the disposable128KiB source through public editor input; exactSaved source then browserclose/reopen.1MiB single wrapped Latin paragraph similarly replaces that same source afterward. Allother seeded account documents retained. Accepted journal/checkpoint cursor/background quiescence was not observed.",
+	"stalls": "32KiB rich first desktop trial includes592.009/290.834ms IndexedDB continuation tasks, mapped to indexeddb-journal.ts585 resume; sampled JS source not captured.1MiB long coarse first trial includes17.095/10.55ms MessageChannel tasks dominated by16.86/10.32ms GC; heap1.58GB before majorGC,973MB after. These are real complete-journey stalls, not discarded.",
+	"limits": "Warm scroll renderer geometry generallyfits8.33ms task budget, but backgroundtasks violateit. RAFcadence is60Hz headless~16.7ms, occasional100\u2013283ms gaps. Neither shorttasks nor frameopportunities prove120Hz painting. Coarse deviceuses trusted wheel, not actual touch/physical selection handles. No old-version A/B and no production correction.",
+	"trials": [
+		{
+			"fixture": "128-coarse",
+			"trial": 0,
+			"ready": {
+				"coarse": true,
+				"height": 149632,
+				"nativeCharacters": 131072,
+				"nodes": 513,
+				"sourceCharacters": 131072,
+				"top": 0
+			},
+			"observation": {
+				"duration": 306.80000001192093,
+				"frames": [
+					16.699999999999932, 16.600000000000023, 16.700000000000045,
+					16.699999999999932, 16.600000000000023, 16.700000000000045,
+					16.699999999999932, 16.700000000000045, 16.5, 16.699999999999932,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045
+				],
+				"nativeCharacters": 131072,
+				"nodes": 513,
+				"scrolls": 3,
+				"settled": true,
+				"sourceExact": true,
+				"top": 1800,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/128-coarse-0.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 1.568,
+					"total": 13.461
+				},
+				"Layout": {
+					"max": 0.126,
+					"total": 0.126
+				},
+				"Paint": {
+					"max": 0.322,
+					"total": 1.896
+				},
+				"UpdateLayoutTree": {
+					"max": 0.151,
+					"total": 0.633
+				},
+				"FunctionCall": {
+					"max": 0.338,
+					"total": 3.955
+				},
+				"FireAnimationFrame": {
+					"max": 0.213,
+					"total": 1.313
+				}
+			}
+		},
+		{
+			"fixture": "128-coarse",
+			"trial": 1,
+			"ready": {
+				"coarse": true,
+				"height": 149632,
+				"nativeCharacters": 131072,
+				"nodes": 513,
+				"sourceCharacters": 131072,
+				"top": 74414
+			},
+			"observation": {
+				"duration": 282.2999999523163,
+				"frames": [
+					0.06999999999993634, 16.59999999999991, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045
+				],
+				"nativeCharacters": 131072,
+				"nodes": 513,
+				"scrolls": 3,
+				"settled": true,
+				"sourceExact": true,
+				"top": 76214,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/128-coarse-1.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 1.082,
+					"total": 6.398
+				},
+				"Layout": {
+					"max": 0.082,
+					"total": 0.082
+				},
+				"Paint": {
+					"max": 0.319,
+					"total": 0.609
+				},
+				"UpdateLayoutTree": {
+					"max": 0.213,
+					"total": 0.213
+				},
+				"FunctionCall": {
+					"max": 0.369,
+					"total": 1.962
+				},
+				"FireAnimationFrame": {
+					"max": 0.413,
+					"total": 1.215
+				}
+			}
+		},
+		{
+			"fixture": "128-coarse",
+			"trial": 2,
+			"ready": {
+				"coarse": true,
+				"height": 149632,
+				"nativeCharacters": 131072,
+				"nodes": 513,
+				"sourceCharacters": 131072,
+				"top": 140828
+			},
+			"observation": {
+				"duration": 312.0999999642372,
+				"frames": [
+					16.600000000000136, 16.699999999999818, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045, 16.59999999999991
+				],
+				"nativeCharacters": 131072,
+				"nodes": 513,
+				"scrolls": 4,
+				"settled": true,
+				"sourceExact": true,
+				"top": 143228,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/128-coarse-2.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 0.903,
+					"total": 5.222
+				},
+				"Layout": {
+					"max": 0.0,
+					"total": 0.0
+				},
+				"Paint": {
+					"max": 0.232,
+					"total": 0.443
+				},
+				"UpdateLayoutTree": {
+					"max": 0.0,
+					"total": 0.0
+				},
+				"FunctionCall": {
+					"max": 0.138,
+					"total": 1.94
+				},
+				"FireAnimationFrame": {
+					"max": 0.175,
+					"total": 1.099
+				}
+			}
+		},
+		{
+			"fixture": "128-desktop",
+			"trial": 0,
+			"ready": {
+				"coarse": false,
+				"height": 83687,
+				"nativeCharacters": 3072,
+				"nodes": 13,
+				"sourceCharacters": 131072,
+				"top": 0
+			},
+			"observation": {
+				"duration": 347.10000002384186,
+				"frames": [
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045, 16.699999999999932,
+					16.600000000000023, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.800000000000068, 16.600000000000023, 16.699999999999932,
+					16.600000000000023, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045
+				],
+				"nativeCharacters": 4096,
+				"nodes": 17,
+				"scrolls": 3,
+				"settled": true,
+				"sourceExact": true,
+				"top": 1800,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/128-desktop-0.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 2.657,
+					"total": 26.657
+				},
+				"Layout": {
+					"max": 0.357,
+					"total": 4.432
+				},
+				"Paint": {
+					"max": 0.213,
+					"total": 2.29
+				},
+				"UpdateLayoutTree": {
+					"max": 0.221,
+					"total": 5.213
+				},
+				"FunctionCall": {
+					"max": 1.441,
+					"total": 16.368
+				},
+				"FireAnimationFrame": {
+					"max": 1.447,
+					"total": 7.629
+				}
+			}
+		},
+		{
+			"fixture": "128-desktop",
+			"trial": 1,
+			"ready": {
+				"coarse": false,
+				"height": 84983,
+				"nativeCharacters": 4096,
+				"nodes": 17,
+				"sourceCharacters": 131072,
+				"top": 41986
+			},
+			"observation": {
+				"duration": 311,
+				"frames": [
+					16.59999999999991, 16.700000000000045, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.59999999999991,
+					16.800000000000182, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045, 16.700000000000045
+				],
+				"nativeCharacters": 4096,
+				"nodes": 17,
+				"scrolls": 4,
+				"settled": true,
+				"sourceExact": true,
+				"top": 43916,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/128-desktop-1.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 1.098,
+					"total": 8.254
+				},
+				"Layout": {
+					"max": 0.115,
+					"total": 0.655
+				},
+				"Paint": {
+					"max": 0.123,
+					"total": 0.778
+				},
+				"UpdateLayoutTree": {
+					"max": 0.194,
+					"total": 1.217
+				},
+				"FunctionCall": {
+					"max": 0.56,
+					"total": 3.486
+				},
+				"FireAnimationFrame": {
+					"max": 0.565,
+					"total": 2.627
+				}
+			}
+		},
+		{
+			"fixture": "128-desktop",
+			"trial": 2,
+			"ready": {
+				"coarse": false,
+				"height": 85890,
+				"nativeCharacters": 4096,
+				"nodes": 17,
+				"sourceCharacters": 131072,
+				"top": 76750
+			},
+			"observation": {
+				"duration": 345.60000002384186,
+				"frames": [
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.700000000000045
+				],
+				"nativeCharacters": 4096,
+				"nodes": 17,
+				"scrolls": 4,
+				"settled": true,
+				"sourceExact": true,
+				"top": 78680,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/128-desktop-2.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 1.222,
+					"total": 8.222
+				},
+				"Layout": {
+					"max": 0.135,
+					"total": 0.62
+				},
+				"Paint": {
+					"max": 0.133,
+					"total": 0.786
+				},
+				"UpdateLayoutTree": {
+					"max": 0.232,
+					"total": 1.122
+				},
+				"FunctionCall": {
+					"max": 0.662,
+					"total": 3.496
+				},
+				"FireAnimationFrame": {
+					"max": 0.669,
+					"total": 2.796
+				}
+			}
+		},
+		{
+			"fixture": "1m-coarse",
+			"trial": 0,
+			"ready": {
+				"coarse": true,
+				"height": 1128560,
+				"nativeCharacters": 1048576,
+				"nodes": 2049,
+				"sourceCharacters": 1048576,
+				"top": 0
+			},
+			"observation": {
+				"duration": 302.80000001192093,
+				"frames": [
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.600000000000364,
+					16.799999999999727, 16.59999999999991, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.700000000000273
+				],
+				"nativeCharacters": 1048576,
+				"nodes": 2049,
+				"scrolls": 3,
+				"settled": true,
+				"sourceExact": true,
+				"top": 1800,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/1m-coarse-0.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 1.81,
+					"total": 8.447
+				},
+				"Layout": {
+					"max": 0.098,
+					"total": 0.098
+				},
+				"Paint": {
+					"max": 0.466,
+					"total": 0.932
+				},
+				"UpdateLayoutTree": {
+					"max": 0.337,
+					"total": 0.337
+				},
+				"FunctionCall": {
+					"max": 0.658,
+					"total": 3.668
+				},
+				"FireAnimationFrame": {
+					"max": 0.66,
+					"total": 2.75
+				}
+			}
+		},
+		{
+			"fixture": "1m-coarse",
+			"trial": 1,
+			"ready": {
+				"coarse": true,
+				"height": 1128560,
+				"nativeCharacters": 1048576,
+				"nodes": 2049,
+				"sourceCharacters": 1048576,
+				"top": 563878
+			},
+			"observation": {
+				"duration": 282.19999998807907,
+				"frames": [
+					16.60199999999986, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.59999999999991, 16.800000000000182,
+					16.59999999999991, 16.59999999999991, 16.700000000000273,
+					16.799999999999727, 16.59999999999991, 16.600000000000364,
+					16.699999999999818, 16.699999999999818
+				],
+				"nativeCharacters": 1048576,
+				"nodes": 2049,
+				"scrolls": 3,
+				"settled": true,
+				"sourceExact": true,
+				"top": 565678,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/1m-coarse-1.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 2.956,
+					"total": 11.07
+				},
+				"Layout": {
+					"max": 0.102,
+					"total": 0.102
+				},
+				"Paint": {
+					"max": 0.482,
+					"total": 0.994
+				},
+				"UpdateLayoutTree": {
+					"max": 0.352,
+					"total": 0.352
+				},
+				"FunctionCall": {
+					"max": 0.743,
+					"total": 3.891
+				},
+				"FireAnimationFrame": {
+					"max": 0.746,
+					"total": 2.803
+				}
+			}
+		},
+		{
+			"fixture": "1m-coarse",
+			"trial": 2,
+			"ready": {
+				"coarse": true,
+				"height": 1128560,
+				"nativeCharacters": 1048576,
+				"nodes": 2049,
+				"sourceCharacters": 1048576,
+				"top": 1119756
+			},
+			"observation": {
+				"duration": 310.19999998807907,
+				"frames": [
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.59999999999991, 16.700000000000273, 16.699999999999818,
+					16.59999999999991, 16.800000000000182, 16.59999999999991,
+					16.699999999999818
+				],
+				"nativeCharacters": 1048576,
+				"nodes": 2049,
+				"scrolls": 4,
+				"settled": true,
+				"sourceExact": true,
+				"top": 1122156,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/1m-coarse-2.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 2.25,
+					"total": 8.503
+				},
+				"Layout": {
+					"max": 0.0,
+					"total": 0.0
+				},
+				"Paint": {
+					"max": 0.692,
+					"total": 1.352
+				},
+				"UpdateLayoutTree": {
+					"max": 0.0,
+					"total": 0.0
+				},
+				"FunctionCall": {
+					"max": 0.738,
+					"total": 4.304
+				},
+				"FireAnimationFrame": {
+					"max": 0.741,
+					"total": 3.618
+				}
+			}
+		},
+		{
+			"fixture": "1m-desktop",
+			"trial": 0,
+			"ready": {
+				"coarse": false,
+				"height": 598039,
+				"nativeCharacters": 3072,
+				"nodes": 7,
+				"sourceCharacters": 1048576,
+				"top": 0
+			},
+			"observation": {
+				"duration": 352.30000001192093,
+				"frames": [
+					16.699999999999818, 16.59999999999991, 16.800000000000182,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.59999999999991, 16.800000000000182
+				],
+				"nativeCharacters": 4096,
+				"nodes": 9,
+				"scrolls": 3,
+				"settled": true,
+				"sourceExact": true,
+				"top": 1800,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/1m-desktop-0.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 2.169,
+					"total": 17.314
+				},
+				"Layout": {
+					"max": 0.22,
+					"total": 1.796
+				},
+				"Paint": {
+					"max": 0.167,
+					"total": 0.828
+				},
+				"UpdateLayoutTree": {
+					"max": 0.181,
+					"total": 2.341
+				},
+				"FunctionCall": {
+					"max": 1.201,
+					"total": 8.816
+				},
+				"FireAnimationFrame": {
+					"max": 1.205,
+					"total": 5.886
+				}
+			}
+		},
+		{
+			"fixture": "1m-desktop",
+			"trial": 1,
+			"ready": {
+				"coarse": false,
+				"height": 599335,
+				"nativeCharacters": 4096,
+				"nodes": 9,
+				"sourceCharacters": 1048576,
+				"top": 299227
+			},
+			"observation": {
+				"duration": 348.30000001192093,
+				"frames": [
+					16.700000000000273, 16.59999999999991, 16.799999999999727,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.59999999999991, 16.699999999999818,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.59999999999991
+				],
+				"nativeCharacters": 5120,
+				"nodes": 11,
+				"scrolls": 4,
+				"settled": true,
+				"sourceExact": true,
+				"top": 301092,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/1m-desktop-1.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 2.562,
+					"total": 12.912
+				},
+				"Layout": {
+					"max": 0.342,
+					"total": 1.655
+				},
+				"Paint": {
+					"max": 0.174,
+					"total": 1.19
+				},
+				"UpdateLayoutTree": {
+					"max": 0.236,
+					"total": 2.103
+				},
+				"FunctionCall": {
+					"max": 1.647,
+					"total": 6.647
+				},
+				"FireAnimationFrame": {
+					"max": 1.66,
+					"total": 5.367
+				}
+			}
+		},
+		{
+			"fixture": "1m-desktop",
+			"trial": 2,
+			"ready": {
+				"coarse": false,
+				"height": 599918,
+				"nativeCharacters": 4096,
+				"nodes": 9,
+				"sourceCharacters": 1048576,
+				"top": 590972
+			},
+			"observation": {
+				"duration": 347.60000002384186,
+				"frames": [
+					16.59999999999991, 16.799999999999727, 16.600000000000364,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.59999999999991,
+					16.700000000000273, 16.799999999999727, 16.600000000000364,
+					16.59999999999991, 16.699999999999818
+				],
+				"nativeCharacters": 4096,
+				"nodes": 9,
+				"scrolls": 4,
+				"settled": true,
+				"sourceExact": true,
+				"top": 592837,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/1m-desktop-2.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 2.113,
+					"total": 11.477
+				},
+				"Layout": {
+					"max": 0.217,
+					"total": 1.088
+				},
+				"Paint": {
+					"max": 0.17,
+					"total": 1.154
+				},
+				"UpdateLayoutTree": {
+					"max": 0.34,
+					"total": 1.892
+				},
+				"FunctionCall": {
+					"max": 1.171,
+					"total": 5.686
+				},
+				"FireAnimationFrame": {
+					"max": 1.18,
+					"total": 4.959
+				}
+			}
+		},
+		{
+			"fixture": "1m-long-coarse",
+			"trial": 0,
+			"ready": {
+				"coarse": true,
+				"height": 1108403,
+				"nativeCharacters": 1048576,
+				"nodes": 5,
+				"sourceCharacters": 1048576,
+				"top": 0
+			},
+			"observation": {
+				"duration": 426.89999997615814,
+				"frames": [
+					16.599999999998545, 16.700000000000728, 16.700000000000728,
+					16.599999999998545, 16.700000000000728, 16.599999999998545,
+					16.700000000000728, 16.600000000002183, 16.799999999999272,
+					16.599999999998545, 16.700000000000728, 16.700000000000728,
+					83.29999999999927, 16.599999999998545, 100, 16.700000000000728,
+					16.600000000002183
+				],
+				"nativeCharacters": 1048576,
+				"nodes": 5,
+				"scrolls": 3,
+				"settled": true,
+				"sourceExact": true,
+				"top": 1800,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/1m-long-coarse-0.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 17.095,
+					"total": 426.198
+				},
+				"Layout": {
+					"max": 0.102,
+					"total": 0.102
+				},
+				"Paint": {
+					"max": 0.682,
+					"total": 1.397
+				},
+				"UpdateLayoutTree": {
+					"max": 0.181,
+					"total": 0.181
+				},
+				"FunctionCall": {
+					"max": 17.06,
+					"total": 410.314
+				},
+				"FireAnimationFrame": {
+					"max": 0.561,
+					"total": 2.184
+				}
+			}
+		},
+		{
+			"fixture": "1m-long-coarse",
+			"trial": 1,
+			"ready": {
+				"coarse": true,
+				"height": 1108403,
+				"nativeCharacters": 1048576,
+				"nodes": 5,
+				"sourceCharacters": 1048576,
+				"top": 553799
+			},
+			"observation": {
+				"duration": 411.5999999642372,
+				"frames": [
+					16.600000000002183, 16.69999999999709, 16.700000000000728,
+					16.600000000002183, 16.69999999999709, 16.700000000000728,
+					16.600000000002183, 16.69999999999709, 16.700000000000728,
+					16.700000000000728, 99.90000000000146, 50, 16.69999999999709,
+					16.600000000002183, 16.799999999999272, 16.599999999998545,
+					16.700000000000728
+				],
+				"nativeCharacters": 1048576,
+				"nodes": 5,
+				"scrolls": 3,
+				"settled": true,
+				"sourceExact": true,
+				"top": 555599,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/1m-long-coarse-1.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 5.663,
+					"total": 328.431
+				},
+				"Layout": {
+					"max": 0.063,
+					"total": 0.122
+				},
+				"Paint": {
+					"max": 0.677,
+					"total": 1.375
+				},
+				"UpdateLayoutTree": {
+					"max": 0.162,
+					"total": 0.315
+				},
+				"FunctionCall": {
+					"max": 5.649,
+					"total": 317.39
+				},
+				"FireAnimationFrame": {
+					"max": 1.429,
+					"total": 4.034
+				}
+			}
+		},
+		{
+			"fixture": "1m-long-coarse",
+			"trial": 2,
+			"ready": {
+				"coarse": true,
+				"height": 1108403,
+				"nativeCharacters": 1048576,
+				"nodes": 5,
+				"sourceCharacters": 1048576,
+				"top": 1099599
+			},
+			"observation": {
+				"duration": 306.69999998807907,
+				"frames": [
+					16.69999999999709, 16.599999999998545, 16.80000000000291,
+					16.599999999998545, 16.599999999998545, 16.700000000004366,
+					16.599999999998545, 16.80000000000291, 16.599999999998545,
+					16.599999999998545, 16.69999999999709, 16.80000000000291,
+					16.599999999998545, 16.599999999998545, 16.700000000004366,
+					16.69999999999709, 16.599999999998545, 16.700000000004366
+				],
+				"nativeCharacters": 1048576,
+				"nodes": 5,
+				"scrolls": 4,
+				"settled": true,
+				"sourceExact": true,
+				"top": 1101999,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/1m-long-coarse-2.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 1.915,
+					"total": 9.172
+				},
+				"Layout": {
+					"max": 0.06,
+					"total": 0.06
+				},
+				"Paint": {
+					"max": 0.747,
+					"total": 1.489
+				},
+				"UpdateLayoutTree": {
+					"max": 0.156,
+					"total": 0.156
+				},
+				"FunctionCall": {
+					"max": 0.649,
+					"total": 4.359
+				},
+				"FireAnimationFrame": {
+					"max": 0.652,
+					"total": 3.347
+				}
+			}
+		},
+		{
+			"fixture": "1m-long-desktop",
+			"trial": 0,
+			"ready": {
+				"coarse": false,
+				"height": 564790,
+				"nativeCharacters": 2951,
+				"nodes": 5,
+				"sourceCharacters": 1048576,
+				"top": 0
+			},
+			"observation": {
+				"duration": 369.10000002384186,
+				"frames": [
+					16.699999999999818, 16.699999999999818, 16.700000000000728,
+					16.599999999999454, 16.699999999999818, 16.700000000000728,
+					16.599999999999454, 16.699999999999818, 16.700000000000728,
+					16.599999999999454, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.699999999999818, 16.600000000000364
+				],
+				"nativeCharacters": 4888,
+				"nodes": 1,
+				"scrolls": 2,
+				"settled": true,
+				"sourceExact": true,
+				"top": 1200,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/1m-long-desktop-0.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 2.189,
+					"total": 18.393
+				},
+				"Layout": {
+					"max": 0.282,
+					"total": 3.336
+				},
+				"Paint": {
+					"max": 0.218,
+					"total": 1.035
+				},
+				"UpdateLayoutTree": {
+					"max": 0.198,
+					"total": 3.827
+				},
+				"FunctionCall": {
+					"max": 1.15,
+					"total": 10.961
+				},
+				"FireAnimationFrame": {
+					"max": 1.155,
+					"total": 9.386
+				}
+			}
+		},
+		{
+			"fixture": "1m-long-desktop",
+			"trial": 1,
+			"ready": {
+				"coarse": false,
+				"height": 565373,
+				"nativeCharacters": 3910,
+				"nodes": 1,
+				"sourceCharacters": 1048576,
+				"top": 282262
+			},
+			"observation": {
+				"duration": 415.60000002384186,
+				"frames": [
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.800000000000182, 16.599999999999454, 99.90000000000056,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818
+				],
+				"nativeCharacters": 4888,
+				"nodes": 1,
+				"scrolls": 4,
+				"settled": true,
+				"sourceExact": true,
+				"top": 283526,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/1m-long-desktop-1.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 4.128,
+					"total": 291.657
+				},
+				"Layout": {
+					"max": 0.265,
+					"total": 2.358
+				},
+				"Paint": {
+					"max": 0.222,
+					"total": 1.452
+				},
+				"UpdateLayoutTree": {
+					"max": 0.183,
+					"total": 2.487
+				},
+				"FunctionCall": {
+					"max": 4.114,
+					"total": 280.09
+				},
+				"FireAnimationFrame": {
+					"max": 1.762,
+					"total": 7.459
+				}
+			}
+		},
+		{
+			"fixture": "1m-long-desktop",
+			"trial": 2,
+			"ready": {
+				"coarse": false,
+				"height": 565665,
+				"nativeCharacters": 3914,
+				"nodes": 1,
+				"sourceCharacters": 1048576,
+				"top": 556815
+			},
+			"observation": {
+				"duration": 341.80000001192093,
+				"frames": [
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.600000000000364
+				],
+				"nativeCharacters": 4889,
+				"nodes": 1,
+				"scrolls": 4,
+				"settled": true,
+				"sourceExact": true,
+				"top": 558647,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/1m-long-desktop-2.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 2.695,
+					"total": 13.623
+				},
+				"Layout": {
+					"max": 0.262,
+					"total": 2.688
+				},
+				"Paint": {
+					"max": 0.222,
+					"total": 1.465
+				},
+				"UpdateLayoutTree": {
+					"max": 0.194,
+					"total": 2.406
+				},
+				"FunctionCall": {
+					"max": 1.752,
+					"total": 7.571
+				},
+				"FireAnimationFrame": {
+					"max": 1.758,
+					"total": 6.825
+				}
+			}
+		},
+		{
+			"fixture": "32-rich-coarse",
+			"trial": 0,
+			"ready": {
+				"coarse": true,
+				"height": 41687,
+				"nativeCharacters": 23843,
+				"nodes": 5961,
+				"sourceCharacters": 32768,
+				"top": 0
+			},
+			"observation": {
+				"duration": 287.30000001192093,
+				"frames": [
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.59999999999991
+				],
+				"nativeCharacters": 23843,
+				"nodes": 5961,
+				"scrolls": 3,
+				"settled": true,
+				"sourceExact": true,
+				"top": 1800,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/32-rich-coarse-0.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 1.77,
+					"total": 7.926
+				},
+				"Layout": {
+					"max": 0.167,
+					"total": 0.167
+				},
+				"Paint": {
+					"max": 0.683,
+					"total": 1.394
+				},
+				"UpdateLayoutTree": {
+					"max": 1.584,
+					"total": 1.584
+				},
+				"FunctionCall": {
+					"max": 0.215,
+					"total": 1.952
+				},
+				"FireAnimationFrame": {
+					"max": 0.263,
+					"total": 1.052
+				}
+			}
+		},
+		{
+			"fixture": "32-rich-coarse",
+			"trial": 1,
+			"ready": {
+				"coarse": true,
+				"height": 41687,
+				"nativeCharacters": 23843,
+				"nodes": 5961,
+				"sourceCharacters": 32768,
+				"top": 20441
+			},
+			"observation": {
+				"duration": 281.30000001192093,
+				"frames": [
+					0, 16.670000000000073, 16.59999999999991, 16.59999999999991,
+					16.800000000000182, 16.59999999999991, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045, 16.59999999999991
+				],
+				"nativeCharacters": 23843,
+				"nodes": 5961,
+				"scrolls": 3,
+				"settled": true,
+				"sourceExact": true,
+				"top": 22241,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/32-rich-coarse-1.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 1.93,
+					"total": 6.154
+				},
+				"Layout": {
+					"max": 0.0,
+					"total": 0.0
+				},
+				"Paint": {
+					"max": 0.767,
+					"total": 1.509
+				},
+				"UpdateLayoutTree": {
+					"max": 0.0,
+					"total": 0.0
+				},
+				"FunctionCall": {
+					"max": 0.162,
+					"total": 1.566
+				},
+				"FireAnimationFrame": {
+					"max": 0.208,
+					"total": 0.92
+				}
+			}
+		},
+		{
+			"fixture": "32-rich-coarse",
+			"trial": 2,
+			"ready": {
+				"coarse": true,
+				"height": 41687,
+				"nativeCharacters": 23843,
+				"nodes": 5961,
+				"sourceCharacters": 32768,
+				"top": 32883
+			},
+			"observation": {
+				"duration": 296.80000001192093,
+				"frames": [
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.59999999999991, 16.799999999999727
+				],
+				"nativeCharacters": 23843,
+				"nodes": 5961,
+				"scrolls": 3,
+				"settled": true,
+				"sourceExact": true,
+				"top": 34683,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/32-rich-coarse-2.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 1.576,
+					"total": 5.847
+				},
+				"Layout": {
+					"max": 0.0,
+					"total": 0.0
+				},
+				"Paint": {
+					"max": 0.691,
+					"total": 1.362
+				},
+				"UpdateLayoutTree": {
+					"max": 0.0,
+					"total": 0.0
+				},
+				"FunctionCall": {
+					"max": 0.162,
+					"total": 1.766
+				},
+				"FireAnimationFrame": {
+					"max": 0.214,
+					"total": 0.776
+				}
+			}
+		},
+		{
+			"fixture": "32-rich-desktop",
+			"trial": 0,
+			"ready": {
+				"coarse": false,
+				"height": 27851,
+				"nativeCharacters": 2027,
+				"nodes": 509,
+				"sourceCharacters": 32768,
+				"top": 0
+			},
+			"observation": {
+				"duration": 1158,
+				"frames": [
+					16.700000000000045, 16.600000000000023, 16.699999999999932,
+					16.600000000000136, 16.699999999999818, 16.600000000000136,
+					16.700000000000045, 16.699999999999818, 16.700000000000045,
+					16.600000000000136, 16.699999999999818, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.600000000000136,
+					16.700000000000045, 283.39999999999986
+				],
+				"nativeCharacters": 4043,
+				"nodes": 1013,
+				"scrolls": 3,
+				"settled": true,
+				"sourceExact": true,
+				"top": 1800,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/32-rich-desktop-0.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 592.009,
+					"total": 919.301
+				},
+				"Layout": {
+					"max": 0.887,
+					"total": 6.209
+				},
+				"Paint": {
+					"max": 0.475,
+					"total": 2.375
+				},
+				"UpdateLayoutTree": {
+					"max": 0.626,
+					"total": 5.979
+				},
+				"FunctionCall": {
+					"max": 591.969,
+					"total": 901.187
+				},
+				"FireAnimationFrame": {
+					"max": 3.101,
+					"total": 13.47
+				}
+			}
+		},
+		{
+			"fixture": "32-rich-desktop",
+			"trial": 1,
+			"ready": {
+				"coarse": false,
+				"height": 27851,
+				"nativeCharacters": 4032,
+				"nodes": 1009,
+				"sourceCharacters": 32768,
+				"top": 13549
+			},
+			"observation": {
+				"duration": 318.89999997615814,
+				"frames": [
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273
+				],
+				"nativeCharacters": 3024,
+				"nodes": 757,
+				"scrolls": 3,
+				"settled": true,
+				"sourceExact": true,
+				"top": 15349,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/32-rich-desktop-1.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 5.842,
+					"total": 26.679
+				},
+				"Layout": {
+					"max": 1.006,
+					"total": 6.335
+				},
+				"Paint": {
+					"max": 0.496,
+					"total": 2.324
+				},
+				"UpdateLayoutTree": {
+					"max": 0.617,
+					"total": 4.917
+				},
+				"FunctionCall": {
+					"max": 3.267,
+					"total": 15.438
+				},
+				"FireAnimationFrame": {
+					"max": 3.272,
+					"total": 11.714
+				}
+			}
+		},
+		{
+			"fixture": "32-rich-desktop",
+			"trial": 2,
+			"ready": {
+				"coarse": false,
+				"height": 27851,
+				"nativeCharacters": 3024,
+				"nodes": 757,
+				"sourceCharacters": 32768,
+				"top": 19099
+			},
+			"observation": {
+				"duration": 347.80000001192093,
+				"frames": [
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.600000000000364, 16.799999999999727, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.59999999999991
+				],
+				"nativeCharacters": 4032,
+				"nodes": 1009,
+				"scrolls": 3,
+				"settled": true,
+				"sourceExact": true,
+				"top": 20899,
+				"trusted": 8,
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/32-rich-desktop-2.trace.json",
+			"mainThread": {
+				"RunTask": {
+					"max": 7.365,
+					"total": 28.54
+				},
+				"Layout": {
+					"max": 1.447,
+					"total": 8.623
+				},
+				"Paint": {
+					"max": 0.614,
+					"total": 3.195
+				},
+				"UpdateLayoutTree": {
+					"max": 0.784,
+					"total": 5.857
+				},
+				"FunctionCall": {
+					"max": 4.304,
+					"total": 17.023
+				},
+				"FireAnimationFrame": {
+					"max": 4.308,
+					"total": 14.462
+				}
+			}
+		}
+	]
+}
