@@ -168,3 +168,15 @@ Final overhaul measurements and limitations are published at `public/docs/perfor
 `continuous-native.ts CONFIG.json OUTPUT.json` inserts 25 sequential trusted edits, then traces three seconds of background work. It records native input spans, inter-input timestamps, frames and explicit local-save state. This is a burst and its aftermath, not sustained multi-second typing. Trace summaries use top-level main-thread tasks; never sum nested durations.
 
 All browser commands must share `AGENT_BROWSER_DEFAULT_TIMEOUT=20000`. Changing this value can restart the browser daemon. `BENCHMARK_ACTIVATION=keyboard` and `BENCHMARK_JOURNEY_KB=2` allow one bounded recovery of missing UI cells with native keyboard activation; report that modality separately and retain the failed pointer observations.
+
+## Cached document opening
+
+`cached-browser-open.ts CONFIG.json OUTPUT_DIRECTORY --fresh-echo` uses the disposable session and document paths from `editor-critical-setup.ts`. Create the output directory first. It appends one character and undoes it, then waits for the accepted snapshot's IndexedDB transaction to finish at the latest journal cursor with no pending actions. Preparation finishes before timing starts. The probe records click to correct source, two frame opportunities and a CPU trace. Priming uses two documents within the passive cache's 30-second lifetime.
+
+`cached-browser-open-results.json` retains three ordered trials before and after warming accepted text during snapshot capture. The candidate was built from `1bbe9da` with only that change. Median readiness fell from 81.6 to 70.4 ms for 128 KiB and from 749.2 to 459.7 ms for 1 MiB. Both variants used CPU tracing. Before trials ran first; tiny edit/undo contributions remain in history. Three samples do not establish statistical significance. `before-0` overlapped another test and was discarded.
+
+The earlier 1 MiB trace attributed about 292 ms to cooperative Map copies and 102 ms to rebuilding visible text. Paired trial 2 retained about 299 versus 294 ms of Map-copy CPU work; the visible walk and its visibility checks disappeared after warming. The largest main-thread task remained about 11 ms, above an 8.3 ms frame budget. `browser-map-copy.ts` compares the actual copy helper and Effect browser scheduler against native Map construction. Native construction took about the same total time, but its 1 MiB copy blocked for 43 ms. Cooperative steps stayed near 3 ms, so native cloning was rejected. These Map samples use synthetic indexed atoms; the separate opening traces exercise the app.
+
+Compile the Map probe with `bun build experiments/performance/browser-map-copy.ts --target=browser --minify --outdir=OUTPUT_DIRECTORY`, serve its generated script from an isolated page, then use `window.mapCopyProbe.prepare(131072)` or `prepare(1048576)` and `await window.mapCopyProbe.run(false)` or `run(true)`. Keep fixture construction outside timing. Preserve background browser operation and the fixed 20000 ms daemon timeout.
+
+written with gpt-6 in codex

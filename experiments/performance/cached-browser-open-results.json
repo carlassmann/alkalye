@@ -1,0 +1,1752 @@
+{
+	"writtenBy": "written with gpt-6 in codex",
+	"baselineCommit": "1bbe9da",
+	"description": "Current production browser assets, disposable documents after editor replacement/undo journeys. Single cached-switch trace per size; primes only target and base document within 30-second passive-cache TTL. Main-thread CPU sampling inferred from Profile event thread and mapped source files; CPU samples are approximate, not exclusive wall-clock durations. Native Map alternative rejected: similar total1MiB time but43ms unsliced task.",
+	"open": [
+		{
+			"name": "128k-512",
+			"characters": 131072,
+			"tracePath": "/tmp/alkalye-cached-browser-current/128k-512.trace.json",
+			"metrics": {
+				"firstFrameOpportunityMilliseconds": 66.5,
+				"readyMilliseconds": 55.80000001192093,
+				"secondFrameOpportunityMilliseconds": 83.5
+			}
+		},
+		{
+			"name": "1m-512",
+			"characters": 1048576,
+			"tracePath": "/tmp/alkalye-cached-browser-current/1m-512.trace.json",
+			"metrics": {
+				"firstFrameOpportunityMilliseconds": 632,
+				"readyMilliseconds": 623.7000000476837,
+				"secondFrameOpportunityMilliseconds": 649.5
+			}
+		}
+	],
+	"mapCopies": [
+		{
+			"size": 131072,
+			"samples": [
+				{
+					"cooperative": true,
+					"iteration": 1,
+					"largestStepMilliseconds": 0.3999999761581421,
+					"milliseconds": 5.199999988079071,
+					"stepMilliseconds": 4.399999976158142,
+					"steps": 129
+				},
+				{
+					"cooperative": false,
+					"iteration": 1,
+					"largestStepMilliseconds": 4.899999976158142,
+					"milliseconds": 5.199999988079071,
+					"stepMilliseconds": 4.899999976158142,
+					"steps": 1
+				},
+				{
+					"cooperative": false,
+					"iteration": 2,
+					"largestStepMilliseconds": 4.300000011920929,
+					"milliseconds": 4.5,
+					"stepMilliseconds": 4.300000011920929,
+					"steps": 1
+				},
+				{
+					"cooperative": true,
+					"iteration": 2,
+					"largestStepMilliseconds": 1.5999999642372131,
+					"milliseconds": 6.399999976158142,
+					"stepMilliseconds": 5.800000011920929,
+					"steps": 129
+				},
+				{
+					"cooperative": true,
+					"iteration": 3,
+					"largestStepMilliseconds": 0.20000004768371585,
+					"milliseconds": 4.300000011920929,
+					"stepMilliseconds": 3.899999976158142,
+					"steps": 129
+				},
+				{
+					"cooperative": false,
+					"iteration": 3,
+					"largestStepMilliseconds": 4.599999964237213,
+					"milliseconds": 4.800000011920929,
+					"stepMilliseconds": 4.599999964237213,
+					"steps": 1
+				}
+			]
+		},
+		{
+			"size": 1048576,
+			"samples": [
+				{
+					"cooperative": true,
+					"iteration": 1,
+					"largestStepMilliseconds": 2.899999976158142,
+					"milliseconds": 43.20000004768371,
+					"stepMilliseconds": 42,
+					"steps": 1025
+				},
+				{
+					"cooperative": false,
+					"iteration": 1,
+					"largestStepMilliseconds": 41.19999998807907,
+					"milliseconds": 41.5,
+					"stepMilliseconds": 41.19999998807907,
+					"steps": 1
+				},
+				{
+					"cooperative": false,
+					"iteration": 2,
+					"largestStepMilliseconds": 43,
+					"milliseconds": 43.19999998807907,
+					"stepMilliseconds": 43,
+					"steps": 1
+				},
+				{
+					"cooperative": true,
+					"iteration": 2,
+					"largestStepMilliseconds": 3,
+					"milliseconds": 43.5,
+					"stepMilliseconds": 42,
+					"steps": 1025
+				},
+				{
+					"cooperative": true,
+					"iteration": 3,
+					"largestStepMilliseconds": 3,
+					"milliseconds": 45.5,
+					"stepMilliseconds": 44.49999988079071,
+					"steps": 1025
+				},
+				{
+					"cooperative": false,
+					"iteration": 3,
+					"largestStepMilliseconds": 42.39999997615814,
+					"milliseconds": 42.59999996423721,
+					"stepMilliseconds": 42.39999997615814,
+					"steps": 1
+				}
+			]
+		}
+	],
+	"profiles": [
+		{
+			"name": "128k-512",
+			"sampledMilliseconds": 83.599,
+			"self": [
+				["(idle)", 34.91],
+				["(program)", 20.19],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/collection-copy.ts:1:Ye",
+					16.55
+				],
+				["(garbage collector)", 2.21],
+				["set innerHTML", 1.23],
+				["getBoundingClientRect", 0.74],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-index.ts:36:j",
+					0.61
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:828:paint",
+					0.46
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:489:styleMeasurement",
+					0.46
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/menu.ts:317:",
+					0.31
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/language.ts:11:l",
+					0.31
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:2297:cn",
+					0.31
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:79:Ht",
+					0.3
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:662:refine",
+					0.3
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:1691:ln",
+					0.18
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/html.ts:12:d",
+					0.16
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/menu.ts:314:",
+					0.16
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/scheduler.ts:19:",
+					0.16
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:696:",
+					0.16
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:1765:Yd",
+					0.16
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Pull.js:96:Uu",
+					0.16
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/projection.ts:194:Fe",
+					0.16
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/sync-recovery.ts:31:update",
+					0.16
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Schema.js:942:",
+					0.15
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/FiberMap.js:112:",
+					0.15
+				]
+			],
+			"inclusive": [
+				["(root)", 83.6],
+				["(idle)", 34.91],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:441:runLoop",
+					25.06
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:406:evaluate",
+					25.06
+				],
+				["(program)", 20.19],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:717:mt",
+					17.22
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:735:",
+					16.92
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:766:",
+					16.78
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:164:runTasks",
+					16.75
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/scheduler.ts:12:r",
+					16.75
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/scheduler.ts:28:o.port1.onmessage",
+					16.75
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt.ts:98:forkSteps",
+					16.64
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/platform/effects.ts:24:",
+					16.64
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/collection-copy.ts:1:Ye",
+					16.55
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:812:",
+					8.14
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:984:Ue",
+					6.3
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/platform/indexeddb-journal.ts:585:s.oncomplete",
+					5.97
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Deferred.js:675:Iu",
+					5.82
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/RcMap.js:191:",
+					5.82
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js:295:wf",
+					5.13
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:708:mt",
+					4.53
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2476:",
+					4.13
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:1691:ln",
+					3.68
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:1326:",
+					3.68
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor.ts:76:connectedCallback",
+					3.03
+				],
+				["replaceChildren", 3.03],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor.ts:157:Nr",
+					3.03
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor.ts:166:Mi",
+					2.89
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor.ts:88:",
+					2.89
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:2297:cn",
+					2.51
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:2687:$t",
+					2.5
+				],
+				["(garbage collector)", 2.21],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/source-textarea.ts:53:Ot",
+					2.13
+				],
+				["set innerHTML", 1.85],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/dom.ts:33:l",
+					1.85
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:157:afterScheduled",
+					1.85
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:79:Ht",
+					1.83
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:998:Ue",
+					1.7
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:2519:wf",
+					1.7
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:1307:",
+					1.69
+				]
+			],
+			"groups": {
+				"FunctionCall": {
+					"count": 125,
+					"totalMilliseconds": 42.356,
+					"maxMilliseconds": 6.022
+				},
+				"UpdateLayoutTree": {
+					"count": 29,
+					"totalMilliseconds": 2.974,
+					"maxMilliseconds": 0.302
+				},
+				"RunTask": {
+					"count": 214,
+					"totalMilliseconds": 48.294,
+					"maxMilliseconds": 6.062
+				},
+				"FireAnimationFrame": {
+					"count": 13,
+					"totalMilliseconds": 2.348,
+					"maxMilliseconds": 0.473
+				},
+				"Layout": {
+					"count": 21,
+					"totalMilliseconds": 1.551,
+					"maxMilliseconds": 0.159
+				},
+				"Paint": {
+					"count": 13,
+					"totalMilliseconds": 0.611,
+					"maxMilliseconds": 0.16
+				},
+				"MinorGC": {
+					"count": 1,
+					"totalMilliseconds": 2.345,
+					"maxMilliseconds": 2.345
+				}
+			}
+		},
+		{
+			"name": "1m-512",
+			"sampledMilliseconds": 649.708,
+			"self": [
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/collection-copy.ts:1:Ye",
+					291.5
+				],
+				["(program)", 174.72],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt.ts:768:rawVisibleSteps",
+					101.71
+				],
+				["(idle)", 29.12],
+				["(garbage collector)", 21.04],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/platform/effects.ts:24:",
+					6.64
+				],
+				["getBoundingClientRect", 5.44],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-index.ts:36:j",
+					4.28
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt.ts:836:",
+					1.62
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:580:measuredBlock",
+					1.4
+				],
+				["set innerHTML", 1.23],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt.ts:98:forkSteps",
+					1.16
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/scheduler.ts:28:o.port1.onmessage",
+					1.11
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2877:",
+					0.92
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/markdown.ts:36:z",
+					0.74
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:489:styleMeasurement",
+					0.47
+				],
+				["mark", 0.39],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:79:Ht",
+					0.39
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:828:paint",
+					0.38
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/platform/effects.ts:19:",
+					0.35
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/document-metadata.ts:59:R",
+					0.31
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js:295:wf",
+					0.31
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/menu.ts:317:",
+					0.3
+				],
+				["querySelector", 0.3],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-visibility.ts:360:node",
+					0.3
+				]
+			],
+			"inclusive": [
+				["(root)", 649.71],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:441:runLoop",
+					416.83
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:406:evaluate",
+					416.72
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/scheduler.ts:28:o.port1.onmessage",
+					402.57
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:735:",
+					401.5
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:164:runTasks",
+					401.45
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:157:afterScheduled",
+					401.45
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/scheduler.ts:12:r",
+					401.45
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:717:mt",
+					398.89
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:766:",
+					398.39
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/platform/effects.ts:24:",
+					398.29
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt.ts:98:forkSteps",
+					292.66
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/collection-copy.ts:1:Ye",
+					291.5
+				],
+				["(program)", 174.72],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt.ts:768:rawVisibleSteps",
+					102.01
+				],
+				["(idle)", 29.12],
+				["(garbage collector)", 21.04],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:812:",
+					15.11
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:984:Ue",
+					14.98
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js:295:wf",
+					13.63
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/platform/indexeddb-journal.ts:585:s.oncomplete",
+					12.19
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Deferred.js:675:Iu",
+					11.52
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/RcMap.js:191:",
+					11.36
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:708:mt",
+					10.61
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:1691:ln",
+					9.61
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:1326:",
+					9.61
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2476:",
+					9.08
+				],
+				["replaceChildren", 8.29],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor.ts:157:Nr",
+					8.29
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor.ts:166:Mi",
+					8.13
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor.ts:88:",
+					8.13
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor.ts:76:connectedCallback",
+					8.13
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:662:refine",
+					7.05
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/source-textarea.ts:53:Ot",
+					6.96
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:580:measuredBlock",
+					6.75
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:696:",
+					6.49
+				],
+				["getBoundingClientRect", 5.44],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:79:Ht",
+					4.62
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-index.ts:129:R",
+					4.57
+				],
+				[
+					"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-index.ts:167:W",
+					4.57
+				]
+			],
+			"groups": {
+				"FunctionCall": {
+					"count": 1775,
+					"totalMilliseconds": 597.563,
+					"maxMilliseconds": 11.694
+				},
+				"UpdateLayoutTree": {
+					"count": 76,
+					"totalMilliseconds": 10.675,
+					"maxMilliseconds": 0.332
+				},
+				"RunTask": {
+					"count": 1913,
+					"totalMilliseconds": 618.729,
+					"maxMilliseconds": 11.733
+				},
+				"FireAnimationFrame": {
+					"count": 81,
+					"totalMilliseconds": 15.974,
+					"maxMilliseconds": 0.613
+				},
+				"Layout": {
+					"count": 60,
+					"totalMilliseconds": 5.194,
+					"maxMilliseconds": 0.186
+				},
+				"Paint": {
+					"count": 50,
+					"totalMilliseconds": 1.079,
+					"maxMilliseconds": 0.111
+				},
+				"MinorGC": {
+					"count": 15,
+					"totalMilliseconds": 22.201,
+					"maxMilliseconds": 3.965
+				}
+			}
+		}
+	],
+	"acceptedCacheWarmup": {
+		"candidate": "Frozen git archive1bbe9da with only passiveState accepted materializeDocument(...).pipe(Effect.ignore) before checkpoint capture; no mobile/prepare-once drafts.",
+		"method": "Same disposable account/server and browser session; latest native IndexedDB snapshot transaction must complete at latest journal cursor with pending=[] after accepted edit+undo before every timed switch. Each sample primes target+base within passive-cache TTL; CPU tracing enabled. Before variants then after variants,3 ordered trials each; no statistical significance claim. Mutations restored exact document source but add small retained undo history. Candidate app SHA-256 verified after clearing service-worker and CacheStorage; original frozen assets restored afterward.",
+		"discarded": "before-0 overlapped an unrelated editor correctness run; excluded from every aggregate.",
+		"summary": [
+			{
+				"variant": "before",
+				"name": "128k-512",
+				"readyMilliseconds": [
+					81.60000002384186, 81.60000002384186, 83.79999995231628
+				],
+				"medianMilliseconds": 81.60000002384186
+			},
+			{
+				"variant": "before",
+				"name": "1m-512",
+				"readyMilliseconds": [
+					749.1999999880791, 649.3000000119209, 768.8999999761581
+				],
+				"medianMilliseconds": 749.1999999880791
+			},
+			{
+				"variant": "after",
+				"name": "128k-512",
+				"readyMilliseconds": [70.39999997615814, 67, 83.10000002384186],
+				"medianMilliseconds": 70.39999997615814
+			},
+			{
+				"variant": "after",
+				"name": "1m-512",
+				"readyMilliseconds": [
+					531.3000000119209, 452.199999988079, 459.699999988079
+				],
+				"medianMilliseconds": 459.699999988079
+			}
+		],
+		"rawSamples": [
+			{
+				"variant": "before",
+				"trial": 1,
+				"configurationPath": "/tmp/alkalye-critical-current/config.json",
+				"freshEcho": true,
+				"results": [
+					{
+						"name": "128k-512",
+						"characters": 131072,
+						"tracePath": "/tmp/alkalye-cached-browser-current/before-1/128k-512.trace.json",
+						"metrics": {
+							"firstFrameOpportunityMilliseconds": 98.89999997615814,
+							"readyMilliseconds": 81.60000002384186,
+							"secondFrameOpportunityMilliseconds": 115.60000002384186
+						}
+					},
+					{
+						"name": "1m-512",
+						"characters": 1048576,
+						"tracePath": "/tmp/alkalye-cached-browser-current/before-1/1m-512.trace.json",
+						"metrics": {
+							"firstFrameOpportunityMilliseconds": 765.5,
+							"readyMilliseconds": 749.1999999880791,
+							"secondFrameOpportunityMilliseconds": 783.5999999642372
+						}
+					}
+				]
+			},
+			{
+				"variant": "before",
+				"trial": 2,
+				"configurationPath": "/tmp/alkalye-critical-current/config.json",
+				"freshEcho": true,
+				"results": [
+					{
+						"name": "128k-512",
+						"characters": 131072,
+						"tracePath": "/tmp/alkalye-cached-browser-current/before-2/128k-512.trace.json",
+						"metrics": {
+							"firstFrameOpportunityMilliseconds": 98.69999998807909,
+							"readyMilliseconds": 81.60000002384186,
+							"secondFrameOpportunityMilliseconds": 113.4000000357628
+						}
+					},
+					{
+						"name": "1m-512",
+						"characters": 1048576,
+						"tracePath": "/tmp/alkalye-cached-browser-current/before-2/1m-512.trace.json",
+						"metrics": {
+							"firstFrameOpportunityMilliseconds": 663.6999999880791,
+							"readyMilliseconds": 649.3000000119209,
+							"secondFrameOpportunityMilliseconds": 682.1000000238419
+						}
+					}
+				]
+			},
+			{
+				"variant": "before",
+				"trial": 3,
+				"configurationPath": "/tmp/alkalye-critical-current/config.json",
+				"freshEcho": true,
+				"results": [
+					{
+						"name": "128k-512",
+						"characters": 131072,
+						"tracePath": "/tmp/alkalye-cached-browser-current/before-3/128k-512.trace.json",
+						"metrics": {
+							"firstFrameOpportunityMilliseconds": 98.39999997615814,
+							"readyMilliseconds": 83.79999995231628,
+							"secondFrameOpportunityMilliseconds": 115.69999998807909
+						}
+					},
+					{
+						"name": "1m-512",
+						"characters": 1048576,
+						"tracePath": "/tmp/alkalye-cached-browser-current/before-3/1m-512.trace.json",
+						"metrics": {
+							"firstFrameOpportunityMilliseconds": 783,
+							"readyMilliseconds": 768.8999999761581,
+							"secondFrameOpportunityMilliseconds": 800.3999999761581
+						}
+					}
+				]
+			},
+			{
+				"variant": "after",
+				"trial": 1,
+				"configurationPath": "/tmp/alkalye-critical-current/config.json",
+				"freshEcho": true,
+				"results": [
+					{
+						"name": "128k-512",
+						"characters": 131072,
+						"tracePath": "/tmp/alkalye-cached-browser-current/after-1/128k-512.trace.json",
+						"metrics": {
+							"firstFrameOpportunityMilliseconds": 82,
+							"readyMilliseconds": 70.39999997615814,
+							"secondFrameOpportunityMilliseconds": 100.69999998807909
+						}
+					},
+					{
+						"name": "1m-512",
+						"characters": 1048576,
+						"tracePath": "/tmp/alkalye-cached-browser-current/after-1/1m-512.trace.json",
+						"metrics": {
+							"firstFrameOpportunityMilliseconds": 548.8000000119209,
+							"readyMilliseconds": 531.3000000119209,
+							"secondFrameOpportunityMilliseconds": 564
+						}
+					}
+				]
+			},
+			{
+				"variant": "after",
+				"trial": 2,
+				"configurationPath": "/tmp/alkalye-critical-current/config.json",
+				"freshEcho": true,
+				"results": [
+					{
+						"name": "128k-512",
+						"characters": 131072,
+						"tracePath": "/tmp/alkalye-cached-browser-current/after-2/128k-512.trace.json",
+						"metrics": {
+							"firstFrameOpportunityMilliseconds": 80.60000002384186,
+							"readyMilliseconds": 67,
+							"secondFrameOpportunityMilliseconds": 99.4000000357628
+						}
+					},
+					{
+						"name": "1m-512",
+						"characters": 1048576,
+						"tracePath": "/tmp/alkalye-cached-browser-current/after-2/1m-512.trace.json",
+						"metrics": {
+							"firstFrameOpportunityMilliseconds": 465.300000011921,
+							"readyMilliseconds": 452.199999988079,
+							"secondFrameOpportunityMilliseconds": 482.800000011921
+						}
+					}
+				]
+			},
+			{
+				"variant": "after",
+				"trial": 3,
+				"configurationPath": "/tmp/alkalye-critical-current/config.json",
+				"freshEcho": true,
+				"results": [
+					{
+						"name": "128k-512",
+						"characters": 131072,
+						"tracePath": "/tmp/alkalye-cached-browser-current/after-3/128k-512.trace.json",
+						"metrics": {
+							"firstFrameOpportunityMilliseconds": 98.69999998807909,
+							"readyMilliseconds": 83.10000002384186,
+							"secondFrameOpportunityMilliseconds": 117.39999997615814
+						}
+					},
+					{
+						"name": "1m-512",
+						"characters": 1048576,
+						"tracePath": "/tmp/alkalye-cached-browser-current/after-3/1m-512.trace.json",
+						"metrics": {
+							"firstFrameOpportunityMilliseconds": 465.60000002384186,
+							"readyMilliseconds": 459.699999988079,
+							"secondFrameOpportunityMilliseconds": 482.199999988079
+						}
+					}
+				]
+			}
+		],
+		"pairedProfiles": {
+			"before": [
+				{
+					"name": "128k-512",
+					"sampledMilliseconds": 113.561,
+					"self": [
+						["(idle)", 40.11],
+						["(program)", 27.4],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/collection-copy.ts:1:Ye",
+							21.32
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-visibility.ts:364:ee",
+							5.58
+						],
+						["(garbage collector)", 4.88],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt.ts:768:rawVisibleSteps",
+							2.29
+						],
+						["getBoundingClientRect", 1.7],
+						["set innerHTML", 1.23],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/platform/effects.ts:24:",
+							1.08
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-index.ts:36:j",
+							0.6
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt.ts:98:forkSteps",
+							0.46
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:79:Ht",
+							0.46
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:489:styleMeasurement",
+							0.46
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:828:paint",
+							0.45
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-visibility.ts:209:active",
+							0.38
+						],
+						["mark", 0.36],
+						["addEventListener", 0.31],
+						["abort", 0.3],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:2616:ae",
+							0.18
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt.ts:836:",
+							0.17
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2874:currentTimeMillisUnsafe",
+							0.17
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js:249:r",
+							0.17
+						],
+						["fetch", 0.16],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/line-actions.ts:175:M",
+							0.16
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/ui/menu.ts:8:U",
+							0.16
+						]
+					],
+					"inclusive": [
+						["(root)", 113.56],
+						["(idle)", 40.11],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:441:runLoop",
+							39.26
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:406:evaluate",
+							39.26
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:717:mt",
+							31.55
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:766:",
+							31.3
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/platform/effects.ts:24:",
+							31.15
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:164:runTasks",
+							31.1
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/scheduler.ts:28:o.port1.onmessage",
+							30.93
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:735:",
+							30.8
+						],
+						["(program)", 27.4],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt.ts:98:forkSteps",
+							21.93
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/collection-copy.ts:1:Ye",
+							21.32
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt.ts:768:rawVisibleSteps",
+							8.25
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:812:",
+							8.18
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:984:Ue",
+							6.37
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-visibility.ts:209:active",
+							5.96
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-visibility.ts:235:hidden",
+							5.96
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/platform/indexeddb-journal.ts:585:s.oncomplete",
+							5.68
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js:295:wf",
+							5.67
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-visibility.ts:364:ee",
+							5.58
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Deferred.js:675:Iu",
+							5.43
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/RcMap.js:191:",
+							5.28
+						],
+						["(garbage collector)", 4.88],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2476:",
+							4.66
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:708:mt",
+							4.47
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:1691:ln",
+							3.76
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:1326:",
+							3.76
+						],
+						["replaceChildren", 3.16],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor.ts:157:Nr",
+							3.16
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor.ts:76:connectedCallback",
+							3.03
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor.ts:166:Mi",
+							2.88
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor.ts:88:",
+							2.88
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:2297:cn",
+							2.5
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/source-textarea.ts:53:Ot",
+							2.27
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:2687:$t",
+							2.21
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:79:Ht",
+							1.97
+						],
+						["set innerHTML", 1.85],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/dom.ts:33:l",
+							1.85
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:662:refine",
+							1.7
+						]
+					],
+					"groups": {
+						"FunctionCall": {
+							"count": 285,
+							"totalMilliseconds": 66.324,
+							"maxMilliseconds": 5.482
+						},
+						"UpdateLayoutTree": {
+							"count": 31,
+							"totalMilliseconds": 3.354,
+							"maxMilliseconds": 0.316
+						},
+						"RunTask": {
+							"count": 381,
+							"totalMilliseconds": 72.42,
+							"maxMilliseconds": 5.516
+						},
+						"FireAnimationFrame": {
+							"count": 18,
+							"totalMilliseconds": 3.215,
+							"maxMilliseconds": 0.49
+						},
+						"Layout": {
+							"count": 22,
+							"totalMilliseconds": 1.816,
+							"maxMilliseconds": 0.228
+						},
+						"Paint": {
+							"count": 16,
+							"totalMilliseconds": 0.541,
+							"maxMilliseconds": 0.217
+						},
+						"MinorGC": {
+							"count": 2,
+							"totalMilliseconds": 5.086,
+							"maxMilliseconds": 2.563
+						}
+					}
+				},
+				{
+					"name": "1m-512",
+					"sampledMilliseconds": 682.09,
+					"self": [
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/collection-copy.ts:1:Ye",
+							298.9
+						],
+						["(program)", 173.15],
+						["(idle)", 56.97],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-visibility.ts:364:ee",
+							55.77
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt.ts:768:rawVisibleSteps",
+							28.88
+						],
+						["(garbage collector)", 21.59],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-visibility.ts:209:active",
+							18.15
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/platform/effects.ts:24:",
+							6.38
+						],
+						["getBoundingClientRect", 5.83],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-index.ts:36:j",
+							4.13
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt.ts:836:",
+							2.29
+						],
+						["set innerHTML", 1.38],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt.ts:98:forkSteps",
+							1.21
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:662:refine",
+							0.78
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:580:measuredBlock",
+							0.62
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-visibility.ts:235:hidden",
+							0.62
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:164:runTasks",
+							0.61
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/markdown.ts:144:S",
+							0.36
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/document-metadata.ts:59:R",
+							0.34
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:828:paint",
+							0.32
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-index.ts:151:S",
+							0.31
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:79:Ht",
+							0.31
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/markdown.ts:36:z",
+							0.31
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:1539:",
+							0.3
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/sync-recovery.ts:31:update",
+							0.3
+						]
+					],
+					"inclusive": [
+						["(root)", 682.09],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:441:runLoop",
+							423.33
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:406:evaluate",
+							423.33
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/scheduler.ts:12:r",
+							409.72
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/scheduler.ts:28:o.port1.onmessage",
+							409.72
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:164:runTasks",
+							409.52
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:157:afterScheduled",
+							409.52
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:735:",
+							409.3
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:717:mt",
+							407.56
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:766:",
+							406.95
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/platform/effects.ts:24:",
+							406.65
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt.ts:98:forkSteps",
+							300.11
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/collection-copy.ts:1:Ye",
+							298.9
+						],
+						["(program)", 173.15],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt.ts:768:rawVisibleSteps",
+							103.42
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-visibility.ts:235:hidden",
+							74.54
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-visibility.ts:209:active",
+							73.92
+						],
+						["(idle)", 56.97],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-visibility.ts:364:ee",
+							55.77
+						],
+						["(garbage collector)", 21.59],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:984:Ue",
+							14.03
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:812:",
+							13.76
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js:295:wf",
+							13.0
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/platform/indexeddb-journal.ts:585:s.oncomplete",
+							10.57
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Deferred.js:675:Iu",
+							10.37
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/RcMap.js:191:",
+							10.22
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:708:mt",
+							9.23
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:1691:ln",
+							8.72
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/document-app.ts:1326:",
+							8.72
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2476:",
+							8.44
+						],
+						["replaceChildren", 7.35],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor.ts:166:Mi",
+							7.35
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor.ts:88:",
+							7.35
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor.ts:76:connectedCallback",
+							7.35
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor.ts:157:Nr",
+							7.35
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:662:refine",
+							7.21
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:696:",
+							6.59
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/editor-viewport.ts:580:measuredBlock",
+							6.54
+						],
+						[
+							"../../../Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/source-textarea.ts:53:Ot",
+							6.29
+						],
+						["getBoundingClientRect", 5.83]
+					],
+					"groups": {
+						"FunctionCall": {
+							"count": 1784,
+							"totalMilliseconds": 603.322,
+							"maxMilliseconds": 10.461
+						},
+						"UpdateLayoutTree": {
+							"count": 74,
+							"totalMilliseconds": 10.274000000000001,
+							"maxMilliseconds": 0.28
+						},
+						"RunTask": {
+							"count": 1925,
+							"totalMilliseconds": 623.268,
+							"maxMilliseconds": 10.494
+						},
+						"FireAnimationFrame": {
+							"count": 84,
+							"totalMilliseconds": 15.946,
+							"maxMilliseconds": 0.667
+						},
+						"Layout": {
+							"count": 59,
+							"totalMilliseconds": 5.106,
+							"maxMilliseconds": 0.191
+						},
+						"Paint": {
+							"count": 50,
+							"totalMilliseconds": 1.041,
+							"maxMilliseconds": 0.162
+						},
+						"MinorGC": {
+							"count": 15,
+							"totalMilliseconds": 23.973,
+							"maxMilliseconds": 4.279
+						}
+					}
+				}
+			],
+			"after": [
+				{
+					"name": "128k-512",
+					"sampledMilliseconds": 99.289,
+					"self": [
+						["(idle)", 35.89],
+						["(program)", 24.29],
+						["../src/shared/collection-copy.ts:1:Ye", 23.7],
+						["(garbage collector)", 4.75],
+						["set innerHTML", 1.2],
+						["getBoundingClientRect", 0.82],
+						["../src/shared/text-index.ts:36:j", 0.6],
+						["../src/client/editor-viewport.ts:79:Ht", 0.46],
+						["../src/client/editor-viewport.ts:580:measuredBlock", 0.41],
+						["querySelector", 0.31],
+						["../src/client/editor-viewport.ts:828:paint", 0.31],
+						["fetch", 0.3],
+						["querySelectorAll", 0.29],
+						["../src/client/editor-viewport.ts:489:styleMeasurement", 0.23],
+						["setProperty", 0.19],
+						["../src/shared/html.ts:12:d", 0.17],
+						["../src/client/editor-viewport.ts:662:refine", 0.17],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Context.js:143:oS",
+							0.17
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Function.js:76:",
+							0.16
+						],
+						["../src/shared/routes.ts:52:Bi", 0.16],
+						["../src/client/document-app.ts:1530:qa", 0.16],
+						["close", 0.16],
+						["clearTimeout", 0.16],
+						["../src/client/language.ts:42:A", 0.16],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js:253:",
+							0.16
+						]
+					],
+					"inclusive": [
+						["(root)", 99.29],
+						["(idle)", 35.89],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:441:runLoop",
+							32.48
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:406:evaluate",
+							32.48
+						],
+						["(program)", 24.29],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:735:",
+							24.2
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:717:mt",
+							24.19
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:164:runTasks",
+							24.1
+						],
+						["../src/client/scheduler.ts:28:o.port1.onmessage", 24.1],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:766:",
+							23.94
+						],
+						["../src/platform/effects.ts:24:", 23.91],
+						["../src/shared/crdt.ts:98:forkSteps", 23.86],
+						["../src/shared/collection-copy.ts:1:Ye", 23.7],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:812:",
+							8.32
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:984:Ue",
+							6.28
+						],
+						["../src/platform/indexeddb-journal.ts:585:s.oncomplete", 6.01],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Deferred.js:675:Iu",
+							5.63
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/RcMap.js:191:",
+							5.63
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:708:mt",
+							5.28
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js:295:wf",
+							5.25
+						],
+						["(garbage collector)", 4.75],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2476:",
+							4.05
+						],
+						["../src/client/document-app.ts:1691:ln", 3.83],
+						["../src/client/document-app.ts:1326:", 3.83],
+						["../src/client/document-app.ts:2297:cn", 3.3],
+						["replaceChildren", 3.21],
+						["../src/client/components/editor.ts:157:Nr", 3.21],
+						["../src/client/components/editor.ts:166:Mi", 3.08],
+						["../src/client/components/editor.ts:88:", 3.08],
+						["../src/client/components/editor.ts:76:connectedCallback", 3.08],
+						["../src/client/document-app.ts:2687:$t", 2.99],
+						["../src/client/source-textarea.ts:53:Ot", 2.16],
+						["../src/client/editor-viewport.ts:79:Ht", 1.87],
+						["set innerHTML", 1.8],
+						["../src/client/dom.ts:33:l", 1.8],
+						["../src/client/document-app.ts:2519:wf", 1.66],
+						["../src/client/document-app.ts:1307:", 1.65],
+						["../src/client/storage.ts:257:r.oncomplete", 1.54],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:998:Ue",
+							1.46
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js:335:mt",
+							1.1
+						]
+					],
+					"groups": {
+						"FunctionCall": {
+							"count": 155,
+							"totalMilliseconds": 52.127,
+							"maxMilliseconds": 5.821
+						},
+						"UpdateLayoutTree": {
+							"count": 33,
+							"totalMilliseconds": 3.681,
+							"maxMilliseconds": 0.314
+						},
+						"RunTask": {
+							"count": 266,
+							"totalMilliseconds": 61.791,
+							"maxMilliseconds": 5.859
+						},
+						"FireAnimationFrame": {
+							"count": 18,
+							"totalMilliseconds": 3.54,
+							"maxMilliseconds": 0.465
+						},
+						"Layout": {
+							"count": 24,
+							"totalMilliseconds": 1.79,
+							"maxMilliseconds": 0.146
+						},
+						"Paint": {
+							"count": 14,
+							"totalMilliseconds": 0.605,
+							"maxMilliseconds": 0.166
+						},
+						"MinorGC": {
+							"count": 2,
+							"totalMilliseconds": 5.247999999999999,
+							"maxMilliseconds": 2.707
+						}
+					}
+				},
+				{
+					"name": "1m-512",
+					"sampledMilliseconds": 482.795,
+					"self": [
+						["../src/shared/collection-copy.ts:1:Ye", 293.69],
+						["(program)", 111.41],
+						["(idle)", 34.71],
+						["(garbage collector)", 18.89],
+						["getBoundingClientRect", 5.12],
+						["../src/shared/text-index.ts:36:j", 4.45],
+						["../src/client/editor-viewport.ts:580:measuredBlock", 1.38],
+						["set innerHTML", 1.37],
+						["../src/shared/crdt.ts:98:forkSteps", 1.07],
+						["../src/shared/text-index.ts:151:S", 0.61],
+						["../src/platform/effects.ts:19:", 0.58],
+						["../src/client/editor-viewport.ts:489:styleMeasurement", 0.46],
+						["../src/client/editor-viewport.ts:662:refine", 0.42],
+						["../src/shared/document-metadata.ts:59:R", 0.42],
+						["mark", 0.37],
+						["../src/client/document-app.ts:1539:", 0.31],
+						["../src/client/editor-viewport.ts:79:Ht", 0.31],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:1165:G",
+							0.31
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js:295:wf",
+							0.31
+						],
+						["../src/shared/markdown.ts:36:z", 0.3],
+						["../src/shared/document-session.ts:1901:documents", 0.3],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js:253:",
+							0.3
+						],
+						["../src/client/components/library.ts:159:", 0.29],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:984:Ue",
+							0.29
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:488:getCont",
+							0.21
+						]
+					],
+					"inclusive": [
+						["(root)", 482.8],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:441:runLoop",
+							310.55
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:406:evaluate",
+							310.55
+						],
+						["../src/client/scheduler.ts:12:r", 296.69],
+						["../src/client/scheduler.ts:28:o.port1.onmessage", 296.69],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:164:runTasks",
+							296.47
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:157:afterScheduled",
+							296.47
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:735:",
+							296.44
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:717:mt",
+							295.34
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:766:",
+							294.8
+						],
+						["../src/shared/crdt.ts:98:forkSteps", 294.66],
+						["../src/platform/effects.ts:24:", 294.66],
+						["../src/shared/collection-copy.ts:1:Ye", 293.69],
+						["(program)", 111.41],
+						["(idle)", 34.71],
+						["(garbage collector)", 18.89],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:812:",
+							13.88
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:984:Ue",
+							12.05
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js:295:wf",
+							11.28
+						],
+						["../src/platform/indexeddb-journal.ts:585:s.oncomplete", 10.7],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Deferred.js:675:Iu",
+							10.15
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/RcMap.js:191:",
+							10.15
+						],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:708:mt",
+							9.55
+						],
+						["../src/client/document-app.ts:1691:ln", 8.67],
+						["../src/client/document-app.ts:1326:", 8.67],
+						[
+							"../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2476:",
+							8.25
+						],
+						["replaceChildren", 7.5],
+						["../src/client/components/editor.ts:157:Nr", 7.5],
+						["../src/client/components/editor.ts:166:Mi", 7.34],
+						["../src/client/components/editor.ts:88:", 7.34],
+						["../src/client/components/editor.ts:76:connectedCallback", 7.34],
+						["../src/client/editor-viewport.ts:662:refine", 6.98],
+						["../src/client/editor-viewport.ts:580:measuredBlock", 6.57],
+						["../src/client/source-textarea.ts:53:Ot", 6.43],
+						["../src/client/editor-viewport.ts:696:", 6.41],
+						["getBoundingClientRect", 5.12],
+						["../src/shared/text-index.ts:36:j", 4.45],
+						["../src/shared/text-index.ts:64:x", 4.45],
+						["../src/shared/text-index.ts:129:R", 4.45],
+						["../src/shared/text-index.ts:167:W", 4.45]
+					],
+					"groups": {
+						"FunctionCall": {
+							"count": 530,
+							"totalMilliseconds": 432.917,
+							"maxMilliseconds": 11.379
+						},
+						"UpdateLayoutTree": {
+							"count": 65,
+							"totalMilliseconds": 8.52,
+							"maxMilliseconds": 0.315
+						},
+						"RunTask": {
+							"count": 657,
+							"totalMilliseconds": 446.529,
+							"maxMilliseconds": 11.392
+						},
+						"FireAnimationFrame": {
+							"count": 61,
+							"totalMilliseconds": 12.109,
+							"maxMilliseconds": 0.514
+						},
+						"Layout": {
+							"count": 50,
+							"totalMilliseconds": 3.956,
+							"maxMilliseconds": 0.16
+						},
+						"Paint": {
+							"count": 40,
+							"totalMilliseconds": 0.921,
+							"maxMilliseconds": 0.11
+						},
+						"MinorGC": {
+							"count": 10,
+							"totalMilliseconds": 19.726,
+							"maxMilliseconds": 4.317
+						}
+					}
+				}
+			]
+		},
+		"attribution": "Paired trial2 main-thread CPU samples:1MiB Map-copy self time298.9\u2192293.7ms; rawVisibleSteps28.9ms, visibility node traversal55.8ms, and active visibility18.2ms disappeared after warming. Largest main task10.5\u219211.4ms. This moves the visible-text work into background snapshot capture; total loading improves but all tasks do not yet meet8.3ms."
+	}
+}
