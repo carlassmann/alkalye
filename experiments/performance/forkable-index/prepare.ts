@@ -4,7 +4,8 @@ import { resolve } from "node:path"
 let destination = Bun.argv[2]
 if (!destination) throw new Error("Temporary output directory required")
 destination = resolve(destination)
-let project = process.cwd()
+let project = resolve(Bun.argv[4] ?? process.cwd())
+let indexPath = Bun.argv[3] ?? import.meta.dir + "/index.ts"
 let original = await Bun.file("src/shared/crdt.ts").text()
 
 function replace(source: string, before: string, after: string) {
@@ -53,10 +54,7 @@ for (let variant of ["native", "atoms", "children", "both"]) {
 		)
 	}
 	await Bun.write(directory + "/src/shared/crdt.ts", source)
-	await cp(
-		import.meta.dir + "/index.ts",
-		directory + "/src/shared/forkable-index.ts",
-	)
+	await cp(indexPath, directory + "/src/shared/forkable-index.ts")
 	let journey = await Bun.file(import.meta.dir + "/journey.ts").text()
 	await Bun.write(
 		directory + "/journey.ts",
@@ -75,3 +73,18 @@ for (let variant of ["native", "atoms", "children", "both"]) {
 	)
 }
 console.log(destination)
+
+let contracts = await Bun.file(import.meta.dir + "/contracts.ts").text()
+await Bun.write(
+	destination + "/contracts.ts",
+	contracts.replaceAll("../../../src/", "./native/src/"),
+)
+await Bun.write(
+	destination + "/contracts.test.ts",
+	`import { test } from "bun:test"
+import { Replica as Native } from "./native/src/shared/crdt"
+import { Replica as Shared } from "./both/src/shared/crdt"
+import { verifyEquivalent } from "./contracts"
+test("shared index public Unicode, branch isolation and insertion order", () => verifyEquivalent(actor => new Shared(actor), actor => new Native(actor)))
+`,
+)

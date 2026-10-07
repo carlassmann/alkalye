@@ -1,0 +1,50 @@
+[
+	{
+		"variant": "native",
+		"replacements": 128,
+		"result": {
+			"characters": 1048704,
+			"milliseconds": 92.9000000357628
+		}
+	},
+	{
+		"variant": "native",
+		"replacements": 4096,
+		"result": {
+			"characters": 1052672,
+			"milliseconds": 93.30000001192091
+		}
+	},
+	{
+		"variant": "previous",
+		"replacements": 128,
+		"result": {
+			"characters": 1048704,
+			"milliseconds": 2
+		}
+	},
+	{
+		"variant": "previous",
+		"replacements": 4096,
+		"result": {
+			"characters": 1052672,
+			"milliseconds": 2.199999988079071
+		}
+	},
+	{
+		"variant": "membership",
+		"replacements": 128,
+		"result": {
+			"characters": 1048704,
+			"milliseconds": 2.099999964237213
+		}
+	},
+	{
+		"variant": "membership",
+		"replacements": 4096,
+		"result": {
+			"characters": 1052672,
+			"milliseconds": 2.300000011920929
+		}
+	}
+]

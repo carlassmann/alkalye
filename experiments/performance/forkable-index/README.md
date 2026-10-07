@@ -34,3 +34,24 @@ Do not adopt this representation yet. Fork copies shrink substantially, but chec
 Next useful proof: improve native empty-overlay reads/iteration, exercise repeated middle edits and causal restoration, then measure actual cached app opening with cooperative persistence. Preserve native-map production behavior until those costs and lifecycle rules are reviewed.
 
 written with gpt-6 in codex
+
+## Native override membership follow-up
+
+`membership-index.ts` keeps a private native Set of replaced base keys. Fork copies that set; Effect HashMap remains the persistent update source. Unchanged keys avoid Effect hashing, and empty-overlay reads and iteration delegate to the native base. No automatic compaction.
+
+Build this variant with the optional index-source argument. The optional fourth argument selects a frozen source directory. The generated public-equivalence test exercises 64 Unicode middle edits, retained branch views, causal inverse and checkpoint insertion order.
+
+```sh
+bun experiments/performance/forkable-index/prepare.ts /tmp/alkalye-membership-experiment experiments/performance/forkable-index/membership-index.ts
+bun test /tmp/alkalye-membership-experiment/contracts.test.ts
+```
+
+The follow-up used the same frozen `8d2a063` Replica source and fresh Chromium contexts. Six single-sample journeys compared native, previous shared indexes and membership-gated shared indexes at 128KiB and 1MiB. All variants passed the previous 108 public tests; the extra equivalence test passed 17 assertions. Types passed. Raw phases are in `membership-results.json`.
+
+At 1MiB, checkpoint plus restore improved from 811.4 ms to 768.7 ms but remained slower than native's 665.8 ms. Three forks totaled 315.4 ms for native, 16.6 ms for the previous prototype and 16.5 ms with membership gating. This does not establish a frame-budget improvement or remove the checkpoint regression.
+
+`dense-journey.ts` applies one batched edit through public `prepareReplacements`, inserting into 128 or 4,096 distinct base-parent positions in a 1MiB document. It checks independently editable copies. Fork time was 92.9 / 93.3 ms for native, 2.0 / 2.2 ms for the previous prototype and 2.1 / 2.3 ms for membership gating. Raw samples are in `membership-dense-results.json`.
+
+The membership set is bounded by distinct replaced keys in the initial native base, but that bound can be document-sized. Copying it remains synchronous. Persistent additions continue accumulating. Neither these single samples nor the 4,096-key probe establish safe worst-case task bounds. Production remains unchanged.
+
+written with gpt-6 in codex

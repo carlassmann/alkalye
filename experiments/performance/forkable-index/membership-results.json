@@ -1,0 +1,278 @@
+[
+	{
+		"variant": "native",
+		"size": 131072,
+		"result": {
+			"characters": 131104,
+			"phases": [
+				{
+					"milliseconds": 14,
+					"name": "first fork"
+				},
+				{
+					"milliseconds": 11.400000035762789,
+					"name": "second fork"
+				},
+				{
+					"milliseconds": 9.199999988079073,
+					"name": "third fork"
+				},
+				{
+					"milliseconds": 19.399999976158146,
+					"name": "cold source"
+				},
+				{
+					"milliseconds": 0.6000000238418579,
+					"name": "fork edit"
+				},
+				{
+					"milliseconds": 1,
+					"name": "owner edit"
+				},
+				{
+					"milliseconds": 0,
+					"name": "merge"
+				},
+				{
+					"milliseconds": 0.30000001192092896,
+					"name": "undo"
+				},
+				{
+					"milliseconds": 70,
+					"name": "checkpoint restore"
+				}
+			],
+			"yielding": true
+		}
+	},
+	{
+		"variant": "native",
+		"size": 1048576,
+		"result": {
+			"characters": 1048608,
+			"phases": [
+				{
+					"milliseconds": 122.29999995231628,
+					"name": "first fork"
+				},
+				{
+					"milliseconds": 96.60000002384186,
+					"name": "second fork"
+				},
+				{
+					"milliseconds": 96.5,
+					"name": "third fork"
+				},
+				{
+					"milliseconds": 151.80000001192093,
+					"name": "cold source"
+				},
+				{
+					"milliseconds": 1.199999988079071,
+					"name": "fork edit"
+				},
+				{
+					"milliseconds": 3.199999988079071,
+					"name": "owner edit"
+				},
+				{
+					"milliseconds": 0.10000002384185792,
+					"name": "merge"
+				},
+				{
+					"milliseconds": 0.40000003576278687,
+					"name": "undo"
+				},
+				{
+					"milliseconds": 665.8000000119209,
+					"name": "checkpoint restore"
+				}
+			],
+			"yielding": true
+		}
+	},
+	{
+		"variant": "previous",
+		"size": 131072,
+		"result": {
+			"characters": 131104,
+			"phases": [
+				{
+					"milliseconds": 4.5,
+					"name": "first fork"
+				},
+				{
+					"milliseconds": 0.30000001192092896,
+					"name": "second fork"
+				},
+				{
+					"milliseconds": 0.19999998807907104,
+					"name": "third fork"
+				},
+				{
+					"milliseconds": 22.400000035762787,
+					"name": "cold source"
+				},
+				{
+					"milliseconds": 0.5999999642372131,
+					"name": "fork edit"
+				},
+				{
+					"milliseconds": 1.300000011920929,
+					"name": "owner edit"
+				},
+				{
+					"milliseconds": 0,
+					"name": "merge"
+				},
+				{
+					"milliseconds": 0.30000001192092896,
+					"name": "undo"
+				},
+				{
+					"milliseconds": 88.79999995231628,
+					"name": "checkpoint restore"
+				}
+			],
+			"yielding": true
+		}
+	},
+	{
+		"variant": "previous",
+		"size": 1048576,
+		"result": {
+			"characters": 1048608,
+			"phases": [
+				{
+					"milliseconds": 16.100000023841858,
+					"name": "first fork"
+				},
+				{
+					"milliseconds": 0.30000001192092896,
+					"name": "second fork"
+				},
+				{
+					"milliseconds": 0.19999998807907104,
+					"name": "third fork"
+				},
+				{
+					"milliseconds": 152.80000001192093,
+					"name": "cold source"
+				},
+				{
+					"milliseconds": 1.300000011920929,
+					"name": "fork edit"
+				},
+				{
+					"milliseconds": 3.5,
+					"name": "owner edit"
+				},
+				{
+					"milliseconds": 0.10000002384185792,
+					"name": "merge"
+				},
+				{
+					"milliseconds": 0.40000003576278687,
+					"name": "undo"
+				},
+				{
+					"milliseconds": 811.3999999761581,
+					"name": "checkpoint restore"
+				}
+			],
+			"yielding": true
+		}
+	},
+	{
+		"variant": "membership",
+		"size": 131072,
+		"result": {
+			"characters": 131104,
+			"phases": [
+				{
+					"milliseconds": 4.5,
+					"name": "first fork"
+				},
+				{
+					"milliseconds": 0.2999999523162842,
+					"name": "second fork"
+				},
+				{
+					"milliseconds": 0.30000001192092896,
+					"name": "third fork"
+				},
+				{
+					"milliseconds": 20.5,
+					"name": "cold source"
+				},
+				{
+					"milliseconds": 0.6000000238418579,
+					"name": "fork edit"
+				},
+				{
+					"milliseconds": 1.2000000476837158,
+					"name": "owner edit"
+				},
+				{
+					"milliseconds": 0.09999996423721312,
+					"name": "merge"
+				},
+				{
+					"milliseconds": 0.3999999761581421,
+					"name": "undo"
+				},
+				{
+					"milliseconds": 81,
+					"name": "checkpoint restore"
+				}
+			],
+			"yielding": true
+		}
+	},
+	{
+		"variant": "membership",
+		"size": 1048576,
+		"result": {
+			"characters": 1048608,
+			"phases": [
+				{
+					"milliseconds": 16,
+					"name": "first fork"
+				},
+				{
+					"milliseconds": 0.30000001192092896,
+					"name": "second fork"
+				},
+				{
+					"milliseconds": 0.19999998807907104,
+					"name": "third fork"
+				},
+				{
+					"milliseconds": 148.80000001192093,
+					"name": "cold source"
+				},
+				{
+					"milliseconds": 1.199999988079071,
+					"name": "fork edit"
+				},
+				{
+					"milliseconds": 3.299999952316284,
+					"name": "owner edit"
+				},
+				{
+					"milliseconds": 0.10000002384185792,
+					"name": "merge"
+				},
+				{
+					"milliseconds": 0.30000001192092896,
+					"name": "undo"
+				},
+				{
+					"milliseconds": 768.6999999880791,
+					"name": "checkpoint restore"
+				}
+			],
+			"yielding": true
+		}
+	}
+]
