@@ -230,6 +230,23 @@
 			editor replacement still need work; these changes improve their costs
 			without establishing 120 fps.
 		</p>
+		<h2>Undo copies state cooperatively</h2>
+		<p>
+			Action staging now uses a detached, cooperative replica fork instead of
+			encoding and restoring the entire checkpoint. In three matched browser
+			trials per version, undo in a 1 MiB document reached two paint opportunities
+			in 626.6 ms median, down from 1,259.8 ms. The largest main-thread task fell
+			from 853.7 to 290.3 ms; the fully accepted checkpoint took 2,605.1 ms,
+			down from 3,008.3 ms.
+		</p>
+		<p>
+			Both clients used the same native server and restored identical disposable
+			data and browser profiles. All six trials passed exact source, trusted undo,
+			strictly newer accepted-checkpoint and zero pending/rejected-action checks.
+			Loaded chunk URLs and decoded sizes matched expected builds; loaded bytes
+			were not cryptographically verified. These tasks still exceed 8.33 ms.
+			Samples and method: <code>experiments/performance/undo-fork/</code>.
+		</p>
 		<h2>Body edits remain incremental after metadata changes</h2>
 		<p>
 			Merged frontmatter can leave raw and canonical atom arrays with different
