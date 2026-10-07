@@ -173,6 +173,63 @@
 			8.33ms; cooperative pure preparation and the synchronous editor
 			replacement path remain work to do.
 		</p>
+		<h2>Two further reductions in extreme multicursor work</h2>
+		<p>
+			Code-point counting now avoids temporary character arrays. ASCII uses a
+			native fast path; paired and lone surrogates retain exact offsets.
+			Prepared visibility facts now publish once without repeating their
+			validation. Stale or repeated prepared commits fail before mutation.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Independent five-trial pair</th>
+					<th>Before</th>
+					<th>After</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Code-point counting: input median / maximum</td>
+					<td>31.8 / 35.0 ms</td>
+					<td>27.4 / 31.7 ms</td>
+				</tr>
+				<tr>
+					<td>Code-point counting: deferred maximum median</td>
+					<td>57.5 ms</td>
+					<td>59.1 ms</td>
+				</tr>
+				<tr>
+					<td>Prepared visibility: input median / maximum</td>
+					<td>26.6 / 31.0 ms</td>
+					<td>25.6 / 29.4 ms</td>
+				</tr>
+				<tr>
+					<td>Prepared visibility: deferred maximum median / maximum</td>
+					<td>56.2 / 57.2 ms</td>
+					<td>49.4 / 51.4 ms</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+			Each pair restored the same starting disposable browser and backend
+			histories: a 1 MiB document with 2,048 replacements. Five ordered trials
+			per version used trusted input events, then observed three seconds of
+			background work without a CPU profiler. All twenty trials passed exact
+			range counts, source, durable-save and undo checks. The first pair adds
+			<code>4a14e3c</code> to the batch-only build; the second adds
+			<code>155bc33</code> to that TextIndex build. Pair medians must not be
+			added. Samples and build hashes are in the repository:
+			<code>experiments/performance/editor-codepoint-results.json</code> and
+			<code>editor-visibility-results.json</code>.
+		</p>
+		<p>
+			Both the 25.6 ms input task and 49.4 ms background maximum remain above
+			the 8.33 ms budget. Headless frame opportunities at roughly 60 Hz cannot
+			prove 120 Hz presentation. Schema validation, optimistic publication and
+			editor replacement still need work; these changes improve their costs
+			without establishing 120 fps.
+		</p>
 		<h2>Body edits remain incremental after metadata changes</h2>
 		<p>
 			Merged frontmatter can leave raw and canonical atom arrays with different
