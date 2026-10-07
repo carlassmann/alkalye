@@ -28,6 +28,7 @@ export function browser(session: string, ...args: string[]) {
 		let selector = target.result
 		if (typeof selector !== "string") throw new Error("Missing click selector")
 		args[1] = selector
+		browser(session, "wait", "--fn", clickTargetReady(selector))
 	}
 	let result = spawnSync(
 		"agent-browser",
@@ -49,6 +50,15 @@ export function browser(session: string, ...args: string[]) {
 	let parsed = object(JSON.parse(result.stdout))
 	if (!parsed.success) throw new Error(JSON.stringify(parsed))
 	return object(parsed.data)
+}
+export function clickTargetReady(selector: string) {
+	return `(() => {
+		let node = document.querySelector(${JSON.stringify(selector)});
+		if (!node?.checkVisibility()) return false;
+		let bounds = node.getBoundingClientRect();
+		let hit = document.elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+		return Boolean(hit && (hit === node || node.contains(hit)));
+	})()`
 }
 export function browserBatch(
 	session: string,
