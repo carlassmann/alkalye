@@ -1,3 +1,4 @@
+import { TextIndex } from "../../shared/text-index"
 import * as Effect from "effect/Effect"
 import * as Fiber from "effect/Fiber"
 import * as FiberSet from "effect/FiberSet"
@@ -19,6 +20,7 @@ import { codeLanguageCompletions } from "../../shared/completions"
 import { safeUrl } from "../../shared/markdown"
 import { iconPrefix } from "../../shared/projection"
 import { SourceTextarea } from "../source-textarea"
+import type { SourceReplacement } from "../source-textarea"
 import { EditorOverlay } from "./editor-overlay"
 import type {
 	Atom,
@@ -48,6 +50,7 @@ export interface EditorOptions {
 	change(
 		content: string,
 		base?: Atom[],
+		replacements?: SourceReplacement[],
 	): { atoms: Atom[]; content: string; operation: Operation | null } | undefined
 	undo(redo: boolean): void
 	select(): void
@@ -192,11 +195,15 @@ function createEditorView(
 	let people: Presence[] = []
 	let editable = options.editable
 	let atoms = options.atoms
+	let acceptedSource = options.content
+	let deferredUpdate:
+		{ content: string; atoms: Atom[]; editable: boolean } | undefined
 	let composing = false
 	let dragging = false
 	let releaseTab = false
 	let rawPaste = false
 	let lastTouch = 0
+	let anchorIndices = new Map<string, number>()
 	let contextMenu: { close(): void } | undefined
 	let completionIndex = 0
 	let completionItems: {
@@ -232,6 +239,7 @@ function createEditorView(
 					: "project",
 		caretTop,
 		painted: updateHighlight,
+		fullDocument: options.preferences.accessibleInput,
 	})
 	textarea.readOnly = !editable
 	textarea.oninput = () => {
@@ -239,7 +247,7 @@ function createEditorView(
 		let source = text.input()
 		updateHighlight()
 		if (composing) return
-		let edit = options.change(source, atoms)
+		let edit = options.change(source, atoms, text.takeReplacements())
 		if (edit) update(edit.content, edit.atoms, editable)
 		else text.sync()
 		if (options.preferences.autocomplete) showCompletions()
@@ -258,7 +266,7 @@ function createEditorView(
 		() => {
 			text.input()
 			let base = atoms
-			let edit = options.change(text.value, base)
+			let edit = options.change(text.value, base, text.takeReplacements())
 			composing = false
 			if (edit) {
 				let removed = new Set(edit.operation?.remove ?? [])
@@ -269,7 +277,13 @@ function createEditorView(
 				local.splice(index, 0, ...inserted)
 				atoms = local
 				update(edit.content, edit.atoms, editable)
-			} else text.sync()
+			} else {
+				let deferred = deferredUpdate
+				if (deferred)
+					update(deferred.content, deferred.atoms, deferred.editable)
+				else text.sync()
+			}
+			deferredUpdate = undefined
 		},
 		{ signal: listeners.signal },
 	)
@@ -308,7 +322,7 @@ function createEditorView(
 		options.select()
 	}
 	textarea.onscroll = () => {
-		highlight.scrollTop = textarea.scrollTop
+		highlight.scrollTop = 0
 		highlight.scrollLeft = textarea.scrollLeft
 		geometryDirty = true
 		schedulePaint()
@@ -395,6 +409,7 @@ function createEditorView(
 			contextMenu?.close()
 			cancelAnimationFrame(paintFrame)
 			lineActions.dispose()
+			text.dispose()
 			for (let node of [textarea, menu]) {
 				node.oninput = null
 				node.onselect = null
@@ -444,16 +459,16 @@ function createEditorView(
 	function selectRange(start: number, end = start) {
 		textarea.focus()
 		text.setSelectionRange(start, end)
-		highlight.scrollTop = textarea.scrollTop
+		highlight.scrollTop = 0
 		highlight.scrollLeft = textarea.scrollLeft
-		let from = point(textarea.selectionStart),
+		let from = point(text.toView(text.selectionStart)),
 			range = document.createRange()
 		range.setStart(from.node, from.offset)
 		range.collapse(true)
 		let bounds = range.getBoundingClientRect(),
-			view = textarea.getBoundingClientRect()
-		textarea.scrollTop += bounds.top - view.top - view.height / 3
-		highlight.scrollTop = textarea.scrollTop
+			view = wrapper.getBoundingClientRect()
+		text.viewport.scrollTop += bounds.top - view.top - view.height / 3
+		highlight.scrollTop = 0
 		paintActiveLine()
 	}
 	function paintActiveLine() {
@@ -463,7 +478,7 @@ function createEditorView(
 		}
 		activeLine.hidden = !options.preferences.highlightCurrentLine
 		if (activeLine.hidden) return
-		let from = point(textarea.selectionStart),
+		let from = point(text.toView(text.selectionStart)),
 			range = document.createRange()
 		range.setStart(from.node, from.offset)
 		range.collapse(true)
@@ -476,11 +491,13 @@ function createEditorView(
 		}
 		if (!bounds.height) return
 		let view = wrapper.getBoundingClientRect()
-		activeLine.style.top = `${bounds.top - view.top}px`
+		activeLine.style.top = `${bounds.top - view.top + text.viewport.scrollTop}px`
 		activeLine.style.height = `${bounds.height || parseFloat(getComputedStyle(textarea).lineHeight)}px`
 	}
 	function preferences(next: EditorPreferences) {
 		options.preferences = next
+		text.fullDocument(next.accessibleInput === true)
+		text.viewport.remeasure()
 		textarea.spellcheck = next.spellcheck
 		textarea.lang = next.spellcheckLanguage
 		wrapper.dataset.strikethrough = String(next.strikethroughDoneTasks)
@@ -494,7 +511,7 @@ function createEditorView(
 	}
 	function caretTop() {
 		if (!highlight.isConnected) return
-		let from = point(textarea.selectionStart),
+		let from = point(text.toView(text.selectionStart)),
 			range = document.createRange()
 		range.setStart(from.node, from.offset)
 		range.collapse(true)
@@ -600,7 +617,7 @@ function createEditorView(
 				if (!first) anchor.setAttribute("aria-hidden", "true")
 				else anchor.removeAttribute("aria-hidden")
 				first = false
-				let style = `left:${rectangle.left - bounds.left}px;top:${rectangle.top - bounds.top}px;width:${rectangle.width}px;height:${rectangle.height}px`
+				let style = `left:${rectangle.left - bounds.left}px;top:${rectangle.top - bounds.top + text.viewport.scrollTop}px;width:${rectangle.width}px;height:${rectangle.height}px`
 				if (anchor.dataset.editorStyle !== style) {
 					anchor.style.cssText = style
 					anchor.dataset.editorStyle = style
@@ -663,14 +680,15 @@ function createEditorView(
 					}
 					if (!next) return
 					event.preventDefault()
+					text.viewport.revealOffset(next.view.start)
 					let position = point(next.view.start),
 						range = document.createRange()
 					range.setStart(position.node, position.offset)
 					range.collapse(true)
 					let rectangle = range.getBoundingClientRect()
 					if (rectangle.top < bounds.top || rectangle.bottom > bounds.bottom) {
-						textarea.scrollTop += rectangle.top - bounds.top - 48
-						highlight.scrollTop = textarea.scrollTop
+						text.viewport.scrollTop += rectangle.top - bounds.top - 48
+						highlight.scrollTop = 0
 					}
 					paintLinks()
 					links
@@ -763,7 +781,7 @@ function createEditorView(
 					measurement.kind === "comment"
 						? "comment-highlight"
 						: "remote-selection"
-				mark.style.cssText = `left:${rectangle.left - bounds.left}px;top:${rectangle.top - bounds.top}px;width:${rectangle.width}px;height:${rectangle.height}px;--person:hsl(${hue} 65% 65%)`
+				mark.style.cssText = `left:${rectangle.left - bounds.left}px;top:${rectangle.top - bounds.top + text.viewport.scrollTop}px;width:${rectangle.width}px;height:${rectangle.height}px;--person:hsl(${hue} 65% 65%)`
 				fragment.append(mark)
 			}
 			let rectangle = measurement.caret
@@ -775,7 +793,7 @@ function createEditorView(
 				continue
 			let caret = document.createElement("span")
 			caret.className = "remote-caret"
-			caret.style.cssText = `left:${rectangle.left - bounds.left}px;top:${rectangle.top - bounds.top}px;height:${rectangle.height}px;--person:hsl(${hue} 65% 65%)`
+			caret.style.cssText = `left:${rectangle.left - bounds.left}px;top:${rectangle.top - bounds.top + text.viewport.scrollTop}px;height:${rectangle.height}px;--person:hsl(${hue} 65% 65%)`
 			let name = document.createElement("small")
 			name.textContent = measurement.name
 			caret.append(name)
@@ -787,39 +805,63 @@ function createEditorView(
 		editable = nextEditable
 		textarea.readOnly = !editable
 		if (composing) {
+			deferredUpdate = { content, atoms: nextAtoms, editable: nextEditable }
 			return
 		}
+		acceptedSource = content
 		if (text.value !== content) {
 			let start = anchor(text.selectionStart),
 				end = anchor(text.selectionEnd)
-			text.replace(
+			let nextIndex = new TextIndex(content)
+			text.reconcile(
 				content,
-				position(start, nextAtoms),
-				position(end, nextAtoms),
+				position(start, nextAtoms, nextIndex),
+				position(end, nextAtoms, nextIndex),
 			)
 		} else text.sync()
 		atoms = nextAtoms
+		anchorIndices.clear()
 		lineActions.update()
 		schedulePaint()
 	}
 	function anchor(offset: number) {
 		if (!offset) return ""
-		let index = atomPositions(atoms),
-			low = 0,
-			high = index.ends.length
-		while (low < high) {
-			let middle = (low + high) >>> 1
-			if ((index.ends[middle] ?? Infinity) < offset) low = middle + 1
-			else high = middle
+		let index: number
+		if (atoms.length === text.sourceIndex.codePoints) {
+			let ordinal = text.sourceIndex.codePointOffset(offset)
+			index = Math.min(Math.max(0, ordinal - 1), atoms.length - 1)
+		} else {
+			let ends = atomPositions(atoms).ends,
+				low = 0,
+				high = ends.length
+			while (low < high) {
+				let middle = (low + high) >>> 1
+				if ((ends[middle] ?? Infinity) < offset) low = middle + 1
+				else high = middle
+			}
+			index = Math.min(low, atoms.length - 1)
 		}
-		return atoms[Math.min(low, atoms.length - 1)]?.id ?? ""
+		let id = atoms[index]?.id ?? ""
+		anchorIndices.set(id, index)
+		return id
 	}
-	function position(id: string, nextAtoms: Atom[]) {
+	function position(id: string, nextAtoms: Atom[], nextIndex: TextIndex) {
 		if (!id) return 0
+		let previous = anchorIndices.get(id)
+		if (previous !== undefined && nextAtoms.length === nextIndex.codePoints) {
+			let distance = Math.abs(nextAtoms.length - atoms.length) + 16
+			for (
+				let index = Math.max(0, previous - distance);
+				index < Math.min(nextAtoms.length, previous + distance + 1);
+				index++
+			)
+				if (nextAtoms[index]?.id === id)
+					return nextIndex.offsetAtCodePoint(index + 1)
+		}
 		let next = atomPositions(nextAtoms)
 		let index = next.indices.get(id)
 		if (index !== undefined) return next.ends[index] ?? 0
-		let previous = atomPositions(atoms).indices.get(id) ?? -1
+		previous ??= atomPositions(atoms).indices.get(id) ?? -1
 		for (let index = previous - 1; index >= 0; index--) {
 			let old = atoms[index]
 			let found = old && next.indices.get(old.id)
@@ -837,6 +879,7 @@ function createEditorView(
 				options.documents(),
 				options.mediaIcon,
 				ranges,
+				text.viewport.viewport,
 			)
 		)
 			geometryDirty = true
@@ -1162,7 +1205,7 @@ function createEditorView(
 			range.setStart(highlight, 0)
 			range.setEnd(node, offset)
 			return text.toSource(
-				Math.min(textarea.value.length, range.toString().length),
+				text.viewport.viewport.start + range.toString().length,
 			)
 		} finally {
 			textarea.style.pointerEvents = textareaPointer
@@ -1234,7 +1277,7 @@ function createEditorView(
 		insert(replacement)
 	}
 	function inSync() {
-		return atoms.map(atom => atom.value).join("") === text.value
+		return acceptedSource === text.value
 	}
 	function anchorOffset(id: string) {
 		if (!id) return 0
@@ -1265,7 +1308,7 @@ function createEditorView(
 				showCompletions(true)
 				return !menu.hidden
 			}
-			let location = point(textarea.selectionStart),
+			let location = point(text.toView(text.selectionStart)),
 				range = document.createRange()
 			range.setStart(location.node, location.offset)
 			range.collapse(true)
@@ -2104,7 +2147,16 @@ function createEditorView(
 		source = pieces.join("")
 		secondarySelections = positions.filter(position => !position.primary)
 		let primary = positions.find(position => position.primary)
-		editor.replace(source, primary?.start ?? 0, primary?.end ?? 0)
+		editor.replace(
+			source,
+			primary?.start ?? 0,
+			primary?.end ?? 0,
+			edits.map(edit => ({
+				start: edit.start,
+				remove: edit.end - edit.start,
+				text: typed,
+			})),
+		)
 		editor.dispatchEvent(new Event("input"))
 	}
 	function applyLineEdit(command: string) {
@@ -2177,20 +2229,20 @@ function createEditorView(
 		text.setSelectionRange(primary.start, primary.end, primary.direction)
 		selectionsChanged()
 		let head =
-			textarea.selectionDirection === "backward"
-				? textarea.selectionStart
-				: textarea.selectionEnd
+			text.selectionDirection === "backward"
+				? text.toView(text.selectionStart)
+				: text.toView(text.selectionEnd)
 		let location = point(head),
 			range = document.createRange()
 		range.setStart(location.node, location.offset)
 		range.collapse(true)
 		let bounds = range.getBoundingClientRect(),
-			viewport = textarea.getBoundingClientRect()
+			viewport = wrapper.getBoundingClientRect()
 		if (bounds.top < viewport.top)
-			textarea.scrollTop += bounds.top - viewport.top
+			text.viewport.scrollTop += bounds.top - viewport.top
 		else if (bounds.bottom > viewport.bottom)
-			textarea.scrollTop += bounds.bottom - viewport.bottom
-		highlight.scrollTop = textarea.scrollTop
+			text.viewport.scrollTop += bounds.bottom - viewport.bottom
+		highlight.scrollTop = 0
 	}
 	function mergeSelections(
 		selections: ReturnType<typeof selectedRanges>,

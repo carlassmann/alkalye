@@ -237,31 +237,25 @@ export function applyViewEdit(
 	let prefix = 0
 	let prefixLimit = Math.min(previous.length, next.length) - suffix
 	while (prefix < prefixLimit && previous[prefix] === next[prefix]) prefix++
-	let viewEnd = previous.length - suffix
-	let start = toSource(projection, prefix, "start"),
-		end = Math.max(start, toSource(projection, viewEnd, "end"))
-	for (let link of projection.links) {
-		if (!link.iconSpace) continue
-		if (
-			viewEnd === prefix &&
-			prefix > link.view.start &&
-			prefix < link.view.start + iconPrefix.length
-		)
-			start = end = link.source.start
-		else if (
-			viewEnd > prefix &&
-			prefix < link.view.start + iconPrefix.length &&
-			viewEnd > link.view.start
-		) {
-			start = Math.min(start, link.source.start)
-			end = Math.max(end, link.source.end)
-		}
-	}
-	let inserted = next.slice(prefix, next.length - suffix)
+	return applyViewReplacement(
+		projection,
+		prefix,
+		previous.length - suffix,
+		next.slice(prefix, next.length - suffix),
+	)
+}
+
+export function applyViewReplacement(
+	projection: Projection,
+	prefix: number,
+	viewEnd: number,
+	inserted: string,
+): Projection {
+	let { start, end } = sourceRange(projection, prefix, viewEnd)
 	let source =
 		projection.source.slice(0, start) + inserted + projection.source.slice(end)
 	let sourceShift = inserted.length - (end - start),
-		viewShift = next.length - previous.length
+		viewShift = inserted.length - (viewEnd - prefix)
 	let links: ProjectedLink[] = []
 	for (let link of projection.links) {
 		if (link.source.end <= start && link.view.end <= prefix) links.push(link)
@@ -281,7 +275,41 @@ export function applyViewEdit(
 			links.push(moved(link, sourceShift, viewShift, part))
 		}
 	}
-	return { source, text: next, links }
+	return {
+		source,
+		text:
+			projection.text.slice(0, prefix) +
+			inserted +
+			projection.text.slice(viewEnd),
+		links,
+	}
+}
+
+export function sourceRange(
+	projection: Projection,
+	viewStart: number,
+	viewEnd: number,
+) {
+	let start = toSource(projection, viewStart, "start"),
+		end = Math.max(start, toSource(projection, viewEnd, "end"))
+	for (let link of projection.links) {
+		if (!link.iconSpace) continue
+		if (
+			viewEnd === viewStart &&
+			viewStart > link.view.start &&
+			viewStart < link.view.start + iconPrefix.length
+		)
+			start = end = link.source.start
+		else if (
+			viewEnd > viewStart &&
+			viewStart < link.view.start + iconPrefix.length &&
+			viewEnd > link.view.start
+		) {
+			start = Math.min(start, link.source.start)
+			end = Math.max(end, link.source.end)
+		}
+	}
+	return { start, end }
 }
 
 export function sameProjection(left: Projection, right: Projection) {
@@ -363,6 +391,7 @@ function lineTokens(
 	documents: readonly DocumentLink[],
 ) {
 	let tokens: LinkToken[] = []
+	if (!line.includes("[")) return tokens
 	let index = 0
 	while (index < line.length) {
 		let character = line[index]

@@ -284,8 +284,10 @@ let test = Effect.scoped(
 					throw error
 				},
 				comments: () => [],
-				change(content, base) {
-					let edit = session.edit(content, base)
+				change(content, base, replacements) {
+					let edit = replacements
+						? session.replace(replacements, base)
+						: session.edit(content, base)
 					fork(edit.saved)
 					view.update(session.replica.text(options.document), edit.atoms, true)
 					return edit
@@ -298,9 +300,11 @@ let test = Effect.scoped(
 				find() {},
 			})
 			online = false
-			let editor = host.querySelector("textarea")
-			if (!(editor instanceof HTMLTextAreaElement))
+			let input = host.querySelector("textarea")
+			if (!(input instanceof HTMLTextAreaElement))
 				return yield* Effect.die("Editor missing")
+			let editor = view.source
+			if (!editor) return yield* Effect.die("Editor source missing")
 			editor.value += "\nOffline editor change"
 			editor.dispatchEvent(new Event("input", { bubbles: true }))
 			yield* FiberSet.awaitEmpty(writes)

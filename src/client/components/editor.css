@@ -1,3 +1,4 @@
+@import "./editor-viewport.css";
 [data-editor].editor-wrap {
 	--editor-caret: oklch(59.6% 0.145 163.225);
 	--editor-selection: 10%;
@@ -303,4 +304,17 @@
 [data-editor] [data-editor-line] {
 	display: block;
 	contain: layout style paint;
+}
+
+[data-editor-viewport] #highlight {
+	line-height: var(--editor-native-line-height);
+	position: absolute;
+	inset: 0 0 auto;
+	height: auto;
+	padding-block: 0;
+	overflow: visible;
+}
+[data-editor-viewport] #editor,
+[data-editor-viewport] #highlight {
+	unicode-bidi: plaintext;
 }

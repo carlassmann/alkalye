@@ -37,6 +37,20 @@ try {
 	browser(session, "open", url)
 	wait(session, `Boolean(${native})`)
 	browser(session, "click", '[data-action="new"]')
+	browser(session, "fill", "#editor", "# Pointer cancellation")
+	evaluate(
+		session,
+		`(() => { let input = ${native}; input.dispatchEvent(new PointerEvent("pointerdown", {pointerId:1,pointerType:"mouse",bubbles:true})); input.dispatchEvent(new PointerEvent("pointercancel", {pointerId:1,pointerType:"mouse",bubbles:true})); ${editor}.setSelectionRange(${editor}.value.length,${editor}.value.length); input.focus(); return true })()`,
+	)
+	browser(session, "keyboard", "inserttext", " resumes painting")
+	wait(
+		session,
+		`${editor}.value === "# Pointer cancellation resumes painting" && document.querySelector("#highlight").textContent === ${native}.value + "\\n" && document.querySelector("#save-status").getAttribute("aria-busy") === "false"`,
+	)
+	assert(
+		true,
+		"Cancelled pointer drags resume native editing and syntax painting",
+	)
 	browser(session, "fill", "#editor", source)
 	wait(session, `${editor}.value === ${JSON.stringify(source)}`)
 	wait(session, `${native}.value === ${JSON.stringify(projected)}`)
@@ -526,17 +540,13 @@ try {
 		session,
 		`${editor}.value.endsWith("Last paragraph.") && document.querySelector("#save-status").getAttribute("aria-busy") === "false"`,
 	)
-	assert(
-		evaluate(
-			session,
-			`${native}.scrollHeight === document.querySelector("#highlight").scrollHeight && document.querySelector("#highlight").textContent === ${native}.value + "\\n"`,
-		),
-		"Large wrapped documents keep projected text and scrolling aligned",
+	assertViewportGeometry(
+		"Large wrapped documents keep native input and visible syntax aligned",
 	)
 	browser(session, "reload")
 	wait(
 		session,
-		`${editor}.value === ${JSON.stringify(large + "Last paragraph.")}`,
+		`${editor}.value === ${JSON.stringify(large + "Last paragraph.")} && !${native}.readOnly`,
 	)
 	selectSource(large.indexOf("Paragraph"))
 	browser(session, "keyboard", "inserttext", "Introduction.\n\n")
@@ -544,17 +554,13 @@ try {
 		session,
 		`${editor}.value.includes("Introduction.\\n\\nParagraph") && document.querySelector("#save-status").getAttribute("aria-busy") === "false"`,
 	)
-	assert(
-		evaluate(
-			session,
-			`document.querySelector("#highlight").textContent === ${native}.value + "\\n" && ${native}.scrollHeight === document.querySelector("#highlight").scrollHeight`,
-		),
-		"Inserting lines before thousands of links preserves their offsets and wrapping",
+	assertViewportGeometry(
+		"Inserting lines before thousands of links preserves visible offsets and wrapping",
 	)
 	selectSource(0)
 	evaluate(
 		session,
-		`(() => { ${native}.scrollTop = 0; ${native}.dispatchEvent(new Event("scroll")); return true })()`,
+		`(() => { ${native}.parentElement.scrollTop = 0; ${native}.parentElement.dispatchEvent(new Event("scroll")); return true })()`,
 	)
 	wait(
 		session,
@@ -562,7 +568,7 @@ try {
 	)
 	let focusedLink = evaluate(
 		session,
-		`(() => { let anchor = document.querySelector('[data-editor-links] a[data-kind="link"]'); anchor.focus(); let source = anchor.dataset.editorLink; ${native}.scrollTop = ${native}.scrollHeight; ${native}.dispatchEvent(new Event("scroll")); return source })()`,
+		`(() => { let anchor = document.querySelector('[data-editor-links] a[data-kind="link"]'); anchor.focus(); let source = anchor.dataset.editorLink; ${native}.parentElement.scrollTop = ${native}.parentElement.scrollHeight; ${native}.parentElement.dispatchEvent(new Event("scroll")); return source })()`,
 	)
 	wait(
 		session,
@@ -586,10 +592,55 @@ try {
 	}
 }
 
+function assertViewportGeometry(label: string) {
+	let geometry = `(() => {
+		let input = ${native}, overlay = document.querySelector("#highlight"), outer = input.parentElement
+		let prefix = /^[\\u200e\\u200f]/.test(input.value) ? 1 : 0
+		window.viewportGeometryFailure = undefined
+		if (overlay.textContent !== input.value.slice(prefix) + "\\n" || input.scrollTop !== 0 || input.value.length >= ${editor}.value.length || outer.scrollHeight <= outer.clientHeight) { window.viewportGeometryFailure = {textMatches:overlay.textContent === input.value.slice(prefix)+"\\n",nativeScroll:input.scrollTop,nativeLength:input.value.length,sourceLength:${editor}.value.length,outerHeight:outer.scrollHeight,outerClient:outer.clientHeight}; return false }
+		let mirror = document.createElement("pre"), style = getComputedStyle(input), bounds = input.getBoundingClientRect()
+		for (let property of ["font-family", "font-size", "font-weight", "font-style", "line-height", "letter-spacing", "tab-size", "white-space", "overflow-wrap", "word-break", "unicode-bidi", "direction", "text-align", "padding-top", "padding-right", "padding-bottom", "padding-left", "border-top-width", "border-right-width", "border-bottom-width", "border-left-width", "box-sizing"]) mirror.style.setProperty(property, style.getPropertyValue(property))
+		Object.assign(mirror.style, {position:"fixed", left:bounds.left+"px", top:bounds.top+"px", width:bounds.width+"px", margin:"0", visibility:"hidden", pointerEvents:"none"})
+		mirror.textContent = input.value + "\\u200b"
+		document.body.append(mirror)
+		try {
+			let walker = document.createTreeWalker(overlay, NodeFilter.SHOW_TEXT), nodes = [], offset = 0, node
+			while (node = walker.nextNode()) { nodes.push({node,start:offset,end:offset+node.textContent.length}); offset += node.textContent.length }
+			let checked = 0, rows = new Map(), host = outer.getBoundingClientRect()
+			for (let entry of nodes) for (let local = 0; local < entry.node.textContent.length; local++) {
+				let character = entry.node.textContent[local]
+				if (!/[A-Za-z]/.test(character)) continue
+				let actual = document.createRange()
+				actual.setStart(entry.node, local); actual.setEnd(entry.node, local + 1)
+				let rect = actual.getBoundingClientRect()
+				if (rect.top < host.top || rect.bottom > host.bottom || rect.width === 0) continue
+				let row = Math.round(rect.top), samples = rows.get(row) ?? 0
+				if (samples >= 3) continue
+				rows.set(row, samples + 1)
+				let expected = document.createRange(), position = prefix + entry.start + local
+				expected.setStart(mirror.firstChild, position); expected.setEnd(mirror.firstChild, position + 1)
+				let nativeRect = expected.getBoundingClientRect()
+				if (Math.abs(rect.left-nativeRect.left)>1 || Math.abs(rect.top-nativeRect.top)>1) {window.viewportGeometryFailure={position,character,overlayX:rect.left,overlayY:rect.top,nativeX:nativeRect.left,nativeY:nativeRect.top,inputFont:style.font,inputLine:style.lineHeight,overlayFont:getComputedStyle(overlay).font,overlayLine:getComputedStyle(overlay).lineHeight,inputBounds:{top:bounds.top,width:bounds.width},overlayBounds:{top:overlay.getBoundingClientRect().top,width:overlay.getBoundingClientRect().width},lines:[...overlay.children].slice(0,5).map(line=>({height:line.getBoundingClientRect().height,font:getComputedStyle(line).font,lineHeight:getComputedStyle(line).lineHeight}))}; return false}
+				checked++
+				if (checked === 32) return true
+			}
+			window.viewportGeometryFailure = {checked,rows:rows.size}
+			return checked >= 3 && rows.size >= 2
+		} finally {mirror.remove()}
+	})()`
+	try {
+		wait(session, geometry)
+	} catch (error) {
+		console.error(evaluate(session, "window.viewportGeometryFailure"))
+		throw error
+	}
+	assert(evaluate(session, geometry), label)
+}
+
 function selectSource(offset: number) {
 	evaluate(
 		session,
-		`(() => { ${native}.focus(); ${editor}.setSelectionRange(${offset}, ${offset}); return true })()`,
+		`(() => { if (${native}.readOnly) throw new Error("Document session is not ready for editing"); ${native}.focus(); ${editor}.setSelectionRange(${offset}, ${offset}); return true })()`,
 	)
 }
 function undoUntil(expected: string) {

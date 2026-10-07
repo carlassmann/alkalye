@@ -1847,12 +1847,14 @@ function mountApplication() {
 						)
 					},
 					report,
-					change: (content, base) => {
+					change: (content, base, replacements) => {
 						if (!writable() || selection !== selected) {
 							refreshDocument()
 							return
 						}
-						let edit = selected.opened.session.edit(content, base)
+						let edit = replacements
+							? selected.opened.session.replace(replacements, base)
+							: selected.opened.session.edit(content, base)
 						launch(edit.saved)
 						requestRefresh(true)
 						return edit

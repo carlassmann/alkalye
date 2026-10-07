@@ -116,6 +116,10 @@ let display: { key: keyof EditorPreferences; label: Markup }[] = [
 	{ key: "spellcheck", label: html`${translate("Spellcheck")}` },
 ]
 let authoring: { key: keyof EditorPreferences; label: string }[] = [
+	{
+		key: "accessibleInput",
+		label: "Full document input for assistive technology",
+	},
 	{ key: "smartPairs", label: "Smart bracket and quote pairs" },
 	{ key: "markerWrapping", label: "Wrap selections in Markdown markers" },
 	{ key: "tabIndent", label: "Use Tab to indent Markdown blocks" },

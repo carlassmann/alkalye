@@ -3,6 +3,7 @@ import * as Schema from "effect/Schema"
 import * as Struct from "effect/Struct"
 
 export let EditorPreferencesSchema = Schema.Struct({
+	accessibleInput: Schema.optionalKey(Schema.Boolean),
 	lineWidth: Schema.Finite.check(
 		Schema.isBetween({ minimum: 40, maximum: 120 }),
 	),
@@ -94,6 +95,7 @@ export function editorPreferences(value: unknown): EditorPreferences {
 	let source = object(value ?? {})
 	let height = Number(source.lineHeight)
 	return {
+		accessibleInput: source.accessibleInput === true,
 		lineWidth: bounded(source.lineWidth, 65, 40, 120),
 		letterSpacing: bounded(source.letterSpacing, 0, -0.1, 0.1),
 		strikethroughDoneTasks: source.strikethroughDoneTasks === true,

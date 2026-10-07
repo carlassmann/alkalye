@@ -25,6 +25,9 @@ export class EditorOverlay {
 	private host: HTMLElement
 	private lines: Line[] = []
 	private source = ""
+	private windowStart = 0
+	private windowEnd = 0
+	private direction: "ltr" | "rtl" | undefined
 	private documents = ""
 	private marks = ""
 	private media = ""
@@ -39,8 +42,22 @@ export class EditorOverlay {
 		documents: readonly DocumentLink[],
 		mediaIcon: ((url: string) => IconName) | undefined,
 		selections: readonly Selection[],
+		window: {
+			start: number
+			end: number
+			top: number
+			direction?: "ltr" | "rtl"
+		},
 	) {
-		let source = projection.text
+		let source = projection.text.slice(window.start, window.end)
+		let windowMoved =
+			this.windowStart !== window.start ||
+			this.windowEnd !== window.end ||
+			this.direction !== window.direction
+		this.windowStart = window.start
+		this.windowEnd = window.end
+		this.direction = window.direction
+		this.host.style.transform = `translateY(${window.top}px)`
 		let documentsKey = documents.map(doc => doc.id + ":" + doc.title).join("\n")
 		let marks = JSON.stringify(selections)
 		let mediaNames = new Map(
@@ -53,7 +70,8 @@ export class EditorOverlay {
 			this.projection === projection &&
 			this.documents === documentsKey &&
 			this.marks === marks &&
-			this.media === media
+			this.media === media &&
+			!windowMoved
 		)
 			return false
 		this.projection = projection
@@ -78,11 +96,15 @@ export class EditorOverlay {
 		)
 			suffix++
 		let before = this.lines
-		let offset = 0,
+		let offset = window.start,
 			linkIndex = 0,
 			selectionIndex = 0,
 			fence = ""
-		let headerEnd = frontmatterBlock(source)?.[0].length ?? 0
+		let headerEnd = frontmatterBlock(projection.text)?.[0].length ?? 0
+		let context = projection.text.slice(headerEnd, window.start)
+		if (context.includes("```") || context.includes("~~~"))
+			for (let match of context.matchAll(/^.*$/gm))
+				fence = nextFence(fence, match[0])
 		let changed = false
 		let lines: Line[] = []
 		let used = new Set<Line>()
@@ -101,6 +123,14 @@ export class EditorOverlay {
 			let start = offset
 			offset += text.length + 1
 			line.text = text
+			let direction = index === 0 ? window.direction : undefined
+			if (direction) {
+				line.node.dir = direction
+				line.node.style.unicodeBidi = "isolate"
+			} else {
+				line.node.removeAttribute("dir")
+				line.node.style.removeProperty("unicode-bidi")
+			}
 			line.start = start
 			line.end = offset
 			let previousFence = fence
