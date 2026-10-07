@@ -29,6 +29,10 @@ import type {
 	Presence,
 } from "../../shared/model"
 import type { EditorPreferences } from "../../shared/preferences"
+interface SearchResults {
+	source: string
+	matches: { start: number; end: number }[]
+}
 let lastCodeLanguage = ""
 
 export interface EditorOptions {
@@ -131,8 +135,8 @@ export class EditorElement extends HTMLElement {
 	preferences(preferences: EditorPreferences) {
 		this.view?.preferences(preferences)
 	}
-	search(pattern: RegExp | undefined) {
-		this.view?.search(pattern)
+	search(pattern: RegExp | undefined, results?: SearchResults) {
+		this.view?.search(pattern, results)
 	}
 	selectRange(start: number, end = start) {
 		this.view?.selectRange(start, end)
@@ -435,7 +439,13 @@ function createEditorView(
 		presence,
 		preferences,
 		selectRange,
-		search(pattern: RegExp | undefined) {
+		search(pattern: RegExp | undefined, results?: SearchResults) {
+			if (results && results.source === text.value) {
+				searchPattern = pattern
+				searchSource = results.source
+				searchMatches = results.matches
+				return schedulePaint()
+			}
 			if (
 				searchPattern?.source === pattern?.source &&
 				searchPattern?.flags === pattern?.flags

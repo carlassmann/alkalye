@@ -292,7 +292,6 @@ export class EditorViewport {
 			direction,
 		}
 		this.reveal(direction === "backward" ? start : end)
-		this.paint()
 	}
 	render(source: string, selection?: ViewportSelection) {
 		this.revision++
@@ -604,11 +603,13 @@ export class EditorViewport {
 			measured: false,
 		}
 	}
-	private refine(index: number) {
+	private refine(index: number, updateScroll = true) {
 		let previous = this.blocks[index]
 		if (!previous || previous.measured) return
-		let anchor = this.offsetAtHeight(this.scrollElement.scrollTop)
-		let before = this.topAt(anchor)
+		let anchor = updateScroll
+			? this.offsetAtHeight(this.scrollElement.scrollTop)
+			: 0
+		let before = updateScroll ? this.topAt(anchor) : 0
 		let measured = this.measuredBlock(
 			previous.start,
 			previous.top,
@@ -627,9 +628,11 @@ export class EditorViewport {
 			block.top = top
 			top += block.height
 		}
-		this.spacer.style.height = top + this.paddingBottom + "px"
-		let movement = this.topAt(anchor) - before
-		if (movement) this.scrollElement.scrollTop += movement
+		if (updateScroll) {
+			this.spacer.style.height = top + this.paddingBottom + "px"
+			let movement = this.topAt(anchor) - before
+			if (movement) this.scrollElement.scrollTop += movement
+		}
 	}
 	private idle() {
 		if (this.idleFrame || this.abort.signal.aborted || this.completeDocument())
@@ -761,7 +764,7 @@ export class EditorViewport {
 			this.pointerDocument ||
 			this.navigationDocument ||
 			this.selectionDocument ||
-			this.text.length <= 32768
+			this.text.length <= 8192
 		)
 	}
 	private paint() {
@@ -774,19 +777,33 @@ export class EditorViewport {
 		)
 			this.selectionDocument = true
 		let full = this.completeDocument()
-		let first = full
-			? 0
-			: Math.max(0, this.blockAtHeight(this.scrollElement.scrollTop) - 1)
+		let scrollTop = this.scrollElement.scrollTop
+		let viewportHeight = this.scrollElement.clientHeight
+		let first = full ? 0 : Math.max(0, this.blockAtHeight(scrollTop) - 1)
 		let last = full
 			? this.blocks.length - 1
 			: Math.min(
 					this.blocks.length - 1,
-					this.blockAtHeight(
-						this.scrollElement.scrollTop + this.scrollElement.clientHeight,
-					) + 1,
+					this.blockAtHeight(scrollTop + viewportHeight) + 1,
 				)
-		if (!full)
-			for (let index = first; index <= last; index++) this.refine(index)
+		if (!full) {
+			let anchor = this.offsetAtHeight(scrollTop)
+			let before = this.topAt(anchor)
+			let refined = false
+			for (let index = first; index <= last; index++) {
+				if (this.blocks[index]?.measured) continue
+				this.refine(index, false)
+				refined = true
+			}
+			if (refined) {
+				let final = this.blocks.at(-1)
+				if (final)
+					this.spacer.style.height =
+						final.top + final.height + this.paddingBottom + "px"
+				let movement = this.topAt(anchor) - before
+				if (movement) this.scrollElement.scrollTop = scrollTop + movement
+			}
+		}
 		let beginning = this.blocks[first],
 			ending = this.blocks[last]
 		if (!beginning || !ending) return
@@ -999,7 +1016,7 @@ export class EditorViewport {
 		if (
 			["ArrowLeft", "ArrowRight"].includes(event.key) &&
 			(focus <= this.window.start || focus >= this.window.end) &&
-			this.text.length > 32768 &&
+			this.text.length > 8192 &&
 			!this.accessibleDocument
 		) {
 			this.navigationDocument = true

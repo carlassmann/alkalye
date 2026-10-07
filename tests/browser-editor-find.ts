@@ -59,6 +59,30 @@ try {
 	browser(session, "uncheck", "#find-regex")
 	browser(session, "fill", "#find-text", "needle")
 	wait(session, 'document.querySelectorAll(".search-match").length === 3')
+	fill("needle changed needle")
+	wait(
+		session,
+		'document.querySelector(".find-count").textContent.endsWith("of 2") && document.querySelectorAll(".search-match").length === 2',
+	)
+	browser(session, "click", "#find-next")
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.selectionStart === 0',
+	)
+	browser(session, "click", "#find-next")
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.selectionStart === 15',
+	)
+	browser(session, "click", "#find-next")
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.selectionStart === 0',
+	)
+	assert(
+		true,
+		"Editing invalidates cached matches; repeated navigation wraps through the new source",
+	)
 	browser(session, "click", "#close-find")
 	wait(session, 'document.querySelectorAll(".search-match").length === 0')
 	assert(

@@ -49,6 +49,10 @@ export class FindElement extends HTMLElement {
 	private query = ""
 	private selectionScope: { start: number; end: number } | undefined
 	private scopeSource = ""
+	private matchedSource = ""
+	private matchedPattern = ""
+	private matchedValues: RegExpExecArray[] = []
+	private matchedRanges: { start: number; end: number }[] = []
 	private replacedRange: { start: number; end: number } | undefined
 	private lifetime: Fiber.Fiber<void, never> | undefined
 	configure(host: EditorElement, close: () => void, query = "") {
@@ -285,7 +289,7 @@ export class FindElement extends HTMLElement {
 		if (!pattern) return
 		if (action === "next" || action === "previous") {
 			this.replacedRange = undefined
-			let matches = [...editor.value.matchAll(pattern)]
+			let matches = this.findMatches(pattern)
 			let match =
 				action === "next"
 					? (matches.find(
@@ -456,8 +460,11 @@ export class FindElement extends HTMLElement {
 		}
 		this.trackScope()
 		let pattern = this.expression(false)
-		this.host?.search(pattern)
-		let matches = pattern ? [...this.editor.value.matchAll(pattern)] : []
+		let matches = pattern ? this.findMatches(pattern) : []
+		this.host?.search(pattern, {
+			source: this.editor.value,
+			matches: pattern ? this.matchedRanges : [],
+		})
 		let current = matches.findIndex(
 			match => match.index === this.editor?.selectionStart,
 		)
@@ -471,6 +478,22 @@ export class FindElement extends HTMLElement {
 		))
 			button.disabled = matches.length === 0
 		count.toggleAttribute("data-empty", Boolean(pattern && !matches.length))
+	}
+	private findMatches(pattern: RegExp) {
+		let source = this.editor?.value ?? ""
+		let key = pattern.source + "/" + pattern.flags
+		if (source !== this.matchedSource || key !== this.matchedPattern) {
+			this.matchedSource = source
+			this.matchedPattern = key
+			this.matchedValues = [...source.matchAll(pattern)]
+			this.matchedRanges = this.matchedValues
+				.filter(match => match[0].length > 0)
+				.map(match => ({
+					start: match.index,
+					end: match.index + match[0].length,
+				}))
+		}
+		return this.matchedValues
 	}
 	private captureSelection() {
 		let editor = this.editor
