@@ -43,7 +43,7 @@ import {
 import type { UndoEntry } from "./document-undo"
 import { partitionDocumentActions } from "./document-dependencies"
 import { validateTextCausality } from "./document-causality"
-import { compactCheckpoint } from "./checkpoint"
+import { compactCheckpoint, compactCheckpointEffect } from "./checkpoint"
 import { Replica } from "./crdt"
 import type { TextReplacement } from "./crdt"
 import {
@@ -114,7 +114,7 @@ export interface PassiveDocumentState {
 	generation?: number
 }
 export interface DocumentSessionOptions {
-	cooperativeLoading?: boolean
+	cooperativeWork?: boolean
 	passiveState?: {
 		read: Effect.Effect<PassiveDocumentState | undefined>
 		write(state: PassiveDocumentState): Effect.Effect<void>
@@ -874,21 +874,21 @@ function makeProjection(options: DocumentSessionOptions) {
 				value,
 				actor,
 				options.author,
-				options.cooperativeLoading === true,
+				options.cooperativeWork === true,
 			)
 		}
 		function forkDocument(
 			source: Replica,
 			actor: string,
 		): Effect.Effect<Replica, Error> {
-			return options.cooperativeLoading
+			return options.cooperativeWork
 				? source.forkEffect(actor, options.author)
 				: Effect.try(() => source.fork(actor, options.author))
 		}
 		function materializeDocument(
 			source: Replica,
 		): Effect.Effect<string, Error> {
-			return options.cooperativeLoading
+			return options.cooperativeWork
 				? source.textEffect(options.document)
 				: Effect.try(() => source.text(options.document))
 		}
@@ -1074,7 +1074,7 @@ function makeProjection(options: DocumentSessionOptions) {
 							let restored = yield* restoreSnapshot(
 								value.snapshot,
 								actor,
-								options.cooperativeLoading,
+								options.cooperativeWork,
 							)
 							yield* materializeDocument(restored).pipe(
 								Effect.mapError(cause =>
@@ -1348,14 +1348,19 @@ function makeProjection(options: DocumentSessionOptions) {
 				remotePosition,
 				record: durable.documents("").find(doc => doc.id === options.document),
 			})),
-			captureSnapshot: Effect.sync(() => {
+			captureSnapshot: Effect.gen(function* () {
 				if (
 					!projectionComplete ||
 					!localPosition ||
 					localPosition === cachedPosition
 				)
 					return
-				let checkpoint = accepted.checkpoint()
+				let checkpoint = options.cooperativeWork
+					? yield* accepted.checkpointEffect()
+					: accepted.checkpoint()
+				let compact = options.cooperativeWork
+					? yield* compactCheckpointEffect(checkpoint)
+					: compactCheckpoint(checkpoint)
 				return {
 					position: localPosition,
 					replica: options.passiveState ? accepted : undefined,
@@ -1364,7 +1369,7 @@ function makeProjection(options: DocumentSessionOptions) {
 						format: "document-local-state-v3",
 						document: options.document,
 						subject: options.subject,
-						checkpoint: compactCheckpoint(checkpoint),
+						checkpoint: compact,
 						log,
 						remotePosition,
 						proposals: [...proposals].map(([id, value]) => [
@@ -1644,7 +1649,7 @@ function makeProjection(options: DocumentSessionOptions) {
 						yield* restoreSnapshot(
 							value.snapshot,
 							actor,
-							options.cooperativeLoading,
+							options.cooperativeWork,
 						)
 					return
 				}

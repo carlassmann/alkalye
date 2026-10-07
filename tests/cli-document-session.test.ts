@@ -21,9 +21,14 @@ import { changeMetadata } from "../src/shared/document-metadata"
 import { Identity, personalWorkspaceRequest } from "../src/shared/workspace"
 import { WorkspaceStore } from "../src/server/document-store"
 
-test.each([false, true])(
-	"the browser document engine creates, edits, undoes and reopens offline in Bun, then publishes identical whole-document facts (passive cache: %s)",
-	async cached => {
+test.each([
+	{ cached: false, cooperative: false },
+	{ cached: true, cooperative: false },
+	{ cached: false, cooperative: true },
+	{ cached: true, cooperative: true },
+])(
+	"the browser document engine creates, edits, undoes and reopens offline in Bun, then publishes identical whole-document facts (%j)",
+	async ({ cached, cooperative }) => {
 		let directory = await mkdtemp(join(tmpdir(), "alkalye-cli-document-"))
 		let offline = true
 		let requests = 0
@@ -142,6 +147,7 @@ test.each([false, true])(
 										cliDocumentSessionLayer(directory, {
 											document: "doc",
 											passiveState: cached ? passiveState("doc") : undefined,
+											cooperativeWork: cooperative,
 											subject,
 											transport,
 											initialCreation: initial ? initialCreation : undefined,

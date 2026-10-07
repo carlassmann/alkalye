@@ -17,7 +17,7 @@ export type {
 } from "../shared/document-session"
 
 export function browserDocumentSessionLayer(options: DocumentSessionOptions) {
-	return DocumentSession.layer({ ...options, cooperativeLoading: true }).pipe(
+	return DocumentSession.layer({ ...options, cooperativeWork: true }).pipe(
 		Layer.provide(indexedDbJournalLayer(documentDatabaseName(options))),
 		Layer.provide(browserDocumentLifecycle),
 		Layer.provide(browserSchedulerLayer),
