@@ -116,3 +116,15 @@ bun experiments/performance/switch.ts /tmp/alkalye-benchmark/rewrite-config.json
 ```
 
 The rewrite-only configuration needs the 2, 32 and 128 KiB routes. Nine selections per large document include one initial cold selection and eight warm revisits.
+
+## Post-cutover comparison, 7 October 2026
+
+`public/docs/performance-rebench.html` and its JSON companion record the frozen `be48f8b` rewrite against main `a749728`, including every sample and unsuccessful harness attempt. The later email authentication and CLI changes are outside this comparison.
+
+`compare.ts` now interleaves version batches by fixture size, discards one extra reload warmup and records descriptive percentiles. `journeys.ts` reproduces find, preview and document switching. `peer.ts` reproduces passive peer updates and reconnect; add `peerSession` to each configuration entry after connecting a second disposable browser account to the document. Its offline gate observes absence of the unique marker for 750 ms before restoring the network. This observation is a negative assertion, excluded from reconnect latency.
+
+For synchronous input spans, capture `performance.now()` at document `beforeinput` in capture phase and finish at document `input` bubbling. This omits deferred work. The extra run records 24 single-character middle edits per version, separately from the runner's 12 chunk insertions. Programmatic scrolling advances the editor's scroll owner in `requestAnimationFrame` for 1.5 seconds and records frame intervals; the measured headless cadence was 60 Hz.
+
+The multicursor stress starts from the 128 KiB fixture, selects every `responsiveness` occurrence, then times trusted insertion of `MULTIX` until all replacement counts are verified and a later frame occurs. Selection setup is outside timing. Main uses CodeMirror's public `EditorSelection.create` / `range` API because the initial macOS shortcut attempt selected incorrectly; the rewrite uses its select-all-occurrences shortcut. Restore the complete saved fixture between three repetitions. The counts and this setup difference are retained in the report.
+
+The 1 MiB long-paragraph setup was aborted; it provides no valid load or input comparison. Do not substitute isolated renderer or module timings for a complete app journey.

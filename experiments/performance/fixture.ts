@@ -18,9 +18,9 @@ export function performanceFixture(
 
 if (import.meta.main) {
 	let kilobytes = Number(process.argv[2])
-	if (![2, 32, 128].includes(kilobytes))
+	if (![2, 32, 128, 1024].includes(kilobytes))
 		throw Error(
-			"Usage: bun experiments/performance/fixture.ts 2|32|128 [rich|prose|code|long-line]",
+			"Usage: bun experiments/performance/fixture.ts 2|32|128|1024 [rich|prose|code|long-line]",
 		)
 	let shape = process.argv[3] ?? "rich"
 	if (

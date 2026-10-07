@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+	<meta charset="utf-8" /><meta
+		name="viewport"
+		content="width=device-width,initial-scale=1"
+	/><title>Alkalye performance comparison — 7 October 2026</title>
+	<style>
+		:root {
+			color-scheme: light dark;
+			font-family: system-ui;
+			background: light-dark(#fafafa, #111);
+			color: light-dark(#171717, #eee);
+		}
+		body {
+			max-width: 1100px;
+			margin: 3rem auto;
+			padding: 0 1.3rem;
+		}
+		h1 {
+			font-size: 2rem;
+			line-height: 1.15;
+		}
+		p {
+			max-width: 82ch;
+			line-height: 1.6;
+		}
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			font-variant-numeric: tabular-nums;
+		}
+		td,
+		th {
+			text-align: right;
+			padding: 1rem 0.7rem;
+			border-bottom: 1px solid light-dark(#ddd, #333);
+		}
+		td:first-child,
+		th:first-child {
+			text-align: left;
+		}
+		small {
+			display: block;
+			color: light-dark(#666, #aaa);
+			margin-top: 0.3rem;
+		}
+		.fast td:last-child {
+			color: light-dark(#097343, #74d5a3);
+		}
+		.slow td:last-child {
+			color: light-dark(#ab3d24, #ffa18c);
+		}
+		.scroll {
+			overflow: auto;
+		}
+		code {
+			overflow-wrap: anywhere;
+		}
+		li {
+			margin: 0.7rem 0;
+			line-height: 1.5;
+		}
+		a {
+			color: inherit;
+			text-underline-offset: 3px;
+		}
+		.notice {
+			border-left: 3px solid #b99a40;
+			padding: 0.7rem 1rem;
+			background: light-dark(#f5efdf, #272318);
+		}
+		@media (max-width: 650px) {
+			td,
+			th {
+				padding: 0.6rem 0.3rem;
+				font-size: 0.8rem;
+			}
+		}
+	</style>
+	<h1>Rewrite vs main</h1>
+	<p>
+		Production builds. Same Mac, background browser, local sync servers,
+		equivalent documents. Measured 7 October 2026. All times are milliseconds;
+		smaller is faster. Each cell shows median and minimum–maximum.
+	</p>
+	<p class="notice">
+		The clearest regression is the 128 KiB preview: 477 ms in the rewrite versus
+		65 ms on main. Warm loading and end-of-document input improved. These
+		measurements do not prove 120fps.
+	</p>
+	<div class="scroll">
+		<table>
+			<thead>
+				<tr>
+					<th>Journey</th>
+					<th>Main</th>
+					<th>Rewrite</th>
+					<th>Change</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="slow">
+					<td>
+						open rendered preview<small>128 KiB · 9 samples per version</small>
+					</td>
+					<td>65.2<small>64.5–69.0</small></td>
+					<td>476.8<small>472.4–501.4</small></td>
+					<td>+631%</td>
+				</tr>
+				<tr class="fast">
+					<td>
+						edit to other device paint opportunity<small
+							>2 KiB · 9 samples per version</small
+						>
+					</td>
+					<td>299.7<small>293.8–308.0</small></td>
+					<td>86.5<small>78.7–98.9</small></td>
+					<td>-71%</td>
+				</tr>
+				<tr class="">
+					<td>
+						find all reference matches<small
+							>2 KiB · 9 samples per version</small
+						>
+					</td>
+					<td>26.5<small>15.8–31.3</small></td>
+					<td>25.3<small>18.2–34.2</small></td>
+					<td>-5%</td>
+				</tr>
+				<tr class="fast">
+					<td>
+						insert text to paint opportunity<small
+							>2 KiB · 12 samples per version</small
+						>
+					</td>
+					<td>24.4<small>17.6–31.8</small></td>
+					<td>10.3<small>4.3–25.1</small></td>
+					<td>-58%</td>
+				</tr>
+				<tr class="slow">
+					<td>
+						offline reconnect to other device paint opportunity<small
+							>2 KiB · 3 samples per version</small
+						>
+					</td>
+					<td>41.3<small>37.0–44.7</small></td>
+					<td>84.5<small>76.7–86.4</small></td>
+					<td>+105%</td>
+				</tr>
+				<tr class="fast">
+					<td>
+						offline reload with durable edit<small
+							>2 KiB · 3 samples per version</small
+						>
+					</td>
+					<td>132.7<small>126.8–140.0</small></td>
+					<td>74.1<small>72.3–81.6</small></td>
+					<td>-44%</td>
+				</tr>
+				<tr class="">
+					<td>open find panel<small>2 KiB · 9 samples per version</small></td>
+					<td>34.0<small>32.7–36.0</small></td>
+					<td>30.6<small>20.3–34.7</small></td>
+					<td>-10%</td>
+				</tr>
+				<tr class="fast">
+					<td>
+						open rendered preview<small>2 KiB · 9 samples per version</small>
+					</td>
+					<td>58.5<small>53.1–66.3</small></td>
+					<td>33.0<small>31.3–35.9</small></td>
+					<td>-44%</td>
+				</tr>
+				<tr class="fast">
+					<td>
+						warm document reload<small>2 KiB · 9 samples per version</small>
+					</td>
+					<td>131.2<small>127.9–138.6</small></td>
+					<td>81.8<small>74.8–85.8</small></td>
+					<td>-38%</td>
+				</tr>
+				<tr class="slow">
+					<td>
+						insert at middle to paint opportunity<small
+							>32 KiB · 12 samples per version</small
+						>
+					</td>
+					<td>23.9<small>17.7–31.8</small></td>
+					<td>31.1<small>28.2–35.8</small></td>
+					<td>+30%</td>
+				</tr>
+				<tr class="slow">
+					<td>
+						insert at start to paint opportunity<small
+							>32 KiB · 12 samples per version</small
+						>
+					</td>
+					<td>24.8<small>19.5–33.0</small></td>
+					<td>30.3<small>26.3–35.8</small></td>
+					<td>+22%</td>
+				</tr>
+				<tr class="fast">
+					<td>
+						insert text to paint opportunity<small
+							>32 KiB · 12 samples per version</small
+						>
+					</td>
+					<td>25.7<small>18.2–34.5</small></td>
+					<td>15.7<small>12.7–32.1</small></td>
+					<td>-39%</td>
+				</tr>
+				<tr class="fast">
+					<td>
+						warm document reload<small>32 KiB · 9 samples per version</small>
+					</td>
+					<td>197.7<small>192.0–200.8</small></td>
+					<td>176.3<small>173.8–181.3</small></td>
+					<td>-11%</td>
+				</tr>
+				<tr class="slow">
+					<td>
+						find all reference matches<small
+							>128 KiB · 9 samples per version</small
+						>
+					</td>
+					<td>24.1<small>17.3–32.4</small></td>
+					<td>31.1<small>22.7–40.8</small></td>
+					<td>+29%</td>
+				</tr>
+				<tr class="fast">
+					<td>
+						insert at middle to paint opportunity<small
+							>128 KiB · 12 samples per version</small
+						>
+					</td>
+					<td>24.9<small>20.0–33.6</small></td>
+					<td>22.4<small>17.3–33.1</small></td>
+					<td>-10%</td>
+				</tr>
+				<tr class="fast">
+					<td>
+						insert at start to paint opportunity<small
+							>128 KiB · 12 samples per version</small
+						>
+					</td>
+					<td>23.1<small>15.8–34.3</small></td>
+					<td>18.7<small>15.3–26.6</small></td>
+					<td>-19%</td>
+				</tr>
+				<tr class="fast">
+					<td>
+						insert text to paint opportunity<small
+							>128 KiB · 12 samples per version</small
+						>
+					</td>
+					<td>26.8<small>17.4–31.9</small></td>
+					<td>11.3<small>7.1–28.6</small></td>
+					<td>-58%</td>
+				</tr>
+				<tr class="">
+					<td>open find panel<small>128 KiB · 9 samples per version</small></td>
+					<td>33.8<small>22.2–33.9</small></td>
+					<td>31.3<small>22.1–35.4</small></td>
+					<td>-7%</td>
+				</tr>
+				<tr class="fast">
+					<td>
+						replace all occurrences with 1000+ cursors<small
+							>128 KiB · 3 samples per version</small
+						>
+					</td>
+					<td>96.6<small>94.0–101.8</small></td>
+					<td>53.9<small>51.8–61.8</small></td>
+					<td>-44%</td>
+				</tr>
+				<tr class="fast">
+					<td>
+						single character middle to paint opportunity<small
+							>128 KiB · 24 samples per version</small
+						>
+					</td>
+					<td>25.3<small>16.9–34.9</small></td>
+					<td>21.8<small>19.8–23.9</small></td>
+					<td>-14%</td>
+				</tr>
+				<tr class="slow">
+					<td>
+						synchronous input event span<small
+							>128 KiB · 24 samples per version</small
+						>
+					</td>
+					<td>0.8<small>0.7–1.7</small></td>
+					<td>6.4<small>5.5–8.5</small></td>
+					<td>+700%</td>
+				</tr>
+				<tr class="fast">
+					<td>
+						warm document reload<small>128 KiB · 9 samples per version</small>
+					</td>
+					<td>405.7<small>402.1–409.0</small></td>
+					<td>297.9<small>293.7–311.8</small></td>
+					<td>-27%</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<h2>Where the rewrite remains inferior</h2>
+	<ul>
+		<li>
+			<strong>Large preview rendering:</strong> 128 KiB rich Markdown takes
+			about 7.3 times as long. Both previews were checked for the correct title
+			and exactly 1,297 reference links; this is a real readiness regression.
+		</li>
+		<li>
+			<strong>Some rich-document edits:</strong> 32 KiB beginning / middle edits
+			take 30–31 ms versus 24–25 ms on main. Rewrite animation-frame callbacks
+			consume roughly 18–20 ms, versus less than 1 ms on main. That exceeds an
+			8.3 ms frame budget before browser painting. Wrapping refinement and
+			geometry refresh are candidates; no CPU trace confirmed the cause.
+		</li>
+		<li>
+			<strong>Find:</strong> finding the reference matches in 128 KiB takes 31.1
+			ms versus 24.1 ms. The rewrite gate checks both match count and a visible
+			highlight.
+		</li>
+		<li>
+			<strong>Input blocking:</strong> the 128 KiB single-character synchronous
+			input span is about 6.4 ms versus 0.8 ms. Main defers work, so this
+			measures blocking at the event boundary, not equivalent total application
+			work. The rewrite reaches its next verified frame opportunity slightly
+			earlier: 21.8 versus 25.3 ms.
+		</li>
+		<li>
+			<strong>Reconnect:</strong> after a verified offline interval, the
+			rewrite's peer catches up in 84.5 ms versus 41.3 ms on main. Three samples
+			make this indicative; it is not a stable percentile estimate.
+		</li>
+	</ul>
+	<h2>What improved</h2>
+	<p>
+		At 128 KiB, warm reload fell from 406 to 298 ms and end-of-document chunk
+		input from 26.8 to 11.4 ms. The 2 KiB preview improved from 58.5 to 33 ms.
+		Passive peer updates fell from 300 to 86.5 ms with each app's defaults. Main
+		debounces ordinary document saving by 250 ms; this is an application
+		scheduling comparison, not proof that the underlying transport is 3.5 times
+		faster.
+	</p>
+	<p>
+		Replacing around 1,300 selections took 54 ms in the rewrite versus 97 ms on
+		main. Selection setup was excluded; main used its public EditorSelection
+		API, the rewrite its shortcut. One baseline match had been modified by a
+		discarded shortcut attempt, so counts were 1,297 versus 1,298. Three samples
+		are indicative.
+	</p>
+	<h2>Extreme cases and remaining gaps</h2>
+	<p>
+		A 1 MiB long-paragraph fixture could not be prepared within the harness
+		deadline; both attempts were aborted. Setup is excluded from load timings.
+		This establishes a benchmark gap, not an application failure or a valid
+		comparative 1 MiB latency. There is no new CPU-throttled mobile,
+		history-heavy document or forced-polling browser comparison.
+	</p>
+	<p>
+		Programmatic scrolling produced a 16.7 ms median frame interval in both
+		versions. No difference was detectable at the browser's 60 Hz cadence. This
+		cannot certify 120 Hz presentation or physical wheel / fling behavior.
+	</p>
+	<p>
+		The rewrite's first selection of an existing 128 KiB document took 300 ms;
+		eight later selections had a 152 ms median. The main switch batch was
+		interrupted for other implementation validation, so it has no valid
+		comparative number.
+	</p>
+	<h2>24 writers through real storage and transport</h2>
+	<p>
+		A separate rewrite integration journey passed 1,267 assertions with 24
+		writers, mixed WebSocket / polling transport, durable SQLite storage,
+		presence and offline recovery. Eight rounds produced 192 operations on an 8
+		KiB document. Commit median was 258 ms, p95 508 ms, maximum 574 ms; complete
+		journey throughput was 24.9 operations per second. Clients, server,
+		synchronization barriers and assertions share one process. This is not
+		isolated server capacity or browser frame performance.
+	</p>
+	<h2>Measurement limits</h2>
+	<ul>
+		<li>
+			Reload runs from navigation start until the content-known editor is ready
+			and a frame opportunity occurs. Both PWAs are controlled by their service
+			workers. One extra warmup precedes nine samples.
+		</li>
+		<li>
+			Input, find, preview and switching run from a trusted event to verified
+			source / UI state plus later animation-frame opportunities. Automation
+			roundtrips are excluded. This does not measure completed pixel
+			presentation and may miss deferred work.
+		</li>
+		<li>
+			CDP insertText omits keydown. Chunk input inserts approximately 10–17
+			characters per event; single-character results are separate.
+		</li>
+		<li>
+			Peer timestamps use performance.timeOrigin + performance.now() on the same
+			host. Passive consumers use cloned disposable profiles and never produce
+			text operations. Reconnect requires 750 ms without peer receipt before
+			network restoration. WebSockets are preferred by default; forced polling
+			was not benchmarked.
+		</li>
+		<li>
+			Fixture-size batches are interleaved by version, not randomized per
+			keystroke. Other apps were open; parallel builds and test suites were
+			paused for timed samples. Small differences and all three-sample cells
+			need another run.
+		</li>
+		<li>
+			The machine is an Apple M5 Pro MacBook Pro with 18 CPU cores and 64 GB
+			RAM, macOS 27.0.1, Headless Chrome 154.0.8037.58, 1280×900 viewport. No
+			CPU throttling or artificial network latency.
+		</li>
+	</ul>
+	<h2>Reproduce</h2>
+	<p>
+		Main: <code>a749728a8f9a1cb984c980a5ea2daf984d60ae68</code>. Rewrite:
+		<code>be48f8b23a75ae4836449b795cfa9a4b52069f58</code>, frozen before the
+		authentication changes. Build each against separate local sync servers. Seed
+		disposable accounts with byte-identical sources from
+		<code>experiments/performance/fixture.ts</code>. Use persistent background
+		agent-browser profiles.
+	</p>
+	<p>
+		Run
+		<code>bun experiments/performance/compare.ts CONFIG.json RESULTS.json</code
+		>,
+		<code>bun experiments/performance/journeys.ts CONFIG.json RESULTS.json</code
+		>, and
+		<code
+			>bun experiments/performance/peer.ts CONFIG_WITH_PEERS.json
+			RESULTS.json</code
+		>. Setup details and the additional stress commands are in
+		<code>experiments/performance/README.md</code>.
+	</p>
+	<p>
+		<a href="performance-rebench.json"
+			>Every measured sample, exact configuration and limitations</a
+		>
+	</p>
+	<p><small>written with gpt-6 in codex</small></p>
+</html>

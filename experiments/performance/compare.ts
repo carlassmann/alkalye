@@ -38,6 +38,7 @@ interface Measurement {
 	kb: number
 	values: number[]
 	medianMs: number
+	p95Ms: number
 	minMs: number
 	maxMs: number
 	maxFrameCallbackWorkMs?: number[]
@@ -55,9 +56,17 @@ let configurations = Schema.decodeUnknownSync(Schema.Array(Configuration))(
 let results: Measurement[] = []
 let failures: { version: string; kb: number; error: string }[] = []
 
-for (let configuration of configurations) {
-	browser(configuration, "set", "viewport", "1280", "900")
-	for (let fixture of configuration.docs) {
+for (let kb of [
+	...new Set(
+		configurations.flatMap(configuration =>
+			configuration.docs.map(fixture => fixture.kb),
+		),
+	),
+]) {
+	for (let configuration of configurations) {
+		let fixture = configuration.docs.find(fixture => fixture.kb === kb)
+		if (!fixture) continue
+		browser(configuration, "set", "viewport", "1280", "900")
 		try {
 			measureReload(configuration, fixture)
 			measureTyping(configuration, fixture, "end")
@@ -82,6 +91,8 @@ function measureReload(configuration: Configuration, fixture: Fixture) {
 		`localStorage.setItem('__benchmarkExpected',${JSON.stringify(fixture.title)})`,
 	)
 	browser(configuration, "open", configuration.url + fixture.path)
+	wait(configuration, "window.__benchmark.readyMs!==null")
+	browser(configuration, "reload")
 	wait(configuration, "window.__benchmark.readyMs!==null")
 	let values: number[] = []
 	for (let iteration = 0; iteration < 9; iteration++) {
@@ -168,6 +179,7 @@ function collect(
 		name,
 		kb: fixture.kb,
 		values,
+		p95Ms: sorted[Math.ceil(sorted.length * 0.95) - 1] ?? maxMs,
 		medianMs,
 		minMs,
 		maxMs,
