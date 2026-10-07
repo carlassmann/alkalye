@@ -16,6 +16,8 @@ Optimistic edits, local journal writes, permissions and collaboration transport 
 
 These waits prioritize input; they do not preempt JavaScript. Every synchronous slice still needs a small budget. Browser layout and garbage collection can exceed that budget, and headless tests at 60 Hz cannot certify 120 Hz presentation.
 
+An already-open latch returns immediately without starting a timeout race. Closed-latch waits retain their bounded deadlines. `betweenChunks` gates optional work; it is not a yield point. Chunked computations still yield explicitly.
+
 Integration tests exercise lock access, real document journals, offline reopening, snapshot starvation limits, lifecycle flushes and scope cleanup. The worker browser journey checks that two frame opportunities pass before a deferred transfer, then confirms that only the newest queued update is computed. It also exercises the real worker, interrupted worker cleanup and the main-thread fallback.
 
 written with gpt-6 in codex

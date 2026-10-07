@@ -1,5 +1,6 @@
 import * as Context from "effect/Context"
 import * as Effect from "effect/Effect"
+import type * as Duration from "effect/Duration"
 import * as Latch from "effect/Latch"
 import * as Queue from "effect/Queue"
 import * as Stream from "effect/Stream"
@@ -35,18 +36,9 @@ export function makeBackgroundWork() {
 			Effect.forkScoped({ startImmediately: true }),
 		)
 		return {
-			beforeSnapshot: idle.await.pipe(
-				Effect.timeoutOption("10 seconds"),
-				Effect.asVoid,
-			),
-			beforeDerived: idle.await.pipe(
-				Effect.timeoutOption("500 millis"),
-				Effect.asVoid,
-			),
-			betweenChunks: idle.await.pipe(
-				Effect.timeoutOption("16 millis"),
-				Effect.asVoid,
-			),
+			beforeSnapshot: waitForIdle("10 seconds"),
+			beforeDerived: waitForIdle("500 millis"),
+			betweenChunks: waitForIdle("16 millis"),
 			interact() {
 				if (closed) return
 				idle.closeUnsafe()
@@ -55,6 +47,13 @@ export function makeBackgroundWork() {
 			release() {
 				idle.openUnsafe()
 			},
+		}
+		function waitForIdle(duration: Duration.Input) {
+			let waiting = idle.await.pipe(
+				Effect.timeoutOption(duration),
+				Effect.asVoid,
+			)
+			return Effect.suspend(() => (idle.isOpen() ? Effect.void : waiting))
 		}
 	})
 }
