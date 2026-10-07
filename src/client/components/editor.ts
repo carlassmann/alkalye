@@ -611,11 +611,28 @@ function createEditorView(
 				range = document.createRange()
 			range.setStart(from.node, from.offset)
 			range.setEnd(to.node, to.offset)
+			let rectangles = [...range.getClientRects()].filter(
+				rectangle =>
+					rectangle.width > 0 &&
+					rectangle.height > 0 &&
+					rectangle.bottom >= bounds.top &&
+					rectangle.top <= bounds.bottom,
+			)
 			geometry.push({
 				link,
-				rectangles: [...range.getClientRects()].filter(
-					rectangle =>
-						rectangle.bottom >= bounds.top && rectangle.top <= bounds.bottom,
+				rectangles: rectangles.filter(
+					(rectangle, index) =>
+						!rectangles.some(
+							(other, otherIndex) =>
+								otherIndex !== index &&
+								other.left <= rectangle.left &&
+								other.top <= rectangle.top &&
+								other.right >= rectangle.right &&
+								other.bottom >= rectangle.bottom &&
+								(otherIndex < index ||
+									other.width > rectangle.width ||
+									other.height > rectangle.height),
+						),
 				),
 			})
 		}

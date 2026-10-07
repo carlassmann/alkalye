@@ -36,7 +36,12 @@ try {
 	browser(session, "set", "viewport", "1280", "800")
 	browser(session, "open", url)
 	wait(session, `Boolean(${native})`)
+	let previousDocument = evaluate(session, currentDocument)
 	browser(session, "click", '[data-action="new"]')
+	wait(
+		session,
+		`${currentDocument} !== ${JSON.stringify(previousDocument)} && ${editor}.value === "" && !${native}.readOnly`,
+	)
 	browser(session, "fill", "#editor", "# Pointer cancellation")
 	evaluate(
 		session,
@@ -91,6 +96,13 @@ try {
 	evaluate(
 		session,
 		'document.querySelector("[data-editor]").style.setProperty("--brand", "rgb(113, 87, 217)")',
+	)
+	assert(
+		evaluate(
+			session,
+			`(()=>{let anchors=[...document.querySelectorAll('[data-editor-links] a')];return anchors.length>0 && anchors.every(anchor=>{let bounds=anchor.getBoundingClientRect(),hit=document.elementFromPoint(bounds.x+bounds.width/2,bounds.y+bounds.height/2);return hit===anchor}) && ['link','wiki','media'].every(kind=>anchors.filter(anchor=>anchor.dataset.kind===kind&&anchor.tabIndex===0).length===1)})()`,
+		),
+		"Each visible compact-link fragment is directly actionable with one keyboard stop per link",
 	)
 	for (let kind of ["link", "wiki", "media"]) {
 		browser(session, "hover", `[data-editor-links] a[data-kind="${kind}"]`)
@@ -582,6 +594,26 @@ try {
 	assert(
 		true,
 		"Focused links keep their destination while scrolling, and Tab reaches offscreen links",
+	)
+	let wrappedLink =
+		"# Wrapped link\n\n[" +
+		"English עברית العربية words ".repeat(14) +
+		"](https://example.org/wrapped)\n"
+	browser(session, "set", "viewport", "600", "800")
+	evaluate(
+		session,
+		`(()=>{let app=document.querySelector('#app');if(app.classList.contains('library-open'))document.querySelector('[data-action=library]').click();if(app.classList.contains('tools-open'))document.querySelector('[data-action=toggle-tools]').click();${native}.focus()})();${editor}.value=${JSON.stringify(wrappedLink)};${editor}.dispatchEvent(new Event('input',{bubbles:true}));${editor}.setSelectionRange(0,0);${native}.parentElement.scrollTop=0`,
+	)
+	wait(
+		session,
+		`${editor}.value===${JSON.stringify(wrappedLink)} && document.querySelector('#save-status').textContent==='Saved' && document.querySelectorAll('[data-editor-links] a[data-kind=link]').length>1`,
+	)
+	assert(
+		evaluate(
+			session,
+			`(()=>{let anchors=[...document.querySelectorAll('[data-editor-links] a[data-kind=link]')];return anchors.filter(anchor=>anchor.tabIndex===0).length===1 && anchors.every(anchor=>{let bounds=anchor.getBoundingClientRect();return document.elementFromPoint(bounds.x+bounds.width/2,bounds.y+bounds.height/2)===anchor})})()`,
+		),
+		"Wrapped bidirectional links retain separate actionable fragments and one keyboard stop",
 	)
 } finally {
 	try {
