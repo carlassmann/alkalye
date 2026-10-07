@@ -341,6 +341,13 @@ export function parsePresence(value: unknown): Presence {
 
 let loneSurrogate = /[\uD800-\uDFFF]/u
 export function compactAtoms(atoms: readonly Atom[]) {
+	return finishSteps(compactAtomSteps(atoms, false))
+}
+export function* compactAtomSteps(
+	atoms: readonly Atom[],
+	cooperative: boolean,
+): Generator<void, Atom[]> {
+	let work = 0
 	let insert: Atom[] = []
 	let last: Atom | undefined
 	for (let atom of atoms) {
@@ -369,6 +376,7 @@ export function compactAtoms(atoms: readonly Atom[]) {
 			previous.value += atom.value
 		else insert.push({ ...atom })
 		last = atom
+		if (cooperative && ++work % 512 === 0) yield
 	}
 	return insert
 }

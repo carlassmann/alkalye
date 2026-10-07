@@ -6,7 +6,7 @@ import {
 	OperationEnvelopeSchema,
 	TextAtomIdSchema,
 	deletionIds,
-	compactAtoms,
+	compactAtomSteps,
 } from "./model"
 import {
 	VisibilitySnapshotSchema,
@@ -142,22 +142,40 @@ let CompactCheckpointSchema = Schema.Struct({
 export function compactCheckpoint(
 	snapshot: ReplicaCheckpoint,
 ): ReplicaCheckpoint | typeof CompactCheckpointSchema.Type {
+	let steps = compactCheckpointSteps(snapshot, false)
+	let next = steps.next()
+	while (!next.done) next = steps.next()
+	return next.value
+}
+export function compactCheckpointEffect(snapshot: ReplicaCheckpoint) {
+	return cooperative("checkpoint.compact", () =>
+		compactCheckpointSteps(snapshot, true),
+	)
+}
+function* compactCheckpointSteps(
+	snapshot: ReplicaCheckpoint,
+	cooperative: boolean,
+): Generator<void, ReplicaCheckpoint | typeof CompactCheckpointSchema.Type> {
 	if (
 		snapshot.format === "alkalye-state-v1" ||
 		snapshot.targets.reduce((count, target) => count + target.atoms.length, 0) >
 			maximumCompactAtoms
 	)
 		return snapshot
+	let targets: (typeof CompactCheckpointSchema.Type.targets)[number][] = []
+	for (let target of snapshot.targets)
+		targets.push({
+			...target,
+			atoms: yield* compactAtomSteps(target.atoms, cooperative),
+		})
 	return {
 		format: "alkalye-state-v3",
 		clock: snapshot.clock,
 		restored: snapshot.restored,
-		targets: snapshot.targets.map(target => ({
-			...target,
-			atoms: compactAtoms(target.atoms),
-		})),
+		targets,
 	}
 }
+
 let CheckpointHeaderFields = {
 	clock: CheckpointClockSchema,
 	restored: Schema.Array(Schema.Unknown),

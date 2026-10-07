@@ -1009,28 +1009,67 @@ export class Replica {
 		return this.targets.keys()
 	}
 	checkpoint(): CausalReplicaCheckpoint {
-		return {
-			format: "alkalye-state-v2",
-			clock: this.clock,
-			restored: [...this.restored],
-			targets: [...this.targets.keys()].map(id => ({
+		return finishSteps(this.checkpointSteps(false))
+	}
+	checkpointEffect() {
+		let source = this
+		return cooperative("replica.checkpoint", function* () {
+			let generation = source.generation
+			let snapshot = yield* source.checkpointSteps(true)
+			if (source.generation !== generation)
+				throw new Error("Replica changed while its snapshot was being captured")
+			return snapshot
+		})
+	}
+	private *checkpointSteps(
+		cooperative: boolean,
+	): Generator<void, CausalReplicaCheckpoint> {
+		let clock = this.clock
+		let work = 0
+		let restored: [string, string][] = []
+		for (let [previous, current] of this.restored) {
+			restored.push([previous, current])
+			if (cooperative && ++work % 512 === 0) yield
+		}
+		let targets: CausalReplicaCheckpoint["targets"] = []
+		for (let id of this.targets.keys()) {
+			let atoms: Atom[] = []
+			for (let siblings of this.children.get(id)?.values() ?? [])
+				for (let atom of siblings) {
+					atoms.push(copyAtom(atom))
+					if (cooperative && ++work % 512 === 0) yield
+				}
+			let visibility = yield* (
+				this.visibility.get(id) ?? new TextVisibility()
+			).checkpointSteps(cooperative)
+			let fields: Operation[] = []
+			for (let field of this.registers.get(id)?.values() ?? []) {
+				let insert: Atom[] = []
+				for (let atom of field.insert) {
+					insert.push(copyAtom(atom))
+					if (cooperative && ++work % 512 === 0) yield
+				}
+				let remove: string[] = []
+				for (let id of field.remove) {
+					remove.push(id)
+					if (cooperative && ++work % 512 === 0) yield
+				}
+				fields.push({ ...field, insert, remove })
+				if (cooperative && ++work % 128 === 0) yield
+			}
+			targets.push({
 				id,
 				created: this.created.get(id) ?? 0,
 				updated: this.updated.get(id) ?? 0,
-				atoms: [...(this.children.get(id)?.values() ?? [])]
-					.flat()
-					.map(copyAtom),
-				visibility:
-					this.visibility.get(id)?.checkpoint() ??
-					new TextVisibility().checkpoint(),
-				fields: [...(this.registers.get(id)?.values() ?? [])].map(field => ({
-					...field,
-					insert: field.insert.map(copyAtom),
-					remove: [...field.remove],
-				})),
-			})),
+				atoms,
+				visibility,
+				fields,
+			})
+			if (cooperative && ++work % 128 === 0) yield
 		}
+		return { format: "alkalye-state-v2", clock, restored, targets }
 	}
+
 	restore(snapshot: ReplicaCheckpoint) {
 		this.restoreState(snapshot, false)
 	}
