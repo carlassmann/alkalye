@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>Alkalye interaction follow-up</title>
+		<style>
+			:root {
+				color-scheme: light dark;
+				font-family: system-ui;
+				background: light-dark(#fafafa, #111);
+				color: light-dark(#171717, #eee);
+			}
+			body {
+				max-width: 850px;
+				margin: 3rem auto;
+				padding: 0 1.2rem;
+				line-height: 1.6;
+			}
+			h1,
+			h2 {
+				line-height: 1.2;
+			}
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				font-variant-numeric: tabular-nums;
+			}
+			th,
+			td {
+				padding: 0.6rem;
+				text-align: right;
+				border-bottom: 1px solid light-dark(#ddd, #333);
+			}
+			th:first-child,
+			td:first-child {
+				text-align: left;
+			}
+			footer {
+				margin-top: 3rem;
+				font-size: 0.85rem;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Interaction follow-up</h1>
+		<p>
+			7 October 2026. These narrow experiments follow the
+			<a href="performance-interaction.html">comparison with main</a>. They
+			compare rewrite revisions or implementation paths; main was not rerun
+			here.
+		</p>
+		<h2>Body edits remain incremental after metadata changes</h2>
+		<p>
+			Merged frontmatter can leave raw and canonical atom arrays with different
+			lengths. The old cache rejected those arrays, rebuilding the whole source
+			after each keystroke. The fix maps body splices between the arrays and
+			verifies their anchors. Header-boundary mismatches still use the full
+			projection.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>128KiB document, median input work</th>
+					<th>Before</th>
+					<th>After</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Existing history, body start</td>
+					<td>117.9ms</td>
+					<td>2.6ms</td>
+				</tr>
+				<tr>
+					<td>Existing history, body middle</td>
+					<td>102.0ms</td>
+					<td>2.8ms</td>
+				</tr>
+				<tr>
+					<td>After rename, body start</td>
+					<td>90.8ms</td>
+					<td>2.4ms</td>
+				</tr>
+				<tr>
+					<td>After rename, body middle</td>
+					<td>103.9ms</td>
+					<td>2.6ms</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+			Five trusted keystrokes per position and scenario, forty samples total.
+			Before: <code>71b8f41</code>; after: <code>3185162</code>. This is a
+			history-heavy disposable profile, not a fresh document. Every edit passed
+			exact-source and durable-save checks. Service-worker and browser caches
+			were removed before boot; loaded entry script sizes and hashes were
+			checked. Earlier samples with uncertain cached assets were discarded.
+		</p>
+		<p>
+			The interval runs from native <code>beforeinput</code> to the observer
+			after the app's <code>input</code> handler. The largest after interval was
+			7.9ms. Animation-frame opportunities took longer. A headless browser near
+			60Hz cannot establish 120Hz pixel presentation.
+		</p>
+		<p>
+			The public Replica probe also checks prepare, apply and source projection
+			after retitling, concurrent metadata, peer edits and undo. Correctness
+			checks cover replay, checkpoints, whole-body deletion, empty EOF headers
+			and insertion anchors.
+		</p>
+		<h2>Native search highlights reduce manual geometry work</h2>
+		<p>
+			Inactive matches use the browser's CSS Custom Highlight API. The active
+			match keeps its navigation overlay; unsupported browsers keep the
+			rectangle-based fallback. Five alternating trials per mode used the same
+			35,018-character source with 12,002 matches.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Median largest main-thread task</th>
+					<th>Native</th>
+					<th>Fallback</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Find</td>
+					<td>1.328ms</td>
+					<td>1.919ms</td>
+				</tr>
+				<tr>
+					<td>Scroll</td>
+					<td>1.676ms</td>
+					<td>2.383ms</td>
+				</tr>
+				<tr>
+					<td>Next match</td>
+					<td>3.768ms</td>
+					<td>3.961ms</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+			There was no consistent improvement in time to two animation-frame
+			opportunities. Native Paint totals were slightly higher. The first
+			next-match task took 13.879ms with native highlights and 14.269ms with the
+			fallback, exceeding the 8.33ms budget. Traces show repeated layout and a
+			transient full-document selection.
+		</p>
+		<h2>Distant search selection stays within the viewport</h2>
+		<p>
+			The next fix establishes the target viewport and selection together.
+			Previously, selecting a distant match painted against the old viewport
+			first, expanding the whole document. A pre-reveal experiment failed and
+			was discarded. The accepted change also removes a duplicate reveal and
+			retains full native rendering for long selections.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Cold next match, five trials per version</th>
+					<th>Before</th>
+					<th>After</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Median largest task</td>
+					<td>19.706ms</td>
+					<td>4.114ms</td>
+				</tr>
+				<tr>
+					<td>Maximum task</td>
+					<td>25.191ms</td>
+					<td>4.371ms</td>
+				</tr>
+				<tr>
+					<td>Median Layout total</td>
+					<td>5.204ms</td>
+					<td>0.537ms</td>
+				</tr>
+				<tr>
+					<td>Two animation-frame opportunities</td>
+					<td>43.7ms</td>
+					<td>40.3ms</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+			Both versions passed exact-source, selection, focus and scrolling checks.
+			This separate run uses an end-of-document caret before jumping back to the
+			first match. It is not the earlier native-highlight versus fallback
+			comparison. Opus review also caught deferred IME rendering and
+			refined-window selection boundaries; those retain the selection intent.
+		</p>
+		<h2>Changes kept and rejected</h2>
+		<p>
+			Library synchronization now skips a second save after a successful, clean
+			synchronization. Real IndexedDB and authenticated HTTP tests cover offline
+			reloads, revoked access, retries, and interruption during concurrent
+			edits. One redundant summary projection attempt disappears; actual changed
+			writes and network pulls remain the same.
+		</p>
+		<p>
+			Accepted-cache replicas remain isolated between overlapping sessions.
+			Direct reuse failed the public integration checks. An Effect HashMap
+			prototype made copies cheaper but lookups and scans much slower than
+			native Map in Bun. Neither unsafe cache reuse nor that map replacement
+			entered production.
+		</p>
+		<p>
+			Probes and samples live under
+			<code>experiments/performance/</code>: <code>replica-body-edits.ts</code>,
+			<code>body-edits.ts</code>, <code>body-edits-results.json</code>,
+			<code>search-highlights.ts</code>,
+			<code>search-highlights-results.json</code>, and
+			<code>hash-map-probe.ts</code>. Search trace phases include enclosing
+			input tasks; nested task durations are not added.
+		</p>
+		<footer>written with gpt-6 in codex</footer>
+	</body>
+</html>

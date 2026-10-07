@@ -1,0 +1,254 @@
+{
+	"sourceCharacters": 35018,
+	"results": [
+		{
+			"name": "before",
+			"trial": 0,
+			"coverage": {
+				"nativeRanges": 288,
+				"scrollTop": 600,
+				"visibleRanges": 216
+			},
+			"correctness": {
+				"nativeLength": 35018,
+				"paintOpportunityMs": 39.5,
+				"scrollTop": 0,
+				"searchFocus": true,
+				"selectionEnd": 4,
+				"selectionStart": 3,
+				"sourceExact": true
+			},
+			"tracePath": "next-end-results-before-0.trace.json",
+			"traceSummary": {
+				"largestTaskMs": 15.837,
+				"layoutMs": 5.6610000000000005,
+				"paintMs": 2.032
+			}
+		},
+		{
+			"name": "after",
+			"trial": 0,
+			"coverage": {
+				"nativeRanges": 288,
+				"scrollTop": 600,
+				"visibleRanges": 216
+			},
+			"correctness": {
+				"nativeLength": 35018,
+				"paintOpportunityMs": 39.40000003576279,
+				"scrollTop": 0,
+				"searchFocus": true,
+				"selectionEnd": 4,
+				"selectionStart": 3,
+				"sourceExact": true
+			},
+			"tracePath": "next-end-results-after-0.trace.json",
+			"traceSummary": {
+				"largestTaskMs": 14.584,
+				"layoutMs": 5.234,
+				"paintMs": 1.96
+			}
+		},
+		{
+			"name": "after",
+			"trial": 1,
+			"coverage": {
+				"nativeRanges": 288,
+				"scrollTop": 600,
+				"visibleRanges": 216
+			},
+			"correctness": {
+				"nativeLength": 35018,
+				"paintOpportunityMs": 39.40000003576279,
+				"scrollTop": 0,
+				"searchFocus": true,
+				"selectionEnd": 4,
+				"selectionStart": 3,
+				"sourceExact": true
+			},
+			"tracePath": "next-end-results-after-1.trace.json",
+			"traceSummary": {
+				"largestTaskMs": 15.329,
+				"layoutMs": 4.936999999999999,
+				"paintMs": 2.09
+			}
+		},
+		{
+			"name": "before",
+			"trial": 1,
+			"coverage": {
+				"nativeRanges": 288,
+				"scrollTop": 600,
+				"visibleRanges": 216
+			},
+			"correctness": {
+				"nativeLength": 35018,
+				"paintOpportunityMs": 42.40000003576279,
+				"scrollTop": 0,
+				"searchFocus": true,
+				"selectionEnd": 4,
+				"selectionStart": 3,
+				"sourceExact": true
+			},
+			"tracePath": "next-end-results-before-1.trace.json",
+			"traceSummary": {
+				"largestTaskMs": 15.287,
+				"layoutMs": 5.072,
+				"paintMs": 1.978
+			}
+		},
+		{
+			"name": "before",
+			"trial": 2,
+			"coverage": {
+				"nativeRanges": 288,
+				"scrollTop": 600,
+				"visibleRanges": 216
+			},
+			"correctness": {
+				"nativeLength": 35018,
+				"paintOpportunityMs": 40.19999998807907,
+				"scrollTop": 0,
+				"searchFocus": true,
+				"selectionEnd": 4,
+				"selectionStart": 3,
+				"sourceExact": true
+			},
+			"tracePath": "next-end-results-before-2.trace.json",
+			"traceSummary": {
+				"largestTaskMs": 16.722,
+				"layoutMs": 5.1370000000000005,
+				"paintMs": 1.99
+			}
+		},
+		{
+			"name": "after",
+			"trial": 2,
+			"coverage": {
+				"nativeRanges": 288,
+				"scrollTop": 600,
+				"visibleRanges": 216
+			},
+			"correctness": {
+				"nativeLength": 35018,
+				"paintOpportunityMs": 49.40000003576279,
+				"scrollTop": 0,
+				"searchFocus": true,
+				"selectionEnd": 4,
+				"selectionStart": 3,
+				"sourceExact": true
+			},
+			"tracePath": "next-end-results-after-2.trace.json",
+			"traceSummary": {
+				"largestTaskMs": 16.481,
+				"layoutMs": 4.955,
+				"paintMs": 2.102
+			}
+		},
+		{
+			"name": "after",
+			"trial": 3,
+			"coverage": {
+				"nativeRanges": 288,
+				"scrollTop": 600,
+				"visibleRanges": 216
+			},
+			"correctness": {
+				"nativeLength": 35018,
+				"paintOpportunityMs": 38.79999995231629,
+				"scrollTop": 0,
+				"searchFocus": true,
+				"selectionEnd": 4,
+				"selectionStart": 3,
+				"sourceExact": true
+			},
+			"tracePath": "next-end-results-after-3.trace.json",
+			"traceSummary": {
+				"largestTaskMs": 23.049,
+				"layoutMs": 5.942,
+				"paintMs": 2.231
+			}
+		},
+		{
+			"name": "before",
+			"trial": 3,
+			"coverage": {
+				"nativeRanges": 288,
+				"scrollTop": 600,
+				"visibleRanges": 216
+			},
+			"correctness": {
+				"nativeLength": 35018,
+				"paintOpportunityMs": 41.29999995231629,
+				"scrollTop": 0,
+				"searchFocus": true,
+				"selectionEnd": 4,
+				"selectionStart": 3,
+				"sourceExact": true
+			},
+			"tracePath": "next-end-results-before-3.trace.json",
+			"traceSummary": {
+				"largestTaskMs": 19.882,
+				"layoutMs": 5.11,
+				"paintMs": 2.009
+			}
+		},
+		{
+			"name": "before",
+			"trial": 4,
+			"coverage": {
+				"nativeRanges": 288,
+				"scrollTop": 600,
+				"visibleRanges": 216
+			},
+			"correctness": {
+				"nativeLength": 35018,
+				"paintOpportunityMs": 46.60000002384186,
+				"scrollTop": 0,
+				"searchFocus": true,
+				"selectionEnd": 4,
+				"selectionStart": 3,
+				"sourceExact": true
+			},
+			"tracePath": "next-end-results-before-4.trace.json",
+			"traceSummary": {
+				"largestTaskMs": 22.129,
+				"layoutMs": 5.124,
+				"paintMs": 1.968
+			}
+		},
+		{
+			"name": "after",
+			"trial": 4,
+			"coverage": {
+				"nativeRanges": 288,
+				"scrollTop": 600,
+				"visibleRanges": 216
+			},
+			"correctness": {
+				"nativeLength": 35018,
+				"paintOpportunityMs": 45.5,
+				"scrollTop": 0,
+				"searchFocus": true,
+				"selectionEnd": 4,
+				"selectionStart": 3,
+				"sourceExact": true
+			},
+			"tracePath": "next-end-results-after-4.trace.json",
+			"traceSummary": {
+				"largestTaskMs": 21.478,
+				"layoutMs": 5.036,
+				"paintMs": 2.212
+			}
+		}
+	],
+	"failures": [],
+	"provenance": {
+		"comparison": "Same source tree, before excludes exactly the four-line SourceTextarea pre-reveal experiment. After includes it. Experiment rejected and production change reverted.",
+		"initialControl": "Start-caret reset warmed target block and failed to reproduce; corrected end-caret reset reproduced slow path.",
+		"tracing": "No CPU profiler. Complete main-thread RunTask slices overlap marked next keydown through two animation frame opportunities; no nested task sums.",
+		"fixture": "35,018 ASCII characters,12,002 lowercase e matches; collapsed source selection at end, programmatic scroll to600 then trusted Enter on Find Next.",
+		"trialOrder": "Five per variant, alternating order",
+		"sourceCorrectness": "Every trial exact source,selection3..4,search focus restored,scroll returned0."
+	}
+}

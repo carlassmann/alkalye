@@ -1,0 +1,688 @@
+{
+	"sourceCharacters": 35018,
+	"trialsPerMode": 5,
+	"results": [
+		{
+			"mode": "native",
+			"trial": 0,
+			"measurements": [
+				{
+					"name": "find",
+					"milliseconds": 40.60000002384186
+				},
+				{
+					"name": "scroll",
+					"milliseconds": 24.900000035762787
+				},
+				{
+					"name": "next",
+					"milliseconds": 38.5
+				}
+			],
+			"correctness": {
+				"sourceMatches": 12002,
+				"nativeRanges": 217,
+				"overlayMarks": 1,
+				"activeMarks": 1,
+				"selection": 3
+			},
+			"tracePath": "results-native-0.trace.json"
+		},
+		{
+			"mode": "fallback",
+			"trial": 0,
+			"measurements": [
+				{
+					"name": "find",
+					"milliseconds": 44.5
+				},
+				{
+					"name": "scroll",
+					"milliseconds": 27.100000023841858
+				},
+				{
+					"name": "next",
+					"milliseconds": 47.69999998807907
+				}
+			],
+			"correctness": {
+				"sourceMatches": 12002,
+				"nativeRanges": 0,
+				"overlayMarks": 192,
+				"activeMarks": 1,
+				"selection": 3
+			},
+			"tracePath": "results-fallback-0.trace.json"
+		},
+		{
+			"mode": "fallback",
+			"trial": 1,
+			"measurements": [
+				{
+					"name": "find",
+					"milliseconds": 40.30000001192093
+				},
+				{
+					"name": "scroll",
+					"milliseconds": 28.80000001192093
+				},
+				{
+					"name": "next",
+					"milliseconds": 40.30000001192093
+				}
+			],
+			"correctness": {
+				"sourceMatches": 12002,
+				"nativeRanges": 0,
+				"overlayMarks": 192,
+				"activeMarks": 1,
+				"selection": 10
+			},
+			"tracePath": "results-fallback-1.trace.json"
+		},
+		{
+			"mode": "native",
+			"trial": 1,
+			"measurements": [
+				{
+					"name": "find",
+					"milliseconds": 44.39999997615814
+				},
+				{
+					"name": "scroll",
+					"milliseconds": 33.19999998807907
+				},
+				{
+					"name": "next",
+					"milliseconds": 42.10000002384186
+				}
+			],
+			"correctness": {
+				"sourceMatches": 12002,
+				"nativeRanges": 217,
+				"overlayMarks": 1,
+				"activeMarks": 1,
+				"selection": 10
+			},
+			"tracePath": "results-native-1.trace.json"
+		},
+		{
+			"mode": "native",
+			"trial": 2,
+			"measurements": [
+				{
+					"name": "find",
+					"milliseconds": 45.5
+				},
+				{
+					"name": "scroll",
+					"milliseconds": 32.700000047683716
+				},
+				{
+					"name": "next",
+					"milliseconds": 34.80000001192093
+				}
+			],
+			"correctness": {
+				"sourceMatches": 12002,
+				"nativeRanges": 217,
+				"overlayMarks": 1,
+				"activeMarks": 1,
+				"selection": 19
+			},
+			"tracePath": "results-native-2.trace.json"
+		},
+		{
+			"mode": "fallback",
+			"trial": 2,
+			"measurements": [
+				{
+					"name": "find",
+					"milliseconds": 40.80000001192093
+				},
+				{
+					"name": "scroll",
+					"milliseconds": 21.5
+				},
+				{
+					"name": "next",
+					"milliseconds": 35.80000001192093
+				}
+			],
+			"correctness": {
+				"sourceMatches": 12002,
+				"nativeRanges": 0,
+				"overlayMarks": 192,
+				"activeMarks": 1,
+				"selection": 19
+			},
+			"tracePath": "results-fallback-2.trace.json"
+		},
+		{
+			"mode": "fallback",
+			"trial": 3,
+			"measurements": [
+				{
+					"name": "find",
+					"milliseconds": 40.10000002384186
+				},
+				{
+					"name": "scroll",
+					"milliseconds": 27.200000047683716
+				},
+				{
+					"name": "next",
+					"milliseconds": 34.19999998807907
+				}
+			],
+			"correctness": {
+				"sourceMatches": 12002,
+				"nativeRanges": 0,
+				"overlayMarks": 192,
+				"activeMarks": 1,
+				"selection": 21
+			},
+			"tracePath": "results-fallback-3.trace.json"
+		},
+		{
+			"mode": "native",
+			"trial": 3,
+			"measurements": [
+				{
+					"name": "find",
+					"milliseconds": 47.09999996423903
+				},
+				{
+					"name": "scroll",
+					"milliseconds": 18.60000002383822
+				},
+				{
+					"name": "next",
+					"milliseconds": 37.89999997615814
+				}
+			],
+			"correctness": {
+				"sourceMatches": 12002,
+				"nativeRanges": 217,
+				"overlayMarks": 1,
+				"activeMarks": 1,
+				"selection": 21
+			},
+			"tracePath": "results-native-3.trace.json"
+		},
+		{
+			"mode": "native",
+			"trial": 4,
+			"measurements": [
+				{
+					"name": "find",
+					"milliseconds": 49
+				},
+				{
+					"name": "scroll",
+					"milliseconds": 27.600000023841858
+				},
+				{
+					"name": "next",
+					"milliseconds": 34.10000002383822
+				}
+			],
+			"correctness": {
+				"sourceMatches": 12002,
+				"nativeRanges": 217,
+				"overlayMarks": 1,
+				"activeMarks": 1,
+				"selection": 24
+			},
+			"tracePath": "results-native-4.trace.json"
+		},
+		{
+			"mode": "fallback",
+			"trial": 4,
+			"measurements": [
+				{
+					"name": "find",
+					"milliseconds": 37.90000003576097
+				},
+				{
+					"name": "scroll",
+					"milliseconds": 25
+				},
+				{
+					"name": "next",
+					"milliseconds": 49.5
+				}
+			],
+			"correctness": {
+				"sourceMatches": 12002,
+				"nativeRanges": 0,
+				"overlayMarks": 192,
+				"activeMarks": 1,
+				"selection": 24
+			},
+			"tracePath": "results-fallback-4.trace.json"
+		}
+	],
+	"failures": [],
+	"traceSummary": [
+		{
+			"mode": "native",
+			"trial": 0,
+			"phase": "find",
+			"paintOpportunityMs": 40.60000002384186,
+			"largestTaskMs": 2.005,
+			"layoutMs": 0.163,
+			"paintMs": 0.767,
+			"layoutCount": 3,
+			"paintCount": 12
+		},
+		{
+			"mode": "native",
+			"trial": 0,
+			"phase": "scroll",
+			"paintOpportunityMs": 24.900000035762787,
+			"largestTaskMs": 1.783,
+			"layoutMs": 0.496,
+			"paintMs": 1.091,
+			"layoutCount": 4,
+			"paintCount": 5
+		},
+		{
+			"mode": "native",
+			"trial": 0,
+			"phase": "next",
+			"paintOpportunityMs": 38.5,
+			"largestTaskMs": 13.879,
+			"layoutMs": 4.947,
+			"paintMs": 1.997,
+			"layoutCount": 14,
+			"paintCount": 19
+		},
+		{
+			"mode": "fallback",
+			"trial": 0,
+			"phase": "find",
+			"paintOpportunityMs": 44.5,
+			"largestTaskMs": 2.018,
+			"layoutMs": 0.255,
+			"paintMs": 0.508,
+			"layoutCount": 4,
+			"paintCount": 157
+		},
+		{
+			"mode": "fallback",
+			"trial": 0,
+			"phase": "scroll",
+			"paintOpportunityMs": 27.100000023841858,
+			"largestTaskMs": 2.57,
+			"layoutMs": 0.646,
+			"paintMs": 0.326,
+			"layoutCount": 5,
+			"paintCount": 5
+		},
+		{
+			"mode": "fallback",
+			"trial": 0,
+			"phase": "next",
+			"paintOpportunityMs": 47.69999998807907,
+			"largestTaskMs": 14.269,
+			"layoutMs": 5.197,
+			"paintMs": 1.494,
+			"layoutCount": 14,
+			"paintCount": 315
+		},
+		{
+			"mode": "fallback",
+			"trial": 1,
+			"phase": "find",
+			"paintOpportunityMs": 40.30000001192093,
+			"largestTaskMs": 1.871,
+			"layoutMs": 0.258,
+			"paintMs": 0.527,
+			"layoutCount": 4,
+			"paintCount": 152
+		},
+		{
+			"mode": "fallback",
+			"trial": 1,
+			"phase": "scroll",
+			"paintOpportunityMs": 28.80000001192093,
+			"largestTaskMs": 2.383,
+			"layoutMs": 0.148,
+			"paintMs": 0.443,
+			"layoutCount": 1,
+			"paintCount": 4
+		},
+		{
+			"mode": "fallback",
+			"trial": 1,
+			"phase": "next",
+			"paintOpportunityMs": 40.30000001192093,
+			"largestTaskMs": 3.673,
+			"layoutMs": 1.7220000000000002,
+			"paintMs": 1.094,
+			"layoutCount": 5,
+			"paintCount": 298
+		},
+		{
+			"mode": "native",
+			"trial": 1,
+			"phase": "find",
+			"paintOpportunityMs": 44.39999997615814,
+			"largestTaskMs": 1.231,
+			"layoutMs": 0.188,
+			"paintMs": 0.698,
+			"layoutCount": 4,
+			"paintCount": 13
+		},
+		{
+			"mode": "native",
+			"trial": 1,
+			"phase": "scroll",
+			"paintOpportunityMs": 33.19999998807907,
+			"largestTaskMs": 1.767,
+			"layoutMs": 0.062,
+			"paintMs": 1.146,
+			"layoutCount": 1,
+			"paintCount": 4
+		},
+		{
+			"mode": "native",
+			"trial": 1,
+			"phase": "next",
+			"paintOpportunityMs": 42.10000002384186,
+			"largestTaskMs": 3.428,
+			"layoutMs": 1.541,
+			"paintMs": 1.603,
+			"layoutCount": 5,
+			"paintCount": 35
+		},
+		{
+			"mode": "native",
+			"trial": 2,
+			"phase": "find",
+			"paintOpportunityMs": 45.5,
+			"largestTaskMs": 1.318,
+			"layoutMs": 0.18,
+			"paintMs": 0.737,
+			"layoutCount": 4,
+			"paintCount": 13
+		},
+		{
+			"mode": "native",
+			"trial": 2,
+			"phase": "scroll",
+			"paintOpportunityMs": 32.700000047683716,
+			"largestTaskMs": 1.605,
+			"layoutMs": 0.055,
+			"paintMs": 0.856,
+			"layoutCount": 1,
+			"paintCount": 20
+		},
+		{
+			"mode": "native",
+			"trial": 2,
+			"phase": "next",
+			"paintOpportunityMs": 34.80000001192093,
+			"largestTaskMs": 4.232,
+			"layoutMs": 1.969,
+			"paintMs": 1.7750000000000001,
+			"layoutCount": 6,
+			"paintCount": 36
+		},
+		{
+			"mode": "fallback",
+			"trial": 2,
+			"phase": "find",
+			"paintOpportunityMs": 40.80000001192093,
+			"largestTaskMs": 1.919,
+			"layoutMs": 0.27,
+			"paintMs": 0.535,
+			"layoutCount": 4,
+			"paintCount": 160
+		},
+		{
+			"mode": "fallback",
+			"trial": 2,
+			"phase": "scroll",
+			"paintOpportunityMs": 21.5,
+			"largestTaskMs": 2.104,
+			"layoutMs": 0.152,
+			"paintMs": 0.038,
+			"layoutCount": 1,
+			"paintCount": 1
+		},
+		{
+			"mode": "fallback",
+			"trial": 2,
+			"phase": "next",
+			"paintOpportunityMs": 35.80000001192093,
+			"largestTaskMs": 3.88,
+			"layoutMs": 1.7120000000000002,
+			"paintMs": 1.173,
+			"layoutCount": 6,
+			"paintCount": 308
+		},
+		{
+			"mode": "fallback",
+			"trial": 3,
+			"phase": "find",
+			"paintOpportunityMs": 40.10000002384186,
+			"largestTaskMs": 1.914,
+			"layoutMs": 0.262,
+			"paintMs": 0.527,
+			"layoutCount": 4,
+			"paintCount": 156
+		},
+		{
+			"mode": "fallback",
+			"trial": 3,
+			"phase": "scroll",
+			"paintOpportunityMs": 27.200000047683716,
+			"largestTaskMs": 2.191,
+			"layoutMs": 0.145,
+			"paintMs": 0.029,
+			"layoutCount": 1,
+			"paintCount": 1
+		},
+		{
+			"mode": "fallback",
+			"trial": 3,
+			"phase": "next",
+			"paintOpportunityMs": 34.19999998807907,
+			"largestTaskMs": 3.961,
+			"layoutMs": 1.706,
+			"paintMs": 1.126,
+			"layoutCount": 5,
+			"paintCount": 318
+		},
+		{
+			"mode": "native",
+			"trial": 3,
+			"phase": "find",
+			"paintOpportunityMs": 47.09999996423903,
+			"largestTaskMs": 1.328,
+			"layoutMs": 0.196,
+			"paintMs": 0.774,
+			"layoutCount": 4,
+			"paintCount": 13
+		},
+		{
+			"mode": "native",
+			"trial": 3,
+			"phase": "scroll",
+			"paintOpportunityMs": 18.60000002383822,
+			"largestTaskMs": 1.671,
+			"layoutMs": 0.057,
+			"paintMs": 0.973,
+			"layoutCount": 1,
+			"paintCount": 20
+		},
+		{
+			"mode": "native",
+			"trial": 3,
+			"phase": "next",
+			"paintOpportunityMs": 37.89999997615814,
+			"largestTaskMs": 3.687,
+			"layoutMs": 1.6119999999999999,
+			"paintMs": 1.621,
+			"layoutCount": 5,
+			"paintCount": 35
+		},
+		{
+			"mode": "native",
+			"trial": 4,
+			"phase": "find",
+			"paintOpportunityMs": 49,
+			"largestTaskMs": 1.421,
+			"layoutMs": 0.20500000000000002,
+			"paintMs": 0.782,
+			"layoutCount": 4,
+			"paintCount": 13
+		},
+		{
+			"mode": "native",
+			"trial": 4,
+			"phase": "scroll",
+			"paintOpportunityMs": 27.600000023841858,
+			"largestTaskMs": 1.676,
+			"layoutMs": 0.059,
+			"paintMs": 0.9,
+			"layoutCount": 1,
+			"paintCount": 20
+		},
+		{
+			"mode": "native",
+			"trial": 4,
+			"phase": "next",
+			"paintOpportunityMs": 34.10000002383822,
+			"largestTaskMs": 3.768,
+			"layoutMs": 1.5270000000000001,
+			"paintMs": 1.597,
+			"layoutCount": 5,
+			"paintCount": 35
+		},
+		{
+			"mode": "fallback",
+			"trial": 4,
+			"phase": "find",
+			"paintOpportunityMs": 37.90000003576097,
+			"largestTaskMs": 1.969,
+			"layoutMs": 0.262,
+			"paintMs": 0.54,
+			"layoutCount": 4,
+			"paintCount": 147
+		},
+		{
+			"mode": "fallback",
+			"trial": 4,
+			"phase": "scroll",
+			"paintOpportunityMs": 25,
+			"largestTaskMs": 2.39,
+			"layoutMs": 0.15,
+			"paintMs": 0.03,
+			"layoutCount": 1,
+			"paintCount": 1
+		},
+		{
+			"mode": "fallback",
+			"trial": 4,
+			"phase": "next",
+			"paintOpportunityMs": 49.5,
+			"largestTaskMs": 4.177,
+			"layoutMs": 1.756,
+			"paintMs": 1.153,
+			"layoutCount": 5,
+			"paintCount": 332
+		}
+	],
+	"provenance": {
+		"baseCommit": "2ccae1f",
+		"assets": "Frozen production build created before timed window; no production flag or instrumentation",
+		"modeSelection": "TEST_SEARCH_HIGHLIGHTS=fallback injects undefined Highlight before app module initialization through the existing test proxy",
+		"fixture": "Same ASCII document,500 repeated common-letter sentences;12,002 lowercase e matches",
+		"frameRate": "Headless Chrome near60Hz",
+		"tracing": "No CPU profiler, main-thread RunTask/Layout/Paint complete slices overlapping phase boundaries. Top-level tasks include enclosing input tasks; nested task durations are not added. Layout/Paint sums cover recorded phase windows, not guaranteed final raster/presentation.",
+		"order": "Five trials per mode, order alternated each trial",
+		"scroll": "Programmatic EditorViewport.scrollTop=600, not native wheel gesture latency",
+		"latency": "Trusted input or keyboard activation to required highlight/selection state plus two animation-frame opportunities; cannot establish actual pixel presentation",
+		"counts": "Native registers text ranges for the approximate visible source window; CSS clips them. Fallback filters individual rectangles to the viewport, so raw counts differ.217 native ranges plus one active overlay versus192 rect-filtered spans are not equal units.",
+		"assetHashes": "All files present in the frozen assets directory, including unused stale chunks. This is build provenance, not a bundle closure."
+	},
+	"assetSha256": {
+		"document-worker.js": "46cef91717183f36f40badf598e75bc62aa0a43d68879e7b6f29cddc48ed10ec",
+		"app.js": "252e503bae40824a02a0e361daccb1afaf67a59a5ae85288b501c1d02e78c0be",
+		"sw.js": "cd5ea12e9cdceaf1572bf126bec8118812a7307db67cb0836931ed315ad94e1e",
+		"chunks/document-app-y1hrwemp.js": "f586172f560f028ee72e5b5937847b71d6bd019403b0419bea2b30a4dd6df675",
+		"chunks/document-app-vs6xk76k.js": "bf7a9e209e0027ee9f064848012e21993aae3159138106ae8163e81aee1c3eef",
+		"chunks/media-picker-x0hne6w9.js": "cc0905ddce4f2e1c99d847d18068d58c8bd07bc3a0e6b12ad92554adf071cc66",
+		"chunks/document-app-84g5fq8v.js": "f47987ff574fa3c98e2b4f4605631651054ea8ad6c1bcb09265e39b1ca4b3ac3",
+		"chunks/document-app-6q8jcqjd.js": "530a9bfdb564daf2442a6d910b579ea2acb376887ade01fb5f0a2993937d4069",
+		"chunks/videos-stebcz4d.js": "cf39b258d8617affdd82dcf649f511fe7c6bc1c9832949cdca93b5c827c4df73",
+		"chunks/whiteboard-preview-ddpzrrfv.js": "3eafd090e645a4133f778ebd8ceae7776407bfd525ddfc54ff4def45ebc4a425",
+		"chunks/document-worker-stats-06ykpceg.js": "79459595fde6b47b29fca3c64fb28620040dbb1b0673bb74f0f849a1028ac3cc",
+		"chunks/document-app-nja8vsjk.js": "a58dd371b653383ef800e010535b628ea5102ddb85aca1fde74b7971aa2232a0",
+		"chunks/document-app-jev26rbc.js": "ffe2f07e24a5802624acb728ebe1d3e055ddb1c09022f7c07bd69fc09c4c9cd2",
+		"chunks/document-app-e27xkjdd.js": "8e0b3a4cf9e167397cea862bd7cbf00b430f91fa4908c25c688ebdfe1b5ea0b9",
+		"chunks/document-app-b0yeg0hx.js": "297a20f766e801b94267e924472119ba559f79dcb694af31db9b92165d914292",
+		"chunks/whiteboard-store-h4spts9v.js": "212671559872ad11601562b3c0bd8f5319a5356720397c5883912c088b6d8591",
+		"chunks/images-gh6fx4ec.js": "f1c3a034b8b1642c2cfb17e2e83f0180538ac587dac336220a470fc83c0f9cf6",
+		"chunks/document-app-eznwvf0k.js": "3b68cc19aa306269816b5130b3137bda2a0d81f0cc70d33c921b4feb550e409a",
+		"chunks/document-app-t2c0q4x7.js": "807ba5bba9905e24dc8cadae50667c2824b0be180296a6036382d65906913506",
+		"chunks/document-archives-1rprkwpq.js": "77e43ee9099b5fb5306e756ae5f737f1892cc842c3d3445bf619ff974367e2fa",
+		"chunks/sanitizeSvg-gvgcnb7c.js": "600e0b8d7cb98ba0cd71c36758c06684124d66390fce8537eaa932b0986e6a41",
+		"chunks/document-app-a1wrmpe6.js": "ced0ec45edf1c7cb6abe3efa05f047c8dcdf2b3ff5510876f9e61ab1b61cee90",
+		"chunks/document-app-xechpbp6.js": "5e013bd6329830c9fc28415b45f4d3900ca799cd11c5d759fd5c2e110eed80e3",
+		"chunks/document-app-1t4a0gb7.js": "cc54de98acfe1358d80201bf59456569203203c9c1e17d7e756eef12922061e1",
+		"chunks/document-app-5z66gvks.js": "43090dd255a73edfe4ba22759f2ba9dcfade4aa2c22aaea128655cb932db1ed3",
+		"chunks/document-app-mhc65yn7.js": "70685b005cc0be54dfd9cfd6c0ab43480a02b32ab571ba8e6c1ba5f40ece2342",
+		"chunks/syntax-1xtd23vt.js": "f79f49404d23a8ba185654f0a2255b461842323b47b7ef9569e36675a2f65c7a",
+		"chunks/document-app-fjge2egf.js": "f5f4c66d895fe99cc8c0a2cee58e05bec475f2e2feaaa125ffc34fb8650fed1a",
+		"chunks/document-media-fq5czv8b.js": "cab076ecee271bdfe0196a7075977bd7bfc1caa1b874f64e5d79ac2872994a1b",
+		"chunks/document-app-2d6qcvkk.js": "78de8fa627f4f484f661d8c57595db2f312d9daade130c6bf1acc7c610fcc780",
+		"chunks/invitations-vj0d3tdx.js": "682943248d275fa97658b1eb6ae982ffe7f972bc7884fc09e0604d7b87408f2d",
+		"chunks/document-app-qbpfjp9s.js": "bcd963694f25993aa23f9b92fc71d6be6af2504cf851dc7ebd97667614210da5",
+		"chunks/invitation-screen-ke7tgxmy.js": "20c1e0947f26d668cdc1115f86e8540c78b1070f164e28545e43095f6ae9b858",
+		"chunks/document-app-68q58m06.js": "1678be6a027e992f23bbded505b8e1e721a1b0877b253dbb7afcba64c7464755",
+		"chunks/document-app-e3ap03vm.js": "4b757c48a94d52229e828414ea0ee209a26486612d2b81e5337c4e5edd42e91c",
+		"chunks/document-app-c4ksd8ec.js": "e49c0a6a628119f568a9862a4f44cff62ab439a1bd543e2a76cf2ce9d357176e",
+		"chunks/whiteboard-3mbgtptm.js": "44f8254727cbd5f3d9c50741d9f780d3f478da85f2e6aa7e7bfc49a154e71bf2",
+		"chunks/document-app-c3ss2tq7.js": "fd4106115b595215a79ec9bfa83a4f83ee4536a3f949b7cd0c7f5f66492e38b9",
+		"chunks/document-app-06erkqg7.js": "f2c23575c2800cac4715b59b67110e71094d65f11b3a5206444cd95bca66f631",
+		"chunks/theme-picker-fxfzvdj1.js": "501779ccf54e30a140fb5b55a0a6293ccf1997cbe1a33344e745ab1d09841ab9",
+		"chunks/document-app-jyacae6r.js": "493dc93481df1ee552de4dfa74a2deb8244c485874ed5db020db9484711d1845",
+		"chunks/document-app-j0tstz02.js": "e89ea129e4ca0e884ac312f6d795aac6ce14f317a3d837441556ee3f1c23f52b",
+		"chunks/document-app-09b4kfpc.js": "14e167c979f62512a2a108b5b01e3896b09eb1696f1b4b1ef58f6392adbf8152",
+		"chunks/document-app-m2qx4cqf.js": "a16f603c7e82fa73c3c08187e200539440a114333311e16d891b12060d5d40bc",
+		"chunks/document-app-nqb2j1d5.js": "7ee8a12ff085053fec8ff4edc3bb46ed6125e227c1ca24a152407cb5d6a250c8",
+		"chunks/document-app-ncxg3qzf.js": "2033be89fac9846668f0ed9904b433c97158d25a414f5da55b01817cbc317ada",
+		"chunks/document-app-e7vwaf0q.js": "e00abbc0b9eecb68b145736339e85c8258d0a225aeac8b7c6f0e0c07bde46b5a",
+		"chunks/theme-workbench-0emb6h25.js": "277d949ed8b40cef3e5e22f2957a9802f4fa67e63c4bf518dea99cbd91b6d28f",
+		"chunks/document-app-jegj5sa1.js": "fe1e6ebdc6cf2e7a6705c14e455a259bb8377dadf1e1da5247c22b404a56e1ed",
+		"chunks/document-app-c6wc4y2y.js": "e7cd6742cb47d312c6c57765b930f78dd75eb4202d8419d9a04b8469960a5d42",
+		"chunks/invitations-632v4537.js": "ee968133165f1f4fdf4a3f13d2876ea8bcfe0c9a921b16e5f4966b1a54bc7bd3",
+		"chunks/document-app-pzbxckbs.js": "99c12593e2542c4ec04a9b68d96c292fb36d4f84b1807d62a195d6c579d3d074",
+		"chunks/document-app-gf4hdxnw.js": "8f2502d90355e5ad1b0dc4c4c43962052fc5dd35fcffbdb2df57e349fdde9892"
+	},
+	"outliers": [
+		{
+			"mode": "native",
+			"trial": 0,
+			"phase": "next",
+			"largestTaskMs": 13.879,
+			"keydownMs": 13.809,
+			"layoutInsideTaskMs": 4.802,
+			"gcInsideTaskMs": 0
+		},
+		{
+			"mode": "fallback",
+			"trial": 0,
+			"phase": "next",
+			"largestTaskMs": 14.269,
+			"keydownMs": 14.201,
+			"layoutInsideTaskMs": 4.904,
+			"gcInsideTaskMs": 0
+		}
+	],
+	"outlierInterpretation": "Both first-next keydown handlers exceeded the 8.33 ms budget. Nine Layout events and DOM expansion from 413 to 1750 then 2646 objects were recorded. Source inspection identifies synchronous viewport reveal/refinement and the transient full-document selection path as candidates, not measured causal attribution."
+}

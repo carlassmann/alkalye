@@ -1,0 +1,150 @@
+{
+	"runtime": "Bun 1.4.0 / JavaScriptCore",
+	"scope": "Real SQLite journal and scoped DocumentSession with cooperativeWork=true (browser-style hydration/copy work under Bun scheduler; NOT native CLI default or browser measurement). Experimental closed-source transfer interceptor, not production ownership protocol. Three ordered samples per variant; no significance claim.",
+	"results": [
+		{
+			"kind": "public SQLite session reopen; closed-source transfer microprototype only",
+			"kilobytes": 128,
+			"reuseClosed": false,
+			"iteration": 0,
+			"openedMs": 31.08274999999992,
+			"forks": {
+				"calls": 3,
+				"transferred": 0,
+				"milliseconds": 27.67566599999998
+			}
+		},
+		{
+			"kind": "public SQLite session reopen; closed-source transfer microprototype only",
+			"kilobytes": 128,
+			"reuseClosed": false,
+			"iteration": 1,
+			"openedMs": 28.76545800000008,
+			"forks": {
+				"calls": 3,
+				"transferred": 0,
+				"milliseconds": 26.14791600000001
+			}
+		},
+		{
+			"kind": "public SQLite session reopen; closed-source transfer microprototype only",
+			"kilobytes": 128,
+			"reuseClosed": false,
+			"iteration": 2,
+			"openedMs": 22.44466699999998,
+			"forks": {
+				"calls": 3,
+				"transferred": 0,
+				"milliseconds": 20.244749999999954
+			}
+		},
+		{
+			"kind": "public SQLite session reopen; closed-source transfer microprototype only",
+			"kilobytes": 128,
+			"reuseClosed": true,
+			"iteration": 0,
+			"openedMs": 21.68574999999987,
+			"forks": {
+				"calls": 3,
+				"transferred": 1,
+				"milliseconds": 19.134749000000284
+			}
+		},
+		{
+			"kind": "public SQLite session reopen; closed-source transfer microprototype only",
+			"kilobytes": 128,
+			"reuseClosed": true,
+			"iteration": 1,
+			"openedMs": 19.21308399999998,
+			"forks": {
+				"calls": 3,
+				"transferred": 1,
+				"milliseconds": 17.015084000000115
+			}
+		},
+		{
+			"kind": "public SQLite session reopen; closed-source transfer microprototype only",
+			"kilobytes": 128,
+			"reuseClosed": true,
+			"iteration": 2,
+			"openedMs": 18.49566700000014,
+			"forks": {
+				"calls": 3,
+				"transferred": 1,
+				"milliseconds": 16.169583999999986
+			}
+		},
+		{
+			"kind": "public SQLite session reopen; closed-source transfer microprototype only",
+			"kilobytes": 1024,
+			"reuseClosed": false,
+			"iteration": 0,
+			"openedMs": 655.3947919999991,
+			"forks": {
+				"calls": 3,
+				"transferred": 0,
+				"milliseconds": 647.4027079999996
+			}
+		},
+		{
+			"kind": "public SQLite session reopen; closed-source transfer microprototype only",
+			"kilobytes": 1024,
+			"reuseClosed": false,
+			"iteration": 1,
+			"openedMs": 619.9963750000006,
+			"forks": {
+				"calls": 3,
+				"transferred": 0,
+				"milliseconds": 617.2328739999994
+			}
+		},
+		{
+			"kind": "public SQLite session reopen; closed-source transfer microprototype only",
+			"kilobytes": 1024,
+			"reuseClosed": false,
+			"iteration": 2,
+			"openedMs": 583.0250419999993,
+			"forks": {
+				"calls": 3,
+				"transferred": 0,
+				"milliseconds": 580.0754160000015
+			}
+		},
+		{
+			"kind": "public SQLite session reopen; closed-source transfer microprototype only",
+			"kilobytes": 1024,
+			"reuseClosed": true,
+			"iteration": 0,
+			"openedMs": 406.9566249999989,
+			"forks": {
+				"calls": 3,
+				"transferred": 1,
+				"milliseconds": 402.3161250000012
+			}
+		},
+		{
+			"kind": "public SQLite session reopen; closed-source transfer microprototype only",
+			"kilobytes": 1024,
+			"reuseClosed": true,
+			"iteration": 1,
+			"openedMs": 385.6467080000002,
+			"forks": {
+				"calls": 3,
+				"transferred": 1,
+				"milliseconds": 383.28933400000096
+			}
+		},
+		{
+			"kind": "public SQLite session reopen; closed-source transfer microprototype only",
+			"kilobytes": 1024,
+			"reuseClosed": true,
+			"iteration": 2,
+			"openedMs": 403.3652080000029,
+			"forks": {
+				"calls": 3,
+				"transferred": 1,
+				"milliseconds": 401.2993749999987
+			}
+		}
+	]
+}

@@ -1,0 +1,945 @@
+{
+	"format": "body-edits-v1",
+	"fixture": {
+		"kilobytes": 128,
+		"shape": "rich",
+		"history": "Existing performance-interaction history-bearing rewrite profile and database, copied identically before each version. Not the fresh-document interaction matrix.",
+		"document": "b1c075c3-4930-4d1d-8b66-a106139464bc",
+		"viewport": "Browser profile default; not independently reset by this harness."
+	},
+	"versions": {
+		"before": {
+			"head": "71b8f41b9a95c3b87c61e3fae845b28117f1dab8",
+			"appJavaScriptSha256": "1ac98451e04aa81b79fbfa67ca14d9c2a7cec3503373700d0d1d422379427039",
+			"appJavaScriptBytes": 252745
+		},
+		"after": {
+			"head": "3185162c1174e9d73b1ac16f458c2f536e9d3687",
+			"appJavaScriptSha256": "e0e268aae2b113423fda956b9011bf06b68379741a1c3c1801815ee83e8d3c55",
+			"appJavaScriptBytes": 252795
+		}
+	},
+	"method": {
+		"browser": "agent-browser background; 5 trusted insertions per version/scenario/position; exact canonical source and Saved gates after every edit. Retitle through trusted selected-text replacement, body unchanged apart from measured edits.",
+		"metrics": {
+			"handled": "Trusted beforeinput capture to trusted input bubble, synchronous native editing plus application handlers.",
+			"first": "First requestAnimationFrame callback after accepted input.",
+			"second": "Second requestAnimationFrame callback; frame opportunity, not presentation timestamp."
+		},
+		"provenance": "Fresh copies of original profile/database. Removed Service Worker, Cache and Code Cache directories before first boot. Actual loaded script ResourceTiming decodedBodySize matched frozen app.js, and fetched app.js SHA256 matched frozen file.",
+		"discarded": "Initial runs with copied browser caches produced stale-runtime evidence and were discarded. Only cache-cleared, asset-verified runs retained.",
+		"limits": "Small n; history-bearing profile; headless browser. No measured120Hz display, compositor presentation, peer-convergence or sync throughput claim. Module timings exclude creation, forks and cache warming; module checkpoint/exact-source assertions run outside timing."
+	},
+	"module": {
+		"before": [
+			{
+				"size": 128,
+				"scenario": "normal",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.29879199999999173,
+						"applied": 0.26258300000000645,
+						"projected": 0.001167000000009466,
+						"total": 0.5625420000000076
+					},
+					{
+						"position": "middle",
+						"prepared": 0.029665999999991755,
+						"applied": 0.050790999999975384,
+						"projected": 0.0007919999999899119,
+						"total": 0.08124899999995705
+					},
+					{
+						"position": "end",
+						"prepared": 0.028666999999984455,
+						"applied": 0.027708999999987327,
+						"projected": 0.0002920000000017353,
+						"total": 0.05666799999997352
+					}
+				]
+			},
+			{
+				"size": 128,
+				"scenario": "retitle",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.02524999999997135,
+						"applied": 0.060875000000010004,
+						"projected": 16.554750000000013,
+						"total": 16.640874999999994
+					},
+					{
+						"position": "middle",
+						"prepared": 0.03516700000000128,
+						"applied": 0.058708000000024185,
+						"projected": 14.82099999999997,
+						"total": 14.914874999999995
+					},
+					{
+						"position": "end",
+						"prepared": 0.031207999999992353,
+						"applied": 0.052957999999989624,
+						"projected": 14.30337499999996,
+						"total": 14.387540999999942
+					}
+				]
+			},
+			{
+				"size": 128,
+				"scenario": "merge",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.02904200000000401,
+						"applied": 0.0550829999999678,
+						"projected": 13.111666000000014,
+						"total": 13.195790999999986
+					},
+					{
+						"position": "middle",
+						"prepared": 0.03029100000003382,
+						"applied": 0.05679200000008677,
+						"projected": 12.284249999999929,
+						"total": 12.37133300000005
+					},
+					{
+						"position": "end",
+						"prepared": 0.027291999999988548,
+						"applied": 0.04429199999992761,
+						"projected": 13.569708000000105,
+						"total": 13.641292000000021
+					}
+				]
+			},
+			{
+				"size": 128,
+				"scenario": "remote",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.029415999999969245,
+						"applied": 0.07995800000003328,
+						"projected": 0.00029099999994741665,
+						"total": 0.10966499999994994
+					},
+					{
+						"position": "middle",
+						"prepared": 0.02191600000003291,
+						"applied": 0.03341699999998582,
+						"projected": 0.00016699999991942605,
+						"total": 0.055499999999938154
+					},
+					{
+						"position": "end",
+						"prepared": 0.015499999999974534,
+						"applied": 0.024750000000040018,
+						"projected": 8.400000001529406e-5,
+						"total": 0.040334000000029846
+					}
+				]
+			},
+			{
+				"size": 128,
+				"scenario": "undo",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.04899999999997817,
+						"applied": 0.09337500000003729,
+						"projected": 0.0004159999999728825,
+						"total": 0.14279099999998834
+					},
+					{
+						"position": "middle",
+						"prepared": 0.026958999999919797,
+						"applied": 0.034917000000064036,
+						"projected": 0.00020899999992707308,
+						"total": 0.062084999999910906
+					},
+					{
+						"position": "end",
+						"prepared": 0.01641600000004928,
+						"applied": 0.022458000000028733,
+						"projected": 0.00012499999991177901,
+						"total": 0.03899899999998979
+					}
+				]
+			},
+			{
+				"size": 1024,
+				"scenario": "normal",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.1750000000001819,
+						"applied": 0.11908300000004601,
+						"projected": 0.00037500000007639755,
+						"total": 0.2944580000003043
+					},
+					{
+						"position": "middle",
+						"prepared": 0.18537500000002183,
+						"applied": 0.04329199999983757,
+						"projected": 0.0003339999998388521,
+						"total": 0.22900099999969825
+					},
+					{
+						"position": "end",
+						"prepared": 0.1292500000004111,
+						"applied": 0.026667000000088592,
+						"projected": 0.00016699999969205237,
+						"total": 0.15608400000019174
+					}
+				]
+			},
+			{
+				"size": 1024,
+				"scenario": "retitle",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.15587500000037835,
+						"applied": 0.05045900000004622,
+						"projected": 219.29033400000026,
+						"total": 219.49666800000068
+					},
+					{
+						"position": "middle",
+						"prepared": 0.19433399999979883,
+						"applied": 0.08266699999967386,
+						"projected": 217.23120800000015,
+						"total": 217.50820899999962
+					},
+					{
+						"position": "end",
+						"prepared": 0.1875,
+						"applied": 0.05891599999995378,
+						"projected": 216.82666600000084,
+						"total": 217.0730820000008
+					}
+				]
+			},
+			{
+				"size": 1024,
+				"scenario": "merge",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.20912500000031287,
+						"applied": 0.07466699999986304,
+						"projected": 201.19974999999977,
+						"total": 201.48354199999994
+					},
+					{
+						"position": "middle",
+						"prepared": 0.19012500000008004,
+						"applied": 0.07229100000040489,
+						"projected": 208.25816599999962,
+						"total": 208.5205820000001
+					},
+					{
+						"position": "end",
+						"prepared": 0.1508750000002692,
+						"applied": 0.04545799999959854,
+						"projected": 220.21587500000078,
+						"total": 220.41220800000065
+					}
+				]
+			},
+			{
+				"size": 1024,
+				"scenario": "remote",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.14795799999956216,
+						"applied": 0.09695899999860558,
+						"projected": 0.0004580000004352769,
+						"total": 0.24537499999860302
+					},
+					{
+						"position": "middle",
+						"prepared": 0.12595800000053714,
+						"applied": 0.04233299999941664,
+						"projected": 0.00016700000014679972,
+						"total": 0.16845800000010058
+					},
+					{
+						"position": "end",
+						"prepared": 0.15891700000065612,
+						"applied": 0.01862500000061118,
+						"projected": 0.0002500000009604264,
+						"total": 0.17779200000222772
+					}
+				]
+			},
+			{
+				"size": 1024,
+				"scenario": "undo",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.20750000000043656,
+						"applied": 0.08950000000004366,
+						"projected": 0.0003750000014406396,
+						"total": 0.29737500000192085
+					},
+					{
+						"position": "middle",
+						"prepared": 0.16020799999932933,
+						"applied": 0.028874999999970896,
+						"projected": 0.0004169999992882367,
+						"total": 0.18949999999858846
+					},
+					{
+						"position": "end",
+						"prepared": 0.17358299999978044,
+						"applied": 0.026208999999653315,
+						"projected": 0.00020799999947485048,
+						"total": 0.1999999999989086
+					}
+				]
+			}
+		],
+		"after": [
+			{
+				"size": 128,
+				"scenario": "normal",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.32508300000000645,
+						"applied": 0.2633750000000248,
+						"projected": 0.0009579999999971278,
+						"total": 0.5894160000000284
+					},
+					{
+						"position": "middle",
+						"prepared": 0.03195800000000304,
+						"applied": 0.05279200000001083,
+						"projected": 0.0005419999999958236,
+						"total": 0.0852920000000097
+					},
+					{
+						"position": "end",
+						"prepared": 0.03395899999998164,
+						"applied": 0.03683399999999892,
+						"projected": 0.00033399999998096064,
+						"total": 0.07112699999996153
+					}
+				]
+			},
+			{
+				"size": 128,
+				"scenario": "retitle",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.02812499999998863,
+						"applied": 0.07270899999997482,
+						"projected": 0.000666999999964446,
+						"total": 0.1015009999999279
+					},
+					{
+						"position": "middle",
+						"prepared": 0.02524999999997135,
+						"applied": 0.025875000000041837,
+						"projected": 0.0003330000000119071,
+						"total": 0.051458000000025095
+					},
+					{
+						"position": "end",
+						"prepared": 0.016458000000000084,
+						"applied": 0.01850000000001728,
+						"projected": 0.0002910000000042601,
+						"total": 0.035249000000021624
+					}
+				]
+			},
+			{
+				"size": 128,
+				"scenario": "merge",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.04083300000002055,
+						"applied": 0.08904099999995196,
+						"projected": 0.0005830000000059954,
+						"total": 0.1304569999999785
+					},
+					{
+						"position": "middle",
+						"prepared": 0.015499999999974534,
+						"applied": 0.0326670000000604,
+						"projected": 0.00020799999992959783,
+						"total": 0.04837499999996453
+					},
+					{
+						"position": "end",
+						"prepared": 0.012249999999994543,
+						"applied": 0.019333999999957996,
+						"projected": 0.00024999999993724487,
+						"total": 0.031833999999889784
+					}
+				]
+			},
+			{
+				"size": 128,
+				"scenario": "remote",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.02800000000002001,
+						"applied": 0.04716599999994742,
+						"projected": 0.00020800000004328467,
+						"total": 0.07537400000001071
+					},
+					{
+						"position": "middle",
+						"prepared": 0.020417000000065855,
+						"applied": 0.02437499999996362,
+						"projected": 0.00012500000002546585,
+						"total": 0.04491700000005494
+					},
+					{
+						"position": "end",
+						"prepared": 0.027832999999986896,
+						"applied": 0.02241700000001856,
+						"projected": 0.00012500000002546585,
+						"total": 0.05037500000003092
+					}
+				]
+			},
+			{
+				"size": 128,
+				"scenario": "undo",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.027749999999969077,
+						"applied": 0.07337500000005548,
+						"projected": 0.0003749999999627107,
+						"total": 0.10149999999998727
+					},
+					{
+						"position": "middle",
+						"prepared": 0.01525000000003729,
+						"applied": 0.020499999999969987,
+						"projected": 0.00012500000002546585,
+						"total": 0.03587500000003274
+					},
+					{
+						"position": "end",
+						"prepared": 0.013042000000041298,
+						"applied": 0.01712499999996453,
+						"projected": 0.00016700000003311288,
+						"total": 0.03033400000003894
+					}
+				]
+			},
+			{
+				"size": 1024,
+				"scenario": "normal",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.19604200000003402,
+						"applied": 0.19258399999989706,
+						"projected": 0.0006669999997939158,
+						"total": 0.389292999999725
+					},
+					{
+						"position": "middle",
+						"prepared": 0.23991700000033234,
+						"applied": 0.04541700000027049,
+						"projected": 0.00029100000028847717,
+						"total": 0.2856250000008913
+					},
+					{
+						"position": "end",
+						"prepared": 0.15562499999987267,
+						"applied": 0.024292000000059488,
+						"projected": 0.0002500000000509317,
+						"total": 0.1801669999999831
+					}
+				]
+			},
+			{
+				"size": 1024,
+				"scenario": "retitle",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.1524170000002414,
+						"applied": 0.07175000000006548,
+						"projected": 0.0005000000001018634,
+						"total": 0.22466700000040873
+					},
+					{
+						"position": "middle",
+						"prepared": 0.1349579999996422,
+						"applied": 0.04562499999974534,
+						"projected": 0.00020899999981338624,
+						"total": 0.18079199999920093
+					},
+					{
+						"position": "end",
+						"prepared": 0.12808299999960582,
+						"applied": 0.01937499999985448,
+						"projected": 0.0002500000000509317,
+						"total": 0.14770799999951123
+					}
+				]
+			},
+			{
+				"size": 1024,
+				"scenario": "merge",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.17658299999948213,
+						"applied": 0.10112500000013824,
+						"projected": 0.0003750000005311449,
+						"total": 0.2780830000001515
+					},
+					{
+						"position": "middle",
+						"prepared": 0.17566700000043056,
+						"applied": 0.02420899999924586,
+						"projected": 0.00020899999981338624,
+						"total": 0.2000849999994898
+					},
+					{
+						"position": "end",
+						"prepared": 0.14929199999915,
+						"applied": 0.013707999999496678,
+						"projected": 0.00016599999980826396,
+						"total": 0.16316599999845494
+					}
+				]
+			},
+			{
+				"size": 1024,
+				"scenario": "remote",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.1757500000003347,
+						"applied": 0.05545799999981682,
+						"projected": 0.0004999999991923687,
+						"total": 0.23170799999934388
+					},
+					{
+						"position": "middle",
+						"prepared": 0.15891700000065612,
+						"applied": 0.02195800000026793,
+						"projected": 0.00041599999985919567,
+						"total": 0.18129100000078324
+					},
+					{
+						"position": "end",
+						"prepared": 0.15358300000025338,
+						"applied": 0.02212500000041473,
+						"projected": 0.0002500000000509317,
+						"total": 0.17595800000071904
+					}
+				]
+			},
+			{
+				"size": 1024,
+				"scenario": "undo",
+				"samples": [
+					{
+						"position": "start",
+						"prepared": 0.2056670000001759,
+						"applied": 0.07462499999928696,
+						"projected": 0.0005420000015874393,
+						"total": 0.2808340000010503
+					},
+					{
+						"position": "middle",
+						"prepared": 0.16220799999973678,
+						"applied": 0.020207999999911408,
+						"projected": 0.00020799999947485048,
+						"total": 0.18262399999912304
+					},
+					{
+						"position": "end",
+						"prepared": 0.13112499999988358,
+						"applied": 0.01558400000067195,
+						"projected": 0.00020899999981338624,
+						"total": 0.14691800000036892
+					}
+				]
+			}
+		]
+	},
+	"browser": {
+		"before": [
+			{
+				"version": "before",
+				"scenario": "normal",
+				"position": "start",
+				"sample": 0,
+				"handled": 135.9000000357628,
+				"first": 137.9000000357628,
+				"second": 139.5
+			},
+			{
+				"version": "before",
+				"scenario": "normal",
+				"position": "start",
+				"sample": 1,
+				"handled": 117.89999997615814,
+				"first": 119.39999997615814,
+				"second": 120.69999998807907
+			},
+			{
+				"version": "before",
+				"scenario": "normal",
+				"position": "start",
+				"sample": 2,
+				"handled": 113.39999997615814,
+				"first": 114.79999995231628,
+				"second": 115.89999997615814
+			},
+			{
+				"version": "before",
+				"scenario": "normal",
+				"position": "start",
+				"sample": 3,
+				"handled": 122.59999996423721,
+				"first": 124.19999998807907,
+				"second": 125.39999997615814
+			},
+			{
+				"version": "before",
+				"scenario": "normal",
+				"position": "start",
+				"sample": 4,
+				"handled": 105.10000002384186,
+				"first": 106.60000002384186,
+				"second": 108
+			},
+			{
+				"version": "before",
+				"scenario": "normal",
+				"position": "middle",
+				"sample": 0,
+				"handled": 110.89999997615814,
+				"first": 112.59999996423721,
+				"second": 114.19999998807907
+			},
+			{
+				"version": "before",
+				"scenario": "normal",
+				"position": "middle",
+				"sample": 1,
+				"handled": 102,
+				"first": 103.80000001192093,
+				"second": 105
+			},
+			{
+				"version": "before",
+				"scenario": "normal",
+				"position": "middle",
+				"sample": 2,
+				"handled": 107.69999998807907,
+				"first": 109.30000001192093,
+				"second": 111.19999998807907
+			},
+			{
+				"version": "before",
+				"scenario": "normal",
+				"position": "middle",
+				"sample": 3,
+				"handled": 89.5,
+				"first": 93.10000002384186,
+				"second": 96.19999998807907
+			},
+			{
+				"version": "before",
+				"scenario": "normal",
+				"position": "middle",
+				"sample": 4,
+				"handled": 97,
+				"first": 99.30000001192093,
+				"second": 100.5
+			},
+			{
+				"version": "before",
+				"scenario": "retitle",
+				"position": "start",
+				"sample": 0,
+				"handled": 90.30000001192093,
+				"first": 91.69999998807907,
+				"second": 92.80000001192093
+			},
+			{
+				"version": "before",
+				"scenario": "retitle",
+				"position": "start",
+				"sample": 1,
+				"handled": 102.5,
+				"first": 103.89999997615814,
+				"second": 106
+			},
+			{
+				"version": "before",
+				"scenario": "retitle",
+				"position": "start",
+				"sample": 2,
+				"handled": 90.80000001192093,
+				"first": 92.10000002384186,
+				"second": 94.40000003576279
+			},
+			{
+				"version": "before",
+				"scenario": "retitle",
+				"position": "start",
+				"sample": 3,
+				"handled": 88,
+				"first": 90.70000004768372,
+				"second": 92.20000004768372
+			},
+			{
+				"version": "before",
+				"scenario": "retitle",
+				"position": "start",
+				"sample": 4,
+				"handled": 96.09999996423721,
+				"first": 97.59999996423721,
+				"second": 100
+			},
+			{
+				"version": "before",
+				"scenario": "retitle",
+				"position": "middle",
+				"sample": 0,
+				"handled": 106.10000002384186,
+				"first": 107.69999998807907,
+				"second": 109
+			},
+			{
+				"version": "before",
+				"scenario": "retitle",
+				"position": "middle",
+				"sample": 1,
+				"handled": 103.90000003576279,
+				"first": 105.5,
+				"second": 107.60000002384186
+			},
+			{
+				"version": "before",
+				"scenario": "retitle",
+				"position": "middle",
+				"sample": 2,
+				"handled": 88.89999997615814,
+				"first": 90.59999996423721,
+				"second": 93.59999996423721
+			},
+			{
+				"version": "before",
+				"scenario": "retitle",
+				"position": "middle",
+				"sample": 3,
+				"handled": 103.89999997615814,
+				"first": 105.5,
+				"second": 107.60000002384186
+			},
+			{
+				"version": "before",
+				"scenario": "retitle",
+				"position": "middle",
+				"sample": 4,
+				"handled": 88.10000002384186,
+				"first": 89.80000001192093,
+				"second": 92.5
+			}
+		],
+		"after": [
+			{
+				"version": "after",
+				"scenario": "normal",
+				"position": "start",
+				"sample": 0,
+				"handled": 4.199999988079071,
+				"first": 14.699999988079071,
+				"second": 30
+			},
+			{
+				"version": "after",
+				"scenario": "normal",
+				"position": "start",
+				"sample": 1,
+				"handled": 3.200000047683716,
+				"first": 14,
+				"second": 29.80000001192093
+			},
+			{
+				"version": "after",
+				"scenario": "normal",
+				"position": "start",
+				"sample": 2,
+				"handled": 2.600000023841858,
+				"first": 13.899999976158142,
+				"second": 29.19999998807907
+			},
+			{
+				"version": "after",
+				"scenario": "normal",
+				"position": "start",
+				"sample": 3,
+				"handled": 2.600000023841858,
+				"first": 16.5,
+				"second": 32.5
+			},
+			{
+				"version": "after",
+				"scenario": "normal",
+				"position": "start",
+				"sample": 4,
+				"handled": 2.5,
+				"first": 3.699999988079071,
+				"second": 4.600000023841858
+			},
+			{
+				"version": "after",
+				"scenario": "normal",
+				"position": "middle",
+				"sample": 0,
+				"handled": 7.899999976158142,
+				"first": 9.699999988079071,
+				"second": 18.69999998807907
+			},
+			{
+				"version": "after",
+				"scenario": "normal",
+				"position": "middle",
+				"sample": 1,
+				"handled": 2.800000011920929,
+				"first": 6.800000011920929,
+				"second": 25.100000023841858
+			},
+			{
+				"version": "after",
+				"scenario": "normal",
+				"position": "middle",
+				"sample": 2,
+				"handled": 2.800000011920929,
+				"first": 6.699999988079071,
+				"second": 22.099999964237213
+			},
+			{
+				"version": "after",
+				"scenario": "normal",
+				"position": "middle",
+				"sample": 3,
+				"handled": 2.899999976158142,
+				"first": 8.399999976158142,
+				"second": 25.19999998807907
+			},
+			{
+				"version": "after",
+				"scenario": "normal",
+				"position": "middle",
+				"sample": 4,
+				"handled": 2.699999988079071,
+				"first": 4.699999988079071,
+				"second": 15.899999976158142
+			},
+			{
+				"version": "after",
+				"scenario": "retitle",
+				"position": "start",
+				"sample": 0,
+				"handled": 2.400000035762787,
+				"first": 5.5,
+				"second": 21.900000035762787
+			},
+			{
+				"version": "after",
+				"scenario": "retitle",
+				"position": "start",
+				"sample": 1,
+				"handled": 2.400000035762787,
+				"first": 9.700000047683716,
+				"second": 25.600000023841858
+			},
+			{
+				"version": "after",
+				"scenario": "retitle",
+				"position": "start",
+				"sample": 2,
+				"handled": 2.400000035762787,
+				"first": 4.200000047683716,
+				"second": 17.80000001192093
+			},
+			{
+				"version": "after",
+				"scenario": "retitle",
+				"position": "start",
+				"sample": 3,
+				"handled": 2.600000023841858,
+				"first": 7.900000035762787,
+				"second": 23.30000001192093
+			},
+			{
+				"version": "after",
+				"scenario": "retitle",
+				"position": "start",
+				"sample": 4,
+				"handled": 2.5,
+				"first": 16.19999998807907,
+				"second": 30.099999964237213
+			},
+			{
+				"version": "after",
+				"scenario": "retitle",
+				"position": "middle",
+				"sample": 0,
+				"handled": 2.799999952316284,
+				"first": 4.699999988079071,
+				"second": 19.5
+			},
+			{
+				"version": "after",
+				"scenario": "retitle",
+				"position": "middle",
+				"sample": 1,
+				"handled": 2.900000035762787,
+				"first": 7.800000011920929,
+				"second": 23.30000001192093
+			},
+			{
+				"version": "after",
+				"scenario": "retitle",
+				"position": "middle",
+				"sample": 2,
+				"handled": 2.600000023841858,
+				"first": 9.400000035762787,
+				"second": 24.600000023841858
+			},
+			{
+				"version": "after",
+				"scenario": "retitle",
+				"position": "middle",
+				"sample": 3,
+				"handled": 2.400000035762787,
+				"first": 7.199999988079071,
+				"second": 21.400000035762787
+			},
+			{
+				"version": "after",
+				"scenario": "retitle",
+				"position": "middle",
+				"sample": 4,
+				"handled": 2.600000023841858,
+				"first": 4.699999988079071,
+				"second": 16.19999998807907
+			}
+		]
+	}
+}
