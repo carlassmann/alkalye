@@ -11,6 +11,7 @@ import type { DocumentTransport } from "../src/shared/document-session"
 import type { DocumentSnapshot } from "../src/shared/document-actions"
 import { Replica } from "../src/shared/crdt"
 import { newDocument } from "../src/shared/documents"
+import { frontmatter } from "../src/shared/markdown"
 
 test("precise document transactions retain repeated-character intent, concurrent contributions, Unicode, undo and durable reopening", async () => {
 	let directory = await mkdtemp(join(tmpdir(), "alkalye-replacements-"))
@@ -222,3 +223,90 @@ test.each([false, true])(
 		}
 	},
 )
+
+test("large body transactions after merged frontmatter retain exact source, Unicode, remote writers, undo and snapshots", () => {
+	let replica = new Replica("birth")
+	let body =
+		"Paragraph **bold** ==marker== [link](https://example.com) ![Whiteboard](/assets/drawing.tldr) 😀 مرحبا\n\n".repeat(
+			1400,
+		)
+	newDocument(
+		replica,
+		"doc",
+		"",
+		"---\ntitle: Original\n---\n# Notes\n\n" + body,
+	)
+	let owner = replica.fork("owner")
+	let collaborator = replica.fork("collaborator")
+	let title = owner.edit(
+		"doc",
+		owner.text("doc").replace("title: Original", "title: Renamed"),
+	)
+	let mode = collaborator.edit(
+		"doc",
+		collaborator
+			.text("doc")
+			.replace("title: Original", "title: Original\nmode: present"),
+	)
+	if (!title || !mode) throw Error("Missing metadata contributions")
+	replica.apply([title, mode])
+	expect(replica.metadata("doc").title).toBe("Renamed")
+	expect(frontmatter(replica.text("doc")).data.mode).toBe("present")
+	for (let position of ["first", "unicode", "last"]) {
+		let before = replica.text("doc")
+		let start =
+			position === "first"
+				? before.indexOf("\n\n") + 2
+				: position === "unicode"
+					? before.indexOf("😀")
+					: before.length
+		let remove = position === "unicode" ? 2 : 0
+		let text = position === "unicode" ? "🌟" : "Local contribution "
+		let audit = replica.fork("audit")
+		let operation = replica.prepareReplacements("doc", [
+			{ start, remove, text },
+		])
+		if (!operation) throw Error("Missing body transaction")
+		replica.apply([operation])
+		audit.apply([operation])
+		let expected = before.slice(0, start) + text + before.slice(start + remove)
+		expect(replica.text("doc")).toBe(expected)
+		expect(audit.text("doc")).toBe(expected)
+		let reopened = new Replica("reopened")
+		reopened.restore(replica.checkpoint())
+		expect(reopened.text("doc")).toBe(expected)
+		expect(reopened.metadata("doc")).toEqual(replica.metadata("doc"))
+	}
+	let before = replica.text("doc")
+	let base = replica.visible("doc")
+	let peer = replica.fork("peer")
+	let remote = peer.prepareReplacements("doc", [
+		{ start: before.length, remove: 0, text: "Remote contribution" },
+	])
+	if (!remote) throw Error("Missing remote transaction")
+	replica.apply([remote])
+	let start = before.indexOf("==marker==")
+	let local = replica.prepareReplacements(
+		"doc",
+		[
+			{ start, remove: 10, text: "==changed==" },
+			{ start: before.indexOf("🌟"), remove: 2, text: "😀" },
+		],
+		base,
+	)
+	if (!local) throw Error("Missing concurrent body transaction")
+	replica.apply([local])
+	let expected =
+		before.replace("==marker==", "==changed==").replace("🌟", "😀") +
+		"Remote contribution"
+	expect(replica.text("doc")).toBe(expected)
+	let undo = replica.cancel("doc", local.id)
+	expect(replica.text("doc")).toBe(before + "Remote contribution")
+	replica.cancel("doc", undo.id)
+	expect(replica.text("doc")).toBe(expected)
+	let reopened = new Replica("reopened")
+	reopened.restore(replica.checkpoint())
+	expect(reopened.text("doc")).toBe(expected)
+	expect(reopened.metadata("doc").title).toBe("Renamed")
+	expect(frontmatter(reopened.text("doc")).data.mode).toBe("present")
+})
