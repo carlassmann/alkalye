@@ -27,10 +27,10 @@ The owned-operation token experiment was rejected. Its final bounded issuer vari
 A second, independent pair compared the adopted fork `41716e4` with one guarded argument. When a text undo has no register inverses, `protectedRecords` still checks provenance but receives an empty source. Its returned protection set is unused. This avoids materializing the whole staged document only to discard the result.
 
 | Trusted undo, milliseconds | Fork median / max | Fork + guard median / max |
-| --- | --- | --- |
-| Two paint opportunities | 672.0 / 699.2 | 545.6 / 560.7 |
-| Fully accepted checkpoint | 2659.6 / 3000.8 | 2241.4 / 2284.4 |
-| Largest main-thread task | 316.1 / 343.8 | 332.3 / 358.9 |
+| -------------------------- | ----------------- | ------------------------- |
+| Two paint opportunities    | 672.0 / 699.2     | 545.6 / 560.7             |
+| Fully accepted checkpoint  | 2659.6 / 3000.8   | 2241.4 / 2284.4           |
+| Largest main-thread task   | 316.1 / 343.8     | 332.3 / 358.9             |
 
 The guard reduces total undo latency. It does not improve the largest task, which remains far above 8.33 ms. Each phase restored identical backend/profile seeds, three trials per variant, no index changes. Every trusted/exact/accepted-checkpoint check passed. `empty-inverse-results.json` retains samples, hashes and the independent module comparison. Do not add medians from the two separate rounds.
 
