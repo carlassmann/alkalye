@@ -2011,10 +2011,7 @@ function validateChanges(replicas: Replica[], operations: Operation[]) {
 }
 function applyChanges(replicas: Replica[], operations: Operation[]) {
 	return Effect.try({
-		try: () => {
-			for (let replica of replicas) replica.validate(operations)
-			for (let replica of replicas) replica.apply(operations)
-		},
+		try: () => Replica.applyTogether(replicas, operations),
 		catch: cause =>
 			new DocumentConflict({
 				message:

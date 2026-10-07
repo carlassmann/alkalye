@@ -142,10 +142,28 @@ export class Replica {
 	get generation() {
 		return this.stateGeneration
 	}
+	static applyTogether(replicas: Replica[], input: Operation[]) {
+		let commits: (() => void)[] = []
+		for (let replica of new Set(replicas))
+			commits.push(replica.prepareApplication(input))
+		for (let commit of commits) commit()
+	}
 	apply(input: Operation[]) {
+		this.prepareApplication(input)()
+	}
+	private prepareApplication(input: Operation[]) {
 		let edit = this.preparedEdit
-		this.preparedEdit = undefined
-		this.prepare(input)()
+		let commit = this.prepare(input)
+		return () => {
+			this.preparedEdit = undefined
+			commit()
+			this.cachePreparedText(input, edit)
+		}
+	}
+	private cachePreparedText(
+		input: Operation[],
+		edit: PreparedTextEdit | undefined,
+	) {
 		let operation = this.operations.get(input[0]?.id ?? "")
 		if (
 			!edit ||
