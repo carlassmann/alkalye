@@ -108,12 +108,7 @@ export class SourceTextarea {
 		return toSource(this.current, offset, bias)
 	}
 	setSelectionRange(start: number, end: number, direction?: Direction) {
-		this.render(this.current.source, { start, end, direction })
-		this.viewport.setSelectionRange(
-			toView(this.current, start),
-			toView(this.current, end),
-			direction,
-		)
+		this.render(this.current.source, { start, end, direction }, true)
 	}
 	setRangeText(
 		text: string,
@@ -232,6 +227,7 @@ export class SourceTextarea {
 	private render(
 		source: string,
 		selection: { start: number; end: number; direction?: Direction },
+		reveal = false,
 	) {
 		let length = source.length
 		let bounded = {
@@ -239,7 +235,7 @@ export class SourceTextarea {
 			end: Math.max(0, Math.min(length, selection.end)),
 			direction: selection.direction,
 		}
-		this.apply(this.projectionFor(source, bounded), bounded)
+		this.apply(this.projectionFor(source, bounded), bounded, reveal)
 	}
 	private projectionFor(
 		source: string,
@@ -277,6 +273,7 @@ export class SourceTextarea {
 	private apply(
 		next: Projection,
 		selection: { start: number; end: number; direction?: Direction },
+		reveal = false,
 	) {
 		if (next.source !== this.current.source) {
 			let edit = difference(this.current.source, next.source)
@@ -287,11 +284,15 @@ export class SourceTextarea {
 			})
 		}
 		this.current = next
-		this.viewport.render(next.text, {
-			start: toView(next, selection.start),
-			end: toView(next, selection.end),
-			direction: selection.direction,
-		})
+		this.viewport.render(
+			next.text,
+			{
+				start: toView(next, selection.start),
+				end: toView(next, selection.end),
+				direction: selection.direction,
+			},
+			{ revealSelection: reveal },
+		)
 		this.options.painted()
 	}
 }

@@ -100,6 +100,31 @@ try {
 		true,
 		"Editing invalidates cached matches; repeated navigation wraps through the new source",
 	)
+	fill("needle\n" + "Distant paragraph.\n".repeat(2000) + "needle")
+	evaluate(
+		session,
+		'(() => {let source = document.querySelector("alkalye-editor").source; source.setSelectionRange(0, 0); source.viewport.scrollTop = 8000; return true})()',
+	)
+	browser(session, "click", "#find-next")
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.selectionStart === 0 && document.querySelector("alkalye-editor").source.selectionEnd === 6 && document.querySelectorAll(".search-match[data-active]").length === 1',
+	)
+	assert(
+		evaluate(
+			session,
+			'document.querySelector("alkalye-editor").source.value.slice(0, 6) === "needle" && document.activeElement.id === "find-text" && document.querySelector("alkalye-editor").source.viewport.scrollTop < 100',
+		),
+		"Find reveals a distant selected match and preserves search focus",
+	)
+	assert(
+		evaluate(
+			session,
+			'(() => {let source = document.querySelector("alkalye-editor").source; source.setSelectionRange(0, source.value.length); let input = document.querySelector("#editor"); return source.selectionStart === 0 && source.selectionEnd === source.value.length && input.value.length === source.value.length && input.selectionEnd === input.value.length})()',
+		),
+		"Programmatic selection across viewport windows preserves the whole native range",
+	)
+	fill("needle changed needle")
 	browser(session, "click", "#close-find")
 	wait(session, `${searchHighlightCount} === 0`)
 	assert(

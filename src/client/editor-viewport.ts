@@ -6,6 +6,9 @@ export interface ViewportSelection {
 	end: number
 	direction?: "forward" | "backward" | "none"
 }
+interface ViewportRenderOptions {
+	revealSelection: boolean
+}
 export interface EditorWindow {
 	start: number
 	end: number
@@ -37,7 +40,13 @@ export class EditorViewport {
 	private resize: ResizeObserver
 	private frame = 0
 	private composing = false
-	private deferred: { text: string; selection?: ViewportSelection } | undefined
+	private deferred:
+		| {
+				text: string
+				selection?: ViewportSelection
+				options?: ViewportRenderOptions
+		  }
+		| undefined
 	private pending: Replacement[] = []
 	private intent: { start: number; end: number; type: string } | undefined
 	private accessibleDocument: boolean
@@ -196,7 +205,7 @@ export class EditorViewport {
 				queueMicrotask(() => {
 					if (this.abort.signal.aborted) return
 					if (next && this.revision === revision)
-						this.render(next.text, next.selection)
+						this.render(next.text, next.selection, next.options)
 					else this.paint()
 					this.remeasure()
 				})
@@ -321,12 +330,16 @@ export class EditorViewport {
 			end: Math.max(0, Math.min(this.text.length, end)),
 			direction,
 		}
-		this.reveal(direction === "backward" ? start : end)
+		this.reveal(direction === "backward" ? start : end, true)
 	}
-	render(source: string, selection?: ViewportSelection) {
+	render(
+		source: string,
+		selection?: ViewportSelection,
+		options?: ViewportRenderOptions,
+	) {
 		this.revision++
 		if (this.composing) {
-			this.deferred = { text: source, selection }
+			this.deferred = { text: source, selection, options }
 			return
 		}
 		let previous = this.acknowledged ?? this.text.value
@@ -349,7 +362,14 @@ export class EditorViewport {
 		this.acknowledged = source
 		this.nativeAcknowledgement = false
 		if (selection) this.selection = selection
-		this.paint()
+		if (options?.revealSelection)
+			this.reveal(
+				this.selection.direction === "backward"
+					? this.selection.start
+					: this.selection.end,
+				true,
+			)
+		else this.paint()
 	}
 	acknowledge(source: string, selection?: ViewportSelection) {
 		if (!this.nativeAcknowledgement && source !== this.acknowledged) {
@@ -751,7 +771,8 @@ export class EditorViewport {
 	private topAt(offset: number) {
 		return this.blocks[this.blockAtOffset(offset)]?.top ?? 0
 	}
-	private reveal(offset: number) {
+	private reveal(offset: number, selectionMoved = false) {
+		if (selectionMoved) this.selectionDocument = false
 		let index = this.blockAtOffset(offset)
 		this.refine(index)
 		let block = this.completeDocument()
@@ -783,7 +804,7 @@ export class EditorViewport {
 				0,
 				top - this.scrollElement.clientHeight / 3,
 			)
-		this.paint()
+		this.paint(selectionMoved)
 	}
 	private schedule() {
 		if (this.frame || this.composing) return
@@ -804,11 +825,25 @@ export class EditorViewport {
 			this.text.length <= 8192
 		)
 	}
-	private paint() {
+	private paint(selectionMoved = false) {
 		if (this.composing || this.dragging) return
 		let selected = this.selection.start !== this.selection.end
 		if (!selected) this.selectionDocument = false
-		else if (
+		else if (selectionMoved) {
+			let first = Math.max(
+				0,
+				this.blockAtHeight(this.scrollElement.scrollTop) - 1,
+			)
+			let last = Math.min(
+				this.blocks.length - 1,
+				this.blockAtHeight(
+					this.scrollElement.scrollTop + this.scrollElement.clientHeight,
+				) + 1,
+			)
+			this.selectionDocument =
+				this.selection.start < (this.blocks[first]?.start ?? 0) ||
+				this.selection.end > (this.blocks[last]?.end ?? this.text.length)
+		} else if (
 			this.selection.start < this.window.start ||
 			this.selection.end > this.window.end
 		)
@@ -853,6 +888,17 @@ export class EditorViewport {
 			end: ending.end,
 			top: beginning.top,
 			height: ending.top + ending.height - beginning.top,
+		}
+		if (
+			selectionMoved &&
+			!full &&
+			selected &&
+			(this.selection.start < this.window.start ||
+				this.selection.end > this.window.end)
+		) {
+			this.selectionDocument = true
+			this.paint()
+			return
 		}
 		let fragment = this.text.slice(this.window.start, this.window.end)
 		this.prefix = this.directionMark(this.window.start)
