@@ -22,6 +22,24 @@ function database<A, E>(
 		task.pipe(Effect.provide(sqliteLayer(join(directory, name + ".sqlite")))),
 	)
 }
+test("cached SQLite statements rebind values and reset integer decoding between requests", async () => {
+	await database(
+		"cached-statements",
+		Effect.gen(function* () {
+			let sql = yield* SqlClient.SqlClient
+			for (let value of [7, 19, 31]) {
+				expect(
+					yield* sql`SELECT ${value} AS value`.pipe(
+						Effect.provideService(SqlClient.SafeIntegers, true),
+					),
+				).toEqual([{ value: BigInt(value) }])
+				expect(yield* sql`SELECT ${value + 1} AS value`).toEqual([
+					{ value: value + 1 },
+				])
+			}
+		}),
+	)
+})
 test("native SQLite compiles identifiers and binds Unicode, blobs and integers without interpolation", async () => {
 	await database(
 		"bindings",

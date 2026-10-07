@@ -127,24 +127,19 @@ function makeSqlite(
 				)
 				let safeIntegers = yield* SqlClient.SafeIntegers
 				return yield* native("execute", () => {
-					let statement = database.prepare<
-						SqlConnection.Row,
-						SQLQueryBindings[]
-					>(sql)
-					try {
-						if (
-							"safeIntegers" in statement &&
-							typeof statement.safeIntegers === "function"
+					let statement = database.query<SqlConnection.Row, SQLQueryBindings[]>(
+						sql,
+					)
+					if (
+						"safeIntegers" in statement &&
+						typeof statement.safeIntegers === "function"
+					)
+						statement.safeIntegers(safeIntegers)
+					else if (safeIntegers)
+						throw new Error(
+							"This Bun runtime does not support safe SQLite integers",
 						)
-							statement.safeIntegers(safeIntegers)
-						else if (safeIntegers)
-							throw new Error(
-								"This Bun runtime does not support safe SQLite integers",
-							)
-						return read(statement, [...bindings])
-					} finally {
-						statement.finalize()
-					}
+					return read(statement, [...bindings])
 				})
 			})
 		}
