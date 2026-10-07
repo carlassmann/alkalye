@@ -66,7 +66,9 @@ for (let kb of [
 		),
 	),
 ]) {
-	for (let configuration of configurations) {
+	for (let configuration of kb === 32 || kb === 1024
+		? configurations.slice().reverse()
+		: configurations) {
 		let fixture = configuration.docs.find(fixture => fixture.kb === kb)
 		if (!fixture) continue
 		browser(configuration, "set", "viewport", "1280", "900")
@@ -257,7 +259,7 @@ function browser(configuration: Configuration, ...arguments_: string[]) {
 			env: {
 				...Bun.env,
 				AGENT_BROWSER_HEADED: "false",
-				AGENT_BROWSER_DEFAULT_TIMEOUT: "30000",
+				AGENT_BROWSER_DEFAULT_TIMEOUT: "20000",
 			},
 			timeout: 60_000,
 			stdout: "pipe",

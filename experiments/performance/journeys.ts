@@ -1,5 +1,5 @@
 import * as Schema from "effect/Schema"
-import { browser, evaluate } from "../../tests/browser-driver"
+import { browser as browserCommand, evaluate } from "../../tests/browser-driver"
 
 let Fixture = Schema.Struct({
 	kb: Schema.Number,
@@ -38,7 +38,7 @@ let results: {
 }[] = []
 let failures: { version: string; phase: string; kb?: number; error: string }[] =
 	[]
-for (let kb of [2, 128])
+for (let kb of Bun.env.BENCHMARK_JOURNEY_KB === "2" ? [2] : [2, 128])
 	for (let configuration of configurations) {
 		let fixture = configuration.docs.find(doc => doc.kb === kb)
 		if (!fixture) continue
@@ -249,4 +249,26 @@ function measureSwitch(configuration: Configuration) {
 			if (fixture === large) values.push(elapsed)
 		}
 	collect(configuration, "switch existing128KiB document", 128, values)
+}
+
+function browser(session: string, ...arguments_: string[]) {
+	if (Bun.env.BENCHMARK_ACTIVATION !== "keyboard")
+		return browserCommand(session, ...arguments_)
+	let selector = arguments_[0] === "click" ? arguments_[1] : undefined
+	if (arguments_[0] === "find" && arguments_[3] === "click") {
+		let name = arguments_[5]
+		evaluate(
+			session,
+			`[...document.querySelectorAll('button,[role=button]')].find(node=>node.checkVisibility()&&(node.getAttribute('aria-label')||node.textContent.trim())===${JSON.stringify(name)})?.setAttribute('data-benchmark-activation','')`,
+		)
+		selector = "[data-benchmark-activation]"
+	}
+	if (!selector) return browserCommand(session, ...arguments_)
+	browserCommand(session, "focus", selector)
+	let result = browserCommand(session, "press", "Enter")
+	evaluate(
+		session,
+		"document.querySelectorAll('[data-benchmark-activation]').forEach(node=>node.removeAttribute('data-benchmark-activation'))",
+	)
+	return result
 }

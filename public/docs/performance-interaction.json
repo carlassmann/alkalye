@@ -1,0 +1,4983 @@
+{
+	"measuredAt": "2026-10-07",
+	"versions": {
+		"main": "a749728a8f9a1cb984c980a5ea2daf984d60ae68",
+		"rewrite": "275be37dffeabe274eaf8cbcea8d612515c8e58f",
+		"rewriteAssetSha256": {
+			"document-worker.js": "0bb606cb86757965c3d35428b691b9ca26b1eef68e28a27bdbda73e9a2940679",
+			"app.js": "5c93f68a3296a913a78a3d168bf7e7e63c58f7b7dd1c687a20a953be9e002683",
+			"sw.js": "d5904434fb202669766075b3862f4a7fc73a20663730fa3288e901ba8ddf816a",
+			"chunks/document-app-y1hrwemp.js": "f586172f560f028ee72e5b5937847b71d6bd019403b0419bea2b30a4dd6df675",
+			"chunks/document-app-vs6xk76k.js": "bf7a9e209e0027ee9f064848012e21993aae3159138106ae8163e81aee1c3eef",
+			"chunks/document-app-pykp7k5z.js": "96ed69c2c9514c8bceda83a0c50192e0cc5824ac714ee39c038b3829bc7b452c",
+			"chunks/media-picker-x0hne6w9.js": "cc0905ddce4f2e1c99d847d18068d58c8bd07bc3a0e6b12ad92554adf071cc66",
+			"chunks/document-app-84g5fq8v.js": "f47987ff574fa3c98e2b4f4605631651054ea8ad6c1bcb09265e39b1ca4b3ac3",
+			"chunks/document-app-6q8jcqjd.js": "530a9bfdb564daf2442a6d910b579ea2acb376887ade01fb5f0a2993937d4069",
+			"chunks/videos-stebcz4d.js": "cf39b258d8617affdd82dcf649f511fe7c6bc1c9832949cdca93b5c827c4df73",
+			"chunks/document-app-jev26rbc.js": "ffe2f07e24a5802624acb728ebe1d3e055ddb1c09022f7c07bd69fc09c4c9cd2",
+			"chunks/document-app-e27xkjdd.js": "8e0b3a4cf9e167397cea862bd7cbf00b430f91fa4908c25c688ebdfe1b5ea0b9",
+			"chunks/document-worker-stats-r3t1h82c.js": "9a78beaf3eb6fd91300def2149a746446d1475a31fa13b4c8948274bbf14136f",
+			"chunks/document-archives-dst83xz4.js": "6d24a2420e69fbeb37fcea54436c4eaad0f75f257fd7825ad054ace1be0549b2",
+			"chunks/document-app-b0yeg0hx.js": "297a20f766e801b94267e924472119ba559f79dcb694af31db9b92165d914292",
+			"chunks/images-gh6fx4ec.js": "f1c3a034b8b1642c2cfb17e2e83f0180538ac587dac336220a470fc83c0f9cf6",
+			"chunks/document-app-eznwvf0k.js": "3b68cc19aa306269816b5130b3137bda2a0d81f0cc70d33c921b4feb550e409a",
+			"chunks/document-app-t2c0q4x7.js": "807ba5bba9905e24dc8cadae50667c2824b0be180296a6036382d65906913506",
+			"chunks/whiteboard-6y76q9ya.js": "cce0bea0d3838f24584ce30c30338e897a69dafcb7f2b4720274ea93e3a8df3a",
+			"chunks/sanitizeSvg-gvgcnb7c.js": "600e0b8d7cb98ba0cd71c36758c06684124d66390fce8537eaa932b0986e6a41",
+			"chunks/document-app-a1wrmpe6.js": "ced0ec45edf1c7cb6abe3efa05f047c8dcdf2b3ff5510876f9e61ab1b61cee90",
+			"chunks/document-app-xechpbp6.js": "5e013bd6329830c9fc28415b45f4d3900ca799cd11c5d759fd5c2e110eed80e3",
+			"chunks/document-app-1t4a0gb7.js": "cc54de98acfe1358d80201bf59456569203203c9c1e17d7e756eef12922061e1",
+			"chunks/whiteboard-store-tp02nr1j.js": "ae07794bada535730035eceba5755fab3eefbb35cf1add2a5260f2efc2c5465b",
+			"chunks/document-app-c0z5fzz4.js": "d4bd6333412175fe8c40b4ea8c12c79976e1b4f3fb0d79a64eeefdb38a6f9693",
+			"chunks/document-app-mhc65yn7.js": "70685b005cc0be54dfd9cfd6c0ab43480a02b32ab571ba8e6c1ba5f40ece2342",
+			"chunks/syntax-1xtd23vt.js": "f79f49404d23a8ba185654f0a2255b461842323b47b7ef9569e36675a2f65c7a",
+			"chunks/whiteboard-preview-k28nhxza.js": "d67924aa8b9ed5861dacfb5c317cbfb684b4bd8d95b0f540b75035b2ad5dd1ab",
+			"chunks/document-app-bb8pn15s.js": "4d0f2ecccc5f4484e2fc86eddc4f412f8e3acc97ebd9651ad4307301325b890e",
+			"chunks/document-app-2d6qcvkk.js": "78de8fa627f4f484f661d8c57595db2f312d9daade130c6bf1acc7c610fcc780",
+			"chunks/invitations-vj0d3tdx.js": "682943248d275fa97658b1eb6ae982ffe7f972bc7884fc09e0604d7b87408f2d",
+			"chunks/document-app-qbpfjp9s.js": "bcd963694f25993aa23f9b92fc71d6be6af2504cf851dc7ebd97667614210da5",
+			"chunks/invitation-screen-ke7tgxmy.js": "20c1e0947f26d668cdc1115f86e8540c78b1070f164e28545e43095f6ae9b858",
+			"chunks/document-app-ex1v95a3.js": "00ef0cfdb4363ed3512400853263344e7a5ba302f93d1669c6cb8cfded9c24c3",
+			"chunks/document-app-68q58m06.js": "1678be6a027e992f23bbded505b8e1e721a1b0877b253dbb7afcba64c7464755",
+			"chunks/document-app-9sap0wf0.js": "38389f4e07ab35736ea0a2d7b3d9d858ee6795c0a574bfe6945e9ee739588493",
+			"chunks/document-app-e3ap03vm.js": "4b757c48a94d52229e828414ea0ee209a26486612d2b81e5337c4e5edd42e91c",
+			"chunks/theme-workbench-q35x7r18.js": "e7e99b7ff764fa3aea23eac0682839eede23e69736653ee5a011264d4c8e2500",
+			"chunks/document-app-c3ss2tq7.js": "fd4106115b595215a79ec9bfa83a4f83ee4536a3f949b7cd0c7f5f66492e38b9",
+			"chunks/theme-picker-fxfzvdj1.js": "501779ccf54e30a140fb5b55a0a6293ccf1997cbe1a33344e745ab1d09841ab9",
+			"chunks/document-media-6d98yv9v.js": "b3e0f8a4f95c05729f049abf9ae61ff1f7cd79eb18ac3c87bd74a03fd36bcd7f",
+			"chunks/document-app-jyacae6r.js": "493dc93481df1ee552de4dfa74a2deb8244c485874ed5db020db9484711d1845",
+			"chunks/document-app-yncbg74h.js": "a66dd9352aad484beb7db1f18cb4871efdbf002eb3e2edf9d241f4ab6f61ee74",
+			"chunks/document-app-m2qx4cqf.js": "a16f603c7e82fa73c3c08187e200539440a114333311e16d891b12060d5d40bc",
+			"chunks/document-app-nqb2j1d5.js": "7ee8a12ff085053fec8ff4edc3bb46ed6125e227c1ca24a152407cb5d6a250c8",
+			"chunks/document-app-ncxg3qzf.js": "2033be89fac9846668f0ed9904b433c97158d25a414f5da55b01817cbc317ada",
+			"chunks/document-app-e7vwaf0q.js": "e00abbc0b9eecb68b145736339e85c8258d0a225aeac8b7c6f0e0c07bde46b5a",
+			"chunks/document-app-jegj5sa1.js": "fe1e6ebdc6cf2e7a6705c14e455a259bb8377dadf1e1da5247c22b404a56e1ed",
+			"chunks/document-app-c6wc4y2y.js": "e7cd6742cb47d312c6c57765b930f78dd75eb4202d8419d9a04b8469960a5d42",
+			"chunks/invitations-632v4537.js": "ee968133165f1f4fdf4a3f13d2876ea8bcfe0c9a921b16e5f4966b1a54bc7bd3",
+			"chunks/document-app-v7txzmw7.js": "fd8c993579b6e7def2ae2e726be2691ec787ee162d28e81d36bc6812cd039d20",
+			"chunks/document-app-pzbxckbs.js": "99c12593e2542c4ec04a9b68d96c292fb36d4f84b1807d62a195d6c579d3d074",
+			"chunks/document-app-gf4hdxnw.js": "8f2502d90355e5ad1b0dc4c4c43962052fc5dd35fcffbdb2df57e349fdde9892"
+		}
+	},
+	"environment": {
+		"machine": "Apple M5 Pro,64GiB",
+		"runtime": "Bun1.4.0",
+		"browser": "Headless Chrome154.0.8037.58",
+		"viewport": "1280x900",
+		"main": "Production Astro build, local Jazz0.20.18 relay4220, web4450",
+		"rewrite": "Production frozen assets, Bun/SQLite empty isolated database, web4451",
+		"profiles": "Fresh normal profiles; separate extreme profiles; passive cloned profiles for sync",
+		"agentBrowserTimeoutMs": 20000
+	},
+	"normal": {
+		"results": [
+			{
+				"version": "original",
+				"name": "warm document reload",
+				"kb": 2,
+				"values": [
+					121.5, 116.30000001192091, 111.19999998807909, 116.5,
+					112.70000004768372, 112.5999999642372, 111.30000001192091,
+					127.39999997615814, 122.19999998807909
+				],
+				"p95Ms": 127.39999997615814,
+				"medianMs": 116.30000001192091,
+				"minMs": 111.19999998807909,
+				"maxMs": 127.39999997615814
+			},
+			{
+				"version": "original",
+				"name": "insert text to paint opportunity",
+				"kb": 2,
+				"values": [
+					18.69999998807907, 27.19999998807907, 18.30000001192093, 17,
+					21.200000047683716, 28.80000001192093, 25.100000023841854, 21,
+					33.40000003576279
+				],
+				"p95Ms": 33.40000003576279,
+				"medianMs": 21.200000047683716,
+				"minMs": 17,
+				"maxMs": 33.40000003576279,
+				"maxFrameCallbackWorkMs": [
+					0, 0.6000000238418579, 0.5, 0.5, 0.40000003576278687,
+					0.5999999642372131, 0.5, 0.5, 0.699999988079071
+				],
+				"nativeInputMs": [
+					3.900000035762787, 1.5, 1.300000011920929, 1.100000023841858,
+					1.199999988079071, 1, 1.100000023841858, 1.100000023841858,
+					1.100000023841858
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "warm document reload",
+				"kb": 2,
+				"values": [
+					71.5, 75.39999997615814, 77.89999997615814, 69.69999998807907,
+					72.09999996423721, 77.70000004768372, 66.59999996423721,
+					75.19999998807907, 78.69999998807907
+				],
+				"p95Ms": 78.69999998807907,
+				"medianMs": 75.19999998807907,
+				"minMs": 66.59999996423721,
+				"maxMs": 78.69999998807907
+			},
+			{
+				"version": "rewrite",
+				"name": "insert text to paint opportunity",
+				"kb": 2,
+				"values": [
+					12.199999988079073, 15, 13, 17.200000047683716, 8.5,
+					13.300000011920927, 6, 2.899999976158142, 11.599999964237211
+				],
+				"p95Ms": 17.200000047683716,
+				"medianMs": 12.199999988079073,
+				"minMs": 2.899999976158142,
+				"maxMs": 17.200000047683716,
+				"maxFrameCallbackWorkMs": [
+					0.7999999523162842, 0.699999988079071, 0.5999999642372131,
+					0.800000011920929, 0.5999999642372131, 0.5999999642372131,
+					0.5999999642372131, 0.699999988079071, 0.7999999523162842
+				],
+				"nativeInputMs": [
+					2.100000023841858, 1.5, 1.4000000357627869, 1.9000000357627869,
+					1.4000000357627869, 1.300000011920929, 1.2999999523162842,
+					1.2999999523162842, 1.600000023841858
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "warm document reload",
+				"kb": 32,
+				"values": [
+					117.5, 115.4000000357628, 109.9000000357628, 122.10000002384186, 118,
+					114.70000004768372, 123.39999997615814, 116.19999998807909,
+					125.4000000357628
+				],
+				"p95Ms": 125.4000000357628,
+				"medianMs": 117.5,
+				"minMs": 109.9000000357628,
+				"maxMs": 125.4000000357628
+			},
+			{
+				"version": "rewrite",
+				"name": "insert text to paint opportunity",
+				"kb": 32,
+				"values": [
+					23.69999998807907, 20.30000001192093, 18.899999976158146,
+					8.799999952316284, 15.5, 14.699999988079073, 3.5, 17, 11
+				],
+				"p95Ms": 23.69999998807907,
+				"medianMs": 15.5,
+				"minMs": 3.5,
+				"maxMs": 23.69999998807907,
+				"maxFrameCallbackWorkMs": [
+					0.800000011920929, 0.699999988079071, 0.699999988079071,
+					0.699999988079071, 0.5, 0.6000000238418579, 0.6000000238418579,
+					0.699999988079071, 0.5999999642372131
+				],
+				"nativeInputMs": [
+					2.800000011920929, 1.899999976158142, 2.099999964237213,
+					1.600000023841858, 1.699999988079071, 1.699999988079071,
+					1.699999988079071, 2.099999964237213, 1.699999988079071
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "insert at start to paint opportunity",
+				"kb": 32,
+				"values": [
+					27.600000023841854, 11.600000023841858, 29.399999976158146,
+					35.19999998807907, 28.400000035762787, 14.300000011920927,
+					12.599999964237211, 32.30000001192093, 33.5
+				],
+				"p95Ms": 35.19999998807907,
+				"medianMs": 28.400000035762787,
+				"minMs": 11.600000023841858,
+				"maxMs": 35.19999998807907,
+				"maxFrameCallbackWorkMs": [
+					0.8999999761581421, 0.8999999761581421, 0.800000011920929, 1,
+					0.800000011920929, 0.8999999761581421, 0.8999999761581421, 1,
+					0.7999999523162842
+				],
+				"nativeInputMs": [
+					2.800000011920929, 5.199999988079071, 2.300000011920929, 2,
+					1.800000011920929, 1.899999976158142, 4.699999988079071,
+					1.699999988079071, 1.9000000357627869
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "insert at middle to paint opportunity",
+				"kb": 32,
+				"values": [
+					33.10000002384186, 21.5, 19.200000047683716, 4.800000011920929,
+					26.899999976158146, 30, 19, 4.600000023841858, 27.5
+				],
+				"p95Ms": 33.10000002384186,
+				"medianMs": 21.5,
+				"minMs": 4.600000023841858,
+				"maxMs": 33.10000002384186,
+				"maxFrameCallbackWorkMs": [
+					1.100000023841858, 0.800000011920929, 0.5, 1, 0.7000000476837158,
+					0.9000000357627869, 0.6000000238418579, 1.100000023841858,
+					0.800000011920929
+				],
+				"nativeInputMs": [
+					2.300000011920929, 2.100000023841858, 2.300000011920929,
+					2.200000047683716, 4.199999988079071, 2, 2, 2.100000023841858, 2.5
+				]
+			},
+			{
+				"version": "original",
+				"name": "warm document reload",
+				"kb": 32,
+				"values": [
+					177.80000001192093, 177.19999998807907, 180.5, 177.5,
+					173.10000002384186, 174.5, 174.80000001192093, 175.0999999642372,
+					185.5999999642372
+				],
+				"p95Ms": 185.5999999642372,
+				"medianMs": 177.19999998807907,
+				"minMs": 173.10000002384186,
+				"maxMs": 185.5999999642372
+			},
+			{
+				"version": "original",
+				"name": "insert text to paint opportunity",
+				"kb": 32,
+				"values": [
+					32.39999997615814, 24.400000035762787, 25.399999976158146,
+					19.200000047683716, 20.900000035762787, 19.80000001192093,
+					22.399999976158146, 28.30000001192093, 23
+				],
+				"p95Ms": 32.39999997615814,
+				"medianMs": 23,
+				"minMs": 19.200000047683716,
+				"maxMs": 32.39999997615814,
+				"maxFrameCallbackWorkMs": [
+					0.09999996423721312, 0.5999999642372131, 0.5, 0.3999999761581421,
+					0.5999999642372131, 0.5, 0.30000001192092896, 0.3999999761581421,
+					0.40000003576278687
+				],
+				"nativeInputMs": [
+					3.199999988079071, 1.5, 1.0999999642372131, 1.100000023841858,
+					1.100000023841858, 1.0999999642372131, 1.0999999642372131, 1, 1
+				]
+			},
+			{
+				"version": "original",
+				"name": "insert at start to paint opportunity",
+				"kb": 32,
+				"values": [
+					20.30000001192093, 31.19999998807907, 25, 23.900000035762787, 22.5,
+					31.899999976158146, 20.599999964237213, 17.299999952316284,
+					22.100000023841854
+				],
+				"p95Ms": 31.899999976158146,
+				"medianMs": 22.5,
+				"minMs": 17.299999952316284,
+				"maxMs": 31.899999976158146,
+				"maxFrameCallbackWorkMs": [
+					0, 0.6000000238418579, 0.5, 0.5, 0.5999999642372131,
+					0.699999988079071, 0.5, 0.3999999761581421, 0.40000003576278687
+				],
+				"nativeInputMs": [
+					3, 1.7999999523162842, 1.5, 1.5, 1.5, 1.5999999642372131,
+					1.5999999642372131, 1.5, 1.399999976158142
+				]
+			},
+			{
+				"version": "original",
+				"name": "insert at middle to paint opportunity",
+				"kb": 32,
+				"values": [
+					23.700000047683716, 20.69999998807907, 20.799999952316284,
+					16.899999976158142, 32.5, 24.5, 30.599999964237213, 26.19999998807907,
+					31.80000001192093
+				],
+				"p95Ms": 32.5,
+				"medianMs": 24.5,
+				"minMs": 16.899999976158142,
+				"maxMs": 32.5,
+				"maxFrameCallbackWorkMs": [
+					0, 0.5, 0.5, 0.6000000238418579, 0.6000000238418579,
+					0.6000000238418579, 0.699999988079071, 0.5, 0.6000000238418579
+				],
+				"nativeInputMs": [
+					3, 1.199999988079071, 1.0999999642372131, 1.0999999642372131,
+					1.100000023841858, 1.199999988079071, 1, 1.199999988079071,
+					1.100000023841858
+				]
+			},
+			{
+				"version": "original",
+				"name": "warm document reload",
+				"kb": 128,
+				"values": [
+					375.800000011921, 372.699999988079, 373.800000011921, 374, 375.5,
+					378.800000011921, 372.800000011921, 375.300000011921, 375.199999988079
+				],
+				"p95Ms": 378.800000011921,
+				"medianMs": 375.199999988079,
+				"minMs": 372.699999988079,
+				"maxMs": 378.800000011921
+			},
+			{
+				"version": "original",
+				"name": "insert text to paint opportunity",
+				"kb": 128,
+				"values": [
+					32, 20.80000001192093, 27.19999998807907, 19.400000035762787,
+					17.400000035762787, 20.100000023841854, 22.19999998807907, 24.5,
+					17.200000047683716
+				],
+				"p95Ms": 32,
+				"medianMs": 20.80000001192093,
+				"minMs": 17.200000047683716,
+				"maxMs": 32,
+				"maxFrameCallbackWorkMs": [
+					0.10000002384185792, 0.5, 0.5, 0.3999999761581421,
+					0.30000001192092896, 0.3999999761581421, 0.5, 0.6000000238418579,
+					0.30000001192092896
+				],
+				"nativeInputMs": [
+					1.0999999642372131, 0.6000000238418579, 0.6000000238418579,
+					0.7000000476837158, 0.7000000476837158, 0.5999999642372131,
+					0.699999988079071, 0.699999988079071, 0.7000000476837158
+				]
+			},
+			{
+				"version": "original",
+				"name": "insert at start to paint opportunity",
+				"kb": 128,
+				"values": [
+					18.899999976158146, 22.5, 26, 31, 24.69999998807907, 32,
+					22.30000001192093, 25.69999998807907, 19.099999964237213
+				],
+				"p95Ms": 32,
+				"medianMs": 24.69999998807907,
+				"minMs": 18.899999976158146,
+				"maxMs": 32,
+				"maxFrameCallbackWorkMs": [
+					0.09999996423721312, 0.3999999761581421, 0.30000001192092896,
+					0.3999999761581421, 0.40000003576278687, 0.3999999761581421,
+					0.3999999761581421, 0.3999999761581421, 0.3999999761581421
+				],
+				"nativeInputMs": [
+					1.5, 1, 0.8999999761581421, 1, 1, 1, 0.9000000357627869,
+					1.0999999642372131, 1
+				]
+			},
+			{
+				"version": "original",
+				"name": "insert at middle to paint opportunity",
+				"kb": 128,
+				"values": [
+					24.19999998807907, 20.5, 30.799999952316284, 25.80000001192093,
+					28.799999952316284, 28.600000023841854, 27.399999976158146,
+					24.69999998807907, 17.5
+				],
+				"p95Ms": 30.799999952316284,
+				"medianMs": 25.80000001192093,
+				"minMs": 17.5,
+				"maxMs": 30.799999952316284,
+				"maxFrameCallbackWorkMs": [
+					0.10000002384185792, 0.3999999761581421, 0.5, 0.5, 0.699999988079071,
+					0.5, 0.3999999761581421, 0.6000000238418579, 0.40000003576278687
+				],
+				"nativeInputMs": [
+					0.800000011920929, 0.699999988079071, 0.5, 0.699999988079071,
+					0.699999988079071, 0.6000000238418579, 0.5, 0.5999999642372131,
+					0.699999988079071
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "warm document reload",
+				"kb": 128,
+				"values": [
+					251, 242.80000001192093, 252, 251.89999997615817, 252.5999999642372,
+					254.5, 248.10000002384183, 252, 245.80000001192093
+				],
+				"p95Ms": 254.5,
+				"medianMs": 251.89999997615817,
+				"minMs": 242.80000001192093,
+				"maxMs": 254.5
+			},
+			{
+				"version": "rewrite",
+				"name": "insert text to paint opportunity",
+				"kb": 128,
+				"values": [
+					20.19999998807907, 21.5, 26.5, 21.100000023841854, 28.599999964237213,
+					18.80000001192093, 32.80000001192093, 19.69999998807907,
+					22.80000001192093
+				],
+				"p95Ms": 32.80000001192093,
+				"medianMs": 21.5,
+				"minMs": 18.80000001192093,
+				"maxMs": 32.80000001192093,
+				"maxFrameCallbackWorkMs": [
+					0.9000000357627869, 1, 1.399999976158142, 0.800000011920929,
+					1.100000023841858, 0.800000011920929, 1.399999976158142,
+					0.7999999523162842, 1.199999988079071
+				],
+				"nativeInputMs": [
+					5.5, 2.099999964237213, 2.300000011920929, 2.099999964237213,
+					2.099999964237213, 2.199999988079071, 2.100000023841858,
+					2.100000023841858, 2
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "insert at start to paint opportunity",
+				"kb": 128,
+				"values": [
+					33.19999998807907, 18.5, 30.400000035762787, 29.30000001192093,
+					33.39999997615814, 20.100000023841854, 29.30000001192093,
+					27.899999976158146, 22.900000035762787
+				],
+				"p95Ms": 33.39999997615814,
+				"medianMs": 29.30000001192093,
+				"minMs": 18.5,
+				"maxMs": 33.39999997615814,
+				"maxFrameCallbackWorkMs": [
+					1.100000023841858, 0.800000011920929, 1.2999999523162842,
+					1.300000011920929, 1.4000000357627869, 0.699999988079071,
+					0.7999999523162842, 1.300000011920929, 0.8999999761581421
+				],
+				"nativeInputMs": [
+					10.799999952316284, 3, 3.400000035762787, 2.699999988079071,
+					2.099999964237213, 2.600000023841858, 10.699999988079073, 2.5,
+					2.300000011920929
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "insert at middle to paint opportunity",
+				"kb": 128,
+				"values": [
+					31.80000001192093, 18, 32.299999952316284, 22.399999976158146, 31,
+					20.899999976158146, 17.600000023841858, 28.399999976158146,
+					28.30000001192093
+				],
+				"p95Ms": 32.299999952316284,
+				"medianMs": 28.30000001192093,
+				"minMs": 17.600000023841858,
+				"maxMs": 32.299999952316284,
+				"maxFrameCallbackWorkMs": [
+					1.2000000476837158, 0.800000011920929, 1.399999976158142,
+					1.0999999642372131, 1.0999999642372131, 0.8999999761581421,
+					0.8999999761581421, 1.100000023841858, 1.199999988079071
+				],
+				"nativeInputMs": [
+					2.800000011920929, 3.199999988079071, 2.699999988079071,
+					2.599999964237213, 7.699999988079071, 3.199999988079071,
+					2.599999964237213, 2.699999988079071, 2.599999964237213
+				]
+			}
+		],
+		"failures": []
+	},
+	"large": {
+		"results": [
+			{
+				"version": "rewrite",
+				"name": "warm document reload",
+				"kb": 1024,
+				"values": [1968.800000011921, 1970.5, 2322.600000023842],
+				"p95Ms": 2322.600000023842,
+				"medianMs": 1970.5,
+				"minMs": 1968.800000011921,
+				"maxMs": 2322.600000023842
+			},
+			{
+				"version": "rewrite",
+				"name": "insert text to paint opportunity",
+				"kb": 1024,
+				"values": [35.30000001192093, 12.699999988079073, 16.19999998807907],
+				"p95Ms": 35.30000001192093,
+				"medianMs": 16.19999998807907,
+				"minMs": 12.699999988079073,
+				"maxMs": 35.30000001192093,
+				"maxFrameCallbackWorkMs": [
+					3.400000035762787, 3.399999976158142, 3.699999988079071
+				],
+				"nativeInputMs": [
+					29.899999976158146, 6.800000011920929, 7.300000011920929
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "insert at start to paint opportunity",
+				"kb": 1024,
+				"values": [27.100000023841854, 26.399999976158146, 29],
+				"p95Ms": 29,
+				"medianMs": 27.100000023841854,
+				"minMs": 26.399999976158146,
+				"maxMs": 29,
+				"maxFrameCallbackWorkMs": [
+					3.100000023841858, 2.899999976158142, 3.100000023841858
+				],
+				"nativeInputMs": [6.199999988079071, 5.699999988079071, 5.5]
+			},
+			{
+				"version": "rewrite",
+				"name": "insert at middle to paint opportunity",
+				"kb": 1024,
+				"values": [28.30000001192093, 30.400000035762787, 13.199999988079073],
+				"p95Ms": 30.400000035762787,
+				"medianMs": 28.30000001192093,
+				"minMs": 13.199999988079073,
+				"maxMs": 30.400000035762787,
+				"maxFrameCallbackWorkMs": [2.899999976158142, 3.099999964237213, 3],
+				"nativeInputMs": [7.199999988079071, 6.5, 6.799999952316284]
+			},
+			{
+				"version": "original",
+				"name": "warm document reload",
+				"kb": 1024,
+				"values": [2340.5, 2342.800000011921, 2384.7000000476837],
+				"p95Ms": 2384.7000000476837,
+				"medianMs": 2342.800000011921,
+				"minMs": 2340.5,
+				"maxMs": 2384.7000000476837
+			},
+			{
+				"version": "original",
+				"name": "insert text to paint opportunity",
+				"kb": 1024,
+				"values": [23.19999998807907, 22.200000047683716, 29.5],
+				"p95Ms": 29.5,
+				"medianMs": 23.19999998807907,
+				"minMs": 22.200000047683716,
+				"maxMs": 29.5,
+				"maxFrameCallbackWorkMs": [
+					0.40000003576278687, 0.800000011920929, 0.9000000357627869
+				],
+				"nativeInputMs": [6.199999988079071, 3.5, 3.099999964237213]
+			}
+		],
+		"failures": [
+			{
+				"version": "original",
+				"kb": 1024,
+				"error": "Error: original wait failed: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n"
+			}
+		]
+	},
+	"uiPointer": {
+		"results": [
+			{
+				"version": "original",
+				"name": "open find panel",
+				"kb": 128,
+				"n": 9,
+				"medianMs": 33.10000002384186,
+				"p95Ms": 33.89999997615814,
+				"values": [
+					33.10000002384186, 33.200000047683716, 33.89999997615814, 33,
+					32.80000001192093, 33.69999998807907, 33, 32.89999997615814,
+					33.59999996423721
+				]
+			},
+			{
+				"version": "original",
+				"name": "find all reference matches",
+				"kb": 128,
+				"n": 9,
+				"medianMs": 26.099999964237213,
+				"p95Ms": 33.59999996423721,
+				"values": [
+					28, 26.099999964237213, 33.59999996423721, 20.899999976158146,
+					19.19999998807907, 25.200000047683716, 26.5, 30.399999976158146,
+					19.100000023841854
+				]
+			},
+			{
+				"version": "original",
+				"name": "open rendered preview",
+				"kb": 128,
+				"n": 9,
+				"medianMs": 58,
+				"p95Ms": 77.39999997615814,
+				"values": [
+					77.39999997615814, 58.10000002384186, 59.5, 60.10000002384186,
+					57.20000004768371, 58, 57, 54.30000001192093, 57.40000003576279
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "open find panel",
+				"kb": 128,
+				"n": 9,
+				"medianMs": 32.89999997615814,
+				"p95Ms": 33.09999996423721,
+				"values": [
+					33, 32.5, 33.09999996423721, 33, 32.09999996423721, 32.89999997615814,
+					32.80000001192093, 32.90000003576279, 32.89999997615814
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "find all reference matches",
+				"kb": 128,
+				"n": 9,
+				"medianMs": 40,
+				"p95Ms": 42.90000003576279,
+				"values": [
+					40, 40.80000001192093, 42.90000003576279, 38.40000003576279, 25,
+					37.39999997615814, 41.69999998807907, 27.899999976158146,
+					41.39999997615814
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "open rendered preview",
+				"kb": 128,
+				"n": 9,
+				"medianMs": 40.69999998807907,
+				"p95Ms": 63.60000002384186,
+				"values": [
+					63.60000002384186, 32.19999998807907, 41.5, 32.5, 41,
+					32.30000001192093, 32.39999997615814, 41.29999995231629,
+					40.69999998807907
+				]
+			}
+		],
+		"failures": [
+			{
+				"version": "original",
+				"phase": "find and preview",
+				"kb": 2,
+				"error": "Error: interact-normal-original wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n"
+			},
+			{
+				"version": "rewrite",
+				"phase": "find and preview",
+				"kb": 2,
+				"error": "Error: interact-normal-rewrite wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n"
+			},
+			{
+				"version": "original",
+				"phase": "switch",
+				"error": "Error: interact-normal-original wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n"
+			},
+			{
+				"version": "rewrite",
+				"phase": "switch",
+				"error": "Error: interact-normal-rewrite wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n"
+			}
+		]
+	},
+	"uiKeyboardRecovery": {
+		"results": [
+			{
+				"version": "original",
+				"name": "open find panel",
+				"kb": 2,
+				"n": 9,
+				"medianMs": 29.600000023841854,
+				"p95Ms": 35.60000002384186,
+				"values": [
+					34.60000002384186, 20.099999964237213, 29.600000023841854,
+					28.700000047683716, 17.100000023841858, 20.80000001192093,
+					31.69999998807907, 35.60000002384186, 35.19999998807907
+				]
+			},
+			{
+				"version": "original",
+				"name": "find all reference matches",
+				"kb": 2,
+				"n": 9,
+				"medianMs": 26.099999964237213,
+				"p95Ms": 32.80000001192093,
+				"values": [
+					32.80000001192093, 28.900000035762787, 25.80000001192093,
+					26.099999964237213, 26.599999964237213, 29.19999998807907,
+					19.69999998807907, 17.5, 19.400000035762787
+				]
+			},
+			{
+				"version": "original",
+				"name": "open rendered preview",
+				"kb": 2,
+				"n": 9,
+				"medianMs": 22.399999976158146,
+				"p95Ms": 51,
+				"values": [
+					22.399999976158146, 19.599999964237213, 47.89999997615814,
+					22.80000001192093, 51, 20.399999976158146, 19, 48.60000002384186, 20
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "open find panel",
+				"kb": 2,
+				"n": 9,
+				"medianMs": 25.399999976158146,
+				"p95Ms": 32.39999997615814,
+				"values": [
+					24.30000001192093, 28, 25.399999976158146, 28, 32.39999997615814,
+					4.899999976158142, 31.5, 22.399999976158146, 16.19999998807907
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "find all reference matches",
+				"kb": 2,
+				"n": 9,
+				"medianMs": 28.80000001192093,
+				"p95Ms": 48.30000001192093,
+				"values": [
+					26.600000023841854, 48.30000001192093, 23.80000001192093,
+					29.599999964237213, 34.30000001192093, 25.100000023841854,
+					32.89999997615814, 28.80000001192093, 22.200000047683716
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "open rendered preview",
+				"kb": 2,
+				"n": 9,
+				"medianMs": 22.099999964237213,
+				"p95Ms": 34,
+				"values": [
+					10.900000035762789, 20.399999976158146, 34, 22.099999964237213,
+					22.599999964237213, 21.299999952316284, 21.19999998807907,
+					26.299999952316284, 27.80000001192093
+				]
+			},
+			{
+				"version": "rewrite",
+				"name": "switch existing128KiB document",
+				"kb": 128,
+				"n": 9,
+				"medianMs": 426.39999997615814,
+				"p95Ms": 1619.899999976158,
+				"values": [
+					1619.899999976158, 443.0999999642372, 418.699999988079,
+					403.39999997615814, 426.39999997615814, 472.7000000476837, 395.5,
+					401.5, 433.800000011921
+				]
+			}
+		],
+		"failures": [
+			{
+				"version": "original",
+				"phase": "switch",
+				"error": "Error: interact-normal-original wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n"
+			}
+		]
+	},
+	"multicursor": {
+		"results": [
+			{
+				"version": "original",
+				"name": "replace all occurrences",
+				"kb": 128,
+				"n": 3,
+				"values": [89.80000001192093, 84.5, 83.5],
+				"cursors": [1298, 1298, 1298],
+				"medianMs": 84.5,
+				"p95Ms": 89.80000001192093,
+				"selectionSetup": "CodeMirror public EditorSelection API",
+				"restoration": "Complete original source through public editor boundary; excluded from replacement timing"
+			},
+			{
+				"version": "rewrite",
+				"name": "replace all occurrences",
+				"kb": 128,
+				"n": 3,
+				"values": [42.80000001192093, 38.90000003576279, 38.90000003576279],
+				"cursors": [1298, 1298, 1298],
+				"medianMs": 38.90000003576279,
+				"p95Ms": 42.80000001192093,
+				"selectionSetup": "Select all occurrences shortcut",
+				"restoration": "Complete original source through public editor boundary; excluded from replacement timing"
+			}
+		],
+		"failures": []
+	},
+	"sync": {
+		"results": [
+			{
+				"version": "original",
+				"transport": "socket",
+				"name": "edit to other device paint opportunity",
+				"kb": 2,
+				"n": 9,
+				"medianMs": 303.7001953125,
+				"p95Ms": 310.699951171875,
+				"values": [
+					301.5, 305.69970703125, 310.699951171875, 302.2001953125,
+					296.900146484375, 307, 303.7001953125, 305.199951171875,
+					302.89990234375
+				],
+				"resources": [
+					{
+						"producer": [],
+						"peer": [],
+						"producerSocket": [
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 261.300048828125
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 261.400146484375
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 262.10009765625
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 263.2001953125
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 297.300048828125
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 297.900146484375
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 262.7001953125
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 263
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 270.60009765625
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 270.900146484375
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 298.300048828125
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 298.60009765625
+							}
+						]
+					},
+					{
+						"producer": [],
+						"peer": [],
+						"producerSocket": [
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 257.89990234375
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 258
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 259.099853515625
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 259.5
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 259
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 259.2998046875
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 263.599853515625
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 263.699951171875
+							}
+						]
+					},
+					{
+						"producer": [],
+						"peer": [],
+						"producerSocket": [
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 260
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 260.10009765625
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 260.699951171875
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 262
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 261
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 261.400146484375
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 266.60009765625
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 266.800048828125
+							}
+						]
+					},
+					{
+						"producer": [],
+						"peer": [],
+						"producerSocket": [
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 257.80029296875
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 257.80029296875
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 258.400146484375
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 258.900146484375
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 258.80029296875
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 259.10009765625
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 263.10009765625
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 263.30029296875
+							}
+						]
+					},
+					{
+						"producer": [],
+						"peer": [],
+						"producerSocket": [
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 258.000244140625
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 258.000244140625
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 258.60009765625
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 259.2001953125
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 259.000244140625
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 259.30029296875
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 265.000244140625
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 265.30029296875
+							}
+						]
+					},
+					{
+						"producer": [],
+						"peer": [],
+						"producerSocket": [
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 261.10009765625
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 261.199951171875
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 263.699951171875
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 263.800048828125
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 263.300048828125
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 263.89990234375
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 270.199951171875
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 270.5
+							}
+						]
+					},
+					{
+						"producer": [],
+						"peer": [],
+						"producerSocket": [
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 256.10009765625
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 256.10009765625
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 257.2001953125
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 257.2001953125
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 155.60009765625
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 256.800048828125
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 257.10009765625
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 260.900146484375
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 261.10009765625
+							}
+						]
+					},
+					{
+						"producer": [],
+						"peer": [],
+						"producerSocket": [
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 260.199951171875
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 260.300048828125
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 262.800048828125
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 262.900146484375
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 262.199951171875
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 262.900146484375
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 269.10009765625
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 269.5
+							}
+						]
+					},
+					{
+						"producer": [],
+						"peer": [],
+						"producerSocket": [
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 75
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 259.900146484375
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 260
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 261.900146484375
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 262.10009765625
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 261.5
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 262
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 267.5
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 267.7001953125
+							}
+						]
+					}
+				]
+			},
+			{
+				"version": "original",
+				"transport": "socket",
+				"name": "offline reconnect to other device paint opportunity",
+				"kb": 2,
+				"n": 3,
+				"medianMs": 43.89990234375,
+				"p95Ms": 50.599853515625,
+				"values": [50.599853515625, 43.89990234375, 43.199951171875],
+				"resources": [
+					{
+						"producer": [],
+						"peer": [],
+						"producerSocket": [
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 5.89990234375
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 6.39990234375
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 6.89990234375
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 6.699951171875
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 7
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 10.5
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 10.7998046875
+							}
+						]
+					},
+					{
+						"producer": [],
+						"peer": [],
+						"producerSocket": [
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 5.800048828125
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 6.300048828125
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 6.699951171875
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 6.5
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 6.800048828125
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 10.300048828125
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 10.5
+							}
+						]
+					},
+					{
+						"producer": [],
+						"peer": [],
+						"producerSocket": [
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 4.60009765625
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 4.89990234375
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 5.300048828125
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 5.199951171875
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 5.39990234375
+							},
+							{
+								"path": "/",
+								"direction": "receive",
+								"startMs": 8.800048828125
+							},
+							{
+								"path": "/",
+								"direction": "send",
+								"startMs": 9
+							}
+						]
+					}
+				]
+			},
+			{
+				"version": "rewrite",
+				"transport": "socket",
+				"name": "edit to other device paint opportunity",
+				"kb": 2,
+				"n": 9,
+				"medianMs": 79,
+				"p95Ms": 88.599853515625,
+				"values": [
+					83, 74.19970703125, 72.60009765625, 82.39990234375, 79,
+					73.499755859375, 88.599853515625, 80.2998046875, 78.89990234375
+				],
+				"resources": [
+					{
+						"producer": [
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 14.7001953125,
+								"responseMs": 16.000244140625,
+								"durationMs": 1.300000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 17.10009765625,
+								"responseMs": 20.500244140625,
+								"durationMs": 3.400000035762787
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 21.400146484375,
+								"responseMs": 23.2001953125,
+								"durationMs": 1.800000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 22.000244140625,
+								"responseMs": 24.2001953125,
+								"durationMs": 2.199999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 35.2001953125,
+								"responseMs": 36.60009765625,
+								"durationMs": 1.399999976158142
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 35.7001953125,
+								"responseMs": 37.60009765625,
+								"durationMs": 1.899999976158142
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 21.39990234375,
+								"responseMs": 22.800048828125,
+								"durationMs": 1.399999976158142
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 22.10009765625,
+								"responseMs": 24.699951171875,
+								"durationMs": 2.600000023841858
+							}
+						],
+						"producerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 20.30029296875
+							},
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 50.30029296875
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 20.39990234375
+							},
+							{
+								"path": "/api/live",
+								"direction": "send",
+								"startMs": 49.60009765625
+							}
+						]
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 8,
+								"responseMs": 9.39990234375,
+								"durationMs": 1.399999976158142
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 10.199951171875,
+								"responseMs": 13.10009765625,
+								"durationMs": 2.899999976158142
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 13.699951171875,
+								"responseMs": 15,
+								"durationMs": 1.300000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 14.300048828125,
+								"responseMs": 16.199951171875,
+								"durationMs": 1.899999976158142
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 36.10009765625,
+								"responseMs": 41.800048828125,
+								"durationMs": 5.700000047683716
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 40.699951171875,
+								"responseMs": 45.800048828125,
+								"durationMs": 5.100000023841858
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 13.89990234375,
+								"responseMs": 15.599853515625,
+								"durationMs": 1.699999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 14.69970703125,
+								"responseMs": 17.099853515625,
+								"durationMs": 2.399999976158142
+							}
+						],
+						"producerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 12.89990234375
+							},
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 59.5
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 12.999755859375
+							},
+							{
+								"path": "/api/live",
+								"direction": "send",
+								"startMs": 42.19970703125
+							}
+						]
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 8.7001953125,
+								"responseMs": 9.900146484375,
+								"durationMs": 1.199999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 10.7001953125,
+								"responseMs": 14.30029296875,
+								"durationMs": 3.599999964237213
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 14.60009765625,
+								"responseMs": 16.500244140625,
+								"durationMs": 1.9000000357627869
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 15.60009765625,
+								"responseMs": 18.000244140625,
+								"durationMs": 2.400000035762787
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 27.2001953125,
+								"responseMs": 28.900146484375,
+								"durationMs": 1.699999988079071
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 27.900146484375,
+								"responseMs": 29.900146484375,
+								"durationMs": 2
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 15,
+								"responseMs": 17.39990234375,
+								"durationMs": 2.399999976158142
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 15.89990234375,
+								"responseMs": 18.60009765625,
+								"durationMs": 2.699999988079071
+							}
+						],
+						"producerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 13.80029296875
+							},
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 40.60009765625
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 13.89990234375
+							},
+							{
+								"path": "/api/live",
+								"direction": "send",
+								"startMs": 39.89990234375
+							}
+						]
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 7,
+								"responseMs": 8.199951171875,
+								"durationMs": 1.199999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 9,
+								"responseMs": 12.10009765625,
+								"durationMs": 3.100000023841858
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 12.60009765625,
+								"responseMs": 14.10009765625,
+								"durationMs": 1.5
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 15.400146484375,
+								"responseMs": 16.800048828125,
+								"durationMs": 1.4000000357627869
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 23.699951171875,
+								"responseMs": 25.199951171875,
+								"durationMs": 1.5
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 24.300048828125,
+								"responseMs": 25.900146484375,
+								"durationMs": 1.5999999642372131
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 12.89990234375,
+								"responseMs": 14.89990234375,
+								"durationMs": 2
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 13.39990234375,
+								"responseMs": 15.599853515625,
+								"durationMs": 2.200000047683716
+							}
+						],
+						"producerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 11.900146484375
+							},
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 50.900146484375
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 11.89990234375
+							},
+							{
+								"path": "/api/live",
+								"direction": "send",
+								"startMs": 50.199951171875
+							}
+						]
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 11.300048828125,
+								"responseMs": 12.699951171875,
+								"durationMs": 1.399999976158142
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 13.60009765625,
+								"responseMs": 17.199951171875,
+								"durationMs": 3.600000023841858
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 17.800048828125,
+								"responseMs": 19.199951171875,
+								"durationMs": 1.399999976158142
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 18.199951171875,
+								"responseMs": 20.800048828125,
+								"durationMs": 2.600000023841858
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 29.800048828125,
+								"responseMs": 31.300048828125,
+								"durationMs": 1.5
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 30.39990234375,
+								"responseMs": 32.10009765625,
+								"durationMs": 1.699999988079071
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 17.89990234375,
+								"responseMs": 20.099853515625,
+								"durationMs": 2.199999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 18.499755859375,
+								"responseMs": 21.2998046875,
+								"durationMs": 2.800000011920929
+							}
+						],
+						"producerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 16.800048828125
+							},
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 46.89990234375
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 16.89990234375
+							},
+							{
+								"path": "/api/live",
+								"direction": "send",
+								"startMs": 46.19970703125
+							}
+						]
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 8.199951171875,
+								"responseMs": 9.5,
+								"durationMs": 1.300000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 10.300048828125,
+								"responseMs": 13.60009765625,
+								"durationMs": 3.300000011920929
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 14.199951171875,
+								"responseMs": 15.699951171875,
+								"durationMs": 1.5
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 14.699951171875,
+								"responseMs": 17.300048828125,
+								"durationMs": 2.600000023841858
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 26.400146484375,
+								"responseMs": 28.300048828125,
+								"durationMs": 1.9000000357627869
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 27,
+								"responseMs": 29.10009765625,
+								"durationMs": 2.100000023841858
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 14.199951171875,
+								"responseMs": 16.699951171875,
+								"durationMs": 2.5
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 15.099853515625,
+								"responseMs": 17.999755859375,
+								"durationMs": 2.899999976158142
+							}
+						],
+						"producerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 13.400146484375
+							},
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 41.800048828125
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 13.499755859375
+							},
+							{
+								"path": "/api/live",
+								"direction": "send",
+								"startMs": 41.099853515625
+							}
+						]
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 9.5,
+								"responseMs": 10.800048828125,
+								"durationMs": 1.300000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 11.5,
+								"responseMs": 15.199951171875,
+								"durationMs": 3.699999988079071
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 15.699951171875,
+								"responseMs": 17.199951171875,
+								"durationMs": 1.5
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 16.300048828125,
+								"responseMs": 18.39990234375,
+								"durationMs": 2.099999964237213
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 27.10009765625,
+								"responseMs": 28.60009765625,
+								"durationMs": 1.5
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 27.800048828125,
+								"responseMs": 29.39990234375,
+								"durationMs": 1.5999999642372131
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 15.89990234375,
+								"responseMs": 17.89990234375,
+								"durationMs": 2
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 16.69970703125,
+								"responseMs": 19.099853515625,
+								"durationMs": 2.399999976158142
+							}
+						],
+						"producerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 15
+							},
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 56.800048828125
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 14.999755859375
+							},
+							{
+								"path": "/api/live",
+								"direction": "send",
+								"startMs": 56.099853515625
+							}
+						]
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 2.89990234375,
+								"responseMs": 4.599853515625,
+								"durationMs": 1.699999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 12.099853515625,
+								"responseMs": 14,
+								"durationMs": 1.899999976158142
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 15,
+								"responseMs": 19.099853515625,
+								"durationMs": 4.100000023841858
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 19.89990234375,
+								"responseMs": 21.699951171875,
+								"durationMs": 1.800000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 20.39990234375,
+								"responseMs": 23.39990234375,
+								"durationMs": 3
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 32,
+								"responseMs": 34,
+								"durationMs": 2
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 32.599853515625,
+								"responseMs": 34.7998046875,
+								"durationMs": 2.199999988079071
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": -0.000244140625,
+								"responseMs": 1.599609375,
+								"durationMs": 1.600000023841858
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 19.999755859375,
+								"responseMs": 22.7998046875,
+								"durationMs": 2.800000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 20.499755859375,
+								"responseMs": 23.999755859375,
+								"durationMs": 3.5
+							}
+						],
+						"producerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 18.89990234375
+							},
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 47.699951171875
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 18.999755859375
+							},
+							{
+								"path": "/api/live",
+								"direction": "send",
+								"startMs": 46.999755859375
+							}
+						]
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 8.2001953125,
+								"responseMs": 9.400146484375,
+								"durationMs": 1.2000000476837158
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 11.800048828125,
+								"responseMs": 15.400146484375,
+								"durationMs": 3.600000023841858
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 16,
+								"responseMs": 17.60009765625,
+								"durationMs": 1.600000023841858
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 16.5,
+								"responseMs": 19,
+								"durationMs": 2.5
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 27.60009765625,
+								"responseMs": 29,
+								"durationMs": 1.399999976158142
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 28,
+								"responseMs": 29.5,
+								"durationMs": 1.5
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 16,
+								"responseMs": 18.39990234375,
+								"durationMs": 2.400000035762787
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 16.89990234375,
+								"responseMs": 19.39990234375,
+								"durationMs": 2.5
+							}
+						],
+						"producerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 15.10009765625
+							},
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 46.7001953125
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 15.099853515625
+							},
+							{
+								"path": "/api/live",
+								"direction": "send",
+								"startMs": 46
+							}
+						]
+					}
+				]
+			},
+			{
+				"version": "rewrite",
+				"transport": "socket",
+				"name": "offline reconnect to other device paint opportunity",
+				"kb": 2,
+				"n": 3,
+				"medianMs": 77.800048828125,
+				"p95Ms": 78.199951171875,
+				"values": [78.199951171875, 77.800048828125, 75.60009765625],
+				"resources": [
+					{
+						"producer": [
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 0.800048828125,
+								"responseMs": 2.5,
+								"durationMs": 1.699999988079071
+							},
+							{
+								"path": "/api/accounts/preferences",
+								"initiator": "fetch",
+								"startMs": 1.5,
+								"responseMs": 3,
+								"durationMs": 1.5
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 1.7001953125,
+								"responseMs": 3.300048828125,
+								"durationMs": 1.600000023841858
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 7.7001953125,
+								"responseMs": 10.800048828125,
+								"durationMs": 3.100000023841858
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 11.400146484375,
+								"responseMs": 12.800048828125,
+								"durationMs": 1.399999976158142
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 11.800048828125,
+								"responseMs": 14,
+								"durationMs": 2.199999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 22.5,
+								"responseMs": 23.60009765625,
+								"durationMs": 1.100000023841858
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 24.800048828125,
+								"responseMs": 25.900146484375,
+								"durationMs": 1.100000023841858
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 25.2001953125,
+								"responseMs": 26.60009765625,
+								"durationMs": 1.4000000357627869
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 11.699951171875,
+								"responseMs": 13.39990234375,
+								"durationMs": 1.7000000476837158
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 12.199951171875,
+								"responseMs": 14.699951171875,
+								"durationMs": 2.5
+							}
+						],
+						"producerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 10.7001953125
+							},
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 47.300048828125
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 10.7998046875
+							},
+							{
+								"path": "/api/live",
+								"direction": "send",
+								"startMs": 46.2998046875
+							}
+						]
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 2.5,
+								"responseMs": 4,
+								"durationMs": 1.5
+							},
+							{
+								"path": "/api/accounts/preferences",
+								"initiator": "fetch",
+								"startMs": 3.10009765625,
+								"responseMs": 4.300048828125,
+								"durationMs": 1.199999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 3.400146484375,
+								"responseMs": 4.800048828125,
+								"durationMs": 1.4000000357627869
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 7.60009765625,
+								"responseMs": 11.199951171875,
+								"durationMs": 3.599999964237213
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 11.800048828125,
+								"responseMs": 13.10009765625,
+								"durationMs": 1.300000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 12.10009765625,
+								"responseMs": 14.300048828125,
+								"durationMs": 2.199999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 21.5,
+								"responseMs": 22.699951171875,
+								"durationMs": 1.199999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 23.699951171875,
+								"responseMs": 24.800048828125,
+								"durationMs": 1.100000023841858
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 24.199951171875,
+								"responseMs": 25.300048828125,
+								"durationMs": 1.100000023841858
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 11.89990234375,
+								"responseMs": 13.7998046875,
+								"durationMs": 1.9000000357627869
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 12.499755859375,
+								"responseMs": 14.89990234375,
+								"durationMs": 2.399999976158142
+							}
+						],
+						"producerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 0.10009765625
+							},
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 10.900146484375
+							},
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 45.699951171875
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 0.7998046875
+							},
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 10.89990234375
+							},
+							{
+								"path": "/api/live",
+								"direction": "send",
+								"startMs": 45.099853515625
+							}
+						]
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 2.300048828125,
+								"responseMs": 4.10009765625,
+								"durationMs": 1.800000011920929
+							},
+							{
+								"path": "/api/accounts/preferences",
+								"initiator": "fetch",
+								"startMs": 2.900146484375,
+								"responseMs": 4.5,
+								"durationMs": 1.5999999642372131
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 3.2001953125,
+								"responseMs": 4.800048828125,
+								"durationMs": 1.600000023841858
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 7.900146484375,
+								"responseMs": 11.2001953125,
+								"durationMs": 3.299999952316284
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 11.800048828125,
+								"responseMs": 13.2001953125,
+								"durationMs": 1.399999976158142
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 12.2001953125,
+								"responseMs": 14.300048828125,
+								"durationMs": 2.100000023841858
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 20,
+								"responseMs": 21.2001953125,
+								"durationMs": 1.199999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 22.400146484375,
+								"responseMs": 23.2001953125,
+								"durationMs": 0.7999999523162842
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 22.60009765625,
+								"responseMs": 23.7001953125,
+								"durationMs": 1.0999999642372131
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 12,
+								"responseMs": 14.7998046875,
+								"durationMs": 2.800000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 12.699951171875,
+								"responseMs": 15.2998046875,
+								"durationMs": 2.600000023841858
+							}
+						],
+						"producerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 11
+							},
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 43.60009765625
+							}
+						],
+						"peerSocket": [
+							{
+								"path": "/api/live",
+								"direction": "receive",
+								"startMs": 11.099853515625
+							},
+							{
+								"path": "/api/live",
+								"direction": "send",
+								"startMs": 42.599853515625
+							}
+						]
+					}
+				]
+			}
+		],
+		"failures": []
+	},
+	"polling": {
+		"results": [
+			{
+				"version": "rewrite",
+				"transport": "poll",
+				"name": "edit to other device paint opportunity",
+				"kb": 2,
+				"n": 9,
+				"medianMs": 80.999755859375,
+				"p95Ms": 87.099853515625,
+				"values": [
+					80.999755859375, 79.199951171875, 85.7001953125, 83.89990234375,
+					76.300048828125, 87.099853515625, 82.699951171875, 79.199951171875,
+					70.10009765625
+				],
+				"resources": [
+					{
+						"producer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -827,
+								"responseMs": 13.5,
+								"durationMs": 840.5
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 7.199951171875,
+								"responseMs": 8.5,
+								"durationMs": 1.300000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 9.60009765625,
+								"responseMs": 13.39990234375,
+								"durationMs": 3.799999952316284
+							},
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": 14.300048828125,
+								"responseMs": 50.300048828125,
+								"durationMs": 36
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 14.89990234375,
+								"responseMs": 16.5,
+								"durationMs": 1.600000023841858
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 15.10009765625,
+								"responseMs": 16.89990234375,
+								"durationMs": 1.7999999523162842
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 25.199951171875,
+								"responseMs": 26.39990234375,
+								"durationMs": 1.199999988079071
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 25.5,
+								"responseMs": 26.800048828125,
+								"durationMs": 1.300000011920929
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -52.800048828125,
+								"responseMs": 13.699951171875,
+								"durationMs": 66.5
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 15.099853515625,
+								"responseMs": 17.2998046875,
+								"durationMs": 2.199999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 15.7998046875,
+								"responseMs": 17.89990234375,
+								"durationMs": 2.100000023841858
+							},
+							{
+								"path": "/api/live/send",
+								"initiator": "fetch",
+								"startMs": 48.7998046875,
+								"responseMs": 49.999755859375,
+								"durationMs": 1.2000000476837158
+							}
+						],
+						"producerSocket": [],
+						"peerSocket": []
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -417.599853515625,
+								"responseMs": 14.2001953125,
+								"durationMs": 431.800000011921
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 7.900146484375,
+								"responseMs": 9.10009765625,
+								"durationMs": 1.199999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 10.800048828125,
+								"responseMs": 14.10009765625,
+								"durationMs": 3.300000011920929
+							},
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": 14.900146484375,
+								"responseMs": 48.5,
+								"durationMs": 33.59999996423721
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 15.300048828125,
+								"responseMs": 16.800048828125,
+								"durationMs": 1.5
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 15.5,
+								"responseMs": 17.10009765625,
+								"durationMs": 1.600000023841858
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 24.60009765625,
+								"responseMs": 26,
+								"durationMs": 1.399999976158142
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 25.300048828125,
+								"responseMs": 26.60009765625,
+								"durationMs": 1.300000011920929
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -454.10009765625,
+								"responseMs": 14.099853515625,
+								"durationMs": 468.2000000476837
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 15.39990234375,
+								"responseMs": 17.800048828125,
+								"durationMs": 2.400000035762787
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 16.099853515625,
+								"responseMs": 18.39990234375,
+								"durationMs": 2.299999952316284
+							},
+							{
+								"path": "/api/live/send",
+								"initiator": "fetch",
+								"startMs": 47,
+								"responseMs": 48.199951171875,
+								"durationMs": 1.199999988079071
+							}
+						],
+						"producerSocket": [],
+						"peerSocket": []
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -411.099853515625,
+								"responseMs": 13.10009765625,
+								"durationMs": 424.199999988079
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 7.900146484375,
+								"responseMs": 9.300048828125,
+								"durationMs": 1.399999976158142
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 10.000244140625,
+								"responseMs": 13.10009765625,
+								"durationMs": 3.099999964237213
+							},
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": 13.800048828125,
+								"responseMs": 55.000244140625,
+								"durationMs": 41.20000004768371
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 14.300048828125,
+								"responseMs": 15.900146484375,
+								"durationMs": 1.600000023841858
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 14.500244140625,
+								"responseMs": 16.800048828125,
+								"durationMs": 2.299999952316284
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 26.10009765625,
+								"responseMs": 27.400146484375,
+								"durationMs": 1.300000011920929
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 26.500244140625,
+								"responseMs": 28.000244140625,
+								"durationMs": 1.5
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -445.5,
+								"responseMs": 13.10009765625,
+								"durationMs": 458.60000002384186
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 14.39990234375,
+								"responseMs": 16.10009765625,
+								"durationMs": 1.699999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 15,
+								"responseMs": 17.39990234375,
+								"durationMs": 2.400000035762787
+							},
+							{
+								"path": "/api/live/send",
+								"initiator": "fetch",
+								"startMs": 53.39990234375,
+								"responseMs": 54.60009765625,
+								"durationMs": 1.199999988079071
+							}
+						],
+						"producerSocket": [],
+						"peerSocket": []
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -412.800048828125,
+								"responseMs": 13.10009765625,
+								"durationMs": 425.9000000357628
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 7.699951171875,
+								"responseMs": 8.89990234375,
+								"durationMs": 1.199999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 9.60009765625,
+								"responseMs": 13,
+								"durationMs": 3.399999976158142
+							},
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": 13.89990234375,
+								"responseMs": 53.199951171875,
+								"durationMs": 39.30000001192093
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 16,
+								"responseMs": 17.699951171875,
+								"durationMs": 1.699999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 16.199951171875,
+								"responseMs": 18.199951171875,
+								"durationMs": 2
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 25.800048828125,
+								"responseMs": 27.10009765625,
+								"durationMs": 1.300000011920929
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 26.300048828125,
+								"responseMs": 27.5,
+								"durationMs": 1.199999988079071
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -454.7001953125,
+								"responseMs": 12.999755859375,
+								"durationMs": 467.7000000476837
+							},
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": 13.599853515625,
+								"responseMs": 134.999755859375,
+								"durationMs": 121.4000000357628
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 14.499755859375,
+								"responseMs": 15.7998046875,
+								"durationMs": 1.2999999523162842
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 15.099853515625,
+								"responseMs": 16.7998046875,
+								"durationMs": 1.699999988079071
+							},
+							{
+								"path": "/api/live/send",
+								"initiator": "fetch",
+								"startMs": 51.599853515625,
+								"responseMs": 52.89990234375,
+								"durationMs": 1.300000011920929
+							}
+						],
+						"producerSocket": [],
+						"peerSocket": []
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -403.699951171875,
+								"responseMs": 14.199951171875,
+								"durationMs": 417.89999997615814
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 8.60009765625,
+								"responseMs": 10.10009765625,
+								"durationMs": 1.5
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 10.89990234375,
+								"responseMs": 14.10009765625,
+								"durationMs": 3.200000047683716
+							},
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": 14.89990234375,
+								"responseMs": 45.60009765625,
+								"durationMs": 30.700000047683716
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 15.5,
+								"responseMs": 16.89990234375,
+								"durationMs": 1.399999976158142
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 15.699951171875,
+								"responseMs": 17.39990234375,
+								"durationMs": 1.699999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 25.5,
+								"responseMs": 26.699951171875,
+								"durationMs": 1.199999988079071
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 25.89990234375,
+								"responseMs": 27.39990234375,
+								"durationMs": 1.5
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -321.800048828125,
+								"responseMs": 14.2998046875,
+								"durationMs": 336.0999999642372
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 15.699951171875,
+								"responseMs": 17.999755859375,
+								"durationMs": 2.300000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 16.2998046875,
+								"responseMs": 18.39990234375,
+								"durationMs": 2.100000023841858
+							},
+							{
+								"path": "/api/live/send",
+								"initiator": "fetch",
+								"startMs": 43.999755859375,
+								"responseMs": 45.199951171875,
+								"durationMs": 1.199999988079071
+							}
+						],
+						"producerSocket": [],
+						"peerSocket": []
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -103.599853515625,
+								"responseMs": 14.400146484375,
+								"durationMs": 118
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 8.800048828125,
+								"responseMs": 10.10009765625,
+								"durationMs": 1.300000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 10.7001953125,
+								"responseMs": 14.400146484375,
+								"durationMs": 3.699999988079071
+							},
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": 15.10009765625,
+								"responseMs": 56.300048828125,
+								"durationMs": 41.19999998807907
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 15.60009765625,
+								"responseMs": 17.300048828125,
+								"durationMs": 1.699999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 15.900146484375,
+								"responseMs": 18,
+								"durationMs": 2.099999964237213
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 26.800048828125,
+								"responseMs": 28,
+								"durationMs": 1.199999988079071
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 27.300048828125,
+								"responseMs": 28.5,
+								"durationMs": 1.199999988079071
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -441,
+								"responseMs": 14.300048828125,
+								"durationMs": 455.300000011921
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 15.699951171875,
+								"responseMs": 17.5,
+								"durationMs": 1.800000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 16.300048828125,
+								"responseMs": 18.5,
+								"durationMs": 2.199999988079071
+							},
+							{
+								"path": "/api/live/send",
+								"initiator": "fetch",
+								"startMs": 54.800048828125,
+								"responseMs": 56,
+								"durationMs": 1.199999988079071
+							}
+						],
+						"producerSocket": [],
+						"peerSocket": []
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -397.599853515625,
+								"responseMs": 14.5,
+								"durationMs": 412.0999999642372
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 8.7001953125,
+								"responseMs": 10,
+								"durationMs": 1.2999999523162842
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 10.800048828125,
+								"responseMs": 14.300048828125,
+								"durationMs": 3.5
+							},
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": 15.10009765625,
+								"responseMs": 52.300048828125,
+								"durationMs": 37.19999998807907
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 15.7001953125,
+								"responseMs": 17.10009765625,
+								"durationMs": 1.399999976158142
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 16,
+								"responseMs": 17.900146484375,
+								"durationMs": 1.9000000357627869
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 25.10009765625,
+								"responseMs": 26.5,
+								"durationMs": 1.399999976158142
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 25.7001953125,
+								"responseMs": 27,
+								"durationMs": 1.2999999523162842
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -439.60009765625,
+								"responseMs": 14.599853515625,
+								"durationMs": 454.2000000476837
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 16,
+								"responseMs": 18.599853515625,
+								"durationMs": 2.600000023841858
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 18.099853515625,
+								"responseMs": 19.39990234375,
+								"durationMs": 1.2999999523162842
+							},
+							{
+								"path": "/api/live/send",
+								"initiator": "fetch",
+								"startMs": 50.5,
+								"responseMs": 51.89990234375,
+								"durationMs": 1.399999976158142
+							}
+						],
+						"producerSocket": [],
+						"peerSocket": []
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -417.099853515625,
+								"responseMs": 12.10009765625,
+								"durationMs": 429.199999988079
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 6.5,
+								"responseMs": 7.800048828125,
+								"durationMs": 1.300000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 8.5,
+								"responseMs": 12.10009765625,
+								"durationMs": 3.600000023841858
+							},
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": 12.900146484375,
+								"responseMs": 48.60009765625,
+								"durationMs": 35.69999998807907
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 13.60009765625,
+								"responseMs": 14.800048828125,
+								"durationMs": 1.199999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 13.800048828125,
+								"responseMs": 15.7001953125,
+								"durationMs": 1.9000000357627869
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 23,
+								"responseMs": 24.2001953125,
+								"durationMs": 1.2000000476837158
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 23.5,
+								"responseMs": 24.60009765625,
+								"durationMs": 1.100000023841858
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -454.800048828125,
+								"responseMs": 12,
+								"durationMs": 466.800000011921
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 13.5,
+								"responseMs": 15,
+								"durationMs": 1.5
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 14.199951171875,
+								"responseMs": 16.099853515625,
+								"durationMs": 1.9000000357627869
+							},
+							{
+								"path": "/api/live/send",
+								"initiator": "fetch",
+								"startMs": 47.199951171875,
+								"responseMs": 48.300048828125,
+								"durationMs": 1.100000023841858
+							}
+						],
+						"producerSocket": [],
+						"peerSocket": []
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -409.89990234375,
+								"responseMs": 12.300048828125,
+								"durationMs": 422.199999988079
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 7.2001953125,
+								"responseMs": 8.400146484375,
+								"durationMs": 1.199999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 9.000244140625,
+								"responseMs": 12.10009765625,
+								"durationMs": 3.099999964237213
+							},
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": 12.800048828125,
+								"responseMs": 40.10009765625,
+								"durationMs": 27.30000001192093
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 13.300048828125,
+								"responseMs": 14.900146484375,
+								"durationMs": 1.600000023841858
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 13.500244140625,
+								"responseMs": 15.300048828125,
+								"durationMs": 1.7999999523162842
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 24.000244140625,
+								"responseMs": 25.500244140625,
+								"durationMs": 1.5
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 24.500244140625,
+								"responseMs": 26.400146484375,
+								"durationMs": 1.899999976158142
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -446.60009765625,
+								"responseMs": 12.10009765625,
+								"durationMs": 458.699999988079
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 13.60009765625,
+								"responseMs": 15.699951171875,
+								"durationMs": 2.099999964237213
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 14.10009765625,
+								"responseMs": 16.39990234375,
+								"durationMs": 2.300000011920929
+							},
+							{
+								"path": "/api/live/send",
+								"initiator": "fetch",
+								"startMs": 38.60009765625,
+								"responseMs": 39.800048828125,
+								"durationMs": 1.199999988079071
+							}
+						],
+						"producerSocket": [],
+						"peerSocket": []
+					}
+				]
+			},
+			{
+				"version": "rewrite",
+				"transport": "poll",
+				"name": "offline reconnect to other device paint opportunity",
+				"kb": 2,
+				"n": 3,
+				"medianMs": 70.39990234375,
+				"p95Ms": 82.699951171875,
+				"values": [67.89990234375, 70.39990234375, 82.699951171875],
+				"resources": [
+					{
+						"producer": [
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 1.199951171875,
+								"responseMs": 3.10009765625,
+								"durationMs": 1.9000000357627869
+							},
+							{
+								"path": "/api/accounts/session",
+								"initiator": "fetch",
+								"startMs": 1.5,
+								"responseMs": 3.300048828125,
+								"durationMs": 1.800000011920929
+							},
+							{
+								"path": "/api/accounts/preferences",
+								"initiator": "fetch",
+								"startMs": 2,
+								"responseMs": 3.5,
+								"durationMs": 1.5
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 2.199951171875,
+								"responseMs": 4.199951171875,
+								"durationMs": 2
+							},
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": 3.699951171875,
+								"responseMs": 4.900146484375,
+								"durationMs": 1.2000000476837158
+							},
+							{
+								"path": "/api/live/send",
+								"initiator": "fetch",
+								"startMs": 5.300048828125,
+								"responseMs": 6.300048828125,
+								"durationMs": 1
+							},
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": 5.5,
+								"responseMs": 6.800048828125,
+								"durationMs": 1.300000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 6.300048828125,
+								"responseMs": 9.800048828125,
+								"durationMs": 3.5
+							},
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": 7.199951171875,
+								"responseMs": 9.900146484375,
+								"durationMs": 2.700000047683716
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 7.199951171875,
+								"responseMs": 10.900146484375,
+								"durationMs": 3.700000047683716
+							},
+							{
+								"path": "/api/accounts/preferences",
+								"initiator": "fetch",
+								"startMs": 7.5,
+								"responseMs": 11.199951171875,
+								"durationMs": 3.699999988079071
+							},
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": 10.400146484375,
+								"responseMs": 38.300048828125,
+								"durationMs": 27.899999976158146
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 11.199951171875,
+								"responseMs": 13.10009765625,
+								"durationMs": 1.9000000357627869
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 13.400146484375,
+								"responseMs": 14.400146484375,
+								"durationMs": 1
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 21.800048828125,
+								"responseMs": 23.900146484375,
+								"durationMs": 2.100000023841858
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 29.900146484375,
+								"responseMs": 31.10009765625,
+								"durationMs": 1.199999988079071
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 30.199951171875,
+								"responseMs": 31.699951171875,
+								"durationMs": 1.5
+							},
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": 38.900146484375,
+								"responseMs": 161.60009765625,
+								"durationMs": 122.69999998807909
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -1339.400146484375,
+								"responseMs": 9.7998046875,
+								"durationMs": 1349.2000000476835
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 11.099853515625,
+								"responseMs": 12.2998046875,
+								"durationMs": 1.2000000476837158
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 11.89990234375,
+								"responseMs": 13.599853515625,
+								"durationMs": 1.699999988079071
+							},
+							{
+								"path": "/api/live/send",
+								"initiator": "fetch",
+								"startMs": 36.5,
+								"responseMs": 38,
+								"durationMs": 1.5
+							}
+						],
+						"producerSocket": [],
+						"peerSocket": []
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -1202,
+								"responseMs": 11.39990234375,
+								"durationMs": 1213.399999976158
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 2.60009765625,
+								"responseMs": 4.699951171875,
+								"durationMs": 2.099999964237213
+							},
+							{
+								"path": "/api/accounts/preferences",
+								"initiator": "fetch",
+								"startMs": 3.89990234375,
+								"responseMs": 5.39990234375,
+								"durationMs": 1.5
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 4.10009765625,
+								"responseMs": 5.89990234375,
+								"durationMs": 1.7999999523162842
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 7.60009765625,
+								"responseMs": 11.199951171875,
+								"durationMs": 3.599999964237213
+							},
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": 11.89990234375,
+								"responseMs": 40.60009765625,
+								"durationMs": 28.700000047683716
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 12.300048828125,
+								"responseMs": 13.60009765625,
+								"durationMs": 1.300000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 12.5,
+								"responseMs": 14.199951171875,
+								"durationMs": 1.699999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 22.60009765625,
+								"responseMs": 23.800048828125,
+								"durationMs": 1.199999988079071
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 25.5,
+								"responseMs": 26.699951171875,
+								"durationMs": 1.199999988079071
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 25.89990234375,
+								"responseMs": 27.5,
+								"durationMs": 1.600000023841858
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -1354.000244140625,
+								"responseMs": 11.199951171875,
+								"durationMs": 1365.199999988079
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 12.7998046875,
+								"responseMs": 14.999755859375,
+								"durationMs": 2.200000047683716
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 13.39990234375,
+								"responseMs": 15.699951171875,
+								"durationMs": 2.300000011920929
+							},
+							{
+								"path": "/api/live/send",
+								"initiator": "fetch",
+								"startMs": 38.999755859375,
+								"responseMs": 40.2998046875,
+								"durationMs": 1.2999999523162842
+							}
+						],
+						"producerSocket": [],
+						"peerSocket": []
+					},
+					{
+						"producer": [
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 2.5,
+								"responseMs": 3.900146484375,
+								"durationMs": 1.4000000357627869
+							},
+							{
+								"path": "/api/accounts/preferences",
+								"initiator": "fetch",
+								"startMs": 3.199951171875,
+								"responseMs": 4.5,
+								"durationMs": 1.300000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 3.400146484375,
+								"responseMs": 4.800048828125,
+								"durationMs": 1.399999976158142
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/actions",
+								"initiator": "fetch",
+								"startMs": 7.199951171875,
+								"responseMs": 10.5,
+								"durationMs": 3.300000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 11.300048828125,
+								"responseMs": 12.60009765625,
+								"durationMs": 1.300000011920929
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 20.900146484375,
+								"responseMs": 22.199951171875,
+								"durationMs": 1.2999999523162842
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 23.300048828125,
+								"responseMs": 24.300048828125,
+								"durationMs": 1
+							}
+						],
+						"peer": [
+							{
+								"path": "/api/live/poll",
+								"initiator": "fetch",
+								"startMs": -1325.900146484375,
+								"responseMs": 10.5,
+								"durationMs": 1336.4000000357628
+							},
+							{
+								"path": "/api/library",
+								"initiator": "fetch",
+								"startMs": 11.7998046875,
+								"responseMs": 13.099853515625,
+								"durationMs": 1.2999999523162842
+							},
+							{
+								"path": "/api/documents/23597f46-610f-494f-8953-b1b02b98c71e/history",
+								"initiator": "fetch",
+								"startMs": 12.39990234375,
+								"responseMs": 13.599853515625,
+								"durationMs": 1.199999988079071
+							},
+							{
+								"path": "/api/live/send",
+								"initiator": "fetch",
+								"startMs": 50.599853515625,
+								"responseMs": 51.7998046875,
+								"durationMs": 1.2000000476837158
+							}
+						],
+						"producerSocket": [],
+						"peerSocket": []
+					}
+				]
+			}
+		],
+		"failures": []
+	},
+	"trustedContinuous": {
+		"results": [
+			{
+				"version": "original",
+				"kb": 128,
+				"trustedInput": true,
+				"backgroundObservationMs": 3000,
+				"requestedEdits": 25,
+				"completedEdits": 25,
+				"intervalMs": null,
+				"tracePath": "continuous-native-original.trace.json",
+				"started": 510.699999988079,
+				"finished": 3542.2999999523163,
+				"sourceCharacters": 132293,
+				"durableObserved": true,
+				"sent": [
+					{
+						"count": 1,
+						"time": 510.699999988079,
+						"taskMs": 1.300000011920929
+					},
+					{
+						"count": 2,
+						"time": 512.8999999761581,
+						"taskMs": 0.6000000238418579
+					},
+					{
+						"count": 3,
+						"time": 515.1999999880791,
+						"taskMs": 0.5
+					},
+					{
+						"count": 4,
+						"time": 522.1999999880791,
+						"taskMs": 0.5999999642372131
+					},
+					{
+						"count": 5,
+						"time": 523.5999999642372,
+						"taskMs": 0.5
+					},
+					{
+						"count": 6,
+						"time": 524.5999999642372,
+						"taskMs": 0.5
+					},
+					{
+						"count": 7,
+						"time": 525.5999999642372,
+						"taskMs": 0.5
+					},
+					{
+						"count": 8,
+						"time": 526.5,
+						"taskMs": 0.3999999761581421
+					},
+					{
+						"count": 9,
+						"time": 527.2999999523163,
+						"taskMs": 0.40000003576278687
+					},
+					{
+						"count": 10,
+						"time": 528,
+						"taskMs": 0.2999999523162842
+					},
+					{
+						"count": 11,
+						"time": 528.6999999880791,
+						"taskMs": 0.30000001192092896
+					},
+					{
+						"count": 12,
+						"time": 529.5,
+						"taskMs": 0.2999999523162842
+					},
+					{
+						"count": 13,
+						"time": 530.2999999523163,
+						"taskMs": 0.20000004768371585
+					},
+					{
+						"count": 14,
+						"time": 531.8999999761581,
+						"taskMs": 0.5
+					},
+					{
+						"count": 15,
+						"time": 532.7999999523163,
+						"taskMs": 0.40000003576278687
+					},
+					{
+						"count": 16,
+						"time": 533.6999999880791,
+						"taskMs": 0.30000001192092896
+					},
+					{
+						"count": 17,
+						"time": 534.5,
+						"taskMs": 0.3999999761581421
+					},
+					{
+						"count": 18,
+						"time": 535.2999999523163,
+						"taskMs": 0.30000001192092896
+					},
+					{
+						"count": 19,
+						"time": 536,
+						"taskMs": 0.2999999523162842
+					},
+					{
+						"count": 20,
+						"time": 536.6999999880791,
+						"taskMs": 0.3999999761581421
+					},
+					{
+						"count": 21,
+						"time": 537.3999999761581,
+						"taskMs": 0.30000001192092896
+					},
+					{
+						"count": 22,
+						"time": 538.0999999642372,
+						"taskMs": 0.40000003576278687
+					},
+					{
+						"count": 23,
+						"time": 538.7999999523163,
+						"taskMs": 0.30000001192092896
+					},
+					{
+						"count": 24,
+						"time": 539.3999999761581,
+						"taskMs": 0.3999999761581421
+					},
+					{
+						"count": 25,
+						"time": 540.0999999642372,
+						"taskMs": 0.30000001192092896
+					}
+				],
+				"frames": [
+					16.63400000000007, 16.699999999999932, 16.600000000000023,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.600000000000023, 16.699999999999932, 16.700000000000045,
+					16.600000000000023, 16.699999999999932, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.600000000000023, 16.699999999999932, 16.700000000000045,
+					16.600000000000023, 16.699999999999932, 16.600000000000023,
+					16.700000000000045, 16.699999999999932, 16.600000000000023,
+					16.800000000000068, 16.59999999999991, 16.600000000000023,
+					16.700000000000045, 16.699999999999932, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.600000000000136,
+					16.699999999999818, 16.700000000000045, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.600000000000136,
+					16.699999999999818, 16.700000000000045, 16.600000000000136,
+					16.699999999999818, 16.700000000000045, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.600000000000136,
+					16.699999999999818, 16.700000000000045, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.600000000000136,
+					16.699999999999818, 16.700000000000045, 16.600000000000136,
+					16.699999999999818, 16.700000000000045, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.700000000000045,
+					16.59999999999991, 16.600000000000136, 16.799999999999955,
+					16.59999999999991, 16.700000000000045, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.600000000000136,
+					16.699999999999818, 16.700000000000045, 16.600000000000136,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.59999999999991, 16.800000000000182,
+					16.59999999999991, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.59999999999991, 16.800000000000182,
+					16.59999999999991, 16.59999999999991, 16.700000000000273,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.59999999999991, 16.800000000000182, 16.59999999999991,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.600000000000364,
+					16.799999999999727, 16.59999999999991, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.600000000000364,
+					16.799999999999727, 16.59999999999991, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.600000000000364
+				],
+				"badge": {
+					"text": "",
+					"pending": "",
+					"busy": "",
+					"phase": "",
+					"version": ""
+				},
+				"interInputSpacingMs": {
+					"median": 0.7999999821186066,
+					"max": 7.0,
+					"values": [
+						2.199999988079128, 2.300000011920929, 7.0, 1.399999976158142, 1.0,
+						1.0, 0.9000000357627869, 0.7999999523162842, 0.7000000476837158,
+						0.699999988079071, 0.800000011920929, 0.7999999523162842,
+						1.600000023841858, 0.8999999761581421, 0.9000000357627869,
+						0.800000011920929, 0.7999999523162842, 0.7000000476837158,
+						0.699999988079071, 0.699999988079071, 0.699999988079071,
+						0.699999988079071, 0.6000000238418579, 0.699999988079071
+					]
+				}
+			},
+			{
+				"version": "rewrite",
+				"kb": 128,
+				"trustedInput": true,
+				"backgroundObservationMs": 3000,
+				"requestedEdits": 25,
+				"completedEdits": 25,
+				"intervalMs": null,
+				"tracePath": "continuous-native-rewrite.trace.json",
+				"started": 406,
+				"finished": 3478.199999988079,
+				"sourceCharacters": 132293,
+				"durableObserved": true,
+				"sent": [
+					{
+						"count": 1,
+						"time": 406,
+						"taskMs": 3.199999988079071
+					},
+					{
+						"count": 2,
+						"time": 410.199999988079,
+						"taskMs": 2
+					},
+					{
+						"count": 3,
+						"time": 412.89999997615814,
+						"taskMs": 2
+					},
+					{
+						"count": 4,
+						"time": 415.800000011921,
+						"taskMs": 2.300000011920929
+					},
+					{
+						"count": 5,
+						"time": 418.800000011921,
+						"taskMs": 2.099999964237213
+					},
+					{
+						"count": 6,
+						"time": 421.699999988079,
+						"taskMs": 1.9000000357627869
+					},
+					{
+						"count": 7,
+						"time": 425.699999988079,
+						"taskMs": 2.100000023841858
+					},
+					{
+						"count": 8,
+						"time": 428.5,
+						"taskMs": 2.300000011920929
+					},
+					{
+						"count": 9,
+						"time": 431.800000011921,
+						"taskMs": 2
+					},
+					{
+						"count": 10,
+						"time": 434.60000002384186,
+						"taskMs": 1.7999999523162842
+					},
+					{
+						"count": 11,
+						"time": 436.89999997615814,
+						"taskMs": 1.7000000476837158
+					},
+					{
+						"count": 12,
+						"time": 439.199999988079,
+						"taskMs": 1.600000023841858
+					},
+					{
+						"count": 13,
+						"time": 442.699999988079,
+						"taskMs": 2.300000011920929
+					},
+					{
+						"count": 14,
+						"time": 446.300000011921,
+						"taskMs": 1.699999988079071
+					},
+					{
+						"count": 15,
+						"time": 449.5,
+						"taskMs": 1.699999988079071
+					},
+					{
+						"count": 16,
+						"time": 451.89999997615814,
+						"taskMs": 1.600000023841858
+					},
+					{
+						"count": 17,
+						"time": 454,
+						"taskMs": 1.5
+					},
+					{
+						"count": 18,
+						"time": 457.5,
+						"taskMs": 1.600000023841858
+					},
+					{
+						"count": 19,
+						"time": 460.199999988079,
+						"taskMs": 1.600000023841858
+					},
+					{
+						"count": 20,
+						"time": 462.5,
+						"taskMs": 1.899999976158142
+					},
+					{
+						"count": 21,
+						"time": 465.199999988079,
+						"taskMs": 1.5
+					},
+					{
+						"count": 22,
+						"time": 467.800000011921,
+						"taskMs": 1.5
+					},
+					{
+						"count": 23,
+						"time": 469.89999997615814,
+						"taskMs": 1.800000011920929
+					},
+					{
+						"count": 24,
+						"time": 472.10000002384186,
+						"taskMs": 1.5
+					},
+					{
+						"count": 25,
+						"time": 475.5,
+						"taskMs": 1.800000011920929
+					}
+				],
+				"frames": [
+					16.599999999999966, 16.69999999999999, 16.700000000000045,
+					16.599999999999966, 16.69999999999999, 16.600000000000023,
+					16.69999999999999, 16.69999999999999, 16.600000000000023,
+					16.700000000000045, 16.699999999999932, 16.700000000000045,
+					16.600000000000023, 16.699999999999932, 16.600000000000023,
+					16.799999999999955, 16.600000000000023, 16.700000000000045,
+					16.600000000000023, 16.699999999999932, 16.700000000000045,
+					16.699999999999932, 16.600000000000023, 16.600000000000023,
+					16.799999999999955, 16.600000000000023, 16.700000000000045,
+					16.600000000000023, 16.699999999999932, 16.700000000000045,
+					16.600000000000023, 16.699999999999932, 16.700000000000045,
+					16.600000000000023, 16.699999999999932, 16.600000000000023,
+					16.700000000000045, 16.699999999999932, 16.699999999999932,
+					16.600000000000136, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.59999999999991, 16.799999999999955,
+					16.600000000000136, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045, 16.699999999999818,
+					16.600000000000136, 16.59999999999991, 16.799999999999955,
+					16.600000000000136, 16.700000000000045, 16.699999999999818,
+					16.700000000000045, 16.600000000000136, 16.59999999999991,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.700000000000045, 16.699999999999818,
+					16.600000000000136, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.59999999999991, 16.700000000000273, 16.699999999999818,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.59999999999991, 16.700000000000273, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.59999999999991, 16.800000000000182, 16.59999999999991,
+					16.59999999999991, 16.700000000000273, 16.699999999999818,
+					16.59999999999991, 16.800000000000182, 16.59999999999991,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.59999999999991, 16.700000000000273, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.59999999999991, 16.700000000000273, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.59999999999991, 16.700000000000273, 16.699999999999818,
+					16.59999999999991, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.700000000000273, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.59999999999991,
+					16.699999999999818, 16.700000000000273, 16.699999999999818,
+					16.59999999999991, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.700000000000273, 16.699999999999818,
+					16.59999999999991, 16.700000000000273, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.59999999999991
+				],
+				"badge": {
+					"text": "Saved",
+					"pending": "0",
+					"busy": "false",
+					"phase": "",
+					"version": "76"
+				},
+				"interInputSpacingMs": {
+					"median": 2.800000011920929,
+					"max": 4.199999988079014,
+					"values": [
+						4.199999988079014, 2.699999988079128, 2.9000000357628437, 3.0,
+						2.8999999761580284, 4.0, 2.800000011920986, 3.300000011920986,
+						2.800000011920872, 2.299999952316284, 2.300000011920872, 3.5,
+						3.6000000238419716, 3.199999988079014, 2.399999976158142,
+						2.100000023841858, 3.5, 2.699999988079014, 2.300000011920986,
+						2.699999988079014, 2.6000000238419716, 2.0999999642371563,
+						2.200000047683716, 3.399999976158142
+					]
+				}
+			}
+		]
+	},
+	"continuousTopLevelTasks": [
+		{
+			"version": "original",
+			"largestMainTaskMs": 29.901,
+			"tasksOver8_3Ms": 1,
+			"maxFrameIntervalMs": 16.800000000000182,
+			"taskCount": 655
+		},
+		{
+			"version": "rewrite",
+			"largestMainTaskMs": 8.305,
+			"tasksOver8_3Ms": 1,
+			"maxFrameIntervalMs": 16.800000000000182,
+			"taskCount": 4828
+		}
+	],
+	"bundleSizes": {
+		"method": "Production files on disk. Static imports and HTML module preloads define initial JavaScript; dynamic imports are excluded. Gzip each file independently with Bun.gzipSync at level 9, then sum. Exclude benchmark probes, source maps, HTML, fonts, images, documents and network framing. Whiteboard is the editor's static dependency closure minus initial JavaScript. Sizes describe emitted code, not browser network traces or service-worker cache traffic.",
+		"original": {
+			"initialJavaScript": {
+				"bytes": 3930316,
+				"gzipBytes": 1280350,
+				"files": [
+					"_astro/browser-startup-instrumentation.hp2BeFIz.js",
+					"_astro/client.-iLz22eX.js",
+					"_astro/client.CMSwgtGj.js",
+					"_astro/index.BJJFgUIs.js",
+					"_astro/index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+					"_astro/main.BjTj7Dij.js",
+					"_astro/main.BrO3cuZ6.js"
+				]
+			},
+			"initialCss": {
+				"bytes": 212968,
+				"gzipBytes": 36506,
+				"files": [
+					"_astro/changelog.wvlNSzc1.css",
+					"_astro/mcp.C-yZ6QuE.css",
+					"_astro/tldraw.eCjzm0t1.css"
+				]
+			},
+			"lazyWhiteboardJavaScript": {
+				"bytes": 1690951,
+				"gzipBytes": 514054,
+				"files": [
+					"_astro/tldraw-canvas.B6ZgR3dw.js",
+					"_astro/tldraw-editor.DWMVjfIt.js",
+					"_astro/tldraw-file.CTReCsUp.js",
+					"_astro/tldraw-state-react.B7kKx-SI.js",
+					"_astro/tldraw-state.Br4AVh-B.js",
+					"_astro/tldraw-store.Biu40d6D.js",
+					"_astro/tldraw-tlschema.DtzbXets.js",
+					"_astro/tldraw-utils.BJp5PhA6.js",
+					"_astro/tldraw-validate.Ch1A2EoE.js",
+					"_astro/tldraw.nSA0H8C8.js"
+				]
+			},
+			"lazyWhiteboardCss": {
+				"bytes": 0,
+				"gzipBytes": 0,
+				"files": []
+			},
+			"documentWorkerJavaScript": {
+				"bytes": 0,
+				"gzipBytes": 0,
+				"files": []
+			},
+			"allJavaScript": {
+				"bytes": 9430796,
+				"gzipBytes": 2692957,
+				"files": [
+					"_astro/apl.B4CMkyY2.js",
+					"_astro/asciiarmor.Df11BRmG.js",
+					"_astro/asn1.EdZsLKOL.js",
+					"_astro/asterisk.B-8jnY81.js",
+					"_astro/brainfuck.C4LP7Hcl.js",
+					"_astro/browser-startup-instrumentation.hp2BeFIz.js",
+					"_astro/catppuccin-frappe.DFWUc33u.js",
+					"_astro/catppuccin-latte.C9dUb6Cb.js",
+					"_astro/catppuccin-macchiato.DQyhUUbL.js",
+					"_astro/catppuccin-mocha.D87Tk5Gz.js",
+					"_astro/client.-iLz22eX.js",
+					"_astro/client.CMSwgtGj.js",
+					"_astro/clike.B9uivgTg.js",
+					"_astro/clojure.BMjYHr_A.js",
+					"_astro/cmake.BQqOBYOt.js",
+					"_astro/cobol.CWcv1MsR.js",
+					"_astro/coffeescript.S37ZYGWr.js",
+					"_astro/commonlisp.DBKNyK5s.js",
+					"_astro/crystal.SjHAIU92.js",
+					"_astro/css.BnMrqG3P.js",
+					"_astro/cypher.C_CwsFkJ.js",
+					"_astro/d.pRatUO7H.js",
+					"_astro/dark-plus.C3mMm8J8.js",
+					"_astro/diff.DbItnlRl.js",
+					"_astro/dockerfile.BNmZX-Cu.js",
+					"_astro/document-save.worker-BQTqGf7x.js",
+					"_astro/dtd.DF_7sFjM.js",
+					"_astro/dylan.DwRh75JA.js",
+					"_astro/ebnf.CDyGwa7X.js",
+					"_astro/ecl.Cabwm37j.js",
+					"_astro/eiffel.CnydiIhH.js",
+					"_astro/elm.vLlmbW-K.js",
+					"_astro/erlang.BNw1qcRV.js",
+					"_astro/everforest-dark.BgDCqdQA.js",
+					"_astro/everforest-light.C8M2exoo.js",
+					"_astro/factor.XCvu78D9.js",
+					"_astro/fcl.Kvtd6kyn.js",
+					"_astro/forth.Ffai-XNe.js",
+					"_astro/fortran.DYz_wnZ1.js",
+					"_astro/gas.Bneqetm1.js",
+					"_astro/gherkin.heZmZLOM.js",
+					"_astro/github-dark-default.Cuk6v7N8.js",
+					"_astro/github-dark-dimmed.DH5Ifo-i.js",
+					"_astro/github-dark-high-contrast.E3gJ1_iC.js",
+					"_astro/github-dark.DHJKELXO.js",
+					"_astro/github-light-default.D7oLnXFd.js",
+					"_astro/github-light-high-contrast.BfjtVDDH.js",
+					"_astro/github-light.DAi9KRSo.js",
+					"_astro/groovy.D9Dt4D0W.js",
+					"_astro/gruvbox-dark-hard.CFHQjOhq.js",
+					"_astro/gruvbox-dark-medium.GsRaNv29.js",
+					"_astro/gruvbox-dark-soft.CVdnzihN.js",
+					"_astro/gruvbox-light-hard.CH1njM8p.js",
+					"_astro/gruvbox-light-medium.DRw_LuNl.js",
+					"_astro/gruvbox-light-soft.hJgmCMqR.js",
+					"_astro/haskell.Cw1EW3IL.js",
+					"_astro/haxe.H-WmDvRZ.js",
+					"_astro/http.DBlCnlav.js",
+					"_astro/idl.BEugSyMb.js",
+					"_astro/index.1gpKwaRm.js",
+					"_astro/index.8o8MLoDW.js",
+					"_astro/index.Ahc8saeo.js",
+					"_astro/index.BEMIM92L.js",
+					"_astro/index.BJJFgUIs.js",
+					"_astro/index.BMCdkOo7.js",
+					"_astro/index.BYAvk-BC.js",
+					"_astro/index.Bt_kUUwA.js",
+					"_astro/index.Bu-KJocH.js",
+					"_astro/index.C4gW5NMX.js",
+					"_astro/index.CA-bsVoa.js",
+					"_astro/index.CAtCX9Cd.js",
+					"_astro/index.Cn1jIqSu.js",
+					"_astro/index.D1WY4rBl.js",
+					"_astro/index.DBYMdMRi.js",
+					"_astro/index.DspmuVgb.js",
+					"_astro/index.DvWrrJG_.js",
+					"_astro/index.TuTM1Goq.js",
+					"_astro/index.VAAIWJG2.js",
+					"_astro/index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+					"_astro/javascript.iXu5QeM3.js",
+					"_astro/jszip.min.CKDIplGq.js",
+					"_astro/julia.DuME0IfC.js",
+					"_astro/kanagawa-dragon.CkXjmgJE.js",
+					"_astro/kanagawa-lotus.CfQXZHmo.js",
+					"_astro/kanagawa-wave.DWedfzmr.js",
+					"_astro/light-plus.B7mTdjB0.js",
+					"_astro/livescript.BwQOo05w.js",
+					"_astro/lua.BgMRiT3U.js",
+					"_astro/main.BjTj7Dij.js",
+					"_astro/main.BrO3cuZ6.js",
+					"_astro/material-theme-darker.BfHTSMKl.js",
+					"_astro/material-theme-lighter.B0m2ddpp.js",
+					"_astro/material-theme-ocean.CyktbL80.js",
+					"_astro/material-theme-palenight.Csfq5Kiy.js",
+					"_astro/material-theme.D5KoaKCx.js",
+					"_astro/mathematica.DTrFuWx2.js",
+					"_astro/mbox.CNhZ1qSd.js",
+					"_astro/min-dark.CafNBF8u.js",
+					"_astro/min-light.CTRr51gU.js",
+					"_astro/mirc.CjQqDB4T.js",
+					"_astro/mllike.CXdrOF99.js",
+					"_astro/modelica.Dc1JOy9r.js",
+					"_astro/mscgen.BA5vi2Kp.js",
+					"_astro/mumps.BT43cFF4.js",
+					"_astro/nginx.DdIZxoE0.js",
+					"_astro/nsis.D5ISOQms.js",
+					"_astro/ntriples.BfvgReVJ.js",
+					"_astro/octave.Ck1zUtKM.js",
+					"_astro/one-dark-pro.DVMEJ2y_.js",
+					"_astro/one-light.PoHY5YXO.js",
+					"_astro/oz.BzwKVEFT.js",
+					"_astro/pascal.-L3eBynH.js",
+					"_astro/perl.CdXCOZ3F.js",
+					"_astro/pig.CevX1Tat.js",
+					"_astro/powershell.CFHJl5sT.js",
+					"_astro/properties.C78fOPTZ.js",
+					"_astro/protobuf.ChK-085T.js",
+					"_astro/pug.C8cW77Mm.js",
+					"_astro/puppet.DMA9R1ak.js",
+					"_astro/python.BuPzkPfP.js",
+					"_astro/q.pXgVlZs6.js",
+					"_astro/r.B6wPVr8A.js",
+					"_astro/rose-pine-dawn.DHQR4-dF.js",
+					"_astro/rose-pine-moon.D4_iv3hh.js",
+					"_astro/rose-pine.qdsjHGoJ.js",
+					"_astro/rpm.CTu-6PCP.js",
+					"_astro/ruby.B2Rjki9n.js",
+					"_astro/sas.B4kiWyti.js",
+					"_astro/scheme.C41bIUwD.js",
+					"_astro/shell.CjFT_Tl9.js",
+					"_astro/sieve.C3Gn_uJK.js",
+					"_astro/simple-mode.GW_nhZxv.js",
+					"_astro/slack-dark.BthQWCQV.js",
+					"_astro/slack-ochin.DqwNpetd.js",
+					"_astro/smalltalk.CnHTOXQT.js",
+					"_astro/solarized-dark.DXbdFlpD.js",
+					"_astro/solarized-light.L9t79GZl.js",
+					"_astro/solr.DehyRSwq.js",
+					"_astro/sparql.DkYu6x3z.js",
+					"_astro/spreadsheet.BCZA_wO0.js",
+					"_astro/sql.D0XecflT.js",
+					"_astro/startup-diagnostic-labels.C4cqnaNN.js",
+					"_astro/stex.C3f8Ysf7.js",
+					"_astro/stylus.B533Al4x.js",
+					"_astro/swift.BzpIVaGY.js",
+					"_astro/syntax-highlighter.CVr00Ptv.js",
+					"_astro/tcl.DVfN8rqt.js",
+					"_astro/textile.CnDTJFAw.js",
+					"_astro/tiddlywiki.DO-Gjzrf.js",
+					"_astro/tiki.DGYXhP31.js",
+					"_astro/tldraw-canvas.B6ZgR3dw.js",
+					"_astro/tldraw-editor.DWMVjfIt.js",
+					"_astro/tldraw-file.CTReCsUp.js",
+					"_astro/tldraw-state-react.B7kKx-SI.js",
+					"_astro/tldraw-state.Br4AVh-B.js",
+					"_astro/tldraw-store.Biu40d6D.js",
+					"_astro/tldraw-tlschema.DtzbXets.js",
+					"_astro/tldraw-utils.BJp5PhA6.js",
+					"_astro/tldraw-validate.Ch1A2EoE.js",
+					"_astro/tldraw.nSA0H8C8.js",
+					"_astro/toml.Bm5Em-hy.js",
+					"_astro/troff.wAsdV37c.js",
+					"_astro/ttcn-cfg.B9xdYoR4.js",
+					"_astro/ttcn.CfJYG6tj.js",
+					"_astro/turtle.B1tBg_DP.js",
+					"_astro/vb.CmGdzxic.js",
+					"_astro/vbscript.BuJXcnF6.js",
+					"_astro/velocity.D8B20fx6.js",
+					"_astro/verilog.C6RDOZhf.js",
+					"_astro/vhdl.lSbBsy5d.js",
+					"_astro/virtual_pwa-register.I6B7t9y4.js",
+					"_astro/vitesse-black.Bkuqu6BP.js",
+					"_astro/vitesse-dark.D0r3Knsf.js",
+					"_astro/vitesse-light.CVO1_9PV.js",
+					"_astro/webidl.ZXfAyPTL.js",
+					"_astro/workbox-window.prod.es5.BIl4cyR9.js",
+					"_astro/xquery.DzFWVndE.js",
+					"_astro/yacas.BJ4BC0dw.js",
+					"_astro/z80.Hz9HOZM7.js",
+					"sw.js",
+					"workbox-1ef09536.js"
+				]
+			},
+			"allCss": {
+				"bytes": 212968,
+				"gzipBytes": 36506,
+				"files": [
+					"_astro/changelog.wvlNSzc1.css",
+					"_astro/mcp.C-yZ6QuE.css",
+					"_astro/tldraw.eCjzm0t1.css"
+				]
+			}
+		},
+		"rewrite": {
+			"initialJavaScript": {
+				"bytes": 1041073,
+				"gzipBytes": 344731,
+				"files": [
+					"app.js",
+					"chunks/document-app-1t4a0gb7.js",
+					"chunks/document-app-2d6qcvkk.js",
+					"chunks/document-app-68q58m06.js",
+					"chunks/document-app-6q8jcqjd.js",
+					"chunks/document-app-84g5fq8v.js",
+					"chunks/document-app-9sap0wf0.js",
+					"chunks/document-app-a1wrmpe6.js",
+					"chunks/document-app-b0yeg0hx.js",
+					"chunks/document-app-bb8pn15s.js",
+					"chunks/document-app-c0z5fzz4.js",
+					"chunks/document-app-c3ss2tq7.js",
+					"chunks/document-app-c6wc4y2y.js",
+					"chunks/document-app-e27xkjdd.js",
+					"chunks/document-app-e3ap03vm.js",
+					"chunks/document-app-e7vwaf0q.js",
+					"chunks/document-app-eznwvf0k.js",
+					"chunks/document-app-gf4hdxnw.js",
+					"chunks/document-app-jegj5sa1.js",
+					"chunks/document-app-jev26rbc.js",
+					"chunks/document-app-m2qx4cqf.js",
+					"chunks/document-app-mhc65yn7.js",
+					"chunks/document-app-ncxg3qzf.js",
+					"chunks/document-app-nqb2j1d5.js",
+					"chunks/document-app-pykp7k5z.js",
+					"chunks/document-app-pzbxckbs.js",
+					"chunks/document-app-qbpfjp9s.js",
+					"chunks/document-app-t2c0q4x7.js",
+					"chunks/document-app-v7txzmw7.js",
+					"chunks/document-app-vs6xk76k.js",
+					"chunks/document-app-xechpbp6.js",
+					"chunks/document-app-y1hrwemp.js"
+				]
+			},
+			"initialCss": {
+				"bytes": 120172,
+				"gzipBytes": 31917,
+				"files": [
+					"app.css",
+					"components/access.css",
+					"components/account-agents.css",
+					"components/account-email.css",
+					"components/app.css",
+					"components/attachments.css",
+					"components/boot.css",
+					"components/comments.css",
+					"components/context-menu.css",
+					"components/dialog.css",
+					"components/editor-viewport.css",
+					"components/editor.css",
+					"components/find.css",
+					"components/help.css",
+					"components/history.css",
+					"components/inspector.css",
+					"components/invitation-screen.css",
+					"components/invitations.css",
+					"components/library.css",
+					"components/line-actions.css",
+					"components/media-picker.css",
+					"components/menu.css",
+					"components/palette.css",
+					"components/presentation.css",
+					"components/preview.css",
+					"components/print.css",
+					"components/progress.css",
+					"components/settings-page.css",
+					"components/settings-themes.css",
+					"components/space-avatar.css",
+					"components/statusbar.css",
+					"components/sync-recovery.css",
+					"components/teleprompter.css",
+					"components/theme-picker.css",
+					"components/theme-workbench.css",
+					"components/toast.css",
+					"components/toolbar.css",
+					"components/update-banner.css",
+					"components/whiteboard.css"
+				]
+			},
+			"lazyWhiteboardJavaScript": {
+				"bytes": 1961916,
+				"gzipBytes": 592189,
+				"files": [
+					"chunks/document-app-ex1v95a3.js",
+					"chunks/document-app-jyacae6r.js",
+					"chunks/document-app-yncbg74h.js",
+					"chunks/whiteboard-6y76q9ya.js"
+				]
+			},
+			"lazyWhiteboardCss": {
+				"bytes": 98395,
+				"gzipBytes": 19289,
+				"files": ["tldraw/tldraw.css"]
+			},
+			"documentWorkerJavaScript": {
+				"bytes": 155969,
+				"gzipBytes": 51232,
+				"files": ["document-worker.js"]
+			},
+			"allJavaScript": {
+				"bytes": 3248572,
+				"gzipBytes": 1021995,
+				"files": [
+					"app.js",
+					"chunks/document-app-1t4a0gb7.js",
+					"chunks/document-app-2d6qcvkk.js",
+					"chunks/document-app-68q58m06.js",
+					"chunks/document-app-6q8jcqjd.js",
+					"chunks/document-app-84g5fq8v.js",
+					"chunks/document-app-9sap0wf0.js",
+					"chunks/document-app-a1wrmpe6.js",
+					"chunks/document-app-b0yeg0hx.js",
+					"chunks/document-app-bb8pn15s.js",
+					"chunks/document-app-c0z5fzz4.js",
+					"chunks/document-app-c3ss2tq7.js",
+					"chunks/document-app-c6wc4y2y.js",
+					"chunks/document-app-e27xkjdd.js",
+					"chunks/document-app-e3ap03vm.js",
+					"chunks/document-app-e7vwaf0q.js",
+					"chunks/document-app-ex1v95a3.js",
+					"chunks/document-app-eznwvf0k.js",
+					"chunks/document-app-gf4hdxnw.js",
+					"chunks/document-app-jegj5sa1.js",
+					"chunks/document-app-jev26rbc.js",
+					"chunks/document-app-jyacae6r.js",
+					"chunks/document-app-m2qx4cqf.js",
+					"chunks/document-app-mhc65yn7.js",
+					"chunks/document-app-ncxg3qzf.js",
+					"chunks/document-app-nqb2j1d5.js",
+					"chunks/document-app-pykp7k5z.js",
+					"chunks/document-app-pzbxckbs.js",
+					"chunks/document-app-qbpfjp9s.js",
+					"chunks/document-app-t2c0q4x7.js",
+					"chunks/document-app-v7txzmw7.js",
+					"chunks/document-app-vs6xk76k.js",
+					"chunks/document-app-xechpbp6.js",
+					"chunks/document-app-y1hrwemp.js",
+					"chunks/document-app-yncbg74h.js",
+					"chunks/document-archives-dst83xz4.js",
+					"chunks/document-media-6d98yv9v.js",
+					"chunks/document-worker-stats-r3t1h82c.js",
+					"chunks/images-gh6fx4ec.js",
+					"chunks/invitation-screen-ke7tgxmy.js",
+					"chunks/invitations-632v4537.js",
+					"chunks/invitations-vj0d3tdx.js",
+					"chunks/media-picker-x0hne6w9.js",
+					"chunks/sanitizeSvg-gvgcnb7c.js",
+					"chunks/syntax-1xtd23vt.js",
+					"chunks/theme-picker-fxfzvdj1.js",
+					"chunks/theme-workbench-q35x7r18.js",
+					"chunks/videos-stebcz4d.js",
+					"chunks/whiteboard-6y76q9ya.js",
+					"chunks/whiteboard-preview-k28nhxza.js",
+					"chunks/whiteboard-store-tp02nr1j.js",
+					"document-worker.js",
+					"sw.js"
+				]
+			},
+			"allCss": {
+				"bytes": 230749,
+				"gzipBytes": 54410,
+				"files": [
+					"app.css",
+					"components/access.css",
+					"components/account-agents.css",
+					"components/account-email.css",
+					"components/app.css",
+					"components/attachments.css",
+					"components/boot.css",
+					"components/comments.css",
+					"components/context-menu.css",
+					"components/dialog.css",
+					"components/document-renderer.css",
+					"components/editor-viewport.css",
+					"components/editor.css",
+					"components/find.css",
+					"components/help.css",
+					"components/history.css",
+					"components/inspector.css",
+					"components/invitation-screen.css",
+					"components/invitations.css",
+					"components/library.css",
+					"components/line-actions.css",
+					"components/media-picker.css",
+					"components/menu.css",
+					"components/palette.css",
+					"components/presentation.css",
+					"components/preview.css",
+					"components/print.css",
+					"components/progress.css",
+					"components/settings-page.css",
+					"components/settings-themes.css",
+					"components/site.css",
+					"components/space-avatar.css",
+					"components/statusbar.css",
+					"components/sync-recovery.css",
+					"components/teleprompter.css",
+					"components/theme-picker.css",
+					"components/theme-workbench.css",
+					"components/toast.css",
+					"components/toolbar.css",
+					"components/update-banner.css",
+					"components/whiteboard.css",
+					"tldraw/tldraw.css"
+				]
+			}
+		}
+	},
+	"setup": {
+		"normal": {
+			"configurations": [
+				{
+					"kind": "original",
+					"session": "interact-normal-original",
+					"url": "http://127.0.0.1:4450",
+					"docs": [
+						{
+							"kb": 2,
+							"title": "Benchmark 2 KB",
+							"path": "/app/doc/co_zFw91ni6Mku7ftVzRbYyj7Cufxy"
+						},
+						{
+							"kb": 32,
+							"title": "Benchmark 32 KB",
+							"path": "/app/doc/co_zdAHmfWXaTXzHcXm5k3hfo8KuXp"
+						},
+						{
+							"kb": 128,
+							"title": "Benchmark 128 KB",
+							"path": "/app/doc/co_zYfyj1E1jEwMDBzWZwbGEtV3PHy"
+						}
+					]
+				},
+				{
+					"kind": "rewrite",
+					"session": "interact-normal-rewrite",
+					"url": "http://127.0.0.1:4451",
+					"docs": [
+						{
+							"kb": 2,
+							"title": "Benchmark 2 KB",
+							"path": "/app/doc/23597f46-610f-494f-8953-b1b02b98c71e"
+						},
+						{
+							"kb": 32,
+							"title": "Benchmark 32 KB",
+							"path": "/app/doc/ecd60ebe-83b0-48d8-bb92-b3ef9e721967"
+						},
+						{
+							"kb": 128,
+							"title": "Benchmark 128 KB",
+							"path": "/app/doc/b1c075c3-4930-4d1d-8b66-a106139464bc"
+						}
+					]
+				}
+			],
+			"outcomes": [
+				{
+					"version": "original",
+					"shape": "rich",
+					"setupMs": 313.71074999999996,
+					"durable": true,
+					"characters": 2048,
+					"status": "",
+					"path": "/app/doc/co_zFw91ni6Mku7ftVzRbYyj7Cufxy"
+				},
+				{
+					"version": "rewrite",
+					"shape": "rich",
+					"setupMs": 112.75466699999993,
+					"durable": true,
+					"characters": 2048,
+					"status": "Saved",
+					"path": "/app/doc/23597f46-610f-494f-8953-b1b02b98c71e"
+				},
+				{
+					"version": "original",
+					"shape": "rich",
+					"setupMs": 414.6791250000001,
+					"durable": true,
+					"characters": 32768,
+					"status": "",
+					"path": "/app/doc/co_zdAHmfWXaTXzHcXm5k3hfo8KuXp"
+				},
+				{
+					"version": "rewrite",
+					"shape": "rich",
+					"setupMs": 878.5240419999998,
+					"durable": true,
+					"characters": 32768,
+					"status": "Saved",
+					"path": "/app/doc/ecd60ebe-83b0-48d8-bb92-b3ef9e721967"
+				},
+				{
+					"version": "original",
+					"shape": "rich",
+					"setupMs": 1186.9398340000002,
+					"durable": true,
+					"characters": 131072,
+					"status": "",
+					"path": "/app/doc/co_zYfyj1E1jEwMDBzWZwbGEtV3PHy"
+				},
+				{
+					"version": "rewrite",
+					"shape": "rich",
+					"setupMs": 3730.5742500000006,
+					"durable": true,
+					"characters": 131072,
+					"status": "Saved on this device",
+					"path": "/app/doc/b1c075c3-4930-4d1d-8b66-a106139464bc"
+				}
+			]
+		},
+		"extreme": {
+			"configurations": [
+				{
+					"kind": "original",
+					"session": "interact-original",
+					"url": "http://127.0.0.1:4450",
+					"docs": [
+						{
+							"kb": 2,
+							"title": "Benchmark 2 KB",
+							"path": "/app/doc/co_zQ41z6ugkdsp8JLMdGuN1Zyc5EM"
+						},
+						{
+							"kb": 32,
+							"title": "Benchmark 32 KB",
+							"path": "/app/doc/co_z9VRxcYv5hpLgRe9UBvsEMTcYZL"
+						},
+						{
+							"kb": 128,
+							"title": "Benchmark 128 KB",
+							"path": "/app/doc/co_zhQXx4L9ZBtaJmo6sUzZMQE8LYG"
+						}
+					]
+				},
+				{
+					"kind": "rewrite",
+					"session": "interact-rewrite",
+					"url": "http://127.0.0.1:4451",
+					"docs": [
+						{
+							"kb": 2,
+							"title": "Benchmark 2 KB",
+							"path": "/app/doc/2cfc434c-2bf4-4989-bf2d-c76124aee567"
+						},
+						{
+							"kb": 32,
+							"title": "Benchmark 32 KB",
+							"path": "/app/doc/8998026c-b2d8-4002-9626-bcfc2383b1ba"
+						},
+						{
+							"kb": 128,
+							"title": "Benchmark 128 KB",
+							"path": "/app/doc/83834e88-319f-41c9-a7d1-749df271b018"
+						}
+					]
+				}
+			],
+			"outcomes": [
+				{
+					"version": "original",
+					"shape": "long-line",
+					"setupMs": 310.781209,
+					"durable": true,
+					"characters": 2048,
+					"status": "",
+					"path": "/app/doc/co_zQ41z6ugkdsp8JLMdGuN1Zyc5EM"
+				},
+				{
+					"version": "rewrite",
+					"shape": "long-line",
+					"setupMs": 116.822542,
+					"durable": true,
+					"characters": 2048,
+					"status": "Saved",
+					"path": "/app/doc/2cfc434c-2bf4-4989-bf2d-c76124aee567"
+				},
+				{
+					"version": "original",
+					"shape": "long-line",
+					"setupMs": 444.07675000000006,
+					"durable": true,
+					"characters": 32768,
+					"status": "",
+					"path": "/app/doc/co_z9VRxcYv5hpLgRe9UBvsEMTcYZL"
+				},
+				{
+					"version": "rewrite",
+					"shape": "long-line",
+					"setupMs": 888.3733749999999,
+					"durable": true,
+					"characters": 32768,
+					"status": "Saved",
+					"path": "/app/doc/8998026c-b2d8-4002-9626-bcfc2383b1ba"
+				},
+				{
+					"version": "original",
+					"shape": "long-line",
+					"setupMs": 1191.1618749999998,
+					"durable": true,
+					"characters": 131072,
+					"status": "",
+					"path": "/app/doc/co_zhQXx4L9ZBtaJmo6sUzZMQE8LYG"
+				},
+				{
+					"version": "rewrite",
+					"shape": "long-line",
+					"setupMs": 3797.997083,
+					"durable": true,
+					"characters": 131072,
+					"status": "Saved on this device",
+					"path": "/app/doc/83834e88-319f-41c9-a7d1-749df271b018"
+				},
+				{
+					"version": "original",
+					"error": "Error: interact-original eval: spawnSync agent-browser ETIMEDOUT"
+				},
+				{
+					"version": "rewrite",
+					"shape": "long-line",
+					"setupMs": 23798.899875000003,
+					"durable": false,
+					"characters": 1048576,
+					"status": "Saved on this device",
+					"path": "/app/doc/afcf635e-87f7-4454-8d46-45995fa55173"
+				}
+			]
+		},
+		"recoveredMainLarge": {
+			"route": "/app/doc/co_zT89M1TwZCowUkWsw1o1RMRu3FJ",
+			"characters": 1048576,
+			"reopened": true
+		},
+		"recoveredRewriteLarge": {
+			"characters": 1048576,
+			"pending": "0",
+			"busy": "false"
+		}
+	},
+	"limitations": [
+		"9 normal reload/input samples,9 UI/live-peer samples,3 reconnect/large/multicursor samples. Descriptive p95 at these sample counts.",
+		"Visible-editor readiness requires expected source and an animation frame. It excludes fixture creation, setup/import and optional statistics completion; it is not complete-UI settlement or an uncached first download.",
+		"Fresh separate normal accounts have2/32/128KiB sources plus default welcome. Different welcome content remains. Large documents use separate accounts so their data/background work do not contaminate normal cells. Sources begin identical; measured edits grow different CRDT representation/history.",
+		"Normal local interaction samples precede main synced-account registration. Sync samples use a subsequently registered original account and passive profile clones; no keys or payloads are published.",
+		"128KiB UI samples use pointer activation. Missing2KiB cells were recovered once with keyboard activation; keep input modality distinct. Original native pointer required-state failures remain recorded. Main switching remains unmeasured.",
+		"Main1MiB seed command timed out35s, but exact1MiB source was recovered after reopening without re-import. Rewrite local-save gate exceeded its initial setup window but later pending0/busyfalse and exactsource were verified. Setup timings are excluded.",
+		"Main1MiB beginning input required-state deadline expired20s; middle was skipped. Valid reload/end cells are retained. These are unverified automation outcomes, not app-crash claims.",
+		"The trusted continuous probe is25 sequential native edits followed by3s of deferred/background observation, not sustained multi-second typing. Inter-input gaps are recorded.",
+		"Headless Chrome presents near60Hz. Callback/native timings do not include all layout/raster/compositor work. No universal120fps claim or proof of8.3ms complete frame budgets.",
+		"No fresh20+writer browser-frame stress or1MiB fenced-code case. Prior24writer module evidence is linked separately and is not a fresh capacity measurement.",
+		"Source/application unchanged during timings. Stable agent-browser daemon timeout20000ms for everycommand; launch or activation failures remain visible."
+	],
+	"priorWriterEvidence": {
+		"report": "performance-overhaul.json",
+		"appRevision": "aa89506",
+		"scope": "24 persisted writers,192ops,mixed live transports/reconnect/permissions,client+server+storage+assertions together,not server-only capacity or browser fps",
+		"notRerun": true
+	}
+}

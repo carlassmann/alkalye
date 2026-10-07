@@ -158,3 +158,13 @@ The follow-up report is `public/docs/performance-overhaul.html`, with raw sample
 `continuous.ts CONFIG.json OUTPUT.json` observes 25 canonical edits scheduled at 40 ms intervals over three seconds, including the background persistence window. It records completed edits, synchronous edit spans, frame intervals and whether a durable-save acknowledgement appeared. These edits are synthetic, so this is a behavior/task observation rather than trusted input latency. Each version receives a separate Chrome timeline trace without the CPU-profiler category. Analyze all main-thread tasks, collection, layout and frame gaps; do not infer responsiveness from the synchronous edit span alone.
 
 Final overhaul measurements and limitations are published at `public/docs/performance-overhaul.html`, with raw samples in the adjacent JSON. The final frozen editor source is `aa89506`; both servers use production assets. Reload and input setup remain outside the measured span. The three-second continuous probe accepts both quiet local-save labels and records explicit pending, busy and version fields. A local-save acknowledgement does not prove server convergence.
+
+## Fresh interaction comparison
+
+`public/docs/performance-interaction.html` compares main `a749728` with rewrite `275be37`, using new normal accounts and separate large-file accounts. Raw samples, failed observations, recovered cells and bundle closures are in its adjacent JSON.
+
+`seed.ts CONFIG.json OUTPUT.json` creates matched fixtures through each editor's public boundary. Use `BENCHMARK_NORMAL_ONLY=1` to isolate 2/32/128 KiB fixtures from the 1 MiB paragraph. Observe writable new-document readiness and local persistence; fixture setup is excluded from timings.
+
+`continuous-native.ts CONFIG.json OUTPUT.json` inserts 25 sequential trusted edits, then traces three seconds of background work. It records native input spans, inter-input timestamps, frames and explicit local-save state. This is a burst and its aftermath, not sustained multi-second typing. Trace summaries use top-level main-thread tasks; never sum nested durations.
+
+All browser commands must share `AGENT_BROWSER_DEFAULT_TIMEOUT=20000`. Changing this value can restart the browser daemon. `BENCHMARK_ACTIVATION=keyboard` and `BENCHMARK_JOURNEY_KB=2` allow one bounded recovery of missing UI cells with native keyboard activation; report that modality separately and retain the failed pointer observations.
