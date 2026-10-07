@@ -199,9 +199,8 @@ if (process.argv.includes("--serve")) {
 				"--session",
 				owner,
 				"--json",
-				"wait",
-				"--fn",
-				'window.liveSocketConnections > 1 && document.querySelector("#editor")?.value.includes("Recovered from a silent socket.")',
+				"eval",
+				'new Promise((resolve,reject)=>{let deadline=Date.now()+34000;function check(){if(window.liveSocketConnections>1&&document.querySelector("#editor")?.value.includes("Recovered from a silent socket.")){resolve(true);return}if(Date.now()>=deadline){reject(new Error("Silent socket recovery timed out"));return}requestAnimationFrame(check)}check()})',
 			],
 			{
 				encoding: "utf8",
@@ -209,15 +208,24 @@ if (process.argv.includes("--serve")) {
 				env: {
 					...process.env,
 					AGENT_BROWSER_HEADED: "false",
-					AGENT_BROWSER_DEFAULT_TIMEOUT: "34000",
+					AGENT_BROWSER_DEFAULT_TIMEOUT: "20000",
 				},
 			},
 		)
+		if (recovered.status !== 0)
+			console.log(
+				"Silent socket recovery state",
+				evaluate(
+					owner,
+					'({path:location.pathname,connections:window.liveSocketConnections,polls:window.livePollRequests,socket:window.activeLiveSocket?.readyState,frozen:window.frozenLiveSocket?.readyState,recovered:document.querySelector("#editor")?.value.includes("Recovered from a silent socket."),status:document.querySelector("#save-status")?.textContent})',
+				),
+			)
 		assert(
 			recovered.status === 0,
-			"silent socket recovery finishes within its bounded timeout: " +
-				recovered.stdout +
-				recovered.stderr,
+			"silent socket recovery finishes within its bounded timeout" +
+				(recovered.status === 0
+					? ""
+					: ": " + recovered.stdout + recovered.stderr),
 		)
 		assert(
 			true,
