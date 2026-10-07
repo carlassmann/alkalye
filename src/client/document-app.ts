@@ -4,6 +4,7 @@ import { makeSaveFeedback, saveIndicator } from "../shared/save-status"
 import * as Cause from "effect/Cause"
 import * as Crypto from "effect/Crypto"
 import { webCryptoLayer } from "../platform/web-crypto"
+import { browserSchedulerLayer } from "./scheduler"
 import { documentAccessMarkup } from "./components/access"
 import * as Context from "effect/Context"
 import * as Effect from "effect/Effect"
@@ -141,6 +142,7 @@ let application = Layer.effectDiscard(mountApplication()).pipe(
 	Layer.provide(themes),
 	Layer.provide(FetchHttpClient.layer),
 	Layer.provide(webCryptoLayer),
+	Layer.provide(browserSchedulerLayer),
 )
 class ApplicationElement extends HTMLElement {
 	private lifetime: Fiber.Fiber<void, never> | undefined

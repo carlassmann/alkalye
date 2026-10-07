@@ -1,14 +1,18 @@
 import type { CausalReplicaCheckpoint, ReplicaCheckpoint } from "./checkpoint"
-import { parseCheckpoint } from "./checkpoint"
+import { parseCheckpoint, parseCheckpointEffect } from "./checkpoint"
+import * as Effect from "effect/Effect"
+import { attempt, cooperative } from "../platform/effects"
 import { TextVisibility } from "./text-visibility"
 import type { VisibilityFact } from "./text-visibility"
-import { parseOperation, expandDeletions } from "./model"
+import { parseOperation, expandDeletions, deletionIds } from "./model"
 import { frontmatter, frontmatterBlock } from "./markdown"
 import * as Schema from "effect/Schema"
+import { copyMapSteps, copySetSteps, finishSteps } from "./collection-copy"
 import { documentMetadata } from "./document-metadata"
 import type { DocumentMetadata } from "./document-metadata"
 import {
 	sourceAtoms,
+	sourceAtomsSteps,
 	sourceEdits,
 	sourceUndo,
 	sourceObserved,
@@ -66,29 +70,47 @@ export class Replica {
 		public author = "Writer",
 	) {}
 	fork(actor = this.actor, author = this.author) {
+		return finishSteps(this.forkSteps(false, actor, author))
+	}
+	forkEffect(actor = this.actor, author = this.author) {
+		let source = this
+		return Effect.gen(function* () {
+			let generation = source.generation
+			let clock = source.clock
+			let copied = yield* cooperative("replica.copy", () =>
+				source.forkSteps(true, actor, author),
+			)
+			if (source.generation !== generation || source.clock !== clock)
+				return yield* Effect.fail(
+					new Error("Replica changed while being copied"),
+				)
+			return copied
+		})
+	}
+	private *forkSteps(cooperative: boolean, actor: string, author: string) {
 		let replica = new Replica(actor, author)
-		for (let operation of this.operations.values()) freezeFact(operation)
+		for (let operation of this.operations.values())
+			yield* freezeFactSteps(operation, cooperative)
 		for (let fields of this.registers.values())
-			for (let operation of fields.values()) freezeFact(operation)
-		replica.operations = new Map(this.operations)
+			for (let operation of fields.values())
+				yield* freezeFactSteps(operation, cooperative)
+		replica.operations = yield* copyMapSteps(this.operations, cooperative)
 		replica.clock = this.clock
 		replica.historyLoaded = this.historyLoaded
-		replica.legacyTextTargets = new Set(this.legacyTextTargets)
-		replica.atomIndex = new Map(this.atomIndex)
-		replica.children = new Map(
-			[...this.children].map(([target, children]) => [
-				target,
-				new Map(children),
-			]),
+		replica.legacyTextTargets = yield* copySetSteps(
+			this.legacyTextTargets,
+			cooperative,
 		)
-		replica.visibility = new Map(
-			[...this.visibility].map(([target, visibility]) => [
-				target,
-				visibility.fork(),
-			]),
+		replica.atomIndex = yield* copyMapSteps(this.atomIndex, cooperative)
+		for (let [target, children] of this.children)
+			replica.children.set(target, yield* copyMapSteps(children, cooperative))
+		for (let [target, visibility] of this.visibility)
+			replica.visibility.set(target, yield* visibility.forkSteps(cooperative))
+		replica.textOwners = yield* copyMapSteps(this.textOwners, cooperative)
+		replica.ownedAtomCounts = yield* copyMapSteps(
+			this.ownedAtomCounts,
+			cooperative,
 		)
-		replica.textOwners = new Map(this.textOwners)
-		replica.ownedAtomCounts = new Map(this.ownedAtomCounts)
 		replica.stateGeneration = this.stateGeneration
 		replica.registers = new Map(
 			[...this.registers].map(([target, fields]) => [target, new Map(fields)]),
@@ -96,17 +118,17 @@ export class Replica {
 		replica.targets = new Map(
 			[...this.targets].map(([target, history]) => [target, [...history]]),
 		)
-		replica.strings = new Map(this.strings)
+		replica.strings = yield* copyMapSteps(this.strings, cooperative)
 		replica.textCache = new Map(
 			[...this.textCache].map(([target, atoms]) => [
 				target,
 				immutableAtoms(atoms),
 			]),
 		)
-		replica.sourceCache = new Map(this.sourceCache)
-		replica.updated = new Map(this.updated)
-		replica.created = new Map(this.created)
-		replica.restored = new Map(this.restored)
+		replica.sourceCache = yield* copyMapSteps(this.sourceCache, cooperative)
+		replica.updated = yield* copyMapSteps(this.updated, cooperative)
+		replica.created = yield* copyMapSteps(this.created, cooperative)
+		replica.restored = yield* copyMapSteps(this.restored, cooperative)
 		return replica
 	}
 	get generation() {
@@ -735,6 +757,13 @@ export class Replica {
 		target: string,
 		until: number | string = Infinity,
 	): Atom[] {
+		return finishSteps(this.rawVisibleSteps(target, until, false))
+	}
+	private *rawVisibleSteps(
+		target: string,
+		until: number | string,
+		cooperative: boolean,
+	): Generator<void, Atom[], void> {
 		let cached = this.textCache.get(target)
 		if (until === Infinity && cached) return cached
 		if (until === Infinity) {
@@ -742,6 +771,7 @@ export class Replica {
 			let visibility = this.visibility.get(target)
 			let result: Atom[] = [],
 				stack = [...(children.get("") ?? [])].reverse()
+			let count = 0
 			while (stack.length) {
 				let atom = stack.pop()
 				if (!atom) break
@@ -751,8 +781,12 @@ export class Replica {
 					let child = descendants[index]
 					if (child) stack.push(child)
 				}
+				if (cooperative && ++count === 512) {
+					count = 0
+					yield
+				}
 			}
-			this.textCache.set(target, result)
+			if (!cooperative) this.textCache.set(target, result)
 			return result
 		}
 		this.requireHistory()
@@ -790,6 +824,48 @@ export class Replica {
 				stack.push(child)
 		}
 		return result
+	}
+	textEffect(target: string) {
+		let replica = this
+		return Effect.gen(function* () {
+			let cached = replica.strings.get(target)
+			if (cached !== undefined) return replica.text(target)
+			let generation = replica.generation
+			let visible = yield* cooperative("replica.visible", () =>
+				replica.rawVisibleSteps(target, Infinity, true),
+			)
+			yield* Effect.yieldNow
+			let raw = immutableAtoms(visible)
+			yield* Effect.yieldNow
+			let projected = yield* cooperative("replica.frontmatter", () =>
+				sourceAtomsSteps(
+					raw,
+					() => replica.originalFrames(target, Infinity),
+					true,
+				),
+			)
+			yield* Effect.yieldNow
+			let atoms = immutableAtoms(projected)
+			let values: string[] = []
+			let count = 0
+			for (let atom of atoms) {
+				values.push(atom.value)
+				if (++count === 1024) {
+					count = 0
+					yield* Effect.yieldNow
+				}
+			}
+			let text = values.join("")
+			if (replica.generation !== generation)
+				return yield* Effect.fail(new Error("Replica changed while being read"))
+			replica.textCache.set(target, raw)
+			sourceViews.set(atoms, raw)
+			replica.sourceCache.set(target, atoms)
+			replica.strings.set(target, text)
+			if (atoms.length !== text.length)
+				sourceOffsets.set(atoms, new TextIndex(text))
+			return text
+		})
 	}
 	text(target: string, until: number | string = Infinity) {
 		let cached = this.strings.get(target)
@@ -961,7 +1037,41 @@ export class Replica {
 	restoreCheckpoint(value: unknown) {
 		this.restoreState(parseCheckpoint(value), true)
 	}
+	static fromCheckpointEffect(
+		value: unknown,
+		actor: string,
+		author = "Writer",
+		cooperativeLoading = true,
+	) {
+		return Effect.gen(function* () {
+			let snapshot = yield* cooperativeLoading
+				? parseCheckpointEffect(value)
+				: attempt("checkpoint.parse", () => parseCheckpoint(value))
+			let replica = new Replica(actor, author)
+			if (cooperativeLoading)
+				yield* cooperative("checkpoint.restore", () =>
+					replica.restoreStateSteps(snapshot, true, true),
+				)
+			else
+				yield* attempt("checkpoint.restore", () =>
+					replica.restoreState(snapshot, true),
+				)
+			return replica
+		})
+	}
+
 	private restoreState(snapshot: ReplicaCheckpoint, shareAtoms: boolean) {
+		let steps = this.restoreStateSteps(snapshot, shareAtoms, false)
+		while (!steps.next().done) {}
+	}
+	private *restoreStateSteps(
+		snapshot: ReplicaCheckpoint,
+		shareAtoms: boolean,
+		cooperative: boolean,
+	): Generator<void> {
+		if (cooperative && this.stateGeneration !== 0)
+			throw new Error("Cooperative hydration requires a private fresh replica")
+		let work = 0
 		if (!Number.isSafeInteger(snapshot.clock) || snapshot.clock < 0)
 			throw new Error("Invalid checkpoint clock")
 		if (
@@ -969,7 +1079,12 @@ export class Replica {
 			snapshot.targets.length
 		)
 			throw new Error("Duplicate checkpoint target")
-		let incoming = snapshot.targets.map(target => {
+		let incoming: {
+			target: (typeof snapshot.targets)[number]
+			visibility: TextVisibility
+			state: ReturnType<TextVisibility["checkpoint"]>
+		}[] = []
+		for (let target of snapshot.targets) {
 			if (
 				"visibility" in target &&
 				(target.visibility.floor > snapshot.clock ||
@@ -981,19 +1096,30 @@ export class Replica {
 				throw new Error("Checkpoint clock precedes its causal facts")
 			let visibility = new TextVisibility()
 			let previous = this.visibility.get(target.id)
-			if (previous) visibility.restore(previous.checkpoint())
+			if (previous)
+				yield* visibility.restoreSteps(
+					yield* previous.checkpointSteps(cooperative),
+					cooperative,
+				)
 			if ("removed" in target) {
-				visibility.restore({
-					floor: snapshot.clock,
-					legacyRemoved: target.removed,
-					removals: [],
-					cancels: [],
-				})
-			} else visibility.restore(target.visibility)
-			return { target, visibility, state: visibility.checkpoint() }
-		})
-		this.validateSnapshotOwners(snapshot)
-		let aliases = this.mergedAliases(snapshot)
+				yield* visibility.restoreSteps(
+					{
+						floor: snapshot.clock,
+						legacyRemoved: target.removed,
+						removals: [],
+						cancels: [],
+					},
+					cooperative,
+				)
+			} else yield* visibility.restoreSteps(target.visibility, cooperative)
+			incoming.push({
+				target,
+				visibility,
+				state: yield* visibility.checkpointSteps(cooperative),
+			})
+		}
+		yield* this.validateSnapshotOwnerSteps(snapshot, cooperative)
+		let aliases = yield* this.mergedAliasSteps(snapshot, cooperative)
 		let atoms = new Map<string, { target: string; atom: Atom }>()
 		let owners = new Map(this.textOwners)
 		let fields: Operation[] = []
@@ -1012,11 +1138,16 @@ export class Replica {
 				target.fields.length
 			)
 				throw new Error("Duplicate checkpoint register")
-			if (
-				new Set(target.atoms.map(atom => atom.id)).size !== target.atoms.length
-			)
-				throw new Error("Duplicate checkpoint atom identity")
+			let identities = new Set<string>()
 			for (let atom of target.atoms) {
+				if (cooperative && ++work % 512 === 0) yield
+				if (identities.has(atom.id))
+					throw new Error("Duplicate checkpoint atom identity")
+				identities.add(atom.id)
+				if (cooperative && ++work % 512 === 0) yield
+			}
+			for (let atom of target.atoms) {
+				if (cooperative && ++work % 512 === 0) yield
 				if (Number(atom.id.slice(0, 16)) > snapshot.clock)
 					throw new Error("Checkpoint clock precedes an insertion")
 				let known = atoms.get(atom.id) ?? this.atomIndex.get(atom.id)
@@ -1059,7 +1190,8 @@ export class Replica {
 				state.legacyRemoved,
 				...state.removals.map(([, runs]) => runs),
 			])
-				for (let id of expandDeletions(runs)) {
+				for (let id of deletionIds(runs)) {
+					if (cooperative && ++work % 512 === 0) yield
 					let atom = atoms.get(id) ?? this.atomIndex.get(id)
 					if (atom?.target !== target.id)
 						throw new Error("Unknown checkpoint deletion")
@@ -1074,8 +1206,10 @@ export class Replica {
 		for (let { target, visibility } of incoming) {
 			if (!this.targets.has(target.id)) this.targets.set(target.id, [])
 			this.visibility.set(target.id, visibility)
-			for (let atom of target.atoms)
+			for (let atom of target.atoms) {
 				this.indexAtom(target.id, shareAtoms ? atom : copyAtom(atom))
+				if (cooperative && ++work % 512 === 0) yield
+			}
 			this.created.set(
 				target.id,
 				Math.min(target.created, this.created.get(target.id) ?? Infinity),
@@ -1091,10 +1225,15 @@ export class Replica {
 		this.historyLoaded = false
 		this.stateGeneration++
 	}
-	private validateSnapshotOwners(snapshot: ReplicaCheckpoint) {
+	private *validateSnapshotOwnerSteps(
+		snapshot: ReplicaCheckpoint,
+		cooperative: boolean,
+	): Generator<void> {
+		let work = 0
 		for (let target of snapshot.targets) {
 			let counts = new Map<string, number>()
 			for (let atom of target.atoms) {
+				if (cooperative && ++work % 512 === 0) yield
 				let owner = atom.id.slice(0, -9)
 				counts.set(owner, (counts.get(owner) ?? 0) + 1)
 			}
@@ -1137,14 +1276,24 @@ export class Replica {
 			}
 		}
 	}
-	private mergedAliases(snapshot: ReplicaCheckpoint) {
+	private *mergedAliasSteps(
+		snapshot: ReplicaCheckpoint,
+		cooperative: boolean,
+	): Generator<void, Map<string, string>> {
+		let work = 0
 		if (!this.restored.size && !snapshot.restored.length)
 			return new Map<string, string>()
 		let aliases = new Map(this.restored)
 		let atoms = new Map<string, string>()
-		for (let [id, entry] of this.atomIndex) atoms.set(id, entry.target)
+		for (let [id, entry] of this.atomIndex) {
+			atoms.set(id, entry.target)
+			if (cooperative && ++work % 512 === 0) yield
+		}
 		for (let target of snapshot.targets)
-			for (let atom of target.atoms) atoms.set(atom.id, target.id)
+			for (let atom of target.atoms) {
+				atoms.set(atom.id, target.id)
+				if (cooperative && ++work % 512 === 0) yield
+			}
 		let incoming = new Set<string>()
 		for (let [previous, current] of snapshot.restored) {
 			if (incoming.has(previous))
@@ -1311,9 +1460,16 @@ function freezeTextAtom(atom: Atom) {
 	if (atom.deleted) Object.freeze(atom.deleted)
 	Object.freeze(atom)
 }
-function freezeFact(operation: Operation) {
+function* freezeFactSteps(operation: Operation, cooperative: boolean) {
 	if (Object.isFrozen(operation)) return
-	for (let atom of operation.insert) freezeTextAtom(atom)
+	let count = 0
+	for (let atom of operation.insert) {
+		freezeTextAtom(atom)
+		if (cooperative && ++count === 1024) {
+			count = 0
+			yield
+		}
+	}
 	Object.freeze(operation.insert)
 	Object.freeze(operation.remove)
 	Object.freeze(operation)

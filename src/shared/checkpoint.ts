@@ -5,16 +5,19 @@ import {
 	AtomSchema,
 	OperationEnvelopeSchema,
 	TextAtomIdSchema,
-	expandDeletions,
+	deletionIds,
 	compactAtoms,
 } from "./model"
-import { VisibilitySnapshotSchema } from "./text-visibility"
+import {
+	VisibilitySnapshotSchema,
+	decodeVisibilitySnapshotSteps,
+} from "./text-visibility"
 import type { TextVisibilitySnapshot } from "./text-visibility"
 import type * as Context from "effect/Context"
 import type { Cipher } from "../platform/cipher"
 import * as Stream from "effect/Stream"
 import { ApplicationError } from "../platform/errors"
-import { attempt, promise } from "../platform/effects"
+import { attempt, promise, cooperative } from "../platform/effects"
 import { decode, encode } from "./base64"
 import type { Atom, Operation, Packet } from "./model"
 import { identifier, object, parseOperation, string } from "./model"
@@ -155,27 +158,186 @@ export function compactCheckpoint(
 		})),
 	}
 }
-function expandCompactCheckpoint(
+let CheckpointHeaderFields = {
+	clock: CheckpointClockSchema,
+	restored: Schema.Array(Schema.Unknown),
+	targets: Schema.Array(Schema.Unknown),
+}
+let CheckpointTargetFields = {
+	id: CommonTargetFields.id,
+	created: CommonTargetFields.created,
+	updated: CommonTargetFields.updated,
+	atoms: Schema.Array(Schema.Unknown),
+	fields: Schema.Array(Schema.Unknown),
+}
+let LegacyHeaderSchema = Schema.Struct({
+	...CheckpointHeaderFields,
+	format: LegacyCheckpointSchema.fields.format,
+})
+let CausalHeaderSchema = Schema.Struct({
+	...CheckpointHeaderFields,
+	format: CausalCheckpointSchema.fields.format,
+})
+let CompactHeaderSchema = Schema.Struct({
+	...CheckpointHeaderFields,
+	format: CompactCheckpointSchema.fields.format,
+})
+let LegacyTargetHeaderSchema = Schema.Struct({
+	...CheckpointTargetFields,
+	removed: Schema.Array(Schema.Unknown),
+})
+let CausalTargetHeaderSchema = Schema.Struct({
+	...CheckpointTargetFields,
+	visibility: Schema.Unknown,
+})
+let RestoredIdentitySchema = Schema.Tuple([TextAtomIdSchema, TextAtomIdSchema])
+function* decodeCheckpointArray<A>(
+	values: readonly unknown[],
+	decode: (value: unknown) => A,
+): Generator<void, A[]> {
+	let decoded: A[] = []
+	for (let value of values) {
+		decoded.push(decode(value))
+		if (decoded.length % 128 === 0) yield
+	}
+	return decoded
+}
+function copyCheckpointAtom(atom: Atom): Atom {
+	return {
+		...atom,
+		...(atom.order ? { order: [...atom.order] } : {}),
+		...(atom.observed ? { observed: [...atom.observed] } : {}),
+		...(atom.deleted ? { deleted: [...atom.deleted] } : {}),
+	}
+}
+function decodeRestoredIdentity(value: unknown): [string, string] {
+	let [previous, current] = Schema.decodeUnknownSync(RestoredIdentitySchema)(
+		value,
+	)
+	return [previous, current]
+}
+let decodeCheckpointAtomValue = Schema.decodeUnknownSync(CheckpointAtomSchema)
+let decodeCompactAtomValue = Schema.decodeUnknownSync(CompactAtomSchema)
+function decodeCheckpointAtom(value: unknown) {
+	return copyCheckpointAtom(decodeCheckpointAtomValue(value))
+}
+function decodeCompactAtom(value: unknown) {
+	return copyCheckpointAtom(decodeCompactAtomValue(value))
+}
+function copyVisibility(
+	visibility: TextVisibilitySnapshot,
+): TextVisibilitySnapshot {
+	return {
+		floor: visibility.floor,
+		legacyRemoved: visibility.legacyRemoved.map(run =>
+			typeof run === "string" ? run : { ...run },
+		),
+		removals: visibility.removals.map(([id, runs]) => [
+			id,
+			[
+				typeof runs[0] === "string" ? runs[0] : { ...runs[0] },
+				...runs
+					.slice(1)
+					.map(run => (typeof run === "string" ? run : { ...run })),
+			],
+		]),
+		cancels: visibility.cancels.map(([id, original]) => [id, original]),
+	}
+}
+function* decodeLegacyCheckpointSteps(
+	value: unknown,
+): Generator<void, typeof LegacyCheckpointSchema.Type> {
+	let header = Schema.decodeUnknownSync(LegacyHeaderSchema)(value)
+	let restored = yield* decodeCheckpointArray(
+		header.restored,
+		decodeRestoredIdentity,
+	)
+	let targets: (typeof LegacyCheckpointSchema.Type.targets)[number][] = []
+	for (let value of header.targets) {
+		let target = Schema.decodeUnknownSync(LegacyTargetHeaderSchema)(value)
+		let removed = yield* decodeCheckpointArray(
+			target.removed,
+			Schema.decodeUnknownSync(TextAtomIdSchema),
+		)
+		let atoms = yield* decodeCheckpointArray(target.atoms, decodeCheckpointAtom)
+		let fields = yield* decodeCheckpointArray(target.fields, parseOperation)
+		targets.push({ ...target, atoms, fields, removed })
+	}
+	return { ...header, restored, targets }
+}
+function* decodeCausalCheckpointSteps(
+	value: unknown,
+): Generator<void, typeof CausalCheckpointSchema.Type> {
+	let header = Schema.decodeUnknownSync(CausalHeaderSchema)(value)
+	let restored = yield* decodeCheckpointArray(
+		header.restored,
+		decodeRestoredIdentity,
+	)
+	let targets: (typeof CausalCheckpointSchema.Type.targets)[number][] = []
+	for (let value of header.targets) {
+		let target = Schema.decodeUnknownSync(CausalTargetHeaderSchema)(value)
+		let visibility = yield* decodeVisibilitySnapshotSteps(
+			target.visibility,
+			true,
+		)
+		let atoms = yield* decodeCheckpointArray(target.atoms, decodeCheckpointAtom)
+		let fields = yield* decodeCheckpointArray(target.fields, parseOperation)
+		targets.push({ ...target, atoms, fields, visibility })
+	}
+	return { ...header, restored, targets }
+}
+function* decodeCompactCheckpointSteps(
+	value: unknown,
+): Generator<void, typeof CompactCheckpointSchema.Type> {
+	let header = Schema.decodeUnknownSync(CompactHeaderSchema)(value)
+	let restored = yield* decodeCheckpointArray(
+		header.restored,
+		decodeRestoredIdentity,
+	)
+	let targets: (typeof CompactCheckpointSchema.Type.targets)[number][] = []
+	for (let value of header.targets) {
+		let target = Schema.decodeUnknownSync(CausalTargetHeaderSchema)(value)
+		let visibility = yield* decodeVisibilitySnapshotSteps(
+			target.visibility,
+			true,
+		)
+		let atoms = yield* decodeCheckpointArray(target.atoms, decodeCompactAtom)
+		let fields = yield* decodeCheckpointArray(target.fields, parseOperation)
+		targets.push({ ...target, atoms, fields, visibility })
+	}
+	return { ...header, restored, targets }
+}
+function* expandCompactCheckpointSteps(
 	value: typeof CompactCheckpointSchema.Type,
-): CausalReplicaCheckpoint {
-	let count = 0
+	cooperative: boolean,
+): Generator<void, CausalReplicaCheckpoint> {
+	let count = 0,
+		work = 0
 	for (let target of value.targets)
 		for (let run of target.atoms)
 			for (let _character of run.value) {
 				count++
+				if (cooperative && ++work % 512 === 0) yield
 				if (count > maximumCompactAtoms)
 					throw new Error("Checkpoint expansion exceeds its atom limit")
 			}
-	let targets = value.targets.map(target => {
+	let targets: TargetCheckpoint[] = []
+	for (let target of value.targets) {
 		let atoms: Atom[] = []
 		for (let run of target.atoms) {
-			let characters = Array.from(run.value)
+			let characters = run.value
+			let length = 0
+			for (let _character of characters) {
+				length++
+				if (cooperative && ++work % 512 === 0) yield
+			}
 			let prefix = run.id.slice(0, -8)
 			let offset = Number(run.id.slice(-8))
-			if (offset + characters.length > 100_000_000)
+			if (offset + length > 100_000_000)
 				throw new Error("Checkpoint insertion exceeds its atom identity range")
 			let previous = run.after
-			for (let [index, value] of characters.entries()) {
+			let index = 0
+			for (let value of characters) {
 				let id = prefix + String(offset + index).padStart(8, "0")
 				atoms.push(
 					index === 0
@@ -189,17 +351,19 @@ function expandCompactCheckpoint(
 						: { id, after: previous, value },
 				)
 				previous = id
+				index++
+				if (cooperative && ++work % 512 === 0) yield
 			}
 		}
-		return {
+		targets.push({
 			id: target.id,
 			created: target.created,
 			updated: target.updated,
 			atoms,
 			fields: target.fields.map(parseOperation),
 			visibility: target.visibility,
-		}
-	})
+		})
+	}
 	return {
 		format: "alkalye-state-v2",
 		clock: value.clock,
@@ -208,6 +372,22 @@ function expandCompactCheckpoint(
 	}
 }
 export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
+	let steps = parseCheckpointSteps(value, false)
+	let next = steps.next()
+	while (!next.done) next = steps.next()
+	return next.value
+}
+export function parseCheckpointEffect(value: unknown) {
+	return cooperative("checkpoint.parse", () =>
+		parseCheckpointSteps(value, true),
+	)
+}
+
+function* parseCheckpointSteps(
+	value: unknown,
+	cooperative: boolean,
+): Generator<void, ReplicaCheckpoint> {
+	let work = 0
 	let record = object(value)
 	if (
 		record.format !== "alkalye-state-v1" &&
@@ -217,15 +397,22 @@ export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
 		throw new Error("Unknown checkpoint format")
 	let expanded =
 		record.format === "alkalye-state-v3"
-			? expandCompactCheckpoint(
-					Schema.decodeUnknownSync(CompactCheckpointSchema)(value),
+			? yield* expandCompactCheckpointSteps(
+					cooperative
+						? yield* decodeCompactCheckpointSteps(value)
+						: Schema.decodeUnknownSync(CompactCheckpointSchema)(value),
+					cooperative,
 				)
 			: undefined
 	let decoded =
 		expanded ??
 		(record.format === "alkalye-state-v1"
-			? Schema.decodeUnknownSync(LegacyCheckpointSchema)(value)
-			: Schema.decodeUnknownSync(CausalCheckpointSchema)(value))
+			? cooperative
+				? yield* decodeLegacyCheckpointSteps(value)
+				: Schema.decodeUnknownSync(LegacyCheckpointSchema)(value)
+			: cooperative
+				? yield* decodeCausalCheckpointSteps(value)
+				: Schema.decodeUnknownSync(CausalCheckpointSchema)(value))
 	let targets = new Set<string>(),
 		owners = new Map<string, string>()
 	let operations = new Map<string, { target: string; kind: string }>()
@@ -238,7 +425,9 @@ export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
 			throw new Error("Checkpoint operation identity is ambiguous")
 		operations.set(operation, { target, kind })
 	}
-	let snapshots = decoded.targets.map((target, index) => {
+	let snapshots: (LegacyTargetCheckpoint | TargetCheckpoint)[] = []
+	let targetIndex = 0
+	for (let target of decoded.targets) {
 		let id = identifier(target.id)
 		if (targets.has(id)) throw new Error("Duplicate checkpoint target")
 		targets.add(id)
@@ -249,17 +438,21 @@ export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
 		)
 			throw new Error("Invalid checkpoint registers")
 		for (let field of fields) claim(field.id, id, "set")
-		let expandedTarget = expanded?.targets[index]
-		let atoms = expandedTarget
-			? expandedTarget.atoms
-			: target.atoms.map(atom => ({
-					...atom,
-					...(atom.order ? { order: [...atom.order] } : {}),
-					...(atom.observed ? { observed: [...atom.observed] } : {}),
-					...(atom.deleted ? { deleted: [...atom.deleted] } : {}),
-				}))
-		let indexed = new Map(atoms.map(atom => [atom.id, atom]))
+		let expandedTarget = expanded?.targets[targetIndex++]
+		let atoms = expandedTarget?.atoms ?? []
+		if (!expandedTarget)
+			for (let atom of target.atoms) {
+				atoms.push(cooperative ? atom : copyCheckpointAtom(atom))
+				if (cooperative && ++work % 512 === 0) yield
+			}
+		let indexed = new Map<string, Atom>()
 		for (let atom of atoms) {
+			if (cooperative && ++work % 512 === 0) yield
+			indexed.set(atom.id, atom)
+			if (cooperative && ++work % 512 === 0) yield
+		}
+		for (let atom of atoms) {
+			if (cooperative && ++work % 512 === 0) yield
 			if (owners.has(atom.id) || atom.id === atom.after)
 				throw new Error("Invalid checkpoint atom identity")
 			owners.set(atom.id, id)
@@ -271,15 +464,20 @@ export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
 		}
 		let complete = new Set<string>()
 		for (let atom of atoms) {
+			if (cooperative && ++work % 512 === 0) yield
 			if (complete.has(atom.id)) continue
 			let path = new Set<string>(),
 				next = atom.id
 			while (next && !complete.has(next)) {
 				if (path.has(next)) throw new Error("Checkpoint anchor cycle")
 				path.add(next)
+				if (cooperative && ++work % 512 === 0) yield
 				next = indexed.get(next)?.after ?? ""
 			}
-			for (let id of path) complete.add(id)
+			for (let id of path) {
+				complete.add(id)
+				if (cooperative && ++work % 512 === 0) yield
+			}
 		}
 		if (fields.some(field => field.clock > decoded.clock))
 			throw new Error("Checkpoint clock precedes a register")
@@ -293,28 +491,15 @@ export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
 		if ("removed" in target) {
 			if (target.removed.some(id => !indexed.has(id)))
 				throw new Error("Unknown legacy checkpoint deletion")
-			return { ...common, removed: [...target.removed] }
+			snapshots.push({ ...common, removed: [...target.removed] })
+			continue
 		}
-		let visibility: TextVisibilitySnapshot = {
-			floor: target.visibility.floor,
-			legacyRemoved: target.visibility.legacyRemoved.map(run =>
-				typeof run === "string" ? run : { ...run },
-			),
-			removals: target.visibility.removals.map(([id, runs]) => [
-				id,
-				[
-					typeof runs[0] === "string" ? runs[0] : { ...runs[0] },
-					...runs
-						.slice(1)
-						.map(run => (typeof run === "string" ? run : { ...run })),
-				],
-			]),
-			cancels: target.visibility.cancels.map(([id, original]) => [
-				id,
-				original,
-			]),
+		let visibility = copyVisibility(target.visibility)
+		let known = new Set<string>()
+		for (let atom of atoms) {
+			known.add(atom.id.slice(0, -9))
+			if (cooperative && ++work % 512 === 0) yield
 		}
-		let known = new Set(atoms.map(atom => atom.id.slice(0, -9)))
 		let removers = new Set<string>(),
 			cancels = new Set<string>()
 		for (let [id, runs] of visibility.removals) {
@@ -323,8 +508,10 @@ export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
 			removers.add(id)
 			claim(id, common.id, "text")
 			known.add(id)
-			for (let atom of expandDeletions(runs))
+			for (let atom of deletionIds(runs)) {
 				if (!indexed.has(atom)) throw new Error("Unknown checkpoint deletion")
+				if (cooperative && ++work % 512 === 0) yield
+			}
 		}
 		for (let [id] of visibility.cancels) {
 			if (cancels.has(id) || known.has(id))
@@ -338,9 +525,11 @@ export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
 			[...known].some(id => Number(id.slice(0, 16)) > decoded.clock)
 		)
 			throw new Error("Checkpoint clock precedes its causal facts")
-		for (let atom of expandDeletions(visibility.legacyRemoved))
+		for (let atom of deletionIds(visibility.legacyRemoved)) {
 			if (!indexed.has(atom))
 				throw new Error("Unknown legacy checkpoint deletion")
+			if (cooperative && ++work % 512 === 0) yield
+		}
 		for (let [id, original] of visibility.cancels) {
 			if (
 				!known.has(original) ||
@@ -350,8 +539,8 @@ export function parseCheckpoint(value: unknown): ReplicaCheckpoint {
 			if (Number(original.slice(0, 16)) <= visibility.floor)
 				throw new Error("Checkpoint cancellation crosses its migration floor")
 		}
-		return { ...common, visibility }
-	})
+		snapshots.push({ ...common, visibility })
+	}
 	let restored: [string, string][] = decoded.restored.map(
 		([previous, current]) => [previous, current],
 	)

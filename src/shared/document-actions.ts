@@ -365,16 +365,31 @@ export function undoAction(
 	).pipe(Effect.map(undo => ({ ...undo, undoOf: action.id })))
 }
 
-export function restoreSnapshot(snapshot: DocumentSnapshot, actor: string) {
-	return attempt(() => {
-		let replica = new Replica(actor)
-		replica.restoreCheckpoint(JSON.parse(snapshot.state))
-		for (let target of replica.targetIds())
-			if (
-				target !== snapshot.document &&
-				replica.fields(target).document !== snapshot.document
-			)
-				throw new Error("Snapshot contains another document")
+export function restoreSnapshot(
+	snapshot: DocumentSnapshot,
+	actor: string,
+	cooperative = false,
+) {
+	return Effect.gen(function* () {
+		let value = yield* attempt(() => JSON.parse(snapshot.state))
+		let replica = yield* Replica.fromCheckpointEffect(
+			value,
+			actor,
+			"Writer",
+			cooperative,
+		).pipe(
+			Effect.mapError(
+				cause => new DocumentConflict({ message: cause.message }),
+			),
+		)
+		yield* attempt(() => {
+			for (let target of replica.targetIds())
+				if (
+					target !== snapshot.document &&
+					replica.fields(target).document !== snapshot.document
+				)
+					throw new Error("Snapshot contains another document")
+		})
 		return replica
 	})
 }

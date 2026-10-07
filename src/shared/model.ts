@@ -1,4 +1,5 @@
 import * as Schema from "effect/Schema"
+import { finishSteps } from "./collection-copy"
 
 export interface Atom {
 	id: string
@@ -381,6 +382,13 @@ export function compactOperation(operation: Operation) {
 }
 
 export function compactDeletions(ids: readonly string[]) {
+	return finishSteps(compactDeletionSteps(ids, false))
+}
+export function* compactDeletionSteps(
+	ids: readonly string[],
+	cooperative: boolean,
+): Generator<void, { id: string; count: number }[]> {
+	let work = 0
 	let remove: { id: string; count: number }[] = []
 	for (let id of ids) {
 		let previous = remove[remove.length - 1]
@@ -390,10 +398,11 @@ export function compactDeletions(ids: readonly string[]) {
 			: ""
 		if (previous && id === expected) previous.count++
 		else remove.push({ id, count: 1 })
+		if (cooperative && ++work % 512 === 0) yield
 	}
 	return remove
 }
-export function expandDeletions(
+export function* deletionIds(
 	runs: readonly (string | typeof DeletionRunSchema.Type)[],
 	maximum = 4_000_000,
 ) {
@@ -413,16 +422,23 @@ export function expandDeletions(
 		if (count > maximum)
 			throw new Error("Deletion expansion exceeds its identity limit")
 	}
-	return runs.flatMap(run => {
-		if (typeof run === "string") return [run]
-		return Array.from(
-			{ length: run.count },
-			(_, index) =>
-				run.id.slice(0, -8) +
-				String(Number(run.id.slice(-8)) + index).padStart(8, "0"),
-		)
-	})
+	for (let run of runs) {
+		if (typeof run === "string") yield run
+		else {
+			let prefix = run.id.slice(0, -8)
+			let offset = Number(run.id.slice(-8))
+			for (let index = 0; index < run.count; index++)
+				yield prefix + String(offset + index).padStart(8, "0")
+		}
+	}
 }
+export function expandDeletions(
+	runs: readonly (string | typeof DeletionRunSchema.Type)[],
+	maximum = 4_000_000,
+) {
+	return [...deletionIds(runs, maximum)]
+}
+
 function validTextClock(id: string) {
 	let clock = Number(id.slice(0, 16))
 	return Number.isSafeInteger(clock) && clock >= 1

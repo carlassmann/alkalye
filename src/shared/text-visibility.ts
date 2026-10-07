@@ -1,15 +1,17 @@
 import * as Schema from "effect/Schema"
+import { copyMapSteps, copySetSteps, finishSteps } from "./collection-copy"
 
 import {
 	TextOperationIdSchema,
 	TextAtomIdSchema,
 	DeletionRunSchema,
-	compactDeletions,
-	expandDeletions,
+	compactDeletionSteps,
+	deletionIds,
 } from "./model"
 
 let OperationId = TextOperationIdSchema
 let AtomId = TextAtomIdSchema
+let decodeAtomIdentity = Schema.decodeUnknownSync(AtomId)
 let RemovalAtomSchema = Schema.Union([
 	AtomId,
 	Schema.Struct({ ...DeletionRunSchema.fields, id: AtomId }).check(
@@ -56,22 +58,8 @@ export let VisibilitySnapshotSchema = Schema.Struct({
 	removals: Schema.Array(RemovalSchema),
 	cancels: Schema.Array(CancellationSchema),
 }).check(
-	Schema.makeFilter(state => {
-		let count = 0
-		for (let run of state.legacyRemoved)
-			count += typeof run === "string" ? 1 : run.count
-		for (let [, runs] of state.removals)
-			for (let run of runs) count += typeof run === "string" ? 1 : run.count
-		return (
-			count <= 4_000_000 ||
-			"Checkpoint deletion provenance exceeds four million identities"
-		)
-	}),
-	Schema.makeFilter(
-		state =>
-			state.legacyRemoved.every(
-				atom => clock(typeof atom === "string" ? atom : atom.id) <= state.floor,
-			) || "Legacy atom owner exceeds the migration floor",
+	Schema.makeFilter(state =>
+		finishSteps(validateVisibilitySnapshotSteps(state, false)),
 	),
 )
 
@@ -91,20 +79,35 @@ export class TextVisibility {
 		this.floor = state.clock
 	}
 	fork() {
+		return finishSteps(this.forkSteps(false))
+	}
+	*forkSteps(cooperative: boolean) {
 		let visibility = new TextVisibility()
-		visibility.removals = new Map(this.removals)
-		visibility.removers = new Map(
-			[...this.removers].map(([atom, removers]) => [atom, new Set(removers)]),
-		)
-		visibility.cancels = new Map(this.cancels)
-		visibility.cancellers = new Map(
-			[...this.cancellers].map(([operation, cancellers]) => [
+		visibility.removals = yield* copyMapSteps(this.removals, cooperative)
+		let count = 0
+		for (let [atom, removers] of this.removers) {
+			visibility.removers.set(atom, yield* copySetSteps(removers, cooperative))
+			if (cooperative && ++count === 1024) {
+				count = 0
+				yield
+			}
+		}
+		visibility.cancels = yield* copyMapSteps(this.cancels, cooperative)
+		for (let [operation, cancellers] of this.cancellers) {
+			visibility.cancellers.set(
 				operation,
-				new Set(cancellers),
-			]),
+				yield* copySetSteps(cancellers, cooperative),
+			)
+			if (cooperative && ++count === 1024) {
+				count = 0
+				yield
+			}
+		}
+		visibility.activeCache = yield* copyMapSteps(this.activeCache, cooperative)
+		visibility.legacyRemoved = yield* copySetSteps(
+			this.legacyRemoved,
+			cooperative,
 		)
-		visibility.activeCache = new Map(this.activeCache)
-		visibility.legacyRemoved = new Set(this.legacyRemoved)
 		visibility.floor = this.floor
 		return visibility
 	}
@@ -123,22 +126,34 @@ export class TextVisibility {
 		this.prepare(input)
 	}
 	private prepare(input: readonly VisibilityFact[]) {
+		let commit = finishSteps(this.prepareSteps(input, false))
+		return () => finishSteps(commit)
+	}
+	private *prepareSteps(
+		input: readonly VisibilityFact[],
+		cooperative: boolean,
+	): Generator<void, Generator<void>> {
+		let work = 0
 		let removals = new Map<string, readonly string[]>()
 		let legacyRemoved = new Set<string>()
 		let cancels = new Map<string, string>()
 		for (let value of input) {
-			let fact = Schema.decodeUnknownSync(VisibilityFactSchema)(value)
+			let fact = yield* visibilityFactSteps(value, cooperative)
 			if (fact.kind === "remove") {
-				let atoms = [...new Set(fact.atoms)].sort()
+				let atoms = yield* sortedIdentitySteps(fact.atoms, cooperative)
 				let previous = removals.get(fact.id) ?? this.removals.get(fact.id)
 				if (
 					cancels.has(fact.id) ||
 					this.cancels.has(fact.id) ||
-					(previous && JSON.stringify(previous) !== JSON.stringify(atoms))
+					(previous &&
+						!(yield* equalIdentitySteps(previous, atoms, cooperative)))
 				)
 					throw new Error("Removal identity is immutable")
 				if (clock(fact.id) <= this.floor)
-					for (let atom of atoms) legacyRemoved.add(atom)
+					for (let atom of atoms) {
+						legacyRemoved.add(atom)
+						if (cooperative && ++work % 512 === 0) yield
+					}
 				else removals.set(fact.id, atoms)
 			} else {
 				if (clock(fact.id) <= clock(fact.target))
@@ -157,24 +172,30 @@ export class TextVisibility {
 				cancels.set(fact.id, fact.target)
 			}
 		}
-		return () => {
-			for (let atom of legacyRemoved) this.legacyRemoved.add(atom)
+		let visibility = this
+		return commit()
+		function* commit(): Generator<void> {
+			for (let atom of legacyRemoved) {
+				visibility.legacyRemoved.add(atom)
+				if (cooperative && ++work % 512 === 0) yield
+			}
 			for (let [id, atoms] of removals) {
-				if (this.removals.has(id)) continue
-				this.removals.set(id, atoms)
+				if (visibility.removals.has(id)) continue
+				visibility.removals.set(id, atoms)
 				for (let atom of atoms) {
-					let removers = this.removers.get(atom) ?? new Set<string>()
+					let removers = visibility.removers.get(atom) ?? new Set<string>()
 					removers.add(id)
-					this.removers.set(atom, removers)
+					visibility.removers.set(atom, removers)
+					if (cooperative && ++work % 512 === 0) yield
 				}
 			}
 			for (let [id, target] of cancels) {
-				if (this.cancels.has(id)) continue
-				this.cancels.set(id, target)
-				let cancellers = this.cancellers.get(target) ?? new Set<string>()
+				if (visibility.cancels.has(id)) continue
+				visibility.cancels.set(id, target)
+				let cancellers = visibility.cancellers.get(target) ?? new Set<string>()
 				cancellers.add(id)
-				this.cancellers.set(target, cancellers)
-				this.activeCache.clear()
+				visibility.cancellers.set(target, cancellers)
+				visibility.activeCache.clear()
 			}
 		}
 	}
@@ -235,38 +256,96 @@ export class TextVisibility {
 		return false
 	}
 	checkpoint() {
-		return Schema.decodeUnknownSync(VisibilitySnapshotSchema)({
-			legacyRemoved: compactDeletions([...this.legacyRemoved].sort()),
-			floor: this.floor,
-			removals: [...this.removals]
-				.sort(byIdentity)
-				.map(([id, atoms]) => [id, compactDeletions(atoms)]),
-			cancels: [...this.cancels].sort(byIdentity),
-		})
+		return finishSteps(this.checkpointSteps(false))
+	}
+	*checkpointSteps(
+		cooperative: boolean,
+	): Generator<void, TextVisibilitySnapshot> {
+		let legacy = yield* sortedIdentitySteps(this.legacyRemoved, cooperative)
+		let legacyRemoved = yield* compactDeletionSteps(legacy, cooperative)
+		let removals: [
+			string,
+			[
+				string | typeof DeletionRunSchema.Type,
+				...(string | typeof DeletionRunSchema.Type)[],
+			],
+		][] = []
+		let entries = 0
+		for (let id of yield* sortedIdentitySteps(
+			this.removals.keys(),
+			cooperative,
+		)) {
+			let atoms = this.removals.get(id) ?? []
+			let runs = yield* compactDeletionSteps(atoms, cooperative)
+			let first = runs[0]
+			if (!first) throw new Error("Empty removal provenance")
+			removals.push([id, [first, ...runs.slice(1)]])
+			if (cooperative && ++entries % 128 === 0) yield
+		}
+		let cancels: [string, string][] = []
+		for (let id of yield* sortedIdentitySteps(
+			this.cancels.keys(),
+			cooperative,
+		)) {
+			let original = this.cancels.get(id)
+			if (original) cancels.push([id, original])
+			if (cooperative && ++entries % 128 === 0) yield
+		}
+		return yield* decodeVisibilitySnapshotSteps(
+			{
+				legacyRemoved,
+				floor: this.floor,
+				removals,
+				cancels,
+			},
+			cooperative,
+		)
 	}
 	restore(input: unknown) {
-		let snapshot = Schema.decodeUnknownSync(VisibilitySnapshotSchema)(input)
+		finishSteps(this.restoreSteps(input, false))
+	}
+	*restoreSteps(input: unknown, cooperative: boolean): Generator<void> {
+		let snapshot = yield* decodeVisibilitySnapshotSteps(input, cooperative)
 		if (snapshot.floor > this.floor && this.hasCancellations())
 			throw new Error("An accepted cancellation fixes the migration floor")
-		let next = new TextVisibility({
-			removed: [
-				...this.legacyRemoved,
-				...expandDeletions(snapshot.legacyRemoved),
-			],
-			clock: Math.max(this.floor, snapshot.floor),
-		})
-		if (
-			new Set(snapshot.removals.map(([id]) => id)).size !==
-				snapshot.removals.length ||
-			new Set(snapshot.cancels.map(([id]) => id)).size !==
-				snapshot.cancels.length
-		)
-			throw new Error("Duplicate visibility identity")
-		for (let [id, atoms] of this.removals) next.remove(id, atoms)
-		for (let [id, target] of this.cancels) next.cancel(id, target)
-		for (let [id, atoms] of snapshot.removals)
-			next.remove(id, expandDeletions(atoms))
-		for (let [id, target] of snapshot.cancels) next.cancel(id, target)
+		let next = new TextVisibility()
+		next.floor = Math.max(this.floor, snapshot.floor)
+		next.legacyRemoved = yield* copySetSteps(this.legacyRemoved, cooperative)
+		let work = 0
+		for (let atom of deletionIds(snapshot.legacyRemoved)) {
+			if (clock(atom) > next.floor)
+				throw new Error("Legacy atom owner exceeds the migration floor")
+			next.legacyRemoved.add(atom)
+			if (cooperative && ++work % 512 === 0) yield
+		}
+		let removals = new Set<string>(),
+			cancels = new Set<string>()
+		for (let [id] of snapshot.removals) {
+			if (removals.has(id)) throw new Error("Duplicate visibility identity")
+			removals.add(id)
+			if (cooperative && ++work % 128 === 0) yield
+		}
+		for (let [id] of snapshot.cancels) {
+			if (cancels.has(id)) throw new Error("Duplicate visibility identity")
+			cancels.add(id)
+			if (cooperative && ++work % 128 === 0) yield
+		}
+		for (let [id, atoms] of this.removals) {
+			yield* next.removeSteps(id, atoms, cooperative)
+			if (cooperative && ++work % 128 === 0) yield
+		}
+		for (let [id, target] of this.cancels) {
+			next.cancel(id, target)
+			if (cooperative && ++work % 128 === 0) yield
+		}
+		for (let [id, runs] of snapshot.removals) {
+			yield* next.removeSteps(id, deletionIds(runs), cooperative)
+			if (cooperative && ++work % 128 === 0) yield
+		}
+		for (let [id, target] of snapshot.cancels) {
+			next.cancel(id, target)
+			if (cooperative && ++work % 128 === 0) yield
+		}
 		this.removals = next.removals
 		this.removers = next.removers
 		this.cancels = next.cancels
@@ -275,6 +354,25 @@ export class TextVisibility {
 		this.floor = next.floor
 		this.activeCache.clear()
 	}
+	private *removeSteps(
+		operation: string,
+		values: Iterable<string>,
+		cooperative: boolean,
+	): Generator<void> {
+		let atoms: string[] = []
+		for (let atom of values) {
+			atoms.push(atom)
+			if (cooperative && atoms.length % 512 === 0) yield
+		}
+		let first = atoms[0]
+		if (first === undefined) return
+		let commit = yield* this.prepareSteps(
+			[{ kind: "remove", id: operation, atoms: [first, ...atoms.slice(1)] }],
+			cooperative,
+		)
+		yield* commit
+	}
+
 	private node(id: string) {
 		return { id, children: [...(this.cancellers.get(id) ?? [])], next: 0 }
 	}
@@ -282,9 +380,163 @@ export class TextVisibility {
 function clock(id: string) {
 	return Number(id.slice(0, 16))
 }
-function byIdentity(
-	left: readonly [string, unknown],
-	right: readonly [string, unknown],
-) {
-	return left[0] < right[0] ? -1 : left[0] > right[0] ? 1 : 0
+
+let RemovalFactHeaderSchema = Schema.Struct({
+	kind: Schema.Literal("remove"),
+	id: OperationId,
+	atoms: Schema.NonEmptyArray(Schema.Unknown),
+})
+function* visibilityFactSteps(
+	value: VisibilityFact,
+	cooperative: boolean,
+): Generator<void, VisibilityFact> {
+	if (!cooperative || value.kind !== "remove")
+		return Schema.decodeUnknownSync(VisibilityFactSchema)(value)
+	let header = Schema.decodeUnknownSync(RemovalFactHeaderSchema)(value)
+	let atoms: string[] = []
+	for (let value of header.atoms) {
+		atoms.push(decodeAtomIdentity(value))
+		if (atoms.length % 512 === 0) yield
+	}
+	let first = atoms[0]
+	if (!first) throw new Error("Empty removal provenance")
+	return { ...header, atoms: [first, ...atoms.slice(1)] }
+}
+function* sortedIdentitySteps(
+	values: Iterable<string>,
+	cooperative: boolean,
+): Generator<void, string[]> {
+	if (!cooperative) return [...new Set(values)].sort()
+	let atoms: string[] = [],
+		ordered = true
+	for (let atom of values) {
+		let previous = atoms.at(-1)
+		if (previous && previous > atom) ordered = false
+		if (atom !== previous) atoms.push(atom)
+		if (atoms.length % 512 === 0) yield
+	}
+	if (ordered) return atoms
+	let chunks: string[][] = []
+	for (let offset = 0; offset < atoms.length; offset += 512) {
+		chunks.push([...new Set(atoms.slice(offset, offset + 512).sort())])
+		yield
+	}
+	let work = 0
+	while (chunks.length > 1) {
+		let merged: string[][] = []
+		for (let index = 0; index < chunks.length; index += 2) {
+			let left = chunks[index] ?? [],
+				right = chunks[index + 1] ?? []
+			let output: string[] = [],
+				a = 0,
+				b = 0
+			while (a < left.length || b < right.length) {
+				let first = left[a],
+					second = right[b]
+				let atom: string | undefined
+				if (second === undefined || (first !== undefined && first <= second)) {
+					atom = first
+					a++
+				} else {
+					atom = second
+					b++
+				}
+				if (atom !== undefined && output.at(-1) !== atom) output.push(atom)
+				if (++work % 512 === 0) yield
+			}
+			merged.push(output)
+		}
+		chunks = merged
+	}
+	return chunks[0] ?? []
+}
+function* equalIdentitySteps(
+	first: readonly string[],
+	second: readonly string[],
+	cooperative: boolean,
+): Generator<void, boolean> {
+	if (first.length !== second.length) return false
+	for (let index = 0; index < first.length; index++) {
+		if (first[index] !== second[index]) return false
+		if (cooperative && index % 512 === 0) yield
+	}
+	return true
+}
+
+let VisibilityHeaderSchema = Schema.Struct({
+	legacyRemoved: Schema.Array(Schema.Unknown),
+	floor: LegacySchema.fields.clock,
+	removals: Schema.Array(Schema.Unknown),
+	cancels: Schema.Array(Schema.Unknown),
+})
+let RemovalHeaderSchema = Schema.Tuple([
+	OperationId,
+	Schema.NonEmptyArray(Schema.Unknown),
+])
+export function* decodeVisibilitySnapshotSteps(
+	input: unknown,
+	cooperative: boolean,
+): Generator<void, TextVisibilitySnapshot> {
+	if (!cooperative)
+		return Schema.decodeUnknownSync(VisibilitySnapshotSchema)(input)
+	let header = Schema.decodeUnknownSync(VisibilityHeaderSchema)(input)
+	let legacyRemoved = yield* decodeRemovalRuns(header.legacyRemoved)
+	let removals: [
+		string,
+		[typeof RemovalAtomSchema.Type, ...(typeof RemovalAtomSchema.Type)[]],
+	][] = []
+	for (let value of header.removals) {
+		let [id, input] = Schema.decodeUnknownSync(RemovalHeaderSchema)(value)
+		let runs = yield* decodeRemovalRuns(input)
+		let first = runs[0]
+		if (!first) throw new Error("Empty removal provenance")
+		removals.push([id, [first, ...runs.slice(1)]])
+		if (removals.length % 128 === 0) yield
+	}
+	let cancels: [string, string][] = []
+	for (let value of header.cancels) {
+		let [id, target] = Schema.decodeUnknownSync(CancellationSchema)(value)
+		cancels.push([id, target])
+		if (cancels.length % 128 === 0) yield
+	}
+	let snapshot = { floor: header.floor, legacyRemoved, removals, cancels }
+	let valid = yield* validateVisibilitySnapshotSteps(snapshot, true)
+	if (valid !== true) throw new Error(valid)
+	return snapshot
+}
+let decodeRemovalAtom = Schema.decodeUnknownSync(RemovalAtomSchema)
+function* decodeRemovalRuns(
+	values: readonly unknown[],
+): Generator<void, (typeof RemovalAtomSchema.Type)[]> {
+	let runs: (typeof RemovalAtomSchema.Type)[] = []
+	for (let value of values) {
+		let run = decodeRemovalAtom(value)
+		runs.push(typeof run === "string" ? run : { ...run })
+		if (runs.length % 128 === 0) yield
+	}
+	return runs
+}
+function* validateVisibilitySnapshotSteps(
+	state: TextVisibilitySnapshot,
+	cooperative: boolean,
+): Generator<void, true | string> {
+	let count = 0,
+		work = 0
+	for (let run of state.legacyRemoved) {
+		count += typeof run === "string" ? 1 : run.count
+		if (cooperative && ++work % 512 === 0) yield
+	}
+	for (let [, runs] of state.removals)
+		for (let run of runs) {
+			count += typeof run === "string" ? 1 : run.count
+			if (cooperative && ++work % 512 === 0) yield
+		}
+	if (count > 4_000_000)
+		return "Checkpoint deletion provenance exceeds four million identities"
+	for (let run of state.legacyRemoved) {
+		if (clock(typeof run === "string" ? run : run.id) > state.floor)
+			return "Legacy atom owner exceeds the migration floor"
+		if (cooperative && ++work % 512 === 0) yield
+	}
+	return true
 }

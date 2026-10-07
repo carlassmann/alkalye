@@ -127,6 +127,7 @@ function makeLibrary() {
 		})
 		yield* local.changes.pipe(
 			Stream.merge(folders.changes),
+			Stream.buffer({ capacity: 1, strategy: "sliding" }),
 			Stream.runForEach(() =>
 				compose().pipe(
 					Effect.catch(error =>

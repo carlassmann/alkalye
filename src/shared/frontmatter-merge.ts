@@ -2,6 +2,7 @@ import { frontmatterBlock, frontmatterKey } from "./markdown"
 import type { Atom } from "./model"
 import * as Schema from "effect/Schema"
 import * as Yaml from "effect/encoding/Yaml"
+import { finishSteps } from "./collection-copy"
 
 interface Entry {
 	key: string | undefined
@@ -128,7 +129,15 @@ export function sourceAtoms(
 	raw: Atom[],
 	originalFrames: () => readonly Atom[][] = () => [],
 ) {
-	let headers = sourceHeaders(raw)
+	return finishSteps(sourceAtomsSteps(raw, originalFrames, false))
+}
+
+export function* sourceAtomsSteps(
+	raw: Atom[],
+	originalFrames: () => readonly Atom[][],
+	cooperative: boolean,
+): Generator<void, Atom[], void> {
+	let headers = yield* sourceHeadersSteps(raw, cooperative)
 	if (!headers.length) return raw
 	let winners = new Map<
 		string,
@@ -178,11 +187,24 @@ export function sourceAtoms(
 	entries = withoutLostAliases(entries, headers, originalFrames)
 	let body: Atom[] = [],
 		position = 0
+	let count = 0
 	for (let header of headers) {
-		for (let atom of raw.slice(position, header.start)) body.push(atom)
+		for (let atom of raw.slice(position, header.start)) {
+			body.push(atom)
+			if (cooperative && ++count === 1024) {
+				count = 0
+				yield
+			}
+		}
 		position = header.end
 	}
-	for (let atom of raw.slice(position)) body.push(atom)
+	for (let atom of raw.slice(position)) {
+		body.push(atom)
+		if (cooperative && ++count === 1024) {
+			count = 0
+			yield
+		}
+	}
 	if (
 		!entries.length &&
 		headers.some(header => header.open[0]?.deleted?.length) &&
@@ -403,19 +425,44 @@ export function sourceEdits(
 }
 
 function sourceHeaders(atoms: Atom[]) {
-	if (
-		!atoms.some(
-			atom =>
-				atom.after === "" &&
-				!atom.body &&
-				(atom.value === "-" || atom.value === "\uFEFF"),
-		)
+	return finishSteps(sourceHeadersSteps(atoms, false))
+}
+
+function startsHeader(atom: Atom) {
+	return (
+		atom.after === "" &&
+		!atom.body &&
+		(atom.value === "-" || atom.value === "\uFEFF")
 	)
-		return []
-	let source = sourceText(atoms)
+}
+
+function* sourceHeadersSteps(
+	atoms: Atom[],
+	cooperative: boolean,
+): Generator<void, Header[], void> {
+	let count = 0
+	let hasHeader = cooperative ? false : atoms.some(startsHeader)
+	if (cooperative) {
+		for (let atom of atoms) {
+			if (startsHeader(atom)) {
+				hasHeader = true
+				break
+			}
+			if (++count === 1024) {
+				count = 0
+				yield
+			}
+		}
+	}
+	if (!hasHeader) return []
+	let source = yield* sourceTextSteps(atoms, cooperative)
 	let headers: Header[] = []
 	let sourceOffset = 0
 	for (let [offset, atom] of atoms.entries()) {
+		if (cooperative && ++count === 1024) {
+			count = 0
+			yield
+		}
 		let candidate = sourceOffset
 		sourceOffset += atom.value.length
 		if (
@@ -495,6 +542,20 @@ function frameText(header: Header) {
 
 function sourceText(atoms: readonly Atom[]) {
 	return atoms.map(atom => atom.value).join("")
+}
+
+function* sourceTextSteps(atoms: Atom[], cooperative: boolean) {
+	if (!cooperative) return sourceText(atoms)
+	let values: string[] = []
+	let count = 0
+	for (let atom of atoms) {
+		values.push(atom.value)
+		if (++count === 1024) {
+			count = 0
+			yield
+		}
+	}
+	return values.join("")
 }
 
 function duplicateKeys(entries: Entry[]) {

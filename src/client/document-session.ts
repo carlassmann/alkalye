@@ -6,6 +6,7 @@ import {
 } from "../shared/document-session"
 import type { DocumentSessionOptions } from "../shared/document-session"
 import { browserDocumentLifecycle } from "./document-lifecycle"
+import { browserSchedulerLayer } from "./scheduler"
 export { DocumentSession } from "../shared/document-session"
 export type {
 	DocumentProjectionState,
@@ -16,8 +17,9 @@ export type {
 } from "../shared/document-session"
 
 export function browserDocumentSessionLayer(options: DocumentSessionOptions) {
-	return DocumentSession.layer(options).pipe(
+	return DocumentSession.layer({ ...options, cooperativeLoading: true }).pipe(
 		Layer.provide(indexedDbJournalLayer(documentDatabaseName(options))),
 		Layer.provide(browserDocumentLifecycle),
+		Layer.provide(browserSchedulerLayer),
 	)
 }

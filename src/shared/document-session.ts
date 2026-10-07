@@ -114,6 +114,7 @@ export interface PassiveDocumentState {
 	generation?: number
 }
 export interface DocumentSessionOptions {
+	cooperativeLoading?: boolean
 	passiveState?: {
 		read: Effect.Effect<PassiveDocumentState | undefined>
 		write(state: PassiveDocumentState): Effect.Effect<void>
@@ -868,6 +869,29 @@ function makeProjection(options: DocumentSessionOptions) {
 			creation = undefined
 			remotePosition = localPosition = cachedPosition = 0
 		}
+		function loadDocument(value: unknown, actor: string) {
+			return Replica.fromCheckpointEffect(
+				value,
+				actor,
+				options.author,
+				options.cooperativeLoading === true,
+			)
+		}
+		function forkDocument(
+			source: Replica,
+			actor: string,
+		): Effect.Effect<Replica, Error> {
+			return options.cooperativeLoading
+				? source.forkEffect(actor, options.author)
+				: Effect.try(() => source.fork(actor, options.author))
+		}
+		function materializeDocument(
+			source: Replica,
+		): Effect.Effect<string, Error> {
+			return options.cooperativeLoading
+				? source.textEffect(options.document)
+				: Effect.try(() => source.text(options.document))
+		}
 		function restoreCache(cached: PassiveDocumentState) {
 			return Effect.gen(function* () {
 				if (!(yield* storage.containsPosition(cached.position)))
@@ -899,25 +923,41 @@ function makeProjection(options: DocumentSessionOptions) {
 					return yield* conflict(
 						"Saved local creation is inconsistent with its pending action",
 					)
-				yield* Effect.try({
-					try: () => {
-						if (
-							cached.replica &&
-							cached.replica.generation === cached.generation
-						)
-							accepted = cached.replica.fork(
-								"accepted-document",
-								options.author,
-							)
-						else accepted.restoreCheckpoint(state.checkpoint)
-						accepted.text(options.document)
-						durable = accepted.fork("local-document", options.author)
-						replica = accepted.fork(actor, options.author)
-						cached.replica = accepted
-						cached.generation = accepted.generation
-					},
-					catch: cause => storageFailure("restore document", cause),
-				})
+				let nextAccepted: Replica
+				if (cached.replica && cached.replica.generation === cached.generation)
+					nextAccepted = yield* forkDocument(
+						cached.replica,
+						"accepted-document",
+					).pipe(
+						Effect.catch(() =>
+							loadDocument(state.checkpoint, "accepted-document"),
+						),
+						Effect.mapError(cause => storageFailure("restore document", cause)),
+					)
+				else
+					nextAccepted = yield* loadDocument(
+						state.checkpoint,
+						"accepted-document",
+					).pipe(
+						Effect.mapError(cause => storageFailure("restore document", cause)),
+					)
+				yield* materializeDocument(nextAccepted).pipe(
+					Effect.mapError(cause => storageFailure("restore document", cause)),
+				)
+				let nextDurable = yield* forkDocument(
+					nextAccepted,
+					"local-document",
+				).pipe(
+					Effect.mapError(cause => storageFailure("restore document", cause)),
+				)
+				let nextReplica = yield* forkDocument(nextAccepted, actor).pipe(
+					Effect.mapError(cause => storageFailure("restore document", cause)),
+				)
+				accepted = nextAccepted
+				durable = nextDurable
+				replica = nextReplica
+				cached.replica = accepted
+				cached.generation = accepted.generation
 				log = state.log
 				creation = state.creation ? freezeCreation(state.creation) : undefined
 				remotePosition = state.remotePosition
@@ -1031,10 +1071,34 @@ function makeProjection(options: DocumentSessionOptions) {
 						}
 					} else if (value.kind === "opened") {
 						if (!log && !creation) {
-							let restored = yield* restoreSnapshot(value.snapshot, actor)
-							restored.text(options.document)
-							accepted = restored.fork("accepted-document", options.author)
-							durable = restored.fork("local-document", options.author)
+							let restored = yield* restoreSnapshot(
+								value.snapshot,
+								actor,
+								options.cooperativeLoading,
+							)
+							yield* materializeDocument(restored).pipe(
+								Effect.mapError(cause =>
+									storageFailure("restore document", cause),
+								),
+							)
+							let nextAccepted = yield* forkDocument(
+								restored,
+								"accepted-document",
+							).pipe(
+								Effect.mapError(cause =>
+									storageFailure("restore document", cause),
+								),
+							)
+							let nextDurable = yield* forkDocument(
+								restored,
+								"local-document",
+							).pipe(
+								Effect.mapError(cause =>
+									storageFailure("restore document", cause),
+								),
+							)
+							accepted = nextAccepted
+							durable = nextDurable
 							replica = restored
 							replica.author = options.author ?? "Writer"
 							log = value.snapshot.log
@@ -1576,7 +1640,12 @@ function makeProjection(options: DocumentSessionOptions) {
 				if (value.kind === "opened") {
 					if (value.snapshot.document !== options.document)
 						return yield* conflict("Snapshot belongs to another document")
-					if (!log && !creation) yield* restoreSnapshot(value.snapshot, actor)
+					if (!log && !creation)
+						yield* restoreSnapshot(
+							value.snapshot,
+							actor,
+							options.cooperativeLoading,
+						)
 					return
 				}
 				if (!log && !creation)
