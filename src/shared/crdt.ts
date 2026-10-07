@@ -58,6 +58,7 @@ export class Replica {
 	private sourceCache = new Map<string, Atom[]>()
 	private fieldCache = new Map<string, Record<string, string>>()
 	private metadataCache = new Map<string, DocumentMetadata>()
+	private legacyTextTargets = new Set<string>()
 	private preparedEdit: PreparedTextEdit | undefined
 	constructor(
 		public actor: string,
@@ -71,6 +72,7 @@ export class Replica {
 		replica.operations = new Map(this.operations)
 		replica.clock = this.clock
 		replica.historyLoaded = this.historyLoaded
+		replica.legacyTextTargets = new Set(this.legacyTextTargets)
 		replica.atomIndex = new Map(this.atomIndex)
 		replica.children = new Map(
 			[...this.children].map(([target, children]) => [
@@ -285,6 +287,7 @@ export class Replica {
 		atoms = this.visible(target),
 	) {
 		this.preparedEdit = undefined
+		replacements = replacements.filter(change => change.remove || change.text)
 		let current = this.visible(target)
 		let previous =
 			atoms === current
@@ -338,6 +341,8 @@ export class Replica {
 		pieces.push(previous.slice(cursor))
 		let next = pieces.join("")
 		if (next === previous) return null
+		if (this.legacyTextTargets.has(target))
+			return this.prepareEdit(target, next, atoms)
 		let header = sourceHeader(previous)
 		let displacement = 0
 		let changesFence = false
@@ -377,11 +382,21 @@ export class Replica {
 				let atom = atoms[index]
 				if (atom) operation.remove.push(atom.id)
 			}
-			let anchor = atoms[start - 1]?.id ?? ""
+			let anchor =
+				header && replacement.start === header[0].length
+					? (atoms[start]?.after ?? atoms[start - 1]?.id ?? "")
+					: (atoms[start - 1]?.id ?? "")
 			let inserted: string[] = []
 			for (let value of replacement.text) {
 				let id = `${operation.id}:${String(operation.insert.length).padStart(8, "0")}`
-				operation.insert.push({ id, after: anchor, value })
+				operation.insert.push({
+					id,
+					after: anchor,
+					value,
+					...(anchor === "" && header && replacement.start === header[0].length
+						? { body: true }
+						: {}),
+				})
 				inserted.push(id)
 				anchor = id
 			}
@@ -545,6 +560,8 @@ export class Replica {
 						...(anchor === "" && edit.order && options.migration
 							? { migration: options.migration }
 							: {}),
+						...(anchor === "" && edit.emptyHeader ? { emptyHeader: true } : {}),
+						...(anchor === "" && edit.body ? { body: true } : {}),
 						...(anchor === "" && edit.deleted?.length
 							? { deleted: edit.deleted }
 							: {}),
@@ -890,6 +907,9 @@ export class Replica {
 				atom.ending ?? null,
 				atom.migration ?? false,
 				atom.deleted ?? null,
+				...(atom.emptyHeader || atom.body
+					? [atom.emptyHeader ?? false, atom.body ?? false]
+					: []),
 			]),
 			visibility,
 			fields.map(field => [field.id, field.field, field.value]),
@@ -1210,6 +1230,20 @@ export class Replica {
 		}
 	}
 	private indexAtom(target: string, atom: Atom) {
+		if (
+			!(
+				atom.value.length === 1 &&
+				(atom.value.charCodeAt(0) < 0xd800 || atom.value.charCodeAt(0) > 0xdfff)
+			) &&
+			!(
+				atom.value.length === 2 &&
+				atom.value.charCodeAt(0) >= 0xd800 &&
+				atom.value.charCodeAt(0) <= 0xdbff &&
+				atom.value.charCodeAt(1) >= 0xdc00 &&
+				atom.value.charCodeAt(1) <= 0xdfff
+			)
+		)
+			this.legacyTextTargets.add(target)
 		if (this.atomIndex.has(atom.id)) return
 		freezeTextAtom(atom)
 		this.atomIndex.set(atom.id, { target, atom })
@@ -1237,6 +1271,9 @@ function atomIdentity(atom: Atom) {
 		atom.ending ?? null,
 		atom.migration ?? false,
 		atom.deleted ?? null,
+		...(atom.emptyHeader || atom.body
+			? [atom.emptyHeader ?? false, atom.body ?? false]
+			: []),
 	])
 }
 

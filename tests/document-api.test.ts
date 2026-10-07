@@ -2467,6 +2467,61 @@ test(
 						owner.subject + "-paste-reader",
 					)).text(document),
 				).toBe("")
+				let redoState = yield* restoreSnapshot(
+					undone,
+					owner.subject + "-paste-redo",
+				)
+				let undoReceipt = yield* owner.api.documents.action({
+					params: { document, action: undo.id },
+				})
+				let redo = yield* undoAction(redoState, undoReceipt)
+				yield* owner.api.documents.commit({
+					params: { document },
+					payload: redo,
+				})
+				redoState.apply(redo.changes.map(parseOperation))
+				expect(redoState.text(document)).toBe(source)
+				let deletion = yield* buildAction(
+					redoState,
+					document,
+					"Delete all",
+					staged => [
+						staged.prepareReplacements(document, [
+							{ start: 0, remove: source.length, text: "" },
+						]),
+					],
+				)
+				yield* owner.api.documents.commit({
+					params: { document },
+					payload: deletion,
+				})
+				let deleted = yield* owner.api.documents.snapshot({
+					params: { document },
+					query: { encoding: "compact" },
+				})
+				let deleteState = yield* restoreSnapshot(
+					deleted,
+					owner.subject + "-delete-undo",
+				)
+				expect(deleteState.text(document)).toBe("")
+				let deleteReceipt = yield* owner.api.documents.action({
+					params: { document, action: deletion.id },
+				})
+				let restoreDeletion = yield* undoAction(deleteState, deleteReceipt)
+				yield* owner.api.documents.commit({
+					params: { document },
+					payload: restoreDeletion,
+				})
+				let recovered = yield* owner.api.documents.snapshot({
+					params: { document },
+					query: { encoding: "compact" },
+				})
+				expect(
+					(yield* restoreSnapshot(
+						recovered,
+						owner.subject + "-recovered-reader",
+					)).text(document),
+				).toBe(source)
 			}),
 		),
 	90000,

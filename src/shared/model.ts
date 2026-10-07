@@ -9,6 +9,8 @@ export interface Atom {
 	ending?: "eof"
 	migration?: true
 	deleted?: readonly string[]
+	emptyHeader?: true
+	body?: true
 }
 export interface Operation {
 	id: string
@@ -185,6 +187,8 @@ export let AtomSchema = Schema.Struct({
 	ending: Schema.optional(Schema.Literal("eof")),
 	migration: Schema.optional(Schema.Literal(true)),
 	deleted: Schema.optional(Schema.Array(Schema.String)),
+	emptyHeader: Schema.optional(Schema.Literal(true)),
+	body: Schema.optional(Schema.Literal(true)),
 })
 export let DeletionRunSchema = Schema.Struct({
 	id: Schema.String.check(Schema.isPattern(/:\d{8}$/)),
@@ -251,6 +255,8 @@ export function parseOperation(value: unknown): Operation {
 						...(atom.ending ? { ending: atom.ending } : {}),
 						...(atom.migration ? { migration: atom.migration } : {}),
 						...(atom.deleted ? { deleted: [...atom.deleted] } : {}),
+						...(atom.emptyHeader ? { emptyHeader: atom.emptyHeader } : {}),
+						...(atom.body ? { body: atom.body } : {}),
 					},
 				]
 			if (!/:\d{8}$/.test(id) || characters.length > 2_000_000)
@@ -270,6 +276,10 @@ export function parseOperation(value: unknown): Operation {
 				...(index === 0 && atom.ending ? { ending: atom.ending } : {}),
 				...(index === 0 && atom.migration ? { migration: atom.migration } : {}),
 				...(index === 0 && atom.deleted ? { deleted: [...atom.deleted] } : {}),
+				...(index === 0 && atom.body ? { body: atom.body } : {}),
+				...(index === 0 && atom.emptyHeader
+					? { emptyHeader: atom.emptyHeader }
+					: {}),
 			}))
 		}),
 		remove: expandDeletions(record.remove, 2_000_000),
@@ -350,6 +360,8 @@ export function compactAtoms(atoms: readonly Atom[]) {
 			!atom.ending &&
 			!atom.migration &&
 			!atom.deleted &&
+			!atom.emptyHeader &&
+			!atom.body &&
 			atom.id === expected &&
 			atom.after === last.id
 		)

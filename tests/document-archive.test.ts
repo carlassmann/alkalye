@@ -262,7 +262,7 @@ test("malformed archives fail as ArchiveInvalid before any document is planned",
 		[file("../escape.md", "a")],
 		[file("folder//a.md", "a")],
 		[{ name: "binary.md", data: new Uint8Array([0xff, 0xfe, 0xfd]) }],
-		[file("a.md", "x".repeat(200_001))],
+		[file("a.md", "x".repeat(2_000_001))],
 		[file("Doc/Doc.md", "a"), file("Doc/Doc.comments.json", "[1]")],
 		[
 			file("Doc/Doc.md", "![x](assets/x.png)"),

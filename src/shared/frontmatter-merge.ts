@@ -25,6 +25,8 @@ interface SourceEdit {
 	chain?: boolean
 	ending?: "eof"
 	deleted?: string[]
+	emptyHeader?: true
+	body?: true
 }
 export let SourceUndoSchema = Schema.fromJsonString(
 	Schema.Struct({
@@ -183,7 +185,8 @@ export function sourceAtoms(
 	for (let atom of raw.slice(position)) body.push(atom)
 	if (
 		!entries.length &&
-		headers.some(header => header.open[0]?.deleted?.length)
+		headers.some(header => header.open[0]?.deleted?.length) &&
+		!format?.open[0]?.emptyHeader
 	)
 		return body
 	let close = format?.close ?? last.close
@@ -211,9 +214,13 @@ export function sourceEdits(
 			return [
 				{
 					atoms: atoms.slice(previousHeader.end),
+					body: true,
 					next: next.slice(header.length),
 					remove: [],
-					anchor: previousHeader.close.at(-1)?.id ?? "",
+					anchor:
+						atoms[previousHeader.end]?.after ??
+						previousHeader.close.at(-1)?.id ??
+						"",
 				},
 			]
 	}
@@ -240,6 +247,7 @@ export function sourceEdits(
 				replace: true,
 				order: headerKeys(following),
 				ending: headerEnding(following),
+				...(following.entries.length === 0 ? { emptyHeader: true } : {}),
 			},
 			{
 				atoms,
@@ -272,9 +280,10 @@ export function sourceEdits(
 			{ atoms: [], next: prefix, remove: [], anchor: "", replace: true },
 			{
 				atoms: body,
+				body: true,
 				next: next.slice(prefix.length),
 				remove: [],
-				anchor: previous.close.at(-1)?.id,
+				anchor: atoms[previous.end]?.after ?? previous.close.at(-1)?.id,
 			},
 		]
 	}
@@ -282,12 +291,13 @@ export function sourceEdits(
 	let edits: SourceEdit[] = []
 	let body: SourceEdit = {
 		atoms: atoms.slice(previous.end),
+		body: true,
 		next: nextAtoms
 			.slice(following.end)
 			.map(atom => atom.value)
 			.join(""),
 		remove: [],
-		anchor: previous.close.at(-1)?.id ?? "",
+		anchor: atoms[previous.end]?.after ?? previous.close.at(-1)?.id ?? "",
 	}
 	if (
 		atoms
@@ -329,6 +339,7 @@ export function sourceEdits(
 				order: headerKeys(following),
 				observed: observedEntries(previous),
 				ending: headerEnding(following),
+				...(following.entries.length === 0 ? { emptyHeader: true } : {}),
 			},
 			body,
 		]
@@ -385,6 +396,7 @@ export function sourceEdits(
 			replace: true,
 			order: headerKeys(following),
 			ending: headerEnding(following),
+			...(following.entries.length === 0 ? { emptyHeader: true } : {}),
 		})
 	edits.push(body)
 	return edits
@@ -394,7 +406,9 @@ function sourceHeaders(atoms: Atom[]) {
 	if (
 		!atoms.some(
 			atom =>
-				atom.after === "" && (atom.value === "-" || atom.value === "\uFEFF"),
+				atom.after === "" &&
+				!atom.body &&
+				(atom.value === "-" || atom.value === "\uFEFF"),
 		)
 	)
 		return []
@@ -407,6 +421,7 @@ function sourceHeaders(atoms: Atom[]) {
 		if (
 			offset < (headers.at(-1)?.end ?? 0) ||
 			atom.after !== "" ||
+			atom.body ||
 			(atom.value !== "-" && atom.value !== "\uFEFF")
 		)
 			continue
