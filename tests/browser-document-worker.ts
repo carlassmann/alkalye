@@ -11,10 +11,29 @@ try {
 	let url = new URL("/app", new TextDecoder().decode(output.value).trim()).href
 	browser(session, "open", url)
 	wait(session, 'document.querySelector("#editor") !== null')
+	wait(
+		session,
+		'document.querySelector("alkalye-stats #stats")?.textContent.includes("words")',
+	)
 	evaluate(
 		session,
 		`(() => {
+		window.workerSchedulerChannels = [];
+		let NativeChannel = window.MessageChannel;
+		window.MessageChannel = class extends NativeChannel {
+			constructor() {
+				super();
+				let record = {first:false,second:false,turns:0};
+				this.port1.addEventListener("message", () => {record.turns++});
+				window.workerSchedulerChannels.push(record);
+				for (let [port, key] of [[this.port1,"first"],[this.port2,"second"]]) {
+					let close = port.close.bind(port);
+					port.close = () => {record[key] = true; close()};
+				}
+			}
+		};
 		window.workerTransfers = [];
+		window.workerTransferTurns = [];
 		window.workerTerminations = 0;
 		window.workerCreations = 0;
 		window.workerExits = 0;
@@ -27,6 +46,7 @@ try {
 			}
 			postMessage(message, ...rest) {
 				window.workerTransfers.push(JSON.stringify(message).length);
+				window.workerTransferTurns.push(window.workerSchedulerChannels.at(-1)?.turns ?? 0);
 				return super.postMessage(message, ...rest);
 			}
 			terminate() { window.workerTerminations++; return super.terminate(); }
@@ -68,6 +88,77 @@ try {
 	evaluate(
 		session,
 		`(() => {
+		window.workerSource = "One two.\\n".repeat(131072);
+		document.querySelector("#worker-proof").update(window.workerSource, "words");
+	})()`,
+	)
+	wait(
+		session,
+		'document.querySelector("#worker-proof #stats").textContent === "262144 words"',
+	)
+	for (let edit of ["append", "prepend"]) {
+		evaluate(
+			session,
+			`(() => {
+			window.workerTransfers = [];
+			window.workerScanTask = undefined;
+			window.workerTransferTurns = [];
+			window.workerSchedulerChannels.at(-1).turns = 0;
+			window.workerSource = ${JSON.stringify(edit)} === "append" ? window.workerSource + " Last word." : "First. " + window.workerSource;
+			document.querySelector("#worker-proof").update(window.workerSource, "words");
+			setTimeout(() => {window.workerScanTask = window.workerTransfers.length === 0}, 0);
+		})()`,
+		)
+		wait(session, "window.workerScanTask !== undefined")
+		assert(
+			evaluate(session, "window.workerScanTask"),
+			`A browser task runs during the large common ${edit === "append" ? "prefix" : "suffix"} scan`,
+		)
+		wait(
+			session,
+			`document.querySelector("#worker-proof #stats").textContent === "${edit === "append" ? "262146" : "262147"} words"`,
+		)
+		assert(
+			evaluate(
+				session,
+				"window.workerTransfers.length > 0 && Math.max(...window.workerTransfers) < 2000",
+			),
+			"Large-source edits still transfer compact replacements",
+		)
+		assert(
+			evaluate(session, "window.workerTransferTurns[0] >= 8"),
+			"The large diff crosses multiple scheduler turns before RPC submission",
+		)
+	}
+	evaluate(
+		session,
+		`(() => {
+		window.workerTransfers = [];
+		window.workerScanCancelled = undefined;
+		window.workerCancelledChannel = window.workerSchedulerChannels.at(-1);
+		let stats = document.querySelector("#worker-proof");
+		stats.update(window.workerSource + " Cancelled calculation.", "words");
+		setTimeout(() => {
+			window.workerScanCancelled = window.workerTransfers.length === 0;
+			stats.clear();
+			stats.update("Fresh counts.", "words");
+		}, 0);
+	})()`,
+	)
+	wait(
+		session,
+		'window.workerScanCancelled !== undefined && document.querySelector("#worker-proof #stats").textContent === "2 words"',
+	)
+	assert(
+		evaluate(
+			session,
+			"window.workerScanCancelled && window.workerTerminations > 0 && window.workerCancelledChannel.first && window.workerCancelledChannel.second",
+		),
+		"Clearing queued large-source work releases its worker and both scheduler ports",
+	)
+	evaluate(
+		session,
+		`(() => {
 		let stats = document.querySelector("#worker-proof");
 		for (let index = 0; index < 30; index++) stats.update("Item ".repeat(index + 1), "words");
 	})()`,
@@ -100,6 +191,10 @@ try {
 	)
 	evaluate(session, 'document.querySelector("#worker-proof").remove()')
 	wait(session, "window.workerTerminations > 0")
+	wait(
+		session,
+		"window.workerSchedulerChannels.length > 0 && window.workerSchedulerChannels.every(channel => channel.first && channel.second)",
+	)
 	assert(
 		true,
 		"Disconnecting closes the Effect scope and terminates the worker",

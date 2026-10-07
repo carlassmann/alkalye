@@ -11,6 +11,7 @@ import type { StatsUnit } from "../../shared/document-stats"
 import { setMarkup } from "../dom"
 import { html, joinMarkup, translate } from "../language"
 import { MenuElement } from "./menu"
+import { browserSchedulerLayer } from "../scheduler"
 
 export class StatsElement extends MenuElement {
 	private runtime: ManagedRuntime.ManagedRuntime<never, unknown> | undefined
@@ -95,7 +96,7 @@ export class StatsElement extends MenuElement {
 						),
 					)
 				}),
-			),
+			).pipe(Layer.provide(browserSchedulerLayer)),
 		)
 		this.runtime = runtime
 		runtime.runFork(Effect.void)
