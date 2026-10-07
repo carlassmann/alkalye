@@ -73,6 +73,7 @@ export class TextVisibility {
 	private activeCache = new Map<string, boolean>()
 	private legacyRemoved: Set<string>
 	private floor: number
+	private generation = 0
 	constructor(legacy: typeof LegacySchema.Type = { removed: [], clock: 0 }) {
 		let state = Schema.decodeUnknownSync(LegacySchema)(legacy)
 		this.legacyRemoved = new Set(state.removed)
@@ -109,9 +110,17 @@ export class TextVisibility {
 	validate(input: readonly VisibilityFact[]) {
 		this.prepare(input)
 	}
-	private prepare(input: readonly VisibilityFact[]) {
+	// Prepared facts can only publish once against the state they validated.
+	prepare(input: readonly VisibilityFact[]) {
+		let generation = this.generation
+		let committed = false
 		let commit = finishSteps(this.prepareSteps(input, false))
-		return () => finishSteps(commit)
+		return () => {
+			if (committed || generation !== this.generation)
+				throw new Error("Prepared visibility changes are stale")
+			committed = true
+			finishSteps(commit)
+		}
 	}
 	private *prepareSteps(
 		input: readonly VisibilityFact[],
@@ -159,6 +168,7 @@ export class TextVisibility {
 		let visibility = this
 		return commit()
 		function* commit(): Generator<void> {
+			visibility.generation++
 			for (let atom of legacyRemoved) {
 				visibility.legacyRemoved.add(atom)
 				if (cooperative && ++work % 512 === 0) yield
@@ -330,6 +340,7 @@ export class TextVisibility {
 			next.cancel(id, target)
 			if (cooperative && ++work % 128 === 0) yield
 		}
+		this.generation++
 		this.removals = next.removals
 		this.removers = next.removers
 		this.cancels = next.cancels

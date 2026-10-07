@@ -235,9 +235,10 @@ export class Replica {
 		let commits: (() => void)[] = []
 		for (let [target, changes] of facts) {
 			let visibility = this.visibility.get(target) ?? new TextVisibility()
-			visibility.validate(changes)
+			// Private visibility cannot change between synchronous preparation and publication.
+			let commit = visibility.prepare(changes)
 			commits.push(() => {
-				visibility.apply(changes)
+				commit()
 				this.visibility.set(target, visibility)
 			})
 		}

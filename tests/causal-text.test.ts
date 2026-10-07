@@ -769,3 +769,51 @@ test("operation and checkpoint runs preserve adjacent lone surrogate atom identi
 	expect(cold.visible("document")).toEqual(document.visible("document"))
 	expect(replica.text("document")).toBe("ab!")
 })
+
+test("prepared visibility owns its input and commits once without changing a fork", () => {
+	let visibility = new TextVisibility()
+	let id = "0000000000000002:writer"
+	let atom = "0000000000000001:writer:00000000"
+	let atoms: [string] = [atom]
+	let commit = visibility.prepare([{ kind: "remove", id, atoms }])
+	let fork = visibility.fork()
+	atoms[0] = "0000000000000001:writer:00000001"
+	commit()
+	expect(visibility.matchesRemoval(id, [atom])).toBe(true)
+	expect(fork.known(id)).toBe(false)
+	let before = visibility.checkpoint()
+	expect(commit).toThrow("stale")
+	expect(visibility.checkpoint()).toEqual(before)
+})
+
+test("stale prepared visibility rejects before publishing after apply or restore", () => {
+	let id = "0000000000000002:writer"
+	let atom = "0000000000000001:writer:00000000"
+	let other = "0000000000000001:writer:00000001"
+	for (let restore of [false, true]) {
+		let visibility = new TextVisibility()
+		let commit = visibility.prepare([{ kind: "remove", id, atoms: [atom] }])
+		if (restore) {
+			let peer = new TextVisibility()
+			peer.remove(id, [other])
+			visibility.restore(peer.checkpoint())
+		} else visibility.remove(id, [other])
+		let before = visibility.checkpoint()
+		expect(commit).toThrow("stale")
+		expect(visibility.checkpoint()).toEqual(before)
+		expect(visibility.matchesRemoval(id, [other])).toBe(true)
+	}
+})
+
+test("raising a visibility migration floor invalidates a prepared removal", () => {
+	let visibility = new TextVisibility()
+	let id = "0000000000000002:writer"
+	let atom = "0000000000000001:writer:00000000"
+	let commit = visibility.prepare([{ kind: "remove", id, atoms: [atom] }])
+	let migrated = new TextVisibility({ removed: [atom], clock: 2 })
+	visibility.restore(migrated.checkpoint())
+	let before = visibility.checkpoint()
+	expect(commit).toThrow("stale")
+	expect(visibility.checkpoint()).toEqual(before)
+	expect(visibility.known(id)).toBe(false)
+})
