@@ -28,8 +28,11 @@ export interface PreviewComments {
 
 interface PreviewState {
 	source: string
-	text: string
-	positions: number[]
+	content: HTMLElement
+	text?: string
+	positions?: number[]
+	nodes?: Text[]
+	offsets?: WeakMap<Node, number>
 	selection: { from: number; to: number } | undefined
 	revealed?: string
 }
@@ -56,17 +59,20 @@ export function renderPreview(
 	let content = slot
 	let state = states.get(host)
 	clearMarks(content)
-	let text = renderedText(content)
-	if (!state || state.source !== source || state.text !== text) {
+	if (!state || state.source !== source || state.content !== content) {
 		state = {
 			source,
-			text,
-			positions: alignPreview(source, text),
+			content,
 			selection: undefined,
+			revealed: state?.source === source ? state.revealed : undefined,
 		}
 		states.set(host, state)
 	}
+	state.nodes = undefined
+	state.offsets = undefined
 	markComments(content, state, comments)
+	state.nodes = undefined
+	state.offsets = undefined
 	updateHeader(host, comments)
 	let add = host
 		.closest("[data-preview].preview-screen")
@@ -86,7 +92,7 @@ export function renderPreview(
 		// preview text stays until the reader selects something else.
 		if (document.activeElement?.closest("dialog, input, textarea")) return
 		state.selection = comments?.commentable
-			? selectedText(root, content)
+			? selectedText(root, state)
 			: undefined
 		if (add) add.hidden = !state.selection
 	}
@@ -140,10 +146,10 @@ export function previewCommentSelection(
 	if (!state?.selection || state.source !== source) return
 	let range = sourceRange(
 		source,
-		state.text,
+		prepareText(state),
 		state.selection.from,
 		state.selection.to,
-		state.positions,
+		prepareAlignment(state),
 	)
 	if (!range) return
 	return selectionAnchor(
@@ -170,38 +176,62 @@ function textNodes(content: HTMLElement) {
 	for (let node = walker.nextNode(); node; node = walker.nextNode())
 		if (
 			node instanceof Text &&
-			(node.data.trim() || node.parentElement?.closest("pre, code"))
+			(node.data.trim() ||
+				node.parentElement?.closest("pre, code, mark.preview-comment-range") ||
+				(node.previousSibling instanceof Element &&
+					node.previousSibling.matches("mark.preview-comment-range")) ||
+				(node.nextSibling instanceof Element &&
+					node.nextSibling.matches("mark.preview-comment-range")))
 		)
 			nodes.push(node)
 	return nodes
 }
-function renderedText(content: HTMLElement) {
-	return textNodes(content)
-		.map(node => node.data)
-		.join("")
+function prepareText(state: PreviewState) {
+	if (state.nodes) return state.text ?? ""
+	let nodes = textNodes(state.content)
+	let offsets = new WeakMap<Node, number>()
+	let parts: string[] = []
+	let length = 0
+	for (let node of nodes) {
+		offsets.set(node, length)
+		parts.push(node.data)
+		length += node.data.length
+	}
+	let text = parts.join("")
+	if (state.text !== undefined && state.text !== text)
+		state.positions = undefined
+	state.text = text
+	state.nodes = nodes
+	state.offsets = offsets
+	return text
 }
-function textOffset(content: HTMLElement, container: Node, offset: number) {
+function prepareAlignment(state: PreviewState) {
+	let text = prepareText(state)
+	return (state.positions ??= alignPreview(state.source, text))
+}
+function textOffset(state: PreviewState, container: Node, offset: number) {
+	let found = state.offsets?.get(container)
+	if (found !== undefined) return found + offset
 	let boundary = document.createRange()
 	boundary.setStart(container, offset)
 	let seen = 0
-	for (let node of textNodes(content)) {
-		if (node === container) return seen + offset
+	for (let node of state.nodes ?? []) {
 		if (boundary.comparePoint(node, 0) > 0) return seen
 		seen += node.data.length
 	}
 	return seen
 }
-
-function selectedText(root: ShadowRoot, content: HTMLElement) {
+function selectedText(root: ShadowRoot, state: PreviewState) {
 	let selection = document.getSelection()
 	if (!selection?.rangeCount) return
 	let [range] = selection.getComposedRanges({ shadowRoots: [root] })
 	if (!range || range.collapsed) return
-	if (!content.contains(range.startContainer)) return
-	if (!content.contains(range.endContainer)) return
-	let from = textOffset(content, range.startContainer, range.startOffset)
-	let to = textOffset(content, range.endContainer, range.endOffset)
-	let text = renderedText(content).slice(from, to)
+	if (!state.content.contains(range.startContainer)) return
+	if (!state.content.contains(range.endContainer)) return
+	let rendered = prepareText(state)
+	let from = textOffset(state, range.startContainer, range.startOffset)
+	let to = textOffset(state, range.endContainer, range.endOffset)
+	let text = rendered.slice(from, to)
 	let leading = text.length - text.trimStart().length
 	let trailing = text.length - text.trimEnd().length
 	if (!text.trim()) return
@@ -225,7 +255,7 @@ function markComments(
 	for (let comment of comments.comments) {
 		if (!comment.range) continue
 		let range = renderedRange(
-			state.positions,
+			prepareAlignment(state),
 			comment.range.start,
 			comment.range.end,
 		)

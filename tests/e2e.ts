@@ -34,6 +34,7 @@ let fullSuite = [
 	"tests/browser-dialog.ts",
 	"tests/browser-toasts.ts",
 	"tests/browser-screen-parity.ts",
+	"tests/browser-preview.ts",
 	"tests/browser-presentation-state.ts",
 	"tests/browser-workspace-deletion.ts",
 	"tests/browser-mcp.ts",

@@ -18,8 +18,10 @@ export function alignPreview(source: string, rendered: string) {
 	let header = frontmatterBlock(source)
 	let cursor = header ? header[0].length : 0
 	let positions = new Array<number>(rendered.length).fill(-1)
+	let sourceText = source.replace(/\s/g, " ")
+	let renderedText = rendered.replace(/\s/g, " ")
 	for (let index = 0; index < rendered.length; index++) {
-		let found = find(source, rendered, index, cursor)
+		let found = find(sourceText, renderedText, index, cursor)
 		if (found < 0) continue
 		positions[index] = found
 		cursor = found + 1
@@ -30,31 +32,14 @@ export function alignPreview(source: string, rendered: string) {
 function find(source: string, rendered: string, index: number, from: number) {
 	let length = Math.min(run, rendered.length - index)
 	let limit = Math.min(source.length - length, from + reach)
-	for (let start = from; start <= limit; start++)
-		if (matches(source, start, rendered, index, length)) return start
-	// Text that is not in the source, like a resolved wiki link title, must not
-	// pull the alignment far ahead.
+	let found = source
+		.slice(from, limit + length)
+		.indexOf(rendered.slice(index, index + length))
+	if (found >= 0) return from + found
 	let near = Math.min(source.length - 1, from + 8)
 	for (let start = from; start <= near; start++)
-		if (same(source[start], rendered[index])) return start
+		if (source[start] === rendered[index]) return start
 	return -1
-}
-
-function matches(
-	source: string,
-	start: number,
-	rendered: string,
-	index: number,
-	length: number,
-) {
-	for (let offset = 0; offset < length; offset++)
-		if (!same(source[start + offset], rendered[index + offset])) return false
-	return true
-}
-
-function same(a: string | undefined, b: string | undefined) {
-	if (a === undefined || b === undefined) return false
-	return a === b || (/\s/.test(a) && /\s/.test(b))
 }
 
 export function sourceRange(
