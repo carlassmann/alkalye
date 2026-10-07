@@ -1,0 +1,655 @@
+{
+	"input": {
+		"taskMs": 39.038,
+		"leaf": [
+			{
+				"sampledMs": 5.293,
+				"generatedFunction": "j",
+				"source": "src/shared/text-index.ts",
+				"sourceLine": 36
+			},
+			{
+				"sampledMs": 3.483,
+				"generatedFunction": "Fl.ci.expected",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 2310
+			},
+			{
+				"sampledMs": 1.881,
+				"generatedFunction": "prepareReplacements",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 335
+			},
+			{
+				"sampledMs": 1.489,
+				"generatedFunction": "rn",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 1567
+			},
+			{
+				"sampledMs": 1.319,
+				"generatedFunction": "Gr",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 1541
+			},
+			{
+				"sampledMs": 1.21,
+				"generatedFunction": "replace",
+				"source": "src/shared/document-session.ts",
+				"sourceLine": 544
+			},
+			{
+				"sampledMs": 1.177,
+				"generatedFunction": "(program)"
+			},
+			{
+				"sampledMs": 1.074,
+				"generatedFunction": "Ke",
+				"source": "src/shared/text-visibility.ts",
+				"sourceLine": 389
+			},
+			{
+				"sampledMs": 0.991,
+				"generatedFunction": "(garbage collector)"
+			},
+			{
+				"sampledMs": 0.926,
+				"generatedFunction": "indexAtom",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 1462
+			},
+			{
+				"sampledMs": 0.92,
+				"generatedFunction": "je",
+				"source": "src/shared/model.ts",
+				"sourceLine": 395
+			},
+			{
+				"sampledMs": 0.918,
+				"generatedFunction": "paint",
+				"source": "src/client/editor-viewport.ts",
+				"sourceLine": 828
+			},
+			{
+				"sampledMs": 0.913,
+				"generatedFunction": "getBoundingClientRect"
+			},
+			{
+				"sampledMs": 0.893,
+				"generatedFunction": "onItem",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 1268
+			},
+			{
+				"sampledMs": 0.77,
+				"generatedFunction": "d",
+				"source": "node_modules/effect/dist/internal/schema/interpreter.js",
+				"sourceLine": 87
+			},
+			{
+				"sampledMs": 0.763,
+				"generatedFunction": "s",
+				"source": "src/shared/text-visibility.ts",
+				"sourceLine": 161
+			},
+			{
+				"sampledMs": 0.748,
+				"generatedFunction": "pe",
+				"source": "node_modules/effect/dist/Chunk.js",
+				"sourceLine": 110
+			},
+			{
+				"sampledMs": 0.612,
+				"generatedFunction": "",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 1581
+			},
+			{
+				"sampledMs": 0.611,
+				"generatedFunction": "Ze",
+				"source": "src/shared/model.ts",
+				"sourceLine": 232
+			},
+			{
+				"sampledMs": 0.565,
+				"generatedFunction": "je",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 1495
+			},
+			{
+				"sampledMs": 0.472,
+				"generatedFunction": "t",
+				"source": "src/shared/atom-sequence.ts",
+				"sourceLine": 34
+			},
+			{
+				"sampledMs": 0.469,
+				"generatedFunction": "get",
+				"source": "src/shared/atom-sequence.ts",
+				"sourceLine": 80
+			},
+			{
+				"sampledMs": 0.463,
+				"generatedFunction": "validateIdentities",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 1392
+			},
+			{
+				"sampledMs": 0.459,
+				"generatedFunction": "p",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 1180
+			},
+			{
+				"sampledMs": 0.456,
+				"generatedFunction": "ti",
+				"source": "src/client/components/editor.ts",
+				"sourceLine": 2109
+			}
+		],
+		"inclusive": [
+			{
+				"sampledMs": 38.957,
+				"generatedFunction": "(root)"
+			},
+			{
+				"sampledMs": 36.745,
+				"generatedFunction": "ti",
+				"source": "src/client/components/editor.ts",
+				"sourceLine": 2109
+			},
+			{
+				"sampledMs": 27.75,
+				"generatedFunction": "Mi.s.oninput",
+				"source": "src/client/components/editor.ts",
+				"sourceLine": 257
+			},
+			{
+				"sampledMs": 27.75,
+				"generatedFunction": "dispatchEvent"
+			},
+			{
+				"sampledMs": 27.75,
+				"generatedFunction": "dispatchEvent",
+				"source": "src/client/source-textarea.ts",
+				"sourceLine": 101
+			},
+			{
+				"sampledMs": 25.656,
+				"generatedFunction": "change",
+				"source": "src/client/document-app.ts",
+				"sourceLine": 1885
+			},
+			{
+				"sampledMs": 25.536,
+				"generatedFunction": "replace",
+				"source": "src/shared/document-session.ts",
+				"sourceLine": 544
+			},
+			{
+				"sampledMs": 18.07,
+				"generatedFunction": "Me",
+				"source": "src/shared/document-session.ts",
+				"sourceLine": 460
+			},
+			{
+				"sampledMs": 15.176,
+				"generatedFunction": "apply",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 151
+			},
+			{
+				"sampledMs": 8.774,
+				"generatedFunction": "",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 157
+			},
+			{
+				"sampledMs": 8.642,
+				"generatedFunction": "",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 1581
+			},
+			{
+				"sampledMs": 8.385,
+				"generatedFunction": "apply",
+				"source": "src/client/source-textarea.ts",
+				"sourceLine": 273
+			},
+			{
+				"sampledMs": 8.385,
+				"generatedFunction": "render",
+				"source": "src/client/source-textarea.ts",
+				"sourceLine": 227
+			},
+			{
+				"sampledMs": 8.385,
+				"generatedFunction": "replace",
+				"source": "src/client/source-textarea.ts",
+				"sourceLine": 140
+			},
+			{
+				"sampledMs": 8.385,
+				"generatedFunction": "source.replace"
+			},
+			{
+				"sampledMs": 8.08,
+				"generatedFunction": "D",
+				"source": "src/shared/collection-copy.ts",
+				"sourceLine": 35
+			},
+			{
+				"sampledMs": 7.712,
+				"generatedFunction": "",
+				"source": "node_modules/effect/dist/Function.js",
+				"sourceLine": 76
+			},
+			{
+				"sampledMs": 7.673,
+				"generatedFunction": "p",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 1180
+			},
+			{
+				"sampledMs": 7.673,
+				"generatedFunction": "",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 1208
+			},
+			{
+				"sampledMs": 7.406,
+				"generatedFunction": "d",
+				"source": "node_modules/effect/dist/internal/schema/interpreter.js",
+				"sourceLine": 87
+			},
+			{
+				"sampledMs": 6.979,
+				"generatedFunction": "",
+				"source": "node_modules/effect/dist/SchemaParser.js",
+				"sourceLine": 829
+			},
+			{
+				"sampledMs": 6.913,
+				"generatedFunction": "onItem",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 1268
+			},
+			{
+				"sampledMs": 6.402,
+				"generatedFunction": "prepareApplication",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 154
+			},
+			{
+				"sampledMs": 6.256,
+				"generatedFunction": "prepareReplacements",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 335
+			},
+			{
+				"sampledMs": 6.252,
+				"generatedFunction": "prepare",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 214
+			}
+		],
+		"directChildren": [
+			{
+				"name": "RunTask",
+				"ms": 39.038
+			},
+			{
+				"name": "ThreadControllerImpl::RunTask",
+				"ms": 39.028
+			},
+			{
+				"name": "EventDispatch",
+				"ms": 38.84
+			},
+			{
+				"name": "v8.callFunction",
+				"ms": 38.529
+			},
+			{
+				"name": "FunctionCall",
+				"ms": 38.521
+			},
+			{
+				"name": "EventDispatch",
+				"ms": 29.52
+			},
+			{
+				"name": "v8.callFunction",
+				"ms": 29.504
+			}
+		]
+	},
+	"deferred": {
+		"taskMs": 65.484,
+		"leaf": [
+			{
+				"sampledMs": 15.422,
+				"generatedFunction": "Fl.ci.expected",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 2310
+			},
+			{
+				"sampledMs": 4.864,
+				"generatedFunction": "Ze",
+				"source": "src/shared/model.ts",
+				"sourceLine": 232
+			},
+			{
+				"sampledMs": 4.453,
+				"generatedFunction": "onItem",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 1268
+			},
+			{
+				"sampledMs": 4.405,
+				"generatedFunction": "Ke",
+				"source": "src/shared/text-visibility.ts",
+				"sourceLine": 389
+			},
+			{
+				"sampledMs": 3.911,
+				"generatedFunction": "",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 1581
+			},
+			{
+				"sampledMs": 3.042,
+				"generatedFunction": "validateIdentities",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 1392
+			},
+			{
+				"sampledMs": 2.908,
+				"generatedFunction": "matchesRemoval",
+				"source": "src/shared/text-visibility.ts",
+				"sourceLine": 187
+			},
+			{
+				"sampledMs": 2.291,
+				"generatedFunction": "je",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 1495
+			},
+			{
+				"sampledMs": 2.144,
+				"generatedFunction": "atomTarget",
+				"source": "src/shared/document-session.ts",
+				"sourceLine": 1773
+			},
+			{
+				"sampledMs": 1.978,
+				"generatedFunction": "Pe",
+				"source": "src/shared/model.ts",
+				"sourceLine": 413
+			},
+			{
+				"sampledMs": 1.691,
+				"generatedFunction": "(program)"
+			},
+			{
+				"sampledMs": 1.528,
+				"generatedFunction": "",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 2009
+			},
+			{
+				"sampledMs": 1.52,
+				"generatedFunction": "",
+				"source": "src/shared/model.ts",
+				"sourceLine": 179
+			},
+			{
+				"sampledMs": 1.387,
+				"generatedFunction": "indexAtom",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 1462
+			},
+			{
+				"sampledMs": 1.214,
+				"generatedFunction": "atomTarget",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 1029
+			},
+			{
+				"sampledMs": 1.072,
+				"generatedFunction": "m",
+				"source": "src/shared/text-dependencies.ts",
+				"sourceLine": 75
+			},
+			{
+				"sampledMs": 1.071,
+				"generatedFunction": "prepare",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 214
+			},
+			{
+				"sampledMs": 0.81,
+				"generatedFunction": "(garbage collector)"
+			},
+			{
+				"sampledMs": 0.777,
+				"generatedFunction": "d",
+				"source": "node_modules/effect/dist/internal/schema/interpreter.js",
+				"sourceLine": 87
+			},
+			{
+				"sampledMs": 0.769,
+				"generatedFunction": "o",
+				"source": "node_modules/effect/dist/internal/effect.js",
+				"sourceLine": 2214
+			},
+			{
+				"sampledMs": 0.762,
+				"generatedFunction": "Ue",
+				"source": "src/shared/model.ts",
+				"sourceLine": 443
+			},
+			{
+				"sampledMs": 0.762,
+				"generatedFunction": "s",
+				"source": "src/shared/text-visibility.ts",
+				"sourceLine": 161
+			},
+			{
+				"sampledMs": 0.719,
+				"generatedFunction": "p",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 1180
+			},
+			{
+				"sampledMs": 0.623,
+				"generatedFunction": "",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 1484
+			},
+			{
+				"sampledMs": 0.457,
+				"generatedFunction": "",
+				"source": "src/shared/model.ts",
+				"sourceLine": 243
+			}
+		],
+		"inclusive": [
+			{
+				"sampledMs": 65.572,
+				"generatedFunction": "(root)"
+			},
+			{
+				"sampledMs": 62.918,
+				"generatedFunction": "runLoop",
+				"source": "node_modules/effect/dist/internal/effect.js",
+				"sourceLine": 441
+			},
+			{
+				"sampledMs": 62.918,
+				"generatedFunction": "evaluate",
+				"source": "node_modules/effect/dist/internal/effect.js",
+				"sourceLine": 406
+			},
+			{
+				"sampledMs": 62.918,
+				"generatedFunction": "",
+				"source": "node_modules/effect/dist/internal/effect.js",
+				"sourceLine": 812
+			},
+			{
+				"sampledMs": 62.918,
+				"generatedFunction": "s.oncomplete",
+				"source": "src/platform/indexeddb-journal.ts",
+				"sourceLine": 585
+			},
+			{
+				"sampledMs": 52.604,
+				"generatedFunction": "",
+				"source": "node_modules/effect/dist/internal/effect.js",
+				"sourceLine": 766
+			},
+			{
+				"sampledMs": 52.604,
+				"generatedFunction": "mt",
+				"source": "node_modules/effect/dist/internal/effect.js",
+				"sourceLine": 717
+			},
+			{
+				"sampledMs": 37.761,
+				"generatedFunction": "prepare",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 214
+			},
+			{
+				"sampledMs": 36.786,
+				"generatedFunction": "",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 1581
+			},
+			{
+				"sampledMs": 32.234,
+				"generatedFunction": "",
+				"source": "node_modules/effect/dist/SchemaParser.js",
+				"sourceLine": 829
+			},
+			{
+				"sampledMs": 31.604,
+				"generatedFunction": "p",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 1180
+			},
+			{
+				"sampledMs": 31.604,
+				"generatedFunction": "",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 1208
+			},
+			{
+				"sampledMs": 30.424,
+				"generatedFunction": "o",
+				"source": "node_modules/effect/dist/internal/effect.js",
+				"sourceLine": 2214
+			},
+			{
+				"sampledMs": 29.532,
+				"generatedFunction": "",
+				"source": "node_modules/effect/dist/Schema.js",
+				"sourceLine": 942
+			},
+			{
+				"sampledMs": 29.355,
+				"generatedFunction": "onItem",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 1268
+			},
+			{
+				"sampledMs": 29.082,
+				"generatedFunction": "applyTogether",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 145
+			},
+			{
+				"sampledMs": 29.082,
+				"generatedFunction": "try",
+				"source": "src/shared/document-session.ts",
+				"sourceLine": 2011
+			},
+			{
+				"sampledMs": 25.883,
+				"generatedFunction": "D",
+				"source": "src/shared/collection-copy.ts",
+				"sourceLine": 35
+			},
+			{
+				"sampledMs": 25.121,
+				"generatedFunction": "prepareSteps",
+				"source": "src/shared/text-visibility.ts",
+				"sourceLine": 116
+			},
+			{
+				"sampledMs": 25.121,
+				"generatedFunction": "prepare",
+				"source": "src/shared/text-visibility.ts",
+				"sourceLine": 112
+			},
+			{
+				"sampledMs": 23.351,
+				"generatedFunction": "",
+				"source": "node_modules/effect/dist/SchemaAST.js",
+				"sourceLine": 2009
+			},
+			{
+				"sampledMs": 20.729,
+				"generatedFunction": "d",
+				"source": "node_modules/effect/dist/internal/schema/interpreter.js",
+				"sourceLine": 87
+			},
+			{
+				"sampledMs": 20.412,
+				"generatedFunction": "Ui",
+				"source": "src/shared/text-visibility.ts",
+				"sourceLine": 373
+			},
+			{
+				"sampledMs": 19.09,
+				"generatedFunction": "validate",
+				"source": "src/shared/crdt.ts",
+				"sourceLine": 211
+			},
+			{
+				"sampledMs": 19.09,
+				"generatedFunction": "try",
+				"source": "src/shared/document-session.ts",
+				"sourceLine": 1999
+			}
+		],
+		"directChildren": [
+			{
+				"name": "RunTask",
+				"ms": 65.484
+			},
+			{
+				"name": "ThreadControllerImpl::RunTask",
+				"ms": 65.47
+			},
+			{
+				"name": "SimpleWatcher::OnHandleReady",
+				"ms": 65.466
+			},
+			{
+				"name": "Receive mojo message",
+				"ms": 65.463
+			},
+			{
+				"name": "v8.callFunction",
+				"ms": 65.455
+			},
+			{
+				"name": "FunctionCall",
+				"ms": 65.451
+			}
+		]
+	},
+	"method": "One separate V8 CPU attribution pass after app readiness and two empty frames; profiler timings are not matched latency results. Inclusive sample weights overlap and must not be added. Parent links from streaming ProfileChunk nodes; source maps from exact frozen candidate."
+}

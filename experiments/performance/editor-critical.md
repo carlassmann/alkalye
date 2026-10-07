@@ -18,6 +18,12 @@ A separate CPU profile of the original implementation attributed the longest tas
 
 The next experiment should slice pure preparation while keeping publication synchronous and atomic. Generation checks must reject concurrent mutations and interruption must leave every replica unchanged. The remaining 30 ms native input task needs its own profile; this change does not solve it.
 
+## The synchronous input cost
+
+A separate V8 attribution pass after the batch change found a 39 ms instrumented input task. `DocumentSession.replace` accounted for 25.5 ms of inclusive samples: preparing the precise edit, decoding `DocumentActionSchema`, then applying the optimistic replica synchronously. `Replica.apply` accounted for 15.2 ms within that path. Editor projection/render accounted for 8.4 ms, with 5.3 ms sampled in `TextIndex.summary`, which allocates `Array.from(text)` to count code points. These nested inclusive figures must not be added.
+
+The worst deferred task in that profile still resumed from IndexedDB completion into Effect and replica/schema preparation. Prepared visibility facts could avoid another repeated validation pass; pure cooperative preparation remains a subsequent experiment. The synchronous optimistic edit path requires separate work. Profile samples and mapped source locations: `editor-input-attribution.json`. Profile overhead means its 39/65 ms task durations are attribution evidence, not replacements for the matched timings above.
+
 ## Method and provenance
 
 Before: `1bbe9dae675e72f73027559e65b23faae0b049ca`. Candidate: exactly that source plus the batch application change committed in `bd54e62`; unrelated cache warm-up and mobile changes were excluded. Both ran the same frozen baseline server. Browser entry SHA-256 and loaded script byte counts were verified; hashes are in the raw results.
