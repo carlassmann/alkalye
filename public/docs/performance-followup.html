@@ -50,6 +50,129 @@
 			compare rewrite revisions or implementation paths; main was not rerun
 			here.
 		</p>
+		<h2>8 October: mobile taps and cached switching</h2>
+		<p>
+			Mobile pointer handling was expanding and aligning a document that was
+			already fully rendered. It mixed estimated block positions with measured
+			text geometry, moving the page after a tap. The handler now preserves the
+			existing native input and drag lifecycle in that case.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Measured operation</th>
+					<th>Before</th>
+					<th>After</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Mobile pointer handler, three taps</td>
+					<td>13.4–14ms</td>
+					<td>0.1ms</td>
+				</tr>
+				<tr>
+					<td>Unwanted scroll movement after tapping</td>
+					<td>36–69px</td>
+					<td>0px</td>
+				</tr>
+				<tr>
+					<td>Cached 128KiB switch, median</td>
+					<td>81.6ms</td>
+					<td>70.4ms</td>
+				</tr>
+				<tr>
+					<td>Cached 1MiB switch, median</td>
+					<td>749.2ms</td>
+					<td>459.7ms</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+			The mobile run used actual coarse-pointer emulation at 393px with a 128KiB
+			document, frozen assets and exact saved-content checks. Typing remained
+			roughly 16–24ms; the first frame opportunity after tapping also remained
+			much slower than the pointer handler. Commit
+			<code>74bd83e</code> fixes the tap bug, not the whole mobile frame budget.
+		</p>
+		<p>
+			Cached switching compares frozen <code>1bbe9da</code> with only the
+			accepted-source warm-up in <code>10b9ab7</code>. A background snapshot now
+			materializes accepted text before publishing the passive cache. Pending
+			local edits remain separate. Public integration checks cover overlapping
+			sessions, interrupted saving, retry and accepted versus pending content.
+		</p>
+		<p>
+			Three ordered browser trials per size and version used CPU tracing. Each
+			trial accepted an edit and undo, then waited for the actual stored
+			snapshot cursor before switching. A trial overlapping another test was
+			discarded. These small samples show a useful improvement, not statistical
+			certainty. Native Map cloning was also rejected: copying 1,048,576 entries
+			took roughly 43ms in one task, with almost no total-time gain over
+			cooperative copying.
+		</p>
+		<p>
+			A paired 1MiB CPU trace confirms that source and visibility traversal
+			disappear from switching after warm-up. Map-copy samples remain roughly
+			294–299ms. The largest main-thread task was 10.5ms before and 11.4ms
+			after; faster readiness does not establish an 8.33ms frame budget.
+		</p>
+		<h2>8 October: prepare collaborative batches once</h2>
+		<p>
+			A delayed IndexedDB callback resumed CRDT validation and application. The
+			old path prepared each replica during validation, then prepared it again
+			during application. The new batch operation prepares every replica once
+			and commits only after all preparations succeed. Public contracts cover a
+			conflict in the last replica, duplicate participants, concurrent text and
+			frontmatter, replay, causal undo and independent fork histories.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>1MiB document, 2,048 replacements</th>
+					<th>Before</th>
+					<th>After</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Deferred largest task, median</td>
+					<td>74.768ms</td>
+					<td>57.041ms</td>
+				</tr>
+				<tr>
+					<td>Deferred largest task, maximum</td>
+					<td>80.666ms</td>
+					<td>58.351ms</td>
+				</tr>
+				<tr>
+					<td>Replacement input task, median</td>
+					<td>29.540ms</td>
+					<td>30.073ms</td>
+				</tr>
+				<tr>
+					<td>Select-all shortcut task, maximum</td>
+					<td>1.453ms</td>
+					<td>1.414ms</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+			Five trials per version restored the same disposable SQLite backend and
+			cloned browser profile, with service-worker and browser caches cleared.
+			Loaded entry hashes and sizes were verified. Browser assets compare
+			<code>1bbe9da</code> with only the batch change in <code>bd54e62</code>;
+			the server stayed on the baseline. Every trial passed exact replacement,
+			durable-save and undo checks.
+		</p>
+		<p>
+			Input tasks enclose the trusted replacement event; deferred maxima cover
+			the following three seconds. Nested task times are not added. Select-all
+			starts on the actual L key. Earlier selection samples started on the
+			modifier key and were discarded. The input and deferred tasks still exceed
+			8.33ms; cooperative pure preparation and the synchronous editor
+			replacement path remain work to do.
+		</p>
 		<h2>Body edits remain incremental after metadata changes</h2>
 		<p>
 			Merged frontmatter can leave raw and canonical atom arrays with different
