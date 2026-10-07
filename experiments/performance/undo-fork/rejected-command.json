@@ -1,0 +1,128 @@
+{
+	"decision": "rejected, no production adoption",
+	"method": "Owned normalized operations through concrete bounded Effect Schema issuer. Private single-use token transfers defensive normalized facts to Replica. Plain action shape and untrusted decoding remain unchanged. n=5 per phase alternating phase order; warm independent forks; exact source and undo checks. Module-only, no DOM/queue/persistence.",
+	"contracts": "61 pass, 362 assertions. Opus source review found no remaining blocker. Final test-only type narrowing corrected; prototype not adopted.",
+	"reason": "Final medians regressed: 128 KiB 11.52 to 12.00 ms; 1 MiB 12.62 to 13.14 ms. Six-source-file capability complexity lacked reproduced gain. Earlier approximately 0.6 ms advantage was not reproduced.",
+	"samples": [
+		{
+			"characters": 131072,
+			"trial": 0,
+			"phase": "before",
+			"duration": 18.97508300000004
+		},
+		{
+			"characters": 131072,
+			"trial": 0,
+			"phase": "after",
+			"duration": 15.01362499999999
+		},
+		{
+			"characters": 131072,
+			"trial": 1,
+			"phase": "after",
+			"duration": 12.000291000000004
+		},
+		{
+			"characters": 131072,
+			"trial": 1,
+			"phase": "before",
+			"duration": 12.620042000000012
+		},
+		{
+			"characters": 131072,
+			"trial": 2,
+			"phase": "before",
+			"duration": 11.515582999999992
+		},
+		{
+			"characters": 131072,
+			"trial": 2,
+			"phase": "after",
+			"duration": 11.726334000000008
+		},
+		{
+			"characters": 131072,
+			"trial": 3,
+			"phase": "after",
+			"duration": 10.761417000000051
+		},
+		{
+			"characters": 131072,
+			"trial": 3,
+			"phase": "before",
+			"duration": 11.334208999999987
+		},
+		{
+			"characters": 131072,
+			"trial": 4,
+			"phase": "before",
+			"duration": 10.957917000000066
+		},
+		{
+			"characters": 131072,
+			"trial": 4,
+			"phase": "after",
+			"duration": 12.350416999999993
+		},
+		{
+			"characters": 1048576,
+			"trial": 0,
+			"phase": "before",
+			"duration": 12.94904200000019
+		},
+		{
+			"characters": 1048576,
+			"trial": 0,
+			"phase": "after",
+			"duration": 13.639958000000206
+		},
+		{
+			"characters": 1048576,
+			"trial": 1,
+			"phase": "after",
+			"duration": 13.797625000000153
+		},
+		{
+			"characters": 1048576,
+			"trial": 1,
+			"phase": "before",
+			"duration": 12.862208999999893
+		},
+		{
+			"characters": 1048576,
+			"trial": 2,
+			"phase": "before",
+			"duration": 12.533791000000747
+		},
+		{
+			"characters": 1048576,
+			"trial": 2,
+			"phase": "after",
+			"duration": 13.136625000000095
+		},
+		{
+			"characters": 1048576,
+			"trial": 3,
+			"phase": "after",
+			"duration": 12.5346669999999
+		},
+		{
+			"characters": 1048576,
+			"trial": 3,
+			"phase": "before",
+			"duration": 12.599250000000211
+		},
+		{
+			"characters": 1048576,
+			"trial": 4,
+			"phase": "before",
+			"duration": 12.622459000000163
+		},
+		{
+			"characters": 1048576,
+			"trial": 4,
+			"phase": "after",
+			"duration": 12.945958000000246
+		}
+	]
+}
