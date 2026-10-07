@@ -345,6 +345,16 @@ function mountApplication() {
 		let documentLinkCatalogue = library.state.current().library.documents
 		let documentLinkKey = ""
 		let documentLinkValues: DocumentLink[] = []
+		let documentRecord:
+			| {
+					selection: Selection
+					version: number
+					workspace: string
+					value: DocumentRecord | undefined
+			  }
+			| undefined
+		let presentationSource: string | undefined
+		let presentationMode = false
 		dialog.addEventListener(
 			"close",
 			() => {
@@ -943,7 +953,12 @@ function mountApplication() {
 		}
 		function presenting() {
 			let doc = currentDocument()
-			return Boolean(doc && frontmatter(doc.content).values.mode === "present")
+			if (!doc) return false
+			if (presentationSource !== doc.content) {
+				presentationSource = doc.content
+				presentationMode = frontmatter(doc.content).values.mode === "present"
+			}
+			return presentationMode
 		}
 		// Mode changes are history entries, so Back leaves a slideshow.
 		function changeMode(next: Mode, replace = false) {
@@ -1456,15 +1471,32 @@ function mountApplication() {
 		}
 		function currentDocument(): DocumentRecord | undefined {
 			let current = selection
+			if (!current) {
+				documentRecord = undefined
+				return undefined
+			}
 			let workspace =
 				library.state
 					.current()
 					.library.documents.find(doc => doc.document === current?.document)
 					?.workspace ?? ""
-			// A document in the trash still opens, read-only, so it can be restored.
-			return current?.opened.session.replica
-				.documents(workspace, true)
-				.find(doc => doc.id === current.document)
+			let version = current.opened.session.version()
+			if (
+				documentRecord?.selection !== current ||
+				documentRecord.version !== version ||
+				documentRecord.workspace !== workspace
+			) {
+				// Trash stays readable so its owner can restore it.
+				documentRecord = {
+					selection: current,
+					version,
+					workspace,
+					value: current.opened.session.replica
+						.documents(workspace, true)
+						.find(doc => doc.id === current.document),
+				}
+			}
+			return documentRecord.value
 		}
 		function documentLinks(): DocumentLink[] {
 			let catalogue = library.state.current().library.documents

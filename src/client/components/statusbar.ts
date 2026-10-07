@@ -25,7 +25,9 @@ export class StatsElement extends MenuElement {
 	private pending: StatsUnit | undefined
 	private available = false
 	private requested = false
+	private displayKey = ""
 	connectedCallback() {
+		this.displayKey = ""
 		this.dataset.stats = ""
 		setMarkup(
 			this,
@@ -137,6 +139,18 @@ export class StatsElement extends MenuElement {
 		this.paint()
 	}
 	private paint() {
+		let key = [
+			this.available,
+			this.unit,
+			this.counts.words,
+			this.counts.sentences,
+			this.counts.tasks,
+			this.counts.completedTasks,
+			translate("Document statistics"),
+			...statsUnits.map(unit => translate(unit)),
+		].join("|")
+		if (key === this.displayKey) return
+		this.displayKey = key
 		this.hidden = this.unit === "hidden" || !this.available
 		let label = this.querySelector("#stats")
 		if (label) {

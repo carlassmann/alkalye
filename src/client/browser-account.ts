@@ -253,7 +253,10 @@ function makeBrowserAccount(server: string) {
 		}
 		function checkProfile(allowSignedOut = false) {
 			return Effect.gen(function* () {
-				if ((yield* storage.get("recovery")) !== stored) {
+				let profile = yield* storage.getMany(["recovery", signedOutKey])
+				let recovery = profile.get("recovery")
+				let signedOut = profile.get(signedOutKey)
+				if (recovery !== stored) {
 					yield* publish({ status: "accountChanged" })
 					return yield* Effect.fail(
 						new AccountChanged({
@@ -261,7 +264,6 @@ function makeBrowserAccount(server: string) {
 						}),
 					)
 				}
-				let signedOut = yield* storage.get(signedOutKey)
 				if (!allowSignedOut && signedOut) {
 					yield* publish({ status: "signedOut" })
 					return yield* Effect.fail(
