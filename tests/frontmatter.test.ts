@@ -8,6 +8,7 @@ import {
 } from "../src/shared/document-metadata"
 import { frontmatter, withFrontmatter } from "../src/shared/markdown"
 import { compactOperation, parseOperation } from "../src/shared/model"
+import type { Atom } from "../src/shared/model"
 import { parseCheckpoint } from "../src/shared/checkpoint"
 import {
 	commentRange,
@@ -935,4 +936,74 @@ test("body edits promote a header revealed by another writer deleting its prefix
 		changeMetadata(first, "document", { title: "Promoted" })
 		expect(first.metadata("document").title).toBe("Promoted")
 	}
+})
+
+test("bulk reads preserve immutable replica views through incremental edits and concurrent metadata", () => {
+	let first = new Replica("reader-contract")
+	let source =
+		"---\ntitle: Initial\n---\n" + "A body with 👋 text.\n".repeat(200)
+	first.edit("document", source)
+	let view = first.visible("document")
+	let values = Array.from(view)
+	for (let [start, end] of [
+		[undefined, undefined],
+		[1, undefined],
+		[-2, undefined],
+		[-0.5, undefined],
+		[0.5, 2.9],
+		[NaN, undefined],
+		[Infinity, undefined],
+		[-Infinity, Infinity],
+		[1, -1],
+		[undefined, 2],
+	]) {
+		let sliced = view.slice(start, end)
+		expect(sliced).toEqual(values.slice(start, end))
+		expect(Object.getPrototypeOf(sliced)).toBe(Array.prototype)
+	}
+	let copy = view.slice()
+	copy.pop()
+	expect(view.length).toBe(values.length)
+	expect(view.slice()).not.toBe(copy)
+	expect(view.slice.call(copy, 1)).toEqual(copy.slice(1))
+	let context = { calls: 0, valid: true }
+	function value(
+		this: typeof context,
+		atom: Atom,
+		index: number,
+		atoms: Atom[],
+	) {
+		this.valid &&= atoms === view && atom === values[index]
+		this.calls++
+		return atom.value
+	}
+	expect(view.map(value, context).join("")).toBe(source)
+	expect(context.calls).toBe(view.length)
+	expect(
+		view.some(function (this: typeof context, atom, index, atoms) {
+			this.valid &&=
+				this === context && atoms === view && atom === values[index]
+			return atom.value === "👋"
+		}, context),
+	).toBe(true)
+	expect(context.valid).toBe(true)
+	expect(Array.from(view.entries())).toEqual(Array.from(values.entries()))
+	expect(Reflect.set(view, "0", values.at(-1))).toBe(false)
+	expect(view[0]).toBe(values[0])
+	let second = first.fork("concurrent-metadata")
+	let edit = first.prepareEdit("document", source + "Appended")
+	if (!edit) throw Error("Missing prepared body edit")
+	first.apply([parseOperation(compactOperation(edit))])
+	changeMetadata(second, "document", { title: "Concurrent" })
+	first.apply([...second.operations.values()])
+	second.apply([...first.operations.values()])
+	let current = first.visible("document")
+	expect(current.map(atom => atom.value).join("")).toBe(second.text("document"))
+	expect(first.text("document")).toEndWith("Appended")
+	expect(first.metadata("document").title).toBe("Concurrent")
+	expect(view.map(atom => atom.value).join("")).toBe(source)
+	expect(view.slice()).toEqual(values)
+	let restored = new Replica("restored")
+	restored.restore(parseCheckpoint(first.checkpoint()))
+	expect(restored.text("document")).toBe(first.text("document"))
 })

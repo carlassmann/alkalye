@@ -38,10 +38,52 @@ function atomView(sequence: Chunk.Chunk<Atom>): Atom[] {
 		return Number.isSafeInteger(value) ? value : undefined
 	}
 	let target: Atom[] = []
+	let nativeSlice = target.slice
+	let nativeMap = target.map
+	let nativeEntries = target.entries
+	let nativeSome = target.some
+	function slice(this: Atom[], start?: number, end?: number) {
+		return nativeSlice.call(
+			this === view ? Chunk.toReadonlyArray(sequence) : this,
+			start,
+			end,
+		)
+	}
+	function map<A>(
+		this: Atom[],
+		callback: (atom: Atom, position: number, atoms: Atom[]) => A,
+		thisArg?: unknown,
+	) {
+		if (this !== view || typeof callback !== "function")
+			return nativeMap.call(this, callback, thisArg)
+		return Chunk.toReadonlyArray(sequence).map((atom, position) =>
+			callback.call(thisArg, atom, position, view),
+		)
+	}
+	function some(
+		this: Atom[],
+		callback: (atom: Atom, position: number, atoms: Atom[]) => unknown,
+		thisArg?: unknown,
+	) {
+		if (this !== view || typeof callback !== "function")
+			return nativeSome.call(this, callback, thisArg)
+		return Chunk.toReadonlyArray(sequence).some((atom, position) =>
+			callback.call(thisArg, atom, position, view),
+		)
+	}
+	function entries(this: Atom[]) {
+		return nativeEntries.call(
+			this === view ? Chunk.toReadonlyArray(sequence) : this,
+		)
+	}
 	let view = new Proxy(target, {
 		get(target, property, receiver) {
 			if (property === "length") return sequence.length
 			if (property === Symbol.iterator) return () => sequence[Symbol.iterator]()
+			if (property === "slice") return slice
+			if (property === "map") return map
+			if (property === "entries") return entries
+			if (property === "some") return some
 			let position = index(property)
 			if (position !== undefined)
 				return position < sequence.length
