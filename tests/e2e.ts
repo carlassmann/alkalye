@@ -28,6 +28,7 @@ let fullSuite = [
 	"tests/browser-editor-find.ts",
 	"tests/browser-document-worker.ts",
 	"tests/browser-viewport-editor.ts",
+	"tests/browser-editor-mobile.ts",
 	"tests/browser-media-picker.ts",
 	"tests/browser-ui-parity.ts",
 	"tests/browser-ui-leftovers.ts",

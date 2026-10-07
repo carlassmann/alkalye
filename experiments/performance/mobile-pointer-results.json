@@ -1,0 +1,236 @@
+{
+	"baseline": "1bbe9da",
+	"candidate": "1bbe9da plus only the already-full pointer guard in src/client/editor-viewport.ts",
+	"method": "Sequential matched frozen builds, cloned account/profile/database, service worker and browser caches cleared before boot; background Chromium iPhone 15 coarse-pointer emulation, 393 CSS pixels. Trusted pointer and inserttext commands; exact source and Saved gates. History-bearing 128 KiB rich Markdown fixture. Three taps and six insertions per version.",
+	"limits": "Capture-to-bubble sync spans; requestAnimationFrame timestamps are frame opportunities, not paint completion or 120 Hz proof. Emulator does not validate physical touch handles, WebKit or real IME. No typing speed improvement.",
+	"before": [
+		{
+			"phase": "ready",
+			"state": {
+				"coarse": true,
+				"nativeCharacters": 105070,
+				"overlayNodes": 18167,
+				"scrollHeight": 169854,
+				"sourceCharacters": 132307,
+				"viewportWidth": 393
+			}
+		},
+		{
+			"phase": "tap",
+			"fraction": 0.25,
+			"before": 42263,
+			"after": 42299,
+			"sample": {
+				"first": 22.5,
+				"second": 66,
+				"sync": 14,
+				"type": "pointerdown"
+			}
+		},
+		{
+			"phase": "tap",
+			"fraction": 0.5,
+			"before": 84541,
+			"after": 84610,
+			"sample": {
+				"first": 14.699999988079073,
+				"second": 55.80000001192093,
+				"sync": 13.5,
+				"type": "pointerdown"
+			}
+		},
+		{
+			"phase": "tap",
+			"fraction": 0.75,
+			"before": 126812,
+			"after": 126881,
+			"sample": {
+				"first": 15.099999964237211,
+				"second": 55.59999996423721,
+				"sync": 13.399999976158142,
+				"type": "pointerdown"
+			}
+		},
+		{
+			"phase": "typing",
+			"position": "start",
+			"sample": 0,
+			"timing": {
+				"first": 33,
+				"second": 38.19999998807907,
+				"sync": 18.900000035762787,
+				"type": "input"
+			}
+		},
+		{
+			"phase": "typing",
+			"position": "start",
+			"sample": 1,
+			"timing": {
+				"first": 28.30000001192093,
+				"second": 35.10000002384186,
+				"sync": 16.600000023841858,
+				"type": "input"
+			}
+		},
+		{
+			"phase": "typing",
+			"position": "start",
+			"sample": 2,
+			"timing": {
+				"first": 25.799999952316284,
+				"second": 32.19999998807907,
+				"sync": 17.19999998807907,
+				"type": "input"
+			}
+		},
+		{
+			"phase": "typing",
+			"position": "middle",
+			"sample": 0,
+			"timing": {
+				"first": 37.5,
+				"second": 42.90000003576279,
+				"sync": 23.600000023841854,
+				"type": "input"
+			}
+		},
+		{
+			"phase": "typing",
+			"position": "middle",
+			"sample": 1,
+			"timing": {
+				"first": 34.10000002384186,
+				"second": 36.19999998807907,
+				"sync": 22.600000023841854,
+				"type": "input"
+			}
+		},
+		{
+			"phase": "typing",
+			"position": "middle",
+			"sample": 2,
+			"timing": {
+				"first": 37.80000001192093,
+				"second": 43,
+				"sync": 23.399999976158146,
+				"type": "input"
+			}
+		}
+	],
+	"after": [
+		{
+			"phase": "ready",
+			"state": {
+				"coarse": true,
+				"nativeCharacters": 105070,
+				"overlayNodes": 18167,
+				"scrollHeight": 169854,
+				"sourceCharacters": 132307,
+				"viewportWidth": 393
+			}
+		},
+		{
+			"phase": "tap",
+			"fraction": 0.25,
+			"before": 42263,
+			"after": 42263,
+			"sample": {
+				"first": 53.80000001192093,
+				"second": 56.39999997615814,
+				"sync": 0.09999996423721312,
+				"type": "pointerdown"
+			}
+		},
+		{
+			"phase": "tap",
+			"fraction": 0.5,
+			"before": 84541,
+			"after": 84541,
+			"sample": {
+				"first": 45.89999997615814,
+				"second": 47.89999997615814,
+				"sync": 0.09999996423721312,
+				"type": "pointerdown"
+			}
+		},
+		{
+			"phase": "tap",
+			"fraction": 0.75,
+			"before": 126812,
+			"after": 126812,
+			"sample": {
+				"first": 46,
+				"second": 48.10000002384186,
+				"sync": 0.10000002384185792,
+				"type": "pointerdown"
+			}
+		},
+		{
+			"phase": "typing",
+			"position": "start",
+			"sample": 0,
+			"timing": {
+				"first": 33.10000002384186,
+				"second": 39.5,
+				"sync": 19.100000023841854,
+				"type": "input"
+			}
+		},
+		{
+			"phase": "typing",
+			"position": "start",
+			"sample": 1,
+			"timing": {
+				"first": 23.900000035762787,
+				"second": 29.5,
+				"sync": 16.5,
+				"type": "input"
+			}
+		},
+		{
+			"phase": "typing",
+			"position": "start",
+			"sample": 2,
+			"timing": {
+				"first": 30.69999998807907,
+				"second": 36,
+				"sync": 17.19999998807907,
+				"type": "input"
+			}
+		},
+		{
+			"phase": "typing",
+			"position": "middle",
+			"sample": 0,
+			"timing": {
+				"first": 37.19999998807907,
+				"second": 42.5,
+				"sync": 23.30000001192093,
+				"type": "input"
+			}
+		},
+		{
+			"phase": "typing",
+			"position": "middle",
+			"sample": 1,
+			"timing": {
+				"first": 36.10000002384186,
+				"second": 41.5,
+				"sync": 22.5,
+				"type": "input"
+			}
+		},
+		{
+			"phase": "typing",
+			"position": "middle",
+			"sample": 2,
+			"timing": {
+				"first": 32.30000001192093,
+				"second": 39.30000001192093,
+				"sync": 23.399999976158146,
+				"type": "input"
+			}
+		}
+	]
+}

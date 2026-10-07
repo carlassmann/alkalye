@@ -132,9 +132,17 @@ export class EditorViewport {
 			"pointerdown",
 			() => {
 				this.readSelection()
+				let alreadyFull =
+					this.completeDocument() &&
+					this.window.start === 0 &&
+					this.window.end === this.text.length
+				this.pointerDocument = true
+				if (alreadyFull) {
+					this.dragging = true
+					return
+				}
 				let anchor = this.offsetAtHeight(this.scrollElement.scrollTop)
 				let before = this.topAt(anchor) - this.scrollElement.scrollTop
-				this.pointerDocument = true
 				this.paint()
 				this.measure.textContent = this.value + "\u200b"
 				let node = this.measure.firstChild
