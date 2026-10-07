@@ -129,6 +129,35 @@ try {
 	)
 	browser(session, "click", "#close-find")
 	wait(session, 'document.querySelectorAll(".search-match").length === 0')
+	let dense = ("a" + "\u0301".repeat(400)).repeat(40)
+	fill(dense)
+	evaluate(
+		session,
+		'document.querySelector("alkalye-editor").selectRange(document.querySelector("alkalye-editor").source.value.length)',
+	)
+	wait(
+		session,
+		`document.querySelector("#editor").value === ${JSON.stringify(dense)} && document.querySelector("#editor").parentElement.scrollHeight <= document.querySelector("#editor").parentElement.clientHeight`,
+	)
+	browser(session, "keyboard", "inserttext", "!")
+	wait(
+		session,
+		`document.querySelector("alkalye-editor").source.value === ${JSON.stringify(dense + "!")} && document.querySelector("#editor").parentElement.scrollHeight <= document.querySelector("#editor").parentElement.clientHeight`,
+	)
+	assert(
+		true,
+		"Dense combining text stays on its native visual row while editing",
+	)
+	let ordinary = "ordinary line\n".repeat(3000)
+	fill(ordinary)
+	wait(
+		session,
+		'document.querySelector("#editor").value.length < 8192 && document.querySelector("#editor").parentElement.scrollHeight > document.querySelector("#editor").parentElement.clientHeight',
+	)
+	assert(
+		true,
+		"Replacing dense text restores bounded native windows and document scrolling",
+	)
 } finally {
 	try {
 		browser(session, "close")

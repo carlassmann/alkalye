@@ -62,6 +62,7 @@ export class EditorViewport {
 	private nativeAcknowledgement = false
 	private revision = 0
 	private navigationDocument = false
+	private denseDocument = false
 	private coarsePointer = matchMedia("(pointer: coarse)")
 
 	constructor(
@@ -194,6 +195,7 @@ export class EditorViewport {
 			let anchor = this.offsetAtHeight(this.scrollElement.scrollTop)
 			let before = this.topAt(anchor)
 			this.layoutKey = key
+			this.denseDocument = false
 			this.rebuild(0)
 			let movement = this.topAt(anchor) - before
 			if (movement) this.scrollElement.scrollTop += movement
@@ -267,6 +269,7 @@ export class EditorViewport {
 		let anchor = this.offsetAtHeight(this.scrollElement.scrollTop)
 		let before = this.topAt(anchor)
 		this.layoutKey = key
+		this.denseDocument = false
 		this.rebuild(0)
 		let movement = this.topAt(anchor) - before
 		if (movement) this.scrollElement.scrollTop += movement
@@ -333,11 +336,16 @@ export class EditorViewport {
 		this.paint()
 	}
 	apply(edit: Replacement) {
+		let dense = this.denseDocument
+		this.denseDocument = false
 		this.text.replace(edit)
 		this.acknowledged = undefined
 		this.directions.clear()
 		this.fragmentHeight = 0
-		this.rebuild(this.blockAtOffset(edit.start), edit)
+		this.rebuild(
+			dense ? 0 : this.blockAtOffset(edit.start),
+			dense ? undefined : edit,
+		)
 	}
 	input(): Replacement[] {
 		let result = this.pending.splice(0)
@@ -553,6 +561,8 @@ export class EditorViewport {
 				if (range.getBoundingClientRect().top < lastTop - 1) low = middle + 1
 				else high = middle
 			}
+			// Splitting dense graphemes before a native row boundary invents blank rows.
+			if (!low) this.denseDocument = true
 			if (low > 0) {
 				end = this.blockBoundary(start + low, start)
 				part = this.text.slice(start, end)
@@ -760,6 +770,7 @@ export class EditorViewport {
 	private completeDocument() {
 		return (
 			this.accessibleDocument ||
+			this.denseDocument ||
 			this.coarsePointer.matches ||
 			this.pointerDocument ||
 			this.navigationDocument ||
@@ -793,6 +804,10 @@ export class EditorViewport {
 			for (let index = first; index <= last; index++) {
 				if (this.blocks[index]?.measured) continue
 				this.refine(index, false)
+				if (this.denseDocument) {
+					this.paint()
+					return
+				}
 				refined = true
 			}
 			if (refined) {
