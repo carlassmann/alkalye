@@ -7,6 +7,8 @@ import * as Effect from "effect/Effect"
 import * as Layer from "effect/Layer"
 import * as Scope from "effect/Scope"
 import * as Exit from "effect/Exit"
+import * as Fiber from "effect/Fiber"
+import { BackgroundWork } from "../src/platform/background-work"
 import { makePassiveDocumentCache } from "../src/client/passive-document-cache"
 import { cliDocumentSessionLayer } from "../src/cli/document-platform"
 import { DocumentSession } from "../src/shared/document-session"
@@ -33,11 +35,16 @@ test.each([false, true])(
 						)
 						let store = Context.get(services, WorkspaceStore)
 						let subject = "passive-owner"
+						let initialSource = cooperativeWork
+							? "Initial source\n" + "a".repeat(128 * 1024)
+							: "Initial source"
+						let initialDocument = '---\ntitle: "Cached"\n---\n' + initialSource
+						let acceptedDocument = initialDocument + "\nRemote accepted source"
 						let creation = yield* buildAction(
 							new Replica("passive-birth"),
 							"doc",
 							"Create document",
-							staged => newDocument(staged, "doc", "Cached", "Initial source"),
+							staged => newDocument(staged, "doc", "Cached", initialSource),
 						)
 						yield* store
 							.create("space", "Cached workspace", "create-space")
@@ -93,6 +100,11 @@ test.each([false, true])(
 								}),
 							).pipe(
 								Effect.provideService(Scope.Scope, scope),
+								Effect.provideService(BackgroundWork, {
+									beforeSnapshot: Effect.never,
+									beforeDerived: Effect.void,
+									betweenChunks: Effect.void,
+								}),
 								Effect.map(context => Context.get(context, DocumentSession)),
 							)
 						}
@@ -100,7 +112,7 @@ test.each([false, true])(
 						yield* open(bootstrapScope, transport)
 						yield* Scope.close(bootstrapScope, Exit.void)
 						expect((yield* passive.read)?.replica?.text("doc")).toBe(
-							'---\ntitle: "Cached"\n---\nInitial source',
+							initialDocument,
 						)
 						let secondDirectory = join(directory, "peer")
 						yield* Effect.tryPromise(() =>
@@ -134,18 +146,36 @@ test.each([false, true])(
 						)
 						let second = yield* open(secondScope, blocked, secondDirectory)
 						let retained = (yield* passive.read)?.replica
-						expect(retained?.text("doc")).toBe(
-							'---\ntitle: "Cached"\n---\nInitial source',
-						)
-						yield* first.edit("Remote accepted source").saved
+						expect(retained?.text("doc")).toBe(initialDocument)
+						yield* first.edit(acceptedDocument).saved
 						yield* first.sync
-						expect(first.replica.text("doc")).toBe("Remote accepted source")
-						expect(retained?.text("doc")).toBe(
-							'---\ntitle: "Cached"\n---\nInitial source',
+						expect(first.replica.text("doc")).toBe(acceptedDocument)
+						expect(retained?.text("doc")).toBe(initialDocument)
+						let previousPosition = (yield* passive.read)?.position ?? 0
+						if (cooperativeWork) {
+							let saving = yield* Effect.forkChild(first.save, {
+								startImmediately: true,
+							})
+							yield* Fiber.interrupt(saving)
+							expect((yield* passive.read)?.position ?? 0).toBe(
+								previousPosition,
+							)
+						}
+						yield* first.edit(acceptedDocument + "\nUnpublished local draft")
+							.saved
+						yield* first.save
+						expect((yield* passive.read)?.position ?? 0).toBeGreaterThan(
+							previousPosition,
+						)
+						expect((yield* passive.read)?.replica?.text("doc")).toBe(
+							acceptedDocument,
+						)
+						expect(first.replica.text("doc")).toBe(
+							acceptedDocument + "\nUnpublished local draft",
 						)
 						paused = false
 						yield* second.sync
-						expect(second.replica.text("doc")).toBe("Remote accepted source")
+						expect(second.replica.text("doc")).toBe(acceptedDocument)
 					}),
 				),
 			)

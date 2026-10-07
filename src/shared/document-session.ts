@@ -1369,6 +1369,8 @@ function makeProjection(options: DocumentSessionOptions) {
 					localPosition === cachedPosition
 				)
 					return
+				if (options.passiveState)
+					yield* materializeDocument(accepted).pipe(Effect.ignore)
 				let checkpoint = options.cooperativeWork
 					? yield* accepted.checkpointEffect()
 					: accepted.checkpoint()
