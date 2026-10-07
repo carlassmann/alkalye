@@ -247,6 +247,15 @@
 			were not cryptographically verified. These tasks still exceed 8.33 ms.
 			Samples and method: <code>experiments/performance/undo-fork/</code>.
 		</p>
+		<p>
+			A separate three-trial comparison then skipped source materialization
+			when text undo has no register restoration. Median time to two paint
+			opportunities fell from 672.0 to 545.6 ms; the accepted checkpoint fell
+			from 2,659.6 to 2,241.4 ms. The largest task remained slow: 316.1 versus
+			332.3 ms. All six exact-source and accepted-state checks passed.
+			This improves undo latency, not the frame budget. Samples:
+			<code>experiments/performance/undo-fork/empty-inverse-results.json</code>.
+		</p>
 		<h2>Body edits remain incremental after metadata changes</h2>
 		<p>
 			Merged frontmatter can leave raw and canonical atom arrays with different
