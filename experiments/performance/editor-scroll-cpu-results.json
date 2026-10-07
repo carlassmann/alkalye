@@ -1,0 +1,456 @@
+{
+	"method": "Sampled logical-sequence reproduction; CPU sampling changes timings. No identical-history or original-version comparison.",
+	"bundle": {
+		"source": "660423c",
+		"sha256": "136aa095eb4b500cd2a6acce14248615a3f3e2c9ef5443f855d2ade2fa5800f4"
+	},
+	"history": {
+		"seed": "/tmp/alkalye-critical-batch/data-seed",
+		"profile": "/tmp/alkalye-critical-batch/profile-safety",
+		"sequence": [
+			"Open and wheel 128 KiB TOKEN/512 fixture (three trials)",
+			"Open and wheel 1 MiB TOKEN/2048 fixture (three trials)",
+			"Public replacement of 128 KiB document with 32768-character rich Hebrew/Arabic/English Markdown",
+			"Exact source and Saved, close browser, reopen, editable and Saved",
+			"One sampled eight-wheel trial"
+		],
+		"originalEdgeDatabasePreserved": false,
+		"postReproductionDatabase": "/tmp/alkalye-scroll-current/preserved-rich-repro-data",
+		"postReproductionProfile": "/tmp/alkalye-scroll-current/preserved-rich-repro-profile"
+	},
+	"mainThread": {
+		"scopeMs": 1263.543,
+		"runTaskUnionMs": 1108.293,
+		"busyFraction": 0.8771312096224664
+	},
+	"observation": [
+		{
+			"trial": 0,
+			"ready": {
+				"coarse": false,
+				"height": 27851,
+				"nativeCharacters": 2027,
+				"nodes": 509,
+				"sourceCharacters": 32768,
+				"top": 0
+			},
+			"observation": {
+				"duration": 1263.600000023842,
+				"frames": [
+					16.600000000000023, 16.699999999999932, 16.699999999999932,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.600000000000136, 16.699999999999818,
+					16.700000000000045, 16.600000000000136, 16.699999999999818,
+					316.70000000000005, 16.600000000000136, 633.2999999999997,
+					16.700000000000273, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.59999999999991, 16.800000000000182
+				],
+				"nativeCharacters": 3035,
+				"nodes": 761,
+				"scrolls": 2,
+				"settled": true,
+				"sourceExact": true,
+				"top": 1200,
+				"trusted": 8,
+				"wheelEvents": [
+					{
+						"at": 97.30000001192091,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 0
+					},
+					{
+						"at": 113.10000002384186,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 0
+					},
+					{
+						"at": 125.5,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 600
+					},
+					{
+						"at": 163.10000002384186,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 600
+					},
+					{
+						"at": 174.80000001192093,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 1200
+					},
+					{
+						"at": 514.5,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 1200
+					},
+					{
+						"at": 517.8000000119209,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 1200
+					},
+					{
+						"at": 1172.800000011921,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 1200
+					}
+				],
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-scroll-current/repro-rich-cpu-0.trace.json"
+		}
+	],
+	"sampledTasks": [
+		{
+			"taskMs": 652.326,
+			"samples": 4288,
+			"self": [
+				{
+					"ms": 69.017,
+					"source": "validateIdentities ../src/shared/crdt.ts:1393:28"
+				},
+				{
+					"ms": 56.04,
+					"source": "Fl.ci.expected ../node_modules/effect/dist/SchemaAST.js:2310:21"
+				},
+				{
+					"ms": 53.308,
+					"source": "Fl.ci.expected ../node_modules/effect/dist/SchemaAST.js:2310:21"
+				},
+				{
+					"ms": 36.834,
+					"source": "validateIdentities ../src/shared/crdt.ts:1393:28"
+				},
+				{
+					"ms": 25.06,
+					"source": "Ze ../src/shared/model.ts:232:31"
+				},
+				{
+					"ms": 22.216,
+					"source": "matchesRemoval ../src/shared/text-visibility.ts:197:16"
+				},
+				{
+					"ms": 20.538,
+					"source": "matchesRemoval ../src/shared/text-visibility.ts:197:16"
+				},
+				{
+					"ms": 20.029,
+					"source": "Ke ../src/shared/text-visibility.ts:400:30"
+				},
+				{
+					"ms": 19.747,
+					"source": "Ze ../src/shared/model.ts:232:31"
+				},
+				{
+					"ms": 19.635,
+					"source": "Ze ../src/shared/model.ts:232:31"
+				},
+				{
+					"ms": 18.471,
+					"source": "(garbage collector)"
+				},
+				{
+					"ms": 16.377,
+					"source": " ../node_modules/effect/dist/SchemaAST.js:1581:12"
+				},
+				{
+					"ms": 15.892,
+					"source": " ../node_modules/effect/dist/SchemaAST.js:1581:12"
+				},
+				{
+					"ms": 13.595,
+					"source": "Ke ../src/shared/text-visibility.ts:400:30"
+				},
+				{
+					"ms": 13.001,
+					"source": "onItem ../node_modules/effect/dist/SchemaAST.js:1268:9"
+				}
+			],
+			"inclusive": [
+				{
+					"ms": 652.321,
+					"source": "(root)"
+				},
+				{
+					"ms": 621.287,
+					"source": "evaluate ../node_modules/effect/dist/internal/effect.js:406:11"
+				},
+				{
+					"ms": 621.287,
+					"source": " ../node_modules/effect/dist/internal/effect.js:812:66"
+				},
+				{
+					"ms": 621.287,
+					"source": "s.oncomplete ../src/platform/indexeddb-journal.ts:585:20"
+				},
+				{
+					"ms": 620.98,
+					"source": "runLoop ../node_modules/effect/dist/internal/effect.js:441:10"
+				},
+				{
+					"ms": 577.469,
+					"source": " ../node_modules/effect/dist/internal/effect.js:766:18"
+				},
+				{
+					"ms": 577.469,
+					"source": "mt ../node_modules/effect/dist/internal/effect.js:717:13"
+				},
+				{
+					"ms": 299.515,
+					"source": "applyTogether ../src/shared/crdt.ts:145:22"
+				},
+				{
+					"ms": 299.515,
+					"source": "try ../src/shared/document-session.ts:2013:16"
+				},
+				{
+					"ms": 281.238,
+					"source": "prepareApplication ../src/shared/crdt.ts:154:28"
+				},
+				{
+					"ms": 280.874,
+					"source": "prepare ../src/shared/crdt.ts:214:17"
+				},
+				{
+					"ms": 238.361,
+					"source": "validate ../src/shared/crdt.ts:211:10"
+				},
+				{
+					"ms": 238.361,
+					"source": "try ../src/shared/document-session.ts:2001:16"
+				},
+				{
+					"ms": 236.989,
+					"source": "prepare ../src/shared/crdt.ts:214:17"
+				},
+				{
+					"ms": 102.899,
+					"source": "validateIdentities ../src/shared/crdt.ts:1393:28"
+				},
+				{
+					"ms": 100.889,
+					"source": "prepareSteps ../src/shared/text-visibility.ts:125:23"
+				},
+				{
+					"ms": 100.889,
+					"source": "D ../src/shared/collection-copy.ts:35:31"
+				},
+				{
+					"ms": 100.889,
+					"source": "prepare ../src/shared/text-visibility.ts:114:9"
+				},
+				{
+					"ms": 88.734,
+					"source": "prepareSteps ../src/shared/text-visibility.ts:125:23"
+				},
+				{
+					"ms": 88.734,
+					"source": "D ../src/shared/collection-copy.ts:35:31"
+				},
+				{
+					"ms": 88.734,
+					"source": "prepare ../src/shared/text-visibility.ts:114:9"
+				},
+				{
+					"ms": 79.944,
+					"source": "p ../node_modules/effect/dist/SchemaAST.js:1180:19"
+				},
+				{
+					"ms": 79.944,
+					"source": " ../node_modules/effect/dist/SchemaAST.js:1208:12"
+				},
+				{
+					"ms": 79.944,
+					"source": " ../node_modules/effect/dist/SchemaAST.js:1581:12"
+				}
+			]
+		},
+		{
+			"taskMs": 334.343,
+			"samples": 2170,
+			"self": [
+				{
+					"ms": 53.064,
+					"source": "Fl.ci.expected ../node_modules/effect/dist/SchemaAST.js:2310:21"
+				},
+				{
+					"ms": 44.352,
+					"source": "validateIdentities ../src/shared/crdt.ts:1393:28"
+				},
+				{
+					"ms": 25.689,
+					"source": "prepare ../src/shared/crdt.ts:214:17"
+				},
+				{
+					"ms": 23.405,
+					"source": "matchesRemoval ../src/shared/text-visibility.ts:197:16"
+				},
+				{
+					"ms": 18.034,
+					"source": " ../node_modules/effect/dist/SchemaAST.js:1581:12"
+				},
+				{
+					"ms": 16.383,
+					"source": "(garbage collector)"
+				},
+				{
+					"ms": 14.249,
+					"source": "Ke ../src/shared/text-visibility.ts:400:30"
+				},
+				{
+					"ms": 13.559,
+					"source": "un ../src/shared/document-actions.ts:414:26"
+				},
+				{
+					"ms": 11.782,
+					"source": "onItem ../node_modules/effect/dist/SchemaAST.js:1268:9"
+				},
+				{
+					"ms": 11.235,
+					"source": "atomTarget ../src/shared/document-session.ts:1775:6"
+				},
+				{
+					"ms": 10.598,
+					"source": "je ../src/shared/crdt.ts:1496:22"
+				},
+				{
+					"ms": 7.365,
+					"source": "m ../src/shared/text-dependencies.ts:75:4"
+				},
+				{
+					"ms": 5.841,
+					"source": " ../src/shared/text-dependencies.ts:22:2"
+				},
+				{
+					"ms": 5.151,
+					"source": "onItem ../node_modules/effect/dist/SchemaAST.js:1268:9"
+				},
+				{
+					"ms": 5.099,
+					"source": "atomTarget ../src/shared/crdt.ts:1030:12"
+				}
+			],
+			"inclusive": [
+				{
+					"ms": 334.163,
+					"source": "(root)"
+				},
+				{
+					"ms": 312.99,
+					"source": "runLoop ../node_modules/effect/dist/internal/effect.js:441:10"
+				},
+				{
+					"ms": 312.99,
+					"source": "evaluate ../node_modules/effect/dist/internal/effect.js:406:11"
+				},
+				{
+					"ms": 312.99,
+					"source": " ../node_modules/effect/dist/internal/effect.js:812:66"
+				},
+				{
+					"ms": 312.99,
+					"source": "s.oncomplete ../src/platform/indexeddb-journal.ts:585:20"
+				},
+				{
+					"ms": 275.744,
+					"source": " ../node_modules/effect/dist/internal/effect.js:766:18"
+				},
+				{
+					"ms": 275.744,
+					"source": "mt ../node_modules/effect/dist/internal/effect.js:717:13"
+				},
+				{
+					"ms": 254.85,
+					"source": "validate ../src/shared/crdt.ts:211:10"
+				},
+				{
+					"ms": 254.85,
+					"source": "try ../src/shared/document-session.ts:2001:16"
+				},
+				{
+					"ms": 251.813,
+					"source": "prepare ../src/shared/crdt.ts:214:17"
+				},
+				{
+					"ms": 93.893,
+					"source": "prepare ../src/shared/text-visibility.ts:114:9"
+				},
+				{
+					"ms": 93.821,
+					"source": "prepareSteps ../src/shared/text-visibility.ts:125:23"
+				},
+				{
+					"ms": 93.821,
+					"source": "D ../src/shared/collection-copy.ts:35:31"
+				},
+				{
+					"ms": 78.355,
+					"source": "validateIdentities ../src/shared/crdt.ts:1393:28"
+				},
+				{
+					"ms": 78.028,
+					"source": "p ../node_modules/effect/dist/SchemaAST.js:1180:19"
+				},
+				{
+					"ms": 78.028,
+					"source": " ../node_modules/effect/dist/SchemaAST.js:1208:12"
+				},
+				{
+					"ms": 78.028,
+					"source": " ../node_modules/effect/dist/SchemaAST.js:1581:12"
+				},
+				{
+					"ms": 78.028,
+					"source": " ../node_modules/effect/dist/SchemaAST.js:2009:12"
+				},
+				{
+					"ms": 78.028,
+					"source": " ../node_modules/effect/dist/SchemaParser.js:829:10"
+				},
+				{
+					"ms": 78.028,
+					"source": " ../node_modules/effect/dist/Schema.js:632:10"
+				},
+				{
+					"ms": 78.028,
+					"source": " ../node_modules/effect/dist/Schema.js:942:10"
+				},
+				{
+					"ms": 78.028,
+					"source": "Ui ../src/shared/text-visibility.ts:384:30"
+				},
+				{
+					"ms": 75.135,
+					"source": "onItem ../node_modules/effect/dist/SchemaAST.js:1268:9"
+				},
+				{
+					"ms": 69.529,
+					"source": "d ../node_modules/effect/dist/internal/schema/interpreter.js:87:23"
+				}
+			]
+		}
+	]
+}
