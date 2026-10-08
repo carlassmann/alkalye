@@ -1,0 +1,44 @@
+I found 1 hard blocker left and 2 should-fix issues. This is a source read only: I ran nothing, so types and runtime behaviour are unchecked.
+
+**Hard blocker**
+1. **A crash during prepare leaves the editor frozen for good** (`browser-fixture.ts:239-247`)
+   - Effect's `File` schema encodes the file with an async `arrayBuffer()` call plus base64. If that fails, `RpcClient.ts:694` turns it into a crash (`Effect.orDie`) rather than a normal error.
+   - `PrepareAttachment` doesn't mutate, so `discussion` (`editor-queue.ts:486`) passes the crash through unchanged. `Effect.catch` doesn't handle crashes.
+   - So neither `finishCommand` nor `failCommand` runs. `externalCommand` stays true, the editor stays read-only for good, and nothing is reported.
+   - Realistic triggers: a picked file that can't be read (moved or deleted, or a cloud placeholder), or a file over about 400MB (V8's string limit on the base64).
+   - Fix: switch to `Effect.catchCause`, skip pure interrupts, `Cause.squash` the cause, then reuse the same refused/ambiguous logic. The base64 size gap you already noted then becomes a refusal instead of a frozen editor.
+
+**Should fix (they fail safe and don't corrupt data)**
+2. **The `"Rejected"` refused branch never fires**: the worker never sends `Rejected`.
+   - Normal conflicts in `Attach` happen before anything is saved: renaming to a blank name, a peer deleting the asset, a missing asset. They arrive as `SessionFailure` while sending, so they're treated as ambiguous and the editor shuts down.
+   - Fix: in the worker's `Attach`, map `DocumentConflict` to `fail("Rejected")`, but only on a token's first attempt. On the first attempt `propose` fails before `persistUnlocked`; a retry could hit a rejection after the action was saved.
+3. **`End` doesn't clear asset tokens**: it clears comment and clipboard tokens but leaves asset selections and prepared commands. Fix: call `current.assets.close()` in `End`.
+
+**File chooser parity**
+- Production captures the selection before opening the chooser: `document-app.ts:2780` and `:3931` store the selection in `fileTarget`, then call `assetInput.click()`. The fixture captures on the input's `change` event (`browser-fixture.ts:276-280`).
+- In image context, the production media picker (`document-app.ts:2700-2707`) replaces the image range with an inline reference. The fixture always inserts a non-inline reference at the caret.
+- Smallest fix: snapshot `mergeSelection()` (`{start, end, source}`) when the chooser opens. On `change`, capture from that snapshot with its `source` as the expected source. If the text changed in between, the queue refuses with `SelectionUnavailable` instead of inserting somewhere else.
+- Exact parity would mean capturing the worker token when the chooser opens and releasing it on the input's `cancel` event. That adds a token whose lifetime spans the open chooser.
+
+**Low priority**
+- **Recovery key race**: between the recovery check and the account layer's `getOrCreate` (`worker-assets.ts:20-21`), a sign-out in another tab could let the worker recreate the key.
+- **Merge ignores `externalCommand`**: `bindings.merge` doesn't check it. Harmless, because commands run in order and the selection is captured by position in the document's text, not by offset.
+- **Token leak on lost replies**: if the reply to a capture or prepare is lost after the worker succeeded, that token leaks and counts toward the cap of 8.
+
+**Checked and OK**
+- The `File` codec works over the worker RPC.
+- The queue wraps Blobs in `File`.
+- `Effect.try` keeps domain errors.
+- Capacity failures report `HandleCapacity`.
+- The split-surrogate check is in capture.
+- Undo and asset commands now refuse to run at the same time.
+- Applied assets go through the same bounded adoption retries and 15-second watchdog as Undo.
+- Tokens are released on known success or refusal and kept when the outcome is ambiguous.
+- Both `PermissionDenied` imports are the same class.
+- `PermissionDenied` from `Attach` always happens before anything is saved.
+
+The same findings are in `/Users/carlassmann/.claude/plans/read-only-followup-source-review-happy-ladybug.md`.
+
+Several claude.ai connectors (GitHub, Slack, Notion, etc.) need authorizing in claude.ai connector settings before they can be used. None were needed here.
+
+written with claude-opus-5-5 in claude code

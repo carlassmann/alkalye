@@ -1,0 +1,47 @@
+{
+	"status": "experiment-only",
+	"productionChanges": false,
+	"assertions": {
+		"serviceFileJourney": 11,
+		"passed": 11,
+		"nativeChooser": false,
+		"retryPeerControlsExecuted": false
+	},
+	"types": "pass",
+	"copiedSharedCrdtRevision": "2f55545",
+	"sourceHashes": {
+		"worker-assets.ts": "dcea38944f8b2db22751b5dfe33c982c11e402a48301d04826fc1785262464c0",
+		"worker-session.ts": "81d94eefd4316c194c3e029e438d6e2ed2051b69dbdbcbc21866bb1a4074c1c8",
+		"worker-rpc.ts": "67c2e8d8c9be3bcc86c0f90648df44a1e3bba7dad28f3e2492e4f365d06440da",
+		"worker-client.ts": "9be91716eff0370ebcacae8dda12f61110b7684f1107ace83b945aff3a4c71e4",
+		"worker.ts": "cfcd9f3ae3d67d0629f8728f08cfc02dc035b2929b125b37f21645d4ec278eb9",
+		"editor-queue.ts": "8ea943296bec5ba512ca0481dde5f7e16880d975c9b2dd15d2b8fa306fa76692",
+		"bindings.ts": "4107f5bab98b3e3632d103c656ed216d36cd65013e7702c3fa1f243224d87ab7",
+		"browser-fixture.ts": "884dd59c897952f80a0b384b50e4996779285fa7b6f681fa3fa0ac55a3ee6b56",
+		"assets-journey.ts": "bf65943c07b920f6d60e3a951ac09f945a880f9db968a22c20256a2513ef878e",
+		"assets-controls-journey.ts": "d248977716902051190a3ba74d55e81d469c4a4af83a15ed309dd292dd69e821",
+		"server.ts": "8e4624605f0a7607aede9787fc422989012ef7a793426b8b17903992f49d47f5",
+		"seed.ts": "7f8cbff587a084d6cd6c9acb534e8fa0ef3fb665a8062be819dd3443bfff9a2f",
+		"work.config.js": "07c24b8f889dfb30329cbb75d056b4440157019ea29bcf15eb16d566067aa5ee",
+		"tsconfig.json": "aa34b1bd15694bef1a1014bf6bab127b9c50a7b3e2b67807b0615fa9e546fffb",
+		"src/client/components/editor.ts": "987d754f502276c3f22f2daa82b0d061c166ae97068e71b840320d9511345909",
+		"src/client/document-assets.ts": "a1add52a20bc0e9af4d6a2b742be9ab6079e380df70aae9c52d0213819dbf789",
+		"src/client/document-blobs.ts": "b9c85f97534864e9b30b0953cd2ea88b56ccbe2cbb54cb212011ea10f650250c"
+	},
+	"provenance": [
+		"Original successful bundle was overwritten by a later fixture-controls rebuild before its hash was recorded; no original bundle hash is asserted.",
+		"Current snapshots include later unexecuted control RPC exposures and chooser harness refinements. The domain/worker engine is unchanged from the eleven-pass run; this is not a rerun certificate for every current fixture path.",
+		"First types run failed Deferred variance and Effect union inference; fixed before the passing journey.",
+		"Two expanded context-menu readiness attempts failed before invoking attachment; neither proves actual chooser behavior or cancellation."
+	],
+	"scopeGaps": [
+		"full-app mount and local-file parity",
+		"native chooser and image-context replacement",
+		"prepared retry and peer controls",
+		"real server ACL revocation",
+		"offline reopen",
+		"large-file codec allocation/performance",
+		"abrupt termination and unknown file mutation recovery"
+	],
+	"signature": "written with gpt-6 in codex"
+}

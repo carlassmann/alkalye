@@ -1,0 +1,51 @@
+import { assert, browser, evaluate, wait } from "./tests/browser-driver"
+let url = process.argv[2]
+if (!url) throw Error("URL required")
+let session = "worker-assets-" + Date.now()
+let proof = "window.workerEditorProof"
+let text = 'document.querySelector("alkalye-editor").source'
+function choose(label: string) {
+ evaluate(session, `(function(){let item=[...document.querySelectorAll('[data-context-menu]:popover-open>[role=menuitem]')].find(item=>item.querySelector(':scope>span')?.textContent===${JSON.stringify(label)});if(!item)throw Error('Menu item missing');item.dataset.assetAction=${JSON.stringify(label)}})()`)
+ browser(session, "click", `[data-asset-action="${label}"]`)
+}
+function picker() {
+ evaluate(session, `${text}.dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,cancelable:true}))`)
+ wait(session, "!!document.querySelector('[data-context-menu]:popover-open')")
+ choose("Insert")
+ choose("Attachment")
+}
+try {
+ browser(session, "open", url)
+ wait(session, "document.body.dataset.ready==='true'||!!document.body.dataset.failure")
+ assert(evaluate(session, "!document.body.dataset.failure"), "Actual asset Editor opens with worker authority")
+ let original = evaluate(session, `${proof}.inspect().source`)
+ if (typeof original !== "string") throw Error("Source unavailable")
+ evaluate(session, `${text}.focus();${text}.setSelectionRange(${original.length},${original.length})`)
+ picker()
+ evaluate(session, `(function(){let transfer=new DataTransfer();transfer.items.add(new File(['asset Unicode 😀 bytes'],'report [😀].txt',{type:'text/plain'}));let input=document.querySelector('input[type=file]');input.files=transfer.files;input.dispatchEvent(new Event('change'))})()`)
+ wait(session, `${proof}.assets().then(value=>value.length===1&&!${proof}.inspect().readonly&&${proof}.inspect().pending===0)`)
+ let asset = evaluate(session, `${proof}.assets().then(value=>value[0].id)`)
+ if (typeof asset !== "string") throw Error("Asset unavailable")
+ let inserted = evaluate(session, `${proof}.inspect().source`)
+ assert(typeof inserted === "string" && inserted.includes("asset:" + asset) && inserted.includes("report"), "Actual Attachment menu embeds the worker-created file")
+ assert(evaluate(session, `${proof}.assetFile(${JSON.stringify(asset)}).then(blob=>blob.text())`) === "asset Unicode 😀 bytes", "Stored attachment bytes survive worker Blob RPC")
+ evaluate(session, `${proof}.assetChange('rename',${JSON.stringify(asset)},'Renamed 😀')`)
+ assert(evaluate(session, `${proof}.assets().then(value=>value[0].name==='Renamed 😀')`), "Existing asset service renames metadata")
+ assert(evaluate(session, `${proof}.inspect().source`) === inserted, "Rename retains existing document references")
+ evaluate(session, `${proof}.assetChange('delete',${JSON.stringify(asset)})`)
+ assert(evaluate(session, `${proof}.assets().then(value=>value.length===0&&!${proof}.inspect().source.includes('asset:'+${JSON.stringify(asset)}))`), "Delete removes the asset and native document reference")
+ evaluate(session, `${proof}.undo(false)`)
+ wait(session, `${proof}.assets().then(value=>value.length===1&&!${proof}.inspect().readonly&&${proof}.inspect().pending===0)`)
+ assert(evaluate(session, `${proof}.inspect().source`) === inserted, "Native Undo restores the exact attachment reference")
+ assert(evaluate(session, `${proof}.assetFile(${JSON.stringify(asset)}).then(blob=>blob.text())`) === "asset Unicode 😀 bytes", "Undo retains durable blob bytes")
+ let saved = evaluate(session, `${proof}.flush()`)
+ let reopened = evaluate(session, "location.href")
+ if (typeof reopened !== "string") throw Error("Reopen URL unavailable")
+ evaluate(session, `${proof}.dispose()`)
+ browser(session, "open", reopened)
+ wait(session, "document.body.dataset.ready==='true'||!!document.body.dataset.failure")
+ assert(evaluate(session, `${proof}.inspect().source`) === saved, "Fresh worker reopens exact journal-backed source")
+ assert(evaluate(session, `${proof}.assetFile(${JSON.stringify(asset)}).then(blob=>blob.text())`) === "asset Unicode 😀 bytes", "Reopened worker reads stored attachment without main Replica")
+ evaluate(session, `${proof}.dispose()`)
+ assert(evaluate(session, "document.body.dataset.closed==='true'&&!document.querySelector('alkalye-editor')"), "Asset worker and native Editor release on scope close")
+} finally { browser(session, "close") }

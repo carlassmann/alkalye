@@ -1,0 +1,11 @@
+PASS Actual asset Editor opens with worker authority
+PASS Native file input embeds the worker-created attachment
+PASS Stored attachment bytes survive worker Blob RPC
+PASS Existing asset service renames metadata
+PASS Rename retains existing document references
+PASS Delete removes the asset and native document reference
+PASS Native Undo restores the exact attachment reference
+PASS Undo retains durable blob bytes
+PASS Fresh worker reopens exact journal-backed source
+PASS Reopened worker reads stored attachment without main Replica
+PASS Asset worker and native Editor release on scope close

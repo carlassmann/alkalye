@@ -1,0 +1,5 @@
+{
+	"extends": "/Users/carlassmann/.codex/worktrees/b513/alkalye/tsconfig.json",
+	"include": ["./*.ts"],
+	"exclude": []
+}

@@ -1,0 +1,35 @@
+**No hard blocker left for the bounded tiny-file runtime.** All three findings from the last review are fixed. I only read source, so nothing was type-checked or run.
+
+**Confirmed fixed**
+- **Crashes no longer freeze the editor** (`browser-fixture.ts:242`): `catchCause` passes a pure interruption through, and crashes and file-encoding defects become refusals.
+- **The attempted bit is safe** (`worker-assets.ts:73-83`): a retry never saves a second copy, because both `propose` (`document-session.ts:730-751`) and `attachFiles` (`document-assets.ts:158-205`) reuse the action they already built.
+- **Tokens are cleared on shutdown**: `End` calls `assets.close()` (`worker-session.ts:353`). `Close` and a failed `Open` clear them through the scope finalizer.
+- **File chooser**: the worker token is captured in queue order before `click`, and cancel, an empty pick and a refusal all release it.
+- **Shared bindings**: Undo and merge are refused while an asset command runs, and the asset path uses the same 15-second adoption watchdog as Undo.
+
+**Should fix (all fail safe or are rare)**
+1. **A conflict after saving is reported as `Rejected`.** `persistUnlocked` writes to the journal first, then replays the projection (`document-session.ts:337-347`), and `documentFailure` lets `DocumentConflict` through (`document-failures.ts:44`). So a first attempt can be saved and still be reported as rejected. Fix: snapshot the ids in `session.pending()` before the attempt. If the set grew, keep the outcome ambiguous.
+2. **An unknown token in `Attach` returns `Rejected`** (`worker-assets.ts:76`). A missing token (for example after `End` or `Close`) doesn't prove nothing was saved, so it should be ambiguous.
+3. **The file chooser can get stuck.** If neither `change` nor `cancel` fires (a `click` without a user gesture, or an older browser), `pickerSelection` is never cleared and every later asset command is silently ignored. Fix: `requestAssets` should cancel the stale chooser and capture again.
+4. **Picked files can be dropped silently.** `assetOperation` returns `false` without recording a failure when the editor is busy, an asset command is running, or `beginCommand` refuses.
+5. **The journey doesn't test the new chooser path.** `assets-journey.ts:14` dispatches `change` without opening the chooser first, so no worker token is captured up front. Add a step that sends `command("asset")` before setting files, plus 9 cancels followed by a successful attach to prove tokens are released.
+6. **Minor:** `attachFiles` returns early when there is no selection, before the cleanup step, so the chooser's token leaks. This only happens during teardown.
+
+**Gap classification**
+- **Large-file base64 (known gap):** a failure now becomes a refusal instead of freezing the editor. There's still no size check before encoding, so the main thread still allocates the whole string. Add a size cap before going past tiny files.
+- **Unknown token loss / resource cap:**
+  - By design, an ambiguous attach keeps its token.
+  - A capture or prepare reply lost after the worker succeeded leaks a token.
+  - A chooser release that times out after 1 second also leaks one.
+  - Selections and prepared commands are each capped at 8. Hitting the cap gives a `HandleCapacity` refusal; the editor keeps working. `End` and `Close` clear them.
+- **Actual permission/cutover gaps:**
+  - `AssetAdmission` isn't connected to production role changes; it is only defined in the RPC and the queue.
+  - The chooser always captures a non-inline selection, so the production image-context replace isn't matched.
+  - The recovery-key race in `workerBlobServices` is still there.
+  - `document-app` isn't cut over to the worker yet.
+
+The same findings are in `/Users/carlassmann/.claude/plans/read-only-final-asset-source-swirling-wozniak.md`.
+
+Several claude.ai connectors (GitHub, Slack, Notion and others) need authorizing in claude.ai connector settings before they can be used. None were needed here.
+
+written with claude-opus-5-5 in claude code

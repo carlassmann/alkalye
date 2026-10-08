@@ -1,0 +1,51 @@
+I found 5 correctness blockers and 3 low-priority issues. I didn't run anything (no typecheck, tests or browser), so every point comes from reading the code. #1 I traced into the effect library source.
+
+**Blockers, most severe first**
+
+1. **Sending a Blob over the worker RPC won't work** (`worker-rpc.ts:44`, `:47`)
+   - Worker RPC encodes payloads with `Schema.toCodecJson` on both sides (`node_modules/effect/src/rpc/RpcClient.ts:1435`, `RpcServer.ts:1503`).
+   - `Schema.instanceOf(Blob)` has no JSON-codec annotation, so it falls back to `unknownToJson`. That check (`isJson`, `SchemaAST.ts:5117`) rejects Blob and File because they aren't plain objects.
+   - Result: `PrepareAttachment` fails to encode on the main side and `ReadAsset` fails on the worker side.
+   - Fix: one shared `BlobSchema = Schema.instanceOf(Blob, { toCodecJson: () => Schema.link<Blob>()(Schema.Any, SchemaTransformation.passthrough()) })` (needs a runtime check). Structured clone then carries the Blob through.
+
+2. **Typed failures are lost** (`worker-session.ts:140`, `:142`, `:144`)
+   - `Effect.try(thunk)` turns any thrown error into `UnknownError`.
+   - So `PermissionDenied` and `DocumentConflict` thrown by `capture`, `prepare` and `prepareChange` become `SessionFailure` with category `"failure"`.
+   - Fix: `Effect.try({ try, catch: e => e })`. Also make the capacity check throw a `HandleCapacity` failure instead of `DocumentConflict`.
+
+3. **Any failure kills the editor and leaks tokens** (`browser-fixture.ts:237-244`)
+   - The catch-all calls `failAuthority()` even when nothing was applied: capture/prepare errors, permission denied, file too large.
+   - `freezeCommands(false)` is never called, and the selection/prepared tokens are never released. After 8 such failures the cap of 8 blocks new captures, though only once the editor survives failures (after this fix).
+   - Fix: call `failAuthority()` only for `AppliedUnknown`, untyped attach errors, or a merge failure. Otherwise unfreeze, and release the tokens in `Effect.ensuring`. Keep the prepared token after an ambiguous attach so it can be retried.
+
+4. **A successful attach can still kill the editor at merge** (`browser-fixture.ts:232-233`)
+   - The textarea is read-only while the attach runs, but the user can still select text or move the caret. That bumps the selection generation or changes start/end, so the merge returns `false`.
+   - The fixture treats `false` as `AppliedUnknown` and fails, even though the attachment was applied.
+   - Fix: send `false` to the existing adoption-retry path in `bindings.ts` (expose something like `requireAdoption()` that sets `needsAdoption` and a deadline, then calls `resumeUndo`).
+
+5. **Undo and asset operations can interleave** (`bindings.ts:125-142`, `browser-fixture.ts:222`)
+   - `commandSelection().editable` ignores the frozen state, so undo can start during an asset operation. `queue.undo` sets `commandFrozen`, and the queued attach is then rejected as `QueuedBlocked`.
+   - Or the undo comes back "not-applied" and calls `freezeCommands(false)` mid-upload. Typing then adds pending edits, merge returns `false`, and the editor fails.
+   - Also, `assetOperation` doesn't check `runningUndo`/`needsAdoption`, so `bindings.merge()` returns `false` immediately after an applied attach.
+   - Fix: one shared busy flag that each side checks before starting.
+
+**Low priority**
+- **Retry after permission loss:** `DocumentAssets.change` checks `writable` before running the memoized command. Retrying an attach that already landed, after write access was revoked, reports `PermissionDenied` even though it was applied. The fixture never retries, so this is only latent.
+- **Worker can create a recovery key:** `BrowserAccount.layer` uses `getOrCreate("recovery")`, so the worker can write a new recovery key before the subject check runs. Fix: read it first and fail if it's missing.
+- **Surrogate check missing:** `capture` doesn't have the split-surrogate check that `CaptureComment` has (`worker-session.ts:156`). Reuse it.
+
+**Checked and OK**
+- **Upload before commit:** same pattern as production, `browser-library.ts:479`.
+- **Scoped services:** account, storage and blob services are built in the session scope, with the subject checked.
+- **Causal ranges:** captured atoms come from the local copy, whose edits carry the same IDs as the worker session's, and the epoch/sequence check holds.
+- **Same-effect idempotence:** `propose` memoizes the action and `attachFiles` memoizes identities and the command.
+- **FIFO ordering:** asset commands go through the same queue as edits.
+- **Resource release:** closing or failing to open closes the scope, and a finalizer clears both maps.
+- **Whiteboards:** native board file read only. No editing path added.
+- **Feature caps:** the 8-token caps match the existing handle and comment caps. No new product limit.
+
+The same findings are in `/Users/carlassmann/.claude/plans/read-only-source-review-use-dynamic-puddle.md`.
+
+Several claude.ai connectors (GitHub, Slack, Notion, etc.) need authorizing in claude.ai connector settings before they can be used. None were needed here.
+
+written with claude-opus-5-5 in claude code

@@ -1,0 +1,109 @@
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import * as Layer from "effect/Layer"
+import { BrowserAccount } from "./src/client/browser-account"
+import { BrowserStorage } from "./src/client/storage"
+import { DocumentAssets } from "./src/client/document-assets"
+import type { AttachmentSelection } from "./src/client/document-assets"
+import { DocumentBlobs } from "./src/client/document-blobs"
+import { DocumentSession } from "./src/shared/document-session"
+import { DocumentConflict, PermissionDenied } from "./src/shared/document-errors"
+import { boardFile } from "./src/shared/whiteboard"
+import { WorkerDocumentFailure } from "./worker-rpc"
+import type { Replica } from "./src/shared/crdt"
+import * as Scope from "effect/Scope"
+
+export function workerBlobServices(document: string, subject: string, origin: string, scope: Scope.Scope) {
+ return Effect.gen(function* () {
+  let storageContext = yield* Layer.buildWithScope(BrowserStorage.layer, scope)
+  let storage = Context.get(storageContext, BrowserStorage)
+  if (typeof (yield* storage.get("recovery")) !== "string") return yield* Effect.fail(new PermissionDenied({ message: "Worker account is unavailable" }))
+  let accountContext = yield* Layer.buildWithScope(BrowserAccount.layer(origin).pipe(Layer.provide(Layer.succeed(BrowserStorage, storage))), scope)
+  let account = Context.get(accountContext, BrowserAccount)
+  if (account.subject !== subject) return yield* Effect.fail(new PermissionDenied({ message: "Worker account changed" }))
+  let blobContext = yield* Layer.buildWithScope(DocumentBlobs.layer(document).pipe(
+   Layer.provide(Layer.succeed(BrowserAccount, account)),
+   Layer.provide(Layer.succeed(BrowserStorage, storage)),
+  ), scope)
+  return { account, blobs: Context.get(blobContext, DocumentBlobs) }
+ })
+}
+
+export function workerAssets(document: string, session: Context.Service.Shape<typeof DocumentSession>, blobs: Context.Service.Shape<typeof DocumentBlobs>, canWrite: () => boolean, scope: Scope.Scope) {
+ return Effect.gen(function* () {
+  let context = yield* Layer.buildWithScope(DocumentAssets.layer({ document, canWrite }).pipe(
+   Layer.provide(Layer.succeed(DocumentSession, session)),
+   Layer.provide(Layer.succeed(DocumentBlobs, blobs)),
+  ), scope)
+  let assets = Context.get(context, DocumentAssets)
+  let selections = new Map<string, AttachmentSelection>()
+  let prepared = new Map<string, { command: ReturnType<typeof assets.attachFiles> | ReturnType<typeof assets.insert> | ReturnType<typeof assets.rename> | ReturnType<typeof assets.delete> }>()
+  yield* Scope.addFinalizer(scope, Effect.sync(() => { selections.clear(); prepared.clear() }))
+  function writable() { if (!canWrite()) throw new PermissionDenied({ message: "This document is read-only" }) }
+  function unavailable() { return new DocumentConflict({ message: "Attachment capability unavailable" }) }
+  function capacity(size: number) { if (size >= 8) throw new WorkerDocumentFailure({ reason: "HandleCapacity", category: "conflict" }) }
+  return {
+   current() {
+    return [
+     ...assets.current().map(asset => ({ id: asset.id, kind: "asset", name: asset.fields.name ?? "Asset", audible: asset.audible })),
+     ...session.replica.records("whiteboard").filter(board => board.fields.document === document).map(board => ({ id: board.id, kind: "whiteboard", name: board.fields.name ?? "Whiteboard", audible: false })),
+    ]
+   },
+   capture(replica: Replica, start: number, end: number, inline: boolean) {
+    writable()
+    capacity(selections.size)
+    let source = replica.text(document)
+    if (start > end || end > source.length) throw new DocumentConflict({ message: "Attachment selection unavailable" })
+    let selected = source.slice(start, end)
+    if (/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/u.test(selected)) throw new WorkerDocumentFailure({ reason: "SelectionUnavailable", category: "conflict" })
+    let token = crypto.randomUUID()
+    selections.set(token, { atoms: replica.visible(document), start, end, inline })
+    return token
+   },
+   prepare(files: readonly { blob: Blob; name: string }[], selection: string) {
+    writable()
+    capacity(prepared.size)
+    let captured = selections.get(selection)
+    if (!captured) throw unavailable()
+    let token = crypto.randomUUID()
+    prepared.set(token, { command: assets.attachFiles(files, captured) })
+    selections.delete(selection)
+    return token
+   },
+   attach(token: string) {
+    return Effect.gen(function* () {
+     let entry = prepared.get(token)
+     if (!entry) return yield* Effect.fail(new WorkerDocumentFailure({ reason: "AppliedUnknown", category: "conflict" }))
+     return yield* entry.command
+    })
+   },
+   prepareChange(kind: "insert" | "rename" | "delete", id: string, name?: string, selection?: string) {
+    writable()
+    capacity(prepared.size)
+    let captured = selection ? selections.get(selection) : undefined
+    if (kind === "insert" && !captured) throw unavailable()
+    let command = kind === "insert" ? assets.insert(id, captured) : kind === "rename" ? assets.rename(id, name ?? "") : assets.delete(id)
+    let token = crypto.randomUUID()
+    prepared.set(token, { command })
+    if (selection) selections.delete(selection)
+    return token
+   },
+   read(id: string) {
+    return Effect.gen(function* () {
+     let fields = session.replica.fields(id)
+     if (fields.document !== document) return yield* Effect.fail(unavailable())
+     if (fields.type === "whiteboard") {
+      let file = boardFile(fields)
+      if (!file) return yield* Effect.fail(unavailable())
+      return new File([file], (fields.name ?? "Whiteboard") + ".tldr", { type: "application/json" })
+     }
+     if (fields.type !== "asset" || !fields.data) return yield* Effect.fail(unavailable())
+     let blob = yield* blobs.read(fields.data)
+     return new File([blob], fields.name ?? "Asset", { type: blob.type })
+    })
+   },
+   release(token: string) { selections.delete(token); prepared.delete(token) },
+   close() { selections.clear(); prepared.clear() },
+  }
+ })
+}

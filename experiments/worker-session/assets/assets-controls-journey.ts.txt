@@ -1,0 +1,34 @@
+import { assert, browser, evaluate, wait } from "./tests/browser-driver"
+let url = process.argv[2]
+if (!url) throw Error("URL required")
+let session = "worker-assets-controls-" + Date.now()
+let proof = "window.workerEditorProof"
+let text = 'document.querySelector("alkalye-editor").source'
+try {
+ browser(session, "open", url)
+ wait(session, "document.body.dataset.ready==='true'||!!document.body.dataset.failure")
+ assert(evaluate(session, "!document.body.dataset.failure"), "Asset capability control fixture opens")
+ let original = evaluate(session, `${proof}.inspect().source`)
+ if (typeof original !== "string") throw Error("Source unavailable")
+ let start = original.lastIndexOf("alpha")
+ evaluate(session, `${text}.focus();${text}.setSelectionRange(${start},${start+5})`)
+ let selection = evaluate(session, `${proof}.captureAsset(${start},${start+5}).then(value=>value.token)`)
+ if (typeof selection !== "string") throw Error("Selection unavailable")
+ evaluate(session, `${proof}.peerRange(${original.indexOf('alpha')},0,'PEER')`)
+ let command = evaluate(session, `${proof}.prepareAsset(new File(['retry bytes 😀'],'retry.txt',{type:'text/plain'}),${JSON.stringify(selection)}).then(value=>value.token)`)
+ if (typeof command !== "string") throw Error("Command unavailable")
+ let first = evaluate(session, `${proof}.executeAsset(${JSON.stringify(command)}).then(value=>value.action)`)
+ let repeated = evaluate(session, `${proof}.executeAsset(${JSON.stringify(command)}).then(value=>value.action)`)
+ assert(first === repeated, "Same prepared asset command retry preserves action identity")
+ assert(evaluate(session, `${proof}.assets().then(value=>value.length===1)`), "Repeated attachment command creates one asset")
+ evaluate(session, `${proof}.merge()`)
+ let source = evaluate(session, `${proof}.inspect().source`)
+ assert(typeof source === "string" && source.includes("PEERalpha beta") && source.includes("![retry.txt](asset:") && !source.includes("beta alpha"), "Captured worker basis replaces exact occurrence and preserves unseen peer insertion")
+ evaluate(session, `${proof}.releaseAsset(${JSON.stringify(command)})`)
+ assert(evaluate(session, `${proof}.executeAsset(${JSON.stringify(command)}).then(()=>false,error=>error.reason==='AppliedUnknown')`), "Released mutation capability cannot falsely report no-op")
+ evaluate(session, `${proof}.assetAdmission(false)`)
+ assert(evaluate(session, `${proof}.captureAsset(0,0).then(()=>false,error=>error.reason==='PermissionDenied')`), "Readonly admission retains typed permission refusal")
+ evaluate(session, `${proof}.assetAdmission(true)`)
+ evaluate(session, `${proof}.dispose()`)
+ assert(evaluate(session, "document.body.dataset.closed==='true'"), "Asset command capabilities release with worker scope")
+} finally { browser(session, "close") }
