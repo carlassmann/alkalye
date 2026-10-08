@@ -1,0 +1,16 @@
+{
+  "baseline": {
+    "shared/crdt.ts": "fa018ceddb23a671cc2364e324c11f06a184058e2c58a959c769b9bc39586833",
+    "shared/document-session.ts": "f49813ffb4e8dbcee1dddba26e58207efd464e14fda56d6e9b184f7b3c36420f",
+    "client/worker-document/worker-opened-capabilities.ts": "834abdd3a085cf5b3a9463bd24ffbd590c3f8672503f4d17981483edf37db004",
+    "client/worker-document/worker-session.ts": "f7a873027e50deb2f42255975f5242016021ec47f6a2b3f643c3263b5520d1da",
+    "client/worker-document/worker-opened-observation.ts": "cb697a5c684020a63ca762af21bffd1fdd701f587763f902f331a5c897e30e17"
+  },
+  "candidate": {
+    "shared/crdt.ts": "4a027a4d0500289e77dc15f2c0802d5b964cf50f8d29c78ab59788e0c1cf4e5f",
+    "shared/document-session.ts": "954124f801c1394a91493918dc259deb6c3e3e92077370b98597340f603b80e6",
+    "client/worker-document/worker-opened-capabilities.ts": "e99e791f307f123345d8e456be2c7bb52c4ebc84c8374e76e749387c6adf41f5",
+    "client/worker-document/worker-session.ts": "d30371f74032f6e08dd394cbe71de00d65cdb0e9921fe93317c6560c51674c9b",
+    "client/worker-document/worker-opened-observation.ts": "9a813743d4865cb0bc46727880c4f196d2dcc3e8d275b3b55dd0180d137fca53"
+  }
+}

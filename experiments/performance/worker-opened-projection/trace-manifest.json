@@ -1,0 +1,86 @@
+[
+  {
+    "arm": "baseline",
+    "name": "Undo-1.trace.json",
+    "bytes": 6621533,
+    "sha256": "07588d780bf9722c23cbd19d1a9867319dac350baf4f9ec6740d4f9d800eaca2",
+    "retainedOutsideGit": "/tmp/alkalye-worker-opened-projection/native-baseline-state/Undo-1.trace.json"
+  },
+  {
+    "arm": "baseline",
+    "name": "stable-copy-native-mc-1-selection.trace.json",
+    "bytes": 3396026,
+    "sha256": "3e2d1fb639a1711f463a5d54e0f679db13e1aa69edd05dacc5fe6159f485c9c4",
+    "retainedOutsideGit": "/tmp/alkalye-worker-opened-projection/native-baseline-state/stable-copy-native-mc-1-selection.trace.json"
+  },
+  {
+    "arm": "baseline",
+    "name": "stable-copy-native-mc-512-single.trace.json",
+    "bytes": 8664656,
+    "sha256": "95669043d67a8c859892bf885fa7b4cce546d07e9cb800234118eaa0f4b3c28f",
+    "retainedOutsideGit": "/tmp/alkalye-worker-opened-projection/native-baseline-state/stable-copy-native-mc-512-single.trace.json"
+  },
+  {
+    "arm": "baseline",
+    "name": "stable-copy-native-mc-1-single.trace.json",
+    "bytes": 6138741,
+    "sha256": "58960515c7920572aaeb8b4a9a8f0a4dd2fbb2ea2c847efbeaa93e831e7f9fd0",
+    "retainedOutsideGit": "/tmp/alkalye-worker-opened-projection/native-baseline-state/stable-copy-native-mc-1-single.trace.json"
+  },
+  {
+    "arm": "baseline",
+    "name": "Undo-512.trace.json",
+    "bytes": 7411402,
+    "sha256": "3f27f1e0fef555a20d2d08e08d158f68bccb010a59136b20c7f08315c9e9baa0",
+    "retainedOutsideGit": "/tmp/alkalye-worker-opened-projection/native-baseline-state/Undo-512.trace.json"
+  },
+  {
+    "arm": "baseline",
+    "name": "stable-copy-native-mc-512-selection.trace.json",
+    "bytes": 4993524,
+    "sha256": "7e933a29f6631369fa6043e7968287fe13104c99497b4ad6d280e72b58e73aab",
+    "retainedOutsideGit": "/tmp/alkalye-worker-opened-projection/native-baseline-state/stable-copy-native-mc-512-selection.trace.json"
+  },
+  {
+    "arm": "candidate",
+    "name": "Undo-1.trace.json",
+    "bytes": 8574451,
+    "sha256": "e6008be233ae671cc8d23c3a51a1f009748a064f9272c39f27f4f584d6fc1bee",
+    "retainedOutsideGit": "/tmp/alkalye-worker-opened-projection/native-candidate-state/Undo-1.trace.json"
+  },
+  {
+    "arm": "candidate",
+    "name": "stable-copy-native-mc-1-selection.trace.json",
+    "bytes": 3369830,
+    "sha256": "8948cd6967b7975ed3d0b0c2459b6b110de4a47d5982f7587f54cfb82c29e346",
+    "retainedOutsideGit": "/tmp/alkalye-worker-opened-projection/native-candidate-state/stable-copy-native-mc-1-selection.trace.json"
+  },
+  {
+    "arm": "candidate",
+    "name": "stable-copy-native-mc-512-single.trace.json",
+    "bytes": 8844481,
+    "sha256": "492d8a0b619c25a3e24edf83acd0c9c37466996a6a2a20dfefe87cc9435e3657",
+    "retainedOutsideGit": "/tmp/alkalye-worker-opened-projection/native-candidate-state/stable-copy-native-mc-512-single.trace.json"
+  },
+  {
+    "arm": "candidate",
+    "name": "stable-copy-native-mc-1-single.trace.json",
+    "bytes": 6157549,
+    "sha256": "1d545bfb0daea86584018906902edb76d1b8bb0794a639e0e1c028d4bd5f5692",
+    "retainedOutsideGit": "/tmp/alkalye-worker-opened-projection/native-candidate-state/stable-copy-native-mc-1-single.trace.json"
+  },
+  {
+    "arm": "candidate",
+    "name": "Undo-512.trace.json",
+    "bytes": 8810727,
+    "sha256": "cb95f5a5abadfdbe9660c9b7e3c67b765866707a36ae8f97da4b5621bf4e93d4",
+    "retainedOutsideGit": "/tmp/alkalye-worker-opened-projection/native-candidate-state/Undo-512.trace.json"
+  },
+  {
+    "arm": "candidate",
+    "name": "stable-copy-native-mc-512-selection.trace.json",
+    "bytes": 4910031,
+    "sha256": "6729028102a8005ef116b178915da58de563d4b91c25335708ad6c7b07949a6e",
+    "retainedOutsideGit": "/tmp/alkalye-worker-opened-projection/native-candidate-state/stable-copy-native-mc-512-selection.trace.json"
+  }
+]

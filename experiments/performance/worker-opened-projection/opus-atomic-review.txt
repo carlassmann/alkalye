@@ -1,0 +1,78 @@
+## Verdict
+Correctness holds. One blocker: the retry loop runs while holding `gate`. One should-fix: a close race. The double-read is optional.
+
+## What is now correct
+- `readView` (`shared/document-session.ts:503`) captures replica and generation before warming, then checks both after. If they match, the cache is warm for exactly this state. `read()` runs synchronously right after the check, so nothing can change in between.
+- `read()` keeps its own cache keyed by `version()`. If an edit lands before `revision` advances, it returns the last projection with the old revision. That is stale but consistent, and the next `changes` emission corrects it.
+- Native edits go through `ReplaceReceipt`, which runs under `commands`. So `Read`, `AdmissionEpoch` and the ObserveNotice notice (all also under `commands`) can't race native edits. Only Observe's and ObserveNotice's `changes` stream (outside `commands`) can trigger the retry.
+- Both tests pass on real SQLite (`read-view-tests.log`): interruption releases the permit, and a concurrent replace returns the latest record and version.
+
+## 1. Retry while holding `gate`: blocker
+Two problems, even if the retry rarely fires:
+- **Every cold warm now holds `gate`.** Baseline's synchronous read held no lock. Now `flush`, `propose`, replay and Close's finalizer flush all wait for the full cooperative warm (at least the measured 135ms).
+- **The loop is unbounded under that lock.** Writes to the document outside `gate` that don't refill the cache (multi-op applies, `invalidateText` paths, misses in `cachePreparedText`) restart the warm each time. If they keep arriving faster than a warm takes, close and drafts starve. The common native path refills the cache, so in practice this ends in 1–2 passes. But a liveness guarantee under a lock shouldn't depend on that.
+
+Your alternative is correct. Keep capturing generation *before* the warm. Capturing it afterwards lets an Effect auto-yield slip in a native edit, which passes the check with a cold cache and falls into the synchronous 135ms path.
+
+```ts
+readView: <A>(read: () => A) => Effect.gen(function* () {
+  while (true) {
+    yield* requireOpen
+    let source = projection.replica
+    let generation = source.generation
+    let warmed = yield* source.textEffect(options.document).pipe(Effect.result)
+    let unchanged = () => source === projection.replica && source.generation === generation
+    if (warmed._tag === "Failure") {
+      if (unchanged()) return yield* Effect.fail(warmed.failure)
+      continue
+    }
+    let view = yield* gate.withPermit(requireOpen.pipe(Effect.map(() => unchanged() ? Option.some(read()) : Option.none<A>())))
+    if (Option.isSome(view)) return view.value
+  }
+}),
+```
+- Warming outside `gate` is safe: `textEffect` only writes caches in its synchronous tail, after its own generation check. A replay that swaps the replica is caught by the identity check.
+- `requireOpen` runs on every pass, so a loop running during close stops with a failure instead of spinning.
+- The loop is still unbounded, but only the reader waits. It never holds `gate`, and each pass yields and can be interrupted. No synchronous fallback.
+
+## 2. Failure on normal close: should-fix, small
+- **Close RPC path:** fine. Close sets `opened = undefined` and completes `closed` *before* `Scope.close` ends `unsaved`. Observe and ObserveNotice fibers waiting on `gate` or `commands` are interrupted by `interruptWhen(closed)` first.
+- **Real holes:**
+  - `Connectivity` uses `checked`, not `execute`, so it can run during Close. Its `notice` waits for `gate` behind Close's flush, then hits `requireOpen` and returns `SessionFailure`. Baseline returned a snapshot.
+  - Owner-scope teardown has no ordering guarantee for streams that didn't stop in time.
+- **Fix in `worker-session.ts` only.** `readView` keeps failing honestly, with no "return void when closed" (that would need a synchronous read).
+  ```ts
+  function closedOr(current: Opened) { return (error: unknown) => opened === current ? new WorkerDocumentFailure({ reason: "SessionFailure", category: documentFailureCategory(error) }) : failure("Closed") }
+  // notice:
+  current.capability.read.pipe(Effect.mapError(closedOr(current)), Effect.map(...))
+  // Observe / ObserveNotice changes, replacing the Stream.mapError:
+  current.capability.changes.pipe(Stream.catchIf(() => opened !== current, () => Stream.empty), Stream.mapError(closedOr(current)))
+  ```
+  - RPCs still fail with a typed error: `Closed` after close, `SessionFailure` while open.
+  - Streams end cleanly after close and still fail on real errors while open.
+- Note: a real `textEffect` failure while open now kills the Observe stream. Baseline couldn't fail there. That's acceptable, but the client must treat the stream ending as a reason to reopen.
+
+## 3. Double-read in ObserveNotice: not a blocker
+- The second read is the warm cached path, so it costs little CPU. The real cost: it waits for `gate` **while holding `commands`**, so a long flush or persist stalls every `ReplaceReceipt`.
+- Smallest fix: build the notice from the snapshot already read, and keep `execute` so notices stay ordered with commands.
+  ```ts
+  Stream.mapEffect(snapshot => execute(Effect.sync(() => toNotice(current, snapshot))))
+  ```
+  Add `toNotice(current, snapshot)` as the pure part of `notice`. `Connectivity` and `AdmissionEpoch` keep the fresh `notice(current)`.
+- Tradeoff: a notice can lag one command behind. Each command changes `revision`, which triggers a new emission, so the stream still ends on the latest state.
+
+## Remaining blockers
+1. Move the warm out of `gate` (item 1).
+2. Map close-time failures to `Closed` / end the streams (item 2).
+
+## Tests still needed (real SQLite plus the worker session)
+- **Gate stays free:** while a cold `readView` is warming, `flush` (or `propose`) finishes without waiting for the warm.
+- **Starvation:** keep invalidating the document (multi-op `change` writes on a timer) during a cold `readView`. `flush` and Close still finish, and interrupting the reader releases everything.
+- **Replay swap:** a gated replay swaps the replica mid-warm; the result matches the new replica's record and `version()`.
+- **Close vs Connectivity:** call `Connectivity` while Close is flushing; it returns a notice or `Closed`, never `SessionFailure`.
+- **Close vs observers:** Observe and ObserveNotice parked on `gate` or `commands` during Close end without failing.
+- **Owner teardown:** closing the owner scope with an active Observe ends the stream cleanly.
+- **One read per notice:** count `readView` calls per ObserveNotice emission (only if item 3 lands). With `commands` held by a slow flush, `ReplaceReceipt` isn't delayed by a notice.
+- **Real failure while open:** a fixture fault in `textEffect` reaches Observe as a typed `SessionFailure`.
+
+This was a read-only review of the current files; I didn't run anything.

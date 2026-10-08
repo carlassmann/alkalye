@@ -1,0 +1,45 @@
+import json,sys,pathlib,hashlib
+root=pathlib.Path('/tmp/alkalye-worker-opened-projection')
+rows=[]
+def union(intervals):
+ total=0;end=None
+ for start,stop in sorted(intervals):
+  if end is None or start>end:total+=stop-start;end=stop
+  elif stop>end:total+=stop-end;end=stop
+ return total/1000
+for arm in ['baseline','candidate']:
+ for path in sorted((root/('native-'+arm+'-state')).glob('*.trace.json')):
+  data=json.loads(path.read_text());events=data.get('traceEvents',[]) if isinstance(data,dict) else data
+  starts=[e['ts'] for e in events if e.get('name')=='worker-mc:start'];ends=[e['ts'] for e in events if e.get('name')=='worker-mc:end']
+  if not starts or not ends:rows.append({'arm':arm,'file':path.name,'failure':'Missing primary window marks'});continue
+  start=starts[0];end=next((v for v in ends if v>start),None)
+  if end is None:rows.append({'arm':arm,'file':path.name,'failure':'Missing window end'});continue
+  threads={}
+  for e in events:
+   if e.get('ph')=='M' and e.get('name')=='thread_name':threads[(e.get('pid'),e.get('tid'))]=e.get('args',{}).get('name','unknown')
+  selected=[e for e in events if e.get('ts',0)<end and e.get('ts',0)+e.get('dur',0)>start]
+  per={}
+  for key,name in threads.items():
+   tasks=[e for e in selected if (e.get('pid'),e.get('tid'))==key and e.get('name')=='RunTask' and e.get('dur')]
+   if tasks:per[str(key)]={'name':name,'maxTaskMs':max(e['dur'] for e in tasks)/1000,'taskUnionMs':union([(max(start,e['ts']),min(end,e['ts']+e['dur'])) for e in tasks])}
+  spans=[];openings={}
+  for e in sorted(events,key=lambda e:e.get('ts',0)):
+   if not start<=e.get('ts',0)<=end:continue
+   key=(e.get('pid'),e.get('tid'))
+   if e.get('name')=='mapping:Merge:map-start':openings[key]=e['ts']
+   if e.get('name')=='mapping:Merge:map-done' and key in openings:spans.append({'thread':str(key),'durationMs':(e['ts']-openings[key])/1000,'policies':[v.get('name') for v in events if (v.get('pid'),v.get('tid'))==key and openings[key]<=v.get('ts',0)<=e['ts'] and v.get('name','').startswith(('mapping-policy:','mapping-outcome:'))]})
+  marked=[]
+  for prefix in ['opened:materialize','opened:warm']:
+   active={}
+   for e in sorted(events,key=lambda e:e.get('ts',0)):
+    key=(e.get('pid'),e.get('tid'))
+    if e.get('name')==prefix+':start':active[key]=e['ts']
+    elif e.get('name')==prefix+':end' and key in active:
+     begin=active.pop(key)
+     if begin<end and e['ts']>start:marked.append({'phase':prefix,'thread':str(key),'durationMs':(e['ts']-begin)/1000,'startRelativeMs':(begin-start)/1000,'endRelativeMs':(e['ts']-start)/1000})
+  finishes=[e for e in events if start<=e.get('ts',0)<=end and e.get('name')=='ResourceFinish']
+  requestBytes=sum(e.get('args',{}).get('data',{}).get('encodedDataLength',0) for e in finishes)
+  gc=[e for e in selected if e.get('dur') and ('GC' in e.get('name','') or 'CollectGarbage' in e.get('name',''))]
+  rows.append({'arm':arm,'file':path.name,'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'bytes':path.stat().st_size,'windowMs':(end-start)/1000,'threads':per,'resourceFinishedEncodedBytes':requestBytes,'resourceFinishes':len(finishes),'openedSpans':marked,'cpuProfileChunks':sum(e.get('name')=='ProfileChunk' for e in events),'mappingSpans':spans,'mapperObserved':bool(spans),'maxGCInclusiveMs':max([e['dur']/1000 for e in gc],default=0)})
+(root/'native-analysis.json').write_text(json.dumps(rows,indent=2)+'\n')
+print(json.dumps([{'arm':r.get('arm'),'file':r.get('file'),'threads':r.get('threads'),'materializeMs':[s['durationMs'] for s in r.get('openedSpans',[]) if s['phase']=='opened:materialize'],'warmMs':[s['durationMs'] for s in r.get('openedSpans',[]) if s['phase']=='opened:warm']} for r in rows]))

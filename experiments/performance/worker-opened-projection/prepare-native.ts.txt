@@ -1,0 +1,11 @@
+import { build } from "./build"
+let files = ["shared/crdt.ts", "shared/document-session.ts", "client/worker-document/worker-opened-capabilities.ts", "client/worker-document/worker-session.ts", "client/worker-document/worker-opened-observation.ts"]
+try {
+ for (let arm of ["baseline", "candidate"]) {
+  for (let file of files) await Bun.write("src/" + file, await Bun.file("../" + arm + "-src/" + file).arrayBuffer())
+  await build("../native-" + arm + "-dist")
+  console.log(arm + " assets frozen")
+ }
+} finally {
+ for (let file of files) await Bun.write("src/" + file, await Bun.file("../candidate-src/" + file).arrayBuffer())
+}

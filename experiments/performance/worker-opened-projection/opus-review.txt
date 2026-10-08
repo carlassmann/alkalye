@@ -1,0 +1,19 @@
+No hard blockers found in the code. There are three risks, each with a small fix, and one area I couldn't confirm from the code alone.
+
+**Clean**
+- **Interrupting while holding the permit:** `prepareView` (`shared/document-session.ts:503`) runs entirely inside `gate.withPermit`, so an interrupt releases the permit. `textEffect` (`crdt.ts:1486`) only writes its caches in the synchronous tail after the generation check, so an interrupted read can't leave a half-filled cache.
+- **Version vs. read:** `read()` runs synchronously and reads `version()` and the replica in one step, so the pair it returns always matches. If a native edit slips in between the permit release and `read`, the result is still correct: `text()` just computes synchronously again. One gap exists in the baseline too: a replay that swaps the replica only bumps `revision` later, through the `projection.version` stream (`:395`). In that window `read` returns the old cached projection with the old revision. That is stale but consistent.
+- **Permission check:** `admitted` now calls `capability.canWrite()`, which is the same `connection.canWrite` that `read()` used to report. No change in meaning, and it no longer needs a snapshot.
+- **`documentRecord`/`projectDocument`:** same fields and type filter as baseline `documents().find`, and the view still applies `structuredClone`. Nit: there's a blank line before the closing brace at `crdt.ts:1636`.
+
+**Risks**
+1. **Unbounded retry while holding the gate** (`document-session.ts:505-512`). Native `submitEdit` isn't gated, so it can bump `generation` mid-read and force a restart. Edits to the document itself usually refill the cache through `cachePreparedText`, so the next pass returns immediately. But edits to other targets (`edit(…, target)` on a comment) and multi-op applies that hit `invalidateText` don't refill it. Steady typing there can keep `prepareView` restarting indefinitely. While it does, `flush`, `propose`, replay, and Close's flush all wait on `gate`, so drafts don't get saved.
+   - **Fix:** don't loop. On a generation mismatch just `return`; `read()` is correct either way and will compute synchronously. Or allow one retry, then return.
+2. **`changes` can now fail on a normal close.** Baseline used `Stream.map(read)`, which never failed. Now `Stream.mapEffect(readEffect)` fails through `requireOpen` once `unsaved` has ended. Observe and ObserveNotice only stop on `interruptWhen(closed)`. A stream fiber parked waiting for `gate` (e.g. behind the session finalizer's flush) can wake to `conflict("…closed")` and emit `SessionFailure` instead of ending cleanly. ObserveNotice also queues `execute(notice)` behind Close's `commands` permit; after that, `notice` hits the same failure.
+   - **Fix:** in `prepareView`, return `Effect.void` when closed instead of failing. The sync `read` of the last state is fine, and `interruptWhen` ends the stream.
+3. **ObserveNotice reads twice.** `capability.changes` already runs `readEffect`, then `notice` runs `prepareView` again while holding `commands`. That second wait can be for a `gate` held by persist or flush, which stalls every RPC behind it. It's latency rather than wrong data, and harmless for correctness.
+   - **Fix:** map the snapshot from `changes` directly, without the second read and without `execute`.
+
+**Open cleanup:** `capability.read` runs inside `restore(...)`, so an interrupt or failure goes through `onExit` and `Scope.close(scope, exit)`, same as baseline. Fine.
+
+**Not confirmed:** I didn't check whether anything that holds `gate` (e.g. `activity.settled` inside sync, `:626`) calls back into `capability.read` or `commands`. That would deadlock, since the semaphore isn't re-entrant. Nothing I read does it. Your concurrent tests should include: close while an observer waits on the gate, and typing into a comment while a large document is warming.

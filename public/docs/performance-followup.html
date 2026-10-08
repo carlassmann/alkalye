@@ -1802,6 +1802,18 @@
 			<code>experiments/performance/worker-projection-profile</code>.
 		</p>
 		<p>
+			A selected-document read with cooperative warming passed exact native
+			one-range and 512-range edit/Undo checks and independent server
+			acceptance. It reduced the measured projection read from 186–192ms to
+			under 1ms, but moved expensive work elsewhere. Whole-worker Undo maxima
+			rose to 257–274ms; source-ready frame opportunities worsened from
+			524–571ms to 708–723ms. Durable local-save readiness improved, but
+			interaction latency regressed. This candidate is rejected. These are
+			single matched trials, without CPU sampling or physical paint measurement.
+			Evidence:
+			<code>experiments/performance/worker-opened-projection</code>.
+		</p>
+		<p>
 			The worker metadata pipeline passed 31 storage/owner assertions and a real
 			WorkerRPC journey. A dropped applied reply is recovered as the same
 			action, exact pending state clears, and Merge/Adopt matches an independent

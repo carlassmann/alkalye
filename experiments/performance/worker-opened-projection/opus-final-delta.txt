@@ -1,0 +1,26 @@
+**Verdict: both earlier blockers are fixed, and I found no new blocker.** This was a read-only check of the files in `/tmp/alkalye-worker-opened-projection`; I ran nothing.
+
+**1. The warm now runs outside `gate`. Fixed.**
+- In `shared/document-session.ts:503-517`, the replica and generation are captured at lines 506-507, before the warm starts.
+- The warm at line 508 runs without holding `gate`.
+- If the replica changed during the warm, line 509 retries. If it didn't, a failure is returned as the real error.
+- Inside the permit, `requireOpen` runs, then the identity/generation check, then `read()` synchronously. A mismatch gives `{retry: true}` and the retry happens after the permit is released.
+- `requireOpen` runs on every pass, so a reader that is mid-loop when the session closes stops with a failure. It doesn't spin.
+
+**2. Close-time failures now map to `Closed`. Fixed.**
+- `readFailure` (`worker-session.ts:51`) returns `Closed` only when `opened !== current`. Otherwise it returns `SessionFailure`, so real errors still come through.
+- Close clears `opened` at line 212, before `Deferred.done` and `Scope.close`. So `Connectivity` arriving during Close's flush now gets `Closed`, not `SessionFailure`.
+- `observedChanges` (line 55) only turns a failure into an empty stream when the opened session has changed. Real errors on a still-open session still reach the client as `SessionFailure`.
+
+**3. ObserveNotice reads once per notice. Fixed.**
+- Line 162 builds the notice from the snapshot already read, using the pure `noticeSnapshot`, and runs it under `execute`.
+- There's no second read, so it no longer waits for `gate` while holding `commands`.
+- `Connectivity` and `AdmissionEpoch` still read a fresh snapshot via `notice()`.
+
+**One remaining edge, not a blocker:** owner-scope teardown without Close never clears `opened`. A stream still running at that point would end with `SessionFailure` instead of ending cleanly. That only happens on worker shutdown.
+
+**Tests to confirm once your runs finish:**
+- `flush` finishes without waiting while a cold `readView` is warming.
+- Starvation under repeated multi-op writes.
+- `Connectivity` called during Close returns a notice or `Closed`.
+- Observe and ObserveNotice parked during Close end without failing.

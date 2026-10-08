@@ -1,0 +1,18 @@
+# Selected cooperative opened projection — rejected native pair
+
+Outside prototype only. Original stable-copy worker with full mapper compared with selected-document/cooperative current-projection read, exact generation/identity publication, typed close handling, and ordered single-read notices. No immediate-predecessor mapper or production adoption. One fresh pristine-seed trial per arm; sequential original then candidate; actual native1/512 replacement and Undo through worker/editor, independent API acceptance, every range/direction/primary/caret exact. Both passed. Full3s unsampled browser/worker traces; no ProfileChunks. Frame observations are source-ready opportunities, not physical paint.
+
+| Undo ranges | Original worker max | Candidate worker max | Original worker union | Candidate worker union | Original source opportunity | Candidate source opportunity |
+| ----------- | ------------------: | -------------------: | --------------------: | ---------------------: | --------------------------: | ---------------------------: |
+| 1           |           185.914ms |            257.032ms |            1304.185ms |             1569.310ms |                   523.900ms |                    707.800ms |
+| 512         |           192.365ms |            274.451ms |             904.550ms |             1107.808ms |                   571.100ms |                    723.400ms |
+
+Materialize spans185.816/192.259ms became0.687/0.649ms. Cooperative warm elapsed838.873/815.824ms, overlapping other work: not CPU totals. Main max6.258/4.185 became6.641/4.675ms. Local-saved opportunity1272.100/1234.600 became707.900/723.400ms. Candidate main input source opportunity13.000ms versus6.200ms in1-range arm;5125.300→4.500ms. These are finite n1 cells, not sustained/browser120Hz proof. All row/task unions are per-thread clipped unions; never sum overlapping GC/nested phases or different threads.
+
+Actual RPC48 assertions per arm passed: peer changes, Unicode512 ranges, Undo/Redo, metadata, admission revoke/restore, notice observation and concurrent Connectivity/Close. Empty-atom/lone-surrogate controls still fail Actor identity authorization during create in BOTH arms before projection/mapping; coverage unproved. Actual SQLite2tests/15assertions passed: cold warming pending, flush progresses while pending, interruption releases resources, unrelated comment/native mutation returns exact latest selected record/version. Earlier warm fixture false-eligibility and strict errors retained. Final Opus5.5 review resolved gate-held starvation and released-permit publication issues; worker owner teardown without public Close may still end an observer with SessionFailure.
+
+## Provenance limits
+
+Source pins before/after instrumentation, immutable emitted script hashes, final exact runner and all returned range snapshots retained. Identical materialize marks in both arms; candidate also records cooperative warm spans. Per-input preflight fetched observed script resources and compared SHA to immutable dist; baseline gate executed successfully. Packaging bug: resource JSON filenames shared across arms, so candidate overwrote baseline inventory. Baseline resource inventory not retained; baseline emitted hashes alone are not original response/execution coverage. Candidate resource records are retained and refetch matching is explicitly scoped. Raw traces, SQLite, profiles and credentials remain outside Git. No uncertain action rerun.
+
+Next: source-attributed diagnostic of larger candidate worker task before any further cache/generator change. Current traces show seam movement, not the exclusive function cause of257–274ms. No hashing/JIT/Effect scheduler attribution inferred.
