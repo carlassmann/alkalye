@@ -1,0 +1,27 @@
+**Mostly yes.** The 3 blockers from `opus-integrated.log:18-21` are fixed in the files I read. One bounds gap is left: the 15s deadline is only checked lazily (#1 below). Nothing was run. I wrote no plan file because you said no writes.
+
+## Verified
+- **Mount wiring:** `browser-fixture.ts:173-174` sets `undo: bindings.undo` and `select: bindings.resumeUndo`. The production mount wasn't in the read set, so this is confirmed for the fixture only.
+- **Budget (`bindings.ts:89-92`):** both counters go up before the check, and it fails when attempts > 3, requests > 6, or `remaining <= 0`. So at most 3 stable tries and 6 requests are sent, then the next call fails with `AppliedUnknown`.
+  - A changed generation does `adoptionAttempts--` (`:99`), but the request count stays. So changed generations can't loop forever; the 6-request cap stops them.
+  - The counters reset only on an `applied` receipt (`:117`).
+- **Timeout:** `Effect.timeout(remaining)` (`:96`) fails with a `TimeoutError`. That isn't a `WorkerDocumentFailure`, so `catch` calls `fail` (`:101`). Good.
+- **`SelectionUnavailable` (`:101`):** it's swallowed without undoing the counter, so it uses up the same budget. Then `ensuring` calls `resumeUndo`, which sends only `queue.merge`. The Undo isn't resent (`undo()` with `needsAdoption` goes to `resumeUndo`, `:108`). The bindings never touch source or the draft. The queue keeps `failure` unset for this error (`editor-queue.ts:251-255`), so the retry can work.
+- **Sticky failure:** `fail()` sets `failed` and calls `failAuthority` (`:26-33`), and nothing resets it. An `unknown` receipt, a closed or failed queue, a failed edit save and a merge error all go through `fail`.
+- **Busy or composing selection:** the call returns without counting, then waits for the next `select`. A stable `false` retries right away, so it hits the 3-try limit fast. That is bounded.
+- **Fixture:** one wrapper handles drop-once, drop-always and hold for Undo, plus hold-merge and drop-adopt. The faults fire after the raw call finishes, which models a reply lost after the server applied it. The clipboard stub, Capture/Resolve/Release and Undo all share one queue. I can't confirm the wrapper is an "exact copy": the reference files weren't in the read set.
+
+## Gaps (not blockers for the source)
+1. **The deadline is lazy.** It's only checked when `resumeUndo` runs or while a request is in flight. If the selection stays busy or no `select` arrives after an early return, nothing fails, and the Editor can stay frozen past 15s. Either add a deadline timer that calls `fail` (e.g. an `Effect.sleep` fork), or limit the proof claim to "bounded per attempt".
+2. **If `commandSelection()` returns `undefined` after a `false` result, it counts as a changed generation.** The counter goes down and the next call returns early, with no failure (relates to #1).
+3. **A user-started `merge()` still turns `SelectionUnavailable` into a permanent fail** (`:74`). That's safe but harsh. Keeping it is a conscious choice.
+4. **After a timeout, the queue may still Adopt the candidate.** The authority has already failed by then. That's safe only if `adoptMerged` refuses once authority has failed, and I haven't checked `editor.ts`.
+5. **Log items 4-6 are still not applied:**
+   - `editor-queue.ts:314-316` is still missing `merges.delete`.
+   - `:380-383` still calls `ReleaseClipboard` unconditionally.
+   - `:136-140` still has the three duplicate release branches.
+6. **Type questions are still open:** the generic `UndoQueued<false,false>` vs the non-generic wrapper (`browser-fixture.ts:108`), and the `RpcClientError` shape.
+
+Verdict: you can start the integrated native correctness proofs. Fix #1 first or narrow the deadline claim. This is not a production cutover and makes no performance claim.
+
+The claude.ai connectors (GitHub, Slack, Notion, Gmail, etc.) still need authorizing in your claude.ai connector settings before they work.

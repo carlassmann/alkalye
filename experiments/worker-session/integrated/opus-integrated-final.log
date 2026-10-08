@@ -1,0 +1,29 @@
+**Source: no blocker found. Test: two gaps** in `deadline-journey.ts` should be fixed before final runtime certification. This was a read-only review; I ran nothing.
+
+## Verified
+- **Sticky failure guard**
+  - `adoptMerged` checks `authorityFailed` first (`editor.ts:1010`), and nothing resets that flag.
+  - `setEditable` and `freezeCommands` both respect it (`:1039`, `:1044`), and so does `workerClipboardReady` (`:1672`).
+  - A late candidate is therefore refused, and the queue's `ReleaseCandidate` path runs (`editor-queue.ts:318`).
+- **Watchdog** (`bindings.ts:32-43`)
+  - It races `sleep(15s)` against a `Deferred`. The callback checks that it is still the current deadline (`adoptionCompleted === completed`), that adoption is still needed and that nothing has failed yet.
+  - Success clears it at `:117`, `fail` clears it at `:46`, and a new Undo replaces it at `:33`. When the owner scope closes, the FiberSet interrupts the sleep and `fail` is never called.
+  - Busy selection, composition or a missing `select` can no longer freeze the editor past 15s.
+- **Single failure report:** the timeout at `:115` and the watchdog both reach `fail`, and the `failed` check makes sure only one is reported. So `failures.length===1` holds.
+- **Retry bounds:** at most 3 stable attempts and 6 requests. The 7th request fails, a changed generation gives back an attempt but not a request, and both counters reset only on an `applied` receipt. While adoption is pending, `undo()` routes to `resumeUndo`, so Undo is never resent; only the candidate merge is retried. `postponedUndo` is cleared on fail.
+- **Draft kept:** `failAuthority` never changes the source. After compositionend, `text.value === acceptedSource`, so no edit is sent, and `select → resumeUndo` exits because `failed` is set.
+
+## Gaps to close before certification
+1. **The "late response" test can pass without testing anything** (`deadline-journey.ts:29-31`). After `release()` it only waits for `!held`, so the assertion can run before the queue has handled the late candidate. Wait for something observable first, e.g. a diagnostics counter showing `ReleaseCandidate` ran once, or no merges left in the queue.
+2. **"Undo applied exactly once" isn't proven** (`:32`). If the seed has no earlier undo history, a second Undo would return `not-applied` and `flush()` would still equal `original`. Assert that the `UndoQueued` call count is 1, and that no merge request happens after the failure.
+3. **The `wait` timeout must be over 15s** (`:25`). I couldn't check the default because `tests/browser-driver` wasn't in the read set.
+
+## Limits on the claim (not blockers)
+- The 15s limit starts only once the Undo receipt arrives. If the `UndoQueued` call itself hangs, there's no deadline (`editor-queue.ts:197`), so the editor stays frozen until the transport fails. Limit the claim to the adoption phase, or add a deadline on the Undo request.
+- If the deadline fires between a successful `adoptMerged` and the Adopt acknowledgement, the editor shows the candidate as read-only, not the draft. That's safe, but it's another possible final state.
+- A timeout reports a raw `TimeoutError` while the watchdog reports `AppliedUnknown`. Mapping the timeout to `AppliedUnknown` too would give consistent diagnostics.
+- From the previous log: `editor-queue.ts:314-316` still doesn't call `merges.delete` (a harmless leak), and the duplicate clipboard branches at `:136-140` are still there. The `ReleaseClipboard` call at `:381` now only runs on failure, so that item is fixed.
+
+Verdict: fix gaps 1 and 2 (and confirm 3), then run the runtime proofs. This is not a production cutover claim.
+
+Several claude.ai connectors (GitHub, Slack, Notion, Gmail and others) still need to be authorized in your claude.ai connector settings before they'll work.

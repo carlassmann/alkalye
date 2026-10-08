@@ -1,0 +1,302 @@
+import * as Effect from "effect/Effect"
+import * as Deferred from "effect/Deferred"
+import { RpcClientError, RpcClientDefect } from "effect/rpc/RpcClientError"
+import { WorkerDocumentFailure } from "./worker-rpc"
+import * as Fiber from "effect/Fiber"
+import * as FiberSet from "effect/FiberSet"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import { bootstrapBrowserAccount } from "./tests/browser-account-fixture"
+import { createWorkerSessionClient } from "./worker-client"
+import { makeEditorQueue } from "./editor-queue"
+import { workerEditorBindings } from "./bindings"
+import { EditorElement } from "./src/client/components/editor"
+import { editorPreferences } from "./src/shared/preferences"
+
+interface State {
+	source: string
+	start: number
+	end: number
+	busy: boolean
+	pending: number
+	readonly: boolean
+	queueSource: string
+	failures: string[]
+}
+declare global {
+	interface Window {
+		workerEditorProof?: {
+			fault(mode: string): void
+			release(): void
+			probeLateAdoption(): boolean
+            diagnostics(): { mergeRequests: number; requests: number; requestIds: string[]; held: boolean; closed: boolean; closeReceipt: string }
+			expiredReceipt(): Promise<boolean>
+			observeClosingUndo(): void
+			inspect(): State
+			paste(): void
+			settleClipboard(value: string): void
+			denyClipboard(): void
+			written(): string | undefined
+			settleWrite(): void
+			denyWrite(): void
+			captured(): number
+			undo(redo: boolean): void
+			format(action: string): void
+			merge(): Promise<boolean>
+			peer(selected?: boolean, needle?: string): Promise<void>
+			editable(value: boolean): void
+			flush(): Promise<string>
+			dispose(): Promise<void>
+		}
+	}
+}
+let failures: string[] = []
+let clipboardResult: { resolve: (value: string) => void; reject: (error: unknown) => void } | undefined
+let clipboardCaptured = 0
+let clipboardWritten: string | undefined
+let clipboardWriting: { resolve: () => void; reject: (error: unknown) => void } | undefined
+Object.defineProperty(navigator, "clipboard", { configurable: true, value: {
+	readText() {
+		return new Promise<string>((resolve, reject) => { clipboardResult = { resolve, reject } })
+	},
+	writeText(value: string) {
+		clipboardWritten = value
+		return new Promise<void>((resolve, reject) => { clipboardWriting = { resolve, reject } })
+	},
+} })
+let lifetime: Fiber.Fiber<never, never>
+let program = Effect.scoped(
+	Effect.gen(function* () {
+		let account = yield* bootstrapBrowserAccount((value, message) => {
+			if (!value) throw Error(message)
+		})
+		let existingDocument = new URL(location.href).searchParams.get("document")
+		let documentId = existingDocument ?? "actual-editor-" + crypto.randomUUID()
+		let size = Number(new URL(location.href).searchParams.get("size") ?? 0)
+		let cursors = Number(new URL(location.href).searchParams.get("cursors") ?? 0)
+	let body = cursors ? ("TOKEN " + "z".repeat(Math.floor(size / cursors) - 7) + "\n").repeat(cursors) : size
+			? "Paragraph text remains editable.\n"
+					.repeat(Math.ceil(size / 33))
+					.slice(0, size)
+			: "# Writer\nalpha beta alpha\naa\nbar\n"
+		let source = "---\ntitle: Worker fixture\n---\n" + body
+		if (!existingDocument) yield* Effect.promise(async () => {
+			let response = await fetch("/__tests/seed", {
+				method: "POST",
+				headers: { "content-type": "application/json" },
+				body: JSON.stringify({
+					subject: account.subject,
+					document: documentId,
+					source,
+				}),
+			})
+			if (!response.ok) throw Error("Server seed failed " + response.status)
+		})
+		let rawWorker = yield* createWorkerSessionClient(
+			new URL("/worker.js", location.href).href,
+		)
+        let mode = ""
+        let held = false
+        let closed = false
+        let closeReceipt = ""
+        let release = Deferred.makeUnsafe<void>()
+        let requestIds: string[] = []
+        let mergeRequests = 0
+        let firstRequest: Parameters<typeof rawWorker.UndoQueued>[0] | undefined
+        function dropped() {
+            return new RpcClientError({ reason: new RpcClientDefect({ message: "Fixture dropped completed reply", cause: "controlled transport fault" }) })
+        }
+        let worker = {
+            ...rawWorker,
+            UndoQueued(payload: Parameters<typeof rawWorker.UndoQueued>[0]) {
+                return Effect.gen(function* () {
+                    requestIds.push(payload.request)
+                    firstRequest ??= payload
+                    let outcome = yield* rawWorker.UndoQueued(payload)
+                    if (mode === "drop-once") { mode = ""; return yield* Effect.fail(dropped()) }
+                    if (mode === "drop-always") return yield* Effect.fail(dropped())
+                    if (mode === "hold-undo") { mode = ""; held = true; yield* Deferred.await(release); held = false }
+                    return outcome
+                })
+            },
+            MergeCandidate(payload: Parameters<typeof rawWorker.MergeCandidate>[0]) {
+                return Effect.gen(function* () {
+                    mergeRequests++
+                    let candidate = yield* rawWorker.MergeCandidate(payload)
+                    if (mode === "hold-merge") { mode = ""; held = true; yield* Deferred.await(release); held = false }
+                    return candidate
+                })
+            },
+            Adopt(payload: Parameters<typeof rawWorker.Adopt>[0]) {
+                return Effect.gen(function* () {
+                    let outcome = yield* rawWorker.Adopt(payload)
+                    if (mode === "drop-adopt") { mode = ""; return yield* Effect.fail(dropped()) }
+                    return outcome
+                })
+            },
+        }
+		let options = {
+			document: documentId,
+			subject: account.subject,
+			origin: location.origin,
+		}
+		let opened = yield* worker.Open(options)
+		yield* worker.Release({ handle: opened.handle })
+		let initial = yield* worker.Begin()
+		let queue = yield* makeEditorQueue(worker, initial)
+		let tasks = yield* FiberSet.make()
+		let scopedFork = yield* FiberSet.runtime(tasks)()
+		let editor = new EditorElement()
+		let bindings = workerEditorBindings(
+			editor,
+			queue,
+			task => {
+				scopedFork(task)
+			},
+			error => failures.push(String(error)),
+		)
+		editor.configure({
+			authority: "worker",
+			content: initial.source,
+			atoms: [],
+			editable: true,
+			preferences: editorPreferences({ autocomplete: false }),
+			documents: () => [],
+			isDrawing: () => false,
+			openDrawing() {},
+			openDocument() {},
+			comments: () => [],
+			createLinkedDocument: async () => "unused",
+			report: error => failures.push(String(error)),
+			change: bindings.change,
+			clipboard: {
+				capture(start, end, expectedSource) { return queue.captureClipboard(start, end, expectedSource).pipe(Effect.tap(() => Effect.sync(() => { clipboardCaptured++ }))) },
+				resolve(token) { return queue.resolveClipboard(token) },
+				release(token) { return queue.releaseClipboard(token) },
+			},
+			undo: bindings.undo,
+			select: bindings.resumeUndo,
+			requestAsset() {},
+			attach() {},
+			command() {},
+			find() {},
+		})
+		document.body.append(editor)
+		yield* Effect.addFinalizer(() => Effect.sync(() => editor.remove()))
+		let peer = yield* createWorkerSessionClient(
+			new URL("/worker.js", location.href).href,
+		)
+		let peerOpened = yield* peer.Open(options)
+		yield* peer.Release({ handle: peerOpened.handle })
+		window.workerEditorProof = {
+			inspect() {
+				let text = editor.source
+				let selected = editor.mergeSelection()
+				if (!text || !selected) throw Error("Editor removed")
+				let state = queue.state()
+				return {
+					source: text.value,
+					start: selected.start,
+					end: selected.end,
+					busy: selected.busy,
+					pending: state.pending.length,
+					readonly: text.readOnly,
+					queueSource: state.source,
+					failures,
+				}
+			},
+			paste() { editor.command("paste") },
+			settleClipboard(value) {
+				if (!clipboardResult) throw Error("Clipboard not requested")
+				let pending = clipboardResult
+				clipboardResult = undefined
+				pending.resolve(value)
+			},
+			denyClipboard() {
+				if (!clipboardResult) throw Error("Clipboard not requested")
+				let pending = clipboardResult
+				clipboardResult = undefined
+				pending.reject(Error("Fixture clipboard permission denied"))
+			},
+			written() { return clipboardWritten },
+			settleWrite() {
+				if (!clipboardWriting) throw Error("Clipboard write not requested")
+				let pending = clipboardWriting
+				clipboardWriting = undefined
+				pending.resolve()
+			},
+			denyWrite() {
+				if (!clipboardWriting) throw Error("Clipboard write not requested")
+				let pending = clipboardWriting
+				clipboardWriting = undefined
+				pending.reject(Error("Fixture clipboard write denied"))
+			},
+			captured() { return clipboardCaptured },
+			undo(redo) { bindings.undo(redo) },
+			format(action) {
+				editor.format(action)
+			},
+			merge() {
+				return Effect.runPromise(bindings.merge().saved)
+			},
+			editable(value) { editor.setEditable(value) },
+			async peer(selected = false, needle = "alphabet") {
+				await Effect.runPromise(peer.Sync())
+				let view = await Effect.runPromise(peer.Read())
+				let next = await Effect.runPromise(
+					peer.Replace({
+						handle: view.handle,
+						ranges: selected
+							? [{ start: view.source.indexOf(needle), remove: needle.length, text: "REMOTE" }]
+							: [{ start: 0, remove: 0, text: "PEER\n" }],
+					}),
+				)
+				await Effect.runPromise(peer.Release({ handle: view.handle }))
+				await Effect.runPromise(peer.Release({ handle: next.handle }))
+				await Effect.runPromise(peer.Flush())
+				await Effect.runPromise(worker.Sync())
+			},
+			async flush() {
+				await Effect.runPromise(worker.Flush())
+				let view = await Effect.runPromise(worker.Read())
+				await Effect.runPromise(worker.Release({ handle: view.handle }))
+				return view.source
+			},
+            fault(value) { mode = value; held = false; release = Deferred.makeUnsafe<void>() },
+            release() { Deferred.doneUnsafe(release, Effect.void) },
+            probeLateAdoption() { let selection = editor.mergeSelection(); return selection ? editor.adoptMerged("late candidate must not replace draft", selection) : false },
+            diagnostics() { return { mergeRequests, requests: requestIds.length, requestIds: [...requestIds], held, closed, closeReceipt } },
+            observeClosingUndo() {
+                void Effect.runPromise(queue.undo(false).pipe(Effect.match({
+                    onFailure(error) { closeReceipt = error instanceof WorkerDocumentFailure ? error.reason : String(error) },
+                    onSuccess(receipt) { closeReceipt = receipt.status },
+                })))
+            },
+            async expiredReceipt() {
+                if (!firstRequest) throw Error("No retained request")
+                let result = await Effect.runPromise(rawWorker.UndoQueued(firstRequest).pipe(Effect.exit))
+                return result._tag === "Failure"
+            },
+			async dispose() {
+				await Effect.runPromise(Fiber.interrupt(lifetime))
+				closed = true
+				document.body.dataset.closed = "true"
+			},
+		}
+		let currentUrl = new URL(location.href)
+		currentUrl.searchParams.set("document", documentId)
+		history.replaceState(null, "", currentUrl.href)
+		document.body.dataset.ready = "true"
+		return yield* Effect.never
+	}),
+)
+lifetime = Effect.runFork(
+	program.pipe(
+		Effect.provide(FetchHttpClient.layer),
+		Effect.catch(error =>
+			Effect.sync(() => {
+				document.body.dataset.failure = String(error)
+			}),
+		),
+		Effect.andThen(Effect.never),
+	),
+)

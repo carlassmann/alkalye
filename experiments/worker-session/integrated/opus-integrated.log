@@ -1,0 +1,40 @@
+I found no hard source blocker. One flow gap and one robustness gap need fixing before the types pass; the rest is small cleanup. I only read the files you listed, so everything below comes from reading the source and nothing was run. I didn't write the plan file: plan mode allows that one write, but you said no writes.
+
+## Confirmed in source
+- **One worker setup:** one RPC group (`worker-rpc.ts`), one session/semaphore (`worker-session.ts:29`), one FIFO and one Editor. No second queue or session.
+- **Undo retry:** the client retries only on errors that aren't a `WorkerDocumentFailure` (transport errors), and only once (`editor-queue.ts:197-200`). The server checks its cached receipts under the permit, inside `uninterruptibleMask`, and caches the receipt before returning (`worker-session.ts:165-197`). If an attempt is interrupted, the cached receipt says `unknown`, which is honest.
+- **Receipt completion:** the client handles the receipt in an uninterruptible block (`editor-queue.ts:201-213`).
+- **Frozen and failed states:**
+  - Capture and Resolve reject when `commandFrozen` or failed (`editor-queue.ts:172,182,521,533`). Release is allowed while frozen or failed and only refused once the queue is closed (`:163,545`).
+  - `workerClipboardReady` rejects frozen and failed states (`editor.ts:1672`).
+  - The Editor's `freezeCommands`/`setEditable` can't bring back a failed authority (`editor.ts:1031-1046`).
+  - `mergeSelection.editable` ignores the freeze, so permission and freeze stay separate (`:996`). Keydown and beforeinput use `permissionEditable` (`:1803,1906,2504`).
+- **Unfreeze order:** the queue always unfreezes before the Editor (on `not-applied`, and when Adopt succeeds normally or after the read-back check, `:208,350,358`). So the Editor is never editable while the queue is still frozen.
+- **Pending clipboard while Undo runs:** `undo()` sets the freeze synchronously, so a Capture already in the queue is still rejected. The final insert re-checks readiness inside the same `Effect.sync` block. If the token wasn't submitted, `acquireRelease` releases it.
+- **Clipboard edits:** a token-tagged edit goes through the same `replace` (`bindings.ts:37-39`). The fallback is the minimal `sourceDifference`. The server's `clipboardReplacement` compares whole strings, so it doesn't depend on how the ranges are split.
+- **Epoch changes:** if a merge is in flight when Undo runs, Undo's `sequence++` makes the merge's accept check fail, so the candidate is released. An Adopt already queued runs before Undo, which carries the new epoch. Clipboard tokens use atom boundaries, so they survive Adopt; `End` clears them.
+- **Splice syntax:** braces and parentheses balance in `editor-queue.ts:160-417`. The indentation is broken at `:13-16`, `:136-143`, `:163-187` and `:380-384` (one `if` sits at column 0), but that's cosmetic.
+
+## Source blockers (fix before types)
+1. **Postponed Undo and adoption have no trigger.** `resumeUndo` returns early if the selection is busy or composing, and nothing calls it again (`bindings.ts:76-79`). The fix is in the mount, which wasn't in my read set: `options.select` should call `bindings.resumeUndo()`. The Editor already calls `select()` on compositionend, pointerup and selectionchange. Without this, the Editor can stay frozen for good.
+2. **Moving the cursor during adoption can permanently fail authority.** The textarea is only `readOnly` while frozen, so the user can still change the selection. That changes the selection generation, the merge comes back `false`, the `ensuring` block retries straight away, and on the 4th attempt authority fails permanently (`bindings.ts:87-95`). Smallest fix: when `adopted === false`, don't retry from `ensuring`; wait for the next `select` from fix 1. Or count an attempt only if the generation didn't change.
+3. **A `SelectionUnavailable` error is treated two ways.** The queue treats it as non-permanent (`editor-queue.ts:252-255`). The bindings turn it into a permanent `fail()` (`bindings.ts:72,94`). For Undo adoption, count it as a retry instead.
+
+## Small fixes
+4. In the branch where accepting a merge fails (`editor-queue.ts:314-316`), add `merges.delete(merge)`.
+5. After a token-tagged `ReplaceQueued`, call `ReleaseClipboard` only if the call failed. On success the server has already used up the token, so the extra call just adds up to 1 s to the queue (`:380-383`). Always delete the token from `clipboardTokens`.
+6. In the finalizer, the three identical release branches can be one line (`:136-140`).
+7. If `replace` throws on a token-tagged edit, `change` still returns `pending`, so the Editor never releases the token. The token stays held until the queue closes, which is bounded and only happens once authority has already failed. Optional fix: release the token in `bindings.ts:45`.
+8. Optional extra safety: the server doesn't block `ReplaceQueued`/`Capture` between an applied Undo and Adopt. Only the client enforces that. The server could refuse while a receipt is `applied` and not yet adopted.
+
+## Draft-loss risk (not a blocker)
+- If `replace` throws, the Editor keeps the text and fails authority, so nothing disappears on screen. But that last edit never reaches `queue.state().pending`, so a recovery step that reads queue state would miss it. This belongs to the main-tab draft durability gate.
+
+## Not verified
+- The bodies of `worker-client` and `sourceDifference`, the mount site, and the queue→`WorkerClipboard` adapter.
+- `client.UndoQueued<false,false>` (`editor-queue.ts:14`) and whether `clipboardToken: undefined` is accepted by `Schema.optional` are type questions for the types pass.
+- I didn't check `undo-input-hashes.json` against the files, since that needs a shell.
+
+So this is not a production cutover. The 24 Undo and 23 menu gates still need adapting to the shared fault fixture. After that come the new integrated gates in `integration-plan.md:7`.
+
+Separately, these claude.ai connectors need authorizing in your claude.ai connector settings before they work: Axiom, Canva, GitHub, Gmail, Google Drive, HubSpot, Lusha (both), Miro, Notion, Ocean.io, Ramp Data, Slack, the SynTwin variants, and lemlist.

@@ -1,0 +1,11 @@
+PASS Integrated actual Editor opens one worker authority
+PASS Integrated menu Cut durably edits worker authority
+PASS Queued Undo reverses token-backed menu Cut
+PASS Queued Redo restores token-backed menu Cut
+PASS Integrated menu Paste uses same queued authority
+PASS Queued Undo reverses token-backed menu Paste
+PASS Clipboard completion while Undo frozen cannot delete native draft
+PASS Rejected frozen clipboard capability leaves Undo durable and authority usable
+PASS Integrated authority adopts unseen peer after Undo and clipboard commands
+PASS Combined command history preserves exact peer and local source
+PASS Integrated command scope closes editor and worker resources

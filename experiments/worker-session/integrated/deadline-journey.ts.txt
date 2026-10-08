@@ -1,0 +1,39 @@
+import { assert, browser, evaluate, wait } from "./tests/browser-driver"
+
+let url = process.argv[2]
+if (!url) throw Error("URL required")
+let proof = "window.workerEditorProof"
+let text = 'document.querySelector("alkalye-editor").source'
+for (let mode of ["hold-merge", "hold-undo"]) {
+	let session = "authority-deadline-" + mode + "-" + Date.now()
+	try {
+		browser(session, "open", url)
+		wait(session, "document.body.dataset.ready==='true'||!!document.body.dataset.failure")
+		assert(evaluate(session, "!document.body.dataset.failure"), `${mode} real Editor fixture opens`)
+		let original = evaluate(session, `${proof}.inspect().source`)
+		if (typeof original !== "string") throw Error("Source unavailable")
+		evaluate(session, `${text}.focus();${text}.setSelectionRange(${original.length},${original.length})`)
+		browser(session, "keyboard", "inserttext", "X")
+		let draft = original + "X"
+		wait(session, `${proof}.inspect().source===${JSON.stringify(draft)}&&${proof}.inspect().pending===0`)
+		evaluate(session, `${proof}.fault(${JSON.stringify(mode)});${proof}.undo(false)`)
+		wait(session, `${proof}.diagnostics().held&&${proof}.inspect().readonly`)
+		if (mode === "hold-undo") {
+			evaluate(session, `${text}.dispatchEvent(new CompositionEvent('compositionstart',{bubbles:true}));${proof}.release()`)
+			wait(session, `!${proof}.diagnostics().held`)
+		}
+		wait(session, `${proof}.inspect().failures.length===1&&${proof}.inspect().readonly`)
+		assert(evaluate(session, `${proof}.inspect().source===${JSON.stringify(draft)}`), `${mode} deadline retains complete frozen draft`)
+		let mergeRequests = evaluate(session, `${proof}.diagnostics().mergeRequests`)
+		if (mode === "hold-merge") evaluate(session, `${proof}.release()`)
+		else evaluate(session, `${text}.dispatchEvent(new CompositionEvent('compositionend',{bubbles:true}))`)
+		wait(session, `!${proof}.diagnostics().held`)
+		assert(evaluate(session, `${proof}.probeLateAdoption()`) === false, `${mode} actual Editor refuses late candidate after authority failure`)
+		evaluate(session, `${proof}.editable(true)`)
+		assert(evaluate(session, `${proof}.inspect().readonly&&${proof}.inspect().source===${JSON.stringify(draft)}`), `${mode} late response or select cannot revive failed authority`)
+		assert(evaluate(session, `${proof}.flush()`) === original, `${mode} applied Undo remains exact`)
+		assert(evaluate(session, `${proof}.diagnostics().requests===1&&${proof}.diagnostics().mergeRequests===${mergeRequests}`), `${mode} one Undo request and no candidate retry after failure`)
+		evaluate(session, `${proof}.dispose()`)
+		assert(evaluate(session, "document.body.dataset.closed==='true'&&!document.querySelector('alkalye-editor')"), `${mode} deadline scope releases resources`)
+	} finally { browser(session, "close") }
+}

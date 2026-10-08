@@ -1,0 +1,63 @@
+{
+	"status": "experiment-only; production unchanged",
+	"sourceBase": "5c47f1357d6d8be3fbdf0c0ec3879991f4aa60d1",
+	"sharedCrdtBase": "2f55545",
+	"sourceHashes": {
+		"bindings.ts": "0063af639774ef14ba29f366731e13553c798ff12bb9fcfcbb9a8bf35b125f29",
+		"browser-fixture.ts": "e604a2155b3bd21b8669247e0b467696f2507652e697d0e42d4a65274b4fda6e",
+		"build.ts": "fafff1bbc98d9982169f5b08237efb8b4aceb56ab7a1a25e5d23280dc0f642f4",
+		"deadline-journey.ts": "bbb435789f5627870aa3fa056decdd1640424c92a2c6423eb05bf1acd28c7079",
+		"editor-queue.ts": "e6f1668d9bf6368a72e3da504b74a10d8a0cb3a2cf3b8d151b6447d045e1ed0e",
+		"integrated-journey.ts": "37c48af39fec5f805373bc5f5acd8cb526834690f0dad905dbb6d7721637ece6",
+		"journey.ts": "c4f74bb770c19266c18658436d5212622107d98f8d4f1a04a74e8d28426f327c",
+		"menu-journey.ts": "7a2738084aeb980e5a9b1e5b78f3ced139d05c04c0e31d1795cd2e535d8465a0",
+		"recovery-journey.ts": "4dfdd4e8c89549475019fc99e17c10f62e4aad83ac951e6d030125c5a6b43e8b",
+		"seed.ts": "7f8cbff587a084d6cd6c9acb534e8fa0ef3fb665a8062be819dd3443bfff9a2f",
+		"server.ts": "8e4624605f0a7607aede9787fc422989012ef7a793426b8b17903992f49d47f5",
+		"undo-journey.ts": "e777254386016cf8f12b5edba9c9ee20da7c82ae954a6c62e53493730c27b0a8",
+		"worker-client.ts": "9be91716eff0370ebcacae8dda12f61110b7684f1107ace83b945aff3a4c71e4",
+		"worker-rpc.ts": "d24682de047d4ff9f1330673779c640135840f59f6f5c5e0695844154779e678",
+		"worker-session.ts": "b7ad54442c7c726208b4b68b9ad22e78157fdef2b6489cf79f17610422577999",
+		"worker.ts": "cfcd9f3ae3d67d0629f8728f08cfc02dc035b2929b125b37f21645d4ec278eb9",
+		"work.config.js": "f1ca0dd78b9a226ffd5e46e906e25bf757a07ad936063a36aab0b7d5804a64da",
+		"tsconfig.json": "aa34b1bd15694bef1a1014bf6bab127b9c50a7b3e2b67807b0615fa9e546fffb",
+		"editor-integrated.ts": "4610caa9bf662d14e06f9672b76eb1ab671cb89aef9b12715e5e1154c78cd60f",
+		"source-textarea.ts": "c6ea32c60cf10e9988e83f434bf476a95c47294a276fdf03f5350ce66e7b177e",
+		"shared-crdt.ts": "79218941aa7ab7d664b7eff1fe7249f0193548216284d7465aaf421c2a9d348a"
+	},
+	"bundleHashes": {
+		"browser-fixture.js": "4ac00b502b8c99b9b724359994807f7fa8b1db6512b2c9a6fc6164944f909979",
+		"worker.js": "75d3a365ff36da1cd59780d3d0f39efdd397a26e8a07a640e09a028096ecd338"
+	},
+	"assertions": {
+		"integrated-journey": 11,
+		"undo-journey": 11,
+		"recovery-journey": 13,
+		"menu-journey": 10,
+		"journey": 13,
+		"deadline-journey": 14
+	},
+	"totalAssertions": 72,
+	"types": "types-integrated-certified.log: exit0",
+	"runtime": "http://localhost:53963/; stopped after proofs",
+	"reviews": [
+		"opus-integrated.log",
+		"opus-integrated-followup.log",
+		"opus-integrated-final.log"
+	],
+	"limits": [
+		"Same-account independent peer actor",
+		"Controlled clipboard promises; no OS permission/Safari certification",
+		"No full application mount migration",
+		"No main-tab crash durable draft proof",
+		"No frame rate or performance claim",
+		"Adoption deadline starts after applied Undo receipt; no receipt-hang deadline",
+		"Generic merge and resource lifecycle remain prototype scope",
+		"Held late-response queue cleanup completion not independently asserted; sticky adoption guard directly exercised"
+	],
+	"fixtureCorrections": [
+		"Optional public mergeSelection narrowing fixed before final compiled run",
+		"Final deadline strengthened: direct actual Editor late-adopt refusal; UndoQueued count and no postfailure candidate retries"
+	],
+	"writtenWith": "gpt-6 in codex"
+}

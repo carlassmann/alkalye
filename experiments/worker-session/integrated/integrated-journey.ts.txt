@@ -1,0 +1,68 @@
+import { assert, browser, evaluate, wait } from "./tests/browser-driver"
+
+let url = process.argv[2]
+if (!url) throw Error("URL required")
+let session = "integrated-worker-authority-" + Date.now()
+let proof = "window.workerEditorProof"
+let text = 'document.querySelector("alkalye-editor").source'
+function choose(label: string) {
+	evaluate(session, `(function(){let item=[...document.querySelectorAll('[data-context-menu]:popover-open>[role=menuitem]')].find(item=>item.querySelector(':scope>span')?.textContent===${JSON.stringify(label)});if(!item)throw Error('Menu missing');item.dataset.clipboardAction=${JSON.stringify(label)}})()`)
+	browser(session, "click", `[data-clipboard-action="${label}"]`)
+}
+function menu(start: number, end: number) {
+	evaluate(session, `${text}.focus();${text}.setSelectionRange(${start},${end});${text}.dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,cancelable:true}))`)
+	wait(session, "!!document.querySelector('[data-context-menu]:popover-open')")
+}
+function exact(expected: string) {
+	wait(session, `${proof}.inspect().source===${JSON.stringify(expected)}&&${proof}.inspect().queueSource===${JSON.stringify(expected)}&&${proof}.inspect().pending===0&&!${proof}.inspect().readonly`)
+}
+try {
+	browser(session, "set", "viewport", "1280", "800")
+	browser(session, "open", url)
+	wait(session, "document.body.dataset.ready==='true'||!!document.body.dataset.failure")
+	assert(evaluate(session, "!document.body.dataset.failure"), "Integrated actual Editor opens one worker authority")
+	let original = evaluate(session, `${proof}.inspect().source`)
+	if (typeof original !== "string") throw Error("Source missing")
+	let beta = original.indexOf("beta")
+	menu(beta, beta + 4)
+	choose("Cut")
+	wait(session, `${proof}.captured()===1&&${proof}.written()==='beta'`)
+	evaluate(session, `${proof}.settleWrite()`)
+	let removed = original.slice(0, beta) + original.slice(beta + 4)
+	exact(removed)
+	assert(evaluate(session, `${proof}.flush()`) === removed, "Integrated menu Cut durably edits worker authority")
+	evaluate(session, `${proof}.undo(false)`)
+	exact(original)
+	assert(evaluate(session, `${proof}.flush()`) === original, "Queued Undo reverses token-backed menu Cut")
+	evaluate(session, `${proof}.undo(true)`)
+	exact(removed)
+	assert(evaluate(session, `${proof}.flush()`) === removed, "Queued Redo restores token-backed menu Cut")
+	let alpha = removed.indexOf("alpha")
+	menu(alpha, alpha + 5)
+	choose("Paste")
+	wait(session, `${proof}.captured()===2`)
+	evaluate(session, `${proof}.settleClipboard('PASTED')`)
+	let pasted = removed.slice(0, alpha) + "PASTED" + removed.slice(alpha + 5)
+	exact(pasted)
+	assert(evaluate(session, `${proof}.flush()`) === pasted, "Integrated menu Paste uses same queued authority")
+	evaluate(session, `${proof}.undo(false)`)
+	exact(removed)
+	assert(evaluate(session, `${proof}.flush()`) === removed, "Queued Undo reverses token-backed menu Paste")
+	menu(alpha, alpha + 5)
+	choose("Cut")
+	wait(session, `${proof}.captured()===3&&${proof}.written()==='alpha'`)
+	evaluate(session, `${proof}.fault('hold-undo');${proof}.undo(false)`)
+	wait(session, `${proof}.diagnostics().held&&${proof}.inspect().readonly`)
+	evaluate(session, `${proof}.settleWrite()`)
+	assert(evaluate(session, `${proof}.inspect().source===${JSON.stringify(removed)}`), "Clipboard completion while Undo frozen cannot delete native draft")
+	evaluate(session, `${proof}.release()`)
+	exact(original)
+	wait(session, `${proof}.inspect().failures.length===1`)
+	assert(evaluate(session, `${proof}.flush()`) === original, "Rejected frozen clipboard capability leaves Undo durable and authority usable")
+	evaluate(session, `${proof}.peer()`)
+	assert(evaluate(session, `${proof}.merge()`) === true, "Integrated authority adopts unseen peer after Undo and clipboard commands")
+	exact("PEER\n" + original)
+	assert(evaluate(session, `${proof}.flush()`) === "PEER\n" + original, "Combined command history preserves exact peer and local source")
+	evaluate(session, `${proof}.dispose()`)
+	assert(evaluate(session, "document.body.dataset.closed==='true'&&!document.querySelector('alkalye-editor')"), "Integrated command scope closes editor and worker resources")
+} finally { browser(session, "close") }

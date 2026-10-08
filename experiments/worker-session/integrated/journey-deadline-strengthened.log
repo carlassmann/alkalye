@@ -1,0 +1,14 @@
+PASS hold-merge real Editor fixture opens
+PASS hold-merge deadline retains complete frozen draft
+PASS hold-merge actual Editor refuses late candidate after authority failure
+PASS hold-merge late response or select cannot revive failed authority
+PASS hold-merge applied Undo remains exact
+PASS hold-merge one Undo request and no candidate retry after failure
+PASS hold-merge deadline scope releases resources
+PASS hold-undo real Editor fixture opens
+PASS hold-undo deadline retains complete frozen draft
+PASS hold-undo actual Editor refuses late candidate after authority failure
+PASS hold-undo late response or select cannot revive failed authority
+PASS hold-undo applied Undo remains exact
+PASS hold-undo one Undo request and no candidate retry after failure
+PASS hold-undo deadline scope releases resources
