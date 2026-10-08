@@ -1,0 +1,26 @@
+Review of the 4 unrun sources. I only read them; nothing was executed.
+
+**Blockers**
+
+1. **`bundles.ts:47-52`: whiteboard entry regex and stale files.** `/^[A-Za-z0-9_]+\.js$/` rejects Vite/Astro hashes that contain `-` (e.g. `tldraw-canvas.Ab-3x_.js`), so it would wrongly throw "Missing". `files.find` also scans the whole asset dir, so it can pick a stale build's chunk. Fix: walk the initial entries again but also follow `dynamic-import`. From that reachable set, select entries with `whiteboardPrefix` and throw unless exactly 1. Loosen the hash class to `[\w-]+`.
+2. **`bundles.ts:56-63`: everything except initial is measured from disk, not from the reachable graph.** `whiteboardStyles`, `allJavaScript` and `allCss` all glob the directory, so stale outputs get counted. Fix: limit tldraw CSS to `.css` string literals found in the whiteboard JS closure (Vite's `__vite__mapDeps` lists them) and throw unless exactly 1. Either drop `all*` or compute it from initial ∪ dynamic closure ∪ worker.
+3. **`bundles.ts:38`: inline module scripts are missed.** `<script type="module">import "/_astro/x.js"</script>` has no `src`, so Astro's inlined hoisted scripts are left out of initial. Fix: `scanImports` on each inline `<script type="module">` body and seed the walk with its imports.
+4. **`runner.ts:243`: original save signal is unverified.** The original path waits on the `alkalye:document-saved` event. Nothing in `network.js` emits it, and this checkout's `src` doesn't contain it either. If a749728 doesn't dispatch it, every mutating original cell fails at `edit-client-complete` and gets blocked. Fix: confirm a749728 emits it with `{content}` in `detail`, or drop the client-save wait for the original and rely on the oracle receipt.
+5. **`runner.ts:602-606`: Undo key on macOS.** CDP `Meta+z` fires `keydown` but doesn't run Chrome's native mac editing commands. CodeMirror's keymap handles it, but if the rewrite relies on native textarea undo (`beforeinput historyUndo`), Undo never happens. Fix: check whether agent-browser sends `commands:["undo"]`. If not, branch rewrite on darwin to send it, or confirm the rewrite handles Mod-z in `keydown`. The same risk applies to `Control+Shift+l` (`:291`) on mac.
+6. **`runner.ts:209`: cloned rewrite profiles may share writer identity.** The original gets unique Jazz sessions by clearing `co_<account>_<n>` keys before the `/app` boot (fine, since `/changelog` → `/app` is a full navigation). The rewrite gets nothing equivalent. If rewrite72dd stores its writer/replica ID in IndexedDB, every clone writes operations under the same identity across trials, which is a CRDT ID collision. Fix: confirm rewrite72dd generates a fresh writer ID per tab/session. If not, clear that key or store in `profile()` the same way.
+
+**Smaller issues worth fixing**
+
+- **`runner.ts:462-470`: asset check.** It only keeps `initiatorType==='script'` entries, but modulepreload/static module chunks can report `link` or `other`, which would trigger "Expected frozen script not loaded" incorrectly. Fix: filter by `.js` pathname instead. Also keep lazy whiteboard chunks out of `version.assets`, because the doc page never loads them.
+- **`runner.ts:458` + `main-oracle.js:34`: line endings.** CodeMirror normalises CRLF, so a CRLF fixture fails the hash. Fix: assert fixtures contain no `\r`.
+- **`seed-main.js`: public create.** `createPersonalDocument` probably creates an owner-only group. If "public" means readable by anyone, add the a749728 equivalent of `group.makePublic()` before `waitForAllCoValuesSync`. If the oracle reading with the same credentials is enough, ignore this.
+
+**Already correct**
+
+- **Seed create:** the pending marker is persisted before the create, and the ID is persisted (`:82`) before the wait (`:87`). The same-worker read is labelled `independentReadRequired`.
+- **Oracle:** a fresh in-memory worker that subscribes until the hash matches, with deadline 20s < runner kill at 25s.
+- **Runner:** trusted `x` with a 3s probe window, ready required inside it, then client save, edit receipt, Undo, base receipt. Uncertain fixtures are blocked from repeats, and trial order alternates.
+
+written with claude-opus-5-5 in claude CLI
+
+**Connectors:** many claude.ai connectors (GitHub, Slack, Notion, Gmail and others) need authorizing in your claude.ai connector settings before they work here.

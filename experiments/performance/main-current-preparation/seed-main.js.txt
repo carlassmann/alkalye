@@ -1,0 +1,107 @@
+import { join } from "node:path"
+import { pathToFileURL } from "node:url"
+
+let [configurationPath, manifestPath] = Bun.argv.slice(2)
+if (!configurationPath || !manifestPath)
+	throw Error("Private main configuration and manifest required")
+let configuration = await Bun.file(configurationPath).json()
+let manifest = await Bun.file(manifestPath).json()
+let main = manifest.versions.find(value => value.kind === "original")
+let rewrite = manifest.versions.find(value => value.kind === "rewrite")
+let selected = configuration.fixtures ?? ["small2", "rich128"]
+if (!main || !rewrite)
+	throw Error("Unseeded main and accepted rewrite fixtures required")
+let head = Bun.spawnSync(["git", "rev-parse", "HEAD"], {
+	cwd: configuration.checkout,
+})
+if (
+	head.exitCode !== 0 ||
+	new TextDecoder().decode(head.stdout).trim() !== main.commit
+)
+	throw Error("Original checkout is not the frozen manifest commit")
+let credentials = await Bun.file(configuration.authFile).json()
+let { startWorker } = await import(
+	pathToFileURL(
+		join(
+			configuration.checkout,
+			"node_modules/jazz-tools/dist/worker/index.js",
+		),
+	).href
+)
+let { UserAccount, Document } = await import(
+	pathToFileURL(join(configuration.checkout, "src/schema/index.ts")).href
+)
+let { createPersonalDocument } = await import(
+	pathToFileURL(
+		join(configuration.checkout, "src/app/features/documents/lib/documents.ts"),
+	).href
+)
+let context = await startWorker({
+	accountID: credentials.accountID,
+	accountSecret: credentials.accountSecret,
+	AccountSchema: UserAccount,
+	syncServer: configuration.syncServer,
+	skipInboxLoad: true,
+	asActiveAccount: false,
+})
+try {
+	await context.waitForConnection()
+	let account = await context.worker.$jazz.ensureLoaded({
+		resolve: { root: { documents: true } },
+	})
+	if (!account.root.documents.$isLoaded)
+		throw Error("Account document list not loaded; no creation issued")
+	for (let fixture of rewrite.fixtures.filter(value => selected.includes(value.name))) {
+		let source = await Bun.file(fixture.sourceFile).text()
+		let assigned = configuration.documents.find(
+			value => value.fixture === fixture.name,
+		)
+		let existing = main.fixtures.find(value => value.name === fixture.name)
+		if (
+			existing &&
+			(!assigned || existing.path !== "/app/doc/" + assigned.documentId)
+		)
+			throw Error("Main manifest and assigned identity differ")
+		let documentId = assigned?.documentId
+		if (!documentId) {
+			if (configuration.pendingCreates?.includes(fixture.name))
+				throw Error(
+					"Prior main create outcome unknown; inspect server before retrying",
+				)
+			configuration.pendingCreates = [
+				...(configuration.pendingCreates ?? []),
+				fixture.name,
+			]
+			await Bun.write(configurationPath, JSON.stringify(configuration, null, 2))
+			let created = await createPersonalDocument(account, source)
+			documentId = created.$jazz.id
+			configuration.documents.push({ fixture: fixture.name, documentId })
+			configuration.pendingCreates = configuration.pendingCreates.filter(
+				name => name !== fixture.name,
+			)
+		}
+		await Bun.write(configurationPath, JSON.stringify(configuration, null, 2))
+		if (!existing)
+			main.fixtures.push({ ...fixture, path: "/app/doc/" + documentId })
+		await Bun.write(manifestPath, JSON.stringify(manifest, null, 2))
+		await Bun.write(configurationPath, JSON.stringify(configuration, null, 2))
+		await context.worker.$jazz.waitForAllCoValuesSync()
+		let read = await Document.load(documentId, {
+			loadAs: context.worker,
+			resolve: { content: true },
+		})
+		if (!read.$isLoaded || read.content.toString() !== source)
+			throw Error("Seed source differs; assigned identity retained")
+		console.log(
+			JSON.stringify({
+				fixture: fixture.name,
+				characters: source.length,
+				uploadComplete: true,
+				sha256: new Bun.CryptoHasher("sha256").update(source).digest("hex"),
+				independentReadRequired: true,
+			}),
+		)
+	}
+} finally {
+	await context.shutdownWorker()
+}

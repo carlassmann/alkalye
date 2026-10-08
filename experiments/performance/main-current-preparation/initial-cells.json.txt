@@ -1,0 +1,9 @@
+{
+ "samples":3,
+ "cells":[
+  {"name":"small-middle","journey":"body","fixture":"small2","position":"middle"},
+  {"name":"rich-start","journey":"body","fixture":"rich128","position":"start"},
+  {"name":"rich-middle","journey":"body","fixture":"rich128","position":"middle"},
+  {"name":"rich-end","journey":"body","fixture":"rich128","position":"end"}
+ ]
+}
