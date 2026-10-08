@@ -920,11 +920,8 @@ function createEditorView(
 			let start = anchor(text.selectionStart),
 				end = anchor(text.selectionEnd)
 			let nextIndex = new TextIndex(content)
-			text.reconcile(
-				content,
-				position(start, nextAtoms, nextIndex),
-				position(end, nextAtoms, nextIndex),
-			)
+			let resolved = positions([start, end], nextAtoms, nextIndex)
+			text.reconcile(content, resolved.get(start) ?? 0, resolved.get(end) ?? 0)
 		} else text.sync()
 		atoms = nextAtoms
 		anchorIndices.clear()
@@ -952,11 +949,90 @@ function createEditorView(
 		anchorIndices.set(id, index)
 		return id
 	}
-	function position(id: string, nextAtoms: Atom[], nextIndex: TextIndex) {
+	function positions(ids: string[], nextAtoms: Atom[], nextIndex: TextIndex) {
+		let resolved = new Map<string, number>()
+		type AnchorRequest = {
+			id: string
+			previous: number | undefined
+			rank: number
+			offset: number
+		}
+		let pending: AnchorRequest[] = []
+		for (let id of new Set(ids)) {
+			let nearby = nearbyPosition(id, nextAtoms, nextIndex)
+			if (nearby !== undefined) resolved.set(id, nearby)
+			else
+				pending.push({
+					id,
+					previous: anchorIndices.get(id),
+					rank: Infinity,
+					offset: 0,
+				})
+		}
+		if (!pending.length) return resolved
+		let candidates = new Map<
+			string,
+			{ request: AnchorRequest; rank: number }[]
+		>()
+		function candidate(id: string, request: AnchorRequest, rank: number) {
+			let matches = candidates.get(id) ?? []
+			matches.push({ request, rank })
+			candidates.set(id, matches)
+		}
+		for (let request of pending) {
+			candidate(request.id, request, 0)
+			let previous = request.previous
+			if (previous === undefined) continue
+			for (
+				let index = previous - 1;
+				index >= Math.max(0, previous - 64);
+				index--
+			) {
+				let atom = atoms[index]
+				if (atom) candidate(atom.id, request, previous - index)
+			}
+		}
+		let offset = 0
+		for (let atom of nextAtoms) {
+			offset += atom.value.length
+			let matches = candidates.get(atom.id)
+			if (!matches) continue
+			for (let { request, rank } of matches)
+				if (rank < request.rank) {
+					request.rank = rank
+					request.offset = offset
+				}
+			if (pending.every(request => request.rank === 0)) break
+		}
+		for (let request of pending) {
+			if (request.rank !== Infinity) {
+				resolved.set(request.id, request.offset)
+				continue
+			}
+			let next = atomPositions(nextAtoms)
+			let previous =
+				request.previous ?? atomPositions(atoms).indices.get(request.id) ?? -1
+			let result = 0
+			for (let index = previous - 1; index >= 0; index--) {
+				let old = atoms[index]
+				let found = old && next.indices.get(old.id)
+				if (found !== undefined) {
+					result = next.ends[found] ?? 0
+					break
+				}
+			}
+			resolved.set(request.id, result)
+		}
+		return resolved
+	}
+	function nearbyPosition(id: string, nextAtoms: Atom[], nextIndex: TextIndex) {
 		if (!id) return 0
 		let previous = anchorIndices.get(id)
 		if (previous !== undefined && nextAtoms.length === nextIndex.codePoints) {
-			let distance = Math.abs(nextAtoms.length - atoms.length) + 16
+			let distance = Math.min(
+				256,
+				Math.abs(nextAtoms.length - atoms.length) + 16,
+			)
 			for (
 				let index = Math.max(0, previous - distance);
 				index < Math.min(nextAtoms.length, previous + distance + 1);
@@ -965,17 +1041,9 @@ function createEditorView(
 				if (nextAtoms[index]?.id === id)
 					return nextIndex.offsetAtCodePoint(index + 1)
 		}
-		let next = atomPositions(nextAtoms)
-		let index = next.indices.get(id)
-		if (index !== undefined) return next.ends[index] ?? 0
-		previous ??= atomPositions(atoms).indices.get(id) ?? -1
-		for (let index = previous - 1; index >= 0; index--) {
-			let old = atoms[index]
-			let found = old && next.indices.get(old.id)
-			if (found !== undefined) return next.ends[found] ?? 0
-		}
-		return 0
+		return undefined
 	}
+
 	function updateHighlight() {
 		let ranges = [...secondarySelections].sort(
 			(left, right) => left.start - right.start,
@@ -1598,7 +1666,11 @@ function createEditorView(
 						? 0
 						: editor.value.lastIndexOf("\n", range.start - 1) + 1
 				let end = editor.value.indexOf("\n", range.end)
-				return { ...range, start, end: end < 0 ? editor.value.length : end + 1 }
+				return {
+					...range,
+					start,
+					end: end < 0 ? editor.value.length : end + 1,
+				}
 			})
 			restoreRanges(mergeSelections(ranges, true))
 			return
@@ -2101,7 +2173,10 @@ function createEditorView(
 		})
 		let ranges = [
 			{ ...primary, primary: true },
-			...secondarySelections.map(range => ({ ...move(range), primary: false })),
+			...secondarySelections.map(range => ({
+				...move(range),
+				primary: false,
+			})),
 		].sort((a, b) => a.start - b.start)
 		let merged: typeof ranges = []
 		for (let range of ranges) {
