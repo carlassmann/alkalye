@@ -1,0 +1,49 @@
+import { cp, rm } from "node:fs/promises"
+import { join } from "node:path"
+
+let root = "/tmp/alkalye-compact-server-head"
+let seed = "/tmp/alkalye-focused-interaction/data"
+let configuration = await Bun.file("/tmp/alkalye-focused-interaction/remaining.private.json").json()
+let environment = { ...process.env, WORK_STATE_ROOT: root + "/work-state" }
+if (!await Bun.file(root + "/.git/HEAD").exists() && Bun.spawnSync(["git", "init", "-q", root]).exitCode) throw Error("Disposable work root Git preflight failed")
+let originalVersion = configuration.versions[0]
+let originalData = await Bun.file(root + "/captured.private.json").json()
+let results = []
+for (let trial = 0; trial < 3; trial++) {
+	let arms = trial % 2 ? ["candidate", "baseline"] : ["baseline", "candidate"]
+	for (let arm of arms) {
+		let output = join(root, "results", arm + "-" + trial)
+		let runtime = join(root, arm === "baseline" ? "baseline" : "runtime")
+		Bun.spawnSync(["work", "down"], { cwd: root, env: environment })
+		await rm(root + "/data-active", { recursive: true, force: true })
+		await cp(seed, root + "/data-active", { recursive: true })
+		for (let path of ["documents.sqlite", "documents.sqlite-shm", "documents.sqlite-wal"]) await rm(join(root, "data-active", path), { force: true })
+		let writeOutput = root + "/writes-" + arm + "-" + trial + ".json"
+		let writer = Bun.spawn(["bun", "tests/compact-head-provision.ts", "write", root + "/data-active/documents.sqlite", root + "/captured.private.json", writeOutput], { cwd: runtime, stdout: "inherit", stderr: "inherit" })
+		if (await writer.exited) throw Error("Public equal-history writer failed")
+		let writes = await Bun.file(writeOutput).json()
+		await Bun.write(root + "/work.config.js", `export default {project:"alkalye-compact-server-head",commands:{web:{run:"bun tests/serve-compact.ts ${root}/baseline/dist ${root}/data-active 4473",cwd:"${runtime}",route:false,portless:false}}}`)
+		if (Bun.spawnSync(["work", "run", "web"], { cwd: root, env: environment }).exitCode) throw Error("Fresh scoped server start failed")
+		try {
+			let assets = []
+			let paths = ["app.js"]
+			for (let path of new Bun.Glob("chunks/*.js.map").scanSync({ cwd: root + "/baseline/dist" })) {
+				let map = await Bun.file(join(root, "baseline/dist", path)).json()
+				if (map.sources.some((source: string) => source.endsWith("/src/shared/document-session.ts"))) paths.push(path.slice(0, -4))
+			}
+			if (paths.length < 2) throw Error("Shared DocumentSession client closure not found")
+			for (let path of paths) assets.push({ path: "/" + path, sha256: new Bun.CryptoHasher("sha256").update(await Bun.file(join(root, "baseline/dist", path)).arrayBuffer()).digest("hex") })
+			let version = { ...originalVersion, name: arm, commit: "c922a8d61d2730e0b9b6179b36b36ba85cd5e578", assets }
+			let manifest = { samples: 1, output, versions: [version], cells: configuration.cells.filter((cell: { name: string }) => cell.name === "switch-small-rich") }
+			let manifestFile = root + "/manifest-" + arm + "-" + trial + ".private.json"
+			await Bun.write(manifestFile, JSON.stringify(manifest))
+			let child = Bun.spawn(["bun", "/tmp/alkalye-snapshot-partition/runtime/experiments/performance/interaction-matrix/runner.ts", manifestFile], { cwd: "/tmp/alkalye-snapshot-partition/runtime", stdout: "inherit", stderr: "inherit" })
+			if (await child.exited) throw Error("Native switch driver failed")
+			let rows = await Bun.file(join(output, "results.json")).json()
+			if (rows.length !== 1 || rows[0].status !== "complete") throw Error("Exact cold native/HTTP gates failed")
+			results.push({ arm, trial, writes, result: rows[0], capturedState: originalData.map((value: { name: string; clock: number; checkpointHash: string }) => ({ name: value.name, clock: value.clock, checkpointHash: value.checkpointHash })) })
+			await Bun.write(root + "/combined.private.json", JSON.stringify(results))
+			console.log(JSON.stringify({ arm, trial, complete: true, readyMs: rows[0].observation.probe.ready - rows[0].observation.probe.start }))
+		} finally { Bun.spawnSync(["work", "down"], { cwd: root, env: environment }) }
+	}
+}

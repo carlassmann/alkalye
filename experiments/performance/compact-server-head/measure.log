@@ -1,0 +1,12 @@
+{"mode":"write","fixtures":[{"name":"small2","format":"alkalye-state-v2","bytes":994},{"name":"rich128","format":"alkalye-state-v2","bytes":32116142}]}
+{"arm":"baseline","trial":0,"complete":true,"readyMs":482}
+{"mode":"write","fixtures":[{"name":"small2","format":"alkalye-state-v3","bytes":994},{"name":"rich128","format":"alkalye-state-v3","bytes":134818}]}
+{"arm":"candidate","trial":0,"complete":true,"readyMs":398}
+{"mode":"write","fixtures":[{"name":"small2","format":"alkalye-state-v3","bytes":994},{"name":"rich128","format":"alkalye-state-v3","bytes":134818}]}
+{"arm":"candidate","trial":1,"complete":true,"readyMs":401.39999997615814}
+{"mode":"write","fixtures":[{"name":"small2","format":"alkalye-state-v2","bytes":994},{"name":"rich128","format":"alkalye-state-v2","bytes":32116142}]}
+{"arm":"baseline","trial":1,"complete":true,"readyMs":480.80000001192116}
+{"mode":"write","fixtures":[{"name":"small2","format":"alkalye-state-v2","bytes":994},{"name":"rich128","format":"alkalye-state-v2","bytes":32116142}]}
+{"arm":"baseline","trial":2,"complete":true,"readyMs":500.0000000000002}
+{"mode":"write","fixtures":[{"name":"small2","format":"alkalye-state-v3","bytes":994},{"name":"rich128","format":"alkalye-state-v3","bytes":134818}]}
+{"arm":"candidate","trial":2,"complete":true,"readyMs":400.89999997615837}

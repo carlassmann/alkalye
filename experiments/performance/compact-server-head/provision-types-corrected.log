@@ -1,0 +1,2 @@
+$ tsc --noEmit
+tests/compact-head-provision.ts(20,23): error TS1136: Property assignment expected.

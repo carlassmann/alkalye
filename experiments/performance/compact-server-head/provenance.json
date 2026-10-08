@@ -1,0 +1,65 @@
+{
+	"baseline": "c922a8d61d2730e0b9b6179b36b36ba85cd5e578",
+	"candidateScope": "One durable writer line; same c922 client assets botharms. Generated logepochs differ; public action IDs/payload, expanded checkpoint hash and clock verified equal.",
+	"sources": {
+		"candidate-document-store.ts.txt": "9030f03c08dfbb78e8448f75bbc22ffb7878f296c65c0556d99645f8e94d4a84",
+		"compact-server-head.test.ts.txt": "c7b5601d837e5176a45ae1df9ec9be8ea2bf6f021b7aff11f9a67e1d9618ec77",
+		"compact-head-provision.ts.txt": "09a0c6f15b365b5a29ee7e86f1339568532d9c5da910472bafc3917ee537f502",
+		"serve-compact.ts.txt": "a1691cd2f6cdea89b4e27da349e170a67af3cfad8d8069e9bb3b422ec4d68221",
+		"measure.ts.txt": "19ec09348e8920be20efc41b3cdcf98ff3be22058d7e4395b32a03d0210784f1"
+	},
+	"traces": [
+		{
+			"arm": "baseline",
+			"trial": 0,
+			"sha256": "35b4a7977b10f5c0a3d9dbc100b2625faa8f56be46860860f45ab3654bfd1023",
+			"bytes": 6572115,
+			"outsideGit": "/tmp/alkalye-compact-server-head/results/baseline-0/baseline-switch-small-rich-0.trace.json"
+		},
+		{
+			"arm": "candidate",
+			"trial": 0,
+			"sha256": "47d465eb801e1be9f61b4557747a48fb38fffb8ce8e7fdfd1eced9053c5d7a58",
+			"bytes": 6236188,
+			"outsideGit": "/tmp/alkalye-compact-server-head/results/candidate-0/candidate-switch-small-rich-0.trace.json"
+		},
+		{
+			"arm": "candidate",
+			"trial": 1,
+			"sha256": "69f91b2146b98ca04e688b155b4c5e8f3e7ab2ad0de4d3684f885bdae08d99e8",
+			"bytes": 6107408,
+			"outsideGit": "/tmp/alkalye-compact-server-head/results/candidate-1/candidate-switch-small-rich-0.trace.json"
+		},
+		{
+			"arm": "baseline",
+			"trial": 1,
+			"sha256": "baaf46fb070ebf8640a5bd8fd045b4db494e63efb66b93802e5d247f24a11f98",
+			"bytes": 6126201,
+			"outsideGit": "/tmp/alkalye-compact-server-head/results/baseline-1/baseline-switch-small-rich-0.trace.json"
+		},
+		{
+			"arm": "baseline",
+			"trial": 2,
+			"sha256": "6376836cd0b98c86a324f323923cb9888c1b7b5b5bec7742995314720ca2b466",
+			"bytes": 6264912,
+			"outsideGit": "/tmp/alkalye-compact-server-head/results/baseline-2/baseline-switch-small-rich-0.trace.json"
+		},
+		{
+			"arm": "candidate",
+			"trial": 2,
+			"sha256": "a146a66158e918638222c490b38b908917d82481e0c7cc6ca72237ee75471487",
+			"bytes": 6160878,
+			"outsideGit": "/tmp/alkalye-compact-server-head/results/candidate-2/candidate-switch-small-rich-0.trace.json"
+		}
+	],
+	"servedClientAssets": [
+		{
+			"path": "/app.js",
+			"sha256": "2988004fa7d4909e67b981f37baaa47121198a3dc2a52feb8a6105b86cb07e54"
+		},
+		{
+			"path": "/chunks/document-app-q5tas76n.js",
+			"sha256": "0f712aa9d22bf44eb4944b2a42c216a960f3bb492a6a3b24a9d3b4e5748d48e5"
+		}
+	]
+}

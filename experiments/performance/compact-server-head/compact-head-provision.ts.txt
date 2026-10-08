@@ -1,0 +1,94 @@
+import { Database } from "bun:sqlite"
+import * as Effect from "effect/Effect"
+import * as Layer from "effect/Layer"
+import * as Schema from "effect/Schema"
+import { WorkspaceStore } from "../src/server/document-store"
+import { webCryptoLayer } from "../src/platform/web-crypto"
+import { Replica } from "../src/shared/crdt"
+import { Identity } from "../src/shared/workspace"
+import { DocumentActionSchema, applyAction, restoreSnapshot } from "../src/shared/document-actions"
+
+let Fixture = Schema.Struct({
+	name: Schema.String,
+	document: Schema.String,
+	workspace: Schema.String,
+	owner: Schema.String,
+	actors: Schema.Array(Schema.String),
+	source: Schema.String,
+	actions: Schema.Array(DocumentActionSchema),
+	checkpointHash: Schema.String,
+	clock: Schema.Number,
+})
+let Fixtures = Schema.Array(Fixture)
+let [mode, databaseFile, configurationFile, outputFile] = Bun.argv.slice(2)
+if (!databaseFile || !configurationFile || !outputFile) throw Error("Missing fixture paths")
+if (mode === "capture") {
+	let configuration = await Bun.file(configurationFile).json()
+	let version = configuration.versions[0]
+	let definitions = Schema.decodeUnknownSync(Schema.Array(Schema.Struct({ name: Schema.String, path: Schema.String, sourceFile: Schema.String })))(version.fixtures.filter((value: { name: string }) => value.name === "small2" || value.name === "rich128"))
+	let database = new Database(databaseFile, { readonly: true })
+	let captured = []
+	try {
+		for (let definition of definitions) {
+			let document = definition.path.split("/").at(-1)
+			if (!document) throw Error("Missing document")
+			let identity = Schema.decodeUnknownSync(Schema.Struct({ workspace: Schema.String, owner: Schema.String }))(database.query("SELECT d.workspace,w.owner FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace WHERE d.document=?").get(document))
+			let value = await Effect.runPromise(Effect.gen(function* () {
+				let store = yield* WorkspaceStore
+				let history = yield* store.history(document)
+				let snapshot = yield* store.snapshot(document)
+				if (!snapshot) return yield* Effect.die("Missing source snapshot")
+				let replica = yield* restoreSnapshot(snapshot, "fixture-reader")
+				let basis = new Replica("fixture-capture")
+				let actions = []
+				for (let entry of history) {
+					let action = entry.action
+					let accessFields = [...new Set(action.changes.filter(change => change.target === document && change.field.startsWith("access:")).map(change => change.field))]
+					actions.push(Schema.decodeUnknownSync(DocumentActionSchema)({ id: action.id, document: action.document, actor: action.actor, label: action.label, changes: action.changes, ...(action.undoOf ? { undoOf: action.undoOf } : {}), guards: [], accessGuards: accessFields.map(field => ({ field, observed: basis.register(document, field)?.id ?? "" })) }))
+					yield* applyAction(basis, action)
+				}
+				if (basis.text(document) !== replica.text(document) || basis.clock !== replica.clock) return yield* Effect.die("Public history and snapshot disagree")
+				return { actions, source: replica.text(document), checkpointHash: new Bun.CryptoHasher("sha256").update(JSON.stringify(replica.checkpoint())).digest("hex"), clock: replica.clock }
+			}).pipe(Effect.provideService(Identity, { subject: identity.owner, actors: [] }), Effect.provide(Layer.merge(WorkspaceStore.layer(databaseFile), webCryptoLayer))))
+			if (value.source !== await Bun.file(definition.sourceFile).text()) throw Error("Captured public source differs")
+			captured.push({ name: definition.name, document, ...identity, actors: [...new Set(value.actions.map(action => action.actor))], ...value })
+		}
+	} finally { database.close() }
+	await Bun.write(outputFile, JSON.stringify(captured))
+	console.log(JSON.stringify({ mode, fixtures: captured.map(value => ({ name: value.name, characters: value.source.length, actions: value.actions.length })) }))
+} else if (mode === "write") {
+	let fixtures = Schema.decodeUnknownSync(Fixtures)(await Bun.file(configurationFile).json())
+	let writes = []
+	for (let fixture of fixtures) {
+		let result = await Effect.runPromise(Effect.gen(function* () {
+			let store = yield* WorkspaceStore
+			yield* store.create(fixture.workspace, "Personal", "personal-v1")
+			let start = performance.now()
+			let creation = fixture.actions[0]
+			if (!creation) return yield* Effect.die("Missing creation")
+			let receipt = yield* store.createDocument(fixture.workspace, creation)
+			let creationMs = performance.now() - start
+			let commits = []
+			for (let action of fixture.actions.slice(1)) {
+				let started = performance.now()
+				receipt = yield* store.commit(action)
+				commits.push(performance.now() - started)
+			}
+			let snapshot = yield* store.snapshot(fixture.document)
+			if (!snapshot) return yield* Effect.die("Missing created snapshot")
+			let replica = yield* restoreSnapshot(snapshot, "fixture-reader")
+			let history = yield* store.history(fixture.document)
+			if (replica.text(fixture.document) !== fixture.source || replica.clock !== fixture.clock || JSON.stringify(history.map(entry => entry.action.id)) !== JSON.stringify(fixture.actions.map(action => action.id))) return yield* Effect.die("Public restored source/history/clock mismatch")
+			let checkpointHash = new Bun.CryptoHasher("sha256").update(JSON.stringify(replica.checkpoint())).digest("hex")
+			if (checkpointHash !== fixture.checkpointHash) return yield* Effect.die("Restored expanded checkpoint differs")
+			return { creationMs, commitMs: commits, receipt, checkpointHash, clock: replica.clock }
+		}).pipe(Effect.provideService(Identity, { subject: fixture.owner, actors: fixture.actors }), Effect.provide(Layer.merge(WorkspaceStore.layer(databaseFile), webCryptoLayer))))
+		let database = new Database(databaseFile, { readonly: true })
+		try {
+			let stored = Schema.decodeUnknownSync(Schema.Struct({ format: Schema.String, bytes: Schema.Number, position: Schema.Number, version: Schema.Number }))(database.query("SELECT json_extract(state,'$.format') AS format,length(CAST(state AS BLOB)) AS bytes,position,version FROM document_heads WHERE document=?").get(fixture.document))
+			writes.push({ name: fixture.name, ...result, ...stored, sourceHash: new Bun.CryptoHasher("sha256").update(fixture.source).digest("hex"), actionIdsHash: new Bun.CryptoHasher("sha256").update(JSON.stringify(fixture.actions.map(action => action.id))).digest("hex"), actionPayloadHash: new Bun.CryptoHasher("sha256").update(JSON.stringify(fixture.actions)).digest("hex") })
+		} finally { database.close() }
+	}
+	await Bun.write(outputFile, JSON.stringify(writes))
+	console.log(JSON.stringify({ mode, fixtures: writes.map(value => ({ name: value.name, format: value.format, bytes: value.bytes })) }))
+} else throw Error("Unknown mode")

@@ -1,0 +1,5 @@
+import * as Effect from "effect/Effect"
+import { startServer } from "../src/server/index"
+let [assets, data, port] = Bun.argv.slice(2)
+if (!assets || !data || !port) throw Error("Missing server paths")
+await Effect.runPromise(startServer({ assets, data, port: Number(port), hostname: "127.0.0.1", build: false, development: false }))

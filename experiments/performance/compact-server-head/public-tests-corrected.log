@@ -1,0 +1,59 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/document-api.test.ts:
+(pass) HTTP refuses orphaned text anchors and unknown removals atomically, then accepts a corrected action [45.85ms]
+(pass) attachment source and manifest commit atomically only after their bytes exist; deletion retains historical bytes [41.35ms]
+(pass) document history pages preserve global cursor gaps and reject unsafe page sizes [36.42ms]
+(pass) a bound client cannot read or write through another account's session [10.18ms]
+(pass) whole-document HTTP stream includes text, comments and asset references; snapshots and sidebar do not require history [18.56ms]
+(pass) action chain discovery uses current permissions and masks missing or unrelated receipts [22.83ms]
+(pass) HTTP owner/writer/reader permissions are persisted and cannot be supplied in a request body [23.97ms]
+(pass) unknown documents do not leak existence and history epochs must match [6.28ms]
+(pass) native Effect compression negotiates downloadable snapshots without compressing authentication responses [4.72ms]
+(pass) workspace owner retains control of writer-created documents after membership removal [19.51ms]
+(pass) an account cannot reserve another account's unused producer identity [8.36ms]
+(pass) HTTP rejects excessive actions and compact text expansions before durable mutation [107.50ms]
+(pass) library catalogue lists only current access, includes separate document grants and preserves effective roles [22.76ms]
+(pass) native blob HTTP verifies immutable chunks, scopes them to a document and checks current roles [25.47ms]
+(pass) single-action HTTP reads recover register beforeimages without fetching preceding history [18.67ms]
+(pass) single-action HTTP reads enforce current access and mask unrelated identities [17.70ms]
+(pass) a pruned single action returns its typed history failure while current snapshot remains readable [20.40ms]
+(pass) native document actions refuse unreferenced cancellation and implicit document birth undo [9.35ms]
+(pass) cold native stores migrate a legacy head once and keep its undo boundary across later edits [31.24ms]
+(pass) whole-document HTTP compensation lazily fetches one action, retains blobs and preserves peer deletions through cold redo [40.75ms]
+(pass) Effect routing accepts encoded document identifiers and native action ids at their legal bounds [6.91ms]
+(pass) account preference events merge only changed fields, retry exactly and remain private [8.88ms]
+(pass) document observability measures real HTTP outcomes without document labels and isolates client registries [8.42ms]
+(pass) interrupting a real document request records cancellation and releases its fetch [5.47ms]
+(pass) a one MiB document syncs bounded actions and downloads a compact editable snapshot [12087.23ms]
+[18:48:38.838] WARN (#2531): Slow document operation {
+  boundary: "server",
+  traceId: "112616921d96b516c2d348032ffe81c0",
+  spanId: "69cc4cf61711d333",
+  operation: "commit",
+  outcome: "success",
+  durationMs: 3851,
+}
+(pass) a one MiB paste is one durable HTTP contribution and one undo, with bounded aggregate rejection [21980.45ms]
+
+tests/document-revision.test.ts:
+(pass) exact revisions serialize competing writers and include child changes [21.66ms]
+
+tests/document-blob-store.test.ts:
+(pass) concurrent native chunk writes share a durable document quota and retries do not charge twice [20.01ms]
+(pass) owner account quota covers separate workspaces and charges inherited writers to the workspace owner [18.16ms]
+(pass) concurrent uploads across workspaces cannot exceed their shared owner account quota [17.73ms]
+(pass) server quota covers concurrent uploads from independent account owners [12.27ms]
+(pass) native chunks survive closing and reopening the SQLite engine without the event payload table [16.13ms]
+(pass) corrupted durable blob bytes are reported missing and repaired only by digest-verified incoming bytes [11.56ms]
+(pass) missing chunk discovery repairs wrong-size and non-binary rows without downloading them [13.00ms]
+
+tests/compact-server-head.test.ts:
+(pass) compact creation and interval checkpoints reopen with exact Unicode source, history and Undo [98.86ms]
+(pass) legacy expanded heads remain readable after a fresh store scope [26.56ms]
+(pass) fresh compact checkpoint corruption is rejected without publishing a snapshot [12.15ms]
+
+ 37 pass
+ 0 fail
+ 319 expect() calls
+Ran 37 tests across 4 files. [35.05s]

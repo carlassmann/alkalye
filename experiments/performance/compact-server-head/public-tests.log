@@ -1,0 +1,135 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/document-api.test.ts:
+(pass) HTTP refuses orphaned text anchors and unknown removals atomically, then accepts a corrected action [50.47ms]
+(pass) attachment source and manifest commit atomically only after their bytes exist; deletion retains historical bytes [38.44ms]
+(pass) document history pages preserve global cursor gaps and reject unsafe page sizes [47.27ms]
+(pass) a bound client cannot read or write through another account's session [9.94ms]
+(pass) whole-document HTTP stream includes text, comments and asset references; snapshots and sidebar do not require history [26.77ms]
+(pass) action chain discovery uses current permissions and masks missing or unrelated receipts [20.24ms]
+(pass) HTTP owner/writer/reader permissions are persisted and cannot be supplied in a request body [25.37ms]
+(pass) unknown documents do not leak existence and history epochs must match [6.72ms]
+(pass) native Effect compression negotiates downloadable snapshots without compressing authentication responses [9.18ms]
+(pass) workspace owner retains control of writer-created documents after membership removal [20.57ms]
+(pass) an account cannot reserve another account's unused producer identity [14.23ms]
+(pass) HTTP rejects excessive actions and compact text expansions before durable mutation [108.44ms]
+(pass) library catalogue lists only current access, includes separate document grants and preserves effective roles [27.05ms]
+(pass) native blob HTTP verifies immutable chunks, scopes them to a document and checks current roles [30.66ms]
+(pass) single-action HTTP reads recover register beforeimages without fetching preceding history [20.47ms]
+(pass) single-action HTTP reads enforce current access and mask unrelated identities [16.52ms]
+(pass) a pruned single action returns its typed history failure while current snapshot remains readable [26.45ms]
+(pass) native document actions refuse unreferenced cancellation and implicit document birth undo [12.52ms]
+(pass) cold native stores migrate a legacy head once and keep its undo boundary across later edits [35.41ms]
+(pass) whole-document HTTP compensation lazily fetches one action, retains blobs and preserves peer deletions through cold redo [48.21ms]
+(pass) Effect routing accepts encoded document identifiers and native action ids at their legal bounds [8.27ms]
+(pass) account preference events merge only changed fields, retry exactly and remain private [10.48ms]
+(pass) document observability measures real HTTP outcomes without document labels and isolates client registries [11.07ms]
+(pass) interrupting a real document request records cancellation and releases its fetch [5.46ms]
+(pass) a one MiB document syncs bounded actions and downloads a compact editable snapshot [12409.68ms]
+[18:39:57.183] WARN (#2531): Slow document operation {
+  boundary: "server",
+  traceId: "340f5d353c9f4af8f225e0ec188eb672",
+  spanId: "c0cce376ebdd556c",
+  operation: "commit",
+  outcome: "success",
+  durationMs: 3674,
+}
+(pass) a one MiB paste is one durable HTTP contribution and one undo, with bounded aggregate rejection [21660.41ms]
+
+tests/document-revision.test.ts:
+(pass) exact revisions serialize competing writers and include child changes [19.59ms]
+
+tests/document-blob-store.test.ts:
+(pass) concurrent native chunk writes share a durable document quota and retries do not charge twice [12.04ms]
+(pass) owner account quota covers separate workspaces and charges inherited writers to the workspace owner [16.16ms]
+(pass) concurrent uploads across workspaces cannot exceed their shared owner account quota [10.57ms]
+(pass) server quota covers concurrent uploads from independent account owners [9.31ms]
+(pass) native chunks survive closing and reopening the SQLite engine without the event payload table [11.70ms]
+(pass) corrupted durable blob bytes are reported missing and repaired only by digest-verified incoming bytes [8.45ms]
+(pass) missing chunk discovery repairs wrong-size and non-binary rows without downloading them [9.31ms]
+
+tests/compact-server-head.test.ts:
+781 | 	return Effect.try({
+782 | 		try: work,
+783 | 		catch: cause =>
+784 | 			cause instanceof UndoUnavailable
+785 | 				? cause
+786 | 				: new DocumentConflict({
+            ^
+error: undefined is not an object (evaluating 'action.before.some')
+ _tag: "DocumentConflict",
+
+      at catch (/private/tmp/alkalye-compact-server-head/runtime/src/shared/document-actions.ts:786:7)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:770:19)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+(fail) compact creation and interval checkpoints reopen with exact Unicode source, history and Undo [18.13ms]
+704 | export const fail = exitFail;
+705 | /** @internal */
+706 | export const sync = /*#__PURE__*/makePrimitive({
+707 |   op: "Sync",
+708 |   [evaluate](fiber) {
+709 |     const value = this[args]();
+                             ^
+error: expect(received).toBe(expected)
+
+- "A😀🦊B
++ "---
++ title: "Compact"
++ ---
++ A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  A😀🦊B
+  "
+
+- Expected  - 1
++ Received  + 4
+
+      at ~effect/Effect/evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:709:24)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2478:9)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2530:19)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2541:31)
+      at <anonymous> (/private/tmp/alkalye-compact-server-head/runtime/tests/compact-server-head.test.ts:100:8)
+(fail) legacy expanded heads remain readable after a fresh store scope [14.87ms]
+(pass) fresh compact checkpoint corruption is rejected without publishing a snapshot [11.66ms]
+
+2 tests failed:
+(fail) compact creation and interval checkpoints reopen with exact Unicode source, history and Undo [18.13ms]
+(fail) legacy expanded heads remain readable after a fresh store scope [14.87ms]
+
+ 35 pass
+ 2 fail
+ 305 expect() calls
+Ran 37 tests across 4 files. [35.01s]

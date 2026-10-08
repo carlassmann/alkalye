@@ -1,0 +1,595 @@
+{
+	"scope": "n3 each, alternating public deep-module writer + actual cold native2K\u2192128K switch; CrRendererMain interaction:start/end task and clipped unionGC; heap points not peaks; no CPU sampler/phase markers",
+	"cells": [
+		{
+			"arm": "baseline",
+			"trial": 0,
+			"readyMs": 481.932,
+			"windowMs": 3001.566,
+			"largestMainTaskMs": 18.068,
+			"mainGcUnionMs": 29.724,
+			"snapshotTtfbMs": 241.5999999642371,
+			"snapshotBodyMs": 1.0,
+			"snapshotResource": {
+				"decodedBodySize": 137686,
+				"encodedBodySize": 1777,
+				"fetchStart": 686.5,
+				"requestStart": 686.8000000119209,
+				"responseEnd": 929.399999976158,
+				"responseStart": 928.399999976158,
+				"transferSize": 2077
+			},
+			"heapPointSamples": {
+				"initial": {
+					"limit": 4395630592,
+					"total": 21650066,
+					"used": 12002230
+				},
+				"final": {
+					"limit": 4395630592,
+					"total": 155515468,
+					"used": 90894764
+				}
+			},
+			"write": [
+				{
+					"name": "small2",
+					"creationMs": 8.615916999999996,
+					"commitMs": [
+						12.798292000000004, 1.7942079999999976, 4.953792000000007
+					],
+					"receipt": 4,
+					"checkpointHash": "e9538364af7e5ad40c18d7584f8f34e5857e338b27dff1a960e1ade30e4cdfeb",
+					"clock": 5,
+					"format": "alkalye-state-v2",
+					"bytes": 994,
+					"position": 1,
+					"version": 1,
+					"sourceHash": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+					"actionIdsHash": "c342c9af3e192bd38176d49e1a2e559e0cce9ca0f6cf4e5fafc18a27c3a43c27",
+					"actionPayloadHash": "fc84be11fd391334c85e1ad12a9761092c31ba242a923d40e86f1c23a156d658"
+				},
+				{
+					"name": "rich128",
+					"creationMs": 418.391834,
+					"commitMs": [],
+					"receipt": 5,
+					"checkpointHash": "d77c68167f876b17e10ce2332d803f5bdf6a2bdb3a53d6a0606ad0c7a8b36ba2",
+					"clock": 3,
+					"format": "alkalye-state-v2",
+					"bytes": 32116142,
+					"position": 5,
+					"version": 1,
+					"sourceHash": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac",
+					"actionIdsHash": "2ec343c16cb6fa8e279bf501798efcd024cb9be45689876554d3c26f2d1a93b6",
+					"actionPayloadHash": "3e450670503b1c3cc5d9d6c14bfcc2d26b29c4abb718bf69053111f34e720828"
+				}
+			],
+			"state": [
+				{
+					"name": "small2",
+					"clock": 5,
+					"checkpointHash": "e9538364af7e5ad40c18d7584f8f34e5857e338b27dff1a960e1ade30e4cdfeb"
+				},
+				{
+					"name": "rich128",
+					"clock": 3,
+					"checkpointHash": "d77c68167f876b17e10ce2332d803f5bdf6a2bdb3a53d6a0606ad0c7a8b36ba2"
+				}
+			],
+			"receipts": {
+				"seedReceipt": {
+					"characters": 2048,
+					"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+				},
+				"targetReceipt": {
+					"characters": 131072,
+					"sha256": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac"
+				}
+			}
+		},
+		{
+			"arm": "candidate",
+			"trial": 0,
+			"readyMs": 398.019,
+			"windowMs": 3000.525,
+			"largestMainTaskMs": 17.854,
+			"mainGcUnionMs": 20.05,
+			"snapshotTtfbMs": 157.0,
+			"snapshotBodyMs": 2.199999988079071,
+			"snapshotResource": {
+				"decodedBodySize": 137686,
+				"encodedBodySize": 1777,
+				"fetchStart": 693,
+				"requestStart": 693.2000000476837,
+				"responseEnd": 852.4000000357628,
+				"responseStart": 850.2000000476837,
+				"transferSize": 2077
+			},
+			"heapPointSamples": {
+				"initial": {
+					"limit": 4395630592,
+					"total": 21650066,
+					"used": 12079062
+				},
+				"final": {
+					"limit": 4395630592,
+					"total": 155777644,
+					"used": 91322000
+				}
+			},
+			"write": [
+				{
+					"name": "small2",
+					"creationMs": 8.698375000000006,
+					"commitMs": [13.089208, 1.7758340000000032, 4.890999999999991],
+					"receipt": 4,
+					"checkpointHash": "e9538364af7e5ad40c18d7584f8f34e5857e338b27dff1a960e1ade30e4cdfeb",
+					"clock": 5,
+					"format": "alkalye-state-v3",
+					"bytes": 994,
+					"position": 1,
+					"version": 1,
+					"sourceHash": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+					"actionIdsHash": "c342c9af3e192bd38176d49e1a2e559e0cce9ca0f6cf4e5fafc18a27c3a43c27",
+					"actionPayloadHash": "fc84be11fd391334c85e1ad12a9761092c31ba242a923d40e86f1c23a156d658"
+				},
+				{
+					"name": "rich128",
+					"creationMs": 361.45729200000005,
+					"commitMs": [],
+					"receipt": 5,
+					"checkpointHash": "d77c68167f876b17e10ce2332d803f5bdf6a2bdb3a53d6a0606ad0c7a8b36ba2",
+					"clock": 3,
+					"format": "alkalye-state-v3",
+					"bytes": 134818,
+					"position": 5,
+					"version": 1,
+					"sourceHash": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac",
+					"actionIdsHash": "2ec343c16cb6fa8e279bf501798efcd024cb9be45689876554d3c26f2d1a93b6",
+					"actionPayloadHash": "3e450670503b1c3cc5d9d6c14bfcc2d26b29c4abb718bf69053111f34e720828"
+				}
+			],
+			"state": [
+				{
+					"name": "small2",
+					"clock": 5,
+					"checkpointHash": "e9538364af7e5ad40c18d7584f8f34e5857e338b27dff1a960e1ade30e4cdfeb"
+				},
+				{
+					"name": "rich128",
+					"clock": 3,
+					"checkpointHash": "d77c68167f876b17e10ce2332d803f5bdf6a2bdb3a53d6a0606ad0c7a8b36ba2"
+				}
+			],
+			"receipts": {
+				"seedReceipt": {
+					"characters": 2048,
+					"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+				},
+				"targetReceipt": {
+					"characters": 131072,
+					"sha256": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac"
+				}
+			}
+		},
+		{
+			"arm": "candidate",
+			"trial": 1,
+			"readyMs": 401.401,
+			"windowMs": 3000.889,
+			"largestMainTaskMs": 18.304,
+			"mainGcUnionMs": 19.238,
+			"snapshotTtfbMs": 162.30000001192093,
+			"snapshotBodyMs": 0.2999999523162842,
+			"snapshotResource": {
+				"decodedBodySize": 137686,
+				"encodedBodySize": 1776,
+				"fetchStart": 685.4000000357628,
+				"requestStart": 685.6000000238419,
+				"responseEnd": 848.1999999880791,
+				"responseStart": 847.9000000357628,
+				"transferSize": 2076
+			},
+			"heapPointSamples": {
+				"initial": {
+					"limit": 4395630592,
+					"total": 21650126,
+					"used": 11988186
+				},
+				"final": {
+					"limit": 4395630592,
+					"total": 156564136,
+					"used": 91385196
+				}
+			},
+			"write": [
+				{
+					"name": "small2",
+					"creationMs": 8.439416000000001,
+					"commitMs": [12.923209, 2.18970800000001, 4.966333000000006],
+					"receipt": 4,
+					"checkpointHash": "e9538364af7e5ad40c18d7584f8f34e5857e338b27dff1a960e1ade30e4cdfeb",
+					"clock": 5,
+					"format": "alkalye-state-v3",
+					"bytes": 994,
+					"position": 1,
+					"version": 1,
+					"sourceHash": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+					"actionIdsHash": "c342c9af3e192bd38176d49e1a2e559e0cce9ca0f6cf4e5fafc18a27c3a43c27",
+					"actionPayloadHash": "fc84be11fd391334c85e1ad12a9761092c31ba242a923d40e86f1c23a156d658"
+				},
+				{
+					"name": "rich128",
+					"creationMs": 361.917167,
+					"commitMs": [],
+					"receipt": 5,
+					"checkpointHash": "d77c68167f876b17e10ce2332d803f5bdf6a2bdb3a53d6a0606ad0c7a8b36ba2",
+					"clock": 3,
+					"format": "alkalye-state-v3",
+					"bytes": 134818,
+					"position": 5,
+					"version": 1,
+					"sourceHash": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac",
+					"actionIdsHash": "2ec343c16cb6fa8e279bf501798efcd024cb9be45689876554d3c26f2d1a93b6",
+					"actionPayloadHash": "3e450670503b1c3cc5d9d6c14bfcc2d26b29c4abb718bf69053111f34e720828"
+				}
+			],
+			"state": [
+				{
+					"name": "small2",
+					"clock": 5,
+					"checkpointHash": "e9538364af7e5ad40c18d7584f8f34e5857e338b27dff1a960e1ade30e4cdfeb"
+				},
+				{
+					"name": "rich128",
+					"clock": 3,
+					"checkpointHash": "d77c68167f876b17e10ce2332d803f5bdf6a2bdb3a53d6a0606ad0c7a8b36ba2"
+				}
+			],
+			"receipts": {
+				"seedReceipt": {
+					"characters": 2048,
+					"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+				},
+				"targetReceipt": {
+					"characters": 131072,
+					"sha256": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac"
+				}
+			}
+		},
+		{
+			"arm": "baseline",
+			"trial": 1,
+			"readyMs": 480.768,
+			"windowMs": 3001.427,
+			"largestMainTaskMs": 17.709,
+			"mainGcUnionMs": 19.963,
+			"snapshotTtfbMs": 242.39999997615826,
+			"snapshotBodyMs": 1.3000000119208153,
+			"snapshotResource": {
+				"decodedBodySize": 137686,
+				"encodedBodySize": 1777,
+				"fetchStart": 705.9000000357628,
+				"requestStart": 706.2000000476837,
+				"responseEnd": 949.9000000357628,
+				"responseStart": 948.600000023842,
+				"transferSize": 2077
+			},
+			"heapPointSamples": {
+				"initial": {
+					"limit": 4395630592,
+					"total": 21125185,
+					"used": 11989537
+				},
+				"final": {
+					"limit": 4395630592,
+					"total": 156039703,
+					"used": 91242335
+				}
+			},
+			"write": [
+				{
+					"name": "small2",
+					"creationMs": 8.256124999999997,
+					"commitMs": [
+						12.81029199999999, 1.9056659999999965, 4.974208000000004
+					],
+					"receipt": 4,
+					"checkpointHash": "e9538364af7e5ad40c18d7584f8f34e5857e338b27dff1a960e1ade30e4cdfeb",
+					"clock": 5,
+					"format": "alkalye-state-v2",
+					"bytes": 994,
+					"position": 1,
+					"version": 1,
+					"sourceHash": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+					"actionIdsHash": "c342c9af3e192bd38176d49e1a2e559e0cce9ca0f6cf4e5fafc18a27c3a43c27",
+					"actionPayloadHash": "fc84be11fd391334c85e1ad12a9761092c31ba242a923d40e86f1c23a156d658"
+				},
+				{
+					"name": "rich128",
+					"creationMs": 441.978292,
+					"commitMs": [],
+					"receipt": 5,
+					"checkpointHash": "d77c68167f876b17e10ce2332d803f5bdf6a2bdb3a53d6a0606ad0c7a8b36ba2",
+					"clock": 3,
+					"format": "alkalye-state-v2",
+					"bytes": 32116142,
+					"position": 5,
+					"version": 1,
+					"sourceHash": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac",
+					"actionIdsHash": "2ec343c16cb6fa8e279bf501798efcd024cb9be45689876554d3c26f2d1a93b6",
+					"actionPayloadHash": "3e450670503b1c3cc5d9d6c14bfcc2d26b29c4abb718bf69053111f34e720828"
+				}
+			],
+			"state": [
+				{
+					"name": "small2",
+					"clock": 5,
+					"checkpointHash": "e9538364af7e5ad40c18d7584f8f34e5857e338b27dff1a960e1ade30e4cdfeb"
+				},
+				{
+					"name": "rich128",
+					"clock": 3,
+					"checkpointHash": "d77c68167f876b17e10ce2332d803f5bdf6a2bdb3a53d6a0606ad0c7a8b36ba2"
+				}
+			],
+			"receipts": {
+				"seedReceipt": {
+					"characters": 2048,
+					"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+				},
+				"targetReceipt": {
+					"characters": 131072,
+					"sha256": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac"
+				}
+			}
+		},
+		{
+			"arm": "baseline",
+			"trial": 2,
+			"readyMs": 500.056,
+			"windowMs": 3001.584,
+			"largestMainTaskMs": 17.996,
+			"mainGcUnionMs": 21.791,
+			"snapshotTtfbMs": 247.09999996423733,
+			"snapshotBodyMs": 1.1000000238416305,
+			"snapshotResource": {
+				"decodedBodySize": 137686,
+				"encodedBodySize": 1777,
+				"fetchStart": 697.8999999761581,
+				"requestStart": 698.1000000238419,
+				"responseEnd": 946.3000000119208,
+				"responseStart": 945.1999999880792,
+				"transferSize": 2077
+			},
+			"heapPointSamples": {
+				"initial": {
+					"limit": 4395630592,
+					"total": 21123730,
+					"used": 14361546
+				},
+				"final": {
+					"limit": 4395630592,
+					"total": 154432108,
+					"used": 89494384
+				}
+			},
+			"write": [
+				{
+					"name": "small2",
+					"creationMs": 8.369874999999993,
+					"commitMs": [13.058166, 1.9781669999999991, 4.948083999999994],
+					"receipt": 4,
+					"checkpointHash": "e9538364af7e5ad40c18d7584f8f34e5857e338b27dff1a960e1ade30e4cdfeb",
+					"clock": 5,
+					"format": "alkalye-state-v2",
+					"bytes": 994,
+					"position": 1,
+					"version": 1,
+					"sourceHash": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+					"actionIdsHash": "c342c9af3e192bd38176d49e1a2e559e0cce9ca0f6cf4e5fafc18a27c3a43c27",
+					"actionPayloadHash": "fc84be11fd391334c85e1ad12a9761092c31ba242a923d40e86f1c23a156d658"
+				},
+				{
+					"name": "rich128",
+					"creationMs": 421.099625,
+					"commitMs": [],
+					"receipt": 5,
+					"checkpointHash": "d77c68167f876b17e10ce2332d803f5bdf6a2bdb3a53d6a0606ad0c7a8b36ba2",
+					"clock": 3,
+					"format": "alkalye-state-v2",
+					"bytes": 32116142,
+					"position": 5,
+					"version": 1,
+					"sourceHash": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac",
+					"actionIdsHash": "2ec343c16cb6fa8e279bf501798efcd024cb9be45689876554d3c26f2d1a93b6",
+					"actionPayloadHash": "3e450670503b1c3cc5d9d6c14bfcc2d26b29c4abb718bf69053111f34e720828"
+				}
+			],
+			"state": [
+				{
+					"name": "small2",
+					"clock": 5,
+					"checkpointHash": "e9538364af7e5ad40c18d7584f8f34e5857e338b27dff1a960e1ade30e4cdfeb"
+				},
+				{
+					"name": "rich128",
+					"clock": 3,
+					"checkpointHash": "d77c68167f876b17e10ce2332d803f5bdf6a2bdb3a53d6a0606ad0c7a8b36ba2"
+				}
+			],
+			"receipts": {
+				"seedReceipt": {
+					"characters": 2048,
+					"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+				},
+				"targetReceipt": {
+					"characters": 131072,
+					"sha256": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac"
+				}
+			}
+		},
+		{
+			"arm": "candidate",
+			"trial": 2,
+			"readyMs": 400.769,
+			"windowMs": 3001.575,
+			"largestMainTaskMs": 18.473,
+			"mainGcUnionMs": 20.186,
+			"snapshotTtfbMs": 154.69999998807907,
+			"snapshotBodyMs": 0.3999999761581421,
+			"snapshotResource": {
+				"decodedBodySize": 137686,
+				"encodedBodySize": 1777,
+				"fetchStart": 697,
+				"requestStart": 697.1999999880791,
+				"responseEnd": 852.2999999523163,
+				"responseStart": 851.8999999761581,
+				"transferSize": 2077
+			},
+			"heapPointSamples": {
+				"initial": {
+					"limit": 4395630592,
+					"total": 20861586,
+					"used": 14365726
+				},
+				"final": {
+					"limit": 4395630592,
+					"total": 152662636,
+					"used": 87148584
+				}
+			},
+			"write": [
+				{
+					"name": "small2",
+					"creationMs": 8.415999999999997,
+					"commitMs": [14.193708, 2.1588749999999948, 5.010334],
+					"receipt": 4,
+					"checkpointHash": "e9538364af7e5ad40c18d7584f8f34e5857e338b27dff1a960e1ade30e4cdfeb",
+					"clock": 5,
+					"format": "alkalye-state-v3",
+					"bytes": 994,
+					"position": 1,
+					"version": 1,
+					"sourceHash": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+					"actionIdsHash": "c342c9af3e192bd38176d49e1a2e559e0cce9ca0f6cf4e5fafc18a27c3a43c27",
+					"actionPayloadHash": "fc84be11fd391334c85e1ad12a9761092c31ba242a923d40e86f1c23a156d658"
+				},
+				{
+					"name": "rich128",
+					"creationMs": 395.412417,
+					"commitMs": [],
+					"receipt": 5,
+					"checkpointHash": "d77c68167f876b17e10ce2332d803f5bdf6a2bdb3a53d6a0606ad0c7a8b36ba2",
+					"clock": 3,
+					"format": "alkalye-state-v3",
+					"bytes": 134818,
+					"position": 5,
+					"version": 1,
+					"sourceHash": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac",
+					"actionIdsHash": "2ec343c16cb6fa8e279bf501798efcd024cb9be45689876554d3c26f2d1a93b6",
+					"actionPayloadHash": "3e450670503b1c3cc5d9d6c14bfcc2d26b29c4abb718bf69053111f34e720828"
+				}
+			],
+			"state": [
+				{
+					"name": "small2",
+					"clock": 5,
+					"checkpointHash": "e9538364af7e5ad40c18d7584f8f34e5857e338b27dff1a960e1ade30e4cdfeb"
+				},
+				{
+					"name": "rich128",
+					"clock": 3,
+					"checkpointHash": "d77c68167f876b17e10ce2332d803f5bdf6a2bdb3a53d6a0606ad0c7a8b36ba2"
+				}
+			],
+			"receipts": {
+				"seedReceipt": {
+					"characters": 2048,
+					"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+				},
+				"targetReceipt": {
+					"characters": 131072,
+					"sha256": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac"
+				}
+			}
+		}
+	],
+	"aggregate": {
+		"baseline": {
+			"readyMs": {
+				"samples": [481.932, 480.768, 500.056],
+				"median": 481.932,
+				"max": 500.056
+			},
+			"largestMainTaskMs": {
+				"samples": [18.068, 17.709, 17.996],
+				"median": 17.996,
+				"max": 18.068
+			},
+			"mainGcUnionMs": {
+				"samples": [29.724, 19.963, 21.791],
+				"median": 21.791,
+				"max": 29.724
+			},
+			"snapshotTtfbMs": {
+				"samples": [241.5999999642371, 242.39999997615826, 247.09999996423733],
+				"median": 242.39999997615826,
+				"max": 247.09999996423733
+			},
+			"snapshotBodyMs": {
+				"samples": [1.0, 1.3000000119208153, 1.1000000238416305],
+				"median": 1.1000000238416305,
+				"max": 1.3000000119208153
+			},
+			"richWriterCreationMs": {
+				"samples": [418.391834, 441.978292, 421.099625],
+				"median": 421.099625,
+				"max": 441.978292
+			},
+			"richWriterBytes": {
+				"samples": [32116142, 32116142, 32116142],
+				"median": 32116142,
+				"max": 32116142
+			}
+		},
+		"candidate": {
+			"readyMs": {
+				"samples": [398.019, 401.401, 400.769],
+				"median": 400.769,
+				"max": 401.401
+			},
+			"largestMainTaskMs": {
+				"samples": [17.854, 18.304, 18.473],
+				"median": 18.304,
+				"max": 18.473
+			},
+			"mainGcUnionMs": {
+				"samples": [20.05, 19.238, 20.186],
+				"median": 20.05,
+				"max": 20.186
+			},
+			"snapshotTtfbMs": {
+				"samples": [157.0, 162.30000001192093, 154.69999998807907],
+				"median": 157.0,
+				"max": 162.30000001192093
+			},
+			"snapshotBodyMs": {
+				"samples": [2.199999988079071, 0.2999999523162842, 0.3999999761581421],
+				"median": 0.3999999761581421,
+				"max": 2.199999988079071
+			},
+			"richWriterCreationMs": {
+				"samples": [361.45729200000005, 361.917167, 395.412417],
+				"median": 361.917167,
+				"max": 395.412417
+			},
+			"richWriterBytes": {
+				"samples": [134818, 134818, 134818],
+				"median": 134818,
+				"max": 134818
+			}
+		}
+	}
+}

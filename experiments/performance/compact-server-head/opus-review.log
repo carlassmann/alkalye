@@ -1,0 +1,50 @@
+**No blockers found.** The one-line change keeps canonical semantics, ownership and fingerprints. The real gap is test coverage: no existing test exercises the interval rewrite and then reopens from a cold store.
+
+All anchors are `src/server/document-store.ts` at c922a8d unless noted. I diffed the candidate against c922: the only change is line 2216. Nothing was run.
+
+**Why it's safe**
+- **Lossless:** `compactAtomSteps` (`src/shared/model.ts:346`) only merges an atom into a run if it has none of the optional `Atom` fields (`order`, `observed`, `ending`, `migration`, `deleted`, `emptyHeader`, `body`). Its id must be the previous id + 1, its `after` must point at the previous atom, and neither side may be a lone surrogate. `expandCompactCheckpointSteps` (`src/shared/checkpoint.ts`) rebuilds the same atoms in the same order. `restored`, `fields`, `visibility` and `clock` are copied unchanged.
+- **No reader-rejected v3 output:**
+  - Total atoms above 2M falls back to v2, which matches the reader's 2M expansion limit.
+  - Run length stays ≤ 2M UTF-16 units, matching `CompactAtomSchema` max length.
+  - Consecutive 8-digit ids can't pass the 1e8 range check.
+- **Same checks run:** owner, alias, anchor-cycle and clock checks in `parseCheckpointSteps` run on the expanded atoms. So a v3 head is accepted exactly when the equivalent v2 head would be.
+- **Detached ownership:**
+  - Write side: `checkpoint()` already copies atoms, and compaction spreads before `+=`, so the live replica is never mutated.
+  - Read side: expansion creates fresh objects, so `restoreState(..., shareAtoms=true)` is safe.
+- **Fingerprints, session and cache:**
+  - Heads carry no fingerprint; `refresh` (around line 2416) still returns `{...tip}`.
+  - The warm path (line 1827) uses the in-memory `replacement` and never reparses the head. So a v3 bug would only show up on cold reads.
+  - The `serialized` cache is unaffected.
+- **Old formats:** v1 and v2 rows are still parsed, and rows of different formats can coexist. The `ON CONFLICT … WHERE` logic is unchanged. The legacy-head test (`tests/document-api.test.ts:1714`) still covers v1.
+- **Rollback:** v3 came in with 161c7f1, which is on this branch only. origin/main is a different (Astro) codebase with no `document_heads` table, so there's no same-store rollback risk. Only a downgrade to a branch commit older than 161c7f1 would fail to read these heads.
+- **History, Undo, journal replay:** none of them read heads. Visibility and cancels are unchanged, so `canCancel` and redo behave the same.
+
+**Tradeoffs (not blockers)**
+- **CPU:** the write path gains one synchronous O(n) pass inside the transaction (`compactCheckpoint` is not cooperative), plus run-head copies and string concatenation. Against that, `JSON.stringify` and the SQLite write shrink from about 32 MB to much less. Likely a net win, but unmeasured.
+- **Memory:** peak memory is now the expanded checkpoint plus the compact copy plus a smaller JSON string, instead of the expanded checkpoint plus a 32 MB string. Probably lower.
+- **Blocking:** the event loop and transaction block as before. The cooperative/borrowed path (`durableCheckpointEffect`) exists but is out of scope.
+- **Read cost on cold start:** `Schema.decodeUnknownSync(CompactCheckpointSchema)` plus expansion plus validation, instead of a per-atom v2 decode. Unmeasured too.
+- **Large documents:** above 2M atoms they stay v2, so the biggest documents gain nothing.
+- **Duplicate work:** `parseOperation` runs on `fields` twice in the v3 path. Trivial.
+
+**Coverage gap**
+- Only the birth head (the `!tip` branch) is exercised cold today, through the tests at lines 1714 and 1874 in `tests/document-api.test.ts`.
+- No test passes version 100 (`checkpointInterval`) and then reopens from a fresh scope, so the interval rewrite is never read back cold.
+
+**Recommended gates** (real `startServer({data: directory})` with a cold reopen, following the pattern at `tests/document-api.test.ts:1714`)
+1. **Creation + cold reopen:** a rich birth (emoji or surrogate pair, multiline text, fields and a comment target). After a fresh-scope restart, snapshot and history are identical. One raw-row check that the head format is v3 is acceptable here, since storage format is the subject of the change.
+2. **Interval rewrite + Undo:**
+   - About 101 edits including deletes, a cancel (Undo) and a redo (restored alias), with a cold reopen at exactly version 100 (no tail rows) and again at 101 (one tail row).
+   - Each time, snapshot, `canCancel` and the visible text must match the warm snapshot.
+   - Then Undo an action from before the checkpoint, after the cold reopen.
+   - Also cover format transitions: seed a v2 head through SQLite and confirm it reads, then confirm the next interval rewrite produces v3.
+3. **Malformed head + failure paths:**
+   - Corrupt the v3 head (run id that overflows the range, an anchor to an unknown atom, a cross-target alias). Expect a typed conflict on snapshot and a refused write, with no change to tip or actions.
+   - Retry the action that triggers the interval with the same id: the same receipt comes back and the head position stays monotonic.
+   - Interrupt that request: afterwards head and tip are consistent.
+   - A reader-role cold snapshot still works and a revoked account is still denied. Auth is unchanged, so one assertion is enough.
+
+Skip a 2M-atom boundary gate because it's expensive; the existing `fused-durable-checkpoint` threshold logs at 2000000/2000001 already cover that boundary.
+
+Separately: several claude.ai connectors (GitHub, Slack, Notion and others) need authorization in your claude.ai connector settings before they can be used. Nothing here needed them.
