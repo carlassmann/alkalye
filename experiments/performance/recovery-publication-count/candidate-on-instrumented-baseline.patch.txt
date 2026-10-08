@@ -1,0 +1,87 @@
+--- a/src/shared/document-session.ts
++++ b/src/shared/document-session.ts
+@@ -357,6 +357,7 @@
+ 					else yield* persistUnlocked({ kind: "proposed", action })
+ 					yield* Queue.take(unsaved)
+ 					projection.removeDraft(action.id)
++					publishDraftStatus()
+ 				}
+ 			},
+ 		).pipe(
+@@ -772,6 +773,13 @@
+ 			)
+ 		}
+ 
++		function publishDraftStatus() {
++			drafts.update()
++			// Durability changed without changing the document's content version.
++			Effect.runSync(
++				SubscriptionRef.set(revision, SubscriptionRef.getUnsafe(revision)),
++			)
++		}
+ 		function advanceView() {
+ 			performance.mark("session:revision")
+ 			Effect.runSync(SubscriptionRef.update(revision, current => current + 1))
+--- a/src/shared/document-recovery.ts
++++ b/src/shared/document-recovery.ts
+@@ -87,10 +87,12 @@
+ 				),
+ 			saveFailure: (failure?: DocumentFailure) => setFailure("save", failure),
+ 			synchronizationFailure: (failure?: BlobFailure) =>
+-				SubscriptionRef.update(failures, current =>
++				SubscriptionRef.updateSome(failures, current =>
+ 					current.synchronization === failure
+-						? current
+-						: Object.freeze({ ...current, synchronization: failure }),
++						? Option.none()
++						: Option.some(
++								Object.freeze({ ...current, synchronization: failure }),
++							),
+ 				),
+ 		}
+ 		function attempt(
+@@ -124,11 +126,18 @@
+ 							let pendingFailure = SubscriptionRef.getUnsafe(failures)[kind]
+ 							return pendingFailure ? Effect.fail(pendingFailure) : Effect.void
+ 						}
+-						return SubscriptionRef.modify(failures, current =>
+-							current[kind] === startedFailure
+-								? [undefined, Object.freeze({ ...current, [kind]: undefined })]
+-								: [current[kind], current],
+-						).pipe(
++						return SubscriptionRef.modifySome(failures, current => {
++							if (current[kind] !== startedFailure)
++								return [current[kind], Option.none()]
++							return [
++								undefined,
++								current[kind] === undefined
++									? Option.none()
++									: Option.some(
++											Object.freeze({ ...current, [kind]: undefined }),
++										),
++							]
++						}).pipe(
+ 							Effect.flatMap(newerFailure =>
+ 								newerFailure ? Effect.fail(newerFailure) : Effect.void,
+ 							),
+@@ -148,11 +157,15 @@
+ 			kind: keyof DocumentFailures,
+ 			failure?: DocumentFailure,
+ 		) {
+-			return SubscriptionRef.update(failures, current =>
+-				Object.freeze({
+-					...current,
+-					[kind]: failure ? Object.freeze(failure) : undefined,
+-				}),
++			return SubscriptionRef.updateSome(failures, current =>
++				current[kind] === failure
++					? Option.none()
++					: Option.some(
++							Object.freeze({
++								...current,
++								[kind]: failure ? Object.freeze(failure) : undefined,
++							}),
++						),
+ 			)
+ 		}
+ 	})

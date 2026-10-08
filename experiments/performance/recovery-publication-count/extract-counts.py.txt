@@ -1,0 +1,31 @@
+from pathlib import Path
+import json,collections
+root=Path(__file__).parent
+arms=[]
+for arm in ['baseline-runtime','candidate-runtime']:
+ row=json.loads((root/(arm+'-gate0')/'results/results.json').read_text())[0]
+ observation=row['undoObservation']; probe=observation['probe']; start=probe['start']; end=probe['end']
+ timeline=observation['timeline']; completion=next(m['time'] for m in timeline if m['name']=='undo:completion-refresh-end')
+ windows={'whole3s':(start,end),'afterCompletion100ms':(completion,completion+100)}
+ counts={name:dict(collections.Counter(m['name'] for m in timeline if lo<=m['time']<=hi)) for name,(lo,hi) in windows.items()}
+ tasks=[]; gc=[]; main_windows=[]
+ for field in ['trace','undoTrace']:
+  events=json.loads(Path(row[field]).read_text()).get('traceEvents',[])
+  input_tasks=[e for e in events if e.get('name')=='RunTask' and e.get('ph')=='X' and e.get('dur',0)>0]
+  native_events=[e for e in events if e.get('name')=='EventDispatch' and e.get('args',{}).get('data',{}).get('type') in ['keydown','input','beforeinput']]
+  threads={(e['pid'],e['tid']) for e in native_events}
+  if len(threads)!=1:raise RuntimeError('Ambiguous native event thread')
+  thread=next(iter(threads)); starts=[e['ts'] for e in events if e.get('name')=='interaction:start' and (e['pid'],e['tid'])==thread]
+  if len(starts)!=1:raise RuntimeError('Ambiguous interaction clock mark')
+  window_probe=row['observation']['probe'] if field=='trace' else probe
+  window_start=starts[0];window_end=window_start+(window_probe['end']-window_probe['start'])*1000
+  selected=[e for e in events if (e.get('pid'),e.get('tid'))==thread and e.get('ph')=='X' and e.get('ts',0)<window_end and e.get('ts',0)+e.get('dur',0)>=window_start]
+  main_tasks=[e for e in selected if e.get('name')=='RunTask']
+  main_gc=[e for e in selected if 'GC' in e.get('name','') or 'Garbage' in e.get('name','')]
+  main_windows.append({'window':field,'scope':'native EventDispatch thread, interaction:start through recorded probe.end; complete overlapping task duration','duration_ms':(window_end-window_start)/1000,'task_count':len(main_tasks),'main_task_max_ms':max([e.get('dur',0)/1000 for e in main_tasks],default=0),'main_gc_max_ms':max([e.get('dur',0)/1000 for e in main_gc],default=0)})
+  # Report complete retained trace tasks, explicitly not isolated main thread.
+  tasks.append({'window':field,'all_thread_task_max_ms':max([e['dur']/1000 for e in input_tasks],default=0),'task_count':len(input_tasks)})
+  gc.append({'window':field,'all_thread_gc_max_ms':max([e.get('dur',0)/1000 for e in events if e.get('ph')=='X' and ('GC' in e.get('name','') or 'Garbage' in e.get('name',''))],default=0)})
+ arms.append({'arm':arm,'status':row['status'],'counts':counts,'all_thread_trace_scope':tasks,'all_thread_gc_scope':gc,'main_3s_windows':main_windows,'sourceSelection':row['observation']['sourceSelection'],'receipts':{k:{'sha256':row[k]['sha256'],'characters':row[k]['characters'],'position':int(row[k]['log'].rsplit(':',1)[1])} for k in ['seedReceipt','editedReceipt','undoReceipt']}})
+(root/'count-summary.json').write_text(json.dumps({'scope':'One marked pair; counts only. No latency/frame claim. Trace task/GC maxima across ALL threads, not main-thread attribution.','arms':arms},indent=2)+'\n')
+print(json.dumps({'stages':'two complete exact native/HTTP arms','summary':'count-summary.json'}))

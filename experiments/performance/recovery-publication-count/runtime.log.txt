@@ -1,0 +1,6 @@
+{"phase":"baseline-runtime-gate0","stage":"server-started","process":"started baseline-runtime pid=53801"}
+{"phase":"baseline-runtime-gate0","stage":"pins-ready"}
+{"phase":"baseline-runtime-gate0","stage":"complete"}
+{"phase":"candidate-runtime-gate0","stage":"server-started","process":"started candidate-runtime pid=54150"}
+{"phase":"candidate-runtime-gate0","stage":"pins-ready"}
+{"phase":"candidate-runtime-gate0","stage":"complete"}

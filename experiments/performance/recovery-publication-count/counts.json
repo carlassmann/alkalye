@@ -1,0 +1,212 @@
+{
+	"scope": "One marked pair; counts only. No latency/frame claim. Trace task/GC maxima across ALL threads, not main-thread attribution.",
+	"arms": [
+		{
+			"arm": "baseline-runtime",
+			"status": "complete",
+			"counts": {
+				"whole3s": {
+					"interaction:start": 1,
+					"undo:requested": 1,
+					"propose:gate-acquired": 1,
+					"propose:flush-start": 1,
+					"refresh-cause:session-failure": 24,
+					"app:request-refresh": 43,
+					"propose:flush-end": 1,
+					"app:refresh-frame": 7,
+					"app:refresh-document": 7,
+					"propose:replay-end": 1,
+					"propose:actor-start": 1,
+					"propose:actor-end": 1,
+					"propose:prepared": 1,
+					"propose:persist-start": 1,
+					"refresh-cause:library-state": 11,
+					"refresh-cause:connection": 6,
+					"session:revision": 2,
+					"refresh-cause:session": 2,
+					"propose:persist-end": 1,
+					"undo:completion-refresh-start": 1,
+					"undo:completion-pending": 1,
+					"undo:completion-refresh-end": 1,
+					"interaction:ready": 1
+				},
+				"afterCompletion100ms": {
+					"undo:completion-refresh-end": 1,
+					"refresh-cause:session-failure": 13,
+					"app:request-refresh": 27,
+					"interaction:ready": 1,
+					"app:refresh-frame": 3,
+					"app:refresh-document": 3,
+					"refresh-cause:library-state": 10,
+					"refresh-cause:connection": 3,
+					"session:revision": 1,
+					"refresh-cause:session": 1
+				}
+			},
+			"all_thread_trace_scope": [
+				{
+					"window": "trace",
+					"all_thread_task_max_ms": 3.045,
+					"task_count": 3441
+				},
+				{
+					"window": "undoTrace",
+					"all_thread_task_max_ms": 2.881,
+					"task_count": 2934
+				}
+			],
+			"all_thread_gc_scope": [
+				{
+					"window": "trace",
+					"all_thread_gc_max_ms": 0.418
+				},
+				{
+					"window": "undoTrace",
+					"all_thread_gc_max_ms": 0.348
+				}
+			],
+			"main_3s_windows": [
+				{
+					"window": "trace",
+					"scope": "native EventDispatch thread, interaction:start through recorded probe.end; complete overlapping task duration",
+					"duration_ms": 3001.5,
+					"task_count": 869,
+					"main_task_max_ms": 3.045,
+					"main_gc_max_ms": 0.418
+				},
+				{
+					"window": "undoTrace",
+					"scope": "native EventDispatch thread, interaction:start through recorded probe.end; complete overlapping task duration",
+					"duration_ms": 3001.1,
+					"task_count": 866,
+					"main_task_max_ms": 2.174,
+					"main_gc_max_ms": 0.348
+				}
+			],
+			"sourceSelection": {
+				"start": 1025,
+				"end": 1025
+			},
+			"receipts": {
+				"seedReceipt": {
+					"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+					"characters": 2048,
+					"position": 11
+				},
+				"editedReceipt": {
+					"sha256": "a0079fbe7b0025cb7a9c653264283d7fbad4a62b90fcf41ab19fdbd79500b179",
+					"characters": 2049,
+					"position": 12
+				},
+				"undoReceipt": {
+					"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+					"characters": 2048,
+					"position": 13
+				}
+			}
+		},
+		{
+			"arm": "candidate-runtime",
+			"status": "complete",
+			"counts": {
+				"whole3s": {
+					"interaction:start": 1,
+					"undo:requested": 1,
+					"propose:gate-acquired": 1,
+					"propose:flush-start": 1,
+					"propose:flush-end": 1,
+					"propose:replay-end": 1,
+					"propose:actor-start": 1,
+					"propose:actor-end": 1,
+					"propose:prepared": 1,
+					"propose:persist-start": 1,
+					"refresh-cause:library-state": 11,
+					"app:request-refresh": 19,
+					"refresh-cause:connection": 6,
+					"session:revision": 2,
+					"refresh-cause:session": 2,
+					"propose:persist-end": 1,
+					"undo:completion-refresh-start": 1,
+					"undo:completion-pending": 1,
+					"app:refresh-document": 5,
+					"undo:completion-refresh-end": 1,
+					"interaction:ready": 1,
+					"app:refresh-frame": 5,
+					"interaction:end": 1
+				},
+				"afterCompletion100ms": {
+					"undo:completion-refresh-end": 1,
+					"interaction:ready": 1,
+					"app:refresh-frame": 3,
+					"app:refresh-document": 3,
+					"refresh-cause:library-state": 10,
+					"app:request-refresh": 14,
+					"refresh-cause:connection": 3,
+					"session:revision": 1,
+					"refresh-cause:session": 1
+				}
+			},
+			"all_thread_trace_scope": [
+				{
+					"window": "trace",
+					"all_thread_task_max_ms": 3.299,
+					"task_count": 3434
+				},
+				{
+					"window": "undoTrace",
+					"all_thread_task_max_ms": 3.114,
+					"task_count": 2910
+				}
+			],
+			"all_thread_gc_scope": [
+				{
+					"window": "trace",
+					"all_thread_gc_max_ms": 0.406
+				},
+				{
+					"window": "undoTrace",
+					"all_thread_gc_max_ms": 0.428
+				}
+			],
+			"main_3s_windows": [
+				{
+					"window": "trace",
+					"scope": "native EventDispatch thread, interaction:start through recorded probe.end; complete overlapping task duration",
+					"duration_ms": 3002.7,
+					"task_count": 865,
+					"main_task_max_ms": 3.299,
+					"main_gc_max_ms": 0.406
+				},
+				{
+					"window": "undoTrace",
+					"scope": "native EventDispatch thread, interaction:start through recorded probe.end; complete overlapping task duration",
+					"duration_ms": 3001.9000000610354,
+					"task_count": 871,
+					"main_task_max_ms": 2.238,
+					"main_gc_max_ms": 0.428
+				}
+			],
+			"sourceSelection": {
+				"start": 1025,
+				"end": 1025
+			},
+			"receipts": {
+				"seedReceipt": {
+					"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+					"characters": 2048,
+					"position": 11
+				},
+				"editedReceipt": {
+					"sha256": "a0079fbe7b0025cb7a9c653264283d7fbad4a62b90fcf41ab19fdbd79500b179",
+					"characters": 2049,
+					"position": 12
+				},
+				"undoReceipt": {
+					"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+					"characters": 2048,
+					"position": 13
+				}
+			}
+		}
+	]
+}

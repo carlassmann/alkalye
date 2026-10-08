@@ -1,0 +1,37 @@
+import { mkdir, rm, cp, stat } from 'node:fs/promises'
+let root = '/tmp/alkalye-recovery-noop-publication/count-benchmark'
+let env = { ...process.env, WORK_STATE_ROOT: root + '/work-state' }
+async function command(args, cwd, log) {
+  let child = Bun.spawn(args, { cwd, env, stdout: 'pipe', stderr: 'pipe' })
+  let [stdout, stderr, exit] = await Promise.all([new Response(child.stdout).text(), new Response(child.stderr).text(), child.exited])
+  if (log) await Bun.write(log, stdout + stderr)
+  if (exit !== 0) throw Error('Command failed ' + args[0] + ' exit ' + exit)
+  return stdout
+}
+let phases = []
+try {
+  for (let arm of ['baseline-runtime', 'candidate-runtime']) {
+    let label = arm + '-gate0', path = root + '/' + label
+    await command(['work', 'down'], root)
+    await rm(root + '/data-active', { recursive: true, force: true })
+    await cp(root + '/data-seed', root + '/data-active', { recursive: true })
+    await mkdir(path)
+    try {
+      let started = await command(['work', 'run', arm], root, path + '/work.log.txt')
+      console.log(JSON.stringify({ phase: label, stage: 'server-started', process: started.trim() }))
+      await command(['bun', 'prepare-timeline.ts', label, arm], root + '/' + arm, path + '/pins.log')
+      console.log(JSON.stringify({ phase: label, stage: 'pins-ready' }))
+      await command(['bun', 'experiments/performance/main-current-preparation/runner-consumption.ts', path + '/manifest.private.json'], root + '/' + arm, path + '/run.log')
+      let rows = await Bun.file(path + '/results/results.json').json()
+      if (rows.length !== 1 || rows[0].status !== 'complete' || !rows[0].undoReceipt) throw Error('Incomplete ' + label)
+      phases.push({ label, status: 'complete', results: path + '/results/results.json' })
+      await Bun.write(root + '/phases.json', JSON.stringify(phases))
+      console.log(JSON.stringify({ phase: label, stage: 'complete' }))
+    } catch (error) {
+      await command(['work', 'down'], root)
+      if (await stat(root + '/data-active').catch(() => undefined)) await cp(root + '/data-active', path + '/failed-data', { recursive: true })
+      await Bun.write(path + '/failure.log', String(error))
+      throw error
+    }
+  }
+} finally { await command(['work', 'down'], root) }

@@ -1,0 +1,18 @@
+{
+	"README.md": "08c32bb95455c2ed36f9243c7dbf756e20d76d1f2cb86f30195822dd79d190a3",
+	"baseline-build.log.txt": "a1e1ec9bdb36d7dd3f2aa0b8ef9ca9120691b4a84ccf5f8d8bac12f2ba04504c",
+	"baseline-types.log.txt": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+	"candidate-build.log.txt": "a1e1ec9bdb36d7dd3f2aa0b8ef9ca9120691b4a84ccf5f8d8bac12f2ba04504c",
+	"candidate-on-instrumented-baseline.patch.txt": "9f7c71b2272735b2c088302d779b72a6235b46611cd2ae4405c133fcad406936",
+	"candidate-types.log.txt": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+	"counts.json": "6fe0e5f2c2ae6bbb9c30797bbf79bcec9d15772280b65228fd2083bcb3f29ce7",
+	"extract-counts.initial.py.txt": "92689e5e81494437c77455c0ed00cc673d6a3a8113410c77e24189dce73d129f",
+	"extract-counts.py.txt": "ac2155905620ca1fe54fdd5f566ecb94dd970eb0070e8ffe837bfcd4b083bb0c",
+	"extract.log.txt": "b39276bdcab5d5290344e193b03de70f3928caf417ea4c3253f7c107aa7f5725",
+	"preflight.py.txt": "350b2c28023ea30abb99e40408dfe7372650e53dc4fc345181cecedd067e8fe6",
+	"provenance.json": "4fd86e1bd1f2c3c9b7915b9df99a3cd5906c7427c0256a0f5211731fae85c7b3",
+	"refined-extract.log.txt": "b39276bdcab5d5290344e193b03de70f3928caf417ea4c3253f7c107aa7f5725",
+	"run-gate0.js.txt": "7a54e6cbea3db24f61680c9d45762c61011507519b5fa21547a352a60bd00498",
+	"runtime.log.txt": "adb54d527df5c8bf093e5c0ef6e390bdd84c95a153cc9320f893a010e62ae316",
+	"shared-diagnostic.patch.txt": "e3d464f0855062e8b20a6f9a0ccb5f1d60edd494481bca48ef2a49539741c02e"
+}
