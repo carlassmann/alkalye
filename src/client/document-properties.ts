@@ -32,6 +32,18 @@ function makeProperties(options: PropertyOptions) {
 					),
 		)
 		return Object.freeze({
+			present(index: number) {
+				return writable.pipe(
+					Effect.andThen(
+						session.change("Move presentation", staged => {
+							assertWritable()
+							return [
+								staged.set(options.document, "presentationItem", String(index)),
+							]
+						}),
+					),
+				)
+			},
 			update(patch: MetadataPatch, label = "Document properties") {
 				return writable.pipe(
 					Effect.andThen(

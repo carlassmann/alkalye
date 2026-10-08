@@ -2031,11 +2031,7 @@ function mountApplication() {
 					},
 					present: index => {
 						if (selection !== selected || !writable()) return
-						launch(
-							selected.opened.session.change("Move presentation", staged => [
-								staged.set(doc.id, "presentationItem", String(index)),
-							]),
-						)
+						launch(selected.opened.properties.present(index))
 					},
 					presence: () => library.live.presence.current(doc.id),
 					actor: () => library.live.actor(),

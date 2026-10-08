@@ -114,12 +114,24 @@ test("document properties preserve source metadata, peer text, undo, permissions
 						"present",
 					)
 					yield* properties.presentation(false)
+					yield* properties.present(3)
+					expect(session.replica.fields("doc").presentationItem).toBe("3")
+					yield* session.undo()
+					expect(session.replica.fields("doc").presentationItem).toBe("3")
+					expect(frontmatter(session.replica.text("doc")).data.mode).toBe(
+						"present",
+					)
+					yield* session.redo()
 					expect(
 						frontmatter(session.replica.text("doc")).data.mode,
 					).toBeUndefined()
 					let queued = properties.update({ title: "Denied" })
 					let before = session.replica.text("doc")
 					writable = false
+					expect((yield* Effect.result(properties.present(4)))._tag).toBe(
+						"Failure",
+					)
+					expect(session.replica.fields("doc").presentationItem).toBe("3")
 					expect((yield* Effect.result(queued))._tag).toBe("Failure")
 					expect(
 						(yield* Effect.result(properties.presentation(true)))._tag,
@@ -131,6 +143,7 @@ test("document properties preserve source metadata, peer text, undo, permissions
 		await Effect.runPromise(
 			open(session =>
 				Effect.sync(() => {
+					expect(session.replica.fields("doc").presentationItem).toBe("3")
 					expect(session.replica.metadata("doc")).toMatchObject({
 						title: "After",
 						tags: ["one"],
@@ -212,7 +225,7 @@ test("queued property commands recheck permissions after a real journal read rel
 							document: "doc",
 							canWrite() {
 								let allowed = writable
-								if (++checks === 2) Deferred.doneUnsafe(checked, Effect.void)
+								if (++checks === 3) Deferred.doneUnsafe(checked, Effect.void)
 								return allowed
 							},
 						}).pipe(Layer.provide(Layer.succeed(DocumentSession, session))),
@@ -231,6 +244,7 @@ test("queued property commands recheck permissions after a real journal read rel
 					let presenting = yield* properties
 						.presentation(true)
 						.pipe(Effect.forkScoped)
+					let moving = yield* properties.present(2).pipe(Effect.forkScoped)
 					yield* Deferred.await(checked)
 					writable = false
 					yield* Deferred.succeed(release, undefined)
@@ -241,6 +255,10 @@ test("queued property commands recheck permissions after a real journal read rel
 					expect((yield* Effect.result(Fiber.join(presenting)))._tag).toBe(
 						"Failure",
 					)
+					expect((yield* Effect.result(Fiber.join(moving)))._tag).toBe(
+						"Failure",
+					)
+					expect(session.replica.fields("doc").presentationItem).toBeUndefined()
 					expect(session.replica.metadata("doc").title).toBe("Before")
 					let header = frontmatter(session.replica.text("doc"))
 					expect(header.body).toBe("Body peer")
