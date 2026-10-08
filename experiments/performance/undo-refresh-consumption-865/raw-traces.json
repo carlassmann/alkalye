@@ -1,0 +1,30 @@
+[
+	{
+		"arm": "baseline",
+		"action": "trace",
+		"path": "/tmp/alkalye-undo-refresh-consumption/baseline-gate0/results/baseline-small-middle-0.trace.json",
+		"bytes": 6201627,
+		"sha256": "ce312a71a12cc38c1fdb54e68ce7053f32e7c4e309aa3b1947c3c1bd5ce5ac82"
+	},
+	{
+		"arm": "baseline",
+		"action": "undoTrace",
+		"path": "/tmp/alkalye-undo-refresh-consumption/baseline-gate0/results/baseline-small-middle-0-undo.trace.json",
+		"bytes": 5862354,
+		"sha256": "a5a4d33a0a7bbfe9581464dea83cae18cf7997b6baa564620345cef14de7cd39"
+	},
+	{
+		"arm": "candidate",
+		"action": "trace",
+		"path": "/tmp/alkalye-undo-refresh-consumption/candidate-gate0/results/candidate-small-middle-0.trace.json",
+		"bytes": 3846413,
+		"sha256": "4aa05385bfd61e9a38112f8151d4649b57a07c4e7a4bb4abb6b2f9118e1c34ed"
+	},
+	{
+		"arm": "candidate",
+		"action": "undoTrace",
+		"path": "/tmp/alkalye-undo-refresh-consumption/candidate-gate0/results/candidate-small-middle-0-undo.trace.json",
+		"bytes": 3332967,
+		"sha256": "a6fc21bb77e3d0fb173ff77de681c5bc9514065d33075c168e0b07cf0b146f3f"
+	}
+]

@@ -1,0 +1,23 @@
+{
+	"baselineCommit": "8654545b2ebd0a84671bcfbfe2bf0b0f346f5874",
+	"pairs": 1,
+	"decision": "rejected at Gate0",
+	"candidateDelta": "candidate.patch",
+	"sourceCharacters": 2048,
+	"sourceNewlines": 74,
+	"sameSnapshotRestoredBeforeEachArm": true,
+	"strictTypesAndBuild": "both passed",
+	"actualGates": "trusted native input/Undo, exact source/caret/independent API receipts, requested/emitted/fetched script pins",
+	"unrun": [
+		"Redo",
+		"menu",
+		"fault injection",
+		"simulated reentrant input",
+		"library/presence correctness",
+		"in-flight disposal",
+		"n3 comparison"
+	],
+	"setupFailure": "First shell request rejected nonexistent workdir before execution; corrected setup same candidate. No app failure inference.",
+	"rawTraces": "outside Git",
+	"privateAccountsProfilesData": "not included"
+}

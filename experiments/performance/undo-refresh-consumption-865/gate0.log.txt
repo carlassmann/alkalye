@@ -1,0 +1,6 @@
+{"phase":"baseline-gate0","stage":"server-started","process":"started baseline pid=78402"}
+{"phase":"baseline-gate0","stage":"pins-ready"}
+{"phase":"baseline-gate0","stage":"complete"}
+{"phase":"candidate-gate0","stage":"server-started","process":"started candidate pid=78791"}
+{"phase":"candidate-gate0","stage":"pins-ready"}
+{"phase":"candidate-gate0","stage":"complete"}

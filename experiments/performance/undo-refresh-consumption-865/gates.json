@@ -1,0 +1,915 @@
+[
+	{
+		"arm": "baseline",
+		"status": "complete",
+		"fixture": {
+			"characters": 2048,
+			"bytes": 2048,
+			"realNewlines": 74,
+			"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2"
+		},
+		"receipts": {
+			"seedReceipt": {
+				"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+				"characters": 2048,
+				"journalPosition": 11
+			},
+			"editedReceipt": {
+				"sha256": "a0079fbe7b0025cb7a9c653264283d7fbad4a62b90fcf41ab19fdbd79500b179",
+				"characters": 2049,
+				"journalPosition": 12
+			},
+			"undoReceipt": {
+				"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+				"characters": 2048,
+				"journalPosition": 13
+			}
+		},
+		"undoTimeline": [
+			{
+				"detail": null,
+				"name": "interaction:start",
+				"time": 5137.699999988079
+			},
+			{
+				"detail": null,
+				"name": "undo:requested",
+				"time": 5137.800000011921
+			},
+			{
+				"detail": null,
+				"name": "propose:gate-acquired",
+				"time": 5137.899999976158
+			},
+			{
+				"detail": null,
+				"name": "propose:flush-start",
+				"time": 5137.899999976158
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5137.899999976158
+			},
+			{
+				"detail": null,
+				"name": "propose:flush-end",
+				"time": 5137.899999976158
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 5148.899999976158
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 5148.899999976158
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5150.100000023842
+			},
+			{
+				"detail": null,
+				"name": "propose:replay-end",
+				"time": 5150.100000023842
+			},
+			{
+				"detail": null,
+				"name": "propose:actor-start",
+				"time": 5150.100000023842
+			},
+			{
+				"detail": null,
+				"name": "propose:actor-end",
+				"time": 5150.199999988079
+			},
+			{
+				"detail": null,
+				"name": "propose:prepared",
+				"time": 5153
+			},
+			{
+				"detail": null,
+				"name": "propose:persist-start",
+				"time": 5153
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5154.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5154.300000011921
+			},
+			{
+				"detail": null,
+				"name": "session:revision",
+				"time": 5156.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5156.899999976158
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5156.899999976158
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5156.899999976158
+			},
+			{
+				"detail": null,
+				"name": "propose:persist-end",
+				"time": 5156.899999976158
+			},
+			{
+				"detail": null,
+				"name": "undo:completion-refresh-start",
+				"time": 5156.899999976158
+			},
+			{
+				"detail": {
+					"document": true,
+					"library": true,
+					"presence": false
+				},
+				"name": "undo:completion-pending",
+				"time": 5157.600000023842
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 5157.600000023842
+			},
+			{
+				"detail": {
+					"characters": 2048
+				},
+				"name": "editor:source-assigned",
+				"time": 5158
+			},
+			{
+				"detail": {
+					"characters": 2048
+				},
+				"name": "editor:viewport-rendered",
+				"time": 5159.100000023842
+			},
+			{
+				"detail": null,
+				"name": "undo:completion-refresh-end",
+				"time": 5159.399999976158
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5159.600000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5160.300000011921
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5160.600000023842
+			},
+			{
+				"detail": null,
+				"name": "interaction:ready",
+				"time": 5167.100000023842
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 5167.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 5167.5
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5170.5
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5170.5
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5171.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5173.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5173.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5173.699999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5174
+			},
+			{
+				"detail": null,
+				"name": "session:revision",
+				"time": 5175.899999976158
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5175.899999976158
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5176
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5176
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5176.399999976158
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5177
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5178.100000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5179.100000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5179.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5179.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5179.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5179.899999976158
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5180
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5182.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5182.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5182.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5183
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 5183.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 5183.5
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5184.399999976158
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5185.100000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5185.100000023842
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 5198.899999976158
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 5198.899999976158
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5678.600000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5678.699999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5679.100000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5679.300000011921
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5680
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 5682.399999976158
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 5682.399999976158
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5684
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5684.100000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5684.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 5700.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 5700.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 6066.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 6108
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 6114.899999976158
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 6115
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 8111.300000011921
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 8115.600000023842
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 8115.699999988079
+			},
+			{
+				"detail": null,
+				"name": "interaction:end",
+				"time": 8139.300000011921
+			}
+		],
+		"undoProbeReady": 5167.100000023842,
+		"undoProbeStart": 5137.699999988079,
+		"history": {
+			"mode": "advancing",
+			"acceptedPairsThisRunBefore": 0,
+			"declaredPriorPairs": 4
+		}
+	},
+	{
+		"arm": "candidate",
+		"status": "complete",
+		"fixture": {
+			"characters": 2048,
+			"bytes": 2048,
+			"realNewlines": 74,
+			"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2"
+		},
+		"receipts": {
+			"seedReceipt": {
+				"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+				"characters": 2048,
+				"journalPosition": 11
+			},
+			"editedReceipt": {
+				"sha256": "a0079fbe7b0025cb7a9c653264283d7fbad4a62b90fcf41ab19fdbd79500b179",
+				"characters": 2049,
+				"journalPosition": 12
+			},
+			"undoReceipt": {
+				"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+				"characters": 2048,
+				"journalPosition": 13
+			}
+		},
+		"undoTimeline": [
+			{
+				"detail": null,
+				"name": "interaction:start",
+				"time": 5046.5
+			},
+			{
+				"detail": null,
+				"name": "undo:requested",
+				"time": 5046.699999988079
+			},
+			{
+				"detail": null,
+				"name": "propose:gate-acquired",
+				"time": 5046.800000011921
+			},
+			{
+				"detail": null,
+				"name": "propose:flush-start",
+				"time": 5046.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5046.800000011921
+			},
+			{
+				"detail": null,
+				"name": "propose:flush-end",
+				"time": 5046.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 5059
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 5059
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5060.100000023842
+			},
+			{
+				"detail": null,
+				"name": "propose:replay-end",
+				"time": 5060.100000023842
+			},
+			{
+				"detail": null,
+				"name": "propose:actor-start",
+				"time": 5060.100000023842
+			},
+			{
+				"detail": null,
+				"name": "propose:actor-end",
+				"time": 5060.100000023842
+			},
+			{
+				"detail": null,
+				"name": "propose:prepared",
+				"time": 5063.199999988079
+			},
+			{
+				"detail": null,
+				"name": "propose:persist-start",
+				"time": 5063.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5064.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5064.399999976158
+			},
+			{
+				"detail": null,
+				"name": "session:revision",
+				"time": 5066.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5066.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5066.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5066.300000011921
+			},
+			{
+				"detail": null,
+				"name": "propose:persist-end",
+				"time": 5066.300000011921
+			},
+			{
+				"detail": null,
+				"name": "undo:completion-refresh-start",
+				"time": 5066.399999976158
+			},
+			{
+				"detail": {
+					"document": true,
+					"library": true,
+					"presence": false
+				},
+				"name": "undo:completion-pending",
+				"time": 5066.399999976158
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 5066.399999976158
+			},
+			{
+				"detail": {
+					"characters": 2048
+				},
+				"name": "editor:source-assigned",
+				"time": 5066.699999988079
+			},
+			{
+				"detail": {
+					"characters": 2048
+				},
+				"name": "editor:viewport-rendered",
+				"time": 5067.800000011921
+			},
+			{
+				"detail": null,
+				"name": "undo:completion-refresh-end",
+				"time": 5068
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5068.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5068.600000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5068.800000011921
+			},
+			{
+				"detail": null,
+				"name": "interaction:ready",
+				"time": 5075.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 5075.899999976158
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 5076.100000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5079.899999976158
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5080.100000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5080.699999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5082.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5082.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5083.600000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5083.699999988079
+			},
+			{
+				"detail": null,
+				"name": "session:revision",
+				"time": 5085.5
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5085.5
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5085.600000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5085.600000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5086.100000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5086.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5087.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5089.100000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5089.699999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5089.699999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5089.699999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5089.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5090
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5092
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5092.100000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5092.5
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5092.699999988079
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 5093
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 5093.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5094.199999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5094.300000011921
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5094.399999976158
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 5108.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 5108.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5588.899999976158
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5588.899999976158
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5589.399999976158
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5589.699999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5590.300000011921
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 5592.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 5592.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5593.699999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5594.100000023842
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 5594.100000023842
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 5610.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 5610.800000011921
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 6075.699999988079
+			},
+			{
+				"detail": null,
+				"name": "app:request-refresh",
+				"time": 6120
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-frame",
+				"time": 6125.5
+			},
+			{
+				"detail": null,
+				"name": "app:refresh-document",
+				"time": 6125.5
+			},
+			{
+				"detail": null,
+				"name": "interaction:end",
+				"time": 8047.899999976158
+			}
+		],
+		"undoProbeReady": 5075.800000011921,
+		"undoProbeStart": 5046.5,
+		"history": {
+			"mode": "advancing",
+			"acceptedPairsThisRunBefore": 0,
+			"declaredPriorPairs": 4
+		}
+	}
+]

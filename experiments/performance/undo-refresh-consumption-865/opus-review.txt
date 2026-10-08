@@ -1,0 +1,30 @@
+No correctness blocker in the patch. My one real concern is that the change may do nothing: it only saves work if the duplicate request arrives before Undo/Redo completes, and that is unproven.
+
+**Why the change is safe** (reviewed against the baseline file)
+- Every `requestRefresh` sets `documentRefreshPending` and schedules a frame, so a true flag always has a frame waiting. Clearing the flag doesn't cancel that frame; the frame still drains the library and presence flags.
+- `refreshDocument` reads live state (session, `library.state`, presence), so refreshing early covers any request made before it. `refreshLibrary` (1573–1688) only writes DOM and nothing `refreshDocument` reads, so running document before library is fine.
+- A frame with only presence pending calls `refreshPresence(false)`, which does one extra `editor.presence` call. Correct.
+- On failure: if Undo fails or is interrupted, the completion step never runs and the flag is untouched. If it throws, `||= previousPending` puts the flag back and keeps any request made during the refresh. With no earlier request, nothing retries, same as baseline. It reports once, as before. `undoWaiting` is still held during the refresh because the cleanup runs after the completion step.
+- Native Undo (1857) and menu/tool Undo (3816) both go through `undoDocument`, so one change covers both.
+
+**Main risk: the saving may never happen**
+- `session.changes` reaches `requestRefresh` through a separate background stream (1379), not synchronously. If its notification lands after the completion step, the flag is set again after it was cleared, the frame still refreshes the document, and nothing is saved.
+- Gate: a marker showing the `session.changes` request fires before completion-start, plus a real drop in `app:refresh-document` count per Undo. If that doesn't hold, stop. Don't move on to performance runs.
+
+**Reentrancy gate: the route/tool idea can't work**
+- The only synchronous `requestRefresh` caller is the editor `change` handler (1880–1889). Account, theme, library and session all request through background streams. Route and tool handlers call `refreshDocument` directly (1882, 638, 2060 …), never `requestRefresh`.
+- So a route/tool handler called inside the wrapped `editor.update` can't test that the flag survives. Record that as a missing gate.
+- Smallest real gate: wrap `editor.update` once, dispatch an `input` on the editor textarea (fires `change` → `session.edit` → `requestRefresh(true)`), then call the original.
+  - The original then paints the older `doc.content`, so the screen is briefly stale. Baseline does the same.
+  - Assert that after the next frame the final source, caret and server state include the reentrant edit. If the flag were lost, the stale text would stay.
+- Caveat: that event is synthetic, not trusted. Say so.
+
+**Thrown-refresh gate**
+- Only meaningful if `previousPending` was true at the throw. Add a marker or assertion for it. Otherwise any retry comes from a late session notification and the restore path goes untested.
+- Throw once, before calling the original `update`. Assert one report/toast, unchanged accepted source, a successful refresh in the next frame, and the wrapper removed.
+
+**Other gates (cheap, expected to pass)**
+- Library rename during completion: the library flag survives and the frame refreshes the sidebar. `#document-title` comes from `currentDocument()`, so it should be exact.
+- Peer edit plus presence during completion: the presence-only frame repaints the peer caret through `refreshPresence(false)`.
+
+No style issues.

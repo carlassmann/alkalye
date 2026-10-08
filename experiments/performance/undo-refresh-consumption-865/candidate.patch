@@ -1,0 +1,24 @@
+--- a/src/client/document-app.ts
++++ b/src/client/document-app.ts
+@@ -2690,10 +2690,20 @@
+ 							editor === activeEditor &&
+ 							activeEditor?.isConnected
+ 						)
+-							refreshSafely()
++							refreshCompletedDocument()
+ 					}),
+ 				),
+ 			)
++		}
++		function refreshCompletedDocument() {
++			let previousPending = documentRefreshPending
++			documentRefreshPending = false
++			try {
++				refreshDocument()
++			} catch (error) {
++				documentRefreshPending ||= previousPending
++				report(error)
++			}
+ 		}
+ 		function refreshSafely() {
+ 			try {
