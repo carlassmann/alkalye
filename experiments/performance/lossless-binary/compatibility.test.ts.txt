@@ -1,0 +1,57 @@
+import { expect, test } from "bun:test"
+import { mkdtemp, rm } from "node:fs/promises"
+import * as Effect from "effect/Effect"
+import * as Layer from "effect/Layer"
+import * as Redacted from "effect/Redacted"
+import * as Schema from "effect/Schema"
+import * as SchemaBinary from "effect/encoding/SchemaBinary"
+import * as EventGroup from "effect/eventlog/EventGroup"
+import * as EventLog from "effect/eventlog/EventLog"
+import * as SqlEventJournal from "effect/eventlog/SqlEventJournal"
+import * as SqlClient from "effect/sql/SqlClient"
+import { sqliteLayer } from "/Users/carlassmann/.codex/worktrees/b513/alkalye/src/platform/sqlite"
+import { WorkspaceFactSchema } from "/Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/workspace"
+
+let legacy = SchemaBinary.toCodec(WorkspaceFactSchema)
+let jsonSchema = Schema.fromJsonString(WorkspaceFactSchema)
+let json = SchemaBinary.toCodec(jsonSchema)
+let dual = Schema.Union([json, legacy])
+function fact(name: string) {return Schema.decodeUnknownSync(WorkspaceFactSchema)({id:"fact",workspace:"space",subject:"owner",change:{kind:"created",name}})}
+for (let name of ["Plain", "Emoji😀", "High\uD800", "Low\uDC00", "Pair😀 then \uD800"])
+ test("independent binary codec branches retain legacy and exact new UTF16: "+JSON.stringify(name), () => {
+  let input=fact(name), old=Schema.encodeSync(legacy)(input).slice(), fresh=Schema.encodeSync(json)(input).slice()
+  expect(Schema.decodeUnknownSync(dual)(old)).toEqual(Schema.decodeUnknownSync(legacy)(old))
+  expect(Schema.decodeUnknownSync(dual)(fresh)).toEqual(input)
+  expect(Schema.decodeUnknownSync(json)(fresh)).toEqual(input)
+ })
+test("rejected domain-root union cannot decode existing plain struct bytes",()=>{
+ let rootUnion=SchemaBinary.toCodec(Schema.Union([jsonSchema,WorkspaceFactSchema]))
+ expect(()=>Schema.decodeUnknownSync(rootUnion)(Schema.encodeSync(legacy)(fact("Plain")))).toThrow()
+})
+test("both framed codecs reject truncated and malformed bytes",()=>{
+ for(let bytes of [new Uint8Array(),new Uint8Array([1,255]),Schema.encodeSync(json)(fact("High\uD800")).slice(0,8)]) expect(()=>Schema.decodeUnknownSync(dual)(bytes)).toThrow()
+})
+let group=EventGroup.empty.add({tag:"Fact",primaryKey:value=>value.workspace,payload:WorkspaceFactSchema}).add({tag:"FactJson",primaryKey:value=>value.workspace,payload:jsonSchema})
+let events=EventLog.schema(group)
+let handlers=EventLog.group(group, handlers=>handlers.handle("Fact",()=>Effect.void).handle("FactJson",()=>Effect.void))
+test("real EventLog new-tag writes preserve UTF16 and mixed legacy history",async()=>{
+ let directory=await mkdtemp('/tmp/alkalye-lossless-journal-')
+ try{
+  let layer=EventLog.layer(events,handlers).pipe(Layer.provideMerge(SqlEventJournal.layer()),Layer.provideMerge(sqliteLayer(directory+'/journal.sqlite')),Layer.provideMerge(Layer.succeed(EventLog.Identity,{publicKey:"fixture",privateKey:Redacted.make(new Uint8Array(32))})))
+  await Effect.runPromise(Effect.scoped(Effect.gen(function*(){
+   let context=yield* Layer.build(layer)
+   let work=Effect.gen(function*(){
+    let write=yield* EventLog.makeClient(events)
+    yield* write("Fact",fact("Plain"))
+    yield* write("FactJson",fact("High\uD800 then low\uDC00"))
+    let sql=yield* SqlClient.SqlClient
+    let rows=yield* sql<{event:string,payload:Uint8Array}>`SELECT event,payload FROM effect_event_journal ORDER BY rowid`
+    expect(rows.length).toBe(2)
+    expect(rows[0]?.event).toBe("Fact")
+    expect(rows[1]?.event).toBe("FactJson")
+    for(let row of rows) expect(Schema.decodeUnknownSync(dual)(row.payload)).toEqual(fact(row.event==="Fact"?"Plain":"High\uD800 then low\uDC00"))
+   })
+   yield* work.pipe(Effect.provide(context))
+  })))
+ }finally{await rm(directory,{recursive:true,force:true})}
+})

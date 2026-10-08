@@ -1,0 +1,67 @@
+--- src/shared/document-session.ts
++++ src/shared/document-session.ts
+@@ -203,7 +203,8 @@
+ 	}),
+ ])
+ type Recording = typeof recording.Type
+-let codec = SchemaBinary.toCodec(recording)
++let persistedRecording = Schema.Union([Schema.fromJsonString(recording), recording])
++let codec = SchemaBinary.toCodec(persistedRecording)
+ let proposalIndex = Schema.Array(
+ 	Schema.Tuple([Schema.String, Schema.String, Schema.Boolean]),
+ )
+@@ -236,7 +237,7 @@
+ let changes = EventGroup.empty.add({
+ 	tag: "DocumentRecorded",
+ 	primaryKey: () => "document",
+-	payload: recording,
++	payload: persistedRecording,
+ 	success: Schema.Void,
+ 	error: DocumentFailureSchema,
+ })
+--- src/server/document-store.ts
++++ src/server/document-store.ts
+@@ -250,6 +250,8 @@
+ 	action: DocumentActionSchema,
+ 	subject: IdentifierSchema,
+ })
++let persistedAction = Schema.Union([Schema.fromJsonString(CommittedActionSchema), CommittedActionSchema])
++let persistedFact = Schema.Union([Schema.fromJsonString(WorkspaceFactSchema), WorkspaceFactSchema])
+ let group = EventGroup.empty
+ 	.add({
+ 		tag: "DocumentWithdrawn",
+@@ -261,19 +263,19 @@
+ 	.add({
+ 		tag: "DocumentChanged",
+ 		primaryKey: action => action.document,
+-		payload: CommittedActionSchema,
++		payload: persistedAction,
+ 		success: Schema.Natural,
+ 		error: Schema.Union([DocumentConflict, UndoUnavailable, SqlError.SqlError]),
+ 	})
+ 	.add({
+ 		tag: "WorkspaceChanged",
+ 		primaryKey: fact => fact.workspace,
+-		payload: WorkspaceFactSchema,
++		payload: persistedFact,
+ 		success: Schema.Natural,
+ 		error: Schema.Union([DocumentConflict, SqlError.SqlError]),
+ 	})
+ let events = EventLog.schema(group)
+-let binary = SchemaBinary.toCodec(CommittedActionSchema)
++let binary = SchemaBinary.toCodec(persistedAction)
+ let proposalJson = Schema.encodeSync(
+ 	Schema.fromJsonString(DocumentActionSchema),
+ )
+--- src/server/workspace-projection.ts
++++ src/server/workspace-projection.ts
+@@ -73,7 +73,8 @@
+ 	position: Schema.Natural,
+ 	payload: Schema.NullOr(Schema.Uint8Array),
+ })
+-let binary = SchemaBinary.toCodec(WorkspaceFactSchema)
++let persistedFact = Schema.Union([Schema.fromJsonString(WorkspaceFactSchema), WorkspaceFactSchema])
++let binary = SchemaBinary.toCodec(persistedFact)
+ 
+ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
+ 	let workspace = SqlSchema.findOneOption({

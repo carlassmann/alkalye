@@ -1,0 +1,16 @@
+bun test v1.4.0 (34cbb9a40)
+
+../../../../../../private/tmp/alkalye-lossless-binary-draft/compatibility.test.ts:
+(pass) independent binary codec branches retain legacy and exact new UTF16: "Plain" [1.97ms]
+(pass) independent binary codec branches retain legacy and exact new UTF16: "Emoji😀" [0.21ms]
+(pass) independent binary codec branches retain legacy and exact new UTF16: "High\ud800" [0.15ms]
+(pass) independent binary codec branches retain legacy and exact new UTF16: "Low\udc00" [0.14ms]
+(pass) independent binary codec branches retain legacy and exact new UTF16: "Pair😀 then \ud800" [0.12ms]
+(pass) rejected domain-root union cannot decode existing plain struct bytes [0.40ms]
+(pass) both framed codecs reject truncated and malformed bytes [0.15ms]
+(pass) real EventLog new-tag writes preserve UTF16 and mixed legacy history [16.20ms]
+
+ 8 pass
+ 0 fail
+ 24 expect() calls
+Ran 8 tests across 1 file. [72.00ms]

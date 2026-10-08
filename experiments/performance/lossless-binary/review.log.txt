@@ -1,0 +1,41 @@
+**Verdict: don't adopt the draft as written.** The `recording` change is safe for old bytes. The `CommittedAction` and `WorkspaceFact` changes make every existing server row unreadable.
+
+(Note: I broke your no-Bash rule once. I ran one read-only `diff` of the draft against `src`. No writes, tests or builds.)
+
+## How the union is written and read (`SchemaBinary.js`)
+- **Which branch new writes take:** for `Union([fromJsonString(X), X])` the encoder tries the members in order, and both accept any valid X. So `fromJsonString` wins and new writes are a JSON string. `JSON.stringify` writes a lone surrogate as the escape `\ud800`, so the bytes are plain ASCII and survive `encodeInto`. Decoding gives the exact code units back.
+- **New wire format:** the union is written as `kind byte + body`, with `K.string`=5 for the JSON branch.
+
+## Blockers
+1. **Old `CommittedAction` and `WorkspaceFact` frames can't be read.** Both are plain structs with no literal tag, so their old layout is the bare struct with no kind byte. The new layout is a union, which starts by reading a kind byte (`decodeUnion` :4185). In an old frame that first byte is the start of a field tag, and field ids are FNV hashes, so it's almost always ≥0x80. That byte isn't in `byKind`, decoding returns ABSENT and fails with `MissingKey`. Every existing `effect_event_journal` row then fails in `decodeRow` (document-store.ts:2694) and workspace `history` (workspace-projection.ts:611). Server history is exactly the sync path that produced the original "Operation identity is immutable" error.
+2. **`recording` is fine for old bytes.** Its old frames all start with `K.variant` + a u32 tag, and the tags don't change. Adding the string branch only adds a kind. Nothing to fix there.
+3. **`DocumentWithdrawn` isn't covered.** `WithdrawalSchema` carries `DocumentActionSchema` text and is still lossy. `hashWithdrawal` hashes the original value on write but would hash the decoded value on any later replay.
+4. **Old code can't read new frames.** A stale tab or old service-worker bundle sharing the IndexedDB journal (the BroadcastChannel notifies it) gets `MissingKey` on new frames. A server rollback loses history for anything written after the upgrade. Plan a cutover gate (update banner / forced reload) and accept that rollback isn't possible.
+5. **Already-lossy entries stay lossy.** Old frames already hold U+FFFD, and local journals that already diverged will keep hitting the immutability error. The draft can't repair them; they need a defined recovery.
+6. **Two encodings per value.** New writes are always JSON (deterministic) while old rows stay struct, so payload bytes aren't canonical. That's fine today: dedupe is by entry id and fingerprints use `proposalJson` / `hashWorkspace` JSON. Never hash payload bytes.
+
+## Smallest Effect-native fix that keeps old bytes
+**Version the event tag; don't put a union at the root.**
+- Add `DocumentChangedJson`, `WorkspaceChangedJson` and `DocumentWithdrawnJson` events with `payload: Schema.fromJsonString(X)`. Their layout is a plain string leaf: no kind byte, no custom framing, no scanner.
+- Keep the old tags registered with the old schemas, sharing the same handler functions.
+- In `decodeRow` and workspace `history`, also select `j.event` and pick the codec by tag. Old bytes are decoded exactly as today.
+- Client: either keep the draft's `recording` union (it's safe) or use `DocumentRecordedJson` for uniformity. `decode()` (document-session.ts:1991) must then accept both tags.
+
+The other Effect-native option is struct-level evolution: an encoded struct where every old field is optional, plus a new optional field holding the JSON, then `decodeTo` X. It's heavier and duplicates the field list, so I'd pick tag versioning.
+
+## Size and speed
+JSON inside the binary frame loses SchemaBinary's row runs and back-references, so the key names in atom arrays repeat per atom. Expect roughly 1.3–2× bytes for actions with many atoms (my estimate, not measured), plus `JSON.parse` on every history read and replay. Validation cost doesn't change, since these schemas have checks and get a full validation pass anyway. Only writing JSON when a lone surrogate is present would need a scan, so measure first. Always-JSON is simpler and keeps one encoding per write.
+
+## Byte-compatibility tests to write next
+1. **Golden fixtures:** capture old hex bytes from main for each `recording` kind, `CommittedAction`, `WorkspaceFact` and `Withdrawal`. Assert the new reader decodes them to deep-equal values. Under the draft, `CommittedAction` and `WorkspaceFact` should fail, which proves blocker 1.
+2. **New frame shape:** envelope `0x20`, then a string leaf (tag approach) or kind `0x05` (`recording` union).
+3. **Lone surrogates:** `Lone\uD800\n`, a lone `\uDC00`, and a pair split across atoms. Compare `charCodeAt` arrays after a round trip through the real EventLog write → journal row → `decodeRow` / `history`.
+4. **Local vs replay:** the payload the local handler sees must equal the one `makeReplayFromRemote` decodes.
+5. **Mixed log:** old and new frames in one SQLite journal; `history` keeps order and identity.
+6. **Old reader, new bytes:** must fail with a typed error, never decode the wrong thing silently.
+7. **Real repro:** the DocumentSession integration (insert, sync, server restart, reopen) passes.
+8. **Benchmark:** bytes per action and history decode time for about 10k actions from a production-like log, old vs JSON.
+9. **Invalid values:** a value failing a check must not slip through to an old-format write.
+10. **Recovery:** an existing local journal that already diverged.
+
+Nothing is adopted or running yet.
