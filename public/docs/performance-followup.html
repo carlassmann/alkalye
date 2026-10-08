@@ -412,6 +412,33 @@
 			checks cover replay, checkpoints, whole-body deletion, empty EOF headers
 			and insertion anchors.
 		</p>
+		<h2>Peer edits retain the warm document source</h2>
+		<p>
+			A validated single-character append or tail deletion now updates the
+			cached source without reconstructing every atom. Unknown identities,
+			orphan descendants, hidden contributions and structural changes retain the
+			full path. Normal validation and atomic publication remain unchanged.
+		</p>
+		<p>
+			Three alternating browser pairs used two separate accounts and real
+			workspace invitations, with 128 KiB plain and frontmatter documents. All
+			24 trusted edit journeys passed exact source and strictly newer accepted
+			checkpoint checks. Receiver task medians fell from 25.8 to 11.1 ms for
+			plain append and 25.1 to 10.7 ms for deletion. Frontmatter append fell
+			from 31.2 to 10.6 ms, and deletion from 27.4 to 10.0 ms. Accepted
+			checkpoints took roughly 89 to 106 ms after, versus 167 to 186 ms before.
+		</p>
+		<p>
+			Two frame opportunities remained roughly 106 to 127 ms. Smaller processing
+			tasks therefore do not yet establish instant visible collaboration. Both
+			versions used the same native server and fresh matching logical histories,
+			rather than byte-identical restored databases. A separate diagnostic
+			confirmed cache publication on the peer path. Public Replica contracts
+			cover concurrent headers, Unicode, early cancellations, out-of-order
+			descendants, atomic rejection and checkpoint restoration. Method and
+			samples:
+			<code>experiments/performance/terminal-peer/</code>.
+		</p>
 		<h2>Native search highlights reduce manual geometry work</h2>
 		<p>
 			Inactive matches use the browser's CSS Custom Highlight API. The active
