@@ -1,0 +1,26 @@
+[
+	{
+		"path": "src/platform/open-diagnostic.ts",
+		"sha256": "70b525a18be2d19e2d8f64963eb2555dbad2e5b290b64c1777b5591db3d2e93f"
+	},
+	{
+		"path": "src/client/browser-library.ts",
+		"sha256": "148c82ef622e1e4bdc159a376bbaccc53e6e3d4c6b240c047802a28dd2e60faf"
+	},
+	{
+		"path": "src/client/document-app.ts",
+		"sha256": "fde50761547c94d88edb1a10859739d18ecb068e8a86c4c127e6c73bd53f335f"
+	},
+	{
+		"path": "src/shared/document-session.ts",
+		"sha256": "de830bbe4af2bde159fddade5cd032b475a2fb6be1e140a4d80547b404dc874e"
+	},
+	{
+		"path": "dist/app.js",
+		"sha256": "f82c12b955ad8d0c652b7db2be61adce24fd74884e2036577c63df45139e22d8"
+	},
+	{
+		"path": "trace-external",
+		"sha256": "8b36205cc38595860c709dd74c41d2e4abdbdee6d523433cf40408c53c016f16"
+	}
+]

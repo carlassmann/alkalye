@@ -1,0 +1,29 @@
+import * as Effect from "effect/Effect"
+
+let sequence = 0
+
+export function openPhase<A, E, R>(name: string, effect: Effect.Effect<A, E, R>) {
+	return Effect.suspend(() => {
+		let id = "document-open:" + name + ":" + ++sequence
+		performance.mark(id + ":start")
+		return effect.pipe(Effect.ensuring(Effect.sync(() => {
+			performance.mark(id + ":end")
+			performance.measure(id, id + ":start", id + ":end")
+		})))
+	})
+}
+
+export function openSync<A>(name: string, operation: () => A): A {
+	let id = "document-open:" + name + ":" + ++sequence
+	performance.mark(id + ":start")
+	try {
+		return operation()
+	} finally {
+		performance.mark(id + ":end")
+		performance.measure(id, id + ":start", id + ":end")
+	}
+}
+
+export function openBranch(name: string) {
+	performance.mark("document-open:branch:" + name)
+}

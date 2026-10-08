@@ -1,0 +1,265 @@
+{
+	"version": "marked-current",
+	"commit": "8937a0b749fa805f65b58977213cdf3e809be19e",
+	"cell": "switch-small-rich",
+	"trial": 0,
+	"status": "complete",
+	"seedReceipt": {
+		"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+		"characters": 2048,
+		"log": "0297efe0-6705-479c-9ca4-b80852744c00:5"
+	},
+	"targetReceipt": {
+		"sha256": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac",
+		"characters": 131072,
+		"log": "8c5c6a5d-9d8a-4a78-bf50-89d1bd164f04:6"
+	},
+	"fixture": {
+		"characters": 2048,
+		"bytes": 2048,
+		"realNewlines": 121,
+		"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+	},
+	"observation": {
+		"phases": [
+			{
+				"duration": 0,
+				"name": "document-open:materialize-text:25",
+				"start": 625.1000000238419
+			},
+			{
+				"duration": 0.19999998807907104,
+				"name": "document-open:journal-read:26",
+				"start": 625.5
+			},
+			{
+				"duration": 0.19999998807907104,
+				"name": "document-open:journal-read:27",
+				"start": 625.8000000119209
+			},
+			{
+				"duration": 0.2999999523162842,
+				"name": "document-open:journal-read:28",
+				"start": 645.6000000238419
+			},
+			{
+				"duration": 0,
+				"name": "document-open:materialize-text:29",
+				"start": 646.1000000238419
+			},
+			{
+				"duration": 0.10000002384185792,
+				"name": "document-open:live-watch:31",
+				"start": 734.1999999880791
+			},
+			{
+				"duration": 626.1000000238419,
+				"name": "document-open:library-open:30",
+				"start": 734.1999999880791
+			},
+			{
+				"duration": 15.200000047683716,
+				"name": "document-open:local-creation:32",
+				"start": 734.3999999761581
+			},
+			{
+				"duration": 610.3000000119209,
+				"name": "document-open:session-layer:33",
+				"start": 749.6999999880791
+			},
+			{
+				"duration": 0,
+				"name": "document-open:passive-read:34",
+				"start": 751.8999999761581
+			},
+			{
+				"duration": 0.19999998807907104,
+				"name": "document-open:initial-journal-replay:35",
+				"start": 752.3000000119209
+			},
+			{
+				"duration": 0.10000002384185792,
+				"name": "document-open:journal-read:36",
+				"start": 752.3999999761581
+			},
+			{
+				"duration": 0.19999998807907104,
+				"name": "document-open:journal-read:37",
+				"start": 1015.6999999880792
+			},
+			{
+				"duration": 0.5,
+				"name": "document-open:journal-read:38",
+				"start": 1183.199999988079
+			},
+			{
+				"duration": 22.899999976158146,
+				"name": "document-open:materialize-text:39",
+				"start": 1317.100000023842
+			},
+			{
+				"duration": 10.300000011920927,
+				"name": "document-open:replica-fork:40",
+				"start": 1340
+			},
+			{
+				"duration": 9.099999964237211,
+				"name": "document-open:replica-fork:41",
+				"start": 1350.300000011921
+			},
+			{
+				"duration": 0.30000001192092896,
+				"name": "document-open:journal-read:42",
+				"start": 1359.5
+			},
+			{
+				"duration": 0,
+				"name": "document-open:previous-flush:43",
+				"start": 1361.5
+			},
+			{
+				"duration": 16.5,
+				"name": "document-open:mount-document:44",
+				"start": 1361.600000023842
+			},
+			{
+				"duration": 0,
+				"name": "document-open:mount-current-document:45",
+				"start": 1362.600000023842
+			},
+			{
+				"duration": 14.900000035762789,
+				"name": "document-open:mount-editor:46",
+				"start": 1362.699999988079
+			},
+			{
+				"duration": 9,
+				"name": "document-open:previous-scope-close:47",
+				"start": 1378.399999976158
+			},
+			{
+				"duration": 0,
+				"name": "document-open:materialize-text:48",
+				"start": 1379.699999988079
+			},
+			{
+				"duration": 2.800000011920929,
+				"name": "document-open:journal-read:49",
+				"start": 1387.800000011921
+			},
+			{
+				"duration": 1.4000000357627869,
+				"name": "document-open:journal-read:50",
+				"start": 1390.699999988079
+			},
+			{
+				"duration": 0.09999996423721312,
+				"name": "document-open:journal-read:51",
+				"start": 1395.300000011921
+			},
+			{
+				"duration": 0,
+				"name": "document-open:materialize-text:52",
+				"start": 1395.600000023842
+			},
+			{
+				"duration": 0,
+				"name": "document-open:materialize-text:53",
+				"start": 1420.199999988079
+			},
+			{
+				"duration": 0,
+				"name": "document-open:materialize-text:54",
+				"start": 1887.100000023842
+			},
+			{
+				"duration": 0.19999998807907104,
+				"name": "document-open:journal-read:55",
+				"start": 1888.5
+			},
+			{
+				"duration": 0.19999998807907104,
+				"name": "document-open:journal-read:56",
+				"start": 1888.699999988079
+			},
+			{
+				"duration": 0.19999998807907104,
+				"name": "document-open:journal-read:57",
+				"start": 1891.600000023842
+			},
+			{
+				"duration": 0.10000002384185792,
+				"name": "document-open:materialize-text:58",
+				"start": 1892
+			},
+			{
+				"duration": 0,
+				"name": "document-open:materialize-text:59",
+				"start": 3381.399999976158
+			}
+		],
+		"branches": [
+			{
+				"name": "document-open:branch:journal-page-0",
+				"start": 625.6999999880791
+			},
+			{
+				"name": "document-open:branch:journal-page-0",
+				"start": 626
+			},
+			{
+				"name": "document-open:branch:journal-page-0",
+				"start": 645.8999999761581
+			},
+			{
+				"name": "document-open:branch:passive-miss",
+				"start": 751.8999999761581
+			},
+			{
+				"name": "document-open:branch:journal-page-0",
+				"start": 752.5
+			},
+			{
+				"name": "document-open:branch:journal-page-0",
+				"start": 1015.899999976158
+			},
+			{
+				"name": "document-open:branch:journal-page-1",
+				"start": 1183.699999988079
+			},
+			{
+				"name": "document-open:branch:journal-page-0",
+				"start": 1359.800000011921
+			},
+			{
+				"name": "document-open:branch:journal-page-0",
+				"start": 1390.600000023842
+			},
+			{
+				"name": "document-open:branch:journal-page-0",
+				"start": 1392.199999988079
+			},
+			{
+				"name": "document-open:branch:journal-page-0",
+				"start": 1395.399999976158
+			},
+			{
+				"name": "document-open:branch:journal-page-0",
+				"start": 1888.699999988079
+			},
+			{
+				"name": "document-open:branch:journal-page-0",
+				"start": 1888.899999976158
+			},
+			{
+				"name": "document-open:branch:journal-page-0",
+				"start": 1891.800000011921
+			}
+		]
+	},
+	"probe": {
+		"start": 733.6000000238419,
+		"ready": 1397.899999976158,
+		"end": 3733.800000011921
+	}
+}

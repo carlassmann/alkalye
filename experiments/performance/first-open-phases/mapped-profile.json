@@ -1,0 +1,398 @@
+[
+	{
+		"label": "Vt@document-app-zfrh098j.js:18:11972",
+		"sampleMs": 71.891,
+		"mapped": {
+			"source": "../src/shared/checkpoint.ts",
+			"line": 404,
+			"column": 31
+		}
+	},
+	{
+		"label": "indexAtom@document-app-zfrh098j.js:41:14013",
+		"sampleMs": 37.973,
+		"mapped": {
+			"source": "../src/shared/crdt.ts",
+			"line": 2154,
+			"column": 19
+		}
+	},
+	{
+		"label": "restoreStateSteps@document-app-zfrh098j.js:41:7639",
+		"sampleMs": 24.844,
+		"mapped": {
+			"source": "../src/shared/crdt.ts",
+			"line": 1820,
+			"column": 28
+		}
+	},
+	{
+		"label": "Ye@document-app-ez79bswk.js:1:220",
+		"sampleMs": 10.672,
+		"mapped": {
+			"source": "../src/shared/collection-copy.ts",
+			"line": 1,
+			"column": 36
+		}
+	},
+	{
+		"label": "s@document-app-zfrh098j.js:18:12331",
+		"sampleMs": 10.647,
+		"mapped": {
+			"source": "../src/shared/checkpoint.ts",
+			"line": 437,
+			"column": 16
+		}
+	},
+	{
+		"label": "ur@document-app-zfrh098j.js:41:15059",
+		"sampleMs": 6.332,
+		"mapped": {
+			"source": "../src/shared/crdt.ts",
+			"line": 2211,
+			"column": 24
+		}
+	},
+	{
+		"label": "previousGrapheme@document-app-zfrh098j.js:36:1089",
+		"sampleMs": 6.233,
+		"mapped": {
+			"source": "../src/shared/text-index.ts",
+			"line": 328,
+			"column": 18
+		}
+	},
+	{
+		"label": "<anonymous>@document-app-jarnzdmd.js:1:1785",
+		"sampleMs": 4.969,
+		"mapped": {
+			"source": "../src/platform/effects.ts",
+			"line": 24,
+			"column": 41
+		}
+	},
+	{
+		"label": "Ur@document-app-zfrh098j.js:18:10910",
+		"sampleMs": 4.497,
+		"mapped": {
+			"source": "../src/shared/checkpoint.ts",
+			"line": 328,
+			"column": 39
+		}
+	},
+	{
+		"label": "validateSnapshotOwnerSteps@document-app-zfrh098j.js:41:10970",
+		"sampleMs": 4.425,
+		"mapped": {
+			"source": "../src/shared/crdt.ts",
+			"line": 1983,
+			"column": 37
+		}
+	},
+	{
+		"label": "rawVisibleSteps@document-app-zfrh098j.js:41:1348",
+		"sampleMs": 4.201,
+		"mapped": {
+			"source": "../src/shared/crdt.ts",
+			"line": 1420,
+			"column": 26
+		}
+	},
+	{
+		"label": "active@document-app-zfrh098j.js:18:3216",
+		"sampleMs": 2.216,
+		"mapped": {
+			"source": "../src/shared/text-visibility.ts",
+			"line": 219,
+			"column": 8
+		}
+	},
+	{
+		"label": "z@document-app-zfrh098j.js:18:5787",
+		"sampleMs": 1.463,
+		"mapped": {
+			"source": "../src/shared/text-visibility.ts",
+			"line": 375,
+			"column": 15
+		}
+	},
+	{
+		"label": "Yt@document-app-zfrh098j.js:28:1986",
+		"sampleMs": 1.311,
+		"mapped": {
+			"source": "../src/shared/frontmatter-merge.ts",
+			"line": 454,
+			"column": 29
+		}
+	},
+	{
+		"label": "checkpointSteps@document-app-zfrh098j.js:41:6419",
+		"sampleMs": 0.986,
+		"mapped": {
+			"source": "../src/shared/crdt.ts",
+			"line": 1737,
+			"column": 26
+		}
+	},
+	{
+		"label": "paint@document-app-kmg2rqdx.js:63:3300",
+		"sampleMs": 0.764,
+		"mapped": {
+			"source": "../src/client/editor-viewport.ts",
+			"line": 863,
+			"column": 15
+		}
+	},
+	{
+		"label": "tt@document-app-zfrh098j.js:23:605",
+		"sampleMs": 0.717,
+		"mapped": {
+			"source": "../src/shared/frontmatter-merge.ts",
+			"line": 135,
+			"column": 34
+		}
+	},
+	{
+		"label": "wf@document-app-sga8bwcp.js:7:5661",
+		"sampleMs": 0.698,
+		"mapped": {
+			"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js",
+			"line": 295,
+			"column": 13
+		}
+	},
+	{
+		"label": "nextGrapheme@document-app-zfrh098j.js:36:1304",
+		"sampleMs": 0.612,
+		"mapped": {
+			"source": "../src/shared/text-index.ts",
+			"line": 343,
+			"column": 14
+		}
+	},
+	{
+		"label": "evaluate@document-app-sga8bwcp.js:23:1242",
+		"sampleMs": 276.786,
+		"mapped": {
+			"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+			"line": 406,
+			"column": 11
+		}
+	},
+	{
+		"label": "runLoop@document-app-sga8bwcp.js:23:1815",
+		"sampleMs": 237.397,
+		"mapped": {
+			"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+			"line": 441,
+			"column": 10
+		}
+	},
+	{
+		"label": "r@document-app-7ctzr3r1.js:8:123479",
+		"sampleMs": 190.707,
+		"mapped": {
+			"source": "../src/client/scheduler.ts",
+			"line": 12,
+			"column": 3
+		}
+	},
+	{
+		"label": "o.port1.onmessage@document-app-7ctzr3r1.js:8:123702",
+		"sampleMs": 190.707,
+		"mapped": {
+			"source": "../src/client/scheduler.ts",
+			"line": 28,
+			"column": 17
+		}
+	},
+	{
+		"label": "<anonymous>@document-app-sga8bwcp.js:23:4977",
+		"sampleMs": 190.574,
+		"mapped": {
+			"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+			"line": 735,
+			"column": 42
+		}
+	},
+	{
+		"label": "runTasks@document-app-sga8bwcp.js:9:9328",
+		"sampleMs": 190.425,
+		"mapped": {
+			"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js",
+			"line": 164,
+			"column": 11
+		}
+	},
+	{
+		"label": "afterScheduled@document-app-sga8bwcp.js:9:9278",
+		"sampleMs": 190.425,
+		"mapped": {
+			"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js",
+			"line": 157,
+			"column": 20
+		}
+	},
+	{
+		"label": "mt@document-app-sga8bwcp.js:23:4836",
+		"sampleMs": 190.336,
+		"mapped": {
+			"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+			"line": 717,
+			"column": 13
+		}
+	},
+	{
+		"label": "<anonymous>@document-app-sga8bwcp.js:23:5286",
+		"sampleMs": 187.529,
+		"mapped": {
+			"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+			"line": 766,
+			"column": 18
+		}
+	},
+	{
+		"label": "<anonymous>@document-app-jarnzdmd.js:1:1785",
+		"sampleMs": 187.285,
+		"mapped": {
+			"source": "../src/platform/effects.ts",
+			"line": 24,
+			"column": 41
+		}
+	},
+	{
+		"label": "Vt@document-app-zfrh098j.js:18:11972",
+		"sampleMs": 87.055,
+		"mapped": {
+			"source": "../src/shared/checkpoint.ts",
+			"line": 404,
+			"column": 31
+		}
+	},
+	{
+		"label": "restoreStateSteps@document-app-zfrh098j.js:41:7639",
+		"sampleMs": 73.639,
+		"mapped": {
+			"source": "../src/shared/crdt.ts",
+			"line": 1820,
+			"column": 28
+		}
+	},
+	{
+		"label": "<anonymous>@document-app-sga8bwcp.js:23:5863",
+		"sampleMs": 65.793,
+		"mapped": {
+			"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+			"line": 812,
+			"column": 66
+		}
+	},
+	{
+		"label": "indexAtom@document-app-zfrh098j.js:41:14013",
+		"sampleMs": 44.305,
+		"mapped": {
+			"source": "../src/shared/crdt.ts",
+			"line": 2154,
+			"column": 19
+		}
+	},
+	{
+		"label": "RC@document-app-7ctzr3r1.js:8:60641",
+		"sampleMs": 30.9,
+		"mapped": {
+			"source": "../src/platform/open-diagnostic.ts",
+			"line": 16,
+			"column": 28
+		}
+	},
+	{
+		"label": "Ue@document-app-sga8bwcp.js:23:8033",
+		"sampleMs": 21.515,
+		"mapped": {
+			"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+			"line": 984,
+			"column": 12
+		}
+	},
+	{
+		"label": "s.oncomplete@document-app-7ctzr3r1.js:8:60213",
+		"sampleMs": 21.48,
+		"mapped": {
+			"source": "../src/platform/indexeddb-journal.ts",
+			"line": 585,
+			"column": 20
+		}
+	},
+	{
+		"label": "Su@document-app-sga8bwcp.js:23:30676",
+		"sampleMs": 19.51,
+		"mapped": {
+			"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Deferred.js",
+			"line": 675,
+			"column": 27
+		}
+	},
+	{
+		"label": "<anonymous>@document-app-0m7vhs0v.js:1:12254",
+		"sampleMs": 19.51,
+		"mapped": {
+			"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/RcMap.js",
+			"line": 191,
+			"column": 136
+		}
+	},
+	{
+		"label": "mt@document-app-sga8bwcp.js:23:4735",
+		"sampleMs": 18.563,
+		"mapped": {
+			"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+			"line": 708,
+			"column": 13
+		}
+	},
+	{
+		"label": "wf@document-app-sga8bwcp.js:7:5661",
+		"sampleMs": 18.501,
+		"mapped": {
+			"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js",
+			"line": 295,
+			"column": 13
+		}
+	},
+	{
+		"label": "<anonymous>@document-app-sga8bwcp.js:23:21024",
+		"sampleMs": 16.499,
+		"mapped": {
+			"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+			"line": 2476,
+			"column": 39
+		}
+	},
+	{
+		"label": "<anonymous>@app.js:1570:15675",
+		"sampleMs": 16.258,
+		"mapped": {
+			"source": "../src/client/document-app.ts",
+			"line": 1328,
+			"column": 31
+		}
+	},
+	{
+		"label": "ln@app.js:1573:467",
+		"sampleMs": 16.023,
+		"mapped": {
+			"source": "../src/client/document-app.ts",
+			"line": 1690,
+			"column": 25
+		}
+	},
+	{
+		"label": "Gr@document-app-kmg2rqdx.js:88:3663",
+		"sampleMs": 14.563,
+		"mapped": {
+			"source": "../src/client/components/editor.ts",
+			"line": 161,
+			"column": 28
+		}
+	}
+]
