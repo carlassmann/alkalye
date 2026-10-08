@@ -572,7 +572,10 @@
 		"commit": "78e89af",
 		"serverPid": 37722,
 		"bun": "1.4.0",
-		"fixture": "128KiB existing performanceFixture rich; literal backslash-n separators",
-		"sampleCount": 60
+		"fixture": "128 KiB existing performanceFixture rich; real newline separators",
+		"sampleCount": 60,
+		"fixtureCharacters": 131072,
+		"fixtureNewlines": 2599,
+		"fixtureLiteralBackslashN": 0
 	}
 }

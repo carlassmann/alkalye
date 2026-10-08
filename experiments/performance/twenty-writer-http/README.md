@@ -2,7 +2,7 @@
 
 Frozen application: `78e89af`. Bun 1.4.0, local macOS, separate server and driver processes. Production unchanged. No CPU sampling during measured requests.
 
-Twenty accounts authenticate through public challenge/signature/bearer endpoints. Owner creates one 128 KiB document and writer invitation; nineteen accounts accept it. Each writer privately prepares three causal append actions before timing. Three cohorts target 1 second spacing; each writer has at most one request in flight. The fixture is the existing rich performance fixture with literal backslash-n separators. Markers contain real newline characters.
+Twenty accounts authenticate through public challenge/signature/bearer endpoints. Owner creates one 128 KiB document and writer invitation; nineteen accounts accept it. Each writer privately prepares three causal append actions before timing. Three cohorts target 1 second spacing; each writer has at most one request in flight. The fixture is the existing rich performance fixture: 131,072 characters, 2,599 real newline characters and no literal backslash-n sequences. Markers also contain real newline characters.
 
 Sixty requests accepted in 2,495.5 ms: **24.04 completed operations/s**, latency median **258.13 ms**, nearest-rank p95 **471.04 ms**, max **492.58 ms**. Max dispatch lateness 4.35 ms. This short paced journey does not establish sustained saturation capacity.
 
