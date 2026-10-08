@@ -1,0 +1,351 @@
+{
+	"records": [
+		{
+			"pair": 0,
+			"variant": "baseline",
+			"cells": [
+				{
+					"size": 131072,
+					"undo": [0.699999988079071],
+					"redo": [0.800000011920929],
+					"nativeCharacters": 2028,
+					"sourceExact": true,
+					"indexExact": true,
+					"caretExact": true,
+					"changes": [
+						{
+							"start": 131072,
+							"remove": 1,
+							"text": ""
+						}
+					]
+				},
+				{
+					"size": 1048576,
+					"undo": [4.400000035762787],
+					"redo": [4.5],
+					"nativeCharacters": 2028,
+					"sourceExact": true,
+					"indexExact": true,
+					"caretExact": true,
+					"changes": [
+						{
+							"start": 1048576,
+							"remove": 1,
+							"text": ""
+						}
+					]
+				}
+			],
+			"native": {
+				"source": "native Q text\nend",
+				"selection": 8,
+				"changes": [
+					{
+						"start": 7,
+						"remove": 2,
+						"text": "Q"
+					}
+				]
+			}
+		},
+		{
+			"pair": 0,
+			"variant": "candidate",
+			"cells": [
+				{
+					"size": 131072,
+					"undo": [0.5],
+					"redo": [0.5],
+					"nativeCharacters": 2028,
+					"sourceExact": true,
+					"indexExact": true,
+					"caretExact": true,
+					"changes": [
+						{
+							"start": 131072,
+							"remove": 1,
+							"text": ""
+						}
+					]
+				},
+				{
+					"size": 1048576,
+					"undo": [2.600000023841858],
+					"redo": [2.799999952316284],
+					"nativeCharacters": 2028,
+					"sourceExact": true,
+					"indexExact": true,
+					"caretExact": true,
+					"changes": [
+						{
+							"start": 1048576,
+							"remove": 1,
+							"text": ""
+						}
+					]
+				}
+			],
+			"native": {
+				"source": "native Q text\nend",
+				"selection": 8,
+				"changes": [
+					{
+						"start": 7,
+						"remove": 2,
+						"text": "Q"
+					}
+				]
+			}
+		},
+		{
+			"pair": 1,
+			"variant": "baseline",
+			"cells": [
+				{
+					"size": 131072,
+					"undo": [0.699999988079071],
+					"redo": [0.6000000238418579],
+					"nativeCharacters": 2028,
+					"sourceExact": true,
+					"indexExact": true,
+					"caretExact": true,
+					"changes": [
+						{
+							"start": 131072,
+							"remove": 1,
+							"text": ""
+						}
+					]
+				},
+				{
+					"size": 1048576,
+					"undo": [4.399999976158142],
+					"redo": [4.300000011920929],
+					"nativeCharacters": 2028,
+					"sourceExact": true,
+					"indexExact": true,
+					"caretExact": true,
+					"changes": [
+						{
+							"start": 1048576,
+							"remove": 1,
+							"text": ""
+						}
+					]
+				}
+			],
+			"native": {
+				"source": "native Q text\nend",
+				"selection": 8,
+				"changes": [
+					{
+						"start": 7,
+						"remove": 2,
+						"text": "Q"
+					}
+				]
+			}
+		},
+		{
+			"pair": 1,
+			"variant": "candidate",
+			"cells": [
+				{
+					"size": 131072,
+					"undo": [0.40000003576278687],
+					"redo": [0.5],
+					"nativeCharacters": 2028,
+					"sourceExact": true,
+					"indexExact": true,
+					"caretExact": true,
+					"changes": [
+						{
+							"start": 131072,
+							"remove": 1,
+							"text": ""
+						}
+					]
+				},
+				{
+					"size": 1048576,
+					"undo": [2.300000011920929],
+					"redo": [2.5],
+					"nativeCharacters": 2028,
+					"sourceExact": true,
+					"indexExact": true,
+					"caretExact": true,
+					"changes": [
+						{
+							"start": 1048576,
+							"remove": 1,
+							"text": ""
+						}
+					]
+				}
+			],
+			"native": {
+				"source": "native Q text\nend",
+				"selection": 8,
+				"changes": [
+					{
+						"start": 7,
+						"remove": 2,
+						"text": "Q"
+					}
+				]
+			}
+		},
+		{
+			"pair": 2,
+			"variant": "baseline",
+			"cells": [
+				{
+					"size": 131072,
+					"undo": [0.6000000238418579],
+					"redo": [0.5],
+					"nativeCharacters": 2028,
+					"sourceExact": true,
+					"indexExact": true,
+					"caretExact": true,
+					"changes": [
+						{
+							"start": 131072,
+							"remove": 1,
+							"text": ""
+						}
+					]
+				},
+				{
+					"size": 1048576,
+					"undo": [3.600000023841858],
+					"redo": [3.600000023841858],
+					"nativeCharacters": 2028,
+					"sourceExact": true,
+					"indexExact": true,
+					"caretExact": true,
+					"changes": [
+						{
+							"start": 1048576,
+							"remove": 1,
+							"text": ""
+						}
+					]
+				}
+			],
+			"native": {
+				"source": "native Q text\nend",
+				"selection": 8,
+				"changes": [
+					{
+						"start": 7,
+						"remove": 2,
+						"text": "Q"
+					}
+				]
+			}
+		},
+		{
+			"pair": 2,
+			"variant": "candidate",
+			"cells": [
+				{
+					"size": 131072,
+					"undo": [0.5],
+					"redo": [0.5],
+					"nativeCharacters": 2028,
+					"sourceExact": true,
+					"indexExact": true,
+					"caretExact": true,
+					"changes": [
+						{
+							"start": 131072,
+							"remove": 1,
+							"text": ""
+						}
+					]
+				},
+				{
+					"size": 1048576,
+					"undo": [2.400000035762787],
+					"redo": [2.699999988079071],
+					"nativeCharacters": 2028,
+					"sourceExact": true,
+					"indexExact": true,
+					"caretExact": true,
+					"changes": [
+						{
+							"start": 1048576,
+							"remove": 1,
+							"text": ""
+						}
+					]
+				}
+			],
+			"native": {
+				"source": "native Q text\nend",
+				"selection": 8,
+				"changes": [
+					{
+						"start": 7,
+						"remove": 2,
+						"text": "Q"
+					}
+				]
+			}
+		}
+	],
+	"summary": {
+		"131072": {
+			"baseline": {
+				"undo": {
+					"median": 0.699999988079071,
+					"max": 0.699999988079071
+				},
+				"redo": {
+					"median": 0.6000000238418579,
+					"max": 0.800000011920929
+				}
+			},
+			"candidate": {
+				"undo": {
+					"median": 0.5,
+					"max": 0.5
+				},
+				"redo": {
+					"median": 0.5,
+					"max": 0.5
+				}
+			}
+		},
+		"1048576": {
+			"baseline": {
+				"undo": {
+					"median": 4.399999976158142,
+					"max": 4.400000035762787
+				},
+				"redo": {
+					"median": 4.300000011920929,
+					"max": 4.5
+				}
+			},
+			"candidate": {
+				"undo": {
+					"median": 2.400000035762787,
+					"max": 2.600000023841858
+				},
+				"redo": {
+					"median": 2.699999988079071,
+					"max": 2.799999952316284
+				}
+			}
+		}
+	},
+	"sourceSha256": {
+		"native-source-textarea.ts.txt": "4fc0af5c5dbca6957179dce46919e7a6de71d7c3b9ca787de77ae8010747a7d7",
+		"candidate-source-textarea.ts.txt": "c136e8e1182e0414e6c6205a4ec6f606db7afc3d27a44c291875b59e90ab0d41",
+		"browser-fixture.ts": "7a10a889c17a8327132393be820f389b5c55e6b4468531f1de3d46bc49e3ee44"
+	},
+	"baselineCommit": "99d903eca9de7845d2608e1daa2d7536e9c3c6ea",
+	"scope": "Public SourceTextarea native DOM reconcile only; synchronous performance.now duration, no frame/full-app claim. Three ordered baseline/candidate pairs, both sizes per page, one undo/redo each after prime. Exact model/index/source caret and public replacement ranges; trusted selected-emoji native input each variant. Browser fragment source text not independently EOF-asserted."
+}

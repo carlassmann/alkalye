@@ -1,0 +1,63 @@
+import { SourceTextarea } from "./src/client/source-textarea"
+
+interface Scenario { name: string; before: string; after: string; range?: {start:number;remove:number;text:string} }
+interface Measurement { size:number; undo:number[]; redo:number[]; nativeCharacters:number; sourceExact:boolean; indexExact:boolean; caretExact:boolean; changes:ReturnType<SourceTextarea["takeReplacements"]> }
+declare global { interface Window { differenceProof?: { stage:string; failure?:string; assertions:string[]; measurements:Measurement[]; observations:{name:string;changes:ReturnType<SourceTextarea["takeReplacements"]>}[]; exercise():void; measure(size:number):Measurement; native():{source:string;selection:number;changes:ReturnType<SourceTextarea["takeReplacements"]>} } } }
+let assertions:string[]=[]
+let measurements:Measurement[]=[]
+let observations:{name:string;changes:ReturnType<SourceTextarea["takeReplacements"]>}[]=[]
+function assert(condition: unknown, label:string) { if (!condition) throw Error(label); assertions.push(label) }
+function mounted(source:string, mode:"raw"|"project"="raw") {
+ let host=document.createElement("div"),element=document.createElement("textarea")
+ host.style.cssText="height:800px;width:900px;overflow:auto;position:relative"
+ element.style.cssText="font:16px/24px monospace;padding:8px;border:0;width:100%;resize:none"
+ host.append(element);document.body.append(host)
+ let input=new SourceTextarea(element,source,{documents:()=>[],mode:()=>mode,caretTop:()=>undefined,painted(){}})
+ return {input,host,element,dispose(){input.dispose();host.remove()}}
+}
+function exercise(scenario:Scenario) {
+ let mountedInput=mounted(scenario.before),source=mountedInput.input
+ try {
+  source.replace(scenario.after,scenario.after.length)
+  let changes=source.takeReplacements(),mirror=document.createElement("textarea")
+  observations.push({name:scenario.name,changes})
+  mirror.value=scenario.before
+  for(let change of changes) mirror.setRangeText(change.text,change.start,change.start+change.remove,"end")
+  assert(source.value===scenario.after&&mirror.value===scenario.after&&source.sourceIndex.value===scenario.after,scenario.name+": canonical, native replay and index agree")
+  assert(source.sourceIndex.codePoints===Array.from(scenario.after).length&&source.sourceIndex.newlines===scenario.after.split("\n").length-1,scenario.name+": Unicode and line index agree")
+  assert(source.selectionStart===scenario.after.length&&source.selectionEnd===scenario.after.length,scenario.name+": source caret preserved")
+  if(scenario.range) assert(changes.length===1&&changes[0]?.start===scenario.range.start&&changes[0]?.remove===scenario.range.remove&&changes[0]?.text===scenario.range.text,scenario.name+": source range preserves existing edit behavior")
+  source.reconcile(scenario.before,scenario.before.length)
+  assert(source.value===scenario.before&&source.sourceIndex.value===scenario.before,scenario.name+": reconcile restores source/index")
+ } finally { mountedInput.dispose() }
+}
+let repeated="row contents\n".repeat(Math.ceil(1048576/13)).slice(0,1048576)
+let scenarios:Scenario[]=[
+ {name:"empty insertion",before:"",after:"x",range:{start:0,remove:0,text:"x"}},
+ {name:"empty deletion",before:"x",after:"",range:{start:0,remove:1,text:""}},
+ {name:"short middle",before:"first\nlast",after:"first\nnew last",range:{start:6,remove:0,text:"new "}},
+ {name:"short equal",before:"same",after:"same"},
+ {name:"emoji across chunk",before:"a".repeat(4095)+"🦊\nend",after:"a".repeat(4095)+"🦉\nend",range:{start:4095,remove:2,text:"🦉"}},
+ {name:"lone high joins low",before:"a".repeat(4095)+"\uD83E",after:"a".repeat(4095)+"🦊",range:{start:4095,remove:1,text:"🦊"}},
+ {name:"paired loses low",before:"a".repeat(4095)+"🦊",after:"a".repeat(4095)+"\uD83E",range:{start:4095,remove:2,text:"\uD83E"}},
+ {name:"lone low changed",before:"a".repeat(4096)+"\uDC00\ntail",after:"a".repeat(4096)+"\uDC01\ntail"},
+ {name:"large common suffix",before:"x"+repeated,after:"y"+repeated,range:{start:0,remove:1,text:"y"}},
+ {name:"128K EOF Undo",before:repeated.slice(0,131072)+"x",after:repeated.slice(0,131072),range:{start:131072,remove:1,text:""}},
+ {name:"oneMiB EOF Undo",before:repeated+"x",after:repeated,range:{start:1048576,remove:1,text:""}},
+ {name:"oneMiB middle newline",before:repeated,after:repeated.slice(0,524288)+"\n🦊"+repeated.slice(524288),range:{start:524288,remove:0,text:"\n🦊"}},
+]
+for(let size of [4095,4096,4097,8192]) {
+ let before="a".repeat(size)
+ scenarios.push({name:"length "+size+" repeated append",before,after:before+"a"})
+ for(let offset of [4095,4096,4097]) if(offset<size) scenarios.push({name:"mismatch "+offset+" of "+size,before,after:before.slice(0,offset)+"b"+before.slice(offset+1),range:{start:offset,remove:1,text:"b"}})
+}
+scenarios.push({name:"repeated overlap deletion",before:"a".repeat(10000),after:"a".repeat(5000)},{name:"legacy low inserted after lone high",before:"a".repeat(4095)+"\uD83Ex",after:"a".repeat(4095)+"🦊",range:{start:4096,remove:1,text:"\uDD8A"}},{name:"ASCII becomes two-byte",before:repeated,after:repeated+"🦊",range:{start:1048576,remove:0,text:"🦊"}})
+let nativeInput:ReturnType<typeof mounted>|undefined
+let nativeChanges:ReturnType<SourceTextarea["takeReplacements"]>=[]
+let proof={
+ stage:"ready",assertions,measurements,observations,
+ exercise(){for(let scenario of scenarios)exercise(scenario);let linked=mounted("prefix [Old](doc:target) suffix","project");try {linked.input.replace("prefix [New](doc:target) suffix",30);assert(linked.input.value==="prefix [New](doc:target) suffix"&&linked.input.sourceIndex.value===linked.input.value,"projected document link source remains exact")}finally{linked.dispose()}nativeInput=mounted("native 🦊 text\nend");nativeInput.input.focus();nativeInput.input.setSelectionRange(7,9);nativeInput.element.addEventListener("input",()=>{if(!nativeInput)return;nativeInput.input.input();nativeChanges=nativeInput.input.takeReplacements();assert(nativeInput.input.value===nativeInput.input.sourceIndex.value,"trusted native input and index agree")});proof.stage="native-ready"},
+ measure(size:number){let before=repeated.slice(0,size),after=before+"x",view=mounted(after);try {view.input.reconcile(before,size);view.input.reconcile(after,size+1);let undo:number[]=[],redo:number[]=[];for(let index=0;index<1;index++){let start=performance.now();view.input.reconcile(before,size);undo.push(performance.now()-start);start=performance.now();view.input.reconcile(after,size+1);redo.push(performance.now()-start)}let sourceExact=view.input.value===after,indexExact=view.input.sourceIndex.value===after,caretExact=view.input.selectionStart===size+1&&view.input.selectionEnd===size+1;view.input.replace(before,size);let changes=view.input.takeReplacements();assert(sourceExact&&indexExact&&caretExact&&view.input.value===before&&view.input.sourceIndex.value===before&&view.input.selectionStart===size,"timed cell source/index/caret exact");assert(changes.length===1&&changes[0]?.start===size&&changes[0]?.remove===1&&changes[0]?.text==="","timed cell public undo range exact");let result={size,undo,redo,nativeCharacters:view.element.value.length,sourceExact,indexExact,caretExact,changes};measurements.push(result);return result}finally{view.dispose()}},
+ native(){if(!nativeInput)throw Error("Native fixture unavailable");return{source:nativeInput.input.value,selection:nativeInput.input.selectionStart,changes:nativeChanges}},
+}
+window.differenceProof=proof

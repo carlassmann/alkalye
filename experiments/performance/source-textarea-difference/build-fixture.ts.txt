@@ -1,0 +1,2 @@
+export {}
+let result = await Bun.build({entrypoints:["./browser-fixture.ts"],outdir:"./assets",target:"browser",minify:true,sourcemap:"external"}); if(!result.success) throw new AggregateError(result.logs,"fixture build");

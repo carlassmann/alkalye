@@ -1,0 +1,28 @@
+**Verdict:** the patched `difference` (`/tmp/.../source-textarea.ts:306-335`) should return exactly the same result as the current one for every input. I found no semantic risk. Based only on reading both files; nothing was run.
+
+**Semantics**
+- **Prefix:** the 4096-unit block loop stops at the first unequal block or when fewer than 4096 units are left. The per-unit loop then finds the exact mismatch, so the common prefix is unchanged. Unmatched work per side is at most about 8191 units.
+- **Suffix and overlap:** `end - start >= block && nextEnd - start >= block` keeps every block at or after `start`. That matches the original `end > start && nextEnd > start` limit, so the common suffix is the same and never overlaps the prefix, including on repeated text.
+- **Surrogates:** the adjustments run on the final `start`/`end`, which are unchanged, so a pair split by the 4096 block edge can't matter.
+- **Existing quirk (same in both versions):** the start check reads `before[start] ?? after[start]`. With `before="\uD83Dx"` and `after="\uD83D\uDE00"`, `before[start]` is `x`, so `start` is not moved back and the inserted fragment starts with a lone low surrogate. The end check is safe because the common suffix is equal on both sides. Tests should assert the result matches the old version, not that pairs are never split.
+
+**Allocation and rope risks**
+- **Allocation:** each loop step creates 2 V8 substrings (no copy). At 1MiB that's about 512 per side, so young-generation (minor GC) pressure is negligible.
+- **Ropes:** if the Undo source is a concatenated string (rope), the first `slice` flattens it. Indexing did the same before, so the cost moves rather than goes away. Check where flattening shows up in the profile before crediting the gain.
+- **Mixed string widths:** an emoji in an ASCII doc makes `after` a two-byte string while `before` stays one-byte. V8 then compares the slices more slowly. This is the most likely place the gain shrinks, so measure it separately.
+- **Double call, possible measurement inflation:** `replace()` without replacements calls `difference(current.source, source)` (`:148`), then `apply()` calls it again on the same pair (`:285`). The 1.914ms may be two calls. That changes how to read the A/B result; I'm not proposing a fix here.
+
+**Testing**
+- **Cheapest public check:** `replace(next, …)` → `takeReplacements()` returns the exact `difference` result as `{start, remove, text}`. Run the same inputs against both builds and require identical output. Call `takeReplacements` between `replace` calls: `replace` overwrites `pending`, so a second call returns a replacement measured from the last value, not from `inputBase`. That behaviour exists in both versions.
+- **Smallest missing test cases:**
+  1. First mismatch at 4095, 4096 and 4097, from both the start and the end; lengths 0, 4095, 4096, 4097 and 8192.
+  2. Repeated text across the overlap limit: `"a"*8192` → `"a"*8193`, and `"a"*10000` → `"a"*5000`.
+  3. Pairs straddling 4095/4096: change only the low half; change only the high half; a lone high surrogate followed by an inserted low one (the case above); a lone low surrogate at the suffix block edge.
+  4. ASCII 1MiB doc plus one emoji: insert, then Undo.
+  5. `sourceIndex` must match `new TextIndex(value)` (value, code points, newlines). `apply()` feeds `difference` into `sourceIndex.replace`, so a wrong range corrupts it silently.
+  6. Several `input()` edits, then `takeReplacements()`, so the non-transaction path that recomputes from `inputBase` runs across a block edge.
+  7. `reconcile()` and `setSelectionRange()` in projected-links mode with `[`…`]` near offset 4096. These still reach `apply()`'s `difference`.
+
+**Style, if this is ever adopted:** lines 308-309 and 319 are indented with spaces in a tab-indented file and too long for the formatter, so `check` would fail. Rename `block` to `blockLength`.
+
+written with claude-opus-5-5 in claude-code

@@ -1,0 +1,16 @@
+{
+	"assertions": 121,
+	"scenarios": 25,
+	"equalPublicOutputs": true,
+	"native": {
+		"source": "native Q text\nend",
+		"selection": 8,
+		"changes": [
+			{
+				"start": 7,
+				"remove": 2,
+				"text": "Q"
+			}
+		]
+	}
+}

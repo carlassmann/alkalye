@@ -1,0 +1,21 @@
+import subprocess,json,os,hashlib
+from pathlib import Path
+root=Path('.')
+env=dict(os.environ,AGENT_BROWSER_SESSION='source-difference-timing',AGENT_BROWSER_DEFAULT_TIMEOUT='20000',AGENT_BROWSER_HEADED='false')
+def browser(*args):
+ r=subprocess.run(['agent-browser',*args],env=env,text=True,capture_output=True,check=True)
+ return r.stdout
+def evaluate(code):return json.loads(json.loads(browser('eval',code)))
+records=[]
+for pair in range(3):
+ for variant in ['baseline','candidate']:
+  browser('open','http://localhost:62089/?variant='+variant+'&pair='+str(pair))
+  result=evaluate('JSON.stringify([window.differenceProof.measure(131072),window.differenceProof.measure(1048576)])')
+  evaluate('window.differenceProof.exercise(); JSON.stringify({stage:window.differenceProof.stage,assertions:window.differenceProof.assertions.length})')
+  browser('press','Q')
+  native=evaluate('JSON.stringify(window.differenceProof.native())')
+  assert native['source']=='native Q text\nend' and native['selection']==8,native
+  records.append({'pair':pair,'variant':variant,'cells':result,'native':native})
+  (root/'native-reconcile-results.json').write_text(json.dumps({'records':records},indent=2)+'\n')
+  print(pair,variant,result,flush=True)
+browser('close')
