@@ -1,0 +1,31 @@
+I read all six files with Read only and ran nothing. No change to your type and 25-assertion results. The bounded proof holds, but two claims in it are not proved, and those are what block the full app cutover.
+
+**Blockers**
+
+1. **The "main keeps the full draft" claim is not proved** (`browser-fixture.ts:78-93`). Lines 89 and 93 compare `window.observeProof.draft` with `draft`, but the test sets both itself, so they always match. Main never holds anything real: `FixtureDraft` edits the worker session directly, and the failed `Close` then closes the scope and discards it. In the real app, a failed Close would lose the unsaved text unless the main editor keeps it. Line 93 also never reconciles anything; it only checks that reopen returns the durable prefix.
+   - Smallest fix: keep the draft in the real main owner (the textarea value or editor store), not in a test global. After `recovered`, send the durable→draft suffix as a new edit and assert `Read().content === draft`. If that's too much now, relabel both assertions as unproved gates.
+
+2. **The fixture seams ship in the production RPC group and handler** (`worker-rpc.ts:25-26`, `worker-session.ts:38-39,46-47,72-73`). Any client can call `FixtureFault`, `FixtureDraft` or arbitrary `session.edit`, and the real journal path checks the fault flags on every write.
+   - Smallest fix: move them into a separate `WorkerFixtureRpc` group, merged with the main group and wired to the fault-wrapped journal only in the test worker entry. Production gets the plain group and the unwrapped `DocumentJournal`.
+
+**Cutover gates the proof doesn't cover yet**
+
+3. **No flush on page hide.** The worker's lifecycle layer is a no-op (`worker-session.ts:27-31`), so nothing flushes the session when the page hides. Smallest fix: drive `hidden` from main through a small RPC that feeds a `SubscriptionRef`, the same pattern `Admission` already uses. Until then, keep page-hide flushing as an open gate.
+
+4. **`TaskToggle` and selection capture can never succeed.** `basis: () => undefined` and `editor: Stream.never` (`:77`) mean task toggles and comment/asset capture always fail with "selection has changed", yet `TaskToggle` is exposed over RPC. Either take it out of the RPC group until the editor basis is proved, or mark it as unproved.
+
+5. **One lane for every command** (`worker-client.ts:55`, `concurrency: 2`). An active Observe occupies one of the two lanes, so all commands, including `Close`, go through the other. A stuck command would also block `Close`. The test runs its commands one after another, so "concurrent metadata commands" really means Observe plus one command. Reword the claim, or add one assertion that a slow command doesn't block `Close` (or that interrupting it frees the lane).
+
+**Nits**
+
+- `worker-session.ts:79` adds the same `Deferred.done(closed)` finalizer a second time (line 52 already does). Delete it.
+- Line 58 (`assert(true, …)`) and line 100 always pass and prove nothing. Line 100 should actually check something, for example that a later call on `temporary` fails.
+- `failure()` labels every reason, including `Closed` and `AlreadyOpen`, with category `"conflict"`. Harmless for the proof, but main shouldn't branch on that category.
+
+**Confirmed fine**
+
+- The same-token Execute retry, the Observe acquire/release, Close ending the stream before the scope is torn down, and Open cleaning up its scope on failure and interruption.
+- The failed Close keeps the failure exit and is uninterruptible during teardown.
+- The parent production code has no conflicting changes.
+
+written with claude-opus-5-5 in claude-code

@@ -93,7 +93,15 @@
 		"protocol interruption and worker crash in this bundle",
 		"main-tab crash durability",
 		"native UI parity",
-		"performance"
+		"performance",
+		"actual native-editor recovery draft retention and reconciliation",
+		"resource-count cleanup after client owner scope close",
+		"stuck mutative command cancellation allowing Close"
 	],
-	"signed": "written with gpt-6 in codex"
+	"signed": "written with gpt-6 in codex",
+	"weakFixtureAssertions": [
+		"failed Close preserves complete main recovery draft",
+		"durable-prefix reconciliation does not discard retained suffix"
+	],
+	"terminalReview": "Opus80111; bounded Observe/Open/Close behavior confirmed; two global-string draft assertions unproved native retention"
 }
