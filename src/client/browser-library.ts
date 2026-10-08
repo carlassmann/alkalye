@@ -3,6 +3,7 @@ import * as Context from "effect/Context"
 import * as Crypto from "effect/Crypto"
 import * as Effect from "effect/Effect"
 import * as Layer from "effect/Layer"
+import * as Option from "effect/Option"
 import * as RcMap from "effect/RcMap"
 import * as Ref from "effect/Ref"
 import * as Schema from "effect/Schema"
@@ -249,9 +250,14 @@ function makeLibrary() {
 			)
 		}
 		function publish(value: Omit<BrowserLibraryState, "library">) {
-			return SubscriptionRef.update(state, current =>
-				Object.freeze({ ...current, ...value }),
-			)
+			return SubscriptionRef.updateSome(state, current => {
+				let next = { ...current, ...value }
+				return current.refresh === next.refresh &&
+					current.message === next.message &&
+					current.cacheFailure === next.cacheFailure
+					? Option.none()
+					: Option.some(Object.freeze(next))
+			})
 		}
 		function compose() {
 			return assembling.withPermit(

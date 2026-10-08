@@ -7,6 +7,7 @@ import * as Scope from "effect/Scope"
 import * as Stream from "effect/Stream"
 import * as FetchHttpClient from "effect/http/FetchHttpClient"
 import * as HttpClient from "effect/http/HttpClient"
+import { StorageError } from "../src/platform/errors"
 import { BrowserStorage, Storage } from "../src/client/storage"
 import { BrowserAccount } from "../src/client/browser-account"
 import { BrowserLibrary } from "../src/client/browser-library"
@@ -21,6 +22,12 @@ interface Counts {
 	projectionWrites: number
 }
 interface Probe {
+	refresh(): Promise<void>
+	cacheFault(value: boolean): void
+	state(): { refresh: string; message?: string; cacheFailure?: string }
+	workspaceName(): string | undefined
+	roles(): ReadonlyArray<string>
+
 	edit(text: string): Promise<void>
 	sync(): Promise<void>
 	startSync(): Promise<void>
@@ -39,6 +46,7 @@ declare global {
 		librarySyncFailure?: string
 	}
 }
+let failCache = false
 let counts: Counts = {
 	pulls: 0,
 	projections: 0,
@@ -72,6 +80,17 @@ Effect.runPromise(
 		).pipe(Effect.provideService(Scope.Scope, scope))
 		let counted = new Proxy(storage, {
 			get(target, property, receiver) {
+				if (property === "set")
+					return function (key: string, value: unknown) {
+						return failCache && key.startsWith("document-library:")
+							? Effect.fail(
+									new StorageError({
+										operation: "controlled library cache",
+										cause: "fixture failure",
+									}),
+								)
+							: target.set(key, value)
+					}
 				if (property === "modify")
 					return function (key: string, update: (value: unknown) => unknown) {
 						return target.modify(key, update).pipe(
@@ -144,6 +163,23 @@ Effect.runPromise(
 			return Effect.runPromise(effect)
 		}
 		window.librarySync = {
+			refresh: () => run(library.refresh),
+			cacheFault(value) {
+				failCache = value
+			},
+			state() {
+				let { refresh, message, cacheFailure } = library.state.current()
+				return { refresh, message, cacheFailure }
+			},
+			workspaceName: () =>
+				library.state
+					.current()
+					.library.workspaces.find(space => space.workspace === "sync-space")
+					?.name,
+			roles: () =>
+				library.state
+					.current()
+					.library.documents.map(document => document.role),
 			counts,
 			reset() {
 				counts.pulls = 0

@@ -25,6 +25,7 @@ if (process.argv.includes("--serve")) {
 	let member = ""
 	let requestNumber = 0
 	let holdPulls = false
+	let failLibrary = false
 	let waiting = new Set<() => void>()
 	let observed = new Set<() => void>()
 	function makeRuntime(data: string, publicOrigin: string) {
@@ -50,6 +51,26 @@ if (process.argv.includes("--serve")) {
 				return new Response(script, {
 					headers: { "content-type": "text/javascript" },
 				})
+			if (url.pathname === "/test/library-failure") {
+				failLibrary = (await request.text()) === "true"
+				return new Response("ok")
+			}
+			if (failLibrary && url.pathname === "/api/library")
+				return new Response("Controlled library failure", { status: 503 })
+			if (url.pathname === "/test/name") {
+				let name = await request.text()
+				await runtime.runPromise(
+					WorkspaceStore.use(store =>
+						store.rename("sync-space", name, "rename-" + ++requestNumber),
+					).pipe(
+						Effect.provideService(Identity, {
+							subject: "sync-owner",
+							actors: ["sync-owner"],
+						}),
+					),
+				)
+				return new Response("ok")
+			}
 			if (url.pathname === "/test/hold") {
 				holdPulls = (await request.text()) === "true"
 				if (!holdPulls) for (let release of waiting) release()
@@ -169,6 +190,61 @@ if (process.argv.includes("--serve")) {
 		assert(
 			!evaluate(session, "window.librarySyncFailure ?? null"),
 			"library opens through real IndexedDB and authenticated HTTP",
+		)
+		evaluate(session, "window.librarySync.cacheFault(true)")
+		evaluate(session, "window.librarySync.refresh()")
+		assert(
+			evaluate(session, "Boolean(window.librarySync.state().cacheFailure)"),
+			"controlled library cache failure publishes",
+		)
+		evaluate(session, "window.librarySync.cacheFault(false)")
+		evaluate(session, "window.librarySync.refresh()")
+		assert(
+			evaluate(
+				session,
+				"window.librarySync.state().cacheFailure === undefined",
+			),
+			"explicit cache failure clear publishes",
+		)
+		await fetch(new URL("/test/library-failure", url), {
+			method: "POST",
+			body: "true",
+		})
+		evaluate(session, "window.librarySync.refresh()")
+		assert(
+			evaluate(
+				session,
+				"window.librarySync.state().refresh === 'failed' && Boolean(window.librarySync.state().message)",
+			),
+			"real HTTP library failure publishes",
+		)
+		await fetch(new URL("/test/library-failure", url), {
+			method: "POST",
+			body: "false",
+		})
+		evaluate(session, "window.librarySync.refresh()")
+		assert(
+			evaluate(
+				session,
+				"window.librarySync.state().refresh === 'idle' && window.librarySync.state().message === undefined",
+			),
+			"successful refresh explicitly clears failure",
+		)
+		await fetch(new URL("/test/name", url), {
+			method: "POST",
+			body: "Renamed synchronization workspace",
+		})
+		evaluate(session, "window.librarySync.refresh()")
+		assert(
+			evaluate(
+				session,
+				"window.librarySync.workspaceName() === 'Renamed synchronization workspace'",
+			),
+			"public workspace metadata update survives",
+		)
+		assert(
+			evaluate(session, "window.librarySync.roles().includes('writer')"),
+			"writer catalogue admission survives",
 		)
 		evaluate(
 			session,

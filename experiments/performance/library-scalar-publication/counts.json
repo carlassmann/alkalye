@@ -1,0 +1,398 @@
+{
+	"scope": "One instrumented pair; publication attribution only, no latency/frame claim",
+	"arms": [
+		{
+			"arm": "baseline-runtime",
+			"status": "complete",
+			"spans": {
+				"whole3s": {
+					"counts": {
+						"interaction:start": 1,
+						"undo:requested": 1,
+						"propose:gate-acquired": 1,
+						"propose:flush-start": 1,
+						"refresh-cause:session-failure": 25,
+						"app:request-refresh": 46,
+						"propose:flush-end": 1,
+						"app:refresh-frame": 9,
+						"app:refresh-document": 9,
+						"propose:replay-end": 1,
+						"propose:actor-start": 1,
+						"propose:actor-end": 1,
+						"propose:prepared": 1,
+						"propose:persist-start": 1,
+						"library:catalogue-compose": 7,
+						"refresh-cause:library-state": 13,
+						"refresh-cause:connection": 6,
+						"session:revision": 2,
+						"refresh-cause:session": 2,
+						"propose:persist-end": 1,
+						"undo:completion-refresh-start": 1,
+						"undo:completion-pending": 1,
+						"undo:completion-refresh-end": 1,
+						"interaction:ready": 1,
+						"library:scalar-request": 6,
+						"library:scalar-commit": 6
+					},
+					"scalar_requests": [
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "refreshing"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "refreshing",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "refreshing"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "refreshing",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "idle"
+						}
+					]
+				},
+				"first100ms": {
+					"counts": {
+						"interaction:start": 1,
+						"undo:requested": 1,
+						"propose:gate-acquired": 1,
+						"propose:flush-start": 1,
+						"refresh-cause:session-failure": 17,
+						"app:request-refresh": 36,
+						"propose:flush-end": 1,
+						"app:refresh-frame": 5,
+						"app:refresh-document": 6,
+						"propose:replay-end": 1,
+						"propose:actor-start": 1,
+						"propose:actor-end": 1,
+						"propose:prepared": 1,
+						"propose:persist-start": 1,
+						"library:catalogue-compose": 7,
+						"refresh-cause:library-state": 13,
+						"refresh-cause:connection": 4,
+						"session:revision": 2,
+						"refresh-cause:session": 2,
+						"propose:persist-end": 1,
+						"undo:completion-refresh-start": 1,
+						"undo:completion-pending": 1,
+						"undo:completion-refresh-end": 1,
+						"interaction:ready": 1,
+						"library:scalar-request": 6,
+						"library:scalar-commit": 6
+					},
+					"scalar_requests": [
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "refreshing"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "refreshing",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "refreshing"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "refreshing",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "idle"
+						}
+					]
+				},
+				"afterCompletion100ms": {
+					"counts": {
+						"refresh-cause:session-failure": 13,
+						"app:request-refresh": 29,
+						"interaction:ready": 1,
+						"app:refresh-frame": 4,
+						"app:refresh-document": 4,
+						"library:scalar-request": 6,
+						"library:scalar-commit": 6,
+						"refresh-cause:library-state": 12,
+						"refresh-cause:connection": 3,
+						"library:catalogue-compose": 6,
+						"session:revision": 1,
+						"refresh-cause:session": 1
+					},
+					"scalar_requests": [
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "refreshing"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "refreshing",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "refreshing"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "refreshing",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "idle"
+						}
+					]
+				}
+			}
+		},
+		{
+			"arm": "candidate-runtime",
+			"status": "complete",
+			"spans": {
+				"whole3s": {
+					"counts": {
+						"interaction:start": 1,
+						"undo:requested": 1,
+						"propose:gate-acquired": 1,
+						"propose:flush-start": 1,
+						"refresh-cause:session-failure": 25,
+						"app:request-refresh": 44,
+						"propose:flush-end": 1,
+						"app:refresh-frame": 8,
+						"app:refresh-document": 8,
+						"propose:replay-end": 1,
+						"propose:actor-start": 1,
+						"propose:actor-end": 1,
+						"propose:prepared": 1,
+						"propose:persist-start": 1,
+						"library:catalogue-compose": 7,
+						"refresh-cause:library-state": 11,
+						"refresh-cause:connection": 6,
+						"session:revision": 2,
+						"refresh-cause:session": 2,
+						"propose:persist-end": 1,
+						"undo:completion-refresh-start": 1,
+						"undo:completion-pending": 1,
+						"undo:completion-refresh-end": 1,
+						"interaction:ready": 1,
+						"library:scalar-request": 6,
+						"library:scalar-commit": 4,
+						"interaction:end": 1
+					},
+					"scalar_requests": [
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "refreshing"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "refreshing",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "refreshing"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "refreshing",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "idle"
+						}
+					]
+				},
+				"first100ms": {
+					"counts": {
+						"interaction:start": 1,
+						"undo:requested": 1,
+						"propose:gate-acquired": 1,
+						"propose:flush-start": 1,
+						"refresh-cause:session-failure": 17,
+						"app:request-refresh": 34,
+						"propose:flush-end": 1,
+						"app:refresh-frame": 4,
+						"app:refresh-document": 5,
+						"propose:replay-end": 1,
+						"propose:actor-start": 1,
+						"propose:actor-end": 1,
+						"propose:prepared": 1,
+						"propose:persist-start": 1,
+						"library:catalogue-compose": 7,
+						"refresh-cause:library-state": 11,
+						"refresh-cause:connection": 4,
+						"session:revision": 2,
+						"refresh-cause:session": 2,
+						"propose:persist-end": 1,
+						"undo:completion-refresh-start": 1,
+						"undo:completion-pending": 1,
+						"undo:completion-refresh-end": 1,
+						"interaction:ready": 1,
+						"library:scalar-request": 6,
+						"library:scalar-commit": 4
+					},
+					"scalar_requests": [
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "refreshing"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "refreshing",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "refreshing"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "refreshing",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "idle"
+						}
+					]
+				},
+				"afterCompletion100ms": {
+					"counts": {
+						"refresh-cause:session-failure": 13,
+						"app:request-refresh": 27,
+						"interaction:ready": 1,
+						"app:refresh-frame": 3,
+						"app:refresh-document": 3,
+						"library:scalar-request": 6,
+						"library:scalar-commit": 4,
+						"refresh-cause:library-state": 10,
+						"refresh-cause:connection": 3,
+						"library:catalogue-compose": 6,
+						"session:revision": 1,
+						"refresh-cause:session": 1
+					},
+					"scalar_requests": [
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "refreshing"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "refreshing",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "refreshing"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "refreshing",
+							"messageChanged": false,
+							"to": "idle"
+						},
+						{
+							"cacheFailureChanged": false,
+							"from": "idle",
+							"messageChanged": false,
+							"to": "idle"
+						}
+					]
+				}
+			}
+		}
+	]
+}
