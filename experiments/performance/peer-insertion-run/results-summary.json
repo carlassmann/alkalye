@@ -1,0 +1,163 @@
+{
+	"baselineCommit": "b48c2d8fc91162a15787c589ee103a4aeeb5e435",
+	"baselineCrdtSha256": "7b9fc32242f1955982531c38748364c3ae776c5660767710c932a7e8df343cda",
+	"candidateCrdtSha256": "9b205c30387eafe5536c3813a67fd495c00217d86570ba3e77f846bbc7bcf409",
+	"bun": "1.4.0",
+	"method": "Three paired fresh datasets and native server/driver processes; order base/candidate, candidate/base, base/candidate. Twenty public authenticated writers, three cohorts with sixty requests, 1,000 ms cohort spacing. No CPU profiler. One request outstanding per writer; finite cohort quotient is not sustained capacity. Latencies are correlated within each cohort. Server CPU brackets use one second samples and include lead/lag. No browser or FPS claim.",
+	"fixture": {
+		"characters": 131072,
+		"realNewlines": 2599,
+		"literalBackslashN": 0
+	},
+	"contracts": {
+		"typesPassed": true,
+		"testsPassed": 70,
+		"assertions": 1046
+	},
+	"rows": [
+		{
+			"trial": 0,
+			"arm": "base",
+			"medianMs": 276.1053955,
+			"p95Ms": 502.4539590000004,
+			"maxMs": 534.4697500000002,
+			"elapsedMs": 2535.7444589999996,
+			"allAccepted": true,
+			"sourceExact": true,
+			"projectionExact": true,
+			"serverResources": {
+				"leadMs": 421.96728515625,
+				"lagMs": 107.9619140625,
+				"windowMs": 3065.673583984375,
+				"userUs": 1955992,
+				"systemUs": 107363,
+				"maxRss": 760594432
+			},
+			"driverCpu": {
+				"user": 95244,
+				"system": 18066
+			},
+			"driverRss": 848642048
+		},
+		{
+			"trial": 0,
+			"arm": "candidate",
+			"medianMs": 38.9264169999999,
+			"p95Ms": 135.3375000000001,
+			"maxMs": 148.0735410000002,
+			"elapsedMs": 2051.643916,
+			"allAccepted": true,
+			"sourceExact": true,
+			"projectionExact": true,
+			"serverResources": {
+				"leadMs": 251.75634765625,
+				"lagMs": 703.34814453125,
+				"windowMs": 3006.748291015625,
+				"userUs": 675019,
+				"systemUs": 57412,
+				"maxRss": 662077440
+			},
+			"driverCpu": {
+				"user": 106212,
+				"system": 15585
+			},
+			"driverRss": 971718656
+		},
+		{
+			"trial": 1,
+			"arm": "base",
+			"medianMs": 276.46399999999994,
+			"p95Ms": 495.8337080000001,
+			"maxMs": 544.4373749999995,
+			"elapsedMs": 2547.2203750000003,
+			"allAccepted": true,
+			"sourceExact": true,
+			"projectionExact": true,
+			"serverResources": {
+				"leadMs": 184.8857421875,
+				"lagMs": 274.933349609375,
+				"windowMs": 3007.03955078125,
+				"userUs": 1970242,
+				"systemUs": 107772,
+				"maxRss": 773554176
+			},
+			"driverCpu": {
+				"user": 92758,
+				"system": 15769
+			},
+			"driverRss": 869171200
+		},
+		{
+			"trial": 1,
+			"arm": "candidate",
+			"medianMs": 32.28066650000005,
+			"p95Ms": 122.68574999999964,
+			"maxMs": 126.38037499999973,
+			"elapsedMs": 2044.269042,
+			"allAccepted": true,
+			"sourceExact": true,
+			"projectionExact": true,
+			"serverResources": {
+				"leadMs": 143.916015625,
+				"lagMs": 821.465576171875,
+				"windowMs": 3009.650634765625,
+				"userUs": 628032,
+				"systemUs": 52801,
+				"maxRss": 706265088
+			},
+			"driverCpu": {
+				"user": 111049,
+				"system": 17864
+			},
+			"driverRss": 855490560
+		},
+		{
+			"trial": 2,
+			"arm": "base",
+			"medianMs": 262.71568749999983,
+			"p95Ms": 474.8269170000003,
+			"maxMs": 526.4787500000002,
+			"elapsedMs": 2528.9832909999996,
+			"allAccepted": true,
+			"sourceExact": true,
+			"projectionExact": true,
+			"serverResources": {
+				"leadMs": 156.605224609375,
+				"lagMs": 320.55078125,
+				"windowMs": 3006.139404296875,
+				"userUs": 1927794,
+				"systemUs": 111333,
+				"maxRss": 755286016
+			},
+			"driverCpu": {
+				"user": 88929,
+				"system": 17000
+			},
+			"driverRss": 802701312
+		},
+		{
+			"trial": 2,
+			"arm": "candidate",
+			"medianMs": 38.446312500000204,
+			"p95Ms": 124.40470899999991,
+			"maxMs": 127.96612499999992,
+			"elapsedMs": 2052.596083,
+			"allAccepted": true,
+			"sourceExact": true,
+			"projectionExact": true,
+			"serverResources": {
+				"leadMs": 186.229736328125,
+				"lagMs": 778.587646484375,
+				"windowMs": 3017.41357421875,
+				"userUs": 662881,
+				"systemUs": 57237,
+				"maxRss": 736493568
+			},
+			"driverCpu": {
+				"user": 100702,
+				"system": 15587
+			},
+			"driverRss": 881197056
+		}
+	]
+}

@@ -1,0 +1,571 @@
+{
+	"projectionExact": true,
+	"method": "Twenty authenticated HTTP writers in one driver process; separate native server process. Actions prepared before timing. No browser rendering or persisted client-session claim.",
+	"writers": 20,
+	"rounds": 3,
+	"intervalMs": 1000,
+	"fixtureCharacters": 131072,
+	"initialPosition": 1,
+	"acceptedCursor": 61,
+	"elapsedMs": 2052.596083,
+	"throughput": 29.231274724204958,
+	"allAccepted": true,
+	"exactMarkers": true,
+	"contiguous": true,
+	"finalSnapshotPosition": 61,
+	"results": [
+		{
+			"writer": 0,
+			"round": 0,
+			"dispatchLatenessMs": 0.753041999999823,
+			"requestMs": 5.447791000000052,
+			"position": 2,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 0,
+			"round": 1,
+			"dispatchLatenessMs": 3.495042000000012,
+			"requestMs": 16.91187499999978,
+			"position": 22,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 0,
+			"round": 2,
+			"dispatchLatenessMs": 4.968374999999469,
+			"requestMs": 14.712083000000348,
+			"position": 42,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 1,
+			"round": 0,
+			"dispatchLatenessMs": 1.04300000000012,
+			"requestMs": 8.745832999999948,
+			"position": 3,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 1,
+			"round": 1,
+			"dispatchLatenessMs": 6.222667000000001,
+			"requestMs": 39.01758299999983,
+			"position": 35,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 1,
+			"round": 2,
+			"dispatchLatenessMs": 6.806374999999207,
+			"requestMs": 27.50695799999994,
+			"position": 49,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 2,
+			"round": 0,
+			"dispatchLatenessMs": 1.138082999999824,
+			"requestMs": 38.34400000000005,
+			"position": 4,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 2,
+			"round": 1,
+			"dispatchLatenessMs": 4.53899999999976,
+			"requestMs": 27.400583000000097,
+			"position": 27,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 2,
+			"round": 2,
+			"dispatchLatenessMs": 7.46508299999914,
+			"requestMs": 38.54862500000036,
+			"position": 56,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 3,
+			"round": 0,
+			"dispatchLatenessMs": 1.1950419999998303,
+			"requestMs": 38.862125000000106,
+			"position": 5,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 3,
+			"round": 1,
+			"dispatchLatenessMs": 4.84866699999975,
+			"requestMs": 25.17341600000009,
+			"position": 26,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 3,
+			"round": 2,
+			"dispatchLatenessMs": 6.147749999999178,
+			"requestMs": 18.56525000000056,
+			"position": 44,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 4,
+			"round": 0,
+			"dispatchLatenessMs": 1.2435829999999441,
+			"requestMs": 40.48112499999979,
+			"position": 6,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 4,
+			"round": 1,
+			"dispatchLatenessMs": 6.331166999999823,
+			"requestMs": 40.72112500000003,
+			"position": 36,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 4,
+			"round": 2,
+			"dispatchLatenessMs": 6.897749999999178,
+			"requestMs": 29.177333000000544,
+			"position": 50,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 5,
+			"round": 0,
+			"dispatchLatenessMs": 1.2839579999999842,
+			"requestMs": 64.12283399999978,
+			"position": 7,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 5,
+			"round": 1,
+			"dispatchLatenessMs": 5.06145800000013,
+			"requestMs": 20.200166999999965,
+			"position": 24,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 5,
+			"round": 2,
+			"dispatchLatenessMs": 5.903707999999824,
+			"requestMs": 16.348291999999674,
+			"position": 43,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 6,
+			"round": 0,
+			"dispatchLatenessMs": 1.3286250000001019,
+			"requestMs": 65.59237499999972,
+			"position": 8,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 6,
+			"round": 1,
+			"dispatchLatenessMs": 6.4585000000001855,
+			"requestMs": 42.19312499999978,
+			"position": 37,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 6,
+			"round": 2,
+			"dispatchLatenessMs": 6.989707999999155,
+			"requestMs": 30.92383400000017,
+			"position": 51,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 7,
+			"round": 0,
+			"dispatchLatenessMs": 1.3685829999999441,
+			"requestMs": 66.97933400000011,
+			"position": 9,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 7,
+			"round": 1,
+			"dispatchLatenessMs": 5.25933299999997,
+			"requestMs": 17.613334000000123,
+			"position": 23,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 7,
+			"round": 2,
+			"dispatchLatenessMs": 7.281707999999526,
+			"requestMs": 35.46808400000009,
+			"position": 54,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 8,
+			"round": 0,
+			"dispatchLatenessMs": 1.4202919999997903,
+			"requestMs": 68.14579100000037,
+			"position": 10,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 8,
+			"round": 1,
+			"dispatchLatenessMs": 5.376499999999851,
+			"requestMs": 22.459749999999985,
+			"position": 25,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 8,
+			"round": 2,
+			"dispatchLatenessMs": 7.380749999999352,
+			"requestMs": 37.16474999999991,
+			"position": 55,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 9,
+			"round": 0,
+			"dispatchLatenessMs": 1.4580829999999878,
+			"requestMs": 69.39199999999983,
+			"position": 11,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 9,
+			"round": 1,
+			"dispatchLatenessMs": 6.575207999999748,
+			"requestMs": 43.51454200000035,
+			"position": 38,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 9,
+			"round": 2,
+			"dispatchLatenessMs": 7.074166999999761,
+			"requestMs": 32.527333,
+			"position": 52,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 10,
+			"round": 0,
+			"dispatchLatenessMs": 1.4957500000000437,
+			"requestMs": 70.78287499999988,
+			"position": 12,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 10,
+			"round": 1,
+			"dispatchLatenessMs": 5.474707999999737,
+			"requestMs": 28.208875000000262,
+			"position": 28,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 10,
+			"round": 2,
+			"dispatchLatenessMs": 6.353457999999591,
+			"requestMs": 20.650292000000263,
+			"position": 45,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 11,
+			"round": 0,
+			"dispatchLatenessMs": 1.6574580000001333,
+			"requestMs": 93.530667,
+			"position": 13,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 11,
+			"round": 1,
+			"dispatchLatenessMs": 5.587417000000187,
+			"requestMs": 29.78320799999983,
+			"position": 29,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 11,
+			"round": 2,
+			"dispatchLatenessMs": 6.478416999999354,
+			"requestMs": 22.330832999999984,
+			"position": 46,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 12,
+			"round": 0,
+			"dispatchLatenessMs": 1.699916999999914,
+			"requestMs": 118.56058299999995,
+			"position": 14,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 12,
+			"round": 1,
+			"dispatchLatenessMs": 5.677624999999807,
+			"requestMs": 31.29129200000034,
+			"position": 30,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 12,
+			"round": 2,
+			"dispatchLatenessMs": 7.5364169999993464,
+			"requestMs": 39.621000000000095,
+			"position": 57,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 13,
+			"round": 0,
+			"dispatchLatenessMs": 1.7391670000001795,
+			"requestMs": 120.24062499999991,
+			"position": 15,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 13,
+			"round": 1,
+			"dispatchLatenessMs": 6.7912499999997635,
+			"requestMs": 48.007542000000285,
+			"position": 39,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 13,
+			"round": 2,
+			"dispatchLatenessMs": 7.775916999999936,
+			"requestMs": 43.619832999999744,
+			"position": 60,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 14,
+			"round": 0,
+			"dispatchLatenessMs": 1.7840830000000096,
+			"requestMs": 121.71729199999982,
+			"position": 16,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 14,
+			"round": 1,
+			"dispatchLatenessMs": 5.783625000000029,
+			"requestMs": 32.55833299999995,
+			"position": 31,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 14,
+			"round": 2,
+			"dispatchLatenessMs": 6.5844999999999345,
+			"requestMs": 23.84662499999922,
+			"position": 47,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 15,
+			"round": 0,
+			"dispatchLatenessMs": 1.8322920000000522,
+			"requestMs": 123.03629099999989,
+			"position": 17,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 15,
+			"round": 1,
+			"dispatchLatenessMs": 7.170916999999918,
+			"requestMs": 49.791999999999916,
+			"position": 40,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 15,
+			"round": 2,
+			"dispatchLatenessMs": 7.859499999999571,
+			"requestMs": 44.72437499999978,
+			"position": 61,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 16,
+			"round": 0,
+			"dispatchLatenessMs": 1.878708000000188,
+			"requestMs": 124.40470899999991,
+			"position": 18,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 16,
+			"round": 1,
+			"dispatchLatenessMs": 5.895750000000135,
+			"requestMs": 34.02941699999974,
+			"position": 32,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 16,
+			"round": 2,
+			"dispatchLatenessMs": 7.62133299999914,
+			"requestMs": 40.9384170000003,
+			"position": 58,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 17,
+			"round": 0,
+			"dispatchLatenessMs": 1.915124999999989,
+			"requestMs": 125.6339579999999,
+			"position": 19,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 17,
+			"round": 1,
+			"dispatchLatenessMs": 6.005874999999833,
+			"requestMs": 35.73920799999996,
+			"position": 33,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 17,
+			"round": 2,
+			"dispatchLatenessMs": 7.69891699999971,
+			"requestMs": 42.434166000000005,
+			"position": 59,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 18,
+			"round": 0,
+			"dispatchLatenessMs": 1.947208000000046,
+			"requestMs": 126.7685419999998,
+			"position": 20,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 18,
+			"round": 1,
+			"dispatchLatenessMs": 6.1045829999998205,
+			"requestMs": 37.458250000000135,
+			"position": 34,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 18,
+			"round": 2,
+			"dispatchLatenessMs": 6.696499999999105,
+			"requestMs": 25.83729200000016,
+			"position": 48,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 19,
+			"round": 0,
+			"dispatchLatenessMs": 1.9845420000001468,
+			"requestMs": 127.96612499999992,
+			"position": 21,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 19,
+			"round": 1,
+			"dispatchLatenessMs": 7.411458000000039,
+			"requestMs": 51.01795899999979,
+			"position": 41,
+			"accepted": true,
+			"errors": []
+		},
+		{
+			"writer": 19,
+			"round": 2,
+			"dispatchLatenessMs": 7.191749999999956,
+			"requestMs": 33.85499999999956,
+			"position": 53,
+			"accepted": true,
+			"errors": []
+		}
+	],
+	"clientCpu": {
+		"user": 100702,
+		"system": 15587
+	},
+	"clientRss": 881197056,
+	"serverResources": {
+		"leadMs": 186.229736328125,
+		"lagMs": 778.587646484375,
+		"windowMs": 3017.41357421875,
+		"userUs": 662881,
+		"systemUs": 57237,
+		"maxRss": 736493568
+	}
+}

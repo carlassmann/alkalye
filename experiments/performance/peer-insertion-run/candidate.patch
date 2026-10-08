@@ -1,0 +1,83 @@
+diff --git a/base/src/shared/crdt.ts b/candidate/src/shared/crdt.ts
+index d3c2ba7..d40ad51 100644
+--- a/base/src/shared/crdt.ts
++++ b/candidate/src/shared/crdt.ts
+@@ -155,7 +155,8 @@ export class Replica {
+ 		let edit =
+ 			this.preparedEdit ??
+ 			this.prepareTerminalCancellation(input) ??
+-			this.prepareTerminalPeerEdit(input)
++			this.prepareTerminalPeerEdit(input) ??
++			this.preparePeerInsertionRun(input)
+ 		let commit = this.prepare(input)
+ 		return () => {
+ 			this.preparedEdit = undefined
+@@ -340,6 +341,68 @@ export class Replica {
+ 			],
+ 		}
+ 	}
++	private preparePeerInsertionRun(input: Operation[]): PreparedTextEdit | undefined {
++		let operation = input[0]
++		if (
++			input.length !== 1 || !operation || operation.kind !== "text" ||
++			typeof operation.id !== "string" || !Array.isArray(operation.insert) || !Array.isArray(operation.remove) ||
++			operation.field || operation.remove.length || operation.insert.length < 2 ||
++			this.operations.has(operation.id) || this.textOwners.has(operation.id) ||
++			this.legacyTextTargets.has(operation.target) ||
++			this.visibility.get(operation.target)?.active(operation.id) === false
++		) return undefined
++		let target = operation.target
++		let atoms = this.sourceCache.get(target)
++		let raw = this.textCache.get(target)
++		let content = this.strings.get(target)
++		if (!atoms || !raw || content === undefined || sourceViews.get(atoms) !== raw) return undefined
++		let first = operation.insert[0]
++		if (!first) return undefined
++		let anchor = first.after
++		for (let atom of operation.insert) {
++			if (
++				!atom || typeof atom.id !== "string" || typeof atom.value !== "string" ||
++				atom.after !== anchor || this.atomIndex.has(atom.id) ||
++				this.children.get(target)?.has(atom.id) ||
++				this.visibility.get(target)?.hidden(atom.id) ||
++				atom.order !== undefined || atom.observed !== undefined ||
++				atom.ending !== undefined || atom.migration !== undefined ||
++				atom.deleted !== undefined || atom.emptyHeader !== undefined || atom.body !== undefined ||
++				!(
++					(atom.value.length === 1 && (atom.value.charCodeAt(0) < 0xd800 || atom.value.charCodeAt(0) > 0xdfff)) ||
++					(atom.value.length === 2 && atom.value.charCodeAt(0) >= 0xd800 && atom.value.charCodeAt(0) <= 0xdbff && atom.value.charCodeAt(1) >= 0xdc00 && atom.value.charCodeAt(1) <= 0xdfff)
++				)
++			) return undefined
++			anchor = atom.id
++		}
++		let anchorPosition = raw.length - 1
++		while (anchorPosition >= 0 && raw[anchorPosition]?.id !== first.after) anchorPosition--
++		if (anchorPosition < 0) return undefined
++		let siblings = this.children.get(target)?.get(first.after) ?? []
++		let lower = siblings.find(sibling => sibling.id < first.id)
++		let boundary = !siblings.length || siblings[0] === lower ? first.after : lower?.id
++		if (!boundary) return undefined
++		let rawStart = raw.length - 1
++		while (rawStart >= 0 && raw[rawStart]?.id !== boundary) rawStart--
++		if (rawStart < anchorPosition) return undefined
++		if (boundary === first.after) rawStart++
++		let start = rawStart - (raw.length - atoms.length)
++		let splice = { after: atoms[start - 1]?.id ?? "", start, remove: 0, inserted: operation.insert.map(atom => atom.id) }
++		let rawSplices = rawEditSplices(atoms, raw, [splice])
++		if (!rawSplices) return undefined
++		let index = sourceOffsets.get(atoms)
++		let offset = atoms.length === content.length ? start : index?.offsetAtCodePoint(start)
++		if (offset === undefined) return undefined
++		let header = sourceHeader(content)
++		if (header && offset <= header[0].length) return undefined
++		let inserted = operation.insert.map(atom => atom.value).join("")
++		if (content.includes("\uFEFF") || inserted.includes("\uFEFF")) return undefined
++		let next = content.slice(0, offset) + inserted + content.slice(offset)
++		if (touchesSourceFence(content, offset, offset) || touchesSourceFence(next, offset, offset + inserted.length)) return undefined
++		if (sourceHeader(next)?.[0].length !== header?.[0].length) return undefined
++		return { id: operation.id, target, generation: this.generation, signature: textEditSignature(operation), content: next, atoms, raw, splices: [splice], rawSplices }
++	}
++
+ 	private cachePreparedText(
+ 		input: Operation[],
+ 		edit: PreparedTextEdit | undefined,

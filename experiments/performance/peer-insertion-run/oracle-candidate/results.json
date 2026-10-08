@@ -1,0 +1,7 @@
+{
+	"observations": [],
+	"failure": {
+		"phase": "commit-load",
+		"errors": ["Die"]
+	}
+}
