@@ -210,10 +210,11 @@
 			Mid-document Undo in the same 1MiB rich fixture remains slow: six trials
 			contain a 203–233ms task. The key handler takes about 0.5ms; the long task
 			starts about 150ms later in the scheduled document refresh. Layout takes
-			about 0.4ms within that task. These traces locate the refresh boundary,
-			but do not isolate CRDT reconstruction, editor reconciliation or
-			projection. A CPU profile is needed before choosing a fix. Terminal Undo
-			improvements do not cover this case.
+			about 0.4ms within that task. A separate sampled run passed exact source,
+			caret and server-acceptance checks: its 208ms refresh included 117ms of
+			self time rebuilding visible CRDT atoms and 15ms resolving editor cursor
+			anchors. These are measured bottlenecks, not a timing comparison with the
+			unsampled trials. Terminal Undo improvements do not cover this case.
 		</p>
 		<h2>Earlier journey comparison with main</h2>
 		<p>
