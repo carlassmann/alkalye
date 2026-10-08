@@ -272,7 +272,7 @@ export class Replica {
 		)
 			return undefined
 		let header = sourceHeader(content)
-		if (raw !== atoms && (!header || content.length <= header[0].length))
+		if (raw !== atoms && header && content.length <= header[0].length)
 			return undefined
 		let next: string
 		if (inserted) {

@@ -267,10 +267,40 @@
 			visibility traversal. Snapshot capture accounted for 1.29 seconds. These
 			costs overlap and cannot be added. The longest 438ms input task included
 			replacement preparation and source reading; a separate 257ms task included
-			snapshot capture and garbage collection. Two submitEdit read sites remain
-			unresolved. This diagnostic identifies work, not a measured speedup.
-			Evidence:
+			snapshot capture and garbage collection. The sampled trace cannot
+			distinguish the two submitEdit read sites. This diagnostic identifies
+			work, not a measured speedup. Evidence:
 			<code>experiments/worker-session/sustained-worker-profile</code>.
+		</p>
+		<p>
+			A six-keystroke diagnostic with the shipped source cache isolated the
+			remaining rejection. Source reads before a peer prefix took 0.002–0.006ms.
+			After inserting text before frontmatter, the successful edit result read
+			took 160–175ms because a projected-source guard rejected caching when the
+			document had no leading header. Exact tail identity and warm pre-edit
+			caches were preserved. A suspected legacy-format cause was refuted.
+			Eligibility is unchanged in these diagnostic runs; they passed accepted
+			snapshot and offline reopen checks.
+		</p>
+		<p>
+			Allowing validated body-only projected tail edits to retain their source
+			cache removed that reconstruction. Three fresh matched runs per arm
+			reduced peak queued edits from 37–39 to 2–4 and post-input drain from
+			8.1–8.5 seconds to 12–23ms. All 432 trusted keystrokes, four peer edits
+			per arm, exact accepted snapshots and offline reopen checks passed.
+			Fourteen public contracts compare Unicode, frontmatter, concurrent edits,
+			cancellation and legacy documents against cold reconstruction. Existing
+			validation, fence, identity and legacy checks remain.
+		</p>
+		<p>
+			The tradeoff: input-task p95 rose from 1.47–1.48ms to 2.49–2.54ms; maximum
+			main-thread tasks remained below 4.02ms. Main heap observations fell from
+			150–164MB to 71–72MB. Combined worker tasks still reached 348–388ms; their
+			ownership is not distinguished in these comparison traces. This finite
+			1MiB journey does not establish sustained capacity, physical 120Hz
+			presentation or full app cutover. The cache fix ships; the worker editor
+			remains isolated. Evidence:
+			<code>experiments/worker-session/projected-terminal-cache</code>.
 		</p>
 		<p>
 			Worker undo recovery now passes 13 fault assertions and the original 11
