@@ -1,0 +1,46 @@
+import { join } from "node:path"
+import { pathToFileURL } from "node:url"
+
+let [mode, configurationPath] = Bun.argv.slice(2)
+if (!configurationPath || !["seed-empty", "read"].includes(mode)) throw new Error("Usage: bun proof.js seed-empty|read PRIVATE_CONFIG")
+let configuration = await Bun.file(configurationPath).json()
+let credentials = await Bun.file(configuration.authFile).json()
+let source = await Bun.file(configuration.sourceFile).text()
+let expectedSha256 = new Bun.CryptoHasher("sha256").update(source).digest("hex")
+let { startWorker } = await import(pathToFileURL(join(configuration.checkout, "node_modules/jazz-tools/dist/worker/index.js")).href)
+let { UserAccount, Document } = await import(pathToFileURL(join(configuration.checkout, "src/schema/index.ts")).href)
+let context = await startWorker({
+ accountID: credentials.accountID,
+ accountSecret: credentials.accountSecret,
+ AccountSchema: UserAccount,
+ syncServer: configuration.syncServer,
+ skipInboxLoad: true,
+ asActiveAccount: false,
+})
+try {
+ await context.waitForConnection()
+ let document = await Document.load(configuration.documentId, { loadAs: context.worker, resolve: { content: true } })
+ if (!document.$isLoaded) throw new Error("Independent server document unavailable")
+ if (mode === "seed-empty") {
+  if (document.content.toString() !== "") throw new Error("Seed refused: document is not verified empty; no mutation performed")
+  document.content.applyDiff(source)
+  await context.worker.$jazz.waitForAllCoValuesSync()
+ }
+ let receipt = await new Promise((resolve, reject) => {
+  let release = () => undefined
+  let deadline = setTimeout(() => {
+   release()
+   reject(new Error("Independent server source did not match before readiness deadline"))
+  }, configuration.deadlineMs ?? 15000)
+  release = document.$jazz.subscribe({resolve:{content:true}}, (value, unsubscribe) => {
+   if (!value.$isLoaded) return
+   let content = value.content.toString()
+   let sha256 = new Bun.CryptoHasher("sha256").update(content).digest("hex")
+   if (sha256 !== expectedSha256) return
+   clearTimeout(deadline)
+   unsubscribe()
+   resolve({sha256,characters:content.length,sourceExact:content===source,mode})
+  })
+ })
+ console.log(JSON.stringify(receipt))
+} finally { await context.shutdownWorker() }

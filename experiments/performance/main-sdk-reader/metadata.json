@@ -1,0 +1,39 @@
+{
+	"mainCommit": "a749728a8f9a1cb984c980a5ea2daf984d60ae68",
+	"scope": "one existing Welcome document,1813UTF16units; independent actual SDK read",
+	"seedAttemptPerformed": false,
+	"explicitDocumentContentMutation": false,
+	"newAccountOrDocumentCreatedInSuccessfulReadArm": false,
+	"priorBootstrap": "public UI created signed-in account and automatic nonempty Welcome document; not server acceptance proof until corrected transport",
+	"transportCorrection": {
+		"embeddedBuildSyncServer": "ws://127.0.0.1:4220",
+		"initialWrongServerPort": 4226,
+		"successfulOwnServerPort": 4220,
+		"ownUiOrigin": "http://127.0.0.1:4490"
+	},
+	"readContext": "NEW Bun process, installedJazz startWorker, default in-memory storage and fresh MockSessionProvider, asActiveAccount:false, no browser profile/IndexedDB clones",
+	"sourceExact": true,
+	"sourceSha256": "22cead3570892ac612c124d5005d49f99d50dfa15db178bbf625adb5ccb2268c",
+	"sourceCharacters": 1813,
+	"privateDataNotArchived": [
+		"accountID/accountSecret",
+		"browser profile",
+		"private source/config/document route manifests",
+		"SQLite database"
+	],
+	"sourceHashes": {
+		"/tmp/alkalye-main-rebench/src/schema/index.ts": "e17d830158160dafbaa8f44a7b50abc8461232a94c79a9fa77e1547d999935e1",
+		"/tmp/alkalye-main-rebench/src/app/features/documents/lib/schema.ts": "3966771d74906617a36f0236c06ac2b38b60bbb4db1c0176f75b543d4be2d8da",
+		"/tmp/alkalye-main-rebench/node_modules/jazz-tools/dist/worker/index.js": "5fa29fd8d428653f494e2b89a8019dc7322d508351e498f2c494996f0d20d7a5",
+		"/tmp/alkalye-main-rebench/.vercel/output/static/_astro/main.BrO3cuZ6.js": "c5e00a47e5d2fe3deb14602cbef5ec08897fd469ce8da21748d3560b8855ba01"
+	},
+	"failureClassification": [
+		"account-create callback navigated to document before settings-sign-out readiness gate",
+		"generic /app did not establish expected document-sidebar new-button readiness",
+		"automatic Welcome document correctly failed verified-empty seed eligibility",
+		"initial isolated sync server4226 did not match build4220; prior UI was local-only"
+	],
+	"cleanup": "reader76342 naturally exited0 after shutdownWorker; browserclosed; own managed sync76283/main76303 stopped; phone untouched",
+	"performanceMeasured": false,
+	"fixture2KiBSeedValidated": false
+}

@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"baseUrl": "/tmp/alkalye-main-rebench",
+		"paths": {
+			"@/*": ["src/*"],
+			"#app/*": ["src/app/*"],
+			"#www/*": ["src/www/*"]
+		}
+	}
+}

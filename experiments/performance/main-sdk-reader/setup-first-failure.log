@@ -1,0 +1,5 @@
+main-sdk-setup-1791476963628 {
+  path: "/app/doc/co_zn98vR4cxdEwVysSk3Jeh9ifBkw",
+  size: "",
+}
+{"stage":"account","error":"Error: Browser condition failed: document.querySelector('[data-testid=\"settings-sign-out\"]')!==null"}
