@@ -10,7 +10,7 @@ The main oracle is a fresh in-memory SDK process for every acceptance check, loa
 
 Every cloned main browser profile must clear only its SDK numeric session keys on the app-free static route BEFORE app boot, retaining authentication. The existing runner does this. Each trial checks complete source, writable native editor and actual loaded asset digests before tracing. Record native-platform Undo (`Meta+z` on macOS), client saved-content completion, independent edited receipt, restored source and independent Undo receipt separately. Full enclosing tasks and three-second aftermath include microtasks; two-rAF opportunities are not display latency. No 120 Hz claim from the headless environment.
 
-The bundle adapter counts actual HTML/static dependency closure and finds the whiteboard entry through reachable static/dynamic imports. Whiteboard static dependencies exclude initial code. It reports raw, independently gzip-compressed and Brotli-compressed file sums with SHA-256 per included file. Unreachable old output files are excluded. This is emitted membership, not proof of browser transfer or cache behavior; actual loaded resources need their separate checks.
+The bundle adapter separately reports static bootstrap closure and optional same-origin ready-document ResourceTiming JavaScript/CSS/font paths; observing a resource does not prove every module executed or establish actual transferred/compressed bytes. It counts actual HTML/static dependency closure and finds the whiteboard entry through reachable static/dynamic imports. Whiteboard static dependencies exclude initial code. It reports raw, independently gzip-compressed and Brotli-compressed file sums with SHA-256 per included file. Unreachable old output files are excluded. Additional whiteboard bytes subtract resources already observed for the ready document; bootstrap-relative lazy sizes remain separate. CSS/fonts remain separate. PWA precache traffic is unmeasured and is not initial payload. This is emitted membership, not proof of browser transfer or cache behavior; actual loaded resources need their separate checks.
 
 Promote copies of these archives outside the repository for types/runtime checks; preserve original checkout read-only. Private configuration supplies credentials, known document IDs, profile paths, source files, frozen asset roots and oracle commands. None belong in this archive. Use the existing standalone `work` config pattern with isolated DBs and an exclusive timing lease.
 
@@ -21,7 +21,7 @@ bun seed-main.js private-main.json private-manifest.json
 bun main-oracle.js private-main.json < private-seed-request.json
 BENCHMARK_CELLS=small-middle,rich-start,rich-middle,rich-end bun runner.ts private-manifest.json
 python3 summarize.py PRIVATE_OUTPUT
-bun bundles.ts MAIN_STATIC CURRENT_DIST PRIVATE_BUNDLE_RESULT.json
+bun bundles.ts MAIN_STATIC CURRENT_DIST PRIVATE_BUNDLE_RESULT.json PRIVATE_READY_RESOURCE_CAPTURE.json
 ```
 
 These commands are preparation, not a claim they ran. Public SDK creation/readback was separately proven in `main-sdk-created` (`ea60199`). Backend history advances through accepted edit/Undo pairs unless the managed reset layer explicitly restores a snapshot; cloned profiles alone do not establish identical histories.

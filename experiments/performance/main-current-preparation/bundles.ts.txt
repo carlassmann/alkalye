@@ -1,5 +1,6 @@
 import { resolve, dirname, relative } from "node:path"
 import { brotliCompressSync, constants } from "node:zlib"
+import * as Schema from "effect/Schema"
 
 interface BundleSize {
 	bytes: number
@@ -9,7 +10,19 @@ interface BundleSize {
 	files: string[]
 }
 
-let [originalDirectory, rewriteDirectory, output] = Bun.argv.slice(2)
+let Resource = Schema.Struct({
+	path: Schema.String,
+	initiatorType: Schema.String,
+})
+let Captures = Schema.Struct({
+	original: Schema.Array(Resource),
+	rewrite: Schema.Array(Resource),
+})
+let [originalDirectory, rewriteDirectory, output, capturePath] =
+	Bun.argv.slice(2)
+let captures = capturePath
+	? Schema.decodeUnknownSync(Captures)(await Bun.file(capturePath).json())
+	: undefined
 if (!originalDirectory || !rewriteDirectory || !output)
 	throw new Error(
 		"Usage: bun experiments/performance/bundles.ts MAIN_ASSETS REWRITE_ASSETS OUTPUT.json",
@@ -17,13 +30,19 @@ if (!originalDirectory || !rewriteDirectory || !output)
 
 let result = {
 	method:
-		"Production files on disk. Static imports and HTML module preloads define initial JavaScript; dynamic imports are excluded. Gzip each file independently with Bun.gzipSync at level 9, then sum. Exclude benchmark probes, source maps, HTML, fonts, images, documents and network framing. Whiteboard entry must be reachable through emitted static/dynamic app imports; its static dependency closure excludes initial JavaScript. Brotli each file independently at quality 11. Each included file records SHA-256. Unreachable retained files are excluded. Sizes describe emitted code, not browser network traces or service-worker cache traffic.",
+		"Production files on disk. Static imports and HTML module preloads define initial JavaScript; dynamic imports are excluded. Gzip each file independently with Bun.gzipSync at level 9, then sum. Exclude benchmark probes, source maps, HTML, fonts, images, documents and network framing. Whiteboard entry must be reachable through emitted static/dynamic app imports; its static dependency closure excludes initial JavaScript. Brotli each file independently at quality 11. Each included file records SHA-256. Unreachable retained files are excluded. Optional ready-document ResourceTiming paths are sized separately; resource observation is not proof of every module executing or browser transferred/compressed bytes. Lazy incremental closure excludes already observed document resources. Fonts/CSS stay separate. PWA precache traffic is not initial payload and is not measured here.",
 	original: await measure(
 		originalDirectory,
 		"app/index.html",
 		"_astro/tldraw-canvas.",
+		captures?.original,
 	),
-	rewrite: await measure(rewriteDirectory, "app.html", "chunks/whiteboard-"),
+	rewrite: await measure(
+		rewriteDirectory,
+		"app.html",
+		"chunks/whiteboard-",
+		captures?.rewrite,
+	),
 }
 await Bun.write(output, JSON.stringify(result, null, "\t") + "\n")
 console.log(JSON.stringify(result, null, "\t"))
@@ -32,9 +51,9 @@ async function measure(
 	directory: string,
 	htmlPath: string,
 	whiteboardPrefix: string,
+	resources?: readonly (typeof Resource.Type)[],
 ) {
 	let root = resolve(directory)
-	let files = [...new Bun.Glob("**/*").scanSync({ cwd: root, onlyFiles: true })]
 	let html = await Bun.file(resolve(root, htmlPath)).text()
 	let scripts = new Set<string>()
 	let styles = new Set<string>()
@@ -47,18 +66,27 @@ async function measure(
 		if (path.endsWith(".css")) styles.add(path.slice(1))
 	}
 	let transpiler = new Bun.Transpiler({ loader: "js" })
-	for (let inline of html.matchAll(/<script\b[^>]*type="module"[^>]*>([\s\S]*?)<\/script>/g))
+	for (let inline of html.matchAll(
+		/<script\b[^>]*type="module"[^>]*>([\s\S]*?)<\/script>/g,
+	))
 		for (let dependency of transpiler.scanImports(inline[1] ?? ""))
-			if (dependency.kind === "import-statement" && dependency.path.endsWith(".js"))
+			if (
+				dependency.kind === "import-statement" &&
+				dependency.path.endsWith(".js")
+			)
 				scripts.add(localPath(root, htmlPath, dependency.path))
 	let initial = await imports(root, scripts)
 	let reachable = await imports(root, scripts, true)
 	let whiteboards = [...reachable].filter(
 		path =>
 			path.startsWith(whiteboardPrefix) &&
-			/^[A-Za-z0-9_-]+\.js$/.test(path.slice(whiteboardPrefix.length)),
+			(whiteboardPrefix.startsWith("chunks/")
+				? /^[A-Za-z0-9_]+\.js$/
+				: /^[A-Za-z0-9_-]+\.js$/
+			).test(path.slice(whiteboardPrefix.length)),
 	)
-	if (whiteboards.length !== 1) throw new Error("Expected one reachable whiteboard entry in " + root)
+	if (whiteboards.length !== 1)
+		throw new Error("Expected one reachable whiteboard entry in " + root)
 	let whiteboard = whiteboards[0]
 	if (!whiteboard) throw new Error("Missing whiteboard entry")
 	let whiteboardFiles = await imports(root, [whiteboard])
@@ -67,27 +95,62 @@ async function measure(
 	let whiteboardStyles = new Set<string>()
 	for (let path of reachable) {
 		let source = await Bun.file(resolve(root, path)).text()
-		for (let reference of source.matchAll(/["']([^"']*tldraw(?:\.[^"']*)?\.css)["']/g)) {
+		for (let reference of source.matchAll(
+			/["']([^"']*tldraw(?:\.[^"']*)?\.css)["']/g,
+		)) {
 			let dependency = reference[1]
 			if (!dependency) continue
-			let css = localPath(root, path, dependency.startsWith("_astro/") ? "/" + dependency : dependency)
+			let css = localPath(
+				root,
+				path,
+				dependency.startsWith("_astro/") ? "/" + dependency : dependency,
+			)
 			if (!initialStyles.has(css)) whiteboardStyles.add(css)
 		}
 	}
 
+	let documentScripts = new Set<string>()
+	let documentStyles = new Set<string>()
+	let documentFonts = new Set<string>()
+	for (let resource of resources ?? []) {
+		if (resource.path.startsWith("/__benchmark")) continue
+		let path = localPath(root, htmlPath, resource.path)
+		if (path.endsWith(".js")) documentScripts.add(path)
+		if (path.endsWith(".css")) documentStyles.add(path)
+		if (/\.(woff2?|ttf|otf)$/.test(path)) documentFonts.add(path)
+	}
+	let additionalWhiteboard = new Set(whiteboardFiles)
+	let additionalWhiteboardStyles = new Set(whiteboardStyles)
+	for (let path of documentScripts) additionalWhiteboard.delete(path)
+	for (let path of documentStyles) additionalWhiteboardStyles.delete(path)
+
 	return {
-		initialJavaScript: await size(root, initial),
-		initialCss: await size(root, initialStyles),
+		bootstrapStaticJavaScript: await size(root, initial),
+		bootstrapCss: await size(root, initialStyles),
+		documentOpeningResources: resources
+			? {
+					javascript: await size(root, documentScripts),
+					css: await size(root, documentStyles),
+					fonts: await size(root, documentFonts),
+					resources,
+				}
+			: null,
+		whiteboardAdditionalToDocument: resources
+			? {
+					javascript: await size(root, additionalWhiteboard),
+					css: await size(root, additionalWhiteboardStyles),
+				}
+			: null,
 		lazyWhiteboardJavaScript: await size(root, whiteboardFiles),
 		lazyWhiteboardCss: await size(root, whiteboardStyles),
-		documentWorkerJavaScript: await size(
-			root,
-			files.filter(path => path === "document-worker.js"),
-		),
 	}
 }
 
-async function imports(root: string, entries: Iterable<string>, includeDynamic = false) {
+async function imports(
+	root: string,
+	entries: Iterable<string>,
+	includeDynamic = false,
+) {
 	let included = new Set<string>()
 	let pending = [...entries]
 	let transpiler = new Bun.Transpiler({ loader: "js" })
@@ -98,7 +161,8 @@ async function imports(root: string, entries: Iterable<string>, includeDynamic =
 		let source = await Bun.file(resolve(root, path)).text()
 		for (let dependency of transpiler.scanImports(source))
 			if (
-				(dependency.kind === "import-statement" || (includeDynamic && dependency.kind === "dynamic-import")) &&
+				(dependency.kind === "import-statement" ||
+					(includeDynamic && dependency.kind === "dynamic-import")) &&
 				dependency.path.endsWith(".js")
 			)
 				pending.push(localPath(root, path, dependency.path))
@@ -149,7 +213,9 @@ async function size(
 		)
 		bytes += contents.byteLength
 		gzipBytes += Bun.gzipSync(contents, { level: 9 }).byteLength
-		brotliBytes += brotliCompressSync(contents, { params: { [constants.BROTLI_PARAM_QUALITY]: 11 } }).byteLength
+		brotliBytes += brotliCompressSync(contents, {
+			params: { [constants.BROTLI_PARAM_QUALITY]: 11 },
+		}).byteLength
 		sha256[path] = new Bun.CryptoHasher("sha256").update(contents).digest("hex")
 	}
 	return { bytes, gzipBytes, brotliBytes, files, sha256 }
