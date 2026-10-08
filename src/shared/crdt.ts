@@ -53,6 +53,14 @@ interface PreparedSplice {
 	remove: number
 	inserted: string[]
 }
+interface TerminalRedo {
+	undo: string
+	target: string
+	atom: Atom
+	atoms: Atom[]
+	raw: Atom[]
+	content: string
+}
 interface PreparedTextEdit {
 	terminalRemoval?: true
 	id: string
@@ -88,6 +96,7 @@ export class Replica {
 	private metadataCache = new Map<string, DocumentMetadata>()
 	private legacyTextTargets = new Set<string>()
 	private preparedEdit: PreparedTextEdit | undefined
+	private terminalRedo: TerminalRedo | undefined
 	constructor(
 		public actor: string,
 		public author = "Writer",
@@ -152,6 +161,7 @@ export class Replica {
 		replica.updated = yield* copyMapSteps(this.updated, cooperative)
 		replica.created = yield* copyMapSteps(this.created, cooperative)
 		replica.restored = yield* copyMapSteps(this.restored, cooperative)
+		replica.terminalRedo = this.terminalRedo
 		return replica
 	}
 	get generation() {
@@ -170,6 +180,7 @@ export class Replica {
 		let edit =
 			this.preparedEdit ??
 			this.prepareTerminalCancellation(input) ??
+			this.prepareTerminalRedo(input) ??
 			this.prepareTerminalPeerEdit(input) ??
 			this.preparePeerInsertionRun(input)
 		let commit = this.prepare(input)
@@ -177,6 +188,70 @@ export class Replica {
 			this.preparedEdit = undefined
 			commit()
 			this.cachePreparedText(input, edit)
+		}
+	}
+	private prepareTerminalRedo(
+		input: Operation[],
+	): PreparedTextEdit | undefined {
+		let operation = input[0]
+		let redo = this.terminalRedo
+		if (
+			!redo ||
+			input.length !== 1 ||
+			!operation ||
+			operation.kind !== "cancel" ||
+			typeof operation.id !== "string" ||
+			typeof operation.value !== "string" ||
+			this.operations.has(operation.id) ||
+			this.textOwners.has(operation.id) ||
+			this.visibility.get(redo.target)?.known(operation.id) ||
+			operation.target !== redo.target ||
+			operation.value !== redo.undo ||
+			this.legacyTextTargets.has(redo.target) ||
+			this.visibility.get(redo.target)?.active(operation.id) === false ||
+			!this.canCancel(redo.target, redo.undo) ||
+			this.sourceCache.get(redo.target) !== redo.atoms ||
+			this.textCache.get(redo.target) !== redo.raw ||
+			this.strings.get(redo.target) !== redo.content ||
+			this.atomIndex.get(redo.atom.id)?.atom !== redo.atom
+		)
+			return undefined
+		let content = redo.content + redo.atom.value
+		if (
+			touchesSourceFence(
+				redo.content,
+				redo.content.length,
+				redo.content.length,
+			) ||
+			touchesSourceFence(content, redo.content.length, content.length) ||
+			sourceHeader(redo.content)?.[0].length !==
+				sourceHeader(content)?.[0].length
+		)
+			return undefined
+		return {
+			id: operation.id,
+			target: redo.target,
+			generation: this.generation,
+			signature: textEditSignature(operation),
+			content,
+			atoms: redo.atoms,
+			raw: redo.raw,
+			splices: [
+				{
+					after: redo.atoms.at(-1)?.id ?? "",
+					start: redo.atoms.length,
+					remove: 0,
+					inserted: [redo.atom.id],
+				},
+			],
+			rawSplices: [
+				{
+					after: redo.raw.at(-1)?.id ?? "",
+					start: redo.raw.length,
+					remove: 0,
+					inserted: [redo.atom.id],
+				},
+			],
 		}
 	}
 	private prepareTerminalCancellation(
@@ -547,7 +622,7 @@ export class Replica {
 			Object.isFrozen(removed) &&
 			atoms.length === edit.atoms.length - 1 &&
 			atoms.at(-1) === edit.atoms.at(-2)
-		)
+		) {
 			terminalRemovals.set(
 				atoms,
 				new WeakMap([
@@ -560,6 +635,25 @@ export class Replica {
 					],
 				]),
 			)
+			if (
+				removed === edit.raw.at(-1) &&
+				removed.order === undefined &&
+				removed.ending === undefined &&
+				removed.observed === undefined &&
+				removed.migration === undefined &&
+				removed.deleted === undefined &&
+				removed.emptyHeader === undefined &&
+				removed.body === undefined
+			)
+				this.terminalRedo = {
+					undo: edit.id,
+					target: edit.target,
+					atom: removed,
+					atoms,
+					raw,
+					content: edit.content,
+				}
+		}
 	}
 
 	validate(input: Operation[]) {
@@ -597,6 +691,8 @@ export class Replica {
 			})
 		}
 		return () => {
+			if (operations.some(operation => !this.operations.has(operation.id)))
+				this.terminalRedo = undefined
 			for (let commit of commits) commit()
 			for (let operation of operations) {
 				this.clock = Math.max(this.clock, operation.clock)
@@ -1494,6 +1590,7 @@ export class Replica {
 		shareAtoms: boolean,
 		cooperative: boolean,
 	): Generator<void> {
+		this.terminalRedo = undefined
 		if (cooperative && this.stateGeneration !== 0)
 			throw new Error("Cooperative hydration requires a private fresh replica")
 		let work = 0

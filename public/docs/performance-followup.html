@@ -149,6 +149,17 @@
 			did not improve, so this is still not a 120fps result. Evidence:
 			<code>experiments/performance/terminal-anchor-position</code>.
 		</p>
+		<p>
+			The terminal Redo shortcut retains one inverse of a validated Undo.
+			Duplicate acknowledgements preserve it; new operations and restored state
+			invalidate it. Six matched 1MiB trials preserved accepted source, caret
+			and bounded editor viewport. The largest task in the full Redo window fell
+			from a median 198.0ms to 13.5ms. Remaining peaks were minor garbage
+			collection, still above the 8.33ms target. The initial entry remained
+			253,391 bytes. These results cover terminal Redo, not all editing or
+			physical 120Hz presentation. Evidence:
+			<code>experiments/performance/terminal-redo-certificate</code>.
+		</p>
 		<h2>Earlier journey comparison with main</h2>
 		<p>
 			Both production builds used their own local sync servers, signed accounts
