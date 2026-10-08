@@ -277,6 +277,17 @@
 			Cold text reconstruction still exceeds the frame budget. Samples:
 			<code>experiments/performance/undo-fork/caret-results.json</code>.
 		</p>
+		<p>
+			A private staged-warming experiment was rejected. In three matched
+			browser trials per version, the largest undo task fell from 188.4 to
+			25.4 ms, but two paint opportunities increased from 368.1 to 1,313.5 ms.
+			Sampled post-undo heap increased from 619 to 1,051 MB. Single-character
+			input stayed near 4.6 ms. All six exact-source and accepted-state checks
+			passed. Repeated full-map preparation delays the result despite shorter
+			tasks; the experiment does not establish instant interaction. Production
+			keeps the earlier cursor fix. Method and rejected patch:
+			<code>experiments/performance/cooperative-prepare/</code>.
+		</p>
 		<h2>Body edits remain incremental after metadata changes</h2>
 		<p>
 			Merged frontmatter can leave raw and canonical atom arrays with different
