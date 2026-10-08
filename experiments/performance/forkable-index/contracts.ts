@@ -16,7 +16,7 @@ type PublicReplica = Pick<
 	| "apply"
 > & { fork(actor: string): PublicReplica }
 
-function exercise(make: (actor: string) => PublicReplica) {
+function exercise(make: (actor: string) => PublicReplica, edits: number) {
 	let owner = make("owner")
 	let source = "---\ntitle: Unicode 🌻\n---\n" + "a😀b".repeat(1024)
 	owner.edit("document", source)
@@ -24,7 +24,7 @@ function exercise(make: (actor: string) => PublicReplica) {
 	let firstView = owner.visible("document")
 	let originalCheckpoint = peer.checkpoint()
 	let operations: Operation[] = []
-	for (let edit = 0; edit < 64; edit++) {
+	for (let edit = 0; edit < edits; edit++) {
 		let at = 32 + edit * 6
 		let points = Array.from(source)
 		points.splice(at, 0, "X")
@@ -76,6 +76,7 @@ function exercise(make: (actor: string) => PublicReplica) {
 export function verifyEquivalent(
 	left: (actor: string) => PublicReplica,
 	right: (actor: string) => PublicReplica,
+	edits = 64,
 ) {
-	expect(exercise(left)).toEqual(exercise(right))
+	expect(exercise(left, edits)).toEqual(exercise(right, edits))
 }

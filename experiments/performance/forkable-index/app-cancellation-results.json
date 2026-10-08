@@ -1,0 +1,2590 @@
+{
+	"status": "rejected; no production adoption",
+	"baselineCommit": "17d3a97",
+	"candidate": "same source plus six COW index substitutions from app-index.patch and empty-overlay-index.ts",
+	"backend": "native baseline17d3a97 for both clients; candidate server not measured",
+	"measurements": "n3 paired alternate-order undo on1MiB/512paragraphs; n1 paired controls128KiB/2048 and1MiB/2048; native trusted X append then Ctrl+z",
+	"assertions": [
+		"full literal source equals fixture before append and after undo",
+		"trusted keyboard input and undo",
+		"accepted snapshot has no pending/rejected entries",
+		"accepted snapshot position equals latest journal position",
+		"undo accepted cursor strictly exceeds edit accepted cursor",
+		"fresh identical copied browser profile and consistent SQLite seed per phase",
+		"service worker/cache reset; served app.js SHA256 equals frozen build"
+	],
+	"limitations": [
+		"two RAF opportunities after source restoration; not physical paint or120Hz proof",
+		"heap sampled at cache readiness; not peak and affected by GC",
+		"controls are one-character native edits, not2048-selection replacement",
+		"long-overlay growth not compacted; fork override Set copies can grow",
+		"native backend reused; shared-module server adoption needs separate verification"
+	],
+	"assetHashes": {
+		"baseline": "f4b242a3c4b15232f65dce8ca1dc05739f8ab2360a844b2effec106be9c46985",
+		"candidate": "58dc992af067cc86b4ec150578b60c4e2eeed54df9ef2e12801b905f87a4e235"
+	},
+	"moduleContracts": {
+		"tests": 129,
+		"assertions": 1225,
+		"failure": 0,
+		"strictTypes": "pass",
+		"opusModel": "claude-opus-5-5",
+		"review": "no correctness blockers; overlay growth and override-copy costs identified"
+	},
+	"samples": [
+		{
+			"phase": "baseline",
+			"trial": 0,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 210.80000001192093,
+			"undoAcceptedCheckpointMs": 1211,
+			"editAcceptedCheckpointMs": 2436.5,
+			"largestUndoTaskMs": 25.51,
+			"largestBeforePaintTaskMs": 25.51,
+			"layoutMs": 2.72,
+			"paintMs": 1.653,
+			"largestTaskCallback": {
+				"args": {
+					"data": {
+						"columnNumber": 476,
+						"frame": "A62847697B33D6CBCC55A07A89FEF418",
+						"functionName": "",
+						"isolate": "2849313244792646325",
+						"lineNumber": 1653,
+						"sampleTraceId": 7802383225407083,
+						"scriptId": "3",
+						"url": "http://localhost:58167/app.js"
+					}
+				},
+				"cat": "devtools.timeline",
+				"dur": 24550,
+				"name": "FunctionCall",
+				"ph": "X",
+				"pid": 53348,
+				"tdur": 23852,
+				"tid": 15611242,
+				"ts": 315718412020,
+				"tts": 3204596
+			},
+			"loadedScripts": [
+				{
+					"bytes": 2036,
+					"name": "http://localhost:58167/chunks/document-app-06pkehrg.js"
+				},
+				{
+					"bytes": 1330,
+					"name": "http://localhost:58167/chunks/document-app-58cqw1dx.js"
+				},
+				{
+					"bytes": 2798,
+					"name": "http://localhost:58167/chunks/document-app-m2qx4cqf.js"
+				},
+				{
+					"bytes": 7968,
+					"name": "http://localhost:58167/chunks/document-app-43g09p0a.js"
+				},
+				{
+					"bytes": 3894,
+					"name": "http://localhost:58167/chunks/document-app-r3eebhvw.js"
+				},
+				{
+					"bytes": 617,
+					"name": "http://localhost:58167/chunks/document-app-q00km86k.js"
+				},
+				{
+					"bytes": 252795,
+					"name": "http://localhost:58167/app.js"
+				},
+				{
+					"bytes": 16754,
+					"name": "http://localhost:58167/chunks/document-app-es06eeja.js"
+				},
+				{
+					"bytes": 119345,
+					"name": "http://localhost:58167/chunks/document-app-v6p1qvay.js"
+				},
+				{
+					"bytes": 14375,
+					"name": "http://localhost:58167/chunks/document-app-102pwqh5.js"
+				},
+				{
+					"bytes": 901,
+					"name": "http://localhost:58167/chunks/document-app-pk3bkrhx.js"
+				},
+				{
+					"bytes": 2725,
+					"name": "http://localhost:58167/chunks/document-app-1n8fnx10.js"
+				},
+				{
+					"bytes": 1656,
+					"name": "http://localhost:58167/chunks/document-app-g7pr3ty8.js"
+				},
+				{
+					"bytes": 765,
+					"name": "http://localhost:58167/chunks/document-app-1hr2amdq.js"
+				},
+				{
+					"bytes": 5735,
+					"name": "http://localhost:58167/chunks/document-app-3jdkyp4f.js"
+				},
+				{
+					"bytes": 7957,
+					"name": "http://localhost:58167/chunks/document-app-nmkmxrxg.js"
+				},
+				{
+					"bytes": 6070,
+					"name": "http://localhost:58167/chunks/document-app-xc53pmep.js"
+				},
+				{
+					"bytes": 211373,
+					"name": "http://localhost:58167/chunks/document-app-b3j6rkzj.js"
+				},
+				{
+					"bytes": 24137,
+					"name": "http://localhost:58167/chunks/document-app-44h4an5k.js"
+				},
+				{
+					"bytes": 10572,
+					"name": "http://localhost:58167/chunks/document-app-2br1y630.js"
+				},
+				{
+					"bytes": 11389,
+					"name": "http://localhost:58167/chunks/document-app-8b7kt562.js"
+				},
+				{
+					"bytes": 74239,
+					"name": "http://localhost:58167/chunks/document-app-akx6xkv7.js"
+				},
+				{
+					"bytes": 2075,
+					"name": "http://localhost:58167/chunks/document-app-vvdk6tcs.js"
+				},
+				{
+					"bytes": 713,
+					"name": "http://localhost:58167/chunks/document-app-fzyeh54r.js"
+				},
+				{
+					"bytes": 2729,
+					"name": "http://localhost:58167/chunks/document-app-acm1vyk8.js"
+				},
+				{
+					"bytes": 2037,
+					"name": "http://localhost:58167/chunks/document-app-w23t8p99.js"
+				},
+				{
+					"bytes": 27137,
+					"name": "http://localhost:58167/chunks/document-app-jb1jvatb.js"
+				},
+				{
+					"bytes": 41742,
+					"name": "http://localhost:58167/chunks/document-app-29ytm0gp.js"
+				},
+				{
+					"bytes": 14516,
+					"name": "http://localhost:58167/chunks/document-app-er26grye.js"
+				},
+				{
+					"bytes": 272,
+					"name": "http://localhost:58167/chunks/document-app-70vy0mv8.js"
+				},
+				{
+					"bytes": 1109,
+					"name": "http://localhost:58167/chunks/document-app-nqb2j1d5.js"
+				},
+				{
+					"bytes": 174723,
+					"name": "http://localhost:58167/chunks/document-app-x9k35fb4.js"
+				},
+				{
+					"bytes": 20324,
+					"name": "http://localhost:58167/chunks/document-worker-stats-xj2116pa.js"
+				},
+				{
+					"bytes": 0,
+					"name": "http://localhost:58167/document-worker.js"
+				}
+			],
+			"largestEditTaskMs": 9.705,
+			"largestInputEventDispatchMs": 4.159,
+			"editHeapBytes": 1064301493,
+			"undoHeapBytes": 1320384116,
+			"editPosition": 54,
+			"undoPosition": 56
+		},
+		{
+			"phase": "candidate",
+			"trial": 0,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 85.09999996423721,
+			"undoAcceptedCheckpointMs": 925.899999976158,
+			"editAcceptedCheckpointMs": 2512.199999988079,
+			"largestUndoTaskMs": 26.321,
+			"largestBeforePaintTaskMs": 26.321,
+			"layoutMs": 2.245,
+			"paintMs": 1.472,
+			"largestTaskCallback": {
+				"args": {
+					"data": {
+						"columnNumber": 476,
+						"frame": "EF6B1CE5C07C33F4436DDD6C85D67008",
+						"functionName": "",
+						"isolate": "6184045135699437245",
+						"lineNumber": 1653,
+						"sampleTraceId": 299518929758648,
+						"scriptId": "3",
+						"url": "http://localhost:58167/app.js"
+					}
+				},
+				"cat": "devtools.timeline",
+				"dur": 25460,
+				"name": "FunctionCall",
+				"ph": "X",
+				"pid": 53517,
+				"tdur": 25286,
+				"tid": 15612165,
+				"ts": 315725667438,
+				"tts": 2832163
+			},
+			"loadedScripts": [
+				{
+					"bytes": 2036,
+					"name": "http://localhost:58167/chunks/document-app-jyezybx6.js"
+				},
+				{
+					"bytes": 2798,
+					"name": "http://localhost:58167/chunks/document-app-m2qx4cqf.js"
+				},
+				{
+					"bytes": 119345,
+					"name": "http://localhost:58167/chunks/document-app-ene8prfc.js"
+				},
+				{
+					"bytes": 1330,
+					"name": "http://localhost:58167/chunks/document-app-mv4fwnrc.js"
+				},
+				{
+					"bytes": 252795,
+					"name": "http://localhost:58167/app.js"
+				},
+				{
+					"bytes": 16754,
+					"name": "http://localhost:58167/chunks/document-app-dd2q35bj.js"
+				},
+				{
+					"bytes": 617,
+					"name": "http://localhost:58167/chunks/document-app-4xprzseq.js"
+				},
+				{
+					"bytes": 7968,
+					"name": "http://localhost:58167/chunks/document-app-pgrjjm9d.js"
+				},
+				{
+					"bytes": 3894,
+					"name": "http://localhost:58167/chunks/document-app-1cj8xn63.js"
+				},
+				{
+					"bytes": 14375,
+					"name": "http://localhost:58167/chunks/document-app-vnwkd783.js"
+				},
+				{
+					"bytes": 901,
+					"name": "http://localhost:58167/chunks/document-app-2492txzq.js"
+				},
+				{
+					"bytes": 2725,
+					"name": "http://localhost:58167/chunks/document-app-s6ebq21x.js"
+				},
+				{
+					"bytes": 5735,
+					"name": "http://localhost:58167/chunks/document-app-7dvv3r7d.js"
+				},
+				{
+					"bytes": 1656,
+					"name": "http://localhost:58167/chunks/document-app-td1qshmr.js"
+				},
+				{
+					"bytes": 7957,
+					"name": "http://localhost:58167/chunks/document-app-34w64gpm.js"
+				},
+				{
+					"bytes": 6070,
+					"name": "http://localhost:58167/chunks/document-app-62jy9d4y.js"
+				},
+				{
+					"bytes": 765,
+					"name": "http://localhost:58167/chunks/document-app-s6xwpz2x.js"
+				},
+				{
+					"bytes": 211373,
+					"name": "http://localhost:58167/chunks/document-app-8dpt9c8q.js"
+				},
+				{
+					"bytes": 24137,
+					"name": "http://localhost:58167/chunks/document-app-ebda9rwn.js"
+				},
+				{
+					"bytes": 11389,
+					"name": "http://localhost:58167/chunks/document-app-pf9a02se.js"
+				},
+				{
+					"bytes": 10572,
+					"name": "http://localhost:58167/chunks/document-app-q80w28ak.js"
+				},
+				{
+					"bytes": 2729,
+					"name": "http://localhost:58167/chunks/document-app-pcx1a4e5.js"
+				},
+				{
+					"bytes": 75670,
+					"name": "http://localhost:58167/chunks/document-app-f1c6psvb.js"
+				},
+				{
+					"bytes": 2037,
+					"name": "http://localhost:58167/chunks/document-app-efr8tsz3.js"
+				},
+				{
+					"bytes": 2075,
+					"name": "http://localhost:58167/chunks/document-app-5mfkvqya.js"
+				},
+				{
+					"bytes": 27137,
+					"name": "http://localhost:58167/chunks/document-app-0fxwdp86.js"
+				},
+				{
+					"bytes": 14516,
+					"name": "http://localhost:58167/chunks/document-app-arzhgms9.js"
+				},
+				{
+					"bytes": 713,
+					"name": "http://localhost:58167/chunks/document-app-s15nn115.js"
+				},
+				{
+					"bytes": 272,
+					"name": "http://localhost:58167/chunks/document-app-c1vterjt.js"
+				},
+				{
+					"bytes": 41742,
+					"name": "http://localhost:58167/chunks/document-app-26k5tvss.js"
+				},
+				{
+					"bytes": 1109,
+					"name": "http://localhost:58167/chunks/document-app-4ptpq1fa.js"
+				},
+				{
+					"bytes": 181610,
+					"name": "http://localhost:58167/chunks/document-app-5y49dtc4.js"
+				},
+				{
+					"bytes": 20324,
+					"name": "http://localhost:58167/chunks/document-worker-stats-37wqfxja.js"
+				},
+				{
+					"bytes": 0,
+					"name": "http://localhost:58167/document-worker.js"
+				}
+			],
+			"largestEditTaskMs": 9.45,
+			"largestInputEventDispatchMs": 4.548,
+			"editHeapBytes": 922482999,
+			"undoHeapBytes": 1074950408,
+			"editPosition": 54,
+			"undoPosition": 56
+		},
+		{
+			"phase": "candidate",
+			"trial": 1,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 93.69999998807907,
+			"undoAcceptedCheckpointMs": 957.5,
+			"editAcceptedCheckpointMs": 2420.5,
+			"largestUndoTaskMs": 25.069,
+			"largestBeforePaintTaskMs": 25.069,
+			"layoutMs": 2.4,
+			"paintMs": 1.496,
+			"largestTaskCallback": {
+				"args": {
+					"data": {
+						"columnNumber": 476,
+						"frame": "C677F2D5C662F95F0DC341A176A584C8",
+						"functionName": "",
+						"isolate": "3849941135505468215",
+						"lineNumber": 1653,
+						"sampleTraceId": 2761599519430100,
+						"scriptId": "3",
+						"url": "http://localhost:58167/app.js"
+					}
+				},
+				"cat": "devtools.timeline",
+				"dur": 24229,
+				"name": "FunctionCall",
+				"ph": "X",
+				"pid": 53678,
+				"tdur": 24194,
+				"tid": 15613058,
+				"ts": 315732728656,
+				"tts": 2876953
+			},
+			"loadedScripts": [
+				{
+					"bytes": 2036,
+					"name": "http://localhost:58167/chunks/document-app-jyezybx6.js"
+				},
+				{
+					"bytes": 2798,
+					"name": "http://localhost:58167/chunks/document-app-m2qx4cqf.js"
+				},
+				{
+					"bytes": 1330,
+					"name": "http://localhost:58167/chunks/document-app-mv4fwnrc.js"
+				},
+				{
+					"bytes": 119345,
+					"name": "http://localhost:58167/chunks/document-app-ene8prfc.js"
+				},
+				{
+					"bytes": 252795,
+					"name": "http://localhost:58167/app.js"
+				},
+				{
+					"bytes": 16754,
+					"name": "http://localhost:58167/chunks/document-app-dd2q35bj.js"
+				},
+				{
+					"bytes": 7968,
+					"name": "http://localhost:58167/chunks/document-app-pgrjjm9d.js"
+				},
+				{
+					"bytes": 3894,
+					"name": "http://localhost:58167/chunks/document-app-1cj8xn63.js"
+				},
+				{
+					"bytes": 617,
+					"name": "http://localhost:58167/chunks/document-app-4xprzseq.js"
+				},
+				{
+					"bytes": 14375,
+					"name": "http://localhost:58167/chunks/document-app-vnwkd783.js"
+				},
+				{
+					"bytes": 901,
+					"name": "http://localhost:58167/chunks/document-app-2492txzq.js"
+				},
+				{
+					"bytes": 2725,
+					"name": "http://localhost:58167/chunks/document-app-s6ebq21x.js"
+				},
+				{
+					"bytes": 1656,
+					"name": "http://localhost:58167/chunks/document-app-td1qshmr.js"
+				},
+				{
+					"bytes": 5735,
+					"name": "http://localhost:58167/chunks/document-app-7dvv3r7d.js"
+				},
+				{
+					"bytes": 7957,
+					"name": "http://localhost:58167/chunks/document-app-34w64gpm.js"
+				},
+				{
+					"bytes": 6070,
+					"name": "http://localhost:58167/chunks/document-app-62jy9d4y.js"
+				},
+				{
+					"bytes": 765,
+					"name": "http://localhost:58167/chunks/document-app-s6xwpz2x.js"
+				},
+				{
+					"bytes": 24137,
+					"name": "http://localhost:58167/chunks/document-app-ebda9rwn.js"
+				},
+				{
+					"bytes": 211373,
+					"name": "http://localhost:58167/chunks/document-app-8dpt9c8q.js"
+				},
+				{
+					"bytes": 11389,
+					"name": "http://localhost:58167/chunks/document-app-pf9a02se.js"
+				},
+				{
+					"bytes": 10572,
+					"name": "http://localhost:58167/chunks/document-app-q80w28ak.js"
+				},
+				{
+					"bytes": 2729,
+					"name": "http://localhost:58167/chunks/document-app-pcx1a4e5.js"
+				},
+				{
+					"bytes": 2037,
+					"name": "http://localhost:58167/chunks/document-app-efr8tsz3.js"
+				},
+				{
+					"bytes": 75670,
+					"name": "http://localhost:58167/chunks/document-app-f1c6psvb.js"
+				},
+				{
+					"bytes": 2075,
+					"name": "http://localhost:58167/chunks/document-app-5mfkvqya.js"
+				},
+				{
+					"bytes": 713,
+					"name": "http://localhost:58167/chunks/document-app-s15nn115.js"
+				},
+				{
+					"bytes": 14516,
+					"name": "http://localhost:58167/chunks/document-app-arzhgms9.js"
+				},
+				{
+					"bytes": 272,
+					"name": "http://localhost:58167/chunks/document-app-c1vterjt.js"
+				},
+				{
+					"bytes": 27137,
+					"name": "http://localhost:58167/chunks/document-app-0fxwdp86.js"
+				},
+				{
+					"bytes": 41742,
+					"name": "http://localhost:58167/chunks/document-app-26k5tvss.js"
+				},
+				{
+					"bytes": 1109,
+					"name": "http://localhost:58167/chunks/document-app-4ptpq1fa.js"
+				},
+				{
+					"bytes": 181610,
+					"name": "http://localhost:58167/chunks/document-app-5y49dtc4.js"
+				},
+				{
+					"bytes": 20324,
+					"name": "http://localhost:58167/chunks/document-worker-stats-37wqfxja.js"
+				},
+				{
+					"bytes": 0,
+					"name": "http://localhost:58167/document-worker.js"
+				}
+			],
+			"largestEditTaskMs": 10.373,
+			"largestInputEventDispatchMs": 4.228,
+			"editHeapBytes": 944379655,
+			"undoHeapBytes": 1086404506,
+			"editPosition": 54,
+			"undoPosition": 56
+		},
+		{
+			"phase": "baseline",
+			"trial": 1,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 204.80000001192093,
+			"undoAcceptedCheckpointMs": 1180.699999988079,
+			"editAcceptedCheckpointMs": 2439.900000035763,
+			"largestUndoTaskMs": 24.881,
+			"largestBeforePaintTaskMs": 24.881,
+			"layoutMs": 2.391,
+			"paintMs": 1.403,
+			"largestTaskCallback": {
+				"args": {
+					"data": {
+						"columnNumber": 476,
+						"frame": "64AB820E0DAB466FA00D12FA01B7B750",
+						"functionName": "",
+						"isolate": "6656735501693761271",
+						"lineNumber": 1653,
+						"sampleTraceId": 4284576492183576,
+						"scriptId": "3",
+						"url": "http://localhost:58167/app.js"
+					}
+				},
+				"cat": "devtools.timeline",
+				"dur": 23689,
+				"name": "FunctionCall",
+				"ph": "X",
+				"pid": 53833,
+				"tdur": 23654,
+				"tid": 15613983,
+				"ts": 315740165347,
+				"tts": 3165957
+			},
+			"loadedScripts": [
+				{
+					"bytes": 2798,
+					"name": "http://localhost:58167/chunks/document-app-m2qx4cqf.js"
+				},
+				{
+					"bytes": 2036,
+					"name": "http://localhost:58167/chunks/document-app-06pkehrg.js"
+				},
+				{
+					"bytes": 252795,
+					"name": "http://localhost:58167/app.js"
+				},
+				{
+					"bytes": 119345,
+					"name": "http://localhost:58167/chunks/document-app-v6p1qvay.js"
+				},
+				{
+					"bytes": 1330,
+					"name": "http://localhost:58167/chunks/document-app-58cqw1dx.js"
+				},
+				{
+					"bytes": 617,
+					"name": "http://localhost:58167/chunks/document-app-q00km86k.js"
+				},
+				{
+					"bytes": 3894,
+					"name": "http://localhost:58167/chunks/document-app-r3eebhvw.js"
+				},
+				{
+					"bytes": 7968,
+					"name": "http://localhost:58167/chunks/document-app-43g09p0a.js"
+				},
+				{
+					"bytes": 901,
+					"name": "http://localhost:58167/chunks/document-app-pk3bkrhx.js"
+				},
+				{
+					"bytes": 14375,
+					"name": "http://localhost:58167/chunks/document-app-102pwqh5.js"
+				},
+				{
+					"bytes": 2725,
+					"name": "http://localhost:58167/chunks/document-app-1n8fnx10.js"
+				},
+				{
+					"bytes": 1656,
+					"name": "http://localhost:58167/chunks/document-app-g7pr3ty8.js"
+				},
+				{
+					"bytes": 16754,
+					"name": "http://localhost:58167/chunks/document-app-es06eeja.js"
+				},
+				{
+					"bytes": 7957,
+					"name": "http://localhost:58167/chunks/document-app-nmkmxrxg.js"
+				},
+				{
+					"bytes": 5735,
+					"name": "http://localhost:58167/chunks/document-app-3jdkyp4f.js"
+				},
+				{
+					"bytes": 6070,
+					"name": "http://localhost:58167/chunks/document-app-xc53pmep.js"
+				},
+				{
+					"bytes": 211373,
+					"name": "http://localhost:58167/chunks/document-app-b3j6rkzj.js"
+				},
+				{
+					"bytes": 765,
+					"name": "http://localhost:58167/chunks/document-app-1hr2amdq.js"
+				},
+				{
+					"bytes": 24137,
+					"name": "http://localhost:58167/chunks/document-app-44h4an5k.js"
+				},
+				{
+					"bytes": 11389,
+					"name": "http://localhost:58167/chunks/document-app-8b7kt562.js"
+				},
+				{
+					"bytes": 74239,
+					"name": "http://localhost:58167/chunks/document-app-akx6xkv7.js"
+				},
+				{
+					"bytes": 2075,
+					"name": "http://localhost:58167/chunks/document-app-vvdk6tcs.js"
+				},
+				{
+					"bytes": 2037,
+					"name": "http://localhost:58167/chunks/document-app-w23t8p99.js"
+				},
+				{
+					"bytes": 2729,
+					"name": "http://localhost:58167/chunks/document-app-acm1vyk8.js"
+				},
+				{
+					"bytes": 10572,
+					"name": "http://localhost:58167/chunks/document-app-2br1y630.js"
+				},
+				{
+					"bytes": 27137,
+					"name": "http://localhost:58167/chunks/document-app-jb1jvatb.js"
+				},
+				{
+					"bytes": 14516,
+					"name": "http://localhost:58167/chunks/document-app-er26grye.js"
+				},
+				{
+					"bytes": 713,
+					"name": "http://localhost:58167/chunks/document-app-fzyeh54r.js"
+				},
+				{
+					"bytes": 272,
+					"name": "http://localhost:58167/chunks/document-app-70vy0mv8.js"
+				},
+				{
+					"bytes": 41742,
+					"name": "http://localhost:58167/chunks/document-app-29ytm0gp.js"
+				},
+				{
+					"bytes": 174723,
+					"name": "http://localhost:58167/chunks/document-app-x9k35fb4.js"
+				},
+				{
+					"bytes": 1109,
+					"name": "http://localhost:58167/chunks/document-app-nqb2j1d5.js"
+				},
+				{
+					"bytes": 20324,
+					"name": "http://localhost:58167/chunks/document-worker-stats-xj2116pa.js"
+				},
+				{
+					"bytes": 0,
+					"name": "http://localhost:58167/document-worker.js"
+				}
+			],
+			"largestEditTaskMs": 10.715,
+			"largestInputEventDispatchMs": 4.152,
+			"editHeapBytes": 1065153281,
+			"undoHeapBytes": 1322012564,
+			"editPosition": 54,
+			"undoPosition": 56
+		},
+		{
+			"phase": "baseline",
+			"trial": 2,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 223.10000002384186,
+			"undoAcceptedCheckpointMs": 1029,
+			"editAcceptedCheckpointMs": 2379,
+			"largestUndoTaskMs": 36.765,
+			"largestBeforePaintTaskMs": 29.895,
+			"layoutMs": 2.651,
+			"paintMs": 1.591,
+			"largestTaskCallback": null,
+			"loadedScripts": [
+				{
+					"bytes": 1330,
+					"name": "http://localhost:58167/chunks/document-app-58cqw1dx.js"
+				},
+				{
+					"bytes": 2036,
+					"name": "http://localhost:58167/chunks/document-app-06pkehrg.js"
+				},
+				{
+					"bytes": 2798,
+					"name": "http://localhost:58167/chunks/document-app-m2qx4cqf.js"
+				},
+				{
+					"bytes": 119345,
+					"name": "http://localhost:58167/chunks/document-app-v6p1qvay.js"
+				},
+				{
+					"bytes": 16754,
+					"name": "http://localhost:58167/chunks/document-app-es06eeja.js"
+				},
+				{
+					"bytes": 7968,
+					"name": "http://localhost:58167/chunks/document-app-43g09p0a.js"
+				},
+				{
+					"bytes": 252795,
+					"name": "http://localhost:58167/app.js"
+				},
+				{
+					"bytes": 617,
+					"name": "http://localhost:58167/chunks/document-app-q00km86k.js"
+				},
+				{
+					"bytes": 3894,
+					"name": "http://localhost:58167/chunks/document-app-r3eebhvw.js"
+				},
+				{
+					"bytes": 14375,
+					"name": "http://localhost:58167/chunks/document-app-102pwqh5.js"
+				},
+				{
+					"bytes": 901,
+					"name": "http://localhost:58167/chunks/document-app-pk3bkrhx.js"
+				},
+				{
+					"bytes": 7957,
+					"name": "http://localhost:58167/chunks/document-app-nmkmxrxg.js"
+				},
+				{
+					"bytes": 6070,
+					"name": "http://localhost:58167/chunks/document-app-xc53pmep.js"
+				},
+				{
+					"bytes": 1656,
+					"name": "http://localhost:58167/chunks/document-app-g7pr3ty8.js"
+				},
+				{
+					"bytes": 2725,
+					"name": "http://localhost:58167/chunks/document-app-1n8fnx10.js"
+				},
+				{
+					"bytes": 765,
+					"name": "http://localhost:58167/chunks/document-app-1hr2amdq.js"
+				},
+				{
+					"bytes": 5735,
+					"name": "http://localhost:58167/chunks/document-app-3jdkyp4f.js"
+				},
+				{
+					"bytes": 24137,
+					"name": "http://localhost:58167/chunks/document-app-44h4an5k.js"
+				},
+				{
+					"bytes": 11389,
+					"name": "http://localhost:58167/chunks/document-app-8b7kt562.js"
+				},
+				{
+					"bytes": 211373,
+					"name": "http://localhost:58167/chunks/document-app-b3j6rkzj.js"
+				},
+				{
+					"bytes": 2729,
+					"name": "http://localhost:58167/chunks/document-app-acm1vyk8.js"
+				},
+				{
+					"bytes": 10572,
+					"name": "http://localhost:58167/chunks/document-app-2br1y630.js"
+				},
+				{
+					"bytes": 74239,
+					"name": "http://localhost:58167/chunks/document-app-akx6xkv7.js"
+				},
+				{
+					"bytes": 2037,
+					"name": "http://localhost:58167/chunks/document-app-w23t8p99.js"
+				},
+				{
+					"bytes": 2075,
+					"name": "http://localhost:58167/chunks/document-app-vvdk6tcs.js"
+				},
+				{
+					"bytes": 713,
+					"name": "http://localhost:58167/chunks/document-app-fzyeh54r.js"
+				},
+				{
+					"bytes": 27137,
+					"name": "http://localhost:58167/chunks/document-app-jb1jvatb.js"
+				},
+				{
+					"bytes": 272,
+					"name": "http://localhost:58167/chunks/document-app-70vy0mv8.js"
+				},
+				{
+					"bytes": 14516,
+					"name": "http://localhost:58167/chunks/document-app-er26grye.js"
+				},
+				{
+					"bytes": 41742,
+					"name": "http://localhost:58167/chunks/document-app-29ytm0gp.js"
+				},
+				{
+					"bytes": 174723,
+					"name": "http://localhost:58167/chunks/document-app-x9k35fb4.js"
+				},
+				{
+					"bytes": 1109,
+					"name": "http://localhost:58167/chunks/document-app-nqb2j1d5.js"
+				},
+				{
+					"bytes": 20324,
+					"name": "http://localhost:58167/chunks/document-worker-stats-xj2116pa.js"
+				},
+				{
+					"bytes": 0,
+					"name": "http://localhost:58167/document-worker.js"
+				}
+			],
+			"largestEditTaskMs": 9.772,
+			"largestInputEventDispatchMs": 4.298,
+			"editHeapBytes": 1063703697,
+			"undoHeapBytes": 553202791,
+			"editPosition": 54,
+			"undoPosition": 56
+		},
+		{
+			"phase": "candidate",
+			"trial": 2,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 88.59999996423721,
+			"undoAcceptedCheckpointMs": 1180.199999988079,
+			"editAcceptedCheckpointMs": 2492.5,
+			"largestUndoTaskMs": 25.072,
+			"largestBeforePaintTaskMs": 25.072,
+			"layoutMs": 2.613,
+			"paintMs": 1.671,
+			"largestTaskCallback": {
+				"args": {
+					"data": {
+						"columnNumber": 476,
+						"frame": "83C49A678A529451659DBCB564057A7C",
+						"functionName": "",
+						"isolate": "15255351123165477779",
+						"lineNumber": 1653,
+						"sampleTraceId": 6961704557285833,
+						"scriptId": "3",
+						"url": "http://localhost:58167/app.js"
+					}
+				},
+				"cat": "devtools.timeline",
+				"dur": 24331,
+				"name": "FunctionCall",
+				"ph": "X",
+				"pid": 54158,
+				"tdur": 24182,
+				"tid": 15615821,
+				"ts": 315754883869,
+				"tts": 2906228
+			},
+			"loadedScripts": [
+				{
+					"bytes": 2036,
+					"name": "http://localhost:58167/chunks/document-app-jyezybx6.js"
+				},
+				{
+					"bytes": 1330,
+					"name": "http://localhost:58167/chunks/document-app-mv4fwnrc.js"
+				},
+				{
+					"bytes": 2798,
+					"name": "http://localhost:58167/chunks/document-app-m2qx4cqf.js"
+				},
+				{
+					"bytes": 119345,
+					"name": "http://localhost:58167/chunks/document-app-ene8prfc.js"
+				},
+				{
+					"bytes": 252795,
+					"name": "http://localhost:58167/app.js"
+				},
+				{
+					"bytes": 16754,
+					"name": "http://localhost:58167/chunks/document-app-dd2q35bj.js"
+				},
+				{
+					"bytes": 3894,
+					"name": "http://localhost:58167/chunks/document-app-1cj8xn63.js"
+				},
+				{
+					"bytes": 7968,
+					"name": "http://localhost:58167/chunks/document-app-pgrjjm9d.js"
+				},
+				{
+					"bytes": 617,
+					"name": "http://localhost:58167/chunks/document-app-4xprzseq.js"
+				},
+				{
+					"bytes": 901,
+					"name": "http://localhost:58167/chunks/document-app-2492txzq.js"
+				},
+				{
+					"bytes": 5735,
+					"name": "http://localhost:58167/chunks/document-app-7dvv3r7d.js"
+				},
+				{
+					"bytes": 2725,
+					"name": "http://localhost:58167/chunks/document-app-s6ebq21x.js"
+				},
+				{
+					"bytes": 1656,
+					"name": "http://localhost:58167/chunks/document-app-td1qshmr.js"
+				},
+				{
+					"bytes": 14375,
+					"name": "http://localhost:58167/chunks/document-app-vnwkd783.js"
+				},
+				{
+					"bytes": 211373,
+					"name": "http://localhost:58167/chunks/document-app-8dpt9c8q.js"
+				},
+				{
+					"bytes": 7957,
+					"name": "http://localhost:58167/chunks/document-app-34w64gpm.js"
+				},
+				{
+					"bytes": 765,
+					"name": "http://localhost:58167/chunks/document-app-s6xwpz2x.js"
+				},
+				{
+					"bytes": 6070,
+					"name": "http://localhost:58167/chunks/document-app-62jy9d4y.js"
+				},
+				{
+					"bytes": 24137,
+					"name": "http://localhost:58167/chunks/document-app-ebda9rwn.js"
+				},
+				{
+					"bytes": 11389,
+					"name": "http://localhost:58167/chunks/document-app-pf9a02se.js"
+				},
+				{
+					"bytes": 75670,
+					"name": "http://localhost:58167/chunks/document-app-f1c6psvb.js"
+				},
+				{
+					"bytes": 2729,
+					"name": "http://localhost:58167/chunks/document-app-pcx1a4e5.js"
+				},
+				{
+					"bytes": 2037,
+					"name": "http://localhost:58167/chunks/document-app-efr8tsz3.js"
+				},
+				{
+					"bytes": 2075,
+					"name": "http://localhost:58167/chunks/document-app-5mfkvqya.js"
+				},
+				{
+					"bytes": 10572,
+					"name": "http://localhost:58167/chunks/document-app-q80w28ak.js"
+				},
+				{
+					"bytes": 713,
+					"name": "http://localhost:58167/chunks/document-app-s15nn115.js"
+				},
+				{
+					"bytes": 272,
+					"name": "http://localhost:58167/chunks/document-app-c1vterjt.js"
+				},
+				{
+					"bytes": 14516,
+					"name": "http://localhost:58167/chunks/document-app-arzhgms9.js"
+				},
+				{
+					"bytes": 27137,
+					"name": "http://localhost:58167/chunks/document-app-0fxwdp86.js"
+				},
+				{
+					"bytes": 41742,
+					"name": "http://localhost:58167/chunks/document-app-26k5tvss.js"
+				},
+				{
+					"bytes": 181610,
+					"name": "http://localhost:58167/chunks/document-app-5y49dtc4.js"
+				},
+				{
+					"bytes": 1109,
+					"name": "http://localhost:58167/chunks/document-app-4ptpq1fa.js"
+				},
+				{
+					"bytes": 20324,
+					"name": "http://localhost:58167/chunks/document-worker-stats-37wqfxja.js"
+				},
+				{
+					"bytes": 0,
+					"name": "http://localhost:58167/document-worker.js"
+				}
+			],
+			"largestEditTaskMs": 11.407,
+			"largestInputEventDispatchMs": 4.337,
+			"editHeapBytes": 950123643,
+			"undoHeapBytes": 1083030410,
+			"editPosition": 54,
+			"undoPosition": 56
+		}
+	],
+	"controls": [
+		{
+			"fixture": "controls-128k",
+			"samples": [
+				{
+					"phase": "baseline",
+					"trial": 0,
+					"exact": true,
+					"trusted": true,
+					"pending": "0",
+					"busy": "false",
+					"acceptedPending": 0,
+					"acceptedRejected": 0,
+					"paintOpportunityMs": 95.80000001192093,
+					"undoAcceptedCheckpointMs": 133.5999999642372,
+					"editAcceptedCheckpointMs": 310.89999997615814,
+					"largestUndoTaskMs": 7.025,
+					"largestBeforePaintTaskMs": 6.175,
+					"layoutMs": 0.833,
+					"paintMs": 0.575,
+					"largestTaskCallback": {
+						"args": {
+							"data": {
+								"columnNumber": 57014,
+								"frame": "016C1FF837C43481F4DB88476E407842",
+								"functionName": "p.onsuccess",
+								"isolate": "11352504651983063094",
+								"lineNumber": 8,
+								"sampleTraceId": 8846094523465962,
+								"scriptId": "17",
+								"url": "http://localhost:58167/chunks/document-app-b3j6rkzj.js"
+							}
+						},
+						"cat": "devtools.timeline",
+						"dur": 7005,
+						"name": "FunctionCall",
+						"ph": "X",
+						"pid": 54525,
+						"tdur": 7005,
+						"tid": 15617284,
+						"ts": 315793376594,
+						"tts": 826129
+					},
+					"loadedScripts": [
+						{
+							"bytes": 119345,
+							"name": "http://localhost:58167/chunks/document-app-v6p1qvay.js"
+						},
+						{
+							"bytes": 252795,
+							"name": "http://localhost:58167/app.js"
+						},
+						{
+							"bytes": 2036,
+							"name": "http://localhost:58167/chunks/document-app-06pkehrg.js"
+						},
+						{
+							"bytes": 2798,
+							"name": "http://localhost:58167/chunks/document-app-m2qx4cqf.js"
+						},
+						{
+							"bytes": 1330,
+							"name": "http://localhost:58167/chunks/document-app-58cqw1dx.js"
+						},
+						{
+							"bytes": 7968,
+							"name": "http://localhost:58167/chunks/document-app-43g09p0a.js"
+						},
+						{
+							"bytes": 16754,
+							"name": "http://localhost:58167/chunks/document-app-es06eeja.js"
+						},
+						{
+							"bytes": 3894,
+							"name": "http://localhost:58167/chunks/document-app-r3eebhvw.js"
+						},
+						{
+							"bytes": 617,
+							"name": "http://localhost:58167/chunks/document-app-q00km86k.js"
+						},
+						{
+							"bytes": 901,
+							"name": "http://localhost:58167/chunks/document-app-pk3bkrhx.js"
+						},
+						{
+							"bytes": 14375,
+							"name": "http://localhost:58167/chunks/document-app-102pwqh5.js"
+						},
+						{
+							"bytes": 2725,
+							"name": "http://localhost:58167/chunks/document-app-1n8fnx10.js"
+						},
+						{
+							"bytes": 1656,
+							"name": "http://localhost:58167/chunks/document-app-g7pr3ty8.js"
+						},
+						{
+							"bytes": 5735,
+							"name": "http://localhost:58167/chunks/document-app-3jdkyp4f.js"
+						},
+						{
+							"bytes": 211373,
+							"name": "http://localhost:58167/chunks/document-app-b3j6rkzj.js"
+						},
+						{
+							"bytes": 7957,
+							"name": "http://localhost:58167/chunks/document-app-nmkmxrxg.js"
+						},
+						{
+							"bytes": 6070,
+							"name": "http://localhost:58167/chunks/document-app-xc53pmep.js"
+						},
+						{
+							"bytes": 765,
+							"name": "http://localhost:58167/chunks/document-app-1hr2amdq.js"
+						},
+						{
+							"bytes": 24137,
+							"name": "http://localhost:58167/chunks/document-app-44h4an5k.js"
+						},
+						{
+							"bytes": 11389,
+							"name": "http://localhost:58167/chunks/document-app-8b7kt562.js"
+						},
+						{
+							"bytes": 10572,
+							"name": "http://localhost:58167/chunks/document-app-2br1y630.js"
+						},
+						{
+							"bytes": 74239,
+							"name": "http://localhost:58167/chunks/document-app-akx6xkv7.js"
+						},
+						{
+							"bytes": 2729,
+							"name": "http://localhost:58167/chunks/document-app-acm1vyk8.js"
+						},
+						{
+							"bytes": 2037,
+							"name": "http://localhost:58167/chunks/document-app-w23t8p99.js"
+						},
+						{
+							"bytes": 2075,
+							"name": "http://localhost:58167/chunks/document-app-vvdk6tcs.js"
+						},
+						{
+							"bytes": 27137,
+							"name": "http://localhost:58167/chunks/document-app-jb1jvatb.js"
+						},
+						{
+							"bytes": 14516,
+							"name": "http://localhost:58167/chunks/document-app-er26grye.js"
+						},
+						{
+							"bytes": 713,
+							"name": "http://localhost:58167/chunks/document-app-fzyeh54r.js"
+						},
+						{
+							"bytes": 272,
+							"name": "http://localhost:58167/chunks/document-app-70vy0mv8.js"
+						},
+						{
+							"bytes": 41742,
+							"name": "http://localhost:58167/chunks/document-app-29ytm0gp.js"
+						},
+						{
+							"bytes": 1109,
+							"name": "http://localhost:58167/chunks/document-app-nqb2j1d5.js"
+						},
+						{
+							"bytes": 174723,
+							"name": "http://localhost:58167/chunks/document-app-x9k35fb4.js"
+						},
+						{
+							"bytes": 20324,
+							"name": "http://localhost:58167/chunks/document-worker-stats-xj2116pa.js"
+						},
+						{
+							"bytes": 0,
+							"name": "http://localhost:58167/document-worker.js"
+						}
+					],
+					"largestEditTaskMs": 9.758,
+					"largestInputEventDispatchMs": 4.398,
+					"editHeapBytes": 242299637,
+					"undoHeapBytes": 275095496,
+					"editPosition": 6,
+					"undoPosition": 8
+				},
+				{
+					"phase": "candidate",
+					"trial": 0,
+					"exact": true,
+					"trusted": true,
+					"pending": "0",
+					"busy": "false",
+					"acceptedPending": 0,
+					"acceptedRejected": 0,
+					"paintOpportunityMs": 72.5,
+					"undoAcceptedCheckpointMs": 122.30000001192091,
+					"editAcceptedCheckpointMs": 306.9000000357628,
+					"largestUndoTaskMs": 6.686,
+					"largestBeforePaintTaskMs": 6.411,
+					"layoutMs": 0.701,
+					"paintMs": 0.448,
+					"largestTaskCallback": {
+						"args": {
+							"data": {
+								"columnNumber": 122887,
+								"frame": "8B49424C7829A6B6C14766B3B6C7672D",
+								"functionName": "o.port1.onmessage",
+								"isolate": "5396697635793586086",
+								"lineNumber": 8,
+								"sampleTraceId": 218448070036426,
+								"scriptId": "17",
+								"url": "http://localhost:58167/chunks/document-app-8dpt9c8q.js"
+							}
+						},
+						"cat": "devtools.timeline",
+						"dur": 6675,
+						"name": "FunctionCall",
+						"ph": "X",
+						"pid": 54648,
+						"tdur": 3324,
+						"tid": 15618078,
+						"ts": 315795985847,
+						"tts": 860096
+					},
+					"loadedScripts": [
+						{
+							"bytes": 1330,
+							"name": "http://localhost:58167/chunks/document-app-mv4fwnrc.js"
+						},
+						{
+							"bytes": 2798,
+							"name": "http://localhost:58167/chunks/document-app-m2qx4cqf.js"
+						},
+						{
+							"bytes": 2036,
+							"name": "http://localhost:58167/chunks/document-app-jyezybx6.js"
+						},
+						{
+							"bytes": 16754,
+							"name": "http://localhost:58167/chunks/document-app-dd2q35bj.js"
+						},
+						{
+							"bytes": 119345,
+							"name": "http://localhost:58167/chunks/document-app-ene8prfc.js"
+						},
+						{
+							"bytes": 252795,
+							"name": "http://localhost:58167/app.js"
+						},
+						{
+							"bytes": 3894,
+							"name": "http://localhost:58167/chunks/document-app-1cj8xn63.js"
+						},
+						{
+							"bytes": 7968,
+							"name": "http://localhost:58167/chunks/document-app-pgrjjm9d.js"
+						},
+						{
+							"bytes": 617,
+							"name": "http://localhost:58167/chunks/document-app-4xprzseq.js"
+						},
+						{
+							"bytes": 901,
+							"name": "http://localhost:58167/chunks/document-app-2492txzq.js"
+						},
+						{
+							"bytes": 14375,
+							"name": "http://localhost:58167/chunks/document-app-vnwkd783.js"
+						},
+						{
+							"bytes": 6070,
+							"name": "http://localhost:58167/chunks/document-app-62jy9d4y.js"
+						},
+						{
+							"bytes": 1656,
+							"name": "http://localhost:58167/chunks/document-app-td1qshmr.js"
+						},
+						{
+							"bytes": 2725,
+							"name": "http://localhost:58167/chunks/document-app-s6ebq21x.js"
+						},
+						{
+							"bytes": 5735,
+							"name": "http://localhost:58167/chunks/document-app-7dvv3r7d.js"
+						},
+						{
+							"bytes": 7957,
+							"name": "http://localhost:58167/chunks/document-app-34w64gpm.js"
+						},
+						{
+							"bytes": 765,
+							"name": "http://localhost:58167/chunks/document-app-s6xwpz2x.js"
+						},
+						{
+							"bytes": 211373,
+							"name": "http://localhost:58167/chunks/document-app-8dpt9c8q.js"
+						},
+						{
+							"bytes": 24137,
+							"name": "http://localhost:58167/chunks/document-app-ebda9rwn.js"
+						},
+						{
+							"bytes": 11389,
+							"name": "http://localhost:58167/chunks/document-app-pf9a02se.js"
+						},
+						{
+							"bytes": 75670,
+							"name": "http://localhost:58167/chunks/document-app-f1c6psvb.js"
+						},
+						{
+							"bytes": 10572,
+							"name": "http://localhost:58167/chunks/document-app-q80w28ak.js"
+						},
+						{
+							"bytes": 2729,
+							"name": "http://localhost:58167/chunks/document-app-pcx1a4e5.js"
+						},
+						{
+							"bytes": 2037,
+							"name": "http://localhost:58167/chunks/document-app-efr8tsz3.js"
+						},
+						{
+							"bytes": 2075,
+							"name": "http://localhost:58167/chunks/document-app-5mfkvqya.js"
+						},
+						{
+							"bytes": 27137,
+							"name": "http://localhost:58167/chunks/document-app-0fxwdp86.js"
+						},
+						{
+							"bytes": 713,
+							"name": "http://localhost:58167/chunks/document-app-s15nn115.js"
+						},
+						{
+							"bytes": 14516,
+							"name": "http://localhost:58167/chunks/document-app-arzhgms9.js"
+						},
+						{
+							"bytes": 272,
+							"name": "http://localhost:58167/chunks/document-app-c1vterjt.js"
+						},
+						{
+							"bytes": 41742,
+							"name": "http://localhost:58167/chunks/document-app-26k5tvss.js"
+						},
+						{
+							"bytes": 1109,
+							"name": "http://localhost:58167/chunks/document-app-4ptpq1fa.js"
+						},
+						{
+							"bytes": 181610,
+							"name": "http://localhost:58167/chunks/document-app-5y49dtc4.js"
+						},
+						{
+							"bytes": 20324,
+							"name": "http://localhost:58167/chunks/document-worker-stats-37wqfxja.js"
+						},
+						{
+							"bytes": 0,
+							"name": "http://localhost:58167/document-worker.js"
+						}
+					],
+					"largestEditTaskMs": 9.192,
+					"largestInputEventDispatchMs": 2.3,
+					"editHeapBytes": 397241998,
+					"undoHeapBytes": 398344815,
+					"editPosition": 6,
+					"undoPosition": 8
+				}
+			]
+		},
+		{
+			"fixture": "controls-1m",
+			"samples": [
+				{
+					"phase": "baseline",
+					"trial": 0,
+					"exact": true,
+					"trusted": true,
+					"pending": "0",
+					"busy": "false",
+					"acceptedPending": 0,
+					"acceptedRejected": 0,
+					"paintOpportunityMs": 263.89999997615814,
+					"undoAcceptedCheckpointMs": 1261.699999988079,
+					"editAcceptedCheckpointMs": 2466.099999964237,
+					"largestUndoTaskMs": 24.63,
+					"largestBeforePaintTaskMs": 24.63,
+					"layoutMs": 2.58,
+					"paintMs": 1.748,
+					"largestTaskCallback": {
+						"args": {
+							"data": {
+								"columnNumber": 476,
+								"frame": "53FCDA31BBE638ECCCE04C4689505C8E",
+								"functionName": "",
+								"isolate": "11123690130465313816",
+								"lineNumber": 1653,
+								"sampleTraceId": 2241679212490482,
+								"scriptId": "3",
+								"url": "http://localhost:58167/app.js"
+							}
+						},
+						"cat": "devtools.timeline",
+						"dur": 23828,
+						"name": "FunctionCall",
+						"ph": "X",
+						"pid": 54877,
+						"tdur": 23793,
+						"tid": 15619191,
+						"ts": 315819123204,
+						"tts": 3493988
+					},
+					"loadedScripts": [
+						{
+							"bytes": 2036,
+							"name": "http://localhost:58167/chunks/document-app-06pkehrg.js"
+						},
+						{
+							"bytes": 119345,
+							"name": "http://localhost:58167/chunks/document-app-v6p1qvay.js"
+						},
+						{
+							"bytes": 252795,
+							"name": "http://localhost:58167/app.js"
+						},
+						{
+							"bytes": 1330,
+							"name": "http://localhost:58167/chunks/document-app-58cqw1dx.js"
+						},
+						{
+							"bytes": 7968,
+							"name": "http://localhost:58167/chunks/document-app-43g09p0a.js"
+						},
+						{
+							"bytes": 2798,
+							"name": "http://localhost:58167/chunks/document-app-m2qx4cqf.js"
+						},
+						{
+							"bytes": 3894,
+							"name": "http://localhost:58167/chunks/document-app-r3eebhvw.js"
+						},
+						{
+							"bytes": 16754,
+							"name": "http://localhost:58167/chunks/document-app-es06eeja.js"
+						},
+						{
+							"bytes": 617,
+							"name": "http://localhost:58167/chunks/document-app-q00km86k.js"
+						},
+						{
+							"bytes": 14375,
+							"name": "http://localhost:58167/chunks/document-app-102pwqh5.js"
+						},
+						{
+							"bytes": 901,
+							"name": "http://localhost:58167/chunks/document-app-pk3bkrhx.js"
+						},
+						{
+							"bytes": 765,
+							"name": "http://localhost:58167/chunks/document-app-1hr2amdq.js"
+						},
+						{
+							"bytes": 2725,
+							"name": "http://localhost:58167/chunks/document-app-1n8fnx10.js"
+						},
+						{
+							"bytes": 6070,
+							"name": "http://localhost:58167/chunks/document-app-xc53pmep.js"
+						},
+						{
+							"bytes": 10572,
+							"name": "http://localhost:58167/chunks/document-app-2br1y630.js"
+						},
+						{
+							"bytes": 7957,
+							"name": "http://localhost:58167/chunks/document-app-nmkmxrxg.js"
+						},
+						{
+							"bytes": 5735,
+							"name": "http://localhost:58167/chunks/document-app-3jdkyp4f.js"
+						},
+						{
+							"bytes": 1656,
+							"name": "http://localhost:58167/chunks/document-app-g7pr3ty8.js"
+						},
+						{
+							"bytes": 11389,
+							"name": "http://localhost:58167/chunks/document-app-8b7kt562.js"
+						},
+						{
+							"bytes": 24137,
+							"name": "http://localhost:58167/chunks/document-app-44h4an5k.js"
+						},
+						{
+							"bytes": 74239,
+							"name": "http://localhost:58167/chunks/document-app-akx6xkv7.js"
+						},
+						{
+							"bytes": 211373,
+							"name": "http://localhost:58167/chunks/document-app-b3j6rkzj.js"
+						},
+						{
+							"bytes": 2729,
+							"name": "http://localhost:58167/chunks/document-app-acm1vyk8.js"
+						},
+						{
+							"bytes": 2037,
+							"name": "http://localhost:58167/chunks/document-app-w23t8p99.js"
+						},
+						{
+							"bytes": 2075,
+							"name": "http://localhost:58167/chunks/document-app-vvdk6tcs.js"
+						},
+						{
+							"bytes": 272,
+							"name": "http://localhost:58167/chunks/document-app-70vy0mv8.js"
+						},
+						{
+							"bytes": 713,
+							"name": "http://localhost:58167/chunks/document-app-fzyeh54r.js"
+						},
+						{
+							"bytes": 14516,
+							"name": "http://localhost:58167/chunks/document-app-er26grye.js"
+						},
+						{
+							"bytes": 27137,
+							"name": "http://localhost:58167/chunks/document-app-jb1jvatb.js"
+						},
+						{
+							"bytes": 41742,
+							"name": "http://localhost:58167/chunks/document-app-29ytm0gp.js"
+						},
+						{
+							"bytes": 1109,
+							"name": "http://localhost:58167/chunks/document-app-nqb2j1d5.js"
+						},
+						{
+							"bytes": 174723,
+							"name": "http://localhost:58167/chunks/document-app-x9k35fb4.js"
+						},
+						{
+							"bytes": 20324,
+							"name": "http://localhost:58167/chunks/document-worker-stats-xj2116pa.js"
+						},
+						{
+							"bytes": 0,
+							"name": "http://localhost:58167/document-worker.js"
+						}
+					],
+					"largestEditTaskMs": 12.874,
+					"largestInputEventDispatchMs": 11.493,
+					"editHeapBytes": 1220269782,
+					"undoHeapBytes": 1541737781,
+					"editPosition": 30,
+					"undoPosition": 32
+				},
+				{
+					"phase": "candidate",
+					"trial": 0,
+					"exact": true,
+					"trusted": true,
+					"pending": "0",
+					"busy": "false",
+					"acceptedPending": 0,
+					"acceptedRejected": 0,
+					"paintOpportunityMs": 149.69999998807907,
+					"undoAcceptedCheckpointMs": 955.1999999880792,
+					"editAcceptedCheckpointMs": 2493.800000011921,
+					"largestUndoTaskMs": 25.366,
+					"largestBeforePaintTaskMs": 25.366,
+					"layoutMs": 2.122,
+					"paintMs": 1.436,
+					"largestTaskCallback": {
+						"args": {
+							"data": {
+								"columnNumber": 476,
+								"frame": "11C9E038C3CEE7DC92214CC2607701EE",
+								"functionName": "",
+								"isolate": "106232082046518295",
+								"lineNumber": 1653,
+								"sampleTraceId": 4701595069069375,
+								"scriptId": "3",
+								"url": "http://localhost:58167/app.js"
+							}
+						},
+						"cat": "devtools.timeline",
+						"dur": 24525,
+						"name": "FunctionCall",
+						"ph": "X",
+						"pid": 55044,
+						"tdur": 24494,
+						"tid": 15620114,
+						"ts": 315826551037,
+						"tts": 3111270
+					},
+					"loadedScripts": [
+						{
+							"bytes": 252795,
+							"name": "http://localhost:58167/app.js"
+						},
+						{
+							"bytes": 1330,
+							"name": "http://localhost:58167/chunks/document-app-mv4fwnrc.js"
+						},
+						{
+							"bytes": 2798,
+							"name": "http://localhost:58167/chunks/document-app-m2qx4cqf.js"
+						},
+						{
+							"bytes": 617,
+							"name": "http://localhost:58167/chunks/document-app-4xprzseq.js"
+						},
+						{
+							"bytes": 3894,
+							"name": "http://localhost:58167/chunks/document-app-1cj8xn63.js"
+						},
+						{
+							"bytes": 14375,
+							"name": "http://localhost:58167/chunks/document-app-vnwkd783.js"
+						},
+						{
+							"bytes": 2036,
+							"name": "http://localhost:58167/chunks/document-app-jyezybx6.js"
+						},
+						{
+							"bytes": 7968,
+							"name": "http://localhost:58167/chunks/document-app-pgrjjm9d.js"
+						},
+						{
+							"bytes": 16754,
+							"name": "http://localhost:58167/chunks/document-app-dd2q35bj.js"
+						},
+						{
+							"bytes": 119345,
+							"name": "http://localhost:58167/chunks/document-app-ene8prfc.js"
+						},
+						{
+							"bytes": 901,
+							"name": "http://localhost:58167/chunks/document-app-2492txzq.js"
+						},
+						{
+							"bytes": 2725,
+							"name": "http://localhost:58167/chunks/document-app-s6ebq21x.js"
+						},
+						{
+							"bytes": 1656,
+							"name": "http://localhost:58167/chunks/document-app-td1qshmr.js"
+						},
+						{
+							"bytes": 5735,
+							"name": "http://localhost:58167/chunks/document-app-7dvv3r7d.js"
+						},
+						{
+							"bytes": 7957,
+							"name": "http://localhost:58167/chunks/document-app-34w64gpm.js"
+						},
+						{
+							"bytes": 211373,
+							"name": "http://localhost:58167/chunks/document-app-8dpt9c8q.js"
+						},
+						{
+							"bytes": 765,
+							"name": "http://localhost:58167/chunks/document-app-s6xwpz2x.js"
+						},
+						{
+							"bytes": 24137,
+							"name": "http://localhost:58167/chunks/document-app-ebda9rwn.js"
+						},
+						{
+							"bytes": 2729,
+							"name": "http://localhost:58167/chunks/document-app-pcx1a4e5.js"
+						},
+						{
+							"bytes": 6070,
+							"name": "http://localhost:58167/chunks/document-app-62jy9d4y.js"
+						},
+						{
+							"bytes": 11389,
+							"name": "http://localhost:58167/chunks/document-app-pf9a02se.js"
+						},
+						{
+							"bytes": 10572,
+							"name": "http://localhost:58167/chunks/document-app-q80w28ak.js"
+						},
+						{
+							"bytes": 75670,
+							"name": "http://localhost:58167/chunks/document-app-f1c6psvb.js"
+						},
+						{
+							"bytes": 2037,
+							"name": "http://localhost:58167/chunks/document-app-efr8tsz3.js"
+						},
+						{
+							"bytes": 2075,
+							"name": "http://localhost:58167/chunks/document-app-5mfkvqya.js"
+						},
+						{
+							"bytes": 14516,
+							"name": "http://localhost:58167/chunks/document-app-arzhgms9.js"
+						},
+						{
+							"bytes": 27137,
+							"name": "http://localhost:58167/chunks/document-app-0fxwdp86.js"
+						},
+						{
+							"bytes": 713,
+							"name": "http://localhost:58167/chunks/document-app-s15nn115.js"
+						},
+						{
+							"bytes": 272,
+							"name": "http://localhost:58167/chunks/document-app-c1vterjt.js"
+						},
+						{
+							"bytes": 1109,
+							"name": "http://localhost:58167/chunks/document-app-4ptpq1fa.js"
+						},
+						{
+							"bytes": 41742,
+							"name": "http://localhost:58167/chunks/document-app-26k5tvss.js"
+						},
+						{
+							"bytes": 181610,
+							"name": "http://localhost:58167/chunks/document-app-5y49dtc4.js"
+						},
+						{
+							"bytes": 20324,
+							"name": "http://localhost:58167/chunks/document-worker-stats-37wqfxja.js"
+						},
+						{
+							"bytes": 0,
+							"name": "http://localhost:58167/document-worker.js"
+						}
+					],
+					"largestEditTaskMs": 12.042,
+					"largestInputEventDispatchMs": 3.249,
+					"editHeapBytes": 983330128,
+					"undoHeapBytes": 1206486896,
+					"editPosition": 30,
+					"undoPosition": 32
+				}
+			]
+		}
+	],
+	"signature": "written with gpt-6 in codex",
+	"actualMulticursor": {
+		"rows": [
+			{
+				"phase": "baseline",
+				"phaseTrial": 0,
+				"fixture": "128k-2048",
+				"inputTaskMs": 27.368,
+				"largestTaskWithAftermathMs": 75.572,
+				"readyMs": 27.624,
+				"taskCount": 1400,
+				"tasksOverBudget": 6,
+				"trusted": true,
+				"correctness": {
+					"busy": "false",
+					"characters": 122880,
+					"exact": true,
+					"observedEditCount": 2048,
+					"pending": "0",
+					"remaining": 0,
+					"replacements": 2048
+				},
+				"editAcceptedCursor": 6,
+				"undoAcceptedCursor": 8,
+				"undoExact": true,
+				"loadedScripts": [
+					"http://localhost:58167/chunks/document-app-58cqw1dx.js",
+					"http://localhost:58167/chunks/document-app-m2qx4cqf.js",
+					"http://localhost:58167/chunks/document-app-06pkehrg.js",
+					"http://localhost:58167/chunks/document-app-es06eeja.js",
+					"http://localhost:58167/app.js",
+					"http://localhost:58167/chunks/document-app-v6p1qvay.js",
+					"http://localhost:58167/chunks/document-app-q00km86k.js",
+					"http://localhost:58167/chunks/document-app-pk3bkrhx.js",
+					"http://localhost:58167/chunks/document-app-r3eebhvw.js",
+					"http://localhost:58167/chunks/document-app-43g09p0a.js",
+					"http://localhost:58167/chunks/document-app-1n8fnx10.js",
+					"http://localhost:58167/chunks/document-app-102pwqh5.js",
+					"http://localhost:58167/chunks/document-app-g7pr3ty8.js",
+					"http://localhost:58167/chunks/document-app-3jdkyp4f.js",
+					"http://localhost:58167/chunks/document-app-nmkmxrxg.js",
+					"http://localhost:58167/chunks/document-app-b3j6rkzj.js",
+					"http://localhost:58167/chunks/document-app-1hr2amdq.js",
+					"http://localhost:58167/chunks/document-app-xc53pmep.js",
+					"http://localhost:58167/chunks/document-app-44h4an5k.js",
+					"http://localhost:58167/chunks/document-app-8b7kt562.js",
+					"http://localhost:58167/chunks/document-app-2br1y630.js",
+					"http://localhost:58167/chunks/document-app-akx6xkv7.js",
+					"http://localhost:58167/chunks/document-app-acm1vyk8.js",
+					"http://localhost:58167/chunks/document-app-w23t8p99.js",
+					"http://localhost:58167/chunks/document-app-vvdk6tcs.js",
+					"http://localhost:58167/chunks/document-app-fzyeh54r.js",
+					"http://localhost:58167/chunks/document-app-er26grye.js",
+					"http://localhost:58167/chunks/document-app-jb1jvatb.js",
+					"http://localhost:58167/chunks/document-app-70vy0mv8.js",
+					"http://localhost:58167/chunks/document-app-nqb2j1d5.js",
+					"http://localhost:58167/chunks/document-app-29ytm0gp.js",
+					"http://localhost:58167/chunks/document-app-x9k35fb4.js",
+					"http://localhost:58167/chunks/document-worker-stats-xj2116pa.js",
+					"http://localhost:58167/document-worker.js"
+				]
+			},
+			{
+				"phase": "baseline",
+				"phaseTrial": 0,
+				"fixture": "1m-2048",
+				"inputTaskMs": 25.731,
+				"largestTaskWithAftermathMs": 50.959,
+				"readyMs": 25.976,
+				"taskCount": 4516,
+				"tasksOverBudget": 10,
+				"trusted": true,
+				"correctness": {
+					"busy": "false",
+					"characters": 1040384,
+					"exact": true,
+					"observedEditCount": 2048,
+					"pending": "0",
+					"remaining": 0,
+					"replacements": 2048
+				},
+				"editAcceptedCursor": 30,
+				"undoAcceptedCursor": 32,
+				"undoExact": true,
+				"loadedScripts": [
+					"http://localhost:58167/app.js",
+					"http://localhost:58167/chunks/document-app-v6p1qvay.js",
+					"http://localhost:58167/chunks/document-app-06pkehrg.js",
+					"http://localhost:58167/chunks/document-app-m2qx4cqf.js",
+					"http://localhost:58167/chunks/document-app-58cqw1dx.js",
+					"http://localhost:58167/chunks/document-app-es06eeja.js",
+					"http://localhost:58167/chunks/document-app-43g09p0a.js",
+					"http://localhost:58167/chunks/document-app-r3eebhvw.js",
+					"http://localhost:58167/chunks/document-app-q00km86k.js",
+					"http://localhost:58167/chunks/document-app-102pwqh5.js",
+					"http://localhost:58167/chunks/document-app-pk3bkrhx.js",
+					"http://localhost:58167/chunks/document-app-1n8fnx10.js",
+					"http://localhost:58167/chunks/document-app-g7pr3ty8.js",
+					"http://localhost:58167/chunks/document-app-3jdkyp4f.js",
+					"http://localhost:58167/chunks/document-app-b3j6rkzj.js",
+					"http://localhost:58167/chunks/document-app-nmkmxrxg.js",
+					"http://localhost:58167/chunks/document-app-xc53pmep.js",
+					"http://localhost:58167/chunks/document-app-1hr2amdq.js",
+					"http://localhost:58167/chunks/document-app-44h4an5k.js",
+					"http://localhost:58167/chunks/document-app-8b7kt562.js",
+					"http://localhost:58167/chunks/document-app-akx6xkv7.js",
+					"http://localhost:58167/chunks/document-app-2br1y630.js",
+					"http://localhost:58167/chunks/document-app-acm1vyk8.js",
+					"http://localhost:58167/chunks/document-app-w23t8p99.js",
+					"http://localhost:58167/chunks/document-app-vvdk6tcs.js",
+					"http://localhost:58167/chunks/document-app-jb1jvatb.js",
+					"http://localhost:58167/chunks/document-app-er26grye.js",
+					"http://localhost:58167/chunks/document-app-fzyeh54r.js",
+					"http://localhost:58167/chunks/document-app-29ytm0gp.js",
+					"http://localhost:58167/chunks/document-app-70vy0mv8.js",
+					"http://localhost:58167/chunks/document-app-x9k35fb4.js",
+					"http://localhost:58167/chunks/document-app-nqb2j1d5.js",
+					"http://localhost:58167/chunks/document-worker-stats-xj2116pa.js",
+					"http://localhost:58167/document-worker.js"
+				]
+			},
+			{
+				"phase": "candidate",
+				"phaseTrial": 0,
+				"fixture": "128k-2048",
+				"inputTaskMs": 31.783,
+				"largestTaskWithAftermathMs": 58.722,
+				"readyMs": 29.571,
+				"taskCount": 1691,
+				"tasksOverBudget": 7,
+				"trusted": true,
+				"correctness": {
+					"busy": "false",
+					"characters": 122880,
+					"exact": true,
+					"observedEditCount": 2048,
+					"pending": "0",
+					"remaining": 0,
+					"replacements": 2048
+				},
+				"editAcceptedCursor": 6,
+				"undoAcceptedCursor": 8,
+				"undoExact": true,
+				"loadedScripts": [
+					"http://localhost:58167/chunks/document-app-jyezybx6.js",
+					"http://localhost:58167/chunks/document-app-ene8prfc.js",
+					"http://localhost:58167/app.js",
+					"http://localhost:58167/chunks/document-app-m2qx4cqf.js",
+					"http://localhost:58167/chunks/document-app-mv4fwnrc.js",
+					"http://localhost:58167/chunks/document-app-dd2q35bj.js",
+					"http://localhost:58167/chunks/document-app-4xprzseq.js",
+					"http://localhost:58167/chunks/document-app-1cj8xn63.js",
+					"http://localhost:58167/chunks/document-app-pgrjjm9d.js",
+					"http://localhost:58167/chunks/document-app-vnwkd783.js",
+					"http://localhost:58167/chunks/document-app-2492txzq.js",
+					"http://localhost:58167/chunks/document-app-s6ebq21x.js",
+					"http://localhost:58167/chunks/document-app-7dvv3r7d.js",
+					"http://localhost:58167/chunks/document-app-td1qshmr.js",
+					"http://localhost:58167/chunks/document-app-s6xwpz2x.js",
+					"http://localhost:58167/chunks/document-app-34w64gpm.js",
+					"http://localhost:58167/chunks/document-app-62jy9d4y.js",
+					"http://localhost:58167/chunks/document-app-ebda9rwn.js",
+					"http://localhost:58167/chunks/document-app-pf9a02se.js",
+					"http://localhost:58167/chunks/document-app-q80w28ak.js",
+					"http://localhost:58167/chunks/document-app-f1c6psvb.js",
+					"http://localhost:58167/chunks/document-app-8dpt9c8q.js",
+					"http://localhost:58167/chunks/document-app-pcx1a4e5.js",
+					"http://localhost:58167/chunks/document-app-efr8tsz3.js",
+					"http://localhost:58167/chunks/document-app-5mfkvqya.js",
+					"http://localhost:58167/chunks/document-app-0fxwdp86.js",
+					"http://localhost:58167/chunks/document-app-s15nn115.js",
+					"http://localhost:58167/chunks/document-app-arzhgms9.js",
+					"http://localhost:58167/chunks/document-app-26k5tvss.js",
+					"http://localhost:58167/chunks/document-app-c1vterjt.js",
+					"http://localhost:58167/chunks/document-app-4ptpq1fa.js",
+					"http://localhost:58167/chunks/document-app-5y49dtc4.js",
+					"http://localhost:58167/chunks/document-worker-stats-37wqfxja.js",
+					"http://localhost:58167/document-worker.js"
+				]
+			},
+			{
+				"phase": "candidate",
+				"phaseTrial": 0,
+				"fixture": "1m-2048",
+				"inputTaskMs": 32.811,
+				"largestTaskWithAftermathMs": 65.785,
+				"readyMs": 32.949,
+				"taskCount": 4512,
+				"tasksOverBudget": 10,
+				"trusted": true,
+				"correctness": {
+					"busy": "false",
+					"characters": 1040384,
+					"exact": true,
+					"observedEditCount": 2048,
+					"pending": "0",
+					"remaining": 0,
+					"replacements": 2048
+				},
+				"editAcceptedCursor": 30,
+				"undoAcceptedCursor": 32,
+				"undoExact": true,
+				"loadedScripts": [
+					"http://localhost:58167/chunks/document-app-ene8prfc.js",
+					"http://localhost:58167/app.js",
+					"http://localhost:58167/chunks/document-app-jyezybx6.js",
+					"http://localhost:58167/chunks/document-app-m2qx4cqf.js",
+					"http://localhost:58167/chunks/document-app-mv4fwnrc.js",
+					"http://localhost:58167/chunks/document-app-dd2q35bj.js",
+					"http://localhost:58167/chunks/document-app-pgrjjm9d.js",
+					"http://localhost:58167/chunks/document-app-1cj8xn63.js",
+					"http://localhost:58167/chunks/document-app-4xprzseq.js",
+					"http://localhost:58167/chunks/document-app-vnwkd783.js",
+					"http://localhost:58167/chunks/document-app-2492txzq.js",
+					"http://localhost:58167/chunks/document-app-s6ebq21x.js",
+					"http://localhost:58167/chunks/document-app-td1qshmr.js",
+					"http://localhost:58167/chunks/document-app-7dvv3r7d.js",
+					"http://localhost:58167/chunks/document-app-8dpt9c8q.js",
+					"http://localhost:58167/chunks/document-app-34w64gpm.js",
+					"http://localhost:58167/chunks/document-app-62jy9d4y.js",
+					"http://localhost:58167/chunks/document-app-s6xwpz2x.js",
+					"http://localhost:58167/chunks/document-app-ebda9rwn.js",
+					"http://localhost:58167/chunks/document-app-pf9a02se.js",
+					"http://localhost:58167/chunks/document-app-f1c6psvb.js",
+					"http://localhost:58167/chunks/document-app-q80w28ak.js",
+					"http://localhost:58167/chunks/document-app-pcx1a4e5.js",
+					"http://localhost:58167/chunks/document-app-efr8tsz3.js",
+					"http://localhost:58167/chunks/document-app-5mfkvqya.js",
+					"http://localhost:58167/chunks/document-app-0fxwdp86.js",
+					"http://localhost:58167/chunks/document-app-arzhgms9.js",
+					"http://localhost:58167/chunks/document-app-s15nn115.js",
+					"http://localhost:58167/chunks/document-app-26k5tvss.js",
+					"http://localhost:58167/chunks/document-app-c1vterjt.js",
+					"http://localhost:58167/chunks/document-app-5y49dtc4.js",
+					"http://localhost:58167/chunks/document-app-4ptpq1fa.js",
+					"http://localhost:58167/chunks/document-worker-stats-37wqfxja.js",
+					"http://localhost:58167/document-worker.js"
+				]
+			},
+			{
+				"phase": "candidate",
+				"phaseTrial": 1,
+				"fixture": "128k-2048",
+				"inputTaskMs": 29.599,
+				"largestTaskWithAftermathMs": 54.75,
+				"readyMs": 29.748,
+				"taskCount": 1914,
+				"tasksOverBudget": 7,
+				"trusted": true,
+				"correctness": {
+					"busy": "false",
+					"characters": 122880,
+					"exact": true,
+					"observedEditCount": 2048,
+					"pending": "0",
+					"remaining": 0,
+					"replacements": 2048
+				},
+				"editAcceptedCursor": 6,
+				"undoAcceptedCursor": 8,
+				"undoExact": true,
+				"loadedScripts": [
+					"http://localhost:58167/chunks/document-app-jyezybx6.js",
+					"http://localhost:58167/chunks/document-app-m2qx4cqf.js",
+					"http://localhost:58167/chunks/document-app-ene8prfc.js",
+					"http://localhost:58167/app.js",
+					"http://localhost:58167/chunks/document-app-dd2q35bj.js",
+					"http://localhost:58167/chunks/document-app-mv4fwnrc.js",
+					"http://localhost:58167/chunks/document-app-vnwkd783.js",
+					"http://localhost:58167/chunks/document-app-2492txzq.js",
+					"http://localhost:58167/chunks/document-app-pgrjjm9d.js",
+					"http://localhost:58167/chunks/document-app-1cj8xn63.js",
+					"http://localhost:58167/chunks/document-app-4xprzseq.js",
+					"http://localhost:58167/chunks/document-app-s6ebq21x.js",
+					"http://localhost:58167/chunks/document-app-td1qshmr.js",
+					"http://localhost:58167/chunks/document-app-7dvv3r7d.js",
+					"http://localhost:58167/chunks/document-app-34w64gpm.js",
+					"http://localhost:58167/chunks/document-app-62jy9d4y.js",
+					"http://localhost:58167/chunks/document-app-s6xwpz2x.js",
+					"http://localhost:58167/chunks/document-app-ebda9rwn.js",
+					"http://localhost:58167/chunks/document-app-8dpt9c8q.js",
+					"http://localhost:58167/chunks/document-app-pf9a02se.js",
+					"http://localhost:58167/chunks/document-app-q80w28ak.js",
+					"http://localhost:58167/chunks/document-app-pcx1a4e5.js",
+					"http://localhost:58167/chunks/document-app-efr8tsz3.js",
+					"http://localhost:58167/chunks/document-app-5mfkvqya.js",
+					"http://localhost:58167/chunks/document-app-s15nn115.js",
+					"http://localhost:58167/chunks/document-app-0fxwdp86.js",
+					"http://localhost:58167/chunks/document-app-f1c6psvb.js",
+					"http://localhost:58167/chunks/document-app-arzhgms9.js",
+					"http://localhost:58167/chunks/document-app-c1vterjt.js",
+					"http://localhost:58167/chunks/document-app-4ptpq1fa.js",
+					"http://localhost:58167/chunks/document-app-26k5tvss.js",
+					"http://localhost:58167/chunks/document-app-5y49dtc4.js",
+					"http://localhost:58167/chunks/document-worker-stats-37wqfxja.js",
+					"http://localhost:58167/document-worker.js"
+				]
+			},
+			{
+				"phase": "candidate",
+				"phaseTrial": 1,
+				"fixture": "1m-2048",
+				"inputTaskMs": 33.155,
+				"largestTaskWithAftermathMs": 63.676,
+				"readyMs": 33.391,
+				"taskCount": 4518,
+				"tasksOverBudget": 10,
+				"trusted": true,
+				"correctness": {
+					"busy": "false",
+					"characters": 1040384,
+					"exact": true,
+					"observedEditCount": 2048,
+					"pending": "0",
+					"remaining": 0,
+					"replacements": 2048
+				},
+				"editAcceptedCursor": 30,
+				"undoAcceptedCursor": 32,
+				"undoExact": true,
+				"loadedScripts": [
+					"http://localhost:58167/chunks/document-app-ene8prfc.js",
+					"http://localhost:58167/app.js",
+					"http://localhost:58167/chunks/document-app-jyezybx6.js",
+					"http://localhost:58167/chunks/document-app-m2qx4cqf.js",
+					"http://localhost:58167/chunks/document-app-mv4fwnrc.js",
+					"http://localhost:58167/chunks/document-app-dd2q35bj.js",
+					"http://localhost:58167/chunks/document-app-pgrjjm9d.js",
+					"http://localhost:58167/chunks/document-app-1cj8xn63.js",
+					"http://localhost:58167/chunks/document-app-4xprzseq.js",
+					"http://localhost:58167/chunks/document-app-vnwkd783.js",
+					"http://localhost:58167/chunks/document-app-2492txzq.js",
+					"http://localhost:58167/chunks/document-app-s6ebq21x.js",
+					"http://localhost:58167/chunks/document-app-td1qshmr.js",
+					"http://localhost:58167/chunks/document-app-7dvv3r7d.js",
+					"http://localhost:58167/chunks/document-app-8dpt9c8q.js",
+					"http://localhost:58167/chunks/document-app-34w64gpm.js",
+					"http://localhost:58167/chunks/document-app-62jy9d4y.js",
+					"http://localhost:58167/chunks/document-app-s6xwpz2x.js",
+					"http://localhost:58167/chunks/document-app-ebda9rwn.js",
+					"http://localhost:58167/chunks/document-app-pf9a02se.js",
+					"http://localhost:58167/chunks/document-app-f1c6psvb.js",
+					"http://localhost:58167/chunks/document-app-q80w28ak.js",
+					"http://localhost:58167/chunks/document-app-pcx1a4e5.js",
+					"http://localhost:58167/chunks/document-app-efr8tsz3.js",
+					"http://localhost:58167/chunks/document-app-5mfkvqya.js",
+					"http://localhost:58167/chunks/document-app-0fxwdp86.js",
+					"http://localhost:58167/chunks/document-app-arzhgms9.js",
+					"http://localhost:58167/chunks/document-app-s15nn115.js",
+					"http://localhost:58167/chunks/document-app-26k5tvss.js",
+					"http://localhost:58167/chunks/document-app-c1vterjt.js",
+					"http://localhost:58167/chunks/document-app-5y49dtc4.js",
+					"http://localhost:58167/chunks/document-app-4ptpq1fa.js",
+					"http://localhost:58167/chunks/document-worker-stats-37wqfxja.js",
+					"http://localhost:58167/document-worker.js"
+				]
+			},
+			{
+				"phase": "baseline",
+				"phaseTrial": 1,
+				"fixture": "128k-2048",
+				"inputTaskMs": 27.44,
+				"largestTaskWithAftermathMs": 50.829,
+				"readyMs": 27.64,
+				"taskCount": 1319,
+				"tasksOverBudget": 7,
+				"trusted": true,
+				"correctness": {
+					"busy": "false",
+					"characters": 122880,
+					"exact": true,
+					"observedEditCount": 2048,
+					"pending": "0",
+					"remaining": 0,
+					"replacements": 2048
+				},
+				"editAcceptedCursor": 6,
+				"undoAcceptedCursor": 8,
+				"undoExact": true,
+				"loadedScripts": [
+					"http://localhost:58167/chunks/document-app-06pkehrg.js",
+					"http://localhost:58167/chunks/document-app-v6p1qvay.js",
+					"http://localhost:58167/app.js",
+					"http://localhost:58167/chunks/document-app-58cqw1dx.js",
+					"http://localhost:58167/chunks/document-app-m2qx4cqf.js",
+					"http://localhost:58167/chunks/document-app-43g09p0a.js",
+					"http://localhost:58167/chunks/document-app-es06eeja.js",
+					"http://localhost:58167/chunks/document-app-r3eebhvw.js",
+					"http://localhost:58167/chunks/document-app-q00km86k.js",
+					"http://localhost:58167/chunks/document-app-pk3bkrhx.js",
+					"http://localhost:58167/chunks/document-app-1n8fnx10.js",
+					"http://localhost:58167/chunks/document-app-g7pr3ty8.js",
+					"http://localhost:58167/chunks/document-app-102pwqh5.js",
+					"http://localhost:58167/chunks/document-app-3jdkyp4f.js",
+					"http://localhost:58167/chunks/document-app-nmkmxrxg.js",
+					"http://localhost:58167/chunks/document-app-b3j6rkzj.js",
+					"http://localhost:58167/chunks/document-app-1hr2amdq.js",
+					"http://localhost:58167/chunks/document-app-xc53pmep.js",
+					"http://localhost:58167/chunks/document-app-44h4an5k.js",
+					"http://localhost:58167/chunks/document-app-8b7kt562.js",
+					"http://localhost:58167/chunks/document-app-akx6xkv7.js",
+					"http://localhost:58167/chunks/document-app-2br1y630.js",
+					"http://localhost:58167/chunks/document-app-vvdk6tcs.js",
+					"http://localhost:58167/chunks/document-app-acm1vyk8.js",
+					"http://localhost:58167/chunks/document-app-w23t8p99.js",
+					"http://localhost:58167/chunks/document-app-jb1jvatb.js",
+					"http://localhost:58167/chunks/document-app-er26grye.js",
+					"http://localhost:58167/chunks/document-app-fzyeh54r.js",
+					"http://localhost:58167/chunks/document-app-70vy0mv8.js",
+					"http://localhost:58167/chunks/document-app-nqb2j1d5.js",
+					"http://localhost:58167/chunks/document-app-29ytm0gp.js",
+					"http://localhost:58167/chunks/document-app-x9k35fb4.js",
+					"http://localhost:58167/chunks/document-worker-stats-xj2116pa.js",
+					"http://localhost:58167/document-worker.js"
+				]
+			},
+			{
+				"phase": "baseline",
+				"phaseTrial": 1,
+				"fixture": "1m-2048",
+				"inputTaskMs": 26.148,
+				"largestTaskWithAftermathMs": 51.139,
+				"readyMs": 26.383,
+				"taskCount": 4507,
+				"tasksOverBudget": 10,
+				"trusted": true,
+				"correctness": {
+					"busy": "false",
+					"characters": 1040384,
+					"exact": true,
+					"observedEditCount": 2048,
+					"pending": "0",
+					"remaining": 0,
+					"replacements": 2048
+				},
+				"editAcceptedCursor": 30,
+				"undoAcceptedCursor": 32,
+				"undoExact": true,
+				"loadedScripts": [
+					"http://localhost:58167/chunks/document-app-v6p1qvay.js",
+					"http://localhost:58167/app.js",
+					"http://localhost:58167/chunks/document-app-06pkehrg.js",
+					"http://localhost:58167/chunks/document-app-m2qx4cqf.js",
+					"http://localhost:58167/chunks/document-app-58cqw1dx.js",
+					"http://localhost:58167/chunks/document-app-es06eeja.js",
+					"http://localhost:58167/chunks/document-app-43g09p0a.js",
+					"http://localhost:58167/chunks/document-app-r3eebhvw.js",
+					"http://localhost:58167/chunks/document-app-q00km86k.js",
+					"http://localhost:58167/chunks/document-app-102pwqh5.js",
+					"http://localhost:58167/chunks/document-app-pk3bkrhx.js",
+					"http://localhost:58167/chunks/document-app-1n8fnx10.js",
+					"http://localhost:58167/chunks/document-app-g7pr3ty8.js",
+					"http://localhost:58167/chunks/document-app-3jdkyp4f.js",
+					"http://localhost:58167/chunks/document-app-b3j6rkzj.js",
+					"http://localhost:58167/chunks/document-app-nmkmxrxg.js",
+					"http://localhost:58167/chunks/document-app-xc53pmep.js",
+					"http://localhost:58167/chunks/document-app-1hr2amdq.js",
+					"http://localhost:58167/chunks/document-app-44h4an5k.js",
+					"http://localhost:58167/chunks/document-app-8b7kt562.js",
+					"http://localhost:58167/chunks/document-app-akx6xkv7.js",
+					"http://localhost:58167/chunks/document-app-2br1y630.js",
+					"http://localhost:58167/chunks/document-app-acm1vyk8.js",
+					"http://localhost:58167/chunks/document-app-w23t8p99.js",
+					"http://localhost:58167/chunks/document-app-vvdk6tcs.js",
+					"http://localhost:58167/chunks/document-app-jb1jvatb.js",
+					"http://localhost:58167/chunks/document-app-er26grye.js",
+					"http://localhost:58167/chunks/document-app-fzyeh54r.js",
+					"http://localhost:58167/chunks/document-app-29ytm0gp.js",
+					"http://localhost:58167/chunks/document-app-70vy0mv8.js",
+					"http://localhost:58167/chunks/document-app-x9k35fb4.js",
+					"http://localhost:58167/chunks/document-app-nqb2j1d5.js",
+					"http://localhost:58167/chunks/document-worker-stats-xj2116pa.js",
+					"http://localhost:58167/document-worker.js"
+				]
+			},
+			{
+				"phase": "baseline",
+				"phaseTrial": 2,
+				"fixture": "128k-2048",
+				"inputTaskMs": 27.051,
+				"largestTaskWithAftermathMs": 50.933,
+				"readyMs": 27.217,
+				"taskCount": 1274,
+				"tasksOverBudget": 7,
+				"trusted": true,
+				"correctness": {
+					"busy": "false",
+					"characters": 122880,
+					"exact": true,
+					"observedEditCount": 2048,
+					"pending": "0",
+					"remaining": 0,
+					"replacements": 2048
+				},
+				"editAcceptedCursor": 6,
+				"undoAcceptedCursor": 8,
+				"undoExact": true,
+				"loadedScripts": [
+					"http://localhost:58167/chunks/document-app-v6p1qvay.js",
+					"http://localhost:58167/app.js",
+					"http://localhost:58167/chunks/document-app-m2qx4cqf.js",
+					"http://localhost:58167/chunks/document-app-58cqw1dx.js",
+					"http://localhost:58167/chunks/document-app-06pkehrg.js",
+					"http://localhost:58167/chunks/document-app-43g09p0a.js",
+					"http://localhost:58167/chunks/document-app-es06eeja.js",
+					"http://localhost:58167/chunks/document-app-r3eebhvw.js",
+					"http://localhost:58167/chunks/document-app-q00km86k.js",
+					"http://localhost:58167/chunks/document-app-102pwqh5.js",
+					"http://localhost:58167/chunks/document-app-pk3bkrhx.js",
+					"http://localhost:58167/chunks/document-app-1n8fnx10.js",
+					"http://localhost:58167/chunks/document-app-g7pr3ty8.js",
+					"http://localhost:58167/chunks/document-app-3jdkyp4f.js",
+					"http://localhost:58167/chunks/document-app-nmkmxrxg.js",
+					"http://localhost:58167/chunks/document-app-b3j6rkzj.js",
+					"http://localhost:58167/chunks/document-app-xc53pmep.js",
+					"http://localhost:58167/chunks/document-app-1hr2amdq.js",
+					"http://localhost:58167/chunks/document-app-44h4an5k.js",
+					"http://localhost:58167/chunks/document-app-8b7kt562.js",
+					"http://localhost:58167/chunks/document-app-akx6xkv7.js",
+					"http://localhost:58167/chunks/document-app-acm1vyk8.js",
+					"http://localhost:58167/chunks/document-app-w23t8p99.js",
+					"http://localhost:58167/chunks/document-app-vvdk6tcs.js",
+					"http://localhost:58167/chunks/document-app-2br1y630.js",
+					"http://localhost:58167/chunks/document-app-er26grye.js",
+					"http://localhost:58167/chunks/document-app-jb1jvatb.js",
+					"http://localhost:58167/chunks/document-app-fzyeh54r.js",
+					"http://localhost:58167/chunks/document-app-70vy0mv8.js",
+					"http://localhost:58167/chunks/document-app-29ytm0gp.js",
+					"http://localhost:58167/chunks/document-app-nqb2j1d5.js",
+					"http://localhost:58167/chunks/document-app-x9k35fb4.js",
+					"http://localhost:58167/chunks/document-worker-stats-xj2116pa.js",
+					"http://localhost:58167/document-worker.js"
+				]
+			},
+			{
+				"phase": "baseline",
+				"phaseTrial": 2,
+				"fixture": "1m-2048",
+				"inputTaskMs": 25.705,
+				"largestTaskWithAftermathMs": 52.123,
+				"readyMs": 25.948,
+				"taskCount": 4539,
+				"tasksOverBudget": 10,
+				"trusted": true,
+				"correctness": {
+					"busy": "false",
+					"characters": 1040384,
+					"exact": true,
+					"observedEditCount": 2048,
+					"pending": "0",
+					"remaining": 0,
+					"replacements": 2048
+				},
+				"editAcceptedCursor": 30,
+				"undoAcceptedCursor": 32,
+				"undoExact": true,
+				"loadedScripts": [
+					"http://localhost:58167/chunks/document-app-v6p1qvay.js",
+					"http://localhost:58167/app.js",
+					"http://localhost:58167/chunks/document-app-06pkehrg.js",
+					"http://localhost:58167/chunks/document-app-m2qx4cqf.js",
+					"http://localhost:58167/chunks/document-app-58cqw1dx.js",
+					"http://localhost:58167/chunks/document-app-es06eeja.js",
+					"http://localhost:58167/chunks/document-app-43g09p0a.js",
+					"http://localhost:58167/chunks/document-app-r3eebhvw.js",
+					"http://localhost:58167/chunks/document-app-q00km86k.js",
+					"http://localhost:58167/chunks/document-app-102pwqh5.js",
+					"http://localhost:58167/chunks/document-app-pk3bkrhx.js",
+					"http://localhost:58167/chunks/document-app-1n8fnx10.js",
+					"http://localhost:58167/chunks/document-app-g7pr3ty8.js",
+					"http://localhost:58167/chunks/document-app-3jdkyp4f.js",
+					"http://localhost:58167/chunks/document-app-b3j6rkzj.js",
+					"http://localhost:58167/chunks/document-app-nmkmxrxg.js",
+					"http://localhost:58167/chunks/document-app-xc53pmep.js",
+					"http://localhost:58167/chunks/document-app-1hr2amdq.js",
+					"http://localhost:58167/chunks/document-app-44h4an5k.js",
+					"http://localhost:58167/chunks/document-app-8b7kt562.js",
+					"http://localhost:58167/chunks/document-app-akx6xkv7.js",
+					"http://localhost:58167/chunks/document-app-2br1y630.js",
+					"http://localhost:58167/chunks/document-app-acm1vyk8.js",
+					"http://localhost:58167/chunks/document-app-w23t8p99.js",
+					"http://localhost:58167/chunks/document-app-vvdk6tcs.js",
+					"http://localhost:58167/chunks/document-app-jb1jvatb.js",
+					"http://localhost:58167/chunks/document-app-er26grye.js",
+					"http://localhost:58167/chunks/document-app-fzyeh54r.js",
+					"http://localhost:58167/chunks/document-app-29ytm0gp.js",
+					"http://localhost:58167/chunks/document-app-70vy0mv8.js",
+					"http://localhost:58167/chunks/document-app-x9k35fb4.js",
+					"http://localhost:58167/chunks/document-app-nqb2j1d5.js",
+					"http://localhost:58167/chunks/document-worker-stats-xj2116pa.js",
+					"http://localhost:58167/document-worker.js"
+				]
+			},
+			{
+				"phase": "candidate",
+				"phaseTrial": 2,
+				"fixture": "128k-2048",
+				"inputTaskMs": 30.095,
+				"largestTaskWithAftermathMs": 54.76,
+				"readyMs": 30.277,
+				"taskCount": 1297,
+				"tasksOverBudget": 7,
+				"trusted": true,
+				"correctness": {
+					"busy": "false",
+					"characters": 122880,
+					"exact": true,
+					"observedEditCount": 2048,
+					"pending": "0",
+					"remaining": 0,
+					"replacements": 2048
+				},
+				"editAcceptedCursor": 6,
+				"undoAcceptedCursor": 8,
+				"undoExact": true,
+				"loadedScripts": [
+					"http://localhost:58167/app.js",
+					"http://localhost:58167/chunks/document-app-jyezybx6.js",
+					"http://localhost:58167/chunks/document-app-mv4fwnrc.js",
+					"http://localhost:58167/chunks/document-app-m2qx4cqf.js",
+					"http://localhost:58167/chunks/document-app-1cj8xn63.js",
+					"http://localhost:58167/chunks/document-app-pgrjjm9d.js",
+					"http://localhost:58167/chunks/document-app-dd2q35bj.js",
+					"http://localhost:58167/chunks/document-app-ene8prfc.js",
+					"http://localhost:58167/chunks/document-app-4xprzseq.js",
+					"http://localhost:58167/chunks/document-app-2492txzq.js",
+					"http://localhost:58167/chunks/document-app-vnwkd783.js",
+					"http://localhost:58167/chunks/document-app-s6ebq21x.js",
+					"http://localhost:58167/chunks/document-app-td1qshmr.js",
+					"http://localhost:58167/chunks/document-app-7dvv3r7d.js",
+					"http://localhost:58167/chunks/document-app-8dpt9c8q.js",
+					"http://localhost:58167/chunks/document-app-s6xwpz2x.js",
+					"http://localhost:58167/chunks/document-app-62jy9d4y.js",
+					"http://localhost:58167/chunks/document-app-34w64gpm.js",
+					"http://localhost:58167/chunks/document-app-ebda9rwn.js",
+					"http://localhost:58167/chunks/document-app-pcx1a4e5.js",
+					"http://localhost:58167/chunks/document-app-5mfkvqya.js",
+					"http://localhost:58167/chunks/document-app-efr8tsz3.js",
+					"http://localhost:58167/chunks/document-app-pf9a02se.js",
+					"http://localhost:58167/chunks/document-app-q80w28ak.js",
+					"http://localhost:58167/chunks/document-app-f1c6psvb.js",
+					"http://localhost:58167/chunks/document-app-s15nn115.js",
+					"http://localhost:58167/chunks/document-app-0fxwdp86.js",
+					"http://localhost:58167/chunks/document-app-c1vterjt.js",
+					"http://localhost:58167/chunks/document-app-arzhgms9.js",
+					"http://localhost:58167/chunks/document-app-26k5tvss.js",
+					"http://localhost:58167/chunks/document-app-4ptpq1fa.js",
+					"http://localhost:58167/chunks/document-app-5y49dtc4.js",
+					"http://localhost:58167/chunks/document-worker-stats-37wqfxja.js",
+					"http://localhost:58167/document-worker.js"
+				]
+			},
+			{
+				"phase": "candidate",
+				"phaseTrial": 2,
+				"fixture": "1m-2048",
+				"inputTaskMs": 30.128,
+				"largestTaskWithAftermathMs": 56.877,
+				"readyMs": 30.422,
+				"taskCount": 4514,
+				"tasksOverBudget": 9,
+				"trusted": true,
+				"correctness": {
+					"busy": "false",
+					"characters": 1040384,
+					"exact": true,
+					"observedEditCount": 2048,
+					"pending": "0",
+					"remaining": 0,
+					"replacements": 2048
+				},
+				"editAcceptedCursor": 30,
+				"undoAcceptedCursor": 32,
+				"undoExact": true,
+				"loadedScripts": [
+					"http://localhost:58167/chunks/document-app-ene8prfc.js",
+					"http://localhost:58167/chunks/document-app-jyezybx6.js",
+					"http://localhost:58167/chunks/document-app-m2qx4cqf.js",
+					"http://localhost:58167/chunks/document-app-mv4fwnrc.js",
+					"http://localhost:58167/app.js",
+					"http://localhost:58167/chunks/document-app-dd2q35bj.js",
+					"http://localhost:58167/chunks/document-app-pgrjjm9d.js",
+					"http://localhost:58167/chunks/document-app-1cj8xn63.js",
+					"http://localhost:58167/chunks/document-app-4xprzseq.js",
+					"http://localhost:58167/chunks/document-app-vnwkd783.js",
+					"http://localhost:58167/chunks/document-app-2492txzq.js",
+					"http://localhost:58167/chunks/document-app-s6ebq21x.js",
+					"http://localhost:58167/chunks/document-app-td1qshmr.js",
+					"http://localhost:58167/chunks/document-app-7dvv3r7d.js",
+					"http://localhost:58167/chunks/document-app-8dpt9c8q.js",
+					"http://localhost:58167/chunks/document-app-34w64gpm.js",
+					"http://localhost:58167/chunks/document-app-62jy9d4y.js",
+					"http://localhost:58167/chunks/document-app-s6xwpz2x.js",
+					"http://localhost:58167/chunks/document-app-ebda9rwn.js",
+					"http://localhost:58167/chunks/document-app-pf9a02se.js",
+					"http://localhost:58167/chunks/document-app-f1c6psvb.js",
+					"http://localhost:58167/chunks/document-app-q80w28ak.js",
+					"http://localhost:58167/chunks/document-app-pcx1a4e5.js",
+					"http://localhost:58167/chunks/document-app-efr8tsz3.js",
+					"http://localhost:58167/chunks/document-app-5mfkvqya.js",
+					"http://localhost:58167/chunks/document-app-0fxwdp86.js",
+					"http://localhost:58167/chunks/document-app-arzhgms9.js",
+					"http://localhost:58167/chunks/document-app-s15nn115.js",
+					"http://localhost:58167/chunks/document-app-26k5tvss.js",
+					"http://localhost:58167/chunks/document-app-c1vterjt.js",
+					"http://localhost:58167/chunks/document-app-5y49dtc4.js",
+					"http://localhost:58167/chunks/document-app-4ptpq1fa.js",
+					"http://localhost:58167/chunks/document-worker-stats-37wqfxja.js",
+					"http://localhost:58167/document-worker.js"
+				]
+			}
+		],
+		"failures": []
+	},
+	"actualMulticursorMethod": "n3 matched alternate-order phases. Both128KiB/2048 and1MiB/2048 fixtures. Trusted Ctrl+Shift+L then native X; full input RunTask and3s deferred aftermath; exact2048 replacements and accepted strictly newer undo cursor. Same frozen client variants and native backend/profile/database seeds.",
+	"growthContract": {
+		"edits": 256,
+		"tests": 1,
+		"assertions": 17,
+		"failure": 0,
+		"checks": "native checkpoint equivalence, independent forks, cancellation, held source views, Unicode, restore"
+	},
+	"rejection": "Current undo wins do not compensate for real2048-selection replacement regressions.1MiB full input25.731\u219232.811ms and largest deferred51.139\u219263.676ms median. No production change."
+}

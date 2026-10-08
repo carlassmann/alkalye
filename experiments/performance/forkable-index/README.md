@@ -154,3 +154,43 @@ Undo deletes the caret's anchor. The editor's local search misses that exact ide
 `app-guard-profile-results.json` preserves the mapped samples. These single diagnostic samples identify code paths; they are not new statistical latency results. Shared indexes remain unadopted.
 
 written with gpt-6 in codex
+
+## Current cancellation-cache app comparison
+
+Frozen baseline `17d3a97` includes the guarded terminal-cancellation source cache, deleted-caret fix and coalesced syntax overlay. The candidate changes only atom-index and child-index containers: apply `app-cancellation-index.patch`, then copy `empty-overlay-index.ts` to `src/shared/forkable-index.ts`. It adds no eager materialization or private preparation copies. Both clients use the same native baseline server.
+
+Three matched pairs on the exact 1MiB/512-paragraph fixture, alternating variant order, measured:
+
+| Journey metric                               |   Native | Hybrid index |
+| -------------------------------------------- | -------: | -----------: |
+| Undo source ready plus two RAF opportunities |  210.8ms |       88.6ms |
+| Undo accepted checkpoint                     | 1180.7ms |      957.5ms |
+| Largest undo task                            |  25.51ms |      25.07ms |
+| Native single-character input dispatch       |   4.16ms |       4.34ms |
+| Largest deferred edit task                   |   9.77ms |      10.37ms |
+| Edit accepted checkpoint                     | 2436.5ms |     2492.5ms |
+
+Single paired controls also passed on 128KiB/2048 and 1MiB/2048-paragraph fixtures. Undo visibility opportunities decreased 95.8→72.5ms and 263.9→149.7ms. These are native one-character append/undo controls, not multicursor replacement.
+
+Each phase restores the same consistent disposable SQLite seed and browser-profile seed, clears service-worker caches, verifies frozen asset hashes, requires exact literal source, trusted events, no pending/rejected operations, and an accepted snapshot cursor strictly newer than the preceding edit. Traces remain outside Git under `/tmp/alkalye-index-cancel-current`. Compact raw measurements are in `app-cancellation-results.json`.
+
+The candidate remains experimental. The 25ms largest task exceeds the 8.3ms target. Heap samples are readiness samples affected by GC: 1MiB samples generally decreased, but the single 128KiB candidate sample increased. They establish neither peak memory nor retained-memory bounds. The native backend avoids attributing server changes to a client comparison.
+
+129 public integration contracts passed, including Unicode edits, independent forks, held views, checkpoint ordering/restore, causal undo, cooperative interruption/stale copying, passive-session isolation and the current terminal-cancellation cases. Strict types passed. Opus5.5 found no correctness blockers, but noted that persistent additions and copied override Sets grow throughout long sessions. No speculative compaction was added.
+
+written with gpt-6 in codex
+
+### Genuine multicursor control rejects adoption
+
+The native single-character controls above did not cover multicursor cost. A second matched comparison used trusted Ctrl+Shift+L to select all 2048 `TOKEN` occurrences, then native `X` input. Three alternating-order pairs ran both 128KiB and 1MiB fixtures. Every trial proved exactly 2048 edits, exact replacement source, accepted edit, exact undo and a strictly newer accepted undo cursor.
+
+| Actual 2048-selection metric | Native median / max | Hybrid median / max |
+| ---------------------------- | ------------------: | ------------------: |
+| 128KiB input RunTask         |     27.37 / 27.44ms |     30.10 / 31.78ms |
+| 128KiB largest deferred task |     50.93 / 75.57ms |     54.76 / 58.72ms |
+| 1MiB input RunTask           |     25.73 / 26.15ms |     32.81 / 33.16ms |
+| 1MiB largest deferred task   |     51.14 / 52.12ms |     63.68 / 65.79ms |
+
+**Rejected.** Faster undo does not compensate for slower multicursor editing. Production remains native Maps. The broader control shows why an append-only benchmark could not justify adoption. `verifyEquivalent(nativeFactory, candidateFactory, 256)` extends the public contract to 256 edits; it also passed native checkpoint equivalence, held views, Unicode, independent branches, cancellation and restoration; correctness was not the reason for rejection. No compaction or additional infrastructure was added.
+
+written with gpt-6 in codex
