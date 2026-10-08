@@ -22,7 +22,8 @@
 		"offlineApiRequests": 0,
 		"observedServerPosition": 9,
 		"distinctAssertions": 9,
-		"bootstrapAssertions": 3
+		"bootstrapAssertions": 3,
+		"timeoutBoundary": "whole verify method: Flush/Close/dispose/createWorker/blockAPI/Open/Read; not isolatedofflineOpen"
 	},
 	"fixture": {
 		"initialUtf8Bytes": 1048576,
@@ -101,7 +102,7 @@
 	},
 	"limits": [
 		"initialOpen crossed20s readinesswait; completed later unchanged",
-		"offlineReopen crossed20s wait; completed later unchanged",
+		"whole verification (Flush/Close/dispose/create/Open/Read) crossed20s wait; offlineOpen duration unmeasured",
 		"Observe consumer counter-only, not sidebar/preview DOM or peeradoption",
 		"workerheap/processRSS unmeasured",
 		"one sample, no comparative gain",
