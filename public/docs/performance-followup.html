@@ -201,9 +201,25 @@
 			checks: native typing, queued edits, formatting, multicursor editing,
 			remote caret adoption, local durability and scoped disposal. Its timing
 			fixture had incorrect CSS precedence: the 1MiB editor expanded to
-			663,985px tall. Those timings are discarded. The corrected fixture must
-			verify bounded viewport geometry before measurement. No speedup,
-			frame-rate or visual-parity claim follows from this run.
+			663,985px tall. Those timings are discarded.
+		</p>
+		<p>
+			The corrected fixture verifies an 800px viewport and a bounded native
+			fragment before timing. All nine cells passed exact source, local flush
+			and queue checks. Complete enclosing main-thread tasks took 1.0–2.1ms for
+			128KiB and 1MiB typing, and 5.1–7.2ms for 2,048 cursors. These include
+			microtasks; listener-only measurements are not the frame-budget evidence.
+			Each cell also observed three seconds of aftermath without a main task
+			exceeding 8.33ms.
+		</p>
+		<p>
+			Worker tasks still reached 204–240ms, and multicursor completion took
+			302–507ms including driver round trips. Main heap samples were 8–44MB;
+			worker heap and total browser memory were unavailable. This bounded
+			prototype supports input isolation, not a causal full-app speedup or 120Hz
+			presentation claim. Undo, anchor-dependent features, sustained input and
+			worker failure recovery remain production gates. Evidence:
+			<code>experiments/worker-session/actual-editor</code>.
 		</p>
 		<p>
 			Active-line geometry caching was rejected. Six valid rich-document wheel
