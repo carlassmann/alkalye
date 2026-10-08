@@ -1,0 +1,10 @@
+bun test v1.4.0 (34cbb9a40)
+
+compat-old.test.ts:
+(pass) old reader preserves unsupported journal and classifies failure [26.71ms]
+
+ 1 pass
+ 1 filtered out
+ 0 fail
+ 2 expect() calls
+Ran 1 test across 1 file. [80.00ms]

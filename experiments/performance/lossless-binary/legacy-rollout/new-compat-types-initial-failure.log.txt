@@ -1,0 +1,13 @@
+compat-new.test.ts(10,1): error TS6133: 'Replica' is declared but its value is never read.
+compat-new.test.ts(11,10): error TS6133: 'buildAction' is declared but its value is never read.
+compat-new.test.ts(12,1): error TS6133: 'newDocument' is declared but its value is never read.
+compat-new.test.ts(13,27): error TS6133: 'documentDatabaseName' is declared but its value is never read.
+compat-new.test.ts(15,10): error TS6133: 'cliDocumentPlatform' is declared but its value is never read.
+compat-new.test.ts(16,1): error TS6133: 'DocumentJournal' is declared but its value is never read.
+compat-new.test.ts(65,58): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(expected: { event: string; bytes: string; }[]): void', gave the following error.
+    Argument of type 'readonly { readonly event: string; readonly bytes: string; }[]' is not assignable to parameter of type '{ event: string; bytes: string; }[]'.
+      The type 'readonly { readonly event: string; readonly bytes: string; }[]' is 'readonly' and cannot be assigned to the mutable type '{ event: string; bytes: string; }[]'.
+  Overload 2 of 2, '(expected: NoInfer<{ event: string; bytes: string; }[]>): void', gave the following error.
+    Argument of type 'readonly { readonly event: string; readonly bytes: string; }[]' is not assignable to parameter of type '{ event: string; bytes: string; }[]'.
+      The type 'readonly { readonly event: string; readonly bytes: string; }[]' is 'readonly' and cannot be assigned to the mutable type '{ event: string; bytes: string; }[]'.

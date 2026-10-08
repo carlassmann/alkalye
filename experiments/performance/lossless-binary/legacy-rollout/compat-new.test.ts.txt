@@ -1,0 +1,83 @@
+import { expect, test } from "bun:test"
+import { Database } from "bun:sqlite"
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import * as Layer from "effect/Layer"
+import type * as Scope from "effect/Scope"
+import * as Schema from "effect/Schema"
+import { WorkspaceStore } from "./src/server/document-store"
+import { Identity } from "./src/shared/workspace"
+import { ResourceUnavailable } from "./src/shared/document-actions"
+import { DocumentSession } from "./src/shared/document-session"
+import type { DocumentTransport } from "./src/shared/document-session"
+import { cliDocumentSessionLayer } from "./src/cli/document-platform"
+
+let directory = process.env.LOSSLESS_COMPAT_DATA
+if (!directory) throw new Error("Missing disposable fixture directory")
+let fixtureDirectory = directory
+let source = '---\ntitle: "Legacy"\n---\nBody 😀\n'
+function required<A>(value: A | undefined) {
+ return value === undefined ? Effect.fail(new ResourceUnavailable({message:"Missing fixture"})) : Effect.succeed(value)
+}
+function rows(filename:string) {
+ let db = new Database(filename,{readonly:true})
+ try {return db.query<{event:string,payload:Uint8Array},[]>("SELECT event,payload FROM effect_event_journal ORDER BY rowid").all().map(row=>({event:row.event,bytes:Buffer.from(row.payload).toString("hex")}))}
+ finally {db.close()}
+}
+function withStore<A,E>(work:(store:WorkspaceStore["Service"])=>Effect.Effect<A,E,Scope.Scope>) {
+ return Effect.scoped(Effect.gen(function*(){
+ let services=yield* Layer.build(WorkspaceStore.layer(fixtureDirectory+"/server.sqlite"))
+ return yield* work(Context.get(services,WorkspaceStore))
+ }))
+}
+function request<A,E>(value:Effect.Effect<A,E,Identity>) {return value.pipe(Effect.provideService(Identity,{subject:"compat-owner",actors:[]}))}
+function transport(store:WorkspaceStore["Service"]):DocumentTransport {
+ return {
+ create:()=>Effect.fail(new Error("Already seeded")),
+ snapshot:document=>request(store.snapshot(document)).pipe(Effect.flatMap(required)),
+ commit:action=>store.commit(action).pipe(Effect.provideService(Identity,{subject:"compat-owner",actors:[action.actor]})),
+ history:(document,after,log,limit)=>request(store.history(document,after,log,limit)),
+ action:(document,action)=>request(store.action(document,action)).pipe(Effect.flatMap(required)),
+ chain:(document,action)=>request(store.chain(document,action)).pipe(Effect.flatMap(required))
+ }
+}
+test("phase-one reader migrates populated legacy data without changing bytes",async()=>{
+ let originalRows=Schema.decodeUnknownSync(Schema.fromJsonString(Schema.Array(Schema.Struct({event:Schema.String,bytes:Schema.String}))))(await Bun.file(fixtureDirectory+"/old-server-rows.json").text())
+ await Effect.runPromise(withStore(store=>Effect.gen(function*(){
+ let workspace=yield* request(store.workspaceSnapshot("space"))
+ expect(workspace?.name).toBe('"literal JSON-looking name"')
+ let history=yield* request(store.workspaceHistory("space"))
+ expect(history.find(row=>row.fact.change.kind === "created")?.fact.change).toEqual({kind:"created",name:'"literal JSON-looking name"'})
+ let options={document:"doc",subject:"compat-owner",transport:transport(store)}
+ let context=yield* Layer.build(cliDocumentSessionLayer(fixtureDirectory,options))
+ let session=Context.get(context,DocumentSession)
+ expect(session.replica.text("doc")).toBe(source+"!")
+ yield* session.sync
+ expect(session.replica.text("doc")).toBe(source+"!")
+ let library=yield* request(store.library())
+ expect(library.workspaces[0]?.name).toBe('"literal JSON-looking name"')
+ expect(library.documents[0]?.metadata.title).toBe("Legacy")
+ expect(library.documents[0]?.excerpt).toBe("Body 😀 !")
+ })))
+ expect(rows(fixtureDirectory+"/server.sqlite")).toEqual(originalRows.map(row=>({...row})))
+ let db=new Database(fixtureDirectory+"/server.sqlite",{readonly:true})
+ try {
+ expect(db.query("SELECT name FROM pragma_table_info('workspaces') WHERE name='name_json'").all()).toHaveLength(1)
+ expect(db.query("SELECT name FROM pragma_table_info('document_summaries') WHERE name='excerpt_json'").all()).toHaveLength(1)
+ } finally {db.close()}
+},10000)
+
+test("phase-two exceptional write is exact before old-reader probe",async()=>{
+ await Effect.runPromise(withStore(store=>Effect.gen(function*(){
+ yield* request(store.rename("space","Workspace lone\uD800","new-name"))
+ let options={document:"doc",subject:"compat-owner",transport:transport(store)}
+ let context=yield* Layer.build(cliDocumentSessionLayer(fixtureDirectory,options))
+ let session=Context.get(context,DocumentSession)
+ expect(session.replica.text("doc")).toBe(source+"!")
+ yield* session.edit(source+"!\uD800").saved
+ yield* session.sync
+ yield* session.save
+ expect(session.replica.text("doc")).toBe(source+"!\uD800")
+ expect((yield* request(store.workspaceSnapshot("space")))?.name).toBe("Workspace lone\uD800")
+ })))
+},10000)

@@ -1,0 +1,2 @@
+compat-old.test.ts(47,43): error TS2322: Type 'Effect<void, unknown, Scope>' is not assignable to type 'Effect<void, unknown, never>'.
+  Type 'Scope' is not assignable to type 'never'.

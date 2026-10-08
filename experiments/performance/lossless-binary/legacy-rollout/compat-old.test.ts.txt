@@ -1,0 +1,84 @@
+import { expect, test } from "bun:test"
+import { Database } from "bun:sqlite"
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import * as Layer from "effect/Layer"
+import type * as Scope from "effect/Scope"
+import * as EventJournal from "effect/eventlog/EventJournal"
+import { WorkspaceStore } from "./src/server/document-store"
+import { Identity } from "./src/shared/workspace"
+import { Replica } from "./src/shared/crdt"
+import { buildAction, ResourceUnavailable } from "./src/shared/document-actions"
+import { newDocument } from "./src/shared/documents"
+import { DocumentSession, documentDatabaseName } from "./src/shared/document-session"
+import type { DocumentTransport } from "./src/shared/document-session"
+import { cliDocumentPlatform, cliDocumentSessionLayer } from "./src/cli/document-platform"
+import { DocumentJournal } from "./src/platform/document-journal"
+
+let directory = process.env.LOSSLESS_COMPAT_DATA
+if (!directory) throw new Error("Missing disposable fixture directory")
+let fixtureDirectory = directory
+let source = '---\ntitle: "Legacy"\n---\nBody 😀\n'
+function required<A>(value: A | undefined) {
+ return value === undefined ? Effect.fail(new ResourceUnavailable({message:"Missing fixture"})) : Effect.succeed(value)
+}
+function rows(filename:string) {
+ let db = new Database(filename,{readonly:true})
+ try {return db.query<{event:string,payload:Uint8Array},[]>("SELECT event,payload FROM effect_event_journal ORDER BY rowid").all().map(row=>({event:row.event,bytes:Buffer.from(row.payload).toString("hex")}))}
+ finally {db.close()}
+}
+function withStore<A,E>(work:(store:WorkspaceStore["Service"])=>Effect.Effect<A,E,Scope.Scope>) {
+ return Effect.scoped(Effect.gen(function*(){
+ let services=yield* Layer.build(WorkspaceStore.layer(fixtureDirectory+"/server.sqlite"))
+ return yield* work(Context.get(services,WorkspaceStore))
+ }))
+}
+function request<A,E>(value:Effect.Effect<A,E,Identity>) {return value.pipe(Effect.provideService(Identity,{subject:"compat-owner",actors:[]}))}
+function transport(store:WorkspaceStore["Service"]):DocumentTransport {
+ return {
+ create:()=>Effect.fail(new Error("Already seeded")),
+ snapshot:document=>request(store.snapshot(document)).pipe(Effect.flatMap(required)),
+ commit:action=>store.commit(action).pipe(Effect.provideService(Identity,{subject:"compat-owner",actors:[action.actor]})),
+ history:(document,after,log,limit)=>request(store.history(document,after,log,limit)),
+ action:(document,action)=>request(store.action(document,action)).pipe(Effect.flatMap(required)),
+ chain:(document,action)=>request(store.chain(document,action)).pipe(Effect.flatMap(required))
+ }
+}
+test("seed actual pre-migration database",async()=>{
+ await Effect.runPromise(withStore(store=>Effect.gen(function*(){
+ yield* request(store.create("space",'"literal JSON-looking name"',"old-create"))
+ let birth=new Replica("old-birth")
+ let creation=yield* buildAction(birth,"doc","Old create",staged=>newDocument(staged,"doc","Legacy",source))
+ yield* store.createDocument("space",creation).pipe(Effect.provideService(Identity,{subject:"compat-owner",actors:[creation.actor]}))
+ let options={document:"doc",subject:"compat-owner",transport:transport(store)}
+ let context=yield* Layer.build(cliDocumentSessionLayer(fixtureDirectory,options))
+ let session=Context.get(context,DocumentSession)
+ expect(session.replica.text("doc")).toBe(source)
+ yield* session.edit(source+"!").saved
+ yield* session.sync
+ yield* session.save
+ expect(session.replica.text("doc")).toBe(source+"!")
+ })))
+ let db=new Database(fixtureDirectory+"/server.sqlite",{readonly:true})
+ try {expect(db.query("SELECT name FROM pragma_table_info('workspaces') WHERE name='name_json'").all()).toHaveLength(0)} finally{db.close()}
+ await Bun.write(fixtureDirectory+"/old-server-rows.json",JSON.stringify(rows(fixtureDirectory+"/server.sqlite")))
+},10000)
+
+test("old reader preserves unsupported journal and classifies failure",async()=>{
+ let options={document:"doc",subject:"compat-owner",transport:{create:()=>Effect.fail(new Error("No network")),snapshot:()=>Effect.fail(new Error("No network")),commit:()=>Effect.fail(new Error("No network")),history:()=>Effect.succeed([])}} satisfies Parameters<typeof DocumentSession.layer>[0]
+ let journalName=documentDatabaseName(options)
+ let filename=fixtureDirectory+"/documents/"+new Bun.CryptoHasher("sha256").update(journalName).digest("hex")+".sqlite"
+ let before=rows(filename)
+ let result=await Effect.runPromise(Effect.scoped(Effect.gen(function*(){
+ let platform=cliDocumentPlatform(fixtureDirectory)
+ let journalServices=yield* Layer.build(platform.journal(journalName))
+ let storage=Context.get(journalServices,DocumentJournal)
+ let storageWithoutCache=Layer.succeed(DocumentJournal,{...storage,cache:Effect.succeed(undefined)})
+ let journal=Layer.succeed(EventJournal.EventJournal,storage.journal)
+ let layer=DocumentSession.layer(options).pipe(Layer.provide(Layer.merge(storageWithoutCache,journal)),Layer.provide(platform.lifecycle))
+ return yield* Layer.build(layer).pipe(Effect.result)
+ })))
+ expect(result._tag).toBe("Failure")
+ await Bun.write(fixtureDirectory+"/old-reader-result.json",JSON.stringify(result))
+ expect(rows(filename)).toEqual(before)
+},10000)

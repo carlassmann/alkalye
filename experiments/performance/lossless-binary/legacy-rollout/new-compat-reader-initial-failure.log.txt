@@ -1,0 +1,37 @@
+bun test v1.4.0 (34cbb9a40)
+
+compat-new.test.ts:
+45 |  let originalRows=Schema.decodeUnknownSync(Schema.fromJsonString(Schema.Array(Schema.Struct({event:Schema.String,bytes:Schema.String}))))(await Bun.file(fixtureDirectory+"/old-server-rows.json").text())
+46 |  await Effect.runPromise(withStore(store=>Effect.gen(function*(){
+47 |  let workspace=yield* request(store.workspaceSnapshot("space"))
+48 |  expect(workspace?.name).toBe('"literal JSON-looking name"')
+49 |  let history=yield* request(store.workspaceHistory("space"))
+50 |  expect(history.at(-1)?.fact.change).toEqual({kind:"created",name:'"literal JSON-looking name"'})
+                                          ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "kind": "created",
+-   "name": ""literal JSON-looking name"",
++   "document": "doc",
++   "kind": "documentAdded",
+  }
+
+- Expected  - 2
++ Received  + 2
+
+      at <anonymous> (/private/tmp/alkalye-lossless-binary-runtime/compat-new.test.ts:50:38)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2478:9)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2530:19)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2541:31)
+      at <anonymous> (/private/tmp/alkalye-lossless-binary-runtime/compat-new.test.ts:46:15)
+(fail) phase-one reader migrates populated legacy data without changing bytes [22.48ms]
+
+ 0 pass
+ 1 filtered out
+ 1 fail
+ 2 expect() calls
+Ran 1 test across 1 file. [77.00ms]

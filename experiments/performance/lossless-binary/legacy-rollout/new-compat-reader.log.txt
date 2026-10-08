@@ -1,0 +1,10 @@
+bun test v1.4.0 (34cbb9a40)
+
+compat-new.test.ts:
+(pass) phase-one reader migrates populated legacy data without changing bytes [31.02ms]
+
+ 1 pass
+ 1 filtered out
+ 0 fail
+ 10 expect() calls
+Ran 1 test across 1 file. [79.00ms]

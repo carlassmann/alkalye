@@ -1,0 +1,10 @@
+bun test v1.4.0 (34cbb9a40)
+
+compat-old.test.ts:
+(pass) seed actual pre-migration database [62.25ms]
+
+ 1 pass
+ 1 filtered out
+ 0 fail
+ 3 expect() calls
+Ran 1 test across 1 file. [121.00ms]

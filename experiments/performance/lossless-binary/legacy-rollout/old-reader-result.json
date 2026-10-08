@@ -1,0 +1,8 @@
+{
+	"_id": "Result",
+	"_tag": "Failure",
+	"failure": {
+		"_tag": "DocumentConflict",
+		"message": "Unknown document journal entry"
+	}
+}
