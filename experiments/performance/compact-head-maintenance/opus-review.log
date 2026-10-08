@@ -1,0 +1,27 @@
+Two blockers; the core design holds up. Review was done by reading code only (no tsc, no tests run).
+
+**Blockers**
+1. **Wrong error tag in tests.** `tests/checkpoint-maintenance.test.ts:146` and `:182` expect `_tag === "DocumentForbidden"`. But `forbidden()` fails with `PermissionDenied` (`src/shared/document-errors.ts:48`), and "DocumentForbidden" appears nowhere in `src`. Both the reader test and the revocation test will fail at runtime. tsc won't catch it, because `_tag` is compared as a string.
+2. **No tip skips validation.** If a head exists but the tip row is missing, `refresh` (`document-store.ts:2449`) returns an empty replica without checking anything. Maintenance then compacts the head with no recovery check. Fix: in the read transaction, fail with a conflict when there is no tip: `if (!tip) return yield* conflict("Document recovery tail is incomplete")`.
+
+**Checked and OK**
+- **Full validation:** `refresh` runs on the readonly `ReadDatabase` connection with a fresh `makeSession()` and `readQueries`, so no cache aliasing. Malformed state and a short tail both fail with `DocumentConflict`.
+- **Head encoding:** the second restore encodes only the head cursor. Log, position, version, tip, actions and history are untouched. No notice or cache update is needed, since the logical state is unchanged.
+- **Write path:** the CAS on (log, position, version, state) plus the owner recheck run on the write connection inside `transact`, which handles ownership and masking. An interval rewrite, a log change or a second maintenance run each get 0 rows back, so the call returns `false`.
+- **Interruption:** the body is interruptible and rolls back. Once committed, the result can't be interrupted.
+- **Over the compact limit:** v1 or more than 2M atoms leaves the format unchanged, so the call returns `false`.
+- **Nesting:** a caller transaction gets `TransactionOwnershipError`. This only fires after the read work has run, so that work is wasted, but it's safe.
+
+**Should fix**
+- **Round-trip check:** before overwriting legacy bytes, restore the new state and compare its checkpoint with `replica.checkpoint()`. The overwrite can't be undone.
+- **Ambiguous `false`:** it means no head, already compact, too large or lost race. Return a tagged result so the report can say which.
+- **Helper reuse (your question):** yes. `restoreSnapshot(..., true)` plus `compactCheckpointEffect` (`checkpoint.ts:150`) give built-in cooperative yields. They'd replace the manual `yieldNow` and the synchronous compaction. Keep the two restores.
+
+**The tests prove less than their names claim**
+- **Race:** `false` also results when the commit finishes before maintenance reads, through the `state === head.state` path. Without a hook this is not deterministic. It proves "no stale publish", not "CAS rejected".
+- **Interrupt:** the child almost certainly stops at its first `yieldNow`, before `transact`. That covers interruption before the write, not inside the write transaction. The fiber's exit isn't asserted, so add a check that it was actually interrupted.
+- **Revocation:** `PermissionDenied` can come from either the read-time check or the recheck, so the recheck isn't isolated.
+
+Plan file: /Users/carlassmann/.claude/plans/read-only-claude-opus5-5-review-sharded-mist.md
+
+Several claude.ai connectors (GitHub, Slack, etc.) need authorization in claude.ai connector settings; they weren't needed here.

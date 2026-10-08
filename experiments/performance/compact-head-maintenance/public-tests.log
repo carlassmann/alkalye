@@ -1,0 +1,73 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/checkpoint-maintenance.test.ts:
+91 | 		expect(yield* store.commit(undo)).toBe(position)
+92 | 	}))
+93 | 	await run(filename, Effect.gen(function* () {
+94 | 		let { store, replica } = yield* read()
+95 | 		expect(replica.text("doc")).toBe(original)
+96 | 		expect(replica.fields("doc").note).toBeUndefined()
+                                          ^
+error: expect(received).toBeUndefined()
+
+Received: ""
+
+      at <anonymous> (/private/tmp/alkalye-compact-head-maintenance/runtime/tests/checkpoint-maintenance.test.ts:96:38)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2478:9)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2530:19)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2541:31)
+      at <anonymous> (/private/tmp/alkalye-compact-head-maintenance/runtime/tests/checkpoint-maintenance.test.ts:93:8)
+(fail) owner compaction preserves old checkpoint cursor, current tail, Unicode source, history and Undo across scopes [155.25ms]
+(pass) malformed legacy state refuses maintenance without changing its durable bytes [29.20ms]
+(pass) incomplete recovery tail refuses maintenance without changing the old checkpoint [34.15ms]
+127 | 	await legacy(filename, 98)
+128 | 	await run(filename, Effect.gen(function* () {
+129 | 		let { store, replica } = yield* read()
+130 | 		let edit = yield* buildAction(replica, "doc", "Note 99", staged => [staged.set("doc", "note", "99")])
+131 | 		let result = yield* Effect.all({ maintenance: store.compactStoredCheckpoint("doc"), commit: store.commit(edit) }, { concurrency: 2 })
+132 | 		expect(result.maintenance).toBe("Stale")
+                                   ^
+error: expect(received).toBe(expected)
+
+Expected: "Stale"
+Received: "Compacted"
+
+      at <anonymous> (/private/tmp/alkalye-compact-head-maintenance/runtime/tests/checkpoint-maintenance.test.ts:132:30)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2305:17)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:434:19)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+(fail) a concurrent public checkpoint rewrite preserves the newer public state [211.75ms]
+(pass) readers cannot compact and interrupted maintenance leaves its original durable checkpoint [283.00ms]
+179 | 		expect(yield* store.accessRole("doc", "owner")).toBe("owner")
+180 | 		let result = yield* Effect.all({
+181 | 			maintenance: store.compactStoredCheckpoint("doc").pipe(Effect.result),
+182 | 			move: store.moveDocument("doc", "destination", "move-to-revoke"),
+183 | 		}, { concurrency: 2 })
+184 | 		expect(result.maintenance._tag === "Failure" && result.maintenance.failure._tag).toBe("PermissionDenied")
+                                                                                         ^
+error: expect(received).toBe(expected)
+
+Expected: "PermissionDenied"
+Received: false
+
+      at <anonymous> (/private/tmp/alkalye-compact-head-maintenance/runtime/tests/checkpoint-maintenance.test.ts:184:84)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2305:17)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:434:19)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+(fail) moving a creator-owned document refuses concurrent inherited-owner maintenance [42.38ms]
+
+ 3 pass
+ 3 fail
+ 23 expect() calls
+Ran 6 tests across 1 file. [840.00ms]

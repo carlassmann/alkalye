@@ -1,0 +1,31 @@
+The latest code is safe and minimally scoped, with no mandatory blockers. I only read the code; nothing was compiled or run.
+
+**Both earlier blockers are fixed**
+- **No tip:** a head with no tip now fails with a conflict (`document-store.ts:969`).
+- **Tests:** the reader and revocation tests now expect `PermissionDenied`.
+
+**Checked and OK**
+- **Captured lookup adapter:** the types fit. A fresh session means no cache hit, so `refresh` rechecks the head against the tip, checks the tail count and last position, and decodes and applies every row. Head, tip and rows all come from one read transaction, so they agree with each other. Nothing aliases the live session or cache.
+- **`cooperative=false` default:** the existing caller (`:2373`) is unchanged.
+- **Equivalence check:** `isDeepStrictEqual` fails closed. If one restore path yields `undefined` where the other omits the field, maintenance refuses; it never corrupts.
+- **Write:** the owner recheck runs on the write connection, and the swap only succeeds if log, position, version and state all still match the captured head. `transact` rolls back on interruption.
+- **Old head:** it is only re-encoded; the cursor and tail are untouched. Notices and caches need no update, because `snapshotOf` serializes from the replica, not from the stored bytes.
+
+**Non-blocking risks**
+1. **Race and revocation tests depend on scheduling** (`:131`, `:180`):
+   - `Stale` needs the commit to land between maintenance's read and its write. If the commit lands first the result is `AlreadyCompact`; if maintenance writes first it is `Compacted`.
+   - The revocation test also fails if maintenance finishes before the move.
+   - The order is probably stable, but that's unproven. Run each test 50+ times.
+   - The race test also silently relies on `checkpointInterval = 100` (`:115`): 98 notes plus one commit reaches version 100.
+2. **Wider error type:** failures inside `checkpointEffect` and `compactCheckpointEffect` come out as `ApplicationError`, not `DocumentConflict`. Nothing calls this yet, but a future route must handle it.
+3. **Outcome decode does nothing at runtime** (`:1001`): TypeScript already infers the literal union, and a mismatch would become a defect. Keep it only if the exported Schema is the intended contract.
+4. **CPU cost:** each run restores the head three times and replays the tail. That's fine for an offline job, but worth weighing before the CPU lease for large documents.
+5. **Managed documents:** maintenance doesn't refuse managed documents. Commit already writes compact heads for them, so this is probably harmless; confirm it's intended.
+
+**Scope:** one import, one exported Schema, one method and one optional `refresh` parameter. No route or job.
+
+**When the CPU lease is granted:** run `bun test tests/checkpoint-maintenance.test.ts --rerun-each 50`, then `bun run check`.
+
+The review is also saved at /Users/carlassmann/.claude/plans/read-only-followup-on-completed-swirling-planet.md.
+
+Several claude.ai connectors (GitHub, Slack, etc.) need authorizing in claude.ai connector settings; this review didn't use them.

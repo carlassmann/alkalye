@@ -1,0 +1,102 @@
+diff --git a/tmp/alkalye-compact-head-maintenance/baseline.ts.txt b/tmp/alkalye-compact-head-maintenance/runtime/src/server/document-store.ts
+index 0e97de7..32fe33e 100644
+--- a/tmp/alkalye-compact-head-maintenance/baseline.ts.txt
++++ b/tmp/alkalye-compact-head-maintenance/runtime/src/server/document-store.ts
+@@ -1,3 +1,4 @@
++import { isDeepStrictEqual } from "node:util"
+ import * as Context from "effect/Context"
+ import * as Config from "effect/Config"
+ import * as Crypto from "effect/Crypto"
+@@ -26,7 +27,7 @@ import { decode, encode } from "../shared/base64"
+ import { InvitationRevoked } from "../shared/invitations"
+ import type { InvitationDescription } from "../shared/invitations"
+ import { Replica } from "../shared/crdt"
+-import { compactCheckpoint } from "../shared/checkpoint"
++import { compactCheckpoint, compactCheckpointEffect } from "../shared/checkpoint"
+ import {
+ 	ResourceUnavailable,
+ 	PermissionDenied,
+@@ -140,6 +141,8 @@ export class DocumentStore extends Context.Service<
+ 		).pipe(Layer.provide(storeLayer(filename)))
+ 	}
+ }
++export let CheckpointMaintenanceOutcomeSchema = Schema.Literals(["Compacted", "AlreadyCompact", "Stale", "NoHead", "Unsupported"])
++
+ export class WorkspaceStore extends Context.Service<
+ 	WorkspaceStore,
+ 	Effect.Success<ReturnType<typeof makeDocumentStore>>["workspace"]
+@@ -597,6 +600,7 @@ function makeDocumentStore() {
+ 				createDocument: Effect.fn("WorkspaceStore.createDocument")(
+ 					createDocument,
+ 				),
++				compactStoredCheckpoint: Effect.fn("WorkspaceStore.compactStoredCheckpoint")(compactStoredCheckpoint),
+ 				commit: Effect.fn("WorkspaceStore.commit")(commitAuthorized),
+ 				withdraw: Effect.fn("WorkspaceStore.withdraw")(withdrawAuthorized),
+ 				snapshot: (document: string) =>
+@@ -952,6 +956,50 @@ function makeDocumentStore() {
+ 				)
+ 			})
+ 		}
++		function compactStoredCheckpoint(document: string) {
++			return Effect.gen(function* () {
++				let identity = yield* Identity
++				let captured = yield* readSql.withTransaction(
++					Effect.gen(function* () {
++						let role = yield* readWorkspace.documentRole(document, identity.subject, identity.access)
++						if (!role) return yield* unavailable()
++						if (role !== "owner") return yield* forbidden()
++						let head = yield* readQueries.checkpoint(document)
++						if (!head) return undefined
++						let tip = Option.getOrUndefined(yield* readQueries.notice(document))
++						if (!tip) return yield* conflict("Document checkpoint has no durable tip")
++						let rows = yield* readQueries.history({ document, after: head.position })
++						return { head, tip, rows }
++					}),
++				)
++				if (!captured) return "NoHead"
++				let { head, tip, rows } = captured
++				yield* refresh(document, yield* makeSession(), tip, {
++					...readQueries,
++					checkpoint: () => Effect.succeed(head),
++					history: () => Effect.succeed(rows),
++				}, true)
++				let replica = yield* restoreSnapshot({ format: "document-state-v1", document, ...head }, "maintenance", true)
++				let expanded = yield* replica.checkpointEffect()
++				let checkpoint = yield* compactCheckpointEffect(expanded)
++				if (checkpoint.format !== "alkalye-state-v3") return "Unsupported"
++				let state = JSON.stringify(checkpoint)
++				if (state === head.state) return "AlreadyCompact"
++				let roundtrip = yield* restoreSnapshot({ format: "document-state-v1", document, ...head, state }, "maintenance", true)
++				if (!isDeepStrictEqual(expanded, yield* roundtrip.checkpointEffect()))
++					return yield* conflict("Compacted checkpoint changed its restored state")
++				return yield* transact(
++					Effect.gen(function* () {
++						let role = yield* workspace.documentRole(document, identity.subject, identity.access)
++						if (!role) return yield* unavailable()
++						if (role !== "owner") return yield* forbidden()
++						let changed = yield* sql`UPDATE document_heads SET state=${state} WHERE document=${document} AND log=${head.log} AND position=${head.position} AND version=${head.version} AND state=${head.state} RETURNING document`
++						return changed.length === 1 ? "Compacted" : "Stale"
++					}),
++					Effect.succeed,
++				)
++			}).pipe(Effect.map(Schema.decodeUnknownSync(CheckpointMaintenanceOutcomeSchema)))
++		}
+ 		function createWorkspace(id: string, name: string, request: string) {
+ 			return Effect.gen(function* () {
+ 				let identity = yield* Identity
+@@ -2405,6 +2453,7 @@ function makeDocumentStore() {
+ 			session: DocumentSession,
+ 			tip: typeof TipSchema.Type | undefined,
+ 			lookup = queries,
++			cooperative = false,
+ 		) {
+ 			return Effect.gen(function* () {
+ 				if (!tip)
+@@ -2442,6 +2491,7 @@ function makeDocumentStore() {
+ 					let replica = yield* restoreSnapshot(
+ 						{ format: "document-state-v1", document, ...head },
+ 						"projection",
++						cooperative,
+ 					)
+ 					state = { ...head, replica, fingerprint: "" }
+ 				}

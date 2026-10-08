@@ -1,0 +1,14 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/checkpoint-maintenance.test.ts:
+(pass) owner compaction preserves old checkpoint cursor, current tail, Unicode source, history and Undo across scopes [104.45ms]
+(pass) malformed legacy state refuses maintenance without changing its durable bytes [18.24ms]
+(pass) incomplete recovery tail refuses maintenance without changing the old checkpoint [25.99ms]
+(pass) a concurrent public checkpoint rewrite preserves the newer public state [1455.52ms]
+(pass) readers cannot compact and interrupted maintenance leaves its original durable checkpoint [199.67ms]
+(pass) moving a creator-owned document refuses concurrent inherited-owner maintenance [579.21ms]
+
+ 6 pass
+ 0 fail
+ 32 expect() calls
+Ran 6 tests across 1 file. [2.44s]

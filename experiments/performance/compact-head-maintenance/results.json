@@ -1,0 +1,53 @@
+{
+	"base": "e7cc136",
+	"source_sha256": "8adbb5fb02d381fd68d9a40a996fb223c364ee61fc4512da39b9957dc9d2de4c",
+	"test_sha256": "7e7dd4eb80667eed8ef01ea4b20d7a09ea4ef2367c7ae516c7eac2247ebada8a",
+	"types": {
+		"initial": {
+			"handle": 91600,
+			"exit": 0
+		},
+		"corrected": {
+			"handle": 41530,
+			"exit": 0
+		},
+		"oracle": {
+			"handle": 8929,
+			"exit": 0
+		}
+	},
+	"public_tests": {
+		"initial": {
+			"pass": 3,
+			"fail": 3,
+			"assertions": 23
+		},
+		"corrected": {
+			"handle": 94008,
+			"pass": 4,
+			"fail": 2,
+			"assertions": 28
+		},
+		"oracle": {
+			"handle": 1134,
+			"exit": 0,
+			"pass": 6,
+			"fail": 0,
+			"assertions": 32,
+			"wall_ms": 2440
+		}
+	},
+	"reviews": {
+		"initial": {
+			"handle": 23695,
+			"verdict": "HOLD"
+		},
+		"followup": {
+			"handle": 77329,
+			"exit": 0,
+			"verdict": "No mandatory blockers; source-only"
+		}
+	},
+	"production_adopted": false,
+	"production_migration_executed": false
+}

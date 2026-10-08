@@ -1,0 +1,192 @@
+import { afterAll, expect, test } from "bun:test"
+import { Database } from "bun:sqlite"
+import { mkdtemp, rm } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import * as Crypto from "effect/Crypto"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
+import * as Fiber from "effect/Fiber"
+import * as Layer from "effect/Layer"
+import * as Schema from "effect/Schema"
+import type * as Scope from "effect/Scope"
+import { WorkspaceStore } from "../src/server/document-store"
+import { webCryptoLayer } from "../src/platform/web-crypto"
+import { Replica } from "../src/shared/crdt"
+import { applyAction, buildAction, restoreSnapshot, undoAction } from "../src/shared/document-actions"
+import { newDocument } from "../src/shared/documents"
+import { Identity } from "../src/shared/workspace"
+
+let directory = await mkdtemp(join(tmpdir(), "alkalye-maintenance-"))
+afterAll(() => rm(directory, { recursive: true, force: true }))
+let original = "A😀🦊B\n".repeat(32)
+let Head = Schema.Struct({ log: Schema.String, position: Schema.Natural, version: Schema.Natural, state: Schema.String })
+function run<A, E>(filename: string, work: Effect.Effect<A, E, WorkspaceStore | Identity | Crypto.Crypto | Scope.Scope>) {
+	return Effect.runPromise(work.pipe(
+		Effect.provideService(Identity, { subject: "owner", actors: ["owner"] }),
+		Effect.provide(Layer.merge(WorkspaceStore.layer(filename), webCryptoLayer)),
+		Effect.scoped,
+	))
+}
+function read() {
+	return Effect.gen(function* () {
+		let store = yield* WorkspaceStore
+		let snapshot = yield* store.snapshot("doc")
+		if (!snapshot) return yield* Effect.die("Missing snapshot")
+		return { store, snapshot, replica: yield* restoreSnapshot(snapshot, "owner") }
+	})
+}
+function stored(filename: string) {
+	let database = new Database(filename, { readonly: true })
+	try { return Schema.decodeUnknownSync(Head)(database.query("SELECT log,position,version,state FROM document_heads WHERE document='doc'").get()) }
+	finally { database.close() }
+}
+async function legacy(filename: string, notes = 0, source = original) {
+	let expanded = await run(filename, Effect.gen(function* () {
+		let store = yield* WorkspaceStore
+		yield* store.create("space", "Workspace", "create-space")
+		let action = yield* buildAction(new Replica("owner"), "doc", "Create", replica => newDocument(replica, "doc", "Untitled", source))
+		yield* store.createDocument("space", action)
+		let { replica } = yield* read()
+		let state = JSON.stringify(replica.checkpoint())
+		let note = replica.fields("doc").note
+		for (let index = 1; index <= notes; index++) {
+			let edit = yield* buildAction(replica, "doc", "Note " + index, staged => [staged.set("doc", "note", String(index))])
+			yield* store.commit(edit)
+			let accepted = yield* store.action("doc", edit.id)
+			if (!accepted) return yield* Effect.die("Missing accepted note")
+			yield* applyAction(replica, accepted)
+		}
+		return { state, note }
+	}))
+	let database = new Database(filename)
+	try { database.query("UPDATE document_heads SET state=? WHERE document='doc'").run(expanded.state) }
+	finally { database.close() }
+	return expanded.note
+}
+
+test("owner compaction preserves old checkpoint cursor, current tail, Unicode source, history and Undo across scopes", async () => {
+	let filename = join(directory, "valid.sqlite")
+	let initialNote = await legacy(filename, 1)
+	let before = stored(filename)
+	let historyBefore = await run(filename, WorkspaceStore.use(store => store.history("doc")))
+	await run(filename, Effect.gen(function* () {
+		let { store, snapshot, replica } = yield* read()
+		expect(replica.text("doc")).toBe(original)
+		expect(replica.fields("doc").note).toBe("1")
+		expect(yield* store.compactStoredCheckpoint("doc")).toBe("Compacted")
+		expect(yield* store.compactStoredCheckpoint("doc")).toBe("AlreadyCompact")
+		let after = yield* store.snapshot("doc")
+		expect(after?.log).toBe(snapshot.log)
+		expect(after?.position).toBe(snapshot.position)
+		expect(yield* store.history("doc")).toEqual(historyBefore)
+	}))
+	let after = stored(filename)
+	expect({ ...after, state: before.state }).toEqual(before)
+	expect(JSON.parse(after.state).format).toBe("alkalye-state-v3")
+	await run(filename, Effect.gen(function* () {
+		let { store, replica } = yield* read()
+		let last = historyBefore.at(-1)?.action
+		if (!last) return yield* Effect.die("Missing Undo action")
+		let undo = yield* undoAction(replica, last)
+		let position = yield* store.commit(undo)
+		expect(yield* store.commit(undo)).toBe(position)
+	}))
+	await run(filename, Effect.gen(function* () {
+		let { store, replica } = yield* read()
+		expect(replica.text("doc")).toBe(original)
+		expect(replica.fields("doc").note).toBe(initialNote)
+		expect(yield* store.history("doc")).toHaveLength(3)
+	}))
+})
+
+test("malformed legacy state refuses maintenance without changing its durable bytes", async () => {
+	let filename = join(directory, "corrupt.sqlite")
+	await legacy(filename)
+	let database = new Database(filename)
+	try { database.query("UPDATE document_heads SET state=? WHERE document='doc'").run('{"format":"alkalye-state-v2","clock":-1,"targets":[],"restored":[]}') }
+	finally { database.close() }
+	let before = stored(filename)
+	let result = await run(filename, WorkspaceStore.use(store => store.compactStoredCheckpoint("doc")).pipe(Effect.result))
+	expect(result._tag === "Failure" && result.failure._tag).toBe("DocumentConflict")
+	expect(stored(filename)).toEqual(before)
+})
+
+test("incomplete recovery tail refuses maintenance without changing the old checkpoint", async () => {
+	let filename = join(directory, "tail.sqlite")
+	await legacy(filename, 1)
+	let database = new Database(filename)
+	try { database.query("DELETE FROM document_actions WHERE document='doc' AND position=(SELECT MAX(position) FROM document_actions WHERE document='doc')").run() }
+	finally { database.close() }
+	let before = stored(filename)
+	let result = await run(filename, WorkspaceStore.use(store => store.compactStoredCheckpoint("doc")).pipe(Effect.result))
+	expect(result._tag === "Failure" && result.failure._tag).toBe("DocumentConflict")
+	expect(stored(filename)).toEqual(before)
+})
+
+test("a concurrent public checkpoint rewrite preserves the newer public state", async () => {
+	let filename = join(directory, "race.sqlite")
+	let source = original.repeat(Math.ceil(64 * 1024 / original.length))
+	await legacy(filename, 98, source)
+	await run(filename, Effect.gen(function* () {
+		let { store, replica } = yield* read()
+		let edit = yield* buildAction(replica, "doc", "Note 99", staged => [staged.set("doc", "note", "99")])
+		let result = yield* Effect.all({ maintenance: store.compactStoredCheckpoint("doc"), commit: store.commit(edit) }, { concurrency: 2 })
+		expect(result.maintenance).toBe("Stale")
+		let current = yield* read()
+		expect(current.replica.text("doc")).toBe(source)
+		expect(current.replica.fields("doc").note).toBe("99")
+		expect(yield* store.history("doc")).toHaveLength(100)
+	}))
+	expect(stored(filename).version).toBe(100)
+	await run(filename, read().pipe(Effect.tap(({ replica }) => Effect.sync(() => expect(replica.fields("doc").note).toBe("99")))))
+})
+
+test("readers cannot compact and interrupted maintenance leaves its original durable checkpoint", async () => {
+	let filename = join(directory, "interrupt.sqlite")
+	let source = original.repeat(128)
+	await legacy(filename, 0, source)
+	let before = stored(filename)
+	await run(filename, Effect.gen(function* () {
+		let store = yield* WorkspaceStore
+		yield* store.membership("space", "reader", "reader", "grant-reader")
+		let denied = yield* store.compactStoredCheckpoint("doc").pipe(Effect.provideService(Identity, { subject: "reader", actors: ["reader"] }), Effect.result)
+		expect(denied._tag === "Failure" && denied.failure._tag).toBe("PermissionDenied")
+		let pending = yield* Effect.forkChild(store.compactStoredCheckpoint("doc"))
+		yield* Effect.yieldNow
+		yield* Fiber.interrupt(pending)
+		expect(Exit.hasInterrupts(yield* Fiber.await(pending))).toBe(true)
+	}))
+	expect(stored(filename)).toEqual(before)
+	await run(filename, read().pipe(Effect.tap(({ replica }) => Effect.sync(() => expect(replica.text("doc")).toBe(source)))))
+})
+
+test("moving a creator-owned document refuses concurrent inherited-owner maintenance", async () => {
+	let filename = join(directory, "revocation.sqlite")
+	let source = original.repeat(Math.ceil(64 * 1024 / original.length))
+	await run(filename, Effect.gen(function* () {
+		let store = yield* WorkspaceStore
+		yield* store.create("space", "Workspace", "create-space")
+		yield* store.membership("space", "creator", "writer", "grant-creator")
+		yield* store.create("destination", "Destination", "create-destination").pipe(Effect.provideService(Identity, { subject: "second", actors: ["second"] }))
+		yield* store.membership("destination", "owner", "writer", "grant-destination").pipe(Effect.provideService(Identity, { subject: "second", actors: ["second"] }))
+		let creation = yield* buildAction(new Replica("creator"), "doc", "Create", staged => newDocument(staged, "doc", "Untitled", source))
+		yield* store.createDocument("space", creation).pipe(Effect.provideService(Identity, { subject: "creator", actors: ["creator"] }))
+	}))
+	let expanded = await run(filename, read().pipe(Effect.map(({ replica }) => JSON.stringify(replica.checkpoint()))))
+	let database = new Database(filename)
+	try { database.query("UPDATE document_heads SET state=? WHERE document='doc'").run(expanded) }
+	finally { database.close() }
+	let before = stored(filename)
+	await run(filename, Effect.gen(function* () {
+		let store = yield* WorkspaceStore
+		expect(yield* store.accessRole("doc", "owner")).toBe("owner")
+		let result = yield* Effect.all({
+			maintenance: store.compactStoredCheckpoint("doc").pipe(Effect.result),
+			move: store.moveDocument("doc", "destination", "move-to-revoke"),
+		}, { concurrency: 2 })
+		expect(result.maintenance._tag === "Failure" && result.maintenance.failure._tag).toBe("PermissionDenied")
+		expect(yield* store.accessRole("doc", "owner")).toBe("writer")
+	}))
+	expect(stored(filename)).toEqual(before)
+})
