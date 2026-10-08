@@ -1,0 +1,6 @@
+{
+	"navigation": "Restart changed ephemeralURL; old56397 failed beforeproof",
+	"typingCommand": "First agent-browser type missing selector refused before input; corrected type @e1 INTERRUPT",
+	"assertion": "Initial run expected queue.state.failure after scopefinalizer. Actual queue records unknown delivery and reports Deferred failure, but does not set failurefield. Corrected to observable unknown delivery + native report. First16proof was not claimed pass.",
+	"types": "Generic RPC method wrapper erased discard generic; runtime16 passed but stricttypes failed. Corrected diagnostic callback within queue; final types/runtime rerun passed."
+}

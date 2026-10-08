@@ -1,0 +1,40 @@
+**Verdict:** the bounded claim mostly holds, but three things need fixing or rewording before it's recorded. Everything below comes from reading the 4 files only.
+
+**Contradictions**
+
+1. **The held write never resumed.** `worker-session.ts:79` posts `resumed` after `Deferred.await(gate)`. The JSON signals are `armed, held, released, write-failed, write-failed`, with no `resumed`. So the held write most likely never ran and its fiber was interrupted at the gate. The likely cause is the RPC interrupt reaching the worker handler, which holds the `commands` permit.
+   - The two `write-failed` signals then came from other writes, probably the Close flush, not the held one.
+   - "Release forces journal write refusal" of the held write is therefore unproven.
+   - The suffix may be excluded because of interruption, not refusal.
+   - The evidence points towards worker-side interruption, which the bounded claim disclaims. The assertion at `browser-fixture.ts:105` checks for neither `resumed` nor its absence.
+   - Fix: record a write id per hold, and assert either `resumed` followed by `write-failed` for that id, or an explicit interruption.
+
+2. **The "durable prefix" is only the HTTP seed.** `clientExits` contains just `["interrupted"]`, and the observer sees every ReplaceQueued exit. So no native edit was accepted before the interruption. `queueSource` and `recovery` are seed + `INTERRUPT`.
+   - IndexedDB durability of a natively committed prefix was never exercised.
+   - The reopen also passes `online: true` (`:111`), so the projection could come from the server, not the IDB. The assertion can't tell which.
+   - Fix: commit some native text and call `accepted()` before `hold`, then reopen with `online: false`.
+
+3. **Unload protection is supplied by the fixture.** The `forwardWorkerActivity` predicate returns dirty whenever `recovery !== undefined` (`:38`), and `recovery` is the fixture's own textarea. So the `+closedCleanly false` and `beforeunload` assertions (`:119`, `:128`, `:134`) can't fail. Either move recovery ownership into product code, or label these assertions as fixture-owned.
+
+**Weak assertions**
+
+4. "without blind replay" (`:101`) only checks for `unknown` delivery and `failures.length > 0`. Nothing confirms that no further ReplaceQueued or UndoQueued call was sent. Also, `failures` stores `String(error)` = `"WorkerDocumentFailure"`, which loses the reason, so AppliedUnknown can't be told apart from QueuedBlocked.
+5. "Close remains failed" (`:107`) accepts any failure. Assert the reason (SessionFailure/write) so a timeout or `Closed` can't pass it.
+6. The hold gates *every* journal write (`:79`), including sync or server-ack writes. The single `held` signal isn't tied to the native edit's write. The `sending` check only shows an RPC was in flight, not what caused it to block.
+
+**Security / lifecycle**
+
+7. The `:fixture` BroadcastChannel hook, `FixtureFault`/`FixtureDraft`, and the `holdGate`/`writeFailure` paths are in the worker handler. If any of this ships, any same-origin script can freeze or refuse every journal write. They must be stripped from the production build; I couldn't verify that from these files. The `/__tests/seed` and `/__tests/accepted?subject=` routes also need a server-side test-only gate, because `accepted` returns the source keyed by a subject query parameter.
+8. A failed Close still sets `opened = undefined` and closes the scope (`worker-session.ts:134-137`). After that, the main-thread recovery is the only copy, and the worker-only recovery gap stays real. This is correctly listed as a known gap.
+9. The queue finalizer marks `sending` edits as `unknown` but never sets `failure`, so `state().failure` stays `undefined` after closing. This is consistent with your corrected assertion, but anything that reads `failure` alone will see the closed queue as healthy.
+
+**Holds as claimed**
+
+- The client effect is interrupted: the `onExit` observer fires and the exit is recorded synchronously inside `Scope.close`.
+- All 9 edits stay pending: 1 `unknown`, 8 `blocked`.
+- The editor is read-only, and the native text matches the recovery text.
+- The fresh worker reopens on a separate scope and channel, so the hold can't leak into it.
+- The retained draft is not overwritten by the reopen.
+- The no-after-commit-loss, main-tab crash, perf, cutover, full-app and ship claims are correctly left out.
+
+written with claude-opus-5-5 in claude-code

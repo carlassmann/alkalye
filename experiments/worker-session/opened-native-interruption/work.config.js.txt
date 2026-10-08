@@ -1,0 +1,1 @@
+export default { project:"alkalye-opened-interruption-proof", commands:{web:{run:"bun server.ts",route:false,portless:false}} }

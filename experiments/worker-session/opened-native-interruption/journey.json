@@ -1,0 +1,30 @@
+{
+	"assertions": [
+		"simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections",
+		"browser identity is available before any network authentication",
+		"native browser account login serializes cookie issuance and agrees with server verification",
+		"real HTTP fixture seeded without main Replica",
+		"worker opened projection exact",
+		"native local source exactly accepted by real server",
+		"real worker journal hold armed",
+		"actual native mutation RPC sending while real journal held",
+		"actual ReplaceQueued client fiber exit interrupted",
+		"interrupted native FIFO retains real native draft readonly",
+		"interrupted sending RPC marked unknown without blind replay",
+		"held worker persistence released into real journal refusal",
+		"interrupted suffix durable Close remains failed",
+		"independent worker reopen exact durable prefix excludes interrupted suffix",
+		"independent reopen never replaces retained native unknown draft",
+		"post-disposal native recovery retains unload protection"
+	],
+	"inspection": {
+		"clientExits": ["interrupted"],
+		"failures": ["WorkerDocumentFailure"],
+		"observations": 4,
+		"pending": 9,
+		"queueSource": "---\ntitle: Worker fixture\n---\n# Native writer\nUnicode 🦊 café.\nINTERRUPT",
+		"recovery": "---\ntitle: Worker fixture\n---\n# Native writer\nUnicode 🦊 café.\nINTERRUPT",
+		"signals": ["armed", "held", "released", "write-failed", "write-failed"]
+	},
+	"stage": "passed"
+}

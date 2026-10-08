@@ -1,0 +1,86 @@
+{
+	"scope": "experiment-only actual native client RPC interruption; not worker save-fiber interruption",
+	"baseArtifact": "e0a182f experiments/worker-session/opened-native",
+	"core": "52670c02b4138fc0f22646f24d2d383815a7d439",
+	"runtime": "/tmp/alkalye-worker-opened/editor-interruption",
+	"assertions": 16,
+	"types": {
+		"handle": 31485,
+		"exitCode": 0,
+		"log": "types.log"
+	},
+	"runtimeHandle": 57870,
+	"runtimeExitCode": 0,
+	"server": {
+		"pid": 66785,
+		"url": "http://localhost:56580/",
+		"stopped": true
+	},
+	"browser": {
+		"session": "opened-interrupt-corrected",
+		"closed": true
+	},
+	"clientExit": ["interrupted"],
+	"workerSignals": [
+		"armed",
+		"held",
+		"released",
+		"write-failed",
+		"write-failed"
+	],
+	"admittedNativeEdits": 9,
+	"durablePrefix": {
+		"source": "---\ntitle: Worker fixture\n---\n# Native writer\nUnicode \ud83e\udd8a caf\u00e9.\n",
+		"sha256": "cdb1bdf369aaf3998bb7d2f97bc22f2667ddf5d3bc708df08551de63b3f39c18",
+		"acceptedServerPosition": 1,
+		"freshIndependentWorkerReopenExact": false,
+		"freshWorkerProjectionExact": true,
+		"origin": "HTTP seed; online reopen could refetch server"
+	},
+	"retainedDraft": {
+		"source": "---\ntitle: Worker fixture\n---\n# Native writer\nUnicode \ud83e\udd8a caf\u00e9.\nINTERRUPT",
+		"sha256": "da9b3cb44c62c5448bdec708c9260c2b26d220132e861b8a6f7ff275b79354cb",
+		"realReadonlyDOM": true,
+		"postEditorWorkerDisposalBeforeUnloadPrevented": true,
+		"protectionOwner": "fixture-owned real recovery textarea; not production recovery component"
+	},
+	"sourceHashes": {
+		"browser-fixture.ts": "38225b663eef2b5d0b2f8af2a2aaa3052d79da4ff8cdaebba085614ca67e5099",
+		"worker-session.ts": "2ae5389724a031acc47a57846d23db9a116134c67629547c64a63acbb1d9340b",
+		"editor-queue.ts": "afacd58bf8ce7ce9ef4a5580a254d8d65bb0a8b7008616061e2409ec48640126",
+		"worker-rpc.ts": "b1c5d5ea2a38fef6113809206b5b25ed60990463c6565bbe0a41ee6ee924a1f6",
+		"worker-client.ts": "cf3ae2f2cc7f87909d95d50e7298e8e075399be431ff3847b4023d97db94cca1",
+		"bindings.ts": "0063af639774ef14ba29f366731e13553c798ff12bb9fcfcbb9a8bf35b125f29",
+		"worker-activity.ts": "91b0f0bb2f3d8e7c252fc4b9073a34d7e0912cdb5ce8620498c15e18500fb939"
+	},
+	"bundleHashes": {
+		"browser-fixture.js": "2c8e98638fdf9808412c8d4c1d9ec686b4ca981cfa18e833979777d710c7995d",
+		"worker.js": "8df8e2cfba7c7af87048dc7a4ca14c6d260c223b7859fc84b229235a250464b7"
+	},
+	"review": {
+		"handle": 34827,
+		"status": "terminal",
+		"file": "runtime-review.log",
+		"claimCorrections": [
+			"No resumed signal: held write outcome cannot be attributed to later write-failed signals",
+			"Reopen was online with seed-only prefix; offline local journal source not independently proved",
+			"Unload prevention comes from fixture-owned real recovery DOM predicate",
+			"No blind replay assertion did not count outgoing RPC commands",
+			"Close failure cause not specifically asserted"
+		]
+	},
+	"unproved": [
+		"worker save-fiber interruption",
+		"after-commit lost acknowledgement",
+		"main-tab crash recovery durability",
+		"1MiB Observe/ACK budget",
+		"production reader admission",
+		"worker-only failed Close recovery",
+		"full app cutover",
+		"held write resumed/refused vs interrupted",
+		"offline journal-backed native committed prefix",
+		"outgoing RPC count after cancellation",
+		"specific Close failure reason"
+	],
+	"harness": "16 assertions passed; reviewed claim corrections supersede overstrong literal assertion labels"
+}
