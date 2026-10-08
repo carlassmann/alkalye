@@ -1,0 +1,481 @@
+--- a/src/shared/crdt.ts
++++ b/src/shared/crdt.ts
+@@ -2,6 +2,7 @@
+ import { parseCheckpoint, parseCheckpointEffect } from "./checkpoint"
+ import * as Effect from "effect/Effect"
+ import { attempt, cooperative } from "../platform/effects"
++import { ApplicationError } from "../platform/errors"
+ import { TextVisibility } from "./text-visibility"
+ import type { VisibilityFact } from "./text-visibility"
+ import { parseOperation, expandDeletions, deletionIds } from "./model"
+@@ -51,6 +52,13 @@
+ 	rawSplices: PreparedSplice[]
+ }
+ 
++export class ReplicaPreparationStale extends Error {
++	readonly _tag = "ReplicaPreparationStale"
++	constructor() {
++		super("Prepared replica changes are stale")
++	}
++}
++
+ export class Replica {
+ 	operations = new Map<string, Operation>()
+ 	clock = 0
+@@ -95,13 +103,20 @@
+ 			return copied
+ 		})
+ 	}
+-	private *forkSteps(cooperative: boolean, actor: string, author: string) {
++	private *forkSteps(
++		cooperative: boolean,
++		actor: string,
++		author: string,
++		freezeFacts = true,
++	) {
+ 		let replica = new Replica(actor, author)
+-		for (let operation of this.operations.values())
+-			yield* freezeFactSteps(operation, cooperative)
+-		for (let fields of this.registers.values())
+-			for (let operation of fields.values())
++		if (freezeFacts)
++			for (let operation of this.operations.values())
+ 				yield* freezeFactSteps(operation, cooperative)
++		if (freezeFacts)
++			for (let fields of this.registers.values())
++				for (let operation of fields.values())
++					yield* freezeFactSteps(operation, cooperative)
+ 		replica.operations = yield* copyMapSteps(this.operations, cooperative)
+ 		replica.clock = this.clock
+ 		replica.historyLoaded = this.historyLoaded
+@@ -142,6 +157,97 @@
+ 	get generation() {
+ 		return this.stateGeneration
+ 	}
++	static prepareTogetherEffect(
++		replicas: Replica[],
++		input: Operation[],
++		options: { materializeDocuments?: readonly string[] } = {},
++	) {
++		return Effect.gen(function* () {
++			let unique = [...new Set(replicas)]
++			let documents = [...new Set(options.materializeDocuments)]
++			let generations = unique.map(replica => ({
++				replica,
++				generation: replica.generation,
++				clock: replica.clock,
++			}))
++			let operations: Operation[] = []
++			let values = [...input]
++			for (let value of values) {
++				let operation = yield* attempt("replica.parse", () =>
++					parseOperation(value),
++				)
++				yield* cooperative("replica.own-operation", () =>
++					freezeFactSteps(operation, true),
++				)
++				operations.push(operation)
++				yield* Effect.yieldNow
++			}
++			let staged: { original: Replica; copy: Replica }[] = []
++			for (let { replica, generation, clock } of generations) {
++				let copy = yield* cooperative("replica.stage", () =>
++					replica.forkSteps(true, replica.actor, replica.author, false),
++				)
++				let publication = yield* cooperative("replica.prepare", () =>
++					copy.prepareSteps(operations, true, true),
++				)
++				yield* cooperative("replica.stage-publication", () => publication)
++				for (let document of documents)
++					yield* copy
++						.textEffect(document)
++						.pipe(
++							Effect.mapError(cause =>
++								cause instanceof ApplicationError
++									? cause
++									: new ApplicationError({
++											operation: "replica.materialize",
++											cause,
++										}),
++							),
++						)
++				if (replica.generation !== generation || replica.clock !== clock)
++					return yield* Effect.fail(new ReplicaPreparationStale())
++				staged.push({ original: replica, copy })
++			}
++			let committed = false
++			return {
++				commit() {
++					if (
++						committed ||
++						generations.some(
++							({ replica, generation, clock }) =>
++								replica.generation !== generation || replica.clock !== clock,
++						)
++					)
++						throw new ReplicaPreparationStale()
++					committed = true
++					for (let { original, copy } of staged) original.publishStaged(copy)
++				},
++			}
++		})
++	}
++	private publishStaged(staged: Replica) {
++		this.operations = staged.operations
++		this.clock = staged.clock
++		this.atomIndex = staged.atomIndex
++		this.children = staged.children
++		this.visibility = staged.visibility
++		this.textOwners = staged.textOwners
++		this.ownedAtomCounts = staged.ownedAtomCounts
++		this.stateGeneration = staged.stateGeneration
++		this.registers = staged.registers
++		this.targets = staged.targets
++		this.strings = staged.strings
++		this.updated = staged.updated
++		this.created = staged.created
++		this.restored = staged.restored
++		this.textCache = staged.textCache
++		this.sourceCache = staged.sourceCache
++		this.fieldCache = staged.fieldCache
++		this.metadataCache = staged.metadataCache
++		this.legacyTextTargets = staged.legacyTextTargets
++		this.preparedEdit = staged.preparedEdit
++	}
++
+ 	static applyTogether(replicas: Replica[], input: Operation[]) {
+ 		let commits: (() => void)[] = []
+ 		for (let replica of new Set(replicas))
+@@ -212,8 +318,26 @@
+ 		this.prepare(input)
+ 	}
+ 	private prepare(input: Operation[]) {
+-		let operations = input.map(parseOperation)
+-		this.validateIdentities(operations)
++		let commit = finishSteps(this.prepareSteps(input, false))
++		let committed = false
++		return () => {
++			if (committed)
++				throw new Error("Prepared replica changes already published")
++			committed = true
++			finishSteps(commit)
++		}
++	}
++	private *prepareSteps(
++		input: Operation[],
++		cooperative: boolean,
++		decoded = false,
++	): Generator<void, Generator<void>> {
++		let operations: Operation[] = []
++		for (let value of input) {
++			operations.push(decoded ? value : parseOperation(value))
++			if (cooperative) yield
++		}
++		yield* this.validateIdentitiesSteps(operations, cooperative)
+ 		let facts = new Map<string, VisibilityFact[]>()
+ 		for (let operation of operations) {
+ 			let changes = facts.get(operation.target) ?? []
+@@ -232,56 +356,62 @@
+ 				})
+ 			if (changes.length) facts.set(operation.target, changes)
+ 		}
+-		let commits: (() => void)[] = []
++		let commits: (() => Generator<void>)[] = []
++		let replica = this
+ 		for (let [target, changes] of facts) {
+ 			let visibility = this.visibility.get(target) ?? new TextVisibility()
+-			// Private visibility cannot change between synchronous preparation and publication.
+-			let commit = visibility.prepare(changes)
+-			commits.push(() => {
+-				commit()
+-				this.visibility.set(target, visibility)
++			// Cooperative publication only mutates private staging; live publication is synchronous.
++			let commit = yield* visibility.applicationSteps(changes, cooperative)
++			commits.push(function* () {
++				yield* commit
++				replica.visibility.set(target, visibility)
+ 			})
+ 		}
+-		return () => {
+-			for (let commit of commits) commit()
+-			for (let operation of operations) {
+-				this.clock = Math.max(this.clock, operation.clock)
+-				if (this.operations.has(operation.id)) continue
+-				this.operations.set(operation.id, operation)
+-				this.metadataCache.delete(operation.target)
+-				let history = this.targets.get(operation.target) ?? []
++		return publish()
++		function* publish(): Generator<void> {
++			let work = 0
++			for (let commit of commits) yield* commit()
++			for (let operation of operations) {
++				replica.clock = Math.max(replica.clock, operation.clock)
++				if (replica.operations.has(operation.id)) continue
++				replica.operations.set(operation.id, operation)
++				replica.metadataCache.delete(operation.target)
++				let history = replica.targets.get(operation.target) ?? []
+ 				history.push(operation)
+-				this.targets.set(operation.target, history)
+-				this.created.set(
++				replica.targets.set(operation.target, history)
++				replica.created.set(
+ 					operation.target,
+ 					Math.min(
+-						this.created.get(operation.target) ?? Infinity,
++						replica.created.get(operation.target) ?? Infinity,
+ 						operation.time,
+ 					),
+ 				)
+-				this.updated.set(
++				replica.updated.set(
+ 					operation.target,
+-					Math.max(this.updated.get(operation.target) ?? 0, operation.time),
++					Math.max(replica.updated.get(operation.target) ?? 0, operation.time),
+ 				)
+ 				if (operation.kind !== "set") {
+ 					if (operation.kind === "text") {
+-						for (let atom of operation.insert)
+-							this.indexAtom(operation.target, atom)
++						for (let atom of operation.insert) {
++							replica.indexAtom(operation.target, atom)
++							if (cooperative && ++work % 512 === 0) yield
++						}
+ 						if (operation.insert.length || operation.remove.length)
+-							this.textOwners.set(operation.id, operation.target)
+-					} else this.textOwners.set(operation.id, operation.target)
+-					this.invalidateText(operation.target)
++							replica.textOwners.set(operation.id, operation.target)
++					} else replica.textOwners.set(operation.id, operation.target)
++					replica.invalidateText(operation.target)
+ 				} else {
+ 					let fields =
+-						this.registers.get(operation.target) ?? new Map<string, Operation>()
++						replica.registers.get(operation.target) ??
++						new Map<string, Operation>()
+ 					let previous = fields.get(operation.field)
+ 					if (!previous || operation.id > previous.id)
+ 						fields.set(operation.field, operation)
+-					this.registers.set(operation.target, fields)
+-					this.fieldCache.delete(operation.target)
++					replica.registers.set(operation.target, fields)
++					replica.fieldCache.delete(operation.target)
+ 				}
+ 			}
+-			if (operations.length) this.stateGeneration++
++			if (operations.length) replica.stateGeneration++
+ 		}
+ 	}
+ 
+@@ -1261,7 +1391,7 @@
+ 						throw new Error("Unknown checkpoint deletion")
+ 				}
+ 		}
+-		this.validateIdentities(fields)
++		yield* this.validateIdentitiesSteps(fields, cooperative)
+ 		if (fields.some(field => owners.has(field.id)))
+ 			throw new Error("Checkpoint operation identity is ambiguous")
+ 		this.apply(fields)
+@@ -1390,7 +1520,11 @@
+ 		this.strings.delete(target)
+ 		this.metadataCache.delete(target)
+ 	}
+-	private validateIdentities(operations: Operation[]) {
++	private *validateIdentitiesSteps(
++		operations: Operation[],
++		cooperative: boolean,
++	): Generator<void> {
++		let work = 0
+ 		let known = new Map<string, Operation>()
+ 		let atoms = new Map<string, { target: string; atom: Atom }>()
+ 		for (let operation of operations) {
+@@ -1437,6 +1571,7 @@
+ 				)
+ 					throw new Error("Atom identity is immutable")
+ 				atoms.set(atom.id, { target: operation.target, atom })
++				if (cooperative && ++work % 512 === 0) yield
+ 			}
+ 		}
+ 	}
+--- a/src/shared/document-session.ts
++++ b/src/shared/document-session.ts
+@@ -45,7 +45,7 @@
+ import { partitionDocumentActions } from "./document-dependencies"
+ import { validateTextCausality } from "./document-causality"
+ import { compactCheckpoint, compactCheckpointEffect } from "./checkpoint"
+-import { Replica } from "./crdt"
++import { Replica, ReplicaPreparationStale } from "./crdt"
+ import type { TextReplacement } from "./crdt"
+ import {
+ 	CommittedActionSchema,
+@@ -793,6 +793,20 @@
+ function makeProjection(options: DocumentSessionOptions) {
+ 	return Effect.gen(function* () {
+ 		let storage = yield* DocumentJournal
++		let backgroundWork = yield* BackgroundWork
++		let preparedProposal:
++			| {
++					recording: Recording
++					durable: Replica
++					replica: Replica
++					commit(): void
++			  }
++			| undefined
++		yield* Effect.addFinalizer(() =>
++			Effect.sync(() => {
++				preparedProposal = undefined
++			}),
++		)
+ 		let cryptography = yield* Crypto.Crypto
+ 		let actor = yield* documentActor(cryptography, options)
+ 		let replica = new Replica(actor, options.author)
+@@ -1123,8 +1137,15 @@
+ 						let action =
+ 							value.kind === "proposed" ? value.action : value.creation.action
+ 						if (!proposals.has(action.id)) {
+-							let operations = action.changes.map(parseOperation)
+-							yield* applyChanges([durable, replica], operations)
++							if (
++								value.kind === "proposed" &&
++								cooperativelyPreparesUndo(action)
++							)
++								yield* publishPreparedProposal(value)
++							else {
++								let operations = action.changes.map(parseOperation)
++								yield* applyChanges([durable, replica], operations)
++							}
+ 							pending.set(action.id, freezeAction(action))
+ 							proposals.set(action.id, {
+ 								entry: entry.idString,
+@@ -1592,8 +1613,108 @@
+ 					)
+ 			})
+ 		}
+-		function check(value: Recording) {
++		function check(value: Recording): Effect.Effect<void, DocumentFailure> {
+ 			return Effect.gen(function* () {
++				while (true) {
++					preparedProposal = undefined
++					let checked = yield* checkOnce(value).pipe(
++						Effect.as(true),
++						Effect.catchTag("ReplicaPreparationStale", () =>
++							Effect.succeed(false),
++						),
++					)
++					if (checked) return
++					yield* backgroundWork.betweenChunks
++					yield* Effect.yieldNow
++				}
++			}).pipe(
++				Effect.mapError(error => storageFailure("validate document", error)),
++				Effect.onInterrupt(() =>
++					Effect.sync(() => {
++						preparedProposal = undefined
++					}),
++				),
++			)
++		}
++		function cooperativelyPreparesUndo(action: DocumentAction) {
++			return options.cooperativeWork === true && action.undoOf !== undefined
++		}
++		function prepareProposal(value: Recording, operations: Operation[]) {
++			let targets = { durable, replica }
++			return Replica.prepareTogetherEffect(
++				[targets.durable, targets.replica],
++				operations,
++				{ materializeDocuments: [options.document] },
++			).pipe(
++				Effect.mapError(error =>
++					error instanceof ReplicaPreparationStale
++						? error
++						: new DocumentConflict({
++								message:
++									error instanceof Error
++										? error.message
++										: "Invalid document changes",
++							}),
++				),
++				Effect.map(handle => {
++					preparedProposal = {
++						recording: value,
++						...targets,
++						commit: handle.commit,
++					}
++				}),
++			)
++		}
++		function publishPreparedProposal(
++			value: Recording,
++		): Effect.Effect<void, DocumentFailure> {
++			return Effect.gen(function* () {
++				while (true) {
++					let candidate = preparedProposal
++					if (
++						!candidate ||
++						candidate.recording !== value ||
++						candidate.durable !== durable ||
++						candidate.replica !== replica
++					) {
++						yield* check(value)
++						continue
++					}
++					preparedProposal = undefined
++					let published = yield* Effect.try({
++						try: () => {
++							candidate.commit()
++							return true
++						},
++						catch: error =>
++							error instanceof ReplicaPreparationStale
++								? error
++								: new DocumentConflict({
++										message:
++											error instanceof Error
++												? error.message
++												: "Could not publish document changes",
++									}),
++					}).pipe(
++						Effect.catchTag("ReplicaPreparationStale", () =>
++							Effect.succeed(false),
++						),
++					)
++					if (published) return
++					yield* backgroundWork.betweenChunks
++					yield* Effect.yieldNow
++					yield* check(value)
++				}
++			}).pipe(
++				Effect.onInterrupt(() =>
++					Effect.sync(() => {
++						preparedProposal = undefined
++					}),
++				),
++			)
++		}
++		function checkOnce(value: Recording) {
++			return Effect.gen(function* () {
+ 				if (value.kind === "localCreated") {
+ 					let action = value.creation.action
+ 					if (hasBlobReferences(action))
+@@ -1753,7 +1874,9 @@
+ 					}
+ 					let operations = yield* validateAction(durable, value.action)
+ 					yield* validateTextCausality(durable, options.document, operations)
+-					yield* validateChanges([durable, replica], operations)
++					if (cooperativelyPreparesUndo(value.action))
++						yield* prepareProposal(value, operations)
++					else yield* validateChanges([durable, replica], operations)
+ 					return
+ 				}
+ 				if (value.log !== log) return yield* epochConflict()
+--- a/src/shared/text-visibility.ts
++++ b/src/shared/text-visibility.ts
+@@ -122,6 +122,9 @@
+ 			finishSteps(commit)
+ 		}
+ 	}
++	*applicationSteps(input: readonly VisibilityFact[], cooperative: boolean) {
++		return yield* this.prepareSteps(input, cooperative)
++	}
+ 	private *prepareSteps(
+ 		input: readonly VisibilityFact[],
+ 		cooperative: boolean,
