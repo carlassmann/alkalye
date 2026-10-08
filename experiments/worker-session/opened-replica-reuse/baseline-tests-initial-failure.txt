@@ -1,0 +1,74 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/opened-reuse.test.ts:
+(pass) opened snapshot retains authorship, exact source, save, undo and independent offline reopen (cooperative=%s) [46.06ms]
+(pass) opened snapshot retains authorship, exact source, save, undo and independent offline reopen (cooperative=%s) [17.61ms]
+(pass) wrong-document and corrupt snapshots do not poison a subsequent valid open (cooperative=%s) [12.81ms]
+(pass) wrong-document and corrupt snapshots do not poison a subsequent valid open (cooperative=%s) [11.41ms]
+64 |  let requested = yield* Deferred.make<void>()
+65 |  let release = yield* Deferred.make<void>()
+66 |  let stale = { ...snapshot("Stale second snapshot"), position: 9 }
+67 |  let waiting: DocumentTransport = { ...transport(stale), snapshot: () => Deferred.succeed(requested, undefined).pipe(Effect.andThen(release.await), Effect.as(stale)) }
+68 |  let second = yield* open(directory, cooperativeWork, waiting, session => Effect.succeed({ source: session.replica.text("doc"), cursor: session.historyCursor() })).pipe(Effect.forkScoped)
+69 |  yield* requested.await
+             ^
+TypeError: undefined is not an object (evaluating 'yield* requested.await')
+      at <anonymous> (/private/tmp/alkalye-open-reuse-runtime/tests/opened-reuse.test.ts:69:9)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2478:9)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2530:19)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2541:31)
+      at fixture (/private/tmp/alkalye-open-reuse-runtime/tests/opened-reuse.test.ts:35:14)
+(fail) a racing second opened record cannot replace the already accepted snapshot (cooperative=%s) [1.00ms]
+64 |  let requested = yield* Deferred.make<void>()
+65 |  let release = yield* Deferred.make<void>()
+66 |  let stale = { ...snapshot("Stale second snapshot"), position: 9 }
+67 |  let waiting: DocumentTransport = { ...transport(stale), snapshot: () => Deferred.succeed(requested, undefined).pipe(Effect.andThen(release.await), Effect.as(stale)) }
+68 |  let second = yield* open(directory, cooperativeWork, waiting, session => Effect.succeed({ source: session.replica.text("doc"), cursor: session.historyCursor() })).pipe(Effect.forkScoped)
+69 |  yield* requested.await
+             ^
+TypeError: undefined is not an object (evaluating 'yield* requested.await')
+      at <anonymous> (/private/tmp/alkalye-open-reuse-runtime/tests/opened-reuse.test.ts:69:9)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2478:9)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2530:19)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2541:31)
+      at fixture (/private/tmp/alkalye-open-reuse-runtime/tests/opened-reuse.test.ts:35:14)
+(fail) a racing second opened record cannot replace the already accepted snapshot (cooperative=%s) [0.48ms]
+76 |  let held = yield* Deferred.make<void>()
+77 |  let storage = Context.get(yield* Layer.build(cliDocumentPlatform(directory).journal(documentDatabaseName({ document: "doc", subject: "owner" }))), DocumentJournal)
+78 |  let blocked = { ...storage, readAfter: (position: number, limit?: number, through?: number) => storage.readAfter(position, limit, through).pipe(Effect.flatMap(tail => tail.entries.length > 0 ? Deferred.succeed(held, undefined).pipe(Effect.andThen(Effect.never)) : Effect.succeed(tail))) }
+79 |  let opening = DocumentSession.layer({ document: "doc", subject: "owner", author: "Visible writer", cooperativeWork, transport: transport(snapshot()) }).pipe(Layer.provide(Layer.succeed(DocumentJournal, blocked)), Layer.provide(Layer.succeed(EventJournal.EventJournal, storage.journal)), Layer.provide(cliDocumentPlatform(directory).lifecycle))
+80 |  let fiber = yield* Effect.scoped(Layer.build(opening)).pipe(Effect.forkScoped)
+81 |  yield* held.await.pipe(Effect.timeout("3 seconds"))
+                  ^
+TypeError: undefined is not an object (evaluating 'held.await.pipe')
+      at <anonymous> (/private/tmp/alkalye-open-reuse-runtime/tests/opened-reuse.test.ts:81:14)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+(fail) interruption after a real opened journal write leaves replay independently recoverable (cooperative=%s) [3.89ms]
+76 |  let held = yield* Deferred.make<void>()
+77 |  let storage = Context.get(yield* Layer.build(cliDocumentPlatform(directory).journal(documentDatabaseName({ document: "doc", subject: "owner" }))), DocumentJournal)
+78 |  let blocked = { ...storage, readAfter: (position: number, limit?: number, through?: number) => storage.readAfter(position, limit, through).pipe(Effect.flatMap(tail => tail.entries.length > 0 ? Deferred.succeed(held, undefined).pipe(Effect.andThen(Effect.never)) : Effect.succeed(tail))) }
+79 |  let opening = DocumentSession.layer({ document: "doc", subject: "owner", author: "Visible writer", cooperativeWork, transport: transport(snapshot()) }).pipe(Layer.provide(Layer.succeed(DocumentJournal, blocked)), Layer.provide(Layer.succeed(EventJournal.EventJournal, storage.journal)), Layer.provide(cliDocumentPlatform(directory).lifecycle))
+80 |  let fiber = yield* Effect.scoped(Layer.build(opening)).pipe(Effect.forkScoped)
+81 |  yield* held.await.pipe(Effect.timeout("3 seconds"))
+                  ^
+TypeError: undefined is not an object (evaluating 'held.await.pipe')
+      at <anonymous> (/private/tmp/alkalye-open-reuse-runtime/tests/opened-reuse.test.ts:81:14)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+(fail) interruption after a real opened journal write leaves replay independently recoverable (cooperative=%s) [3.94ms]
+
+ 4 pass
+ 4 fail
+ 16 expect() calls
+Ran 8 tests across 1 file. [142.00ms]

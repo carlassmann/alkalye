@@ -1,0 +1,61 @@
+import { browser, evaluate } from "/Users/carlassmann/.codex/worktrees/b513/alkalye/tests/browser-driver"
+import * as Schema from "effect/Schema"
+
+let [url] = Bun.argv.slice(2)
+if (!url) throw new Error("Isolated fixture URL required")
+let session="worker-cold-diag-"+Date.now()
+let root=import.meta.dir
+let observations: unknown[]=[]
+let deadlineFailures:string[]=[]
+let stage=Schema.Struct({stage:Schema.String,at:Schema.Number,origin:Schema.Number})
+let diagnostic=Schema.Struct({stage:Schema.String,stages:Schema.Array(stage)})
+try {
+ browser(session,"--profile",root+"/profile","open","about:blank")
+ browser(session,"set","viewport","1280","800")
+ browser(session,"profiler","start","--categories","devtools.timeline,disabled-by-default-devtools.timeline,toplevel,blink.user_timing,v8")
+ browser(session,"open",url)
+ let attempts=Number(Bun.env.COLD_DIAG_READY_ATTEMPTS ?? "3")
+ if (![1,3].includes(attempts)) throw new Error("One or three readiness observations required")
+ let ready=false
+ for (let attempt=0;attempt<attempts&&!ready;attempt++) {
+  try {browser(session,"wait","--fn","window.openedNative?.stage==='ready'||window.openedNative?.stage==='failed'")}
+  catch(error){deadlineFailures.push(String(error))}
+  let observed=evaluate(session,"window.coldOpenDiagnostic?.inspect()")
+  observations.push(observed)
+  await Bun.write(root+"/progress.json",JSON.stringify({observations,deadlineFailures},null,2))
+  ready=evaluate(session,"window.openedNative?.stage==='ready'")===true
+ }
+ browser(session,"profiler","stop",root+"/cold.trace.json")
+ let current=Schema.decodeUnknownSync(diagnostic)(evaluate(session,"window.coldOpenDiagnostic?.inspect()"))
+ let failure=evaluate(session,"window.openedNative?.failure?.split(\"\\n\")[0]")
+ let resources=evaluate(session,"performance.getEntriesByType('resource').filter(entry=>entry.name.includes('/api/')||entry.name.includes('/__tests/seed')).map(entry=>({path:new URL(entry.name).pathname,initiator:entry.initiatorType,start:entry.startTime,duration:entry.duration,responseStart:entry.responseStart,responseEnd:entry.responseEnd,transfer:entry.transferSize,decoded:entry.decodedBodySize}))")
+ let gauge=evaluate(session,"window.openedNative?.gauge()")
+ let verificationObservations: unknown[]=[]
+ if (ready) {
+  evaluate(session,"(()=>{let editor=document.querySelector('alkalye-editor');editor.selectRange(editor.source.value.length);return true})()")
+  browser(session,"focus","#editor")
+  browser(session,"keyboard","inserttext","abcdefgh")
+  browser(session,"wait","--fn","window.openedNative?.inspect().pending===0")
+  evaluate(session,"(()=>{window.coldAccepted={status:'running'};window.openedNative.accepted().then(value=>window.coldAccepted={status:'passed',sourceCharacters:value.source.length,position:value.position},error=>window.coldAccepted={status:'failed',error:String(error)});return true})()")
+  browser(session,"wait","--fn","window.coldAccepted?.status!=='running'")
+  if(evaluate(session,"window.coldAccepted?.status")!=="passed") throw new Error("Server accepted-source oracle failed")
+  browser(session,"profiler","start","--categories","devtools.timeline,disabled-by-default-devtools.timeline,toplevel,blink.user_timing,v8")
+  evaluate(session,"(()=>{window.coldVerification={status:'running'};window.openedNative.verify().then(()=>window.coldVerification={status:'passed'},error=>window.coldVerification={status:'failed',error:String(error)});return true})()")
+  for(let attempt=0;attempt<3;attempt++) {
+   try {browser(session,"wait","--fn","window.coldVerification?.status!=='running'")}
+   catch(error){deadlineFailures.push(String(error))}
+   verificationObservations.push({stage:evaluate(session,"window.coldOpenDiagnostic.inspect()"),result:evaluate(session,"window.coldVerification")})
+   await Bun.write(root+"/verification-progress.json",JSON.stringify(verificationObservations,null,2))
+   if(evaluate(session,"window.coldVerification?.status!=='running'")===true) break
+  }
+  browser(session,"profiler","stop",root+"/offline.trace.json")
+ }
+ let accepted=evaluate(session,"window.coldAccepted")
+ let verification=evaluate(session,"window.coldVerification")
+ let finalStages=evaluate(session,"window.coldOpenDiagnostic?.inspect()")
+ let assertions=evaluate(session,"window.openedNative?.assertions")
+ await Bun.write(root+"/result.json",JSON.stringify({scope:"one diagnostic cold fixture; frozen526 source, instrumentation only; no CPU samples; no app120fps claim",ready,current,resources,gauge,failure,assertions,observations,accepted,verification,verificationObservations,finalStages,deadlineFailures},null,2))
+ console.log(JSON.stringify({ready,current,gauge,verification,deadlineFailures:deadlineFailures.length}))
+} finally {
+ browser(session,"close")
+}

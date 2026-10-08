@@ -1,0 +1,10 @@
+{
+	"worker.ts": "d0458a0b8ab9a876425c15b12cf363b94547dcbc5935b6a094770233aa998c8a",
+	"worker-session.ts": "71ee4474db90a3404e005e83bcd9fdf874a33176e4b4c39b817b2eafa2427731",
+	"browser-fixture.ts": "91153ca10eb4ba806aca4d388c9d77a2de589f053981f553d7de59d3542f4698",
+	"src/shared/document-session.ts": "f2ef90267a34b316440d99e04ce99598edbaa5f10caee0d1c3ca89f932deb8e1",
+	"src/client/scheduler.ts": "70912b36f407786b1ede73ce77f6728e2dbcea24d467c8158c6454048838c647",
+	"assets/worker.js": "db4adc623582a10ab67662f23a7c08a5d6051042b711ecad7f59673944016d48",
+	"assets/browser-fixture.js": "04e1247d7139a7cd3ddc20a765c7bb098098819b16811476f020cf2006dd2e2e",
+	"baselineInstrumentedSessionSha256": "35c8d5469f49ed176eaa7349a83f8e0e69a1bbc48062ddab1887bc9d233ddcde"
+}

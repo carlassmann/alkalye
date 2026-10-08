@@ -1,0 +1,41 @@
+No correctness blockers. The patch is semantically equivalent to current code and saves one `restoreSnapshot` per cold open. On the replay path that's 2 restores instead of 3.
+
+**Return branches of `check`**
+- Only `opened` with `!log && !creation` returns a `Replica`, through `return yield* restoreSnapshot` (`:1663`).
+- `opened` when the document is already initialized returns `undefined`, so replay skips it, same as the old guard.
+- Every other branch returns nothing or fails, including `rejected`, which calls `rebuild` and discards the result. The success type becomes `Replica | undefined`.
+- `strict` doesn't turn on `noImplicitReturns`, so the implicit end at `:1827` still type-checks.
+
+**Replay gate and concurrency**
+- Equivalence holds because nothing changes `log` or `creation` between `check(value)` and the `opened` branch. `check` doesn't mutate state in the `opened` case.
+- Every `replay` caller holds `gate`: `:382`, `:392`, `:344`/`:353` through `recovery` (projection: gate), `:592`, `:631`. `record` runs in the EventLog handler inside `persist`, which also holds `gate`.
+- If replay could ever run concurrently, the stale `restored` could overwrite a newer `log`. But replay already shares `localPosition` and the replica state without locks, so the gate is already a hard requirement. Nothing new.
+
+**Ownership**
+- `restoreSnapshot` builds a fresh `Replica` through `fromCheckpointEffect`, which no one else references.
+- The order is unchanged: materialize, then fork accepted and durable, then `replica = restored`, then set `author`.
+- `Effect.asVoid` on `validate` is required, not cosmetic. Without it the public `validate` would hand callers a private live-candidate replica and widen the `DocumentProjection` service type.
+- `asVoid` on `record` is redundant, because the trailing `andThen(proposing)` already discards the result. It's harmless; drop it to keep the diff smaller.
+
+**Interruption**
+- If interrupted during materialize or fork, nothing has been assigned yet. The assignments at `:1112-1117` are synchronous, so state stays consistent. Same as today.
+- `Replica` holds no scoped resources, so no release is needed.
+
+**Failure semantics**
+- A `restoreSnapshot` `DocumentConflict` is now raised only in `check`. Inside replay it's still wrapped as `storageFailure("replay document")`, and from the handler as `"validate document action"`.
+- Before, a second restore failure was only possible if restore wasn't deterministic, so no public error behaviour changes.
+
+**Pre-write validation**
+`record`'s `check` still restores and throws away a private replica before the write. That's retained, as intended.
+
+**Concrete issue**
+`reuse-document-session.ts:1334` (the `validate:` line) is probably over the print width, so the format step of `bun run check` would likely fail. Wrap it into multi-line `.pipe(...)`. I didn't run anything to confirm.
+
+**Minimum public `DocumentSession` contracts to cover**
+1. Cold open from an `opened` snapshot shows the snapshot text and keeps working for edit, save and reload.
+2. A snapshot for another document, or with corrupt state, fails with a `DocumentFailure` and leaves the session not opened.
+3. A second `opened` entry after `log` is set (two tabs racing to open) is a no-op: content and cursor don't change.
+4. Interrupting during the cold-open replay leaves the session reopenable with the right content.
+5. An edit after cold open is attributed to `options.author` (checks that the author is set on the reused replica).
+
+The scheduler proof stays separate, with no production change.

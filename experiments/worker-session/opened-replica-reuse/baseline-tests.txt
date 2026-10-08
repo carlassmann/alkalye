@@ -1,0 +1,16 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/opened-reuse.test.ts:
+(pass) opened snapshot retains authorship, exact source, save, undo and independent offline reopen (cooperative=%s) [45.51ms]
+(pass) opened snapshot retains authorship, exact source, save, undo and independent offline reopen (cooperative=%s) [17.75ms]
+(pass) wrong-document and corrupt snapshots do not poison a subsequent valid open (cooperative=%s) [13.30ms]
+(pass) wrong-document and corrupt snapshots do not poison a subsequent valid open (cooperative=%s) [11.71ms]
+(pass) a racing second opened record cannot replace the already accepted snapshot (cooperative=%s) [8.86ms]
+(pass) a racing second opened record cannot replace the already accepted snapshot (cooperative=%s) [9.02ms]
+(pass) interruption after a real opened journal write leaves replay independently recoverable (cooperative=%s) [7.54ms]
+(pass) interruption after a real opened journal write leaves replay independently recoverable (cooperative=%s) [7.27ms]
+
+ 8 pass
+ 0 fail
+ 20 expect() calls
+Ran 8 tests across 1 file. [165.00ms]

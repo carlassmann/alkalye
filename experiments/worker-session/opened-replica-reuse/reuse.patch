@@ -1,0 +1,44 @@
+--- a/src/shared/document-session.ts
++++ b/src/shared/document-session.ts
+@@ -1065,7 +1065,7 @@
+ 				let tail = yield* storage.readAfter(localPosition, 1000)
+ 				for (let entry of tail.entries) {
+ 					let value = yield* decode(entry)
+-					yield* check(value)
++					let restored = yield* check(value)
+ 					if (value.kind === "published") {
+ 						if (creation) {
+ 							accepted.apply(
+@@ -1082,12 +1082,7 @@
+ 							creation = undefined
+ 						}
+ 					} else if (value.kind === "opened") {
+-						if (!log && !creation) {
+-							let restored = yield* restoreSnapshot(
+-								value.snapshot,
+-								actor,
+-								options.cooperativeWork,
+-							)
++						if (restored) {
+ 							yield* materializeDocument(restored).pipe(
+ 								Effect.mapError(cause =>
+ 									storageFailure("restore document", cause),
+@@ -1336,7 +1331,8 @@
+ 			pending: () => Object.freeze([...pending.values()]),
+ 			cursor: () => ({ log, position: remotePosition }),
+ 			replay,
+-			validate: (value: Recording) => replay.pipe(Effect.andThen(check(value))),
++			validate: (value: Recording) =>
++				replay.pipe(Effect.andThen(check(value)), Effect.asVoid),
+ 			record: (value: Recording) =>
+ 				replay.pipe(
+ 					Effect.andThen(
+@@ -1665,7 +1661,7 @@
+ 					if (value.snapshot.document !== options.document)
+ 						return yield* conflict("Snapshot belongs to another document")
+ 					if (!log && !creation)
+-						yield* restoreSnapshot(
++						return yield* restoreSnapshot(
+ 							value.snapshot,
+ 							actor,
+ 							options.cooperativeWork,

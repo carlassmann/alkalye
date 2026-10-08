@@ -1,0 +1,162 @@
+{
+	"reuse-baseline": {
+		"ready": true,
+		"verification": {
+			"status": "passed"
+		},
+		"accepted": {
+			"position": 2,
+			"sourceCharacters": 986907,
+			"status": "passed"
+		},
+		"assertions": 9,
+		"deadlines": 0,
+		"boundaries": {
+			"account": 47.199951171875,
+			"seed": 5679.699951171875,
+			"worker:activity": 0.2998046875,
+			"worker:account": 3.900146484375,
+			"worker:journal": 3.60009765625,
+			"worker:cache-read": 0.300048828125,
+			"worker:snapshot-http": 206.7998046875,
+			"worker:session": 4195.699951171875,
+			"worker:connection": 0.199951171875,
+			"worker:editor-basis": 0.10009765625,
+			"worker:capability": 0.60009765625,
+			"worker:projection": 1.099853515625,
+			"open": 4245.699951171875,
+			"read": 1.39990234375,
+			"observe": 1.400146484375,
+			"begin": 162.0,
+			"mount": 11.300048828125,
+			"verify-flush": 0.599853515625,
+			"verify-close": 2.10009765625,
+			"verify-dispose": 0.199951171875,
+			"verify-create-worker": 0.199951171875,
+			"reopen-worker:activity": 0.39990234375,
+			"reopen-worker:account": 4.0,
+			"reopen-worker:journal": 0.300048828125,
+			"reopen-worker:cache-read": 0.900146484375,
+			"reopen-worker:session": 1615.89990234375,
+			"reopen-worker:connection": 0.10009765625,
+			"reopen-worker:editor-basis": 0.099853515625,
+			"reopen-worker:capability": 0.60009765625,
+			"reopen-worker:projection": 1.0,
+			"verify-offline-open": 1661.39990234375,
+			"verify-offline-read": 0.800048828125,
+			"verify-final-close": 1.60009765625
+		},
+		"coldPhases": [
+			{
+				"phase": "cold-session:validate-open-snapshot",
+				"ms": 1270.543
+			},
+			{
+				"phase": "cold-session:event-write",
+				"ms": 1282.802
+			},
+			{
+				"phase": "cold-session:validate-open-snapshot",
+				"ms": 1158.055
+			},
+			{
+				"phase": "cold-session:replay-check",
+				"ms": 1158.075
+			},
+			{
+				"phase": "cold-session:hydrate-server",
+				"ms": 1201.97
+			},
+			{
+				"phase": "cold-session:materialize",
+				"ms": 168.942
+			},
+			{
+				"phase": "cold-session:fork",
+				"ms": 85.936
+			},
+			{
+				"phase": "cold-session:fork",
+				"ms": 84.495
+			}
+		]
+	},
+	"reuse-candidate": {
+		"ready": true,
+		"verification": {
+			"status": "passed"
+		},
+		"accepted": {
+			"position": 2,
+			"sourceCharacters": 986907,
+			"status": "passed"
+		},
+		"assertions": 9,
+		"deadlines": 0,
+		"boundaries": {
+			"account": 45.199951171875,
+			"seed": 5464.10009765625,
+			"worker:activity": 0.400146484375,
+			"worker:account": 3.89990234375,
+			"worker:journal": 3.5,
+			"worker:cache-read": 0.2998046875,
+			"worker:snapshot-http": 201.699951171875,
+			"worker:session": 2873.89990234375,
+			"worker:connection": 0.199951171875,
+			"worker:editor-basis": 0.10009765625,
+			"worker:capability": 0.699951171875,
+			"worker:projection": 0.800048828125,
+			"open": 2923.89990234375,
+			"read": 1.39990234375,
+			"observe": 1.39990234375,
+			"begin": 152.60009765625,
+			"mount": 11.10009765625,
+			"verify-flush": 0.699951171875,
+			"verify-close": 2.0,
+			"verify-dispose": 0.300048828125,
+			"verify-create-worker": 0.199951171875,
+			"reopen-worker:activity": 0.300048828125,
+			"reopen-worker:account": 3.89990234375,
+			"reopen-worker:journal": 0.400146484375,
+			"reopen-worker:cache-read": 0.800048828125,
+			"reopen-worker:session": 1620.099853515625,
+			"reopen-worker:connection": 0.10009765625,
+			"reopen-worker:editor-basis": 0.099853515625,
+			"reopen-worker:capability": 0.60009765625,
+			"reopen-worker:projection": 1.0,
+			"verify-offline-open": 1665.199951171875,
+			"verify-offline-read": 0.599853515625,
+			"verify-final-close": 1.7998046875
+		},
+		"coldPhases": [
+			{
+				"phase": "cold-session:validate-open-snapshot",
+				"ms": 1202.499
+			},
+			{
+				"phase": "cold-session:event-write",
+				"ms": 1210.741
+			},
+			{
+				"phase": "cold-session:validate-open-snapshot",
+				"ms": 1112.403
+			},
+			{
+				"phase": "cold-session:replay-check",
+				"ms": 1112.423
+			},
+			{
+				"phase": "cold-session:materialize",
+				"ms": 170.949
+			},
+			{
+				"phase": "cold-session:fork",
+				"ms": 90.909
+			},
+			{
+				"phase": "cold-session:fork",
+				"ms": 81.095
+			}
+		]
+	}
+}
