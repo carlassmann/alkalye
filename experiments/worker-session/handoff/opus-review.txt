@@ -1,0 +1,27 @@
+**Verdict: no blockers for a bounded real-browser proof.** Your claimed invariants hold as written. Below: what I confirmed, then risks and nits. I only read the four files, so nothing was run.
+
+**Confirmed**
+- **Single sync step** (`editor-queue.ts:107-123`): readSelection, the source/epoch/sequence/generation/direction/composing checks, native accept, the Adopt offer and the epoch switch all happen in one `Effect.try`. If accept returns false or throws, nothing is offered and epoch, sequence and source are unchanged. The `accepting` guard makes a `replace` from inside accept throw.
+- **Adopt deferred retained**: `merge.saved` stays in `merges` until the Adopt reply (`:148`). Finalizers run in reverse order, so the stream fiber is interrupted before `:69` runs, and an `adopting` merge then gets AppliedUnknown.
+- **Failed Adopt reconcile**: reconcile succeeds only if a Read shows `epoch === candidate && sequence === 0`. Because the queue fiber is FIFO, no ReplaceQueued can land in between. Otherwise the queue stays failed and the draft stays in `source`/`pending`.
+- **Worker candidate cleanup**: MergeCandidate (`:150`) and ReplaceQueued (`:122`) both clear `candidate`. Adopt checks basis and candidate prior epoch/sequence.
+- **Edits after offer, before reply**: `source`, or `sequence` for no-op ranges, changes synchronously, so the check at `:87`/`:109` refuses.
+
+**Risks (not blockers)**
+1. **Source drift goes undetected.** `editor-queue.ts:173` ignores `result.value.source`. If what `session.replace` writes differs from the naive range splice in `:184-191`, main and worker offsets drift silently. Selection mapping would then be wrong, and only the final check (`fixture:102`) would catch it. Suggested fix: compare the reply's source to the expected source per sequence, or in the fixture `Read().localSource === textarea.value` before the first merge.
+2. **Out-of-range selection is treated as harmless.** The check at `worker-session.ts:151` (`end > length`) can only fail if there is drift, but it shares the reason `SelectionUnavailable` with "anchor deleted". Main excludes that reason from `failure` (`:101`). Use a distinct reason and make it fatal.
+3. **Refusals resolve two different ways.** SelectionUnavailable fails `saved` via `failCause`, while every other refusal resolves `false`.
+4. **Race tests depend on timing.** "Input during request" (`fixture:64-65`) assumes the fixture fiber resumes before the worker reply. That is very likely, since the worker does a flush and a fork first, but not guaranteed. It could be flaky but won't give a false pass.
+5. **A throwing accept leaves inconsistent state.** If accept throws after painting (`:124`), the textarea shows the candidate while `state().source` is still old, the merge isn't removed from `merges`, and the worker candidate isn't released. The queue is terminal by then, so only the draft is ambiguous.
+6. **Accept doesn't check the textarea value.** `readSelection` doesn't compare `textarea.value` to `merge.source`, so native mutations not routed through `replace` (undo, drag-drop, autocorrect) get overwritten. That's acceptable for this proof but needed before production.
+
+**Not covered by the fixture** (say so in the claim): the Adopt failure → reconcile path, the finalizer during adopting/sending, the deleted-anchor refusal, Unsaved/Rejected delivery, and Close during an in-flight RPC.
+
+**Nits**
+- If `merge.selection.composing` is already true when `merge()` is created, it could refuse up front instead of sending the RPC.
+- Indentation is off at `worker-session.ts:134,182,192`, so the format check will flag it if these files land.
+- `fixture:60` "no HANDOFF PEER" is trivially true, since the textarea is only ever set from main. The unseen-peer case is really proven by `:98`.
+
+The plan file wasn't written because Write isn't available in this session.
+
+These connectors need authorization in claude.ai connector settings before they work: Axiom, Canva, GitHub, Gmail, Google Drive, HubSpot, Lusha (both entries), Miro, Notion, Ocean.io, Ramp Data, Slack, Staging SynTwin, SynTwin Admin, SynTwin Kunde, lemlist, syntwin admin, syntwin main.

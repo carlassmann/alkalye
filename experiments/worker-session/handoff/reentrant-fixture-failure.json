@@ -1,0 +1,70 @@
+{
+	"success": true,
+	"data": {
+		"lifecycle": {
+			"effectiveLaunch": {
+				"browserLaunched": true,
+				"engine": "chrome",
+				"launchHash": 11677035664275010974
+			},
+			"launched": false,
+			"relaunchedBrowser": false,
+			"restartedBackground": false,
+			"restoreStatus": "not_configured",
+			"reused": true,
+			"saveStatus": "not_attempted"
+		},
+		"origin": "http://localhost:59278/",
+		"result": {
+			"done": true,
+			"failure": "An error occurred in Effect.try",
+			"results": [
+				"simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections",
+				"browser identity is available before any network authentication",
+				"native browser account login serializes cookie issuance and agrees with server verification",
+				"worker opens real HTTP source into its IndexedDB-backed session",
+				"worker sync pulls independent peer HTTP action",
+				"replacement against stale Unicode source handle preserves peer insertion and persists locally",
+				"independent stale frontmatter replacement preserves prior local edit and peer body",
+				"worker edits converge through native server accepted snapshot",
+				"explicit Close releases session and prevents subsequent read",
+				"same worker reopens exact durable source",
+				"old session handles fail without mutation after reopen",
+				"expired handle rejection leaves source unchanged",
+				"worker saves local edit while HTTP is unavailable",
+				"failed remote sync remains a typed worker boundary failure",
+				"offline Close and reopen preserve durable pending source",
+				"reconnected worker publishes exact offline source and clears pending actions",
+				"independent worker opens existing durable accepted state after scoped close",
+				"worker Begin captures exact editor-local atom basis",
+				"FIFO adapter paints complete optimistic source while eight edits await acknowledgement",
+				"one scoped queue drain delivers eight source edits in order",
+				"worker acknowledgements preserve actual adapter optimistic source before explicit idle merge",
+				"legacy handle replacement cannot bypass active editor basis",
+				"worker retains distinct local basis and merged authoritative source",
+				"ambiguous queued command cannot be blindly replayed into duplicate text",
+				"authentication loss produces typed sync access failure",
+				"failed remote access preserves queued local draft and durable pending edits",
+				"explicit idle End adopts merged peer source without losing queued local edits",
+				"queued basis edits converge exactly through real HTTP acceptance",
+				"save observer reaches an interrupted exit",
+				"interrupting one save observer preserves independent queued draft delivery",
+				"interrupted observer does not duplicate generated text in worker basis",
+				"worker rejects over-limit edit before applying it",
+				"FIFO adapter stops failed suffix instead of sending invalid dependent offsets",
+				"recovery retains complete optimistic draft and rejected suffix without silent reset",
+				"rejected edit leaves worker editor basis unchanged",
+				"scoped adapter shutdown releases queue while draft remains available for recovery copy",
+				"handoff begins from exact durable source",
+				"handoff adapter retains eight optimistic edits against unseen peer basis",
+				"input during merge RPC rejects stale candidate without painting peer reply",
+				"stale candidate release retains old basis and ninth queued edit exactly",
+				"selection change during merge refuses handoff and preserves active basis",
+				"composition starting during merge refuses candidate without replacing local source",
+				"native editor refusal releases candidate before epoch or Adopt mutation",
+				"handoff maps native textarea caret using retained atom identities"
+			]
+		}
+	},
+	"error": null
+}
