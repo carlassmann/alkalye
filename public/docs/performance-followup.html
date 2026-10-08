@@ -222,6 +222,16 @@
 			<code>experiments/worker-session/actual-editor</code>.
 		</p>
 		<p>
+			A separate recovery slice passed 66 browser assertions. An interrupted
+			posted RPC applied once and was reconciled through the surviving worker.
+			Abrupt termination left one unknown command and seven blocked dependents;
+			reopening preserved the durable prefix without replaying the suffix. The
+			full optimistic draft survives in the main tab. Whether the terminated
+			command applied without saving, and draft recovery after main-tab reload,
+			remain unproved. Evidence:
+			<code>experiments/worker-session/recovery</code>.
+		</p>
+		<p>
 			Active-line geometry caching was rejected. Six valid rich-document wheel
 			cells showed no consistent layout or paint gain, and geometry fixtures did
 			not prove correctness across a viewport-top shift. The 1MiB arm failed an
