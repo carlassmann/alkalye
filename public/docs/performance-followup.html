@@ -1496,7 +1496,6 @@
 			correction and failed hypothesis are preserved in
 			<code>experiments/performance/multicursor-forward-chunk</code>.
 		</p>
-		<h2>Original server comparison setup</h2>
 		<p>
 			A separate multicursor candidate kept full validation but decoded plain
 			deletion IDs with a string-array schema. Strict types and 95 module tests
@@ -1506,6 +1505,7 @@
 			Median GC time also rose from 43.510ms to 60.512ms. The candidate remains
 			unshipped; its foreground gain does not solve the frame-budget problem.
 		</p>
+		<h2>Original server comparison setup</h2>
 		<p>
 			The original application's installed SDK created one 2,048-character
 			document and completed its sync wait. A separate fresh SDK reader loaded
