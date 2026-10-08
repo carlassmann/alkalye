@@ -174,13 +174,18 @@
 			Evidence: <code>experiments/worker-session</code>.
 		</p>
 		<p>
-			The next outside draft passed 35 browser assertions, including eight
+			The latest outside draft passed 46 browser assertions, including eight
 			ordered edits against a worker-local replica basis, changes to newly
 			inserted characters and retained text after rejection. The peer was a
-			separate actor under the same account. Authentication loss was tested;
-			permission revocation was not. Follow-up Opus review found error-path
-			problems; the subsequent fixes still need runtime verification. Actual RPC
-			interruption, abrupt worker death and performance also remain gates.
+			separate actor under the same account. A further fixture used a separate
+			signed owner to revoke the writer invitation, retain reader access and
+			refuse the queued draft. Refreshing credentials kept it refused;
+			reauthorization accepted it once. Follow-up Opus error-path fixes passed
+			the latest run. The repository copy has adjusted import locators and
+			passed types; its original tested bundles and hashes are preserved. Actual
+			RPC interruption, abrupt worker death, native selections and performance
+			remain gates. Input arriving during the current End handoff is also
+			unresolved; this is not a production editor replacement.
 		</p>
 		<p>
 			Active-line geometry caching was rejected. Six valid rich-document wheel
@@ -190,6 +195,32 @@
 			readiness failure. Evidence and the corrected reproducer:
 			<code>experiments/performance/active-line-geometry</code>. Production
 			keeps measuring cursor geometry.
+		</p>
+		<h2>Twenty writers: authenticated server load</h2>
+		<p>
+			Twenty independent accounts joined through the public writer invitation
+			API and sent three paced cohorts to one 128KiB document. All 60 HTTP
+			commits were accepted. Receipts were contiguous, the snapshot and history
+			reached cursor 61, and each marker appeared exactly once. Request latency:
+			median 258ms, empirical p95 471ms, maximum 493ms. These are correlated
+			requests from one short journey, not a stable latency distribution.
+		</p>
+		<p>
+			The journey lasted 2.495 seconds. Its 24 completed operations per second
+			is a finite-cohort quotient, not sustained capacity. Each writer had one
+			request in flight. Server and driver ran in separate processes. Server CPU
+			samples covered a 4.056-second bracket, with 678ms before and 883ms after
+			the requests: 2.056 CPU seconds and observed maximum RSS 725MiB. Driver
+			CPU was 107ms; RSS 775MiB. Those resource observations include boundary
+			slack and do not identify individual request stages.
+		</p>
+		<p>
+			No persisted client-session, presence, reconnect or browser frame-rate
+			claim follows from this slice. The rich fixture contains 2599 real
+			newlines; a source-representation mistake in the first report was
+			corrected without changing the run. Setup failures, exact receipts and
+			reproduction commands:
+			<code>experiments/performance/twenty-writer-http</code>.
 		</p>
 		<h2>8 October: mobile taps and cached switching</h2>
 		<p>
