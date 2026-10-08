@@ -1526,6 +1526,49 @@
 			matched interaction and bundle comparisons still need to run. Evidence:
 			<code>experiments/performance/main-sdk-created</code>.
 		</p>
+		<p>
+			The first paired 2KiB typing smoke passed exact edited source, independent
+			server acceptance and Undo restoration for original main and rewrite
+			c922a8d. Input tasks took 5.330ms and 3.199ms respectively; largest tasks
+			over three seconds took 6.924ms and 3.199ms. This was one sample, original
+			first, with unmatched library histories. Undo was verified after the
+			window but not timed. Headless frame opportunities do not prove paint or
+			120Hz presentation.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>JavaScript, gzip bytes</th>
+					<th>Original</th>
+					<th>Rewrite</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Static bootstrap</td>
+					<td>1,280,350</td>
+					<td>351,064</td>
+				</tr>
+				<tr>
+					<td>Ready-document resources</td>
+					<td>1,300,394</td>
+					<td>409,948</td>
+				</tr>
+				<tr>
+					<td>Additional whiteboard resources</td>
+					<td>514,054</td>
+					<td>592,192</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+			Sizes sum each file compressed at gzip level 9. Static bootstrap follows
+			imports; ready-document resources came from observed requests. Whiteboard
+			resources exclude already observed document resources. CSS and fonts are
+			separate. These are file sizes, not transferred bytes; precache traffic
+			was not measured. Evidence:
+			<code>experiments/performance/main-current-small-c922</code>.
+		</p>
 		<footer>written with gpt-6 in codex</footer>
 	</body>
 </html>
