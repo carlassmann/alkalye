@@ -1,0 +1,52 @@
+**Verdict:** the plan is sound on ownership and counting, with one correction. It is close to the smallest realistic slice. Below is the source evidence, the exact seam, and the blockers I found.
+
+**Ownership (source-backed)**
+- Every write into `children`/`atomIndex` goes through `indexAtom` (`src/shared/crdt.ts:719`, `:1732`). It calls `freezeTextAtom` before inserting (`crdt.ts:1937`). That freezes `order`/`observed`/`deleted` first, then the atom.
+- The other freeze sites (`document-session.ts:1942`) use the same order. Still to check: `immutableAtoms` (`atom-sequence.ts:7`). If anything froze an atom without its arrays, the early return at `crdt.ts:1979` would skip freezing the arrays.
+- Siblings arrays are copy-on-write (`crdt.ts:1942`), so mutation never happens in place. Reading private atoms during capture is safe.
+- **Correction:** `compactAtomSteps` does `{ ...atom }` (`model.ts:377`), which is a shallow copy. Today that's only safe because the input was already deep-copied by `copyAtom`. On private atoms the output would share frozen internal arrays. You need to detach **`deleted` too**, not just `order`/`observed`.
+- Smallest fix, leaving `compactAtomSteps` behavior unchanged: the producer yields `atom.order || atom.observed || atom.deleted ? copyAtom(atom) : atom`. Structural atoms are rare, and plain atoms are either spread into a fresh run head or concatenated as strings. Merge decisions don't change because the copies are equal by value.
+- The spread also makes the run head non-frozen, so `previous.value +=` works. Never push the raw atom there.
+
+**Count limit**
+- The current gate is the sum of `target.atoms.length` over `this.targets.keys()` (`checkpoint.ts:161`).
+- `atomIndex.size` is equal under current source:
+  - There are no delete or clear paths.
+  - Both `indexAtom` callers do `targets.set` first (`crdt.ts:704→719`, `crdt.ts:1729→1732`).
+  - The `atomIndex.has` dedupe means each id lands in exactly one `children` entry.
+  - `forkSteps` copies both maps together.
+- That equality is an invariant, not a guarantee. Either walk sibling lengths exactly (`O(parents)`, no allocation, yield every 512), or use `atomIndex.size` plus one equivalence test. I'd use the exact walk because it's cheap and can't drift.
+- Keep strict `>`: exactly 2,000,000 compacts, 2,000,001 falls back to the owned v2 capture via the existing `checkpointSteps`.
+
+**Seam (no new infrastructure)**
+- `model.ts:346`: change the parameter to `atoms: Iterable<Atom>`. `compactAtoms`/`compactOperation` stay compatible.
+- `checkpoint.ts`: export `maximumCompactAtoms` and a `CompactReplicaCheckpoint` type (`typeof CompactCheckpointSchema.Type`).
+- `crdt.ts`:
+  - private `*targetAtoms(id)`: the same `children.get(id).values()` → siblings iteration order as `crdt.ts:1519`.
+  - `private *checkpointSteps(cooperative, compact = false)`: when `compact`, `atoms = yield* compactAtomSteps(detached(targetAtoms(id)), cooperative)`. Leave `restored`/`visibility`/`fields` code untouched. Emit `format: "alkalye-state-v3"`.
+  - `durableCheckpoint()` / `durableCheckpointEffect()`: same generation fence as `crdt.ts:1496–1504`. Precount inside the fenced generator, then either `checkpointSteps(c, true)` or `checkpointSteps(c)`. The fence covers the fallback too.
+- `document-session.ts:1377–1382`: becomes one ternary calling `accepted.durableCheckpointEffect()` / `durableCheckpoint()`.
+- Leave `document-store.ts:2478` and the public `checkpoint*` methods unchanged.
+- Cooperative yields: the producer has none. The 512 cadence comes from `compactAtomSteps`, which is equivalent to the old copy loop's cadence.
+
+**Semantic blockers (all exist today and behave the same on both paths; test, don't fix in this slice)**
+- **Empty or multi-code-point atoms:** `Replica.restore()` takes an unparsed snapshot, and `restoreStateSteps` doesn't check one code point per atom. An empty atom merges via `+= ""` while still advancing the id, so expansion (`checkpoint.ts:345`) silently shifts identities. An all-empty run fails `NonEmptyString` at `encodeSync`. A multi-code-point legacy atom causes the same offset drift.
+- **Lone surrogates:** still never merged (`model.ts:364`). Unchanged.
+- **Run length cap:** 2M uses UTF-16 `.length`, which matches `isMaxLength`. Unchanged.
+- **Mutation during capture:** the Map iterator sees `children.set` on not-yet-visited keys, same as today. Only the generation fence discards it, so both paths need an interrupt-plus-mutation test.
+
+**Allocation vs. peak heap**
+- This removes about 1M transient `Atom` objects plus an 8MB array per capture. That should lower scavenge pressure.
+- It probably won't move the 1.1GB peak much. `forkSteps` copies `atomIndex`, the per-target `children` maps (one key per parent, so ~1M for linear text), `textOwners` and `ownedAtomCounts`, plus ~1M length-1 siblings arrays at rest. Those likely dominate both peak heap and the 13–14ms GC if undo/redo forks.
+- Before adopting, you need:
+  - a same-app A/B with allocation sampling attributed per phase (fork / capture / compact / encode);
+  - byte-identical v3 output against `compactCheckpoint(checkpoint())`, including structural atoms, legacy targets, surrogates and the 2M / 2M+1 cases;
+  - real IndexedDB/SQLite save → reopen → decode → mutate → re-snapshot;
+  - interruption during capture, and generation-change rejection;
+  - a check that captured output arrays are not frozen and not shared with internal state.
+
+I only read source. Nothing was run and no code was written, so the equivalence claims and the heap attribution above are untested.
+
+Several claude.ai connectors (GitHub, Slack, Notion, etc.) need authorizing in your claude.ai connector settings before they can be used. They weren't needed here.
+
+written with claude-opus-5-5 in claude code

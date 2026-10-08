@@ -1,0 +1,39 @@
+ 7 | import { ApplicationError } from "./errors"
+ 8 | 
+ 9 | export function attempt<A>(operation: string, work: () => A) {
+10 | 	return Effect.try({
+11 | 		try: work,
+12 | 		catch: cause => new ApplicationError({ operation, cause }),
+                       ^
+error: Expected an object
+ operation: "checkpoint.parse",
+      _tag: "ApplicationError",
+
+      at catch (/private/tmp/alkalye-fused-checkpoint/candidate/src/platform/effects.ts:12:19)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:770:19)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2478:9)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2530:19)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2541:31)
+      at /private/tmp/alkalye-fused-checkpoint/candidate/threshold.ts:35:28
+
+93 | 	height: number
+94 | 	appearance: "light" | "dark"
+95 | }
+96 | export function object(value: unknown): Record<string, unknown> {
+97 | 	if (!value || typeof value !== "object" || Array.isArray(value))
+98 | 		throw new Error("Expected an object")
+                 ^
+error: Expected an object
+      at object (/private/tmp/alkalye-fused-checkpoint/candidate/src/shared/model.ts:98:13)
+      at parseCheckpointSteps (/private/tmp/alkalye-fused-checkpoint/candidate/src/shared/checkpoint.ts:409:15)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:768:22)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2478:9)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2530:19)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2541:31)
+      at /private/tmp/alkalye-fused-checkpoint/candidate/threshold.ts:35:28
+
+Bun v1.4.0 (macOS arm64)

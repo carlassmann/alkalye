@@ -1,0 +1,60 @@
+import assert from "node:assert/strict"
+import * as Effect from "effect/Effect"
+import { Replica } from "../src/shared/crdt"
+import type { Atom } from "../src/shared/model"
+
+let phase = process.argv[2]
+let count = Number(process.argv[3])
+assert(count === 2_000_000 || count === 2_000_001)
+let path = `/tmp/alkalye-fused-checkpoint/threshold-${count}.json`
+let source = "x".repeat(count)
+if (phase === "capture") {
+	let owner = new Replica("owner")
+	owner.edit("doc", source.slice(0, 2_000_000))
+	if (count > 2_000_000) owner.edit("doc", source)
+	assert.equal(owner.visible("doc").length, count)
+	let captured = await Effect.runPromise(owner.durableCheckpointEffect())
+	assert.equal(
+		captured.format,
+		count === 2_000_000 ? "alkalye-state-v3" : "alkalye-state-v2",
+	)
+	let target = captured.targets.find(value => value.id === "doc")
+	if (!target) throw Error("Missing target")
+	assert.equal(target.atoms.length, count === 2_000_000 ? 1 : count)
+	assert.equal(target.atoms.map(atom => atom.value).join(""), source)
+	await Bun.write(path, JSON.stringify(captured))
+	for (let index of [
+		0,
+		Math.floor(target.atoms.length / 2),
+		target.atoms.length - 1,
+	]) {
+		let atom: Atom | undefined = target.atoms[index]
+		if (!atom) throw Error("Missing owned atom")
+		assert.equal(Object.isFrozen(atom), false)
+		Reflect.set(atom, "value", "tampered")
+	}
+	Reflect.set(target.atoms, "length", 0)
+	Reflect.set(captured.targets, "length", 0)
+	assert.equal(owner.text("doc"), source)
+	assert.equal(owner.visible("doc").length, count)
+	console.log(
+		JSON.stringify({
+			phase,
+			count,
+			format: captured.format,
+			retainedAtoms: count,
+			owned: true,
+			file: path,
+		}),
+	)
+} else if (phase === "reopen") {
+	let value: unknown = JSON.parse(await Bun.file(path).text())
+	let reader = await Effect.runPromise(
+		Replica.fromCheckpointEffect(value, "reader"),
+	)
+	assert.equal(reader.text("doc"), source)
+	assert.equal(reader.visible("doc").length, count)
+	console.log(
+		JSON.stringify({ phase, count, sourceExact: true, visibleExact: true }),
+	)
+} else throw Error("Unknown phase")

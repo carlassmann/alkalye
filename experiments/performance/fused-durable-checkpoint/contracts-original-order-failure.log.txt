@@ -1,0 +1,111 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/durable-checkpoint.test.ts:
+27 | 			let redo = owner.create("doc", "cancel")
+28 | 			redo.value = undo.id
+29 | 			owner.apply([redo])
+30 | 			let expected = compactCheckpoint(owner.checkpoint())
+31 | 			let captured = await Effect.runPromise(owner.durableCheckpointEffect())
+32 | 			expect(JSON.stringify(captured)).toBe(JSON.stringify(expected))
+                                         ^
+error: expect(received).toBe(expected)
+
+Expected: "{"format":"alkalye-state-v3","clock":7,"restored":[],"targets":[{"id":"doc","created":1791463467593,"updated":1791463467598,"atoms":[{"id":"0000000000000004:owner:00000000","after":"","value":"-","order":["title","tags"],"observed":["0000000000000003:owner:00000004"]},{"id":"0000000000000003:owner:00000000","after":"","value":"---\ntitle: \"Original\"\n---\nBody","order":["title"]},{"id":"0000000000000004:owner:00000001","after":"0000000000000004:owner:00000000","value":"--\ntitle: \"Renamed\"\ntags: [\"blue\"]\n---\n"},{"id":"0000000000000005:owner:00000000","after":"0000000000000003:owner:00000029","value":"🌻"}],"visibility":{"legacyRemoved":[],"floor":0,"removals":[["0000000000000004:owner",[{"id":"0000000000000003:owner:00000004","count":18}]]],"cancels":[["0000000000000006:owner","0000000000000005:owner"],["0000000000000007:owner","0000000000000006:owner"]]},"fields":[{"id":"0000000000000001:owner","clock":1,"actor":"owner","time":1791463467593,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"type","value":"document"},{"id":"0000000000000002:owner","clock":2,"actor":"owner","time":1791463467593,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"metadata","value":"frontmatter-v1"}]}]}"
+Received: "{"format":"alkalye-state-v3","clock":7,"restored":[],"targets":[{"id":"doc","created":1791463467593,"updated":1791463467598,"atoms":[{"id":"0000000000000004:owner:00000000","after":"","value":"-","order":["title","tags"],"observed":["0000000000000003:owner:00000004"]},{"id":"0000000000000003:owner:00000000","after":"","value":"---\ntitle: \"Original\"\n---\nBody","order":["title"]},{"id":"0000000000000004:owner:00000001","after":"0000000000000004:owner:00000000","value":"--\ntitle: \"Renamed\"\ntags: [\"blue\"]\n---\n"},{"id":"0000000000000005:owner:00000000","after":"0000000000000003:owner:00000029","value":"🌻"}],"visibility":{"floor":0,"legacyRemoved":[],"removals":[["0000000000000004:owner",[{"id":"0000000000000003:owner:00000004","count":18}]]],"cancels":[["0000000000000006:owner","0000000000000005:owner"],["0000000000000007:owner","0000000000000006:owner"]]},"fields":[{"id":"0000000000000001:owner","clock":1,"actor":"owner","time":1791463467593,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"type","value":"document"},{"id":"0000000000000002:owner","clock":2,"actor":"owner","time":1791463467593,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"metadata","value":"frontmatter-v1"}]}]}"
+
+      at <anonymous> (/private/tmp/alkalye-fused-checkpoint/candidate/tests/durable-checkpoint.test.ts:32:37)
+(fail) durable capture equals existing compact output and reopens 4 [9.01ms]
+27 | 			let redo = owner.create("doc", "cancel")
+28 | 			redo.value = undo.id
+29 | 			owner.apply([redo])
+30 | 			let expected = compactCheckpoint(owner.checkpoint())
+31 | 			let captured = await Effect.runPromise(owner.durableCheckpointEffect())
+32 | 			expect(JSON.stringify(captured)).toBe(JSON.stringify(expected))
+                                         ^
+error: expect(received).toBe(expected)
+
+Expected: "{"format":"alkalye-state-v3","clock":7,"restored":[],"targets":[{"id":"doc","created":1791463467600... (82357 bytes truncated) ...000000005:owner:00000000","after":"0000000000000003:owner:00049177","value":"🌻"}],"visibility":{"legacyRemoved":[],"floor":0,"removals":[["0000000000000004:owner",[{"id":"0000000000000003:owner:00000004","count":18}]]],"cancels":[["0000000000000006:owner","0000000000000005:owner"],["0000000000000007:owner","0000000000000006:owner"]]},"fields":[{"id":"0000000000000001:owner","clock":1,"actor":"owner","time":1791463467600,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"type","value":"document"},{"id":"0000000000000002:owner","clock":2,"actor":"owner","time":1791463467600,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"metadata","value":"frontmatter-v1"}]}]}"
+Received: "{"format":"alkalye-state-v3","clock":7,"restored":[],"targets":[{"id":"doc","created":1791463467600... (82357 bytes truncated) ...000000005:owner:00000000","after":"0000000000000003:owner:00049177","value":"🌻"}],"visibility":{"floor":0,"legacyRemoved":[],"removals":[["0000000000000004:owner",[{"id":"0000000000000003:owner:00000004","count":18}]]],"cancels":[["0000000000000006:owner","0000000000000005:owner"],["0000000000000007:owner","0000000000000006:owner"]]},"fields":[{"id":"0000000000000001:owner","clock":1,"actor":"owner","time":1791463467600,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"type","value":"document"},{"id":"0000000000000002:owner","clock":2,"actor":"owner","time":1791463467600,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"metadata","value":"frontmatter-v1"}]}]}"
+
+      at <anonymous> (/private/tmp/alkalye-fused-checkpoint/candidate/tests/durable-checkpoint.test.ts:32:37)
+(fail) durable capture equals existing compact output and reopens 57344 [121.08ms]
+27 | 			let redo = owner.create("doc", "cancel")
+28 | 			redo.value = undo.id
+29 | 			owner.apply([redo])
+30 | 			let expected = compactCheckpoint(owner.checkpoint())
+31 | 			let captured = await Effect.runPromise(owner.durableCheckpointEffect())
+32 | 			expect(JSON.stringify(captured)).toBe(JSON.stringify(expected))
+                                         ^
+error: expect(received).toBe(expected)
+
+Expected: "{"format":"alkalye-state-v3","clock":7,"restored":[],"targets":[{"id":"doc","created":1791463467721,"updated":1791463467722,"atoms":[{"id":"0000000000000004:owner:00000000","after":"","value":"-","order":["title","tags"],"observed":["0000000000000003:owner:00000004"]},{"id":"0000000000000003:owner:00000000","after":"","value":"---\ntitle: \"Original\"\n---\n","order":["title"]},{"id":"0000000000000003:owner:00000026","after":"0000000000000003:owner:00000025","value":"\ud800"},{"id":"0000000000000003:owner:00000027","after":"0000000000000003:owner:00000026","value":" lone "},{"id":"0000000000000003:owner:00000033","after":"0000000000000003:owner:00000032","value":"\udc00"},{"id":"0000000000000004:owner:00000001","after":"0000000000000004:owner:00000000","value":"--\ntitle: \"Renamed\"\ntags: [\"blue\"]\n---\n"},{"id":"0000000000000005:owner:00000000","after":"0000000000000003:owner:00000033","value":"🌻"}],"visibility":{"legacyRemoved":[],"floor":0,"removals":[["0000000000000004:owner",[{"id":"0000000000000003:owner:00000004","count":18}]]],"cancels":[["0000000000000006:owner","0000000000000005:owner"],["0000000000000007:owner","0000000000000006:owner"]]},"fields":[{"id":"0000000000000001:owner","clock":1,"actor":"owner","time":1791463467721,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"type","value":"document"},{"id":"0000000000000002:owner","clock":2,"actor":"owner","time":1791463467722,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"metadata","value":"frontmatter-v1"}]}]}"
+Received: "{"format":"alkalye-state-v3","clock":7,"restored":[],"targets":[{"id":"doc","created":1791463467721,"updated":1791463467722,"atoms":[{"id":"0000000000000004:owner:00000000","after":"","value":"-","order":["title","tags"],"observed":["0000000000000003:owner:00000004"]},{"id":"0000000000000003:owner:00000000","after":"","value":"---\ntitle: \"Original\"\n---\n","order":["title"]},{"id":"0000000000000003:owner:00000026","after":"0000000000000003:owner:00000025","value":"\ud800"},{"id":"0000000000000003:owner:00000027","after":"0000000000000003:owner:00000026","value":" lone "},{"id":"0000000000000003:owner:00000033","after":"0000000000000003:owner:00000032","value":"\udc00"},{"id":"0000000000000004:owner:00000001","after":"0000000000000004:owner:00000000","value":"--\ntitle: \"Renamed\"\ntags: [\"blue\"]\n---\n"},{"id":"0000000000000005:owner:00000000","after":"0000000000000003:owner:00000033","value":"🌻"}],"visibility":{"floor":0,"legacyRemoved":[],"removals":[["0000000000000004:owner",[{"id":"0000000000000003:owner:00000004","count":18}]]],"cancels":[["0000000000000006:owner","0000000000000005:owner"],["0000000000000007:owner","0000000000000006:owner"]]},"fields":[{"id":"0000000000000001:owner","clock":1,"actor":"owner","time":1791463467721,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"type","value":"document"},{"id":"0000000000000002:owner","clock":2,"actor":"owner","time":1791463467722,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"metadata","value":"frontmatter-v1"}]}]}"
+
+      at <anonymous> (/private/tmp/alkalye-fused-checkpoint/candidate/tests/durable-checkpoint.test.ts:32:37)
+(fail) durable capture equals existing compact output and reopens 8 [1.30ms]
+27 | 			let redo = owner.create("doc", "cancel")
+28 | 			redo.value = undo.id
+29 | 			owner.apply([redo])
+30 | 			let expected = compactCheckpoint(owner.checkpoint())
+31 | 			let captured = await Effect.runPromise(owner.durableCheckpointEffect())
+32 | 			expect(JSON.stringify(captured)).toBe(JSON.stringify(expected))
+                                         ^
+error: expect(received).toBe(expected)
+
+Expected: "{"format":"alkalye-state-v3","clock":7,"restored":[],"targets":[{"id":"doc","created":1791463467723... (10677 bytes truncated) ...000000005:owner:00000000","after":"0000000000000003:owner:00010009","value":"🌻"}],"visibility":{"legacyRemoved":[],"floor":0,"removals":[["0000000000000004:owner",[{"id":"0000000000000003:owner:00000004","count":18}]]],"cancels":[["0000000000000006:owner","0000000000000005:owner"],["0000000000000007:owner","0000000000000006:owner"]]},"fields":[{"id":"0000000000000001:owner","clock":1,"actor":"owner","time":1791463467723,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"type","value":"document"},{"id":"0000000000000002:owner","clock":2,"actor":"owner","time":1791463467723,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"metadata","value":"frontmatter-v1"}]}]}"
+Received: "{"format":"alkalye-state-v3","clock":7,"restored":[],"targets":[{"id":"doc","created":1791463467723... (10677 bytes truncated) ...000000005:owner:00000000","after":"0000000000000003:owner:00010009","value":"🌻"}],"visibility":{"floor":0,"legacyRemoved":[],"removals":[["0000000000000004:owner",[{"id":"0000000000000003:owner:00000004","count":18}]]],"cancels":[["0000000000000006:owner","0000000000000005:owner"],["0000000000000007:owner","0000000000000006:owner"]]},"fields":[{"id":"0000000000000001:owner","clock":1,"actor":"owner","time":1791463467723,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"type","value":"document"},{"id":"0000000000000002:owner","clock":2,"actor":"owner","time":1791463467723,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"metadata","value":"frontmatter-v1"}]}]}"
+
+      at <anonymous> (/private/tmp/alkalye-fused-checkpoint/candidate/tests/durable-checkpoint.test.ts:32:37)
+(fail) durable capture equals existing compact output and reopens 9984 [20.30ms]
+(pass) owned captured arrays and atom values cannot mutate live header or discussion [1.58ms]
+93 | 	let inserted = owner.edit("doc", owner.text("doc") + "x")
+94 | 	if (!inserted) throw Error("Missing insertion")
+95 | 	let undo = owner.cancel("doc", inserted.id)
+96 | 	owner.apply([undo])
+97 | 	let compact = await Effect.runPromise(owner.durableCheckpointEffect())
+98 | 	expect(JSON.stringify(compact)).toBe(
+                                      ^
+error: expect(received).toBe(expected)
+
+Expected: "{"format":"alkalye-state-v3","clock":6,"restored":[],"targets":[{"id":"doc","created":1791463467745,"updated":1791463467746,"atoms":[{"id":"0000000000000004:peer:00000000","after":"","value":"-","order":["title"],"observed":["0000000000000003:owner:00000004"]},{"id":"0000000000000003:owner:00000000","after":"","value":"---\ntitle: \"Header\"\n---\nBody\n---x","order":["title"]},{"id":"0000000000000004:peer:00000001","after":"0000000000000004:peer:00000000","value":"--\ntitle: \"Peer title\"\n---\n"},{"id":"0000000000000005:owner:00000000","after":"0000000000000003:owner:00000032","value":"x"}],"visibility":{"legacyRemoved":[],"floor":0,"removals":[["0000000000000004:peer",[{"id":"0000000000000003:owner:00000004","count":16}]]],"cancels":[["0000000000000006:owner","0000000000000005:owner"]]},"fields":[{"id":"0000000000000001:owner","clock":1,"actor":"owner","time":1791463467745,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"type","value":"document"},{"id":"0000000000000002:owner","clock":2,"actor":"owner","time":1791463467745,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"metadata","value":"frontmatter-v1"}]}]}"
+Received: "{"format":"alkalye-state-v3","clock":6,"restored":[],"targets":[{"id":"doc","created":1791463467745,"updated":1791463467746,"atoms":[{"id":"0000000000000004:peer:00000000","after":"","value":"-","order":["title"],"observed":["0000000000000003:owner:00000004"]},{"id":"0000000000000003:owner:00000000","after":"","value":"---\ntitle: \"Header\"\n---\nBody\n---x","order":["title"]},{"id":"0000000000000004:peer:00000001","after":"0000000000000004:peer:00000000","value":"--\ntitle: \"Peer title\"\n---\n"},{"id":"0000000000000005:owner:00000000","after":"0000000000000003:owner:00000032","value":"x"}],"visibility":{"floor":0,"legacyRemoved":[],"removals":[["0000000000000004:peer",[{"id":"0000000000000003:owner:00000004","count":16}]]],"cancels":[["0000000000000006:owner","0000000000000005:owner"]]},"fields":[{"id":"0000000000000001:owner","clock":1,"actor":"owner","time":1791463467745,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"type","value":"document"},{"id":"0000000000000002:owner","clock":2,"actor":"owner","time":1791463467745,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"metadata","value":"frontmatter-v1"}]}]}"
+
+      at <anonymous> (/private/tmp/alkalye-fused-checkpoint/candidate/tests/durable-checkpoint.test.ts:98:34)
+(fail) concurrent writer, source fence and retained cancellations survive durable capture [1.35ms]
+113 | 	await Effect.runPromise(Fiber.interrupt(fiber))
+114 | 	expect(Exit.isFailure(await Effect.runPromise(Fiber.await(fiber)))).toBe(true)
+115 | 	expect(owner.text("doc")).toBe(before)
+116 | 	expect(
+117 | 		JSON.stringify(await Effect.runPromise(owner.durableCheckpointEffect())),
+118 | 	).toBe(JSON.stringify(compactCheckpoint(owner.checkpoint())))
+         ^
+error: expect(received).toBe(expected)
+
+Expected: "{"format":"alkalye-state-v3","clock":1,"restored":[],"targets":[{"id":"doc","created":1791463467746... (65549 bytes truncated) ...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}],"visibility":{"legacyRemoved":[],"floor":0,"removals":[],"cancels":[]},"fields":[]}]}"
+Received: "{"format":"alkalye-state-v3","clock":1,"restored":[],"targets":[{"id":"doc","created":1791463467746... (65549 bytes truncated) ...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}],"visibility":{"floor":0,"legacyRemoved":[],"removals":[],"cancels":[]},"fields":[]}]}"
+
+      at <anonymous> (/private/tmp/alkalye-fused-checkpoint/candidate/tests/durable-checkpoint.test.ts:118:4)
+(fail) interrupted durable capture leaves live replica and later capture intact [82.78ms]
+124 | 	let fiber = Effect.runFork(owner.durableCheckpointEffect())
+125 | 	await new Promise<void>(resolve => setImmediate(resolve))
+126 | 	owner.edit("doc", owner.text("doc") + "🌻")
+127 | 	expect(Exit.isFailure(await Effect.runPromise(Fiber.await(fiber)))).toBe(true)
+128 | 	let captured = await Effect.runPromise(owner.durableCheckpointEffect())
+129 | 	expect(JSON.stringify(captured)).toBe(
+                                        ^
+error: expect(received).toBe(expected)
+
+Expected: "{"format":"alkalye-state-v3","clock":2,"restored":[],"targets":[{"id":"doc","created":1791463467829... (65647 bytes truncated) ...000000002:owner:00000000","after":"0000000000000001:owner:00065535","value":"🌻"}],"visibility":{"legacyRemoved":[],"floor":0,"removals":[],"cancels":[]},"fields":[]}]}"
+Received: "{"format":"alkalye-state-v3","clock":2,"restored":[],"targets":[{"id":"doc","created":1791463467829... (65647 bytes truncated) ...000000002:owner:00000000","after":"0000000000000001:owner:00065535","value":"🌻"}],"visibility":{"floor":0,"legacyRemoved":[],"removals":[],"cancels":[]},"fields":[]}]}"
+
+      at <anonymous> (/private/tmp/alkalye-fused-checkpoint/candidate/tests/durable-checkpoint.test.ts:129:35)
+(fail) generation changes reject the entire captured output [83.13ms]
+
+tests/durable-checkpoint-session.test.ts:
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [480.88ms]
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [411.81ms]
+
+ 3 pass
+ 7 fail
+ 41 expect() calls
+Ran 10 tests across 2 files. [1269.00ms]

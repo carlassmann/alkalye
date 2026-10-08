@@ -1,0 +1,1 @@
+{"phase":"capture","count":2000001,"format":"alkalye-state-v2","retainedAtoms":2000001,"owned":true,"file":"/tmp/alkalye-fused-checkpoint/threshold-2000001.json"}

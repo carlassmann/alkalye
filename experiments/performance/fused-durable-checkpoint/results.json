@@ -1,0 +1,144 @@
+{
+	"status": "correctness proved outside production; native performance not measured",
+	"lineage": {
+		"documentSessionBase": "5b4d2b7",
+		"initialOutsideArchive": "1e01c8a",
+		"crdtProductionLineage": "d26 terminal Redo certificate; unchanged between initial archive and session rebase"
+	},
+	"proofs": {
+		"initialTypes": "pass",
+		"initialContracts": {
+			"pass": 3,
+			"fail": 7,
+			"cause": "JSON property order comparing sync checkpoint against cooperative checkpoint"
+		},
+		"correctedContracts": {
+			"pass": 10,
+			"fail": 0,
+			"assertions": 59,
+			"oracle": "compactCheckpoint(await checkpointEffect())"
+		},
+		"strengthenedDeletedOwnership": {
+			"pass": 1,
+			"fail": 0,
+			"assertions": 15
+		},
+		"thresholds": [
+			{
+				"retainedAtoms": 2000000,
+				"format": "alkalye-state-v3",
+				"emittedAtoms": 1,
+				"capture": "pass",
+				"independentReopen": "pass"
+			},
+			{
+				"retainedAtoms": 2000001,
+				"format": "alkalye-state-v2",
+				"emittedAtoms": 2000001,
+				"capture": "pass",
+				"independentReopen": "pass"
+			}
+		],
+		"finalTypes": "pass",
+		"reviews": [
+			{
+				"handle": 82150,
+				"exit": 0
+			},
+			{
+				"handle": 36653,
+				"exit": 0
+			}
+		]
+	},
+	"thresholdPayloads": {
+		"included": false,
+		"reason": "large generated checkpoints; reproduce from public ASCII fixture and capture logs",
+		"paths": [
+			"/tmp/alkalye-fused-checkpoint/threshold-2000000.json",
+			"/tmp/alkalye-fused-checkpoint/threshold-2000001.json"
+		]
+	},
+	"files": {
+		"crdt.ts.txt": {
+			"sha256": "aaff1f792bc1bccb8bea0e81521db32c3545647a72b976a45aeca9d0273d8459",
+			"bytes": 65285
+		},
+		"document-session.ts.txt": {
+			"sha256": "e7ec5917e7dda0730159bb0954b1b3276747f1bc2263c5f02a5445ee92ffb279",
+			"bytes": 64436
+		},
+		"durable-checkpoint.test.ts.txt": {
+			"sha256": "49a660e5c4da3f4f9d554a1759ef044f7f6c106695a2cb50e81ef738ef756f84",
+			"bytes": 5805
+		},
+		"durable-checkpoint-session.test.ts.txt": {
+			"sha256": "86b84da5e9442b933e4c37b6040c63356ad973c33a124eaeff3c456d7a52e817",
+			"bytes": 6390
+		},
+		"durable-checkpoint-threshold.ts.txt": {
+			"sha256": "6d54c33c0b2972189df1356b7092617892b6f8994e537449d58608892c3bc7d0",
+			"bytes": 2078
+		},
+		"types.log.txt": {
+			"sha256": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+			"bytes": 15
+		},
+		"types-threshold.log.txt": {
+			"sha256": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+			"bytes": 15
+		},
+		"contracts.log.txt": {
+			"sha256": "cfa5b3f97095c82c70c6c1501f4e288e30e85fd1adc7e0e93d2849bb4ca4d2be",
+			"bytes": 1108
+		},
+		"review-candidate.log.txt": {
+			"sha256": "de870a88b19dc687fa0d30ea0e65b262c61cf9596e61b0c6fe6af0ca454a3fa5",
+			"bytes": 4312
+		},
+		"deleted-ownership.log.txt": {
+			"sha256": "5dd99e070a9e11cdb03eccfd34a259b5e94a6eaed36ed688427bb5e6c71967cb",
+			"bytes": 245
+		},
+		"threshold-2000001-reopen.log.txt": {
+			"sha256": "6663e9008012a6dbd47abf2062eba2ae0e7c591666a332961be0984442a7277b",
+			"bytes": 74
+		},
+		"threshold-2000000-capture.log.txt": {
+			"sha256": "110319e6d30b54da41eea41480db94aa2c9cb94d1c5e4fc626dbacdfc72a80ef",
+			"bytes": 163
+		},
+		"types-threshold-inference-failure.log.txt": {
+			"sha256": "bad52cea63e79589965284d8e87e78c1c11b419f91489c67e2542aa58324813f",
+			"bytes": 215
+		},
+		"review.log.txt": {
+			"sha256": "2e5d160a7ca33b48a62a7298a854b6d735caebdcc3c9dd5622d2948b32587ecd",
+			"bytes": 5825
+		},
+		"threshold-2000000-reopen.log.txt": {
+			"sha256": "096d1c50fa188d798e1451822de3c407b29cecbc6fab33d4edcec95ebe369401",
+			"bytes": 74
+		},
+		"threshold-reader-argument-failure.log.txt": {
+			"sha256": "d50d8e94bb25558649f3ef28c61414d8a42fec277054a0080e16366842d1ed80",
+			"bytes": 2589
+		},
+		"contracts-original-order-failure.log.txt": {
+			"sha256": "2165fe3aad7e3540030240aa7b77ac2b3e2e1128aefc77efa58271192066824a",
+			"bytes": 17629
+		},
+		"threshold-2000001-capture.log.txt": {
+			"sha256": "dd766491145fc600e9ee4f2a7661c9073c776eb5a59f2d7a6cea586cfe0f125b",
+			"bytes": 163
+		},
+		"review.txt": {
+			"sha256": "a031f635d22fb8fb4b1822f186d87fbfee62dc3cfa16da0355dc424d38670dcb",
+			"bytes": 2078
+		},
+		"review-candidate.txt": {
+			"sha256": "cc0492c9d25d901d8618ccb13a23d375a4f5d4801321c7c82f22769e21f59f6d",
+			"bytes": 1412
+		}
+	}
+}

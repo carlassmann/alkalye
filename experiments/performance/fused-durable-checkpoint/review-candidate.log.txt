@@ -1,0 +1,46 @@
+I found one likely compile blocker and two smaller blockers. The ownership logic itself holds up, judging from the source.
+
+**What holds up**
+- `compactAtomSteps` always does `insert.push({ ...atom })` (`model.ts:377`). So the compacted output never contains a private atom object. Only the nested arrays can be shared.
+- `Atom` has exactly 3 nested arrays: `order`, `observed`, `deleted` (`model.ts:8-12`). The output pass detaches all 3 by calling `copyAtom` (`crdt.ts:1999`).
+- `+=` only ever touches the spread copy, never a frozen atom.
+- The over-2M fallback (`compact === borrowed`) copies every atom. `restored`, `visibility` and `fields` are already fresh in `checkpointSteps`, so nothing private escapes.
+- On interruption, the borrowed array is simply dropped. Nothing is exposed.
+- Generation is read when the Effect runs, not when it is constructed. Correct.
+
+**Blockers**
+1. **Types: likely `tsc` failure at `crdt.ts:1519-1529`.** `typeof compact.targets` is `TargetCheckpoint[] | ReadonlyArray<CompactTarget>`. Effect `Schema.Array` produces readonly types, which is why `checkpoint.ts:165` annotates `(…)[number][]`. So `targets.push` fails to compile on the readonly half. The `{ ...compact, targets }` union also won't fit v2's mutable `TargetCheckpoint[]`. Fix: branch instead of checking per atom:
+   - `if (compact.format !== "alkalye-state-v3")` → copy every atom and return v2.
+   - Otherwise build `(typeof compact.targets)[number][]` and return v3.
+   - This removes the `compact === borrowed` check from the hot loop, and the unreachable v1 throw.
+2. **Tests won't type-check (`durable-checkpoint.test.ts:43-51`).**
+   - `order`, `observed` and `deleted` are `readonly string[]`, so `.push` doesn't compile.
+   - The v3 `targets`/`atoms` arrays are readonly, so `.length = 0` doesn't compile.
+   - Either assert `!Object.isFrozen(atom.order)` instead, or mutate after explicit copies. Casts are not allowed.
+   - Also assert the fixture really contains at least one atom with `order`, `observed` or `deleted`. Otherwise the detach check may test nothing.
+3. **Style/format.**
+   - The new code uses space indentation in `crdt.ts:1506-1537` and `document-session.ts:1378-1379`; both tests use 1 space. The repo uses tabs.
+   - It uses `throw Error(...)` where the file uses `throw new Error`.
+   - `check` will flag both.
+
+**Semantics**
+- The generation checks after compaction and after output are stricter than today. Today only the capture step is checked, and compaction runs unchecked. Everything the borrowed snapshot references is frozen or owned, so a later mutation can't corrupt the output. These extra checks only add rejections while the user is typing, and a 1M-atom capture has many yield points.
+  - Check whether `gate.withPermit` (`document-session.ts:298`) already serialises edits against `accepted`. If it does, the checks can never fire anyway.
+  - Either keep just the one check after capture (same as today's contract), or state the stricter contract on purpose.
+- The fallback above 2M briefly holds the borrowed reference array *and* the full copy. That's one extra array of about 16MB at 2M atoms over the current path. Acceptable, but note it.
+
+**Test weaknesses**
+- Interrupt test (`:73-85`): after one `yieldNow`, the child may not have started yet. Interrupting it then passes trivially. Wait until it has observably made progress before interrupting.
+- Generation test (`:86-97`): if the fork hasn't read the generation before the edit, the capture succeeds and the test fails. That's flaky. It also never targets the compaction or output phases separately.
+- Still missing:
+  - exactly 2M and 2M+1 atoms (you noted this);
+  - mixed text where structural atoms sit inside mergeable runs.
+- The session test is good. It also needs one case that forces the >2M fallback through the session.
+
+I made no claims about heap. I agree that the private Map copies in fork probably still dominate peak heap.
+
+This was a read-only review: I ran no `tsc`, tests or diff. So the readonly compile errors are inferred from the Schema types and `checkpoint.ts:165`, not observed.
+
+I didn't need any connectors. GitHub, Slack, Notion and others need authorizing in your claude.ai connector settings before they can be used.
+
+written with claude-opus-5-5 in claude code

@@ -1,0 +1,20 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/durable-checkpoint.test.ts:
+(pass) durable capture equals existing compact output and reopens 4 [13.74ms]
+(pass) durable capture equals existing compact output and reopens 57344 [249.21ms]
+(pass) durable capture equals existing compact output and reopens 8 [6.19ms]
+(pass) durable capture equals existing compact output and reopens 9984 [45.87ms]
+(pass) owned captured arrays and atom values cannot mutate live header or discussion [2.23ms]
+(pass) concurrent writer, source fence and retained cancellations survive durable capture [2.47ms]
+(pass) interrupted durable capture leaves live replica and later capture intact [89.28ms]
+(pass) generation changes reject the entire captured output [75.23ms]
+
+tests/durable-checkpoint-session.test.ts:
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [460.79ms]
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [415.01ms]
+
+ 10 pass
+ 0 fail
+ 59 expect() calls
+Ran 10 tests across 2 files. [1411.00ms]

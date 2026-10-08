@@ -1,0 +1,2 @@
+$ tsc --noEmit
+tests/durable-checkpoint-threshold.ts(30,7): error TS7022: 'atom' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
