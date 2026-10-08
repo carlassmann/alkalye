@@ -2,14 +2,14 @@
 
 Rejected for production. Three paired synthetic 1 MiB browser journeys, frozen at f9508ce, passed exact source and accepted journal checks. The candidate privately stages undo proposals and warms source before atomic publication. Ordinary edits keep the native path.
 
-| Median | Native | Candidate |
-|---|---:|---:|
-| Largest undo task | 188.4 ms | 25.4 ms |
-| Undo frame opportunity | 368.1 ms | 1313.5 ms |
-| Undo accepted cache | 1491.6 ms | 2547.7 ms |
-| Sampled heap after undo | 619 MB | 1051 MB |
-| Trusted character dispatch | 4.58 ms | 4.61 ms |
-| Largest deferred edit task | 9.71 ms | 10.32 ms |
+| Median                     |    Native | Candidate |
+| -------------------------- | --------: | --------: |
+| Largest undo task          |  188.4 ms |   25.4 ms |
+| Undo frame opportunity     |  368.1 ms | 1313.5 ms |
+| Undo accepted cache        | 1491.6 ms | 2547.7 ms |
+| Sampled heap after undo    |    619 MB |   1051 MB |
+| Trusted character dispatch |   4.58 ms |   4.61 ms |
+| Largest deferred edit task |   9.71 ms |  10.32 ms |
 
 The smaller tasks do not compensate for slower readiness and more memory. Opus found repeated staging: journal replay decodes a different Recording object, so the identity guard discards the earlier private preparation and copies full maps again. Known proposal validation also stages without publication. These are source findings, not sampled attribution of the regression.
 
