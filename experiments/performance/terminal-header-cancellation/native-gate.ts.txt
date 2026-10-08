@@ -1,0 +1,40 @@
+import { browser, evaluate } from '/Users/carlassmann/.codex/worktrees/b513/alkalye/tests/browser-driver'
+import { cp, rm } from 'node:fs/promises'
+let root = '/tmp/alkalye-terminal-header'
+let seed = '/tmp/alkalye-production-allocation-oct8/profile-seed'
+let session = 'header-native-gate', observer = session + '-observer'
+let url = 'http://127.0.0.1:4461/app/doc/47522f3e-4811-413b-a36a-51c1225c4246'
+let read = "document.querySelector('alkalye-editor')?.source.value"
+let result: { stage: string; passed: boolean; error: string; state: unknown } = { stage: 'prepare', passed: false, error: '', state: null }
+try {
+ let env = { ...process.env, WORK_STATE_ROOT: root + '/work-state' }, cwd = root + '/serve'
+ Bun.spawnSync(['work', 'down'], { cwd, env })
+ await rm(root + '/data-active', { recursive: true, force: true }); await cp(root + '/data-seed', root + '/data-active', { recursive: true })
+ await rm(root + '/assets-active', { recursive: true, force: true }); await cp(root + '/diagnostic/dist', root + '/assets-active', { recursive: true })
+ if (Bun.spawnSync(['work', 'run', 'rewrite'], { cwd, env }).exitCode) throw Error('Server start failed')
+ for (let name of [session, observer]) {
+  let profile = root + '/profile-' + name
+  await rm(profile, { recursive: true, force: true }); await cp(seed, profile, { recursive: true })
+  for (let lock of ['SingletonLock', 'SingletonCookie', 'SingletonSocket', 'Default/Service Worker', 'Default/Cache', 'Default/Code Cache']) await rm(profile + '/' + lock, { recursive: true, force: true })
+  browser(name, '--profile', profile, 'open', 'http://127.0.0.1:4461/changelog')
+ }
+ evaluate(observer, `indexedDB.databases().then(async rows=>{for(let row of rows)if(row.name?.startsWith('alkalye-document-v1:'))await new Promise((resolve,reject)=>{let r=indexedDB.deleteDatabase(row.name);r.onsuccess=()=>resolve(true);r.onerror=()=>reject(r.error)});return true})`)
+ result.stage = 'initial'
+ browser(session, 'open', url); browser(session, 'wait', '--fn', `${read}?.length===1048576&&!document.querySelector('#editor').readOnly`)
+ evaluate(session, `(()=>{let source=document.querySelector('alkalye-editor').source;window.__original=source.value;window.__hits=[];document.addEventListener('header-cancel:committed',e=>window.__hits.push(e.detail));source.setSelectionRange(source.value.length,source.value.length);source.focus();return true})()`)
+ browser(session, 'wait', '--fn', "document.activeElement?.id==='editor'")
+ browser(session, 'press', 'x'); browser(session, 'wait', '--fn', `${read}===window.__original+'x'&&document.querySelector('#save-status').dataset.pending==='0'&&document.querySelector('#save-status').getAttribute('aria-busy')==='false'`)
+ browser(observer, 'open', url); browser(observer, 'wait', '--fn', `${read}?.length===1048577`)
+ result.stage = 'undo'
+ browser(session, 'press', 'Control+z'); browser(session, 'wait', '--fn', `${read}===window.__original&&document.querySelector('#save-status').dataset.pending==='0'&&document.querySelector('#save-status').getAttribute('aria-busy')==='false'`)
+ browser(observer, 'open', url); browser(observer, 'wait', '--fn', `${read}?.length===1048576`)
+ let expected = new Bun.CryptoHasher('sha256').update(await Bun.file('/tmp/alkalye-prod-current-oct8/long1m.txt').arrayBuffer()).digest('hex')
+ let accepted = evaluate(observer, `crypto.subtle.digest('SHA-256',new TextEncoder().encode(${read})).then(b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''))`)
+ if (accepted !== expected) throw Error('Accepted Undo source mismatch')
+ browser(session, 'wait', '--fn', `(()=>{let source=document.querySelector('alkalye-editor').source,host=source.viewport.scrollElement;return source.selectionStart===source.value.length&&source.selectionEnd===source.value.length&&source.viewport.viewport.end===source.projection.text.length&&host.scrollHeight-host.clientHeight-host.scrollTop<host.clientHeight&&document.querySelector('#editor').value.length<32768&&window.__hits.length>0})()`)
+ result.state = evaluate(session, `(()=>{let source=document.querySelector('alkalye-editor').source,host=source.viewport.scrollElement;return {selectionStart:source.selectionStart,selectionEnd:source.selectionEnd,sourceLength:source.value.length,nativeLength:document.querySelector('#editor').value.length,window:source.viewport.viewport,scrollTop:host.scrollTop,scrollHeight:host.scrollHeight,clientHeight:host.clientHeight,hits:window.__hits,accepted:${JSON.stringify(accepted)}}})()`)
+ result.passed = true; result.stage = 'complete'
+} catch(error) { result.error=String(error) }
+finally { for(let name of [session,observer])try{browser(name,'close')}catch{};await Bun.write(root+'/gate-results.json',JSON.stringify(result,null,2)) }
+console.log(JSON.stringify(result))
+if(!result.passed)process.exitCode=1

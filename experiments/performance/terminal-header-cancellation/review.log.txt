@@ -1,0 +1,32 @@
+**No blockers found.** The candidate's guards hold up in every scenario you listed. I traced them by reading the code only; I didn't run anything.
+
+**Why the raw≠atoms path is sound**
+- **Projection:** `sourceAtomsSteps` (frontmatter-merge.ts:135) builds the view as the merged header followed by the body in raw order. The body is raw with the header ranges cut out. So if the raw last atom has the same id as the view's last atom, that atom is the body tail (or the body is empty). Removing it leaves winners, `order`, `withoutLostAliases` and `originalFrames` unchanged.
+- **Header detection after removal:** dropping the tail can only change raw headers through the end-of-input match in `frontmatterBlock`. Either an open finds a new close, or a close loses its EOF match.
+  - A close at EOF contains the last atom, so the view's last atom equals it only when the body is empty. The `oldHeader` guard rejects that case. This guard is load-bearing: with `content="---\na: 1\n---"` and the last `-` cancelled, next is `"…\n--"`, which neither `touchesSourceFence(next)` nor `sourceHeader(next)` catches.
+  - A new close (tails like `"--- x"` or `"---\rx"` → `"---"`) is caught by `touchesSourceFence(next, len, len)`.
+  - The raw last line can differ from the content's last line, e.g. raw `…---\n` then `---x` vs content `abc---x`. Even then no new header can form: an unmatched open would need no `^---` line after it, but the header in between supplies one.
+- **`eof` close stripping when the body becomes empty:** next is then header-only, which the existing next-header-only guard rejects. The `deleted`-only branch that returns the body gives `[]`, which matches `replaceAtoms`.
+- **Cancel visibility:**
+  - `parseOperation` forces atom ids to start with the operation id, and `hidden()` derives the owner from that prefix. With `insert.length===1` the cancel hides exactly X.
+  - The original has no removes, so the cancel reveals nothing.
+  - X is the raw tail, so it has no visible descendants and no orphans can appear.
+  - Cancel chains: an already-cancelled cancel is rejected by `active(op.id)===false`. A second cancel of an inactive original fails `canCancel`. A cancel whose own canceller was itself cancelled correctly goes through.
+- **Later metadata, peer edits and redo:** the commit runs `invalidateText` and clears `metadataCache` before `cachePreparedText`. A redo cancels a cancel, so `original.kind!=="text"` sends it down the slow path. A peer insert after hidden X fails `inserted.after===last.id` and also takes the slow path. A chained cancel works because `sourceViews.set(atoms, raw)` is re-established.
+- **Scalars, lone surrogates, empty values:** lone surrogates put the target in `legacyTextTargets`, which rejects early. Surrogate pairs work via `slice(0,-2)` and `offsetAtCodePoint`. `!last.value` rejects empty values.
+- **Atom ownership:** `replaceAtoms` returns new frozen Chunk views and never mutates public arrays. raw and atoms get separate views. `rawSplices.start = raw.length-1` is correct.
+
+**Minimal recommendations**
+1. **Malformed input:** existing issue, also in the baseline. At crdt.ts:178, `active(operation.id)` runs `clock()`, which calls `.slice`. A non-string id therefore throws a TypeError before the schema decode, which should be the error. Add `typeof operation.id !== "string" || typeof operation.value !== "string"` at the top of the guard, like `prepareTerminalPeerEdit` does. The decoder stays untouched.
+2. **Redundant check:** `rawLast.value !== last.value` can't fail, because the same id means the same frozen indexed atom. It's harmless; keep it or drop it.
+3. **Leave alone:** don't add `touchesSourceFence(content…)` for symmetry. For removals the next-only check plus `oldHeader` is enough, and the extra check would only add false rejects.
+4. **Integration tests to pin these down** (Replica public API):
+   - (a) raw≠atoms, terminal cancel whose next leaves a header-only document (close `-` or `\n`) → falls back to the slow path, and the text equals a fresh `visible()`.
+   - (b) a second-root `"---\nb: 2\n---x"` → cancel x is rejected by the fence guard.
+   - (c) a cancel chain: cancel, redo, cancel again, comparing against a fresh projection each time.
+   - (d) a terminal surrogate-pair cancel with `sourceOffsets` present.
+   - (e) a deleted-only header whose body becomes empty.
+
+   After each step, check the cached text against a fresh `visible()`/`text()` from a fork.
+
+written with claude-opus-5-5 in claude code

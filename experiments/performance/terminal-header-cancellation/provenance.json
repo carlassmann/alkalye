@@ -1,0 +1,123 @@
+{
+	"browserBase": "bf51704",
+	"nativeBackend": "0e13876",
+	"baselineOriginalSource": "/tmp/alkalye-compact-pieces/baseline",
+	"fixtureExpectedSha256": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a",
+	"files": [
+		{
+			"path": "/tmp/alkalye-terminal-header/baseline/src/shared/crdt.ts",
+			"bytes": 59860,
+			"sha256": "79218941aa7ab7d664b7eff1fe7249f0193548216284d7465aaf421c2a9d348a"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/candidate/src/shared/crdt.ts",
+			"bytes": 60327,
+			"sha256": "e1dc8399ed4f254afe97af53d93c5d9a113966533eb61f282fed6f083f0b53b5"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/diagnostic/src/shared/crdt.ts",
+			"bytes": 60610,
+			"sha256": "39dc7797a93a1dc3f0a29ff67d2ad36f73915fded06b79fadacd6b8b0c96bc00"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/baseline/dist/app.js",
+			"bytes": 253333,
+			"sha256": "ff0c57c440cddaf4b73635627b9f211c0331a463373799475fdb08d0cc41f3d6"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/candidate/dist/app.js",
+			"bytes": 253333,
+			"sha256": "0eb4e95e2ef1b10610cb46a81671aa03367c35effbfdbab21afd77e8d9c295fb"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/diagnostic/dist/app.js",
+			"bytes": 253333,
+			"sha256": "4866648d489f5660fe5393144cdbe2332b0e896a8e0a3c4c1fab3a2b39c5a5b9"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/candidate/tests/replica-header-cancel.test.ts",
+			"bytes": 5667,
+			"sha256": "51dcda8a67f75b8d0a57ac32e67d0b5865ff2b50171f9b79a2e92bd630d13bdd"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/measure.ts",
+			"bytes": 13203,
+			"sha256": "ed0b4be5d618e3e16948edb7094b5cedd04d1b255df1b1744656d9f6fb823723"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/gate.ts",
+			"bytes": 4824,
+			"sha256": "1017524c7fa52b21ba51a318494ae75f54da8c9c3438d37fbae14feae6ce468c"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/core-candidate-long1m-end-1.trace.json",
+			"bytes": 11597475,
+			"sha256": "3aafa6b92f8303b5b165b934ce27480409e0dfd8de504b8487390bce0e6bae31"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/core-baseline-long1m-end-1.trace.json",
+			"bytes": 9943475,
+			"sha256": "17aef1713c20f5c759ccd5f510af6189689cba7126fdeaa2625897a9b8e5ecff"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/core-baseline-long1m-end-2.trace.json",
+			"bytes": 11541028,
+			"sha256": "9eb1cae1fe41ce48af851793a8889a759acad9116186c64acde20e5ed726da61"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/core-candidate-long1m-end-0.trace.json",
+			"bytes": 11505149,
+			"sha256": "4e8f48dd1ed530e435e033fc5c58a156995464a8226f6faea03ffd96932ce8e7"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/core-baseline-long1m-end-0.trace.json",
+			"bytes": 11589390,
+			"sha256": "92b49b4898d5df0832c57943faf10a56df39faca8e347a34ae8301341a95762c"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/core-candidate-long1m-end-2.trace.json",
+			"bytes": 11257369,
+			"sha256": "e196003b891ba611dec13c65139e183c7a2c8007b3d21b9da0510f00fb1ebe32"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/undo-candidate-long1m-0.trace.json",
+			"bytes": 6914892,
+			"sha256": "75e6d6197d60bde29aaf9cd5c52529eb13442c0c9386920baab4fa115744d66b"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/undo-candidate-long1m-2.trace.json",
+			"bytes": 6933240,
+			"sha256": "cac8141bea44797b316545ba3566daa962efaf81c95981739acaef523caa1c75"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/undo-baseline-long1m-1.trace.json",
+			"bytes": 12049878,
+			"sha256": "e5f3d386af96ded40e1c8a2ad2730a7106d0e3cac334e858370945418c97fcf2"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/undo-candidate-long1m-1.trace.json",
+			"bytes": 6849093,
+			"sha256": "c5326085cf561061209078d0ae357f93318bc78476d3377b57a2da53ac2b08d3"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/undo-baseline-long1m-2.trace.json",
+			"bytes": 10648442,
+			"sha256": "a687c80dd776954e86a6d49a5a3fc0922f0c24db2303188930a7317aabb84fc3"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-header/undo-baseline-long1m-0.trace.json",
+			"bytes": 10667709,
+			"sha256": "0ae44466e9e732e3cbaca02e3bda0f4818c2808a52a57ecf0031604a1b0f1f12"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/diagnostic-core-baseline-long1m-end-0.trace.json",
+			"bytes": 10720878,
+			"sha256": "41acab033bc65c8a1ebfb4755555542b057ef47f4b2ee2417e06a3e66008234b"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/diagnostic-undo-baseline-long1m-0.trace.json",
+			"bytes": 12504287,
+			"sha256": "48d8f58df82222153890f8310d0a4da061983e5b8bd71ecd992fdf36509e4045"
+		}
+	]
+}

@@ -1,0 +1,48 @@
+{
+	"stage": "complete",
+	"passed": true,
+	"error": "",
+	"state": {
+		"accepted": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a",
+		"clientHeight": 585,
+		"hits": [
+			{
+				"characters": 1048576,
+				"rawAtoms": 1048576,
+				"sourceAtoms": 1048576,
+				"target": "47522f3e-4811-413b-a36a-51c1225c4246"
+			},
+			{
+				"characters": 1048576,
+				"rawAtoms": 1048576,
+				"sourceAtoms": 1048576,
+				"target": "47522f3e-4811-413b-a36a-51c1225c4246"
+			},
+			{
+				"characters": 1048576,
+				"rawAtoms": 1048576,
+				"sourceAtoms": 1048576,
+				"target": "47522f3e-4811-413b-a36a-51c1225c4246"
+			},
+			{
+				"characters": 1048576,
+				"rawAtoms": 1048576,
+				"sourceAtoms": 1048576,
+				"target": "47522f3e-4811-413b-a36a-51c1225c4246"
+			}
+		],
+		"nativeLength": 1995,
+		"scrollHeight": 565327,
+		"scrollTop": 564742,
+		"selectionEnd": 1048576,
+		"selectionStart": 1048576,
+		"sourceLength": 1048576,
+		"window": {
+			"direction": "ltr",
+			"end": 1048576,
+			"height": 1101.8125,
+			"start": 1046582,
+			"top": 564098.9375
+		}
+	}
+}
