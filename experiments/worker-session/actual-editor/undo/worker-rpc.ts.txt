@@ -1,0 +1,89 @@
+import * as Rpc from "effect/rpc/Rpc"
+import * as RpcGroup from "effect/rpc/RpcGroup"
+import * as Schema from "effect/Schema"
+
+export class WorkerDocumentFailure extends Schema.TaggedError<WorkerDocumentFailure>()(
+	"WorkerDocumentFailure",
+	{
+		reason: Schema.Literals(["Closed", "AlreadyOpen", "HandleUnavailable", "HandleCapacity", "Rejected", "Unsaved", "BasisUnavailable", "SequenceUnavailable", "AppliedUnknown", "QueuedBlocked", "CandidateUnavailable", "SelectionUnavailable", "SessionFailure"]),
+		category: Schema.String,
+	},
+) {}
+
+let view = Schema.Struct({
+	handle: Schema.String,
+	revision: Schema.Natural,
+	source: Schema.String,
+	unsaved: Schema.Natural,
+	pending: Schema.Natural,
+	rejected: Schema.Natural,
+	epoch: Schema.optional(Schema.String),
+	sequence: Schema.optional(Schema.Natural),
+	localSource: Schema.optional(Schema.String),
+})
+let selectedRange = Schema.Struct({ start: Schema.Natural, end: Schema.Natural, direction: Schema.Literals(["forward", "backward", "none"]) })
+let undoReceipt = Schema.Struct({
+	request: Schema.String,
+	epoch: Schema.String,
+	sequence: Schema.Natural,
+	status: Schema.Literals(["applied", "not-applied", "unknown"]),
+	action: Schema.optional(Schema.String),
+	failure: Schema.optional(Schema.String),
+})
+
+export let WorkerDocumentRpc = RpcGroup.make(
+	Rpc.make("Open", {
+		payload: { document: Schema.String, subject: Schema.String, origin: Schema.String },
+		success: view,
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("Read", { success: view, error: WorkerDocumentFailure }),
+	Rpc.make("Replace", {
+		payload: {
+			handle: Schema.String,
+			ranges: Schema.Array(Schema.Struct({ start: Schema.Natural, remove: Schema.Natural, text: Schema.String })),
+		},
+		success: view,
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("Begin", {
+		success: Schema.Struct({ epoch: Schema.String, sequence: Schema.Natural, source: Schema.String }),
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("ReplaceQueued", {
+		payload: {
+			epoch: Schema.String,
+			sequence: Schema.Natural,
+			ranges: Schema.Array(Schema.Struct({ start: Schema.Natural, remove: Schema.Natural, text: Schema.String })),
+		},
+		success: Schema.Struct({ epoch: Schema.String, sequence: Schema.Natural, source: Schema.String, unsaved: Schema.Natural }),
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("UndoQueued", {
+		payload: { request: Schema.String, epoch: Schema.String, sequence: Schema.Natural, redo: Schema.Boolean },
+		success: undoReceipt,
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("MergeCandidate", {
+		payload: { epoch: Schema.String, sequence: Schema.Natural, start: Schema.Natural, end: Schema.Natural, ranges: Schema.optional(Schema.Array(selectedRange)) },
+		success: Schema.Struct({ candidate: Schema.String, source: Schema.String, start: Schema.Natural, end: Schema.Natural, ranges: Schema.optional(Schema.Array(selectedRange)) }),
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("Adopt", {
+		payload: { epoch: Schema.String, sequence: Schema.Natural, candidate: Schema.String },
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("ReleaseCandidate", {
+		payload: { candidate: Schema.String },
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("End", {
+		payload: { epoch: Schema.String, sequence: Schema.Natural },
+		success: view,
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("Release", { payload: { handle: Schema.String }, error: WorkerDocumentFailure }),
+	Rpc.make("Sync", { error: WorkerDocumentFailure }),
+	Rpc.make("Flush", { error: WorkerDocumentFailure }),
+	Rpc.make("Close", { error: WorkerDocumentFailure }),
+)

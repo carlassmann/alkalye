@@ -1,0 +1,50 @@
+Review finished; I only read files and ran nothing. Found 2 remaining correctness blockers, plus some medium and minor issues.
+
+## Blockers
+1. **The editor can stay frozen after a refused undo-adoption merge.**
+   - In `bindings.ts:79-85`, if the resume merge resolves `false` (no adoption), nothing retries. It is only resumed by the `ensuring` in `undo()` (`:103`), not by its own.
+   - Race: the user clicks or moves the caret while `MergeCandidate` is in flight. The `selectionchange`, which calls `resumeUndo`, is ignored because `runningUndo` is true (`:70`). Then the accept check sees a different start/end (`editor-queue.ts:203-205`) and refuses (`:251-258`).
+   - Result: the textarea stays readOnly until the next caret action. Typing into a readOnly textarea fires no selection event, so typing alone never recovers it.
+   - Not a livelock today, because nothing retries.
+   - Fix: in the `ensuring` at `:84`, re-call `resumeUndo()` when `needsAdoption && queue.state().failure === undefined && !closed`, with a small bounded counter (about 3, then `fail`). The bound matters: refusals on epoch, sequence or source (`editor-queue.ts:152-157`) can repeat forever.
+2. **A fatal failure is stored in the permission flag, so the host can re-enable a dead queue.**
+   - `fail()` calls `editor.setEditable(false)` (`bindings.ts:23`), and that writes `permissionEditable` (`editor.ts:1021`). A later host permission refresh calling `setEditable(true)` makes the editor editable again (`editor.ts:1022`).
+   - `queue.replace` checks only `commandFrozen` (`editor-queue.ts:367`), not `failure`. So typed text appears locally, gets blocked at `:300-302` and is never saved, and an error is reported per keystroke.
+   - The fixture never calls `setEditable`, so this is hidden. It is a cutover blocker.
+   - Fix:
+     - Add `if (failure !== undefined || closed) throw blocked()` at `:367`.
+     - Have `fail` use a separate sticky "failed" freeze, not `setEditable`. One option is `freezeCommands(true)` plus a `failed` flag in `editor.ts` that `freezeCommands(false)` can't clear.
+
+## Medium
+- **A stale postponed undo can fire later.** `postponedUndo` (`bindings.ts:93`) survives an `options.change`. After a composition, the `change` at `editor.ts:325` runs before the `select` at `:345`. So an undo pressed during IME composition undoes the text the composition just committed. That is probably acceptable, but nothing ever clears it. Clearing `postponedUndo` in `change` would be too aggressive here, because it would drop the IME case. Decide and document which behaviour you want.
+- **Window where a receipt can be lost.** `undoRequests.delete(command)` (`editor-queue.ts:137`) runs before `Deferred.succeed`/`fail` (`:140`, `:147`). If the scope is interrupted between the two, the finalizer skips that request and its `saved` never resolves.
+  - The fixture survives this only because the FiberSet closes first.
+  - Fix: delete after completing the deferred, or make `:137-147` uninterruptible.
+  - The same applies to `merges.delete` after `failCause` at `:190-191`.
+- **Leftover `undoRequests` entries.** Refusals at `:127-129` and the offer failure at `:359` never remove the entry. At finalize, `Deferred.fail` runs on an already-done deferred; it does nothing, but it is sloppy.
+
+## Minor
+- **Duplicate error reports on close.** Each blocked pending edit calls `fail` → `report` from `bindings.ts:35`, so closing with N pending edits gives N reports and N `setEditable(false)` calls. The fixture is hidden only by its scope ordering. Dedupe with a `failed` flag; it pairs with blocker 2.
+- **Receipts outlive Close.** `undoReceipts` is not cleared at Close (`worker-session.ts:237-240`) or on Open failure (`:94-98`). A retry that arrives after Close gets the retained "applied" receipt. That is truthful history, and the next MergeCandidate gets `BasisUnavailable`, which is fatal. So it's safe; keep it, but note it in the docs.
+- **Stale `commandOwner`.** It isn't cleared on `not-applied` (`editor-queue.ts:145`). This is harmless, because the next undo overwrites it and any accidental owner match only clears a flag that is already false.
+- **A second Ctrl+Z is dropped.** Pressed while `runningUndo` or `needsAdoption` (`bindings.ts:89-90`), it is silently lost. Still undocumented.
+
+## Verified OK
+- **Freeze owner:** set at `editor-queue.ts:356`. Both direct Adopt (`:292`) and reconciled Adopt (`:284`) check it. While frozen, the queue sequence can't advance (replace and undo are refused), so the owner's epoch/sequence match the adopt's.
+- **Scope close during undo:** `phase` is set to `sending` at `:131`, and the finalizer maps it to `AppliedUnknown` (`:93`). The forked stream is interrupted before this finalizer runs.
+- **External merge during undo:** refused in bindings (`bindings.ts:58`). One already queued before the undo is refused by the sequence check (`editor-queue.ts:156`/`:201`).
+- **Second transport error:** a non-typed error is resent once with the same request id (`:134`). Any failure after that becomes `AppliedUnknown` (`:139`). Typed refusals are not retried, which is the conservative choice, since an evicted resend can come back as `SequenceUnavailable`.
+- **Receipt eviction:** a resend after eviction fails `sequence+1` (`worker-session.ts:161`, advanced at `:175`) or the epoch check. It is never re-run.
+- **Range validation and merging:** all ranges are validated (`worker-session.ts:196`), and `restoreRanges(mergeSelections(…, true))` keeps the primary range first (`editor.ts:1009`, `:2682-2685`).
+- **Intercepts:** Ctrl/⌘+Z (`editor.ts:1721`) and `historyUndo`/`historyRedo` (`:2422`) are intercepted before the composing early-returns (`:1726`, `:2427`). They check permission, call `preventDefault` when not permitted, and never reach native undo. Ctrl+Y during composition goes through `beforeinput` → `:2422`.
+- **Permission flags:** `freezeCommands` and `setEditable` keep separate flags (`:1015-1024`), apart from blocker 2.
+- **Busy sources and resume events:** composing resumes on `compositionend` (`:345`), dragging on `pointerup`/`pointercancel` (`:367`). In worker mode `!inSync()` is effectively only true while composing.
+- **Generation:** Escape and other multi-cursor changes bump the generation through `selectionsChanged` (`:2718`), so the accept check at `editor-queue.ts:203` catches a change to the secondary cursors.
+
+## Smallest missing runtime tests (existing fixture, agent-browser)
+1. **Click during the resume merge.** Press Ctrl+Z, then immediately send a pointer click and a caret-moving key. Wait for `inspect().readonly === false` with no further input. This covers blocker 1 and fails today, unless the RPC is fast enough to win the race. Make the race reliable with a fixture query param that delays `MergeCandidate` by one tick.
+2. **Re-enable after a fatal failure.** Add one fixture hook, `setEditable(v)`, that calls `editor.setEditable(v)`. Force a failure, call `setEditable(true)`, type, then assert `readonly` stays true, the source is unchanged and there is exactly one failure. This covers blocker 2 and duplicate reports.
+3. **Synthetic composition.** Dispatch `compositionstart`, press Ctrl+Z, assert the source is unchanged and the editor is not frozen. Then dispatch `compositionend` and wait for the undo to apply. This pins down the postponed-undo behaviour without a real OS IME.
+4. **Dispose during an in-flight undo.** Press Ctrl+Z, call `dispose()` before the receipt arrives, and assert the failure is `AppliedUnknown`, not `QueuedBlocked`. This needs the same delay param as test 1; skip it if that can't be made deterministic.
+
+Several claude.ai connectors aren't authorized (Axiom, Canva, GitHub, Gmail, Google Drive, HubSpot, Lusha ×2, Miro, Notion, Ocean.io, Ramp Data, Slack, Staging SynTwin, SynTwin Admin, SynTwin Kunde, lemlist, syntwin admin, syntwin main). This review didn't need them; authorize them in your claude.ai connector settings if you want them.

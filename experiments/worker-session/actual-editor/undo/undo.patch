@@ -1,0 +1,620 @@
+--- a/worker-rpc.ts
++++ b/worker-rpc.ts
+@@ -21,6 +21,16 @@
+ 	sequence: Schema.optional(Schema.Natural),
+ 	localSource: Schema.optional(Schema.String),
+ })
++let selectedRange = Schema.Struct({ start: Schema.Natural, end: Schema.Natural, direction: Schema.Literals(["forward", "backward", "none"]) })
++let undoReceipt = Schema.Struct({
++	request: Schema.String,
++	epoch: Schema.String,
++	sequence: Schema.Natural,
++	status: Schema.Literals(["applied", "not-applied", "unknown"]),
++	action: Schema.optional(Schema.String),
++	failure: Schema.optional(Schema.String),
++})
++
+ export let WorkerDocumentRpc = RpcGroup.make(
+ 	Rpc.make("Open", {
+ 		payload: { document: Schema.String, subject: Schema.String, origin: Schema.String },
+@@ -49,9 +59,14 @@
+ 		success: Schema.Struct({ epoch: Schema.String, sequence: Schema.Natural, source: Schema.String, unsaved: Schema.Natural }),
+ 		error: WorkerDocumentFailure,
+ 	}),
++	Rpc.make("UndoQueued", {
++		payload: { request: Schema.String, epoch: Schema.String, sequence: Schema.Natural, redo: Schema.Boolean },
++		success: undoReceipt,
++		error: WorkerDocumentFailure,
++	}),
+ 	Rpc.make("MergeCandidate", {
+-		payload: { epoch: Schema.String, sequence: Schema.Natural, start: Schema.Natural, end: Schema.Natural },
+-		success: Schema.Struct({ candidate: Schema.String, source: Schema.String, start: Schema.Natural, end: Schema.Natural }),
++		payload: { epoch: Schema.String, sequence: Schema.Natural, start: Schema.Natural, end: Schema.Natural, ranges: Schema.optional(Schema.Array(selectedRange)) },
++		success: Schema.Struct({ candidate: Schema.String, source: Schema.String, start: Schema.Natural, end: Schema.Natural, ranges: Schema.optional(Schema.Array(selectedRange)) }),
+ 		error: WorkerDocumentFailure,
+ 	}),
+ 	Rpc.make("Adopt", {
+--- a/worker-session.ts
++++ b/worker-session.ts
+@@ -1,4 +1,5 @@
+ import * as Context from "effect/Context"
++import * as Cause from "effect/Cause"
+ import * as Effect from "effect/Effect"
+ import * as Exit from "effect/Exit"
+ import * as Layer from "effect/Layer"
+@@ -10,6 +11,7 @@
+ import { DocumentSession, documentDatabaseName } from "./src/shared/document-session"
+ import { makeDocumentTransport } from "./src/shared/document-transport"
+ import { documentFailureCategory } from "./src/shared/document-observability"
++import { UndoUnavailable } from "./src/shared/document-errors"
+ import { Replica } from "./src/shared/crdt"
+ import type { Atom } from "./src/shared/model"
+ import { WorkerDocumentFailure, WorkerDocumentRpc } from "./worker-rpc"
+@@ -29,6 +31,10 @@
+ 			scope: Scope.Closeable
+ 			session: Context.Service.Shape<typeof DocumentSession>
+ 		} | undefined
++		let undoReceipts = new Map<string, {
++			request: string; epoch: string; sequence: number; redo: boolean;
++			status: "applied" | "not-applied" | "unknown"; action?: string; failure?: string;
++		}>()
+ 		let handles = new Map<string, Atom[]>()
+ 		let sequence = 0
+ 		let epoch = 0
+@@ -142,6 +148,39 @@
+ 				local.sequence = input.sequence
+ 				return { epoch: local.epoch, sequence: local.sequence, source: local.replica.text(current.document), unsaved: current.session.unsaved() }
+ 			})),
++			UndoQueued: input => execute(Effect.uninterruptibleMask(restore => Effect.gen(function* () {
++				let retained = undoReceipts.get(input.request)
++				if (retained) {
++					if (retained.epoch !== input.epoch || retained.sequence !== input.sequence || retained.redo !== input.redo)
++						return yield* Effect.fail(fail("SequenceUnavailable"))
++					return retained
++				}
++				let current = yield* requireSession()
++				let local = basis
++				if (!local || local.epoch !== input.epoch) return yield* Effect.fail(fail("BasisUnavailable"))
++				if (input.sequence !== local.sequence + 1) return yield* Effect.fail(fail("SequenceUnavailable"))
++				candidate = undefined
++				let result = yield* restore(input.redo ? current.session.redo() : current.session.undo()).pipe(Effect.exit)
++				let status: "applied" | "not-applied" | "unknown"
++				let action: string | undefined
++				let failure: string | undefined
++				if (Exit.isSuccess(result)) {
++					status = "applied"
++					action = result.value.id
++				} else {
++					let error = Cause.squash(result.cause)
++					status = error instanceof UndoUnavailable ? "not-applied" : "unknown"
++					failure = documentFailureCategory(error)
++				}
++				local.sequence = input.sequence
++				let receipt = { ...input, status, ...(action ? { action } : {}), ...(failure ? { failure } : {}) }
++				undoReceipts.set(input.request, receipt)
++				if (undoReceipts.size > 64) {
++					let oldest = undoReceipts.keys().next().value
++					if (oldest) undoReceipts.delete(oldest)
++				}
++				return receipt
++			}))),
+ 			MergeCandidate: input => execute(Effect.gen(function* () {
+ 				let current = yield* requireSession()
+ 				let local = basis
+@@ -154,12 +193,20 @@
+ 				let source = replica.text(current.document)
+ 				let oldAtoms = local.replica.visible(current.document)
+ 				let newAtoms = replica.visible(current.document)
+-				let start = mapSelectionBoundary(oldAtoms, newAtoms, input.start)
+-				let end = mapSelectionBoundary(oldAtoms, newAtoms, input.end)
++				if (input.ranges?.some(range => range.start > range.end || range.end > local.replica.text(current.document).length)) return yield* Effect.fail(fail("SelectionUnavailable"))
++				let requestedRanges = input.ranges ?? [{ start: input.start, end: input.end, direction: "none" }]
++				let mapped = mapSelectionBoundaries(oldAtoms, newAtoms, [input.start, input.end, ...requestedRanges.flatMap(range => [range.start, range.end])])
++				let start = mapped.get(input.start), end = mapped.get(input.end)
+ 				if (start === undefined || end === undefined) return yield* Effect.fail(fail("SelectionUnavailable"))
++				let mappedRanges: { start: number; end: number; direction: "forward" | "backward" | "none" }[] = []
++				for (let range of requestedRanges) {
++					let start = mapped.get(range.start), end = mapped.get(range.end)
++					if (start === undefined || end === undefined) return yield* Effect.fail(fail("SelectionUnavailable"))
++					mappedRanges.push({ start, end, direction: range.direction })
++				}
+ 				let next = String(++epoch)
+ 				candidate = { epoch: next, priorEpoch: local.epoch, priorSequence: local.sequence, replica }
+-				return { candidate: next, source, start, end }
++				return { candidate: next, source, start, end, ranges: mappedRanges }
+ 			})),
+ 			Adopt: input => execute(Effect.try({
+ 				try: () => {
+@@ -199,22 +246,27 @@
+ 	}),
+ )
+ 
+-function mapSelectionBoundary(previous: readonly Atom[], next: readonly Atom[], offset: number) {
+-	if (offset === 0) return 0
+-	let position = 0
+-	let anchor: { id: string; inside: number } | undefined
++function mapSelectionBoundaries(previous: readonly Atom[], next: readonly Atom[], offsets: number[]) {
++	let nextPositions = new Map<string, { start: number; end: number }>()
++	let nextOffset = 0
++	for (let atom of next) {
++		nextPositions.set(atom.id, { start: nextOffset, end: nextOffset + atom.value.length })
++		nextOffset += atom.value.length
++	}
++	let requests = [...new Set(offsets)].sort((left, right) => left - right)
++	let resolved = new Map<number, number>()
++	if (requests[0] === 0) { resolved.set(0, 0); requests.shift() }
++	let request = 0, position = 0, predecessor = 0
+ 	for (let atom of previous) {
+-		if (atom.value.length && offset <= position + atom.value.length) {
+-			anchor = { id: atom.id, inside: offset - position }
+-			break
+-		}
++		let mapped = nextPositions.get(atom.id)
++		let offset = requests[request]
++		while (atom.value.length && offset !== undefined && offset <= position + atom.value.length) {
++			resolved.set(offset, mapped ? mapped.start + Math.min(offset - position, mapped.end - mapped.start) : predecessor)
++			request++
++			offset = requests[request]
++		}
++		if (mapped) predecessor = mapped.end
+ 		position += atom.value.length
+ 	}
+-	if (!anchor) return undefined
+-	let mapped = 0
+-	for (let atom of next) {
+-		if (atom.id === anchor.id) return mapped + anchor.inside
+-		mapped += atom.value.length
+-	}
+-	return undefined
++	return resolved
+ }
+--- a/editor-queue.ts
++++ b/editor-queue.ts
+@@ -22,6 +22,7 @@
+ }
+ 
+ export interface EditorSelection {
++	ranges?: { start: number; end: number; direction: "forward" | "backward" | "none" }[]
+ 	source: string
+ 	busy: boolean
+ 	start: number
+@@ -49,7 +50,16 @@
+ 	candidate: string
+ 	saved: Deferred.Deferred<boolean, unknown>
+ }
+-type EditorCommand = PendingEdit | MergeRequest | Adoption
++interface UndoRequest {
++	phase: "queued" | "sending"
++	kind: "undo"
++	request: string
++	epoch: string
++	sequence: number
++	redo: boolean
++	saved: Deferred.Deferred<{ status: "applied" | "not-applied" | "unknown"; action?: string; failure?: string }, unknown>
++}
++type EditorCommand = PendingEdit | MergeRequest | Adoption | UndoRequest
+ 
+ export function makeEditorQueue(
+ 	client: WorkerClient,
+@@ -66,6 +76,9 @@
+ 		let failure: unknown
+ 		let closed = false
+ 		let accepting = false
++		let commandFrozen = false
++		let commandOwner: { epoch: string; sequence: number } | undefined
++		let undoRequests = new Set<UndoRequest>()
+ 		let merges = new Set<MergeRequest>()
+ 		function blocked() {
+ 			return new WorkerDocumentFailure({
+@@ -77,6 +90,8 @@
+ 			Effect.gen(function* () {
+ 				closed = true
+ 				yield* Queue.shutdown(queue)
++				for (let request of undoRequests) yield* Deferred.fail(request.saved, request.phase === "sending" ? new WorkerDocumentFailure({ reason: "AppliedUnknown", category: "failure" }) : blocked())
++				undoRequests.clear()
+ 				for (let merge of merges) {
+ 					yield* Deferred.fail(merge.requested, blocked())
+ 					yield* Deferred.fail(
+@@ -108,6 +123,30 @@
+ 		yield* Stream.fromQueue(queue).pipe(
+ 			Stream.runForEach(command =>
+ 				Effect.gen(function* () {
++					if (command.kind === "undo") {
++						if (failure !== undefined || closed) {
++							yield* Deferred.fail(command.saved, blocked())
++							return
++						}
++						command.phase = "sending"
++						let payload = { request: command.request, epoch: command.epoch, sequence: command.sequence, redo: command.redo }
++						let result = yield* client.UndoQueued(payload).pipe(
++							Effect.catch(error => error instanceof WorkerDocumentFailure ? Effect.fail(error) : client.UndoQueued(payload)),
++							Effect.exit,
++						)
++						undoRequests.delete(command)
++						if (Exit.isFailure(result)) {
++							failure = new WorkerDocumentFailure({ reason: "AppliedUnknown", category: "failure" })
++							yield* Deferred.fail(command.saved, failure)
++							return
++						}
++						acknowledged = command.sequence
++						applied = command.sequence
++						if (result.value.status === "not-applied") commandFrozen = false
++						if (result.value.status === "unknown") failure = new WorkerDocumentFailure({ reason: "AppliedUnknown", category: result.value.failure ?? "failure" })
++						yield* Deferred.succeed(command.saved, result.value)
++						return
++					}
+ 					if (command.kind === "merge") {
+ 						let merge = command
+ 						if (
+@@ -130,6 +169,7 @@
+ 										sequence: merge.sequence,
+ 										start: merge.selection.start,
+ 										end: merge.selection.end,
++										...(merge.selection.ranges ? { ranges: merge.selection.ranges } : {}),
+ 									})
+ 									.pipe(
+ 										Effect.exit,
+@@ -178,6 +218,7 @@
+ 									...selection,
+ 									start: candidate.start,
+ 									end: candidate.end,
++									...(candidate.ranges ? { ranges: [...candidate.ranges] } : {}),
+ 								})
+ 							} finally {
+ 								accepting = false
+@@ -239,12 +280,18 @@
+ 								reconciled.value.sequence === 0 &&
+ 								failure === undefined
+ 							)
++								{
++								if (commandOwner?.epoch === command.epoch && commandOwner.sequence === command.sequence) { commandFrozen = false; commandOwner = undefined }
+ 								yield* Deferred.succeed(command.saved, true)
++							}
+ 							else {
+ 								failure = Cause.squash(result.cause)
+ 								yield* Deferred.failCause(command.saved, result.cause)
+ 							}
+-						} else yield* Deferred.succeed(command.saved, true)
++						} else {
++							if (commandOwner?.epoch === command.epoch && commandOwner.sequence === command.sequence) { commandFrozen = false; commandOwner = undefined }
++							yield* Deferred.succeed(command.saved, true)
++						}
+ 						for (let merge of merges)
+ 							if (merge.saved === command.saved) merges.delete(merge)
+ 						return
+@@ -298,11 +345,26 @@
+ 			Effect.forkScoped({ startImmediately: true }),
+ 		)
+ 		return {
++			undo(redo: boolean) {
++				let saved = Deferred.makeUnsafe<{ status: "applied" | "not-applied" | "unknown"; action?: string; failure?: string }, unknown>()
++				if (closed || failure !== undefined || commandFrozen) {
++					Deferred.doneUnsafe(saved, Effect.fail(blocked()))
++					return Deferred.await(saved)
++				}
++				commandFrozen = true
++				sequence++
++				commandOwner = { epoch, sequence }
++				let command: UndoRequest = { phase: "queued", kind: "undo", request: crypto.randomUUID(), epoch, sequence, redo, saved }
++				undoRequests.add(command)
++				if (!Queue.offerUnsafe(queue, command)) Deferred.doneUnsafe(saved, Effect.fail(blocked()))
++				return Deferred.await(saved)
++			},
+ 			replace(
+ 				ranges: readonly TextReplacement[],
+ 				expectedSource?: string,
+ 				fallback?: () => readonly TextReplacement[],
+ 			) {
++				if (commandFrozen) throw blocked()
+ 				let changes = ranges.map(change => Object.freeze({ ...change }))
+ 				let pieces: string[] = []
+ 				let offset = 0
+@@ -382,6 +444,7 @@
+ 					applied,
+ 					failure,
+ 					closed,
++					commandFrozen,
+ 					pending: pending.map(edit => ({
+ 						sequence: edit.sequence,
+ 						delivery: edit.delivery,
+--- a/bindings.ts
++++ b/bindings.ts
+@@ -6,6 +6,7 @@
+ 	MergedEditorSelection,
+ } from "./src/client/components/editor"
+ import type { makeEditorQueue } from "./editor-queue"
++import { WorkerDocumentFailure } from "./worker-rpc"
+ 
+ type EditorQueue = Effect.Success<ReturnType<typeof makeEditorQueue>>
+ 
+@@ -15,6 +16,9 @@
+ 	fork: (effect: Effect.Effect<void, unknown>) => void,
+ 	report: (error: unknown) => void,
+ ) {
++	let runningUndo = false
++	let needsAdoption = false
++	let postponedUndo: boolean | undefined
+ 	function fail(error: unknown) {
+ 		editor.setEditable(false)
+ 		fork(Effect.sync(() => report(error)))
+@@ -51,6 +55,7 @@
+ 		return selected
+ 	}
+ 	function merge() {
++		if (runningUndo || needsAdoption) return { requested: Effect.fail(new WorkerDocumentFailure({ reason: "QueuedBlocked", category: "conflict" })), saved: Effect.succeed(false) }
+ 		let requested = queue.merge(selection, (source, selected) =>
+ 			editor.adoptMerged(source, selected),
+ 		)
+@@ -61,5 +66,44 @@
+ 			),
+ 		}
+ 	}
+-	return { change, merge }
++	function resumeUndo() {
++		if (runningUndo) return
++		let selected = editor.commandSelection()
++		if (!selected || selected.busy || selected.composing) return
++		if (!needsAdoption) {
++			let redo = postponedUndo
++			if (redo !== undefined) { postponedUndo = undefined; undo(redo) }
++			return
++		}
++		runningUndo = true
++		fork(queue.merge(() => editor.commandSelection() ?? selection(), (source, selected) => editor.adoptMerged(source, selected)).saved.pipe(
++			Effect.tap(adopted => Effect.sync(() => {
++				if (adopted) { needsAdoption = false; editor.freezeCommands(false) }
++			})),
++			Effect.catch(error => Effect.sync(() => fail(error))),
++			Effect.ensuring(Effect.sync(() => { runningUndo = false })),
++			Effect.asVoid,
++		))
++	}
++	function undo(redo: boolean) {
++		if (runningUndo) return
++		if (needsAdoption) { resumeUndo(); return }
++		let selected = editor.commandSelection()
++		if (!selected || !selected.editable) return
++		if (selected.busy || selected.composing) { postponedUndo = redo; return }
++		runningUndo = true
++		editor.freezeCommands(true)
++		fork(queue.undo(redo).pipe(
++			Effect.tap(receipt => Effect.sync(() => {
++				if (receipt.status === "not-applied") editor.freezeCommands(false)
++				else if (receipt.status === "applied") needsAdoption = true
++				else fail(new WorkerDocumentFailure({ reason: "AppliedUnknown", category: receipt.failure ?? "failure" }))
++			})),
++			Effect.catch(error => Effect.sync(() => fail(error))),
++			Effect.ensuring(Effect.sync(() => { runningUndo = false; if (needsAdoption) resumeUndo() })),
++			Effect.asVoid,
++		))
++	}
++	return { change, merge, undo, resumeUndo }
++
+ }
+--- a/browser-fixture.ts
++++ b/browser-fixture.ts
+@@ -38,7 +38,8 @@
+ 		let account = yield* bootstrapBrowserAccount((value, message) => {
+ 			if (!value) throw Error(message)
+ 		})
+-		let documentId = "actual-editor-" + crypto.randomUUID()
++		let existingDocument = new URL(location.href).searchParams.get("document")
++		let documentId = existingDocument ?? "actual-editor-" + crypto.randomUUID()
+ 		let size = Number(new URL(location.href).searchParams.get("size") ?? 0)
+ 		let cursors = Number(new URL(location.href).searchParams.get("cursors") ?? 0)
+ 	let body = cursors ? ("TOKEN " + "z".repeat(Math.floor(size / cursors) - 7) + "\n").repeat(cursors) : size
+@@ -47,7 +48,7 @@
+ 					.slice(0, size)
+ 			: "# Writer\nalpha beta alpha\n"
+ 		let source = "---\ntitle: Worker fixture\n---\n" + body
+-		yield* Effect.promise(async () => {
++		if (!existingDocument) yield* Effect.promise(async () => {
+ 			let response = await fetch("/__tests/seed", {
+ 				method: "POST",
+ 				headers: { "content-type": "application/json" },
+@@ -96,8 +97,8 @@
+ 			createLinkedDocument: async () => "unused",
+ 			report: error => failures.push(String(error)),
+ 			change: bindings.change,
+-			undo() {},
+-			select() {},
++			undo: bindings.undo,
++			select: bindings.resumeUndo,
+ 			requestAsset() {},
+ 			attach() {},
+ 			command() {},
+@@ -158,6 +159,9 @@
+ 				document.body.dataset.closed = "true"
+ 			},
+ 		}
++		let currentUrl = new URL(location.href)
++		currentUrl.searchParams.set("document", documentId)
++		history.replaceState(null, "", currentUrl.href)
+ 		document.body.dataset.ready = "true"
+ 		return yield* Effect.never
+ 	}),
+--- a/src/client/components/editor.ts
++++ b/src/client/components/editor.ts
+@@ -41,6 +41,8 @@
+ 	kind: "pending"
+ }
+ export interface MergedEditorSelection {
++	editable?: boolean
++	ranges?: { start: number; end: number; direction: "forward" | "backward" | "none" }[]
+ 	start: number
+ 	end: number
+ 	direction: "forward" | "backward" | "none"
+@@ -131,6 +133,12 @@
+ 	}
+ 	setEditable(editable: boolean) {
+ 		this.view?.setEditable(editable)
++	}
++	commandSelection() {
++		return this.view?.mergeSelection(true)
++	}
++	freezeCommands(frozen: boolean) {
++		this.view?.freezeCommands(frozen)
+ 	}
+ 	mergeSelection() {
+ 		return this.view?.mergeSelection()
+@@ -233,6 +241,8 @@
+ 	let searchMatches: { start: number; end: number }[] = []
+ 	let people: Presence[] = []
+ 	let editable = options.editable
++	let permissionEditable = options.editable
++	let commandFrozen = false
+ 	let atoms = options.atoms
+ 	let selectionGeneration = ++editorSelectionGeneration
+ 	let acceptedSource = options.content
+@@ -332,6 +342,7 @@
+ 				else text.sync()
+ 			}
+ 			deferredUpdate = undefined
++			options.select()
+ 		},
+ 		{ signal: listeners.signal },
+ 	)
+@@ -353,13 +364,17 @@
+ 				if (!dragging) return
+ 				dragging = false
+ 				text.sync()
++				options.select()
+ 			},
+ 			{ signal: listeners.signal },
+ 		)
+ 	document.addEventListener(
+ 		"selectionchange",
+ 		() => {
+-			if (document.activeElement === textarea && !text.sync()) paintActiveLine()
++			if (document.activeElement === textarea) {
++				if (!text.sync()) paintActiveLine()
++				options.select()
++			}
+ 		},
+ 		{ signal: listeners.signal },
+ 	)
+@@ -474,6 +489,7 @@
+ 		mergeSelection,
+ 		adoptMerged,
+ 		setEditable,
++		freezeCommands,
+ 		format,
+ 		command,
+ 		insert,
+@@ -959,15 +975,17 @@
+ 		lineActions.update()
+ 		schedulePaint()
+ 	}
+-	function mergeSelection(): MergedEditorSelection {
++	function mergeSelection(command = false): MergedEditorSelection {
+ 		return {
++			editable: permissionEditable,
+ 			start: text.selectionStart,
+ 			end: text.selectionEnd,
+ 			direction: text.selectionDirection,
+ 			generation: selectionGeneration,
+ 			composing,
+ 			busy:
+-				composing || dragging || secondarySelections.length > 0 || !inSync(),
++				composing || dragging || (!command && secondarySelections.length > 0) || !inSync(),
++			...(command ? { ranges: selectedRanges() } : {}),
+ 			source: text.value,
+ 		}
+ 	}
+@@ -976,7 +994,7 @@
+ 			options.authority !== "worker" ||
+ 			composing ||
+ 			dragging ||
+-			secondarySelections.length > 0 ||
++			(!selection.ranges && secondarySelections.length > 0) ||
+ 			listeners.signal.aborted ||
+ 			selection.generation !== selectionGeneration ||
+ 			selection.source !== text.value
+@@ -988,13 +1006,20 @@
+ 		acceptedSource = content
+ 		text.reconcile(content, selection.start, selection.end)
+ 		text.setSelectionRange(selection.start, selection.end, selection.direction)
++		if (selection.ranges) restoreRanges(mergeSelections(selection.ranges, true))
+ 		selectionGeneration = ++editorSelectionGeneration
+ 		lineActions.update()
+ 		schedulePaint()
+ 		return true
+ 	}
++	function freezeCommands(frozen: boolean) {
++		commandFrozen = frozen
++		editable = permissionEditable && !frozen
++		textarea.readOnly = !editable
++	}
+ 	function setEditable(nextEditable: boolean) {
+-		editable = nextEditable
++		permissionEditable = nextEditable
++		editable = nextEditable && !commandFrozen
+ 		textarea.readOnly = !editable
+ 	}
+ 	function update(content: string, nextAtoms: Atom[], nextEditable: boolean) {
+@@ -1693,6 +1718,11 @@
+ 	}
+ 	function editorKeydown(event: KeyboardEvent) {
+ 		if (!(event.currentTarget instanceof HTMLTextAreaElement)) return
++		if (options.authority === "worker" && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "z") {
++			event.preventDefault()
++			if (permissionEditable) options.undo(event.shiftKey)
++			return
++		}
+ 		if (event.isComposing || composing) return
+ 		let editor = text
+ 		let mac = /Mac/i.test(navigator.platform)
+@@ -1758,9 +1788,7 @@
+ 		}
+ 		if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "z") {
+ 			event.preventDefault()
+-			if (options.authority !== "worker") options.undo(event.shiftKey)
+-			else
+-				options.report(new Error("Worker undo delegation is not implemented"))
++			options.undo(event.shiftKey)
+ 			return
+ 		}
+ 		let mod = event.metaKey || event.ctrlKey,
+@@ -1795,9 +1823,7 @@
+ 		}
+ 		if (mod && key === "y") {
+ 			event.preventDefault()
+-			if (options.authority !== "worker") options.undo(true)
+-			else
+-				options.report(new Error("Worker undo delegation is not implemented"))
++			if (permissionEditable) options.undo(true)
+ 			return
+ 		}
+ 		if (mod && event.shiftKey && key === "l") {
+@@ -2393,6 +2419,11 @@
+ 	}
+ 
+ 	function multiInput(event: InputEvent) {
++		if (options.authority === "worker" && ["historyUndo", "historyRedo"].includes(event.inputType)) {
++			event.preventDefault()
++			if (permissionEditable) options.undo(event.inputType === "historyRedo")
++			return
++		}
+ 		if (composing) return
+ 		primaryGoalX = undefined
+ 		if (
+@@ -2400,10 +2431,7 @@
+ 			event.inputType === "historyRedo"
+ 		) {
+ 			event.preventDefault()
+-			if (options.authority !== "worker")
+-				options.undo(event.inputType === "historyRedo")
+-			else
+-				options.report(new Error("Worker undo delegation is not implemented"))
++			options.undo(event.inputType === "historyRedo")
+ 			return
+ 		}
+ 		if (
+@@ -2687,6 +2715,7 @@
+ 		restoreRanges(after)
+ 	}
+ 	function selectionsChanged() {
++		selectionGeneration = ++editorSelectionGeneration
+ 		if (!text.sync()) updateHighlight()
+ 	}
+ }

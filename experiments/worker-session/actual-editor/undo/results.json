@@ -1,0 +1,33 @@
+{
+	"adopted": false,
+	"nativeCorrectnessAssertions": 11,
+	"types": "passed",
+	"timingMeasured": false,
+	"sourceBase": "actual-editor corrected prototype 71eac8c; worker handoff b48c2d8",
+	"knownBlockers": [
+		"Refused adoption after in-flight selection movement can stay frozen until another selection event",
+		"Fatal failure currently uses permissionEditable; a host permission refresh can re-enable a dead queue"
+	],
+	"additionalRace": "UndoRequest deletion before Deferred completion leaves an interruption window",
+	"verified": [
+		"No-op unfreezes",
+		"Deleted own emoji caret maps to nearest surviving predecessor",
+		"Redo exact local journal",
+		"All multicursor selections retained",
+		"New same-subject peer edit invalidates old redo",
+		"Later local Undo/Redo preserves previously merged peer prefix",
+		"Actual same-document reload",
+		"Scoped disposal"
+	],
+	"unverified": [
+		"Different-account concurrent peer during Undo",
+		"OS IME and synthetic composition postponement",
+		"Pointer drag postponement",
+		"Dropped Undo/Adopt reply and retained receipt eviction",
+		"Close during in-flight Undo",
+		"Permission revocation and failed queue recovery",
+		"Accepted HTTP checkpoint",
+		"Full app singleton authority/lifecycle/metadata assets comments presence search cutover"
+	],
+	"signature": "written with gpt-6 in codex"
+}

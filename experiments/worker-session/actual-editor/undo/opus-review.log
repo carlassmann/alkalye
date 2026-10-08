@@ -1,0 +1,34 @@
+Read-only review of the 6 draft files; I ran nothing. The editor won't compile as written, and several paths can leave it frozen with no recovery.
+
+## Blockers
+1. **Syntax error in `editor.ts`.** Lines `1780-1782`, `1817-1819` and `2422-2424` each have an `else` with no `if`. The prototype had `if (authority !== "worker") … else report` (prototype `editor.ts:1761,1798,2403`). Fix: delete the 3 `else options.report(...)` branches.
+2. **Adopt reconcile path never unfreezes the queue.** In `editor-queue.ts:269-281` the Read-reconcile success resolves `saved=true`, but only the direct-success branch at `:285` sets `commandFrozen=false`. Every later `replace` then throws `blocked` (`:357`), and `bindings.change` calls `fail` → editor uneditable for good.
+3. **Scope close during an in-flight undo is reported as "not applied".** Finalizer `editor-queue.ts:91` fails every queued undo with `QueuedBlocked`, including one whose `UndoQueued` was already sent. It should be `AppliedUnknown`, as edits get at `:107`. It needs a `phase`/`sending` flag on `UndoRequest`.
+4. **The editor can stay frozen forever waiting for a select event.**
+   - `options.select()` fires only from `textarea.onselect` (`editor.ts:378`), `compositionend` (`:344`) and link shift-click (`:749`).
+   - The `selectionchange` handler (`:370`) and pointerup (`:359-367`) don't call it. So a postponed undo after a drag, or after `!inSync()` busy, can wait indefinitely.
+   - The same applies after an adoption refusal (`bindings.ts:78-85`, false → wait), with the editor read-only meanwhile (it is still selectable).
+   - Fix: call `options.select()` from `selectionchange` and pointerup.
+5. **Two overlapping merges keep the editor frozen.** An external `bindings.merge()` can run while an undo is pending (FIFO: undo, merge#1). The receipt then starts resumeUndo merge#2, which captured the epoch from before the adopt. merge#1 adopts and changes the epoch, so merge#2 is refused at `editor-queue.ts:152` → back to the missing select event from #4. Fix: if the queue epoch changed since the undo receipt, treat it as adopted, or clear `needsAdoption` on any `adopted=true`.
+
+## Correctness (medium)
+- **Undo permission:** Ctrl+Z, Ctrl+Y and `historyUndo` don't check edit permission (`editor.ts:1778,1815,2417`; `bindings.ts:87`). A read-only viewer can send `UndoQueued`. If the session rejects it with `AccessConflict` (not `UndoUnavailable`), it becomes `unknown` → freeze.
+- **Undo during IME composition:** `editorKeydown` returns early when composing (`editor.ts:1715`). `multiInput` also returns before the `historyUndo` check (`:2415`). The browser's own undo then changes the textarea, and the result goes out as a normal change at `compositionend`. The binding's composing postponement (`bindings.ts:92`) is therefore never reached from those paths.
+- **Multi-cursor restore:** in `editor.ts:1003`, `restoreRanges` doesn't merge ranges. After an undo, deleted regions map several ranges to the same predecessor offset, giving duplicate or overlapping secondary cursors. Pass the ranges through `mergeSelections(…, true)`. `primary` is index 0 and survives because the order is kept.
+- **Selection validation:** `MergeCandidate` checks bounds only for `start`/`end` (`worker-session.ts:190`), not for each entry in `ranges`. Out-of-range entries become `SelectionUnavailable`, which the queue doesn't treat as fatal (`editor-queue.ts:184`). But `bindings.ts:82` calls `fail` anyway → editor dead. Either validate all ranges or treat this as a refusal.
+- **Transport errors after the resend:** a second transport error, or `Closed` from a respawned worker (`editor-queue.ts:131-138`), comes through as the raw error, not `AppliedUnknown`. It still freezes, but the classification is wrong.
+- **Queue-level freeze cleared by an unrelated adopt:** `editor-queue.ts:285` lets any adopt clear `commandFrozen`, even one queued before a later undo. Today only the editor's own read-only freeze stops input after that. Tie the unfreeze to the undo that set it.
+- **Dropped keypress:** Ctrl+Z while `runningUndo` is silently dropped (`bindings.ts:88`). Acceptable, but say so in the docs.
+
+## Verified OK
+- **Receipts:** the retained-receipt lookup runs before session and basis checks (`worker-session.ts:152-157`). A mismatched payload is rejected, same-ID resends are serialized by the semaphore, and eviction keeps 64 in insertion order. A pruned request fails on epoch or `sequence+1`, since `local.sequence` was already advanced (`:161,175`).
+- **Interruption:** an interrupt inside `restore` is stored as `unknown` before leaving the mask. An interrupt while waiting for the permit is a safe no-op.
+- **Not-applied classification:** `documentFailure` keeps `UndoUnavailable` (`document-failures.ts:41`). The `Stale` check runs inside prepare, before persist (`document-session.ts:711-744`), so `not-applied` is accurate.
+- **Basis and sequences:** the old basis is retained, sequence numbers stay aligned between queue and worker (`editor-queue.ts:346` ↔ `worker-session.ts:175`), and `MergeCandidate` requires `local.sequence === input.sequence`.
+- **Caret mapping:** O(n + k log k). Deleted atoms map to the nearest surviving predecessor; offsets inside an atom are clamped (a no-op since atoms are immutable). An empty document before or after maps everything to 0. No `Atom[]` crosses the RPC.
+- **Redo:** same path with the `redo` flag; invalidation stays in the session.
+
+## Not covered (as documented)
+Host metadata/asset/comment writers and the lifecycle cutover are outside this slice. Also: the fixture's peer uses the same subject, so subject-scoped undo candidates may include the peer's actions. That only matters for tests.
+
+Several claude.ai connectors (Axiom, Canva, GitHub, Gmail, Google Drive, HubSpot, Lusha, Lusha (2), Miro, Notion, Ocean.io, Ramp Data, Slack, Staging SynTwin, SynTwin Admin, SynTwin Kunde, lemlist, syntwin admin, syntwin main) need authorizing in your claude.ai connector settings; I didn't need them for this.
