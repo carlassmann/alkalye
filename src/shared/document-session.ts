@@ -357,6 +357,7 @@ function makeSession(options: DocumentSessionOptions) {
 					else yield* persistUnlocked({ kind: "proposed", action })
 					yield* Queue.take(unsaved)
 					projection.removeDraft(action.id)
+					publishDraftStatus()
 				}
 			},
 		).pipe(
@@ -762,6 +763,13 @@ function makeSession(options: DocumentSessionOptions) {
 			)
 		}
 
+		function publishDraftStatus() {
+			drafts.update()
+			// Durability changed without changing the document's content version.
+			Effect.runSync(
+				SubscriptionRef.set(revision, SubscriptionRef.getUnsafe(revision)),
+			)
+		}
 		function advanceView() {
 			Effect.runSync(SubscriptionRef.update(revision, current => current + 1))
 		}
