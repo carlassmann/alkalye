@@ -1,0 +1,6 @@
+PASS Comment boundary fixture opens
+PASS Ninth transient composer refused with typed capacity failure
+PASS Release restores transient capability capacity
+PASS Existing domain preserves comment body above64KiB without invented limit
+PASS Large comment leaves document source exact
+PASS Boundary scope releases worker resources

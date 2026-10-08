@@ -1,0 +1,44 @@
+I couldn't run anything here, so everything below comes from reading the code (no typecheck, tests or builds). I also couldn't write the plan file: no write tool was available in this session.
+
+The comment port is close but not ready. There are four blockers: one stops the typecheck, one breaks your "no mainReplica" rule, and two are smaller correctness gaps. Only comment code is new compared with `/tmp/alkalye-worker-integrated`. The one other change is the PermissionDenied mapping in `execute`, and the editor change is just the `workerComments` flag (`editor.ts:73,1503`).
+
+**What checks out**
+- `DocumentSession` is the same service in both places (`src/client/document-session.ts:10` re-exports the shared one), and `webCryptoLayer` supplies the `Crypto` that `DocumentDiscussion` needs.
+- **Anchor:** taken from the worker's saved copy at the exact epoch/sequence the queue sent. Queued edits are saved before the comment is staged, so the anchor's characters exist when it's written. Overlapping Unicode pairs stay together.
+- **Same-body retry:** resubmitting the same token with the same body reuses one prepared command, so the comment id and action id stay the same. That holds after a dropped reply or an interruption.
+- **Different body:** resubmitting with a new body only changes the existing comment's body.
+- **After peer deletion:** if the anchored text is gone, the thread shows `orphaned` (headers fall back to the quote). Clipboard paste fails with `ClipboardChanged` in the same case, as you intended.
+- **Ordering:** capture, submit, threads, release and admission all go through the same queue in order.
+  - Capture is refused while an undo is waiting for a merge, or after a failure.
+  - Release always gets through.
+  - Closing during a submit reports `AppliedUnknown`.
+  - Capture doesn't disturb a merge candidate that's in progress.
+- **Permissions:** the writable flag is only a UI hint. It's checked at capture, before the write and while staging, and the server's ACL is untouched.
+- **Bad ranges:** empty, reversed or out-of-bounds selections and a non-matching editor text all fail with `SelectionUnavailable`.
+
+**Blockers**
+1. **Typecheck fails** at `worker-session.ts:134`: `let current = yield* requireSession()` is never used, and `noUnusedLocals` is on. Fix: `yield* requireSession()`.
+2. **`Threads` reads the main replica.** `discussion.current()` → `commentRanges(session.replica…)` (`document-discussion.ts:55-62`). After a sync but before a merge, peer edits shift offsets, so `range` no longer matches the editor text. Fix: keep the comment records but compute ranges with `commentRanges(basis.replica, document, fields)` when there is a saved basis, and return its epoch/sequence.
+3. **Turning comments off can be lost.** `commentAdmission` isn't treated as cleanup (`editor-queue.ts:499`). If the queue is frozen or has failed, `CommentAdmission(false)` is rejected with `QueuedBlocked` and the worker keeps `commentsWritable = true`. Fix: pass `cleanup = true`, at least for `false`.
+4. **Split Unicode pairs.** `CaptureComment` doesn't reject `start`/`end` landing inside a surrogate pair. The quote then holds half a character and gets saved and sent. Fix: in `CaptureComment`, reject with `SelectionUnavailable` when `source.slice(start, end)` contains a lone surrogate (same regex as `crdt.ts:650`).
+
+**Smaller risks**
+- `Open` sets `commentsWritable` to `true` when omitted, so a read-only account writes local comment proposals that the server later rejects. Defaulting to `false` is safer.
+- If `ReleaseComment` times out (1s, error swallowed), the slot stays taken until `End` or `Close`; merges don't clear slots. Eight leaks block capture for the rest of the session.
+- A successful `SubmitComment` only means the change was saved locally. The server's permission check happens at sync, so the UI shouldn't say "saved" as if the server accepted it.
+- Fixture `addComment` only checks `commentDialog` after the capture finishes. Two quick calls create two dialogs and the first one leaks.
+- PermissionDenied thrown during staging becomes `DocumentConflict` → `SessionFailure`. The single-command lock in the worker means this can't happen in practice.
+- Comment requires the document itself to be editable (`selection.editable`), so comment-only users can't comment. That matches the main-thread menu.
+
+**Proof (browser fixture, after fixes 1–4)**
+1. Type, then capture right away (no flush), then submit. `threads()` should show one thread whose range in the editor equals the quote.
+2. Add a `drop-submit-once` fault mode (wrapper like `UndoQueued`'s), then resubmit the same token and body. Expect one thread, the same action id, and the same result after a peer `Sync`.
+3. Capture, then `peer(true, quote)`, then submit. The thread should be `orphaned`. The clipboard version of the same steps should give `ClipboardChanged`.
+4. `peer()` inserts before the quote with no merge. The thread range should still match editor text (this fails today because of blocker 2).
+5. `commentAdmission(false)`: capture and submit of an already-captured token should return `PermissionDenied`. Repeat while an undo is held: admission should still apply.
+6. Eight captures, then the ninth returns `HandleCapacity`. Release one and capture should work again.
+7. Hold a submit, `dispose()`, reopen. Expect zero or one thread, never two.
+8. Offsets that split an emoji should return `SelectionUnavailable`.
+9. Reader account with the hint set to true: submit succeeds locally, the server rejects it after `Sync`, and text editing still works.
+
+Many claude.ai connectors (Slack, GitHub, Notion and others) need to be authorized in claude.ai connector settings before they can be used.

@@ -1,0 +1,1 @@
+export default { project: "alkalye-worker-comments-proof", commands: { web: { run: "bun server.ts", route: false, portless: false } } }

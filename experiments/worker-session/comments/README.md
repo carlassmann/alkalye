@@ -1,0 +1,17 @@
+# Worker-owned selected comments
+
+Outside experiment; production unchanged. **20 assertions passed**, final types passed, two Opus5.5 source reviews completed. One actual Editor uses the existing worker/session/FIFO and real DocumentDiscussion composer. No main Replica or second DocumentSession. Source snapshots and bundle hashes are recorded in `results.json`.
+
+Fourteen actual Editor assertions cover native menu Add comment, body dialog, repeated Unicode selection, peer insertion before a merge, tagged editor-basis coordinates, authoritative orphan status, peer deletion without reassignment to an identical earlier quote, same-body action idempotence, readonly admission/recovery, half-surrogate refusal, comments-disabled refusal, token release, exact source and scope close. Six additional assertions verify eight transient composers, typed refusal of a ninth, release/reuse, an exact 65,537-character comment body, unchanged source and scope close. The body schema uses the existing maximumActionText; no new 64KiB feature limit.
+
+Capture owns saved-basis atom anchors inside the worker. Existing selectionAnchor and DocumentDiscussion.prepareComment supply the copied quote, stable anchors and memoized command. Submit preserves the same comment/action identity on a same-body retry. Threads combines authoritative comment state with ranges computed by existing commentRanges against the editor basis; epoch/sequence identify that coordinate space. A valid peer comment may have no editor range until a merge. Orphan status remains authoritative.
+
+Composer tokens are transient capabilities, bounded to eight, explicitly released and cleared on close. Capture, submit, release and threads use the same FIFO as native edits. False admission and cleanup are allowed while frozen. Unknown mutating RPC errors retain AppliedUnknown semantics; this mapper was source-reviewed, not fault-injected. The native fixture uses a minimal body dialog; full production comments sidebar integration remains pending.
+
+Open/update writable flags are UI hints. Actual server ACL checks remain unchanged, but separate-owner revocation was not tested here. Submission assertions prove local durable commands; accepted comment snapshots and dropped-reply retry were not independently asserted. Peer is another worker actor under the same account. No production facade/cutover, main-tab draft durability or performance claim.
+
+Final evidence: journey-comments-final.log (14), journey-comments-boundary-final.log (6), types-comments-final.log. Earlier ten/twelve-assertion proofs preceded final refinements and remain separate. Opus found stale range coordinates, missing denial admission during freeze, split-surrogate acceptance and an unused declaration; all were fixed. Followup refinements preserve authoritative orphan status and classify unknown submit outcomes. Initial types log was overwritten by a later passing run; its unused-variable failure is retained in the first review.
+
+Preserved .ts.txt files are excluded from production checks. Reproduce from the recorded source using actual copied src/tests/dependencies; restore root source names and copied Editor/SourceTextarea/discussion/documents modules, adapt tsconfig, then work run web. Run both journey scripts serially against the printed disposable URL with background agent-browser and stable 20000ms timeout. Stop the server afterward. Never write through source symlinks.
+
+written with gpt-6 in codex

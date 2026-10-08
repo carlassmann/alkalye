@@ -1,0 +1,12 @@
+PASS Actual comment Editor opens with worker authority
+PASS Actual menu composer retains exact repeated Unicode occurrence
+PASS Peer deletion orphans captured occurrence without attaching earlier identical quote
+PASS Existing composer retry preserves action identity
+PASS Retry creates one thread
+PASS Readonly UI admission returns typed permission failure without losing composer
+PASS Composer resumes after admission returns
+PASS Half-surrogate comment selection refused without writing malformed quote
+PASS Disabled discussion refuses typed submission while preserving composer
+PASS Released capability refuses reuse
+PASS Comment metadata changes preserve document source
+PASS Scope cleanup releases actual editor and worker

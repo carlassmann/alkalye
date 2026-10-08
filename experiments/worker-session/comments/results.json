@@ -1,0 +1,50 @@
+{
+	"status": "experiment-only; production unchanged",
+	"base": "integrated1e449fa source plus comments-only ports",
+	"underlyingSource": "5c47f1357d6d8be3fbdf0c0ec3879991f4aa60d1",
+	"sharedCrdtBase": "2f55545",
+	"sourceHashes": {
+		"bindings.ts": "0063af639774ef14ba29f366731e13553c798ff12bb9fcfcbb9a8bf35b125f29",
+		"browser-fixture.ts": "ee8c77db92e8f41ed0d1641f6fe1f438748d8e17f46d6f8194840c7e28cc302c",
+		"build.ts": "fafff1bbc98d9982169f5b08237efb8b4aceb56ab7a1a25e5d23280dc0f642f4",
+		"comments-journey.ts": "bdf9cff68f890005690abe23adad3c0f4a1925d844b3fc1f4e3b3a3201fb561c",
+		"comments-boundary-journey.ts": "deb93b3ff9951a7b7e6dd0353d7f87e1cdb4d0896c5dc6af29a925f835547bc9",
+		"editor-queue.ts": "9ba13546de563a05c31a531f564e9ddeb77c981fc9977d7451242e3d411bb645",
+		"seed.ts": "7f8cbff587a084d6cd6c9acb534e8fa0ef3fb665a8062be819dd3443bfff9a2f",
+		"server.ts": "8e4624605f0a7607aede9787fc422989012ef7a793426b8b17903992f49d47f5",
+		"worker-client.ts": "9be91716eff0370ebcacae8dda12f61110b7684f1107ace83b945aff3a4c71e4",
+		"worker-rpc.ts": "23a17480be06dcf834eeda958fb5d359edb573b2817789914556abfde7e9eb48",
+		"worker-session.ts": "acd3b2fd65002f40234fc5065dfc7dbdae3548b641cad85549d138e774f8051f",
+		"worker.ts": "cfcd9f3ae3d67d0629f8728f08cfc02dc035b2929b125b37f21645d4ec278eb9",
+		"work.config.js": "379165c75d551a5ce2ca8d8742b8cfc028dfdfbb3c739ff7e5b6f3ff49b94bb0",
+		"tsconfig.json": "aa34b1bd15694bef1a1014bf6bab127b9c50a7b3e2b67807b0615fa9e546fffb",
+		"editor-comments.ts": "a831d09db54bef849e519e9d705a614390d38859647826079a5b8349d4fb818c",
+		"source-textarea.ts": "c6ea32c60cf10e9988e83f434bf476a95c47294a276fdf03f5350ce66e7b177e",
+		"document-discussion.ts": "22594439a66bf7c87fd25e43d8e1991f2ef3c924a2e478f8b7a203f4c0e8ad97",
+		"documents.ts": "dcbbb8587d0d2c7a9769af38e6aae75a98649304c942cf3f8112f4cbdaf9e4a5"
+	},
+	"bundleHashes": {
+		"browser-fixture.js": "c15e62ed5e81a0b68be5f2d350a1ab7f0695b2e0c1bb7ce722b87cabe1122786",
+		"worker.js": "aca0dea1be565391575cfe6f27d2eb121091375d8c28849979caf66b31193945"
+	},
+	"assertions": {
+		"actualEditorComments": 14,
+		"capacityAndLargeBody": 6
+	},
+	"totalAssertions": 20,
+	"types": "types-comments-final.log exit0",
+	"runtime": "http://localhost:56930/; stopped after proof",
+	"reviews": [
+		"opus-comments.log initial source blockers fixed",
+		"opus-comments-followup.log source no hard blockers; projection/unknown failure refinements adopted before final proof"
+	],
+	"bodyLimit": "existing maximumActionText;65,537-character body exact",
+	"limits": [
+		"UI writable admission only; real server ACLrevocation not proven",
+		"Generic raw/defect mutation failure maps AppliedUnknown by source review only; no fault injection",
+		"Comment submit proof is local durable; accepted peer comment snapshots not separately asserted",
+		"Same-account independent peer actor",
+		"No full-app facade/cutover, tldraw or media port, main-tab durability or frame/performance claim"
+	],
+	"writtenWith": "gpt-6 in codex"
+}

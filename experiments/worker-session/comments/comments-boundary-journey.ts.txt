@@ -1,0 +1,24 @@
+import { assert, browser, evaluate, wait } from "./tests/browser-driver"
+let url=process.argv[2]
+if(!url)throw Error("URL required")
+let session="worker-comment-bounds-"+Date.now()
+let proof="window.workerEditorProof"
+try {
+ browser(session,"open",url)
+ wait(session,"document.body.dataset.ready==='true'||!!document.body.dataset.failure")
+ assert(evaluate(session,"!document.body.dataset.failure"),"Comment boundary fixture opens")
+ let source=evaluate(session,`${proof}.inspect().source`)
+ if(typeof source!=="string")throw Error("Source unavailable")
+ let start=source.indexOf("alpha")
+ evaluate(session,`(async()=>{window.commentTokens=[];for(let i=0;i<8;i++)window.commentTokens.push((await ${proof}.captureComment(${start},${start+5})).token)})()`)
+ assert(evaluate(session,`${proof}.captureComment(${start},${start+5}).then(()=>false,error=>error.reason==='HandleCapacity')`),"Ninth transient composer refused with typed capacity failure")
+ evaluate(session,`${proof}.releaseComment(window.commentTokens.shift())`)
+ evaluate(session,`${proof}.captureComment(${start},${start+5}).then(value=>window.commentTokens.push(value.token))`)
+ assert(evaluate(session,"window.commentTokens.length===8"),"Release restores transient capability capacity")
+ evaluate(session,`${proof}.submitComment(window.commentTokens[0],'L'.repeat(65537))`)
+ assert(evaluate(session,`${proof}.threads().then(({threads})=>threads.length===1&&threads[0].fields.body==='L'.repeat(65537))`),"Existing domain preserves comment body above64KiB without invented limit")
+ evaluate(session,`(async()=>{for(let token of window.commentTokens)await ${proof}.releaseComment(token)})()`)
+ assert(evaluate(session,`${proof}.flush()`)===source,"Large comment leaves document source exact")
+ evaluate(session,`${proof}.dispose()`)
+ assert(evaluate(session,"document.body.dataset.closed==='true'&&!document.querySelector('alkalye-editor')"),"Boundary scope releases worker resources")
+}finally{browser(session,"close")}

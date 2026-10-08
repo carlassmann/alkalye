@@ -1,0 +1,42 @@
+I found no hard blockers. All four earlier blockers are fixed in source. I did this by reading the code only: no edits, Bash, tests or builds. I couldn't write the plan file because no Write tool was available.
+
+**Earlier blockers: fixed**
+1. **Unused `current`:** it's now used for the comments-disabled metadata check (`worker-session.ts:134-135`).
+2. **Threads coordinates:** ranges are computed from the worker's basis replica and returned with its epoch and sequence (`:147-152`). Comment records still come from `discussion.current()`. The journey checks the range matches the quote.
+3. **Turning comments off while frozen:** `commentAdmission(false)` is now cleanup (`editor-queue.ts:500`), so a frozen queue or an earlier failure no longer blocks it. A closed queue still rejects it, and the worker clears its state on close anyway.
+4. **Split Unicode pairs:** the lone-surrogate check works, including a range that starts or ends mid-pair (`:126`). Empty, reversed and out-of-bounds ranges are also refused.
+- **Smaller fixes:** writable defaults to false (`:102`), the duplicate dialog guard is in (`browser-fixture.ts:159-163,199`), and the body limit reuses the existing `maximumActionText` (`worker-rpc.ts:46`).
+
+**No new main replica or session**
+- The discussion is built on the existing session via `Layer.succeed(DocumentSession, session)` in the same scope (`:103-106`).
+- `src/client/document-session.ts` re-exports the shared tag, so both sides use the same session.
+- The only forks are the existing ones in `Begin` and `MergeCandidate`.
+- `Threads` and `SubmitComment` read the existing main replica; they don't create one.
+
+**Should fix**
+1. **Peer comments wrongly marked orphaned before a merge** (`worker-session.ts:152`). `orphaned` is computed from the basis replica. A peer comment anchored in peer text that hasn't been merged has no range in the basis, so it shows `orphaned: true` until the merge.
+   - Fix: `orphaned: thread.orphaned` (already computed against the main replica), keep `range` from the basis, and treat no range on a non-orphaned thread as "not merged yet".
+   - The journey doesn't cover peer-edit-then-Threads-before-merge, which was proof 4 in the earlier review.
+2. **Unknown submit results aren't always classified** (`editor-queue.ts:481`).
+   - Closing during a submit is handled: a mutating command in "sending" gets `AppliedUnknown` (`:123`), and queued ones get `QueuedBlocked`. That's correct.
+   - But if the submit RPC itself fails with a transport error or defect (anything not a `WorkerDocumentFailure`), the raw error goes to the caller instead of `AppliedUnknown`.
+   - Retrying the same token is still safe, so this is about telling the caller the right thing. Fix: map those errors to `AppliedUnknown` when `mutates` is true.
+
+**Minor**
+- **Disabled-comments race:** new comments are checked again while staging (`documents.ts:54`). But a body change to an already-saved comment (`document-discussion.ts:84`) isn't, so a peer disabling comments right after the pre-check can still let the edit through. If the staging check is what fires, it throws a plain `Error`, which surfaces as `SessionFailure` rather than `CommentsDisabled`.
+- **Retry after `End`:** `End` clears the comment tokens (`:326`). Retrying after it returns `CommentUnavailable`, which can't tell "already saved" from "never saved". The caller must treat that as unknown.
+- **Leftover default:** `let commentsWritable = true` (`:46`) is overwritten on Open. Set it to `false` for clarity.
+- **Threads blocked while frozen:** it's a read but isn't marked cleanup, so it's refused while an undo is held or after a failure. That's a UX choice, not a correctness issue.
+- **`revision`** in Threads is the main-replica version alongside basis epoch/sequence. Clients must key on epoch/sequence.
+
+**What checks out**
+- **Body and quote privacy:** none of the five files logs anything. Errors carry only reason and category. The body reaches the main thread only through Threads, for rendering.
+  - One small leak: on a failed save the dialog shows `String(error)` (`browser-fixture.ts:189`). An oversize-body schema error may include the body text there. It isn't sent to `failures`.
+- **Duplicate submits:** the token survives a successful submit. Same body reuses the prepared command, and a non-retryable failure rebuilds it with the same comment id, so the comment never duplicates. The journey checks sequential duplicates only, not a dropped reply.
+- **Turning comments off:** `canWrite` is checked before the write and again while staging.
+
+**Not covered by tests yet** (as you noted)
+- Server-side permission revocation, the eight-token cap, a large-body run, a dropped-reply retry, and peer edits before a merge.
+- The last journey log, `journey-comments-domain-cap.log`, reports 12 PASS; `types-comments.log`, from before the final edits, passed.
+
+Many claude.ai connectors (Slack, GitHub, Notion and others) need authorizing in claude.ai connector settings before they can be used.
