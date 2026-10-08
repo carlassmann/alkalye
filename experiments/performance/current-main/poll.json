@@ -1,0 +1,735 @@
+{
+	"results": [
+		{
+			"version": "rewrite",
+			"transport": "poll",
+			"name": "edit to other device paint opportunity",
+			"kb": 2,
+			"n": 3,
+			"medianMs": 75.7998046875,
+			"p95Ms": 77.099853515625,
+			"values": [75.7998046875, 77.099853515625, 73.099853515625],
+			"resources": [
+				{
+					"producer": [
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": -928,
+							"responseMs": 12.5,
+							"durationMs": 940.5
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 6.89990234375,
+							"responseMs": 8.099853515625,
+							"durationMs": 1.199999988079071
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/actions",
+							"initiator": "fetch",
+							"startMs": 9.199951171875,
+							"responseMs": 12.39990234375,
+							"durationMs": 3.199999988079071
+						},
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": 13.199951171875,
+							"responseMs": 44.699951171875,
+							"durationMs": 31.5
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 13.699951171875,
+							"responseMs": 15.099853515625,
+							"durationMs": 1.399999976158142
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 13.89990234375,
+							"responseMs": 15.800048828125,
+							"durationMs": 1.899999976158142
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 26.89990234375,
+							"responseMs": 28.599853515625,
+							"durationMs": 1.699999988079071
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 27,
+							"responseMs": 29.199951171875,
+							"durationMs": 2.199999988079071
+						}
+					],
+					"peer": [
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": -48.7001953125,
+							"responseMs": 12.599853515625,
+							"durationMs": 61.30000001192093
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 13.999755859375,
+							"responseMs": 16.499755859375,
+							"durationMs": 2.5
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 14.499755859375,
+							"responseMs": 17.199951171875,
+							"durationMs": 2.699999988079071
+						},
+						{
+							"path": "/api/live/send",
+							"initiator": "fetch",
+							"startMs": 43.2998046875,
+							"responseMs": 44.499755859375,
+							"durationMs": 1.2000000476837158
+						}
+					],
+					"producerSocket": [],
+					"peerSocket": []
+				},
+				{
+					"producer": [
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": -403.5,
+							"responseMs": 12.800048828125,
+							"durationMs": 416.300000011921
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 7.39990234375,
+							"responseMs": 8.89990234375,
+							"durationMs": 1.5
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/actions",
+							"initiator": "fetch",
+							"startMs": 9.60009765625,
+							"responseMs": 12.699951171875,
+							"durationMs": 3.100000023841858
+						},
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": 13.5,
+							"responseMs": 45.300048828125,
+							"durationMs": 31.80000001192093
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 13.89990234375,
+							"responseMs": 15.5,
+							"durationMs": 1.600000023841858
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 14.10009765625,
+							"responseMs": 15.89990234375,
+							"durationMs": 1.800000011920929
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 25.60009765625,
+							"responseMs": 27,
+							"durationMs": 1.4000000357627869
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 25.699951171875,
+							"responseMs": 27.800048828125,
+							"durationMs": 2.100000023841858
+						}
+					],
+					"peer": [
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": -435.5,
+							"responseMs": 12.89990234375,
+							"durationMs": 448.39999997615814
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 14.199951171875,
+							"responseMs": 16.5,
+							"durationMs": 2.300000011920929
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 14.599853515625,
+							"responseMs": 17.39990234375,
+							"durationMs": 2.800000011920929
+						},
+						{
+							"path": "/api/live/send",
+							"initiator": "fetch",
+							"startMs": 43.7998046875,
+							"responseMs": 44.89990234375,
+							"durationMs": 1.0999999642372131
+						}
+					],
+					"producerSocket": [],
+					"peerSocket": []
+				},
+				{
+					"producer": [
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": -391.60009765625,
+							"responseMs": 12,
+							"durationMs": 403.60000002384186
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 7.099853515625,
+							"responseMs": 8.199951171875,
+							"durationMs": 1.100000023841858
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/actions",
+							"initiator": "fetch",
+							"startMs": 8.89990234375,
+							"responseMs": 12,
+							"durationMs": 3.100000023841858
+						},
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": 12.699951171875,
+							"responseMs": 43,
+							"durationMs": 30.30000001192093
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 13,
+							"responseMs": 14.599853515625,
+							"durationMs": 1.5999999642372131
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 13.300048828125,
+							"responseMs": 15.39990234375,
+							"durationMs": 2.100000023841858
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 24.599853515625,
+							"responseMs": 26,
+							"durationMs": 1.4000000357627869
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 24.89990234375,
+							"responseMs": 27,
+							"durationMs": 2.100000023841858
+						}
+					],
+					"peer": [
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": -423.800048828125,
+							"responseMs": 12.099853515625,
+							"durationMs": 435.89999997615814
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 13.2998046875,
+							"responseMs": 14.999755859375,
+							"durationMs": 1.7000000476837158
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 13.89990234375,
+							"responseMs": 16.499755859375,
+							"durationMs": 2.600000023841858
+						},
+						{
+							"path": "/api/live/send",
+							"initiator": "fetch",
+							"startMs": 41.499755859375,
+							"responseMs": 42.699951171875,
+							"durationMs": 1.199999988079071
+						}
+					],
+					"producerSocket": [],
+					"peerSocket": []
+				}
+			]
+		},
+		{
+			"version": "rewrite",
+			"transport": "poll",
+			"name": "offline reconnect to other device paint opportunity",
+			"kb": 2,
+			"n": 3,
+			"medianMs": 75,
+			"p95Ms": 83.300048828125,
+			"values": [75, 83.300048828125, 74],
+			"resources": [
+				{
+					"producer": [
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 1.099853515625,
+							"responseMs": 3,
+							"durationMs": 1.9000000357627869
+						},
+						{
+							"path": "/api/accounts/session",
+							"initiator": "fetch",
+							"startMs": 1.300048828125,
+							"responseMs": 3.300048828125,
+							"durationMs": 2
+						},
+						{
+							"path": "/api/accounts/preferences",
+							"initiator": "fetch",
+							"startMs": 2.199951171875,
+							"responseMs": 3.699951171875,
+							"durationMs": 1.5
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 2.39990234375,
+							"responseMs": 4.5,
+							"durationMs": 2.100000023841858
+						},
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": 4.800048828125,
+							"responseMs": 6,
+							"durationMs": 1.2000000476837158
+						},
+						{
+							"path": "/api/live/send",
+							"initiator": "fetch",
+							"startMs": 6.5,
+							"responseMs": 7.599853515625,
+							"durationMs": 1.0999999642372131
+						},
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": 6.699951171875,
+							"responseMs": 7.89990234375,
+							"durationMs": 1.199999988079071
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/actions",
+							"initiator": "fetch",
+							"startMs": 7.39990234375,
+							"responseMs": 12.099853515625,
+							"durationMs": 4.699999988079071
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 8.300048828125,
+							"responseMs": 9.89990234375,
+							"durationMs": 1.600000023841858
+						},
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": 8.5,
+							"responseMs": 12.39990234375,
+							"durationMs": 3.899999976158142
+						},
+						{
+							"path": "/api/accounts/preferences",
+							"initiator": "fetch",
+							"startMs": 8.599853515625,
+							"responseMs": 10.099853515625,
+							"durationMs": 1.5
+						},
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": 12.800048828125,
+							"responseMs": 44.300048828125,
+							"durationMs": 31.5
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 13.199951171875,
+							"responseMs": 14.699951171875,
+							"durationMs": 1.5
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 13.300048828125,
+							"responseMs": 15.39990234375,
+							"durationMs": 2.100000023841858
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 24.099853515625,
+							"responseMs": 25.199951171875,
+							"durationMs": 1.100000023841858
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 26.5,
+							"responseMs": 27.800048828125,
+							"durationMs": 1.2999999523162842
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 26.800048828125,
+							"responseMs": 28.300048828125,
+							"durationMs": 1.5
+						}
+					],
+					"peer": [
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": -1317.900146484375,
+							"responseMs": 12.39990234375,
+							"durationMs": 1330.300000011921
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 14.099853515625,
+							"responseMs": 15.89990234375,
+							"durationMs": 1.800000011920929
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 14.7998046875,
+							"responseMs": 16.499755859375,
+							"durationMs": 1.7000000476837158
+						},
+						{
+							"path": "/api/live/send",
+							"initiator": "fetch",
+							"startMs": 42.7998046875,
+							"responseMs": 44.099853515625,
+							"durationMs": 1.300000011920929
+						}
+					],
+					"producerSocket": [],
+					"peerSocket": []
+				},
+				{
+					"producer": [
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": -1264.39990234375,
+							"responseMs": 10.800048828125,
+							"durationMs": 1275.2000000476835
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 2.300048828125,
+							"responseMs": 4.10009765625,
+							"durationMs": 1.7999999523162842
+						},
+						{
+							"path": "/api/accounts/preferences",
+							"initiator": "fetch",
+							"startMs": 3,
+							"responseMs": 4.699951171875,
+							"durationMs": 1.699999988079071
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 3.300048828125,
+							"responseMs": 5.199951171875,
+							"durationMs": 1.899999976158142
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/actions",
+							"initiator": "fetch",
+							"startMs": 7,
+							"responseMs": 10.39990234375,
+							"durationMs": 3.399999976158142
+						},
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": 12.10009765625,
+							"responseMs": 52.39990234375,
+							"durationMs": 40.30000001192093
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 12.699951171875,
+							"responseMs": 14.89990234375,
+							"durationMs": 2.199999988079071
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 12.89990234375,
+							"responseMs": 15.5,
+							"durationMs": 2.600000023841858
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 23.89990234375,
+							"responseMs": 25.10009765625,
+							"durationMs": 1.199999988079071
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 27.39990234375,
+							"responseMs": 28.60009765625,
+							"durationMs": 1.199999988079071
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 27.800048828125,
+							"responseMs": 29.10009765625,
+							"durationMs": 1.2999999523162842
+						}
+					],
+					"peer": [
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": -1296.2001953125,
+							"responseMs": 10.7998046875,
+							"durationMs": 1307
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 12.099853515625,
+							"responseMs": 14,
+							"durationMs": 1.9000000357627869
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 13.39990234375,
+							"responseMs": 16.2998046875,
+							"durationMs": 2.900000035762787
+						},
+						{
+							"path": "/api/live/send",
+							"initiator": "fetch",
+							"startMs": 50.89990234375,
+							"responseMs": 52.099853515625,
+							"durationMs": 1.199999988079071
+						}
+					],
+					"producerSocket": [],
+					"peerSocket": []
+				},
+				{
+					"producer": [
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 2.5,
+							"responseMs": 4.300048828125,
+							"durationMs": 1.800000011920929
+						},
+						{
+							"path": "/api/accounts/session",
+							"initiator": "fetch",
+							"startMs": 2.900146484375,
+							"responseMs": 4.7001953125,
+							"durationMs": 1.7999999523162842
+						},
+						{
+							"path": "/api/accounts/preferences",
+							"initiator": "fetch",
+							"startMs": 3.10009765625,
+							"responseMs": 5,
+							"durationMs": 1.899999976158142
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 3.60009765625,
+							"responseMs": 5.800048828125,
+							"durationMs": 2.199999988079071
+						},
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": 5,
+							"responseMs": 6.400146484375,
+							"durationMs": 1.4000000357627869
+						},
+						{
+							"path": "/api/live/send",
+							"initiator": "fetch",
+							"startMs": 6.800048828125,
+							"responseMs": 7.800048828125,
+							"durationMs": 1
+						},
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": 6.800048828125,
+							"responseMs": 8.400146484375,
+							"durationMs": 1.600000023841858
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/actions",
+							"initiator": "fetch",
+							"startMs": 7.800048828125,
+							"responseMs": 12.7001953125,
+							"durationMs": 4.899999976158142
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 8.10009765625,
+							"responseMs": 10.300048828125,
+							"durationMs": 2.199999988079071
+						},
+						{
+							"path": "/api/accounts/preferences",
+							"initiator": "fetch",
+							"startMs": 8.5,
+							"responseMs": 10.300048828125,
+							"durationMs": 1.800000011920929
+						},
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": 8.7001953125,
+							"responseMs": 12.900146484375,
+							"durationMs": 4.200000047683716
+						},
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": 13.300048828125,
+							"responseMs": 43.10009765625,
+							"durationMs": 29.80000001192093
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 13.800048828125,
+							"responseMs": 15.300048828125,
+							"durationMs": 1.5
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 13.900146484375,
+							"responseMs": 15.800048828125,
+							"durationMs": 1.899999976158142
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 23.900146484375,
+							"responseMs": 25.300048828125,
+							"durationMs": 1.399999976158142
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 26.300048828125,
+							"responseMs": 27.60009765625,
+							"durationMs": 1.300000011920929
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 26.7001953125,
+							"responseMs": 28.10009765625,
+							"durationMs": 1.4000000357627869
+						},
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": 43.60009765625,
+							"responseMs": 256.300048828125,
+							"durationMs": 212.69999998807907
+						}
+					],
+					"peer": [
+						{
+							"path": "/api/live/poll",
+							"initiator": "fetch",
+							"startMs": -1314.5,
+							"responseMs": 12.800048828125,
+							"durationMs": 1327.300000011921
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 14.199951171875,
+							"responseMs": 16.699951171875,
+							"durationMs": 2.5
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 14.699951171875,
+							"responseMs": 17.300048828125,
+							"durationMs": 2.600000023841858
+						},
+						{
+							"path": "/api/live/send",
+							"initiator": "fetch",
+							"startMs": 41.60009765625,
+							"responseMs": 42.800048828125,
+							"durationMs": 1.199999988079071
+						}
+					],
+					"producerSocket": [],
+					"peerSocket": []
+				}
+			]
+		}
+	],
+	"failures": []
+}

@@ -1,0 +1,77 @@
+{
+	"results": [
+		{
+			"version": "original",
+			"name": "close find panel",
+			"kb": 128,
+			"n": 3,
+			"medianMs": 32.19999998807907,
+			"p95Ms": 32.69999998807907,
+			"values": [27.600000023841854, 32.69999998807907, 32.19999998807907]
+		},
+		{
+			"version": "original",
+			"name": "open find panel",
+			"kb": 128,
+			"n": 3,
+			"medianMs": 27,
+			"p95Ms": 33.39999997615814,
+			"values": [33.39999997615814, 18.80000001192093, 27]
+		},
+		{
+			"version": "original",
+			"name": "find all reference matches",
+			"kb": 128,
+			"n": 3,
+			"medianMs": 30.600000023841854,
+			"p95Ms": 33,
+			"values": [30.600000023841854, 25.5, 33]
+		},
+		{
+			"version": "rewrite",
+			"name": "close find panel",
+			"kb": 128,
+			"n": 3,
+			"medianMs": 20.5,
+			"p95Ms": 34.19999998807907,
+			"values": [34.19999998807907, 17.600000023841858, 20.5]
+		},
+		{
+			"version": "rewrite",
+			"name": "open find panel",
+			"kb": 128,
+			"n": 3,
+			"medianMs": 28.5,
+			"p95Ms": 30.400000035762787,
+			"values": [30.400000035762787, 8.100000023841858, 28.5]
+		},
+		{
+			"version": "rewrite",
+			"name": "find all reference matches",
+			"kb": 128,
+			"n": 3,
+			"medianMs": 30.5,
+			"p95Ms": 33.19999998807907,
+			"values": [30.5, 33.19999998807907, 21.400000035762787]
+		},
+		{
+			"version": "original",
+			"name": "switch existing128KiB document",
+			"kb": 128,
+			"n": 3,
+			"medianMs": 34.39999997615814,
+			"p95Ms": 2269.5,
+			"values": [2269.5, 34.39999997615814, 27.5]
+		},
+		{
+			"version": "rewrite",
+			"name": "switch existing128KiB document",
+			"kb": 128,
+			"n": 3,
+			"medianMs": 534.0999999642372,
+			"p95Ms": 2812.5,
+			"values": [2812.5, 504.4000000357628, 534.0999999642372]
+		}
+	],
+	"failures": []
+}

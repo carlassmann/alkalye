@@ -1,0 +1,1025 @@
+{
+	"results": [
+		{
+			"version": "original",
+			"transport": "socket",
+			"name": "edit to other device paint opportunity",
+			"kb": 2,
+			"n": 3,
+			"medianMs": 308.60009765625,
+			"p95Ms": 321.2001953125,
+			"values": [321.2001953125, 308.60009765625, 301.89990234375],
+			"resources": [
+				{
+					"producer": [],
+					"peer": [],
+					"producerSocket": [
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 273.10009765625
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 273.2001953125
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 282.5
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 287
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 315.800048828125
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 318.10009765625
+						}
+					],
+					"peerSocket": [
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 282.300048828125
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 282.7001953125
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 292.7001953125
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 293.000244140625
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 317.000244140625
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 317.300048828125
+						}
+					]
+				},
+				{
+					"producer": [],
+					"peer": [],
+					"producerSocket": [
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 263.60009765625
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 263.800048828125
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 264.800048828125
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 265.900146484375
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 302.900146484375
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 303.400146484375
+						}
+					],
+					"peerSocket": [
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 265.800048828125
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 266.500244140625
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 274.000244140625
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 274.2001953125
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 303.800048828125
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 304.000244140625
+						}
+					]
+				},
+				{
+					"producer": [],
+					"peer": [],
+					"producerSocket": [
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 259.099853515625
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 259.19970703125
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 259.69970703125
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 261.19970703125
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 297.999755859375
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 299.19970703125
+						}
+					],
+					"peerSocket": [
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 16.499755859375
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 260.199951171875
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 260.599853515625
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 265.7998046875
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 266.099853515625
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 298.89990234375
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 299.199951171875
+						}
+					]
+				}
+			]
+		},
+		{
+			"version": "original",
+			"transport": "socket",
+			"name": "offline reconnect to other device paint opportunity",
+			"kb": 2,
+			"n": 3,
+			"medianMs": 47.099853515625,
+			"p95Ms": 48,
+			"values": [47.099853515625, 46.000244140625, 48],
+			"resources": [
+				{
+					"producer": [],
+					"peer": [],
+					"producerSocket": [
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 4.999755859375
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 5.2998046875
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 5.89990234375
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 6.39990234375
+						}
+					],
+					"peerSocket": [
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 5.699951171875
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 6.099853515625
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 9.89990234375
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 10.099853515625
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 12.2998046875
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 12.39990234375
+						}
+					]
+				},
+				{
+					"producer": [],
+					"peer": [],
+					"producerSocket": [
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 3.7001953125
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 4
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 4.400146484375
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 5.10009765625
+						}
+					],
+					"peerSocket": [
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 4.400146484375
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 4.7001953125
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 8.000244140625
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 8.10009765625
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 10.2001953125
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 10.300048828125
+						}
+					]
+				},
+				{
+					"producer": [],
+					"peer": [],
+					"producerSocket": [
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 7.300048828125
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 7.699951171875
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 8.099853515625
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 8.599853515625
+						}
+					],
+					"peerSocket": [
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 8.10009765625
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 8.300048828125
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 11.89990234375
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 12
+						},
+						{
+							"path": "/",
+							"direction": "receive",
+							"startMs": 14.199951171875
+						},
+						{
+							"path": "/",
+							"direction": "send",
+							"startMs": 14.199951171875
+						}
+					]
+				}
+			]
+		},
+		{
+			"version": "rewrite",
+			"transport": "socket",
+			"name": "edit to other device paint opportunity",
+			"kb": 2,
+			"n": 3,
+			"medianMs": 74.699951171875,
+			"p95Ms": 102.7001953125,
+			"values": [102.7001953125, 73.400146484375, 74.699951171875],
+			"resources": [
+				{
+					"producer": [
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 11.5,
+							"responseMs": 13.10009765625,
+							"durationMs": 1.600000023841858
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/actions",
+							"initiator": "fetch",
+							"startMs": 14.800048828125,
+							"responseMs": 35.300048828125,
+							"durationMs": 20.5
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 36.10009765625,
+							"responseMs": 37.7001953125,
+							"durationMs": 1.600000023841858
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 36.7001953125,
+							"responseMs": 39.800048828125,
+							"durationMs": 3.099999964237213
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 51.7001953125,
+							"responseMs": 53.300048828125,
+							"durationMs": 1.5999999642372131
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 51.900146484375,
+							"responseMs": 53.900146484375,
+							"durationMs": 2
+						}
+					],
+					"peer": [
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 36.2001953125,
+							"responseMs": 38.80029296875,
+							"durationMs": 2.600000023841858
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 37.000244140625,
+							"responseMs": 40.600341796875,
+							"durationMs": 3.599999964237213
+						}
+					],
+					"producerSocket": [
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 34.900146484375
+						},
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 72
+						}
+					],
+					"peerSocket": [
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 35.100341796875
+						},
+						{
+							"path": "/api/live",
+							"direction": "send",
+							"startMs": 71.30029296875
+						}
+					]
+				},
+				{
+					"producer": [
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 8.300048828125,
+							"responseMs": 9.599853515625,
+							"durationMs": 1.2999999523162842
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/actions",
+							"initiator": "fetch",
+							"startMs": 10.300048828125,
+							"responseMs": 14.099853515625,
+							"durationMs": 3.799999952316284
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 14.699951171875,
+							"responseMs": 16.300048828125,
+							"durationMs": 1.600000023841858
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 15.099853515625,
+							"responseMs": 17.89990234375,
+							"durationMs": 2.800000011920929
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 27.89990234375,
+							"responseMs": 30.099853515625,
+							"durationMs": 2.199999988079071
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 28.199951171875,
+							"responseMs": 30.599853515625,
+							"durationMs": 2.399999976158142
+						}
+					],
+					"peer": [
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 14.900146484375,
+							"responseMs": 17.300048828125,
+							"durationMs": 2.399999976158142
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 15.7001953125,
+							"responseMs": 18.7001953125,
+							"durationMs": 3
+						}
+					],
+					"producerSocket": [
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 13.800048828125
+						},
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 41.599853515625
+						}
+					],
+					"peerSocket": [
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 14.000244140625
+						},
+						{
+							"path": "/api/live",
+							"direction": "send",
+							"startMs": 41.10009765625
+						}
+					]
+				},
+				{
+					"producer": [
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 7.499755859375,
+							"responseMs": 9.39990234375,
+							"durationMs": 1.9000000357627869
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/actions",
+							"initiator": "fetch",
+							"startMs": 10.19970703125,
+							"responseMs": 13.499755859375,
+							"durationMs": 3.300000011920929
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 14.099853515625,
+							"responseMs": 15.499755859375,
+							"durationMs": 1.399999976158142
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 14.499755859375,
+							"responseMs": 16.999755859375,
+							"durationMs": 2.5
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 26.099853515625,
+							"responseMs": 27.599853515625,
+							"durationMs": 1.5
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 26.19970703125,
+							"responseMs": 28.499755859375,
+							"durationMs": 2.300000011920929
+						}
+					],
+					"peer": [
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 14.300048828125,
+							"responseMs": 16.39990234375,
+							"durationMs": 2.100000023841858
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 15,
+							"responseMs": 18,
+							"durationMs": 3
+						}
+					],
+					"producerSocket": [
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 13.2998046875
+						},
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 40.89990234375
+						}
+					],
+					"peerSocket": [
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 13.5
+						},
+						{
+							"path": "/api/live",
+							"direction": "send",
+							"startMs": 40.39990234375
+						}
+					]
+				}
+			]
+		},
+		{
+			"version": "rewrite",
+			"transport": "socket",
+			"name": "offline reconnect to other device paint opportunity",
+			"kb": 2,
+			"n": 3,
+			"medianMs": 79.60009765625,
+			"p95Ms": 79.60009765625,
+			"values": [79.60009765625, 79.60009765625, 75.60009765625],
+			"resources": [
+				{
+					"producer": [
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 0.89990234375,
+							"responseMs": 2.599853515625,
+							"durationMs": 1.699999988079071
+						},
+						{
+							"path": "/api/accounts/preferences",
+							"initiator": "fetch",
+							"startMs": 1.5,
+							"responseMs": 3.199951171875,
+							"durationMs": 1.699999988079071
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 1.800048828125,
+							"responseMs": 3.699951171875,
+							"durationMs": 1.899999976158142
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/actions",
+							"initiator": "fetch",
+							"startMs": 7.800048828125,
+							"responseMs": 11.800048828125,
+							"durationMs": 4
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 12.39990234375,
+							"responseMs": 13.800048828125,
+							"durationMs": 1.4000000357627869
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 12.800048828125,
+							"responseMs": 15.300048828125,
+							"durationMs": 2.5
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 21.89990234375,
+							"responseMs": 23.199951171875,
+							"durationMs": 1.300000011920929
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 25.800048828125,
+							"responseMs": 27.300048828125,
+							"durationMs": 1.5
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 26.199951171875,
+							"responseMs": 27.599853515625,
+							"durationMs": 1.399999976158142
+						}
+					],
+					"peer": [
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 12.60009765625,
+							"responseMs": 14.800048828125,
+							"durationMs": 2.199999988079071
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 13.400146484375,
+							"responseMs": 16.2001953125,
+							"durationMs": 2.799999952316284
+						}
+					],
+					"producerSocket": [
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 11.599853515625
+						},
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 48.89990234375
+						}
+					],
+					"peerSocket": [
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 11.7001953125
+						},
+						{
+							"path": "/api/live",
+							"direction": "send",
+							"startMs": 48.400146484375
+						}
+					]
+				},
+				{
+					"producer": [
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 0.89990234375,
+							"responseMs": 9.39990234375,
+							"durationMs": 8.5
+						},
+						{
+							"path": "/api/accounts/preferences",
+							"initiator": "fetch",
+							"startMs": 1.300048828125,
+							"responseMs": 9.599853515625,
+							"durationMs": 8.299999952316284
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 1.5,
+							"responseMs": 10,
+							"durationMs": 8.5
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/actions",
+							"initiator": "fetch",
+							"startMs": 11.800048828125,
+							"responseMs": 15.39990234375,
+							"durationMs": 3.599999964237213
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 16.099853515625,
+							"responseMs": 17.699951171875,
+							"durationMs": 1.600000023841858
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 16.599853515625,
+							"responseMs": 20.800048828125,
+							"durationMs": 4.200000047683716
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 29.199951171875,
+							"responseMs": 30.599853515625,
+							"durationMs": 1.399999976158142
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 31.699951171875,
+							"responseMs": 32.89990234375,
+							"durationMs": 1.199999988079071
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 31.89990234375,
+							"responseMs": 33.89990234375,
+							"durationMs": 2
+						}
+					],
+					"peer": [
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 16.2001953125,
+							"responseMs": 18.10009765625,
+							"durationMs": 1.9000000357627869
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 16.900146484375,
+							"responseMs": 21.300048828125,
+							"durationMs": 4.399999976158142
+						}
+					],
+					"producerSocket": [
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 8.099853515625
+						},
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 15.199951171875
+						},
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 48.39990234375
+						}
+					],
+					"peerSocket": [
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 8.300048828125
+						},
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 15.400146484375
+						},
+						{
+							"path": "/api/live",
+							"direction": "send",
+							"startMs": 47.900146484375
+						}
+					]
+				},
+				{
+					"producer": [
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 2.7998046875,
+							"responseMs": 4.7998046875,
+							"durationMs": 2
+						},
+						{
+							"path": "/api/accounts/preferences",
+							"initiator": "fetch",
+							"startMs": 3.89990234375,
+							"responseMs": 5.099853515625,
+							"durationMs": 1.199999988079071
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 4.099853515625,
+							"responseMs": 5.599853515625,
+							"durationMs": 1.5
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/actions",
+							"initiator": "fetch",
+							"startMs": 7.599853515625,
+							"responseMs": 10.7998046875,
+							"durationMs": 3.199999988079071
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 11.39990234375,
+							"responseMs": 12.7998046875,
+							"durationMs": 1.399999976158142
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 11.89990234375,
+							"responseMs": 14.199951171875,
+							"durationMs": 2.300000011920929
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 20.2998046875,
+							"responseMs": 21.5,
+							"durationMs": 1.2000000476837158
+						},
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 23.099853515625,
+							"responseMs": 24.2998046875,
+							"durationMs": 1.199999988079071
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 23.5,
+							"responseMs": 24.89990234375,
+							"durationMs": 1.399999976158142
+						}
+					],
+					"peer": [
+						{
+							"path": "/api/library",
+							"initiator": "fetch",
+							"startMs": 11.60009765625,
+							"responseMs": 13.10009765625,
+							"durationMs": 1.5
+						},
+						{
+							"path": "/api/documents/155b507c-487c-4a63-9cae-4a9eba9d8f0b/history",
+							"initiator": "fetch",
+							"startMs": 12.400146484375,
+							"responseMs": 14.900146484375,
+							"durationMs": 2.5
+						}
+					],
+					"producerSocket": [
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 10.599853515625
+						},
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 44.699951171875
+						}
+					],
+					"peerSocket": [
+						{
+							"path": "/api/live",
+							"direction": "receive",
+							"startMs": 10.7001953125
+						},
+						{
+							"path": "/api/live",
+							"direction": "send",
+							"startMs": 44.2001953125
+						}
+					]
+				}
+			]
+		}
+	],
+	"failures": []
+}

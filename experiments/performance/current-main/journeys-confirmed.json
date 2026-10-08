@@ -1,0 +1,161 @@
+{
+	"results": [
+		{
+			"version": "original",
+			"name": "close find panel",
+			"kb": 2,
+			"n": 5,
+			"medianMs": 21.30000001192093,
+			"p95Ms": 23.69999998807907,
+			"values": [
+				22.69999998807907, 16.30000001192093, 23.69999998807907,
+				21.30000001192093, 17.400000035762787
+			]
+		},
+		{
+			"version": "original",
+			"name": "open find panel",
+			"kb": 2,
+			"n": 5,
+			"medianMs": 28.5,
+			"p95Ms": 32.39999997615814,
+			"values": [
+				22, 23.200000047683716, 28.69999998807907, 28.5, 32.39999997615814
+			]
+		},
+		{
+			"version": "original",
+			"name": "find all reference matches",
+			"kb": 2,
+			"n": 5,
+			"medianMs": 29.69999998807907,
+			"p95Ms": 32.30000001192093,
+			"values": [
+				32.30000001192093, 20.69999998807907, 30, 19.900000035762787,
+				29.69999998807907
+			]
+		},
+		{
+			"version": "original",
+			"name": "open rendered preview",
+			"kb": 2,
+			"n": 5,
+			"medianMs": 24.19999998807907,
+			"p95Ms": 65.80000001192093,
+			"values": [
+				65.80000001192093, 24.19999998807907, 19, 23.69999998807907,
+				50.30000001192093
+			]
+		},
+		{
+			"version": "original",
+			"name": "close find panel",
+			"kb": 128,
+			"n": 5,
+			"medianMs": 29.399999976158146,
+			"p95Ms": 38.39999997615814,
+			"values": [
+				23.69999998807907, 29.399999976158146, 38.39999997615814,
+				31.80000001192093, 27.69999998807907
+			]
+		},
+		{
+			"version": "original",
+			"name": "open find panel",
+			"kb": 128,
+			"n": 5,
+			"medianMs": 29.399999976158146,
+			"p95Ms": 31.599999964237213,
+			"values": [
+				29.399999976158146, 21, 31.599999964237213, 26.80000001192093,
+				30.799999952316284
+			]
+		},
+		{
+			"version": "original",
+			"name": "find all reference matches",
+			"kb": 128,
+			"n": 5,
+			"medianMs": 25.899999976158146,
+			"p95Ms": 48.60000002384186,
+			"values": [
+				48.60000002384186, 25.899999976158146, 22.5, 29.899999976158146,
+				22.899999976158146
+			]
+		},
+		{
+			"version": "original",
+			"name": "open rendered preview",
+			"kb": 128,
+			"n": 5,
+			"medianMs": 64.80000001192093,
+			"p95Ms": 65,
+			"values": [
+				64.80000001192093, 63.30000001192093, 64.90000003576279, 65,
+				60.40000003576279
+			]
+		},
+		{
+			"version": "rewrite",
+			"name": "switch existing128KiB document",
+			"kb": 128,
+			"n": 5,
+			"medianMs": 79,
+			"p95Ms": 231.60000002384183,
+			"values": [
+				231.60000002384183, 80.59999996423721, 72.30000001192093,
+				67.10000002384186, 79
+			]
+		}
+	],
+	"failures": [
+		{
+			"version": "rewrite",
+			"phase": "find and preview",
+			"kb": 2,
+			"error": "Error: fresh-rewrite wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n",
+			"condition": "window.__benchmark.arm===null",
+			"state": {
+				"findCount": "1 of 20",
+				"findVisible": true,
+				"focused": "find-text",
+				"matchSpans": 1,
+				"nativeMatches": 6,
+				"path": "/app/doc/155b507c-487c-4a63-9cae-4a9eba9d8f0b",
+				"pending": "0",
+				"readonly": false,
+				"sourceCharacters": 2158
+			}
+		},
+		{
+			"version": "rewrite",
+			"phase": "find and preview",
+			"kb": 128,
+			"error": "Error: fresh-rewrite wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n",
+			"condition": "window.__benchmark.arm===null",
+			"state": {
+				"findCount": "1 of 1297",
+				"findVisible": true,
+				"focused": "find-text",
+				"matchSpans": 1,
+				"nativeMatches": 6,
+				"path": "/app/doc/7292644f-e17e-4b56-81a4-49b58ab60c73",
+				"pending": "0",
+				"readonly": false,
+				"sourceCharacters": 131512
+			}
+		},
+		{
+			"version": "original",
+			"phase": "switch",
+			"error": "Error: fresh-main wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n",
+			"condition": "window.__benchmark.arm===null",
+			"state": {
+				"focused": "",
+				"matchSpans": 0,
+				"path": "/app/doc/co_zjv9bpJdnh7BbL6x7VsCvXikXsQ",
+				"sourceCharacters": 2158
+			}
+		}
+	]
+}

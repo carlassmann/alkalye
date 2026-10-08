@@ -1,0 +1,29 @@
+{
+	"results": [
+		{
+			"version": "original",
+			"name": "replace all occurrences",
+			"kb": 128,
+			"n": 3,
+			"values": [88.80000001192093, 85.39999997615814, 87.59999996423721],
+			"cursors": [1298, 1298, 1298],
+			"medianMs": 87.59999996423721,
+			"p95Ms": 88.80000001192093,
+			"selectionSetup": "CodeMirror public EditorSelection API",
+			"restoration": "Complete original source through public editor boundary; excluded from replacement timing"
+		},
+		{
+			"version": "rewrite",
+			"name": "replace all occurrences",
+			"kb": 128,
+			"n": 3,
+			"values": [49.89999997615814, 43.19999998807907, 41.69999998807907],
+			"cursors": [1298, 1298, 1298],
+			"medianMs": 43.19999998807907,
+			"p95Ms": 49.89999997615814,
+			"selectionSetup": "Select all occurrences shortcut",
+			"restoration": "Complete original source through public editor boundary; excluded from replacement timing"
+		}
+	],
+	"failures": []
+}

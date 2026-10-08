@@ -1,0 +1,102 @@
+{
+	"date": "2026-10-08",
+	"originalCommit": "a749728a8f9a1cb984c980a5ea2daf984d60ae68",
+	"rewriteCommit": "aad445b6fdf3a2efe5679daa5a0e010d58785a61",
+	"runtime": "Bun 1.4.0, macOS arm64, background Chromium via agent-browser, DEFAULT_TIMEOUT=20000",
+	"normalSamples": 5,
+	"extremeAndTransportSamples": 3,
+	"traceSampling": false,
+	"assetsSHA256": {
+		"original": {
+			"_astro/browser-startup-instrumentation.hp2BeFIz.js": "7cd392919e9495031df7ef025417cc5d140c0d61ce8842a0bd20cfdac781a254",
+			"_astro/client.-iLz22eX.js": "6e61a55e346cf81594a8f79ef7d1177300d57e3ecdbf9344989586584043bbe0",
+			"_astro/client.CMSwgtGj.js": "b59fa5a209b259582587c593fbd18e461ad7a320587ff6fc8871cfe8654f07ca",
+			"_astro/index.BJJFgUIs.js": "f3d7f04681cd4a3f824abb256a676b879bb3283c1131f93375bbf6e17e31040b",
+			"_astro/index.astro_astro_type_script_index_0_lang.DkMI-E-L.js": "cf41a1b372e9c378ca8174aba1a79e401f193936fe652ac5bb8da32e3198dda4",
+			"_astro/main.BZnRi7In.js": "3ff13673e74bdc2b00d2e8f2e5f09f48f9b1f04fbacdd2d28f32453499b5e5e9",
+			"_astro/main.RwhXd_cQ.js": "7cb997394eabfd43da5d748850ba9f0b340ec66fb28689e94efec3130685af11",
+			"_astro/tldraw-canvas.CLg_D8Xl.js": "cc059067e2c06f1b87d0ea9ad62d0f2dbe4db01d6590547d1254c58a6955a84a",
+			"_astro/tldraw-editor.BBrc2Cor.js": "53726c35b9c4a790f30a88fa8f51ada05967f9e8c6e58729971ea86fc5199f72",
+			"_astro/tldraw-file.Bg9gpyRf.js": "036214b6af5d7af534052f0a32832bcfddd217e5a4d60ce85378a3ddfb53cb7d",
+			"_astro/tldraw-state-react.DqiSPINI.js": "b0ae3d9bb5c894056305de84f2aa8a7da8f1b1f64591589a39210bbe60f7b6c9",
+			"_astro/tldraw-state.C9LnVlES.js": "49343c4abcd470fbe1cb0f2e16afc84439080c3334f9fa413a9d2eeb299c7c45",
+			"_astro/tldraw-store.OMu2Pupj.js": "445d14f8e892c50a80a9e97dae553d2924acf5ef787dfabf6846c4f5640c6edc",
+			"_astro/tldraw-tlschema.BrM2lrCb.js": "49ed78404c57bc3f4aff63b2e0e0098b0763a0f8007779504bd5697254f84716",
+			"_astro/tldraw-utils.jbL-1g3v.js": "0aa8be2702e31a0b458b4dea700a123a445e60085376a5d4960f86aad694cb9d",
+			"_astro/tldraw-validate.Bsa_mjo1.js": "c2c85bbc57133eb40c17365a46b7be076e7faed45ecce29ee0a66016679298cc",
+			"_astro/tldraw.DU0Q5zXz.js": "0cc6b464d813a61b74c33e627a1a2044e2ead6d02ff9c24b38399d2399427e1c"
+		},
+		"rewrite": {
+			"app.js": "b87e08435c0b377467ed08d7de4bbc0a74f6ae31a6a33c41c718f7bd488687a3",
+			"chunks/document-app-1t4a0gb7.js": "cc54de98acfe1358d80201bf59456569203203c9c1e17d7e756eef12922061e1",
+			"chunks/document-app-2d6qcvkk.js": "78de8fa627f4f484f661d8c57595db2f312d9daade130c6bf1acc7c610fcc780",
+			"chunks/document-app-68q58m06.js": "1678be6a027e992f23bbded505b8e1e721a1b0877b253dbb7afcba64c7464755",
+			"chunks/document-app-6q8jcqjd.js": "530a9bfdb564daf2442a6d910b579ea2acb376887ade01fb5f0a2993937d4069",
+			"chunks/document-app-84g5fq8v.js": "f47987ff574fa3c98e2b4f4605631651054ea8ad6c1bcb09265e39b1ca4b3ac3",
+			"chunks/document-app-a1wrmpe6.js": "ced0ec45edf1c7cb6abe3efa05f047c8dcdf2b3ff5510876f9e61ab1b61cee90",
+			"chunks/document-app-b0yeg0hx.js": "297a20f766e801b94267e924472119ba559f79dcb694af31db9b92165d914292",
+			"chunks/document-app-bvsc7173.js": "e6b4d6d5da6781d49860dce4ad6f2b3308774ba82ec628bad196715e6f38a292",
+			"chunks/document-app-c3ss2tq7.js": "fd4106115b595215a79ec9bfa83a4f83ee4536a3f949b7cd0c7f5f66492e38b9",
+			"chunks/document-app-c4ksd8ec.js": "e49c0a6a628119f568a9862a4f44cff62ab439a1bd543e2a76cf2ce9d357176e",
+			"chunks/document-app-c6wc4y2y.js": "e7cd6742cb47d312c6c57765b930f78dd75eb4202d8419d9a04b8469960a5d42",
+			"chunks/document-app-dh3m50w7.js": "cb1c9b103f9c28c0e9ad8ce2a7887dba13b05759988740ea5bba559472e270c2",
+			"chunks/document-app-e3ap03vm.js": "4b757c48a94d52229e828414ea0ee209a26486612d2b81e5337c4e5edd42e91c",
+			"chunks/document-app-e7vwaf0q.js": "e00abbc0b9eecb68b145736339e85c8258d0a225aeac8b7c6f0e0c07bde46b5a",
+			"chunks/document-app-eznwvf0k.js": "3b68cc19aa306269816b5130b3137bda2a0d81f0cc70d33c921b4feb550e409a",
+			"chunks/document-app-fjge2egf.js": "f5f4c66d895fe99cc8c0a2cee58e05bec475f2e2feaaa125ffc34fb8650fed1a",
+			"chunks/document-app-gf4hdxnw.js": "8f2502d90355e5ad1b0dc4c4c43962052fc5dd35fcffbdb2df57e349fdde9892",
+			"chunks/document-app-jegj5sa1.js": "fe1e6ebdc6cf2e7a6705c14e455a259bb8377dadf1e1da5247c22b404a56e1ed",
+			"chunks/document-app-jev26rbc.js": "ffe2f07e24a5802624acb728ebe1d3e055ddb1c09022f7c07bd69fc09c4c9cd2",
+			"chunks/document-app-jvxsp8xh.js": "99d016215a1bc56a5f433706defacd26108a4941c9ef9605c9960cb4bc598bc5",
+			"chunks/document-app-m2qx4cqf.js": "a16f603c7e82fa73c3c08187e200539440a114333311e16d891b12060d5d40bc",
+			"chunks/document-app-mhc65yn7.js": "70685b005cc0be54dfd9cfd6c0ab43480a02b32ab571ba8e6c1ba5f40ece2342",
+			"chunks/document-app-ncxg3qzf.js": "2033be89fac9846668f0ed9904b433c97158d25a414f5da55b01817cbc317ada",
+			"chunks/document-app-nqb2j1d5.js": "7ee8a12ff085053fec8ff4edc3bb46ed6125e227c1ca24a152407cb5d6a250c8",
+			"chunks/document-app-pzbxckbs.js": "99c12593e2542c4ec04a9b68d96c292fb36d4f84b1807d62a195d6c579d3d074",
+			"chunks/document-app-qbpfjp9s.js": "bcd963694f25993aa23f9b92fc71d6be6af2504cf851dc7ebd97667614210da5",
+			"chunks/document-app-qenvjegg.js": "4a1ff3ede6df966ddb25938d2e2f328002c97eaafe6493ed7e0b20bfebe879c8",
+			"chunks/document-app-t2c0q4x7.js": "807ba5bba9905e24dc8cadae50667c2824b0be180296a6036382d65906913506",
+			"chunks/document-app-vs6xk76k.js": "bf7a9e209e0027ee9f064848012e21993aae3159138106ae8163e81aee1c3eef",
+			"chunks/document-app-xechpbp6.js": "5e013bd6329830c9fc28415b45f4d3900ca799cd11c5d759fd5c2e110eed80e3",
+			"chunks/document-app-y1hrwemp.js": "f586172f560f028ee72e5b5937847b71d6bd019403b0419bea2b30a4dd6df675",
+			"chunks/document-app-61082287.js": "37410e8eb1371308c5a2ae1a4f7c2d79337a07d5d93ec0a914d1bcfc53a36518",
+			"chunks/document-app-dv2my8cn.js": "8e7881007a0c0115460cdd7940d651f41c8ad8629fb02e7b374a8db56140390d",
+			"chunks/document-app-jyacae6r.js": "493dc93481df1ee552de4dfa74a2deb8244c485874ed5db020db9484711d1845",
+			"chunks/whiteboard-d04qv5j6.js": "57c2fe9cbe44caad562d3606bff5551f0687f2db74660fabaf412cad0c836208"
+		}
+	},
+	"assetProof": "Frozen emitted file hashes and immutable hash-named module graph; no independent cryptographic capture of browser-executed bytes. Fresh profiles for account setup. Browser service workers may serve the same frozen assets.",
+	"accountState": "Both normal versions signed in and connected for normal-confirmed; initial normal.json is exploratory mismatched anonymous main versus connected rewrite and excluded from confirmatory comparison.",
+	"history": "Fresh logical source graphs; subsequent rows append matched test markers and advance history. No per-row backend/profile reset. 1 MiB uses separate accounts/libraries. Traced journeys occur later than untraced journeys; rewrite traced journeys ran polling after transport tests.",
+	"fixtures": "2/32/128 Ki UTF-16 characters of rich Markdown with real line breaks; 1 Mi UTF-16 characters in a long paragraph. Nominal names describe initial source; actual source grows with test edits.",
+	"excludedRuns": [
+		{
+			"file": "journeys-retry.log",
+			"reason": "Aborted entire run because setup CPU overlapped timers; no values used."
+		}
+	],
+	"setupFailures": [
+		{
+			"phase": "main production build gate",
+			"reason": "Seven pre-existing Astro type errors; unchanged astro build generated assets successfully."
+		},
+		{
+			"phase": "main 1 MiB seed",
+			"reason": "Driver 20 s timeout; no second import; later exact source/durable save verified."
+		},
+		{
+			"phase": "Find keyboard close",
+			"reason": "Rewrite Enter handler intercepts native close button Enter; pointer-close corrected for both. Root fixes separately after frozen benchmark."
+		},
+		{
+			"phase": "main switch selector",
+			"reason": "Focus wrapper li did not activate anchor; one corrected native anchor run retained."
+		},
+		{
+			"phase": "1 MiB end-input trace",
+			"reason": "Missing signed profile on reopen then daemon failed to connect on profile launch. No workload trace; existing n=3 input/2RAF data retained."
+		}
+	],
+	"causalUndo": "Multicursor restoration uses whole original source through public editor boundary, not undo; excluded from measured replacement timing.",
+	"scope": "No 20+ writer rerun; previously recorded module capacity evidence is not new browser comparison. No 120 Hz proof from approximately 60 Hz headless rAF."
+}

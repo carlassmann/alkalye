@@ -1,0 +1,294 @@
+[
+	{
+		"trial": 0,
+		"ready": {
+			"coarse": true,
+			"height": 1132659,
+			"nativeCharacters": 8859,
+			"nodes": 14,
+			"sourceCharacters": 1048635,
+			"top": 0
+		},
+		"observation": {
+			"duration": 380.699999988079,
+			"frames": [
+				16.700000000000273, 16.699999999999818, 16.59999999999991,
+				16.700000000000273, 16.59999999999991, 16.800000000000182,
+				16.59999999999991, 16.699999999999818, 16.59999999999991,
+				16.700000000000273, 16.59999999999991, 16.699999999999818,
+				16.700000000000273, 16.59999999999991, 16.699999999999818,
+				16.700000000000273, 16.59999999999991, 16.699999999999818,
+				16.700000000000273, 16.59999999999991, 16.699999999999818,
+				16.700000000000273
+			],
+			"nativeCharacters": 8859,
+			"nodes": 14,
+			"scrolls": 0,
+			"settled": true,
+			"sourceExact": true,
+			"top": 0,
+			"trusted": 8,
+			"wheelEvents": [
+				{
+					"at": 99.30000001192091,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 0
+				},
+				{
+					"at": 132.30000001192093,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 0
+				},
+				{
+					"at": 165.9000000357628,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 0
+				},
+				{
+					"at": 199.30000001192093,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 0
+				},
+				{
+					"at": 231.9000000357628,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 0
+				},
+				{
+					"at": 266.19999998807907,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 0
+				},
+				{
+					"at": 281.19999998807907,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 0
+				},
+				{
+					"at": 299.30000001192093,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 0
+				}
+			],
+			"wheels": 8
+		},
+		"trace": "/tmp/alkalye-fresh-matrix/scroll-original-1024-coarse-0.trace.json"
+	},
+	{
+		"trial": 1,
+		"ready": {
+			"coarse": true,
+			"height": 1132750,
+			"nativeCharacters": 17228,
+			"nodes": 9,
+			"sourceCharacters": 1048635,
+			"top": 565927
+		},
+		"observation": {
+			"duration": 280.0999999642372,
+			"frames": [
+				16.700000000000273, 16.59999999999991, 16.800000000000182,
+				16.59999999999991, 16.59999999999991, 16.699999999999818,
+				16.700000000000273, 16.699999999999818, 16.59999999999991,
+				16.600000000000364, 16.699999999999818, 16.699999999999818,
+				16.600000000000364, 16.699999999999818, 16.699999999999818,
+				16.700000000000273
+			],
+			"nativeCharacters": 17228,
+			"nodes": 9,
+			"scrolls": 0,
+			"settled": true,
+			"sourceExact": true,
+			"top": 565927,
+			"trusted": 8,
+			"wheelEvents": [
+				{
+					"at": 80,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 565927
+				},
+				{
+					"at": 97.29999995231628,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 565927
+				},
+				{
+					"at": 112.69999998807909,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 565927
+				},
+				{
+					"at": 130.5,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 565927
+				},
+				{
+					"at": 147.29999995231628,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 565927
+				},
+				{
+					"at": 163.5999999642372,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 565927
+				},
+				{
+					"at": 179.5999999642372,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 565927
+				},
+				{
+					"at": 197.29999995231628,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 565927
+				}
+			],
+			"wheels": 8
+		},
+		"trace": "/tmp/alkalye-fresh-matrix/scroll-original-1024-coarse-1.trace.json"
+	},
+	{
+		"trial": 2,
+		"ready": {
+			"coarse": true,
+			"height": 1132809,
+			"nativeCharacters": 16146,
+			"nodes": 6,
+			"sourceCharacters": 1048635,
+			"top": 1123946
+		},
+		"observation": {
+			"duration": 265.19999998807907,
+			"frames": [
+				16.600000000000364, 16.699999999999818, 16.699999999999818,
+				16.700000000000273, 16.59999999999991, 16.699999999999818,
+				16.699999999999818, 16.600000000000364, 16.699999999999818,
+				16.699999999999818, 16.600000000000364, 16.699999999999818,
+				16.600000000000364, 16.699999999999818, 16.699999999999818
+			],
+			"nativeCharacters": 16146,
+			"nodes": 6,
+			"scrolls": 0,
+			"settled": true,
+			"sourceExact": true,
+			"top": 1123946,
+			"trusted": 8,
+			"wheelEvents": [
+				{
+					"at": 83,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 1123946
+				},
+				{
+					"at": 99.69999998807909,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 1123946
+				},
+				{
+					"at": 114.60000002384186,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 1123946
+				},
+				{
+					"at": 131.30000001192093,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 1123946
+				},
+				{
+					"at": 148.30000001192093,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 1123946
+				},
+				{
+					"at": 164.69999998807907,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 1123946
+				},
+				{
+					"at": 182.4000000357628,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 1123946
+				},
+				{
+					"at": 199.69999998807907,
+					"deltaMode": 0,
+					"deltaY": 200,
+					"prevented": false,
+					"target": "",
+					"top": 1123946
+				}
+			],
+			"wheels": 8
+		},
+		"trace": "/tmp/alkalye-fresh-matrix/scroll-original-1024-coarse-2.trace.json"
+	}
+]

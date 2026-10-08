@@ -1,0 +1,8 @@
+{
+	"original": {
+		"characters": 1048576,
+		"exact": true,
+		"saved": true,
+		"setupDeadline": "Initial eval timed out; one bounded observable-state probe proved exact source and save. No repeated import."
+	}
+}

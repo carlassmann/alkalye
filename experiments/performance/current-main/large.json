@@ -1,0 +1,83 @@
+{
+	"results": [
+		{
+			"version": "rewrite",
+			"name": "warm document reload",
+			"kb": 1024,
+			"values": [1714.300000011921, 1720.899999976158, 1720.699999988079],
+			"p95Ms": 1720.899999976158,
+			"medianMs": 1720.699999988079,
+			"minMs": 1714.300000011921,
+			"maxMs": 1720.899999976158
+		},
+		{
+			"version": "rewrite",
+			"name": "insert text to paint opportunity",
+			"kb": 1024,
+			"values": [32.89999997615814, 25.599999964237213, 27.099999964237213],
+			"p95Ms": 32.89999997615814,
+			"medianMs": 27.099999964237213,
+			"minMs": 25.599999964237213,
+			"maxMs": 32.89999997615814,
+			"maxFrameCallbackWorkMs": [3.300000011920929, 3, 4.099999964237213],
+			"nativeInputMs": [28.19999998807907, 5.899999976158142, 6.699999988079071]
+		},
+		{
+			"version": "rewrite",
+			"name": "insert at start to paint opportunity",
+			"kb": 1024,
+			"values": [14.100000023841858, 28.900000035762787, 22.80000001192093],
+			"p95Ms": 28.900000035762787,
+			"medianMs": 22.80000001192093,
+			"minMs": 14.100000023841858,
+			"maxMs": 28.900000035762787,
+			"maxFrameCallbackWorkMs": [3, 2.600000023841858, 3.100000023841858],
+			"nativeInputMs": [5.5, 5.600000023841858, 5]
+		},
+		{
+			"version": "rewrite",
+			"name": "insert at middle to paint opportunity",
+			"kb": 1024,
+			"values": [29, 32, 12],
+			"p95Ms": 32,
+			"medianMs": 29,
+			"minMs": 12,
+			"maxMs": 32,
+			"maxFrameCallbackWorkMs": [
+				2.899999976158142, 2.800000011920929, 2.900000035762787
+			],
+			"nativeInputMs": [6.300000011920929, 6.100000023841858, 6.399999976158142]
+		},
+		{
+			"version": "original",
+			"name": "warm document reload",
+			"kb": 1024,
+			"values": [2256.800000011921, 2279.899999976158, 2259.5],
+			"p95Ms": 2279.899999976158,
+			"medianMs": 2259.5,
+			"minMs": 2256.800000011921,
+			"maxMs": 2279.899999976158
+		},
+		{
+			"version": "original",
+			"name": "insert text to paint opportunity",
+			"kb": 1024,
+			"values": [27.30000001192093, 19.100000023841854, 31.30000001192093],
+			"p95Ms": 31.30000001192093,
+			"medianMs": 27.30000001192093,
+			"minMs": 19.100000023841854,
+			"maxMs": 31.30000001192093,
+			"maxFrameCallbackWorkMs": [
+				0.3999999761581421, 0.7000000476837158, 0.7999999523162842
+			],
+			"nativeInputMs": [5.5, 2.900000035762787, 2.800000011920929]
+		}
+	],
+	"failures": [
+		{
+			"version": "original",
+			"kb": 1024,
+			"error": "Error: original wait failed: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n"
+		}
+	]
+}

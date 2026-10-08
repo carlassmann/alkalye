@@ -1,0 +1,127 @@
+{
+	"results": [
+		{
+			"version": "original",
+			"name": "close find panel",
+			"kb": 2,
+			"n": 5,
+			"medianMs": 32,
+			"p95Ms": 33.09999996423721,
+			"values": [
+				24.19999998807907, 26.899999976158146, 33.09999996423721, 32,
+				32.80000001192093
+			]
+		},
+		{
+			"version": "original",
+			"name": "open find panel",
+			"kb": 2,
+			"n": 5,
+			"medianMs": 24.900000035762787,
+			"p95Ms": 32,
+			"values": [
+				24.900000035762787, 23.900000035762787, 32, 24.5, 29.099999964237213
+			]
+		},
+		{
+			"version": "original",
+			"name": "find all reference matches",
+			"kb": 2,
+			"n": 5,
+			"medianMs": 21.299999952316284,
+			"p95Ms": 32.89999997615814,
+			"values": [
+				30.099999964237213, 32.89999997615814, 20.600000023841854, 20,
+				21.299999952316284
+			]
+		},
+		{
+			"version": "original",
+			"name": "open rendered preview",
+			"kb": 2,
+			"n": 5,
+			"medianMs": 50.90000003576279,
+			"p95Ms": 55,
+			"values": [
+				55, 22.30000001192093, 50.90000003576279, 48, 51.60000002384186
+			]
+		},
+		{
+			"version": "original",
+			"name": "close find panel",
+			"kb": 128,
+			"n": 5,
+			"medianMs": 19,
+			"p95Ms": 25.099999964237213,
+			"values": [
+				19, 23.900000035762787, 16.19999998807907, 18.099999964237213,
+				25.099999964237213
+			]
+		},
+		{
+			"version": "original",
+			"name": "open find panel",
+			"kb": 128,
+			"n": 5,
+			"medianMs": 25,
+			"p95Ms": 29.099999964237213,
+			"values": [
+				27.19999998807907, 25, 29.099999964237213, 20.5, 22.700000047683716
+			]
+		},
+		{
+			"version": "original",
+			"name": "find all reference matches",
+			"kb": 128,
+			"n": 5,
+			"medianMs": 25.30000001192093,
+			"p95Ms": 34.39999997615814,
+			"values": [
+				21.100000023841854, 20.100000023841854, 25.30000001192093, 32.5,
+				34.39999997615814
+			]
+		},
+		{
+			"version": "original",
+			"name": "open rendered preview",
+			"kb": 128,
+			"n": 5,
+			"medianMs": 62.5,
+			"p95Ms": 65.40000003576279,
+			"values": [
+				65.40000003576279, 62.5, 61.19999998807907, 62, 63.89999997615814
+			]
+		},
+		{
+			"version": "rewrite",
+			"name": "switch existing128KiB document",
+			"kb": 128,
+			"n": 5,
+			"medianMs": 82.30000001192093,
+			"p95Ms": 241.10000002384183,
+			"values": [
+				241.10000002384183, 91.30000001192091, 70.30000001192093,
+				68.39999997615814, 82.30000001192093
+			]
+		}
+	],
+	"failures": [
+		{
+			"version": "rewrite",
+			"phase": "find and preview",
+			"kb": 2,
+			"error": "Error: fresh-rewrite wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n"
+		},
+		{
+			"version": "rewrite",
+			"phase": "find and preview",
+			"kb": 128,
+			"error": "Error: fresh-rewrite wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n"
+		},
+		{
+			"version": "original",
+			"phase": "switch",
+			"error": "Error: fresh-main wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n"
+		}
+	]
+}
