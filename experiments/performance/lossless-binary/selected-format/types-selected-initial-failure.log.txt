@@ -1,0 +1,9 @@
+lossless-session.test.ts(107,80): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(expected: Uint8Array<ArrayBuffer>): void', gave the following error.
+    Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'Uint8Array<ArrayBuffer>'.
+      Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+        Property 'resize' is missing in type 'SharedArrayBuffer' but required in type 'ArrayBuffer'.
+  Overload 2 of 2, '(expected: NoInfer<Uint8Array<ArrayBuffer>>): void', gave the following error.
+    Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'Uint8Array<ArrayBuffer>'.
+      Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+        Property 'resize' is missing in type 'SharedArrayBuffer' but required in type 'ArrayBuffer'.

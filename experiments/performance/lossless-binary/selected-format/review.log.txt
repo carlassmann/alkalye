@@ -1,0 +1,38 @@
+I found 3 blockers and 6 smaller improvements. Production adoption is not recommended yet. I read the code only: no commands, builds or tests. `node_modules` isn't installed, so I couldn't check Effect's `SchemaBinary` source myself. I relied on the experiment README, which says lone surrogates become U+FFFD.
+
+## What checks out
+- **Regex:** `/[\uD800-\uDFFF]/u` is correct. With the `u` flag, a valid pair is read as one code point, so only lone surrogates match. It has no `g` flag, so reusing it at module level is safe.
+- **No missed fields:** every free string in the action, recording and workspace schemas is checked. Fields not checked are pattern-limited (`IdentifierSchema`, `TextOperationIdSchema`, `TextAtomIdSchema`, guard `state`, `themeLibrary`, `digest`) or literals or numbers. Preference values go through `JSON.stringify` (`preferences.ts:69`), and so do metadata and links. Fingerprints hash JSON, which escapes lone surrogates.
+- **Handlers and decoders line up:** each new `*Json` tag has a handler. Session `decode` picks the codec by tag (`document-session.ts:1992`).
+- **SQL:** `COALESCE(x_json, json_quote(x))` plus `fromJsonString(Schema.String)` gives the exact value back. Both columns are `NOT NULL` (excerpt defaults to `''`), so `json_quote(NULL)` can't happen. All three name reads and the one excerpt read use it, and so does the deletion `NameMismatch` comparison.
+- **Wire:** the transport is JSON, so nothing is lost there.
+
+## Blockers
+1. **Stale code can't read new entries.** Old code fails on a `DocumentRecordedJson` entry ("Unknown document journal entry") and can't decode `*Json` server rows. Two cases:
+   - An old tab and a new tab share the same IndexedDB during a service-worker update.
+   - A server rollback after any `*Json` write leaves that history unreadable.
+   Needs a cutover decision before adoption: force stale tabs to reload, or ship the readers one release before the writers.
+2. **Formatting will fail `bun run check`.** These lines are long one-liners with single-space indents in tab-indented files: `document-actions.ts:793-798`, `workspace.ts:158-166`, `document-session.ts:247,254,333,1992,2023-2033`, `document-store.ts:300`, `workspace-projection.ts:38,232,567`. The test file uses 4-space indents.
+3. **The new test hasn't been run.** `lossless-session.test.ts` sits at the repo root, not in `tests/`, and it's unexecuted.
+
+## Smaller improvements
+- **Server reads ignore the event tag.** `document-store.ts:300`/`2824` and `workspace-projection.ts:78`/`615` try the JSON codec first. Every normal (legacy) row gets decoded twice, which costs real time on history reads of large actions. Fix: select `j.event` and dispatch like the session does, or at least put the legacy codec first.
+- **`!value.isWellFormed()`** does the same check natively and should be cheaper than the regex. It matters because every write scans each string once more, including `opened` `snapshot.state` and 2 MB values.
+- **Three handlers are copy-pasted** (`document-store.ts:354/401`, `448/463`, `478/522`, about 45 lines each). Extract one function per pair so the two tags can't drift apart.
+- **Excerpt split:** `.slice(0, 72)` at `workspace-projection.ts:491` can cut an emoji in half. That creates a lone surrogate from valid text, so the JSON path will be common for emoji-heavy documents, and the library shows half an emoji. This predates the draft; a separate fix should cut on code-point boundaries.
+- **Migration 011** doesn't check `pragma_table_info` first, unlike 007/008. It's also not backfilled, which is fine: old values that were already lost can't be recovered.
+- **Drift risk:** the hand-written checks duplicate the schemas. A new string field would silently fall back to the lossy path. Guard it with a public test (below), not a recursive scanner.
+
+## Missing public tests
+- Withdrawing an action that contains a lone surrogate (`DocumentWithdrawnJson`), then checking that its operation ids stay reserved.
+- Checked-in byte fixtures written by the old code for `DocumentChanged`, `WorkspaceChanged` and `DocumentRecorded`, read by the new readers. The current test only round-trips bytes the new code wrote.
+- A server reopening a populated database from before migration 011: migration runs and legacy names and excerpts read back exactly.
+- Every field of a fully populated action and fact set to a lone surrogate, each producing a JSON tag. This is the drift guard.
+- Emoji-only edits producing only legacy tags (assert per step; today the test only checks that some legacy rows exist).
+- `rejected` and `received` recordings with lone surrogates, surviving a journal reopen.
+- A preference name with a lone surrogate, showing up as owner and member name.
+- An emoji at the 72-character excerpt boundary.
+- An old-code reader hitting a `*Json` entry fails with a typed error, to document the cutover behaviour.
+
+
+Irrelevant connector authorization notice omitted; review used no connectors.

@@ -1,0 +1,166 @@
+import { requiresLosslessEncoding } from "./utf16"
+import * as Context from "effect/Context"
+import * as Schema from "effect/Schema"
+import { IdentifierSchema } from "./model"
+import { DocumentMetadataSchema } from "./document-metadata"
+import { PreferencePatchSchema } from "./preferences"
+export let personalWorkspaceRequest = "personal-v1"
+// `access:public` lets any signed-in account read a document by its link.
+// Account subjects are digests, so this member name can never be a person.
+export let publicMember = "public"
+// 32 random bytes or their SHA-256 digest, both in unpadded base64url.
+export let InvitationDigestSchema = Schema.String.check(
+	Schema.isPattern(/^[\w-]{42}[AEIMQUYcgkosw048]$/),
+)
+
+// A space's avatar: a small square image, kept inline so libraries stay
+// complete offline.
+export let WorkspaceAvatarSchema = Schema.String.check(
+	Schema.isMaxLength(120_000),
+	Schema.isPattern(
+		/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/,
+	),
+)
+export let WorkspaceChangeSchema = Schema.Union([
+	Schema.Struct({
+		kind: Schema.Literal("preferences"),
+		patch: PreferencePatchSchema,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("renamed"),
+		name: Schema.NonEmptyString,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("created"),
+		name: Schema.NonEmptyString,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("avatar"),
+		image: Schema.NullOr(WorkspaceAvatarSchema),
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("membership"),
+		member: IdentifierSchema,
+		role: Schema.NullOr(Schema.Literals(["writer", "reader"])),
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("documentAdded"),
+		document: IdentifierSchema,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("invitationCreated"),
+		invitation: IdentifierSchema,
+		document: Schema.NullOr(IdentifierSchema),
+		role: Schema.Literals(["writer", "reader"]),
+		digest: InvitationDigestSchema,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("invitationAccepted"),
+		invitation: IdentifierSchema,
+		member: IdentifierSchema,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("invitationRevoked"),
+		invitation: IdentifierSchema,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("invitationLeft"),
+		invitation: IdentifierSchema,
+		member: IdentifierSchema,
+	}),
+	Schema.Struct({
+		kind: Schema.Literal("documentMoved"),
+		document: IdentifierSchema,
+		from: IdentifierSchema,
+	}),
+	// A tombstone: the journal keeps the workspace's history for audit, while
+	// the projection stops granting any access through it.
+	Schema.Struct({ kind: Schema.Literal("deleted") }),
+])
+export let WorkspaceFactSchema = Schema.Struct({
+	id: Schema.NonEmptyString,
+	workspace: IdentifierSchema,
+	subject: IdentifierSchema,
+	change: WorkspaceChangeSchema,
+})
+export type WorkspaceFact = typeof WorkspaceFactSchema.Type
+export class WorkspaceDeletionRefused extends Schema.TaggedError<WorkspaceDeletionRefused>()(
+	"WorkspaceDeletionRefused",
+	{
+		reason: Schema.Literals(["Personal", "NameMismatch"]),
+		message: Schema.String,
+	},
+) {}
+export type AccessRole = "owner" | "writer" | "reader"
+export interface AccessAuthority {
+	workspaces: "all" | ReadonlyArray<string>
+	ceiling: AccessRole
+}
+export let AccessRoleSchema = Schema.Literals(["owner", "writer", "reader"])
+export class Identity extends Context.Service<
+	Identity,
+	{ subject: string; actors: ReadonlyArray<string>; access?: AccessAuthority }
+>()("WorkspaceIdentity") {}
+export let SidebarDocumentSchema = Schema.Struct({
+	document: IdentifierSchema,
+	workspace: IdentifierSchema,
+	owner: IdentifierSchema,
+	log: IdentifierSchema,
+	position: Schema.Natural,
+	deleted: Schema.Boolean,
+	metadata: DocumentMetadataSchema,
+})
+export type SidebarDocument = typeof SidebarDocumentSchema.Type
+export let MembershipSchema = Schema.Struct({
+	member: IdentifierSchema,
+	role: Schema.Literals(["writer", "reader"]),
+})
+export let WorkspaceMemberSchema = Schema.Struct({
+	...MembershipSchema.fields,
+	name: Schema.optionalKey(Schema.String),
+	source: Schema.optionalKey(Schema.Literals(["direct", "invitation", "both"])),
+})
+export let WorkspaceSnapshotSchema = Schema.Struct({
+	workspace: IdentifierSchema,
+	name: Schema.String,
+	owner: IdentifierSchema,
+	position: Schema.Natural,
+	avatar: Schema.optionalKey(WorkspaceAvatarSchema),
+	ownerName: Schema.optionalKey(Schema.String),
+	members: Schema.Array(WorkspaceMemberSchema),
+	documents: Schema.Array(SidebarDocumentSchema),
+})
+export type WorkspaceSnapshot = typeof WorkspaceSnapshotSchema.Type
+export let LibraryWorkspaceSchema = Schema.Struct({
+	workspace: IdentifierSchema,
+	name: Schema.String,
+	owner: IdentifierSchema,
+	position: Schema.Natural,
+	role: AccessRoleSchema,
+	avatar: Schema.optionalKey(WorkspaceAvatarSchema),
+})
+export let LibraryDocumentSchema = Schema.Struct({
+	...SidebarDocumentSchema.fields,
+	role: AccessRoleSchema,
+	kind: Schema.Literals(["document", "slides", "whiteboard"]),
+	excerpt: Schema.String,
+	updated: Schema.Natural,
+	created: Schema.Natural,
+	links: Schema.optionalKey(Schema.Array(Schema.String)),
+})
+export let LibrarySnapshotSchema = Schema.Struct({
+	workspaces: Schema.Array(LibraryWorkspaceSchema),
+	documents: Schema.Array(LibraryDocumentSchema),
+})
+export type LibrarySnapshot = typeof LibrarySnapshotSchema.Type
+export type LibraryDocument = typeof LibraryDocumentSchema.Type
+
+export function factRequiresLosslessEncoding(fact: WorkspaceFact) {
+ if(requiresLosslessEncoding(fact.id)) return true
+ let change = fact.change
+ switch(change.kind) {
+ case "created": case "renamed": return requiresLosslessEncoding(change.name)
+ case "preferences": return requiresLosslessEncoding(change.patch.name ?? "") || requiresLosslessEncoding(change.patch.editor?.syntaxTheme ?? "") || requiresLosslessEncoding(change.patch.editor?.previewTheme ?? "") || requiresLosslessEncoding(change.patch.editor?.slideshowTheme ?? "")
+ case "avatar": case "membership": case "documentAdded": case "invitationCreated": case "invitationAccepted": case "invitationRevoked": case "invitationLeft": case "documentMoved": case "deleted": return false
+ }
+}

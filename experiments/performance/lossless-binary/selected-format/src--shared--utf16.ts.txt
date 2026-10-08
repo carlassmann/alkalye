@@ -1,0 +1,4 @@
+let unpairedSurrogate = /[\uD800-\uDFFF]/u
+export function requiresLosslessEncoding(value: string) {
+ return unpairedSurrogate.test(value)
+}
