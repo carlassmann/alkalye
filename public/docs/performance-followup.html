@@ -1400,6 +1400,46 @@
 			budget. Evidence and trace hashes live in
 			<code>experiments/performance/interaction-matrix</code>.
 		</p>
+		<h2>Two real browser writers</h2>
+		<p>
+			One production <code>1b630c8</code> pilot used two independent accounts
+			and browser profiles editing a shared 2KiB document. Writer grants, named
+			remote cursors and trusted native input passed. Both editors and an
+			independently reconstructed HTTP snapshot converged exactly, preserving
+			the starting source and both additions.
+		</p>
+		<p>
+			The primary browser's input task took 2.062ms; its largest task over three
+			seconds took 3.389ms. Peer source updates were observed on frame
+			opportunities after 67.0ms and 72.7ms. These timestamps do not prove
+			completed paint or server commit latency. Twenty browser writers,
+			sustained typing and large shared documents remain unmeasured. The earlier
+			twenty-writer HTTP workload does not cover those browser costs.
+		</p>
+		<p>
+			The full trace, source receipts and limitations live in
+			<code>experiments/performance/two-browser-writers</code>. Asset inventory
+			missed dynamic document imports; their build hashes are recorded
+			separately and are not proof of executed bytes.
+		</p>
+		<h2>Worker recovery remains a production blocker</h2>
+		<p>
+			The latest outside prototype passed 64 native safety assertions and a
+			separate 13-assertion termination rerun. Actual thread termination
+			produced no error event; a receipt deadline retained the unacknowledged
+			native draft. The independent server oracle allowed either an acknowledged
+			prefix or the exact once-applied draft, without determining which branch
+			occurred.
+		</p>
+		<p>
+			Final Opus review still rejected this prototype for production. Recovery
+			does not guard every exposed command, some RPCs can hang, and the recovery
+			ledger is only in memory. Adoption can race scoped Close. Actual
+			BrowserLibrary integration, separate-account revocation, offline reopening
+			and complete editor behavior remain required. Production document sessions
+			still run on the main thread. Evidence:
+			<code>experiments/worker-session/browser-library-safety</code>.
+		</p>
 		<footer>written with gpt-6 in codex</footer>
 	</body>
 </html>
