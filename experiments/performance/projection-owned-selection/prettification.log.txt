@@ -1,0 +1,49 @@
+http://localhost:63259/app
+PASS Cancelled pointer drags resume native editing and syntax painting
+PASS inactive links and wiki-links collapse in the textarea and its overlay alike
+PASS saving and reopening keeps the Markdown source, not the projection
+PASS compact web links retain native anchor semantics and their destination
+PASS Each visible compact-link fragment is directly actionable with one keyboard stop per link
+PASS link hover recolors the existing underline without adding another
+PASS wiki hover recolors the existing underline without adding another
+PASS media hover recolors the existing underline without adding another
+PASS Leaving a link restores its underline color
+PASS compact link hit areas follow text wrapping after a viewport resize
+PASS repainting compact links preserves keyboard focus
+PASS Shift-click extends source selection without opening the link
+PASS a caret in a resolved wiki label stays empty in source coordinates
+PASS compact links retain the editor context menu
+PASS clicking a compact wiki-link opens its document
+PASS source selections inside hidden destinations reveal the link
+PASS links stay compact when the cursor is elsewhere on their line
+PASS moving the caret into a link shows its Markdown
+PASS leaving the link collapses it on the same line
+PASS typing elsewhere edits the source while links stay collapsed
+PASS undo restores the exact source
+PASS edits on a raw link line are kept when it collapses
+PASS composition keeps the textarea unchanged
+PASS composition end reprojects around the caret's source offset
+PASS composition end accepts final native text before the final input event
+PASS a pointer drag keeps the text under it
+PASS copying collapsed text puts its Markdown source on the clipboard
+PASS releasing the pointer expands the selected lines and keeps the selection
+PASS cutting collapsed text removes its whole Markdown source
+PASS multiple selections show raw Markdown
+PASS clearing extra selections collapses links again
+PASS select-all-occurrences switches both the native textarea and overlay to source
+PASS find matches text inside hidden link destinations
+PASS replace edits the source of a link
+PASS line actions read the source of the current line
+PASS remote edits keep the local source selection and collapsed links
+PASS source navigation scrolls to its projected position below many compact links
+PASS Small mobile text reserves icon space while wrapping stays aligned with the textarea
+PASS A broken document link cannot navigate to a missing document
+PASS Clicking a broken document label reveals its source for editing
+PASS Unicode caret round-trips through the editor's source API
+PASS Deleting synthetic icon space preserves valid source across a durable reload
+PASS Unicode caret round-trips through the editor's source API
+PASS Deleting synthetic icon space preserves valid source across a durable reload
+PASS Large wrapped documents keep native input and visible syntax aligned
+PASS Inserting lines before thousands of links preserves visible offsets and wrapping
+PASS Focused links keep their destination while scrolling, and Tab reaches offscreen links
+PASS Wrapped bidirectional links retain separate actionable fragments and one keyboard stop

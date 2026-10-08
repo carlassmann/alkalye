@@ -1,0 +1,325 @@
+import { TextIndex } from "../shared/text-index"
+import type { DocumentLink } from "../shared/model"
+import {
+	applyViewReplacement,
+	sourceRange,
+	identity,
+	Projector,
+	sameProjection,
+	toSource,
+	toView,
+} from "../shared/projection"
+import type { Projection } from "../shared/projection"
+import { EditorViewport } from "./editor-viewport"
+
+export type ProjectionMode = "project" | "raw" | "hold"
+export interface SourceTextareaOptions {
+	documents(): readonly DocumentLink[]
+	mode(): ProjectionMode
+	caretTop(): number | undefined
+	painted(): void
+	fullDocument?: boolean
+}
+export interface SourceReplacement {
+	start: number
+	remove: number
+	text: string
+}
+type Direction = "forward" | "backward" | "none"
+
+// The native textarea shows a projection with inactive links collapsed. Every
+// offset and value read or written here is in Markdown source coordinates.
+export class SourceTextarea {
+	readonly element: HTMLTextAreaElement
+	readonly viewport: EditorViewport
+	readonly sourceIndex: TextIndex
+	private pending: SourceReplacement[] | undefined
+	private transaction = false
+	private inputBase: string
+	private options: SourceTextareaOptions
+	private current: Projection
+	private projector = new Projector()
+	private projected:
+		| {
+				source: string
+				start: number
+				end: number
+				documents: string
+				mode: ProjectionMode
+				value: Projection
+		  }
+		| undefined
+
+	constructor(
+		element: HTMLTextAreaElement,
+		source: string,
+		options: SourceTextareaOptions,
+	) {
+		this.element = element
+		this.options = options
+		this.sourceIndex = new TextIndex(source)
+		this.current = identity(source)
+		this.inputBase = source
+		let ready = false
+		this.viewport = new EditorViewport(element, source, {
+			fullDocument: options.fullDocument,
+			painted: () => {
+				if (ready) options.painted()
+			},
+		})
+		ready = true
+	}
+	get projection() {
+		return this.current
+	}
+	get value() {
+		return this.current.source
+	}
+	set value(source: string) {
+		this.render(source, { start: source.length, end: source.length })
+	}
+	get selectionStart() {
+		return toSource(this.current, this.viewport.selectionStart, "start")
+	}
+	get selectionEnd() {
+		if (this.viewport.selectionStart === this.viewport.selectionEnd)
+			return this.selectionStart
+		return Math.max(
+			this.selectionStart,
+			toSource(this.current, this.viewport.selectionEnd, "end"),
+		)
+	}
+	get selectionDirection() {
+		return this.viewport.selectionDirection
+	}
+	get readOnly() {
+		return this.element.readOnly
+	}
+	focus() {
+		this.viewport.focus()
+	}
+	dispatchEvent(event: Event) {
+		return this.element.dispatchEvent(event)
+	}
+	toView(offset: number) {
+		return toView(this.current, offset)
+	}
+	toSource(offset: number, bias: "start" | "end" = "start") {
+		return toSource(this.current, offset, bias)
+	}
+	setSelectionRange(start: number, end: number, direction?: Direction) {
+		this.render(this.current.source, { start, end, direction }, true)
+	}
+	setRangeText(
+		text: string,
+		start = this.selectionStart,
+		end = this.selectionEnd,
+		mode: SelectionMode = "preserve",
+	) {
+		let selection = { start: this.selectionStart, end: this.selectionEnd }
+		this.record({ start, remove: end - start, text })
+		let source =
+			this.current.source.slice(0, start) +
+			text +
+			this.current.source.slice(end)
+		let next = start + text.length
+		if (mode === "select") selection = { start, end: next }
+		else if (mode === "start") selection = { start, end: start }
+		else if (mode === "end") selection = { start: next, end: next }
+		else {
+			let shift = text.length - (end - start)
+			let adjust = (offset: number) =>
+				offset >= end ? offset + shift : offset > start ? start : offset
+			selection = {
+				start: adjust(selection.start),
+				end: adjust(selection.end),
+			}
+		}
+		this.render(source, selection)
+	}
+	replace(
+		source: string,
+		start: number,
+		end = start,
+		replacements?: SourceReplacement[],
+	) {
+		if (source !== this.current.source) {
+			this.pending = replacements ?? [difference(this.current.source, source)]
+			this.transaction = Boolean(replacements)
+		}
+		this.render(source, { start, end })
+	}
+	reconcile(source: string, start: number, end = start) {
+		this.pending = undefined
+		this.transaction = false
+		this.inputBase = source
+		this.render(source, { start, end })
+	}
+	input() {
+		let reprojected = false
+		let caret = this.selectionEnd
+		for (let edit of this.viewport.input()) {
+			let range = sourceRange(this.current, edit.start, edit.end)
+			this.sourceIndex.replace({
+				start: range.start,
+				end: range.end,
+				insert: edit.insert,
+			})
+			this.record({
+				start: range.start,
+				remove: range.end - range.start,
+				text: edit.insert,
+			})
+			let expectedLength =
+				this.current.text.length + edit.insert.length - (edit.end - edit.start)
+			caret = range.start + edit.insert.length
+			this.current = applyViewReplacement(
+				this.current,
+				edit.start,
+				edit.end,
+				edit.insert,
+			)
+			reprojected ||= this.current.text.length !== expectedLength
+		}
+		if (reprojected)
+			this.viewport.render(this.current.text, {
+				start: toView(this.current, caret),
+				end: toView(this.current, caret),
+			})
+		else this.viewport.acknowledge(this.current.text)
+		this.options.painted()
+		return this.current.source
+	}
+	takeReplacements() {
+		let replacements = this.pending
+		if (this.current.source === this.inputBase) replacements = []
+		else if (!replacements || (!this.transaction && replacements.length > 1))
+			replacements = [difference(this.inputBase, this.current.source)]
+		this.pending = undefined
+		this.transaction = false
+		this.inputBase = this.current.source
+		return replacements
+	}
+	fullDocument(enabled: boolean) {
+		this.viewport.fullDocument(enabled)
+	}
+	dispose() {
+		this.viewport.dispose()
+	}
+	private record(edit: SourceReplacement) {
+		if (!this.pending) this.pending = []
+		this.pending.push(edit)
+	}
+	// Reprojects when the selection moved to other tokens or document titles
+	// changed. Returns whether the textarea was rewritten.
+	sync() {
+		if (this.options.mode() === "hold") return false
+		let selection = {
+			start: this.selectionStart,
+			end: this.selectionEnd,
+			direction: this.viewport.selectionDirection,
+		}
+		let next = this.projectionFor(this.current.source, selection)
+		if (sameProjection(next, this.current)) return false
+		this.apply(next, selection)
+		return true
+	}
+	private render(
+		source: string,
+		selection: { start: number; end: number; direction?: Direction },
+		reveal = false,
+	) {
+		let length = source.length
+		let bounded = {
+			start: Math.max(0, Math.min(length, selection.start)),
+			end: Math.max(0, Math.min(length, selection.end)),
+			direction: selection.direction,
+		}
+		this.apply(this.projectionFor(source, bounded), bounded, reveal)
+	}
+	private projectionFor(
+		source: string,
+		active: { start: number; end: number },
+	) {
+		let mode = this.options.mode()
+		let documents = this.options.documents()
+		let key = documents
+			.map(document => document.id + ":" + document.title)
+			.join("\n")
+		let previous = this.projected
+		if (
+			previous &&
+			previous.source === source &&
+			previous.start === active.start &&
+			previous.end === active.end &&
+			previous.documents === key &&
+			previous.mode === mode
+		)
+			return previous.value
+		let value =
+			mode === "raw" || !source.includes("[")
+				? identity(source)
+				: this.projector.project(source, { active, documents, iconSpace: true })
+		this.projected = {
+			source,
+			start: active.start,
+			end: active.end,
+			documents: key,
+			mode,
+			value,
+		}
+		return value
+	}
+	private apply(
+		next: Projection,
+		selection: { start: number; end: number; direction?: Direction },
+		reveal = false,
+	) {
+		if (next.source !== this.current.source) {
+			let edit = difference(this.current.source, next.source)
+			this.sourceIndex.replace({
+				start: edit.start,
+				end: edit.start + edit.remove,
+				insert: edit.text,
+			})
+		}
+		this.current = next
+		this.viewport.render(
+			next.text,
+			{
+				start: toView(next, selection.start),
+				end: toView(next, selection.end),
+				direction: selection.direction,
+			},
+			{ revealSelection: reveal },
+		)
+		this.options.painted()
+	}
+}
+
+function difference(before: string, after: string): SourceReplacement {
+	let start = 0
+	while (
+		start < before.length &&
+		start < after.length &&
+		before[start] === after[start]
+	)
+		start++
+	let end = before.length,
+		nextEnd = after.length
+	while (
+		end > start &&
+		nextEnd > start &&
+		before[end - 1] === after[nextEnd - 1]
+	) {
+		end--
+		nextEnd--
+	}
+	if (start && /[\uDC00-\uDFFF]/.test(before[start] ?? after[start] ?? ""))
+		start--
+	if (/[\uDC00-\uDFFF]/.test(before[end] ?? "")) {
+		end++
+		nextEnd++
+	}
+	return { start, remove: end - start, text: after.slice(start, nextEnd) }
+}

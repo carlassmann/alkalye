@@ -1,0 +1,20 @@
+**Verdict: no correctness blockers.** The reuse is safe to land with narrow wording. I did a read-only review: no shell, tests or browser.
+
+**Source checks (all pass)**
+- **`sameActiveTokens`** (`projection.ts:49-86`): both binary searches assume tokens are sorted with strictly increasing ends. That holds, because `lineTokens` skips past each token's end and lines are in order. Adjacent tokens (one ends where the next starts) still count as touched, the same rule `projectTokens` uses. An empty touched set always maps to `{0,0}`, so two empty sets match. NaN misses, and Infinity is clamped by `selectionBounds`.
+- **Document titles:** whether a token exists doesn't depend on `documents` (an unknown wiki target still makes a broken token). The caller compares the document key before trusting token positions, so a retitle always reprojects.
+- **Projector vs cached projection:** they stay in sync because only `projectionFor` calls the projector, and it always updates `projected`. Sources without `[` skip the projector and miss safely, since the projector can't hold an identical source.
+- **Text edits:** `input()` swaps `current` without touching `projected`. A source change misses. For A→B→A, the cached projection for A is reused; its content is deterministic and the projector still holds A, so this is correct. No link objects are mutated: `applyViewReplacement` and `moved` build new ones.
+- **Updating start/end on a hit** (`source-textarea.ts:261`): safe, because "same touched tokens" is an equivalence, so chaining hits doesn't drift.
+- **`hold` / `raw` modes:** `hold` renders identical content. `raw` only reuses on an exact start/end match, which is conservative and correct.
+
+**Wording to narrow (evidence vs claim)**
+1. **"Middle" isn't inside a link.** `prepare("middle")` puts the caret at row start + 2, inside "Paragraph", so no link is touched before or after. Label it "plain text, no link touched". Only "end" (`[Ex|ample`) is the inside-active-link case.
+2. **Position order is fixed.** "end" always runs right after "middle" on the same page load. Arm order alternates, position order doesn't, so say position is confounded with warm-up order.
+3. **Boundary crossing wasn't timed.** The plan wanted a separate link-boundary-crossing timing; the timing cells only cover moves that keep the same touched links. The crossing path has correctness evidence (the corpus and native tests), but don't claim it's no slower.
+4. **`mappedExact` isn't independent.** It checks the native caret against `toView` of that same projection. It shows the textarea and projection agree, not that the overlay or link layout is right.
+5. **Don't cite `duration`.** It runs from keydown to two animation frames later and sits around 18-34ms, so it's frame-bound and says nothing about either arm.
+6. **Sample size.** With n=3 per cell, the 1MiB result is a "consistent drop in median main-thread task time". 128KiB is inconclusive. Keep the "no frame over 8.333ms" result scoped to these 12 candidate cells, with no claim about 120Hz in the full app.
+7. **Allocation remains a hypothesis.** There was no GC or heap measurement, so describe the win as skipping `projectTokens` assembly, which is supported by the task-time drop, not as an allocation or GC reduction.
+
+Bundle hashes match `bundle-hashes.json` (checked baseline and candidate rows at 128KiB).

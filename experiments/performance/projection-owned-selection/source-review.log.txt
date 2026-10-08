@@ -1,0 +1,40 @@
+**No correctness blockers found.** The caches stay in sync and the readonly getter works with every consumer. One possible gate blocker is formatting, plus two gaps in what the slice saves.
+
+**Cache staleness: none found**
+- **Projector state matches the cache.** `Projector.project` is only called from `projectionFor`, which always overwrites `projected` right after. So when a cache entry came from `project`, the projector holds that same source.
+  - In project/hold mode, identity entries only happen for sources without `[`.
+  - The projector only ever holds sources containing `[`, so `source !== this.source` correctly rejects those.
+- **Documents:** token positions don't depend on documents; only labels and broken flags do. The `previous.documents === key` guard covers those.
+- **Editing / undo / A-B-A:** `input()` swaps in a new `current` without touching `projected` or the projector. Going back to source A reuses the cached A projection, and nothing in the chain mutates it:
+  - `applyViewReplacement` and `moved` build new objects.
+  - Untouched links are shared by reference but never mutated.
+  - Baseline already did this with exact-selection reuse, so there's no new aliasing class.
+- **Raw ↔ hold ↔ project:** the mode guard forces a recompute. Hold mode behaves like project mode in `render`.
+- **Token boundaries:** tokens are sorted and don't overlap; adjacent links can share a boundary, and ends never decrease, so both binary searches are valid. The first finds the first token with `end >= selection.start`, the second the first with `start > selection.end`. Together they match `projectTokens`' inclusive exclusion exactly.
+  - Adjacent links: a caret exactly on the shared boundary activates both links, handled correctly.
+  - Fences: literal lines produce no tokens, so they're already excluded.
+  - Unicode: UTF-16 offsets are used consistently.
+- **Empty sets:** if no tokens are touched, the full projection is the same everywhere, so normalizing to the same range is sound.
+- **Selection edge cases:** NaN fails the exact-match check, then `sameActiveTokens` returns false, so it recomputes. `selectionBounds` orders reversed ranges. Updating `previous.start/end` on reuse is sound because the token set is the same.
+
+**Readonly getter: compatible**
+- Consumers only read it:
+  - `editor.ts:603-645`, `:730`, `:1148`
+  - `editor-overlay.ts:52-77`
+  - Matches in `tests/` are a different `.projection`.
+- The protection is weak:
+  - It's shallow: the `links` array and link objects are still mutable.
+  - TS lets readonly properties be assigned to a mutable `Projection`, so `overlay.update(text.projection)` compiles without complaint. Treat it as documentation, which is fine.
+- Side effect: the overlay's identity check (`editor-overlay.ts:70`) will now skip rebuilds when `setSelectionRange` moves within the same tokens. That's correct because the content is identical, but it's a real behavior change and belongs in the measurement.
+
+**Blockers and gaps**
+1. **Formatting (possible blocker):** `source-textarea.ts:257` and the NaN guard in `projection.ts:56-59` look unformatted and over-width, so they will probably fail the format step of `bun run check`.
+2. **Remaining allocation:** every call still runs `options.documents()` plus a `map().join` for the key. That may outweigh the projection allocation you're removing, and should be measured separately. A cheap fix is caching the key by array identity.
+3. **Documents without links get no benefit,** probably the most common case:
+   - Project mode on a source without `[` returns a new `identity()` on every selection move, because `sameActiveTokens` rejects it via the source mismatch.
+   - Raw mode is limited to exact-selection reuse, even though identity is valid for any selection.
+   - Reusing whenever the previous value was identity and source/mode/key match would be safe and simple.
+4. **API design:** `sameActiveTokens` is public, which exposes internal cache state. Its optional `left`/`right` path is never used by `SourceTextarea`. Minor.
+5. **No tests in the candidate:** it needs a journey or module test covering caret moves inside, onto and between links, adjacent links, and undo back to a cached source.
+
+Performance is still unmeasured, so no production adoption.

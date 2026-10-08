@@ -1,0 +1,71 @@
+let candidate = await Bun.file("src/shared/projection.ts").text()
+let baseline = await Bun.file("../baseline-projection.ts.txt").text()
+let candidateTextarea = await Bun.file("src/client/source-textarea.ts").text()
+let baselineTextarea = await Bun.file(
+	"../baseline-source-textarea.ts.txt",
+).text()
+let bundles: Record<string, Blob> = {}
+let hashes: Record<string, string> = {}
+try {
+	for (let [name, source] of [
+		["baseline", baseline],
+		["candidate", candidate],
+	]) {
+		if (!name || !source) throw Error("Missing arm")
+		await Bun.write("src/shared/projection.ts", source)
+		await Bun.write(
+			"src/client/source-textarea.ts",
+			name === "baseline" ? baselineTextarea : candidateTextarea,
+		)
+		let built = await Bun.build({
+			entrypoints: ["selection-fixture.ts"],
+			target: "browser",
+			minify: true,
+			sourcemap: "none",
+		})
+		if (!built.success)
+			throw new AggregateError(built.logs, "Selection fixture failed")
+		let script = built.outputs[0]
+		if (!script) throw Error("Missing bundle")
+		bundles[name] = script
+		let bytes = await script.arrayBuffer()
+		hashes[name] = new Bun.CryptoHasher("sha256").update(bytes).digest("hex")
+		await Bun.write(
+			"/tmp/alkalye-projection-allocation/" + name + ".js",
+			script,
+		)
+	}
+} finally {
+	await Bun.write("src/shared/projection.ts", candidate)
+	await Bun.write("src/client/source-textarea.ts", candidateTextarea)
+}
+let style = await Bun.file("src/client/components/editor.css").text()
+let viewport = await Bun.file(
+	"src/client/components/editor-viewport.css",
+).text()
+let server = Bun.serve({
+	port: 0,
+	fetch(request) {
+		let url = new URL(request.url)
+		let arm = url.searchParams.get("arm") ?? "baseline"
+		if (url.pathname === "/fixture.js")
+			return new Response(bundles[arm], {
+				headers: { "Content-Type": "text/javascript" },
+			})
+		return new Response(
+			`<!doctype html><style>:root{--mono:monospace;--foreground:#111;--background:#fff}*{box-sizing:border-box}html,body{height:100%;margin:0}alkalye-editor{display:block;height:800px}${style}${viewport}</style><script type="module" src="/fixture.js?arm=${arm}"></script>`,
+			{ headers: { "Content-Type": "text/html" } },
+		)
+	},
+})
+await Bun.write(
+	"/tmp/alkalye-projection-allocation/bundle-hashes.json",
+	JSON.stringify(hashes, null, 2),
+)
+console.log(server.url.href)
+process.once("SIGTERM", () => {
+	server.stop(true)
+	process.exit(0)
+})
+
+export {}

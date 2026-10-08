@@ -1,0 +1,86 @@
+{
+	"baseline": "production f094700 token-cache slice; copied tree679da31 with three relevant files compared byte-identical to current production before experiment",
+	"sourceSha256": {
+		"selection-fixture.ts.txt": "3899a5ae2a583f05e46d6ec03fbb256f53a25024d4696ecd31daa1f75f270aa5",
+		"baseline-source-textarea.ts.txt": "b9fe611e13e1f35faba9a4d1fb4b170c66b7ec507ec8408fa51eef51036647cd",
+		"selection-server.ts.txt": "4109aa2b1c56d7aded00a88cc131246fdfd5b52ea5edb739f451b002d3699d0a",
+		"selection-timing.ts.txt": "7ccbb7f1350f1150e7f39890a80c7bae6025d5d52e17061d1ea2023326a9f1ce",
+		"baseline-projection.ts.txt": "babb77080d03392836be1e35c7044d6052b318e7098786b1c72f2a1abf13fd62",
+		"corpus.ts.txt": "d3398b7db24d7fae3c734d493a4ade9e68d5f75717233cb433838299815b29de",
+		"source-textarea.ts.txt": "4fc0af5c5dbca6957179dce46919e7a6de71d7c3b9ca787de77ae8010747a7d7",
+		"projection.ts.txt": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e"
+	},
+	"loadedBundleSha256": {
+		"baseline": "bfbd54cc4bcec56f846bad6c23e607a720f5f91fe1611cb0e1b1a412ed81c6da",
+		"candidate": "c90cf8d8ae8275a9053d015f67b981ed3c420051d4295daf1ec73cba7d83b97c"
+	},
+	"bundleVerification": "Each cell fetched immutable served script bytes before profiling and checked SHA256 against the persisted Bun.build output. No SW on fixture origin.",
+	"rawTraceSha256": {
+		"131072-1-candidate-middle.trace.json": "2ed6efca9c3e0dba6d01c98377690229b86542431bd623bfb67a3f0d9008f9a5",
+		"1048576-2-candidate-end.trace.json": "3c8ab9b8e24197826ad699e0a2d5f904c96a9993370e085a1f5c83101f24f1e3",
+		"131072-1-baseline-middle.trace.json": "bf8eac3211403ca3cf2c14efca5172f9e1ce2027caf6838724173402ec855660",
+		"131072-0-candidate-end.trace.json": "07dfc1061759e0f63904b18fed1a3cbf85d4a105091b7ecc4e137265a2cd0d2a",
+		"131072-1-baseline-end.trace.json": "86e4318b73a85f9f0707e7640237e7a1c6b0e29e7d0eea1bf771ec10f276691d",
+		"1048576-0-baseline-middle.trace.json": "e8e3ec904ee901f7d506dc552f0feb9b3bcc762f116f756c54d64ed0f02f5440",
+		"1048576-2-candidate-middle.trace.json": "4fb80080e4d4f67df57781059eace2635e06cddfd17b196dc7fe10f504a60827",
+		"1048576-2-baseline-end.trace.json": "9f14f56aa0584c07ccaeb26e4f292978bf11cbe76062a5da354edf98a8c462de",
+		"1048576-1-baseline-middle.trace.json": "68ae70e013286b490f92479ab2583db05fee131f758002f2980691a0b747d9e0",
+		"131072-1-candidate-end.trace.json": "2a6e3ffb91a3ee276af27516ccf16ba71567501c42d9f3f8ece3eadcb92ee7b5",
+		"1048576-1-baseline-end.trace.json": "80d83887b1388f7b0454136f96e70c12b20199825c96cc3f33e81c6d87f15ae2",
+		"131072-2-baseline-end.trace.json": "f7d707e4384833a0b7917a4de6df3cd4207db1e737129aa1b2686f2ad0c4c59d",
+		"131072-0-candidate-middle.trace.json": "de44a832501beaed745b8269f8659aabcb95593eab3bfb4a52b6e3e727097574",
+		"131072-0-baseline-middle.trace.json": "24f051765fcd8ad055acf6ffc22447c419983988163632f6a31c0eaf323c03e4",
+		"131072-0-baseline-end.trace.json": "56fa6f1eb7febdaf791426ed17823982aa0185a3c484bbe6acb4bbd7747f37f6",
+		"1048576-0-candidate-middle.trace.json": "eff30451cc72e2f09de5b025996748f2368bb596f9f2a520c3cd61367dc4209c",
+		"1048576-1-candidate-end.trace.json": "d445337527df37815dd67dfb6529a671df2b13767c3463758bbeeccb647800e4",
+		"131072-2-baseline-middle.trace.json": "c9d1a06b88222197a14df9a1be722f6636fb7e3f89ce6a661b1ce912bf74e946",
+		"1048576-1-candidate-middle.trace.json": "70989142df74ba36e35fb42fed8b55548063c8dc55e3574f66046c4e293e40f0",
+		"1048576-0-candidate-end.trace.json": "ff32e6b4926a5b4705907e9dbef88e6646e01a7215bbc50a7bad91b7f81142ec",
+		"1048576-2-baseline-middle.trace.json": "4fd3d6f87f5eb3b5da1f8b2c8a2a1e45fb568201c99ac17c5f5b92ee848ee195",
+		"1048576-0-baseline-end.trace.json": "99724383f266f318ca60263d53efe389be9e9755408f9effc9167c7235429e88",
+		"131072-2-candidate-middle.trace.json": "942e5ab6548027b08f57b9d1a663ebc92a620d9517736f5cf5ee489db72096f7",
+		"131072-2-candidate-end.trace.json": "838ad0144d4187708860f87303fe54ff49280e6fb77bb1230407cc5e7cde38bc"
+	},
+	"validation": {
+		"types": {
+			"passed": true,
+			"handle": 79156
+		},
+		"publicCorpus": {
+			"passed": true,
+			"assertions": 14285,
+			"reusePairs": 7110
+		},
+		"nativePrettification": {
+			"passed": true,
+			"gates": 48,
+			"handle": 79156
+		},
+		"timing": {
+			"passed": true,
+			"cells": 24,
+			"handle": 86298,
+			"exitCode": 0
+		},
+		"sourceReview": {
+			"completed": true,
+			"handle": 21660,
+			"correctnessBlockers": false
+		},
+		"finalReview": {
+			"completed": true,
+			"handle": 44159,
+			"correctnessBlockers": false
+		}
+	},
+	"ownership": "SourceTextarea.projection is borrowed internal mapping state. Getter readonly is shallow documentation. Public Projector.project mutable output freshness preserved.",
+	"limits": [
+		"Isolated EditorElement, not full app.",
+		"Same active token set in timed keys; no timed boundary crossing.",
+		"128KiB inconclusive.",
+		"Fixed position order and n3.",
+		"No measured allocation/GC/heap reduction.",
+		"No physical OS IME/mobile/accessibility or120Hz claim.",
+		"Mapped caret verifies own public projection consistency; overlay parity comes from48native journey."
+	]
+}

@@ -1,0 +1,94 @@
+import { Projector, project } from "./src/shared/projection"
+import type { DocumentLink } from "./src/shared/model"
+let documents: DocumentLink[] = [
+	{ id: "first", title: "First", archived: false },
+]
+let sources = [
+	"[a](https://a.test)[b](https://b.test) [[First]] ![Media](asset:one) 😀 last",
+	"---\r\ntitle: '[header](https://header.test)'\r\n---\r\n[[First]] [body](https://body.test)",
+	"```md\n[code](https://code.test)\n```\n[body](https://body.test)\n~~~\n[[First]]",
+	"````\n```\n[hidden](https://hidden.test)\n````\n    [indent](https://indent.test)\n[[Missing]]",
+	"---\ntitle: Missing close\n[hidden](https://hidden.test)\n😀",
+	"אבג [עברית](https://example.org) 😀 [[First]]\n`[raw](https://raw.test)`",
+]
+let assertions = 0,
+	hits = 0
+function equal(actual: unknown, expected: unknown, label: string) {
+	if (JSON.stringify(actual) !== JSON.stringify(expected)) throw Error(label)
+	assertions++
+}
+let projector = new Projector()
+for (let source of [
+	...sources,
+	sources[0] ?? "",
+	...sources.slice().reverse(),
+]) {
+	let initial = projector.project(source, { documents })
+	let offsets = new Set([
+		0,
+		source.length,
+		-1,
+		source.length + 1,
+		Infinity,
+		-Infinity,
+	])
+	for (let link of initial.links)
+		for (let boundary of [link.source.start, link.source.end])
+			for (let delta of [-1, 0, 1]) offsets.add(boundary + delta)
+	let selections: Array<{ start: number; end: number } | undefined> = [
+		undefined,
+	]
+	for (let offset of offsets)
+		selections.push(
+			{ start: offset, end: offset },
+			{ start: offset, end: source.length },
+			{ start: offset, end: 0 },
+		)
+	for (let left of selections)
+		for (let right of selections) {
+			if (!projector.sameActiveTokens(source, left, right)) continue
+			hits++
+			for (let iconSpace of [false, true])
+				equal(
+					project(source, { documents, active: left, iconSpace }),
+					project(source, { documents, active: right, iconSpace }),
+					"Reused output differs at token boundary",
+				)
+		}
+	let link = initial.links[0]
+	if (link) link.target = "mutated"
+	equal(
+		projector.project(source, { documents }),
+		project(source, { documents }),
+		"Public output mutation leaked into fresh projection",
+	)
+	let doc = documents[0]
+	if (doc) doc.title = doc.title === "First" ? "Renamed" : "First"
+	equal(
+		projector.project(source, { documents, active: { start: 0, end: 1 } }),
+		project(source, { documents, active: { start: 0, end: 1 } }),
+		"Same-array title mutation differs",
+	)
+	if (
+		projector.sameActiveTokens(
+			source + "changed",
+			{ start: 0, end: 0 },
+			{ start: 0, end: 0 },
+		)
+	)
+		throw Error("Unknown source reused")
+	if (projector.sameActiveTokens(source, undefined, { start: 0, end: 0 }))
+		throw Error("Undefined active conflated")
+	if (
+		projector.sameActiveTokens(
+			source,
+			{ start: NaN, end: 0 },
+			{ start: 0, end: 0 },
+		)
+	)
+		throw Error("NaN range reused")
+	assertions += 3
+}
+console.log(
+	JSON.stringify({ assertions, hits, sources: sources.length, exact: true }),
+)

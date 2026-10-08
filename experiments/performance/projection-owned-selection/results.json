@@ -1,0 +1,794 @@
+[
+	{
+		"chars": 131072,
+		"trial": 0,
+		"arm": "baseline",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 65492,
+			"sourceCharacters": 131072
+		},
+		"loadedBundleSha": "bfbd54cc4bcec56f846bad6c23e607a720f5f91fe1611cb0e1b1a412ed81c6da",
+		"observation": {
+			"caretExact": true,
+			"duration": 28.899999976158146,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/131072-0-baseline-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 28.782,
+			"interactionLargestTaskMs": 0.753,
+			"completeTraceLargestTaskMs": 4.776,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0.059,
+			"interactionPaintMs": 0.161,
+			"traceLayoutMs": 13.121,
+			"tracePaintMs": 46.979
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 0,
+		"arm": "baseline",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2394,
+			"selection": 130993,
+			"sourceCharacters": 131072
+		},
+		"loadedBundleSha": "bfbd54cc4bcec56f846bad6c23e607a720f5f91fe1611cb0e1b1a412ed81c6da",
+		"observation": {
+			"caretExact": true,
+			"duration": 31.399999976158146,
+			"mappedExact": true,
+			"nativeCharacters": 2394,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/131072-0-baseline-end.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 31.313,
+			"interactionLargestTaskMs": 0.542,
+			"completeTraceLargestTaskMs": 3.425,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.122,
+			"traceLayoutMs": 15.208,
+			"tracePaintMs": 37.523
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 0,
+		"arm": "candidate",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 65492,
+			"sourceCharacters": 131072
+		},
+		"loadedBundleSha": "c90cf8d8ae8275a9053d015f67b981ed3c420051d4295daf1ec73cba7d83b97c",
+		"observation": {
+			"caretExact": true,
+			"duration": 30.899999976158146,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/131072-0-candidate-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 30.862,
+			"interactionLargestTaskMs": 1.699,
+			"completeTraceLargestTaskMs": 3.968,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0.258,
+			"interactionPaintMs": 0.608,
+			"traceLayoutMs": 13.557,
+			"tracePaintMs": 52.244
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 0,
+		"arm": "candidate",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2394,
+			"selection": 130993,
+			"sourceCharacters": 131072
+		},
+		"loadedBundleSha": "c90cf8d8ae8275a9053d015f67b981ed3c420051d4295daf1ec73cba7d83b97c",
+		"observation": {
+			"caretExact": true,
+			"duration": 31.100000023841854,
+			"mappedExact": true,
+			"nativeCharacters": 2394,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/131072-0-candidate-end.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 31.068,
+			"interactionLargestTaskMs": 0.455,
+			"completeTraceLargestTaskMs": 3.359,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.11,
+			"traceLayoutMs": 9.665,
+			"tracePaintMs": 30.402
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 1,
+		"arm": "candidate",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 65492,
+			"sourceCharacters": 131072
+		},
+		"loadedBundleSha": "c90cf8d8ae8275a9053d015f67b981ed3c420051d4295daf1ec73cba7d83b97c",
+		"observation": {
+			"caretExact": true,
+			"duration": 25.399999976158146,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/131072-1-candidate-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 25.456,
+			"interactionLargestTaskMs": 0.564,
+			"completeTraceLargestTaskMs": 4.3,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.157,
+			"traceLayoutMs": 12.074,
+			"tracePaintMs": 44.67
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 1,
+		"arm": "candidate",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2394,
+			"selection": 130993,
+			"sourceCharacters": 131072
+		},
+		"loadedBundleSha": "c90cf8d8ae8275a9053d015f67b981ed3c420051d4295daf1ec73cba7d83b97c",
+		"observation": {
+			"caretExact": true,
+			"duration": 31.400000035762787,
+			"mappedExact": true,
+			"nativeCharacters": 2394,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/131072-1-candidate-end.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 31.336,
+			"interactionLargestTaskMs": 0.484,
+			"completeTraceLargestTaskMs": 3.165,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.122,
+			"traceLayoutMs": 12.559,
+			"tracePaintMs": 35.085
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 1,
+		"arm": "baseline",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 65492,
+			"sourceCharacters": 131072
+		},
+		"loadedBundleSha": "bfbd54cc4bcec56f846bad6c23e607a720f5f91fe1611cb0e1b1a412ed81c6da",
+		"observation": {
+			"caretExact": true,
+			"duration": 33.89999997615814,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/131072-1-baseline-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 33.882,
+			"interactionLargestTaskMs": 0.522,
+			"completeTraceLargestTaskMs": 4.107,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.147,
+			"traceLayoutMs": 11.915000000000001,
+			"tracePaintMs": 46.358
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 1,
+		"arm": "baseline",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2394,
+			"selection": 130993,
+			"sourceCharacters": 131072
+		},
+		"loadedBundleSha": "bfbd54cc4bcec56f846bad6c23e607a720f5f91fe1611cb0e1b1a412ed81c6da",
+		"observation": {
+			"caretExact": true,
+			"duration": 17.899999976158142,
+			"mappedExact": true,
+			"nativeCharacters": 2394,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/131072-1-baseline-end.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 17.746,
+			"interactionLargestTaskMs": 0.407,
+			"completeTraceLargestTaskMs": 3.459,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.10099999999999999,
+			"traceLayoutMs": 10.431,
+			"tracePaintMs": 36.249
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 2,
+		"arm": "baseline",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 65492,
+			"sourceCharacters": 131072
+		},
+		"loadedBundleSha": "bfbd54cc4bcec56f846bad6c23e607a720f5f91fe1611cb0e1b1a412ed81c6da",
+		"observation": {
+			"caretExact": true,
+			"duration": 18.799999952316284,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/131072-2-baseline-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 18.771,
+			"interactionLargestTaskMs": 0.555,
+			"completeTraceLargestTaskMs": 8.415,
+			"completeTraceTasksOverBudget": 1,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.16,
+			"traceLayoutMs": 12.557,
+			"tracePaintMs": 47.314
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 2,
+		"arm": "baseline",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2394,
+			"selection": 130993,
+			"sourceCharacters": 131072
+		},
+		"loadedBundleSha": "bfbd54cc4bcec56f846bad6c23e607a720f5f91fe1611cb0e1b1a412ed81c6da",
+		"observation": {
+			"caretExact": true,
+			"duration": 18.399999976158146,
+			"mappedExact": true,
+			"nativeCharacters": 2394,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/131072-2-baseline-end.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 18.406,
+			"interactionLargestTaskMs": 1.006,
+			"completeTraceLargestTaskMs": 3.665,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.10400000000000001,
+			"traceLayoutMs": 11.861,
+			"tracePaintMs": 38.647
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 2,
+		"arm": "candidate",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 65492,
+			"sourceCharacters": 131072
+		},
+		"loadedBundleSha": "c90cf8d8ae8275a9053d015f67b981ed3c420051d4295daf1ec73cba7d83b97c",
+		"observation": {
+			"caretExact": true,
+			"duration": 31.400000035762787,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/131072-2-candidate-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 31.359,
+			"interactionLargestTaskMs": 0.586,
+			"completeTraceLargestTaskMs": 4.681,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.174,
+			"traceLayoutMs": 14.536,
+			"tracePaintMs": 58.065
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 2,
+		"arm": "candidate",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2394,
+			"selection": 130993,
+			"sourceCharacters": 131072
+		},
+		"loadedBundleSha": "c90cf8d8ae8275a9053d015f67b981ed3c420051d4295daf1ec73cba7d83b97c",
+		"observation": {
+			"caretExact": true,
+			"duration": 33,
+			"mappedExact": true,
+			"nativeCharacters": 2394,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/131072-2-candidate-end.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 32.896,
+			"interactionLargestTaskMs": 0.458,
+			"completeTraceLargestTaskMs": 3.66,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.10400000000000001,
+			"traceLayoutMs": 12.742,
+			"tracePaintMs": 37.86
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 0,
+		"arm": "baseline",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 524276,
+			"sourceCharacters": 1048576
+		},
+		"loadedBundleSha": "bfbd54cc4bcec56f846bad6c23e607a720f5f91fe1611cb0e1b1a412ed81c6da",
+		"observation": {
+			"caretExact": true,
+			"duration": 24.600000023841854,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/1048576-0-baseline-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 24.569,
+			"interactionLargestTaskMs": 2.873,
+			"completeTraceLargestTaskMs": 4.884,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.17099999999999999,
+			"traceLayoutMs": 14.426,
+			"tracePaintMs": 54.786
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 0,
+		"arm": "baseline",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2785,
+			"selection": 1048502,
+			"sourceCharacters": 1048576
+		},
+		"loadedBundleSha": "bfbd54cc4bcec56f846bad6c23e607a720f5f91fe1611cb0e1b1a412ed81c6da",
+		"observation": {
+			"caretExact": true,
+			"duration": 30,
+			"mappedExact": true,
+			"nativeCharacters": 2785,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/1048576-0-baseline-end.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 29.88,
+			"interactionLargestTaskMs": 2.252,
+			"completeTraceLargestTaskMs": 4.026,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.153,
+			"traceLayoutMs": 13.45,
+			"tracePaintMs": 48.32
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 0,
+		"arm": "candidate",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 524276,
+			"sourceCharacters": 1048576
+		},
+		"loadedBundleSha": "c90cf8d8ae8275a9053d015f67b981ed3c420051d4295daf1ec73cba7d83b97c",
+		"observation": {
+			"caretExact": true,
+			"duration": 29.80000001192093,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/1048576-0-candidate-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 29.857,
+			"interactionLargestTaskMs": 0.596,
+			"completeTraceLargestTaskMs": 5.548,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.174,
+			"traceLayoutMs": 15.623,
+			"tracePaintMs": 60.714
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 0,
+		"arm": "candidate",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2785,
+			"selection": 1048502,
+			"sourceCharacters": 1048576
+		},
+		"loadedBundleSha": "c90cf8d8ae8275a9053d015f67b981ed3c420051d4295daf1ec73cba7d83b97c",
+		"observation": {
+			"caretExact": true,
+			"duration": 33.60000002384186,
+			"mappedExact": true,
+			"nativeCharacters": 2785,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/1048576-0-candidate-end.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 33.569,
+			"interactionLargestTaskMs": 0.51,
+			"completeTraceLargestTaskMs": 4.37,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.146,
+			"traceLayoutMs": 15.414,
+			"tracePaintMs": 48.226
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 1,
+		"arm": "candidate",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 524276,
+			"sourceCharacters": 1048576
+		},
+		"loadedBundleSha": "c90cf8d8ae8275a9053d015f67b981ed3c420051d4295daf1ec73cba7d83b97c",
+		"observation": {
+			"caretExact": true,
+			"duration": 26.599999964237213,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/1048576-1-candidate-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 26.562,
+			"interactionLargestTaskMs": 0.602,
+			"completeTraceLargestTaskMs": 5.107,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.16699999999999998,
+			"traceLayoutMs": 15.815,
+			"tracePaintMs": 63.227
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 1,
+		"arm": "candidate",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2785,
+			"selection": 1048502,
+			"sourceCharacters": 1048576
+		},
+		"loadedBundleSha": "c90cf8d8ae8275a9053d015f67b981ed3c420051d4295daf1ec73cba7d83b97c",
+		"observation": {
+			"caretExact": true,
+			"duration": 28.399999976158146,
+			"mappedExact": true,
+			"nativeCharacters": 2785,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/1048576-1-candidate-end.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 28.339,
+			"interactionLargestTaskMs": 0.588,
+			"completeTraceLargestTaskMs": 4.447,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.13,
+			"traceLayoutMs": 14.39,
+			"tracePaintMs": 48.912
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 1,
+		"arm": "baseline",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 524276,
+			"sourceCharacters": 1048576
+		},
+		"loadedBundleSha": "bfbd54cc4bcec56f846bad6c23e607a720f5f91fe1611cb0e1b1a412ed81c6da",
+		"observation": {
+			"caretExact": true,
+			"duration": 32.10000002384186,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/1048576-1-baseline-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 32.011,
+			"interactionLargestTaskMs": 2.852,
+			"completeTraceLargestTaskMs": 6.195,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0.124,
+			"interactionPaintMs": 0.658,
+			"traceLayoutMs": 15.58,
+			"tracePaintMs": 54.449
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 1,
+		"arm": "baseline",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2785,
+			"selection": 1048502,
+			"sourceCharacters": 1048576
+		},
+		"loadedBundleSha": "bfbd54cc4bcec56f846bad6c23e607a720f5f91fe1611cb0e1b1a412ed81c6da",
+		"observation": {
+			"caretExact": true,
+			"duration": 32.5,
+			"mappedExact": true,
+			"nativeCharacters": 2785,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/1048576-1-baseline-end.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 32.558,
+			"interactionLargestTaskMs": 2.572,
+			"completeTraceLargestTaskMs": 4.356,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.135,
+			"traceLayoutMs": 15.761,
+			"tracePaintMs": 48.41
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 2,
+		"arm": "baseline",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 524276,
+			"sourceCharacters": 1048576
+		},
+		"loadedBundleSha": "bfbd54cc4bcec56f846bad6c23e607a720f5f91fe1611cb0e1b1a412ed81c6da",
+		"observation": {
+			"caretExact": true,
+			"duration": 26.19999998807907,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/1048576-2-baseline-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 26.158,
+			"interactionLargestTaskMs": 3.007,
+			"completeTraceLargestTaskMs": 4.841,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.16899999999999998,
+			"traceLayoutMs": 15.281,
+			"tracePaintMs": 61.452
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 2,
+		"arm": "baseline",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2785,
+			"selection": 1048502,
+			"sourceCharacters": 1048576
+		},
+		"loadedBundleSha": "bfbd54cc4bcec56f846bad6c23e607a720f5f91fe1611cb0e1b1a412ed81c6da",
+		"observation": {
+			"caretExact": true,
+			"duration": 29,
+			"mappedExact": true,
+			"nativeCharacters": 2785,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/1048576-2-baseline-end.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 29.001,
+			"interactionLargestTaskMs": 2.551,
+			"completeTraceLargestTaskMs": 4.64,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.131,
+			"traceLayoutMs": 13.349,
+			"tracePaintMs": 45.89
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 2,
+		"arm": "candidate",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 524276,
+			"sourceCharacters": 1048576
+		},
+		"loadedBundleSha": "c90cf8d8ae8275a9053d015f67b981ed3c420051d4295daf1ec73cba7d83b97c",
+		"observation": {
+			"caretExact": true,
+			"duration": 21.400000035762787,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/1048576-2-candidate-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 21.29,
+			"interactionLargestTaskMs": 0.527,
+			"completeTraceLargestTaskMs": 5.64,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.16999999999999998,
+			"traceLayoutMs": 15.373,
+			"tracePaintMs": 58.171
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 2,
+		"arm": "candidate",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2785,
+			"selection": 1048502,
+			"sourceCharacters": 1048576
+		},
+		"loadedBundleSha": "c90cf8d8ae8275a9053d015f67b981ed3c420051d4295daf1ec73cba7d83b97c",
+		"observation": {
+			"caretExact": true,
+			"duration": 27.399999976158146,
+			"mappedExact": true,
+			"nativeCharacters": 2785,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-allocation/1048576-2-candidate-end.trace.json",
+		"traceSummary": {
+			"mainThread": [8273, 16698741],
+			"keyToTwoRafMs": 27.33,
+			"interactionLargestTaskMs": 1.257,
+			"completeTraceLargestTaskMs": 5.947,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0.072,
+			"interactionPaintMs": 0.46900000000000003,
+			"traceLayoutMs": 14.866,
+			"tracePaintMs": 48.746
+		}
+	}
+]
