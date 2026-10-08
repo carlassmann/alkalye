@@ -1498,6 +1498,15 @@
 		</p>
 		<h2>Original server comparison setup</h2>
 		<p>
+			A separate multicursor candidate kept full validation but decoded plain
+			deletion IDs with a string-array schema. Strict types and 95 module tests
+			passed. Three alternating 2,048-cursor pairs passed exact accepted edit
+			and Undo checks. Median input task fell from 35.629ms to 33.567ms, but
+			median largest task over three seconds rose from 59.596ms to 61.102ms.
+			Median GC time also rose from 43.510ms to 60.512ms. The candidate remains
+			unshipped; its foreground gain does not solve the frame-budget problem.
+		</p>
+		<p>
 			The original application's installed SDK created one 2,048-character
 			document and completed its sync wait. A separate fresh SDK reader loaded
 			the exact source from the local sync server. The existing browser account
