@@ -1,0 +1,29 @@
+Nothing in the run contradicts the bounded proof. I found no semantic blockers. I only read the files: no shell, edits or runs.
+
+**The run matches the claim**
+- **All three follow-up fixes are in:**
+  - The fixture asserts exactly one `held:` signal (`browser-fixture.ts:100`).
+  - The reopen `Read` now retries (`:121`).
+  - `stage` becomes `"passed"` only at the end of the successful path (`:132`).
+- **The interruption came from the client, not the release.** The signal order is `armed, held:14, interrupted:14, released, write-failed:15`. `interrupted:14` arrives before `release-fail` is sent, so the client's RPC interrupt is what stopped the gated write. The held write never resumed, because there is no `resumed:14`.
+- **The counts agree:**
+  - 7 dispatches = 6 for `PREFIX` + 1 interrupted.
+  - 6 client exits succeeded and 1 was interrupted.
+  - 9 edits are pending: 1 marked unknown and 8 blocked (the rest of `INTERRUPT`).
+  - The queue source and the recovery textarea both hold `…PREFIXINTERRUPT`.
+  - There is 1 failure, `AppliedUnknown`.
+- **Reopen:** the fresh worker shows exactly the server-accepted text ending in `PREFIX`, makes 0 `/api` requests, and leaves the original editor and recovery draft unchanged.
+
+**Caveats on wording (not blockers)**
+1. **The suffix is missing on reopen because of the injected fault, not because of the interrupt.** `release-fail` sets `writeFailure=true` for every later write (`worker-session.ts:61`). Without it, a later unmarked flush could persist an edit the session already applied in memory. That would be correct for `AppliedUnknown`. Better wording: "an interrupted write at the gate, plus refused later writes, leaves the committed prefix". Avoid "interruption excludes the suffix".
+2. **Nothing ties write 15 to Close.** Close carries no marker, so 15 could be a background write that ran after `released`. The fixture only shows that 15 is not the held write and that Close returned `SessionFailure`.
+3. **14 is only shown to be inside the handler's interruption tree.** The exactly-one check plus `interrupted:14` on client interrupt shows that. It doesn't prove 14 is the handler's own journal write rather than a child forked inside the handler that inherited the marker. That's fine for "a marked journal write at the gate"; just don't call it "the edit's write".
+4. **Weak limits already accepted:**
+   - "Never dispatched again" holds trivially once the queue is closed.
+   - `apiRequests` counts only HTTP `/api/*`.
+   - The test-only routes, channels and `FixtureFault` aren't proven absent from the shipped build.
+   - `failClose` still accepts any Close failure.
+
+**Scope:** your stated limits match the code. This proves one client RPC interrupt plus one marked journal write interrupted at the gate. It does not prove general worker-save cancellation, a response lost after commit, crash persistence, 1M-char performance or the full cutover.
+
+written with claude-opus-5-5 in claude-code

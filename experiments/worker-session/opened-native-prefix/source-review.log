@@ -1,0 +1,46 @@
+The fixture is mostly sound. Three issues could let it pass falsely or flake, and should be fixed before the evidence is recorded. Everything below comes from reading the 4 files only; nothing was run.
+
+**Mistakes**
+
+1. **The held write might not be the native write (can pass falsely).** `worker-session.ts:80` holds every journal write once the gate is armed. `browser-fixture.ts:97` takes the first `held:` signal.
+   - Suppose a background sync, ack or presence write arrives after `accepted()` and gets id 1. The native `ReplaceQueued` write then waits as id 2.
+   - The client interrupt cancels id 2. Id 1 is then resumed, gets `write-failed:1`, and `:111` passes through the "resumed refusal" branch about a write that wasn't the native one.
+   - Checking that a `sending` edit exists (`:100`) doesn't link the two.
+   - Waiting for `synced` in `accepted()` doesn't prove nothing else will write.
+   - Fix: only hold writes that come from the `ReplaceQueued` handler, for example with a fiber-local marker that handler provides. Otherwise, assert there is exactly one `held:` and that it appeared after `mutationCalls` went up past its value at `hold()`.
+
+2. **Race between `resumed` and `write-failed` (flaky).** `:110` stops waiting as soon as `resumed:id` arrives. `write-failed:id` is a separate BroadcastChannel message, so `:111` can run before it lands and fail.
+   - Fix: wait for `interrupted:id || write-failed:id` instead.
+
+3. **The exclusion check is indirect.** `:121` checks reopened text `=== durableSource` and that it ends with `"PREFIX"`. It never states that the native text minus the suffix equals the prefix.
+   - Fix: also assert `native.startsWith(durableSource) && native !== durableSource`.
+
+**Weak, but not wrong**
+
+4. `:120` reads `fresh.Read()` once, with no retry. The first open (`:48`) retries. If the offline projection loads after `Open` returns, the test fails falsely; it won't pass falsely.
+5. `apiRequests` (`server.ts:26`) only counts `/api/*` requests. Requests to other paths, such as auth or `.well-known`, wouldn't be counted, so "zero HTTP API requests" is only that narrow.
+6. `mutationCalls` only counts `ReplaceQueued` calls the client makes.
+   - "Never dispatched again" (`:126`) holds trivially once the queue is shut down.
+   - `UndoQueued` retries itself after non-`WorkerDocumentFailure` errors (`editor-queue.ts:200`) and isn't counted. That's outside this path, but worth knowing.
+   - Nothing on the worker side counts handler entries.
+7. `failures` stores `String(error)`, so `:107` still can't tell `AppliedUnknown` from `QueuedBlocked` (prior review item 4). Assert `reason === "AppliedUnknown"` on the interrupted edit's failure.
+8. The `failClose` path (`:141`) still accepts any Close failure. Only the interrupt path checks for `SessionFailure` specifically (`:114`).
+9. The `SessionFailure` on Close assumes the flush still has something to write after the interruption. If the session rolled the suffix back in memory, Close succeeds and `:114` fails. That's a failure, not a false pass, but it depends on runtime behaviour.
+10. Assertions that throw inside the `openedNative.*` methods reject only that method's own promise. `stage` stays `"ready"`, so the driver must treat a rejection as a failure.
+
+**Holds as claimed**
+
+- **PREFIX:** if `accepted()` is never called, `durableSource` stays as the seed and `:121` fails.
+- **Interrupt:** the client-side interrupt is recorded separately (`clientExits`, `:104`) from what the worker reports (`interrupted:`/`resumed:`/`write-failed:` per id).
+- **Refusal:** `writeFailure` is set before the gate opens (`:59`), so a resumed write fails immediately and never reaches IndexedDB.
+- **Recovery:** the queue is closed while the bindings and the editor stay alive. The recovery owner and the read-only editor are kept, and the dispatch counter is captured before cancellation.
+- **Reopen:** the fresh worker opens on its own scope and channel, with `online:false`, the proxy blocked and the counter reset.
+- **Unload protection:** this is still owned by the fixture (`:39` returns dirty whenever `recovery !== undefined`).
+  - The labels at `:130` and `:139` read as product behaviour.
+  - Fix: relabel them as fixture-owned.
+- **Gaps:** these files don't contradict the reader hint, worker-only failed Close, or recovery component gaps.
+  - Failed Close still drops `opened` and closes the scope (`:134-138`), so the worker-only recovery gap remains.
+- **Test-only code:** the `:fixture` BroadcastChannel, `FixtureFault`/`FixtureDraft`, the hold gate, `/__tests/*` and the oracle lookup keyed by `subject` are all in fixture files. Nothing here proves they're kept out of the shipped build. The `:fixture` channel is opened on every `Open`.
+- **Production:** none of the 4 files is production code.
+
+written with claude-opus-5-5 in claude-code

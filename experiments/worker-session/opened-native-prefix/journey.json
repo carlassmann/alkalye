@@ -1,0 +1,49 @@
+{
+	"assertions": [
+		"simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections",
+		"browser identity is available before any network authentication",
+		"native browser account login serializes cookie issuance and agrees with server verification",
+		"real HTTP fixture seeded without main Replica",
+		"worker opened projection exact",
+		"native local source exactly accepted by real server",
+		"real worker journal hold armed",
+		"exactly one native-marked held journal write has an identity",
+		"actual native mutation RPC sending while real journal held",
+		"actual ReplaceQueued client fiber exit interrupted",
+		"interrupted native FIFO retains real native draft readonly",
+		"interrupted sending RPC marked unknown without blind replay",
+		"held journal write identity has an explicit interrupt or resumed refusal outcome",
+		"interrupted suffix Close reports journal session failure",
+		"offline independent worker reopens exact native committed prefix excluding interrupted suffix",
+		"offline prefix reopen makes zero HTTP API requests",
+		"interrupted native suffix is never dispatched again",
+		"independent reopen never replaces retained native unknown draft",
+		"fixture-owned recovery retains unload protection after disposal"
+	],
+	"inspection": {
+		"clientExits": [
+			"success",
+			"success",
+			"success",
+			"success",
+			"success",
+			"success",
+			"interrupted"
+		],
+		"failureReasons": ["AppliedUnknown"],
+		"failures": ["WorkerDocumentFailure"],
+		"mutationCalls": 7,
+		"observations": 23,
+		"pending": 9,
+		"queueSource": "---\ntitle: Worker fixture\n---\n# Native writer\nUnicode 🦊 café.\nPREFIXINTERRUPT",
+		"recovery": "---\ntitle: Worker fixture\n---\n# Native writer\nUnicode 🦊 café.\nPREFIXINTERRUPT",
+		"signals": [
+			"armed",
+			"held:14",
+			"interrupted:14",
+			"released",
+			"write-failed:15"
+		]
+	},
+	"stage": "passed"
+}

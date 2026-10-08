@@ -1,0 +1,99 @@
+{
+	"scope": "experiment-only native prefix + marked journal-await interruption + offline reopen",
+	"baseArtifact": "e0a182f experiments/worker-session/opened-native",
+	"core": "52670c02b4138fc0f22646f24d2d383815a7d439",
+	"runtime": "/tmp/alkalye-worker-opened/editor-interruption-prefix",
+	"assertions": 19,
+	"types": {
+		"handle": 60042,
+		"exitCode": 0,
+		"log": "types.log"
+	},
+	"runtimeHandle": 56789,
+	"runtimeExitCode": 0,
+	"server": {
+		"pid": 77062,
+		"url": "http://localhost:57995/",
+		"stopped": true
+	},
+	"browser": {
+		"session": "opened-prefix-1791513000",
+		"closed": true
+	},
+	"clientExits": [
+		"success",
+		"success",
+		"success",
+		"success",
+		"success",
+		"success",
+		"interrupted"
+	],
+	"workerSignals": [
+		"armed",
+		"held:14",
+		"interrupted:14",
+		"released",
+		"write-failed:15"
+	],
+	"typedFailureReasons": ["AppliedUnknown"],
+	"mutationDispatches": 7,
+	"admittedNativeSuffixEdits": 9,
+	"prefix": {
+		"source": "---\ntitle: Worker fixture\n---\n# Native writer\nUnicode \ud83e\udd8a caf\u00e9.\nPREFIX",
+		"sha256": "50c454943a01d53d7c42f1c3f6c2f99f1180fe16c73cd948fbc479ef66e4d158",
+		"serverPosition": 7,
+		"offlineIndependentWorkerReopenExact": true,
+		"apiRequests": 0
+	},
+	"retainedDraft": {
+		"source": "---\ntitle: Worker fixture\n---\n# Native writer\nUnicode \ud83e\udd8a caf\u00e9.\nPREFIXINTERRUPT",
+		"sha256": "7586fa89227f9a71cc4fd92039795a70f7fe2918323427544d30d90c81ffad95",
+		"realReadonlyDOM": true,
+		"protectionOwner": "fixture-owned recovery predicate",
+		"postEditorWorkerDisposalBeforeUnloadPrevented": true
+	},
+	"journalOutcome": {
+		"heldWriteId": "14",
+		"awaitExit": "interrupted",
+		"resumed": false,
+		"physicalTransaction": "held write14 never entered underlying journal.write; no during/after-transaction cancellation guarantee",
+		"laterRefusedWriteId": "15",
+		"reopenSuffixExclusion": "gate interrupt plus injected refusal of all laterwrites"
+	},
+	"sourceHashes": {
+		"browser-fixture.ts": "79af9cbd3ace02e1fe19451fa1c64d9515ab1cd9542c288fbb0a89cb8e452bf4",
+		"worker-session.ts": "64a7d77ab03341b8703c72f0ecc6bff990d9e13dcb82c048e141d3239c053aef",
+		"editor-queue.ts": "90cc09eeba4fbb573dc73975d0b841a730330cea4d40df890e8ec25d67ac1a80",
+		"server.ts": "f80f47168e66b2e51abde11d19e62e95fe7efe2aeed93adc698cbef880e9e4ae",
+		"worker-rpc.ts": "b1c5d5ea2a38fef6113809206b5b25ed60990463c6565bbe0a41ee6ee924a1f6",
+		"worker-client.ts": "cf3ae2f2cc7f87909d95d50e7298e8e075399be431ff3847b4023d97db94cca1",
+		"bindings.ts": "0063af639774ef14ba29f366731e13553c798ff12bb9fcfcbb9a8bf35b125f29",
+		"worker-activity.ts": "91b0f0bb2f3d8e7c252fc4b9073a34d7e0912cdb5ce8620498c15e18500fb939"
+	},
+	"bundleHashes": {
+		"browser-fixture.js": "837c987b726a50ff43ae985f014688877745b6a78898fcd99efb94c41021133d",
+		"worker.js": "b14c8cf2c341286d339627fb3bf697d5f434598e3d9a80c76618256919eec4a8"
+	},
+	"runtimeReview": {
+		"handle": 79035,
+		"status": "terminal",
+		"file": "runtime-review.log",
+		"semanticBlockers": false,
+		"wordingLimits": [
+			"write14 is marked handler interruption-tree write, not independently identified direct edit write",
+			"write15 may be background, not tied specifically toClose",
+			"reopened prefix reflects interruption plus injected refusal of laterwrites, not interruption alone"
+		]
+	},
+	"unproved": [
+		"interruption during or after physical IndexedDB commit",
+		"lost response after successful commit",
+		"main-tab crash/recovery persistence",
+		"Undo retries in interrupted suffix",
+		"1MiB activeObserve/fullACK budget",
+		"reader admission atOpen",
+		"worker-only failedClose recovery",
+		"production cutover/fullfeatureparity"
+	]
+}
