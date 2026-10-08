@@ -1,0 +1,261 @@
+--- src/shared/document-session.ts
++++ src/shared/document-session.ts
+@@ -203,7 +203,9 @@
+ 	}),
+ ])
+ type Recording = typeof recording.Type
+-let codec = SchemaBinary.toCodec(recording)
++let jsonRecording = Schema.fromJsonString(recording)
++let legacyCodec = SchemaBinary.toCodec(recording)
++let jsonCodec = SchemaBinary.toCodec(jsonRecording)
+ let proposalIndex = Schema.Array(
+ 	Schema.Tuple([Schema.String, Schema.String, Schema.Boolean]),
+ )
+@@ -240,24 +242,15 @@
+ 	success: Schema.Void,
+ 	error: DocumentFailureSchema,
+ })
+-let events = EventLog.schema(changes)
++let persistedChanges = changes.add({tag: "DocumentRecordedJson", primaryKey: () => "document", payload: jsonRecording, success: Schema.Void, error: DocumentFailureSchema})
++let events = EventLog.schema(persistedChanges)
+ class DocumentProjection extends Context.Service<
+ 	DocumentProjection,
+ 	Effect.Success<ReturnType<typeof makeProjection>>
+ >()("alkalye/DocumentProjection") {}
+-let handlers = EventLog.group(changes, handlers =>
+-	handlers.handle("DocumentRecorded", ({ payload }) =>
+-		DocumentProjection.use(projection =>
+-			projection
+-				.record(payload)
+-				.pipe(
+-					Effect.mapError(error =>
+-						storageFailure("validate document action", error),
+-					),
+-				),
+-		),
+-	),
+-)
++function recordPayload(payload: Recording) { return DocumentProjection.use(projection => projection.record(payload).pipe(Effect.mapError(error => storageFailure("validate document action", error)))) }
++let handlers = EventLog.group(persistedChanges, handlers => handlers.handle("DocumentRecorded", ({payload}) => recordPayload(payload)).handle("DocumentRecordedJson", ({payload}) => recordPayload(payload)))
++
+ let equalAction = Schema.toEquivalence(DocumentActionSchema)
+ let equalCommittedAction = Schema.toEquivalence(CommittedActionSchema)
+ interface UndoReceipt {
+@@ -335,7 +328,7 @@
+ 		let revision = yield* SubscriptionRef.make(0)
+ 		advanceView()
+ 		let persistUnlocked = (value: Recording) =>
+-			write("DocumentRecorded", value).pipe(
++			write("DocumentRecordedJson", value).pipe(
+ 				Effect.catchDefect(cause =>
+ 					SqlError.isSqlError(cause)
+ 						? Effect.fail(storageFailure("save document action", cause))
+@@ -1988,13 +1981,13 @@
+ function decode(
+ 	entry: EventJournal.Entry,
+ ): Effect.Effect<Recording, DocumentFailure> {
+-	if (entry.event !== "DocumentRecorded")
++	if (entry.event !== "DocumentRecorded" && entry.event !== "DocumentRecordedJson")
+ 		return conflict("Unknown document journal entry").pipe(
+ 			Effect.mapError(error =>
+ 				storageFailure("decode document journal", error),
+ 			),
+ 		)
+-	return Schema.decodeEffect(codec)(new Uint8Array(entry.payload)).pipe(
++	return Schema.decodeEffect(entry.event === "DocumentRecorded" ? legacyCodec : jsonCodec)(new Uint8Array(entry.payload)).pipe(
+ 		Effect.mapError(error => storageFailure("decode document journal", error)),
+ 	)
+ }
+--- src/server/document-store.ts
++++ src/server/document-store.ts
+@@ -272,8 +272,30 @@
+ 		success: Schema.Natural,
+ 		error: Schema.Union([DocumentConflict, SqlError.SqlError]),
+ 	})
++
++	.add({
++		tag: "DocumentWithdrawnJson",
++		primaryKey: fact => fact.action.document,
++		payload: Schema.fromJsonString(WithdrawalSchema),
++		success: Schema.Void,
++		error: Schema.Union([DocumentConflict, SqlError.SqlError]),
++	})
++	.add({
++		tag: "DocumentChangedJson",
++		primaryKey: action => action.document,
++		payload: Schema.fromJsonString(CommittedActionSchema),
++		success: Schema.Natural,
++		error: Schema.Union([DocumentConflict, UndoUnavailable, SqlError.SqlError]),
++	})
++	.add({
++		tag: "WorkspaceChangedJson",
++		primaryKey: fact => fact.workspace,
++		payload: Schema.fromJsonString(WorkspaceFactSchema),
++		success: Schema.Natural,
++		error: Schema.Union([DocumentConflict, SqlError.SqlError]),
++	})
+ let events = EventLog.schema(group)
+-let binary = SchemaBinary.toCodec(CommittedActionSchema)
++let binary = Schema.Union([SchemaBinary.toCodec(Schema.fromJsonString(CommittedActionSchema)), SchemaBinary.toCodec(CommittedActionSchema)])
+ let proposalJson = Schema.encodeSync(
+ 	Schema.fromJsonString(DocumentActionSchema),
+ )
+@@ -374,7 +396,69 @@
+ 					),
+ 				),
+ 			)
++			.handle("DocumentWithdrawnJson", ({ payload }) =>
++				Effect.gen(function* () {
++					let { action, subject } = payload
++					let clock = action.changes.reduce(
++						(maximum, change) => Math.max(maximum, change.clock),
++						0,
++					)
++					let operations = yield* validateActionIdentity(action)
++					yield* sql`INSERT INTO document_actor_subjects VALUES (${action.actor},${subject},${action.document}) ON CONFLICT DO NOTHING`
++					let actor = yield* queries.actorSubject(action.actor)
++					if (
++						Option.isNone(actor) ||
++						actor.value.subject !== subject ||
++						actor.value.document !== action.document
++					)
++						return yield* conflict("Actor identity is not authorized")
++					if (
++						Option.isSome(
++							yield* queries.receipt({
++								document: action.document,
++								id: action.id,
++							}),
++						)
++					)
++						return yield* conflict("A committed action cannot be withdrawn")
++					yield* sql`INSERT INTO document_withdrawals VALUES (${action.document},${action.id},${subject},${yield* hashWithdrawal(crypto, action)})`
++					for (let change of operations) {
++						if (
++							Option.isSome(
++								yield* queries.operation({
++									document: action.document,
++									id: change.id,
++								}),
++							)
++						)
++							return yield* conflict("Operation identity is already admitted")
++						yield* sql`INSERT INTO document_operation_ids VALUES (${action.document},${change.id},${action.id})`
++					}
++					yield* sql`INSERT INTO document_clock_reservations VALUES (${action.document},${subject},${clock}) ON CONFLICT(document,subject) DO UPDATE SET clock=MAX(document_clock_reservations.clock,excluded.clock)`
++				}).pipe(
++					Effect.mapError(cause =>
++						cause._tag === "DocumentConflict" || cause._tag === "SqlError"
++							? cause
++							: new DocumentConflict({ message: cause.message }),
++					),
++				),
++			)
+ 			.handle("WorkspaceChanged", ({ payload, entry }) =>
++				Effect.gen(function* () {
++					return yield* workspace.project(
++						payload,
++						entry.id,
++						yield* hashWorkspace(crypto, payload),
++					)
++				}).pipe(
++					Effect.mapError(cause =>
++						cause._tag === "DocumentConflict" || cause._tag === "SqlError"
++							? cause
++							: new DocumentConflict({ message: cause.message }),
++					),
++				),
++			)
++			.handle("WorkspaceChangedJson", ({ payload, entry }) =>
+ 				Effect.gen(function* () {
+ 					return yield* workspace.project(
+ 						payload,
+@@ -390,6 +474,50 @@
+ 				),
+ 			)
+ 			.handle("DocumentChanged", ({ payload, entry }) =>
++				Effect.gen(function* () {
++					let current = Option.getOrUndefined(
++						yield* queries.notice(payload.document),
++					)
++					let fingerprint = yield* hashProposal(crypto, payload)
++					yield* sql`INSERT INTO document_actions(document,action,entry,fingerprint) VALUES (${payload.document},${payload.id},${entry.id},${fingerprint})`
++					if (payload.undoOf) {
++						yield* sql`INSERT INTO document_compensations VALUES (${payload.document},${payload.undoOf},${payload.id}) ON CONFLICT(document,original) DO NOTHING`
++						let compensation = yield* queries.compensation({
++							document: payload.document,
++							id: payload.undoOf,
++						})
++						if (
++							Option.isNone(compensation) ||
++							compensation.value.action !== payload.id
++						)
++							return yield* new UndoUnavailable({
++								reason: "Superseded",
++								message:
++									"This action was already compensated; undo the latest action in its chain",
++							})
++					}
++					let receipt = yield* queries.receipt({
++						document: payload.document,
++						id: payload.id,
++					})
++					if (Option.isNone(receipt))
++						return yield* Effect.fail(
++							new DocumentConflict({ message: "Missing action receipt" }),
++						)
++					let log = current?.log ?? (yield* crypto.randomUUIDv4)
++					yield* sql`INSERT INTO document_tips VALUES (${payload.document},${log},${receipt.value.position},${(current?.version ?? 0) + 1},${fingerprint}) ON CONFLICT(document) DO UPDATE SET position=excluded.position,version=excluded.version,fingerprint=excluded.fingerprint`
++					return receipt.value.position
++				}).pipe(
++					Effect.mapError(cause =>
++						cause._tag === "DocumentConflict" ||
++						cause._tag === "UndoUnavailable" ||
++						cause._tag === "SqlError"
++							? cause
++							: new DocumentConflict({ message: cause.message }),
++					),
++				),
++			)
++			.handle("DocumentChangedJson", ({ payload, entry }) =>
+ 				Effect.gen(function* () {
+ 					let current = Option.getOrUndefined(
+ 						yield* queries.notice(payload.document),
+@@ -903,7 +1031,7 @@
+ 									: "Invalid withdrawal clocks",
+ 						}),
+ 				})
+-				yield* write("DocumentWithdrawn", {
++				yield* write("DocumentWithdrawnJson", {
+ 					action,
+ 					subject: principal.subject,
+ 				}).pipe(
+@@ -1597,7 +1725,7 @@
+ 					Option.isSome(yield* workspace.document(fact.change.document))
+ 				)
+ 					return yield* conflict("Document already belongs to a workspace")
+-				let position = yield* write("WorkspaceChanged", fact).pipe(
++				let position = yield* write("WorkspaceChangedJson", fact).pipe(
+ 					Effect.catchTag("EventJournalError", error =>
+ 						Effect.fail(
+ 							SqlError.isSqlError(error.cause)
+@@ -2153,7 +2281,7 @@
+ 						)
+ 					yield* sql`INSERT INTO document_operation_ids VALUES (${fact.document},${change.id},${fact.id})`
+ 				}
+-				let position = yield* write("DocumentChanged", fact).pipe(
++				let position = yield* write("DocumentChangedJson", fact).pipe(
+ 					Effect.catchTag("EventJournalError", error =>
+ 						Effect.fail(
+ 							SqlError.isSqlError(error.cause)
+--- src/server/workspace-projection.ts
++++ src/server/workspace-projection.ts
+@@ -73,7 +73,7 @@
+ 	position: Schema.Natural,
+ 	payload: Schema.NullOr(Schema.Uint8Array),
+ })
+-let binary = SchemaBinary.toCodec(WorkspaceFactSchema)
++let binary = Schema.Union([SchemaBinary.toCodec(Schema.fromJsonString(WorkspaceFactSchema)), SchemaBinary.toCodec(WorkspaceFactSchema)])
+ 
+ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
+ 	let workspace = SqlSchema.findOneOption({

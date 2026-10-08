@@ -11,3 +11,13 @@ Opus 5.5 recommends versioned event tags, preserving existing schema/handler reg
 Always writing JSON remains an unmeasured performance tradeoff. It repeats object keys and escapes snapshot strings again; normal production latency, task and byte-size measurements are required before adoption. Domain-specific well-formed-text checks may retain ordinary binary writes, but no custom recursive schema scanner or encoding bypass is proposed here.
 
 No production change was adopted. `compatibility.test.ts.txt` is an executable outside-workspace snapshot with absolute imports requiring adjustment; it is excluded from the application TypeScript build. `rejected-domain-union.patch` is rejected evidence, not a patch to apply. The original full DocumentSession failed fixture was not copied before its later Unicode-valid correction; the sequence and log are retained separately under `/tmp/alkalye-compact-pieces`. No exact reproduction-file SHA is claimed.
+
+## Full outside draft
+
+`versioned-json-tags.patch` keeps legacy events and adds JSON events for DocumentRecorded, DocumentChanged, WorkspaceChanged and DocumentWithdrawn. Explicit committed-action and workspace-fact readers use separate framed codecs. The exploratory server handlers duplicate behavior; refactor before any conscious production adoption. Nothing is adopted.
+
+Strict source types passed. The exact failed document sequence now passes both snapshot modes: two contracts, 30 assertions, including sync, discussion, saved snapshot, reopen and Undo. `document-session-pass.log.txt` retains the result. The executed document-only source was subsequently extended; no exact earlier test-source SHA is claimed.
+
+The workspace extension exposes a separate genuine failure. Its public history retains the exact high-surrogate name, while `workspaceSnapshot.name` returns three replacement characters instead of one unpaired UTF-16 unit. Both modes fail. Raw SQL TEXT projection writes and reads workspace names; the authoritative JSON event does not repair that scalar projection. `workspace-projection-failure.log.txt` and `full-session.test.ts.txt` retain the failing oracle. This prevents claiming a complete UTF-16 repair.
+
+Two harness failures are also retained: a test filter required an explicit `./` path, and the initial workspace history assertion used `.change` instead of `.fact.change`. The corrected typed assertion passes the history check and then fails at the real snapshot boundary. No further runtime or performance adoption followed.

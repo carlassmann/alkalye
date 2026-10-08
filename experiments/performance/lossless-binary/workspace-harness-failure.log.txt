@@ -1,0 +1,56 @@
+bun test v1.4.0 (34cbb9a40)
+
+lossless-session.test.ts:
+37 | 				return effect.pipe(Effect.provideService(Identity, { subject, actors: [] }))
+38 | 			}
+39 | 			yield* request(store.create("space", "Compaction", "compact-space"))
+40 |             yield* request(store.rename("space", "Workspace\uD800\uDC00 lone\uD800", "rename"))
+41 |             let workspaceHistory = yield* request(store.workspaceHistory("space"))
+42 |             expect(workspaceHistory.at(-1)?.change).toEqual({kind:"renamed",name:"Workspace\uD800\uDC00 lone\uD800"})
+                                                         ^
+error: expect(received).toEqual(expected)
+
+- {
+-   "kind": "renamed",
+-   "name": "Workspace𐀀 lone�",
+- }
++ undefined
+
+- Expected  - 4
++ Received  + 1
+
+      at <anonymous> (/private/tmp/alkalye-lossless-binary-runtime/lossless-session.test.ts:42:53)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+(fail) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [75.41ms]
+37 | 				return effect.pipe(Effect.provideService(Identity, { subject, actors: [] }))
+38 | 			}
+39 | 			yield* request(store.create("space", "Compaction", "compact-space"))
+40 |             yield* request(store.rename("space", "Workspace\uD800\uDC00 lone\uD800", "rename"))
+41 |             let workspaceHistory = yield* request(store.workspaceHistory("space"))
+42 |             expect(workspaceHistory.at(-1)?.change).toEqual({kind:"renamed",name:"Workspace\uD800\uDC00 lone\uD800"})
+                                                         ^
+error: expect(received).toEqual(expected)
+
+- {
+-   "kind": "renamed",
+-   "name": "Workspace𐀀 lone�",
+- }
++ undefined
+
+- Expected  - 4
++ Received  + 1
+
+      at <anonymous> (/private/tmp/alkalye-lossless-binary-runtime/lossless-session.test.ts:42:53)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+(fail) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [46.30ms]
+
+ 0 pass
+ 2 fail
+ 2 expect() calls
+Ran 2 tests across 1 file. [173.00ms]

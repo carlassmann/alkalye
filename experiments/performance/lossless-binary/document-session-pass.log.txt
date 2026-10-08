@@ -1,0 +1,10 @@
+bun test v1.4.0 (34cbb9a40)
+
+lossless-session.test.ts:
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [546.45ms]
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [463.12ms]
+
+ 2 pass
+ 0 fail
+ 30 expect() calls
+Ran 2 tests across 1 file. [1068.00ms]
