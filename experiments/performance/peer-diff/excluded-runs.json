@@ -1,0 +1,135 @@
+[
+	{
+		"name": "1048576-before-0",
+		"reason": "Seed argv exceeded posix_spawn E2BIG before editing.",
+		"log": "43 | \t\t\t},\n44 | \t\t},\n45 | \t)\n46 | \tif (result.status !== 0) {\n47 | \t\tlet failure = result.error?.message || result.stderr || result.stdout\n48 | \t\tthrow new Error(`${session} ${args[0]}: ${failure}`)\n                 ^\nerror: terminal-owner-1791425025992 eval: E2BIG: argument list too long, posix_spawn '/Users/carlassmann/.bun/bin/agent-browser'\n      at browser (/private/tmp/alkalye-peer-diff/tests/browser-driver.ts:48:13)\n      at evaluate (/private/tmp/alkalye-peer-diff/tests/browser-driver.ts:166:9)\n      at /private/tmp/alkalye-peer-diff/experiments/performance/terminal-peer/journey.ts:98:3\n\nBun v1.4.0 (macOS arm64)\n",
+		"output": {
+			"phase": "1048576-before-0",
+			"rows": []
+		}
+	},
+	{
+		"name": "large-1048576-before-0",
+		"reason": "Reload cleared harness window.peerExpected; exact document remained durable. Two preliminary plain cells excluded.",
+		"log": "terminal-peer-1791425214864 {\n  appearance: \"dark\",\n  library: \"\\n\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\tTodayUntitled\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\tTodayWelcome to Alkalye\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t\",\n  path: \"/app/doc/35335226-566f-42b6-af6f-18a08d488662\",\n  profile: \"Polling guestSynced to your account\",\n  readOnly: false,\n  retry: true,\n  size: \"18px\",\n  source: \"Paragraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nPara\",\n  sourceLength: 1048576,\n  status: \"Saved\",\n  toast: \"\",\n  tools: \"\\n\\t\\t\\t\\t\\t\\t\\n\\t\\tFind\u2318F\\n\\t\\n\\t\\tCommand palette\u2318\u21e7P\\n\\t\\n\\t\\tDocument outline\u2318\u21e7O\\n\\t\\n\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\n\\t\\tPreview\\n\\t\\n\\t\\tDisable comments\\n\\t\\n\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\tFile\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\n\\t\\tProperties\\n\\t\\n\\t\\tTurn into presentation\\n\\t\\n\\t\\tPin\\n\\t\\n\\t\\tArchive\\n\\t\\n\\t\\tTime machine\\n\\t\\n\\t\\tTheme\\n\\t\\n\\t\\tExport\\n\\t\\n\\t\\tSave as\u2026\u2318\u21e7S\\n\\t\\n\\t\\tShare a copy\\n\\t\\n\\t\\tPrint or PDF\u2318P\\n\\t\\n\\t\\tDuplicate\\n\\t\\n\\t\\tLeave document\\n\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\tEdit\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\n\\t\\tUndo\u2318Z\\n\\t\\n\\t\\tRedo\u2318\u21e7Z\\n\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\tCut\u2318X\\n\\t\\n\\t\\tCopy\u2318C\\n\\t\\n\\t\\tPaste\u2318V\\n\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\tFind and replace\\n\\t\\n\\t\\tToggle task completion\u2325\u2318X\\n\\t\\n\\t\\tSort tasks\u2325\u2318\u21e7X\\n\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\tFormat\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\tHeadings\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\n\\t\\tHeading 1\u2325\u23181\\n\\t\\n\\t\\tHeading 2\u2325\u23182\\n\\t\\n\\t\\tHeading 3\u2325\u23183\\n\\t\\n\\t\\tHeading 4\u2325\u23184\\n\\t\\n\\t\\tHeading 5\u2325\u23185\\n\\t\\n\\t\\tHeading 6\u2325\u23186\\n\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\tLists\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\n\\t\\tBullet list\u2325\u2318L\\n\\t\\n\\t\\tNumbered list\u2325\u2318O\\n\\t\\n\\t\\tTask list\u2325\u2318\u21e7L\\n\\t\\n\\t\\tToggle task completion\u2325\u2318X\\n\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\n\\t\\tQuote\u2325\u2318Q\\n\\t\\n\\t\\tBody text\u2325\u23180\\n\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\tStructure\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\n\\t\\tIndent\\n\\t\\n\\t\\tOutdent\\n\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\tMove line up\\n\\t\\n\\t\\tMove line down\\n\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\tBold\u2318B\\n\\t\\n\\t\\tItalic\u2318I\\n\\t\\n\\t\\tStrikethrough\u2318\u21e7X\\n\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\tInline code\u2318E\\n\\t\\n\\t\\tCode block\u2325\u2318C\\n\\t\\n\\t\\tLink\u2318K\\n\\t\\n\\t\\tImage\\n\\t\\n\\t\\tLink to document\\n\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\tClear formatting\\n\\t\\n\\t\\t\\t\\t\\n\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\tCollaboration\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\tInvite collaborators\\n\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\n\\t\\t\\t\\tBacklinks\\n\\t\\t\\t\\tNo documents link here yet.\\n\\t\\t\\t\\n\\t\\t\\t\\t\\t\\n\\t\\t\\n\\t\\t\\tAssets\\n\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\t\\t\\n\\t\\tNew whiteboard\\n\\t\\n\\t\\tUpload or import\\n\\t\\n\\t\\t\\t\\t\\t\\t\\t\\n\\t\\t\\n\\t\\tNo assets yet\\n\\t\\t\\n\\t\\n\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\\n\\t\\tSign in\\n\\t\\n\\t\\tSign out\\n\\t\\n\\t\\t\\t\\t\\t\",\n  view: \"Paragraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nParagraph text.\\nPara\",\n}\n174 | \t\t\tevaluate(\n175 | \t\t\t\tsession,\n176 | \t\t\t\t'({readOnly:document.querySelector(\"#editor\")?.readOnly,tools:document.querySelector(\"#inspector-body\")?.textContent,source:document.querySelector(\"alkalye-editor\")?.source?.value.slice(0,500),sourceLength:document.querySelector(\"alkalye-editor\")?.source?.value.length,view:document.querySelector(\"#editor\")?.value.slice(0,500),status:document.querySelector(\"#save-status\")?.textContent,retry:document.querySelector(\"#retry-save\")?.hidden,toast:document.querySelector(\"#toast\")?.textContent,results:window.documentApiResults?.slice(-8),failure:window.documentApiFailure,discussion:window.documentDiscussionStage,library:document.querySelector(\"#document-list\")?.textContent,path:location.pathname+location.search,page:document.querySelector(\"[data-settings-page],[data-workspace-settings]\")?.querySelector(\".settings-content\")?.id,appearance:document.documentElement.dataset.appearance,size:document.documentElement.style.getPropertyValue(\"--editor-size\"),profile:document.querySelector(\".profile-name\")?.textContent.tri\n177 | \t\t\t),\n178 | \t\t)\n179 | \t\tthrow new Error(\"Browser condition failed: \" + source, { cause: error })\n                  ^\nerror: Browser condition failed: document.querySelector(\"alkalye-editor\")?.source.value === window.peerExpected && document.querySelector(\"#editor\") && !document.querySelector(\"#editor\").readOnly && document.querySelector(\"#save-status\")?.dataset.pending === \"0\" && document.querySelector(\"#save-status\")?.getAttribute(\"aria-busy\") === \"false\"\n      at wait (/private/tmp/alkalye-peer-diff/tests/browser-driver.ts:179:13)\n      at saved (/private/tmp/alkalye-peer-diff/experiments/performance/terminal-peer/journey.ts:82:3)\n      at /private/tmp/alkalye-peer-diff/experiments/performance/terminal-peer/journey.ts:201:3\n\n43 | \t\t\t},\n44 | \t\t},\n45 | \t)\n46 | \tif (result.status !== 0) {\n47 | \t\tlet failure = result.error?.message || result.stderr || result.stdout\n48 | \t\tthrow new Error(`${session} ${args[0]}: ${failure}`)\n                 ^\nerror: terminal-peer-1791425214864 wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n\n      at browser (/private/tmp/alkalye-peer-diff/tests/browser-driver.ts:48:13)\n      at wait (/private/tmp/alkalye-peer-diff/tests/browser-driver.ts:170:3)\n      at saved (/private/tmp/alkalye-peer-diff/experiments/performance/terminal-peer/journey.ts:82:3)\n\nBun v1.4.0 (macOS arm64)\n",
+		"output": {
+			"phase": "large-1048576-before-0",
+			"rows": [
+				{
+					"phase": "large-1048576-before-0",
+					"header": false,
+					"trial": 0,
+					"action": "append",
+					"owner": {
+						"start": 1791425246521,
+						"trusted": true
+					},
+					"peer": {
+						"accepted": 1791425247124.7002,
+						"exact": true,
+						"floor": 2,
+						"heap": 2005207545,
+						"paint": 1791425246875,
+						"position": 3,
+						"received": 1791425246843,
+						"scripts": [
+							"http://localhost:52458/chunks/document-app-m2qx4cqf.js",
+							"http://localhost:52458/chunks/document-app-6q8jcqjd.js",
+							"http://localhost:52458/chunks/document-app-qbpfjp9s.js",
+							"http://localhost:52458/chunks/document-app-jvxsp8xh.js",
+							"http://localhost:52458/chunks/document-app-pzbxckbs.js",
+							"http://localhost:52458/app.js",
+							"http://localhost:52458/chunks/document-app-vs6xk76k.js",
+							"http://localhost:52458/chunks/document-app-gf4hdxnw.js",
+							"http://localhost:52458/chunks/document-app-e3ap03vm.js",
+							"http://localhost:52458/chunks/document-app-t2c0q4x7.js",
+							"http://localhost:52458/chunks/document-app-84g5fq8v.js",
+							"http://localhost:52458/chunks/document-app-fjge2egf.js",
+							"http://localhost:52458/chunks/document-app-c3ss2tq7.js",
+							"http://localhost:52458/chunks/document-app-c6wc4y2y.js",
+							"http://localhost:52458/chunks/document-app-b0yeg0hx.js",
+							"http://localhost:52458/chunks/document-app-xechpbp6.js",
+							"http://localhost:52458/chunks/document-app-ncxg3qzf.js",
+							"http://localhost:52458/chunks/document-app-e7vwaf0q.js",
+							"http://localhost:52458/chunks/document-app-c4ksd8ec.js",
+							"http://localhost:52458/chunks/document-app-qenvjegg.js",
+							"http://localhost:52458/chunks/document-app-dh3m50w7.js",
+							"http://localhost:52458/chunks/document-app-1t4a0gb7.js",
+							"http://localhost:52458/chunks/document-app-bvsc7173.js",
+							"http://localhost:52458/chunks/document-app-a1wrmpe6.js",
+							"http://localhost:52458/chunks/document-app-mhc65yn7.js",
+							"http://localhost:52458/chunks/document-app-68q58m06.js",
+							"http://localhost:52458/chunks/document-app-y1hrwemp.js",
+							"http://localhost:52458/chunks/document-app-2d6qcvkk.js",
+							"http://localhost:52458/chunks/document-app-jegj5sa1.js",
+							"http://localhost:52458/chunks/document-app-jev26rbc.js",
+							"http://localhost:52458/chunks/document-app-eznwvf0k.js",
+							"http://localhost:52458/chunks/document-app-nqb2j1d5.js",
+							"http://localhost:52458/chunks/invitation-screen-ke7tgxmy.js",
+							"http://localhost:52458/chunks/document-worker-stats-06ykpceg.js",
+							"http://localhost:52458/document-worker.js"
+						],
+						"start": 1791425246369.4
+					}
+				},
+				{
+					"phase": "large-1048576-before-0",
+					"header": false,
+					"trial": 0,
+					"action": "remove",
+					"owner": {
+						"start": 1791425247613,
+						"trusted": true
+					},
+					"peer": {
+						"accepted": 1791425247960.7002,
+						"exact": true,
+						"floor": 3,
+						"heap": 2064942058,
+						"paint": 1791425247710.4,
+						"position": 4,
+						"received": 1791425247674.5,
+						"scripts": [
+							"http://localhost:52458/chunks/document-app-m2qx4cqf.js",
+							"http://localhost:52458/chunks/document-app-6q8jcqjd.js",
+							"http://localhost:52458/chunks/document-app-qbpfjp9s.js",
+							"http://localhost:52458/chunks/document-app-jvxsp8xh.js",
+							"http://localhost:52458/chunks/document-app-pzbxckbs.js",
+							"http://localhost:52458/app.js",
+							"http://localhost:52458/chunks/document-app-vs6xk76k.js",
+							"http://localhost:52458/chunks/document-app-gf4hdxnw.js",
+							"http://localhost:52458/chunks/document-app-e3ap03vm.js",
+							"http://localhost:52458/chunks/document-app-t2c0q4x7.js",
+							"http://localhost:52458/chunks/document-app-84g5fq8v.js",
+							"http://localhost:52458/chunks/document-app-fjge2egf.js",
+							"http://localhost:52458/chunks/document-app-c3ss2tq7.js",
+							"http://localhost:52458/chunks/document-app-c6wc4y2y.js",
+							"http://localhost:52458/chunks/document-app-b0yeg0hx.js",
+							"http://localhost:52458/chunks/document-app-xechpbp6.js",
+							"http://localhost:52458/chunks/document-app-ncxg3qzf.js",
+							"http://localhost:52458/chunks/document-app-e7vwaf0q.js",
+							"http://localhost:52458/chunks/document-app-c4ksd8ec.js",
+							"http://localhost:52458/chunks/document-app-qenvjegg.js",
+							"http://localhost:52458/chunks/document-app-dh3m50w7.js",
+							"http://localhost:52458/chunks/document-app-1t4a0gb7.js",
+							"http://localhost:52458/chunks/document-app-bvsc7173.js",
+							"http://localhost:52458/chunks/document-app-a1wrmpe6.js",
+							"http://localhost:52458/chunks/document-app-mhc65yn7.js",
+							"http://localhost:52458/chunks/document-app-68q58m06.js",
+							"http://localhost:52458/chunks/document-app-y1hrwemp.js",
+							"http://localhost:52458/chunks/document-app-2d6qcvkk.js",
+							"http://localhost:52458/chunks/document-app-jegj5sa1.js",
+							"http://localhost:52458/chunks/document-app-jev26rbc.js",
+							"http://localhost:52458/chunks/document-app-eznwvf0k.js",
+							"http://localhost:52458/chunks/document-app-nqb2j1d5.js",
+							"http://localhost:52458/chunks/invitation-screen-ke7tgxmy.js",
+							"http://localhost:52458/chunks/document-worker-stats-06ykpceg.js",
+							"http://localhost:52458/document-worker.js"
+						],
+						"start": 1791425247509.2002
+					}
+				}
+			]
+		}
+	}
+]

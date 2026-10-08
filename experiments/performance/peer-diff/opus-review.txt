@@ -1,0 +1,26 @@
+I found no correctness blockers. The only concrete blocker is formatting. I only read the files; nothing was run.
+
+**`difference()` in source-textarea.ts:300**
+- It gives exactly the same result as before. When one string is a strict prefix of the other, the fast path sets `start = shorter.length`, which is where the old scan stopped. The old scan then runs and exits at once.
+- **Append:** `end == start`, so the suffix loop doesn't run. If the appended text starts with a low surrogate, the existing adjustment still catches it via `after[start]` and moves `start` back one, as before.
+- **Backspace:** the mirror case also matches. `before[start]` is the removed character.
+- **Equal and same-length strings** skip the fast path and use the old scan. Callers only call it on differing strings anyway.
+- **Empty strings:** `"".startsWith` never runs. `x.startsWith("")` gives `start = 0`. Correct.
+- **Invalid surrogate halves:** a lone low surrogate at the cut moves `start` back one. That widens the edit but gives the same final text, as before.
+
+**`render()` in editor-viewport.ts:354**
+- The prefix path is the same as above. In the terminal case the suffix loop never runs, because either `end == start` or `tail == start`.
+- The new adjustment changes the edit, not the final text. For example, if previous ends with a high surrogate and the appended text starts with a low one, the edit becomes `{len-1, len, "H L…"}` instead of `{len, len, "L…"}`. After `text.replace` the text is the same. `rebuild` may start one block earlier, which is harmless.
+- **Backspace that cuts a pair** (e.g. previous `a\uD83D\uDE00`, new `a\uD83D`): the old `{2,3,""}` becomes `{1,3,"\uD83D"}`. Same text.
+- **Invalid low surrogate:** previous `a\uDC00` → new `a` gives `{0,2,"a"}`. Correct.
+- `previous[start] ?? source[start]` picks the right string in both directions, because the shorter side is always `undefined` at `start`.
+- **Not a blocker:** the low-surrogate adjustment applies only to the terminal case. Edits in the middle still don't get it, which is how render behaved before. The `edit` from `render()` doesn't reach `pending` or `edited`, so sync can't change.
+
+**Unchanged behaviour**
+- Projection, selection and IME are unaffected. The composing deferral, `acknowledge`, `input()`, selection assignment, `projectionFor` and `apply` look the same. `input()` moved exactly 10 lines, which matches the size of the render change, so I assume nothing else in the file changed. I didn't diff the whole file.
+
+**Blocker**
+- editor-viewport.ts:376 is far too long for the formatter, so `bun run check` would fail on formatting. Wrap the `if` condition.
+
+**Minor (not blockers)**
+- If a string isn't a prefix, the mismatch is near the end and the lengths differ, `startsWith` scans up to the mismatch and the JS loop then scans it again. The worst case is about 2× the old scan, but the native half is cheap.

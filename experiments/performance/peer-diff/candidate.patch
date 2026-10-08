@@ -1,0 +1,43 @@
+--- a/src/client/source-textarea.ts
++++ b/src/client/source-textarea.ts
+@@ -299,6 +299,10 @@
+ 
+ function difference(before: string, after: string): SourceReplacement {
+ 	let start = 0
++	if (after.length > before.length && after.startsWith(before))
++		start = before.length
++	else if (before.length > after.length && before.startsWith(after))
++		start = after.length
+ 	while (
+ 		start < before.length &&
+ 		start < after.length &&
+--- a/src/client/editor-viewport.ts
++++ b/src/client/editor-viewport.ts
+@@ -355,6 +355,14 @@
+ 			let start = 0,
+ 				end = previous.length,
+ 				tail = source.length
++			let terminal = false
++			if (tail > end && source.startsWith(previous)) {
++				start = end
++				terminal = true
++			} else if (end > tail && previous.startsWith(source)) {
++				start = tail
++				terminal = true
++			}
+ 			while (start < end && start < tail && previous[start] === source[start])
+ 				start++
+ 			while (
+@@ -365,6 +373,12 @@
+ 				end--
+ 				tail--
+ 			}
++			if (
++				terminal &&
++				start > 0 &&
++				/[\uDC00-\uDFFF]/.test(previous[start] ?? source[start] ?? "")
++			)
++				start--
+ 			this.apply({ start, end, insert: source.slice(start, tail) })
+ 		}
+ 		this.acknowledged = source
