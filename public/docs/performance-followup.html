@@ -439,6 +439,17 @@
 			samples:
 			<code>experiments/performance/terminal-peer/</code>.
 		</p>
+		<h2>Shared-index experiments remain outside production</h2>
+		<p>
+			Sharing immutable CRDT indices reduced undo latency in one experiment, but
+			slowed real 2,048-selection edits. A second version used Effect's
+			transient batch mutation and still regressed. Three alternating pairs
+			measured input tasks at 25.01 versus 30.75 ms for 128 KiB, and 23.63
+			versus 31.54 ms for 1 MiB. Deferred tasks also grew. All 24 trusted edit
+			and durable-undo trials passed, along with 133 public contracts.
+			Correctness alone does not justify slower typing. Both experiments stay
+			out of production.
+		</p>
 		<h2>Native search highlights reduce manual geometry work</h2>
 		<p>
 			Inactive matches use the browser's CSS Custom Highlight API. The active
