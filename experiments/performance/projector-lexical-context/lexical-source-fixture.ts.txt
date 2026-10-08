@@ -1,0 +1,151 @@
+import { SourceTextarea } from "../src/client/source-textarea"
+import { SourceTextarea as BaselineTextarea } from "../src/client/source-textarea-oracle"
+import type { ProjectionMode } from "../src/client/source-textarea"
+import { project, identity, toView } from "../src/shared/projection-oracle"
+
+let linkedDocument = { id: "first", title: "First", archived: false }
+let documents = [linkedDocument]
+let mode: ProjectionMode = "project"
+let native = document.createElement("textarea")
+native.id = "editor"
+document.body.append(native)
+let source = new SourceTextarea(native, "", {
+	documents: () => documents,
+	mode: () => mode,
+	caretTop: () => undefined,
+	painted() {},
+	fullDocument: true,
+})
+let controlNative = document.createElement("textarea")
+document.body.append(controlNative)
+let control = new BaselineTextarea(controlNative, "", {
+	documents: () => documents,
+	mode: () => mode,
+	caretTop: () => undefined,
+	painted() {},
+	fullDocument: true,
+})
+let crlfNormalizationUnresolved: {
+	requested: number
+	actual: number
+	native: number
+}[] = []
+let assertions = 0
+let stages: string[] = []
+function check(condition: boolean, message: string) {
+	assertions++
+	if (!condition) throw new Error(message)
+}
+function validate(content: string, start: number, end = start) {
+	source.setSelectionRange(start, end)
+	control.value = content
+	control.setSelectionRange(start, end)
+	let expected =
+		mode === "raw"
+			? identity(content)
+			: project(content, { documents, active: { start, end }, iconSpace: true })
+	check(source.value === content, "source changed")
+	check(
+		JSON.stringify(source.projection) === JSON.stringify(expected),
+		"fresh projection differs at " + stages.at(-1),
+	)
+	if (content.includes("\r\n")) {
+		check(
+			source.selectionStart === control.selectionStart &&
+				source.selectionEnd === control.selectionEnd,
+			"CRLF baseline caret differs",
+		)
+		check(
+			source.viewport.selectionStart === control.viewport.selectionStart &&
+				source.viewport.selectionEnd === control.viewport.selectionEnd,
+			"CRLF baseline native mapping differs",
+		)
+		if (source.selectionStart !== start)
+			crlfNormalizationUnresolved.push({
+				requested: start,
+				actual: source.selectionStart,
+				native: source.viewport.selectionStart,
+			})
+	} else {
+		check(
+			source.selectionStart === start && source.selectionEnd === end,
+			"LF source selection moved",
+		)
+		check(
+			source.viewport.selectionStart === toView(expected, start) &&
+				source.viewport.selectionEnd === toView(expected, end),
+			"LF native view mapping differs",
+		)
+	}
+}
+try {
+	let body =
+		"Body [Label](https://example.org) [[First]] 😀 end.\nNext [Two](https://two.example).\n"
+	let cases = [
+		body,
+		"---\ntitle: Doc\n---\n" + body,
+		"---\ntitle: Doc\n--\n" + body,
+		"---\r\ntitle: Doc\r\n...  \r\n" + body,
+		body,
+		"```\n" + body + "```\nOutside [Three](https://three.example)",
+		"````\n" + body + "```\nOutside [Three](https://three.example)",
+		"````\n" + body + "```` trailing\nOutside [Three](https://three.example)",
+		"````\n" + body + "````  \nOutside [Three](https://three.example)",
+		"~~~\n" + body + "~~~\nOutside [Three](https://three.example)",
+		"\n\n" + body,
+		"`[Code](https://code.example)`\n    [Indented](https://indent.example)\n\t[[First]]\n   [Visible](https://visible.example)\n" +
+			body,
+	]
+	for (let [index, content] of cases.entries()) {
+		stages.push("transition" + index)
+		source.value = content
+		let link = content.indexOf("[Label]")
+		for (let position of [
+			0,
+			Math.max(0, link - 1),
+			Math.max(0, link),
+			Math.max(0, link + 1),
+			content.length,
+		])
+			validate(content, position)
+		if (link >= 0) validate(content, link, link + 7)
+	}
+	stages.push("two shifted suffixes")
+	for (let content of ["Prefix\n\n" + body, body, "Another\n" + body, body]) {
+		source.value = content
+		validate(content, content.indexOf("[[First]]") + 2)
+	}
+	stages.push("same array retitle")
+	source.value = body
+	linkedDocument.title = "Renamed"
+	source.sync()
+	validate(body, 0)
+	stages.push("raw then hold then project")
+	for (let next of ["raw", "hold", "project"] satisfies ProjectionMode[]) {
+		mode = next
+		source.sync()
+		validate(body, 0)
+		validate(body, body.indexOf("[Label]") + 1)
+	}
+	linkedDocument.title = "First"
+	mode = "project"
+	source.value = body
+	source.setSelectionRange(2, 2)
+	source.focus()
+	native.addEventListener("input", () => {
+		source.input()
+		validate(source.value, source.selectionStart, source.selectionEnd)
+		Object.assign(window, { lexicalTyped: source.value })
+	})
+	Object.assign(window, {
+		lexicalDone: true,
+		lexicalResults: { assertions, stages, crlfNormalizationUnresolved },
+		lexicalInitial: body,
+	})
+} catch (error) {
+	Object.assign(window, {
+		lexicalDone: true,
+		lexicalFailure: String(error),
+		lexicalResults: { assertions, stages, crlfNormalizationUnresolved },
+	})
+}

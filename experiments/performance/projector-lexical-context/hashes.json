@@ -1,0 +1,74 @@
+{
+	"candidate-2-undo.trace.json": {
+		"sha256": "ee41899f4f8a2add79b83c3f6e1a50f4a5674096723830b3e3bd9f505b47d7a6",
+		"bytes": 9731930,
+		"retainedPath": "/tmp/alkalye-projector-lexical-context/app/candidate-2-undo.trace.json"
+	},
+	"baseline-2-input.trace.json": {
+		"sha256": "d569ee112f430bcc4fda1a2bc7e6cbbc1404ced0c1ce7247323f3e12b8368fd6",
+		"bytes": 8345444,
+		"retainedPath": "/tmp/alkalye-projector-lexical-context/app/baseline-2-input.trace.json"
+	},
+	"baseline-0-undo.trace.json": {
+		"sha256": "926a584444e796a679f368322d4a155319ae5fce3101576318e498d35acb94e0",
+		"bytes": 9651894,
+		"retainedPath": "/tmp/alkalye-projector-lexical-context/app/baseline-0-undo.trace.json"
+	},
+	"candidate-2-input.trace.json": {
+		"sha256": "512bc8a09e2d10fdb40737043c1b7300689f16ecc93f2f7fbcd42cc52bd0e23a",
+		"bytes": 8304919,
+		"retainedPath": "/tmp/alkalye-projector-lexical-context/app/candidate-2-input.trace.json"
+	},
+	"baseline-1-undo.trace.json": {
+		"sha256": "deb1a2ddb52392e6badbd7be3ceed3d47d8c5dcb03461f2204fbd54bb05d4742",
+		"bytes": 9630600,
+		"retainedPath": "/tmp/alkalye-projector-lexical-context/app/baseline-1-undo.trace.json"
+	},
+	"baseline-0-input.trace.json": {
+		"sha256": "dd16c228b08ae2f9214f2c0af02d969c5fa856d789eaa7929d4452d1191ac2fb",
+		"bytes": 8417630,
+		"retainedPath": "/tmp/alkalye-projector-lexical-context/app/baseline-0-input.trace.json"
+	},
+	"candidate-0-input.trace.json": {
+		"sha256": "adcc61af4e339188241a19979bf0b9f08773c063a4c69bd9149a9481f9b6e1a7",
+		"bytes": 8309426,
+		"retainedPath": "/tmp/alkalye-projector-lexical-context/app/candidate-0-input.trace.json"
+	},
+	"candidate-1-undo.trace.json": {
+		"sha256": "d01137d3f67e25c3ce2f1f78b1c0b42306b5e3c0c039b3108dfcbaf38dfa10e3",
+		"bytes": 9509465,
+		"retainedPath": "/tmp/alkalye-projector-lexical-context/app/candidate-1-undo.trace.json"
+	},
+	"candidate-0-undo.trace.json": {
+		"sha256": "f8c635a0e9557bb25fb372894d25c7b1ad1564796373505e9a8b0280fc362fdc",
+		"bytes": 9548268,
+		"retainedPath": "/tmp/alkalye-projector-lexical-context/app/candidate-0-undo.trace.json"
+	},
+	"baseline-1-input.trace.json": {
+		"sha256": "4d0fb8df286cf5c9815167df94e0ef3777d98eca1cdd66b831d0acf93e47062e",
+		"bytes": 8285933,
+		"retainedPath": "/tmp/alkalye-projector-lexical-context/app/baseline-1-input.trace.json"
+	},
+	"baseline-2-undo.trace.json": {
+		"sha256": "eed039b02f4ead61f35dc47649bbf20c4af68844b0b0c53e4cf4cb7482651a56",
+		"bytes": 9563549,
+		"retainedPath": "/tmp/alkalye-projector-lexical-context/app/baseline-2-undo.trace.json"
+	},
+	"candidate-1-input.trace.json": {
+		"sha256": "ea374e911d35ade01f461d1545fd797eb2af2509122351901305a062cff79819",
+		"bytes": 8363748,
+		"retainedPath": "/tmp/alkalye-projector-lexical-context/app/candidate-1-input.trace.json"
+	},
+	"baseline/src/shared/projection.ts": {
+		"sha256": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e"
+	},
+	"runtime/src/shared/projection.ts": {
+		"sha256": "121fa6adf08622e72a511fd2ba1171398fb1b33b5b1370d8b3962f12d339b369"
+	},
+	"baseline/dist/app.js": {
+		"sha256": "e4f1b5b17e5a15ba15d86e043cbb7d0b73cdb5c6e767630927e7963777d3ce87"
+	},
+	"runtime/dist/app.js": {
+		"sha256": "099d74fb1b7c552d538b208bc82306671541497d1ca498a0e49690eb1c474e03"
+	}
+}

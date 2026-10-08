@@ -1,0 +1,1721 @@
+{
+	"rows": [
+		{
+			"arm": "baseline",
+			"fixture": "rich1m",
+			"trial": 0,
+			"input": {
+				"trace": "/tmp/alkalye-projector-lexical-context/app/baseline-0-input.trace.json",
+				"sha256": "dd16c228b08ae2f9214f2c0af02d969c5fa856d789eaa7929d4452d1191ac2fb",
+				"mainThread": [75099, 17361212],
+				"windowMs": 3000.703,
+				"initiatingTaskMs": 16.958,
+				"largestTaskMs": 16.958,
+				"aftermathTaskMs": 13.072,
+				"taskCountOver833": 10,
+				"busyUnionMs": 1012.248,
+				"layoutTotalMs": 66.967,
+				"paintTotalMs": 8.596,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 12.791,
+				"largestTaskBreakdown": {
+					"relativeMs": -0.608,
+					"taskMs": 16.958,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "EventDispatch",
+							"durationMs": 16.446,
+							"args": {
+								"data": {
+									"type": "keypress"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 16.143,
+							"args": {
+								"data": {
+									"type": "textInput"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 15.256,
+							"args": {
+								"data": {
+									"type": "input"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 13.315,
+							"args": {
+								"data": {
+									"columnNumber": 5060,
+									"frame": "A40A2141635D725E68E86A564B4F120F",
+									"functionName": "Ai.s.oninput",
+									"isolate": "13002306064606250229",
+									"lineNumber": 86,
+									"sampleTraceId": 483067567356932,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.899,
+							"args": {
+								"data": {
+									"columnNumber": 19193,
+									"frame": "A40A2141635D725E68E86A564B4F120F",
+									"functionName": "me",
+									"isolate": "13002306064606250229",
+									"lineNumber": 86,
+									"sampleTraceId": 483067567356944,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.265,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "A40A2141635D725E68E86A564B4F120F",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 0.199,
+							"args": {
+								"data": {
+									"type": "beforeinput"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.167,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "A40A2141635D725E68E86A564B4F120F",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-projector-lexical-context/app/baseline-0-undo.trace.json",
+				"sha256": "926a584444e796a679f368322d4a155319ae5fce3101576318e498d35acb94e0",
+				"mainThread": [75099, 17361212],
+				"windowMs": 3001.634,
+				"initiatingTaskMs": 0.501,
+				"largestTaskMs": 221.337,
+				"aftermathTaskMs": 221.337,
+				"taskCountOver833": 19,
+				"busyUnionMs": 1512.596,
+				"layoutTotalMs": 57.556,
+				"paintTotalMs": 7.528,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 13.553,
+				"largestTaskBreakdown": {
+					"relativeMs": 148.18,
+					"taskMs": 221.337,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 217.99,
+							"args": {
+								"data": {
+									"columnNumber": 476,
+									"frame": "A40A2141635D725E68E86A564B4F120F",
+									"functionName": "",
+									"isolate": "13002306064606250229",
+									"lineNumber": 1653,
+									"sampleTraceId": 483067567349698,
+									"scriptId": "5",
+									"url": "http://127.0.0.1:4461/app.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.615,
+							"args": {
+								"data": {
+									"columnNumber": 19193,
+									"frame": "A40A2141635D725E68E86A564B4F120F",
+									"functionName": "me",
+									"isolate": "13002306064606250229",
+									"lineNumber": 86,
+									"sampleTraceId": 483067567349717,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.246,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 667276436,
+								"usedHeapSizeBefore": 705127644
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.051,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 675294288,
+								"usedHeapSizeBefore": 720493596
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.003,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 658595696,
+								"usedHeapSizeBefore": 698010308
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.741,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 678743708,
+								"usedHeapSizeBefore": 719984720
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.62,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 653488152,
+								"usedHeapSizeBefore": 689888456
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.419,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 438,
+									"frame": "A40A2141635D725E68E86A564B4F120F",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"used": 616559772
+			},
+			"bundleSha": "e4f1b5b17e5a15ba15d86e043cbb7d0b73cdb5c6e767630927e7963777d3ce87",
+			"exact": true,
+			"acceptedEditHash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+			"acceptedUndoHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+			"readinessMs": 2218.9221660000003
+		},
+		{
+			"arm": "candidate",
+			"fixture": "rich1m",
+			"trial": 0,
+			"input": {
+				"trace": "/tmp/alkalye-projector-lexical-context/app/candidate-0-input.trace.json",
+				"sha256": "adcc61af4e339188241a19979bf0b9f08773c063a4c69bd9149a9481f9b6e1a7",
+				"mainThread": [75506, 17362741],
+				"windowMs": 3001.26,
+				"initiatingTaskMs": 16.9,
+				"largestTaskMs": 16.9,
+				"aftermathTaskMs": 12.83,
+				"taskCountOver833": 10,
+				"busyUnionMs": 1052.001,
+				"layoutTotalMs": 76.885,
+				"paintTotalMs": 8.674,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 12.545,
+				"largestTaskBreakdown": {
+					"relativeMs": -0.603,
+					"taskMs": 16.9,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "EventDispatch",
+							"durationMs": 16.387,
+							"args": {
+								"data": {
+									"type": "keypress"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 16.079,
+							"args": {
+								"data": {
+									"type": "textInput"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 15.116,
+							"args": {
+								"data": {
+									"type": "input"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 13.095,
+							"args": {
+								"data": {
+									"columnNumber": 5062,
+									"frame": "C1EAFE45ACD4FB7C8ED61071AA2FD000",
+									"functionName": "Ri.s.oninput",
+									"isolate": "2661957113055391374",
+									"lineNumber": 86,
+									"sampleTraceId": 1874169615521442,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-qaz3h2zn.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.972,
+							"args": {
+								"data": {
+									"columnNumber": 19192,
+									"frame": "C1EAFE45ACD4FB7C8ED61071AA2FD000",
+									"functionName": "me",
+									"isolate": "2661957113055391374",
+									"lineNumber": 86,
+									"sampleTraceId": 1874169615521628,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-qaz3h2zn.js"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.245,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "C1EAFE45ACD4FB7C8ED61071AA2FD000",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 0.206,
+							"args": {
+								"data": {
+									"type": "beforeinput"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.158,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "C1EAFE45ACD4FB7C8ED61071AA2FD000",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-projector-lexical-context/app/candidate-0-undo.trace.json",
+				"sha256": "f8c635a0e9557bb25fb372894d25c7b1ad1564796373505e9a8b0280fc362fdc",
+				"mainThread": [75506, 17362741],
+				"windowMs": 3000.457,
+				"initiatingTaskMs": 0.519,
+				"largestTaskMs": 227.291,
+				"aftermathTaskMs": 227.291,
+				"taskCountOver833": 19,
+				"busyUnionMs": 1528.333,
+				"layoutTotalMs": 59.142,
+				"paintTotalMs": 7.368,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 13.599,
+				"largestTaskBreakdown": {
+					"relativeMs": 146.978,
+					"taskMs": 227.291,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 224.03,
+							"args": {
+								"data": {
+									"columnNumber": 476,
+									"frame": "C1EAFE45ACD4FB7C8ED61071AA2FD000",
+									"functionName": "",
+									"isolate": "2661957113055391374",
+									"lineNumber": 1653,
+									"sampleTraceId": 1874169615529321,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/app.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.594,
+							"args": {
+								"data": {
+									"columnNumber": 19192,
+									"frame": "C1EAFE45ACD4FB7C8ED61071AA2FD000",
+									"functionName": "me",
+									"isolate": "2661957113055391374",
+									"lineNumber": 86,
+									"sampleTraceId": 1874169615529243,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-qaz3h2zn.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.254,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 619758456,
+								"usedHeapSizeBefore": 659928476
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.071,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 636251944,
+								"usedHeapSizeBefore": 673503312
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.069,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 609914608,
+								"usedHeapSizeBefore": 649171056
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.986,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 632002764,
+								"usedHeapSizeBefore": 672088688
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.682,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 604773848,
+								"usedHeapSizeBefore": 641178884
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.413,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 438,
+									"frame": "C1EAFE45ACD4FB7C8ED61071AA2FD000",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"used": 570902463
+			},
+			"bundleSha": "099d74fb1b7c552d538b208bc82306671541497d1ca498a0e49690eb1c474e03",
+			"exact": true,
+			"acceptedEditHash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+			"acceptedUndoHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+			"readinessMs": 2201.5480830000015
+		},
+		{
+			"arm": "candidate",
+			"fixture": "rich1m",
+			"trial": 1,
+			"input": {
+				"trace": "/tmp/alkalye-projector-lexical-context/app/candidate-1-input.trace.json",
+				"sha256": "ea374e911d35ade01f461d1545fd797eb2af2509122351901305a062cff79819",
+				"mainThread": [75922, 17364185],
+				"windowMs": 3002.044,
+				"initiatingTaskMs": 18.903,
+				"largestTaskMs": 18.903,
+				"aftermathTaskMs": 13.016,
+				"taskCountOver833": 11,
+				"busyUnionMs": 1024.019,
+				"layoutTotalMs": 72.056,
+				"paintTotalMs": 9.095,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 12.781,
+				"largestTaskBreakdown": {
+					"relativeMs": -0.614,
+					"taskMs": 18.903,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "EventDispatch",
+							"durationMs": 18.384,
+							"args": {
+								"data": {
+									"type": "keypress"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 18.078,
+							"args": {
+								"data": {
+									"type": "textInput"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 17.12,
+							"args": {
+								"data": {
+									"type": "input"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 15.051,
+							"args": {
+								"data": {
+									"columnNumber": 5062,
+									"frame": "A60C1EEF421264FD0FC10C7BCF7C4EFF",
+									"functionName": "Ri.s.oninput",
+									"isolate": "15501147676157388869",
+									"lineNumber": 86,
+									"sampleTraceId": 6521886598440084,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-qaz3h2zn.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 2.115,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 475892716,
+								"usedHeapSizeBefore": 507032884
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 2.023,
+							"args": {
+								"data": {
+									"columnNumber": 19192,
+									"frame": "A60C1EEF421264FD0FC10C7BCF7C4EFF",
+									"functionName": "me",
+									"isolate": "15501147676157388869",
+									"lineNumber": 86,
+									"sampleTraceId": 6521886598440068,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-qaz3h2zn.js"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.269,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "A60C1EEF421264FD0FC10C7BCF7C4EFF",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 0.201,
+							"args": {
+								"data": {
+									"type": "beforeinput"
+								}
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-projector-lexical-context/app/candidate-1-undo.trace.json",
+				"sha256": "d01137d3f67e25c3ce2f1f78b1c0b42306b5e3c0c039b3108dfcbaf38dfa10e3",
+				"mainThread": [75922, 17364185],
+				"windowMs": 3001.169,
+				"initiatingTaskMs": 0.525,
+				"largestTaskMs": 228.162,
+				"aftermathTaskMs": 228.162,
+				"taskCountOver833": 20,
+				"busyUnionMs": 1510.021,
+				"layoutTotalMs": 55.931,
+				"paintTotalMs": 7.237,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 14.111,
+				"largestTaskBreakdown": {
+					"relativeMs": 146.029,
+					"taskMs": 228.162,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 224.92,
+							"args": {
+								"data": {
+									"columnNumber": 476,
+									"frame": "A60C1EEF421264FD0FC10C7BCF7C4EFF",
+									"functionName": "",
+									"isolate": "15501147676157388869",
+									"lineNumber": 1653,
+									"sampleTraceId": 6521886598432623,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/app.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.626,
+							"args": {
+								"data": {
+									"columnNumber": 19192,
+									"frame": "A60C1EEF421264FD0FC10C7BCF7C4EFF",
+									"functionName": "me",
+									"isolate": "15501147676157388869",
+									"lineNumber": 86,
+									"sampleTraceId": 6521886598432606,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-qaz3h2zn.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.254,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 673979728,
+								"usedHeapSizeBefore": 711505036
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.068,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 655787744,
+								"usedHeapSizeBefore": 692093600
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.969,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 642663752,
+								"usedHeapSizeBefore": 680000012
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.939,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 650079432,
+								"usedHeapSizeBefore": 687851152
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.551,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 639277732,
+								"usedHeapSizeBefore": 674627480
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.432,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 438,
+									"frame": "A60C1EEF421264FD0FC10C7BCF7C4EFF",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"used": 610863003
+			},
+			"bundleSha": "099d74fb1b7c552d538b208bc82306671541497d1ca498a0e49690eb1c474e03",
+			"exact": true,
+			"acceptedEditHash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+			"acceptedUndoHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+			"readinessMs": 2193.913166999999
+		},
+		{
+			"arm": "baseline",
+			"fixture": "rich1m",
+			"trial": 1,
+			"input": {
+				"trace": "/tmp/alkalye-projector-lexical-context/app/baseline-1-input.trace.json",
+				"sha256": "4d0fb8df286cf5c9815167df94e0ef3777d98eca1cdd66b831d0acf93e47062e",
+				"mainThread": [76342, 17365689],
+				"windowMs": 3000.664,
+				"initiatingTaskMs": 19.22,
+				"largestTaskMs": 19.22,
+				"aftermathTaskMs": 12.693,
+				"taskCountOver833": 10,
+				"busyUnionMs": 977.889,
+				"layoutTotalMs": 65.265,
+				"paintTotalMs": 8.149,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 12.394,
+				"largestTaskBreakdown": {
+					"relativeMs": -0.706,
+					"taskMs": 19.22,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "EventDispatch",
+							"durationMs": 18.65,
+							"args": {
+								"data": {
+									"type": "keypress"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 18.304,
+							"args": {
+								"data": {
+									"type": "textInput"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 17.287,
+							"args": {
+								"data": {
+									"type": "input"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 15.289,
+							"args": {
+								"data": {
+									"columnNumber": 5060,
+									"frame": "524390F4485202A71CB9F72A5E109300",
+									"functionName": "Ai.s.oninput",
+									"isolate": "13302447023822918001",
+									"lineNumber": 86,
+									"sampleTraceId": 7319540642176982,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.953,
+							"args": {
+								"data": {
+									"columnNumber": 19193,
+									"frame": "524390F4485202A71CB9F72A5E109300",
+									"functionName": "me",
+									"isolate": "13302447023822918001",
+									"lineNumber": 86,
+									"sampleTraceId": 7319540642176934,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.776,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 471542020,
+								"usedHeapSizeBefore": 503577476
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.312,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "524390F4485202A71CB9F72A5E109300",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 0.203,
+							"args": {
+								"data": {
+									"type": "beforeinput"
+								}
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-projector-lexical-context/app/baseline-1-undo.trace.json",
+				"sha256": "deb1a2ddb52392e6badbd7be3ceed3d47d8c5dcb03461f2204fbd54bb05d4742",
+				"mainThread": [76342, 17365689],
+				"windowMs": 3001.543,
+				"initiatingTaskMs": 0.526,
+				"largestTaskMs": 203.101,
+				"aftermathTaskMs": 203.101,
+				"taskCountOver833": 19,
+				"busyUnionMs": 1511.015,
+				"layoutTotalMs": 56.857,
+				"paintTotalMs": 7.78,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 14.036,
+				"largestTaskBreakdown": {
+					"relativeMs": 146.065,
+					"taskMs": 203.101,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 200.199,
+							"args": {
+								"data": {
+									"columnNumber": 476,
+									"frame": "524390F4485202A71CB9F72A5E109300",
+									"functionName": "",
+									"isolate": "13302447023822918001",
+									"lineNumber": 1653,
+									"sampleTraceId": 7319540642184637,
+									"scriptId": "5",
+									"url": "http://127.0.0.1:4461/app.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.51,
+							"args": {
+								"data": {
+									"columnNumber": 19193,
+									"frame": "524390F4485202A71CB9F72A5E109300",
+									"functionName": "me",
+									"isolate": "13302447023822918001",
+									"lineNumber": 86,
+									"sampleTraceId": 7319540642184590,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.195,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 650064684,
+								"usedHeapSizeBefore": 687571152
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.868,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 626189444,
+								"usedHeapSizeBefore": 664229764
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.822,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 631865884,
+								"usedHeapSizeBefore": 668171620
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.801,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 618749124,
+								"usedHeapSizeBefore": 656297348
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.538,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 615341460,
+								"usedHeapSizeBefore": 650715824
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.392,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 646325160,
+								"usedHeapSizeBefore": 686206956
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"used": 601626637
+			},
+			"bundleSha": "e4f1b5b17e5a15ba15d86e043cbb7d0b73cdb5c6e767630927e7963777d3ce87",
+			"exact": true,
+			"acceptedEditHash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+			"acceptedUndoHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+			"readinessMs": 2204.703708000001
+		},
+		{
+			"arm": "baseline",
+			"fixture": "rich1m",
+			"trial": 2,
+			"input": {
+				"trace": "/tmp/alkalye-projector-lexical-context/app/baseline-2-input.trace.json",
+				"sha256": "d569ee112f430bcc4fda1a2bc7e6cbbc1404ced0c1ce7247323f3e12b8368fd6",
+				"mainThread": [76739, 17367292],
+				"windowMs": 3002.61,
+				"initiatingTaskMs": 18.8,
+				"largestTaskMs": 18.8,
+				"aftermathTaskMs": 12.564,
+				"taskCountOver833": 10,
+				"busyUnionMs": 1042.939,
+				"layoutTotalMs": 74.975,
+				"paintTotalMs": 8.607,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 12.258,
+				"largestTaskBreakdown": {
+					"relativeMs": -0.644,
+					"taskMs": 18.8,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "EventDispatch",
+							"durationMs": 18.269,
+							"args": {
+								"data": {
+									"type": "keypress"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 17.941,
+							"args": {
+								"data": {
+									"type": "textInput"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 16.923,
+							"args": {
+								"data": {
+									"type": "input"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 14.963,
+							"args": {
+								"data": {
+									"columnNumber": 5060,
+									"frame": "580859CEA1779B53882DC589166F35C4",
+									"functionName": "Ai.s.oninput",
+									"isolate": "8138863419867977560",
+									"lineNumber": 86,
+									"sampleTraceId": 6735399684167278,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.992,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 474389912,
+								"usedHeapSizeBefore": 506630948
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.915,
+							"args": {
+								"data": {
+									"columnNumber": 19193,
+									"frame": "580859CEA1779B53882DC589166F35C4",
+									"functionName": "me",
+									"isolate": "8138863419867977560",
+									"lineNumber": 86,
+									"sampleTraceId": 6735399684167293,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.258,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "580859CEA1779B53882DC589166F35C4",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 0.202,
+							"args": {
+								"data": {
+									"type": "beforeinput"
+								}
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-projector-lexical-context/app/baseline-2-undo.trace.json",
+				"sha256": "eed039b02f4ead61f35dc47649bbf20c4af68844b0b0c53e4cf4cb7482651a56",
+				"mainThread": [76739, 17367292],
+				"windowMs": 3002.459,
+				"initiatingTaskMs": 0.539,
+				"largestTaskMs": 231.932,
+				"aftermathTaskMs": 231.932,
+				"taskCountOver833": 19,
+				"busyUnionMs": 1544.52,
+				"layoutTotalMs": 56.616,
+				"paintTotalMs": 7.122,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 13.896,
+				"largestTaskBreakdown": {
+					"relativeMs": 150.044,
+					"taskMs": 231.932,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 228.706,
+							"args": {
+								"data": {
+									"columnNumber": 476,
+									"frame": "580859CEA1779B53882DC589166F35C4",
+									"functionName": "",
+									"isolate": "8138863419867977560",
+									"lineNumber": 1653,
+									"sampleTraceId": 6735399684175249,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/app.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.61,
+							"args": {
+								"data": {
+									"columnNumber": 19193,
+									"frame": "580859CEA1779B53882DC589166F35C4",
+									"functionName": "me",
+									"isolate": "8138863419867977560",
+									"lineNumber": 86,
+									"sampleTraceId": 6735399684175267,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.162,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 645210020,
+								"usedHeapSizeBefore": 685380040
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.123,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 660135164,
+								"usedHeapSizeBefore": 697932736
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.078,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 657421536,
+								"usedHeapSizeBefore": 698391844
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.068,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 635370408,
+								"usedHeapSizeBefore": 674772188
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.596,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 630248840,
+								"usedHeapSizeBefore": 666621224
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.414,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 438,
+									"frame": "580859CEA1779B53882DC589166F35C4",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"used": 596409541
+			},
+			"bundleSha": "e4f1b5b17e5a15ba15d86e043cbb7d0b73cdb5c6e767630927e7963777d3ce87",
+			"exact": true,
+			"acceptedEditHash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+			"acceptedUndoHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+			"readinessMs": 2209.066334000003
+		},
+		{
+			"arm": "candidate",
+			"fixture": "rich1m",
+			"trial": 2,
+			"input": {
+				"trace": "/tmp/alkalye-projector-lexical-context/app/candidate-2-input.trace.json",
+				"sha256": "512bc8a09e2d10fdb40737043c1b7300689f16ecc93f2f7fbcd42cc52bd0e23a",
+				"mainThread": [77135, 17368754],
+				"windowMs": 3001.462,
+				"initiatingTaskMs": 17.027,
+				"largestTaskMs": 17.027,
+				"aftermathTaskMs": 12.767,
+				"taskCountOver833": 10,
+				"busyUnionMs": 1028.145,
+				"layoutTotalMs": 68.666,
+				"paintTotalMs": 7.763,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 12.486,
+				"largestTaskBreakdown": {
+					"relativeMs": -0.651,
+					"taskMs": 17.027,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "EventDispatch",
+							"durationMs": 16.492,
+							"args": {
+								"data": {
+									"type": "keypress"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 16.157,
+							"args": {
+								"data": {
+									"type": "textInput"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 15.207,
+							"args": {
+								"data": {
+									"type": "input"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 13.253,
+							"args": {
+								"data": {
+									"columnNumber": 5062,
+									"frame": "9D5FEA182463AC34EBF260ADD7AEE14A",
+									"functionName": "Ri.s.oninput",
+									"isolate": "8695790021145368419",
+									"lineNumber": 86,
+									"sampleTraceId": 2519541435334806,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-qaz3h2zn.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.911,
+							"args": {
+								"data": {
+									"columnNumber": 19192,
+									"frame": "9D5FEA182463AC34EBF260ADD7AEE14A",
+									"functionName": "me",
+									"isolate": "8695790021145368419",
+									"lineNumber": 86,
+									"sampleTraceId": 2519541435335020,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-qaz3h2zn.js"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.281,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "9D5FEA182463AC34EBF260ADD7AEE14A",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 0.211,
+							"args": {
+								"data": {
+									"type": "beforeinput"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.168,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "9D5FEA182463AC34EBF260ADD7AEE14A",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-projector-lexical-context/app/candidate-2-undo.trace.json",
+				"sha256": "ee41899f4f8a2add79b83c3f6e1a50f4a5674096723830b3e3bd9f505b47d7a6",
+				"mainThread": [77135, 17368754],
+				"windowMs": 3000.646,
+				"initiatingTaskMs": 0.53,
+				"largestTaskMs": 233.148,
+				"aftermathTaskMs": 233.148,
+				"taskCountOver833": 18,
+				"busyUnionMs": 1527.723,
+				"layoutTotalMs": 51.121,
+				"paintTotalMs": 6.894,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 14.273,
+				"largestTaskBreakdown": {
+					"relativeMs": 147.933,
+					"taskMs": 233.148,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 230.094,
+							"args": {
+								"data": {
+									"columnNumber": 476,
+									"frame": "9D5FEA182463AC34EBF260ADD7AEE14A",
+									"functionName": "",
+									"isolate": "8695790021145368419",
+									"lineNumber": 1653,
+									"sampleTraceId": 2519541435343686,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/app.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.567,
+							"args": {
+								"data": {
+									"columnNumber": 19192,
+									"frame": "9D5FEA182463AC34EBF260ADD7AEE14A",
+									"functionName": "me",
+									"isolate": "8695790021145368419",
+									"lineNumber": 86,
+									"sampleTraceId": 2519541435343703,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-qaz3h2zn.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.274,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 651277032,
+								"usedHeapSizeBefore": 688281596
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.182,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 634710476,
+								"usedHeapSizeBefore": 674913004
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.017,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 624903084,
+								"usedHeapSizeBefore": 664135480
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.951,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 646967132,
+								"usedHeapSizeBefore": 688392052
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.658,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 619807928,
+								"usedHeapSizeBefore": 655967916
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.406,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 438,
+									"frame": "9D5FEA182463AC34EBF260ADD7AEE14A",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"used": 586648719
+			},
+			"bundleSha": "099d74fb1b7c552d538b208bc82306671541497d1ca498a0e49690eb1c474e03",
+			"exact": true,
+			"acceptedEditHash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+			"acceptedUndoHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+			"readinessMs": 2192.523874999999
+		}
+	],
+	"summaries": [
+		{
+			"fixture": "rich1m",
+			"arm": "baseline",
+			"n": 3,
+			"input": {
+				"initiatingTaskMs": {
+					"median": 18.8,
+					"max": 19.22
+				},
+				"aftermathTaskMs": {
+					"median": 12.693,
+					"max": 13.072
+				},
+				"largestTaskMs": {
+					"median": 18.8,
+					"max": 19.22
+				},
+				"busyUnionMs": {
+					"median": 1012.248,
+					"max": 1042.939
+				},
+				"layoutTotalMs": {
+					"median": 66.967,
+					"max": 74.975
+				},
+				"paintTotalMs": {
+					"median": 8.596,
+					"max": 8.607
+				},
+				"majorGcMaxMs": {
+					"median": 0,
+					"max": 0
+				},
+				"minorGcMaxMs": {
+					"median": 12.394,
+					"max": 12.791
+				},
+				"taskCountOver833": {
+					"median": 10,
+					"max": 10
+				}
+			},
+			"undo": {
+				"initiatingTaskMs": {
+					"median": 0.526,
+					"max": 0.539
+				},
+				"aftermathTaskMs": {
+					"median": 221.337,
+					"max": 231.932
+				},
+				"largestTaskMs": {
+					"median": 221.337,
+					"max": 231.932
+				},
+				"busyUnionMs": {
+					"median": 1512.596,
+					"max": 1544.52
+				},
+				"layoutTotalMs": {
+					"median": 56.857,
+					"max": 57.556
+				},
+				"paintTotalMs": {
+					"median": 7.528,
+					"max": 7.78
+				},
+				"majorGcMaxMs": {
+					"median": 0,
+					"max": 0
+				},
+				"minorGcMaxMs": {
+					"median": 13.896,
+					"max": 14.036
+				},
+				"taskCountOver833": {
+					"median": 19,
+					"max": 19
+				}
+			},
+			"mainHeapUsed": {
+				"median": 601626637,
+				"max": 616559772
+			}
+		},
+		{
+			"fixture": "rich1m",
+			"arm": "candidate",
+			"n": 3,
+			"input": {
+				"initiatingTaskMs": {
+					"median": 17.027,
+					"max": 18.903
+				},
+				"aftermathTaskMs": {
+					"median": 12.83,
+					"max": 13.016
+				},
+				"largestTaskMs": {
+					"median": 17.027,
+					"max": 18.903
+				},
+				"busyUnionMs": {
+					"median": 1028.145,
+					"max": 1052.001
+				},
+				"layoutTotalMs": {
+					"median": 72.056,
+					"max": 76.885
+				},
+				"paintTotalMs": {
+					"median": 8.674,
+					"max": 9.095
+				},
+				"majorGcMaxMs": {
+					"median": 0,
+					"max": 0
+				},
+				"minorGcMaxMs": {
+					"median": 12.545,
+					"max": 12.781
+				},
+				"taskCountOver833": {
+					"median": 10,
+					"max": 11
+				}
+			},
+			"undo": {
+				"initiatingTaskMs": {
+					"median": 0.525,
+					"max": 0.53
+				},
+				"aftermathTaskMs": {
+					"median": 228.162,
+					"max": 233.148
+				},
+				"largestTaskMs": {
+					"median": 228.162,
+					"max": 233.148
+				},
+				"busyUnionMs": {
+					"median": 1527.723,
+					"max": 1528.333
+				},
+				"layoutTotalMs": {
+					"median": 55.931,
+					"max": 59.142
+				},
+				"paintTotalMs": {
+					"median": 7.237,
+					"max": 7.368
+				},
+				"majorGcMaxMs": {
+					"median": 0,
+					"max": 0
+				},
+				"minorGcMaxMs": {
+					"median": 14.111,
+					"max": 14.273
+				},
+				"taskCountOver833": {
+					"median": 19,
+					"max": 20
+				}
+			},
+			"mainHeapUsed": {
+				"median": 586648719,
+				"max": 610863003
+			}
+		}
+	],
+	"failures": []
+}
