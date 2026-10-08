@@ -288,6 +288,18 @@
 			keeps the earlier cursor fix. Method and rejected patch:
 			<code>experiments/performance/cooperative-prepare/</code>.
 		</p>
+		<p>
+			Large-deletion cursor recovery now returns immediately for empty text
+			and uses shared native iterator scans for distant surviving atoms.
+			An actual EditorElement component matrix measured 1 MiB-to-empty updates
+			at 170.6 versus 1.1 ms, and reordered sparse survivors at 156.1 versus
+			70.1 ms. All twelve cells passed exact source and cursor checks; ten
+			public editor contracts passed, including distinct endpoints and legacy
+			Unicode widths. Each matrix cell has one sample. These exclude document
+			storage and initial rendering, and do not prove whole-app latency or
+			120 Hz presentation. The nonempty fallback remains linear. Method:
+			<code>experiments/performance/editor-anchor-fallback/</code>.
+		</p>
 		<h2>Body edits remain incremental after metadata changes</h2>
 		<p>
 			Merged frontmatter can leave raw and canonical atom arrays with different
