@@ -1,0 +1,188 @@
+import { expect, test } from "bun:test"
+import { Replica } from "../src/shared/crdt"
+import { documentMetadata } from "../src/shared/document-metadata"
+
+function rebuilt(replica: Replica) {
+	let restored = new Replica("restored")
+	restored.restore(replica.checkpoint())
+	expect(replica.text("doc")).toBe(restored.text("doc"))
+	expect(replica.visible("doc")).toEqual(restored.visible("doc"))
+	expect(replica.metadata("doc")).toEqual(restored.metadata("doc"))
+	expect(documentMetadata(replica.text("doc"))).toEqual(
+		documentMetadata(restored.text("doc")),
+	)
+	let position = replica.text("doc").indexOf("😀")
+	if (position >= 0) {
+		let warm = replica.fork("offset-probe"),
+			cold = restored.fork("offset-probe")
+		let replacement = { start: position, remove: 2, text: "🦋" }
+		expect(warm.prepareReplacements("doc", [replacement])).toEqual(
+			cold.prepareReplacements("doc", [replacement]),
+		)
+	}
+}
+function seed(source: string) {
+	let replica = new Replica("birth")
+	replica.edit("doc", source)
+	replica.text("doc")
+	return replica
+}
+for (let source of [
+	"Body",
+	"Body😀",
+	"---\ntitle: Shared\n---\nBody😀",
+	"---\ntitle: Shared\n---\n" + "x".repeat(131072),
+])
+	for (let order of [
+		[0, 1, 2],
+		[2, 1, 0],
+		[1, 2, 0],
+	])
+		test(
+			"concurrent insertion runs reconstruct exactly " +
+				source.length +
+				" " +
+				order.join(),
+			() => {
+				let receiver = seed(source)
+				let writers = ["z-writer", "a-writer", "m-writer"].map(actor =>
+					receiver.fork(actor),
+				)
+				for (let round = 0; round < 3; round++) {
+					let operations = writers.map((writer, index) =>
+						writer.edit(
+							"doc",
+							writer.text("doc") +
+								"\nWriter " +
+								index +
+								" 🌻 round " +
+								round +
+								"\n",
+						),
+					)
+					for (let index of order) {
+						let operation = operations[index]
+						if (!operation) throw Error("Missing run")
+						receiver.text("doc")
+						receiver.apply([operation])
+						rebuilt(receiver)
+					}
+				}
+			},
+		)
+
+test("run source fences, links and Unicode reconstruct with canonical metadata", () => {
+	for (let append of [
+		"\n---\nmode: present\n---\n",
+		"x\n---",
+		"\n[[target]]😀\r\n",
+		"\r\nHeading\n",
+		"🌻😀",
+	]) {
+		let receiver = seed("---\ntitle: Shared\n---\nBody")
+		let writer = receiver.fork("writer")
+		let operation = writer.edit("doc", writer.text("doc") + append)
+		if (!operation) throw Error("Missing run")
+		receiver.apply([operation])
+		rebuilt(receiver)
+	}
+})
+test("concurrent merged header blocks retain body run mapping", () => {
+	let receiver = seed("---\ntitle: Initial\n---\nBody😀")
+	let left = receiver.fork("left"),
+		right = receiver.fork("right")
+	let title = left.edit("doc", "---\ntitle: Left longer\n---\nBody😀")
+	let tags = right.edit(
+		"doc",
+		"---\ntitle: Right\ntags: [one, two]\n---\nBody😀",
+	)
+	if (!title || !tags) throw Error("Missing headers")
+	receiver.apply([title, tags])
+	rebuilt(receiver)
+	let writer = receiver.fork("writer")
+	let operation = writer.edit("doc", writer.text("doc") + "🌻 appended text\n")
+	if (!operation) throw Error("Missing run")
+	receiver.apply([operation])
+	rebuilt(receiver)
+})
+test("cancellation before inserted run, hidden branch and causal undo reconstruct", () => {
+	let receiver = seed("Body")
+	let writer = receiver.fork("writer")
+	let operation = writer.edit("doc", "Body appended run")
+	if (!operation) throw Error("Missing run")
+	let cancelled = writer.cancel("doc", operation.id)
+	if (!cancelled) throw Error("Missing cancellation")
+	receiver.apply([cancelled])
+	receiver.text("doc")
+	receiver.apply([operation])
+	rebuilt(receiver)
+	expect(receiver.text("doc")).toBe("Body")
+})
+test("multi-operation runs and conflicting final replica retain atomic publication", () => {
+	let receiver = seed("Body"),
+		writer = receiver.fork("writer")
+	let operation = writer.edit("doc", "Body appended run")
+	if (!operation) throw Error("Missing run")
+	let final = receiver.fork("final")
+	final.apply([{ ...operation, author: "Conflicting" }])
+	let before = receiver.checkpoint()
+	expect(() =>
+		Replica.applyTogether([receiver, writer, final], [operation]),
+	).toThrow()
+	expect(receiver.checkpoint()).toEqual(before)
+	rebuilt(receiver)
+	let title = writer.set("doc", "title", "Different")
+	receiver.apply([operation, title])
+	rebuilt(receiver)
+})
+
+test("run insertion reveals pre-existing orphan descendants through full reconstruction", () => {
+	let receiver = seed("Body"),
+		writer = receiver.fork("writer")
+	let parent = writer.edit("doc", "Body parent run")
+	let child = writer.edit("doc", "Body parent run descendant run")
+	if (!parent || !child) throw Error("Missing chain")
+	receiver.apply([child])
+	rebuilt(receiver)
+	receiver.text("doc")
+	receiver.apply([parent])
+	rebuilt(receiver)
+	expect(receiver.text("doc")).toBe(writer.text("doc"))
+})
+test("hidden source anchor and hidden lower sibling preserve peer branch ordering", () => {
+	let receiver = seed("Body"),
+		first = receiver.fork("first"),
+		second = receiver.fork("second")
+	let one = first.edit("doc", "Body first run")
+	let two = second.edit("doc", "Body second run")
+	if (!one || !two) throw Error("Missing siblings")
+	receiver.apply([one])
+	rebuilt(receiver)
+	receiver.edit("doc", "Body")
+	rebuilt(receiver)
+	receiver.apply([two])
+	rebuilt(receiver)
+	let hidden = seed("Body"),
+		writer = hidden.fork("writer")
+	let run = writer.edit("doc", "Body peer run")
+	if (!run) throw Error("Missing hidden anchor run")
+	hidden.edit("doc", "Bod")
+	rebuilt(hidden)
+	hidden.apply([run])
+	rebuilt(hidden)
+})
+
+test("BOM-prefixed body fence insertions retain full canonical reconstruction", () => {
+	for (let source of [
+		"Body\n\uFEFF--\nmode: present\n---\nTail",
+		"---\ntitle: Shared\n---\nBody\n\uFEFF--",
+	]) {
+		let receiver = seed(source),
+			writer = receiver.fork("writer")
+		let next = writer.text("doc").replace("\uFEFF--", "\uFEFF---\n")
+		let operation = writer.edit("doc", next)
+		if (!operation) throw Error("Missing BOM run")
+		receiver.apply([operation])
+		rebuilt(receiver)
+	}
+})

@@ -189,11 +189,11 @@
 		<p>
 			A subsequent guarded handoff passed 57 browser assertions using a
 			standalone native textarea. Input arriving during a merge, changed
-			selection, composition and refused native acceptance retain the old
-			causal basis. Successful acceptance maps the caret by atom identity and
-			orders adoption before subsequent edits. The failed reentrant fixture
-			and corrected run are preserved. Actual EditorElement integration,
-			multicursor merge mapping and performance remain unverified. Evidence:
+			selection, composition and refused native acceptance retain the old causal
+			basis. Successful acceptance maps the caret by atom identity and orders
+			adoption before subsequent edits. The failed reentrant fixture and
+			corrected run are preserved. Actual EditorElement integration, multicursor
+			merge mapping and performance remain unverified. Evidence:
 			<code>experiments/worker-session/handoff</code>.
 		</p>
 		<p>
@@ -241,16 +241,34 @@
 			<code>experiments/performance/twenty-writer-http</code>.
 		</p>
 		<p>
-			A separate server sampling run traced the cost to rebuilding document
-			text for sidebar summaries. Of 10,965 function samples, raw traversal
-			accounted for about 46% and canonical header reconstruction for 20%.
-			The inclusive text call covered about 84%; these counts overlap.
-			Every mapped raw traversal sample came through summary projection.
-			This identifies a reconstruction bottleneck, not a transport wait.
-			The sampled run is diagnostic evidence, not a latency comparison.
-			A broader validated insertion cache is the next experiment; it has
-			not been adopted. Evidence:
+			A separate server sampling run traced the cost to rebuilding document text
+			for sidebar summaries. Of 10,965 function samples, raw traversal accounted
+			for about 46% and canonical header reconstruction for 20%. The inclusive
+			text call covered about 84%; these counts overlap. Every mapped raw
+			traversal sample came through summary projection. This identifies a
+			reconstruction bottleneck, not a transport wait. The sampled run is
+			diagnostic evidence, not a latency comparison. Evidence:
 			<code>experiments/performance/twenty-writer-http/diagnostic</code>.
+		</p>
+		<p>
+			The resulting insertion-run cache preserves source only when fresh atoms
+			have a provable position in the existing body. Full validation and
+			generation checks remain; hidden anchors, orphan descendants, structural
+			headers and ambiguous positions fall back to reconstruction. Three matched
+			fresh-server runs cut median commit latency from 263–276ms to 32–39ms,
+			with empirical p95 falling from 475–502ms to 123–135ms. All 360 measured
+			requests passed exact source, receipt, snapshot, history and library
+			checks.
+		</p>
+		<p>
+			Server CPU observations fell from 2.04–2.08 seconds to 0.68–0.73 seconds
+			in roughly three-second brackets, including boundary slack. Separate
+			public oracles verified 120 edits across checkpoint 100, including
+			presentation metadata, excerpts and wiki links. Production adopts this
+			cache after deep module and app checks; it does not establish browser
+			frame rate or sustained server capacity. Raw results and retained harness
+			failures:
+			<code>experiments/performance/peer-insertion-run</code>.
 		</p>
 		<h2>8 October: mobile taps and cached switching</h2>
 		<p>
