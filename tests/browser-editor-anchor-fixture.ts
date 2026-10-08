@@ -65,7 +65,8 @@ async function exercise(scenario: Scenario) {
 	let exact =
 		actual[0] === scenario.expected[0] &&
 		actual[1] === scenario.expected[1] &&
-		source.value === content(scenario.after)
+		source.value === content(scenario.after) &&
+		source.sourceIndex.value === source.value
 	editor.remove()
 	if (!exact)
 		throw Error(`${scenario.name}: ${actual} expected ${scenario.expected}`)
@@ -153,7 +154,45 @@ function terminalScenario(
 		expected: [selected ? start : source.length, source.length],
 	}
 }
+function replacementScenarios(name: string, before: string, after: string) {
+	let replica = new Replica("replacement-owner")
+	replica.edit("replacement", before)
+	let initial = replica.visible("replacement")
+	replica.edit("replacement", after)
+	let updated = replica.visible("replacement")
+	return [
+		{
+			name: name + " forward",
+			before: initial,
+			after: updated,
+			start: before.length,
+			expected: [after.length, after.length],
+		},
+		{
+			name: name + " backward",
+			before: updated,
+			after: initial,
+			start: after.length,
+			expected: [before.length, before.length],
+		},
+	] satisfies Scenario[]
+}
 let scenarios: Scenario[] = [
+	...replacementScenarios(
+		"Unicode replacement at a block boundary",
+		"x".repeat(4095) + "😀\n" + "z".repeat(8192),
+		"x".repeat(4095) + "Q\n" + "z".repeat(8192),
+	),
+	...replacementScenarios(
+		"Long unchanged suffix after prefix insertion",
+		"x".repeat(8193) + "tail\n",
+		"Prefix\n" + "x".repeat(8193) + "tail\n",
+	),
+	...replacementScenarios(
+		"Overlapping repeated text retains its final line",
+		"a".repeat(12288) + "\nend",
+		"a".repeat(8192) + "\nend",
+	),
 	terminalScenario("Body" + "z".repeat(16384), "X"),
 	terminalScenario("Body😀" + "z".repeat(16384), "🌻"),
 	terminalScenario("Body😀" + "z".repeat(16384), "🌻", true),

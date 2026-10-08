@@ -305,6 +305,14 @@ export class SourceTextarea {
 
 function difference(before: string, after: string): SourceReplacement {
 	let start = 0
+	let blockLength = 4096
+	let limit = Math.min(before.length, after.length)
+	while (
+		start + blockLength <= limit &&
+		before.slice(start, start + blockLength) ===
+			after.slice(start, start + blockLength)
+	)
+		start += blockLength
 	while (
 		start < before.length &&
 		start < after.length &&
@@ -313,6 +321,15 @@ function difference(before: string, after: string): SourceReplacement {
 		start++
 	let end = before.length,
 		nextEnd = after.length
+	while (
+		end - start >= blockLength &&
+		nextEnd - start >= blockLength &&
+		before.slice(end - blockLength, end) ===
+			after.slice(nextEnd - blockLength, nextEnd)
+	) {
+		end -= blockLength
+		nextEnd -= blockLength
+	}
 	while (
 		end > start &&
 		nextEnd > start &&

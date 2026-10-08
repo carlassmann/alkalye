@@ -62,7 +62,7 @@ if (process.argv.includes("--serve")) {
 			let contract = object(result)
 			assert(contract.exact === true, String(contract.name))
 		}
-		assert(results.length === 20, "Every editor anchor contract ran")
+		assert(results.length === 26, "Every editor anchor contract ran")
 	} finally {
 		try {
 			browser(session, "close")

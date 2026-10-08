@@ -160,6 +160,16 @@
 			physical 120Hz presentation. Evidence:
 			<code>experiments/performance/terminal-redo-certificate</code>.
 		</p>
+		<p>
+			Text reconciliation now compares equal 4096-unit string blocks before
+			scanning their remainder. Six matched 1MiB app trials preserved accepted
+			source, native caret and bounded viewport. Undo's refresh task fell from a
+			median 9.8ms to 7.2ms; Redo's fell from 8.4ms to 7.7ms, with one candidate
+			trial still at 8.7ms. Largest tasks across the full three-second windows
+			remained garbage collection at 14–18ms. This improves refresh work, not
+			whole-window peaks or physical 120Hz presentation. Evidence:
+			<code>experiments/performance/source-textarea-difference/app</code>.
+		</p>
 		<h2>Earlier journey comparison with main</h2>
 		<p>
 			Both production builds used their own local sync servers, signed accounts
@@ -556,6 +566,19 @@
 			1.2–1.3 seconds. This is one corrected fixture comparison, not a
 			production loading result or proof of scheduler channel release. Evidence:
 			<code>experiments/worker-session/cold-open-scheduler</code>.
+		</p>
+		<p>
+			Replay now reuses the private replica returned by snapshot validation,
+			avoiding another restoration. Validation before journal writes remains.
+			Eight public SQLite contracts cover both loading paths, corrupt snapshots,
+			racing opens and recovery after interruption. One fresh matched worker
+			pair opened in 4.25 seconds before and 2.92 seconds after; offline
+			reopening stayed around 1.66 seconds. Both arms preserved typed source at
+			the server and after offline reopening. The baseline asset digest was not
+			captured before rebuilding; source hashes and runtime outcomes are
+			retained. These are worker fixture results, not production loading
+			measurements. Evidence:
+			<code>experiments/worker-session/opened-replica-reuse</code>.
 		</p>
 		<p>
 			The first cache reuses parsed link tokens when the caret moves through
