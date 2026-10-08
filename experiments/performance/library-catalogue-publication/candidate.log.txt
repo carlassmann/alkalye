@@ -1,0 +1,24 @@
+http://localhost:58184/
+PASS library opens through real IndexedDB and authenticated HTTP
+PASS unchanged authenticated refreshes preserve catalogue projection
+PASS controlled library cache failure publishes
+PASS explicit cache failure clear publishes
+PASS real HTTP library failure publishes
+PASS successful refresh explicitly clears failure
+PASS public workspace metadata update survives
+PASS changed workspace publishes to the same catalogue observer
+PASS writer catalogue admission survives
+PASS offline edit is immediately visible
+PASS offline reload opens durable journal
+PASS offline journal survives reload
+RECONNECT {"catalogueChanges":1,"catalogues":3,"projectionWrites":1,"projections":3,"pulls":4}
+PASS reconnect preserves offline edits
+AFTER EXPLICIT SYNC {"catalogueChanges":1,"catalogues":3,"projectionWrites":1,"projections":4,"pulls":5}
+PASS permission rejection preserves durable pending edits
+PASS permission rejection preserves local source
+PASS scope release leaves journal reopenable
+PASS rejected journal survives scope release and offline reload
+PASS explicit retry commits preserved edits after access restoration
+PASS edit during blocked pull is durably queued
+PASS interrupted sync scope releases transport and reopens
+PASS edit racing a pull survives interruption and retry

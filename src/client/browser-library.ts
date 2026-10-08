@@ -25,7 +25,10 @@ import { newDocument } from "../shared/documents"
 import { documentMetadata } from "../shared/document-metadata"
 import { maximumActionText, DocumentConflict } from "../shared/document-actions"
 import type { LocalDocumentCreation } from "../shared/document-actions"
-import { LibrarySnapshotSchema } from "../shared/workspace"
+import {
+	LibraryDocumentSchema,
+	LibrarySnapshotSchema,
+} from "../shared/workspace"
 import type { LibrarySnapshot } from "../shared/workspace"
 import { DocumentLive } from "./document-live"
 import { BrowserAccount } from "./browser-account"
@@ -39,7 +42,7 @@ import { DocumentAssets } from "./document-assets"
 import { DocumentProperties } from "./document-properties"
 import { DocumentMedia } from "./document-media"
 import { makeDocumentTransport } from "./document-transport"
-import { LocalDocuments } from "./local-documents"
+import { CatalogueDocumentSchema, LocalDocuments } from "./local-documents"
 import {
 	isLocalWorkspace,
 	LocalDirectories,
@@ -79,6 +82,19 @@ let cachedLibrary = Schema.Struct({
 	subject: Schema.String,
 	library: LibrarySnapshotSchema,
 })
+
+let sameCatalogue = Schema.toEquivalence(
+	Schema.Struct({
+		workspaces: LibrarySnapshotSchema.fields.workspaces,
+		documents: Schema.Array(
+			Schema.Struct({
+				...CatalogueDocumentSchema.fields,
+				log: Schema.optionalKey(LibraryDocumentSchema.fields.log),
+				position: Schema.optionalKey(LibraryDocumentSchema.fields.position),
+			}),
+		),
+	}),
+)
 
 function makeLibrary() {
 	return Effect.gen(function* () {
@@ -263,17 +279,17 @@ function makeLibrary() {
 			return assembling.withPermit(
 				local.rows.pipe(
 					Effect.flatMap(rows =>
-						SubscriptionRef.update(state, current =>
-							Object.freeze({
-								...current,
-								library: mergeCatalogue(
-									Ref.getUnsafe(remote),
-									rows,
-									folders.current(),
-									account.subject,
-								),
-							}),
-						),
+						SubscriptionRef.updateSome(state, current => {
+							let library = mergeCatalogue(
+								Ref.getUnsafe(remote),
+								rows,
+								folders.current(),
+								account.subject,
+							)
+							return sameCatalogue(current.library, library)
+								? Option.none()
+								: Option.some(Object.freeze({ ...current, library }))
+						}),
 					),
 				),
 			)

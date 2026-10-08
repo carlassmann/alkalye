@@ -191,6 +191,15 @@ if (process.argv.includes("--serve")) {
 			!evaluate(session, "window.librarySyncFailure ?? null"),
 			"library opens through real IndexedDB and authenticated HTTP",
 		)
+		evaluate(session, "window.librarySync.reset()")
+		evaluate(
+			session,
+			"window.librarySync.refresh().then(() => window.librarySync.refresh())",
+		)
+		assert(
+			evaluate(session, "window.librarySync.counts.catalogueChanges === 0"),
+			"unchanged authenticated refreshes preserve catalogue projection",
+		)
 		evaluate(session, "window.librarySync.cacheFault(true)")
 		evaluate(session, "window.librarySync.refresh()")
 		assert(
@@ -241,6 +250,10 @@ if (process.argv.includes("--serve")) {
 				"window.librarySync.workspaceName() === 'Renamed synchronization workspace'",
 			),
 			"public workspace metadata update survives",
+		)
+		assert(
+			evaluate(session, "window.librarySync.counts.catalogueChanges > 0"),
+			"changed workspace publishes to the same catalogue observer",
 		)
 		assert(
 			evaluate(session, "window.librarySync.roles().includes('writer')"),

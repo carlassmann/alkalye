@@ -19,6 +19,7 @@ interface Counts {
 	pulls: number
 	projections: number
 	catalogues: number
+	catalogueChanges: number
 	projectionWrites: number
 }
 interface Probe {
@@ -51,6 +52,7 @@ let counts: Counts = {
 	pulls: 0,
 	projections: 0,
 	catalogues: 0,
+	catalogueChanges: 0,
 	projectionWrites: 0,
 }
 let countedHttp = Layer.effect(
@@ -155,6 +157,13 @@ Effect.runPromise(
 			yield* library.refresh
 		}
 
+		yield* library.state.changes.pipe(
+			Stream.map(state => state.library),
+			Stream.changesWith((previous, current) => previous === current),
+			Stream.runForEach(() => Effect.sync(() => counts.catalogueChanges++)),
+			Effect.forkIn(scope),
+		)
+
 		let opened = yield* library
 			.open(document)
 			.pipe(Effect.provideService(Scope.Scope, scope))
@@ -185,6 +194,7 @@ Effect.runPromise(
 				counts.pulls = 0
 				counts.projections = 0
 				counts.catalogues = 0
+				counts.catalogueChanges = 0
 				counts.projectionWrites = 0
 			},
 			source: () => opened.session.replica.text(document),

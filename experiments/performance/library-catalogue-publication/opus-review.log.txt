@@ -1,0 +1,23 @@
+**No blocker if one condition holds.** I couldn't confirm it without tools, so please check it before merge.
+
+**Possible blocker: `sameCatalogue` only compares the fields its schema declares.**
+- `Schema.toEquivalence` on a `Struct` checks only the declared keys and ignores the rest. Fields missing from the schema can change without anyone being notified.
+- TypeScript won't catch this. Structural typing lets `current.library`, even with extra fields, pass into the narrower equivalence.
+- Things to confirm:
+  1. `mergeCatalogue` returns exactly `{ workspaces, documents }` at the top level. If it also carries `folders`, `subject`, a revision or a cursor, folder changes would be silently dropped. It takes `folders.current()` and `account.subject`, so check this one first.
+  2. `LibraryDocumentSchema` has no fields other than `log`/`position` that are missing from `CatalogueDocumentSchema`.
+  3. Fields that exist in both schemas have compatible types. The local schema's equivalence is the one used for the overlapping keys.
+  4. Local directory workspaces match `LibrarySnapshotSchema.fields.workspaces`. Extra local-only fields would be ignored.
+- Fix: derive the equivalence from one exported catalogue schema that `mergeCatalogue`'s return type is built from, such as `Schema.Schema.Type<typeof CatalogueSchema>`. Or add a type-level exactness check.
+
+**Semantic risk: code that waits for a refresh to emit.**
+- Anything that waits for `state.changes` to emit after a refresh will now hang when nothing changed. Examples: a "refresh done" signal, a spinner reset, a test helper, `waitFor`-style E2E code. Search for consumers of `changes` that rely on that.
+
+**Harmless (at worst extra emissions, never missed ones):**
+- If `mergeCatalogue` sorts unstably or follows Map insertion order, documents compare unequal and extra emissions return. Your 0-emission test suggests ordering is stable.
+- Local docs with an explicit `log: undefined` instead of a missing key may compare unequal. Same result: an extra emission, not a correctness problem.
+- If a workspace value fails every union member, the union compares unequal and emits.
+- Cost: one O(n) deep comparison per compose. It runs alongside an O(n) merge that was already there and stays inside the same permit, so it isn't meaningful.
+- Behaviour on a skipped update: the other `state` fields stay untouched, which is correct. Stable references are a bonus for downstream identity checks.
+
+**Verdict:** ship once points 1–4 are confirmed and nothing depends on a refresh always emitting.
