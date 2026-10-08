@@ -265,6 +265,18 @@
 			cooperative text preparation before rendering and exact cursor resolution
 			with a small candidate set.
 		</p>
+		<p>
+			Exact cursor recovery now uses a small candidate set and one shared atom
+			iterator pass, preserving distant survivors and an exhaustive fallback.
+			Three matched browser trials per version reduced the largest undo task
+			from 281.0 to 180.7 ms median, and two paint opportunities from 487.1 to
+			373.8 ms. The trusted shortcut handler stayed below 1 ms in both versions;
+			the improvement occurs in the later refresh. All six exact-source,
+			trusted-input and accepted-checkpoint checks passed. The worst accepted
+			checkpoint increased from 2,501.6 to 2,651.0 ms; the median decreased.
+			Cold text reconstruction still exceeds the frame budget. Samples:
+			<code>experiments/performance/undo-fork/caret-results.json</code>.
+		</p>
 		<h2>Body edits remain incremental after metadata changes</h2>
 		<p>
 			Merged frontmatter can leave raw and canonical atom arrays with different
