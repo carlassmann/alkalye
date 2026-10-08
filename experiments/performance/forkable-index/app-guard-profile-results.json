@@ -1,0 +1,549 @@
+{
+	"source": "2d95381",
+	"server": "native fork plus empty-inverse guard for both client variants",
+	"fixture": "1MiB,512paragraphs",
+	"method": "One diagnostic V8-sampled accepted edit and undo per variant; identical restored disposable DB/profile, verified frozen assets, strict accepted edit cache then strictly newer accepted undo cache and exact original source. Select longest renderer task after accepted-undo:start; filter sampler by main-thread Profile process/id and source-map callframes. Not a statistical latency comparison.",
+	"result": "Longest task is application RAF refresh: synchronous cold document text materialization, then editor atomPositions full-array identity indexing after the caret anchor is deleted. Shared-index get overhead increases materialization cost; proxy array access and native Map construction increase selection indexing cost. No checkpoint/staging attribution at this revision.",
+	"samples": [
+		{
+			"variant": "baseline",
+			"longestTaskMilliseconds": 314.049,
+			"sampledMilliseconds": 313.708,
+			"self": [
+				{
+					"source": "../src/client/components/editor.ts:2479:qt",
+					"milliseconds": 117.39
+				},
+				{
+					"source": "../src/shared/crdt.ts:787:rawVisibleSteps",
+					"milliseconds": 42.9
+				},
+				{
+					"source": "../src/shared/text-visibility.ts:375:ee",
+					"milliseconds": 35.52
+				},
+				{
+					"source": "../src/shared/text-visibility.ts:219:active",
+					"milliseconds": 31.25
+				},
+				{
+					"source": "../src/shared/text-visibility.ts:245:hidden",
+					"milliseconds": 22.08
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:34:t",
+					"milliseconds": 7.19
+				},
+				{
+					"source": "(program)",
+					"milliseconds": 7.02
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:80:get",
+					"milliseconds": 6.47
+				},
+				{
+					"source": "../src/shared/collection-copy.ts:35:D",
+					"milliseconds": 6.45
+				},
+				{
+					"source": "RegExp: ^(0|[1-9]\\d*)$",
+					"milliseconds": 6.11
+				},
+				{
+					"source": "(garbage collector)",
+					"milliseconds": 5.45
+				},
+				{
+					"source": "../src/client/components/editor.ts:955:Xt",
+					"milliseconds": 4.75
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:52:c",
+					"milliseconds": 4.4
+				},
+				{
+					"source": "../src/client/editor-viewport.ts:343:render",
+					"milliseconds": 2.47
+				},
+				{
+					"source": "../src/shared/crdt.ts:895:text",
+					"milliseconds": 2.47
+				},
+				{
+					"source": "../src/client/source-textarea.ts:300:It",
+					"milliseconds": 2.02
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:63:l",
+					"milliseconds": 1.82
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:70:",
+					"milliseconds": 1.49
+				},
+				{
+					"source": "../src/client/editor-viewport.ts:836:paint",
+					"milliseconds": 0.96
+				},
+				{
+					"source": "../src/shared/frontmatter-merge.ts:446:Mr",
+					"milliseconds": 0.91
+				},
+				{
+					"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Chunk.js:505:",
+					"milliseconds": 0.81
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:59:",
+					"milliseconds": 0.63
+				},
+				{
+					"source": "../src/shared/markdown.ts:36:z",
+					"milliseconds": 0.44
+				},
+				{
+					"source": "../src/shared/crdt.ts:904:",
+					"milliseconds": 0.31
+				},
+				{
+					"source": "../src/shared/document-metadata.ts:59:R",
+					"milliseconds": 0.31
+				}
+			],
+			"inclusive": [
+				{
+					"source": "(root)",
+					"milliseconds": 313.71
+				},
+				{
+					"source": "../src/client/document-app.ts:2658:",
+					"milliseconds": 300.55
+				},
+				{
+					"source": "../src/client/document-app.ts:1575:ze",
+					"milliseconds": 151.28
+				},
+				{
+					"source": "../src/client/document-app.ts:1530:qa",
+					"milliseconds": 150.95
+				},
+				{
+					"source": "../src/shared/document-session.ts:1904:documents",
+					"milliseconds": 150.65
+				},
+				{
+					"source": "../src/client/document-app.ts:1474:sn",
+					"milliseconds": 150.65
+				},
+				{
+					"source": "../src/shared/crdt.ts:973:",
+					"milliseconds": 150.5
+				},
+				{
+					"source": "../src/shared/crdt.ts:963:documents",
+					"milliseconds": 150.5
+				},
+				{
+					"source": "../src/shared/crdt.ts:895:text",
+					"milliseconds": 150.2
+				},
+				{
+					"source": "../src/client/document-app.ts:2297:cn",
+					"milliseconds": 149.27
+				},
+				{
+					"source": "../src/client/document-app.ts:2687:$t",
+					"milliseconds": 149.27
+				},
+				{
+					"source": "../src/client/components/editor.ts:911:et",
+					"milliseconds": 148.82
+				},
+				{
+					"source": "../src/client/components/editor.ts:115:update",
+					"milliseconds": 148.82
+				},
+				{
+					"source": "../src/client/components/editor.ts:955:Xt",
+					"milliseconds": 142.56
+				},
+				{
+					"source": "../src/shared/crdt.ts:747:visible",
+					"milliseconds": 142.54
+				},
+				{
+					"source": "../src/shared/collection-copy.ts:35:D",
+					"milliseconds": 142.39
+				},
+				{
+					"source": "../src/shared/crdt.ts:781:rawVisible",
+					"milliseconds": 138.35
+				},
+				{
+					"source": "../src/client/components/editor.ts:2479:qt",
+					"milliseconds": 137.74
+				},
+				{
+					"source": "../src/shared/crdt.ts:787:rawVisibleSteps",
+					"milliseconds": 131.9
+				},
+				{
+					"source": "../src/shared/text-visibility.ts:245:hidden",
+					"milliseconds": 89.0
+				},
+				{
+					"source": "../src/shared/text-visibility.ts:219:active",
+					"milliseconds": 66.92
+				},
+				{
+					"source": "../src/shared/text-visibility.ts:375:ee",
+					"milliseconds": 35.52
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:80:get",
+					"milliseconds": 20.59
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:34:t",
+					"milliseconds": 13.3
+				},
+				{
+					"source": "(program)",
+					"milliseconds": 7.02
+				},
+				{
+					"source": "RegExp: ^(0|[1-9]\\d*)$",
+					"milliseconds": 6.11
+				},
+				{
+					"source": "../src/client/source-textarea.ts:227:render",
+					"milliseconds": 5.95
+				},
+				{
+					"source": "../src/client/source-textarea.ts:152:reconcile",
+					"milliseconds": 5.95
+				},
+				{
+					"source": "../src/client/source-textarea.ts:273:apply",
+					"milliseconds": 5.81
+				},
+				{
+					"source": "(garbage collector)",
+					"milliseconds": 5.45
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:52:c",
+					"milliseconds": 5.18
+				},
+				{
+					"source": "../src/shared/frontmatter-merge.ts:135:Ot",
+					"milliseconds": 4.04
+				},
+				{
+					"source": "../src/shared/frontmatter-merge.ts:128:Nr",
+					"milliseconds": 4.04
+				},
+				{
+					"source": "../src/shared/frontmatter-merge.ts:454:Br",
+					"milliseconds": 4.03
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:63:l",
+					"milliseconds": 3.95
+				},
+				{
+					"source": "../src/client/editor-viewport.ts:343:render",
+					"milliseconds": 3.79
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:70:",
+					"milliseconds": 2.41
+				},
+				{
+					"source": "../src/client/source-textarea.ts:300:It",
+					"milliseconds": 2.02
+				},
+				{
+					"source": "../src/client/editor-viewport.ts:836:paint",
+					"milliseconds": 1.42
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:59:",
+					"milliseconds": 0.94
+				}
+			]
+		},
+		{
+			"variant": "prototype",
+			"longestTaskMilliseconds": 373.003,
+			"sampledMilliseconds": 373.052,
+			"self": [
+				{
+					"source": "../src/client/components/editor.ts:2479:qt",
+					"milliseconds": 165.16
+				},
+				{
+					"source": "../src/shared/forkable-index.ts:19:get",
+					"milliseconds": 51.49
+				},
+				{
+					"source": "../src/shared/text-visibility.ts:375:ee",
+					"milliseconds": 35.04
+				},
+				{
+					"source": "../src/shared/text-visibility.ts:219:active",
+					"milliseconds": 33.08
+				},
+				{
+					"source": "../src/shared/text-visibility.ts:245:hidden",
+					"milliseconds": 21.89
+				},
+				{
+					"source": "../src/shared/crdt.ts:788:rawVisibleSteps",
+					"milliseconds": 7.14
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:80:get",
+					"milliseconds": 6.48
+				},
+				{
+					"source": "(program)",
+					"milliseconds": 6.09
+				},
+				{
+					"source": "../src/shared/collection-copy.ts:35:D",
+					"milliseconds": 5.86
+				},
+				{
+					"source": "(garbage collector)",
+					"milliseconds": 5.35
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:34:t",
+					"milliseconds": 5.04
+				},
+				{
+					"source": "../src/client/components/editor.ts:955:Xt",
+					"milliseconds": 4.74
+				},
+				{
+					"source": "RegExp: ^(0|[1-9]\\d*)$",
+					"milliseconds": 4.29
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:52:c",
+					"milliseconds": 3.38
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:63:l",
+					"milliseconds": 3.37
+				},
+				{
+					"source": "../src/client/editor-viewport.ts:343:render",
+					"milliseconds": 2.6
+				},
+				{
+					"source": "../src/shared/crdt.ts:896:text",
+					"milliseconds": 2.3
+				},
+				{
+					"source": "../src/client/source-textarea.ts:300:It",
+					"milliseconds": 1.81
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:59:",
+					"milliseconds": 1.61
+				},
+				{
+					"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Chunk.js:505:",
+					"milliseconds": 1.42
+				},
+				{
+					"source": "../src/client/editor-viewport.ts:836:paint",
+					"milliseconds": 0.62
+				},
+				{
+					"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Hash.js:325:W",
+					"milliseconds": 0.61
+				},
+				{
+					"source": "../src/shared/frontmatter-merge.ts:446:Pr",
+					"milliseconds": 0.47
+				},
+				{
+					"source": "../src/client/source-textarea.ts:273:apply",
+					"milliseconds": 0.31
+				},
+				{
+					"source": "getBoundingClientRect",
+					"milliseconds": 0.31
+				}
+			],
+			"inclusive": [
+				{
+					"source": "(root)",
+					"milliseconds": 373.05
+				},
+				{
+					"source": "../src/client/document-app.ts:2297:cn",
+					"milliseconds": 361.0
+				},
+				{
+					"source": "../src/client/document-app.ts:2687:$t",
+					"milliseconds": 361.0
+				},
+				{
+					"source": "../src/client/document-app.ts:2658:",
+					"milliseconds": 361.0
+				},
+				{
+					"source": "../src/client/components/editor.ts:911:et",
+					"milliseconds": 193.05
+				},
+				{
+					"source": "../src/client/components/editor.ts:115:update",
+					"milliseconds": 193.05
+				},
+				{
+					"source": "../src/client/components/editor.ts:955:Xt",
+					"milliseconds": 186.81
+				},
+				{
+					"source": "../src/client/components/editor.ts:2479:qt",
+					"milliseconds": 182.01
+				},
+				{
+					"source": "../src/shared/crdt.ts:896:text",
+					"milliseconds": 166.74
+				},
+				{
+					"source": "../src/shared/document-session.ts:1890:text",
+					"milliseconds": 166.74
+				},
+				{
+					"source": "../src/client/document-app.ts:1333:source",
+					"milliseconds": 166.74
+				},
+				{
+					"source": "../src/client/document-media-view.ts:43:refresh",
+					"milliseconds": 166.74
+				},
+				{
+					"source": "../src/shared/collection-copy.ts:35:D",
+					"milliseconds": 159.55
+				},
+				{
+					"source": "../src/shared/crdt.ts:748:visible",
+					"milliseconds": 159.55
+				},
+				{
+					"source": "../src/shared/crdt.ts:782:rawVisible",
+					"milliseconds": 155.27
+				},
+				{
+					"source": "../src/shared/crdt.ts:788:rawVisibleSteps",
+					"milliseconds": 149.41
+				},
+				{
+					"source": "../src/shared/text-visibility.ts:245:hidden",
+					"milliseconds": 90.16
+				},
+				{
+					"source": "../src/shared/text-visibility.ts:219:active",
+					"milliseconds": 68.27
+				},
+				{
+					"source": "../src/shared/forkable-index.ts:19:get",
+					"milliseconds": 52.1
+				},
+				{
+					"source": "../src/shared/text-visibility.ts:375:ee",
+					"milliseconds": 35.04
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:80:get",
+					"milliseconds": 17.22
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:34:t",
+					"milliseconds": 9.33
+				},
+				{
+					"source": "(program)",
+					"milliseconds": 6.09
+				},
+				{
+					"source": "../src/client/source-textarea.ts:227:render",
+					"milliseconds": 6.08
+				},
+				{
+					"source": "../src/client/source-textarea.ts:152:reconcile",
+					"milliseconds": 6.08
+				},
+				{
+					"source": "../src/client/source-textarea.ts:273:apply",
+					"milliseconds": 6.0
+				},
+				{
+					"source": "(garbage collector)",
+					"milliseconds": 5.35
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:52:c",
+					"milliseconds": 4.88
+				},
+				{
+					"source": "RegExp: ^(0|[1-9]\\d*)$",
+					"milliseconds": 4.29
+				},
+				{
+					"source": "../src/shared/frontmatter-merge.ts:454:Kr",
+					"milliseconds": 4.28
+				},
+				{
+					"source": "../src/shared/frontmatter-merge.ts:135:Dt",
+					"milliseconds": 4.28
+				},
+				{
+					"source": "../src/shared/frontmatter-merge.ts:128:Jr",
+					"milliseconds": 4.28
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:63:l",
+					"milliseconds": 4.15
+				},
+				{
+					"source": "../src/client/editor-viewport.ts:343:render",
+					"milliseconds": 3.83
+				},
+				{
+					"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Function.js:76:",
+					"milliseconds": 2.03
+				},
+				{
+					"source": "../src/client/source-textarea.ts:300:It",
+					"milliseconds": 1.81
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:59:",
+					"milliseconds": 1.81
+				},
+				{
+					"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Chunk.js:505:",
+					"milliseconds": 1.42
+				},
+				{
+					"source": "../src/client/editor-viewport.ts:836:paint",
+					"milliseconds": 1.23
+				},
+				{
+					"source": "../src/shared/atom-sequence.ts:70:",
+					"milliseconds": 0.78
+				}
+			]
+		}
+	],
+	"rawTraces": "/tmp/alkalye-guarded-app-guard/{baseline,prototype}-profile-0/1m-512-checkpoint.trace.json",
+	"author": "written with gpt-6 in codex"
+}

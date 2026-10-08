@@ -142,3 +142,15 @@ All complete-source, cursor, pending and rejection checks passed. The largest ac
 `app-fork-results.json` retains exact metrics, hashes and scope. Timeline traces remain outside Git at `/tmp/alkalye-guarded-app-fork`. Staging through a fork removes the earlier full-checkpoint clone penalty, but it does not clear the shared index's residual main-task tradeoff. Keep indexes experimental pending attribution and a conscious adoption decision.
 
 written with gpt-6 in codex
+
+## Residual refresh after the inverse guard
+
+Frozen `2d95381` adds the empty-inverse guard to independent action staging. One further diagnostic per native/index client used the same current native backend and exact accepted undo fixtures. Source-mapped samples show a different bottleneck: the longest task now comes from the application animation-frame refresh, not undo checkpoint staging.
+
+Native's 314 ms task includes 150 ms of cold document text materialization through `currentDocument` and `session.replica.documents`, then 138 ms in editor `atomPositions`. The shared-index task is 373 ms: 167 ms of cold text through media refresh and 182 ms of editor identity indexing. Editor indexing self time is 117 / 165 ms; shared-index lookups contribute 52 ms during materialization. GC contributes about 5 ms in either sample.
+
+Undo deletes the caret's anchor. The editor's local search misses that exact identity, then builds a full identity-to-offset index before looking for a surviving predecessor. Separately, publishing a changed replica leaves its text cache cold, so synchronous UI getters walk the document inside the frame callback. Those are the measured targets. A safe fix must preserve exact cursor recovery and publish complete, current materialization; merely changing task scheduling or guessing an anchor is insufficient.
+
+`app-guard-profile-results.json` preserves the mapped samples. These single diagnostic samples identify code paths; they are not new statistical latency results. Shared indexes remain unadopted.
+
+written with gpt-6 in codex
