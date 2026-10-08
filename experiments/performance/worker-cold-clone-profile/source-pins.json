@@ -1,9 +1,9 @@
 {
-  "src/shared/crdt.ts": "46fbaa7b74d4335814e5e540ed5603fb8c4ca11f7ee8f0812bfaffbfe19edb16",
-  "src/shared/document-session.ts": "954124f801c1394a91493918dc259deb6c3e3e92077370b98597340f603b80e6",
-  "src/client/worker-document/worker-opened-capabilities.ts": "e99e791f307f123345d8e456be2c7bb52c4ebc84c8374e76e749387c6adf41f5",
-  "src/client/worker-document/worker-session.ts": "d30371f74032f6e08dd394cbe71de00d65cdb0e9921fe93317c6560c51674c9b",
-  "dist/worker-editor.js": "523fadcadd2ed7558710781ffac36ab968d03c94234d0c732316d48765464014",
-  "dist/worker-editor.js.map": "a54b87f4dfc96a1b1fc6bc6b5d8b1e19a597af9caeb8cde66c1236cdac1a5360",
-  "sampled-undo.ts": "a80cb9af6dff97b90bf12b2d8bae161ff9e99fd135cae510f716bdee346b02ac"
+	"src/shared/crdt.ts": "46fbaa7b74d4335814e5e540ed5603fb8c4ca11f7ee8f0812bfaffbfe19edb16",
+	"src/shared/document-session.ts": "954124f801c1394a91493918dc259deb6c3e3e92077370b98597340f603b80e6",
+	"src/client/worker-document/worker-opened-capabilities.ts": "e99e791f307f123345d8e456be2c7bb52c4ebc84c8374e76e749387c6adf41f5",
+	"src/client/worker-document/worker-session.ts": "d30371f74032f6e08dd394cbe71de00d65cdb0e9921fe93317c6560c51674c9b",
+	"dist/worker-editor.js": "523fadcadd2ed7558710781ffac36ab968d03c94234d0c732316d48765464014",
+	"dist/worker-editor.js.map": "a54b87f4dfc96a1b1fc6bc6b5d8b1e19a597af9caeb8cde66c1236cdac1a5360",
+	"sampled-undo.ts": "a80cb9af6dff97b90bf12b2d8bae161ff9e99fd135cae510f716bdee346b02ac"
 }

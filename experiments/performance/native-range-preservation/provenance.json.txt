@@ -1,0 +1,6 @@
+{
+  "baseline": "36f6a76 RTL production module; disposable runtime archived root source when HEAD01d70ec",
+  "runtime": "Actual EditorElement + SourceTextarea + SourceViewport with real Replica; change callback returns undefined, no persistence/authority proof",
+  "server": "Bun scoped ephemeral fixture, agent-browser background sessions; all finally closed",
+  "geometry": "Independent full native input collapsed DOM Range coordinate; trusted held mouse plus real edge autoscroll. Control must pass before candidate."
+}

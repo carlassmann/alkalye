@@ -1,0 +1,57 @@
+import { browser,browserBatch,evaluate,serverAddress,wait } from "./tests/browser-driver"
+import * as Schema from "effect/Schema"
+let base="/tmp/alkalye-pointer-bounded-window"
+let rows=[]
+let coordinate=Schema.Struct({raw:Schema.Number,x:Schema.Number,y:Schema.Number,height:Schema.Number,top:Schema.Number})
+let state=Schema.Struct({publicStart:Schema.Number,publicEnd:Schema.Number,nativeStart:Schema.Number,nativeEnd:Schema.Number,scrollTop:Schema.Number,sourceExact:Schema.Boolean})
+let server=Bun.spawn(["bun","pointer-structural-server.ts","--ordered"],{stdout:"pipe",stderr:"inherit"})
+let session="pointer-full-control-"+Date.now()
+try{
+ let origin=await serverAddress(server.stdout)
+ for(let name of ["rtl"]){
+  for(let target of [61450]){
+   browser(session,"set","viewport","1280","800")
+   browser(session,"open",origin+"?case="+name)
+   wait(session,"document.body.dataset.ready==='true'")
+   evaluate(session,"window.pointerFixture.reveal();true")
+   let before=Schema.decodeUnknownSync(state)(evaluate(session,"window.pointerFixture.state()"))
+   browser(session,"open",origin+"?case="+name+"&full")
+   wait(session,"document.body.dataset.ready==='true'")
+   let from=Schema.decodeUnknownSync(coordinate)(evaluate(session,`window.pointerFixture.nativeCoordinate(65536,${before.scrollTop})`))
+   let to=Schema.decodeUnknownSync(coordinate)(evaluate(session,`(()=>{let p=window.pointerFixture.nativeCoordinate(${target},0);return window.pointerFixture.nativeCoordinate(${target},p.y-400)})()`))
+   let reverseRaw=target>65536?65024:66050
+   let reverse=Schema.decodeUnknownSync(coordinate)(evaluate(session,`(()=>{let p=window.pointerFixture.nativeCoordinate(${reverseRaw},0);return window.pointerFixture.nativeCoordinate(${reverseRaw},p.y-400)})()`))
+   for(let full of [true,false]){
+    if(!full){browser(session,"open",origin+"?case="+name);wait(session,"document.body.dataset.ready==='true'");evaluate(session,"window.pointerFixture.reveal();true");evaluate(session,"window.pointerFixture.settle()")}
+    else evaluate(session,`window.pointerFixture.nativeCoordinate(65536,${before.scrollTop});true`)
+    browserBatch(session,[["mouse","move",String(from.x),String(from.y)],["mouse","down"]])
+    let first=moveHeld(to,target<65536)
+    let second=moveHeld(reverse,target>65536)
+    browser(session,"mouse","up")
+    let released=evaluate(session,"window.pointerFixture.state()")
+    let actual=Schema.decodeUnknownSync(state)(released)
+    let valid=actual.publicStart===Math.min(from.raw,reverse.raw)&&actual.publicEnd===Math.max(from.raw,reverse.raw)
+    let firstActual=Schema.decodeUnknownSync(state)(first.held)
+    let firstValid=firstActual.publicStart===Math.min(from.raw,to.raw)&&firstActual.publicEnd===Math.max(from.raw,to.raw)
+    rows.push({name,target,full,from,to,reverse,first,second,released,firstValid,valid})
+    await Bun.write(base+"/structural-preserve-up-results.json",JSON.stringify(rows,null,2))
+    console.log(JSON.stringify({name,target,full,firstValid,valid}))
+    if(!valid||!firstValid){console.log("Stopped at incorrect independent held/reversed native range");break}
+   }
+   if(rows.some(row=>!row.valid||!row.firstValid))break
+  }
+  if(rows.some(row=>!row.valid||!row.firstValid))break
+ }
+ function moveHeld(point:{raw:number,x:number,y:number,top:number},up:boolean){
+  browser(session,"mouse","move",String(point.x),up?"5":"790")
+  let gate
+  try{wait(session,`document.querySelector('[data-editor-viewport]').scrollTop${up?'<=':'>='}${point.top}`);gate="nativeAutoscrollReachedTarget"}catch(error){gate=String(error)}
+  browser(session,"mouse","move",String(point.x),"400")
+  evaluate(session,"new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve(true))))")
+  let scrolled=Schema.decodeUnknownSync(state)(evaluate(session,"window.pointerFixture.state()"))
+  let y=Math.round(point.y+point.top-scrolled.scrollTop)
+  if(y>0&&y<800)browser(session,"mouse","move",String(point.x),String(y))
+  return {gate,scrolled,y,held:evaluate(session,"window.pointerFixture.state()")}
+ }
+
+}finally{try{browser(session,"close")}finally{server.kill();await server.exited}}

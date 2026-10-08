@@ -1,0 +1,41 @@
+**Still HOLD.** The suffix fix holds up for downward growth only. The "up" cells never ran the prepend path. I edited nothing and ran nothing, apart from a plan-mode notes file.
+
+**Does the suffix fix hold up?**
+- **Downward, yes.** In the bounded 69632 cell, the anchor stays at native 1984 / raw 65536 across 3 `setRangeText` writes. Mac reports direction `none` throughout, the restore is skipped because the endpoints are already exact, and the reversal lands exactly on 65024.
+- **Upward, no evidence.** In the bounded 61440 cell, `after-value` logs `retainedNativeSelection:true` while `window.start` moves from 63488 to 62464. The check at `append-preserve-editor-viewport.ts:1043` compares content, not structure. The fixture repeats with a period of one block, so a prepend looked like an append.
+  - The old native offsets then pointed one block off.
+  - The endpoint check caught the mismatch and `setSelectionRange` rewrote the range with `backward`. So nothing was fabricated.
+  - But the up cells don't test the prepend path, and the README's "Prepend unchanged" is false for this fixture.
+- **A side result worth keeping.** The up reversal was still exact with `setSelectionRange` and no whole-value assignment. That supports the theory that whole-value assignment is what collapsed the range and caused the loss. It's still unproven.
+
+**Concrete blockers**
+1. **Make the append check structural.** Require the prefix and `window.start` to be unchanged, and only then `value.startsWith(previous)`. Real docs with repeated text (blank lines, boilerplate) can hit the same false match.
+2. **`detail` is 0 on pointerdown.** The pointer-down traces log `detail: 0`, so `:167` (`event.detail !== 1`) is always true and the guard never fires. That confirms the prior review's blocker 2.
+3. **Prior blockers 1 and 3 are unchanged.**
+   - `:912` still forces `forward` when the selection is neither backward nor forward. That drops the word on a double-click drag upward, and the anchor on a fast first move.
+   - `:911` still tests start/end instead of the moving end.
+4. **Hidden drag affinity isn't observable,** so word granularity and shift-click remain open.
+   - `setSelectionRange` likely resets word extension to character extension.
+   - Shift-click anchoring at `:165` is untested.
+
+**Smallest prepend option:** when `value.endsWith(previous)` and the prefix is unchanged, use `setRangeText(head, 0, 0, "preserve")`. The browser then shifts the selection itself. Gate it the same way as the append.
+
+**Smallest native gates**
+- Rerun the up and down cells on a fixture that doesn't repeat (a block index in each block).
+- Run the structural prepend in both directions.
+- Double-click word drag up and down across the window edge.
+- Shift-click to extend, then drag.
+- Fast first move upward before the first frame.
+- ASCII/mixed: only 2 cells are logged so far.
+- Record the textarea size after release separately.
+
+**Scope:**
+- Mac Chrome only, outside prototype, mouse drag only.
+- Release can still expand to the full doc: the full=true cells end with window 0–131072.
+- Touch, IME and clipboard are unproved, and there's no performance or adoption claim.
+
+Notes are in `/Users/carlassmann/.claude/plans/read-only-exact-native-platform-tender-abelson.md`.
+
+Several claude.ai connectors (GitHub, Slack, Gmail and others) need authorizing in claude.ai connector settings; this review didn't use them.
+
+written with claude-opus-5-5 in Claude Agent SDK

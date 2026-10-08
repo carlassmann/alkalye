@@ -1,0 +1,203 @@
+import { expect, test } from "bun:test"
+import { mkdtemp, rm } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import * as Fiber from "effect/Fiber"
+import * as Cause from "effect/Cause"
+import * as Exit from "effect/Exit"
+import * as Layer from "effect/Layer"
+import * as Scope from "effect/Scope"
+import {
+	
+	cliDocumentSessionLayer,
+} from "../src/cli/document-platform"
+import {
+	DocumentSession,
+	
+} from "../src/shared/document-session"
+import type { DocumentTransport } from "../src/shared/document-session"
+import type { DocumentSnapshot } from "../src/shared/document-actions"
+import { Replica } from "../src/shared/crdt"
+import { newDocument } from "../src/shared/documents"
+
+function snapshot(source = "Body 😀\n", document = "doc"): DocumentSnapshot {
+	let replica = new Replica("birth")
+	newDocument(replica, document, "Opened", source)
+ replica.apply([replica.set("comment", "type", "comment")])
+ replica.apply([replica.set("comment", "document", document)])
+ replica.edit("comment", "Thread")
+	return {
+		format: "document-state-v1",
+		document,
+		log: "opened-log",
+		position: 1,
+		state: JSON.stringify(replica.checkpoint()),
+	}
+}
+function transport(value: DocumentSnapshot): DocumentTransport {
+	return {
+		snapshot: () => Effect.succeed(value),
+		commit: () => Effect.fail(new Error("Offline")),
+		history: () => Effect.succeed([]),
+	}
+}
+function open<A, E>(
+	directory: string,
+	cooperativeWork: boolean,
+	source: DocumentTransport,
+	work: (session: DocumentSession["Service"]) => Effect.Effect<A, E, Scope.Scope>,
+) {
+	return Effect.scoped(
+		Effect.gen(function* () {
+			let services = yield* Layer.build(
+				cliDocumentSessionLayer(directory, {
+					document: "doc",
+					subject: "owner",
+					author: "Visible writer",
+					cooperativeWork,
+					transport: source,
+				}),
+			)
+			return yield* work(Context.get(services, DocumentSession))
+		}),
+	)
+}
+async function fixture(work: (directory: string) => Promise<unknown>) {
+	let directory = await mkdtemp(join(tmpdir(), "alkalye-open-reuse-"))
+	try {
+		await work(directory)
+	} finally {
+		await rm(directory, { recursive: true, force: true })
+	}
+}
+
+
+function cold(session: DocumentSession["Service"], expected: string) {
+ return session.change("Cold middle edit", staged => [staged.prepareEdit("doc", expected)])
+}
+
+test("interrupted selected-view preparation releases the real SQLite session permit", () =>
+ fixture(directory => Effect.runPromise(open(directory, true, transport(snapshot("Body 😀\n".repeat(16384))), session => Effect.gen(function* () {
+  let initial = session.replica.text("doc")
+  let offset = Math.floor(initial.length / 2)
+  let expected = initial.slice(0, offset) + "Inserted XY" + initial.slice(offset)
+  yield* cold(session, expected)
+  yield* session.undo()
+  expected = initial
+  let preparing = yield* session.readView(() => ({version: session.version(), record: session.replica.documentRecord("doc", "workspace", true)})).pipe(Effect.forkScoped({startImmediately: true}))
+  expect(preparing.pollUnsafe()).toBeUndefined()
+  yield* session.flush
+  expect(preparing.pollUnsafe()).toBeUndefined()
+  yield* Fiber.interrupt(preparing)
+  let interrupted = yield* Fiber.await(preparing)
+  expect(Exit.isFailure(interrupted)).toBe(true)
+  if (Exit.isFailure(interrupted)) expect(Cause.hasInterrupts(interrupted.cause)).toBe(true)
+  let warmed = yield* session.readView(() => session.replica.documentRecord("doc", "workspace", true))
+  expect(warmed?.content).toBe(expected)
+  expect(session.replica.documentRecord("doc", "workspace", true)?.content).toBe(expected)
+  let next = session.replace([{start: expected.length, remove: 0, text: "Saved 🦊"}])
+  yield* next.saved
+  yield* session.flush
+  expect(session.replica.text("doc")).toBe(expected + "Saved 🦊")
+ }))))
+)
+
+test("native-like mutation during selected-view warming republishes the latest exact generation", () =>
+ fixture(directory => Effect.runPromise(open(directory, true, transport(snapshot("Body 😀\n".repeat(16384))), session => Effect.gen(function* () {
+  let initial = session.replica.text("doc")
+  let offset = Math.floor(initial.length / 2)
+  let expected = initial.slice(0, offset) + "Inserted XY" + initial.slice(offset)
+  yield* cold(session, expected)
+  yield* session.undo()
+  expected = initial
+  let copying = yield* session.forkReplica("concurrent-copy").pipe(Effect.forkScoped({startImmediately: true}))
+  expect(copying.pollUnsafe()).toBeUndefined()
+  let previousVersion = session.version()
+  let preparing = yield* session.readView(() => ({version: session.version(), record: session.replica.documentRecord("doc", "workspace", true)})).pipe(Effect.forkScoped({startImmediately: true}))
+  expect(preparing.pollUnsafe()).toBeUndefined()
+  let unrelated = session.replace([{start: 6, remove: 0, text: "!"}], undefined, "comment")
+  expect(session.version()).toBeGreaterThan(previousVersion)
+  let next = session.replace([{start: expected.length, remove: 0, text: "Concurrent 🦊"}])
+  expect(session.version()).toBeGreaterThan(previousVersion)
+  let warmed = yield* Fiber.join(preparing)
+  expect(warmed.version).toBe(session.version())
+  expect(warmed.record?.content).toBe(expected + "Concurrent 🦊")
+  let copied = yield* Fiber.join(copying)
+  expect(copied.text("doc")).toBe(expected + "Concurrent 🦊")
+  expect(copied.visible("doc")).toBe(session.replica.visible("doc"))
+  expect(session.replica.documentRecord("doc", "workspace", true)?.content).toBe(expected + "Concurrent 🦊")
+  yield* unrelated.saved
+  yield* next.saved
+  yield* session.flush
+  expect(session.replica.text("comment")).toBe("Thread!")
+  expect(session.replica.text("doc")).toBe(expected + "Concurrent 🦊")
+ }))))
+)
+
+test("interrupted read waiter leaves authoritative fork warming alive and flush progresses", () =>
+ fixture(directory => Effect.runPromise(open(directory, true, transport(snapshot("Body 😀\n".repeat(16384))), session => Effect.gen(function* () {
+  let initial = session.replica.text("doc")
+  let offset = Math.floor(initial.length / 2)
+  yield* cold(session, initial.slice(0, offset) + "Inserted XY" + initial.slice(offset))
+  yield* session.undo()
+  let reading = yield* session.readView(() => session.replica.visible("doc")).pipe(Effect.forkScoped({startImmediately: true}))
+  let copying = yield* session.forkReplica("detached", "Detached writer").pipe(Effect.forkScoped({startImmediately: true}))
+  expect(reading.pollUnsafe()).toBeUndefined()
+  expect(copying.pollUnsafe()).toBeUndefined()
+  yield* session.flush
+  expect(copying.pollUnsafe()).toBeUndefined()
+  yield* Fiber.interrupt(reading)
+  let copied = yield* Fiber.join(copying)
+  expect(copied.text("doc")).toBe(initial)
+  expect(copied.visible("doc")).toBe(session.replica.visible("doc"))
+  expect(copied.actor).toBe("detached")
+  let local = copied.prepareEdit("doc", initial + "Detached 🦊")
+  if (local) copied.apply([local])
+  expect(copied.text("doc")).toBe(initial + "Detached 🦊")
+  expect(session.replica.text("doc")).toBe(initial)
+  yield* session.flush
+ }))))
+)
+
+
+test("raw native replacement during detached copying retries the latest authoritative generation", () =>
+ fixture(directory => Effect.runPromise(open(directory, true, transport(snapshot("Body 😀\n".repeat(16384))), session => Effect.gen(function* () {
+  let initial = yield* session.readView(() => session.replica.text("doc"))
+  let copying = yield* session.forkReplica("native-copy").pipe(Effect.forkScoped({startImmediately: true}))
+  expect(copying.pollUnsafe()).toBeUndefined()
+  let replacement = session.replace([{start: initial.length, remove: 0, text: "During copy 🦊"}])
+  let copied = yield* Fiber.join(copying)
+  expect(copied.text("doc")).toBe(initial + "During copy 🦊")
+  expect(copied.visible("doc")).toBe(session.replica.visible("doc"))
+  yield* replacement.saved
+  yield* session.flush
+ }))))
+)
+
+
+test("closing the session owner releases shared warm waiters and rejects subsequent reads", () =>
+ fixture(directory => Effect.runPromise(Effect.scoped(Effect.gen(function* () {
+  let owner = yield* Scope.fork(yield* Scope.Scope)
+  let services = yield* Layer.buildWithScope(cliDocumentSessionLayer(directory, {
+   document: "doc", subject: "owner", author: "Visible writer", cooperativeWork: true,
+   transport: transport(snapshot("Body 😀\n".repeat(16384))),
+  }), owner)
+  let session = Context.get(services, DocumentSession)
+  let initial = session.replica.text("doc")
+  let offset = Math.floor(initial.length / 2)
+  yield* cold(session, initial.slice(0, offset) + "Inserted XY" + initial.slice(offset))
+  yield* session.undo()
+  let reading = yield* session.readView(() => session.replica.text("doc")).pipe(Effect.forkScoped({startImmediately: true}))
+  let copying = yield* session.forkReplica("closing-copy").pipe(Effect.forkScoped({startImmediately: true}))
+  expect(reading.pollUnsafe()).toBeUndefined()
+  expect(copying.pollUnsafe()).toBeUndefined()
+  yield* Scope.close(owner, Exit.void)
+  expect(Exit.isFailure(yield* Fiber.await(reading))).toBe(true)
+  expect(Exit.isFailure(yield* Fiber.await(copying))).toBe(true)
+  let closed = yield* session.readView(() => session.replica.text("doc")).pipe(Effect.result)
+  expect(closed._tag).toBe("Failure")
+  if (closed._tag === "Failure") expect(String(closed.failure)).toContain("closed")
+ }))))
+)

@@ -1,0 +1,1 @@
+{"extends": "./tsconfig.json", "include": ["src/**/*.ts", "pointer-unique-fixture.ts", "pointer-structural-server.ts", "pointer-structural-run.ts"]}

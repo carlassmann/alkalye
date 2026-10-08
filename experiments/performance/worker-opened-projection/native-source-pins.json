@@ -1,16 +1,16 @@
 {
-  "baseline": {
-    "shared/crdt.ts": "fa018ceddb23a671cc2364e324c11f06a184058e2c58a959c769b9bc39586833",
-    "shared/document-session.ts": "f49813ffb4e8dbcee1dddba26e58207efd464e14fda56d6e9b184f7b3c36420f",
-    "client/worker-document/worker-opened-capabilities.ts": "a64eb3a3ab3a84d50f820e1d894362a639c7a08ca298cb554ff96cd7f0fd6a6d",
-    "client/worker-document/worker-session.ts": "f7a873027e50deb2f42255975f5242016021ec47f6a2b3f643c3263b5520d1da",
-    "client/worker-document/worker-opened-observation.ts": "cb697a5c684020a63ca762af21bffd1fdd701f587763f902f331a5c897e30e17"
-  },
-  "candidate": {
-    "shared/crdt.ts": "4a027a4d0500289e77dc15f2c0802d5b964cf50f8d29c78ab59788e0c1cf4e5f",
-    "shared/document-session.ts": "57ba94e55d3dbad05fa2c36fe81239ade68cea5e5d1e52e0483e67b9d41109f8",
-    "client/worker-document/worker-opened-capabilities.ts": "963d7dc66a26ab49312646657fefce384773aad5087cc588616bcba7884a2086",
-    "client/worker-document/worker-session.ts": "d30371f74032f6e08dd394cbe71de00d65cdb0e9921fe93317c6560c51674c9b",
-    "client/worker-document/worker-opened-observation.ts": "9a813743d4865cb0bc46727880c4f196d2dcc3e8d275b3b55dd0180d137fca53"
-  }
+	"baseline": {
+		"shared/crdt.ts": "fa018ceddb23a671cc2364e324c11f06a184058e2c58a959c769b9bc39586833",
+		"shared/document-session.ts": "f49813ffb4e8dbcee1dddba26e58207efd464e14fda56d6e9b184f7b3c36420f",
+		"client/worker-document/worker-opened-capabilities.ts": "a64eb3a3ab3a84d50f820e1d894362a639c7a08ca298cb554ff96cd7f0fd6a6d",
+		"client/worker-document/worker-session.ts": "f7a873027e50deb2f42255975f5242016021ec47f6a2b3f643c3263b5520d1da",
+		"client/worker-document/worker-opened-observation.ts": "cb697a5c684020a63ca762af21bffd1fdd701f587763f902f331a5c897e30e17"
+	},
+	"candidate": {
+		"shared/crdt.ts": "4a027a4d0500289e77dc15f2c0802d5b964cf50f8d29c78ab59788e0c1cf4e5f",
+		"shared/document-session.ts": "57ba94e55d3dbad05fa2c36fe81239ade68cea5e5d1e52e0483e67b9d41109f8",
+		"client/worker-document/worker-opened-capabilities.ts": "963d7dc66a26ab49312646657fefce384773aad5087cc588616bcba7884a2086",
+		"client/worker-document/worker-session.ts": "d30371f74032f6e08dd394cbe71de00d65cdb0e9921fe93317c6560c51674c9b",
+		"client/worker-document/worker-opened-observation.ts": "9a813743d4865cb0bc46727880c4f196d2dcc3e8d275b3b55dd0180d137fca53"
+	}
 }

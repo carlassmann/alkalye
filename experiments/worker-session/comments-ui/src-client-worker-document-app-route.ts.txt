@@ -1,0 +1,328 @@
+import { commentsMarkup } from "../components/comments"
+import { openDialog } from "../components/dialog"
+import { setMarkup } from "../dom"
+import { html } from "../language"
+import type { OpenedThreadSchema } from "./worker-opened-schemas"
+import { workerBootMark } from "./boot-diagnostics"
+import * as Effect from "effect/Effect"
+import * as FiberSet from "effect/FiberSet"
+import * as Stream from "effect/Stream"
+import { BrowserLibrary } from "../browser-library"
+import { EditorElement } from "../components/editor"
+import { openFind } from "../components/find"
+import type { EditorPreferences } from "../../shared/preferences"
+import type { DocumentLink } from "../../shared/model"
+import { workerEditorBindings } from "./bindings"
+
+export function mountWorkerAppRoute(
+	host: HTMLElement,
+	document: string,
+	options: {
+		preferences: EditorPreferences
+		documents(): readonly DocumentLink[]
+		openDocument(id: string): void
+		report(error: unknown): void
+		title(title: string): void
+		status(pending: number, unsaved: number, failed: boolean): void
+		findBar: HTMLElement
+  dialog: HTMLDialogElement
+	},
+) {
+	return Effect.gen(function* () {
+		let library = yield* BrowserLibrary
+		workerBootMark("route:open-start")
+		let opened = yield* library
+			.openWorker(document)
+			.pipe(
+				Effect.tapError(error =>
+					Effect.sync(() => workerBootMark("route:open-error", error)),
+				),
+			)
+		workerBootMark("route:open-done")
+		let owner = library.workerOwner(document)
+		if (!owner)
+			return yield* Effect.fail(new Error("Missing worker native owner"))
+		let initialized = yield* Effect.gen(function* () {
+			if (owner.recovery() !== undefined) return undefined
+			return yield* opened.queue()
+		}).pipe(
+			Effect.catch(error =>
+				owner.recovery() !== undefined
+					? Effect.succeed(undefined)
+					: Effect.fail(error),
+			),
+		)
+		let tasks = yield* FiberSet.make()
+		let fork = yield* FiberSet.runtime(tasks)()
+		if (!initialized) {
+			let recovery = owner.recovery()
+			if (recovery === undefined)
+				return yield* Effect.fail(new Error("Recovery source unavailable"))
+			workerBootMark("route:Editor-start")
+			let editor = new EditorElement()
+			function unsupported() {
+				options.report(
+					"Retained recovery is read-only; download before manual reconciliation",
+				)
+			}
+			editor.configure({
+				authority: "worker",
+				content: recovery,
+				atoms: [],
+				editable: false,
+				preferences: options.preferences,
+				documents: options.documents,
+				openDocument: options.openDocument,
+				isDrawing: () => false,
+				openDrawing: unsupported,
+				createLinkedDocument: async () => {
+					throw Error("Recovery is read-only")
+				},
+				canComment: () => false,
+				canAttach: () => false,
+				comments: () => [],
+				report: options.report,
+				change: () => ({ kind: "pending" }),
+				undo: unsupported,
+				select() {},
+				requestAsset: unsupported,
+				attach: unsupported,
+				command: unsupported,
+				find: unsupported,
+			})
+			let download = globalThis.document.createElement("button")
+			download.textContent = "Download retained draft"
+			download.addEventListener("click", () => {
+				let url = URL.createObjectURL(
+					new Blob([recovery], { type: "text/markdown" }),
+				)
+				let link = globalThis.document.createElement("a")
+				link.href = url
+				link.download = "retained-draft.md"
+				link.click()
+				URL.revokeObjectURL(url)
+			})
+   let commands = globalThis.document.createElement("button")
+   commands.textContent = "Download retained commands"
+   commands.addEventListener("click", () => {
+    fork(opened.exportDomainRecords.pipe(Effect.tap(contents => Effect.sync(() => {
+     let url = URL.createObjectURL(new Blob([contents], { type: "application/json" }))
+     let link = globalThis.document.createElement("a")
+     link.href = url; link.download = "retained-commands.json"; link.click(); URL.revokeObjectURL(url)
+    })), Effect.catch(error => Effect.sync(() => { workerBootMark("comments:error", error instanceof Error ? error.name + ":" + error.message : String(error)); options.report(error) }))))
+   })
+			host.replaceChildren(editor, download, commands)
+			owner.attachRecovered(editor)
+			yield* Effect.addFinalizer(() =>
+				Effect.sync(() => {
+					owner.detach(editor)
+					editor.remove()
+					download.remove()
+    commands.remove()
+				}),
+			)
+			return {
+				document,
+				editor,
+				save: Effect.void,
+				synchronize: Effect.void,
+				pending: owner.draft.pending,
+				recovery: owner.recovery,
+			}
+		}
+		let queue = initialized.queue
+		let lastMergedRevision = opened.current().revision
+		workerBootMark("route:Editor-start")
+		let editor = new EditorElement()
+		let bindings = workerEditorBindings(
+			editor,
+			queue,
+			command => {
+				fork(command)
+			},
+			options.report,
+			owner.draft.retain,
+		)
+		function unsupported() {
+			options.report(
+				"Worker route prototype: this feature has not crossed to worker authority",
+			)
+		}
+  let threads: readonly typeof OpenedThreadSchema.Type[] = []
+  let threadBasis: { epoch: string; sequence: number } | undefined
+  let commentsVisible = false
+  let routeClosed = false
+  let controls = globalThis.document.createElement("div")
+  let toggle = globalThis.document.createElement("button")
+  toggle.dataset.workerComments = ""
+  toggle.textContent = "Comments"
+  let panel = globalThis.document.createElement("aside")
+  panel.dataset.workerCommentsPanel = ""
+  panel.hidden = true
+  controls.append(toggle)
+  let commentOwner = owner
+  function canComment() { return opened.current().canWrite && commentOwner.recovery() === undefined && opened.current().metadata?.commentsDisabled !== true }
+  function renderComments() {
+   workerBootMark("comments:render", JSON.stringify({ writable: opened.current().canWrite, recovery: commentOwner.recovery() !== undefined, nativeReadOnly: editor.source?.readOnly, disabled: opened.current().metadata?.commentsDisabled === true, connected: panel.isConnected }))
+   let markup = commentsMarkup(threads, opened.current().metadata?.commentsDisabled === true, opened.current().canWrite && commentOwner.recovery() === undefined)
+   setMarkup(panel, markup)
+   workerBootMark("comments:markup", JSON.stringify({ markup: String(markup), panel: panel.outerHTML }))
+  }
+  let refreshComments = Effect.suspend(() => commentsVisible && !routeClosed ? opened.discussion.view().pipe(
+   Effect.tap(view => Effect.sync(() => { threads = view.threads; threadBasis = { epoch: view.epoch, sequence: view.sequence }; renderComments() })),
+   Effect.catch(error => Effect.sync(() => { threadBasis = undefined; options.report(error) })),
+  ) : Effect.void)
+  function compose(reply?: string) {
+   return Effect.gen(function* () {
+    workerBootMark("comments:compose", JSON.stringify({ allowed: canComment(), start: editor.source?.selectionStart, end: editor.source?.selectionEnd }))
+    if (!canComment()) return yield* Effect.fail(new Error("Comments are unavailable"))
+    let composer = yield* reply === undefined ? opened.discussion.capture() : opened.discussion.reply(reply)
+    workerBootMark("comments:composer-ready")
+    let quote = "quote" in composer && typeof composer.quote === "string" ? composer.quote : undefined
+    openDialog(options.dialog, options.report, () => { fork(refreshComments) }, reply === undefined ? "Add comment" : "Reply", html`${quote ? html`<blockquote>${quote}</blockquote>` : ""}<label>Comment<textarea name="body" rows="4" required></textarea></label>`, form => Effect.runPromise(Effect.suspend(() => routeClosed || !canComment() ? Effect.fail(new Error("This document is read-only")) : opened.discussion.submit(composer.token, String(form.get("body") ?? "")))))
+    options.dialog.addEventListener("close", () => { if (!routeClosed) fork(opened.discussion.release(composer.token).pipe(Effect.catch(() => Effect.void))) }, { once: true })
+   })
+  }
+  toggle.addEventListener("click", () => { commentsVisible = !commentsVisible; panel.hidden = !commentsVisible; if (commentsVisible) fork(refreshComments) })
+  panel.addEventListener("click", event => {
+   if (!(event.target instanceof Element)) return
+   let target = event.target.closest("[data-action]")
+   if (!(target instanceof HTMLElement)) return
+   event.stopPropagation()
+   let action = target.dataset.action ?? ""
+   workerBootMark("comments:click", action)
+   if (action === "comment") fork(compose().pipe(Effect.catch(error => Effect.sync(() => { workerBootMark("comments:error", error instanceof Error ? error.name + ":" + error.message : String(error)); options.report(error) }))))
+   else if (action.startsWith("reply:")) fork(compose(action.slice(6)).pipe(Effect.catch(error => Effect.sync(() => { workerBootMark("comments:error", error instanceof Error ? error.name + ":" + error.message : String(error)); options.report(error) }))))
+   else if (action.startsWith("jump-comment:")) { let thread = threads.find(value => value.id === action.slice(13)); if (thread?.range) editor.selectRange(thread.range.start, thread.range.end) }
+   else {
+    let command = action.startsWith("resolve:") ? opened.discussion.resolve(action.slice(8), true) : action.startsWith("reopen:") ? opened.discussion.resolve(action.slice(7), false) : action.startsWith("delete-comment:") ? opened.discussion.delete(action.slice(15)) : action === "toggle-comments" ? opened.properties.update({ commentsDisabled: opened.current().metadata?.commentsDisabled !== true }) : undefined
+    if (command) fork(command.pipe(Effect.andThen(refreshComments), Effect.catch(error => Effect.sync(() => { workerBootMark("comments:error", error instanceof Error ? error.name + ":" + error.message : String(error)); options.report(error) }))))
+   }
+  })
+		editor.configure({
+			authority: "worker",
+			content: initialized.initial.source,
+			atoms: [],
+			editable: opened.current().canWrite,
+			preferences: options.preferences,
+			documents: options.documents,
+			openDocument: options.openDocument,
+			isDrawing: () => false,
+			openDrawing: unsupported,
+			createLinkedDocument: async () => {
+				throw new Error("Worker linked creation unavailable")
+			},
+			canComment,
+			canAttach: () => false,
+			comments: () => {
+    let state = queue.state()
+    return threadBasis?.epoch === state.epoch && threadBasis.sequence === state.sequence && editor.source?.value === state.source ? threads.filter(thread => thread.fields.resolved !== "true").flatMap(thread => thread.range ? [thread.range] : []) : []
+   },
+			report: options.report,
+			change: (...args) => { threadBasis = undefined; return bindings.change(...args) },
+			undo: bindings.undo,
+			select: bindings.resumeUndo,
+			requestAsset: unsupported,
+			attach: unsupported,
+			command: action => { if (action === "comment") fork(compose().pipe(Effect.catch(error => Effect.sync(() => { workerBootMark("comments:error", error instanceof Error ? error.name + ":" + error.message : String(error)); options.report(error) })))); else unsupported() },
+			find: query => openFind(query, false, { editor, bar: options.findBar }),
+		})
+		workerBootMark("route:Editor-configured")
+		host.replaceChildren(controls, editor, panel)
+		owner.attach(editor, queue, initialized.initial.source)
+		yield* Effect.addFinalizer(() =>
+			Effect.sync(() => {
+				owner.detach(editor)
+    routeClosed = true; if (options.dialog.open) options.dialog.close("cancel"); controls.remove(); panel.remove()
+				editor.remove()
+				options.findBar.hidden = true
+				options.findBar.replaceChildren()
+			}),
+		)
+		yield* opened.changes.pipe(
+			Stream.runForEach(state =>
+				Effect.sync(() => {
+					editor.setEditable(state.canWrite && owner.recovery() === undefined)
+					options.title(state.metadata?.title ?? "Untitled")
+     if (commentsVisible) fork(refreshComments)
+					options.status(
+						state.status.pending,
+						state.status.unsaved,
+						state.failed || state.status.failures.save !== undefined,
+					)
+				}),
+			),
+			Effect.forkScoped({ startImmediately: true }),
+		)
+		yield* Stream.fromEventListener(editor, "keyup").pipe(
+			Stream.merge(Stream.fromEventListener(editor, "pointerup")),
+			Stream.merge(Stream.fromEventListener(editor, "compositionend")),
+			Stream.runForEach(() => Effect.sync(bindings.resumeUndo)),
+			Effect.forkScoped({ startImmediately: true }),
+		)
+		yield* opened.changes.pipe(
+			Stream.map(() => undefined),
+			Stream.merge(
+				Stream.fromEventListener(editor, "keyup").pipe(
+					Stream.map(() => undefined),
+				),
+			),
+			Stream.merge(
+				Stream.fromEventListener(editor, "pointerup").pipe(
+					Stream.map(() => undefined),
+				),
+			),
+			Stream.merge(
+				Stream.fromEventListener(editor, "compositionend").pipe(
+					Stream.map(() => undefined),
+				),
+			),
+			Stream.buffer({ capacity: 1, strategy: "sliding" }),
+			Stream.runForEach(() =>
+				queue.settle.pipe(
+					Effect.flatMap(settled =>
+						Effect.suspend(() => {
+							let state = opened.current()
+							if (
+								!settled ||
+								!state.canWrite ||
+								owner.recovery() !== undefined ||
+								state.revision <= lastMergedRevision
+							)
+								return Effect.void
+							let revision = state.revision
+							return bindings.merge().saved.pipe(
+								Effect.tap(accepted =>
+									Effect.sync(() => {
+										if (accepted) { lastMergedRevision = revision; fork(refreshComments) }
+									}),
+								),
+								Effect.asVoid,
+								Effect.catch(error => Effect.sync(() => { workerBootMark("comments:error", error instanceof Error ? error.name + ":" + error.message : String(error)); options.report(error) })),
+							)
+						}),
+					),
+				),
+			),
+			Effect.forkScoped({ startImmediately: true }),
+		)
+		return {
+			document,
+			editor,
+			save: Effect.suspend(() =>
+				owner.recovery() !== undefined && !owner.draft.pending()
+					? Effect.void
+					: queue.settle.pipe(
+							Effect.flatMap(settled =>
+								settled
+									? opened.save
+									: Effect.fail(new Error("Native queue not settled")),
+							),
+						),
+			),
+			synchronize: opened.synchronize,
+			pending: owner.draft.pending,
+			recovery: owner.recovery,
+		}
+	})
+}

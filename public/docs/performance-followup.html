@@ -1825,6 +1825,17 @@
 			Evidence: <code>experiments/performance/worker-cold-clone-profile</code>.
 		</p>
 		<p>
+			Sharing authoritative warming before the clone passes shutdown,
+			interruption, concurrency and RPC checks. In one matched trial per
+			one-range and 512-range Undo, the worker task maximum falls from about
+			184ms to 105–120ms. Source-ready opportunities still worsen from 527–542ms
+			to 536–583ms, and local-save readiness also worsens. This candidate is not
+			adopted as a responsiveness improvement. The measured edit replaces a
+			five-character token, so optimizing pure insertion Undo would not address
+			this journey. Evidence:
+			<code>experiments/performance/worker-shared-warm</code>.
+		</p>
+		<p>
 			The worker metadata pipeline passed 31 storage/owner assertions and a real
 			WorkerRPC journey. A dropped applied reply is recovered as the same
 			action, exact pending state clears, and Merge/Adopt matches an independent
@@ -1839,10 +1850,30 @@
 			source, comment fields, asset references, revisions and single-action
 			counts. Interrupted commands with unknown outcomes remain recoverable and
 			read-only after reload; server acceptance alone never clears their pending
-			state. These are module integration proofs, without timing claims. The
-			actual comments UI check failed before submission, and assets UI,
-			automatic blob cleanup and full worker cutover remain unproved. Evidence:
+			state. These are module integration proofs, without timing claims. Assets
+			UI, automatic blob cleanup and full worker cutover remain unproved.
+			Evidence:
 			<code>experiments/worker-session/domain-comments-assets</code>.
+		</p>
+		<p>
+			The worker comments prototype now passes six actual UI checks: selected
+			submission, navigation to the quoted text, reply, resolution, trusted Undo
+			with independent accepted source, and reload. The capture guard checks
+			semantic selection and queue basis because unchanged native selection
+			events can advance a generic generation counter. Explicit stale-capture
+			refusal checks remain pending. This is a development route, without a
+			production or performance claim. Evidence:
+			<code>experiments/worker-session/comments-ui</code>.
+		</p>
+		<p>
+			Bounded native pointer experiments retain exact grow/reverse ranges with
+			platform range insertion instead of replacing the textarea value. A
+			repetitive fixture hid an append/prepend branch ambiguity; distinct text
+			then exposed a real prepend anchor failure. Restoring the captured
+			backward direction passes that case, but direction, Shift, word selection,
+			clipboard and release behavior still need verification. This prototype
+			stays outside production. Evidence:
+			<code>experiments/performance/native-range-preservation</code>.
 		</p>
 		<footer>written with gpt-6 in codex</footer>
 	</body>

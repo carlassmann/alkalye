@@ -1,0 +1,23 @@
+{
+	"types.log": "types.log.txt",
+	"prepend-direction-results.json": "prepend-direction-results.json.txt",
+	"tsconfig.preserve.json": "tsconfig.preserve.json.txt",
+	"append-preserve-regression-results.json": "append-preserve-regression-results.json.txt",
+	"provenance.json": "provenance.json.txt",
+	"structural-native.log": "structural-native.log.txt",
+	"tsconfig.structural.json": "tsconfig.structural.json.txt",
+	"prepend-direction-native.log": "prepend-direction-native.log.txt",
+	"structural-preserve-results.json": "structural-preserve-results.json.txt",
+	"original-provenance-results.json": "original-provenance-results.json.txt",
+	"opus.log": "opus.log.txt",
+	"native.log": "native.log.txt",
+	"structural-types.log": "structural-types.log.txt",
+	"structural-preserve-up-results.json": "structural-preserve-up-results.json.txt",
+	"original-provenance-types.log": "original-provenance-types.log.txt",
+	"append-preserve-results.json": "append-preserve-results.json.txt",
+	"prepend-direction-types.log": "prepend-direction-types.log.txt",
+	"original-provenance-native.log": "original-provenance-native.log.txt",
+	"structural-up-native.log": "structural-up-native.log.txt",
+	"regression-native.log": "regression-native.log.txt",
+	"tsconfig.prepend-direction.json": "tsconfig.prepend-direction.json.txt"
+}

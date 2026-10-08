@@ -1,54 +1,48 @@
 [
-  {
-    "count": 1,
-    "owner": [
-      39289,
-      19258723
-    ],
-    "id": "2",
-    "phasesRelativeMs": {
-      "visible:start": 324.153,
-      "visible:end": 952.292,
-      "raw:start": 952.463,
-      "raw:end": 952.497,
-      "frontmatter:start": 952.691,
-      "frontmatter:end": 1111.862,
-      "source:start": 1112.664,
-      "source:end": 1112.686,
-      "values:start": 1112.687,
-      "values:end": 1201.561,
-      "join:start": 1201.565,
-      "join:end": 1203.904,
-      "index:start": 1203.91,
-      "index:end": 1203.912,
-      "publish": 1203.913
-    },
-    "elapsedMs": 879.76
-  },
-  {
-    "count": 512,
-    "owner": [
-      39289,
-      19260205
-    ],
-    "id": "2",
-    "phasesRelativeMs": {
-      "visible:start": 264.316,
-      "visible:end": 930.699,
-      "raw:start": 930.872,
-      "raw:end": 930.89,
-      "frontmatter:start": 931.081,
-      "frontmatter:end": 1074.747,
-      "source:start": 1079.974,
-      "source:end": 1079.992,
-      "values:start": 1079.994,
-      "values:end": 1158.317,
-      "join:start": 1158.321,
-      "join:end": 1160.682,
-      "index:start": 1160.686,
-      "index:end": 1160.688,
-      "publish": 1160.689
-    },
-    "elapsedMs": 896.373
-  }
+	{
+		"count": 1,
+		"owner": [39289, 19258723],
+		"id": "2",
+		"phasesRelativeMs": {
+			"visible:start": 324.153,
+			"visible:end": 952.292,
+			"raw:start": 952.463,
+			"raw:end": 952.497,
+			"frontmatter:start": 952.691,
+			"frontmatter:end": 1111.862,
+			"source:start": 1112.664,
+			"source:end": 1112.686,
+			"values:start": 1112.687,
+			"values:end": 1201.561,
+			"join:start": 1201.565,
+			"join:end": 1203.904,
+			"index:start": 1203.91,
+			"index:end": 1203.912,
+			"publish": 1203.913
+		},
+		"elapsedMs": 879.76
+	},
+	{
+		"count": 512,
+		"owner": [39289, 19260205],
+		"id": "2",
+		"phasesRelativeMs": {
+			"visible:start": 264.316,
+			"visible:end": 930.699,
+			"raw:start": 930.872,
+			"raw:end": 930.89,
+			"frontmatter:start": 931.081,
+			"frontmatter:end": 1074.747,
+			"source:start": 1079.974,
+			"source:end": 1079.992,
+			"values:start": 1079.994,
+			"values:end": 1158.317,
+			"join:start": 1158.321,
+			"join:end": 1160.682,
+			"index:start": 1160.686,
+			"index:end": 1160.688,
+			"publish": 1160.689
+		},
+		"elapsedMs": 896.373
+	}
 ]

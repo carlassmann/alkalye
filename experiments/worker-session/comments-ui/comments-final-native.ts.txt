@@ -1,0 +1,171 @@
+import * as Effect from "effect/Effect"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import * as Redacted from "effect/Redacted"
+import * as Schema from "effect/Schema"
+import { apiDocuments } from "./src/cli/api-documents"
+import { browser, evaluate } from "./tests/browser-driver"
+
+let configuration = Schema.decodeUnknownSync(
+	Schema.Struct({
+		origin: Schema.String,
+		keyFile: Schema.String,
+		scope: Schema.String,
+	}),
+)(
+	await Bun.file(
+		"/tmp/alkalye-interaction-matrix-smoke/oracle.private.json",
+	).json(),
+)
+let api = apiDocuments(
+	configuration.origin,
+	Redacted.make((await Bun.file(configuration.keyFile).text()).trim()),
+	configuration.scope,
+)
+let session = "worker-comments-" + Date.now()
+let source = 'document.querySelector("alkalye-editor").source'
+let result: {
+	stage: string
+	gates: string[]
+	failure?: string
+	state?: unknown
+	initialSHA?: string
+	editedSHA?: string
+} = { stage: "setup", gates: [] }
+function run<A, E>(
+	work: Effect.Effect<A, E, import("effect/http/HttpClient").HttpClient>,
+) {
+	return Effect.runPromise(work.pipe(Effect.provide(FetchHttpClient.layer)))
+}
+function wait(expression: string) {
+	browser(session, "wait", "--fn", expression)
+}
+function accepted(document: string, expected: string) {
+	return run(
+		Effect.gen(function* () {
+			while (true) {
+				if ((yield* api.read(document)).content === expected) return
+				yield* Effect.sleep("100 millis")
+			}
+		}).pipe(Effect.timeout("30 seconds")),
+	)
+}
+try {
+	browser(
+		session,
+		"--profile",
+		"/tmp/alkalye-worker-comments-app/runtime/profile-run",
+		"open",
+		configuration.origin + "/app",
+	)
+	evaluate(
+		session,
+		"(async()=>{for(let registration of await navigator.serviceWorker.getRegistrations())await registration.unregister();for(let name of await caches.keys())await caches.delete(name);return true})()",
+	)
+	browser(session, "open", configuration.origin + "/app")
+	let file = Bun.file("comments-final-created.private.json")
+	let record = (await file.exists())
+		? Schema.decodeUnknownSync(Schema.Struct({ documentId: Schema.String }))(
+				await file.json(),
+			)
+		: await run(api.create("TOKEN 😀 body\nTOKEN Beta\n", "Worker comments"))
+	if (!(await file.exists()))
+		await Bun.write(
+			file,
+			JSON.stringify({ documentId: record.documentId }) + "\n",
+		)
+	if (await Bun.file("comments-final-attempt.private.json").exists())
+		throw Error("Recorded input attempt exists; refusing repeated mutation")
+	let initial = (await run(api.read(record.documentId))).content
+	let edited = initial.split("TOKEN").join("gamma")
+	result.initialSHA = new Bun.CryptoHasher("sha256")
+		.update(initial)
+		.digest("hex")
+	result.editedSHA = new Bun.CryptoHasher("sha256").update(edited).digest("hex")
+	wait(
+		"document.querySelector(" +
+			JSON.stringify('[data-library] [data-doc="' + record.documentId + '"]') +
+			")!==null",
+	)
+	browser(
+		session,
+		"open",
+		configuration.origin + "/app/doc/" + record.documentId + "?worker=1",
+	)
+	wait(
+		source +
+			"?.value===" +
+			JSON.stringify(initial) +
+			'&&!document.querySelector("#editor").readOnly&&document.querySelector("#app").getAttribute("aria-busy")!=="true"',
+	)
+	let resources = Schema.decodeUnknownSync(
+		Schema.Array(Schema.Struct({ url: Schema.String, sha256: Schema.String })),
+	)(
+		evaluate(
+			session,
+			'(async()=>{let urls=[...new Set(performance.getEntriesByType("resource").map(entry=>entry.name).filter(name=>new URL(name).pathname.endsWith(".js")))];urls.push(new URL("/worker-editor.js",location.href).href);return await Promise.all([...new Set(urls)].map(async url=>{let response=await fetch(url,{cache:"no-store"});if(!response.ok)throw Error("Script fetch failed");let hash=await crypto.subtle.digest("SHA-256",await response.arrayBuffer());return {url,sha256:Array.from(new Uint8Array(hash),value=>value.toString(16).padStart(2,"0")).join("")}}))})()',
+		),
+	)
+	for (let resource of resources) {
+		let url = new URL(resource.url)
+		if (
+			url.origin !== configuration.origin ||
+			new Bun.CryptoHasher("sha256")
+				.update(await Bun.file("dist" + url.pathname).arrayBuffer())
+				.digest("hex") !== resource.sha256
+		)
+			throw Error("Script differs from frozen graph")
+	}
+	await Bun.write(
+		"comments-final-resources.json",
+		JSON.stringify(resources, null, 2) + "\n",
+	)
+	result.stage = "comment"
+ browser(session, "click", "[data-worker-comments]")
+ wait('document.querySelector("[data-worker-comments-panel]")?.hidden===false')
+ let quoteStart = initial.indexOf('TOKEN')
+ if (quoteStart < 0) throw Error('Fixture quote missing')
+ wait('document.querySelector("[data-worker-comments-panel] [data-action=comment]")!==null')
+ evaluate(session, source + '.focus();' + source + '.setSelectionRange('+quoteStart+','+(quoteStart+5)+')')
+ result.stage="open-composer"
+ browser(session, "click", '[data-worker-comments-panel] [data-action="comment"]')
+ wait('document.querySelector("#dialog").open')
+ if(evaluate(session,'document.querySelector("#dialog blockquote")?.textContent')!=="TOKEN")throw Error("Comment quote differs")
+ await Bun.write("comments-final-attempt.private.json",JSON.stringify({documentId:record.documentId,phase:"submit",time:Date.now()})+"\n")
+ browser(session,"fill",'#dialog textarea[name="body"]',"Native worker discussion 😀")
+ browser(session,"click","#submit-dialog")
+ wait('!document.querySelector("#dialog").open&&document.querySelector("[data-worker-comments-panel]")?.textContent.includes("Native worker discussion 😀")')
+ result.gates.push("native selected comment submit and UI refresh")
+ let thread=String(evaluate(session,'document.querySelector("[data-worker-comments-panel] [data-comment]").dataset.comment'))
+ browser(session,"click",'[data-worker-comments-panel] [data-action="jump-comment:'+thread+'"]')
+ wait(source+'.selectionStart==='+quoteStart+'&&'+source+'.selectionEnd==='+(quoteStart+5))
+ result.gates.push("native anchored range navigation")
+ browser(session,"click",'[data-worker-comments-panel] [data-action="reply:'+thread+'"]')
+ wait('document.querySelector("#dialog").open')
+ browser(session,"fill",'#dialog textarea[name="body"]',"Native reply")
+ browser(session,"click","#submit-dialog")
+ wait('!document.querySelector("#dialog").open&&document.querySelector("[data-worker-comments-panel]")?.textContent.includes("Native reply")')
+ result.gates.push("native reply through durable ledger")
+ browser(session,"click",'[data-worker-comments-panel] [data-action="resolve:'+thread+'"]')
+ wait('document.querySelector("[data-worker-comments-panel] [data-comment]")?.classList.contains("resolved")')
+ result.gates.push("native resolve")
+ evaluate(session,source+'.focus()')
+ browser(session,"press","Control+z")
+ wait('!document.querySelector("[data-worker-comments-panel] [data-comment]")?.classList.contains("resolved")')
+ await accepted(record.documentId,initial)
+ result.gates.push("native Undo resolve preserves accepted source")
+ result.stage="reload"
+ browser(session,"reload")
+ wait(source+'.value==='+JSON.stringify(initial)+'&&!document.querySelector("#editor").readOnly')
+ browser(session,"click","[data-worker-comments]")
+ wait('document.querySelector("[data-worker-comments-panel]")?.textContent.includes("Native reply")')
+ result.gates.push("reload retained comment and reply")
+ result.stage="complete"
+} catch(error) {
+ result.failure=String(error)
+ try {result.state=evaluate(session,'({pathname:location.pathname,text:document.body.innerText.slice(-2200),source:document.querySelector("alkalye-editor")?.source?.value,readonly:document.querySelector("#editor")?.readOnly,panel:document.querySelector("[data-worker-comments-panel]")?.innerHTML,dialog:document.querySelector("#dialog")?.outerHTML,boot:document.querySelector("#worker-boot-diagnostics")?.textContent})')}catch{}
+ process.exitCode=1
+} finally {
+ await Bun.write("comments-final-results.json",JSON.stringify(result,null,2)+"\n")
+ console.log(JSON.stringify(result))
+ browser(session,"close")
+}

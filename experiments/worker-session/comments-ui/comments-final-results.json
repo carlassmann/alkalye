@@ -1,0 +1,13 @@
+{
+	"stage": "complete",
+	"gates": [
+		"native selected comment submit and UI refresh",
+		"native anchored range navigation",
+		"native reply through durable ledger",
+		"native resolve",
+		"native Undo resolve preserves accepted source",
+		"reload retained comment and reply"
+	],
+	"initialSHA": "387eab73076ae3bf6ceb9cb8813899b7dde3e8a8dc1fff42d01d2adccdcb4d30",
+	"editedSHA": "23999095d691f30fe4e313376f7e5accc4b388b29cbdc428fba81d8f46555c74"
+}

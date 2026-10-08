@@ -1,0 +1,318 @@
+--- baseline/src/shared/crdt.ts
++++ candidate/src/shared/crdt.ts
+@@ -1596,41 +1596,44 @@
+ 		this.metadataCache.set(target, metadata)
+ 		return metadata
+ 	}
++	documentRecord(id: string, room: string, includeDeleted = false): DocumentRecord | undefined {
++		let type = this.fields(id).type
++		if (type !== "document" && !(includeDeleted && type === "deleted")) return undefined
++		let drawings = new Set(this.records("whiteboard").map(board => board.fields.document))
++		return this.projectDocument(id, room, drawings)
++	}
+ 	documents(room: string, includeDeleted = false): DocumentRecord[] {
+-		let targets = this.targets.keys()
+-		let drawings = new Set(
+-			this.records("whiteboard").map(board => board.fields.document),
+-		)
+-		return [...targets]
+-			.filter(id => {
+-				let type = this.fields(id).type
+-				return type === "document" || (includeDeleted && type === "deleted")
+-			})
+-			.map(id => {
+-				let fields = this.fields(id)
+-				let content = this.text(id)
+-				let metadata = this.metadata(id)
+-				let mode = frontmatter(content).values.mode
+-				let updated = this.updated.get(id) ?? 0
+-				return {
+-					id,
+-					kind:
+-						fields.whiteboard || drawings.has(id)
+-							? "whiteboard"
+-							: mode === "present"
+-								? "slides"
+-								: "document",
+-					title: metadata.title,
+-					content,
+-					folder: metadata.path,
+-					archived: metadata.archived,
+-					updated,
+-					room,
+-					tags: [...metadata.tags],
+-					pinned: metadata.pinned,
+-					created: this.created.get(id) ?? 0,
+-				}
+-			})
++		let drawings = new Set(this.records("whiteboard").map(board => board.fields.document))
++		return [...this.targets.keys()].filter(id => {
++			let type = this.fields(id).type
++			return type === "document" || (includeDeleted && type === "deleted")
++		}).map(id => this.projectDocument(id, room, drawings))
++	}
++	private projectDocument(id: string, room: string, drawings: Set<string | undefined>): DocumentRecord {
++		let fields = this.fields(id)
++		let content = this.text(id)
++		let metadata = this.metadata(id)
++		let mode = frontmatter(content).values.mode
++		let updated = this.updated.get(id) ?? 0
++		return {
++			id,
++			kind:
++				fields.whiteboard || drawings.has(id)
++					? "whiteboard"
++					: mode === "present"
++						? "slides"
++						: "document",
++			title: metadata.title,
++			content,
++			folder: metadata.path,
++			archived: metadata.archived,
++			updated,
++			room,
++			tags: [...metadata.tags],
++			pinned: metadata.pinned,
++			created: this.created.get(id) ?? 0,
++		}
++
+ 	}
+ 	revision(target: string) {
+ 		let atoms = [...(this.children.get(target)?.values() ?? [])]
+--- baseline/src/shared/document-session.ts
++++ candidate/src/shared/document-session.ts
+@@ -9,6 +9,8 @@
+ import * as Ref from "effect/Ref"
+ import * as Schedule from "effect/Schedule"
+ import * as Scope from "effect/Scope"
++import * as RcMap from "effect/RcMap"
++import * as Equal from "effect/Equal"
+ import * as EventGroup from "effect/eventlog/EventGroup"
+ import * as EventJournal from "effect/eventlog/EventJournal"
+ import * as EventLog from "effect/eventlog/EventLog"
+@@ -498,21 +500,60 @@
+ 			}
+ 		}
+ 
++		type WarmView = { source: Replica; generation: number }
++		let warmView: WarmView | undefined
++		let warmViews = yield* RcMap.make({
++			lookup: (view: WarmView) => view.source.textEffect(options.document).pipe(Effect.asVoid),
++			idleTimeToLive: 0,
++		}).pipe(Effect.provideService(Scope.Scope, background))
++		function currentWarmView() {
++			let source = projection.replica
++			if (!warmView || warmView.source !== source || warmView.generation !== source.generation)
++				warmView = Equal.byReferenceUnsafe({ source, generation: source.generation })
++			return warmView
++		}
++		function unchanged(view: WarmView) {
++			return view.source === projection.replica && view.generation === view.source.generation
++		}
++		function warmCurrentView() {
++			return Effect.gen(function* () {
++				while (true) {
++					yield* requireOpen
++					let view = currentWarmView()
++					let result = yield* RcMap.get(warmViews, view).pipe(Effect.scoped, Effect.exit)
++					yield* requireOpen
++					if (!unchanged(view)) continue
++					if (Exit.isFailure(result)) return yield* Effect.failCause(result.cause)
++					return view
++				}
++			})
++		}
+ 		return {
+ 			replica: view,
+-			forkReplica: (actor?: string, author?: string) =>
+-				gate.withPermit(
+-					Effect.gen(function* () {
++			readView: <A>(read: () => A) => Effect.gen(function* () {
++				while (true) {
++					let view = yield* warmCurrentView()
++					let published = yield* gate.withPermit(requireOpen.pipe(Effect.andThen(Effect.sync((): { retry: true } | { retry: false; value: A } => {
++						if (!unchanged(view)) return { retry: true }
++						return { retry: false, value: read() }
++					}))))
++					if (!published.retry) return published.value
++				}
++			}),
++			forkReplica: (actor?: string, author?: string) => Effect.gen(function* () {
++				while (true) {
++					let view = yield* warmCurrentView()
++					let copied = yield* gate.withPermit(Effect.gen(function* () {
+ 						yield* requireOpen
+-						let source = projection.replica
+-						let copied = yield* source.forkEffect(actor, author)
+-						if (source !== projection.replica)
+-							return yield* Effect.fail(
+-								new Error("Replica changed while being copied"),
+-							)
+-						return copied
+-					}),
+-				),
++						if (!unchanged(view)) return { retry: true, replica: undefined }
++						let result = yield* view.source.forkEffect(actor, author).pipe(Effect.result)
++						if (!unchanged(view)) return { retry: true, replica: undefined }
++						if (result._tag === "Failure") return yield* Effect.fail(result.failure)
++						return { retry: false, replica: result.success }
++					}))
++					if (copied.replica) return copied.replica
++				}
++			}),
+ 			version: () => SubscriptionRef.getUnsafe(revision),
+ 			changes: SubscriptionRef.changes(revision),
+ 			failures: recovery.failures,
+@@ -1997,6 +2038,7 @@
+ 			...current().fields(target, until),
+ 		}),
+ 		metadata: (target: string) => structuredClone(current().metadata(target)),
++		documentRecord: (id: string, room: string, includeDeleted = false) => structuredClone(current().documentRecord(id, room, includeDeleted)),
+ 		documents: (room: string, includeDeleted = false) =>
+ 			structuredClone(current().documents(room, includeDeleted)),
+ 		checkpoint: () => structuredClone(current().checkpoint()),
+--- baseline/src/client/worker-document/worker-opened-capabilities.ts
++++ candidate/src/client/worker-document/worker-opened-capabilities.ts
+@@ -68,7 +68,7 @@
+   function materialize() {
+    performance.mark("opened:materialize:start")
+    try {
+-   let document = session.replica.documents(options.workspace, true).find(value => value.id === options.document)
++   let document = session.replica.documentRecord(options.document, options.workspace, true)
+    if (!document) return undefined
+    return Object.freeze({
+     document: Object.freeze({ ...document, kind: document.kind ?? "document", tags: Object.freeze([...(document.tags ?? [])]), pinned: document.pinned ?? false, created: document.created ?? 0, deleted: session.replica.fields(options.document).type === "deleted" }),
+@@ -102,13 +102,15 @@
+     }),
+    })
+   }
++  let readEffect = session.readView(read)
+   function readRecord(id: string) {
+    let fields = session.replica.fields(id)
+    if (id !== options.document && (fields.document !== options.document || !["asset", "whiteboard", "comment"].includes(fields.type ?? ""))) return undefined
+    return Object.freeze({ id, fields: Object.freeze({ ...fields }) })
+   }
+   return {
+-   current: read,
++   read: readEffect,
++   canWrite: options.canWrite,
+    record: (id: string) => Effect.sync(() => readRecord(id)),
+    changes: Stream.succeed(undefined).pipe(
+     Stream.concat(session.changes),
+@@ -116,7 +118,7 @@
+     Stream.merge(options.connection.changes),
+     Stream.merge(options.editor.changes),
+     Stream.buffer({ capacity: 1, strategy: "sliding" }),
+-    Stream.map(read),
++    Stream.mapEffect(() => readEffect),
+     Stream.changesWith(Schema.toEquivalence(WorkerOpenedSnapshotSchema)),
+    ),
+    ...intents,
+--- baseline/src/client/worker-document/worker-session.ts
++++ candidate/src/client/worker-document/worker-session.ts
+@@ -1,6 +1,7 @@
+ import * as Cause from "effect/Cause"
+ import { workerBootMark } from "./boot-diagnostics"
+ import * as Schema from "effect/Schema"
++import type { WorkerOpenedSnapshot } from "./worker-opened-schemas"
+ import type { Storage } from "../storage"
+ import { commandIntentDigest } from "./command-intent"
+ import * as EventJournal from "effect/eventlog/EventJournal"
+@@ -40,13 +41,21 @@
+  let writeFailure = false
+  function failure(reason: WorkerDocumentFailure["reason"]) { return new WorkerDocumentFailure({ reason, category: "conflict" }) }
+  function requireOpen() { return Effect.suspend(() => opened ? Effect.succeed(opened) : Effect.fail(failure("Closed"))) }
+- function admitted(current: Opened, epoch: number) { return current.admissionEpoch === epoch && current.capability.current().canWrite ? Effect.void : Effect.fail(failure("PermissionDenied")) }
++ function admitted(current: Opened, epoch: number) { return current.admissionEpoch === epoch && current.capability.canWrite() ? Effect.void : Effect.fail(failure("PermissionDenied")) }
+  function prepareAdmitted(current: Opened, epoch: number, command: Effect.Effect<{ token: string }, unknown>) {
+   return Effect.uninterruptible(admitted(current, epoch).pipe(Effect.andThen(command), Effect.tap(receipt => Effect.sync(() => current.commandEpochs.set(receipt.token, epoch)))))
+  }
++ function noticeSnapshot(current: Opened, snapshot: WorkerOpenedSnapshot) {
++  return { revision: snapshot.revision, admissionEpoch: current.admissionEpoch, metadata: snapshot.projection?.metadata, canWrite: snapshot.canWrite, connection: snapshot.connection, status: snapshot.status }
++ }
++ function readFailure(current: Opened, error: unknown) {
++  return opened === current ? new WorkerDocumentFailure({reason:"SessionFailure",category:documentFailureCategory(error)}) : failure("Closed")
++ }
++ function observedChanges(current: Opened) {
++  return current.capability.changes.pipe(Stream.catchIf(() => opened !== current, () => Stream.empty), Stream.mapError(error => readFailure(current, error)))
++ }
+  function notice(current: Opened) {
+-  let snapshot = current.capability.current()
+-  return { revision: snapshot.revision, admissionEpoch: current.admissionEpoch, metadata: snapshot.projection?.metadata, canWrite: snapshot.canWrite, connection: snapshot.connection, status: snapshot.status }
++  return current.capability.read.pipe(Effect.mapError(error => readFailure(current, error)), Effect.map(snapshot => noticeSnapshot(current, snapshot)))
+  }
+  function checked<A, E, R>(work: Effect.Effect<A, E, R>) {
+   return work.pipe(Effect.tapError(error => Effect.tryPromise({ try: async () => {
+@@ -103,18 +112,18 @@
+     let editor = yield* makeWorkerEditorBasis({ document: input.document, session, canWrite: connection.canWrite }).pipe(Scope.provide(sessionScope))
+     workerBootMark("Open:capability-start")
+     let capability = yield* makeWorkerOpenedCapabilities({ document: input.document, subject: input.subject, storage, online: () => SubscriptionRef.getUnsafe(admission).online, workspace: input.workspace, author: session.replica.author, session, blobs, connection, live, canWrite: connection.canWrite, basis: editor.basis, editor }).pipe(Scope.provide(sessionScope))
+-    let snapshot = capability.current()
++    let snapshot = yield* capability.read
+     yield* Scope.addFinalizer(scope, Deferred.done(closed, Exit.void))
+     opened = { storage, document: input.document, commandEpochs: new Map(), subject: input.subject, admissionEpoch: input.admission.epoch, editor, activity: currentActivity, session, observing: false, actor: session.replica.actor, closed, scope, capability, admission, live }
+     workerBootMark("Open:snapshot-done")
+     return snapshot
+    })).pipe(Effect.onExit(exit => Exit.isSuccess(exit) ? Effect.void : Effect.sync(() => { workerBootMark("Open:error", Cause.pretty(exit.cause)); activity?.release() }).pipe(Effect.andThen(Scope.close(scope, exit)))))
+   }))),
+-  Connectivity: input => checked(requireOpen().pipe(Effect.flatMap(current => SubscriptionRef.update(current.admission, value => ({ ...value, online: input.online })).pipe(Effect.map(() => notice(current)))))),
++  Connectivity: input => checked(requireOpen().pipe(Effect.flatMap(current => SubscriptionRef.update(current.admission, value => ({ ...value, online: input.online })).pipe(Effect.flatMap(() => notice(current)))))),
+   AdmissionEpoch: input => execute(requireOpen().pipe(Effect.flatMap(current => Effect.gen(function* () {
+    if (input.admission.subject !== current.subject || input.admission.epoch <= current.admissionEpoch) return yield* Effect.fail(failure("PermissionDenied"))
+    yield* Effect.uninterruptible(SubscriptionRef.set(current.admission, { ...input.admission, role: input.admission.role, online: SubscriptionRef.getUnsafe(current.admission).online }).pipe(Effect.andThen(Effect.sync(() => { current.admissionEpoch = input.admission.epoch }))))
+-   return notice(current)
++   return yield* notice(current)
+   })))),
+   ExecuteAdmitted: input => execute(requireOpen().pipe(Effect.flatMap(current => current.commandEpochs.get(input.token) === input.admissionEpoch ? admitted(current, input.admissionEpoch).pipe(Effect.andThen(current.capability.commands.execute(input.token))) : Effect.fail(failure("PermissionDenied"))))),
+   Synchronize: () => checked(requireOpen().pipe(Effect.flatMap(current => current.capability.synchronize))),
+@@ -149,10 +158,8 @@
+     return Effect.succeed(current)
+    })))),
+    current => Effect.sync(() => { current.observing = false }),
+-  ).pipe(Effect.map(current => current.capability.changes.pipe(
+-   Stream.mapEffect(() => execute(Effect.sync(() => {
+-    return notice(current)
+-   }))),
++  ).pipe(Effect.map(current => observedChanges(current).pipe(
++   Stream.mapEffect(snapshot => execute(Effect.sync(() => noticeSnapshot(current, snapshot)))),
+    Stream.interruptWhen(Deferred.await(current.closed)),
+   )))),
+   Observe: () => Stream.unwrap(Effect.acquireRelease(
+@@ -163,7 +170,7 @@
+    })))),
+    current => Effect.sync(() => { current.observing = false }),
+   ).pipe(Effect.map(current => observeWorkerOpenedDocument({
+-   changes: current.capability.changes,
++   changes: observedChanges(current),
+    presence: current.capability.presence,
+    actor: () => current.actor,
+   }, current.closed)))),
+@@ -183,7 +190,7 @@
+   ResolveClipboard: input => execute(requireOpen().pipe(Effect.flatMap(current => current.editor.handlers.ResolveClipboard(input)))),
+   ReleaseClipboard: input => execute(requireOpen().pipe(Effect.flatMap(current => current.editor.handlers.ReleaseClipboard(input)))),
+   Protection: () => execute(requireOpen().pipe(Effect.map(current => ({ unsaved: current.session.unsaved(), dirty: current.activity.dirty() })))),
+-  Read: () => execute(requireOpen().pipe(Effect.map(current => current.capability.current()))),
++  Read: () => execute(requireOpen().pipe(Effect.flatMap(current => current.capability.read))),
+   PropertiesUpdate: input => execute(requireOpen().pipe(Effect.flatMap(current => prepareAdmitted(current, input.admissionEpoch, current.capability.properties.update(input.patch))))),
+   Present: input => execute(requireOpen().pipe(Effect.flatMap(current => prepareAdmitted(current, input.admissionEpoch, current.capability.properties.present(input.index))))),
+   Presentation: input => execute(requireOpen().pipe(Effect.flatMap(current => prepareAdmitted(current, input.admissionEpoch, current.capability.properties.presentation(input.enabled))))),
+--- baseline/src/client/worker-document/worker-opened-observation.ts
++++ candidate/src/client/worker-document/worker-opened-observation.ts
+@@ -10,14 +10,14 @@
+  Schema.Struct({ type: Schema.Literal("presence"), actor: Schema.String, value: WorkerPresenceSchema }),
+ ])
+ export type WorkerOpenedEvent = typeof WorkerOpenedEventSchema.Type
+-interface ObservedDocument {
+- changes: Stream.Stream<WorkerOpenedSnapshot>
++interface ObservedDocument<E> {
++ changes: Stream.Stream<WorkerOpenedSnapshot,E>
+  presence: { changes: Stream.Stream<readonly LivePresence[]> }
+  actor(): string
+ }
+ 
+ // One observer occupies one worker lease; the other lease remains for the existing FIFO.
+-export function observeWorkerOpenedDocument(opened: ObservedDocument, closed: Deferred.Deferred<void>) {
++export function observeWorkerOpenedDocument<E>(opened: ObservedDocument<E>, closed: Deferred.Deferred<void>) {
+  return opened.changes.pipe(
+   Stream.map((value): WorkerOpenedEvent => ({ type: "document", value })),
+   Stream.merge(opened.presence.changes.pipe(Stream.map((value): WorkerOpenedEvent => ({ type: "presence", value, actor: opened.actor() })))),

@@ -1,0 +1,2 @@
+{"name":"rtl","target":61450,"full":true,"firstValid":true,"valid":true}
+{"name":"rtl","target":61450,"full":false,"firstValid":true,"valid":true}

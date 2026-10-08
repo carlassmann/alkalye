@@ -1,2308 +1,2296 @@
 [
-  {
-    "count": 1,
-    "taskOwner": [
-      39289,
-      19258723
-    ],
-    "taskMs": 290.142,
-    "taskOffsetMs": 635.097,
-    "profiles": [
-      {
-        "owner": [
-          39289,
-          19258723
-        ],
-        "workerURLVerified": true,
-        "sampleWeightMs": 290.339,
-        "self": [
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 97817,
-              "functionName": "",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 85.549,
-            "inclusiveMs": 265.427,
-            "source": {
-              "file": "../src/client/worker-document/worker-editor-basis.ts",
-              "line": 289,
-              "column": 28,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1349,
-              "functionName": "rawVisibleSteps",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 42.366,
-            "inclusiveMs": 130.55,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1421,
-              "column": 26,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8746,
-              "functionName": "Ga",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 36.62,
-            "inclusiveMs": 36.62,
-            "source": {
-              "file": "../src/shared/text-visibility.ts",
-              "line": 375,
-              "column": 15,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 6167,
-              "functionName": "active",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 33.409,
-            "inclusiveMs": 70.029,
-            "source": {
-              "file": "../src/shared/text-visibility.ts",
-              "line": 219,
-              "column": 8,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 6586,
-              "functionName": "hidden",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 18.155,
-            "inclusiveMs": 88.184,
-            "source": {
-              "file": "../src/shared/text-visibility.ts",
-              "line": 245,
-              "column": 8,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1997,
-              "functionName": "WB",
-              "lineNumber": 64,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 11.612,
-            "inclusiveMs": 20.64,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 454,
-              "column": 29,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 606,
-              "functionName": "CI",
-              "lineNumber": 59,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 10.518,
-            "inclusiveMs": 31.158,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 135,
-              "column": 34,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(garbage collector)",
-              "scriptId": 0
-            },
-            "selfMs": 9.17,
-            "inclusiveMs": 9.17,
-            "source": null
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 86866,
-              "functionName": "In",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 7.633,
-            "inclusiveMs": 7.633,
-            "source": {
-              "file": "../src/shared/collection-copy.ts",
-              "line": 1,
-              "column": 36,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(program)",
-              "scriptId": 0
-            },
-            "selfMs": 7.325,
-            "inclusiveMs": 7.325,
-            "source": null
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 87130,
-              "functionName": "An",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 6.148,
-            "inclusiveMs": 136.698,
-            "source": {
-              "file": "../src/shared/collection-copy.ts",
-              "line": 35,
-              "column": 31,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 558,
-              "functionName": "c",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 5.832,
-            "inclusiveMs": 6.737,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 52,
-              "column": 17,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 558,
-              "functionName": "c",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 3.67,
-            "inclusiveMs": 6.446,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 52,
-              "column": 17,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 87130,
-              "functionName": "An",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.476,
-            "inclusiveMs": 33.634,
-            "source": {
-              "file": "../src/shared/collection-copy.ts",
-              "line": 35,
-              "column": 31,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3255,
-              "functionName": "text",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.305,
-            "inclusiveMs": 179.236,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1547,
-              "column": 6,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 13,
-              "functionName": "Ya",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.291,
-            "inclusiveMs": 9.028,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 558,
-              "column": 20,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.169,
-            "inclusiveMs": 2.625,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 59,
-              "column": 46,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "functionName": "mark",
-              "scriptId": 0
-            },
-            "selfMs": 0.637,
-            "inclusiveMs": 0.637,
-            "source": null
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.599,
-            "inclusiveMs": 0.751,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 59,
-              "column": 46,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3457,
-              "functionName": "",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.456,
-            "inclusiveMs": 0.456,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1557,
-              "column": 9,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(idle)",
-              "scriptId": 0
-            },
-            "selfMs": 0.159,
-            "inclusiveMs": 0.159,
-            "source": null
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8199,
-              "functionName": "",
-              "lineNumber": 83,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.159,
-            "inclusiveMs": 0.159,
-            "source": {
-              "file": "../src/client/worker-document/worker.ts",
-              "line": 15,
-              "column": 17,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 30,
-              "functionName": "",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.154,
-            "inclusiveMs": 0.154,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 559,
-              "column": 19,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 560,
-              "functionName": "zB",
-              "lineNumber": 59,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.153,
-            "inclusiveMs": 33.787,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 128,
-              "column": 28,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3929,
-              "functionName": "forkSteps",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.152,
-            "inclusiveMs": 7.785,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 156,
-              "column": 20,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.152,
-            "inclusiveMs": 0.152,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 59,
-              "column": 46,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 30,
-              "functionName": "",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.152,
-            "inclusiveMs": 0.152,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 559,
-              "column": 19,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3457,
-              "functionName": "",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.152,
-            "inclusiveMs": 0.152,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1557,
-              "column": 9,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3457,
-              "functionName": "",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.151,
-            "inclusiveMs": 0.151,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1557,
-              "column": 9,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8746,
-              "functionName": "Ga",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.01,
-            "inclusiveMs": 0.01,
-            "source": {
-              "file": "../src/shared/text-visibility.ts",
-              "line": 375,
-              "column": 15,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "functionName": "mark",
-              "scriptId": 0
-            },
-            "selfMs": 0.005,
-            "inclusiveMs": 0.005,
-            "source": null
-          }
-        ],
-        "inclusive": [
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(root)",
-              "scriptId": 0
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 290.339,
-            "source": null
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1816,
-              "functionName": "runLoop",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 273.381,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
-              "line": 441,
-              "column": 10,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1242,
-              "functionName": "evaluate",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 273.381,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
-              "line": 406,
-              "column": 11,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 4895,
-              "functionName": "",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 273.381,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
-              "line": 735,
-              "column": 42,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8813,
-              "functionName": "runTasks",
-              "lineNumber": 8,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 273.381,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js",
-              "line": 164,
-              "column": 11,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8763,
-              "functionName": "afterScheduled",
-              "lineNumber": 8,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 273.381,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js",
-              "line": 157,
-              "column": 20,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 108765,
-              "functionName": "n",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 273.381,
-            "source": {
-              "file": "../src/client/scheduler.ts",
-              "line": 12,
-              "column": 20,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 108988,
-              "functionName": "o.port1.onmessage",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 273.381,
-            "source": {
-              "file": "../src/client/scheduler.ts",
-              "line": 28,
-              "column": 29,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 97817,
-              "functionName": "",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 85.549,
-            "inclusiveMs": 265.427,
-            "source": {
-              "file": "../src/client/worker-document/worker-editor-basis.ts",
-              "line": 289,
-              "column": 28,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 7253,
-              "functionName": "Oo",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 265.427,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
-              "line": 984,
-              "column": 12,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 5715,
-              "functionName": "WA",
-              "lineNumber": 6,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 265.427,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js",
-              "line": 295,
-              "column": 13,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3255,
-              "functionName": "text",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.305,
-            "inclusiveMs": 179.236,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1547,
-              "column": 6,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 744,
-              "functionName": "visible",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 170.485,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1381,
-              "column": 9,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 87130,
-              "functionName": "An",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 6.148,
-            "inclusiveMs": 136.698,
-            "source": {
-              "file": "../src/shared/collection-copy.ts",
-              "line": 35,
-              "column": 31,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1283,
-              "functionName": "rawVisible",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 136.698,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1415,
-              "column": 20,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1349,
-              "functionName": "rawVisibleSteps",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 42.366,
-            "inclusiveMs": 130.55,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1421,
-              "column": 26,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 6586,
-              "functionName": "hidden",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 18.155,
-            "inclusiveMs": 88.184,
-            "source": {
-              "file": "../src/shared/text-visibility.ts",
-              "line": 245,
-              "column": 8,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 6167,
-              "functionName": "active",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 33.409,
-            "inclusiveMs": 70.029,
-            "source": {
-              "file": "../src/shared/text-visibility.ts",
-              "line": 219,
-              "column": 8,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8746,
-              "functionName": "Ga",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 36.62,
-            "inclusiveMs": 36.62,
-            "source": {
-              "file": "../src/shared/text-visibility.ts",
-              "line": 375,
-              "column": 15,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 560,
-              "functionName": "zB",
-              "lineNumber": 59,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.153,
-            "inclusiveMs": 33.787,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 128,
-              "column": 28,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 87130,
-              "functionName": "An",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.476,
-            "inclusiveMs": 33.634,
-            "source": {
-              "file": "../src/shared/collection-copy.ts",
-              "line": 35,
-              "column": 31,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 606,
-              "functionName": "CI",
-              "lineNumber": 59,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 10.518,
-            "inclusiveMs": 31.158,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 135,
-              "column": 34,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1997,
-              "functionName": "WB",
-              "lineNumber": 64,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 11.612,
-            "inclusiveMs": 20.64,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 454,
-              "column": 29,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(garbage collector)",
-              "scriptId": 0
-            },
-            "selfMs": 9.17,
-            "inclusiveMs": 9.17,
-            "source": null
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 13,
-              "functionName": "Ya",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.291,
-            "inclusiveMs": 9.028,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 558,
-              "column": 20,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 64,
-              "functionName": "qQ",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 9.028,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 562,
-              "column": 26,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 11801,
-              "functionName": "",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 7.795,
-            "source": {
-              "file": "../src/platform/effects.ts",
-              "line": 24,
-              "column": 41,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 5213,
-              "functionName": "",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 7.795,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
-              "line": 766,
-              "column": 18,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 4752,
-              "functionName": "mi",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 7.795,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
-              "line": 717,
-              "column": 13,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3929,
-              "functionName": "forkSteps",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.152,
-            "inclusiveMs": 7.785,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 156,
-              "column": 20,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 86866,
-              "functionName": "In",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 7.633,
-            "inclusiveMs": 7.633,
-            "source": {
-              "file": "../src/shared/collection-copy.ts",
-              "line": 1,
-              "column": 36,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(program)",
-              "scriptId": 0
-            },
-            "selfMs": 7.325,
-            "inclusiveMs": 7.325,
-            "source": null
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 558,
-              "functionName": "c",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 5.832,
-            "inclusiveMs": 6.737,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 52,
-              "column": 17,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 558,
-              "functionName": "c",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 3.67,
-            "inclusiveMs": 6.446,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 52,
-              "column": 17,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.169,
-            "inclusiveMs": 2.625,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 59,
-              "column": 46,
-              "name": null
-            }
-          }
-        ]
-      }
-    ],
-    "failure": null
-  },
-  {
-    "count": 512,
-    "taskOwner": [
-      39289,
-      19260205
-    ],
-    "taskMs": 312.556,
-    "taskOffsetMs": 588.129,
-    "profiles": [
-      {
-        "owner": [
-          39289,
-          19260205
-        ],
-        "workerURLVerified": true,
-        "sampleWeightMs": 312.743,
-        "self": [
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 100808,
-              "functionName": "_9",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 90.022,
-            "inclusiveMs": 90.022,
-            "source": {
-              "file": "../src/client/worker-document/worker-editor-basis.ts",
-              "line": 493,
-              "column": 32,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1349,
-              "functionName": "rawVisibleSteps",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 45.358,
-            "inclusiveMs": 139.839,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1421,
-              "column": 26,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 6167,
-              "functionName": "active",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 39.088,
-            "inclusiveMs": 70.987,
-            "source": {
-              "file": "../src/shared/text-visibility.ts",
-              "line": 219,
-              "column": 8,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8746,
-              "functionName": "Ga",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 31.745,
-            "inclusiveMs": 31.745,
-            "source": {
-              "file": "../src/shared/text-visibility.ts",
-              "line": 375,
-              "column": 15,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 6586,
-              "functionName": "hidden",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 23.494,
-            "inclusiveMs": 94.481,
-            "source": {
-              "file": "../src/shared/text-visibility.ts",
-              "line": 245,
-              "column": 8,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(garbage collector)",
-              "scriptId": 0
-            },
-            "selfMs": 23.475,
-            "inclusiveMs": 23.475,
-            "source": null
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1997,
-              "functionName": "WB",
-              "lineNumber": 64,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 11.115,
-            "inclusiveMs": 20.485,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 454,
-              "column": 29,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 606,
-              "functionName": "CI",
-              "lineNumber": 59,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 10.087,
-            "inclusiveMs": 30.729,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 135,
-              "column": 34,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 87130,
-              "functionName": "An",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 7.86,
-            "inclusiveMs": 147.699,
-            "source": {
-              "file": "../src/shared/collection-copy.ts",
-              "line": 35,
-              "column": 31,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(program)",
-              "scriptId": 0
-            },
-            "selfMs": 6.615,
-            "inclusiveMs": 6.615,
-            "source": null
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 558,
-              "functionName": "c",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 5.383,
-            "inclusiveMs": 6.461,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 52,
-              "column": 17,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 558,
-              "functionName": "c",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 5.072,
-            "inclusiveMs": 6.918,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 52,
-              "column": 17,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 13,
-              "functionName": "Ya",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.452,
-            "inclusiveMs": 9.37,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 558,
-              "column": 20,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3255,
-              "functionName": "text",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.166,
-            "inclusiveMs": 189.19,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1547,
-              "column": 6,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 87130,
-              "functionName": "An",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.135,
-            "inclusiveMs": 32.864,
-            "source": {
-              "file": "../src/shared/collection-copy.ts",
-              "line": 35,
-              "column": 31,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 97817,
-              "functionName": "",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 1.456,
-            "inclusiveMs": 281.298,
-            "source": {
-              "file": "../src/client/worker-document/worker-editor-basis.ts",
-              "line": 289,
-              "column": 28,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 30,
-              "functionName": "",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.93,
-            "inclusiveMs": 0.93,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 559,
-              "column": 19,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.916,
-            "inclusiveMs": 1.846,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 59,
-              "column": 46,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.62,
-            "inclusiveMs": 1.078,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 59,
-              "column": 46,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "functionName": "mark",
-              "scriptId": 0
-            },
-            "selfMs": 0.468,
-            "inclusiveMs": 0.468,
-            "source": null
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3457,
-              "functionName": "",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.458,
-            "inclusiveMs": 0.458,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1557,
-              "column": 9,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3457,
-              "functionName": "",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.314,
-            "inclusiveMs": 0.314,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1557,
-              "column": 9,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8199,
-              "functionName": "",
-              "lineNumber": 83,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.299,
-            "inclusiveMs": 0.299,
-            "source": {
-              "file": "../src/client/worker-document/worker.ts",
-              "line": 15,
-              "column": 17,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 9658,
-              "functionName": "i8",
-              "lineNumber": 24,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.235,
-            "inclusiveMs": 0.235,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaAST.js",
-              "line": 1249,
-              "column": 26,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.158,
-            "inclusiveMs": 0.158,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 59,
-              "column": 46,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 503,
-              "functionName": "a",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.157,
-            "inclusiveMs": 0.157,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 45,
-              "column": 16,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8669,
-              "functionName": "node",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.154,
-            "inclusiveMs": 0.154,
-            "source": {
-              "file": "../src/shared/text-visibility.ts",
-              "line": 371,
-              "column": 14,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 98560,
-              "functionName": "",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.154,
-            "inclusiveMs": 0.154,
-            "source": {
-              "file": "../src/client/worker-document/worker-editor-basis.ts",
-              "line": 332,
-              "column": 10,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 14433,
-              "functionName": "",
-              "lineNumber": 24,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.147,
-            "inclusiveMs": 0.147,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaAST.js",
-              "line": 1581,
-              "column": 12,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(idle)",
-              "scriptId": 0
-            },
-            "selfMs": 0.135,
-            "inclusiveMs": 0.135,
-            "source": null
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 7253,
-              "functionName": "Oo",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.067,
-            "inclusiveMs": 281.365,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
-              "line": 984,
-              "column": 12,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "functionName": "mark",
-              "scriptId": 0
-            },
-            "selfMs": 0.008,
-            "inclusiveMs": 0.008,
-            "source": null
-          }
-        ],
-        "inclusive": [
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(root)",
-              "scriptId": 0
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 312.743,
-            "source": null
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1816,
-              "functionName": "runLoop",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 282.046,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
-              "line": 441,
-              "column": 10,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1242,
-              "functionName": "evaluate",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 282.046,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
-              "line": 406,
-              "column": 11,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 4895,
-              "functionName": "",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 282.046,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
-              "line": 735,
-              "column": 42,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8813,
-              "functionName": "runTasks",
-              "lineNumber": 8,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 282.046,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js",
-              "line": 164,
-              "column": 11,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8763,
-              "functionName": "afterScheduled",
-              "lineNumber": 8,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 282.046,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js",
-              "line": 157,
-              "column": 20,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 108765,
-              "functionName": "n",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 282.046,
-            "source": {
-              "file": "../src/client/scheduler.ts",
-              "line": 12,
-              "column": 20,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 108988,
-              "functionName": "o.port1.onmessage",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 282.046,
-            "source": {
-              "file": "../src/client/scheduler.ts",
-              "line": 28,
-              "column": 29,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 5715,
-              "functionName": "WA",
-              "lineNumber": 6,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 281.747,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js",
-              "line": 295,
-              "column": 13,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 7253,
-              "functionName": "Oo",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.067,
-            "inclusiveMs": 281.365,
-            "source": {
-              "file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
-              "line": 984,
-              "column": 12,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 97817,
-              "functionName": "",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 1.456,
-            "inclusiveMs": 281.298,
-            "source": {
-              "file": "../src/client/worker-document/worker-editor-basis.ts",
-              "line": 289,
-              "column": 28,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3255,
-              "functionName": "text",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.166,
-            "inclusiveMs": 189.19,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1547,
-              "column": 6,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 744,
-              "functionName": "visible",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 180.563,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1381,
-              "column": 9,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 87130,
-              "functionName": "An",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 7.86,
-            "inclusiveMs": 147.699,
-            "source": {
-              "file": "../src/shared/collection-copy.ts",
-              "line": 35,
-              "column": 31,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1283,
-              "functionName": "rawVisible",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 147.699,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1415,
-              "column": 20,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1349,
-              "functionName": "rawVisibleSteps",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 45.358,
-            "inclusiveMs": 139.839,
-            "source": {
-              "file": "../src/shared/crdt.ts",
-              "line": 1421,
-              "column": 26,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 6586,
-              "functionName": "hidden",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 23.494,
-            "inclusiveMs": 94.481,
-            "source": {
-              "file": "../src/shared/text-visibility.ts",
-              "line": 245,
-              "column": 8,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 100808,
-              "functionName": "_9",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 90.022,
-            "inclusiveMs": 90.022,
-            "source": {
-              "file": "../src/client/worker-document/worker-editor-basis.ts",
-              "line": 493,
-              "column": 32,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 6167,
-              "functionName": "active",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 39.088,
-            "inclusiveMs": 70.987,
-            "source": {
-              "file": "../src/shared/text-visibility.ts",
-              "line": 219,
-              "column": 8,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 87130,
-              "functionName": "An",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.135,
-            "inclusiveMs": 32.864,
-            "source": {
-              "file": "../src/shared/collection-copy.ts",
-              "line": 35,
-              "column": 31,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 560,
-              "functionName": "zB",
-              "lineNumber": 59,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 32.864,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 128,
-              "column": 28,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8746,
-              "functionName": "Ga",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 31.745,
-            "inclusiveMs": 31.745,
-            "source": {
-              "file": "../src/shared/text-visibility.ts",
-              "line": 375,
-              "column": 15,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 606,
-              "functionName": "CI",
-              "lineNumber": 59,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 10.087,
-            "inclusiveMs": 30.729,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 135,
-              "column": 34,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(garbage collector)",
-              "scriptId": 0
-            },
-            "selfMs": 23.475,
-            "inclusiveMs": 23.475,
-            "source": null
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1997,
-              "functionName": "WB",
-              "lineNumber": 64,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 11.115,
-            "inclusiveMs": 20.485,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 454,
-              "column": 29,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 13,
-              "functionName": "Ya",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.452,
-            "inclusiveMs": 9.37,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 558,
-              "column": 20,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 64,
-              "functionName": "qQ",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 9.37,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 562,
-              "column": 26,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 558,
-              "functionName": "c",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 5.072,
-            "inclusiveMs": 6.918,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 52,
-              "column": 17,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(program)",
-              "scriptId": 0
-            },
-            "selfMs": 6.615,
-            "inclusiveMs": 6.615,
-            "source": null
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 558,
-              "functionName": "c",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 5.383,
-            "inclusiveMs": 6.461,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 52,
-              "column": 17,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.916,
-            "inclusiveMs": 1.846,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 59,
-              "column": 46,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.62,
-            "inclusiveMs": 1.078,
-            "source": {
-              "file": "../src/shared/atom-sequence.ts",
-              "line": 59,
-              "column": 46,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 30,
-              "functionName": "",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.93,
-            "inclusiveMs": 0.93,
-            "source": {
-              "file": "../src/shared/frontmatter-merge.ts",
-              "line": 559,
-              "column": 19,
-              "name": null
-            }
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "functionName": "mark",
-              "scriptId": 0
-            },
-            "selfMs": 0.468,
-            "inclusiveMs": 0.468,
-            "source": null
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 9317,
-              "functionName": "kr",
-              "lineNumber": 46,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 0.468,
-            "source": {
-              "file": "../src/client/worker-document/boot-diagnostics.ts",
-              "line": 11,
-              "column": 31,
-              "name": null
-            }
-          }
-        ]
-      }
-    ],
-    "failure": null
-  }
+	{
+		"count": 1,
+		"taskOwner": [39289, 19258723],
+		"taskMs": 290.142,
+		"taskOffsetMs": 635.097,
+		"profiles": [
+			{
+				"owner": [39289, 19258723],
+				"workerURLVerified": true,
+				"sampleWeightMs": 290.339,
+				"self": [
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 97817,
+							"functionName": "",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 85.549,
+						"inclusiveMs": 265.427,
+						"source": {
+							"file": "../src/client/worker-document/worker-editor-basis.ts",
+							"line": 289,
+							"column": 28,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1349,
+							"functionName": "rawVisibleSteps",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 42.366,
+						"inclusiveMs": 130.55,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1421,
+							"column": 26,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8746,
+							"functionName": "Ga",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 36.62,
+						"inclusiveMs": 36.62,
+						"source": {
+							"file": "../src/shared/text-visibility.ts",
+							"line": 375,
+							"column": 15,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6167,
+							"functionName": "active",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 33.409,
+						"inclusiveMs": 70.029,
+						"source": {
+							"file": "../src/shared/text-visibility.ts",
+							"line": 219,
+							"column": 8,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6586,
+							"functionName": "hidden",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 18.155,
+						"inclusiveMs": 88.184,
+						"source": {
+							"file": "../src/shared/text-visibility.ts",
+							"line": 245,
+							"column": 8,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1997,
+							"functionName": "WB",
+							"lineNumber": 64,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 11.612,
+						"inclusiveMs": 20.64,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 454,
+							"column": 29,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 606,
+							"functionName": "CI",
+							"lineNumber": 59,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 10.518,
+						"inclusiveMs": 31.158,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 135,
+							"column": 34,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(garbage collector)",
+							"scriptId": 0
+						},
+						"selfMs": 9.17,
+						"inclusiveMs": 9.17,
+						"source": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 86866,
+							"functionName": "In",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 7.633,
+						"inclusiveMs": 7.633,
+						"source": {
+							"file": "../src/shared/collection-copy.ts",
+							"line": 1,
+							"column": 36,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(program)",
+							"scriptId": 0
+						},
+						"selfMs": 7.325,
+						"inclusiveMs": 7.325,
+						"source": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 87130,
+							"functionName": "An",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 6.148,
+						"inclusiveMs": 136.698,
+						"source": {
+							"file": "../src/shared/collection-copy.ts",
+							"line": 35,
+							"column": 31,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 558,
+							"functionName": "c",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 5.832,
+						"inclusiveMs": 6.737,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 52,
+							"column": 17,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 558,
+							"functionName": "c",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 3.67,
+						"inclusiveMs": 6.446,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 52,
+							"column": 17,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 87130,
+							"functionName": "An",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.476,
+						"inclusiveMs": 33.634,
+						"source": {
+							"file": "../src/shared/collection-copy.ts",
+							"line": 35,
+							"column": 31,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3255,
+							"functionName": "text",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.305,
+						"inclusiveMs": 179.236,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1547,
+							"column": 6,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 13,
+							"functionName": "Ya",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.291,
+						"inclusiveMs": 9.028,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 558,
+							"column": 20,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.169,
+						"inclusiveMs": 2.625,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 59,
+							"column": 46,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"functionName": "mark",
+							"scriptId": 0
+						},
+						"selfMs": 0.637,
+						"inclusiveMs": 0.637,
+						"source": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.599,
+						"inclusiveMs": 0.751,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 59,
+							"column": 46,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3457,
+							"functionName": "",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.456,
+						"inclusiveMs": 0.456,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1557,
+							"column": 9,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(idle)",
+							"scriptId": 0
+						},
+						"selfMs": 0.159,
+						"inclusiveMs": 0.159,
+						"source": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8199,
+							"functionName": "",
+							"lineNumber": 83,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.159,
+						"inclusiveMs": 0.159,
+						"source": {
+							"file": "../src/client/worker-document/worker.ts",
+							"line": 15,
+							"column": 17,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 30,
+							"functionName": "",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.154,
+						"inclusiveMs": 0.154,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 559,
+							"column": 19,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 560,
+							"functionName": "zB",
+							"lineNumber": 59,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.153,
+						"inclusiveMs": 33.787,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 128,
+							"column": 28,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3929,
+							"functionName": "forkSteps",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.152,
+						"inclusiveMs": 7.785,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 156,
+							"column": 20,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.152,
+						"inclusiveMs": 0.152,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 59,
+							"column": 46,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 30,
+							"functionName": "",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.152,
+						"inclusiveMs": 0.152,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 559,
+							"column": 19,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3457,
+							"functionName": "",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.152,
+						"inclusiveMs": 0.152,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1557,
+							"column": 9,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3457,
+							"functionName": "",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.151,
+						"inclusiveMs": 0.151,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1557,
+							"column": 9,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8746,
+							"functionName": "Ga",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.01,
+						"inclusiveMs": 0.01,
+						"source": {
+							"file": "../src/shared/text-visibility.ts",
+							"line": 375,
+							"column": 15,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"functionName": "mark",
+							"scriptId": 0
+						},
+						"selfMs": 0.005,
+						"inclusiveMs": 0.005,
+						"source": null
+					}
+				],
+				"inclusive": [
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(root)",
+							"scriptId": 0
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 290.339,
+						"source": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1816,
+							"functionName": "runLoop",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 273.381,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 441,
+							"column": 10,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1242,
+							"functionName": "evaluate",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 273.381,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 406,
+							"column": 11,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 4895,
+							"functionName": "",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 273.381,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 735,
+							"column": 42,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8813,
+							"functionName": "runTasks",
+							"lineNumber": 8,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 273.381,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js",
+							"line": 164,
+							"column": 11,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8763,
+							"functionName": "afterScheduled",
+							"lineNumber": 8,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 273.381,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js",
+							"line": 157,
+							"column": 20,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 108765,
+							"functionName": "n",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 273.381,
+						"source": {
+							"file": "../src/client/scheduler.ts",
+							"line": 12,
+							"column": 20,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 108988,
+							"functionName": "o.port1.onmessage",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 273.381,
+						"source": {
+							"file": "../src/client/scheduler.ts",
+							"line": 28,
+							"column": 29,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 97817,
+							"functionName": "",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 85.549,
+						"inclusiveMs": 265.427,
+						"source": {
+							"file": "../src/client/worker-document/worker-editor-basis.ts",
+							"line": 289,
+							"column": 28,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 7253,
+							"functionName": "Oo",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 265.427,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 984,
+							"column": 12,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 5715,
+							"functionName": "WA",
+							"lineNumber": 6,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 265.427,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js",
+							"line": 295,
+							"column": 13,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3255,
+							"functionName": "text",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.305,
+						"inclusiveMs": 179.236,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1547,
+							"column": 6,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 744,
+							"functionName": "visible",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 170.485,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1381,
+							"column": 9,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 87130,
+							"functionName": "An",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 6.148,
+						"inclusiveMs": 136.698,
+						"source": {
+							"file": "../src/shared/collection-copy.ts",
+							"line": 35,
+							"column": 31,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1283,
+							"functionName": "rawVisible",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 136.698,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1415,
+							"column": 20,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1349,
+							"functionName": "rawVisibleSteps",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 42.366,
+						"inclusiveMs": 130.55,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1421,
+							"column": 26,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6586,
+							"functionName": "hidden",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 18.155,
+						"inclusiveMs": 88.184,
+						"source": {
+							"file": "../src/shared/text-visibility.ts",
+							"line": 245,
+							"column": 8,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6167,
+							"functionName": "active",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 33.409,
+						"inclusiveMs": 70.029,
+						"source": {
+							"file": "../src/shared/text-visibility.ts",
+							"line": 219,
+							"column": 8,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8746,
+							"functionName": "Ga",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 36.62,
+						"inclusiveMs": 36.62,
+						"source": {
+							"file": "../src/shared/text-visibility.ts",
+							"line": 375,
+							"column": 15,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 560,
+							"functionName": "zB",
+							"lineNumber": 59,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.153,
+						"inclusiveMs": 33.787,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 128,
+							"column": 28,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 87130,
+							"functionName": "An",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.476,
+						"inclusiveMs": 33.634,
+						"source": {
+							"file": "../src/shared/collection-copy.ts",
+							"line": 35,
+							"column": 31,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 606,
+							"functionName": "CI",
+							"lineNumber": 59,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 10.518,
+						"inclusiveMs": 31.158,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 135,
+							"column": 34,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1997,
+							"functionName": "WB",
+							"lineNumber": 64,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 11.612,
+						"inclusiveMs": 20.64,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 454,
+							"column": 29,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(garbage collector)",
+							"scriptId": 0
+						},
+						"selfMs": 9.17,
+						"inclusiveMs": 9.17,
+						"source": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 13,
+							"functionName": "Ya",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.291,
+						"inclusiveMs": 9.028,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 558,
+							"column": 20,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 64,
+							"functionName": "qQ",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 9.028,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 562,
+							"column": 26,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 11801,
+							"functionName": "",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 7.795,
+						"source": {
+							"file": "../src/platform/effects.ts",
+							"line": 24,
+							"column": 41,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 5213,
+							"functionName": "",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 7.795,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 766,
+							"column": 18,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 4752,
+							"functionName": "mi",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 7.795,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 717,
+							"column": 13,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3929,
+							"functionName": "forkSteps",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.152,
+						"inclusiveMs": 7.785,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 156,
+							"column": 20,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 86866,
+							"functionName": "In",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 7.633,
+						"inclusiveMs": 7.633,
+						"source": {
+							"file": "../src/shared/collection-copy.ts",
+							"line": 1,
+							"column": 36,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(program)",
+							"scriptId": 0
+						},
+						"selfMs": 7.325,
+						"inclusiveMs": 7.325,
+						"source": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 558,
+							"functionName": "c",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 5.832,
+						"inclusiveMs": 6.737,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 52,
+							"column": 17,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 558,
+							"functionName": "c",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 3.67,
+						"inclusiveMs": 6.446,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 52,
+							"column": 17,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.169,
+						"inclusiveMs": 2.625,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 59,
+							"column": 46,
+							"name": null
+						}
+					}
+				]
+			}
+		],
+		"failure": null
+	},
+	{
+		"count": 512,
+		"taskOwner": [39289, 19260205],
+		"taskMs": 312.556,
+		"taskOffsetMs": 588.129,
+		"profiles": [
+			{
+				"owner": [39289, 19260205],
+				"workerURLVerified": true,
+				"sampleWeightMs": 312.743,
+				"self": [
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 100808,
+							"functionName": "_9",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 90.022,
+						"inclusiveMs": 90.022,
+						"source": {
+							"file": "../src/client/worker-document/worker-editor-basis.ts",
+							"line": 493,
+							"column": 32,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1349,
+							"functionName": "rawVisibleSteps",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 45.358,
+						"inclusiveMs": 139.839,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1421,
+							"column": 26,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6167,
+							"functionName": "active",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 39.088,
+						"inclusiveMs": 70.987,
+						"source": {
+							"file": "../src/shared/text-visibility.ts",
+							"line": 219,
+							"column": 8,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8746,
+							"functionName": "Ga",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 31.745,
+						"inclusiveMs": 31.745,
+						"source": {
+							"file": "../src/shared/text-visibility.ts",
+							"line": 375,
+							"column": 15,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6586,
+							"functionName": "hidden",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 23.494,
+						"inclusiveMs": 94.481,
+						"source": {
+							"file": "../src/shared/text-visibility.ts",
+							"line": 245,
+							"column": 8,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(garbage collector)",
+							"scriptId": 0
+						},
+						"selfMs": 23.475,
+						"inclusiveMs": 23.475,
+						"source": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1997,
+							"functionName": "WB",
+							"lineNumber": 64,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 11.115,
+						"inclusiveMs": 20.485,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 454,
+							"column": 29,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 606,
+							"functionName": "CI",
+							"lineNumber": 59,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 10.087,
+						"inclusiveMs": 30.729,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 135,
+							"column": 34,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 87130,
+							"functionName": "An",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 7.86,
+						"inclusiveMs": 147.699,
+						"source": {
+							"file": "../src/shared/collection-copy.ts",
+							"line": 35,
+							"column": 31,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(program)",
+							"scriptId": 0
+						},
+						"selfMs": 6.615,
+						"inclusiveMs": 6.615,
+						"source": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 558,
+							"functionName": "c",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 5.383,
+						"inclusiveMs": 6.461,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 52,
+							"column": 17,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 558,
+							"functionName": "c",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 5.072,
+						"inclusiveMs": 6.918,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 52,
+							"column": 17,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 13,
+							"functionName": "Ya",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.452,
+						"inclusiveMs": 9.37,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 558,
+							"column": 20,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3255,
+							"functionName": "text",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.166,
+						"inclusiveMs": 189.19,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1547,
+							"column": 6,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 87130,
+							"functionName": "An",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.135,
+						"inclusiveMs": 32.864,
+						"source": {
+							"file": "../src/shared/collection-copy.ts",
+							"line": 35,
+							"column": 31,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 97817,
+							"functionName": "",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 1.456,
+						"inclusiveMs": 281.298,
+						"source": {
+							"file": "../src/client/worker-document/worker-editor-basis.ts",
+							"line": 289,
+							"column": 28,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 30,
+							"functionName": "",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.93,
+						"inclusiveMs": 0.93,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 559,
+							"column": 19,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.916,
+						"inclusiveMs": 1.846,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 59,
+							"column": 46,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.62,
+						"inclusiveMs": 1.078,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 59,
+							"column": 46,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"functionName": "mark",
+							"scriptId": 0
+						},
+						"selfMs": 0.468,
+						"inclusiveMs": 0.468,
+						"source": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3457,
+							"functionName": "",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.458,
+						"inclusiveMs": 0.458,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1557,
+							"column": 9,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3457,
+							"functionName": "",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.314,
+						"inclusiveMs": 0.314,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1557,
+							"column": 9,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8199,
+							"functionName": "",
+							"lineNumber": 83,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.299,
+						"inclusiveMs": 0.299,
+						"source": {
+							"file": "../src/client/worker-document/worker.ts",
+							"line": 15,
+							"column": 17,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 9658,
+							"functionName": "i8",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.235,
+						"inclusiveMs": 0.235,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaAST.js",
+							"line": 1249,
+							"column": 26,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.158,
+						"inclusiveMs": 0.158,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 59,
+							"column": 46,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 503,
+							"functionName": "a",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.157,
+						"inclusiveMs": 0.157,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 45,
+							"column": 16,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8669,
+							"functionName": "node",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.154,
+						"inclusiveMs": 0.154,
+						"source": {
+							"file": "../src/shared/text-visibility.ts",
+							"line": 371,
+							"column": 14,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 98560,
+							"functionName": "",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.154,
+						"inclusiveMs": 0.154,
+						"source": {
+							"file": "../src/client/worker-document/worker-editor-basis.ts",
+							"line": 332,
+							"column": 10,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 14433,
+							"functionName": "",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.147,
+						"inclusiveMs": 0.147,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaAST.js",
+							"line": 1581,
+							"column": 12,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(idle)",
+							"scriptId": 0
+						},
+						"selfMs": 0.135,
+						"inclusiveMs": 0.135,
+						"source": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 7253,
+							"functionName": "Oo",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.067,
+						"inclusiveMs": 281.365,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 984,
+							"column": 12,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"functionName": "mark",
+							"scriptId": 0
+						},
+						"selfMs": 0.008,
+						"inclusiveMs": 0.008,
+						"source": null
+					}
+				],
+				"inclusive": [
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(root)",
+							"scriptId": 0
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 312.743,
+						"source": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1816,
+							"functionName": "runLoop",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 282.046,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 441,
+							"column": 10,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1242,
+							"functionName": "evaluate",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 282.046,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 406,
+							"column": 11,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 4895,
+							"functionName": "",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 282.046,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 735,
+							"column": 42,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8813,
+							"functionName": "runTasks",
+							"lineNumber": 8,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 282.046,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js",
+							"line": 164,
+							"column": 11,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8763,
+							"functionName": "afterScheduled",
+							"lineNumber": 8,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 282.046,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js",
+							"line": 157,
+							"column": 20,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 108765,
+							"functionName": "n",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 282.046,
+						"source": {
+							"file": "../src/client/scheduler.ts",
+							"line": 12,
+							"column": 20,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 108988,
+							"functionName": "o.port1.onmessage",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 282.046,
+						"source": {
+							"file": "../src/client/scheduler.ts",
+							"line": 28,
+							"column": 29,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 5715,
+							"functionName": "WA",
+							"lineNumber": 6,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 281.747,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js",
+							"line": 295,
+							"column": 13,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 7253,
+							"functionName": "Oo",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.067,
+						"inclusiveMs": 281.365,
+						"source": {
+							"file": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 984,
+							"column": 12,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 97817,
+							"functionName": "",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 1.456,
+						"inclusiveMs": 281.298,
+						"source": {
+							"file": "../src/client/worker-document/worker-editor-basis.ts",
+							"line": 289,
+							"column": 28,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3255,
+							"functionName": "text",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.166,
+						"inclusiveMs": 189.19,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1547,
+							"column": 6,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 744,
+							"functionName": "visible",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 180.563,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1381,
+							"column": 9,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 87130,
+							"functionName": "An",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 7.86,
+						"inclusiveMs": 147.699,
+						"source": {
+							"file": "../src/shared/collection-copy.ts",
+							"line": 35,
+							"column": 31,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1283,
+							"functionName": "rawVisible",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 147.699,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1415,
+							"column": 20,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1349,
+							"functionName": "rawVisibleSteps",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 45.358,
+						"inclusiveMs": 139.839,
+						"source": {
+							"file": "../src/shared/crdt.ts",
+							"line": 1421,
+							"column": 26,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6586,
+							"functionName": "hidden",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 23.494,
+						"inclusiveMs": 94.481,
+						"source": {
+							"file": "../src/shared/text-visibility.ts",
+							"line": 245,
+							"column": 8,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 100808,
+							"functionName": "_9",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 90.022,
+						"inclusiveMs": 90.022,
+						"source": {
+							"file": "../src/client/worker-document/worker-editor-basis.ts",
+							"line": 493,
+							"column": 32,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6167,
+							"functionName": "active",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 39.088,
+						"inclusiveMs": 70.987,
+						"source": {
+							"file": "../src/shared/text-visibility.ts",
+							"line": 219,
+							"column": 8,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 87130,
+							"functionName": "An",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.135,
+						"inclusiveMs": 32.864,
+						"source": {
+							"file": "../src/shared/collection-copy.ts",
+							"line": 35,
+							"column": 31,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 560,
+							"functionName": "zB",
+							"lineNumber": 59,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 32.864,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 128,
+							"column": 28,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8746,
+							"functionName": "Ga",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 31.745,
+						"inclusiveMs": 31.745,
+						"source": {
+							"file": "../src/shared/text-visibility.ts",
+							"line": 375,
+							"column": 15,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 606,
+							"functionName": "CI",
+							"lineNumber": 59,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 10.087,
+						"inclusiveMs": 30.729,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 135,
+							"column": 34,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(garbage collector)",
+							"scriptId": 0
+						},
+						"selfMs": 23.475,
+						"inclusiveMs": 23.475,
+						"source": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1997,
+							"functionName": "WB",
+							"lineNumber": 64,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 11.115,
+						"inclusiveMs": 20.485,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 454,
+							"column": 29,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 13,
+							"functionName": "Ya",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.452,
+						"inclusiveMs": 9.37,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 558,
+							"column": 20,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 64,
+							"functionName": "qQ",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 9.37,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 562,
+							"column": 26,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 558,
+							"functionName": "c",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 5.072,
+						"inclusiveMs": 6.918,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 52,
+							"column": 17,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(program)",
+							"scriptId": 0
+						},
+						"selfMs": 6.615,
+						"inclusiveMs": 6.615,
+						"source": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 558,
+							"functionName": "c",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 5.383,
+						"inclusiveMs": 6.461,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 52,
+							"column": 17,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.916,
+						"inclusiveMs": 1.846,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 59,
+							"column": 46,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.62,
+						"inclusiveMs": 1.078,
+						"source": {
+							"file": "../src/shared/atom-sequence.ts",
+							"line": 59,
+							"column": 46,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 30,
+							"functionName": "",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.93,
+						"inclusiveMs": 0.93,
+						"source": {
+							"file": "../src/shared/frontmatter-merge.ts",
+							"line": 559,
+							"column": 19,
+							"name": null
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"functionName": "mark",
+							"scriptId": 0
+						},
+						"selfMs": 0.468,
+						"inclusiveMs": 0.468,
+						"source": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 9317,
+							"functionName": "kr",
+							"lineNumber": 46,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 0.468,
+						"source": {
+							"file": "../src/client/worker-document/boot-diagnostics.ts",
+							"line": 11,
+							"column": 31,
+							"name": null
+						}
+					}
+				]
+			}
+		],
+		"failure": null
+	}
 ]

@@ -1,1595 +1,1583 @@
 [
-  {
-    "count": 1,
-    "taskOwner": [
-      39289,
-      19258723
-    ],
-    "taskMs": 290.142,
-    "taskOffsetMs": 635.097,
-    "profiles": [
-      {
-        "owner": [
-          39289,
-          19258723
-        ],
-        "workerURLVerified": true,
-        "sampleWeightMs": 290.339,
-        "self": [
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 97817,
-              "functionName": "",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 85.549,
-            "inclusiveMs": 265.427
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1349,
-              "functionName": "rawVisibleSteps",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 42.366,
-            "inclusiveMs": 130.55
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8746,
-              "functionName": "Ga",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 36.62,
-            "inclusiveMs": 36.62
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 6167,
-              "functionName": "active",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 33.409,
-            "inclusiveMs": 70.029
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 6586,
-              "functionName": "hidden",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 18.155,
-            "inclusiveMs": 88.184
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1997,
-              "functionName": "WB",
-              "lineNumber": 64,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 11.612,
-            "inclusiveMs": 20.64
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 606,
-              "functionName": "CI",
-              "lineNumber": 59,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 10.518,
-            "inclusiveMs": 31.158
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(garbage collector)",
-              "scriptId": 0
-            },
-            "selfMs": 9.17,
-            "inclusiveMs": 9.17
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 86866,
-              "functionName": "In",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 7.633,
-            "inclusiveMs": 7.633
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(program)",
-              "scriptId": 0
-            },
-            "selfMs": 7.325,
-            "inclusiveMs": 7.325
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 87130,
-              "functionName": "An",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 6.148,
-            "inclusiveMs": 136.698
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 558,
-              "functionName": "c",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 5.832,
-            "inclusiveMs": 6.737
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 558,
-              "functionName": "c",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 3.67,
-            "inclusiveMs": 6.446
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 87130,
-              "functionName": "An",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.476,
-            "inclusiveMs": 33.634
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3255,
-              "functionName": "text",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.305,
-            "inclusiveMs": 179.236
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 13,
-              "functionName": "Ya",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.291,
-            "inclusiveMs": 9.028
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.169,
-            "inclusiveMs": 2.625
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "functionName": "mark",
-              "scriptId": 0
-            },
-            "selfMs": 0.637,
-            "inclusiveMs": 0.637
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.599,
-            "inclusiveMs": 0.751
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3457,
-              "functionName": "",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.456,
-            "inclusiveMs": 0.456
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(idle)",
-              "scriptId": 0
-            },
-            "selfMs": 0.159,
-            "inclusiveMs": 0.159
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8199,
-              "functionName": "",
-              "lineNumber": 83,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.159,
-            "inclusiveMs": 0.159
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 30,
-              "functionName": "",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.154,
-            "inclusiveMs": 0.154
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 560,
-              "functionName": "zB",
-              "lineNumber": 59,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.153,
-            "inclusiveMs": 33.787
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3929,
-              "functionName": "forkSteps",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.152,
-            "inclusiveMs": 7.785
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.152,
-            "inclusiveMs": 0.152
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 30,
-              "functionName": "",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.152,
-            "inclusiveMs": 0.152
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3457,
-              "functionName": "",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.152,
-            "inclusiveMs": 0.152
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3457,
-              "functionName": "",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.151,
-            "inclusiveMs": 0.151
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8746,
-              "functionName": "Ga",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.01,
-            "inclusiveMs": 0.01
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "functionName": "mark",
-              "scriptId": 0
-            },
-            "selfMs": 0.005,
-            "inclusiveMs": 0.005
-          }
-        ],
-        "inclusive": [
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(root)",
-              "scriptId": 0
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 290.339
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1816,
-              "functionName": "runLoop",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 273.381
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1242,
-              "functionName": "evaluate",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 273.381
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 4895,
-              "functionName": "",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 273.381
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8813,
-              "functionName": "runTasks",
-              "lineNumber": 8,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 273.381
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8763,
-              "functionName": "afterScheduled",
-              "lineNumber": 8,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 273.381
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 108765,
-              "functionName": "n",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 273.381
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 108988,
-              "functionName": "o.port1.onmessage",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 273.381
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 97817,
-              "functionName": "",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 85.549,
-            "inclusiveMs": 265.427
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 7253,
-              "functionName": "Oo",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 265.427
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 5715,
-              "functionName": "WA",
-              "lineNumber": 6,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 265.427
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3255,
-              "functionName": "text",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.305,
-            "inclusiveMs": 179.236
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 744,
-              "functionName": "visible",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 170.485
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 87130,
-              "functionName": "An",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 6.148,
-            "inclusiveMs": 136.698
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1283,
-              "functionName": "rawVisible",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 136.698
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1349,
-              "functionName": "rawVisibleSteps",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 42.366,
-            "inclusiveMs": 130.55
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 6586,
-              "functionName": "hidden",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 18.155,
-            "inclusiveMs": 88.184
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 6167,
-              "functionName": "active",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 33.409,
-            "inclusiveMs": 70.029
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8746,
-              "functionName": "Ga",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 36.62,
-            "inclusiveMs": 36.62
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 560,
-              "functionName": "zB",
-              "lineNumber": 59,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.153,
-            "inclusiveMs": 33.787
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 87130,
-              "functionName": "An",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.476,
-            "inclusiveMs": 33.634
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 606,
-              "functionName": "CI",
-              "lineNumber": 59,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 10.518,
-            "inclusiveMs": 31.158
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1997,
-              "functionName": "WB",
-              "lineNumber": 64,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 11.612,
-            "inclusiveMs": 20.64
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(garbage collector)",
-              "scriptId": 0
-            },
-            "selfMs": 9.17,
-            "inclusiveMs": 9.17
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 13,
-              "functionName": "Ya",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.291,
-            "inclusiveMs": 9.028
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 64,
-              "functionName": "qQ",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 9.028
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 11801,
-              "functionName": "",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 7.795
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 5213,
-              "functionName": "",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 7.795
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 4752,
-              "functionName": "mi",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 7.795
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3929,
-              "functionName": "forkSteps",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.152,
-            "inclusiveMs": 7.785
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 86866,
-              "functionName": "In",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 7.633,
-            "inclusiveMs": 7.633
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(program)",
-              "scriptId": 0
-            },
-            "selfMs": 7.325,
-            "inclusiveMs": 7.325
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 558,
-              "functionName": "c",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 5.832,
-            "inclusiveMs": 6.737
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 558,
-              "functionName": "c",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 3.67,
-            "inclusiveMs": 6.446
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.169,
-            "inclusiveMs": 2.625
-          }
-        ]
-      }
-    ],
-    "failure": null
-  },
-  {
-    "count": 512,
-    "taskOwner": [
-      39289,
-      19260205
-    ],
-    "taskMs": 312.556,
-    "taskOffsetMs": 588.129,
-    "profiles": [
-      {
-        "owner": [
-          39289,
-          19260205
-        ],
-        "workerURLVerified": true,
-        "sampleWeightMs": 312.743,
-        "self": [
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 100808,
-              "functionName": "_9",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 90.022,
-            "inclusiveMs": 90.022
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1349,
-              "functionName": "rawVisibleSteps",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 45.358,
-            "inclusiveMs": 139.839
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 6167,
-              "functionName": "active",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 39.088,
-            "inclusiveMs": 70.987
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8746,
-              "functionName": "Ga",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 31.745,
-            "inclusiveMs": 31.745
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 6586,
-              "functionName": "hidden",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 23.494,
-            "inclusiveMs": 94.481
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(garbage collector)",
-              "scriptId": 0
-            },
-            "selfMs": 23.475,
-            "inclusiveMs": 23.475
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1997,
-              "functionName": "WB",
-              "lineNumber": 64,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 11.115,
-            "inclusiveMs": 20.485
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 606,
-              "functionName": "CI",
-              "lineNumber": 59,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 10.087,
-            "inclusiveMs": 30.729
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 87130,
-              "functionName": "An",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 7.86,
-            "inclusiveMs": 147.699
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(program)",
-              "scriptId": 0
-            },
-            "selfMs": 6.615,
-            "inclusiveMs": 6.615
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 558,
-              "functionName": "c",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 5.383,
-            "inclusiveMs": 6.461
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 558,
-              "functionName": "c",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 5.072,
-            "inclusiveMs": 6.918
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 13,
-              "functionName": "Ya",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.452,
-            "inclusiveMs": 9.37
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3255,
-              "functionName": "text",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.166,
-            "inclusiveMs": 189.19
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 87130,
-              "functionName": "An",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.135,
-            "inclusiveMs": 32.864
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 97817,
-              "functionName": "",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 1.456,
-            "inclusiveMs": 281.298
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 30,
-              "functionName": "",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.93,
-            "inclusiveMs": 0.93
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.916,
-            "inclusiveMs": 1.846
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.62,
-            "inclusiveMs": 1.078
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "functionName": "mark",
-              "scriptId": 0
-            },
-            "selfMs": 0.468,
-            "inclusiveMs": 0.468
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3457,
-              "functionName": "",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.458,
-            "inclusiveMs": 0.458
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3457,
-              "functionName": "",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.314,
-            "inclusiveMs": 0.314
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8199,
-              "functionName": "",
-              "lineNumber": 83,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.299,
-            "inclusiveMs": 0.299
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 9658,
-              "functionName": "i8",
-              "lineNumber": 24,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.235,
-            "inclusiveMs": 0.235
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.158,
-            "inclusiveMs": 0.158
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 503,
-              "functionName": "a",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.157,
-            "inclusiveMs": 0.157
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8669,
-              "functionName": "node",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.154,
-            "inclusiveMs": 0.154
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 98560,
-              "functionName": "",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.154,
-            "inclusiveMs": 0.154
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 14433,
-              "functionName": "",
-              "lineNumber": 24,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.147,
-            "inclusiveMs": 0.147
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(idle)",
-              "scriptId": 0
-            },
-            "selfMs": 0.135,
-            "inclusiveMs": 0.135
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 7253,
-              "functionName": "Oo",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.067,
-            "inclusiveMs": 281.365
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "functionName": "mark",
-              "scriptId": 0
-            },
-            "selfMs": 0.008,
-            "inclusiveMs": 0.008
-          }
-        ],
-        "inclusive": [
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(root)",
-              "scriptId": 0
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 312.743
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1816,
-              "functionName": "runLoop",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 282.046
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1242,
-              "functionName": "evaluate",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 282.046
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 4895,
-              "functionName": "",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 282.046
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8813,
-              "functionName": "runTasks",
-              "lineNumber": 8,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 282.046
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8763,
-              "functionName": "afterScheduled",
-              "lineNumber": 8,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 282.046
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 108765,
-              "functionName": "n",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 282.046
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 108988,
-              "functionName": "o.port1.onmessage",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 282.046
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 5715,
-              "functionName": "WA",
-              "lineNumber": 6,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 281.747
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 7253,
-              "functionName": "Oo",
-              "lineNumber": 22,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.067,
-            "inclusiveMs": 281.365
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 97817,
-              "functionName": "",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 1.456,
-            "inclusiveMs": 281.298
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 3255,
-              "functionName": "text",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.166,
-            "inclusiveMs": 189.19
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 744,
-              "functionName": "visible",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 180.563
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 87130,
-              "functionName": "An",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 7.86,
-            "inclusiveMs": 147.699
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1283,
-              "functionName": "rawVisible",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 147.699
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1349,
-              "functionName": "rawVisibleSteps",
-              "lineNumber": 77,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 45.358,
-            "inclusiveMs": 139.839
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 6586,
-              "functionName": "hidden",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 23.494,
-            "inclusiveMs": 94.481
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 100808,
-              "functionName": "_9",
-              "lineNumber": 79,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 90.022,
-            "inclusiveMs": 90.022
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 6167,
-              "functionName": "active",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 39.088,
-            "inclusiveMs": 70.987
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 87130,
-              "functionName": "An",
-              "lineNumber": 27,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.135,
-            "inclusiveMs": 32.864
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 560,
-              "functionName": "zB",
-              "lineNumber": 59,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 32.864
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 8746,
-              "functionName": "Ga",
-              "lineNumber": 54,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 31.745,
-            "inclusiveMs": 31.745
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 606,
-              "functionName": "CI",
-              "lineNumber": 59,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 10.087,
-            "inclusiveMs": 30.729
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(garbage collector)",
-              "scriptId": 0
-            },
-            "selfMs": 23.475,
-            "inclusiveMs": 23.475
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 1997,
-              "functionName": "WB",
-              "lineNumber": 64,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 11.115,
-            "inclusiveMs": 20.485
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 13,
-              "functionName": "Ya",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 2.452,
-            "inclusiveMs": 9.37
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 64,
-              "functionName": "qQ",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 9.37
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 558,
-              "functionName": "c",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 5.072,
-            "inclusiveMs": 6.918
-          },
-          {
-            "frame": {
-              "codeType": "other",
-              "functionName": "(program)",
-              "scriptId": 0
-            },
-            "selfMs": 6.615,
-            "inclusiveMs": 6.615
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 558,
-              "functionName": "c",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 5.383,
-            "inclusiveMs": 6.461
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.916,
-            "inclusiveMs": 1.846
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 640,
-              "functionName": "",
-              "lineNumber": 73,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.62,
-            "inclusiveMs": 1.078
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 30,
-              "functionName": "",
-              "lineNumber": 67,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.93,
-            "inclusiveMs": 0.93
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "functionName": "mark",
-              "scriptId": 0
-            },
-            "selfMs": 0.468,
-            "inclusiveMs": 0.468
-          },
-          {
-            "frame": {
-              "codeType": "JS",
-              "columnNumber": 9317,
-              "functionName": "kr",
-              "lineNumber": 46,
-              "scriptId": 3,
-              "url": "http://127.0.0.1:4473/worker-editor.js"
-            },
-            "selfMs": 0.0,
-            "inclusiveMs": 0.468
-          }
-        ]
-      }
-    ],
-    "failure": null
-  }
+	{
+		"count": 1,
+		"taskOwner": [39289, 19258723],
+		"taskMs": 290.142,
+		"taskOffsetMs": 635.097,
+		"profiles": [
+			{
+				"owner": [39289, 19258723],
+				"workerURLVerified": true,
+				"sampleWeightMs": 290.339,
+				"self": [
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 97817,
+							"functionName": "",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 85.549,
+						"inclusiveMs": 265.427
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1349,
+							"functionName": "rawVisibleSteps",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 42.366,
+						"inclusiveMs": 130.55
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8746,
+							"functionName": "Ga",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 36.62,
+						"inclusiveMs": 36.62
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6167,
+							"functionName": "active",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 33.409,
+						"inclusiveMs": 70.029
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6586,
+							"functionName": "hidden",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 18.155,
+						"inclusiveMs": 88.184
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1997,
+							"functionName": "WB",
+							"lineNumber": 64,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 11.612,
+						"inclusiveMs": 20.64
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 606,
+							"functionName": "CI",
+							"lineNumber": 59,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 10.518,
+						"inclusiveMs": 31.158
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(garbage collector)",
+							"scriptId": 0
+						},
+						"selfMs": 9.17,
+						"inclusiveMs": 9.17
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 86866,
+							"functionName": "In",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 7.633,
+						"inclusiveMs": 7.633
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(program)",
+							"scriptId": 0
+						},
+						"selfMs": 7.325,
+						"inclusiveMs": 7.325
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 87130,
+							"functionName": "An",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 6.148,
+						"inclusiveMs": 136.698
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 558,
+							"functionName": "c",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 5.832,
+						"inclusiveMs": 6.737
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 558,
+							"functionName": "c",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 3.67,
+						"inclusiveMs": 6.446
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 87130,
+							"functionName": "An",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.476,
+						"inclusiveMs": 33.634
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3255,
+							"functionName": "text",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.305,
+						"inclusiveMs": 179.236
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 13,
+							"functionName": "Ya",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.291,
+						"inclusiveMs": 9.028
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.169,
+						"inclusiveMs": 2.625
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"functionName": "mark",
+							"scriptId": 0
+						},
+						"selfMs": 0.637,
+						"inclusiveMs": 0.637
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.599,
+						"inclusiveMs": 0.751
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3457,
+							"functionName": "",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.456,
+						"inclusiveMs": 0.456
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(idle)",
+							"scriptId": 0
+						},
+						"selfMs": 0.159,
+						"inclusiveMs": 0.159
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8199,
+							"functionName": "",
+							"lineNumber": 83,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.159,
+						"inclusiveMs": 0.159
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 30,
+							"functionName": "",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.154,
+						"inclusiveMs": 0.154
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 560,
+							"functionName": "zB",
+							"lineNumber": 59,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.153,
+						"inclusiveMs": 33.787
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3929,
+							"functionName": "forkSteps",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.152,
+						"inclusiveMs": 7.785
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.152,
+						"inclusiveMs": 0.152
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 30,
+							"functionName": "",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.152,
+						"inclusiveMs": 0.152
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3457,
+							"functionName": "",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.152,
+						"inclusiveMs": 0.152
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3457,
+							"functionName": "",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.151,
+						"inclusiveMs": 0.151
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8746,
+							"functionName": "Ga",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.01,
+						"inclusiveMs": 0.01
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"functionName": "mark",
+							"scriptId": 0
+						},
+						"selfMs": 0.005,
+						"inclusiveMs": 0.005
+					}
+				],
+				"inclusive": [
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(root)",
+							"scriptId": 0
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 290.339
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1816,
+							"functionName": "runLoop",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 273.381
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1242,
+							"functionName": "evaluate",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 273.381
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 4895,
+							"functionName": "",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 273.381
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8813,
+							"functionName": "runTasks",
+							"lineNumber": 8,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 273.381
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8763,
+							"functionName": "afterScheduled",
+							"lineNumber": 8,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 273.381
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 108765,
+							"functionName": "n",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 273.381
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 108988,
+							"functionName": "o.port1.onmessage",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 273.381
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 97817,
+							"functionName": "",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 85.549,
+						"inclusiveMs": 265.427
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 7253,
+							"functionName": "Oo",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 265.427
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 5715,
+							"functionName": "WA",
+							"lineNumber": 6,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 265.427
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3255,
+							"functionName": "text",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.305,
+						"inclusiveMs": 179.236
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 744,
+							"functionName": "visible",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 170.485
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 87130,
+							"functionName": "An",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 6.148,
+						"inclusiveMs": 136.698
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1283,
+							"functionName": "rawVisible",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 136.698
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1349,
+							"functionName": "rawVisibleSteps",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 42.366,
+						"inclusiveMs": 130.55
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6586,
+							"functionName": "hidden",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 18.155,
+						"inclusiveMs": 88.184
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6167,
+							"functionName": "active",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 33.409,
+						"inclusiveMs": 70.029
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8746,
+							"functionName": "Ga",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 36.62,
+						"inclusiveMs": 36.62
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 560,
+							"functionName": "zB",
+							"lineNumber": 59,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.153,
+						"inclusiveMs": 33.787
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 87130,
+							"functionName": "An",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.476,
+						"inclusiveMs": 33.634
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 606,
+							"functionName": "CI",
+							"lineNumber": 59,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 10.518,
+						"inclusiveMs": 31.158
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1997,
+							"functionName": "WB",
+							"lineNumber": 64,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 11.612,
+						"inclusiveMs": 20.64
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(garbage collector)",
+							"scriptId": 0
+						},
+						"selfMs": 9.17,
+						"inclusiveMs": 9.17
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 13,
+							"functionName": "Ya",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.291,
+						"inclusiveMs": 9.028
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 64,
+							"functionName": "qQ",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 9.028
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 11801,
+							"functionName": "",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 7.795
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 5213,
+							"functionName": "",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 7.795
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 4752,
+							"functionName": "mi",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 7.795
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3929,
+							"functionName": "forkSteps",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.152,
+						"inclusiveMs": 7.785
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 86866,
+							"functionName": "In",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 7.633,
+						"inclusiveMs": 7.633
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(program)",
+							"scriptId": 0
+						},
+						"selfMs": 7.325,
+						"inclusiveMs": 7.325
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 558,
+							"functionName": "c",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 5.832,
+						"inclusiveMs": 6.737
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 558,
+							"functionName": "c",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 3.67,
+						"inclusiveMs": 6.446
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.169,
+						"inclusiveMs": 2.625
+					}
+				]
+			}
+		],
+		"failure": null
+	},
+	{
+		"count": 512,
+		"taskOwner": [39289, 19260205],
+		"taskMs": 312.556,
+		"taskOffsetMs": 588.129,
+		"profiles": [
+			{
+				"owner": [39289, 19260205],
+				"workerURLVerified": true,
+				"sampleWeightMs": 312.743,
+				"self": [
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 100808,
+							"functionName": "_9",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 90.022,
+						"inclusiveMs": 90.022
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1349,
+							"functionName": "rawVisibleSteps",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 45.358,
+						"inclusiveMs": 139.839
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6167,
+							"functionName": "active",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 39.088,
+						"inclusiveMs": 70.987
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8746,
+							"functionName": "Ga",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 31.745,
+						"inclusiveMs": 31.745
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6586,
+							"functionName": "hidden",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 23.494,
+						"inclusiveMs": 94.481
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(garbage collector)",
+							"scriptId": 0
+						},
+						"selfMs": 23.475,
+						"inclusiveMs": 23.475
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1997,
+							"functionName": "WB",
+							"lineNumber": 64,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 11.115,
+						"inclusiveMs": 20.485
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 606,
+							"functionName": "CI",
+							"lineNumber": 59,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 10.087,
+						"inclusiveMs": 30.729
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 87130,
+							"functionName": "An",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 7.86,
+						"inclusiveMs": 147.699
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(program)",
+							"scriptId": 0
+						},
+						"selfMs": 6.615,
+						"inclusiveMs": 6.615
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 558,
+							"functionName": "c",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 5.383,
+						"inclusiveMs": 6.461
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 558,
+							"functionName": "c",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 5.072,
+						"inclusiveMs": 6.918
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 13,
+							"functionName": "Ya",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.452,
+						"inclusiveMs": 9.37
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3255,
+							"functionName": "text",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.166,
+						"inclusiveMs": 189.19
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 87130,
+							"functionName": "An",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.135,
+						"inclusiveMs": 32.864
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 97817,
+							"functionName": "",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 1.456,
+						"inclusiveMs": 281.298
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 30,
+							"functionName": "",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.93,
+						"inclusiveMs": 0.93
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.916,
+						"inclusiveMs": 1.846
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.62,
+						"inclusiveMs": 1.078
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"functionName": "mark",
+							"scriptId": 0
+						},
+						"selfMs": 0.468,
+						"inclusiveMs": 0.468
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3457,
+							"functionName": "",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.458,
+						"inclusiveMs": 0.458
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3457,
+							"functionName": "",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.314,
+						"inclusiveMs": 0.314
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8199,
+							"functionName": "",
+							"lineNumber": 83,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.299,
+						"inclusiveMs": 0.299
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 9658,
+							"functionName": "i8",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.235,
+						"inclusiveMs": 0.235
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.158,
+						"inclusiveMs": 0.158
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 503,
+							"functionName": "a",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.157,
+						"inclusiveMs": 0.157
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8669,
+							"functionName": "node",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.154,
+						"inclusiveMs": 0.154
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 98560,
+							"functionName": "",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.154,
+						"inclusiveMs": 0.154
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 14433,
+							"functionName": "",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.147,
+						"inclusiveMs": 0.147
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(idle)",
+							"scriptId": 0
+						},
+						"selfMs": 0.135,
+						"inclusiveMs": 0.135
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 7253,
+							"functionName": "Oo",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.067,
+						"inclusiveMs": 281.365
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"functionName": "mark",
+							"scriptId": 0
+						},
+						"selfMs": 0.008,
+						"inclusiveMs": 0.008
+					}
+				],
+				"inclusive": [
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(root)",
+							"scriptId": 0
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 312.743
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1816,
+							"functionName": "runLoop",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 282.046
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1242,
+							"functionName": "evaluate",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 282.046
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 4895,
+							"functionName": "",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 282.046
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8813,
+							"functionName": "runTasks",
+							"lineNumber": 8,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 282.046
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8763,
+							"functionName": "afterScheduled",
+							"lineNumber": 8,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 282.046
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 108765,
+							"functionName": "n",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 282.046
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 108988,
+							"functionName": "o.port1.onmessage",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 282.046
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 5715,
+							"functionName": "WA",
+							"lineNumber": 6,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 281.747
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 7253,
+							"functionName": "Oo",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.067,
+						"inclusiveMs": 281.365
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 97817,
+							"functionName": "",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 1.456,
+						"inclusiveMs": 281.298
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3255,
+							"functionName": "text",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.166,
+						"inclusiveMs": 189.19
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 744,
+							"functionName": "visible",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 180.563
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 87130,
+							"functionName": "An",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 7.86,
+						"inclusiveMs": 147.699
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1283,
+							"functionName": "rawVisible",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 147.699
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1349,
+							"functionName": "rawVisibleSteps",
+							"lineNumber": 77,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 45.358,
+						"inclusiveMs": 139.839
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6586,
+							"functionName": "hidden",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 23.494,
+						"inclusiveMs": 94.481
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 100808,
+							"functionName": "_9",
+							"lineNumber": 79,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 90.022,
+						"inclusiveMs": 90.022
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6167,
+							"functionName": "active",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 39.088,
+						"inclusiveMs": 70.987
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 87130,
+							"functionName": "An",
+							"lineNumber": 27,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.135,
+						"inclusiveMs": 32.864
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 560,
+							"functionName": "zB",
+							"lineNumber": 59,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 32.864
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 8746,
+							"functionName": "Ga",
+							"lineNumber": 54,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 31.745,
+						"inclusiveMs": 31.745
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 606,
+							"functionName": "CI",
+							"lineNumber": 59,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 10.087,
+						"inclusiveMs": 30.729
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(garbage collector)",
+							"scriptId": 0
+						},
+						"selfMs": 23.475,
+						"inclusiveMs": 23.475
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1997,
+							"functionName": "WB",
+							"lineNumber": 64,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 11.115,
+						"inclusiveMs": 20.485
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 13,
+							"functionName": "Ya",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 2.452,
+						"inclusiveMs": 9.37
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 64,
+							"functionName": "qQ",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 9.37
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 558,
+							"functionName": "c",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 5.072,
+						"inclusiveMs": 6.918
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(program)",
+							"scriptId": 0
+						},
+						"selfMs": 6.615,
+						"inclusiveMs": 6.615
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 558,
+							"functionName": "c",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 5.383,
+						"inclusiveMs": 6.461
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.916,
+						"inclusiveMs": 1.846
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 640,
+							"functionName": "",
+							"lineNumber": 73,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.62,
+						"inclusiveMs": 1.078
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 30,
+							"functionName": "",
+							"lineNumber": 67,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.93,
+						"inclusiveMs": 0.93
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"functionName": "mark",
+							"scriptId": 0
+						},
+						"selfMs": 0.468,
+						"inclusiveMs": 0.468
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 9317,
+							"functionName": "kr",
+							"lineNumber": 46,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4473/worker-editor.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 0.468
+					}
+				]
+			}
+		],
+		"failure": null
+	}
 ]

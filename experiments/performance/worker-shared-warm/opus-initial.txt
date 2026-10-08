@@ -1,0 +1,71 @@
+RcMap from installed Effect 4.0.0 is the right tool and the design holds up, but there are 3 blockers to fix first.
+
+**Blockers**
+
+1. **The plain `{source, generation}` key gets hashed structurally.** Effect 4 `MutableHashMap.set`/`remove` call `Hash.hash(key)` on object keys (`MutableHashMap.ts:821-835`, `:1591`). That walks the whole Replica (operations, atomIndex, every Map) synchronously, which is the same kind of stall you're removing. It runs on every first `get` and on every zero-TTL release. It also leaves a cached hash of the Replica in the global `hashCache`.
+   - Fix: `Equal.byReferenceUnsafe({ source, generation })` from `effect/Equal`. The hash becomes random-by-identity and equality becomes `===`.
+2. **A closed map turns into interruption.** `RcMap.get` on a closed map returns `Effect.interrupt` (`RcMap.ts:530`). The scope finalizer also interrupts in-flight lookups, so waiters see interruption, not the typed "session closed" error.
+   - Fix: wrap with `Effect.exit` and recheck `requireOpen` / the key before returning the failure.
+3. **forkEffect failures caused by edits must retry, not reach the caller.** `submitEdit` (`document-session.ts:489`) applies to `projection.replica` without taking the gate. So the gated preflight can't stop an edit during the cooperative copy, and `forkEffect` will fail with "Replica changed while being copied".
+   - Fix: on fork failure, retry if the key is no longer current; propagate only if it is still current.
+
+**What checks out**
+
+- **Interruption:** the lookup runs in its own fiber, attached to the entry's scope (`RcMap.ts:567-572`). Interrupting one waiter only lowers the count. When the last waiter releases, the entry is removed and the lookup fiber interrupted (zero TTL, `RcMap.ts:752-754`). That waiter's scope close waits for the lookup to reach its next yield. Publication is one synchronous block at the end of `textEffect`, so no partial cache can appear. No `Effect.cached`-style poisoning.
+- **Failures:** a failed result lasts only while the entry has references. Zero TTL drops it on last release, so failures don't stick.
+- **Stale publication:** `textEffect` checks generation before publishing. Any text op runs `invalidateText` and bumps `stateGeneration` (`crdt.ts:902,913`). An old key's lookup can only write into its own generation, and a changed generation fails, which triggers a retry.
+- **Scope ownership:** the map is made in the session scope and its finalizer closes all entries. The lookup never takes the gate, so there's no deadlock.
+- **Waiter scope:** use `Effect.scoped(RcMap.get(...))` around the warm only. The value lives in the Replica, not the entry. A fork that arrives after release runs a new lookup, which hits the cheap `strings` fast path.
+- **flush/Close:** the gate is no longer held during the warm, only during the gated check plus `forkEffect`. Today the gate is held for the whole fork, so this is strictly better. Close interrupts lookups at their next yield.
+- **Import:** `RcMap` is already used via the `effect/RcMap` subpath in `src/server/mcp-server.ts` and `src/client/document-live.ts`.
+
+**Minimal code**
+```ts
+let warmKey: WarmKey | undefined
+let warmed = yield* RcMap.make({
+	lookup: (key: WarmKey) => key.source.textEffect(options.document).pipe(Effect.asVoid),
+})
+function currentWarmKey() {
+	let source = projection.replica
+	if (warmKey?.source !== source || warmKey.generation !== source.generation)
+		warmKey = Equal.byReferenceUnsafe({ source, generation: source.generation })
+	return warmKey
+}
+function isCurrent(key: WarmKey) {
+	return key.source === projection.replica && key.source.generation === key.generation
+}
+function withWarmReplica<A, E>(use: (source: Replica) => Effect.Effect<A, E>) {
+	return Effect.gen(function* () {
+		while (true) {
+			yield* requireOpen
+			let key = currentWarmKey()
+			let warm = yield* Effect.exit(Effect.scoped(RcMap.get(warmed, key)))
+			if (!isCurrent(key)) continue
+			if (Exit.isFailure(warm)) return yield* requireOpen.pipe(Effect.andThen(warm))
+			let outcome = yield* gate.withPermit(requireOpen.pipe(Effect.andThen(Effect.suspend(() =>
+				isCurrent(key)
+					? use(key.source).pipe(
+						Effect.map(value => ({ retry: false as const, value })),
+						Effect.catch(error => isCurrent(key) ? Effect.fail(error) : Effect.succeed({ retry: true as const })),
+					)
+					: Effect.succeed({ retry: true as const })))))
+			if (!outcome.retry) return outcome.value
+		}
+	})
+}
+// readView: withWarmReplica(() => Effect.sync(read))
+// forkReplica: withWarmReplica(source => source.forkEffect(actor, author))
+```
+Before relying on it, check that `Exit` can be yielded as an Effect in 4.0.0. If not, use `Effect.failCause(warm.cause)`. The `WarmKey` type also needs declaring.
+
+**Integration cases** (through the session's public API, cooperative worker)
+
+1. Cold open, concurrent `readView` + `forkReplica`: one warm (count the `opened:warm:start` marks), and `fork.text()` comes back without a synchronous rebuild.
+2. Interrupt the `readView` waiter while the fork waits: the fork still succeeds with the correct text.
+3. Interrupt the only waiter: the lookup stops, nothing is cached for that key, the next `readView` works, and Close finishes promptly.
+4. Remote op during the warm: both callers retry and return the new text, and the old generation's cache is never read.
+5. `submitEdit` during `forkEffect`: `forkReplica` retries, and the copy includes the edit.
+6. Close during the warm: both calls fail with the typed "session closed" error, not interruption, and Close doesn't wait for the full warm.
+7. `flush`/`commit` started during a long warm finishes before the warm does (proves the gate isn't held).
+
+**Watch:** a steady stream of remote ops could keep forcing new warms, and the retry loop has no limit. Local typing should keep the cache warm through the cache updates at `crdt.ts:681,732` (not verified). Add a bounded retry or a metric if that matters.

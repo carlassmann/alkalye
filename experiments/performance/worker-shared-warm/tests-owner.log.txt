@@ -1,0 +1,13 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/opened-prepare-view.test.ts:
+(pass) interrupted selected-view preparation releases the real SQLite session permit [747.68ms]
+(pass) native-like mutation during selected-view warming republishes the latest exact generation [654.60ms]
+(pass) interrupted read waiter leaves authoritative fork warming alive and flush progresses [608.10ms]
+(pass) raw native replacement during detached copying retries the latest authoritative generation [471.31ms]
+(pass) closing the session owner releases shared warm waiters and rejects subsequent reads [582.38ms]
+
+ 5 pass
+ 0 fail
+ 35 expect() calls
+Ran 5 tests across 1 file. [3.12s]

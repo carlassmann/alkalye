@@ -1,0 +1,94 @@
+[
+	{
+		"arm": "baseline",
+		"count": 1,
+		"sourceOpportunityMs": 527.3000000119191,
+		"localSavedOpportunityMs": 1310.3999999761545,
+		"main": [
+			{
+				"name": "CrRendererMain",
+				"maxTaskMs": 6.168,
+				"taskUnionMs": 202.923
+			}
+		],
+		"worker": [
+			{
+				"name": "DedicatedWorker thread",
+				"maxTaskMs": 184.876,
+				"taskUnionMs": 1516.587
+			}
+		],
+		"gcInclusiveMaxMs": 9.674,
+		"completedEncodedRequestBytes": 7184,
+		"cpuProfileChunks": 0
+	},
+	{
+		"arm": "baseline",
+		"count": 512,
+		"sourceOpportunityMs": 541.6000000238419,
+		"localSavedOpportunityMs": 1357,
+		"main": [
+			{
+				"name": "CrRendererMain",
+				"maxTaskMs": 4.435,
+				"taskUnionMs": 207.481
+			}
+		],
+		"worker": [
+			{
+				"name": "DedicatedWorker thread",
+				"maxTaskMs": 184.009,
+				"taskUnionMs": 874.73
+			}
+		],
+		"gcInclusiveMaxMs": 11.572,
+		"completedEncodedRequestBytes": 7184,
+		"cpuProfileChunks": 0
+	},
+	{
+		"arm": "candidate",
+		"count": 1,
+		"sourceOpportunityMs": 535.5,
+		"localSavedOpportunityMs": 1500.6999999880773,
+		"main": [
+			{
+				"name": "CrRendererMain",
+				"maxTaskMs": 6.387,
+				"taskUnionMs": 190.124
+			}
+		],
+		"worker": [
+			{
+				"name": "DedicatedWorker thread",
+				"maxTaskMs": 105.063,
+				"taskUnionMs": 1497.072
+			}
+		],
+		"gcInclusiveMaxMs": 9.762,
+		"completedEncodedRequestBytes": 7184,
+		"cpuProfileChunks": 0
+	},
+	{
+		"arm": "candidate",
+		"count": 512,
+		"sourceOpportunityMs": 582.5,
+		"localSavedOpportunityMs": 1382.0,
+		"main": [
+			{
+				"name": "CrRendererMain",
+				"maxTaskMs": 4.476,
+				"taskUnionMs": 223.395
+			}
+		],
+		"worker": [
+			{
+				"name": "DedicatedWorker thread",
+				"maxTaskMs": 119.842,
+				"taskUnionMs": 914.673
+			}
+		],
+		"gcInclusiveMaxMs": 20.203,
+		"completedEncodedRequestBytes": 7184,
+		"cpuProfileChunks": 0
+	}
+]

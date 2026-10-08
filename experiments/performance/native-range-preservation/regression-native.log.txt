@@ -1,0 +1,8 @@
+{"name":"ascii","target":69632,"full":true,"firstValid":true,"valid":true}
+{"name":"ascii","target":69632,"full":false,"firstValid":true,"valid":true}
+{"name":"ascii","target":61440,"full":true,"firstValid":true,"valid":true}
+{"name":"ascii","target":61440,"full":false,"firstValid":true,"valid":true}
+{"name":"mixed","target":69632,"full":true,"firstValid":true,"valid":true}
+{"name":"mixed","target":69632,"full":false,"firstValid":true,"valid":true}
+{"name":"mixed","target":61440,"full":true,"firstValid":true,"valid":true}
+{"name":"mixed","target":61440,"full":false,"firstValid":true,"valid":true}

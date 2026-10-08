@@ -1,0 +1,3 @@
+{"name":"rtl","target":69632,"full":true,"firstValid":true,"valid":true}
+{"name":"rtl","target":69632,"full":false,"firstValid":true,"valid":false}
+Stopped at incorrect independent held/reversed native range

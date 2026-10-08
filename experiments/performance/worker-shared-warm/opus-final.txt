@@ -1,0 +1,45 @@
+I reviewed both files read-only and edited nothing. I didn't re-run the tests; the 4 tests / 29 assertions result is yours.
+
+## Part 1: audit of warmView / RcMap / readView / forkReplica
+
+**Verdict: I found no blocker.**
+
+**Checked in the source and the installed Effect:**
+- **Caller interruption escapes the retry loops.** `RcMap.get` puts `restore()` around `Deferred.await` (`RcMap.ts:576`). If the caller is interrupted, `Effect.scoped` releases the entry, the count drops to 0 and with `idleTimeToLive: 0` the lookup fiber is interrupted (`closeEntry`). `Effect.exit` captures that, but the fiber still has `_interruptedCause` set, so the next interruptible step (`yield* requireOpen`) re-raises it (`internal/effect.ts:4568`). The `while (true)` loops in `warmCurrentView`, `readView` and `forkReplica` therefore can't swallow it. `gate.withPermit` hands the permit back on interruption.
+- **A waiter's interruption doesn't poison others.** Each waiter holds its own reference; the lookup is only interrupted when the last one releases.
+- **Owner teardown is ordered correctly.** `Queue.end(unsaved)` runs before `Scope.close(background)`, so `requireOpen` already fails when the RcMap closes. A waiter woken by that interrupt-cause, with the view unchanged, gets the typed "This document session is closed" conflict, not a stray interrupt. A `get` after close (`Effect.interrupt`) hits the same `requireOpen` path.
+- **The fork retry is sound.** `Effect.result` catches only typed failures, so defects and interrupts propagate. A real failure on an unchanged view is passed through. A successful fork on a stale view is thrown away; that's safe because a `Replica` holds no resources.
+- **Clone caches stay warm.** `immutableAtoms` returns the same array if it's already immutable (`atom-sequence.ts:8`), so the clone shares the source's cache identities. Its `insertionReceipt` can therefore still match.
+
+**Non-blocking risks (unverified):**
+1. **The fork can starve under continuous typing.** `edit`/`replace` bump the generation without taking `gate`. If a cooperative copy of 1 MiB takes longer than the gap between keystrokes, `forkReplica` (and `readView`) retry with no limit. A bounded retry or a quick test with steady key input would settle it.
+2. `warmView` keeps a strong reference to the last source replica until the next call. That's minor memory.
+
+## Part 2: cold middle Undo
+
+**Checked in the source:**
+- Undo's cancel is applied through `applyChanges([durable, replica])`, which calls `prepareApplication` on each replica. It takes the first fast path that applies, otherwise the commit calls `invalidateText` and the next warm does a full rebuild (`rawVisibleSteps`, then frontmatter, then join).
+- Only two fast paths cover a cancel:
+  - `prepareInsertionInverse`: a single receipt slot, and only when the cancel targets `receipt.lastOperation`.
+  - `prepareTerminalCancellation`: only when the atom is the last one (`last.id === original.insert[0].id`).
+- So after the first Undo the receipt points at that Undo's own cancel. A second Undo of an earlier single-character insert in the middle of the text fits neither path and goes cold.
+- `preparePeerInsertionRun` already uses linear position scans plus `rawEditSplices`. `cachePreparedText` already handles any splice, including the `sourceOffsets` update.
+
+**Hypotheses:**
+- In ff55fdf, the one cold `visible:start` per Undo window is the authoritative current-view warm. Which fast path it missed isn't recorded; it could be this middle case or a multi-character replace.
+- Scanning the atom view with `indexOf` costs a few ms at 1 MiB, far below the ~880 ms warm.
+
+### Proposed experiment: a middle-position version of `prepareTerminalCancellation`
+- **Scope:** a cancel of one text op that inserts exactly one atom and removes none, whose atom is currently visible anywhere in the sequence.
+- **Locating the atom:** `start` = position of `atomIndex.get(id).atom` in `sourceCache`, then `splice {after: atoms[start-1]?.id ?? "", start, remove: 1, inserted: []}`.
+- **Raw view:** `rawEditSplices(atoms, raw, [splice])`, which bails out if the frontmatter mapping disagrees.
+- **Content:** a code-unit cut at `offsetAtCodePoint(start)`. Keep the existing guards: `canCancel`, `legacyTextTargets`, `touchesSourceFence`, header unchanged, and `sourceViews.get(atoms) === raw`.
+- **No new flags:** leave out `terminalRemoval`, so a Redo after a middle Undo may stay cold.
+- **Step 0 (cheap):** first put temporary marks on the selected fast path in `prepareApplication` and run the existing sampled Undo harness. This confirms the missed op shape is really "single insert, middle" before building anything.
+- **Proof, through the public module:** a SQLite/`Replica` test that types in the middle, then does 2+ consecutive Undos. Cover frontmatter, a fenced block, a surrogate pair, an atom that has children, and a concurrent peer insert between Undos. After each, `text()`/`visible()` must equal a cold `fromCheckpoint` rebuild.
+- **Proof, at runtime:** rerun the 1 MiB worker Undo harness. Expect zero `visible:start` marks in the second Undo window.
+- **Reverting** is deleting one prepare function and one `??` entry.
+
+Out of scope: Undo of deletes (a cancel with removes) and multi-atom replaces.
+
+The Slack, GitHub, Notion and other claude.ai connectors were listed as needing authorization, which this non-interactive session can't do. If you want them, connect them in your claude.ai connector settings. This review didn't need them.
