@@ -73,6 +73,12 @@
 			was absent from these builds. Evidence:
 			<code>experiments/performance/production-native-oct8</code>.
 		</p>
+		<p>
+			The original sync server later recorded a fatal JavaScript heap exhaustion
+			near its 4GiB limit. Its retained stack includes JSON stringification. The
+			log proves that server failure, but does not establish when it occurred
+			relative to the undo deadline or which operation caused it.
+		</p>
 		<h2>Earlier journey comparison with main</h2>
 		<p>
 			Both production builds used their own local sync servers, signed accounts
@@ -387,14 +393,14 @@
 			comments UI. Evidence: <code>experiments/worker-session/comments</code>.
 		</p>
 		<p>
-			An unchanged Markdown source now reuses parsed link tokens when the caret
-			moves. Selection projection still runs, and document-title changes
-			invalidate the cache. In an isolated actual Editor, the median largest
-			main-thread task during a 1MiB caret interaction fell from 4.23 to 2.53ms
-			in the middle and from 4.52 to 2.32ms near the end. These moves kept the
-			same active-link set. The 128KiB results were mixed. All 24 trusted-key
-			cells passed exact source, selection, mapping and bounded-viewport checks;
-			48 existing browser checks also passed.
+			The first cache reuses parsed link tokens when the caret moves through
+			unchanged Markdown. It still assembles each projection; document-title
+			changes invalidate the cache. In an isolated actual Editor, the median
+			largest main-thread task during a 1MiB caret interaction fell from 4.23 to
+			2.53ms in the middle and from 4.52 to 2.32ms near the end. These moves
+			kept the same active-link set. The 128KiB results were mixed. All 24
+			trusted-key cells passed exact source, selection, mapping and
+			bounded-viewport checks; 48 existing browser checks also passed.
 		</p>
 		<p>
 			The largest main-thread task across those complete three-second traces
@@ -404,6 +410,27 @@
 			lower end-to-end latency. Link-boundary transition speed remains
 			unmeasured. Evidence:
 			<code>experiments/performance/projection-selection</code>.
+		</p>
+		<p>
+			SourceTextarea also reuses its own projection when a selection touches the
+			same token interval. A binary search checks inclusive token boundaries;
+			source, document titles and mode still invalidate reuse. Public Projector
+			calls continue returning fresh mutable outputs. In another isolated actual
+			Editor experiment, 1MiB median interaction tasks fell from 2.87 to 0.60ms
+			in plain text and from 2.55 to 0.59ms inside an active link near the end.
+			The 128KiB results were inconclusive. All 24 trusted-key cells passed
+			exact source, selection and bounded-viewport gates; 14,285 semantic
+			assertions and 48 native editor checks also passed.
+		</p>
+		<p>
+			Across those three-second traces, the largest task fell from 8.42 to
+			5.95ms. This measures skipped output assembly and smaller tasks, not
+			allocation volume or garbage collection savings. Two-frame opportunities
+			showed no consistent improvement. Token-boundary transitions were checked
+			for correctness but not timed; fixed position order and warmup remain
+			limitations. The experiment excludes the full app and physical 120Hz
+			presentation. Evidence:
+			<code>experiments/performance/projection-owned-selection</code>.
 		</p>
 		<p>
 			Active-line geometry caching was rejected. Six valid rich-document wheel
