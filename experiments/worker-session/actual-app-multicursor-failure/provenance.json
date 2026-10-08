@@ -1,0 +1,3464 @@
+[
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/platform/web-crypto.ts",
+		"bytes": 792,
+		"sha256": "0048a562207d7ea70d9ad6f91806600b73c4d02796e8cde346e8e2a16f84c3c4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/platform/errors.ts",
+		"bytes": 1370,
+		"sha256": "d2912da2a0247812a8132b695f86f8ead5406522237369cbcc966c3c7c25b74d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/platform/background-work.ts",
+		"bytes": 1624,
+		"sha256": "db2845852c680feca095209d00b263111deea8f7526651557d340e063d022151",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/platform/transfer-budget.ts",
+		"bytes": 230,
+		"sha256": "c5e29043cde7759e6ef1d16f3f01d12a0efe1e44f33848ecd6c8a6a354d91ad3",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/platform/http.ts",
+		"bytes": 941,
+		"sha256": "f304a98c29d47c4f2c56e6db00d543172cab5d61f27d1442b3ce82de15910191",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/platform/browser-lock.ts",
+		"bytes": 555,
+		"sha256": "930dac9a0aa0ba11a40e8a29f09a35cc30c98d4a13da56a7be4ab0c50763eb57",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/platform/signatures.ts",
+		"bytes": 4389,
+		"sha256": "9c5b7d817ce491dd7a445c2b965684f912b39e82aa619679b1e5b083c007b1dc",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/platform/cipher.ts",
+		"bytes": 3449,
+		"sha256": "039814795bb5ce71c80c724ad6f3d38850b7fa1110825b427f04e74895e59218",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/platform/sqlite.ts",
+		"bytes": 4710,
+		"sha256": "b87f310b420e565e2ae6bb479893575d801a94836877e2486c34aa90620e5a03",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/platform/sqlite-journal.ts",
+		"bytes": 8165,
+		"sha256": "c3a4ebd8245a7a33d2b0740f6485fd4446e99a7d3dfef7ee47608041347c69d5",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/platform/document-lifecycle.ts",
+		"bytes": 461,
+		"sha256": "ec8dda72738a80505652e7126d95c9ae59fac08a879c1835a785fb627e932a1e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/platform/http-server.ts",
+		"bytes": 877,
+		"sha256": "5182a3c9d3aa47e1ad232d93f8e591ed2d22c942139aede4849379ae093871b2",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/platform/indexeddb-journal.ts",
+		"bytes": 18575,
+		"sha256": "4688e51f4278fc4884c6b6ec38a0381b453650849cdb3462cb01199dd4808e59",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/platform/tasks.ts",
+		"bytes": 1619,
+		"sha256": "dc990e3dfb6e38e693b333784f46ce20ec15902d18cd19d4d5a6cb1bdfe08aaa",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/platform/document-journal.ts",
+		"bytes": 1004,
+		"sha256": "2670068adaa1faaf08ee1a6e9f84ed875e6eb63853ae993b037d43a3e5bb7a2f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/platform/effects.ts",
+		"bytes": 1701,
+		"sha256": "f2e2150de87a67e73eb36f57941c10f2c68e35d16673d59cf3a9c43742a772de",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/oauth.ts",
+		"bytes": 9410,
+		"sha256": "e598d6a4eda39eaae32e9c443e15d8024d5b57dc4618bf80f99fd07493084783",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/agent-database.ts",
+		"bytes": 4877,
+		"sha256": "236252b2f32eed8b25ce0cd2f1e9942be91ec8a59f5e4359f3dfb2be89cc9acc",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/static-files.ts",
+		"bytes": 1197,
+		"sha256": "7f2558bfea485089ea630cf31c6cb6592355c3193791e7e3ee22933417b8f9c9",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/email-authentication.ts",
+		"bytes": 13555,
+		"sha256": "7a71132ef99f75fd327a14d54ebb54f6228a542b86565f66ea9bb45d41794419",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/mcp-server.ts",
+		"bytes": 4018,
+		"sha256": "9dbab4edc8912f2c886a457858a360e7523082ea7aa591304287833b7f1db844",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/oauth-database.ts",
+		"bytes": 6791,
+		"sha256": "cd9c212e171bab74ed07fc6ede18b123f7fb2eed312cdcadb8d4f4ac2cc18c1a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/account-documents.ts",
+		"bytes": 11029,
+		"sha256": "02fb44c78e60e93d91a1c4eeeeb00f7056a2fcbff5f0586ef55800eff312f7b2",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/email-api.ts",
+		"bytes": 5118,
+		"sha256": "7c740ba0533fd6fd0ce7707da8f97c2f3b8fc2bb5fa51eee97e74976e2dd18b6",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/presentation-presence.ts",
+		"bytes": 671,
+		"sha256": "e4378f2b75cd1f905bedef90fae78c160ecc1a4a9b7e5c16e798552bc1b5dec6",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/settings.ts",
+		"bytes": 3110,
+		"sha256": "2fd4e329c7668b6dbbddf09a8a3abf79cc7171bfb9a775b8d2edda65a30daa4e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/request-origin.ts",
+		"bytes": 1331,
+		"sha256": "9cf0554ccf2603e4d14e2495c7864610f8769fc1ca5265c97230988e8a26c033",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/input.ts",
+		"bytes": 857,
+		"sha256": "c499a774cfb0473eb266c74a55743464cc981619751b0725aab23712ddd13cfb",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/email-delivery.ts",
+		"bytes": 3809,
+		"sha256": "28d8db246644f9b2820a4531ac9e04629adaeef0a00056e17487e3006809e154",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/failures.ts",
+		"bytes": 861,
+		"sha256": "9a741e88a2ab6bf45b824ae039e036c4ad1906ce35daa476845d76b674602d73",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/document-live.ts",
+		"bytes": 21006,
+		"sha256": "7489502f3d1fab8cdb926d3e339da074332e374aca54002d331dac13d446e4cb",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/oauth-maintenance.ts",
+		"bytes": 499,
+		"sha256": "76c8fcbd96aa0c2a84e2e38287b94508907f434af81459665773b0285f11c697",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/application.ts",
+		"bytes": 6096,
+		"sha256": "616e9dc319fb108e6cefc68230c821ebaf244fe6afd67f7d16289d2d9211f179",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/mcp-tools.ts",
+		"bytes": 7465,
+		"sha256": "a5db2872c06115165f8c1696fa85be842d3978e281ae0c16ccdf93354c8386fd",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/workspace-projection.ts",
+		"bytes": 29579,
+		"sha256": "42becef133cd1e78952d233d04f0749b507a69bef664a94afe87b0ca49867ad7",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/agent-credentials.ts",
+		"bytes": 7375,
+		"sha256": "54153d8c0413ccd3cdd730ee82d4b79d5ef509ddb549a06f7e834f08e159bb99",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/agent-documents.ts",
+		"bytes": 3331,
+		"sha256": "69844a86930642b5064d963aaf97021049da28f8eff3957c83f28762f05a6583",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/client-metadata.ts",
+		"bytes": 4868,
+		"sha256": "1d86773e3c71e2115a1fc6d822003e25e183a3800ab6b9d3895c9d09e7ca004d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/document-api.ts",
+		"bytes": 8621,
+		"sha256": "063a9f94d4e8aad5a0d9bc44a974f5cb6362c17cc6cabb8f396c171de710ff42",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/agent-store.ts",
+		"bytes": 3540,
+		"sha256": "6a5a2401a94dd868cf9441f8ebc924578cf2f562b3bdfddb36639f5d73b03f3e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/index.ts",
+		"bytes": 4961,
+		"sha256": "8cd4387aa1e1142ecd438d8a5d96672234623be6cb899b57103200f5f2f3d285",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/oauth-grants.ts",
+		"bytes": 2942,
+		"sha256": "14a1d6ac594a9c5467bb4696bff6f279718f200fd457956115eb3f2c70a6280d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/account-api.ts",
+		"bytes": 8952,
+		"sha256": "a7e27a0a873ce6242c2b8dd649cb764e69d60418642bd56d94658a260ab8ddd8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/document-store.ts",
+		"bytes": 93261,
+		"sha256": "5641817768ca96451e576aaea210d21f7e5b1cc2ad26a2f2308998906215f8ab",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/sessions.ts",
+		"bytes": 10793,
+		"sha256": "f98853ee071235d51f2595afbaf4cc9bd48ffd3f7427bcc6e58038a19a6e954d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/server/account-authentication.ts",
+		"bytes": 2357,
+		"sha256": "8e5bd40addf212d9b53f28b4be675b40e333d9fcda6d42f2472f7db497b2c2d4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/signing-keys.ts",
+		"bytes": 1097,
+		"sha256": "48ffea7ac5a3b2f7670de781700560d058ce102fca6a120889f684b4a4ef4b90",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/history.ts",
+		"bytes": 1340,
+		"sha256": "81b1b8b0bde0051752b932c45e7dbf22c44e483971be06781a6f92b86eb62298",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/routes.ts",
+		"bytes": 7121,
+		"sha256": "9362fb6790bad20299a9446cfddce97dc7379f8213ced8abcd77b099fd01fbcf",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-observability.ts",
+		"bytes": 5474,
+		"sha256": "89217c6eb62fa8a20cb5cf6c7209a3c67c7de2e875b1a0c10486147cc65f6b0b",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/legacy-drawing.ts",
+		"bytes": 5399,
+		"sha256": "e2011117ae815a91f129615ed2f708870d15d7117657c4caa2d996031494c30e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-blobs.ts",
+		"bytes": 4365,
+		"sha256": "f4d3a6c308fe148f8a1bcc175338ccf7b3ab1dd0798161f9e76b1e22c388e8f6",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-metadata.ts",
+		"bytes": 5341,
+		"sha256": "4c73710d3968826e25fe02f3f6f4c3c16f8b035a770df31abee4d0517a64302d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/email-authentication.ts",
+		"bytes": 2608,
+		"sha256": "e8c0b5c3bdb56a26b4a07e1ff009f882e676f07c09dac692746411b06425f2b5",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-recovery.ts",
+		"bytes": 5252,
+		"sha256": "acfe73ac1320a540ff5435075ca21954b8b4c979a39e11f288b3b53521e6f023",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/folders.ts",
+		"bytes": 2307,
+		"sha256": "149cd58b4e01e90a8e30f56aa4ca793c141afdd5a8b6eebb26c68dd5de42e7ff",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/projection.ts",
+		"bytes": 16073,
+		"sha256": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/typing.ts",
+		"bytes": 6518,
+		"sha256": "2fad9b021fe326ac0508f2e69f7c2331fb6c9ab305b4062296101f6592f129f1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-history.ts",
+		"bytes": 3886,
+		"sha256": "05987512a32ca69f2cb1517896778402659d2177827520a21a5048f56cf8bbda",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/workspace.ts",
+		"bytes": 5220,
+		"sha256": "d7fee4c99c2be496a6ec663c41e0a95c5df58d7cf4fa4a0e6d0eb3ddf245a8c3",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-transport.ts",
+		"bytes": 4039,
+		"sha256": "365a17c145df8e3c14c0dc313396dfee148da437ae407686068f54ff118ececd",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/preference-state.ts",
+		"bytes": 3769,
+		"sha256": "b830e0d0f74ea5e4820680f0c8240acd7f9a829b3183b37e8b0c67a3e96216b8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/startup-diagnostics.ts",
+		"bytes": 1872,
+		"sha256": "d04c35e509190bcb1f06ca62e9427263c6b920a9a92882a9efabbcc849a5a35c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/selection.ts",
+		"bytes": 5965,
+		"sha256": "26e01ff547868e70c5bb58a4c3284064027adf79d9395d7db9e2b71dd534b0b8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/syntax.ts",
+		"bytes": 3697,
+		"sha256": "0224b272c94e12a00c34e9b26309d1e092bed1d4469eb4a7ea88c90c191201c3",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/text-splices.ts",
+		"bytes": 3308,
+		"sha256": "d7e3d091d195da1a4f3f795f29b38a239eeabcbd194ca274dceeee33bef9f808",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/invitations.ts",
+		"bytes": 3233,
+		"sha256": "9ea953fea7872ad55602576b2e94159cbef1917a57595454f5371a3b680a5238",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-stats.ts",
+		"bytes": 5713,
+		"sha256": "35213a9ffabefa7a5b3ea93430d9742346169e3d859c4f51e27a01b64c83bc9c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/find.ts",
+		"bytes": 532,
+		"sha256": "e02733cdf079f36d1485f0d22f525aed63f21b9832a0db95ecf91f514a9701f4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/text-dependencies.ts",
+		"bytes": 5145,
+		"sha256": "2bd205095e5a81b875d898d1b0db0f9419114b2eaab05f6a5dc17c9e085a7abb",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/atom-sequence.ts",
+		"bytes": 3971,
+		"sha256": "94f6fb6946fae3ac58cf21f5587c61629b9e87a1e23374fe760a54675f0aaf46",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/authentication.ts",
+		"bytes": 2909,
+		"sha256": "87cc19ebd548653174613d1629642ed4e5ed24910686f353c2eaeeea7e526d0d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/markdown.ts",
+		"bytes": 18727,
+		"sha256": "ffa8c2fb770a349740bbf62f72b8259e28398b3a56bfe190e401abe4149cd3d1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/authoring.ts",
+		"bytes": 8118,
+		"sha256": "dea127a9dbd4388f98f10dc83a3d8424a48a4be8532e5ec0d95059ec38a36476",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/portable.ts",
+		"bytes": 7090,
+		"sha256": "d74d51d15fd13a91e54edf0b0bbe80f9eaab3d9068c3b35506dc463403dc8b7e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/changelog.ts",
+		"bytes": 1427,
+		"sha256": "b2e11fc316ab207cbc7fd33234e354344e33f305729ccf6dffc34bcbafadfdc5",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-errors.ts",
+		"bytes": 2738,
+		"sha256": "ba9b7d8c6ccfc7eba146e7e3577cf155afe3f2f4b3e144a8bd90a0fdc9cb8850",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-live.ts",
+		"bytes": 3025,
+		"sha256": "9f405232699f9374c96902671ef53dccdd85abb98ea6d5b001d61f7c171b0857",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/completions.ts",
+		"bytes": 4073,
+		"sha256": "c9ece16bc4a32b7aabbc1979230b53ab90f406a7cdc61bb43e6dbd2df710d84e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/zip.ts",
+		"bytes": 5278,
+		"sha256": "b2c0f55ba643bfae4db073450de82d19b8a553dcec3ad97d4c0e8aab5365c281",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/presentation.ts",
+		"bytes": 4506,
+		"sha256": "97a2b7f4b36af2aeaae0cf82b8daaab8e5a60194d21f3d2f0f754a2f81d47cda",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-undo.ts",
+		"bytes": 4022,
+		"sha256": "59a1c5fe16f64deb7863e83579abcd1f7412ac468f660f479011ae0debfd3c12",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/presentation-laser.ts",
+		"bytes": 4204,
+		"sha256": "df90269d3a4fa42bc264e79ff921009c8c194c63dd043a78d9ce408fef6ef4d7",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/model.ts",
+		"bytes": 13342,
+		"sha256": "70f8ce900a37b8a9bc3fab851528755367eba0eddac527610e4d88a53039cac8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-causality.ts",
+		"bytes": 1067,
+		"sha256": "0b2b4d16de35139abd1e4638df70a0df749020f1699c507756ede88620a31ce0",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/lines.ts",
+		"bytes": 3843,
+		"sha256": "27994086618fea3c92cd26b31d2e57b9a443d4ddee688db93c689d1821c7ed45",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/collection-copy.ts",
+		"bytes": 879,
+		"sha256": "9d6d41a166bdb8066e34cfc60d9e0f60e82b4cc785fd2eb2e836fc3d3e01a282",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-archive.ts",
+		"bytes": 33894,
+		"sha256": "b81f18261149871d9aff6e97d5399bcb45a7333533d2e15fac25a2c66233033c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/theme-archive.ts",
+		"bytes": 3909,
+		"sha256": "29bd3f921caa14fe4d8beace5e81c01eb733f085bfc7f08efa478b9c35c5402b",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/frontmatter-merge.ts",
+		"bytes": 18931,
+		"sha256": "9b1d3afe8706817b8445736880166cc3b292911e2e61f7af669ab6d57fbd44f8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/preferences.ts",
+		"bytes": 6627,
+		"sha256": "91d7ed9248cf7611bc89e09ec6fd4696be82c803b14afc40b07e6341654ddcd9",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-failures.ts",
+		"bytes": 1980,
+		"sha256": "74dc87a4fed31aa0b433e32ed44480c4ca82dfdf6a71cb1532036196bc03ac95",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/html.ts",
+		"bytes": 736,
+		"sha256": "19efbf35675500cd6d9a58d0e5b1ed108c7b8f2c0bb060d05924807e0f31c714",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-session.ts",
+		"bytes": 67379,
+		"sha256": "fdbc79466a33698c583c33e4d9d10410bfccaecd33bc324080da491a248c6ef8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/documents.ts",
+		"bytes": 13328,
+		"sha256": "dcbbb8587d0d2c7a9769af38e6aae75a98649304c942cf3f8112f4cbdaf9e4a5",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-actions.ts",
+		"bytes": 22540,
+		"sha256": "2cb868e892987a8b0e210fdee585bf293bc0fa6bbcc41dd2b9c3d02211b1ac23",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/crdt.ts",
+		"bytes": 71062,
+		"sha256": "fa018ceddb23a671cc2364e324c11f06a184058e2c58a959c769b9bc39586833",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-dependencies.ts",
+		"bytes": 4390,
+		"sha256": "300ffed9bd3e8c91d19c63d81650128a42dfa4af70545877913f7c7a93b986bf",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/save-status.ts",
+		"bytes": 2106,
+		"sha256": "76ee3f8cc65eaa32c7aa3e80cb352d24dba007197f18729d6c1d3844b025db58",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/theme-source.ts",
+		"bytes": 2622,
+		"sha256": "9dfc43a26e83cac2eda9dd5646e5deee0e482135d6b0a3f77452474e121e307a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-api.ts",
+		"bytes": 11685,
+		"sha256": "2a9a2e216372f650fe487dc5546a2d97b2cd6ed8820b22980fd91421585e7a04",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/text-merge.ts",
+		"bytes": 1744,
+		"sha256": "b5839a536fee7cd25ffc11027d76249d1b019fd989cc311ed4973b3f22f80845",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/whiteboard.ts",
+		"bytes": 15156,
+		"sha256": "40e16ed21ade63d7618063dac6bf92302c489609e0ca2851c42d2b97ac21e4bd",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/account-api.ts",
+		"bytes": 2187,
+		"sha256": "9cdd79a34e33510078a3e5d5591810c187820bde0d6ca504f358f5f53cd3f712",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/preview-text.ts",
+		"bytes": 3906,
+		"sha256": "9cbeaffd771be3c9e20bf844bb02e884d189c5bef89000090a9155724e2c116e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/checkpoint.ts",
+		"bytes": 21439,
+		"sha256": "4eda90d9ea075d2f25f25440012b6bf1e3aeaee917f6ca7ce7949524d27cbe79",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/document-diagnostics.ts",
+		"bytes": 1376,
+		"sha256": "1db9c8773f984d95fe878c3df5fe00640d43a6742761500f3cd15d6c709cc5a4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/text-admission.ts",
+		"bytes": 2822,
+		"sha256": "9f8a1a1e5bcf3d154daddf94429a9b24a65df5131fa22373ee76656f18ccf314",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/base64.ts",
+		"bytes": 741,
+		"sha256": "49d4d2e44869391d75698a439aaafd03b54899b2ca0168d1339dee23198b3f21",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/text-visibility.ts",
+		"bytes": 16932,
+		"sha256": "e9a76f46b757a8fa0aab4134492f43d76a497d1f062cacd052e02fca086947df",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/presentation-follow.ts",
+		"bytes": 2750,
+		"sha256": "3503f2f08d745de6608b465ae5b10a719cb1756eb0d72ad13c77c61072067f0c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/theme-library.ts",
+		"bytes": 3379,
+		"sha256": "24250d33f1c6c9f4a5075b407c006f21fcc50652ef7dc7415b5c2b2a9414effb",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/text-index.ts",
+		"bytes": 11559,
+		"sha256": "79e7ea2f341bd5aa93462f8b93235ca10a36010000f66f397ef4c5fa7221a8e8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/agent-access.ts",
+		"bytes": 809,
+		"sha256": "6cf01d3799a0776448f69dcc0b190c62079c4f5da272e1d8e0988bc5031edb4f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/themes.ts",
+		"bytes": 2622,
+		"sha256": "bacceb6452bbabdbc479d70eae2784abcf778576ac536125a7d8473b62241845",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/shared/portable-links.ts",
+		"bytes": 1405,
+		"sha256": "7bcc7c538cea262a5240b829ac07af8d6b8071ccb19b3a1cfbebd9ae87af2400",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/cli/main.ts",
+		"bytes": 14624,
+		"sha256": "0e264282b89c76574a620988473da41d92b0090d8963f0da44eee484a40a5002",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/cli/api-documents.ts",
+		"bytes": 5457,
+		"sha256": "fb9726458a4ab1b549bf13085dd341a64040f3bce4360dbd7d33bbde751b0ab7",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/cli/mcp.ts",
+		"bytes": 14646,
+		"sha256": "683f03ac063cb2f4f3063e1e468dae28f5d799e314f97fdbdcb2965fa3a763c1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/cli/platform.ts",
+		"bytes": 5119,
+		"sha256": "2cda4a262df3b412542f65570cff3ac0b00f61daab9b010efc25c0aeb079db51",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/cli/application.ts",
+		"bytes": 347,
+		"sha256": "b79225d4146fd42aa01c241ce4a81fb6850bb7ed531a16b2489b5adf15aafbf3",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/cli/runtime.ts",
+		"bytes": 1087,
+		"sha256": "e01e329fb05b9180517c93691fe4603c3b54ebaa4490b0eb5f3334a481fa5b66",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/cli/document-platform.ts",
+		"bytes": 1542,
+		"sha256": "d7912dcf3db12d353941889ef343111b080d0646db1f31ba7341ef14f6d55510",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/cli/documents.ts",
+		"bytes": 9489,
+		"sha256": "71bfebf24c9f3731a395817c9d1468da8cfc904448882bd8d36fe539f39a2e94",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/cli/profile.ts",
+		"bytes": 2615,
+		"sha256": "5358e6bc59da97118956932f92d939c54d9b8f8c5b6fe850a4bfeafabf5ee587",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-assets.ts",
+		"bytes": 9898,
+		"sha256": "a1add52a20bc0e9af4d6a2b742be9ab6079e380df70aae9c52d0213819dbf789",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/videos.ts",
+		"bytes": 5739,
+		"sha256": "aac2e58034b8e19f35ad41202f24c19543dd48ed2af3da51ef8177ce640e5144",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/dom.ts",
+		"bytes": 1056,
+		"sha256": "35d4543b49e2c9baeeaf9243a76ef50a513655ab5b5420a7e4b107a3a2863970",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/local-media.ts",
+		"bytes": 2634,
+		"sha256": "9f40f6aedb5b44e14ead7ccb03e3701becb6a73989f6ab4a4e456a4a8169554a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/browser-account.ts",
+		"bytes": 9568,
+		"sha256": "3eba2b8d4f16ea2ad310c338e1c2a0ecc6b2c783a95beff03fd4a438b016fc8f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-blobs.ts",
+		"bytes": 7276,
+		"sha256": "b9c85f97534864e9b30b0953cd2ea88b56ccbe2cbb54cb212011ea10f650250c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/paste.ts",
+		"bytes": 3313,
+		"sha256": "f920cdd6e45aa62fa27196d3c2b514cdb753fce18057402f3a8c5ec43cd7958a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/local-directories.ts",
+		"bytes": 25092,
+		"sha256": "c74d01bc020c35df9f7a494c56485cfc7b36cfb321395921fabaf0b3e81e7985",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-recovery.ts",
+		"bytes": 67,
+		"sha256": "343bc665df6d94c6099039d94eed57e0306be4150565a9df3d7167d197d7005f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-properties.ts",
+		"bytes": 2410,
+		"sha256": "89e630a3fb1fbc6b554dcef53cb95444b43a2cd1a90f791009fe779df1b8a265",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-history.ts",
+		"bytes": 3054,
+		"sha256": "4f3ad830de162cf5b198a8b1704d18aa49559feb410087b592b318587323c9f6",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/router.ts",
+		"bytes": 2124,
+		"sha256": "25107886e7d8240cc5b8d1d2344e0d2142ac4e24abe67a6b6a6b505d277863b1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-transport.ts",
+		"bytes": 88,
+		"sha256": "b2d5248344185abdf5d6006940532e566fd02aeafe1071fbdd56a824644e13e8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/scheduler.ts",
+		"bytes": 1406,
+		"sha256": "70912b36f407786b1ede73ce77f6728e2dbcea24d467c8158c6454048838c647",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-worker-rpc.ts",
+		"bytes": 913,
+		"sha256": "c628996af989c204cd1c2039ed91b1f1eef2400a89febadf02f57bef8e690125",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/background-work.ts",
+		"bytes": 1289,
+		"sha256": "98836aefcd928ae2324d3682e55e097495a4768f761821a299b58c06585505e2",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/invitations.ts",
+		"bytes": 2214,
+		"sha256": "3974453f0fbd24d13e44244a5089c242cfa1e8a85b51bae307e8e21e8a0d5f50",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/browser-preferences.ts",
+		"bytes": 6660,
+		"sha256": "5e249d002e5131620f9c98ace21280950739420b5453fce8ec6cfc60812b109b",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/images.ts",
+		"bytes": 1241,
+		"sha256": "e422b0e672cce1527ec1a9d6198109e63730132460c6092dbd1c79488d1b7571",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-media-view.ts",
+		"bytes": 5780,
+		"sha256": "50a0ca096babb53e4c1800306c24f80ca0f8968d6919d0249ef569e6ee6fdcc9",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/language.ts",
+		"bytes": 1692,
+		"sha256": "cacfbf9732f7b6b12edc214e072189df96cbd6bf420a8a0246dc46318208b80f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/storage.ts",
+		"bytes": 7546,
+		"sha256": "257a1ace0fdba86a2cf286a62ae678e9c888398360b67e02fa740225c23bcaeb",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/whiteboard-preview.ts",
+		"bytes": 2116,
+		"sha256": "0353fd44fd2c05d2dba2ce19c2f847f706519a451b62e41d3dd651dce8214ece",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/passive-document-cache.ts",
+		"bytes": 991,
+		"sha256": "9c50d5422654688611aa444f52d026d2e234d3027deff15a2a8b71d957c84502",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-live.ts",
+		"bytes": 13605,
+		"sha256": "f9db0143853175ed8c4e62a736d02586d4f47ed7e16bcfa118c70944142d7d5f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-archives.ts",
+		"bytes": 9307,
+		"sha256": "e7205e1968fdcae5013734e5c45507b61503ae651b9f29987f775194c41f71d6",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-app.ts",
+		"bytes": 131396,
+		"sha256": "b98b35db95acba2da9b22b56a113ac4b1eb3327cf15e44bccd3836c0b0299933",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/whiteboard-store.ts",
+		"bytes": 15496,
+		"sha256": "58402a63cb6f26dd245b5b81b2730093e9497f9c21175d68544ca0968ac23c90",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-duplicate.ts",
+		"bytes": 2270,
+		"sha256": "4928113023575712f61503d4db0e405d4a9904cde3faa11fbaf1186651927422",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-failures.ts",
+		"bytes": 44,
+		"sha256": "769c0408e6a953e9a2676459bb4249e21af23f67fdc34af8e0c0526d912e3040",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-upload.ts",
+		"bytes": 1509,
+		"sha256": "d254b4c70cf956e5b58b08712a5a234712d94c3196c0bda34f0926e164078775",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/source-textarea.ts",
+		"bytes": 10204,
+		"sha256": "21887f5aab82815b14c20d8d261b17cb5ffd53fd51f299f2f00229b7a768c0d1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/language.de.ts",
+		"bytes": 24767,
+		"sha256": "3f12201fc3b8140447ae81e54ef3f8040290f66b58b7d56455aed1cb6b2ce638",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-worker.ts",
+		"bytes": 2532,
+		"sha256": "fc7a60cd6b3c2a3395373a4063a109c12eaaf8f6d0c1f7331af43b112453bd67",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/local-documents.ts",
+		"bytes": 9806,
+		"sha256": "9648bb9d4816013c5efa1edf77888ee549d02b1fc1d7ac54c69c7ea877939b49",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-lifecycle.ts",
+		"bytes": 1227,
+		"sha256": "682b6af99f2128c2a3106112c5d56d407e4d9957b579fe484098ebbb24c7703a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-session.ts",
+		"bytes": 917,
+		"sha256": "fff6e2864cfb9ddb713e5dc0d42cfb2526a71f85b1e474f81f07f1eee99dec56",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/updates.ts",
+		"bytes": 1416,
+		"sha256": "d36822f3eb52d7ac210d30a3717b447e0e1113169da9b937f76106c28868b7af",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/icons.ts",
+		"bytes": 15040,
+		"sha256": "6f388d9189f7ca443414737e43dc3bfcafd235071d9ca7b200b74d413919c7d9",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/cancellation.ts",
+		"bytes": 745,
+		"sha256": "6e86c25833aa68777af24a2e246bacdbd33f9715efc8a91823d9885510e6b3bf",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/local-file-sync.ts",
+		"bytes": 6328,
+		"sha256": "e666e59fb33b41698bd59abdb9543d19ac35ab44d10aac80d398c094c1a1a69f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-worker-client.ts",
+		"bytes": 1957,
+		"sha256": "fdf35574c4f0bf2380ab7048e253195ac2dc584ee415593b6dda42dba8607495",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/toast-stack.ts",
+		"bytes": 3194,
+		"sha256": "0cc37459a10538aeb7956e7da5fe50bafcdb650bd9f615e2a43c775b0fa4bcba",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/shortcuts.ts",
+		"bytes": 4574,
+		"sha256": "78e1ac49e85f4f4a457385cf537335438d3c9f79a2644abd32e9d3e3f61b4bb1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/browser-library.ts",
+		"bytes": 27839,
+		"sha256": "0aea7beec8797bf263b6922caffe6ab5c068d72b84314408e1401c63a6b98bb0",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-discussion.ts",
+		"bytes": 6083,
+		"sha256": "22594439a66bf7c87fd25e43d8e1991f2ef3c924a2e478f8b7a203f4c0e8ad97",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/video-duration.ts",
+		"bytes": 1086,
+		"sha256": "a6c6daf3e0dfd1c0c4fdd3942c9d43053db864317b63460b7527b2e455ab02be",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-worker-stats.ts",
+		"bytes": 4102,
+		"sha256": "a342d3fc091295b6b641266d94e6682e5a993042e891041f4a31b0da150dc274",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/theme-library.ts",
+		"bytes": 7788,
+		"sha256": "00cee0f53018ae410ac86f6a7a21ccd13e543bf8f623fe14e773614edb92017a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/dialog-session.ts",
+		"bytes": 1662,
+		"sha256": "10fb6b3ce028111fb673194fc06e7bb44ce581f286eb4096678055f4f8a44459",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/document-media.ts",
+		"bytes": 10111,
+		"sha256": "c2e96cbbf5acf9d92015027154ca130242aa2880d7a779d4b5be63ead576c92f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/whiteboard-legacy.ts",
+		"bytes": 7146,
+		"sha256": "980c49b4788b0754e943cebfb126f6710dc1037a7efeb5258636525bc94c1885",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/editor-viewport.ts",
+		"bytes": 36675,
+		"sha256": "98959330a68d6b096a7d3b5b4efd3179606ad37729c2f5dc199f8eca50867b2c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/theme-workbench-documents.ts",
+		"bytes": 6173,
+		"sha256": "5676fd587130638ad3cd5110cc09ae7b84502bd137d0fd4d0eb4f8645e704058",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/history-timeline.ts",
+		"bytes": 1023,
+		"sha256": "04b53c8c65ecd8979012f39b2b42e91f2a795fda19483028669a5d20a0ba0620",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/ui/placement.ts",
+		"bytes": 1539,
+		"sha256": "75107481e09e9a1fb1c27d15300e2877639bb01e67e20914b193352da7fff5a5",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/ui/menu.ts",
+		"bytes": 7742,
+		"sha256": "3d4aafc4a5cdf930d1b6b9144c43ae7c776ebb2cabe62477200b602638a31437",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/pending-ledger.ts",
+		"bytes": 6304,
+		"sha256": "8d56bd2f3dfdb0dc14bc5332569a22463448ed45e2f154f40cff6d923d5e310b",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/app-route.ts",
+		"bytes": 6033,
+		"sha256": "b6458fe52dbe5e4a4f81d7a1c480d8ff9aa5cd9d8b87146951d9271a7d00d9ee",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/worker-opened-connection.ts",
+		"bytes": 3578,
+		"sha256": "ef57c6d81b12fc40bcae45dbbffff12fe09a22acdbc22b27f4f73369803c1868",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/worker-client.ts",
+		"bytes": 2435,
+		"sha256": "cf3ae2f2cc7f87909d95d50e7298e8e075399be431ff3847b4023d97db94cca1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/app-owner.ts",
+		"bytes": 3754,
+		"sha256": "abff890e7ce467f877d3250f11aea0a0eb7223dc2767a7a487335c349d428cd3",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/worker-opened-intents.ts",
+		"bytes": 8878,
+		"sha256": "7253b031446780270cd1719d1732efa5926188f5520884a1b1a3c184cdbe6854",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/worker-opened-observation.ts",
+		"bytes": 1316,
+		"sha256": "cb697a5c684020a63ca762af21bffd1fdd701f587763f902f331a5c897e30e17",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/bindings.ts",
+		"bytes": 5736,
+		"sha256": "8ddc7ade3a940e18c2b8eccf03ac9c72f29a7a2934b9280212ea17d7daf9f905",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/browser-worker-documents.ts",
+		"bytes": 16352,
+		"sha256": "05d642f33dd728289afeb2f389bc6189398f31618e17ab100dc98bb488e01059",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/document-lock.ts",
+		"bytes": 1096,
+		"sha256": "d1474863d26aae3fbc3cb49b1ff952c087bbecfbb86d9af39c6b1c393bae6ae3",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/worker-opened-capabilities.ts",
+		"bytes": 7583,
+		"sha256": "a64eb3a3ab3a84d50f820e1d894362a639c7a08ca298cb554ff96cd7f0fd6a6d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/worker-opened-history.ts",
+		"bytes": 4603,
+		"sha256": "08eb507b3575858d9d117ca06a08098c40d3257454c6cb26e09d178abd2afa94",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/command-intent.ts",
+		"bytes": 725,
+		"sha256": "d4e9c30baaafa870ff4e2ab5f3bee76e468f54841fcb27ccf030e67a47474ef1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/worker-editor-basis.ts",
+		"bytes": 15707,
+		"sha256": "ec9ea0a477d5949c9b0a25ef4f6612d863af46987b7955f6764b984c768a81a6",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/worker-rpc.ts",
+		"bytes": 8640,
+		"sha256": "174f8a1c38dbc1741dbd920bf8daf50df4e15f995752c33acf1f136ead45e213",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/worker-assets.ts",
+		"bytes": 6038,
+		"sha256": "2108d797eafbb5ac93fb98ab82344818049e416c83c99692537158fa76dc9d3a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/worker-activity.ts",
+		"bytes": 6831,
+		"sha256": "c9a2a53100d29bf5deff604a13d1c1c6e29a748aa443005c9cf3a316237808c3",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/editor-queue.ts",
+		"bytes": 31329,
+		"sha256": "9eabd44bef3cd932b4dd0d72c297abee38c9cbd132d97012ff55b00ec8754493",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/opened-document-contract.ts",
+		"bytes": 2794,
+		"sha256": "6ef40c7ba34d68cf709857deb88eec324537478443d6ac85b928a10847dc54eb",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/worker-session.ts",
+		"bytes": 18194,
+		"sha256": "7832dadfc354a0f67dd7dc52d297d9468c7adde82222df8098ead04a16f1200c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/worker-opened-schemas.ts",
+		"bytes": 3488,
+		"sha256": "79a7ea5ec98b17ebd88db4ba67a708cbb298cf7bff624871c7aa703bab7dad23",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/worker.ts",
+		"bytes": 1811,
+		"sha256": "cfac7ac920ec4bfd2e603801f5b9c07cddbbebc24c9523007c76cd28f4a3d292",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/worker-document/worker-opened-tasks.ts",
+		"bytes": 1982,
+		"sha256": "958381c0c0ae05ff96459cf613db730781006bd484a6fe3c98ca30acb29b2077",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/history.ts",
+		"bytes": 13412,
+		"sha256": "d8f236077a4e2789e81f43ee4812b48066f7152a7733bd8e74340316ef27f9f8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/comments.css",
+		"bytes": 1869,
+		"sha256": "6159e493ac0f877ad9b7d4b4e09c92eab828a0e96cec886ed25a7fb771fb9769",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/comments.ts",
+		"bytes": 2845,
+		"sha256": "dcde9d1644c98cf88c54b2d7018b43c87ccbaec6628826b8f732a511ef0001af",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/account-email.ts",
+		"bytes": 11945,
+		"sha256": "5c73150e53e5beecf163f0ba5b7f7e6bb7f209cb59bc708ee71c434dcb246b97",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/media-picker.ts",
+		"bytes": 8816,
+		"sha256": "948153daad9122753f5295ddc569a0d61c38c7b12299c322df7e5e24b4b3ab81",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/presentation.css",
+		"bytes": 9168,
+		"sha256": "236cda6deca469e7375fbc05f56e8a9571e8212e03530911b43b9536b0f8f1a0",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/attachments.css",
+		"bytes": 1245,
+		"sha256": "087e3e087193556b224aa770a63b14a80871359c33203782f2e17fa0c582e277",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/library.css",
+		"bytes": 6020,
+		"sha256": "f881df96810a862cbe4b1f6fa1c6e5ab59d80c6082261b980a1e46771a4adf8f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/theme-workbench.css",
+		"bytes": 8269,
+		"sha256": "db024c47bf9e2d77696d7b201b990df4b73de0f8bade35cb15d7ca50c1b16953",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/whiteboard.css",
+		"bytes": 3117,
+		"sha256": "c5283bb727ec21f76de5fc2b12be7a79abacd65b82fa2cc3a5a4430597efd21a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/help.ts",
+		"bytes": 3112,
+		"sha256": "31416aea64010cf6eea85e7545230f77ecd895827eec381bc71002d9997ae1f8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/toolbar.css",
+		"bytes": 1915,
+		"sha256": "ae8f3c65eada852ef39ed3477e4468ccebfe632bc7b8f8bed9bcf85691f19c6f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/account-email.css",
+		"bytes": 354,
+		"sha256": "a86eeaf12cd6d8ad454143606d262f1a277fdaeaf2ad00bada36f0f870730f1c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/line-actions.ts",
+		"bytes": 6137,
+		"sha256": "9d0367509bde4052a5f88161f871f1b003a81db7fee5f517d48972f596da44b9",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/settings-themes.css",
+		"bytes": 1834,
+		"sha256": "a021a75e327fc01054c504c5786de92f65319a17e3555d4add52a670fa1fd978",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/editor-syntax.ts",
+		"bytes": 4715,
+		"sha256": "c2a9a71aa1faf3e4ee5c2cb2421e1bd244c7d48cb159c2d466adbb4bd2b64a9f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/editor-search.ts",
+		"bytes": 697,
+		"sha256": "c21de253110f41e3f7eee6a873f5ca5e86acac2f2ff464167829999e9bba5872",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/settings-themes.ts",
+		"bytes": 12105,
+		"sha256": "97abc31acde71333b724fa649a20e19c969b831a30bfcf2e3155f1d522828b93",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/inspector.css",
+		"bytes": 3136,
+		"sha256": "dbdee7a4fb0dfc6b7d953c82d026c372d132e1de4d87dbe4360dd805476ab3f1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/editor.ts",
+		"bytes": 85930,
+		"sha256": "ba304aebd2cc9ab9e326f1943e7b9a2645187bed0494f895d9ae22bab9945cb2",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/editor.css",
+		"bytes": 7150,
+		"sha256": "6045ebd25fc3980b933ecdb8664e8b96563c3a5fc0f577d9b47465e7039f28e8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/progress.ts",
+		"bytes": 909,
+		"sha256": "786143309792401ba04e93dbbb8413be1545f6609d1e626160324cb1b52ba223",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/media-picker.css",
+		"bytes": 1656,
+		"sha256": "e42c451b4f872916398c6f73cc73393d9fa57b2af2e80108679c51fd034b0806",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/invitations.ts",
+		"bytes": 8338,
+		"sha256": "432b4d2a6991ca84569d49e7f2dd0fd8e9308cf0c4101a4a5a71e5cbfa757b3c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/palette.css",
+		"bytes": 1362,
+		"sha256": "dd0d21e5bdf43b621de5cdf09d40b069d723974635cbe1635117427babfa60b7",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/find.ts",
+		"bytes": 17693,
+		"sha256": "be2b6d87c196e45471929887be3afa660008ffbe85c8256ae36f6ad4b1cd8aea",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/account-agents.css",
+		"bytes": 2457,
+		"sha256": "7a72055912f86296a3434ac5071c523fa4db3bb49bf8bbe760334265faba8d18",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/theme-picker.ts",
+		"bytes": 5268,
+		"sha256": "ae7cf44877174b51e52020c763c90dfe622cc4b143f871a8977cf1ef8a06cf40",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/toast.ts",
+		"bytes": 11659,
+		"sha256": "fe0ab36102507935c9ada70dccea4920895089bf4f63d1203db41b7d7299c098",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/document-renderer.ts",
+		"bytes": 9358,
+		"sha256": "f393dd2ac0f93acd05acc2bf79ce1ed1f78184cb2db3faffe2dbfdf80d83edfd",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/invitation-screen.css",
+		"bytes": 1164,
+		"sha256": "2c0fb1fc1dbd006e904a4376774d8cd2c35f91e8d9521c9182e2f30face6f10d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/access.css",
+		"bytes": 452,
+		"sha256": "ad8db7213311b9b0d2353d5b1a03af6dd30307565ce63315d83c98fcb079c878",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/preview.css",
+		"bytes": 4499,
+		"sha256": "acf3b83b828a11cacb8f122589c92276b8d98c78f74aeb968ab7b1ce6767b839",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/update-banner.css",
+		"bytes": 718,
+		"sha256": "60a67e56982075dd3cdf19a38c4265c0d35a2c432b6a6f3a195c7ce9b551ef9f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/progress.css",
+		"bytes": 454,
+		"sha256": "68ea02d7d7abba085420f76f29771cf530824367c93432cc9e88c7129e32428a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/print.ts",
+		"bytes": 2355,
+		"sha256": "51df1cf38eb94af12ffa07006b3347173e509949add13c3e0f63d724150564fa",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/settings-page.css",
+		"bytes": 16143,
+		"sha256": "3b30a03f8cf1c389a0713eb846337b435b4809dbac7a155df5709ef17b62b1d4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/sync-recovery.ts",
+		"bytes": 2034,
+		"sha256": "d2c6e277fda83d1b34a149f7777af54dcb2f1346993e6e3f612750739933d963",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/app.css",
+		"bytes": 5873,
+		"sha256": "071c9da5f8d9a2260d7c87f8407ac8945bed080b30587c1dec47fb2f789effda",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/site.ts",
+		"bytes": 5329,
+		"sha256": "0092c50cd55fcb9d1b9abcdd7e1e8fc21b23b8be4d362524adf64292f424d620",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/toolbar.ts",
+		"bytes": 1263,
+		"sha256": "699fb7a78405709028cb6ad22408b4a5a1417448186206ed375b1415e5497133",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/menu.ts",
+		"bytes": 15116,
+		"sha256": "234ef0f03f066c2075a884c9cc30a3234cc5ce126c0b94d43e5030ad5f849452",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/presentation.ts",
+		"bytes": 29867,
+		"sha256": "2b0e2afbb4011e5d420f550ff4a2e66a876340515fe2f372badf1914e6775054",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/attachments.ts",
+		"bytes": 3218,
+		"sha256": "83e3fe250cabb2c81153c43d05a726f2a12166c9f78100449ade650c489d47e2",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/space-avatar.ts",
+		"bytes": 2659,
+		"sha256": "c5287fc8acfca8fcc4fe2e3a0994f367df94a0e5433c3d967d18ff383b2a99a4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/invitation-screen.ts",
+		"bytes": 5289,
+		"sha256": "a45338adc8cbd802a9d3b07560d6a76cd275ac3148471a78d4c3f26f2fe0fd2f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/palette.ts",
+		"bytes": 4362,
+		"sha256": "b580bcaeff9c7543fb1d1a4b49df96e5dcf75bdaa60aef6e8f59449d83456899",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/theme-workbench.ts",
+		"bytes": 28051,
+		"sha256": "55210204186d128bf22f7550469b2ddffb23308701b068a0e533e9bf39ed6c9c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/update-banner.ts",
+		"bytes": 1429,
+		"sha256": "9e1071eebfd2b903229d28ae6fa6841b3d23b2f3805d5d94835bc6aecf865995",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/teleprompter.css",
+		"bytes": 3350,
+		"sha256": "7a88da5f2ed0cfefc0f1570e97b09f7de48353fcaadc140b39b693721c0a557a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/document-renderer.css",
+		"bytes": 8591,
+		"sha256": "35326a48af251353e24c336839d1b54cd87d040d9c87e491c651077470641404",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/context-menu.css",
+		"bytes": 1809,
+		"sha256": "f3fdaa409ca5d37ab54e182568162b5fe58414bd2f44b380e9971b6c984e5d37",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/screen-icons.ts",
+		"bytes": 1694,
+		"sha256": "e9dbb46d304f8dbb636cc1c736d5af100707c9f53b2f407fa76e8b2ccf317aa5",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/boot.css",
+		"bytes": 114,
+		"sha256": "6bf2359899a32144eda9f641e4cba887b1bfbf541cc1373056abb42608231f68",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/space-avatar.css",
+		"bytes": 1027,
+		"sha256": "bb0712908235c93490c007e0db716a5fac84d8b0d657278e376fc5d99968800c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/access.ts",
+		"bytes": 1992,
+		"sha256": "d7a4249a15891fc993371ed052d8dbd3b46f65edde142cd407ffda8102096f05",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/workspace-settings.ts",
+		"bytes": 27263,
+		"sha256": "a322346c34aca454fcadee6a868d55eddf4c4e876a3430c44eb93bb9b21b8114",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/toast.css",
+		"bytes": 6201,
+		"sha256": "c95ce3c964c768576228bdf4b9cb19205a438afb129cbabb3facb0865d4c991f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/teleprompter.ts",
+		"bytes": 4892,
+		"sha256": "37a6154004169729e45c5e850a45a0d856ab304d1a971b9da6f6590e4b8d40b6",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/boot.ts",
+		"bytes": 169,
+		"sha256": "3cf1a79c2cc9ff83f4a8aea781542d0b6a9f9b0327158119ca73e0a00cbf33cf",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/site.css",
+		"bytes": 3591,
+		"sha256": "53145505c9d6c743521a9d47baaf364bbb1e017d4336aa9309e18b1fc93821cc",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/dialog.ts",
+		"bytes": 6839,
+		"sha256": "0fe7f75f16ff04a5045bfcfbe295c2726c8eb1903acaa8b8b0414ea20b13d194",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/print.css",
+		"bytes": 509,
+		"sha256": "74e543557a4f695e082ad2f11ca2ffdab853eb24636fc51875186659d378c6d5",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/sync-recovery.css",
+		"bytes": 806,
+		"sha256": "c58a12745051fd0c38d21cc48dd02139bd62371576f1da156a93d5dfc79c2e9a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/statusbar.css",
+		"bytes": 1574,
+		"sha256": "9fc1546795055202e89680bd373f25e9b38e3b07cb5fb0a84e1ec9652e33129b",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/settings-page.ts",
+		"bytes": 41810,
+		"sha256": "c936065e223417eadea2cb91a81c08f9456f15ea4cf717f964b655a2c7f52bc9",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/find.css",
+		"bytes": 2424,
+		"sha256": "16333226ea304b0626968c954638c2257c013224c0d18cb30274618ac635807e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/history.css",
+		"bytes": 3869,
+		"sha256": "2e5542143e6022a18e3b511609d3e88b4a827c6d347a0d63593dcf915a528336",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/library.ts",
+		"bytes": 10325,
+		"sha256": "222fb5bb05a4b2c2b14e23084a5e5b2e765b5fdb33c474cabfab933221c99d82",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/whiteboard.ts",
+		"bytes": 26617,
+		"sha256": "fb192fc8acc8621783621f18fd1ffa85bb498959a77bfa4947e8aceffacf33fc",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/line-actions.css",
+		"bytes": 1656,
+		"sha256": "2b57ed1a3a2041e96a008388f68156ca10daf0d476fa77df25a91381fc5aa28f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/theme-picker.css",
+		"bytes": 108,
+		"sha256": "34414d5eacc3f81ac331630b1994deea8820ec0844904a3dd01def49fe5f5dbf",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/dialog.css",
+		"bytes": 4461,
+		"sha256": "b22e6f67951980dac4ed02b15016f84854c6d63cba77c0968a1dd15948a50ec4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/invitations.css",
+		"bytes": 1202,
+		"sha256": "9d53235642ad4baea6c5050f0bc2d4930a20d76938598e8fe2ca0abae188fb8d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/menu.css",
+		"bytes": 4590,
+		"sha256": "340ba82e92724acd86bcbf44ddcab7cb3a4f737dd7adc476bea5860aca39c6a4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/context-menu.ts",
+		"bytes": 5541,
+		"sha256": "3af3ad027467b1065e63663fb5bcfb24754be5470b512b93f23437a54eb15429",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/help.css",
+		"bytes": 304,
+		"sha256": "409e2e8bae97db051da4c81335b0499735f052f046028cde51b335c5f3ba9651",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/account-agents.ts",
+		"bytes": 11635,
+		"sha256": "9c38e11f5dc06dfc880f282ffdac5cda96c41d96fa459ae6e7e7298ab2073314",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/statusbar.ts",
+		"bytes": 5576,
+		"sha256": "1d4c80f7708f7a5bea8779e5fe396c9992c181ba11e9c5800884beb9b34e5468",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/preview.ts",
+		"bytes": 12606,
+		"sha256": "7fff8f896b01a801baaaa8367bf66dfe651ae6d955d12d7ff61f7a90a2a60cc7",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/editor-viewport.css",
+		"bytes": 433,
+		"sha256": "91c9cfa195dd9b247ea06ef37b226da08f2139c08a6c25e6516d30a7f4cd73f6",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/src/client/components/editor-overlay.ts",
+		"bytes": 9594,
+		"sha256": "6a457d3985f9a2562b21de4439490bbb9e6c83f711db73bea69490d2e711f4bf",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/platform/web-crypto.ts",
+		"bytes": 792,
+		"sha256": "0048a562207d7ea70d9ad6f91806600b73c4d02796e8cde346e8e2a16f84c3c4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/platform/errors.ts",
+		"bytes": 1370,
+		"sha256": "d2912da2a0247812a8132b695f86f8ead5406522237369cbcc966c3c7c25b74d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/platform/background-work.ts",
+		"bytes": 1624,
+		"sha256": "db2845852c680feca095209d00b263111deea8f7526651557d340e063d022151",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/platform/transfer-budget.ts",
+		"bytes": 230,
+		"sha256": "c5e29043cde7759e6ef1d16f3f01d12a0efe1e44f33848ecd6c8a6a354d91ad3",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/platform/http.ts",
+		"bytes": 941,
+		"sha256": "f304a98c29d47c4f2c56e6db00d543172cab5d61f27d1442b3ce82de15910191",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/platform/browser-lock.ts",
+		"bytes": 555,
+		"sha256": "930dac9a0aa0ba11a40e8a29f09a35cc30c98d4a13da56a7be4ab0c50763eb57",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/platform/signatures.ts",
+		"bytes": 4389,
+		"sha256": "9c5b7d817ce491dd7a445c2b965684f912b39e82aa619679b1e5b083c007b1dc",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/platform/cipher.ts",
+		"bytes": 3449,
+		"sha256": "039814795bb5ce71c80c724ad6f3d38850b7fa1110825b427f04e74895e59218",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/platform/sqlite.ts",
+		"bytes": 4710,
+		"sha256": "b87f310b420e565e2ae6bb479893575d801a94836877e2486c34aa90620e5a03",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/platform/sqlite-journal.ts",
+		"bytes": 8165,
+		"sha256": "c3a4ebd8245a7a33d2b0740f6485fd4446e99a7d3dfef7ee47608041347c69d5",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/platform/document-lifecycle.ts",
+		"bytes": 461,
+		"sha256": "ec8dda72738a80505652e7126d95c9ae59fac08a879c1835a785fb627e932a1e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/platform/http-server.ts",
+		"bytes": 877,
+		"sha256": "5182a3c9d3aa47e1ad232d93f8e591ed2d22c942139aede4849379ae093871b2",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/platform/indexeddb-journal.ts",
+		"bytes": 18575,
+		"sha256": "4688e51f4278fc4884c6b6ec38a0381b453650849cdb3462cb01199dd4808e59",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/platform/tasks.ts",
+		"bytes": 1619,
+		"sha256": "dc990e3dfb6e38e693b333784f46ce20ec15902d18cd19d4d5a6cb1bdfe08aaa",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/platform/document-journal.ts",
+		"bytes": 1004,
+		"sha256": "2670068adaa1faaf08ee1a6e9f84ed875e6eb63853ae993b037d43a3e5bb7a2f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/platform/effects.ts",
+		"bytes": 1701,
+		"sha256": "f2e2150de87a67e73eb36f57941c10f2c68e35d16673d59cf3a9c43742a772de",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/oauth.ts",
+		"bytes": 9410,
+		"sha256": "e598d6a4eda39eaae32e9c443e15d8024d5b57dc4618bf80f99fd07493084783",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/agent-database.ts",
+		"bytes": 4877,
+		"sha256": "236252b2f32eed8b25ce0cd2f1e9942be91ec8a59f5e4359f3dfb2be89cc9acc",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/static-files.ts",
+		"bytes": 1197,
+		"sha256": "7f2558bfea485089ea630cf31c6cb6592355c3193791e7e3ee22933417b8f9c9",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/email-authentication.ts",
+		"bytes": 13555,
+		"sha256": "7a71132ef99f75fd327a14d54ebb54f6228a542b86565f66ea9bb45d41794419",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/mcp-server.ts",
+		"bytes": 4018,
+		"sha256": "9dbab4edc8912f2c886a457858a360e7523082ea7aa591304287833b7f1db844",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/oauth-database.ts",
+		"bytes": 6791,
+		"sha256": "cd9c212e171bab74ed07fc6ede18b123f7fb2eed312cdcadb8d4f4ac2cc18c1a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/account-documents.ts",
+		"bytes": 11029,
+		"sha256": "02fb44c78e60e93d91a1c4eeeeb00f7056a2fcbff5f0586ef55800eff312f7b2",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/email-api.ts",
+		"bytes": 5118,
+		"sha256": "7c740ba0533fd6fd0ce7707da8f97c2f3b8fc2bb5fa51eee97e74976e2dd18b6",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/presentation-presence.ts",
+		"bytes": 671,
+		"sha256": "e4378f2b75cd1f905bedef90fae78c160ecc1a4a9b7e5c16e798552bc1b5dec6",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/settings.ts",
+		"bytes": 3110,
+		"sha256": "2fd4e329c7668b6dbbddf09a8a3abf79cc7171bfb9a775b8d2edda65a30daa4e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/request-origin.ts",
+		"bytes": 1331,
+		"sha256": "9cf0554ccf2603e4d14e2495c7864610f8769fc1ca5265c97230988e8a26c033",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/input.ts",
+		"bytes": 857,
+		"sha256": "c499a774cfb0473eb266c74a55743464cc981619751b0725aab23712ddd13cfb",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/email-delivery.ts",
+		"bytes": 3809,
+		"sha256": "28d8db246644f9b2820a4531ac9e04629adaeef0a00056e17487e3006809e154",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/failures.ts",
+		"bytes": 861,
+		"sha256": "9a741e88a2ab6bf45b824ae039e036c4ad1906ce35daa476845d76b674602d73",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/document-live.ts",
+		"bytes": 21006,
+		"sha256": "7489502f3d1fab8cdb926d3e339da074332e374aca54002d331dac13d446e4cb",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/oauth-maintenance.ts",
+		"bytes": 499,
+		"sha256": "76c8fcbd96aa0c2a84e2e38287b94508907f434af81459665773b0285f11c697",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/application.ts",
+		"bytes": 6096,
+		"sha256": "616e9dc319fb108e6cefc68230c821ebaf244fe6afd67f7d16289d2d9211f179",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/mcp-tools.ts",
+		"bytes": 7465,
+		"sha256": "a5db2872c06115165f8c1696fa85be842d3978e281ae0c16ccdf93354c8386fd",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/workspace-projection.ts",
+		"bytes": 29579,
+		"sha256": "42becef133cd1e78952d233d04f0749b507a69bef664a94afe87b0ca49867ad7",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/agent-credentials.ts",
+		"bytes": 7375,
+		"sha256": "54153d8c0413ccd3cdd730ee82d4b79d5ef509ddb549a06f7e834f08e159bb99",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/agent-documents.ts",
+		"bytes": 3331,
+		"sha256": "69844a86930642b5064d963aaf97021049da28f8eff3957c83f28762f05a6583",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/client-metadata.ts",
+		"bytes": 4868,
+		"sha256": "1d86773e3c71e2115a1fc6d822003e25e183a3800ab6b9d3895c9d09e7ca004d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/document-api.ts",
+		"bytes": 8621,
+		"sha256": "063a9f94d4e8aad5a0d9bc44a974f5cb6362c17cc6cabb8f396c171de710ff42",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/agent-store.ts",
+		"bytes": 3540,
+		"sha256": "6a5a2401a94dd868cf9441f8ebc924578cf2f562b3bdfddb36639f5d73b03f3e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/index.ts",
+		"bytes": 4961,
+		"sha256": "8cd4387aa1e1142ecd438d8a5d96672234623be6cb899b57103200f5f2f3d285",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/oauth-grants.ts",
+		"bytes": 2942,
+		"sha256": "14a1d6ac594a9c5467bb4696bff6f279718f200fd457956115eb3f2c70a6280d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/account-api.ts",
+		"bytes": 8952,
+		"sha256": "a7e27a0a873ce6242c2b8dd649cb764e69d60418642bd56d94658a260ab8ddd8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/document-store.ts",
+		"bytes": 93261,
+		"sha256": "5641817768ca96451e576aaea210d21f7e5b1cc2ad26a2f2308998906215f8ab",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/sessions.ts",
+		"bytes": 10793,
+		"sha256": "f98853ee071235d51f2595afbaf4cc9bd48ffd3f7427bcc6e58038a19a6e954d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/server/account-authentication.ts",
+		"bytes": 2357,
+		"sha256": "8e5bd40addf212d9b53f28b4be675b40e333d9fcda6d42f2472f7db497b2c2d4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/signing-keys.ts",
+		"bytes": 1097,
+		"sha256": "48ffea7ac5a3b2f7670de781700560d058ce102fca6a120889f684b4a4ef4b90",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/history.ts",
+		"bytes": 1340,
+		"sha256": "81b1b8b0bde0051752b932c45e7dbf22c44e483971be06781a6f92b86eb62298",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/routes.ts",
+		"bytes": 7121,
+		"sha256": "9362fb6790bad20299a9446cfddce97dc7379f8213ced8abcd77b099fd01fbcf",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-observability.ts",
+		"bytes": 5474,
+		"sha256": "89217c6eb62fa8a20cb5cf6c7209a3c67c7de2e875b1a0c10486147cc65f6b0b",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/legacy-drawing.ts",
+		"bytes": 5399,
+		"sha256": "e2011117ae815a91f129615ed2f708870d15d7117657c4caa2d996031494c30e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-blobs.ts",
+		"bytes": 4365,
+		"sha256": "f4d3a6c308fe148f8a1bcc175338ccf7b3ab1dd0798161f9e76b1e22c388e8f6",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-metadata.ts",
+		"bytes": 5341,
+		"sha256": "4c73710d3968826e25fe02f3f6f4c3c16f8b035a770df31abee4d0517a64302d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/email-authentication.ts",
+		"bytes": 2608,
+		"sha256": "e8c0b5c3bdb56a26b4a07e1ff009f882e676f07c09dac692746411b06425f2b5",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-recovery.ts",
+		"bytes": 5252,
+		"sha256": "acfe73ac1320a540ff5435075ca21954b8b4c979a39e11f288b3b53521e6f023",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/folders.ts",
+		"bytes": 2307,
+		"sha256": "149cd58b4e01e90a8e30f56aa4ca793c141afdd5a8b6eebb26c68dd5de42e7ff",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/projection.ts",
+		"bytes": 16073,
+		"sha256": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/typing.ts",
+		"bytes": 6518,
+		"sha256": "2fad9b021fe326ac0508f2e69f7c2331fb6c9ab305b4062296101f6592f129f1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-history.ts",
+		"bytes": 3886,
+		"sha256": "05987512a32ca69f2cb1517896778402659d2177827520a21a5048f56cf8bbda",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/workspace.ts",
+		"bytes": 5220,
+		"sha256": "d7fee4c99c2be496a6ec663c41e0a95c5df58d7cf4fa4a0e6d0eb3ddf245a8c3",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-transport.ts",
+		"bytes": 4039,
+		"sha256": "365a17c145df8e3c14c0dc313396dfee148da437ae407686068f54ff118ececd",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/preference-state.ts",
+		"bytes": 3769,
+		"sha256": "b830e0d0f74ea5e4820680f0c8240acd7f9a829b3183b37e8b0c67a3e96216b8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/startup-diagnostics.ts",
+		"bytes": 1872,
+		"sha256": "d04c35e509190bcb1f06ca62e9427263c6b920a9a92882a9efabbcc849a5a35c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/selection.ts",
+		"bytes": 5965,
+		"sha256": "26e01ff547868e70c5bb58a4c3284064027adf79d9395d7db9e2b71dd534b0b8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/syntax.ts",
+		"bytes": 3697,
+		"sha256": "0224b272c94e12a00c34e9b26309d1e092bed1d4469eb4a7ea88c90c191201c3",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/text-splices.ts",
+		"bytes": 3308,
+		"sha256": "d7e3d091d195da1a4f3f795f29b38a239eeabcbd194ca274dceeee33bef9f808",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/invitations.ts",
+		"bytes": 3233,
+		"sha256": "9ea953fea7872ad55602576b2e94159cbef1917a57595454f5371a3b680a5238",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-stats.ts",
+		"bytes": 5713,
+		"sha256": "35213a9ffabefa7a5b3ea93430d9742346169e3d859c4f51e27a01b64c83bc9c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/find.ts",
+		"bytes": 532,
+		"sha256": "e02733cdf079f36d1485f0d22f525aed63f21b9832a0db95ecf91f514a9701f4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/text-dependencies.ts",
+		"bytes": 5145,
+		"sha256": "2bd205095e5a81b875d898d1b0db0f9419114b2eaab05f6a5dc17c9e085a7abb",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/atom-sequence.ts",
+		"bytes": 3971,
+		"sha256": "94f6fb6946fae3ac58cf21f5587c61629b9e87a1e23374fe760a54675f0aaf46",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/authentication.ts",
+		"bytes": 2909,
+		"sha256": "87cc19ebd548653174613d1629642ed4e5ed24910686f353c2eaeeea7e526d0d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/markdown.ts",
+		"bytes": 18727,
+		"sha256": "ffa8c2fb770a349740bbf62f72b8259e28398b3a56bfe190e401abe4149cd3d1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/authoring.ts",
+		"bytes": 8118,
+		"sha256": "dea127a9dbd4388f98f10dc83a3d8424a48a4be8532e5ec0d95059ec38a36476",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/portable.ts",
+		"bytes": 7090,
+		"sha256": "d74d51d15fd13a91e54edf0b0bbe80f9eaab3d9068c3b35506dc463403dc8b7e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/changelog.ts",
+		"bytes": 1427,
+		"sha256": "b2e11fc316ab207cbc7fd33234e354344e33f305729ccf6dffc34bcbafadfdc5",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-errors.ts",
+		"bytes": 2738,
+		"sha256": "ba9b7d8c6ccfc7eba146e7e3577cf155afe3f2f4b3e144a8bd90a0fdc9cb8850",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-live.ts",
+		"bytes": 3025,
+		"sha256": "9f405232699f9374c96902671ef53dccdd85abb98ea6d5b001d61f7c171b0857",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/completions.ts",
+		"bytes": 4073,
+		"sha256": "c9ece16bc4a32b7aabbc1979230b53ab90f406a7cdc61bb43e6dbd2df710d84e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/zip.ts",
+		"bytes": 5278,
+		"sha256": "b2c0f55ba643bfae4db073450de82d19b8a553dcec3ad97d4c0e8aab5365c281",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/presentation.ts",
+		"bytes": 4506,
+		"sha256": "97a2b7f4b36af2aeaae0cf82b8daaab8e5a60194d21f3d2f0f754a2f81d47cda",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-undo.ts",
+		"bytes": 4022,
+		"sha256": "59a1c5fe16f64deb7863e83579abcd1f7412ac468f660f479011ae0debfd3c12",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/presentation-laser.ts",
+		"bytes": 4204,
+		"sha256": "df90269d3a4fa42bc264e79ff921009c8c194c63dd043a78d9ce408fef6ef4d7",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/model.ts",
+		"bytes": 13342,
+		"sha256": "70f8ce900a37b8a9bc3fab851528755367eba0eddac527610e4d88a53039cac8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-causality.ts",
+		"bytes": 1067,
+		"sha256": "0b2b4d16de35139abd1e4638df70a0df749020f1699c507756ede88620a31ce0",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/lines.ts",
+		"bytes": 3843,
+		"sha256": "27994086618fea3c92cd26b31d2e57b9a443d4ddee688db93c689d1821c7ed45",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/collection-copy.ts",
+		"bytes": 879,
+		"sha256": "9d6d41a166bdb8066e34cfc60d9e0f60e82b4cc785fd2eb2e836fc3d3e01a282",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-archive.ts",
+		"bytes": 33894,
+		"sha256": "b81f18261149871d9aff6e97d5399bcb45a7333533d2e15fac25a2c66233033c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/theme-archive.ts",
+		"bytes": 3909,
+		"sha256": "29bd3f921caa14fe4d8beace5e81c01eb733f085bfc7f08efa478b9c35c5402b",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/frontmatter-merge.ts",
+		"bytes": 18931,
+		"sha256": "9b1d3afe8706817b8445736880166cc3b292911e2e61f7af669ab6d57fbd44f8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/preferences.ts",
+		"bytes": 6627,
+		"sha256": "91d7ed9248cf7611bc89e09ec6fd4696be82c803b14afc40b07e6341654ddcd9",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-failures.ts",
+		"bytes": 1980,
+		"sha256": "74dc87a4fed31aa0b433e32ed44480c4ca82dfdf6a71cb1532036196bc03ac95",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/html.ts",
+		"bytes": 736,
+		"sha256": "19efbf35675500cd6d9a58d0e5b1ed108c7b8f2c0bb060d05924807e0f31c714",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-session.ts",
+		"bytes": 67379,
+		"sha256": "fdbc79466a33698c583c33e4d9d10410bfccaecd33bc324080da491a248c6ef8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/documents.ts",
+		"bytes": 13328,
+		"sha256": "dcbbb8587d0d2c7a9769af38e6aae75a98649304c942cf3f8112f4cbdaf9e4a5",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-actions.ts",
+		"bytes": 22540,
+		"sha256": "2cb868e892987a8b0e210fdee585bf293bc0fa6bbcc41dd2b9c3d02211b1ac23",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/crdt.ts",
+		"bytes": 71062,
+		"sha256": "fa018ceddb23a671cc2364e324c11f06a184058e2c58a959c769b9bc39586833",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-dependencies.ts",
+		"bytes": 4390,
+		"sha256": "300ffed9bd3e8c91d19c63d81650128a42dfa4af70545877913f7c7a93b986bf",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/save-status.ts",
+		"bytes": 2106,
+		"sha256": "76ee3f8cc65eaa32c7aa3e80cb352d24dba007197f18729d6c1d3844b025db58",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/theme-source.ts",
+		"bytes": 2622,
+		"sha256": "9dfc43a26e83cac2eda9dd5646e5deee0e482135d6b0a3f77452474e121e307a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-api.ts",
+		"bytes": 11685,
+		"sha256": "2a9a2e216372f650fe487dc5546a2d97b2cd6ed8820b22980fd91421585e7a04",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/text-merge.ts",
+		"bytes": 1744,
+		"sha256": "b5839a536fee7cd25ffc11027d76249d1b019fd989cc311ed4973b3f22f80845",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/whiteboard.ts",
+		"bytes": 15156,
+		"sha256": "40e16ed21ade63d7618063dac6bf92302c489609e0ca2851c42d2b97ac21e4bd",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/account-api.ts",
+		"bytes": 2187,
+		"sha256": "9cdd79a34e33510078a3e5d5591810c187820bde0d6ca504f358f5f53cd3f712",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/preview-text.ts",
+		"bytes": 3906,
+		"sha256": "9cbeaffd771be3c9e20bf844bb02e884d189c5bef89000090a9155724e2c116e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/checkpoint.ts",
+		"bytes": 21439,
+		"sha256": "4eda90d9ea075d2f25f25440012b6bf1e3aeaee917f6ca7ce7949524d27cbe79",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/document-diagnostics.ts",
+		"bytes": 1376,
+		"sha256": "1db9c8773f984d95fe878c3df5fe00640d43a6742761500f3cd15d6c709cc5a4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/text-admission.ts",
+		"bytes": 2822,
+		"sha256": "9f8a1a1e5bcf3d154daddf94429a9b24a65df5131fa22373ee76656f18ccf314",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/base64.ts",
+		"bytes": 741,
+		"sha256": "49d4d2e44869391d75698a439aaafd03b54899b2ca0168d1339dee23198b3f21",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/text-visibility.ts",
+		"bytes": 16932,
+		"sha256": "e9a76f46b757a8fa0aab4134492f43d76a497d1f062cacd052e02fca086947df",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/presentation-follow.ts",
+		"bytes": 2750,
+		"sha256": "3503f2f08d745de6608b465ae5b10a719cb1756eb0d72ad13c77c61072067f0c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/theme-library.ts",
+		"bytes": 3379,
+		"sha256": "24250d33f1c6c9f4a5075b407c006f21fcc50652ef7dc7415b5c2b2a9414effb",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/text-index.ts",
+		"bytes": 11559,
+		"sha256": "79e7ea2f341bd5aa93462f8b93235ca10a36010000f66f397ef4c5fa7221a8e8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/agent-access.ts",
+		"bytes": 809,
+		"sha256": "6cf01d3799a0776448f69dcc0b190c62079c4f5da272e1d8e0988bc5031edb4f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/themes.ts",
+		"bytes": 2622,
+		"sha256": "bacceb6452bbabdbc479d70eae2784abcf778576ac536125a7d8473b62241845",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/shared/portable-links.ts",
+		"bytes": 1405,
+		"sha256": "7bcc7c538cea262a5240b829ac07af8d6b8071ccb19b3a1cfbebd9ae87af2400",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/cli/main.ts",
+		"bytes": 14624,
+		"sha256": "0e264282b89c76574a620988473da41d92b0090d8963f0da44eee484a40a5002",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/cli/api-documents.ts",
+		"bytes": 5457,
+		"sha256": "fb9726458a4ab1b549bf13085dd341a64040f3bce4360dbd7d33bbde751b0ab7",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/cli/mcp.ts",
+		"bytes": 14646,
+		"sha256": "683f03ac063cb2f4f3063e1e468dae28f5d799e314f97fdbdcb2965fa3a763c1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/cli/platform.ts",
+		"bytes": 5119,
+		"sha256": "2cda4a262df3b412542f65570cff3ac0b00f61daab9b010efc25c0aeb079db51",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/cli/application.ts",
+		"bytes": 347,
+		"sha256": "b79225d4146fd42aa01c241ce4a81fb6850bb7ed531a16b2489b5adf15aafbf3",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/cli/runtime.ts",
+		"bytes": 1087,
+		"sha256": "e01e329fb05b9180517c93691fe4603c3b54ebaa4490b0eb5f3334a481fa5b66",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/cli/document-platform.ts",
+		"bytes": 1542,
+		"sha256": "d7912dcf3db12d353941889ef343111b080d0646db1f31ba7341ef14f6d55510",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/cli/documents.ts",
+		"bytes": 9489,
+		"sha256": "71bfebf24c9f3731a395817c9d1468da8cfc904448882bd8d36fe539f39a2e94",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/cli/profile.ts",
+		"bytes": 2615,
+		"sha256": "5358e6bc59da97118956932f92d939c54d9b8f8c5b6fe850a4bfeafabf5ee587",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-assets.ts",
+		"bytes": 9898,
+		"sha256": "a1add52a20bc0e9af4d6a2b742be9ab6079e380df70aae9c52d0213819dbf789",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/videos.ts",
+		"bytes": 5739,
+		"sha256": "aac2e58034b8e19f35ad41202f24c19543dd48ed2af3da51ef8177ce640e5144",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/dom.ts",
+		"bytes": 1056,
+		"sha256": "35d4543b49e2c9baeeaf9243a76ef50a513655ab5b5420a7e4b107a3a2863970",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/local-media.ts",
+		"bytes": 2634,
+		"sha256": "9f40f6aedb5b44e14ead7ccb03e3701becb6a73989f6ab4a4e456a4a8169554a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/browser-account.ts",
+		"bytes": 9568,
+		"sha256": "3eba2b8d4f16ea2ad310c338e1c2a0ecc6b2c783a95beff03fd4a438b016fc8f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-blobs.ts",
+		"bytes": 7276,
+		"sha256": "b9c85f97534864e9b30b0953cd2ea88b56ccbe2cbb54cb212011ea10f650250c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/paste.ts",
+		"bytes": 3313,
+		"sha256": "f920cdd6e45aa62fa27196d3c2b514cdb753fce18057402f3a8c5ec43cd7958a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/local-directories.ts",
+		"bytes": 25092,
+		"sha256": "c74d01bc020c35df9f7a494c56485cfc7b36cfb321395921fabaf0b3e81e7985",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-recovery.ts",
+		"bytes": 67,
+		"sha256": "343bc665df6d94c6099039d94eed57e0306be4150565a9df3d7167d197d7005f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-properties.ts",
+		"bytes": 2410,
+		"sha256": "89e630a3fb1fbc6b554dcef53cb95444b43a2cd1a90f791009fe779df1b8a265",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-history.ts",
+		"bytes": 3054,
+		"sha256": "4f3ad830de162cf5b198a8b1704d18aa49559feb410087b592b318587323c9f6",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/router.ts",
+		"bytes": 2124,
+		"sha256": "25107886e7d8240cc5b8d1d2344e0d2142ac4e24abe67a6b6a6b505d277863b1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-transport.ts",
+		"bytes": 88,
+		"sha256": "b2d5248344185abdf5d6006940532e566fd02aeafe1071fbdd56a824644e13e8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/scheduler.ts",
+		"bytes": 1406,
+		"sha256": "70912b36f407786b1ede73ce77f6728e2dbcea24d467c8158c6454048838c647",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-worker-rpc.ts",
+		"bytes": 913,
+		"sha256": "c628996af989c204cd1c2039ed91b1f1eef2400a89febadf02f57bef8e690125",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/background-work.ts",
+		"bytes": 1289,
+		"sha256": "98836aefcd928ae2324d3682e55e097495a4768f761821a299b58c06585505e2",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/invitations.ts",
+		"bytes": 2214,
+		"sha256": "3974453f0fbd24d13e44244a5089c242cfa1e8a85b51bae307e8e21e8a0d5f50",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/browser-preferences.ts",
+		"bytes": 6660,
+		"sha256": "5e249d002e5131620f9c98ace21280950739420b5453fce8ec6cfc60812b109b",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/images.ts",
+		"bytes": 1241,
+		"sha256": "e422b0e672cce1527ec1a9d6198109e63730132460c6092dbd1c79488d1b7571",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-media-view.ts",
+		"bytes": 5780,
+		"sha256": "50a0ca096babb53e4c1800306c24f80ca0f8968d6919d0249ef569e6ee6fdcc9",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/language.ts",
+		"bytes": 1692,
+		"sha256": "cacfbf9732f7b6b12edc214e072189df96cbd6bf420a8a0246dc46318208b80f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/storage.ts",
+		"bytes": 7546,
+		"sha256": "257a1ace0fdba86a2cf286a62ae678e9c888398360b67e02fa740225c23bcaeb",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/whiteboard-preview.ts",
+		"bytes": 2116,
+		"sha256": "0353fd44fd2c05d2dba2ce19c2f847f706519a451b62e41d3dd651dce8214ece",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/passive-document-cache.ts",
+		"bytes": 991,
+		"sha256": "9c50d5422654688611aa444f52d026d2e234d3027deff15a2a8b71d957c84502",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-live.ts",
+		"bytes": 13605,
+		"sha256": "f9db0143853175ed8c4e62a736d02586d4f47ed7e16bcfa118c70944142d7d5f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-archives.ts",
+		"bytes": 9307,
+		"sha256": "e7205e1968fdcae5013734e5c45507b61503ae651b9f29987f775194c41f71d6",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-app.ts",
+		"bytes": 131396,
+		"sha256": "b98b35db95acba2da9b22b56a113ac4b1eb3327cf15e44bccd3836c0b0299933",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/whiteboard-store.ts",
+		"bytes": 15496,
+		"sha256": "58402a63cb6f26dd245b5b81b2730093e9497f9c21175d68544ca0968ac23c90",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-duplicate.ts",
+		"bytes": 2270,
+		"sha256": "4928113023575712f61503d4db0e405d4a9904cde3faa11fbaf1186651927422",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-failures.ts",
+		"bytes": 44,
+		"sha256": "769c0408e6a953e9a2676459bb4249e21af23f67fdc34af8e0c0526d912e3040",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-upload.ts",
+		"bytes": 1509,
+		"sha256": "d254b4c70cf956e5b58b08712a5a234712d94c3196c0bda34f0926e164078775",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/source-textarea.ts",
+		"bytes": 10204,
+		"sha256": "21887f5aab82815b14c20d8d261b17cb5ffd53fd51f299f2f00229b7a768c0d1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/language.de.ts",
+		"bytes": 24767,
+		"sha256": "3f12201fc3b8140447ae81e54ef3f8040290f66b58b7d56455aed1cb6b2ce638",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-worker.ts",
+		"bytes": 2532,
+		"sha256": "fc7a60cd6b3c2a3395373a4063a109c12eaaf8f6d0c1f7331af43b112453bd67",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/local-documents.ts",
+		"bytes": 9806,
+		"sha256": "9648bb9d4816013c5efa1edf77888ee549d02b1fc1d7ac54c69c7ea877939b49",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-lifecycle.ts",
+		"bytes": 1227,
+		"sha256": "682b6af99f2128c2a3106112c5d56d407e4d9957b579fe484098ebbb24c7703a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-session.ts",
+		"bytes": 917,
+		"sha256": "fff6e2864cfb9ddb713e5dc0d42cfb2526a71f85b1e474f81f07f1eee99dec56",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/updates.ts",
+		"bytes": 1416,
+		"sha256": "d36822f3eb52d7ac210d30a3717b447e0e1113169da9b937f76106c28868b7af",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/icons.ts",
+		"bytes": 15040,
+		"sha256": "6f388d9189f7ca443414737e43dc3bfcafd235071d9ca7b200b74d413919c7d9",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/cancellation.ts",
+		"bytes": 745,
+		"sha256": "6e86c25833aa68777af24a2e246bacdbd33f9715efc8a91823d9885510e6b3bf",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/local-file-sync.ts",
+		"bytes": 6328,
+		"sha256": "e666e59fb33b41698bd59abdb9543d19ac35ab44d10aac80d398c094c1a1a69f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-worker-client.ts",
+		"bytes": 1957,
+		"sha256": "fdf35574c4f0bf2380ab7048e253195ac2dc584ee415593b6dda42dba8607495",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/toast-stack.ts",
+		"bytes": 3194,
+		"sha256": "0cc37459a10538aeb7956e7da5fe50bafcdb650bd9f615e2a43c775b0fa4bcba",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/shortcuts.ts",
+		"bytes": 4574,
+		"sha256": "78e1ac49e85f4f4a457385cf537335438d3c9f79a2644abd32e9d3e3f61b4bb1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/browser-library.ts",
+		"bytes": 28037,
+		"sha256": "a28a4b10c1323773845204e4ce5819a50ef498a7c0948439647de1c4a7cf63b7",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-discussion.ts",
+		"bytes": 6083,
+		"sha256": "22594439a66bf7c87fd25e43d8e1991f2ef3c924a2e478f8b7a203f4c0e8ad97",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/video-duration.ts",
+		"bytes": 1086,
+		"sha256": "a6c6daf3e0dfd1c0c4fdd3942c9d43053db864317b63460b7527b2e455ab02be",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-worker-stats.ts",
+		"bytes": 4102,
+		"sha256": "a342d3fc091295b6b641266d94e6682e5a993042e891041f4a31b0da150dc274",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/theme-library.ts",
+		"bytes": 7788,
+		"sha256": "00cee0f53018ae410ac86f6a7a21ccd13e543bf8f623fe14e773614edb92017a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/dialog-session.ts",
+		"bytes": 1662,
+		"sha256": "10fb6b3ce028111fb673194fc06e7bb44ce581f286eb4096678055f4f8a44459",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/document-media.ts",
+		"bytes": 10111,
+		"sha256": "c2e96cbbf5acf9d92015027154ca130242aa2880d7a779d4b5be63ead576c92f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/whiteboard-legacy.ts",
+		"bytes": 7146,
+		"sha256": "980c49b4788b0754e943cebfb126f6710dc1037a7efeb5258636525bc94c1885",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/editor-viewport.ts",
+		"bytes": 36675,
+		"sha256": "98959330a68d6b096a7d3b5b4efd3179606ad37729c2f5dc199f8eca50867b2c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/theme-workbench-documents.ts",
+		"bytes": 6173,
+		"sha256": "5676fd587130638ad3cd5110cc09ae7b84502bd137d0fd4d0eb4f8645e704058",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/history-timeline.ts",
+		"bytes": 1023,
+		"sha256": "04b53c8c65ecd8979012f39b2b42e91f2a795fda19483028669a5d20a0ba0620",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/ui/placement.ts",
+		"bytes": 1539,
+		"sha256": "75107481e09e9a1fb1c27d15300e2877639bb01e67e20914b193352da7fff5a5",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/ui/menu.ts",
+		"bytes": 7742,
+		"sha256": "3d4aafc4a5cdf930d1b6b9144c43ae7c776ebb2cabe62477200b602638a31437",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/pending-ledger.ts",
+		"bytes": 6304,
+		"sha256": "8d56bd2f3dfdb0dc14bc5332569a22463448ed45e2f154f40cff6d923d5e310b",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/app-route.ts",
+		"bytes": 6373,
+		"sha256": "34092675683b9ea3aa82196e86d63c9b3d8c7dd36f88e01af2352d6f80270163",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/worker-opened-connection.ts",
+		"bytes": 3578,
+		"sha256": "ef57c6d81b12fc40bcae45dbbffff12fe09a22acdbc22b27f4f73369803c1868",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/worker-client.ts",
+		"bytes": 2720,
+		"sha256": "c3860b8530721976d78489c050b836334c37f60d63d8c90f6da956d0a8631326",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/app-owner.ts",
+		"bytes": 3754,
+		"sha256": "abff890e7ce467f877d3250f11aea0a0eb7223dc2767a7a487335c349d428cd3",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/worker-opened-intents.ts",
+		"bytes": 8878,
+		"sha256": "7253b031446780270cd1719d1732efa5926188f5520884a1b1a3c184cdbe6854",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/worker-opened-observation.ts",
+		"bytes": 1316,
+		"sha256": "cb697a5c684020a63ca762af21bffd1fdd701f587763f902f331a5c897e30e17",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/bindings.ts",
+		"bytes": 5736,
+		"sha256": "8ddc7ade3a940e18c2b8eccf03ac9c72f29a7a2934b9280212ea17d7daf9f905",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/browser-worker-documents.ts",
+		"bytes": 16696,
+		"sha256": "2c59b18539820cd0bb2e7371042a5c67b715dc47149b9258933390d4aa401900",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/document-lock.ts",
+		"bytes": 1096,
+		"sha256": "d1474863d26aae3fbc3cb49b1ff952c087bbecfbb86d9af39c6b1c393bae6ae3",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/worker-opened-capabilities.ts",
+		"bytes": 7583,
+		"sha256": "a64eb3a3ab3a84d50f820e1d894362a639c7a08ca298cb554ff96cd7f0fd6a6d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/worker-opened-history.ts",
+		"bytes": 4603,
+		"sha256": "08eb507b3575858d9d117ca06a08098c40d3257454c6cb26e09d178abd2afa94",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/boot-diagnostics.ts",
+		"bytes": 871,
+		"sha256": "efade8754f913663577ec82c3f0113c8579872f02797f3e5bbe443905efde87e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/command-intent.ts",
+		"bytes": 725,
+		"sha256": "d4e9c30baaafa870ff4e2ab5f3bee76e468f54841fcb27ccf030e67a47474ef1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/worker-editor-basis.ts",
+		"bytes": 15707,
+		"sha256": "ec9ea0a477d5949c9b0a25ef4f6612d863af46987b7955f6764b984c768a81a6",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/worker-rpc.ts",
+		"bytes": 8640,
+		"sha256": "174f8a1c38dbc1741dbd920bf8daf50df4e15f995752c33acf1f136ead45e213",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/worker-assets.ts",
+		"bytes": 6038,
+		"sha256": "2108d797eafbb5ac93fb98ab82344818049e416c83c99692537158fa76dc9d3a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/worker-activity.ts",
+		"bytes": 6831,
+		"sha256": "c9a2a53100d29bf5deff604a13d1c1c6e29a748aa443005c9cf3a316237808c3",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/editor-queue.ts",
+		"bytes": 31329,
+		"sha256": "9eabd44bef3cd932b4dd0d72c297abee38c9cbd132d97012ff55b00ec8754493",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/opened-document-contract.ts",
+		"bytes": 2794,
+		"sha256": "6ef40c7ba34d68cf709857deb88eec324537478443d6ac85b928a10847dc54eb",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/worker-session.ts",
+		"bytes": 18775,
+		"sha256": "da94ab278b724ae288928daa5cfdb374cfb47393f6d04b79c8e5a833c63aebb4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/worker-opened-schemas.ts",
+		"bytes": 3488,
+		"sha256": "79a7ea5ec98b17ebd88db4ba67a708cbb298cf7bff624871c7aa703bab7dad23",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/worker.ts",
+		"bytes": 1811,
+		"sha256": "cfac7ac920ec4bfd2e603801f5b9c07cddbbebc24c9523007c76cd28f4a3d292",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/worker-opened-tasks.ts",
+		"bytes": 1982,
+		"sha256": "958381c0c0ae05ff96459cf613db730781006bd484a6fe3c98ca30acb29b2077",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/history.ts",
+		"bytes": 13412,
+		"sha256": "d8f236077a4e2789e81f43ee4812b48066f7152a7733bd8e74340316ef27f9f8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/comments.css",
+		"bytes": 1869,
+		"sha256": "6159e493ac0f877ad9b7d4b4e09c92eab828a0e96cec886ed25a7fb771fb9769",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/comments.ts",
+		"bytes": 2845,
+		"sha256": "dcde9d1644c98cf88c54b2d7018b43c87ccbaec6628826b8f732a511ef0001af",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/account-email.ts",
+		"bytes": 11945,
+		"sha256": "5c73150e53e5beecf163f0ba5b7f7e6bb7f209cb59bc708ee71c434dcb246b97",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/media-picker.ts",
+		"bytes": 8816,
+		"sha256": "948153daad9122753f5295ddc569a0d61c38c7b12299c322df7e5e24b4b3ab81",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/presentation.css",
+		"bytes": 9168,
+		"sha256": "236cda6deca469e7375fbc05f56e8a9571e8212e03530911b43b9536b0f8f1a0",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/attachments.css",
+		"bytes": 1245,
+		"sha256": "087e3e087193556b224aa770a63b14a80871359c33203782f2e17fa0c582e277",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/library.css",
+		"bytes": 6020,
+		"sha256": "f881df96810a862cbe4b1f6fa1c6e5ab59d80c6082261b980a1e46771a4adf8f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/theme-workbench.css",
+		"bytes": 8269,
+		"sha256": "db024c47bf9e2d77696d7b201b990df4b73de0f8bade35cb15d7ca50c1b16953",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/whiteboard.css",
+		"bytes": 3117,
+		"sha256": "c5283bb727ec21f76de5fc2b12be7a79abacd65b82fa2cc3a5a4430597efd21a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/help.ts",
+		"bytes": 3112,
+		"sha256": "31416aea64010cf6eea85e7545230f77ecd895827eec381bc71002d9997ae1f8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/toolbar.css",
+		"bytes": 1915,
+		"sha256": "ae8f3c65eada852ef39ed3477e4468ccebfe632bc7b8f8bed9bcf85691f19c6f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/account-email.css",
+		"bytes": 354,
+		"sha256": "a86eeaf12cd6d8ad454143606d262f1a277fdaeaf2ad00bada36f0f870730f1c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/line-actions.ts",
+		"bytes": 6137,
+		"sha256": "9d0367509bde4052a5f88161f871f1b003a81db7fee5f517d48972f596da44b9",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/settings-themes.css",
+		"bytes": 1834,
+		"sha256": "a021a75e327fc01054c504c5786de92f65319a17e3555d4add52a670fa1fd978",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/editor-syntax.ts",
+		"bytes": 4715,
+		"sha256": "c2a9a71aa1faf3e4ee5c2cb2421e1bd244c7d48cb159c2d466adbb4bd2b64a9f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/editor-search.ts",
+		"bytes": 697,
+		"sha256": "c21de253110f41e3f7eee6a873f5ca5e86acac2f2ff464167829999e9bba5872",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/settings-themes.ts",
+		"bytes": 12105,
+		"sha256": "97abc31acde71333b724fa649a20e19c969b831a30bfcf2e3155f1d522828b93",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/inspector.css",
+		"bytes": 3136,
+		"sha256": "dbdee7a4fb0dfc6b7d953c82d026c372d132e1de4d87dbe4360dd805476ab3f1",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/editor.ts",
+		"bytes": 85930,
+		"sha256": "ba304aebd2cc9ab9e326f1943e7b9a2645187bed0494f895d9ae22bab9945cb2",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/editor.css",
+		"bytes": 7150,
+		"sha256": "6045ebd25fc3980b933ecdb8664e8b96563c3a5fc0f577d9b47465e7039f28e8",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/progress.ts",
+		"bytes": 909,
+		"sha256": "786143309792401ba04e93dbbb8413be1545f6609d1e626160324cb1b52ba223",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/media-picker.css",
+		"bytes": 1656,
+		"sha256": "e42c451b4f872916398c6f73cc73393d9fa57b2af2e80108679c51fd034b0806",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/invitations.ts",
+		"bytes": 8338,
+		"sha256": "432b4d2a6991ca84569d49e7f2dd0fd8e9308cf0c4101a4a5a71e5cbfa757b3c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/palette.css",
+		"bytes": 1362,
+		"sha256": "dd0d21e5bdf43b621de5cdf09d40b069d723974635cbe1635117427babfa60b7",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/find.ts",
+		"bytes": 17693,
+		"sha256": "be2b6d87c196e45471929887be3afa660008ffbe85c8256ae36f6ad4b1cd8aea",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/account-agents.css",
+		"bytes": 2457,
+		"sha256": "7a72055912f86296a3434ac5071c523fa4db3bb49bf8bbe760334265faba8d18",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/theme-picker.ts",
+		"bytes": 5268,
+		"sha256": "ae7cf44877174b51e52020c763c90dfe622cc4b143f871a8977cf1ef8a06cf40",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/toast.ts",
+		"bytes": 11659,
+		"sha256": "fe0ab36102507935c9ada70dccea4920895089bf4f63d1203db41b7d7299c098",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/document-renderer.ts",
+		"bytes": 9358,
+		"sha256": "f393dd2ac0f93acd05acc2bf79ce1ed1f78184cb2db3faffe2dbfdf80d83edfd",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/invitation-screen.css",
+		"bytes": 1164,
+		"sha256": "2c0fb1fc1dbd006e904a4376774d8cd2c35f91e8d9521c9182e2f30face6f10d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/access.css",
+		"bytes": 452,
+		"sha256": "ad8db7213311b9b0d2353d5b1a03af6dd30307565ce63315d83c98fcb079c878",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/preview.css",
+		"bytes": 4499,
+		"sha256": "acf3b83b828a11cacb8f122589c92276b8d98c78f74aeb968ab7b1ce6767b839",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/update-banner.css",
+		"bytes": 718,
+		"sha256": "60a67e56982075dd3cdf19a38c4265c0d35a2c432b6a6f3a195c7ce9b551ef9f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/progress.css",
+		"bytes": 454,
+		"sha256": "68ea02d7d7abba085420f76f29771cf530824367c93432cc9e88c7129e32428a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/print.ts",
+		"bytes": 2355,
+		"sha256": "51df1cf38eb94af12ffa07006b3347173e509949add13c3e0f63d724150564fa",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/settings-page.css",
+		"bytes": 16143,
+		"sha256": "3b30a03f8cf1c389a0713eb846337b435b4809dbac7a155df5709ef17b62b1d4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/sync-recovery.ts",
+		"bytes": 2034,
+		"sha256": "d2c6e277fda83d1b34a149f7777af54dcb2f1346993e6e3f612750739933d963",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/app.css",
+		"bytes": 5873,
+		"sha256": "071c9da5f8d9a2260d7c87f8407ac8945bed080b30587c1dec47fb2f789effda",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/site.ts",
+		"bytes": 5329,
+		"sha256": "0092c50cd55fcb9d1b9abcdd7e1e8fc21b23b8be4d362524adf64292f424d620",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/toolbar.ts",
+		"bytes": 1263,
+		"sha256": "699fb7a78405709028cb6ad22408b4a5a1417448186206ed375b1415e5497133",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/menu.ts",
+		"bytes": 15116,
+		"sha256": "234ef0f03f066c2075a884c9cc30a3234cc5ce126c0b94d43e5030ad5f849452",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/presentation.ts",
+		"bytes": 29867,
+		"sha256": "2b0e2afbb4011e5d420f550ff4a2e66a876340515fe2f372badf1914e6775054",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/attachments.ts",
+		"bytes": 3218,
+		"sha256": "83e3fe250cabb2c81153c43d05a726f2a12166c9f78100449ade650c489d47e2",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/space-avatar.ts",
+		"bytes": 2659,
+		"sha256": "c5287fc8acfca8fcc4fe2e3a0994f367df94a0e5433c3d967d18ff383b2a99a4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/invitation-screen.ts",
+		"bytes": 5289,
+		"sha256": "a45338adc8cbd802a9d3b07560d6a76cd275ac3148471a78d4c3f26f2fe0fd2f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/palette.ts",
+		"bytes": 4362,
+		"sha256": "b580bcaeff9c7543fb1d1a4b49df96e5dcf75bdaa60aef6e8f59449d83456899",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/theme-workbench.ts",
+		"bytes": 28051,
+		"sha256": "55210204186d128bf22f7550469b2ddffb23308701b068a0e533e9bf39ed6c9c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/update-banner.ts",
+		"bytes": 1429,
+		"sha256": "9e1071eebfd2b903229d28ae6fa6841b3d23b2f3805d5d94835bc6aecf865995",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/teleprompter.css",
+		"bytes": 3350,
+		"sha256": "7a88da5f2ed0cfefc0f1570e97b09f7de48353fcaadc140b39b693721c0a557a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/document-renderer.css",
+		"bytes": 8591,
+		"sha256": "35326a48af251353e24c336839d1b54cd87d040d9c87e491c651077470641404",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/context-menu.css",
+		"bytes": 1809,
+		"sha256": "f3fdaa409ca5d37ab54e182568162b5fe58414bd2f44b380e9971b6c984e5d37",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/screen-icons.ts",
+		"bytes": 1694,
+		"sha256": "e9dbb46d304f8dbb636cc1c736d5af100707c9f53b2f407fa76e8b2ccf317aa5",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/boot.css",
+		"bytes": 114,
+		"sha256": "6bf2359899a32144eda9f641e4cba887b1bfbf541cc1373056abb42608231f68",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/space-avatar.css",
+		"bytes": 1027,
+		"sha256": "bb0712908235c93490c007e0db716a5fac84d8b0d657278e376fc5d99968800c",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/access.ts",
+		"bytes": 1992,
+		"sha256": "d7a4249a15891fc993371ed052d8dbd3b46f65edde142cd407ffda8102096f05",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/workspace-settings.ts",
+		"bytes": 27263,
+		"sha256": "a322346c34aca454fcadee6a868d55eddf4c4e876a3430c44eb93bb9b21b8114",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/toast.css",
+		"bytes": 6201,
+		"sha256": "c95ce3c964c768576228bdf4b9cb19205a438afb129cbabb3facb0865d4c991f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/teleprompter.ts",
+		"bytes": 4892,
+		"sha256": "37a6154004169729e45c5e850a45a0d856ab304d1a971b9da6f6590e4b8d40b6",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/boot.ts",
+		"bytes": 169,
+		"sha256": "3cf1a79c2cc9ff83f4a8aea781542d0b6a9f9b0327158119ca73e0a00cbf33cf",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/site.css",
+		"bytes": 3591,
+		"sha256": "53145505c9d6c743521a9d47baaf364bbb1e017d4336aa9309e18b1fc93821cc",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/dialog.ts",
+		"bytes": 6839,
+		"sha256": "0fe7f75f16ff04a5045bfcfbe295c2726c8eb1903acaa8b8b0414ea20b13d194",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/print.css",
+		"bytes": 509,
+		"sha256": "74e543557a4f695e082ad2f11ca2ffdab853eb24636fc51875186659d378c6d5",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/sync-recovery.css",
+		"bytes": 806,
+		"sha256": "c58a12745051fd0c38d21cc48dd02139bd62371576f1da156a93d5dfc79c2e9a",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/statusbar.css",
+		"bytes": 1574,
+		"sha256": "9fc1546795055202e89680bd373f25e9b38e3b07cb5fb0a84e1ec9652e33129b",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/settings-page.ts",
+		"bytes": 41810,
+		"sha256": "c936065e223417eadea2cb91a81c08f9456f15ea4cf717f964b655a2c7f52bc9",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/find.css",
+		"bytes": 2424,
+		"sha256": "16333226ea304b0626968c954638c2257c013224c0d18cb30274618ac635807e",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/history.css",
+		"bytes": 3869,
+		"sha256": "2e5542143e6022a18e3b511609d3e88b4a827c6d347a0d63593dcf915a528336",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/library.ts",
+		"bytes": 10325,
+		"sha256": "222fb5bb05a4b2c2b14e23084a5e5b2e765b5fdb33c474cabfab933221c99d82",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/whiteboard.ts",
+		"bytes": 26617,
+		"sha256": "fb192fc8acc8621783621f18fd1ffa85bb498959a77bfa4947e8aceffacf33fc",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/line-actions.css",
+		"bytes": 1656,
+		"sha256": "2b57ed1a3a2041e96a008388f68156ca10daf0d476fa77df25a91381fc5aa28f",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/theme-picker.css",
+		"bytes": 108,
+		"sha256": "34414d5eacc3f81ac331630b1994deea8820ec0844904a3dd01def49fe5f5dbf",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/dialog.css",
+		"bytes": 4461,
+		"sha256": "b22e6f67951980dac4ed02b15016f84854c6d63cba77c0968a1dd15948a50ec4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/invitations.css",
+		"bytes": 1202,
+		"sha256": "9d53235642ad4baea6c5050f0bc2d4930a20d76938598e8fe2ca0abae188fb8d",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/menu.css",
+		"bytes": 4590,
+		"sha256": "340ba82e92724acd86bcbf44ddcab7cb3a4f737dd7adc476bea5860aca39c6a4",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/context-menu.ts",
+		"bytes": 5541,
+		"sha256": "3af3ad027467b1065e63663fb5bcfb24754be5470b512b93f23437a54eb15429",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/help.css",
+		"bytes": 304,
+		"sha256": "409e2e8bae97db051da4c81335b0499735f052f046028cde51b335c5f3ba9651",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/account-agents.ts",
+		"bytes": 11635,
+		"sha256": "9c38e11f5dc06dfc880f282ffdac5cda96c41d96fa459ae6e7e7298ab2073314",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/statusbar.ts",
+		"bytes": 5576,
+		"sha256": "1d4c80f7708f7a5bea8779e5fe396c9992c181ba11e9c5800884beb9b34e5468",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/preview.ts",
+		"bytes": 12606,
+		"sha256": "7fff8f896b01a801baaaa8367bf66dfe651ae6d955d12d7ff61f7a90a2a60cc7",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/editor-viewport.css",
+		"bytes": 433,
+		"sha256": "91c9cfa195dd9b247ea06ef37b226da08f2139c08a6c25e6516d30a7f4cd73f6",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/components/editor-overlay.ts",
+		"bytes": 9594,
+		"sha256": "6a457d3985f9a2562b21de4439490bbb9e6c83f711db73bea69490d2e711f4bf",
+		"scope": "Retrospective source bytes, not original response capture"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/worker-mc-retry-512-selection.trace.json",
+		"bytes": 4407814,
+		"sha256": "e14e4ac6da058f58467845484fe383b1ee7a3df20f1539b4827863f50f639f87",
+		"scope": "Retained incomplete-journey trace"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-route/worker-mc-retry-512-single.trace.json",
+		"bytes": 7763969,
+		"sha256": "58a56fd9456436b8bc181bc460fcdb70fc85963cd83aabba99b3e836d2ca28ca",
+		"scope": "Retained incomplete-journey trace"
+	}
+]

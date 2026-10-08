@@ -1,0 +1,244 @@
+[
+	{
+		"scope": "selection",
+		"durationMs": 3002.46,
+		"marks": [
+			{
+				"name": "worker-mc:start",
+				"offsetMs": 0.0
+			},
+			{
+				"name": "worker-mc:ready",
+				"offsetMs": 6.625
+			},
+			{
+				"name": "worker-mc:local-saved",
+				"offsetMs": 6.647
+			},
+			{
+				"name": "worker-mc:end",
+				"offsetMs": 3002.46
+			}
+		],
+		"threads": {
+			"48814:18214535": {
+				"count": 964,
+				"largestMs": 2.05,
+				"sumMs": 148.56100000000032,
+				"main": true
+			},
+			"48802:18214423": {
+				"count": 103,
+				"largestMs": 0.059,
+				"sumMs": 0.7400000000000005,
+				"main": false
+			},
+			"48814:18214901": {
+				"count": 62,
+				"largestMs": 0.369,
+				"sumMs": 3.7449999999999974,
+				"main": false
+			},
+			"48814:18214562": {
+				"count": 22,
+				"largestMs": 0.051,
+				"sumMs": 0.3640000000000001,
+				"main": false
+			},
+			"48814:18214578": {
+				"count": 1447,
+				"largestMs": 1.743,
+				"sumMs": 17.50100000000003,
+				"main": false
+			},
+			"48802:18214346": {
+				"count": 146,
+				"largestMs": 1.119,
+				"sumMs": 5.5069999999999935,
+				"main": false
+			},
+			"48802:18214487": {
+				"count": 33,
+				"largestMs": 0.026,
+				"sumMs": 0.4570000000000003,
+				"main": false
+			},
+			"48808:18214486": {
+				"count": 886,
+				"largestMs": 0.295,
+				"sumMs": 15.355999999999986,
+				"main": false
+			},
+			"48814:18214572": {
+				"count": 68,
+				"largestMs": 0.019,
+				"sumMs": 0.2650000000000001,
+				"main": false
+			},
+			"48808:18214454": {
+				"count": 14,
+				"largestMs": 0.043,
+				"sumMs": 0.258,
+				"main": false
+			},
+			"48808:18214439": {
+				"count": 530,
+				"largestMs": 0.326,
+				"sumMs": 10.838999999999967,
+				"main": false
+			},
+			"48802:18214416": {
+				"count": 16,
+				"largestMs": 0.055,
+				"sumMs": 0.3470000000000001,
+				"main": false
+			},
+			"48814:18214898": {
+				"count": 2,
+				"largestMs": 0.081,
+				"sumMs": 0.08600000000000001,
+				"main": false
+			},
+			"48802:18214417": {
+				"count": 5,
+				"largestMs": 0.078,
+				"sumMs": 0.165,
+				"main": false
+			},
+			"48808:18214485": {
+				"count": 2,
+				"largestMs": 0.007,
+				"sumMs": 0.008,
+				"main": false
+			}
+		},
+		"limit": "Thread classification via browser marks; no CPU samples or successful durable-journey claim"
+	},
+	{
+		"scope": "single",
+		"durationMs": 3000.86,
+		"marks": [
+			{
+				"name": "worker-mc:start",
+				"offsetMs": 0.0
+			},
+			{
+				"name": "worker-mc:ready",
+				"offsetMs": 15.975
+			},
+			{
+				"name": "worker-mc:local-saved",
+				"offsetMs": 15.993
+			},
+			{
+				"name": "worker-mc:end",
+				"offsetMs": 3000.86
+			}
+		],
+		"threads": {
+			"48814:18214535": {
+				"count": 1493,
+				"largestMs": 7.255,
+				"sumMs": 172.8040000000023,
+				"main": true
+			},
+			"48808:18214439": {
+				"count": 550,
+				"largestMs": 6.357,
+				"sumMs": 27.340000000000085,
+				"main": false
+			},
+			"48814:18214901": {
+				"count": 1420,
+				"largestMs": 190.251,
+				"sumMs": 1553.893999999999,
+				"main": false
+			},
+			"48808:18214486": {
+				"count": 884,
+				"largestMs": 0.049,
+				"sumMs": 15.63300000000001,
+				"main": false
+			},
+			"48814:18214572": {
+				"count": 137,
+				"largestMs": 0.027,
+				"sumMs": 0.5610000000000004,
+				"main": false
+			},
+			"48802:18214423": {
+				"count": 232,
+				"largestMs": 0.241,
+				"sumMs": 1.6449999999999936,
+				"main": false
+			},
+			"48802:18214346": {
+				"count": 256,
+				"largestMs": 2.228,
+				"sumMs": 6.3539999999999806,
+				"main": false
+			},
+			"48814:18214562": {
+				"count": 53,
+				"largestMs": 0.157,
+				"sumMs": 0.6390000000000002,
+				"main": false
+			},
+			"48814:18214578": {
+				"count": 1474,
+				"largestMs": 0.144,
+				"sumMs": 17.767999999999997,
+				"main": false
+			},
+			"48802:18214487": {
+				"count": 39,
+				"largestMs": 0.051,
+				"sumMs": 0.6670000000000004,
+				"main": false
+			},
+			"48808:18214454": {
+				"count": 18,
+				"largestMs": 0.038,
+				"sumMs": 0.28600000000000003,
+				"main": false
+			},
+			"48808:18214485": {
+				"count": 23,
+				"largestMs": 0.008,
+				"sumMs": 0.09900000000000003,
+				"main": false
+			},
+			"48802:18214416": {
+				"count": 27,
+				"largestMs": 0.09,
+				"sumMs": 0.43300000000000016,
+				"main": false
+			},
+			"48802:18214417": {
+				"count": 8,
+				"largestMs": 0.107,
+				"sumMs": 0.24400000000000002,
+				"main": false
+			},
+			"48814:18214898": {
+				"count": 12,
+				"largestMs": 0.132,
+				"sumMs": 0.521,
+				"main": false
+			},
+			"48802:18214525": {
+				"count": 80,
+				"largestMs": 0.256,
+				"sumMs": 2.1889999999999983,
+				"main": false
+			},
+			"48814:18214566": {
+				"count": 2,
+				"largestMs": 0.027,
+				"sumMs": 0.043,
+				"main": false
+			}
+		},
+		"limit": "Thread classification via browser marks; no CPU samples or successful durable-journey claim"
+	}
+]

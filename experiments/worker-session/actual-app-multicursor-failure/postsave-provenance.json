@@ -1,0 +1,62 @@
+[
+	{
+		"path": "/tmp/alkalye-worker-app-postsave/src/client/worker-document/app-owner.ts",
+		"snapshot": "capture-source/app-owner.ts.txt",
+		"sha256": "4314c464025e3a063f0638a81bd7997a82a270c63753ba24f65bae904097ef8f",
+		"scope": "Retrospective source snapshot for typed SessionFailure capture; graph pins captured before input are separate"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-postsave/src/client/worker-document/editor-queue.ts",
+		"snapshot": "capture-source/editor-queue.ts.txt",
+		"sha256": "6faa4f5b3eb9c8b4ef5f5a83886d3359827d8b539cb231f053f1d554ef3f5342",
+		"scope": "Retrospective source snapshot for typed SessionFailure capture; graph pins captured before input are separate"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/worker-session.ts",
+		"snapshot": "capture-source/worker-session.ts.txt",
+		"sha256": "da94ab278b724ae288928daa5cfdb374cfb47393f6d04b79c8e5a833c63aebb4",
+		"scope": "Retrospective source snapshot for typed SessionFailure capture; graph pins captured before input are separate"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/browser-worker-documents.ts",
+		"snapshot": "capture-source/browser-worker-documents.ts.txt",
+		"sha256": "2c59b18539820cd0bb2e7371042a5c67b715dc47149b9258933390d4aa401900",
+		"scope": "Retrospective source snapshot for typed SessionFailure capture; graph pins captured before input are separate"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/boot-diagnostics.ts",
+		"snapshot": "capture-source/boot-diagnostics.ts.txt",
+		"sha256": "efade8754f913663577ec82c3f0113c8579872f02797f3e5bbe443905efde87e",
+		"scope": "Retrospective source snapshot for typed SessionFailure capture; graph pins captured before input are separate"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/worker-client.ts",
+		"snapshot": "capture-source/worker-client.ts.txt",
+		"sha256": "c3860b8530721976d78489c050b836334c37f60d63d8c90f6da956d0a8631326",
+		"scope": "Retrospective source snapshot for typed SessionFailure capture; graph pins captured before input are separate"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/worker-document/app-route.ts",
+		"snapshot": "capture-source/app-route.ts.txt",
+		"sha256": "34092675683b9ea3aa82196e86d63c9b3d8c7dd36f88e01af2352d6f80270163",
+		"scope": "Retrospective source snapshot for typed SessionFailure capture; graph pins captured before input are separate"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-boot/src/client/browser-library.ts",
+		"snapshot": "capture-source/browser-library.ts.txt",
+		"sha256": "a28a4b10c1323773845204e4ce5819a50ef498a7c0948439647de1c4a7cf63b7",
+		"scope": "Retrospective source snapshot for typed SessionFailure capture; graph pins captured before input are separate"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-postsave/postsave-existing-mc-512-single.trace.json",
+		"bytes": 8329747,
+		"sha256": "18db947daf158d52488324a934709d5c7663b8e6aa7c930b37b48e1f1e5f93fd",
+		"scope": "Retained incomplete diagnostic journey trace"
+	},
+	{
+		"path": "/tmp/alkalye-worker-app-postsave/postsave-existing-mc-512-selection.trace.json",
+		"bytes": 4456585,
+		"sha256": "0631156e75213711936d0d63e114590b0ee8ad6f601e100b2ac2cd9cdb9e1d1e",
+		"scope": "Retained incomplete diagnostic journey trace"
+	}
+]

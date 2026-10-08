@@ -1,0 +1,26 @@
+import * as Effect from "effect/Effect"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import * as Redacted from "effect/Redacted"
+import * as Schema from "effect/Schema"
+import { apiDocuments } from "./src/cli/api-documents"
+import { browser, evaluate } from "./tests/browser-driver"
+let configuration = Schema.decodeUnknownSync(Schema.Struct({ origin: Schema.String, keyFile: Schema.String, scope: Schema.String, documents: Schema.Array(Schema.Struct({ fixture: Schema.String, documentId: Schema.String })) }))(await Bun.file('/tmp/alkalye-interaction-matrix-smoke/oracle.private.json').json())
+let api = apiDocuments(configuration.origin, Redacted.make((await Bun.file(configuration.keyFile).text()).trim()), configuration.scope)
+let session='worker-boot-diagnostic-'+Date.now()
+let result:{stage:string;initialLength?:number;sourceSHA?:string;state?:unknown;errors?:unknown;console?:unknown;failure?:string;resources?:unknown}={stage:'preflight'}
+let documentId=Schema.decodeUnknownSync(Schema.Struct({documentId:Schema.String}))(await Bun.file('/tmp/alkalye-worker-app-postsave/multicursor-512-created.json').json()).documentId
+try{
+ let source=(await Effect.runPromise(api.read(documentId).pipe(Effect.provide(FetchHttpClient.layer)))).content
+ result.initialLength=source.length;result.sourceSHA=new Bun.CryptoHasher('sha256').update(source).digest('hex')
+ browser(session,'--profile','/tmp/alkalye-worker-app-postsave/profile-run','open',configuration.origin+'/changelog')
+ browser(session,'open',configuration.origin+'/app/doc/'+documentId+'?worker=1')
+ result.stage='observe-existing-route'
+ try{browser(session,'wait','--fn','document.querySelector("alkalye-editor")?.source !== undefined || document.querySelector("#worker-boot-diagnostics")?.textContent.includes("error")')}catch(error){result.failure=String(error)}
+ result.state=evaluate(session,`({url:location.href,browserElapsedMs:performance.now(),phaseLog:document.querySelector('#worker-boot-diagnostics')?.textContent,appBusy:document.querySelector('#app')?.getAttribute('aria-busy'),worker:document.querySelector('#app')?.dataset.workerExperiment,documentReady:document.querySelector('#app')?.hasAttribute('data-document-ready'),editorPresent:!!document.querySelector('alkalye-editor'),sourceLength:document.querySelector('alkalye-editor')?.source?.value.length,readOnly:document.querySelector('#editor')?.readOnly,alerts:[...document.querySelectorAll('[role=alert],.notification,.notifications,#toast')].map(node=>({tag:node.tagName,text:node.textContent?.slice(0,1500)})),targetCatalogue:[...document.querySelectorAll('[data-doc="${documentId}"]')].map(node=>({text:node.textContent,visible:node.checkVisibility()})),libraryCount:document.querySelectorAll('[data-library] [data-doc]').length,body:document.body.innerText.slice(0,5000),resources:performance.getEntriesByType('resource').map(entry=>({name:entry.name,initiator:entry.initiatorType,start:entry.startTime,duration:entry.duration,size:entry.decodedBodySize})).slice(-70)})`)
+ result.errors=browser(session,'errors');result.console=browser(session,'console')
+ let schema=Schema.Array(Schema.Struct({url:Schema.String,sha256:Schema.String,status:Schema.Number}))
+ let resources=Schema.decodeUnknownSync(schema)(evaluate(session,'(async()=>{let urls=[...new Set(performance.getEntriesByType("resource").map(entry=>entry.name).filter(name=>new URL(name).pathname.endsWith(".js")))];let worker=new URL("/worker-editor.js",location.href).href;if(!urls.includes(worker))urls.push(worker);return await Promise.all(urls.map(async url=>{let response=await fetch(url,{cache:"no-store"}),hash=await crypto.subtle.digest("SHA-256",await response.arrayBuffer());return {url,status:response.status,sha256:Array.from(new Uint8Array(hash),value=>value.toString(16).padStart(2,"0")).join("")}}))})()'))
+ for(let entry of resources){if(entry.status!==200||new URL(entry.url).origin!==configuration.origin)throw Error('Unexpected script response');if(new Bun.CryptoHasher('sha256').update(await Bun.file('dist'+new URL(entry.url).pathname).arrayBuffer()).digest('hex')!==entry.sha256)throw Error('Script network bytes differ from instrumented build')}
+ result.resources=resources;result.stage='terminal';console.log(JSON.stringify(result))
+}catch(error){result.failure=String(error);console.log(JSON.stringify(result));process.exitCode=1}
+finally{await Bun.write('postsave-boot-results.json',JSON.stringify(result,null,2)+'\n');browser(session,'close')}

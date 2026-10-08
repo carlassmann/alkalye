@@ -1,0 +1,547 @@
+{
+	"stage": "observe-existing-route",
+	"initialLength": 1048614,
+	"sourceSHA": "bb290ab79d27d450de6855da92b541b025149127bf47d2bea1d3231206af13ba",
+	"state": {
+		"alerts": [
+			{
+				"tag": "ALKALYE-TOASTER",
+				"text": "\n\t\t\t\t\tUpdate available\n\t\t\t\t\t\n\t\t\t\t\t\tReload to update to the latest version\n\t\t\t\t\t\n\t\t\t\t\n\t\t\t\t\n\t\t\t\t\tReload\n\t\t\t\t"
+			}
+		],
+		"appBusy": null,
+		"browserElapsedMs": 2992.100000023842,
+		"documentReady": true,
+		"editorPresent": true,
+		"libraryCount": 5,
+		"readOnly": false,
+		"resources": [
+			{
+				"duration": 5.800000011920929,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-97bkem5j.js",
+				"size": 901,
+				"start": 3.800000011920929
+			},
+			{
+				"duration": 6,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-6029fy4f.js",
+				"size": 14376,
+				"start": 3.800000011920929
+			},
+			{
+				"duration": 6,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-y19qjey5.js",
+				"size": 20108,
+				"start": 3.800000011920929
+			},
+			{
+				"duration": 6,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-mcdv6xvd.js",
+				"size": 1656,
+				"start": 3.800000011920929
+			},
+			{
+				"duration": 6,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-5892trkj.js",
+				"size": 5735,
+				"start": 3.800000011920929
+			},
+			{
+				"duration": 6.900000035762787,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-dhfqkvrw.js",
+				"size": 7957,
+				"start": 3.899999976158142
+			},
+			{
+				"duration": 7.900000035762787,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-8h5yjn7d.js",
+				"size": 6070,
+				"start": 3.899999976158142
+			},
+			{
+				"duration": 7.900000035762787,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-4bgmrsrx.js",
+				"size": 765,
+				"start": 3.899999976158142
+			},
+			{
+				"duration": 7.900000035762787,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-w7011z6k.js",
+				"size": 24137,
+				"start": 3.899999976158142
+			},
+			{
+				"duration": 8.300000011920929,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-ktmfdbym.js",
+				"size": 11389,
+				"start": 3.899999976158142
+			},
+			{
+				"duration": 9.5,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-85srs0w5.js",
+				"size": 212574,
+				"start": 3.899999976158142
+			},
+			{
+				"duration": 8.5,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-0mvv6xke.js",
+				"size": 20419,
+				"start": 4
+			},
+			{
+				"duration": 9.399999976158142,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-qck93mbe.js",
+				"size": 75938,
+				"start": 4
+			},
+			{
+				"duration": 8.399999976158142,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-zbxrpx1j.js",
+				"size": 2412,
+				"start": 4.100000023841858
+			},
+			{
+				"duration": 8.5,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-v5m1nj88.js",
+				"size": 2354,
+				"start": 4.100000023841858
+			},
+			{
+				"duration": 8.5,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-mfap4qbx.js",
+				"size": 2075,
+				"start": 4.100000023841858
+			},
+			{
+				"duration": 8.5,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-395fvyz7.js",
+				"size": 14516,
+				"start": 4.100000023841858
+			},
+			{
+				"duration": 8.5,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-hanb36xp.js",
+				"size": 27429,
+				"start": 4.100000023841858
+			},
+			{
+				"duration": 8.5,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-tqw183ch.js",
+				"size": 713,
+				"start": 4.100000023841858
+			},
+			{
+				"duration": 8.400000035762787,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-1jvyxqbz.js",
+				"size": 272,
+				"start": 4.199999988079071
+			},
+			{
+				"duration": 8.400000035762787,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-794xhmze.js",
+				"size": 41742,
+				"start": 4.199999988079071
+			},
+			{
+				"duration": 9.5,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-ypg29j2n.js",
+				"size": 1109,
+				"start": 4.199999988079071
+			},
+			{
+				"duration": 11.199999988079073,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-y47vn36r.js",
+				"size": 175260,
+				"start": 4.199999988079071
+			},
+			{
+				"duration": 7,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/account-email.css",
+				"size": 354,
+				"start": 6.800000011920929
+			},
+			{
+				"duration": 7.099999964237213,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/access.css",
+				"size": 452,
+				"start": 6.800000011920929
+			},
+			{
+				"duration": 7.099999964237213,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/menu.css",
+				"size": 4590,
+				"start": 6.800000011920929
+			},
+			{
+				"duration": 7.099999964237213,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/settings-page.css",
+				"size": 16143,
+				"start": 6.800000011920929
+			},
+			{
+				"duration": 7,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/settings-themes.css",
+				"size": 1834,
+				"start": 6.899999976158142
+			},
+			{
+				"duration": 7.5,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/space-avatar.css",
+				"size": 1027,
+				"start": 6.899999976158142
+			},
+			{
+				"duration": 7.5,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/invitations.css",
+				"size": 1202,
+				"start": 6.899999976158142
+			},
+			{
+				"duration": 7.5,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/invitation-screen.css",
+				"size": 1164,
+				"start": 6.899999976158142
+			},
+			{
+				"duration": 8.600000023841858,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/account-agents.css",
+				"size": 2457,
+				"start": 6.899999976158142
+			},
+			{
+				"duration": 8.600000023841858,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/theme-picker.css",
+				"size": 108,
+				"start": 6.899999976158142
+			},
+			{
+				"duration": 8.600000023841858,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/media-picker.css",
+				"size": 1656,
+				"start": 6.899999976158142
+			},
+			{
+				"duration": 8.600000023841858,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/teleprompter.css",
+				"size": 3350,
+				"start": 6.899999976158142
+			},
+			{
+				"duration": 8.900000035762787,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/progress.css",
+				"size": 454,
+				"start": 6.899999976158142
+			},
+			{
+				"duration": 8.900000035762787,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/context-menu.css",
+				"size": 1809,
+				"start": 6.899999976158142
+			},
+			{
+				"duration": 8.800000011920929,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/line-actions.css",
+				"size": 1656,
+				"start": 7
+			},
+			{
+				"duration": 8.899999976158142,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/print.css",
+				"size": 509,
+				"start": 7
+			},
+			{
+				"duration": 8.899999976158142,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/app.css",
+				"size": 5873,
+				"start": 7
+			},
+			{
+				"duration": 9,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/boot.css",
+				"size": 114,
+				"start": 7
+			},
+			{
+				"duration": 9.199999988079073,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/library.css",
+				"size": 6020,
+				"start": 7
+			},
+			{
+				"duration": 9.099999964237211,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/toolbar.css",
+				"size": 1915,
+				"start": 7.100000023841858
+			},
+			{
+				"duration": 9.199999988079073,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/editor.css",
+				"size": 7150,
+				"start": 7.100000023841858
+			},
+			{
+				"duration": 9.199999988079073,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/statusbar.css",
+				"size": 1574,
+				"start": 7.100000023841858
+			},
+			{
+				"duration": 9.699999988079073,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/sync-recovery.css",
+				"size": 806,
+				"start": 7.100000023841858
+			},
+			{
+				"duration": 9.600000023841858,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/inspector.css",
+				"size": 3136,
+				"start": 7.199999988079071
+			},
+			{
+				"duration": 9.699999988079073,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/preview.css",
+				"size": 4499,
+				"start": 7.199999988079071
+			},
+			{
+				"duration": 9.699999988079073,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/dialog.css",
+				"size": 4461,
+				"start": 7.199999988079071
+			},
+			{
+				"duration": 9.699999988079073,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/history.css",
+				"size": 3869,
+				"start": 7.199999988079071
+			},
+			{
+				"duration": 9.699999988079073,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/presentation.css",
+				"size": 9168,
+				"start": 7.199999988079071
+			},
+			{
+				"duration": 9.699999988079073,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/find.css",
+				"size": 2424,
+				"start": 7.199999988079071
+			},
+			{
+				"duration": 9.800000011920927,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/toast.css",
+				"size": 6201,
+				"start": 7.300000011920929
+			},
+			{
+				"duration": 9.899999976158142,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/update-banner.css",
+				"size": 718,
+				"start": 7.300000011920929
+			},
+			{
+				"duration": 9.899999976158142,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/theme-workbench.css",
+				"size": 8269,
+				"start": 7.300000011920929
+			},
+			{
+				"duration": 9.899999976158142,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/whiteboard.css",
+				"size": 3117,
+				"start": 7.300000011920929
+			},
+			{
+				"duration": 10.099999964237211,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/help.css",
+				"size": 304,
+				"start": 7.300000011920929
+			},
+			{
+				"duration": 10,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/palette.css",
+				"size": 1362,
+				"start": 7.399999976158142
+			},
+			{
+				"duration": 10.300000011920927,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/comments.css",
+				"size": 1869,
+				"start": 7.399999976158142
+			},
+			{
+				"duration": 10.400000035762789,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/attachments.css",
+				"size": 1245,
+				"start": 7.399999976158142
+			},
+			{
+				"duration": 8.900000035762787,
+				"initiator": "link",
+				"name": "http://127.0.0.1:4473/manifest.webmanifest",
+				"size": 644,
+				"start": 8.899999976158142
+			},
+			{
+				"duration": 1.5,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/editor-viewport.css",
+				"size": 433,
+				"start": 16.399999976158142
+			},
+			{
+				"duration": 1,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/icons/alkalye-icon.png",
+				"size": 193160,
+				"start": 44.89999997615814
+			},
+			{
+				"duration": 4.600000023841858,
+				"initiator": "fetch",
+				"name": "http://127.0.0.1:4473/api/accounts/session",
+				"size": 81,
+				"start": 64.5
+			},
+			{
+				"duration": 1.0999999642372131,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/fonts/geist-latin.woff2",
+				"size": 28400,
+				"start": 74.60000002384186
+			},
+			{
+				"duration": 3.699999988079071,
+				"initiator": "fetch",
+				"name": "http://127.0.0.1:4473/api/library",
+				"size": 3009,
+				"start": 86.69999998807907
+			},
+			{
+				"duration": 2,
+				"initiator": "fetch",
+				"name": "http://127.0.0.1:4473/api/accounts/preferences",
+				"size": 508,
+				"start": 89.80000001192093
+			},
+			{
+				"duration": -0.699999988079071,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/worker-editor.js",
+				"size": 0,
+				"start": 91
+			},
+			{
+				"duration": 2.100000023841858,
+				"initiator": "fetch",
+				"name": "http://127.0.0.1:4473/api/library",
+				"size": 3009,
+				"start": 94.5
+			},
+			{
+				"duration": 2.700000047683716,
+				"initiator": "fetch",
+				"name": "http://127.0.0.1:4473/api/accounts/preferences",
+				"size": 508,
+				"start": 94.89999997615814
+			}
+		],
+		"sourceLength": 1048614,
+		"url": "http://127.0.0.1:4473/app/doc/ba33ee00-f45d-477c-bd99-d94042b0dddb",
+		"worker": "ordinary-document"
+	},
+	"errors": {
+		"errors": [],
+		"lifecycle": {
+			"effectiveLaunch": {
+				"browserLaunched": true,
+				"engine": "chrome",
+				"launchHash": 3240465465933957600
+			},
+			"launched": false,
+			"relaunchedBrowser": false,
+			"restartedBackground": false,
+			"restoreStatus": "not_configured",
+			"reused": true,
+			"saveStatus": "not_attempted"
+		}
+	},
+	"console": {
+		"lifecycle": {
+			"effectiveLaunch": {
+				"browserLaunched": true,
+				"engine": "chrome",
+				"launchHash": 3240465465933957600
+			},
+			"launched": false,
+			"relaunchedBrowser": false,
+			"restartedBackground": false,
+			"restoreStatus": "not_configured",
+			"reused": true,
+			"saveStatus": "not_attempted"
+		},
+		"messages": []
+	},
+	"failure": "Error: ENOENT: no such file or directory, open 'dist/chunks/document-app-k4h5mhfe.js'"
+}

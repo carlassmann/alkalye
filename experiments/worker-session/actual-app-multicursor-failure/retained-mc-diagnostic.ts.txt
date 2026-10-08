@@ -1,0 +1,18 @@
+import * as Effect from "effect/Effect"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import * as Redacted from "effect/Redacted"
+import * as Schema from "effect/Schema"
+import { apiDocuments } from "./src/cli/api-documents"
+import { browser, evaluate } from "./tests/browser-driver"
+let configuration = Schema.decodeUnknownSync(Schema.Struct({ origin: Schema.String, keyFile: Schema.String, scope: Schema.String }))(await Bun.file('/tmp/alkalye-interaction-matrix-smoke/oracle.private.json').json())
+let api = apiDocuments(configuration.origin, Redacted.make((await Bun.file(configuration.keyFile).text()).trim()), configuration.scope)
+let fixture = Schema.decodeUnknownSync(Schema.Struct({documentId:Schema.String}))(await Bun.file('multicursor-512-created.json').json())
+let accepted = await Effect.runPromise(api.read(fixture.documentId).pipe(Effect.provide(FetchHttpClient.layer)))
+let session = 'worker-mc-retained-read-'+Date.now()
+try {
+ browser(session,'--profile','/tmp/alkalye-worker-app-route/profile-run','open',configuration.origin+'/changelog')
+ let settings = evaluate(session, `(async()=>{let databases=await indexedDB.databases();if(!databases.some(database=>database.name==='alkalye-native-v1'))throw Error('Retained database missing');let database=await new Promise((resolve,reject)=>{let request=indexedDB.open('alkalye-native-v1');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error)});let entries=await new Promise((resolve,reject)=>{let transaction=database.transaction('settings','readonly'),request=transaction.objectStore('settings').openCursor(),entries=[];request.onsuccess=()=>{let cursor=request.result;if(!cursor){resolve(entries);return}let key=String(cursor.key);if(key.includes(${JSON.stringify(fixture.documentId)})&&key.startsWith('worker-'))entries.push({key,value:cursor.value});cursor.continue()};request.onerror=()=>reject(request.error)});database.close();async function fingerprint(source){if(typeof source!=='string')return undefined;let bytes=new TextEncoder().encode(source),hash=await crypto.subtle.digest('SHA-256',bytes);return {length:source.length,sha256:Array.from(new Uint8Array(hash),value=>value.toString(16).padStart(2,'0')).join('')}}return await Promise.all(entries.map(async entry=>{let value=entry.value;if(typeof value==='string')return {key:entry.key,recovery:await fingerprint(value)};return {key:entry.key,fields:Object.keys(value),epoch:value.epoch,acknowledged:value.acknowledged,acceptedBasis:await fingerprint(value.acceptedBasis),pending:value.pending?.map(edit=>({intentDigest:edit.intentDigest,sequence:edit.sequence,admissionEpoch:edit.admissionEpoch,beforeLength:edit.beforeLength,afterLength:edit.afterLength,ranges:edit.ranges?.length})),receipt:value.intentDigest?{intentDigest:value.intentDigest,epoch:value.epoch,sequence:value.sequence,beforeLength:value.beforeLength,afterLength:value.afterLength,agreement:value.agreement,unsaved:value.unsaved,operation:value.operation}:undefined}}))})()`)
+ let result = {scope:'Readonly settings read and independent accepted GET before document route mount. No mutation, recovery, or receipt deletion requested.',document:fixture.documentId,accepted:{length:accepted.content.length,sha256:new Bun.CryptoHasher('sha256').update(accepted.content).digest('hex')},settings}
+ await Bun.write('retained-mc-diagnostic.json',JSON.stringify(result,null,2)+'\n')
+ console.log(JSON.stringify(result))
+} finally { browser(session,'close') }

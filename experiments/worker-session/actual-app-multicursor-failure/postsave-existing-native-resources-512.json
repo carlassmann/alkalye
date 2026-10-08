@@ -1,0 +1,137 @@
+{
+	"scope": "Network re-fetch of observed script URLs plus explicit worker entry before native input; not retrospective original response bytes",
+	"resources": [
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-krsa5qgp.js",
+			"sha256": "351d173ad2b1f1f4e1b1ff01a8fd13367cb8957f70249befa9b66ee3d22ce4d8"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-y9bvngz5.js",
+			"sha256": "5ac8b737980eb46b6ca1c5b5fb7ec854eb5ec8403462d4c6bb982a019ba0dfc6"
+		},
+		{
+			"url": "http://127.0.0.1:4473/app.js",
+			"sha256": "d0ada0bd4136ea52bab2271496ee313fb318f275df26959b3e91eb7747481bd5"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-65drjwwj.js",
+			"sha256": "9ff1b4e025cc34478b8083e2e4fc777c561c15153bd4c1806847c07d34f6c06b"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-1xvjj3bm.js",
+			"sha256": "5ad0cde4797476efd56471f4bad0223abfd28385a224f525e501110b0a46d85c"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-30ctz9ws.js",
+			"sha256": "94e3cdfb9e630f518250c399cbd6889d530cbf2348ea33ae4dded0e0276291ad"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-h8pt0gbb.js",
+			"sha256": "1becfd6a54810ab1c30c71736c5c00742c00809b2fd5f22796312bde124f2c60"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-jd36dnf4.js",
+			"sha256": "58bfadd28c2cdb161a961bffab712ef39dc3a486bf4f1fb0c8618f2be3940620"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-zddzedhb.js",
+			"sha256": "a303a4367194f1e7b3912e368a69a941d7cf4c8369bb7510c8bc1039aa8ad096"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-5snwaj28.js",
+			"sha256": "8afe094c0fea3d31cd31aa25442e62fdaa30aa19d4d01d67f020d36acdc5ea8e"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-5hgg4jhd.js",
+			"sha256": "f845784d185922144109f951670009f8a35c82949e1cfc8e436017acbe0773d2"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-ncjf2wxx.js",
+			"sha256": "70403f770cb1d68b939991c818faf673d929d50d45516f23643631ec0259a783"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-281eesyv.js",
+			"sha256": "724b345b618291d46ecea44b0d30176ffccb3d3fd3404591c10aa53adadaabad"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-waxhwvqn.js",
+			"sha256": "560d34109218c67288620ee12bcd2c943b2cbc298f59345d8bf83246b884088f"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-9t309qct.js",
+			"sha256": "551770328db9bbb4f3fea664148b20bc8ffa73a76d41856ef20c6bd2367bcf35"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-3g161rtg.js",
+			"sha256": "7d7a70f548ce93981580cfcea177ffb9fc12d549848678011ce3aef919769b5e"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-c05sa202.js",
+			"sha256": "3dfb090356f6bbb586b0f456301566dec11ecbeeacc2cd8e65cf8017f6ed04d5"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-9wy04nbx.js",
+			"sha256": "6dae8c8d85e2f596f14127b52a9fbd98dd171a47fc5cf4fb3de118ed8f867691"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-05kjexam.js",
+			"sha256": "98521c5aa09113b0ffcce3bb09dd69f5e2d04177e68cabfe4fcf3366933f3606"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-z4j087f1.js",
+			"sha256": "2c212fecb334edb59bc09a245da0a6b4e1cf11c0e5efef6b413ad452a2844596"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-b9aejcn7.js",
+			"sha256": "56fd2cb1b307347262825f23aa965c72160b6a7f5ad95b4081934cbeee1d20d6"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-2pvxnp5r.js",
+			"sha256": "baabe5f2ad887da9d8d12df25ae4de9349f5cd14c9efe3c506340b5cecdb2f25"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-5e5da339.js",
+			"sha256": "271d23b22a653093f0eb1e6a26fdc34ef0b9b8bbcd9d01cd240714305db5d706"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-zm3skfsb.js",
+			"sha256": "2836d8cd774de74fbc85897e6582cf01a7d0e72af2225a9439e877af48e410c8"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-pac5vb7w.js",
+			"sha256": "501c2cc4963042919874cb60f31890d9a054960ffcad8cf193bbd2cdf8099384"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-8pa55mrt.js",
+			"sha256": "e063e206b44a66ef20d4c015495d19ecfcabb35add7ef987d6cad7a957835457"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-05w0y7z2.js",
+			"sha256": "2614a0d68bdc1414ed63886e4fbb8374f34fcfe7f5545f645c4025c95002f518"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-39wtzcbq.js",
+			"sha256": "27382f836a42c7c435e9f3db16ed8fcfbf4301d9af4cbd460aac7061ff970ec1"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-3sv6e9cp.js",
+			"sha256": "7243207dc663d20a974a8a7856432dc0b040444ef1935159e2070cffd6f66bd9"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-ypg29j2n.js",
+			"sha256": "224f4b076e78adaa03fd1f6ec6987214d477881dd9236bbaad2f64ae550b7174"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-rgakaa8z.js",
+			"sha256": "df1ec4d031817d99bf3e0617dc640082c676f4f37887f3b5bfeeadd506a2513a"
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-xjch7gzf.js",
+			"sha256": "11ac0c4237a980f214f9b932c9ad5835a30cddaf567e55ba0ad0500655ee50c9"
+		},
+		{
+			"url": "http://127.0.0.1:4473/worker-editor.js",
+			"sha256": "9ccf9c79db0f585c85186fc828199cbf3e4b5d23e3677e17c3b4583f24d25532"
+		}
+	]
+}

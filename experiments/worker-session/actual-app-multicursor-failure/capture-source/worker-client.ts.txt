@@ -1,0 +1,81 @@
+import { workerBootRecord, workerBootMark } from "./boot-diagnostics"
+import * as Deferred from "effect/Deferred"
+import * as Effect from "effect/Effect"
+import * as Layer from "effect/Layer"
+import * as Scope from "effect/Scope"
+import * as RpcClient from "effect/rpc/RpcClient"
+import * as Workers from "effect/workers/Worker"
+import { WorkerError, WorkerReceiveError } from "effect/workers/WorkerError"
+import { WorkerDocumentRpc } from "./worker-rpc"
+
+let platform = Workers.makePlatform<Worker>()({
+	setup({ worker, scope }) {
+		return Scope.addFinalizer(
+			scope,
+			Effect.sync(() => worker.terminate()),
+		).pipe(Effect.as(worker))
+	},
+	listen({ port, emit, deferred, scope }) {
+		function message(event: MessageEvent<unknown>) {
+			let data = event.data
+   if (Array.isArray(data) && data[0] === 2) { workerBootRecord(data[1]); return }
+			emit(data)
+		}
+		function error(event: ErrorEvent) {
+			workerBootMark("worker:error", event.message); failed(event.message)
+		}
+		function messageError() {
+			workerBootMark("worker:messageerror"); failed("Worker response could not be decoded")
+		}
+		function failed(message: string) {
+			Effect.runFork(
+				Deferred.fail(
+					deferred,
+					new WorkerError({
+						reason: new WorkerReceiveError({ message }),
+					}),
+				),
+			)
+		}
+		port.addEventListener("message", message)
+		port.addEventListener("error", error)
+		port.addEventListener("messageerror", messageError)
+		return Scope.addFinalizer(
+			scope,
+			Effect.sync(() => {
+				port.removeEventListener("message", message)
+				port.removeEventListener("error", error)
+				port.removeEventListener("messageerror", messageError)
+			}),
+		)
+	},
+})
+export function createWorkerSessionClient(url: string, options?: { platformScope?: Scope.Closeable; sent?: (message: unknown) => void }) {
+	return Effect.gen(function* () {
+		let scope = yield* Scope.Scope
+		let context = yield* Layer.buildWithScope(
+			RpcClient.layerProtocolWorker({ size: 1, concurrency: 2 }).pipe(
+				Layer.provide(Layer.succeed(Workers.WorkerPlatform, platform)),
+				Layer.provide(
+					Workers.layerSpawner(() => {
+						workerBootMark("worker:construct", url)
+						let worker = new Worker(url, { type: "module" })
+						if (options?.sent) {
+							let send = worker.postMessage.bind(worker)
+							worker.postMessage = (message: unknown, transfers?: Transferable[] | StructuredSerializeOptions) => {
+								if (Array.isArray(transfers)) send(message, transfers)
+								else send(message, transfers)
+								options.sent?.(message)
+							}
+						}
+						return worker
+					}),
+				),
+			),
+			options?.platformScope ?? scope,
+		)
+		return yield* RpcClient.make(WorkerDocumentRpc).pipe(
+			Effect.provideContext(context),
+		)
+	})
+}

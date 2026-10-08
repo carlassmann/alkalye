@@ -1,0 +1,5 @@
+src/client/worker-document/app-owner.ts(42,4): error TS1005: ',' expected.
+src/client/worker-document/app-owner.ts(43,18): error TS1005: ',' expected.
+src/client/worker-document/app-owner.ts(43,28): error TS1005: ',' expected.
+src/client/worker-document/app-owner.ts(43,43): error TS1005: ',' expected.
+src/client/worker-document/app-owner.ts(43,58): error TS1005: ';' expected.

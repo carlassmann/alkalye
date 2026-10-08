@@ -1,0 +1,27 @@
+{
+	"stage": "native-replace-512",
+	"gates": [],
+	"cells": [],
+	"failure": "Error: worker-actual-multicursor-1791490342769 wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n",
+	"diagnostic": [
+		{
+			"acknowledged": 1,
+			"category": "failure",
+			"document": "ba33ee00-f45d-477c-bd99-d94042b0dddb",
+			"epoch": "52942b60-c6f4-40e3-88e5-a173f989c899:1",
+			"phase": "merge-candidate",
+			"reason": "SessionFailure",
+			"request": "52942b60-c6f4-40e3-88e5-a173f989c899:1:1",
+			"sequence": 1,
+			"time": 1791490357833
+		}
+	],
+	"state": {
+		"alerts": ["Could not save on this device"],
+		"length": 1046566,
+		"path": "/app/doc/ba33ee00-f45d-477c-bd99-d94042b0dddb",
+		"readOnly": true,
+		"selection": [39, 39],
+		"toast": ""
+	}
+}

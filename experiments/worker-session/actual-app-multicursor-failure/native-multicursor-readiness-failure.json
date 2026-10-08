@@ -1,0 +1,11 @@
+{
+	"stage": "fixture-512",
+	"gates": [],
+	"cells": [],
+	"failure": "Error: worker-actual-multicursor-1791486983238 wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n",
+	"state": {
+		"path": "/app/doc/c5855e88-4313-46e4-a4d8-bb7f581a7b32",
+		"selection": [null, null],
+		"toast": ""
+	}
+}

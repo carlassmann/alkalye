@@ -1,0 +1,55 @@
+{
+	"scope": "Readonly settings read and independent accepted GET before document route mount. No mutation, recovery, or receipt deletion requested.",
+	"document": "c5855e88-4313-46e4-a4d8-bb7f581a7b32",
+	"accepted": {
+		"length": 1046566,
+		"sha256": "e42499f5ec1a310b6224f059eb4dd3a42fb6fb2dfda854322a2557a283879310"
+	},
+	"settings": [
+		{
+			"acceptedBasis": {
+				"length": 1048614,
+				"sha256": "bb290ab79d27d450de6855da92b541b025149127bf47d2bea1d3231206af13ba"
+			},
+			"acknowledged": 0,
+			"epoch": "50ffa6cb-d26e-4344-8b8b-5e1aa0323fa4:1",
+			"fields": [
+				"subject",
+				"document",
+				"session",
+				"epoch",
+				"acceptedBasis",
+				"acknowledged",
+				"pending"
+			],
+			"pending": [],
+			"kind": "worker-native-pending"
+		},
+		{
+			"acceptedBasis": {
+				"length": 1046566,
+				"sha256": "e42499f5ec1a310b6224f059eb4dd3a42fb6fb2dfda854322a2557a283879310"
+			},
+			"acknowledged": 1,
+			"epoch": "aadf2603-e186-44f5-ac5a-e144ff19b99a:1",
+			"fields": [
+				"subject",
+				"document",
+				"session",
+				"epoch",
+				"acceptedBasis",
+				"acknowledged",
+				"pending"
+			],
+			"pending": [],
+			"kind": "worker-native-pending"
+		},
+		{
+			"recovery": {
+				"length": 1046566,
+				"sha256": "e42499f5ec1a310b6224f059eb4dd3a42fb6fb2dfda854322a2557a283879310"
+			},
+			"kind": "worker-native-recovery"
+		}
+	]
+}
