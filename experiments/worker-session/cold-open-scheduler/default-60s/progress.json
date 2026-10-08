@@ -1,0 +1,264 @@
+{
+	"observations": [
+		{
+			"stage": "open:start",
+			"stages": [
+				{
+					"at": 35.59999996423721,
+					"origin": 1791460675857,
+					"stage": "account:start"
+				},
+				{
+					"at": 78.69999998807907,
+					"origin": 1791460675857,
+					"stage": "account:end"
+				},
+				{
+					"at": 78.69999998807907,
+					"origin": 1791460675857,
+					"stage": "seed:start"
+				},
+				{
+					"at": 5102.399999976158,
+					"origin": 1791460675857,
+					"stage": "seed:end"
+				},
+				{
+					"at": 5103.899999976158,
+					"origin": 1791460675857,
+					"stage": "open:start"
+				},
+				{
+					"at": 35.09999996423721,
+					"origin": 1791460680963.4,
+					"stage": "worker:activity:start"
+				},
+				{
+					"at": 35.5,
+					"origin": 1791460680963.4,
+					"stage": "worker:activity:end"
+				},
+				{
+					"at": 35.5,
+					"origin": 1791460680963.4,
+					"stage": "worker:account:start"
+				},
+				{
+					"at": 39.30000001192093,
+					"origin": 1791460680963.4,
+					"stage": "worker:account:end"
+				},
+				{
+					"at": 41.39999997615814,
+					"origin": 1791460680963.4,
+					"stage": "worker:journal:start"
+				},
+				{
+					"at": 44.5,
+					"origin": 1791460680963.4,
+					"stage": "worker:journal:end"
+				},
+				{
+					"at": 44.5,
+					"origin": 1791460680963.4,
+					"stage": "worker:session:start"
+				},
+				{
+					"at": 44.89999997615814,
+					"origin": 1791460680963.4,
+					"stage": "worker:cache-read:start"
+				},
+				{
+					"at": 45.19999998807907,
+					"origin": 1791460680963.4,
+					"stage": "worker:cache-read:end"
+				},
+				{
+					"at": 48,
+					"origin": 1791460680963.4,
+					"stage": "worker:snapshot-http:start"
+				},
+				{
+					"at": 238.39999997615817,
+					"origin": 1791460680963.4,
+					"stage": "worker:snapshot-http:end"
+				}
+			]
+		},
+		{
+			"stage": "open:start",
+			"stages": [
+				{
+					"at": 35.59999996423721,
+					"origin": 1791460675857,
+					"stage": "account:start"
+				},
+				{
+					"at": 78.69999998807907,
+					"origin": 1791460675857,
+					"stage": "account:end"
+				},
+				{
+					"at": 78.69999998807907,
+					"origin": 1791460675857,
+					"stage": "seed:start"
+				},
+				{
+					"at": 5102.399999976158,
+					"origin": 1791460675857,
+					"stage": "seed:end"
+				},
+				{
+					"at": 5103.899999976158,
+					"origin": 1791460675857,
+					"stage": "open:start"
+				},
+				{
+					"at": 35.09999996423721,
+					"origin": 1791460680963.4,
+					"stage": "worker:activity:start"
+				},
+				{
+					"at": 35.5,
+					"origin": 1791460680963.4,
+					"stage": "worker:activity:end"
+				},
+				{
+					"at": 35.5,
+					"origin": 1791460680963.4,
+					"stage": "worker:account:start"
+				},
+				{
+					"at": 39.30000001192093,
+					"origin": 1791460680963.4,
+					"stage": "worker:account:end"
+				},
+				{
+					"at": 41.39999997615814,
+					"origin": 1791460680963.4,
+					"stage": "worker:journal:start"
+				},
+				{
+					"at": 44.5,
+					"origin": 1791460680963.4,
+					"stage": "worker:journal:end"
+				},
+				{
+					"at": 44.5,
+					"origin": 1791460680963.4,
+					"stage": "worker:session:start"
+				},
+				{
+					"at": 44.89999997615814,
+					"origin": 1791460680963.4,
+					"stage": "worker:cache-read:start"
+				},
+				{
+					"at": 45.19999998807907,
+					"origin": 1791460680963.4,
+					"stage": "worker:cache-read:end"
+				},
+				{
+					"at": 48,
+					"origin": 1791460680963.4,
+					"stage": "worker:snapshot-http:start"
+				},
+				{
+					"at": 238.39999997615817,
+					"origin": 1791460680963.4,
+					"stage": "worker:snapshot-http:end"
+				}
+			]
+		},
+		{
+			"stage": "open:start",
+			"stages": [
+				{
+					"at": 35.59999996423721,
+					"origin": 1791460675857,
+					"stage": "account:start"
+				},
+				{
+					"at": 78.69999998807907,
+					"origin": 1791460675857,
+					"stage": "account:end"
+				},
+				{
+					"at": 78.69999998807907,
+					"origin": 1791460675857,
+					"stage": "seed:start"
+				},
+				{
+					"at": 5102.399999976158,
+					"origin": 1791460675857,
+					"stage": "seed:end"
+				},
+				{
+					"at": 5103.899999976158,
+					"origin": 1791460675857,
+					"stage": "open:start"
+				},
+				{
+					"at": 35.09999996423721,
+					"origin": 1791460680963.4,
+					"stage": "worker:activity:start"
+				},
+				{
+					"at": 35.5,
+					"origin": 1791460680963.4,
+					"stage": "worker:activity:end"
+				},
+				{
+					"at": 35.5,
+					"origin": 1791460680963.4,
+					"stage": "worker:account:start"
+				},
+				{
+					"at": 39.30000001192093,
+					"origin": 1791460680963.4,
+					"stage": "worker:account:end"
+				},
+				{
+					"at": 41.39999997615814,
+					"origin": 1791460680963.4,
+					"stage": "worker:journal:start"
+				},
+				{
+					"at": 44.5,
+					"origin": 1791460680963.4,
+					"stage": "worker:journal:end"
+				},
+				{
+					"at": 44.5,
+					"origin": 1791460680963.4,
+					"stage": "worker:session:start"
+				},
+				{
+					"at": 44.89999997615814,
+					"origin": 1791460680963.4,
+					"stage": "worker:cache-read:start"
+				},
+				{
+					"at": 45.19999998807907,
+					"origin": 1791460680963.4,
+					"stage": "worker:cache-read:end"
+				},
+				{
+					"at": 48,
+					"origin": 1791460680963.4,
+					"stage": "worker:snapshot-http:start"
+				},
+				{
+					"at": 238.39999997615817,
+					"origin": 1791460680963.4,
+					"stage": "worker:snapshot-http:end"
+				}
+			]
+		}
+	],
+	"deadlineFailures": [
+		"Error: worker-cold-diag-1791460675249 wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n",
+		"Error: worker-cold-diag-1791460675249 wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n",
+		"Error: worker-cold-diag-1791460675249 wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n"
+	]
+}

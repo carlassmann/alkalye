@@ -1,0 +1,23 @@
+--- a/worker.ts
++++ b/worker.ts
+@@ -6,6 +6,7 @@
+ import { WorkerDocumentRpc } from "./worker-rpc"
+ import { workerSessionHandlers } from "./worker-session"
+ import * as FetchHttpClient from "effect/http/FetchHttpClient"
++import { nativeSchedulerLayer } from "./src/client/scheduler"
+ 
+ let runner = Layer.succeed(WorkerRunner.WorkerRunnerPlatform, {
+ 	start: <O, I>() =>
+@@ -45,6 +46,7 @@
+    Layer.provide(RpcServer.layerProtocolWorkerRunner),
+    Layer.provide(runner),
+    Layer.provide(FetchHttpClient.layer),
++   Layer.provide(nativeSchedulerLayer),
+   ),
+  ),
+ )
+--- a/src/client/scheduler.ts
++++ b/src/client/scheduler.ts
+@@ -6,1 +6,1 @@
+-let nativeSchedulerLayer = Layer.effect(
++export let nativeSchedulerLayer = Layer.effect(

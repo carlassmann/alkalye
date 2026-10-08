@@ -1,0 +1,94 @@
+{
+	"scope": "one diagnostic cold fixture; frozen526 source, instrumentation only; no CPU samples; no app120fps claim",
+	"ready": false,
+	"current": {
+		"stage": "account:start",
+		"stages": [
+			{
+				"stage": "account:start",
+				"at": 36.19999998807907,
+				"origin": 1791460277648.4
+			}
+		]
+	},
+	"resources": [
+		{
+			"decoded": 65,
+			"duration": 2.599999964237213,
+			"initiator": "fetch",
+			"path": "/api/accounts/session",
+			"responseEnd": 71.09999996423721,
+			"responseStart": 71,
+			"start": 68.5,
+			"transfer": 365
+		},
+		{
+			"decoded": 26,
+			"duration": 0.5999999642372131,
+			"initiator": "fetch",
+			"path": "/api/accounts/challenge",
+			"responseEnd": 73.29999995231628,
+			"responseStart": 73.19999998807907,
+			"start": 72.69999998807907,
+			"transfer": 326
+		}
+	],
+	"gauge": {
+		"failures": 1,
+		"height": 0,
+		"nativeCharacters": 0,
+		"observations": 0,
+		"pending": 0,
+		"readonly": true,
+		"sourceCharacters": 0
+	},
+	"assertions": [
+		"simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections",
+		"browser identity is available before any network authentication"
+	],
+	"observations": [
+		{
+			"stage": "account:start",
+			"stages": [
+				{
+					"at": 36.19999998807907,
+					"origin": 1791460277648.4,
+					"stage": "account:start"
+				}
+			]
+		},
+		{
+			"stage": "account:start",
+			"stages": [
+				{
+					"at": 36.19999998807907,
+					"origin": 1791460277648.4,
+					"stage": "account:start"
+				}
+			]
+		},
+		{
+			"stage": "account:start",
+			"stages": [
+				{
+					"at": 36.19999998807907,
+					"origin": 1791460277648.4,
+					"stage": "account:start"
+				}
+			]
+		}
+	],
+	"verification": null,
+	"verificationObservations": [],
+	"finalStages": {
+		"stage": "account:start",
+		"stages": [
+			{
+				"at": 36.19999998807907,
+				"origin": 1791460277648.4,
+				"stage": "account:start"
+			}
+		]
+	},
+	"deadlineFailures": []
+}

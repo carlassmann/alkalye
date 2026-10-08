@@ -1,0 +1,35 @@
+No blockers in the source itself. One evidence blocker: the built bundle doesn't contain the candidate yet. I didn't build, run or edit anything.
+
+**Blockers**
+1. **Built bundle is stale.** `assets/worker.js:37401` launches without `provide2(nativeSchedulerLayer)`. Any run of the current asset measures the baseline. Rebuild before any A/B and check that line.
+2. **Channel release can't be seen in this fixture.** The fiber returned by `Effect.runFork(Layer.launch(...))` (`worker.ts:42`) is discarded and never interrupted. So the scope that releases the scheduler only closes when the worker is terminated, and nothing can observe the release. "Scoped release" is unproven for the worker until a test closes that scope.
+
+**Worker safety (OK)**
+- `scheduler.ts` → `client/background-work.ts` → `platform/background-work.ts` only build a `Layer.effect` and a `Context.Reference` when the module loads. `document`/`window` are touched only inside `browserBackgroundWorkLayer`'s acquire step, which the worker never builds.
+- The baseline bundle already includes these modules (`worker.js:36126-36195`, pulled in through the `document-session.ts` import). So the import adds no new module-load risk in the worker.
+- The worker keeps its own `BackgroundWork` from `worker-activity.ts:65`, so it doesn't pick up the DOM version.
+
+**Scheduler propagation (OK)**
+- In the bundled Effect 4, `forkUnsafe` (`worker.js:4198`) gives a child the parent's context. `FiberSet.runtime` (`worker.js:6120`) captures the current context and passes it to `runForkWith`.
+- When the scheduler in a fiber's context changes, `setContext` (`worker.js:3001`) resets the dispatcher.
+- Path to the handlers: the runner's `run` and the `RpcServer` fibers start inside the provided build. Per-open `Layer.buildWithScope` calls (`worker-session.ts:62,75,80`) run on handler fibers, so they inherit the scheduler too.
+- Same pattern as main app: `document-session.ts:23`, `document-app.ts:145`.
+- Two things stay on the default scheduler: the root launch fiber and any `Effect.runSync`, which injects its own sync scheduler (`worker.js:4284`). Neither matters here.
+
+**Cancellation and release (correct by reading)**
+- The cancel function is only called by `MixedSchedulerDispatcher.flush` (`worker.js:2277`). It runs `callbacks.delete(id)`, and a port message that arrives later is ignored. Interrupting a fiber never cancels a scheduler task.
+- Release order: `nativeSchedulerLayer` is acquired first, so it's released last. Its finalizer sets `closed`, closes both ports, and re-sends pending ids through `setTimeout`. Those ids still go through the map, so an earlier cancel still holds.
+- After release, new tasks fall back to `setTimeout`, which can be cancelled with `clearTimeout`. No task is lost or run twice.
+
+**Smallest public proof** (browser test using only `Layer`, `Scope` and `MixedScheduler` public APIs):
+1. Build `nativeSchedulerLayer` in a `Scope.make()`. Wrap `MessageChannel` to count `port.close()` calls; `tests/browser-document-worker.ts:21-28` already has `workerSchedulerChannels` for this.
+2. **Cancel:** `d = scheduler.makeDispatcher()`, `d.scheduleTask(a, 0)`, `d.flush()`, wait one channel turn. Expect `a` ran exactly once.
+3. **Release:** `d.scheduleTask(b, 0)`, then `Scope.close` right away, before the message is delivered. Expect both ports closed and `b` run exactly once (via the `setTimeout` fallback). Then `scheduleTask(c)` runs once, and `scheduleTask(e)` followed by `flush()` runs once.
+4. **Worker version:** keep the fiber from `Effect.runFork`, interrupt it from a test-only message, and assert the channel record shows both ports closed.
+
+**Diagnostic note**
+- 6358 RunTasks fits per-yield task scheduling: Effect yields every 2048 ops, and without `setImmediate` in workers it falls back to `setTimeout(0)`. But that only makes clamping possible, not shown.
+- To confirm, rebuild and compare the gaps between RunTasks and their task source (TimerFire vs message) in the baseline and candidate traces.
+- Hydration and validation paths are unchanged; the diff only provides the scheduler service.
+
+Production not touched.

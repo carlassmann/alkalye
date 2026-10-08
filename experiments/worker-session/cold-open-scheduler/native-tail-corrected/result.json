@@ -1,0 +1,1135 @@
+{
+	"scope": "one diagnostic cold fixture; frozen526 source, instrumentation only; no CPU samples; no app120fps claim",
+	"ready": true,
+	"current": {
+		"stage": "ready",
+		"stages": [
+			{
+				"stage": "account:start",
+				"at": 36.89999997615814,
+				"origin": 1791461607897.7
+			},
+			{
+				"stage": "account:end",
+				"at": 81.80000001192093,
+				"origin": 1791461607897.7
+			},
+			{
+				"stage": "seed:start",
+				"at": 81.89999997615814,
+				"origin": 1791461607897.7
+			},
+			{
+				"stage": "seed:end",
+				"at": 5628.5,
+				"origin": 1791461607897.7
+			},
+			{
+				"stage": "open:start",
+				"at": 5630.100000023842,
+				"origin": 1791461607897.7
+			},
+			{
+				"stage": "worker:activity:start",
+				"at": 32.80000001192093,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:activity:end",
+				"at": 33.19999998807907,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:account:start",
+				"at": 33.19999998807907,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:account:end",
+				"at": 37,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:journal:start",
+				"at": 39.10000002384186,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:journal:end",
+				"at": 41.80000001192093,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:session:start",
+				"at": 41.90000003576279,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:cache-read:start",
+				"at": 42.19999998807907,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:cache-read:end",
+				"at": 42.5,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:snapshot-http:start",
+				"at": 45.5,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:snapshot-http:end",
+				"at": 273.9000000357628,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:session:end",
+				"at": 4412.300000011921,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:connection:start",
+				"at": 4412.400000035763,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:connection:end",
+				"at": 4412.5,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:editor-basis:start",
+				"at": 4412.5,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:editor-basis:end",
+				"at": 4412.600000023842,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:capability:start",
+				"at": 4412.600000023842,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:capability:end",
+				"at": 4413.5,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:projection:start",
+				"at": 4413.5,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "worker:projection:end",
+				"at": 4414.300000011921,
+				"origin": 1791461613530.5
+			},
+			{
+				"stage": "open:end",
+				"at": 10048.30000001192,
+				"origin": 1791461607897.7
+			},
+			{
+				"stage": "read:start",
+				"at": 10048.30000001192,
+				"origin": 1791461607897.7
+			},
+			{
+				"stage": "read:end",
+				"at": 10049.600000023842,
+				"origin": 1791461607897.7
+			},
+			{
+				"stage": "observe:start",
+				"at": 10050.19999998808,
+				"origin": 1791461607897.7
+			},
+			{
+				"stage": "observe:end",
+				"at": 10051.5,
+				"origin": 1791461607897.7
+			},
+			{
+				"stage": "begin:start",
+				"at": 10051.600000023842,
+				"origin": 1791461607897.7
+			},
+			{
+				"stage": "begin:end",
+				"at": 10218,
+				"origin": 1791461607897.7
+			},
+			{
+				"stage": "mount:start",
+				"at": 10218.399999976158,
+				"origin": 1791461607897.7
+			},
+			{
+				"stage": "mount:end",
+				"at": 10229.5,
+				"origin": 1791461607897.7
+			},
+			{
+				"stage": "ready",
+				"at": 10229.5,
+				"origin": 1791461607897.7
+			}
+		]
+	},
+	"resources": [
+		{
+			"decoded": 65,
+			"duration": 2.599999964237213,
+			"initiator": "fetch",
+			"path": "/api/accounts/session",
+			"responseEnd": 71.89999997615814,
+			"responseStart": 71.69999998807907,
+			"start": 69.30000001192093,
+			"transfer": 365
+		},
+		{
+			"decoded": 234,
+			"duration": 2.399999976158142,
+			"initiator": "fetch",
+			"path": "/api/accounts/challenge",
+			"responseEnd": 75.89999997615814,
+			"responseStart": 75.80000001192093,
+			"start": 73.5,
+			"transfer": 534
+		},
+		{
+			"decoded": 81,
+			"duration": 2.700000047683716,
+			"initiator": "fetch",
+			"path": "/api/accounts/browser-session",
+			"responseEnd": 79.60000002384186,
+			"responseStart": 79.5,
+			"start": 76.89999997615814,
+			"transfer": 381
+		},
+		{
+			"decoded": 81,
+			"duration": 1,
+			"initiator": "fetch",
+			"path": "/api/accounts/session",
+			"responseEnd": 81.60000002384186,
+			"responseStart": 81.5,
+			"start": 80.60000002384186,
+			"transfer": 381
+		},
+		{
+			"decoded": 1069216,
+			"duration": 5537.899999976158,
+			"initiator": "fetch",
+			"path": "/__tests/seed",
+			"responseEnd": 5628.399999976158,
+			"responseStart": 5627.899999976158,
+			"start": 90.5,
+			"transfer": 1069516
+		}
+	],
+	"gauge": {
+		"failures": 0,
+		"height": 800,
+		"nativeCharacters": 3022,
+		"observations": 5,
+		"pending": 0,
+		"readonly": false,
+		"sourceCharacters": 986899
+	},
+	"failure": null,
+	"assertions": [
+		"simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections",
+		"browser identity is available before any network authentication",
+		"native browser account login serializes cookie issuance and agrees with server verification",
+		"real HTTP fixture seeded without main Replica",
+		"worker opened projection exact",
+		"native local source exactly accepted by real server",
+		"trusted eight characters exact native and FIFO source",
+		"oneMiB actual native source exactly durable on offline independent worker reopen",
+		"oneMiB durable reopen makes zero API requests"
+	],
+	"observations": [
+		{
+			"stage": "ready",
+			"stages": [
+				{
+					"at": 36.89999997615814,
+					"origin": 1791461607897.7,
+					"stage": "account:start"
+				},
+				{
+					"at": 81.80000001192093,
+					"origin": 1791461607897.7,
+					"stage": "account:end"
+				},
+				{
+					"at": 81.89999997615814,
+					"origin": 1791461607897.7,
+					"stage": "seed:start"
+				},
+				{
+					"at": 5628.5,
+					"origin": 1791461607897.7,
+					"stage": "seed:end"
+				},
+				{
+					"at": 5630.100000023842,
+					"origin": 1791461607897.7,
+					"stage": "open:start"
+				},
+				{
+					"at": 32.80000001192093,
+					"origin": 1791461613530.5,
+					"stage": "worker:activity:start"
+				},
+				{
+					"at": 33.19999998807907,
+					"origin": 1791461613530.5,
+					"stage": "worker:activity:end"
+				},
+				{
+					"at": 33.19999998807907,
+					"origin": 1791461613530.5,
+					"stage": "worker:account:start"
+				},
+				{
+					"at": 37,
+					"origin": 1791461613530.5,
+					"stage": "worker:account:end"
+				},
+				{
+					"at": 39.10000002384186,
+					"origin": 1791461613530.5,
+					"stage": "worker:journal:start"
+				},
+				{
+					"at": 41.80000001192093,
+					"origin": 1791461613530.5,
+					"stage": "worker:journal:end"
+				},
+				{
+					"at": 41.90000003576279,
+					"origin": 1791461613530.5,
+					"stage": "worker:session:start"
+				},
+				{
+					"at": 42.19999998807907,
+					"origin": 1791461613530.5,
+					"stage": "worker:cache-read:start"
+				},
+				{
+					"at": 42.5,
+					"origin": 1791461613530.5,
+					"stage": "worker:cache-read:end"
+				},
+				{
+					"at": 45.5,
+					"origin": 1791461613530.5,
+					"stage": "worker:snapshot-http:start"
+				},
+				{
+					"at": 273.9000000357628,
+					"origin": 1791461613530.5,
+					"stage": "worker:snapshot-http:end"
+				},
+				{
+					"at": 4412.300000011921,
+					"origin": 1791461613530.5,
+					"stage": "worker:session:end"
+				},
+				{
+					"at": 4412.400000035763,
+					"origin": 1791461613530.5,
+					"stage": "worker:connection:start"
+				},
+				{
+					"at": 4412.5,
+					"origin": 1791461613530.5,
+					"stage": "worker:connection:end"
+				},
+				{
+					"at": 4412.5,
+					"origin": 1791461613530.5,
+					"stage": "worker:editor-basis:start"
+				},
+				{
+					"at": 4412.600000023842,
+					"origin": 1791461613530.5,
+					"stage": "worker:editor-basis:end"
+				},
+				{
+					"at": 4412.600000023842,
+					"origin": 1791461613530.5,
+					"stage": "worker:capability:start"
+				},
+				{
+					"at": 4413.5,
+					"origin": 1791461613530.5,
+					"stage": "worker:capability:end"
+				},
+				{
+					"at": 4413.5,
+					"origin": 1791461613530.5,
+					"stage": "worker:projection:start"
+				},
+				{
+					"at": 4414.300000011921,
+					"origin": 1791461613530.5,
+					"stage": "worker:projection:end"
+				},
+				{
+					"at": 10048.30000001192,
+					"origin": 1791461607897.7,
+					"stage": "open:end"
+				},
+				{
+					"at": 10048.30000001192,
+					"origin": 1791461607897.7,
+					"stage": "read:start"
+				},
+				{
+					"at": 10049.600000023842,
+					"origin": 1791461607897.7,
+					"stage": "read:end"
+				},
+				{
+					"at": 10050.19999998808,
+					"origin": 1791461607897.7,
+					"stage": "observe:start"
+				},
+				{
+					"at": 10051.5,
+					"origin": 1791461607897.7,
+					"stage": "observe:end"
+				},
+				{
+					"at": 10051.600000023842,
+					"origin": 1791461607897.7,
+					"stage": "begin:start"
+				},
+				{
+					"at": 10218,
+					"origin": 1791461607897.7,
+					"stage": "begin:end"
+				},
+				{
+					"at": 10218.399999976158,
+					"origin": 1791461607897.7,
+					"stage": "mount:start"
+				},
+				{
+					"at": 10229.5,
+					"origin": 1791461607897.7,
+					"stage": "mount:end"
+				},
+				{
+					"at": 10229.5,
+					"origin": 1791461607897.7,
+					"stage": "ready"
+				}
+			]
+		}
+	],
+	"accepted": {
+		"position": 2,
+		"sourceCharacters": 986907,
+		"status": "passed"
+	},
+	"verification": {
+		"status": "passed"
+	},
+	"verificationObservations": [
+		{
+			"stage": {
+				"stage": "verify-final-close:end",
+				"stages": [
+					{
+						"at": 36.89999997615814,
+						"origin": 1791461607897.7,
+						"stage": "account:start"
+					},
+					{
+						"at": 81.80000001192093,
+						"origin": 1791461607897.7,
+						"stage": "account:end"
+					},
+					{
+						"at": 81.89999997615814,
+						"origin": 1791461607897.7,
+						"stage": "seed:start"
+					},
+					{
+						"at": 5628.5,
+						"origin": 1791461607897.7,
+						"stage": "seed:end"
+					},
+					{
+						"at": 5630.100000023842,
+						"origin": 1791461607897.7,
+						"stage": "open:start"
+					},
+					{
+						"at": 32.80000001192093,
+						"origin": 1791461613530.5,
+						"stage": "worker:activity:start"
+					},
+					{
+						"at": 33.19999998807907,
+						"origin": 1791461613530.5,
+						"stage": "worker:activity:end"
+					},
+					{
+						"at": 33.19999998807907,
+						"origin": 1791461613530.5,
+						"stage": "worker:account:start"
+					},
+					{
+						"at": 37,
+						"origin": 1791461613530.5,
+						"stage": "worker:account:end"
+					},
+					{
+						"at": 39.10000002384186,
+						"origin": 1791461613530.5,
+						"stage": "worker:journal:start"
+					},
+					{
+						"at": 41.80000001192093,
+						"origin": 1791461613530.5,
+						"stage": "worker:journal:end"
+					},
+					{
+						"at": 41.90000003576279,
+						"origin": 1791461613530.5,
+						"stage": "worker:session:start"
+					},
+					{
+						"at": 42.19999998807907,
+						"origin": 1791461613530.5,
+						"stage": "worker:cache-read:start"
+					},
+					{
+						"at": 42.5,
+						"origin": 1791461613530.5,
+						"stage": "worker:cache-read:end"
+					},
+					{
+						"at": 45.5,
+						"origin": 1791461613530.5,
+						"stage": "worker:snapshot-http:start"
+					},
+					{
+						"at": 273.9000000357628,
+						"origin": 1791461613530.5,
+						"stage": "worker:snapshot-http:end"
+					},
+					{
+						"at": 4412.300000011921,
+						"origin": 1791461613530.5,
+						"stage": "worker:session:end"
+					},
+					{
+						"at": 4412.400000035763,
+						"origin": 1791461613530.5,
+						"stage": "worker:connection:start"
+					},
+					{
+						"at": 4412.5,
+						"origin": 1791461613530.5,
+						"stage": "worker:connection:end"
+					},
+					{
+						"at": 4412.5,
+						"origin": 1791461613530.5,
+						"stage": "worker:editor-basis:start"
+					},
+					{
+						"at": 4412.600000023842,
+						"origin": 1791461613530.5,
+						"stage": "worker:editor-basis:end"
+					},
+					{
+						"at": 4412.600000023842,
+						"origin": 1791461613530.5,
+						"stage": "worker:capability:start"
+					},
+					{
+						"at": 4413.5,
+						"origin": 1791461613530.5,
+						"stage": "worker:capability:end"
+					},
+					{
+						"at": 4413.5,
+						"origin": 1791461613530.5,
+						"stage": "worker:projection:start"
+					},
+					{
+						"at": 4414.300000011921,
+						"origin": 1791461613530.5,
+						"stage": "worker:projection:end"
+					},
+					{
+						"at": 10048.30000001192,
+						"origin": 1791461607897.7,
+						"stage": "open:end"
+					},
+					{
+						"at": 10048.30000001192,
+						"origin": 1791461607897.7,
+						"stage": "read:start"
+					},
+					{
+						"at": 10049.600000023842,
+						"origin": 1791461607897.7,
+						"stage": "read:end"
+					},
+					{
+						"at": 10050.19999998808,
+						"origin": 1791461607897.7,
+						"stage": "observe:start"
+					},
+					{
+						"at": 10051.5,
+						"origin": 1791461607897.7,
+						"stage": "observe:end"
+					},
+					{
+						"at": 10051.600000023842,
+						"origin": 1791461607897.7,
+						"stage": "begin:start"
+					},
+					{
+						"at": 10218,
+						"origin": 1791461607897.7,
+						"stage": "begin:end"
+					},
+					{
+						"at": 10218.399999976158,
+						"origin": 1791461607897.7,
+						"stage": "mount:start"
+					},
+					{
+						"at": 10229.5,
+						"origin": 1791461607897.7,
+						"stage": "mount:end"
+					},
+					{
+						"at": 10229.5,
+						"origin": 1791461607897.7,
+						"stage": "ready"
+					},
+					{
+						"at": 14353.899999976158,
+						"origin": 1791461607897.7,
+						"stage": "verify-flush:start"
+					},
+					{
+						"at": 14354.69999998808,
+						"origin": 1791461607897.7,
+						"stage": "verify-flush:end"
+					},
+					{
+						"at": 14354.69999998808,
+						"origin": 1791461607897.7,
+						"stage": "verify-close:start"
+					},
+					{
+						"at": 14357.100000023842,
+						"origin": 1791461607897.7,
+						"stage": "verify-close:end"
+					},
+					{
+						"at": 14357.100000023842,
+						"origin": 1791461607897.7,
+						"stage": "verify-dispose:start"
+					},
+					{
+						"at": 14357.30000001192,
+						"origin": 1791461607897.7,
+						"stage": "verify-dispose:end"
+					},
+					{
+						"at": 14357.399999976158,
+						"origin": 1791461607897.7,
+						"stage": "verify-create-worker:start"
+					},
+					{
+						"at": 14357.600000023842,
+						"origin": 1791461607897.7,
+						"stage": "verify-create-worker:end"
+					},
+					{
+						"at": 14358.399999976158,
+						"origin": 1791461607897.7,
+						"stage": "verify-offline-open:start"
+					},
+					{
+						"at": 34.19999998807907,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:activity:start"
+					},
+					{
+						"at": 34.5,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:activity:end"
+					},
+					{
+						"at": 34.60000002384186,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:account:start"
+					},
+					{
+						"at": 38.39999997615814,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:account:end"
+					},
+					{
+						"at": 40.69999998807907,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:journal:start"
+					},
+					{
+						"at": 41.10000002384186,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:journal:end"
+					},
+					{
+						"at": 41.10000002384186,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:session:start"
+					},
+					{
+						"at": 41.5,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:cache-read:start"
+					},
+					{
+						"at": 42.30000001192093,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:cache-read:end"
+					},
+					{
+						"at": 1795.199999988079,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:session:end"
+					},
+					{
+						"at": 1795.199999988079,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:connection:start"
+					},
+					{
+						"at": 1795.399999976158,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:connection:end"
+					},
+					{
+						"at": 1795.399999976158,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:editor-basis:start"
+					},
+					{
+						"at": 1795.399999976158,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:editor-basis:end"
+					},
+					{
+						"at": 1795.399999976158,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:capability:start"
+					},
+					{
+						"at": 1796,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:capability:end"
+					},
+					{
+						"at": 1796,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:projection:start"
+					},
+					{
+						"at": 1797,
+						"origin": 1791461622257.7,
+						"stage": "reopen-worker:projection:end"
+					},
+					{
+						"at": 16157.600000023842,
+						"origin": 1791461607897.7,
+						"stage": "verify-offline-open:end"
+					},
+					{
+						"at": 16157.69999998808,
+						"origin": 1791461607897.7,
+						"stage": "verify-offline-read:start"
+					},
+					{
+						"at": 16158.30000001192,
+						"origin": 1791461607897.7,
+						"stage": "verify-offline-read:end"
+					},
+					{
+						"at": 16159.5,
+						"origin": 1791461607897.7,
+						"stage": "verify-final-close:start"
+					},
+					{
+						"at": 16161.100000023842,
+						"origin": 1791461607897.7,
+						"stage": "verify-final-close:end"
+					}
+				]
+			},
+			"result": {
+				"status": "passed"
+			}
+		}
+	],
+	"finalStages": {
+		"stage": "verify-final-close:end",
+		"stages": [
+			{
+				"at": 36.89999997615814,
+				"origin": 1791461607897.7,
+				"stage": "account:start"
+			},
+			{
+				"at": 81.80000001192093,
+				"origin": 1791461607897.7,
+				"stage": "account:end"
+			},
+			{
+				"at": 81.89999997615814,
+				"origin": 1791461607897.7,
+				"stage": "seed:start"
+			},
+			{
+				"at": 5628.5,
+				"origin": 1791461607897.7,
+				"stage": "seed:end"
+			},
+			{
+				"at": 5630.100000023842,
+				"origin": 1791461607897.7,
+				"stage": "open:start"
+			},
+			{
+				"at": 32.80000001192093,
+				"origin": 1791461613530.5,
+				"stage": "worker:activity:start"
+			},
+			{
+				"at": 33.19999998807907,
+				"origin": 1791461613530.5,
+				"stage": "worker:activity:end"
+			},
+			{
+				"at": 33.19999998807907,
+				"origin": 1791461613530.5,
+				"stage": "worker:account:start"
+			},
+			{
+				"at": 37,
+				"origin": 1791461613530.5,
+				"stage": "worker:account:end"
+			},
+			{
+				"at": 39.10000002384186,
+				"origin": 1791461613530.5,
+				"stage": "worker:journal:start"
+			},
+			{
+				"at": 41.80000001192093,
+				"origin": 1791461613530.5,
+				"stage": "worker:journal:end"
+			},
+			{
+				"at": 41.90000003576279,
+				"origin": 1791461613530.5,
+				"stage": "worker:session:start"
+			},
+			{
+				"at": 42.19999998807907,
+				"origin": 1791461613530.5,
+				"stage": "worker:cache-read:start"
+			},
+			{
+				"at": 42.5,
+				"origin": 1791461613530.5,
+				"stage": "worker:cache-read:end"
+			},
+			{
+				"at": 45.5,
+				"origin": 1791461613530.5,
+				"stage": "worker:snapshot-http:start"
+			},
+			{
+				"at": 273.9000000357628,
+				"origin": 1791461613530.5,
+				"stage": "worker:snapshot-http:end"
+			},
+			{
+				"at": 4412.300000011921,
+				"origin": 1791461613530.5,
+				"stage": "worker:session:end"
+			},
+			{
+				"at": 4412.400000035763,
+				"origin": 1791461613530.5,
+				"stage": "worker:connection:start"
+			},
+			{
+				"at": 4412.5,
+				"origin": 1791461613530.5,
+				"stage": "worker:connection:end"
+			},
+			{
+				"at": 4412.5,
+				"origin": 1791461613530.5,
+				"stage": "worker:editor-basis:start"
+			},
+			{
+				"at": 4412.600000023842,
+				"origin": 1791461613530.5,
+				"stage": "worker:editor-basis:end"
+			},
+			{
+				"at": 4412.600000023842,
+				"origin": 1791461613530.5,
+				"stage": "worker:capability:start"
+			},
+			{
+				"at": 4413.5,
+				"origin": 1791461613530.5,
+				"stage": "worker:capability:end"
+			},
+			{
+				"at": 4413.5,
+				"origin": 1791461613530.5,
+				"stage": "worker:projection:start"
+			},
+			{
+				"at": 4414.300000011921,
+				"origin": 1791461613530.5,
+				"stage": "worker:projection:end"
+			},
+			{
+				"at": 10048.30000001192,
+				"origin": 1791461607897.7,
+				"stage": "open:end"
+			},
+			{
+				"at": 10048.30000001192,
+				"origin": 1791461607897.7,
+				"stage": "read:start"
+			},
+			{
+				"at": 10049.600000023842,
+				"origin": 1791461607897.7,
+				"stage": "read:end"
+			},
+			{
+				"at": 10050.19999998808,
+				"origin": 1791461607897.7,
+				"stage": "observe:start"
+			},
+			{
+				"at": 10051.5,
+				"origin": 1791461607897.7,
+				"stage": "observe:end"
+			},
+			{
+				"at": 10051.600000023842,
+				"origin": 1791461607897.7,
+				"stage": "begin:start"
+			},
+			{
+				"at": 10218,
+				"origin": 1791461607897.7,
+				"stage": "begin:end"
+			},
+			{
+				"at": 10218.399999976158,
+				"origin": 1791461607897.7,
+				"stage": "mount:start"
+			},
+			{
+				"at": 10229.5,
+				"origin": 1791461607897.7,
+				"stage": "mount:end"
+			},
+			{
+				"at": 10229.5,
+				"origin": 1791461607897.7,
+				"stage": "ready"
+			},
+			{
+				"at": 14353.899999976158,
+				"origin": 1791461607897.7,
+				"stage": "verify-flush:start"
+			},
+			{
+				"at": 14354.69999998808,
+				"origin": 1791461607897.7,
+				"stage": "verify-flush:end"
+			},
+			{
+				"at": 14354.69999998808,
+				"origin": 1791461607897.7,
+				"stage": "verify-close:start"
+			},
+			{
+				"at": 14357.100000023842,
+				"origin": 1791461607897.7,
+				"stage": "verify-close:end"
+			},
+			{
+				"at": 14357.100000023842,
+				"origin": 1791461607897.7,
+				"stage": "verify-dispose:start"
+			},
+			{
+				"at": 14357.30000001192,
+				"origin": 1791461607897.7,
+				"stage": "verify-dispose:end"
+			},
+			{
+				"at": 14357.399999976158,
+				"origin": 1791461607897.7,
+				"stage": "verify-create-worker:start"
+			},
+			{
+				"at": 14357.600000023842,
+				"origin": 1791461607897.7,
+				"stage": "verify-create-worker:end"
+			},
+			{
+				"at": 14358.399999976158,
+				"origin": 1791461607897.7,
+				"stage": "verify-offline-open:start"
+			},
+			{
+				"at": 34.19999998807907,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:activity:start"
+			},
+			{
+				"at": 34.5,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:activity:end"
+			},
+			{
+				"at": 34.60000002384186,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:account:start"
+			},
+			{
+				"at": 38.39999997615814,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:account:end"
+			},
+			{
+				"at": 40.69999998807907,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:journal:start"
+			},
+			{
+				"at": 41.10000002384186,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:journal:end"
+			},
+			{
+				"at": 41.10000002384186,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:session:start"
+			},
+			{
+				"at": 41.5,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:cache-read:start"
+			},
+			{
+				"at": 42.30000001192093,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:cache-read:end"
+			},
+			{
+				"at": 1795.199999988079,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:session:end"
+			},
+			{
+				"at": 1795.199999988079,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:connection:start"
+			},
+			{
+				"at": 1795.399999976158,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:connection:end"
+			},
+			{
+				"at": 1795.399999976158,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:editor-basis:start"
+			},
+			{
+				"at": 1795.399999976158,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:editor-basis:end"
+			},
+			{
+				"at": 1795.399999976158,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:capability:start"
+			},
+			{
+				"at": 1796,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:capability:end"
+			},
+			{
+				"at": 1796,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:projection:start"
+			},
+			{
+				"at": 1797,
+				"origin": 1791461622257.7,
+				"stage": "reopen-worker:projection:end"
+			},
+			{
+				"at": 16157.600000023842,
+				"origin": 1791461607897.7,
+				"stage": "verify-offline-open:end"
+			},
+			{
+				"at": 16157.69999998808,
+				"origin": 1791461607897.7,
+				"stage": "verify-offline-read:start"
+			},
+			{
+				"at": 16158.30000001192,
+				"origin": 1791461607897.7,
+				"stage": "verify-offline-read:end"
+			},
+			{
+				"at": 16159.5,
+				"origin": 1791461607897.7,
+				"stage": "verify-final-close:start"
+			},
+			{
+				"at": 16161.100000023842,
+				"origin": 1791461607897.7,
+				"stage": "verify-final-close:end"
+			}
+		]
+	},
+	"deadlineFailures": []
+}

@@ -1,0 +1,53 @@
+{
+	"control": {
+		"validationWindowMs": 14222.465,
+		"complete": false,
+		"workerTasks": 3288,
+		"taskCpuMs": 3282.544,
+		"maxTaskMs": 30.1,
+		"medianGapMs": 5.01,
+		"timerFireCount": 2254,
+		"topTaskSources": [
+			["RunTask", 3289],
+			["ThreadControllerImpl::RunTask", 3289],
+			["Major concurrent marking rescheduled", 3145],
+			["V8.GC_MC_INCREMENTAL", 3132],
+			["UpdateCounters", 2309],
+			["v8.callFunction", 2259],
+			["FunctionCall", 2259],
+			["TimerInstall", 2256],
+			["TimerFire", 2254],
+			["V8.GCIncrementalMarking", 1044],
+			["V8.GC_MC_INCREMENTAL_EMBEDDER_TRACING", 1044],
+			["V8.GC_SCAVENGER_SCAVENGE_PARALLEL", 170]
+		]
+	},
+	"native-tail-corrected": {
+		"validationWindowMs": 1300.163,
+		"complete": true,
+		"workerTasks": 1951,
+		"taskCpuMs": 1299.426,
+		"maxTaskMs": 12.281,
+		"medianGapMs": 0.0,
+		"timerFireCount": 0,
+		"topTaskSources": [
+			["RunTask", 1952],
+			["ThreadControllerImpl::RunTask", 1952],
+			["UpdateCounters", 1894],
+			["v8.callFunction", 1842],
+			["FunctionCall", 1842],
+			["V8.GC_MC_INCREMENTAL", 1011],
+			["Major concurrent marking rescheduled", 976],
+			["V8.GCIncrementalMarking", 337],
+			["V8.GC_MC_INCREMENTAL_EMBEDDER_TRACING", 337],
+			["ComputeWeaknessProcessor start", 138],
+			["ClearWeaknessProcessor start", 135],
+			["Parallel scavenge started", 114]
+		]
+	},
+	"worker.tsSha256": "d0458a0b8ab9a876425c15b12cf363b94547dcbc5935b6a094770233aa998c8a",
+	"src/client/scheduler.tsSha256": "70912b36f407786b1ede73ce77f6728e2dbcea24d467c8158c6454048838c647",
+	"src/shared/document-session.tsSha256": "35c8d5469f49ed176eaa7349a83f8e0e69a1bbc48062ddab1887bc9d233ddcde",
+	"assets/worker.jsSha256": "e0b2ae03a9a00e70d2392e990390ecd73382108e044ce9490c2d03a018da2bf2",
+	"assets/browser-fixture.jsSha256": "04e1247d7139a7cd3ddc20a765c7bb098098819b16811476f020cf2006dd2e2e"
+}

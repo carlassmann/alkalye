@@ -1,0 +1,35 @@
+{
+	"observations": [
+		{
+			"stage": "account:start",
+			"stages": [
+				{
+					"at": 36.19999998807907,
+					"origin": 1791460277648.4,
+					"stage": "account:start"
+				}
+			]
+		},
+		{
+			"stage": "account:start",
+			"stages": [
+				{
+					"at": 36.19999998807907,
+					"origin": 1791460277648.4,
+					"stage": "account:start"
+				}
+			]
+		},
+		{
+			"stage": "account:start",
+			"stages": [
+				{
+					"at": 36.19999998807907,
+					"origin": 1791460277648.4,
+					"stage": "account:start"
+				}
+			]
+		}
+	],
+	"deadlineFailures": []
+}
