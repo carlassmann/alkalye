@@ -1,0 +1,20 @@
+{
+	"baseline": "fa56600",
+	"bundleSHA": "977b6ddae4177d015ab2cb9d62f55ec75c3c733365078518ca07aed666c8d3d6",
+	"measuredSourceReconstructed": "Only corrected operation-array snapshot line reverted to original borrowed-array line; corrected source was not rebuilt after valid run. No source hash claimed captured before build.",
+	"limits": [
+		"Untimed diagnostic; no latency inference",
+		"Operation-history arrays were borrowed so later events mutate prior rows; generation/cache identity booleans/scalars are independent snapshot values",
+		"First fixture launch failed missing disposable Git registration; preserved",
+		"Corrected reproducer not rerun"
+	],
+	"files": {
+		"diagnostic-corrected.ts.txt": "a29406d99d8e99c71c093369b6a080718ceeb2586e785fe40d9c31d21ebe4cac",
+		"gate.log.txt": "5777132ca1a451879cfeeb2e156001458edf9a2475e4a69b0b0bcf73ba22f306",
+		"build.log.txt": "a1e1ec9bdb36d7dd3f2aa0b8ef9ca9120691b4a84ccf5f8d8bac12f2ba04504c",
+		"untimed-gate-results.json": "99ccae170d512b0ce1d68f51357ff6f02015e027b919d2e366e2ebb656f4f649",
+		"untimed.ts.txt": "f065e5c9ecdc7584ffc15f20d0f7629a0cfb25148af455b1847e5888577067c6",
+		"gate-retry.log.txt": "5964ad848645c28d022280c99674c00425fe2da67c2f3293323d60fc9a3a431e",
+		"diagnostic-measured.ts.txt": "40357b7161124bfe8f1999d0c6710506635d9b56b2cd76b14b05c11af0523476"
+	}
+}

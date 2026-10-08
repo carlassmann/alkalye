@@ -1,0 +1,48 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/replica-terminal-redo.test.ts:
+(pass) terminal redo with duplicate ACK and distinct views false:4 [9.18ms]
+(pass) terminal redo with duplicate ACK and distinct views false:6 [2.02ms]
+(pass) terminal redo with duplicate ACK and distinct views false:65540 [606.24ms]
+(pass) terminal redo with duplicate ACK and distinct views true:4 [6.04ms]
+(pass) terminal redo with duplicate ACK and distinct views true:6 [2.25ms]
+(pass) terminal redo with duplicate ACK and distinct views true:65540 [636.92ms]
+(pass) terminal redo after intervening metadata [1.13ms]
+(pass) terminal redo after intervening other-target [0.77ms]
+(pass) terminal redo after intervening peer-prefix [0.97ms]
+(pass) terminal redo after intervening restore [0.85ms]
+(pass) terminal redo after intervening restored-reader [0.69ms]
+(pass) prearrived redo cancellation chain 0 [0.55ms]
+(pass) prearrived redo cancellation chain 1 [0.51ms]
+(pass) prearrived redo cancellation chain 2 [0.47ms]
+(pass) malformed redo batch rejects atomically and retains valid redo [1.00ms]
+1581 | 		})
+1582 | 	}
+1583 | 
+1584 | 	private restoreState(snapshot: ReplicaCheckpoint, shareAtoms: boolean) {
+1585 | 		let steps = this.restoreStateSteps(snapshot, shareAtoms, false)
+1586 | 		while (!steps.next().done) {}
+                       ^
+error: Invalid checkpoint cancellation target
+      at restoreState (/private/tmp/alkalye-terminal-redo/candidate/src/shared/crdt.ts:1586:17)
+      at restore (/private/tmp/alkalye-terminal-redo/candidate/src/shared/crdt.ts:1556:8)
+      at equivalent (/private/tmp/alkalye-terminal-redo/candidate/tests/replica-terminal-redo.test.ts:22:11)
+      at <anonymous> (/private/tmp/alkalye-terminal-redo/candidate/tests/replica-terminal-redo.test.ts:114:2)
+(fail) wrong-target redo cannot alter original document [0.35ms]
+(pass) terminal redo cycles restore scalar "x" [0.55ms]
+(pass) terminal redo cycles restore scalar "\n" [0.42ms]
+(pass) terminal redo cycles restore scalar "🌻" [0.52ms]
+(pass) mixed duplicate and new batch cannot retain an old terminal redo projection [0.25ms]
+(pass) fork divergence retains only each replica's own source [0.24ms]
+(pass) lower-clock redo rejects before publication [0.15ms]
+(pass) structural terminal insertion redo matches rebuilt source "Body\n--" [0.20ms]
+(pass) structural terminal insertion redo matches rebuilt source "---\ntitle: T\n--" [0.63ms]
+(pass) structural terminal insertion redo matches rebuilt source "---\ntitle: T\n---\n" [0.30ms]
+
+1 tests failed:
+(fail) wrong-target redo cannot alter original document [0.35ms]
+
+ 24 pass
+ 1 fail
+ 284 expect() calls
+Ran 25 tests across 1 file. [1310.00ms]

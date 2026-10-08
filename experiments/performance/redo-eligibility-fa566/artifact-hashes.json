@@ -1,0 +1,20 @@
+{
+	"redo-candidate.ts.txt": "a433ff69efe7aba953f00b3d1d7ffed75fdb0389aacc8808e020e05ca405ce48",
+	"provenance.json": "28501bc933d0eba50353af9c7bbe2a70c4606e8e8fc2191980e882b08643b6d8",
+	"review-duplicate.log.txt": "a995e8646261431b13f595cb18c856eeb41e6be658da7a19b42937a91b144885",
+	"diagnostic-corrected.ts.txt": "a29406d99d8e99c71c093369b6a080718ceeb2586e785fe40d9c31d21ebe4cac",
+	"types.log.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+	"gate.log.txt": "5777132ca1a451879cfeeb2e156001458edf9a2475e4a69b0b0bcf73ba22f306",
+	"wrong-target-rejection.test.ts.txt": "b32f4e5b8c3e3eb8b30d4983ca6ebafeb77be4f5efd5c10e447159c6af0409fe",
+	"build.log.txt": "a1e1ec9bdb36d7dd3f2aa0b8ef9ca9120691b4a84ccf5f8d8bac12f2ba04504c",
+	"untimed-gate-results.json": "81827ccffb943cdd09b370dce459f64130c10254ed5269571620fcdd4156262a",
+	"README.md": "72d47e4e530d417435ce54cd5d1dbd7bcb1b8cbb66f5912a7371aa70e633e968",
+	"untimed.ts.txt": "f065e5c9ecdc7584ffc15f20d0f7629a0cfb25148af455b1847e5888577067c6",
+	"review-candidate.log.txt": "10f439e141bebf02109b6f312920b8a1a293baaaa7c88e4911ce3caa62691d27",
+	"gate-retry.log.txt": "5964ad848645c28d022280c99674c00425fe2da67c2f3293323d60fc9a3a431e",
+	"diagnostic-measured.ts.txt": "40357b7161124bfe8f1999d0c6710506635d9b56b2cd76b14b05c11af0523476",
+	"contracts-first-failure.log.txt": "8138ca5b0285ec3bf05ed689bd4c5749e291176efb8d041ebba02b5c9851529e",
+	"redo-contracts.test.ts.txt": "21e40d54452b6ab0c392989f228af99ed3d4c4c4bf37fed0e6527b984ca488ec",
+	"contracts.log.txt": "54c72bf62c42851dc0c2aeb1e3d3115ae019f7977d35a84ea898b6a630e1b502",
+	"wrong-target-baseline.log.txt": "5a5db9d7e4b64187169f7d65eb1e095d0f22679b9419497cf9caf4bf142d1a25"
+}

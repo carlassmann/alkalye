@@ -1,0 +1,33 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/replica-terminal-redo.test.ts:
+(pass) terminal redo with duplicate ACK and distinct views false:4 [7.94ms]
+(pass) terminal redo with duplicate ACK and distinct views false:6 [1.32ms]
+(pass) terminal redo with duplicate ACK and distinct views false:65540 [519.39ms]
+(pass) terminal redo with duplicate ACK and distinct views true:4 [5.51ms]
+(pass) terminal redo with duplicate ACK and distinct views true:6 [1.98ms]
+(pass) terminal redo with duplicate ACK and distinct views true:65540 [546.56ms]
+(pass) terminal redo after intervening metadata [0.93ms]
+(pass) terminal redo after intervening other-target [0.63ms]
+(pass) terminal redo after intervening peer-prefix [0.83ms]
+(pass) terminal redo after intervening restore [0.71ms]
+(pass) terminal redo after intervening restored-reader [0.58ms]
+(pass) prearrived redo cancellation chain 0 [0.43ms]
+(pass) prearrived redo cancellation chain 1 [0.44ms]
+(pass) prearrived redo cancellation chain 2 [0.41ms]
+(pass) malformed redo batch rejects atomically and retains valid redo [0.88ms]
+(pass) wrong-target redo cannot alter original document [0.10ms]
+(pass) terminal redo cycles restore scalar "x" [0.47ms]
+(pass) terminal redo cycles restore scalar "\n" [0.39ms]
+(pass) terminal redo cycles restore scalar "🌻" [0.39ms]
+(pass) mixed duplicate and new batch cannot retain an old terminal redo projection [0.20ms]
+(pass) fork divergence retains only each replica's own source [0.20ms]
+(pass) lower-clock redo rejects before publication [0.14ms]
+(pass) structural terminal insertion redo matches rebuilt source "Body\n--" [0.17ms]
+(pass) structural terminal insertion redo matches rebuilt source "---\ntitle: T\n--" [0.52ms]
+(pass) structural terminal insertion redo matches rebuilt source "---\ntitle: T\n---\n" [0.25ms]
+
+ 25 pass
+ 0 fail
+ 286 expect() calls
+Ran 25 tests across 1 file. [1122.00ms]
