@@ -173,6 +173,8 @@ export class Replica {
 			input.length !== 1 ||
 			!operation ||
 			operation.kind !== "cancel" ||
+			typeof operation.id !== "string" ||
+			typeof operation.value !== "string" ||
 			this.operations.has(operation.id) ||
 			this.legacyTextTargets.has(operation.target) ||
 			this.visibility.get(operation.target)?.active(operation.id) === false
@@ -193,14 +195,27 @@ export class Replica {
 		let atoms = this.sourceCache.get(target)
 		let raw = this.textCache.get(target)
 		let content = this.strings.get(target)
-		if (!atoms || raw !== atoms || content === undefined) return undefined
+		if (
+			!atoms ||
+			!raw ||
+			content === undefined ||
+			sourceViews.get(atoms) !== raw
+		)
+			return undefined
 		let last = atoms.at(-1)
+		let rawLast = raw.at(-1)
 		if (
 			!last ||
+			!rawLast ||
+			rawLast.id !== last.id ||
+			rawLast.value !== last.value ||
 			last.id !== original.insert[0]?.id ||
 			!last.value ||
 			!content.endsWith(last.value)
 		)
+			return undefined
+		let oldHeader = sourceHeader(content)
+		if (raw !== atoms && oldHeader && content.length <= oldHeader[0].length)
 			return undefined
 		let next = content.slice(0, -last.value.length)
 		if (touchesSourceFence(next, next.length, next.length)) return undefined
@@ -219,9 +234,16 @@ export class Replica {
 			signature: textEditSignature(operation),
 			content: next,
 			atoms,
-			raw: atoms,
+			raw,
 			splices: [splice],
-			rawSplices: [splice],
+			rawSplices: [
+				{
+					after: raw.at(-2)?.id ?? "",
+					start: raw.length - 1,
+					remove: 1,
+					inserted: [],
+				},
+			],
 		}
 	}
 	private prepareTerminalPeerEdit(

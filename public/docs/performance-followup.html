@@ -105,6 +105,23 @@
 			is not a multicursor or 120fps result. Evidence:
 			<code>experiments/performance/compact-pieces</code>.
 		</p>
+		<p>
+			A separate sampled undo run located 153ms of cold text materialization
+			inside its largest UI refresh; visible-atom traversal accounted for 112ms
+			of self samples. The cancellation cache previously refused documents whose
+			frontmatter creates distinct raw and displayed atom views. The fix retains
+			both views and removes only their matching terminal atom, preserving
+			header, visibility and source-fence guards. In six matched 1MiB trials,
+			the median largest undo task fell from 203.5ms to 25.7ms; the worst fell
+			from 224.5ms to 27.2ms. Exact local and independently accepted source
+			checks passed. A separate native gate verified EOF caret position, a
+			1,995-character editing fragment, bottom scroll and validated cache
+			publication. These are distinct proofs: the sampled and publication runs
+			were diagnostic, not timing arms. Ordinary typing and deferred task counts
+			did not improve; 21–22 main tasks still exceeded 8.33ms during the undo
+			window. Redo performance remains unmeasured. Evidence:
+			<code>experiments/performance/terminal-header-cancellation</code>.
+		</p>
 		<h2>Earlier journey comparison with main</h2>
 		<p>
 			Both production builds used their own local sync servers, signed accounts
@@ -428,6 +445,16 @@
 			and the full editor cutover remain unproved. These checks do not aggregate
 			the earlier editor, comments or attachment proofs. Evidence:
 			<code>experiments/worker-session/opened</code>.
+		</p>
+		<p>
+			The next worker slice passed 25 checks with concurrent observation and
+			commands, token retries, interrupted observation and real IndexedDB open
+			and write failures. Durable-prefix reopen and stream shutdown are
+			verified. Two checks only compare fixture strings; they do not prove
+			native-editor draft retention or recovery. The real draft lifecycle, stuck
+			commands, task and history ports, and production cutover remain unproved.
+			Evidence:
+			<code>experiments/worker-session/opened-observation</code>.
 		</p>
 		<p>
 			The first cache reuses parsed link tokens when the caret moves through
