@@ -1,0 +1,36 @@
+Status: **HOLD.** I found 6 blockers before an ordinary-route smoke, plus some smaller items. This was a read-only review: nothing run, nothing written.
+
+**What holds up**
+- **Intent hash:** the digest covers subject, document, epoch, sequence, admission epoch, clipboard token and each range with its text. The worker recomputes it and rejects a mismatch (`worker-session.ts:108-109`). Confirm and reconcile both require it to equal the first pending digest (`pending-ledger.ts:50,58`). So an unrelated edit of the same length cannot clear the ledger.
+- **Durable receipt:** written only after `edit.saved`, the journal save (`worker-editor-basis.ts:111`, `worker-session.ts:118`).
+- **Epochs:** each `Begin` gets a random identity plus a counter, so ledger keys never collide between sessions.
+- **Lock and late replies:** the lock is acquired in the entry scope before the client, so it is released after `Close`. Each entry has its own worker, terminated when its scope closes. Admission refresh checks the epoch. A late reply cannot reach a new owner.
+- **Optional:** the receipt only checks lengths, not content. Adding an `afterDigest` would make the check exact instead of relying on both sides starting from the same text.
+
+**Blockers**
+1. **Undo with nothing to undo breaks the next keystroke.** The worker still advances the sequence (`worker-editor-basis.ts:143`) and the queue accepts it (`editor-queue.ts:268`), but the ledger's `acknowledged` doesn't move. The next `prepare` fails its sequence check (`pending-ledger.ts:43`), which retains a recovery and makes the document read-only. To reproduce: press Cmd+Z with empty history, then type before the idle merge runs. Fix: add `ledger.advance(sequence)` on any undo receipt (pending is empty by then).
+2. **Fake empty recovery.** If `retain` runs before an editor is attached, it stores `lastSource`, which is `""` (`app-owner.ts:17,31`). This happens on an `Open` failure (`browser-worker-documents.ts:63`), a `Begin` timeout (`:171`), and background drain opens (`browser-library.ts:302`). Because recovery is first-wins, a later real ledger recovery is then ignored (`app-owner.ts:36`). Fix: if no editor was ever attached, only freeze; don't persist. Remove retain from `Open` `tapError`.
+3. **A stored recovery isn't shown.** `queue()` succeeds even when a recovery exists, so the route shows the worker's text read-only, with no draft and no download (`app-route.ts:23`). Fix: take the recovered branch whenever `owner.recovery() !== undefined`.
+4. **You can't leave a document once it has a recovery.** `pending()` is true whenever a recovery exists (`app-owner.ts:22`), and both leave paths refuse (`document-app.ts:1291,1301`). Fix: block leaving only while the recovery isn't yet durably stored (set a flag after `storage.set` succeeds). The discard flow can stay out of scope.
+5. **Ordinary sync can create a recovery.** `Synchronize` and `Flush` run network sync plus save while holding the worker's single command permit (`worker-session.ts:50,104`; `worker-opened-connection.ts:39-40`). Edits, merges and `Connectivity` queue behind it and hit the 15 s timeout. That becomes `AppliedUnknown` or `retain`, and `connectivity` also retains on timeout (`browser-worker-documents.ts:166`). Easy trigger: an `online` event starts drain and `Connectivity` together. Fix: run `Synchronize`/`Flush`/`Connectivity` outside the permit, and drop retain from connectivity failures.
+6. **Ledger cleanup runs in the wrong scope.** `makeNativePendingLedger` is called from `queue()` under the route's scope (`browser-worker-documents.ts:172`). On unmount its finalizer can delete the row while the entry's queue still holds edits not yet written to the ledger. The next `prepare` then fails and creates a spurious recovery. Fix: `Scope.provide(queueScope)` around it, so its finalizer runs after the queue's.
+
+**Smaller items**
+- **Merge errors:** the idle merge loop dies on its first error (`app-route.ts:60`). `bindings.merge` fails authority even on `SelectionUnavailable` (`bindings.ts:93`). Any other MergeCandidate failure sets queue failure, which retains (`editor-queue.ts:314-318`). Catch errors per iteration.
+- **DOM-only text:** `bindings.fail` makes the editor read-only but doesn't persist the text (`bindings.ts:44-51`). It survives only if the scope finalizer runs, so a killed tab loses it. Pass `owner.draft.retain` into it.
+- **Remount:** `queue()` works only once per entry. If drain still holds the RcMap entry, remounting fails with `BasisUnavailable` (`browser-worker-documents.ts:168`).
+- **Leave check order:** pending is checked before the queue settles (`document-app.ts:1300-1301`), so leaving right after typing is falsely blocked. Await `draft.settle` first.
+- **Durability window:** the ledger is written when an edit leaves the main queue, not when it enters (`editor-queue.ts:436`). A killed tab can lose the whole backlog, not just one IndexedDB commit.
+- **Cleanup:** reconciled rows and their receipts are never deleted (`pending-ledger.ts:55-61`).
+- **Lock name:** it isn't encoded (`document-lock.ts:7`), unlike the storage keys.
+
+**Shortest path to an ordinary-route smoke:** fix 1–6, then run with `?worker=1`:
+- type, press undo with nothing to undo, type again;
+- navigate A→B→A;
+- toggle offline/online while a sync is running;
+- type during a slow sync;
+- kill the tab mid-typing and reload.
+
+Pass condition: no recovery row exists unless a fault was injected. Do performance work only after this passes.
+
+Several claude.ai connectors (Slack, GitHub, etc.) need authorizing in your claude.ai connector settings; I didn't need them for this review.

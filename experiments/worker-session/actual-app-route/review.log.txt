@@ -1,0 +1,59 @@
+**Verdict: hold.** The receipt and digest path holds up: the digest binds subject, doc, epoch, admission epoch, sequence, clipboard token and ranges, and the worker recomputes it (`worker-session.ts:108`). The receipt is written only after `edit.saved` (journal), so a stale same-length ack fails closed. The blockers are around that path. Read-only review; nothing was run.
+
+## Blockers (smallest fix each)
+
+1. **A retained recovery gets overwritten, so text is lost.** `app-owner.ts:30,35`: `retain` and `recover` always overwrite the key.
+   - Case 1: an edit's outcome is unknown, so `retain` stores the full page text (edits 1..n). On reload `recover(retainedNativeSource(row))` stores basis + edit 1 only, and edits 2..n are gone.
+   - Case 2: a recovery exists, the worker text is mounted frozen, then any later `retain` (for example a sync timeout) writes the worker text over the real recovery.
+   - Fix: first write wins. `if (recovery !== undefined) return Effect.void` in both.
+
+2. **The retained recovery is never shown.** Nothing reads `route.recovery()`. `act()` is fully blocked under `workerMount` (`document-app.ts:2866`), which includes recover-export and recover-copy. `app-route.ts:30` mounts `initialized.initial.source` (the worker text), not the recovery. On partial reconcile, `queue()` fails, so the route fails and the doc can never open, and there's no export.
+   - Fix: in `mountWorkerAppRoute`, check `owner.recovery()` before `queue()`. If set, render the recovery read-only with a download action and an explicit `owner.discard()` (`storage.remove(key)`). Never discard automatically.
+
+3. **A failed command kills the queue fiber silently.** `editor-queue.ts:412,421` (`ledger.rebase`) and `:434` (`commandIntentDigest`) are plain `yield*`. A failure ends `runForEach`, `failure` stays undefined, so `onFailure` never runs and deferreds never settle. The user keeps typing into a dead queue with no retain.
+   - Fix: wrap with `Effect.exit` (as `prepare` and `confirm` already are), set `failure`, fail `command.saved`. Or add a top-level `Effect.catchCause` on the per-command gen that does the same.
+
+4. **Two tabs, or a reopen during close, race on the same ledger and recovery keys.** A dedicated `Worker` runs per tab (`worker-client.ts:59`). Tab B's `getPrefix` sees tab A's in-flight row. It then either writes a recovery from A's text, or reconciles A's row so that A's later `confirm` conflicts. The same race happens on RcMap release then reacquire: the old finalizer writes the recovery after the new owner has already read storage.
+   - Fix: hold an exclusive `navigator.locks` lock on `worker-native:{subject}:{doc}` for the lookup scope, acquired in `optionsFor` and released after `Close`. If it's unavailable, fail with "open in another tab".
+
+5. **The native route doesn't close the worker route.** `document-app.ts:1325`: for a local file, `open()` goes native without closing `workerMount`. `mountDocument` then replaces `#main`, the EditorElement disconnects and its view is disposed. After that `owner.selection()` returns the stale `lastSource` from attach time, so `nativeDiffers` and `retain` store stale text. `refreshDocument` stays suppressed forever (`:2331`).
+   - Fix: move the leave logic from `openWorkerPage` (save, pending check, close scope) into a `leaveWorkerPage()` and call it at the top of the native branch. Also add `if (workerMount) return` in `mountDocument`.
+
+6. **`pending()` ignores text that only exists on the page.** `app-owner.ts:22`: after `replace()` throws (permission, frozen, accepting), the binding fails authority and the text lives only in the DOM. `pending()` is false, so `openWorkerPage` (`:1290`) lets the user leave. The finalizer retains a hidden recovery.
+   - Fix: also return pending when `editor?.source?.value !== queue.state().source`.
+
+7. **Account, role and admission epoch are frozen at open.** `browser-library.ts:135` fixes `epoch: 1`, `role` and `account`, and nothing calls `opened.admission`. A revoke or sign-out never freezes the editor on the main side. `"offline"` stays read-only after sign-in.
+   - Fix: in the lookup, fork a stream over `state.changes` and `account.state.changes`, mapped to a new admission with `epoch++`, and call `opened.admission(next)`.
+
+8. **Syncing or saving can retain a recovery.** `browser-worker-documents.ts:208-209`: `bounded` sends any failure or 15s timeout to `retain`. `drain` (`browser-library.ts:298`) calls `synchronize` and `save` on focus and online events. A slow or offline sync freezes the document for good.
+   - Fix: plain `Effect.timeout` for these, no `retain`.
+
+9. **Bad stored data crashes instead of failing.** `pending-ledger.ts:24` (`existing.map(decode)`) and `browser-worker-documents.ts:184` (`retainedNativeSource` throws) run inside the gen. They crash rather than return an error, no recovery is written, and the doc can't open.
+   - Fix: `Effect.try` both. On a corrupt row, store the raw row JSON as the recovery and fail with a typed error.
+
+10. **Leaving during adoption, or with an adopt in flight, writes a needless recovery.** `settle` (`editor-queue.ts:623`) returns false while `commandFrozen` after an applied undo awaits adoption. It also ignores in-flight merge and adopt. The close finalizer then writes the recovery.
+    - Fix: include `merges` in `settle`'s awaits. Have `openWorkerPage` refuse while `commandFrozen` (`pending()` already does), and have the finalizer wait for adoption before `retain`.
+
+**Minor:**
+- Old ledger rows (`pending: []`) and `worker-native-receipt:*` keys are never deleted, so storage grows with every open. Delete own empty row in the finalizer.
+- The undo merge in `bindings.ts:114` bypasses `owner.draft.adopt`, so the admission and recovery gates are skipped.
+- `optionsFor` is typed as `Effect<DocumentOpenOptions>` but fails and needs `Scope`.
+- `show({kind:"library"})` doesn't close the worker route.
+
+## Gates you named (still open)
+- Text typed but not yet prepared in the ledger, and unknown-outcome undo or domain commands, are lost if the tab dies. This needs durable command protection, and pagehide finalizers that write to IndexedDB can't be relied on.
+- An edit applied in the journal without a receipt (crash between `ReplaceQueued` and `storage.set`) shows up as a recovery whose text is already applied. That's correct, but needs an explicit discard flow.
+- Not production-ready. Untyped, unrun, dev flag only.
+
+## Executable gates (real app, `/app/doc/<id>?worker=1`, agent-browser)
+1. Type, receive the receipt, reload: same text, ledger row has `pending: []`, no recovery key.
+2. Fixture delay inside ReplaceReceipt, type 3 edits, kill the tab: reload shows a recovery with all 3 edits, and the text survives a second reload.
+3. Fixture receipt with the same lengths but a wrong digest: AppliedUnknown, ledger row kept.
+4. Open the same doc in a second tab: the second tab refuses, and the first tab's ledger is untouched.
+5. Go from the worker doc to a local file with unsaved worker input: navigation blocked, or worker closes first; correct recovery text.
+6. Write a corrupt ledger row into IndexedDB: typed error and an exportable recovery, no crash.
+7. Fixture where storage fails on rebase after Adopt: editor fails authority within 1s and a recovery is retained.
+8. Change the role to reader through a library refresh: editor goes read-only, and the worker rejects the stale admission epoch.
+9. Offline focus: drain sync times out and no recovery key is written.
+10. Undo, then navigate during adoption: refused or adopted, no recovery written.
+11. Revoke, type, navigate: blocked, and the recovery equals the DOM text exactly.

@@ -1,0 +1,107 @@
+$ tsc --noEmit
+src/client/document-app.ts(382,6): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(468,13): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(483,24): error TS2345: Argument of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...' is not assignable to parameter of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...'.
+  Type 'Scope | HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(506,11): error TS2345: Argument of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...' is not assignable to parameter of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...'.
+  Type 'Scope | HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(518,25): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(525,25): error TS2345: Argument of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...' is not assignable to parameter of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...'.
+  Type 'Scope | HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(530,25): error TS2345: Argument of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...' is not assignable to parameter of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...'.
+  Type 'Scope | HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(536,25): error TS2345: Argument of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...' is not assignable to parameter of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...'.
+  Type 'Scope | HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(544,25): error TS2345: Argument of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...' is not assignable to parameter of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...'.
+  Type 'Scope | HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(549,25): error TS2345: Argument of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...' is not assignable to parameter of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...'.
+  Type 'Scope | HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(554,25): error TS2345: Argument of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...' is not assignable to parameter of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...'.
+  Type 'Scope | HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(623,13): error TS2345: Argument of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...' is not assignable to parameter of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...'.
+  Type 'Scope | HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(780,38): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(789,7): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(802,5): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(812,11): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(925,18): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(985,46): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1005,11): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1057,28): error TS2345: Argument of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...' is not assignable to parameter of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...'.
+  Type 'Scope | HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1316,33): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1837,19): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1904,56): error TS2345: Argument of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...' is not assignable to parameter of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...'.
+  Type 'Scope | HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1968,19): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1990,35): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(2042,6): error TS2322: Type '(historical: Replica, position: number) => Effect<void, unknown, BrowserLibrary>' is not assignable to type '(replica: Replica, position: number) => Effect<unknown, unknown, never>'.
+  Type 'Effect<void, unknown, BrowserLibrary>' is not assignable to type 'Effect<unknown, unknown, never>'.
+    Type 'BrowserLibrary' is not assignable to type 'never'.
+src/client/document-app.ts(2102,21): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(2407,20): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(2721,45): error TS2345: Argument of type 'boolean | undefined' is not assignable to parameter of type 'boolean'.
+  Type 'undefined' is not assignable to type 'boolean'.
+src/client/document-app.ts(2898,27): error TS2345: Argument of type 'Effect<void, unknown, Scope | HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'Scope | HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(2918,8): error TS2322: Type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to type 'Task'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(3520,17): error TS2345: Argument of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...' is not assignable to parameter of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<void | { readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel...'.
+  Type 'Scope | HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(3945,20): error TS2345: Argument of type 'Effect<void, unknown, HttpClient | BrowserLibrary>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'HttpClient | BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+    Type 'BrowserLibrary' is not assignable to type 'Scope | HttpClient'.
+src/client/worker-document/browser-worker-documents.ts(143,38): error TS2322: Type 'Effect<void, unknown, never>' is not assignable to type 'Effect<void, never, never>'.
+  Type 'unknown' is not assignable to type 'never'.
+src/client/worker-document/browser-worker-documents.ts(191,11): error TS2345: Argument of type '(failure: unknown) => Effect<void, unknown, never>' is not assignable to parameter of type '(failure: unknown) => Effect<void, never, never>'.
+  Type 'Effect<void, unknown, never>' is not assignable to type 'Effect<void, never, never>'.
+    Type 'unknown' is not assignable to type 'never'.
+src/client/worker-document/pending-ledger.ts(25,62): error TS2345: Argument of type '(input: unknown, options?: ParseOptions | undefined) => { readonly subject: string; readonly document: string; readonly session: string; readonly epoch: string; readonly acceptedBasis: string; readonly acknowledged: number; readonly pending: readonly { ...; }[]; }' is not assignable to parameter of type '(value: unknown, index: number, array: unknown[]) => { readonly subject: string; readonly document: string; readonly session: string; readonly epoch: string; readonly acceptedBasis: string; readonly acknowledged: number; readonly pending: readonly { ...; }[]; }'.
+  Types of parameters 'options' and 'index' are incompatible.
+    Type 'number' has no properties in common with type 'ParseOptions'.

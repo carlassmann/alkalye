@@ -1,0 +1,179 @@
+$ tsc --noEmit
+src/client/browser-library.ts(140,7): error TS2345: Argument of type '(document: string) => { pending: () => boolean; hasRecovery: () => boolean; freeze(): void; settle: Effect<boolean, never, never>; retain(failure: unknown): Effect<void, StorageError, never>; recover(source: string): Effect<...>; selection: () => EditorSelection; selectionReady(afterGeneration?: number | undefined):...' is not assignable to parameter of type '(document: string) => MainDraftOwner'.
+  Call signature return types '{ pending: () => boolean; hasRecovery: () => boolean; freeze(): void; settle: Effect<boolean, never, never>; retain(failure: unknown): Effect<void, StorageError, never>; recover(source: string): Effect<...>; selection: () => EditorSelection; selectionReady(afterGeneration?: number | undefined): Effect<...>; adopt(so...' and 'MainDraftOwner' are incompatible.
+    The types returned by 'retain(...)' are incompatible between these types.
+      Type 'Effect<void, StorageError, never>' is not assignable to type 'Effect<void, never, never>'.
+        Type 'StorageError' is not assignable to type 'never'.
+src/client/browser-library.ts(142,24): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(options: { readonly lookup: (key: unknown) => Effect<{ kind: "worker"; opened: Readonly<{ document: string; initial: { readonly status: { readonly unsaved: number; readonly pending: number; readonly rejected: number; readonly failures: { readonly save?: "network" | ... 4 more ... | undefined; readonly snapshot?: "network" | ... 4 more ... | undefined; readonly projection?: "network" | ... 4 more ... | undefined; }; }; ... 4 more ...; readonly projection?: { ...; } | undefined; }; ... 9 more ...; properties: Readonly<...>; }>; }, unknown, Scope | ... 1 more ... | BrowserAccount>; readonly idleTimeToLive?: Input | ... 1 more ... | undefined; readonly capacity?: undefined; }): Effect<...>', gave the following error.
+    Type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<{ kind: "worker"; opened: Readonly<{ document: string; initial: { readonly status: { readonly unsaved: number; readonly pending: number; readonly rejected: number; readonly failures: { readonly save?: "network" | "acces...' is not assignable to type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<{ kind: "worker"; opened: Readonly<{ document: string; initial: { readonly status: { readonly unsaved: number; readonly pending: number; readonly rejected: number; readonly failures: { readonly save?: "network" | "acces...'. Two different types with this name exist, but they are unrelated.
+      Type 'Effect<{ kind: "native"; opened: Readonly<{ session: { replica: Readonly<{ readonly actor: string; readonly clock: number; readonly author: string; text: (target: string, until?: string | number) => string; visible(target: string, until?: string | number): Atom[]; ... 6 more ...; forkEffect: (actor?: string | undefi...' is not assignable to type 'Effect<{ kind: "worker"; opened: Readonly<{ document: string; initial: { readonly status: { readonly unsaved: number; readonly pending: number; readonly rejected: number; readonly failures: { readonly save?: "network" | "access" | "conflict" | "storage" | "failure" | undefined; readonly snapshot?: "network" | ... 4 ...'.
+        Type '{ kind: "native"; opened: Readonly<{ session: { replica: Readonly<{ readonly actor: string; readonly clock: number; readonly author: string; text: (target: string, until?: string | number) => string; visible(target: string, until?: string | number): Atom[]; ... 6 more ...; forkEffect: (actor?: string | undefined, au...' is not assignable to type '{ kind: "worker"; opened: Readonly<{ document: string; initial: { readonly status: { readonly unsaved: number; readonly pending: number; readonly rejected: number; readonly failures: { readonly save?: "network" | "access" | "conflict" | "storage" | "failure" | undefined; readonly snapshot?: "network" | ... 4 more .....'.
+          Types of property 'kind' are incompatible.
+            Type '"native"' is not assignable to type '"worker"'.
+  Overload 2 of 2, '(options: { readonly lookup: (key: unknown) => Effect<{ kind: "worker"; opened: Readonly<{ document: string; initial: { readonly status: { readonly unsaved: number; readonly pending: number; readonly rejected: number; readonly failures: { readonly save?: "network" | ... 4 more ... | undefined; readonly snapshot?: "network" | ... 4 more ... | undefined; readonly projection?: "network" | ... 4 more ... | undefined; }; }; ... 4 more ...; readonly projection?: { ...; } | undefined; }; ... 9 more ...; properties: Readonly<...>; }>; }, unknown, Scope | ... 1 more ... | BrowserAccount>; readonly idleTimeToLive?: Input | ... 1 more ... | undefined; readonly capacity: number; }): Effect<...>', gave the following error.
+    Type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<{ kind: "worker"; opened: Readonly<{ document: string; initial: { readonly status: { readonly unsaved: number; readonly pending: number; readonly rejected: number; readonly failures: { readonly save?: "network" | "acces...' is not assignable to type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<{ kind: "worker"; opened: Readonly<{ document: string; initial: { readonly status: { readonly unsaved: number; readonly pending: number; readonly rejected: number; readonly failures: { readonly save?: "network" | "acces...'. Two different types with this name exist, but they are unrelated.
+      Type 'Effect<{ kind: "native"; opened: Readonly<{ session: { replica: Readonly<{ readonly actor: string; readonly clock: number; readonly author: string; text: (target: string, until?: string | number) => string; visible(target: string, until?: string | number): Atom[]; ... 6 more ...; forkEffect: (actor?: string | undefi...' is not assignable to type 'Effect<{ kind: "worker"; opened: Readonly<{ document: string; initial: { readonly status: { readonly unsaved: number; readonly pending: number; readonly rejected: number; readonly failures: { readonly save?: "network" | "access" | "conflict" | "storage" | "failure" | undefined; readonly snapshot?: "network" | ... 4 ...'.
+        Type '{ kind: "native"; opened: Readonly<{ session: { replica: Readonly<{ readonly actor: string; readonly clock: number; readonly author: string; text: (target: string, until?: string | number) => string; visible(target: string, until?: string | number): Atom[]; ... 6 more ...; forkEffect: (actor?: string | undefined, au...' is not assignable to type '{ kind: "worker"; opened: Readonly<{ document: string; initial: { readonly status: { readonly unsaved: number; readonly pending: number; readonly rejected: number; readonly failures: { readonly save?: "network" | "access" | "conflict" | "storage" | "failure" | undefined; readonly snapshot?: "network" | ... 4 more .....'.
+          Types of property 'kind' are incompatible.
+            Type '"native"' is not assignable to type '"worker"'.
+src/client/browser-library.ts(142,60): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/client/browser-library.ts(142,91): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/client/browser-library.ts(142,165): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/client/browser-library.ts(184,97): error TS18046: 'value' is of type 'unknown'.
+src/client/browser-library.ts(184,138): error TS18046: 'value' is of type 'unknown'.
+src/client/browser-library.ts(185,91): error TS18046: 'value' is of type 'unknown'.
+src/client/browser-library.ts(185,132): error TS18046: 'value' is of type 'unknown'.
+src/client/browser-library.ts(302,12): error TS18046: 'resource' is of type 'unknown'.
+src/client/browser-library.ts(302,49): error TS18046: 'resource' is of type 'unknown'.
+src/client/browser-library.ts(302,85): error TS18046: 'resource' is of type 'unknown'.
+src/client/browser-library.ts(303,21): error TS18046: 'resource' is of type 'unknown'.
+src/client/components/settings-themes.ts(111,10): error TS2345: Argument of type 'Effect<string, unknown, unknown>' is not assignable to parameter of type 'Effect<unknown, unknown, never>'.
+  Type 'unknown' is not assignable to type 'never'.
+src/client/components/settings-themes.ts(130,10): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<unknown, unknown, never>'.
+  Type 'unknown' is not assignable to type 'never'.
+src/client/components/settings-themes.ts(162,10): error TS2345: Argument of type 'Effect<string | void, never, unknown>' is not assignable to parameter of type 'Effect<string | void, never, never>'.
+  Type 'unknown' is not assignable to type 'never'.
+src/client/document-app.ts(154,4): error TS2345: Argument of type 'Effect<void, never, unknown>' is not assignable to parameter of type 'Effect<void, never, never>'.
+  Type 'unknown' is not assignable to type 'never'.
+src/client/document-app.ts(382,6): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(386,8): error TS2322: Type '(source: string, name: string) => Effect<undefined, unknown, unknown>' is not assignable to type '(source: string, name: string) => Effect<void, unknown, never>'.
+  Type 'Effect<undefined, unknown, unknown>' is not assignable to type 'Effect<void, unknown, never>'.
+    Type 'unknown' is not assignable to type 'never'.
+src/client/document-app.ts(468,13): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(506,11): error TS2345: Argument of type 'Effect<unknown, unknown, unknown>' is not assignable to parameter of type 'Effect<unknown, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(518,25): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(525,25): error TS2345: Argument of type 'Effect<unknown, unknown, unknown>' is not assignable to parameter of type 'Effect<unknown, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(530,25): error TS2345: Argument of type 'Effect<unknown, unknown, unknown>' is not assignable to parameter of type 'Effect<unknown, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(536,25): error TS2345: Argument of type 'Effect<unknown, unknown, unknown>' is not assignable to parameter of type 'Effect<unknown, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(544,25): error TS2345: Argument of type 'Effect<unknown, unknown, unknown>' is not assignable to parameter of type 'Effect<unknown, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(549,25): error TS2345: Argument of type 'Effect<unknown, unknown, unknown>' is not assignable to parameter of type 'Effect<unknown, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(554,25): error TS2345: Argument of type 'Effect<unknown, unknown, unknown>' is not assignable to parameter of type 'Effect<unknown, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(780,38): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(789,7): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(802,5): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(812,11): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(925,18): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(985,46): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(993,36): error TS2345: Argument of type 'Effect<undefined, unknown, unknown>' is not assignable to parameter of type 'Effect<undefined, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1005,11): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1316,33): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1554,13): error TS7006: Parameter 'doc' implicitly has an 'any' type.
+src/client/document-app.ts(1837,19): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1852,8): error TS2345: Argument of type 'Effect<Fiber<void, never>, never, unknown>' is not assignable to parameter of type 'Effect<Fiber<void, never>, never, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1862,21): error TS7031: Binding element 'asset' implicitly has an 'any' type.
+src/client/document-app.ts(1910,16): error TS7006: Parameter 'comment' implicitly has an 'any' type.
+src/client/document-app.ts(1911,17): error TS7006: Parameter 'comment' implicitly has an 'any' type.
+src/client/document-app.ts(1967,6): error TS2345: Argument of type '{ appearance: string | undefined; size: string | undefined; preset: string | undefined; syntaxTheme: string; mode: string | undefined; assets: Map<unknown, unknown>; mutedAssets: any; warning?: string | undefined; resolve: (id: string) => string | undefined; theme: string; }' is not assignable to parameter of type 'DocumentOptions'.
+  Types of property 'assets' are incompatible.
+    Type 'Map<unknown, unknown>' is not assignable to type 'Map<string, string>'.
+      Type 'unknown' is not assignable to type 'string'.
+src/client/document-app.ts(1968,19): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1990,35): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(2011,7): error TS2322: Type 'Effect<unknown, unknown, unknown>' is not assignable to type 'Effect<unknown, unknown, never>'.
+  Type 'unknown' is not assignable to type 'never'.
+src/client/document-app.ts(2023,50): error TS7006: Parameter 'staged' implicitly has an 'any' type.
+src/client/document-app.ts(2042,6): error TS2322: Type '(historical: Replica, position: number) => Effect<void, unknown, unknown>' is not assignable to type '(replica: Replica, position: number) => Effect<unknown, unknown, never>'.
+  Type 'Effect<void, unknown, unknown>' is not assignable to type 'Effect<unknown, unknown, never>'.
+    Type 'unknown' is not assignable to type 'never'.
+src/client/document-app.ts(2096,8): error TS2345: Argument of type '{ appearance: string | undefined; mode: string | undefined; slideNumber: number | undefined; size: string | undefined; preset: string | undefined; syntaxTheme: string; assets: Map<unknown, unknown>; mutedAssets: any; warning?: string | undefined; resolve: (id: string) => string | undefined; theme: string; }' is not assignable to parameter of type 'DocumentOptions'.
+  Types of property 'assets' are incompatible.
+    Type 'Map<unknown, unknown>' is not assignable to type 'Map<string, string>'.
+      Type 'unknown' is not assignable to type 'string'.
+src/client/document-app.ts(2102,21): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(2176,51): error TS7006: Parameter 'staged' implicitly has an 'any' type.
+src/client/document-app.ts(2343,14): error TS7006: Parameter 'asset' implicitly has an 'any' type.
+src/client/document-app.ts(2344,11): error TS7006: Parameter 'asset' implicitly has an 'any' type.
+src/client/document-app.ts(2406,7): error TS2345: Argument of type '{ appearance: string | undefined; size: string | undefined; preset: string | undefined; syntaxTheme: string; mode: string | undefined; assets: Map<unknown, unknown>; mutedAssets: any; warning?: string | undefined; resolve: (id: string) => string | undefined; theme: string; }' is not assignable to parameter of type 'DocumentOptions'.
+  Types of property 'assets' are incompatible.
+    Type 'Map<unknown, unknown>' is not assignable to type 'Map<string, string>'.
+      Type 'unknown' is not assignable to type 'string'.
+src/client/document-app.ts(2407,20): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(2562,154): error TS7006: Parameter 'board' implicitly has an 'any' type.
+src/client/document-app.ts(2721,45): error TS2345: Argument of type 'boolean | undefined' is not assignable to parameter of type 'boolean'.
+  Type 'undefined' is not assignable to type 'boolean'.
+src/client/document-app.ts(2767,51): error TS7006: Parameter 'asset' implicitly has an 'any' type.
+src/client/document-app.ts(2782,9): error TS7006: Parameter 'board' implicitly has an 'any' type.
+src/client/document-app.ts(2786,13): error TS7006: Parameter 'board' implicitly has an 'any' type.
+src/client/document-app.ts(2859,5): error TS2345: Argument of type 'Effect<void, never, unknown>' is not assignable to parameter of type 'Effect<void, never, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(2918,8): error TS2322: Type 'Effect<void, unknown, unknown>' is not assignable to type 'Task'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(3423,48): error TS7006: Parameter 'staged' implicitly has an 'any' type.
+src/client/document-app.ts(3475,45): error TS7006: Parameter 'staged' implicitly has an 'any' type.
+src/client/document-app.ts(3508,12): error TS7006: Parameter 'staged' implicitly has an 'any' type.
+src/client/document-app.ts(3545,9): error TS2345: Argument of type 'Effect<undefined, unknown, unknown>' is not assignable to parameter of type 'Effect<undefined, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(3682,7): error TS7006: Parameter 'staged' implicitly has an 'any' type.
+src/client/document-app.ts(3852,7): error TS2345: Argument of type 'Effect<any, unknown, unknown>' is not assignable to parameter of type 'Effect<any, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(3901,11): error TS7006: Parameter 'asset' implicitly has an 'any' type.
+src/client/document-app.ts(3927,11): error TS7006: Parameter 'comment' implicitly has an 'any' type.
+src/client/document-app.ts(3944,40): error TS2345: Argument of type '{ appearance: string | undefined; size: string | undefined; preset: string | undefined; syntaxTheme: string; mode: string | undefined; assets: Map<unknown, unknown>; mutedAssets: any; warning?: string | undefined; resolve: (id: string) => string | undefined; theme: string; }' is not assignable to parameter of type 'DocumentOptions'.
+  Types of property 'assets' are incompatible.
+    Type 'Map<unknown, unknown>' is not assignable to type 'Map<string, string>'.
+      Type 'unknown' is not assignable to type 'string'.
+src/client/document-app.ts(3945,20): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(4065,12): error TS2345: Argument of type 'Effect<void | undefined, unknown, unknown>' is not assignable to parameter of type 'Effect<void | undefined, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(4154,59): error TS7006: Parameter 'staged' implicitly has an 'any' type.
+src/client/document-archives.ts(277,53): error TS18046: 'blob' is of type 'unknown'.
+src/client/document-archives.ts(279,42): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'ArrayBuffer | ArrayLike<number>'.
+src/client/document-duplicate.ts(51,57): error TS7006: Parameter 'staged' implicitly has an 'any' type.
+src/client/theme-library.ts(174,50): error TS7006: Parameter 'staged' implicitly has an 'any' type.
+src/client/theme-library.ts(227,53): error TS7006: Parameter 'staged' implicitly has an 'any' type.
+src/client/theme-workbench-documents.ts(95,3): error TS2322: Type 'Effect<string, unknown, unknown>' is not assignable to type 'Effect<unknown, unknown, never>'.
+  Type 'unknown' is not assignable to type 'never'.
+src/client/worker-document/app-owner.ts(26,11): error TS6133: 'failure' is declared but its value is never read.
+src/client/worker-document/app-route.ts(55,23): error TS18046: 'state' is of type 'unknown'.
+src/client/worker-document/app-route.ts(56,18): error TS18046: 'state' is of type 'unknown'.
+src/client/worker-document/app-route.ts(57,19): error TS18046: 'state' is of type 'unknown'.
+src/client/worker-document/app-route.ts(57,41): error TS18046: 'state' is of type 'unknown'.
+src/client/worker-document/app-route.ts(57,63): error TS18046: 'state' is of type 'unknown'.
+src/client/worker-document/app-route.ts(57,79): error TS18046: 'state' is of type 'unknown'.
+src/client/worker-document/bindings.ts(3,10): error TS2305: Module '"../source-textarea"' has no exported member 'sourceDifference'.
+src/client/worker-document/editor-queue.ts(487,26): error TS2345: Argument of type 'Deferred<void, unknown> | Deferred<boolean, unknown> | Deferred<{ status: "applied" | "not-applied" | "unknown"; action?: string | undefined; failure?: string | undefined; }, unknown> | Deferred<...> | Deferred<...> | Deferred<...> | Deferred<...>' is not assignable to parameter of type 'Deferred<void, unknown>'.
+  Type 'Deferred<boolean, unknown>' is not assignable to type 'Deferred<void, unknown>'.
+    Types of property 'resumes' are incompatible.
+      Type '((effect: Effect<boolean, unknown, never>) => void)[] | undefined' is not assignable to type '((effect: Effect<void, unknown, never>) => void)[] | undefined'.
+        Type '((effect: Effect<boolean, unknown, never>) => void)[]' is not assignable to type '((effect: Effect<void, unknown, never>) => void)[]'.
+          Type '(effect: Effect<boolean, unknown, never>) => void' is not assignable to type '(effect: Effect<void, unknown, never>) => void'.
+            Types of parameters 'effect' and 'effect' are incompatible.
+              Type 'Effect<void, unknown, never>' is not assignable to type 'Effect<boolean, unknown, never>'.
+                Type 'void' is not assignable to type 'boolean'.
+src/client/worker-document/pending-ledger.ts(25,62): error TS2345: Argument of type '(input: unknown, options?: ParseOptions | undefined) => { readonly subject: string; readonly document: string; readonly session: string; readonly epoch: string; readonly acceptedBasis: string; readonly acknowledged: number; readonly pending: readonly { ...; }[]; }' is not assignable to parameter of type '(value: unknown, index: number, array: unknown[]) => { readonly subject: string; readonly document: string; readonly session: string; readonly epoch: string; readonly acceptedBasis: string; readonly acknowledged: number; readonly pending: readonly { ...; }[]; }'.
+  Types of parameters 'options' and 'index' are incompatible.
+    Type 'number' has no properties in common with type 'ParseOptions'.
+src/client/worker-document/worker-session.ts(69,64): error TS2339: Property 'layerWithConnectivity' does not exist on type 'typeof DocumentLive'.
+src/client/worker-document/worker.ts(43,2): error TS2345: Argument of type 'Effect<never, WorkerError, unknown>' is not assignable to parameter of type 'Effect<never, WorkerError, never>'.
+  Type 'unknown' is not assignable to type 'never'.
+tests/browser-library-sync-fixture.ts(68,2): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, never>'.
+  Type 'unknown' is not assignable to type 'never'.

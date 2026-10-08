@@ -1,0 +1,53 @@
+Found 3 likely blockers and 2 lesser ones. All of this comes from reading the source. I didn't type-check or run anything, so the timing claims below are inferences.
+
+## Blockers for the smallest ordinary-doc smoke
+
+**B1. Typing right after a background merge kills the session.** The code path is certain from source; how often typing lands in the window is a guess.
+- Every keyup, pointerup or notice, once the queue is settled, calls `bindings.merge()` (`worker-document/app-route.ts:60`). The worker returns a new candidate epoch every time (`worker-editor-basis.ts:173`), and `adoptMerged` accepts it even when the text is unchanged.
+- When the merge is accepted, the queue switches synchronously to epoch = candidate, sequence 0 (`editor-queue.ts:380-384`). The ledger is only rebased after the Adopt reply comes back (`editor-queue.ts:421,430`).
+- If you type during that Adopt round trip, the edit is created with sequence 1. The separate FIFO calls `ledger.prepare` straight away (`editor-queue.ts:124-127`) against the old row (old `acknowledged` and `acceptedBasis`). That gives a conflict, the edit fails and the session is retained. If `prepare` happens to pass, `rebase` then throws on the non-empty `pending` (`pending-ledger.ts:48`).
+- The window is the Adopt RPC plus one IDB write, and it reopens after every key. Normal typing likely hits it.
+- `Pending` rows don't carry an epoch, so `prepare` can't tell which basis an edit belongs to.
+- Smallest fix: put the rebase on `durableQueue` (or block `replace`) between accepting the merge and finishing the rebase.
+
+**B2. After Undo the editor can stay read-only.** The mechanism is certain; the ordering of the notice and the reply is likely but unproven.
+- `editor.setEditable` is only re-evaluated when `opened.changes` emits (`app-route.ts:54-55`).
+- `canWrite()` returns false while `commandFrozen` is set (`browser-worker-documents.ts:102`).
+- The worker bumps the editor revision inside `publishAfter`, so the notice can arrive before the UndoQueued or Adopt reply. The main side then also awaits the IDB write (`ledger.advance` or `rebase`) before clearing `commandFrozen`.
+- That calls `setEditable(false)`. `freezeCommands(false)` doesn't reset `permissionEditable` (`components/editor.ts:1041-1049`).
+- This is your "no-op Undo then type right away" case. A no-op Undo doesn't change the session, so no sync notice comes to fix it, and it stays stuck, especially offline.
+- An applied Undo may recover when the next connection-status notice arrives.
+
+**B3. Leaving after an in-session failure is impossible.** Certain from source.
+- `closeWorkerPage` and `openWorkerPage` run `route.save` before checking `pending()` (`document-app.ts:1290,1300`).
+- `route.save` fails whenever `queue.settle` returns false (`app-route.ts:61`), which is the case after any queue failure, worker death or `commandFrozen` stuck.
+- So after an AppliedUnknown or a worker death, recovery is stored but the user can't navigate away. Leaving only works after a reload, through the read-only recovery mount.
+
+## Smaller items
+
+**B4. A save/sync control marker left on disk blocks the document permanently, with no UI.** Certain from source.
+- Any marker under `worker-control-pending:` makes `open` fail (`browser-worker-documents.ts:64-65`). That happens before the route checks `owner.recovery()`, so you get a route error, not the read-only Editor.
+- Nothing ever clears these markers.
+- Ways to get one:
+  - reloading or closing the tab during Flush or Synchronize, including the save on navigation;
+  - a sync that runs longer than the 15s timeout;
+  - library `drain()` calling `synchronize` and `save` on worker docs in the background on focus or online events (`browser-library.ts:305`). Whether worker docs ever show up as dirty rows is a guess I didn't check.
+- Offline Synchronize returns quickly without error (`worker-opened-connection.ts:37`), so offline alone doesn't trigger this.
+
+**B5. Navigating A→B→A is safe, with one narrow exception.** Hypothesis, low risk for the smoke.
+- `openWorkerPage` waits for the old route scope to close, and RcMap removes and closes the entry inside that wait.
+- The exception: something holds the lock outside RcMap, or the old close hangs. Then the `ifAvailable` lock request fails with `BasisUnavailable`.
+- If drain holds the entry, remounting reuses the existing queue and its current basis. That looks correct.
+
+## Scenarios that look fine in source
+- No-op Undo ordering against the ledger: `advance` runs before `commandFrozen=false`, and the textarea stays readOnly while Undo is in flight. Apart from B2, this is fine.
+- `prepare` and `confirm` commute on the same row, and `storage.modify` is one atomic IDB read-and-write.
+- Multiple matching receipts plus an unresolved tail: the recovered text is built from the original row snapshot, which is correct. Recovery is then permanent, with no way to clear it.
+- An old same-length digest can't collide, because epoch and sequence are part of it.
+- Clean close: settle, Flush, Close, then the lock is released.
+- Revoked document with a draft that exists only in the editor: it's retained, and leaving is allowed when the queue isn't failed. If the queue is failed, B3 applies.
+
+## Debt you already know about (not blocking)
+Corrupt-ledger export, the Undo/domain pre-dispatch ledger, the IDB commit window, full-source copies, and reconciled rows that are never deleted.
+
+**Verdict:** still HOLD. Fix B1 and B2 before running the ordinary-doc smoke. B3 and B4 block the failure and reload smoke cases.

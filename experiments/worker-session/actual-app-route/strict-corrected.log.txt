@@ -1,0 +1,64 @@
+$ tsc --noEmit
+src/client/document-app.ts(382,6): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(468,13): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(506,11): error TS2345: Argument of type 'Effect<unknown, unknown, unknown>' is not assignable to parameter of type 'Effect<unknown, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(518,25): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(525,25): error TS2345: Argument of type 'Effect<unknown, unknown, unknown>' is not assignable to parameter of type 'Effect<unknown, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(530,25): error TS2345: Argument of type 'Effect<unknown, unknown, unknown>' is not assignable to parameter of type 'Effect<unknown, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(536,25): error TS2345: Argument of type 'Effect<unknown, unknown, unknown>' is not assignable to parameter of type 'Effect<unknown, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(544,25): error TS2345: Argument of type 'Effect<unknown, unknown, unknown>' is not assignable to parameter of type 'Effect<unknown, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(549,25): error TS2345: Argument of type 'Effect<unknown, unknown, unknown>' is not assignable to parameter of type 'Effect<unknown, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(554,25): error TS2345: Argument of type 'Effect<unknown, unknown, unknown>' is not assignable to parameter of type 'Effect<unknown, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(780,38): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(789,7): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(802,5): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(812,11): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(925,18): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(985,46): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(993,36): error TS2345: Argument of type 'Effect<undefined, unknown, unknown>' is not assignable to parameter of type 'Effect<undefined, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1005,11): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1316,33): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1837,19): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1968,19): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(1990,35): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(2042,6): error TS2322: Type '(historical: Replica, position: number) => Effect<void, unknown, unknown>' is not assignable to type '(replica: Replica, position: number) => Effect<unknown, unknown, never>'.
+  Type 'Effect<void, unknown, unknown>' is not assignable to type 'Effect<unknown, unknown, never>'.
+    Type 'unknown' is not assignable to type 'never'.
+src/client/document-app.ts(2102,21): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(2407,20): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(2918,8): error TS2322: Type 'Effect<void, unknown, unknown>' is not assignable to type 'Task'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/document-app.ts(3945,20): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, Scope | HttpClient>'.
+  Type 'unknown' is not assignable to type 'Scope | HttpClient'.
+src/client/worker-document/app-route.ts(23,28): error TS2488: Type 'never' must have a '[Symbol.iterator]()' method that returns an iterator.
+src/client/worker-document/app-route.ts(23,111): error TS2345: Argument of type '<A, R>(self: Effect<A, never, R>) => Effect<A | undefined, never, R>' is not assignable to parameter of type '(_: Effect<undefined, never, never> | Effect<{ initial: { epoch: string; sequence: number; source: string; }; queue: { replace: (ranges: readonly TextReplacement[], expectedSource?: string | undefined, fallback?: (() => readonly TextReplacement[]) | undefined, clipboardToken?: string | undefined) => { ...; }; ... 7 ...'.
+  Types of parameters 'self' and '_' are incompatible.
+    Type 'Effect<undefined, never, never> | Effect<{ initial: { epoch: string; sequence: number; source: string; }; queue: { replace: (ranges: readonly TextReplacement[], expectedSource?: string | undefined, fallback?: (() => readonly TextReplacement[]) | undefined, clipboardToken?: string | undefined) => { ...; }; ... 7 more...' is not assignable to type 'Effect<{ initial: { epoch: string; sequence: number; source: string; }; queue: { replace: (ranges: readonly TextReplacement[], expectedSource?: string | undefined, fallback?: (() => readonly TextReplacement[]) | undefined, clipboardToken?: string | undefined) => { ...; }; ... 7 more ...; undo: (redo: boolean) => Eff...'.
+      Type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<{ initial: { epoch: string; sequence: number; source: string; }; queue: { replace: (ranges: readonly import("/private/tmp/alkalye-worker-app-route/src/shared/crdt").TextReplacement[], expectedSource?: string | undefined...' is not assignable to type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<{ initial: { epoch: string; sequence: number; source: string; }; queue: { replace: (ranges: readonly import("/private/tmp/alkalye-worker-app-route/src/shared/crdt").TextReplacement[], expectedSource?: string | undefined...'. Two different types with this name exist, but they are unrelated.
+        Type 'unknown' is not assignable to type 'never'.
+src/client/worker-document/editor-queue.ts(507,26): error TS2345: Argument of type 'Effect<void, unknown, never>' is not assignable to parameter of type 'Effect<void, never, never>'.
+  Type 'unknown' is not assignable to type 'never'.
