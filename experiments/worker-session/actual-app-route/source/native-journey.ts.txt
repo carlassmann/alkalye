@@ -1,0 +1,59 @@
+import * as Effect from "effect/Effect"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import * as Redacted from "effect/Redacted"
+import * as Schema from "effect/Schema"
+import { apiDocuments } from "./src/cli/api-documents"
+import { browser, evaluate } from "./tests/browser-driver"
+let configuration = Schema.decodeUnknownSync(Schema.Struct({ origin: Schema.String, keyFile: Schema.String, scope: Schema.String, documents: Schema.Array(Schema.Struct({ fixture: Schema.String, documentId: Schema.String })) }))(await Bun.file('/tmp/alkalye-interaction-matrix-smoke/oracle.private.json').json())
+let document = configuration.documents.find(value => value.documentId === 'eb27d15c-02ac-4fbb-aa99-02f2918f63b6')
+if (!document) throw Error('Known fixture document missing')
+let documentId = document.documentId
+let api = apiDocuments(configuration.origin, Redacted.make((await Bun.file(configuration.keyFile).text()).trim()), configuration.scope)
+function read() { return Effect.runPromise(api.read(documentId).pipe(Effect.provide(FetchHttpClient.layer))) }
+let session = 'worker-route-journey-' + Date.now()
+let result: { stage: string; gates: string[]; secondDocument?: string; state?: unknown; failure?: string } = { stage: 'preflight', gates: [] }
+let native = 'document.querySelector("alkalye-editor")?.source'
+function condition(expression: string) { browser(session, 'wait', '--fn', expression) }
+function accepted(id: string, source: string) { return Effect.runPromise(Effect.gen(function*(){while(true){let value=yield* api.read(id);if(value.content===source)return;yield* Effect.sleep('100 millis')}}).pipe(Effect.timeout('20 seconds'),Effect.provide(FetchHttpClient.layer))) }
+function ready(id: string, source: string) { condition('location.pathname === '+JSON.stringify('/app/doc/'+id)+' && document.querySelector("#app").getAttribute("aria-busy") !== "true" && document.querySelector("[data-worker-experiment=ordinary-document]") !== null && '+native+'?.value === '+JSON.stringify(source)+' && !document.querySelector("#editor").readOnly') }
+function saved() { condition('document.querySelector("#save-status").getAttribute("aria-busy") === "false" && document.querySelector("#save-status").dataset.pending === "0" && !document.querySelector("#editor").readOnly') }
+function focusEnd() { evaluate(session,'(()=>{let source='+native+';source.focus();source.setSelectionRange(source.value.length,source.value.length);return document.activeElement===source.element})()'); condition('document.activeElement === document.querySelector("#editor")') }
+function switchTo(id: string, source: string) { let selector='[data-library] [data-doc="'+id+'"]'; condition('document.querySelector('+JSON.stringify(selector)+') !== null'); browser(session,'click',selector); ready(id,source) }
+try {
+ let known = await Bun.file('/tmp/alkalye-interaction-matrix-smoke/small2.txt').text()
+ let current = (await read()).content
+ if(current!==known+'x')throw Error('Accepted preflight must equal known fixture + previously proved x')
+ result.gates.push('accepted A exact known fixture + x')
+ let created=await Effect.runPromise(api.create('Worker route isolated no-op gate\n','Worker route gate '+Date.now()).pipe(Effect.provide(FetchHttpClient.layer)))
+ result.secondDocument=created.documentId
+ await Bun.write('native-journey-created.json',JSON.stringify({documentId:created.documentId})+'\n')
+ let second=(await Effect.runPromise(api.read(created.documentId).pipe(Effect.provide(FetchHttpClient.layer)))).content
+ browser(session,'--profile','/tmp/alkalye-worker-app-route/profile-run','open',configuration.origin+'/changelog')
+ browser(session,'open',configuration.origin+'/app/doc/'+documentId+'?worker=1')
+ ready(documentId,current)
+ result.stage='undo-previous-native-x'
+ focusEnd();browser(session,'press','Control+z'); condition(native+'.value === '+JSON.stringify(known)); saved();await accepted(documentId,known)
+ result.gates.push('trusted Undo restores exact independently accepted original A')
+ result.stage='switch-A-B'
+ switchTo(created.documentId,second)
+ result.gates.push('actual library A to fresh B worker mount exact accepted source')
+ result.stage='no-op-undo-B'
+ focusEnd();browser(session,'press','Control+z'); saved(); condition(native+'.value === '+JSON.stringify(second));await accepted(created.documentId,second)
+ result.gates.push('fresh birth-only B Undo leaves source and writable state intact')
+ result.stage='type-after-no-op'
+ focusEnd();browser(session,'press','y');condition(native+'.value === '+JSON.stringify(second+'y'));saved();await accepted(created.documentId,second+'y')
+ condition(native+'.selectionStart === '+(second.length+1)+' && '+native+'.selectionEnd === '+(second.length+1))
+ result.gates.push('trusted typing after no-op Undo has exact caret and accepted source')
+ result.stage='Undo-B'
+ browser(session,'press','Control+z');condition(native+'.value === '+JSON.stringify(second));saved();await accepted(created.documentId,second)
+ result.gates.push('trusted B Undo durably restores its own known source')
+ result.stage='switch-B-A'
+ switchTo(documentId,known)
+ result.gates.push('actual library B to A remount succeeds with exact source')
+ result.stage='reload-A'
+ browser(session,'open',configuration.origin+'/app/doc/'+documentId+'?worker=1');ready(documentId,known);saved();await accepted(documentId,known)
+ result.gates.push('full flagged reload restores durable A through same worker authority')
+ result.state=evaluate(session,'({path:location.pathname,sourceLength:'+native+'.value.length,selection:['+native+'.selectionStart,'+native+'.selectionEnd],visible:document.querySelector("#editor").checkVisibility(),readOnly:document.querySelector("#editor").readOnly,scripts:performance.getEntriesByType("resource").map(entry=>entry.name).filter(name=>new URL(name).pathname.endsWith(".js"))})')
+ result.stage='terminal';console.log(JSON.stringify(result))
+} catch(error) {result.failure=String(error);try{result.state=evaluate(session,'({path:location.pathname,source:'+native+'?.value,selection:['+native+'?.selectionStart,'+native+'?.selectionEnd],readOnly:document.querySelector("#editor")?.readOnly,toast:document.querySelector("#toast")?.textContent,badge:document.querySelector("#save-status")?.outerHTML,main:document.querySelector("#main")?.textContent?.slice(0,1500)})')}catch{}console.log(JSON.stringify(result));process.exitCode=1}
+finally {await Bun.write('native-journey-results.json',JSON.stringify(result,null,2)+'\n');browser(session,'close')}

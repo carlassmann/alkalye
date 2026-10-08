@@ -1,0 +1,97 @@
+import * as Schema from "effect/Schema"
+import { DocumentMetadataSchema } from "../../shared/document-metadata"
+import { LivePresenceSchema } from "../../shared/document-live"
+import { IdentifierSchema } from "../../shared/model"
+
+export let EditorBasisSchema = Schema.Struct({
+ epoch: Schema.String,
+ sequence: Schema.Natural,
+ source: Schema.String,
+})
+export let OpenedDocumentRecordSchema = Schema.Struct({
+ id: IdentifierSchema,
+ kind: Schema.Literals(["document", "slides", "whiteboard"]),
+ title: Schema.String,
+ content: Schema.String,
+ folder: Schema.String,
+ archived: Schema.Boolean,
+ updated: Schema.Natural,
+ room: Schema.String,
+ tags: Schema.Array(Schema.String),
+ pinned: Schema.Boolean,
+ created: Schema.Natural,
+ deleted: Schema.Boolean,
+})
+export let OpenedAssetSchema = Schema.Struct({
+ id: IdentifierSchema,
+ name: Schema.String,
+ contentType: Schema.String,
+ referenceVersion: Schema.optional(Schema.String),
+ muted: Schema.Boolean,
+ audible: Schema.Boolean,
+})
+export let OpenedWhiteboardSchema = Schema.Struct({ id: IdentifierSchema, name: Schema.String })
+export let OpenedThreadSchema = Schema.Struct({
+ id: IdentifierSchema,
+ fields: Schema.Record(Schema.String, Schema.String),
+ orphaned: Schema.Boolean,
+})
+export let EditorThreadRangeSchema = Schema.Struct({
+ id: IdentifierSchema,
+ start: Schema.Natural,
+ end: Schema.Natural,
+})
+export let OpenedConnectionSchema = Schema.Struct({
+ status: Schema.Literals(["offline", "syncing", "synced", "unavailable", "failed"]),
+ message: Schema.optional(Schema.String),
+ reason: Schema.optional(Schema.Literals(["access", "authentication", "unavailable"])),
+})
+let failure = Schema.optional(Schema.Literals(["access", "conflict", "storage", "network", "failure"]))
+export let WorkerOpenedSnapshotSchema = Schema.Struct({
+ revision: Schema.Natural,
+ editor: Schema.optional(Schema.Struct({
+  basis: EditorBasisSchema,
+  ranges: Schema.Array(EditorThreadRangeSchema),
+ })),
+ projection: Schema.optional(Schema.Struct({
+  document: OpenedDocumentRecordSchema,
+  metadata: DocumentMetadataSchema,
+  assets: Schema.Array(OpenedAssetSchema),
+  whiteboards: Schema.Array(OpenedWhiteboardSchema),
+  threads: Schema.Array(OpenedThreadSchema),
+ })),
+ canWrite: Schema.Boolean,
+ connection: OpenedConnectionSchema,
+ status: Schema.Struct({
+  unsaved: Schema.Natural,
+  pending: Schema.Natural,
+  rejected: Schema.Natural,
+  failures: Schema.Struct({ save: failure, snapshot: failure, projection: failure }),
+ }),
+})
+export let WorkerRecordSchema = Schema.Struct({
+ id: IdentifierSchema,
+ fields: Schema.Record(Schema.String, Schema.String),
+})
+export let WorkerPresenceSchema = Schema.Array(LivePresenceSchema)
+export type WorkerOpenedSnapshot = typeof WorkerOpenedSnapshotSchema.Type
+export type WorkerEditorProjection = NonNullable<WorkerOpenedSnapshot["editor"]>
+export type WorkerRecord = typeof WorkerRecordSchema.Type
+
+export let WorkerAdmissionSchema = Schema.Struct({
+ subject: Schema.String,
+ epoch: Schema.Natural,
+ exists: Schema.Boolean,
+ deleted: Schema.Boolean,
+ role: Schema.optional(Schema.Literals(["owner", "writer", "reader"])),
+ account: Schema.Literals(["ready", "signedOut", "accountChanged"]),
+ online: Schema.Boolean,
+})
+export let WorkerOpenedNoticeSchema = Schema.Struct({
+ revision: Schema.Natural,
+ admissionEpoch: Schema.Natural,
+ metadata: Schema.optional(DocumentMetadataSchema),
+ canWrite: Schema.Boolean,
+ connection: OpenedConnectionSchema,
+ status: WorkerOpenedSnapshotSchema.fields.status,
+})

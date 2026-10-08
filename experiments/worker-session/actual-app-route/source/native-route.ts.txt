@@ -1,0 +1,48 @@
+import * as Effect from "effect/Effect"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import * as Redacted from "effect/Redacted"
+import * as Schema from "effect/Schema"
+import { apiDocuments } from "./src/cli/api-documents"
+import { browser, evaluate } from "./tests/browser-driver"
+let configuration = Schema.decodeUnknownSync(Schema.Struct({ origin: Schema.String, keyFile: Schema.String, scope: Schema.String, documents: Schema.Array(Schema.Struct({ fixture: Schema.String, documentId: Schema.String })) }))(await Bun.file('/tmp/alkalye-interaction-matrix-smoke/oracle.private.json').json())
+let document = configuration.documents.find(value => value.documentId === 'eb27d15c-02ac-4fbb-aa99-02f2918f63b6')
+if (!document) throw Error('Known fixture document missing')
+let documentId = document.documentId
+let api = apiDocuments(configuration.origin, Redacted.make((await Bun.file(configuration.keyFile).text()).trim()), configuration.scope)
+function read() { return Effect.runPromise(api.read(documentId).pipe(Effect.provide(FetchHttpClient.layer))) }
+let session = 'actual-worker-route-' + Date.now()
+let result: { stage: string; initialLength?: number; gates: string[]; state?: unknown; failure?: string } = { stage: 'accepted-before', gates: [] }
+let native = 'document.querySelector("alkalye-editor")?.source'
+function condition(expression: string) { browser(session, 'wait', '--fn', expression) }
+try {
+ let original = (await read()).content
+ result.initialLength = original.length
+ browser(session, '--profile', '/tmp/alkalye-worker-app-route/profile-run', 'open', configuration.origin+'/changelog')
+ result.stage = 'worker-mount'
+ browser(session, 'open', configuration.origin+'/app/doc/'+documentId+'?worker=1')
+ condition('document.querySelector("[data-worker-experiment=ordinary-document]") !== null && document.querySelector("#app").getAttribute("aria-busy") !== "true" && '+native+' !== undefined && !document.querySelector("#editor").readOnly')
+ condition(native+'.value === '+JSON.stringify(original))
+ result.gates.push('actual BrowserLibrary route + existing Editor mounts exact accepted source')
+ result.state = evaluate(session, '({sourceLength:'+native+'.value.length,authority:document.querySelector("alkalye-editor").getAttribute("data-authority"),path:location.pathname+location.search,scripts:performance.getEntriesByType("resource").map(entry=>entry.name).filter(name=>new URL(name).pathname.endsWith(".js"))})')
+ result.stage = 'native-append'
+ evaluate(session, '(()=>{let editor=document.querySelector("alkalye-editor"),source=editor.source,node=document.querySelector("#editor");window.originalEditor=editor;window.originalTextarea=node;window.focusFacts=[];window.nativeTrusted=false;window.events=[];for(let type of ["focusin","focusout","keydown","beforeinput","input","keyup"]){document.addEventListener(type,event=>{let item={type,key:event.key,inputType:event.inputType,trusted:event.isTrusted,target:event.target.id,prevented:event.defaultPrevented,editorSame:document.querySelector("alkalye-editor")===window.originalEditor,textareaSame:document.querySelector("#editor")===window.originalTextarea,connected:window.originalEditor.isConnected};window.events.push(item);queueMicrotask(()=>{item.prevented=event.defaultPrevented})},true)}window.removals=[];new MutationObserver(records=>{for(let record of records){if(record.removedNodes.length)window.removals.push({editorSame:document.querySelector("alkalye-editor")===window.originalEditor,textareaSame:document.querySelector("#editor")===window.originalTextarea,connected:window.originalEditor.isConnected})}}).observe(document.querySelector("#main"),{childList:true,subtree:true});source.focus();window.focusFacts.push({phase:"focus",active:document.activeElement?.id,connected:editor.isConnected,sourceNodeSame:source.element===node,sourceNodeConnected:source.element.isConnected});source.setSelectionRange(source.value.length,source.value.length);window.focusFacts.push({phase:"selection",active:document.activeElement?.id,connected:editor.isConnected,sourceNodeSame:source.element===node,sourceNodeConnected:source.element.isConnected});document.addEventListener("beforeinput",event=>{window.nativeTrusted=event.isTrusted},{once:true,capture:true});return true})()')
+ console.log('pre-key', JSON.stringify(evaluate(session, '({focusFacts:window.focusFacts,removals:window.removals,active:document.activeElement?.id,tag:document.activeElement?.tagName,nativeLength:document.querySelector("#editor")?.value.length,sourceSelection:['+native+'.selectionStart,'+native+'.selectionEnd],nativeSelection:[document.querySelector("#editor")?.selectionStart,document.querySelector("#editor")?.selectionEnd],editorSame:document.querySelector("alkalye-editor")===window.originalEditor,textareaSame:document.querySelector("#editor")===window.originalTextarea,connected:window.originalEditor.isConnected,visible:document.querySelector("#editor")?.checkVisibility(),display:getComputedStyle(document.querySelector("#editor")).display,visibility:getComputedStyle(document.querySelector("#editor")).visibility,inert:document.querySelector("#editor")?.closest("[inert]")?.id,dialogs:[...document.querySelectorAll("dialog")].map(node=>({id:node.id,open:node.open})),rect:document.querySelector("#editor")?.getBoundingClientRect().toJSON()})')))
+ browser(session, 'press', 'x')
+ console.log('post-key', JSON.stringify(evaluate(session,'({events:window.events,sourceLength:'+native+'.value.length,nativeLength:document.querySelector("#editor")?.value.length,active:document.activeElement?.id,sourceSelection:['+native+'.selectionStart,'+native+'.selectionEnd]})')))
+ condition(native+'.value === '+JSON.stringify(original+'x'))
+ condition('window.nativeTrusted === true')
+ result.gates.push('trusted native append preserves optimistic draft')
+ condition('document.querySelector("#save-status").getAttribute("aria-busy") === "false"')
+ result.stage = 'accepted-after'
+ await Effect.runPromise(Effect.gen(function*(){while(true){let value=yield* api.read(documentId);if(value.content===original+'x')return;yield* Effect.sleep('100 millis')}}).pipe(Effect.timeout('20 seconds'),Effect.provide(FetchHttpClient.layer)))
+ result.gates.push('independent public API accepts exact native edit')
+ result.stage = 'terminal'
+ console.log(JSON.stringify(result))
+} catch(error) {
+ result.failure=String(error)
+ try {result.state=evaluate(session,'({path:location.pathname+location.search,sourceLength:'+native+'?.value.length,readOnly:document.querySelector("#editor")?.readOnly,toast:document.querySelector("#toast")?.textContent,main:document.querySelector("#main")?.textContent?.slice(0,2000),worker:document.querySelector("#app")?.dataset.workerExperiment})')}catch{}
+ console.log(JSON.stringify(result)); process.exitCode=1
+} finally {
+ await Bun.write('native-route-results.json',JSON.stringify(result,null,2)+'\n')
+ browser(session,'close')
+}

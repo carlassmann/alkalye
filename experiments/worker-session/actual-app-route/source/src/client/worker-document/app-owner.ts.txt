@@ -1,0 +1,67 @@
+import * as Effect from "effect/Effect"
+import * as Stream from "effect/Stream"
+import type { Storage } from "../storage"
+import type { EditorElement } from "../components/editor"
+import type { EditorSelection, makeEditorQueue } from "./editor-queue"
+import { WorkerDocumentFailure } from "./worker-rpc"
+
+type NativeQueue = Pick<Effect.Success<ReturnType<typeof makeEditorQueue>>, "state" | "settle">
+export function makeWorkerAppOwner(storage: Storage, subject: string, document: string) {
+ let key = "worker-native-recovery:" + encodeURIComponent(subject) + ":" + encodeURIComponent(document)
+ return Effect.gen(function* () {
+  let retained = yield* storage.get(key)
+  let recovery = typeof retained === "string" ? retained : undefined
+  let editor: EditorElement | undefined
+  let queue: NativeQueue | undefined
+  let frozen = recovery !== undefined
+  let lastSource = recovery ?? ""
+ let hasSource = recovery !== undefined
+ let recoveryStored = recovery !== undefined
+  function selection(): EditorSelection {
+   return editor?.mergeSelection() ?? { source: lastSource, start: 0, end: 0, direction: "none", generation: 0, composing: false, busy: true }
+  }
+  let draft = {
+   pending: () => recovery !== undefined ? !recoveryStored : !!editor && !!queue && editor.source?.value !== queue.state().source || !!queue && (!!queue.state().pending.length || !!queue.state().failure || queue.state().commandFrozen),
+   hasRecovery: () => recovery !== undefined,
+   freeze() { frozen = true; editor?.setEditable(false) },
+   settle: Effect.suspend(() => queue ? queue.settle : Effect.succeed(true)),
+   retain(_failure: unknown) {
+    return Effect.suspend(() => {
+     if (recovery !== undefined) return Effect.void
+     if (!hasSource) { frozen = true; return Effect.void }
+     frozen = true
+     editor?.failAuthority()
+     recovery = editor?.source?.value ?? lastSource
+     lastSource = recovery
+     return storage.set(key, recovery).pipe(Effect.tap(() => Effect.sync(() => { recoveryStored = true })), Effect.asVoid)
+    })
+   },
+   recover(source: string) { if (recovery !== undefined) return Effect.void; recovery = source; lastSource = source; frozen = true; editor?.failAuthority(); hasSource = true; return storage.set(key, source).pipe(Effect.tap(() => Effect.sync(() => { recoveryStored = true })), Effect.asVoid) },
+   selection,
+   selectionReady(afterGeneration?: number) {
+    return Effect.suspend(() => {
+     let active = editor
+     if (!active) return Effect.fail(new WorkerDocumentFailure({ reason: "SelectionUnavailable", category: "conflict" }))
+     if (afterGeneration === undefined || selection().generation !== afterGeneration) return Effect.void
+     return Stream.fromEventListener(active, "keyup").pipe(Stream.merge(Stream.fromEventListener(active, "pointerup")), Stream.merge(Stream.fromEventListener(active, "compositionend")), Stream.filter(() => selection().generation !== afterGeneration), Stream.runHead, Effect.asVoid)
+    })
+   },
+   adopt(source: string, selected: EditorSelection) {
+    if (recovery !== undefined || !editor) return false
+    let adopted = editor.adoptMerged(source, selected)
+    if (adopted) { lastSource = source; frozen = false }
+    return adopted
+   },
+  }
+  return {
+   draft,
+   recovery: () => recovery,
+   attachRecovered(native: EditorElement) { hasSource = true; editor = native; native.setEditable(false) },
+   attach(native: EditorElement, activeQueue: NativeQueue, source: string) {
+    editor = native; queue = activeQueue; lastSource = source; hasSource = true
+    if (frozen || recovery !== undefined) native.setEditable(false)
+   },
+   detach(native: EditorElement) { if (editor === native) { lastSource = native.source?.value ?? lastSource; editor = undefined } },
+  }
+ })
+}

@@ -1,0 +1,16 @@
+{
+  "stage": "native-append",
+  "gates": [
+    "actual BrowserLibrary route + existing Editor mounts exact accepted source"
+  ],
+  "initialLength": 2048,
+  "state": {
+    "main": "---\ntitle: Matrix smoke\n---\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\nReal small body.\n",
+    "path": "/app/doc/eb27d15c-02ac-4fbb-aa99-02f2918f63b6",
+    "readOnly": false,
+    "sourceLength": 2048,
+    "toast": "",
+    "worker": "ordinary-document"
+  },
+  "failure": "Error: actual-worker-route-1791483355738 wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n"
+}

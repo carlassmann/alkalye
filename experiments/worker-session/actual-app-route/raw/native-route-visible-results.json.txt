@@ -1,0 +1,49 @@
+{
+  "stage": "terminal",
+  "gates": [
+    "actual BrowserLibrary route + existing Editor mounts exact accepted source",
+    "trusted native append preserves optimistic draft",
+    "independent public API accepts exact native edit"
+  ],
+  "initialLength": 2048,
+  "state": {
+    "authority": null,
+    "path": "/app/doc/eb27d15c-02ac-4fbb-aa99-02f2918f63b6",
+    "scripts": [
+      "http://127.0.0.1:4473/chunks/document-app-hd68kss0.js",
+      "http://127.0.0.1:4473/chunks/document-app-65drjwwj.js",
+      "http://127.0.0.1:4473/chunks/document-app-s0vm8c3p.js",
+      "http://127.0.0.1:4473/chunks/document-app-tny41kb5.js",
+      "http://127.0.0.1:4473/chunks/document-app-k4h5mhfe.js",
+      "http://127.0.0.1:4473/chunks/document-app-4g2kcngh.js",
+      "http://127.0.0.1:4473/chunks/document-app-dn8sdt5w.js",
+      "http://127.0.0.1:4473/app.js",
+      "http://127.0.0.1:4473/chunks/document-app-fz2b1ej2.js",
+      "http://127.0.0.1:4473/chunks/document-app-6029fy4f.js",
+      "http://127.0.0.1:4473/chunks/document-app-97bkem5j.js",
+      "http://127.0.0.1:4473/chunks/document-app-mcdv6xvd.js",
+      "http://127.0.0.1:4473/chunks/document-app-y19qjey5.js",
+      "http://127.0.0.1:4473/chunks/document-app-5892trkj.js",
+      "http://127.0.0.1:4473/chunks/document-app-dhfqkvrw.js",
+      "http://127.0.0.1:4473/chunks/document-app-8h5yjn7d.js",
+      "http://127.0.0.1:4473/chunks/document-app-4bgmrsrx.js",
+      "http://127.0.0.1:4473/chunks/document-app-w7011z6k.js",
+      "http://127.0.0.1:4473/chunks/document-app-ktmfdbym.js",
+      "http://127.0.0.1:4473/chunks/document-app-0mvv6xke.js",
+      "http://127.0.0.1:4473/chunks/document-app-zbxrpx1j.js",
+      "http://127.0.0.1:4473/chunks/document-app-qck93mbe.js",
+      "http://127.0.0.1:4473/chunks/document-app-85srs0w5.js",
+      "http://127.0.0.1:4473/chunks/document-app-v5m1nj88.js",
+      "http://127.0.0.1:4473/chunks/document-app-mfap4qbx.js",
+      "http://127.0.0.1:4473/chunks/document-app-tqw183ch.js",
+      "http://127.0.0.1:4473/chunks/document-app-395fvyz7.js",
+      "http://127.0.0.1:4473/chunks/document-app-hanb36xp.js",
+      "http://127.0.0.1:4473/chunks/document-app-1jvyxqbz.js",
+      "http://127.0.0.1:4473/chunks/document-app-ypg29j2n.js",
+      "http://127.0.0.1:4473/chunks/document-app-794xhmze.js",
+      "http://127.0.0.1:4473/chunks/document-app-y47vn36r.js",
+      "http://127.0.0.1:4473/worker-editor.js"
+    ],
+    "sourceLength": 2048
+  }
+}

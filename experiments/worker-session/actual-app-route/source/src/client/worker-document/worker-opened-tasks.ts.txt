@@ -1,0 +1,32 @@
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import { DocumentSession } from "../../shared/document-session"
+import { DocumentConflict, PermissionDenied } from "../../shared/document-errors"
+import { formatSelection } from "../../shared/authoring"
+import type { Replica } from "../../shared/crdt"
+import type { DocumentRange } from "./opened-document-contract"
+
+interface TaskOptions {
+ document: string
+ session: Context.Service.Shape<typeof DocumentSession>
+ canWrite(): boolean
+ basis(range: DocumentRange): Replica | undefined
+}
+
+export function prepareWorkerTaskToggle(options: TaskOptions, range: DocumentRange) {
+ return Effect.gen(function* () {
+ if (!Number.isSafeInteger(range.sequence) || range.sequence < 0 || !Number.isSafeInteger(range.start) || !Number.isSafeInteger(range.end) || range.start < 0 || range.start !== range.end) return yield* Effect.fail(new DocumentConflict({ message: "The task selection is unavailable" }))
+ let basis = options.basis(range)
+ if (!basis) return yield* Effect.fail(new DocumentConflict({ message: "The task selection is unavailable" }))
+ let source = basis.text(options.document)
+ if (range.end > source.length) return yield* Effect.fail(new DocumentConflict({ message: "The task selection is unavailable" }))
+ let formatted = formatSelection(source, { start: range.start, end: range.end }, "complete")
+ if (formatted.source === source) return yield* Effect.fail(new DocumentConflict({ message: "This line is no longer a task" }))
+ let atoms = basis.visible(options.document)
+ let command = options.session.change("Toggle task completion", staged => {
+  if (!options.canWrite()) throw new PermissionDenied({ message: "This document is read-only" })
+  return [staged.edit(options.document, formatted.source, atoms)]
+ })
+ return Effect.suspend(() => options.canWrite() ? Effect.void : Effect.fail(new PermissionDenied({ message: "This document is read-only" }))).pipe(Effect.andThen(command))
+ })
+}
