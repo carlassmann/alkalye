@@ -1,0 +1,55 @@
+{
+	"scope": "Outside worker-native clipboard capability in actual EditorElement; production unchanged.",
+	"sourceBase": "5c47f1357d6d8be3fbdf0c0ec3879991f4aa60d1",
+	"productionComparison": "This proof freezes the copied underlying CRDT/cache source, distinct from later production 4401f54. No timing or current-production parity claim.",
+	"currentProof": {
+		"assertions": 13,
+		"types": "pass",
+		"browser": "pass",
+		"log": "journey-corrected.log",
+		"sourceHashes": {
+			"worker-client.ts": "9be91716eff0370ebcacae8dda12f61110b7684f1107ace83b945aff3a4c71e4",
+			"worker-rpc.ts": "fb2fcd20799d4e0f06a622944acf510797a2af48986de238c9893464322ab281",
+			"worker-session.ts": "8160d50d60c95b012be9c198f7fd3889d6cba2fd1bcaf0875e0635b17b52b4cb",
+			"worker.ts": "cfcd9f3ae3d67d0629f8728f08cfc02dc035b2929b125b37f21645d4ec278eb9",
+			"editor-queue.ts": "d52d8d369eb439f642c335d03523536f153f61d5d51c27069e3f78b3d60eb4a4",
+			"browser-fixture.ts": "4492c65e04c01ad3815491028d155170673d39add69ab35f333a14df4310550a",
+			"bindings.ts": "56aa0a6527a41903ddab3b2b0952f18dab4556d3f6d95f9bffef1098ac33007b",
+			"journey.ts": "c4f74bb770c19266c18658436d5212622107d98f8d4f1a04a74e8d28426f327c",
+			"server.ts": "8e4624605f0a7607aede9787fc422989012ef7a793426b8b17903992f49d47f5",
+			"seed.ts": "7f8cbff587a084d6cd6c9acb534e8fa0ef3fb665a8062be819dd3443bfff9a2f",
+			"build.ts": "fafff1bbc98d9982169f5b08237efb8b4aceb56ab7a1a25e5d23280dc0f642f4",
+			"work.config.js": "d29ce60fc18bfff291188aa055d8f87135c9bcb640926f803054409044f444d1",
+			"tsconfig.json": "aa34b1bd15694bef1a1014bf6bab127b9c50a7b3e2b67807b0615fa9e546fffb",
+			"src/client/components/editor.ts": "d95cbc60127ad0cdf5136dbd9430da8e506cf0c9484d84f6aa933b698301ae69",
+			"src/client/source-textarea.ts": "c6ea32c60cf10e9988e83f434bf476a95c47294a276fdf03f5350ce66e7b177e",
+			"assets/worker.js": "439c0e764334d06836543402f1844261939a28131b233b55e63a7e170e478854",
+			"assets/browser-fixture.js": "205231129f4a80901fd4397c3a571eaab0be77323484b6a2e953c7e7cd54289d"
+		}
+	},
+	"priorProof": {
+		"assertions": 7,
+		"log": "journey.log",
+		"scope": "Earlier fixture only; not certification of expanded fixture."
+	},
+	"preservedFailure": {
+		"log": "journey-peer.log",
+		"cause": "Fixture attempted merged adoption while native selection was anchored inside text removed by peer. Worker safely returned SelectionUnavailable. Corrected fixture moves caret to a retained anchor before guarded merge. Engine behavior unchanged."
+	},
+	"review": {
+		"model": "claude-opus-5-5",
+		"final": "No correctness blocker for bounded actual Editor clipboard proof.",
+		"logs": ["opus-review.log", "opus-followup.log", "opus-final.log"],
+		"afterReview": "Typed Deferred union narrowing only; fixture source added peer and native refusal assertions."
+	},
+	"limitations": [
+		"Deferred clipboard promises replace browser clipboard reads; real browser permission/gesture support not proven.",
+		"Peer uses independent worker actor under same account, not separate-account permission revocation.",
+		"Peer change before Resolve is covered; peer change between Resolve and ReplaceQueued remains source-reviewed, not deterministically runtime exercised.",
+		"Readonly and composition refusals covered; pointer drag and multicursor guards source-only in this proof.",
+		"Context menu remains worker-gated; journey calls editor.command(\"paste\").",
+		"No main-tab crash durability, performance, unified Undo adapter, or full production mount cutover proof."
+	],
+	"resources": "Disposable server stopped and all journey browser sessions closed.",
+	"signed": "written with gpt-6 in codex"
+}

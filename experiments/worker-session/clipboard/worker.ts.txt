@@ -1,0 +1,50 @@
+import * as Effect from "effect/Effect"
+import * as FiberSet from "effect/FiberSet"
+import * as Layer from "effect/Layer"
+import * as RpcServer from "effect/rpc/RpcServer"
+import * as WorkerRunner from "effect/workers/WorkerRunner"
+import { WorkerDocumentRpc } from "./worker-rpc"
+import { workerSessionHandlers } from "./worker-session"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+
+let runner = Layer.succeed(WorkerRunner.WorkerRunnerPlatform, {
+	start: <O, I>() =>
+		Effect.succeed({
+			send: (_port: number, message: O) =>
+				Effect.sync(() => self.postMessage([1, message])),
+			sendUnsafe: (_port: number, message: O) => self.postMessage([1, message]),
+			run: <A, E, R>(
+				handler: (port: number, message: I) => Effect.Effect<A, E, R> | void,
+			) =>
+				Effect.scoped(
+					Effect.gen(function* () {
+						let fibers = yield* FiberSet.make<void, never>()
+						let run = yield* FiberSet.runtime(fibers)<R>()
+						function receive(
+							event: MessageEvent<WorkerRunner.PlatformMessage<I>>,
+						) {
+							if (event.data[0] === 1) return
+							let work = handler(0, event.data[1])
+							if (work) run(work.pipe(Effect.orDie, Effect.asVoid))
+						}
+						yield* Effect.acquireRelease(
+							Effect.sync(() => self.addEventListener("message", receive)),
+							() =>
+								Effect.sync(() => self.removeEventListener("message", receive)),
+						)
+						self.postMessage([0])
+						yield* FiberSet.join(fibers)
+					}),
+				),
+		}),
+})
+Effect.runFork(
+ Layer.launch(
+  RpcServer.layer(WorkerDocumentRpc).pipe(
+   Layer.provide(workerSessionHandlers),
+   Layer.provide(RpcServer.layerProtocolWorkerRunner),
+   Layer.provide(runner),
+   Layer.provide(FetchHttpClient.layer),
+  ),
+ ),
+)
