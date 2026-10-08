@@ -1,0 +1,56 @@
+--- a/src/client/worker-document/worker-editor-basis.ts
++++ b/src/client/worker-document/worker-editor-basis.ts
+@@ -8,6 +8,7 @@
+ import { documentFailureCategory } from "../../shared/document-observability"
+ import { DocumentSession } from "../../shared/document-session"
+ import type { Replica, TextReplacement } from "../../shared/crdt"
++import { insertionRemovalPosition, terminalRemovalPosition } from "../../shared/crdt"
+ import type { Atom } from "../../shared/model"
+ import type { DocumentRange } from "./opened-document-contract"
+ import type { WorkerEditorProjection } from "./worker-opened-schemas"
+@@ -489,7 +490,44 @@
+ 	})
+ }
+ 
+-function mapSelectionBoundaries(
++function mapSelectionBoundaries(previous: Atom[], next: Atom[], offsets: number[]) {
++ let requests = [...new Set(offsets)].sort((left, right) => left - right)
++ if (previous === next) return new Map(requests.map(offset => [offset, offset]))
++ let resolved = new Map<number, number>()
++ let anchors = new Map<number, { id: string; inside: number }>()
++ let wanted = new Set<string>()
++ let request = 0, position = 0
++ if (requests[0] === 0) { resolved.set(0, 0); request++ }
++ for (let atom of previous) {
++  let offset = requests[request]
++  while (atom.value.length && offset !== undefined && offset <= position + atom.value.length) {
++   let removed = insertionRemovalPosition(previous, next, atom.id) ?? terminalRemovalPosition(previous, next, atom.id)
++   if (removed !== undefined) resolved.set(offset, removed)
++   else { anchors.set(offset, { id: atom.id, inside: offset - position }); wanted.add(atom.id) }
++   offset = requests[++request]
++  }
++  position += atom.value.length
++  if (request === requests.length) break
++ }
++ if (!wanted.size) return resolved
++ let positions = new Map<string, { start: number; end: number }>()
++ position = 0
++ for (let atom of next) {
++  if (wanted.has(atom.id)) {
++   positions.set(atom.id, { start: position, end: position + atom.value.length })
++   if (positions.size === wanted.size) break
++  }
++  position += atom.value.length
++ }
++ for (let [offset, anchor] of anchors) {
++  let mapped = positions.get(anchor.id)
++  if (!mapped) return mapSelectionBoundariesFallback(previous, next, offsets)
++  resolved.set(offset, mapped.start + Math.min(anchor.inside, mapped.end - mapped.start))
++ }
++ return resolved
++}
++
++function mapSelectionBoundariesFallback(
+ 	previous: readonly Atom[],
+ 	next: readonly Atom[],
+ 	offsets: number[],

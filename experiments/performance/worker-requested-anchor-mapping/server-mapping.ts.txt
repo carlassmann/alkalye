@@ -1,0 +1,5 @@
+import * as Effect from "effect/Effect"
+import {startServer} from "./src/server/index"
+let instance=await Effect.runPromise(startServer({port:4475,hostname:"127.0.0.1",publicOrigin:"http://127.0.0.1:4475",data:"/tmp/alkalye-worker-anchor-mapping/data",development:false,build:false}))
+console.log(JSON.stringify({url:instance.server.url.href}))
+for(let signal of ["SIGINT","SIGTERM"])process.once(signal,async()=>{await Effect.runPromise(instance.close());process.exit(0)})

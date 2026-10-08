@@ -1,0 +1,8 @@
+{
+	"sourcePath": "/tmp/alkalye-worker-app-stable-copy/src/client/worker-document/worker-editor-basis.ts",
+	"baselineSha256": "894b1afee87fc442bca5de39ae73fb8e58e8689c24f9dbf6254494bf0354669d",
+	"candidateSha256": "5a5dc0075a114cfd48f6a0dadff7d8400b985b9e246a02365fdce34da6a8a47f",
+	"originalFallbackPreserved": true,
+	"instrumentationPreserved": true,
+	"runtime": "unrun"
+}

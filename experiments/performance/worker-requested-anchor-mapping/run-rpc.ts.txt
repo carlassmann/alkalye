@@ -1,0 +1,17 @@
+import {browser,evaluate} from './tests/browser-driver'
+let results:unknown[]=[]
+for(let arm of ['baseline','candidate']) {
+ let session='mapping-'+arm+'-'+Date.now()
+ try {
+  browser(session,'--profile','/tmp/alkalye-worker-anchor-mapping/profile-'+arm+'-'+Date.now(),'open','http://127.0.0.1:4475/mapping.html?arm='+arm)
+  for(let attempt=0;attempt<5;attempt++) {
+   let value=evaluate(session,'({done:window.mappingDone,checks:window.mappingChecks,controls:window.mappingControls,failure:window.mappingFailure})')
+   await Bun.write('/tmp/alkalye-worker-anchor-mapping/'+arm+'-progress.json',JSON.stringify(value,null,2))
+   if(value.done){results.push({arm,...value});break}
+   try {browser(session,'wait','--fn','window.mappingDone')}catch(error){console.log(JSON.stringify({arm,attempt,waitFailure:String(error)}))}
+  }
+ }catch(error){results.push({arm,failure:String(error)})}
+ finally{browser(session,'close')}
+}
+await Bun.write('/tmp/alkalye-worker-anchor-mapping/rpc-results.json',JSON.stringify(results,null,2))
+console.log(JSON.stringify(results))

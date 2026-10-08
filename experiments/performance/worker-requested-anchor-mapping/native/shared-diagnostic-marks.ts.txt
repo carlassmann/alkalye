@@ -1,0 +1,16 @@
+import * as Schema from "effect/Schema"
+let Entry = Schema.Struct({ phase: Schema.String, time: Schema.Number, details: Schema.optional(Schema.String) })
+let entries: typeof Entry.Type[] = []
+export function workerBootRecord(value: unknown) {
+ let entry = Schema.decodeUnknownSync(Entry)(value)
+ entries.push(entry)
+ let output = document.querySelector<HTMLPreElement>("#worker-boot-diagnostics")
+ if (!output) { output = document.createElement("pre"); output.id = "worker-boot-diagnostics"; output.hidden = true; document.body.append(output) }
+ output.textContent = JSON.stringify(entries)
+}
+export function workerBootMark(phase: string, details?: unknown) {
+ if (phase.startsWith("Merge:")) performance.mark("mapping:"+phase)
+ let entry = { phase, time: performance.now(), ...(details === undefined ? {} : { details: String(details) }) }
+ if (typeof document === "undefined") self.postMessage([2, entry])
+ else workerBootRecord(entry)
+}

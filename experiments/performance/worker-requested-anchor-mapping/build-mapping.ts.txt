@@ -1,0 +1,13 @@
+import { build } from './build'
+await build()
+let baseline=await Bun.file('../stable-copy-baseline.ts.txt').text()
+let path='src/client/worker-document/worker-editor-basis.ts'
+let candidate=await Bun.file(path).text()
+try {
+ await Bun.write(path,baseline)
+ let result=await Bun.build({entrypoints:['src/client/worker-document/worker.ts'],outdir:'dist',target:'browser',naming:{entry:'baseline-worker-editor.js'},minify:true})
+ if(!result.success)throw new AggregateError(result.logs,'Baseline worker build failed')
+} finally {await Bun.write(path,candidate)}
+let fixture=await Bun.build({entrypoints:['browser-rpc-binding.ts'],outdir:'dist',target:'browser',naming:{entry:'mapping-fixture.js'},minify:true})
+if(!fixture.success)throw new AggregateError(fixture.logs,'Fixture build failed')
+await Bun.write('dist/mapping.html','<!doctype html><script type="module" src="/mapping-fixture.js"></script>')

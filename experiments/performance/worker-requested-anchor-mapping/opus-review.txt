@@ -1,0 +1,29 @@
+I found no correctness blocker. Equivalence holds on every path; the main problem is that the certificate fast path will almost never fire in the worker. This is from reading only, nothing was run.
+
+**Equivalence check**
+- **`previous === next`:** identity is correct. `forkEffect` copies `sourceCache` with the arrays shared (`crdt.ts:193`), so the arrays are identical whenever there was no local or remote edit since Begin or Adopt. `text()` is built from the same visible atoms, and offsets were already checked to be ≤ length, so every offset > 0 falls inside a non-empty atom. That matches what the baseline resolves.
+- **Surviving anchor:** `start + min(inside, len)` by atom ID is the same as the baseline. It uses UTF16 offsets and ties to the earlier atom (`<=` on its end), same as before.
+- **Deleted anchor without a certificate:** it falls back to `mapSelectionBoundariesFallback(previous, next, offsets)` on the original offsets, so the result is exactly the baseline's. That covers predecessor semantics, zero-value atoms and frontmatter.
+- **Certificate hit:** these are only valid for the exact array pair (`next` = `previous` minus one atom), so the result equals the nearest surviving predecessor's end. The offset comes from `offsetAtCodePoint`, which is UTF16 on the source view. This matches the baseline.
+- **Unresolved offsets:** they stay unresolved in both versions, giving the same `SelectionUnavailable`.
+- **Allocation:** O(k) in the fast path, and both scans stop early. No new index or cache.
+
+**Main finding: certificates are effectively unreachable in the worker**
+- `ReplaceQueued` applies the edit to `local.replica` and to the session separately, so each side builds its own `replaceAtoms` array. `UndoQueued` only undoes in the session, never in `local`.
+- Certificates are keyed by the session's own (before, after) arrays (`crdt.ts:689`, `:804`). The local array is never the session's `edit.atoms`, so the lookup misses.
+- So the "canceled-insertion anchor" Undo case the plan targets takes the slowest route: first scan, then a full second scan that never breaks because the ID is missing, then the full fallback. That is about 2 extra O(n) scans compared to the baseline. It is a performance regression on Undo and on remote deletes, not a correctness bug.
+- Certificates only hit when the local view is still the shared fork array and a remote insertion was undone.
+- Smallest fix, if you keep the change at all: drop the certificate calls and the `crdt` import, and accept that a deleted anchor costs the extra scans. Or record in the first runtime diagnostic whether a certificate hit, before keeping that code.
+
+**Small nit**
+- Unlike the editor (`editor.ts:978`, `:986`), the candidate doesn't bounds-check certificate offsets against the next length. It's harmless because of the identity keys, but copying the editor's guard is cheap.
+
+**Public WorkerRPC fixture gates (minimum)**
+I couldn't find a WorkerRPC fixture in this worktree: `tests/` has no `MergeCandidate`. These would need adding in the worker branch's existing fixture.
+1. Begin → MergeCandidate → Adopt with nothing changed (1 MiB): source, ranges and caret identical to the baseline.
+2. Remote insertions at the start and in the middle, with selections inside multi-unit atoms, surrogate pairs and lone surrogates.
+3. Remote delete of an anchored atom whose predecessor is a long deleted run: result equals the baseline predecessor.
+4. Local insert, `UndoQueued`, then MergeCandidate, with the anchor on the undone atom. This proves whether the certificate hits; per the above it should miss and still match the baseline.
+5. Frontmatter canonical rewrite, and zero-value or header-only atoms.
+6. All 512 ranges with mixed directions and duplicate or zero offsets.
+7. Existing gates: stale epoch, sequence or candidate rejected; peer edit after the candidate makes Adopt fail as before.

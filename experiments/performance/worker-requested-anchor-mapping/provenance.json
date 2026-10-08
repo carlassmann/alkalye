@@ -1,0 +1,30 @@
+{
+	"runtime/src/client/worker-document/worker-editor-basis.ts": {
+		"sha256": "5a5dc0075a114cfd48f6a0dadff7d8400b985b9e246a02365fdce34da6a8a47f",
+		"bytes": 20654
+	},
+	"stable-copy-baseline.ts.txt": {
+		"sha256": "894b1afee87fc442bca5de39ae73fb8e58e8689c24f9dbf6254494bf0354669d",
+		"bytes": 18936
+	},
+	"runtime/browser-rpc-binding.ts": {
+		"sha256": "4781f7c9cc5d8e9c0a1a9cc7ef40dc6363556688da1b30ae338ed578928b778f",
+		"bytes": 6395
+	},
+	"runtime/worker-rpc-gates.ts": {
+		"sha256": "ff008c9fd746c1ed9d63012911543ef05ab02186400a5cf6449e9a4503473b9f",
+		"bytes": 4752
+	},
+	"runtime/dist/baseline-worker-editor.js": {
+		"sha256": "ddc49da2f5ae974b7bc6d0fa7eae51856ce9977a3055709f2ccf8ea942558c5b",
+		"bytes": 609011
+	},
+	"runtime/dist/worker-editor.js": {
+		"sha256": "3b3322ede2e83261543cbe2c063744ba0f987ce3e129ac2b872628c83ad3682a",
+		"bytes": 609889
+	},
+	"runtime/dist/mapping-fixture.js": {
+		"sha256": "ee12c0f1c03c326f6f7877dded4bb4ea6c46d33ea3bbf43c86113eb9e5c88f73",
+		"bytes": 386318
+	}
+}

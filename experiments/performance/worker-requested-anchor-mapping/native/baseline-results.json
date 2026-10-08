@@ -1,0 +1,526 @@
+{
+	"stage": "terminal",
+	"gates": [
+		"actual worker MC1 trusted replacements + primary + accepted edit/Undo",
+		"actual worker MC512 trusted replacements + primary + accepted edit/Undo"
+	],
+	"cells": [
+		{
+			"phase": "Undo",
+			"count": 1,
+			"probe": {
+				"end": 16064,
+				"events": [
+					{
+						"key": "z",
+						"time": 13063.19999998808,
+						"type": "keydown"
+					}
+				],
+				"heapAfter": 22199072,
+				"heapBefore": 24652007,
+				"label": "Undo-1",
+				"localSaved": 14586.899999976158,
+				"ready": 13839.299999952316,
+				"start": 13063.19999998808
+			}
+		},
+		{
+			"selectionProbe": {
+				"end": 6257.699999988079,
+				"events": [
+					{
+						"key": "l",
+						"time": 3255.899999976158,
+						"type": "keydown"
+					}
+				],
+				"heapAfter": 29077228,
+				"heapBefore": 26799473,
+				"label": "selection-1",
+				"localSaved": 3268.699999988079,
+				"ready": 3268.599999964237,
+				"start": 3255.899999976158
+			},
+			"singleProbe": {
+				"end": 9582.799999952316,
+				"events": [
+					{
+						"key": "x",
+						"time": 6579.699999988079,
+						"type": "keydown"
+					},
+					{
+						"inputType": "insertText",
+						"time": 6580.099999964237,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 6580.599999964237,
+						"type": "input"
+					}
+				],
+				"heapAfter": 23449483,
+				"heapBefore": 29193949,
+				"label": "single-1",
+				"localSaved": 6587.299999952316,
+				"ready": 6587.299999952316,
+				"start": 6579.699999988079
+			},
+			"mergePhases": [
+				{
+					"phase": "Merge:flush-start",
+					"time": 6795.899999976158
+				},
+				{
+					"phase": "Merge:fork-start",
+					"time": 7059.099999964237
+				},
+				{
+					"phase": "Merge:text-start",
+					"time": 7227.300000011921
+				},
+				{
+					"phase": "Merge:visible-start",
+					"time": 7227.399999976158
+				},
+				{
+					"phase": "Merge:visible-done",
+					"time": 7227.399999976158
+				},
+				{
+					"phase": "Merge:map-start",
+					"time": 7227.399999976158
+				},
+				{
+					"phase": "Merge:map-done",
+					"time": 7366.800000011921
+				},
+				{
+					"phase": "Merge:flush-start",
+					"time": 7785.300000011921
+				},
+				{
+					"phase": "Merge:fork-start",
+					"time": 8027.899999976158
+				},
+				{
+					"phase": "Merge:text-start",
+					"time": 8193.699999988079
+				},
+				{
+					"phase": "Merge:visible-start",
+					"time": 8193.699999988079
+				},
+				{
+					"phase": "Merge:visible-done",
+					"time": 8193.800000011921
+				},
+				{
+					"phase": "Merge:map-start",
+					"time": 8193.800000011921
+				},
+				{
+					"phase": "Merge:map-done",
+					"time": 8304.699999988079
+				},
+				{
+					"phase": "Merge:flush-start",
+					"time": 13477.80000001192
+				},
+				{
+					"phase": "Merge:fork-start",
+					"time": 13477.899999976158
+				},
+				{
+					"phase": "Merge:text-start",
+					"time": 13656.099999964235
+				},
+				{
+					"phase": "Merge:visible-start",
+					"time": 13656.099999964235
+				},
+				{
+					"phase": "Merge:visible-done",
+					"time": 13656.099999964235
+				},
+				{
+					"phase": "Merge:map-start",
+					"time": 13656.099999964235
+				},
+				{
+					"phase": "Merge:map-done",
+					"time": 13784
+				},
+				{
+					"phase": "Merge:flush-start",
+					"time": 13798.30000001192
+				},
+				{
+					"phase": "Merge:fork-start",
+					"time": 14034.5
+				},
+				{
+					"phase": "Merge:text-start",
+					"time": 14246.399999976158
+				},
+				{
+					"phase": "Merge:visible-start",
+					"time": 14246.399999976158
+				},
+				{
+					"phase": "Merge:visible-done",
+					"time": 14246.399999976158
+				},
+				{
+					"phase": "Merge:map-start",
+					"time": 14246.399999976158
+				},
+				{
+					"phase": "Merge:map-done",
+					"time": 14385.599999964235
+				},
+				{
+					"phase": "Merge:flush-start",
+					"time": 14539.599999964235
+				},
+				{
+					"phase": "Merge:fork-start",
+					"time": 14772
+				},
+				{
+					"phase": "Merge:text-start",
+					"time": 14965.30000001192
+				},
+				{
+					"phase": "Merge:visible-start",
+					"time": 14965.30000001192
+				},
+				{
+					"phase": "Merge:visible-done",
+					"time": 14965.30000001192
+				},
+				{
+					"phase": "Merge:map-start",
+					"time": 14965.399999976158
+				},
+				{
+					"phase": "Merge:map-done",
+					"time": 15111.899999976158
+				}
+			],
+			"acceptedObservedMs": 6385.287875,
+			"burstProbe": {
+				"end": 22651.89999997616,
+				"events": [
+					{
+						"inputType": "insertText",
+						"time": 19651.39999997616,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19651.89999997616,
+						"type": "input"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19657.799999952316,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19658.19999998808,
+						"type": "input"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19664.69999998808,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19665,
+						"type": "input"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19669.69999998808,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19670,
+						"type": "input"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19675.799999952316,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19676.099999964237,
+						"type": "input"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19681.69999998808,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19681.89999997616,
+						"type": "input"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19687.39999997616,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19687.599999964237,
+						"type": "input"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19694.39999997616,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19694.69999998808,
+						"type": "input"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19700.099999964237,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19700.39999997616,
+						"type": "input"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19705.5,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 19705.69999998808,
+						"type": "input"
+					}
+				],
+				"heapAfter": 30232339,
+				"heapBefore": 20278074,
+				"label": "burst-1",
+				"localSaved": 19720,
+				"ready": 19720,
+				"start": 19651.39999997616
+			},
+			"burstAcceptedObservedMs": 13359.267457999998,
+			"scope": "Driver-inclusive accepted upperbounds include3s observation. Heap samples mainJS only. Burst intentionally retained accepted, no unknownUndo cleanup.",
+			"count": 1,
+			"sourceLength": 1048610,
+			"expectedLength": 1048606,
+			"sourceSHA": "d675ebef528946b884a7088f5d3b81d1120f0c5416bce767855f49367af8a1b3",
+			"editedSHA": "9ba37b24c80f5b7049bb81b5fdb909716dd8fcb2477b75b3e61d27a1d94419c5",
+			"after": {
+				"busy": false,
+				"end": 35,
+				"generation": 10,
+				"ranges": 1,
+				"start": 35
+			},
+			"restored": {
+				"busy": false,
+				"end": 34,
+				"generation": 17,
+				"ranges": 1,
+				"start": 34
+			}
+		},
+		{
+			"phase": "Undo",
+			"count": 512,
+			"probe": {
+				"end": 16572,
+				"events": [
+					{
+						"key": "z",
+						"time": 13570.399999976158,
+						"type": "keydown"
+					}
+				],
+				"heapAfter": 17770504,
+				"heapBefore": 16716457,
+				"label": "Undo-512",
+				"localSaved": 15115.399999976158,
+				"ready": 14400.399999976158,
+				"start": 13570.399999976158
+			}
+		},
+		{
+			"selectionProbe": {
+				"end": 6145.5,
+				"events": [
+					{
+						"key": "l",
+						"time": 3142.800000011921,
+						"type": "keydown"
+					}
+				],
+				"heapAfter": 14477010,
+				"heapBefore": 18308883,
+				"label": "selection-512",
+				"localSaved": 3148.199999988079,
+				"ready": 3148.199999988079,
+				"start": 3142.899999976158
+			},
+			"singleProbe": {
+				"end": 9502.80000001192,
+				"events": [
+					{
+						"key": "x",
+						"time": 6501.800000011921,
+						"type": "keydown"
+					},
+					{
+						"inputType": "insertText",
+						"time": 6502.099999964237,
+						"type": "beforeinput"
+					}
+				],
+				"heapAfter": 16630900,
+				"heapBefore": 16325184,
+				"label": "single-512",
+				"localSaved": 6516.399999976158,
+				"ready": 6516.399999976158,
+				"start": 6501.800000011921
+			},
+			"mergePhases": [
+				{
+					"phase": "Merge:flush-start",
+					"time": 13985.399999976158
+				},
+				{
+					"phase": "Merge:fork-start",
+					"time": 13985.5
+				},
+				{
+					"phase": "Merge:text-start",
+					"time": 14156
+				},
+				{
+					"phase": "Merge:visible-start",
+					"time": 14156.099999964235
+				},
+				{
+					"phase": "Merge:visible-done",
+					"time": 14156.099999964235
+				},
+				{
+					"phase": "Merge:map-start",
+					"time": 14156.19999998808
+				},
+				{
+					"phase": "Merge:map-done",
+					"time": 14328.899999976158
+				}
+			],
+			"acceptedObservedMs": 6928.471665999998,
+			"burstProbe": {
+				"end": 23233.80000001192,
+				"events": [
+					{
+						"inputType": "insertText",
+						"time": 20232.19999998808,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 20239.5,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 20246.80000001192,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 20254.5,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 20262.599999964237,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 20270.39999997616,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 20278.80000001192,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 20287,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 20297.099999964237,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 20304.30000001192,
+						"type": "beforeinput"
+					}
+				],
+				"heapAfter": 103185769,
+				"heapBefore": 17617019,
+				"label": "burst-512",
+				"localSaved": 20316.19999998808,
+				"ready": 20316.099999964237,
+				"start": 20232.19999998808
+			},
+			"burstAcceptedObservedMs": 13231.030666000006,
+			"scope": "Driver-inclusive accepted upperbounds include3s observation. Heap samples mainJS only. Burst intentionally retained accepted, no unknownUndo cleanup.",
+			"count": 512,
+			"sourceLength": 1048612,
+			"expectedLength": 1046564,
+			"sourceSHA": "bcd940bce20cd546f7a79bf5bddc42f9c75d5ce214387b3707eeedbc87ed3445",
+			"editedSHA": "a6cdcf9718f73b97615694bc6652fe739f7b31bf4312ea2ec14ae5818b61d4b6",
+			"after": {
+				"busy": false,
+				"end": 37,
+				"generation": 6,
+				"ranges": 512,
+				"start": 37
+			},
+			"restored": {
+				"busy": false,
+				"end": 36,
+				"generation": 9,
+				"ranges": 512,
+				"start": 36
+			}
+		}
+	],
+	"fixture": {
+		"initialLength": 1048612,
+		"editedLength": 1046564,
+		"initialSHA": "bcd940bce20cd546f7a79bf5bddc42f9c75d5ce214387b3707eeedbc87ed3445",
+		"editedSHA": "a6cdcf9718f73b97615694bc6652fe739f7b31bf4312ea2ec14ae5818b61d4b6"
+	}
+}
