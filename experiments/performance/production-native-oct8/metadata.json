@@ -61,5 +61,15 @@
 		"rewrite128": 3,
 		"original1MiB": 0,
 		"rewrite1MiB": 3
+	},
+	"originalSyncLifecycle": {
+		"log": "original-sync-oom.log",
+		"nodeVersion": "24.14.0",
+		"nodePid": 90885,
+		"lastMajorGcMillisecondsSinceStartup": 358450,
+		"lastMajorGcHeapMiB": 4083.1,
+		"fatalError": "Reached heap limit Allocation failed - JavaScript heap out of memory",
+		"nativeStackIncludes": "JsonStringifier::Stringify",
+		"scope": "Direct process failure evidence; no established wall-clock correlation with prior Undo acceptance deadline, action-level attribution, or cause of older process disappearance."
 	}
 }
