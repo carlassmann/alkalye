@@ -354,6 +354,15 @@
 			<code>experiments/worker-session/activity</code>.
 		</p>
 		<p>
+			Worker comments passed 20 browser checks through the actual Editor and
+			existing DocumentDiscussion service. Selection tokens retain the original
+			quote across peer edits; orphaned comments keep their identity. The checks
+			cover retries, disabled comments, token capacity and a 65,537-character
+			comment. Remote acceptance, server permission revocation and lost Submit
+			replies remain unverified. This slice does not replace the production
+			comments UI. Evidence: <code>experiments/worker-session/comments</code>.
+		</p>
+		<p>
 			Active-line geometry caching was rejected. Six valid rich-document wheel
 			cells showed no consistent layout or paint gain, and geometry fixtures did
 			not prove correctness across a viewport-top shift. The 1MiB arm failed an
