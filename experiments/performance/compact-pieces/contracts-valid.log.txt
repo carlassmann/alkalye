@@ -1,0 +1,27 @@
+bun test v1.4.0 (34cbb9a40)
+
+session.test.ts:
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [637.23ms]
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [517.85ms]
+
+tests/checkpoint.test.ts:
+(pass) malformed checkpoint headers remain typed failures [0.68ms]
+(pass) checkpoint and shuffled duplicate replay converge to the full event log [25.37ms]
+(pass) checkpoint tombstones retain offline anchors and undo values [1.63ms]
+(pass) random offline writers converge when checkpoints arrive after pending local edits [2301.75ms]
+(pass) history hydration restores every version while current state stays unchanged [5.74ms]
+(pass) a checkpoint opens thousands of metadata events as winning registers [7.36ms]
+(pass) checkpoint validation rejects ambiguous identities and invalid clocks [0.84ms]
+(pass) compressed checkpoints authenticate their room and preserve materialized state [9.08ms]
+(pass) checkpoint streams reject corrupt gzip, invalid state and oversized decompression as typed failures [50.59ms]
+
+tests/checkpoint-capture.test.ts:
+(pass) cooperative capture and compaction preserve the complete document and return owned snapshots [303.70ms]
+(pass) concurrent writes reject a captured snapshot instead of publishing a mixed revision [148.03ms]
+(pass) interrupted capture and compaction leave the document usable and publish no partial snapshot [312.05ms]
+(pass) cooperative compact checkpoints retain lone surrogate atom identities [0.59ms]
+
+ 15 pass
+ 0 fail
+ 1651 expect() calls
+Ran 15 tests across 3 files. [4.38s]

@@ -1,0 +1,42 @@
+**Verdict: hold, leaning adopt.** I found no correctness blocker. The case for adopting rests on less total main-thread work in `long1m`, not on shorter worst-case tasks. Two gaps need closing before adoption, and both use existing harnesses. This review was read-only; nothing was run.
+
+## Correctness (`runtime/src/shared/model.ts:346-415` vs `baseline/src/shared/model.ts:346-382`)
+- **Merge decision:** the merge condition is the same. `length` tracks exactly what `previous.value.length` was in the baseline, and it resets in `finishRun` before the next run starts. The lone-surrogate test still runs on the raw atoms.
+- **Fast paths:** `finishRun` returns `pieces[0]` when nothing has been flushed yet. `pieces` can't be empty at that point, because `append` always runs before it. The output strings are the same as `+=` for string values.
+- **Stale value mid-run:** while a run is still open, `previous.value` holds only the first piece. Nothing reads it inside the loop or across a yield, and `insert` doesn't escape until the return. Interrupting the generator leaves no partial result.
+- **Callers:** `checkpoint.ts:169` (cooperative) and `compactOperation` (non-cooperative) both work unchanged. `CompactAtomSchema` (`checkpoint.ts:129`, at most 2M characters) is still satisfied.
+- **Your copies:** `runtime/`, `model.ts` and `tested-candidate-model.ts` contain the same compaction code. I compared the key lines, not a full diff.
+- **Not blockers for this change:**
+  - The lone-surrogate server/session insert failure happens identically in both arms. Track it separately.
+  - A `value` that isn't a string would come out differently. Schemas stop this from reaching the code.
+
+## The data (n=3 per cell, cursor at end only)
+| Metric | Baseline (per trial) | Candidate (per trial) | Read |
+|---|---|---|---|
+| long Undo, largest task | 253.6 / 224.4 / 268.2 | 244.8 / 227.7 / 221.2 | **Ranges overlap.** The median drop of about 10% isn't robust. |
+| long Undo, busy union | 1634 / 1649 / 1774 | 1384 / 1408 / 1415 | Clean separation, about −15% |
+| long Undo, tasks >8.33 ms | 21 / 24 / 22 | 4 / 8 / 5 | Strongest signal. Your summary leaves it out. |
+| long input, largest task | 20.1 / 20.1 / 15.5 | 7.7 / 20.7 / 20.3 | Unchanged. A MajorGC of about 20 ms still dominates in 2 of 3 candidate runs. |
+| long input, busy union / tasks >8.33 ms | 987 / 939 / 968; 20 / 17 / 18 | 845 / 858 / 764; 0 / 3 / 3 | Separated |
+| many-line input, initiating task | 4.29 / 5.03 / 4.01 | 4.75 / 5.11 / 4.79 | About +0.5 ms. Overlaps, under 1 ms, probably noise. |
+| many-line Undo | 29.5 / 32.1 / 29.3 | 30.0 / 28.0 / 29.6 | Unchanged |
+| heap used after input (MB) | long: 676 / 700 / 1249<br>many-line: 635 / 549 / 1183 | long: 556 / 656 / 643<br>many-line: 815 / 1191 / 596 | Inconsistent: lower for long, higher for many-line. Single samples, so no claim. |
+
+## Caveats in the raw data
+1. **The `mc1m` measurements are confounded.** All 3 baseline runs ended with the badge showing `pending: "1"`; all 3 candidate runs ended with `"0"` (`allocation-results.json:2397,3575,3958`). A save may still have been in flight while the baseline window was measured, so the `mc1m` busy-union and largest-task differences can't be credited to the candidate.
+2. **`eventTiming` doesn't support a comparison.**
+   - The set of recorded entries differs from trial to trial.
+   - Candidate `long1m` trials 1 and 2 show keydown/keypress at 24 ms; every baseline shows 16 (`:802,809,2000,2007`). Processing time is about the same, and the values are rounded to 8 ms, so this is weak evidence against the candidate, not a finding.
+3. **The `frames` arrays don't agree with the traces.** No frame in any of the 12 runs reaches 18 ms, yet the traces show tasks of 20 ms and more. Don't use the frames as jank evidence. Everything here assumes a 60 Hz display, and nothing in it supports a 120fps claim.
+4. **The mechanism is unidentified.** The largest tasks are `o.port1.onmessage` and `app.js:1653`, not compaction itself. The busy-union reduction is real at n=3, but nothing in this data shows why it happens.
+5. **Untested paths:**
+   - **Fragmented input:** many short runs from multicursor edits, interleaved actors or undo-heavy histories. `mc1m` doesn't exercise this. It's the candidate's worst case, because every run adds a push and a reset on top of the baseline's spread.
+   - **One 2M-character run in cooperative mode:** the final join happens all at once between yields.
+
+## Recommendation
+- **Adopt once:**
+  - the `mc1m` pending-save asymmetry is explained, by re-reading the saved traces or by waiting until pending is 0 before measuring;
+  - a fragmented-atom case shows no regression. The deep checkpoint suite or a module test can cover this, so no new browser benchmark is needed.
+- **If you must decide now:** adopting is low-risk. It changes no behaviour, is easy to revert, and shows no regression above noise. Scope the rationale strictly to "fewer >8.33 ms tasks and lower busy union on `long1m`, n=3". Don't claim it improves Undo's worst-case task, input latency, heap or GC.
+
+written with claude-opus-5-5 in claude-code

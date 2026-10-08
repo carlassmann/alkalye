@@ -1,0 +1,225 @@
+{
+	"decision": "hold; no production adoption",
+	"sourceBase": "bf517046a7ea87ee823f786fbf42fef9b98e4334",
+	"backendBase": "frozen0e13876 native Bun backend, identical both arms",
+	"sourceSha": {
+		"baseline": "70f8ce900a37b8a9bc3fab851528755367eba0eddac527610e4d88a53039cac8",
+		"candidate": "58d2d60eafa08b90ac2d63906c20fadd9378aaadef8d7c91e434c1088e3cb7a1",
+		"moduleFixture": "3472337bc5007b870e53ce572690634309938dd60d8e4a06c6b18ae9fa05670e",
+		"browserHarness": "c57a22d3cea46753f7adba0e2a5344262031c39a49f72dcb8c085b46feb8d508"
+	},
+	"browserBundleEntryShaVerifiedPerCell": true,
+	"allBuiltJsSha": {
+		"baseline": {
+			"app.js": "ff0c57c440cddaf4b73635627b9f211c0331a463373799475fdb08d0cc41f3d6",
+			"chunks/document-app-06pkehrg.js": "d0c2d0576bfc02dbf39b350f8d668290c1a292e4242bc69cc5cfae3133e0df4e",
+			"chunks/document-app-102pwqh5.js": "3ea9422a76f23abcf697ae1436b23912b874f353c65ff416935c20db20d327b6",
+			"chunks/document-app-1hr2amdq.js": "27f49a62953d429fd99acc80627a50f4825985ec9a4d31d7f3eb1f2e633cf4ad",
+			"chunks/document-app-1n8fnx10.js": "03c61247d94d83a7290009425a76dcb49298a52f314cdf327b83d36a50a948c7",
+			"chunks/document-app-29ytm0gp.js": "bd0544afd35e9c88bfdb3e37ca3b2236e00bc095ccd85528489f54d9965e49db",
+			"chunks/document-app-2br1y630.js": "0ab8526b174787cb44645872f3809988e30f4e21a1b74aa2ae36b296deed08a9",
+			"chunks/document-app-3jdkyp4f.js": "0d321215a525b9b6885c4d6fec351e12c842a06dfa5b09f520dcc9d60698a0dd",
+			"chunks/document-app-43g09p0a.js": "c67578ea104ce232539af018e0753b6e0501fc3c8f9ea21d115116cd8ab14162",
+			"chunks/document-app-44h4an5k.js": "fcf3cdc74077f1ab6d6038f356aada6d58819a591c1dd0de54cf22d233489d5e",
+			"chunks/document-app-58cqw1dx.js": "1fc9f2eccd4ba2a277e39210e41db3b823c84d68b621811f674b49515a9ebfa4",
+			"chunks/document-app-5r0cx4gq.js": "26dcce54f767ba61ff693010b24819bade92bbd1630d529733e513da871d222a",
+			"chunks/document-app-70vy0mv8.js": "ff897df7071e80b0f7cecb569ca0ce6fe7ecf58d34ef5998ead4b8fc7e4f68e0",
+			"chunks/document-app-7fxmvxj8.js": "254c326fa57b0a4cec4a07b03342e929ace102425fd59a51a7dc0df656ae20d9",
+			"chunks/document-app-8b7kt562.js": "2418a20596e5ea15d28b70c5c7bc71539aed01faa7948e4761a1ae27deb967db",
+			"chunks/document-app-acm1vyk8.js": "5ee52eb4b7b26832db8b06062cd81558871ee70fab9408b17a48822cc49b56f1",
+			"chunks/document-app-e4xxqn99.js": "95d8795993306bf11ebdcec485f3eb8bdcf5e4e49976f73c4603e1651fa4bdd7",
+			"chunks/document-app-er26grye.js": "63cf9ac709459c7c3fa472fbc2106b40b9b9bb7fd4c56e47f306de485209fe57",
+			"chunks/document-app-es06eeja.js": "9a8d5b6450fe902d19bcc8ee73bd7a04edcff6b10391e24483d2348e09e2408d",
+			"chunks/document-app-fzyeh54r.js": "55b8dcd1c0f554f35a905d6931103642eaed49fa944629ff4fbb091218691835",
+			"chunks/document-app-g7pr3ty8.js": "2b9eaae87642053d01fd47b2266c07165e5ccd1600ae47f360d33f19a0a2d87a",
+			"chunks/document-app-jb1jvatb.js": "4754e153068e53cc2e23ee27ddc6c6b4b9111e20d65f0dd58fea02e04393d68b",
+			"chunks/document-app-m2qx4cqf.js": "a16f603c7e82fa73c3c08187e200539440a114333311e16d891b12060d5d40bc",
+			"chunks/document-app-nmkmxrxg.js": "5408ccc1d21901762d47ffd61d2c6958e4bf53cae52ced6ac02f1ca302b05761",
+			"chunks/document-app-nqb2j1d5.js": "7ee8a12ff085053fec8ff4edc3bb46ed6125e227c1ca24a152407cb5d6a250c8",
+			"chunks/document-app-pk3bkrhx.js": "97726465da72ef1f4653c1e46f61cc78be7c225143e806c23cd6c19aa59706ff",
+			"chunks/document-app-q00km86k.js": "edcb412cd1bd0588017a27f66075b89ddfc9a599c29610dcee25d65fb31b9c58",
+			"chunks/document-app-r3eebhvw.js": "0deb92415c94fb9b034496d46af5e24c4049adf22bff8b498c15a595d93af003",
+			"chunks/document-app-tz1jnf15.js": "28132bf4ed64da4f89c612b6049cd260e139211c62b29853cfeb3f82ba1f3d58",
+			"chunks/document-app-vvdk6tcs.js": "bae5779b00686025f7f8b2a4519d97299ff8d842cf3e98e6d8838f7071e0680e",
+			"chunks/document-app-w23t8p99.js": "c37729b4ebfe4b135b6f0f3730d014ee517edd3af393f0b485c4a0c3d02f441e",
+			"chunks/document-app-x9k35fb4.js": "ece4cc082cabd060f546c3c0ac9f869f0b128673a66cc3363aa1b622c704c145",
+			"chunks/document-app-xc53pmep.js": "31f4bdecfa3462b5415d455f08b5dea809decf7bac32127c91e28b795462c518",
+			"chunks/document-app-xepte0jj.js": "316004650d0897e1d22dbe95b711c615a3e9f3f99f5ec5af4a3bebc00b12b8e2",
+			"chunks/document-app-z7twvbyh.js": "ef04f58d51d9e67b620a5989610022de71ba90dfa06d104913162c50fa860cea",
+			"chunks/document-archives-9bczywse.js": "dea71cf8ae0995055bf38ad19029d60dc82d1f4a52de0de976c3feb77279cf66",
+			"chunks/document-media-crtzmsf8.js": "79fac81128d356228c544757a2b129dc5b4034ada69cb39ee6e57158af49cd32",
+			"chunks/document-worker-stats-xj2116pa.js": "2e4da9838ea2303ec700744d5434c69b079f3f9d88bef2dc255ad72789ad502a",
+			"chunks/images-6w3x3a8k.js": "d6a7c08b3ea0941bd91fb3269d1bb6c6856a9851d077219bb3dbeca26befd580",
+			"chunks/invitation-screen-w34cv4vx.js": "83bd081796935fbe3a027669b5a4dbfc89888c9075daed1767903941c2e605a5",
+			"chunks/invitations-npggwfcf.js": "5b050442eda7489210547fcfa758aeb721611612b3070030e64fa71266c67d13",
+			"chunks/invitations-s2zpac03.js": "04c46fa296b9dc5a48bb6d298472214139270c46ecde4e510d27bb7e9064807e",
+			"chunks/media-picker-739mhjq4.js": "2aab661d3197d86ca394f3f3328b1632608127c95537077617f9d90ee9efdec1",
+			"chunks/sanitizeSvg-652g212e.js": "4f39e5260cb44942a1509bb9a84cc6d7921570f1bc5a279e8c74cac49fb3e914",
+			"chunks/syntax-1xtd23vt.js": "f79f49404d23a8ba185654f0a2255b461842323b47b7ef9569e36675a2f65c7a",
+			"chunks/theme-picker-fs8m8h6c.js": "8bf40dc0eddbca46ef88c7a6670686523a424fc89721c78e9c6b978af316bc75",
+			"chunks/theme-workbench-gsephcdb.js": "7e1a964c758c025afc189cc5d6873195ab460a64daca3fbc3b2b700492e0945f",
+			"chunks/videos-s960rf18.js": "f921f34d5edb77d761f51eabc8ed8b77732286daba43dc823ed7ad82d6b0f655",
+			"chunks/whiteboard-hwm3vxrz.js": "f045c8080e8f813b70a8417615c14646ed105aa549124e44a44afa5ead431a03",
+			"chunks/whiteboard-preview-85d69vvt.js": "a881d8af2effb58396e2fe601b289af398c80d9257456000617dd0d52ca5c696",
+			"chunks/whiteboard-store-2eyxdhtc.js": "4f32e9f28d0fbcac0d6992c8cfa0176555da8ad00a79748316d9a253373e8cf6",
+			"document-worker.js": "ba2c2d193e95a38f5c21f8680f66481ce6751e273feea60b085992467b853d88",
+			"sw.js": "b74d9dd9f3b75741686e62d723a9712af76e8a1f284d704149b8121b6a691366"
+		},
+		"candidate": {
+			"app.js": "8d96391bde34e3324d534036916b50684ea77348fc693451ce5de1c64e3d1cb3",
+			"chunks/document-app-06pkehrg.js": "d0c2d0576bfc02dbf39b350f8d668290c1a292e4242bc69cc5cfae3133e0df4e",
+			"chunks/document-app-19tdk60a.js": "bc81c60832e75cddb4ae2849e7b257371f206d1c88027b730cdbe7563b933681",
+			"chunks/document-app-1hr2amdq.js": "27f49a62953d429fd99acc80627a50f4825985ec9a4d31d7f3eb1f2e633cf4ad",
+			"chunks/document-app-29ytm0gp.js": "bd0544afd35e9c88bfdb3e37ca3b2236e00bc095ccd85528489f54d9965e49db",
+			"chunks/document-app-2fw467g2.js": "b7353dcd1cc889d0fe2d5ebdf872e308b16b733d34ffb6381e8299caea9ad8d5",
+			"chunks/document-app-6pqhz0fb.js": "ac7996a7f25452aba7274e7b9df36759aded08a453a95109c8af020280868e2d",
+			"chunks/document-app-70vy0mv8.js": "ff897df7071e80b0f7cecb569ca0ce6fe7ecf58d34ef5998ead4b8fc7e4f68e0",
+			"chunks/document-app-811mra06.js": "d5e8c207d3e2e1acfd9a7caa8626b92e6a972e79dfbc7246f2fa826eaf568927",
+			"chunks/document-app-8b7kt562.js": "2418a20596e5ea15d28b70c5c7bc71539aed01faa7948e4761a1ae27deb967db",
+			"chunks/document-app-91taf6q0.js": "5d303154715e874a493599e609449beb54698b85948d30c793495e725f899527",
+			"chunks/document-app-93gg853z.js": "2ce4fd65c139d3624e8ad100c85435f3a6b69e151c7681ecd74668e6944f1399",
+			"chunks/document-app-a2a5r9t8.js": "f1015373a5598d599a081ee1c2297f8b9f7022338422d6cc8d288ae676937bd3",
+			"chunks/document-app-acm1vyk8.js": "5ee52eb4b7b26832db8b06062cd81558871ee70fab9408b17a48822cc49b56f1",
+			"chunks/document-app-d71w5ykp.js": "34ca38d15ce2be02ee45eb34c34fbb467a044412e948eb0e8eab9aa95d29f136",
+			"chunks/document-app-er26grye.js": "63cf9ac709459c7c3fa472fbc2106b40b9b9bb7fd4c56e47f306de485209fe57",
+			"chunks/document-app-fzyeh54r.js": "55b8dcd1c0f554f35a905d6931103642eaed49fa944629ff4fbb091218691835",
+			"chunks/document-app-g7pr3ty8.js": "2b9eaae87642053d01fd47b2266c07165e5ccd1600ae47f360d33f19a0a2d87a",
+			"chunks/document-app-kdvp7rj0.js": "b7bf486ad5916698152ffeaed98736317c952d4b2244185c45f7e33db5ab4aaf",
+			"chunks/document-app-kt5kdbra.js": "e795bef92bfd9df0d20dbb2c11f416946da47077bcb62bfff868d8fedd28f2f0",
+			"chunks/document-app-m2qx4cqf.js": "a16f603c7e82fa73c3c08187e200539440a114333311e16d891b12060d5d40bc",
+			"chunks/document-app-nqb2j1d5.js": "7ee8a12ff085053fec8ff4edc3bb46ed6125e227c1ca24a152407cb5d6a250c8",
+			"chunks/document-app-pk3bkrhx.js": "97726465da72ef1f4653c1e46f61cc78be7c225143e806c23cd6c19aa59706ff",
+			"chunks/document-app-qrc62qws.js": "f6dd708a85e4831a9103ae6311b7b2a015c84832fc946e90da331af92f9fef3f",
+			"chunks/document-app-s9x2gwj9.js": "45e99c30459ad0f43cd2f2dcbaa7ff0440fe7ccd91c14c2eecd62d0ce8d95005",
+			"chunks/document-app-t34w9x68.js": "5b3b9579227799f8a6a57f96b6b919358166b7e8b48b7a3f7d30d6765e316e07",
+			"chunks/document-app-tc94xkps.js": "86e7f6f495c4a5bdb15d68e9005c7d9878d71293463361e1d936f6de7227132c",
+			"chunks/document-app-ttgp89fe.js": "8829c317ccc1c3e324f1f77b2a10394f0d026157164d7503675921f2aeea1c41",
+			"chunks/document-app-vvdk6tcs.js": "bae5779b00686025f7f8b2a4519d97299ff8d842cf3e98e6d8838f7071e0680e",
+			"chunks/document-app-wzmzp3p4.js": "21dd5dce5c79e5c42e20fcd7ab5c1ad4bb1d64740faa9fdac820bc6fdfcbd4c3",
+			"chunks/document-app-x65qb9n6.js": "c2972ba57933fe58a445374fbc7dc77dcad04de8ab62c7dad79dec929c09b5d9",
+			"chunks/document-app-x9k35fb4.js": "ece4cc082cabd060f546c3c0ac9f869f0b128673a66cc3363aa1b622c704c145",
+			"chunks/document-app-xepte0jj.js": "316004650d0897e1d22dbe95b711c615a3e9f3f99f5ec5af4a3bebc00b12b8e2",
+			"chunks/document-app-yp20amyw.js": "fa848db27e0d3da6f03b116393784619828f9cfb632fe77e7bbde65a24d71f98",
+			"chunks/document-app-yvgx0nam.js": "520856c17e8402963370b5348bde61cc03cde92ef679884698fb9280d6c31f3a",
+			"chunks/document-archives-zss4pvvf.js": "af9afbe0d0ea4d64baeba9d5aa2091e4143d9fd32002a796dab254ffa41c91a8",
+			"chunks/document-media-v5r05vfb.js": "e8daea6b3d20414b5e18f30279d26a23530e28080ef1586e2bc07dbd53962764",
+			"chunks/document-worker-stats-a4phmfsy.js": "1fa52364c5a5b2eea1d66057a86b0683c04bc645bcba0c05b0879fd26d8b9509",
+			"chunks/images-6w3x3a8k.js": "d6a7c08b3ea0941bd91fb3269d1bb6c6856a9851d077219bb3dbeca26befd580",
+			"chunks/invitation-screen-veat67v0.js": "ded2650c6ca41db3a3e9a329172999e42384cfa297af2adfd448a7b01adc8854",
+			"chunks/invitations-t7ndjvkr.js": "ce5720dcab4d76ed8969fddcd27403fe1764e0cf7b25349e57eab1518f7bf59e",
+			"chunks/invitations-vjqbb6dw.js": "fa7babefedf1e7749f964b6d0a183b5c9a7e7ac327ed2341780ca6a00394bd99",
+			"chunks/media-picker-2123wjmw.js": "85977270b5e669c9866488fcd793bbfe9d9365ffad44347578be308fae493d21",
+			"chunks/sanitizeSvg-652g212e.js": "4f39e5260cb44942a1509bb9a84cc6d7921570f1bc5a279e8c74cac49fb3e914",
+			"chunks/syntax-1xtd23vt.js": "f79f49404d23a8ba185654f0a2255b461842323b47b7ef9569e36675a2f65c7a",
+			"chunks/theme-picker-ra37kafc.js": "01738e7b8af29a587a84e5368d9265ef12c92c4c9d9ffc6e0c7276c47738a82d",
+			"chunks/theme-workbench-b7z1x2yf.js": "82628f99c0efa8b0c6adc1726ea2154111962ef375d4bdaa84dd4ac6af17aaa1",
+			"chunks/videos-s960rf18.js": "f921f34d5edb77d761f51eabc8ed8b77732286daba43dc823ed7ad82d6b0f655",
+			"chunks/whiteboard-096qc085.js": "dd87063d40b848daaa6fc227076c0b587e926606114ae7196db51c6339cfb39b",
+			"chunks/whiteboard-preview-wdve6q87.js": "7e8ad22203b9087d8043632915c2648e3572535710b4699c75e704837a74247f",
+			"chunks/whiteboard-store-k3kejg0y.js": "fc16872049740b1f73cfe355f70b97188c369a95e7a4bb0cfe7838b22b38f8b1",
+			"document-worker.js": "ba2c2d193e95a38f5c21f8680f66481ce6751e273feea60b085992467b853d88",
+			"sw.js": "7e768096be1cd1d4201d681fc209edd9a7fa95baf83ee158de272b0a04268e81"
+		}
+	},
+	"dependencyHashesMethod": "Persisted built bytes; individual loaded dependency response hashes were not verified. app.js URL and fetched SHA verified per arm after clean service worker/cache profile boot. Assets remained frozen during each arm.",
+	"rawTraces": [
+		{
+			"path": "/tmp/alkalye-compact-pieces/core-baseline-long1m-end-0.trace.json",
+			"sha256": "195687f6ef192946321b980ae9225615133de694ad5d42df5cb238a4a62db047"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/undo-baseline-long1m-0.trace.json",
+			"sha256": "6a98dc32a7ecd16960c07e8d3361b326d94d9e1082fd6889daa8ef7d679d3c88"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/core-candidate-long1m-end-0.trace.json",
+			"sha256": "5d33e525dc8100d7468479bc3983c5bd2099747c6b4a158f22c4ebc05ce17444"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/undo-candidate-long1m-0.trace.json",
+			"sha256": "3d318879af97168e4e2b2040692e8fa732d7ec7a602b6f4bbf8b4d635f424e1a"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/core-candidate-long1m-end-1.trace.json",
+			"sha256": "94f212950db69e970a5a9642efa0ac6ff521a9dea7fc7ec14946519f76d8cbb9"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/undo-candidate-long1m-1.trace.json",
+			"sha256": "6f168b99c3be8e90ec07fd913e38d66887a847fc4cb67966dbc1a4190ad10f2b"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/core-baseline-long1m-end-1.trace.json",
+			"sha256": "ad3c3ad987da4cb79b847bb35039cfdf2077a7e2d373b6f29777bf02c8e02347"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/undo-baseline-long1m-1.trace.json",
+			"sha256": "eb3b2e15c885a68742729195f2d222326de694d88435c9f178f31ff53c549c91"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/core-baseline-long1m-end-2.trace.json",
+			"sha256": "4616c46b129ebb70337557223c03ff9b3f2d95eae354ddcdd6be7184e231081c"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/undo-baseline-long1m-2.trace.json",
+			"sha256": "d3f7e1d731ab198f3be30ea100eeb95f718fb2b64fd2c5e694d1c31c3a3dcaee"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/core-candidate-long1m-end-2.trace.json",
+			"sha256": "ade58c87f5e5f7d3b5606657a69a67584bd16a5903d7d2db67777c0f1fabd7b9"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/undo-candidate-long1m-2.trace.json",
+			"sha256": "8be29ed67381e567f143cb4c676315b6f803c72625f5818ed6f5ef40ba89d168"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/core-baseline-mc1m-end-0.trace.json",
+			"sha256": "0d5d66b52deb0fa52f0e18e1a2d7ac2c074f72ba8d622bdc8f2449d6b1caad35"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/undo-baseline-mc1m-0.trace.json",
+			"sha256": "643e97d0ea66b3bdeb25553c5e69735288c2e795e538ee6824da28007ee6ea1f"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/core-candidate-mc1m-end-0.trace.json",
+			"sha256": "9c4db8f5ab811a69ddfc11ee4045a94cd420930e2f46626aba0d0d24de2b14c0"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/undo-candidate-mc1m-0.trace.json",
+			"sha256": "ed2f3c7d33dbcdef84835595272d598123dbe2794b1083cd8026c03fac41be26"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/core-candidate-mc1m-end-1.trace.json",
+			"sha256": "9c98acb8f2db6611fe507b30570c179bdf069bb5792cd0e9daf6d1c058962cf2"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/undo-candidate-mc1m-1.trace.json",
+			"sha256": "33f6913d27af58dab3015f1ede683c77e3e09789f34eca71e2f366d30645c5e7"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/core-baseline-mc1m-end-1.trace.json",
+			"sha256": "94f6843bf09aedf6d5a1713f126719d8753e7184d7c55ecbb827fbbc3ee94b46"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/undo-baseline-mc1m-1.trace.json",
+			"sha256": "614e83bf11e1635d2673d6baec1ec259051830e27ff57984084a87bc98953638"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/core-baseline-mc1m-end-2.trace.json",
+			"sha256": "62ad9ce6cfd7e6fe2db987a21f2c853dfdb11194aa811fa4d1621f8864bf3c7b"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/undo-baseline-mc1m-2.trace.json",
+			"sha256": "03489e5227d1d549b9efb3e1a27b465b0216cc2071bb17f3a3dc3969ca157916"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/core-candidate-mc1m-end-2.trace.json",
+			"sha256": "d90437621153cfca809c004b1ca16bd8db9e0d8711afaecc2293f1836d59bbe7"
+		},
+		{
+			"path": "/tmp/alkalye-compact-pieces/undo-candidate-mc1m-2.trace.json",
+			"sha256": "f9cb9760993209b79ff63e96fd5055a80804c70911b028a93230a3aac331bc82"
+		}
+	],
+	"history": "Each arm reset stopped data/profile snapshots from retained disposable allocation fixture. Profile journals retained; observer journals cleared before independent server-accepted read. Existing source histories retained, not fresh empty graphs. Many-line raw graph fragmentation was not counted.",
+	"cleanup": "Own browsers closed and own server stopped. Original allocation server4461 restored against original assets/data."
+}

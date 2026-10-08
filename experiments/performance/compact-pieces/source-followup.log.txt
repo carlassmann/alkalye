@@ -1,0 +1,34 @@
+No blockers in the model change. The test draft has one blocker and a few smaller issues. I only read source: nothing was run, typechecked or benchmarked, so none of this is runtime proof.
+
+**`compactAtomSteps` (`model.ts:346-415`) compared with the baseline**
+- The new fast path in `finishRun` (`:367-371`) returns `pieces[0]` when `chunks` is empty. `pieces` can never be empty there, because `finishRun` only runs once `previous` exists, which means `append` has already run. Both branches reset `pieces`, `chunks` and `length`.
+- `flushPieces` (`:363`) and the outer join (`:374`) skip the join when there is only one element. The output strings are the same as `join("")` for string values.
+- Every point from my earlier review still holds: run limit, lone-surrogate tests, property-read order, yields every 512 atoms, ownership, interruption and callers. Non-string values still differ from the baseline (`join` turns `undefined` into `""`); schemas guard all callers, so this is not a blocker.
+
+**`session.test.ts` blocker**
+1. **A broken snapshot can't fail this test.** If the saved cache can't be read or restored, `document-session.ts:841-871` logs "Rebuilding … from its journal" and replays the journal instead. A corrupt compacted checkpoint would still produce the right text, so sessions 2 and 3 pass either way. Fix:
+   - assert `Option.isSome(yield* value.save)`;
+   - fail the test on that warning (capture logs with a test logger), or decode the stored cache and check its checkpoint.
+
+**Smaller issues**
+- **Import paths:** imports use `./src/...`, which only resolves from the repo root. Repo tests live in `tests/` and use `../src/...`.
+- **Formatting:** lines 24, 27 and 49 are very long and will likely fail the format step of `bun run check`.
+- **Undo:** session 2 only undoes its own newest edit. Nothing shows that undo history from session 1 survives a reopen, which the test title claims. Either undo the comment from session 1 after reopening (or redo after session 3 reopens), or drop "undo history" from the title.
+- **Runtime-only assumptions:**
+  - The frontmatter title `"Compaction"` must equal `documentMetadata(source).title`, or `newDocument` rewrites the content and the first assertion fails.
+  - The `"x"` edit must not join the earlier `"Tail😀"` edit into one undo step.
+- **Coverage is good otherwise:**
+  - Atoms are one per code point (`crdt.ts:795`), so about 33k atoms with no lone surrogates take the multi-chunk path.
+  - The server snapshot (`document-store.ts:2478`, non-cooperative) and the client `captureSnapshot` (`document-session.ts:1377-1382`, both modes via `test.each`) both compact.
+  - Imports, transport shape, `required`/`undefined` returns, `Identity`, `BackgroundWork` and the session methods (`edit().saved`, `change`, `sync`, `save`, `unsaved`, `undo`) all match the current sources and `tests/cli-document-session.test.ts`.
+
+**Performance limits not yet measured**
+- **Fragmented input:** with no merges, there is still a `{...atom}` spread and an array push and reset per run, compared with the baseline's spread alone. The benefit of the fast path is unmeasured.
+- **`pieces.length = 0`:** I haven't measured whether resetting the arrays like this makes JSC reallocate them.
+- **Large runs:**
+  - A 2M run builds a fully flat string in one go between yields. That is a latency spike in cooperative mode.
+  - Peak memory is about 2× the run.
+  - Flat strings should speed up later reads, but that is unmeasured.
+- **Test size:** the test uses 40k characters. It never reaches the 2M run limit or production-scale GC pressure, so it says nothing about performance.
+
+written with claude-opus-5-5 in claude-code

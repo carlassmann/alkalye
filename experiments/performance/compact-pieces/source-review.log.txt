@@ -1,0 +1,31 @@
+I found no correctness blockers. Within the typed `Atom` contract, the candidate's `compactAtomSteps` behaves the same as the baseline. This was a read-only review; nothing was run.
+
+**What matches the baseline (`baseline-model.ts.txt:346-382` vs `model.ts:346-409`)**
+- **Run limit:** `length` holds the same UTF-16 sum the baseline gets from `previous.value.length`. It resets in `finishRun` and starts again from `copied.value`, so the `<= 2_000_000` check gives the same results, including a first atom already over the limit.
+- **Lone-surrogate flags:** both still test the raw input `last.value` and `atom.value`, never the merged string. Results are the same.
+- **Legacy multi-character and empty atoms:** these merge the same way. An empty piece only adds a `""` to `pieces`. An empty atom that stays unmerged still produces `""`, which `CompactAtomSchema` (`checkpoint.ts:129`, NonEmptyString) rejects. That bug already exists in production and wasn't introduced here.
+- **Property-read order:**
+  - Merge branch: both read `atom.value` 3 times in the same order (`.length`, the surrogate test, then the append).
+  - Else branch: both do a single `{...atom}` spread. The candidate's later `copied.value` read is on its own private copy, so callers can't see it.
+  - `last.id` and `last.value` are re-read each iteration in both.
+  - Getters that change value or throw behave the same.
+- **Mutating inputs between yields:** both use a live `for-of` over the array and read `last`/`atom` lazily, so mutations behave the same. Yields still happen once every 512 atoms.
+- **Output ownership:** both return fresh objects built by spreading the input. The candidate changes `previous.value` before `.return`, but nothing outside the generator holds the result yet, so no change is visible.
+- **Interruption:** neither has a `finally`. On `.return()`, the `pieces`/`chunks` arrays just become garbage, and nothing partial is ever returned.
+- **Callers:**
+  - `checkpoint.ts:169` uses `yield*` with the cooperative flag. Behaviour is unchanged, and its `maximumCompactAtoms` guard still runs first.
+  - `compactOperation` (`model.ts:384`) feeds `document-actions.ts:270` and `document-session.ts:472`. Both use the non-cooperative path, so nothing changes there.
+  - `crdt.ts` has no `compactAtomSteps` callers.
+
+**Non-blocking difference (only for untyped input)**
+- If `value` isn't a string at runtime, results differ. `join` turns `null`/`undefined` into `""` and numbers into strings; the baseline keeps them as they are (`{value: undefined}` → `undefined` vs `""`). Bad values also make `length` `NaN`, which blocks merging in both versions. Schemas guard every caller, so only mention this if strict raw-input parity matters.
+
+**Allocation / performance risks**
+1. **Many short runs** (flags, broken ID chains, interleaved actors): each run now does two `join`s that each create an array (`pieces.join` of 1, then `chunks.join` of 1), plus `push`es. The baseline did one spread and nothing more. In the worst case (2M atoms, none merging) this means about 4M extra joins. Fix: return `pieces[0]` from `finishRun` when `chunks` is empty and `pieces.length === 1`, and also skip the outer `join` when there is only one chunk. Benchmark the fragmented case, not just one long run.
+2. **`pieces.length = 0` / `chunks.length = 0`:** in JSC this may shrink the backing store and reallocate it on the next 512 pushes. It's probably cheap, but it's worth measuring against reusing the array with an index.
+3. **One 2M run:** about 3,900 512-piece chunks, a 3,900-element final join, and a peak of roughly 2× the run size (chunks plus the final flat string). That's acceptable and better than the baseline's 2M-node rope. One benefit is easy to miss: the result is already flat, so later regex/slice calls won't pay a hidden flatten cost. Keep that in mind if benchmarks only time the compaction step.
+4. **Yield granularity:** a yield every 512 atoms doesn't bound join work. The final `chunks.join` for a 2M run runs between yields with no break, roughly 2–4 MB copied in one go. The baseline deferred this cost to whoever first read the string. Fine unless cooperative latency budgets are tight.
+
+**Before adoption:** add the single-piece/single-chunk fast path, and add an integration case through `compactCheckpointEffect` that mixes long runs, flagged atoms, lone surrogates and empty legacy atoms, checked against the baseline output.
+
+written with claude-opus-5-5 in claude-code

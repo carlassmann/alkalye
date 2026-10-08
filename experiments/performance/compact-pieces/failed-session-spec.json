@@ -1,0 +1,16 @@
+{
+	"status": "reconstructed input specification, not original source snapshot/hash",
+	"initial": "header + AB\ud83d\ude00\\n repeated8192",
+	"header": "---\ntitle: \"Compaction\"\n---\n",
+	"bodyUnit": "AB\ud83d\ude00\n",
+	"bodyRepeats": 8192,
+	"firstAppend": "Tail\ud83d\ude00",
+	"pieces": [
+		"Fragment\ud83d\ude00\n",
+		"Lone\ud800\n",
+		"Lone\udc00\n",
+		"Final fragment\n"
+	],
+	"offset": "edited.indexOf(\"\\n\", Math.floor(edited.length/2))+1",
+	"sequence": "Insert piece, await edit.saved, await sync. Failure on second piece,41005\u219241011 chars; both candidate/baseline and cooperative flags."
+}
