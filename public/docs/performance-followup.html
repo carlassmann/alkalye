@@ -262,6 +262,17 @@
 			<code>experiments/worker-session/source-view-strings</code>.
 		</p>
 		<p>
+			A separate sampled baseline run mapped 12.38 seconds of inclusive primary
+			worker time to submitEdit's source reads, with 10.32 seconds nested in
+			visibility traversal. Snapshot capture accounted for 1.29 seconds. These
+			costs overlap and cannot be added. The longest 438ms input task included
+			replacement preparation and source reading; a separate 257ms task included
+			snapshot capture and garbage collection. Two submitEdit read sites remain
+			unresolved. This diagnostic identifies work, not a measured speedup.
+			Evidence:
+			<code>experiments/worker-session/sustained-worker-profile</code>.
+		</p>
+		<p>
 			Worker undo recovery now passes 13 fault assertions and the original 11
 			Undo/Redo assertions. Lost replies reuse the same receipt, stale selection
 			adoption retries without repeating Undo, fatal failures keep editing
@@ -269,6 +280,15 @@
 			Physical IME, drag and different-account peers remain unverified. These
 			checks use a local journal and do not prove server acceptance. Evidence:
 			<code>experiments/worker-session/actual-editor/recovery</code>.
+		</p>
+		<p>
+			Worker-owned clipboard ranges passed 13 actual editor assertions with
+			local storage and HTTP durability checks. Repeated characters, newline
+			boundaries, peer changes, denied reads and disposal retain the expected
+			selection and draft. Opaque range tokens replace main-thread atom graphs.
+			This isolated slice does not prove system clipboard permissions, physical
+			IME or the full editor cutover. Evidence:
+			<code>experiments/worker-session/clipboard</code>.
 		</p>
 		<p>
 			Active-line geometry caching was rejected. Six valid rich-document wheel
