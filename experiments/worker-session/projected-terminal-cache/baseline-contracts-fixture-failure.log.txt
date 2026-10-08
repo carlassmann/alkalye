@@ -1,0 +1,32 @@
+bun test v1.4.0 (34cbb9a40)
+
+terminal-projected.test.ts:
+(pass) projected terminal peer edits reconstruct exactly "---\ntitle: Shared\n---\nBody" [12.96ms]
+(pass) projected terminal peer edits reconstruct exactly "﻿---\r\ntitle: Shared\r\n---\r\nBody😀" [2.86ms]
+(pass) projected terminal peer edits reconstruct exactly "---\n---\nBody" [1.89ms]
+(pass) projected terminal peer edits reconstruct exactly "---\ntitle: Shared\n---\n" [3.59ms]
+(pass) projected terminal peer edits reconstruct exactly "---\ntitle: Shared" [1.10ms]
+(pass) projected terminal peer edits reconstruct exactly "---\ntitle: Shared\n---\nBody\n---\nSecond" [1.88ms]
+(pass) projected terminal peer edits reconstruct exactly "Body without frontmatter" [0.97ms]
+(pass) concurrent header rewrites, terminal siblings and metadata reconstruct [2.70ms]
+(pass) non-scalar legacy body retains full reconstruction and future Unicode edits [0.83ms]
+(pass) cold cooperative projected view and hidden tail cancellation remain exact [2.22ms]
+(pass) tail fence completion and removal reconstruct "\n" [2.92ms]
+(pass) tail fence completion and removal reconstruct "\r" [1.22ms]
+(pass) tail fence completion and removal reconstruct " " [0.99ms]
+597 | 	}
+598 | 	cancel(target: string, original: string) {
+599 | 		if (!this.canCancel(target, original))
+600 | 			throw new Error(
+601 | 				"Text cancellation requires an active accepted contribution above the migration floor",
+602 | 			)
+         ^
+error: Text cancellation requires an active accepted contribution above the migration floor
+      at cancel (/private/tmp/alkalye-terminal-projected/baseline/src/shared/crdt.ts:602:4)
+      at <anonymous> (/private/tmp/alkalye-terminal-projected/baseline/terminal-projected.test.ts:120:15)
+(fail) deleted frames mid-line, frontmatter undo and terminal peer edit reconstruct [0.84ms]
+
+ 13 pass
+ 1 fail
+ 300 expect() calls
+Ran 14 tests across 1 file. [66.00ms]

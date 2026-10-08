@@ -1,0 +1,32 @@
+[
+	{
+		"path": "/tmp/alkalye-terminal-projected/baseline-human-1.json.trace.json",
+		"bytes": 52925970,
+		"sha256": "a56385141f0ca14307dab2edb4abc6ba14261709d5787858a0e185c0f1722136"
+	},
+	{
+		"path": "/tmp/alkalye-terminal-projected/baseline-human-2.json.trace.json",
+		"bytes": 53102391,
+		"sha256": "dabdd6956ba9ddedba91887a63009b7dec10b85380cf07ff8e242e5212eccc02"
+	},
+	{
+		"path": "/tmp/alkalye-terminal-projected/baseline-human-3.json.trace.json",
+		"bytes": 51636171,
+		"sha256": "890573ee03c30b4a78bd94f1d818f6961f2363e6d6c8246912b5657c49a00500"
+	},
+	{
+		"path": "/tmp/alkalye-terminal-projected/candidate-human-1.json.trace.json",
+		"bytes": 38633816,
+		"sha256": "8976db8cf7d66dfea806b25c71e918ed2b28e713f754c9fb0e1173a45330b367"
+	},
+	{
+		"path": "/tmp/alkalye-terminal-projected/candidate-human-2.json.trace.json",
+		"bytes": 40493371,
+		"sha256": "ec6c21d0f135c6991d153a48593bae00d84628332e2c21045473775b18f3dba0"
+	},
+	{
+		"path": "/tmp/alkalye-terminal-projected/candidate-human-3.json.trace.json",
+		"bytes": 38387625,
+		"sha256": "31418dd7d82afb85af842c303e7b7a5cfc46216ecb84c51aa74b7f2072e64165"
+	}
+]

@@ -1,0 +1,92 @@
+[
+	{
+		"arm": "baseline",
+		"trial": 1,
+		"url": "http://localhost:51580/",
+		"output": "/tmp/alkalye-terminal-projected/baseline-human-1.json",
+		"exit": 0,
+		"hashes": {
+			"src/shared/crdt.ts": "3e693fbb55343b00cf22d146eca316c00087986c79eeaa95c75caa15b01c405a",
+			"worker-session.ts": "3bf96392f4564873c0c3ba18ff15e4352d2fc659b00974f059811496f7f224a0",
+			"browser-fixture.ts": "43977e783c2ee3c6ae13a8065afe49be43819e22f3f00acff8b93360f7cbe750",
+			"sustained.ts": "4765c7282d4a80683f47bd85498e96ec5576eec9a2bd1bb040eeb408bd7e8916",
+			"assets/worker.js": "bfc643e81a00332d3379e429eb26347b5aa03aff6e11f342a2ffd32e10f0e9ec",
+			"assets/browser-fixture.js": "c2c29456f0435b22bb3b4d2d2fafde2202e1edf232dd0f5c9d2f1465745cacb4"
+		}
+	},
+	{
+		"arm": "candidate",
+		"trial": 1,
+		"url": "http://localhost:51653/",
+		"output": "/tmp/alkalye-terminal-projected/candidate-human-1.json",
+		"exit": 0,
+		"hashes": {
+			"src/shared/crdt.ts": "79218941aa7ab7d664b7eff1fe7249f0193548216284d7465aaf421c2a9d348a",
+			"worker-session.ts": "3bf96392f4564873c0c3ba18ff15e4352d2fc659b00974f059811496f7f224a0",
+			"browser-fixture.ts": "43977e783c2ee3c6ae13a8065afe49be43819e22f3f00acff8b93360f7cbe750",
+			"sustained.ts": "4765c7282d4a80683f47bd85498e96ec5576eec9a2bd1bb040eeb408bd7e8916",
+			"assets/worker.js": "e82e50f0f9a3eec5449b4b40fa3c239b4fb7ef18f3ab4b91dcf3b0f4a954a9da",
+			"assets/browser-fixture.js": "67d4136fc23a9c51685a3668af93b7ffb564a552eb04eaac6908f052b242788f"
+		}
+	},
+	{
+		"arm": "candidate",
+		"trial": 2,
+		"url": "http://localhost:51721/",
+		"output": "/tmp/alkalye-terminal-projected/candidate-human-2.json",
+		"exit": 0,
+		"hashes": {
+			"src/shared/crdt.ts": "79218941aa7ab7d664b7eff1fe7249f0193548216284d7465aaf421c2a9d348a",
+			"worker-session.ts": "3bf96392f4564873c0c3ba18ff15e4352d2fc659b00974f059811496f7f224a0",
+			"browser-fixture.ts": "43977e783c2ee3c6ae13a8065afe49be43819e22f3f00acff8b93360f7cbe750",
+			"sustained.ts": "4765c7282d4a80683f47bd85498e96ec5576eec9a2bd1bb040eeb408bd7e8916",
+			"assets/worker.js": "e82e50f0f9a3eec5449b4b40fa3c239b4fb7ef18f3ab4b91dcf3b0f4a954a9da",
+			"assets/browser-fixture.js": "67d4136fc23a9c51685a3668af93b7ffb564a552eb04eaac6908f052b242788f"
+		}
+	},
+	{
+		"arm": "baseline",
+		"trial": 2,
+		"url": "http://localhost:51794/",
+		"output": "/tmp/alkalye-terminal-projected/baseline-human-2.json",
+		"exit": 0,
+		"hashes": {
+			"src/shared/crdt.ts": "3e693fbb55343b00cf22d146eca316c00087986c79eeaa95c75caa15b01c405a",
+			"worker-session.ts": "3bf96392f4564873c0c3ba18ff15e4352d2fc659b00974f059811496f7f224a0",
+			"browser-fixture.ts": "43977e783c2ee3c6ae13a8065afe49be43819e22f3f00acff8b93360f7cbe750",
+			"sustained.ts": "4765c7282d4a80683f47bd85498e96ec5576eec9a2bd1bb040eeb408bd7e8916",
+			"assets/worker.js": "bfc643e81a00332d3379e429eb26347b5aa03aff6e11f342a2ffd32e10f0e9ec",
+			"assets/browser-fixture.js": "c2c29456f0435b22bb3b4d2d2fafde2202e1edf232dd0f5c9d2f1465745cacb4"
+		}
+	},
+	{
+		"arm": "baseline",
+		"trial": 3,
+		"url": "http://localhost:51860/",
+		"output": "/tmp/alkalye-terminal-projected/baseline-human-3.json",
+		"exit": 0,
+		"hashes": {
+			"src/shared/crdt.ts": "3e693fbb55343b00cf22d146eca316c00087986c79eeaa95c75caa15b01c405a",
+			"worker-session.ts": "3bf96392f4564873c0c3ba18ff15e4352d2fc659b00974f059811496f7f224a0",
+			"browser-fixture.ts": "43977e783c2ee3c6ae13a8065afe49be43819e22f3f00acff8b93360f7cbe750",
+			"sustained.ts": "4765c7282d4a80683f47bd85498e96ec5576eec9a2bd1bb040eeb408bd7e8916",
+			"assets/worker.js": "bfc643e81a00332d3379e429eb26347b5aa03aff6e11f342a2ffd32e10f0e9ec",
+			"assets/browser-fixture.js": "c2c29456f0435b22bb3b4d2d2fafde2202e1edf232dd0f5c9d2f1465745cacb4"
+		}
+	},
+	{
+		"arm": "candidate",
+		"trial": 3,
+		"url": "http://localhost:51924/",
+		"output": "/tmp/alkalye-terminal-projected/candidate-human-3.json",
+		"exit": 0,
+		"hashes": {
+			"src/shared/crdt.ts": "79218941aa7ab7d664b7eff1fe7249f0193548216284d7465aaf421c2a9d348a",
+			"worker-session.ts": "3bf96392f4564873c0c3ba18ff15e4352d2fc659b00974f059811496f7f224a0",
+			"browser-fixture.ts": "43977e783c2ee3c6ae13a8065afe49be43819e22f3f00acff8b93360f7cbe750",
+			"sustained.ts": "4765c7282d4a80683f47bd85498e96ec5576eec9a2bd1bb040eeb408bd7e8916",
+			"assets/worker.js": "e82e50f0f9a3eec5449b4b40fa3c239b4fb7ef18f3ab4b91dcf3b0f4a954a9da",
+			"assets/browser-fixture.js": "67d4136fc23a9c51685a3668af93b7ffb564a552eb04eaac6908f052b242788f"
+		}
+	}
+]

@@ -1,0 +1,29 @@
+**Verdict:** I found no counterexample. Under the existing checks, the relaxed guard is safe, and I don't think it needs another guard. This comes from reading the code only; I ran no tests.
+
+**What actually changes:** the old and new guards differ only when `raw !== atoms` and `sourceHeader(content)` finds no header. If `sourceAtomsSteps` projects any frame, the content always starts with a header that `frontmatterBlock` accepts. Entry lines can't hold a close fence because each source frame's lazy match stops at its first close line, and closing with the EOF ending still matches. So the only new case is the body-only projection (`frontmatter-merge.ts:208-213`): no entries, a deleted frame present, no `emptyHeader`. Your `PEER\n` + `---` case is this one: the inserted `---` is ordinary text after a non-root atom, so it is never a header start.
+
+**Why a tail edit can't change the earlier source:**
+- **New atom placement:** `after === last.id`, not root, no `body`, `order` or `ending`, and nothing visible follows `last`. So the new atom can't start a header, and it always lands at the end of `raw` (it follows `last` in the tree walk).
+- **Frames before the end:** frame matching is lazy, so a tail edit only matters for a header start whose match runs to EOF.
+  - Starts before a projected frame: they either match before the tail or are skipped because they contain that frame's opener with `order` (`:497`). Neither depends on the tail.
+  - Starts after the last projected frame: their text is the same contiguous run in `raw` and `content`, and every line start inside it falls after a `\n` they share. A newly completed or removed close fence must therefore be the last line of `content`, which `touchesSourceFence(content|next)` refuses. Its multiline regex also covers `\r` and `\u2028`.
+- **Where raw and content lines differ:** a projected frame inside the last raw line makes raw's last line differ from content's. That can't create a match, because no header start can sit between the frame's end and that line.
+- **Frame at the very end of raw:** raw's last atom is then a frame atom, so `raw.at(-1).id !== last.id` refuses it. That covers EOF-ending frames, whose close has no newline.
+- **Empty body:** EOF close-fence trimming only happens with an empty body. Content then equals the frame, which the remaining `content.length <= header[0].length` check refuses, and the `nextHeader` check covers the edit itself.
+- **`withoutLostAliases`/`originalFrames`:** with no entries this returns early. A single-atom frame for the new atom can't be a header anyway.
+- **Multiple headers:** if one is projected and leading, baseline already allowed it.
+- **Undo, cancel, legacy:** hidden children of `last` have no visible descendants, or `last` wouldn't be raw's last atom. Frontmatter undo (`field`) is refused. Cancellation still requires `raw === atoms`. The legacy exclusion is unchanged.
+- **Unicode:** inserts stay single-scalar or valid surrogate pairs. A BOM at the tail is harmless because a header start needs `after === ""`.
+
+**Weakest point:** the safety argument depends on "every projected raw frame ends before the raw tail run and fence lines are checked on content." If `sourceHeadersSteps` ever matches non-root header starts, or stops being lazy, this breaks silently. An optional belt-and-braces guard: when `!header`, also refuse if any raw atom in the last line has `after === ""`. It's cheap if you scan back from the end of `raw` to the previous `\n`.
+
+**Oracle tests to require.** Compare against a fresh replica rebuilt with the same ops (`text()`, `visible()`, offsets):
+1. `PEER\n` before frontmatter, then append and remove at the tail, including surrogate pairs.
+2. A deleted frame sitting mid-line in raw (`abc` + frame + `---x`), then remove `x`.
+3. Tail edits that complete or break a fence: `--`→`---`, then `\n`, `\r`, `\u2028`.
+4. A projected frame at the end of raw; confirm it's refused.
+5. Two peers' frames, one deleted and one with entries, plus a nonleading body header.
+6. Tail removal followed by a concurrent cancel, and a frontmatter-edit undo.
+7. A legacy target.
+
+Separately: most claude.ai connectors (GitHub, Slack, Notion, Gmail and others) need authorization in your claude.ai connector settings before they can be used. Nothing in this review needed them.

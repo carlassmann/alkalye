@@ -1,0 +1,22 @@
+bun test v1.4.0 (34cbb9a40)
+
+terminal-projected.test.ts:
+(pass) projected terminal peer edits reconstruct exactly "---\ntitle: Shared\n---\nBody" [13.99ms]
+(pass) projected terminal peer edits reconstruct exactly "﻿---\r\ntitle: Shared\r\n---\r\nBody😀" [2.90ms]
+(pass) projected terminal peer edits reconstruct exactly "---\n---\nBody" [1.66ms]
+(pass) projected terminal peer edits reconstruct exactly "---\ntitle: Shared\n---\n" [3.83ms]
+(pass) projected terminal peer edits reconstruct exactly "---\ntitle: Shared" [1.11ms]
+(pass) projected terminal peer edits reconstruct exactly "---\ntitle: Shared\n---\nBody\n---\nSecond" [1.84ms]
+(pass) projected terminal peer edits reconstruct exactly "Body without frontmatter" [0.92ms]
+(pass) concurrent header rewrites, terminal siblings and metadata reconstruct [2.91ms]
+(pass) non-scalar legacy body retains full reconstruction and future Unicode edits [0.55ms]
+(pass) cold cooperative projected view and hidden tail cancellation remain exact [2.42ms]
+(pass) tail fence completion and removal reconstruct "\n" [2.76ms]
+(pass) tail fence completion and removal reconstruct "\r" [1.09ms]
+(pass) tail fence completion and removal reconstruct " " [1.01ms]
+(pass) deleted frames mid-line, frontmatter undo and terminal peer edit reconstruct [1.98ms]
+
+ 14 pass
+ 0 fail
+ 315 expect() calls
+Ran 14 tests across 1 file. [73.00ms]

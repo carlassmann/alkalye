@@ -1,0 +1,68 @@
+[
+	{
+		"arm": "baseline",
+		"trial": 1,
+		"queue": 39,
+		"drainMs": 8361.800000011921,
+		"inputP95": 1.479,
+		"inputMax": 2.356,
+		"mainMax": 2.356,
+		"workerMax": 422.949,
+		"heapPeak": 150027612
+	},
+	{
+		"arm": "baseline",
+		"trial": 2,
+		"queue": 39,
+		"drainMs": 8458.600000023842,
+		"inputP95": 1.47,
+		"inputMax": 2.605,
+		"mainMax": 2.605,
+		"workerMax": 401.419,
+		"heapPeak": 154577184
+	},
+	{
+		"arm": "baseline",
+		"trial": 3,
+		"queue": 37,
+		"drainMs": 8106.0,
+		"inputP95": 1.471,
+		"inputMax": 2.992,
+		"mainMax": 2.992,
+		"workerMax": 388.495,
+		"heapPeak": 163707022
+	},
+	{
+		"arm": "candidate",
+		"trial": 1,
+		"queue": 4,
+		"drainMs": 16.0,
+		"inputP95": 2.502,
+		"inputMax": 3.342,
+		"mainMax": 3.373,
+		"workerMax": 347.811,
+		"heapPeak": 70630313
+	},
+	{
+		"arm": "candidate",
+		"trial": 2,
+		"queue": 2,
+		"drainMs": 12.099999964237213,
+		"inputP95": 2.538,
+		"inputMax": 4.016,
+		"mainMax": 4.016,
+		"workerMax": 387.87,
+		"heapPeak": 70661595
+	},
+	{
+		"arm": "candidate",
+		"trial": 3,
+		"queue": 3,
+		"drainMs": 23.200000047683716,
+		"inputP95": 2.494,
+		"inputMax": 3.508,
+		"mainMax": 3.508,
+		"workerMax": 364.622,
+		"heapPeak": 71662196
+	}
+]

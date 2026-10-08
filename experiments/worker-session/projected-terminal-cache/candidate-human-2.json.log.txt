@@ -1,0 +1,5 @@
+PASS Fixture ready
+PASS Actual bounded editor geometry
+PASS Initial seed journal settled
+PASS Observed native human cadence
+PASS Exact source, trusted character count, local reopen and authenticated server acceptance

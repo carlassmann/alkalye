@@ -1,0 +1,11 @@
+--- src/shared/crdt.ts
++++ src/shared/crdt.ts
+@@ -272,7 +272,7 @@
+ 		)
+ 			return undefined
+ 		let header = sourceHeader(content)
+-		if (raw !== atoms && (!header || content.length <= header[0].length))
++		if (raw !== atoms && header && content.length <= header[0].length)
+ 			return undefined
+ 		let next: string
+ 		if (inserted) {
