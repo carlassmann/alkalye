@@ -1,0 +1,264 @@
+{
+	"adopted": true,
+	"fixture": {
+		"characters": 1048576,
+		"occurrences": 512,
+		"source": "TOKEN + repeated z + newline",
+		"terminalEdit": "trusted X append then accepted Ctrl+Z"
+	},
+	"baseline": "Frozen74fd39f client source; plain fixture unchanged by later37c90a5 multicursor fence guard",
+	"backend": "native660423c same both arms",
+	"phaseOrder": ["before", "after", "after", "before", "before", "after"],
+	"method": "Three alternating matched pairs; reset SQLite/blobs/browser profile from identical disposable seeds. Trusted append and undo gated by exact source +pending0/rejected0 +fresh accepted projection cursor. Timeline tracing without CPU sampling; largest complete main-thread RunTask fromundo:start through acceptedcache, includes enclosing task. Paint opportunity twoRAF, not physical paint.",
+	"provenance": {
+		"before": {
+			"replicaSourceSha256": "21b1074c9b9ef1c21e02f19e9995479cc4628c8227793bb5c300b872781149f0",
+			"loadedScripts": [
+				{
+					"url": "http://localhost:58167/app.js",
+					"sha256": "076a4dbc5e2f3a7ec135a7407b3335910fe5a4d618148c80520e836e6d2e0868",
+					"frozenBytes": 252795,
+					"loadedDecodedBytes": 252795
+				},
+				{
+					"url": "http://localhost:58167/document-worker.js",
+					"sha256": "0cbf35c7d129bc8189fb1ff638905291241b989b7e47ebc64a57b330c8f0f414",
+					"frozenBytes": 155969,
+					"loadedDecodedBytes": 0
+				}
+			]
+		},
+		"after": {
+			"replicaSourceSha256": "429c3c5464350fc644aa93638bce653bba9258e4dbf0e5dd0cfe36756bf32ca7",
+			"loadedScripts": [
+				{
+					"url": "http://localhost:58167/app.js",
+					"sha256": "0b64fba2383859283f4d0cfe9b1a529fce8e6c5efc9e8d4ec699ba3d4719c919",
+					"frozenBytes": 252795,
+					"loadedDecodedBytes": 252795
+				},
+				{
+					"url": "http://localhost:58167/document-worker.js",
+					"sha256": "edffba1c653f305dfacfb9e4f2db86e912d6b4cbae850f5815e8e783a6c3c6d3",
+					"frozenBytes": 155969,
+					"loadedDecodedBytes": 0
+				}
+			]
+		}
+	},
+	"provenanceLimit": "Frozen hashes and observed loaded module URLs/decoded sizes, not cryptographic retrieval of browser-loaded bytes.",
+	"heapLimit": "Chromium performance.memory usedJSHeapSize samples across complete journey, approximate whole isolate heap. No forced GC/allocation/retention profiling or ownership attribution.",
+	"contracts": "16publicReplica contracts175assertions/types and read-onlyOpus no blockers.",
+	"samples": [
+		{
+			"phase": "before",
+			"trial": 0,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 370.89999997615814,
+			"undoAcceptedCheckpointMs": 2366,
+			"editAcceptedCheckpointMs": 2401,
+			"largestUndoTaskMs": 165.137,
+			"largestBeforePaintTaskMs": 165.137,
+			"layoutMs": 4.354,
+			"paintMs": 2.797,
+			"heapBeforeBytes": 747862971,
+			"heapAfterBytes": 836474123,
+			"acceptedStages": [
+				{
+					"delay": 2401,
+					"pending": 0,
+					"position": 54,
+					"rejected": 0,
+					"stage": "edit"
+				},
+				{
+					"delay": 2366,
+					"pending": 0,
+					"position": 56,
+					"rejected": 0,
+					"stage": "undo"
+				}
+			]
+		},
+		{
+			"phase": "after",
+			"trial": 0,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 289.10000002384186,
+			"undoAcceptedCheckpointMs": 2056.400000035763,
+			"editAcceptedCheckpointMs": 2388.5,
+			"largestUndoTaskMs": 31.596,
+			"largestBeforePaintTaskMs": 31.596,
+			"layoutMs": 3.922,
+			"paintMs": 2.638,
+			"heapBeforeBytes": 719372721,
+			"heapAfterBytes": 799908812,
+			"acceptedStages": [
+				{
+					"delay": 2388.5,
+					"pending": 0,
+					"position": 54,
+					"rejected": 0,
+					"stage": "edit"
+				},
+				{
+					"delay": 2056.400000035763,
+					"pending": 0,
+					"position": 56,
+					"rejected": 0,
+					"stage": "undo"
+				}
+			]
+		},
+		{
+			"phase": "after",
+			"trial": 1,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 267.80000001192093,
+			"undoAcceptedCheckpointMs": 2049.5,
+			"editAcceptedCheckpointMs": 2389.600000023842,
+			"largestUndoTaskMs": 31.53,
+			"largestBeforePaintTaskMs": 31.53,
+			"layoutMs": 4.25,
+			"paintMs": 2.923,
+			"heapBeforeBytes": 711576665,
+			"heapAfterBytes": 800388576,
+			"acceptedStages": [
+				{
+					"delay": 2389.600000023842,
+					"pending": 0,
+					"position": 54,
+					"rejected": 0,
+					"stage": "edit"
+				},
+				{
+					"delay": 2049.5,
+					"pending": 0,
+					"position": 56,
+					"rejected": 0,
+					"stage": "undo"
+				}
+			]
+		},
+		{
+			"phase": "before",
+			"trial": 1,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 464.39999997615814,
+			"undoAcceptedCheckpointMs": 2252.800000011921,
+			"editAcceptedCheckpointMs": 2377.199999988079,
+			"largestUndoTaskMs": 199.11,
+			"largestBeforePaintTaskMs": 199.11,
+			"layoutMs": 4.09,
+			"paintMs": 2.716,
+			"heapBeforeBytes": 711971426,
+			"heapAfterBytes": 839464734,
+			"acceptedStages": [
+				{
+					"delay": 2377.199999988079,
+					"pending": 0,
+					"position": 54,
+					"rejected": 0,
+					"stage": "edit"
+				},
+				{
+					"delay": 2252.800000011921,
+					"pending": 0,
+					"position": 56,
+					"rejected": 0,
+					"stage": "undo"
+				}
+			]
+		},
+		{
+			"phase": "before",
+			"trial": 2,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 423.89999997615814,
+			"undoAcceptedCheckpointMs": 2266.600000023842,
+			"editAcceptedCheckpointMs": 2423.199999988079,
+			"largestUndoTaskMs": 180.916,
+			"largestBeforePaintTaskMs": 180.916,
+			"layoutMs": 4.214,
+			"paintMs": 2.804,
+			"heapBeforeBytes": 725947826,
+			"heapAfterBytes": 846540193,
+			"acceptedStages": [
+				{
+					"delay": 2423.199999988079,
+					"pending": 0,
+					"position": 54,
+					"rejected": 0,
+					"stage": "edit"
+				},
+				{
+					"delay": 2266.600000023842,
+					"pending": 0,
+					"position": 56,
+					"rejected": 0,
+					"stage": "undo"
+				}
+			]
+		},
+		{
+			"phase": "after",
+			"trial": 2,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 256.69999998807907,
+			"undoAcceptedCheckpointMs": 2058.600000023842,
+			"editAcceptedCheckpointMs": 2401.599999964237,
+			"largestUndoTaskMs": 25.663,
+			"largestBeforePaintTaskMs": 25.663,
+			"layoutMs": 3.879,
+			"paintMs": 2.65,
+			"heapBeforeBytes": 736333377,
+			"heapAfterBytes": 802153580,
+			"acceptedStages": [
+				{
+					"delay": 2401.599999964237,
+					"pending": 0,
+					"position": 54,
+					"rejected": 0,
+					"stage": "edit"
+				},
+				{
+					"delay": 2058.600000023842,
+					"pending": 0,
+					"position": 56,
+					"rejected": 0,
+					"stage": "undo"
+				}
+			]
+		}
+	]
+}

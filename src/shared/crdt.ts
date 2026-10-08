@@ -152,12 +152,71 @@ export class Replica {
 		this.prepareApplication(input)()
 	}
 	private prepareApplication(input: Operation[]) {
-		let edit = this.preparedEdit
+		let edit = this.preparedEdit ?? this.prepareTerminalCancellation(input)
 		let commit = this.prepare(input)
 		return () => {
 			this.preparedEdit = undefined
 			commit()
 			this.cachePreparedText(input, edit)
+		}
+	}
+	private prepareTerminalCancellation(
+		input: Operation[],
+	): PreparedTextEdit | undefined {
+		let operation = input[0]
+		if (
+			input.length !== 1 ||
+			!operation ||
+			operation.kind !== "cancel" ||
+			this.operations.has(operation.id) ||
+			this.legacyTextTargets.has(operation.target) ||
+			this.visibility.get(operation.target)?.active(operation.id) === false
+		)
+			return undefined
+		let original = this.operations.get(operation.value)
+		if (
+			!original ||
+			original.kind !== "text" ||
+			original.field ||
+			original.insert.length !== 1 ||
+			original.remove.length ||
+			original.target !== operation.target ||
+			!this.canCancel(operation.target, original.id)
+		)
+			return undefined
+		let target = operation.target
+		let atoms = this.sourceCache.get(target)
+		let raw = this.textCache.get(target)
+		let content = this.strings.get(target)
+		if (!atoms || raw !== atoms || content === undefined) return undefined
+		let last = atoms.at(-1)
+		if (
+			!last ||
+			last.id !== original.insert[0]?.id ||
+			!last.value ||
+			!content.endsWith(last.value)
+		)
+			return undefined
+		let next = content.slice(0, -last.value.length)
+		if (touchesSourceFence(next, next.length, next.length)) return undefined
+		let header = sourceHeader(next)
+		if (header && next.length === header[0].length) return undefined
+		let splice = {
+			after: atoms.at(-2)?.id ?? "",
+			start: atoms.length - 1,
+			remove: 1,
+			inserted: [],
+		}
+		return {
+			id: operation.id,
+			target,
+			generation: this.generation,
+			signature: textEditSignature(operation),
+			content: next,
+			atoms,
+			raw: atoms,
+			splices: [splice],
+			rawSplices: [splice],
 		}
 	}
 	private cachePreparedText(

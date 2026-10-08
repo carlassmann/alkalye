@@ -1,0 +1,185 @@
+{
+	"excludedFromTimings": true,
+	"method": "Separate instrumented actual app append+accepted trustedundo; grouped eligibility reasons and cachepublication hit counter only.",
+	"result": {
+		"configuration": {
+			"url": "http://localhost:58167",
+			"session": "terminal-cancel-diagnostic-diagnostic-0",
+			"path": "/app/doc/07bd3efd-9ca1-495e-9f41-ebc8c14d7c1b",
+			"characters": 1048576,
+			"occurrences": 512
+		},
+		"metrics": {
+			"busy": "false",
+			"controller": "http://localhost:58167/sw.js",
+			"exact": true,
+			"heapAfter": 654743459,
+			"heapBefore": 759972421,
+			"paint": 4860.300000011921,
+			"pending": "0",
+			"probe": {
+				"attempts": 12,
+				"hits": 4,
+				"reasons": {
+					"operation": 8
+				}
+			},
+			"scripts": [
+				{
+					"bytes": 252795,
+					"name": "http://localhost:58167/app.js"
+				},
+				{
+					"bytes": 119172,
+					"name": "http://localhost:58167/chunks/document-app-3tjktven.js"
+				},
+				{
+					"bytes": 2036,
+					"name": "http://localhost:58167/chunks/document-app-2kgdwx8e.js"
+				},
+				{
+					"bytes": 2798,
+					"name": "http://localhost:58167/chunks/document-app-vm9jneyf.js"
+				},
+				{
+					"bytes": 1330,
+					"name": "http://localhost:58167/chunks/document-app-pwtjyhr7.js"
+				},
+				{
+					"bytes": 16754,
+					"name": "http://localhost:58167/chunks/document-app-qjr8vwyz.js"
+				},
+				{
+					"bytes": 7968,
+					"name": "http://localhost:58167/chunks/document-app-tytahy0j.js"
+				},
+				{
+					"bytes": 3894,
+					"name": "http://localhost:58167/chunks/document-app-bb64wyrk.js"
+				},
+				{
+					"bytes": 617,
+					"name": "http://localhost:58167/chunks/document-app-nbkz3ahh.js"
+				},
+				{
+					"bytes": 14375,
+					"name": "http://localhost:58167/chunks/document-app-knakp04m.js"
+				},
+				{
+					"bytes": 901,
+					"name": "http://localhost:58167/chunks/document-app-tmtkdtra.js"
+				},
+				{
+					"bytes": 2725,
+					"name": "http://localhost:58167/chunks/document-app-t35pg4fw.js"
+				},
+				{
+					"bytes": 1656,
+					"name": "http://localhost:58167/chunks/document-app-mxj8dsqn.js"
+				},
+				{
+					"bytes": 5735,
+					"name": "http://localhost:58167/chunks/document-app-cwt3h7hv.js"
+				},
+				{
+					"bytes": 211373,
+					"name": "http://localhost:58167/chunks/document-app-57h3fc11.js"
+				},
+				{
+					"bytes": 7957,
+					"name": "http://localhost:58167/chunks/document-app-p02ptkrs.js"
+				},
+				{
+					"bytes": 6070,
+					"name": "http://localhost:58167/chunks/document-app-7znc18jr.js"
+				},
+				{
+					"bytes": 765,
+					"name": "http://localhost:58167/chunks/document-app-c1c7xhgx.js"
+				},
+				{
+					"bytes": 24137,
+					"name": "http://localhost:58167/chunks/document-app-n00b84m3.js"
+				},
+				{
+					"bytes": 11389,
+					"name": "http://localhost:58167/chunks/document-app-rdyaf2n3.js"
+				},
+				{
+					"bytes": 74481,
+					"name": "http://localhost:58167/chunks/document-app-b6vv4htx.js"
+				},
+				{
+					"bytes": 10572,
+					"name": "http://localhost:58167/chunks/document-app-jm7es2e4.js"
+				},
+				{
+					"bytes": 2729,
+					"name": "http://localhost:58167/chunks/document-app-48wbcxr4.js"
+				},
+				{
+					"bytes": 2037,
+					"name": "http://localhost:58167/chunks/document-app-eeqnmdm1.js"
+				},
+				{
+					"bytes": 2075,
+					"name": "http://localhost:58167/chunks/document-app-1mgbsbm9.js"
+				},
+				{
+					"bytes": 27137,
+					"name": "http://localhost:58167/chunks/document-app-4ayv50ed.js"
+				},
+				{
+					"bytes": 14516,
+					"name": "http://localhost:58167/chunks/document-app-0rgj2pt3.js"
+				},
+				{
+					"bytes": 713,
+					"name": "http://localhost:58167/chunks/document-app-pt0vb1th.js"
+				},
+				{
+					"bytes": 41742,
+					"name": "http://localhost:58167/chunks/document-app-m4kepen8.js"
+				},
+				{
+					"bytes": 272,
+					"name": "http://localhost:58167/chunks/document-app-yd5t74fk.js"
+				},
+				{
+					"bytes": 174723,
+					"name": "http://localhost:58167/chunks/document-app-7aeqndrb.js"
+				},
+				{
+					"bytes": 1109,
+					"name": "http://localhost:58167/chunks/document-app-nqb2j1d5.js"
+				},
+				{
+					"bytes": 20324,
+					"name": "http://localhost:58167/chunks/document-worker-stats-hzr4km5x.js"
+				},
+				{
+					"bytes": 0,
+					"name": "http://localhost:58167/document-worker.js"
+				}
+			],
+			"stages": [
+				{
+					"delay": 2419.199999988079,
+					"pending": 0,
+					"position": 54,
+					"rejected": 0,
+					"stage": "edit"
+				},
+				{
+					"delay": 2257.599999964237,
+					"pending": 0,
+					"position": 56,
+					"rejected": 0,
+					"stage": "undo"
+				}
+			],
+			"started": 4623.900000035763,
+			"trusted": true
+		}
+	}
+}
