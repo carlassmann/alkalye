@@ -1,0 +1,4 @@
+browser-rpc-binding.ts(99,100): error TS2322: Type '{ start: number; end: number; direction: string; }[]' is not assignable to type 'readonly { readonly start: number; readonly end: number; readonly direction: "forward" | "backward" | "none"; }[]'.
+  Type '{ start: number; end: number; direction: string; }' is not assignable to type '{ readonly start: number; readonly end: number; readonly direction: "forward" | "backward" | "none"; }'.
+    Types of property 'direction' are incompatible.
+      Type 'string' is not assignable to type '"forward" | "backward" | "none"'.

@@ -1771,6 +1771,18 @@
 			<code>experiments/performance/worker-applied-undo-mapping</code>.
 		</p>
 		<p>
+			A third mapping experiment uses requested anchors and their immediate
+			predecessors, with the original fallback for deleted chains. It passes 42
+			public assertions per arm and native one-range and 512-range edit/Undo
+			checks, including every selection direction and accepted server state.
+			Undo mapping falls from about 86ms to 16ms and from 120ms to 28ms.
+			Whole-worker maxima remain about 186–194ms; the 512-range maximum worsens.
+			This diagnostic pair does not establish a broad speedup. The residual
+			worker callback needs sampled profiling before attributing its cost.
+			Production is unchanged. Evidence:
+			<code>experiments/performance/worker-immediate-predecessor-mapping</code>.
+		</p>
+		<p>
 			The worker metadata pipeline passed 31 storage/owner assertions and a real
 			WorkerRPC journey. A dropped applied reply is recovered as the same
 			action, exact pending state clears, and Merge/Adopt matches an independent

@@ -1,0 +1,6 @@
+native-merge-undo.ts(315,237): error TS18048: 'actual' is possibly 'undefined'.
+native-merge-undo.ts(315,265): error TS18048: 'actual' is possibly 'undefined'.
+native-merge-undo.ts(315,289): error TS18048: 'actual' is possibly 'undefined'.
+native-merge-undo.ts(316,225): error TS18048: 'actual' is possibly 'undefined'.
+native-merge-undo.ts(316,253): error TS18048: 'actual' is possibly 'undefined'.
+native-merge-undo.ts(316,277): error TS18048: 'actual' is possibly 'undefined'.

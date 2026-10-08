@@ -1,0 +1,8 @@
+native-merge-undo.ts(313,40): error TS18046: 'after' is of type 'unknown'.
+native-merge-undo.ts(313,83): error TS18046: 'after' is of type 'unknown'.
+native-merge-undo.ts(313,122): error TS18046: 'after' is of type 'unknown'.
+native-merge-undo.ts(313,207): error TS18046: 'after' is of type 'unknown'.
+native-merge-undo.ts(314,7): error TS18046: 'restored' is of type 'unknown'.
+native-merge-undo.ts(314,56): error TS18046: 'restored' is of type 'unknown'.
+native-merge-undo.ts(314,101): error TS18046: 'restored' is of type 'unknown'.
+native-merge-undo.ts(314,192): error TS18046: 'restored' is of type 'unknown'.

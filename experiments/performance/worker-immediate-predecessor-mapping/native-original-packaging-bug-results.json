@@ -1,0 +1,52 @@
+{
+	"stage": "terminal",
+	"gates": [],
+	"cells": [
+		{
+			"phase": "Undo",
+			"count": 1,
+			"probe": {
+				"end": 14195.900000035765,
+				"events": [
+					{
+						"key": "z",
+						"time": 11194.900000035765,
+						"type": "keydown"
+					}
+				],
+				"heapAfter": 18427710,
+				"heapBefore": 43915962,
+				"label": "Undo-1",
+				"localSaved": 12526.30000001192,
+				"ready": 11727.600000023842,
+				"start": 11194.900000035765
+			}
+		},
+		{
+			"phase": "Undo",
+			"count": 512,
+			"probe": {
+				"end": 14175.100000023842,
+				"events": [
+					{
+						"key": "z",
+						"time": 11174.80000001192,
+						"type": "keydown"
+					}
+				],
+				"heapAfter": 17176357,
+				"heapBefore": 16576852,
+				"label": "Undo-512",
+				"localSaved": 12404.899999976158,
+				"ready": 11756.30000001192,
+				"start": 11174.80000001192
+			}
+		}
+	],
+	"fixture": {
+		"initialLength": 1048612,
+		"editedLength": 1046564,
+		"initialSHA": "bcd940bce20cd546f7a79bf5bddc42f9c75d5ce214387b3707eeedbc87ed3445",
+		"editedSHA": "a6cdcf9718f73b97615694bc6652fe739f7b31bf4312ea2ec14ae5818b61d4b6"
+	}
+}

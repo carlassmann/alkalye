@@ -1,0 +1,86 @@
+[
+	{
+		"arm": "original",
+		"count": 1,
+		"maxWorkerTaskMs": 193.88,
+		"taskOffsetMs": 151.778,
+		"calls": [
+			{
+				"durationMs": 193.867,
+				"data": {
+					"columnNumber": 108447,
+					"functionName": "o.port1.onmessage",
+					"isolate": "10853107238379341870",
+					"lineNumber": 80,
+					"sampleTraceId": 8709398029316397,
+					"scriptId": "3",
+					"url": "http://127.0.0.1:4473/worker-editor.js"
+				}
+			}
+		],
+		"marks": []
+	},
+	{
+		"arm": "original",
+		"count": 512,
+		"maxWorkerTaskMs": 185.169,
+		"taskOffsetMs": 147.787,
+		"calls": [
+			{
+				"durationMs": 185.154,
+				"data": {
+					"columnNumber": 108447,
+					"functionName": "o.port1.onmessage",
+					"isolate": "6873676182309953398",
+					"lineNumber": 80,
+					"sampleTraceId": 8709398029296877,
+					"scriptId": "3",
+					"url": "http://127.0.0.1:4473/worker-editor.js"
+				}
+			}
+		],
+		"marks": []
+	},
+	{
+		"arm": "candidate",
+		"count": 1,
+		"maxWorkerTaskMs": 186.48,
+		"taskOffsetMs": 132.377,
+		"calls": [
+			{
+				"durationMs": 186.467,
+				"data": {
+					"columnNumber": 109368,
+					"functionName": "o.port1.onmessage",
+					"isolate": "15731407609206271813",
+					"lineNumber": 80,
+					"sampleTraceId": 8028125373753368,
+					"scriptId": "3",
+					"url": "http://127.0.0.1:4473/worker-editor.js"
+				}
+			}
+		],
+		"marks": []
+	},
+	{
+		"arm": "candidate",
+		"count": 512,
+		"maxWorkerTaskMs": 192.251,
+		"taskOffsetMs": 134.711,
+		"calls": [
+			{
+				"durationMs": 192.24,
+				"data": {
+					"columnNumber": 109368,
+					"functionName": "o.port1.onmessage",
+					"isolate": "13723157252212387348",
+					"lineNumber": 80,
+					"sampleTraceId": 8028125373774896,
+					"scriptId": "3",
+					"url": "http://127.0.0.1:4473/worker-editor.js"
+				}
+			}
+		],
+		"marks": []
+	}
+]

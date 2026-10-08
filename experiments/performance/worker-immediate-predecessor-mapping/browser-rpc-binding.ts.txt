@@ -1,0 +1,161 @@
+import * as Effect from "effect/Effect"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import * as HttpApiClient from "effect/http-api/HttpApiClient"
+import { DocumentApi } from "./src/shared/document-api"
+import { buildAction, restoreSnapshot, undoAction } from "./src/shared/document-actions"
+import { parseOperation } from "./src/shared/model"
+import { Replica } from "./src/shared/crdt"
+import { newDocument } from "./src/shared/documents"
+import { bootstrapBrowserAccount } from "./tests/browser-account-fixture"
+import { createWorkerSessionClient } from "./src/client/worker-document/worker-client"
+import { verifyRequestedAnchors } from "./worker-rpc-gates"
+
+declare global {
+ interface Window { mappingDone:boolean;mappingFailure?:string;mappingChecks:string[];mappingControls:{name:string;stage:string;passed:boolean;failure?:string}[] }
+}
+window.mappingDone=false
+window.mappingChecks=[]
+window.mappingControls=[]
+function check(condition:unknown,message:string) {
+ if(!condition)throw Error(message)
+ window.mappingChecks.push(message)
+}
+let proof=Effect.scoped(Effect.gen(function*(){
+ let account=yield* bootstrapBrowserAccount(check)
+ let api=yield* HttpApiClient.make(DocumentApi,{baseUrl:location.origin})
+ function control(name:string,source:string,bodyStart:number) {return Effect.scoped(Effect.gen(function*(){
+  let outcome:{name:string;stage:string;passed:boolean;failure?:string}={name,stage:"create",passed:false}
+  window.mappingControls.push(outcome)
+  let workspace="mapping-control-"+crypto.randomUUID(),document="mapping-control-"+crypto.randomUUID()
+  yield* api.workspaces.create({payload:{workspace,name:"Mapping control",request:"create"}})
+  let creation=yield* buildAction(new Replica(account.subject+"-control"),document,"Create",replica=>newDocument(replica,document,"Untitled",source))
+  yield* api.documents.create({payload:{workspace,action:creation}})
+  outcome.stage="open"
+  let worker=yield* createWorkerSessionClient(new URL(new URLSearchParams(location.search).get('arm')==='baseline'?'/baseline-worker-editor.js':'/worker-editor.js',location.origin).href)
+  yield* Effect.addFinalizer(()=>worker.Close().pipe(Effect.catch(()=>Effect.void)))
+  let opened=yield* worker.Open({document,workspace,subject:account.subject,origin:location.origin,online:true,activityChannel:"control-"+crypto.randomUUID(),cooperativeWork:true,admission:{subject:account.subject,epoch:0,exists:true,deleted:false,role:"owner",account:"ready",online:true}})
+  check(opened.projection?.document.content===source,name+" exact opened source")
+  let basis=yield* worker.Begin()
+  let unavailable=yield* worker.UndoQueued({request:crypto.randomUUID(),epoch:basis.epoch,sequence:basis.sequence+1,redo:false,admissionEpoch:0})
+  check(unavailable.status==="not-applied"&&(yield* worker.EditorRead()).source===source,name+" unavailable Undo leaves exact source unchanged")
+  basis={...basis,sequence:basis.sequence+1}
+  let unchanged=yield* worker.MergeCandidate({epoch:basis.epoch,sequence:basis.sequence,start:bodyStart+2,end:bodyStart+3})
+  check(unchanged.source===source&&unchanged.start===bodyStart+2&&unchanged.end===bodyStart+3,name+" stable UTF16 boundaries")
+  yield* worker.ReleaseCandidate({candidate:unchanged.candidate})
+  outcome.stage="peer"
+  let next=source.slice(0,bodyStart)+"PEER"+source.slice(bodyStart)
+  let snapshot=yield* api.documents.snapshot({params:{document},query:{encoding:"compact"}})
+  let replica=yield* restoreSnapshot(snapshot,account.subject+"-control-peer")
+  let action=yield* buildAction(replica,document,"Peer",staged=>[staged.edit(document,next)])
+  yield* api.documents.commit({params:{document},payload:action})
+  yield* worker.Synchronize()
+  outcome.stage="mapping"
+  let merged=yield* worker.MergeCandidate({epoch:basis.epoch,sequence:basis.sequence,start:bodyStart+2,end:bodyStart+3})
+  check(merged.source===next&&merged.start===bodyStart+6&&merged.end===bodyStart+7,name+" peer source and UTF16 anchors")
+  yield* worker.ReleaseCandidate({candidate:merged.candidate})
+  let accepted=yield* api.documents.snapshot({params:{document},query:{encoding:"compact"}})
+  check((yield* restoreSnapshot(accepted,"control-reader")).text(document)===next,name+" independent accepted exact source")
+  let original=action.changes[0]
+  if(!original)throw Error("Missing peer cancellation target")
+  replica.apply(action.changes.map(parseOperation))
+  let acceptedAction=yield* api.documents.action({params:{document,action:action.id}})
+  let canceled=yield* undoAction(replica,acceptedAction)
+  yield* api.documents.commit({params:{document},payload:canceled})
+  yield* worker.Synchronize()
+  let restored=yield* worker.MergeCandidate({epoch:basis.epoch,sequence:basis.sequence,start:bodyStart+2,end:bodyStart+3})
+  check(restored.source===source&&restored.start===bodyStart+2&&restored.end===bodyStart+3,name+" remote cancellation preserves canonical source and UTF16 caret")
+  yield* worker.ReleaseCandidate({candidate:restored.candidate})
+  let canceledSnapshot=yield* api.documents.snapshot({params:{document},query:{encoding:"compact"}})
+  check((yield* restoreSnapshot(canceledSnapshot,"cancel-reader")).text(document)===source,name+" cancellation independently accepted exact source")
+  outcome.stage="complete";outcome.passed=true
+ })).pipe(Effect.catch(error=>Effect.sync(()=>{let outcome=window.mappingControls.find(value=>value.name===name);if(outcome)outcome.failure=String(error)})))}
+ function boundaryControl(empty: boolean) { return Effect.scoped(Effect.gen(function* () {
+  let workspace="boundary-"+crypto.randomUUID(), document="boundary-"+crypto.randomUUID()
+  yield* api.workspaces.create({payload:{workspace,name:"Boundary",request:"create"}})
+  let initial=empty?"BC😀D":"ABC😀D"
+  let creation=yield* buildAction(new Replica(account.subject+"-boundary"),document,"Create",staged=>{
+   let fields=[staged.set(document,"type","document"),staged.set(document,"metadata","frontmatter-v1")]
+   let text=staged.prepareEdit(document,"ABC😀D")
+   if(!text)throw Error("Missing boundary seed")
+   if(empty)text={...text,insert:text.insert.map((atom,index)=>index===0?{...atom,value:""}:atom)}
+   return [...fields,text]
+  })
+  yield* api.documents.create({payload:{workspace,action:creation}})
+  let worker=yield* createWorkerSessionClient(new URL(new URLSearchParams(location.search).get('arm')==='baseline'?'/baseline-worker-editor.js':'/worker-editor.js',location.origin).href)
+  yield* Effect.addFinalizer(()=>worker.Close().pipe(Effect.catch(()=>Effect.void)))
+  let opened=yield* worker.Open({document,workspace,subject:account.subject,origin:location.origin,online:true,activityChannel:"boundary-"+crypto.randomUUID(),cooperativeWork:true,admission:{subject:account.subject,epoch:0,exists:true,deleted:false,role:"owner",account:"ready",online:true}})
+  check(opened.projection?.document.content===initial,"boundary seed accepted including empty atom "+empty)
+  let basis=yield* worker.Begin()
+  function peer(next:string) {return Effect.gen(function*(){
+   let snapshot=yield* api.documents.snapshot({params:{document},query:{encoding:"compact"}})
+   let replica=yield* restoreSnapshot(snapshot,account.subject+"-boundary-peer-"+crypto.randomUUID())
+   let action=yield* buildAction(replica,document,"Peer",staged=>[staged.edit(document,next)])
+   yield* api.documents.commit({params:{document},payload:action})
+   yield* worker.Synchronize()
+  })}
+  let next=initial.slice(1)
+  yield* peer(next)
+  let ranges: {start:number;end:number;direction:"forward"|"backward"|"none"}[]=[{start:1,end:2,direction:"backward"},{start:1,end:1,direction:"none"},{start:0,end:3,direction:"forward"}]
+  let mapped=yield* worker.MergeCandidate({epoch:basis.epoch,sequence:basis.sequence,start:1,end:1,ranges})
+  check(mapped.source===next&&mapped.start===0&&mapped.end===0,"first deleted anchor exact zero "+empty)
+  check(JSON.stringify(mapped.ranges)===JSON.stringify(ranges.map(range=>({...range,start:Math.max(0,range.start-1),end:Math.max(0,range.end-1)}))),"overlapping ranges UTF16 directions preserve first removal "+empty)
+  yield* worker.ReleaseCandidate({candidate:mapped.candidate})
+  yield* peer("😀D")
+  let chain=yield* worker.MergeCandidate({epoch:basis.epoch,sequence:basis.sequence,start:2,end:3})
+  check(chain.source==="😀D"&&chain.start===0&&chain.end===(empty?1:0),"missing predecessor chain exact fallback "+empty)
+  yield* worker.ReleaseCandidate({candidate:chain.candidate})
+  let accepted=yield* api.documents.snapshot({params:{document},query:{encoding:"compact"}})
+  check((yield* restoreSnapshot(accepted,"boundary-reader")).text(document)==="😀D","independent boundary source acceptance "+empty)
+ })) }
+ yield* boundaryControl(false)
+ yield* boundaryControl(true).pipe(Effect.catch(error=>Effect.sync(()=>window.mappingControls.push({name:"empty-atom",stage:"create",passed:false,failure:String(error)}))))
+ yield* Effect.scoped(Effect.gen(function* () {
+  let workspace="siblings-"+crypto.randomUUID(),document="siblings-"+crypto.randomUUID(),source="A😀BC"
+  yield* api.workspaces.create({payload:{workspace,name:"Siblings",request:"create"}})
+  let create=yield* buildAction(new Replica(account.subject+"-siblings"),document,"Create",staged=>newDocument(staged,document,"Untitled",source))
+  yield* api.documents.create({payload:{workspace,action:create}})
+  let worker=yield* createWorkerSessionClient(new URL(new URLSearchParams(location.search).get('arm')==='baseline'?'/baseline-worker-editor.js':'/worker-editor.js',location.origin).href)
+  yield* Effect.addFinalizer(()=>worker.Close().pipe(Effect.catch(()=>Effect.void)))
+  yield* worker.Open({document,workspace,subject:account.subject,origin:location.origin,online:true,activityChannel:"siblings-"+crypto.randomUUID(),cooperativeWork:true,admission:{subject:account.subject,epoch:0,exists:true,deleted:false,role:"owner",account:"ready",online:true}})
+  let basis=yield* worker.Begin()
+  let snapshot=yield* api.documents.snapshot({params:{document},query:{encoding:"compact"}})
+  let left=yield* restoreSnapshot(snapshot,account.subject+"-siblings-left")
+  let right=yield* restoreSnapshot(snapshot,account.subject+"-siblings-right")
+  let first=yield* buildAction(left,document,"Left",staged=>[staged.edit(document,"P"+source)])
+  let second=yield* buildAction(right,document,"Right",staged=>[staged.edit(document,"Q"+source)])
+  yield* api.documents.commit({params:{document},payload:first})
+  yield* api.documents.commit({params:{document},payload:second})
+  yield* worker.Synchronize()
+  let accepted=yield* api.documents.snapshot({params:{document},query:{encoding:"compact"}})
+  let exact=(yield* restoreSnapshot(accepted,"siblings-reader")).text(document)
+  check(exact.length===source.length+2&&exact.slice(2)===source&&exact.slice(0,2).includes("P")&&exact.slice(0,2).includes("Q"),"concurrent RGA sibling insertions independently accepted")
+  let ranges: {start:number;end:number;direction:"forward"|"backward"|"none"}[]=[{start:1,end:3,direction:"backward"},{start:2,end:4,direction:"forward"}]
+  let merged=yield* worker.MergeCandidate({epoch:basis.epoch,sequence:basis.sequence,start:2,end:3,ranges})
+  check(merged.source===exact&&merged.start===4&&merged.end===5,"concurrent sibling order preserves intra-emoji anchor")
+  check(JSON.stringify(merged.ranges)===JSON.stringify(ranges.map(range=>({...range,start:range.start+2,end:range.end+2}))),"concurrent sibling overlapping range directions exact")
+  yield* worker.ReleaseCandidate({candidate:merged.candidate})
+ }))
+ let header='---\ntitle: "Mapping"\n---\n'
+ yield* control("frontmatter",header+"A😀B\n".repeat(8),header.length)
+ yield* control("lone-surrogates","A😀B\nLone\uD800\nLow\uDC00\n",0)
+ let workspace="mapping-"+crypto.randomUUID(),document="mapping-"+crypto.randomUUID()
+ let source="A😀B\n".repeat(1024)
+ yield* api.workspaces.create({payload:{workspace,name:"Worker mapping fixture",request:"create"}})
+ let creation=yield* buildAction(new Replica(account.subject+"-mapping-owner"),document,"Create",replica=>newDocument(replica,document,"Untitled",source))
+ yield* api.documents.create({payload:{workspace,action:creation}})
+ let worker=yield* createWorkerSessionClient(new URL(new URLSearchParams(location.search).get('arm')==='baseline'?'/baseline-worker-editor.js':'/worker-editor.js',location.origin).href)
+ yield* Effect.addFinalizer(()=>worker.Close().pipe(Effect.catch(()=>Effect.void)))
+ let opened=yield* worker.Open({document,workspace,subject:account.subject,origin:location.origin,online:true,activityChannel:"mapping-activity-"+crypto.randomUUID(),cooperativeWork:true,admission:{subject:account.subject,epoch:0,exists:true,deleted:false,role:"owner",account:"ready",online:true}})
+ check(opened.projection?.document.content===source && opened.canWrite,"real worker opens actual authenticated HTTP/IndexedDB source")
+ function peer(next:string){return Effect.gen(function*(){
+  let snapshot=yield* api.documents.snapshot({params:{document},query:{encoding:"compact"}})
+  let replica=yield* restoreSnapshot(snapshot,account.subject+"-mapping-peer-"+crypto.randomUUID())
+  let action=yield* buildAction(replica,document,"Peer mapping edit",staged=>[staged.edit(document,next)])
+  yield* api.documents.commit({params:{document},payload:action})
+ })}
+ yield* verifyRequestedAnchors(worker,account.subject,document,source,peer,check)
+ let accepted=yield* api.documents.snapshot({params:{document},query:{encoding:"compact"}})
+ let replica=yield* restoreSnapshot(accepted,"mapping-independent-reader")
+ check(replica.text(document)==="PEER"+source.slice(1020),"independent accepted snapshot preserves all public peer operations")
+})).pipe(Effect.provide(FetchHttpClient.layer))
+Effect.runPromise(proof).then(()=>{window.mappingDone=true},error=>{window.mappingFailure=String(error);window.mappingDone=true})

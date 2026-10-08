@@ -1,0 +1,136 @@
+[
+	{
+		"arm": "baseline",
+		"checks": [
+			"simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections",
+			"browser identity is available before any network authentication",
+			"native browser account login serializes cookie issuance and agrees with server verification",
+			"boundary seed accepted including empty atom false",
+			"first deleted anchor exact zero false",
+			"overlapping ranges UTF16 directions preserve first removal false",
+			"missing predecessor chain exact fallback false",
+			"independent boundary source acceptance false",
+			"concurrent RGA sibling insertions independently accepted",
+			"concurrent sibling order preserves intra-emoji anchor",
+			"concurrent sibling overlapping range directions exact",
+			"frontmatter exact opened source",
+			"frontmatter unavailable Undo leaves exact source unchanged",
+			"frontmatter stable UTF16 boundaries",
+			"frontmatter peer source and UTF16 anchors",
+			"frontmatter independent accepted exact source",
+			"frontmatter remote cancellation preserves canonical source and UTF16 caret",
+			"frontmatter cancellation independently accepted exact source",
+			"real worker opens actual authenticated HTTP/IndexedDB source",
+			"real worker Begin exact seed",
+			"stable Unicode intra-atom boundaries preserved",
+			"all512 stable ranges and directions preserved",
+			"remote prefix shifts Unicode intra-atom anchors exactly",
+			"all512 remote ranges preserve offset-zero affinity and directions",
+			"Adopt keeps exact source/new epoch",
+			"old epoch rejected without mutation",
+			"stale mapping leaves exact source unchanged",
+			"removed anchor maps to exact surviving predecessor through original fallback",
+			"authenticated queued receipt preserves exact intent",
+			"local queued basis preserves its exact stale source",
+			"real accepted local insertion Undo applies once",
+			"local Undo deleted-anchor fallback preserves exact tail caret and peer deletion",
+			"repeated released Undo candidate preserves all512 tail boundaries/directions",
+			"accepted Redo applies after released Undo candidate",
+			"Redo reconciliation preserves peer deletion and tail caret",
+			"Adopt publishes exact reconciled Redo source",
+			"cached Redo receipt cannot alter newly adopted basis",
+			"later admitted local edit uses newly adopted exact source",
+			"later accepted Undo applies after policy lifecycle reset",
+			"later Undo restores exact source/caret after Adopt and new edit",
+			"long removed predecessor chain maps to baseline surviving prefix",
+			"independent accepted snapshot preserves all public peer operations"
+		],
+		"controls": [
+			{
+				"failure": "DocumentConflict: Actor identity is not authorized",
+				"name": "empty-atom",
+				"passed": false,
+				"stage": "create"
+			},
+			{
+				"name": "frontmatter",
+				"passed": true,
+				"stage": "complete"
+			},
+			{
+				"failure": "DocumentConflict: Actor identity is not authorized",
+				"name": "lone-surrogates",
+				"passed": false,
+				"stage": "create"
+			}
+		],
+		"done": true
+	},
+	{
+		"arm": "candidate",
+		"checks": [
+			"simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections",
+			"browser identity is available before any network authentication",
+			"native browser account login serializes cookie issuance and agrees with server verification",
+			"boundary seed accepted including empty atom false",
+			"first deleted anchor exact zero false",
+			"overlapping ranges UTF16 directions preserve first removal false",
+			"missing predecessor chain exact fallback false",
+			"independent boundary source acceptance false",
+			"concurrent RGA sibling insertions independently accepted",
+			"concurrent sibling order preserves intra-emoji anchor",
+			"concurrent sibling overlapping range directions exact",
+			"frontmatter exact opened source",
+			"frontmatter unavailable Undo leaves exact source unchanged",
+			"frontmatter stable UTF16 boundaries",
+			"frontmatter peer source and UTF16 anchors",
+			"frontmatter independent accepted exact source",
+			"frontmatter remote cancellation preserves canonical source and UTF16 caret",
+			"frontmatter cancellation independently accepted exact source",
+			"real worker opens actual authenticated HTTP/IndexedDB source",
+			"real worker Begin exact seed",
+			"stable Unicode intra-atom boundaries preserved",
+			"all512 stable ranges and directions preserved",
+			"remote prefix shifts Unicode intra-atom anchors exactly",
+			"all512 remote ranges preserve offset-zero affinity and directions",
+			"Adopt keeps exact source/new epoch",
+			"old epoch rejected without mutation",
+			"stale mapping leaves exact source unchanged",
+			"removed anchor maps to exact surviving predecessor through original fallback",
+			"authenticated queued receipt preserves exact intent",
+			"local queued basis preserves its exact stale source",
+			"real accepted local insertion Undo applies once",
+			"local Undo deleted-anchor fallback preserves exact tail caret and peer deletion",
+			"repeated released Undo candidate preserves all512 tail boundaries/directions",
+			"accepted Redo applies after released Undo candidate",
+			"Redo reconciliation preserves peer deletion and tail caret",
+			"Adopt publishes exact reconciled Redo source",
+			"cached Redo receipt cannot alter newly adopted basis",
+			"later admitted local edit uses newly adopted exact source",
+			"later accepted Undo applies after policy lifecycle reset",
+			"later Undo restores exact source/caret after Adopt and new edit",
+			"long removed predecessor chain maps to baseline surviving prefix",
+			"independent accepted snapshot preserves all public peer operations"
+		],
+		"controls": [
+			{
+				"failure": "DocumentConflict: Actor identity is not authorized",
+				"name": "empty-atom",
+				"passed": false,
+				"stage": "create"
+			},
+			{
+				"name": "frontmatter",
+				"passed": true,
+				"stage": "complete"
+			},
+			{
+				"failure": "DocumentConflict: Actor identity is not authorized",
+				"name": "lone-surrogates",
+				"passed": false,
+				"stage": "create"
+			}
+		],
+		"done": true
+	}
+]

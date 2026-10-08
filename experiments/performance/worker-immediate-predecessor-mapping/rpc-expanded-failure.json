@@ -1,0 +1,34 @@
+[
+	{
+		"arm": "baseline",
+		"checks": [
+			"simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections",
+			"browser identity is available before any network authentication",
+			"native browser account login serializes cookie issuance and agrees with server verification",
+			"boundary seed accepted including empty atom false",
+			"first deleted anchor exact zero false",
+			"overlapping ranges UTF16 directions preserve first removal false",
+			"missing predecessor chain exact fallback false",
+			"independent boundary source acceptance false"
+		],
+		"controls": [],
+		"done": true,
+		"failure": "DocumentConflict: Actor identity is not authorized"
+	},
+	{
+		"arm": "candidate",
+		"checks": [
+			"simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections",
+			"browser identity is available before any network authentication",
+			"native browser account login serializes cookie issuance and agrees with server verification",
+			"boundary seed accepted including empty atom false",
+			"first deleted anchor exact zero false",
+			"overlapping ranges UTF16 directions preserve first removal false",
+			"missing predecessor chain exact fallback false",
+			"independent boundary source acceptance false"
+		],
+		"controls": [],
+		"done": true,
+		"failure": "DocumentConflict: Actor identity is not authorized"
+	}
+]
