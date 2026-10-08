@@ -450,6 +450,22 @@
 			Correctness alone does not justify slower typing. Both experiments stay
 			out of production.
 		</p>
+		<h2>Native prefix checks did not improve peer rendering</h2>
+		<p>
+			Another rejected experiment replaced repeated character scans with native
+			prefix checks for tail appends and deletions. Eighteen editor component
+			journeys passed, including projected links and Unicode boundaries. Three
+			alternating two-account pairs at each document size passed all 48 trusted
+			edit, fresh-checkpoint and reload checks.
+		</p>
+		<p>
+			The 128 KiB plain-append receiver task worsened from 8.25 to 10.20 ms;
+			frontmatter append worsened from 9.11 to 10.95 ms. At 1 MiB, receiver
+			tasks stayed roughly 13 to 15 ms and visible readiness barely changed.
+			Only browser assets changed; both versions used the same native baseline
+			server. These measurements do not describe the current full stack. The
+			experiment stays out of production.
+		</p>
 		<h2>Native search highlights reduce manual geometry work</h2>
 		<p>
 			Inactive matches use the browser's CSS Custom Highlight API. The active
