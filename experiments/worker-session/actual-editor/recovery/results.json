@@ -1,0 +1,34 @@
+{
+	"prototype": "outside production; existing native EditorElement with worker queue",
+	"correctness": {
+		"faultAssertions": 13,
+		"priorUndoAssertions": 11,
+		"types": "passed"
+	},
+	"baselineArtifact": "5c47f13",
+	"productionHead": "3ccef5d2947cf35934cdb7238fc286a3e9808394",
+	"sourceHashes": {
+		"bindings.ts": "164b729538d5725dc85819b3639b0f2eb05e1b924c4f6779d4b2f748915eb16e",
+		"editor-queue.ts": "6a626881b35456866893daef72ac9fb26a1a7e91fd76b3883864000715e1db7b",
+		"browser-fixture.ts": "e10da7061bffc6bd019e151e8b55ea652393115e96d17e1eb069715ae4565699",
+		"recovery-journey.ts": "4dfdd4e8c89549475019fc99e17c10f62e4aad83ac951e6d030125c5a6b43e8b",
+		"undo-journey.ts": "e777254386016cf8f12b5edba9c9ee20da7c82ae954a6c62e53493730c27b0a8",
+		"worker-rpc.ts": "1bcc14f868e58910794d3082a19c376f3c9ff2ea6681a81853cc87658ea72e78",
+		"worker-session.ts": "3fdecbfb537e3e33ed7004072e4e2b1c31bdca07c1f72e807ce74633e90f4eef",
+		"worker-client.ts": "ce1af1569236c7ed789d32b0d40c8985344c5abf40be67bdb0985527612b66e7",
+		"server.ts": "4aff52a39e880fe224c2ca0920a5e5ecc3cf76921b1e08c97c3c8cc4215cc20a",
+		"seed.ts": "cff27abd329b5131af5c029f3a5408c102dfea1539537d15156c6784289e9b3d"
+	},
+	"editorSha256": "e45b5e626779b521ad20b0469b0abf00a510bdc913ac0e5623cd32fd88503b83",
+	"bundles": {
+		"worker.js": "01518ead4ba4bd3b43bf12b44b864faf58af9f84bfad9576bc4cf9c50aa6c19d",
+		"browser-fixture.js": "da842126974eabeca60711af05742c6c3286abfdafbfb09f8af2c54435eedd53"
+	},
+	"limits": [
+		"No performance measurements",
+		"No different-account collaboration gate",
+		"No physical IME or clipboard gate",
+		"Flush verifies local journal, not server acceptance",
+		"Initial disposed same-URL navigation readiness timed out; fresh isolated session per scenario passed"
+	]
+}

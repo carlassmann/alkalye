@@ -1,0 +1,512 @@
+import * as Context from "effect/Context"
+import * as Cause from "effect/Cause"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
+import * as Layer from "effect/Layer"
+import * as Scope from "effect/Scope"
+import * as Semaphore from "effect/Semaphore"
+import * as Stream from "effect/Stream"
+import { indexedDbJournalLayer } from "./src/platform/indexeddb-journal"
+import { DocumentLifecycle } from "./src/platform/document-lifecycle"
+import {
+	DocumentSession,
+	documentDatabaseName,
+} from "./src/shared/document-session"
+import { makeDocumentTransport } from "./src/shared/document-transport"
+import { documentFailureCategory } from "./src/shared/document-observability"
+import { UndoUnavailable } from "./src/shared/document-errors"
+import { Replica } from "./src/shared/crdt"
+import type { Atom } from "./src/shared/model"
+import { WorkerDocumentFailure, WorkerDocumentRpc } from "./worker-rpc"
+
+let workerLifecycle = Layer.succeed(DocumentLifecycle, {
+	changes: Stream.never,
+	hidden: Stream.never,
+	protect: () => Effect.succeed({ update() {} }),
+})
+
+export let workerSessionHandlers = WorkerDocumentRpc.toLayer(
+	Effect.gen(function* () {
+		let owner = yield* Scope.Scope
+		let commands = yield* Semaphore.make(1)
+		let opened:
+			| {
+					document: string
+					scope: Scope.Closeable
+					session: Context.Service.Shape<typeof DocumentSession>
+			  }
+			| undefined
+		let undoReceipts = new Map<
+			string,
+			{
+				request: string
+				epoch: string
+				sequence: number
+				redo: boolean
+				status: "applied" | "not-applied" | "unknown"
+				action?: string
+				failure?: string
+			}
+		>()
+		let handles = new Map<string, Atom[]>()
+		let sequence = 0
+		let epoch = 0
+		let basis: { epoch: string; sequence: number; replica: Replica } | undefined
+		let candidate:
+			| {
+					epoch: string
+					priorEpoch: string
+					priorSequence: number
+					replica: Replica
+			  }
+			| undefined
+		function fail(reason: WorkerDocumentFailure["reason"]) {
+			return new WorkerDocumentFailure({ reason, category: "conflict" })
+		}
+		function requireSession() {
+			return Effect.suspend(() =>
+				opened ? Effect.succeed(opened) : Effect.fail(fail("Closed")),
+			)
+		}
+		function requireCapacity() {
+			return Effect.suspend(() =>
+				handles.size < 8 ? Effect.void : Effect.fail(fail("HandleCapacity")),
+			)
+		}
+		function read() {
+			return Effect.gen(function* () {
+				yield* requireCapacity()
+				let current = yield* requireSession()
+				return yield* Effect.try(() => {
+					let handle = String(++sequence)
+					let atoms = current.session.replica.visible(current.document)
+					let source = current.session.replica.text(current.document)
+					handles.set(handle, atoms)
+					return {
+						handle,
+						revision: current.session.version(),
+						source,
+						unsaved: current.session.unsaved(),
+						pending: current.session.pending().length,
+						rejected: current.session.rejected().length,
+						...(basis
+							? {
+									epoch: basis.epoch,
+									sequence: basis.sequence,
+									localSource: basis.replica.text(current.document),
+								}
+							: {}),
+					}
+				})
+			})
+		}
+		function execute<A, E, R>(work: Effect.Effect<A, E, R>) {
+			return commands.withPermit(work).pipe(
+				Effect.mapError(error =>
+					error instanceof WorkerDocumentFailure
+						? error
+						: new WorkerDocumentFailure({
+								reason: "SessionFailure",
+								category: documentFailureCategory(error),
+							}),
+				),
+				Effect.catchDefect(() =>
+					Effect.fail(
+						new WorkerDocumentFailure({
+							reason: "SessionFailure",
+							category: "failure",
+						}),
+					),
+				),
+			)
+		}
+		return WorkerDocumentRpc.of({
+			Open: input =>
+				execute(
+					Effect.uninterruptibleMask(restore =>
+						Effect.gen(function* () {
+							if (opened) return yield* Effect.fail(fail("AlreadyOpen"))
+							let options = {
+								...input,
+								transport: yield* makeDocumentTransport(
+									input.origin,
+									input.subject,
+								),
+							}
+							let scope = yield* Scope.fork(owner)
+							return yield* restore(
+								Effect.gen(function* () {
+									let context = yield* Layer.buildWithScope(
+										DocumentSession.layer(options).pipe(
+											Layer.provide(
+												indexedDbJournalLayer(documentDatabaseName(options)),
+											),
+											Layer.provide(workerLifecycle),
+										),
+										scope,
+									)
+									opened = {
+										document: input.document,
+										scope,
+										session: Context.get(context, DocumentSession),
+									}
+									return yield* read()
+								}),
+							).pipe(
+								Effect.onExit(exit =>
+									Exit.isSuccess(exit)
+										? Effect.void
+										: Effect.sync(() => {
+												opened = undefined
+												basis = undefined
+												candidate = undefined
+												handles.clear()
+											}).pipe(Effect.andThen(Scope.close(scope, exit))),
+								),
+							)
+						}),
+					),
+				),
+			Read: () => execute(read()),
+			Replace: input =>
+				execute(
+					Effect.gen(function* () {
+						if (basis) return yield* Effect.fail(fail("BasisUnavailable"))
+						yield* requireCapacity()
+						let current = yield* requireSession()
+						let base = handles.get(input.handle)
+						if (!base) return yield* Effect.fail(fail("HandleUnavailable"))
+						let edit = yield* Effect.try(() =>
+							current.session.replace(input.ranges, base),
+						)
+						let saved: Effect.Effect<void, unknown> = edit.saved
+						yield* saved.pipe(
+							Effect.mapError(
+								error =>
+									new WorkerDocumentFailure({
+										reason: edit.operation ? "Unsaved" : "Rejected",
+										category: documentFailureCategory(error),
+									}),
+							),
+						)
+						return yield* read()
+					}),
+				),
+			Begin: () =>
+				execute(
+					Effect.gen(function* () {
+						let current = yield* requireSession()
+						if (basis) return yield* Effect.fail(fail("BasisUnavailable"))
+						let replica = yield* current.session.replica.forkEffect()
+						basis = { epoch: String(++epoch), sequence: 0, replica }
+						return {
+							epoch: basis.epoch,
+							sequence: basis.sequence,
+							source: replica.text(current.document),
+						}
+					}),
+				),
+			ReplaceQueued: input =>
+				execute(
+					Effect.gen(function* () {
+						let current = yield* requireSession()
+						let local = basis
+						if (!local || local.epoch !== input.epoch)
+							return yield* Effect.fail(fail("BasisUnavailable"))
+						if (input.sequence !== local.sequence + 1)
+							return yield* Effect.fail(fail("SequenceUnavailable"))
+						candidate = undefined
+						let edit = yield* Effect.try({
+							try: () => {
+								let edit = current.session.replace(
+									input.ranges,
+									local.replica.visible(current.document),
+								)
+								if (edit.operation) {
+									local.replica.apply([edit.operation])
+									local.sequence = input.sequence
+								}
+								return edit
+							},
+							catch: () => {
+								basis = undefined
+								candidate = undefined
+								return fail("AppliedUnknown")
+							},
+						})
+						let saved: Effect.Effect<void, unknown> = edit.saved
+						yield* saved.pipe(
+							Effect.mapError(
+								error =>
+									new WorkerDocumentFailure({
+										reason: edit.operation ? "Unsaved" : "Rejected",
+										category: documentFailureCategory(error),
+									}),
+							),
+						)
+						local.sequence = input.sequence
+						return {
+							epoch: local.epoch,
+							sequence: local.sequence,
+							source: local.replica.text(current.document),
+							unsaved: current.session.unsaved(),
+						}
+					}),
+				),
+			UndoQueued: input =>
+				execute(
+					Effect.uninterruptibleMask(restore =>
+						Effect.gen(function* () {
+							let retained = undoReceipts.get(input.request)
+							if (retained) {
+								if (
+									retained.epoch !== input.epoch ||
+									retained.sequence !== input.sequence ||
+									retained.redo !== input.redo
+								)
+									return yield* Effect.fail(fail("SequenceUnavailable"))
+								return retained
+							}
+							let current = yield* requireSession()
+							let local = basis
+							if (!local || local.epoch !== input.epoch)
+								return yield* Effect.fail(fail("BasisUnavailable"))
+							if (input.sequence !== local.sequence + 1)
+								return yield* Effect.fail(fail("SequenceUnavailable"))
+							candidate = undefined
+							let result = yield* restore(
+								input.redo ? current.session.redo() : current.session.undo(),
+							).pipe(Effect.exit)
+							let status: "applied" | "not-applied" | "unknown"
+							let action: string | undefined
+							let failure: string | undefined
+							if (Exit.isSuccess(result)) {
+								status = "applied"
+								action = result.value.id
+							} else {
+								let error = Cause.squash(result.cause)
+								status =
+									error instanceof UndoUnavailable ? "not-applied" : "unknown"
+								failure = documentFailureCategory(error)
+							}
+							local.sequence = input.sequence
+							let receipt = {
+								...input,
+								status,
+								...(action ? { action } : {}),
+								...(failure ? { failure } : {}),
+							}
+							undoReceipts.set(input.request, receipt)
+							if (undoReceipts.size > 64) {
+								let oldest = undoReceipts.keys().next().value
+								if (oldest) undoReceipts.delete(oldest)
+							}
+							return receipt
+						}),
+					),
+				),
+			MergeCandidate: input =>
+				execute(
+					Effect.gen(function* () {
+						let current = yield* requireSession()
+						let local = basis
+						if (!local || local.epoch !== input.epoch)
+							return yield* Effect.fail(fail("BasisUnavailable"))
+						if (local.sequence !== input.sequence)
+							return yield* Effect.fail(fail("SequenceUnavailable"))
+						candidate = undefined
+						if (
+							input.start > input.end ||
+							input.end > local.replica.text(current.document).length
+						)
+							return yield* Effect.fail(fail("SelectionUnavailable"))
+						yield* current.session.flush
+						let replica = yield* current.session.replica.forkEffect()
+						let source = replica.text(current.document)
+						let oldAtoms = local.replica.visible(current.document)
+						let newAtoms = replica.visible(current.document)
+						if (
+							input.ranges?.some(
+								range =>
+									range.start > range.end ||
+									range.end > local.replica.text(current.document).length,
+							)
+						)
+							return yield* Effect.fail(fail("SelectionUnavailable"))
+						let requestedRanges = input.ranges ?? [
+							{ start: input.start, end: input.end, direction: "none" },
+						]
+						let mapped = mapSelectionBoundaries(oldAtoms, newAtoms, [
+							input.start,
+							input.end,
+							...requestedRanges.flatMap(range => [range.start, range.end]),
+						])
+						let start = mapped.get(input.start),
+							end = mapped.get(input.end)
+						if (start === undefined || end === undefined)
+							return yield* Effect.fail(fail("SelectionUnavailable"))
+						let mappedRanges: {
+							start: number
+							end: number
+							direction: "forward" | "backward" | "none"
+						}[] = []
+						for (let range of requestedRanges) {
+							let start = mapped.get(range.start),
+								end = mapped.get(range.end)
+							if (start === undefined || end === undefined)
+								return yield* Effect.fail(fail("SelectionUnavailable"))
+							mappedRanges.push({ start, end, direction: range.direction })
+						}
+						let next = String(++epoch)
+						candidate = {
+							epoch: next,
+							priorEpoch: local.epoch,
+							priorSequence: local.sequence,
+							replica,
+						}
+						return { candidate: next, source, start, end, ranges: mappedRanges }
+					}),
+				),
+			Adopt: input =>
+				execute(
+					Effect.try({
+						try: () => {
+							if (
+								!basis ||
+								!candidate ||
+								candidate.epoch !== input.candidate ||
+								basis.epoch !== input.epoch ||
+								basis.sequence !== input.sequence ||
+								candidate.priorEpoch !== input.epoch ||
+								candidate.priorSequence !== input.sequence
+							)
+								throw fail("CandidateUnavailable")
+							basis = {
+								epoch: candidate.epoch,
+								sequence: 0,
+								replica: candidate.replica,
+							}
+							candidate = undefined
+						},
+						catch: error =>
+							error instanceof WorkerDocumentFailure
+								? error
+								: fail("AppliedUnknown"),
+					}),
+				),
+			ReleaseCandidate: input =>
+				execute(
+					Effect.sync(() => {
+						if (candidate?.epoch === input.candidate) candidate = undefined
+					}),
+				),
+			End: input =>
+				execute(
+					Effect.gen(function* () {
+						let current = yield* requireSession()
+						if (!basis || basis.epoch !== input.epoch)
+							return yield* Effect.fail(fail("BasisUnavailable"))
+						if (input.sequence !== basis.sequence)
+							return yield* Effect.fail(fail("SequenceUnavailable"))
+						yield* current.session.flush
+						let merged = yield* read()
+						basis = undefined
+						candidate = undefined
+						return {
+							...merged,
+							epoch: undefined,
+							sequence: undefined,
+							localSource: undefined,
+						}
+					}),
+				),
+			Release: input =>
+				execute(
+					Effect.sync(() => {
+						handles.delete(input.handle)
+					}),
+				),
+			Sync: () =>
+				execute(
+					requireSession().pipe(
+						Effect.flatMap(current => current.session.sync),
+					),
+				),
+			Flush: () =>
+				execute(
+					requireSession().pipe(
+						Effect.flatMap(current => current.session.flush),
+					),
+				),
+			Close: () =>
+				execute(
+					Effect.uninterruptible(
+						Effect.gen(function* () {
+							let current = yield* requireSession()
+							opened = undefined
+							basis = undefined
+							candidate = undefined
+							handles.clear()
+							yield* Scope.close(current.scope, Exit.void)
+						}),
+					).pipe(
+						Effect.catchDefect(() =>
+							Effect.fail(
+								new WorkerDocumentFailure({
+									reason: "SessionFailure",
+									category: "storage",
+								}),
+							),
+						),
+					),
+				),
+		})
+	}),
+)
+
+function mapSelectionBoundaries(
+	previous: readonly Atom[],
+	next: readonly Atom[],
+	offsets: number[],
+) {
+	let nextPositions = new Map<string, { start: number; end: number }>()
+	let nextOffset = 0
+	for (let atom of next) {
+		nextPositions.set(atom.id, {
+			start: nextOffset,
+			end: nextOffset + atom.value.length,
+		})
+		nextOffset += atom.value.length
+	}
+	let requests = [...new Set(offsets)].sort((left, right) => left - right)
+	let resolved = new Map<number, number>()
+	if (requests[0] === 0) {
+		resolved.set(0, 0)
+		requests.shift()
+	}
+	let request = 0,
+		position = 0,
+		predecessor = 0
+	for (let atom of previous) {
+		let mapped = nextPositions.get(atom.id)
+		let offset = requests[request]
+		while (
+			atom.value.length &&
+			offset !== undefined &&
+			offset <= position + atom.value.length
+		) {
+			resolved.set(
+				offset,
+				mapped
+					? mapped.start +
+							Math.min(offset - position, mapped.end - mapped.start)
+					: predecessor,
+			)
+			request++
+			offset = requests[request]
+		}
+		if (mapped) predecessor = mapped.end
+		position += atom.value.length
+	}
+	return resolved
+}

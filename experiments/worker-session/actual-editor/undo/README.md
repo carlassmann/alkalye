@@ -1,10 +1,10 @@
-# Native worker Undo/Redo — unshipped
+# Native worker Undo/Redo prototype
 
 Eleven actual EditorElement assertions passed; types passed. No timing measurement or production adoption. The follow-up review identifies two remaining recovery blockers and an interruption race.
 
 ## Slice
 
-UndoQueued enters the existing scoped FIFO after local replacements. The worker calls existing DocumentSession.undo/redo; no source-restore undo engine or main Atom[] graph. A bounded64-receipt cache retains request/epoch/sequence/redo plus outcome. Same-payload retry returns the original outcome; old evicted requests fail epoch/next-sequence checks before mutation. The old editor basis remains until existing MergeCandidate/Adopt publishes canonical source. Deleted anchors map to the globally nearest surviving old predecessor; all ranges share a single worker scan, then the current editor restores merged ranges. Command freeze is separate from permission editability.
+UndoQueued enters the existing scoped FIFO after local replacements. The worker calls existing DocumentSession.undo/redo; no source-restore undo engine or main Atom[] graph. A bounded 64-receipt cache retains request/epoch/sequence/redo plus outcome. Same-payload retry returns the original outcome; old evicted requests fail epoch/next-sequence checks before mutation. The old editor basis remains until existing MergeCandidate/Adopt publishes canonical source. Deleted anchors map to the globally nearest surviving old predecessor; all ranges share a single worker scan, then the current editor restores merged ranges. Command freeze is separate from permission editability.
 
 Known no-op UndoUnavailable unfreezes. Applied outcomes require candidate adoption. Unknown outcomes preserve the draft read-only. This is a prototype, not a complete production recovery contract.
 
@@ -22,11 +22,11 @@ The first journey incorrectly expected redo after a new same-subject peer edit. 
 
 Repeated Ctrl+Z while a command is active is dropped, matching the current host's undoWaiting guard. Postponed undo during composition is intended to act after its committed edit; physical IME remains unverified.
 
-Follow-up review is in opus-followup.log. OS IME/drag, lost replies,64-receipt eviction, in-flight close, revocation, accepted server checkpoint and total worker memory remain untested. Full-app single-writer library/session integration and lifecycle forwarding remain separate; comments/media/clipboard facades have not been swapped.
+Follow-up review is in opus-followup.log. OS IME/drag, lost replies,64 receipt eviction, in-flight close, revocation, accepted server checkpoint and total worker memory remain untested. Full-app single-writer library/session integration and lifecycle forwarding remain separate; comments/media/clipboard facades have not been swapped.
 
 ## Reproduce
 
-Prepare a real disposable repository copy following the parent actual-editor README, apply its prototype.patch, then undo.patch. Copy worker handoff sources to the disposable root as before; copy these fixture text files to matching .ts names. Server-seeded fixture and corrected bounded CSS are inherited. Run bun server.ts, then bun undo-journey.ts URL. Keep agent-browser background with stable default timeout20000. Do not apply this patch to production.
+Prepare a real disposable repository copy following the parent actual-editor README, apply its prototype.patch, then undo.patch. Copy worker handoff sources to the disposable root as before; copy these fixture text files to matching .ts names. Server-seeded fixture and corrected bounded CSS are inherited. Run bun server.ts, then bun undo-journey.ts URL. Keep agent-browser background with stable default timeout 20000. Do not apply this patch to production.
 
 Source and compiled browser/worker SHA256 hashes are in tested-hashes.txt. The journey label was corrected after the passing run to say previously merged rather than concurrent; assertions and compiled source did not change.
 
