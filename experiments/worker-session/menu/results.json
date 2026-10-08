@@ -1,0 +1,61 @@
+{
+	"scope": "Outside actual Editor context-menu Copy/Paste/Cut/format capability. Production unchanged.",
+	"sourceBase": "5c47f1357d6d8be3fbdf0c0ec3879991f4aa60d1",
+	"proof": {
+		"types": "pass",
+		"build": "pass",
+		"menuAssertions": 10,
+		"clipboardRegressionAssertions": 13,
+		"totalAssertions": 23,
+		"menuLog": "journey-menu-corrected.log",
+		"clipboardLog": "journey-clipboard-regression.log",
+		"sourceAndBundleHashes": {
+			"worker-client.ts": "9be91716eff0370ebcacae8dda12f61110b7684f1107ace83b945aff3a4c71e4",
+			"worker-rpc.ts": "fb2fcd20799d4e0f06a622944acf510797a2af48986de238c9893464322ab281",
+			"worker-session.ts": "8160d50d60c95b012be9c198f7fd3889d6cba2fd1bcaf0875e0635b17b52b4cb",
+			"worker.ts": "cfcd9f3ae3d67d0629f8728f08cfc02dc035b2929b125b37f21645d4ec278eb9",
+			"editor-queue.ts": "b2df4af019c36fde5b44fef560ae219ac88316027c84dfb9323a8d6b0a994cec",
+			"browser-fixture.ts": "ae49b27f800c893230b7731d09169679d52758e9edb618e8720d7126fc14167a",
+			"bindings.ts": "56aa0a6527a41903ddab3b2b0952f18dab4556d3f6d95f9bffef1098ac33007b",
+			"journey.ts": "c4f74bb770c19266c18658436d5212622107d98f8d4f1a04a74e8d28426f327c",
+			"menu-journey.ts": "7a2738084aeb980e5a9b1e5b78f3ced139d05c04c0e31d1795cd2e535d8465a0",
+			"server.ts": "8e4624605f0a7607aede9787fc422989012ef7a793426b8b17903992f49d47f5",
+			"seed.ts": "7f8cbff587a084d6cd6c9acb534e8fa0ef3fb665a8062be819dd3443bfff9a2f",
+			"build.ts": "fafff1bbc98d9982169f5b08237efb8b4aceb56ab7a1a25e5d23280dc0f642f4",
+			"work.config.js": "bfc4532257e0ddcf31747073726490ebd9ccdf29fa558353529cd4fe73775e09",
+			"tsconfig.json": "aa34b1bd15694bef1a1014bf6bab127b9c50a7b3e2b67807b0615fa9e546fffb",
+			"src/client/components/editor.ts": "d55605d5a09777f648fe47320590f081a72000b53b2134d3704b347eea111c46",
+			"src/client/source-textarea.ts": "c6ea32c60cf10e9988e83f434bf476a95c47294a276fdf03f5350ce66e7b177e",
+			"assets/worker.js": "439c0e764334d06836543402f1844261939a28131b233b55e63a7e170e478854",
+			"assets/browser-fixture.js": "a9fb009bc478232752754643b88ec85c06fd1342bbc6b45b84ffa248d36e90ed"
+		}
+	},
+	"preservedFailures": [
+		{
+			"log": "types-menu-initial.log",
+			"cause": "Harness evaluate() returned unknown; assigned narrowed original string before mutable expected source."
+		},
+		{
+			"log": "journey-menu-initial.log",
+			"cause": "Repeated persistent browser eval declared global item twice. Corrected lookup runs inside local IIFE. No engine change."
+		}
+	],
+	"reviews": {
+		"model": "claude-opus-5-5",
+		"handles": "75521 and70805 both terminal exit0",
+		"logs": ["opus-menu.log", "opus-menu-followup.log"],
+		"result": "No blocker for bounded actual contextmenu proof.",
+		"finalHardening": "Added immediate rejected-promise handler before deferred fiber; original failure still reaches Effect."
+	},
+	"limits": [
+		"Deferred fake clipboard is not OS permission or Safari gesture proof; Copy retains existing forked write timing.",
+		"Contextmenu opened by dispatched event, then visible menu items clicked through background agent-browser.",
+		"Gesture-to-fiber expected-source guard source-reviewed; no deterministic auto-yield race injected.",
+		"Native ClipboardEvent cut remains existing code, not explicitly exercised here.",
+		"Peer is independent worker actor under same account, not separate-account revocation proof.",
+		"Disposal confirms editor removal while write pending; this menu journey does not restart storage afterward.",
+		"Task/comment/assets remain gated named capability gaps; no full app cutover, unified Undo, main-tab crash durability, performance, or120fps claim."
+	],
+	"resources": "Disposable server stopped; all journey browser sessions closed.",
+	"signed": "written with gpt-6 in codex"
+}

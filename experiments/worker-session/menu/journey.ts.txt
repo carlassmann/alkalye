@@ -1,0 +1,90 @@
+import { assert, browser, evaluate, wait } from "./tests/browser-driver"
+
+let url = process.argv[2]
+if (!url) throw Error("URL required")
+let session = "worker-clipboard-" + Date.now()
+let proof = "window.workerEditorProof"
+let text = 'document.querySelector("alkalye-editor").source'
+function paste(start: number, end: number, value: string) {
+	let prior = evaluate(session, `${proof}.captured()`)
+	if (typeof prior !== "number") throw Error("Capture count unavailable")
+	evaluate(session, `${text}.focus();${text}.setSelectionRange(${start},${end});${proof}.paste()`)
+	wait(session, `${proof}.captured()===${prior + 1}`)
+	evaluate(session, `${proof}.settleClipboard(${JSON.stringify(value)})`)
+}
+try {
+	browser(session, "set", "viewport", "1280", "800")
+	browser(session, "open", url)
+	wait(session, "document.body.dataset.ready==='true'||!!document.body.dataset.failure")
+	assert(evaluate(session, "!document.body.dataset.failure"), "Actual Editor clipboard fixture opens")
+	let original = evaluate(session, `${proof}.inspect().source`)
+	if (typeof original !== "string") throw Error("Missing original source")
+	let expected = original
+	let alpha = expected.indexOf("alpha")
+	paste(alpha, alpha + 5, "alphabet")
+	expected = expected.slice(0, alpha) + "alphabet" + expected.slice(alpha + 5)
+	wait(session, `${proof}.inspect().source===${JSON.stringify(expected)}&&${proof}.inspect().pending===0`)
+	assert(evaluate(session, `${proof}.inspect().queueSource===${JSON.stringify(expected)}`), "Selected text paste accepts native trimmed common prefix")
+	let aa = expected.indexOf("\naa\n") + 2
+	paste(aa, aa, "a")
+	expected = expected.slice(0, aa) + "a" + expected.slice(aa)
+	wait(session, `${proof}.inspect().source===${JSON.stringify(expected)}&&${proof}.inspect().pending===0`)
+	assert(evaluate(session, `${proof}.inspect().queueSource===${JSON.stringify(expected)}`), "Collapsed repeated text paste retains captured anchor")
+	let bar = expected.indexOf("\nbar\n") + 1
+	paste(bar, bar, "foo\n")
+	expected = expected.slice(0, bar) + "foo\n" + expected.slice(bar)
+	wait(session, `${proof}.inspect().source===${JSON.stringify(expected)}&&${proof}.inspect().pending===0`)
+	assert(evaluate(session, `${proof}.inspect().queueSource===${JSON.stringify(expected)}`), "Copied line paste preserves boundary despite native suffix trimming")
+	let beta = expected.indexOf("beta")
+	let beforePeerCapture = evaluate(session, `${proof}.captured()`)
+	evaluate(session, `${text}.focus();${text}.setSelectionRange(${beta},${beta + 4});${proof}.paste()`)
+	wait(session, `${proof}.captured()===${Number(beforePeerCapture) + 1}`)
+	evaluate(session, `${text}.setSelectionRange(${expected.length},${expected.length})`)
+	browser(session, "keyboard", "inserttext", "LOCAL")
+	expected += "LOCAL"
+	wait(session, `${proof}.inspect().source===${JSON.stringify(expected)}&&${proof}.inspect().pending===0`)
+	evaluate(session, `${proof}.peer()`)
+	evaluate(session, `${proof}.settleClipboard('BETA')`)
+	expected = expected.slice(0, beta) + "BETA" + expected.slice(beta + 4)
+	wait(session, `${proof}.inspect().source===${JSON.stringify(expected)}&&${proof}.inspect().pending===0`)
+	assert(evaluate(session, `${proof}.flush()`) === "PEER\n" + expected, "Deferred paste preserves queued local edit and unseen peer insertion")
+	assert(evaluate(session, `${proof}.merge()`) === true, "Paste basis rebases through guarded native merge")
+	expected = "PEER\n" + expected
+	wait(session, `${proof}.inspect().source===${JSON.stringify(expected)}`)
+	let selectedAlpha = expected.indexOf("alphabet")
+	let selectedCapture = evaluate(session, `${proof}.captured()`)
+	evaluate(session, `${text}.focus();${text}.setSelectionRange(${selectedAlpha},${selectedAlpha + 8});${proof}.paste()`)
+	wait(session, `${proof}.captured()===${Number(selectedCapture) + 1}`)
+	evaluate(session, `${proof}.peer(true)`)
+	evaluate(session, `${proof}.settleClipboard('STALE')`)
+	wait(session, `${proof}.inspect().failures.length===1`)
+	assert(evaluate(session, `${proof}.inspect().source===${JSON.stringify(expected)}&&!${proof}.inspect().readonly`), "Peer change to captured selection refuses paste without freezing typing")
+	evaluate(session, `${text}.setSelectionRange(0,0)`)
+	assert(evaluate(session, `${proof}.merge()`) === true, "Refused clipboard query retains usable worker basis after selecting retained anchor")
+	expected = expected.replace("alphabet", "REMOTE")
+	wait(session, `${proof}.inspect().source===${JSON.stringify(expected)}`)
+	let captureGuard = evaluate(session, `${proof}.captured()`)
+	evaluate(session, `${proof}.editable(false);${proof}.paste()`)
+	assert(evaluate(session, `${proof}.captured()===${Number(captureGuard)}&&${proof}.inspect().source===${JSON.stringify(expected)}`), "Readonly native paste refuses before capture")
+	evaluate(session, `${proof}.editable(true);${text}.dispatchEvent(new CompositionEvent('compositionstart',{bubbles:true}));${proof}.paste()`)
+	assert(evaluate(session, `${proof}.captured()===${Number(captureGuard)}&&${proof}.inspect().source===${JSON.stringify(expected)}`), "Composition native paste refuses before capture")
+	evaluate(session, `${text}.dispatchEvent(new CompositionEvent('compositionend',{bubbles:true}))`)
+	for (let attempt = 0; attempt < 9; attempt++) {
+		let prior = evaluate(session, `${proof}.captured()`)
+		evaluate(session, `${text}.setSelectionRange(0,0);${proof}.paste()`)
+		wait(session, `${proof}.captured()===${Number(prior) + 1}`)
+		evaluate(session, `${proof}.denyClipboard()`)
+		wait(session, `${proof}.inspect().failures.length===${attempt + 2}`)
+	}
+	assert(evaluate(session, `${proof}.inspect().source===${JSON.stringify(expected)}&&!${proof}.inspect().readonly`), "Repeated clipboard denial preserves source and typing authority")
+	paste(expected.length, expected.length, "TAIL")
+	expected += "TAIL"
+	wait(session, `${proof}.inspect().source===${JSON.stringify(expected)}&&${proof}.inspect().pending===0`)
+	assert(evaluate(session, `${proof}.flush()`) === expected, "Valid paste after nine denials has exact durable HTTP source")
+	let disposalCapture = evaluate(session, `${proof}.captured()`)
+	evaluate(session, `${text}.setSelectionRange(0,0);${proof}.paste()`)
+	wait(session, `${proof}.captured()===${Number(disposalCapture) + 1}`)
+	evaluate(session, `${proof}.dispose()`)
+	evaluate(session, `${proof}.settleClipboard('LATE')`)
+	assert(evaluate(session, "document.body.dataset.closed==='true'&&!document.querySelector('alkalye-editor')"), "Clipboard owner scope releases actual editor and workers")
+} finally { browser(session, "close") }

@@ -1,0 +1,10 @@
+PASS Actual worker menu fixture opens
+PASS Actual menu Copy writes exact selection without deleting
+PASS Actual menu Paste has exact HTTP durability
+PASS Menu Cut preserves text until clipboard write succeeds
+PASS Successful menu Cut deletes only captured span durably
+PASS Denied menu Cut retains text and native typing authority
+PASS Peer-changed menu Cut refuses deletion and retains draft
+PASS Refused menu Cut retains usable worker basis
+PASS Actual menu native formatting queues exact markup
+PASS Disposal interrupts pending menu Cut before native deletion

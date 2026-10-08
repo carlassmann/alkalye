@@ -1,0 +1,32 @@
+**No blocker for the bounded menu proof.** One small guard is worth adding first because it's cheap. I only read the files you listed. Note that `editor-queue.ts`, `worker-session.ts` and `worker-rpc.ts` are in the repo root, not in `src/client/components/`.
+
+**Checks that hold:**
+- **Gesture:** `cutInWorker` calls `writeText` synchronously (`editor.ts:1637`), and paste calls `readText` synchronously. Removal only happens after `Fiber.join` succeeds (`:1648`).
+- **Denial:** the join fails, nothing is removed, the error is reported, and the scope releases the token because `submitted` is false.
+- **Selection check:** the copied selection is compared with `captured.selected` (`:1649`). Resolve then checks the local and remote ranges (`worker-session.ts:212-215`). The editor checks source and range text again (`:1652`). `ReplaceQueued` checks a third time (`:131-134`).
+- **Local edits after capture:** these are safe. Resolve reads the queue's latest epoch and sequence, runs after pending edits (FIFO), and `text.value !== resolved.source` aborts quietly.
+- **Remote edits:** these give `ClipboardChanged`, which leaves the queue in failed state. That matches the paste design already accepted (B2) and is not new.
+- **Disposal:** the fiber is interrupted, the token is released through the queue, and a failure there is caught. Once submitted, the queue owns the token and the finalizer cleans up `clipboardTokens`.
+- **Token ownership:** the `source === acceptedSource` early return leaves `clipboardSubmitted` false, so the token is released. A throw from `change` gives `submitted = false`, and the release is queued behind the edit, which is harmless.
+- **smartPaste:** for Cut, `expectedSelected !== undefined` skips `pasteMarkdown` and the replacement is `""`. Paste behaves the same as before. The rule is implicit but correct, because an empty-selection Cut returns early.
+- **Native `cut` event:** `copySource` uses `setRangeText` and an input event with no token, so it goes through the ordinary queue. Good.
+- **Menu reachability:** the menu is only blocked when there is no clipboard. Touch, Alt, IME and `!inSync` keep their rules. With no selection or link context, the browser menu appears with native Paste and the normal paste path, same as local. On Mac, `contextmenu` fires on mousedown while `dragging` is true, but `run` happens later, after pointerup, so it's fine.
+- **Atom command gating:** Toggle complete, Add comment, Attachment and Whiteboard are gated. Format and Insert link/code block only edit text. Open link/doc and Preview image don't change anything.
+
+**Hazards and smallest fixes:**
+1. **Gesture-to-fiber gap (worth fixing before the proof; affects both cut and paste).** `start`/`end` are read at gesture time. `captureClipboard` reads the queue's epoch and sequence lazily in `Effect.suspend`, when the forked fiber starts. In Effect v4 the plain `fork(...)` probably doesn't start immediately; the explicit `startImmediately` elsewhere suggests that. A keystroke in that gap would capture old coordinates against a newer basis. With repeated text like `aaaa`, `selected` can still match, so text equal to the clipboard gets removed or replaced in the wrong place.
+   - **Fix:** in `cutInWorker` and `pasteInWorker`, snapshot `let gestureSource = text.value`. Pass it through, and right before `clipboard.capture` (same synchronous segment) add `if (text.value !== gestureSource || !workerClipboardReady()) return`.
+   - Alternatively pass `{ startImmediately: true }` to `fork`, if `FiberSet.runtime` accepts it. I haven't verified that.
+2. **Ctrl+Space on an image** (`editor.ts:1705`): `contextAction` calls `options.requestAsset()` in worker mode without a gate, and it's the keyboard path into the menu. Fix: add `&& options.authority !== "worker"` so it falls through to the menu.
+3. **Copy parity (not a blocker in Chrome):** `writeClipboard` calls `writeText` inside the forked fiber, not synchronously. Safari may refuse it as outside the gesture. This applies to local mode too.
+4. **Cut fails after a successful write:** the text is on the clipboard, the document is unchanged, and `ClipboardChanged` is reported. That's safe. It's noisier than local mode, which returns silently.
+5. **Small ones:** the Cut entry is disabled only for `!editable || !selected`, not for the full `workerClipboardReady` state (dragging, secondary selections), so clicking it in that state does nothing. `writing.then(() => "")` may briefly count as an unhandled rejection before the fiber attaches, same as paste today; check any global `unhandledrejection` reporter.
+
+**Things to assert in the proof:**
+- Cut keeps the text when the write is denied.
+- Typing between capture and write completion: no change, token released.
+- A remote edit makes it fail.
+- Disposing mid-write releases the token.
+- Repeated-text selection with a keystroke right after the click (this would catch hazard 1).
+
+Separately, several claude.ai connectors (GitHub, Slack, Notion and others) need to be authorized in your claude.ai connector settings before they can be used.

@@ -1,0 +1,17 @@
+PASS Actual worker menu fixture opens
+PASS Actual menu Copy writes exact selection without deleting
+43 | 			},
+44 | 		},
+45 | 	)
+46 | 	if (result.status !== 0) {
+47 | 		let failure = result.error?.message || result.stderr || result.stdout
+48 | 		throw new Error(`${session} ${args[0]}: ${failure}`)
+                 ^
+error: worker-menu-1791439892915 eval: {"success":false,"data":null,"error":"Evaluation error: SyntaxError: Identifier 'item' has already been declared"}
+
+      at browser (/private/tmp/alkalye-worker-menu/tests/browser-driver.ts:48:13)
+      at evaluate (/private/tmp/alkalye-worker-menu/tests/browser-driver.ts:166:9)
+      at choose (/private/tmp/alkalye-worker-menu/menu-journey.ts:9:2)
+      at /private/tmp/alkalye-worker-menu/menu-journey.ts:31:2
+
+Bun v1.4.0 (macOS arm64)

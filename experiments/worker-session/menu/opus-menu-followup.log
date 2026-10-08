@@ -1,0 +1,40 @@
+**Verdict:** the source is ready for a bounded real `contextmenu` proof. I found no blockers, only one small optional hardening fix. I read only the four files.
+
+**Gesture gap: fixed**
+- **Snapshot timing:** `cutInWorker`/`pasteInWorker` (`editor.ts:1623-1644`) snapshot source, start and end before calling `writeText`/`readText`. Both calls stay synchronous in the gesture.
+- **Editor guard:** before acquiring the token, `editor.ts:1651` checks `text.value !== gestureSource || !workerClipboardReady()`, inside the fiber. This covers the deferred start of the fork.
+- **Queue guard:** `editor-queue.ts:299-301` compares the queue `source`, then reads `epoch`/`sequence` and offers the command, all in one `suspend` segment. So the coordinates always match a basis whose text equals `gestureSource`.
+  - Every place `source` changes also updates `sequence` in the same sync block: `replace` at `:269-271` and merge adoption at `:181-185`. The one exception is the merge-offer-fail path at `:178`, which sets `failure`, so the capture is blocked anyway.
+  - A change and its undo (A→B→A) is harmless, because the coordinates are textual against the same text.
+  - If an Effect auto-yield landed between `:1651` and the suspend, the queue check would catch it. That only reports a harmless `ClipboardChanged`.
+- **Later checks:** after capture, FIFO, `resolve`, and the final check at `:1657` (source plus slice equals `captured.selected`) protect subsequent edits. The epoch/sequence guard is unchanged, so this holds.
+
+**Token ownership: correct**
+- **Acquire:** capture runs inside `acquireRelease`, so it can't be interrupted. A token that lands is either released through the queue or swept by the queue finalizer (`:109`).
+- **Not submitted:** denial, a `selected` mismatch, a failed resolve, the `acceptedSource` early return, or a throw from `change` all leave `submitted=false`, and the release runs.
+- **Submitted:** the queue releases the token after `ReplaceQueued` (`:228-231`).
+- **No gap:** nothing can interrupt between `insert` and `submitted = clipboardSubmitted`.
+
+**Promise ownership: one small gap**
+- **The gap:** `reading` and `writing.then(() => "")` have no rejection handler until the deferred fiber runs `tryPromise` (`:1649`). A quick denial before then may fire `unhandledrejection`. Look for a global reporter that would turn this into noise.
+- **Cheap fix:** in `replaceWorkerClipboard`, add `reading.catch(() => {})` right away. The fiber still sees the rejection.
+- **Early return at `:1651`:** for cut, the text is already written to the clipboard and the document is unchanged. That matches local mode and is acceptable, but assert it.
+
+**Other**
+- **Image path:** the `contextAction` image path is now gated (`:1710`) and falls through to the menu.
+- **Possible gap, not checked:** `mountLineActions` still receives `options.requestAsset` without a gate in worker mode (`:434`). `line-actions.ts` was outside the read set.
+- **Cut entry:** it is still disabled only on `!editable || !selected`. If the editor isn't ready, clicking it silently does nothing. That's acceptable.
+- **Copy limitation:** retained as you intended, since `writeClipboard` writes from inside the fork. The native `ClipboardEvent` path is unchanged.
+
+**Things to assert in the proof** (the fixture supports them: `writeText` records the value synchronously, and the seed has `alpha…alpha` and `aa`):
+1. Right-click, then Cut: `written()` is set in the same task as the click. This proves the gesture is kept.
+2. Same evaluate as the click: a synchronous `input` on repeated text. Expect `captured()===0`, the source unchanged except for the typed text, and no token.
+3. `denyWrite`: the text stays and the token is released.
+4. Typing between capture and `settleWrite`: no change.
+5. Peer edit: `ClipboardChanged`.
+6. `dispose` mid-write: the token is released.
+7. Check that the menu's `run` fires synchronously in the click handler. That's in `context-menu.ts`, which I didn't read; if it doesn't, assertion 1 will fail.
+
+The fixture has no `cut()` hook, so drive cut through the real menu click, which is what you want anyway.
+
+Several claude.ai connectors (GitHub, Slack, Notion and others) need authorizing in your claude.ai connector settings before they can be used.
