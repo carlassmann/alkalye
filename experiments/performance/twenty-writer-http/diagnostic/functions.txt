@@ -1,0 +1,16 @@
+
+
+Sampling rate: 100.000000 microseconds. Total samples: 10965
+Top functions as <numSamples  'functionName#hash:sourceID'>
+  5048    'rawVisibleSteps#ADv1lt:10'
+  2222    'sourceHeadersSteps#EKk5Xy:12'
+   607    'map#CPBdlN:7'
+   331    'join#<nil>:4294967295'
+   251    '#EK3mcu:11'
+   225    'sourceAtomsSteps#CSkslq:12'
+   199    'parseCheckpointSteps#AoeifA:71'
+   186    'slice#<nil>:4294967295'
+   146    'stringify#<nil>:4294967295'
+   133    'all#<nil>:4294967295'
+   102    '#DwtxqS:12'
+    91    'file#<nil>:4294967295'

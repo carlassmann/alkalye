@@ -1,0 +1,18 @@
+--- experiment.ts
++++ sampled-experiment.ts
+@@ -65,6 +65,7 @@
+  }
+  phase="commit-load"
+  let clientCpuStart=process.cpuUsage()
++ yield* Effect.promise(async()=>{await Bun.write("/tmp/alkalye-20-writer-frozen/diagnostic/start","1");while(!await Bun.file("/tmp/alkalye-20-writer-frozen/diagnostic/ready").exists())await Bun.sleep(10)})
+  let started=performance.now()
+  console.info(JSON.stringify({phase:"timing-start",unixMs:performance.timeOrigin+started,writers,rounds,fixtureCharacters:source.length,plannedRate:20,serverProcessSeparate:true}))
+  let grouped=yield* Effect.forEach(accounts,(_,writer)=>Effect.forEach(requests.filter(request=>request.writer===writer),request=>Effect.gen(function*(){
+@@ -79,6 +80,7 @@
+  }),{concurrency:1}),{concurrency:"unbounded"})
+  let results=grouped.flat()
+  let finished=performance.now()
++ yield* Effect.promise(()=>Bun.write("/tmp/alkalye-20-writer-frozen/diagnostic/stop","1"))
+  let clientCpu=process.cpuUsage(clientCpuStart),clientRss=process.memoryUsage().rss
+  phase="verifying-convergence"
+  console.info(JSON.stringify({phase:"timing-end",unixMs:performance.timeOrigin+finished}))

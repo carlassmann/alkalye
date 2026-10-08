@@ -1,0 +1,59 @@
+{
+	"method": "Separate sampled native-server diagnostic; not used for latency comparison. Requested JSC interval 100 microseconds; sample counts are not exact wall time. Driver and server separate processes. Authentication, invitations and actions prepared before sampling; sampling ends after 60 receipts.",
+	"commit": "78e89af",
+	"samples": 10967,
+	"selfSamples": {
+		"rawVisibleSteps": 5048,
+		"sourceHeadersSteps": 2222,
+		"": 640,
+		"map": 608,
+		"join": 331,
+		"sourceAtomsSteps": 226,
+		"parseCheckpointSteps": 199,
+		"slice": 187,
+		"stringify": 146,
+		"all": 133,
+		"file": 91,
+		"prepare": 84,
+		"set": 78,
+		"compactAtomSteps": 76,
+		"frontmatterBlock": 52
+	},
+	"inclusiveSamples": {
+		"": 10859,
+		"evaluate": 10837,
+		"runLoop": 10836,
+		"generatorResume": 10149,
+		"~effect/Effect/successCont": 9793,
+		"next": 9567,
+		"text": 9158,
+		"finishSteps": 8566,
+		"visible": 8509,
+		"rawVisibleSteps": 5052,
+		"sourceAtomsSteps": 3448,
+		"sourceHeadersSteps": 3027,
+		"map": 1037,
+		"sourceText": 514,
+		"parseCheckpoint": 390,
+		"parseCheckpointSteps": 390,
+		"join": 331,
+		"observer": 237,
+		"afterScheduled": 237,
+		"runTasks": 237,
+		"slice": 187,
+		"snapshotOf": 168,
+		"stringify": 146,
+		"all": 133,
+		"waitFile": 104
+	},
+	"rawVisibleMappedCallers": [
+		{
+			"source": "server/workspace-projection.ts",
+			"line": 418,
+			"column": 33,
+			"samples": 5048
+		}
+	],
+	"rawProfileSha256": "bb78f6f60ff38d52d55704550a26848fd585487cfb36cd9552fc011312204751",
+	"warning": "Inclusive counts overlap and must not be added. Waiting and native work are not necessarily represented in JSC stacks."
+}

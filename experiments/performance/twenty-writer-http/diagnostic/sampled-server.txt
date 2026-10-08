@@ -1,0 +1,20 @@
+import { profile } from "bun:jsc"
+import * as Effect from "effect/Effect"
+import { startServer } from "/tmp/alkalye-20-writer-frozen/src/server/index"
+let data=Bun.argv[2]
+if(!data)throw Error("Disposable data directory required")
+let instance=await Effect.runPromise(startServer({port:4470,data,build:false}))
+let samples=setInterval(()=>console.info(JSON.stringify({phase:"server-resource-sample",unixMs:performance.timeOrigin+performance.now(),cpu:process.cpuUsage(),rss:process.memoryUsage().rss})),1000)
+console.info(JSON.stringify({phase:"server-ready",url:instance.server.url.href,pid:process.pid}))
+async function close(){clearInterval(samples);await Effect.runPromise(instance.close());process.exit(0)}
+process.on("SIGTERM",close)
+process.on("SIGINT",close)
+
+let directory="/tmp/alkalye-20-writer-frozen/diagnostic"
+await Bun.write(directory+"/waiting", "1")
+async function waitFile(name:string){let deadline=performance.now()+120000;while(!await Bun.file(directory+"/"+name).exists()){if(performance.now()>deadline)throw Error("Diagnostic handshake timeout");await Bun.sleep(10)}}
+await waitFile("start")
+let result=await profile(async()=>{await Bun.write(directory+"/ready","1");await waitFile("stop")},100)
+await Bun.write(directory+"/functions.txt",result.functions)
+await Bun.write(directory+"/stacks.json",JSON.stringify(result.stackTraces))
+await Bun.write(directory+"/complete","1")
