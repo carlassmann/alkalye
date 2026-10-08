@@ -1,0 +1,28 @@
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(15,1): error TS6133: 'WorkerDocumentFailure' is declared but its value is never read.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(57,2): error TS2322: Type '{ replace: (ranges: readonly TextReplacement[], expectedSource?: string, fallback?: () => readonly TextReplacement[], clipboardToken?: string) => { ...; }; ... 6 more ...; undo: (redo: boolean) => Effect.Effect<...>; }' is not assignable to type 'Pick<{ undo(redo: boolean): Effect<{ status: "unknown" | "applied" | "not-applied"; action?: string | undefined; failure?: string | undefined; }, unknown, never>; replace: (ranges: readonly TextReplacement[], expectedSource?: string | undefined, fallback?: (() => readonly TextReplacement[]) | undefined, clipboardTok...'.
+  The types returned by 'undo(...)' are incompatible between these types.
+    Type 'Effect<unknown, unknown, unknown>' is not assignable to type 'Effect<{ status: "unknown" | "applied" | "not-applied"; action?: string | undefined; failure?: string | undefined; }, unknown, never>'.
+      Type 'unknown' is not assignable to type '{ status: "unknown" | "applied" | "not-applied"; action?: string | undefined; failure?: string | undefined; }'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(67,16): error TS18048: 'currentQueue' is possibly 'undefined'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(68,23): error TS18048: 'currentQueue' is possibly 'undefined'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(73,11): error TS6133: 'merge' is declared but its value is never read.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(73,28): error TS18048: 'currentQueue' is possibly 'undefined'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(76,114): error TS18048: 'currentQueue' is possibly 'undefined'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(80,58): error TS18048: 'currentQueue' is possibly 'undefined'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(87,78): error TS18048: 'currentQueue' is possibly 'undefined'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(87,116): error TS18048: 'currentQueue' is possibly 'undefined'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(89,33): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, never>'.
+  Type 'unknown' is not assignable to type 'never'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(90,37): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, never>'.
+  Type 'unknown' is not assignable to type 'never'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(94,15): error TS18048: 'currentQueue' is possibly 'undefined'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(97,10): error TS18046: 'changed' is of type 'unknown'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(100,35): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, never>'.
+  Type 'unknown' is not assignable to type 'never'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(104,15): error TS18048: 'currentQueue' is possibly 'undefined'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(112,40): error TS18048: 'currentQueue' is possibly 'undefined'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(120,43): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, never>'.
+  Type 'unknown' is not assignable to type 'never'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-fixture.ts(142,19): error TS2345: Argument of type 'Effect<void, unknown, unknown>' is not assignable to parameter of type 'Effect<void, unknown, never>'.
+  Type 'unknown' is not assignable to type 'never'.
+../../../../../../tmp/alkalye-browser-worker-open/runtime-admission/browser-worker-documents.ts(51,34): error TS2339: Property 'makeSemaphore' does not exist on type 'typeof import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect")'.

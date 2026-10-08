@@ -1,0 +1,35 @@
+No tools used; reviewed only the pasted source.
+
+## Concrete blockers
+
+1. **`worker-session.ts` `Open` won't run.** It reads `SubscriptionRef.getUnsafe(current.admission).online`, but no `current` exists in that scope. The fix looks pasted from the `AdmissionEpoch` handler. Every `Open` fails with a ReferenceError, and the type check should catch it. Fix: `online: input.online`.
+
+2. **Undo retry hits the permission check before the ledger.** `UndoQueued` runs `admitted(current, input.admissionEpoch)` before `undoReceipts.get(request)`. If the retry comes after a same-writer epoch refresh or a revoke, it gets `PermissionDenied`, and the queue records `AppliedUnknown` even though the ledger has a known result. Replaying the ledger changes nothing, so look it up before the permission check.
+
+3. **Undo has no owner in `browser-worker-documents.ts`.** `queue.undo` skips the `controls` permit, `draft.freeze`, `retain` and the bounded merge. The native textarea stays writable while an undo is in flight. If an undo applies and its merge then fails, `commandFrozen` stays set with no `failure` and no `retain` until Close. The fixture calls the queue directly. Add `opened.undo(redo)` built like `domain()`.
+
+4. **The `admissionEpoch()` callback throws instead of failing an Effect.** It throws synchronously inside `queue.domain`, `undo` and `replace`. In host `domain()`, `canWrite()` is checked before the permit is acquired. If a transition starts while it waits for the permit, the throw becomes a defect. `Effect.catch` doesn't catch defects, so callers lose the typed failure. The callback should return a typed failure.
+
+5. **The domain merge "retry" is mostly not a retry.**
+   - A failed `requested` (stale basis) or `SelectionUnavailable` exits the loop on the first attempt.
+   - Only `accept` returning false retries, and the three attempts run back to back with no wait.
+   - If IME composition is active at freeze, all three fail at once, so a property edit fails the whole host.
+   - Fix: wait for the selection to settle (generation or composition change) between attempts.
+
+6. **Notice revision can go backwards.** The `SubscriptionRef.set` calls in admission refresh and `connectivity` skip the `revision` check that Observe applies. They can overwrite a newer notice, including `canWrite` and `status.unsaved`.
+
+7. **Queue failures never reach the host.** If an edit is refused after a revoke, the queue's `failure` gets set, but host `failed`, `activity.uncertain()` and `retain` don't run. Recovery depends on each draft owner's per-edit handler (the fixture has one; production isn't guaranteed to). The revoke path also trusts `draft.pending()` to report queue state. The host should read `editorQueue.state()` itself.
+
+8. **Minor: prepared domain tokens leak.** When `ExecuteAdmitted` fails, the prepared token is never released and stays held until Close.
+
+## Runtime gates still missing
+- A type check run (it would catch #1).
+- Whether worker `connection.canWrite` updates in the same step as `AdmissionEpoch`. `worker-opened-connection` wasn't included.
+- Message ordering between a direct `AdmissionEpoch` call and RPCs sent through the queue is assumed, not tested.
+- Untested paths:
+  - revoke with pending edits
+  - two quick epoch changes (3 then 4)
+  - revoke during a domain execute
+  - Close when the worker hangs or Close fails
+- Undo: a retry after a transport error reaching the ledger, eviction past 64 entries, and undo after an epoch refresh.
+- Domain merge during IME composition or a selection change.

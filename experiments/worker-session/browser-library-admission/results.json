@@ -1,0 +1,42 @@
+{
+	"status": "bounded-native-proof-passed-executed-review-hold",
+	"core": "2ccca63 copied source plus four src files refreshed from1b630c8; existing worker Editor/connectivity/scheduler/sourceDifference adapters retained",
+	"strict": {
+		"first": 2,
+		"second": 2,
+		"third": 0
+	},
+	"native": {
+		"exit": 0,
+		"fixtureAssertions": [26, 12],
+		"totalFixtureAssertions": 38,
+		"driverReadinessAssertions": 2
+	},
+	"sourceSha256": {
+		"browser-worker-documents.ts": "d67de96e03775be89ce3042e2c55b78705e607ac25be38273fedde010726b35c",
+		"editor-queue.ts": "bb67a8b707f06a8510500acaed89f7ca5c9579b3c9865c75a950060ad874416a",
+		"worker-session.ts": "b0fb2e30ce60470409f099b6d68981cd3b7cc9d168ad7c8476969a37ef33a02c",
+		"worker-editor-basis.ts": "fa987959d794a2eda7005e171d9d01bd97f8d9c53fcea8fa5067d7d12d9ac29b",
+		"worker-rpc.ts": "8b275b562503eaf0094405a577296704d0ba07513e121ef3183caabd419daa3a",
+		"browser-fixture.ts": "a9e9a931e8b788e877a0d37fded4d0d5f16f83acdca62d8e24c4f88014562169",
+		"tests/browser-worker-admission.ts": "5aad7592ea542675df5fb4c0740e5f888141738fa82d537e1e11fec2c7161efc"
+	},
+	"limitations": [
+		"Standalone RcMap factory, not actual BrowserLibrary/document-app integration/drain",
+		"SourceTextarea native control, not full EditorElement commands",
+		"Main reader/writer admission hints under one owner account, not server ACL revocation",
+		"No true offline journal reopen, abrupt death, peer, main tab crash, full features, performance or FPS proof",
+		"Known Undo ledger retry after epoch change or eviction not exercised",
+		"Executedreview1917 terminal0 HOLD: native/FIFO divergent draft could still permit Undo/metadata before refused adoption. Successor guard written outside only, untyped/unexecuted."
+	],
+	"review": {
+		"prior": [10226, 15765],
+		"executed": {
+			"handle": 1917,
+			"exit": 0,
+			"verdict": "HOLD",
+			"blocker": "withAdoption lacked nativeDiffers/recovery preflight"
+		},
+		"successor": "Checks added before/inside permit in admission-next only; not certified by38proof"
+	}
+}

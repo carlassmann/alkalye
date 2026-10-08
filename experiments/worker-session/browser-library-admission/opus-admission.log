@@ -1,0 +1,45 @@
+## Verdict
+Rejected. FIFO drain on refresh is now correct, but six blockers remain.
+
+## Blockers
+
+**1. Revocation can wait forever behind `controls`.** In `changeAdmission`, `draft.freeze()` and the revoke RPC both run inside `controls.withPermit`. Two other holders keep that permit for a long time:
+- `domain` holds it during the merge, which can take 15s or more.
+- A refresh holds it while `editorQueue.admission(next)` drains the FIFO. That wait has no timeout, so one hung old-epoch `ReplaceReceipt` blocks it indefinitely.
+
+So a revocation that arrives during either one doesn't freeze anything.
+
+Fix: when `!writable(next)`, skip the permit. Synchronously set `admission = next`, call `draft.freeze()`, and `retain` if there is a draft. Then send `client.AdmissionEpoch`. After a refresh's await, assign `admission`/notice only if `admission.epoch < next.epoch`. Once superseded, its `PermissionDenied` is expected, so don't `retain` on it.
+
+**2. Revocation retains too late and misses unsent text.** `draft.pending()` is only checked after the RPC round trip, and it only looks at queue state. Fix: before the RPC, retain if `draft.pending() || draft.selection().source !== editorQueue?.state().source`.
+
+**3. Refused preconditions permanently fail the document.** Both `domain` and `changeAdmission` put their guard `Effect.fail` inside `Effect.catch(retain…)`. So these all set `failed = true`, freeze, and invent recovery:
+- a duplicate or stale admission notice (`epoch <= admission.epoch`)
+- a metadata click during undo (`commandFrozen`)
+- a metadata click while in reader mode
+- a metadata click before the queue exists
+
+Fix: check guards before the retain-wrapped section and fail without retaining. A stale epoch should just return `Effect.void`.
+
+**4. The refresh reopens writing over a failed FIFO.** `AdmissionRequest` succeeds even after an earlier drained edit failed. `canWrite()` doesn't check `editorQueue.state().failure`, and authority-level `failed` is never set; only the fixture's per-edit catch retains. Fix: add `editorQueue?.state().failure === undefined` to `canWrite()`. After the refresh await, `retain` if the queue failed.
+
+**5. A permission change overwrites connectivity.** Worker `AdmissionEpoch` writes `input.admission` wholesale, including the main side's stale `online` flag. If an admission change arrives while offline, the worker flips back to online, the `restored` stream fires, and it reconnects. The epoch stays correct, but connectivity and permission are no longer independent. Fix (worker): `{ ...input.admission, online: SubscriptionRef.getUnsafe(current.admission).online }`.
+
+**6. Blind undo retry.** In the queue's undo branch, `Effect.catch(error => … : client.UndoQueued(payload))` resends the mutation after a transport or defect failure. Fix: delete the catch. The failure path already maps to `AppliedUnknown`.
+
+**7. Bounded Close loses the unsent draft.** `settle` only proves that queued work finished. If the textarea differs from the queue's source (input threw, or input didn't fire), the result is `settled && closedCleanly`, so `closedCleanly()` runs with no recovery. Fix: in the finalizer, after `freeze`, `retain` if `draft.selection().source !== editorQueue?.state().source`. Separately, the settle-timeout path calls `retain` twice; drop the second call.
+
+## Checks that pass
+- **Refresh drain:** the old-epoch edit, domain or undo runs ahead of `AdmissionRequest` in the FIFO, and the worker checks the epoch per command. Fixes the runtime23 overtake.
+- **Metadata:** domain goes through the same FIFO and holds `commandFrozen` until `Adopt` clears `commandOwner`. The native textarea stays frozen until adopt. `merge` requires `pending` to be empty, which holds because the FIFO already ACKed the earlier edit.
+- **Compact ACK:** the worker compares source after ranges with the receipt, and the main side checks lengths. Agreement holds under the assumed induction.
+- **Connectivity on the main side:** it leaves the epoch alone, and stale notices are dropped.
+
+## Needs checking (code not shown)
+If `connection.canWrite` or `capability.current().canWrite` depends on `online`, `admitted()` rejects offline edits as `PermissionDenied`. That would break the connectivity invariant.
+
+## Fixture problems
+- **Racy checks:** `!native.readOnly` right after `opened.admission(...)` depends on the forked `changes` fiber having already run. Wait for a `changes` emission with `canWrite` first, or derive `readOnly` from `opened.current()`.
+- **Vacuous FIFO check:** `another` is the same RcMap entry, so "overlapping lease refuses competing FIFO" only proves `queueCreated` is set, not worker exclusivity.
+- **Typing during undo:** undo doesn't freeze the textarea. Typing during it makes `replace` throw, and the catch permanently sets recovery.
+- **Selection move during metadata merge:** moving the caret in the read-only textarea makes `accept` return false, which leads to `SelectionUnavailable`, retain, and a permanently failed document. Retrying the merge is safe because a merge doesn't mutate.

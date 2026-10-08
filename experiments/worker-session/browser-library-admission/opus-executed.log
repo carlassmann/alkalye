@@ -1,0 +1,32 @@
+**Verdict: HOLD. I found one correctness blocker. Production adoption stays off either way.**
+
+## Blocker: host-owned Undo and metadata commands can run while the visible draft has diverged
+
+- `withAdoption` checks only `canWrite()`. `canWrite()` doesn't look at whether the visible editor text (`nativeDiffers()`) or the host's own recovery state differs from the queue.
+- Some `replace()` failures throw without setting the queue's `failure`:
+  - `rejectedRanges()`
+  - the `admissionEpoch()` throw while `transitioning`
+
+  In both cases the host sets `recovery` and goes read-only, but the queue source never advances. After that, `canWrite()` can be true again (for example, once the refresh finishes).
+- `opened.undo()` or `properties.update()` then runs Undo or the metadata change durably in the worker. Adoption is refused afterwards (the source check fails, then `draft.adopt` checks `recovery`), which leads to a retain. The result: the worker applied a change the user never saw, on top of a draft that was never sent.
+- Fix: inside `withAdoption`, both before and inside the permit, fail when `nativeDiffers()` is true. Don't put this check in `canWrite()`. `replace()` calls it through `admissionEpoch()` before the queue source advances, so it would reject every edit. Also consider making the `rejectedRanges` path set `failure` so `onFailure` triggers a retain.
+- The fixture doesn't cover this: it sets `readOnly` before Undo but never pairs a rejected or throwing replace with a later command.
+
+## Areas that look OK
+- **Cached receipt before the epoch check:** `retainedUndo` runs before `admitted`, and both happen under the worker's command lock. A retry returns the stored receipt and doesn't apply anything new. An evicted receipt fails with `SequenceUnavailable` because `local.sequence` already moved on. A mismatched request gets `SequenceUnavailable`. Retries only happen on errors that aren't `WorkerDocumentFailure`. No double apply.
+- **Admission order:** a same-writer refresh goes through the queue, so old-epoch edits finish first. Revocation skips the queue, so queued old-epoch edits get `PermissionDenied`, which triggers a retain. Out-of-order epochs are rejected by the worker's `<=` check, and the main side's `admission.epoch !== next.epoch` guard ignores stale ones.
+- **Late candidate after revoke or timeout:** `accept` checks `failed` and `writable`, and `draft.adopt` checks `recovery`. Correct.
+- **Scoped tokens:** domain tokens are tied to their epoch through `commandEpochs` and released by `acquireRelease`. Clipboard tokens are consumed or released on every edit path, and also in the queue finalizer.
+
+## Non-blocking notes
+1. **Selection wait:** retries wait only for a `select` event. If adoption is refused for some other reason (busy, composing, source mismatch), the loop holds `controls` until the 15s timeout. That fails closed, but a concurrent writer refresh can also time out and retain. Composition and busy states are untested (the fixture hard-codes them to false).
+2. **Recovery basis:** after a retain where the command already ran (SelectionUnavailable, timeout), the saved recovery text predates that command. Restoring it as a full replace would revert the Undo or metadata change. That depends on how recovery is consumed, which isn't in these files.
+3. **Leaked tokens:** if a domain prepare response is lost, its worker token and `commandEpochs` entry leak until Close. Bounded by the session, and the retain blocks further commands.
+4. **Failed Begin:** `queueCreated` is set before `Begin`. If `Begin` fails, the document is unusable, yet `canWrite()` stays true with no editor queue.
+5. **Weak fixture check:** "overlapping opened lease refuses competing editor FIFO" uses the same `RcMap` entry, so it only tests the `queueCreated` guard. It doesn't test two worker sessions.
+6. **Missing field:** `current()` doesn't include `closing`, but `changes` does.
+
+## Still unverified (as you listed)
+Real server access control, offline reopen (`MergeCandidate` calls `session.flush` and could hang until the 15s timeout), worker death, and the full app.
+
+Your earlier HOLD logs are untouched; this was a read-only review with no tools run.

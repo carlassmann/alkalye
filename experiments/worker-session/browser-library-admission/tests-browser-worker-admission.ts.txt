@@ -1,0 +1,40 @@
+import { browser, evaluate, wait, assert } from "./browser-driver"
+let session = "worker-library-" + Date.now()
+let url = process.env.WORKER_LIBRARY_URL
+if (!url) throw new Error("Missing WORKER_LIBRARY_URL")
+try {
+ browser(session, "open", url)
+ wait(session, 'window.workerBridge?.stage === "ready" || window.workerBridge?.stage === "failed"')
+ assert(evaluate(session, 'window.workerBridge.stage') === "ready", "fixture not ready: " + JSON.stringify(evaluate(session, '({stage:window.workerBridge.stage,failure:window.workerBridge.failure})')))
+ browser(session, "click", "#editor")
+ browser(session, "press", "x")
+ console.log(JSON.stringify({ typed: evaluate(session, "window.workerBridge.inspect()") }))
+ console.log(JSON.stringify({ accepted: evaluate(session, "window.workerBridge.accepted()") }))
+ evaluate(session, "window.workerBridge.undo()")
+ evaluate(session, "window.workerBridge.metadata()")
+ evaluate(session, "window.workerBridge.revoke()")
+ evaluate(session, "window.workerBridge.dispose()")
+ console.log(JSON.stringify(evaluate(session, '({stage:window.workerBridge.stage,assertions:window.workerBridge.assertions,inspection:window.workerBridge.inspect()})')))
+} catch (error) {
+ console.error(error)
+ try { console.error(JSON.stringify(evaluate(session, '({fixture:window.workerBridge && {stage:window.workerBridge.stage,failure:window.workerBridge.failure,assertions:window.workerBridge.assertions},inspection:window.workerBridge?.inspect()})'))) } catch {}
+ process.exitCode = 1
+} finally { browser(session, "close") }
+
+if (!process.exitCode) {
+ let held = session + "-held"
+ try {
+  browser(held, "open", url)
+  wait(held, 'window.workerBridge?.stage === "ready" || window.workerBridge?.stage === "failed"')
+  assert(evaluate(held, 'window.workerBridge.stage') === "ready", "held fixture ready")
+  browser(held, "click", "#editor")
+  browser(held, "press", "x")
+  evaluate(held, "window.workerBridge.accepted()")
+  evaluate(held, "window.workerBridge.heldRevocation()")
+  console.log(JSON.stringify(evaluate(held, '({stage:window.workerBridge.stage,assertions:window.workerBridge.assertions,inspection:window.workerBridge.inspect()})')))
+ } catch (error) {
+  console.error(error)
+  try { console.error(JSON.stringify(evaluate(held, '({fixture:window.workerBridge && {stage:window.workerBridge.stage,failure:window.workerBridge.failure,assertions:window.workerBridge.assertions},inspection:window.workerBridge?.inspect()})'))) } catch {}
+  process.exitCode = 1
+ } finally { browser(held,"close") }
+}
