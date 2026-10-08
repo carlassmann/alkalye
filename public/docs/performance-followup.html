@@ -230,6 +230,17 @@
 			editor replacement still need work; these changes improve their costs
 			without establishing 120 fps.
 		</p>
+		<p>
+			A later source-fence guard reduced a separate matched 1 MiB,
+			2,048-selection input task from 29.02 to 26.73 ms median and from 29.16 to
+			28.22 ms maximum. Five corrected trials per version passed exact text,
+			causal undo and strictly newer accepted checkpoints. Single-selection
+			edits retain their original checking path. The largest task across the
+			three-second aftermath changed only from 52.80 to 52.27 ms median. These
+			figures cannot be added to the earlier pair medians. Both input and
+			deferred work still exceed 8.33 ms. Method, controls and retained setup
+			failures: <code>experiments/performance/source-fence-guard/</code>.
+		</p>
 		<h2>Undo copies state cooperatively</h2>
 		<p>
 			Action staging now uses a detached, cooperative replica fork instead of
