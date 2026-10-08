@@ -45,10 +45,105 @@
 	<body>
 		<h1>Interaction follow-up</h1>
 		<p>
-			7 October 2026. These narrow experiments follow the
-			<a href="performance-interaction.html">comparison with main</a>. They
-			compare rewrite revisions or implementation paths; main was not rerun
-			here.
+			Updated 8 October 2026. The fresh comparison below reruns main. Earlier
+			sections compare rewrite revisions or implementation paths and follow the
+			<a href="performance-interaction.html">previous comparison with main</a>.
+		</p>
+		<h2>Fresh comparison with main</h2>
+		<p>
+			Both production builds used their own local sync servers, signed accounts
+			and matching documents. Main <code>a749728</code>; rewrite
+			<code>aad445b</code>. Five samples for ordinary journeys, three for large
+			files, multicursor and sync. Times below are medians. Two animation frames
+			measure paint opportunities, not displayed frames.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Journey</th>
+					<th>Main</th>
+					<th>Rewrite</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>128KiB warm reload</td>
+					<td>358.1ms</td>
+					<td>265.8ms</td>
+				</tr>
+				<tr>
+					<td>1MiB warm reload</td>
+					<td>2259.5ms</td>
+					<td>1720.7ms</td>
+				</tr>
+				<tr>
+					<td>128KiB end typing → two frames</td>
+					<td>24.0ms</td>
+					<td>28.2ms</td>
+				</tr>
+				<tr>
+					<td>128KiB Find matches → two frames</td>
+					<td>30.4ms</td>
+					<td>40.5ms</td>
+				</tr>
+				<tr>
+					<td>Existing 128KiB document switch</td>
+					<td>29.7ms</td>
+					<td>72.6ms</td>
+				</tr>
+				<tr>
+					<td>1,298 selections: complete input task</td>
+					<td>83.4ms</td>
+					<td>37.3ms</td>
+				</tr>
+				<tr>
+					<td>Socket edit → peer two frames</td>
+					<td>308.6ms</td>
+					<td>74.7ms</td>
+				</tr>
+				<tr>
+					<td>Offline socket reconnect → peer two frames</td>
+					<td>47.1ms</td>
+					<td>79.6ms</td>
+				</tr>
+				<tr>
+					<td>Initial JavaScript, gzip</td>
+					<td>1250.3KiB</td>
+					<td>339.1KiB</td>
+				</tr>
+				<tr>
+					<td>Lazy whiteboard JavaScript, gzip</td>
+					<td>502.0KiB</td>
+					<td>578.3KiB</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+			120fps remains unmet. Multicursor input reached 47ms, and one deferred
+			task lasted 1536ms. Its IndexedDB completion callback resumed other work;
+			the callback name does not establish which work caused the stall. A
+			separate sampled profile is investigating this. After a 25-edit burst, all
+			edits were locally saved, but 19–20 remained pending at the three-second
+			gate. The earlier main saved marker does not prove server acceptance
+			either.
+		</p>
+		<p>
+			Find's traced handler took only 0.69–1.17ms; its slower two-frame result
+			alone does not identify a synchronous search bottleneck. Switching had
+			long tails in both versions. Later traces used more history and polling in
+			the rewrite, so those results remain separate. Trusted wheel tests reached
+			10.04ms in the rewrite versus 1.02ms in main. Headless runs were
+			approximately 60Hz; physical touch, 120Hz presentation and 20+ browser
+			writers remain unverified.
+		</p>
+		<p>
+			Full samples, failures, build hashes and reproduction commands:
+			<code>experiments/performance/current-main/README.md</code>. Main's
+			standard build hit existing type errors; unchanged Astro production assets
+			were used. Histories advanced across journeys; databases were not reset
+			before every cell. The benchmark also exposed a search keyboard bug: Enter
+			on Close or Replace all was intercepted as Find-next. That is now fixed
+			and covered by the app's keyboard journey.
 		</p>
 		<h2>8 October: mobile taps and cached switching</h2>
 		<p>
