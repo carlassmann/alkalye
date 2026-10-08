@@ -207,6 +207,14 @@
 			Evidence: <code>experiments/performance/projector-lexical-context</code>.
 		</p>
 		<p>
+			A second experiment stored tokens relative to each line to avoid copying
+			shifted suffixes. It passed 635 native assertions and six matched rich app
+			trials, but remains on hold. Input median fell from 19.0ms to 17.3ms with
+			garbage-collection differences; maximum rose from 19.2ms to 19.7ms.
+			Deferred peaks stayed near 13.4ms and Undo median rose from 244ms to
+			261ms. Production retains the existing token representation.
+		</p>
+		<p>
 			Mid-document Undo in the same 1MiB rich fixture remains slow: six trials
 			contain a 203–233ms task. The key handler takes about 0.5ms; the long task
 			starts about 150ms later in the scheduled document refresh. Layout takes
