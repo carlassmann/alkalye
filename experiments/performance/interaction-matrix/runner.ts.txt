@@ -274,7 +274,7 @@ function prepare(
 		let token = JSON.stringify(fixture.token)
 		let observed = evaluate(
 			session,
-			`(()=>{let text=window.interactionBase,token=${token},ranges=[],index=0;while((index=text.indexOf(token,index))>=0){ranges.push({start:index,end:index+token.length});index+=token.length}window.interactionExpected=text.split(token).join('x');window.interactionSelectionCount=ranges.length;${version.kind === "original" ? `let view=document.querySelector('.cm-content').cmTile.view;view.dispatch({selection:view.state.selection.constructor.create(ranges.map(range=>view.state.selection.constructor.range(range.start,range.end)))});view.focus();` : `if(!ranges.length)throw Error('No token');${setSelection(version, "ranges[0].start", "ranges[0].end")}`}return ranges.length})()`,
+			`(()=>{let text=window.interactionBase,token=${token},ranges=[],index=0;while((index=text.indexOf(token,index))>=0){ranges.push({start:index,end:index+token.length});index+=token.length}window.interactionExpected=text.split(token).join('x');window.interactionSelectionCount=ranges.length;window.interactionPrimaryExpected=text.indexOf(token)+1;${version.kind === "original" ? `let view=document.querySelector('.cm-content').cmTile.view;view.dispatch({selection:view.state.selection.constructor.create(ranges.map(range=>view.state.selection.constructor.range(range.start,range.end)))});view.focus();` : `if(!ranges.length)throw Error('No token');${setSelection(version, "ranges[0].start", "ranges[0].end")}`}return ranges.length})()`,
 		)
 		if (observed !== fixture.selections)
 			throw Error("Multicursor fixture count differs")
@@ -589,6 +589,11 @@ async function run(
 		if (mutated) {
 			stage = "edit-client-complete"
 			completeClient(version, session, "window.interactionExpected")
+			if (cell.journey === "multicursor")
+				wait(
+					session,
+					`(${selection(version)}).start===window.interactionPrimaryExpected&&(${selection(version)}).end===window.interactionPrimaryExpected`,
+				)
 			let editedHash = digest(session, "window.interactionExpected")
 			stage = "edit-accepted"
 			editedReceipt = await accepted(version, fixture, editedHash, "edit")

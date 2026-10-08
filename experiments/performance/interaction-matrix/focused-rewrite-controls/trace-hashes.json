@@ -1,0 +1,22 @@
+[
+	{
+		"trace": "rewrite-multicursor-2048-0.trace.json",
+		"bytes": 8613920,
+		"sha256": "6156daa6c70331c14d97e8aed7ff4c8dd2be95dd5574ba47205e872789d6edc6"
+	},
+	{
+		"trace": "rewrite-multicursor-512-0.trace.json",
+		"bytes": 8537682,
+		"sha256": "71327f71ac9aa2dceab1c6d00b4348a4e66a000bbc29bb0d13c452e6dfe2ecbe"
+	},
+	{
+		"trace": "rewrite-switch-rich-small-0.trace.json",
+		"bytes": 4153576,
+		"sha256": "1443ea6937b55cd24bb9365acd35dca490a26b914fad26363958fa8d391e247d"
+	},
+	{
+		"trace": "rewrite-switch-small-rich-0.trace.json",
+		"bytes": 6546279,
+		"sha256": "f3a5940d12c295313194412729fdda9cffcf0861bd626e9e2b7cb93de6280ce3"
+	}
+]
