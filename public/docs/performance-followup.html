@@ -462,9 +462,9 @@
 			The 128 KiB plain-append receiver task worsened from 8.25 to 10.20 ms;
 			frontmatter append worsened from 9.11 to 10.95 ms. At 1 MiB, receiver
 			tasks stayed roughly 13 to 15 ms and visible readiness barely changed.
-			Only browser assets changed; both versions used the same native baseline
-			server. These measurements do not describe the current full stack. The
-			experiment stays out of production.
+			Only browser assets changed; both versions used the native server from
+			<code>aad445b</code>. The experiment stays out of production. Method and
+			samples: <code>experiments/performance/peer-diff/</code>.
 		</p>
 		<h2>Native search highlights reduce manual geometry work</h2>
 		<p>
