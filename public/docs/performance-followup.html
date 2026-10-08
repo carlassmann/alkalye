@@ -321,6 +321,22 @@
 			<code>experiments/worker-session/clipboard</code>.
 		</p>
 		<p>
+			The combined worker editor now passes 72 browser assertions through one
+			actual Editor, command queue and authoritative DocumentSession. They cover
+			Undo/Redo, formatting, Copy/Paste/Cut, denied clipboard access, peer
+			races, lost replies and scope closure. Recovery retries only selection
+			adoption; it never repeats Undo. A scoped 15-second deadline starts after
+			the Undo receipt, and late candidates cannot overwrite a failed editor's
+			draft.
+		</p>
+		<p>
+			This combines previously separate capability proofs; it does not replace
+			the production editor. Physical clipboard permissions, IME, browser
+			lifecycle forwarding and the full app facade remain cutover gates. No new
+			performance claim follows from these correctness checks. Evidence:
+			<code>experiments/worker-session/integrated</code>.
+		</p>
+		<p>
 			Active-line geometry caching was rejected. Six valid rich-document wheel
 			cells showed no consistent layout or paint gain, and geometry fixtures did
 			not prove correctness across a viewport-top shift. The 1MiB arm failed an
