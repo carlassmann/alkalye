@@ -1,0 +1,124 @@
+import { SourceTextarea } from "../src/client/source-textarea"
+import type { ProjectionMode } from "../src/client/source-textarea"
+
+let mode: ProjectionMode = "project"
+let native = document.createElement("textarea")
+native.id = "editor"
+let host = document.createElement("div")
+host.dataset.editor = ""
+host.className = "editor-wrap"
+host.style.cssText =
+	"height:800px;overflow:auto;width:700px;--editor-size:18px;--mono:monospace;--editor-width:65ch"
+host.append(native)
+document.body.append(host)
+let source = new SourceTextarea(native, "", {
+	documents: () => [{ id: "first", title: "First", archived: false }],
+	mode: () => mode,
+	caretTop: () => undefined,
+	painted() {},
+	fullDocument: true,
+})
+let assertions = 0
+function check(condition: boolean, message: string) {
+	assertions++
+	if (!condition) throw new Error(message)
+}
+function select(content: string, offset: number) {
+	source.reconcile(content, offset)
+	check(source.value === content, "raw source changed")
+	check(source.sourceIndex.length === content.length, "raw index changed")
+	check(
+		source.selectionStart === offset && source.selectionEnd === offset,
+		"source caret moved",
+	)
+	check(!native.value.includes("\r"), "native value not normalized")
+}
+try {
+	let body =
+		"Body [Label](https://example.org) [[First]] 😀 end.\nNext [Two](https://two.example).\n"
+	let cases = [
+		"---\r\ntitle: Doc\r\n...  \r\n" + body,
+		"First\r\nSecond\nThird\rFourth 🦊\r\n" + body,
+		"x".repeat(2047) + "\r\n" + body,
+		"x".repeat(4095) + "\r\n😀\r\n" + body,
+	]
+	for (let value of cases) {
+		for (let projection of ["project", "raw"] satisfies ProjectionMode[]) {
+			mode = projection
+			for (let offset of [
+				0,
+				value.indexOf("Body"),
+				value.indexOf("[[First]]"),
+				value.length,
+			])
+				select(value, Math.max(0, offset))
+			let middle =
+				value.indexOf("Second") >= 0
+					? value.indexOf("Second") + 2
+					: value.indexOf("Body") + 2
+			source.reconcile(value, middle)
+			source.setRangeText("🦊", middle, middle, "end")
+			let edited = value.slice(0, middle) + "🦊" + value.slice(middle)
+			check(
+				source.value === edited && source.selectionStart === middle + 2,
+				"programmatic insert moved",
+			)
+			source.reconcile(value, middle)
+			check(
+				source.value === value && source.selectionStart === middle,
+				"undo reconcile moved",
+			)
+		}
+	}
+	mode = "raw"
+	source.reconcile("a\r\nb", 2)
+	check(
+		source.selectionStart === 3 && source.selectionEnd === 3,
+		"CRLF interior was not canonicalized after LF",
+	)
+	let original = "First\r\nSecond 😀\r\nThird\n"
+	source.reconcile(original, original.length)
+	native.addEventListener("input", () => {
+		source.input()
+		Object.assign(window, {
+			crlfTyped: source.value,
+			crlfCaret: source.selectionStart,
+			crlfReplacements: source.takeReplacements(),
+		})
+	})
+	Object.assign(window, {
+		crlfDone: true,
+		crlfAssertions: assertions,
+		crlfOriginal: original,
+		crlfSource: source,
+		crlfPrepare(content: string, start: number, end = start, full = true) {
+			source.fullDocument(full)
+			source.reconcile(content, start, end)
+			source.focus()
+			return {
+				source: source.value,
+				start: source.selectionStart,
+				end: source.selectionEnd,
+				native: native.value,
+				window: source.viewport.viewport,
+			}
+		},
+		crlfState() {
+			return {
+				source: source.value,
+				start: source.selectionStart,
+				end: source.selectionEnd,
+				native: native.value,
+				window: source.viewport.viewport,
+				scroll: host.scrollTop,
+				scrollHeight: host.scrollHeight,
+			}
+		},
+	})
+} catch (error) {
+	Object.assign(window, {
+		crlfDone: true,
+		crlfFailure: String(error),
+		crlfAssertions: assertions,
+	})
+}

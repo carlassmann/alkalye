@@ -1,0 +1,27 @@
+import { browser, browserBatch, evaluate } from "./browser-driver";
+import { object } from "../src/shared/model";
+let session = "crlf-lf-" + Date.now();
+try {
+  browser(session, "open", process.env.CRLF_URL ?? "http://localhost:4913/");
+  browser(session, "wait", "--fn", "window.crlfDone===true");
+  let initial = object(
+    evaluate(
+      session,
+      "(() => { let line='Plain text line with words and emoji 🦊.\\n';let content=line.repeat(Math.ceil(1048576/line.length)).slice(0,1048576);window.lfOriginal=content;window.crlfPrepare(content,content.length,content.length,false);window.crlfSource.setSelectionRange(content.length,content.length);window.lfDurations=[];let start=0;document.addEventListener('input',()=>{start=performance.now()},{capture:true});document.addEventListener('input',()=>window.lfDurations.push(performance.now()-start));return {length:window.crlfSource.value.length,caret:window.crlfSource.selectionStart,nativeLength:document.querySelector('textarea').value.length,window:window.crlfSource.viewport.viewport}})()",
+    ),
+  );
+  if (initial.length !== 1048576 || initial.caret !== 1048576)
+    throw new Error("LF readiness");
+  browserBatch(session, [...[..."abcdefgh"].map((key) => ["press", key])]);
+  let result = object(
+    evaluate(
+      session,
+      "({sourceExact:window.crlfSource.value===window.lfOriginal+'abcdefgh',caret:window.crlfSource.selectionStart,end:window.crlfSource.selectionEnd,durations:window.lfDurations,nativeLength:document.querySelector('textarea').value.length,window:window.crlfSource.viewport.viewport})",
+    ),
+  );
+  if (!result.sourceExact || result.caret !== 1048584 || result.end !== 1048584)
+    throw new Error(JSON.stringify(result));
+  console.log(JSON.stringify({ initial, result }));
+} finally {
+  browser(session, "close");
+}

@@ -1,0 +1,10 @@
+{"assertions":145}
+{"end":25,"native":"First\nSecond 😀\nThird\nx","scroll":0,"scrollHeight":800,"source":"First\r\nSecond 😀\r\nThird\nx","start":25,"window":{"end":25,"height":129.625,"start":0,"top":48}}
+{"nativeCase":0,"sourceExact":true,"caretExact":true,"undoExact":true}
+{"nativeCase":1,"sourceExact":true,"caretExact":true,"undoExact":true}
+{"nativeCase":2,"sourceExact":true,"caretExact":true,"undoExact":true}
+{"nativeCase":3,"sourceExact":true,"caretExact":true,"undoExact":true}
+{"nativeCase":4,"sourceExact":true,"caretExact":true,"undoExact":true}
+{"nativeCase":5,"sourceExact":true,"caretExact":true,"undoExact":true}
+{"nativeCase":6,"sourceExact":true,"caretExact":true,"undoExact":true}
+{"nativeCase":7,"sourceExact":true,"caretExact":true,"undoExact":true}

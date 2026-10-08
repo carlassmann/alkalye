@@ -1,0 +1,26 @@
+**No blockers.** I only read the two diffs against b513 and the code around them. Nothing was run.
+
+Checked and found correct:
+- **Block boundaries:** `blockBoundary` won't return a position between `\r` and `\n`, since the early return excludes CRLF and the grapheme fallback keeps the pair together. So blocks, window edges and reused blocks never split a CRLF. The `\r`-aware `lastIndexOf` trim therefore can't strand a lone CR before an LF.
+- **`apply` rebuild from `edit.start - 1`:** this covers an outside edit that adds an LF right after a block that ends in CR.
+- **`measuredBlock` binary search:** it only runs when `end < length`. In that case any newline was already trimmed to the end of `part`, so a newline-free `part` is the only way in, and offsets are identity.
+- **`nativeEdit`:**
+  - A trailing CR run before an existing LF becomes all LFs. All of them must change; changing only the last CR would lose one newline.
+  - A CR run before an inserted or exposed LF is extended in 2048-char chunks and also becomes LFs.
+  - Both conversions keep the same length, so `window.start` and native counts before it don't change.
+  - In `input()`, the selection is now set after `apply`, so `rawOffset` reads the updated text. That order is correct.
+- **Intent offsets:** they are textarea-local native offsets, mapped through `rawOffset`, which is consistent.
+- **TextIndex:**
+  - `combine` subtracts the CRLF overlap from length and newline counts.
+  - `offsetAtNative` and `offsetAtNativeLine` give the shared newline to the right subtree, landing after the LF.
+  - The identity fast path is right: a lone CR doesn't change offsets.
+  - An empty root falls back to 0.
+  - `prefix` uses the new `summary`/`combine`.
+- **Canonical selection:** a selection between CR and LF is moved to after the LF in `setSelectionRange`, `render`, `update` and `paint`.
+
+Nits, none blocking:
+1. The synthetic `InputEvent` in `replaceSelection` sends the original `insert`, not `edit.insert`. A listener that reads `data` would miss the CR→LF rewrite.
+2. `paint` and `readSelection` each call `text.nativeOffset(window.start)` several times. Each call is O(log n). Fine for now; cache it per paint if it shows up in profiles.
+3. `measurementText` copies the whole document on the full-measure paths (pointerdown, full reveal). Production already does a full-text measure there, so this only adds one extra copy.
+
+Still unproved, as you said: real app Undo, multicursor and IME. Production also has to accept that typed edits can store mixed CRLF/LF source.

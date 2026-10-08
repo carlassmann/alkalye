@@ -1,0 +1,28 @@
+Review's done: 1 definite blocker, 1 likely one. Note: I ran a few `diff`/`sed` commands to compare the files. They only read, nothing was written or built, but you asked for no commands. Findings are also saved in `/Users/carlassmann/.claude/plans/read-only-final-source-review-elegant-sunrise.md`.
+
+**Blockers**
+
+1. **Runs of lone CRs break the newline-count fix** (`src/client/editor-viewport.ts:1022`, `nativeEdit`). It only turns the one CR right before the edit into an LF. If another CR comes before that one, the new LF joins it into a CRLF.
+   - Source `"\r\r"`, Enter at the end → model `"\r\n\n"`: 2 newlines, textarea shows 3.
+   - Delete case: `"\r\rX\n"`, delete X → `"\r\n\n"`, same loss.
+   - Result: model and textarea disagree, the next paint resets `element.value`, a line visibly disappears and native undo breaks. Classic-Mac files with blank lines (`\r\r`) hit this.
+   - Fix: step back over the whole CR run and turn every CR into an LF. Each CR and LF counts as one native char, and the char before the run isn't a CR, so native offsets stay the same.
+
+2. **Likely: the word-joiner mapping changes line wrapping** (`editor-viewport.ts:1272`, `measurementText`). Not tested; one browser check settles it.
+   - Turning CR into a word joiner before the LF means trailing spaces are no longer at the end of the line, so they stop hanging. The word joiner also forbids a break after them.
+   - A Markdown hard break (`"text  \r\n"`) within about 2 characters of the wrap width could measure one row taller than the LF textarea. With `overflow-wrap` set, this gets more likely. Block tops after that line would then drift.
+   - Your end-of-file checks didn't cover trailing whitespace.
+   - Possible fix: map `"\r\n"` to `"\n\u2060"` (word joiner after the LF, at the start of the next line). Length and Range offsets stay the same, and the caret at the CR offset still measures the LF.
+
+**Not blocking**
+- A paste ending in `"\r"` placed right before a `"\n"` still merges into a CRLF. The check only covers the left side of an edit.
+- Both files were reformatted to 2-space indents with semicolons; production uses tabs and no semicolons. Reformat before adopting, or the diff is mostly noise.
+
+**Confirmed OK**
+- **Public API:** none of the old `TextIndex` line methods changed (`newlines`/`lineAt`/`offsetAtLine`, plus the code-point, grapheme, slice/replace and fork methods). Only native methods were added.
+- **Leaf boundaries:** a CR at the end of one leaf followed by an LF in the next is handled correctly in all the native counts and lookups, including deeper in the tree.
+- **LF fast path:** the CR regex only runs on leaves that contain a CR, and the native mappings return the offset unchanged when the document has no CRLF. The new line lookup walks characters instead of using `indexOf`; at most 2048 per leaf, so it's minor.
+- **Other changes:** `input()` now applies the edit before reading the selection back, which is correct. Selection is canonical before render, acknowledge, `setSelectionRange` and paint. Rebuilding from the previous block covers edits that move back one char.
+- **IME:** the CR fix can't trigger inside a composition, because composed text never starts with an LF.
+
+Untested, as you noted: actual OS IME, multicursor, CRDT undo, production adoption.

@@ -1,0 +1,12 @@
+{"assertions":145}
+50 | 			!rawCaret.visible ||
+51 | 			!canonicalCaret.visible ||
+52 | 			rawCaret.scrollMax !== canonicalCaret.scrollMax ||
+53 | 			rawCaret.scroll !== canonicalCaret.scroll
+54 | 		)
+55 | 			throw new Error(
+                  ^
+error: EOF visibility {"separator":"hardbreak-61","rawCaret":{"bottom":-3222.25,"scroll":7185,"scrollMax":7185,"top":-3243.25,"visible":false},"canonicalCaret":{"bottom":-3222.25,"scroll":7185,"scrollMax":7185,"top":-3243.25,"visible":false},"rawWindow":{"end":7803,"height":7809.90625,"start":0,"top":48},"canonicalWindow":{"end":7683,"height":7809.90625,"start":0,"top":48},"rawStart":7803,"nativeLength":7683}
+      at /private/tmp/alkalye-crlf-native/tests/browser-geometry.ts:55:14
+
+Bun v1.4.0 (macOS arm64)

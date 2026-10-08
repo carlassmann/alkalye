@@ -1,0 +1,1 @@
+export default { project: "alkalye-crlf-native", commands: { web: { run: "bun tests/serve.ts", route: true } } }

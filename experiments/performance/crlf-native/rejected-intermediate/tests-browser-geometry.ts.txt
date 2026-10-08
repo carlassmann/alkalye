@@ -1,0 +1,62 @@
+import { browser, evaluate } from "./browser-driver";
+import { object } from "../src/shared/model";
+let session = "crlf-native-" + Date.now();
+try {
+  browser(session, "open", process.env.CRLF_URL ?? "http://localhost:4913/");
+  browser(session, "wait", "--fn", "window.crlfDone===true");
+  let initial = object(
+    evaluate(
+      session,
+      "({failure:window.crlfFailure,assertions:window.crlfAssertions})",
+    ),
+  );
+  console.log(JSON.stringify(initial));
+  if (initial.failure) throw new Error(String(initial.failure));
+  evaluate(session, "window.crlfSource.focus()");
+  evaluate(
+    session,
+    `window.crlfCaretGeometry=()=>{let native=document.querySelector('#editor');let host=native.parentElement;let style=getComputedStyle(native);let mirror=document.createElement('pre');mirror.style.cssText='position:fixed;left:0;top:0;margin:0;border:0;padding:0;visibility:hidden;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal';for(let key of ['font','letterSpacing','lineHeight','tabSize'])mirror.style[key]=style[key];mirror.style.width=(native.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight))+'px';mirror.textContent=native.value+'\\u200b';document.body.append(mirror);let range=document.createRange();range.setStart(mirror.firstChild,native.selectionEnd);range.setEnd(mirror.firstChild,native.selectionEnd+1);let rect=range.getBoundingClientRect();let top=native.getBoundingClientRect().top+rect.top-mirror.getBoundingClientRect().top-native.scrollTop;let bottom=top+rect.height;let bounds=host.getBoundingClientRect();mirror.remove();return {top,bottom,visible:top>=bounds.top&&bottom<=bounds.bottom,scrollMax:host.scrollHeight-host.clientHeight,scroll:host.scrollTop}}`,
+  );
+  let geometry = [];
+  for (let separator of ["\r\n", "\r", "\n"]) {
+    let content = Array.from(
+      { length: 300 },
+      (_, index) => "Line " + index + " 🦊 text " + "word ".repeat(8),
+    ).join(separator);
+    let normalized = content.replace(/\r\n?/g, "\n");
+    let raw = object(
+      evaluate(
+        session,
+        `(()=>{window.crlfPrepare(${JSON.stringify(content)},${content.length},${content.length},false);window.crlfSource.setSelectionRange(${content.length},${content.length});return {...window.crlfState(),caretGeometry:window.crlfCaretGeometry()}})()`,
+      ),
+    );
+    let canonical = object(
+      evaluate(
+        session,
+        `(()=>{window.crlfPrepare(${JSON.stringify(normalized)},${normalized.length},${normalized.length},false);window.crlfSource.setSelectionRange(${normalized.length},${normalized.length});return {...window.crlfState(),caretGeometry:window.crlfCaretGeometry()}})()`,
+      ),
+    );
+    let rawCaret = object(raw.caretGeometry),
+      canonicalCaret = object(canonical.caretGeometry);
+    if (
+      !rawCaret.visible ||
+      !canonicalCaret.visible ||
+      rawCaret.scrollMax !== canonicalCaret.scrollMax ||
+      rawCaret.scroll !== canonicalCaret.scroll
+    )
+      throw new Error(
+        "EOF visibility " +
+          JSON.stringify({ separator, rawCaret, canonicalCaret }),
+      );
+    if (
+      typeof rawCaret.top !== "number" ||
+      typeof canonicalCaret.top !== "number" ||
+      Math.abs(rawCaret.top - canonicalCaret.top) > 1
+    )
+      throw new Error("EOF caret rect differs");
+    geometry.push({ separator, raw, canonical });
+  }
+  console.log(JSON.stringify(geometry));
+} finally {
+  browser(session, "close");
+}

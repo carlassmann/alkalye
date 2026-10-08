@@ -1,0 +1,121 @@
+import { browser, evaluate } from "./browser-driver"
+import { object } from "../src/shared/model"
+let session = "crlf-native-" + Date.now()
+try {
+	browser(session, "open", process.env.CRLF_URL ?? "http://localhost:4913/")
+	browser(session, "wait", "--fn", "window.crlfDone===true")
+	let initial = object(
+		evaluate(
+			session,
+			"({failure:window.crlfFailure,assertions:window.crlfAssertions})",
+		),
+	)
+	console.log(JSON.stringify(initial))
+	if (initial.failure) throw new Error(String(initial.failure))
+	evaluate(session, "window.crlfSource.focus()")
+	browser(session, "press", "x")
+	browser(session, "wait", "--fn", "window.crlfTyped===window.crlfOriginal+'x'")
+	console.log(JSON.stringify(evaluate(session, "window.crlfState()")))
+	let cases = [
+		{
+			source: "\r\r",
+			start: 2,
+			end: 2,
+			key: "Enter",
+			expected: "\n\n\n",
+			caret: 3,
+		},
+		{
+			source: "\r\rX\n",
+			start: 2,
+			end: 3,
+			key: "Backspace",
+			expected: "\n\n\n",
+			caret: 2,
+		},
+		{
+			source: "a" + "\r".repeat(2049),
+			start: 2050,
+			end: 2050,
+			key: "Enter",
+			expected: "a" + "\n".repeat(2050),
+			caret: 2051,
+		},
+
+		{
+			source: "a\r",
+			start: 2,
+			end: 2,
+			key: "Enter",
+			expected: "a\n\n",
+			caret: 3,
+		},
+		{
+			source: "a\rX\nb",
+			start: 2,
+			end: 3,
+			key: "Backspace",
+			expected: "a\n\nb",
+			caret: 2,
+		},
+		{
+			source: "a\r\nb",
+			start: 3,
+			end: 3,
+			key: "Backspace",
+			expected: "ab",
+			caret: 1,
+		},
+		{
+			source: "x".repeat(2047) + "\r",
+			start: 2048,
+			end: 2048,
+			key: "Enter",
+			expected: "x".repeat(2047) + "\n\n",
+			caret: 2049,
+		},
+		{
+			source: "a\r\n😀\r\nb",
+			start: 5,
+			end: 5,
+			key: "x",
+			expected: "a\r\n😀x\r\nb",
+			caret: 6,
+		},
+	]
+	for (let [index, item] of cases.entries()) {
+		evaluate(
+			session,
+			`window.crlfPrepare(${JSON.stringify(item.source)},${item.start},${item.end})`,
+		)
+		browser(session, "press", item.key)
+		let state = object(evaluate(session, "window.crlfState()"))
+		if (
+			state.source !== item.expected ||
+			state.start !== item.caret ||
+			state.end !== item.caret
+		)
+			throw new Error("native case" + index + " " + JSON.stringify(state))
+		evaluate(
+			session,
+			`window.crlfPrepare(${JSON.stringify(item.source)},${item.start},${item.end})`,
+		)
+		let undo = object(evaluate(session, "window.crlfState()"))
+		if (
+			undo.source !== item.source ||
+			undo.start !== item.start ||
+			undo.end !== item.end
+		)
+			throw new Error("reconcile undo case" + index)
+		console.log(
+			JSON.stringify({
+				nativeCase: index,
+				sourceExact: true,
+				caretExact: true,
+				undoExact: true,
+			}),
+		)
+	}
+} finally {
+	browser(session, "close")
+}

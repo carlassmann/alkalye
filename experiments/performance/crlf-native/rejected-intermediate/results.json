@@ -1,0 +1,82 @@
+{
+	"status": "experiment-only",
+	"productionEdits": false,
+	"baseline": "5c5b6aa production source copied before substitutions",
+	"sourceHashes": {
+		"src/client/editor-viewport.ts": "1a4bbbb6d25e2b2ce1f7f1d6fe4c4497e53b44a798dcb84874f1925f3c904482",
+		"src/shared/text-index.ts": "26fe2c75707b434da6ae7912c3c71db7460bf27488327f28e9b5b6649c1c8ced",
+		"tests/crlf-source-fixture.ts": "3a4e42410bd3e73699d13153983aa7cf50d577bba99165754342653bf8621629",
+		"tests/browser-crlf.ts": "e483fb880b0e2f08eff3e0db93ec22ce248a110cc2719ffe95f7d6b558584a32",
+		"tests/browser-geometry.ts": "265f3677ff64d42787173d66d8d397ba488002eb0bc8196307f710d2b399db5d",
+		"tests/browser-lf.ts": "58ae26e8b9d780356277aa726567aef38d1d603ad1097c2dcefba91c99a9803c",
+		"tests/serve.ts": "e02dea0ba899d5def4a3e6a3c62af23fdeaadccd7a106a1f7bb014a7bff02f08",
+		"work.config.js": "8991c66a040fb04b83aa0a1df3fb67737a2b6169dccc4e90fd0117455fd01dbb"
+	},
+	"types": "pass",
+	"publicSourceTextareaAssertions": 145,
+	"trustedNativeEditCells": 5,
+	"geometryPairs": 3,
+	"nativeEditCases": [
+		"Enter after lone CR preserves two visible lines",
+		"Deletion between CR and LF does not merge line breaks",
+		"Backspace removes whole CRLF",
+		"Native Enter at 2048 seam",
+		"Middle emoji insertion preserves untouched CRLF"
+	],
+	"undoScope": "SourceTextarea.reconcile, not CRDT or actual app Undo",
+	"geometry": {
+		"host": "actual data-editor/editor-wrap/#editor CSS",
+		"eols": ["CRLF", "CR", "LF"],
+		"nativeMirrorCaretTop": 646.46875,
+		"nativeMirrorCaretBottom": 667.46875,
+		"visible": true,
+		"scroll": 9096,
+		"scrollMax": 9096,
+		"extraEndBlank": false
+	},
+	"lfJourney": {
+		"initial": {
+			"caret": 1048576,
+			"length": 1048576,
+			"nativeLength": 2584,
+			"window": {
+				"end": 1048576,
+				"height": 2074,
+				"start": 1045992,
+				"top": 826796.25
+			}
+		},
+		"result": {
+			"caret": 1048584,
+			"durations": [
+				0.699999988079071, 0.2999999523162842, 0.30000001192092896,
+				0.30000001192092896, 0.2999999523162842, 0.30000001192092896,
+				0.30000001192092896, 0.30000001192092896
+			],
+			"end": 1048584,
+			"nativeLength": 2592,
+			"sourceExact": true,
+			"window": {
+				"end": 1048584,
+				"height": 2074,
+				"start": 1045992,
+				"top": 826796.25
+			}
+		}
+	},
+	"failedHarnesses": [
+		"Missing copied build.ts during first types",
+		"serve.ts needed module export",
+		"First trusted input lacked focus",
+		"Managed restart changed direct port",
+		"Earlier geometry/LF lacked actual editor CSS; visibility and timing claims invalidated"
+	],
+	"limits": [
+		"No production cutover",
+		"No actual app/CRDT Undo proof",
+		"No real OS IME or multicursor proof",
+		"Native LF listener durations exclude complete RunTask and are not app/FPS benchmarks",
+		"Final review pending",
+		"Tested files use default formatter whitespace; adoption must use repository config without semantic change"
+	]
+}

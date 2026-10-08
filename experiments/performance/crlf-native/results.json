@@ -1,0 +1,94 @@
+{
+	"status": "experiment-only",
+	"productionEdits": false,
+	"baseline": "5c5b6aa production source copied before substitutions",
+	"sourceHashes": {
+		"src/client/editor-viewport.ts": "98959330a68d6b096a7d3b5b4efd3179606ad37729c2f5dc199f8eca50867b2c",
+		"src/shared/text-index.ts": "79e7ea2f341bd5aa93462f8b93235ca10a36010000f66f397ef4c5fa7221a8e8",
+		"tests/crlf-source-fixture.ts": "68a1586aa8e6c9b6a98555791ef308e581729fe252cfe7ae79e81fb06d8c06d6",
+		"tests/browser-crlf.ts": "3a8a65a53ff3c93231f69680ed548588e786a3291ef747a3a7ced308902eb8ec",
+		"tests/browser-geometry.ts": "718d0ab13dcadf4b35811aa81ed6949046dd23f0395300944927b00b856e978f",
+		"tests/browser-lf.ts": "ff157b0bca2844d68eed8d41f14dddea05bc02d6c9c2a2dbfb40a61716e5926e",
+		"tests/serve.ts": "caf15159116c11e9bd381a2fa16a5e02a254744d046222945ea02a69143210a8",
+		"work.config.js": "8991c66a040fb04b83aa0a1df3fb67737a2b6169dccc4e90fd0117455fd01dbb"
+	},
+	"types": "pass",
+	"publicSourceTextareaAssertions": 145,
+	"trustedNativeEditCells": 8,
+	"geometryPairs": 14,
+	"nativeEditCases": [
+		"Consecutive CR Enter",
+		"CR run exposed by deletion",
+		"2049 CR crossleaf run Enter",
+		"Lone CR Enter",
+		"Deletion between CR/LF",
+		"Backspace whole CRLF",
+		"2048 seam Enter",
+		"Emoji middle insertion preserves untouched CRLF"
+	],
+	"undoScope": "SourceTextarea.reconcile, not CRDT or actual app Undo",
+	"geometry": {
+		"host": "production editor selectors and global border-box; independent native-value mirror",
+		"eols": ["CRLF", "CR", "LF"],
+		"nativeMirrorCaretTop": 646.46875,
+		"nativeMirrorCaretBottom": 667.46875,
+		"visible": true,
+		"scroll": 9096,
+		"scrollMax": 9096,
+		"extraEndBlank": false
+	},
+	"lfJourney": {
+		"initial": {
+			"caret": 1048576,
+			"length": 1048576,
+			"nativeLength": 2584,
+			"window": {
+				"end": 1048576,
+				"height": 2074,
+				"start": 1045992,
+				"top": 826796.25
+			}
+		},
+		"result": {
+			"caret": 1048584,
+			"durations": [
+				0.699999988079071, 0.2999999523162842, 0.30000001192092896,
+				0.30000001192092896, 0.2999999523162842, 0.30000001192092896,
+				0.30000001192092896, 0.30000001192092896
+			],
+			"end": 1048584,
+			"nativeLength": 2592,
+			"sourceExact": true,
+			"window": {
+				"end": 1048584,
+				"height": 2074,
+				"start": 1045992,
+				"top": 826796.25
+			}
+		}
+	},
+	"failedHarnesses": [
+		"Missing copied build.ts during first types",
+		"serve.ts needed module export",
+		"First trusted input lacked focus",
+		"Managed restart changed direct port",
+		"Earlier geometry/LF lacked actual editor CSS; visibility and timing claims invalidated",
+		"WORD JOINER measurement variants rejected after reviewer wrap concern",
+		"Geometry hardbreak61 failure caused missing production global box-sizing:border-box; corrected host passes all widths56\u201366"
+	],
+	"limits": [
+		"No production cutover",
+		"No actual app/CRDT Undo proof",
+		"No real OS IME or multicursor proof",
+		"Native LF listener durations exclude complete RunTask and are not app/FPS benchmarks"
+	],
+	"review": {
+		"model": "claude-opus-5-5",
+		"handle": 82913,
+		"exit": 0,
+		"outcome": "No blockers",
+		"log": "opus-normalized-review.log"
+	},
+	"formatter": "repository tabs/no semicolons before final runtime",
+	"lfJourneyScope": "Final candidate before fixture global border-box correction; exact EOF fragment retained; not app/RunTask/FPS claim"
+}
