@@ -1,0 +1,53 @@
+{
+	"stage": "complete",
+	"passed": true,
+	"error": "",
+	"state": {
+		"undo": {
+			"accepted": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a",
+			"clientHeight": 585,
+			"nativeLength": 1995,
+			"scrollHeight": 565551,
+			"scrollTop": 564966,
+			"selectionEnd": 1048576,
+			"selectionStart": 1048576,
+			"sourceLength": 1048576,
+			"window": {
+				"direction": "ltr",
+				"end": 1048576,
+				"height": 1101.8125,
+				"start": 1046582,
+				"top": 564322.59375
+			}
+		},
+		"redo": {
+			"accepted": "48fc71562c05fc08f94e30c55249d234b1c83b56803e3f109e7c18a42e3dd9cb",
+			"clientHeight": 585,
+			"nativeLength": 1996,
+			"scrollHeight": 565998,
+			"scrollTop": 565413,
+			"selectionEnd": 1048576,
+			"selectionStart": 1048576,
+			"sourceLength": 1048577,
+			"window": {
+				"direction": "ltr",
+				"end": 1048577,
+				"height": 1101.8125,
+				"start": 1046582,
+				"top": 564769.65625
+			}
+		},
+		"bundleSha": "dbea0bd65330190229302a28d84a2d7d8e547924409042d1ebd3b339a3b3080c",
+		"observation": {
+			"heap": {
+				"total": 1181372002,
+				"used": 1102424538
+			},
+			"key": {
+				"key": "z",
+				"time": 18499.5,
+				"trusted": true
+			}
+		}
+	}
+}

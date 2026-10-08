@@ -1,0 +1,2907 @@
+{
+	"baselineCommit": "d26c0a8",
+	"candidateChange": "Only two private4096-code-unit string-comparison loops in SourceTextarea.difference; candidate formatted before build",
+	"nativeBackendCommit": "d26c0a8",
+	"cpuSampling": false,
+	"sourceSha256": {
+		"baseline": "4fc0af5c5dbca6957179dce46919e7a6de71d7c3b9ca787de77ae8010747a7d7",
+		"candidate": "f0c0f2f66fae090bc4f8d4ed3693a923e8734e6984827aa38ff839929235346f"
+	},
+	"summary": {
+		"undo": {
+			"baseline": {
+				"allTaskMaxMs": {
+					"median": 14.159,
+					"max": 14.297
+				},
+				"inputTaskMs": {
+					"median": 0.599,
+					"max": 0.606
+				},
+				"deferredMaxMs": {
+					"median": 14.159,
+					"max": 14.297
+				},
+				"animationFrameTaskMs": {
+					"median": 9.818,
+					"max": 10.088
+				},
+				"animationFrameCallbackMs": {
+					"median": 8.369,
+					"max": 8.635
+				},
+				"refreshCallbackMs": {
+					"median": 8.088,
+					"max": 8.358
+				},
+				"refreshEnclosingTaskMs": {
+					"median": 9.818,
+					"max": 10.088
+				}
+			},
+			"candidate": {
+				"allTaskMaxMs": {
+					"median": 14.547,
+					"max": 14.708
+				},
+				"inputTaskMs": {
+					"median": 0.581,
+					"max": 0.603
+				},
+				"deferredMaxMs": {
+					"median": 14.547,
+					"max": 14.708
+				},
+				"animationFrameTaskMs": {
+					"median": 7.208,
+					"max": 7.679
+				},
+				"animationFrameCallbackMs": {
+					"median": 6.319,
+					"max": 6.386
+				},
+				"refreshCallbackMs": {
+					"median": 6.04,
+					"max": 6.133
+				},
+				"refreshEnclosingTaskMs": {
+					"median": 7.208,
+					"max": 7.679
+				}
+			}
+		},
+		"redo": {
+			"baseline": {
+				"allTaskMaxMs": {
+					"median": 13.759,
+					"max": 14.04
+				},
+				"inputTaskMs": {
+					"median": 0.393,
+					"max": 0.456
+				},
+				"deferredMaxMs": {
+					"median": 13.759,
+					"max": 14.04
+				},
+				"animationFrameTaskMs": {
+					"median": 8.384,
+					"max": 8.86
+				},
+				"animationFrameCallbackMs": {
+					"median": 7.227,
+					"max": 7.337
+				},
+				"refreshCallbackMs": {
+					"median": 6.927,
+					"max": 7.082
+				},
+				"refreshEnclosingTaskMs": {
+					"median": 8.384,
+					"max": 8.86
+				}
+			},
+			"candidate": {
+				"allTaskMaxMs": {
+					"median": 13.616,
+					"max": 17.859
+				},
+				"inputTaskMs": {
+					"median": 0.4,
+					"max": 0.424
+				},
+				"deferredMaxMs": {
+					"median": 13.616,
+					"max": 17.859
+				},
+				"animationFrameTaskMs": {
+					"median": 7.69,
+					"max": 8.661
+				},
+				"animationFrameCallbackMs": {
+					"median": 6.254,
+					"max": 7.021
+				},
+				"refreshCallbackMs": {
+					"median": 5.984,
+					"max": 6.702
+				},
+				"refreshEnclosingTaskMs": {
+					"median": 7.69,
+					"max": 8.661
+				}
+			}
+		}
+	},
+	"rows": [
+		{
+			"trial": 0,
+			"variant": "baseline",
+			"phase": "undo",
+			"windowMs": 3000.731,
+			"allTaskCount": 1780,
+			"allTaskMaxMs": 14.159,
+			"inputTaskMs": 0.599,
+			"deferredMaxMs": 14.159,
+			"heap": {
+				"total": 1209427139,
+				"used": 1139413239
+			},
+			"gate": {
+				"accepted": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a",
+				"clientHeight": 585,
+				"nativeLength": 1995,
+				"scrollHeight": 565583,
+				"scrollTop": 564998,
+				"selectionEnd": 1048576,
+				"selectionStart": 1048576,
+				"sourceLength": 1048576,
+				"window": {
+					"direction": "ltr",
+					"end": 1048576,
+					"height": 1101.8125,
+					"start": 1046582,
+					"top": 564354.5
+				}
+			},
+			"bundleSha": "28d4ba7ebcf1abd630b21f6f7381c08402e80ca291fa63e27537b8e2c199be8c",
+			"traceSha256": "6163989b2f21e108adc4043f8e1ff4997f059d25c64ca327a7436f38c413737a",
+			"largestTasks": [
+				{
+					"relativeMs": 778.192,
+					"taskMs": 14.159,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 14.143,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C0B1BD74157728D44FB8800E9D73B611",
+									"functionName": "o.port1.onmessage",
+									"isolate": "6816589585917062585",
+									"lineNumber": 8,
+									"sampleTraceId": 441943543052428,
+									"scriptId": "21",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.834,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 848685348,
+								"usedHeapSizeBefore": 877726388
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 940.907,
+					"taskMs": 14.039,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 14.023,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C0B1BD74157728D44FB8800E9D73B611",
+									"functionName": "o.port1.onmessage",
+									"isolate": "6816589585917062585",
+									"lineNumber": 8,
+									"sampleTraceId": 441943543023214,
+									"scriptId": "21",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.688,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 863959836,
+								"usedHeapSizeBefore": 893017284
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 1133.68,
+					"taskMs": 14.031,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 14.015,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C0B1BD74157728D44FB8800E9D73B611",
+									"functionName": "o.port1.onmessage",
+									"isolate": "6816589585917062585",
+									"lineNumber": 8,
+									"sampleTraceId": 441943543022745,
+									"scriptId": "21",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.745,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 908901980,
+								"usedHeapSizeBefore": 937868344
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 827.834,
+					"taskMs": 13.993,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.974,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C0B1BD74157728D44FB8800E9D73B611",
+									"functionName": "o.port1.onmessage",
+									"isolate": "6816589585917062585",
+									"lineNumber": 8,
+									"sampleTraceId": 441943543023397,
+									"scriptId": "21",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.657,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 853057800,
+								"usedHeapSizeBefore": 882203500
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 803.546,
+					"taskMs": 13.93,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.913,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C0B1BD74157728D44FB8800E9D73B611",
+									"functionName": "o.port1.onmessage",
+									"isolate": "6816589585917062585",
+									"lineNumber": 8,
+									"sampleTraceId": 441943543023461,
+									"scriptId": "21",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.637,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 850837640,
+								"usedHeapSizeBefore": 879768884
+							}
+						}
+					]
+				}
+			],
+			"maxAnimationFrameTask": {
+				"taskMs": 10.088,
+				"callbackMs": 8.635,
+				"relativeMs": 198.219
+			},
+			"refreshFunctionCalls": [
+				{
+					"ms": 0.745,
+					"args": {
+						"data": {
+							"columnNumber": 744,
+							"frame": "C0B1BD74157728D44FB8800E9D73B611",
+							"functionName": "",
+							"isolate": "6816589585917062585",
+							"lineNumber": 67,
+							"sampleTraceId": 441943543053036,
+							"scriptId": "6",
+							"url": "http://127.0.0.1:4461/chunks/document-app-wzgm2rr8.js"
+						}
+					}
+				},
+				{
+					"ms": 8.358,
+					"args": {
+						"data": {
+							"columnNumber": 476,
+							"frame": "C0B1BD74157728D44FB8800E9D73B611",
+							"functionName": "",
+							"isolate": "6816589585917062585",
+							"lineNumber": 1653,
+							"sampleTraceId": 441943543053037,
+							"scriptId": "5",
+							"url": "http://127.0.0.1:4461/app.js"
+						}
+					}
+				},
+				{
+					"ms": 0.131,
+					"args": {
+						"data": {
+							"columnNumber": 19193,
+							"frame": "C0B1BD74157728D44FB8800E9D73B611",
+							"functionName": "me",
+							"isolate": "6816589585917062585",
+							"lineNumber": 86,
+							"sampleTraceId": 441943543053039,
+							"scriptId": "6",
+							"url": "http://127.0.0.1:4461/chunks/document-app-wzgm2rr8.js"
+						}
+					}
+				}
+			],
+			"refresh": {
+				"callbackMs": 8.358,
+				"enclosingTaskMs": 10.088,
+				"relativeMs": 199.029,
+				"generatedLine": 1653,
+				"generatedColumn": 476
+			}
+		},
+		{
+			"trial": 0,
+			"variant": "baseline",
+			"phase": "redo",
+			"windowMs": 3000.682,
+			"allTaskCount": 1389,
+			"allTaskMaxMs": 14.04,
+			"inputTaskMs": 0.456,
+			"deferredMaxMs": 14.04,
+			"heap": {
+				"total": 1209427139,
+				"used": 1139413239
+			},
+			"gate": {
+				"accepted": "48fc71562c05fc08f94e30c55249d234b1c83b56803e3f109e7c18a42e3dd9cb",
+				"clientHeight": 585,
+				"nativeLength": 1996,
+				"scrollHeight": 566030,
+				"scrollTop": 565445,
+				"selectionEnd": 1048576,
+				"selectionStart": 1048576,
+				"sourceLength": 1048577,
+				"window": {
+					"direction": "ltr",
+					"end": 1048577,
+					"height": 1101.8125,
+					"start": 1046582,
+					"top": 564801.5625
+				}
+			},
+			"bundleSha": "28d4ba7ebcf1abd630b21f6f7381c08402e80ca291fa63e27537b8e2c199be8c",
+			"traceSha256": "1c49c92d62b9373b509f37b32252b23c7ba74916fa484003fbc6f1a86e80680f",
+			"largestTasks": [
+				{
+					"relativeMs": 640.759,
+					"taskMs": 14.04,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 14.024,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C0B1BD74157728D44FB8800E9D73B611",
+									"functionName": "o.port1.onmessage",
+									"isolate": "6816589585917062585",
+									"lineNumber": 8,
+									"sampleTraceId": 441943543027048,
+									"scriptId": "21",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.762,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1086364880,
+								"usedHeapSizeBefore": 1115320352
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 707.513,
+					"taskMs": 13.756,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.744,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C0B1BD74157728D44FB8800E9D73B611",
+									"functionName": "o.port1.onmessage",
+									"isolate": "6816589585917062585",
+									"lineNumber": 8,
+									"sampleTraceId": 441943543026964,
+									"scriptId": "21",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.415,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1092900652,
+								"usedHeapSizeBefore": 1121843108
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 176.592,
+					"taskMs": 13.603,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.575,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C0B1BD74157728D44FB8800E9D73B611",
+									"functionName": "o.port1.onmessage",
+									"isolate": "6816589585917062585",
+									"lineNumber": 8,
+									"sampleTraceId": 441943543024299,
+									"scriptId": "21",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 754.196,
+					"taskMs": 13.479,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.465,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C0B1BD74157728D44FB8800E9D73B611",
+									"functionName": "o.port1.onmessage",
+									"isolate": "6816589585917062585",
+									"lineNumber": 8,
+									"sampleTraceId": 441943543027113,
+									"scriptId": "21",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.199,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1097250668,
+								"usedHeapSizeBefore": 1126223232
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 617.032,
+					"taskMs": 13.452,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.437,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C0B1BD74157728D44FB8800E9D73B611",
+									"functionName": "o.port1.onmessage",
+									"isolate": "6816589585917062585",
+									"lineNumber": 8,
+									"sampleTraceId": 441943543027368,
+									"scriptId": "21",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.174,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1084142668,
+								"usedHeapSizeBefore": 1113244424
+							}
+						}
+					]
+				}
+			],
+			"maxAnimationFrameTask": {
+				"taskMs": 8.118,
+				"callbackMs": 7.227,
+				"relativeMs": 211.195
+			},
+			"refresh": {
+				"callbackMs": 6.927,
+				"enclosingTaskMs": 8.118,
+				"relativeMs": 211.452,
+				"generatedLine": 1653,
+				"generatedColumn": 476
+			}
+		},
+		{
+			"trial": 0,
+			"variant": "candidate",
+			"phase": "undo",
+			"windowMs": 3001.336,
+			"allTaskCount": 1774,
+			"allTaskMaxMs": 14.024,
+			"inputTaskMs": 0.603,
+			"deferredMaxMs": 14.024,
+			"heap": {
+				"total": 754193514,
+				"used": 698006570
+			},
+			"gate": {
+				"accepted": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a",
+				"clientHeight": 585,
+				"nativeLength": 1995,
+				"scrollHeight": 565583,
+				"scrollTop": 564998,
+				"selectionEnd": 1048576,
+				"selectionStart": 1048576,
+				"sourceLength": 1048576,
+				"window": {
+					"direction": "ltr",
+					"end": 1048576,
+					"height": 1101.8125,
+					"start": 1046582,
+					"top": 564354.5
+				}
+			},
+			"bundleSha": "dbea0bd65330190229302a28d84a2d7d8e547924409042d1ebd3b339a3b3080c",
+			"traceSha256": "ffdf8029fe7a60503826237040419ca68c1563dd273bbe255a8a8865fb2bcf3d",
+			"largestTasks": [
+				{
+					"relativeMs": 816.146,
+					"taskMs": 14.024,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 14.01,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+									"functionName": "o.port1.onmessage",
+									"isolate": "4902778506097296088",
+									"lineNumber": 8,
+									"sampleTraceId": 8989990713707049,
+									"scriptId": "23",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.704,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1050143788,
+								"usedHeapSizeBefore": 1079193488
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 1276.233,
+					"taskMs": 13.96,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.946,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+									"functionName": "o.port1.onmessage",
+									"isolate": "4902778506097296088",
+									"lineNumber": 8,
+									"sampleTraceId": 8989990713700656,
+									"scriptId": "23",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.687,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1123369692,
+								"usedHeapSizeBefore": 1152348980
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 1136.099,
+					"taskMs": 13.823,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.802,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+									"functionName": "o.port1.onmessage",
+									"isolate": "4902778506097296088",
+									"lineNumber": 8,
+									"sampleTraceId": 8989990713701930,
+									"scriptId": "23",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.536,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1110278252,
+								"usedHeapSizeBefore": 1139200160
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 986.275,
+					"taskMs": 13.506,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.486,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+									"functionName": "o.port1.onmessage",
+									"isolate": "4902778506097296088",
+									"lineNumber": 8,
+									"sampleTraceId": 8989990713701563,
+									"scriptId": "23",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.22,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1065403976,
+								"usedHeapSizeBefore": 1094328168
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 840.333,
+					"taskMs": 13.407,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.394,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+									"functionName": "o.port1.onmessage",
+									"isolate": "4902778506097296088",
+									"lineNumber": 8,
+									"sampleTraceId": 8989990713707017,
+									"scriptId": "23",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.125,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1052296328,
+								"usedHeapSizeBefore": 1081216000
+							}
+						}
+					]
+				}
+			],
+			"maxAnimationFrameTask": {
+				"taskMs": 7.198,
+				"callbackMs": 6.386,
+				"relativeMs": 190.91
+			},
+			"refreshFunctionCalls": [
+				{
+					"ms": 0.008,
+					"args": {
+						"data": {
+							"columnNumber": 122544,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "t",
+							"isolate": "4902778506097296088",
+							"lineNumber": 8,
+							"sampleTraceId": 8989990713706666,
+							"scriptId": "23",
+							"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+						}
+					}
+				},
+				{
+					"ms": 0.005,
+					"args": {
+						"data": {
+							"columnNumber": 4801,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "E.document.addEventListener.signal",
+							"isolate": "4902778506097296088",
+							"lineNumber": 1,
+							"sampleTraceId": 8989990713706667,
+							"scriptId": "10",
+							"url": "http://127.0.0.1:4461/chunks/document-app-4gxjme62.js"
+						}
+					}
+				},
+				{
+					"ms": 0.002,
+					"args": {
+						"data": {
+							"columnNumber": 4801,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "E.document.addEventListener.signal",
+							"isolate": "4902778506097296088",
+							"lineNumber": 1,
+							"sampleTraceId": 8989990713706645,
+							"scriptId": "10",
+							"url": "http://127.0.0.1:4461/chunks/document-app-4gxjme62.js"
+						}
+					}
+				},
+				{
+					"ms": 0.001,
+					"args": {
+						"data": {
+							"columnNumber": 4801,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "E.document.addEventListener.signal",
+							"isolate": "4902778506097296088",
+							"lineNumber": 1,
+							"sampleTraceId": 8989990713706646,
+							"scriptId": "10",
+							"url": "http://127.0.0.1:4461/chunks/document-app-4gxjme62.js"
+						}
+					}
+				},
+				{
+					"ms": 0.001,
+					"args": {
+						"data": {
+							"columnNumber": 4801,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "E.document.addEventListener.signal",
+							"isolate": "4902778506097296088",
+							"lineNumber": 1,
+							"sampleTraceId": 8989990713706647,
+							"scriptId": "10",
+							"url": "http://127.0.0.1:4461/chunks/document-app-4gxjme62.js"
+						}
+					}
+				},
+				{
+					"ms": 0.002,
+					"args": {
+						"data": {
+							"columnNumber": 4801,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "E.document.addEventListener.signal",
+							"isolate": "4902778506097296088",
+							"lineNumber": 1,
+							"sampleTraceId": 8989990713706642,
+							"scriptId": "10",
+							"url": "http://127.0.0.1:4461/chunks/document-app-4gxjme62.js"
+						}
+					}
+				},
+				{
+					"ms": 0.002,
+					"args": {
+						"data": {
+							"columnNumber": 4801,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "E.document.addEventListener.signal",
+							"isolate": "4902778506097296088",
+							"lineNumber": 1,
+							"sampleTraceId": 8989990713706643,
+							"scriptId": "10",
+							"url": "http://127.0.0.1:4461/chunks/document-app-4gxjme62.js"
+						}
+					}
+				},
+				{
+					"ms": 0.004,
+					"args": {
+						"data": {
+							"columnNumber": 122544,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "t",
+							"isolate": "4902778506097296088",
+							"lineNumber": 8,
+							"sampleTraceId": 8989990713706653,
+							"scriptId": "23",
+							"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+						}
+					}
+				},
+				{
+					"ms": 0.001,
+					"args": {
+						"data": {
+							"columnNumber": 4801,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "E.document.addEventListener.signal",
+							"isolate": "4902778506097296088",
+							"lineNumber": 1,
+							"sampleTraceId": 8989990713706654,
+							"scriptId": "10",
+							"url": "http://127.0.0.1:4461/chunks/document-app-4gxjme62.js"
+						}
+					}
+				},
+				{
+					"ms": 0.001,
+					"args": {
+						"data": {
+							"columnNumber": 4801,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "E.document.addEventListener.signal",
+							"isolate": "4902778506097296088",
+							"lineNumber": 1,
+							"sampleTraceId": 8989990713706655,
+							"scriptId": "10",
+							"url": "http://127.0.0.1:4461/chunks/document-app-4gxjme62.js"
+						}
+					}
+				},
+				{
+					"ms": 0.001,
+					"args": {
+						"data": {
+							"columnNumber": 4801,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "E.document.addEventListener.signal",
+							"isolate": "4902778506097296088",
+							"lineNumber": 1,
+							"sampleTraceId": 8989990713706648,
+							"scriptId": "10",
+							"url": "http://127.0.0.1:4461/chunks/document-app-4gxjme62.js"
+						}
+					}
+				},
+				{
+					"ms": 0.002,
+					"args": {
+						"data": {
+							"columnNumber": 4801,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "E.document.addEventListener.signal",
+							"isolate": "4902778506097296088",
+							"lineNumber": 1,
+							"sampleTraceId": 8989990713706649,
+							"scriptId": "10",
+							"url": "http://127.0.0.1:4461/chunks/document-app-4gxjme62.js"
+						}
+					}
+				},
+				{
+					"ms": 0.001,
+					"args": {
+						"data": {
+							"columnNumber": 4801,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "E.document.addEventListener.signal",
+							"isolate": "4902778506097296088",
+							"lineNumber": 1,
+							"sampleTraceId": 8989990713706651,
+							"scriptId": "10",
+							"url": "http://127.0.0.1:4461/chunks/document-app-4gxjme62.js"
+						}
+					}
+				},
+				{
+					"ms": 0.001,
+					"args": {
+						"data": {
+							"columnNumber": 4801,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "E.document.addEventListener.signal",
+							"isolate": "4902778506097296088",
+							"lineNumber": 1,
+							"sampleTraceId": 8989990713706628,
+							"scriptId": "10",
+							"url": "http://127.0.0.1:4461/chunks/document-app-4gxjme62.js"
+						}
+					}
+				},
+				{
+					"ms": 0.001,
+					"args": {
+						"data": {
+							"columnNumber": 4801,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "E.document.addEventListener.signal",
+							"isolate": "4902778506097296088",
+							"lineNumber": 1,
+							"sampleTraceId": 8989990713706629,
+							"scriptId": "10",
+							"url": "http://127.0.0.1:4461/chunks/document-app-4gxjme62.js"
+						}
+					}
+				},
+				{
+					"ms": 0.008,
+					"args": {
+						"data": {
+							"columnNumber": 4647,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "It.i.addEventListener.signal",
+							"isolate": "4902778506097296088",
+							"lineNumber": 60,
+							"sampleTraceId": 8989990713706630,
+							"scriptId": "7",
+							"url": "http://127.0.0.1:4461/chunks/document-app-eaxye032.js"
+						}
+					}
+				},
+				{
+					"ms": 0.005,
+					"args": {
+						"data": {
+							"columnNumber": 744,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "",
+							"isolate": "4902778506097296088",
+							"lineNumber": 67,
+							"sampleTraceId": 8989990713706631,
+							"scriptId": "7",
+							"url": "http://127.0.0.1:4461/chunks/document-app-eaxye032.js"
+						}
+					}
+				},
+				{
+					"ms": 6.133,
+					"args": {
+						"data": {
+							"columnNumber": 476,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "",
+							"isolate": "4902778506097296088",
+							"lineNumber": 1653,
+							"sampleTraceId": 8989990713706624,
+							"scriptId": "6",
+							"url": "http://127.0.0.1:4461/app.js"
+						}
+					}
+				},
+				{
+					"ms": 0.117,
+					"args": {
+						"data": {
+							"columnNumber": 19193,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "me",
+							"isolate": "4902778506097296088",
+							"lineNumber": 86,
+							"sampleTraceId": 8989990713706626,
+							"scriptId": "7",
+							"url": "http://127.0.0.1:4461/chunks/document-app-eaxye032.js"
+						}
+					}
+				},
+				{
+					"ms": 0.189,
+					"args": {
+						"data": {
+							"columnNumber": 2763,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "",
+							"isolate": "4902778506097296088",
+							"lineNumber": 67,
+							"sampleTraceId": 8989990713706627,
+							"scriptId": "7",
+							"url": "http://127.0.0.1:4461/chunks/document-app-eaxye032.js"
+						}
+					}
+				},
+				{
+					"ms": 0.005,
+					"args": {
+						"data": {
+							"columnNumber": 19193,
+							"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+							"functionName": "me",
+							"isolate": "4902778506097296088",
+							"lineNumber": 86,
+							"sampleTraceId": 8989990713706636,
+							"scriptId": "7",
+							"url": "http://127.0.0.1:4461/chunks/document-app-eaxye032.js"
+						}
+					}
+				}
+			],
+			"refresh": {
+				"callbackMs": 6.133,
+				"enclosingTaskMs": 7.198,
+				"relativeMs": 191.041,
+				"generatedLine": 1653,
+				"generatedColumn": 476
+			}
+		},
+		{
+			"trial": 0,
+			"variant": "candidate",
+			"phase": "redo",
+			"windowMs": 3001.524,
+			"allTaskCount": 2223,
+			"allTaskMaxMs": 17.859,
+			"inputTaskMs": 0.4,
+			"deferredMaxMs": 17.859,
+			"heap": {
+				"total": 754193514,
+				"used": 698006570
+			},
+			"gate": {
+				"accepted": "48fc71562c05fc08f94e30c55249d234b1c83b56803e3f109e7c18a42e3dd9cb",
+				"clientHeight": 585,
+				"nativeLength": 1996,
+				"scrollHeight": 565998,
+				"scrollTop": 565413,
+				"selectionEnd": 1048576,
+				"selectionStart": 1048576,
+				"sourceLength": 1048577,
+				"window": {
+					"direction": "ltr",
+					"end": 1048577,
+					"height": 1101.8125,
+					"start": 1046582,
+					"top": 564769.625
+				}
+			},
+			"bundleSha": "dbea0bd65330190229302a28d84a2d7d8e547924409042d1ebd3b339a3b3080c",
+			"traceSha256": "2fff1ef57ab398830b6d49d83a24feda29dda81351c87e36816fad3519655adb",
+			"largestTasks": [
+				{
+					"relativeMs": 213.587,
+					"taskMs": 17.859,
+					"children": [
+						{
+							"name": "MajorGC",
+							"ms": 17.817,
+							"args": {
+								"type": "finalize incremental marking via task",
+								"usedHeapSizeAfter": 603962152,
+								"usedHeapSizeBefore": 1264886884
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 165.916,
+					"taskMs": 14.172,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 14.157,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+									"functionName": "o.port1.onmessage",
+									"isolate": "4902778506097296088",
+									"lineNumber": 8,
+									"sampleTraceId": 8989990713702630,
+									"scriptId": "23",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 673.164,
+					"taskMs": 13.406,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.388,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+									"functionName": "o.port1.onmessage",
+									"isolate": "4902778506097296088",
+									"lineNumber": 8,
+									"sampleTraceId": 8989990713698272,
+									"scriptId": "23",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.101,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 654082168,
+								"usedHeapSizeBefore": 682979696
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 625.544,
+					"taskMs": 13.258,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.244,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+									"functionName": "o.port1.onmessage",
+									"isolate": "4902778506097296088",
+									"lineNumber": 8,
+									"sampleTraceId": 8989990713698235,
+									"scriptId": "23",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 12.897,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 649714292,
+								"usedHeapSizeBefore": 678806388
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 740.05,
+					"taskMs": 13.128,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.116,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "37DB8E7C95DBDD0110C0A701EBEF3978",
+									"functionName": "o.port1.onmessage",
+									"isolate": "4902778506097296088",
+									"lineNumber": 8,
+									"sampleTraceId": 8989990713698057,
+									"scriptId": "23",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 12.815,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 660646872,
+								"usedHeapSizeBefore": 689768388
+							}
+						}
+					]
+				}
+			],
+			"maxAnimationFrameTask": {
+				"taskMs": 8.661,
+				"callbackMs": 7.021,
+				"relativeMs": 192.268
+			},
+			"refresh": {
+				"callbackMs": 6.702,
+				"enclosingTaskMs": 8.661,
+				"relativeMs": 193.139,
+				"generatedLine": 1653,
+				"generatedColumn": 476
+			}
+		},
+		{
+			"trial": 1,
+			"variant": "baseline",
+			"phase": "undo",
+			"windowMs": 3001.018,
+			"allTaskCount": 1740,
+			"allTaskMaxMs": 14.297,
+			"inputTaskMs": 0.57,
+			"deferredMaxMs": 14.297,
+			"heap": {
+				"total": 1186975459,
+				"used": 1100888131
+			},
+			"gate": {
+				"accepted": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a",
+				"clientHeight": 585,
+				"nativeLength": 1995,
+				"scrollHeight": 565615,
+				"scrollTop": 565029,
+				"selectionEnd": 1048576,
+				"selectionStart": 1048576,
+				"sourceLength": 1048576,
+				"window": {
+					"direction": "ltr",
+					"end": 1048576,
+					"height": 1101.8125,
+					"start": 1046582,
+					"top": 564386.46875
+				}
+			},
+			"bundleSha": "28d4ba7ebcf1abd630b21f6f7381c08402e80ca291fa63e27537b8e2c199be8c",
+			"traceSha256": "05e01fb81889982b192e6dea8c48ed6e41521ef8c05b9e784f099c560a1c593b",
+			"largestTasks": [
+				{
+					"relativeMs": 489.383,
+					"taskMs": 14.297,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 14.282,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "6B907E3437031A9C004E92872695D0E9",
+									"functionName": "o.port1.onmessage",
+									"isolate": "2369174490874329273",
+									"lineNumber": 8,
+									"sampleTraceId": 4191639820534507,
+									"scriptId": "17",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.981,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 826251364,
+								"usedHeapSizeBefore": 855235220
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 578.578,
+					"taskMs": 13.981,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.962,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "6B907E3437031A9C004E92872695D0E9",
+									"functionName": "o.port1.onmessage",
+									"isolate": "2369174490874329273",
+									"lineNumber": 8,
+									"sampleTraceId": 4191639820534371,
+									"scriptId": "17",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.685,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 835001436,
+								"usedHeapSizeBefore": 863928752
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 603.495,
+					"taskMs": 13.907,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.889,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "6B907E3437031A9C004E92872695D0E9",
+									"functionName": "o.port1.onmessage",
+									"isolate": "2369174490874329273",
+									"lineNumber": 8,
+									"sampleTraceId": 4191639820534719,
+									"scriptId": "17",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.575,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 837225600,
+								"usedHeapSizeBefore": 866112712
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 443.335,
+					"taskMs": 13.731,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.709,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "6B907E3437031A9C004E92872695D0E9",
+									"functionName": "o.port1.onmessage",
+									"isolate": "2369174490874329273",
+									"lineNumber": 8,
+									"sampleTraceId": 4191639820534450,
+									"scriptId": "17",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.378,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 821911688,
+								"usedHeapSizeBefore": 850950896
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 554.594,
+					"taskMs": 13.651,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.637,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "6B907E3437031A9C004E92872695D0E9",
+									"functionName": "o.port1.onmessage",
+									"isolate": "2369174490874329273",
+									"lineNumber": 8,
+									"sampleTraceId": 4191639820534275,
+									"scriptId": "17",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.328,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 832811480,
+								"usedHeapSizeBefore": 861743076
+							}
+						}
+					]
+				}
+			],
+			"maxAnimationFrameTask": {
+				"taskMs": 9.818,
+				"callbackMs": 8.369,
+				"relativeMs": 180.248
+			},
+			"refresh": {
+				"callbackMs": 8.088,
+				"enclosingTaskMs": 9.818,
+				"relativeMs": 181.039,
+				"generatedLine": 1653,
+				"generatedColumn": 476
+			}
+		},
+		{
+			"trial": 1,
+			"variant": "baseline",
+			"phase": "redo",
+			"windowMs": 3001.764,
+			"allTaskCount": 1396,
+			"allTaskMaxMs": 13.759,
+			"inputTaskMs": 0.393,
+			"deferredMaxMs": 13.759,
+			"heap": {
+				"total": 1186975459,
+				"used": 1100888131
+			},
+			"gate": {
+				"accepted": "48fc71562c05fc08f94e30c55249d234b1c83b56803e3f109e7c18a42e3dd9cb",
+				"clientHeight": 585,
+				"nativeLength": 1996,
+				"scrollHeight": 566062,
+				"scrollTop": 565477,
+				"selectionEnd": 1048576,
+				"selectionStart": 1048576,
+				"sourceLength": 1048577,
+				"window": {
+					"direction": "ltr",
+					"end": 1048577,
+					"height": 1101.8125,
+					"start": 1046582,
+					"top": 564833.53125
+				}
+			},
+			"bundleSha": "28d4ba7ebcf1abd630b21f6f7381c08402e80ca291fa63e27537b8e2c199be8c",
+			"traceSha256": "8c4542a8d49dd0f04748500f86748305d6d3a563418ca414cc8c5992ad62eb7f",
+			"largestTasks": [
+				{
+					"relativeMs": 651.759,
+					"taskMs": 13.759,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.743,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "6B907E3437031A9C004E92872695D0E9",
+									"functionName": "o.port1.onmessage",
+									"isolate": "2369174490874329273",
+									"lineNumber": 8,
+									"sampleTraceId": 4191639820538048,
+									"scriptId": "17",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.44,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1067525968,
+								"usedHeapSizeBefore": 1096401224
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 700.005,
+					"taskMs": 13.5,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.482,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "6B907E3437031A9C004E92872695D0E9",
+									"functionName": "o.port1.onmessage",
+									"isolate": "2369174490874329273",
+									"lineNumber": 8,
+									"sampleTraceId": 4191639820537964,
+									"scriptId": "17",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.227,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1071840460,
+								"usedHeapSizeBefore": 1100885628
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 583.096,
+					"taskMs": 13.331,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.3,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "6B907E3437031A9C004E92872695D0E9",
+									"functionName": "o.port1.onmessage",
+									"isolate": "2369174490874329273",
+									"lineNumber": 8,
+									"sampleTraceId": 4191639820538033,
+									"scriptId": "17",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.044,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1060906128,
+								"usedHeapSizeBefore": 1089840460
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 535.133,
+					"taskMs": 13.323,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.308,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "6B907E3437031A9C004E92872695D0E9",
+									"functionName": "o.port1.onmessage",
+									"isolate": "2369174490874329273",
+									"lineNumber": 8,
+									"sampleTraceId": 4191639820538751,
+									"scriptId": "17",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 12.56,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1056560944,
+								"usedHeapSizeBefore": 1085198868
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 607.751,
+					"taskMs": 13.194,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.179,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "6B907E3437031A9C004E92872695D0E9",
+									"functionName": "o.port1.onmessage",
+									"isolate": "2369174490874329273",
+									"lineNumber": 8,
+									"sampleTraceId": 4191639820537994,
+									"scriptId": "17",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 12.919,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1063156068,
+								"usedHeapSizeBefore": 1092030652
+							}
+						}
+					]
+				}
+			],
+			"maxAnimationFrameTask": {
+				"taskMs": 8.384,
+				"callbackMs": 7.021,
+				"relativeMs": 154.026
+			},
+			"refresh": {
+				"callbackMs": 6.725,
+				"enclosingTaskMs": 8.384,
+				"relativeMs": 154.813,
+				"generatedLine": 1653,
+				"generatedColumn": 476
+			}
+		},
+		{
+			"trial": 1,
+			"variant": "candidate",
+			"phase": "undo",
+			"windowMs": 3002.142,
+			"allTaskCount": 1778,
+			"allTaskMaxMs": 14.547,
+			"inputTaskMs": 0.581,
+			"deferredMaxMs": 14.547,
+			"heap": {
+				"total": 1111696702,
+				"used": 1045170578
+			},
+			"gate": {
+				"accepted": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a",
+				"clientHeight": 585,
+				"nativeLength": 1995,
+				"scrollHeight": 565551,
+				"scrollTop": 564965,
+				"selectionEnd": 1048576,
+				"selectionStart": 1048576,
+				"sourceLength": 1048576,
+				"window": {
+					"direction": "ltr",
+					"end": 1048576,
+					"height": 1101.8125,
+					"start": 1046582,
+					"top": 564322.46875
+				}
+			},
+			"bundleSha": "dbea0bd65330190229302a28d84a2d7d8e547924409042d1ebd3b339a3b3080c",
+			"traceSha256": "09de5871322c2c8440c08e6387a2896f1038ddfb589f07177b0e0e9a856d527c",
+			"largestTasks": [
+				{
+					"relativeMs": 831.845,
+					"taskMs": 14.547,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 14.526,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "AE9CFFFF54029FEF44FBEE4DEDB67D65",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9768584827554174870",
+									"lineNumber": 8,
+									"sampleTraceId": 962067665822797,
+									"scriptId": "18",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 14.196,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 761129528,
+								"usedHeapSizeBefore": 790093044
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 762.025,
+					"taskMs": 14.001,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.988,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "AE9CFFFF54029FEF44FBEE4DEDB67D65",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9768584827554174870",
+									"lineNumber": 8,
+									"sampleTraceId": 962067665837021,
+									"scriptId": "18",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.17,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 754624416,
+								"usedHeapSizeBefore": 783212984
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 808.446,
+					"taskMs": 13.862,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.846,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "AE9CFFFF54029FEF44FBEE4DEDB67D65",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9768584827554174870",
+									"lineNumber": 8,
+									"sampleTraceId": 962067665822829,
+									"scriptId": "18",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.585,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 758906904,
+								"usedHeapSizeBefore": 788114452
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 876.492,
+					"taskMs": 13.75,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.735,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "AE9CFFFF54029FEF44FBEE4DEDB67D65",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9768584827554174870",
+									"lineNumber": 8,
+									"sampleTraceId": 962067665822858,
+									"scriptId": "18",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.471,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 765538648,
+								"usedHeapSizeBefore": 794467716
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 1091.195,
+					"taskMs": 13.636,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.621,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "AE9CFFFF54029FEF44FBEE4DEDB67D65",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9768584827554174870",
+									"lineNumber": 8,
+									"sampleTraceId": 962067665823701,
+									"scriptId": "18",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.258,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 816347196,
+								"usedHeapSizeBefore": 845475608
+							}
+						}
+					]
+				}
+			],
+			"maxAnimationFrameTask": {
+				"taskMs": 7.208,
+				"callbackMs": 5.995,
+				"relativeMs": 170.326
+			},
+			"refresh": {
+				"callbackMs": 5.789,
+				"enclosingTaskMs": 7.208,
+				"relativeMs": 170.986,
+				"generatedLine": 1653,
+				"generatedColumn": 476
+			}
+		},
+		{
+			"trial": 1,
+			"variant": "candidate",
+			"phase": "redo",
+			"windowMs": 3001.194,
+			"allTaskCount": 1380,
+			"allTaskMaxMs": 13.258,
+			"inputTaskMs": 0.385,
+			"deferredMaxMs": 13.258,
+			"heap": {
+				"total": 1111696702,
+				"used": 1045170578
+			},
+			"gate": {
+				"accepted": "48fc71562c05fc08f94e30c55249d234b1c83b56803e3f109e7c18a42e3dd9cb",
+				"clientHeight": 585,
+				"nativeLength": 1996,
+				"scrollHeight": 565998,
+				"scrollTop": 565413,
+				"selectionEnd": 1048576,
+				"selectionStart": 1048576,
+				"sourceLength": 1048577,
+				"window": {
+					"direction": "ltr",
+					"end": 1048577,
+					"height": 1101.8125,
+					"start": 1046582,
+					"top": 564769.53125
+				}
+			},
+			"bundleSha": "dbea0bd65330190229302a28d84a2d7d8e547924409042d1ebd3b339a3b3080c",
+			"traceSha256": "bba151e8d7d704dede12b3a61ac2c3e98c9cb354f4d3ba7cf66d22ecddf56309",
+			"largestTasks": [
+				{
+					"relativeMs": 606.455,
+					"taskMs": 13.258,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.244,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "AE9CFFFF54029FEF44FBEE4DEDB67D65",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9768584827554174870",
+									"lineNumber": 8,
+									"sampleTraceId": 962067665827211,
+									"scriptId": "18",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 12.99,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 991638348,
+								"usedHeapSizeBefore": 1020522296
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 721.747,
+					"taskMs": 13.222,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.213,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "AE9CFFFF54029FEF44FBEE4DEDB67D65",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9768584827554174870",
+									"lineNumber": 8,
+									"sampleTraceId": 962067665827401,
+									"scriptId": "18",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 12.922,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1002575120,
+								"usedHeapSizeBefore": 1031718280
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 583.097,
+					"taskMs": 13.21,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.198,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "AE9CFFFF54029FEF44FBEE4DEDB67D65",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9768584827554174870",
+									"lineNumber": 8,
+									"sampleTraceId": 962067665827243,
+									"scriptId": "18",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 12.855,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 989453348,
+								"usedHeapSizeBefore": 1018502596
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 698.235,
+					"taskMs": 13.188,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.173,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "AE9CFFFF54029FEF44FBEE4DEDB67D65",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9768584827554174870",
+									"lineNumber": 8,
+									"sampleTraceId": 962067665827437,
+									"scriptId": "18",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 12.911,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1000356000,
+								"usedHeapSizeBefore": 1029268932
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 629.973,
+					"taskMs": 12.806,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 12.789,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "AE9CFFFF54029FEF44FBEE4DEDB67D65",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9768584827554174870",
+									"lineNumber": 8,
+									"sampleTraceId": 962067665827307,
+									"scriptId": "18",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 12.521,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 993823280,
+								"usedHeapSizeBefore": 1022718068
+							}
+						}
+					]
+				}
+			],
+			"maxAnimationFrameTask": {
+				"taskMs": 6.76,
+				"callbackMs": 5.597,
+				"relativeMs": 163.663
+			},
+			"refresh": {
+				"callbackMs": 5.392,
+				"enclosingTaskMs": 6.76,
+				"relativeMs": 164.268,
+				"generatedLine": 1653,
+				"generatedColumn": 476
+			}
+		},
+		{
+			"trial": 2,
+			"variant": "baseline",
+			"phase": "undo",
+			"windowMs": 3002.205,
+			"allTaskCount": 1749,
+			"allTaskMaxMs": 13.92,
+			"inputTaskMs": 0.606,
+			"deferredMaxMs": 13.92,
+			"heap": {
+				"total": 1189678790,
+				"used": 1106718590
+			},
+			"gate": {
+				"accepted": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a",
+				"clientHeight": 585,
+				"nativeLength": 1995,
+				"scrollHeight": 565583,
+				"scrollTop": 564998,
+				"selectionEnd": 1048576,
+				"selectionStart": 1048576,
+				"sourceLength": 1048576,
+				"window": {
+					"direction": "ltr",
+					"end": 1048576,
+					"height": 1101.8125,
+					"start": 1046582,
+					"top": 564354.5
+				}
+			},
+			"bundleSha": "28d4ba7ebcf1abd630b21f6f7381c08402e80ca291fa63e27537b8e2c199be8c",
+			"traceSha256": "11139caca1424b84e90d90ef1efab01b8ce77424fe24455aa3353be8acd87dbf",
+			"largestTasks": [
+				{
+					"relativeMs": 733.439,
+					"taskMs": 13.92,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.902,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "B5D0AE998108CE1F73B6AB814D2588D6",
+									"functionName": "o.port1.onmessage",
+									"isolate": "15952172459649659646",
+									"lineNumber": 8,
+									"sampleTraceId": 8262691982164296,
+									"scriptId": "22",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.629,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 825057208,
+								"usedHeapSizeBefore": 854266568
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 683.396,
+					"taskMs": 13.91,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.898,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "B5D0AE998108CE1F73B6AB814D2588D6",
+									"functionName": "o.port1.onmessage",
+									"isolate": "15952172459649659646",
+									"lineNumber": 8,
+									"sampleTraceId": 8262691982164245,
+									"scriptId": "22",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.595,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 820775032,
+								"usedHeapSizeBefore": 850019268
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 799.685,
+					"taskMs": 13.881,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.862,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "B5D0AE998108CE1F73B6AB814D2588D6",
+									"functionName": "o.port1.onmessage",
+									"isolate": "15952172459649659646",
+									"lineNumber": 8,
+									"sampleTraceId": 8262691982163616,
+									"scriptId": "22",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.597,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 831613592,
+								"usedHeapSizeBefore": 860562520
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 825.088,
+					"taskMs": 13.542,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.519,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "B5D0AE998108CE1F73B6AB814D2588D6",
+									"functionName": "o.port1.onmessage",
+									"isolate": "15952172459649659646",
+									"lineNumber": 8,
+									"sampleTraceId": 8262691982163477,
+									"scriptId": "22",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.236,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 833873228,
+								"usedHeapSizeBefore": 862981988
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 709.688,
+					"taskMs": 13.467,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.454,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "B5D0AE998108CE1F73B6AB814D2588D6",
+									"functionName": "o.port1.onmessage",
+									"isolate": "15952172459649659646",
+									"lineNumber": 8,
+									"sampleTraceId": 8262691982164265,
+									"scriptId": "22",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.329,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 822902528,
+								"usedHeapSizeBefore": 853115016
+							}
+						}
+					]
+				}
+			],
+			"maxAnimationFrameTask": {
+				"taskMs": 9.601,
+				"callbackMs": 8.086,
+				"relativeMs": 189.573
+			},
+			"refresh": {
+				"callbackMs": 7.833,
+				"enclosingTaskMs": 9.601,
+				"relativeMs": 190.424,
+				"generatedLine": 1653,
+				"generatedColumn": 476
+			}
+		},
+		{
+			"trial": 2,
+			"variant": "baseline",
+			"phase": "redo",
+			"windowMs": 3000.955,
+			"allTaskCount": 1389,
+			"allTaskMaxMs": 13.479,
+			"inputTaskMs": 0.373,
+			"deferredMaxMs": 13.479,
+			"heap": {
+				"total": 1189678790,
+				"used": 1106718590
+			},
+			"gate": {
+				"accepted": "48fc71562c05fc08f94e30c55249d234b1c83b56803e3f109e7c18a42e3dd9cb",
+				"clientHeight": 585,
+				"nativeLength": 1996,
+				"scrollHeight": 566030,
+				"scrollTop": 565445,
+				"selectionEnd": 1048576,
+				"selectionStart": 1048576,
+				"sourceLength": 1048577,
+				"window": {
+					"direction": "ltr",
+					"end": 1048577,
+					"height": 1101.8125,
+					"start": 1046582,
+					"top": 564801.5625
+				}
+			},
+			"bundleSha": "28d4ba7ebcf1abd630b21f6f7381c08402e80ca291fa63e27537b8e2c199be8c",
+			"traceSha256": "164be77aa0124c47e0bf7dd7ebf823e40a8fbf15a2cc8b1985b02e9492704bda",
+			"largestTasks": [
+				{
+					"relativeMs": 584.101,
+					"taskMs": 13.479,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.463,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "B5D0AE998108CE1F73B6AB814D2588D6",
+									"functionName": "o.port1.onmessage",
+									"isolate": "15952172459649659646",
+									"lineNumber": 8,
+									"sampleTraceId": 8262691982159865,
+									"scriptId": "22",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.148,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1059745368,
+								"usedHeapSizeBefore": 1088763812
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 559.95,
+					"taskMs": 13.421,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.403,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "B5D0AE998108CE1F73B6AB814D2588D6",
+									"functionName": "o.port1.onmessage",
+									"isolate": "15952172459649659646",
+									"lineNumber": 8,
+									"sampleTraceId": 8262691982159833,
+									"scriptId": "22",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.126,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1057564044,
+								"usedHeapSizeBefore": 1086647972
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 534.958,
+					"taskMs": 13.381,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.359,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "B5D0AE998108CE1F73B6AB814D2588D6",
+									"functionName": "o.port1.onmessage",
+									"isolate": "15952172459649659646",
+									"lineNumber": 8,
+									"sampleTraceId": 8262691982159745,
+									"scriptId": "22",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 12.586,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1055369792,
+								"usedHeapSizeBefore": 1084022012
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 608.916,
+					"taskMs": 13.339,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.325,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "B5D0AE998108CE1F73B6AB814D2588D6",
+									"functionName": "o.port1.onmessage",
+									"isolate": "15952172459649659646",
+									"lineNumber": 8,
+									"sampleTraceId": 8262691982159661,
+									"scriptId": "22",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.068,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1061929696,
+								"usedHeapSizeBefore": 1090961968
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 651.518,
+					"taskMs": 13.18,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.158,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "B5D0AE998108CE1F73B6AB814D2588D6",
+									"functionName": "o.port1.onmessage",
+									"isolate": "15952172459649659646",
+									"lineNumber": 8,
+									"sampleTraceId": 8262691982159712,
+									"scriptId": "22",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 12.891,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1066351144,
+								"usedHeapSizeBefore": 1095256336
+							}
+						}
+					]
+				}
+			],
+			"maxAnimationFrameTask": {
+				"taskMs": 8.86,
+				"callbackMs": 7.337,
+				"relativeMs": 155.705
+			},
+			"refresh": {
+				"callbackMs": 7.082,
+				"enclosingTaskMs": 8.86,
+				"relativeMs": 156.609,
+				"generatedLine": 1653,
+				"generatedColumn": 476
+			}
+		},
+		{
+			"trial": 2,
+			"variant": "candidate",
+			"phase": "undo",
+			"windowMs": 3001.504,
+			"allTaskCount": 1784,
+			"allTaskMaxMs": 14.708,
+			"inputTaskMs": 0.571,
+			"deferredMaxMs": 14.708,
+			"heap": {
+				"total": 1181372002,
+				"used": 1102424538
+			},
+			"gate": {
+				"accepted": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a",
+				"clientHeight": 585,
+				"nativeLength": 1995,
+				"scrollHeight": 565551,
+				"scrollTop": 564966,
+				"selectionEnd": 1048576,
+				"selectionStart": 1048576,
+				"sourceLength": 1048576,
+				"window": {
+					"direction": "ltr",
+					"end": 1048576,
+					"height": 1101.8125,
+					"start": 1046582,
+					"top": 564322.59375
+				}
+			},
+			"bundleSha": "dbea0bd65330190229302a28d84a2d7d8e547924409042d1ebd3b339a3b3080c",
+			"traceSha256": "ab9b7b9c1432515f0acf0c87422f48a04c12d9b6d6e513144f90c860e7b22521",
+			"largestTasks": [
+				{
+					"relativeMs": 824.16,
+					"taskMs": 14.708,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 14.686,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C529C2738694C0F716FB7E84B134FEEC",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9375553758367987532",
+									"lineNumber": 8,
+									"sampleTraceId": 7732558058414737,
+									"scriptId": "19",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 14.399,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 816159048,
+								"usedHeapSizeBefore": 845087580
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 800.256,
+					"taskMs": 14.124,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 14.11,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C529C2738694C0F716FB7E84B134FEEC",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9375553758367987532",
+									"lineNumber": 8,
+									"sampleTraceId": 7732558058414829,
+									"scriptId": "19",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.855,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 814041536,
+								"usedHeapSizeBefore": 842894740
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 776.726,
+					"taskMs": 14.063,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 14.044,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C529C2738694C0F716FB7E84B134FEEC",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9375553758367987532",
+									"lineNumber": 8,
+									"sampleTraceId": 7732558058414792,
+									"scriptId": "19",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.727,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 811788256,
+								"usedHeapSizeBefore": 840867468
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 1229.9,
+					"taskMs": 13.668,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.653,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C529C2738694C0F716FB7E84B134FEEC",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9375553758367987532",
+									"lineNumber": 8,
+									"sampleTraceId": 7732558058396099,
+									"scriptId": "19",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.389,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 885125764,
+								"usedHeapSizeBefore": 914247220
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 1207.059,
+					"taskMs": 13.392,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.379,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C529C2738694C0F716FB7E84B134FEEC",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9375553758367987532",
+									"lineNumber": 8,
+									"sampleTraceId": 7732558058395935,
+									"scriptId": "19",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.137,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 882905304,
+								"usedHeapSizeBefore": 911853668
+							}
+						}
+					]
+				}
+			],
+			"maxAnimationFrameTask": {
+				"taskMs": 7.679,
+				"callbackMs": 6.319,
+				"relativeMs": 172.436
+			},
+			"refresh": {
+				"callbackMs": 6.04,
+				"enclosingTaskMs": 7.679,
+				"relativeMs": 173.117,
+				"generatedLine": 1653,
+				"generatedColumn": 476
+			}
+		},
+		{
+			"trial": 2,
+			"variant": "candidate",
+			"phase": "redo",
+			"windowMs": 3001.644,
+			"allTaskCount": 1386,
+			"allTaskMaxMs": 13.616,
+			"inputTaskMs": 0.424,
+			"deferredMaxMs": 13.616,
+			"heap": {
+				"total": 1181372002,
+				"used": 1102424538
+			},
+			"gate": {
+				"accepted": "48fc71562c05fc08f94e30c55249d234b1c83b56803e3f109e7c18a42e3dd9cb",
+				"clientHeight": 585,
+				"nativeLength": 1996,
+				"scrollHeight": 565998,
+				"scrollTop": 565413,
+				"selectionEnd": 1048576,
+				"selectionStart": 1048576,
+				"sourceLength": 1048577,
+				"window": {
+					"direction": "ltr",
+					"end": 1048577,
+					"height": 1101.8125,
+					"start": 1046582,
+					"top": 564769.65625
+				}
+			},
+			"bundleSha": "dbea0bd65330190229302a28d84a2d7d8e547924409042d1ebd3b339a3b3080c",
+			"traceSha256": "a4b4162cc5ffdd2b96254106f0402d8978f19e73bd9824c6e69cbc2c5e9eee29",
+			"largestTasks": [
+				{
+					"relativeMs": 570.898,
+					"taskMs": 13.616,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.597,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C529C2738694C0F716FB7E84B134FEEC",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9375553758367987532",
+									"lineNumber": 8,
+									"sampleTraceId": 7732558058392586,
+									"scriptId": "19",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.279,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1041402808,
+								"usedHeapSizeBefore": 1070577900
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 593.82,
+					"taskMs": 13.572,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.559,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C529C2738694C0F716FB7E84B134FEEC",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9375553758367987532",
+									"lineNumber": 8,
+									"sampleTraceId": 7732558058392618,
+									"scriptId": "19",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.246,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1043591432,
+								"usedHeapSizeBefore": 1072674380
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 726.769,
+					"taskMs": 13.566,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.551,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C529C2738694C0F716FB7E84B134FEEC",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9375553758367987532",
+									"lineNumber": 8,
+									"sampleTraceId": 7732558058393351,
+									"scriptId": "19",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 13.26,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1056723500,
+								"usedHeapSizeBefore": 1085657256
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 703.31,
+					"taskMs": 13.074,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 13.06,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C529C2738694C0F716FB7E84B134FEEC",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9375553758367987532",
+									"lineNumber": 8,
+									"sampleTraceId": 7732558058393442,
+									"scriptId": "19",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 12.81,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1054566788,
+								"usedHeapSizeBefore": 1083464812
+							}
+						}
+					]
+				},
+				{
+					"relativeMs": 680.696,
+					"taskMs": 12.989,
+					"children": [
+						{
+							"name": "FunctionCall",
+							"ms": 12.978,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "C529C2738694C0F716FB7E84B134FEEC",
+									"functionName": "o.port1.onmessage",
+									"isolate": "9375553758367987532",
+									"lineNumber": 8,
+									"sampleTraceId": 7732558058392763,
+									"scriptId": "19",
+									"url": "http://127.0.0.1:4461/chunks/document-app-c690jn96.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"ms": 12.715,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 1052412148,
+								"usedHeapSizeBefore": 1081276892
+							}
+						}
+					]
+				}
+			],
+			"maxAnimationFrameTask": {
+				"taskMs": 7.69,
+				"callbackMs": 6.254,
+				"relativeMs": 168.826
+			},
+			"refresh": {
+				"callbackMs": 5.984,
+				"enclosingTaskMs": 7.69,
+				"relativeMs": 169.633,
+				"generatedLine": 1653,
+				"generatedColumn": 476
+			}
+		}
+	],
+	"scope": "n3 alternating full-app1MiB EOF insert->Undo->Redo. Every arm restores identical disposable data/profile; same native backend/assets-only swap. Separate observer document cache cleared then exact accepted source SHA checked per operation. Source caret, native bounded fragment and EOF viewport checked.3s complete main RunTask windows include GC; no physical120Hz claim.",
+	"refreshSourceMap": {
+		"baseline": {
+			"source": "../src/client/document-app.ts",
+			"line": 2654,
+			"column": 19,
+			"name": ""
+		},
+		"candidate": {
+			"source": "../src/client/document-app.ts",
+			"line": 2654,
+			"column": 19,
+			"name": ""
+		}
+	}
+}

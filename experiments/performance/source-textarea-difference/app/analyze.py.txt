@@ -1,0 +1,23 @@
+import json,pathlib,statistics,hashlib
+p=pathlib.Path('/tmp/alkalye-difference-app');rows=[]
+for trial in range(3):
+ for variant in ['baseline','candidate']:
+  gate=json.loads((p/f'result-{variant}-{trial}.json').read_text());assert gate['passed'],gate
+  for phase in ['undo','redo']:
+   path=p/f'{phase}-{variant}-{trial}.trace.json';events=json.loads(path.read_text())['traceEvents']
+   marks={e['name']:e for e in events if e.get('name') in [phase+':start',phase+':end']};a,b=marks[phase+':start'],marks[phase+':end'];thread=a['pid'],a['tid']
+   tasks=[e for e in events if e.get('name')=='RunTask' and e.get('ph')=='X' and (e.get('pid'),e.get('tid'))==thread and e['ts']<=b['ts'] and e['ts']+e.get('dur',0)>=a['ts']]
+   initial=[e for e in tasks if e['ts']<=a['ts']<=e['ts']+e.get('dur',0)]
+   top=[]
+   for t in sorted(tasks,key=lambda e:e.get('dur',0),reverse=True)[:5]:
+    inside=[e for e in events if e.get('ph')=='X' and (e.get('pid'),e.get('tid'))==thread and e.get('ts',0)>=t['ts'] and e.get('ts',0)+e.get('dur',0)<=t['ts']+t.get('dur',0) and e.get('name') in ['FunctionCall','MinorGC','MajorGC','Layout','Paint','TimerFire','EventDispatch','FireAnimationFrame']]
+    top.append({'relativeMs':(t['ts']-a['ts'])/1000,'taskMs':t.get('dur',0)/1000,'children':[{'name':e['name'],'ms':e.get('dur',0)/1000,'args':e.get('args',{})} for e in sorted(inside,key=lambda e:e.get('dur',0),reverse=True)[:5]]})
+   rows.append({'trial':trial,'variant':variant,'phase':phase,'windowMs':(b['ts']-a['ts'])/1000,'allTaskCount':len(tasks),'allTaskMaxMs':max(e.get('dur',0)/1000 for e in tasks),'inputTaskMs':max(e.get('dur',0)/1000 for e in initial),'deferredMaxMs':max((e.get('dur',0)/1000 for e in tasks if e not in initial),default=0),'heap':gate['state']['observation']['heap'],'gate':gate['state'][phase],'bundleSha':gate['state']['bundleSha'],'traceSha256':hashlib.sha256(path.read_bytes()).hexdigest(),'largestTasks':top})
+summary={}
+for phase in ['undo','redo']:
+ summary[phase]={}
+ for variant in ['baseline','candidate']:
+  samples=[r for r in rows if r['phase']==phase and r['variant']==variant]
+  summary[phase][variant]={key:{'median':statistics.median(s[key] for s in samples),'max':max(s[key] for s in samples)} for key in ['allTaskMaxMs','inputTaskMs','deferredMaxMs']}
+r={'baselineCommit':'d26c0a8','candidateChange':'Only two private4096-code-unit string-comparison loops in SourceTextarea.difference; candidate formatted before build','nativeBackendCommit':'d26c0a8','cpuSampling':False,'sourceSha256':{v:hashlib.sha256((p/v/'src/client/source-textarea.ts').read_bytes()).hexdigest() for v in ['baseline','candidate']},'summary':summary,'rows':rows,'scope':'n3 alternating full-app1MiB EOF insert->Undo->Redo. Every arm restores identical disposable data/profile; same native backend/assets-only swap. Separate observer document cache cleared then exact accepted source SHA checked per operation. Source caret, native bounded fragment and EOF viewport checked.3s complete main RunTask windows include GC; no physical120Hz claim.'}
+(p/'analysis.json').write_text(json.dumps(r,indent=2)+'\n');print(json.dumps(summary,indent=2))

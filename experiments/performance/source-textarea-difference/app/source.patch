@@ -1,0 +1,33 @@
+--- /tmp/alkalye-difference-app/baseline/src/client/source-textarea.ts	2026-10-08 14:10:32
++++ /tmp/alkalye-difference-app/candidate/src/client/source-textarea.ts	2026-10-08 14:22:42
+@@ -305,6 +305,14 @@
+ 
+ function difference(before: string, after: string): SourceReplacement {
+ 	let start = 0
++	let blockLength = 4096
++	let limit = Math.min(before.length, after.length)
++	while (
++		start + blockLength <= limit &&
++		before.slice(start, start + blockLength) ===
++			after.slice(start, start + blockLength)
++	)
++		start += blockLength
+ 	while (
+ 		start < before.length &&
+ 		start < after.length &&
+@@ -314,6 +322,15 @@
+ 	let end = before.length,
+ 		nextEnd = after.length
+ 	while (
++		end - start >= blockLength &&
++		nextEnd - start >= blockLength &&
++		before.slice(end - blockLength, end) ===
++			after.slice(nextEnd - blockLength, nextEnd)
++	) {
++		end -= blockLength
++		nextEnd -= blockLength
++	}
++	while (
+ 		end > start &&
+ 		nextEnd > start &&
+ 		before[end - 1] === after[nextEnd - 1]
