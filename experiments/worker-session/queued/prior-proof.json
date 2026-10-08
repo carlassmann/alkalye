@@ -1,0 +1,52 @@
+{
+	"status": "passed-prior-revision",
+	"assertions": [
+		"simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections",
+		"browser identity is available before any network authentication",
+		"native browser account login serializes cookie issuance and agrees with server verification",
+		"worker opens real HTTP source into its IndexedDB-backed session",
+		"worker sync pulls independent peer HTTP action",
+		"replacement against stale Unicode source handle preserves peer insertion and persists locally",
+		"independent stale frontmatter replacement preserves prior local edit and peer body",
+		"worker edits converge through native server accepted snapshot",
+		"explicit Close releases session and prevents subsequent read",
+		"same worker reopens exact durable source",
+		"old session handles fail without mutation after reopen",
+		"expired handle rejection leaves source unchanged",
+		"worker saves local edit while HTTP is unavailable",
+		"failed remote sync remains a typed worker boundary failure",
+		"offline Close and reopen preserve durable pending source",
+		"reconnected worker publishes exact offline source and clears pending actions",
+		"independent worker opens existing durable accepted state after scoped close",
+		"worker Begin captures exact editor-local atom basis",
+		"FIFO adapter paints complete optimistic source while eight edits await acknowledgement",
+		"one scoped queue drain delivers eight source edits in order",
+		"worker acknowledgements preserve actual adapter optimistic source before explicit idle merge",
+		"legacy handle replacement cannot bypass active editor basis",
+		"worker retains distinct local basis and merged authoritative source",
+		"ambiguous queued command cannot be blindly replayed into duplicate text",
+		"authentication loss produces typed sync access failure",
+		"failed remote access preserves queued local draft and durable pending edits",
+		"explicit idle End adopts merged peer source without losing queued local edits",
+		"queued basis edits converge exactly through real HTTP acceptance",
+		"interrupting one save observer preserves independent queued draft delivery",
+		"interrupted observer does not duplicate generated text in worker basis",
+		"worker rejects over-limit edit before applying it",
+		"FIFO adapter stops failed suffix instead of sending invalid dependent offsets",
+		"recovery retains complete optimistic draft and rejected suffix without silent reset",
+		"rejected edit leaves worker editor basis unchanged",
+		"scoped adapter shutdown releases queue while draft remains available for recovery copy"
+	],
+	"assertionCount": 35,
+	"failure": null,
+	"testedBundlesSha256": {
+		"worker.js": "023d9ea854bde2b70455e2a32d2a6e71b7f58491e402a4542db50a6601dff3ee",
+		"browser-fixture.js": "6ea3b1be38eae55ac0b14e8f0c5ba8c2eadd52ce0660d035f3a56961cfab3c2d"
+	},
+	"postProofUnverifiedChanges": [
+		"Atomic try error mapper invalidates basis for every ambiguous throw",
+		"Adapter delivery labels distinguish applied-unsaved from unknown/rejected/blocked",
+		"Save observer starts immediately and asserts interrupted exit",
+		"Separate-account permission fixture prepared but not called/run"
+	]
+}

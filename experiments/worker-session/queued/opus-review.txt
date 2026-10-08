@@ -1,0 +1,41 @@
+Six files read, nothing run.
+
+## Blockers to fix before the runtime proof
+
+1. **The permission fixture may not actually use a distinct owner.** `permission-fixture.ts:28-35` builds the owner client on the shared `FetchHttpClient`, and fetch sends cookies by default (`same-origin`). So owner requests carry the member's cookie session as well as the bearer token. If the server prefers cookies over the bearer, the member creates the workspace. The `login.subject !== member.subject` check at `:36` only compares the IDs; it doesn't prove who the server acted as. Cheapest fix: right after `documents.create`, check that the member's snapshot read or `worker.Open` fails with `access` before the invitation is accepted. Or send owner requests with `credentials: "omit"`.
+2. **Refused actions may count as rejected, not pending.** `permission-fixture.ts:63` asserts `pending > 0` after the access refusal. If `DocumentSession` moves access-refused actions into `rejected()`, that assert fails, and the reauth "accepted once" check at `:74` can't pass. I can't confirm this from the six files. If it fails, it's a real result, not a fixture bug, so record it that way.
+3. **The over-limit edit must fail through `saved`, not by throwing.** `browser-fixture.ts:168,172` expects `Rejected` with the basis unchanged. If `session.replace` throws for over-limit text, the new `catch` (`worker-session.ts:129-132`) turns it into `AppliedUnknown` and drops the basis. Same caveat: I can't verify this from the allowed files.
+4. **Wrong label when replacing after close.** `editor-queue.ts:86-88`: an edit added after close keeps `delivery: "queued"` while its `saved` fails with `QueuedBlocked`. Set `delivery = "blocked"` in that branch. Also use `Exit.fail(blocked())` rather than `Effect.fail` for `doneUnsafe`. This source hasn't been type-checked yet, so `bun run check` must confirm it.
+
+## Reviewed and sound
+- **`Effect.try` invalidation** (`worker-session.ts:120-133`): the authoritative replace, branch apply and sequence advance are one sync block, and any throw clears the basis and returns `AppliedUnknown`. Interrupting while waiting on `saved` leaves the sequence advanced and consistent. A defect thrown inside `saved` becomes `SessionFailure` with the sequence advanced, which the client labels unknown. Correct. `:138` is redundant except for a no-op edit (no operation, saved succeeds), where it's harmless.
+- **Applied/acknowledged labels:** `applied` only moves on success or `Unsaved`, both of which mean the worker already advanced. `unknown` doesn't move it. Correct.
+- **FIFO scoped close:** `addFinalizer` is registered before `forkScoped`. Finalizers run in reverse, so the drain fiber is interrupted first, then the finalizer marks `sending` as unknown and `queued` as blocked. Labels for edits that already failed are kept. Edits taken off the queue but not yet processed are still covered, because `pending` is the source of truth.
+- **Interrupted save observer:** valid as an observer-only test, and the README says so. It could in theory flake if the RPC finishes before `Fiber.interrupt`, but it can't give a false pass.
+- **Not blockers:** the second worker reaches 7 of 8 handles (`End`/`Read` handles are never released), so one more `Read` would hit `HandleCapacity`. The first two editor queues stay alive until the journey ends, which is harmless.
+
+## Future continuous-typing handoff (smallest version)
+
+**Worker:**
+- `Merge{epoch E, seq N}`: goes through the same FIFO as `ReplaceQueued`. Requires basis E at sequence N and a clean queue. It forks the authoritative replica into candidate E′ at sequence 0 and keeps basis E. It returns E′, the merged source, and the submitted selection mapped by atom identity from E to E′ (no offset transforms).
+- `Adopt{E, N, E′}`: swaps E′ in and drops E.
+- `ReleaseCandidate{E′}`: drops E′ and keeps E.
+- At most one candidate exists, and it is released when the scope closes.
+
+**Main, in one synchronous task on reply:**
+- If the submitted sequence is still N, the source generation is unchanged, the selection/composition generation is unchanged, there is no active composition and there is no queue failure:
+  - write the candidate source and selection;
+  - add `Adopt` to the FIFO;
+  - switch the queue to E′ at sequence 0;
+  - all before the next input is handled.
+- Otherwise add `ReleaseCandidate` and keep E.
+
+**Handshake risks:**
+- **Atomicity:** the check, textarea write, `Adopt` enqueue and epoch switch must share one task. `beforeinput` can't interleave, but IME can. Bump the generation on `compositionstart`/`end` and on user `selectionchange`, ignore the `selectionchange` the adoption itself causes, and never adopt while `isComposing`.
+- **`Adopt` failing after the paint:** the worker must guarantee nothing can change E between `Merge` and `Adopt`. The FIFO plus main's sequence check gives that. If it still fails, E′ edits end up unknown and recovery goes through `Read`. Never discard the painted text.
+- **Starvation:** a typist who never pauses for a full round trip never passes the check. Send `Merge` only after the last submitted edit is acknowledged and input is idle, and measure how stale peer text gets.
+- **Native side effects:** setting `textarea.value` wipes the undo stack and resets scroll and selection. These need explicit handling or have to be accepted.
+- **Memory and cost:** a handoff briefly holds three copies (authoritative, E, E′) and clones the full source.
+- **Failure states:** refuse `Merge` while any edit is `unsaved`, `unknown` or `rejected`. Merging over those mixes recovery into adoption.
+
+I didn't write a plan file or call ExitPlanMode, since you limited me to Read, Grep and Glob. Several claude.ai connectors (GitHub, Slack and others) need authorizing in claude.ai connector settings before I can use them.
