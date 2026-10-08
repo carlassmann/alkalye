@@ -1,0 +1,35 @@
+Timeout waiting for peer to load coValue {
+  id: "[fixture-account-id-redacted]",
+  peerID: "ws://127.0.0.1:4220",
+}
+Timeout waiting for peer to load coValue {
+  id: "[fixture-account-id-redacted]",
+  peerID: "ws://127.0.0.1:4220",
+}
+Error withLoadedAccount {
+  err: 275 |             for (const peer of peers) {
+276 |                 node.syncManager.addPeer(peer);
+277 |             }
+278 |             const account = await node.load(accountID);
+279 |             if (account === "unavailable") {
+280 |                 throw new Error("Account unavailable from all peers");
+                                ^
+error: Account unavailable from all peers
+      at withLoadedAccount (/private/tmp/alkalye-main-rebench/node_modules/cojson/dist/localNode.js:280:27)
+      at async createJazzContextFromExistingCredentials (/private/tmp/alkalye-main-rebench/node_modules/jazz-tools/dist/chunk-MIPBSAS7.js:7053:33)
+      at async startWorker (/private/tmp/alkalye-main-rebench/node_modules/jazz-tools/dist/worker/index.js:58:25)
+,
+}
+275 |             for (const peer of peers) {
+276 |                 node.syncManager.addPeer(peer);
+277 |             }
+278 |             const account = await node.load(accountID);
+279 |             if (account === "unavailable") {
+280 |                 throw new Error("Account unavailable from all peers");
+                                ^
+error: Account unavailable from all peers
+      at withLoadedAccount (/private/tmp/alkalye-main-rebench/node_modules/cojson/dist/localNode.js:280:27)
+      at async createJazzContextFromExistingCredentials (/private/tmp/alkalye-main-rebench/node_modules/jazz-tools/dist/chunk-MIPBSAS7.js:7053:33)
+      at async startWorker (/private/tmp/alkalye-main-rebench/node_modules/jazz-tools/dist/worker/index.js:58:25)
+
+Bun v1.4.0 (macOS arm64)

@@ -1,0 +1,2 @@
+{"stage":"assigned","knownIdPersisted":true,"characters":2048,"sha256":"2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2"}
+{"stage":"sync-complete","knownIdPersisted":true,"characters":2048,"sha256":"2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2"}

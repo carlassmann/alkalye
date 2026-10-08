@@ -1,0 +1,31 @@
+import { join } from "node:path"
+import { pathToFileURL } from "node:url"
+
+let root = "/tmp/alkalye-main-sdk-proof"
+let marker = root + "/creation.pending.private.json"
+if (await Bun.file(marker).exists()) throw new Error("Prior creation marker exists; inspect recorded state instead of repeating creation")
+let credentials = await Bun.file(root + "/auth.private.json").json()
+let source = ("# Main SDK fixture\n\n" + "Matched independent source.\n".repeat(100)).slice(0, 2048)
+let sourceFile = root + "/small2-source.private.txt"
+await Bun.write(sourceFile, source)
+let sourceSha256 = new Bun.CryptoHasher("sha256").update(source).digest("hex")
+let checkout = "/tmp/alkalye-main-rebench"
+let { startWorker } = await import(pathToFileURL(join(checkout, "node_modules/jazz-tools/dist/worker/index.js")).href)
+let { UserAccount } = await import(pathToFileURL(join(checkout, "src/schema/index.ts")).href)
+let { createPersonalDocument } = await import(pathToFileURL(join(checkout, "src/app/features/documents/lib/documents.ts")).href)
+let context = await startWorker({accountID:credentials.accountID,accountSecret:credentials.accountSecret,AccountSchema:UserAccount,syncServer:"ws://127.0.0.1:4220",skipInboxLoad:true,asActiveAccount:false})
+try {
+ await context.waitForConnection()
+ let account = await context.worker.$jazz.ensureLoaded({resolve:{root:{documents:true}}})
+ if (!account.root?.documents?.$isLoaded) throw new Error("Account document list not ready; no creation attempted")
+ await Bun.write(marker, JSON.stringify({stage:"pending-create",sourceSha256,sourceCharacters:source.length}))
+ let document = await createPersonalDocument(account, source)
+ let documentId = document.$jazz.id
+ await Bun.write(root + "/created.private.json", JSON.stringify({documentId,sourceFile,sourceSha256}))
+ await Bun.write(marker, JSON.stringify({stage:"assigned",documentId,sourceSha256,sourceCharacters:source.length}))
+ await Bun.write(root + "/small2-read-config.private.json", JSON.stringify({checkout,authFile:root+"/auth.private.json",syncServer:"ws://127.0.0.1:4220",documentId,sourceFile,deadlineMs:15000}))
+ console.log(JSON.stringify({stage:"assigned",knownIdPersisted:true,characters:source.length,sha256:sourceSha256}))
+ await context.worker.$jazz.waitForAllCoValuesSync()
+ await Bun.write(marker, JSON.stringify({stage:"sync-complete",documentId,sourceSha256,sourceCharacters:source.length}))
+ console.log(JSON.stringify({stage:"sync-complete",knownIdPersisted:true,characters:source.length,sha256:sourceSha256}))
+} finally { await context.shutdownWorker() }

@@ -1,0 +1,23 @@
+import {browser,wait} from "/Users/carlassmann/.codex/worktrees/b513/alkalye/tests/browser-driver"
+let root="/tmp/alkalye-main-sdk-proof",session="main-sdk-create-publisher-"+Date.now()
+let known=await Bun.file(root+"/known-created.private.json").json()
+try{
+ browser(session,"--profile",root+"/profile-main-sdk-setup-1791476963628","open","http://127.0.0.1:4490/app/doc/"+known.documentId)
+ wait(session,"document.querySelector('.cm-content')?.cmTile?.view!==undefined")
+ wait(session,"window.__benchmark?.socketFrames.some(frame=>frame.direction==='receive')")
+ console.log(JSON.stringify({stage:"existing-profile-connected",mutated:false}))
+ let child=Bun.spawn(["bun","create-once.js"],{cwd:root,stdout:"pipe",stderr:"pipe"})
+ console.log(JSON.stringify({stage:"creation-process",pid:child.pid}))
+ let deadline=setTimeout(()=>child.kill(),45000)
+ let code=await child.exited;clearTimeout(deadline)
+ await Bun.write(root+"/create-retry.stdout.log",await new Response(child.stdout).text())
+ await Bun.write(root+"/create-retry.stderr.log",await new Response(child.stderr).text())
+ if(code!==0)throw new Error("SDK creation exited "+code)
+ let reader=Bun.spawn(["bun","proof.js","read",root+"/small2-read-config.private.json"],{cwd:root,stdout:"pipe",stderr:"pipe"})
+ let readerDeadline=setTimeout(()=>reader.kill(),25000)
+ let readerCode=await reader.exited;clearTimeout(readerDeadline)
+ await Bun.write(root+"/small2-reader.stdout.log",await new Response(reader.stdout).text())
+ await Bun.write(root+"/small2-reader.stderr.log",await new Response(reader.stderr).text())
+ if(readerCode!==0)throw new Error("SDK reader exited "+readerCode)
+ console.log(JSON.stringify({stage:"independent-reader-complete",readerExit:readerCode}))
+}finally{browser(session,"close")}

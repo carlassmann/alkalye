@@ -1,0 +1,21 @@
+{
+	"baseline": "a749728a8f9a1cb984c980a5ea2daf984d60ae68",
+	"scope": "untimed public SDK create, durable wait, fresh independent reader, same-account browser view",
+	"characters": 2048,
+	"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+	"creatorExit": 0,
+	"readerExit": 0,
+	"browserViewExit": 0,
+	"creationIssuedOnce": true,
+	"pendingBeforeCreate": true,
+	"assignedBeforeSyncWait": true,
+	"firstAttempt": {
+		"exit": 1,
+		"phase": "startWorker",
+		"pendingMarker": false,
+		"assignedMarker": false,
+		"creationIssued": false
+	},
+	"browserKeptConnectedDuringCreationAndRead": true,
+	"performanceMeasured": false
+}
