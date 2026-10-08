@@ -79,6 +79,20 @@
 			log proves that server failure, but does not establish when it occurred
 			relative to the undo deadline or which operation caused it.
 		</p>
+		<h2>Current snapshot diagnostic</h2>
+		<p>
+			A separate production diagnostic on <code>0e13876</code> passed exact edit
+			and undo acceptance for a trusted key at the end of a 1MiB document. The
+			unsampled input task took 7.25ms. Its largest deferred task took 20.76ms,
+			including a 20.27ms major garbage collection. V8 recorded heap usage
+			falling from 1.32GB to 563MB during that collection. A separate sampled
+			run identified snapshot atom compaction and cold visible-text traversal as
+			expensive main-thread paths. The statistics worker contributed about 4ms
+			of sampled work. The authoritative document session still runs on the main
+			thread. These samples identify expensive work, not which retained objects
+			caused collection or how much a change will save. Evidence:
+			<code>experiments/performance/production-allocation-oct8</code>.
+		</p>
 		<h2>Earlier journey comparison with main</h2>
 		<p>
 			Both production builds used their own local sync servers, signed accounts
