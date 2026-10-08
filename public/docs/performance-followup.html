@@ -1636,6 +1636,15 @@
 		</p>
 		<h2>Twenty real browser writers</h2>
 		<p>
+			RTL pointer selection had a verified defect: expanding the textarea inside
+			pointerdown changed the native offset before browser hit testing. The fix
+			lets native hit testing finish first, then expands and preserves the
+			selected anchor. Independent native controls and the editor agree on
+			click, held drag and released ranges for ASCII, mixed line endings and
+			RTL. Repeated pointerdown, cancellation and disposal also pass.
+			Full-document expansion still needs work to meet the interaction budget.
+		</p>
+		<p>
 			A three-browser pilot and a twenty-browser journey now pass against the
 			production editor. Every independent account inserts one distinct marker;
 			all browsers converge, retain their own caret anchor and independently

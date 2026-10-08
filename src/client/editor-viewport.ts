@@ -69,6 +69,7 @@ export class EditorViewport {
 	private dragging = false
 	private lastInteraction = 0
 	private pointerDocument = false
+	private pointerFrame = 0
 	private selectionDocument = false
 	private nativeAcknowledgement = false
 	private revision = 0
@@ -135,6 +136,8 @@ export class EditorViewport {
 		element.addEventListener(
 			"pointerdown",
 			() => {
+				cancelAnimationFrame(this.pointerFrame)
+				this.pointerFrame = 0
 				this.readSelection()
 				let alreadyFull =
 					this.completeDocument() &&
@@ -145,28 +148,36 @@ export class EditorViewport {
 					this.dragging = true
 					return
 				}
-				let anchor = this.offsetAtHeight(this.scrollElement.scrollTop)
-				let before = this.topAt(anchor) - this.scrollElement.scrollTop
-				this.paint()
-				this.measure.textContent = measurementText(this.value) + "\u200b"
-				let node = this.measure.firstChild
-				if (node) {
-					let range = document.createRange()
-					range.setStart(node, this.text.nativeOffset(anchor))
-					range.setEnd(
-						node,
-						Math.min(
-							this.text.nativeOffset(anchor) + 1,
-							this.text.nativeOffset(this.text.length) + 1,
-						),
-					)
-					this.scrollElement.scrollTop =
-						this.paddingTop +
-						range.getBoundingClientRect().top -
-						this.measure.getBoundingClientRect().top -
-						before
-				}
 				this.dragging = true
+				// Native hit testing must finish against the fragment before replacing it.
+				this.pointerFrame = requestAnimationFrame(() => {
+					this.pointerFrame = 0
+					if (!this.dragging || this.abort.signal.aborted) return
+					this.readSelection()
+					this.dragging = false
+					let anchor = this.offsetAtHeight(this.scrollElement.scrollTop)
+					let before = this.topAt(anchor) - this.scrollElement.scrollTop
+					this.paint()
+					this.measure.textContent = measurementText(this.value) + "\u200b"
+					let node = this.measure.firstChild
+					if (node) {
+						let range = document.createRange()
+						range.setStart(node, this.text.nativeOffset(anchor))
+						range.setEnd(
+							node,
+							Math.min(
+								this.text.nativeOffset(anchor) + 1,
+								this.text.nativeOffset(this.text.length) + 1,
+							),
+						)
+						this.scrollElement.scrollTop =
+							this.paddingTop +
+							range.getBoundingClientRect().top -
+							this.measure.getBoundingClientRect().top -
+							before
+					}
+					this.dragging = true
+				})
 			},
 			{ signal },
 		)
@@ -174,6 +185,8 @@ export class EditorViewport {
 			"pointerup",
 			() => {
 				if (!this.dragging) return
+				cancelAnimationFrame(this.pointerFrame)
+				this.pointerFrame = 0
 				this.readSelection(true)
 				this.dragging = false
 				this.pointerDocument = false
@@ -185,6 +198,8 @@ export class EditorViewport {
 			"pointercancel",
 			() => {
 				if (!this.dragging) return
+				cancelAnimationFrame(this.pointerFrame)
+				this.pointerFrame = 0
 				this.readSelection(true)
 				this.dragging = false
 				this.pointerDocument = false
@@ -513,6 +528,7 @@ export class EditorViewport {
 		this.mutation.disconnect()
 		cancelAnimationFrame(this.frame)
 		cancelAnimationFrame(this.idleFrame)
+		cancelAnimationFrame(this.pointerFrame)
 		this.spacer.remove()
 		this.measure.remove()
 		delete this.scrollElement.dataset.editorViewport

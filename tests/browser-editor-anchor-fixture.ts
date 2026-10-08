@@ -349,6 +349,7 @@ let scenarios: Scenario[] = [
 declare global {
 	interface Window {
 		anchorCases: () => Promise<Awaited<ReturnType<typeof exercise>>[]>
+		anchorPointer: ReturnType<typeof mountPointer>
 	}
 }
 window.anchorCases = async function () {
@@ -357,13 +358,158 @@ window.anchorCases = async function () {
 	return results
 }
 
-window.anchorCases().then(
-	results => {
-		document.body.dataset.results = JSON.stringify(results)
-		document.body.dataset.done = "true"
-	},
-	error => {
-		document.body.dataset.failure = String(error)
-		document.body.dataset.done = "true"
-	},
-)
+if (new URL(location.href).searchParams.has("pointer")) {
+	window.anchorPointer = mountPointer()
+	document.body.dataset.ready = "true"
+} else {
+	window.anchorCases().then(
+		results => {
+			document.body.dataset.results = JSON.stringify(results)
+			document.body.dataset.done = "true"
+		},
+		error => {
+			document.body.dataset.failure = String(error)
+			document.body.dataset.done = "true"
+		},
+	)
+}
+
+function mountPointer() {
+	let name = new URL(location.href).searchParams.get("pointer") ?? "ascii"
+	let line =
+		name === "mixed"
+			? "alpha 😀 beta\r\nnext lone\rrow 😀 end\n"
+			: name === "rtl"
+				? "שלום עולם 😀 אבג\r\nمرحبا بالعالم\n"
+				: "alpha beta gamma 😀\n"
+	let content = line.repeat(Math.ceil(131072 / line.length)).slice(0, 131072)
+	let replica = new Replica("pointer-fixture")
+	replica.edit("doc", content)
+	let editor = new EditorElement()
+	editor.configure({
+		content,
+		atoms: replica.visible("doc"),
+		editable: true,
+		preferences: editorPreferences({
+			autocomplete: false,
+			accessibleInput: new URL(location.href).searchParams.has("full"),
+		}),
+		documents: () => [],
+		isDrawing: () => false,
+		openDrawing() {},
+		openDocument() {},
+		comments: () => [],
+		createLinkedDocument: async () => "unused",
+		report(error) {
+			throw error
+		},
+		change() {
+			return undefined
+		},
+		undo() {},
+		select() {},
+		requestAsset() {},
+		attach() {},
+		command() {},
+		find() {},
+	})
+	editor.style.height = "800px"
+	document.body.append(editor)
+	let input = editor.querySelector<HTMLTextAreaElement>("#editor")
+	if (!input) throw Error("Missing native input")
+	let source = editor.source
+	if (!source) throw Error("Missing SourceTextarea")
+	let events: {
+		type: string
+		trusted: boolean
+		buttons: number
+		x: number
+		y: number
+	}[] = []
+	for (let type of ["pointerdown", "pointermove", "pointerup"])
+		input.addEventListener(type, event => {
+			if (!(event instanceof PointerEvent)) return
+			events.push({
+				type: event.type,
+				trusted: event.isTrusted,
+				buttons: event.buttons,
+				x: event.clientX,
+				y: event.clientY,
+			})
+		})
+	let fixture = {
+		nativeCoordinate(raw: number, top: number) {
+			if (!source) throw Error("Missing source")
+			source.setSelectionRange(raw, raw)
+			let expected = source.selectionStart
+			let offset = input.selectionStart
+			source.viewport.scrollTop = top
+			let measure = editor.querySelector("[data-viewport-measure]")
+			let node = measure?.firstChild
+			if (!measure || !node || node.textContent !== input.value + "\u200b")
+				throw Error(
+					"Full-input control measure does not match actual native value",
+				)
+			let range = document.createRange()
+			range.setStart(node, offset)
+			range.collapse(true)
+			let rect = range.getBoundingClientRect()
+			if (!rect.height) throw Error("No native caret rectangle")
+			let native = input.getBoundingClientRect()
+			let mirror = measure.getBoundingClientRect()
+			let style = getComputedStyle(input)
+			let dx = native.left + parseFloat(style.paddingLeft) - mirror.left
+			let dy = native.top + parseFloat(style.paddingTop) - mirror.top
+			return {
+				raw: expected,
+				x: Math.round(rect.left + dx),
+				y: Math.round(rect.top + rect.height * 0.5 + dy),
+				height: rect.height,
+				top,
+			}
+		},
+		state() {
+			return {
+				sourceExact: source.value === content,
+				publicStart: source.selectionStart,
+				publicEnd: source.selectionEnd,
+				nativeStart: input.selectionStart,
+				nativeEnd: input.selectionEnd,
+				nativeLength: input.value.length,
+				window: source.viewport.viewport,
+				scrollTop: source.viewport.scrollElement.scrollTop,
+				events,
+			}
+		},
+		reveal() {
+			source.setSelectionRange(65536, 65536)
+			source.viewport.revealOffset(65536)
+		},
+		clear() {
+			events = []
+		},
+		async settle() {
+			await new Promise<void>(resolve =>
+				requestIdleCallback(() => requestAnimationFrame(() => resolve())),
+			)
+		},
+		async cancel(dispose: boolean) {
+			source.setSelectionRange(65536, 65536)
+			source.viewport.revealOffset(65536)
+			let before = source.viewport.viewport
+			input.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }))
+			input.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }))
+			if (dispose) source.viewport.dispose()
+			else window.dispatchEvent(new PointerEvent("pointercancel"))
+			await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+			return {
+				sourceExact: source.value === content,
+				unchangedWindow:
+					source.viewport.viewport.start === before.start &&
+					source.viewport.viewport.end === before.end,
+				detached: !editor.querySelector("[data-viewport-measure]"),
+			}
+		},
+	}
+	return fixture
+}
