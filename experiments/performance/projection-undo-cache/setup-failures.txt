@@ -1,0 +1,10 @@
+Pre-runtime setup command requested cwd /tmp/alkalye-source-undo-projection/app/baseline before it existed. Tool rejected process creation with 'No such file or directory (os error 2)'. No command body executed, browser/traces not started. Corrected setup ran from existing workspace then built after creating directories.
+
+Initial strict command:
+bun run types
+Returned exit1: error: Script not found "types"
+Corrected command:
+bun run check:types
+Returned exit0, retained types.log.
+
+Original313-proof predecessor259 skipped CRLF caret assertion based on inherited baseline-hazard text. Root challenged it:2ccca63 already includes CRLF fix. Withdrawn unsupported defect claim. Corrected313 proof executed baseline native comparator and desired canonical CRLF boundary/end rounding, PASS.

@@ -1,0 +1,71 @@
+import { browser, evaluate, serverAddress, assert } from "./browser-driver"
+import { object } from "../src/shared/model"
+if (process.argv.includes("--serve")) {
+	let built = await Bun.build({
+		entrypoints: ["tests/cache-source-fixture.ts"],
+		target: "browser",
+	})
+	if (!built.success)
+		throw new AggregateError(built.logs, "Cache fixture build failed")
+	let script = built.outputs[0]
+	if (!script) throw new Error("Missing script")
+	let style =
+		(await Bun.file("src/client/components/editor.css").text()) +
+		(await Bun.file("src/client/components/editor-viewport.css").text())
+	let server = Bun.serve({
+		port: 0,
+		routes: {
+			"/": new Response(
+				`<!doctype html><style>:root{--font-mono:monospace;--font-size:18px;--line-height:1.8;--background:#fff;--foreground:#111}html,body{height:800px;margin:0}${style}</style><script type="module" src="/fixture.js"></script>`,
+				{ headers: { "Content-Type": "text/html" } },
+			),
+			"/fixture.js": new Response(script, {
+				headers: { "Content-Type": "text/javascript" },
+			}),
+		},
+		fetch: () => new Response("Missing", { status: 404 }),
+	})
+	console.log(server.url.href)
+	process.once("SIGTERM", () => {
+		server.stop(true)
+		process.exit(0)
+	})
+	await new Promise(() => {})
+} else {
+	let server = Bun.spawn(["bun", "tests/browser-cache-source.ts", "--serve"], {
+		stdout: "pipe",
+		stderr: "inherit",
+	})
+	let session = "cache-source-" + Date.now()
+	try {
+		let url = await serverAddress(server.stdout)
+		browser(session, "open", url)
+		browser(session, "wait", "--fn", "window.cacheDone===true")
+		let state = object(
+			evaluate(
+				session,
+				"({failure:window.cacheFailure,results:window.cacheResults})",
+			),
+		)
+		if (state.failure) throw new Error(String(state.failure))
+		console.log(JSON.stringify(state))
+		browser(session, "press", "x")
+		browser(
+			session,
+			"wait",
+			"--fn",
+			"window.cacheTyped===window.cacheInitial.slice(0,2)+'x'+window.cacheInitial.slice(2)",
+		)
+		assert(
+			true,
+			"trusted native input retains exact source projection and caret",
+		)
+	} finally {
+		try {
+			browser(session, "close")
+		} finally {
+			server.kill()
+			await server.exited
+		}
+	}
+}

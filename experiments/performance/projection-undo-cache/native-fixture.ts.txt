@@ -1,0 +1,184 @@
+import { SourceTextarea as BaselineTextarea } from "../src/client/source-textarea-oracle"
+import { SourceTextarea } from "../src/client/source-textarea"
+import type { ProjectionMode } from "../src/client/source-textarea"
+import { project, identity, toView } from "../src/shared/projection"
+
+let documents = [{ id: "first", title: "First", archived: false }]
+let mode: ProjectionMode = "project"
+let native = document.createElement("textarea")
+native.id = "editor"
+document.body.append(native)
+let source = new SourceTextarea(native, "", {
+	documents: () => documents,
+	mode: () => mode,
+	caretTop: () => undefined,
+	painted() {},
+	fullDocument: true,
+})
+let controlNative = document.createElement("textarea")
+document.body.append(controlNative)
+let control = new BaselineTextarea(controlNative, "", {
+	documents: () => documents,
+	mode: () => mode,
+	caretTop: () => undefined,
+	painted() {},
+	fullDocument: true,
+})
+let crlfFacts: { requested: number; source: number; native: number }[] = []
+let assertions = 0
+let stages: string[] = []
+function check(condition: boolean, message: string) {
+	assertions++
+	if (!condition) throw new Error(message)
+}
+function verify(content: string, start: number, end = start) {
+	let expected =
+		mode === "raw"
+			? identity(content)
+			: project(content, { documents, active: { start, end }, iconSpace: true })
+	check(source.value === content, "source changed")
+	check(
+		JSON.stringify(source.projection) === JSON.stringify(expected),
+		"fresh projection differs: " + stages.at(-1),
+	)
+	check(source.sourceIndex.value === content, "source index differs")
+	if (content.includes("\r")) {
+		control.reconcile(content, start, end)
+		check(
+			source.selectionStart === control.selectionStart &&
+				source.selectionEnd === control.selectionEnd,
+			"CRLF baseline source caret differs",
+		)
+		check(
+			native.selectionStart === controlNative.selectionStart &&
+				native.selectionEnd === controlNative.selectionEnd,
+			"CRLF baseline native caret differs",
+		)
+		let rounded =
+			start > 0 && content[start - 1] === "\r" && content[start] === "\n"
+				? start + 1
+				: start
+		check(
+			source.selectionStart === rounded,
+			"CRLF desired source caret differs",
+		)
+		crlfFacts.push({
+			requested: start,
+			source: source.selectionStart,
+			native: native.selectionStart,
+		})
+	} else {
+		check(
+			source.selectionStart === start && source.selectionEnd === end,
+			"source caret differs",
+		)
+		check(
+			source.viewport.selectionStart === toView(expected, start),
+			"native caret differs",
+		)
+	}
+}
+function restore(content: string, caret: number) {
+	source.reconcile(content, caret)
+	verify(content, caret)
+}
+try {
+	let body =
+		"Body [Label](https://example.org) [[First]] 😀 end.\nNext [Two](https://two.example).\n"
+	for (let original of [
+		body,
+		"---\ntitle: Doc\n---\n" + body,
+		"```\n" + body + "```\n" + body,
+		body.replaceAll("\n", "\r\n"),
+	]) {
+		stages.push("distinct source restore")
+		let caret = original.indexOf("Body") + 2
+		restore(original, caret)
+		let borrowed = source.projection
+		let snapshot = JSON.stringify(borrowed)
+		let edited = original.slice(0, caret) + "x" + original.slice(caret)
+		restore(edited, caret + 1)
+		source.setSelectionRange(edited.length, edited.length)
+		verify(edited, edited.length)
+		restore(original, caret)
+		check(
+			source.projection === borrowed,
+			"same-source caret refresh evicted inverse record",
+		)
+		check(
+			JSON.stringify(borrowed) === snapshot,
+			"borrowed previous output mutated",
+		)
+		stages.push("post restore inclusive link boundary")
+		if (original.includes("\r")) {
+			let newline = original.indexOf("\r\n")
+			for (let position of [
+				newline,
+				newline + 1,
+				newline + 2,
+				original.length,
+			]) {
+				source.setSelectionRange(position, position)
+				verify(original, position)
+			}
+		}
+		let link = original.indexOf("[Label]")
+		for (let position of [
+			link,
+			link + 1,
+			link + "[Label](https://example.org)".length,
+		]) {
+			source.setSelectionRange(position, position)
+			verify(original, position)
+		}
+		stages.push("redo then undo changed caret")
+		restore(edited, caret + 1)
+		restore(original, caret)
+		verify(original, caret)
+	}
+	stages.push("retitle original source before restore")
+	restore(body, 2)
+	restore("x" + body, 3)
+	let firstDocument = documents[0]
+	if (!firstDocument) throw new Error("Missing document")
+	firstDocument.title = "Renamed"
+	restore(body, 2)
+	stages.push("raw hold project key refresh")
+	for (let next of ["raw", "hold", "project"] satisfies ProjectionMode[]) {
+		mode = next
+		restore("x" + body, 3)
+		restore(body, 2)
+	}
+	stages.push("hold sync retains current native draft")
+	mode = "hold"
+	let held = source.projection
+	check(
+		!source.sync() && source.projection === held,
+		"hold sync projected draft",
+	)
+	mode = "project"
+	stages.push("third distinct source replaces inverse")
+	for (let content of [body, "x" + body, "y" + body, body]) restore(content, 2)
+	restore(body, 2)
+	source.focus()
+	native.addEventListener("input", () => {
+		source.input()
+		let content = source.value
+		let caret = source.selectionStart
+		source.reconcile(content, caret)
+		verify(content, caret)
+		restore(body, 2)
+		Object.assign(window, { cacheTyped: content, cacheRestored: source.value })
+	})
+	Object.assign(window, {
+		cacheDone: true,
+		cacheResults: { assertions, stages, crlfFacts },
+		cacheInitial: body,
+	})
+} catch (error) {
+	Object.assign(window, {
+		cacheDone: true,
+		cacheFailure: String(error),
+		cacheResults: { assertions, stages, crlfFacts },
+	})
+}

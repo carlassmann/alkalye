@@ -1,0 +1,117 @@
+[
+	{
+		"path": "/tmp/alkalye-source-undo-projection/runtime/src/client/source-textarea.ts",
+		"bytes": 10173,
+		"sha256": "462a7c6793951e3d2898258eb1bf6978915c9fd9d49d2ad852620afb569d171c"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/baseline-source-textarea.ts",
+		"bytes": 9466,
+		"sha256": "f0c0f2f66fae090bc4f8d4ed3693a923e8734e6984827aa38ff839929235346f"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/runtime/tests/cache-source-fixture.ts",
+		"bytes": 5530,
+		"sha256": "93a347dafad11ba6472dba136bd75ba98c4d8fc1337de59a3fcc63b691b7285b"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/runtime/tests/browser-cache-source.ts",
+		"bytes": 2159,
+		"sha256": "d364443dedda88fc1b3111b92d7a2b4facabaafe2d74824d3c214b2316464ef3"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/measure.ts",
+		"bytes": 11674,
+		"sha256": "d9fb443d8502560c7a831b22416849bed80badd472188f5fde24b26faba20c40"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/baseline-0-caret.trace.json",
+		"bytes": 957291,
+		"sha256": "69e09fa2a439bd0265320af7146311dcc638da9a200f142d384fd8486320a401"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/baseline-0-input.trace.json",
+		"bytes": 8293636,
+		"sha256": "dc25f902413a76960bcb84041f1545dcf77773d6a7b5c4e904179671a1d601c9"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/baseline-0-undo.trace.json",
+		"bytes": 9649577,
+		"sha256": "e4291a31c9984e16a459f25ff7b073c687cc319efce91434d96a31b3dda633d0"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/baseline-1-caret.trace.json",
+		"bytes": 976091,
+		"sha256": "732083a3b665a0169f71df90360389bfec70a7b5b58338bcd11081e7f80fe4b3"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/baseline-1-input.trace.json",
+		"bytes": 8317728,
+		"sha256": "6f5325e7c70cd005f257063dec8330e17f063df91b8a9d3146a5f70bf981df4f"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/baseline-1-undo.trace.json",
+		"bytes": 9649342,
+		"sha256": "4625aaef04dd8f671114d88b6582a8a50e3c868441a095aa4c53bcdc06c71207"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/baseline-2-caret.trace.json",
+		"bytes": 962629,
+		"sha256": "d918444d4ea34ddada6135e93aadb6c021d841a03f3ae91acf76b6b55a08ec2b"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/baseline-2-input.trace.json",
+		"bytes": 8290771,
+		"sha256": "b9cffaeda3eba318995dfd2044ca1b0f6b12c0c4dc6d81ca1600f8f249d36e0e"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/baseline-2-undo.trace.json",
+		"bytes": 9625003,
+		"sha256": "01bb7b1f17cd58175d8c966a18df24daf06dc4b2369aafef2dce4909f4005960"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/candidate-0-caret.trace.json",
+		"bytes": 970574,
+		"sha256": "e853b592e3c281699d420cfd7686fbeb4d776a1de00f81035c7dba965c8958fb"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/candidate-0-input.trace.json",
+		"bytes": 8293095,
+		"sha256": "327c2a0d8cf8b056da28747d5cc61c01b6ad1b7b2cf89bcb9791496ff91d6ce4"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/candidate-0-undo.trace.json",
+		"bytes": 9604384,
+		"sha256": "9a224d7c9d54d245d04b17bc78953f51040482a51909eb1d3477ebbdafae7fc9"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/candidate-1-caret.trace.json",
+		"bytes": 1004672,
+		"sha256": "06873a41dc5612d0dc99331de28785e9da510d68515141229831e83fbb0a2b09"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/candidate-1-input.trace.json",
+		"bytes": 8244043,
+		"sha256": "14dc81f9a62d5bd0a2acd997919eccde22c7d6b31d893df90aeb26db72001d32"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/candidate-1-undo.trace.json",
+		"bytes": 9605243,
+		"sha256": "b0e449177eba3156df7a16f3701b52f28aecc8421c882259f3d17661a9b5a95c"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/candidate-2-caret.trace.json",
+		"bytes": 1015959,
+		"sha256": "088f7bcdeeb4ba89d99f3b375bc9c0dab30960cf373c70c74f438b0ce0ede276"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/candidate-2-input.trace.json",
+		"bytes": 8261322,
+		"sha256": "e459ae56d26dadb85fc88c2cdbe102dc7cb14720a1debfa3f240c2c874d61c2b"
+	},
+	{
+		"path": "/tmp/alkalye-source-undo-projection/app/candidate-2-undo.trace.json",
+		"bytes": 9610251,
+		"sha256": "276313692a4f54f74f082ed4d3a120ee2065c63726f9dce6f6e7becd8ffaab6d"
+	}
+]

@@ -1,0 +1,512 @@
+[
+	{
+		"kind": "baseline",
+		"trial": 0,
+		"stage": "complete",
+		"passed": true,
+		"error": "",
+		"sourceLength": 1048576,
+		"sourceBytes": 1056200,
+		"sourceHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+		"state": {
+			"setup": {
+				"caret": 524497,
+				"links": 11436,
+				"nativeLength": 2915,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800255.53125
+				}
+			},
+			"before": {
+				"hash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+				"position": 65,
+				"length": 1048576
+			},
+			"input": {
+				"hash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+				"position": 66,
+				"length": 1048577
+			},
+			"inputState": {
+				"caret": 524497,
+				"characters": 1048577,
+				"end": 524498,
+				"event": {
+					"trusted": true,
+					"type": "insertText"
+				},
+				"heap": 626085425,
+				"links": 11436,
+				"nativeLength": 2916,
+				"start": 524498,
+				"view": {
+					"end": 413166,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800255.5
+				}
+			},
+			"undone": {
+				"hash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+				"position": 67,
+				"length": 1048576
+			},
+			"undoState": {
+				"characters": 1048576,
+				"end": 524497,
+				"heap": 850253062,
+				"links": 11436,
+				"nativeLength": 2915,
+				"start": 524497,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800252.78125
+				}
+			},
+			"caretState": {
+				"end": 524498,
+				"heap": 851211436,
+				"nativeLength": 2915,
+				"start": 524498,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800252.78125
+				}
+			},
+			"bundleHash": "f5f4f81c7de47e6de00d7bce23a469bb1eb37477cb98f7971f4cf46e0c6dba11"
+		},
+		"readinessMs": 2010.4870839999999
+	},
+	{
+		"kind": "candidate",
+		"trial": 0,
+		"stage": "complete",
+		"passed": true,
+		"error": "",
+		"sourceLength": 1048576,
+		"sourceBytes": 1056200,
+		"sourceHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+		"state": {
+			"setup": {
+				"caret": 524497,
+				"links": 11436,
+				"nativeLength": 2915,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800255.53125
+				}
+			},
+			"before": {
+				"hash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+				"position": 65,
+				"length": 1048576
+			},
+			"input": {
+				"hash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+				"position": 66,
+				"length": 1048577
+			},
+			"inputState": {
+				"caret": 524497,
+				"characters": 1048577,
+				"end": 524498,
+				"event": {
+					"trusted": true,
+					"type": "insertText"
+				},
+				"heap": 630081218,
+				"links": 11436,
+				"nativeLength": 2916,
+				"start": 524498,
+				"view": {
+					"end": 413166,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800255.5
+				}
+			},
+			"undone": {
+				"hash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+				"position": 67,
+				"length": 1048576
+			},
+			"undoState": {
+				"characters": 1048576,
+				"end": 524497,
+				"heap": 815142708,
+				"links": 11436,
+				"nativeLength": 2915,
+				"start": 524497,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800252.78125
+				}
+			},
+			"caretState": {
+				"end": 524498,
+				"heap": 830846114,
+				"nativeLength": 2915,
+				"start": 524498,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800252.78125
+				}
+			},
+			"bundleHash": "26e592a15c10b37dce23cff3e13684c1af46cb293d8265d64f1d76d152b77e44"
+		},
+		"readinessMs": 2019.7902499999982
+	},
+	{
+		"kind": "candidate",
+		"trial": 1,
+		"stage": "complete",
+		"passed": true,
+		"error": "",
+		"sourceLength": 1048576,
+		"sourceBytes": 1056200,
+		"sourceHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+		"state": {
+			"setup": {
+				"caret": 524497,
+				"links": 11436,
+				"nativeLength": 2915,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800255.53125
+				}
+			},
+			"before": {
+				"hash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+				"position": 65,
+				"length": 1048576
+			},
+			"input": {
+				"hash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+				"position": 66,
+				"length": 1048577
+			},
+			"inputState": {
+				"caret": 524497,
+				"characters": 1048577,
+				"end": 524498,
+				"event": {
+					"trusted": true,
+					"type": "insertText"
+				},
+				"heap": 616017226,
+				"links": 11436,
+				"nativeLength": 2916,
+				"start": 524498,
+				"view": {
+					"end": 413166,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800255.5
+				}
+			},
+			"undone": {
+				"hash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+				"position": 67,
+				"length": 1048576
+			},
+			"undoState": {
+				"characters": 1048576,
+				"end": 524497,
+				"heap": 805845028,
+				"links": 11436,
+				"nativeLength": 2915,
+				"start": 524497,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800252.78125
+				}
+			},
+			"caretState": {
+				"end": 524498,
+				"heap": 785101050,
+				"nativeLength": 2915,
+				"start": 524498,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800252.78125
+				}
+			},
+			"bundleHash": "26e592a15c10b37dce23cff3e13684c1af46cb293d8265d64f1d76d152b77e44"
+		},
+		"readinessMs": 2024.9929170000032
+	},
+	{
+		"kind": "baseline",
+		"trial": 1,
+		"stage": "complete",
+		"passed": true,
+		"error": "",
+		"sourceLength": 1048576,
+		"sourceBytes": 1056200,
+		"sourceHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+		"state": {
+			"setup": {
+				"caret": 524497,
+				"links": 11436,
+				"nativeLength": 2915,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800255.53125
+				}
+			},
+			"before": {
+				"hash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+				"position": 65,
+				"length": 1048576
+			},
+			"input": {
+				"hash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+				"position": 66,
+				"length": 1048577
+			},
+			"inputState": {
+				"caret": 524497,
+				"characters": 1048577,
+				"end": 524498,
+				"event": {
+					"trusted": true,
+					"type": "insertText"
+				},
+				"heap": 619371926,
+				"links": 11436,
+				"nativeLength": 2916,
+				"start": 524498,
+				"view": {
+					"end": 413166,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800255.5
+				}
+			},
+			"undone": {
+				"hash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+				"position": 67,
+				"length": 1048576
+			},
+			"undoState": {
+				"characters": 1048576,
+				"end": 524497,
+				"heap": 854464252,
+				"links": 11436,
+				"nativeLength": 2915,
+				"start": 524497,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800252.75
+				}
+			},
+			"caretState": {
+				"end": 524498,
+				"heap": 855403286,
+				"nativeLength": 2915,
+				"start": 524498,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800252.75
+				}
+			},
+			"bundleHash": "f5f4f81c7de47e6de00d7bce23a469bb1eb37477cb98f7971f4cf46e0c6dba11"
+		},
+		"readinessMs": 2006.5334580000053
+	},
+	{
+		"kind": "baseline",
+		"trial": 2,
+		"stage": "complete",
+		"passed": true,
+		"error": "",
+		"sourceLength": 1048576,
+		"sourceBytes": 1056200,
+		"sourceHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+		"state": {
+			"setup": {
+				"caret": 524497,
+				"links": 11436,
+				"nativeLength": 2915,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800255.53125
+				}
+			},
+			"before": {
+				"hash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+				"position": 65,
+				"length": 1048576
+			},
+			"input": {
+				"hash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+				"position": 66,
+				"length": 1048577
+			},
+			"inputState": {
+				"caret": 524497,
+				"characters": 1048577,
+				"end": 524498,
+				"event": {
+					"trusted": true,
+					"type": "insertText"
+				},
+				"heap": 586351094,
+				"links": 11436,
+				"nativeLength": 2916,
+				"start": 524498,
+				"view": {
+					"end": 413166,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800255.5
+				}
+			},
+			"undone": {
+				"hash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+				"position": 67,
+				"length": 1048576
+			},
+			"undoState": {
+				"characters": 1048576,
+				"end": 524497,
+				"heap": 797861952,
+				"links": 11436,
+				"nativeLength": 2915,
+				"start": 524497,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800252.8125
+				}
+			},
+			"caretState": {
+				"end": 524498,
+				"heap": 798814862,
+				"nativeLength": 2915,
+				"start": 524498,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800252.8125
+				}
+			},
+			"bundleHash": "f5f4f81c7de47e6de00d7bce23a469bb1eb37477cb98f7971f4cf46e0c6dba11"
+		},
+		"readinessMs": 2004.8173749999987
+	},
+	{
+		"kind": "candidate",
+		"trial": 2,
+		"stage": "complete",
+		"passed": true,
+		"error": "",
+		"sourceLength": 1048576,
+		"sourceBytes": 1056200,
+		"sourceHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+		"state": {
+			"setup": {
+				"caret": 524497,
+				"links": 11436,
+				"nativeLength": 2915,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800255.53125
+				}
+			},
+			"before": {
+				"hash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+				"position": 65,
+				"length": 1048576
+			},
+			"input": {
+				"hash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+				"position": 66,
+				"length": 1048577
+			},
+			"inputState": {
+				"caret": 524497,
+				"characters": 1048577,
+				"end": 524498,
+				"event": {
+					"trusted": true,
+					"type": "insertText"
+				},
+				"heap": 600182061,
+				"links": 11436,
+				"nativeLength": 2916,
+				"start": 524498,
+				"view": {
+					"end": 413166,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800255.5
+				}
+			},
+			"undone": {
+				"hash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+				"position": 67,
+				"length": 1048576
+			},
+			"undoState": {
+				"characters": 1048576,
+				"end": 524497,
+				"heap": 822400083,
+				"links": 11436,
+				"nativeLength": 2915,
+				"start": 524497,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800252.875
+				}
+			},
+			"caretState": {
+				"end": 524498,
+				"heap": 801710013,
+				"nativeLength": 2915,
+				"start": 524498,
+				"view": {
+					"end": 413165,
+					"height": 5671.125,
+					"start": 410250,
+					"top": 800252.875
+				}
+			},
+			"bundleHash": "26e592a15c10b37dce23cff3e13684c1af46cb293d8265d64f1d76d152b77e44"
+		},
+		"readinessMs": 1993.9975000000122
+	}
+]
