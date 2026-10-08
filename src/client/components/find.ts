@@ -228,11 +228,15 @@ export class FindElement extends HTMLElement {
 							if (event.key === "Escape") {
 								event.preventDefault()
 								host.close()
-							} else if (event.key === "Enter") {
+							} else if (
+								event.key === "Enter" &&
+								event.target instanceof HTMLInputElement &&
+								(event.target.id === "find-text" ||
+									event.target.id === "replace-text")
+							) {
 								event.preventDefault()
 								host.perform(
-									event.target instanceof HTMLInputElement &&
-										event.target.id === "replace-text"
+									event.target.id === "replace-text"
 										? "replace"
 										: event.shiftKey
 											? "previous"
