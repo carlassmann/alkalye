@@ -1,0 +1,1 @@
+export default {project:'alkalye-fused-checkpoint',commands:{rewrite:{run:'bun experiments/performance/serve-rewrite.ts /tmp/alkalye-fused-checkpoint/app/assets-active /tmp/alkalye-fused-checkpoint/app/data-active 4461 > /tmp/alkalye-fused-checkpoint/app/server.log 2>&1',cwd:'/tmp/alkalye-fused-checkpoint/app/baseline',route:false,portless:false}}}

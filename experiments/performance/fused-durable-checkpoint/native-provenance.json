@@ -1,0 +1,116 @@
+{
+	"status": "native n3 matched app proof; no 120 Hz claim",
+	"baseline": "5b4d2b7",
+	"backend": "5b4d2b7 both arms",
+	"candidateChanges": ["src/shared/crdt.ts", "src/shared/document-session.ts"],
+	"sourceEqualsCorrectnessArtifact": true,
+	"scope": "retained 1MiB long wrapped header/body source; append then Undo; 3s main thread windows; one native editor context during each measured window",
+	"reset": {
+		"databaseSeed": "/tmp/alkalye-terminal-header/data-seed",
+		"profileSeed": "/tmp/alkalye-production-allocation-oct8/profile-seed",
+		"exactFixture": "/tmp/alkalye-prod-current-oct8/long1m.txt",
+		"cleared": "Singleton locks, Service Worker, HTTP and Code Cache; observer document journals cleared before independent acceptance read"
+	},
+	"order": [
+		"baseline0",
+		"candidate0",
+		"candidate1",
+		"baseline1",
+		"baseline2",
+		"candidate2"
+	],
+	"gates": "all six exact local/independent accepted edit and Undo hashes, native source/caret/EOF window gates passed",
+	"rawTracesIncluded": false,
+	"rawTraces": "retained outside; twelve exact trace hashes and paths in native-analysis.json",
+	"bundles": [
+		{
+			"arm": "baseline",
+			"entryBytes": 253391,
+			"sha256": "c6bea270ae9ff6ee8476b3e1d6cb7d77d707c2dee334dfbc2778151ed6de638e",
+			"path": "/tmp/alkalye-fused-checkpoint/app/baseline/dist"
+		},
+		{
+			"arm": "candidate",
+			"entryBytes": 253391,
+			"sha256": "e4f1b5b17e5a15ba15d86e043cbb7d0b73cdb5c6e767630927e7963777d3ce87",
+			"path": "/tmp/alkalye-fused-checkpoint/app/candidate-dist-measured"
+		},
+		{
+			"arm": "diagnostic",
+			"entryBytes": 253391,
+			"sha256": "70a7c7baa676202655779aeacccd63c6b6291e4c16366f3453739df1fa4dca01",
+			"path": "/tmp/alkalye-fused-checkpoint/app/runtime/dist"
+		}
+	],
+	"eligibility": "separate instrumented build; 5 started/5 completed; retained1048589/90 -> emitted15/16; owned nested arrays and rows; accepted/caret gates pass; excluded from timings",
+	"failures": "initial execution cwd absent before setup; then all six premeasurement work-down failures because disposable serve lacked Git workspace. Preserved failed driver/results, initialized only disposable serve Git, fail-fast retry passed six cells. No measurements from failed setup. Loading formatter grant produced no tool calls; no overlapping CPU work reported.",
+	"limits": [
+		"GC peaks remain ~13\u201314ms, above 8.33ms",
+		"sampled main JS heap is not peak/process/worker memory or isolated allocation measurement",
+		"no full 120fps or physical display/IME proof",
+		"one large fixture, no native fragmented multicursor control",
+		">2M correctness passes but temporary reference array can raise peak memory"
+	],
+	"files": {
+		"native-measure.ts.txt": {
+			"sha256": "e9f40fe0d54fe21061577c43ef00f023d7b85803c6fe44c2fe00533745563032",
+			"bytes": 14169
+		},
+		"native-analyze.py.txt": {
+			"sha256": "1ce899997f2ed401d1c545461456ee25b2e0df676713d8b1b31d46ddfb23c863",
+			"bytes": 4888
+		},
+		"native-results.json": {
+			"sha256": "4797e103273b797d1c38d8526e4c3f79300acd638828cb26fd449967a3676ba2",
+			"bytes": 73589
+		},
+		"native-analysis.json": {
+			"sha256": "3e8d9ca1f7bf94c14e407b878fa6116342673f5c0e391174baf578ccf3b3619b",
+			"bytes": 26243
+		},
+		"native-analysis.log.txt": {
+			"sha256": "4faf60dede5fa7f6a6fffe982cfdc5e18e5a9e826c03d657f54861f18ee67cf5",
+			"bytes": 449
+		},
+		"native-timing.log.txt": {
+			"sha256": "7b24c9996d0718bf81732631585a9025b0d0ad561498d288e0fcbd1be9e3d4cc",
+			"bytes": 495
+		},
+		"native-eligibility.ts.txt": {
+			"sha256": "893cab96dcea7195f5ab94d314d2b11e9e1f85bd3e5dfdcca991c00bfcce107e",
+			"bytes": 14058
+		},
+		"native-eligibility.json": {
+			"sha256": "003901f2e06f2e58f3329713105dd449394ecdc1cc4ca39262048559923952bc",
+			"bytes": 757
+		},
+		"native-eligibility-results.json": {
+			"sha256": "2c2a5f8816ed5a8aa739e7f49f55b163ec930ab29b3e523aaf4dadf75d17996a",
+			"bytes": 11857
+		},
+		"native-eligibility.log.txt": {
+			"sha256": "db4854b859f0910f1d7e3a60696031a6c534c7216ea0d016afdad6fac71bd3af",
+			"bytes": 83
+		},
+		"diagnostic-crdt.ts.txt": {
+			"sha256": "e964a20b74b29e6ca7fe3217583633f8be1c70f6983dd8311eef865042067a35",
+			"bytes": 65903
+		},
+		"setup-missing-workspace.log.txt": {
+			"sha256": "cd114f1d213b0f8485068946335be5a3bee7c4265f7730879e2b4f358f6f442f",
+			"bytes": 831
+		},
+		"setup-missing-workspace-results.json": {
+			"sha256": "b11174316915a4a643f938646d08ef30f6d6af3553c3da4cfdbb62c41f5b2c36",
+			"bytes": 1620
+		},
+		"native-original-setup.ts.txt": {
+			"sha256": "d0465b99f962d0b67ee3e5e554b22eb717a6049a1603d0ce3782aa36e6756a72",
+			"bytes": 13984
+		},
+		"native-work.config.js.txt": {
+			"sha256": "053b566da45d7ba392fc1445be68fe015a3ece1842683f85f0170ea9accb6169",
+			"bytes": 351
+		}
+	}
+}

@@ -1,0 +1,6 @@
+{"kind":"baseline","name":"long1m","position":"end","trial":0,"phase":"failed","stage":"profile-ready","error":"Error: work down failed"}
+{"kind":"candidate","name":"long1m","position":"end","trial":0,"phase":"failed","stage":"profile-ready","error":"Error: work down failed"}
+{"kind":"candidate","name":"long1m","position":"end","trial":1,"phase":"failed","stage":"profile-ready","error":"Error: work down failed"}
+{"kind":"baseline","name":"long1m","position":"end","trial":1,"phase":"failed","stage":"profile-ready","error":"Error: work down failed"}
+{"kind":"baseline","name":"long1m","position":"end","trial":2,"phase":"failed","stage":"profile-ready","error":"Error: work down failed"}
+{"kind":"candidate","name":"long1m","position":"end","trial":2,"phase":"failed","stage":"profile-ready","error":"Error: work down failed"}

@@ -1,0 +1,2 @@
+long1m baseline input {'median': 7.37, 'max': 7.879} deferred {'median': 13.946, 'max': 14.574} undo {'median': 13.78, 'max': 14.867} busyUndo {'median': 915.973, 'max': 983.35} heap {'median': 915754463, 'max': 917666685}
+long1m candidate input {'median': 6.766, 'max': 6.959} deferred {'median': 13.625, 'max': 13.819} undo {'median': 13.701, 'max': 13.776} busyUndo {'median': 833.23, 'max': 836.673} heap {'median': 814346671, 'max': 821196937}
