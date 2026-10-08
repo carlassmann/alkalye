@@ -121,11 +121,10 @@
 		<p>
 			120fps remains unmet. Multicursor input reached 47ms, and one deferred
 			task lasted 1536ms. Its IndexedDB completion callback resumed other work;
-			the callback name does not establish which work caused the stall. A
-			separate sampled profile is investigating this. After a 25-edit burst, all
-			edits were locally saved, but 19–20 remained pending at the three-second
-			gate. The earlier main saved marker does not prove server acceptance
-			either.
+			the callback name does not establish which work caused the stall. After a
+			25-edit burst, all edits were locally saved, but 19–20 remained pending at
+			the three-second gate. The earlier main saved marker does not prove server
+			acceptance either.
 		</p>
 		<p>
 			Find's traced handler took only 0.69–1.17ms; its slower two-frame result
@@ -144,6 +143,53 @@
 			before every cell. The benchmark also exposed a search keyboard bug: Enter
 			on Close or Replace all was intercepted as Find-next. That is now fixed
 			and covered by the app's keyboard journey.
+		</p>
+		<h2>Deferred replay and worker isolation</h2>
+		<p>
+			Separate CPU sampling reproduced a 1642ms task and mapped it to operation
+			decoding, identity validation and CRDT preparation. Inclusive stack times
+			overlap; they cannot be added. A subsequent control waited for each bulk
+			fixture restoration to reach accepted state and a current local snapshot.
+			Its largest baseline task fell from 1611ms to 121ms. The giant tail is
+			associated with unfinished restoration; samples do not identify the
+			responsible action. Bulk replacement remains a supported workload that
+			needs improvement.
+		</p>
+		<p>
+			A private decode-once batch candidate passed 44 public contracts but did
+			not improve clean multicursor runs: median largest task 114.076ms versus
+			114.066ms; input 40.115ms versus 40.470ms. Three samples per arm, complete
+			browser tasks, no CPU sampler, matched initial histories. The candidate
+			was rejected. Evidence:
+			<code>experiments/performance/multicursor-deferred</code>.
+		</p>
+		<p>
+			A separate worker-owned session prototype passed 17 real-browser
+			assertions using existing Effect RPC, IndexedDB and HTTP modules. It
+			preserved concurrent peer contributions when editing stale Unicode and
+			frontmatter views, saved offline, reopened pending edits and converged
+			with the server. No atom graph crosses to the input thread. This is a
+			bounded serial proof; queued typing, complete recovery, termination and
+			performance remain production gates. The editor has not been switched.
+			Evidence: <code>experiments/worker-session</code>.
+		</p>
+		<p>
+			The next outside draft passed 35 browser assertions, including eight
+			ordered edits against a worker-local replica basis, changes to newly
+			inserted characters and retained text after rejection. The peer was a
+			separate actor under the same account. Authentication loss was tested;
+			permission revocation was not. Follow-up Opus review found error-path
+			problems; the subsequent fixes still need runtime verification. Actual RPC
+			interruption, abrupt worker death and performance also remain gates.
+		</p>
+		<p>
+			Active-line geometry caching was rejected. Six valid rich-document wheel
+			cells showed no consistent layout or paint gain, and geometry fixtures did
+			not prove correctness across a viewport-top shift. The 1MiB arm failed an
+			incorrect expected-length condition in the harness, not an established app
+			readiness failure. Evidence and the corrected reproducer:
+			<code>experiments/performance/active-line-geometry</code>. Production
+			keeps measuring cursor geometry.
 		</p>
 		<h2>8 October: mobile taps and cached switching</h2>
 		<p>
