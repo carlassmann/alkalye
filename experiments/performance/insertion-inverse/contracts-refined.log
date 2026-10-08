@@ -1,0 +1,65 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/replica-insertion-inverse.test.ts:
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 15 [7.60ms]
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 13 [1.16ms]
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 30 [2.57ms]
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 34 [2.95ms]
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 49 [1.18ms]
+(pass) accepted duplicate insertion preserves exact source and inverse through a detached fork [1.02ms]
+(pass) concurrent sibling and metadata publication preserve peer text across cancellation [0.39ms]
+(pass) identity mutation cannot preserve acknowledgement or publish an inverse [0.35ms]
+(pass) cold restored cancellation preserves exact Unicode without a receipt [0.29ms]
+(pass) previously unknown child revealed by its parent survives parent cancellation [0.27ms]
+(pass) intervening metadata keeps source reconstruction and later inverse exact [0.24ms]
+(pass) all prepared replicas retain their own exact cursor removal proof [0.32ms]
+(pass) malformed UTF16 insertion and its inverse preserve exact source 55296 [0.27ms]
+(pass) malformed UTF16 insertion and its inverse preserve exact source 56320 [0.12ms]
+(pass) peer cancellation uses validated inverse and reconstructs the same source [0.18ms]
+(pass) a cancellation received before its target cannot publish an inactive inverse [0.34ms]
+(pass) mixed known acknowledgement and new metadata preserve reconstruction [0.23ms]
+
+tests/durable-insertion-inverse.test.ts:
+{"cooperativeWork":false,"savedSame":true,"acceptedSame":true,"undoSame":false}
+177 |         let acceptedView = value.replica.visible("doc")
+178 |         yield* value.undo()
+179 |         yield* value.sync
+180 |         expect(value.replica.text("doc")).toBe(edited)
+181 |         console.log(JSON.stringify({ cooperativeWork, savedSame: savedView === after, acceptedSame: acceptedView === after, undoSame: value.replica.visible("doc") === before, removalOffset: insertionRemovalPosition(acceptedView, value.replica.visible("doc"), appended.operation?.insert[0]?.id ?? "") }))
+182 |         expect(value.replica.visible("doc")).toBe(before)
+                                                   ^
+error: expect(received).toBe(expected)
+
+Expected: []
+Received: serializes to the same string
+
+      at <anonymous> (/private/tmp/alkalye-rich-undo-certificate/runtime/tests/durable-insertion-inverse.test.ts:182:46)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+(fail) accepted middle insertion undo and redo persist and reopen exact document and discussion (cooperative=%s) [92.41ms]
+{"cooperativeWork":true,"savedSame":true,"acceptedSame":true,"undoSame":false}
+177 |         let acceptedView = value.replica.visible("doc")
+178 |         yield* value.undo()
+179 |         yield* value.sync
+180 |         expect(value.replica.text("doc")).toBe(edited)
+181 |         console.log(JSON.stringify({ cooperativeWork, savedSame: savedView === after, acceptedSame: acceptedView === after, undoSame: value.replica.visible("doc") === before, removalOffset: insertionRemovalPosition(acceptedView, value.replica.visible("doc"), appended.operation?.insert[0]?.id ?? "") }))
+182 |         expect(value.replica.visible("doc")).toBe(before)
+                                                   ^
+error: expect(received).toBe(expected)
+
+Expected: []
+Received: serializes to the same string
+
+      at <anonymous> (/private/tmp/alkalye-rich-undo-certificate/runtime/tests/durable-insertion-inverse.test.ts:182:46)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+(fail) accepted middle insertion undo and redo persist and reopen exact document and discussion (cooperative=%s) [58.11ms]
+
+ 17 pass
+ 2 fail
+ 183 expect() calls
+Ran 19 tests across 2 files. [223.00ms]

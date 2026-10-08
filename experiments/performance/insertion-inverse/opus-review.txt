@@ -1,0 +1,49 @@
+**Verdict: not approved yet.** I found no way the cached views can go wrong, but one bug blocks the speedup in most documents, and a second loses it when replicas share views. This is from reading the code only; nothing was run.
+
+## Blockers
+
+**1. Receipt never forms in plain-text documents** (`crdt.ts:680`)
+- The receipt condition requires `previousIndex`, which is `sourceOffsets.get(edit.atoms)`.
+- `sourceOffsets` is only filled when `atoms.length !== content.length` (lines 941, 1421, 1432, 1411). That means only documents with astral characters such as emoji get one.
+- In an ASCII or BMP-only document, Undo and Redo always take the slow path, so the prototype measures nothing there.
+- Smallest fix:
+  ```ts
+  let offset = previousIndex ? previousIndex.offsetAtCodePoint(splice.start)
+    : before.length === edit.atoms.length && insertedAtom.value.length === 1 ? splice.start : undefined
+  ```
+  Then gate on `offset !== undefined` instead of `previousIndex`. This does not scan the text.
+
+**2. `insertionRemovals` entries overwrite each other** (`crdt.ts:638`)
+- The key is `before.atoms`, the restored array. Forked replicas share that array: durable, replica and staged copy `sourceCache` by reference.
+- Each replica builds its own `after` array through `replaceAtoms`.
+- When `applyTogether` undoes in several replicas, the last commit replaces the inner WeakMap. If the editor's replica isn't last, its cursor mapping is lost and it falls back to `nearbyPosition` or the pending scan. Still correct, just slower.
+- Fix: merge into the existing map, `(insertionRemovals.get(view.atoms) ?? new WeakMap()).set(edit.atoms, …)`, and store it back.
+
+## Checked, no bug found
+- **Normal validation:** `prepare(input)` still runs: parse, identities, visibility clock, floor and cancel-identity checks. On error nothing is committed and the receipt is unchanged. `cachePreparedText` checks the generation is exactly +1 and the signature matches, and the signature includes `value = lastOperation`.
+- **Cancel visibility:** the receipt only exists while no other op has arrived. In that state Undo, Redo and further Undos are a strict chain (X, C1, C2, …), so the atom's visibility flips exactly. An earlier canceller of the new cancel (`active===false`), known ids, the floor and `canCancel` are all checked.
+- **Hidden orphan children:** `children.has(atom.id)` runs after indexing. Atom ids must carry their op prefix (`parseOperation`), so no other op can own atoms of X. Any later child arrives as a new op, which clears the receipt.
+- **Frontmatter and source framing:**
+  - Receipts only come from existing fast paths, which already rejected fence, header, body-anchor and BOM edits.
+  - The raw view after Undo is the same sequence as before.
+  - One unstated dependency: `originalFrames` now includes X's frame. That's harmless only because a one-atom frame can't parse as a header in `withoutLostAliases`. Write that down or test it.
+- **ACK:** a batch counts as an ACK only if every op is known and identity-checked by JSON. Duplicates skip `invalidateText`. Generation is re-stamped after the commit. Any new op, mixed batch, or hydration/checkpoint load clears the receipt.
+- **Fork:** the receipt object is immutable and shared. If `immutableAtoms` produces a new array for a mutable `textCache` entry, the views no longer match and the fork safely takes the slow path. `forkEffect` checks generation and clock.
+- **Caller mutations:** views are read-only proxies, the atom is frozen and checked by identity in `atomIndex`, and content is a string.
+- **Stale restored views:** the WeakMap proofs depend only on the two arrays. Old `terminalRemovals` entries stay true.
+- **Full traversals:** the patch adds none. String `===` is by reference in the normal flow.
+
+## Non-blocking caveats
+- A pending `preparedEdit` takes priority over the inverse, so a stale prepare disables the fast path. Safe.
+- The durable replica gets no receipt for a single-character mid-document insert: there's no preparedEdit, `preparePeerInsertionRun` needs at least 2 characters, and the terminal path needs an append at the end. Check in a trace whether anything reads durable text eagerly after Undo.
+- Redo sets no cursor mapping, so the cursor lands before the re-inserted character. That's the same as today's slow path.
+- `new TextIndex(content)` in the editor's `update` (`editor.ts:929`) is an existing full-text scan. The patch doesn't add it, but it caps the gain.
+- I couldn't find code named "prepared source publisher", so that part isn't checked against its guarantees.
+
+## Tests to add
+- ASCII document: a mid-document insert, then Undo/Redo/Undo, hits the fast path and matches a fresh replica's `text()`/`visible()`.
+- `applyTogether` over a fork pair: the cursor mapping works in every replica.
+- A peer's cancel of `lastOperation`.
+- A canceller that arrives before the cancel it targets.
+- An ACK batch mixing known and new ops clears the receipt.
+- A frontmatter document with insert and Undo in the body.

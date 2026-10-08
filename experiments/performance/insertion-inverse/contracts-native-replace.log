@@ -1,0 +1,33 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/replica-insertion-inverse.test.ts:
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 15 [7.59ms]
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 13 [1.50ms]
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 30 [3.01ms]
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 34 [3.23ms]
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 49 [1.26ms]
+(pass) accepted duplicate insertion preserves exact source and inverse through a detached fork [1.19ms]
+(pass) concurrent sibling and metadata publication preserve peer text across cancellation [0.42ms]
+(pass) identity mutation cannot preserve acknowledgement or publish an inverse [0.37ms]
+(pass) cold restored cancellation preserves exact Unicode without a receipt [0.33ms]
+(pass) previously unknown child revealed by its parent survives parent cancellation [0.30ms]
+(pass) intervening metadata keeps source reconstruction and later inverse exact [0.25ms]
+(pass) all prepared replicas retain their own exact cursor removal proof [0.32ms]
+(pass) malformed UTF16 insertion and its inverse preserve exact source 55296 [0.28ms]
+(pass) malformed UTF16 insertion and its inverse preserve exact source 56320 [0.14ms]
+(pass) peer cancellation uses validated inverse and reconstructs the same source [0.20ms]
+(pass) a cancellation received before its target cannot publish an inactive inverse [0.35ms]
+(pass) mixed known acknowledgement and new metadata preserve reconstruction [0.29ms]
+
+tests/durable-insertion-inverse.test.ts:
+{"stage":"afterUndo","same":true,"removalOffset":30,"insertCount":1,"removeCount":0,"field":false,"special":{"order":false,"observed":false,"migration":false,"deleted":false,"emptyHeader":false,"body":false,"ending":false}}
+{"cooperativeWork":false,"savedSame":true,"acceptedSame":true,"undoSame":true,"removalOffset":30}
+(pass) accepted middle insertion undo and redo persist and reopen exact document and discussion (cooperative=%s) [113.07ms]
+{"stage":"afterUndo","same":true,"removalOffset":30,"insertCount":1,"removeCount":0,"field":false,"special":{"order":false,"observed":false,"migration":false,"deleted":false,"emptyHeader":false,"body":false,"ending":false}}
+{"cooperativeWork":true,"savedSame":true,"acceptedSame":true,"undoSame":true,"removalOffset":30}
+(pass) accepted middle insertion undo and redo persist and reopen exact document and discussion (cooperative=%s) [64.73ms]
+
+ 19 pass
+ 0 fail
+ 199 expect() calls
+Ran 19 tests across 2 files. [257.00ms]

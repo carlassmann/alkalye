@@ -1,0 +1,19 @@
+main True sampledTargetTaskSelfMs 208.479
+117.08 117.08 rawVisibleSteps {'source': '../src/shared/crdt.ts', 'line': 1245, 'column': 26, 'name': ''}
+15.417 15.572 Zn {'source': '../src/client/components/editor.ts', 'line': 959, 'column': 20, 'name': ''}
+10.64 20.048 Kt {'source': '../src/shared/frontmatter-merge.ts', 'line': 454, 'column': 29, 'name': ''}
+8.166 8.166 (program) None
+7.768 28.135 tt {'source': '../src/shared/frontmatter-merge.ts', 'line': 135, 'column': 34, 'name': ''}
+5.064 7.368 d {'source': '../src/shared/atom-sequence.ts', 'line': 52, 'column': 17, 'name': ''}
+4.727 4.727 (garbage collector) None
+4.656 5.25 d {'source': '../src/shared/atom-sequence.ts', 'line': 52, 'column': 17, 'name': ''}
+4.158 9.408 J {'source': '../src/shared/frontmatter-merge.ts', 'line': 558, 'column': 20, 'name': ''}
+4.114 4.726 projectionFor {'source': '../src/client/source-textarea.ts', 'line': 242, 'column': 23, 'name': ''}
+4.0 121.08 D {'source': '../src/shared/collection-copy.ts', 'line': 35, 'column': 31, 'name': ''}
+3.991 162.564 text {'source': '../src/shared/crdt.ts', 'line': 1354, 'column': 6, 'name': ''}
+2.34 4.541 render {'source': '../src/client/editor-viewport.ts', 'line': 343, 'column': 8, 'name': ''}
+1.445 6.298 apply {'source': '../src/client/source-textarea.ts', 'line': 279, 'column': 15, 'name': ''}
+1.23 1.23 _r {'source': '../src/shared/text-index.ts', 'line': 39, 'column': 25, 'name': ''}
+main False sampledTargetTaskSelfMs 216.943
+206.592 206.592 (idle) None
+10.351 10.351 (program) None

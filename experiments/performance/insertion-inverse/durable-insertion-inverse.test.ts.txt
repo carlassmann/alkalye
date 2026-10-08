@@ -1,0 +1,258 @@
+import { expect, test } from "bun:test"
+import { mkdtemp, rm } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import * as Layer from "effect/Layer"
+import * as Schema from "effect/Schema"
+import { BackgroundWork } from "../src/platform/background-work"
+import { DocumentJournal } from "../src/platform/document-journal"
+import {
+	cliDocumentSessionLayer,
+	cliDocumentPlatform,
+} from "../src/cli/document-platform"
+import {
+	DocumentSession,
+	documentDatabaseName,
+} from "../src/shared/document-session"
+import type { DocumentTransport } from "../src/shared/document-session"
+import { Replica, insertionRemovalPosition } from "../src/shared/crdt"
+import {
+	buildAction,
+	ResourceUnavailable,
+} from "../src/shared/document-actions"
+import { newDocument, newComment } from "../src/shared/documents"
+import { Identity } from "../src/shared/workspace"
+import { WorkspaceStore } from "../src/server/document-store"
+
+function required<A>(value: A | undefined) {
+	return value === undefined
+		? Effect.fail(new ResourceUnavailable({ message: "Document unavailable" }))
+		: Effect.succeed(value)
+}
+
+test.each([false, true])(
+	"accepted middle insertion undo and redo persist and reopen exact document and discussion (cooperative=%s)",
+	async cooperativeWork => {
+		let directory = await mkdtemp(join(tmpdir(), "alkalye-compact-session-"))
+		try {
+			await Effect.runPromise(
+				Effect.scoped(
+					Effect.gen(function* () {
+						let services = yield* Layer.build(
+							WorkspaceStore.layer(join(directory, "server.sqlite")),
+						)
+						let store = Context.get(services, WorkspaceStore)
+						let subject = "compact-owner"
+						let source =
+							'---\ntitle: "Compaction"\n---\n' + "AB😀\n".repeat(256)
+						let birth = new Replica("compact-birth")
+						let creation = yield* buildAction(
+							birth,
+							"doc",
+							"Create document",
+							staged => newDocument(staged, "doc", "Compaction", source),
+						)
+						function request<A, E>(effect: Effect.Effect<A, E, Identity>) {
+							return effect.pipe(
+								Effect.provideService(Identity, { subject, actors: [] }),
+							)
+						}
+						yield* request(store.create("space", "Compaction", "compact-space"))
+						yield* store.createDocument("space", creation).pipe(
+							Effect.provideService(Identity, {
+								subject,
+								actors: [creation.actor],
+							}),
+						)
+						let transport: DocumentTransport = {
+							create: () => Effect.fail(new Error("Already created")),
+							snapshot: document =>
+								request(store.snapshot(document)).pipe(
+									Effect.flatMap(required),
+								),
+							commit: action =>
+								store.commit(action).pipe(
+									Effect.provideService(Identity, {
+										subject,
+										actors: [action.actor],
+									}),
+								),
+							history: (document, after, log, limit) =>
+								request(store.history(document, after, log, limit)),
+							action: (document, action) =>
+								request(store.action(document, action)).pipe(
+									Effect.flatMap(required),
+								),
+							chain: (document, action) =>
+								request(store.chain(document, action)).pipe(
+									Effect.flatMap(required),
+								),
+						}
+						function session<A, E>(
+							work: (value: DocumentSession["Service"]) => Effect.Effect<A, E>,
+						) {
+							return Effect.scoped(
+								Effect.gen(function* () {
+									let context = yield* Layer.build(
+										cliDocumentSessionLayer(directory, {
+											document: "doc",
+											subject,
+											transport,
+											cooperativeWork,
+										}),
+									).pipe(
+										Effect.provideService(BackgroundWork, {
+											beforeSnapshot: Effect.void,
+											beforeDerived: Effect.void,
+											betweenChunks: Effect.void,
+										}),
+									)
+									return yield* work(Context.get(context, DocumentSession))
+								}),
+							)
+						}
+						function readSnapshot() {
+							return Effect.scoped(
+								Effect.gen(function* () {
+									let context = yield* Layer.build(
+										cliDocumentPlatform(directory).journal(
+											documentDatabaseName({
+												document: "doc",
+												subject,
+												transport,
+											}),
+										),
+									)
+									let cache = yield* Context.get(context, DocumentJournal).cache
+									if (!cache) throw new Error("Snapshot was not durably saved")
+									let value = Schema.decodeUnknownSync(
+										Schema.Struct({ checkpoint: Schema.Unknown }),
+									)(cache.value)
+									return yield* Replica.fromCheckpointEffect(
+										value.checkpoint,
+										"snapshot-audit",
+									)
+								}),
+							)
+						}
+						let initial = source
+						let edited = initial + "Tail😀"
+						yield* session(value =>
+							Effect.gen(function* () {
+								expect(value.replica.text("doc")).toBe(initial)
+								yield* value.edit(edited).saved
+								yield* value.change("Discussion", staged =>
+									newComment(
+										staged,
+										"comment",
+										"doc",
+										"AB😀",
+										"Persist me",
+										"Reader",
+										initial.indexOf("AB😀"),
+									),
+								)
+								yield* value.sync
+								yield* value.save
+								expect(value.unsaved()).toBe(0)
+							}),
+						)
+						let saved = yield* readSnapshot()
+						expect(saved.text("doc")).toBe(edited)
+						expect(saved.fields("comment").body).toBe("Persist me")
+						yield* session(value =>
+							Effect.gen(function* () {
+								expect(value.replica.text("doc")).toBe(edited)
+								expect(value.replica.fields("comment").body).toBe("Persist me")
+								let offset = edited.indexOf("AB😀") + 2
+								let inserted =
+									edited.slice(0, offset) + "x" + edited.slice(offset)
+								let before = value.replica.visible("doc")
+								let appended = value.replace(
+									[{ start: offset, remove: 0, text: "x" }],
+									before,
+								)
+								let after = appended.atoms
+								yield* appended.saved
+								let savedView = value.replica.visible("doc")
+								yield* value.sync
+								let acceptedView = value.replica.visible("doc")
+								yield* value.undo()
+								let undoneView = value.replica.visible("doc")
+								let atom = appended.operation?.insert[0]
+								console.log(
+									JSON.stringify({
+										stage: "afterUndo",
+										same: undoneView === before,
+										removalOffset: insertionRemovalPosition(
+											acceptedView,
+											undoneView,
+											atom?.id ?? "",
+										),
+										insertCount: appended.operation?.insert.length,
+										removeCount: appended.operation?.remove.length,
+										field: Boolean(appended.operation?.field),
+										special: atom && {
+											order: Boolean(atom.order),
+											observed: Boolean(atom.observed),
+											migration: Boolean(atom.migration),
+											deleted: Boolean(atom.deleted),
+											emptyHeader: Boolean(atom.emptyHeader),
+											body: Boolean(atom.body),
+											ending: Boolean(atom.ending),
+										},
+									}),
+								)
+								yield* value.sync
+								expect(value.replica.text("doc")).toBe(edited)
+								console.log(
+									JSON.stringify({
+										cooperativeWork,
+										savedSame: savedView === after,
+										acceptedSame: acceptedView === after,
+										undoSame: value.replica.visible("doc") === before,
+										removalOffset: insertionRemovalPosition(
+											acceptedView,
+											value.replica.visible("doc"),
+											appended.operation?.insert[0]?.id ?? "",
+										),
+									}),
+								)
+								expect(value.replica.visible("doc")).toBe(before)
+								expect(
+									insertionRemovalPosition(
+										after,
+										value.replica.visible("doc"),
+										appended.operation?.insert[0]?.id ?? "",
+									),
+								).toBe(offset)
+								yield* value.redo()
+								yield* value.sync
+								expect(value.replica.text("doc")).toBe(inserted)
+								expect(value.replica.visible("doc")).toBe(after)
+								yield* value.undo()
+								yield* value.sync
+								yield* value.save
+								expect(value.replica.text("doc")).toBe(edited)
+							}),
+						)
+						let undone = yield* readSnapshot()
+						expect(undone.text("doc")).toBe(edited)
+						expect(undone.fields("comment").body).toBe("Persist me")
+						yield* session(value =>
+							Effect.gen(function* () {
+								expect(value.replica.text("doc")).toBe(edited)
+								expect(value.replica.fields("comment").body).toBe("Persist me")
+							}),
+						)
+					}),
+				),
+			)
+		} finally {
+			await rm(directory, { recursive: true, force: true })
+		}
+	},
+	30_000,
+)

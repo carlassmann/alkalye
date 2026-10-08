@@ -1,0 +1,21 @@
+**Verdict: both blockers are fixed, and the candidate can move on to type checks and the deep runtime contracts.** I only read the code. Nothing was run, so all tests are still unproven.
+
+**Blocker 1 (ASCII offset): fixed.**
+- `before.length === edit.atoms.length` is a safe identity check. `indexAtom` (crdt.ts:2096) marks any atom that isn't a single BMP unit or a valid surrogate pair as legacy, and the receipt path rejects legacy targets. So on a non-legacy target, equal lengths mean every atom is one UTF-16 unit.
+- The existing `prepareReplacements` code (crdt.ts:996) already relies on the same check, so this adds no new assumption.
+- When the lengths differ, `previousIndex` is there, so the fallback works.
+- The strict scalar guard repeats what `indexAtom` already enforces, so it's redundant but harmless. The malformed-UTF-16 case is excluded by the legacy check before the guard is reached.
+
+**Blocker 2 (removal map merge): the code is fixed, but the test doesn't prove it.**
+- The read, set and store-back merge is correct.
+- Test `all prepared replicas…` (line 99) inserts once and then forks. That most likely leaves `replica` and `second` sharing the same `after` array, so the inner key is identical. The test would then pass with the old overwriting code too.
+- Fix: apply the insert to each replica separately so each builds its own `after`, and assert `beforeFirst !== beforeSecond`.
+
+**Other test weaknesses:**
+- Line 30, `if (position !== undefined)`, means the ASCII test passes even if the fast path is never taken. Assert that `position` equals `offset`, at least for `"Left body Right"`.
+- From my earlier list, three cases are still uncovered:
+  - a peer's cancel of `lastOperation`
+  - a canceller that arrives before the cancel it targets
+  - an ACK batch mixing known and new ops
+
+**Remaining semantic blockers:** none. The `originalFrames` dependency on a one-atom frame is still undocumented, so add a comment or test for it. It doesn't block.

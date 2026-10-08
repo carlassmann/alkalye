@@ -1,0 +1,27 @@
+--- src/client/components/editor.ts	2026-10-08 13:19:52
++++ /tmp/alkalye-rich-undo-certificate/src/client/components/editor.ts	2026-10-08 16:44:16
+@@ -1,4 +1,7 @@
+-import { terminalRemovalPosition } from "../../shared/crdt"
++import {
++	terminalRemovalPosition,
++	insertionRemovalPosition,
++} from "../../shared/crdt"
+ import { TextIndex } from "../../shared/text-index"
+ import * as Effect from "effect/Effect"
+ import * as Fiber from "effect/Fiber"
+@@ -970,6 +973,15 @@
+ 		}
+ 		let pending: AnchorRequest[] = []
+ 		for (let id of new Set(ids)) {
++			let insertionRemoved = insertionRemovalPosition(atoms, nextAtoms, id)
++			if (
++				insertionRemoved !== undefined &&
++				insertionRemoved >= 0 &&
++				insertionRemoved <= nextIndex.length
++			) {
++				resolved.set(id, insertionRemoved)
++				continue
++			}
+ 			let removed = terminalRemovalPosition(atoms, nextAtoms, id)
+ 			if (removed !== undefined && removed === nextIndex.length) {
+ 				resolved.set(id, removed)

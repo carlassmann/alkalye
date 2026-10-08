@@ -1,0 +1,137 @@
+{
+	"productionBase": "da0714c8924af5781f7ea0d837cb2868621582d8",
+	"effect": "4.0.0",
+	"order": [
+		"baseline0",
+		"candidate0",
+		"candidate1",
+		"baseline1",
+		"baseline2",
+		"candidate2"
+	],
+	"sourceBase": {},
+	"arms": {
+		"baseline": {
+			"source": {
+				"src/shared/crdt.ts": "aaff1f792bc1bccb8bea0e81521db32c3545647a72b976a45aeca9d0273d8459",
+				"src/client/components/editor.ts": "bd34a9293277203b79d2a7817ae909d89bb83b52c4cf9e325a433826c763f6ff",
+				"src/client/editor-viewport.ts": "98959330a68d6b096a7d3b5b4efd3179606ad37729c2f5dc199f8eca50867b2c",
+				"src/shared/document-session.ts": "e7ec5917e7dda0730159bb0954b1b3276747f1bc2263c5f02a5445ee92ffb279",
+				"src/client/source-textarea.ts": "f0c0f2f66fae090bc4f8d4ed3693a923e8734e6984827aa38ff839929235346f"
+			},
+			"assets": {
+				"app.js": "cfa17a0cfac3c5da438f478b14faf4a935cbc91f0da47724eca6a37fe4fb51a7",
+				"chunks/document-app-faj7y588.js": "0505551329e5e106061693cbf8098948b0735185893e22c8c30bef9f27371935",
+				"chunks/document-app-30cxn5ja.js": "e58b0510e3780a20b7eca6d8e439de905646564965ce4386eaf169649484a7a5",
+				"chunks/document-app-hh9btwab.js": "80ab58b0a318964912edf8af7d6a7851fd1ffefedd1c6da938dcf0690ae8df10",
+				"chunks/document-app-49c3p401.js": "7b407d0ac57346f43fcc7de5d08263766e703a2e067bd68d9c11a0eaa929f589",
+				"chunks/document-app-jbkkw4dm.js": "9bb6c34f9da7e1b36eb759e749ecacdfdd52a6fd57ddc4fc40041fe42f11237a",
+				"chunks/document-app-d69gspnm.js": "024c2358faed3fd8257a9bf95763401a43abfe9dabe6017ea6be66e83b87daaa",
+				"chunks/document-app-cgwkxydp.js": "cb3731a65efb89c5d7b6c9a18290e349145b2a505d545282f4d42641e6034d19",
+				"chunks/document-app-cy429x6m.js": "d2b4539aa1cbd0298403d12e0b8c0f530fbd54c909422ab2e4d49b61004dac82",
+				"chunks/document-app-va1n4ht9.js": "150cf99bae8f4235172ee79e61af0a8bbeea43efabf9fbcb5c4fd60f1aa85ac5",
+				"chunks/document-app-1a55de4a.js": "c094a3a66accda0481156eaa2ce8f0cff112c3e2ba4ca70c7a7578d97b7613d1",
+				"chunks/document-app-n1xch5rb.js": "594b6b23cf992bbd4af1279aa90575149dc2662df918a1f45287225a8ab776d1",
+				"chunks/document-app-b7r6zy26.js": "27a32de120cb761f0f81348814be9679b170b85d8bededff650ab247d7d9e814",
+				"chunks/document-app-5dcwcckw.js": "f502415740c752402873f16c9ce52e7726f719475d5056e9693753bd454d91d3",
+				"chunks/document-app-axs1xsyw.js": "97624d0233206a058756c84c1177eb150b1785f2433ce7941481bfb982b3381b",
+				"chunks/document-app-tqe6f0f5.js": "4f3854b213bbc851ea82bb870e63363b8d861a771abb0e765501f4d62c7437f1",
+				"chunks/document-app-bkcgqpf0.js": "a8f0d333795dbeaef3f78cc2fc9a09bbacd7c4dad838a301ed558ca0016e509c",
+				"chunks/document-app-n3tarf2r.js": "15e86711ccc97a43b80d7dc37257b0f243eaaa52b6db969d2436f432e4c1176e",
+				"chunks/document-app-71ztjd4m.js": "93f360d89cd562cb5747ae07ffc324deb4f45591f43c1fc07409b3fb2e1e4f3b",
+				"chunks/document-app-16nn2tk4.js": "135182e3bf018d95828492ce57a09d213560a9c1bd60a72a3df687f8a7dca65d",
+				"chunks/document-app-mpt5cvj5.js": "07a26352f6b4309eb4dfd67fc13d6aa1417fbf5462670198b35baafb92ff98da",
+				"chunks/document-app-952p6rsw.js": "a4144f31d919181509c94658562fb76edacf0ea554bd6c329594efa940b1a575",
+				"chunks/document-app-c34mh9jw.js": "e429fc5b58ae9356c84c13c418945a4a4df3060e6f923e3e77e4bc28ccb6f9b7",
+				"chunks/document-app-m1esheny.js": "23675b2ed7bf5a9eb8e6fadd52568e1665bbb73ee08655a23540c78b78cc465c",
+				"chunks/document-app-bfgerj0e.js": "9c1a9fd1e739d7c5e3a50eaf2a894089dcec8d68701c47b35f254626c0e10ecf",
+				"chunks/document-app-fhberdvr.js": "e897ae5b841b2cae1ac7da6a152153738f9552d40240e8947e1bef9c6b2a5231",
+				"chunks/document-app-gh7pw82v.js": "0c02b8556ac5eb1792bde5fc920370d0f3b1ddabe69b77a47fcbb277c4f649db",
+				"chunks/document-app-d1pez2gc.js": "27b1254ca129c99b0205d2246f2aa89d5aff6273b137acf619f7f6728bdcd5a8",
+				"chunks/document-app-pkb00jtx.js": "f5abd61392aca372f9479ec48f591be7d8e966e49402789c80f3a98083fbb235",
+				"chunks/document-app-xtf0901q.js": "5bc31d8fe461ef749d75eb09c3ff4e7f706ee0645214f57dca4a825568cbddfc",
+				"chunks/document-app-shfhaehx.js": "5b82d8d1c3be73d4b3a9abe259ff7f134cfba6a2c9479aa31bc4dc4a59a03a81",
+				"chunks/document-app-bj9yaqf4.js": "a058b91e89b2144651fb404cbac5e6bec846ac6be6df50e3c210fb691bade388",
+				"chunks/document-app-m2qx4cqf.js": "a16f603c7e82fa73c3c08187e200539440a114333311e16d891b12060d5d40bc",
+				"chunks/document-app-nqb2j1d5.js": "7ee8a12ff085053fec8ff4edc3bb46ed6125e227c1ca24a152407cb5d6a250c8",
+				"chunks/document-app-xe6sx472.js": "cfd5570faa82f2afc7367678680b40139991611aca53820de6ff3452002c0f2f"
+			}
+		},
+		"candidate": {
+			"source": {
+				"src/shared/crdt.ts": "fa018ceddb23a671cc2364e324c11f06a184058e2c58a959c769b9bc39586833",
+				"src/client/components/editor.ts": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+				"src/client/editor-viewport.ts": "98959330a68d6b096a7d3b5b4efd3179606ad37729c2f5dc199f8eca50867b2c",
+				"src/shared/document-session.ts": "e7ec5917e7dda0730159bb0954b1b3276747f1bc2263c5f02a5445ee92ffb279",
+				"src/client/source-textarea.ts": "f0c0f2f66fae090bc4f8d4ed3693a923e8734e6984827aa38ff839929235346f"
+			},
+			"assets": {
+				"app.js": "f5f4f81c7de47e6de00d7bce23a469bb1eb37477cb98f7971f4cf46e0c6dba11",
+				"chunks/document-app-b5t92vx3.js": "6d146657cc1a1240a9becbe69434c62fff926696e7bed64d1fda077af02e5cba",
+				"chunks/document-app-cg70nxf6.js": "bb2320411645dac8916a8017ec8b296c859c067396bb1db258eed993f18aaca7",
+				"chunks/document-app-0qws83by.js": "7ae01b9ac8e67e17ba8bd37005498319b494efd9bd0a32b3c82fbb7b5c941ea9",
+				"chunks/document-app-vdebftn1.js": "507e8da09143d836113a404c56232595e878cba4400fa799c62798dec7b517f6",
+				"chunks/document-app-fxe9brfg.js": "c6d31a7614eb676767733fa606014d94570bc11ad6be571740a10282ad065a60",
+				"chunks/document-app-e2d6q4wt.js": "18b771ce81741e0926a1d7c6108fff6fd9f405801500bc20944237d45a2de46c",
+				"chunks/document-app-jtpt88mn.js": "41436880a07e4578aa7c96dede854e6bf49baa39fa5d4a36d2caded7cdb0f150",
+				"chunks/document-app-mhxdbbcv.js": "dea4045e1f34be00d5b61ac25f091ecf0ea50cf746910f281279e52e65602a53",
+				"chunks/document-app-8zxcexv4.js": "e6d6c69e82f7bf3bef1a59cb9283ddb5d7a8ea11c62b4dc7afdabc5987c67bcb",
+				"chunks/document-app-pttx3cxm.js": "dc7c2bf38f6634af443b463c52f70e138ea023f24f56c4f5f9dbe071b8c47eff",
+				"chunks/document-app-sqcqrsy0.js": "c38552eb5a9e2c2446063cae119eccc2d8165852e5ee0a6bff6e3c6161c572db",
+				"chunks/document-app-r2dwgsj2.js": "dd9a4ec6188a01b683d562eb26bb629a4fd3a3700a3aa5f1c6e5388641a9e82a",
+				"chunks/document-app-jw3p599h.js": "81fbf74e85b7d331e180c53fdd05a1c363f07082a4fedfba81e743025acebce4",
+				"chunks/document-app-dvm9cexk.js": "5ca6f4bf6ef2642ca8c30d7129397369900cd830f14d51412a7ce45d1460b5f6",
+				"chunks/document-app-spv3fgqe.js": "a8b525987e7fe7e14e35d0b846b7db4fc447a0ba8259ba80a820ab9a7b2397bc",
+				"chunks/document-app-ptjnpbmr.js": "0ac77f19f941a9b25166adac8d8d323c772071ed93fae193af3136a6f4994dfa",
+				"chunks/document-app-20grwdac.js": "3a8e44f0e1470da8412e205bcfc12d9f51d39181d25e71997cb28ea7f9b9bc86",
+				"chunks/document-app-nmw4mf8b.js": "590a0fd6c9972ab869dddcf9310b2a60e3ed97b191d738ec758f7643ce61faf3",
+				"chunks/document-app-xftmtyp7.js": "96ad1db8381221658fbf6cc497ab1294ffa69896ae72c1217f07656a7e78d287",
+				"chunks/document-app-28435jy0.js": "80ea4576f95e98e2a34732b28fde792d1a8aced3fc8b0f128f5a9962cc5b2658",
+				"chunks/document-app-vvj55qy7.js": "f4f2553e1496fb14375999b07ee0731c62c5c3810872a88e8a5daee28641c280",
+				"chunks/document-app-a8eweg2a.js": "2544f6ea6109b813c01d982e72535381b71922adcd1e2033ed6ad44ce090421f",
+				"chunks/document-app-n9bmzf76.js": "ea951ea421d7a8e53d52ae16d0d4cca824f1aa2e7862f896c79a211c80fc748c",
+				"chunks/document-app-dgy6r4yf.js": "820ee26305c3065a625b276787d938b7cd2e15f6a8934e588e8ab1a8a15cdafb",
+				"chunks/document-app-96t1yrbm.js": "eafac57ca99c87f450a381c03635c8877fdfff4965f52e0faf56295e21668c79",
+				"chunks/document-app-wv0axdcr.js": "8f608b010c154ab2b36d6bad714896527ecc295bab9cc34790b74f2ac2255596",
+				"chunks/document-app-wpvfcmn0.js": "53e52f70d17c83dafb8853a1f00909426e3333209e935ec9f3255915ca824bda",
+				"chunks/document-app-vtk1npmh.js": "5f90fbb3fa9513efe676d0839b29dc31682ba14c75a2392e39fe4f7069c12c5b",
+				"chunks/document-app-9qmsf4xa.js": "db73b55bb6ac97dba6631b92977064a8fd2454c0d3a1eb25db6a3a9c723ac95c",
+				"chunks/document-app-737t3vbf.js": "2a1f7a1e13864ca534e28ddeb57fe26ca7b8ea3ea39509002930a3f19042bb72",
+				"chunks/document-app-m2qx4cqf.js": "a16f603c7e82fa73c3c08187e200539440a114333311e16d891b12060d5d40bc",
+				"chunks/document-app-769nr5qc.js": "b8ca627ed14a8bc1a00d3ba3076b325f9e393eedc441f500124f2cb34620be01",
+				"chunks/document-app-xe6sx472.js": "cfd5570faa82f2afc7367678680b40139991611aca53820de6ff3452002c0f2f",
+				"chunks/document-app-6we13wz9.js": "1a7159f90ebec061d8a329cddca1e9671c898819fb47499bac6114d0f59d124a"
+			}
+		}
+	},
+	"method": {
+		"input": "trusted native x at mid-document Plain checkpoint offset+6",
+		"undo": "trusted Control+z; production accepts Control and Meta",
+		"window": "complete main RunTask union across 3s; enclosing initiating task included",
+		"trace": "no CPU sampling",
+		"history": "same closed browser profile and backend data seed restored independently per trial",
+		"scope": "one finite rich1MiB fixture, n3 each arm; headless60Hz; no120Hzclaim"
+	},
+	"gates": {
+		"exactSeed": true,
+		"exactAcceptedInput": true,
+		"exactAcceptedUndo": true,
+		"acceptedCursorAdvanced": true,
+		"exactNativeCursor": true,
+		"boundedNativeTextarea": true,
+		"publicModule": "19 contracts199 assertions +strict types pass; actual session.replace accepted Undo exact pre-view/offset, Redo exact post-view, save/reopen"
+	},
+	"limitations": [
+		"Full-source Unicode session.edit does not publish a prepared insertion receipt; retained Session eligibility failures.",
+		"Durable replica may remain cold for nonterminal peer insertion.",
+		"Restored cursor/native source are verified; full physical paint latency unavailable.",
+		"Heap samples reflect process state at input/Undo endpoints, not retained allocation ownership.",
+		"Earlier sampled5c causal diagnostic separate from current da0714c comparison."
+	],
+	"restoredPredecessor": {
+		"managedDirectory": "/tmp/alkalye-production-allocation-oct8",
+		"workState": "/tmp/alkalye-production-allocation-oct8/work-state",
+		"pid": 19740,
+		"port": 4461
+	}
+}

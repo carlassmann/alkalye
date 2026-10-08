@@ -1,0 +1,97 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/replica-insertion-inverse.test.ts:
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 15 [9.68ms]
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 13 [1.83ms]
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 30 [3.96ms]
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 34 [3.69ms]
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 49 [1.48ms]
+(pass) accepted duplicate insertion preserves exact source and inverse through a detached fork [1.32ms]
+(pass) concurrent sibling and metadata publication preserve peer text across cancellation [0.48ms]
+(pass) identity mutation cannot preserve acknowledgement or publish an inverse [0.39ms]
+(pass) cold restored cancellation preserves exact Unicode without a receipt [0.34ms]
+(pass) previously unknown child revealed by its parent survives parent cancellation [0.29ms]
+(pass) intervening metadata keeps source reconstruction and later inverse exact [0.25ms]
+(pass) all prepared replicas retain their own exact cursor removal proof [0.35ms]
+924 | 					replacement.text,
+925 | 				)
+926 | 			)
+927 | 				throw new RangeError(
+928 | 					"Text replacements must contain complete Unicode characters",
+929 | 				)
+          ^
+RangeError: Text replacements must contain complete Unicode characters
+      at prepareReplacements (/private/tmp/alkalye-rich-undo-certificate/runtime/src/shared/crdt.ts:929:5)
+      at insertion (/private/tmp/alkalye-rich-undo-certificate/runtime/tests/replica-insertion-inverse.test.ts:17:26)
+      at <anonymous> (/private/tmp/alkalye-rich-undo-certificate/runtime/tests/replica-insertion-inverse.test.ts:121:40)
+(fail) malformed UTF16 insertion and its inverse preserve exact source 55296 [0.41ms]
+924 | 					replacement.text,
+925 | 				)
+926 | 			)
+927 | 				throw new RangeError(
+928 | 					"Text replacements must contain complete Unicode characters",
+929 | 				)
+          ^
+RangeError: Text replacements must contain complete Unicode characters
+      at prepareReplacements (/private/tmp/alkalye-rich-undo-certificate/runtime/src/shared/crdt.ts:929:5)
+      at insertion (/private/tmp/alkalye-rich-undo-certificate/runtime/tests/replica-insertion-inverse.test.ts:17:26)
+      at <anonymous> (/private/tmp/alkalye-rich-undo-certificate/runtime/tests/replica-insertion-inverse.test.ts:121:40)
+(fail) malformed UTF16 insertion and its inverse preserve exact source 56320 [0.14ms]
+(pass) peer cancellation uses validated inverse and reconstructs the same source [0.42ms]
+1755 | 		})
+1756 | 	}
+1757 | 
+1758 | 	private restoreState(snapshot: ReplicaCheckpoint, shareAtoms: boolean) {
+1759 | 		let steps = this.restoreStateSteps(snapshot, shareAtoms, false)
+1760 | 		while (!steps.next().done) {}
+                       ^
+error: Invalid checkpoint cancellation target
+      at restoreState (/private/tmp/alkalye-rich-undo-certificate/runtime/src/shared/crdt.ts:1760:17)
+      at restore (/private/tmp/alkalye-rich-undo-certificate/runtime/src/shared/crdt.ts:1730:8)
+      at oracle (/private/tmp/alkalye-rich-undo-certificate/runtime/tests/replica-insertion-inverse.test.ts:6:7)
+      at <anonymous> (/private/tmp/alkalye-rich-undo-certificate/runtime/tests/replica-insertion-inverse.test.ts:140:2)
+(fail) a cancellation received before its target cannot publish an inactive inverse [1.18ms]
+(pass) mixed known acknowledgement and new metadata preserve reconstruction [0.40ms]
+
+tests/durable-insertion-inverse.test.ts:
+174 | 								yield* appended.saved
+175 | 								yield* value.sync
+176 |         yield* value.undo()
+177 |         yield* value.sync
+178 |         expect(value.replica.text("doc")).toBe(edited)
+179 |         expect(value.replica.visible("doc")).toBe(before)
+                                                   ^
+error: expect(received).toBe(expected)
+
+Expected: []
+Received: serializes to the same string
+
+      at <anonymous> (/private/tmp/alkalye-rich-undo-certificate/runtime/tests/durable-insertion-inverse.test.ts:179:46)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+(fail) accepted middle insertion undo and redo persist and reopen exact document and discussion (cooperative=%s) [115.54ms]
+174 | 								yield* appended.saved
+175 | 								yield* value.sync
+176 |         yield* value.undo()
+177 |         yield* value.sync
+178 |         expect(value.replica.text("doc")).toBe(edited)
+179 |         expect(value.replica.visible("doc")).toBe(before)
+                                                   ^
+error: expect(received).toBe(expected)
+
+Expected: []
+Received: serializes to the same string
+
+      at <anonymous> (/private/tmp/alkalye-rich-undo-certificate/runtime/tests/durable-insertion-inverse.test.ts:179:46)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+(fail) accepted middle insertion undo and redo persist and reopen exact document and discussion (cooperative=%s) [69.48ms]
+
+ 14 pass
+ 5 fail
+ 168 expect() calls
+Ran 19 tests across 2 files. [279.00ms]

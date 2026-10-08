@@ -1,0 +1,49 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/durable-insertion-inverse.test.ts:
+{"stage":"afterUndo","same":false,"insertCount":1,"removeCount":0,"field":false,"special":{"order":false,"observed":false,"migration":false,"deleted":false,"emptyHeader":false,"body":false,"ending":false}}
+{"cooperativeWork":false,"savedSame":true,"acceptedSame":true,"undoSame":false}
+180 |         let atom = appended.operation?.insert[0]
+181 |         console.log(JSON.stringify({ stage: "afterUndo", same: undoneView === before, removalOffset: insertionRemovalPosition(acceptedView, undoneView, atom?.id ?? ""), insertCount: appended.operation?.insert.length, removeCount: appended.operation?.remove.length, field: Boolean(appended.operation?.field), special: atom && { order: Boolean(atom.order), observed: Boolean(atom.observed), migration: Boolean(atom.migration), deleted: Boolean(atom.deleted), emptyHeader: Boolean(atom.emptyHeader), body: Boolean(atom.body), ending: Boolean(atom.ending) } }))
+182 |         yield* value.sync
+183 |         expect(value.replica.text("doc")).toBe(edited)
+184 |         console.log(JSON.stringify({ cooperativeWork, savedSame: savedView === after, acceptedSame: acceptedView === after, undoSame: value.replica.visible("doc") === before, removalOffset: insertionRemovalPosition(acceptedView, value.replica.visible("doc"), appended.operation?.insert[0]?.id ?? "") }))
+185 |         expect(value.replica.visible("doc")).toBe(before)
+      ^
+error: expect(received).toBe(expected)
+
+Expected: []
+Received: serializes to the same string
+
+      at toBe (unknown:1:1)
+      at /private/tmp/alkalye-rich-undo-certificate/runtime/tests/durable-insertion-inverse.test.ts:185:46
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at /Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17
+(fail) accepted middle insertion undo and redo persist and reopen exact document and discussion (cooperative=%s) [113.20ms]
+{"stage":"afterUndo","same":false,"insertCount":1,"removeCount":0,"field":false,"special":{"order":false,"observed":false,"migration":false,"deleted":false,"emptyHeader":false,"body":false,"ending":false}}
+{"cooperativeWork":true,"savedSame":true,"acceptedSame":true,"undoSame":false}
+180 |         let atom = appended.operation?.insert[0]
+181 |         console.log(JSON.stringify({ stage: "afterUndo", same: undoneView === before, removalOffset: insertionRemovalPosition(acceptedView, undoneView, atom?.id ?? ""), insertCount: appended.operation?.insert.length, removeCount: appended.operation?.remove.length, field: Boolean(appended.operation?.field), special: atom && { order: Boolean(atom.order), observed: Boolean(atom.observed), migration: Boolean(atom.migration), deleted: Boolean(atom.deleted), emptyHeader: Boolean(atom.emptyHeader), body: Boolean(atom.body), ending: Boolean(atom.ending) } }))
+182 |         yield* value.sync
+183 |         expect(value.replica.text("doc")).toBe(edited)
+184 |         console.log(JSON.stringify({ cooperativeWork, savedSame: savedView === after, acceptedSame: acceptedView === after, undoSame: value.replica.visible("doc") === before, removalOffset: insertionRemovalPosition(acceptedView, value.replica.visible("doc"), appended.operation?.insert[0]?.id ?? "") }))
+185 |         expect(value.replica.visible("doc")).toBe(before)
+                                                   ^
+error: expect(received).toBe(expected)
+
+Expected: []
+Received: serializes to the same string
+
+      at <anonymous> (/private/tmp/alkalye-rich-undo-certificate/runtime/tests/durable-insertion-inverse.test.ts:185:46)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+(fail) accepted middle insertion undo and redo persist and reopen exact document and discussion (cooperative=%s) [58.39ms]
+
+ 0 pass
+ 2 fail
+ 16 expect() calls
+Ran 2 tests across 1 file. [221.00ms]

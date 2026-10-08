@@ -1,0 +1,1027 @@
+{
+	"cpuSampling": true,
+	"undoInitiatingTaskMs": 0.572,
+	"sampledTargetTaskMs": 208.208,
+	"targetStartRelativeMs": 150.888,
+	"allTaskMaxMs": 208.208,
+	"deferredMaxMs": 208.208,
+	"profiles": [
+		{
+			"main": true,
+			"sampledTargetTaskSelfMs": 208.479,
+			"self": [
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1347,
+						"functionName": "rawVisibleSteps",
+						"lineNumber": 36,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 117.08,
+					"inclusiveMs": 117.08,
+					"mapped": {
+						"source": "../src/shared/crdt.ts",
+						"line": 1245,
+						"column": 26,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 16881,
+						"functionName": "Zn",
+						"lineNumber": 85,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+					},
+					"selfMs": 15.417,
+					"inclusiveMs": 15.572,
+					"mapped": {
+						"source": "../src/client/components/editor.ts",
+						"line": 959,
+						"column": 20,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1985,
+						"functionName": "Kt",
+						"lineNumber": 27,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 10.64,
+					"inclusiveMs": 20.048,
+					"mapped": {
+						"source": "../src/shared/frontmatter-merge.ts",
+						"line": 454,
+						"column": 29,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(program)",
+						"scriptId": 0
+					},
+					"selfMs": 8.166,
+					"inclusiveMs": 8.166,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 604,
+						"functionName": "tt",
+						"lineNumber": 22,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 7.768,
+					"inclusiveMs": 28.135,
+					"mapped": {
+						"source": "../src/shared/frontmatter-merge.ts",
+						"line": 135,
+						"column": 34,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 558,
+						"functionName": "d",
+						"lineNumber": 32,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 5.064,
+					"inclusiveMs": 7.368,
+					"mapped": {
+						"source": "../src/shared/atom-sequence.ts",
+						"line": 52,
+						"column": 17,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(garbage collector)",
+						"scriptId": 0
+					},
+					"selfMs": 4.727,
+					"inclusiveMs": 4.727,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 558,
+						"functionName": "d",
+						"lineNumber": 32,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 4.656,
+					"inclusiveMs": 5.25,
+					"mapped": {
+						"source": "../src/shared/atom-sequence.ts",
+						"line": 52,
+						"column": 17,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 12,
+						"functionName": "J",
+						"lineNumber": 30,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 4.158,
+					"inclusiveMs": 9.408,
+					"mapped": {
+						"source": "../src/shared/frontmatter-merge.ts",
+						"line": 558,
+						"column": 20,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 6498,
+						"functionName": "projectionFor",
+						"lineNumber": 67,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+					},
+					"selfMs": 4.114,
+					"inclusiveMs": 4.726,
+					"mapped": {
+						"source": "../src/client/source-textarea.ts",
+						"line": 242,
+						"column": 23,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 482,
+						"functionName": "D",
+						"lineNumber": 0,
+						"scriptId": 32,
+						"url": "http://127.0.0.1:4461/chunks/document-app-tqe6f0f5.js"
+					},
+					"selfMs": 4.0,
+					"inclusiveMs": 121.08,
+					"mapped": {
+						"source": "../src/shared/collection-copy.ts",
+						"line": 35,
+						"column": 31,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 2931,
+						"functionName": "text",
+						"lineNumber": 36,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 3.991,
+					"inclusiveMs": 162.564,
+					"mapped": {
+						"source": "../src/shared/crdt.ts",
+						"line": 1354,
+						"column": 6,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 9036,
+						"functionName": "render",
+						"lineNumber": 59,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+					},
+					"selfMs": 2.34,
+					"inclusiveMs": 4.541,
+					"mapped": {
+						"source": "../src/client/editor-viewport.ts",
+						"line": 343,
+						"column": 8,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 391,
+						"functionName": "apply",
+						"lineNumber": 68,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+					},
+					"selfMs": 1.445,
+					"inclusiveMs": 6.298,
+					"mapped": {
+						"source": "../src/client/source-textarea.ts",
+						"line": 279,
+						"column": 15,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1566,
+						"functionName": "_r",
+						"lineNumber": 30,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 1.23,
+					"inclusiveMs": 1.23,
+					"mapped": {
+						"source": "../src/shared/text-index.ts",
+						"line": 39,
+						"column": 25,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 3014,
+						"functionName": "paint",
+						"lineNumber": 66,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+					},
+					"selfMs": 1.227,
+					"inclusiveMs": 2.14,
+					"mapped": {
+						"source": "../src/client/editor-viewport.ts",
+						"line": 836,
+						"column": 15,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1566,
+						"functionName": "_r",
+						"lineNumber": 30,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 1.221,
+					"inclusiveMs": 1.221,
+					"mapped": {
+						"source": "../src/shared/text-index.ts",
+						"line": 39,
+						"column": 25,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 640,
+						"functionName": "",
+						"lineNumber": 32,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 1.198,
+					"inclusiveMs": 1.849,
+					"mapped": {
+						"source": "../src/shared/atom-sequence.ts",
+						"line": 59,
+						"column": 46,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 228,
+						"functionName": "update",
+						"lineNumber": 81,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+					},
+					"selfMs": 1.064,
+					"inclusiveMs": 1.83,
+					"mapped": {
+						"source": "../src/client/components/editor-overlay.ts",
+						"line": 40,
+						"column": 8,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 16305,
+						"functionName": "tt",
+						"lineNumber": 85,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+					},
+					"selfMs": 0.86,
+					"inclusiveMs": 29.455,
+					"mapped": {
+						"source": "../src/client/components/editor.ts",
+						"line": 918,
+						"column": 17,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1786,
+						"functionName": "er",
+						"lineNumber": 30,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 0.769,
+					"inclusiveMs": 1.99,
+					"mapped": {
+						"source": "../src/shared/text-index.ts",
+						"line": 55,
+						"column": 17,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 3131,
+						"functionName": "",
+						"lineNumber": 36,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 0.651,
+					"inclusiveMs": 0.651,
+					"mapped": {
+						"source": "../src/shared/crdt.ts",
+						"line": 1364,
+						"column": 9,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1786,
+						"functionName": "er",
+						"lineNumber": 30,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 0.616,
+					"inclusiveMs": 1.846,
+					"mapped": {
+						"source": "../src/shared/text-index.ts",
+						"line": 55,
+						"column": 17,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1236,
+						"functionName": "project",
+						"lineNumber": 11,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+					},
+					"selfMs": 0.612,
+					"inclusiveMs": 0.612,
+					"mapped": {
+						"source": "../src/shared/projection.ts",
+						"line": 87,
+						"column": 9,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 640,
+						"functionName": "",
+						"lineNumber": 32,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 0.588,
+					"inclusiveMs": 0.594,
+					"mapped": {
+						"source": "../src/shared/atom-sequence.ts",
+						"line": 59,
+						"column": 46,
+						"name": ""
+					}
+				}
+			],
+			"inclusive": [
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(root)",
+						"scriptId": 0
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 208.479,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 2088,
+						"functionName": "cn",
+						"lineNumber": 1578,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 192.923,
+					"mapped": {
+						"source": "../src/client/document-app.ts",
+						"line": 2293,
+						"column": 27,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 823,
+						"functionName": "$t",
+						"lineNumber": 1652,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 192.923,
+					"mapped": {
+						"source": "../src/client/document-app.ts",
+						"line": 2683,
+						"column": 3,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 475,
+						"functionName": "",
+						"lineNumber": 1652,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 192.923,
+					"mapped": {
+						"source": "../src/client/document-app.ts",
+						"line": 2654,
+						"column": 19,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 2931,
+						"functionName": "text",
+						"lineNumber": 36,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 3.991,
+					"inclusiveMs": 162.564,
+					"mapped": {
+						"source": "../src/shared/crdt.ts",
+						"line": 1354,
+						"column": 6,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 119143,
+						"functionName": "text",
+						"lineNumber": 7,
+						"scriptId": 18,
+						"url": "http://127.0.0.1:4461/chunks/document-app-hfwc5xy0.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 162.564,
+					"mapped": {
+						"source": "../src/shared/document-session.ts",
+						"line": 1883,
+						"column": 21,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 15726,
+						"functionName": "source",
+						"lineNumber": 1569,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 162.564,
+					"mapped": {
+						"source": "../src/client/document-app.ts",
+						"line": 1333,
+						"column": 20,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 344,
+						"functionName": "refresh",
+						"lineNumber": 993,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 162.564,
+					"mapped": {
+						"source": "../src/client/document-media-view.ts",
+						"line": 43,
+						"column": 11,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 744,
+						"functionName": "visible",
+						"lineNumber": 36,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 149.215,
+					"mapped": {
+						"source": "../src/shared/crdt.ts",
+						"line": 1205,
+						"column": 9,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 482,
+						"functionName": "D",
+						"lineNumber": 0,
+						"scriptId": 32,
+						"url": "http://127.0.0.1:4461/chunks/document-app-tqe6f0f5.js"
+					},
+					"selfMs": 4.0,
+					"inclusiveMs": 121.08,
+					"mapped": {
+						"source": "../src/shared/collection-copy.ts",
+						"line": 35,
+						"column": 31,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1282,
+						"functionName": "rawVisible",
+						"lineNumber": 36,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 121.08,
+					"mapped": {
+						"source": "../src/shared/crdt.ts",
+						"line": 1239,
+						"column": 20,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1347,
+						"functionName": "rawVisibleSteps",
+						"lineNumber": 36,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 117.08,
+					"inclusiveMs": 117.08,
+					"mapped": {
+						"source": "../src/shared/crdt.ts",
+						"line": 1245,
+						"column": 26,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 16305,
+						"functionName": "tt",
+						"lineNumber": 85,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+					},
+					"selfMs": 0.86,
+					"inclusiveMs": 29.455,
+					"mapped": {
+						"source": "../src/client/components/editor.ts",
+						"line": 918,
+						"column": 17,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 3055,
+						"functionName": "update",
+						"lineNumber": 85,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 29.455,
+					"mapped": {
+						"source": "../src/client/components/editor.ts",
+						"line": 116,
+						"column": 8,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 604,
+						"functionName": "tt",
+						"lineNumber": 22,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 7.768,
+					"inclusiveMs": 28.135,
+					"mapped": {
+						"source": "../src/shared/frontmatter-merge.ts",
+						"line": 135,
+						"column": 34,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 482,
+						"functionName": "D",
+						"lineNumber": 0,
+						"scriptId": 32,
+						"url": "http://127.0.0.1:4461/chunks/document-app-tqe6f0f5.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 28.135,
+					"mapped": {
+						"source": "../src/shared/collection-copy.ts",
+						"line": 35,
+						"column": 31,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 559,
+						"functionName": "Xt",
+						"lineNumber": 22,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 28.135,
+					"mapped": {
+						"source": "../src/shared/frontmatter-merge.ts",
+						"line": 128,
+						"column": 28,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1985,
+						"functionName": "Kt",
+						"lineNumber": 27,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 10.64,
+					"inclusiveMs": 20.048,
+					"mapped": {
+						"source": "../src/shared/frontmatter-merge.ts",
+						"line": 454,
+						"column": 29,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 16881,
+						"functionName": "Zn",
+						"lineNumber": 85,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+					},
+					"selfMs": 15.417,
+					"inclusiveMs": 15.572,
+					"mapped": {
+						"source": "../src/client/components/editor.ts",
+						"line": 959,
+						"column": 20,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 6321,
+						"functionName": "render",
+						"lineNumber": 67,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 11.024,
+					"mapped": {
+						"source": "../src/client/source-textarea.ts",
+						"line": 229,
+						"column": 16,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 4943,
+						"functionName": "reconcile",
+						"lineNumber": 67,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 11.024,
+					"mapped": {
+						"source": "../src/client/source-textarea.ts",
+						"line": 153,
+						"column": 11,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 12,
+						"functionName": "J",
+						"lineNumber": 30,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 4.158,
+					"inclusiveMs": 9.408,
+					"mapped": {
+						"source": "../src/shared/frontmatter-merge.ts",
+						"line": 558,
+						"column": 20,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 63,
+						"functionName": "jr",
+						"lineNumber": 30,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 9.408,
+					"mapped": {
+						"source": "../src/shared/frontmatter-merge.ts",
+						"line": 562,
+						"column": 26,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(program)",
+						"scriptId": 0
+					},
+					"selfMs": 8.166,
+					"inclusiveMs": 8.166,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 558,
+						"functionName": "d",
+						"lineNumber": 32,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 5.064,
+					"inclusiveMs": 7.368,
+					"mapped": {
+						"source": "../src/shared/atom-sequence.ts",
+						"line": 52,
+						"column": 17,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 391,
+						"functionName": "apply",
+						"lineNumber": 68,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+					},
+					"selfMs": 1.445,
+					"inclusiveMs": 6.298,
+					"mapped": {
+						"source": "../src/client/source-textarea.ts",
+						"line": 279,
+						"column": 15,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 558,
+						"functionName": "d",
+						"lineNumber": 32,
+						"scriptId": 26,
+						"url": "http://127.0.0.1:4461/chunks/document-app-5jwrpbdb.js"
+					},
+					"selfMs": 4.656,
+					"inclusiveMs": 5.25,
+					"mapped": {
+						"source": "../src/shared/atom-sequence.ts",
+						"line": 52,
+						"column": 17,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(garbage collector)",
+						"scriptId": 0
+					},
+					"selfMs": 4.727,
+					"inclusiveMs": 4.727,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 6498,
+						"functionName": "projectionFor",
+						"lineNumber": 67,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+					},
+					"selfMs": 4.114,
+					"inclusiveMs": 4.726,
+					"mapped": {
+						"source": "../src/client/source-textarea.ts",
+						"line": 242,
+						"column": 23,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 9036,
+						"functionName": "render",
+						"lineNumber": 59,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-0dak6ph7.js"
+					},
+					"selfMs": 2.34,
+					"inclusiveMs": 4.541,
+					"mapped": {
+						"source": "../src/client/editor-viewport.ts",
+						"line": 343,
+						"column": 8,
+						"name": ""
+					}
+				}
+			]
+		},
+		{
+			"main": false,
+			"sampledTargetTaskSelfMs": 216.943,
+			"self": [
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(idle)",
+						"scriptId": 0
+					},
+					"selfMs": 206.592,
+					"inclusiveMs": 206.592,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(program)",
+						"scriptId": 0
+					},
+					"selfMs": 10.351,
+					"inclusiveMs": 10.351,
+					"mapped": null
+				}
+			],
+			"inclusive": [
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(root)",
+						"scriptId": 0
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 216.943,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(idle)",
+						"scriptId": 0
+					},
+					"selfMs": 206.592,
+					"inclusiveMs": 206.592,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(program)",
+						"scriptId": 0
+					},
+					"selfMs": 10.351,
+					"inclusiveMs": 10.351,
+					"mapped": null
+				}
+			]
+		}
+	],
+	"traceSha256": "cb13ce335175ef12eb6a394b55d734e8f6e8bb00cc8c5ecb783a13b4e93e570a"
+}

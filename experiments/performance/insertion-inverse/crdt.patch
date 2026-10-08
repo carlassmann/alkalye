@@ -1,0 +1,251 @@
+--- src/shared/crdt.ts	2026-10-08 15:13:05
++++ /tmp/alkalye-rich-undo-certificate/src/shared/crdt.ts	2026-10-08 16:44:15
+@@ -51,6 +51,33 @@
+ 	let removed = terminalRemovals.get(next)?.get(previous)
+ 	return removed?.id === id ? removed.offset : undefined
+ }
++let insertionRemovals = new WeakMap<
++	Atom[],
++	WeakMap<Atom[], { id: string; offset: number }>
++>()
++export function insertionRemovalPosition(
++	previous: Atom[],
++	next: Atom[],
++	id: string,
++) {
++	let removed = insertionRemovals.get(next)?.get(previous)
++	return removed?.id === id ? removed.offset : undefined
++}
++interface InsertionView {
++	atoms: Atom[]
++	raw: Atom[]
++	content: string
++}
++interface InsertionReceipt {
++	target: string
++	generation: number
++	lastOperation: string
++	atom: Atom
++	offset: number
++	inserted: boolean
++	before: InsertionView
++	after: InsertionView
++}
+ interface PreparedSplice {
+ 	after: string
+ 	start: number
+@@ -66,6 +93,7 @@
+ 	content: string
+ }
+ interface PreparedTextEdit {
++	inverse?: InsertionReceipt
+ 	terminalRemoval?: true
+ 	id: string
+ 	target: string
+@@ -101,6 +129,7 @@
+ 	private legacyTextTargets = new Set<string>()
+ 	private preparedEdit: PreparedTextEdit | undefined
+ 	private terminalRedo: TerminalRedo | undefined
++	private insertionReceipt: InsertionReceipt | undefined
+ 	constructor(
+ 		public actor: string,
+ 		public author = "Writer",
+@@ -166,6 +195,7 @@
+ 		replica.created = yield* copyMapSteps(this.created, cooperative)
+ 		replica.restored = yield* copyMapSteps(this.restored, cooperative)
+ 		replica.terminalRedo = this.terminalRedo
++		replica.insertionReceipt = this.insertionReceipt
+ 		return replica
+ 	}
+ 	get generation() {
+@@ -183,15 +213,72 @@
+ 	private prepareApplication(input: Operation[]) {
+ 		let edit =
+ 			this.preparedEdit ??
++			this.prepareInsertionInverse(input) ??
+ 			this.prepareTerminalCancellation(input) ??
+ 			this.prepareTerminalRedo(input) ??
+ 			this.prepareTerminalPeerEdit(input) ??
+ 			this.preparePeerInsertionRun(input)
++		let receipt = this.insertionReceipt
++		let acknowledge =
++			receipt &&
++			input.every(operation => this.operations.has(operation.id)) &&
++			this.matchesInsertionReceipt(receipt)
+ 		let commit = this.prepare(input)
+ 		return () => {
+ 			this.preparedEdit = undefined
++			this.insertionReceipt = undefined
+ 			commit()
++			if (acknowledge && receipt)
++				this.insertionReceipt = { ...receipt, generation: this.generation }
+ 			this.cachePreparedText(input, edit)
++		}
++	}
++	private matchesInsertionReceipt(receipt: InsertionReceipt) {
++		let view = receipt.inserted ? receipt.after : receipt.before
++		return (
++			this.generation === receipt.generation &&
++			this.sourceCache.get(receipt.target) === view.atoms &&
++			this.textCache.get(receipt.target) === view.raw &&
++			this.strings.get(receipt.target) === view.content &&
++			sourceViews.get(view.atoms) === view.raw
++		)
++	}
++	private prepareInsertionInverse(
++		input: Operation[],
++	): PreparedTextEdit | undefined {
++		let receipt = this.insertionReceipt
++		let operation = input[0]
++		if (
++			!receipt ||
++			input.length !== 1 ||
++			!operation ||
++			operation.kind !== "cancel" ||
++			typeof operation.id !== "string" ||
++			operation.target !== receipt.target ||
++			operation.value !== receipt.lastOperation ||
++			this.operations.has(operation.id) ||
++			this.textOwners.has(operation.id) ||
++			this.visibility.get(receipt.target)?.known(operation.id) ||
++			this.visibility.get(receipt.target)?.active(operation.id) === false ||
++			this.legacyTextTargets.has(receipt.target) ||
++			!this.canCancel(receipt.target, receipt.lastOperation) ||
++			!this.matchesInsertionReceipt(receipt) ||
++			this.atomIndex.get(receipt.atom.id)?.atom !== receipt.atom
++		)
++			return undefined
++		let current = receipt.inserted ? receipt.after : receipt.before
++		let next = receipt.inserted ? receipt.before : receipt.after
++		return {
++			inverse: receipt,
++			id: operation.id,
++			target: receipt.target,
++			generation: this.generation,
++			signature: textEditSignature(operation),
++			content: next.content,
++			atoms: current.atoms,
++			raw: current.raw,
++			splices: [],
++			rawSplices: [],
+ 		}
+ 	}
+ 	private prepareTerminalRedo(
+@@ -586,7 +673,33 @@
+ 			this.generation !== edit.generation + 1 ||
+ 			textEditSignature(operation) !== edit.signature
+ 		)
++			return
++		if (edit.inverse) {
++			let receipt = edit.inverse
++			let view = receipt.inserted ? receipt.before : receipt.after
++			this.textCache.set(edit.target, view.raw)
++			this.sourceCache.set(edit.target, view.atoms)
++			this.strings.set(edit.target, view.content)
++			sourceViews.set(view.atoms, view.raw)
++			sourceStrings.set(view.atoms, view.content)
++			if (receipt.inserted) {
++				let removals =
++					insertionRemovals.get(view.atoms) ??
++					new WeakMap<Atom[], { id: string; offset: number }>()
++				removals.set(edit.atoms, {
++					id: receipt.atom.id,
++					offset: receipt.offset,
++				})
++				insertionRemovals.set(view.atoms, removals)
++			}
++			this.insertionReceipt = {
++				...receipt,
++				generation: this.generation,
++				lastOperation: operation.id,
++				inserted: !receipt.inserted,
++			}
+ 			return
++		}
+ 		let replica = this
+ 		function replacements(splices: PreparedSplice[]) {
+ 			return splices.map(splice => ({
+@@ -620,6 +733,67 @@
+ 		sourceViews.set(atoms, raw)
+ 		this.strings.set(edit.target, edit.content)
+ 		sourceStrings.set(atoms, edit.content)
++		let splice = edit.splices[0]
++		let rawSplice = edit.rawSplices[0]
++		let inserted = operation.insert[0]
++		let insertedAtom = inserted && this.atomIndex.get(inserted.id)?.atom
++		let before = sourceStrings.get(edit.atoms)
++		if (
++			operation.kind === "text" &&
++			!operation.field &&
++			operation.insert.length === 1 &&
++			!operation.remove.length &&
++			this.visibility.get(edit.target)?.active(operation.id) !== false &&
++			!this.legacyTextTargets.has(edit.target) &&
++			splice &&
++			edit.splices.length === 1 &&
++			splice.remove === 0 &&
++			splice.inserted.length === 1 &&
++			splice.inserted[0] === inserted?.id &&
++			rawSplice &&
++			edit.rawSplices.length === 1 &&
++			rawSplice.remove === 0 &&
++			rawSplice.inserted.length === 1 &&
++			rawSplice.inserted[0] === inserted?.id &&
++			insertedAtom &&
++			Object.isFrozen(insertedAtom) &&
++			((insertedAtom.value.length === 1 &&
++				(insertedAtom.value.charCodeAt(0) < 0xd800 ||
++					insertedAtom.value.charCodeAt(0) > 0xdfff)) ||
++				(insertedAtom.value.length === 2 &&
++					insertedAtom.value.charCodeAt(0) >= 0xd800 &&
++					insertedAtom.value.charCodeAt(0) <= 0xdbff &&
++					insertedAtom.value.charCodeAt(1) >= 0xdc00 &&
++					insertedAtom.value.charCodeAt(1) <= 0xdfff)) &&
++			insertedAtom.order === undefined &&
++			insertedAtom.ending === undefined &&
++			insertedAtom.observed === undefined &&
++			insertedAtom.migration === undefined &&
++			insertedAtom.deleted === undefined &&
++			insertedAtom.emptyHeader === undefined &&
++			insertedAtom.body === undefined &&
++			!this.children.get(edit.target)?.has(insertedAtom.id) &&
++			before !== undefined &&
++			sourceViews.get(edit.atoms) === edit.raw &&
++			atoms.length === edit.atoms.length + 1 &&
++			raw.length === edit.raw.length + 1
++		) {
++			let offset =
++				before.length === edit.atoms.length
++					? splice.start
++					: previousIndex?.offsetAtCodePoint(splice.start)
++			if (offset !== undefined)
++				this.insertionReceipt = {
++					target: edit.target,
++					generation: this.generation,
++					lastOperation: operation.id,
++					atom: insertedAtom,
++					offset,
++					inserted: true,
++					before: { atoms: edit.atoms, raw: edit.raw, content: before },
++					after: { atoms, raw, content: edit.content },
++				}
++		}
+ 		let removed = edit.terminalRemoval && edit.atoms.at(-1)
+ 		if (
+ 			removed &&
+@@ -697,6 +871,7 @@
+ 		return () => {
+ 			if (operations.some(operation => !this.operations.has(operation.id)))
+ 				this.terminalRedo = undefined
++			this.insertionReceipt = undefined
+ 			for (let commit of commits) commit()
+ 			for (let operation of operations) {
+ 				this.clock = Math.max(this.clock, operation.clock)
+@@ -1648,6 +1823,7 @@
+ 		cooperative: boolean,
+ 	): Generator<void> {
+ 		this.terminalRedo = undefined
++		this.insertionReceipt = undefined
+ 		if (cooperative && this.stateGeneration !== 0)
+ 			throw new Error("Cooperative hydration requires a private fresh replica")
+ 		let work = 0
