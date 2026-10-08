@@ -206,6 +206,15 @@
 			useful cache improvement, so production retains the original lexer.
 			Evidence: <code>experiments/performance/projector-lexical-context</code>.
 		</p>
+		<p>
+			Mid-document Undo in the same 1MiB rich fixture remains slow: six trials
+			contain a 203–233ms task. The key handler takes about 0.5ms; the long task
+			starts about 150ms later in the scheduled document refresh. Layout takes
+			about 0.4ms within that task. These traces locate the refresh boundary,
+			but do not isolate CRDT reconstruction, editor reconciliation or
+			projection. A CPU profile is needed before choosing a fix. Terminal Undo
+			improvements do not cover this case.
+		</p>
 		<h2>Earlier journey comparison with main</h2>
 		<p>
 			Both production builds used their own local sync servers, signed accounts
