@@ -44,6 +44,7 @@ import { verifyAcceptedDocumentSnapshots } from "./browser-document-snapshots"
 import { verifyReceivedDocumentBatches } from "./browser-document-batches"
 import { verifyDocumentOpeningRace } from "./browser-document-opening"
 import { verifyDocumentIndex } from "./browser-document-index"
+import { verifyExcerptCatalogue } from "./browser-excerpt-catalogue"
 import { verifyDocumentDiscussion } from "./browser-document-discussion"
 import { verifyReceivedDocumentCompensations } from "./browser-document-undo"
 import { verifyDocumentUndo } from "./browser-native-undo"
@@ -846,6 +847,7 @@ let test = Effect.scoped(
 		yield* verifyReceivedDocumentBatches(identity.subject, check)
 		yield* verifyDocumentOpeningRace(identity.subject, check)
 		yield* verifyDocumentIndex(identity.subject, check)
+		yield* verifyExcerptCatalogue("excerpt-" + crypto.randomUUID(), check)
 		yield* verifyDocumentDiscussion(identity.subject, check)
 		yield* verifyDocumentBlobs(identity, check)
 		yield* verifyReceivedDocumentCompensations(identity.subject, check)

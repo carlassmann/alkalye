@@ -257,6 +257,17 @@
 			does not meet 8.33ms.
 		</p>
 		<p>
+			Sidebar excerpts now transform only the prefix needed for their
+			72-code-unit label. Forty-one real IndexedDB catalogue assertions passed,
+			including reopen, frontmatter, whitespace and Unicode cases. Six separate
+			trials against the pre-projection-cache version reduced input-task median
+			from 18.06ms to 16.58ms and Undo peak median from 19.51ms to 17.79ms.
+			Input aftermath, maximum Undo-window work and heap samples increased; this
+			is no claim of less total work or memory. Long blank prefixes and
+			unfinished frontmatter can still require full scans. Combined changes
+			remain to be measured.
+		</p>
+		<p>
 			CRLF correctness: the editor now maps Markdown source offsets to the
 			textarea's native LF offsets through its existing text index. Edits retain
 			untouched line endings, including across tree leaves. Native module checks

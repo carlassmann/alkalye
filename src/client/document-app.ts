@@ -33,6 +33,7 @@ import type { MenuEntry } from "./components/context-menu"
 import { PermissionDenied } from "../shared/document-actions"
 import {
 	compileTheme,
+	documentExcerpt,
 	frontmatter,
 	safeUrl,
 	withFrontmatter,
@@ -1548,10 +1549,7 @@ function mountApplication() {
 										folder: doc.metadata.path,
 									}
 								: {}),
-							excerpt: frontmatter(current.content)
-								.body.replace(/[#*`>\n]/g, " ")
-								.trim()
-								.slice(0, 72),
+							excerpt: documentExcerpt(current.content),
 						}
 					return {
 						id: doc.document,

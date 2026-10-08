@@ -39,6 +39,21 @@ export function frontmatterBlock(source: string) {
 	)
 	return match?.index === 0 ? match : undefined
 }
+export function documentExcerpt(source: string) {
+	let bodyStart = /^(?:\uFEFF)?---[ \t]*\r?\n/.test(source)
+		? (frontmatterBlock(source)?.[0].length ?? 0)
+		: 0
+	let surviving = /[^#*`>\s]/g
+	surviving.lastIndex = bodyStart
+	let first = surviving.exec(source)
+	if (!first) return ""
+	let end = first.index + 72
+	let prefix = source.slice(first.index, end).replace(/[#*`>\n]/g, " ")
+	let trimmed = prefix.trimEnd()
+	if (prefix === trimmed || end >= source.length) return trimmed
+	surviving.lastIndex = end
+	return surviving.test(source) ? prefix : trimmed
+}
 export type FrontmatterValue =
 	string | boolean | number | readonly string[] | undefined
 export function withFrontmatter(

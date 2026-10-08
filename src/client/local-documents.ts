@@ -9,7 +9,7 @@ import { Replica } from "../shared/crdt"
 import { LocalDocumentCreationSchema } from "../shared/document-actions"
 import type { LocalDocumentCreation } from "../shared/document-actions"
 import { documentMetadata } from "../shared/document-metadata"
-import { frontmatter } from "../shared/markdown"
+import { frontmatter, documentExcerpt } from "../shared/markdown"
 import { parseOperation } from "../shared/model"
 import { LibraryDocumentSchema } from "../shared/workspace"
 import { wikiTargets } from "../shared/portable-links"
@@ -221,7 +221,7 @@ function makeDocuments(subject: string) {
 											...row.summary,
 											metadata: documentMetadata(record.content),
 											kind: record.kind ?? "document",
-											excerpt: excerpt(record.content),
+											excerpt: documentExcerpt(record.content),
 											links: wikiTargets(frontmatter(record.content).body),
 											created: record.created ?? 0,
 											updated: record.updated,
@@ -293,16 +293,10 @@ function initialSummary(creation: LocalDocumentCreation): SummaryRow {
 			deleted: false,
 			metadata: documentMetadata(record.content),
 			kind: record.kind ?? "document",
-			excerpt: excerpt(record.content),
+			excerpt: documentExcerpt(record.content),
 			links: wikiTargets(frontmatter(record.content).body),
 			created: record.created ?? 0,
 			updated: record.updated,
 		},
 	}
-}
-function excerpt(source: string) {
-	return frontmatter(source)
-		.body.replace(/[#*`>\n]/g, " ")
-		.trim()
-		.slice(0, 72)
 }
