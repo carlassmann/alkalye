@@ -1,0 +1,2642 @@
+[
+	{
+		"role": null,
+		"phase": "cache:scenario:before-peer",
+		"ts": 332079096104
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:unchanged:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}",
+		"ts": 332079147937
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:unchanged:end",
+		"ts": 332079147944
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:apply:start",
+		"ts": 332079148123
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079148139,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": true,
+			"preparedIdMatches": true,
+			"preparedGenerationMatches": true,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079148352,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:apply:end",
+		"ts": 332079148354
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:result:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}",
+		"ts": 332079148404
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:result:end",
+		"ts": 332079148410
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079148430,
+		"facts": {
+			"replica": 4,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079148576,
+		"facts": {
+			"replica": 4,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079157242,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079157366,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079157417,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079157421,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:unchanged:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}",
+		"ts": 332079158228
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:unchanged:end",
+		"ts": 332079158232
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:apply:start",
+		"ts": 332079158267
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079158276,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079158411,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:apply:end",
+		"ts": 332079158412
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:result:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}",
+		"ts": 332079158423
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:result:end",
+		"ts": 332079158425
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079158436,
+		"facts": {
+			"replica": 4,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079158579,
+		"facts": {
+			"replica": 4,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079160952,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079161153,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079161391,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079161442,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079164474,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079164605,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079164646,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079164649,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:unchanged:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}",
+		"ts": 332079165295
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:unchanged:end",
+		"ts": 332079165299
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:apply:start",
+		"ts": 332079165321
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079165330,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079165502,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:apply:end",
+		"ts": 332079165503
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:result:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}",
+		"ts": 332079165514
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:result:end",
+		"ts": 332079165518
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079165525,
+		"facts": {
+			"replica": 4,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079165634,
+		"facts": {
+			"replica": 4,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079166530,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079166658,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079166811,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079166834,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079170883,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079170993,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079171022,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079171024,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079173251,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079173363,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079173495,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079173506,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": null,
+		"phase": "cache:scenario:peer:start",
+		"ts": 332079290049
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079323300,
+		"facts": {
+			"replica": 1,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079323578,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079323601,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079323646,
+		"facts": {
+			"replica": 1,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079323650,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079323655,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079324624,
+		"facts": {
+			"replica": 6,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079324722,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079324732,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079324766,
+		"facts": {
+			"replica": 6,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079324768,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079324770,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079332160,
+		"facts": {
+			"replica": 1,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079332290,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079332302,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079332491,
+		"facts": {
+			"replica": 1,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079332493,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079332494,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079333168,
+		"facts": {
+			"replica": 6,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079333263,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079333275,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079333298,
+		"facts": {
+			"replica": 6,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079333300,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079333301,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079340277,
+		"facts": {
+			"replica": 1,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079340375,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079340387,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079340409,
+		"facts": {
+			"replica": 1,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079340411,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079340412,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079340995,
+		"facts": {
+			"replica": 6,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079341095,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079341107,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079341127,
+		"facts": {
+			"replica": 6,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079341129,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079341131,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "cache:submit:unchanged:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}",
+		"ts": 332079520785
+	},
+	{
+		"role": "peer",
+		"phase": "cache:submit:unchanged:end",
+		"ts": 332079520802
+	},
+	{
+		"role": "peer",
+		"phase": "cache:submit:apply:start",
+		"ts": 332079521073
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079521090,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": false,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079521454,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": false,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "cache:submit:apply:end",
+		"ts": 332079521456
+	},
+	{
+		"role": "peer",
+		"phase": "cache:submit:result:start:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false}",
+		"ts": 332079521481
+	},
+	{
+		"role": "peer",
+		"phase": "cache:submit:result:end",
+		"ts": 332079701937
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079705517,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": false,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332079705574,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": false,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079705704,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": false,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332079705708,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": false,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079706853,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": false,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332079706916,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": false,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079707070,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": false,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332079707117,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": false,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332080435599,
+		"facts": {
+			"replica": 6,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": false,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332080435649,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"kind": "text",
+			"sourceRawSame": false,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": false,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": false
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332080435753,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"kind": "text",
+			"sourceRawSame": false,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": false,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": false
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332080435910,
+		"facts": {
+			"replica": 6,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": false,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332080435914,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": false,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332080435915,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": false,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": null,
+		"phase": "cache:scenario:peer:end",
+		"ts": 332080436132
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332080438176,
+		"facts": {
+			"replica": 1,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": false,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332080438238,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"kind": "text",
+			"sourceRawSame": false,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": false,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": false
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332080438340,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": false,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332080438490,
+		"facts": {
+			"replica": 1,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": false,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332080438494,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": false,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332080438496,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": false,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": null,
+		"phase": "cache:scenario:after-peer",
+		"ts": 332080463193
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:unchanged:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":false}",
+		"ts": 332080661369
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:unchanged:end",
+		"ts": 332080670704
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:apply:start",
+		"ts": 332080670760
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332080670782,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332080670822,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:apply:end",
+		"ts": 332080670824
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:result:start:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false}",
+		"ts": 332080670849
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:result:end",
+		"ts": 332080834012
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332080834038,
+		"facts": {
+			"replica": 4,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332080834176,
+		"facts": {
+			"replica": 4,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332080840265,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"kind": "text",
+			"sourceRawSame": false,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": false
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332080840281,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332080840298,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332080840300,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332080842026,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"kind": "text",
+			"sourceRawSame": false,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": false
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332080842046,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332080842067,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332080842078,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:unchanged:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}",
+		"ts": 332081039385
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:unchanged:end",
+		"ts": 332081039391
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:apply:start",
+		"ts": 332081039419
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332081039427,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332081039459,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:apply:end",
+		"ts": 332081039461
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:result:start:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false}",
+		"ts": 332081039476
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:result:end",
+		"ts": 332081210501
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332081210536,
+		"facts": {
+			"replica": 4,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332081210634,
+		"facts": {
+			"replica": 4,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332081219393,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"kind": "text",
+			"sourceRawSame": false,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": false
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332081219407,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332081219420,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332081219422,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:unchanged:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}",
+		"ts": 332081220058
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:unchanged:end",
+		"ts": 332081220062
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:apply:start",
+		"ts": 332081220083
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332081220088,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332081220116,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:apply:end",
+		"ts": 332081220117
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:result:start:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false}",
+		"ts": 332081220125
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332081221007,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"kind": "text",
+			"sourceRawSame": false,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": false
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332081221024,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"kind": "text",
+			"sourceRawSame": false,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": false
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332081221039,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332081221044,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "cache:submit:result:end",
+		"ts": 332081380675
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332081380704,
+		"facts": {
+			"replica": 4,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": true,
+			"rawAnchorMatches": true,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332081380783,
+		"facts": {
+			"replica": 4,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": true,
+			"appliedPresent": true,
+			"operationIdMatches": true,
+			"generationMatches": true,
+			"signatureChecked": true,
+			"signatureMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332081386399,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"kind": "text",
+			"sourceRawSame": false,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": false
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "before",
+		"ts": 332081386413,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"kind": "text",
+			"sourceRawSame": true,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": true
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332081386428,
+		"facts": {
+			"replica": 5,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "editor",
+		"phase": "after",
+		"ts": 332081386433,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": true,
+			"rawWarm": true,
+			"stringWarm": true,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332081387877,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"kind": "text",
+			"sourceRawSame": false,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": false
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "before",
+		"ts": 332081387886,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"kind": "text",
+			"sourceRawSame": false,
+			"preparedPresent": false,
+			"preparedIdMatches": false,
+			"preparedGenerationMatches": false,
+			"scalarInsertion": true,
+			"sourceAnchorMatches": false,
+			"rawAnchorMatches": false,
+			"sourceRawTailMatches": false
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332081387900,
+		"facts": {
+			"replica": 2,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": "peer",
+		"phase": "after",
+		"ts": 332081387905,
+		"facts": {
+			"replica": 3,
+			"sourceWarm": false,
+			"rawWarm": false,
+			"stringWarm": false,
+			"editPresent": false,
+			"appliedPresent": true,
+			"operationIdMatches": false,
+			"generationMatches": false,
+			"signatureChecked": true,
+			"signatureMatches": null
+		}
+	},
+	{
+		"role": null,
+		"phase": "cache:scenario:done",
+		"ts": 332081479702
+	}
+]

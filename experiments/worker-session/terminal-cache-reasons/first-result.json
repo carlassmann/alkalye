@@ -1,0 +1,73 @@
+{
+	"finish": {
+		"accepted": {
+			"position": 8,
+			"sha256": "d40528cd4999eb4b8c4b5e7b2a9ae3f0e92f64168a7239ffa5d0309cb68cf858",
+			"sourceCharacters": 1048617
+		},
+		"editorExact": true,
+		"expectedCharacters": 1048617,
+		"failures": [],
+		"localReopenExact": true,
+		"merged": true,
+		"peerCompleted": 1,
+		"peerTimes": [],
+		"pending": 0,
+		"rejected": 0,
+		"sha256": "d40528cd4999eb4b8c4b5e7b2a9ae3f0e92f64168a7239ffa5d0309cb68cf858",
+		"unsaved": 0,
+		"workerExact": true
+	},
+	"inputs": [
+		{
+			"time": 18140.69999998808,
+			"trusted": true
+		},
+		{
+			"time": 18144,
+			"trusted": true
+		},
+		{
+			"time": 18146.30000001192,
+			"trusted": true
+		},
+		{
+			"time": 19509.60000002384,
+			"trusted": true
+		},
+		{
+			"time": 19511.80000001192,
+			"trusted": true
+		},
+		{
+			"time": 19514,
+			"trusted": true
+		}
+	],
+	"keys": [
+		{
+			"time": 18140.30000001192,
+			"trusted": true
+		},
+		{
+			"time": 18144,
+			"trusted": true
+		},
+		{
+			"time": 18146.30000001192,
+			"trusted": true
+		},
+		{
+			"time": 19509.5,
+			"trusted": true
+		},
+		{
+			"time": 19511.80000001192,
+			"trusted": true
+		},
+		{
+			"time": 19513.89999997616,
+			"trusted": true
+		}
+	]
+}

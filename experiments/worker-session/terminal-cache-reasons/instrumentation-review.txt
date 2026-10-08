@@ -1,0 +1,47 @@
+**Verdict:** the instrumentation mostly preserves the original validation and publication logic. But it has one failure-ordering risk, a few misleading booleans, and it misses the two facts you need: whether the cache was warm before each of the two `submitEdit` reads, and why the edit publisher refused. Source read only; nothing was run.
+
+**Does it preserve the original? (crdt.ts)**
+- The edit fallback chain, `prepare`, the commit and `cachePreparedText` are unchanged. The added reads (`Map.has/get`, the `sourceViews` WeakMap, `.at`) don't mutate anything. No IDs or content are logged.
+- **Risk:** the "before" mark reads `operation?.insert[0]` and `operation.remove.length` before any validation. The original guards these with `Array.isArray` (`crdt.ts:264-265`). On malformed input this now throws a `TypeError` before `parseOperation`'s own error, so the failure type changes. Guard both with `Array.isArray`.
+- **Risk:** the "after" mark runs inside the commit closure. If it ever threw, `applyTogether` would be left partly committed. That's unlikely with parsed operations, but it's worth a try/finally.
+- **Cost:**
+  - `textEditSignature(applied)` re-runs `JSON.stringify` over the whole insert list. That doubles an O(insert) cost on large runs.
+  - Each apply adds two marks with JSON names. In a long backlog the timeline buffer grows without limit and fills with many distinct names. Use counters instead (below).
+
+**Misleading booleans**
+1. **Before-mark warmth on local submits is always true.** `submitEdit`'s unchanged read (`view.text` and `view.visible`) fills `strings`, `sourceCache` and `textCache` right before `apply`. So `sourceWarm`, `rawWarm`, `stringWarm` and `sourceRawSame` tell you nothing there. The fact you actually need is the previous apply's after-mark `stringWarm`/`sourceWarm`, assuming nothing else invalidated the cache in between.
+2. **`scalar` only means a single insert.** The terminal path also accepts a single remove and cancellations. `scalar=false` does not mean ineligible.
+3. **`sourceRawSame` uses the wrong test for cancels.** The cancellation path requires `raw === atoms` (`crdt.ts:221`), not `sourceViews.get(atoms) === raw`.
+4. **Missing gate inputs:** `kind`, `field`, `operations.has(id)` (duplicates and echoes), `textOwners`, legacy target, visibility, atom extra fields, header/fence checks, and the code-point check. "Eligible" can't be derived from what's logged; it's only a partial snapshot of preconditions.
+5. **No replica role.** `applyTogether` and staged or forked replicas emit marks indistinguishable from `projection.replica`'s, which mixes up the counts.
+
+**Fallback order (`preparedEdit ?? terminal ?? run`)**
+- `preparedEdit` wins without any check on id, target or generation. Those checks happen only afterwards, in `cachePreparedText`.
+- So a stale `preparedEdit` blocks both fallbacks, `cachePreparedText` rejects it, the cache is invalidated, and the next read pays `rawVisible`.
+- How it goes stale:
+  - `preparedEdit` is cleared only on commit and at the start of `prepareEdit`/`prepareReplacements`.
+  - `submitEdit`'s refusal paths (decode failure, queue closed) return without applying, so it stays set.
+  - The next apply could be a remote op or a `set`.
+- `preparedPresent && !preparedIdMatches` captures this case. Keep it.
+
+**Publisher refusal isn't captured.** `rememberTextEdit` is never reached, or returns silently, when:
+- `prepareEdit` takes the general `sourceEdits` path (`crdt.ts:901`). The second fast path needs `previous.length === atoms.length && raw.length === atoms.length`, so any astral character (e.g. emoji) or hidden raw atoms is enough to send an edit there.
+- the edit is over 128 code units, or `current !== atoms`.
+- the content is header-only, or `rawEditSplices` returns null.
+
+All of these show up as `preparedPresent=false`. That is a hypothesis for the result-read miss, not a measurement.
+
+**`submitEdit` unchanged vs result reads (document-session.ts)**
+- The unchanged read runs on every call, including successful ones, and its result is thrown away on success. It pays `rawVisible` only if the cache is cold before the call.
+- The result read pays only if `cachePreparedText` skipped after commit.
+- Inside each window, `text` and `visible` can't be told apart. `text` hits `strings` and then `visible` misses `sourceCache`, or `text` misses and fills `visible` for free.
+- Moving `freezeOperation` after the reads is harmless.
+
+**Smallest safe way to expose misses**
+1. Add a read-only `cacheState(target)` to `Replica` returning `{strings, source, raw}` as booleans. Call it on `projection.replica` right before the unchanged read and right before the result read. That settles which callsite pays and why.
+2. Record one ordered first-refusal enum per gate: prepared (absent/id/generation), terminal, run, and remember (path, length, current, header, rawSplices). Add replica role and kind.
+3. Increment counters in a module-level `Map<string, number>` and dump them once. No per-apply marks, and no second `textEditSignature`.
+
+I'm not proposing any optimization until those counts are in.
+
+**Connectors:** many claude.ai connectors (GitHub, Slack, Notion, Gmail, Google Drive and others) need authorizing in your claude.ai connector settings. They weren't needed for this review.

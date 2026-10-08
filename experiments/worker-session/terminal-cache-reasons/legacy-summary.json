@@ -1,0 +1,3297 @@
+{
+	"marks": [
+		{
+			"role": null,
+			"ts": 332311164449,
+			"name": "cache:scenario:before-peer"
+		},
+		{
+			"role": "editor",
+			"ts": 332311215816,
+			"name": "cache:submit:unchanged:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}"
+		},
+		{
+			"role": "editor",
+			"ts": 332311215822,
+			"name": "cache:submit:unchanged:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332311215995,
+			"name": "cache:submit:apply:start"
+		},
+		{
+			"role": "editor",
+			"ts": 332311216018,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":true,\"preparedIdMatches\":true,\"preparedGenerationMatches\":true,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": true,
+				"preparedIdMatches": true,
+				"preparedGenerationMatches": true,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311216225,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311216227,
+			"name": "cache:submit:apply:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332311216271,
+			"name": "cache:submit:result:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}"
+		},
+		{
+			"role": "editor",
+			"ts": 332311216276,
+			"name": "cache:submit:result:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332311216295,
+			"name": "cache:apply:before:{\"replica\":4,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 4,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311216448,
+			"name": "cache:apply:after:{\"replica\":4,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 4,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311225263,
+			"name": "cache:apply:before:{\"replica\":5,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311225375,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311225428,
+			"name": "cache:apply:after:{\"replica\":5,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311225432,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311226190,
+			"name": "cache:submit:unchanged:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}"
+		},
+		{
+			"role": "editor",
+			"ts": 332311226194,
+			"name": "cache:submit:unchanged:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332311226222,
+			"name": "cache:submit:apply:start"
+		},
+		{
+			"role": "editor",
+			"ts": 332311226233,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311226357,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311226359,
+			"name": "cache:submit:apply:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332311226368,
+			"name": "cache:submit:result:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}"
+		},
+		{
+			"role": "editor",
+			"ts": 332311226370,
+			"name": "cache:submit:result:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332311226380,
+			"name": "cache:apply:before:{\"replica\":4,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 4,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311226496,
+			"name": "cache:apply:after:{\"replica\":4,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 4,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311228875,
+			"name": "cache:apply:before:{\"replica\":2,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311229045,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311229271,
+			"name": "cache:apply:after:{\"replica\":2,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311229318,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311232320,
+			"name": "cache:apply:before:{\"replica\":5,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311232425,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311232474,
+			"name": "cache:apply:after:{\"replica\":5,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311232477,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311233116,
+			"name": "cache:submit:unchanged:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}"
+		},
+		{
+			"role": "editor",
+			"ts": 332311233120,
+			"name": "cache:submit:unchanged:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332311233146,
+			"name": "cache:submit:apply:start"
+		},
+		{
+			"role": "editor",
+			"ts": 332311233163,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311233309,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311233311,
+			"name": "cache:submit:apply:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332311233323,
+			"name": "cache:submit:result:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}"
+		},
+		{
+			"role": "editor",
+			"ts": 332311233325,
+			"name": "cache:submit:result:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332311233335,
+			"name": "cache:apply:before:{\"replica\":4,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 4,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311233452,
+			"name": "cache:apply:after:{\"replica\":4,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 4,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311234390,
+			"name": "cache:apply:before:{\"replica\":2,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311234508,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311234674,
+			"name": "cache:apply:after:{\"replica\":2,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311234697,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311239090,
+			"name": "cache:apply:before:{\"replica\":5,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311239187,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311239226,
+			"name": "cache:apply:after:{\"replica\":5,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311239228,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311241125,
+			"name": "cache:apply:before:{\"replica\":2,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311241301,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311241446,
+			"name": "cache:apply:after:{\"replica\":2,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311241456,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": null,
+			"ts": 332311360663,
+			"name": "cache:scenario:peer:start"
+		},
+		{
+			"role": "peer",
+			"ts": 332311393144,
+			"name": "cache:apply:before:{\"replica\":1,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 1,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311393240,
+			"name": "cache:apply:before:{\"replica\":2,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311393266,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311393306,
+			"name": "cache:apply:after:{\"replica\":1,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 1,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311393310,
+			"name": "cache:apply:after:{\"replica\":2,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311393315,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311394440,
+			"name": "cache:apply:before:{\"replica\":6,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 6,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311394536,
+			"name": "cache:apply:before:{\"replica\":5,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311394548,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311394593,
+			"name": "cache:apply:after:{\"replica\":6,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 6,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311394595,
+			"name": "cache:apply:after:{\"replica\":5,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311394596,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311401146,
+			"name": "cache:apply:before:{\"replica\":1,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 1,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311401268,
+			"name": "cache:apply:before:{\"replica\":2,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311401282,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311401316,
+			"name": "cache:apply:after:{\"replica\":1,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 1,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311401318,
+			"name": "cache:apply:after:{\"replica\":2,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311401320,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311401962,
+			"name": "cache:apply:before:{\"replica\":6,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 6,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311402052,
+			"name": "cache:apply:before:{\"replica\":5,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311402070,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311402094,
+			"name": "cache:apply:after:{\"replica\":6,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 6,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311402098,
+			"name": "cache:apply:after:{\"replica\":5,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311402100,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311408543,
+			"name": "cache:apply:before:{\"replica\":1,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 1,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311408631,
+			"name": "cache:apply:before:{\"replica\":2,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311408644,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311408664,
+			"name": "cache:apply:after:{\"replica\":1,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 1,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311408665,
+			"name": "cache:apply:after:{\"replica\":2,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311408667,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311409247,
+			"name": "cache:apply:before:{\"replica\":6,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 6,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311409343,
+			"name": "cache:apply:before:{\"replica\":5,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311409354,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311409372,
+			"name": "cache:apply:after:{\"replica\":6,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 6,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311409374,
+			"name": "cache:apply:after:{\"replica\":5,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311409375,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311583669,
+			"name": "cache:submit:unchanged:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}"
+		},
+		{
+			"role": "peer",
+			"ts": 332311583683,
+			"name": "cache:submit:unchanged:end"
+		},
+		{
+			"role": "peer",
+			"ts": 332311583919,
+			"name": "cache:submit:apply:start"
+		},
+		{
+			"role": "peer",
+			"ts": 332311583942,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":true,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":false,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": true,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": false,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311584296,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":false,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": false,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311584298,
+			"name": "cache:submit:apply:end"
+		},
+		{
+			"role": "peer",
+			"ts": 332311584320,
+			"name": "cache:submit:result:start:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false}"
+		},
+		{
+			"role": "peer",
+			"ts": 332311753444,
+			"name": "cache:submit:result:end"
+		},
+		{
+			"role": "peer",
+			"ts": 332311756523,
+			"name": "cache:apply:before:{\"replica\":2,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":true,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":false,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": true,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": false,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311756581,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":true,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":false,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": true,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": false,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311756709,
+			"name": "cache:apply:after:{\"replica\":2,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":false,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": false,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332311756713,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":false,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": false,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311757836,
+			"name": "cache:apply:before:{\"replica\":5,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":true,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":false,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": true,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": false,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311757903,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":true,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":false,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": true,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": false,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311758052,
+			"name": "cache:apply:after:{\"replica\":5,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":false,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": false,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332311758092,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":false,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": false,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312108838,
+			"name": "cache:apply:before:{\"replica\":6,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":true,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":false,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 6,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": true,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": false,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312108899,
+			"name": "cache:apply:before:{\"replica\":5,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"kind\":\"text\",\"sourceRawSame\":false,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":true,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":false,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":false}",
+			"phase": "before",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"kind": "text",
+				"sourceRawSame": false,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": true,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": false,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": false
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312109005,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"kind\":\"text\",\"sourceRawSame\":false,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":true,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":false,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":false}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"kind": "text",
+				"sourceRawSame": false,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": true,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": false,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": false
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312109165,
+			"name": "cache:apply:after:{\"replica\":6,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":false,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 6,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": false,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312109169,
+			"name": "cache:apply:after:{\"replica\":5,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":false,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": false,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312109174,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":false,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": false,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": null,
+			"ts": 332312109393,
+			"name": "cache:scenario:peer:end"
+		},
+		{
+			"role": "peer",
+			"ts": 332312111579,
+			"name": "cache:apply:before:{\"replica\":1,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":true,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":false,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 1,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": true,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": false,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332312111648,
+			"name": "cache:apply:before:{\"replica\":2,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"kind\":\"text\",\"sourceRawSame\":false,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":true,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":false,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":false}",
+			"phase": "before",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"kind": "text",
+				"sourceRawSame": false,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": true,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": false,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": false
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332312111766,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":true,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":false,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": true,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": false,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332312111918,
+			"name": "cache:apply:after:{\"replica\":1,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":false,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 1,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": false,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332312111921,
+			"name": "cache:apply:after:{\"replica\":2,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":false,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": false,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332312111931,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":false,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": false,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": null,
+			"ts": 332312144614,
+			"name": "cache:scenario:after-peer"
+		},
+		{
+			"role": "editor",
+			"ts": 332312345192,
+			"name": "cache:submit:unchanged:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":false}"
+		},
+		{
+			"role": "editor",
+			"ts": 332312355466,
+			"name": "cache:submit:unchanged:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332312355547,
+			"name": "cache:submit:apply:start"
+		},
+		{
+			"role": "editor",
+			"ts": 332312355574,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312355627,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312355629,
+			"name": "cache:submit:apply:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332312355660,
+			"name": "cache:submit:result:start:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false}"
+		},
+		{
+			"role": "editor",
+			"ts": 332312516705,
+			"name": "cache:submit:result:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332312516747,
+			"name": "cache:apply:before:{\"replica\":4,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 4,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312516898,
+			"name": "cache:apply:after:{\"replica\":4,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 4,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312523050,
+			"name": "cache:apply:before:{\"replica\":5,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"kind\":\"text\",\"sourceRawSame\":false,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":false}",
+			"phase": "before",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"kind": "text",
+				"sourceRawSame": false,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": false
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312523066,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312523081,
+			"name": "cache:apply:after:{\"replica\":5,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312523083,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332312524684,
+			"name": "cache:apply:before:{\"replica\":2,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"kind\":\"text\",\"sourceRawSame\":false,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":false}",
+			"phase": "before",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"kind": "text",
+				"sourceRawSame": false,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": false
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332312524705,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332312524724,
+			"name": "cache:apply:after:{\"replica\":2,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332312524731,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312729418,
+			"name": "cache:submit:unchanged:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}"
+		},
+		{
+			"role": "editor",
+			"ts": 332312729474,
+			"name": "cache:submit:unchanged:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332312729498,
+			"name": "cache:submit:apply:start"
+		},
+		{
+			"role": "editor",
+			"ts": 332312729510,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312729540,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312729542,
+			"name": "cache:submit:apply:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332312729555,
+			"name": "cache:submit:result:start:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false}"
+		},
+		{
+			"role": "editor",
+			"ts": 332312904459,
+			"name": "cache:submit:result:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332312904493,
+			"name": "cache:apply:before:{\"replica\":4,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 4,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312904588,
+			"name": "cache:apply:after:{\"replica\":4,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 4,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312914007,
+			"name": "cache:apply:before:{\"replica\":5,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"kind\":\"text\",\"sourceRawSame\":false,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":false}",
+			"phase": "before",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"kind": "text",
+				"sourceRawSame": false,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": false
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312914033,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312914050,
+			"name": "cache:apply:after:{\"replica\":5,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312914052,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312914761,
+			"name": "cache:submit:unchanged:start:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true}"
+		},
+		{
+			"role": "editor",
+			"ts": 332312914766,
+			"name": "cache:submit:unchanged:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332312914858,
+			"name": "cache:submit:apply:start"
+		},
+		{
+			"role": "editor",
+			"ts": 332312914875,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312914899,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332312914900,
+			"name": "cache:submit:apply:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332312914911,
+			"name": "cache:submit:result:start:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false}"
+		},
+		{
+			"role": "peer",
+			"ts": 332312916185,
+			"name": "cache:apply:before:{\"replica\":2,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"kind\":\"text\",\"sourceRawSame\":false,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":false}",
+			"phase": "before",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"kind": "text",
+				"sourceRawSame": false,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": false
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332312916195,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"kind\":\"text\",\"sourceRawSame\":false,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":false}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"kind": "text",
+				"sourceRawSame": false,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": false
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332312916210,
+			"name": "cache:apply:after:{\"replica\":2,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332312916215,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332313074731,
+			"name": "cache:submit:result:end"
+		},
+		{
+			"role": "editor",
+			"ts": 332313074772,
+			"name": "cache:apply:before:{\"replica\":4,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":true,\"rawAnchorMatches\":true,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 4,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": true,
+				"rawAnchorMatches": true,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332313074867,
+			"name": "cache:apply:after:{\"replica\":4,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":true,\"appliedPresent\":true,\"operationIdMatches\":true,\"generationMatches\":true,\"signatureChecked\":true,\"signatureMatches\":true}",
+			"phase": "after",
+			"facts": {
+				"replica": 4,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": true,
+				"appliedPresent": true,
+				"operationIdMatches": true,
+				"generationMatches": true,
+				"signatureChecked": true,
+				"signatureMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332313081411,
+			"name": "cache:apply:before:{\"replica\":5,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"kind\":\"text\",\"sourceRawSame\":false,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":false}",
+			"phase": "before",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"kind": "text",
+				"sourceRawSame": false,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": false
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332313081425,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"kind\":\"text\",\"sourceRawSame\":true,\"legacyTarget\":false,\"duplicate\":true,\"ownerPresent\":true,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":true}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"kind": "text",
+				"sourceRawSame": true,
+				"legacyTarget": false,
+				"duplicate": true,
+				"ownerPresent": true,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": true
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332313081440,
+			"name": "cache:apply:after:{\"replica\":5,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 5,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "editor",
+			"ts": 332313081445,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":true,\"rawWarm\":true,\"stringWarm\":true,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332313082948,
+			"name": "cache:apply:before:{\"replica\":2,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"kind\":\"text\",\"sourceRawSame\":false,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":false}",
+			"phase": "before",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"kind": "text",
+				"sourceRawSame": false,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": false
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332313082958,
+			"name": "cache:apply:before:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"kind\":\"text\",\"sourceRawSame\":false,\"legacyTarget\":false,\"duplicate\":false,\"ownerPresent\":false,\"fieldPresent\":false,\"visibilityInactive\":false,\"preparedPresent\":false,\"preparedIdMatches\":false,\"preparedGenerationMatches\":false,\"scalarInsertion\":true,\"sourceAnchorMatches\":false,\"rawAnchorMatches\":false,\"sourceRawTailMatches\":false}",
+			"phase": "before",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"kind": "text",
+				"sourceRawSame": false,
+				"legacyTarget": false,
+				"duplicate": false,
+				"ownerPresent": false,
+				"fieldPresent": false,
+				"visibilityInactive": false,
+				"preparedPresent": false,
+				"preparedIdMatches": false,
+				"preparedGenerationMatches": false,
+				"scalarInsertion": true,
+				"sourceAnchorMatches": false,
+				"rawAnchorMatches": false,
+				"sourceRawTailMatches": false
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332313082972,
+			"name": "cache:apply:after:{\"replica\":2,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 2,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": "peer",
+			"ts": 332313082978,
+			"name": "cache:apply:after:{\"replica\":3,\"sourceWarm\":false,\"rawWarm\":false,\"stringWarm\":false,\"editPresent\":false,\"appliedPresent\":true,\"operationIdMatches\":false,\"generationMatches\":false,\"signatureChecked\":true,\"signatureMatches\":null}",
+			"phase": "after",
+			"facts": {
+				"replica": 3,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false,
+				"editPresent": false,
+				"appliedPresent": true,
+				"operationIdMatches": false,
+				"generationMatches": false,
+				"signatureChecked": true,
+				"signatureMatches": null
+			}
+		},
+		{
+			"role": null,
+			"ts": 332313165783,
+			"name": "cache:scenario:done"
+		}
+	],
+	"reads": [
+		{
+			"role": "editor",
+			"read": "unchanged",
+			"ms": 0.006,
+			"before": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true
+			}
+		},
+		{
+			"role": "editor",
+			"read": "apply",
+			"ms": 0.232,
+			"before": null
+		},
+		{
+			"role": "editor",
+			"read": "result",
+			"ms": 0.005,
+			"before": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true
+			}
+		},
+		{
+			"role": "editor",
+			"read": "unchanged",
+			"ms": 0.004,
+			"before": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true
+			}
+		},
+		{
+			"role": "editor",
+			"read": "apply",
+			"ms": 0.137,
+			"before": null
+		},
+		{
+			"role": "editor",
+			"read": "result",
+			"ms": 0.002,
+			"before": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true
+			}
+		},
+		{
+			"role": "editor",
+			"read": "unchanged",
+			"ms": 0.004,
+			"before": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true
+			}
+		},
+		{
+			"role": "editor",
+			"read": "apply",
+			"ms": 0.165,
+			"before": null
+		},
+		{
+			"role": "editor",
+			"read": "result",
+			"ms": 0.002,
+			"before": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true
+			}
+		},
+		{
+			"role": "peer",
+			"read": "unchanged",
+			"ms": 0.014,
+			"before": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true
+			}
+		},
+		{
+			"role": "peer",
+			"read": "apply",
+			"ms": 0.379,
+			"before": null
+		},
+		{
+			"role": "peer",
+			"read": "result",
+			"ms": 169.124,
+			"before": {
+				"replica": 3,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false
+			}
+		},
+		{
+			"role": "editor",
+			"read": "unchanged",
+			"ms": 10.274,
+			"before": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": false
+			}
+		},
+		{
+			"role": "editor",
+			"read": "apply",
+			"ms": 0.082,
+			"before": null
+		},
+		{
+			"role": "editor",
+			"read": "result",
+			"ms": 161.045,
+			"before": {
+				"replica": 3,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false
+			}
+		},
+		{
+			"role": "editor",
+			"read": "unchanged",
+			"ms": 0.056,
+			"before": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true
+			}
+		},
+		{
+			"role": "editor",
+			"read": "apply",
+			"ms": 0.044,
+			"before": null
+		},
+		{
+			"role": "editor",
+			"read": "result",
+			"ms": 174.904,
+			"before": {
+				"replica": 3,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false
+			}
+		},
+		{
+			"role": "editor",
+			"read": "unchanged",
+			"ms": 0.005,
+			"before": {
+				"replica": 3,
+				"sourceWarm": true,
+				"rawWarm": true,
+				"stringWarm": true
+			}
+		},
+		{
+			"role": "editor",
+			"read": "apply",
+			"ms": 0.042,
+			"before": null
+		},
+		{
+			"role": "editor",
+			"read": "result",
+			"ms": 159.82,
+			"before": {
+				"replica": 3,
+				"sourceWarm": false,
+				"rawWarm": false,
+				"stringWarm": false
+			}
+		}
+	]
+}

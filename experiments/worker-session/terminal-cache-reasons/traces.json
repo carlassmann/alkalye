@@ -1,0 +1,17 @@
+[
+	{
+		"path": "/tmp/alkalye-worker-cache-reasons/first-result.json.trace.json",
+		"bytes": 7729757,
+		"sha256": "8e691bcee5ce7ef56dd7742382dc7df224055f974b2b85382c8cc10e143e2859"
+	},
+	{
+		"path": "/tmp/alkalye-worker-cache-reasons/legacy-result.json.trace.json",
+		"bytes": 5148622,
+		"sha256": "590acd16d8da98541f36a1fb5d2f80127d5761eed88da849b7237a5baa7ab685"
+	},
+	{
+		"path": "/tmp/alkalye-worker-cache-reasons/refusal-result.json.trace.json",
+		"bytes": 8207331,
+		"sha256": "8573cdf3a16b1135c3eb3ff0b21d72a2ea97cf97d6830548a2928ded2a203fa9"
+	}
+]

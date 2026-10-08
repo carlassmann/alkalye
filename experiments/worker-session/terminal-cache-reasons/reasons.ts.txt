@@ -1,0 +1,31 @@
+import { assert, browser, browserBatch, evaluate, wait } from "./tests/browser-driver"
+let url=process.argv[2], output=process.argv[3]
+if(!url || !output) throw Error("URL/output required")
+let session="worker-cache-reasons-"+Date.now(), tracing=false
+try {
+ browser(session,"set","viewport","1280","800")
+ browser(session,"open",url)
+ wait(session,"document.body.dataset.ready==='true'||!!document.body.dataset.failure")
+ assert(evaluate(session,"!document.body.dataset.failure"),"Fixture ready")
+ evaluate(session,"window.workerEditorProof.finishSustained(false).then(value=>{window.seedCheck=value})")
+ assert(evaluate(session,"window.seedCheck.editorExact&&window.seedCheck.workerExact&&window.seedCheck.accepted.sha256===window.seedCheck.sha256"),"Initial signed snapshot exact")
+ evaluate(session,"(()=>{let source=document.querySelector('alkalye-editor').source;source.focus();source.setSelectionRange(source.value.length,source.value.length);window.workerEditorProof.startSustained('abcdef',0);window.cacheKeys=[];window.cacheInputs=[];document.addEventListener('keydown',event=>window.cacheKeys.push({trusted:event.isTrusted,time:performance.now()}),true);document.addEventListener('beforeinput',event=>window.cacheInputs.push({trusted:event.isTrusted,time:performance.now()}),true)})()")
+ browser(session,"profiler","start","--categories","devtools.timeline,disabled-by-default-devtools.timeline,toplevel,blink.user_timing,v8")
+ tracing=true
+ evaluate(session,"performance.mark('cache:scenario:before-peer')")
+ browserBatch(session,[["press","a"],["press","b"],["press","c"]])
+ wait(session,"window.workerEditorProof.gauge().pending===0")
+ evaluate(session,"performance.mark('cache:scenario:peer:start');window.workerEditorProof.peer().then(()=>performance.mark('cache:scenario:peer:end'))")
+ evaluate(session,"(()=>{let source=document.querySelector('alkalye-editor').source;source.focus();source.setSelectionRange(source.value.length,source.value.length);performance.mark('cache:scenario:after-peer')})()")
+ browserBatch(session,[["press","d"],["press","e"],["press","f"]])
+ wait(session,"window.workerEditorProof.gauge().pending===0")
+ evaluate(session,"performance.mark('cache:scenario:done')")
+ browser(session,"profiler","stop",output+".trace.json");tracing=false
+ evaluate(session,"window.workerEditorProof.finishSustained().then(value=>{window.finalCheck=value})")
+ let result=evaluate(session,"({finish:window.finalCheck,keys:window.cacheKeys,inputs:window.cacheInputs})")
+ assert(evaluate(session,"window.finalCheck.editorExact&&window.finalCheck.workerExact&&window.finalCheck.localReopenExact&&window.finalCheck.accepted.sha256===window.finalCheck.sha256&&window.finalCheck.peerCompleted===1&&window.finalCheck.pending===0&&window.finalCheck.unsaved===0&&window.cacheKeys.length===6&&window.cacheInputs.length===6&&window.cacheKeys.every(event=>event.trusted)&&window.cacheInputs.every(event=>event.trusted)"),"Exact native edits, peer, accepted snapshot and offline reopen")
+ await Bun.write(output,JSON.stringify(result,null,2))
+} finally {
+ if(tracing) try {browser(session,"profiler","stop",output+".trace.json")} catch {}
+ try {browser(session,"close")}catch{}
+}

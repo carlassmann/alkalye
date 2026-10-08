@@ -1,0 +1,248 @@
+[
+	{
+		"role": "editor",
+		"ts": 332478504894,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "editor",
+		"ts": 332478511337,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "editor",
+		"ts": 332478517976,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "peer",
+		"ts": 332478572063,
+		"replica": 2,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "peer",
+		"ts": 332478572088,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "editor",
+		"ts": 332478573188,
+		"replica": 5,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "editor",
+		"ts": 332478573200,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "peer",
+		"ts": 332478580867,
+		"replica": 2,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "peer",
+		"ts": 332478580883,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "editor",
+		"ts": 332478581681,
+		"replica": 5,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "editor",
+		"ts": 332478581699,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "peer",
+		"ts": 332478588485,
+		"replica": 2,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "peer",
+		"ts": 332478588496,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "editor",
+		"ts": 332478589169,
+		"replica": 5,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "editor",
+		"ts": 332478589186,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "peer",
+		"ts": 332478768133,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "peer",
+		"ts": 332478956647,
+		"replica": 2,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "peer",
+		"ts": 332478956709,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "editor",
+		"ts": 332478958411,
+		"replica": 5,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "editor",
+		"ts": 332478958480,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "editor",
+		"ts": 332479708210,
+		"replica": 6,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "editor",
+		"ts": 332479708266,
+		"replica": 5,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "editor",
+		"ts": 332479708371,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "peer",
+		"ts": 332479710753,
+		"replica": 1,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "peer",
+		"ts": 332479710810,
+		"replica": 2,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "peer",
+		"ts": 332479710911,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "editor",
+		"ts": 332479938013,
+		"replica": 3,
+		"reason": "projected-source-without-leading-header-or-body"
+	},
+	{
+		"role": "editor",
+		"ts": 332480101277,
+		"replica": 5,
+		"reason": "source-cache-unavailable"
+	},
+	{
+		"role": "editor",
+		"ts": 332480101292,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "peer",
+		"ts": 332480103020,
+		"replica": 2,
+		"reason": "source-cache-unavailable"
+	},
+	{
+		"role": "peer",
+		"ts": 332480103040,
+		"replica": 3,
+		"reason": "projected-source-without-leading-header-or-body"
+	},
+	{
+		"role": "editor",
+		"ts": 332480312514,
+		"replica": 3,
+		"reason": "projected-source-without-leading-header-or-body"
+	},
+	{
+		"role": "editor",
+		"ts": 332480489278,
+		"replica": 5,
+		"reason": "source-cache-unavailable"
+	},
+	{
+		"role": "editor",
+		"ts": 332480489291,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "editor",
+		"ts": 332480489988,
+		"replica": 3,
+		"reason": "projected-source-without-leading-header-or-body"
+	},
+	{
+		"role": "peer",
+		"ts": 332480490951,
+		"replica": 2,
+		"reason": "source-cache-unavailable"
+	},
+	{
+		"role": "peer",
+		"ts": 332480490960,
+		"replica": 3,
+		"reason": "source-cache-unavailable"
+	},
+	{
+		"role": "editor",
+		"ts": 332480675116,
+		"replica": 5,
+		"reason": "source-cache-unavailable"
+	},
+	{
+		"role": "editor",
+		"ts": 332480675129,
+		"replica": 3,
+		"reason": "operation-shape-or-target"
+	},
+	{
+		"role": "peer",
+		"ts": 332480676590,
+		"replica": 2,
+		"reason": "source-cache-unavailable"
+	},
+	{
+		"role": "peer",
+		"ts": 332480676599,
+		"replica": 3,
+		"reason": "source-cache-unavailable"
+	}
+]
