@@ -197,6 +197,15 @@
 			<code>experiments/worker-session/handoff</code>.
 		</p>
 		<p>
+			An outside bridge using the actual EditorElement passed 12 correctness
+			checks: native typing, queued edits, formatting, multicursor editing,
+			remote caret adoption, local durability and scoped disposal. Its timing
+			fixture had incorrect CSS precedence: the 1MiB editor expanded to
+			663,985px tall. Those timings are discarded. The corrected fixture must
+			verify bounded viewport geometry before measurement. No speedup,
+			frame-rate or visual-parity claim follows from this run.
+		</p>
+		<p>
 			Active-line geometry caching was rejected. Six valid rich-document wheel
 			cells showed no consistent layout or paint gain, and geometry fixtures did
 			not prove correctness across a viewport-top shift. The 1MiB arm failed an
