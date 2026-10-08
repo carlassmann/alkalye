@@ -1,0 +1,48 @@
+COJSON sync server listening on ws://127.0.0.1:4226
+
+<--- Last few GCs --->
+
+[90885:0x7b0080c000]   358316 ms: Mark-Compact 4080.9 (4157.5) -> 4080.9 (4157.5) MB, pooled: 9 MB, 94.67 / 0.00 ms  (average mu = 0.269, current mu = 0.098) allocation failure; scavenge might not succeed
+[90885:0x7b0080c000]   358450 ms: Mark-Compact 4083.1 (4159.7) -> 4083.1 (4167.7) MB, pooled: 1 MB, 131.79 / 0.00 ms  (average mu = 0.128, current mu = 0.012) allocation failure; scavenge might not succeed
+
+FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0x100f1883c node::OOMErrorHandler(char const*, v8::OOMDetails const&) [<Node v24.14.0>]
+ 2: 0x1011184b0 v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [<Node v24.14.0>]
+ 3: 0x1013780e4 v8::internal::Heap::stack() [<Node v24.14.0>]
+ 4: 0x101375fcc v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [<Node v24.14.0>]
+ 5: 0x10136aaf4 v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [<Node v24.14.0>]
+ 6: 0x101339d30 v8::internal::FactoryBase<v8::internal::Factory>::NewRawOneByteString(int, v8::internal::AllocationType) [<Node v24.14.0>]
+ 7: 0x101339b6c v8::internal::FactoryBase<v8::internal::Factory>::NewStringFromOneByte(v8::base::Vector<unsigned char const>, v8::internal::AllocationType) [<Node v24.14.0>]
+ 8: 0x10149feb0 v8::internal::JsonStringifier::Stringify(v8::internal::Handle<v8::internal::Union<v8::internal::Smi, v8::internal::HeapNumber, v8::internal::BigInt, v8::internal::String, v8::internal::Symbol, v8::internal::Boolean, v8::internal::Null, v8::internal::Undefined, v8::internal::JSReceiver>>, v8::internal::Handle<v8::internal::Union<v8::internal::Smi, v8::internal::HeapNumber, v8::internal::BigInt, v8::internal::String, v8::internal::Symbol, v8::internal::Boolean, v8::internal::Null, v8::internal::Undefined, v8::internal::JSReceiver>>, v8::internal::Handle<v8::internal::Object>) [<Node v24.14.0>]
+ 9: 0x1014a5e80 v8::internal::JsonStringify(v8::internal::Isolate*, v8::internal::Handle<v8::internal::Union<v8::internal::Smi, v8::internal::HeapNumber, v8::internal::BigInt, v8::internal::String, v8::internal::Symbol, v8::internal::Boolean, v8::internal::Null, v8::internal::Undefined, v8::internal::JSReceiver>>, v8::internal::Handle<v8::internal::Union<v8::internal::Smi, v8::internal::HeapNumber, v8::internal::BigInt, v8::internal::String, v8::internal::Symbol, v8::internal::Boolean, v8::internal::Null, v8::internal::Undefined, v8::internal::JSReceiver>>, v8::internal::Handle<v8::internal::Object>) [<Node v24.14.0>]
+10: 0x1011952c4 v8::internal::Builtin_JsonStringify(int, unsigned long*, v8::internal::Isolate*) [<Node v24.14.0>]
+11: 0x101e31e94 Builtins_CEntry_Return1_ArgvOnStack_BuiltinExit [<Node v24.14.0>]
+12: 0x120cfc310 
+13: 0x120d18174 
+14: 0x120e5c03c 
+15: 0x120e61ab8 
+16: 0x120e99c28 
+17: 0x120e5d7a4 
+18: 0x120e99ebc 
+19: 0x120e91a40 
+20: 0x120e9a1f0 
+21: 0x120e74808 
+22: 0x120e9a624 
+23: 0x120e7f780 
+24: 0x120e74698 
+25: 0x120e7fb2c 
+26: 0x101d928cc Builtins_JSEntryTrampoline [<Node v24.14.0>]
+27: 0x101d92570 Builtins_JSEntry [<Node v24.14.0>]
+28: 0x1012bc32c v8::internal::(anonymous namespace)::Invoke(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [<Node v24.14.0>]
+29: 0x1012bbc90 v8::internal::Execution::Call(v8::internal::Isolate*, v8::internal::DirectHandle<v8::internal::Object>, v8::internal::DirectHandle<v8::internal::Object>, v8::base::Vector<v8::internal::DirectHandle<v8::internal::Object> const>) [<Node v24.14.0>]
+30: 0x101130428 v8::Function::Call(v8::Isolate*, v8::Local<v8::Context>, v8::Local<v8::Value>, int, v8::Local<v8::Value>*) [<Node v24.14.0>]
+31: 0x100e19348 node::InternalMakeCallback(node::Environment*, v8::Local<v8::Object>, v8::Local<v8::Object>, v8::Local<v8::Function>, int, v8::Local<v8::Value>*, node::async_context, v8::Local<v8::Value>) [<Node v24.14.0>]
+32: 0x100e2d044 node::AsyncWrap::MakeCallback(v8::Local<v8::Function>, int, v8::Local<v8::Value>*) [<Node v24.14.0>]
+33: 0x100eaeb40 node::HandleWrap::OnClose(uv_handle_s*) [<Node v24.14.0>]
+34: 0x101d717dc uv_run [<Node v24.14.0>]
+35: 0x100e19b44 node::SpinEventLoopInternal(node::Environment*) [<Node v24.14.0>]
+36: 0x100f6c848 node::NodeMainInstance::Run() [<Node v24.14.0>]
+37: 0x100ed2468 node::Start(int, char**) [<Node v24.14.0>]
+38: 0x193fc3e80 start [/usr/lib/dyld]

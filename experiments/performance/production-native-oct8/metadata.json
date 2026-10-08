@@ -63,7 +63,7 @@
 		"rewrite1MiB": 3
 	},
 	"originalSyncLifecycle": {
-		"log": "original-sync-oom.log",
+		"log": "original-sync-oom.log.txt",
 		"nodeVersion": "24.14.0",
 		"nodePid": 90885,
 		"lastMajorGcMillisecondsSinceStartup": 358450,
