@@ -1,0 +1,30 @@
+{
+  "assertions": [
+    "simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections",
+    "browser identity is available before any network authentication",
+    "native browser account login serializes cookie issuance and agrees with server verification",
+    "real HTTP owner fixture seeded",
+    "real journal open failure reported",
+    "failed Open retains no authority slot",
+    "Open succeeds after failed scope cleanup",
+    "Observe emits readonly document while authority active",
+    "second Observe refused without consuming mutation lane",
+    "active Observe allows FIFO command and same-token retry identity",
+    "active observer receives command projection",
+    "safe-integer Present command works beside Observe",
+    "interrupted observer lease reusable",
+    "Close cleanly completes active Observe before scope teardown",
+    "Close releases authority",
+    "fresh scope reopens exact offline journal source",
+    "unsaved worker draft matches retained full main draft",
+    "real journal write failure leaves Flush failed",
+    "failed durable Close remains failure",
+    "failed Close releases active observation",
+    "failed Close still releases authority slot",
+    "failed Close preserves complete main recovery draft",
+    "reopen reads durable prefix without blind unknown-suffix replay",
+    "durable-prefix reconciliation does not discard retained suffix",
+    "client owner scope closes worker resources"
+  ],
+  "stage": "passed"
+}

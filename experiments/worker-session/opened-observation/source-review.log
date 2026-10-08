@@ -1,0 +1,42 @@
+I found 5 blockers and 6 smaller corrections across the 8 files. I only read source; I ran no shell commands, tests or builds and changed nothing. Nothing here proves streaming works or that the adopted editor basis was exercised.
+
+## Blockers
+
+1. **Prepare failures don't surface until Execute.**
+   - At `worker-opened-capabilities.ts:120`, `tasks.toggle` builds the toggle effect right away, and validation (bad range, `basis` undefined, "no longer a task") comes back as a failed effect. `prepare` then stores that effect and returns a token anyway, so `TaskToggle` succeeds and the error only shows up at `Execute`.
+   - `history.restore` at line 124 does the same when the moment is missing (`worker-opened-history.ts:77`).
+   - Fix: have `prepareWorkerTaskToggle` and `history.restore` return `Effect<Command, DocumentConflict>`, then `Effect.flatMap(intents.commands.prepare)`. Run the validation inside the effect rather than when the function is called.
+
+2. **Shutdown order on Close.** `closed` is resolved by the first finalizer added to the scope (`worker-session.ts:45`), and scope finalizers run in reverse order, so it fires last. That means the live connection, the session and the capabilities are all torn down while Observe is still reading `session.changes` and `presence.changes`. The client may then see an interrupt or defect instead of a clean end of stream.
+   - Fix: in `Close`, call `Deferred.done(current.closed, Exit.void)` before `Scope.close`, and keep the finalizer for Open failure and owner shutdown.
+
+3. **Prepared commands can run more than once.** `commands.execute` (`worker-opened-intents.ts:84`) never removes the token. `Execute` called twice applies the change twice. For task toggle, the second run re-applies `formatted.source` against stale `atoms`.
+   - Fix: delete the token before or on success, or explicitly accept and document re-execution.
+
+4. **`Command` type probably doesn't fit.** The union (`intents.ts:19`) is probably narrower than what task toggle and history restore return, which add `DocumentConflict` and `PermissionDenied` to the error type. Expect a type error at `prepare(...)` until this compiles.
+
+5. **History schema can fail to encode.** `subject: moment.source === "local" ? moment.subject : ...` (`history.ts:48`) may be undefined, but the RPC schema requires a `String`. That would turn into a defect while encoding the response. `time` uses `?? 0`, which is fine; check that `subject` is always set.
+
+## Small corrections
+
+- **Error mapping** (`worker-session.ts:38`): `PermissionDenied` comes back as reason `SessionFailure`. Map it to reason `PermissionDenied`. Also, `failure()` stamps category `"conflict"` on `Closed`, `AlreadyOpen` and `AlreadyObserving`. The reasons `AppliedUnknown`, `HandleCapacity` and `SelectionUnavailable` are never produced; drop them or wire them.
+- **Released history can leave a moment behind** (`history.ts:61`): `select` checks the history, then awaits `history.at`. If `HistoryRelease` lands in between, it stores a moment for a history that no longer exists, and it stays until close.
+  - Today the shared semaphore serializes these calls, so this can't happen yet.
+  - Re-checking `histories.has(historyToken)` in the second `attempt` costs little and holds up if the semaphore changes.
+- **Restore command keeps the replica alive**: it captures `moment.replica` when it's prepared, so `MomentRelease` doesn't free it while the command token is held. Acceptable; just noting it.
+- **Task toggle and capture can't succeed yet**: `basis: () => undefined` and `editor.changes: Stream.never` (`worker-session.ts:66`) make `TaskToggle` and discussion/asset capture always fail with "selection unavailable". That's expected until there is an adopted editor basis; don't count them as covered.
+- **Duplicate call**: `materialize` calls `session.replica.metadata(document)` twice (`capabilities.ts:73`), and the same pattern appears in `history.ts:69`. Use a local variable.
+- **Odd branch in the client**: in `worker-client.ts:63`, both branches of the `postMessage` override are identical. That's fine if it's only there to satisfy TS overloads, but it reads as a bug.
+
+## Checked, no issue found
+
+- The single observer slot plus `acquireRelease` and the per-open reservation. The mutation semaphore is taken only while acquiring the observer.
+- Open closes the scope on failure or interrupt. Close clears `opened` and closes the scope even when flush fails, and the main thread keeps its draft.
+- Task and history effects go through the existing command registry; no new queue.
+- Read-only history load is allowed; restore and prepare check `canWrite`.
+
+Assumption I didn't verify: that Effect 4's `Stream.unwrap` removes `Scope` and scopes it to the stream's lifetime. Confirm that against the installed `Stream.ts`.
+
+Several Claude.ai connectors (GitHub, Slack, Notion and others) still need authorization in the Claude.ai connector settings. This review didn't use them.
+
+written with claude-opus-5-5 in claude-code

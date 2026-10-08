@@ -1,0 +1,13 @@
+{
+  "assertions": [
+    "simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections",
+    "browser identity is available before any network authentication",
+    "native browser account login serializes cookie issuance and agrees with server verification",
+    "real HTTP owner fixture seeded",
+    "real journal open failure reported",
+    "failed Open retains no authority slot",
+    "Open succeeds after failed scope cleanup"
+  ],
+  "failure": "Cause([Die(Error: Observe emits readonly document while authority active)])",
+  "stage": "failed"
+}

@@ -1,0 +1,105 @@
+import * as Effect from "effect/Effect"
+import * as Deferred from "effect/Deferred"
+import * as Schedule from "effect/Schedule"
+import * as Exit from "effect/Exit"
+import * as Fiber from "effect/Fiber"
+import * as Stream from "effect/Stream"
+import * as Scope from "effect/Scope"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import { bootstrapBrowserAccount } from "./tests/browser-account-fixture"
+import { createWorkerSessionClient } from "./worker-client"
+
+declare global { interface Window { observeProof?: { stage: string; assertions: string[]; failure?: string; draft: string } } }
+let assertions: string[] = []
+let draft = ""
+function assert(value: unknown, label: string) { if (!value) throw Error(label); assertions.push(label) }
+let source = "---\ntitle: Worker fixture\n---\n# Hello\nUnicode 🦊 café remains exact.\n"
+window.observeProof = { stage: "running", assertions, draft }
+let program = Effect.scoped(Effect.gen(function* () {
+ let account = yield* bootstrapBrowserAccount(assert)
+ let document = "observe-" + crypto.randomUUID()
+ yield* Effect.promise(async () => {
+  let response = await fetch("/__tests/seed", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ subject: account.subject, document, source }) })
+  assert(response.ok, "real HTTP owner fixture seeded")
+ })
+ let worker = yield* createWorkerSessionClient(new URL("/worker.js", location.href).href)
+ let input = { document, workspace: "personal-" + account.subject, subject: account.subject, origin: location.origin, online: true }
+ yield* worker.FixtureFault({ openFailure: true, writeFailure: false })
+ let failedOpen = yield* worker.Open(input).pipe(Effect.exit)
+ assert(Exit.isFailure(failedOpen), "real journal open failure reported")
+ assert(Exit.isFailure(yield* worker.Read().pipe(Effect.exit)), "failed Open retains no authority slot")
+ yield* worker.FixtureFault({ openFailure: false, writeFailure: false })
+ yield* worker.Open(input)
+ let opened = yield* worker.Read().pipe(Effect.flatMap(value => value.projection ? Effect.succeed(value) : Effect.fail("NotReady")), Effect.retry(Schedule.spaced("20 millis")), Effect.timeout("10 seconds"))
+ assert(opened.projection?.document.content === source, "Open succeeds after failed scope cleanup")
+ function observe() {
+  return Effect.gen(function* () {
+   let first = yield* Deferred.make<void>()
+   let events: string[] = []
+   let fiber = yield* worker.Observe().pipe(Stream.runForEach(event => Effect.gen(function* () {
+    if (event.type === "document") {
+     events.push(event.value.projection?.metadata.title ?? "")
+     yield* Deferred.succeed(first, undefined)
+    }
+   })), Effect.forkScoped({ startImmediately: true }))
+   yield* Deferred.await(first).pipe(Effect.timeout("5 seconds"))
+   return { fiber, events }
+  })
+ }
+ let observer = yield* observe()
+ assert(observer.events.includes("Worker fixture"), "Observe emits readonly document while authority active")
+ let duplicate = yield* worker.Observe().pipe(Stream.runDrain, Effect.exit, Effect.timeout("5 seconds"))
+ assert(Exit.isFailure(duplicate), "second Observe refused without consuming mutation lane")
+ let prepared = yield* worker.PropertiesUpdate({ patch: { title: "Observed title" } })
+ let first = yield* worker.Execute(prepared)
+ let retry = yield* worker.Execute(prepared)
+ assert(first.action === retry.action, "active Observe allows FIFO command and same-token retry identity")
+ yield* Effect.suspend(() => observer.events.includes("Observed title") ? Effect.void : Effect.fail("EventNotReady")).pipe(Effect.retry(Schedule.spaced("20 millis")), Effect.timeout("5 seconds"))
+ assert(true, "active observer receives command projection")
+ yield* worker.Release(prepared)
+ let present = yield* worker.Present({ index: 3 })
+ yield* worker.Execute(present)
+ yield* worker.Release(present)
+ assert((yield* worker.Read()).revision > opened.revision, "safe-integer Present command works beside Observe")
+ yield* Fiber.interrupt(observer.fiber)
+ let resumed = yield* observe()
+ assert(resumed.events.includes("Observed title"), "interrupted observer lease reusable")
+ yield* worker.Admission({ writable: true, online: false })
+ yield* Effect.promise(() => fetch("/__tests/network?blocked=1"))
+ yield* worker.Flush()
+ let durable = (yield* worker.Read()).projection?.document.content
+ yield* worker.Close()
+ let closed = yield* Fiber.await(resumed.fiber).pipe(Effect.timeout("5 seconds"))
+ assert(Exit.isSuccess(closed), "Close cleanly completes active Observe before scope teardown")
+ assert(Exit.isFailure(yield* worker.Read().pipe(Effect.exit)), "Close releases authority")
+ let reopened = yield* worker.Open({ ...input, online: false })
+ assert(reopened.projection?.document.content === durable, "fresh scope reopens exact offline journal source")
+ let failureObserver = yield* observe()
+ draft = (durable ?? source) + "Unacknowledged draft 🦊\n"
+ if (window.observeProof) window.observeProof.draft = draft
+ yield* worker.FixtureFault({ openFailure: false, writeFailure: true })
+ yield* worker.FixtureDraft({ source: draft })
+ assert((yield* worker.Read()).projection?.document.content === draft, "unsaved worker draft matches retained full main draft")
+ let flush = yield* worker.Flush().pipe(Effect.exit)
+ assert(Exit.isFailure(flush), "real journal write failure leaves Flush failed")
+ let failedClose = yield* worker.Close().pipe(Effect.exit, Effect.timeout("10 seconds"))
+ assert(Exit.isFailure(failedClose), "failed durable Close remains failure")
+ assert(Exit.isSuccess(yield* Fiber.await(failureObserver.fiber).pipe(Effect.timeout("5 seconds"))), "failed Close releases active observation")
+ assert(Exit.isFailure(yield* worker.Read().pipe(Effect.exit)), "failed Close still releases authority slot")
+ assert(window.observeProof?.draft === draft, "failed Close preserves complete main recovery draft")
+ yield* worker.FixtureFault({ openFailure: false, writeFailure: false })
+ let recovered = yield* worker.Open({ ...input, online: false })
+ assert(recovered.projection?.document.content === durable, "reopen reads durable prefix without blind unknown-suffix replay")
+ assert(window.observeProof?.draft === draft, "durable-prefix reconciliation does not discard retained suffix")
+ yield* worker.Close()
+ let owner = yield* Scope.Scope
+ let child = yield* Scope.fork(owner)
+ let temporary = yield* createWorkerSessionClient(new URL("/worker.js", location.href).href).pipe(Scope.provide(child))
+ yield* temporary.Open({ ...input, online: false })
+ yield* Scope.close(child, Exit.void)
+ assert(true, "client owner scope closes worker resources")
+ if (window.observeProof) window.observeProof.stage = "passed"
+})).pipe(Effect.provide(FetchHttpClient.layer), Effect.catchCause(cause => Effect.sync(() => {
+ if (window.observeProof) { window.observeProof.stage = "failed"; window.observeProof.failure = String(cause) }
+})))
+Effect.runFork(program)
