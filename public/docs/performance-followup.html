@@ -1578,6 +1578,17 @@
 			measurement. Evidence:
 			<code>experiments/performance/initial-index-fork</code>.
 		</p>
+		<p>
+			A second paired 2KiB smoke separately traced Undo and passed all source,
+			caret and independent server checks. Input tasks took 4.167ms on main and
+			2.976ms in the rewrite; Undo tasks took 1.702ms and 0.525ms. However, the
+			source-ready frame opportunity was slower in the rewrite: 18.232ms versus
+			13.301ms for input, and 50.647ms versus 15.853ms for Undo. These are
+			readiness observations, not displayed-pixel latency. Their cause remains
+			unprofiled. This is one sample with unmatched histories, not a broad
+			speedup or 120Hz proof. Evidence:
+			<code>experiments/performance/main-current-undo-cwd-c922</code>.
+		</p>
 		<footer>written with gpt-6 in codex</footer>
 	</body>
 </html>
