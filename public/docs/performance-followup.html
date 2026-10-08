@@ -1327,6 +1327,79 @@
 			<code>hash-map-probe.ts</code>. Search trace phases include enclosing
 			input tasks; nested task durations are not added.
 		</p>
+		<h2>Current search, switching and multicursor checks</h2>
+		<p>
+			Seven focused journeys passed on frozen production <code>1b630c8</code>.
+			Search retained exact source and selection; closing search cleared its
+			highlights. Document switches verified the target route, editable content
+			and an independent server receipt. Multicursor edits checked every
+			replacement, the primary caret and server acceptance. Native Undo restored
+			both documents exactly and durably.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Journey, one trial each</th>
+					<th>Input task</th>
+					<th>Largest task over three seconds</th>
+					<th>Two frame opportunities</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Search query, 128KiB</td>
+					<td>1.092ms</td>
+					<td>2.381ms</td>
+					<td>29.861ms</td>
+				</tr>
+				<tr>
+					<td>Next search match</td>
+					<td>0.435ms</td>
+					<td>2.861ms</td>
+					<td>16.312ms</td>
+				</tr>
+				<tr>
+					<td>Close search</td>
+					<td>0.430ms</td>
+					<td>2.874ms</td>
+					<td>32.297ms</td>
+				</tr>
+				<tr>
+					<td>2KiB to rich 128KiB document</td>
+					<td>0.351ms</td>
+					<td>18.781ms</td>
+					<td>632.281ms</td>
+				</tr>
+				<tr>
+					<td>Rich 128KiB to 2KiB document</td>
+					<td>0.306ms</td>
+					<td>7.409ms</td>
+					<td>35.136ms</td>
+				</tr>
+				<tr>
+					<td>512 selections, 1MiB document</td>
+					<td>14.900ms</td>
+					<td>15.101ms</td>
+					<td>15.615ms</td>
+				</tr>
+				<tr>
+					<td>2,048 selections, 1MiB document</td>
+					<td>33.803ms</td>
+					<td>53.964ms</td>
+					<td>34.447ms</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+			These are single observations, with no main counterpart yet. They cannot
+			establish a speedup, percentile or physical 120Hz presentation. Search and
+			switch input tasks begin with pointerdown; later click handling is
+			included in the full window. Multicursor input tasks include beforeinput.
+			Undo correctness passed outside the recorded window, so its latency is
+			unmeasured. The rich opening and large multicursor edits remain over
+			budget. Evidence and trace hashes live in
+			<code>experiments/performance/interaction-matrix</code>.
+		</p>
 		<footer>written with gpt-6 in codex</footer>
 	</body>
 </html>
