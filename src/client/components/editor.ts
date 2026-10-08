@@ -1,3 +1,4 @@
+import { terminalRemovalPosition } from "../../shared/crdt"
 import { TextIndex } from "../../shared/text-index"
 import * as Effect from "effect/Effect"
 import * as Fiber from "effect/Fiber"
@@ -969,6 +970,11 @@ function createEditorView(
 		}
 		let pending: AnchorRequest[] = []
 		for (let id of new Set(ids)) {
+			let removed = terminalRemovalPosition(atoms, nextAtoms, id)
+			if (removed !== undefined && removed === nextIndex.length) {
+				resolved.set(id, removed)
+				continue
+			}
 			let nearby = nearbyPosition(id, nextAtoms, nextIndex)
 			if (nearby !== undefined) resolved.set(id, nearby)
 			else

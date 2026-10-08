@@ -1,6 +1,8 @@
 import { EditorElement } from "../src/client/components/editor"
 import { editorPreferences } from "../src/shared/preferences"
 import { Replica } from "../src/shared/crdt"
+import { newDocument } from "../src/shared/documents"
+import { changeMetadata } from "../src/shared/document-metadata"
 import type { Atom } from "../src/shared/model"
 
 interface Scenario {
@@ -113,7 +115,49 @@ let mixedRuns = new Replica("mixed-owner")
 mixedRuns.edit("mixed", "x".repeat(2048))
 mixedRuns.edit("mixed", "x".repeat(2048) + "y".repeat(2048))
 let mixedAtoms = mixedRuns.visible("mixed")
+function terminalScenario(
+	body: string,
+	tail: string,
+	selected = false,
+): Scenario {
+	let replica = new Replica("terminal-owner")
+	newDocument(replica, "terminal", "Original", body)
+	changeMetadata(replica, "terminal", {
+		title: "Long renamed title",
+		tags: ["green"],
+	})
+	changeMetadata(replica, "terminal", { title: "Short" })
+	let source = replica.text("terminal")
+	let inserted = replica.edit("terminal", source + tail)
+	if (!inserted) throw Error("Missing terminal insertion")
+	let before = replica.visible("terminal")
+	replica.cancel("terminal", inserted.id)
+	let after = replica.visible("terminal")
+	let restored = new Replica("independent")
+	restored.restore(replica.checkpoint())
+	if (replica.text("terminal") !== restored.text("terminal"))
+		throw Error("Checkpoint mismatch")
+	let start = selected
+		? source.indexOf("Body") + 2
+		: source.length + tail.length
+	return {
+		name:
+			"terminal cancellation " +
+			tail +
+			" preserves " +
+			(selected ? "selection" : "caret"),
+		before,
+		after,
+		start,
+		...(selected ? { end: source.length + tail.length } : {}),
+		expected: [selected ? start : source.length, source.length],
+	}
+}
 let scenarios: Scenario[] = [
+	terminalScenario("Body" + "z".repeat(16384), "X"),
+	terminalScenario("Body😀" + "z".repeat(16384), "🌻"),
+	terminalScenario("Body😀" + "z".repeat(16384), "🌻", true),
+	terminalScenario("", "X"),
 	{
 		name: "generated Unicode survivors preserve UTF16 offsets",
 		before: generatedEmojiAtoms,

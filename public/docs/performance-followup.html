@@ -137,6 +137,18 @@
 			remove; they are not a before/after comparison or proof of 120fps.
 			Evidence: <code>experiments/performance/undo-redo-526</code>.
 		</p>
+		<p>
+			The next fix records the exact immutable atom-view pair produced by a
+			validated terminal cancellation. Cursor restoration can resolve that
+			removed atom directly; other edits retain the exhaustive fallback. Twenty
+			native contracts and a separate 1MiB eligibility check passed. In six
+			matched trials, the Undo refresh callback fell from 24.2ms to 7.5ms, and
+			its enclosing task from 25.6ms to 9.0ms. The largest task in the full Undo
+			window fell from 25.6ms to 13.4ms; candidate peaks were garbage
+			collection. Ordinary input stayed around 6.6ms. Over-budget task counts
+			did not improve, so this is still not a 120fps result. Evidence:
+			<code>experiments/performance/terminal-anchor-position</code>.
+		</p>
 		<h2>Earlier journey comparison with main</h2>
 		<p>
 			Both production builds used their own local sync servers, signed accounts

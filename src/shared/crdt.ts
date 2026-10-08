@@ -34,6 +34,19 @@ export interface TextReplacement {
 let sourceViews = new WeakMap<Atom[], Atom[]>()
 let sourceOffsets = new WeakMap<Atom[], TextIndex>()
 let sourceStrings = new WeakMap<Atom[], string>()
+let terminalRemovals = new WeakMap<
+	Atom[],
+	WeakMap<Atom[], { id: string; offset: number }>
+>()
+
+export function terminalRemovalPosition(
+	previous: Atom[],
+	next: Atom[],
+	id: string,
+) {
+	let removed = terminalRemovals.get(next)?.get(previous)
+	return removed?.id === id ? removed.offset : undefined
+}
 interface PreparedSplice {
 	after: string
 	start: number
@@ -41,6 +54,7 @@ interface PreparedSplice {
 	inserted: string[]
 }
 interface PreparedTextEdit {
+	terminalRemoval?: true
 	id: string
 	target: string
 	generation: number
@@ -228,6 +242,7 @@ export class Replica {
 			inserted: [],
 		}
 		return {
+			terminalRemoval: true,
 			id: operation.id,
 			target,
 			generation: this.generation,
@@ -526,6 +541,25 @@ export class Replica {
 		sourceViews.set(atoms, raw)
 		this.strings.set(edit.target, edit.content)
 		sourceStrings.set(atoms, edit.content)
+		let removed = edit.terminalRemoval && edit.atoms.at(-1)
+		if (
+			removed &&
+			Object.isFrozen(removed) &&
+			atoms.length === edit.atoms.length - 1 &&
+			atoms.at(-1) === edit.atoms.at(-2)
+		)
+			terminalRemovals.set(
+				atoms,
+				new WeakMap([
+					[
+						edit.atoms,
+						{
+							id: removed.id,
+							offset: edit.content.length,
+						},
+					],
+				]),
+			)
 	}
 
 	validate(input: Operation[]) {
