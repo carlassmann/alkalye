@@ -1,0 +1,263 @@
+{
+	"phase": "diagnostic",
+	"rows": [
+		{
+			"phase": "diagnostic",
+			"header": false,
+			"trial": 0,
+			"action": "append",
+			"owner": {
+				"start": 1791424040055.2998,
+				"trusted": true
+			},
+			"peer": {
+				"accepted": 1791424040144,
+				"exact": true,
+				"heap": 159720556,
+				"paint": 1791424040164.7998,
+				"probe": {
+					"attempts": 9,
+					"committed": 1,
+					"last": {
+						"canonical": 131072,
+						"insert": true,
+						"raw": 131072
+					},
+					"prepared": 3
+				},
+				"received": 1791424040132.5,
+				"scripts": [
+					"http://localhost:49516/chunks/document-app-2kgdwx8e.js",
+					"http://localhost:49516/chunks/document-app-m2qx4cqf.js",
+					"http://localhost:49516/chunks/document-app-thkxqxcb.js",
+					"http://localhost:49516/chunks/document-app-yban52j1.js",
+					"http://localhost:49516/app.js",
+					"http://localhost:49516/chunks/document-app-wgc0k76q.js",
+					"http://localhost:49516/chunks/document-app-fgx2x77g.js",
+					"http://localhost:49516/chunks/document-app-a90w6d6m.js",
+					"http://localhost:49516/chunks/document-app-2kfchhzr.js",
+					"http://localhost:49516/chunks/document-app-0ajm8m26.js",
+					"http://localhost:49516/chunks/document-app-36rg9vk7.js",
+					"http://localhost:49516/chunks/document-app-fqd391qv.js",
+					"http://localhost:49516/chunks/document-app-mxj8dsqn.js",
+					"http://localhost:49516/chunks/document-app-y700tj5b.js",
+					"http://localhost:49516/chunks/document-app-jfdxw43y.js",
+					"http://localhost:49516/chunks/document-app-wk18rnbw.js",
+					"http://localhost:49516/chunks/document-app-9stfpdwp.js",
+					"http://localhost:49516/chunks/document-app-c1c7xhgx.js",
+					"http://localhost:49516/chunks/document-app-ppf43dcv.js",
+					"http://localhost:49516/chunks/document-app-sk4fq211.js",
+					"http://localhost:49516/chunks/document-app-mkpsmxxh.js",
+					"http://localhost:49516/chunks/document-app-77kb75mj.js",
+					"http://localhost:49516/chunks/document-app-dqkm6ct5.js",
+					"http://localhost:49516/chunks/document-app-d6ev79eg.js",
+					"http://localhost:49516/chunks/document-app-028fjwvz.js",
+					"http://localhost:49516/chunks/document-app-ww9hhdm0.js",
+					"http://localhost:49516/chunks/document-app-0rgj2pt3.js",
+					"http://localhost:49516/chunks/document-app-pt0vb1th.js",
+					"http://localhost:49516/chunks/document-app-yd5t74fk.js",
+					"http://localhost:49516/chunks/document-app-m4kepen8.js",
+					"http://localhost:49516/chunks/document-app-7aeqndrb.js",
+					"http://localhost:49516/chunks/document-app-nqb2j1d5.js",
+					"http://localhost:49516/chunks/invitation-screen-8858smx7.js",
+					"http://localhost:49516/chunks/document-worker-stats-88n1d0q5.js",
+					"http://localhost:49516/document-worker.js"
+				],
+				"start": 1791424039919.1
+			}
+		},
+		{
+			"phase": "diagnostic",
+			"header": false,
+			"trial": 0,
+			"action": "remove",
+			"owner": {
+				"start": 1791424040511.4,
+				"trusted": true
+			},
+			"peer": {
+				"accepted": 1791424040599.2998,
+				"exact": true,
+				"heap": 146237776,
+				"paint": 1791424040615.2998,
+				"probe": {
+					"attempts": 12,
+					"committed": 2,
+					"last": {
+						"canonical": 131073,
+						"insert": false,
+						"raw": 131073
+					},
+					"prepared": 6
+				},
+				"received": 1791424040582.6,
+				"scripts": [
+					"http://localhost:49516/chunks/document-app-2kgdwx8e.js",
+					"http://localhost:49516/chunks/document-app-m2qx4cqf.js",
+					"http://localhost:49516/chunks/document-app-thkxqxcb.js",
+					"http://localhost:49516/chunks/document-app-yban52j1.js",
+					"http://localhost:49516/app.js",
+					"http://localhost:49516/chunks/document-app-wgc0k76q.js",
+					"http://localhost:49516/chunks/document-app-fgx2x77g.js",
+					"http://localhost:49516/chunks/document-app-a90w6d6m.js",
+					"http://localhost:49516/chunks/document-app-2kfchhzr.js",
+					"http://localhost:49516/chunks/document-app-0ajm8m26.js",
+					"http://localhost:49516/chunks/document-app-36rg9vk7.js",
+					"http://localhost:49516/chunks/document-app-fqd391qv.js",
+					"http://localhost:49516/chunks/document-app-mxj8dsqn.js",
+					"http://localhost:49516/chunks/document-app-y700tj5b.js",
+					"http://localhost:49516/chunks/document-app-jfdxw43y.js",
+					"http://localhost:49516/chunks/document-app-wk18rnbw.js",
+					"http://localhost:49516/chunks/document-app-9stfpdwp.js",
+					"http://localhost:49516/chunks/document-app-c1c7xhgx.js",
+					"http://localhost:49516/chunks/document-app-ppf43dcv.js",
+					"http://localhost:49516/chunks/document-app-sk4fq211.js",
+					"http://localhost:49516/chunks/document-app-mkpsmxxh.js",
+					"http://localhost:49516/chunks/document-app-77kb75mj.js",
+					"http://localhost:49516/chunks/document-app-dqkm6ct5.js",
+					"http://localhost:49516/chunks/document-app-d6ev79eg.js",
+					"http://localhost:49516/chunks/document-app-028fjwvz.js",
+					"http://localhost:49516/chunks/document-app-ww9hhdm0.js",
+					"http://localhost:49516/chunks/document-app-0rgj2pt3.js",
+					"http://localhost:49516/chunks/document-app-pt0vb1th.js",
+					"http://localhost:49516/chunks/document-app-yd5t74fk.js",
+					"http://localhost:49516/chunks/document-app-m4kepen8.js",
+					"http://localhost:49516/chunks/document-app-7aeqndrb.js",
+					"http://localhost:49516/chunks/document-app-nqb2j1d5.js",
+					"http://localhost:49516/chunks/invitation-screen-8858smx7.js",
+					"http://localhost:49516/chunks/document-worker-stats-88n1d0q5.js",
+					"http://localhost:49516/document-worker.js"
+				],
+				"start": 1791424040409.4
+			}
+		},
+		{
+			"phase": "diagnostic",
+			"header": true,
+			"trial": 0,
+			"action": "append",
+			"owner": {
+				"start": 1791424041521.7,
+				"trusted": true
+			},
+			"peer": {
+				"accepted": 1791424041616.2,
+				"exact": true,
+				"heap": 251593519,
+				"paint": 1791424041631,
+				"probe": {
+					"attempts": 7,
+					"committed": 1,
+					"last": {
+						"canonical": 131120,
+						"insert": true,
+						"raw": 131120
+					},
+					"prepared": 3
+				},
+				"received": 1791424041602.3,
+				"scripts": [
+					"http://localhost:49516/chunks/document-app-yban52j1.js",
+					"http://localhost:49516/chunks/document-app-2kgdwx8e.js",
+					"http://localhost:49516/chunks/document-app-m2qx4cqf.js",
+					"http://localhost:49516/chunks/document-app-thkxqxcb.js",
+					"http://localhost:49516/app.js",
+					"http://localhost:49516/chunks/document-app-a90w6d6m.js",
+					"http://localhost:49516/chunks/document-app-fgx2x77g.js",
+					"http://localhost:49516/chunks/document-app-wgc0k76q.js",
+					"http://localhost:49516/chunks/document-app-2kfchhzr.js",
+					"http://localhost:49516/chunks/document-app-36rg9vk7.js",
+					"http://localhost:49516/chunks/document-app-0ajm8m26.js",
+					"http://localhost:49516/chunks/document-app-fqd391qv.js",
+					"http://localhost:49516/chunks/document-app-mxj8dsqn.js",
+					"http://localhost:49516/chunks/document-app-y700tj5b.js",
+					"http://localhost:49516/chunks/document-app-jfdxw43y.js",
+					"http://localhost:49516/chunks/document-app-wk18rnbw.js",
+					"http://localhost:49516/chunks/document-app-9stfpdwp.js",
+					"http://localhost:49516/chunks/document-app-c1c7xhgx.js",
+					"http://localhost:49516/chunks/document-app-ppf43dcv.js",
+					"http://localhost:49516/chunks/document-app-sk4fq211.js",
+					"http://localhost:49516/chunks/document-app-d6ev79eg.js",
+					"http://localhost:49516/chunks/document-app-mkpsmxxh.js",
+					"http://localhost:49516/chunks/document-app-77kb75mj.js",
+					"http://localhost:49516/chunks/document-app-dqkm6ct5.js",
+					"http://localhost:49516/chunks/document-app-028fjwvz.js",
+					"http://localhost:49516/chunks/document-app-ww9hhdm0.js",
+					"http://localhost:49516/chunks/document-app-0rgj2pt3.js",
+					"http://localhost:49516/chunks/document-app-pt0vb1th.js",
+					"http://localhost:49516/chunks/document-app-m4kepen8.js",
+					"http://localhost:49516/chunks/document-app-yd5t74fk.js",
+					"http://localhost:49516/chunks/document-app-7aeqndrb.js",
+					"http://localhost:49516/chunks/document-app-nqb2j1d5.js",
+					"http://localhost:49516/chunks/document-worker-stats-88n1d0q5.js",
+					"http://localhost:49516/document-worker.js"
+				],
+				"start": 1791424041419.4
+			}
+		},
+		{
+			"phase": "diagnostic",
+			"header": true,
+			"trial": 0,
+			"action": "remove",
+			"owner": {
+				"start": 1791424041977.4,
+				"trusted": true
+			},
+			"peer": {
+				"accepted": 1791424042076.8,
+				"exact": true,
+				"heap": 238245827,
+				"paint": 1791424042096.8,
+				"probe": {
+					"attempts": 10,
+					"committed": 2,
+					"last": {
+						"canonical": 131121,
+						"insert": false,
+						"raw": 131121
+					},
+					"prepared": 6
+				},
+				"received": 1791424042065.6,
+				"scripts": [
+					"http://localhost:49516/chunks/document-app-yban52j1.js",
+					"http://localhost:49516/chunks/document-app-2kgdwx8e.js",
+					"http://localhost:49516/chunks/document-app-m2qx4cqf.js",
+					"http://localhost:49516/chunks/document-app-thkxqxcb.js",
+					"http://localhost:49516/app.js",
+					"http://localhost:49516/chunks/document-app-a90w6d6m.js",
+					"http://localhost:49516/chunks/document-app-fgx2x77g.js",
+					"http://localhost:49516/chunks/document-app-wgc0k76q.js",
+					"http://localhost:49516/chunks/document-app-2kfchhzr.js",
+					"http://localhost:49516/chunks/document-app-36rg9vk7.js",
+					"http://localhost:49516/chunks/document-app-0ajm8m26.js",
+					"http://localhost:49516/chunks/document-app-fqd391qv.js",
+					"http://localhost:49516/chunks/document-app-mxj8dsqn.js",
+					"http://localhost:49516/chunks/document-app-y700tj5b.js",
+					"http://localhost:49516/chunks/document-app-jfdxw43y.js",
+					"http://localhost:49516/chunks/document-app-wk18rnbw.js",
+					"http://localhost:49516/chunks/document-app-9stfpdwp.js",
+					"http://localhost:49516/chunks/document-app-c1c7xhgx.js",
+					"http://localhost:49516/chunks/document-app-ppf43dcv.js",
+					"http://localhost:49516/chunks/document-app-sk4fq211.js",
+					"http://localhost:49516/chunks/document-app-d6ev79eg.js",
+					"http://localhost:49516/chunks/document-app-mkpsmxxh.js",
+					"http://localhost:49516/chunks/document-app-77kb75mj.js",
+					"http://localhost:49516/chunks/document-app-dqkm6ct5.js",
+					"http://localhost:49516/chunks/document-app-028fjwvz.js",
+					"http://localhost:49516/chunks/document-app-ww9hhdm0.js",
+					"http://localhost:49516/chunks/document-app-0rgj2pt3.js",
+					"http://localhost:49516/chunks/document-app-pt0vb1th.js",
+					"http://localhost:49516/chunks/document-app-m4kepen8.js",
+					"http://localhost:49516/chunks/document-app-yd5t74fk.js",
+					"http://localhost:49516/chunks/document-app-7aeqndrb.js",
+					"http://localhost:49516/chunks/document-app-nqb2j1d5.js",
+					"http://localhost:49516/chunks/document-worker-stats-88n1d0q5.js",
+					"http://localhost:49516/document-worker.js"
+				],
+				"start": 1791424041873.9
+			}
+		}
+	]
+}

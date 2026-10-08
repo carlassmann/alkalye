@@ -152,7 +152,10 @@ export class Replica {
 		this.prepareApplication(input)()
 	}
 	private prepareApplication(input: Operation[]) {
-		let edit = this.preparedEdit ?? this.prepareTerminalCancellation(input)
+		let edit =
+			this.preparedEdit ??
+			this.prepareTerminalCancellation(input) ??
+			this.prepareTerminalPeerEdit(input)
 		let commit = this.prepare(input)
 		return () => {
 			this.preparedEdit = undefined
@@ -217,6 +220,124 @@ export class Replica {
 			raw: atoms,
 			splices: [splice],
 			rawSplices: [splice],
+		}
+	}
+	private prepareTerminalPeerEdit(
+		input: Operation[],
+	): PreparedTextEdit | undefined {
+		let operation = input[0]
+		if (
+			input.length !== 1 ||
+			!operation ||
+			operation.kind !== "text" ||
+			typeof operation.id !== "string" ||
+			operation.field ||
+			this.operations.has(operation.id) ||
+			this.textOwners.has(operation.id) ||
+			!Array.isArray(operation.insert) ||
+			!Array.isArray(operation.remove) ||
+			this.legacyTextTargets.has(operation.target) ||
+			this.visibility.get(operation.target)?.active(operation.id) === false
+		)
+			return undefined
+		let inserted =
+			operation.insert.length === 1 && !operation.remove.length
+				? operation.insert[0]
+				: undefined
+		let removed =
+			!operation.insert.length && operation.remove.length === 1
+				? operation.remove[0]
+				: undefined
+		if (!inserted && !removed) return undefined
+		let target = operation.target
+		let atoms = this.sourceCache.get(target)
+		let raw = this.textCache.get(target)
+		let content = this.strings.get(target)
+		if (
+			!atoms ||
+			!raw ||
+			content === undefined ||
+			sourceViews.get(atoms) !== raw
+		)
+			return undefined
+		let last = atoms.at(-1)
+		if (
+			!last ||
+			!last.id ||
+			raw.at(-1)?.id !== last.id ||
+			!last.value ||
+			!content.endsWith(last.value)
+		)
+			return undefined
+		let header = sourceHeader(content)
+		if (raw !== atoms && (!header || content.length <= header[0].length))
+			return undefined
+		let next: string
+		if (inserted) {
+			if (
+				typeof inserted.id !== "string" ||
+				typeof inserted.value !== "string" ||
+				inserted.after !== last.id ||
+				this.atomIndex.has(inserted.id) ||
+				this.children.get(target)?.has(inserted.id) ||
+				this.visibility.get(target)?.hidden(inserted.id) ||
+				inserted.order !== undefined ||
+				inserted.observed !== undefined ||
+				inserted.ending !== undefined ||
+				inserted.migration !== undefined ||
+				inserted.deleted !== undefined ||
+				inserted.emptyHeader !== undefined ||
+				inserted.body !== undefined ||
+				!(
+					(inserted.value.length === 1 &&
+						(inserted.value.charCodeAt(0) < 0xd800 ||
+							inserted.value.charCodeAt(0) > 0xdfff)) ||
+					(inserted.value.length === 2 &&
+						inserted.value.charCodeAt(0) >= 0xd800 &&
+						inserted.value.charCodeAt(0) <= 0xdbff &&
+						inserted.value.charCodeAt(1) >= 0xdc00 &&
+						inserted.value.charCodeAt(1) <= 0xdfff)
+				)
+			)
+				return undefined
+			next = content + inserted.value
+		} else {
+			if (removed !== last.id) return undefined
+			next = content.slice(0, -last.value.length)
+		}
+		if (
+			touchesSourceFence(content, content.length, content.length) ||
+			touchesSourceFence(next, next.length, next.length)
+		)
+			return undefined
+		let nextHeader = sourceHeader(next)
+		if (nextHeader && next.length === nextHeader[0].length) return undefined
+		let remove = inserted ? 0 : 1
+		let insertion = inserted ? [inserted.id] : []
+		return {
+			id: operation.id,
+			target,
+			generation: this.generation,
+			signature: textEditSignature(operation),
+			content: next,
+			atoms,
+			raw,
+			splices: [
+				{
+					after: inserted ? last.id : (atoms.at(-2)?.id ?? ""),
+					start: atoms.length - remove,
+					remove,
+					inserted: insertion,
+				},
+			],
+			rawSplices: [
+				{
+					after: inserted ? last.id : (raw.at(-2)?.id ?? ""),
+					start: raw.length - remove,
+					remove,
+					inserted: insertion,
+				},
+			],
 		}
 	}
 	private cachePreparedText(
