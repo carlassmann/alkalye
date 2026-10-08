@@ -1,0 +1,65 @@
+{
+	"originalCommit": "a749728a8f9a1cb984c980a5ea2daf984d60ae68",
+	"rewriteCommit": "dc2af56a7c1e7b07510b8e922b99c06d33340cac",
+	"originalURL": "http://127.0.0.1:4460",
+	"rewriteURL": "http://127.0.0.1:4461",
+	"originalSyncURL": "ws://127.0.0.1:4226",
+	"fixtures": [
+		{
+			"name": "rich128",
+			"characters": 131072,
+			"bytes": 131072,
+			"realNewlines": 2599,
+			"literalBackslashN": 0,
+			"sha256": "902a5f06a4a69efe3d450eb9476528643accca2e5b10bd8ad99545a93e4a7343"
+		},
+		{
+			"name": "long1m",
+			"characters": 1048576,
+			"bytes": 1048576,
+			"realNewlines": 5,
+			"literalBackslashN": 0,
+			"sha256": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a"
+		},
+		{
+			"name": "mc1m",
+			"characters": 1048576,
+			"bytes": 1048576,
+			"realNewlines": 2048,
+			"literalBackslashN": 0,
+			"sha256": "b2088bd7a8259c3837423df38dd7e1ce7ddd1ede62ea11be9e9f4b7855462119"
+		}
+	],
+	"rewriteEmittedJavaScript": [
+		{
+			"file": "app.js",
+			"bytes": 252795,
+			"sha256": "13301ed03233ab44b7a61ecc97c6adb9a5d56dbf9e2e9f972a45299dd3dd7b67"
+		},
+		{
+			"file": "document-worker.js",
+			"bytes": 155969,
+			"sha256": "ba2c2d193e95a38f5c21f8680f66481ce6751e273feea60b085992467b853d88"
+		},
+		{
+			"file": "sw.js",
+			"bytes": 9239,
+			"sha256": "29c6626abca092bf3891ac6020796f224e758380220544bcc54853064995a524"
+		}
+	],
+	"assetEvidence": "Emitted digests, plus per-cell loaded script resource URLs and decoded sizes; no claim of reading executing module memory. Original17emitted digests match prior frozen build.",
+	"processesAfterRestart": {
+		"syncManagedPid": 90883,
+		"mainManagedPid": 90907,
+		"rewriteManagedPid": 90929
+	},
+	"scope": "Frozen production full apps; single trusted input plus3s aftermath. Later Projector cache excluded.",
+	"traceSampling": false,
+	"headlessFrameCadence": "approximately60Hz",
+	"completeCounts": {
+		"original128": 3,
+		"rewrite128": 3,
+		"original1MiB": 0,
+		"rewrite1MiB": 3
+	}
+}

@@ -1,0 +1,7 @@
+import {startWorker} from '/tmp/alkalye-main-rebench/node_modules/jazz-tools/dist/worker/index.js'
+import {UserAccount} from '/tmp/alkalye-main-rebench/src/schema/index.ts'
+import {createPersonalDocument} from '/tmp/alkalye-main-rebench/src/app/features/documents/lib/documents.ts'
+let root='/tmp/alkalye-prod-current-oct8',auth=await Bun.file(root+'/main-fixture-auth.private.json').json(),config=await Bun.file(root+'/config.json').json(),docs=[]
+let context=await startWorker({accountID:auth.accountID,accountSecret:auth.accountSecret,AccountSchema:UserAccount,syncServer:'ws://127.0.0.1:4226',skipInboxLoad:true});await context.waitForConnection()
+for(let name of ['rich128','long1m','mc1m']){let source=await Bun.file(root+'/'+name+'.txt').text();let doc=await createPersonalDocument(context.worker,source);await context.worker.$jazz.waitForAllCoValuesSync();docs.push({name,kb:name==='rich128'?128:1024,path:'/app/doc/'+doc.$jazz.id,sourcePath:root+'/'+name+'.txt',characters:source.length});console.log(JSON.stringify({name,phase:'server-synchronized',characters:source.length}));config.configurations=config.configurations.map(c=>c.kind==='original'?{...c,session:'prod-main-identity-fixed-v2',docs}:c);await Bun.write(root+'/config-identity-fixed.json',JSON.stringify(config,null,2))}
+await context.shutdownWorker()

@@ -1,0 +1,27 @@
+{
+	"identity": {
+		"appBooted": false,
+		"remaining": 0,
+		"removed": 2
+	},
+	"results": [
+		{
+			"name": "rich128",
+			"actual": "902a5f06a4a69efe3d450eb9476528643accca2e5b10bd8ad99545a93e4a7343",
+			"expected": "902a5f06a4a69efe3d450eb9476528643accca2e5b10bd8ad99545a93e4a7343",
+			"exact": true
+		},
+		{
+			"name": "long1m",
+			"actual": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a",
+			"expected": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a",
+			"exact": true
+		},
+		{
+			"name": "mc1m",
+			"actual": "b2088bd7a8259c3837423df38dd7e1ce7ddd1ede62ea11be9e9f4b7855462119",
+			"expected": "b2088bd7a8259c3837423df38dd7e1ce7ddd1ede62ea11be9e9f4b7855462119",
+			"exact": true
+		}
+	]
+}
