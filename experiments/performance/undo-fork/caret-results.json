@@ -1,0 +1,216 @@
+{
+	"baseline": "2d95381",
+	"candidate": "2d95381 + editor bounded predecessor resolution; only src/client/components/editor.ts changed",
+	"server": "native 660423c, unchanged both phases",
+	"date": "2026-10-08",
+	"samplesPerPhase": 3,
+	"phaseOrder": ["before", "after", "after", "before", "before", "after"],
+	"fixture": {
+		"characters": 1048576,
+		"occurrences": 512
+	},
+	"method": "Existing strict trusted append/accepted checkpoint/trusted undo harness; identical SQLite/blob and browser profile resets each phase. Candidate contains only anchor.patch. Main-thread RunTask includes enclosing task overlapping undo:start through undo:cache. No CPU sampling profiler. Two RAF opportunities are not physical paint measurements.",
+	"provenance": {
+		"before": {
+			"appSha256": "1f63ab523e2bdf1bc5d44849bd661e6eefded714a604dfb224e380a1aa9a59b4",
+			"editorSourceSha256": "d2ba133665cddcc0d47fb853b52aefebb5557010601353c708faa508baf06f3a",
+			"modules": [
+				{
+					"path": "chunks/document-app-vg5dtg6h.js",
+					"sha256": "b81dcd57f1d01a37b4aa11d9aa1e2f08abf82de41498675eebcdb75e543d9725",
+					"bytes": 117404,
+					"sources": ["../src/client/components/editor.ts"],
+					"loadedDecodedBytes": [117404, 117404, 117404],
+					"allObservedSizesMatch": true
+				}
+			]
+		},
+		"after": {
+			"appSha256": "5e6de27b0534e9f7e94b299bebe5cc0b29fd499cc5019e62b8c73dda65920967",
+			"editorSourceSha256": "0e9ef36633b68fda7398434383eeafe27d62468103d970b6737f511ce423a599",
+			"modules": [
+				{
+					"path": "chunks/document-app-ff1nerz9.js",
+					"sha256": "4b5bc65e1fdb0e8193fd744e0291583394382571fd6165e0147ef5bfaa3ba39e",
+					"bytes": 118055,
+					"sources": ["../src/client/components/editor.ts"],
+					"loadedDecodedBytes": [118055, 118055, 118055],
+					"allObservedSizesMatch": true
+				}
+			]
+		}
+	},
+	"provenanceLimit": "Frozen file SHA values; observed hashed module URLs and decoded sizes match. Not cryptographic retrieval of loaded browser bytes.",
+	"allocationLimit": "No allocation profiler or heap byte measurements. GC events describe the complete observation interval and cannot isolate allocation savings from the caret path.",
+	"failures": [],
+	"results": [
+		{
+			"phase": "before",
+			"trial": 0,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 590.1999999880791,
+			"undoAcceptedCheckpointMs": 2280.899999976158,
+			"editAcceptedCheckpointMs": 2381.199999988079,
+			"largestUndoTaskMs": 332.356,
+			"largestBeforePaintTaskMs": 332.356,
+			"layoutMs": 3.976,
+			"paintMs": 2.738,
+			"gc": {
+				"MinorGC": {
+					"count": 48,
+					"durationMs": 176.994
+				},
+				"MajorGC": {
+					"count": 1,
+					"durationMs": 16.341
+				}
+			},
+			"trustedUndoKeyTaskMs": 0.695
+		},
+		{
+			"phase": "after",
+			"trial": 0,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 372.30000001192093,
+			"undoAcceptedCheckpointMs": 2651,
+			"editAcceptedCheckpointMs": 2438.400000035763,
+			"largestUndoTaskMs": 162.637,
+			"largestBeforePaintTaskMs": 162.637,
+			"layoutMs": 4.764,
+			"paintMs": 3.063,
+			"gc": {
+				"MinorGC": {
+					"count": 50,
+					"durationMs": 153.413
+				},
+				"MajorGC": {
+					"count": 0,
+					"durationMs": 0
+				}
+			},
+			"trustedUndoKeyTaskMs": 0.631
+		},
+		{
+			"phase": "after",
+			"trial": 1,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 373.7999999523163,
+			"undoAcceptedCheckpointMs": 2236.5,
+			"editAcceptedCheckpointMs": 2425.699999988079,
+			"largestUndoTaskMs": 180.686,
+			"largestBeforePaintTaskMs": 180.686,
+			"layoutMs": 4.126,
+			"paintMs": 2.753,
+			"gc": {
+				"MinorGC": {
+					"count": 50,
+					"durationMs": 165.961
+				},
+				"MajorGC": {
+					"count": 0,
+					"durationMs": 0
+				}
+			},
+			"trustedUndoKeyTaskMs": 0.686
+		},
+		{
+			"phase": "before",
+			"trial": 1,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 454.60000002384186,
+			"undoAcceptedCheckpointMs": 2478.7000000476837,
+			"editAcceptedCheckpointMs": 2358.199999988079,
+			"largestUndoTaskMs": 276.847,
+			"largestBeforePaintTaskMs": 276.847,
+			"layoutMs": 4.162,
+			"paintMs": 2.776,
+			"gc": {
+				"MinorGC": {
+					"count": 50,
+					"durationMs": 162.553
+				},
+				"MajorGC": {
+					"count": 0,
+					"durationMs": 0
+				}
+			},
+			"trustedUndoKeyTaskMs": 0.739
+		},
+		{
+			"phase": "before",
+			"trial": 2,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 487.10000002384186,
+			"undoAcceptedCheckpointMs": 2501.600000023842,
+			"editAcceptedCheckpointMs": 2412.899999976158,
+			"largestUndoTaskMs": 281.019,
+			"largestBeforePaintTaskMs": 281.019,
+			"layoutMs": 4.276,
+			"paintMs": 2.85,
+			"gc": {
+				"MinorGC": {
+					"count": 50,
+					"durationMs": 183.991
+				},
+				"MajorGC": {
+					"count": 1,
+					"durationMs": 18.492
+				}
+			},
+			"trustedUndoKeyTaskMs": 0.708
+		},
+		{
+			"phase": "after",
+			"trial": 2,
+			"exact": true,
+			"trusted": true,
+			"pending": "0",
+			"busy": "false",
+			"acceptedPending": 0,
+			"acceptedRejected": 0,
+			"paintOpportunityMs": 405.30000001192093,
+			"undoAcceptedCheckpointMs": 2214.7000000476837,
+			"editAcceptedCheckpointMs": 2393.399999976158,
+			"largestUndoTaskMs": 210.174,
+			"largestBeforePaintTaskMs": 210.174,
+			"layoutMs": 4.33,
+			"paintMs": 2.756,
+			"gc": {
+				"MinorGC": {
+					"count": 49,
+					"durationMs": 153.15
+				},
+				"MajorGC": {
+					"count": 1,
+					"durationMs": 13.164
+				}
+			},
+			"trustedUndoKeyTaskMs": 0.695
+		}
+	]
+}

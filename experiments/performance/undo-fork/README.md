@@ -35,3 +35,20 @@ A second, independent pair compared the adopted fork `41716e4` with one guarded 
 The guard reduces total undo latency. It does not improve the largest task, which remains far above 8.33 ms. Each phase restored identical backend/profile seeds, three trials per variant, no index changes. Every trusted/exact/accepted-checkpoint check passed. `empty-inverse-results.json` retains samples, hashes and the independent module comparison. Do not add medians from the two separate rounds.
 
 The 32 undo/register/history integration contracts passed with 170 assertions; types passed. Opus 5.5 confirmed that BirthRoot, BelowFloor and error ordering remain intact. Production commit `2d95381` changes one argument only. The staged source is still read when register inverses need asset protection.
+
+## Deleted caret anchor
+
+A third independent pair compares `2d95381` with bounded predecessor lookup in the editor. Undo removes the atom at the caret. The previous fallback builds positions for every atom before looking for a surviving neighbor. The candidate resolves nearby anchors first and retains the original global ranking for distant fallbacks.
+
+| Trusted undo, milliseconds | Guard baseline median / max | Caret candidate median / max |
+| -------------------------- | --------------------------- | ---------------------------- |
+| Two paint opportunities    | 487.1 / 590.2               | 373.8 / 405.3                |
+| Fully accepted checkpoint  | 2478.7 / 2501.6             | 2236.5 / 2651.0              |
+| Enclosing trusted key task | 0.71 / 0.74                 | 0.69 / 0.70                  |
+| Largest main-thread task   | 281.0 / 332.4               | 180.7 / 210.2                |
+| Layout phase sum           | 4.2 / 4.3                   | 4.3 / 4.8                    |
+| Paint phase sum            | 2.8 / 2.9                   | 2.8 / 3.1                    |
+
+Three trials per variant, alternating phase order, identical backend/profile resets, native server `660423c`. All six phases passed exact text, trusted undo, strictly newer accepted checkpoint and zero pending/rejected actions. The candidate improves main-thread tasks and paint opportunities; its worst accepted-checkpoint latency regresses. Remaining tasks exceed 8.33 ms. Cold document materialization remains a separate blocker.
+
+`caret-results.json` preserves every sample and frozen editor/module hashes. No allocation profiler ran. Minor GC duration totals for the whole undo interval were 177.0/162.6/184.0 ms before and 153.4/166.0/153.2 ms after; these do not isolate caret allocation costs. Public runtime fixture contracts cover caret semantics separately. Do not combine medians across these three independent experiments.
