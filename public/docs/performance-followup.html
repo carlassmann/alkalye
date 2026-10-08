@@ -249,6 +249,28 @@
 			<code>experiments/worker-session/sustained-editor</code>.
 		</p>
 		<p>
+			A private source-string cache for immutable stale views reduced burst
+			drain from 11.17 to 1.42 seconds in a matched experiment. Paced typing
+			improved less, from 8.31 to 7.51 seconds, and still accumulated 36 queued
+			edits. Each arm used a fresh server, account and browser profile. All
+			source, server acceptance and offline reopen checks passed. There was one
+			run per arm; peer interleaving differs. These sessions use explicit HTTP
+			sync and share a local journal; live WebSocket delivery was not tested.
+			Main heap samples rose from 217MB to 237MB in the burst. The private cache
+			now ships after 14 public convergence and stale-basis contracts passed.
+			The worker editor remains unshipped. Evidence:
+			<code>experiments/worker-session/source-view-strings</code>.
+		</p>
+		<p>
+			Worker undo recovery now passes 13 fault assertions and the original 11
+			Undo/Redo assertions. Lost replies reuse the same receipt, stale selection
+			adoption retries without repeating Undo, fatal failures keep editing
+			frozen, and closing an in-flight command returns an unknown outcome.
+			Physical IME, drag and different-account peers remain unverified. These
+			checks use a local journal and do not prove server acceptance. Evidence:
+			<code>experiments/worker-session/actual-editor/recovery</code>.
+		</p>
+		<p>
 			Active-line geometry caching was rejected. Six valid rich-document wheel
 			cells showed no consistent layout or paint gain, and geometry fixtures did
 			not prove correctness across a viewport-top shift. The 1MiB arm failed an
