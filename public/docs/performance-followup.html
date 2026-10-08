@@ -1626,6 +1626,14 @@
 			120Hz performance. Evidence:
 			<code>experiments/performance/durable-undo-refresh-e7cc</code>.
 		</p>
+		<p>
+			A follow-up tried consuming the pending document refresh before immediate
+			Undo feedback. One matched pair still performed four document refreshes
+			within 100ms of completion: later notifications recreated the pending
+			state. Exact source, caret and server checks passed, but no reduction in
+			duplicate work was demonstrated. The candidate was rejected. Evidence:
+			<code>experiments/performance/undo-refresh-consumption-865</code>.
+		</p>
 		<h2>Cold snapshot storage and worker recovery</h2>
 		<p>
 			A cold 128KiB opening spent 210.409ms restoring the server checkpoint,
@@ -1656,6 +1664,16 @@
 			fault tests, multiple tabs and full feature parity still block adoption.
 			These are correctness checks, not performance results. Evidence:
 			<code>experiments/worker-session/actual-app-route</code>.
+		</p>
+		<p>
+			The larger worker journey remains incomplete. A native replacement of 512
+			selections in a 1MiB document reached the server and the local durable
+			ledger, then the editor became read-only. A separate instrumented
+			reproduction captured a SessionFailure during the subsequent merge
+			candidate request, after acknowledgement. Its underlying cause remains
+			unknown. Undo and continued typing were not verified, so the worker cannot
+			replace the production editor yet. Evidence:
+			<code>experiments/worker-session/actual-app-multicursor-failure</code>.
 		</p>
 		<footer>written with gpt-6 in codex</footer>
 	</body>
