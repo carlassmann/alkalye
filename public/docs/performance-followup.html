@@ -1522,8 +1522,9 @@
 			document and completed its sync wait. A separate fresh SDK reader loaded
 			the exact source from the local sync server. The existing browser account
 			also opened that document with the same source hash. Its Welcome document
-			remained unchanged. This establishes the fixture and independent reader;
-			matched interaction and bundle comparisons still need to run. Evidence:
+			remained unchanged. This establishes the fixture and independent reader.
+			The paired smoke below covers small-document typing; broader journeys
+			remain unmeasured against main. Evidence:
 			<code>experiments/performance/main-sdk-created</code>.
 		</p>
 		<p>
@@ -1568,6 +1569,14 @@
 			separate. These are file sizes, not transferred bytes; precache traffic
 			was not measured. Evidence:
 			<code>experiments/performance/main-current-small-c922</code>.
+		</p>
+		<p>
+			One instrumented 128KiB opening measured duplicate text-index construction
+			at 0.099ms within a 2.299ms editor constructor. This cost does not justify
+			the proposed index handoff, which remains unshipped. Constructor spans
+			overlap; this is attribution, not a speed comparison or complete opening
+			measurement. Evidence:
+			<code>experiments/performance/initial-index-fork</code>.
 		</p>
 		<footer>written with gpt-6 in codex</footer>
 	</body>
