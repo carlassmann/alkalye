@@ -1584,10 +1584,22 @@
 			2.976ms in the rewrite; Undo tasks took 1.702ms and 0.525ms. However, the
 			source-ready frame opportunity was slower in the rewrite: 18.232ms versus
 			13.301ms for input, and 50.647ms versus 15.853ms for Undo. These are
-			readiness observations, not displayed-pixel latency. Their cause remains
-			unprofiled. This is one sample with unmatched histories, not a broad
-			speedup or 120Hz proof. Evidence:
+			readiness observations, not displayed-pixel latency. The marked diagnostic
+			below separates application and observer delay. This is one sample with
+			unmatched histories, not a broad speedup or 120Hz proof. Evidence:
 			<code>experiments/performance/main-current-undo-cwd-c922</code>.
+		</p>
+		<p>
+			A separate marked 2KiB Undo restored the source model at 29.4ms and
+			returned from viewport rendering at 30.6ms. The frame observer recorded
+			readiness at 45.3ms, after checking before the app refresh in the previous
+			frame. Durable work finished at 20.4ms; app refresh began at 28.7ms. The
+			largest task in the three-second window was 2.955ms. This single
+			diagnostic identifies a refresh wait to investigate; it is not a speed
+			comparison or displayed-pixel measurement. Exact source, native caret,
+			independent server acceptance and 34 script-byte checks passed. Evidence:
+			<code>experiments/performance/main-current-small-undo-timeline-c922</code
+			>.
 		</p>
 		<h2>Cold snapshot storage and worker recovery</h2>
 		<p>
