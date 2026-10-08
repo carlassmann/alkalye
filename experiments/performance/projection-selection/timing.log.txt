@@ -1,0 +1,48 @@
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping
+PASS Bounded native fixture geometry
+PASS Trusted arrow preserves exact source/caret mapping

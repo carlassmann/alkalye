@@ -1,0 +1,770 @@
+[
+	{
+		"chars": 131072,
+		"trial": 0,
+		"arm": "baseline",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 65492,
+			"sourceCharacters": 131072
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 25.399999976158146,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/131072-0-baseline-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 25.357,
+			"interactionLargestTaskMs": 1.627,
+			"completeTraceLargestTaskMs": 4.294,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0.277,
+			"interactionPaintMs": 0.506,
+			"traceLayoutMs": 13.147,
+			"tracePaintMs": 45.756
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 0,
+		"arm": "baseline",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2394,
+			"selection": 130993,
+			"sourceCharacters": 131072
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 30.30000001192093,
+			"mappedExact": true,
+			"nativeCharacters": 2394,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/131072-0-baseline-end.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 30.223,
+			"interactionLargestTaskMs": 0.749,
+			"completeTraceLargestTaskMs": 3.514,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.116,
+			"traceLayoutMs": 12.766,
+			"tracePaintMs": 36.284
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 0,
+		"arm": "candidate",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 65492,
+			"sourceCharacters": 131072
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 27.799999952316284,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/131072-0-candidate-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 27.774,
+			"interactionLargestTaskMs": 0.593,
+			"completeTraceLargestTaskMs": 4.076,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.165,
+			"traceLayoutMs": 14.577,
+			"tracePaintMs": 52.558
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 0,
+		"arm": "candidate",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2394,
+			"selection": 130993,
+			"sourceCharacters": 131072
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 27.900000035762787,
+			"mappedExact": true,
+			"nativeCharacters": 2394,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/131072-0-candidate-end.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 27.901,
+			"interactionLargestTaskMs": 0.896,
+			"completeTraceLargestTaskMs": 3.346,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.097,
+			"traceLayoutMs": 11.531,
+			"tracePaintMs": 35.54
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 1,
+		"arm": "candidate",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 65492,
+			"sourceCharacters": 131072
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 24.5,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/131072-1-candidate-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 24.445,
+			"interactionLargestTaskMs": 0.645,
+			"completeTraceLargestTaskMs": 4.139,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.16899999999999998,
+			"traceLayoutMs": 12.45,
+			"tracePaintMs": 43.975
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 1,
+		"arm": "candidate",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2394,
+			"selection": 130993,
+			"sourceCharacters": 131072
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 27.600000023841854,
+			"mappedExact": true,
+			"nativeCharacters": 2394,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/131072-1-candidate-end.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 27.694,
+			"interactionLargestTaskMs": 1.751,
+			"completeTraceLargestTaskMs": 3.232,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.126,
+			"traceLayoutMs": 13.123,
+			"tracePaintMs": 36.879
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 1,
+		"arm": "baseline",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 65492,
+			"sourceCharacters": 131072
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 27.19999998807907,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/131072-1-baseline-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 27.295,
+			"interactionLargestTaskMs": 1.007,
+			"completeTraceLargestTaskMs": 4.446,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.159,
+			"traceLayoutMs": 15.552,
+			"tracePaintMs": 57.222
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 1,
+		"arm": "baseline",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2394,
+			"selection": 130993,
+			"sourceCharacters": 131072
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 30.099999964237213,
+			"mappedExact": true,
+			"nativeCharacters": 2394,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/131072-1-baseline-end.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 30.069,
+			"interactionLargestTaskMs": 0.651,
+			"completeTraceLargestTaskMs": 3.351,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.104,
+			"traceLayoutMs": 13.417,
+			"tracePaintMs": 39.581
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 2,
+		"arm": "baseline",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 65492,
+			"sourceCharacters": 131072
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 27.200000047683716,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/131072-2-baseline-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 27.242,
+			"interactionLargestTaskMs": 1.259,
+			"completeTraceLargestTaskMs": 4.219,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.17099999999999999,
+			"traceLayoutMs": 14.585,
+			"tracePaintMs": 52.279
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 2,
+		"arm": "baseline",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2394,
+			"selection": 130993,
+			"sourceCharacters": 131072
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 24.899999976158146,
+			"mappedExact": true,
+			"nativeCharacters": 2394,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/131072-2-baseline-end.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 24.822,
+			"interactionLargestTaskMs": 0.618,
+			"completeTraceLargestTaskMs": 3.305,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.11,
+			"traceLayoutMs": 14.02,
+			"tracePaintMs": 41.173
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 2,
+		"arm": "candidate",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 65492,
+			"sourceCharacters": 131072
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 29.80000001192093,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/131072-2-candidate-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 29.803,
+			"interactionLargestTaskMs": 0.541,
+			"completeTraceLargestTaskMs": 4.268,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.159,
+			"traceLayoutMs": 14.112,
+			"tracePaintMs": 52.671
+		}
+	},
+	{
+		"chars": 131072,
+		"trial": 2,
+		"arm": "candidate",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2394,
+			"selection": 130993,
+			"sourceCharacters": 131072
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 30.19999998807907,
+			"mappedExact": true,
+			"nativeCharacters": 2394,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/131072-2-candidate-end.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 30.199,
+			"interactionLargestTaskMs": 0.411,
+			"completeTraceLargestTaskMs": 3.382,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.098,
+			"traceLayoutMs": 13.329,
+			"tracePaintMs": 42.514
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 0,
+		"arm": "baseline",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 524276,
+			"sourceCharacters": 1048576
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 25.399999976158146,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/1048576-0-baseline-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 25.354,
+			"interactionLargestTaskMs": 4.226,
+			"completeTraceLargestTaskMs": 4.228,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.156,
+			"traceLayoutMs": 15.567,
+			"tracePaintMs": 56.834
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 0,
+		"arm": "baseline",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2785,
+			"selection": 1048502,
+			"sourceCharacters": 1048576
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 29.599999964237213,
+			"mappedExact": true,
+			"nativeCharacters": 2785,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/1048576-0-baseline-end.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 29.463,
+			"interactionLargestTaskMs": 4.014,
+			"completeTraceLargestTaskMs": 4.014,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.14,
+			"traceLayoutMs": 14.621,
+			"tracePaintMs": 47.546
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 0,
+		"arm": "candidate",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 524276,
+			"sourceCharacters": 1048576
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 25.19999998807907,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/1048576-0-candidate-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 25.186,
+			"interactionLargestTaskMs": 2.409,
+			"completeTraceLargestTaskMs": 4.389,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.173,
+			"traceLayoutMs": 15.677,
+			"tracePaintMs": 57.989
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 0,
+		"arm": "candidate",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2785,
+			"selection": 1048502,
+			"sourceCharacters": 1048576
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 17,
+			"mappedExact": true,
+			"nativeCharacters": 2785,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/1048576-0-candidate-end.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 17.088,
+			"interactionLargestTaskMs": 2.562,
+			"completeTraceLargestTaskMs": 3.67,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.152,
+			"traceLayoutMs": 13.131,
+			"tracePaintMs": 43.789
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 1,
+		"arm": "candidate",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 524276,
+			"sourceCharacters": 1048576
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 28.399999976158146,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/1048576-1-candidate-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 28.315,
+			"interactionLargestTaskMs": 2.99,
+			"completeTraceLargestTaskMs": 4.429,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.172,
+			"traceLayoutMs": 14.134,
+			"tracePaintMs": 53.344
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 1,
+		"arm": "candidate",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2785,
+			"selection": 1048502,
+			"sourceCharacters": 1048576
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 27.299999952316284,
+			"mappedExact": true,
+			"nativeCharacters": 2785,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/1048576-1-candidate-end.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 27.347,
+			"interactionLargestTaskMs": 2.28,
+			"completeTraceLargestTaskMs": 3.55,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.129,
+			"traceLayoutMs": 13.521,
+			"tracePaintMs": 44.431
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 1,
+		"arm": "baseline",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 524276,
+			"sourceCharacters": 1048576
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 26.299999952316284,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/1048576-1-baseline-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 26.296,
+			"interactionLargestTaskMs": 5.048,
+			"completeTraceLargestTaskMs": 6.003,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.141,
+			"traceLayoutMs": 16.571,
+			"tracePaintMs": 60.129
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 1,
+		"arm": "baseline",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2785,
+			"selection": 1048502,
+			"sourceCharacters": 1048576
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 31.100000023841854,
+			"mappedExact": true,
+			"nativeCharacters": 2785,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/1048576-1-baseline-end.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 31.017,
+			"interactionLargestTaskMs": 4.517,
+			"completeTraceLargestTaskMs": 4.517,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.135,
+			"traceLayoutMs": 15.096,
+			"tracePaintMs": 49.228
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 2,
+		"arm": "baseline",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 524276,
+			"sourceCharacters": 1048576
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 27.19999998807907,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/1048576-2-baseline-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 27.084,
+			"interactionLargestTaskMs": 4.218,
+			"completeTraceLargestTaskMs": 4.218,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.16799999999999998,
+			"traceLayoutMs": 14.606,
+			"tracePaintMs": 57.294
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 2,
+		"arm": "baseline",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2785,
+			"selection": 1048502,
+			"sourceCharacters": 1048576
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 29.5,
+			"mappedExact": true,
+			"nativeCharacters": 2785,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/1048576-2-baseline-end.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 29.42,
+			"interactionLargestTaskMs": 4.615,
+			"completeTraceLargestTaskMs": 4.615,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.13,
+			"traceLayoutMs": 14.212,
+			"tracePaintMs": 44.791
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 2,
+		"arm": "candidate",
+		"position": "middle",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 4032,
+			"selection": 524276,
+			"sourceCharacters": 1048576
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 27.599999964237213,
+			"mappedExact": true,
+			"nativeCharacters": 4032,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/1048576-2-candidate-middle.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 27.499,
+			"interactionLargestTaskMs": 2.526,
+			"completeTraceLargestTaskMs": 4.238,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.16899999999999998,
+			"traceLayoutMs": 12.153,
+			"tracePaintMs": 45.573
+		}
+	},
+	{
+		"chars": 1048576,
+		"trial": 2,
+		"arm": "candidate",
+		"position": "end",
+		"ready": {
+			"height": 800,
+			"nativeCharacters": 2785,
+			"selection": 1048502,
+			"sourceCharacters": 1048576
+		},
+		"observation": {
+			"caretExact": true,
+			"duration": 30.19999998807907,
+			"mappedExact": true,
+			"nativeCharacters": 2785,
+			"sourceExact": true,
+			"trusted": true
+		},
+		"trace": "/tmp/alkalye-projection-selection/1048576-2-candidate-end.trace.json",
+		"traceSummary": {
+			"mainThread": [82034, 16587425],
+			"keyToTwoRafMs": 30.191,
+			"interactionLargestTaskMs": 2.317,
+			"completeTraceLargestTaskMs": 3.6,
+			"completeTraceTasksOverBudget": 0,
+			"interactionLayoutMs": 0,
+			"interactionPaintMs": 0.148,
+			"traceLayoutMs": 14.28,
+			"tracePaintMs": 47.719
+		}
+	}
+]

@@ -1,0 +1,38 @@
+import { Projector, project, toSource, toView, applyViewReplacement } from "./src/shared/projection"
+import type { DocumentLink } from "./src/shared/model"
+
+let documents: DocumentLink[] = [{ id: "first", title: "First", archived: false }]
+let sources = [
+	"Read [Example](https://example.org/a_(b)) and [[First]].\n![Board](/asset/board) 😀 last",
+	"---\ntitle: '[header](https://header.test)'\n---\n[[First]] [body](https://body.test)",
+	"```md\n[code](https://code.test)\n```\n[body](https://body.test)\n~~~\n[[First]]",
+	"````\n```\n[hidden](https://hidden.test)\n````\n    [indent](https://indent.test)\n[[Missing]]",
+	"---\ntitle: Missing close\n[hidden](https://hidden.test)\n😀",
+	"אבג [עברית](https://example.org) 😀 [[First]]\n`[raw](https://raw.test)`",
+]
+let projector = new Projector()
+let assertions = 0
+function equal(actual: unknown, expected: unknown, label: string) {
+	if (JSON.stringify(actual) !== JSON.stringify(expected)) throw Error(label)
+	assertions++
+}
+for (let source of [...sources, sources[0] ?? "", ...sources.slice().reverse()]) {
+	let offsets = [0, source.indexOf("["), source.indexOf("]") + 1, Math.floor(source.length / 2), source.length].filter(offset => offset >= 0)
+	for (let iconSpace of [false, true]) for (let start of offsets) {
+		for (let end of [start, source.length, 0]) {
+			let options = { documents, active: { start, end }, iconSpace }
+			let actual = projector.project(source, options)
+			let expected = project(source, options)
+			equal(actual, expected, "Projection differs")
+			for (let offset of offsets) equal(toView(actual, offset), toView(expected, offset), "Source mapping differs")
+			for (let offset of [0, Math.floor(actual.text.length / 2), actual.text.length]) {
+				equal(toSource(actual, offset), toSource(expected, offset), "View mapping differs")
+				equal(applyViewReplacement(actual, offset, offset, "😀"), applyViewReplacement(expected, offset, offset, "😀"), "Native replacement differs")
+			}
+		}
+	}
+	let document = documents[0]
+	if (document) document.title = document.title === "First" ? "Renamed" : "First"
+	equal(projector.project(source, { documents }), project(source, { documents }), "Same-array title change differs")
+}
+console.log(JSON.stringify({ assertions, sources: sources.length, exact: true }))

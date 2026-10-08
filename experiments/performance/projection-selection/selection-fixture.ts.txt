@@ -1,0 +1,53 @@
+import { EditorElement } from "./src/client/components/editor"
+import { editorPreferences } from "./src/shared/preferences"
+import { toView } from "./src/shared/projection"
+
+let chars = Number(new URL(location.href).searchParams.get("chars") ?? 131072)
+let row = "Paragraph [Example](https://example.org) [[First]] 😀 end.\n"
+let content = row.repeat(Math.ceil(chars / row.length)).slice(0, chars)
+let documents = [{ id: "first", title: "First", archived: false }]
+let atoms = Array.from(content, (value, index) => ({ id: "fixture:" + index, after: "", value }))
+let editor = new EditorElement()
+editor.configure({
+	content, atoms, editable: true,
+	preferences: editorPreferences({ autocomplete: false }),
+	documents: () => documents,
+	isDrawing: () => false, openDrawing() {}, openDocument() {}, comments: () => [],
+	createLinkedDocument: async () => "unused", report(error) { throw error },
+	change: () => undefined, undo() {}, select() {}, requestAsset() {}, attach() {}, command() {}, find() {},
+})
+document.body.append(editor)
+let original = content
+let prepared = 0
+let observations: Array<{ trusted: boolean; sourceExact: boolean; caretExact: boolean; mappedExact: boolean; duration: number; nativeCharacters: number }> = []
+let start = 0
+document.addEventListener("keydown", event => {
+	if (event.key !== "ArrowRight") return
+	start = performance.now()
+	performance.mark("selection:start")
+}, { capture: true })
+document.addEventListener("keyup", event => {
+	if (event.key !== "ArrowRight") return
+	requestAnimationFrame(() => requestAnimationFrame(() => {
+		let source = editor.source
+		let native = editor.querySelector("textarea")
+		if (!source || !native) throw Error("Missing native source")
+		let selection = { start: prepared + 1, end: prepared + 1 }
+		let projection = source.projection
+		performance.mark("selection:end")
+		observations.push({ trusted: event.isTrusted, sourceExact: source.value === original, caretExact: source.selectionStart === selection.start && source.selectionEnd === selection.end, mappedExact: source.viewport.selectionStart === toView(projection, selection.start), duration: performance.now() - start, nativeCharacters: native.value.length })
+	}))
+})
+Object.assign(window, {
+	selectionFixture: {
+		prepare(position: "middle" | "end") {
+			let source = editor.source
+			if (!source) throw Error("Missing source")
+			prepared = position === "middle" ? Math.floor(original.length / row.length / 2) * row.length + 2 : (Math.floor(original.length / row.length) - 1) * row.length + row.indexOf("[Example]") + 3
+			source.focus()
+			source.setSelectionRange(prepared, prepared)
+			return new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve({ sourceCharacters: source.value.length, nativeCharacters: editor.querySelector("textarea")?.value.length, height: editor.getBoundingClientRect().height, selection: source.selectionStart }))))
+		},
+		read() { return observations },
+	},
+})

@@ -1,0 +1,35 @@
+No blockers found. The candidate looks correct and it does help on 1MiB documents. A few of your claims need narrowing first.
+
+**Correctness**
+- **Cache invalidation is sound.** The document key is recomputed and stored before the early return, so changing a title inside the same array still forces a full parse. When the source and key are both unchanged, the old code reused every line as-is, which gives the same token list. That makes the shortcut equivalent to the old behaviour. Tokens depend only on the line text, its start offset and document id/title, and the key covers all of those. If the parser throws partway through, `this.source` is not updated, so the cache can't go stale.
+- **Raw mode and link-free sources skip the Projector** (`source-textarea.ts:260`). Its cached state stays valid, so switching back to project mode is still correct.
+- **Callers can't mutate cached state.** `projectTokens` builds new links, parts and text on every call, and tokens are never returned. `applyViewReplacement` sharing link objects is unchanged from baseline.
+- **Pre-existing, not a regression:** the document key `id:title` joined by `\n` is ambiguous if ids or titles contain `:` or a newline. Baseline has the same issue.
+
+**Corpus gaps (`corpus.ts`)**
+- **Oracle:** `project()` from the candidate module runs the fresh, unchanged path, so it effectively stands in for baseline. It is not a cross-check against the baseline file itself.
+- **Title change:** covered, same array, but only checked once per source and without an active selection.
+- **A→B→A:** covered by the s5→s0→s5 sequence.
+- **Active endpoints:** the offsets used are the first `[` and the position after the first `]`. The exact inclusive end of a link (`offset === token.end`) is only exercised where a link ends the source (source 7). Don't claim exact-endpoint coverage across all token kinds.
+- **Not covered:** CRLF frontmatter, and edit→reproject or undo sequences on one Projector. Those rest on the 48 Editor gates, not the corpus.
+
+**Timing**
+- **Biggest limit: neither timed cell crosses a link boundary.**
+  - "middle" is caret +2→+3 inside "Paragraph", touching no link.
+  - "end" is inside the `[Example]` label and stays raw before and after the press.
+  - So the active link set never changes and `sameProjection` probably returns early without rewriting the textarea. Only the cache-hit path plus the comparison was timed. Entering or leaving a link, which rewrites the textarea and adds layout, was not timed. The gain there is probably the same in absolute terms but smaller as a share.
+- **"end" means the last full row**, not the end of the document. Label it that way.
+- **1M improvement is solid:** all six candidate values (2.28–2.99ms) are below all six baseline values (4.01–5.05ms), and the medians match what you reported.
+- **128K is inconclusive, not just "mixed":** candidate "end" ranges 0.411–1.751ms with n=3. Make no 128K claim.
+- **Candidate still costs about 2.3–3ms at 1M.** `projectTokens` still walks every token and concatenates the whole source on each selection change. Don't describe it as removing the cost.
+- **`mappedExact` only checks the candidate against itself** (it uses the candidate's own `toView`). Parity with baseline comes from the corpus, not from the timing run.
+- **Fixed position order** (middle, then end on the same page load) adds warm-up bias. Arms alternate only by trial.
+- **Not representative of the full app:** the fixture has autocomplete off, a static documents array and no title changes.
+- **Keyup→two-frame times show no trend.** The one candidate value of 17.088ms is a single outlier; don't cite it.
+- **Trace max:** the 6.003→4.429ms "largest task in the trace" figure covers a 3s window that includes the harness's own wait/evaluate work. Treat it as secondary.
+
+Your stated limits are accurate as written: no 120Hz, full-app, allocation/GC or physical-device claims, and no verified bundle hashes.
+
+**Verdict:** OK for tiny production adoption if the claim is stated as "about 40–50% shorter interaction task for a selection change that stays inside or outside the same links in a 1MiB link-rich doc; 128K neutral."
+
+The connected tool list also notes that several claude.ai connectors (GitHub, Slack, Notion, etc.) need authorizing in your claude.ai connector settings. None were needed for this review.

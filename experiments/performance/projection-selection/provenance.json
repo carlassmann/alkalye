@@ -1,0 +1,88 @@
+{
+	"sourceBaseline": "679da31f0d2027736ea4518c386bc402f29e8690",
+	"productionSourceChanges": ["src/shared/projection.ts"],
+	"sourceSha256": {
+		"selection-fixture.ts.txt": "111bc77d0edd83df2bf0dfd1c5b8e4324d69be4e61bf6c388a02bd6fc6de40ee",
+		"selection-server.ts.txt": "5be0e330d778fce6a7cf4d52ea5e482fd68c5b8d366dab11c705c8b071a775a4",
+		"selection-timing.ts.txt": "e4f9a895643f12386dec224f5fdefe82b7ba12c18f826fcdeb44d2afbb05527b",
+		"baseline-projection.ts.txt": "c3abab8574a0ce657d683fb088a3ede03b92a0177094b9189bb7bde9667c62cc",
+		"corpus.ts.txt": "fd5ed0eb39d443f0bfb1d6af791c33e5ab2f226833f51cccfc0bf19c3c214679",
+		"projection.ts.txt": "babb77080d03392836be1e35c7044d6052b318e7098786b1c72f2a1abf13fd62"
+	},
+	"originalLoadedBundleSha256": null,
+	"bundleLimitation": "Bun.build outputs remained in server memory. Original measured bundle bytes and loaded hashes were not persisted. No retrospective verified bundle hash claim.",
+	"rawTraceSha256": {
+		"131072-1-candidate-middle.trace.json": "b75ec7639dc80f30a42e21ef772c30e0046c03016ed07b591450bfb56356d797",
+		"1048576-2-candidate-end.trace.json": "b2c728ebcddad75180a2ea817e2fdc367abeddff74be1f8c6a5f3afa84043b44",
+		"131072-1-baseline-middle.trace.json": "c39d48704f671c3d8b30ce5f6f5e36c782f0bb31717488b9be379b0bfea226ba",
+		"131072-0-candidate-end.trace.json": "d1407dcfb4ed10ce51e15bf9e8838f659de0338d9f97ba583096038147212a94",
+		"131072-1-baseline-end.trace.json": "f11d46aca2a90f480009e03a5000319eaa6dd789b3ec03cb7ece8126b84c7945",
+		"1048576-0-baseline-middle.trace.json": "9b5017eb4b67363d8b7b07bb20085e95adecac60bc29e1c36a2cad206ed33257",
+		"1048576-2-candidate-middle.trace.json": "d8460aa9d20bdece1c6d83715175add9384a700cc407d388ad1b5d293dead7df",
+		"1048576-2-baseline-end.trace.json": "e3d87f1dde07a8db5e785ce7b87bce0f822306ce1030d1169390d1a74dfd1790",
+		"1048576-1-baseline-middle.trace.json": "1c76c35e4b60a53413b3b4b021f6970887066356797c23a6f8a67ecd09348c28",
+		"131072-1-candidate-end.trace.json": "09e21df20aecfd034d4c4731a50c018f274549cc4a2f7d9799991795b832ea55",
+		"1048576-1-baseline-end.trace.json": "45819e79cb1b698c9cbb65fa58e5ff72ce16cda99d7c2c19c07ad0a6120becae",
+		"131072-2-baseline-end.trace.json": "1030f0db90feda0248f25092c311f0bad7f3bc016334371f8f8d787eb49384ef",
+		"131072-0-candidate-middle.trace.json": "b7e16a3cee2b76c54da24db51a35b3237659497ea7c6262c9995b50bc473c1cf",
+		"131072-0-baseline-middle.trace.json": "8191d2821d00877e041996cc5dbd64b5a96bff4b80320523953a1e14f87681e3",
+		"131072-0-baseline-end.trace.json": "8806e69632566943fb17abd4833b2aeabfc37e6ba55051136b9b43c922f6583b",
+		"1048576-0-candidate-middle.trace.json": "a860916c285a606498e69312761846a10d9f57d34a657f76833f4d3e3e9b7b80",
+		"1048576-1-candidate-end.trace.json": "ffe20e2e85f03adbce026e646277349af12ef3d58b8c1de4a182b1177f7438f2",
+		"131072-2-baseline-middle.trace.json": "536dae6c94ec6d9414e8ecfbe338c65448fd567bd76230b80d8020d94d97e906",
+		"1048576-1-candidate-middle.trace.json": "2348c179efa9ed69debab8110a08e206a184d693ce638f4c0227dad0205dc909",
+		"1048576-0-candidate-end.trace.json": "14195e99b1450c550e62bf584f003aaf31f753c57d4e02cd66c1e175eb9151eb",
+		"1048576-2-baseline-middle.trace.json": "f057db59acbdc679069f7d3d191e4e0b49df56a122e0dcadb0c6e215b15cc950",
+		"1048576-0-baseline-end.trace.json": "23aac033fce2114095ac2a090a33da2c6d6d76962eeb0c5028a5755edac5ea01",
+		"131072-2-candidate-middle.trace.json": "98ec0a60471e7737b513344502f8b1a8a5dda2dbd8230c142f301c1d88e17e29",
+		"131072-2-candidate-end.trace.json": "e59a5622bca2a92c60a47c271f3790aa6b7af062028dda6f6e04a2f05869cebd"
+	},
+	"validation": {
+		"corpus": {
+			"assertions": 4693,
+			"passed": true,
+			"oracle": "fresh project() cold parser in same candidate module"
+		},
+		"nativePrettification": {
+			"gates": 48,
+			"passed": true,
+			"terminalHandle": 20462,
+			"exitCode": 0
+		},
+		"types": {
+			"passed": true,
+			"terminalHandle": 11791,
+			"exitCode": 0,
+			"command": "bun node_modules/typescript/bin/tsc --project /tmp/alkalye-projection-selection/runtime/tsconfig.json"
+		},
+		"timing": {
+			"cells": 24,
+			"allBehaviorGatesPassed": true,
+			"terminalHandle": 97684,
+			"exitCode": 0
+		},
+		"sourceReview": {
+			"terminalHandle": 34792,
+			"completed": true,
+			"blockers": false
+		},
+		"finalReview": {
+			"terminalHandle": 32317,
+			"completed": true,
+			"blockers": false
+		},
+		"pointerReview": {
+			"terminalHandle": 18534,
+			"completed": true,
+			"pointerPrototypeImplemented": false
+		}
+	},
+	"limitations": [
+		"Isolated existing EditorElement, not full app.",
+		"Timing keys retain identical active-link sets; link-boundary transitions unmeasured.",
+		"128KiB results inconclusive.",
+		"Fixed middle then last-complete-row order; alternate arm order per trial.",
+		"3s aftermath includes browser-driver observation work.",
+		"No listener-only timing, GC/allocation win, physical device or 120Hz claim."
+	]
+}

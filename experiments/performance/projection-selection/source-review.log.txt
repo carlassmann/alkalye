@@ -1,0 +1,28 @@
+**Verdict:** I found no correctness blockers. The one blocker is the root rule: there's no performance or browser proof, so this shouldn't land as a production change yet.
+
+**Equivalence.** I checked `/tmp/alkalye-projection-selection/projection.ts:54-55` against the original `src/shared/projection.ts:52-123`. When the source and the documents key are unchanged, the original loop reuses every line:
+- `prefix === texts.length`, so `suffix = 0` and `previous = this.lines[index]`.
+- `start` is the same.
+- `literal` depends only on the source, so it matches.
+- `changed` is false, so `[[` lines aren't forced to reparse.
+
+So the original's token list is element-for-element the same objects as the cached `this.tokens`. The cache skips work but gives the same result.
+
+**Specific semantics:**
+- **Title/wikilink:** `wikiLink` reads only `doc.id` and `doc.title`, and the key covers both, in order, so `find` order is preserved. The key could in theory collide when an id or title contains `\n`/`:`, but the original has the same issue, so it's not new.
+- **Fence/frontmatter/literal:** these depend only on the source, so a same-source call means the same values.
+- **Raw mode or no `[`:** `source-textarea.ts:260-262` skips the projector entirely. When it comes back, `this.source`, `this.lines` and `this.tokens` still describe the same earlier source, so a cache hit is valid.
+- **Input/undo:** an undo back to an earlier source string fails `===` with the latest cached source, so it takes the normal reparse path. It's correct, just not faster.
+- **Selection/iconSpace:** these are still applied fresh in `projectTokens` on every call.
+
+**Alias/mutation risk:** I found none.
+- `projectTokens` only reads `tokens` and builds new `links` and `parts` objects. The `LinkToken` objects never leave the module.
+- Token objects were already shared across calls in the original through reused lines.
+- `this.source`, `this.lines` and `this.tokens` are all set together at the end, so if `lineTokens`/`safeUrl` throws, the cache stays consistent.
+- The documents key is recomputed every call, so changing the `documents` array in place is safe.
+
+**Hidden assumptions and the blocker:**
+1. **Unproven gain.** The caller already caches by source, selection, documents and mode (`source-textarea.ts:250-258`), so this only helps when the selection moves without an edit. Even then, each call still does an O(n) documents-key join and an O(n) `projectTokens` rebuild of the view string. It only saves the `split("\n")` and the line loop. Without a measured trace showing that loop is the hot spot on a large document, the root rule forbids landing it.
+2. **Duplicate key logic.** The documents key is now computed twice per call, once in the caller and once in the Projector. That's not a correctness problem.
+
+Several claude.ai connectors (GitHub, Slack, Notion and others) need authorizing in your claude.ai connector settings before they can be used; this review didn't need them.

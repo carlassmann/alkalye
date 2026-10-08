@@ -1,0 +1,34 @@
+import { browser, evaluate, wait, assert } from "./tests/browser-driver"
+let out = "/tmp/alkalye-projection-selection/selection-results.json"
+let rows = []
+let server = Bun.spawn(["bun", "selection-server.ts"], { stdout: "pipe", stderr: "inherit" })
+let session = "projection-selection-" + Date.now()
+try {
+	let output = await server.stdout.getReader().read()
+	if (!output.value) throw Error("Missing URL")
+	let base = new TextDecoder().decode(output.value).trim()
+	browser(session, "set", "viewport", "1280", "800")
+	for (let chars of [131072, 1048576]) for (let trial = 0; trial < 3; trial++) {
+		for (let arm of trial % 2 ? ["candidate", "baseline"] : ["baseline", "candidate"]) {
+			browser(session, "open", base + `?arm=${arm}&chars=${chars}`)
+			wait(session, `Boolean(window.selectionFixture&&document.querySelector('alkalye-editor').source)&&document.querySelector('alkalye-editor').source.value.length===${chars}`)
+			for (let position of ["middle", "end"]) {
+				let ready = evaluate(session, `window.selectionFixture.prepare(${JSON.stringify(position)})`)
+				assert(evaluate(session, `document.querySelector('alkalye-editor').getBoundingClientRect().height===800&&document.querySelector('#editor').value.length<32768`), "Bounded native fixture geometry")
+				let before = evaluate(session, "window.selectionFixture.read().length")
+				let trace = `/tmp/alkalye-projection-selection/${chars}-${trial}-${arm}-${position}.trace.json`
+				browser(session, "profiler", "start", "--categories", "devtools.timeline,disabled-by-default-devtools.timeline,toplevel,blink.user_timing,v8")
+				browser(session, "press", "ArrowRight")
+				wait(session, `window.selectionFixture.read().length===${Number(before) + 1}`)
+				let observation = evaluate(session, "window.selectionFixture.read().at(-1)")
+				assert(evaluate(session, "(()=>{let row=window.selectionFixture.read().at(-1);return row.trusted&&row.sourceExact&&row.caretExact&&row.mappedExact})()"), "Trusted arrow preserves exact source/caret mapping")
+				evaluate(session, "new Promise(resolve=>setTimeout(()=>resolve(true),3000))")
+				browser(session, "profiler", "stop", trace)
+				rows.push({ chars, trial, arm, position, ready, observation, trace })
+				await Bun.write(out, JSON.stringify(rows, null, 2))
+			}
+		}
+	}
+} finally {
+	try { browser(session, "close") } finally { server.kill(); await server.exited }
+}

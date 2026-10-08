@@ -1,0 +1,31 @@
+I read only `src/client/editor-viewport.ts` and ran nothing. Short answer: an ordinary click can skip the full-document paint, with a small change. Keeping native drag by expanding mid-gesture rests on an unproven assumption that probably differs by browser. Nothing here should ship until a browser probe passes.
+
+## What the code does now
+- **Pointerdown (`:131-162`):** sets `pointerDocument`, which makes `completeDocument()` true (`:830`). It then calls `paint()`, which puts the whole document into the textarea, and lays the document out a second time in `measure` (`:147`) to restore the scroll anchor. Finally it sets `dragging`, which makes `paint()` a no-op (`:837`).
+- **Pointerup/cancel (`:163-184`):** reads the selection with force, clears both flags and paints back down to the bounded window.
+- So every plain click costs two full-document layouts on the way in, plus a shrink on the way out. The browser places the caret during mousedown's default action, after the expansion.
+- The textarea itself is never swapped, so implicit mouse capture stays on the same element. Capture is not the risk. The risks are the browser's internal drag anchor and the hit-test layout under the pointer.
+
+## Narrow experiment that looks feasible (click path only)
+Skip expansion at pointerdown only when **all** of these hold:
+- primary button, no shift, `detail <= 1` (pointerdown's `detail` is unreliable, so read it from mousedown);
+- `selection` lies inside `window` (otherwise the fragment's native selection is clamped, and a shift-click or later extension starts from the wrong place);
+- not `alreadyFull`.
+
+Otherwise keep today's path. Shift-click and selections outside the window keep expanding up front, which is safe because their intent is known at pointerdown. Pointerup already maps the selection through `window.start` (`:967-989`), so a click inside the fragment reads back correctly. Double- and triple-click inside the fragment should work natively if block boundaries fall on newlines (`blockBoundary`), but that needs proof for words and lines at the fragment edge.
+
+## Unsafe assumption: expanding mid-gesture
+To expand on the first real movement you would have to: clear `dragging` for a moment, paint the full document (which replaces `element.value`), call `setSelectionRange` again with the mapped anchor and focus, then fix up scroll. The unknowns:
+1. **Drag anchor.** Setting `value` resets the native selection. Chromium's drag likely re-reads the base from the current selection, so re-applying it might work. Firefox and WebKit keep separate drag state and may end or re-anchor the drag. This is unverified everywhere.
+2. **Granularity.** `setSelectionRange` resets selection to character granularity, so a double-click-drag (word) or triple-click-drag (line) would probably degrade mid-gesture.
+3. **Hit-test drift.** The full layout replaces estimated block tops. Any error in the scroll fix-up moves the text under a pointer that is still held down, so the focus jumps.
+4. **Autoscroll across the viewport.** Before expansion the textarea only contains the window ±1 block. Expanding lazily at the fragment edge hits problems 1–3 at the worst possible moment.
+
+## Proof needed before any production change
+Put it behind a flag, then use a background agent-browser plus a manual Safari/Firefox probe on a document over 8192 chars. Cover: plain click, click-drag inside the viewport, drag past the viewport with autoscroll, double/triple click, double-click-drag, shift-click with the anchor offscreen, backward drag, pointercancel, and RTL prefix. Assert the final `selectionStart/End/Direction` and that the scroll position stays stable.
+
+## Verdict
+- Deferring the click path (skip expansion on unambiguous plain clicks) is small, reversible and keeps the single `EditorElement` architecture. Worth trying.
+- I see no small path that is known to be safe for mid-gesture expansion with native drag. If the probe fails in any target browser, keep expanding at pointerdown for every gesture that might turn into a drag. A deferred plain click that then becomes a drag would be capped at the bounded window, which is unacceptable for drags across the viewport. So if mid-gesture expansion fails, the click deferral only works if plain clicks also keep expanding at pointerdown, and nothing is gained.
+
+Separately: the second full layout at `:147` is only there to restore the scroll anchor. It's a separate, cheaper thing to cut, but also needs proof.
