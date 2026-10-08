@@ -109,6 +109,33 @@ try {
 		session,
 		'document.querySelector("#save-status").textContent === "Saved"',
 	)
+	selectSource(2)
+	browser(session, "keyboard", "inserttext", "x")
+	wait(
+		session,
+		`${editor}.value === ${JSON.stringify(source.slice(0, 2) + "x" + source.slice(2))} && document.querySelector("#save-status").textContent === "Saved"`,
+	)
+	browser(session, "press", "Control+z")
+	wait(
+		session,
+		`${editor}.value === ${JSON.stringify(source)} && ${editor}.selectionStart === 2 && ${editor}.selectionEnd === 2 && document.querySelector("#save-status").textContent === "Saved"`,
+	)
+	browser(session, "press", "ArrowRight")
+	wait(
+		session,
+		`${editor}.value === ${JSON.stringify(source)} && ${editor}.selectionStart === 3 && ${editor}.selectionEnd === 3`,
+	)
+	selectSource(source.indexOf("[Example]") + 2)
+	wait(session, expanded)
+	assert(
+		evaluate(
+			session,
+			`${editor}.value === ${JSON.stringify(source)} && ${editor}.sourceIndex.value === ${JSON.stringify(source)} && ${native}.value.includes("[Example](https://example.org/a_(b))")`,
+		),
+		"Undo restores projected source and later caret movement expands its link",
+	)
+	selectSource(source.length)
+	wait(session, collapsed)
 	let id = evaluate(session, currentDocument)
 	browser(session, "reload")
 	wait(

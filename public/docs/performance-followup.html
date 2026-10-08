@@ -245,6 +245,18 @@
 			the 20.4ms unsampled median. Rendering remains above the frame budget.
 		</p>
 		<p>
+			The editor now retains its previous distinct-source projection. Reuse
+			requires the exact source, document labels, mode and selection; changed
+			caret positions safely reproject. Six alternating rich-document trials
+			passed typing, accepted source, Undo and post-Undo caret checks. Median
+			Undo peak fell from 20.9ms to 14.7ms; the maximum fell from 21.1ms to
+			16.0ms. The next caret move rose from 4.1ms to 5.9ms, with a 6.0ms
+			maximum. Typing showed no consistent gain, and total Undo-window work did
+			not fall. Two retained projections trade bounded memory for a smaller Undo
+			peak; grouped Undo and intervening edits can miss the cache. This still
+			does not meet 8.33ms.
+		</p>
+		<p>
 			CRLF correctness: the editor now maps Markdown source offsets to the
 			textarea's native LF offsets through its existing text index. Edits retain
 			untouched line endings, including across tree leaves. Native module checks

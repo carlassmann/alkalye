@@ -4,6 +4,7 @@ import {
 	applyViewReplacement,
 	sourceRange,
 	identity,
+	iconPrefix,
 	Projector,
 	sameProjection,
 	toSource,
@@ -26,6 +27,15 @@ export interface SourceReplacement {
 	text: string
 }
 type Direction = "forward" | "backward" | "none"
+interface ProjectedSource {
+	source: string
+	start: number
+	end: number
+	documents: string
+	mode: ProjectionMode
+	prefix: string
+	value: Projection
+}
 
 // The native textarea shows a projection with inactive links collapsed. Every
 // offset and value read or written here is in Markdown source coordinates.
@@ -39,16 +49,8 @@ export class SourceTextarea {
 	private options: SourceTextareaOptions
 	private current: Projection
 	private projector = new Projector()
-	private projected:
-		| {
-				source: string
-				start: number
-				end: number
-				documents: string
-				mode: ProjectionMode
-				value: Projection
-		  }
-		| undefined
+	private projected: ProjectedSource | undefined
+	private previousProjected: ProjectedSource | undefined
 
 	constructor(
 		element: HTMLTextAreaElement,
@@ -206,6 +208,9 @@ export class SourceTextarea {
 	}
 	dispose() {
 		this.viewport.dispose()
+		this.projected = undefined
+		this.previousProjected = undefined
+		this.projector = new Projector()
 	}
 	private record(edit: SourceReplacement) {
 		if (!this.pending) this.pending = []
@@ -254,6 +259,7 @@ export class SourceTextarea {
 			previous.source === source &&
 			previous.documents === key &&
 			previous.mode === mode &&
+			previous.prefix === iconPrefix &&
 			((previous.start === active.start && previous.end === active.end) ||
 				(mode !== "raw" &&
 					this.projector.sameActiveTokens(source, previous, active)))
@@ -262,16 +268,33 @@ export class SourceTextarea {
 			previous.end = active.end
 			return previous.value
 		}
+		let restored = this.previousProjected
+		if (
+			restored &&
+			restored.source === source &&
+			restored.documents === key &&
+			restored.mode === mode &&
+			restored.prefix === iconPrefix &&
+			restored.start === active.start &&
+			restored.end === active.end
+		) {
+			this.previousProjected = previous
+			this.projected = restored
+			return restored.value
+		}
 		let value =
 			mode === "raw" || !source.includes("[")
 				? identity(source)
 				: this.projector.project(source, { active, documents, iconSpace: true })
+		if (previous && previous.source !== source)
+			this.previousProjected = previous
 		this.projected = {
 			source,
 			start: active.start,
 			end: active.end,
 			documents: key,
 			mode,
+			prefix: iconPrefix,
 			value,
 		}
 		return value
