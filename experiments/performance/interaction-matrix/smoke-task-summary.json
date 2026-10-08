@@ -1,0 +1,47 @@
+[
+	{
+		"version": "rewrite",
+		"commit": "5c5b6aaf0446dd2eb153d9726562ed77d5332a83",
+		"cell": "body-small",
+		"trial": 0,
+		"status": "complete",
+		"stage": null,
+		"error": null,
+		"gates": {
+			"seedReceipt": true,
+			"editedReceipt": true,
+			"undoReceipt": true
+		},
+		"traceStatus": "complete-window",
+		"initialEnclosingTaskMs": 3.303,
+		"aftermathMaxTaskMs": 2.118,
+		"windowMaxTaskMs": 3.303,
+		"presentationOpportunityMs": 6.919,
+		"layoutUnionMs": 1.491,
+		"paintUnionMs": 0.584,
+		"gcUnionMs": 0.825,
+		"largestTasks": [
+			{
+				"relativeStartMs": -0.231,
+				"durationMs": 3.303
+			},
+			{
+				"relativeStartMs": 540.477,
+				"durationMs": 2.118
+			},
+			{
+				"relativeStartMs": 6.761,
+				"durationMs": 1.816
+			},
+			{
+				"relativeStartMs": 556.274,
+				"durationMs": 1.726
+			},
+			{
+				"relativeStartMs": 1055.853,
+				"durationMs": 1.64
+			}
+		],
+		"eventTiming": []
+	}
+]

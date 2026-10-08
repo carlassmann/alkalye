@@ -1,0 +1,25 @@
+{
+  "samples": 3,
+  "output": "/tmp/alkalye-interaction-matrix-results",
+  "versions": [],
+  "cells": [
+    { "name": "body-small", "journey": "body", "fixture": "small2", "position": "middle" },
+    { "name": "body-rich-start", "journey": "body", "fixture": "rich128", "position": "start" },
+    { "name": "body-rich-middle", "journey": "body", "fixture": "rich128", "position": "middle" },
+    { "name": "body-rich-end", "journey": "body", "fixture": "rich128", "position": "end" },
+    { "name": "body-long-middle", "journey": "body", "fixture": "long1m", "position": "middle" },
+    { "name": "body-long-end", "journey": "body", "fixture": "long1m", "position": "end" },
+    { "name": "find-rich", "journey": "find", "fixture": "rich128" },
+    { "name": "find-next-rich", "journey": "find-next", "fixture": "rich128" },
+    { "name": "find-close-rich", "journey": "find-close", "fixture": "rich128" },
+    { "name": "switch-small-rich", "journey": "switch", "fixture": "small2", "target": "rich128" },
+    { "name": "switch-rich-long", "journey": "switch", "fixture": "rich128", "target": "long1m" },
+    { "name": "multicursor-512", "journey": "multicursor", "fixture": "mc512" },
+    { "name": "multicursor-2048", "journey": "multicursor", "fixture": "mc2048" },
+    { "name": "scroll-rich", "journey": "scroll", "fixture": "rich128" },
+    { "name": "scroll-long", "journey": "scroll", "fixture": "long1m" },
+    { "name": "sync-rich", "journey": "sync", "fixture": "rich128", "position": "middle" },
+    { "name": "offline-rich", "journey": "offline", "fixture": "rich128", "position": "middle" },
+    { "name": "poll-rich", "journey": "poll", "fixture": "rich128", "position": "middle", "versions": ["rewrite"] }
+  ]
+}

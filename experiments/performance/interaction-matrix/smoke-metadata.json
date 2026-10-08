@@ -1,0 +1,28 @@
+{
+	"sourceCommit": "5c5b6aaf0446dd2eb153d9726562ed77d5332a83",
+	"sourceChanges": "runner/observers only; production source/backend/build unchanged",
+	"loadedPathsAndServedDigests": [
+		{
+			"path": "/app.js",
+			"sha256": "010cd76abb4b3e0d37f22cec8d6fc69359a13291c7441bf58a845c23acf66c6f"
+		},
+		{
+			"path": "/chunks/document-worker-stats-xj2116pa.js",
+			"sha256": "2e4da9838ea2303ec700744d5434c69b079f3f9d88bef2dc255ad72789ad502a"
+		}
+	],
+	"samples": 1,
+	"fixture": "2048 ASCII bytes/UTF16 units,121 real newlines",
+	"strictTypes": "PASS; initial readonly argv error retained in smoke-types-initial.log; argv copied before spawn",
+	"completedJourneys": [
+		"rewrite 2 KiB middle trusted x,client save,independent server receipt,native-platform Undo,client save,server receipt"
+	],
+	"notExercised": [
+		"original oracle",
+		"other17 cells",
+		"MC count adapter",
+		"polling/scroll/find/switch adapters"
+	],
+	"closedBrowserAndStoppedOwnServer": true,
+	"traceScope": "no CPU sampling; 3 seconds after first trusted event; enclosing main RunTask includes microtasks"
+}

@@ -1,0 +1,38 @@
+import { join } from "node:path"
+import { pathToFileURL } from "node:url"
+
+let [configurationPath] = Bun.argv.slice(2)
+if (!configurationPath) throw Error("Private oracle configuration required")
+let configuration = await Bun.file(configurationPath).json()
+let request = JSON.parse(await Bun.stdin.text())
+let target = configuration.documents.find(value => value.fixture === request.fixture)
+if (!target || !request.path.endsWith("/" + target.documentId)) throw Error("Oracle document route differs")
+if (!/^[a-f0-9]{64}$/.test(request.expectedSha256)) throw Error("Oracle digest invalid")
+let credentials = await Bun.file(configuration.authFile).json()
+let { startWorker } = await import(pathToFileURL(join(configuration.checkout, "node_modules/jazz-tools/dist/worker/index.js")).href)
+let { UserAccount, Document } = await import(pathToFileURL(join(configuration.checkout, "src/schema/index.ts")).href)
+let context = await startWorker({
+ accountID: credentials.accountID,
+ accountSecret: credentials.accountSecret,
+ AccountSchema: UserAccount,
+ syncServer: configuration.syncServer,
+ skipInboxLoad: true,
+})
+try {
+ await context.waitForConnection()
+ let document = await Document.load(target.documentId, { loadAs: context.worker, resolve: { content: true } })
+ if (!document.$isLoaded) throw Error("Independent server document unavailable")
+ let deadline = performance.now() + request.deadlineMs
+ while (true) {
+  let content = document.content.toString()
+  let sha256 = new Bun.CryptoHasher("sha256").update(content).digest("hex")
+  if (sha256 === request.expectedSha256) {
+   console.log(JSON.stringify({ sha256, characters: content.length }))
+   break
+  }
+  if (performance.now() >= deadline) throw Error("Independent server digest not accepted before deadline")
+  await Bun.sleep(100)
+ }
+} finally {
+ await context.shutdownWorker()
+}
