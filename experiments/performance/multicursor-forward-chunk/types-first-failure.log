@@ -1,0 +1,5 @@
+$ tsc --noEmit
+src/server/settings.ts(8,23): error TS2307: Cannot find module '../../build' or its corresponding type declarations.
+tests/durable-checkpoint-session.test.ts(159,34): error TS2339: Property 'fork' does not exist on type 'Readonly<{ readonly actor: string; readonly clock: number; readonly author: string; text: (target: string, until?: string | number) => string; visible(target: string, until?: string | number): Atom[]; ... 6 more ...; forkEffect: (actor?: string | undefined, author?: string | undefined) => Effect<...>; }>'.
+tests/durable-checkpoint-session.test.ts(164,20): error TS2322: Type 'Operation | null' is not assignable to type '(Operation | null)[]'.
+  Type 'null' is not assignable to type '(Operation | null)[]'.

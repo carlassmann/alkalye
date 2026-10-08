@@ -1,0 +1,13 @@
+{
+	"baselineCommit": "1b630c80268665f1c7838e584eeb9c6f9f0ad463",
+	"candidateSourceSHA256": "e1088e66ae4f4e5a335281677cd44776b4b831e0ad49b1c7ed30d204fa80cb2b",
+	"baselineSourceSHA256": "94f6fb6946fae3ac58cf21f5587c61629b9e87a1e23374fe760a54675f0aaf46",
+	"baselineEntrySHA256": "f5f4df9cc9b13c96ec49bb95fc860f3d93e7f42f77ab923cf6b382577c7d64ed",
+	"candidateEntrySHA256": "a16bc8f3b835c49ae07d629791eea1e1c10b1f3c974bed9f1211e4ac0b979453",
+	"snapshots": {
+		"atom-sequence.ts.txt": "e1088e66ae4f4e5a335281677cd44776b4b831e0ad49b1c7ed30d204fa80cb2b",
+		"replica-contracts.test.ts.txt": "4ed4d85b230f3e3b1a37151c4a40ae3da948673bcf245753291598ab34248b2a",
+		"session-contracts.test.ts.txt": "b18b1a3656bd88ee43f54c2ff598e94e5811517ebf22ec20e04b453481ac671d",
+		"matched.ts.txt": "583b76ad98b2ebd82da3267ea7616880e844bc90a354855988f1dac9aeff1095"
+	}
+}

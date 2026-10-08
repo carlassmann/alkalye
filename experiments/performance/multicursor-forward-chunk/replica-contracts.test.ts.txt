@@ -1,0 +1,90 @@
+import { expect, test } from "bun:test"
+import { Replica } from "../src/shared/crdt"
+import type { TextReplacement } from "../src/shared/crdt"
+
+for (let count of [128, 512, 2048]) {
+	test(
+		"ordered replacements preserve Unicode, forks and causal undo " + count,
+		() => {
+			let source = ("TOKEN😀\r\n" + "z".repeat(64) + "\n").repeat(count)
+			let seed = new Replica("seed")
+			seed.edit("doc", source)
+			let writer = seed.fork("writer"),
+				observer = seed.fork("observer")
+			let changes: TextReplacement[] = []
+			for (
+				let start = source.indexOf("TOKEN");
+				start >= 0;
+				start = source.indexOf("TOKEN", start + 5)
+			)
+				changes.push({ start, remove: 5, text: "🌻" })
+			let operation = writer.prepareReplacements("doc", changes)
+			if (!operation) throw Error("Missing multi edit")
+			writer.apply([operation])
+			expect(writer.text("doc")).toBe(source.replaceAll("TOKEN", "🌻"))
+			expect(seed.text("doc")).toBe(source)
+			observer.apply([operation])
+			expect(observer.text("doc")).toBe(writer.text("doc"))
+			let restored = new Replica("restored")
+			restored.restore(writer.checkpoint())
+			expect(restored.visible("doc")).toEqual(writer.visible("doc"))
+			let undo = writer.inverse(operation)
+			writer.apply([undo])
+			observer.apply([undo])
+			expect(writer.text("doc")).toBe(source)
+			expect(observer.text("doc")).toBe(source)
+			let redo = writer.inverse(undo)
+			writer.apply([redo])
+			observer.apply([redo])
+			expect(writer.text("doc")).toBe(source.replaceAll("TOKEN", "🌻"))
+			expect(observer.text("doc")).toBe(writer.text("doc"))
+		},
+	)
+}
+
+for (let changes of [
+	[
+		{ start: 1, remove: 1, text: "X" },
+		{ start: 4, remove: 0, text: "Y" },
+	],
+	[
+		{ start: 0, remove: 1, text: "X" },
+		{ start: 1, remove: 1, text: "Y" },
+	],
+	[
+		{ start: 0, remove: 1, text: "" },
+		{ start: 6, remove: 0, text: "Z" },
+	],
+])
+	test(
+		"boundary replacements and chained concat-backed edits " +
+			JSON.stringify(changes),
+		() => {
+			let replica = new Replica("writer")
+			replica.edit("doc", "abcdef")
+			for (let repetition = 0; repetition < 3; repetition++) {
+				let before = replica.text("doc"),
+					parts: string[] = [],
+					cursor = 0
+				let currentChanges =
+					repetition === 0
+						? changes
+						: [
+								{ start: 0, remove: 1, text: "Q" },
+								{ start: before.length, remove: 0, text: "Z" },
+							]
+				for (let change of currentChanges) {
+					parts.push(before.slice(cursor, change.start), change.text)
+					cursor = change.start + change.remove
+				}
+				parts.push(before.slice(cursor))
+				let operation = replica.prepareReplacements("doc", currentChanges)
+				if (!operation) throw Error("Missing replacement")
+				replica.apply([operation])
+				expect(replica.text("doc")).toBe(parts.join(""))
+				let restored = new Replica("oracle")
+				restored.restore(replica.checkpoint())
+				expect(restored.visible("doc")).toEqual(replica.visible("doc"))
+			}
+		},
+	)

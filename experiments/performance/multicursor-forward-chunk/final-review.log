@@ -1,0 +1,46 @@
+I agree with **HOLD**, but for a stronger reason than "the signal is small": the data shows no speedup at all, and the code gives no reason to expect a large one. The quadratic claim should be dropped.
+
+## Performance inference flaws
+
+1. **The quadratic claim isn't supported.** In the installed Effect:
+   - `appendAll` rebalances (`node_modules/effect/src/Chunk.ts:1475-1540`).
+   - `take` and `drop` build `IConcat`/`ISlice` nodes directly through `makeChunk` (`:1001-1038`, `:1091-1125`). They skip rebalancing, so the balance invariant isn't guaranteed. Depth still can't grow beyond the input's depth. This is a gap in proof, not evidence of quadratic growth.
+   - `toReadonlyArray` flattens the node in place to `IArray` and sets depth to 0 (`:451-471`). The view's `slice`, `map`, `some`, `entries` and iterator all call it, and so does Chunk's own iterator (`:210-221`). So if any consumer reads each new version, depth resets on every edit.
+   - Net cost per edit: tree work is O(k·depth), plus at most one O(n) flatten. No quadratic term is shown. Calling it asymptotically faster is just as unsupported.
+
+2. **Likely reason the gain is small:** if something materializes each version (probable for rendering and string building), each edit still costs O(n), the same order as the baseline array copy. The Chunk only helps on paths that never flatten, and nobody has shown such a path is hot.
+
+3. **Statistics:**
+   - n=3 per arm. A rank test can't get below p≈0.1 two-sided, even if every candidate run beats every baseline run.
+   - The arms overlap: 512 baseline 14.04–15.12 vs candidate 14.45–15.07; 2048 baseline 32.21–33.11 vs candidate 31.10–33.04.
+   - Some metrics moved the wrong way at 512: layout 31.7→34.0, GC 79.5→82.6. That's probably noise too.
+   - Say "no detectable difference; this design can't resolve <~1ms", not "small signal".
+
+4. **No proof the new path ran in the timed window.** Nothing counts calls to `replaceAtoms` or the ordered branch, and nothing shows what share of the 15/33ms task it accounts for. Without that, a small delta can't be read as a small benefit.
+
+5. **Arm identity:** both arms show commit `1b630c8` and the same URL. Only the `/app.js` hashes differ (f5f4… vs a16b…). "Only atom-sequence differs" rests on the source diff; there's no bundle diff.
+
+6. **Heap:** no proof either way. `ISlice` nodes keep whole backing arrays alive until flattened, and history/undo views keep old trees alive. Retention is unmeasured.
+
+## Can the sampled `Chunk.drop` belong to `cachePreparedText` while the fast path missed?
+
+- In `src`, Chunk is used only in `atom-sequence.ts`, so `drop` is reached only through `cachePreparedText` → `replaceAtoms` (`crdt.ts:714-719`).
+- `cachePreparedText` returns early when there's no prepared edit or the guards fail (`crdt.ts:667-676`), and takes the `edit.inverse` branch with no Chunk calls (`:677-701`). So a real `drop` under `cachePreparedText` means the prepared, non-inverse path **hit**.
+- What can still be a "miss" at that point:
+  - `sequences.get` missing for a plain array. Cheap: `fromIterable` aliases the array.
+  - The materialization cost showing up later in consumers, not under `drop`.
+- Ways the attribution could still be wrong:
+  - The app uses Effect elsewhere (`store.commit(...).pipe`), and Effect's own internals use Chunk, so a bare `drop` frame may not come from `replaceAtoms`.
+  - Inlining in the minified bundle can blur parent frames.
+  - At ~1ms sampling, a 15ms task gives about 15 samples, too few to attribute reliably.
+
+## Correctness (no new blockers)
+
+- `fromIterable` keeps a reference to the original array rather than copying it (`Array.ts:411`). If a cached array is ever mutated, the view's length goes stale. That's safe only if callers never mutate.
+- Out-of-range replacements skip the ordered branch, and in the reverse loop `take`/`drop` clamp silently instead of throwing. Whether that matches the baseline is unverified.
+- Reads like `indexOf`, `filter`, `join`, `forEach` and index loops go through the Proxy `get` trap on every element: a regex test plus a tree walk. That's correct but slow. Hot callers are unaudited.
+- `chunk-replacements.test.ts` covers ordered multi-replace with Unicode, forks, checkpoints, undo/redo and boundaries. `durable-checkpoint-session.test.ts` has one parameterized test on chained single edits; it doesn't exercise the ordered branch.
+
+## Limits
+
+I only read files; nothing was run or profiled. I didn't audit Proxy-method usage in `crdt.ts` and didn't diff the bundles.

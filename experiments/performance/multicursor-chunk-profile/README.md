@@ -9,3 +9,5 @@ Source maps locate replace at document-session.ts:544, apply at crdt.ts:210, pre
 ProfileChunk events use a sampler thread. The analyzer links them to the main-thread Profile by process and profile ID. An initial thread-only filter produced empty summaries; corrected before interpretation. Raw traces stay in /tmp/alkalye-focused-interaction/sampled-multicursor-results; their hashes are retained. Main browser callbacks and worker profiles are separated.
 
 Runner snapshot restores to .ts inside the copied 1b fixture. Private manifests, account profiles and bearer keys are omitted. Existing focused controls document fixture construction and independent acceptance gates. Both disposable browser sessions and the own 4473 server were closed. No production edits or physical frame-rate claim.
+
+Correction: the 8.862 ms Chunk.drop value above is recursion-weighted, counting the same frame multiple times per sample. Unique-stack inclusive time is 1.226 ms, self 0.466 ms. The bottleneck magnitude inference is withdrawn; see ../multicursor-forward-chunk for corrected analyzer and matched HOLD evidence.

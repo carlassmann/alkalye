@@ -1,0 +1,194 @@
+{
+	"multicursor-512": {
+		"baseline": {
+			"trustedInputTaskMs": {
+				"median": 14.875,
+				"max": 15.12,
+				"samples": [15.12, 14.038, 14.875]
+			},
+			"beforeinputMs": {
+				"median": 14.425,
+				"max": 14.691,
+				"samples": [14.691, 13.575, 14.425]
+			},
+			"aftermathMaxTaskMs": {
+				"median": 14.573,
+				"max": 15.761,
+				"samples": [14.456, 14.573, 15.761]
+			},
+			"windowMaxTaskMs": {
+				"median": 15.12,
+				"max": 15.761,
+				"samples": [15.12, 14.573, 15.761]
+			},
+			"presentationOpportunityMs": {
+				"median": 15.441,
+				"max": 15.759,
+				"samples": [15.759, 14.865, 15.441]
+			},
+			"layoutUnionMs": {
+				"median": 31.658,
+				"max": 33.768,
+				"samples": [31.078, 31.658, 33.768]
+			},
+			"paintUnionMs": {
+				"median": 4.888,
+				"max": 5.044,
+				"samples": [4.726, 4.888, 5.044]
+			},
+			"gcUnionMs": {
+				"median": 79.549,
+				"max": 81.884,
+				"samples": [79.549, 81.884, 78.809]
+			},
+			"maxGcMs": {
+				"median": 10.216,
+				"max": 10.401,
+				"samples": [10.401, 10.216, 9.523]
+			}
+		},
+		"candidate": {
+			"trustedInputTaskMs": {
+				"median": 14.538,
+				"max": 15.072,
+				"samples": [14.454, 14.538, 15.072]
+			},
+			"beforeinputMs": {
+				"median": 14.088,
+				"max": 14.626,
+				"samples": [14.002, 14.088, 14.626]
+			},
+			"aftermathMaxTaskMs": {
+				"median": 14.692,
+				"max": 15.12,
+				"samples": [15.12, 14.627, 14.692]
+			},
+			"windowMaxTaskMs": {
+				"median": 15.072,
+				"max": 15.12,
+				"samples": [15.12, 14.627, 15.072]
+			},
+			"presentationOpportunityMs": {
+				"median": 15.124,
+				"max": 15.673,
+				"samples": [15.056, 15.124, 15.673]
+			},
+			"layoutUnionMs": {
+				"median": 33.954,
+				"max": 34.225,
+				"samples": [33.954, 34.225, 32.262]
+			},
+			"paintUnionMs": {
+				"median": 5.229,
+				"max": 5.426,
+				"samples": [5.229, 5.426, 4.921]
+			},
+			"gcUnionMs": {
+				"median": 82.617,
+				"max": 84.4,
+				"samples": [82.617, 81.411, 84.4]
+			},
+			"maxGcMs": {
+				"median": 10.273,
+				"max": 10.575,
+				"samples": [10.273, 9.577, 10.575]
+			}
+		}
+	},
+	"multicursor-2048": {
+		"baseline": {
+			"trustedInputTaskMs": {
+				"median": 32.884,
+				"max": 33.114,
+				"samples": [32.211, 33.114, 32.884]
+			},
+			"beforeinputMs": {
+				"median": 32.427,
+				"max": 32.667,
+				"samples": [31.775, 32.667, 32.427]
+			},
+			"aftermathMaxTaskMs": {
+				"median": 58.17,
+				"max": 58.34,
+				"samples": [58.34, 58.17, 57.187]
+			},
+			"windowMaxTaskMs": {
+				"median": 58.17,
+				"max": 58.34,
+				"samples": [58.34, 58.17, 57.187]
+			},
+			"presentationOpportunityMs": {
+				"median": 33.578,
+				"max": 33.787,
+				"samples": [32.86, 33.787, 33.578]
+			},
+			"layoutUnionMs": {
+				"median": 29.777,
+				"max": 30.156,
+				"samples": [30.156, 29.521, 29.777]
+			},
+			"paintUnionMs": {
+				"median": 4.634,
+				"max": 4.723,
+				"samples": [4.634, 4.524, 4.723]
+			},
+			"gcUnionMs": {
+				"median": 43.06,
+				"max": 56.251,
+				"samples": [43.06, 42.133, 56.251]
+			},
+			"maxGcMs": {
+				"median": 5.514,
+				"max": 15.079,
+				"samples": [5.514, 4.228, 15.079]
+			}
+		},
+		"candidate": {
+			"trustedInputTaskMs": {
+				"median": 32.647,
+				"max": 33.036,
+				"samples": [31.095, 33.036, 32.647]
+			},
+			"beforeinputMs": {
+				"median": 32.135,
+				"max": 32.613,
+				"samples": [30.653, 32.613, 32.135]
+			},
+			"aftermathMaxTaskMs": {
+				"median": 56.986,
+				"max": 58.075,
+				"samples": [56.771, 58.075, 56.986]
+			},
+			"windowMaxTaskMs": {
+				"median": 56.986,
+				"max": 58.075,
+				"samples": [56.771, 58.075, 56.986]
+			},
+			"presentationOpportunityMs": {
+				"median": 33.286,
+				"max": 33.708,
+				"samples": [31.692, 33.708, 33.286]
+			},
+			"layoutUnionMs": {
+				"median": 29.967,
+				"max": 30.483,
+				"samples": [30.483, 29.967, 29.294]
+			},
+			"paintUnionMs": {
+				"median": 4.697,
+				"max": 4.822,
+				"samples": [4.822, 4.697, 4.621]
+			},
+			"gcUnionMs": {
+				"median": 39.867,
+				"max": 58.477,
+				"samples": [39.867, 58.477, 39.835]
+			},
+			"maxGcMs": {
+				"median": 5.567,
+				"max": 15.761,
+				"samples": [5.567, 15.761, 4.048]
+			}
+		}
+	}
+}

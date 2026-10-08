@@ -1,0 +1,26 @@
+import * as Effect from "effect/Effect"
+import { startServer } from "/tmp/alkalye-focused-interaction/runtime/src/server/index"
+let arm = (
+	await Bun.file("/tmp/alkalye-chunk-forward/matched/arm.txt").text()
+).trim()
+let assets =
+	arm === "baseline"
+		? "/tmp/alkalye-focused-interaction/runtime/dist"
+		: "/tmp/alkalye-chunk-forward/dist"
+let instance = await Effect.runPromise(
+	startServer({
+		port: 4473,
+		hostname: "127.0.0.1",
+		publicOrigin: "http://127.0.0.1:4473",
+		data: "/tmp/alkalye-chunk-forward/matched/data-active",
+		development: false,
+		build: false,
+		assets,
+	}),
+)
+console.log(instance.server.url.href)
+for (let signal of ["SIGINT", "SIGTERM"])
+	process.once(signal, async () => {
+		await Effect.runPromise(instance.close())
+		process.exit(0)
+	})

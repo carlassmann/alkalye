@@ -1,0 +1,42 @@
+No blockers. On every input the public API can reach, the candidate gives the same atom order as the original, and it only takes the new forward path for input that is already sorted and in range. I only read the code; nothing was run or measured.
+
+**Ordering**
+- The forward path runs only when there are more than one replacement, starts and removes are safe integers, starts are ascending (`start >= prevEnd`), removes are not negative, and nothing runs past the original length. Otherwise it uses the original reverse code unchanged, and a single replacement always does, so the result is the same as before.
+- Callers only send sorted, non-overlapping replacements anyway:
+  - `prepareReplacements` throws on out-of-order, overlapping or same-start replacements (`crdt.ts:989-999`).
+  - `textSplices` puts at least one kept character between splices.
+  - `rawEditSplices` shifts every splice by the same amount, so order holds.
+  - Converting UTF-16 offsets to code points keeps order, since splitting a surrogate pair is rejected.
+- Adjacent replacements (`start === prevEnd`) take the forward path and give the same result as before.
+
+**Same-start inserts**
+- `[{5,0,[A]},{5,0,[B]}]` gives `A,B` in both versions.
+- `[{5,0,[A]},{5,2,[B]}]` gives `A,B,orig[7..]` in both.
+- `[{5,2,[A]},{5,0,[B]}]` fails the `start < end` check, falls back, and keeps the old (odd) behaviour.
+- The public API rejects same-start input anyway (`start === lastStart`).
+
+**Mutable input ownership**: unchanged from the original.
+- `Chunk.fromIterable(array)` keeps a reference to the array rather than copying it (`Chunk.js:242`, via `RA.fromIterable`). This was already true in the original, for both `inserted` and a plain `atoms` array that isn't a view yet.
+- `inserted` is always a fresh array from `flatMap` (`crdt.ts:708`), so the caller can't mutate it later.
+- `toReadonlyArray` flattens a chunk node in place (`Chunk.js:306`). Slices that point at it stay correct, but depth numbers on parent nodes go stale. The original has the same issue.
+
+**Chunk allocation and complexity**
+- On an array-backed sequence, `take`/`drop` create O(1) slices. On a concat-backed one they cost O(depth) and allocate one new node per level.
+- Each change allocates: a `drop` slice that is thrown away right after `take`, a `take` slice, the inserted chunk, and two concat nodes plus any rebalancing in `appendAll`. When the unchanged gap is empty, `take` returns `_empty` but the `drop` allocation is still spent.
+- Original: each step works on the tree the previous step built, and depth can grow by about 2 per change. That is roughly O(k²) node work for k changes and depth O(k), which then makes `getUnsafe` and the recursive copy depth-heavy.
+- Candidate: every slice comes from the original sequence (depth d₀), and `appendAll` rebalances. That is O(k·(d₀ + log k)) node work and result depth about d₀ + log k. The only extra cost is one O(k) validation pass.
+- Depth still builds up across separate edits until something flattens the view (`slice`, `map`, `entries`, `some`). That predates this change.
+
+**Smallest public cases** (each asserts visible text and atom ids, and compares against a fresh replica rebuilt from the operations):
+1. Replica `"abcdef"`: `prepareReplacements(t, [{start:1,remove:1,text:"X"},{start:4,remove:0,text:"Y"}])` then `apply` → `aXcdYef`.
+2. Adjacent: `[{0,1,"X"},{1,1,"Y"}]` → `XYcdef`.
+3. Boundaries: `[{0,1,""},{6,0,"Z"}]` → `bcdefZ` (end of the last replacement equals the length).
+4. A second edit chained on the result of case 1, so the slices come from a concat-backed sequence and not the original array.
+5. `edit`/`prepareEdit` from `"abcdef"` to `"aXcdeYf"`, which goes through `textSplices` (two splices).
+6. A document with a frontmatter header where raw ≠ atoms, so `rawSplices` are shifted. Check the source view and raw view match each other.
+7. Through DocumentSession: a two-replacement action that reaches `document-session.ts:556`, then commit, then compare with a reloaded session.
+8. Regression: same-start or out-of-order replacements still throw `RangeError`.
+
+Optional cleanup, not a blocker: the forward and fallback paths could share one splice helper.
+
+The claude.ai connectors (Slack, GitHub, Gmail, Notion and others) need authorizing in your claude.ai connector settings before they can be used. I didn't need any of them for this.
