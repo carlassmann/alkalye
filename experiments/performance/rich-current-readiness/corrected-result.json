@@ -1,0 +1,10 @@
+{
+	"stage": "seed",
+	"passed": false,
+	"error": "Error: rich-current-middle wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n",
+	"sourceLength": 1048576,
+	"sourceBytes": 1056200,
+	"sourceHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+	"state": null,
+	"readinessMs": 2383.225917
+}

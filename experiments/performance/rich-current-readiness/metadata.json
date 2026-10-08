@@ -1,0 +1,15 @@
+{
+	"commit": "5b4d2b7c5023c79f6eefcc8868325db7caffc6e4",
+	"bundleSha256": "d7b141bf675861a24f2b9780a15427f04c63cfe82e4dc3d82273f9bbed544edc",
+	"sourceBytes": 1056200,
+	"sourceUtf16Units": 1048576,
+	"sourceSha256": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+	"stage": "seed readiness only",
+	"interactionTraceCreated": false,
+	"trustedMiddleTypingExecuted": false,
+	"acceptedFixtureSourceVerified": false,
+	"correctedServerActionPositions": [60, 61],
+	"cachedHeadPosition": 60,
+	"browserProfile": "one disposable main context",
+	"cookies": "transient process memory only; no credentials included"
+}

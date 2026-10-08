@@ -1,0 +1,11 @@
+{
+	"stage": "seed",
+	"passed": false,
+	"error": "Error: rich-current-middle eval: spawnSync agent-browser ENOBUFS (stdout or stderr buffer reached maxBuffer size limit)",
+	"sourceLength": 1048576,
+	"sourceBytes": 1056200,
+	"sourceHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+	"state": null,
+	"readinessMs": 2199.0585419999998,
+	"seedMs": 33466.732292
+}

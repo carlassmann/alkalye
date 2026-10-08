@@ -1,0 +1,1 @@
+export default {project:'alkalye-rich-current',commands:{rewrite:{run:'bun experiments/performance/serve-rewrite.ts /tmp/alkalye-rich-current/runtime/dist /tmp/alkalye-rich-current/data-active 4461 > /tmp/alkalye-rich-current/server.log 2>&1',cwd:'/tmp/alkalye-rich-current/runtime',route:false,portless:false}}}
