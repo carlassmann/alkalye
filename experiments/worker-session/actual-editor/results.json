@@ -1,0 +1,16 @@
+{
+	"adopted": false,
+	"correctnessAssertions": 12,
+	"visualParityVerified": false,
+	"performanceValid": false,
+	"reason": "Fixture selector lost height specificity; host expanded to fullsource height663985px. All ordinary input cells invalid performance evidence. Multicursor exactsource and pending0 reached; nativeinput observerRAF gate failed because editor prevents default input.",
+	"repaired": [
+		"bounded [data-editor].editor-wrap height800px",
+		"geometry assertion before trace: host800px,scroll overflow,native fragment<32768,writable",
+		"trusted beforeinput schedules microtask and twoRAF"
+	],
+	"repairedRuntimeVerified": false,
+	"durability": "Worker Flush and Read exact local source; accepted HTTP snapshot unverified",
+	"memory": "Main JS heap sampled only; worker heap and processRSS unavailable",
+	"signature": "written with gpt-6 in codex"
+}

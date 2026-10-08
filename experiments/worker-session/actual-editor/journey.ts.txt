@@ -1,0 +1,51 @@
+import { assert, browser, browserBatch, evaluate, wait } from "./tests/browser-driver"
+let url = process.argv[2]
+if (!url) throw Error("URL required")
+let session = "actual-worker-editor-" + Date.now()
+let api = "window.workerEditorProof"
+let source = 'document.querySelector("alkalye-editor").source'
+try {
+	browser(session, "set", "viewport", "1280", "800")
+	browser(session, "open", url)
+	wait(session, "document.body.dataset.ready==='true' || !!document.body.dataset.failure")
+	console.log(evaluate(session, "({ready:document.body.dataset.ready,failure:document.body.dataset.failure})"))
+	assert(evaluate(session, "!document.body.dataset.failure"), "Actual EditorElement worker fixture opens")
+	let original = evaluate(session, `${api}.inspect().source`)
+	if (typeof original !== "string") throw Error("Missing original source")
+	evaluate(session, `${source}.focus();${source}.setSelectionRange(${original.length},${original.length})`)
+	browser(session, "keyboard", "inserttext", "XYZ")
+	let expected = original + "XYZ"
+	wait(session, `${api}.inspect().source===${JSON.stringify(expected)}&&${api}.inspect().pending===0`)
+	assert(evaluate(session, `${api}.inspect().queueSource===${JSON.stringify(expected)}`), "Trusted input uses real source replacement queue")
+	browserBatch(session, [["keyboard", "inserttext", "1"], ["keyboard", "inserttext", "2"], ["keyboard", "inserttext", "3"]])
+	expected += "123"
+	wait(session, `${api}.inspect().source===${JSON.stringify(expected)}&&${api}.inspect().pending===0`)
+	assert(evaluate(session, `${api}.inspect().queueSource===${JSON.stringify(expected)}`), "Queued rapid native edits preserve FIFO source")
+	let beta = expected.indexOf("beta")
+	evaluate(session, `${source}.setSelectionRange(${beta},${beta + 4});${api}.format('bold')`)
+	expected = expected.slice(0, beta) + "**beta**" + expected.slice(beta + 4)
+	wait(session, `${api}.inspect().source===${JSON.stringify(expected)}&&${api}.inspect().pending===0`)
+	assert(evaluate(session, `${api}.inspect().queueSource===${JSON.stringify(expected)}`), "Actual editor formatting queues canonical replacement")
+	let alpha = expected.indexOf("alpha")
+	evaluate(session, `${source}.focus();${source}.setSelectionRange(${alpha},${alpha + 5})`)
+	browser(session, "press", "Control+d")
+	browser(session, "keyboard", "inserttext", "T")
+	expected = expected.replaceAll("alpha", "T")
+	wait(session, `${api}.inspect().source===${JSON.stringify(expected)}&&${api}.inspect().pending===0`)
+	assert(evaluate(session, `${api}.inspect().busy`), "Actual editor multicursor source remains active")
+	assert(evaluate(session, `${api}.merge()` ) === false, "Remote handoff refuses active multicursors")
+	browser(session, "press", "Escape")
+	wait(session, `!${api}.inspect().busy`)
+	evaluate(session, `${api}.peer()`)
+	let prior = evaluate(session, `${api}.inspect().start`)
+	if (typeof prior !== "number") throw Error("Source caret is unavailable")
+	assert(true, "Source caret is available")
+	assert(evaluate(session, `${api}.merge()`) === true, "Worker candidate adopts through actual editor")
+	expected = "PEER\n" + expected
+	wait(session, `${api}.inspect().source===${JSON.stringify(expected)}`)
+	assert(evaluate(session, `${api}.inspect().start===${prior + 5}`), "Worker-resolved canonical caret follows peer prefix")
+	assert(evaluate(session, `${api}.flush()`) === expected, "Worker/native server durability preserves actual editor source")
+	assert(evaluate(session, `${api}.inspect().failures.length===0`), "Actual native bridge reports no authority failures")
+	evaluate(session, `${api}.dispose()`)
+	assert(evaluate(session, "document.body.dataset.closed==='true'&&!document.querySelector('alkalye-editor')"), "Scope interruption removes editor and workers")
+} finally { browser(session, "close") }

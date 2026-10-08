@@ -1,0 +1,56 @@
+[
+	{
+		"trial": 0,
+		"multicursor": false,
+		"observation": {
+			"durableMs": 163.60000002384186,
+			"failures": [],
+			"heap": 11840430,
+			"inputMs": 85.19999998807907,
+			"microtaskMs": 85.19999998807907,
+			"nativeCharacters": 131103,
+			"nodes": 3977,
+			"pending": 0,
+			"raf2Ms": 90.39999997615814,
+			"sourceCharacters": 131103,
+			"trusted": 1
+		},
+		"trace": "/tmp/alkalye-worker-editor/timing-128.json-0.trace.json"
+	},
+	{
+		"trial": 1,
+		"multicursor": false,
+		"observation": {
+			"durableMs": 169.70000004768372,
+			"failures": [],
+			"heap": 12128255,
+			"inputMs": 89.60000002384186,
+			"microtaskMs": 89.60000002384186,
+			"nativeCharacters": 131104,
+			"nodes": 3977,
+			"pending": 0,
+			"raf2Ms": 94,
+			"sourceCharacters": 131104,
+			"trusted": 1
+		},
+		"trace": "/tmp/alkalye-worker-editor/timing-128.json-1.trace.json"
+	},
+	{
+		"trial": 2,
+		"multicursor": false,
+		"observation": {
+			"durableMs": 162.4000000357628,
+			"failures": [],
+			"heap": 16491554,
+			"inputMs": 85.40000003576279,
+			"microtaskMs": 85.40000003576279,
+			"nativeCharacters": 131105,
+			"nodes": 3977,
+			"pending": 0,
+			"raf2Ms": 89.5,
+			"sourceCharacters": 131105,
+			"trusted": 1
+		},
+		"trace": "/tmp/alkalye-worker-editor/timing-128.json-2.trace.json"
+	}
+]

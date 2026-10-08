@@ -1,0 +1,322 @@
+--- a/src/client/components/editor.ts
++++ b/src/client/components/editor.ts
+@@ -35,8 +35,22 @@
+ 	matches: { start: number; end: number }[]
+ }
+ let lastCodeLanguage = ""
++let editorSelectionGeneration = 0
+ 
++export interface PendingEditorChange {
++	kind: "pending"
++}
++export interface MergedEditorSelection {
++	start: number
++	end: number
++	direction: "forward" | "backward" | "none"
++	generation: number
++	composing: boolean
++	busy: boolean
++	source: string
++}
+ export interface EditorOptions {
++	authority?: "local" | "worker"
+ 	isDrawing(id: string): boolean
+ 	openDrawing(id: string): void
+ 	content: string
+@@ -56,7 +70,10 @@
+ 		content: string,
+ 		base?: Atom[],
+ 		replacements?: SourceReplacement[],
+-	): { atoms: Atom[]; content: string; operation: Operation | null } | undefined
++	):
++		| { atoms: Atom[]; content: string; operation: Operation | null }
++		| PendingEditorChange
++		| undefined
+ 	undo(redo: boolean): void
+ 	select(): void
+ 	requestAsset(): void
+@@ -111,6 +128,15 @@
+ 	// textarea shows inactive links collapsed, so its value and offsets differ.
+ 	get source() {
+ 		return this.view?.text
++	}
++	setEditable(editable: boolean) {
++		this.view?.setEditable(editable)
++	}
++	mergeSelection() {
++		return this.view?.mergeSelection()
++	}
++	adoptMerged(content: string, selection: MergedEditorSelection) {
++		return this.view?.adoptMerged(content, selection) ?? false
+ 	}
+ 	update(content: string, atoms: Atom[], editable: boolean) {
+ 		this.view?.update(content, atoms, editable)
+@@ -208,6 +234,7 @@
+ 	let people: Presence[] = []
+ 	let editable = options.editable
+ 	let atoms = options.atoms
++	let selectionGeneration = ++editorSelectionGeneration
+ 	let acceptedSource = options.content
+ 	let deferredUpdate:
+ 		{ content: string; atoms: Atom[]; editable: boolean } | undefined
+@@ -260,8 +287,11 @@
+ 		let source = text.input()
+ 		updateHighlight()
+ 		if (composing) return
++		selectionGeneration = ++editorSelectionGeneration
++		if (options.authority === "worker" && source === acceptedSource) return
+ 		let edit = options.change(source, atoms, text.takeReplacements())
+-		if (edit) update(edit.content, edit.atoms, editable)
++		if (edit && "kind" in edit) acceptPending()
++		else if (edit) update(edit.content, edit.atoms, editable)
+ 		else text.sync()
+ 		if (options.preferences.autocomplete) showCompletions()
+ 	}
+@@ -279,9 +309,14 @@
+ 		() => {
+ 			text.input()
+ 			let base = atoms
+-			let edit = options.change(text.value, base, text.takeReplacements())
++			let edit =
++				options.authority === "worker" && text.value === acceptedSource
++					? undefined
++					: options.change(text.value, base, text.takeReplacements())
+ 			composing = false
+-			if (edit) {
++			selectionGeneration = ++editorSelectionGeneration
++			if (edit && "kind" in edit) acceptPending()
++			else if (edit) {
+ 				let removed = new Set(edit.operation?.remove ?? [])
+ 				let local = base.filter(atom => !removed.has(atom.id))
+ 				let inserted = edit.operation?.insert ?? []
+@@ -331,6 +366,7 @@
+ 	textarea.addEventListener("copy", copySource, { signal: listeners.signal })
+ 	textarea.addEventListener("cut", copySource, { signal: listeners.signal })
+ 	textarea.onselect = () => {
++		selectionGeneration = ++editorSelectionGeneration
+ 		paintActiveLine()
+ 		options.select()
+ 	}
+@@ -435,6 +471,9 @@
+ 			}
+ 		},
+ 		update,
++		mergeSelection,
++		adoptMerged,
++		setEditable,
+ 		format,
+ 		command,
+ 		insert,
+@@ -461,7 +500,7 @@
+ 			schedulePaint()
+ 		},
+ 		mediaSelection() {
+-			if (composing || !inSync()) return
++			if (options.authority === "worker" || composing || !inSync()) return
+ 			let image = editorContext(text.value, text.selectionStart).image
+ 			return {
+ 				atoms,
+@@ -470,7 +509,7 @@
+ 			}
+ 		},
+ 		attachmentSelection() {
+-			if (composing || !inSync()) return
++			if (options.authority === "worker" || composing || !inSync()) return
+ 			return {
+ 				atoms,
+ 				start: text.selectionStart,
+@@ -478,7 +517,7 @@
+ 			}
+ 		},
+ 		selectionAnchor() {
+-			if (composing || !inSync()) return
++			if (options.authority === "worker" || composing || !inSync()) return
+ 			return selectionAnchor(
+ 				atoms,
+ 				text.value,
+@@ -914,7 +953,57 @@
+ 		}
+ 		collaborators.replaceChildren(fragment)
+ 	}
++	function acceptPending() {
++		acceptedSource = text.value
++		anchorIndices.clear()
++		lineActions.update()
++		schedulePaint()
++	}
++	function mergeSelection(): MergedEditorSelection {
++		return {
++			start: text.selectionStart,
++			end: text.selectionEnd,
++			direction: text.selectionDirection,
++			generation: selectionGeneration,
++			composing,
++			busy:
++				composing || dragging || secondarySelections.length > 0 || !inSync(),
++			source: text.value,
++		}
++	}
++	function adoptMerged(content: string, selection: MergedEditorSelection) {
++		if (
++			options.authority !== "worker" ||
++			composing ||
++			dragging ||
++			secondarySelections.length > 0 ||
++			listeners.signal.aborted ||
++			selection.generation !== selectionGeneration ||
++			selection.source !== text.value
++		)
++			return false
++		menu.hidden = true
++		completionItems = []
++		textarea.removeAttribute("aria-activedescendant")
++		acceptedSource = content
++		text.reconcile(content, selection.start, selection.end)
++		text.setSelectionRange(selection.start, selection.end, selection.direction)
++		selectionGeneration = ++editorSelectionGeneration
++		lineActions.update()
++		schedulePaint()
++		return true
++	}
++	function setEditable(nextEditable: boolean) {
++		editable = nextEditable
++		textarea.readOnly = !editable
++	}
+ 	function update(content: string, nextAtoms: Atom[], nextEditable: boolean) {
++		if (options.authority === "worker") {
++			options.report(
++				new Error("Worker editor requires resolved candidate adoption"),
++			)
++			return
++		}
+ 		editable = nextEditable
+ 		textarea.readOnly = !editable
+ 		if (composing) {
+@@ -1231,6 +1320,7 @@
+ 		// Alt, touch and IME composition keep the browser menu for spelling,
+ 		// selection handles and candidate pickers.
+ 		if (
++			options.authority === "worker" ||
+ 			composing ||
+ 			!inSync() ||
+ 			(!keyboard &&
+@@ -1526,6 +1616,7 @@
+ 	// Clipboard promises can outlive remote edits, so the range is held as atom
+ 	// anchors and resolved against the document once the clipboard settles.
+ 	function captureSelection() {
++		if (options.authority === "worker") return
+ 		if (!editable || composing || !inSync()) return
+ 		return {
+ 			start: anchor(text.selectionStart),
+@@ -1667,7 +1758,9 @@
+ 		}
+ 		if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "z") {
+ 			event.preventDefault()
+-			options.undo(event.shiftKey)
++			if (options.authority !== "worker") options.undo(event.shiftKey)
++			else
++				options.report(new Error("Worker undo delegation is not implemented"))
+ 			return
+ 		}
+ 		let mod = event.metaKey || event.ctrlKey,
+@@ -1702,7 +1795,9 @@
+ 		}
+ 		if (mod && key === "y") {
+ 			event.preventDefault()
+-			options.undo(true)
++			if (options.authority !== "worker") options.undo(true)
++			else
++				options.report(new Error("Worker undo delegation is not implemented"))
+ 			return
+ 		}
+ 		if (mod && event.shiftKey && key === "l") {
+@@ -2305,7 +2400,10 @@
+ 			event.inputType === "historyRedo"
+ 		) {
+ 			event.preventDefault()
+-			options.undo(event.inputType === "historyRedo")
++			if (options.authority !== "worker")
++				options.undo(event.inputType === "historyRedo")
++			else
++				options.report(new Error("Worker undo delegation is not implemented"))
+ 			return
+ 		}
+ 		if (
+--- a/src/client/source-textarea.ts
++++ b/src/client/source-textarea.ts
+@@ -144,7 +144,9 @@
+ 		replacements?: SourceReplacement[],
+ 	) {
+ 		if (source !== this.current.source) {
+-			this.pending = replacements ?? [difference(this.current.source, source)]
++			this.pending = replacements ?? [
++				sourceDifference(this.current.source, source),
++			]
+ 			this.transaction = Boolean(replacements)
+ 		}
+ 		this.render(source, { start, end })
+@@ -194,7 +196,7 @@
+ 		let replacements = this.pending
+ 		if (this.current.source === this.inputBase) replacements = []
+ 		else if (!replacements || (!this.transaction && replacements.length > 1))
+-			replacements = [difference(this.inputBase, this.current.source)]
++			replacements = [sourceDifference(this.inputBase, this.current.source)]
+ 		this.pending = undefined
+ 		this.transaction = false
+ 		this.inputBase = this.current.source
+@@ -276,7 +278,7 @@
+ 		reveal = false,
+ 	) {
+ 		if (next.source !== this.current.source) {
+-			let edit = difference(this.current.source, next.source)
++			let edit = sourceDifference(this.current.source, next.source)
+ 			this.sourceIndex.replace({
+ 				start: edit.start,
+ 				end: edit.start + edit.remove,
+@@ -297,7 +299,10 @@
+ 	}
+ }
+ 
+-function difference(before: string, after: string): SourceReplacement {
++export function sourceDifference(
++	before: string,
++	after: string,
++): SourceReplacement {
+ 	let start = 0
+ 	while (
+ 		start < before.length &&
+--- a/editor-queue.ts
++++ b/editor-queue.ts
+@@ -5,7 +5,7 @@
+ import * as Fiber from "effect/Fiber"
+ import * as Queue from "effect/Queue"
+ import * as Stream from "effect/Stream"
+-import type { TextReplacement } from "../../../src/shared/crdt"
++import type { TextReplacement } from "./src/shared/crdt"
+ import type { createWorkerSessionClient } from "./worker-client"
+ import { WorkerDocumentFailure } from "./worker-rpc"
+ 
+@@ -298,7 +298,11 @@
+ 			Effect.forkScoped({ startImmediately: true }),
+ 		)
+ 		return {
+-			replace(ranges: readonly TextReplacement[], expectedSource?: string) {
++			replace(
++				ranges: readonly TextReplacement[],
++				expectedSource?: string,
++				fallback?: () => readonly TextReplacement[],
++			) {
+ 				let changes = ranges.map(change => Object.freeze({ ...change }))
+ 				let pieces: string[] = []
+ 				let offset = 0
+@@ -309,7 +313,9 @@
+ 				pieces.push(source.slice(offset))
+ 				let nextSource = pieces.join("")
+ 				if (expectedSource !== undefined && nextSource !== expectedSource) {
+-					changes = [{ start: 0, remove: source.length, text: expectedSource }]
++					changes = fallback?.().map(change =>
++						Object.freeze({ ...change }),
++					) ?? [{ start: 0, remove: source.length, text: expectedSource }]
+ 					nextSource = expectedSource
+ 				}
+ 				source = nextSource

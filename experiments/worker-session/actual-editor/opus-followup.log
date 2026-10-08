@@ -1,0 +1,34 @@
+Read-only review; I ran no commands, tests or builds. I found one blocker that stops merges from working at all, and three bugs that can leave the editor in a bad state.
+
+**Blockers**
+
+1. **Every merge is declined.** The selection the editor returns has no `source` field (`editor-after.ts:957`), but the queue checks `selection.source !== merge.source` (`editor-queue.ts:112`). Either `tsc` rejects this at `bindings.ts:35`, or at runtime `undefined !== source`, so nothing is ever adopted. Fix: add `source: text.value` to `mergeSelection()`.
+2. **A detached view breaks the queue permanently.** `bindings.ts:31` throws when the view is gone, for example when the editor is re-rendered while a merge is in flight. Inside the accept check (`editor-queue.ts:110`) that throw sets `failure` for good, so the editor stays frozen. Called directly from `queue.merge()` (`:222`), it escapes as an uncaught exception. Fix: return a selection with `busy: true` instead of throwing.
+3. **An empty document never freezes.** In `fail()`, `if (source)` is false for `""` (`bindings.ts:15`). Use `!== undefined`, or call `setEditable(false)` unconditionally.
+4. **Merge and adopt failures aren't reported.** `bindings.merge` returns `saved` without passing failures to `fail()`. If Adopt fails after `adoptMerged`, the editor shows candidate text the worker never adopted. It only freezes on the next keystroke, when that edit is blocked. Fix: route `merge().saved` failures into `fail()`.
+
+**Merges can stall (no corruption)**
+
+5. **Nothing retries a merge when the editor goes idle.** Composition, drag, multicursor and unacknowledged edits each make it `busy`, and the merge is declined. Nothing tries again when composition ends, the pointer is released, multicursor is cleared, or the queue drains. On Android, Gboard can stay in composition while the caret sits inside a word, so remote changes may not appear until something else calls `merge`. Fix: have the host call `merge` again on those transitions. No new editor API is needed.
+6. **`dragging` can get stuck.** It is cleared only by `pointerup`/`pointercancel` on the window. If the window loses focus mid-drag, the editor stays `busy` indefinitely. Also clear it on `blur`.
+7. **Some merges are wasted round-trips.** `queue.merge` sends `MergeCandidate` even when the selection is already busy, so the request is always declined and then released. Return early instead.
+
+**Correctness checked, OK**
+
+- **IME:** At `compositionend`, the replacements come from `takeReplacements()`. With several recorded edits and no transaction it falls back to a minimal diff from the input base, so the edit sent is correct. The worker-only suppression of the no-op follow-up `input` is correct.
+- **Multicursor typing:** the transaction ranges are sorted and relative to the original text, which matches how the queue applies them.
+- **Formatting, line edits and typing helpers:** all go through the `input` event → `change` path, and are gated on `composing` and `inSync`.
+- **Adoption:** `reconcile` resets `inputBase`, so adopted text doesn't leak into the next edit's replacements. The generation check in `adoptMerged` always passes, because the queue passes the fresh selection. The real guard is the queue's compare, so it only works once fix 1 is in.
+- **Async "create document" completion:** the `editor.value !== source` check covers adoption during the await.
+
+**Gaps to state explicitly (not parity claims)**
+
+8. **Host-supplied offsets may be stale.** `comments()`, presence `cursor`, `search(results)` and `selectRange` offsets come from the host's possibly stale source. After an adoption these display at the wrong place, and none of them are gated. Either gate them in worker mode or record them as known cosmetic drift.
+9. **The host must not call `update()` in worker mode.** Each call reports an error and does not apply `editable`, so permission changes must go through `setEditable`.
+10. **Undo, Ctrl+Space and pasted files:**
+    - Undo reports an error on every keypress; make it a silent no-op or a one-time notice.
+    - Ctrl+Space on a wiki link or image does nothing yet still blocks the key, because the context menu is gated.
+    - Pasting files calls `options.attach`, which probably needs `attachmentSelection()`. That returns `undefined` in worker mode, so the host must handle it.
+11. **The queue's full-document fallback (`editor-queue.ts:205`) loses identity.** Replacing the whole text loses atom identity, so comments and other people's cursors detach. It should rarely trigger, given the diff-based replacements. Replacing it with a common prefix/suffix diff is a cheap fix.
+
+Nothing here needs a new editor architecture. Fixes 1–4 are each one or two lines. Until fix 1 is in, no runtime test will exercise adoption at all.

@@ -1,0 +1,35 @@
+PASS Actual native editor fixture ready
+PASS Actual multicursor selections are active
+actual-worker-timing-1791433855267 {
+  path: "/?size=1048576&cursors=2048",
+  readOnly: false,
+  size: "",
+  source: "---\ntitle: Worker fixture\n---\nTOKENX zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
+  sourceLength: 1050654,
+  view: "---\ntitle: Worker fixture\n---\nTOKENX zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
+}
+174 | 			evaluate(
+175 | 				session,
+176 | 				'({readOnly:document.querySelector("#editor")?.readOnly,tools:document.querySelector("#inspector-body")?.textContent,source:document.querySelector("alkalye-editor")?.source?.value.slice(0,500),sourceLength:document.querySelector("alkalye-editor")?.source?.value.length,view:document.querySelector("#editor")?.value.slice(0,500),status:document.querySelector("#save-status")?.textContent,retry:document.querySelector("#retry-save")?.hidden,toast:document.querySelector("#toast")?.textContent,results:window.documentApiResults?.slice(-8),failure:window.documentApiFailure,discussion:window.documentDiscussionStage,library:document.querySelector("#document-list")?.textContent,path:location.pathname+location.search,page:document.querySelector("[data-settings-page],[data-workspace-settings]")?.querySelector(".settings-content")?.id,appearance:document.documentElement.dataset.appearance,size:document.documentElement.style.getPropertyValue("--editor-size"),profile:document.querySelector(".profile-name")?.textContent.tri
+177 | 			),
+178 | 		)
+179 | 		throw new Error("Browser condition failed: " + source, { cause: error })
+                  ^
+error: Browser condition failed: window.workerEditorProof.inspect().source===window.inputExpected&&window.workerEditorProof.inspect().pending===0&&window.inputProof.raf2>0
+      at wait (/private/tmp/alkalye-worker-editor/runtime/tests/browser-driver.ts:179:13)
+      at /private/tmp/alkalye-worker-editor/runtime/timing.ts:28:3
+
+43 | 			},
+44 | 		},
+45 | 	)
+46 | 	if (result.status !== 0) {
+47 | 		let failure = result.error?.message || result.stderr || result.stdout
+48 | 		throw new Error(`${session} ${args[0]}: ${failure}`)
+                 ^
+error: actual-worker-timing-1791433855267 wait: {"success":false,"data":null,"error":"Wait timed out after 20000ms"}
+
+      at browser (/private/tmp/alkalye-worker-editor/runtime/tests/browser-driver.ts:48:13)
+      at wait (/private/tmp/alkalye-worker-editor/runtime/tests/browser-driver.ts:170:3)
+      at /private/tmp/alkalye-worker-editor/runtime/timing.ts:28:3
+
+Bun v1.4.0 (macOS arm64)

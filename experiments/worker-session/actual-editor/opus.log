@@ -1,0 +1,38 @@
+**Verdict: the approach works, but there are 5 blockers.** Each one has a small fix inside the existing `EditorElement`, and none needs a second editor architecture. The Applied path is unchanged apart from the shared generation counter, and gating comments, media, menus and clipboard is fine for the prototype.
+
+**Blockers**
+
+1. **Multicursor and drag state are invisible to the handoff.** `mergeSelection` (after.ts:948) only reports the primary range. `secondarySelections` (Cmd+D, Cmd+Shift+L, Alt+Cmd+arrow) don't bump the generation, and `adoptMerged` doesn't remap them, so after an adopt they point at offsets in the old text. A drag in progress (`dragging`, which holds the projection) has the same problem.
+   - Fix: rename the `composing` field to `busy`, set as `composing || dragging || secondarySelections.length > 0 || !inSync()`. The queue already refuses a busy selection.
+
+2. **Accept order in the queue.** At editor-queue.ts:107 the queue offers `adopt` and swaps epoch, sequence and source before it calls `accept`. `accept` returns void, so when `adoptMerged` returns false (aborted, generation moved, composing) the queue still adopts while the editor shows old text.
+   - Fix: change to `accept(...): boolean`. Call it first; if it returns false, return false so the existing release path runs. Only after it returns true, offer `adopt` and mutate state. `offerUnsafe` can only fail after `closed`, which can't change inside this synchronous block, so the order is safe.
+
+3. **Replacement hints are trusted blindly.** `queue.replace` applies ranges as sorted, non-overlapping and relative to the original `source` (editor-queue.ts:171-176). Some edit paths don't guarantee that:
+   - `text.replace(content, …)` without ranges: format, sort-tasks, `applyLineEdit`, `applyTyping`.
+   - Replacements collected across a whole IME composition, which may be sequential rather than relative to the original.
+   - Input inside projected (collapsed) link regions.
+   - Fix: in the worker `change()`, apply the hints to `queue.source`. If the result isn't `source`, fall back to a minimal diff of `queue.source` against `source`. Never enqueue unvalidated ranges.
+
+4. **Generation resets when the editor reconnects.** `selectionGeneration = 0` is per view. After disconnect and reconnect, a merge started under the old view can match generation 0 with identical offsets and be adopted on a different basis.
+   - Fix: use a module-level or element-level counter that only increases.
+
+5. **Stale completion offsets.** `adoptMerged` doesn't close the completion menu. `completionItems[].start/end` keep old-text offsets, and `chooseCompletion` passes `inSync()` (after.ts:2019), so it inserts in the wrong place.
+   - Fix: in `adoptMerged`, clear `completionItems`, hide `menu`, remove `aria-activedescendant` and clear `expansionHistory`.
+
+**Composition and IME (fine once 1 and 3 are done)**
+- `compositionstart` doesn't bump the generation, but `readSelection` reports composing, so the merge is refused. That's correct.
+- Safari, and some IMEs elsewhere, fire one more `input` after `compositionend`. That calls `change()` a second time with no net change and queues an empty edit.
+- Fix: skip `change()` in worker mode when `source === acceptedSource`. The same guard covers `compositionend` with no net change.
+
+**Smaller items**
+- **No main Replica, so no undo.** With worker authority, `options.undo` (Cmd+Z, Cmd+Y, `historyUndo`) has nothing behind it. Gate it with the other undelegated features.
+- **`update()` must not be called in worker mode.** With `atoms: []`, `positions()` collapses the selection to 0. Guard it with `authority === "worker"`. That also means editable/revocation changes no longer reach the editor, so add a small `setEditable`.
+- **A blocked queue isn't visible to the user.** If the queue fails, `change()` still reports pending and `acceptPending` treats it as accepted. On failure, set `readOnly` or return `undefined`. The same applies when `Adopt` fails after the editor has already switched to the merged text: make it read-only.
+- **`mergeSelection()` can return undefined** when there's no view. The host should treat that as busy.
+- **Native `select` event after `setSelectionRange` in `adoptMerged`.** It bumps the generation once more. Harmless: at worst it refuses one later merge.
+
+The rest checks out:
+- Typing goes synchronously from `oninput` through `change` to `queue.replace`, and later edits use the new epoch and run after `adopt` in FIFO order.
+- The queue re-checks epoch, sequence, source and generation plus start, end and direction, which catches caret moves even without a generation bump.
+- Direction is preserved, and offsets are in source coordinates.

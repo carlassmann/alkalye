@@ -1,0 +1,65 @@
+import * as Effect from "effect/Effect"
+import { sourceDifference } from "./src/client/source-textarea"
+import type {
+	EditorElement,
+	EditorOptions,
+	MergedEditorSelection,
+} from "./src/client/components/editor"
+import type { makeEditorQueue } from "./editor-queue"
+
+type EditorQueue = Effect.Success<ReturnType<typeof makeEditorQueue>>
+
+export function workerEditorBindings(
+	editor: EditorElement,
+	queue: EditorQueue,
+	fork: (effect: Effect.Effect<void, unknown>) => void,
+	report: (error: unknown) => void,
+) {
+	function fail(error: unknown) {
+		editor.setEditable(false)
+		fork(Effect.sync(() => report(error)))
+	}
+	let change: EditorOptions["change"] = (content, _base, replacements) => {
+		let previous = queue.state().source
+		let ranges = replacements ?? [sourceDifference(previous, content)]
+		try {
+			let pending = queue.replace(ranges, content, () => [
+				sourceDifference(previous, content),
+			])
+			fork(
+				pending.saved.pipe(
+					Effect.catch(error => Effect.sync(() => fail(error))),
+				),
+			)
+		} catch (error) {
+			fail(error)
+		}
+		return { kind: "pending" }
+	}
+	function selection(): MergedEditorSelection {
+		let selected = editor.mergeSelection()
+		if (!selected)
+			return {
+				start: 0,
+				end: 0,
+				direction: "none",
+				generation: 0,
+				composing: false,
+				busy: true,
+				source: queue.state().source,
+			}
+		return selected
+	}
+	function merge() {
+		let requested = queue.merge(selection, (source, selected) =>
+			editor.adoptMerged(source, selected),
+		)
+		return {
+			...requested,
+			saved: requested.saved.pipe(
+				Effect.tapError(error => Effect.sync(() => fail(error))),
+			),
+		}
+	}
+	return { change, merge }
+}

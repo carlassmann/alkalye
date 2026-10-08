@@ -1,0 +1,14 @@
+PASS Actual native editor fixture ready
+43 | 			},
+44 | 		},
+45 | 	)
+46 | 	if (result.status !== 0) {
+47 | 		let failure = result.error?.message || result.stderr || result.stdout
+48 | 		throw new Error(`${session} ${args[0]}: ${failure}`)
+                 ^
+error: actual-worker-timing-1791433775160 eval: spawnSync agent-browser ENOBUFS (stdout or stderr buffer reached maxBuffer size limit)
+      at browser (/private/tmp/alkalye-worker-editor/runtime/tests/browser-driver.ts:48:13)
+      at evaluate (/private/tmp/alkalye-worker-editor/runtime/tests/browser-driver.ts:166:9)
+      at /private/tmp/alkalye-worker-editor/runtime/timing.ts:24:3
+
+Bun v1.4.0 (macOS arm64)
