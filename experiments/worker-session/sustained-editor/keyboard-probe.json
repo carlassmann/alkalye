@@ -1,0 +1,114 @@
+{
+	"type": [
+		{
+			"data": "a",
+			"name": "beforeinput",
+			"target": "window",
+			"trusted": true
+		},
+		{
+			"data": "a",
+			"name": "beforeinput",
+			"target": "document",
+			"trusted": true
+		},
+		{
+			"data": "a",
+			"name": "beforeinput",
+			"target": "textarea",
+			"trusted": true
+		},
+		{
+			"data": "a",
+			"name": "input",
+			"target": "window",
+			"trusted": true
+		},
+		{
+			"data": "a",
+			"name": "input",
+			"target": "document",
+			"trusted": true
+		},
+		{
+			"data": "a",
+			"name": "input",
+			"target": "textarea",
+			"trusted": true
+		}
+	],
+	"press": [
+		{
+			"key": "b",
+			"name": "keydown",
+			"target": "window",
+			"trusted": true
+		},
+		{
+			"key": "b",
+			"name": "keydown",
+			"target": "document",
+			"trusted": true
+		},
+		{
+			"key": "b",
+			"name": "keydown",
+			"target": "textarea",
+			"trusted": true
+		},
+		{
+			"data": "b",
+			"name": "beforeinput",
+			"target": "window",
+			"trusted": true
+		},
+		{
+			"data": "b",
+			"name": "beforeinput",
+			"target": "document",
+			"trusted": true
+		},
+		{
+			"data": "b",
+			"name": "beforeinput",
+			"target": "textarea",
+			"trusted": true
+		},
+		{
+			"data": "b",
+			"name": "input",
+			"target": "window",
+			"trusted": true
+		},
+		{
+			"data": "b",
+			"name": "input",
+			"target": "document",
+			"trusted": true
+		},
+		{
+			"data": "b",
+			"name": "input",
+			"target": "textarea",
+			"trusted": true
+		},
+		{
+			"key": "b",
+			"name": "keyup",
+			"target": "window",
+			"trusted": true
+		},
+		{
+			"key": "b",
+			"name": "keyup",
+			"target": "document",
+			"trusted": true
+		},
+		{
+			"key": "b",
+			"name": "keyup",
+			"target": "textarea",
+			"trusted": true
+		}
+	]
+}

@@ -1,0 +1,17 @@
+[
+	{
+		"path": "/tmp/alkalye-worker-sustained/human-peer.json.trace.json",
+		"bytes": 50684886,
+		"sha256": "f80b516c37d7d53c7bd5d998c6e49c7b5f1787451b63cf5dc0ec73e5615b628a"
+	},
+	{
+		"path": "/tmp/alkalye-worker-sustained/human-peer-keys.json.trace.json",
+		"bytes": 52176371,
+		"sha256": "d4508bd317ca5ea548f5f6a2ccd5b66aa2c7c7c33f53242e9a63d935d6cd5eb3"
+	},
+	{
+		"path": "/tmp/alkalye-worker-sustained/burst-peer.json.trace.json",
+		"bytes": 42613098,
+		"sha256": "1ceb90cbd7a6a6d9c2d18aa4d7c8688a266abdad3caa67c6c7187a8dbc613895"
+	}
+]

@@ -1,0 +1,136 @@
+{
+	"arm": "human-peer",
+	"geometry": {
+		"height": 800,
+		"nativeCharacters": 2080,
+		"readonly": false,
+		"scrollHeight": 1030046,
+		"sourceCharacters": 1048606
+	},
+	"trustedInputs": 72,
+	"inputSpacingMs": {
+		"n": 71,
+		"median": 103.89999997615814,
+		"p95": 104.80000001192457,
+		"max": 106.10000002384186
+	},
+	"inputEnclosingMainTasksMs": {
+		"n": 72,
+		"median": 1.095,
+		"p95": 1.512,
+		"max": 2.704
+	},
+	"allMainTasksMs": {
+		"n": 5510,
+		"median": 0.015,
+		"p95": 0.376,
+		"max": 2.704
+	},
+	"workerTasksMs": {
+		"n": 6860,
+		"median": 0.014,
+		"p95": 0.716,
+		"max": 399.2
+	},
+	"frameGapsMs": {
+		"n": 1156,
+		"median": 16.69999999999709,
+		"p95": 16.700000000004366,
+		"max": 16.80000000000291
+	},
+	"maxQueueDepth": 38,
+	"maxAckLag": 38,
+	"maxQueuedInsertedCharacters": 38,
+	"postSentDrainUpperBoundMs": 8604.799999952316,
+	"mainHeapStartBytes": 23477291,
+	"mainHeapEndBytes": 97149933,
+	"mainHeapPeakBytes": 156410788,
+	"sent": {
+		"acknowledged": 34,
+		"applied": 34,
+		"failures": 0,
+		"inputs": 72,
+		"inserted": 38,
+		"pending": 38,
+		"sequence": 72,
+		"time": 25141.700000047684
+	},
+	"finalGauge": {
+		"acknowledged": 72,
+		"applied": 72,
+		"failures": 0,
+		"inserted": 0,
+		"pending": 0,
+		"sequence": 72
+	},
+	"finish": {
+		"done": true,
+		"result": {
+			"accepted": {
+				"position": 77,
+				"sha256": "80ec5e1a1f45c8c533cbc104a353b6c6196282edf44d9c0bbbc72091181f5526",
+				"sourceCharacters": 1048702
+			},
+			"editorExact": true,
+			"expectedCharacters": 1048702,
+			"failures": [],
+			"localReopenExact": true,
+			"merged": true,
+			"peerCompleted": 4,
+			"peerTimes": [
+				{
+					"end": 41305.60000002384,
+					"index": 0,
+					"replaced": 41305.60000002384,
+					"start": 17594.80000001192
+				},
+				{
+					"end": 42715.10000002384,
+					"index": 1,
+					"replaced": 42715.10000002384,
+					"start": 41808.70000004768
+				},
+				{
+					"end": 43720.30000001192,
+					"index": 2,
+					"replaced": 43720.30000001192,
+					"start": 43218.20000004768
+				},
+				{
+					"end": 44940.5,
+					"index": 3,
+					"replaced": 44940.5,
+					"start": 44223.10000002384
+				}
+			],
+			"pending": 0,
+			"rejected": 0,
+			"sha256": "80ec5e1a1f45c8c533cbc104a353b6c6196282edf44d9c0bbbc72091181f5526",
+			"unsaved": 0,
+			"workerExact": true
+		},
+		"time": 52492.20000004768
+	},
+	"topMainTasks": [
+		{
+			"ms": 2.704,
+			"afterStartMs": 30.31
+		},
+		{
+			"ms": 1.795,
+			"afterStartMs": 11952.73
+		},
+		{
+			"ms": 1.657,
+			"afterStartMs": 968.413
+		},
+		{
+			"ms": 1.61,
+			"afterStartMs": 6163.8
+		},
+		{
+			"ms": 1.512,
+			"afterStartMs": 2423.049
+		}
+	]
+}

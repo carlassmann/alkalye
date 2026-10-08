@@ -1,0 +1,52 @@
+Read-only review of the 6 files. Nothing was run, so all of this comes from reading the code.
+
+**Blockers**
+
+1. **Burst arm has no real overlap with peers.** The first peer waits 500ms (`browser-fixture.ts:134`), but one `keyboard type` of 72 chars likely finishes well before that. So all 4 peer edits land after the burst, and "concurrent" isn't shown.
+   - Fix: record `{index, start, end}` per peer edit, return it from `finishSustained`, and assert it overlaps `[inputs[0].time, inputs.at(-1).time]`. For the burst arm, set the first delay to 0 or start typing only after the first peer's `Sync` resolves.
+
+2. **The human 100ms cadence isn't checked.** The rate depends on agent-browser's `eval` awaiting the promise (`sustained.ts:24`). If it doesn't, the human arm turns into a burst.
+   - Fix: assert from `inputs` that median gap ≥100ms and min gap ≥~90ms, and report p50/p95/max.
+
+3. **The peer count isn't asserted.** `peers` only becomes 4 when the arm name contains "peer" (`sustained.ts:9`), so `human` or `burst` silently run with 0 peers and still pass.
+   - Fix: add `value.peerCompleted===${peers}&&${peers}===4` to the final assert. Also assert `inputs.map(i=>i.data).join('')===text`.
+
+4. **Local reopen doesn't prove the editor worker's own durability.**
+   - Both workers use identical `options`, so `documentDatabaseName(options)` gives them the same IndexedDB journal.
+   - The reopen goes through `peer` (`browser-fixture.ts:162-164`), whose session had already synced the typed ops from the server.
+   - The editor worker is never closed.
+   - Fix: block network, `peer.Close()`, `worker.Close()`, then `worker.Open(options)` and compare that source. Or state plainly that the claim is "shared-origin journal reopen".
+
+5. **Network block can leak.** `/__tests/network?blocked=1` isn't undone if `Close` or `Open` throws, and the `blocked` flag lives on the server. A reused server then makes the next arm fail.
+   - Fix: `try { … } finally { await fetch("/__tests/network?blocked=0") }`.
+
+6. **Proof-only overhead on the main thread skews timing and isolation numbers.**
+   - Every `ReplaceQueued` sends back the full 1MiB `source` (`worker-session.ts:143`), which the main thread decodes and then compares against `expectedSource` (`editor-queue.ts:283`). That's about 2×1MiB of work per keystroke.
+   - Each peer edit also returns a 1MiB `read()` (from `Replace`) plus a 1MiB `Read` on the editor's page.
+   - Fix: return a length or hash instead of the full source, or turn the check off for timing runs. For an isolation claim, run the peer in a separate agent-browser session or isolated context. That also removes the shared IndexedDB problem in item 4.
+
+**Should fix**
+
+7. **Drain wait can pass too early.** If `EditorElement` delays its `change` callback, `pending===0` is already true at `sent` (`sustained.ts:29`), which makes the drain time wrong.
+   - Fix: wait on `editor.source.value.endsWith(text) && pending===0`.
+
+8. **No evidence the editor worker took in peer ops during typing.** It may only see them at the final `Sync`, so the concurrency would happen only on the server.
+   - Fix: sample a cheap revision probe, i.e. a new RPC that returns `session.version()` without the source, and record when it first changes.
+
+9. **Queue metrics only show depth.** There's no per-edit latency.
+   - Fix: record enqueue → ack time per edit sequence in `editor-queue.ts`.
+
+10. **"True keyboard" is unproven.** `beforeinput` alone doesn't tell real key events apart from CDP `insertText`.
+    - Fix: also count trusted `keydown` events and assert there are 72.
+
+11. **`merged` isn't asserted.** `editorExact` covers it indirectly, but add `merged===true` so a failure points at the right cause.
+
+**Verified OK**
+
+- **Peer order:** `unshift` gives `PEER3…PEER0` in front, which is correct because each peer reads its own previous prefix before inserting at 0.
+- **Typed text:** goes at the end, mapped through the basis atoms.
+- **Server check:** the server SHA-256 comes from a SQLite snapshot rebuilt independently. Both sides hash UTF-8, so the comparison is valid.
+- **Pending/unsaved/rejected:** read after `Flush`+`Sync`.
+- **Deadlocks:** I found none. Each worker uses one semaphore, the editor worker gets no `Sync` during typing, `peerWork` never rejects, the merge only runs once `pending` is empty, and the finish wait is bounded.
+
+Separately, the claude.ai connectors in this session need to be authorized in your claude.ai connector settings before they can be used. None were needed for this review.

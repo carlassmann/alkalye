@@ -1,0 +1,4 @@
+export default {
+    project: "alkalye-worker-sustained",
+    commands: { web: { run: "bun server.ts", autoStart: true, route: false, portless: false } },
+}
