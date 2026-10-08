@@ -256,6 +256,15 @@
 			This improves undo latency, not the frame budget. Samples:
 			<code>experiments/performance/undo-fork/empty-inverse-results.json</code>.
 		</p>
+		<p>
+			A separate CPU-sampled 1 MiB undo run traced a 314 ms animation-frame
+			callback to two costs: roughly 150 ms rebuilding cold document text and
+			138 ms resolving cursor positions. The editor fallback creates offsets
+			and an ID lookup for every atom. These are sampled call-tree durations,
+			not an additional matched latency comparison. The next changes target
+			cooperative text preparation before rendering and exact cursor resolution
+			with a small candidate set.
+		</p>
 		<h2>Body edits remain incremental after metadata changes</h2>
 		<p>
 			Merged frontmatter can leave raw and canonical atom arrays with different
