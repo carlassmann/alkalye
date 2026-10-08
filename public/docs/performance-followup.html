@@ -363,6 +363,25 @@
 			comments UI. Evidence: <code>experiments/worker-session/comments</code>.
 		</p>
 		<p>
+			An unchanged Markdown source now reuses parsed link tokens when the caret
+			moves. Selection projection still runs, and document-title changes
+			invalidate the cache. In an isolated actual Editor, the median largest
+			main-thread task during a 1MiB caret interaction fell from 4.23 to 2.53ms
+			in the middle and from 4.52 to 2.32ms near the end. These moves kept the
+			same active-link set. The 128KiB results were mixed. All 24 trusted-key
+			cells passed exact source, selection, mapping and bounded-viewport checks;
+			48 existing browser checks also passed.
+		</p>
+		<p>
+			The largest main-thread task across those complete three-second traces
+			fell from 6.00 to 4.43ms. These tests omit the full app, network and CRDT
+			work. Two-frame paint opportunities stayed around 26–30ms in the 60Hz
+			browser, so this proves a smaller task, not physical 120Hz presentation or
+			lower end-to-end latency. Link-boundary transition speed remains
+			unmeasured. Evidence:
+			<code>experiments/performance/projection-selection</code>.
+		</p>
+		<p>
 			Active-line geometry caching was rejected. Six valid rich-document wheel
 			cells showed no consistent layout or paint gain, and geometry fixtures did
 			not prove correctness across a viewport-top shift. The 1MiB arm failed an

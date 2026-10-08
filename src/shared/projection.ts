@@ -43,12 +43,16 @@ interface TokenLine {
 }
 export class Projector {
 	private lines: TokenLine[] = []
+	private source: string | undefined
+	private tokens: LinkToken[] = []
 	private documents = ""
 	project(source: string, options: ProjectionOptions = {}) {
 		let documents = options.documents ?? []
 		let key = documents.map(doc => doc.id + ":" + doc.title).join("\n")
 		let changed = key !== this.documents
 		this.documents = key
+		if (source === this.source && !changed)
+			return projectTokens(source, options, this.tokens)
 		let texts = source.split("\n"),
 			offset = 0,
 			first = true
@@ -120,6 +124,8 @@ export class Projector {
 			for (let token of line.tokens) tokens.push(token)
 		}
 		this.lines = lines
+		this.source = source
+		this.tokens = tokens
 		return projectTokens(source, options, tokens)
 	}
 }

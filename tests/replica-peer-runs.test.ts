@@ -16,9 +16,11 @@ function rebuilt(replica: Replica) {
 		let warm = replica.fork("offset-probe"),
 			cold = restored.fork("offset-probe")
 		let replacement = { start: position, remove: 2, text: "🦋" }
-		expect(warm.prepareReplacements("doc", [replacement])).toEqual(
-			cold.prepareReplacements("doc", [replacement]),
-		)
+		let actual = warm.prepareReplacements("doc", [replacement])
+		let expected = cold.prepareReplacements("doc", [replacement])
+		if (!actual || !expected) throw Error("Missing offset edit")
+		// Independent preparations sample the wall clock separately.
+		expect(actual).toEqual({ ...expected, time: actual.time })
 	}
 }
 function seed(source: string) {
