@@ -222,6 +222,18 @@
 			reproduction commands:
 			<code>experiments/performance/twenty-writer-http</code>.
 		</p>
+		<p>
+			A separate server sampling run traced the cost to rebuilding document
+			text for sidebar summaries. Of 10,965 function samples, raw traversal
+			accounted for about 46% and canonical header reconstruction for 20%.
+			The inclusive text call covered about 84%; these counts overlap.
+			Every mapped raw traversal sample came through summary projection.
+			This identifies a reconstruction bottleneck, not a transport wait.
+			The sampled run is diagnostic evidence, not a latency comparison.
+			A broader validated insertion cache is the next experiment; it has
+			not been adopted. Evidence:
+			<code>experiments/performance/twenty-writer-http/diagnostic</code>.
+		</p>
 		<h2>8 October: mobile taps and cached switching</h2>
 		<p>
 			Mobile pointer handling was expanding and aligning a document that was
