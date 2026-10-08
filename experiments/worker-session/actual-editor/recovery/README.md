@@ -10,6 +10,6 @@ Controlled transport faults drop a reply after the real worker completes it, or 
 
 The first run timed out reopening the disposed same URL. Preserved in recovery-navigation-failure.log. Fresh isolated browser sessions per scenario passed. No performance, different-account peer, physical IME, clipboard, accessibility or server acceptance claim. Flush checks the local journal only. Full-app worker ownership and feature parity remain unimplemented.
 
-Source and bundle hashes in results.json refer to the executed outside files, before artifact formatting. editor-worker.patch applies to the recorded production head. Remaining files replace the corresponding outside fixture files. Run its server.ts, then recovery-journey.ts and undo-journey.ts with the printed URL. Both use background agent-browser with a stable 20000 ms default timeout.
+Source and bundle hashes in results.json refer to the executed outside files, before artifact formatting. editor-worker.patch applies to the recorded production head. Snapshot sources use .ts.txt names so workspace checks do not compile the disposable fixture. Remove the .txt suffix when copying them into the outside runtime. Run server.ts, then recovery-journey.ts and undo-journey.ts with the printed URL. Both use background agent-browser with a stable 20000 ms default timeout.
 
 written with gpt-6 in codex
