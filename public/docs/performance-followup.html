@@ -234,36 +234,37 @@
 		<p>
 			Action staging now uses a detached, cooperative replica fork instead of
 			encoding and restoring the entire checkpoint. In three matched browser
-			trials per version, undo in a 1 MiB document reached two paint opportunities
-			in 626.6 ms median, down from 1,259.8 ms. The largest main-thread task fell
-			from 853.7 to 290.3 ms; the fully accepted checkpoint took 2,605.1 ms,
-			down from 3,008.3 ms.
+			trials per version, undo in a 1 MiB document reached two paint
+			opportunities in 626.6 ms median, down from 1,259.8 ms. The largest
+			main-thread task fell from 853.7 to 290.3 ms; the fully accepted
+			checkpoint took 2,605.1 ms, down from 3,008.3 ms.
 		</p>
 		<p>
 			Both clients used the same native server and restored identical disposable
-			data and browser profiles. All six trials passed exact source, trusted undo,
-			strictly newer accepted-checkpoint and zero pending/rejected-action checks.
-			Loaded chunk URLs and decoded sizes matched expected builds; loaded bytes
-			were not cryptographically verified. These tasks still exceed 8.33 ms.
-			Samples and method: <code>experiments/performance/undo-fork/</code>.
+			data and browser profiles. All six trials passed exact source, trusted
+			undo, strictly newer accepted-checkpoint and zero pending/rejected-action
+			checks. Loaded chunk URLs and decoded sizes matched expected builds;
+			loaded bytes were not cryptographically verified. These tasks still exceed
+			8.33 ms. Samples and method:
+			<code>experiments/performance/undo-fork/</code>.
 		</p>
 		<p>
-			A separate three-trial comparison then skipped source materialization
-			when text undo has no register restoration. Median time to two paint
+			A separate three-trial comparison then skipped source materialization when
+			text undo has no register restoration. Median time to two paint
 			opportunities fell from 672.0 to 545.6 ms; the accepted checkpoint fell
 			from 2,659.6 to 2,241.4 ms. The largest task remained slow: 316.1 versus
-			332.3 ms. All six exact-source and accepted-state checks passed.
-			This improves undo latency, not the frame budget. Samples:
+			332.3 ms. All six exact-source and accepted-state checks passed. This
+			improves undo latency, not the frame budget. Samples:
 			<code>experiments/performance/undo-fork/empty-inverse-results.json</code>.
 		</p>
 		<p>
 			A separate CPU-sampled 1 MiB undo run traced a 314 ms animation-frame
 			callback to two costs: roughly 150 ms rebuilding cold document text and
-			138 ms resolving cursor positions. The editor fallback creates offsets
-			and an ID lookup for every atom. These are sampled call-tree durations,
-			not an additional matched latency comparison. The next changes target
-			cooperative text preparation before rendering and exact cursor resolution
-			with a small candidate set.
+			138 ms resolving cursor positions. The editor fallback creates offsets and
+			an ID lookup for every atom. These are sampled call-tree durations, not an
+			additional matched latency comparison. The next changes target cooperative
+			text preparation before rendering and exact cursor resolution with a small
+			candidate set.
 		</p>
 		<p>
 			Exact cursor recovery now uses a small candidate set and one shared atom
@@ -278,27 +279,38 @@
 			<code>experiments/performance/undo-fork/caret-results.json</code>.
 		</p>
 		<p>
-			A private staged-warming experiment was rejected. In three matched
-			browser trials per version, the largest undo task fell from 188.4 to
-			25.4 ms, but two paint opportunities increased from 368.1 to 1,313.5 ms.
-			Sampled post-undo heap increased from 619 to 1,051 MB. Single-character
-			input stayed near 4.6 ms. All six exact-source and accepted-state checks
-			passed. Repeated full-map preparation delays the result despite shorter
-			tasks; the experiment does not establish instant interaction. Production
-			keeps the earlier cursor fix. Method and rejected patch:
+			A private staged-warming experiment was rejected. In three matched browser
+			trials per version, the largest undo task fell from 188.4 to 25.4 ms, but
+			two paint opportunities increased from 368.1 to 1,313.5 ms. Sampled
+			post-undo heap increased from 619 to 1,051 MB. Single-character input
+			stayed near 4.6 ms. All six exact-source and accepted-state checks passed.
+			Repeated full-map preparation delays the result despite shorter tasks; the
+			experiment does not establish instant interaction. Production keeps the
+			cursor optimizations. Method and rejected patch:
 			<code>experiments/performance/cooperative-prepare/</code>.
 		</p>
 		<p>
-			Large-deletion cursor recovery now returns immediately for empty text
-			and uses shared native iterator scans for distant surviving atoms.
-			An actual EditorElement component matrix measured 1 MiB-to-empty updates
-			at 170.6 versus 1.1 ms, and reordered sparse survivors at 156.1 versus
-			70.1 ms. All twelve cells passed exact source and cursor checks; ten
-			public editor contracts passed, including distinct endpoints and legacy
-			Unicode widths. Each matrix cell has one sample. These exclude document
-			storage and initial rendering, and do not prove whole-app latency or
-			120 Hz presentation. The nonempty fallback remains linear. Method:
+			Large-deletion cursor recovery now returns immediately for empty text and
+			uses shared native iterator scans for distant surviving atoms. An actual
+			EditorElement component matrix measured 1 MiB-to-empty updates at 170.6
+			versus 1.1 ms, and reordered sparse survivors at 156.1 versus 70.1 ms. All
+			twelve cells passed exact source and cursor checks; ten public editor
+			contracts passed, including distinct endpoints and legacy Unicode widths.
+			Each matrix cell has one sample. These exclude document storage and
+			initial rendering, and do not prove whole-app latency or 120 Hz
+			presentation. The nonempty fallback remains linear. Method:
 			<code>experiments/performance/editor-anchor-fallback/</code>.
+		</p>
+		<p>
+			A separate matched experiment used real Replica-generated atom IDs. Three
+			alternating pairs measured sparse survivor updates at 5.5 versus 0.4 ms
+			for 128 KiB and 20.6 versus 0.7 ms for 1 MiB. The shortcut verifies every
+			survivor's exact old identity before using its predicted position;
+			unverified cases retain the full scan. Sixteen public cursor contracts
+			passed. These component measurements exclude storage and initial
+			rendering. They cover sparse deletions, and do not establish ordinary
+			large-document typing or 120 Hz presentation. This generated-ID fixture
+			has a different baseline from the earlier manual-ID matrix.
 		</p>
 		<h2>Body edits remain incremental after metadata changes</h2>
 		<p>
