@@ -1,0 +1,19 @@
+main True sampledTargetTaskSelfMs 23.797
+4.171 6.118 projectionFor {'source': '../src/client/source-textarea.ts', 'line': 242, 'column': 23, 'name': ''}
+2.373 4.912 render {'source': '../src/client/editor-viewport.ts', 'line': 356, 'column': 8, 'name': ''}
+2.079 2.079 (program) None
+1.602 6.74 apply {'source': '../src/client/source-textarea.ts', 'line': 279, 'column': 15, 'name': ''}
+1.514 2.539 paint {'source': '../src/client/editor-viewport.ts', 'line': 863, 'column': 15, 'name': ''}
+1.3 1.3  {'source': '../src/client/document-app.ts', 'line': 1539, 'column': 10, 'name': ''}
+1.296 1.296  {'source': '../src/client/document-app.ts', 'line': 1539, 'column': 10, 'name': ''}
+1.162 1.162 Wr {'source': '../src/shared/text-index.ts', 'line': 47, 'column': 25, 'name': ''}
+1.157 1.932 update {'source': '../src/client/components/editor-overlay.ts', 'line': 40, 'column': 8, 'name': ''}
+1.071 1.071 (garbage collector) None
+0.906 2.068 tr {'source': '../src/shared/text-index.ts', 'line': 63, 'column': 17, 'name': ''}
+0.772 0.772  {'source': '../src/client/components/library.ts', 'line': 159, 'column': 13, 'name': ''}
+0.651 0.651 project {'source': '../src/shared/projection.ts', 'line': 87, 'column': 9, 'name': ''}
+0.645 0.645 V {'source': '../src/shared/markdown.ts', 'line': 436, 'column': 26, 'name': ''}
+0.514 0.514 getBoundingClientRect None
+main False sampledTargetTaskSelfMs 25.774
+15.615 15.615 (idle) None
+10.159 10.159 (program) None

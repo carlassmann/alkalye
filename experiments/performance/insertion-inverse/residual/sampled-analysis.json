@@ -1,0 +1,987 @@
+{
+	"cpuSampling": true,
+	"undoInitiatingTaskMs": 0.68,
+	"sampledTargetTaskMs": 23.635,
+	"targetStartRelativeMs": 179.839,
+	"allTaskMaxMs": 23.635,
+	"deferredMaxMs": 23.635,
+	"profiles": [
+		{
+			"main": true,
+			"sampledTargetTaskSelfMs": 23.797,
+			"self": [
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 3281,
+						"functionName": "projectionFor",
+						"lineNumber": 69,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 4.171,
+					"inclusiveMs": 6.118,
+					"mapped": {
+						"source": "../src/client/source-textarea.ts",
+						"line": 242,
+						"column": 23,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 9087,
+						"functionName": "render",
+						"lineNumber": 59,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 2.373,
+					"inclusiveMs": 4.912,
+					"mapped": {
+						"source": "../src/client/editor-viewport.ts",
+						"line": 356,
+						"column": 8,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(program)",
+						"scriptId": 0
+					},
+					"selfMs": 2.079,
+					"inclusiveMs": 2.079,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 391,
+						"functionName": "apply",
+						"lineNumber": 70,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 1.602,
+					"inclusiveMs": 6.74,
+					"mapped": {
+						"source": "../src/client/source-textarea.ts",
+						"line": 279,
+						"column": 15,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 3299,
+						"functionName": "paint",
+						"lineNumber": 62,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 1.514,
+					"inclusiveMs": 2.539,
+					"mapped": {
+						"source": "../src/client/editor-viewport.ts",
+						"line": 863,
+						"column": 15,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 17817,
+						"functionName": "",
+						"lineNumber": 1569,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 1.3,
+					"inclusiveMs": 1.3,
+					"mapped": {
+						"source": "../src/client/document-app.ts",
+						"line": 1539,
+						"column": 10,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 17817,
+						"functionName": "",
+						"lineNumber": 1569,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 1.296,
+					"inclusiveMs": 1.296,
+					"mapped": {
+						"source": "../src/client/document-app.ts",
+						"line": 1539,
+						"column": 10,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1638,
+						"functionName": "Wr",
+						"lineNumber": 30,
+						"scriptId": 25,
+						"url": "http://127.0.0.1:4461/chunks/document-app-qnhnen76.js"
+					},
+					"selfMs": 1.162,
+					"inclusiveMs": 1.162,
+					"mapped": {
+						"source": "../src/shared/text-index.ts",
+						"line": 47,
+						"column": 25,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 228,
+						"functionName": "update",
+						"lineNumber": 83,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 1.157,
+					"inclusiveMs": 1.932,
+					"mapped": {
+						"source": "../src/client/components/editor-overlay.ts",
+						"line": 40,
+						"column": 8,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(garbage collector)",
+						"scriptId": 0
+					},
+					"selfMs": 1.071,
+					"inclusiveMs": 1.071,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1858,
+						"functionName": "tr",
+						"lineNumber": 30,
+						"scriptId": 25,
+						"url": "http://127.0.0.1:4461/chunks/document-app-qnhnen76.js"
+					},
+					"selfMs": 0.906,
+					"inclusiveMs": 2.068,
+					"mapped": {
+						"source": "../src/shared/text-index.ts",
+						"line": 63,
+						"column": 17,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 212,
+						"functionName": "",
+						"lineNumber": 1234,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 0.772,
+					"inclusiveMs": 0.772,
+					"mapped": {
+						"source": "../src/client/components/library.ts",
+						"line": 159,
+						"column": 13,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1236,
+						"functionName": "project",
+						"lineNumber": 11,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 0.651,
+					"inclusiveMs": 0.651,
+					"mapped": {
+						"source": "../src/shared/projection.ts",
+						"line": 87,
+						"column": 9,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 13,
+						"functionName": "V",
+						"lineNumber": 30,
+						"scriptId": 33,
+						"url": "http://127.0.0.1:4461/chunks/document-app-sr56q0yc.js"
+					},
+					"selfMs": 0.645,
+					"inclusiveMs": 0.645,
+					"mapped": {
+						"source": "../src/shared/markdown.ts",
+						"line": 436,
+						"column": 26,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"functionName": "getBoundingClientRect",
+						"scriptId": 0
+					},
+					"selfMs": 0.514,
+					"inclusiveMs": 0.514,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"functionName": "getBoundingClientRect",
+						"scriptId": 0
+					},
+					"selfMs": 0.511,
+					"inclusiveMs": 0.511,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"functionName": "getBoundingClientRect",
+						"scriptId": 0
+					},
+					"selfMs": 0.429,
+					"inclusiveMs": 0.429,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 119369,
+						"functionName": "documents",
+						"lineNumber": 7,
+						"scriptId": 17,
+						"url": "http://127.0.0.1:4461/chunks/document-app-p9w1sy1m.js"
+					},
+					"selfMs": 0.253,
+					"inclusiveMs": 0.384,
+					"mapped": {
+						"source": "../src/shared/document-session.ts",
+						"line": 1897,
+						"column": 3,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 712,
+						"functionName": "Bt",
+						"lineNumber": 70,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 0.135,
+					"inclusiveMs": 0.135,
+					"mapped": {
+						"source": "../src/client/source-textarea.ts",
+						"line": 306,
+						"column": 20,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 688,
+						"functionName": "k",
+						"lineNumber": 0,
+						"scriptId": 27,
+						"url": "http://127.0.0.1:4461/chunks/document-app-fqa9pay0.js"
+					},
+					"selfMs": 0.131,
+					"inclusiveMs": 0.131,
+					"mapped": {
+						"source": "../src/shared/document-metadata.ts",
+						"line": 59,
+						"column": 33,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"functionName": "URL",
+						"scriptId": 0
+					},
+					"selfMs": 0.13,
+					"inclusiveMs": 0.13,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 16881,
+						"functionName": "ti",
+						"lineNumber": 87,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 0.13,
+					"inclusiveMs": 0.13,
+					"mapped": {
+						"source": "../src/client/components/editor.ts",
+						"line": 962,
+						"column": 20,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 4552,
+						"functionName": "Xi",
+						"lineNumber": 2,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 0.13,
+					"inclusiveMs": 0.13,
+					"mapped": {
+						"source": "../src/client/shortcuts.ts",
+						"line": 110,
+						"column": 36,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"functionName": "set innerHTML",
+						"scriptId": 0
+					},
+					"selfMs": 0.13,
+					"inclusiveMs": 0.13,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 947,
+						"functionName": "F",
+						"lineNumber": 32,
+						"scriptId": 25,
+						"url": "http://127.0.0.1:4461/chunks/document-app-qnhnen76.js"
+					},
+					"selfMs": 0.129,
+					"inclusiveMs": 0.129,
+					"mapped": {
+						"source": "../src/shared/text-index.ts",
+						"line": 115,
+						"column": 16,
+						"name": ""
+					}
+				}
+			],
+			"inclusive": [
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(root)",
+						"scriptId": 0
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 23.797,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 475,
+						"functionName": "",
+						"lineNumber": 1652,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 18.286,
+					"mapped": {
+						"source": "../src/client/document-app.ts",
+						"line": 2654,
+						"column": 19,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 2088,
+						"functionName": "cn",
+						"lineNumber": 1578,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 15.702,
+					"mapped": {
+						"source": "../src/client/document-app.ts",
+						"line": 2293,
+						"column": 27,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 823,
+						"functionName": "$t",
+						"lineNumber": 1652,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 15.702,
+					"mapped": {
+						"source": "../src/client/document-app.ts",
+						"line": 2683,
+						"column": 3,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 16305,
+						"functionName": "tt",
+						"lineNumber": 87,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 15.185,
+					"mapped": {
+						"source": "../src/client/components/editor.ts",
+						"line": 921,
+						"column": 17,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 3055,
+						"functionName": "update",
+						"lineNumber": 87,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 15.185,
+					"mapped": {
+						"source": "../src/client/components/editor.ts",
+						"line": 119,
+						"column": 8,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 3104,
+						"functionName": "render",
+						"lineNumber": 69,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 12.858,
+					"mapped": {
+						"source": "../src/client/source-textarea.ts",
+						"line": 229,
+						"column": 16,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1726,
+						"functionName": "reconcile",
+						"lineNumber": 69,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 12.858,
+					"mapped": {
+						"source": "../src/client/source-textarea.ts",
+						"line": 153,
+						"column": 11,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 391,
+						"functionName": "apply",
+						"lineNumber": 70,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 1.602,
+					"inclusiveMs": 6.74,
+					"mapped": {
+						"source": "../src/client/source-textarea.ts",
+						"line": 279,
+						"column": 15,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 3281,
+						"functionName": "projectionFor",
+						"lineNumber": 69,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 4.171,
+					"inclusiveMs": 6.118,
+					"mapped": {
+						"source": "../src/client/source-textarea.ts",
+						"line": 242,
+						"column": 23,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 9087,
+						"functionName": "render",
+						"lineNumber": 59,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 2.373,
+					"inclusiveMs": 4.912,
+					"mapped": {
+						"source": "../src/client/editor-viewport.ts",
+						"line": 356,
+						"column": 8,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 18314,
+						"functionName": "ze",
+						"lineNumber": 1569,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 2.584,
+					"mapped": {
+						"source": "../src/client/document-app.ts",
+						"line": 1575,
+						"column": 26,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 3299,
+						"functionName": "paint",
+						"lineNumber": 62,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 1.514,
+					"inclusiveMs": 2.539,
+					"mapped": {
+						"source": "../src/client/editor-viewport.ts",
+						"line": 863,
+						"column": 15,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 2069,
+						"functionName": "er",
+						"lineNumber": 32,
+						"scriptId": 25,
+						"url": "http://127.0.0.1:4461/chunks/document-app-qnhnen76.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 2.197,
+					"mapped": {
+						"source": "../src/shared/text-index.ts",
+						"line": 177,
+						"column": 15,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 2703,
+						"functionName": "oe",
+						"lineNumber": 32,
+						"scriptId": 25,
+						"url": "http://127.0.0.1:4461/chunks/document-app-qnhnen76.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 2.197,
+					"mapped": {
+						"source": "../src/shared/text-index.ts",
+						"line": 215,
+						"column": 13,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(program)",
+						"scriptId": 0
+					},
+					"selfMs": 2.079,
+					"inclusiveMs": 2.079,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1858,
+						"functionName": "tr",
+						"lineNumber": 30,
+						"scriptId": 25,
+						"url": "http://127.0.0.1:4461/chunks/document-app-qnhnen76.js"
+					},
+					"selfMs": 0.906,
+					"inclusiveMs": 2.068,
+					"mapped": {
+						"source": "../src/shared/text-index.ts",
+						"line": 63,
+						"column": 17,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 228,
+						"functionName": "update",
+						"lineNumber": 83,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 1.157,
+					"inclusiveMs": 1.932,
+					"mapped": {
+						"source": "../src/client/components/editor-overlay.ts",
+						"line": 40,
+						"column": 8,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 19262,
+						"functionName": "me",
+						"lineNumber": 87,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 1.932,
+					"mapped": {
+						"source": "../src/client/components/editor.ts",
+						"line": 1157,
+						"column": 25,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 17677,
+						"functionName": "Ia",
+						"lineNumber": 1569,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 1.684,
+					"mapped": {
+						"source": "../src/client/document-app.ts",
+						"line": 1530,
+						"column": 21,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 17817,
+						"functionName": "",
+						"lineNumber": 1569,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 1.3,
+					"inclusiveMs": 1.3,
+					"mapped": {
+						"source": "../src/client/document-app.ts",
+						"line": 1539,
+						"column": 10,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 17817,
+						"functionName": "",
+						"lineNumber": 1569,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 1.296,
+					"inclusiveMs": 1.296,
+					"mapped": {
+						"source": "../src/client/document-app.ts",
+						"line": 1539,
+						"column": 10,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 17677,
+						"functionName": "Ia",
+						"lineNumber": 1569,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 1.296,
+					"mapped": {
+						"source": "../src/client/document-app.ts",
+						"line": 1530,
+						"column": 21,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 17369,
+						"functionName": "qa",
+						"lineNumber": 1569,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 1.296,
+					"mapped": {
+						"source": "../src/client/document-app.ts",
+						"line": 1503,
+						"column": 25,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1638,
+						"functionName": "Wr",
+						"lineNumber": 30,
+						"scriptId": 25,
+						"url": "http://127.0.0.1:4461/chunks/document-app-qnhnen76.js"
+					},
+					"selfMs": 1.162,
+					"inclusiveMs": 1.162,
+					"mapped": {
+						"source": "../src/shared/text-index.ts",
+						"line": 47,
+						"column": 25,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(garbage collector)",
+						"scriptId": 0
+					},
+					"selfMs": 1.071,
+					"inclusiveMs": 1.071,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 212,
+						"functionName": "",
+						"lineNumber": 1234,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 0.772,
+					"inclusiveMs": 0.772,
+					"mapped": {
+						"source": "../src/client/components/library.ts",
+						"line": 159,
+						"column": 13,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 78,
+						"functionName": "",
+						"lineNumber": 1234,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 0.772,
+					"mapped": {
+						"source": "../src/client/components/library.ts",
+						"line": 151,
+						"column": 4,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 22,
+						"functionName": "id",
+						"lineNumber": 1234,
+						"scriptId": 6,
+						"url": "http://127.0.0.1:4461/app.js"
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 0.772,
+					"mapped": {
+						"source": "../src/client/components/library.ts",
+						"line": 132,
+						"column": 30,
+						"name": ""
+					}
+				},
+				{
+					"frame": {
+						"codeType": "JS",
+						"columnNumber": 1236,
+						"functionName": "project",
+						"lineNumber": 11,
+						"scriptId": 7,
+						"url": "http://127.0.0.1:4461/chunks/document-app-rppm9cjw.js"
+					},
+					"selfMs": 0.651,
+					"inclusiveMs": 0.651,
+					"mapped": {
+						"source": "../src/shared/projection.ts",
+						"line": 87,
+						"column": 9,
+						"name": ""
+					}
+				}
+			]
+		},
+		{
+			"main": false,
+			"sampledTargetTaskSelfMs": 25.774,
+			"self": [
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(idle)",
+						"scriptId": 0
+					},
+					"selfMs": 15.615,
+					"inclusiveMs": 15.615,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(program)",
+						"scriptId": 0
+					},
+					"selfMs": 10.159,
+					"inclusiveMs": 10.159,
+					"mapped": null
+				}
+			],
+			"inclusive": [
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(root)",
+						"scriptId": 0
+					},
+					"selfMs": 0.0,
+					"inclusiveMs": 25.774,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(idle)",
+						"scriptId": 0
+					},
+					"selfMs": 15.615,
+					"inclusiveMs": 15.615,
+					"mapped": null
+				},
+				{
+					"frame": {
+						"codeType": "other",
+						"functionName": "(program)",
+						"scriptId": 0
+					},
+					"selfMs": 10.159,
+					"inclusiveMs": 10.159,
+					"mapped": null
+				}
+			]
+		}
+	],
+	"traceSha256": "d0ef8059e084717153947996968c6ddd8f77824625b00427f689a5df42b255c9"
+}
