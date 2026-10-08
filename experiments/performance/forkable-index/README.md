@@ -176,7 +176,7 @@ Each phase restores the same consistent disposable SQLite seed and browser-profi
 
 The candidate remains experimental. The 25ms largest task exceeds the 8.3ms target. Heap samples are readiness samples affected by GC: 1MiB samples generally decreased, but the single 128KiB candidate sample increased. They establish neither peak memory nor retained-memory bounds. The native backend avoids attributing server changes to a client comparison.
 
-129 public integration contracts passed, including Unicode edits, independent forks, held views, checkpoint ordering/restore, causal undo, cooperative interruption/stale copying, passive-session isolation and the current terminal-cancellation cases. Strict types passed. Opus5.5 found no correctness blockers, but noted that persistent additions and copied override Sets grow throughout long sessions. No speculative compaction was added.
+129 public integration contracts passed, including Unicode edits, independent forks, held views, checkpoint ordering/restore, causal undo, cooperative interruption/stale copying, passive-session isolation and the current terminal-cancellation cases. Strict types passed. Opus 5.5 found no correctness blockers, but noted that persistent additions and copied override Sets grow throughout long sessions. No speculative compaction was added.
 
 written with gpt-6 in codex
 
@@ -192,5 +192,24 @@ The native single-character controls above did not cover multicursor cost. A sec
 | 1MiB largest deferred task   |     51.14 / 52.12ms |     63.68 / 65.79ms |
 
 **Rejected.** Faster undo does not compensate for slower multicursor editing. Production remains native Maps. The broader control shows why an append-only benchmark could not justify adoption. `verifyEquivalent(nativeFactory, candidateFactory, 256)` extends the public contract to 256 edits; it also passed native checkpoint equivalence, held views, Unicode, independent branches, cancellation and restoration; correctness was not the reason for rejection. No compaction or additional infrastructure was added.
+
+written with gpt-6 in codex
+
+## Effect transient batch arm: rejected
+
+The next candidate used installed Effect 4 `HashMap.beginMutation`/`endMutation` inside synchronous validated multi-atom publication, gathering insertion-order keys for one `Chunk.appendAll`. Forks cannot escape an active mutation window. Single-atom edits and cooperative restore paths remain unchanged. Previous fork roots stay immutable. Opus 5.5 found no correctness blockers. `transient-index.ts` and `app-transient-index.patch` preserve this outside-production arm.
+
+Both variants froze current `88a154a`, including warmed accepted passive snapshots. Three alternating-order matched pairs ran four fixtures: 128KiB/1MiB one-selection controls and 128KiB/1MiB true 2048-selection replacements. All 24 trusted source/durable edit+undo checks passed. Types and 133 public module contracts passed, including 2048 Unicode batches, independent forks/forks-of-forks, held views, 256-edit growth, checkpoint order/mutation/restore, causal undo and atomic rejection. `verifyTransientBatches` in `batch-contracts.ts` exposes the added public comparison.
+
+| Actual 2048-selection metric | Native median / max | Transient hybrid median / max |
+| ---------------------------- | ------------------: | ----------------------------: |
+| 128KiB input RunTask         |     25.01 / 25.81ms |               30.75 / 31.06ms |
+| 128KiB largest deferred task |     50.21 / 50.23ms |               62.83 / 65.28ms |
+| 1MiB input RunTask           |     23.63 / 23.89ms |               31.54 / 31.57ms |
+| 1MiB largest deferred task   |     53.87 / 55.17ms |               67.26 / 69.51ms |
+
+One-selection input controls measured 3.06→3.32ms (128KiB) and 3.51→3.81ms (1MiB). These differ from the append controls in the preceding experiment. The matching profiler includes 3s deferred aftermath; browser ready observations are not physical paint measurements. Heap was not sampled in this harness. Compact exact samples and provenance are in `app-transient-results.json`; large traces remain under `/tmp/alkalye-index-transient-current/multicursor`.
+
+**Rejected.** Effect transients did not remove the actual interaction regression. Undo timing was skipped once multicursor failed. This arm is not a direct timing comparison with the earlier index arm because the production baseline changed. Native Maps remain in production.
 
 written with gpt-6 in codex
