@@ -1,0 +1,24 @@
+**No semantic blocker.** I found it exactly equivalent to `frontmatter(s).body.replace(/[#*`>\n]/g," ").trim().slice(0,72)` for every input. I reviewed by reading only and ran nothing.
+
+**Why it's equivalent:**
+- **Header detection:** the pre-check `/^\uFEFF?---[ \t]*\r?\n/` is a necessary condition for `frontmatterBlock` to match at index 0, so `bodyStart` matches what `frontmatter` uses. `frontmatter` slices the body even when the YAML is bad, because its catch only wraps parsing. So a malformed header strips the same span. An unclosed header gives no match, so `bodyStart` is 0 and the body is the whole source, same as before.
+- **Leading trim:** markers become spaces, then `trim` removes WhiteSpace and LineTerminator. Regex `\s` is exactly that same set, including `\uFEFF`, `\u00A0`, `\u2028`, `\u2029` and Zs, but not `\u0085`. So the first match of `[^#*`>\s]` is the first character the old code would keep. A BOM with no valid header is treated as whitespace and skipped, as before.
+- **Trailing trim:** the replacement maps one UTF-16 unit to one unit, so lengths are preserved. Let R be the trimmed rest of the text after the start:
+  - If the prefix doesn't end in whitespace, R reaches at least that far, so the result is `prefix`. ✓
+  - If `end >= length`, the prefix is the whole rest, so the result is `trimEnd(prefix)`. ✓
+  - If the prefix ends in whitespace and a kept character appears at or after `end`, R is longer than 72, so the result is `prefix` with its trailing spaces. ✓ If no kept character follows, R is `trimEnd(prefix)`. ✓
+- **UTF-16:** there is no `u` flag, so matching works on code units. Lone surrogates aren't `\s`, so they count as kept text. A pair split at unit 72 is cut the same way `slice` cuts it. ✓
+
+**Performance:** better or equal in every case, no regression.
+- Worst case is two linear regex scans, with no full-length copy from `replace`/`trim`.
+- YAML is no longer parsed for excerpts.
+- `frontmatterBlock` now only runs when the header pre-check passes.
+- `local-documents` still calls `frontmatter` for `wikiTargets`, so YAML is parsed once per record instead of twice.
+
+**Non-semantic blocker:** the new function in `markdown.ts` (patch lines 9–21) is indented with single spaces, but the file uses tabs. The format step of `bun run check` will likely fail.
+
+**Minor:**
+- `(?:\uFEFF)?` can be just `\uFEFF?`.
+- The import order `frontmatter, documentExcerpt` isn't alphabetical, so lint may flag it.
+- The test only covers the `local-documents` path. The `document-app.ts` call site has no test, though it's the same function.
+- The test cases cover every branch above, including a later kept character right after a prefix that ends in whitespace (the "interior boundary blanks" case). Optional extra cases: a lone surrogate as the very first character, and a BOM-plus-header document whose body starts with markers.

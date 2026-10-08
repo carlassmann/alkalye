@@ -1,0 +1,71 @@
+{
+	"stage": "complete",
+	"passed": true,
+	"error": "",
+	"sourceLength": 1048576,
+	"sourceBytes": 1056200,
+	"sourceHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+	"state": {
+		"setup": {
+			"caret": 524497,
+			"links": 11436,
+			"nativeLength": 2915,
+			"view": {
+				"end": 413165,
+				"height": 5671.125,
+				"start": 410250,
+				"top": 800255.53125
+			}
+		},
+		"before": {
+			"hash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+			"position": 65,
+			"length": 1048576
+		},
+		"input": {
+			"hash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+			"position": 66,
+			"length": 1048577
+		},
+		"inputState": {
+			"caret": 524497,
+			"characters": 1048577,
+			"end": 524498,
+			"event": {
+				"trusted": true,
+				"type": "insertText"
+			},
+			"heap": 634539180,
+			"links": 11436,
+			"nativeLength": 2916,
+			"start": 524498,
+			"view": {
+				"end": 413166,
+				"height": 5671.125,
+				"start": 410250,
+				"top": 800255.5
+			}
+		},
+		"undone": {
+			"hash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+			"position": 67,
+			"length": 1048576
+		},
+		"undoState": {
+			"characters": 1048576,
+			"end": 524497,
+			"heap": 823597646,
+			"links": 11436,
+			"nativeLength": 2915,
+			"start": 524497,
+			"view": {
+				"end": 413165,
+				"height": 5671.125,
+				"start": 410250,
+				"top": 800252.71875
+			}
+		},
+		"bundleHash": "63e222bdbeb83b0c8b8303efcd0b6bb13c0e2ab9352b2afcc14a57a03488bd24"
+	},
+	"readinessMs": 1990.5556670000005
+}

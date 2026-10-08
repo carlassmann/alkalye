@@ -1,0 +1,73 @@
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import * as Layer from "effect/Layer"
+import { LocalDocuments } from "../src/client/local-documents"
+import { BrowserStorage, Storage } from "../src/client/storage"
+import { Replica } from "../src/shared/crdt"
+import { buildAction } from "../src/shared/document-actions"
+import { newDocument } from "../src/shared/documents"
+import { frontmatter } from "../src/shared/markdown"
+import { parseOperation } from "../src/shared/model"
+
+type Check = (value: unknown, message: string) => void
+
+export function verifyExcerptCatalogue(subject: string, check: Check) {
+	let document = "excerpt-catalogue"
+	let workspace = "personal-" + subject
+	let cases = [
+		["normal", "Plain paragraph " + "body ".repeat(220000)],
+		["interior boundary blanks", "a".repeat(68) + " #\n " + "later"],
+		["terminal boundary blanks", "a".repeat(68) + " #\n " + " \r\t".repeat(100)],
+		["leading markers", "#*`>\n\t \r".repeat(1000) + "Visible text"],
+		["all blank", "#*`>\n\t \r".repeat(131072)],
+		["CRLF interior", "first\r\n\tsecond " + "z".repeat(100)],
+		["ECMAScript whitespace", "\uFEFF\u00A0\u2000\u2028\u2029\u3000Text\u00A0"],
+		["non-trim control", "\u0085" + "a".repeat(100)],
+		["astral boundary", "a".repeat(71) + "😀tail"],
+		["astral within boundary", "a".repeat(70) + "😀 tail"],
+		["lone high unit", "a".repeat(71) + "\uD800tail"],
+		["lone low unit", "a".repeat(71) + "\uDC00tail"],
+		["closed header", '---\ntitle: "Example"\n---\n# Body\n' + "tail ".repeat(100)],
+		["BOM CRLF header", '\uFEFF--- \t\r\ntitle: "Example"\r\n--- \t\r\nBody\r\n'],
+		["malformed YAML header", "---\ntitle: [\n---\nBody after malformed YAML"],
+		["unclosed header", "---\ntitle: [\n" + "body ".repeat(220000)],
+		["non-leading header", "Preamble\n---\ntitle: Hidden\n---\nBody"],
+		["header without closing newline", "---\ntitle: Empty\n---"],
+		["empty body", "---\n---\n"],
+		["BOM without header", "\uFEFFBody"],
+	]
+	let finalExcerpt = ""
+	return Effect.gen(function* () {
+		yield* Effect.scoped(Effect.gen(function* () {
+			let storage = yield* Effect.acquireRelease(Storage.open(), storage => Effect.sync(() => storage.close()))
+			let local = Context.get(yield* Layer.build(LocalDocuments.layer(subject).pipe(Layer.provide(Layer.succeed(BrowserStorage, storage)))), LocalDocuments)
+			let creation = {
+				subject,
+				workspace,
+				action: yield* buildAction(new Replica(subject + "-birth"), document, "Create", staged => newDocument(staged, document, "Untitled", "Seed")),
+			}
+			yield* local.create(creation)
+			let replica = new Replica(subject + "-oracle")
+			replica.apply(creation.action.changes.map(parseOperation))
+			let record = replica.documents(workspace).find(record => record.id === document)
+			if (!record) return yield* Effect.fail(new Error("Creation did not produce a document"))
+			let activity = local.activity(document, () => undefined)
+			let position = 0
+			for (let [label, source] of cases) {
+				if (label === undefined || source === undefined) return yield* Effect.fail(new Error("Invalid corpus entry"))
+				let expected = frontmatter(source).body.replace(/[#*`>\n]/g, " ").trim().slice(0, 72)
+				yield* activity.projected({ document, localPosition: ++position, remoteLog: "excerpt-oracle", remotePosition: position, record: { ...record, content: source } })
+				let row = (yield* local.rows).find(row => row.summary.document === document)
+				check(row?.summary.excerpt === expected, label + ": persisted catalogue excerpt matches existing semantics")
+				check(row?.localPosition === position, label + ": catalogue publishes the projected revision")
+				finalExcerpt = expected
+			}
+		}))
+		yield* Effect.scoped(Effect.gen(function* () {
+			let storage = yield* Effect.acquireRelease(Storage.open(), storage => Effect.sync(() => storage.close()))
+			let local = Context.get(yield* Layer.build(LocalDocuments.layer(subject).pipe(Layer.provide(Layer.succeed(BrowserStorage, storage)))), LocalDocuments)
+			let row = (yield* local.rows).find(row => row.summary.document === document)
+			check(row?.summary.excerpt === finalExcerpt, "catalogue excerpt survives storage close and reopen")
+		}))
+	})
+}

@@ -1,0 +1,72 @@
+import collections
+import hashlib
+import json
+from pathlib import Path
+import statistics
+
+root = Path('/tmp/alkalye-bounded-excerpt/app')
+result = {'results': json.loads((root / 'results.json').read_text()), 'failures': []}
+rows = []
+
+def analyze(path, start_name, end_name, input_name=None):
+    raw = Path(path).read_bytes()
+    events = json.loads(raw)['traceEvents']
+    marks = {event['name']: event for event in events if event.get('name') in [start_name, end_name, input_name]}
+    start, end = marks[start_name], marks[end_name]
+    thread = start['pid'], start['tid']
+    relevant = [event for event in events if event.get('ph') == 'X' and (event.get('pid'), event.get('tid')) == thread and event.get('ts', 0) <= end['ts'] and event.get('ts', 0) + event.get('dur', 0) >= start['ts']]
+    tasks = [event for event in relevant if event.get('name') == 'RunTask']
+    initiating = [event for event in tasks if event['ts'] <= start['ts'] <= event['ts'] + event.get('dur', 0) or input_name and event['ts'] <= marks[input_name]['ts'] <= event['ts'] + event.get('dur', 0)]
+    intervals = sorted((max(event['ts'], start['ts']), min(event['ts'] + event.get('dur', 0), end['ts'])) for event in tasks)
+    union = []
+    for left, right in intervals:
+        if union and left <= union[-1][1]:
+            union[-1] = union[-1][0], max(union[-1][1], right)
+        else:
+            union.append((left, right))
+    def largest(values):
+        return max((event.get('dur', 0) / 1000 for event in values), default=0)
+    top = max(tasks, key=lambda event: event.get('dur', 0))
+    children = [event for event in relevant if event.get('name') in ['FunctionCall', 'RunMicrotasks', 'MajorGC', 'MinorGC', 'Layout', 'Paint', 'TimerFire', 'EventDispatch'] and event['ts'] >= top['ts'] and event['ts'] + event.get('dur', 0) <= top['ts'] + top.get('dur', 0)]
+    return {
+        'trace': str(path), 'sha256': hashlib.sha256(raw).hexdigest(),
+        'mainThread': thread, 'windowMs': (end['ts'] - start['ts']) / 1000,
+        'initiatingTaskMs': largest(initiating), 'largestTaskMs': largest(tasks),
+        'aftermathTaskMs': largest([event for event in tasks if event not in initiating]),
+        'taskCountOver833': sum(event.get('dur', 0) > 8333.333 for event in tasks),
+        'busyUnionMs': sum(right - left for left, right in union) / 1000,
+        'layoutTotalMs': sum(event.get('dur', 0) for event in relevant if event.get('name') == 'Layout') / 1000,
+        'paintTotalMs': sum(event.get('dur', 0) for event in relevant if event.get('name') == 'Paint') / 1000,
+        'majorGcMaxMs': largest([event for event in relevant if event.get('name') == 'MajorGC']),
+        'minorGcMaxMs': largest([event for event in relevant if event.get('name') == 'MinorGC']),
+        'largestTaskBreakdown': {
+            'relativeMs': (top['ts'] - start['ts']) / 1000,
+            'taskMs': top.get('dur', 0) / 1000,
+            'childrenInclusiveNotAdditive': [{'name': event['name'], 'durationMs': event.get('dur', 0) / 1000, 'args': event.get('args', {})} for event in sorted(children, key=lambda event: event.get('dur', 0), reverse=True)[:8]],
+        },
+    }
+
+for cell in result['results']:
+    state = cell['state']
+    rows.append({
+        'arm': cell['kind'], 'fixture': 'rich1m', 'trial': cell['trial'],
+        'input': analyze(root / (cell['kind']+'-'+str(cell['trial'])+'-input.trace.json'), 'rich:start', 'rich:end'),
+        'undo': analyze(root / (cell['kind']+'-'+str(cell['trial'])+'-undo.trace.json'), 'undo:start', 'undo:end'),
+        'heapSample': {'used': state['inputState'].get('heap',0)}, 'bundleSha': state['bundleHash'],
+        'exact': cell['passed'], 'acceptedEditHash': state['input']['hash'],
+        'acceptedUndoHash': state['undone']['hash'], 'readinessMs':cell['readinessMs'],
+    })
+groups = collections.defaultdict(list)
+for row in rows:
+    groups[row['fixture'], row['arm']].append(row)
+summaries = []
+for (fixture, arm), cells in groups.items():
+    summary = {'fixture': fixture, 'arm': arm, 'n': len(cells)}
+    for phase in ['input', 'undo']:
+        summary[phase] = {key: {'median': statistics.median(cell[phase][key] for cell in cells), 'max': max(cell[phase][key] for cell in cells)} for key in ['initiatingTaskMs', 'aftermathTaskMs', 'largestTaskMs', 'busyUnionMs', 'layoutTotalMs', 'paintTotalMs', 'majorGcMaxMs', 'minorGcMaxMs', 'taskCountOver833']}
+    summary['mainHeapUsed'] = {'median': statistics.median(cell['heapSample']['used'] for cell in cells), 'max': max(cell['heapSample']['used'] for cell in cells)}
+    summaries.append(summary)
+output = {'rows': rows, 'summaries': summaries, 'failures': result['failures']}
+(root / 'analysis.json').write_text(json.dumps(output, indent=2))
+for group in summaries:
+    print(group['fixture'], group['arm'], 'input', group['input']['initiatingTaskMs'], 'deferred', group['input']['aftermathTaskMs'], 'undo', group['undo']['largestTaskMs'], 'busyUndo', group['undo']['busyUnionMs'], 'heap', group['mainHeapUsed'])

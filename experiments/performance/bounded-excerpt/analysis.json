@@ -1,0 +1,1975 @@
+{
+	"rows": [
+		{
+			"arm": "baseline",
+			"fixture": "rich1m",
+			"trial": 0,
+			"input": {
+				"trace": "/tmp/alkalye-bounded-excerpt/app/baseline-0-input.trace.json",
+				"sha256": "7324c4cb24e7684c96e17d1fe724dac0f3650bcc7f413999a2b122d01927400c",
+				"mainThread": [39155, 17638931],
+				"windowMs": 3000.912,
+				"initiatingTaskMs": 16.409,
+				"largestTaskMs": 16.409,
+				"aftermathTaskMs": 11.43,
+				"taskCountOver833": 10,
+				"busyUnionMs": 882.829,
+				"layoutTotalMs": 57.63,
+				"paintTotalMs": 6.785,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 11.073,
+				"largestTaskBreakdown": {
+					"relativeMs": -0.627,
+					"taskMs": 16.409,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "EventDispatch",
+							"durationMs": 15.895,
+							"args": {
+								"data": {
+									"type": "keypress"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 15.581,
+							"args": {
+								"data": {
+									"type": "textInput"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 14.701,
+							"args": {
+								"data": {
+									"type": "input"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 12.788,
+							"args": {
+								"data": {
+									"columnNumber": 5060,
+									"frame": "BDBF45A74DBB14D31E72A94E049EB211",
+									"functionName": "Ci.s.oninput",
+									"isolate": "6019785251340490291",
+									"lineNumber": 88,
+									"sampleTraceId": 2059915033505009,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-spv3fgqe.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.875,
+							"args": {
+								"data": {
+									"columnNumber": 19263,
+									"frame": "BDBF45A74DBB14D31E72A94E049EB211",
+									"functionName": "me",
+									"isolate": "6019785251340490291",
+									"lineNumber": 88,
+									"sampleTraceId": 2059915033505022,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-spv3fgqe.js"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.26,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "BDBF45A74DBB14D31E72A94E049EB211",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 0.193,
+							"args": {
+								"data": {
+									"type": "beforeinput"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.154,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "BDBF45A74DBB14D31E72A94E049EB211",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-bounded-excerpt/app/baseline-0-undo.trace.json",
+				"sha256": "5cdad6f5f420df9bf70ac5c39cc436aa78bc0cb0bfd9356a47b031aa9647e125",
+				"mainThread": [39155, 17638931],
+				"windowMs": 3002.388,
+				"initiatingTaskMs": 0.497,
+				"largestTaskMs": 21.208,
+				"aftermathTaskMs": 21.208,
+				"taskCountOver833": 18,
+				"busyUnionMs": 1216.61,
+				"layoutTotalMs": 54.514,
+				"paintTotalMs": 7.158,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 12.792,
+				"largestTaskBreakdown": {
+					"relativeMs": 134.876,
+					"taskMs": 21.208,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 18.267,
+							"args": {
+								"data": {
+									"columnNumber": 476,
+									"frame": "BDBF45A74DBB14D31E72A94E049EB211",
+									"functionName": "",
+									"isolate": "6019785251340490291",
+									"lineNumber": 1653,
+									"sampleTraceId": 2059915033497298,
+									"scriptId": "5",
+									"url": "http://127.0.0.1:4461/app.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.477,
+							"args": {
+								"data": {
+									"columnNumber": 19263,
+									"frame": "BDBF45A74DBB14D31E72A94E049EB211",
+									"functionName": "me",
+									"isolate": "6019785251340490291",
+									"lineNumber": 88,
+									"sampleTraceId": 2059915033497301,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-spv3fgqe.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.164,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 650905576,
+								"usedHeapSizeBefore": 691341044
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.369,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 438,
+									"frame": "BDBF45A74DBB14D31E72A94E049EB211",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Paint",
+							"durationMs": 0.269,
+							"args": {
+								"data": {
+									"clip": [0, 0, 1280, 0, 1280, 633, 0, 633],
+									"frame": "BDBF45A74DBB14D31E72A94E049EB211",
+									"layerId": 0,
+									"nodeId": 3,
+									"nodeName": "#document"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.255,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "BDBF45A74DBB14D31E72A94E049EB211",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.175,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "BDBF45A74DBB14D31E72A94E049EB211",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.174,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 27,
+									"frame": "BDBF45A74DBB14D31E72A94E049EB211",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"used": 611598229
+			},
+			"bundleSha": "f5f4f81c7de47e6de00d7bce23a469bb1eb37477cb98f7971f4cf46e0c6dba11",
+			"exact": true,
+			"acceptedEditHash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+			"acceptedUndoHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+			"readinessMs": 2009.692125
+		},
+		{
+			"arm": "candidate",
+			"fixture": "rich1m",
+			"trial": 0,
+			"input": {
+				"trace": "/tmp/alkalye-bounded-excerpt/app/candidate-0-input.trace.json",
+				"sha256": "c72f675e108a0a2f59fba30c33c209640e0b91ff71de323bfa92afc8ca92d2c0",
+				"mainThread": [39368, 17640546],
+				"windowMs": 3001.524,
+				"initiatingTaskMs": 16.581,
+				"largestTaskMs": 16.581,
+				"aftermathTaskMs": 12.076,
+				"taskCountOver833": 9,
+				"busyUnionMs": 885.566,
+				"layoutTotalMs": 60.42,
+				"paintTotalMs": 7.213,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 11.839,
+				"largestTaskBreakdown": {
+					"relativeMs": -0.592,
+					"taskMs": 16.581,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "EventDispatch",
+							"durationMs": 16.084,
+							"args": {
+								"data": {
+									"type": "keypress"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 15.791,
+							"args": {
+								"data": {
+									"type": "textInput"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 14.977,
+							"args": {
+								"data": {
+									"type": "input"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 13.083,
+							"args": {
+								"data": {
+									"columnNumber": 5060,
+									"frame": "C4EBB9451C0138C69B190F0C2608B9B6",
+									"functionName": "Ci.s.oninput",
+									"isolate": "15189550815333151142",
+									"lineNumber": 88,
+									"sampleTraceId": 6609696103997409,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-54q61xde.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.859,
+							"args": {
+								"data": {
+									"columnNumber": 19263,
+									"frame": "C4EBB9451C0138C69B190F0C2608B9B6",
+									"functionName": "me",
+									"isolate": "15189550815333151142",
+									"lineNumber": 88,
+									"sampleTraceId": 6609696103997407,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-54q61xde.js"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.255,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "C4EBB9451C0138C69B190F0C2608B9B6",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 0.192,
+							"args": {
+								"data": {
+									"type": "beforeinput"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.146,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "C4EBB9451C0138C69B190F0C2608B9B6",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-bounded-excerpt/app/candidate-0-undo.trace.json",
+				"sha256": "29f95367813808328b9c79b48565724392d675cd73cf480866623e0bb509dc0b",
+				"mainThread": [39368, 17640546],
+				"windowMs": 3001.858,
+				"initiatingTaskMs": 0.518,
+				"largestTaskMs": 16.589,
+				"aftermathTaskMs": 16.589,
+				"taskCountOver833": 18,
+				"busyUnionMs": 1123.303,
+				"layoutTotalMs": 47.968,
+				"paintTotalMs": 6.386,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 11.173,
+				"largestTaskBreakdown": {
+					"relativeMs": 140.712,
+					"taskMs": 16.589,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 13.896,
+							"args": {
+								"data": {
+									"columnNumber": 476,
+									"frame": "C4EBB9451C0138C69B190F0C2608B9B6",
+									"functionName": "",
+									"isolate": "15189550815333151142",
+									"lineNumber": 1653,
+									"sampleTraceId": 6609696104005040,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/app.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.442,
+							"args": {
+								"data": {
+									"columnNumber": 19263,
+									"frame": "C4EBB9451C0138C69B190F0C2608B9B6",
+									"functionName": "me",
+									"isolate": "15189550815333151142",
+									"lineNumber": 88,
+									"sampleTraceId": 6609696104005032,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-54q61xde.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.977,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 646089784,
+								"usedHeapSizeBefore": 681692308
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.366,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 438,
+									"frame": "C4EBB9451C0138C69B190F0C2608B9B6",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.241,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "C4EBB9451C0138C69B190F0C2608B9B6",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Paint",
+							"durationMs": 0.208,
+							"args": {
+								"data": {
+									"clip": [0, 0, 1280, 0, 1280, 633, 0, 633],
+									"frame": "C4EBB9451C0138C69B190F0C2608B9B6",
+									"layerId": 0,
+									"nodeId": 3,
+									"nodeName": "#document"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.182,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "C4EBB9451C0138C69B190F0C2608B9B6",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Paint",
+							"durationMs": 0.104,
+							"args": {
+								"data": {
+									"clip": [0, -1, 1056, -1, 1056, 5671, 0, 5671],
+									"frame": "C4EBB9451C0138C69B190F0C2608B9B6",
+									"layerId": 0,
+									"nodeId": 43,
+									"nodeName": "TEXTAREA id='editor'"
+								}
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"used": 634539180
+			},
+			"bundleSha": "63e222bdbeb83b0c8b8303efcd0b6bb13c0e2ab9352b2afcc14a57a03488bd24",
+			"exact": true,
+			"acceptedEditHash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+			"acceptedUndoHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+			"readinessMs": 1990.5556670000005
+		},
+		{
+			"arm": "candidate",
+			"fixture": "rich1m",
+			"trial": 1,
+			"input": {
+				"trace": "/tmp/alkalye-bounded-excerpt/app/candidate-1-input.trace.json",
+				"sha256": "cd12b1cffb520cf9c99d88e2bf689bdfb71028709738a5c8c26c465f6ae95ca4",
+				"mainThread": [39571, 17642109],
+				"windowMs": 3003.05,
+				"initiatingTaskMs": 16.492,
+				"largestTaskMs": 16.492,
+				"aftermathTaskMs": 12.049,
+				"taskCountOver833": 9,
+				"busyUnionMs": 902.664,
+				"layoutTotalMs": 65.399,
+				"paintTotalMs": 7.689,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 11.597,
+				"largestTaskBreakdown": {
+					"relativeMs": -0.601,
+					"taskMs": 16.492,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "EventDispatch",
+							"durationMs": 15.992,
+							"args": {
+								"data": {
+									"type": "keypress"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 15.697,
+							"args": {
+								"data": {
+									"type": "textInput"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 14.835,
+							"args": {
+								"data": {
+									"type": "input"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 12.92,
+							"args": {
+								"data": {
+									"columnNumber": 5060,
+									"frame": "2B0FE3C982C277FD50E29AEDE9DEDC8C",
+									"functionName": "Ci.s.oninput",
+									"isolate": "9348495398958009373",
+									"lineNumber": 88,
+									"sampleTraceId": 1231564724535410,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-54q61xde.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.875,
+							"args": {
+								"data": {
+									"columnNumber": 19263,
+									"frame": "2B0FE3C982C277FD50E29AEDE9DEDC8C",
+									"functionName": "me",
+									"isolate": "9348495398958009373",
+									"lineNumber": 88,
+									"sampleTraceId": 1231564724535420,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-54q61xde.js"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.257,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "2B0FE3C982C277FD50E29AEDE9DEDC8C",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 0.187,
+							"args": {
+								"data": {
+									"type": "beforeinput"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.152,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "2B0FE3C982C277FD50E29AEDE9DEDC8C",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-bounded-excerpt/app/candidate-1-undo.trace.json",
+				"sha256": "a0699f338372564346e35f0079f63c0f2827d14e73121cc99b42304a0a9bb825",
+				"mainThread": [39571, 17642109],
+				"windowMs": 3001.179,
+				"initiatingTaskMs": 0.492,
+				"largestTaskMs": 18.014,
+				"aftermathTaskMs": 18.014,
+				"taskCountOver833": 18,
+				"busyUnionMs": 1262.765,
+				"layoutTotalMs": 61.444,
+				"paintTotalMs": 7.85,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 12.863,
+				"largestTaskBreakdown": {
+					"relativeMs": 138.418,
+					"taskMs": 18.014,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 15.011,
+							"args": {
+								"data": {
+									"columnNumber": 476,
+									"frame": "2B0FE3C982C277FD50E29AEDE9DEDC8C",
+									"functionName": "",
+									"isolate": "9348495398958009373",
+									"lineNumber": 1653,
+									"sampleTraceId": 1231564724544092,
+									"scriptId": "5",
+									"url": "http://127.0.0.1:4461/app.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.542,
+							"args": {
+								"data": {
+									"columnNumber": 19263,
+									"frame": "2B0FE3C982C277FD50E29AEDE9DEDC8C",
+									"functionName": "me",
+									"isolate": "9348495398958009373",
+									"lineNumber": 88,
+									"sampleTraceId": 1231564724544035,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-54q61xde.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.007,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 618786832,
+								"usedHeapSizeBefore": 654644468
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.396,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 438,
+									"frame": "2B0FE3C982C277FD50E29AEDE9DEDC8C",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.274,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "2B0FE3C982C277FD50E29AEDE9DEDC8C",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Paint",
+							"durationMs": 0.234,
+							"args": {
+								"data": {
+									"clip": [0, 0, 1280, 0, 1280, 633, 0, 633],
+									"frame": "2B0FE3C982C277FD50E29AEDE9DEDC8C",
+									"layerId": 0,
+									"nodeId": 3,
+									"nodeName": "#document"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.181,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "2B0FE3C982C277FD50E29AEDE9DEDC8C",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Paint",
+							"durationMs": 0.117,
+							"args": {
+								"data": {
+									"clip": [0, -1, 1056, -1, 1056, 5671, 0, 5671],
+									"frame": "2B0FE3C982C277FD50E29AEDE9DEDC8C",
+									"layerId": 0,
+									"nodeId": 43,
+									"nodeName": "TEXTAREA id='editor'"
+								}
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"used": 609300324
+			},
+			"bundleSha": "63e222bdbeb83b0c8b8303efcd0b6bb13c0e2ab9352b2afcc14a57a03488bd24",
+			"exact": true,
+			"acceptedEditHash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+			"acceptedUndoHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+			"readinessMs": 1990.6256250000006
+		},
+		{
+			"arm": "baseline",
+			"fixture": "rich1m",
+			"trial": 1,
+			"input": {
+				"trace": "/tmp/alkalye-bounded-excerpt/app/baseline-1-input.trace.json",
+				"sha256": "e4f2f8bdf3f628d88d053e27f416df1f574051eaf21801c55fd324d441c05d77",
+				"mainThread": [39818, 17643809],
+				"windowMs": 3000.892,
+				"initiatingTaskMs": 18.055,
+				"largestTaskMs": 18.055,
+				"aftermathTaskMs": 11.472,
+				"taskCountOver833": 7,
+				"busyUnionMs": 898.46,
+				"layoutTotalMs": 63.236,
+				"paintTotalMs": 7.722,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 11.175,
+				"largestTaskBreakdown": {
+					"relativeMs": -0.608,
+					"taskMs": 18.055,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "EventDispatch",
+							"durationMs": 17.546,
+							"args": {
+								"data": {
+									"type": "keypress"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 17.253,
+							"args": {
+								"data": {
+									"type": "textInput"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 16.384,
+							"args": {
+								"data": {
+									"type": "input"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 14.416,
+							"args": {
+								"data": {
+									"columnNumber": 5060,
+									"frame": "A2682B16A6630389287D91B1A4C45FB5",
+									"functionName": "Ci.s.oninput",
+									"isolate": "15405369020581966077",
+									"lineNumber": 88,
+									"sampleTraceId": 6300773219802600,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-spv3fgqe.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.927,
+							"args": {
+								"data": {
+									"columnNumber": 19263,
+									"frame": "A2682B16A6630389287D91B1A4C45FB5",
+									"functionName": "me",
+									"isolate": "15405369020581966077",
+									"lineNumber": 88,
+									"sampleTraceId": 6300773219802585,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-spv3fgqe.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.598,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 483458080,
+								"usedHeapSizeBefore": 515364080
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.252,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "A2682B16A6630389287D91B1A4C45FB5",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 0.192,
+							"args": {
+								"data": {
+									"type": "beforeinput"
+								}
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-bounded-excerpt/app/baseline-1-undo.trace.json",
+				"sha256": "ddd07994405a98eed57136a2eb5f238c98540d2dd77536d49c14679ff055101d",
+				"mainThread": [39818, 17643809],
+				"windowMs": 3001.546,
+				"initiatingTaskMs": 0.514,
+				"largestTaskMs": 19.506,
+				"aftermathTaskMs": 19.506,
+				"taskCountOver833": 18,
+				"busyUnionMs": 1163.045,
+				"layoutTotalMs": 50.975,
+				"paintTotalMs": 6.598,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 11.585,
+				"largestTaskBreakdown": {
+					"relativeMs": 144.222,
+					"taskMs": 19.506,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 16.537,
+							"args": {
+								"data": {
+									"columnNumber": 476,
+									"frame": "A2682B16A6630389287D91B1A4C45FB5",
+									"functionName": "",
+									"isolate": "15405369020581966077",
+									"lineNumber": 1653,
+									"sampleTraceId": 6300773219811094,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/app.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.566,
+							"args": {
+								"data": {
+									"columnNumber": 19263,
+									"frame": "A2682B16A6630389287D91B1A4C45FB5",
+									"functionName": "me",
+									"isolate": "15405369020581966077",
+									"lineNumber": 88,
+									"sampleTraceId": 6300773219811083,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-spv3fgqe.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.696,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 653016280,
+								"usedHeapSizeBefore": 694414244
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.386,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 438,
+									"frame": "A2682B16A6630389287D91B1A4C45FB5",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Paint",
+							"durationMs": 0.247,
+							"args": {
+								"data": {
+									"clip": [0, 0, 1280, 0, 1280, 633, 0, 633],
+									"frame": "A2682B16A6630389287D91B1A4C45FB5",
+									"layerId": 0,
+									"nodeId": 3,
+									"nodeName": "#document"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.243,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "A2682B16A6630389287D91B1A4C45FB5",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.171,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 27,
+									"frame": "A2682B16A6630389287D91B1A4C45FB5",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.163,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "A2682B16A6630389287D91B1A4C45FB5",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"used": 613844649
+			},
+			"bundleSha": "f5f4f81c7de47e6de00d7bce23a469bb1eb37477cb98f7971f4cf46e0c6dba11",
+			"exact": true,
+			"acceptedEditHash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+			"acceptedUndoHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+			"readinessMs": 1998.2074999999968
+		},
+		{
+			"arm": "baseline",
+			"fixture": "rich1m",
+			"trial": 2,
+			"input": {
+				"trace": "/tmp/alkalye-bounded-excerpt/app/baseline-2-input.trace.json",
+				"sha256": "3748c03df0429cb6a3c2997e5968cb6db5fe42cad7ee522f76eb87c91d30a98e",
+				"mainThread": [40032, 17645410],
+				"windowMs": 3001.633,
+				"initiatingTaskMs": 18.573,
+				"largestTaskMs": 18.573,
+				"aftermathTaskMs": 11.154,
+				"taskCountOver833": 9,
+				"busyUnionMs": 927.495,
+				"layoutTotalMs": 67.34,
+				"paintTotalMs": 7.82,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 10.799,
+				"largestTaskBreakdown": {
+					"relativeMs": -0.578,
+					"taskMs": 18.573,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "EventDispatch",
+							"durationMs": 18.078,
+							"args": {
+								"data": {
+									"type": "keypress"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 17.794,
+							"args": {
+								"data": {
+									"type": "textInput"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 16.968,
+							"args": {
+								"data": {
+									"type": "input"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 15.056,
+							"args": {
+								"data": {
+									"columnNumber": 5060,
+									"frame": "1690F06E0CD0175C692F5FC3FF1CD3D4",
+									"functionName": "Ci.s.oninput",
+									"isolate": "3173225518948969799",
+									"lineNumber": 88,
+									"sampleTraceId": 8727243425582499,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-spv3fgqe.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 2.324,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 474809264,
+								"usedHeapSizeBefore": 506842344
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.871,
+							"args": {
+								"data": {
+									"columnNumber": 19263,
+									"frame": "1690F06E0CD0175C692F5FC3FF1CD3D4",
+									"functionName": "me",
+									"isolate": "3173225518948969799",
+									"lineNumber": 88,
+									"sampleTraceId": 8727243425582484,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-spv3fgqe.js"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.266,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "1690F06E0CD0175C692F5FC3FF1CD3D4",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 0.191,
+							"args": {
+								"data": {
+									"type": "beforeinput"
+								}
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-bounded-excerpt/app/baseline-2-undo.trace.json",
+				"sha256": "243054556e5a41951ac741795cf24f7507d37b0d0a5c387953ec77dea862768a",
+				"mainThread": [40032, 17645410],
+				"windowMs": 3001.662,
+				"initiatingTaskMs": 0.574,
+				"largestTaskMs": 19.034,
+				"aftermathTaskMs": 19.034,
+				"taskCountOver833": 18,
+				"busyUnionMs": 1226.355,
+				"layoutTotalMs": 51.579,
+				"paintTotalMs": 6.622,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 12.931,
+				"largestTaskBreakdown": {
+					"relativeMs": 155.68,
+					"taskMs": 19.034,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 15.168,
+							"args": {
+								"data": {
+									"columnNumber": 476,
+									"frame": "1690F06E0CD0175C692F5FC3FF1CD3D4",
+									"functionName": "",
+									"isolate": "3173225518948969799",
+									"lineNumber": 1653,
+									"sampleTraceId": 8727243425591281,
+									"scriptId": "5",
+									"url": "http://127.0.0.1:4461/app.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.587,
+							"args": {
+								"data": {
+									"columnNumber": 19263,
+									"frame": "1690F06E0CD0175C692F5FC3FF1CD3D4",
+									"functionName": "me",
+									"isolate": "3173225518948969799",
+									"lineNumber": 88,
+									"sampleTraceId": 8727243425591272,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-spv3fgqe.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.107,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 632496892,
+								"usedHeapSizeBefore": 671316088
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 0.704,
+							"args": {
+								"data": {
+									"columnNumber": 957,
+									"frame": "1690F06E0CD0175C692F5FC3FF1CD3D4",
+									"functionName": "",
+									"isolate": "3173225518948969799",
+									"lineNumber": 63,
+									"sampleTraceId": 8727243425591283,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-spv3fgqe.js"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.417,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 438,
+									"frame": "1690F06E0CD0175C692F5FC3FF1CD3D4",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.276,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "1690F06E0CD0175C692F5FC3FF1CD3D4",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.239,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "1690F06E0CD0175C692F5FC3FF1CD3D4",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Paint",
+							"durationMs": 0.237,
+							"args": {
+								"data": {
+									"clip": [0, 0, 1280, 0, 1280, 633, 0, 633],
+									"frame": "1690F06E0CD0175C692F5FC3FF1CD3D4",
+									"layerId": 0,
+									"nodeId": 3,
+									"nodeName": "#document"
+								}
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"used": 593214526
+			},
+			"bundleSha": "f5f4f81c7de47e6de00d7bce23a469bb1eb37477cb98f7971f4cf46e0c6dba11",
+			"exact": true,
+			"acceptedEditHash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+			"acceptedUndoHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+			"readinessMs": 1983.9763749999984
+		},
+		{
+			"arm": "candidate",
+			"fixture": "rich1m",
+			"trial": 2,
+			"input": {
+				"trace": "/tmp/alkalye-bounded-excerpt/app/candidate-2-input.trace.json",
+				"sha256": "e53b4357b47418c0f739285d7337e8c069a838511ba2eadb328746c2bf9ab6cf",
+				"mainThread": [40302, 17647363],
+				"windowMs": 3001.748,
+				"initiatingTaskMs": 18.444,
+				"largestTaskMs": 18.444,
+				"aftermathTaskMs": 11.295,
+				"taskCountOver833": 10,
+				"busyUnionMs": 903.027,
+				"layoutTotalMs": 63.851,
+				"paintTotalMs": 7.575,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 10.951,
+				"largestTaskBreakdown": {
+					"relativeMs": -0.622,
+					"taskMs": 18.444,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "EventDispatch",
+							"durationMs": 17.935,
+							"args": {
+								"data": {
+									"type": "keypress"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 17.626,
+							"args": {
+								"data": {
+									"type": "textInput"
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 16.734,
+							"args": {
+								"data": {
+									"type": "input"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 14.764,
+							"args": {
+								"data": {
+									"columnNumber": 5060,
+									"frame": "E616258A624A605EF6E46B2CE0B1B631",
+									"functionName": "Ci.s.oninput",
+									"isolate": "14491806160808506650",
+									"lineNumber": 88,
+									"sampleTraceId": 2838121025258370,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-54q61xde.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.928,
+							"args": {
+								"data": {
+									"columnNumber": 19263,
+									"frame": "E616258A624A605EF6E46B2CE0B1B631",
+									"functionName": "me",
+									"isolate": "14491806160808506650",
+									"lineNumber": 88,
+									"sampleTraceId": 2838121025258381,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-54q61xde.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 1.673,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 486721364,
+								"usedHeapSizeBefore": 515807896
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.251,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "E616258A624A605EF6E46B2CE0B1B631",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "EventDispatch",
+							"durationMs": 0.196,
+							"args": {
+								"data": {
+									"type": "beforeinput"
+								}
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-bounded-excerpt/app/candidate-2-undo.trace.json",
+				"sha256": "10f1f737abdaecf0f1f224a7100bdd12e4f41d76ad344b407a88c15e1e435c18",
+				"mainThread": [40302, 17647363],
+				"windowMs": 3001.767,
+				"initiatingTaskMs": 0.496,
+				"largestTaskMs": 17.792,
+				"aftermathTaskMs": 17.792,
+				"taskCountOver833": 17,
+				"busyUnionMs": 1163.627,
+				"layoutTotalMs": 51.441,
+				"paintTotalMs": 6.877,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 12.346,
+				"largestTaskBreakdown": {
+					"relativeMs": 161.479,
+					"taskMs": 17.792,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 14.297,
+							"args": {
+								"data": {
+									"columnNumber": 476,
+									"frame": "E616258A624A605EF6E46B2CE0B1B631",
+									"functionName": "",
+									"isolate": "14491806160808506650",
+									"lineNumber": 1653,
+									"sampleTraceId": 2838121025266119,
+									"scriptId": "5",
+									"url": "http://127.0.0.1:4461/app.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 1.531,
+							"args": {
+								"data": {
+									"columnNumber": 19263,
+									"frame": "E616258A624A605EF6E46B2CE0B1B631",
+									"functionName": "me",
+									"isolate": "14491806160808506650",
+									"lineNumber": 88,
+									"sampleTraceId": 2838121025266117,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-54q61xde.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 0.67,
+							"args": {
+								"data": {
+									"columnNumber": 957,
+									"frame": "E616258A624A605EF6E46B2CE0B1B631",
+									"functionName": "",
+									"isolate": "14491806160808506650",
+									"lineNumber": 63,
+									"sampleTraceId": 2838121025266113,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-54q61xde.js"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.39,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 438,
+									"frame": "E616258A624A605EF6E46B2CE0B1B631",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.258,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "E616258A624A605EF6E46B2CE0B1B631",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.22,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "E616258A624A605EF6E46B2CE0B1B631",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Paint",
+							"durationMs": 0.205,
+							"args": {
+								"data": {
+									"clip": [0, 0, 1280, 0, 1280, 633, 0, 633],
+									"frame": "E616258A624A605EF6E46B2CE0B1B631",
+									"layerId": 0,
+									"nodeId": 3,
+									"nodeName": "#document"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.137,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "E616258A624A605EF6E46B2CE0B1B631",
+									"partialLayout": false,
+									"totalObjects": 1654
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"used": 643762892
+			},
+			"bundleSha": "63e222bdbeb83b0c8b8303efcd0b6bb13c0e2ab9352b2afcc14a57a03488bd24",
+			"exact": true,
+			"acceptedEditHash": "0861808b6062ecbc01a1d58911ff8818dd190f01ebd5b9d88acda90831cdd31f",
+			"acceptedUndoHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+			"readinessMs": 1990.947959000012
+		}
+	],
+	"summaries": [
+		{
+			"fixture": "rich1m",
+			"arm": "baseline",
+			"n": 3,
+			"input": {
+				"initiatingTaskMs": {
+					"median": 18.055,
+					"max": 18.573
+				},
+				"aftermathTaskMs": {
+					"median": 11.43,
+					"max": 11.472
+				},
+				"largestTaskMs": {
+					"median": 18.055,
+					"max": 18.573
+				},
+				"busyUnionMs": {
+					"median": 898.46,
+					"max": 927.495
+				},
+				"layoutTotalMs": {
+					"median": 63.236,
+					"max": 67.34
+				},
+				"paintTotalMs": {
+					"median": 7.722,
+					"max": 7.82
+				},
+				"majorGcMaxMs": {
+					"median": 0,
+					"max": 0
+				},
+				"minorGcMaxMs": {
+					"median": 11.073,
+					"max": 11.175
+				},
+				"taskCountOver833": {
+					"median": 9,
+					"max": 10
+				}
+			},
+			"undo": {
+				"initiatingTaskMs": {
+					"median": 0.514,
+					"max": 0.574
+				},
+				"aftermathTaskMs": {
+					"median": 19.506,
+					"max": 21.208
+				},
+				"largestTaskMs": {
+					"median": 19.506,
+					"max": 21.208
+				},
+				"busyUnionMs": {
+					"median": 1216.61,
+					"max": 1226.355
+				},
+				"layoutTotalMs": {
+					"median": 51.579,
+					"max": 54.514
+				},
+				"paintTotalMs": {
+					"median": 6.622,
+					"max": 7.158
+				},
+				"majorGcMaxMs": {
+					"median": 0,
+					"max": 0
+				},
+				"minorGcMaxMs": {
+					"median": 12.792,
+					"max": 12.931
+				},
+				"taskCountOver833": {
+					"median": 18,
+					"max": 18
+				}
+			},
+			"mainHeapUsed": {
+				"median": 611598229,
+				"max": 613844649
+			}
+		},
+		{
+			"fixture": "rich1m",
+			"arm": "candidate",
+			"n": 3,
+			"input": {
+				"initiatingTaskMs": {
+					"median": 16.581,
+					"max": 18.444
+				},
+				"aftermathTaskMs": {
+					"median": 12.049,
+					"max": 12.076
+				},
+				"largestTaskMs": {
+					"median": 16.581,
+					"max": 18.444
+				},
+				"busyUnionMs": {
+					"median": 902.664,
+					"max": 903.027
+				},
+				"layoutTotalMs": {
+					"median": 63.851,
+					"max": 65.399
+				},
+				"paintTotalMs": {
+					"median": 7.575,
+					"max": 7.689
+				},
+				"majorGcMaxMs": {
+					"median": 0,
+					"max": 0
+				},
+				"minorGcMaxMs": {
+					"median": 11.597,
+					"max": 11.839
+				},
+				"taskCountOver833": {
+					"median": 9,
+					"max": 10
+				}
+			},
+			"undo": {
+				"initiatingTaskMs": {
+					"median": 0.496,
+					"max": 0.518
+				},
+				"aftermathTaskMs": {
+					"median": 17.792,
+					"max": 18.014
+				},
+				"largestTaskMs": {
+					"median": 17.792,
+					"max": 18.014
+				},
+				"busyUnionMs": {
+					"median": 1163.627,
+					"max": 1262.765
+				},
+				"layoutTotalMs": {
+					"median": 51.441,
+					"max": 61.444
+				},
+				"paintTotalMs": {
+					"median": 6.877,
+					"max": 7.85
+				},
+				"majorGcMaxMs": {
+					"median": 0,
+					"max": 0
+				},
+				"minorGcMaxMs": {
+					"median": 12.346,
+					"max": 12.863
+				},
+				"taskCountOver833": {
+					"median": 18,
+					"max": 18
+				}
+			},
+			"mainHeapUsed": {
+				"median": 634539180,
+				"max": 643762892
+			}
+		}
+	],
+	"failures": []
+}

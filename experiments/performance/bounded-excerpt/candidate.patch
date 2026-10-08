@@ -1,0 +1,84 @@
+--- a/src/shared/markdown.ts
++++ b/src/shared/markdown.ts
+@@ -38,6 +38,21 @@
+ 		/^(\uFEFF?---[ \t]*\r?\n)([\s\S]*?)(^---[ \t]*(?:\r?\n|$))/m,
+ 	)
+ 	return match?.index === 0 ? match : undefined
++}
++export function documentExcerpt(source: string) {
++ let bodyStart = /^(?:\uFEFF)?---[ \t]*\r?\n/.test(source)
++  ? (frontmatterBlock(source)?.[0].length ?? 0)
++  : 0
++ let surviving = /[^#*`>\s]/g
++ surviving.lastIndex = bodyStart
++ let first = surviving.exec(source)
++ if (!first) return ""
++ let end = first.index + 72
++ let prefix = source.slice(first.index, end).replace(/[#*`>\n]/g, " ")
++ let trimmed = prefix.trimEnd()
++ if (prefix === trimmed || end >= source.length) return trimmed
++ surviving.lastIndex = end
++ return surviving.test(source) ? prefix : trimmed
+ }
+ export type FrontmatterValue =
+ 	string | boolean | number | readonly string[] | undefined
+--- a/src/client/document-app.ts
++++ b/src/client/document-app.ts
+@@ -33,6 +33,7 @@
+ import { PermissionDenied } from "../shared/document-actions"
+ import {
+ 	compileTheme,
++	documentExcerpt,
+ 	frontmatter,
+ 	safeUrl,
+ 	withFrontmatter,
+@@ -1548,10 +1549,7 @@
+ 										folder: doc.metadata.path,
+ 									}
+ 								: {}),
+-							excerpt: frontmatter(current.content)
+-								.body.replace(/[#*`>\n]/g, " ")
+-								.trim()
+-								.slice(0, 72),
++							excerpt: documentExcerpt(current.content),
+ 						}
+ 					return {
+ 						id: doc.document,
+--- a/src/client/local-documents.ts
++++ b/src/client/local-documents.ts
+@@ -9,7 +9,7 @@
+ import { LocalDocumentCreationSchema } from "../shared/document-actions"
+ import type { LocalDocumentCreation } from "../shared/document-actions"
+ import { documentMetadata } from "../shared/document-metadata"
+-import { frontmatter } from "../shared/markdown"
++import { frontmatter, documentExcerpt } from "../shared/markdown"
+ import { parseOperation } from "../shared/model"
+ import { LibraryDocumentSchema } from "../shared/workspace"
+ import { wikiTargets } from "../shared/portable-links"
+@@ -221,7 +221,7 @@
+ 											...row.summary,
+ 											metadata: documentMetadata(record.content),
+ 											kind: record.kind ?? "document",
+-											excerpt: excerpt(record.content),
++											excerpt: documentExcerpt(record.content),
+ 											links: wikiTargets(frontmatter(record.content).body),
+ 											created: record.created ?? 0,
+ 											updated: record.updated,
+@@ -293,16 +293,10 @@
+ 			deleted: false,
+ 			metadata: documentMetadata(record.content),
+ 			kind: record.kind ?? "document",
+-			excerpt: excerpt(record.content),
++			excerpt: documentExcerpt(record.content),
+ 			links: wikiTargets(frontmatter(record.content).body),
+ 			created: record.created ?? 0,
+ 			updated: record.updated,
+ 		},
+ 	}
+ }
+-function excerpt(source: string) {
+-	return frontmatter(source)
+-		.body.replace(/[#*`>\n]/g, " ")
+-		.trim()
+-		.slice(0, 72)
+-}

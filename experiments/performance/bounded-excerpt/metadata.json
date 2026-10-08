@@ -1,0 +1,60 @@
+{
+	"baselineCommit": "2ccca63",
+	"candidate": "same baseline; bounded excerpt helper and three callsites only",
+	"productionProjectionCacheExcluded": true,
+	"effectVersion": "4.0.0",
+	"samplesPerArm": 3,
+	"order": [
+		"baseline0",
+		"candidate0",
+		"candidate1",
+		"baseline1",
+		"baseline2",
+		"candidate2"
+	],
+	"fixture": {
+		"utf16Units": 1048576,
+		"realNewlines": true,
+		"midbodyCaret": 524497,
+		"links": 1030
+	},
+	"browser": "background agent-browser; consistent20000ms defaults",
+	"profiling": "timeline traces only; no CPU sampling",
+	"scope": "trusted native x, local+HTTP accepted source, trusted Undo, restored caret/native viewport, each3s main-thread window",
+	"rawTracesRetainedAt": "/tmp/alkalye-bounded-excerpt/app",
+	"immutableHashes": {
+		"baseline": {
+			"src/shared/markdown.ts": "c46ab1b259588993df4b7a2596b31a36192b30409de019300e0f734401d38e7f",
+			"src/client/document-app.ts": "879ec336a83ba7b4905ba3844ee348ce6d5655963ac67744542051e7c56339aa",
+			"src/client/local-documents.ts": "1b32c5d178da315aab5075eb1e308af639726d51cefb6e2e3f8d2adadddcf6d8",
+			"src/shared/crdt.ts": "fa018ceddb23a671cc2364e324c11f06a184058e2c58a959c769b9bc39586833",
+			"src/client/source-textarea.ts": "f0c0f2f66fae090bc4f8d4ed3693a923e8734e6984827aa38ff839929235346f",
+			"dist/app.js": "f5f4f81c7de47e6de00d7bce23a469bb1eb37477cb98f7971f4cf46e0c6dba11"
+		},
+		"runtime": {
+			"src/shared/markdown.ts": "5adba5df09a4cb10a0ad9370b006e923aec3bc508ea70e29803a8392d50eff33",
+			"src/client/document-app.ts": "a1809e1fb8d620bb7e53f6bf23c1eec2a810abce73608bfb1e7a87ca72d9509f",
+			"src/client/local-documents.ts": "9648bb9d4816013c5efa1edf77888ee549d02b1fc1d7ac54c69c7ea877939b49",
+			"src/shared/crdt.ts": "fa018ceddb23a671cc2364e324c11f06a184058e2c58a959c769b9bc39586833",
+			"src/client/source-textarea.ts": "f0c0f2f66fae090bc4f8d4ed3693a923e8734e6984827aa38ff839929235346f",
+			"dist/app.js": "63e222bdbeb83b0c8b8303efcd0b6bb13c0e2ab9352b2afcc14a57a03488bd24"
+		}
+	},
+	"setupFailures": [
+		{
+			"stage": "first build command",
+			"error": "requested workdir did not exist; command rejected before execution"
+		},
+		{
+			"stage": "first correctness strict types",
+			"error": "server.ts lacked module export; first failure log retained"
+		},
+		{
+			"stage": "first correctness work start",
+			"error": "command config used command instead of run; corrected before browser execution"
+		}
+	],
+	"acceptanceScope": "server snapshot reconstructed independently outside measured windows; exact edit/Undo hashes and increasing accepted positions recorded",
+	"heapScope": "endpoint main heap observation, not retained allocation ownership",
+	"restore": "own managed allocation4461 predecessor restarted pid40552; user phone untouched"
+}
