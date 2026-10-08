@@ -1,0 +1,39 @@
+**Verdict: the logic looks safe, but I found one hard blocker (formatting) and some test gaps. All of this comes from reading the code only; I ran nothing.**
+
+**Blocker**
+1. **Formatting.** Three places in `crdt.ts` use single-space indents and very long lines, while the rest of the file uses tabs:
+   - `TerminalRedo` at `/tmp/alkalye-terminal-redo/candidate/src/shared/crdt.ts:56-63`
+   - `prepareTerminalRedo` at `:193-206`
+   - slot creation at `:588-589`
+
+   The whole test file has the same problem, plus `a(); b()` written on one line. `check:format` (prettier) will fail.
+
+   While reformatting, split the guard on line 196 into named predicates: slot match, redo identity fresh, cancel provenance, cache identity, fence/header. Right now it is one line of about 900 characters.
+
+**Logic: no blocker found**
+- **Clearing the slot:** happens inside the commit closure (`:628`) before the visibility commits and before `operations.set`. It uses the same `has` check, without dedupe. `validate()` never touches the slot.
+- **Restore:** clears as the first statement (`:1527`), before the cooperative throw and before any `yield`.
+- **Fork:** copies the slot last (`:164`). `forkEffect`'s generation and clock fence covers a stale copy. The fork's `textCache` goes through `immutableAtoms`, so the fork probably misses the slot and takes the slow path, which is safe.
+- **Publication:** requires canonical last === raw last, the frozen check, and none of the structural flags.
+- **Redo:** looks up `atomIndex` by identity, so the splice appends the same object to both views.
+- **Lazy cache refills:** `visible`, `text` and `textEffect` only refill a cache after `invalidateText`, which only a new op triggers. So exact identity on all three caches is a sound guard.
+- **Undo path doesn't catch a Redo:** a Redo cancels an Undo, which is not a text op, so `prepareTerminalCancellation` returns undefined first.
+- **`textOwners` / `known` guards:** unreachable while the slot is live, because only restore produces compacted ids and restore clears the slot. They are fine as defence in depth.
+
+**Missing adversarial contracts**
+1. **Nothing proves the fast path runs.** Every assertion would also pass if `prepareTerminalRedo` always returned undefined. `.not.toBe(afterUndo)` holds on the slow path too. Add an observable witness that the fast path was taken, plus one negative case asserting it was not taken after an interruption.
+2. **Mixed batch** `[undoDuplicate, newOp]` on the same or another target, then Redo. This proves the clear is "any new op", not "all new".
+3. **Redo with a lower clock** (crafted so `clock ≤ undo` clock). It must throw atomically, leave the text unchanged, and a valid Redo afterwards must still work.
+4. **Insertion types:** every test inserts 🌻. Add:
+   - a single BMP character
+   - `"\n"`
+   - a fence-forming tail, e.g. body ending `"\n--"` + `"-"`, so `touchesSourceFence` rejects on the new content
+   - a header boundary where the appended character changes the frontmatter header length
+5. **Interrupted cooperative restore** (`restoreEffect` interrupted or failed partway), then Redo on the same replica. Today only the synchronous `restore` is covered.
+6. **Repeated cycles:** Undo → Redo → Undo(original) → Redo on one replica, with each step compared via `equivalent` to a restored replica. Today only Undo-of-Redo is covered, not re-entering the slot.
+7. **Fork, then diverge:** fork with a live slot, apply a new op to the fork only, then Redo on both. The owner may use the fast path; the fork must not.
+8. **`applyTogether` duplicate replica entries:** `[owner, owner]` with the Redo. `new Set` dedupes them, but nothing asserts that.
+
+**Fine as is:** the generic `operations` map is still publicly mutable. As the previous review found, outside writes are safe; just document "only `prepare` mutates `operations`".
+
+written with claude-opus-5-5 in claude code

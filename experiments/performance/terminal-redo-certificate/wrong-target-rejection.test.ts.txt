@@ -1,0 +1,24 @@
+import { expect, test } from "bun:test"
+import { Replica } from "./candidate/src/shared/crdt"
+
+for (let mode of ["known", "same-batch", "reverse-arrival"])
+ test("cross-target cancellation must reject atomically " + mode, () => {
+  let replica = new Replica("owner")
+  let insertion = replica.create("doc", "text")
+  insertion.insert = [{ id: insertion.id + ":00000000", after: "", value: "x" }]
+  let cancellation = replica.create("other", "cancel")
+  cancellation.value = insertion.id
+  if (mode === "known") {
+   replica.apply([insertion])
+   expect(() => replica.apply([cancellation])).toThrow()
+  }
+  if (mode === "same-batch")
+   expect(() => replica.apply([insertion, cancellation])).toThrow()
+  if (mode === "reverse-arrival") {
+   replica.apply([cancellation])
+   expect(() => replica.apply([insertion])).toThrow()
+  }
+  let reader = new Replica("reader")
+  reader.restore(replica.checkpoint())
+  expect(reader.text("doc")).toBe(replica.text("doc"))
+ })

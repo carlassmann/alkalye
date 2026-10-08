@@ -1,0 +1,27 @@
+**No semantic blocker and no missing critical guard in the exact candidate.** I only read the code; I ran nothing.
+
+**Checked and sound:**
+- **Slot lifecycle:**
+  - Any new op clears the slot inside commit, before visibility, operations or cache mutation (`crdt.ts:694-695`).
+  - It is republished only after that, in `cachePreparedText` (`:648`), and only for the frozen single-atom terminal Undo.
+  - `restoreStateSteps` clears it first (`:1593`). Its internal `apply(fields)` only sees `set` ops, so it can't republish.
+  - The only other cache writers are the lazy refills (`:1208`, `:1340`, `:1363`), which run only after `invalidateText`. That keeps the identity guards on `sourceCache`, `textCache`, `strings` and `atomIndex` sufficient.
+- **Redo guard (`:198-230`):**
+  - It checks that the op is fresh: not in `operations`, `textOwners`, `known`, or a pre-cancelled `active` op.
+  - It checks the slot target and the Undo id, and that `canCancel` passes (active, and above the floor).
+  - The header and fence check is transitive: the Undo path had already rejected a header-only result, so a header-only state can't get here.
+- **Precedence:** a Redo's value is a cancel id, so `prepareTerminalCancellation` returns undefined. A stale `preparedEdit` only skips the fast path; it can't corrupt state.
+- **Malformed input:** malformed or lower-clock ops throw in `prepare` before commit, so the prepared edit is dropped and nothing is published.
+- **Cancel ops carrying insert/remove/field:** the slow path ignores those fields for `cancel` (`:675`, `:717-722`), so the fast path gives the same result.
+- **Fork:** the fork shares the slot by reference. That is valid only while the state is identical, and any divergence clears it. `forkEffect` is protected by its generation and clock check.
+- **Wrong target:** a Redo aimed at another target misses the fast path (`:208`) and clears the slot. The existing weakness, where a direct cross-target cancel is accepted, is unchanged and not made worse.
+
+**Gaps that don't block:**
+1. The Redo guard is still one large condition. Named predicates would read better.
+2. The unit tests still have no witness that the fast path is actually taken. You rely on the separate gate results (untimed-gate-results.json) for that, which is acceptable if it's cited in the PR.
+3. No test where the appended character changes the header length (guarded at `:227-228`). Only the fence tails are covered.
+4. Interrupted cooperative restore doesn't apply: it requires a fresh replica, so the slot is already undefined.
+
+Your listed claims (25 tests passing, the benchmark deltas, and what you exclude: 120, total memory, physical IME, existing input) match the scope of the code.
+
+written with claude-opus-5-5 in claude code

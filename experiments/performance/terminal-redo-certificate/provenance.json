@@ -1,0 +1,46 @@
+{
+	"baseline": "fa56600",
+	"backend": "fa56600 both arms; only browser asset directories differ",
+	"candidateSHA256": "a433ff69efe7aba953f00b3d1d7ffed75fdb0389aacc8808e020e05ca405ce48",
+	"contractsSHA256": "21e40d54452b6ab0c392989f228af99ed3d4c4c4bf37fed0e6527b984ca488ec",
+	"diagnosticSHA256": "bd9928cec2669d458d0f16efbca3bb007c72c925634868098c3a1a987667f9c6",
+	"traces": [
+		{
+			"path": "/tmp/alkalye-redo-benchmark/redo-candidate-1.trace.json",
+			"sha256": "05ca499788db85cbb9cc74f8b3ccf82f24d8a526834373952a8b826674410dd6"
+		},
+		{
+			"path": "/tmp/alkalye-redo-benchmark/redo-baseline-1.trace.json",
+			"sha256": "4e3f8eb3e4e8d9c25f1d38d1862ac337d0db350ed266623020f13db21ae88ff8"
+		},
+		{
+			"path": "/tmp/alkalye-redo-benchmark/redo-candidate-0.trace.json",
+			"sha256": "1ea2d72dd57c42be9f64ed5e3facf75faa9ec56ec21741bff5e873436864d2f3"
+		},
+		{
+			"path": "/tmp/alkalye-redo-benchmark/redo-baseline-2.trace.json",
+			"sha256": "23568ec084cad2087f531267d3313af93824a0f715ee02e2179d9a97d8fee084"
+		},
+		{
+			"path": "/tmp/alkalye-redo-benchmark/redo-candidate-2.trace.json",
+			"sha256": "5668b365ce1a1ec75de5e0758d578b081371e5074a5994f96e399bb6bb33dbce"
+		},
+		{
+			"path": "/tmp/alkalye-redo-benchmark/redo-baseline-0.trace.json",
+			"sha256": "32c22062540ff333f3337ad1351986bb4e31b87e93de524466f956c68ac149a3"
+		}
+	],
+	"fixtureSHA256": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a",
+	"dataSeed": "/tmp/alkalye-terminal-header/data-seed",
+	"profileSeed": "/tmp/alkalye-production-allocation-oct8/profile-seed",
+	"serverConfig": "export default {project:'alkalye-redo-benchmark',commands:{rewrite:{run:'bun experiments/performance/serve-rewrite.ts /tmp/alkalye-redo-benchmark/assets-active /tmp/alkalye-redo-benchmark/data-active 4461 > /tmp/alkalye-redo-benchmark/server.log 2>&1',cwd:'/tmp/alkalye-redo-benchmark/baseline',route:false,portless:false}}}\n",
+	"independentAcceptance": "Observer profile clears only document journals before boot; accepted Undo/Redo hashes checked independently",
+	"trialOrder": [
+		"baseline0",
+		"candidate0",
+		"candidate1",
+		"baseline1",
+		"baseline2",
+		"candidate2"
+	]
+}

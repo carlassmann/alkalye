@@ -1,0 +1,52 @@
+**Verdict:** keeping the certificate across exact validated duplicate batches is safe, provided you add the guards below. I read `crdt.ts` and `text-visibility.ts` closely but skimmed `document-session.ts`, and ran nothing.
+
+**Why duplicates are safe.** A duplicate here means `this.operations.has(id)` is true for every operation when the commit runs. `validateIdentities` (`crdt.ts:1760`) already requires each duplicate to be JSON-identical to the stored copy. In the commit (`crdt.ts:599-638`), a duplicate only does these things:
+- **`clock = max`:** no change.
+- **`stateGeneration++`:** this is your 31→32 diagnostic; the certificate ignores it.
+- **The visibility commit for its target:**
+  - `visibility.generation++`. That only makes *other* prepared visibility commits stale; it doesn't change what's visible.
+  - Removals and cancels that are already known hit `continue`, and `activeCache` is not cleared.
+  - Removals at or below the floor re-add to `legacyRemoved`. That's a no-op unless the floor moved since the first apply. The floor only moves in `restore`, which clears the slot. Also, `restoreSteps` throws when the floor rises on a target that has cancellations (`text-visibility.ts:303`), and the slot target always has the Undo cancellation.
+- **Caches:** no `invalidateText` and no `metadataCache` change. Caches stay identical, which matches the diagnostic.
+
+**Blockers and contracts:**
+1. **Where to clear.** Clear inside the closure returned by `prepare`, as its first statement, before `for (commit of commits)`. Decide "is anything new" there using exactly the same check as line 603: `ops.some(op => !this.operations.has(op.id))`.
+   - Don't decide at prepare time. A stale prepared closure, or another replica's commit inside `applyTogether`, can run in between.
+   - `validate()` must never touch the slot.
+2. **Compacted operations count as new.** After a checkpoint restore, an operation can be absent from `operations` but still present in `textOwners` or in visibility (`known`/`isCancellation`). The commit treats it as new: `operations.set`, `invalidateText`, owner set. So the check above clears the slot automatically.
+   - The Redo preflight must additionally reject `textOwners.has(redo.id)` and `visibility.known(redo.id)`. Today `prepareTerminalCancellation` checks only `operations.has` (line 192).
+   - Don't use `known` or `textOwners` to decide whether something is a duplicate.
+3. **Within one batch.** `[A, A]` where A is new still counts as new. Never dedupe the batch before the check.
+4. **Restore.** Clear the slot at the start of `restoreStateSteps`, before the first `yield` and before `this.apply(fields)`. An interrupted cooperative or partial restore mutates visibility, `textOwners` and caches directly without going through `prepare`. Don't rely on `fields` being new.
+5. **Fork.** Copy the slot as the last step of `forkSteps`. `forkEffect` already rejects if `generation` or `clock` changed during the copy. Every way the slot changes (creation, new-op clear, restore) also bumps `generation`, so a stale copy can't get through.
+   - The fork rebuilds `textCache` with `immutableAtoms(...)`, which may return a new identity. The slot's identity check then misses and falls back to the slow path, which is safe. Expect cache misses on forks.
+6. **When to create the slot.** Create it as the last statement of `cachePreparedText`, after all caches are set, and only when:
+   - `edit.terminalRemoval` is true,
+   - `input.length === 1`,
+   - `generation === edit.generation + 1`,
+   - the signature matches.
+
+   If anything earlier throws, no slot. Since `commit()` (which clears) runs before `cachePreparedText`, the order is already right.
+7. **Store both last atoms.** Keep the raw last atom (`edit.raw.at(-1)`) and the canonical last atom (`edit.atoms.at(-1)`) separately; they can be different objects. Redo appends each to its own view. Also check that `atomIndex.get(id)?.atom` is the same object as the raw last atom.
+8. **Redo preflight still needs:**
+   - `!legacyTextTargets.has(target)`
+   - `visibility.active(redo.id) !== false`
+   - `canCancel(target, undoId)`, which gives floor and owner provenance
+   - `clock(redo) > clock(undo)`, enforced by `visibility.prepare`
+   - Redo is the only operation in the input, its kind is `cancel`, and its `value` is the Undo id
+   - slot target equals the Redo target
+
+   Correctness relies on the visibility after Redo being exactly the visibility before Undo. That holds only if nothing new happened since the Undo, which guard 1 ensures. With that, a pre-existing *inactive* canceller of the Undo is harmless, and an *active* one was already rejected by the Undo preflight (line 194).
+9. **Header/fence (defence in depth, cheap).** The Undo preflight checked only the content after removal for fences and headers, not the original content. Mirror `prepareTerminalPeerEdit`'s insert checks on both contents: `touchesSourceFence` on old and new, same header length, and the original atom has no `order`, `ending`, `observed`, `migration`, `body` or `emptyHeader`.
+10. **`applyTogether`.** `new Set(replicas)` dedupes the same replica, and each replica has its own slot. If replica B's commit throws after A committed, A's slot still matches A's state. Fresh views mean no shared array keys are mutated, because `sourceViews`, `sourceOffsets` and `terminalRemovals` only get new keys.
+11. **`preparedEdit` precedence.** Leave it unchanged. A leftover local `preparedEdit` with a colliding id is still rejected by the `kind` field in `textEditSignature`, so it just takes the slow path. Building a `preparedEdit` doesn't mutate anything, so it doesn't clear the slot.
+
+**Caveat: `operations` is a public mutable Map.** Nothing outside `crdt.ts` writes to it (only reads in `documents.ts`).
+- An outside `delete` would make a later duplicate count as new and clear the slot, which is safe.
+- An outside `set` with no apply would make a real new operation look like a duplicate. That keeps the slot, but the commit also skips the state change, so caches still match.
+
+So it doesn't break the slot, but document "only `prepare` mutates `operations`", or make the field readonly.
+
+The other aliasing write is `this.restored.set` after `apply` (`crdt.ts:1096`). It goes through a new text operation, so the slot is already cleared.
+
+written with claude-opus-5-5 in claude code
