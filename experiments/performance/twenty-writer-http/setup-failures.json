@@ -1,0 +1,25 @@
+{
+	"excludedSetupFailures": [
+		{
+			"phase": "types",
+			"error": "Private actionOperations import; replaced with public validateActionIdentity"
+		},
+		{
+			"phase": "document-create",
+			"error": "Actor missing authenticated subject prefix"
+		},
+		{
+			"phase": "workspace-create",
+			"error": "Repeat request after partial setup; fresh disposable data used"
+		},
+		{
+			"phase": "authentication",
+			"error": "Request before restarted server readiness"
+		},
+		{
+			"phase": "snapshot-exactness",
+			"error": "newDocument title normalization changed source; Untitled preserves original source"
+		}
+	],
+	"measuredRun": "Only final successful fresh-data run contributes timings."
+}
