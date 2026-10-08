@@ -1,0 +1,447 @@
+--- a/src/client/components/editor.ts
++++ b/src/client/components/editor.ts
+@@ -1,5 +1,6 @@
+ import { TextIndex } from "../../shared/text-index"
+ import * as Effect from "effect/Effect"
++import * as Cause from "effect/Cause"
+ import * as Fiber from "effect/Fiber"
+ import * as FiberSet from "effect/FiberSet"
+ import { proseAt, typingEdit } from "../../shared/typing"
+@@ -35,8 +36,30 @@
+ 	matches: { start: number; end: number }[]
+ }
+ let lastCodeLanguage = ""
++let editorSelectionGeneration = 0
+ 
++export interface PendingEditorChange {
++	kind: "pending"
++}
++export interface MergedEditorSelection {
++	editable?: boolean
++	ranges?: { start: number; end: number; direction: "forward" | "backward" | "none" }[]
++	start: number
++	end: number
++	direction: "forward" | "backward" | "none"
++	generation: number
++	composing: boolean
++	busy: boolean
++	source: string
++}
++export interface WorkerClipboard {
++	capture(start: number, end: number, expectedSource: string): Effect.Effect<{ token: string; selected: string }, unknown>
++	resolve(token: string): Effect.Effect<{ source: string; start: number; end: number }, unknown>
++	release(token: string): Effect.Effect<void, unknown>
++}
+ export interface EditorOptions {
++	clipboard?: WorkerClipboard
++	authority?: "local" | "worker"
+ 	isDrawing(id: string): boolean
+ 	openDrawing(id: string): void
+ 	content: string
+@@ -56,7 +79,11 @@
+ 		content: string,
+ 		base?: Atom[],
+ 		replacements?: SourceReplacement[],
+-	): { atoms: Atom[]; content: string; operation: Operation | null } | undefined
++		command?: { clipboardToken: string },
++	):
++		| { atoms: Atom[]; content: string; operation: Operation | null }
++		| PendingEditorChange
++		| undefined
+ 	undo(redo: boolean): void
+ 	select(): void
+ 	requestAsset(): void
+@@ -111,6 +138,24 @@
+ 	// textarea shows inactive links collapsed, so its value and offsets differ.
+ 	get source() {
+ 		return this.view?.text
++	}
++	setEditable(editable: boolean) {
++		this.view?.setEditable(editable)
++	}
++	commandSelection() {
++		return this.view?.mergeSelection(true)
++	}
++	failAuthority() {
++		this.view?.failAuthority()
++	}
++	freezeCommands(frozen: boolean) {
++		this.view?.freezeCommands(frozen)
++	}
++	mergeSelection() {
++		return this.view?.mergeSelection()
++	}
++	adoptMerged(content: string, selection: MergedEditorSelection) {
++		return this.view?.adoptMerged(content, selection) ?? false
+ 	}
+ 	update(content: string, atoms: Atom[], editable: boolean) {
+ 		this.view?.update(content, atoms, editable)
+@@ -207,7 +252,13 @@
+ 	let searchMatches: { start: number; end: number }[] = []
+ 	let people: Presence[] = []
+ 	let editable = options.editable
++	let permissionEditable = options.editable
++	let commandFrozen = false
++	let authorityFailed = false
++	let clipboardCommit: string | undefined
++	let clipboardSubmitted = false
+ 	let atoms = options.atoms
++	let selectionGeneration = ++editorSelectionGeneration
+ 	let acceptedSource = options.content
+ 	let deferredUpdate:
+ 		{ content: string; atoms: Atom[]; editable: boolean } | undefined
+@@ -260,8 +311,12 @@
+ 		let source = text.input()
+ 		updateHighlight()
+ 		if (composing) return
+-		let edit = options.change(source, atoms, text.takeReplacements())
+-		if (edit) update(edit.content, edit.atoms, editable)
++		selectionGeneration = ++editorSelectionGeneration
++		if (options.authority === "worker" && source === acceptedSource) return
++		let edit = options.change(source, atoms, text.takeReplacements(), clipboardCommit ? { clipboardToken: clipboardCommit } : undefined)
++		if (clipboardCommit) clipboardSubmitted = edit !== undefined
++		if (edit && "kind" in edit) acceptPending()
++		else if (edit) update(edit.content, edit.atoms, editable)
+ 		else text.sync()
+ 		if (options.preferences.autocomplete) showCompletions()
+ 	}
+@@ -279,9 +334,14 @@
+ 		() => {
+ 			text.input()
+ 			let base = atoms
+-			let edit = options.change(text.value, base, text.takeReplacements())
++			let edit =
++				options.authority === "worker" && text.value === acceptedSource
++					? undefined
++					: options.change(text.value, base, text.takeReplacements())
+ 			composing = false
+-			if (edit) {
++			selectionGeneration = ++editorSelectionGeneration
++			if (edit && "kind" in edit) acceptPending()
++			else if (edit) {
+ 				let removed = new Set(edit.operation?.remove ?? [])
+ 				let local = base.filter(atom => !removed.has(atom.id))
+ 				let inserted = edit.operation?.insert ?? []
+@@ -297,6 +357,7 @@
+ 				else text.sync()
+ 			}
+ 			deferredUpdate = undefined
++			options.select()
+ 		},
+ 		{ signal: listeners.signal },
+ 	)
+@@ -318,19 +379,24 @@
+ 				if (!dragging) return
+ 				dragging = false
+ 				text.sync()
++				options.select()
+ 			},
+ 			{ signal: listeners.signal },
+ 		)
+ 	document.addEventListener(
+ 		"selectionchange",
+ 		() => {
+-			if (document.activeElement === textarea && !text.sync()) paintActiveLine()
++			if (document.activeElement === textarea) {
++				if (!text.sync()) paintActiveLine()
++				options.select()
++			}
+ 		},
+ 		{ signal: listeners.signal },
+ 	)
+ 	textarea.addEventListener("copy", copySource, { signal: listeners.signal })
+ 	textarea.addEventListener("cut", copySource, { signal: listeners.signal })
+ 	textarea.onselect = () => {
++		selectionGeneration = ++editorSelectionGeneration
+ 		paintActiveLine()
+ 		options.select()
+ 	}
+@@ -435,6 +501,11 @@
+ 			}
+ 		},
+ 		update,
++		mergeSelection,
++		adoptMerged,
++		setEditable,
++		freezeCommands,
++		failAuthority,
+ 		format,
+ 		command,
+ 		insert,
+@@ -461,7 +532,7 @@
+ 			schedulePaint()
+ 		},
+ 		mediaSelection() {
+-			if (composing || !inSync()) return
++			if (options.authority === "worker" || composing || !inSync()) return
+ 			let image = editorContext(text.value, text.selectionStart).image
+ 			return {
+ 				atoms,
+@@ -470,7 +541,7 @@
+ 			}
+ 		},
+ 		attachmentSelection() {
+-			if (composing || !inSync()) return
++			if (options.authority === "worker" || composing || !inSync()) return
+ 			return {
+ 				atoms,
+ 				start: text.selectionStart,
+@@ -478,7 +549,7 @@
+ 			}
+ 		},
+ 		selectionAnchor() {
+-			if (composing || !inSync()) return
++			if (options.authority === "worker" || composing || !inSync()) return
+ 			return selectionAnchor(
+ 				atoms,
+ 				text.value,
+@@ -914,7 +985,72 @@
+ 		}
+ 		collaborators.replaceChildren(fragment)
+ 	}
++	function acceptPending() {
++		acceptedSource = text.value
++		anchorIndices.clear()
++		lineActions.update()
++		schedulePaint()
++	}
++	function mergeSelection(command = false): MergedEditorSelection {
++		return {
++			editable: permissionEditable && !authorityFailed,
++			start: text.selectionStart,
++			end: text.selectionEnd,
++			direction: text.selectionDirection,
++			generation: selectionGeneration,
++			composing,
++			busy:
++				composing || dragging || (!command && secondarySelections.length > 0) || !inSync(),
++			...(command ? { ranges: selectedRanges() } : {}),
++			source: text.value,
++		}
++	}
++	function adoptMerged(content: string, selection: MergedEditorSelection) {
++		if (
++			options.authority !== "worker" || authorityFailed ||
++			composing ||
++			dragging ||
++			(!selection.ranges && secondarySelections.length > 0) ||
++			listeners.signal.aborted ||
++			selection.generation !== selectionGeneration ||
++			selection.source !== text.value
++		)
++			return false
++		menu.hidden = true
++		completionItems = []
++		textarea.removeAttribute("aria-activedescendant")
++		acceptedSource = content
++		text.reconcile(content, selection.start, selection.end)
++		text.setSelectionRange(selection.start, selection.end, selection.direction)
++		if (selection.ranges) restoreRanges(mergeSelections(selection.ranges, true))
++		selectionGeneration = ++editorSelectionGeneration
++		lineActions.update()
++		schedulePaint()
++		return true
++	}
++	function failAuthority() {
++		authorityFailed = true
++		editable = false
++		textarea.readOnly = true
++		menu.hidden = true
++	}
++	function freezeCommands(frozen: boolean) {
++		commandFrozen = frozen
++		editable = permissionEditable && !frozen && !authorityFailed
++		textarea.readOnly = !editable
++	}
++	function setEditable(nextEditable: boolean) {
++		permissionEditable = nextEditable
++		editable = nextEditable && !commandFrozen && !authorityFailed
++		textarea.readOnly = !editable
++	}
+ 	function update(content: string, nextAtoms: Atom[], nextEditable: boolean) {
++		if (options.authority === "worker") {
++			options.report(
++				new Error("Worker editor requires resolved candidate adoption"),
++			)
++			return
++		}
+ 		editable = nextEditable
+ 		textarea.readOnly = !editable
+ 		if (composing) {
+@@ -1231,6 +1367,7 @@
+ 		// Alt, touch and IME composition keep the browser menu for spelling,
+ 		// selection handles and candidate pickers.
+ 		if (
++			(options.authority === "worker" && !options.clipboard) ||
+ 			composing ||
+ 			!inSync() ||
+ 			(!keyboard &&
+@@ -1313,7 +1450,7 @@
+ 				icon: "image",
+ 				run: () => options.previewImage?.(image.url, image.alt),
+ 			})
+-		if (context.task && editable)
++		if (context.task && editable && options.authority !== "worker")
+ 			entries.push({
+ 				label: "Toggle complete",
+ 				icon: "check",
+@@ -1362,7 +1499,7 @@
+ 		)
+ 		if (selected) {
+ 			entries.push("separator")
+-			if (editable && (options.canComment?.() ?? true))
++			if (editable && options.authority !== "worker" && (options.canComment?.() ?? true))
+ 				entries.push({
+ 					label: "Add comment",
+ 					icon: "message-square-plus",
+@@ -1413,7 +1550,7 @@
+ 					icon: "plus",
+ 					items: [
+ 						action("Link", "link", "link"),
+-						...((options.canAttach?.() ?? true)
++						...((options.authority !== "worker" && (options.canAttach?.() ?? true))
+ 							? ([
+ 									{
+ 										label: "Attachment",
+@@ -1429,7 +1566,7 @@
+ 							shortcut: key("codeBlock"),
+ 							run: insertCodeBlock,
+ 						},
+-						...((options.canAttach?.() ?? true)
++						...((options.authority !== "worker" && (options.canAttach?.() ?? true))
+ 							? ([
+ 									{
+ 										label: "Whiteboard",
+@@ -1494,6 +1631,10 @@
+ 		)
+ 	}
+ 	function cut() {
++		if (options.authority === "worker") {
++			cutInWorker()
++			return
++		}
+ 		let range = captureSelection()
+ 		if (!range?.text) return
+ 		let copied = range.text
+@@ -1505,6 +1646,10 @@
+ 		)
+ 	}
+ 	function paste() {
++		if (options.authority === "worker") {
++			pasteInWorker()
++			return
++		}
+ 		let range = captureSelection()
+ 		if (!range) return
+ 		fork(
+@@ -1523,9 +1668,60 @@
+ 			),
+ 		)
+ 	}
++	function workerClipboardReady() {
++		return options.clipboard && editable && !commandFrozen && !authorityFailed && !composing && !dragging && !secondarySelections.length && inSync() && !listeners.signal.aborted
++	}
++	function pasteInWorker() {
++		if (!workerClipboardReady()) return
++		let gestureSource = text.value
++		let start = text.selectionStart
++		let end = text.selectionEnd
++		let reading: Promise<string>
++		try { reading = navigator.clipboard.readText() }
++		catch (error) { options.report(error); return }
++		replaceWorkerClipboard(reading, start, end, gestureSource)
++	}
++	function cutInWorker() {
++		if (!workerClipboardReady()) return
++		let start = text.selectionStart
++		let end = text.selectionEnd
++		let gestureSource = text.value
++		let selected = gestureSource.slice(start, end)
++		if (!selected) return
++		let writing: Promise<void>
++		try { writing = navigator.clipboard.writeText(selected) }
++		catch (error) { options.report(error); return }
++		replaceWorkerClipboard(writing.then(() => ""), start, end, gestureSource, selected)
++	}
++	function replaceWorkerClipboard(reading: Promise<string>, start: number, end: number, gestureSource: string, expectedSelected?: string) {
++		void reading.catch(() => undefined)
++		let clipboard = options.clipboard
++		if (!clipboard) return
++		fork(Effect.scoped(Effect.gen(function* () {
++			let readingTask = yield* Effect.tryPromise(() => reading).pipe(Effect.forkScoped({ startImmediately: true }))
++			let submitted = false
++			if (text.value !== gestureSource || !workerClipboardReady()) return
++			let captured = yield* Effect.acquireRelease(clipboard.capture(start, end, gestureSource), captured => Effect.suspend(() => submitted ? Effect.void : clipboard.release(captured.token).pipe(Effect.timeout("1 second"), Effect.catch(() => Effect.void))))
++			let pasted = yield* Fiber.join(readingTask)
++			if (expectedSelected !== undefined && expectedSelected !== captured.selected) return
++			let resolved = yield* clipboard.resolve(captured.token)
++			yield* Effect.sync(() => {
++				if (!workerClipboardReady() || text.value !== resolved.source || text.value.slice(resolved.start, resolved.end) !== captured.selected) return
++				text.setSelectionRange(resolved.start, resolved.end)
++				clipboardCommit = captured.token
++				clipboardSubmitted = false
++				try {
++					insert(options.preferences.smartPaste && expectedSelected === undefined ? pasteMarkdown(pasted, "", captured.selected) : pasted)
++					submitted = clipboardSubmitted
++				} finally { clipboardCommit = undefined }
++			})
++		})).pipe(Effect.catchCause(cause => Effect.sync(() => options.report(Cause.squash(cause))))))
++	}
++
+ 	// Clipboard promises can outlive remote edits, so the range is held as atom
+ 	// anchors and resolved against the document once the clipboard settles.
+ 	function captureSelection() {
++		if (options.authority === "worker") return
+ 		if (!editable || composing || !inSync()) return
+ 		return {
+ 			start: anchor(text.selectionStart),
+@@ -1563,7 +1759,7 @@
+ 	function contextAction() {
+ 		if (!proseAt(text.value, text.selectionStart)) return false
+ 		let context = editorContext(text.value, text.selectionStart)
+-		if (context.image && editable) {
++		if (context.image && editable && options.authority !== "worker") {
+ 			options.requestAsset()
+ 			return true
+ 		}
+@@ -1602,6 +1798,11 @@
+ 	}
+ 	function editorKeydown(event: KeyboardEvent) {
+ 		if (!(event.currentTarget instanceof HTMLTextAreaElement)) return
++		if (options.authority === "worker" && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "z") {
++			event.preventDefault()
++			if (permissionEditable) options.undo(event.shiftKey)
++			return
++		}
+ 		if (event.isComposing || composing) return
+ 		let editor = text
+ 		let mac = /Mac/i.test(navigator.platform)
+@@ -1702,7 +1903,7 @@
+ 		}
+ 		if (mod && key === "y") {
+ 			event.preventDefault()
+-			options.undo(true)
++			if (permissionEditable) options.undo(true)
+ 			return
+ 		}
+ 		if (mod && event.shiftKey && key === "l") {
+@@ -2298,6 +2499,11 @@
+ 	}
+ 
+ 	function multiInput(event: InputEvent) {
++		if (options.authority === "worker" && ["historyUndo", "historyRedo"].includes(event.inputType)) {
++			event.preventDefault()
++			if (permissionEditable) options.undo(event.inputType === "historyRedo")
++			return
++		}
+ 		if (composing) return
+ 		primaryGoalX = undefined
+ 		if (
+@@ -2589,6 +2795,7 @@
+ 		restoreRanges(after)
+ 	}
+ 	function selectionsChanged() {
++		selectionGeneration = ++editorSelectionGeneration
+ 		if (!text.sync()) updateHighlight()
+ 	}
+ }

@@ -1,0 +1,10 @@
+--- a/src/client/source-textarea.ts
++++ b/src/client/source-textarea.ts
+@@ -323,3 +323,7 @@
+ 	}
+ 	return { start, remove: end - start, text: after.slice(start, nextEnd) }
+ }
++
++export function sourceDifference(before: string, after: string): SourceReplacement {
++	return difference(before, after)
++}

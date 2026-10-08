@@ -1,0 +1,12 @@
+$ tsc --noEmit
+worker-editor-basis.ts(5,1): error TS6133: 'Stream' is declared but its value is never read.
+worker-editor-basis.ts(67,19): error TS7006: Parameter 'input' implicitly has an 'any' type.
+worker-editor-basis.ts(107,16): error TS7006: Parameter 'input' implicitly has an 'any' type.
+worker-editor-basis.ts(141,20): error TS7006: Parameter 'input' implicitly has an 'any' type.
+worker-editor-basis.ts(153,28): error TS7006: Parameter 'range' implicitly has an 'any' type.
+worker-editor-basis.ts(155,113): error TS7006: Parameter 'range' implicitly has an 'any' type.
+worker-editor-basis.ts(168,11): error TS7006: Parameter 'input' implicitly has an 'any' type.
+worker-editor-basis.ts(176,22): error TS7006: Parameter 'input' implicitly has an 'any' type.
+worker-editor-basis.ts(179,22): error TS7006: Parameter 'input' implicitly has an 'any' type.
+worker-editor-basis.ts(195,22): error TS7006: Parameter 'input' implicitly has an 'any' type.
+worker-editor-basis.ts(208,22): error TS7006: Parameter 'input' implicitly has an 'any' type.

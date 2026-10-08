@@ -1,0 +1,71 @@
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import * as Stream from "effect/Stream"
+import * as SubscriptionRef from "effect/SubscriptionRef"
+import { AuthenticationRequired, AccountChanged } from "./src/shared/authentication"
+import { PermissionDenied, ResourceUnavailable } from "./src/shared/document-actions"
+import { DocumentSession } from "./src/shared/document-session"
+import type { DocumentConnectionState } from "./src/client/browser-library"
+import type { DocumentObservability } from "./src/shared/document-observability"
+
+export interface WorkerDocumentAdmission {
+ readonly exists: boolean
+ readonly deleted: boolean
+ readonly role: "owner" | "writer" | "reader" | undefined
+ readonly account: "ready" | "signedOut" | "accountChanged"
+ readonly online: boolean
+}
+interface ConnectionOptions {
+ session: Context.Service.Shape<typeof DocumentSession>
+ admission: SubscriptionRef.SubscriptionRef<WorkerDocumentAdmission>
+ wakeups: Stream.Stream<unknown>
+ observe: Context.Service.Shape<typeof DocumentObservability>["observe"]
+}
+
+export function makeWorkerOpenedConnection(options: ConnectionOptions) {
+ return Effect.gen(function* () {
+  let state = yield* SubscriptionRef.make<DocumentConnectionState>({ status: "offline" })
+  let deniedRole: WorkerDocumentAdmission["role"]
+  function canWrite() {
+   let admission = SubscriptionRef.getUnsafe(options.admission)
+   return admission.exists && !admission.deleted && admission.role !== "reader" && admission.role !== undefined && admission.account === "ready" && SubscriptionRef.getUnsafe(state).status !== "unavailable"
+  }
+  function synchronize(manual = false) {
+   return Effect.suspend(() => {
+    let admission = SubscriptionRef.getUnsafe(options.admission)
+    if (!manual && SubscriptionRef.getUnsafe(state).status === "unavailable" && admission.role === deniedRole) return Effect.void
+    if (!admission.online) return SubscriptionRef.set(state, { status: "offline" })
+    return SubscriptionRef.set(state, { status: "syncing" }).pipe(
+     Effect.andThen(options.session.sync.pipe(options.observe("sync"))),
+     Effect.andThen(options.session.save),
+     Effect.andThen(Effect.suspend(() => SubscriptionRef.set(state, { status: options.session.unsaved() || options.session.pending().length ? "syncing" : "synced" }))),
+     Effect.catch(error => {
+      let authentication = error instanceof AuthenticationRequired || error instanceof AccountChanged
+      let unavailable = error instanceof PermissionDenied || error instanceof ResourceUnavailable || authentication
+      if (unavailable) deniedRole = SubscriptionRef.getUnsafe(options.admission).role
+      return SubscriptionRef.set(state, {
+       status: unavailable ? "unavailable" : "failed",
+       message: error instanceof Error ? error.message : String(error),
+       reason: authentication ? "authentication" : error instanceof PermissionDenied ? "access" : error instanceof ResourceUnavailable ? "unavailable" : undefined,
+      })
+     }),
+    )
+   })
+  }
+  yield* options.session.changes.pipe(
+   Stream.debounce(500),
+   Stream.merge(options.wakeups),
+   Stream.merge(SubscriptionRef.changes(options.admission).pipe(Stream.changes)),
+   Stream.buffer({ capacity: 1, strategy: "sliding" }),
+   Stream.runForEach(() => synchronize()),
+   Effect.forkScoped({ startImmediately: true }),
+  )
+  return Object.freeze({
+   canWrite,
+   current: () => SubscriptionRef.getUnsafe(state),
+   changes: SubscriptionRef.changes(state),
+   synchronize: synchronize(),
+   retryAfterAdmissionRefresh: synchronize(true),
+  })
+ })
+}

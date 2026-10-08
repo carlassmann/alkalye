@@ -1,0 +1,43 @@
+**Read-only review: worker-opened native editor bundle**
+
+Nothing in this bundle contradicts the claims about epochs, ownership, receipt idempotency or FIFO. I found three gaps between what the proof claims and what the code actually asserts, and two permission/lifecycle gates to clear before cutover.
+
+**Proof vs claim**
+
+1. **Protection after disposal is never asserted.** `beforeunload` is only dispatched before `Close` (`browser-fixture.ts:88`). After `Scope.close(workerScope)` and `editor.remove()` (`:92-95`), only the recovery text and `closedCleanly()` are checked.
+   - "beforeunload stays protected" is proven pre-disposal only.
+   - `queueScope` is never closed, so the claim covers editor+worker disposal only. Queue disposal (sending → unknown) is unexercised.
+2. **"Close failure not clean" passes for an indirect reason.** `closedCleanly()` (`worker-activity.ts:122`) never looks at the Close result. It returns false only because `hasPendingNativeEdits()` is true, which comes from the recovery textarea and `pending > 0`.
+   - Case: Close fails, but there was no prior native failure (e.g. only `PropertiesUpdate` or `TaskToggle` unsaved). `closedCleanly()` then returns true and clears `workerDirty`/`rpcDirty`, so protection drops.
+3. **"5 pending" isn't asserted in source.** The fixture only checks `pending.length > 0` (`browser-fixture.ts:87`). The count of 5 must come from the external `inspect()`. Sticky readonly is also checked at a single point (`:86`), not after later input attempts.
+
+**Lifecycle / ownership gate**
+
+4. **Failed Close tears down anyway.** On flush failure, `Close` clears `opened` and closes the scope (`worker-session.ts:125-131`). Any worker-only unsaved state is lost and can't be retried.
+   - The comment says "main owner must retain full draft", but the main side only creates a recovery owner through `report()` after a native edit fails. A Close failure never calls `report()`.
+   - It's safe only when native recovery already exists, which is the only case the fixture runs.
+   - Gate: Close failure must itself trigger recovery and block `closedCleanly`.
+5. **Close doesn't know about the main queue.** If Close succeeds while main still has queued edits, they arrive afterwards and fail with "Closed", get marked unknown, and land in recovery. No data is lost, but it surfaces as a failure. The main side needs to drain its queue (or check `closedCleanly`) before calling Close; this is untested.
+
+**Permission**
+
+6. **Every open starts as writer.** Initial admission is hardcoded to `role: "writer"`, `exists: true`, `account: "ready"` (`worker-session.ts:55`). `canWrite` is true until an `Admission` RPC demotes it, so a reader-only document accepts local journal writes in that window. Cutover gate: the initial role must come from the real capability, not a default.
+7. **Refusals get relabeled as unknown.** The worker's `PermissionDenied` is a definite not-applied. The queue turns it into `delivery: "unknown"` for edits (`editor-queue.ts:394`) and `AppliedUnknown` for undo (`:203`). That's conservative and loses no data, but the precise refusal never reaches the UI. Readonly demotion looks like an uncertainty failure.
+8. **Nit:** `UndoQueued` clears `candidate` before the `canWrite` check (`worker-editor-basis.ts:122-123`); `ReplaceQueued` does the opposite (`:76-77`). There's no practical impact, because FIFO plus the inline `ReleaseCandidate` means no candidate exists at undo time.
+
+**Confirmed OK**
+- **Epochs:** unique per open (`identity` is per basis instance).
+- **Receipts:** undo receipt is idempotent across a transport retry (`:112-117`, queue `:198`).
+- **Scope finalizer order:** on close, the `closed` deferred finishes first, then `release`, then the sessionScope durable finalizers, then the activity channel.
+- **Failed Open:** explicitly releases and closes the scope.
+- **Observer:** reset on stream end.
+- **Merge/undo/replace interleave:** blocked by the `sequence++` / `accepting` guards.
+- **Adopt:** a failed Adopt is reconciled via `EditorRead`.
+- **Exact-source check:** `expectedSource` holds because the basis is a fork that doesn't take remote changes.
+
+**Other cutover dependencies**
+- **Typing during adoption:** while undo adoption is pending, `replace` throws blocked and hard-fails (`editor-queue.ts:421`). Correct behaviour relies on `EditorElement.freezeCommands(true)` stopping `change` from being called; that's outside the files reviewed.
+- **Test-only code:** `FixtureFault`/`FixtureDraft` are part of the `WorkerDocumentRpc` group itself, and their flags are handler-global (they persist across Close and reopen). The seed endpoints set `accountHeader` and forward cookies. The production RPC group and server must leave both out.
+- **Unverified:** `observe: transport.observe` isn't wrapped in `account.request` the way the other transport calls are (`worker-session.ts:76`). It may be intentional; I couldn't confirm from these files.
+
+written with claude-opus-5-5 in claude-code

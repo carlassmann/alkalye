@@ -1,0 +1,21 @@
+{
+  "assertions": [
+    "simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections",
+    "browser identity is available before any network authentication",
+    "native browser account login serializes cookie issuance and agrees with server verification",
+    "real HTTP fixture seeded without main Replica",
+    "worker opened projection exact",
+    "eight trusted native characters drain with Observe active",
+    "trusted selection replaces newly inserted character",
+    "native local source exactly accepted by real server",
+    "trusted native Undo adopts exact prior source while Observe active",
+    "native local source exactly accepted by real server",
+    "refused actual native edit retains full source in recovery owner",
+    "failed native FIFO suffix remains recoverable",
+    "actual native recovery retains unload protection",
+    "failed native durable Close remains failed",
+    "native recovery owner survives editor and worker disposal",
+    "dirty owner refuses clean-close acknowledgement"
+  ],
+  "stage": "passed"
+}

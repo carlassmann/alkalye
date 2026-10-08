@@ -1,0 +1,35 @@
+**Read-only review: worker-opened editor draft. No shell, build, types, tests or edits.**
+
+I found three blockers to fix before the native fixture. The first is the close-ordering requirement you asked about.
+
+**Blockers**
+
+1. **Activity is released after the session's durable finalizer on owner close and on failed or interrupted Open.** See `worker-session.ts:51`.
+   - Finalizers run in reverse order of registration. The `activity.release` finalizer at line 51, and `makeWorkerActivity`'s own `work.release` finalizer, are registered before the session layer is built at line 72. So when the scope closes, the session finalizer runs first.
+   - Two paths hit this: Open's `onExit → Scope.close` (line 81) and the owner scope closing. Either way the durable finalize can wait on an admission that hasn't been released yet.
+   - Only a normal Close is correct, because line 127 releases explicitly before `Scope.close`.
+   - Smallest fix: after creating activity, do `let sessionScope = yield* Scope.fork(scope)`, then register `Scope.addFinalizer(scope, Effect.sync(activity.release))`, then build journal, session, connection, editor and capability in `sessionScope`. A parent finalizer registered after the fork runs before the child closes. Check this ordering against the installed Effect 4 `Scope.fork`.
+   - Line 127 can stay, since releasing twice should be harmless.
+
+2. **A permission denial becomes AppliedUnknown and destroys the basis.** See `worker-editor-basis.ts:81` and `:89-93`.
+   - `throw fail("PermissionDenied")` inside `Effect.try` lands in `catch`, which clears `basis` and `candidate` and returns `AppliedUnknown`. Nothing was applied, but the queue marks the edit unknown and the binding calls `failAuthority`.
+   - Fix: check `canWrite()` before `candidate = undefined` and the clipboard token delete, and fail with `PermissionDenied` while keeping the basis. `UndoQueued` (line 114) already does this.
+
+3. **Epochs repeat across Opens.** See `worker-editor-basis.ts:30`, `:59` and `:159`.
+   - The `epoch` counter is per editor instance, so every Open starts again at `"1"`.
+   - After a failed Close and a re-Open by the recovery owner, a stale main queue (or its `Adopt`/`EditorRead` reconciliation) can match the new basis on epoch and sequence alone. Stale edits would then apply to the new branch.
+   - Fix: prefix epochs with something unique per Open, e.g. `crypto.randomUUID()` once per `makeWorkerEditorBasis`.
+
+**Smaller issues**
+
+4. **`EditorRead` returns a mixed result** (`worker-editor-basis.ts:54`). Epoch and sequence come from the branch, but `source` comes from the authoritative session. Return `basis.replica.text` instead, or drop `source`. Otherwise a caller reconciling against it would be checking a different document.
+5. **`publishAfter` fires on every call** (`worker-editor-basis.ts:41`), including failures, read-only calls like `ResolveClipboard` and `CaptureClipboard`, and no-op releases. Observe then sends branch updates when nothing changed. Bump `revision` only on success, in `Begin`, `ReplaceQueued`, `UndoQueued`, `Adopt` and `MergeCandidate`.
+6. **The required channel and cooperative flag aren't enforced** (`worker-rpc.ts:86`). `activityChannel: Schema.String` accepts `""`, and `cooperativeWork` accepts `false`. With no listener on the other end, the worker never gets an interaction or hidden signal. Use a non-empty string, and use `Schema.Literal(true)` if cooperative work is mandatory.
+7. **Interrupt semantics of the save are unconfirmed** (`worker-editor-basis.ts:95-98`). The planned "interrupted actual save" proof needs `edit.saved` to be an await on a write the session owns. If interrupting the RPC fiber cancels the journal write itself, the durable prefix becomes whatever the interrupt happened to hit, and the test proves nothing.
+8. **`MergeCandidate` awaits `session.flush` while holding the command permit** (`worker-editor-basis.ts:143`). If flush includes server acknowledgement, adopting after an undo while offline stalls until the 15-second deadline and then fails the editor. Check what flush actually covers.
+9. **Fixture code sits on the production Open path** (`worker-session.ts:42-43`, `:70-71`). This is acceptable for the fixture, but it blocks shipping: the faults have to move into a test-only layer and RPC group.
+10. **Duplicate `closed` finalizer** (`worker-session.ts:78`) repeats line 48 and can go.
+
+Checked with no problems found: one semaphore wraps every handler, and `publishAfter` adds no lock or FIFO of its own. Open takes no main session or replica. Close releases before closing the scope, and a failed Close stays a failure. `closedCleanly` is refused while native edits are pending. The undo receipt is stored as unknown when interrupted.
+
+*written with claude-opus-5-5 in claude-code*

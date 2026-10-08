@@ -1,0 +1,104 @@
+import * as Rpc from "effect/rpc/Rpc"
+import * as RpcGroup from "effect/rpc/RpcGroup"
+import * as Schema from "effect/Schema"
+import { DocumentMetadataSchema } from "./src/shared/document-metadata"
+import { WorkerOpenedEventSchema } from "./worker-opened-observation"
+import { WorkerOpenedSnapshotSchema } from "./worker-opened-schemas"
+
+export class WorkerDocumentFailure extends Schema.TaggedError<WorkerDocumentFailure>()("WorkerDocumentFailure", {
+ reason: Schema.Literals(["Closed", "AlreadyOpen", "AlreadyObserving", "SessionFailure", "PermissionDenied", "AppliedUnknown", "HandleCapacity", "SelectionUnavailable", "BasisUnavailable", "SequenceUnavailable", "CandidateUnavailable", "ClipboardUnavailable", "ClipboardChanged", "Rejected", "Unsaved", "QueuedBlocked"]),
+ category: Schema.String,
+}) {}
+let selectedRange = Schema.Struct({ start: Schema.Natural, end: Schema.Natural, direction: Schema.Literals(["forward", "backward", "none"]) })
+let undoReceipt = Schema.Struct({
+	request: Schema.String,
+	epoch: Schema.String,
+	sequence: Schema.Natural,
+	status: Schema.Literals(["applied", "not-applied", "unknown"]),
+	action: Schema.optional(Schema.String),
+	failure: Schema.optional(Schema.String),
+})
+
+let token = Schema.Struct({ token: Schema.String })
+let range = Schema.Struct({ epoch: Schema.String, sequence: Schema.Natural, start: Schema.Natural, end: Schema.Natural })
+let history = Schema.Struct({ token: Schema.String, complete: Schema.Boolean, moments: Schema.Array(Schema.Struct({ position: Schema.Natural, label: Schema.String, time: Schema.Natural, subject: Schema.String })) })
+let moment = Schema.Struct({ token: Schema.String, position: Schema.Natural, source: Schema.String, metadata: DocumentMetadataSchema, records: Schema.Array(Schema.Struct({ id: Schema.String, kind: Schema.String, label: Schema.String })) })
+let patch = Schema.Struct({
+ title: Schema.optional(Schema.String),
+ path: Schema.optional(Schema.String),
+ tags: Schema.optional(Schema.Array(Schema.String)),
+ pinned: Schema.optional(Schema.Boolean),
+ archived: Schema.optional(Schema.Boolean),
+ commentsDisabled: Schema.optional(Schema.Boolean),
+})
+export let WorkerDocumentRpc = RpcGroup.make(
+ Rpc.make("FixtureFault", { payload: { openFailure: Schema.Boolean, writeFailure: Schema.Boolean }, error: WorkerDocumentFailure }),
+ Rpc.make("FixtureDraft", { payload: { source: Schema.String }, error: WorkerDocumentFailure }),
+ Rpc.make("EditorRead", { success: Schema.Struct({ epoch: Schema.optional(Schema.String), sequence: Schema.optional(Schema.Natural), source: Schema.String }), error: WorkerDocumentFailure }),
+	Rpc.make("Begin", {
+		success: Schema.Struct({ epoch: Schema.String, sequence: Schema.Natural, source: Schema.String }),
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("ReplaceQueued", {
+		payload: {
+			epoch: Schema.String,
+			sequence: Schema.Natural,
+			clipboardToken: Schema.optional(Schema.String),
+			ranges: Schema.Array(Schema.Struct({ start: Schema.Natural, remove: Schema.Natural, text: Schema.String })),
+		},
+		success: Schema.Struct({ epoch: Schema.String, sequence: Schema.Natural, source: Schema.String, unsaved: Schema.Natural }),
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("UndoQueued", {
+		payload: { request: Schema.String, epoch: Schema.String, sequence: Schema.Natural, redo: Schema.Boolean },
+		success: undoReceipt,
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("MergeCandidate", {
+		payload: { epoch: Schema.String, sequence: Schema.Natural, start: Schema.Natural, end: Schema.Natural, ranges: Schema.optional(Schema.Array(selectedRange)) },
+		success: Schema.Struct({ candidate: Schema.String, source: Schema.String, start: Schema.Natural, end: Schema.Natural, ranges: Schema.optional(Schema.Array(selectedRange)) }),
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("Adopt", {
+		payload: { epoch: Schema.String, sequence: Schema.Natural, candidate: Schema.String },
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("ReleaseCandidate", {
+		payload: { candidate: Schema.String },
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("CaptureClipboard", {
+		payload: { epoch: Schema.String, sequence: Schema.Natural, start: Schema.Natural, end: Schema.Natural },
+		success: Schema.Struct({ token: Schema.String, selected: Schema.String }),
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("ResolveClipboard", {
+		payload: { token: Schema.String, epoch: Schema.String, sequence: Schema.Natural },
+		success: Schema.Struct({ epoch: Schema.String, sequence: Schema.Natural, source: Schema.String, start: Schema.Natural, end: Schema.Natural }),
+		error: WorkerDocumentFailure,
+	}),
+	Rpc.make("ReleaseClipboard", {
+		payload: { token: Schema.String },
+		error: WorkerDocumentFailure,
+	}),
+
+ Rpc.make("Protection", { success: Schema.Struct({ unsaved: Schema.Natural, dirty: Schema.Boolean }), error: WorkerDocumentFailure }),
+ Rpc.make("Open", { payload: { document: Schema.String, workspace: Schema.String, subject: Schema.String, origin: Schema.String, online: Schema.Boolean, activityChannel: Schema.NonEmptyString, cooperativeWork: Schema.Boolean }, success: WorkerOpenedSnapshotSchema, error: WorkerDocumentFailure }),
+ Rpc.make("Observe", { success: WorkerOpenedEventSchema, error: WorkerDocumentFailure, stream: true }),
+ Rpc.make("Read", { success: WorkerOpenedSnapshotSchema, error: WorkerDocumentFailure }),
+ Rpc.make("PropertiesUpdate", { payload: { patch }, success: token, error: WorkerDocumentFailure }),
+ Rpc.make("Present", { payload: { index: Schema.Natural }, success: token, error: WorkerDocumentFailure }),
+ Rpc.make("Presentation", { payload: { enabled: Schema.Boolean }, success: token, error: WorkerDocumentFailure }),
+ Rpc.make("TaskToggle", { payload: { range }, success: token, error: WorkerDocumentFailure }),
+ Rpc.make("HistoryLoad", { success: history, error: WorkerDocumentFailure }),
+ Rpc.make("HistorySelect", { payload: { token: Schema.String, position: Schema.Natural }, success: moment, error: WorkerDocumentFailure }),
+ Rpc.make("HistoryRestore", { payload: { token: Schema.String }, success: token, error: WorkerDocumentFailure }),
+ Rpc.make("HistoryRelease", { payload: { token: Schema.String }, error: WorkerDocumentFailure }),
+ Rpc.make("MomentRelease", { payload: { token: Schema.String }, error: WorkerDocumentFailure }),
+ Rpc.make("Execute", { payload: { token: Schema.String }, success: Schema.Struct({ action: Schema.String }), error: WorkerDocumentFailure }),
+ Rpc.make("Release", { payload: { token: Schema.String }, error: WorkerDocumentFailure }),
+ Rpc.make("Admission", { payload: { writable: Schema.Boolean, online: Schema.Boolean }, error: WorkerDocumentFailure }),
+ Rpc.make("Flush", { error: WorkerDocumentFailure }),
+ Rpc.make("LiveStatus", { success: Schema.Struct({ connected: Schema.Boolean, transport: Schema.Literals(["socket", "poll"]), opened: Schema.Boolean }), error: WorkerDocumentFailure }),
+ Rpc.make("Close", { error: WorkerDocumentFailure }),
+)

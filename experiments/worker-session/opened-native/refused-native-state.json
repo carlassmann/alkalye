@@ -1,0 +1,11 @@
+{
+	"provenance": "agent-browser eval window.openedNative.inspect before failClose, observed tool output",
+	"source": "---\ntitle: Worker fixture\n---\n# Native writer\nUnicode \ud83e\udd8a caf\u00e9.\nabcdefgRECOVh",
+	"queueSource": "---\ntitle: Worker fixture\n---\n# Native writer\nUnicode \ud83e\udd8a caf\u00e9.\nabcdefgRECOVh",
+	"recovery": "---\ntitle: Worker fixture\n---\n# Native writer\nUnicode \ud83e\udd8a caf\u00e9.\nabcdefgRECOVh",
+	"readonly": true,
+	"pending": 5,
+	"observations": 50,
+	"failures": ["WorkerDocumentFailure"],
+	"typingScope": "Batch RECOVERY raced readonly authority failure; five characters admitted before editing froze. Remaining keys refused, no claim all eight entered."
+}

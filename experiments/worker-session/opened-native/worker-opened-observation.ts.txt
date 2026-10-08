@@ -1,0 +1,26 @@
+import * as Deferred from "effect/Deferred"
+import * as Schema from "effect/Schema"
+import * as Stream from "effect/Stream"
+import { WorkerOpenedSnapshotSchema, WorkerPresenceSchema } from "./worker-opened-schemas"
+import type { WorkerOpenedSnapshot } from "./worker-opened-schemas"
+import type { LivePresence } from "./src/shared/document-live"
+
+export let WorkerOpenedEventSchema = Schema.Union([
+ Schema.Struct({ type: Schema.Literal("document"), value: WorkerOpenedSnapshotSchema }),
+ Schema.Struct({ type: Schema.Literal("presence"), actor: Schema.String, value: WorkerPresenceSchema }),
+])
+export type WorkerOpenedEvent = typeof WorkerOpenedEventSchema.Type
+interface ObservedDocument {
+ changes: Stream.Stream<WorkerOpenedSnapshot>
+ presence: { changes: Stream.Stream<readonly LivePresence[]> }
+ actor(): string
+}
+
+// One observer occupies one worker lease; the other lease remains for the existing FIFO.
+export function observeWorkerOpenedDocument(opened: ObservedDocument, closed: Deferred.Deferred<void>) {
+ return opened.changes.pipe(
+  Stream.map((value): WorkerOpenedEvent => ({ type: "document", value })),
+  Stream.merge(opened.presence.changes.pipe(Stream.map((value): WorkerOpenedEvent => ({ type: "presence", value, actor: opened.actor() })))),
+  Stream.interruptWhen(Deferred.await(closed)),
+ )
+}

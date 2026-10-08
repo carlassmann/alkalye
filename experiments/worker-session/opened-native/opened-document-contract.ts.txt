@@ -1,0 +1,62 @@
+import type * as Effect from "effect/Effect"
+import type * as Stream from "effect/Stream"
+import type { MetadataPatch } from "./src/shared/document-metadata"
+import type { LivePresence } from "./src/shared/document-live"
+import type { WorkerOpenedSnapshot } from "./worker-opened-schemas"
+
+export interface MutationReceipt {
+ readonly action: string
+}
+export interface DocumentRange {
+ readonly epoch: string
+ readonly sequence: number
+ readonly start: number
+ readonly end: number
+}
+export interface DocumentToken {
+ readonly token: string
+}
+export interface OpenedDocumentCommands<Failure> {
+ properties: {
+  update(patch: MetadataPatch, label?: string): Effect.Effect<DocumentToken, Failure>
+  presentation(enabled: boolean): Effect.Effect<DocumentToken, Failure>
+ }
+ discussion: {
+  capture(range: DocumentRange): Effect.Effect<DocumentToken, Failure>
+  submit(token: string, body: string): Effect.Effect<MutationReceipt, Failure>
+  release(token: string): Effect.Effect<void, Failure>
+  reply(thread: string): Effect.Effect<DocumentToken, Failure>
+  resolve(thread: string, resolved: boolean): Effect.Effect<DocumentToken, Failure>
+  delete(thread: string): Effect.Effect<DocumentToken, Failure>
+  setEnabled(enabled: boolean): Effect.Effect<DocumentToken, Failure>
+ }
+ assets: {
+  capture(range: DocumentRange, inline: boolean): Effect.Effect<DocumentToken, Failure>
+  attachFiles(files: readonly File[], selection: string): Effect.Effect<DocumentToken, Failure>
+  insert(asset: string, selection: string): Effect.Effect<DocumentToken, Failure>
+  rename(asset: string, name: string): Effect.Effect<DocumentToken, Failure>
+  delete(asset: string): Effect.Effect<DocumentToken, Failure>
+  mute(asset: string, muted: boolean): Effect.Effect<DocumentToken, Failure>
+  restore(asset: string, file: File): Effect.Effect<void, Failure>
+  release(token: string): Effect.Effect<void, Failure>
+  file(asset: string): Effect.Effect<File, Failure>
+ }
+ commands: {
+  execute(token: string): Effect.Effect<MutationReceipt, Failure>
+  release(token: string): Effect.Effect<void, Failure>
+ }
+ flush: Effect.Effect<void, Failure>
+ save: Effect.Effect<void, Failure>
+ synchronize: Effect.Effect<void, Failure>
+}
+export interface OpenedDocumentProjection<Failure> {
+ current(): WorkerOpenedSnapshot
+ changes: Stream.Stream<WorkerOpenedSnapshot, Failure>
+ record(id: string): Effect.Effect<{ readonly id: string; readonly fields: Readonly<Record<string, string>> } | undefined, Failure>
+ presence: {
+  current(): readonly LivePresence[]
+  changes: Stream.Stream<readonly LivePresence[], Failure>
+  announce(presence: Omit<LivePresence, "own">): Effect.Effect<void, Failure>
+ }
+}
+export interface OpenedDocumentCapability<Failure> extends OpenedDocumentCommands<Failure>, OpenedDocumentProjection<Failure> {}
