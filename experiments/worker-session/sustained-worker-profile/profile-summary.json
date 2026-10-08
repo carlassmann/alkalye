@@ -1,0 +1,771 @@
+{
+	"profiles": [
+		{
+			"urls": [],
+			"samples": 136201,
+			"selfMs": [
+				["(idle)", 19552.39799999542],
+				["(program)", 768.0729999999953],
+				["getBoundingClientRect", 29.742999999999995],
+				["(garbage collector)", 16.77],
+				["refine [src/client/editor-viewport.ts:670]", 10.769999999999994],
+				[
+					"measuredBlock [src/client/editor-viewport.ts:588]",
+					9.740999999999998
+				],
+				["(anonymous)", 6.551],
+				["(anonymous) [src/client/editor-viewport.ts:704]", 6.2490000000000006],
+				["replace [editor-queue.ts:301]", 5.401],
+				["(anonymous) [editor-queue.ts:110]", 5.211],
+				["update [src/client/components/editor-overlay.ts:40]", 4.523],
+				["message [worker-client.ts:18]", 3.493],
+				["sameProjection [src/shared/projection.ts:315]", 3.369],
+				["collect [src/shared/text-index.ts:170]", 3.308],
+				["requestAnimationFrame", 2.8809999999999993],
+				[
+					"readSelection [src/client/editor-viewport.ts:966]",
+					1.8419999999999999
+				],
+				["mark", 1.7419999999999989],
+				["paint [src/client/editor-viewport.ts:836]", 1.6889999999999998],
+				[
+					"projectionFor [src/client/source-textarea.ts:242]",
+					1.4869999999999999
+				],
+				["rebuild [src/client/editor-viewport.ts:718]", 1.3179999999999998]
+			],
+			"inclusiveMs": [
+				["(root)", 20462.438999991282],
+				["(idle)", 19552.39799999542],
+				["(program)", 768.0729999999953],
+				["(anonymous) [src/client/editor-viewport.ts:704]", 50.513],
+				["refine [src/client/editor-viewport.ts:670]", 44.36400000000001],
+				[
+					"measuredBlock [src/client/editor-viewport.ts:588]",
+					32.98299999999998
+				],
+				["getBoundingClientRect", 29.742999999999995],
+				[
+					"textarea.oninput [src/client/components/editor.ts:285]",
+					25.44799999999999
+				],
+				["input [src/client/source-textarea.ts:160]", 19.078999999999994],
+				["message [worker-client.ts:18]", 18.642999999999997],
+				["(garbage collector)", 16.77],
+				["paint [src/client/editor-viewport.ts:836]", 15.529999999999998],
+				["acknowledge [src/client/editor-viewport.ts:382]", 15.526999999999996],
+				["emit [effect/dist/workers/Worker.js:103]", 14.842000000000004],
+				["evaluate [effect/dist/internal/effect.js:406]", 13.141],
+				["runLoop [effect/dist/internal/effect.js:441]", 12.826],
+				["(anonymous) [effect/dist/internal/effect.js:812]", 12.654],
+				["(anonymous) [effect/dist/FiberSet.js:391]", 11.303999999999998],
+				[
+					"(anonymous) [effect/dist/internal/effect.js:2476]",
+					11.296999999999999
+				],
+				["makeExit [effect/dist/internal/core.js:295]", 11.146999999999998],
+				["write [effect/dist/rpc/RpcClient.js:221]", 10.981999999999998],
+				["onSuccess [effect/dist/rpc/RpcClient.js:382]", 10.981999999999998],
+				["resume [effect/dist/rpc/RpcClient.js:115]", 10.981999999999998],
+				["(anonymous)", 8.725999999999996],
+				[
+					"document.addEventListener.signal [src/client/components/editor.ts:361]",
+					6.369
+				],
+				["replace [editor-queue.ts:301]", 5.705],
+				["change [bindings.ts:22]", 5.705],
+				["succeedWith [effect/dist/internal/effect.js:512]", 5.636],
+				[
+					"makePrimitiveProto [effect/dist/internal/effect.js:984]",
+					5.512999999999999
+				],
+				["(anonymous) [editor-queue.ts:110]", 5.512999999999999],
+				["makePrimitive [effect/dist/internal/effect.js:1635]", 5.481],
+				[
+					"flushHighlight [src/client/components/editor.ts:1228]",
+					5.3679999999999986
+				],
+				["sync [src/client/source-textarea.ts:217]", 5.329999999999999],
+				[
+					"update [src/client/components/editor-overlay.ts:40]",
+					5.2139999999999995
+				],
+				["(anonymous) [effect/dist/rpc/RpcClient.js:770]", 3.845999999999999],
+				["slice [src/shared/text-index.ts:232]", 3.62],
+				["sameProjection [src/shared/projection.ts:315]", 3.369],
+				["collect [src/shared/text-index.ts:170]", 3.308],
+				["input [src/client/editor-viewport.ts:405]", 3.0529999999999995],
+				["makePrimitive [effect/dist/internal/core.js:335]", 3.001],
+				["idle [src/client/editor-viewport.ts:701]", 2.898],
+				["requestAnimationFrame", 2.8809999999999993],
+				[
+					"paintActiveLine [src/client/components/editor.ts:544]",
+					2.861999999999999
+				],
+				[
+					"(anonymous) [src/client/components/editor.ts:1250]",
+					2.7479999999999993
+				],
+				["(anonymous) [effect/dist/rpc/Utils.js:59]", 2.6979999999999995],
+				["(anonymous) [effect/dist/rpc/RpcClient.js:356]", 2.6979999999999995],
+				["apply [src/client/editor-viewport.ts:393]", 2.5779999999999994],
+				["pipe [effect/dist/internal/core.js:35]", 2.511],
+				[
+					"blockBoundary [src/client/editor-viewport.ts:549]",
+					2.4869999999999997
+				],
+				["pipeArguments [effect/dist/Pipeable.js:51]", 2.358],
+				["(anonymous) [effect/dist/SchemaParser.js:829]", 2.1859999999999995],
+				[
+					"get selectionStart [src/client/source-textarea.ts:81]",
+					2.1689999999999996
+				],
+				["makePrimitiveProto [effect/dist/internal/effect.js:808]", 2.017],
+				["(anonymous) [effect/dist/rpc/RpcClient.js:110]", 2.017],
+				["(anonymous) [effect/dist/Schema.js:632]", 1.8980000000000001],
+				[
+					"(anonymous) [effect/dist/internal/schema/interpreter.js:140]",
+					1.8980000000000001
+				],
+				["document.addEventListener.capture", 1.8679999999999983],
+				[
+					"readSelection [src/client/editor-viewport.ts:966]",
+					1.8419999999999999
+				],
+				["(anonymous) [effect/dist/SchemaAST.js:1581]", 1.8119999999999998],
+				["mark", 1.7419999999999989],
+				["projectionFor [src/client/source-textarea.ts:242]", 1.642],
+				["rebuild [src/client/editor-viewport.ts:718]", 1.5519999999999998],
+				["get selectionStart [src/client/editor-viewport.ts:282]", 1.534],
+				["(anonymous) [effect/dist/internal/effect.js:2792]", 1.522],
+				[
+					"update4 [src/client/components/line-actions.ts:62]",
+					1.4849999999999999
+				],
+				["makePrimitive [effect/dist/internal/effect.js:717]", 1.402],
+				["inspect [browser-fixture.ts:182]", 1.3880000000000001],
+				["(anonymous) [effect/dist/internal/effect.js:766]", 1.25],
+				["frame", 1.235],
+				["multiInput [src/client/components/editor.ts:2395]", 1.21]
+			]
+		},
+		{
+			"urls": ["http://localhost:49738/worker.js?role=peer"],
+			"samples": 132731,
+			"selfMs": [
+				["(idle)", 17164.83800000791],
+				["(garbage collector)", 1002.2579999999969],
+				["compactAtomSteps [src/shared/model.ts:346]", 769.6670000000069],
+				["(program)", 191.766999999999],
+				["checkpointSteps [src/shared/crdt.ts:1349]", 160.608],
+				[
+					"compactCheckpointSteps [src/shared/checkpoint.ts:155]",
+					112.02900000000052
+				],
+				["copyAtom [src/shared/crdt.ts:1811]", 102.66000000000037],
+				["rawVisibleSteps [src/shared/crdt.ts:1087]", 101.36900000000034],
+				["clock [src/shared/text-visibility.ts:375]", 81.33700000000022],
+				["active [src/shared/text-visibility.ts:219]", 69.9190000000001],
+				[
+					"entry.onsuccess [src/platform/indexeddb-journal.ts:464]",
+					58.58900000000007
+				],
+				["publish2 [src/platform/indexeddb-journal.ts:326]", 57.77900000000003],
+				[
+					"sourceHeadersSteps [src/shared/frontmatter-merge.ts:454]",
+					57.06900000000004
+				],
+				["hidden [src/shared/text-visibility.ts:245]", 43.842000000000006],
+				["map13 [src/shared/atom-sequence.ts:52]", 43.458000000000034],
+				["finishSteps [src/shared/collection-copy.ts:35]", 33.676999999999985],
+				["sourceUndo [src/shared/frontmatter-merge.ts:41]", 33.28599999999999],
+				["RegExp: [\\uD800-\\uDFFF]", 27.410000000000004],
+				[
+					"sourceEdits [src/shared/frontmatter-merge.ts:243]",
+					22.99999999999999
+				],
+				["sourceText [src/shared/frontmatter-merge.ts:558]", 15.294999999999993]
+			],
+			"inclusiveMs": [
+				["(root)", 20328.26999999206],
+				["(idle)", 17164.83800000791],
+				["evaluate [effect/dist/internal/effect.js:406]", 1840.6760000000238],
+				["runLoop [effect/dist/internal/effect.js:441]", 1839.5200000000239],
+				["(anonymous) [effect/dist/internal/effect.js:812]", 1486.267000000022],
+				[
+					"makePrimitiveProto [effect/dist/internal/effect.js:984]",
+					1220.8490000000204
+				],
+				[
+					"makePrimitiveProto [effect/dist/internal/effect.js:998]",
+					1205.8280000000198
+				],
+				["afterScheduled [effect/dist/Scheduler.js:157]", 1196.4720000000198],
+				["runTasks [effect/dist/Scheduler.js:164]", 1196.4720000000198],
+				[
+					"(anonymous) [src/shared/document-session.ts:1368]",
+					1193.5240000000204
+				],
+				["(garbage collector)", 1002.2579999999969],
+				["releaseTakers [effect/dist/Queue.js:1551]", 947.9080000000101],
+				["(anonymous) [effect/dist/Queue.js:1569]", 947.8890000000101],
+				["compactCheckpoint [src/shared/checkpoint.ts:142]", 908.9660000000109],
+				[
+					"compactCheckpointSteps [src/shared/checkpoint.ts:155]",
+					908.9660000000109
+				],
+				["compactAtomSteps [src/shared/model.ts:346]", 797.0770000000082],
+				["finishSteps [src/shared/collection-copy.ts:35]", 722.4030000000001],
+				[
+					"makePrimitive [effect/dist/internal/effect.js:717]",
+					559.1109999999949
+				],
+				["(anonymous) [effect/dist/internal/effect.js:766]", 555.9329999999951],
+				["makePrimitive [effect/dist/internal/core.js:335]", 363.7239999999973],
+				["visible [src/shared/crdt.ts:1047]", 362.3299999999972],
+				[
+					"(anonymous) [effect/dist/internal/effect.js:2476]",
+					355.35799999999745
+				],
+				["receive [worker.ts:23]", 354.4929999999973],
+				[
+					"handleRequest [effect/dist/rpc/RpcServer.js:147]",
+					354.10999999999734
+				],
+				["(anonymous) [effect/dist/rpc/RpcServer.js:85]", 354.10999999999734],
+				["(anonymous) [effect/dist/FiberSet.js:391]", 354.10999999999734],
+				["replace [src/shared/document-session.ts:544]", 353.03999999999735],
+				["(anonymous) [worker-session.ts:104]", 353.03999999999735],
+				["rawVisible [src/shared/crdt.ts:1081]", 309.1399999999976],
+				["rawVisibleSteps [src/shared/crdt.ts:1087]", 296.3139999999975],
+				["checkpoint [src/shared/crdt.ts:1336]", 283.8719999999975],
+				["checkpointSteps [src/shared/crdt.ts:1349]", 263.62399999999747],
+				[
+					"tx.oncomplete [src/platform/indexeddb-journal.ts:585]",
+					261.5209999999986
+				],
+				["observer [effect/dist/Semaphore.js:46]", 247.96599999999884],
+				["(anonymous) [effect/dist/Semaphore.js:86]", 247.96599999999884],
+				["text [src/shared/document-session.ts:1892]", 197.8769999999997],
+				["text [src/shared/crdt.ts:1195]", 197.8769999999997],
+				["hidden [src/shared/text-visibility.ts:245]", 194.94499999999925],
+				["(anonymous) [worker-session.ts:51]", 191.85799999999938],
+				["(program)", 191.766999999999],
+				["submitEdit [src/shared/document-session.ts:460]", 189.86599999999981],
+				["visible [src/shared/document-session.ts:1894]", 182.70399999999952],
+				["prepareReplacements [src/shared/crdt.ts:632]", 162.86399999999955],
+				["prepareEdit [src/shared/crdt.ts:764]", 161.94799999999958],
+				["active [src/shared/text-visibility.ts:219]", 151.25600000000006],
+				[
+					"sourceHeadersSteps [src/shared/frontmatter-merge.ts:454]",
+					113.8270000000005
+				],
+				["copyAtom [src/shared/crdt.ts:1811]", 102.66000000000037],
+				[
+					"sourceEdits [src/shared/frontmatter-merge.ts:243]",
+					94.17600000000014
+				],
+				["clock [src/shared/text-visibility.ts:375]", 81.33700000000022],
+				[
+					"sourceHeaders [src/shared/frontmatter-merge.ts:442]",
+					75.9870000000002
+				],
+				["map13 [src/shared/atom-sequence.ts:52]", 60.0300000000001],
+				[
+					"existing.onsuccess [src/platform/indexeddb-journal.ts:346]",
+					59.91200000000003
+				],
+				["publish2 [src/platform/indexeddb-journal.ts:326]", 59.91200000000003],
+				[
+					"entry.onsuccess [src/platform/indexeddb-journal.ts:464]",
+					58.58900000000007
+				],
+				["sourceUndo [src/shared/frontmatter-merge.ts:41]", 56.361000000000026],
+				[
+					"sourceTextSteps [src/shared/frontmatter-merge.ts:562]",
+					55.19100000000008
+				],
+				["sourceText [src/shared/frontmatter-merge.ts:558]", 55.19100000000008],
+				[
+					"sourceAtoms [src/shared/frontmatter-merge.ts:128]",
+					53.190000000000076
+				],
+				[
+					"sourceAtomsSteps [src/shared/frontmatter-merge.ts:135]",
+					53.03700000000008
+				],
+				[
+					"makePrimitiveProto [effect/dist/internal/effect.js:808]",
+					33.923999999999985
+				],
+				["makeExit [effect/dist/internal/core.js:295]", 31.08299999999997],
+				["(anonymous) [effect/dist/internal/effect.js:793]", 27.45599999999998],
+				["RegExp: [\\uD800-\\uDFFF]", 27.410000000000004],
+				[
+					"(anonymous) [effect/dist/internal/effect.js:1127]",
+					24.726999999999997
+				],
+				[
+					"forkUnsafe [effect/dist/internal/effect.js:2423]",
+					24.663999999999994
+				],
+				["(anonymous) [effect/dist/SchemaParser.js:829]", 20.787999999999982],
+				["(anonymous) [effect/dist/Function.js:76]", 17.170999999999996],
+				["(anonymous) [effect/dist/Schema.js:632]", 15.387000000000004],
+				["(anonymous) [src/shared/atom-sequence.ts:59]", 14.264999999999993],
+				[
+					"(anonymous) [effect/dist/internal/schema/interpreter.js:140]",
+					14.190000000000003
+				]
+			]
+		},
+		{
+			"urls": ["http://localhost:49738/worker.js?role=editor"],
+			"samples": 133058,
+			"selfMs": [
+				["rawVisibleSteps [src/shared/crdt.ts:1087]", 3554.5979999997858],
+				["(idle)", 3453.3869999999424],
+				["clock [src/shared/text-visibility.ts:375]", 2559.388],
+				["active [src/shared/text-visibility.ts:219]", 2321.0450000000483],
+				["hidden [src/shared/text-visibility.ts:245]", 1422.6070000000395],
+				["(garbage collector)", 1344.9659999999965],
+				["map13 [src/shared/atom-sequence.ts:52]", 947.335000000006],
+				["compactAtomSteps [src/shared/model.ts:346]", 765.1240000000108],
+				["finishSteps [src/shared/collection-copy.ts:35]", 553.1149999999977],
+				[
+					"sourceHeadersSteps [src/shared/frontmatter-merge.ts:454]",
+					545.7699999999977
+				],
+				["(program)", 419.3559999999956],
+				[
+					"sourceAtomsSteps [src/shared/frontmatter-merge.ts:135]",
+					390.93899999999576
+				],
+				["copyAtom [src/shared/crdt.ts:1811]", 260.1039999999963],
+				["(anonymous) [src/shared/atom-sequence.ts:59]", 228.8799999999985],
+				["prepareReplacements [src/shared/crdt.ts:632]", 189.75599999999898],
+				["sourceText [src/shared/frontmatter-merge.ts:558]", 176.5859999999994],
+				["text [src/shared/crdt.ts:1195]", 172.7179999999998],
+				["receive [worker.ts:23]", 134.216],
+				["checkpointSteps [src/shared/crdt.ts:1349]", 133.9780000000005],
+				[
+					"compactCheckpointSteps [src/shared/checkpoint.ts:155]",
+					104.04200000000044
+				]
+			],
+			"inclusiveMs": [
+				["(root)", 20293.070999990254],
+				["evaluate [effect/dist/internal/effect.js:406]", 14805.400000008794],
+				["runLoop [effect/dist/internal/effect.js:441]", 14804.852000008792],
+				["receive [worker.ts:23]", 13494.53800000748],
+				["makePrimitive [effect/dist/internal/core.js:335]", 13362.32900000735],
+				[
+					"(anonymous) [effect/dist/internal/effect.js:2476]",
+					13360.401000007349
+				],
+				["(anonymous) [effect/dist/FiberSet.js:391]", 13360.092000007347],
+				["(anonymous) [effect/dist/rpc/RpcServer.js:85]", 13359.802000007348],
+				["handleRequest [effect/dist/rpc/RpcServer.js:147]", 13359.64500000735],
+				[
+					"makePrimitive [effect/dist/internal/effect.js:717]",
+					13344.132000007337
+				],
+				[
+					"(anonymous) [effect/dist/internal/effect.js:766]",
+					13342.458000007331
+				],
+				["try [worker-session.ts:127]", 13331.192000007322],
+				["replace [src/shared/document-session.ts:544]", 13329.739000007323],
+				["submitEdit [src/shared/document-session.ts:460]", 12385.62700000629],
+				["text [src/shared/document-session.ts:1892]", 12377.109000006281],
+				["text [src/shared/crdt.ts:1195]", 12377.109000006281],
+				["finishSteps [src/shared/collection-copy.ts:35]", 12376.250000006288],
+				["visible [src/shared/crdt.ts:1047]", 11961.857000005846],
+				["rawVisible [src/shared/crdt.ts:1081]", 10315.858000004202],
+				["rawVisibleSteps [src/shared/crdt.ts:1087]", 9857.638000003803],
+				["hidden [src/shared/text-visibility.ts:245]", 6303.040000000905],
+				["active [src/shared/text-visibility.ts:219]", 4880.433000000076],
+				["(idle)", 3453.3869999999424],
+				["clock [src/shared/text-visibility.ts:375]", 2559.388],
+				[
+					"sourceAtoms [src/shared/frontmatter-merge.ts:128]",
+					1643.9540000000598
+				],
+				[
+					"sourceAtomsSteps [src/shared/frontmatter-merge.ts:135]",
+					1569.985000000054
+				],
+				[
+					"(anonymous) [effect/dist/internal/effect.js:812]",
+					1445.5980000000548
+				],
+				["map13 [src/shared/atom-sequence.ts:52]", 1440.523000000038],
+				["(garbage collector)", 1344.9659999999965],
+				[
+					"makePrimitiveProto [effect/dist/internal/effect.js:984]",
+					1335.3370000000502
+				],
+				[
+					"makePrimitiveProto [effect/dist/internal/effect.js:998]",
+					1292.1790000000483
+				],
+				["afterScheduled [effect/dist/Scheduler.js:157]", 1286.9740000000484],
+				["runTasks [effect/dist/Scheduler.js:164]", 1286.9740000000484],
+				[
+					"(anonymous) [src/shared/document-session.ts:1368]",
+					1285.4700000000485
+				],
+				[
+					"sourceHeadersSteps [src/shared/frontmatter-merge.ts:454]",
+					1172.2430000000215
+				],
+				["(anonymous) [effect/dist/Semaphore.js:86]", 1143.8330000000349],
+				["observer [effect/dist/Semaphore.js:46]", 1143.7880000000348],
+				["prepareReplacements [src/shared/crdt.ts:632]", 943.6510000000126],
+				["compactCheckpoint [src/shared/checkpoint.ts:142]", 868.7340000000191],
+				[
+					"compactCheckpointSteps [src/shared/checkpoint.ts:155]",
+					868.7340000000191
+				],
+				["compactAtomSteps [src/shared/model.ts:346]", 765.1240000000108],
+				["sourceText [src/shared/frontmatter-merge.ts:558]", 622.0489999999975],
+				[
+					"sourceTextSteps [src/shared/frontmatter-merge.ts:562]",
+					621.7439999999974
+				],
+				["(program)", 419.3559999999956],
+				["checkpoint [src/shared/crdt.ts:1336]", 416.0369999999953],
+				["checkpointSteps [src/shared/crdt.ts:1349]", 394.49699999999575],
+				["(anonymous) [src/shared/atom-sequence.ts:59]", 389.4009999999965],
+				["copyAtom [src/shared/crdt.ts:1811]", 260.1039999999963],
+				[
+					"tx.oncomplete [src/platform/indexeddb-journal.ts:585]",
+					154.29399999999958
+				],
+				["releaseTakers [effect/dist/Queue.js:1551]", 143.29500000000024],
+				["(anonymous) [effect/dist/Queue.js:1569]", 143.14100000000025],
+				[
+					"makePrimitiveProto [effect/dist/internal/effect.js:808]",
+					105.1980000000002
+				],
+				[
+					"(anonymous) [src/platform/indexeddb-journal.ts:579]",
+					101.54200000000019
+				],
+				[
+					"(anonymous) [src/platform/indexeddb-journal.ts:97]",
+					96.66100000000016
+				],
+				["append4 [src/platform/indexeddb-journal.ts:312]", 96.52500000000016],
+				["toReadonlyArray_ [effect/dist/Chunk.js:292]", 86.53200000000021],
+				["(anonymous) [src/shared/frontmatter-merge.ts:559]", 85.1260000000003],
+				["copyToArray [effect/dist/Chunk.js:243]", 76.97000000000016],
+				["copy [effect/dist/Chunk.js:26]", 76.51700000000014],
+				["(anonymous) [src/shared/crdt.ts:643]", 76.3250000000002],
+				["(anonymous) [src/shared/crdt.ts:1204]", 66.03400000000016],
+				[
+					"entry.onsuccess [src/platform/indexeddb-journal.ts:464]",
+					58.40300000000001
+				],
+				["add", 53.17200000000004],
+				["makeExit [effect/dist/internal/core.js:295]", 48.62100000000006],
+				["get result", 44.275999999999996],
+				["(anonymous) [worker-session.ts:119]", 33.089000000000006],
+				["mark", 32.58100000000002],
+				[
+					"existing.onsuccess [src/platform/indexeddb-journal.ts:346]",
+					23.789999999999996
+				],
+				[
+					"publish2 [src/platform/indexeddb-journal.ts:326]",
+					23.474999999999998
+				],
+				["(anonymous) [effect/dist/SchemaParser.js:829]", 19.360000000000003]
+			]
+		}
+	],
+	"longWorkerTasks": [
+		{
+			"role": "editor",
+			"ms": 437.973,
+			"afterStartMs": 565.255,
+			"priorPhase": "worker:editor:queued:5:materialized",
+			"phases": [
+				{
+					"name": "worker:editor:queued:6:prepare",
+					"afterTaskStartMs": 0.141
+				},
+				{
+					"name": "worker:editor:queued:6:prepared",
+					"afterTaskStartMs": 437.869
+				}
+			],
+			"selfSamplesMs": [
+				["rawVisibleSteps [src/shared/crdt.ts:1087]", 122.5640000000004],
+				["clock [src/shared/text-visibility.ts:375]", 80.9640000000002],
+				["active [src/shared/text-visibility.ts:219]", 73.15700000000004],
+				["hidden [src/shared/text-visibility.ts:245]", 45.08100000000001],
+				["finishSteps [src/shared/collection-copy.ts:35]", 26.910999999999966],
+				["map13 [src/shared/atom-sequence.ts:52]", 23.726],
+				[
+					"sourceHeadersSteps [src/shared/frontmatter-merge.ts:454]",
+					19.618999999999986
+				],
+				["(garbage collector)", 10.841999999999997],
+				["(program)", 8.495000000000001],
+				["(anonymous) [src/shared/atom-sequence.ts:59]", 5.919000000000001],
+				["sourceText [src/shared/frontmatter-merge.ts:558]", 5.209999999999999],
+				["text [src/shared/crdt.ts:1195]", 5.146]
+			],
+			"inclusiveSamplesMs": [
+				["(root)", 437.9749999999973],
+				[
+					"handleRequest [effect/dist/rpc/RpcServer.js:147]",
+					417.68099999999754
+				],
+				["runLoop [effect/dist/internal/effect.js:441]", 417.68099999999754],
+				["evaluate [effect/dist/internal/effect.js:406]", 417.68099999999754],
+				[
+					"(anonymous) [effect/dist/internal/effect.js:2476]",
+					417.68099999999754
+				],
+				["(anonymous) [effect/dist/rpc/RpcServer.js:85]", 417.68099999999754],
+				[
+					"makePrimitive [effect/dist/internal/core.js:335]",
+					417.68099999999754
+				],
+				["(anonymous) [effect/dist/FiberSet.js:391]", 417.68099999999754],
+				["receive [worker.ts:23]", 417.68099999999754],
+				["replace [src/shared/document-session.ts:544]", 417.3789999999975],
+				["try [worker-session.ts:127]", 417.3789999999975],
+				["(anonymous) [effect/dist/internal/effect.js:766]", 417.3789999999975],
+				[
+					"makePrimitive [effect/dist/internal/effect.js:717]",
+					417.3789999999975
+				],
+				["visible [src/shared/crdt.ts:1047]", 388.04599999999806],
+				["finishSteps [src/shared/collection-copy.ts:35]", 387.8699999999981],
+				["rawVisible [src/shared/crdt.ts:1081]", 336.6819999999984],
+				["rawVisibleSteps [src/shared/crdt.ts:1087]", 321.76599999999854],
+				["submitEdit [src/shared/document-session.ts:460]", 217.16399999999953],
+				["text [src/shared/document-session.ts:1892]", 217.01099999999957],
+				["text [src/shared/crdt.ts:1195]", 217.01099999999957],
+				["prepareReplacements [src/shared/crdt.ts:632]", 200.21499999999912],
+				["hidden [src/shared/text-visibility.ts:245]", 199.20199999999943],
+				["active [src/shared/text-visibility.ts:219]", 154.12100000000032],
+				["clock [src/shared/text-visibility.ts:375]", 80.9640000000002],
+				[
+					"sourceAtoms [src/shared/frontmatter-merge.ts:128]",
+					51.188000000000045
+				]
+			]
+		},
+		{
+			"role": "peer",
+			"ms": 392.327,
+			"afterStartMs": 108.669,
+			"priorPhase": "worker:peer:read:materialize",
+			"phases": [],
+			"selfSamplesMs": [
+				["rawVisibleSteps [src/shared/crdt.ts:1087]", 54.07],
+				[
+					"sourceHeadersSteps [src/shared/frontmatter-merge.ts:454]",
+					46.93800000000001
+				],
+				["active [src/shared/text-visibility.ts:219]", 36.196999999999974],
+				["clock [src/shared/text-visibility.ts:375]", 35.184],
+				["map13 [src/shared/atom-sequence.ts:52]", 34.448],
+				["sourceUndo [src/shared/frontmatter-merge.ts:41]", 33.28599999999999],
+				["(garbage collector)", 26.218999999999983],
+				[
+					"sourceEdits [src/shared/frontmatter-merge.ts:243]",
+					22.99999999999999
+				],
+				["hidden [src/shared/text-visibility.ts:245]", 20.766999999999996],
+				[
+					"sourceText [src/shared/frontmatter-merge.ts:558]",
+					12.829999999999997
+				],
+				[
+					"(anonymous) [src/shared/frontmatter-merge.ts:266]",
+					11.599999999999998
+				],
+				["(program)", 9.888999999999996]
+			],
+			"inclusiveSamplesMs": [
+				["(root)", 392.3799999999971],
+				[
+					"handleRequest [effect/dist/rpc/RpcServer.js:147]",
+					353.50199999999734
+				],
+				["runLoop [effect/dist/internal/effect.js:441]", 353.50199999999734],
+				["evaluate [effect/dist/internal/effect.js:406]", 353.50199999999734],
+				["(anonymous) [effect/dist/rpc/RpcServer.js:85]", 353.50199999999734],
+				[
+					"(anonymous) [effect/dist/internal/effect.js:2476]",
+					353.50199999999734
+				],
+				["(anonymous) [effect/dist/FiberSet.js:391]", 353.50199999999734],
+				[
+					"makePrimitive [effect/dist/internal/core.js:335]",
+					353.50199999999734
+				],
+				["receive [worker.ts:23]", 353.50199999999734],
+				[
+					"(anonymous) [effect/dist/internal/effect.js:766]",
+					353.03999999999735
+				],
+				["replace [src/shared/document-session.ts:544]", 353.03999999999735],
+				[
+					"makePrimitive [effect/dist/internal/effect.js:717]",
+					353.03999999999735
+				],
+				["(anonymous) [worker-session.ts:104]", 353.03999999999735],
+				["finishSteps [src/shared/collection-copy.ts:35]", 255.89799999999806],
+				["submitEdit [src/shared/document-session.ts:460]", 189.86599999999981],
+				["text [src/shared/document-session.ts:1892]", 188.97699999999983],
+				["text [src/shared/crdt.ts:1195]", 188.97699999999983],
+				["visible [src/shared/crdt.ts:1047]", 179.62600000000003],
+				["prepareReplacements [src/shared/crdt.ts:632]", 162.86399999999955],
+				["prepareEdit [src/shared/crdt.ts:764]", 161.94799999999958],
+				["rawVisible [src/shared/crdt.ts:1081]", 151.94000000000034],
+				["rawVisibleSteps [src/shared/crdt.ts:1087]", 146.21800000000033],
+				[
+					"sourceHeadersSteps [src/shared/frontmatter-merge.ts:454]",
+					94.75600000000036
+				],
+				[
+					"sourceEdits [src/shared/frontmatter-merge.ts:243]",
+					94.17600000000014
+				],
+				["hidden [src/shared/text-visibility.ts:245]", 92.14800000000025]
+			]
+		},
+		{
+			"role": "editor",
+			"ms": 257.518,
+			"afterStartMs": 1637.846,
+			"priorPhase": "worker:editor:queued:9:materialized",
+			"phases": [],
+			"selfSamplesMs": [
+				["(garbage collector)", 105.39800000000045],
+				["compactAtomSteps [src/shared/model.ts:346]", 85.17500000000025],
+				["copyAtom [src/shared/crdt.ts:1811]", 30.069999999999993],
+				["checkpointSteps [src/shared/crdt.ts:1349]", 15.74999999999999],
+				[
+					"compactCheckpointSteps [src/shared/checkpoint.ts:155]",
+					10.843999999999998
+				],
+				["(program)", 7.816999999999997],
+				["finishSteps [src/shared/collection-copy.ts:35]", 1.9779999999999998],
+				["(anonymous) [effect/dist/SchemaAST.js:1208]", 0.154],
+				["(anonymous) [src/shared/document-session.ts:1368]", 0.085],
+				["finish [effect/dist/SchemaAST.js:1158]", 0.072],
+				["(idle)", 0.033],
+				["parse [effect/dist/SchemaAST.js:1180]", 0.028999999999999998]
+			],
+			"inclusiveSamplesMs": [
+				["(root)", 257.4079999999978],
+				[
+					"(anonymous) [src/shared/document-session.ts:1368]",
+					144.0080000000003
+				],
+				[
+					"makePrimitiveProto [effect/dist/internal/effect.js:998]",
+					144.0080000000003
+				],
+				["runLoop [effect/dist/internal/effect.js:441]", 144.0080000000003],
+				["evaluate [effect/dist/internal/effect.js:406]", 144.0080000000003],
+				["observer [effect/dist/Semaphore.js:46]", 144.0080000000003],
+				["afterScheduled [effect/dist/Scheduler.js:157]", 144.0080000000003],
+				[
+					"makePrimitiveProto [effect/dist/internal/effect.js:984]",
+					144.0080000000003
+				],
+				["(anonymous) [effect/dist/internal/effect.js:812]", 144.0080000000003],
+				["runTasks [effect/dist/Scheduler.js:164]", 144.0080000000003],
+				["(anonymous) [effect/dist/Semaphore.js:86]", 144.0080000000003],
+				["(garbage collector)", 105.39800000000045],
+				["compactCheckpoint [src/shared/checkpoint.ts:142]", 96.01900000000042],
+				[
+					"compactCheckpointSteps [src/shared/checkpoint.ts:155]",
+					96.01900000000042
+				],
+				["compactAtomSteps [src/shared/model.ts:346]", 85.17500000000025],
+				["finishSteps [src/shared/collection-copy.ts:35]", 47.9040000000001],
+				["checkpoint [src/shared/crdt.ts:1336]", 47.9040000000001],
+				["checkpointSteps [src/shared/crdt.ts:1349]", 45.92600000000009],
+				["copyAtom [src/shared/crdt.ts:1811]", 30.069999999999993],
+				["(program)", 7.816999999999997],
+				["checkpointSteps [src/shared/text-visibility.ts:255]", 0.258],
+				["(anonymous) [effect/dist/Schema.js:632]", 0.258],
+				["(anonymous) [effect/dist/SchemaAST.js:1581]", 0.258],
+				["(anonymous) [effect/dist/Schema.js:942]", 0.258],
+				["(anonymous) [effect/dist/SchemaParser.js:829]", 0.258]
+			]
+		},
+		{
+			"role": "editor",
+			"ms": 256.677,
+			"afterStartMs": 8044.017,
+			"priorPhase": "worker:editor:queued:35:materialized",
+			"phases": []
+		},
+		{
+			"role": "editor",
+			"ms": 256.65,
+			"afterStartMs": 12403.438,
+			"priorPhase": "worker:editor:queued:53:materialized",
+			"phases": []
+		},
+		{
+			"role": "editor",
+			"ms": 256.197,
+			"afterStartMs": 18554.977,
+			"priorPhase": "worker:editor:queued:72:materialized",
+			"phases": []
+		},
+		{
+			"role": "editor",
+			"ms": 255.922,
+			"afterStartMs": 10231.269,
+			"priorPhase": "worker:editor:queued:44:materialized",
+			"phases": []
+		},
+		{
+			"role": "editor",
+			"ms": 255.024,
+			"afterStartMs": 16552.903,
+			"priorPhase": "worker:editor:queued:70:materialized",
+			"phases": []
+		},
+		{
+			"role": "editor",
+			"ms": 254.106,
+			"afterStartMs": 5847.36,
+			"priorPhase": "worker:editor:queued:26:materialized",
+			"phases": []
+		},
+		{
+			"role": "editor",
+			"ms": 253.477,
+			"afterStartMs": 14416.316,
+			"priorPhase": "worker:editor:queued:61:materialized",
+			"phases": []
+		},
+		{
+			"role": "editor",
+			"ms": 253.151,
+			"afterStartMs": 3843.111,
+			"priorPhase": "worker:editor:queued:18:materialized",
+			"phases": []
+		},
+		{
+			"role": "peer",
+			"ms": 242.86,
+			"afterStartMs": 13437.201,
+			"priorPhase": "worker:peer:read:materialize",
+			"phases": []
+		}
+	]
+}

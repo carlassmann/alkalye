@@ -1,0 +1,47 @@
+[
+	{
+		"path": "/tmp/alkalye-worker-source-diagnostic/runtime/src/shared/crdt.ts",
+		"sha256": "09430839d4093aef3644e2991a6161c3f30e338cc63632a80224e590787818f2",
+		"bytes": 59586
+	},
+	{
+		"path": "/tmp/alkalye-worker-source-diagnostic/runtime/worker-session.ts",
+		"sha256": "af13820f77df9593136b4343003de79e42dfb3c7d0c5a123bb6f42df673cad77",
+		"bytes": 10486
+	},
+	{
+		"path": "/tmp/alkalye-worker-source-diagnostic/runtime/browser-fixture.ts",
+		"sha256": "921d2e797a4820226e366aff30727e55f879603fd1b7e2436abb8aea9e684b8f",
+		"bytes": 9726
+	},
+	{
+		"path": "/tmp/alkalye-worker-source-diagnostic/runtime/sustained.ts",
+		"sha256": "95d9c763531ef9384bdeb0e45fac82ecdd132691a02c0291e3576155bdfacd36",
+		"bytes": 6708
+	},
+	{
+		"path": "/tmp/alkalye-worker-source-diagnostic/runtime/server.ts",
+		"sha256": "7369fd22a453abbc4d651a9bb58f99130e8973bd6af0e8f72e169970f113ecf1",
+		"bytes": 3957
+	},
+	{
+		"path": "/tmp/alkalye-worker-source-diagnostic/runtime/assets/worker.js",
+		"sha256": "41d625031d675797a6d357909471efd01894db1b879d3d2463e8f0ea282f8edf",
+		"bytes": 1113837
+	},
+	{
+		"path": "/tmp/alkalye-worker-source-diagnostic/runtime/assets/worker.js.map",
+		"sha256": "8f833a4a7d59bbac876abada715ff3d86eb2593247afeb627ed7a56f8fb307f4",
+		"bytes": 5397799
+	},
+	{
+		"path": "/tmp/alkalye-worker-source-diagnostic/runtime/assets/browser-fixture.js",
+		"sha256": "680c9692e7fb1adaaf83ee6f06a92007517252c2c0a71932a0c96788d7d1820f",
+		"bytes": 1108415
+	},
+	{
+		"path": "/tmp/alkalye-worker-source-diagnostic/runtime/assets/browser-fixture.js.map",
+		"sha256": "0c33a671090343576af709a60fee9d10dc54dafdb9323c6b8a6ea52d0b9a960d",
+		"bytes": 5073376
+	}
+]

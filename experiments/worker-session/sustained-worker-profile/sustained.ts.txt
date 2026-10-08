@@ -1,0 +1,58 @@
+import { assert, browser, browserBatch, evaluate, wait } from "./tests/browser-driver"
+let url = process.argv[2]
+let output = process.argv[3]
+let arm = process.argv[4] ?? "human"
+if (!url || !output) throw Error("URL/output required")
+let session = "worker-sustained-" + arm + "-" + Date.now()
+let api = "window.workerEditorProof"
+let text = "abcdefghijklmnopqrstuvwx".repeat(3)
+let peers = arm.includes("peer") ? 4 : 0
+let rows: unknown[] = []
+let tracing = false
+try {
+    browser(session, "set", "viewport", "1280", "800")
+    browser(session, "open", url)
+    wait(session, "document.body.dataset.ready==='true'||!!document.body.dataset.failure")
+    assert(evaluate(session, "!document.body.dataset.failure"), "Fixture ready")
+    let geometry = evaluate(session, `(()=>{let source=document.querySelector('alkalye-editor').source;source.focus();source.setSelectionRange(source.value.length,source.value.length);let native=source.element,host=native.parentElement;return {height:host.clientHeight,scrollHeight:host.scrollHeight,nativeCharacters:native.value.length,sourceCharacters:source.value.length,readonly:native.readOnly}})()`)
+    assert(evaluate(session, `(()=>{let source=document.querySelector('alkalye-editor').source;return source.element.parentElement.clientHeight===800&&source.element.value.length<32768&&!source.readOnly})()`), "Actual bounded editor geometry")
+    let initial = evaluate(session, `${api}.finishSustained(false).then(value=>{window.sustainedInitial=value;return value})`)
+    assert(evaluate(session, `${api}.gauge().pending===0&&${api}.gauge().failures===0&&window.sustainedInitial.editorExact&&window.sustainedInitial.workerExact&&window.sustainedInitial.accepted.sha256===window.sustainedInitial.sha256&&window.sustainedInitial.pending===0&&window.sustainedInitial.unsaved===0`), "Initial seed journal settled")
+    browser(session, "profiler", "start", "--categories", "devtools.timeline,disabled-by-default-devtools.timeline,toplevel,blink.user_timing,v8,disabled-by-default-v8.cpu_profiler")
+    tracing = true
+    evaluate(session, `(()=>{let controller=new AbortController(),state=window.sustainedProof={controller,inputs:[],keys:[],gauges:[],frames:[],lastFrame:performance.now(),ended:false};document.addEventListener('keydown',event=>{state.keys.push({time:performance.now(),trusted:event.isTrusted,key:event.key})},{capture:true,signal:controller.signal});document.addEventListener('beforeinput',event=>{state.inputs.push({time:performance.now(),trusted:event.isTrusted,data:event.data,inputType:event.inputType});performance.mark('sustained:input')},{capture:true,signal:controller.signal});state.interval=setInterval(()=>{state.gauges.push({time:performance.now(),...${api}.gauge(),heap:performance.memory?.usedJSHeapSize})},50);function frame(time){state.frames.push(time-state.lastFrame);state.lastFrame=time;if(!state.ended)requestAnimationFrame(frame)}requestAnimationFrame(frame);performance.mark('sustained:start');${api}.startSustained(${JSON.stringify(text)},${peers});return true})()`)
+    if (arm.startsWith("human")) {
+        let commands: string[][] = []
+        for (let character of text) {
+            commands.push(["press", character])
+            commands.push(["eval", "new Promise(resolve=>setTimeout(()=>resolve(true),100))"])
+        }
+        browserBatch(session, commands)
+    } else browser(session, "keyboard", "type", text)
+    let sent = evaluate(session, `(()=>{performance.mark('sustained:sent');return {time:performance.now(),...${api}.gauge(),inputs:window.sustainedProof.inputs.length}})()`)
+    for (let attempt = 0; attempt < 3; attempt++) {
+        try { wait(session, `(${api}.inspect().source.endsWith(${JSON.stringify(text)})&&${api}.gauge().pending===0)||${api}.gauge().failures>0`); break } catch (error) { if (attempt===2) throw error }
+    }
+    let observation = evaluate(session, `new Promise(resolve=>setTimeout(()=>{let state=window.sustainedProof;state.ended=true;clearInterval(state.interval);state.controller.abort();performance.mark('sustained:aftermath');resolve({inputs:state.inputs,keys:state.keys,gauges:state.gauges,frames:state.frames,final:${api}.gauge(),heap:performance.memory?.usedJSHeapSize})},3000))`)
+    browser(session, "profiler", "stop", output + ".trace.json")
+    tracing = false
+    if (arm.startsWith("human")) assert(evaluate(session, "window.sustainedProof.inputs.every((input,index,list)=>!index||input.time-list[index-1].time>=90)"), "Observed native human cadence")
+    await Bun.write(output, JSON.stringify({arm, geometry, initial, sent, observation}, null, 2))
+    evaluate(session, `(()=>{window.sustainedFinish={done:false};${api}.finishSustained().then(result=>{window.sustainedFinish={done:true,result}},error=>{window.sustainedFinish={done:true,error:String(error)}});return true})()`)
+    for (let attempt = 0; attempt < 3; attempt++) {
+        try { wait(session, "window.sustainedFinish.done"); break } catch (error) { if (attempt===2) throw error }
+    }
+    let finish = evaluate(session, `(()=>{return {time:performance.now(),...window.sustainedFinish}})()`)
+    rows.push({arm, geometry, initial, sent, finish, observation})
+    await Bun.write(output, JSON.stringify(rows, null, 2))
+    assert(evaluate(session, `(()=>{let value=window.sustainedFinish.result;return value?.merged&&value.peerCompleted===${peers}&&value.editorExact&&value.workerExact&&value.localReopenExact&&value.accepted.sha256===value.sha256&&value.accepted.position===window.sustainedInitial.accepted.position+${text.length}+${peers}&&value.pending===0&&value.rejected===0&&!value.unsaved&&value.failures.length===0&&window.sustainedProof.inputs.length===${text.length}&&window.sustainedProof.inputs.every(input=>input.trusted)&&window.sustainedProof.inputs.map(input=>input.data).join('')===${JSON.stringify(text)}&&(${JSON.stringify(arm.startsWith("human"))}?window.sustainedProof.keys.length===${text.length}&&window.sustainedProof.keys.every(key=>key.trusted):true)})()`), "Exact source, trusted character count, local reopen and authenticated server acceptance")
+    evaluate(session, `${api}.dispose()`)
+} catch (error) {
+    let state: unknown
+    try { state = evaluate(session, `(()=>{let proof=window.sustainedProof;return {gauge:${api}?.gauge(),failure:document.body.dataset.failure,inputs:proof?.inputs,keys:proof?.keys,gauges:proof?.gauges,frames:proof?.frames,finish:window.sustainedFinish}})()`) } catch {}
+    if (tracing) {
+        try { browser(session, "profiler", "stop", output + ".trace.json") } catch {}
+    }
+    await Bun.write(output + ".failure.json", JSON.stringify({arm,error:String(error),state},null,2))
+    throw error
+} finally { browser(session, "close") }
