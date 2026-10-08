@@ -1,0 +1,96 @@
+import { mkdtemp, rm } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import * as Context from "effect/Context"
+import * as Deferred from "effect/Deferred"
+import * as Effect from "effect/Effect"
+import * as EventJournal from "effect/eventlog/EventJournal"
+import * as Fiber from "effect/Fiber"
+import * as Latch from "effect/Latch"
+import * as Layer from "effect/Layer"
+import * as Queue from "effect/Queue"
+import * as Stream from "effect/Stream"
+import { BackgroundWork } from "./src/platform/background-work"
+import { DocumentJournal } from "./src/platform/document-journal"
+import { DocumentLifecycle } from "./src/platform/document-lifecycle"
+import { sqliteJournalLayer } from "./src/platform/sqlite-journal"
+import { DocumentSession, type DocumentTransport } from "./src/shared/document-session"
+import { Replica } from "./src/shared/crdt"
+import { newDocument } from "./src/shared/documents"
+
+let directory = await mkdtemp(join(tmpdir(), "alkalye-lifecycle-proof-"))
+let expectedClean = process.argv.includes("--clean")
+let remote = new Replica("birth")
+newDocument(remote,"doc","","Before")
+let transport: DocumentTransport = {
+ snapshot: () => Effect.succeed({format:"document-state-v1",document:"doc",log:"lifecycle-log",position:1,state:JSON.stringify(remote.checkpoint())}),
+ commit: () => Effect.fail(new Error("Offline")),
+ history: () => Effect.succeed([]),
+}
+let flags: boolean[] = []
+function check(value: unknown,message:string) { if(!value)throw Error(message); console.log("PASS "+message) }
+try {
+ await Effect.runPromise(Effect.scoped(Effect.gen(function* () {
+  let database = join(directory,"journal.sqlite")
+  let services = yield* Layer.build(sqliteJournalLayer(database))
+  let original = Context.get(services,DocumentJournal)
+  let entered = yield* Deferred.make<void>()
+  let cached = yield* Deferred.make<void>()
+  let writes = yield* Latch.make(true)
+  let blocked = false
+  let journal = EventJournal.EventJournal.of({
+   ...original.journal,
+   write: options => Effect.suspend(() => {
+    if(!blocked)return original.journal.write(options)
+    return Deferred.succeed(entered,undefined).pipe(Effect.andThen(writes.await),Effect.andThen(original.journal.write(options)))
+   }),
+  })
+  let storage = DocumentJournal.of({
+   ...original,journal,
+   saveCache: (position,value) => original.saveCache(position,value).pipe(Effect.tap(() => Deferred.succeed(cached,undefined))),
+  })
+  let hidden = yield* Queue.sliding<void>(1)
+  yield* Effect.addFinalizer(() => Queue.shutdown(hidden))
+  let lifecycle = DocumentLifecycle.of({
+   changes:Stream.never,
+   hidden:Stream.fromQueue(hidden),
+   protect: hasUnsaved => Effect.succeed({update(){flags.push(hasUnsaved())}}),
+  })
+  let options = {document:"doc",subject:"owner",transport}
+  let layer = DocumentSession.layer(options).pipe(
+   Layer.provide(Layer.succeed(DocumentJournal,storage)),
+   Layer.provide(Layer.succeed(EventJournal.EventJournal,journal)),
+   Layer.provide(Layer.succeed(DocumentLifecycle,lifecycle)),
+   Layer.provide(Layer.succeed(BackgroundWork,{beforeSnapshot:Effect.never,beforeDerived:Effect.void,betweenChunks:Effect.void})),
+  )
+  yield* Effect.scoped(Effect.gen(function* () {
+   let session = Context.get(yield* Layer.build(layer),DocumentSession)
+   blocked = true; writes.closeUnsafe()
+   let edit = session.replace([{start:6,remove:0,text:"Z"}])
+   check(session.unsaved()===1&&flags.at(-1)===true,"Native draft immediately protects unsaved source")
+   let saving = yield* Effect.forkChild(edit.saved,{startImmediately:true})
+   yield* Deferred.await(entered).pipe(Effect.timeout("2 seconds"))
+   yield* Fiber.interrupt(saving)
+   check(session.unsaved()===1&&session.replica.text("doc")==="BeforeZ","Interrupted saved fiber retains exact optimistic draft")
+   blocked=false; writes.openUnsafe()
+   yield* Queue.offer(hidden,undefined)
+   yield* Deferred.await(cached).pipe(Effect.timeout("3 seconds"))
+   check(session.unsaved()===0,"Lifecycle hidden event drains actual SQLite journal without another RPC")
+   let cache = yield* original.cache
+   let head = yield* original.readAfter(0)
+   check(cache?.position===head.position,"Hidden event caches complete durable journal position")
+   console.log(JSON.stringify({flags,lastProtection:flags.at(-1),unsaved:session.unsaved(),source:session.replica.text("doc")}))
+   if(expectedClean)check(flags.at(-1)===false,"Protection clears on hidden durable completion without another update caller")
+   else check(flags.at(-1)===true,"Baseline reproduces stale dirty protection after hidden durable completion")
+  }))
+  let reopenedLayer = DocumentSession.layer(options).pipe(
+   Layer.provide(Layer.succeed(DocumentJournal,original)),
+   Layer.provide(Layer.succeed(EventJournal.EventJournal,original.journal)),
+   Layer.provide(Layer.succeed(DocumentLifecycle,lifecycle)),
+  )
+  yield* Effect.scoped(Effect.gen(function* () {
+   let reopened = Context.get(yield* Layer.build(reopenedLayer),DocumentSession)
+   check(reopened.replica.text("doc")==="BeforeZ"&&reopened.unsaved()===0,"Actual journal reopen preserves exact interrupted-then-hidden-flushed source")
+  }))
+ })).pipe(Effect.timeout("8 seconds")))
+} finally { await rm(directory,{recursive:true,force:true}) }

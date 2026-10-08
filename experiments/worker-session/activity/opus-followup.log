@@ -1,0 +1,22 @@
+Blockers B1–B3 and the post-close send issue are resolved. One narrow issue remains: after a failed save recovers in the background, the page can keep its leave-page warning until the next RPC. This is from reading the files only; nothing was run.
+
+**Resolved**
+- **B1 (no "clean" after save):** the worker keeps the session's dirty check and re-reads it on each `publish()`. Posts only happen when the value changes. Running `publish()` after every RPC via `ensuring`, plus `failures.changes` calling `drafts.update`, covers every place the save queue drains (`document-session.ts:357`). The hidden-flush path is also covered: `Replace` and `ReplaceQueued` wait for the save before replying, so the queue is already empty when the publish after the RPC runs.
+- **B2 (warning stuck after `Close`):** `closedCleanly()` makes the dirty check false before the forwarder scope closes. The `protectDocumentDrafts` finalizer (`src/client/document-lifecycle.ts:26`) then removes the `beforeunload` listener. Late channel messages are ignored once `cleanClose` is set.
+- **B3 (edit unprotected before dirty signal arrives):** a failed RPC calls `uncertain()`, which sets `rpcDirty` directly. Nothing waits on the channel message any more.
+- **Sends after close:** the worker sets `closed` in a finalizer that runs before `channel.close()`, so the `publish()` after `Close` returns early. The main page's `interact`, `hidden` and `sendLifecycle` all check `closed` and `cleanClose`.
+- **`ready` handshake:** it only forwards `hidden` when the page is actually hidden; it no longer invents an interaction.
+- **Plan wording:** the explicit hidden and final snapshot paths are now correctly described as bypassing `beforeSnapshot`, and the ten-second claim is gone.
+
+**Remaining narrow issue: the `rpcDirty` flag can stay set after recovery**
+- **What happens:** an RPC fails and `uncertain()` sets `rpcDirty = true`. A background retry then succeeds, and the worker posts `dirty:false`. But only the next RPC reply clears `rpcDirty`. If the user makes no further edit, every unload still prompts — the same symptom as B1, just limited to recovered failures.
+- **Why not clear it on the channel's `false`:** a stale `false`, posted before the failure, can arrive after the RPC reply and bring back the B3 race.
+- **Fix:** when the channel moves `workerDirty` from true to false while `rpcDirty` is set, issue a `Read` and feed its `unsaved` count to `confirmedUnsaved`. RPCs run one at a time, so the reply reflects the worker's state after the failure.
+
+**Minor, not blocking**
+- If `Open` fails, `hasPendingNativeEdits` returns true until the queue exists, so it stays true. The forwarder finalizer then leaves `beforeunload` attached with no edits. Consider treating a failed `Open` with an empty queue as clean.
+- The 50ms throttle on `interact` hasn't been added. The worker's sliding queue makes this harmless.
+
+As you said, this is still outside the source draft and has no runtime proof.
+
+Many claude.ai connectors (GitHub, Slack, Notion and others) need authorizing in your claude.ai connector settings before they can be used; this review didn't need them.

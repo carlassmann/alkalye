@@ -1,0 +1,25 @@
+PASS Native draft immediately protects unsaved source
+PASS Interrupted saved fiber retains exact optimistic draft
+PASS Lifecycle hidden event drains actual SQLite journal without another RPC
+PASS Hidden event caches complete durable journal position
+{"flags":[false,false,false,true,true,true,true,true,false],"lastProtection":false,"unsaved":0,"source":"BeforeZ"}
+26 |  snapshot: () => Effect.succeed({format:"document-state-v1",document:"doc",log:"lifecycle-log",position:1,state:JSON.stringify(remote.checkpoint())}),
+27 |  commit: () => Effect.fail(new Error("Offline")),
+28 |  history: () => Effect.succeed([]),
+29 | }
+30 | let flags: boolean[] = []
+31 | function check(value: unknown,message:string) { if(!value)throw Error(message); console.log("PASS "+message) }
+                                                                     ^
+error: Baseline reproduces stale dirty protection after hidden durable completion
+      at check (/private/tmp/alkalye-lifecycle-save/proof.ts:31:65)
+      at <anonymous> (/private/tmp/alkalye-lifecycle-save/proof.ts:84:9)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:1139:9)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:434:19)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+      at doneUnsafe (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Deferred.js:685:15)
+
+Bun v1.4.0 (macOS arm64)

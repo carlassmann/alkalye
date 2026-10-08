@@ -1,0 +1,32 @@
+{
+	"scope": "outside existing EditorElement worker activity/lifecycle prototype, no production adoption",
+	"baseIntegratedProof": "1e449fa",
+	"productionHead": "dc2af56a7c1e7b07510b8e922b99c06d33340cac",
+	"proof": {
+		"types": "passed",
+		"activityWithoutCooperativeAssertions": 17,
+		"activityWithCooperativeAssertions": 17,
+		"realSqliteBaselineAssertions": 6,
+		"sharedNotificationPatch": "not applied; presumed baseline bug refuted"
+	},
+	"sourceHashes": {
+		"worker-activity.ts": "91b0f0bb2f3d8e7c252fc4b9073a34d7e0912cdb5ce8620498c15e18500fb939",
+		"worker-session.ts": "dc3034108dde08cbb005ae46569bd0a7b3a2d0bd2c41f632ea57c5910f8397e9",
+		"worker-rpc.ts": "a0b7aa1a5f2408a8a890c3f860afb9b2b26310186fa2047ef52b4234b023509b",
+		"browser-fixture.ts": "f33fb0b03820074451c098e7fe5be9bd398b877ba0d7a3e9726d52b0dce0b194",
+		"activity-journey.ts": "e8882b36f4781a8406bba714232d6ac2ad184c405122b16ea69960b7ebaa5b17"
+	},
+	"bundleHashes": {
+		"worker.js": "2f11b9dc7766acdfa11698d924d74539c5aa22ea32625834bb528072f162b5c1",
+		"browser-fixture.js": "b995512fb1b1e2dae111bbeebe083594a3f28c5241d7bcf9a537b4d7e8b9d0b2"
+	},
+	"journalSourceHash": "34f674a9da19cd36d6c97796053dca56ab3f36c741f92067c27fbcb918b7b098",
+	"limits": [
+		"No performance timings or preemption proof",
+		"Synthetic pagehide, not physical background termination durability",
+		"No new physical IME/mobile/a11y validation",
+		"Initial dirty-notification hypothesis failed against real SQLite baseline and was not patched",
+		"Full integrated72 suite not rerun under activity adapter; focused17 repeated with separate cooperative flag",
+		"Abrupt dirty scope intentionally retains beforeunload listener and pending draft under existing recovery owner"
+	]
+}

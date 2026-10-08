@@ -1,0 +1,7 @@
+PASS Native draft immediately protects unsaved source
+PASS Interrupted saved fiber retains exact optimistic draft
+PASS Lifecycle hidden event drains actual SQLite journal without another RPC
+PASS Hidden event caches complete durable journal position
+{"flags":[false,false,false,true,true,true,true,true,false],"lastProtection":false,"unsaved":0,"source":"BeforeZ"}
+PASS Protection clears on hidden durable completion without another update caller
+PASS Actual journal reopen preserves exact interrupted-then-hidden-flushed source

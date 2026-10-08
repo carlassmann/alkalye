@@ -1,0 +1,69 @@
+import { assert,browser,evaluate,wait } from "./tests/browser-driver"
+let url=process.argv[2]??""
+if(!url)throw Error("URL required")
+let session="worker-activity-"+Date.now()
+let api="window.workerEditorProof"
+let source='document.querySelector("alkalye-editor").source'
+function counter(name:string) { let value=evaluate(session,`${api}.activity().then(value=>value.${name})`);if(typeof value!=="number")throw Error("Counter missing");return value }
+try {
+ browser(session,"open",url)
+ wait(session,"document.body.dataset.ready==='true'||!!document.body.dataset.failure")
+ assert(evaluate(session,"!document.body.dataset.failure"),"Activity authority opens actual native editor")
+ wait(session,`!${api}.protected()`)
+ assert(true,"Clean opened authority does not protect a nonexistent draft")
+ let original=evaluate(session,`${api}.inspect().source`)
+ if(typeof original!=="string")throw Error("Source missing")
+ evaluate(session,`${source}.focus();${source}.setSelectionRange(${original.length},${original.length})`)
+ let requests=counter("snapshotRequests")
+ let admissions=counter("snapshotAdmissions")
+ let interactions=counter("interactions")
+ browser(session,"keyboard","inserttext","X")
+ wait(session,`${api}.inspect().pending===0&&!${api}.protected()`)
+ assert(true,"Native durable save clears protection with no subsequent RPC")
+ let blockedAdmission=false
+ for(let index=0;index<40;index++) {
+  browser(session,"press","ArrowLeft")
+  let nextRequests=counter("snapshotRequests")
+  let nextAdmissions=counter("snapshotAdmissions")
+  if(nextRequests>requests&&nextAdmissions===admissions)blockedAdmission=true
+ }
+ assert(counter("interactions")>interactions,"Trusted key activity reaches the independent worker channel")
+ assert(blockedAdmission,"Actual periodic snapshot request waits during ongoing activity")
+ evaluate(session,`window.activityWait=${api}.activity().then(value=>{window.activityLast=value})`)
+ // Observe admission through the same real worker, without synthetic clock changes.
+ let last=counter("snapshotAdmissions")
+ if(last===admissions) {
+  evaluate(session,`${api}.hide()`)
+  wait(session,`${api}.inspect().pending===0`)
+  last=counter("snapshotAdmissions")
+ }
+ assert(last>admissions,"Activity admission eventually completes or is released by lifecycle hide")
+ assert(evaluate(session,`${api}.staleAck()`),"An old clean receipt cannot clear a newer uncertain outcome")
+ wait(session,`!${api}.protected()`)
+ assert(true,"Lightweight protection query clears resolved uncertainty")
+ let hides=counter("hides")
+ evaluate(session,`${api}.hide()`)
+ assert(counter("hides")>hides,"Synthetic pagehide forwards existing lifecycle hidden event")
+ assert(evaluate(session,`${api}.flush()`)===original+"X","Actual local journal remains exact after activity and lifecycle signals")
+ assert(evaluate(session,`${api}.closeCleanly()`),"Graceful Close acknowledges durable scope and no pending native draft")
+ assert(evaluate(session,`!${api}.protected()`),"Clean Close removes beforeunload protection")
+ assert(evaluate(session,`${api}.activityResources()===0`),"Clean scope releases every real main BroadcastChannel")
+ browser(session,"close")
+ session="worker-activity-abrupt-"+Date.now()
+ browser(session,"open",url)
+ wait(session,"document.body.dataset.ready==='true'")
+ let draft=evaluate(session,`${api}.inspect().source`)
+ if(typeof draft!=="string")throw Error("Source missing")
+ evaluate(session,`${source}.focus();${source}.setSelectionRange(${draft.length},${draft.length})`)
+ browser(session,"keyboard","inserttext","K")
+ wait(session,`${api}.inspect().pending===0`)
+ evaluate(session,`${api}.fault('hold-undo')`)
+ browser(session,"press","Control+z")
+ wait(session,`${api}.diagnostics().held`)
+ assert(evaluate(session,`${api}.protected()`),"In-flight uncertain command retains native draft protection")
+ evaluate(session,`${api}.dispose()`)
+ assert(evaluate(session,`${api}.protected()`),"Abrupt scope termination retains draft protection under recovery owner")
+ assert(evaluate(session,`${api}.activityResources()===0`),"Abrupt dirty scope still closes every real main BroadcastChannel")
+ evaluate(session,"window.lateActivityErrors=0;window.addEventListener('error',()=>window.lateActivityErrors++);document.dispatchEvent(new Event('keydown'));window.dispatchEvent(new Event('pagehide'))")
+ assert(evaluate(session,"window.lateActivityErrors===0"),"Late activity after scope close cannot post to closed channels")
+} finally {browser(session,"close")}

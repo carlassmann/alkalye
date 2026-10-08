@@ -1,0 +1,39 @@
+The adapter's approach is sound: it reuses the existing services, the activity channel is separate from the serial command RPC, and the hidden queue buffers a signal that arrives before the session subscribes. I found 3 blockers, all in dirty-protection and close ordering. I only read source; nothing was run.
+
+## Blockers
+
+**B1. The worker never reports "clean" after a normal save, so the main page keeps warning on unload.**
+- Your `protect().update()` captures `hasUnsaved()` once, at the moment it's called. The browser version is different: it re-checks inside `beforeunload` (`src/client/document-lifecycle.ts:38`), so a stale call is harmless there.
+- The session calls `drafts.update()` when it adds a draft (`document-session.ts:490`, which reports dirty), around in-flight proposals (`:733/:759`), and when failure state changes (`:371`).
+- The normal save path drains the queue at `:357` (`rawFlushUnlocked`'s `Queue.take`) without calling `update()`. So after the first keystroke the worker reports dirty and never reports clean.
+- On the main page `workerDirty` then stays true, so every unload prompts.
+- Narrow fix: add `drafts.update()` right after `Queue.take(unsaved)` at `:357`. For the browser this just removes the listener sooner.
+- If the shared session must stay untouched: have the adapter expose `publish()` and run it after every RPC in worker-session `execute` (`Effect.ensuring`). Background retries already clear through `failures.changes`.
+- Either way, only post when the value changes (today it posts on every keystroke).
+
+**B2. After a successful `Close`, the main page can keep the unload warning forever.**
+- The `Close` RPC reply and the BroadcastChannel dirty message travel on different channels, and nothing orders them.
+- The main forwarder can close while `workerDirty` is still true. `protectDocumentDrafts`' finalizer then deliberately leaves the `beforeunload` listener attached (`:26`) after the document has closed.
+- Fix: on `Close` success, set `workerDirty = false`, call `update()`, then close the forwarder scope. On `Close` failure or a terminate without `Close`, keep it dirty (conservative is correct there).
+
+**B3. The main page can stop protecting an edit before the worker's dirty signal arrives.**
+- If a save fails with `Unsaved`, the RPC reply can reach the main page before the dirty message, leaving the edit unprotected for a moment.
+- Fix: make the RPC result the authority. Keep `hasPendingNativeEdits()` true while the last `Replace`/`ReplaceQueued`/`Read` reply had `unsaved > 0` or failed. Treat the channel's `dirty` only as an extra signal for background failures.
+
+## Corrections to the plan
+- **The release-before-`Close` rationale is wrong.** `beforeSnapshot` only applies when recovery runs without an explicit task (`document-recovery.ts:110`). The hidden pipeline (`:413`) and the finalizer `save` (`:366`, `:440`) both pass a task, so the activity latch never blocks them. Only the periodic and retry snapshots are blocked, and those wait interruptibly and are interrupted by `Scope.close(background)` before the final flush. Calling `release()` is harmless, but drop the "final snapshot waits ten seconds" claim.
+- **Snapshot-gating tests must use the periodic path.** The hidden-flush test doesn't exercise `release()` at all.
+- **Posting after close throws.** `BroadcastChannel.postMessage` throws `InvalidStateError` once the channel is closed. If you take the B1 `publish()`-after-RPC route, it will run after `Close` has closed the Open scope's channel. Guard it with a `closed` flag set in the channel's release.
+
+## Minor
+- When the worker sends `ready` and the page is visible, the main page replies with a fake `interaction`, which closes the latch for 100ms during Open. Only reply when hidden.
+- Main-page `interact` posts on every scroll, wheel and drag-move event. Consider a 50ms leading throttle; the worker's sliding queue already coalesces.
+- `pagehide` plus `visibilitychange` sends `hidden` twice. That's fine because the sliding(1) queue coalesces them.
+
+## Checked and fine
+- **Effect APIs:** `Queue.sliding`, `offerUnsafe`, `Stream.fromQueue`, `Latch` and array-form `Schema.Union` all match the installed Effect 4.
+- **Interrupting long work:** the default `MixedScheduler` in async mode yields through `setTimeout(0)` in a worker (no `setImmediate` there). So `cooperativeWork`'s `yieldNow` gives queued BroadcastChannel messages a chance to run.
+- **Finalizer order:** the activity is built before the session in the Open scope, so the session's finalizer runs while the channel is still open.
+- **Open failure:** `scope.close` releases the channel and listeners.
+
+Several claude.ai connectors (GitHub, Slack, Notion and others) need authorizing in your claude.ai connector settings before they can be used; this review didn't need them.

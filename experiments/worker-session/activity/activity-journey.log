@@ -1,0 +1,17 @@
+PASS Activity authority opens actual native editor
+PASS Clean opened authority does not protect a nonexistent draft
+PASS Native durable save clears protection with no subsequent RPC
+PASS Trusted key activity reaches the independent worker channel
+PASS Actual periodic snapshot request waits during ongoing activity
+PASS Activity admission eventually completes or is released by lifecycle hide
+PASS An old clean receipt cannot clear a newer uncertain outcome
+PASS Lightweight protection query clears resolved uncertainty
+PASS Synthetic pagehide forwards existing lifecycle hidden event
+PASS Actual local journal remains exact after activity and lifecycle signals
+PASS Graceful Close acknowledges durable scope and no pending native draft
+PASS Clean Close removes beforeunload protection
+PASS Clean scope releases every real main BroadcastChannel
+PASS In-flight uncertain command retains native draft protection
+PASS Abrupt scope termination retains draft protection under recovery owner
+PASS Abrupt dirty scope still closes every real main BroadcastChannel
+PASS Late activity after scope close cannot post to closed channels

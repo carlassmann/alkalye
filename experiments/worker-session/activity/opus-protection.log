@@ -1,0 +1,36 @@
+**Verdict:** the stale-ack/uncertainty design holds. One blocker stops recovered protection from clearing by itself. Close is safe only under three conditions the source doesn't enforce yet. This is a source-only review; types and runtime are not proven.
+
+**1. Stale ack / uncertainty: valid, with one caveat**
+- The uncertainty counter in the receipt (`worker-activity.ts:124`) works: a success captured before `uncertain()` can never clear the newer uncertain outcome. The recovery query takes a fresh receipt after the bump, and a bump during an in-flight refresh starts one more query (`:139`). Correct.
+- Caveat: the order check assumes the worker runs RPCs in receipt order. The installed Effect `Semaphore` is not strictly FIFO. On release it wakes waiters in a later task (`node_modules/effect/src/Semaphore.ts:264-272`), and a request arriving in that gap can take the permit first (`:297-300`). If that happens, a later clean reply raises `confirmed`, and the earlier dirty reply is then thrown away as stale, which would wrongly clear protection.
+- This is unlikely while main sends one mutation at a time plus the query. A cheap fix:
+  - always accept a dirty result (set `rpcDirty`, start a refresh);
+  - accept a clean result only if its uncertainty matches and its order is above the last dirty order.
+- Also required: take the receipt in the same synchronous step as the send, after any main-side waiting.
+
+**2. Does recovered protection clear by itself? Not always (blocker)**
+- A stale `dirty=false` from the channel never clears `rpcDirty`; it only starts a query. Correct.
+- The gap: an interrupted Replace leaves its draft queued in the worker. The query then correctly returns dirty, and the next query depends on the worker publishing `dirty=false`.
+- The worker never sends that message when its queue drains without an RPC. The drain `Queue.take` (`src/shared/document-session.ts:357`) doesn't call `drafts.update`. A successful hidden flush only triggers an update through the failures stream (`:371`) when a save failure actually clears, so with no prior failure nothing fires.
+- Result: `workerDirty` and `rpcDirty` stay true until the user's next RPC. The beforeunload warning stays up indefinitely; drafts aren't lost.
+- Fix: call `drafts.update()` after the drain (or in an `ensuring` on `flush`). Alternatively, the worker's failure path could start a flush followed by `publish`.
+- Minor: a failed query is never retried (`:136`). Add a bounded retry with `Schedule`, or document "clears on the next signal".
+
+**3. Close/disposal APIs: safe only if all three hold**
+- **Send Close only after every earlier mutation reply has settled**, not merely been enqueued. Otherwise a mutation can lose the race to Close and fail with `Closed` after `cleanClose` is set. `uncertain()` is then hidden by `cleanClose`, and the draft is lost with no warning.
+- **Don't let `cleanClose` hide pending native edits.** Use `hasPendingNativeEdits() || (!cleanClose && (workerDirty || rpcDirty))`. Then a missed input freeze or a sticky queue failure after Close stays protected.
+- **Abrupt disposal:** `protectDocumentDrafts` keeps the beforeunload listener only if the predicate is true at finalize time, and `preventUnload` keeps reading the same closures afterwards (`src/client/document-lifecycle.ts:24-28,38`). So disposing the native queue must not reset its pending or sticky-failure state.
+
+Fine as is:
+- Finalizer order: the read `FiberSet` closes last and `closed` guards everything.
+- A failed Close: the worker clears `opened` before closing the scope (`experiments/worker-session/worker-session.ts:183-185`). Later queries then fail with `Closed`, so the dirty state is kept permanently, which is the conservative outcome.
+- Close waits for the session finalizer's durable flush, so its acknowledgement is a valid basis for `cleanClose`.
+
+**Narrow blockers:**
+1. Make the worker publish when its queue drains.
+2. Keep the pending-native-edits check active after `cleanClose`.
+3. Enforce in the code, not just the plan, that Close waits for earlier replies to settle.
+
+Recommended but not blocking: accept dirty results regardless of order.
+
+Many claude.ai connectors (GitHub, Slack, Notion and others) aren't authorized; this review didn't need them. To enable them, authorize them in the claude.ai connector settings.
