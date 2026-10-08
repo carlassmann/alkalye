@@ -225,6 +225,16 @@
 			unsampled trials. Terminal Undo improvements do not cover this case.
 		</p>
 		<p>
+			A guarded inverse of the latest single-character insertion restores its
+			previous immutable views and cursor position. Nineteen public contracts
+			passed, including accepted native replacements, Undo/Redo and durable
+			reopen. Six matched app trials reduced median Undo's largest task from
+			257ms to 20.4ms, and the maximum from 262ms to 22.8ms. Three-second Undo
+			busy time fell from 1657ms to 1441ms. This remains above 8.33ms;
+			intervening operations and full-source Unicode edits use the existing
+			fallback.
+		</p>
+		<p>
 			CRLF correctness: the editor now maps Markdown source offsets to the
 			textarea's native LF offsets through its existing text index. Edits retain
 			untouched line endings, including across tree leaves. Native module checks

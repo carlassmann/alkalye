@@ -1,4 +1,7 @@
-import { terminalRemovalPosition } from "../../shared/crdt"
+import {
+	terminalRemovalPosition,
+	insertionRemovalPosition,
+} from "../../shared/crdt"
 import { TextIndex } from "../../shared/text-index"
 import * as Effect from "effect/Effect"
 import * as Fiber from "effect/Fiber"
@@ -970,6 +973,15 @@ function createEditorView(
 		}
 		let pending: AnchorRequest[] = []
 		for (let id of new Set(ids)) {
+			let insertionRemoved = insertionRemovalPosition(atoms, nextAtoms, id)
+			if (
+				insertionRemoved !== undefined &&
+				insertionRemoved >= 0 &&
+				insertionRemoved <= nextIndex.length
+			) {
+				resolved.set(id, insertionRemoved)
+				continue
+			}
 			let removed = terminalRemovalPosition(atoms, nextAtoms, id)
 			if (removed !== undefined && removed === nextIndex.length) {
 				resolved.set(id, removed)
