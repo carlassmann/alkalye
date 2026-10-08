@@ -1,0 +1,28 @@
+No blocker in the reuse logic. The issues I found are a few cleanup items, plus test-fixture problems that could make the new tests crash or fail to test what they're named for. I checked the patch against the `writeHandler` excerpt you included. Nothing was compiled or run.
+
+## Reuse logic: checked, no blockers
+- **Encoded bytes win:** the handler decodes a copy of the encoded bytes (`entry.payload`), not the caller's mutable object. Replay reads the stored row once, copies it and compares it byte for byte. So reuse only happens when the restore would come from the same bytes.
+- **Which entries can reuse:** reuse needs the same entry id and the same bytes, and only the first entry replay reads after `localPosition` can use it. Any earlier entry from another tab or process clears it, and that entry then gets the full check. Reuse is safe if the same id comes back with the same bytes, and changed bytes always get the full check.
+- **Stale state:** the only state the `opened` check depends on is `!log && !creation`, plus `localPosition`. The patch checks all of these. The replica, generation, document and subject checks are redundant but harmless.
+- **Interruption and errors:** `onError` covers failures in the write, the handler and replay, and the finalizer clears the rest. One small gap: an interrupt after the write succeeds but before replay starts keeps the restored replica in memory until the finalizer runs. That only costs memory, since the entry and byte checks still guard reuse.
+- **Independent sessions:** each session has its own projection. One session's handler never runs for another session's write, so ids never match across sessions and the other session's replay does the full check.
+- **Activity parity:** the order for `proposed` and `localCreated` is unchanged: replay, then the compensation check, then `check`, then `proposing`. `opened` never triggered `proposing` before either.
+- **Premise:** the handler runs before the entry is visible to `readAfter`. The existing test that interrupts after the write implicitly confirms this; otherwise it would hang inside the transaction.
+
+## Smallest repairs
+1. **Formatting:** the patch isn't formatted, so `bun run check` will fail.
+2. **`detachedEntry`:** building a new `EventJournal.Entry` runs Schema validation on every replayed entry. If that throws, it becomes a defect and skips the `storageFailure` mapping. Copy only the bytes instead, and read the id once:
+   `let payload = new Uint8Array(entry.payload); let entryId = entry.idString; decode(entry, payload)`
+3. **Restored replica outliving the handler (`cooperative=true`):** check that `restoreSnapshot` returns a replica with no lazy work tied to the handler's scope or fiber. The handler ends before replay uses that replica.
+4. **Out of scope:** `value.kind` is still read from the mutable caller payload to pick the branch and decide on `proposing`. Other kinds are still checked against the raw payload. This isn't a regression, but changed bytes are only caught for `opened`.
+
+## Test critique
+- **Test 1 (caller mutation):** this one is valid and fails on baseline, because baseline's handler checks `"{broken"` and aborts. The mutation happens at the right time: after encoding, before the handler runs.
+- **Tests 2 and 3 (failure / interruption before commit):**
+  - They can't tell whether clearing the prepared state works. A failed open tears down the whole projection, so baseline passes them too. They are durable-rollback regression tests; name them that way.
+  - `Effect.result` doesn't catch defects. If the injected `EventJournalError` or the interrupt ends up as a defect (the `catchDefect` path turns any non-SQL error into one), `runPromise` rejects instead of returning a Failure. Use `Effect.exit` and `Exit.isFailure`.
+- **Test 4 (changed payload, same id):** the getter trick is sound. Because the first read returns the corrupted bytes, it catches both "decode, then re-read to compare" and "compare, then re-read to decode". Two risks:
+  - If Schema.Class instances are frozen, `Object.defineProperty` throws and the test crashes rather than failing. A Proxy runs into the same restriction. Fallback: `Object.create(EventJournal.Entry.prototype)` and define `id`, `event`, `primaryKey` and `payload` on it.
+  - If `restoreSnapshot` ignores the format marker, the corrupted open succeeds and the test fails loudly. That's acceptable.
+- **Spreading `storage.journal`:** this only works if the journal is a plain object whose methods don't use `this`. Check that before running.
+- **Missing:** nothing shows that reuse actually happens. A silent fallback would pass every test. For the experiment, rely on the trace: you should see exactly one `restoreSnapshot` call per open.

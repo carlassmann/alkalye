@@ -1,0 +1,927 @@
+[
+	{
+		"version": "baseline",
+		"commit": "72dd6f5edf6c8927b4c927d4c5c932d3940d6303",
+		"cell": "switch-small-rich",
+		"trial": 0,
+		"status": "complete",
+		"stage": null,
+		"error": null,
+		"gates": {
+			"seedReceipt": true,
+			"editedReceipt": false,
+			"undoReceipt": false,
+			"targetReceipt": true
+		},
+		"traceStatus": "complete-window",
+		"initialEnclosingTaskMs": 0.487,
+		"aftermathMaxTaskMs": 19.589,
+		"windowMaxTaskMs": 19.589,
+		"presentationOpportunityMs": 622.821,
+		"layoutUnionMs": 31.263,
+		"paintUnionMs": 4.561,
+		"gcUnionMs": 35.101,
+		"largestTasks": [
+			{
+				"relativeStartMs": 593.452,
+				"durationMs": 19.589
+			},
+			{
+				"relativeStartMs": 642.123,
+				"durationMs": 8.188
+			},
+			{
+				"relativeStartMs": 613.359,
+				"durationMs": 4.891
+			},
+			{
+				"relativeStartMs": 393.371,
+				"durationMs": 4.62
+			},
+			{
+				"relativeStartMs": 547.523,
+				"durationMs": 3.925
+			}
+		],
+		"eventTiming": [
+			{
+				"duration": 16,
+				"name": "pointerover",
+				"processingEnd": 1329.600000023842,
+				"processingStart": 1329.600000023842,
+				"startTime": 1329.4000000357628
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1329.600000023842,
+				"processingStart": 1329.600000023842,
+				"startTime": 1329.4000000357628
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1329.600000023842,
+				"processingStart": 1329.600000023842,
+				"startTime": 1329.4000000357628
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1329.600000023842,
+				"processingStart": 1329.600000023842,
+				"startTime": 1329.4000000357628
+			},
+			{
+				"duration": 16,
+				"name": "mouseover",
+				"processingEnd": 1329.600000023842,
+				"processingStart": 1329.600000023842,
+				"startTime": 1329.4000000357628
+			}
+		],
+		"pairTrial": 0
+	},
+	{
+		"version": "candidate",
+		"commit": "72dd6f5edf6c8927b4c927d4c5c932d3940d6303",
+		"cell": "switch-small-rich",
+		"trial": 0,
+		"status": "complete",
+		"stage": null,
+		"error": null,
+		"gates": {
+			"seedReceipt": true,
+			"editedReceipt": false,
+			"undoReceipt": false,
+			"targetReceipt": true
+		},
+		"traceStatus": "complete-window",
+		"initialEnclosingTaskMs": 0.437,
+		"aftermathMaxTaskMs": 20.336,
+		"windowMaxTaskMs": 20.336,
+		"presentationOpportunityMs": 529.38,
+		"layoutUnionMs": 33.853,
+		"paintUnionMs": 4.841,
+		"gcUnionMs": 22.091,
+		"largestTasks": [
+			{
+				"relativeStartMs": 491.397,
+				"durationMs": 20.336
+			},
+			{
+				"relativeStartMs": 539.399,
+				"durationMs": 7.888
+			},
+			{
+				"relativeStartMs": 512.024,
+				"durationMs": 4.875
+			},
+			{
+				"relativeStartMs": 358.743,
+				"durationMs": 3.561
+			},
+			{
+				"relativeStartMs": 431.186,
+				"durationMs": 3.475
+			}
+		],
+		"eventTiming": [
+			{
+				"duration": 16,
+				"name": "pointerover",
+				"processingEnd": 705.2999999523163,
+				"processingStart": 705.1999999880791,
+				"startTime": 694.2999999523163
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 705.2999999523163,
+				"processingStart": 705.2999999523163,
+				"startTime": 694.2999999523163
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 705.2999999523163,
+				"processingStart": 705.2999999523163,
+				"startTime": 694.2999999523163
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 705.2999999523163,
+				"processingStart": 705.2999999523163,
+				"startTime": 694.2999999523163
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 705.2999999523163,
+				"processingStart": 705.2999999523163,
+				"startTime": 694.2999999523163
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 705.2999999523163,
+				"processingStart": 705.2999999523163,
+				"startTime": 694.2999999523163
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 705.2999999523163,
+				"processingStart": 705.2999999523163,
+				"startTime": 694.2999999523163
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 705.2999999523163,
+				"processingStart": 705.2999999523163,
+				"startTime": 694.2999999523163
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 705.2999999523163,
+				"processingStart": 705.2999999523163,
+				"startTime": 694.2999999523163
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 705.2999999523163,
+				"processingStart": 705.2999999523163,
+				"startTime": 694.2999999523163
+			},
+			{
+				"duration": 16,
+				"name": "mouseover",
+				"processingEnd": 705.2999999523163,
+				"processingStart": 705.2999999523163,
+				"startTime": 694.2999999523163
+			},
+			{
+				"duration": 16,
+				"name": "pointerdown",
+				"processingEnd": 709.2999999523163,
+				"processingStart": 709.0999999642372,
+				"startTime": 709
+			},
+			{
+				"duration": 16,
+				"name": "mousedown",
+				"processingEnd": 709.2999999523163,
+				"processingStart": 709.2999999523163,
+				"startTime": 709
+			},
+			{
+				"duration": 16,
+				"name": "pointerup",
+				"processingEnd": 709.6999999880791,
+				"processingStart": 709.6999999880791,
+				"startTime": 709.5999999642372
+			},
+			{
+				"duration": 16,
+				"name": "mouseup",
+				"processingEnd": 709.6999999880791,
+				"processingStart": 709.6999999880791,
+				"startTime": 709.5999999642372
+			},
+			{
+				"duration": 16,
+				"name": "click",
+				"processingEnd": 710.1999999880791,
+				"processingStart": 709.6999999880791,
+				"startTime": 709.5999999642372
+			},
+			{
+				"duration": 16,
+				"name": "pointerover",
+				"processingEnd": 1238.699999988079,
+				"processingStart": 1238.699999988079,
+				"startTime": 1238.5
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1238.699999988079,
+				"processingStart": 1238.699999988079,
+				"startTime": 1238.5
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1238.699999988079,
+				"processingStart": 1238.699999988079,
+				"startTime": 1238.5
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1238.699999988079,
+				"processingStart": 1238.699999988079,
+				"startTime": 1238.5
+			},
+			{
+				"duration": 16,
+				"name": "mouseover",
+				"processingEnd": 1238.699999988079,
+				"processingStart": 1238.699999988079,
+				"startTime": 1238.5
+			}
+		],
+		"pairTrial": 0
+	},
+	{
+		"version": "baseline",
+		"commit": "72dd6f5edf6c8927b4c927d4c5c932d3940d6303",
+		"cell": "switch-small-rich",
+		"trial": 0,
+		"status": "complete",
+		"stage": null,
+		"error": null,
+		"gates": {
+			"seedReceipt": true,
+			"editedReceipt": false,
+			"undoReceipt": false,
+			"targetReceipt": true
+		},
+		"traceStatus": "complete-window",
+		"initialEnclosingTaskMs": 0.468,
+		"aftermathMaxTaskMs": 19.406,
+		"windowMaxTaskMs": 19.406,
+		"presentationOpportunityMs": 646.489,
+		"layoutUnionMs": 33.625,
+		"paintUnionMs": 4.87,
+		"gcUnionMs": 36.251,
+		"largestTasks": [
+			{
+				"relativeStartMs": 617.882,
+				"durationMs": 19.406
+			},
+			{
+				"relativeStartMs": 665.587,
+				"durationMs": 7.677
+			},
+			{
+				"relativeStartMs": 569.382,
+				"durationMs": 5.128
+			},
+			{
+				"relativeStartMs": 637.626,
+				"durationMs": 4.792
+			},
+			{
+				"relativeStartMs": 441.833,
+				"durationMs": 3.769
+			}
+		],
+		"eventTiming": [
+			{
+				"duration": 16,
+				"name": "pointerover",
+				"processingEnd": 712.3999999761581,
+				"processingStart": 712.3000000119209,
+				"startTime": 698.3000000119209
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 712.3999999761581,
+				"processingStart": 712.3999999761581,
+				"startTime": 698.3000000119209
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 712.3999999761581,
+				"processingStart": 712.3999999761581,
+				"startTime": 698.3000000119209
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 712.3999999761581,
+				"processingStart": 712.3999999761581,
+				"startTime": 698.3000000119209
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 712.3999999761581,
+				"processingStart": 712.3999999761581,
+				"startTime": 698.3000000119209
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 712.3999999761581,
+				"processingStart": 712.3999999761581,
+				"startTime": 698.3000000119209
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 712.3999999761581,
+				"processingStart": 712.3999999761581,
+				"startTime": 698.3000000119209
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 712.3999999761581,
+				"processingStart": 712.3999999761581,
+				"startTime": 698.3000000119209
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 712.3999999761581,
+				"processingStart": 712.3999999761581,
+				"startTime": 698.3000000119209
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 712.3999999761581,
+				"processingStart": 712.3999999761581,
+				"startTime": 698.3000000119209
+			},
+			{
+				"duration": 16,
+				"name": "mouseover",
+				"processingEnd": 712.3999999761581,
+				"processingStart": 712.3999999761581,
+				"startTime": 698.3000000119209
+			},
+			{
+				"duration": 16,
+				"name": "pointerdown",
+				"processingEnd": 717,
+				"processingStart": 716.8000000119209,
+				"startTime": 716.5
+			},
+			{
+				"duration": 16,
+				"name": "mousedown",
+				"processingEnd": 717,
+				"processingStart": 717,
+				"startTime": 716.5
+			},
+			{
+				"duration": 16,
+				"name": "pointerup",
+				"processingEnd": 717.3999999761581,
+				"processingStart": 717.3000000119209,
+				"startTime": 717.1999999880791
+			},
+			{
+				"duration": 16,
+				"name": "mouseup",
+				"processingEnd": 717.3999999761581,
+				"processingStart": 717.3999999761581,
+				"startTime": 717.1999999880791
+			},
+			{
+				"duration": 16,
+				"name": "click",
+				"processingEnd": 717.8000000119209,
+				"processingStart": 717.3999999761581,
+				"startTime": 717.1999999880791
+			},
+			{
+				"duration": 16,
+				"name": "pointerover",
+				"processingEnd": 1363.300000011921,
+				"processingStart": 1363.300000011921,
+				"startTime": 1363
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1363.300000011921,
+				"processingStart": 1363.300000011921,
+				"startTime": 1363
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1363.300000011921,
+				"processingStart": 1363.300000011921,
+				"startTime": 1363
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1363.300000011921,
+				"processingStart": 1363.300000011921,
+				"startTime": 1363
+			},
+			{
+				"duration": 16,
+				"name": "mouseover",
+				"processingEnd": 1363.300000011921,
+				"processingStart": 1363.300000011921,
+				"startTime": 1363
+			}
+		],
+		"pairTrial": 1
+	},
+	{
+		"version": "candidate",
+		"commit": "72dd6f5edf6c8927b4c927d4c5c932d3940d6303",
+		"cell": "switch-small-rich",
+		"trial": 0,
+		"status": "complete",
+		"stage": null,
+		"error": null,
+		"gates": {
+			"seedReceipt": true,
+			"editedReceipt": false,
+			"undoReceipt": false,
+			"targetReceipt": true
+		},
+		"traceStatus": "complete-window",
+		"initialEnclosingTaskMs": 0.377,
+		"aftermathMaxTaskMs": 19.144,
+		"windowMaxTaskMs": 19.144,
+		"presentationOpportunityMs": 533.519,
+		"layoutUnionMs": 37.018,
+		"paintUnionMs": 5.435,
+		"gcUnionMs": 19.838,
+		"largestTasks": [
+			{
+				"relativeStartMs": 492.746,
+				"durationMs": 19.144
+			},
+			{
+				"relativeStartMs": 512.216,
+				"durationMs": 4.947
+			},
+			{
+				"relativeStartMs": 455.706,
+				"durationMs": 4.565
+			},
+			{
+				"relativeStartMs": 416.898,
+				"durationMs": 3.795
+			},
+			{
+				"relativeStartMs": 358.148,
+				"durationMs": 3.228
+			}
+		],
+		"eventTiming": [
+			{
+				"duration": 16,
+				"name": "pointerover",
+				"processingEnd": 721.6000000238419,
+				"processingStart": 721.6000000238419,
+				"startTime": 704.1000000238419
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 721.6000000238419,
+				"processingStart": 721.6000000238419,
+				"startTime": 704.1000000238419
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 721.6000000238419,
+				"processingStart": 721.6000000238419,
+				"startTime": 704.1000000238419
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 721.6000000238419,
+				"processingStart": 721.6000000238419,
+				"startTime": 704.1000000238419
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 721.6000000238419,
+				"processingStart": 721.6000000238419,
+				"startTime": 704.1000000238419
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 721.6000000238419,
+				"processingStart": 721.6000000238419,
+				"startTime": 704.1000000238419
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 721.6000000238419,
+				"processingStart": 721.6000000238419,
+				"startTime": 704.1000000238419
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 721.6000000238419,
+				"processingStart": 721.6000000238419,
+				"startTime": 704.1000000238419
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 721.6000000238419,
+				"processingStart": 721.6000000238419,
+				"startTime": 704.1000000238419
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 721.6000000238419,
+				"processingStart": 721.6000000238419,
+				"startTime": 704.1000000238419
+			},
+			{
+				"duration": 16,
+				"name": "mouseover",
+				"processingEnd": 721.6000000238419,
+				"processingStart": 721.6000000238419,
+				"startTime": 704.1000000238419
+			},
+			{
+				"duration": 16,
+				"name": "pointerdown",
+				"processingEnd": 722.4000000357628,
+				"processingStart": 722.2000000476837,
+				"startTime": 722.1000000238419
+			},
+			{
+				"duration": 16,
+				"name": "mousedown",
+				"processingEnd": 722.4000000357628,
+				"processingStart": 722.4000000357628,
+				"startTime": 722.1000000238419
+			},
+			{
+				"duration": 16,
+				"name": "pointerup",
+				"processingEnd": 722.7000000476837,
+				"processingStart": 722.7000000476837,
+				"startTime": 722.6000000238419
+			},
+			{
+				"duration": 16,
+				"name": "mouseup",
+				"processingEnd": 722.7000000476837,
+				"processingStart": 722.7000000476837,
+				"startTime": 722.6000000238419
+			},
+			{
+				"duration": 16,
+				"name": "click",
+				"processingEnd": 723.2000000476837,
+				"processingStart": 722.7000000476837,
+				"startTime": 722.6000000238419
+			},
+			{
+				"duration": 16,
+				"name": "pointerover",
+				"processingEnd": 1255.800000011921,
+				"processingStart": 1255.800000011921,
+				"startTime": 1255.7000000476835
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1255.800000011921,
+				"processingStart": 1255.800000011921,
+				"startTime": 1255.7000000476835
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1255.800000011921,
+				"processingStart": 1255.800000011921,
+				"startTime": 1255.7000000476835
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1255.800000011921,
+				"processingStart": 1255.800000011921,
+				"startTime": 1255.7000000476835
+			},
+			{
+				"duration": 16,
+				"name": "mouseover",
+				"processingEnd": 1255.800000011921,
+				"processingStart": 1255.800000011921,
+				"startTime": 1255.7000000476835
+			}
+		],
+		"pairTrial": 1
+	},
+	{
+		"version": "baseline",
+		"commit": "72dd6f5edf6c8927b4c927d4c5c932d3940d6303",
+		"cell": "switch-small-rich",
+		"trial": 0,
+		"status": "complete",
+		"stage": null,
+		"error": null,
+		"gates": {
+			"seedReceipt": true,
+			"editedReceipt": false,
+			"undoReceipt": false,
+			"targetReceipt": true
+		},
+		"traceStatus": "complete-window",
+		"initialEnclosingTaskMs": 0.452,
+		"aftermathMaxTaskMs": 19.328,
+		"windowMaxTaskMs": 19.328,
+		"presentationOpportunityMs": 661.012,
+		"layoutUnionMs": 32.299,
+		"paintUnionMs": 4.755,
+		"gcUnionMs": 32.773,
+		"largestTasks": [
+			{
+				"relativeStartMs": 625.862,
+				"durationMs": 19.328
+			},
+			{
+				"relativeStartMs": 674.691,
+				"durationMs": 7.654
+			},
+			{
+				"relativeStartMs": 645.259,
+				"durationMs": 6.845
+			},
+			{
+				"relativeStartMs": 569.439,
+				"durationMs": 4.856
+			},
+			{
+				"relativeStartMs": 425.224,
+				"durationMs": 4.239
+			}
+		],
+		"eventTiming": [
+			{
+				"duration": 16,
+				"name": "pointerover",
+				"processingEnd": 716.5,
+				"processingStart": 716.5,
+				"startTime": 699.6999999880791
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 716.5,
+				"processingStart": 716.5,
+				"startTime": 699.6999999880791
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 716.5,
+				"processingStart": 716.5,
+				"startTime": 699.6999999880791
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 716.5,
+				"processingStart": 716.5,
+				"startTime": 699.6999999880791
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 716.5,
+				"processingStart": 716.5,
+				"startTime": 699.6999999880791
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 716.5,
+				"processingStart": 716.5,
+				"startTime": 699.6999999880791
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 716.5,
+				"processingStart": 716.5,
+				"startTime": 699.6999999880791
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 716.5,
+				"processingStart": 716.5,
+				"startTime": 699.6999999880791
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 716.5,
+				"processingStart": 716.5,
+				"startTime": 699.6999999880791
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 716.5,
+				"processingStart": 716.5,
+				"startTime": 699.6999999880791
+			},
+			{
+				"duration": 16,
+				"name": "mouseover",
+				"processingEnd": 716.5,
+				"processingStart": 716.5,
+				"startTime": 699.6999999880791
+			},
+			{
+				"duration": 16,
+				"name": "pointerdown",
+				"processingEnd": 722,
+				"processingStart": 721.8999999761581,
+				"startTime": 721.6999999880791
+			},
+			{
+				"duration": 16,
+				"name": "mousedown",
+				"processingEnd": 722,
+				"processingStart": 722,
+				"startTime": 721.6999999880791
+			},
+			{
+				"duration": 16,
+				"name": "pointerover",
+				"processingEnd": 1383,
+				"processingStart": 1383,
+				"startTime": 1382.899999976158
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1383,
+				"processingStart": 1383,
+				"startTime": 1382.899999976158
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1383,
+				"processingStart": 1383,
+				"startTime": 1382.899999976158
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1383,
+				"processingStart": 1383,
+				"startTime": 1382.899999976158
+			},
+			{
+				"duration": 16,
+				"name": "mouseover",
+				"processingEnd": 1383,
+				"processingStart": 1383,
+				"startTime": 1382.899999976158
+			}
+		],
+		"pairTrial": 2
+	},
+	{
+		"version": "candidate",
+		"commit": "72dd6f5edf6c8927b4c927d4c5c932d3940d6303",
+		"cell": "switch-small-rich",
+		"trial": 0,
+		"status": "complete",
+		"stage": null,
+		"error": null,
+		"gates": {
+			"seedReceipt": true,
+			"editedReceipt": false,
+			"undoReceipt": false,
+			"targetReceipt": true
+		},
+		"traceStatus": "complete-window",
+		"initialEnclosingTaskMs": 0.343,
+		"aftermathMaxTaskMs": 18.882,
+		"windowMaxTaskMs": 18.882,
+		"presentationOpportunityMs": 516.885,
+		"layoutUnionMs": 31.701,
+		"paintUnionMs": 4.733,
+		"gcUnionMs": 19.204,
+		"largestTasks": [
+			{
+				"relativeStartMs": 488.572,
+				"durationMs": 18.882
+			},
+			{
+				"relativeStartMs": 507.822,
+				"durationMs": 5.059
+			},
+			{
+				"relativeStartMs": 412.529,
+				"durationMs": 3.736
+			},
+			{
+				"relativeStartMs": 452.661,
+				"durationMs": 3.568
+			},
+			{
+				"relativeStartMs": 352.77,
+				"durationMs": 3.565
+			}
+		],
+		"eventTiming": [
+			{
+				"duration": 16,
+				"name": "pointerdown",
+				"processingEnd": 719.8000000119209,
+				"processingStart": 719.6999999880791,
+				"startTime": 719.5
+			},
+			{
+				"duration": 16,
+				"name": "mousedown",
+				"processingEnd": 719.9000000357628,
+				"processingStart": 719.8000000119209,
+				"startTime": 719.5
+			},
+			{
+				"duration": 16,
+				"name": "pointerup",
+				"processingEnd": 720.3000000119209,
+				"processingStart": 720.3000000119209,
+				"startTime": 720.1999999880791
+			},
+			{
+				"duration": 16,
+				"name": "mouseup",
+				"processingEnd": 720.3000000119209,
+				"processingStart": 720.3000000119209,
+				"startTime": 720.1999999880791
+			},
+			{
+				"duration": 16,
+				"name": "click",
+				"processingEnd": 720.6999999880791,
+				"processingStart": 720.3000000119209,
+				"startTime": 720.1999999880791
+			}
+		],
+		"pairTrial": 2
+	}
+]

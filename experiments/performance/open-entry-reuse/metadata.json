@@ -1,0 +1,68 @@
+{
+	"baseline": "72dd6f5edf6c8927b4c927d4c5c932d3940d6303",
+	"backend": "same native72 for all client arms",
+	"candidate": "only private opened-entry reuse patch",
+	"sourceHashes": {
+		"runtime/src/shared/document-session.ts": "fdbc79466a33698c583c33e4d9d10410bfccaecd33bc324080da491a248c6ef8",
+		"runtime/tests/opened-entry-reuse.test.ts": "a166de51ef3623ae44dd4769e769707fc1cf72355402247f7ffbf54df8b8fc79",
+		"baseline/src/shared/document-session.ts": "e7ec5917e7dda0730159bb0954b1b3276747f1bc2263c5f02a5445ee92ffb279",
+		"count-runtime/src/shared/document-session.ts": "4ba5583a8f6451575522f975bd6ab1b4e96009c20638afc19a9a51f41df41450",
+		"measure.ts": "326c2f8f2a3edf6cb58a6e12c501fe92fbce4dbf74469034fef5e2e61e6aa5b1",
+		"measure-count.ts": "7242bf1385ab42cb042af243083f7c9a55f9c1361c27f993e1d3d58e3c4c870f",
+		"baseline/experiments/performance/interaction-matrix/runner.ts": "1410fe3fc3cf179f4fd2dddac87796cdb807f8ff5704ba44de368337bbc456c5",
+		"opus-prompt.txt": "494e11e87beb9d2080a107d2d99c5d0a3a5c932a3d9983bf9e24eb6f03b3dd0c",
+		"opus-followup-prompt.txt": "8d0bf245e0f77fe75d9d7eea95ceb9e11a9e3462d799d1c86af12a3ee32704b1"
+	},
+	"bundleHashes": {
+		"baseline": {
+			"app.js": "9616ab7c9928c9d71eddfe67ad0c1d13711a8ee536eee0e425d3645e6da9798f",
+			"chunks/document-app-q85ewmp1.js": "a29563b5c928caa0a787711b703a9af0f08cc6b146928dd3050bd6947f731cbd"
+		},
+		"candidate": {
+			"app.js": "2988004fa7d4909e67b981f37baaa47121198a3dc2a52feb8a6105b86cb07e54",
+			"chunks/document-app-q5tas76n.js": "0f712aa9d22bf44eb4944b2a42c216a960f3bb492a6a3b24a9d3b4e5748d48e5"
+		},
+		"diagnostic": {
+			"app.js": "aba957be1804f57df3da0e0388551163308700e70a2f05cef663e00357a44341",
+			"chunks/document-app-ssfa1b25.js": "e59659f6eda86301d0100a7135e614e56fc7c0172ef3fce2fa946f8eda4c0127"
+		}
+	},
+	"traceHashes": [
+		{
+			"path": "/tmp/alkalye-open-entry-reuse/results/baseline-0/baseline-switch-small-rich-0.trace.json",
+			"sha256": "e190a5aa68878d142e21241468b736ed8b043f78c7476e28c7b73509cfe88d32"
+		},
+		{
+			"path": "/tmp/alkalye-open-entry-reuse/results/candidate-0/candidate-switch-small-rich-0.trace.json",
+			"sha256": "09321c672674620eacf1a512faf90868bc3d523381d9a122e9441488886264ce"
+		},
+		{
+			"path": "/tmp/alkalye-open-entry-reuse/results/baseline-1/baseline-switch-small-rich-0.trace.json",
+			"sha256": "01005dc822d486d66e3a30a4c26a0785ab717732188304895127a9bcd5bd41bf"
+		},
+		{
+			"path": "/tmp/alkalye-open-entry-reuse/results/candidate-1/candidate-switch-small-rich-0.trace.json",
+			"sha256": "7b3a9ca5e2c37e7d7b13ff9e3b40196042f404954f15b851a2d88eb9b46869f1"
+		},
+		{
+			"path": "/tmp/alkalye-open-entry-reuse/results/baseline-2/baseline-switch-small-rich-0.trace.json",
+			"sha256": "f561fbeb04def4265c29ee5c2fff05effa2d3b10076b2299a3df9a2605278bd1"
+		},
+		{
+			"path": "/tmp/alkalye-open-entry-reuse/results/candidate-2/candidate-switch-small-rich-0.trace.json",
+			"sha256": "704da639fb827bda62723875b33d196e35d3225caf8f7bb878c3b2908334b698"
+		},
+		{
+			"path": "/tmp/alkalye-open-entry-reuse/count-results/candidate-0/candidate-switch-small-rich-0.trace.json",
+			"sha256": "c3c65f80024298a0c1492e7fddd6674b290ab360aa5346d0fefbf67c39023460"
+		}
+	],
+	"runnerCorrection": "cold document-IDB deletion plus all requested .js resource inventory, existing0e412da modulepreload correction",
+	"setupFailures": [
+		"work root lacked .git; no browser launched",
+		"lazy asset pinning required unloaded chunks; setup only",
+		"script initiator filter omitted modulepreloaded document chunk; setup only",
+		"count-copy absent workdir rejected before command; copying broken helper symlinks failed, corrected symlinks=True"
+	],
+	"resources": "work status: no tracked commands; per-cell browser scopes closed"
+}

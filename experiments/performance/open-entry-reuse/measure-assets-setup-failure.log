@@ -1,0 +1,11 @@
+21 | 	let path = join(root, "manifest-" + arm + "-" + trial + ".private.json")
+22 | 	await Bun.write(path, JSON.stringify(manifest))
+23 | 	let child = Bun.spawn(["bun", root + "/baseline/experiments/performance/interaction-matrix/runner.ts", path], { cwd: root + "/baseline", stdout: "inherit", stderr: "inherit" })
+24 | 	if (await child.exited) throw Error("Switch runner process failed")
+25 | 	let rows = await Bun.file(join(output, "results.json")).json()
+26 | 	if (rows.length !== 1 || rows[0].status !== "complete") throw Error("Exact cold switch gate failed")
+                                                                    ^
+error: Exact cold switch gate failed
+      at /private/tmp/alkalye-open-entry-reuse/measure.ts:26:64
+
+Bun v1.4.0 (macOS arm64)

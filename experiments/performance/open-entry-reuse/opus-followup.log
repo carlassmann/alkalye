@@ -1,0 +1,17 @@
+## No logic blockers
+
+I reviewed the source only and didn't compile or run anything. The private prepared state is used at most once in every case you listed:
+
+- **Stale generation or cursor:** `matchesPreparedOpen` checks replica, durable and accepted identity and generations, both positions, document/subject, and `!log && !creation`. It runs both when the state is saved and when it's used, so if `check` changes state, nothing is saved.
+- **Different row:** replay clears the state before it decodes anything. Only the first entry read after `localPosition` can use it. Any other id clears it and gets the full `check`.
+- **Different bytes:** replay copies the bytes once and decodes that copy. The handler saved its own copy. Reuse needs an exact byte match. The test 4 getter catches both ways an implementation could read twice.
+- **Failure or interrupt:** `Effect.onError` also runs on interruption. It covers the handler, the write and recovery together, and replay. The finalizer and `resetProjection` also clear the state. If an interrupt lands after the commit but before replay, the state stays in memory until cleanup, and the id and byte checks still guard it.
+- **Concurrent or empty replay:** any replay clears the state at the end, so a replay running in parallel only forces a fallback. That costs speed, not correctness.
+
+## Non-blocking checks
+
+1. **Formatting:** the patch is still unformatted (long lines, `{ preparedOpen = undefined }` on one line), so `bun run check` will fail. The test imports may also trip the sort lint (`Exit` comes after `Fiber`).
+2. **`Effect.addFinalizer` in `makeProjection`:** it adds a `Scope` requirement. That's fine if the layer is built with `Layer.effect`, which removes `Scope` in Effect 4, but confirm it type-checks. The finalizer isn't needed anyway; you could drop it.
+3. **`check` side effects:** `check` for `opened` now runs once instead of twice, which matters only if it does more than return the restored replica. That's fine if it's pure.
+4. **Silent fallback:** no test proves reuse actually happens. Confirm it with the trace: one `restoreSnapshot` call per open.
+5. **Test 4:** it needs two things at runtime: the `Entry` instance can't be frozen, and the encoded payload must contain `alkalye-state-v2`. If either fails, the test crashes loudly instead of passing by mistake, which is fine.

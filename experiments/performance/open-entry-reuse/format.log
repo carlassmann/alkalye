@@ -1,0 +1,3 @@
+[error] Invalid configuration for file "/private/tmp/alkalye-open-entry-reuse/runtime/src/shared/document-session.ts":
+[error] JSON Error in /Users/carlassmann/.codex/worktrees/b513/alkalye/.prettierrc.json:
+[error] "undefined" is not valid JSON

@@ -1,0 +1,37 @@
+import { cp, rm } from "node:fs/promises"
+import { join } from "node:path"
+
+let root = "/tmp/alkalye-open-entry-reuse"
+let seed = "/tmp/alkalye-focused-interaction/data"
+let configuration = await Bun.file("/tmp/alkalye-focused-interaction/remaining.private.json").json()
+if (!await Bun.file(root + "/.git/HEAD").exists() && Bun.spawnSync(["git", "init", "-q", root]).exitCode) throw Error("Disposable managed root requires Git initialization")
+let environment = { ...process.env, WORK_STATE_ROOT: root + "/work-state" }
+for (let trial = 0; trial < 1; trial++) for (let arm of ["candidate"]) {
+	let output = join(root, "count-results", arm + "-" + trial)
+	let assets = join(root, arm === "baseline" ? "baseline" : "count-runtime", "dist")
+	Bun.spawnSync(["work", "down"], { cwd: root, env: environment })
+	await rm(root + "/data-active", { recursive: true, force: true })
+	await cp(seed, root + "/data-active", { recursive: true })
+	await rm(root + "/assets-active", { recursive: true, force: true })
+	await cp(assets, root + "/assets-active", { recursive: true })
+	if (Bun.spawnSync(["work", "run", "web"], { cwd: root, env: environment }).exitCode) throw Error("Managed server start failed")
+	let version = { ...configuration.versions[0], name: arm, commit: "72dd6f5" }
+	version.commit = (await Bun.$`git -C /Users/carlassmann/.codex/worktrees/b513/alkalye rev-parse 72dd6f5`.text()).trim()
+	let documentChunks = []
+	for (let path of new Bun.Glob("chunks/*.js.map").scanSync({ cwd: assets })) {
+		let map = await Bun.file(join(assets, path)).json()
+		if (map.sources.some((source: string) => source.endsWith("/src/shared/document-session.ts"))) documentChunks.push(path.slice(0, -4))
+	}
+	if (!documentChunks.length) throw Error("DocumentSession source chunk was not found")
+	version.assets = []
+	for (let path of ["app.js", ...documentChunks]) version.assets.push({ path: "/" + path, sha256: new Bun.CryptoHasher("sha256").update(await Bun.file(join(assets, path)).arrayBuffer()).digest("hex") })
+	let manifest = { samples: 1, output, versions: [version], cells: configuration.cells.filter((cell: { name: string }) => cell.name === "switch-small-rich") }
+	let path = join(root, "manifest-" + arm + "-" + trial + ".private.json")
+	await Bun.write(path, JSON.stringify(manifest))
+	let child = Bun.spawn(["bun", root + "/baseline/experiments/performance/interaction-matrix/runner.ts", path], { cwd: root + "/baseline", stdout: "inherit", stderr: "inherit" })
+	if (await child.exited) throw Error("Switch runner process failed")
+	let rows = await Bun.file(join(output, "results.json")).json()
+	if (rows.length !== 1 || rows[0].status !== "complete") throw Error("Exact cold switch gate failed")
+	console.log(JSON.stringify({ arm, trial, status: "complete" }))
+}
+Bun.spawnSync(["work", "down"], { cwd: root, env: environment })

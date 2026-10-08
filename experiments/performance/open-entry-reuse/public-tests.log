@@ -1,0 +1,54 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/opened-reuse.test.ts:
+(pass) opened snapshot retains authorship, exact source, save, undo and independent offline reopen (cooperative=%s) [46.66ms]
+(pass) opened snapshot retains authorship, exact source, save, undo and independent offline reopen (cooperative=%s) [16.65ms]
+(pass) wrong-document and corrupt snapshots do not poison a subsequent valid open (cooperative=%s) [12.68ms]
+(pass) wrong-document and corrupt snapshots do not poison a subsequent valid open (cooperative=%s) [12.18ms]
+(pass) a racing second opened record cannot replace the already accepted snapshot (cooperative=%s) [8.40ms]
+(pass) a racing second opened record cannot replace the already accepted snapshot (cooperative=%s) [8.29ms]
+(pass) interruption after a real opened journal write leaves replay independently recoverable (cooperative=%s) [7.82ms]
+(pass) interruption after a real opened journal write leaves replay independently recoverable (cooperative=%s) [7.27ms]
+
+tests/document-recovery.test.ts:
+(pass) storage failures preserve the actionable cause through nested journal wrappers [0.12ms]
+(pass) idle save recovery drains a failed append without another foreground request [0.83ms]
+(pass) an attempt waiting for its gate clears a failure that preceded its actual work [0.36ms]
+(pass) recovery keeps save, projection, snapshot and notification failures independent [0.26ms]
+(pass) nested transient journal failures heal automatically with backoff and no self-signaling [0.52ms]
+(pass) schema damage remains terminal instead of becoming an infrastructure retry loop [0.41ms]
+(pass) a foreground failure during recovery cannot be hidden by the older successful attempt [0.35ms]
+(pass) closing the recovery scope cancels backoff and stops subsequent attempts [0.28ms]
+(pass) deferring a snapshot preserves its existing failure until a real copy succeeds [0.17ms]
+(pass) SQLite lock timeouts are actionable retryable document failures [0.22ms]
+
+tests/opened-entry-reuse.test.ts:
+(pass) encoded journal bytes retain original snapshot despite later caller mutation (cooperative=%s) [10.94ms]
+(pass) encoded journal bytes retain original snapshot despite later caller mutation (cooperative=%s) [6.93ms]
+(pass) failed journal commit does not publish prepared snapshot (cooperative=%s) [10.32ms]
+(pass) failed journal commit does not publish prepared snapshot (cooperative=%s) [9.85ms]
+(pass) interruption before journal commit leaves no prepared publication (cooperative=%s) [10.05ms]
+(pass) interruption before journal commit leaves no prepared publication (cooperative=%s) [10.04ms]
+[17:27:22.505] ERROR (#1063): Document recovery required {
+  category: "conflict",
+  operation: "projection",
+}
+(pass) same entry identity cannot reuse validation of different payload bytes (cooperative=%s) [9.38ms]
+[17:27:22.514] ERROR (#1115): Document recovery required {
+  category: "conflict",
+  operation: "projection",
+}
+(pass) same entry identity cannot reuse validation of different payload bytes (cooperative=%s) [7.76ms]
+
+tests/passive-session-isolation.test.ts:
+(pass) concurrent sessions keep cached accepted state isolated until each journal receives the remote edit (cooperative=%s) [36.64ms]
+(pass) concurrent sessions keep cached accepted state isolated until each journal receives the remote edit (cooperative=%s) [909.54ms]
+
+tests/durable-checkpoint-session.test.ts:
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [323.11ms]
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [335.65ms]
+
+ 30 pass
+ 0 fail
+ 118 expect() calls
+Ran 30 tests across 5 files. [1.87s]

@@ -1,0 +1,78 @@
+$ bun build.ts
+4 | import * as Cause from "effect/Cause"
+                           ^
+error: Could not resolve: "effect/Cause". Maybe you need to "bun install"?
+    at /private/tmp/alkalye-open-entry-reuse/count-runtime/src/client/document-app.ts:4:24
+
+5 | import * as Crypto from "effect/Crypto"
+                            ^
+error: Could not resolve: "effect/Crypto". Maybe you need to "bun install"?
+    at /private/tmp/alkalye-open-entry-reuse/count-runtime/src/client/document-app.ts:5:25
+
+10 | import * as Effect from "effect/Effect"
+                             ^
+error: Could not resolve: "effect/Effect". Maybe you need to "bun install"?
+    at /private/tmp/alkalye-open-entry-reuse/count-runtime/src/client/document-app.ts:10:25
+
+11 | import * as Exit from "effect/Exit"
+                           ^
+error: Could not resolve: "effect/Exit". Maybe you need to "bun install"?
+    at /private/tmp/alkalye-open-entry-reuse/count-runtime/src/client/document-app.ts:11:23
+
+12 | import * as Fiber from "effect/Fiber"
+                            ^
+error: Could not resolve: "effect/Fiber". Maybe you need to "bun install"?
+    at /private/tmp/alkalye-open-entry-reuse/count-runtime/src/client/document-app.ts:12:24
+
+13 | import * as FiberHandle from "effect/FiberHandle"
+                                  ^
+error: Could not resolve: "effect/FiberHandle". Maybe you need to "bun install"?
+    at /private/tmp/alkalye-open-entry-reuse/count-runtime/src/client/document-app.ts:13:30
+
+14 | import * as Layer from "effect/Layer"
+                            ^
+error: Could not resolve: "effect/Layer". Maybe you need to "bun install"?
+    at /private/tmp/alkalye-open-entry-reuse/count-runtime/src/client/document-app.ts:14:24
+
+15 | import * as Schema from "effect/Schema"
+                             ^
+error: Could not resolve: "effect/Schema". Maybe you need to "bun install"?
+    at /private/tmp/alkalye-open-entry-reuse/count-runtime/src/client/document-app.ts:15:25
+
+17 | import * as Scope from "effect/Scope"
+                            ^
+error: Could not resolve: "effect/Scope". Maybe you need to "bun install"?
+    at /private/tmp/alkalye-open-entry-reuse/count-runtime/src/client/document-app.ts:17:24
+
+18 | import * as Ref from "effect/Ref"
+                          ^
+error: Could not resolve: "effect/Ref". Maybe you need to "bun install"?
+    at /private/tmp/alkalye-open-entry-reuse/count-runtime/src/client/document-app.ts:18:22
+
+19 | import * as Semaphore from "effect/Semaphore"
+                                ^
+error: Could not resolve: "effect/Semaphore". Maybe you need to "bun install"?
+    at /private/tmp/alkalye-open-entry-reuse/count-runtime/src/client/document-app.ts:19:28
+
+20 | import * as Schedule from "effect/Schedule"
+                               ^
+error: Could not resolve: "effect/Schedule". Maybe you need to "bun install"?
+    at /private/tmp/alkalye-open-entry-reuse/count-runtime/src/client/document-app.ts:20:27
+
+21 | import * as Stream from "effect/Stream"
+                             ^
+error: Could not resolve: "effect/Stream". Maybe you need to "bun install"?
+    at /private/tmp/alkalye-open-entry-reuse/count-runtime/src/client/document-app.ts:21:25
+
+22 | import * as FetchHttpClient from "effect/http/FetchHttpClient"
+                                      ^
+error: Could not resolve: "effect/http/FetchHttpClient". Maybe you need to "bun install"?
+    at /private/tmp/alkalye-open-entry-reuse/count-runtime/src/client/document-app.ts:22:34
+
+104 | import * as HttpClientResponse from "effect/http/HttpClientResponse"
+                                          ^
+error: Could not resolve: "effect/http/HttpClientResponse". Maybe you need to "bun install"?
+    at /private/tmp/alkalye-open-entry-reuse/count-runtime/src/client/document-app.ts:104:37
+
+Bun v1.4.0 (macOS arm64)
+error: script "build" exited with code 1

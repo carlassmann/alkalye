@@ -1,0 +1,24 @@
+[
+	{
+		"version": "baseline",
+		"commit": "72dd6f5edf6c8927b4c927d4c5c932d3940d6303",
+		"cell": "switch-small-rich",
+		"trial": 0,
+		"status": "failed",
+		"stage": "setup",
+		"error": "Error: Expected frozen script not loaded by app",
+		"trace": "/tmp/alkalye-open-entry-reuse/results/baseline-0/baseline-switch-small-rich-0.trace.json",
+		"observation": {},
+		"seedReceipt": {
+			"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+			"characters": 2048,
+			"log": "0297efe0-6705-479c-9ca4-b80852744c00:5"
+		},
+		"fixture": {
+			"characters": 2048,
+			"bytes": 2048,
+			"realNewlines": 121,
+			"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+		}
+	}
+]

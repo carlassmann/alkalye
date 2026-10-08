@@ -1,0 +1,45 @@
+--- candidate/src/shared/document-session.ts
++++ diagnostic/src/shared/document-session.ts
+@@ -1102,7 +1102,7 @@
+ 							(byte, index) => byte === entry.payload[index],
+ 						)
+ 							? prepared.restored
+-							: yield* check(value)
++							: yield* check(value, "replay")
+ 					if (value.kind === "published") {
+ 						if (creation) {
+ 							accepted.apply(
+@@ -1425,7 +1425,7 @@
+ 						document: options.document,
+ 						subject: options.subject,
+ 					}
+-					let restored = yield* check(decoded)
++					let restored = yield* check(decoded, "record")
+ 					if (
+ 						restored &&
+ 						matchesPreparedOpen({ ...basis, entry: entryId, payload, restored })
+@@ -1675,7 +1675,7 @@
+ 					)
+ 			})
+ 		}
+-		function check(value: Recording) {
++		function check(value: Recording, phase = "other") {
+ 			return Effect.gen(function* () {
+ 				if (value.kind === "localCreated") {
+ 					let action = value.creation.action
+@@ -1747,12 +1747,14 @@
+ 				if (value.kind === "opened") {
+ 					if (value.snapshot.document !== options.document)
+ 						return yield* conflict("Snapshot belongs to another document")
+-					if (!log && !creation)
++					if (!log && !creation) {
++						performance.mark("open-reuse:restore:" + phase + ":" + options.document)
+ 						return yield* restoreSnapshot(
+ 							value.snapshot,
+ 							actor,
+ 							options.cooperativeWork,
+ 						)
++					}
+ 					return
+ 				}
+ 				if (!log && !creation)

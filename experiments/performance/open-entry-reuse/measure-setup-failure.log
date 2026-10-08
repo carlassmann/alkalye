@@ -1,0 +1,11 @@
+11 | 	Bun.spawnSync(["work", "down"], { cwd: root, env: environment })
+12 | 	await rm(root + "/data-active", { recursive: true, force: true })
+13 | 	await cp(seed, root + "/data-active", { recursive: true })
+14 | 	await rm(root + "/assets-active", { recursive: true, force: true })
+15 | 	await cp(assets, root + "/assets-active", { recursive: true })
+16 | 	if (Bun.spawnSync(["work", "run", "web"], { cwd: root, env: environment }).exitCode) throw Error("Managed server start failed")
+                                                                                                 ^
+error: Managed server start failed
+      at /private/tmp/alkalye-open-entry-reuse/measure.ts:16:93
+
+Bun v1.4.0 (macOS arm64)

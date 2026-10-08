@@ -1,0 +1,20 @@
+--- frozen72/runner.ts.txt
++++ cold-fixture/runner.ts
+@@ -228,6 +228,8 @@
+ 			: []),
+ 		version.url + "/changelog",
+ 	)
++	if (version.kind === "rewrite")
++		evaluate(session, "indexedDB.databases().then(async rows=>{for(let row of rows)if(row.name?.startsWith('alkalye-document-v1:'))await new Promise((resolve,reject)=>{let request=indexedDB.deleteDatabase(row.name);request.onsuccess=()=>resolve(true);request.onerror=()=>reject(request.error);request.onblocked=()=>reject(Error('Cold journal deletion blocked'))});return true})")
+ 	if (version.kind === "original")
+ 		evaluate(
+ 			session,
+@@ -460,7 +462,7 @@
+ 		seedReceipt = await accepted(version, fixture, hash, "seed")
+ 		let loadedScripts = evaluate(
+ 			session,
+-			"performance.getEntriesByType('resource').filter(entry=>entry.initiatorType==='script').map(entry=>new URL(entry.name).pathname)",
++			"performance.getEntriesByType('resource').map(entry=>new URL(entry.name).pathname).filter(path=>path.endsWith('.js'))",
+ 		)
+ 		let scripts = Schema.decodeUnknownSync(Schema.Array(Schema.String))(
+ 			loadedScripts,

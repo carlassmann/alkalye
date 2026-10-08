@@ -1,0 +1,56 @@
+{
+	"baseline": {
+		"presentationOpportunityMs": {
+			"values": [622.821, 646.489, 661.012],
+			"median": 646.489,
+			"maximum": 661.012
+		},
+		"windowMaxTaskMs": {
+			"values": [19.589, 19.406, 19.328],
+			"median": 19.406,
+			"maximum": 19.589
+		},
+		"gcUnionMs": {
+			"values": [35.101, 36.251, 32.773],
+			"median": 35.101,
+			"maximum": 36.251
+		},
+		"layoutUnionMs": {
+			"values": [31.263, 33.625, 32.299],
+			"median": 32.299,
+			"maximum": 33.625
+		},
+		"paintUnionMs": {
+			"values": [4.561, 4.87, 4.755],
+			"median": 4.755,
+			"maximum": 4.87
+		}
+	},
+	"candidate": {
+		"presentationOpportunityMs": {
+			"values": [529.38, 533.519, 516.885],
+			"median": 529.38,
+			"maximum": 533.519
+		},
+		"windowMaxTaskMs": {
+			"values": [20.336, 19.144, 18.882],
+			"median": 19.144,
+			"maximum": 20.336
+		},
+		"gcUnionMs": {
+			"values": [22.091, 19.838, 19.204],
+			"median": 19.838,
+			"maximum": 22.091
+		},
+		"layoutUnionMs": {
+			"values": [33.853, 37.018, 31.701],
+			"median": 33.853,
+			"maximum": 37.018
+		},
+		"paintUnionMs": {
+			"values": [4.841, 5.435, 4.733],
+			"median": 4.841,
+			"maximum": 5.435
+		}
+	}
+}
