@@ -1,0 +1,45 @@
+**Verdict:** PASS on the previous HOLD (38 variant / 1917). Still HOLD on divergent draft, termination, ledger and Close. This is a source-only review: I ran nothing and used no tools.
+
+**Previous HOLD is fixed**
+- `withAdoption` checks `nativeDiffers() || draft.hasRecovery()` before taking the permit and again inside it, before `operation`.
+- `queue.undo` and `queue.domain` set `commandFrozen` synchronously, so a later `replace` throws and adoption is refused.
+- Revoked admission retains the draft when `pending() || nativeDiffers()`.
+
+**Blockers**
+
+1. **Recovery alone doesn't close writes.**
+   - `canWrite()` ignores `hasRecovery()`. In the `unsent` test, `rejectedRanges` throws before the queue records a failure, so `failed=false`, the queue has no failure and `current().canWrite` stays true.
+   - The exposed `queue.replace`, `captureClipboard`, `save` and `synchronize` don't check recovery or `nativeDiffers`. Only Undo and metadata are guarded.
+   - Fix: add `!draft.hasRecovery() && !nativeDiffers()` to `canWrite()`, or require the owner to route every recovery through `retain`.
+
+2. **Termination is only bounded for `ReplaceReceipt` and the first `UndoQueued` attempt.** These calls have no deadline:
+   - the revoked-path `client.AdmissionEpoch`
+   - `PropertiesUpdate`/`Present`/`Presentation` and `ExecuteAdmitted`
+   - `MergeCandidate` and `Adopt`
+   - the `EditorRead` reconcile after a failed `Adopt`
+   - `Begin`, `Open`, `Flush`, `Connectivity`
+   - the `UndoQueued` retry after a non-`WorkerDocumentFailure` error.
+
+   If the worker dies during a domain command, `yield* receipt` holds `controls` forever, because the 15s timeout covers only the adoption loop. Close still escapes through its 10s timeouts, but admission refreshes and commands hang.
+
+3. **The recovery ledger is missing.**
+   - `recovery` is text only and held in memory. It has no epoch, sequence, accepted revision or record of applied commands, and doesn't survive a reload.
+   - The death test accepts either branch ("prefix" or "uncertain-draft"), so a restore can't tell which happened. Restoring the text as a full replace could revert server changes.
+   - The same problem appears when a domain or undo command is applied but adoption fails (`SelectionUnavailable`, or recovery set mid-loop). The retained draft lacks the committed change.
+
+4. **Close / adoption ordering.**
+   - `settle` doesn't wait for in-flight merges or queued `Adopt`s.
+   - `activity.closedCleanly()` can fire, and then a late `Adopt` fails, causing `onFailure` → `retain`. Activity reports clean while recovery is set.
+   - `retain` overwrites `recovery` each time it runs; that's safe only while the textarea stays read-only.
+
+5. **Freeze comes after enqueue.** `draft.freeze()` runs after `operation()` has queued the command. If Effect auto-yields in between, a keystroke can set recovery. Adoption then refuses, `selectionReady` waits about 15s, and the draft is retained without the applied change. Fix: freeze before `operation`.
+
+**Test gaps**
+- `unsent` makes both `hasRecovery` and `nativeDiffers` true, so the `nativeDiffers`-only guard is never exercised. Needed: native diverged with no recovery and no queue failure.
+- "competing editor FIFO" gets the same `RcMap` instance, so it only proves the `queueCreated` flag.
+- The termination branch isn't deterministic and is probably always "prefix". The "uncertain-draft" branch is unproven.
+- `recovery === current.value` is true by construction.
+- Idle death isn't detected: `ObserveNotice` never ends without an error event.
+- The 30s `rpcDeadline` covers a durable save inside the worker, so slow mobile IndexedDB will cause false `AppliedUnknown`. Not mobile-validated.
+
+**Not claimed:** actual BrowserLibrary, full feature, ACL, offline or production parity.
