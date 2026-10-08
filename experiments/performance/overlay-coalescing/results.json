@@ -1,0 +1,719 @@
+{
+	"date": "2026-10-08",
+	"baseline": "4bbbca11c1097c84ff497f86d7e458f938110fef",
+	"candidate": "Same baseline, syntax overlay update microtask coalescing only; viewport paint/refinement unchanged",
+	"server": "Fixed native660423c backend with identical SQLite/blob snapshot restored per phase",
+	"method": "Five alternating pairs. Identical quiet profile restored; Service Worker/HTTP/code caches removed. Trusted CDP insertText replaces one TOKEN or all2048. Exact source, causal undo, zero pending/busy and strictly newer accepted checkpoint with zero rejected actions. Complete enclosing main-thread RunTask includes queued microtasks; separate three-second aftermath. No CPU profiler. Headless60Hz cadence cannot prove120fps.",
+	"provenance": {
+		"before": {
+			"entrySha256": "8fb47f22685c446630c8dd4f4996bf00912e86d74447c3490df7f2369e50104a",
+			"editorSourceSha256": "3fef3e3484063f997ee2cdcb1ca8dbf21fac4be311fb527b2e0d2784535b282d",
+			"modules": [
+				{
+					"path": "chunks/document-app-ce2wsaa0.js",
+					"sha256": "404d9ad3c4f1370f63d1c1ccab8f032d21e35195d4db0b3f585e71437670dcf6",
+					"allLoadedUrlsMatch": true
+				}
+			]
+		},
+		"after": {
+			"entrySha256": "f4b242a3c4b15232f65dce8ca1dc05739f8ab2360a844b2effec106be9c46985",
+			"editorSourceSha256": "d4669c811f7f8b72b87f512646f80e34482bbbb52d11a97027f7452ed4126c27",
+			"modules": [
+				{
+					"path": "chunks/document-app-v6p1qvay.js",
+					"sha256": "d80bb912cfe90e3a63bbf7d3570f4bce74ffd69704d72cca4d9e47c900341deb",
+					"allLoadedUrlsMatch": true
+				}
+			]
+		}
+	},
+	"provenanceLimit": "Frozen local file hashes plus observed loaded hashed module URLs; not cryptographic retrieval of browser-loaded bytes.",
+	"correctness": {
+		"portableContracts": [
+			"Immediate distant selection/current overlay",
+			"Simulated DOM composition reconciles complete source",
+			"Disposed editor suppresses queued overlay repaint"
+		],
+		"productionJourneys": [
+			"Find",
+			"Viewport/full-document/Unicode/composition/offline",
+			"Multicursor including512Unicode cursors",
+			"Link prettification"
+		],
+		"compositionLimit": "CompositionEvent/InputEvent sequences are simulated composition contracts, not trusted OS/device IME."
+	},
+	"rows": [
+		{
+			"phase": "before",
+			"phaseTrial": 0,
+			"fixture": "128k-single",
+			"inputTaskMs": 3.031,
+			"largestTaskWithAftermathMs": 9.754,
+			"readyMs": 14.002,
+			"taskCount": 1519,
+			"tasksOverBudget": 1,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 131068,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 34,
+			"undoAcceptedCursor": 36,
+			"undoExact": true
+		},
+		{
+			"phase": "before",
+			"phaseTrial": 0,
+			"fixture": "1m-single",
+			"inputTaskMs": 3.923,
+			"largestTaskWithAftermathMs": 10.038,
+			"readyMs": 3.964,
+			"taskCount": 4466,
+			"tasksOverBudget": 2,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1048572,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 54,
+			"undoAcceptedCursor": 56,
+			"undoExact": true
+		},
+		{
+			"phase": "before",
+			"phaseTrial": 0,
+			"fixture": "1m-2048",
+			"inputTaskMs": 28.339,
+			"largestTaskWithAftermathMs": 53.804,
+			"readyMs": 28.515,
+			"taskCount": 4547,
+			"tasksOverBudget": 10,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1040384,
+				"exact": true,
+				"observedEditCount": 2048,
+				"pending": "0",
+				"remaining": 0,
+				"replacements": 2048
+			},
+			"editAcceptedCursor": 30,
+			"undoAcceptedCursor": 32,
+			"undoExact": true
+		},
+		{
+			"phase": "after",
+			"phaseTrial": 0,
+			"fixture": "128k-single",
+			"inputTaskMs": 3.063,
+			"largestTaskWithAftermathMs": 10.383,
+			"readyMs": 15.796,
+			"taskCount": 1520,
+			"tasksOverBudget": 1,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 131068,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 34,
+			"undoAcceptedCursor": 36,
+			"undoExact": true
+		},
+		{
+			"phase": "after",
+			"phaseTrial": 0,
+			"fixture": "1m-single",
+			"inputTaskMs": 3.987,
+			"largestTaskWithAftermathMs": 9.49,
+			"readyMs": 4.142,
+			"taskCount": 4464,
+			"tasksOverBudget": 3,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1048572,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 54,
+			"undoAcceptedCursor": 56,
+			"undoExact": true
+		},
+		{
+			"phase": "after",
+			"phaseTrial": 0,
+			"fixture": "1m-2048",
+			"inputTaskMs": 26.705,
+			"largestTaskWithAftermathMs": 52.802,
+			"readyMs": 26.877,
+			"taskCount": 4522,
+			"tasksOverBudget": 10,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1040384,
+				"exact": true,
+				"observedEditCount": 2048,
+				"pending": "0",
+				"remaining": 0,
+				"replacements": 2048
+			},
+			"editAcceptedCursor": 30,
+			"undoAcceptedCursor": 32,
+			"undoExact": true
+		},
+		{
+			"phase": "after",
+			"phaseTrial": 1,
+			"fixture": "128k-single",
+			"inputTaskMs": 3.306,
+			"largestTaskWithAftermathMs": 9.788,
+			"readyMs": 3.371,
+			"taskCount": 1522,
+			"tasksOverBudget": 1,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 131068,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 34,
+			"undoAcceptedCursor": 36,
+			"undoExact": true
+		},
+		{
+			"phase": "after",
+			"phaseTrial": 1,
+			"fixture": "1m-single",
+			"inputTaskMs": 3.342,
+			"largestTaskWithAftermathMs": 9.423,
+			"readyMs": 10.299,
+			"taskCount": 4461,
+			"tasksOverBudget": 5,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1048572,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 54,
+			"undoAcceptedCursor": 56,
+			"undoExact": true
+		},
+		{
+			"phase": "after",
+			"phaseTrial": 1,
+			"fixture": "1m-2048",
+			"inputTaskMs": 27.261,
+			"largestTaskWithAftermathMs": 53.564,
+			"readyMs": 27.381,
+			"taskCount": 4514,
+			"tasksOverBudget": 10,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1040384,
+				"exact": true,
+				"observedEditCount": 2048,
+				"pending": "0",
+				"remaining": 0,
+				"replacements": 2048
+			},
+			"editAcceptedCursor": 30,
+			"undoAcceptedCursor": 32,
+			"undoExact": true
+		},
+		{
+			"phase": "before",
+			"phaseTrial": 1,
+			"fixture": "128k-single",
+			"inputTaskMs": 3.218,
+			"largestTaskWithAftermathMs": 9.359,
+			"readyMs": 9.316,
+			"taskCount": 1520,
+			"tasksOverBudget": 1,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 131068,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 34,
+			"undoAcceptedCursor": 36,
+			"undoExact": true
+		},
+		{
+			"phase": "before",
+			"phaseTrial": 1,
+			"fixture": "1m-single",
+			"inputTaskMs": 3.881,
+			"largestTaskWithAftermathMs": 9.22,
+			"readyMs": 9.522,
+			"taskCount": 4456,
+			"tasksOverBudget": 3,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1048572,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 54,
+			"undoAcceptedCursor": 56,
+			"undoExact": true
+		},
+		{
+			"phase": "before",
+			"phaseTrial": 1,
+			"fixture": "1m-2048",
+			"inputTaskMs": 26.819,
+			"largestTaskWithAftermathMs": 52.98,
+			"readyMs": 27.019,
+			"taskCount": 4520,
+			"tasksOverBudget": 10,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1040384,
+				"exact": true,
+				"observedEditCount": 2048,
+				"pending": "0",
+				"remaining": 0,
+				"replacements": 2048
+			},
+			"editAcceptedCursor": 30,
+			"undoAcceptedCursor": 32,
+			"undoExact": true
+		},
+		{
+			"phase": "before",
+			"phaseTrial": 2,
+			"fixture": "128k-single",
+			"inputTaskMs": 2.974,
+			"largestTaskWithAftermathMs": 10.045,
+			"readyMs": 11.884,
+			"taskCount": 1518,
+			"tasksOverBudget": 1,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 131068,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 34,
+			"undoAcceptedCursor": 36,
+			"undoExact": true
+		},
+		{
+			"phase": "before",
+			"phaseTrial": 2,
+			"fixture": "1m-single",
+			"inputTaskMs": 4.039,
+			"largestTaskWithAftermathMs": 10.224,
+			"readyMs": 12.999,
+			"taskCount": 4482,
+			"tasksOverBudget": 3,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1048572,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 54,
+			"undoAcceptedCursor": 56,
+			"undoExact": true
+		},
+		{
+			"phase": "before",
+			"phaseTrial": 2,
+			"fixture": "1m-2048",
+			"inputTaskMs": 28.308,
+			"largestTaskWithAftermathMs": 54.3,
+			"readyMs": 28.49,
+			"taskCount": 4504,
+			"tasksOverBudget": 9,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1040384,
+				"exact": true,
+				"observedEditCount": 2048,
+				"pending": "0",
+				"remaining": 0,
+				"replacements": 2048
+			},
+			"editAcceptedCursor": 30,
+			"undoAcceptedCursor": 32,
+			"undoExact": true
+		},
+		{
+			"phase": "after",
+			"phaseTrial": 2,
+			"fixture": "128k-single",
+			"inputTaskMs": 3.022,
+			"largestTaskWithAftermathMs": 9.74,
+			"readyMs": 9.597,
+			"taskCount": 1518,
+			"tasksOverBudget": 1,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 131068,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 34,
+			"undoAcceptedCursor": 36,
+			"undoExact": true
+		},
+		{
+			"phase": "after",
+			"phaseTrial": 2,
+			"fixture": "1m-single",
+			"inputTaskMs": 3.988,
+			"largestTaskWithAftermathMs": 9.903,
+			"readyMs": 6.779,
+			"taskCount": 4455,
+			"tasksOverBudget": 3,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1048572,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 54,
+			"undoAcceptedCursor": 56,
+			"undoExact": true
+		},
+		{
+			"phase": "after",
+			"phaseTrial": 2,
+			"fixture": "1m-2048",
+			"inputTaskMs": 26.836,
+			"largestTaskWithAftermathMs": 53.051,
+			"readyMs": 27.102,
+			"taskCount": 4500,
+			"tasksOverBudget": 9,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1040384,
+				"exact": true,
+				"observedEditCount": 2048,
+				"pending": "0",
+				"remaining": 0,
+				"replacements": 2048
+			},
+			"editAcceptedCursor": 30,
+			"undoAcceptedCursor": 32,
+			"undoExact": true
+		},
+		{
+			"phase": "after",
+			"phaseTrial": 3,
+			"fixture": "128k-single",
+			"inputTaskMs": 3.227,
+			"largestTaskWithAftermathMs": 10.319,
+			"readyMs": 5.69,
+			"taskCount": 1521,
+			"tasksOverBudget": 1,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 131068,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 34,
+			"undoAcceptedCursor": 36,
+			"undoExact": true
+		},
+		{
+			"phase": "after",
+			"phaseTrial": 3,
+			"fixture": "1m-single",
+			"inputTaskMs": 3.712,
+			"largestTaskWithAftermathMs": 10.907,
+			"readyMs": 13.212,
+			"taskCount": 4457,
+			"tasksOverBudget": 4,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1048572,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 54,
+			"undoAcceptedCursor": 56,
+			"undoExact": true
+		},
+		{
+			"phase": "after",
+			"phaseTrial": 3,
+			"fixture": "1m-2048",
+			"inputTaskMs": 27.394,
+			"largestTaskWithAftermathMs": 53.835,
+			"readyMs": 27.558,
+			"taskCount": 4523,
+			"tasksOverBudget": 10,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1040384,
+				"exact": true,
+				"observedEditCount": 2048,
+				"pending": "0",
+				"remaining": 0,
+				"replacements": 2048
+			},
+			"editAcceptedCursor": 30,
+			"undoAcceptedCursor": 32,
+			"undoExact": true
+		},
+		{
+			"phase": "before",
+			"phaseTrial": 3,
+			"fixture": "128k-single",
+			"inputTaskMs": 3.046,
+			"largestTaskWithAftermathMs": 10.215,
+			"readyMs": 13.174,
+			"taskCount": 1516,
+			"tasksOverBudget": 1,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 131068,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 34,
+			"undoAcceptedCursor": 36,
+			"undoExact": true
+		},
+		{
+			"phase": "before",
+			"phaseTrial": 3,
+			"fixture": "1m-single",
+			"inputTaskMs": 3.92,
+			"largestTaskWithAftermathMs": 9.722,
+			"readyMs": 10.095,
+			"taskCount": 4459,
+			"tasksOverBudget": 3,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1048572,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 54,
+			"undoAcceptedCursor": 56,
+			"undoExact": true
+		},
+		{
+			"phase": "before",
+			"phaseTrial": 3,
+			"fixture": "1m-2048",
+			"inputTaskMs": 27.464,
+			"largestTaskWithAftermathMs": 53.79,
+			"readyMs": 27.561,
+			"taskCount": 4525,
+			"tasksOverBudget": 10,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1040384,
+				"exact": true,
+				"observedEditCount": 2048,
+				"pending": "0",
+				"remaining": 0,
+				"replacements": 2048
+			},
+			"editAcceptedCursor": 30,
+			"undoAcceptedCursor": 32,
+			"undoExact": true
+		},
+		{
+			"phase": "before",
+			"phaseTrial": 4,
+			"fixture": "128k-single",
+			"inputTaskMs": 3.28,
+			"largestTaskWithAftermathMs": 9.676,
+			"readyMs": 14.477,
+			"taskCount": 1517,
+			"tasksOverBudget": 1,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 131068,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 34,
+			"undoAcceptedCursor": 36,
+			"undoExact": true
+		},
+		{
+			"phase": "before",
+			"phaseTrial": 4,
+			"fixture": "1m-single",
+			"inputTaskMs": 3.792,
+			"largestTaskWithAftermathMs": 10.134,
+			"readyMs": 5.937,
+			"taskCount": 4457,
+			"tasksOverBudget": 3,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1048572,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 54,
+			"undoAcceptedCursor": 56,
+			"undoExact": true
+		},
+		{
+			"phase": "before",
+			"phaseTrial": 4,
+			"fixture": "1m-2048",
+			"inputTaskMs": 28.609,
+			"largestTaskWithAftermathMs": 54.018,
+			"readyMs": 28.932,
+			"taskCount": 4515,
+			"tasksOverBudget": 8,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1040384,
+				"exact": true,
+				"observedEditCount": 2048,
+				"pending": "0",
+				"remaining": 0,
+				"replacements": 2048
+			},
+			"editAcceptedCursor": 30,
+			"undoAcceptedCursor": 32,
+			"undoExact": true
+		},
+		{
+			"phase": "after",
+			"phaseTrial": 4,
+			"fixture": "128k-single",
+			"inputTaskMs": 3.068,
+			"largestTaskWithAftermathMs": 9.745,
+			"readyMs": 13.594,
+			"taskCount": 1519,
+			"tasksOverBudget": 1,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 131068,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 34,
+			"undoAcceptedCursor": 36,
+			"undoExact": true
+		},
+		{
+			"phase": "after",
+			"phaseTrial": 4,
+			"fixture": "1m-single",
+			"inputTaskMs": 3.893,
+			"largestTaskWithAftermathMs": 9.925,
+			"readyMs": 4.184,
+			"taskCount": 4463,
+			"tasksOverBudget": 3,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1048572,
+				"exact": true,
+				"pending": "0",
+				"remaining": 511,
+				"replacements": 1
+			},
+			"editAcceptedCursor": 54,
+			"undoAcceptedCursor": 56,
+			"undoExact": true
+		},
+		{
+			"phase": "after",
+			"phaseTrial": 4,
+			"fixture": "1m-2048",
+			"inputTaskMs": 26.446,
+			"largestTaskWithAftermathMs": 52.574,
+			"readyMs": 26.622,
+			"taskCount": 4515,
+			"tasksOverBudget": 9,
+			"trusted": true,
+			"correctness": {
+				"busy": "false",
+				"characters": 1040384,
+				"exact": true,
+				"observedEditCount": 2048,
+				"pending": "0",
+				"remaining": 0,
+				"replacements": 2048
+			},
+			"editAcceptedCursor": 30,
+			"undoAcceptedCursor": 32,
+			"undoExact": true
+		}
+	],
+	"failures": []
+}
