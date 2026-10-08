@@ -1,0 +1,179 @@
+bun test v1.4.0 (34cbb9a40)
+
+source-cache.test.ts:
+(pass) published stale base matches cold action and reconstruction 4 [7.15ms]
+(pass) published stale base matches cold action and reconstruction 8 [0.82ms]
+27 |     test("published stale base matches cold action and reconstruction " + source.length, () => {
+28 |         let {warm,cold,warmBase,coldBase} = scenario(source)
+29 |         let replacements: TextReplacement[] = [{start:source.length,remove:0,text:" LOCAL😀"}]
+30 |         let a=warm.prepareReplacements("doc",replacements,warmBase),b=cold.prepareReplacements("doc",replacements,coldBase)
+31 |         if (!a||!b) throw Error("Missing replacement")
+32 |         expect(a).toEqual(b);warm.apply([a]);cold.apply([b]);rebuilt(warm,cold)
+                       ^
+error: expect(received).toEqual(expected)
+
+  {
+    "actor": "writer",
+    "author": "Writer",
+    "clock": 3,
+    "field": "",
+    "id": "0000000000000003:writer",
+    "insert": [
+      {
+        "after": "0000000000000001:birth:00000040",
+        "id": "0000000000000003:writer:00000000",
+        "value": " ",
+      },
+      {
+        "after": "0000000000000003:writer:00000000",
+        "id": "0000000000000003:writer:00000001",
+        "value": "L",
+      },
+      {
+        "after": "0000000000000003:writer:00000001",
+        "id": "0000000000000003:writer:00000002",
+        "value": "O",
+      },
+      {
+        "after": "0000000000000003:writer:00000002",
+        "id": "0000000000000003:writer:00000003",
+        "value": "C",
+      },
+      {
+        "after": "0000000000000003:writer:00000003",
+        "id": "0000000000000003:writer:00000004",
+        "value": "A",
+      },
+      {
+        "after": "0000000000000003:writer:00000004",
+        "id": "0000000000000003:writer:00000005",
+        "value": "L",
+      },
+      {
+        "after": "0000000000000003:writer:00000005",
+        "id": "0000000000000003:writer:00000006",
+        "value": "😀",
+      },
+    ],
+    "kind": "text",
+    "remove": [],
+    "target": "doc",
+-   "time": 1791437171451,
++   "time": 1791437171450,
+    "value": "",
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/private/tmp/alkalye-worker-source-cache/candidate/source-cache.test.ts:32:19)
+(fail) published stale base matches cold action and reconstruction 42 [2.24ms]
+(pass) published stale base matches cold action and reconstruction 31 [1.12ms]
+27 |     test("published stale base matches cold action and reconstruction " + source.length, () => {
+28 |         let {warm,cold,warmBase,coldBase} = scenario(source)
+29 |         let replacements: TextReplacement[] = [{start:source.length,remove:0,text:" LOCAL😀"}]
+30 |         let a=warm.prepareReplacements("doc",replacements,warmBase),b=cold.prepareReplacements("doc",replacements,coldBase)
+31 |         if (!a||!b) throw Error("Missing replacement")
+32 |         expect(a).toEqual(b);warm.apply([a]);cold.apply([b]);rebuilt(warm,cold)
+                       ^
+error: expect(received).toEqual(expected)
+
+  {
+    "actor": "writer",
+    "author": "Writer",
+    "clock": 3,
+    "field": "",
+    "id": "0000000000000003:writer",
+    "insert": [
+      {
+        "after": "0000000000000001:birth:00131093",
+        "id": "0000000000000003:writer:00000000",
+        "value": " ",
+      },
+      {
+        "after": "0000000000000003:writer:00000000",
+        "id": "0000000000000003:writer:00000001",
+        "value": "L",
+      },
+      {
+        "after": "0000000000000003:writer:00000001",
+        "id": "0000000000000003:writer:00000002",
+        "value": "O",
+      },
+      {
+        "after": "0000000000000003:writer:00000002",
+        "id": "0000000000000003:writer:00000003",
+        "value": "C",
+      },
+      {
+        "after": "0000000000000003:writer:00000003",
+        "id": "0000000000000003:writer:00000004",
+        "value": "A",
+      },
+      {
+        "after": "0000000000000003:writer:00000004",
+        "id": "0000000000000003:writer:00000005",
+        "value": "L",
+      },
+      {
+        "after": "0000000000000003:writer:00000005",
+        "id": "0000000000000003:writer:00000006",
+        "value": "😀",
+      },
+    ],
+    "kind": "text",
+    "remove": [],
+    "target": "doc",
+-   "time": 1791437171740,
++   "time": 1791437171720,
+    "value": "",
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/private/tmp/alkalye-worker-source-cache/candidate/source-cache.test.ts:32:19)
+(fail) published stale base matches cold action and reconstruction 131094 [288.64ms]
+34 | test("stale prepareEdit matches cold frontmatter merge and peer preservation", () => {
+35 |     let source="---\ntitle: Shared\n---\nBody😀"
+36 |     let {warm,cold,warmBase,coldBase}=scenario(source)
+37 |     let a=warm.prepareEdit("doc",source.replace("Shared","Changed"),warmBase),b=cold.prepareEdit("doc",source.replace("Shared","Changed"),coldBase)
+38 |     if(!a||!b)throw Error("Missing header edit")
+39 |     expect(a).toEqual(b);warm.apply([a]);cold.apply([b]);rebuilt(warm,cold)
+                   ^
+error: expect(received).toEqual(expected)
+
+@@ -152,8 +152,8 @@
+      "0000000000000001:birth:00000015",
+      "0000000000000001:birth:00000016",
+      "0000000000000001:birth:00000017",
+    ],
+    "target": "doc",
+-   "time": 1791437171742,
++   "time": 1791437171741,
+    "value": "{"hidden":[],"header":["0000000000000001:birth:00000004","0000000000000001:birth:00000005","0000000000000001:birth:00000006","0000000000000001:birth:00000007","0000000000000001:birth:00000008","0000000000000001:birth:00000009","0000000000000001:birth:00000010","0000000000000001:birth:00000011","0000000000000001:birth:00000012","0000000000000001:birth:00000013","0000000000000001:birth:00000014","0000000000000001:birth:00000015","0000000000000001:birth:00000016","0000000000000001:birth:00000017"],"order":["title"]}",
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/private/tmp/alkalye-worker-source-cache/candidate/source-cache.test.ts:39:15)
+(fail) stale prepareEdit matches cold frontmatter merge and peer preservation [1.52ms]
+(pass) external mutable atom arrays keep current values and Unicode bounds [1.11ms]
+663 | 				replacement.start === lastStart ||
+664 | 				stop > previous.length
+665 | 			)
+666 | 				throw new RangeError(
+667 | 					"Text replacements must be ordered, disjoint and within their base",
+668 | 				)
+          ^
+RangeError: Text replacements must be ordered, disjoint and within their base
+      at prepareReplacements (/private/tmp/alkalye-worker-source-cache/candidate/src/shared/crdt.ts:668:5)
+      at <anonymous> (/private/tmp/alkalye-worker-source-cache/candidate/source-cache.test.ts:64:17)
+(fail) published frontmatter atoms and nested arrays cannot mutate before stale use [0.46ms]
+(pass) cooperative source materialization preserves stale bases through cancellation [0.99ms]
+
+ 5 pass
+ 4 fail
+ 54 expect() calls
+Ran 9 tests across 1 file. [341.00ms]

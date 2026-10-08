@@ -1,0 +1,17 @@
+bun test v1.4.0 (34cbb9a40)
+
+source-cache.test.ts:
+(pass) published stale base matches cold action and reconstruction 4 [6.77ms]
+(pass) published stale base matches cold action and reconstruction 8 [0.79ms]
+(pass) published stale base matches cold action and reconstruction 42 [2.48ms]
+(pass) published stale base matches cold action and reconstruction 31 [0.92ms]
+(pass) published stale base matches cold action and reconstruction 131094 [476.49ms]
+(pass) stale prepareEdit matches cold frontmatter merge and peer preservation [2.40ms]
+(pass) external mutable atom arrays keep current values and Unicode bounds [0.42ms]
+(pass) published frontmatter atoms and nested arrays cannot mutate before stale use [0.37ms]
+(pass) cooperative source materialization preserves stale bases through cancellation [0.76ms]
+
+ 9 pass
+ 0 fail
+ 68 expect() calls
+Ran 9 tests across 1 file. [525.00ms]
