@@ -78,6 +78,14 @@ interface InsertionReceipt {
 	before: InsertionView
 	after: InsertionView
 }
+interface ReplacementReceipt {
+	target: string
+	generation: number
+	lastOperation: string
+	applied: boolean
+	before: InsertionView
+	after: InsertionView
+}
 interface PreparedSplice {
 	after: string
 	start: number
@@ -94,6 +102,7 @@ interface TerminalRedo {
 }
 interface PreparedTextEdit {
 	inverse?: InsertionReceipt
+	replacementInverse?: ReplacementReceipt
 	terminalRemoval?: true
 	id: string
 	target: string
@@ -130,6 +139,7 @@ export class Replica {
 	private preparedEdit: PreparedTextEdit | undefined
 	private terminalRedo: TerminalRedo | undefined
 	private insertionReceipt: InsertionReceipt | undefined
+	private replacementReceipt: ReplacementReceipt | undefined
 	constructor(
 		public actor: string,
 		public author = "Writer",
@@ -196,6 +206,7 @@ export class Replica {
 		replica.restored = yield* copyMapSteps(this.restored, cooperative)
 		replica.terminalRedo = this.terminalRedo
 		replica.insertionReceipt = this.insertionReceipt
+		replica.replacementReceipt = this.replacementReceipt
 		return replica
 	}
 	get generation() {
@@ -214,6 +225,7 @@ export class Replica {
 		let edit =
 			this.preparedEdit ??
 			this.prepareInsertionInverse(input) ??
+			this.prepareReplacementInverse(input) ??
 			this.prepareTerminalCancellation(input) ??
 			this.prepareTerminalRedo(input) ??
 			this.prepareTerminalPeerEdit(input) ??
@@ -223,16 +235,74 @@ export class Replica {
 			receipt &&
 			input.every(operation => this.operations.has(operation.id)) &&
 			this.matchesInsertionReceipt(receipt)
+		let replacement = this.replacementReceipt
+		let acknowledgeReplacement =
+			replacement &&
+			input.every(operation => this.operations.has(operation.id)) &&
+			this.matchesReplacementReceipt(replacement)
 		let commit = this.prepare(input)
 		return () => {
 			this.preparedEdit = undefined
 			this.insertionReceipt = undefined
+			this.replacementReceipt = undefined
 			commit()
 			if (acknowledge && receipt)
 				this.insertionReceipt = { ...receipt, generation: this.generation }
+			if (acknowledgeReplacement && replacement)
+				this.replacementReceipt = {
+					...replacement,
+					generation: this.generation,
+				}
 			this.cachePreparedText(input, edit)
 		}
 	}
+	private matchesReplacementReceipt(receipt: ReplacementReceipt) {
+		let view = receipt.applied ? receipt.after : receipt.before
+		return (
+			this.generation === receipt.generation &&
+			this.sourceCache.get(receipt.target) === view.atoms &&
+			this.textCache.get(receipt.target) === view.raw &&
+			this.strings.get(receipt.target) === view.content &&
+			sourceViews.get(view.atoms) === view.raw
+		)
+	}
+	private prepareReplacementInverse(
+		input: Operation[],
+	): PreparedTextEdit | undefined {
+		let receipt = this.replacementReceipt
+		let operation = input[0]
+		if (
+			!receipt ||
+			input.length !== 1 ||
+			!operation ||
+			operation.kind !== "cancel" ||
+			operation.target !== receipt.target ||
+			operation.value !== receipt.lastOperation ||
+			this.operations.has(operation.id) ||
+			this.textOwners.has(operation.id) ||
+			this.visibility.get(receipt.target)?.known(operation.id) ||
+			this.visibility.get(receipt.target)?.active(operation.id) === false ||
+			this.legacyTextTargets.has(receipt.target) ||
+			!this.canCancel(receipt.target, receipt.lastOperation) ||
+			!this.matchesReplacementReceipt(receipt)
+		)
+			return undefined
+		let current = receipt.applied ? receipt.after : receipt.before
+		let next = receipt.applied ? receipt.before : receipt.after
+		return {
+			replacementInverse: receipt,
+			id: operation.id,
+			target: receipt.target,
+			generation: this.generation,
+			signature: textEditSignature(operation),
+			content: next.content,
+			atoms: current.atoms,
+			raw: current.raw,
+			splices: [],
+			rawSplices: [],
+		}
+	}
+
 	private matchesInsertionReceipt(receipt: InsertionReceipt) {
 		let view = receipt.inserted ? receipt.after : receipt.before
 		return (
@@ -674,6 +744,22 @@ export class Replica {
 			textEditSignature(operation) !== edit.signature
 		)
 			return
+		if (edit.replacementInverse) {
+			let receipt = edit.replacementInverse
+			let view = receipt.applied ? receipt.before : receipt.after
+			this.textCache.set(edit.target, view.raw)
+			this.sourceCache.set(edit.target, view.atoms)
+			this.strings.set(edit.target, view.content)
+			sourceViews.set(view.atoms, view.raw)
+			sourceStrings.set(view.atoms, view.content)
+			this.replacementReceipt = {
+				...receipt,
+				generation: this.generation,
+				lastOperation: operation.id,
+				applied: !receipt.applied,
+			}
+			return
+		}
 		if (edit.inverse) {
 			let receipt = edit.inverse
 			let view = receipt.inserted ? receipt.before : receipt.after
@@ -733,6 +819,29 @@ export class Replica {
 		sourceViews.set(atoms, raw)
 		this.strings.set(edit.target, edit.content)
 		sourceStrings.set(atoms, edit.content)
+		let previousContent = sourceStrings.get(edit.atoms)
+		if (
+			operation.kind === "text" &&
+			!operation.field &&
+			operation.remove.length > 0 &&
+			this.visibility.get(edit.target)?.active(operation.id) !== false &&
+			!operation.insert.some(
+				atom =>
+					atom.after === "" && (atom.value === "-" || atom.value === "\uFEFF"),
+			) &&
+			!this.legacyTextTargets.has(edit.target) &&
+			previousContent !== undefined &&
+			sourceViews.get(edit.atoms) === edit.raw
+		) {
+			this.replacementReceipt = {
+				target: edit.target,
+				generation: this.generation,
+				lastOperation: operation.id,
+				applied: true,
+				before: { atoms: edit.atoms, raw: edit.raw, content: previousContent },
+				after: { atoms, raw, content: edit.content },
+			}
+		}
 		let splice = edit.splices[0]
 		let rawSplice = edit.rawSplices[0]
 		let inserted = operation.insert[0]
@@ -872,6 +981,7 @@ export class Replica {
 			if (operations.some(operation => !this.operations.has(operation.id)))
 				this.terminalRedo = undefined
 			this.insertionReceipt = undefined
+			this.replacementReceipt = undefined
 			for (let commit of commits) commit()
 			for (let operation of operations) {
 				this.clock = Math.max(this.clock, operation.clock)
@@ -1824,6 +1934,7 @@ export class Replica {
 	): Generator<void> {
 		this.terminalRedo = undefined
 		this.insertionReceipt = undefined
+		this.replacementReceipt = undefined
 		if (cooperative && this.stateGeneration !== 0)
 			throw new Error("Cooperative hydration requires a private fresh replica")
 		let work = 0

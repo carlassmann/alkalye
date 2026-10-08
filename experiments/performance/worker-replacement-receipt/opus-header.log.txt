@@ -1,0 +1,16 @@
+I found no counterexample. The guard holds for alias lost-deletion, orphaned and structural frames. I read the code and didn't run anything.
+
+**Why it holds, from the code:**
+1. **Frames are owned by one operation.** `parseOperation` (`model.ts:318`) requires every atom id to be `opId + ":" + 8 digits`, so `atom.id.slice(0,-9)` in `originalFrames` (`crdt.ts:1477`) is always that operation's own id. The replacement can only add its own new frame; it can't add to or change a historical one. `validateIdentities` and `indexAtom` block reusing an existing atom id across targets or identities.
+2. **The new frame has no header.** `sourceHeadersSteps` (`frontmatter-merge.ts:446-470`) only starts a header at an atom with `after==="" && !body && value ∈ {"-", BOM}`. Your guard rejects every inserted atom with `after==="" && value ∈ {"-", BOM}`, whatever `body` is, so it is stricter than needed. `parseOperation` limits each atom to one code point, so `"\uFEFF"` matches exactly. That makes `sourceHeaders(newFrame) = []`.
+3. **Frames don't depend on visibility.** `originalFrames` reads `children`, which holds hidden atoms too. Cancel only toggles visibility, so after cancel the frames are the old frames plus one empty frame. `originalEntries` in `withoutLostAliases` therefore comes out the same.
+4. **Raw returns to its pre-operation state.** The exact generation check plus the `sourceCache`/`textCache`/`strings` identity checks rule out any other operation in between. Atoms the replacement removed come back only if nothing else still removes them. Atoms that were already hidden stay hidden, which matches `before`. Its own inserted atoms are hidden, so their per-atom flags (`order`, `deleted`, `observed`, …) can't reach the projection.
+5. **The projection only reads raw and `originalFrames`.** The `restored` and `liveAtom` maps are only used when building undo, not here. Past views (`until`) don't use receipts.
+
+**Not covered by this argument:**
+- When you redo (cancel the cancel), the receipt puts back `after.atoms`. That list came from the first apply's incremental `replaceAtoms`, not a fresh projection. So it is only as correct as the first apply. The receipt doesn't make this worse, but I didn't audit whether the replacement prepare path matches a fresh projection. One case to check: a root atom from the replacement with `after===""` and a value other than `-` sorts first among root siblings, ahead of the header's opening fence. The projection then lifts the header back above it. Does the incremental `after` agree?
+
+**Regressions worth adding:**
+- **Cold replay of the alias case.** Use a header with a deleted key and observed set, a `*` alias entry and a concurrent deletion, so `unseenDeletions` is not empty. Run replace TOKEN→x in the body, then cancel, then cancel the cancel. At each step, check the cached text against a fresh `Replica` built from the same operations, and against `text(target, until)`.
+- **Same scenario with `after` checked.** Also compare the redo state against a cold projection, which covers the gap above.
+- **Negative case.** A replacement that inserts a root `-` or BOM must not create a receipt, and must still give correct text after cancel.

@@ -1,0 +1,74 @@
+[
+	{
+		"arm": "baseline",
+		"file": "Undo-1.trace.json",
+		"bytes": 7273218,
+		"sha256": "269e36991a205f11c9caa4ef6b1253c4022ca15fafebd44297e86e5d304ce4f7"
+	},
+	{
+		"arm": "baseline",
+		"file": "stable-copy-native-mc-1-selection.trace.json",
+		"bytes": 3391991,
+		"sha256": "09ddec7d1b84208ecd377d62bfe67ef2752dbbab5e943019be8ee1c673c86536"
+	},
+	{
+		"arm": "baseline",
+		"file": "stable-copy-native-mc-512-single.trace.json",
+		"bytes": 9178665,
+		"sha256": "33b5aa176ef1f13293ed3302bbc6c5e92757f494ecf68ac2f1162428a81c3b18"
+	},
+	{
+		"arm": "baseline",
+		"file": "stable-copy-native-mc-1-single.trace.json",
+		"bytes": 6130026,
+		"sha256": "22544c89c3524572ee7e6cd13eca8fec75f72af3d2e43205e16cded3b2cbf726"
+	},
+	{
+		"arm": "baseline",
+		"file": "Undo-512.trace.json",
+		"bytes": 7347231,
+		"sha256": "f5948fc6c05776bcb0a53603086c28b719db6527b411747b1d72ff83c5fd57d8"
+	},
+	{
+		"arm": "baseline",
+		"file": "stable-copy-native-mc-512-selection.trace.json",
+		"bytes": 4954301,
+		"sha256": "f9c1bba37925463a8fb9dfb03fe20bdd86a6450b92594a0ba48d235264fc8ec3"
+	},
+	{
+		"arm": "candidate",
+		"file": "Undo-1.trace.json",
+		"bytes": 6466948,
+		"sha256": "495d1112a455feb76f26ff986ddf826a027d7aa2f5d07e04d222663e143d047d"
+	},
+	{
+		"arm": "candidate",
+		"file": "stable-copy-native-mc-1-selection.trace.json",
+		"bytes": 3078345,
+		"sha256": "bc8748824f54b0b77c86d3167dd0f4d014eb4afd19dabf0d3c13d048d9650900"
+	},
+	{
+		"arm": "candidate",
+		"file": "stable-copy-native-mc-512-single.trace.json",
+		"bytes": 9177598,
+		"sha256": "3406aca13aa5aa5476ba63905d4cc93de0915298c20a4434332260200752e4d5"
+	},
+	{
+		"arm": "candidate",
+		"file": "stable-copy-native-mc-1-single.trace.json",
+		"bytes": 6332050,
+		"sha256": "4ade677d6b0184be432e46ff99bb153f8e166c568d2527ee763b0e0f3d82f75c"
+	},
+	{
+		"arm": "candidate",
+		"file": "Undo-512.trace.json",
+		"bytes": 7272213,
+		"sha256": "35ea32182992354eaf40f81d2780e11aaba3b851daa1a0295955f582220f40f1"
+	},
+	{
+		"arm": "candidate",
+		"file": "stable-copy-native-mc-512-selection.trace.json",
+		"bytes": 4885471,
+		"sha256": "bd1847c427b1fd8f700a23e65e1434161bb738b0135b771372c4c15fc284a1a5"
+	}
+]

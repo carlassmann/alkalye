@@ -1489,6 +1489,30 @@
 			19.589ms to 20.336ms, so the frame budget remains unmet. Evidence:
 			<code>experiments/performance/open-entry-reuse</code>.
 		</p>
+		<h2>Validated replacement Undo cache</h2>
+		<p>
+			A private receipt retains the authoritative before/after views of a
+			validated replacement. Undo/Redo can reuse them only while exact
+			generation, view identity and cancellation permissions still match.
+			Unknown operations clear the receipt; header-frame insertions use full
+			reconstruction.
+		</p>
+		<p>
+			In a fresh, sequential worker prototype comparison (one trial per cell),
+			Undo source observer readiness improved from 523→341ms for one range and
+			542→379ms for 512 ranges. Largest worker tasks fell from 181–182ms to
+			102–115ms; the unchanged selection mapper still cost 87–114ms. Local Saved
+			readiness worsened from 1322→1341ms and 1225→1313ms. These observations do
+			not prove physical presentation, sustained performance or a production
+			worker cutover. Exact native source, every selection/direction, caret and
+			independent server acceptance passed in both arms.
+		</p>
+		<p>
+			Evidence: <code>experiments/performance/worker-replacement-receipt</code>.
+			The shared CRDT change passed 735 repository tests, six module integration
+			suites and fast app journeys in the production architecture. Worker UI
+			parity remains separate work.
+		</p>
 		<h2>Forward Chunk replacement remains unshipped</h2>
 		<p>
 			An outside candidate assembled multicursor changes from slices of the

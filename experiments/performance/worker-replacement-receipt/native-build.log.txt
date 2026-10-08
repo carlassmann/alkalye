@@ -1,0 +1,6 @@
+15 | import { verifyRequestedAnchors } from "./worker-rpc-gates"
+                                            ^
+error: Could not resolve: "./worker-rpc-gates"
+    at /private/tmp/alkalye-worker-replacement-diagnostic/runtime/browser-rpc-binding.ts:15:40
+
+Bun v1.4.0 (macOS arm64)

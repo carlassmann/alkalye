@@ -1,0 +1,28 @@
+I found one correctness blocker in the frontmatter case and one blocker for `bun run check`. Everything else you asked about holds, with only minor notes. This was read-only: I made no edits and ran no tests.
+
+## Blockers
+
+1. **Undo can show the wrong text in documents with frontmatter.** When a document has a frontmatter header (`raw !== atoms`), the source projection is not built from visible atoms alone. `withoutLostAliases` (`frontmatter-merge.ts:603`) also reads `originalFrames`, which includes atoms hidden by cancellation. After `cancel(X)`, X's frame is still there, so the full projection can differ from the cached pre-X `before` view. This happens when the YAML has `*` aliases, a deleted key and a frame that parses as a header. In that case the receipt restores text that a full rebuild would not produce.
+   - **Fix:** in the receipt creation at `crdt.ts:813`, add `edit.raw === edit.atoms && raw === atoms`. Those arrays are the same exactly when there is no header (`sourceAtomsSteps` returns `raw` when it finds no headers).
+   - If the diagnostic document has frontmatter, this fix turns the fast path off for it. A narrower alternative is to also reject documents whose header contains `*`, but that is a weaker proof.
+2. **Formatting fails `check`.** Lines 248 and 955 are indented with two tabs instead of three, and lines 243, 252, 264 and 814 are long one-liners. Run prettier before anything lands.
+
+## Checked and fine
+
+- **Identity and staleness:** the strict `generation` match plus cache identity checks are enough. Every apply that carries operations bumps the generation, and so does a snapshot load. The other cache writes (`visible`, `text`, `textEffect`) only fill caches when they are empty. Marking a target legacy is checked at prepare time.
+- **Visibility and cancel:** an atom is hidden if it is legacy-removed, its owner is inactive, or any active remover exists. `canCancel` requires the clock to be above the floor, so X's removals never reach `legacyRemoved`. With no headers, `cancel(X)` gives exactly the pre-X visible set. The `before` arrays are the real pre-X cache, not recomputed.
+- **Redo and repeated Undo:** cancelling the cancel (C2 of C1) makes X active again and restores `after`. Flipping `applied` alternates correctly. If a client issues `cancel(X)` again instead of cancelling the last cancel, the value doesn't match `lastOperation` and it takes the slow path safely.
+- **Peer insert/delete, metadata, comments, other targets:** any new operation clears the receipt in the commit. That is correct but conservative: a comment arriving between edit and Undo disables the fast path. Not a blocker.
+- **Duplicate ACK:** the "all known" check runs before prepare. The known operation skips `invalidateText`, and the generation bump is followed by the receipt being restamped. `prepareReplacementInverse` rejects operations it already has.
+- **Multiple headers, BOM:** covered by the blocker 1 fix. Once there is no header, restoring cached arrays is pure, so the insertion path's `\uFEFF` guard isn't needed here.
+- **Restore and hydration:** hydration clears the receipt (line 1908) and snapshot load bumps the generation. Header undo uses `field = "frontmatter-edit"`, which is already excluded by `!operation.field`.
+- **`applyTogether`:** each replica runs the full `prepare(input)` validation before any commit. Commits only touch their own replica state plus the shared `sourceViews`/`sourceStrings` maps, which get identical values. A partial commit failure is the same as baseline.
+- **Frozen views and fork:** atoms come from `atomView`/`immutableAtoms`, so the fork's `textCache` keeps the same references and the shared receipt still matches.
+- **Precedence:** a leftover `preparedEdit` short-circuits the `??` chain, which loses the fast path but not correctness. Same as baseline insertion.
+
+## Minor
+
+- For the `previousContent` check you could use `this.strings.get(target)` before it is overwritten instead of the global `sourceStrings`. Equivalent today.
+- The replacement path doesn't add a removal-position hint like `insertionRemovals`, so downstream incremental diffs may fall back to a full diff. That's a performance note, not correctness.
+
+The native matched run is still pending.
