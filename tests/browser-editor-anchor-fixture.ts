@@ -79,6 +79,12 @@ let legacy = [
 	{ id: "world", after: "emoji", value: "world" },
 ]
 let ranges = atoms("abcde")
+let removedRange = atoms("x".repeat(4096))
+let variableRange = Array.from({ length: 192 }, (_, index) => ({
+	id: "variable" + index,
+	after: "",
+	value: index % 2 ? "😀" : "abc",
+}))
 let owner = new Replica("owner")
 let initial = "---\ntitle: Shared\n---\n" + "Line 😀\n".repeat(2048)
 owner.edit("doc", initial)
@@ -87,6 +93,33 @@ if (!operation) throw Error("Missing CRDT edit")
 let beforeUndo = owner.visible("doc")
 owner.cancel("doc", operation.id)
 let scenarios: Scenario[] = [
+	{
+		name: "empty replacement preserves both range anchors at zero",
+		before: removedRange,
+		after: [],
+		start: 2048,
+		end: 4096,
+		expected: [0, 0],
+	},
+	{
+		name: "exhaustive predecessor follows old order across reordered survivors",
+		before: removedRange,
+		after: [
+			requiredAtom(removedRange, 120),
+			requiredAtom(removedRange, 80),
+			requiredAtom(removedRange, 3000),
+		],
+		start: 2048,
+		end: 4096,
+		expected: [1, 3],
+	},
+	{
+		name: "exhaustive legacy predecessor preserves variable-width offsets",
+		before: variableRange,
+		after: [requiredAtom(variableRange, 19), requiredAtom(variableRange, 20)],
+		start: content(variableRange).length,
+		expected: [5, 5],
+	},
 	{
 		name: "primary survives beyond capped local radius",
 		before: original,

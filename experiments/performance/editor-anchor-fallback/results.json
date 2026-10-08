@@ -1,0 +1,132 @@
+{
+	"baselineHead": "9e5b303",
+	"method": "Single sequential sample per cell; frozen minified browser modules; actual EditorElement with immutableAtoms Chunk-backed inputs. Initial mount and selection settle excluded; synchronous is editor.update; frameOpportunity is next requestAnimationFrame, not actual paint. Programmatic public component update, not trusted typing or full-app convergence. No CPU profiler.",
+	"arms": {
+		"baseline": "Adopted bounded deleted-anchor scan before this change",
+		"empty": "Only empty-next early return",
+		"native": "Empty-next plus exact native exhaustive predecessor scan"
+	},
+	"correctness": "All12 samples exact source and both canonical selection endpoints.10public component contracts/types pass; Opus read-only no blockers.",
+	"samples": [
+		{
+			"arm": "baseline",
+			"characters": 131072,
+			"empty": true,
+			"actual": [0, 0],
+			"exact": true,
+			"frameOpportunity": 22.5,
+			"name": "empty-131072",
+			"synchronous": 22
+		},
+		{
+			"arm": "empty",
+			"characters": 131072,
+			"empty": true,
+			"actual": [0, 0],
+			"exact": true,
+			"frameOpportunity": 16.899999976158142,
+			"name": "empty-131072",
+			"synchronous": 0.699999988079071
+		},
+		{
+			"arm": "native",
+			"characters": 131072,
+			"empty": true,
+			"actual": [0, 0],
+			"exact": true,
+			"frameOpportunity": 16.69999998807907,
+			"name": "empty-131072",
+			"synchronous": 0.699999988079071
+		},
+		{
+			"arm": "baseline",
+			"characters": 131072,
+			"empty": false,
+			"actual": [1, 1],
+			"exact": true,
+			"frameOpportunity": 22.399999976158146,
+			"name": "reordered-survivors-131072",
+			"synchronous": 22
+		},
+		{
+			"arm": "empty",
+			"characters": 131072,
+			"empty": false,
+			"actual": [1, 1],
+			"exact": true,
+			"frameOpportunity": 20.899999976158146,
+			"name": "reordered-survivors-131072",
+			"synchronous": 20.399999976158146
+		},
+		{
+			"arm": "native",
+			"characters": 131072,
+			"empty": false,
+			"actual": [1, 1],
+			"exact": true,
+			"frameOpportunity": 15.5,
+			"name": "reordered-survivors-131072",
+			"synchronous": 9.400000035762789
+		},
+		{
+			"arm": "baseline",
+			"characters": 1048576,
+			"empty": true,
+			"actual": [0, 0],
+			"exact": true,
+			"frameOpportunity": 171.19999998807907,
+			"name": "empty-1048576",
+			"synchronous": 170.5999999642372
+		},
+		{
+			"arm": "empty",
+			"characters": 1048576,
+			"empty": true,
+			"actual": [0, 0],
+			"exact": true,
+			"frameOpportunity": 14.700000047683716,
+			"name": "empty-1048576",
+			"synchronous": 1.100000023841858
+		},
+		{
+			"arm": "native",
+			"characters": 1048576,
+			"empty": true,
+			"actual": [0, 0],
+			"exact": true,
+			"frameOpportunity": 15.600000023841858,
+			"name": "empty-1048576",
+			"synchronous": 0.6000000238418579
+		},
+		{
+			"arm": "baseline",
+			"characters": 1048576,
+			"empty": false,
+			"actual": [1, 1],
+			"exact": true,
+			"frameOpportunity": 157,
+			"name": "reordered-survivors-1048576",
+			"synchronous": 156.10000002384186
+		},
+		{
+			"arm": "empty",
+			"characters": 1048576,
+			"empty": false,
+			"actual": [1, 1],
+			"exact": true,
+			"frameOpportunity": 178.10000002384186,
+			"name": "reordered-survivors-1048576",
+			"synchronous": 177.30000001192093
+		},
+		{
+			"arm": "native",
+			"characters": 1048576,
+			"empty": false,
+			"actual": [1, 1],
+			"exact": true,
+			"frameOpportunity": 70.80000001192093,
+			"name": "reordered-survivors-1048576",
+			"synchronous": 70.09999996423721
+		}
+	]
+}

@@ -951,6 +951,10 @@ function createEditorView(
 	}
 	function positions(ids: string[], nextAtoms: Atom[], nextIndex: TextIndex) {
 		let resolved = new Map<string, number>()
+		if (!nextAtoms.length) {
+			for (let id of ids) resolved.set(id, 0)
+			return resolved
+		}
 		type AnchorRequest = {
 			id: string
 			previous: number | undefined
@@ -1004,25 +1008,41 @@ function createEditorView(
 				}
 			if (pending.every(request => request.rank === 0)) break
 		}
-		for (let request of pending) {
-			if (request.rank !== Infinity) {
-				resolved.set(request.id, request.offset)
-				continue
-			}
-			let next = atomPositions(nextAtoms)
-			let previous =
-				request.previous ?? atomPositions(atoms).indices.get(request.id) ?? -1
-			let result = 0
-			for (let index = previous - 1; index >= 0; index--) {
-				let old = atoms[index]
-				let found = old && next.indices.get(old.id)
-				if (found !== undefined) {
-					result = next.ends[found] ?? 0
-					break
-				}
-			}
-			resolved.set(request.id, result)
+		let exhaustive = pending.filter(request => request.rank === Infinity)
+		for (let request of pending)
+			if (request.rank !== Infinity) resolved.set(request.id, request.offset)
+		if (!exhaustive.length) return resolved
+		let survivingEnds = new Map<string, number>()
+		offset = 0
+		for (let atom of nextAtoms) {
+			offset += atom.value.length
+			survivingEnds.set(atom.id, offset)
 		}
+		let previousEnds = new Map<AnchorRequest, number>()
+		let index = 0
+		for (let atom of atoms) {
+			for (let request of exhaustive) {
+				if (resolved.has(request.id)) continue
+				if (
+					index === request.previous ||
+					(request.previous === undefined && atom.id === request.id)
+				) {
+					resolved.set(request.id, previousEnds.get(request) ?? 0)
+					continue
+				}
+				let end = survivingEnds.get(atom.id)
+				if (end !== undefined) previousEnds.set(request, end)
+			}
+			if (exhaustive.every(request => resolved.has(request.id))) break
+			index++
+		}
+		for (let request of exhaustive)
+			if (!resolved.has(request.id))
+				resolved.set(
+					request.id,
+					request.previous === undefined ? 0 : (previousEnds.get(request) ?? 0),
+				)
+
 		return resolved
 	}
 	function nearbyPosition(id: string, nextAtoms: Atom[], nextIndex: TextIndex) {
