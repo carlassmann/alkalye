@@ -1,0 +1,1 @@
+{"stage":"manifest-prepared","versions":2,"samples":1,"cells":1}

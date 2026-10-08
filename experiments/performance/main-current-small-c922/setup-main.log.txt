@@ -1,0 +1,1 @@
+{"stage":"main-view-confirmed","characters":2048,"loadedAssets":10,"mutated":false}

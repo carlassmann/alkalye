@@ -1,0 +1,932 @@
+{
+	"method": "Production files on disk. Static imports and HTML module preloads define initial JavaScript; dynamic imports are excluded. Gzip each file independently with Bun.gzipSync at level 9, then sum. Exclude benchmark probes, source maps, HTML, fonts, images, documents and network framing. Whiteboard entry must be reachable through emitted static/dynamic app imports; its static dependency closure excludes initial JavaScript. Brotli each file independently at quality 11. Each included file records SHA-256. Unreachable retained files are excluded. Optional ready-document ResourceTiming paths are sized separately; resource observation is not proof of every module executing or browser transferred/compressed bytes. Lazy incremental closure excludes already observed document resources. Fonts/CSS stay separate. PWA precache traffic is not initial payload and is not measured here.",
+	"original": {
+		"bootstrapStaticJavaScript": {
+			"bytes": 3930316,
+			"gzipBytes": 1280350,
+			"brotliBytes": 1017607,
+			"files": [
+				"_astro/browser-startup-instrumentation.hp2BeFIz.js",
+				"_astro/client.-iLz22eX.js",
+				"_astro/client.CMSwgtGj.js",
+				"_astro/index.BJJFgUIs.js",
+				"_astro/index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+				"_astro/main.BjTj7Dij.js",
+				"_astro/main.BrO3cuZ6.js"
+			],
+			"sha256": {
+				"_astro/browser-startup-instrumentation.hp2BeFIz.js": "7cd392919e9495031df7ef025417cc5d140c0d61ce8842a0bd20cfdac781a254",
+				"_astro/client.-iLz22eX.js": "6e61a55e346cf81594a8f79ef7d1177300d57e3ecdbf9344989586584043bbe0",
+				"_astro/client.CMSwgtGj.js": "b59fa5a209b259582587c593fbd18e461ad7a320587ff6fc8871cfe8654f07ca",
+				"_astro/index.BJJFgUIs.js": "f3d7f04681cd4a3f824abb256a676b879bb3283c1131f93375bbf6e17e31040b",
+				"_astro/index.astro_astro_type_script_index_0_lang.DkMI-E-L.js": "cf41a1b372e9c378ca8174aba1a79e401f193936fe652ac5bb8da32e3198dda4",
+				"_astro/main.BjTj7Dij.js": "7c92f6c18fdc369e25553ac5736d7667d90fabd385aecbe813eda15ff2979c63",
+				"_astro/main.BrO3cuZ6.js": "c5e00a47e5d2fe3deb14602cbef5ec08897fd469ce8da21748d3560b8855ba01"
+			}
+		},
+		"bootstrapCss": {
+			"bytes": 212968,
+			"gzipBytes": 36506,
+			"brotliBytes": 30887,
+			"files": [
+				"_astro/changelog.wvlNSzc1.css",
+				"_astro/mcp.C-yZ6QuE.css",
+				"_astro/tldraw.eCjzm0t1.css"
+			],
+			"sha256": {
+				"_astro/changelog.wvlNSzc1.css": "69eb8434bc000a2605b937240c29ebccae7664b2f088f1945c5e35d65863b332",
+				"_astro/mcp.C-yZ6QuE.css": "df66bd7321e3fcd7192da5658ad30c4c4674950967b4a718d7bc3134275a00b5",
+				"_astro/tldraw.eCjzm0t1.css": "79c31aad2a31b54345b504c1059ca26b7e3e42ef79e1ef4d47fe20107fb64521"
+			}
+		},
+		"documentOpeningResources": {
+			"javascript": {
+				"bytes": 3982818,
+				"gzipBytes": 1300394,
+				"brotliBytes": 1035315,
+				"files": [
+					"_astro/browser-startup-instrumentation.hp2BeFIz.js",
+					"_astro/client.-iLz22eX.js",
+					"_astro/client.CMSwgtGj.js",
+					"_astro/document-save.worker-BQTqGf7x.js",
+					"_astro/index.BJJFgUIs.js",
+					"_astro/index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+					"_astro/main.BjTj7Dij.js",
+					"_astro/main.BrO3cuZ6.js",
+					"_astro/virtual_pwa-register.I6B7t9y4.js",
+					"_astro/workbox-window.prod.es5.BIl4cyR9.js"
+				],
+				"sha256": {
+					"_astro/browser-startup-instrumentation.hp2BeFIz.js": "7cd392919e9495031df7ef025417cc5d140c0d61ce8842a0bd20cfdac781a254",
+					"_astro/client.-iLz22eX.js": "6e61a55e346cf81594a8f79ef7d1177300d57e3ecdbf9344989586584043bbe0",
+					"_astro/client.CMSwgtGj.js": "b59fa5a209b259582587c593fbd18e461ad7a320587ff6fc8871cfe8654f07ca",
+					"_astro/document-save.worker-BQTqGf7x.js": "c40cdd504133a76c6ff65a7519d2ffd3975750376799b0aa882875baedb90cde",
+					"_astro/index.BJJFgUIs.js": "f3d7f04681cd4a3f824abb256a676b879bb3283c1131f93375bbf6e17e31040b",
+					"_astro/index.astro_astro_type_script_index_0_lang.DkMI-E-L.js": "cf41a1b372e9c378ca8174aba1a79e401f193936fe652ac5bb8da32e3198dda4",
+					"_astro/main.BjTj7Dij.js": "7c92f6c18fdc369e25553ac5736d7667d90fabd385aecbe813eda15ff2979c63",
+					"_astro/main.BrO3cuZ6.js": "c5e00a47e5d2fe3deb14602cbef5ec08897fd469ce8da21748d3560b8855ba01",
+					"_astro/virtual_pwa-register.I6B7t9y4.js": "10e46f3159b01a461d392a435c0767d86ee4a6a3fe21bc93f1aafae950bb0620",
+					"_astro/workbox-window.prod.es5.BIl4cyR9.js": "ef75dc538a74d630094d7453bce980f4e7c78096700d40489d8ead191131d8ba"
+				}
+			},
+			"css": {
+				"bytes": 212968,
+				"gzipBytes": 36506,
+				"brotliBytes": 30887,
+				"files": [
+					"_astro/changelog.wvlNSzc1.css",
+					"_astro/mcp.C-yZ6QuE.css",
+					"_astro/tldraw.eCjzm0t1.css"
+				],
+				"sha256": {
+					"_astro/changelog.wvlNSzc1.css": "69eb8434bc000a2605b937240c29ebccae7664b2f088f1945c5e35d65863b332",
+					"_astro/mcp.C-yZ6QuE.css": "df66bd7321e3fcd7192da5658ad30c4c4674950967b4a718d7bc3134275a00b5",
+					"_astro/tldraw.eCjzm0t1.css": "79c31aad2a31b54345b504c1059ca26b7e3e42ef79e1ef4d47fe20107fb64521"
+				}
+			},
+			"fonts": {
+				"bytes": 59768,
+				"gzipBytes": 59824,
+				"brotliBytes": 59767,
+				"files": [
+					"_astro/geist-latin-wght-normal.Dm3htQBi.woff2",
+					"_astro/geist-mono-latin-wght-normal.Cjtb1TV-.woff2"
+				],
+				"sha256": {
+					"_astro/geist-latin-wght-normal.Dm3htQBi.woff2": "0cbbe6286a00f356e98980783cc950a9b693751e04aedfb97d9526ff6dc2b316",
+					"_astro/geist-mono-latin-wght-normal.Cjtb1TV-.woff2": "e9fb088eeacced307860d82ceedb0ae9ad2ebfa07a7c0a7279c8c961dd9d5fd3"
+				}
+			},
+			"resources": [
+				{
+					"path": "/_astro/main.BjTj7Dij.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/_astro/browser-startup-instrumentation.hp2BeFIz.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/_astro/index.BJJFgUIs.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/_astro/main.BrO3cuZ6.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/_astro/mcp.C-yZ6QuE.css",
+					"initiatorType": "link"
+				},
+				{
+					"path": "/_astro/tldraw.eCjzm0t1.css",
+					"initiatorType": "link"
+				},
+				{
+					"path": "/_astro/changelog.wvlNSzc1.css",
+					"initiatorType": "link"
+				},
+				{
+					"path": "/_astro/index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+					"initiatorType": "script"
+				},
+				{
+					"path": "/_astro/client.CMSwgtGj.js",
+					"initiatorType": "script"
+				},
+				{
+					"path": "/_astro/geist-latin-wght-normal.Dm3htQBi.woff2",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/_astro/geist-mono-latin-wght-normal.Cjtb1TV-.woff2",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/_astro/client.-iLz22eX.js",
+					"initiatorType": "script"
+				},
+				{
+					"path": "/_astro/virtual_pwa-register.I6B7t9y4.js",
+					"initiatorType": "script"
+				},
+				{
+					"path": "/_astro/workbox-window.prod.es5.BIl4cyR9.js",
+					"initiatorType": "script"
+				},
+				{
+					"path": "/_astro/document-save.worker-BQTqGf7x.js",
+					"initiatorType": "other"
+				}
+			]
+		},
+		"whiteboardAdditionalToDocument": {
+			"javascript": {
+				"bytes": 1690951,
+				"gzipBytes": 514054,
+				"brotliBytes": 426039,
+				"files": [
+					"_astro/tldraw-canvas.B6ZgR3dw.js",
+					"_astro/tldraw-editor.DWMVjfIt.js",
+					"_astro/tldraw-file.CTReCsUp.js",
+					"_astro/tldraw-state-react.B7kKx-SI.js",
+					"_astro/tldraw-state.Br4AVh-B.js",
+					"_astro/tldraw-store.Biu40d6D.js",
+					"_astro/tldraw-tlschema.DtzbXets.js",
+					"_astro/tldraw-utils.BJp5PhA6.js",
+					"_astro/tldraw-validate.Ch1A2EoE.js",
+					"_astro/tldraw.nSA0H8C8.js"
+				],
+				"sha256": {
+					"_astro/tldraw-canvas.B6ZgR3dw.js": "d82d8936f556307575d9faed6d90a9c590852ec7d49b87beaf97d03d26f8380a",
+					"_astro/tldraw-editor.DWMVjfIt.js": "9d967137e6d6f81d656731c2e23594730c9fba58f7b22be4716d5be93415fe99",
+					"_astro/tldraw-file.CTReCsUp.js": "e75f9f9e190620b8887384dc9dabff4708965da626bbb35071de9bd9de06cdc8",
+					"_astro/tldraw-state-react.B7kKx-SI.js": "f42e58a6866cb153620c6f062c94cd75398f2c9259bcfe54d18bdfe0bbca2e92",
+					"_astro/tldraw-state.Br4AVh-B.js": "cf7b21f9bd28598222140de5c3efc700f7f6a02eeaec2ae797b7ee4d7fcc29ea",
+					"_astro/tldraw-store.Biu40d6D.js": "e15ba11d2a138a359187edee8a95ea9741e971580a34337a9ce7e4e8038414aa",
+					"_astro/tldraw-tlschema.DtzbXets.js": "0d9e0c7a69762446367a94dfe90127c1af9b80603a7c5e13a836a8beff33891f",
+					"_astro/tldraw-utils.BJp5PhA6.js": "1f1b58a39bcb915558483939a2916e448643af22122b305187d04d7e42182185",
+					"_astro/tldraw-validate.Ch1A2EoE.js": "d9bdafef5d4e4e7953984edd3fa2e108e44d93aff24c089fe3bbdc026f87997f",
+					"_astro/tldraw.nSA0H8C8.js": "0aba01174b80444a00181288ea11f84c4d29aeb98b9c41e521a213ee53a16c02"
+				}
+			},
+			"css": {
+				"bytes": 0,
+				"gzipBytes": 0,
+				"brotliBytes": 0,
+				"files": [],
+				"sha256": {}
+			}
+		},
+		"lazyWhiteboardJavaScript": {
+			"bytes": 1690951,
+			"gzipBytes": 514054,
+			"brotliBytes": 426039,
+			"files": [
+				"_astro/tldraw-canvas.B6ZgR3dw.js",
+				"_astro/tldraw-editor.DWMVjfIt.js",
+				"_astro/tldraw-file.CTReCsUp.js",
+				"_astro/tldraw-state-react.B7kKx-SI.js",
+				"_astro/tldraw-state.Br4AVh-B.js",
+				"_astro/tldraw-store.Biu40d6D.js",
+				"_astro/tldraw-tlschema.DtzbXets.js",
+				"_astro/tldraw-utils.BJp5PhA6.js",
+				"_astro/tldraw-validate.Ch1A2EoE.js",
+				"_astro/tldraw.nSA0H8C8.js"
+			],
+			"sha256": {
+				"_astro/tldraw-canvas.B6ZgR3dw.js": "d82d8936f556307575d9faed6d90a9c590852ec7d49b87beaf97d03d26f8380a",
+				"_astro/tldraw-editor.DWMVjfIt.js": "9d967137e6d6f81d656731c2e23594730c9fba58f7b22be4716d5be93415fe99",
+				"_astro/tldraw-file.CTReCsUp.js": "e75f9f9e190620b8887384dc9dabff4708965da626bbb35071de9bd9de06cdc8",
+				"_astro/tldraw-state-react.B7kKx-SI.js": "f42e58a6866cb153620c6f062c94cd75398f2c9259bcfe54d18bdfe0bbca2e92",
+				"_astro/tldraw-state.Br4AVh-B.js": "cf7b21f9bd28598222140de5c3efc700f7f6a02eeaec2ae797b7ee4d7fcc29ea",
+				"_astro/tldraw-store.Biu40d6D.js": "e15ba11d2a138a359187edee8a95ea9741e971580a34337a9ce7e4e8038414aa",
+				"_astro/tldraw-tlschema.DtzbXets.js": "0d9e0c7a69762446367a94dfe90127c1af9b80603a7c5e13a836a8beff33891f",
+				"_astro/tldraw-utils.BJp5PhA6.js": "1f1b58a39bcb915558483939a2916e448643af22122b305187d04d7e42182185",
+				"_astro/tldraw-validate.Ch1A2EoE.js": "d9bdafef5d4e4e7953984edd3fa2e108e44d93aff24c089fe3bbdc026f87997f",
+				"_astro/tldraw.nSA0H8C8.js": "0aba01174b80444a00181288ea11f84c4d29aeb98b9c41e521a213ee53a16c02"
+			}
+		},
+		"lazyWhiteboardCss": {
+			"bytes": 0,
+			"gzipBytes": 0,
+			"brotliBytes": 0,
+			"files": [],
+			"sha256": {}
+		}
+	},
+	"rewrite": {
+		"bootstrapStaticJavaScript": {
+			"bytes": 1062829,
+			"gzipBytes": 351064,
+			"brotliBytes": 307292,
+			"files": [
+				"app.js",
+				"chunks/document-app-022w94n0.js",
+				"chunks/document-app-0fyrxqjt.js",
+				"chunks/document-app-1dxag10p.js",
+				"chunks/document-app-2d5x6ewf.js",
+				"chunks/document-app-3fnhg1mw.js",
+				"chunks/document-app-4bdv4e1h.js",
+				"chunks/document-app-57h2bdht.js",
+				"chunks/document-app-5w0555xf.js",
+				"chunks/document-app-7es742rc.js",
+				"chunks/document-app-bxa2bqfs.js",
+				"chunks/document-app-cksk812g.js",
+				"chunks/document-app-cpyrabzv.js",
+				"chunks/document-app-dw31ncjv.js",
+				"chunks/document-app-ef2e4sa0.js",
+				"chunks/document-app-fdca9e8a.js",
+				"chunks/document-app-jxg7vknv.js",
+				"chunks/document-app-kjpwy0e1.js",
+				"chunks/document-app-kkm66nr6.js",
+				"chunks/document-app-kyjabmpr.js",
+				"chunks/document-app-m2qx4cqf.js",
+				"chunks/document-app-njm9xdrd.js",
+				"chunks/document-app-nz4nbhyt.js",
+				"chunks/document-app-q5tas76n.js",
+				"chunks/document-app-qpn16pt3.js",
+				"chunks/document-app-twgbb54m.js",
+				"chunks/document-app-vk38pqtz.js",
+				"chunks/document-app-wnaem0wt.js",
+				"chunks/document-app-xryb03fv.js",
+				"chunks/document-app-zc37nkfy.js",
+				"chunks/document-app-zsc4xtxg.js",
+				"chunks/document-app-zzda0gnp.js"
+			],
+			"sha256": {
+				"app.js": "2988004fa7d4909e67b981f37baaa47121198a3dc2a52feb8a6105b86cb07e54",
+				"chunks/document-app-022w94n0.js": "e635bcb418ec176970269a95d71dce53a4a8ff593f30054c44584bdbbfc3a485",
+				"chunks/document-app-0fyrxqjt.js": "d8865a326038465f5f36b89744d4d909b9aec1414308e60a54f2aed5e7021e01",
+				"chunks/document-app-1dxag10p.js": "c968cf94b0d392a1d38c849b9913f7953953891d93b956f2c2a5e6084379c134",
+				"chunks/document-app-2d5x6ewf.js": "a5c64ed3f97fe620060b16ee408c0be6cfb99bf88b191e7e9e0c30c7623d7a98",
+				"chunks/document-app-3fnhg1mw.js": "e0bcd64bb2efd87e9e74d6cf4c8a685ff0d9de3e87391a8418bc59b26e224e7a",
+				"chunks/document-app-4bdv4e1h.js": "67b52bb778a6e0dc86f3b04d2c3c1309054bc2267187f16a3bbe066f08b3c4c1",
+				"chunks/document-app-57h2bdht.js": "bebaa30fcf7da0ed80104f1fef1bd4f25df24e8fd32ee215e06e719d01ec38c9",
+				"chunks/document-app-5w0555xf.js": "7d7b8e907d398d9ebde2b2f7578b708d49537402022e52a86efe2c7a427ef9bf",
+				"chunks/document-app-7es742rc.js": "f26fef54ac042bdc0e4fed98195dba515b485138aa0e18a9130b799f6e9fe01c",
+				"chunks/document-app-bxa2bqfs.js": "f6d71a7cf9e8c0dd3ed5edde0f1e0d56ed70aac57856a4306cc53d10695cd51c",
+				"chunks/document-app-cksk812g.js": "3d644e1b8bbf11d2f7be967d532146a91b95532264961946437ffc179bb14d96",
+				"chunks/document-app-cpyrabzv.js": "a453a789c1e7017fdb0fcb9b8c069d5a196b3759533040fe5d08cc570a7030d1",
+				"chunks/document-app-dw31ncjv.js": "0efa2025fc076d1a1f53e86bb4b2420c167f04823b1823cf86e920f17ecfaa15",
+				"chunks/document-app-ef2e4sa0.js": "a17e921a80fda0dc42c8577369425655a648a709e0cb6e4fa3f2acd6a2d431a3",
+				"chunks/document-app-fdca9e8a.js": "b0b0af909b923c9342b22f4278ba9669712b7b7a586a1de8324b09eb6f4a1762",
+				"chunks/document-app-jxg7vknv.js": "6d85834edb7e0414dbb34ba1cfae436ccb020c6bcbc61b8fd8279151a028e5d1",
+				"chunks/document-app-kjpwy0e1.js": "3f5dd91bdf01d2afe633d2b6f1f01a209c1238c43c97bb96150e087c9b620428",
+				"chunks/document-app-kkm66nr6.js": "9ab8e4906ed35620496573f0fc8639bbe5cc98ea5a03d880cae8d816437d80f9",
+				"chunks/document-app-kyjabmpr.js": "34826db88e2431da79a064fc1ff9b6114b097ac87d85575cb3dc3a2b4a5e3f1b",
+				"chunks/document-app-m2qx4cqf.js": "a16f603c7e82fa73c3c08187e200539440a114333311e16d891b12060d5d40bc",
+				"chunks/document-app-njm9xdrd.js": "31162268c175e30eacd5cc7b0523697be6a918dbe738bc579621394572d14e03",
+				"chunks/document-app-nz4nbhyt.js": "b5481fa646073959ee2a691e25b678a88414fa3073b87e54af80c1e5fc773f76",
+				"chunks/document-app-q5tas76n.js": "0f712aa9d22bf44eb4944b2a42c216a960f3bb492a6a3b24a9d3b4e5748d48e5",
+				"chunks/document-app-qpn16pt3.js": "b279bf8fb3c69c9b880edaad6887a2384d1235c8cc818e4c45e14876f70d8841",
+				"chunks/document-app-twgbb54m.js": "30c362c098e4e5f980d11ad4291d263be5e479be1a2383cb5f2bd87544148436",
+				"chunks/document-app-vk38pqtz.js": "546d085bfa9a0424a3302bd830bfcbb0a23ea3c678b497eadfd8ad0c8adca3bb",
+				"chunks/document-app-wnaem0wt.js": "9017e1bb106586511082caec95b505dd41c360b55f2d604ca62b51efdfc7c5e5",
+				"chunks/document-app-xryb03fv.js": "ea1544ff316d51ecaf80ae96d161904e8c4ece098d38a1468b402c3d2164393c",
+				"chunks/document-app-zc37nkfy.js": "a2ab412d85e54eae18d7fff9d30a3cd868006e7511e7d9ea7d5b19dbcd21f1ad",
+				"chunks/document-app-zsc4xtxg.js": "8c5390bc6a78e63db610cad54a2194bcafb2267859c6804daa24bf14db80e56f",
+				"chunks/document-app-zzda0gnp.js": "28e1e8092a60bbeb7cee01e8cd3a3122c78c3ce0c4f3035442e6947e90845876"
+			}
+		},
+		"bootstrapCss": {
+			"bytes": 120313,
+			"gzipBytes": 31946,
+			"brotliBytes": 26243,
+			"files": [
+				"app.css",
+				"components/access.css",
+				"components/account-agents.css",
+				"components/account-email.css",
+				"components/app.css",
+				"components/attachments.css",
+				"components/boot.css",
+				"components/comments.css",
+				"components/context-menu.css",
+				"components/dialog.css",
+				"components/editor-viewport.css",
+				"components/editor.css",
+				"components/find.css",
+				"components/help.css",
+				"components/history.css",
+				"components/inspector.css",
+				"components/invitation-screen.css",
+				"components/invitations.css",
+				"components/library.css",
+				"components/line-actions.css",
+				"components/media-picker.css",
+				"components/menu.css",
+				"components/palette.css",
+				"components/presentation.css",
+				"components/preview.css",
+				"components/print.css",
+				"components/progress.css",
+				"components/settings-page.css",
+				"components/settings-themes.css",
+				"components/space-avatar.css",
+				"components/statusbar.css",
+				"components/sync-recovery.css",
+				"components/teleprompter.css",
+				"components/theme-picker.css",
+				"components/theme-workbench.css",
+				"components/toast.css",
+				"components/toolbar.css",
+				"components/update-banner.css",
+				"components/whiteboard.css"
+			],
+			"sha256": {
+				"app.css": "81f837602e54ed6695e3d900d3701bb4c2ef49b31701b3586e6b1d49fe5e513d",
+				"components/access.css": "ad8db7213311b9b0d2353d5b1a03af6dd30307565ce63315d83c98fcb079c878",
+				"components/account-agents.css": "7a72055912f86296a3434ac5071c523fa4db3bb49bf8bbe760334265faba8d18",
+				"components/account-email.css": "a86eeaf12cd6d8ad454143606d262f1a277fdaeaf2ad00bada36f0f870730f1c",
+				"components/app.css": "071c9da5f8d9a2260d7c87f8407ac8945bed080b30587c1dec47fb2f789effda",
+				"components/attachments.css": "087e3e087193556b224aa770a63b14a80871359c33203782f2e17fa0c582e277",
+				"components/boot.css": "6bf2359899a32144eda9f641e4cba887b1bfbf541cc1373056abb42608231f68",
+				"components/comments.css": "6159e493ac0f877ad9b7d4b4e09c92eab828a0e96cec886ed25a7fb771fb9769",
+				"components/context-menu.css": "f3fdaa409ca5d37ab54e182568162b5fe58414bd2f44b380e9971b6c984e5d37",
+				"components/dialog.css": "b22e6f67951980dac4ed02b15016f84854c6d63cba77c0968a1dd15948a50ec4",
+				"components/editor-viewport.css": "91c9cfa195dd9b247ea06ef37b226da08f2139c08a6c25e6516d30a7f4cd73f6",
+				"components/editor.css": "6045ebd25fc3980b933ecdb8664e8b96563c3a5fc0f577d9b47465e7039f28e8",
+				"components/find.css": "16333226ea304b0626968c954638c2257c013224c0d18cb30274618ac635807e",
+				"components/help.css": "409e2e8bae97db051da4c81335b0499735f052f046028cde51b335c5f3ba9651",
+				"components/history.css": "2e5542143e6022a18e3b511609d3e88b4a827c6d347a0d63593dcf915a528336",
+				"components/inspector.css": "dbdee7a4fb0dfc6b7d953c82d026c372d132e1de4d87dbe4360dd805476ab3f1",
+				"components/invitation-screen.css": "2c0fb1fc1dbd006e904a4376774d8cd2c35f91e8d9521c9182e2f30face6f10d",
+				"components/invitations.css": "9d53235642ad4baea6c5050f0bc2d4930a20d76938598e8fe2ca0abae188fb8d",
+				"components/library.css": "f881df96810a862cbe4b1f6fa1c6e5ab59d80c6082261b980a1e46771a4adf8f",
+				"components/line-actions.css": "2b57ed1a3a2041e96a008388f68156ca10daf0d476fa77df25a91381fc5aa28f",
+				"components/media-picker.css": "e42c451b4f872916398c6f73cc73393d9fa57b2af2e80108679c51fd034b0806",
+				"components/menu.css": "340ba82e92724acd86bcbf44ddcab7cb3a4f737dd7adc476bea5860aca39c6a4",
+				"components/palette.css": "dd0d21e5bdf43b621de5cdf09d40b069d723974635cbe1635117427babfa60b7",
+				"components/presentation.css": "236cda6deca469e7375fbc05f56e8a9571e8212e03530911b43b9536b0f8f1a0",
+				"components/preview.css": "acf3b83b828a11cacb8f122589c92276b8d98c78f74aeb968ab7b1ce6767b839",
+				"components/print.css": "74e543557a4f695e082ad2f11ca2ffdab853eb24636fc51875186659d378c6d5",
+				"components/progress.css": "68ea02d7d7abba085420f76f29771cf530824367c93432cc9e88c7129e32428a",
+				"components/settings-page.css": "3b30a03f8cf1c389a0713eb846337b435b4809dbac7a155df5709ef17b62b1d4",
+				"components/settings-themes.css": "a021a75e327fc01054c504c5786de92f65319a17e3555d4add52a670fa1fd978",
+				"components/space-avatar.css": "bb0712908235c93490c007e0db716a5fac84d8b0d657278e376fc5d99968800c",
+				"components/statusbar.css": "9fc1546795055202e89680bd373f25e9b38e3b07cb5fb0a84e1ec9652e33129b",
+				"components/sync-recovery.css": "c58a12745051fd0c38d21cc48dd02139bd62371576f1da156a93d5dfc79c2e9a",
+				"components/teleprompter.css": "7a88da5f2ed0cfefc0f1570e97b09f7de48353fcaadc140b39b693721c0a557a",
+				"components/theme-picker.css": "34414d5eacc3f81ac331630b1994deea8820ec0844904a3dd01def49fe5f5dbf",
+				"components/theme-workbench.css": "db024c47bf9e2d77696d7b201b990df4b73de0f8bade35cb15d7ca50c1b16953",
+				"components/toast.css": "c95ce3c964c768576228bdf4b9cb19205a438afb129cbabb3facb0865d4c991f",
+				"components/toolbar.css": "ae8f3c65eada852ef39ed3477e4468ccebfe632bc7b8f8bed9bcf85691f19c6f",
+				"components/update-banner.css": "60a67e56982075dd3cdf19a38c4265c0d35a2c432b6a6f3a195c7ce9b551ef9f",
+				"components/whiteboard.css": "c5283bb727ec21f76de5fc2b12be7a79abacd65b82fa2cc3a5a4430597efd21a"
+			}
+		},
+		"documentOpeningResources": {
+			"javascript": {
+				"bytes": 1239122,
+				"gzipBytes": 409948,
+				"brotliBytes": 359746,
+				"files": [
+					"app.js",
+					"chunks/document-app-022w94n0.js",
+					"chunks/document-app-0fyrxqjt.js",
+					"chunks/document-app-1dxag10p.js",
+					"chunks/document-app-2d5x6ewf.js",
+					"chunks/document-app-3fnhg1mw.js",
+					"chunks/document-app-4bdv4e1h.js",
+					"chunks/document-app-57h2bdht.js",
+					"chunks/document-app-5w0555xf.js",
+					"chunks/document-app-7es742rc.js",
+					"chunks/document-app-bxa2bqfs.js",
+					"chunks/document-app-cksk812g.js",
+					"chunks/document-app-cpyrabzv.js",
+					"chunks/document-app-dw31ncjv.js",
+					"chunks/document-app-ef2e4sa0.js",
+					"chunks/document-app-fdca9e8a.js",
+					"chunks/document-app-jxg7vknv.js",
+					"chunks/document-app-kjpwy0e1.js",
+					"chunks/document-app-kkm66nr6.js",
+					"chunks/document-app-kyjabmpr.js",
+					"chunks/document-app-m2qx4cqf.js",
+					"chunks/document-app-njm9xdrd.js",
+					"chunks/document-app-nz4nbhyt.js",
+					"chunks/document-app-q5tas76n.js",
+					"chunks/document-app-qpn16pt3.js",
+					"chunks/document-app-twgbb54m.js",
+					"chunks/document-app-vk38pqtz.js",
+					"chunks/document-app-wnaem0wt.js",
+					"chunks/document-app-xryb03fv.js",
+					"chunks/document-app-zc37nkfy.js",
+					"chunks/document-app-zsc4xtxg.js",
+					"chunks/document-app-zzda0gnp.js",
+					"chunks/document-worker-stats-339x9rb5.js",
+					"document-worker.js"
+				],
+				"sha256": {
+					"app.js": "2988004fa7d4909e67b981f37baaa47121198a3dc2a52feb8a6105b86cb07e54",
+					"chunks/document-app-022w94n0.js": "e635bcb418ec176970269a95d71dce53a4a8ff593f30054c44584bdbbfc3a485",
+					"chunks/document-app-0fyrxqjt.js": "d8865a326038465f5f36b89744d4d909b9aec1414308e60a54f2aed5e7021e01",
+					"chunks/document-app-1dxag10p.js": "c968cf94b0d392a1d38c849b9913f7953953891d93b956f2c2a5e6084379c134",
+					"chunks/document-app-2d5x6ewf.js": "a5c64ed3f97fe620060b16ee408c0be6cfb99bf88b191e7e9e0c30c7623d7a98",
+					"chunks/document-app-3fnhg1mw.js": "e0bcd64bb2efd87e9e74d6cf4c8a685ff0d9de3e87391a8418bc59b26e224e7a",
+					"chunks/document-app-4bdv4e1h.js": "67b52bb778a6e0dc86f3b04d2c3c1309054bc2267187f16a3bbe066f08b3c4c1",
+					"chunks/document-app-57h2bdht.js": "bebaa30fcf7da0ed80104f1fef1bd4f25df24e8fd32ee215e06e719d01ec38c9",
+					"chunks/document-app-5w0555xf.js": "7d7b8e907d398d9ebde2b2f7578b708d49537402022e52a86efe2c7a427ef9bf",
+					"chunks/document-app-7es742rc.js": "f26fef54ac042bdc0e4fed98195dba515b485138aa0e18a9130b799f6e9fe01c",
+					"chunks/document-app-bxa2bqfs.js": "f6d71a7cf9e8c0dd3ed5edde0f1e0d56ed70aac57856a4306cc53d10695cd51c",
+					"chunks/document-app-cksk812g.js": "3d644e1b8bbf11d2f7be967d532146a91b95532264961946437ffc179bb14d96",
+					"chunks/document-app-cpyrabzv.js": "a453a789c1e7017fdb0fcb9b8c069d5a196b3759533040fe5d08cc570a7030d1",
+					"chunks/document-app-dw31ncjv.js": "0efa2025fc076d1a1f53e86bb4b2420c167f04823b1823cf86e920f17ecfaa15",
+					"chunks/document-app-ef2e4sa0.js": "a17e921a80fda0dc42c8577369425655a648a709e0cb6e4fa3f2acd6a2d431a3",
+					"chunks/document-app-fdca9e8a.js": "b0b0af909b923c9342b22f4278ba9669712b7b7a586a1de8324b09eb6f4a1762",
+					"chunks/document-app-jxg7vknv.js": "6d85834edb7e0414dbb34ba1cfae436ccb020c6bcbc61b8fd8279151a028e5d1",
+					"chunks/document-app-kjpwy0e1.js": "3f5dd91bdf01d2afe633d2b6f1f01a209c1238c43c97bb96150e087c9b620428",
+					"chunks/document-app-kkm66nr6.js": "9ab8e4906ed35620496573f0fc8639bbe5cc98ea5a03d880cae8d816437d80f9",
+					"chunks/document-app-kyjabmpr.js": "34826db88e2431da79a064fc1ff9b6114b097ac87d85575cb3dc3a2b4a5e3f1b",
+					"chunks/document-app-m2qx4cqf.js": "a16f603c7e82fa73c3c08187e200539440a114333311e16d891b12060d5d40bc",
+					"chunks/document-app-njm9xdrd.js": "31162268c175e30eacd5cc7b0523697be6a918dbe738bc579621394572d14e03",
+					"chunks/document-app-nz4nbhyt.js": "b5481fa646073959ee2a691e25b678a88414fa3073b87e54af80c1e5fc773f76",
+					"chunks/document-app-q5tas76n.js": "0f712aa9d22bf44eb4944b2a42c216a960f3bb492a6a3b24a9d3b4e5748d48e5",
+					"chunks/document-app-qpn16pt3.js": "b279bf8fb3c69c9b880edaad6887a2384d1235c8cc818e4c45e14876f70d8841",
+					"chunks/document-app-twgbb54m.js": "30c362c098e4e5f980d11ad4291d263be5e479be1a2383cb5f2bd87544148436",
+					"chunks/document-app-vk38pqtz.js": "546d085bfa9a0424a3302bd830bfcbb0a23ea3c678b497eadfd8ad0c8adca3bb",
+					"chunks/document-app-wnaem0wt.js": "9017e1bb106586511082caec95b505dd41c360b55f2d604ca62b51efdfc7c5e5",
+					"chunks/document-app-xryb03fv.js": "ea1544ff316d51ecaf80ae96d161904e8c4ece098d38a1468b402c3d2164393c",
+					"chunks/document-app-zc37nkfy.js": "a2ab412d85e54eae18d7fff9d30a3cd868006e7511e7d9ea7d5b19dbcd21f1ad",
+					"chunks/document-app-zsc4xtxg.js": "8c5390bc6a78e63db610cad54a2194bcafb2267859c6804daa24bf14db80e56f",
+					"chunks/document-app-zzda0gnp.js": "28e1e8092a60bbeb7cee01e8cd3a3122c78c3ce0c4f3035442e6947e90845876",
+					"chunks/document-worker-stats-339x9rb5.js": "c7ccb25034156f994f2b83f0c1246dbfa8ce63e83b393da62380994a98e5721b",
+					"document-worker.js": "ba2c2d193e95a38f5c21f8680f66481ce6751e273feea60b085992467b853d88"
+				}
+			},
+			"css": {
+				"bytes": 120313,
+				"gzipBytes": 31946,
+				"brotliBytes": 26243,
+				"files": [
+					"app.css",
+					"components/access.css",
+					"components/account-agents.css",
+					"components/account-email.css",
+					"components/app.css",
+					"components/attachments.css",
+					"components/boot.css",
+					"components/comments.css",
+					"components/context-menu.css",
+					"components/dialog.css",
+					"components/editor-viewport.css",
+					"components/editor.css",
+					"components/find.css",
+					"components/help.css",
+					"components/history.css",
+					"components/inspector.css",
+					"components/invitation-screen.css",
+					"components/invitations.css",
+					"components/library.css",
+					"components/line-actions.css",
+					"components/media-picker.css",
+					"components/menu.css",
+					"components/palette.css",
+					"components/presentation.css",
+					"components/preview.css",
+					"components/print.css",
+					"components/progress.css",
+					"components/settings-page.css",
+					"components/settings-themes.css",
+					"components/space-avatar.css",
+					"components/statusbar.css",
+					"components/sync-recovery.css",
+					"components/teleprompter.css",
+					"components/theme-picker.css",
+					"components/theme-workbench.css",
+					"components/toast.css",
+					"components/toolbar.css",
+					"components/update-banner.css",
+					"components/whiteboard.css"
+				],
+				"sha256": {
+					"app.css": "81f837602e54ed6695e3d900d3701bb4c2ef49b31701b3586e6b1d49fe5e513d",
+					"components/access.css": "ad8db7213311b9b0d2353d5b1a03af6dd30307565ce63315d83c98fcb079c878",
+					"components/account-agents.css": "7a72055912f86296a3434ac5071c523fa4db3bb49bf8bbe760334265faba8d18",
+					"components/account-email.css": "a86eeaf12cd6d8ad454143606d262f1a277fdaeaf2ad00bada36f0f870730f1c",
+					"components/app.css": "071c9da5f8d9a2260d7c87f8407ac8945bed080b30587c1dec47fb2f789effda",
+					"components/attachments.css": "087e3e087193556b224aa770a63b14a80871359c33203782f2e17fa0c582e277",
+					"components/boot.css": "6bf2359899a32144eda9f641e4cba887b1bfbf541cc1373056abb42608231f68",
+					"components/comments.css": "6159e493ac0f877ad9b7d4b4e09c92eab828a0e96cec886ed25a7fb771fb9769",
+					"components/context-menu.css": "f3fdaa409ca5d37ab54e182568162b5fe58414bd2f44b380e9971b6c984e5d37",
+					"components/dialog.css": "b22e6f67951980dac4ed02b15016f84854c6d63cba77c0968a1dd15948a50ec4",
+					"components/editor-viewport.css": "91c9cfa195dd9b247ea06ef37b226da08f2139c08a6c25e6516d30a7f4cd73f6",
+					"components/editor.css": "6045ebd25fc3980b933ecdb8664e8b96563c3a5fc0f577d9b47465e7039f28e8",
+					"components/find.css": "16333226ea304b0626968c954638c2257c013224c0d18cb30274618ac635807e",
+					"components/help.css": "409e2e8bae97db051da4c81335b0499735f052f046028cde51b335c5f3ba9651",
+					"components/history.css": "2e5542143e6022a18e3b511609d3e88b4a827c6d347a0d63593dcf915a528336",
+					"components/inspector.css": "dbdee7a4fb0dfc6b7d953c82d026c372d132e1de4d87dbe4360dd805476ab3f1",
+					"components/invitation-screen.css": "2c0fb1fc1dbd006e904a4376774d8cd2c35f91e8d9521c9182e2f30face6f10d",
+					"components/invitations.css": "9d53235642ad4baea6c5050f0bc2d4930a20d76938598e8fe2ca0abae188fb8d",
+					"components/library.css": "f881df96810a862cbe4b1f6fa1c6e5ab59d80c6082261b980a1e46771a4adf8f",
+					"components/line-actions.css": "2b57ed1a3a2041e96a008388f68156ca10daf0d476fa77df25a91381fc5aa28f",
+					"components/media-picker.css": "e42c451b4f872916398c6f73cc73393d9fa57b2af2e80108679c51fd034b0806",
+					"components/menu.css": "340ba82e92724acd86bcbf44ddcab7cb3a4f737dd7adc476bea5860aca39c6a4",
+					"components/palette.css": "dd0d21e5bdf43b621de5cdf09d40b069d723974635cbe1635117427babfa60b7",
+					"components/presentation.css": "236cda6deca469e7375fbc05f56e8a9571e8212e03530911b43b9536b0f8f1a0",
+					"components/preview.css": "acf3b83b828a11cacb8f122589c92276b8d98c78f74aeb968ab7b1ce6767b839",
+					"components/print.css": "74e543557a4f695e082ad2f11ca2ffdab853eb24636fc51875186659d378c6d5",
+					"components/progress.css": "68ea02d7d7abba085420f76f29771cf530824367c93432cc9e88c7129e32428a",
+					"components/settings-page.css": "3b30a03f8cf1c389a0713eb846337b435b4809dbac7a155df5709ef17b62b1d4",
+					"components/settings-themes.css": "a021a75e327fc01054c504c5786de92f65319a17e3555d4add52a670fa1fd978",
+					"components/space-avatar.css": "bb0712908235c93490c007e0db716a5fac84d8b0d657278e376fc5d99968800c",
+					"components/statusbar.css": "9fc1546795055202e89680bd373f25e9b38e3b07cb5fb0a84e1ec9652e33129b",
+					"components/sync-recovery.css": "c58a12745051fd0c38d21cc48dd02139bd62371576f1da156a93d5dfc79c2e9a",
+					"components/teleprompter.css": "7a88da5f2ed0cfefc0f1570e97b09f7de48353fcaadc140b39b693721c0a557a",
+					"components/theme-picker.css": "34414d5eacc3f81ac331630b1994deea8820ec0844904a3dd01def49fe5f5dbf",
+					"components/theme-workbench.css": "db024c47bf9e2d77696d7b201b990df4b73de0f8bade35cb15d7ca50c1b16953",
+					"components/toast.css": "c95ce3c964c768576228bdf4b9cb19205a438afb129cbabb3facb0865d4c991f",
+					"components/toolbar.css": "ae8f3c65eada852ef39ed3477e4468ccebfe632bc7b8f8bed9bcf85691f19c6f",
+					"components/update-banner.css": "60a67e56982075dd3cdf19a38c4265c0d35a2c432b6a6f3a195c7ce9b551ef9f",
+					"components/whiteboard.css": "c5283bb727ec21f76de5fc2b12be7a79abacd65b82fa2cc3a5a4430597efd21a"
+				}
+			},
+			"fonts": {
+				"bytes": 59768,
+				"gzipBytes": 59824,
+				"brotliBytes": 59767,
+				"files": ["fonts/geist-latin.woff2", "fonts/geist-mono-latin.woff2"],
+				"sha256": {
+					"fonts/geist-latin.woff2": "0cbbe6286a00f356e98980783cc950a9b693751e04aedfb97d9526ff6dc2b316",
+					"fonts/geist-mono-latin.woff2": "e9fb088eeacced307860d82ceedb0ae9ad2ebfa07a7c0a7279c8c961dd9d5fd3"
+				}
+			},
+			"resources": [
+				{
+					"path": "/fonts/geist-mono-latin.woff2",
+					"initiatorType": "link"
+				},
+				{
+					"path": "/app.css",
+					"initiatorType": "link"
+				},
+				{
+					"path": "/chunks/document-app-57h2bdht.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-cpyrabzv.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-m2qx4cqf.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/app.js",
+					"initiatorType": "script"
+				},
+				{
+					"path": "/chunks/document-app-zzda0gnp.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-kyjabmpr.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-fdca9e8a.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-njm9xdrd.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-4bdv4e1h.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-zsc4xtxg.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-0fyrxqjt.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-dw31ncjv.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-zc37nkfy.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-wnaem0wt.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-q5tas76n.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-022w94n0.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-ef2e4sa0.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-5w0555xf.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-xryb03fv.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-7es742rc.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-2d5x6ewf.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-kjpwy0e1.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-jxg7vknv.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-vk38pqtz.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-1dxag10p.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-twgbb54m.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-3fnhg1mw.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-kkm66nr6.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-qpn16pt3.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-nz4nbhyt.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-cksk812g.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/chunks/document-app-bxa2bqfs.js",
+					"initiatorType": "other"
+				},
+				{
+					"path": "/components/account-email.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/access.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/menu.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/settings-page.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/settings-themes.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/space-avatar.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/invitations.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/invitation-screen.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/account-agents.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/theme-picker.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/media-picker.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/teleprompter.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/progress.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/context-menu.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/line-actions.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/print.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/app.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/boot.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/library.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/toolbar.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/editor.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/statusbar.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/sync-recovery.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/inspector.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/preview.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/dialog.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/history.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/presentation.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/find.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/toast.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/update-banner.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/theme-workbench.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/whiteboard.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/help.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/palette.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/comments.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/attachments.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/components/editor-viewport.css",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/fonts/geist-latin.woff2",
+					"initiatorType": "css"
+				},
+				{
+					"path": "/chunks/document-worker-stats-339x9rb5.js",
+					"initiatorType": "script"
+				},
+				{
+					"path": "/document-worker.js",
+					"initiatorType": "other"
+				}
+			]
+		},
+		"whiteboardAdditionalToDocument": {
+			"javascript": {
+				"bytes": 1961916,
+				"gzipBytes": 592192,
+				"brotliBytes": 481852,
+				"files": [
+					"chunks/document-app-f1s11jyz.js",
+					"chunks/document-app-h4hnw989.js",
+					"chunks/document-app-xepte0jj.js",
+					"chunks/whiteboard-6sm7wp04.js"
+				],
+				"sha256": {
+					"chunks/document-app-f1s11jyz.js": "e54bd2fcad5b23598e87ee5b48ec96479a5f66d9faae168092bb44d0d6aeb47c",
+					"chunks/document-app-h4hnw989.js": "dda38a757ea221650997996ac382f58cb3d1c03c5d4521d7f14a6ddf2334e01b",
+					"chunks/document-app-xepte0jj.js": "316004650d0897e1d22dbe95b711c615a3e9f3f99f5ec5af4a3bebc00b12b8e2",
+					"chunks/whiteboard-6sm7wp04.js": "3f991df4bf875fe94d8cc71eb41cb374a33cd603232ae073e21e332378a735a1"
+				}
+			},
+			"css": {
+				"bytes": 98395,
+				"gzipBytes": 19289,
+				"brotliBytes": 16255,
+				"files": ["tldraw/tldraw.css"],
+				"sha256": {
+					"tldraw/tldraw.css": "c4a89b188aecfa313add8cf1a2444a1f4cde48c7e08bd36b01e33d6d8f7f1634"
+				}
+			}
+		},
+		"lazyWhiteboardJavaScript": {
+			"bytes": 1961916,
+			"gzipBytes": 592192,
+			"brotliBytes": 481852,
+			"files": [
+				"chunks/document-app-f1s11jyz.js",
+				"chunks/document-app-h4hnw989.js",
+				"chunks/document-app-xepte0jj.js",
+				"chunks/whiteboard-6sm7wp04.js"
+			],
+			"sha256": {
+				"chunks/document-app-f1s11jyz.js": "e54bd2fcad5b23598e87ee5b48ec96479a5f66d9faae168092bb44d0d6aeb47c",
+				"chunks/document-app-h4hnw989.js": "dda38a757ea221650997996ac382f58cb3d1c03c5d4521d7f14a6ddf2334e01b",
+				"chunks/document-app-xepte0jj.js": "316004650d0897e1d22dbe95b711c615a3e9f3f99f5ec5af4a3bebc00b12b8e2",
+				"chunks/whiteboard-6sm7wp04.js": "3f991df4bf875fe94d8cc71eb41cb374a33cd603232ae073e21e332378a735a1"
+			}
+		},
+		"lazyWhiteboardCss": {
+			"bytes": 98395,
+			"gzipBytes": 19289,
+			"brotliBytes": 16255,
+			"files": ["tldraw/tldraw.css"],
+			"sha256": {
+				"tldraw/tldraw.css": "c4a89b188aecfa313add8cf1a2444a1f4cde48c7e08bd36b01e33d6d8f7f1634"
+			}
+		}
+	}
+}

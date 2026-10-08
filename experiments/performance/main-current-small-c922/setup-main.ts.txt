@@ -1,0 +1,18 @@
+import {browser,evaluate,wait} from "./tests/browser-driver"
+import * as Schema from "effect/Schema"
+let root="/tmp/alkalye-main-current72",previous="/tmp/alkalye-main-sdk-proof",session="main-current72-original-"+Date.now(),url="http://127.0.0.1:4490"
+let created=Schema.decodeUnknownSync(Schema.Struct({documentId:Schema.String}))(await Bun.file(previous+"/created.private.json").json())
+let source=await Bun.file(root+"/small2.txt").text(),path="/app/doc/"+created.documentId
+try{
+ browser(session,"--profile",previous+"/profile-main-sdk-setup-1791476963628","open",url+path)
+ wait(session,"document.querySelector('.cm-content')?.cmTile?.view?.state.doc.toString()==="+JSON.stringify(source))
+ wait(session,"window.__benchmark?.socketFrames.some(frame=>frame.direction==='receive')")
+ let resources=Schema.decodeUnknownSync(Schema.Array(Schema.Struct({path:Schema.String,initiatorType:Schema.String})))(evaluate(session,"performance.getEntriesByType('resource').filter(entry=>new URL(entry.name).origin===location.origin).map(entry=>({path:new URL(entry.name).pathname,initiatorType:entry.initiatorType})).filter(entry=>/\\.(js|css|woff2?|ttf|otf)$/.test(entry.path))"))
+ await Bun.write(root+"/original-resources.private.json",JSON.stringify(resources))
+ let scripts=Schema.decodeUnknownSync(Schema.Array(Schema.String))(evaluate(session,"performance.getEntriesByType('resource').map(entry=>new URL(entry.name).pathname).filter(path=>path.endsWith('.js'))"))
+ let assets=[]
+ for(let path of [...new Set(scripts)]){let response=await fetch(url+path);assets.push({path,sha256:new Bun.CryptoHasher('sha256').update(await response.arrayBuffer()).digest('hex')})}
+ await Bun.write(root+"/main-oracle.private.json",JSON.stringify({checkout:"/tmp/alkalye-main-rebench",authFile:previous+"/auth.private.json",syncServer:"ws://127.0.0.1:4220",documents:[{fixture:"small2",documentId:created.documentId}]}))
+ await Bun.write(root+"/main-version.private.json",JSON.stringify({name:"main",kind:"original",commit:"a749728a8f9a1cb984c980a5ea2daf984d60ae68",url,seedProfile:previous+"/profile-main-sdk-setup-1791476963628",oracle:["bun",import.meta.dir+"/experiments/performance/main-current-preparation/main-oracle.js",root+"/main-oracle.private.json"],assets,fixtures:[{name:"small2",path,sourceFile:root+"/small2.txt"}]}))
+ console.log(JSON.stringify({stage:"main-view-confirmed",characters:source.length,loadedAssets:assets.length,mutated:false}))
+}finally{browser(session,"close")}

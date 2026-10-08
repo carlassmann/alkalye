@@ -1,0 +1,35 @@
+import { browser, evaluate, wait } from "./tests/browser-driver"
+import * as Schema from "effect/Schema"
+import { join } from "node:path"
+let root="/tmp/alkalye-main-current72",url="http://127.0.0.1:4491",session="main-current72-setup-"+Date.now(),profile=root+"/profile-rewrite"
+let source=await Bun.file(root+"/small2.txt").text()
+if(await Bun.file(root+"/rewrite-creation.pending.private.json").exists())throw Error("Prior setup may have created a document; inspect before retry")
+try{
+ browser(session,"--profile",profile,"open",url+"/app")
+ wait(session,"document.querySelector('[data-document-app]')!==null")
+ await Bun.write(root+"/rewrite-creation.pending.private.json",JSON.stringify({stage:"pending"}))
+ browser(session,"click",'[data-action="new"]')
+ wait(session,"document.querySelector('#editor')?.readOnly===false")
+ let path=Schema.decodeUnknownSync(Schema.String)(evaluate(session,"location.pathname"))
+ await Bun.write(root+"/rewrite-created.private.json",JSON.stringify({path}))
+ browser(session,"fill","#editor",source)
+ wait(session,"document.querySelector('alkalye-editor').source.value==="+JSON.stringify(source))
+ wait(session,"document.querySelector('#save-status')?.dataset.pending==='0'&&document.querySelector('#save-status')?.getAttribute('aria-busy')==='false'")
+ browser(session,"open",url+"/app/settings?category=connections")
+ wait(session,"document.querySelector('[data-agent=create]')?.disabled===false")
+ browser(session,"fill",'[name="agent-name"]',"Private performance oracle")
+ browser(session,"click",'[data-agent="create"]')
+ wait(session,"document.querySelector('#agent-token')?.value.length>20")
+ let key=Schema.decodeUnknownSync(Schema.String)(evaluate(session,"document.querySelector('#agent-token').value"))
+ await Bun.write(root+"/key.private",key)
+ await Bun.write(root+"/rewrite-oracle.private.json",JSON.stringify({origin:url,keyFile:root+"/key.private",scope:"all",documents:[{fixture:"small2",documentId:path.split('/').at(-1)}]}))
+ browser(session,"open",url+path)
+ wait(session,"document.querySelector('alkalye-editor')?.source.value==="+JSON.stringify(source))
+ let resources=Schema.decodeUnknownSync(Schema.Array(Schema.Struct({path:Schema.String,initiatorType:Schema.String})))(evaluate(session,"performance.getEntriesByType('resource').filter(entry=>new URL(entry.name).origin===location.origin).map(entry=>({path:new URL(entry.name).pathname,initiatorType:entry.initiatorType})).filter(entry=>/\\.(js|css|woff2?|ttf|otf)$/.test(entry.path))"))
+ await Bun.write(root+"/rewrite-resources.private.json",JSON.stringify(resources))
+ let scripts=Schema.decodeUnknownSync(Schema.Array(Schema.String))(evaluate(session,"performance.getEntriesByType('resource').map(entry=>new URL(entry.name).pathname).filter(path=>path.endsWith('.js'))"))
+ let assets=[]
+ for(let path of [...new Set(scripts)]){let response=await fetch(url+path);assets.push({path,sha256:new Bun.CryptoHasher('sha256').update(await response.arrayBuffer()).digest('hex')})}
+ await Bun.write(root+"/rewrite-version.private.json",JSON.stringify({name:"rewrite",kind:"rewrite",commit:"c922a8d61d2730e0b9b6179b36b36ba85cd5e578",url,seedProfile:profile,oracle:["bun",join(import.meta.dir,"experiments/performance/interaction-matrix/rewrite-oracle.ts"),root+"/rewrite-oracle.private.json"],assets,fixtures:[{name:"small2",path,sourceFile:root+"/small2.txt"}]}))
+ console.log(JSON.stringify({stage:"setup-complete",characters:source.length,loadedAssets:assets.length}))
+}finally{browser(session,"close")}

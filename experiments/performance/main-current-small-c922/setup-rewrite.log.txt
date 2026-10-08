@@ -1,0 +1,1 @@
+{"stage":"setup-complete","characters":2048,"loadedAssets":34}

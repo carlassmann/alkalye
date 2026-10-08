@@ -1,0 +1,215 @@
+{
+	"scope": "one paired2KiB middle-input gate; Undo accepted outside tracedwindow",
+	"versions": [
+		{
+			"name": "main",
+			"commit": "a749728a8f9a1cb984c980a5ea2daf984d60ae68",
+			"assets": [
+				{
+					"path": "/_astro/main.BjTj7Dij.js",
+					"sha256": "7c92f6c18fdc369e25553ac5736d7667d90fabd385aecbe813eda15ff2979c63"
+				},
+				{
+					"path": "/_astro/browser-startup-instrumentation.hp2BeFIz.js",
+					"sha256": "7cd392919e9495031df7ef025417cc5d140c0d61ce8842a0bd20cfdac781a254"
+				},
+				{
+					"path": "/_astro/index.BJJFgUIs.js",
+					"sha256": "f3d7f04681cd4a3f824abb256a676b879bb3283c1131f93375bbf6e17e31040b"
+				},
+				{
+					"path": "/_astro/main.BrO3cuZ6.js",
+					"sha256": "c5e00a47e5d2fe3deb14602cbef5ec08897fd469ce8da21748d3560b8855ba01"
+				},
+				{
+					"path": "/_astro/index.astro_astro_type_script_index_0_lang.DkMI-E-L.js",
+					"sha256": "cf41a1b372e9c378ca8174aba1a79e401f193936fe652ac5bb8da32e3198dda4"
+				},
+				{
+					"path": "/_astro/client.CMSwgtGj.js",
+					"sha256": "b59fa5a209b259582587c593fbd18e461ad7a320587ff6fc8871cfe8654f07ca"
+				},
+				{
+					"path": "/_astro/client.-iLz22eX.js",
+					"sha256": "6e61a55e346cf81594a8f79ef7d1177300d57e3ecdbf9344989586584043bbe0"
+				},
+				{
+					"path": "/_astro/virtual_pwa-register.I6B7t9y4.js",
+					"sha256": "10e46f3159b01a461d392a435c0767d86ee4a6a3fe21bc93f1aafae950bb0620"
+				},
+				{
+					"path": "/_astro/workbox-window.prod.es5.BIl4cyR9.js",
+					"sha256": "ef75dc538a74d630094d7453bce980f4e7c78096700d40489d8ead191131d8ba"
+				},
+				{
+					"path": "/_astro/document-save.worker-BQTqGf7x.js",
+					"sha256": "c40cdd504133a76c6ff65a7519d2ffd3975750376799b0aa882875baedb90cde"
+				}
+			]
+		},
+		{
+			"name": "rewrite",
+			"commit": "c922a8d61d2730e0b9b6179b36b36ba85cd5e578",
+			"assets": [
+				{
+					"path": "/chunks/document-app-57h2bdht.js",
+					"sha256": "bebaa30fcf7da0ed80104f1fef1bd4f25df24e8fd32ee215e06e719d01ec38c9"
+				},
+				{
+					"path": "/chunks/document-app-cpyrabzv.js",
+					"sha256": "a453a789c1e7017fdb0fcb9b8c069d5a196b3759533040fe5d08cc570a7030d1"
+				},
+				{
+					"path": "/chunks/document-app-m2qx4cqf.js",
+					"sha256": "a16f603c7e82fa73c3c08187e200539440a114333311e16d891b12060d5d40bc"
+				},
+				{
+					"path": "/app.js",
+					"sha256": "2988004fa7d4909e67b981f37baaa47121198a3dc2a52feb8a6105b86cb07e54"
+				},
+				{
+					"path": "/chunks/document-app-zzda0gnp.js",
+					"sha256": "28e1e8092a60bbeb7cee01e8cd3a3122c78c3ce0c4f3035442e6947e90845876"
+				},
+				{
+					"path": "/chunks/document-app-kyjabmpr.js",
+					"sha256": "34826db88e2431da79a064fc1ff9b6114b097ac87d85575cb3dc3a2b4a5e3f1b"
+				},
+				{
+					"path": "/chunks/document-app-fdca9e8a.js",
+					"sha256": "b0b0af909b923c9342b22f4278ba9669712b7b7a586a1de8324b09eb6f4a1762"
+				},
+				{
+					"path": "/chunks/document-app-njm9xdrd.js",
+					"sha256": "31162268c175e30eacd5cc7b0523697be6a918dbe738bc579621394572d14e03"
+				},
+				{
+					"path": "/chunks/document-app-4bdv4e1h.js",
+					"sha256": "67b52bb778a6e0dc86f3b04d2c3c1309054bc2267187f16a3bbe066f08b3c4c1"
+				},
+				{
+					"path": "/chunks/document-app-zsc4xtxg.js",
+					"sha256": "8c5390bc6a78e63db610cad54a2194bcafb2267859c6804daa24bf14db80e56f"
+				},
+				{
+					"path": "/chunks/document-app-0fyrxqjt.js",
+					"sha256": "d8865a326038465f5f36b89744d4d909b9aec1414308e60a54f2aed5e7021e01"
+				},
+				{
+					"path": "/chunks/document-app-dw31ncjv.js",
+					"sha256": "0efa2025fc076d1a1f53e86bb4b2420c167f04823b1823cf86e920f17ecfaa15"
+				},
+				{
+					"path": "/chunks/document-app-zc37nkfy.js",
+					"sha256": "a2ab412d85e54eae18d7fff9d30a3cd868006e7511e7d9ea7d5b19dbcd21f1ad"
+				},
+				{
+					"path": "/chunks/document-app-wnaem0wt.js",
+					"sha256": "9017e1bb106586511082caec95b505dd41c360b55f2d604ca62b51efdfc7c5e5"
+				},
+				{
+					"path": "/chunks/document-app-q5tas76n.js",
+					"sha256": "0f712aa9d22bf44eb4944b2a42c216a960f3bb492a6a3b24a9d3b4e5748d48e5"
+				},
+				{
+					"path": "/chunks/document-app-022w94n0.js",
+					"sha256": "e635bcb418ec176970269a95d71dce53a4a8ff593f30054c44584bdbbfc3a485"
+				},
+				{
+					"path": "/chunks/document-app-ef2e4sa0.js",
+					"sha256": "a17e921a80fda0dc42c8577369425655a648a709e0cb6e4fa3f2acd6a2d431a3"
+				},
+				{
+					"path": "/chunks/document-app-5w0555xf.js",
+					"sha256": "7d7b8e907d398d9ebde2b2f7578b708d49537402022e52a86efe2c7a427ef9bf"
+				},
+				{
+					"path": "/chunks/document-app-xryb03fv.js",
+					"sha256": "ea1544ff316d51ecaf80ae96d161904e8c4ece098d38a1468b402c3d2164393c"
+				},
+				{
+					"path": "/chunks/document-app-7es742rc.js",
+					"sha256": "f26fef54ac042bdc0e4fed98195dba515b485138aa0e18a9130b799f6e9fe01c"
+				},
+				{
+					"path": "/chunks/document-app-2d5x6ewf.js",
+					"sha256": "a5c64ed3f97fe620060b16ee408c0be6cfb99bf88b191e7e9e0c30c7623d7a98"
+				},
+				{
+					"path": "/chunks/document-app-kjpwy0e1.js",
+					"sha256": "3f5dd91bdf01d2afe633d2b6f1f01a209c1238c43c97bb96150e087c9b620428"
+				},
+				{
+					"path": "/chunks/document-app-jxg7vknv.js",
+					"sha256": "6d85834edb7e0414dbb34ba1cfae436ccb020c6bcbc61b8fd8279151a028e5d1"
+				},
+				{
+					"path": "/chunks/document-app-vk38pqtz.js",
+					"sha256": "546d085bfa9a0424a3302bd830bfcbb0a23ea3c678b497eadfd8ad0c8adca3bb"
+				},
+				{
+					"path": "/chunks/document-app-1dxag10p.js",
+					"sha256": "c968cf94b0d392a1d38c849b9913f7953953891d93b956f2c2a5e6084379c134"
+				},
+				{
+					"path": "/chunks/document-app-twgbb54m.js",
+					"sha256": "30c362c098e4e5f980d11ad4291d263be5e479be1a2383cb5f2bd87544148436"
+				},
+				{
+					"path": "/chunks/document-app-3fnhg1mw.js",
+					"sha256": "e0bcd64bb2efd87e9e74d6cf4c8a685ff0d9de3e87391a8418bc59b26e224e7a"
+				},
+				{
+					"path": "/chunks/document-app-kkm66nr6.js",
+					"sha256": "9ab8e4906ed35620496573f0fc8639bbe5cc98ea5a03d880cae8d816437d80f9"
+				},
+				{
+					"path": "/chunks/document-app-qpn16pt3.js",
+					"sha256": "b279bf8fb3c69c9b880edaad6887a2384d1235c8cc818e4c45e14876f70d8841"
+				},
+				{
+					"path": "/chunks/document-app-nz4nbhyt.js",
+					"sha256": "b5481fa646073959ee2a691e25b678a88414fa3073b87e54af80c1e5fc773f76"
+				},
+				{
+					"path": "/chunks/document-app-cksk812g.js",
+					"sha256": "3d644e1b8bbf11d2f7be967d532146a91b95532264961946437ffc179bb14d96"
+				},
+				{
+					"path": "/chunks/document-app-bxa2bqfs.js",
+					"sha256": "f6d71a7cf9e8c0dd3ed5edde0f1e0d56ed70aac57856a4306cc53d10695cd51c"
+				},
+				{
+					"path": "/chunks/document-worker-stats-339x9rb5.js",
+					"sha256": "c7ccb25034156f994f2b83f0c1246dbfa8ce63e83b393da62380994a98e5721b"
+				},
+				{
+					"path": "/document-worker.js",
+					"sha256": "ba2c2d193e95a38f5c21f8680f66481ce6751e273feea60b085992467b853d88"
+				}
+			]
+		}
+	],
+	"sourceSha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+	"characters": 2048,
+	"samplesPerVersion": 1,
+	"headlessFrameCadence": "60Hz; frame opportunity not display latency",
+	"sourceExact": true,
+	"independentEditedReceipt": true,
+	"independentUndoReceipt": true,
+	"closed": true,
+	"setupFailures": [
+		{
+			"phase": "initial exec",
+			"error": "Requested runtime cwd absent; rejected before process creation",
+			"repaired": "Create runtime from repository cwd; no fixture action repeated"
+		}
+	],
+	"typesExit": 0,
+	"buildExit": 0,
+	"smokeExit": 0,
+	"bundleExit": 0,
+	"undoTaskMeasured": false,
+	"accountLibraryMatched": false,
+	"historyResetPerTrial": false
+}
