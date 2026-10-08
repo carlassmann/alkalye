@@ -1,0 +1,36 @@
+No correctness blockers. Remembering the context (lexical-state memo) is exact. I could not run the native A/B, so I can't say whether it's faster yet.
+
+**Why the reuse is safe**
+- A line's `(literal, after)` depends only on its `text` and its `before` state. Line 132 reuses it only when the text is the same and `sameContext(before)` matches. So the old/new line mapping (prefix, suffix, middle) only affects how often reuse happens, never whether it's right.
+- A change in initial frontmatter (`/^---\r?\n/` on the whole source) changes line 0's `before`, so everything re-parses. A first line of `---` with no newline gives `frontmatter:false`, same as baseline.
+- CRLF, `\s*$` / `.trim()` closing tails, backtick vs tilde marker, `>=` length and `{0,3}` / `( {4}|\t)` indentation all use the same parser. Only reachable through the changed branch.
+- Newline insert/delete uses the same suffix mapping as baseline. Correct, because the memo check is pure.
+- Doc title change on the same source: every line hits the memo. `[[` lines still get new tokens through `changed`.
+- Context and fence objects are never mutated, so sharing them across runs is safe. `projectTokens` still builds fresh links/text on every call. `sameActiveTokens` and `this.tokens` behave as before.
+- Out-of-order (async) or raw-mode calls: still correct, just more cache misses. Raw mode and sources without `[` skip the projector at `src/client/source-textarea.ts:266`, so its saved lines go stale.
+
+**Non-blocking issues (narrow fixes)**
+1. **`first` is compared outside frontmatter (line 45).** Adding or removing the top `---` makes every later `before` differ. Every line then re-parses (same as baseline), and on top of that the line-167 path builds a new TokenLine and copies tokens with `shift(…,0)` for the whole document. That's extra allocation baseline didn't have. Fix: only compare `first` when `frontmatter` is true. This is exact, because frontmatter can't turn back on once it ends.
+2. **Line 172 copies tokens even when `start` is unchanged.** Fix: `tokens: start === previous.start ? previous.tokens : previous.tokens.map(...)`.
+3. On the reuse path, line 165 runs `sameContext` a second time. Carry a flag from line 132 instead.
+4. Costs to state explicitly: 2 extra pointers per TokenLine, 1 context object per project call, 1 per line where the state changes. A cold first run still parses every line. Opening a fence with no close, or changing its marker or length, invalidates every line up to the next real close or the end of the doc. That costs about as much as baseline.
+
+**Not addressed, so don't assume the 14 ms GC goes away**
+- `source.split("\n")` on 1 MiB, the prefix/suffix string compares, rebuilding `tokens`, and the full-document `text +=` in `projectTokens` (1.9 ms self).
+- The saving is probably limited to the regex part of the 5.7 ms project self time. This doesn't show the 120 target is met.
+
+**Gates**
+- **Public equivalence test:** replay an edit sequence through one `Projector` and assert each output equals a fresh `project(source)`, with `active` and `iconSpace` set, `sameActiveTokens`, and `documents` retitled on an unchanged source. Edits to cover:
+  - add/remove frontmatter; break and restore its closing `---`
+  - CRLF
+  - ```` ``` ```` ↔ `~~~`; length 3→4; a close followed by trailing text
+  - adding/removing 4-space indent
+  - joining/splitting lines above link lines
+  - a line that's the same but sits in a different context: a link line before vs inside a fence
+- **SourceTextarea journey:** extend `tests/browser-editor-prettification.ts` with the fence/frontmatter toggle cases. Assert collapsed vs raw links and caret mapping.
+- **Native A/B on rich 1 MiB, n=3 each:** baseline 5c5b6aa vs candidate (CPU is owned by the other agent, so this needs to run there). Compare:
+  - Projector.project self/incl time, projectTokens time, `projectionFor` time
+  - Editor handler, GC, input p95
+  - plus a cold-load sample and a case that toggles a fence near the top
+
+Claude.ai connectors needing auth (Axiom, Canva, GitHub, Gmail, Google Drive, HubSpot, Lusha ×2, Miro, Notion, Ocean.io, Ramp Data, Slack, Staging SynTwin, SynTwin Admin, SynTwin Kunde, lemlist, syntwin admin, syntwin main) can't be used until authorized in claude.ai connector settings.

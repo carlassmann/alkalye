@@ -1,0 +1,11 @@
+45 | 			evaluate(
+46 | 				session,
+47 | 				"({failure:window.lexicalFailure,results:window.lexicalResults})",
+48 | 			),
+49 | 		)
+50 | 		if (state.failure) throw new Error(String(state.failure))
+                                    ^
+error: Error: source selection moved
+      at /private/tmp/alkalye-projector-lexical-context/candidate/tests/browser-lexical-source.ts:50:32
+
+Bun v1.4.0 (macOS arm64)

@@ -1,0 +1,2 @@
+{"results":{"assertions":332,"crlfNormalizationUnresolved":[{"actual":84,"native":62,"requested":109}],"stages":["transition0","transition1","transition2","transition3","transition4","transition5","transition6","transition7","transition8","transition9","transition10","transition11","two shifted suffixes","same array retitle","raw then hold then project"]}}
+PASS trusted native input retains exact source projection and caret
