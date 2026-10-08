@@ -1,0 +1,23 @@
+**Verdict:** I found no semantic blockers against the baseline. There is one hazard the baseline already has, with a one-line fix. Formatting is still pending, as you planned. It's not adoptable until the native gates (public SourceTextarea, prettification, matched rich-n3) pass.
+
+**Fix (small; same behaviour as baseline, but cheap to fix now)**
+- `projection.ts:95`: `this.documents = key` is set before parsing. Two ways this goes wrong:
+  - **Parse throws:** a `doc.id` or `doc.title` getter inside `wikiLink`'s `documents.find` throws. The new key is saved but the tokens are still the old ones. The next call with the same source and documents takes the fast path and returns stale wiki `label`/`broken`/`target`.
+  - **Re-entry:** a getter calls `project(oldSource, sameDocs)` while the projector is rebuilding. That call sees `changed=false`, takes the fast path and returns tokens parsed under the previous documents.
+  - **Fix:** keep `changed` as a local, delete line 95, and add `this.documents = key` next to `this.source = source` at line 167. Publication is then atomic.
+
+**Checked, OK**
+- **Delayed publication:** the parse loop (114-150) only reads `this.lines`. The buffer is reallocated and written in place at 151-163, after every throwable call, with no callbacks before 164-167. If the parse throws, `source`/`lines`/`tokens`/`tokenBounds`/`tokenCount` stay consistent. A re-entrant call during parsing sees the old state, consistently.
+- **Re-entrant rebuild:** the outer loop reads `this.lines[...]` live, so after an inner rebuild it may reuse the inner call's lines. Reuse requires the same `text` and `literal`, and tokens are relative, so position no longer matters. That makes it safer than the baseline, which reused lines by `start`. Bounds are rewritten from the outer call's `lines`, and `this.tokenBounds` is re-read after the loop. The only leftover risk is the documents-key hazard above.
+- **Snapshot:** `active` and `iconSpace` are taken at lines 89-91, before any `documents` getter runs. `projectTokens` makes no outside calls, so the buffer can't be overwritten mid-render. Note that `selectionBounds` reads `start`/`end` twice each; a getter that changes between reads gives an inconsistent selection, same as baseline. Optional fix: `let { start, end } = selection` once.
+- **Shared tokens:** when lines are inserted (T > L), the middle and suffix mappings can reuse the same old `TokenLine` at two indices. The same `LinkToken` objects then appear twice in `tokens`. The baseline cloned via `shift`. This is harmless because tokens are never mutated and bounds are stored per position. Optional: mark `LinkToken` fields `readonly` to lock that in.
+- **Boundaries:** `end >= a.start && start <= a.end` and both binary searches match the baseline.
+  - `undefined` active means nothing is active.
+  - NaN propagates through `selectionBounds`, so every comparison is false and nothing is active, same as baseline. `sameActiveTokens` rejects NaN.
+  - `?? 0` / `?? Infinity` are never reached within `tokenCount`, and stale tail entries are never read.
+- **Raw/plain mode:** `this.source` stays stale, so `sameActiveTokens` returns false. Correct.
+- **Output ownership:** links and parts are fresh on every call, and `tokenBounds` is never exposed. The fast path loops over refs only, O(tokens).
+- **Invalidation:** tokens depend only on line text, `literal` and (wiki links only) documents. The `changed && "[["` rule is sufficient. Fence and frontmatter state is recomputed every rebuild.
+- **Shrink:** after a shrink to exactly `needed`, the next growth of one token reallocates. That's fine but churns. Optional: shrink to `needed * 2`.
+
+**Gates (unchanged):** a native public-SourceTextarea oracle against a fresh baseline `project()`, then prettification plus matched rich-n3 latency and long-task distributions, and heap after a large→small document switch.

@@ -1,0 +1,3 @@
+src/shared/projection.ts 50ms
+tests/lexical-source-fixture.ts 15ms
+tests/browser-lexical-source.ts 4ms (unchanged)

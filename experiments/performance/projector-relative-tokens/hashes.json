@@ -1,0 +1,62 @@
+{
+	"baseline-0-input.trace.json": {
+		"sha256": "c8c1f3bea2c9e392648b31eabb5ea875037446ff14d9c6ebaa759bee1427427b",
+		"retainedPath": "/tmp/alkalye-projector-relative-tokens/app/baseline-0-input.trace.json"
+	},
+	"baseline-0-undo.trace.json": {
+		"sha256": "f4a1e5ab1d78c82919def53104dc54f5c49ce4c7fe7e572ba82cf2723b0d64f9",
+		"retainedPath": "/tmp/alkalye-projector-relative-tokens/app/baseline-0-undo.trace.json"
+	},
+	"candidate-0-input.trace.json": {
+		"sha256": "369756a87d23b2d11b64127632d0e1c554e34907eb27f7c992ee49bad6ed6828",
+		"retainedPath": "/tmp/alkalye-projector-relative-tokens/app/candidate-0-input.trace.json"
+	},
+	"candidate-0-undo.trace.json": {
+		"sha256": "85b75328d908d9b85a167cdb18fa9a15f92f2fc4a579cb39823e49c625b1b2a4",
+		"retainedPath": "/tmp/alkalye-projector-relative-tokens/app/candidate-0-undo.trace.json"
+	},
+	"candidate-1-input.trace.json": {
+		"sha256": "2fa5ff3c3004a9c6d9c84aecc004d9b147646b87f1ffef3454c46bf89a3b055d",
+		"retainedPath": "/tmp/alkalye-projector-relative-tokens/app/candidate-1-input.trace.json"
+	},
+	"candidate-1-undo.trace.json": {
+		"sha256": "7249134ae85b5f79632e4565794a282ac5f2c869fc17cb1796d4b0eca40cf462",
+		"retainedPath": "/tmp/alkalye-projector-relative-tokens/app/candidate-1-undo.trace.json"
+	},
+	"baseline-1-input.trace.json": {
+		"sha256": "59062e8ce683e4342e491dc4c31227c817bd48861342d5b11f7fcf94132b8896",
+		"retainedPath": "/tmp/alkalye-projector-relative-tokens/app/baseline-1-input.trace.json"
+	},
+	"baseline-1-undo.trace.json": {
+		"sha256": "d015f7ba4bdae425ef8e3ffa2af0515c7356b908b15798f22cbb44aa58e3273a",
+		"retainedPath": "/tmp/alkalye-projector-relative-tokens/app/baseline-1-undo.trace.json"
+	},
+	"baseline-2-input.trace.json": {
+		"sha256": "2ac3078d89d5a22935a19c0e7a0eb67ef2901f0d5b2597e41653e09a8e99f9c8",
+		"retainedPath": "/tmp/alkalye-projector-relative-tokens/app/baseline-2-input.trace.json"
+	},
+	"baseline-2-undo.trace.json": {
+		"sha256": "2e8296a51bd218decb1dfc5b84cb4a8cfae20a5ffe30537e50e3721b9cf8b123",
+		"retainedPath": "/tmp/alkalye-projector-relative-tokens/app/baseline-2-undo.trace.json"
+	},
+	"candidate-2-input.trace.json": {
+		"sha256": "a37d30bcb6f7a4e9198a3c095f3e59773ad5ec2f714572e09f7cc1697fb91675",
+		"retainedPath": "/tmp/alkalye-projector-relative-tokens/app/candidate-2-input.trace.json"
+	},
+	"candidate-2-undo.trace.json": {
+		"sha256": "d66979f8336f62f7c36f66370843229d80dbe398b58552b3b01d09366aad4d48",
+		"retainedPath": "/tmp/alkalye-projector-relative-tokens/app/candidate-2-undo.trace.json"
+	},
+	"baseline/src/shared/projection.ts": {
+		"sha256": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e"
+	},
+	"runtime/src/shared/projection.ts": {
+		"sha256": "3322c95b9693934953a6d44f7c0e8ec429e86ce00d3afe179424743d0b6e4f9d"
+	},
+	"baseline/dist/app.js": {
+		"sha256": "e4f1b5b17e5a15ba15d86e043cbb7d0b73cdb5c6e767630927e7963777d3ce87"
+	},
+	"runtime/dist/app.js": {
+		"sha256": "62bfc3a36238c3b4a4e004a1749e55d1cc46e8d879c40fcbffedfd10185c18b1"
+	}
+}

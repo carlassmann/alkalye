@@ -1,0 +1,40 @@
+**Verdict:** the logic is equivalent to the baseline as far as I can tell. I found no correctness blockers. There is one mechanical blocker (formatting), two small hardening fixes, and one performance tradeoff that needs measuring. Not adoptable until the native gates below pass.
+
+**Blocker**
+- `projection.ts:177-203`: the `projectTokens` loops are mis-indented, and `let start = …, end = …` sits on one line. The formatter step in `bun run check` will fail. Run the formatter.
+
+**Checked, OK**
+- **Inclusive boundaries:** both searches match the baseline exactly (`end < sel.start`, then `start <= sel.end`). They rely on token ranges being sorted and non-overlapping, which they are.
+- **Bounds:** Float64 integers are exact. Bounds hold `start + token.start`, which is the same absolute offset the baseline computed with `shift`.
+- **NaN:** `sameActiveTokens` rejects NaN. In `projectTokens`, NaN means no token is active, same as baseline.
+- **±Infinity:** clamped by `selectionBounds`.
+- **Unicode/CRLF:** UTF-16 offsets throughout. `\r` stays inside the line text, and `offset += text.length + 1` matches `split("\n")`. Frontmatter/fence regexes are unchanged.
+- **Fence/frontmatter state:** recomputed for every line on each recompute, and `literal` is part of the reuse key. Unchanged.
+- **Reuse:** relative tokens make reuse in prefix, middle and suffix lines independent of position. That removes the shift clones correctly.
+- **Title invalidation:** the `changed && "[["` reparse is unchanged. Token existence doesn't depend on document titles (only `broken`/`label`/`target` do), so bounds stay valid across title changes.
+- **Ownership:** `tokenBounds` is private and never exposed. `projectTokens` builds fresh links and parts, so old Projection objects never alias the mutable buffer. `applyViewReplacement` doesn't touch the projector.
+- **Plain source and raw mode:** `source-textarea.ts:266` skips the projector, so `projector.source` stays stale and `sameActiveTokens` returns false through the source check. Correct.
+- **Reentrancy:** fully synchronous, no callbacks (`safeUrl` is pure). No typed errors involved. The baseline's pre-existing issue remains: `this.documents` is set before parsing.
+
+**Should fix (small)**
+1. **Exception safety:** `this.tokenCount = 0` (line 111) and the in-place bounds writes run before `this.lines/source` are reassigned. If parsing throws partway, the old `source` is paired with corrupt bounds. Fix: count in a local variable and assign `this.tokenCount` at the end. Or set `this.source = undefined` before the loop.
+2. **Retained memory:** `tokenBounds` only grows, at 16 B per token. A large document followed by a small one keeps the peak buffer for the life of the textarea. Optional fix: shrink when `length > 4096 && tokenCount*8 < length`.
+
+**Perf tradeoff (measure, don't assume)**
+- The fast path (`source === this.source`, selection-only) is now O(lines) instead of O(tokens), because `projectTokens` walks every line to keep a running offset. That hurts large documents with few links on every caret move.
+- Minimal alternative: during recompute, store a flat `LinkToken[]` of token refs next to the bounds. Then use `tokenBounds[2i] - token.start` as the line base in `projectTokens`. That's O(tokens), still clone-free, and stays fresh because it's only read synchronously.
+- `lineTokens(text, 0, …)` still runs `shift(..., 0)`, which clones every parsed token for nothing. Since you want the parser unchanged this is optional, but dropping `base`/`shift` is safe.
+
+**Gates before adoption**
+- **Oracle (public SourceTextarea):** across randomized edit/selection sequences, the candidate's `Projector` output (`text`, `links`, `parts`, `view`) and its `sameActiveTokens` answers must match a fresh baseline `project()`. Cover:
+  - caret exactly at token start and end, and selections touching, spanning and reversed
+  - NaN/±Infinity selections
+  - CRLF, astral/emoji characters before links
+  - front-matter open/close, nested fences of `` ` `` vs `~` and different lengths, indented code
+  - line insert/delete/swap in prefix, middle and suffix positions
+  - duplicate identical lines
+  - a title rename affecting `[[…]]`, and a doc → no-`[` → doc round-trip
+  - a large document followed by a small one (for retained capacity)
+- **Native:** run the matched native-input tasks and all interaction-matrix tasks on the same build, baseline vs candidate, with identical seeds. Report per-task input latency and long-task distributions plus heap after the document switch.
+
+No GC or 120 Hz win can be claimed until those runs exist; that matches your constraint.
