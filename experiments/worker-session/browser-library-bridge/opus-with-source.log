@@ -1,0 +1,39 @@
+**2 blockers.**
+
+**1. A second editor path bypasses the singleton FIFO queue**
+- **Where:** `browser-worker-documents.ts`, the `editor` object on the returned document (`replace`, `undo`, `merge`, `adopt`, `release`). These call `client.ReplaceReceipt`, `UndoQueued`, `MergeCandidate` and `Adopt` directly, beside `queue()`.
+- **Problem:**
+  - Direct calls advance or replace the worker's `epoch`/`sequence` without the queue's `source`/`sequence` knowing.
+  - Direct `replace` skips the main-side compact-ACK check (`expectedSource` length, `beforeLength`, epoch and sequence), so the same-basis attestation can't be relied on.
+  - Direct `Adopt` swaps the worker's basis under the queue.
+  - Later queue edits fail closed with `BasisUnavailable`, which is reported as `unknown`, so FIFO and same-basis attestation stop holding.
+- **Fix:** remove the `editor` field. `queue()` should be the only way to change the editor.
+
+**2. The notice observer can stop silently**
+- **Where:** the `ObserveNotice` fork.
+- **Problem:**
+  - A cause that is only interrupts is treated as harmless, even when we aren't closing. A worker-side interrupt counts.
+  - If the stream simply finishes, nothing happens either.
+  - Either way the last notice (`canWrite`, `status.unsaved`) stays frozen as "writable / saved", and nothing calls `retain`.
+  - The cleanup that interrupts the observer runs before the close cleanup sets `closing`. So just checking `closing` would wrongly retain on every normal close.
+- **Fix:** register a cleanup that sets `closing = true` just before forking the observer, so it runs before the observer is interrupted. Then retain on any end while not closing:
+
+  ```ts
+  yield* Effect.addFinalizer(() => Effect.sync(() => { closing = true }))
+  yield* client.ObserveNotice().pipe(
+   Stream.runForEach(/* unchanged */),
+   Effect.andThen(Effect.suspend(() => closing ? Effect.void : retain(unavailable()))),
+   Effect.catchCause(cause => closing && Cause.hasInterruptsOnly(cause) ? Effect.void : retain(cause)),
+   Effect.forkScoped({ startImmediately: true }),
+  )
+  ```
+
+**No blockers in the other areas you listed:**
+- **Admission:** an epoch bump turns writes off until the new epoch's notice arrives. The worker checks the epoch and `canWrite` inside the same permit.
+- **Compact ACK:** given equal sources at `Begin`, the worker's `sourceAfterRanges` check plus the main-side lengths/epoch/sequence keep main and worker in step.
+- **Fallback replay:** checked with `nextSource === expectedSource` before anything is changed.
+- **Close / draft retention:** freeze, then settle, then retain on any failure, then `Close`. A failed worker flush comes back as a failure and is retained.
+
+Assumed, not checked: `draftFor(...).settle` covers the queue's `settle`. The queue is created after `draftFor`, so make sure that's wired up somewhere.
+
+written with claude-opus-5-5 in claude CLI

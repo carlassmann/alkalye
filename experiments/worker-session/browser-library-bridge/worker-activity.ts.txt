@@ -1,0 +1,153 @@
+import * as Effect from "effect/Effect"
+import * as FiberSet from "effect/FiberSet"
+import * as Layer from "effect/Layer"
+import * as Option from "effect/Option"
+import * as Queue from "effect/Queue"
+import * as Schema from "effect/Schema"
+import * as Stream from "effect/Stream"
+import { BackgroundWork, makeBackgroundWork } from "./src/platform/background-work"
+import { DocumentLifecycle } from "./src/platform/document-lifecycle"
+import { protectDocumentDrafts } from "./src/client/document-lifecycle"
+
+export interface ProtectionReceipt { order: number; uncertainty: number }
+export interface WorkerProtection { unsaved: number; dirty: boolean }
+
+let mainSignal = Schema.Struct({ kind: Schema.Literals(["interaction", "hidden"]) })
+let workerSignal = Schema.Union([
+ Schema.Struct({ kind: Schema.Literal("ready") }),
+ Schema.Struct({ kind: Schema.Literal("protection"), dirty: Schema.Boolean }),
+])
+
+export function makeWorkerActivity(name: string) {
+ return Effect.gen(function* () {
+  let work = yield* makeBackgroundWork()
+  let hidden = yield* Queue.sliding<void>(1)
+  yield* Effect.addFinalizer(() => Queue.shutdown(hidden))
+  let channel = yield* Effect.acquireRelease(
+   Effect.sync(() => new BroadcastChannel(name)),
+   channel => Effect.sync(() => { channel.close() }),
+  )
+  let closed = false
+  let hasUnsaved: (() => boolean) | undefined
+  let lastDirty: boolean | undefined
+  let interactions = 0
+  let hides = 0
+  let snapshotAdmissions = 0
+  let snapshotRequests = 0
+  function receive(event: MessageEvent<unknown>) {
+   let decoded = Schema.decodeUnknownOption(mainSignal)(event.data)
+   if (closed || Option.isNone(decoded)) return
+   if (decoded.value.kind === "interaction") { interactions++; work.interact() }
+   else { hides++; work.release(); Queue.offerUnsafe(hidden, undefined) }
+  }
+  yield* Effect.acquireRelease(
+   Effect.sync(() => channel.addEventListener("message", receive)),
+   () => Effect.sync(() => channel.removeEventListener("message", receive)),
+  )
+  yield* Effect.addFinalizer(() => Effect.sync(() => { closed = true; work.release() }))
+  function publish() {
+   if (closed || !hasUnsaved) return
+   let dirty = hasUnsaved()
+   if (dirty === lastDirty) return
+   lastDirty = dirty
+   channel.postMessage({ kind: "protection", dirty })
+  }
+  let lifecycle = {
+   changes: Stream.never,
+   hidden: Stream.fromQueue(hidden),
+   protect(readUnsaved: () => boolean) {
+    hasUnsaved = readUnsaved
+    return Effect.sync(() => ({ update: publish }))
+   },
+  }
+  channel.postMessage({ kind: "ready" })
+  return {
+   layer: Layer.merge(Layer.succeed(BackgroundWork, { ...work, beforeSnapshot: Effect.sync(() => { snapshotRequests++ }).pipe(Effect.andThen(work.beforeSnapshot), Effect.tap(() => Effect.sync(() => { snapshotAdmissions++ }))) }), Layer.succeed(DocumentLifecycle, lifecycle)),
+   release: work.release,
+   publish,
+   dirty() { return hasUnsaved?.() ?? false },
+   inspect() { return { interactions, hides, snapshotRequests, snapshotAdmissions } },
+  }
+ })
+}
+
+export function forwardWorkerActivity(name: string, hasPendingNativeEdits: () => boolean, readProtection: () => Effect.Effect<WorkerProtection, unknown>) {
+ return Effect.gen(function* () {
+  let reads = yield* FiberSet.make()
+  let runRead = yield* FiberSet.runtime(reads)()
+  let refreshing = false
+  let refreshAgain = false
+  let issued = 0
+  let confirmed = 0
+  let workerDirty = false
+  let rpcDirty = false
+  let uncertainty = 0
+  let closed = false
+  let cleanClose = false
+  let channel = yield* Effect.acquireRelease(
+   Effect.sync(() => new BroadcastChannel(name)),
+   channel => Effect.sync(() => { closed = true; channel.close() }),
+  )
+  let protection = yield* protectDocumentDrafts(() => hasPendingNativeEdits() || (!cleanClose && (workerDirty || rpcDirty)))
+  function sendLifecycle() {
+   if (closed || cleanClose) return
+   channel.postMessage({ kind: document.visibilityState === "visible" ? "interaction" : "hidden" })
+  }
+  function receive(event: MessageEvent<unknown>) {
+   let decoded = Schema.decodeUnknownOption(workerSignal)(event.data)
+   if (closed || cleanClose || Option.isNone(decoded)) return
+   if (decoded.value.kind === "ready") { if (document.visibilityState !== "visible") hidden() }
+   else {
+    workerDirty = decoded.value.dirty
+    protection.update()
+    if (!workerDirty && rpcDirty) refreshProtection()
+   }
+  }
+  yield* Effect.acquireRelease(Effect.sync(() => {
+   let listeners = new AbortController()
+   let options = { capture: true, passive: true, signal: listeners.signal }
+   for (let type of ["keydown", "beforeinput", "input", "pointerdown", "wheel", "scroll", "touchmove", "compositionstart", "compositionupdate"])
+    document.addEventListener(type, interact, options)
+   document.addEventListener("pointermove", event => { if (event.buttons) interact() }, options)
+   document.addEventListener("visibilitychange", sendLifecycle, options)
+   window.addEventListener("pagehide", hidden, options)
+   channel.addEventListener("message", receive, { signal: listeners.signal })
+   return listeners
+  }), listeners => Effect.sync(() => listeners.abort()))
+  return {
+   update: protection.update,
+   beginReceipt,
+   confirmedUnsaved(receipt: ProtectionReceipt, count: number) { confirm(receipt, count > 0) },
+   uncertain() { uncertainty++; rpcDirty = true; protection.update(); if (!workerDirty) refreshProtection() },
+   closedCleanly() { if (hasPendingNativeEdits()) return false; cleanClose = true; workerDirty = false; rpcDirty = false; protection.update(); return true },
+  }
+  function beginReceipt(): ProtectionReceipt { return { order: ++issued, uncertainty } }
+  function confirm(receipt: ProtectionReceipt, dirty: boolean) {
+   if (closed || cleanClose) return
+   if (!dirty && (receipt.uncertainty !== uncertainty || receipt.order < confirmed)) return
+   confirmed = Math.max(confirmed, receipt.order)
+   rpcDirty = dirty
+   protection.update()
+   if (dirty && !workerDirty && !refreshing) refreshProtection()
+  }
+  function refreshProtection() {
+   if (closed || cleanClose || !rpcDirty) return
+   if (refreshing) { refreshAgain = true; return }
+   refreshing = true
+   let receipt = beginReceipt()
+   runRead(readProtection().pipe(
+    Effect.tap(status => Effect.sync(() => confirm(receipt, status.dirty || status.unsaved > 0))),
+    Effect.catch(() => Effect.void),
+    Effect.ensuring(Effect.sync(() => {
+     refreshing = false
+     let again = refreshAgain || receipt.uncertainty !== uncertainty
+     refreshAgain = false
+     if (again && !workerDirty) refreshProtection()
+    })),
+    Effect.asVoid,
+   ))
+  }
+  function interact() { if (!closed && !cleanClose && document.visibilityState === "visible") channel.postMessage({ kind: "interaction" }) }
+  function hidden() { if (closed || cleanClose) return; channel.postMessage({ kind: "hidden" }) }
+ })
+}

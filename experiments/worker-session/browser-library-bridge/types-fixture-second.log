@@ -1,0 +1,3 @@
+browser-fixture.ts(41,3): error TS2322: Type 'Effect<unknown, never, unknown>' is not assignable to type 'Effect<boolean, unknown, never>'.
+  Type 'unknown' is not assignable to type 'boolean'.
+editor-queue.ts(552,61): error TS2339: Property 'asLazy' does not exist on type 'typeof import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect")'.

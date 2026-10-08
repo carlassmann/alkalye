@@ -1,0 +1,17 @@
+PASS fixture not ready: {"stage":"ready"}
+{"typed":{"failed":false,"observations":4,"pending":0,"queue":"---\ntitle: Worker fixture\n---x\nLine 🦊.\n","readonly":false,"source":"---\ntitle: Worker fixture\n---x\nLine 🦊.\n"}}
+{"accepted":{"length":40,"observations":7}}
+43 | 			},
+44 | 		},
+45 | 	)
+46 | 	if (result.status !== 0) {
+47 | 		let failure = result.error?.message || result.stderr || result.stdout
+48 | 		throw new Error(`${session} ${args[0]}: ${failure}`)
+                 ^
+error: worker-library-1791472599624 eval: {"success":false,"data":null,"error":"Evaluation error: Error: named metadata intent merges exact worker source\n    at check (http://localhost:63409/browser-fixture.js:30180:11)\n    at http://localhost:63409/browser-fixture.js:30293:7\n    at Generator.next (<anonymous>)\n    at ~effect/Effect/successCont (http://localhost:63409/browser-fixture.js:3312:28)\n    at ~effect/Effect/evaluate (http://localhost:63409/browser-fixture.js:1078:30)\n    at FiberImpl.runLoop (http://localhost:63409/browser-fixture.js:2931:95)\n    at FiberImpl.evaluate (http://localhost:63409/browser-fixture.js:2885:23)\n    at Array.<anonymous> (http://localhost:63409/browser-fixture.js:3197:17)\n    at doneUnsafe (http://localhost:63409/browser-fixture.js:4836:17)\n    at PrimitiveImpl.~effect/Effect/args (http://localhost:63409/browser-fixture.js:4822:73)"}
+
+      at browser (/private/tmp/alkalye-browser-worker-open/runtime/tests/browser-driver.ts:48:13)
+      at evaluate (/private/tmp/alkalye-browser-worker-open/runtime/tests/browser-driver.ts:166:9)
+      at /private/tmp/alkalye-browser-worker-open/runtime/tests/browser-worker-library.ts:14:2
+
+{"fixture":{"assertions":["simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections","browser identity is available before any network authentication","native browser account login serializes cookie issuance and agrees with server verification","real server seeds without main Replica","Begin initializes exact native source from sole worker: {\"expected\":\"---\\ntitle: Worker fixture\\n---\\nLine 🦊.\\n\",\"actual\":\"---\\ntitle: Worker fixture\\n---\\nLine 🦊.\\n\"}","overlapping opened lease refuses competing editor FIFO","real accepted source equals actual native and queued source","bounded Observe active during native editing","Observe DTO has no full source/atom projection","real accepted source equals actual native and queued source","bounded Observe active during native editing","Observe DTO has no full source/atom projection"],"stage":"ready"},"inspection":{"failed":false,"observations":14,"pending":0,"queue":"---\ntitle: \"Named update\"\n---\nLine 🦊.\n","readonly":false,"source":"---\ntitle: \"Named update\"\n---\nLine 🦊.\n"}}

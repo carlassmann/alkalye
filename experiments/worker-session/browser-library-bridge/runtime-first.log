@@ -1,0 +1,12 @@
+178 | 		)
+179 | 		throw new Error("Browser condition failed: " + source, { cause: error })
+180 | 	}
+181 | }
+182 | export function assert(condition: unknown, message: string) {
+183 | 	if (!condition) throw new Error(message)
+                                 ^
+error: fixture not ready: {"failure":"Error: Begin initializes exact native source from sole worker","stage":"failed"}
+      at assert (/private/tmp/alkalye-browser-worker-open/runtime/tests/browser-driver.ts:183:28)
+      at /private/tmp/alkalye-browser-worker-open/runtime/tests/browser-worker-library.ts:8:2
+
+{"fixture":{"assertions":["simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections","browser identity is available before any network authentication","native browser account login serializes cookie issuance and agrees with server verification","real server seeds without main Replica"],"failure":"Error: Begin initializes exact native source from sole worker","stage":"failed"},"inspection":{}}

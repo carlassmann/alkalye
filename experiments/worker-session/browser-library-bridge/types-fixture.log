@@ -1,0 +1,5 @@
+browser-fixture.ts(41,103): error TS2339: Property 'changes' does not exist on type '{ undo(redo: boolean): Effect<{ status: "unknown" | "applied" | "not-applied"; action?: string | undefined; failure?: string | undefined; }, unknown, never>; replace: (ranges: readonly TextReplacement[], expectedSource?: string | undefined, fallback?: (() => readonly TextReplacement[]) | undefined, clipboardToken?: ...'.
+browser-fixture.ts(41,139): error TS18046: 'state' is of type 'unknown'.
+browser-fixture.ts(41,169): error TS18046: 'state' is of type 'unknown'.
+browser-fixture.ts(61,70): error TS2554: Expected 2-3 arguments, but got 4.
+browser-fixture.ts(86,42): error TS2322: Type '"reader"' is not assignable to type '"owner"'.

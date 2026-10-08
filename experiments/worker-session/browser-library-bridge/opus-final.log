@@ -1,0 +1,29 @@
+**One definite blocker.** The rest are lower-confidence notes.
+
+## Blocker: an admission refresh while an edit is in flight kills the editor queue
+
+How it happens:
+- `replace()` and `undo()` record the admission epoch (`admissionEpoch()`) when the edit is enqueued, say N.
+- `admission(next)` sets `admission = next` and sends `client.AdmissionEpoch` right away. It doesn't wait for queued edits to drain.
+- In the worker, `AdmissionEpoch` and `ReplaceReceipt` are ordered only by when they reach `commands.withPermit`. If the epoch bump gets there first, `ReplaceReceipt` with N hits `input.admissionEpoch !== current.admissionEpoch` and fails with PermissionDenied. `UndoQueued` fails the same way through `admitted()`.
+- The queue then sets `failure` permanently. The edit is marked `delivery: "unknown"`, even though the worker rejected it before applying anything. Every later `replace`, `merge` and clipboard call throws `blocked()`.
+- The queue can't be rebuilt, because `queueCreated` is already true. Since `idleTimeToLive: 0` only releases with the last holder, editing stays dead until every consumer releases the document.
+
+This is a common path, not an edge case. `online` is part of the admission, so an online/offline flip while the user is typing triggers it.
+
+Fix options:
+1. Drain the queue before sending `AdmissionEpoch`, or send the bump through the queue so it's ordered after pending edits.
+2. Or have the worker accept the previous epoch for edits already enqueued, as long as the new admission still allows writing.
+3. Also treat an epoch-mismatch PermissionDenied as "rejected", not "unknown", so the draft isn't flagged as possibly applied when the worker never applied it.
+
+## Notes (couldn't confirm from this source)
+
+- **`canWrite` may stay false after `admission()`.** The main side sets the notice's `canWrite: false`. It only becomes true again when the worker emits a notice with the new epoch, which depends on `capability.changes` emitting after `current.admissionEpoch` is bumped. If that stream drops duplicates and nothing else changed (same online/role), no new notice arrives. Safer: have `AdmissionEpoch` return a fresh notice and `set` it.
+- **Close has no timeout.** If the worker dies or hangs, `draft.settle` and `client.Close()` in the finalizer can block forever.
+- **Undo can look like a failure on close.** After an applied undo, `commandFrozen` stays true until a matching Adopt runs. If the user closes before a merge/adopt, `settle` returns false and the draft is retained as `AppliedUnknown`. Check that this is intended.
+- **`Begin` failure can't be retried.** `queue()` sets `queueCreated = true` before `Begin`, so one transient failure disables the queue for the rest of the session.
+
+## The two prior repairs look correct
+
+- **Bypass:** the returned object doesn't expose `client`, and `ReplaceQueued` is rejected in the worker.
+- **Observer:** finalizers run in reverse, so `closing = true` runs, then the observer is interrupted (its interrupt-only cause is ignored), then settle/Close, then `queueScope`. A normal stream end or a failure cause while not closing goes through `retain`.

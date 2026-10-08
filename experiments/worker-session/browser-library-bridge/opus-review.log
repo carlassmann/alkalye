@@ -1,0 +1,14 @@
+
+<invoke name="Read">
+<parameter name="file_path">/tmp/alkalye-browser-worker-open/runtime/browser-worker-documents.ts</parameter>
+</invoke>
+<invoke name="Read">
+<parameter name="file_path">/tmp/alkalye-browser-worker-open/runtime/worker-rpc.ts</parameter>
+</invoke>
+<invoke name="Read">
+<parameter name="file_path">/tmp/alkalye-browser-worker-open/runtime/worker-session.ts</parameter>
+</invoke>
+<invoke name="Read">
+<parameter name="file_path">/tmp/alkalye-browser-worker-open/runtime/editor-queue.ts</parameter>
+</invoke>
+[Tool results not included]

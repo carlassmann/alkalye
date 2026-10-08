@@ -1,0 +1,136 @@
+import * as Cause from "effect/Cause"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
+import * as Scope from "effect/Scope"
+import * as RcMap from "effect/RcMap"
+import * as Stream from "effect/Stream"
+import * as SubscriptionRef from "effect/SubscriptionRef"
+import { forwardWorkerActivity } from "./worker-activity"
+import { makeEditorQueue } from "./editor-queue"
+import { createWorkerSessionClient } from "./worker-client"
+import { WorkerDocumentFailure } from "./worker-rpc"
+import type { MetadataPatch } from "./src/shared/document-metadata"
+import type { WorkerAdmissionSchema, WorkerOpenedNoticeSchema } from "./worker-opened-schemas"
+
+interface DocumentOpenOptions {
+ readonly document: string
+ readonly workspace: string
+ readonly subject: string
+ readonly origin: string
+ readonly activityChannel: string
+ readonly admission: typeof WorkerAdmissionSchema.Type
+}
+interface MainDraftOwner {
+ pending(): boolean
+ freeze(): void
+ settle: Effect.Effect<boolean, unknown>
+ retain(failure: unknown): Effect.Effect<void>
+}
+
+export function makeWorkerSharedDocumentLookup(
+ workerUrl: string,
+ optionsFor: (document: string) => Effect.Effect<DocumentOpenOptions>,
+ draftFor: (document: string) => MainDraftOwner,
+) {
+ return Effect.gen(function* () {
+  return open
+
+  function open(document: string) {
+   return Effect.gen(function* () {
+    let options = yield* optionsFor(document)
+    let draft = draftFor(document)
+    let admission = options.admission
+    let failed = false
+    let closing = false
+    let queueCreated = false
+    let client = yield* createWorkerSessionClient(workerUrl)
+    let activity = yield* forwardWorkerActivity(options.activityChannel, draft.pending, () => client.Protection())
+    let first = yield* client.Open({ ...options, online: admission.online, cooperativeWork: true })
+    let queueScope = yield* Effect.acquireRelease(Scope.make(), scope => Scope.close(scope, Exit.void))
+    let notices = yield* SubscriptionRef.make<typeof WorkerOpenedNoticeSchema.Type>({
+     revision: first.revision,
+     admissionEpoch: admission.epoch,
+     metadata: first.projection?.metadata,
+     canWrite: first.canWrite,
+     connection: first.connection,
+     status: first.status,
+    })
+    function unavailable() {
+     return new WorkerDocumentFailure({ reason: "PermissionDenied", category: "access" })
+    }
+    function canWrite() {
+     let notice = SubscriptionRef.getUnsafe(notices)
+     return !failed && !closing && admission.exists && !admission.deleted && admission.account === "ready" && admission.role !== undefined && admission.role !== "reader" && notice.admissionEpoch === admission.epoch && notice.canWrite
+    }
+    function retain(failure: unknown) {
+     return Effect.sync(() => { failed = true; draft.freeze(); activity.uncertain() }).pipe(Effect.andThen(SubscriptionRef.update(notices, notice => ({ ...notice, canWrite: false }))), Effect.andThen(draft.retain(failure)))
+    }
+    function admitted<A, E, R>(command: (epoch: number) => Effect.Effect<A, E, R>) {
+     return Effect.suspend((): Effect.Effect<A, E | WorkerDocumentFailure, R> => canWrite() ? command(admission.epoch) : Effect.fail(unavailable()))
+    }
+    yield* Effect.addFinalizer(() => Effect.gen(function* () {
+     closing = true
+     draft.freeze()
+     let settled = yield* draft.settle.pipe(Effect.catch(error => retain(error).pipe(Effect.as(false))))
+     if (!settled) yield* retain(new WorkerDocumentFailure({ reason: "AppliedUnknown", category: "conflict" }))
+     let closedCleanly = yield* client.Close().pipe(Effect.as(true), Effect.catch(error => retain(error).pipe(Effect.as(false))))
+     if (settled && closedCleanly && !failed) activity.closedCleanly()
+    }))
+    yield* client.ObserveNotice().pipe(
+     Stream.runForEach(notice => notice.admissionEpoch !== admission.epoch || notice.revision < SubscriptionRef.getUnsafe(notices).revision ? Effect.void : SubscriptionRef.set(notices, notice)),
+     Effect.andThen(Effect.suspend(() => closing ? Effect.void : retain(unavailable()))),
+     Effect.catchCause(cause => closing && Cause.hasInterruptsOnly(cause) ? Effect.void : retain(cause)),
+     Effect.forkScoped({ startImmediately: true }),
+    )
+    // Scope finalizers run backwards: mark closing before interrupting Observe.
+    yield* Effect.addFinalizer(() => Effect.sync(() => { closing = true }))
+    return Object.freeze({
+     document,
+     initial: first,
+     current: () => ({ ...SubscriptionRef.getUnsafe(notices), canWrite: canWrite(), failed }),
+     changes: SubscriptionRef.changes(notices).pipe(Stream.map(() => ({ ...SubscriptionRef.getUnsafe(notices), canWrite: canWrite(), failed, closing }))),
+     admission: (next: typeof WorkerAdmissionSchema.Type) => Effect.suspend(() => {
+      if (next.subject !== admission.subject || next.epoch <= admission.epoch) return retain(unavailable()).pipe(Effect.andThen(Effect.fail(unavailable())))
+      admission = next
+      return SubscriptionRef.update(notices, notice => ({ ...notice, canWrite: false })).pipe(Effect.andThen(client.AdmissionEpoch({ admission: next })),Effect.catch(error => retain(error).pipe(Effect.andThen(Effect.fail(error)))))
+     }),
+     queue: () => Effect.suspend(() => {
+      if (queueCreated || failed || closing) return Effect.fail(new WorkerDocumentFailure({ reason: "BasisUnavailable", category: "conflict" }))
+      queueCreated = true
+      return Effect.gen(function* () {
+       let initial = yield* client.Begin()
+       let queue = yield* makeEditorQueue(client, initial, () => {
+        if (!canWrite()) throw unavailable()
+        return admission.epoch
+       }).pipe(Scope.provide(queueScope))
+       return { initial, queue }
+      })
+     }),
+
+     save: client.Flush(),
+     synchronize: client.Synchronize(),
+     unsaved: () => SubscriptionRef.getUnsafe(notices).status.unsaved,
+     properties: Object.freeze({
+      update: (patch: MetadataPatch) => admitted(admissionEpoch => client.PropertiesUpdate({ patch, admissionEpoch })),
+      presentation: (enabled: boolean) => admitted(admissionEpoch => client.Presentation({ enabled, admissionEpoch })),
+      present: (index: number) => admitted(admissionEpoch => client.Present({ index, admissionEpoch })),
+      execute: (token: string) => admitted(admissionEpoch => client.ExecuteAdmitted({ token, admissionEpoch })),
+      release: client.Release,
+     }),
+    })
+   })
+  }
+ })
+}
+
+export function makeBrowserWorkerDocuments(
+ workerUrl: string,
+ optionsFor: (document: string) => Effect.Effect<DocumentOpenOptions>,
+ draftFor: (document: string) => MainDraftOwner,
+) {
+ return Effect.gen(function* () {
+  let lookup = yield* makeWorkerSharedDocumentLookup(workerUrl, optionsFor, draftFor)
+  let documents = yield* RcMap.make({ lookup, idleTimeToLive: 0 })
+  return Object.freeze({ open: (document: string) => RcMap.get(documents, document) })
+ })
+}
