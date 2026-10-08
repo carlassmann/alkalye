@@ -472,6 +472,19 @@
 			<code>experiments/worker-session/opened-observation</code>.
 		</p>
 		<p>
+			The integrated worker-opened fixture now passes 16 checks through the
+			actual native editor, FIFO and activity lifecycle, with observation
+			active. Eight keystrokes, replacing a newly typed character and Undo
+			reached the real server with exact source. When journal storage refused a
+			write, the editor froze; a main-tab recovery textarea retained its full
+			native draft and five pending edits remained recoverable. Unload
+			protection stayed active, durable Close failed, and the recovery owner
+			survived editor and worker disposal. This tests refusal, not interrupted
+			saves. Large-file observation cost, task and history commands, whiteboards
+			and the full production cutover remain unproved. Evidence:
+			<code>experiments/worker-session/opened-native</code>.
+		</p>
+		<p>
 			The first cache reuses parsed link tokens when the caret moves through
 			unchanged Markdown. It still assembles each projection; document-title
 			changes invalidate the cache. In an isolated actual Editor, the median
