@@ -217,7 +217,7 @@
 			302–507ms including driver round trips. Main heap samples were 8–44MB;
 			worker heap and total browser memory were unavailable. This bounded
 			prototype supports input isolation, not a causal full-app speedup or 120Hz
-			presentation claim. Undo, anchor-dependent features, sustained input and
+			presentation claim. Anchor-dependent features, sustained throughput and
 			worker failure recovery remain production gates. Evidence:
 			<code>experiments/worker-session/actual-editor</code>.
 		</p>
@@ -230,6 +230,23 @@
 			command applied without saving, and draft recovery after main-tab reload,
 			remain unproved. Evidence:
 			<code>experiments/worker-session/recovery</code>.
+		</p>
+		<p>
+			Sustained typing exposed a throughput blocker. In a 1MiB document, 72
+			trusted key presses at roughly 104ms intervals kept every main-thread task
+			below 2.70ms, but the worker queue reached 38 edits and took another 8.60
+			seconds to drain. Rapid text entry reached 68 queued edits and an
+			11.27-second drain. Worker tasks reached 396–399ms. Main heap samples
+			peaked at 156MB and 217MB; total browser memory was unavailable.
+		</p>
+		<p>
+			Both finite runs preserved every character and four peer edits, matched
+			the accepted server snapshot, and reopened the local journal offline. The
+			peer worker shared the same account and journal. Peer delivery during
+			typing and bounded backlog remain unproved. These results block production
+			adoption despite responsive input. One run per arm, approximately 60Hz
+			headless rendering. Evidence:
+			<code>experiments/worker-session/sustained-editor</code>.
 		</p>
 		<p>
 			Active-line geometry caching was rejected. Six valid rich-document wheel
