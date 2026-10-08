@@ -1,0 +1,24 @@
+**Verdict: adopt.** I found no correctness or adoption blockers. I only used Read/Grep, except for one accidental no-op `echo` call. I didn't run any tests or edit anything.
+
+**Correctness (candidate vs baseline)**
+- **Two records, two distinct sources.** `previousProjected` is only set when `previous.source !== source` (`source-textarea.ts:289`). A restore swaps the two records (`:281`). So the two never hold the same source, and the restore at `:271` can't run when the source is unchanged.
+- **Exact key.** A restore needs the same source, documents key, mode, prefix, start and end. It never reuses tokens through `sameActiveTokens`, which matters because the Projector is stale for the restored source.
+- **Stale Projector is safe.** `sameActiveTokens` rejects a different source (`projection.ts:54`), so it falls through to `project()`. That diffs line by line against whatever source it last saw (`:99-160`). The rebuild is correct, and it explains the caret 4.1→5.9ms cost. The public `Projector` is unchanged.
+- **Redo comes free.** After a caret move on the restored source, `:289` doesn't evict the newer record, so the redo inverse stays cached.
+- **`input()` doesn't touch the records.** It builds a new object through `applyViewReplacement`. `apply` still diffs `sourceIndex`. `dispose` clears both records and the Projector.
+- **Proof.** All 313 assertions pass across: restore, inclusive boundary, redo/undo with a changed caret, retitle, raw/hold/project switches, hold draft, and third-source eviction. All 6 trials have identical `acceptedEditHash`/`acceptedUndoHash` and `failures: []`.
+
+**Limits (fine as long as they're documented, not claimed as fixed)**
+- Only one inverse is cached, so undoing grouped typing (S0→S1→S2) misses.
+- A remote `reconcile` between input and Undo evicts the record.
+- A restore needs the exact caret, and `hold` records never match `project`.
+- `projection` is borrowed and only shallow-readonly. A mutation of `links`/`parts`/`view` would now survive across Undo. This is a contract to keep, not a blocker.
+
+**Gates still required**
+1. Port the fixture stages into repo integration and journey tests. Add the two not yet covered: a remote reconcile between input and Undo, and a caret move on the same source between input and Undo.
+2. `bun run check`, then `bun run test:e2e:full`.
+3. Changelog entry, then a PR and `bun run ci` with `signoff: success` on the exact head.
+4. Optional: deep-readonly types on the `projection` getter.
+5. Claim only the Undo-task gain (median 20.9→14.7ms). Disclose the caret regression and the trial-0 input noise. Make no total-work, GC, heap or 120fps claim.
+
+**Tradeoff:** two bounded projection graphs plus the one existing Projector is reasonable. It holds at most one extra ~1MiB text plus its links, with no second Projector or other new context. It costs about 1.8ms more on the first caret move after Undo and saves about 6ms on the Undo itself. Grouped-Undo and remote-eviction misses fall back to baseline cost.

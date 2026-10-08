@@ -1,0 +1,29 @@
+I found no correctness blockers in the candidate. I only read the two `source-textarea.ts` snapshots, the shared `projection.ts` and the relevant `editor.ts` and `editor-overlay.ts` call sites; nothing was run.
+
+**Why the cache is safe:**
+- **Two distinct sources only.** `previousProjected` is filled only when the source changes (`source-textarea.ts:289`), and a restore swaps the two records (`:281`). So the old record and the current one never hold the same source. A selection, document or mode refresh on the same source keeps the old record. A restore can only happen when the source differs.
+- **Exact key.** A hit needs the same source, document key (`id:title`, in order), mode, `iconPrefix`, start and end. A renamed or reordered document, a mode change (including `hold`) or a different caret falls back to `project`.
+- **Stale Projector.** After a restore, the Projector may still hold the newer source. `sameActiveTokens` returns false when its source differs (`projection.ts:54`), so a later caret change on the restored source reprojects. It does not reuse stale tokens.
+- **Projector holds the same source but older documents.** This is still safe. Token spans come from the regexes in `lineTokens`, `wikiLink` and `markdownLink` and don't depend on the documents. The documents only change the label, target and broken flag, and the record's key already covers them.
+- **The record's caret moves** (`:267`) only when the active token range is unchanged. The test in `activeTokens` matches the inclusive `end >= start && start <= end` test in `projectTokens`, so the cached value equals what a fresh projection would give.
+- **Restored value equals a fresh projection.** Output depends only on source, active tokens, documents and `iconSpace`. Lines with `[[` are re-tokenized whenever the documents change.
+- **Old projections aren't changed.** `input()` builds a new object through `applyViewReplacement`, and `moved` copies the links it shifts. Unchanged link objects are shared by reference, which is fine as long as nothing writes to them.
+- **Index, viewport and overlay.** `apply` still diffs `current.source` to update `sourceIndex`, and the viewport and paint code are unchanged. The overlay's `this.projection ===` check could see an old object come back, but that already happens in the baseline when the first branch returns `previous.value` after an input.
+- **`dispose`** clears both records and the Projector.
+
+**Limits (missed hits, still correct):**
+- The record's caret is the last caret `projectionFor` saw for the old source. If the caret moved and the user typed before `sync` ran, the cached caret is wrong and Undo falls back.
+- Only one undo step back is cached. If `sync` runs after each input, S0→S1→S2 drops S0, so undoing a grouped run of typing misses.
+- A remote `reconcile` between the input and the Undo pushes the pre-input record out.
+- `hold`-mode records never match `project`-mode Undo.
+- The `iconPrefix` key part is redundant because it's a module-private live binding. It does no harm.
+
+**Required contracts:**
+- `projection` is borrowed and must not be mutated, including deep fields (`links`, `parts`, `view`). `Readonly<Projection>` is only shallow. A mutation would now survive in the cached record across Undo, not just until the next projection. Optional hardening: give the getter deep readonly types (`ReadonlyArray`).
+- The `Projector` contract stays: `sameActiveTokens` must reject any source other than its own, and token spans must not depend on the documents.
+- `iconPrefix` must stay constant.
+- Undo must deliver the exact pre-input caret in source coordinates through `replace` or `reconcile`.
+
+**Minimal fix:** none required. Integration tests worth adding: Undo restore then moving the caret to another token on the same source; renaming a document between input and Undo; Undo after a remote reconcile; a caret change on the same source between input and Undo keeping the old record.
+
+**Verdict:** correct as written. Adopt it after the journey tests above; no speed claim is made here.
