@@ -1,0 +1,24 @@
+Verdict: the narrow claims hold. What the evidence supports: 1 MiB source, 8 trusted inputs, largest main task 2.314 ms, FIFO and native source exact, independent offline reopen exact from IndexedDB, no main Replica/Session in the fixture. I found no false pass in the core assertions. Several claims are worded more broadly than the evidence, and the summary has one data error.
+
+**Wrong or overstated claims**
+1. **"position 9" isn't proven.** `accepted()` asserts only that the source matches (`browser-fixture.ts:87`). `position` is never compared across native, worker and server. It comes from the `acceptedFixture` result (imported from `./seed`), which wasn't in the review set. Drop it or add an assertion.
+2. **Heap label is wrong.** `budget-summary.json:438` `finalMainHeap` = 96502945, which equals `heap.peak` in verification. The real `heap.end` is 27688288. Rename it to `peakMainHeap`. Also note the transient spike of about 76 MB over a 20 MB start for a 1 MiB doc. Don't call memory bounded.
+3. **"10 fixture assertions" is really 6 proof assertions.** "native local source exactly accepted by real server" appears twice (verification:8–9), and the first 3 come from `bootstrapBrowserAccount`. So it's 9 distinct, 6 of them this proof.
+4. **"zero API requests" means zero `/api/*` requests through the proxy** (`server.ts:26`). Other paths aren't counted or blocked, and `Open` gets `online:false`, so zero is mostly by construction. The claim is "IDB-sourced reopen", not "no network".
+5. **Sync probably runs over HTTP long-poll, not WebSocket.** The proxy only forwards plain `fetch` and has no `websocket` handler (`server.ts:30`), so a WS upgrade can't pass through. "synced" likely went through the long-poll fallback. Don't claim WS relay coverage.
+
+**Measurement interpretation**
+6. **Mark attribution undercounts.** Unmarked tasks of 0.81 and 0.692 ms are interleaved inside the input burst (31.8 and 36.9 ms). That's likely follow-on work from inputs, so per-keystroke cost is more than the "input task". Only the "largest single main task ≤2.314 ms" bound is safe. The `opened:input` mark is defined in neither `browser-fixture.ts` nor `editor-queue.ts` (presumably `bindings.ts`), so where it's placed couldn't be checked.
+7. **Observe 0.060 ms isn't the Observe cost.** `materialize()` ships `document` including the full content (`worker-opened-capabilities.ts:72`), so each Observe probably clones about 1 MiB. That can't take 0.06 ms, so deserialization and decode happen in other, unmarked tasks (e.g. 1.376 ms at 95 ms, 1.088 ms at 2122 ms). Your "covered by largest main task" bound is valid. Don't present per-Observe numbers as cost. DTO size per observation isn't recorded.
+8. **This is a burst test, not typing cadence.** The 8 inputs land within 13 ms, so most fall inside one frame. Per-keystroke paint/layout at a realistic cadence (~100 ms apart) isn't isolated. The frame median is diluted by about 3 s of idle; only the max matters. ACKs are serialized about 9 ms apart, the last at about 75 ms after the last input. That's unmeasured worker latency, not a claim.
+9. **Only appending at the end is covered.** `verify` asserts `source + "abcdefgh"`. Mid-document edits, mapping into the 3022-char native fragment, and the whole-doc fallback in `replace()` (`editor-queue.ts:431–435`) aren't exercised. Nothing asserts the edit ranges were small.
+10. **"native" here means the editor's source string** (`editor.source.value`), not the DOM textarea fragment. The fragment holding `abcdefgh` isn't asserted.
+
+**Provenance gaps**
+11. **Network is blocked after the fresh worker is created** (`browser-fixture.ts:97–98`). Any `/api` calls during client construction escape both the block and the count. Low risk, but block first and then create the worker.
+12. **"No main Replica" is only shown at the import level.** Checking the built `browser-fixture.js` for Replica/Session would back it up properly.
+13. **Unexplained activity:** 3 observations fall outside the trace (28 vs 25), and Observe plus an unmarked task occur about 2.1 s after typing. Possibly `accepted()` polling `Read()` (a full DTO every 20 ms) overlapping the trace window. Confirm when it was called.
+
+Agree on the rest: the cold-open waits over 20 s are blockers, there's no 120 fps / after-commit / crash / parity / cutover claim, `performance.memory` is imprecise, and worker heap/time is unmeasured.
+
+written with claude-opus-5-5 in claude-code

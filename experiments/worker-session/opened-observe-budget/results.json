@@ -1,0 +1,115 @@
+{
+	"scope": "one frozen526-core actual native typing trial with full worker-openedObserve DTO and counter-only main consumer",
+	"baseArtifact": "e0a182f experiments/worker-session/opened-native",
+	"core": "52670c02b4138fc0f22646f24d2d383815a7d439",
+	"runtime": "/tmp/alkalye-worker-opened/editor-budget",
+	"types": {
+		"handle": 32895,
+		"exitCode": 0
+	},
+	"trial": {
+		"handle": 77488,
+		"exitCode": 0,
+		"n": 1
+	},
+	"verification": {
+		"handle": 99133,
+		"initialWaitExit": 1,
+		"waitTimeoutMs": 20000,
+		"eventualStage": "passed",
+		"assertions": 10,
+		"offlineReopenSourceExact": true,
+		"offlineApiRequests": 0,
+		"observedServerPosition": 9,
+		"distinctAssertions": 9,
+		"bootstrapAssertions": 3
+	},
+	"fixture": {
+		"initialUtf8Bytes": 1048576,
+		"initialUtf16CodeUnits": 986899,
+		"initialSourceSha256": "24c8bf5a98d12264fe5905d9107a7a2f10ae5d7709e7e43559d522ff9c35924d",
+		"finalSourceSha256": "74dd7806ccb6e1b90a754cc0b250507fef1e204a8dc7552cd47da96c4598fe9c",
+		"hostHeight": 800,
+		"nativeFragmentCodeUnits": 3022,
+		"trustedText": "abcdefgh"
+	},
+	"tasks": {
+		"windowMs": 3249.629,
+		"mainTaskMaxMs": 2.314,
+		"inputTaskMaxMs": 2.314,
+		"ackTaskCount": 8,
+		"observeTaskCount": 25,
+		"ackMarkedTaskMaxMs": 0.635,
+		"observeMarkedTaskMaxMs": 0.06
+	},
+	"frameOpportunities": {
+		"count": 196,
+		"medianMs": 16.699999999982538,
+		"maxMs": 16.800000000017462,
+		"over25ms": 0
+	},
+	"mainHeap": {
+		"peak": 96502945,
+		"start": 19931446,
+		"traceEnd": 96502945,
+		"afterOfflineEnd": 27688288
+	},
+	"sourceHashes": {
+		"browser-fixture.ts": "ddc4cf7b70c34ff4b76efe69788e159e400deb913cbd102167cf00312355bbf9",
+		"editor-queue.ts": "a668cdc395e2bbc9348c565f6334740053bff5cf38dc64d78968a597ed966e52",
+		"server.ts": "f80f47168e66b2e51abde11d19e62e95fe7efe2aeed93adc698cbef880e9e4ae",
+		"worker-session.ts": "95a5c0b748b3f6dca0a698407449a6fa22ae7bbbf1552178ddd77ffb72e40a00",
+		"worker-editor-basis.ts": "35fe597004645d7e35f5353852c2cc43482c1ea02e83058ae30dd678a6580574",
+		"worker-opened-capabilities.ts": "620f1cbe1453bfcda8ae77ec22b1bfd2694f334b5ddf919fba47dd312fee55a0",
+		"worker-client.ts": "cf3ae2f2cc7f87909d95d50e7298e8e075399be431ff3847b4023d97db94cca1",
+		"bindings.ts": "0063af639774ef14ba29f366731e13553c798ff12bb9fcfcbb9a8bf35b125f29",
+		"worker-activity.ts": "91b0f0bb2f3d8e7c252fc4b9073a34d7e0912cdb5ce8620498c15e18500fb939"
+	},
+	"bundleHashes": {
+		"browser-fixture.js": "2e417fd7e8a9f3d1c5d4156e1c0677deb2414de9f3cdc88e47ddda58135017e8",
+		"worker.js": "55f81ebd361faf6fb5093dd29ebc4377734690cca3cfbda9f38aff6b99ca9a88"
+	},
+	"rawTrace": {
+		"path": "/tmp/alkalye-worker-opened/budget.trace.json",
+		"sha256": "960109f466a0995642b707ba1abbadf22633e9430c53a039414a5df2dfc6fc6c",
+		"events": 35330,
+		"committed": false
+	},
+	"server": {
+		"pid": 80516,
+		"url": "http://localhost:58356/",
+		"stopped": true
+	},
+	"browser": {
+		"session": "opened-budget-1791515000",
+		"closed": true
+	},
+	"review": {
+		"handle": 48927,
+		"status": "terminal",
+		"file": "runtime-review.log",
+		"coreFalsePass": false,
+		"interpretationCorrections": [
+			"ACK/Observe-marked maxima not total callback/clone/decode cost",
+			"heap traceend96.5MB differs afterofflineend27.7MB",
+			"ten assertioncalls are9distinct incl3bootstrap",
+			"serverposition9 observed oracle, not separately asserted",
+			"eightinput burst EOF only, no realisticcadence/middle edit proof",
+			"canonical native source exact; DOM fragment suffix notasserted",
+			"zero/api applies blockedOpen not priorworkerclientconstruction"
+		]
+	},
+	"limits": [
+		"initialOpen crossed20s readinesswait; completed later unchanged",
+		"offlineReopen crossed20s wait; completed later unchanged",
+		"Observe consumer counter-only, not sidebar/preview DOM or peeradoption",
+		"workerheap/processRSS unmeasured",
+		"one sample, no comparative gain",
+		"60Hz frameopportunities notphysical120fps",
+		"not fullappcutover or featureparity",
+		"EOF burst within13ms; no cadence or middle edits",
+		"main Observe onlycounterconsumer, clonecost not isolated",
+		"workerclientconstructed before APIblock; zero/API duringOpen only",
+		"canonical Editor source exact, DOMfragment suffix not asserted"
+	]
+}

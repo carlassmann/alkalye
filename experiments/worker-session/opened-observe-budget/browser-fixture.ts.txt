@@ -1,0 +1,132 @@
+import * as Effect from "effect/Effect"
+import * as Deferred from "effect/Deferred"
+import * as Schedule from "effect/Schedule"
+import * as Stream from "effect/Stream"
+import * as FiberSet from "effect/FiberSet"
+import * as Scope from "effect/Scope"
+import * as Exit from "effect/Exit"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import { bootstrapBrowserAccount } from "./tests/browser-account-fixture"
+import { createWorkerSessionClient } from "./worker-client"
+import { makeEditorQueue } from "./editor-queue"
+import { workerEditorBindings } from "./bindings"
+import { forwardWorkerActivity } from "./worker-activity"
+import { EditorElement } from "./src/client/components/editor"
+import { editorPreferences } from "./src/shared/preferences"
+
+interface Inspection { source?: string; readonly?: boolean; pending: number; queueSource: string; recovery?: string; observations: number; failures: string[] }
+declare global { interface Window { openedNative?: { stage: string; assertions: string[]; failure?: string; inspect(): Inspection; gauge(): {pending:number;observations:number;failures:number;sourceCharacters:number;nativeCharacters:number;height:number;readonly:boolean}; accepted(): Promise<{ source: string; position: number }>; verify(): Promise<void>; undo(): void; fault(): Promise<void>; failClose(): Promise<void> } } }
+let assertions: string[] = [], failures: string[] = []
+function assert(value: unknown, label: string) { if (!value) throw Error(label); assertions.push(label) }
+let program = Effect.scoped(Effect.gen(function* () {
+ let account = yield* bootstrapBrowserAccount(assert)
+ let documentId = "opened-native-" + crypto.randomUUID()
+ let header = "---\ntitle: Worker fixture\n---\n# Native writer\n"
+ let paragraph = "Plain text with Unicode 🦊 café and some words.\n"
+ let paragraphBytes = new TextEncoder().encode(paragraph).length
+ let copies = Math.floor((1048576-header.length)/paragraphBytes)
+ let source = header + paragraph.repeat(copies) + "x".repeat(1048576-header.length-copies*paragraphBytes)
+ yield* Effect.promise(async () => {
+  let response = await fetch("/__tests/seed", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ subject: account.subject, document: documentId, source }) })
+  assert(response.ok, "real HTTP fixture seeded without main Replica")
+ })
+ let owner = yield* Scope.Scope
+ let workerScope = yield* Scope.fork(owner)
+ let worker = yield* createWorkerSessionClient(new URL("/worker.js", location.href).href).pipe(Scope.provide(workerScope))
+ let queue: Effect.Success<ReturnType<typeof makeEditorQueue>> | undefined
+ let recovery: HTMLTextAreaElement | undefined
+ let channel = "opened-native-activity-" + crypto.randomUUID()
+ let activity = yield* forwardWorkerActivity(channel, () => {
+  let state = queue?.state()
+  return recovery !== undefined || !!state && (state.pending.length > 0 || state.commandFrozen || state.failure !== undefined)
+ }, () => worker.Protection())
+ let input = { document: documentId, workspace: "personal-" + account.subject, subject: account.subject, origin: location.origin, online: true, activityChannel: channel, cooperativeWork: true }
+ yield* worker.Open(input)
+ let opened = yield* worker.Read().pipe(Effect.flatMap(value => value.projection ? Effect.succeed(value) : Effect.fail("NotReady")), Effect.retry(Schedule.spaced("20 millis")), Effect.timeout("10 seconds"))
+ assert(opened.projection?.document.content === source, "worker opened projection exact")
+ let observations = 0
+ let observed = yield* Deferred.make<void>()
+ yield* worker.Observe().pipe(Stream.runForEach(value => Effect.gen(function* () {
+  if (value.type === "document") { performance.mark("opened:observe"); observations++; yield* Deferred.succeed(observed, undefined) }
+ })), Effect.forkScoped({ startImmediately: true }))
+ yield* Deferred.await(observed).pipe(Effect.timeout("5 seconds"))
+ let initial = yield* worker.Begin()
+ let queueScope = yield* Scope.fork(owner)
+ queue = yield* makeEditorQueue(worker, initial).pipe(Scope.provide(queueScope))
+ let currentQueue = queue
+ let tasks = yield* FiberSet.make()
+ let fork = yield* FiberSet.runtime(tasks)()
+ let editor = new EditorElement()
+ editor.style.display = "block"
+ editor.style.height = "800px"
+ document.body.style.margin = "0"
+ function report(error: unknown) {
+  failures.push(String(error))
+  if (!recovery) {
+   recovery = document.createElement("textarea")
+   recovery.id = "recovery-draft"
+   recovery.readOnly = true
+   recovery.value = editor.source?.value ?? currentQueue.state().source
+   document.body.append(recovery)
+  }
+  activity.uncertain()
+ }
+ let bindings = workerEditorBindings(editor, currentQueue, effect => fork(effect.pipe(Effect.ensuring(Effect.sync(activity.update)))), report)
+ editor.configure({ authority: "worker", content: initial.source, atoms: [], editable: true, preferences: editorPreferences({ autocomplete: false }), documents: () => [], isDrawing: () => false, openDrawing() {}, openDocument() {}, comments: () => [], createLinkedDocument: async () => "unused", report, change: bindings.change, clipboard: { capture: (start,end,expected) => currentQueue.captureClipboard(start,end,expected), resolve: token => currentQueue.resolveClipboard(token), release: token => currentQueue.releaseClipboard(token) }, undo: bindings.undo, select: bindings.resumeUndo, requestAsset() {}, attach() {}, command() {}, find() {} })
+ document.body.append(editor)
+ yield* Effect.addFinalizer(() => Effect.sync(() => { editor.remove(); recovery?.remove() }))
+ let done = yield* Deferred.make<void>()
+ window.openedNative = {
+  stage: "ready", assertions,
+  inspect() { let state = currentQueue.state(); return { source: editor.source?.value, readonly: editor.source?.readOnly, pending: state.pending.length, queueSource: state.source, recovery: recovery?.value, observations, failures } },
+  gauge() { let state=currentQueue.state(), element=editor.source?.element; return { pending: state.pending.length, observations, failures: failures.length, sourceCharacters: editor.source?.value.length ?? 0, nativeCharacters: element?.value.length ?? 0, height: element?.parentElement?.clientHeight ?? 0, readonly: editor.source?.readOnly ?? true } },
+  accepted() { return Effect.runPromise(Effect.gen(function* () {
+   let view = yield* worker.Read().pipe(Effect.flatMap(value => value.status.pending === 0 && value.status.unsaved === 0 && value.connection.status === "synced" ? Effect.succeed(value) : Effect.fail("NotAccepted")), Effect.retry(Schedule.spaced("20 millis")), Effect.timeout("10 seconds"))
+   let response = yield* Effect.promise(() => fetch("/__tests/accepted?document=" + encodeURIComponent(documentId) + "&subject=" + encodeURIComponent(account.subject)))
+   let accepted = yield* Effect.promise(() => response.json())
+   assert(response.ok && typeof accepted.source === "string" && accepted.source === editor.source?.value && accepted.source === view.projection?.document.content, "native local source exactly accepted by real server")
+   return accepted
+  })) },
+  verify() { return Effect.runPromise(Effect.gen(function* () {
+   let native = editor.source?.value
+   assert(native === source + "abcdefgh" && currentQueue.state().source === native && !currentQueue.state().pending.length && !failures.length, "trusted eight characters exact native and FIFO source")
+   yield* worker.Flush()
+   yield* worker.Close()
+   yield* Scope.close(workerScope, Exit.void)
+   let reopenedScope = yield* Scope.fork(owner)
+   let fresh = yield* createWorkerSessionClient(new URL("/worker.js", location.href).href).pipe(Scope.provide(reopenedScope))
+   yield* Effect.promise(() => fetch("/__tests/network?blocked=1&reset=1"))
+   yield* fresh.Open({ ...input, online:false, activityChannel: channel + "-reopen" })
+   let reopened = yield* fresh.Read().pipe(Effect.flatMap(value => value.projection ? Effect.succeed(value) : Effect.fail("ReopenPending")), Effect.retry(Schedule.spaced("20 millis")), Effect.timeout("10 seconds"))
+   assert(reopened.projection?.document.content === native, "oneMiB actual native source exactly durable on offline independent worker reopen")
+   let network = yield* Effect.promise(async () => (await fetch("/__tests/network?blocked=1")).json())
+   assert(network.apiRequests === 0, "oneMiB durable reopen makes zero API requests")
+   yield* fresh.Close()
+   yield* Scope.close(reopenedScope, Exit.void)
+   if (window.openedNative) window.openedNative.stage = "passed"
+   yield* Deferred.succeed(done, undefined)
+  })) },
+  undo() { bindings.undo(false) },
+  fault() { return Effect.runPromise(worker.FixtureFault({ openFailure:false, writeFailure:true })) },
+  failClose() { return Effect.runPromise(Effect.gen(function* () {
+   let native = editor.source?.value
+   assert(!!native && recovery?.value === native && editor.source?.readOnly, "refused actual native edit retains full source in recovery owner")
+   assert(currentQueue.state().pending.length > 0 && currentQueue.state().failure !== undefined, "failed native FIFO suffix remains recoverable")
+   let dirty = new Event("beforeunload", { cancelable:true }); window.dispatchEvent(dirty)
+   assert(dirty.defaultPrevented, "actual native recovery retains unload protection")
+   let closed = yield* worker.Close().pipe(Effect.exit)
+   assert(Exit.isFailure(closed), "failed native durable Close remains failed")
+   yield* Scope.close(workerScope, Exit.void)
+   editor.remove()
+   assert(recovery?.value === native, "native recovery owner survives editor and worker disposal")
+   assert(!activity.closedCleanly(), "dirty owner refuses clean-close acknowledgement")
+   if (window.openedNative) window.openedNative.stage = "passed"
+   yield* Deferred.succeed(done, undefined)
+  })) },
+ }
+ yield* Deferred.await(done)
+})).pipe(Effect.provide(FetchHttpClient.layer), Effect.catchCause(cause => Effect.sync(() => {
+ if (window.openedNative) { window.openedNative.stage = "failed"; window.openedNative.failure = String(cause) }
+ else window.openedNative = { stage:"failed", assertions, failure:String(cause), inspect:()=>({pending:0,queueSource:"",observations:0,failures}), gauge:()=>({pending:0,observations:0,failures:1,sourceCharacters:0,nativeCharacters:0,height:0,readonly:true}), accepted:async()=>({source:"",position:0}),verify:async()=>{},undo(){},fault:async()=>{},failClose:async()=>{} }
+})))
+Effect.runFork(program)

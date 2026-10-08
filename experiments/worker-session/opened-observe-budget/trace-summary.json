@@ -1,0 +1,342 @@
+{
+	"scope": "one actual opened-observe trial, frozen526core; no CPU samples; no physical120fps claim",
+	"traceEvents": 35330,
+	"windowMs": 3249.629,
+	"mainThread": {
+		"pid": 80743,
+		"tid": 17022658
+	},
+	"mainTasks": 688,
+	"largestMainTasks": [
+		{
+			"ms": 2.314,
+			"afterStartMs": 27.247,
+			"marks": ["opened:input"]
+		},
+		{
+			"ms": 1.56,
+			"afterStartMs": 30.09,
+			"marks": ["opened:input"]
+		},
+		{
+			"ms": 1.376,
+			"afterStartMs": 95.45,
+			"marks": []
+		},
+		{
+			"ms": 1.155,
+			"afterStartMs": 32.495,
+			"marks": ["opened:input"]
+		},
+		{
+			"ms": 1.126,
+			"afterStartMs": 35.81,
+			"marks": ["opened:input"]
+		},
+		{
+			"ms": 1.088,
+			"afterStartMs": 2122.438,
+			"marks": []
+		},
+		{
+			"ms": 1.086,
+			"afterStartMs": 34.22,
+			"marks": ["opened:input"]
+		},
+		{
+			"ms": 1.075,
+			"afterStartMs": 38.933,
+			"marks": ["opened:input"]
+		},
+		{
+			"ms": 1.052,
+			"afterStartMs": 40.383,
+			"marks": ["opened:input"]
+		},
+		{
+			"ms": 0.933,
+			"afterStartMs": 37.777,
+			"marks": ["opened:input"]
+		},
+		{
+			"ms": 0.81,
+			"afterStartMs": 36.965,
+			"marks": []
+		},
+		{
+			"ms": 0.692,
+			"afterStartMs": 31.802,
+			"marks": []
+		}
+	],
+	"inputTasks": [
+		{
+			"ms": 2.314,
+			"afterStartMs": 27.247,
+			"marks": ["opened:input"]
+		},
+		{
+			"ms": 1.56,
+			"afterStartMs": 30.09,
+			"marks": ["opened:input"]
+		},
+		{
+			"ms": 1.155,
+			"afterStartMs": 32.495,
+			"marks": ["opened:input"]
+		},
+		{
+			"ms": 1.126,
+			"afterStartMs": 35.81,
+			"marks": ["opened:input"]
+		},
+		{
+			"ms": 1.086,
+			"afterStartMs": 34.22,
+			"marks": ["opened:input"]
+		},
+		{
+			"ms": 1.075,
+			"afterStartMs": 38.933,
+			"marks": ["opened:input"]
+		},
+		{
+			"ms": 1.052,
+			"afterStartMs": 40.383,
+			"marks": ["opened:input"]
+		},
+		{
+			"ms": 0.933,
+			"afterStartMs": 37.777,
+			"marks": ["opened:input"]
+		}
+	],
+	"ackTasks": [
+		{
+			"ms": 0.635,
+			"afterStartMs": 46.587,
+			"marks": ["opened:ack"]
+		},
+		{
+			"ms": 0.436,
+			"afterStartMs": 56.306,
+			"marks": ["opened:ack"]
+		},
+		{
+			"ms": 0.415,
+			"afterStartMs": 65.913,
+			"marks": ["opened:ack"]
+		},
+		{
+			"ms": 0.401,
+			"afterStartMs": 74.741,
+			"marks": ["opened:ack"]
+		},
+		{
+			"ms": 0.374,
+			"afterStartMs": 108.099,
+			"marks": ["opened:ack"]
+		},
+		{
+			"ms": 0.357,
+			"afterStartMs": 91.737,
+			"marks": ["opened:ack"]
+		},
+		{
+			"ms": 0.308,
+			"afterStartMs": 100.435,
+			"marks": ["opened:ack"]
+		},
+		{
+			"ms": 0.292,
+			"afterStartMs": 115.372,
+			"marks": ["opened:ack"]
+		}
+	],
+	"observerTasks": [
+		{
+			"ms": 0.06,
+			"afterStartMs": 631.143,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.052,
+			"afterStartMs": 2150.806,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.049,
+			"afterStartMs": 2215.22,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.048,
+			"afterStartMs": 57.549,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.046,
+			"afterStartMs": 2164.85,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.045,
+			"afterStartMs": 35.307,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.043,
+			"afterStartMs": 59.481,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.043,
+			"afterStartMs": 2191.012,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.042,
+			"afterStartMs": 2203.351,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.042,
+			"afterStartMs": 2227.569,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.041,
+			"afterStartMs": 2178.103,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.038,
+			"afterStartMs": 47.729,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.037,
+			"afterStartMs": 2240.179,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.035,
+			"afterStartMs": 92.652,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.035,
+			"afterStartMs": 94.605,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.032,
+			"afterStartMs": 66.848,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.031,
+			"afterStartMs": 75.837,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.03,
+			"afterStartMs": 110.599,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.028,
+			"afterStartMs": 68.485,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.027,
+			"afterStartMs": 49.447,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.026,
+			"afterStartMs": 102.86,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.026,
+			"afterStartMs": 116.167,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.025,
+			"afterStartMs": 101.276,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.024,
+			"afterStartMs": 108.951,
+			"marks": ["opened:observe"]
+		},
+		{
+			"ms": 0.02,
+			"afterStartMs": 77.411,
+			"marks": ["opened:observe"]
+		}
+	],
+	"trustedInputs": [
+		{
+			"data": "a",
+			"time": 142448.60000002384,
+			"trusted": true
+		},
+		{
+			"data": "b",
+			"time": 142451.20000004768,
+			"trusted": true
+		},
+		{
+			"data": "c",
+			"time": 142453.70000004768,
+			"trusted": true
+		},
+		{
+			"data": "d",
+			"time": 142455.40000003576,
+			"trusted": true
+		},
+		{
+			"data": "e",
+			"time": 142457,
+			"trusted": true
+		},
+		{
+			"data": "f",
+			"time": 142459,
+			"trusted": true
+		},
+		{
+			"data": "g",
+			"time": 142460.10000002384,
+			"trusted": true
+		},
+		{
+			"data": "h",
+			"time": 142461.60000002384,
+			"trusted": true
+		}
+	],
+	"finalGauge": {
+		"failures": 0,
+		"height": 800,
+		"nativeCharacters": 3022,
+		"observations": 28,
+		"pending": 0,
+		"readonly": false,
+		"sourceCharacters": 986907
+	},
+	"frames": {
+		"count": 196,
+		"medianMs": 16.699999999982538,
+		"maxMs": 16.800000000017462,
+		"over25ms": 0
+	},
+	"traceEndMainHeap": 96502945,
+	"markAttribution": "Marks locate enclosing main RunTask only; clone/decode/follow-on work may occur in unmarked tasks. Largest-all-main-task bound includes those tasks."
+}

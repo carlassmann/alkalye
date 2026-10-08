@@ -1,0 +1,24 @@
+{
+	"assertions": [
+		"simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections",
+		"browser identity is available before any network authentication",
+		"native browser account login serializes cookie issuance and agrees with server verification",
+		"real HTTP fixture seeded without main Replica",
+		"worker opened projection exact",
+		"native local source exactly accepted by real server",
+		"native local source exactly accepted by real server",
+		"trusted eight characters exact native and FIFO source",
+		"oneMiB actual native source exactly durable on offline independent worker reopen",
+		"oneMiB durable reopen makes zero API requests"
+	],
+	"heap": {
+		"end": 27688288,
+		"peak": 96502945,
+		"start": 19931446
+	},
+	"sourceCharacters": 986899,
+	"stage": "passed",
+	"verification": {
+		"done": true
+	}
+}
