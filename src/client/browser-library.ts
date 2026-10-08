@@ -35,6 +35,7 @@ import {
 import { DocumentDiscussion } from "./document-discussion"
 import { DocumentBlobs } from "./document-blobs"
 import { DocumentAssets } from "./document-assets"
+import { DocumentProperties } from "./document-properties"
 import { DocumentMedia } from "./document-media"
 import { makeDocumentTransport } from "./document-transport"
 import { LocalDocuments } from "./local-documents"
@@ -416,7 +417,10 @@ function makeLibrary() {
 				)
 				let capabilities = yield* Layer.build(
 					Layer.merge(
-						DocumentAssets.layer({ document, canWrite }),
+						Layer.merge(
+							DocumentAssets.layer({ document, canWrite }),
+							DocumentProperties.layer({ document, canWrite }),
+						),
 						DocumentMedia.layer(document),
 					).pipe(
 						Layer.provide(
@@ -431,6 +435,7 @@ function makeLibrary() {
 					session,
 					blobs,
 					assets: Context.get(capabilities, DocumentAssets),
+					properties: Context.get(capabilities, DocumentProperties),
 					media: Context.get(capabilities, DocumentMedia),
 					canWrite,
 					discussion,
@@ -539,7 +544,10 @@ function makeLibrary() {
 				)
 				let capabilities = yield* Layer.build(
 					Layer.merge(
-						DocumentAssets.layer({ document, canWrite }),
+						Layer.merge(
+							DocumentAssets.layer({ document, canWrite }),
+							DocumentProperties.layer({ document, canWrite }),
+						),
 						DocumentMedia.layer(document),
 					).pipe(
 						Layer.provide(
@@ -554,6 +562,7 @@ function makeLibrary() {
 					session,
 					blobs,
 					assets: Context.get(capabilities, DocumentAssets),
+					properties: Context.get(capabilities, DocumentProperties),
 					media: Context.get(capabilities, DocumentMedia),
 					canWrite,
 					discussion,

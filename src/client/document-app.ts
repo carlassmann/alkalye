@@ -3509,15 +3509,7 @@ function mountApplication() {
 									if (JSON.stringify(tags) !== JSON.stringify(initial.tags))
 										patch.tags = tags
 									if (!Object.keys(patch).length) return
-									yield* selected.opened.session.change(
-										"Document properties",
-										staged => [
-											staged.edit(
-												doc.id,
-												metadataSource(staged.text(doc.id), patch),
-											),
-										],
-									)
+									yield* selected.opened.properties.update(patch)
 								}),
 							),
 					)
@@ -3557,17 +3549,7 @@ function mountApplication() {
 				if (action === "present") {
 					if (!writable()) return
 					let presentation = presenting()
-					yield* selected.opened.session.change(
-						presentation ? "Turn into document" : "Turn into presentation",
-						staged => [
-							staged.edit(
-								selected.document,
-								withFrontmatter(staged.text(selected.document), {
-									mode: presentation ? undefined : "present",
-								}),
-							),
-						],
-					)
+					yield* selected.opened.properties.presentation(!presentation)
 					return
 				}
 				if (action === "save-as" || action === "share-copy") {
@@ -4084,25 +4066,17 @@ function mountApplication() {
 											)
 										: undefined
 								if (title === undefined && action === "rename") return
-								yield* selected.opened.session.change(
+								yield* selected.opened.properties.update(
+									action === "rename"
+										? { title: title ?? doc.title }
+										: action === "pin"
+											? { pinned: !doc.pinned }
+											: { archived: !doc.archived },
 									action === "rename"
 										? "Rename document"
 										: action === "pin"
 											? "Pin document"
 											: "Archive document",
-									staged => [
-										staged.edit(
-											doc.id,
-											metadataSource(
-												staged.text(doc.id),
-												action === "rename"
-													? { title: title ?? doc.title }
-													: action === "pin"
-														? { pinned: !doc.pinned }
-														: { archived: !doc.archived },
-											),
-										),
-									],
 								)
 								refreshLibrary()
 							}
