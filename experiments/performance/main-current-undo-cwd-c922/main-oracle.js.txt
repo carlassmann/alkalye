@@ -1,0 +1,85 @@
+import { join } from "node:path"
+import { pathToFileURL } from "node:url"
+
+function phase(name) {
+	console.error(JSON.stringify({ phase: name, time: performance.now() }))
+}
+phase("configuration")
+let [configurationPath] = Bun.argv.slice(2)
+if (!configurationPath) throw Error("Private oracle configuration required")
+let configuration = await Bun.file(configurationPath).json()
+let request = JSON.parse(await Bun.stdin.text())
+let target = configuration.documents.find(
+	value => value.fixture === request.fixture,
+)
+if (!target || !request.path.endsWith("/" + target.documentId))
+	throw Error("Oracle document route differs")
+if (!/^[a-f0-9]{64}$/.test(request.expectedSha256))
+	throw Error("Oracle digest invalid")
+let credentials = await Bun.file(configuration.authFile).json()
+let { startWorker } = await import(
+	pathToFileURL(
+		join(
+			configuration.checkout,
+			"node_modules/jazz-tools/dist/worker/index.js",
+		),
+	).href
+)
+let { UserAccount, Document } = await import(
+	pathToFileURL(join(configuration.checkout, "src/schema/index.ts")).href
+)
+phase("imports-complete")
+phase("startWorker-start")
+let context = await startWorker({
+	accountID: credentials.accountID,
+	accountSecret: credentials.accountSecret,
+	AccountSchema: UserAccount,
+	syncServer: configuration.syncServer,
+	skipInboxLoad: true,
+	asActiveAccount: false,
+})
+try {
+	phase("startWorker-end")
+	phase("connection-start")
+	await context.waitForConnection()
+	phase("connection-end")
+	phase("document-load-start")
+	let document = await Document.load(target.documentId, {
+		loadAs: context.worker,
+		resolve: { content: true },
+	})
+	phase("document-load-end")
+	if (!document.$isLoaded)
+		throw Error("Independent server document unavailable")
+	phase("subscribe-start")
+	let receipt = await new Promise((resolve, reject) => {
+		let release = () => {}
+		let timer = setTimeout(
+			() => {
+				release()
+				reject(Error("Independent accepted-source deadline"))
+			},
+			Math.min(request.deadlineMs, 20000),
+		)
+		release = document.$jazz.subscribe(
+			{ resolve: { content: true } },
+			(value, unsubscribe) => {
+				if (!value.$isLoaded) return
+				let content = value.content.toString()
+				let sha256 = new Bun.CryptoHasher("sha256")
+					.update(content)
+					.digest("hex")
+				if (sha256 !== request.expectedSha256) return
+				clearTimeout(timer)
+				unsubscribe()
+				resolve({ sha256, characters: content.length })
+			},
+		)
+	})
+	phase("source-exact")
+	console.log(JSON.stringify(receipt))
+} finally {
+	phase("shutdown-start")
+	await context.shutdownWorker()
+	phase("shutdown-end")
+}

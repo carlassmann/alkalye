@@ -58,6 +58,23 @@ let Manifest = Schema.Struct({
 	versions: Schema.Array(Version),
 	cells: Schema.Array(Cell),
 })
+let OraclePhase = Schema.Struct({
+	phase: Schema.Literals([
+		"configuration",
+		"imports-complete",
+		"startWorker-start",
+		"startWorker-end",
+		"connection-start",
+		"connection-end",
+		"document-load-start",
+		"document-load-end",
+		"subscribe-start",
+		"source-exact",
+		"shutdown-start",
+		"shutdown-end",
+	]),
+	time: Schema.Number,
+})
 let Receipt = Schema.Struct({
 	sha256: Schema.String,
 	characters: Schema.Number,
@@ -86,6 +103,7 @@ if ((await readdir(manifest.output)).length)
 	throw Error("Fresh empty output directory required")
 let knownJazzSessions = new Set<string>()
 let acceptedPairs = new Map<string, number>()
+let oracleSequence = 0
 let results: object[] = [],
 	blocked = new Set<string>()
 let selected = Bun.env.BENCHMARK_CELLS?.split(",")
@@ -175,6 +193,7 @@ async function accepted(
 ) {
 	if (!version.oracle.length)
 		throw Error("Independent accepted-source oracle command required")
+	let sequence = oracleSequence++
 	let oracleProcess = Bun.spawn([...version.oracle], {
 		cwd: version.oracleCwd,
 		stdin: "pipe",
@@ -197,8 +216,28 @@ async function accepted(
 		new Response(oracleProcess.stderr).text(),
 		oracleProcess.exited,
 	]).finally(() => clearTimeout(deadline))
+	let phases: (typeof OraclePhase.Type)[] = []
+	for (let line of stderr.split("\n")) {
+		try {
+			phases.push(Schema.decodeUnknownSync(OraclePhase)(JSON.parse(line)))
+		} catch {}
+	}
+	let phasesLog = `oracle-phases-${sequence}.json`
+	await Bun.write(
+		join(manifest.output, phasesLog),
+		JSON.stringify({
+			version: version.name,
+			fixture: fixture.name,
+			phase,
+			exit,
+			phases,
+		}),
+	)
 	if (exit !== 0) {
-		await Bun.write(join(manifest.output, "oracle-failure-private.log"), stderr)
+		await Bun.write(
+			join(manifest.output, `oracle-failure-${sequence}.private.log`),
+			stderr,
+		)
 		throw Error(
 			"Independent accepted-source oracle failed; private diagnostic retained",
 		)
@@ -206,7 +245,7 @@ async function accepted(
 	let receipt = Schema.decodeUnknownSync(Receipt)(JSON.parse(stdout))
 	if (receipt.sha256 !== hash)
 		throw Error("Independent accepted-source digest mismatch")
-	return receipt
+	return { ...receipt, phasesLog }
 }
 async function profile(
 	version: Version,

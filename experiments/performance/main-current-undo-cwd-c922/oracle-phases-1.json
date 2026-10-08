@@ -1,0 +1,20 @@
+{
+	"version": "main",
+	"fixture": "small2",
+	"phase": "edit",
+	"exit": 0,
+	"phases": [
+		{ "phase": "configuration", "time": 5.181125 },
+		{ "phase": "imports-complete", "time": 35.221083 },
+		{ "phase": "startWorker-start", "time": 35.233292 },
+		{ "phase": "startWorker-end", "time": 48.665208 },
+		{ "phase": "connection-start", "time": 48.674 },
+		{ "phase": "connection-end", "time": 48.689208 },
+		{ "phase": "document-load-start", "time": 48.691333 },
+		{ "phase": "document-load-end", "time": 57.4865 },
+		{ "phase": "subscribe-start", "time": 57.494583 },
+		{ "phase": "source-exact", "time": 57.7435 },
+		{ "phase": "shutdown-start", "time": 57.750083 },
+		{ "phase": "shutdown-end", "time": 58.069542 }
+	]
+}

@@ -1,0 +1,31 @@
+{
+	"scope": "one paired 2 KiB middle input and separately traced Undo; advancing unmatched histories",
+	"main": "a749728a8f9a1cb984c980a5ea2daf984d60ae68",
+	"rewrite": "c922a8d61d2730e0b9b6179b36b36ba85cd5e578",
+	"cloneReadHandle": 6706,
+	"cloneReadExit": 0,
+	"strictHandle": 29076,
+	"strictExit": 0,
+	"runnerHandle": 50072,
+	"runnerExit": 0,
+	"samplesPerVersion": 1,
+	"order": ["main", "rewrite"],
+	"previousAcceptedPairs": {
+		"main": 1,
+		"rewrite": 2
+	},
+	"sourceSha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+	"sourceCharacters": 2048,
+	"realNewlines": 74,
+	"acceptedSourceAndUndo": true,
+	"trustedModifiedZ": true,
+	"nativeCaretRestored": true,
+	"traceWindowSecondsPerPhase": 3,
+	"cpuSampler": false,
+	"ownedResourcesClosed": true,
+	"sourceFiles": {
+		"runner-with-undo.ts.txt": "78342c87e4a4906d95ea7b8aacb01d932c50348bd09f3284345ebe8fd5809d77",
+		"main-oracle.js.txt": "c076cb6dd6c963d1231609f931462a9d5c80c01a9805d7cf20eb30c132234e9d",
+		"network-with-receives.js.txt": "8b5ca900be54408a6c4a9545d09f12a06a3594fffff1beb6599d34b5b6b750e9"
+	}
+}

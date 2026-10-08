@@ -1,0 +1,7 @@
+{
+	"version": "rewrite",
+	"fixture": "small2",
+	"phase": "seed",
+	"exit": 0,
+	"phases": []
+}

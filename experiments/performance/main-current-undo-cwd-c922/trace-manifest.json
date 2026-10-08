@@ -1,0 +1,22 @@
+[
+	{
+		"path": "/tmp/alkalye-main-current72/undo-cwd-smoke-results/main-small-middle-0-undo.trace.json",
+		"bytes": 2828233,
+		"sha256": "c6f88ae6a80a83cba2aa5ecc2557def2220148d08f4c4e33ca0e44cc37f69de9"
+	},
+	{
+		"path": "/tmp/alkalye-main-current72/undo-cwd-smoke-results/main-small-middle-0.trace.json",
+		"bytes": 3393139,
+		"sha256": "214901c1aa857562d1520bf5394caf0d0f704ab0735a19c699a3f51c75734f38"
+	},
+	{
+		"path": "/tmp/alkalye-main-current72/undo-cwd-smoke-results/rewrite-small-middle-0-undo.trace.json",
+		"bytes": 3289762,
+		"sha256": "e1f15cf6a0933d7e872b665351176a7d4aae99b6cf0f75edc759cdb96ce0ab43"
+	},
+	{
+		"path": "/tmp/alkalye-main-current72/undo-cwd-smoke-results/rewrite-small-middle-0.trace.json",
+		"bytes": 3760590,
+		"sha256": "66570417f42c70267718b5c0f4783268b408b44f424d475faae4bd4eb438f3fa"
+	}
+]

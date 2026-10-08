@@ -1,0 +1,277 @@
+[
+	{
+		"version": "main",
+		"commit": "a749728a8f9a1cb984c980a5ea2daf984d60ae68",
+		"cell": "small-middle:input",
+		"trial": 0,
+		"status": "complete",
+		"stage": null,
+		"error": null,
+		"gates": {
+			"seedReceipt": true,
+			"editedReceipt": true,
+			"undoReceipt": true
+		},
+		"traceStatus": "complete-window",
+		"initialEnclosingTaskMs": 4.167,
+		"aftermathMaxTaskMs": 8.008,
+		"windowMaxTaskMs": 8.008,
+		"presentationOpportunityMs": 13.301,
+		"layoutUnionMs": 0.738,
+		"paintUnionMs": 0.578,
+		"gcUnionMs": 0.0,
+		"largestTasks": [
+			{
+				"relativeStartMs": 261.98,
+				"durationMs": 8.008
+			},
+			{
+				"relativeStartMs": 257.032,
+				"durationMs": 4.944
+			},
+			{
+				"relativeStartMs": -0.209,
+				"durationMs": 4.167
+			},
+			{
+				"relativeStartMs": 304.471,
+				"durationMs": 3.45
+			},
+			{
+				"relativeStartMs": 273.001,
+				"durationMs": 2.697
+			}
+		],
+		"eventTiming": [
+			{
+				"duration": 16,
+				"name": "keydown",
+				"processingEnd": 916.3000000119208,
+				"processingStart": 915.3000000119208,
+				"startTime": 915.100000023842
+			},
+			{
+				"duration": 16,
+				"name": "keypress",
+				"processingEnd": 919.4000000357628,
+				"processingStart": 916.3000000119208,
+				"startTime": 915.100000023842
+			},
+			{
+				"duration": 16,
+				"name": "beforeinput",
+				"processingEnd": 916.5,
+				"processingStart": 916.3000000119208,
+				"startTime": 916.3000000119208
+			},
+			{
+				"duration": 16,
+				"name": "input",
+				"processingEnd": 919.1999999880792,
+				"processingStart": 916.8000000119208,
+				"startTime": 916.600000023842
+			}
+		]
+	},
+	{
+		"version": "main",
+		"commit": "a749728a8f9a1cb984c980a5ea2daf984d60ae68",
+		"cell": "small-middle:undo",
+		"trial": 0,
+		"status": "complete",
+		"stage": null,
+		"error": null,
+		"gates": {
+			"seedReceipt": true,
+			"editedReceipt": true,
+			"undoReceipt": true
+		},
+		"traceStatus": "complete-window",
+		"initialEnclosingTaskMs": 1.702,
+		"aftermathMaxTaskMs": 8.291,
+		"windowMaxTaskMs": 8.291,
+		"presentationOpportunityMs": 15.853,
+		"layoutUnionMs": 0.654,
+		"paintUnionMs": 0.566,
+		"gcUnionMs": 0.0,
+		"largestTasks": [
+			{
+				"relativeStartMs": 260.766,
+				"durationMs": 8.291
+			},
+			{
+				"relativeStartMs": 253.091,
+				"durationMs": 7.669
+			},
+			{
+				"relativeStartMs": 303.807,
+				"durationMs": 3.405
+			},
+			{
+				"relativeStartMs": 271.83,
+				"durationMs": 2.254
+			},
+			{
+				"relativeStartMs": -0.116,
+				"durationMs": 1.702
+			}
+		],
+		"eventTiming": [
+			{
+				"duration": 24,
+				"name": "keydown",
+				"processingEnd": 4430.600000023842,
+				"processingStart": 4429,
+				"startTime": 4428.900000035763
+			},
+			{
+				"duration": 16,
+				"name": "keyup",
+				"processingEnd": 4430.900000035763,
+				"processingStart": 4430.800000011921,
+				"startTime": 4430.800000011921
+			}
+		]
+	},
+	{
+		"version": "rewrite",
+		"commit": "c922a8d61d2730e0b9b6179b36b36ba85cd5e578",
+		"cell": "small-middle:input",
+		"trial": 0,
+		"status": "complete",
+		"stage": null,
+		"error": null,
+		"gates": {
+			"seedReceipt": true,
+			"editedReceipt": true,
+			"undoReceipt": true
+		},
+		"traceStatus": "complete-window",
+		"initialEnclosingTaskMs": 2.976,
+		"aftermathMaxTaskMs": 2.939,
+		"windowMaxTaskMs": 2.976,
+		"presentationOpportunityMs": 18.232,
+		"layoutUnionMs": 1.406,
+		"paintUnionMs": 0.552,
+		"gcUnionMs": 0.787,
+		"largestTasks": [
+			{
+				"relativeStartMs": -0.256,
+				"durationMs": 2.976
+			},
+			{
+				"relativeStartMs": 2734.598,
+				"durationMs": 2.939
+			},
+			{
+				"relativeStartMs": 1068.017,
+				"durationMs": 1.738
+			},
+			{
+				"relativeStartMs": 18.04,
+				"durationMs": 1.737
+			},
+			{
+				"relativeStartMs": 34.564,
+				"durationMs": 1.532
+			}
+		],
+		"eventTiming": [
+			{
+				"duration": 24,
+				"name": "keydown",
+				"processingEnd": 1375,
+				"processingStart": 1374.399999976158,
+				"startTime": 1374.199999988079
+			},
+			{
+				"duration": 24,
+				"name": "keypress",
+				"processingEnd": 1377.300000011921,
+				"processingStart": 1375,
+				"startTime": 1374.199999988079
+			},
+			{
+				"duration": 24,
+				"name": "beforeinput",
+				"processingEnd": 1375.199999988079,
+				"processingStart": 1375,
+				"startTime": 1375
+			},
+			{
+				"duration": 24,
+				"name": "input",
+				"processingEnd": 1377.199999988079,
+				"processingStart": 1375.5,
+				"startTime": 1375.399999976158
+			},
+			{
+				"duration": 16,
+				"name": "keyup",
+				"processingEnd": 1377.5,
+				"processingStart": 1377.5,
+				"startTime": 1377.5
+			}
+		]
+	},
+	{
+		"version": "rewrite",
+		"commit": "c922a8d61d2730e0b9b6179b36b36ba85cd5e578",
+		"cell": "small-middle:undo",
+		"trial": 0,
+		"status": "complete",
+		"stage": null,
+		"error": null,
+		"gates": {
+			"seedReceipt": true,
+			"editedReceipt": true,
+			"undoReceipt": true
+		},
+		"traceStatus": "complete-window",
+		"initialEnclosingTaskMs": 0.525,
+		"aftermathMaxTaskMs": 2.848,
+		"windowMaxTaskMs": 2.848,
+		"presentationOpportunityMs": 50.647,
+		"layoutUnionMs": 1.426,
+		"paintUnionMs": 0.514,
+		"gcUnionMs": 0.545,
+		"largestTasks": [
+			{
+				"relativeStartMs": 1233.658,
+				"durationMs": 2.848
+			},
+			{
+				"relativeStartMs": 31.796,
+				"durationMs": 2.74
+			},
+			{
+				"relativeStartMs": 548.542,
+				"durationMs": 2.54
+			},
+			{
+				"relativeStartMs": 567.007,
+				"durationMs": 1.744
+			},
+			{
+				"relativeStartMs": 1066.291,
+				"durationMs": 1.604
+			}
+		],
+		"eventTiming": [
+			{
+				"duration": 16,
+				"name": "keydown",
+				"processingEnd": 4875.899999976158,
+				"processingStart": 4875.300000011921,
+				"startTime": 4875.300000011921
+			},
+			{
+				"duration": 16,
+				"name": "keyup",
+				"processingEnd": 4876.300000011921,
+				"processingStart": 4876.199999988079,
+				"startTime": 4876.199999988079
+			}
+		]
+	}
+]

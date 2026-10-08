@@ -1,0 +1,25 @@
+{
+	"publisherPhases": [
+		{
+			"phase": "clone-publisher-ready",
+			"time": 2568.031,
+			"sourceExact": true,
+			"received": 15,
+			"freshSessions": 1
+		},
+		{
+			"phase": "reader-start",
+			"pid": 11524,
+			"time": 2598.869875
+		},
+		{
+			"phase": "reader-terminal",
+			"code": 0,
+			"time": 2676.907791
+		}
+	],
+	"receipt": {
+		"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+		"characters": 2048
+	}
+}

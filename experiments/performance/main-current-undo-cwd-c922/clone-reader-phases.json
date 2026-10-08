@@ -1,0 +1,50 @@
+[
+	{
+		"phase": "configuration",
+		"time": 5.622791
+	},
+	{
+		"phase": "imports-complete",
+		"time": 36.525
+	},
+	{
+		"phase": "startWorker-start",
+		"time": 36.538833
+	},
+	{
+		"phase": "startWorker-end",
+		"time": 57.369333
+	},
+	{
+		"phase": "connection-start",
+		"time": 57.377583
+	},
+	{
+		"phase": "connection-end",
+		"time": 57.395
+	},
+	{
+		"phase": "document-load-start",
+		"time": 57.397208
+	},
+	{
+		"phase": "document-load-end",
+		"time": 70.303458
+	},
+	{
+		"phase": "subscribe-start",
+		"time": 70.311708
+	},
+	{
+		"phase": "source-exact",
+		"time": 70.594416
+	},
+	{
+		"phase": "shutdown-start",
+		"time": 70.60175
+	},
+	{
+		"phase": "shutdown-end",
+		"time": 70.952125
+	}
+]

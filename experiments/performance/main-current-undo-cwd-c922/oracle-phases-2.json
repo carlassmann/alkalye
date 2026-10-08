@@ -1,0 +1,20 @@
+{
+	"version": "main",
+	"fixture": "small2",
+	"phase": "undo",
+	"exit": 0,
+	"phases": [
+		{ "phase": "configuration", "time": 5.144291 },
+		{ "phase": "imports-complete", "time": 34.518333 },
+		{ "phase": "startWorker-start", "time": 34.53325 },
+		{ "phase": "startWorker-end", "time": 48.484375 },
+		{ "phase": "connection-start", "time": 48.492416 },
+		{ "phase": "connection-end", "time": 48.508666 },
+		{ "phase": "document-load-start", "time": 48.51 },
+		{ "phase": "document-load-end", "time": 56.830041 },
+		{ "phase": "subscribe-start", "time": 56.841541 },
+		{ "phase": "source-exact", "time": 57.107125 },
+		{ "phase": "shutdown-start", "time": 57.1145 },
+		{ "phase": "shutdown-end", "time": 57.467833 }
+	]
+}
