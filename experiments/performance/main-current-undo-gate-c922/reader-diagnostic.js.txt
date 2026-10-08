@@ -1,0 +1,17 @@
+import {browser,evaluate,wait} from "/Users/carlassmann/.codex/worktrees/b513/alkalye/tests/browser-driver.ts"
+let root="/tmp/alkalye-main-current72",version=await Bun.file(root+"/main-version.private.json").json(),fixture=version.fixtures[0],session="main-sdk-undo-diagnostic-"+Date.now()
+try{
+ browser(session,"--profile",version.seedProfile,"open",version.url+fixture.path)
+ let source=await Bun.file(fixture.sourceFile).text()
+ wait(session,"document.querySelector('.cm-content')?.cmTile?.view?.state.doc.toString()==="+JSON.stringify(source))
+ wait(session,"window.__benchmark?.socketFrames.some(frame=>frame.direction==='receive')")
+ console.log(JSON.stringify({phase:"publisher-ready",time:performance.now(),sourceExact:true}))
+ let reader=Bun.spawn(["bun",root+"/oracle-diagnostic.js",root+"/main-oracle.private.json"],{cwd:"/tmp/alkalye-main-sdk-proof",stdin:"pipe",stdout:"pipe",stderr:"pipe"})
+ reader.stdin.write(JSON.stringify({fixture:"small2",path:fixture.path,expectedSha256:new Bun.CryptoHasher('sha256').update(source).digest('hex'),deadlineMs:15000}));reader.stdin.end()
+ console.log(JSON.stringify({phase:"reader-start",pid:reader.pid,time:performance.now()}))
+ let timeout=setTimeout(()=>reader.kill(),25000)
+ let code=await reader.exited;clearTimeout(timeout)
+ await Bun.write(root+"/oracle-diagnostic.stdout.log",await new Response(reader.stdout).text())
+ await Bun.write(root+"/oracle-diagnostic.stderr.private.log",await new Response(reader.stderr).text())
+ console.log(JSON.stringify({phase:"reader-terminal",code,time:performance.now()}))
+}finally{browser(session,"close")}

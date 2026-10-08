@@ -1,0 +1,36 @@
+{
+	"main": {
+		"phase": "seed-oracle",
+		"trustedActionIssued": false,
+		"traceStarted": false,
+		"oracleStderrEmpty": true,
+		"oracleHardDeadlineMs": 25000
+	},
+	"rewrite": {
+		"inputWindowComplete": true,
+		"undoWindowComplete": true,
+		"trustedModifiedZ": true,
+		"sourceCaretRestored": true,
+		"independentSeedEditUndo": true
+	},
+	"strictHandle": 37281,
+	"strictExit": 0,
+	"runnerHandle": 87235,
+	"runnerExit": 0,
+	"paired": false,
+	"readerDiagnostic": {
+		"handle": "inline exec terminal",
+		"pid": 4889,
+		"exit": 0,
+		"sourceExact": true,
+		"sourceHash": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+		"publisher": "retained original seed profile",
+		"cwd": "original SDK alias configuration",
+		"phaseStartWorkerMs": 15.696625,
+		"phaseDocumentLoadMs": 8.934875,
+		"variablesChanged": 2,
+		"causalAttribution": false
+	},
+	"allOwnedServersStopped": true,
+	"followup": "cloned publisher plus explicit SDK cwd read-only proof remains unrun"
+}

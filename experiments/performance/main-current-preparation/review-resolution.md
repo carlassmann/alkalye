@@ -11,3 +11,5 @@ Opus review completed, exit zero, read-only tools. No runtime verification of th
 - Public refers to the model API, not anonymous document permissions. Fresh oracle reads use the same authenticated account in an independent SDK process; no public group grant is intended.
 
 written with gpt-6 in codex
+
+Undo extension review terminal, read-only. Source corrections (unrun): modified `z` anchors Undo timing instead of the modifier key; fresh empty output prevents stale trace reuse; started flag and partial observation preserve failed Undo evidence; original SDK sessions are checked for uniqueness and only digests are reported; incoming message counts bracket each trace. Backend history remains advancing, with prior declared and this-run accepted pairs recorded. Incoming counts are diagnostic, not proof of quiescent catch-up. Per-trial authentication-bearing profile copies are removed after closing. Next runtime gate is a paired 2 KiB Undo smoke, not the n3 matrix.

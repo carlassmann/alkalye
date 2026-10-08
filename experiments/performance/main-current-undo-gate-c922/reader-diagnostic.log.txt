@@ -1,0 +1,3 @@
+{"phase":"publisher-ready","time":716.036625,"sourceExact":true}
+{"phase":"reader-start","pid":4889,"time":716.522041}
+{"phase":"reader-terminal","code":0,"time":808.4595}

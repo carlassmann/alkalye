@@ -1,0 +1,16 @@
+[
+	{
+		"phase": "input",
+		"path": "/tmp/alkalye-main-current72/undo-smoke-results/rewrite-small-middle-0.trace.json",
+		"bytes": 3806441,
+		"sha256": "f711f1b98588d7f5a9a82fe9107a53da335e0bdf90da40e99c681761ecf552d1",
+		"archive": "retained outside Git"
+	},
+	{
+		"phase": "undo",
+		"path": "/tmp/alkalye-main-current72/undo-smoke-results/rewrite-small-middle-0-undo.trace.json",
+		"bytes": 3301617,
+		"sha256": "7e5fbbdd171cb0b034448f36d1ba1d304f0cefb3e74af5277c22f2590d0c271c",
+		"archive": "retained outside Git"
+	}
+]

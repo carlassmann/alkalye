@@ -1,0 +1,51 @@
+**Verdict:** the Undo smoke can't run yet. Two things block it (B1, B2). Fix those plus B3–B5, about 15 lines in total, then run the same-2 KiB paired Undo smoke with n=1. I only read the files; nothing was run.
+
+## What already holds
+- **Input trace stops before any server check:** `runner-with-undo.ts.txt:549` (stop) comes before `:594` (client complete) and `:602` (edit oracle).
+- **Undo trace starts only after both acceptances:** the edited client complete (`:594`) and the independent edit receipt (`:602`) come before the Undo trace start (`:606`). The Undo oracle can't pass early, because the server holds base+x until Undo lands.
+- **Native Undo on main is a real keypress path:** CodeMirror's `historyKeymap` (`/tmp/alkalye-main-rebench/src/app/features/editor/widgets/editor.tsx:533`). External content replaces use `addToHistory(false)` (`replace-editor-content.ts:37`), so Undo reverts only the `x`.
+- **Main's saved signal is the real one:** `doc-screen.tsx:537` → `:1212`, sent after a background save and after `updateCursor`.
+- **Rewrite actor is unique per trial:** it's random per session (`src/shared/document-session.ts:2055–2063`), so cloned profiles can't collide.
+- **No false 120 Hz or paint claims:** `summarize.py` has no 120 Hz, `paintUnionMs` is main-thread Paint work, and `presentationOpportunityMs` is labelled as the rAF opportunity. The probe's frame deltas are never summarized.
+- **Failure cleanup:** the `finally` block stops `activeTrace`, turns offline off and closes the browser.
+
+## Blockers
+**B1. Undo timing starts on the Meta key, not on z.**
+- `arm` (`:366`) starts timing on the first trusted keydown, and `press Meta+z` sends Meta first.
+- So the start mark, the enclosing task and the 3 s window are anchored to the Meta keydown, not the Undo task.
+- Fix in `arm`: keep logging every event, but only set `start` when the key isn't a modifier:
+  `state.events.push({...,key:event.key,meta:event.metaKey,ctrl:event.ctrlKey});if(!state.start&&!['Meta','Control','Shift','Alt'].includes(event.key)){...}`
+- After `:618`, assert that a z keydown with the platform modifier was seen:
+  `window.interactionProbe.events.some(e=>e.type==='keydown'&&e.key.toLowerCase()==='z'&&(e.meta||e.ctrl))`
+
+**B2. Stale traces can be summarized as new results.**
+- Trace names are fixed (`:428`, `:433`), `output` is reused (`:80`), and `summarize.py:31` reads any file that exists. An old Undo or input trace would be read as this run's.
+- Fix after `:80`: `if (await Bun.file(join(manifest.output,"results.json")).exists()) throw Error("Fresh output directory required")`
+
+**B3. Partial Undo evidence is lost on failure.**
+- The `catch` (`:660`) only fills `observation`, so a timeout at `:614` or `:618` drops the Undo probe.
+- Also, `undoTrace` is reported whenever `mutated` is true (`:650`, `:676`), even if the Undo trace never started.
+- Fix: add `let undoStarted=false`, set it to `true` right after the `:606` profiler start, and report `undoTrace: undoStarted ? undoTrace : undefined`.
+- In the `catch`, add: `if (undoStarted) try { undoObservation ??= evaluate(session,"(()=>{window.interactionEventObserver?.disconnect();return {probe:window.interactionProbe,network:window.interactionNetwork}})()") } catch {}`
+
+**B4. Main's per-trial session uniqueness isn't checked.**
+- `profile()` ignores the count of removed `co_…_N` keys (`:234`), and nothing checks that a new Jazz session was created.
+- Fix: for the original version, require removed ≥1.
+- After the ready wait at `:459`, read `Object.entries(localStorage).filter(([k])=>/^co_[^_]+_[0-9]+$/.test(k))`.
+- Throw if any value is in a run-level `Set` (seeded with the values just removed), add the new values to the set, and store them in the result.
+
+**B5. History keeps advancing, but the ready gate can't see sync catch-up.**
+- Each cloned profile has the seed-time local state. The server has the seed plus every earlier x/Undo pair, including the ones from the input-only smoke.
+- The ready gate is a content-hash match, which stale local state also passes. So catch-up sync traffic can land inside either trace window.
+- Minimal fix: in `interaction-matrix/network.js`, count incoming socket messages (`observed.received=0` and a `message` listener).
+- Copy that count into the probe at `start` and `end`, and report both. Rewrite's long-poll counts are already there.
+- Label each row `history: "advancing"` with the number of accepted pairs before it for that key. Don't claim identical history; the README line 27 wording is correct.
+
+## Minor (not blocking)
+- **Undo ready check:** `:608` reads the whole source every frame until ready. For parity with input, guard it with a length check first: `${length(version)}===window.interactionBase.length&&${source(version)}===window.interactionBase`.
+- **summarize-phases input phase:** when the Undo fails, the input phase still carries the Undo failure's `stage` and `error`. Clear both when `editedReceipt` exists.
+- **Rewrite client-complete:** `completeClient` can see `pending==='0'` before the Undo save is even scheduled. The Undo oracle covers correctness, so don't present the client-complete time as a save time.
+- **Cloned profiles:** the `profile-*` copies stay in `output` and hold authentication. Keep `output` private or delete them after closing the browser.
+- **Seeders:** no change needed for this gate.
+
+written with claude-opus-5-5 in claude CLI

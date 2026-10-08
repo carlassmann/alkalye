@@ -1,6 +1,6 @@
 # Main/current comparison preparation
 
-Source-only, unrun adapters. No new benchmark numbers or strict-type proof. Main is frozen `a749728a8f9a1cb984c980a5ea2daf984d60ae68`; proposed rewrite source is `72dd6f5edf6c8927b4c927d4c5c932d3940d6303` (verify checkout and build before freezing). Later documentation commits do not imply a different application build.
+Source-only, unrun adapters. No new benchmark numbers or strict-type proof. Main is frozen `a749728a8f9a1cb984c980a5ea2daf984d60ae68`; current paired-smoke rewrite source is `c922a8d61d2730e0b9b6179b36b36ba85cd5e578`. Earlier proposed `72dd6f5` was superseded before that build. Later documentation commits do not imply a different application build.
 
 First bounded run: three alternating trials of 2 KiB middle input/Undo and rich 128 KiB start/middle/end. Reuse `interaction-matrix/runner.ts.txt`, its accepted-source contracts and trace summarizer. Search/next/close, both switch directions, scroll, multicursor, polling and offline cells remain defined in that matrix; run them only after the initial adapters pass. A setup deadline yields no performance sample; uncertain writes block dependent trials.
 
@@ -27,3 +27,9 @@ bun bundles.ts MAIN_STATIC CURRENT_DIST PRIVATE_BUNDLE_RESULT.json PRIVATE_READY
 These commands are preparation, not a claim they ran. Public SDK creation/readback was separately proven in `main-sdk-created` (`ea60199`). Backend history advances through accepted edit/Undo pairs unless the managed reset layer explicitly restores a snapshot; cloned profiles alone do not establish identical histories.
 
 written with gpt-6 in codex
+
+## Next phase draft
+
+`runner-with-undo.ts.txt` adds an independent trusted Undo plus three-second trace after edited-source server acceptance. It keeps input and Undo observations/trace paths separate, preserves partial failures, waits for exact source restoration, native ordinary-edit caret restoration, client completion and independent server receipt. Every native viewport paint and normal application save still runs; no production path is changed. This extension is source-only and has not passed types/runtime.
+
+`seed-rewrite-initial.ts.txt` restricts public API creation to the configured initial fixture list (default `rich128`) instead of unnecessarily creating multicursor fixtures. The main seeder consumes those exact accepted source files and privately retains known assignments before waiting. `summarize-phases.py` delegates to the existing full-task parser for each separate phase; it does not combine input and Undo task maxima. First run one paired 2 KiB input/Undo smoke after strict types; only after that gate passes do these drafts support three alternating trials of the four initial cells against frozen `c922a8d61d2730e0b9b6179b36b36ba85cd5e578` and main `a749728a8f9a1cb984c980a5ea2daf984d60ae68`.

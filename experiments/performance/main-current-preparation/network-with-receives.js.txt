@@ -1,0 +1,30 @@
+;(() => {
+	let observed = (window.interactionNetwork = {
+		openedSockets: [],
+		pollRequests: 0,
+		sends: 0,
+		received: 0,
+	})
+	let NativeSocket = WebSocket
+	window.WebSocket = class extends NativeSocket {
+		constructor(url, protocols) {
+			super(url, protocols)
+			this.addEventListener("message", () => observed.received++)
+			this.addEventListener("open", () =>
+				observed.openedSockets.push(
+					new URL(String(url), location.href).pathname,
+				),
+			)
+		}
+	}
+	let originalFetch = fetch
+	window.fetch = function (input, options) {
+		let path = new URL(
+			input instanceof Request ? input.url : String(input),
+			location.href,
+		).pathname
+		if (path === "/api/live/poll") observed.pollRequests++
+		if (path === "/api/live/send") observed.sends++
+		return originalFetch(input, options)
+	}
+})()

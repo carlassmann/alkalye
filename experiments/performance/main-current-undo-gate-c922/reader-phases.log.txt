@@ -1,0 +1,12 @@
+{"phase":"configuration","time":7.690458}
+{"phase":"imports-complete","time":60.246958}
+{"phase":"startWorker-start","time":60.259708}
+{"phase":"startWorker-end","time":75.956333}
+{"phase":"connection-start","time":75.966667}
+{"phase":"connection-end","time":75.984}
+{"phase":"document-load-start","time":75.987125}
+{"phase":"document-load-end","time":84.922}
+{"phase":"subscribe-start","time":84.931}
+{"phase":"source-exact","time":85.230625}
+{"phase":"shutdown-start","time":85.236542}
+{"phase":"shutdown-end","time":85.601125}
