@@ -1,0 +1,12 @@
+seed accepted; interaction begins
+{"kind":"baseline","trial":0,"stage":"complete","passed":true,"error":""}
+seed accepted; interaction begins
+{"kind":"candidate","trial":0,"stage":"complete","passed":true,"error":""}
+seed accepted; interaction begins
+{"kind":"candidate","trial":1,"stage":"complete","passed":true,"error":""}
+seed accepted; interaction begins
+{"kind":"baseline","trial":1,"stage":"complete","passed":true,"error":""}
+seed accepted; interaction begins
+{"kind":"baseline","trial":2,"stage":"complete","passed":true,"error":""}
+seed accepted; interaction begins
+{"kind":"candidate","trial":2,"stage":"complete","passed":true,"error":""}
