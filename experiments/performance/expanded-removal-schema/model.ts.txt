@@ -1,0 +1,489 @@
+import * as Schema from "effect/Schema"
+import { finishSteps } from "./collection-copy"
+
+export interface Atom {
+	id: string
+	after: string
+	value: string
+	order?: readonly string[]
+	observed?: readonly string[]
+	ending?: "eof"
+	migration?: true
+	deleted?: readonly string[]
+	emptyHeader?: true
+	body?: true
+}
+export interface Operation {
+	id: string
+	clock: number
+	actor: string
+	time: number
+	author: string
+	target: string
+	kind: "text" | "set" | "cancel"
+	insert: Atom[]
+	remove: string[]
+	field: string
+	value: string
+	restores?: string
+}
+export interface Packet {
+	id: string
+	iv: string
+	body: string
+}
+export interface Room {
+	id: string
+	key: string
+	read: string
+	write: string
+	admin: string
+	name: string
+	local: boolean
+	personal?: boolean
+}
+export interface Grant {
+	token: string
+	role: "reader" | "writer" | "manager" | "admin"
+}
+export interface DocumentRecord {
+	kind?: "document" | "slides" | "whiteboard"
+	id: string
+	title: string
+	content: string
+	folder: string
+	archived: boolean
+	updated: number
+	room: string
+	tags?: string[]
+	pinned?: boolean
+	created?: number
+}
+export type DocumentLink = Pick<DocumentRecord, "id" | "title" | "archived"> & {
+	folder?: string
+	tags?: string[]
+}
+export interface Presence {
+	presenting?: boolean
+	boardOpen?: boolean
+	board?: string
+	drawingActive?: boolean
+	actor: string
+	name: string
+	document: string
+	cursor: number
+	selectionEnd?: number
+	scroll?: number
+	slide: number
+	item?: number
+	x: number
+	y: number
+	time: number
+	// When the shown presentation position was chosen; the newest move leads.
+	movedAt?: number
+	// A slideshow window offers itself to laser pointers with its size.
+	display?: PresenceDisplay
+	// The display a laser pointer aims at.
+	target?: string
+	// Set by the relay: the peer is signed into the receiving account.
+	own?: boolean
+}
+export interface PresenceDisplay {
+	width: number
+	height: number
+	appearance: "light" | "dark"
+}
+export function object(value: unknown): Record<string, unknown> {
+	if (!value || typeof value !== "object" || Array.isArray(value))
+		throw new Error("Expected an object")
+	return Object.fromEntries(Object.entries(value))
+}
+export function string(value: unknown): string {
+	if (typeof value !== "string") throw new Error("Expected text")
+	return value
+}
+export function number(value: unknown): number {
+	if (typeof value !== "number" || !Number.isFinite(value))
+		throw new Error("Expected a number")
+	return value
+}
+export function array(value: unknown): unknown[] {
+	if (!Array.isArray(value)) throw new Error("Expected a list")
+	return value
+}
+export let PacketSchema = Schema.Struct({
+	id: Schema.String.check(Schema.isPattern(/^[\w:-]{1,200}$/)),
+	iv: Schema.String.check(Schema.isBetweenLength(16, 16)),
+	body: Schema.String.check(Schema.isMaxLength(8_000_000)),
+})
+export let RoleSchema = Schema.Literals([
+	"reader",
+	"writer",
+	"manager",
+	"admin",
+])
+let decodePacket = Schema.decodeUnknownSync(PacketSchema)
+export function parsePacket(value: unknown): Packet {
+	return decodePacket(value)
+}
+export let parseRole = Schema.decodeUnknownSync(RoleSchema)
+export let IdentifierSchema = Schema.String.check(
+	Schema.isPattern(/^[\w:.-]{1,200}$/),
+)
+export let RoomSchema = Schema.Struct({
+	id: IdentifierSchema,
+	key: Schema.String,
+	read: Schema.String,
+	write: Schema.String,
+	admin: Schema.String,
+	name: Schema.String,
+	local: Schema.optional(Schema.Unknown),
+	personal: Schema.optional(Schema.Unknown),
+})
+export let PresenceSchema = Schema.Struct({
+	presenting: Schema.optional(Schema.Unknown),
+	boardOpen: Schema.optional(Schema.Unknown),
+	board: Schema.optional(Schema.NullOr(Schema.String)),
+	drawingActive: Schema.optional(Schema.Unknown),
+	actor: Schema.String,
+	name: Schema.String,
+	document: Schema.String,
+	cursor: Schema.Finite,
+	selectionEnd: Schema.optional(Schema.NullOr(Schema.Finite)),
+	scroll: Schema.optional(Schema.NullOr(Schema.Finite)),
+	slide: Schema.Finite,
+	item: Schema.optional(Schema.Natural),
+	x: Schema.Finite,
+	y: Schema.Finite,
+	time: Schema.Finite,
+	movedAt: Schema.optional(Schema.Finite),
+	display: Schema.optional(
+		Schema.Struct({
+			width: Schema.Finite,
+			height: Schema.Finite,
+			appearance: Schema.Literals(["light", "dark"]),
+		}),
+	),
+	target: Schema.optional(Schema.String),
+	own: Schema.optional(Schema.Boolean),
+})
+export let TextOperationIdSchema = Schema.String.check(
+	Schema.isPattern(/^\d{16}:[\w-]{1,100}$/),
+	Schema.makeFilter(
+		value => validTextClock(value) || "Invalid contribution clock",
+	),
+)
+export let TextAtomIdSchema = Schema.String.check(
+	Schema.isPattern(/^\d{16}:[\w-]{1,100}:\d{8}$/),
+	Schema.makeFilter(
+		value => validTextClock(value) || "Invalid atom owner clock",
+	),
+)
+export let AtomSchema = Schema.Struct({
+	id: Schema.String,
+	after: Schema.String,
+	value: Schema.String,
+	order: Schema.optional(Schema.Array(Schema.String)),
+	observed: Schema.optional(Schema.Array(TextAtomIdSchema)),
+	ending: Schema.optional(Schema.Literal("eof")),
+	migration: Schema.optional(Schema.Literal(true)),
+	deleted: Schema.optional(Schema.Array(Schema.String)),
+	emptyHeader: Schema.optional(Schema.Literal(true)),
+	body: Schema.optional(Schema.Literal(true)),
+})
+export let DeletionRunSchema = Schema.Struct({
+	id: Schema.String.check(Schema.isPattern(/:\d{8}$/)),
+	count: Schema.Int.check(Schema.isBetween({ minimum: 1, maximum: 2_000_000 })),
+})
+export let OperationEnvelopeSchema = Schema.Struct({
+	id: Schema.String,
+	clock: Schema.Finite,
+	actor: Schema.String,
+	time: Schema.Finite,
+	author: Schema.String,
+	target: IdentifierSchema,
+	kind: Schema.Literals(["text", "set", "cancel"]),
+	insert: Schema.Array(AtomSchema),
+	remove: Schema.Array(Schema.Union([Schema.String, DeletionRunSchema])),
+	field: Schema.String,
+	value: Schema.String,
+	restores: Schema.optional(TextOperationIdSchema),
+})
+let decodeIdentifier = Schema.decodeUnknownSync(IdentifierSchema)
+let decodeRoom = Schema.decodeUnknownSync(RoomSchema)
+let decodePresence = Schema.decodeUnknownSync(PresenceSchema)
+let decodeOperation = Schema.decodeUnknownSync(OperationEnvelopeSchema)
+// The envelope has field checks only; both decoders must retain any future envelope checks.
+let decodeExpandedOperation = Schema.decodeUnknownSync(
+	Schema.Struct({
+		...OperationEnvelopeSchema.fields,
+		remove: Schema.Array(Schema.String),
+	}),
+)
+function hasExpandedRemovals(value: unknown) {
+	if (!value || typeof value !== "object") return false
+	let property = Object.getOwnPropertyDescriptor(value, "remove")
+	if (!property || !Object.hasOwn(property, "value")) return false
+	let removals: unknown = property.value
+	if (!Array.isArray(removals)) return false
+	for (let index = 0; index < removals.length; index++)
+		if (typeof removals[index] !== "string") return false
+	return true
+}
+export function identifier(value: unknown): string {
+	return decodeIdentifier(value)
+}
+export function parseRoom(value: unknown): Room {
+	let record = decodeRoom(value)
+	return {
+		id: record.id,
+		key: record.key,
+		read: record.read,
+		write: record.write,
+		admin: record.admin,
+		name: record.name,
+		local: record.local === true,
+		...(record.personal === true ? { personal: true } : {}),
+	}
+}
+export function parseOperation(value: unknown): Operation {
+	let record = hasExpandedRemovals(value)
+		? decodeExpandedOperation(value)
+		: decodeOperation(value)
+	let operation: Operation = {
+		id: record.id,
+		clock: record.clock,
+		actor: record.actor,
+		time: record.time,
+		author: record.author,
+		target: record.target,
+		kind: record.kind,
+
+		insert: record.insert.flatMap(atom => {
+			let id = atom.id,
+				after = atom.after,
+				content = atom.value,
+				characters = Array.from(content)
+			if (characters.length <= 1)
+				return [
+					{
+						id,
+						after,
+						value: content,
+						...(atom.order ? { order: [...atom.order] } : {}),
+						...(atom.observed ? { observed: [...atom.observed] } : {}),
+						...(atom.ending ? { ending: atom.ending } : {}),
+						...(atom.migration ? { migration: atom.migration } : {}),
+						...(atom.deleted ? { deleted: [...atom.deleted] } : {}),
+						...(atom.emptyHeader ? { emptyHeader: atom.emptyHeader } : {}),
+						...(atom.body ? { body: atom.body } : {}),
+					},
+				]
+			if (!/:\d{8}$/.test(id) || characters.length > 2_000_000)
+				throw new Error("Invalid insertion run")
+			let prefix = id.slice(0, -8),
+				offset = Number(id.slice(-8))
+			return characters.map((value, index) => ({
+				id: prefix + String(offset + index).padStart(8, "0"),
+				after: index
+					? prefix + String(offset + index - 1).padStart(8, "0")
+					: after,
+				value,
+				...(index === 0 && atom.order ? { order: [...atom.order] } : {}),
+				...(index === 0 && atom.observed
+					? { observed: [...atom.observed] }
+					: {}),
+				...(index === 0 && atom.ending ? { ending: atom.ending } : {}),
+				...(index === 0 && atom.migration ? { migration: atom.migration } : {}),
+				...(index === 0 && atom.deleted ? { deleted: [...atom.deleted] } : {}),
+				...(index === 0 && atom.body ? { body: atom.body } : {}),
+				...(index === 0 && atom.emptyHeader
+					? { emptyHeader: atom.emptyHeader }
+					: {}),
+			}))
+		}),
+		remove: expandDeletions(record.remove, 2_000_000),
+		field: record.field,
+		value: record.value,
+		...(record.restores ? { restores: record.restores } : {}),
+	}
+	if (
+		!Number.isSafeInteger(operation.clock) ||
+		operation.clock < 1 ||
+		operation.id !==
+			`${String(operation.clock).padStart(16, "0")}:${operation.actor}` ||
+		!/^[\w-]{1,100}$/.test(operation.actor)
+	)
+		throw new Error("Invalid operation identity")
+	if (
+		operation.restores &&
+		(operation.kind !== "set" ||
+			Number(operation.restores.slice(0, 16)) >= operation.clock)
+	)
+		throw new Error("Invalid register restoration provenance")
+	if (operation.kind === "cancel") {
+		Schema.decodeUnknownSync(TextOperationIdSchema)(operation.value)
+		if (
+			operation.insert.length ||
+			operation.remove.length ||
+			operation.field ||
+			Number(operation.value.slice(0, 16)) >= operation.clock
+		)
+			throw new Error("Invalid text cancellation")
+	}
+	let known = new Set<string>()
+	for (let atom of operation.insert) {
+		if (
+			!atom.id.startsWith(operation.id + ":") ||
+			!/:\d{8}$/.test(atom.id) ||
+			Array.from(atom.value).length !== 1 ||
+			known.has(atom.id) ||
+			atom.after === atom.id
+		)
+			throw new Error("Invalid atom identity")
+		known.add(atom.id)
+	}
+	return operation
+}
+export function parsePresence(value: unknown): Presence {
+	let record = decodePresence(value)
+	return {
+		...record,
+		presenting: record.presenting === true,
+		boardOpen: record.boardOpen === true,
+		drawingActive: record.drawingActive === true,
+		board: record.board ?? "",
+		selectionEnd: record.selectionEnd ?? record.cursor,
+		scroll: record.scroll ?? 0,
+	}
+}
+
+let loneSurrogate = /[\uD800-\uDFFF]/u
+export function compactAtoms(atoms: readonly Atom[]) {
+	return finishSteps(compactAtomSteps(atoms, false))
+}
+export function* compactAtomSteps(
+	atoms: readonly Atom[],
+	cooperative: boolean,
+): Generator<void, Atom[]> {
+	let work = 0
+	let insert: Atom[] = []
+	let last: Atom | undefined
+	for (let atom of atoms) {
+		let previous = insert[insert.length - 1]
+
+		let expected = last
+			? last.id.slice(0, -8) +
+				String(Number(last.id.slice(-8)) + 1).padStart(8, "0")
+			: ""
+		if (
+			previous &&
+			previous.value.length + atom.value.length <= 2_000_000 &&
+			last &&
+			!loneSurrogate.test(last.value) &&
+			!loneSurrogate.test(atom.value) &&
+			!atom.order &&
+			!atom.observed &&
+			!atom.ending &&
+			!atom.migration &&
+			!atom.deleted &&
+			!atom.emptyHeader &&
+			!atom.body &&
+			atom.id === expected &&
+			atom.after === last.id
+		)
+			previous.value += atom.value
+		else insert.push({ ...atom })
+		last = atom
+		if (cooperative && ++work % 512 === 0) yield
+	}
+	return insert
+}
+
+export function compactOperation(operation: Operation) {
+	return {
+		...operation,
+		insert: compactAtoms(operation.insert),
+		remove: compactDeletions(operation.remove),
+	}
+}
+
+export function compactDeletions(ids: readonly string[]) {
+	return finishSteps(compactDeletionSteps(ids, false))
+}
+export function* compactDeletionSteps(
+	ids: readonly string[],
+	cooperative: boolean,
+): Generator<void, { id: string; count: number }[]> {
+	let work = 0
+	let remove: { id: string; count: number }[] = []
+	for (let id of ids) {
+		let previous = remove[remove.length - 1]
+		let expected = previous
+			? previous.id.slice(0, -8) +
+				String(Number(previous.id.slice(-8)) + previous.count).padStart(8, "0")
+			: ""
+		if (previous && id === expected) previous.count++
+		else remove.push({ id, count: 1 })
+		if (cooperative && ++work % 512 === 0) yield
+	}
+	return remove
+}
+export function* deletionIds(
+	runs: readonly (string | typeof DeletionRunSchema.Type)[],
+	maximum = 4_000_000,
+) {
+	let count = 0
+	for (let run of runs) {
+		if (typeof run === "string") count++
+		else {
+			if (
+				!Number.isSafeInteger(run.count) ||
+				run.count < 1 ||
+				!/:\d{8}$/.test(run.id) ||
+				Number(run.id.slice(-8)) + run.count > 100_000_000
+			)
+				throw new Error("Invalid deletion run identity range")
+			count += run.count
+		}
+		if (count > maximum)
+			throw new Error("Deletion expansion exceeds its identity limit")
+	}
+	for (let run of runs) {
+		if (typeof run === "string") yield run
+		else {
+			let prefix = run.id.slice(0, -8)
+			let offset = Number(run.id.slice(-8))
+			for (let index = 0; index < run.count; index++)
+				yield prefix + String(offset + index).padStart(8, "0")
+		}
+	}
+}
+export function expandDeletions(
+	runs: readonly (string | typeof DeletionRunSchema.Type)[],
+	maximum = 4_000_000,
+) {
+	return [...deletionIds(runs, maximum)]
+}
+
+function validTextClock(id: string) {
+	let clock = Number(id.slice(0, 16))
+	return Number.isSafeInteger(clock) && clock >= 1
+}
+
+export function packetBatches(packets: Packet[]) {
+	let batches: Packet[][] = [],
+		current: Packet[] = [],
+		size = 0
+	for (let packet of packets) {
+		if (size + packet.body.length > 4_000_000 && current.length) {
+			batches.push(current)
+			current = []
+			size = 0
+		}
+		current.push(packet)
+		size += packet.body.length
+	}
+	if (current.length) batches.push(current)
+	return batches
+}

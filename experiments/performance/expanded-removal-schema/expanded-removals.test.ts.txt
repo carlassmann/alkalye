@@ -1,0 +1,78 @@
+import { expect, test } from "bun:test"
+import { Replica } from "../src/shared/crdt"
+import { compactOperation, parseOperation } from "../src/shared/model"
+
+function operation() {
+	let replica = new Replica("writer")
+	replica.edit("doc", "A😀B\r\nTOKEN TOKEN")
+	let source = replica.text("doc"),
+		first = source.indexOf("TOKEN"),
+		second = source.indexOf("TOKEN", first + 5)
+	let operation = replica.prepareReplacements("doc", [
+		{ start: first, remove: 5, text: "x" },
+		{ start: second, remove: 5, text: "y" },
+	])
+	if (!operation) throw Error("Missing edit")
+	return operation
+}
+
+test("expanded and compact removal envelopes preserve fresh owned outputs", () => {
+	let original = operation(),
+		expanded = parseOperation(original),
+		compacted = parseOperation(compactOperation(original))
+	expect(expanded).toEqual(compacted)
+	expect(expanded).not.toBe(compacted)
+	expect(expanded.remove).not.toBe(original.remove)
+	let first = expanded.insert[0]
+	if (!first) throw Error("Missing insertion")
+	first.value = "MUTATED"
+	expanded.remove.length = 0
+	expect(parseOperation(original)).toEqual(compacted)
+})
+
+test("mixed and compact deletion runs reconstruct the same contribution", () => {
+	let original = operation(),
+		compacted = compactOperation(original)
+	let first = original.remove[0]
+	if (!first) throw Error("Missing removal")
+	expect(
+		parseOperation({ ...original, remove: [first, ...compacted.remove] })
+			.remove,
+	).toEqual([first, ...original.remove])
+	expect(parseOperation(compacted)).toEqual(parseOperation(original))
+})
+
+test("accessor and inherited removal fields retain generic decoding", () => {
+	let original = operation(),
+		accessed = { ...original }
+	Object.defineProperty(accessed, "remove", {
+		get: () => compactOperation(original).remove,
+	})
+	expect(parseOperation(accessed)).toEqual(parseOperation(original))
+	let inherited: Record<string, unknown> = { ...original }
+	delete inherited.remove
+	Object.setPrototypeOf(inherited, {
+		remove: compactOperation(original).remove,
+	})
+	expect(parseOperation(inherited)).toEqual(parseOperation(original))
+})
+
+test("malformed expanded or mixed removal envelopes retain atomic replica state", () => {
+	let original = operation()
+	for (let remove of [
+		[3],
+		[original.remove[0], { id: "bad", count: -1 }],
+		new Array(2),
+	])
+		expect(() => parseOperation({ ...original, remove })).toThrow()
+	let replica = new Replica("receiver")
+	let before = replica.checkpoint()
+	let malformed = structuredClone(original)
+	malformed.id = "invalid"
+	expect(() => replica.apply([malformed])).toThrow()
+	expect(replica.checkpoint()).toEqual(before)
+	let parsed = parseOperation(original)
+	parsed.actor = "bad actor"
+	expect(() => replica.apply([parsed])).toThrow()
+	expect(replica.checkpoint()).toEqual(before)
+})

@@ -1,0 +1,36 @@
+**Verdict: HOLD / don't adopt. The code is correct and safe. The perf win isn't shown, and the evidence leans slightly against it.**
+
+**Correctness: OK**
+- The diff against `baseline/` is only `model.ts:216-232` and `:250-252`. Everything after decoding is unchanged: the identity, restores, cancel and atom checks, and `expandDeletions(…, 2_000_000)`.
+- The fast path only drops the run branch of the union. `decodeExpandedOperation` reuses `OperationEnvelopeSchema.fields`, so other fields fail with the same path and message.
+- Admission parity holds for JSON inputs. Non-JSON inputs can only fail closed:
+  - Holes (`new Array(2)`) and `[3]` now go to the generic decoder, because the indexed loop sees `undefined`. That fixes the message-wording difference the earlier review found with `every`.
+  - A getter or Proxy that toggles between reads can only push the input into the stricter decoder. That's acceptable.
+- The prior review's hardening point (indexed loop instead of `every`) and its comment-at-definition point are both addressed. No struct-level checks exist today.
+
+**Ownership: OK**
+- `remove` is always a fresh array from `[...deletionIds]`.
+- `insert`, `order`, `observed` and `deleted` are copied via spreads or `flatMap`. Output doesn't alias the input, whether or not Effect returns the input array.
+- Test 1 checks this by mutation.
+
+**Quotas: OK**
+- 2,000,001 strings still throw in `deletionIds`, same as before. The fast path still decodes the whole array before the quota check, just like the generic path.
+
+**Generic fallback: OK**
+- Mixed lists, compact runs, accessor `remove` and inherited `remove` all take the unchanged decoder. The tests cover these cases.
+
+**Test gaps (minor, not blocking)**
+- No fast-path quota test (2,000,001 strings rejected with the same message as a run of the same size).
+- No fast-path schema-field rejection test, e.g. all-string `remove` with a bad `kind` or `target`, checking the error path. The `id="invalid"` case only exercises the post-decode identity check.
+
+**Measurement**
+- The headline numbers check out against `task-summary.json`: input 35.629 → 33.567, aftermath 59.596 → 61.102, GC 43.510 → 60.512.
+- n=3 per arm. Trial order is interleaved, all gates are true, and all traces are complete-window.
+- Input: the −2.06 ms delta is within the baseline spread (32.8–39.0). Candidate trial 0 (36.4) is worse than the baseline median. Not attributable to the change.
+- GC median +17 ms is driven by 76.2 and 60.5 outliers. The change should allocate less, not more, so this is most likely noise. Even so, the direction is adverse and can't be dismissed at n=3.
+- Event timings are all 40 ms because of browser rounding, so they can't tell the arms apart.
+- Missing from the reviewed artifacts: an isolated `parseOperation` benchmark on the ~12K-string native2048 operation, comparing generic vs fast decode. That's the only measurement that could show a real effect at this size. Without it, the end-to-end cells can't show any win.
+
+**Terminal:** correct, owned, fail-closed, quotas preserved. No proven benefit, and aftermath and GC are mildly adverse. HOLD. Revisit only if an isolated microbenchmark shows a material decode saving and a larger matched run (n≥7) confirms it without GC regression.
+
+I only read files; nothing was executed.

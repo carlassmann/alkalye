@@ -1,0 +1,38 @@
+**Verdict:** I'd accept it. The candidate accepts and rejects the same inputs as production for every input `JSON.parse` can produce. Any divergence only shows up with hostile JS objects, and there it makes the candidate reject something production would accept, never the reverse.
+
+**Diff:** only `model.ts:216-228` and `:246` change.
+- `decodeExpandedOperation` is built from `...OperationEnvelopeSchema.fields` with `remove` set to `Array(String)`.
+- `hasExpandedRemovals` requires an own data property whose value is an array of all strings.
+- Everything after decode is identical: `expandDeletions(…, 2_000_000)`, the identity, restores, cancel and atom checks, and the quotas.
+
+**Acceptance parity**
+- `String` is a member of the union, so an all-string array is accepted by both paths. Anything with a run object, a mix, an accessor, an inherited `remove`, a non-object input or a non-array value takes the generic decoder, which is unchanged.
+- On the fast path the `remove` field can't produce an issue. Errors in other fields carry the same path and message, since the field set and order are the same.
+- Holes or `new Array(n)`: `every` skips holes, so the fast path is taken and the decoder rejects at the hole index. Production rejects at the same index, but with the union's "Expected string | {id,count}" message. Same outcome, different wording. JSON can't produce holes.
+
+**Getter/Proxy risks (all fail closed)**
+- The prefilter runs `every`, then the decoder reads the elements again. Element getters and Proxy `get` traps therefore run twice, where production runs them once.
+- If a getter or trap returns a string the first time and a run object the second, the candidate rejects and production accepts.
+- A Proxy whose `getOwnPropertyDescriptor` reports a data property while `get` returns something else, or an Array subclass that overrides `every`, has the same effect: it can only push a valid input into the stricter decoder.
+- No path accepts something production rejects.
+- Optional hardening: use `Array.prototype.every.call`, or a plain indexed loop with `typeof` checks. Not required.
+
+**Output freshness:** `remove` is always the fresh array from `expandDeletions` (`[...deletionIds]`) and never aliases the input. The strings are immutable. Same as production.
+
+**Wire mixed/compressed runs:** these take the generic path. `deletionIds` still enforces its range and limit checks, so behaviour is unchanged.
+
+**Maintenance risk:** the derived schema copies only `.fields`. If someone later adds a struct-level check or annotation to `OperationEnvelopeSchema`, the fast path silently skips it. Add a one-line note at the definition, or a test that keeps the two in sync.
+
+**Scope:** no scalar or string parser rewrite is included, and nothing claims a speedup. The extra pre-scan is O(n), about 12K `typeof` checks for the native2048 cursor operation. Its cost should be measured, not asserted.
+
+**Smallest contract tests to suggest**
+1. **Equivalence via `parseOperation` and admission (`text-admission.ts:22`):** run the same op with `remove` as about 12K strings, as compact runs, and mixed. Assert deep-equal output and that the result never `===` the input array.
+2. **Malformed:** `remove: ["a", 1]`, `[{id:"x:00000001",count:0}]`, a sparse array, `remove` inherited via prototype, `remove` as a getter, and an all-string `remove` with a bad `kind`. All must reject, as in production. For the bad `kind` case also assert the error path is `kind`.
+3. **Proxy/getter toggle:** the element returns a string first and a run on the second read. Assert it rejects and doesn't throw anything other than a decode error.
+4. **`Replica` (`crdt.ts:109`):** apply an expanded-string op and the equivalent compact-run op to two replicas, in both orders, concurrently with an insert. Assert identical text.
+5. **Real `DocumentSession` (`document-session.ts:132`):** delete a Unicode range (surrogate pairs, ZWJ emoji) spanning CRLF, then Undo. Interrupt Undo mid-cooperative-yield with a remote expanded-removal op arriving. Assert converged text, no orphaned lone surrogates or split `\r\n`, and the cursor still valid.
+6. **Quota:** an all-string `remove` of 2,000,001 ids is rejected with the same message as a run totalling the same count.
+
+I reviewed read-only and didn't run any tests.
+
+The claude.ai connectors (GitHub, Slack, Notion and others) need authorizing in your claude.ai connector settings; I didn't need them here.

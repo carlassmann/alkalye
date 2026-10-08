@@ -1,0 +1,165 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/replica-stale-source.test.ts:
+(pass) published stale base matches cold action and reconstruction 4 [7.48ms]
+(pass) published stale base matches cold action and reconstruction 8 [0.88ms]
+(pass) published stale base matches cold action and reconstruction 42 [2.81ms]
+(pass) published stale base matches cold action and reconstruction 31 [1.02ms]
+(pass) published stale base matches cold action and reconstruction 131094 [547.99ms]
+(pass) stale prepareEdit matches cold frontmatter merge and peer preservation [2.44ms]
+(pass) external mutable atom arrays keep current values and Unicode bounds [0.44ms]
+(pass) published frontmatter atoms and nested arrays cannot mutate before stale use [0.36ms]
+(pass) cooperative source materialization preserves stale bases through cancellation [0.83ms]
+(pass) cold cooperative materialization publishes an exact immutable stale basis [4.33ms]
+(pass) published fast source view remains exact through stale use local [0.77ms]
+(pass) published fast source view remains exact through stale use peer-scalar [0.50ms]
+(pass) published fast source view remains exact through stale use peer-run [0.48ms]
+(pass) published fast source view remains exact through stale use terminal-cancel [0.54ms]
+
+tests/expanded-removals.test.ts:
+994 | 				replacement.start === lastStart ||
+995 | 				stop > previous.length
+996 | 			)
+997 | 				throw new RangeError(
+998 | 					"Text replacements must be ordered, disjoint and within their base",
+999 | 				)
+          ^
+RangeError: Text replacements must be ordered, disjoint and within their base
+      at prepareReplacements (/private/tmp/alkalye-expanded-removals/src/shared/crdt.ts:999:5)
+      at operation (/private/tmp/alkalye-expanded-removals/tests/expanded-removals.test.ts:8:26)
+      at <anonymous> (/private/tmp/alkalye-expanded-removals/tests/expanded-removals.test.ts:17:17)
+(fail) expanded and compact removal envelopes preserve fresh owned outputs [0.20ms]
+994 | 				replacement.start === lastStart ||
+995 | 				stop > previous.length
+996 | 			)
+997 | 				throw new RangeError(
+998 | 					"Text replacements must be ordered, disjoint and within their base",
+999 | 				)
+          ^
+RangeError: Text replacements must be ordered, disjoint and within their base
+      at prepareReplacements (/private/tmp/alkalye-expanded-removals/src/shared/crdt.ts:999:5)
+      at operation (/private/tmp/alkalye-expanded-removals/tests/expanded-removals.test.ts:8:26)
+      at <anonymous> (/private/tmp/alkalye-expanded-removals/tests/expanded-removals.test.ts:31:17)
+(fail) mixed and compact deletion runs reconstruct the same contribution [0.11ms]
+994 | 				replacement.start === lastStart ||
+995 | 				stop > previous.length
+996 | 			)
+997 | 				throw new RangeError(
+998 | 					"Text replacements must be ordered, disjoint and within their base",
+999 | 				)
+          ^
+RangeError: Text replacements must be ordered, disjoint and within their base
+      at prepareReplacements (/private/tmp/alkalye-expanded-removals/src/shared/crdt.ts:999:5)
+      at operation (/private/tmp/alkalye-expanded-removals/tests/expanded-removals.test.ts:8:26)
+      at <anonymous> (/private/tmp/alkalye-expanded-removals/tests/expanded-removals.test.ts:43:17)
+(fail) accessor and inherited removal fields retain generic decoding [0.09ms]
+994 | 				replacement.start === lastStart ||
+995 | 				stop > previous.length
+996 | 			)
+997 | 				throw new RangeError(
+998 | 					"Text replacements must be ordered, disjoint and within their base",
+999 | 				)
+          ^
+RangeError: Text replacements must be ordered, disjoint and within their base
+      at prepareReplacements (/private/tmp/alkalye-expanded-removals/src/shared/crdt.ts:999:5)
+      at operation (/private/tmp/alkalye-expanded-removals/tests/expanded-removals.test.ts:8:26)
+      at <anonymous> (/private/tmp/alkalye-expanded-removals/tests/expanded-removals.test.ts:58:17)
+(fail) malformed expanded or mixed removal envelopes retain atomic replica state [0.11ms]
+
+tests/sessions.test.ts:
+(pass) challenge expires exactly at the boundary even when its proof was already signed [10.78ms]
+(pass) idle sessions expire and the same token cannot switch authentication purpose [5.67ms]
+(pass) use extends idle expiry but never the absolute lifetime [4.45ms]
+(pass) tokens survive a server restart, remain redacted and are stored only as hashes [8.84ms]
+(pass) expired entries are reclaimed before applying the challenge capacity [5.98ms]
+(pass) signing identity is deterministic, domain-bound and rejects incomplete recovery keys [0.59ms]
+(pass) native SQL migrations upgrade pre-purpose databases and invalidate unbound old sessions [6.40ms]
+
+tests/frontmatter.test.ts:
+(pass) Effect YAML retains typed frontmatter, nested data and body offsets [0.43ms]
+(pass) empty headers and EOF fences retain the actual body [0.11ms]
+(pass) metadata patches preserve inline comments and anchor references [1.11ms]
+(pass) flow-map frontmatter patches retain unknown nested values [0.19ms]
+(pass) frontmatter patches preserve unrelated YAML, comments and CRLF [0.22ms]
+(pass) source fields override legacy registers, including empty and false values [0.11ms]
+(pass) malformed field types fail independently through Schema [0.17ms]
+(pass) first metadata edit materializes legacy fields, later deletion cannot resurrect them [1.15ms]
+(pass) frontmatter converges through wire and snapshot: identical booleans [3.70ms]
+(pass) frontmatter converges through wire and snapshot: different titles [1.88ms]
+(pass) frontmatter converges through wire and snapshot: independent keys [1.95ms]
+(pass) frontmatter converges through wire and snapshot: concurrent first headers [1.04ms]
+(pass) metadata edits preserve concurrent body insertions and comment atom identities [0.64ms]
+(pass) removing and recreating a header keeps a single valid source [0.21ms]
+(pass) header deletion concurrent with a metadata edit retains a complete header [0.51ms]
+(pass) slide separators and local duplicate keys remain literal source [0.20ms]
+(pass) undo after resolving metadata conflicts restores the previous winner [0.99ms]
+(pass) undo header deletion preserves a concurrent metadata change [0.69ms]
+(pass) concurrent body prepends cannot displace frontmatter [0.72ms]
+(pass) typing a duplicate key leaves it visible for correction [0.23ms]
+(pass) header typing preserves source order, scalar continuations and broken fences [2.25ms]
+(pass) headers over list and separator prefixes remain complete during concurrent creation [0.90ms]
+(pass) body typing does not rewrite a header containing literal duplicate keys [0.36ms]
+(pass) selective undo and redo preserve a subsequent rename by the same actor [0.48ms]
+(pass) undoing a slide deletion never turns body text into frontmatter [0.21ms]
+(pass) composition over a header comment preserves unseen remote metadata [1.14ms]
+(pass) header comments retain unchanged quotes after atomic entry edits [0.58ms]
+(pass) copying legacy metadata into an existing canonical document materializes its source [0.48ms]
+(pass) concurrent legacy migration cannot overwrite another writer's explicit metadata edit [0.78ms]
+(pass) three writers converge through delayed delivery, duplicate replay and cached reopen [448.22ms]
+(pass) header deletion preserves body identities and concurrent prepends [0.37ms]
+(pass) stale header deletion removes every frame observed by the editor [0.34ms]
+(pass) stale composition does not resurrect an unchanged key deleted by a peer [0.45ms]
+(pass) undo restores header comments and its original EOF closing fence [0.37ms]
+(pass) plain ampersands and asterisks do not turn independent keys into one conflict [1.07ms]
+(pass) migration at a higher unrelated room clock cannot replace explicit metadata [1.12ms]
+(pass) body edits cannot erase a deletion that outranks a delayed legacy migration [0.40ms]
+(pass) native YAML keys with spaces, Unicode and periods remain independent entries [0.69ms]
+(pass) first full-source write migrates legacy metadata before marking its source authoritative [0.28ms]
+(pass) header comments must preserve concurrent untouched keys [0.74ms]
+(pass) EOF formatting must preserve concurrent untouched keys [0.75ms]
+(pass) concurrent body separators cannot swallow a new header [0.35ms]
+(pass) concurrent source edits cannot leave dangling YAML aliases [2.85ms]
+(pass) invalid source YAML retains independent concurrent fields and literal asterisks [1.00ms]
+(pass) concurrent deletion of an anchor cannot break an unseen alias [1.05ms]
+(pass) concurrent replacement of an existing value by an alias survives anchor deletion as valid source [0.91ms]
+(pass) removing an anchor after reading its alias preserves deliberately invalid source [0.27ms]
+(pass) an undone anchor cannot justify hiding newly typed invalid aliases [2.55ms]
+(pass) typing after an EOF header preserves its newline and body across checkpoints [0.32ms]
+(pass) closing an offline root header cannot leave the incremental view different from its checkpoint [0.23ms]
+(pass) editing a promoted offline header body preserves raw anchors for following metadata edits [0.46ms]
+(pass) body edits promote a header revealed by another writer deleting its prefix [0.79ms]
+(pass) bulk reads preserve immutable replica views through incremental edits and concurrent metadata [18.75ms]
+
+tests/chunk-replacements.test.ts:
+(pass) ordered replacements preserve Unicode, forks and causal undo 128 [34.39ms]
+(pass) ordered replacements preserve Unicode, forks and causal undo 512 [133.57ms]
+(pass) ordered replacements preserve Unicode, forks and causal undo 2048 [624.64ms]
+(pass) boundary replacements and chained concat-backed edits [{"start":1,"remove":1,"text":"X"},{"start":4,"remove":0,"text":"Y"}] [0.60ms]
+(pass) boundary replacements and chained concat-backed edits [{"start":0,"remove":1,"text":"X"},{"start":1,"remove":1,"text":"Y"}] [0.15ms]
+(pass) boundary replacements and chained concat-backed edits [{"start":0,"remove":1,"text":""},{"start":6,"remove":0,"text":"Z"}] [0.12ms]
+
+tests/replica-source-fence.test.ts:
+(pass) precise replacements preserve separator assembled from two disjoint edits [1.63ms]
+(pass) precise replacements preserve editing a literal body separator [0.15ms]
+(pass) precise replacements preserve editing away from a literal separator [0.12ms]
+(pass) precise replacements preserve plain Unicode and CRLF document [0.14ms]
+(pass) precise replacements preserve separator assembled across replacement boundaries [0.09ms]
+(pass) precise replacements preserve new frontmatter assembled from existing dashes [0.37ms]
+(pass) precise replacements preserve removing an existing opening fence [0.43ms]
+(pass) precise replacements preserve BOM and CRLF frontmatter body edit [0.22ms]
+(pass) plain precise edits from stale atoms retain another writer through convergence and causal undo [0.22ms]
+
+tests/durable-checkpoint-session.test.ts:
+(pass) dense stale replacements preserve peer text through durable snapshots, reopen and cancellation (cooperative=%s) [475.90ms]
+(pass) dense stale replacements preserve peer text through durable snapshots, reopen and cancellation (cooperative=%s) [474.92ms]
+
+4 tests failed:
+(fail) expanded and compact removal envelopes preserve fresh owned outputs [0.20ms]
+(fail) mixed and compact deletion runs reconstruct the same contribution [0.11ms]
+(fail) accessor and inherited removal fields retain generic decoding [0.09ms]
+(fail) malformed expanded or mixed removal envelopes retain atomic replica state [0.11ms]
+
+ 91 pass
+ 4 fail
+ 989 expect() calls
+Ran 95 tests across 7 files. [2.93s]

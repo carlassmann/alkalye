@@ -1,0 +1,6 @@
+$ tsc --noEmit
+tests/browser-preview-fixture.ts(10,36): error TS2307: Cannot find module '../experiments/performance/fixture' or its corresponding type declarations.
+tests/causal-text.test.ts(13,28): error TS2307: Cannot find module '../experiments/causal-text-undo/document' or its corresponding type declarations.
+tests/document-live-poll.test.ts(13,36): error TS2307: Cannot find module '../experiments/performance/fixture' or its corresponding type declarations.
+tests/expanded-removals.test.ts(50,57): error TS2339: Property 'remove' does not exist on type 'never'.
+  The intersection '{ id: string; clock: number; actor: string; time: number; author: string; target: string; kind: "text" | "set" | "cancel"; insert: Atom[]; remove: string[]; field: string; value: string; restores?: string | undefined; } & { ...; }' was reduced to 'never' because property 'remove' has conflicting types in some constituents.

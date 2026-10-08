@@ -1,0 +1,16 @@
+{
+	"base": "72dd6f5",
+	"files": {
+		"src/shared/model.ts": "f8d40e6038eedef93617364dace4d9c090ea52894a6b0cf6a51d8a4ef4be4f9e",
+		"tests/expanded-removals.test.ts": "e4be496f9fecfc2f310ef45bf5de2783a50531a62984081bb798a1a4f511787b",
+		"experiments/performance/interaction-matrix/matched.ts": "e59ebaf3bfe885a3c3e21191a4c61fe990e29a4fd1a655ca8b88e9ed33885f2b"
+	},
+	"traces": {
+		"baseline-multicursor-2048-1.trace.json": "df90e2de2c8cfb7f3d7ac38782be88bc389c80942f81a99a07fd629d37b9423b",
+		"candidate-multicursor-2048-2.trace.json": "28ca76675e8383d44617a2a536d4b8b4e4c08a0af391e678e14582678af2bdd5",
+		"candidate-multicursor-2048-0.trace.json": "f60bba4cf4369a8e3d0dba8afb4919cb5df2ebcbbf2151efd933c21c3f322ad0",
+		"baseline-multicursor-2048-0.trace.json": "d4a23026b066ab1776178e67e3de9f8a6a05ec8143217c4ebf3065ee80fe9043",
+		"baseline-multicursor-2048-2.trace.json": "ec209fdbcc4bf22ec1205b50a22794d2bfef8c39df582f0f8b642cf3222beb60",
+		"candidate-multicursor-2048-1.trace.json": "90e82a7e9ccb77adc38fa082dc650eb26d889ceec5b5518fd6076e37b9599466"
+	}
+}
