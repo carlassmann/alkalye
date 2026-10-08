@@ -1,0 +1,37 @@
+{
+	"status": "complete",
+	"cell": "multicursor-2048",
+	"baselineCommit": "1b630c80268665f1c7838e584eeb9c6f9f0ad463",
+	"counterBefore": {
+		"atoms": null,
+		"batches": null,
+		"ranges": null
+	},
+	"counterAfter": {
+		"atoms": "1048582",
+		"batches": "2",
+		"ranges": "2048"
+	},
+	"fixture": {
+		"characters": 1048582,
+		"bytes": 1048582,
+		"realNewlines": 2051,
+		"sha256": "891fb8df0b0a5e800406aebeddbd3a3c6c7448c35914c43084195929cb9f9323"
+	},
+	"sourceSHA256": "5ec7e3d1535933368af222b690c09ba613d1901bf52b6e74505469e7c498b269",
+	"entrySHA256": "64be96dfa82a9d8a07eb632dfc807001db66516968dc3e20fef5d88de2b61135",
+	"traceSHA256": "665a44d88fedc594fe3daf98ed1dfc6ea9ed53a7418c9d17efc3a3c05ff3e9c3",
+	"limits": "One untimed mechanism gate. No performance metrics; two calls do not identify Replica or raw/canonical ownership.",
+	"seedReceipt": {
+		"sha256": "891fb8df0b0a5e800406aebeddbd3a3c6c7448c35914c43084195929cb9f9323",
+		"characters": 1048582
+	},
+	"editedReceipt": {
+		"sha256": "c56a54f601f00648d40dab8029f8ff5b27b45a9f78daa502feb36c964fb931a9",
+		"characters": 1038342
+	},
+	"undoReceipt": {
+		"sha256": "891fb8df0b0a5e800406aebeddbd3a3c6c7448c35914c43084195929cb9f9323",
+		"characters": 1048582
+	}
+}
