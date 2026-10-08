@@ -93,6 +93,18 @@
 			caused collection or how much a change will save. Evidence:
 			<code>experiments/performance/production-allocation-oct8</code>.
 		</p>
+		<p>
+			A bounded-join compaction candidate passed 15 deep contracts and 12 native
+			browser trials with exact text and independently accepted edits and undo.
+			Its gains were mixed; heap usage did not consistently improve. It remains
+			outside production. In the long-document undo trials, the largest task was
+			a UI refresh callback: 224–268ms in the baseline and 221–245ms in the
+			candidate. Those traces locate the callback, but do not identify its inner
+			CPU work. A many-line control also differed in pending-save state after
+			typing, so its deferred timings cannot establish a clean improvement. This
+			is not a multicursor or 120fps result. Evidence:
+			<code>experiments/performance/compact-pieces</code>.
+		</p>
 		<h2>Earlier journey comparison with main</h2>
 		<p>
 			Both production builds used their own local sync servers, signed accounts
@@ -405,6 +417,17 @@
 			comment. Remote acceptance, server permission revocation and lost Submit
 			replies remain unverified. This slice does not replace the production
 			comments UI. Evidence: <code>experiments/worker-session/comments</code>.
+		</p>
+		<p>
+			A separate worker-opened bundle passed 21 checks with the real document
+			session, account, properties, discussion, assets and live polling
+			services. The main fixture owns no Replica or document session. It
+			verifies exact Unicode source, atomless automatic snapshots, prepared
+			metadata retries, admission checks and offline scope reopen. Streaming
+			observation, server permission revocation, whiteboard, history, recovery
+			and the full editor cutover remain unproved. These checks do not aggregate
+			the earlier editor, comments or attachment proofs. Evidence:
+			<code>experiments/worker-session/opened</code>.
 		</p>
 		<p>
 			The first cache reuses parsed link tokens when the caret moves through
