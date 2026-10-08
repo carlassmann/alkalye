@@ -1,0 +1,44 @@
+I reviewed the five files by reading them only; nothing was built or run. The fixture can't support its main claims as written: several checks pass whether or not the edits ever reached the worker.
+
+## Blocking
+
+1. **Termination isn't the order you described** (`worker-client.ts:53-65`, `recovery-fixture.ts:63`).
+   - The platform/protocol layer and `RpcClient.make` share one scope, `clientScope`. Finalizers run in reverse order, so the client's teardown runs **before** `worker.terminate()`.
+   - The client may interrupt in-flight requests, and may send an Interrupt frame to a still-live worker, before the terminate. That's cooperative cancellation, not an abrupt terminate. I didn't open the installed Effect `RpcClient` to confirm; check that before the run.
+   - Fix: build the layer in `platformScope = yield* Scope.fork(clientScope)` and run `RpcClient.make` in `clientScope`. Close `platformScope` first (terminate while the client is alive and requests are hanging), then `clientScope` (settles the uncertain requests).
+
+2. **Nothing proves the request was delivered.**
+   - `startImmediately` plus `started` (`:32`, `:47`) only show that the fiber was forked, not that `postMessage` happened.
+   - At `:33` the interrupt can land before the send, so `:36` always takes the `sequence === 0` branch. The "once-applied" branch can't be told apart and may never run.
+   - Same at `:60-63`: termination may come before ReplaceQueued #1 is posted, and the run still passes.
+   - Fix: wrap `postMessage` on the spawned `Worker` in the spawner and wait for the sent signal. Record which branch and which prefix happened.
+
+3. **Several checks are always true:**
+   - `:34`: an interrupted fiber always has `hasInterrupts`. It says nothing about the RPC.
+   - `:67`: `editor.state().source` is a local string that is never rolled back, so it equals `drafts.at(-1)` by construction.
+   - `:68`: every outcome fails in every path (one unknown, seven blocked by the finalizer), so `some(isFailure)` can't fail. Assert the exact deliveries instead: `["unknown", ...7×"blocked"]`, or `8×"blocked"` if nothing was sent, plus the matching failure reasons.
+   - `:72`: `drafts.includes(...)` accepts any prefix from 0 to 8. Only `drafts[0]` or `drafts[1]` can actually happen; tie it to the observed send.
+   - `:76`: `ended.source === basis.source` is trivially true, because Begin runs right after End with no writes. It doesn't test the "withheld suffix" claim; the editor half repeats `:67`.
+   - `:75`: the restarted worker has no copy of the main queue, so "no replay" holds vacuously. To mean something, compare against server state after Sync, for example with a fresh Open on an empty IndexedDB, or a server read.
+
+## Seed (`seed.ts`)
+
+4. **Copies all incoming request headers** (`:15`). That forwards `content-length` for a different body, plus `connection`, `accept-encoding` and `origin`. Mismatched lengths can break the request or leave it half-sent. Build new headers containing only the auth credential.
+5. **Sets `accountHeader` from a subject in the request body** (`:18`). If the backend trusts that header, the seed impersonates the subject instead of going through normal authenticated APIs. Use the account's real cookie or bearer token.
+6. **POST `/api/workspaces`** (`:20`) may return 409 if the account already bootstrapped its personal workspace. Treat "already exists" as OK, or check first.
+
+## Resources and risks
+
+7. **IndexedDB / Web Locks after terminate:** if the session holds a `navigator.locks` lock or an open IndexedDB connection, the browser may release it after a delay. The restarted `Open` (`:71`) could then block or fail. I can't check this from these files.
+8. **Request concurrency:** `concurrency: 1` (`worker-client.ts:55`) together with the worker's semaphore means the Read at `:35` queues behind the interrupted call. That's fine, but make sure the interrupt actually settles the call on the client side. Otherwise Read hangs; there's no timeout bounding it.
+9. **Minor:**
+   - Redundant `local.sequence = input.sequence` (`worker-session.ts:142`).
+   - The double close of scopes at `:25`/`:41` is harmless.
+   - The Close finalizer at `:70` after the explicit Close at `:77` is harmless (the error is caught).
+   - Handles from Open and Replace are never released; this stays within the limit of 8.
+
+## Not flaws
+
+- The editor queue doesn't retry blindly: sending becomes unknown, queued becomes blocked.
+- On the worker side, ReplaceQueued applies the edit and advances the sequence before the save, so "applied but unsaved" is correctly uncertain.
+- Restart against the same journal is the right setup.
