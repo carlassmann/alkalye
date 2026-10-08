@@ -201,6 +201,7 @@ function createEditorView(
 	let overlay = new EditorOverlay(highlight)
 	let nativeSearch = nativeSearchHighlights()
 	let geometryDirty = true
+	let highlightPending = false
 	let searchPattern: RegExp | undefined
 	let searchSource = ""
 	let searchMatches: { start: number; end: number }[] = []
@@ -502,6 +503,7 @@ function createEditorView(
 		paintActiveLine()
 	}
 	function paintActiveLine() {
+		flushHighlight()
 		let hidden = !options.preferences.highlightCurrentLine
 		let bounds: DOMRect | undefined
 		let view: DOMRect | undefined
@@ -575,9 +577,11 @@ function createEditorView(
 		textarea.dispatchEvent(new Event("input"))
 	}
 	function point(offset: number) {
+		flushHighlight()
 		return overlay.point(offset)
 	}
 	function paintLinkHover() {
+		flushHighlight()
 		overlay.hover(
 			[...links.querySelectorAll<HTMLAnchorElement>("a:hover")].map(anchor =>
 				Number(anchor.dataset.editorView),
@@ -585,6 +589,7 @@ function createEditorView(
 		)
 	}
 	function paintLinks() {
+		flushHighlight()
 		let existing = [...links.querySelectorAll("a")]
 		let used = new Set<HTMLAnchorElement>()
 		let available = new Map(
@@ -766,6 +771,7 @@ function createEditorView(
 		paintLinkHover()
 	}
 	function paintDecorations() {
+		flushHighlight()
 		if (listeners.signal.aborted) return
 		let comments = options.comments()
 		if (searchPattern && searchSource !== text.value) {
@@ -1126,6 +1132,14 @@ function createEditorView(
 	}
 
 	function updateHighlight() {
+		if (highlightPending || listeners.signal.aborted) return
+		highlightPending = true
+		queueMicrotask(flushHighlight)
+	}
+	function flushHighlight() {
+		if (!highlightPending) return
+		highlightPending = false
+		if (listeners.signal.aborted) return
 		let ranges = [...secondarySelections].sort(
 			(left, right) => left.start - right.start,
 		)
@@ -1145,6 +1159,7 @@ function createEditorView(
 		if (listeners.signal.aborted) return
 		if (!paintFrame)
 			paintFrame = requestAnimationFrame(() => {
+				flushHighlight()
 				paintFrame = 0
 				paintActiveLine()
 				paintDecorations()
@@ -1435,6 +1450,7 @@ function createEditorView(
 		contextMenu = openContextMenu(event, entries)
 	}
 	function clickedOffset(event: MouseEvent) {
+		flushHighlight()
 		if (
 			(event instanceof PointerEvent && event.pointerType === "") ||
 			(!event.clientX && !event.clientY)
@@ -2022,6 +2038,7 @@ function createEditorView(
 		selectionsChanged()
 	}
 	function graphemeLine(offset: number) {
+		flushHighlight()
 		let source = text.value
 		if (segmentedSource !== source) {
 			segmentedSource = source
@@ -2139,6 +2156,7 @@ function createEditorView(
 			if (low >= boundaryCount) return source.length
 			let rowTop = rectangle(boundary(low)).top
 			if (key === "ArrowUp" && rowTop > targetTop + 1) return 0
+			flushHighlight()
 			let line = overlay.lineBounds(boundary(low))
 			if (
 				!/[\u0590-\u08ff\u202a-\u202e\u2066-\u2069]/.test(

@@ -6,6 +6,7 @@ import { build } from "../build"
 let fullSuite = [
 	"tests/browser-native-eventlog.ts",
 	"tests/browser-editor-anchors.ts",
+	"tests/browser-editor-overlay.ts",
 	"tests/browser-document-api.ts",
 	"tests/browser-document-app.ts",
 	"tests/browser-native-tools.ts",
@@ -54,6 +55,7 @@ let moduleSuite = [
 	"tests/browser-document-api.ts",
 	"tests/browser-native-eventlog.ts",
 	"tests/browser-editor-anchors.ts",
+	"tests/browser-editor-overlay.ts",
 	"tests/browser-storage.ts",
 	"tests/browser-library-sync.ts",
 ]
