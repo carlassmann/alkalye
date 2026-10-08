@@ -1,0 +1,30 @@
+import json,collections
+from pathlib import Path
+root=Path('/tmp/alkalye-focused-interaction/sampled-multicursor-results')
+result=[]
+for count in [512,2048]:
+ ev=json.loads((root/f'rewrite-multicursor-{count}-0.trace.json').read_text())['traceEvents']
+ event=next(e for e in ev if e.get('name')=='EventDispatch' and e.get('args',{}).get('data',{}).get('type')=='beforeinput')
+ key=(event['pid'],event['tid']);start=event['ts'];end=start+event['dur']
+ profiles={};nodes={};selfs=collections.Counter();inc=collections.Counter();frames={}
+ for e in ev:
+  if e.get('name')=='Profile' and (e.get('pid'),e.get('tid'))==key:profiles[e['id']]=e['args']['data']['startTime']
+  if e.get('name')!='ProfileChunk' or e.get('pid')!=key[0] or e.get('id') not in profiles:continue
+  d=e['args']['data'];p=d.get('cpuProfile',{})
+  for n in p.get('nodes',[]):nodes[n['id']]=n
+  time=profiles[e['id']]
+  for sample,delta in zip(p.get('samples',[]),d.get('timeDeltas',[])):
+   time+=delta
+   if not start<=time<=end:continue
+   node=nodes.get(sample);seen=set()
+   while node and node['id'] not in seen:
+    seen.add(node['id']);f=node.get('callFrame',{});name=f.get('functionName','') or '<anonymous>'
+    label=f"{name}@{f.get('url','').split('/')[-1]}:{f.get('lineNumber',-1)+1}:{f.get('columnNumber',-1)+1}"
+    inc[label]+=delta
+    if node['id']==sample:selfs[label]+=delta
+    node=nodes.get(node.get('parent'))
+  profiles[e['id']]=time
+ out={'count':count,'beforeinputMs':event['dur']/1000,'selfMs':[(k,v/1000) for k,v in selfs.most_common(18)],'inclusiveMs':[(k,v/1000) for k,v in inc.most_common(22)]}
+ result.append(out)
+ print(json.dumps(out,indent=2))
+(root/'sampled-input-summary.json').write_text(json.dumps(result,indent=2)+'\n')
