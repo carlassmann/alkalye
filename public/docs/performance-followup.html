@@ -1594,12 +1594,22 @@
 			A cold 128KiB opening spent 210.409ms restoring the server checkpoint,
 			13.503ms reading it and 28.255ms serializing the compact response.
 			Response TTFB was 254.100ms. The stored expanded checkpoint occupied
-			32,116,142 UTF-8 bytes; the response contained 137,686 decoded bytes. This
-			single diagnostic motivates storing compact checkpoints. That candidate
-			preserves full validation and remains unshipped; existing checkpoints are
-			unchanged. Client decode and physical gzip cost remain unmeasured.
-			Evidence:
+			32,116,142 UTF-8 bytes; the response contained 137,686 decoded bytes. The
+			server now stores compact checkpoints while preserving full validation;
+			existing checkpoints remain readable. Client decode and physical gzip cost
+			remain unmeasured. Evidence:
 			<code>experiments/performance/snapshot-partition</code>.
+		</p>
+		<p>
+			Three alternating pairs with fresh stores and equivalent public actions
+			passed exact source, history, clock and independent HTTP checks. Median
+			cold readiness fell from 481.932ms to 400.769ms, and document creation
+			from 421.100ms to 361.917ms. Stored checkpoint bytes fell from 32,116,142
+			to 134,818. Browser task peaks stayed around 18ms; this is a loading and
+			storage improvement, not a 120fps result. The full check passed 705 tests
+			plus browser journeys. Existing expanded heads benefit when normally
+			rewritten; no migration ran. Evidence:
+			<code>experiments/performance/compact-server-head</code>.
 		</p>
 		<p>
 			The worker prototype now passes eight checks through the actual app:
