@@ -1,0 +1,22 @@
+[
+	{
+		"path": "/tmp/alkalye-worker-source-cache/baseline-human.json.trace.json",
+		"bytes": 52690987,
+		"sha256": "5092c03bd0778b6c01172e96d2218268dfdb47c8bf7f7db786c15a1c0daf0859"
+	},
+	{
+		"path": "/tmp/alkalye-worker-source-cache/candidate-human.json.trace.json",
+		"bytes": 52195158,
+		"sha256": "d4083e77ca3b29ba6678a3896ab99979f263cf718806527a4137c35b5b802c98"
+	},
+	{
+		"path": "/tmp/alkalye-worker-source-cache/candidate-burst.json.trace.json",
+		"bytes": 28331383,
+		"sha256": "58333c6a59e4a6f98dd325215cfac2b8f2b5c60c651d49749671872afab6687a"
+	},
+	{
+		"path": "/tmp/alkalye-worker-source-cache/baseline-burst.json.trace.json",
+		"bytes": 41567737,
+		"sha256": "babf1ae64e5b4603236d11da71f63661146e2642a48e676e0a54f68c1d2820fa"
+	}
+]

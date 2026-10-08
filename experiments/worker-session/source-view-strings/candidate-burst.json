@@ -1,0 +1,1551 @@
+[
+	{
+		"arm": "burst-peer",
+		"geometry": {
+			"height": 800,
+			"nativeCharacters": 2080,
+			"readonly": false,
+			"scrollHeight": 1030046,
+			"sourceCharacters": 1048606
+		},
+		"initial": {
+			"accepted": {
+				"position": 1,
+				"sha256": "1091753eea2d4aa07567796b88c96e18ca452f9a7fa30fa75d07ff9c00341118",
+				"sourceCharacters": 1048606
+			},
+			"editorExact": true,
+			"expectedCharacters": 1048606,
+			"failures": [],
+			"localReopenExact": false,
+			"merged": true,
+			"peerCompleted": 0,
+			"peerTimes": [],
+			"pending": 0,
+			"rejected": 0,
+			"sha256": "1091753eea2d4aa07567796b88c96e18ca452f9a7fa30fa75d07ff9c00341118",
+			"unsaved": 0,
+			"workerExact": true
+		},
+		"sent": {
+			"acknowledged": 14,
+			"applied": 14,
+			"failures": 0,
+			"inputs": 72,
+			"inserted": 58,
+			"pending": 58,
+			"sequence": 72,
+			"time": 17817.5
+		},
+		"finish": {
+			"done": true,
+			"result": {
+				"accepted": {
+					"position": 77,
+					"sha256": "80ec5e1a1f45c8c533cbc104a353b6c6196282edf44d9c0bbbc72091181f5526",
+					"sourceCharacters": 1048702
+				},
+				"editorExact": true,
+				"expectedCharacters": 1048702,
+				"failures": [],
+				"localReopenExact": true,
+				"merged": true,
+				"peerCompleted": 4,
+				"peerTimes": [
+					{
+						"end": 21009.39999997616,
+						"index": 0,
+						"replaced": 21009.39999997616,
+						"start": 17680.299999952316
+					},
+					{
+						"end": 22653.5,
+						"index": 1,
+						"replaced": 22653.39999997616,
+						"start": 21511
+					},
+					{
+						"end": 23994.799999952316,
+						"index": 2,
+						"replaced": 23994.799999952316,
+						"start": 23154.39999997616
+					},
+					{
+						"end": 25533.89999997616,
+						"index": 3,
+						"replaced": 25533.89999997616,
+						"start": 24497.5
+					}
+				],
+				"pending": 0,
+				"rejected": 0,
+				"sha256": "80ec5e1a1f45c8c533cbc104a353b6c6196282edf44d9c0bbbc72091181f5526",
+				"unsaved": 0,
+				"workerExact": true
+			},
+			"time": 33206.09999996424
+		},
+		"observation": {
+			"final": {
+				"acknowledged": 72,
+				"applied": 72,
+				"failures": 0,
+				"inserted": 0,
+				"pending": 0,
+				"sequence": 72
+			},
+			"frames": [
+				6.800000035764242, 16.69999999999709, 16.700000000000728,
+				16.600000000002183, 16.69999999999709, 16.700000000000728,
+				16.700000000000728, 16.599999999998545, 16.600000000002183,
+				16.700000000000728, 16.69999999999709, 16.700000000000728,
+				16.700000000000728, 16.599999999998545, 16.700000000000728,
+				16.600000000002183, 16.69999999999709, 16.600000000002183,
+				16.799999999999272, 16.599999999998545, 16.700000000000728,
+				16.600000000002183, 16.69999999999709, 16.700000000000728,
+				16.600000000002183, 16.69999999999709, 16.600000000002183,
+				16.700000000000728, 16.69999999999709, 16.600000000002183,
+				16.700000000000728, 16.69999999999709, 16.700000000000728,
+				16.600000000002183, 16.69999999999709, 16.600000000002183,
+				16.700000000000728, 16.69999999999709, 16.700000000000728,
+				16.700000000000728, 16.599999999998545, 16.600000000002183,
+				16.700000000000728, 16.69999999999709, 16.600000000002183,
+				16.799999999999272, 16.5, 16.700000000000728, 16.700000000000728,
+				16.69999999999709, 16.600000000002183, 16.700000000000728,
+				16.69999999999709, 16.700000000000728, 16.600000000002183,
+				16.69999999999709, 16.700000000000728, 16.600000000002183,
+				16.599999999998545, 16.799999999999272, 16.600000000002183,
+				16.599999999998545, 16.799999999999272, 16.600000000002183,
+				16.599999999998545, 16.700000000000728, 16.700000000000728,
+				16.599999999998545, 16.799999999999272, 16.600000000002183,
+				16.69999999999709, 16.600000000002183, 16.700000000000728,
+				16.69999999999709, 16.700000000000728, 16.600000000002183,
+				16.69999999999709, 16.600000000002183, 16.700000000000728,
+				16.599999999998545, 16.700000000000728, 16.700000000000728,
+				16.599999999998545, 16.799999999999272, 16.600000000002183,
+				16.69999999999709, 16.600000000002183, 16.700000000000728,
+				16.69999999999709, 16.700000000000728, 16.600000000002183,
+				16.69999999999709, 16.600000000002183, 16.700000000000728,
+				16.599999999998545, 16.700000000000728, 16.700000000000728,
+				16.599999999998545, 16.799999999999272, 16.600000000002183,
+				16.69999999999709, 16.600000000002183, 16.599999999998545,
+				16.700000000000728, 16.700000000000728, 16.700000000000728,
+				16.599999999998545, 16.700000000000728, 16.700000000000728,
+				16.599999999998545, 16.799999999999272, 16.600000000002183,
+				16.599999999998545, 16.700000000000728, 16.700000000000728,
+				16.599999999998545, 16.799999999999272, 16.600000000002183,
+				16.69999999999709, 16.600000000002183, 16.700000000000728,
+				16.69999999999709, 16.600000000002183, 16.599999999998545,
+				16.700000000000728, 16.700000000000728, 16.599999999998545,
+				16.799999999999272, 16.600000000002183, 16.700000000000728,
+				16.599999999998545, 16.700000000000728, 16.700000000000728,
+				16.599999999998545, 16.700000000000728, 16.599999999998545,
+				16.700000000000728, 16.700000000000728, 16.700000000000728,
+				16.69999999999709, 16.600000000002183, 16.599999999998545,
+				16.700000000000728, 16.700000000000728, 16.700000000000728,
+				16.599999999998545, 16.700000000000728, 16.599999999998545,
+				16.799999999999272, 16.600000000002183, 16.700000000000728,
+				16.69999999999709, 16.600000000002183, 16.599999999998545,
+				16.700000000000728, 16.700000000000728, 16.599999999998545,
+				16.700000000000728, 16.700000000000728, 16.599999999998545,
+				16.700000000000728, 16.700000000000728, 16.599999999998545,
+				16.700000000000728, 16.700000000000728, 16.599999999998545,
+				16.700000000000728, 16.700000000000728, 16.599999999998545,
+				16.700000000000728, 16.599999999998545, 16.700000000000728,
+				16.700000000000728, 16.700000000000728, 16.700000000000728,
+				16.599999999998545, 16.700000000000728, 16.599999999998545,
+				16.700000000000728, 16.700000000000728, 16.700000000000728,
+				16.599999999998545, 16.599999999998545, 16.700000000000728,
+				16.700000000000728, 16.700000000000728, 16.599999999998545,
+				16.700000000000728, 16.700000000000728, 16.599999999998545,
+				16.700000000000728, 16.599999999998545, 16.700000000000728,
+				16.700000000000728, 16.599999999998545, 16.700000000000728,
+				16.700000000000728, 16.700000000000728, 16.599999999998545,
+				16.700000000000728, 16.700000000000728, 16.599999999998545,
+				16.600000000002183, 16.799999999999272, 16.599999999998545,
+				16.700000000000728, 16.599999999998545, 16.80000000000291, 16.5,
+				16.69999999999709, 16.700000000000728, 16.700000000000728,
+				16.599999999998545, 16.700000000000728, 16.700000000000728,
+				16.599999999998545, 16.700000000000728, 16.700000000000728,
+				16.700000000000728, 16.599999999998545, 16.600000000002183,
+				16.69999999999709, 16.700000000000728, 16.600000000002183,
+				16.799999999999272, 16.599999999998545, 16.700000000000728,
+				16.700000000000728, 16.599999999998545, 16.600000000002183,
+				16.799999999999272, 16.599999999998545, 16.700000000000728,
+				16.599999999998545, 16.700000000000728, 16.600000000002183,
+				16.799999999999272, 16.599999999998545, 16.600000000002183,
+				16.799999999999272, 16.599999999998545, 16.700000000000728,
+				16.599999999998545, 16.700000000000728, 16.700000000000728,
+				16.599999999998545, 16.700000000000728, 16.600000000002183,
+				16.799999999999272, 16.599999999998545, 16.600000000002183,
+				16.69999999999709, 16.700000000000728, 16.600000000002183,
+				16.799999999999272, 16.5, 16.700000000000728, 16.69999999999709,
+				16.700000000000728, 16.600000000002183, 16.69999999999709,
+				16.700000000000728, 16.600000000002183, 16.69999999999709,
+				16.700000000000728, 16.600000000002183, 16.69999999999709,
+				16.700000000000728, 16.600000000002183, 16.69999999999709,
+				16.700000000000728, 16.600000000002183, 16.69999999999709,
+				16.600000000002183, 16.700000000000728, 16.69999999999709,
+				16.600000000002183, 16.700000000000728
+			],
+			"gauges": [
+				{
+					"acknowledged": 1,
+					"applied": 1,
+					"failures": 0,
+					"heap": 42534655,
+					"inserted": 12,
+					"pending": 12,
+					"sequence": 13,
+					"time": 17730.299999952316
+				},
+				{
+					"acknowledged": 8,
+					"applied": 8,
+					"failures": 0,
+					"heap": 155200349,
+					"inserted": 58,
+					"pending": 58,
+					"sequence": 66,
+					"time": 17780.5
+				},
+				{
+					"acknowledged": 16,
+					"applied": 16,
+					"failures": 0,
+					"heap": 174056934,
+					"inserted": 56,
+					"pending": 56,
+					"sequence": 72,
+					"time": 17831.099999964237
+				},
+				{
+					"acknowledged": 25,
+					"applied": 25,
+					"failures": 0,
+					"heap": 174056934,
+					"inserted": 47,
+					"pending": 47,
+					"sequence": 72,
+					"time": 17881
+				},
+				{
+					"acknowledged": 34,
+					"applied": 34,
+					"failures": 0,
+					"heap": 193242878,
+					"inserted": 38,
+					"pending": 38,
+					"sequence": 72,
+					"time": 17930.299999952316
+				},
+				{
+					"acknowledged": 43,
+					"applied": 43,
+					"failures": 0,
+					"heap": 202370886,
+					"inserted": 29,
+					"pending": 29,
+					"sequence": 72,
+					"time": 17981.19999998808
+				},
+				{
+					"acknowledged": 51,
+					"applied": 51,
+					"failures": 0,
+					"heap": 210886674,
+					"inserted": 21,
+					"pending": 21,
+					"sequence": 72,
+					"time": 18031.69999998808
+				},
+				{
+					"acknowledged": 60,
+					"applied": 60,
+					"failures": 0,
+					"heap": 210886674,
+					"inserted": 12,
+					"pending": 12,
+					"sequence": 72,
+					"time": 18080.69999998808
+				},
+				{
+					"acknowledged": 64,
+					"applied": 64,
+					"failures": 0,
+					"heap": 224731446,
+					"inserted": 8,
+					"pending": 8,
+					"sequence": 72,
+					"time": 18132.39999997616
+				},
+				{
+					"acknowledged": 66,
+					"applied": 66,
+					"failures": 0,
+					"heap": 224731446,
+					"inserted": 6,
+					"pending": 6,
+					"sequence": 72,
+					"time": 18180.5
+				},
+				{
+					"acknowledged": 68,
+					"applied": 68,
+					"failures": 0,
+					"heap": 229005894,
+					"inserted": 4,
+					"pending": 4,
+					"sequence": 72,
+					"time": 18233
+				},
+				{
+					"acknowledged": 68,
+					"applied": 68,
+					"failures": 0,
+					"heap": 229005894,
+					"inserted": 4,
+					"pending": 4,
+					"sequence": 72,
+					"time": 18282.299999952316
+				},
+				{
+					"acknowledged": 68,
+					"applied": 68,
+					"failures": 0,
+					"heap": 229017826,
+					"inserted": 4,
+					"pending": 4,
+					"sequence": 72,
+					"time": 18332.799999952316
+				},
+				{
+					"acknowledged": 68,
+					"applied": 68,
+					"failures": 0,
+					"heap": 229017826,
+					"inserted": 4,
+					"pending": 4,
+					"sequence": 72,
+					"time": 18382.39999997616
+				},
+				{
+					"acknowledged": 68,
+					"applied": 68,
+					"failures": 0,
+					"heap": 230126278,
+					"inserted": 4,
+					"pending": 4,
+					"sequence": 72,
+					"time": 18432.5
+				},
+				{
+					"acknowledged": 68,
+					"applied": 68,
+					"failures": 0,
+					"heap": 230134182,
+					"inserted": 4,
+					"pending": 4,
+					"sequence": 72,
+					"time": 18482.89999997616
+				},
+				{
+					"acknowledged": 68,
+					"applied": 68,
+					"failures": 0,
+					"heap": 230134182,
+					"inserted": 4,
+					"pending": 4,
+					"sequence": 72,
+					"time": 18531.099999964237
+				},
+				{
+					"acknowledged": 69,
+					"applied": 69,
+					"failures": 0,
+					"heap": 231221998,
+					"inserted": 3,
+					"pending": 3,
+					"sequence": 72,
+					"time": 18581.89999997616
+				},
+				{
+					"acknowledged": 69,
+					"applied": 69,
+					"failures": 0,
+					"heap": 231221998,
+					"inserted": 3,
+					"pending": 3,
+					"sequence": 72,
+					"time": 18630.299999952316
+				},
+				{
+					"acknowledged": 69,
+					"applied": 69,
+					"failures": 0,
+					"heap": 231234102,
+					"inserted": 3,
+					"pending": 3,
+					"sequence": 72,
+					"time": 18680.299999952316
+				},
+				{
+					"acknowledged": 69,
+					"applied": 69,
+					"failures": 0,
+					"heap": 231238266,
+					"inserted": 3,
+					"pending": 3,
+					"sequence": 72,
+					"time": 18731.19999998808
+				},
+				{
+					"acknowledged": 70,
+					"applied": 70,
+					"failures": 0,
+					"heap": 231238266,
+					"inserted": 2,
+					"pending": 2,
+					"sequence": 72,
+					"time": 18780.39999997616
+				},
+				{
+					"acknowledged": 70,
+					"applied": 70,
+					"failures": 0,
+					"heap": 231826550,
+					"inserted": 2,
+					"pending": 2,
+					"sequence": 72,
+					"time": 18830.5
+				},
+				{
+					"acknowledged": 70,
+					"applied": 70,
+					"failures": 0,
+					"heap": 231833894,
+					"inserted": 2,
+					"pending": 2,
+					"sequence": 72,
+					"time": 18881.19999998808
+				},
+				{
+					"acknowledged": 70,
+					"applied": 70,
+					"failures": 0,
+					"heap": 231833894,
+					"inserted": 2,
+					"pending": 2,
+					"sequence": 72,
+					"time": 18930.19999998808
+				},
+				{
+					"acknowledged": 70,
+					"applied": 70,
+					"failures": 0,
+					"heap": 231843214,
+					"inserted": 2,
+					"pending": 2,
+					"sequence": 72,
+					"time": 18981.19999998808
+				},
+				{
+					"acknowledged": 71,
+					"applied": 71,
+					"failures": 0,
+					"heap": 232912550,
+					"inserted": 1,
+					"pending": 1,
+					"sequence": 72,
+					"time": 19031.5
+				},
+				{
+					"acknowledged": 71,
+					"applied": 71,
+					"failures": 0,
+					"heap": 232918790,
+					"inserted": 1,
+					"pending": 1,
+					"sequence": 72,
+					"time": 19082.89999997616
+				},
+				{
+					"acknowledged": 71,
+					"applied": 71,
+					"failures": 0,
+					"heap": 232918790,
+					"inserted": 1,
+					"pending": 1,
+					"sequence": 72,
+					"time": 19132.19999998808
+				},
+				{
+					"acknowledged": 71,
+					"applied": 71,
+					"failures": 0,
+					"heap": 232929922,
+					"inserted": 1,
+					"pending": 1,
+					"sequence": 72,
+					"time": 19181
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 233991750,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 19232.5
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 233991750,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 19282.19999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234006998,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 19332.299999952316
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234012058,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 19382.89999997616
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234012058,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 19432.69999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234021130,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 19482.69999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234021130,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 19530.5
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234030214,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 19582.89999997616
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234036470,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 19633.099999964237
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234036470,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 19682.19999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234045538,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 19731.5
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234057550,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 19782.5
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234061454,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 19832.799999952316
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234061454,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 19882.69999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234070658,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 19932.5
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234070658,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 19982.19999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234081370,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20032.69999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234081370,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20082.19999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234090238,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20133
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234090238,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20182.599999964237
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234099090,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20232.799999952316
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234099090,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20282.19999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234107946,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20332.5
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234112910,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20382.69999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234116822,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20432.69999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234116822,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20482.69999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234125702,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20532.39999997616
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234125702,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20580.19999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234134582,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20632.799999952316
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234134582,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20682.69999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234146774,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20732.69999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234146774,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20782.599999964237
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234155494,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20832.69999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234155494,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20882.599999964237
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234164218,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20932.69999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234169110,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 20983
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234169110,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21032.69999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234195258,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21082.19999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234199102,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21132.19999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234203994,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21182.69999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234207786,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21233
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234207786,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21282.19999998808
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234216494,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21332.5
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234216494,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21381.39999997616
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234225242,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21432.299999952316
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234233006,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21482.799999952316
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234245494,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21532.799999952316
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234250398,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21583.099999964237
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234250398,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21632.39999997616
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234259122,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21682.599999964237
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234259122,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21732.599999964237
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234279878,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21782.799999952316
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234279878,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21832.299999952316
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 234289142,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21882.5
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 235356066,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21932.5
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 235360970,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 21982.5
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 235364798,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 22032.599999964237
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 235364798,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 22082.5
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 236471506,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 22130.5
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 236476398,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 22183
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 236476398,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 22232.299999952316
+				},
+				{
+					"acknowledged": 72,
+					"applied": 72,
+					"failures": 0,
+					"heap": 236485074,
+					"inserted": 0,
+					"pending": 0,
+					"sequence": 72,
+					"time": 22282.19999998808
+				}
+			],
+			"heap": 236485074,
+			"inputs": [
+				{
+					"data": "a",
+					"inputType": "insertText",
+					"time": 17709.899999976158,
+					"trusted": true
+				},
+				{
+					"data": "b",
+					"inputType": "insertText",
+					"time": 17712.19999998808,
+					"trusted": true
+				},
+				{
+					"data": "c",
+					"inputType": "insertText",
+					"time": 17713.5,
+					"trusted": true
+				},
+				{
+					"data": "d",
+					"inputType": "insertText",
+					"time": 17714.599999964237,
+					"trusted": true
+				},
+				{
+					"data": "e",
+					"inputType": "insertText",
+					"time": 17716.099999964237,
+					"trusted": true
+				},
+				{
+					"data": "f",
+					"inputType": "insertText",
+					"time": 17717.299999952316,
+					"trusted": true
+				},
+				{
+					"data": "g",
+					"inputType": "insertText",
+					"time": 17719.399999976158,
+					"trusted": true
+				},
+				{
+					"data": "h",
+					"inputType": "insertText",
+					"time": 17721.899999976158,
+					"trusted": true
+				},
+				{
+					"data": "i",
+					"inputType": "insertText",
+					"time": 17723.299999952316,
+					"trusted": true
+				},
+				{
+					"data": "j",
+					"inputType": "insertText",
+					"time": 17724.399999976158,
+					"trusted": true
+				},
+				{
+					"data": "k",
+					"inputType": "insertText",
+					"time": 17725.69999998808,
+					"trusted": true
+				},
+				{
+					"data": "l",
+					"inputType": "insertText",
+					"time": 17728.69999998808,
+					"trusted": true
+				},
+				{
+					"data": "m",
+					"inputType": "insertText",
+					"time": 17729.599999964237,
+					"trusted": true
+				},
+				{
+					"data": "n",
+					"inputType": "insertText",
+					"time": 17730.399999976158,
+					"trusted": true
+				},
+				{
+					"data": "o",
+					"inputType": "insertText",
+					"time": 17731.19999998808,
+					"trusted": true
+				},
+				{
+					"data": "p",
+					"inputType": "insertText",
+					"time": 17732,
+					"trusted": true
+				},
+				{
+					"data": "q",
+					"inputType": "insertText",
+					"time": 17732.799999952316,
+					"trusted": true
+				},
+				{
+					"data": "r",
+					"inputType": "insertText",
+					"time": 17734,
+					"trusted": true
+				},
+				{
+					"data": "s",
+					"inputType": "insertText",
+					"time": 17735.299999952316,
+					"trusted": true
+				},
+				{
+					"data": "t",
+					"inputType": "insertText",
+					"time": 17737,
+					"trusted": true
+				},
+				{
+					"data": "u",
+					"inputType": "insertText",
+					"time": 17737.799999952316,
+					"trusted": true
+				},
+				{
+					"data": "v",
+					"inputType": "insertText",
+					"time": 17739.19999998808,
+					"trusted": true
+				},
+				{
+					"data": "w",
+					"inputType": "insertText",
+					"time": 17740.19999998808,
+					"trusted": true
+				},
+				{
+					"data": "x",
+					"inputType": "insertText",
+					"time": 17741.399999976158,
+					"trusted": true
+				},
+				{
+					"data": "a",
+					"inputType": "insertText",
+					"time": 17742.299999952316,
+					"trusted": true
+				},
+				{
+					"data": "b",
+					"inputType": "insertText",
+					"time": 17743.299999952316,
+					"trusted": true
+				},
+				{
+					"data": "c",
+					"inputType": "insertText",
+					"time": 17744.19999998808,
+					"trusted": true
+				},
+				{
+					"data": "d",
+					"inputType": "insertText",
+					"time": 17744.899999976158,
+					"trusted": true
+				},
+				{
+					"data": "e",
+					"inputType": "insertText",
+					"time": 17745.599999964237,
+					"trusted": true
+				},
+				{
+					"data": "f",
+					"inputType": "insertText",
+					"time": 17746.399999976158,
+					"trusted": true
+				},
+				{
+					"data": "g",
+					"inputType": "insertText",
+					"time": 17747.299999952316,
+					"trusted": true
+				},
+				{
+					"data": "h",
+					"inputType": "insertText",
+					"time": 17748.099999964237,
+					"trusted": true
+				},
+				{
+					"data": "i",
+					"inputType": "insertText",
+					"time": 17749,
+					"trusted": true
+				},
+				{
+					"data": "j",
+					"inputType": "insertText",
+					"time": 17749.899999976158,
+					"trusted": true
+				},
+				{
+					"data": "k",
+					"inputType": "insertText",
+					"time": 17750.69999998808,
+					"trusted": true
+				},
+				{
+					"data": "l",
+					"inputType": "insertText",
+					"time": 17751.5,
+					"trusted": true
+				},
+				{
+					"data": "m",
+					"inputType": "insertText",
+					"time": 17752.19999998808,
+					"trusted": true
+				},
+				{
+					"data": "n",
+					"inputType": "insertText",
+					"time": 17753.099999964237,
+					"trusted": true
+				},
+				{
+					"data": "o",
+					"inputType": "insertText",
+					"time": 17753.899999976158,
+					"trusted": true
+				},
+				{
+					"data": "p",
+					"inputType": "insertText",
+					"time": 17755.299999952316,
+					"trusted": true
+				},
+				{
+					"data": "q",
+					"inputType": "insertText",
+					"time": 17756.299999952316,
+					"trusted": true
+				},
+				{
+					"data": "r",
+					"inputType": "insertText",
+					"time": 17757,
+					"trusted": true
+				},
+				{
+					"data": "s",
+					"inputType": "insertText",
+					"time": 17757.899999976158,
+					"trusted": true
+				},
+				{
+					"data": "t",
+					"inputType": "insertText",
+					"time": 17758.69999998808,
+					"trusted": true
+				},
+				{
+					"data": "u",
+					"inputType": "insertText",
+					"time": 17759.5,
+					"trusted": true
+				},
+				{
+					"data": "v",
+					"inputType": "insertText",
+					"time": 17760.299999952316,
+					"trusted": true
+				},
+				{
+					"data": "w",
+					"inputType": "insertText",
+					"time": 17761.099999964237,
+					"trusted": true
+				},
+				{
+					"data": "x",
+					"inputType": "insertText",
+					"time": 17762,
+					"trusted": true
+				},
+				{
+					"data": "a",
+					"inputType": "insertText",
+					"time": 17763,
+					"trusted": true
+				},
+				{
+					"data": "b",
+					"inputType": "insertText",
+					"time": 17764.19999998808,
+					"trusted": true
+				},
+				{
+					"data": "c",
+					"inputType": "insertText",
+					"time": 17765.099999964237,
+					"trusted": true
+				},
+				{
+					"data": "d",
+					"inputType": "insertText",
+					"time": 17766,
+					"trusted": true
+				},
+				{
+					"data": "e",
+					"inputType": "insertText",
+					"time": 17767.599999964237,
+					"trusted": true
+				},
+				{
+					"data": "f",
+					"inputType": "insertText",
+					"time": 17768.69999998808,
+					"trusted": true
+				},
+				{
+					"data": "g",
+					"inputType": "insertText",
+					"time": 17769.899999976158,
+					"trusted": true
+				},
+				{
+					"data": "h",
+					"inputType": "insertText",
+					"time": 17770.69999998808,
+					"trusted": true
+				},
+				{
+					"data": "i",
+					"inputType": "insertText",
+					"time": 17771.599999964237,
+					"trusted": true
+				},
+				{
+					"data": "j",
+					"inputType": "insertText",
+					"time": 17772.399999976158,
+					"trusted": true
+				},
+				{
+					"data": "k",
+					"inputType": "insertText",
+					"time": 17773.399999976158,
+					"trusted": true
+				},
+				{
+					"data": "l",
+					"inputType": "insertText",
+					"time": 17774.299999952316,
+					"trusted": true
+				},
+				{
+					"data": "m",
+					"inputType": "insertText",
+					"time": 17775.5,
+					"trusted": true
+				},
+				{
+					"data": "n",
+					"inputType": "insertText",
+					"time": 17776.299999952316,
+					"trusted": true
+				},
+				{
+					"data": "o",
+					"inputType": "insertText",
+					"time": 17777.399999976158,
+					"trusted": true
+				},
+				{
+					"data": "p",
+					"inputType": "insertText",
+					"time": 17778.19999998808,
+					"trusted": true
+				},
+				{
+					"data": "q",
+					"inputType": "insertText",
+					"time": 17778.899999976158,
+					"trusted": true
+				},
+				{
+					"data": "r",
+					"inputType": "insertText",
+					"time": 17779.599999964237,
+					"trusted": true
+				},
+				{
+					"data": "s",
+					"inputType": "insertText",
+					"time": 17780.5,
+					"trusted": true
+				},
+				{
+					"data": "t",
+					"inputType": "insertText",
+					"time": 17781.299999952316,
+					"trusted": true
+				},
+				{
+					"data": "u",
+					"inputType": "insertText",
+					"time": 17781.899999976158,
+					"trusted": true
+				},
+				{
+					"data": "v",
+					"inputType": "insertText",
+					"time": 17782.799999952316,
+					"trusted": true
+				},
+				{
+					"data": "w",
+					"inputType": "insertText",
+					"time": 17783.899999976158,
+					"trusted": true
+				},
+				{
+					"data": "x",
+					"inputType": "insertText",
+					"time": 17784.899999976158,
+					"trusted": true
+				}
+			],
+			"keys": []
+		}
+	}
+]

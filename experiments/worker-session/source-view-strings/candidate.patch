@@ -1,0 +1,60 @@
+--- /tmp/alkalye-worker-source-cache/baseline/src/shared/crdt.ts	2026-10-08 06:42:01
++++ /tmp/alkalye-worker-source-cache/candidate/src/shared/crdt.ts	2026-10-08 07:23:29
+@@ -33,6 +33,7 @@
+ 
+ let sourceViews = new WeakMap<Atom[], Atom[]>()
+ let sourceOffsets = new WeakMap<Atom[], TextIndex>()
++let sourceStrings = new WeakMap<Atom[], string>()
+ interface PreparedSplice {
+ 	after: string
+ 	start: number
+@@ -502,6 +503,7 @@
+ 		this.sourceCache.set(edit.target, atoms)
+ 		sourceViews.set(atoms, raw)
+ 		this.strings.set(edit.target, edit.content)
++		sourceStrings.set(atoms, edit.content)
+ 	}
+ 
+ 	validate(input: Operation[]) {
+@@ -640,7 +642,7 @@
+ 		let previous =
+ 			atoms === current
+ 				? this.text(target)
+-				: atoms.map(atom => atom.value).join("")
++				: (sourceStrings.get(atoms) ?? atoms.map(atom => atom.value).join(""))
+ 		let end = 0
+ 		let lastStart = -1
+ 		for (let replacement of replacements) {
+@@ -771,7 +773,7 @@
+ 		let previous =
+ 			atoms === this.sourceCache.get(target)
+ 				? this.text(target)
+-				: atoms.map(atom => atom.value).join("")
++				: (sourceStrings.get(atoms) ?? atoms.map(atom => atom.value).join(""))
+ 		if (previous === next) return null
+ 		let operation = this.makeOperation(target, "text", this.clock + 1)
+ 		let current = this.visible(target)
+@@ -1187,6 +1189,7 @@
+ 			sourceViews.set(atoms, raw)
+ 			replica.sourceCache.set(target, atoms)
+ 			replica.strings.set(target, text)
++			sourceStrings.set(atoms, text)
+ 			if (atoms.length !== text.length)
+ 				sourceOffsets.set(atoms, new TextIndex(text))
+ 			return text
+@@ -1196,6 +1199,7 @@
+ 		let cached = this.strings.get(target)
+ 		if (until === Infinity && cached !== undefined) {
+ 			let atoms = this.sourceCache.get(target)
++			if (atoms) sourceStrings.set(atoms, cached)
+ 			if (atoms && atoms.length !== cached.length && !sourceOffsets.has(atoms))
+ 				sourceOffsets.set(atoms, new TextIndex(cached))
+ 			return cached
+@@ -1206,6 +1210,7 @@
+ 		if (until === Infinity) {
+ 			this.strings.set(target, text)
+ 			let atoms = this.sourceCache.get(target)
++			if (atoms) sourceStrings.set(atoms, text)
+ 			if (atoms && atoms.length !== text.length)
+ 				sourceOffsets.set(atoms, new TextIndex(text))
+ 		}

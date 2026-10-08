@@ -1,0 +1,50 @@
+No blockers. Within the files you named, I found no path that caches a wrong string, bypasses a public trust check, or leaks memory. One problem: `candidate/source-cache.test.ts` doesn't exist (nothing in `/tmp/alkalye-worker-source-cache` matches `*source-cache*`), so the new code has no tests yet.
+
+**Immutability (holds)**
+- Every value in `sourceCache` is an immutable view: `visible()` and `textEffect` go through `immutableAtoms`, `cachePreparedText` uses `replaceAtoms`, and `fork` copies the same views. So every key in `sourceStrings` is one of these views. A plain array is never a key, because `immutableAtoms` only returns the input as-is when it is already a view.
+- The views block writes: `set`, `deleteProperty`, `defineProperty`, `preventExtensions` and `setPrototypeOf` all return false. So `push`, `splice`, `sort`, `fill`, index assignment and `Object.freeze` throw.
+- The atoms inside are frozen by `indexAtom` → `freezeTextAtom` (`crdt.ts:1784`). `sourceAtoms` only reorders or filters existing raw atoms and doesn't create new ones. So each cached string is a fixed function of its key.
+
+**Where strings get registered (all from validated or computed text)**
+- `cachePreparedText:506`: the content was already checked by generation, operation id and signature, and is the same value `this.strings` already trusted.
+- `textEffect:1192`: the string is computed from the atoms and only stored if the generation hasn't changed.
+- `text()` at 1202 and 1213: `invalidateText` is the only place that deletes `strings` and `sourceCache`, and it deletes both together. When `visible()` rebuilds `sourceCache` while `strings` is still valid, the state hasn't changed, so the text is the same.
+- Caveat: baseline already trusted these predicted strings for stale views indirectly, through `sourceOffsets` built from `cached`. The candidate now trusts the string itself. If `cachePreparedText` ever predicts content that doesn't match the atoms (for example, the `replacements()` flatMap silently dropping an atom missing from `atomIndex`), the wrong value now lasts as long as anyone holds the view, instead of only until the next operation.
+
+**Stale views across forks, peers, frontmatter and Unicode (safe)**
+- The map is shared by the whole module, but a key is only shared between replicas through `fork`, and then the content is identical.
+- Passing a peer's view, or another target's view, gives the same result as joining the atoms.
+- With frontmatter, the raw view is never a key (only the source view is), so it falls back to the join.
+- The stored string is exactly the joined text, so surrogate checks and `TextIndex` behave the same.
+- History views (`until` finite) are never registered and fall back to the join.
+
+**External mutable arrays**
+- They are never keys, so they always fall back to `map().join("")`.
+- Unchanged but worth knowing: the `views` WeakMap in `atom-sequence` caches by the caller's array. If someone mutates that array after calling `immutableAtoms` on it, they get a stale view back. Today it's only called with the replica's own arrays.
+
+**Lifetime and memory**
+- Entries in a WeakMap live only as long as their key, and the string doesn't point back to the view, so there's no cycle and no leak.
+- The regression: every stale view that something holds now also pins a full-length string. In the worker that's the 8 `handles`, `basis` and `candidate`, plus anything `DocumentSession` keeps. The atom chunks share structure between versions, but these strings are full copies, so memory grows with the number of held views times document length. That's bounded today, but it isn't free.
+
+**Cost in the worker's `ReplaceQueued` path with a divergent basis (not measured)**
+- `local.replica.visible()` is a fork's view, so it is never the session's current view, and baseline ran `map().join()` every time.
+- With the candidate it's usually a cache hit: line 143's `local.replica.text()` registers the string after any edit that invalidated the cache, and fork fast paths register it in `cachePreparedText`.
+- This removes one full-document pass per call (on these views `map` turns the chunk into an array, allocates the mapped array, then joins). Several other full passes remain:
+  - line 143's own join after an invalidating edit;
+  - the session's `prepareReplacements` sees `current !== atoms`, so it skips `rememberTextEdit`, and the session replica then invalidates and recomputes;
+  - `local.replica.apply` falls back to a full recompute whenever no fast path matches.
+- So it saves one full pass among several. I'm not claiming any measured speedup.
+
+**Contracts to add, smallest set**
+1. **Same result from cache or fallback:** for a stale view `v`, `prepareReplacements(target, ranges, v)` produces the same operation as with the plain copy `[...v]`. Cover these registration paths:
+   - local fast edit (`cachePreparedText`);
+   - peer `prepareTerminalPeerEdit`;
+   - `preparePeerInsertionRun`;
+   - terminal cancellation;
+   - `textEffect`;
+   - `text()` after `visible()`.
+
+   Use a fork that has moved on, merged frontmatter (raw ≠ source), and non-BMP characters (e.g. emoji). Also test `prepareEdit` with the same view.
+2. **Published views can't be changed:** `push`, index assignment, `defineProperty` and `Object.freeze` throw on `visible()`, and `Object.isFrozen(view[i])` is true. This prevents a future change from exposing mutable atoms.
+3. **Worker journey:** run several `ReplaceQueued` calls on a divergent basis while remote edits arrive, then `End`. The final source should match the session's text. This exercises the path that benefits.
+4. **Optional:** a peer edit that hits `cachePreparedText` is followed by `text(target) === visible(target).map(a => a.value).join("")`. This checks the trusted predicted value.
