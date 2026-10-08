@@ -1,0 +1,21 @@
+PASS Actual Editor clipboard fixture opens
+PASS Selected text paste accepts native trimmed common prefix
+PASS Collapsed repeated text paste retains captured anchor
+PASS Copied line paste preserves boundary despite native suffix trimming
+PASS Deferred paste preserves queued local edit and unseen peer insertion
+PASS Paste basis rebases through guarded native merge
+PASS Peer change to captured selection refuses paste without freezing typing
+43 | 			},
+44 | 		},
+45 | 	)
+46 | 	if (result.status !== 0) {
+47 | 		let failure = result.error?.message || result.stderr || result.stdout
+48 | 		throw new Error(`${session} ${args[0]}: ${failure}`)
+                 ^
+error: worker-clipboard-1791438975567 eval: {"success":false,"data":null,"error":"Evaluation error: WorkerDocumentFailure\n    at Object.transform (http://localhost:49980/browser-fixture.js:13464:51)\n    at transform4 (http://localhost:49980/browser-fixture.js:11487:90)\n    at http://localhost:49980/browser-fixture.js:3412:38\n    at http://localhost:49980/browser-fixture.js:58:18\n    at flatMapTransformation (http://localhost:49980/browser-fixture.js:11474:90)\n    at Array.<anonymous> (http://localhost:49980/browser-fixture.js:11488:36)\n    at http://localhost:49980/browser-fixture.js:11608:35\n    at http://localhost:49980/browser-fixture.js:10826:46\n    at http://localhost:49980/browser-fixture.js:11845:48\n    at http://localhost:49980/browser-fixture.js:13197:57"}
+
+      at browser (/private/tmp/alkalye-worker-session-clipboard/tests/browser-driver.ts:48:13)
+      at evaluate (/private/tmp/alkalye-worker-session-clipboard/tests/browser-driver.ts:166:9)
+      at /private/tmp/alkalye-worker-session-clipboard/journey.ts:62:9
+
+Bun v1.4.0 (macOS arm64)

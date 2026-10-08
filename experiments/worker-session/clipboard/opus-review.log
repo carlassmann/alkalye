@@ -1,0 +1,42 @@
+Plan mode is on, and I don't have a Write or ExitPlanMode tool, so this review is inline only. I read only the four files you named. Nothing was run.
+
+## Blockers to fix before the bounded `actualEditor` proof
+
+1. **Paste stops working after 8 denied or interrupted pastes** (`editor-clipboard.ts:1621-1638`). If `readText` fails (permission denied, the common case) or the view is disposed, `Effect.all` interrupts the capture. A token that was already captured never reaches `ensuring`. It stays in `clipboardTokens` (`editor-queue.ts:118`) and in the worker map. After 8 of these, `HandleCapacity` blocks paste until Close.
+   - Interrupting `Deferred.await` doesn't cancel the queued `CaptureClipboard`, so a late success also leaks.
+   - Fix: wrap capture in `Effect.acquireRelease(capture, release unless submitted)` inside `Effect.scoped`. The acquire step is uninterruptible, so a token can't escape.
+
+2. **A failed `ReplaceQueued` never consumes its token** (`worker-session.ts:127-132`). `ClipboardChanged` returns before `clipboard.delete`. Main has already dropped the token (`replaceClipboard`, `editor-queue.ts:265`), and `submitted=true` skips the release. Same 8-slot leak.
+   - Fix: delete the token as soon as `ReplaceQueued` receives it, whether the check passes or fails.
+
+3. **The exact-range check may reject valid pastes** (`worker-session.ts:131`). It requires exactly one range with `start`/`remove` equal to the captured span. Two cases break that:
+   - `replace()` falls back to a whole-document range when `expectedSource` mismatches (`editor-queue.ts:247-249`).
+   - If `takeReplacements()` trims a common prefix or suffix (selection `foo`, paste `foobar`, giving `+bar`), the range won't match.
+
+   Either way the result is `ClipboardChanged`, which poisons the whole queue. I couldn't verify `SourceTextarea` or the `change` adapter (outside the allowed files). Fix: put the unminimized `{start, remove}` in the command metadata, or accept one range that sits inside the captured span.
+
+4. **A remote edit alone can poison the queue.** Remote ops can land between Resolve and `ReplaceQueued`. The authoritative recheck then fails, `failure` is set (`editor-queue.ts:215-219`), and every later local edit is blocked. That matches "rejected suffix stays recovery draft", but the proof should cover this case on purpose, not hit it by accident.
+
+5. **Queue finalizer can hang** (`editor-queue.ts:103`). It runs sequential, uninterruptible `ReleaseClipboard` RPCs. With a terminated or hung worker, scope close blocks, which regresses the termination-recovery proof. Fix: drop the per-token release (`Close` already clears the worker map) or add a timeout.
+
+6. **`ReleaseClipboard` skips the FIFO queue** (`editor-queue.ts:302-305`). If a release ever follows an enqueued `ReplaceQueued` (e.g. `change` throws after enqueueing), it overtakes it, which gives `ClipboardUnavailable` and poisons the queue. Fix: send releases through the queue.
+
+## Permission and reachability
+
+7. **The context-menu Paste can't be reached in worker mode.** `openEditorMenu` returns early when `authority === "worker"` (`editor-clipboard.ts:1318`). Only `command("paste")` reaches `pasteInWorker`, so the proof must drive it that way, or this needs a decision.
+
+8. **`readText` may lose the user gesture.** It starts inside a forked `Effect.all` child and may not run within the gesture task. Safari and Firefox may refuse it. Fix: call `navigator.clipboard.readText()` synchronously in `paste()` and wrap the promise that's already running. The local path has the same issue, so this isn't a regression.
+
+## Checked and OK
+
+- **FIFO and sequence:** capture and resolve carry the main sequence at call time and run after earlier edits, so worker `local.sequence` matches.
+- **Main checks:** `text.value === resolved.source` and the selected text are checked synchronously before painting. There is no blind replay; on mismatch the token is released.
+- **Boundaries:** both are anchored to the left atom, so a remote insert at the start boundary is rejected (conservative, safe). Collapsed selections are stable.
+- **Interleaved merge/Adopt:** if a merge or Adopt happens between capture and resolve, it's safe. Atom IDs survive the fork, and the main source check catches the repaint.
+- **No second `DocumentSession` on main:** I only checked `editor-clipboard.ts`, which sends the edit as `change(..., {clipboardToken})` and creates no session itself. The adapter wasn't in the allowed files.
+- **No-op paste:** if the result equals `acceptedSource`, the early return leaves `submitted=false`, so the token is released.
+
+## Not in scope
+All other `session.change`/Atom commands are still unresolved, and this isn't a production cutover.
+
+Minimum before the proof: fix 1, 2, 3 and 5, and decide on 7.

@@ -1,0 +1,7 @@
+PASS Actual Editor clipboard fixture opens
+PASS Selected text paste accepts native trimmed common prefix
+PASS Collapsed repeated text paste retains captured anchor
+PASS Copied line paste preserves boundary despite native suffix trimming
+PASS Repeated clipboard denial preserves source and typing authority
+PASS Valid paste after nine denials has exact durable HTTP source
+PASS Clipboard owner scope releases actual editor and workers

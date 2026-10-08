@@ -1,0 +1,50 @@
+I read only the four files and the review log. Nothing was run or written. The plan-mode tools aren't available, so this review is inline only.
+
+## Status of the previous review's points
+1. **Fixed:** token leak on interrupted capture. The capture is uninterruptible inside `acquireRelease`, so a token can't escape on the main side.
+2. **Fixed:** a failed `ReplaceQueued` keeping its token. The early failures (`BasisUnavailable`, `SequenceUnavailable`, `Closed`, document mismatch) still return before the delete at `worker-session.ts:128`. The per-edit release at `editor-queue.ts:227-230` cleans those up.
+3. **Partly fixed:** valid pastes rejected by the range check. See B1.
+4. **By design:** a remote edit alone can poison the queue. See B2.
+5. **Fixed:** finalizer hang. Releases now have 1-second timeouts.
+6. **Fixed:** release overtaking the edit. Releases go through the same FIFO queue, so an edit enqueued and then followed by a throw is consumed first and the release becomes a no-op.
+7. **Accepted limitation:** context-menu Paste stays disabled in worker mode.
+8. **Fixed:** `readText` is called synchronously from `command("paste")`, so the user gesture is kept.
+
+## Blocker before the proof
+
+**B1. Valid pastes can still poison the queue** (`worker-session.ts:131-132`). This assumes `takeReplacements` trims a common prefix and suffix over the whole text, as your note implies. In that case the trimmed range can extend outside the captured span:
+- Caret at the start of a line `…\n|bar`, paste the copied line `foo\n`. The common suffix `\nbar` gives an insert of `\nfoo` at `s-1`, so `start < range.start`.
+- Collapsed caret in `a|a`, paste `a`. The common prefix gives an insert at 2, which is past `range.end`.
+
+Copying a line with its trailing newline and pasting it at a line start is very common. Each case returns `ClipboardChanged`, which poisons the queue.
+
+Smallest fix: check that the text outside the captured span is unchanged, instead of checking where the range sits:
+```ts
+let localSource = local.replica.text(current.document)
+let before = localSource.slice(0, range.start), after = localSource.slice(range.end)
+let next = applyRanges(localSource, input.ranges) // same slice/join loop as editor-queue replace()
+if (!range || !remoteRange || next.length < before.length + after.length || !next.startsWith(before) || !next.endsWith(after)) fail("ClipboardChanged")
+```
+This also removes the need for the `ranges.length !== 1` check, and it accepts the whole-document fallback from `replace()`.
+
+## Worth deciding, not blocking
+- **B2. A remote edit can still poison the queue.** The remote recheck in `ReplaceQueued` (`worker-session.ts:130`) fails if a peer edits between Resolve and apply. That sets `failure` even though nothing local caused it. The draft is kept, but the queue is blocked. The edit uses local atom IDs and merges like normal typing, so the recheck at Resolve is enough. Either drop `remoteRange` from `ReplaceQueued`, or cover this race on purpose in the proof.
+- **B3. Silent refusal.** If the sync guard bails at `editor-clipboard.ts:1630` (text changed, readonly, composing), nothing is reported and the paste just doesn't happen. A defect thrown from `options.change` inside the `Effect.sync` also skips `Effect.catch`, so it isn't reported either. Smallest fix: report a typed refusal unless `aborted`, and use a cause-level catch.
+
+## Minor
+- **Blocked-edit branch** (`editor-queue.ts:215-219`): it returns without releasing the token. That's harmless while the queue stays poisoned, and the finalizer releases it. You could release there for symmetry.
+- **`End` doesn't clear `clipboard`:** stale tokens from the old epoch stay until `Close` and count toward the 8-token limit. Add `clipboard.clear()` next to `basis = undefined`.
+- **Dispose during a hung `CaptureClipboard`:** the uninterruptible acquire keeps the editor's lifetime fiber alive until the queue scope closes. The view itself is already disposed. That's acceptable, but check it in the termination test. Don't add a timeout to the capture, because a late token would then go untracked.
+
+## Checked and OK
+- **Capture interruption:** a token is either acquired, with its release registered, or never handed to main. A queue close during an in-flight capture fails the request with `blocked`. In that case the worker-side token is only cleaned up by `Close`.
+- **Failed paste:** if `readText` fails, the scope closes and the release goes through FIFO. There's no unhandled promise rejection, because `tryPromise` attaches its handler at fork time.
+- **Clipboard-only resolve refusal:** a failed resolve never sets `failure`, so the queue stays usable.
+- **Readonly, IME, no-op paste:** `insert()` refuses, or `oninput` returns early. Either way `clipboardSubmitted` stays false and the token is released. `compositionend` never carries the token.
+- **Dispose:** an interrupted wait on resolve leaves the resolve command queued, and the release is enqueued after it. The finalizer is bounded by the 1-second timeout.
+- **Edits that cancel out** (type then delete) between resolve and paste: safe, because the worker resolves the anchors again.
+- **Dependent edits after a failure:** they stay in `pending` with `rejected` or `blocked` status, so the optimistic `source` is kept and nothing is lost.
+
+Minimum before the bounded actual Editor proof: B1. Decide B2 and either fix it or test it on purpose. B3 is recommended so refusals can be observed in the proof.
+
+Separately, several claude.ai connectors (GitHub, Slack, Notion and others) need authorization in your claude.ai connector settings before they can be used.

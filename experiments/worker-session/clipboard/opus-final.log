@@ -1,0 +1,20 @@
+**I found no remaining correctness blockers for the bounded actual Editor clipboard proof.** I only read the five files; I didn't run, test, build or write anything.
+
+**B1 is fixed:**
+- `clipboardReplacement` (`worker-session.ts:292-306`) rebuilds the result from the input ranges and rejects unordered or out-of-bounds ranges. It requires the text before and after the captured span to be unchanged and non-overlapping. It then sends exactly one replacement anchored at the captured `range.start` to `current.session.replace` (`:135`).
+- The common-prefix/suffix cases are handled. A caret at a line start pasting `foo\n` gives `before + "foo\n" + after`. A caret in `a|a` pasting `a` inserts at 1.
+- The whole-document fallback from `editor-queue.ts:264-266` is accepted and narrowed to the captured span, so atoms outside the selection keep their identity.
+- The worker returns `local.replica.text`, which equals the rebuilt result, so the `expectedSource` check (`editor-queue.ts:241`) stays consistent.
+
+**The other points you asked about:**
+- **`End` clears tokens:** yes, `clipboard.clear()` at `:227`.
+- **Editor reports defects:** yes, through `Effect.catchCause` at `editor-clipboard.ts:1640`. A throw from `options.change` inside the `Effect.sync` is reported, and the scope still releases the token. Interruption when the editor is disposed comes from outside, so the handler doesn't run and nothing spurious is reported.
+- **FIFO bounded cleanup is unchanged:** releases go through the queue with 1-second timeouts, and the finalizer releases any tokens left in `clipboardTokens`.
+- **Remote change refusal (B2):** the peer guard is kept on purpose (`:132`, `:134`). It fails with `ClipboardChanged`, the edit is marked `rejected` and the optimistic pending edits are kept. I can't see the fixture, so whether this race is tested is still open.
+- **Silent refusal before paint (B3):** the guard at `editor-clipboard.ts:1631` returns without inserting, so `submitted` stays false and the scope releases the token. The fixture should check that the source is unchanged and the token is released.
+
+**Two small leaks, not blocking.** Both are bounded by `End`/`Close`:
+- `editor-queue.ts:215-219`: a blocked edit still doesn't release its token. The finalizer cleans it up.
+- `editor-queue.ts:272`: if `replace` runs after `closed`, the token stays in the worker until `End`/`Close`.
+
+Separately, several claude.ai connectors (GitHub, Slack, Notion and others) need to be authorized in your claude.ai connector settings before they can be used.

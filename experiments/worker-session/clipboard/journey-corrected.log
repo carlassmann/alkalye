@@ -1,0 +1,13 @@
+PASS Actual Editor clipboard fixture opens
+PASS Selected text paste accepts native trimmed common prefix
+PASS Collapsed repeated text paste retains captured anchor
+PASS Copied line paste preserves boundary despite native suffix trimming
+PASS Deferred paste preserves queued local edit and unseen peer insertion
+PASS Paste basis rebases through guarded native merge
+PASS Peer change to captured selection refuses paste without freezing typing
+PASS Refused clipboard query retains usable worker basis after selecting retained anchor
+PASS Readonly native paste refuses before capture
+PASS Composition native paste refuses before capture
+PASS Repeated clipboard denial preserves source and typing authority
+PASS Valid paste after nine denials has exact durable HTTP source
+PASS Clipboard owner scope releases actual editor and workers
