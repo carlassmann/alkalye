@@ -183,6 +183,20 @@
 			an extra reference array. This is not a 120fps or total-memory result.
 			Evidence: <code>experiments/performance/fused-durable-checkpoint</code>.
 		</p>
+		<p>
+			A separate 1MiB rich Markdown document with 11,436 projected links exposed
+			a broader input bottleneck on <code>5b4d2b7</code>. Trusted midpoint
+			typing took 17.8ms; the next three seconds included a 14.4ms
+			garbage-collection task. Exact native source, independent server
+			acceptance, Undo and caret checks passed. A separate CPU-sampled run
+			attributed 9.6ms to projection rebuilding, including unchanged-line
+			processing. Its timings are not a comparison with the unsampled run. The
+			first existing-document reopen took 16.3 seconds; a later reopen with
+			retained local cache took 2.3 seconds. Both loaded the exact accepted
+			source. These are single runs with different cache states, not a
+			cold-loading comparison. Evidence:
+			<code>experiments/performance/rich-current-readiness/reopen</code>.
+		</p>
 		<h2>Earlier journey comparison with main</h2>
 		<p>
 			Both production builds used their own local sync servers, signed accounts
