@@ -1465,6 +1465,20 @@
 			about 617ms. Total GC time increased; this is no GC or 120fps success.
 			Evidence: <code>experiments/performance/checkpoint-owner</code>.
 		</p>
+		<p>
+			A later diagnostic separated HTTP, journal validation and replay. HTTP
+			took 267.5ms. Validation restored the snapshot in 157.1ms; replay restored
+			it again in 133.5ms. Both used the same journal entry and identical
+			134,956-byte payload. Library acquisition took 624.6ms. These nested
+			spans include instrumentation overhead and do not predict the gain from
+			removing one restore.
+		</p>
+		<p>
+			The next loading candidate will reuse a privately validated snapshot only
+			for the exact committed entry bytes and unchanged projection state.
+			Failure, interruption and competing state must discard it. No reuse has
+			shipped. Evidence: <code>experiments/performance/first-open-replay</code>.
+		</p>
 		<h2>Forward Chunk replacement remains unshipped</h2>
 		<p>
 			An outside candidate assembled multicursor changes from slices of the
