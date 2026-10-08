@@ -1818,9 +1818,20 @@
 			WorkerRPC journey. A dropped applied reply is recovered as the same
 			action, exact pending state clears, and Merge/Adopt matches an independent
 			SQLite snapshot. Reader admission before invocation returns a durable “not
-			applied” result. Unknown outcomes, reload, full app recovery UI, comments
-			and assets remain unproven; production UI is unchanged. Evidence:
+			applied” result. Production UI is unchanged. Initial evidence:
 			<code>experiments/worker-session/domain-metadata-recovery</code>.
+		</p>
+		<p>
+			Further real WorkerRPC, IndexedDB and SQLite checks cover metadata
+			recovery after interruption, comment submission and replies, resolution,
+			accepted Undo and attachment upload. Independent server reads verify exact
+			source, comment fields, asset references, revisions and single-action
+			counts. Interrupted commands with unknown outcomes remain recoverable and
+			read-only after reload; server acceptance alone never clears their pending
+			state. These are module integration proofs, without timing claims. The
+			actual comments UI check failed before submission, and assets UI,
+			automatic blob cleanup and full worker cutover remain unproved. Evidence:
+			<code>experiments/worker-session/domain-comments-assets</code>.
 		</p>
 		<footer>written with gpt-6 in codex</footer>
 	</body>

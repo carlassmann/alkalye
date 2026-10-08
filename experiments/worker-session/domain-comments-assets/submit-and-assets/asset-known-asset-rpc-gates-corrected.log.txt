@@ -1,0 +1,20 @@
+PASS real worker command fault gates complete: null
+PASS simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections
+PASS browser identity is available before any network authentication
+PASS native browser account login serializes cookie issuance and agrees with server verification
+PASS requested main/worker scripts re-fetched against frozen served body hashes before invocation
+PASS public blob service reopens exact durable bytes through independent IndexedDB connection before dispatch
+PASS pre-dispatch pending intent roundtrips plain JSON with exact durable reference and name
+PASS attachment owns fresh durable attempt identity
+PASS discarded attachment reply recovers exact applied action
+PASS duplicate attachment command returns same action
+PASS independent SQLite snapshot contains one exact attachment reference and revision
+PASS SQLite history contains exactly one attach after duplicate request
+PASS worker read returns exact accepted reference revision
+PASS real HTTP readback returns exact binary uploaded before commit
+PASS public Undo applies attachment inverse
+PASS independent SQLite Undo restores exact source and removes attachment record
+PASS Undo retains durable blob bytes for event-sourced redo and recovery
+PASS scope reopen preserves exact undone attachment state
+PASS all owned worker scopes terminate after recovery/refusal gates
+Retained closed fixture: [retained closed fixture]

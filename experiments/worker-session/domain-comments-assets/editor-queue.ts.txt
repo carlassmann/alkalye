@@ -1,0 +1,768 @@
+import { domainIntent, queuedDomain, type QueuedDomain, type DomainLedger } from "./domain-ledger"
+import { commandIntentDigest } from "./command-intent"
+import type { NativePendingLedger } from "./pending-ledger"
+import * as Cause from "effect/Cause"
+import type * as Duration from "effect/Duration"
+import * as Deferred from "effect/Deferred"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
+import * as Fiber from "effect/Fiber"
+import * as Queue from "effect/Queue"
+import * as Stream from "effect/Stream"
+import type { MetadataPatch } from "../../shared/document-metadata"
+import type { WorkerAdmissionSchema, WorkerOpenedNoticeSchema } from "./worker-opened-schemas"
+import type { TextReplacement } from "../../shared/crdt"
+import type { createWorkerSessionClient } from "./worker-client"
+import { WorkerDocumentFailure } from "./worker-rpc"
+
+type WorkerClient = Effect.Success<ReturnType<typeof createWorkerSessionClient>>
+function queueMethods(client: WorkerClient) {
+    return { UndoQueued: client.UndoQueued<false, false>, MergeCandidate: client.MergeCandidate<false, false>, Adopt: client.Adopt<false, false> }
+}
+type QueueClient = Omit<WorkerClient, "UndoQueued" | "MergeCandidate" | "Adopt"> & ReturnType<typeof queueMethods>
+interface PendingEdit {
+ persisted: Deferred.Deferred<string, unknown>
+	clipboardToken?: string
+	kind: "edit"
+	admissionEpoch: number
+	epoch: string
+	sequence: number
+	delivery:
+		"queued" | "sending" | "unsaved" | "rejected" | "unknown" | "blocked"
+	ranges: readonly TextReplacement[]
+	saved: Deferred.Deferred<void, unknown>
+	expectedSource: string
+}
+
+export interface EditorSelection {
+	ranges?: { start: number; end: number; direction: "forward" | "backward" | "none" }[]
+	source: string
+	busy: boolean
+	start: number
+	end: number
+	direction: "forward" | "backward" | "none"
+	generation: number
+	composing: boolean
+}
+interface MergeRequest {
+	phase: "queued" | "requested" | "adopting"
+	requested: Deferred.Deferred<void, unknown>
+	kind: "merge"
+	epoch: string
+	sequence: number
+	source: string
+	selection: EditorSelection
+	readSelection: () => EditorSelection
+	accept: (source: string, selection: EditorSelection) => boolean
+	saved: Deferred.Deferred<boolean, unknown>
+}
+interface BasisRebase {
+ kind: "rebase"
+ basis: { epoch: string; sequence: number; source: string }
+ persisted: Deferred.Deferred<string, unknown>
+}
+interface Adoption {
+ persisted: Deferred.Deferred<string, unknown>
+	kind: "adopt"
+	epoch: string
+	sequence: number
+	candidate: string
+ source: string
+	saved: Deferred.Deferred<boolean, unknown>
+}
+interface UndoRequest {
+	phase: "queued" | "sending"
+	kind: "undo"
+	admissionEpoch: number
+	request: string
+	epoch: string
+	sequence: number
+	redo: boolean
+	saved: Deferred.Deferred<{ status: "applied" | "not-applied" | "unknown"; action?: string; failure?: string }, unknown>
+}
+interface ClipboardCapture {
+	kind: "clipboardCapture"
+	epoch: string
+	sequence: number
+	start: number
+	end: number
+	saved: Deferred.Deferred<{ token: string; selected: string }, unknown>
+}
+interface ClipboardResolve {
+	kind: "clipboardResolve"
+	token: string
+	epoch: string
+	sequence: number
+	saved: Deferred.Deferred<{ epoch: string; sequence: number; source: string; start: number; end: number }, unknown>
+}
+interface ClipboardRelease {
+	kind: "clipboardRelease"
+	token: string
+	saved: Deferred.Deferred<void, unknown>
+}
+type ClipboardCommand = ClipboardCapture | ClipboardResolve | ClipboardRelease
+export type DomainIntent = { type: "properties"; patch: MetadataPatch } | { type: "presentation"; enabled: boolean } | { type: "present"; index: number } | { type: "commentResolve"; thread: string; resolved: boolean }
+interface DomainRequest {
+ request: string
+ kind: "domain"
+ intent: DomainIntent
+ admissionEpoch: number
+ epoch: string
+ sequence: number
+ source: string
+ persisted: Deferred.Deferred<QueuedDomain, unknown>
+ token?: string
+ phase: "queued" | "sending" | "unknown"
+ saved: Deferred.Deferred<{ action: string }, unknown>
+}
+interface AdmissionRequest {
+ kind: "admission"
+ admission: typeof WorkerAdmissionSchema.Type
+ saved: Deferred.Deferred<typeof WorkerOpenedNoticeSchema.Type, unknown>
+}
+type EditorCommand = PendingEdit | MergeRequest | Adoption | UndoRequest | ClipboardCommand | DomainRequest | AdmissionRequest
+
+export function makeEditorQueue(
+	client: QueueClient,
+	initial: { epoch: string; sequence: number; source: string },
+	admissionEpoch: () => number,
+ onFailure: (failure: unknown) => Effect.Effect<void, unknown> = () => Effect.void,
+ rpcDeadline: Duration.Input = "30 seconds",
+ ledger?: NativePendingLedger,
+ onStateChange: () => Effect.Effect<void> = () => Effect.void,
+ domainLedger?: DomainLedger,
+) {
+	return Effect.gen(function* () {
+		let queue = yield* Queue.unbounded<EditorCommand>()
+ let durableQueue = yield* Queue.unbounded<PendingEdit | BasisRebase | DomainRequest>()
+ yield* Stream.fromQueue(durableQueue).pipe(Stream.runForEach(edit => Effect.gen(function* () {
+  if (edit.kind === "rebase") {
+   if (ledger) yield* ledger.rebase(edit.basis)
+   yield* Deferred.succeed(edit.persisted, edit.basis.epoch)
+   return
+  }
+  if (edit.kind === "domain") {
+   if (!domainLedger) return yield* Effect.fail(blocked())
+   let queued = yield* queuedDomain(domainLedger.subject, domainLedger.document, { request: edit.request, epoch: edit.epoch, sequence: edit.sequence, admissionEpoch: edit.admissionEpoch, command: edit.intent }, edit.source)
+   yield* domainLedger.prepareQueued(queued, edit.source)
+   yield* Deferred.succeed(edit.persisted, queued)
+   return
+  }
+  let intentDigest = yield* commandIntentDigest({ subject: ledger?.subject ?? "standalone", document: ledger?.document ?? "standalone", epoch: edit.epoch, sequence: edit.sequence, admissionEpoch: edit.admissionEpoch, ranges: edit.ranges, clipboardToken: edit.clipboardToken })
+  let beforeLength = edit.expectedSource.length - edit.ranges.reduce((change, range) => change + range.text.length - range.remove, 0)
+  if (ledger) yield* ledger.prepare({ intentDigest, sequence: edit.sequence, admissionEpoch: edit.admissionEpoch, beforeLength, afterLength: edit.expectedSource.length, ranges: edit.ranges })
+  yield* Deferred.succeed(edit.persisted, intentDigest)
+ }).pipe(Effect.catchCause(cause => Effect.gen(function* () {
+ failure = Cause.squash(cause)
+ if (edit.kind === "domain") yield* Deferred.failCause(edit.persisted, cause)
+ else yield* Deferred.failCause(edit.persisted, cause)
+ for (let waiting of pending) { yield* Deferred.failCause(waiting.persisted, cause); yield* Deferred.failCause(waiting.saved, cause) }
+ for (let waiting of domainRequests) { yield* Deferred.failCause(waiting.persisted, cause); yield* Deferred.failCause(waiting.saved, cause) }
+ if (!notifiedFailure) { notifiedFailure = true; yield* onFailure(failure).pipe(Effect.catchCause(() => Effect.void)) }
+})))), Effect.forkScoped({ startImmediately: true }))
+		let epoch = initial.epoch
+		let source = initial.source
+		let sequence = initial.sequence
+		let acknowledged = initial.sequence
+		let applied = initial.sequence
+		let pending: PendingEdit[] = []
+		let domainRequests = new Set<DomainRequest>()
+		let admissionRequests = new Set<AdmissionRequest>()
+		let diagnosticPhase = "idle"
+		let failure: unknown
+		let closed = false
+		let accepting = false
+		let commandFrozen = false
+ let notifiedFailure = false
+		let commandOwner: { epoch: string; sequence: number } | undefined
+		let undoRequests = new Set<UndoRequest>()
+		let merges = new Set<MergeRequest>()
+		let clipboardRequests = new Set<ClipboardCommand>()
+		let clipboardTokens = new Set<string>()
+		function blocked() {
+			return new WorkerDocumentFailure({
+				reason: "QueuedBlocked",
+				category: "conflict",
+			})
+		}
+		yield* Effect.addFinalizer(() =>
+			Effect.gen(function* () {
+				closed = true
+                for (let request of admissionRequests) yield* Deferred.fail(request.saved, blocked())
+                for (let request of domainRequests) yield* Deferred.fail(request.saved, request.phase === "sending" || request.phase === "unknown" ? new WorkerDocumentFailure({ reason: "AppliedUnknown", category: "failure" }) : blocked())
+				yield* Queue.shutdown(queue)
+ yield* Queue.shutdown(durableQueue)
+				for (let request of undoRequests) yield* Deferred.fail(request.saved, request.phase === "sending" ? new WorkerDocumentFailure({ reason: "AppliedUnknown", category: "failure" }) : blocked())
+				undoRequests.clear()
+				for (let merge of merges) {
+					yield* Deferred.fail(merge.requested, blocked())
+					yield* Deferred.fail(
+						merge.saved,
+						merge.phase === "adopting"
+							? new WorkerDocumentFailure({
+									reason: "AppliedUnknown",
+									category: "failure",
+								})
+							: blocked(),
+					)
+				}
+				merges.clear()
+			for (let request of clipboardRequests) {
+				if (request.kind === "clipboardCapture") yield* Deferred.fail(request.saved, blocked())
+				else if (request.kind === "clipboardResolve") yield* Deferred.fail(request.saved, blocked())
+				else yield* Deferred.fail(request.saved, blocked())
+			}
+			yield* Effect.forEach(clipboardTokens, token => client.ReleaseClipboard({ token }).pipe(Effect.timeout("1 second"), Effect.catch(() => Effect.void)), { concurrency: "unbounded", discard: true })
+			clipboardRequests.clear()
+			clipboardTokens.clear()
+
+				for (let edit of pending) {
+					if (edit.delivery === "sending") edit.delivery = "unknown"
+					else if (edit.delivery === "queued") edit.delivery = "blocked"
+					yield* Deferred.fail(
+						edit.saved,
+						edit.delivery === "unknown"
+							? new WorkerDocumentFailure({
+									reason: "AppliedUnknown",
+									category: "failure",
+								})
+							: blocked(),
+					)
+				}
+			}),
+		)
+		yield* Stream.fromQueue(queue).pipe(
+			Stream.runForEach(command =>
+				Effect.gen(function* () {
+
+     if (command.kind === "admission") {
+      let result = yield* client.AdmissionEpoch({ admission: command.admission }).pipe(Effect.timeout(rpcDeadline), Effect.exit)
+      admissionRequests.delete(command)
+      if (Exit.isFailure(result)) yield* Deferred.failCause(command.saved, result.cause)
+      else yield* Deferred.succeed(command.saved, result.value)
+      return
+     }
+     if (command.kind === "domain") {
+      if (failure !== undefined || closed) { yield* Deferred.fail(command.saved, blocked()); return }
+      command.phase = "sending"
+      let result = yield* Effect.scoped(Effect.gen(function* () {
+       if (!domainLedger || !ledger) return yield* Effect.fail(blocked())
+       let queued = yield* Deferred.await(command.persisted)
+       yield* domainLedger.preparing(queued)
+       let intent = command.intent
+       let preparing = intent.type === "properties" ? client.PropertiesUpdate({ patch: intent.patch, admissionEpoch: command.admissionEpoch }) : intent.type === "presentation" ? client.Presentation({ enabled: intent.enabled, admissionEpoch: command.admissionEpoch }) : intent.type === "present" ? client.Present({ index: intent.index, admissionEpoch: command.admissionEpoch }) : client.CommentResolve({ thread: intent.thread, resolved: intent.resolved, admissionEpoch: command.admissionEpoch })
+       let prepared = yield* preparing.pipe(Effect.catch(() => domainLedger.discardNeverSent({ queued, source: command.source, phase: "Preparing" }).pipe(Effect.andThen(Effect.fail(new WorkerDocumentFailure({ reason: "DomainNotApplied", category: "conflict" }))))))
+       yield* Effect.acquireRelease(Effect.succeed(prepared), held => client.Release({ token: held.token }).pipe(Effect.timeout("1 second"), Effect.catch(() => Effect.void)))
+       command.token = prepared.token
+       let durable = yield* domainIntent(ledger.subject, ledger.document, { request: queued.request, token: prepared.token, epoch: queued.epoch, sequence: queued.sequence, admissionEpoch: queued.admissionEpoch, commandDigest: queued.commandDigest }, command.source)
+       yield* domainLedger.prepared(queued, durable)
+       yield* domainLedger.started(queued)
+       let outcome = yield* client.ExecuteDomain({ intent: durable })
+       if (outcome.status === "unknown") return yield* Effect.fail(new WorkerDocumentFailure({ reason: "AppliedUnknown", category: "failure" }))
+       yield* domainLedger.confirm(durable, outcome)
+       if (outcome.status !== "applied" || !outcome.action) return yield* Effect.fail(new WorkerDocumentFailure({ reason: "DomainNotApplied", category: "conflict" }))
+       return { action: outcome.action }
+      })).pipe(Effect.timeout(rpcDeadline), Effect.exit)
+      if (Exit.isFailure(result)) {
+       let error = Cause.squash(result.cause)
+       if (error instanceof WorkerDocumentFailure && error.reason === "DomainNotApplied") {
+        domainRequests.delete(command)
+        commandFrozen = false
+        commandOwner = undefined
+        yield* onStateChange()
+       } else {
+        failure = error
+        command.phase = "unknown"
+       }
+       yield* Deferred.failCause(command.saved, result.cause)
+      } else {
+       domainRequests.delete(command)
+       yield* Deferred.succeed(command.saved, result.value)
+      }
+      return
+     }
+									if (command.kind === "clipboardRelease") {
+					let result = yield* client.ReleaseClipboard({ token: command.token }).pipe(Effect.timeout("1 second"), Effect.exit)
+					clipboardTokens.delete(command.token)
+					if (Exit.isFailure(result)) yield* Deferred.failCause(command.saved, result.cause)
+					else yield* Deferred.succeed(command.saved, undefined)
+					clipboardRequests.delete(command)
+					return
+				}
+				if (command.kind === "clipboardCapture") {
+					let result = yield* (failure === undefined && !closed && !commandFrozen ? client.CaptureClipboard({ epoch: command.epoch, sequence: command.sequence, start: command.start, end: command.end }).pipe(Effect.timeout(rpcDeadline)) : Effect.fail(blocked())).pipe(Effect.exit)
+					if (Exit.isFailure(result)) yield* Deferred.failCause(command.saved, result.cause)
+					else {
+						clipboardTokens.add(result.value.token)
+						yield* Deferred.succeed(command.saved, result.value)
+					}
+					clipboardRequests.delete(command)
+					return
+				}
+				if (command.kind === "clipboardResolve") {
+					let result = yield* (failure === undefined && !closed && !commandFrozen ? client.ResolveClipboard({ token: command.token, epoch: command.epoch, sequence: command.sequence }).pipe(Effect.timeout(rpcDeadline)) : Effect.fail(blocked())).pipe(Effect.exit)
+					if (Exit.isFailure(result)) yield* Deferred.failCause(command.saved, result.cause)
+					else yield* Deferred.succeed(command.saved, result.value)
+					clipboardRequests.delete(command)
+					return
+				}
+
+					if (command.kind === "undo") {
+						if (failure !== undefined || closed) {
+							yield* Deferred.fail(command.saved, blocked())
+							undoRequests.delete(command)
+							return
+						}
+						command.phase = "sending"
+						let payload = { request: command.request, epoch: command.epoch, sequence: command.sequence, redo: command.redo, admissionEpoch: command.admissionEpoch }
+						let result = yield* client.UndoQueued(payload).pipe(
+       Effect.timeout(rpcDeadline),
+       Effect.catchTag("TimeoutError", () => Effect.fail(new WorkerDocumentFailure({ reason: "AppliedUnknown", category: "failure" }))),
+							Effect.catch(error => Effect.fail(error)),
+							Effect.exit,
+						)
+						yield* Effect.uninterruptible(Effect.gen(function* () {
+							if (Exit.isFailure(result)) {
+								failure = new WorkerDocumentFailure({ reason: "AppliedUnknown", category: "failure" })
+								yield* Deferred.fail(command.saved, failure)
+							} else {
+								acknowledged = command.sequence
+								applied = command.sequence
+								if (result.value.status === "not-applied") { if (ledger) yield* ledger.advance(command.sequence); commandFrozen = false; commandOwner = undefined }
+								if (result.value.status === "unknown") failure = new WorkerDocumentFailure({ reason: "AppliedUnknown", category: result.value.failure ?? "failure" })
+								yield* Deferred.succeed(command.saved, result.value)
+							}
+							undoRequests.delete(command)
+						}))
+						return
+					}
+					if (command.kind === "merge") {
+						let merge = command
+						if (
+							failure !== undefined ||
+							closed ||
+							merge.epoch !== epoch ||
+							merge.sequence !== sequence ||
+							merge.source !== source
+						) {
+							yield* Deferred.fail(merge.requested, blocked())
+							yield* Deferred.succeed(merge.saved, false)
+							merges.delete(merge)
+							return
+						}
+						diagnosticPhase = "merge-candidate"
+      let result = yield* Effect.scoped(
+							Effect.gen(function* () {
+								let request = yield* client
+									.MergeCandidate({
+										epoch: merge.epoch,
+										sequence: merge.sequence,
+										start: merge.selection.start,
+										end: merge.selection.end,
+										...(merge.selection.ranges ? { ranges: merge.selection.ranges } : {}),
+									})
+									.pipe(
+          Effect.timeout(rpcDeadline),
+										Effect.exit,
+										Effect.forkScoped({ startImmediately: true }),
+									)
+								merge.phase = "requested"
+								yield* Deferred.succeed(merge.requested, undefined)
+								return yield* Fiber.join(request)
+							}),
+						)
+						if (Exit.isFailure(result)) {
+							let error = Cause.squash(result.cause)
+							if (
+								!(error instanceof WorkerDocumentFailure) ||
+								error.reason !== "SelectionUnavailable"
+							)
+								failure = error
+							yield* Deferred.failCause(merge.saved, result.cause)
+							merges.delete(merge)
+							return
+						}
+						let candidate = result.value
+						diagnosticPhase = "merge-accept"
+      let accepted = yield* Effect.try(() => {
+							let selection = merge.readSelection()
+							if (
+								closed ||
+								failure !== undefined ||
+								epoch !== merge.epoch ||
+								sequence !== merge.sequence ||
+								source !== merge.source ||
+								selection.generation !== merge.selection.generation ||
+								selection.start !== merge.selection.start ||
+								selection.end !== merge.selection.end ||
+								selection.direction !== merge.selection.direction ||
+								selection.composing ||
+								merge.selection.composing ||
+								selection.busy ||
+								merge.selection.busy ||
+								selection.source !== merge.source
+							)
+								return false
+							accepting = true
+							let accepted: boolean
+							try {
+								accepted = merge.accept(candidate.source, {
+									...selection,
+									start: candidate.start,
+									end: candidate.end,
+									...(candidate.ranges ? { ranges: [...candidate.ranges] } : {}),
+								})
+							} finally {
+								accepting = false
+							}
+							if (!accepted) return false
+							if (failure !== undefined) throw failure
+							merge.phase = "adopting"
+       let persisted = Deferred.makeUnsafe<string, unknown>()
+       if (!Queue.offerUnsafe(durableQueue, { kind: "rebase", basis: { epoch: candidate.candidate, sequence: 0, source: candidate.source }, persisted })) throw blocked()
+							if (
+								!Queue.offerUnsafe(queue, {
+									kind: "adopt",
+         persisted,
+									epoch,
+									sequence,
+									candidate: candidate.candidate,
+         source: candidate.source,
+									saved: merge.saved,
+								})
+							) {
+								source = candidate.source
+								throw blocked()
+							}
+							epoch = candidate.candidate
+							sequence = 0
+							acknowledged = 0
+							applied = 0
+							source = candidate.source
+							return true
+						}).pipe(Effect.exit)
+						if (Exit.isFailure(accepted)) {
+							failure = Cause.squash(accepted.cause)
+							merges.delete(merge)
+							yield* Deferred.failCause(merge.saved, accepted.cause)
+						} else if (!accepted.value) {
+							diagnosticPhase = "merge-release"
+       let released = yield* client
+								.ReleaseCandidate({ candidate: candidate.candidate }).pipe(Effect.timeout("1 second"))
+								.pipe(Effect.exit)
+							if (Exit.isFailure(released)) {
+								failure = Cause.squash(released.cause)
+								yield* Deferred.failCause(merge.saved, released.cause)
+							} else yield* Deferred.succeed(merge.saved, false)
+							merges.delete(merge)
+						}
+						return
+					}
+					if (command.kind === "adopt") {
+						let result = yield* client
+							.Adopt({
+								epoch: command.epoch,
+								sequence: command.sequence,
+								candidate: command.candidate,
+							})
+							.pipe(Effect.timeout(rpcDeadline), Effect.exit)
+						if (Exit.isFailure(result)) {
+							let reconciled = yield* client.EditorRead().pipe(Effect.timeout(rpcDeadline), Effect.exit)
+							if (
+								Exit.isSuccess(reconciled) &&
+								reconciled.value.epoch === command.candidate &&
+								reconciled.value.sequence === 0 && reconciled.value.source === command.source &&
+								failure === undefined
+							)
+								{
+								if (commandOwner?.epoch === command.epoch && commandOwner.sequence === command.sequence) { commandFrozen = false; commandOwner = undefined }
+								yield* Deferred.await(command.persisted)
+        yield* Deferred.succeed(command.saved, true)
+							}
+							else {
+								failure = Cause.squash(result.cause)
+								yield* Deferred.failCause(command.saved, result.cause)
+							}
+						} else {
+							if (commandOwner?.epoch === command.epoch && commandOwner.sequence === command.sequence) { commandFrozen = false; commandOwner = undefined }
+							yield* Deferred.await(command.persisted)
+        yield* Deferred.succeed(command.saved, true)
+						}
+						for (let merge of merges)
+							if (merge.saved === command.saved) merges.delete(merge)
+						return
+					}
+					let edit = command
+     diagnosticPhase = "edit-await-persisted"
+					if (failure !== undefined) {
+						edit.delivery = "blocked"
+						yield* Deferred.fail(edit.saved, blocked())
+						return
+					}
+     let persisted = yield* Deferred.await(edit.persisted).pipe(Effect.exit)
+     if (Exit.isFailure(persisted)) { failure = Cause.squash(persisted.cause); edit.delivery = "blocked"; yield* Deferred.failCause(edit.saved, persisted.cause); return }
+     let intentDigest = persisted.value
+     edit.delivery = "sending"
+     diagnosticPhase = "edit-replace-receipt"
+					let result = yield* client
+						.ReplaceReceipt({
+      intentDigest,
+							epoch: edit.epoch,
+							sequence: edit.sequence,
+							admissionEpoch: edit.admissionEpoch,
+							clipboardToken: edit.clipboardToken,
+							ranges: edit.ranges,
+						})
+						.pipe(Effect.timeout(rpcDeadline), Effect.catchTag("TimeoutError", () => Effect.fail(new WorkerDocumentFailure({ reason: "AppliedUnknown", category: "failure" }))), Effect.exit)
+									if (edit.clipboardToken) {
+					if (Exit.isFailure(result)) yield* client.ReleaseClipboard({ token: edit.clipboardToken }).pipe(Effect.timeout("1 second"), Effect.catch(() => Effect.void))
+					clipboardTokens.delete(edit.clipboardToken)
+				}
+if (Exit.isFailure(result)) {
+						failure = Cause.squash(result.cause)
+						if (
+							failure instanceof WorkerDocumentFailure &&
+							failure.reason === "Unsaved"
+						) {
+							edit.delivery = "unsaved"
+							applied = edit.sequence
+						} else if (
+							failure instanceof WorkerDocumentFailure &&
+							(failure.reason === "Rejected" || failure.reason === "PermissionDenied" || failure.reason === "ClipboardChanged" || failure.reason === "ClipboardUnavailable")
+						)
+							edit.delivery = "rejected"
+						else edit.delivery = "unknown"
+						yield* Deferred.failCause(edit.saved, result.cause)
+						return
+					}
+					if (result.value.intentDigest !== intentDigest || result.value.epoch !== edit.epoch || result.value.sequence !== edit.sequence || !result.value.agreement || result.value.afterLength !== edit.expectedSource.length || result.value.beforeLength !== edit.expectedSource.length - edit.ranges.reduce((change, range) => change + range.text.length - range.remove, 0)) {
+						failure = new WorkerDocumentFailure({
+							reason: "AppliedUnknown",
+							category: "conflict",
+						})
+						edit.delivery = "unknown"
+						yield* Deferred.fail(edit.saved, failure)
+						return
+					}
+					diagnosticPhase = "edit-confirm-ledger"
+     let recorded = yield* (ledger ? ledger.confirm(result.value, edit.expectedSource) : Effect.void).pipe(Effect.exit)
+     if (Exit.isFailure(recorded)) { failure = Cause.squash(recorded.cause); edit.delivery = "unknown"; yield* Deferred.failCause(edit.saved, recorded.cause); return }
+     diagnosticPhase = "edit-confirmed"
+     acknowledged = result.value.sequence
+					applied = result.value.sequence
+					pending = pending.filter(item => item !== edit)
+					yield* Deferred.succeed(edit.saved, undefined)
+				}).pipe(Effect.catchCause(cause => Effect.gen(function* () {
+     failure = Cause.squash(cause)
+     switch (command.kind) {
+ case "edit": Deferred.doneUnsafe(command.saved, Effect.failCause(cause)); break
+ case "merge": Deferred.doneUnsafe(command.saved, Effect.failCause(cause)); break
+ case "adopt": Deferred.doneUnsafe(command.saved, Effect.failCause(cause)); break
+ case "undo": Deferred.doneUnsafe(command.saved, Effect.failCause(cause)); break
+ case "admission": Deferred.doneUnsafe(command.saved, Effect.failCause(cause)); break
+ case "domain": Deferred.doneUnsafe(command.saved, Effect.failCause(cause)); break
+ case "clipboardCapture": Deferred.doneUnsafe(command.saved, Effect.failCause(cause)); break
+ case "clipboardResolve": Deferred.doneUnsafe(command.saved, Effect.failCause(cause)); break
+ case "clipboardRelease": Deferred.doneUnsafe(command.saved, Effect.failCause(cause)); break
+}
+     if (command.kind === "merge") Deferred.doneUnsafe(command.requested, Effect.failCause(cause))
+    })), Effect.ensuring(Effect.suspend(() => {
+     if (failure === undefined || notifiedFailure) return Effect.void
+     notifiedFailure = true
+     return onFailure(failure).pipe(Effect.catchCause(() => Effect.void))
+    })), Effect.ensuring(onStateChange())),
+			),
+			Effect.forkScoped({ startImmediately: true }),
+		)
+		function replace(
+				ranges: readonly TextReplacement[],
+				expectedSource?: string,
+				fallback?: () => readonly TextReplacement[],
+				clipboardToken?: string,
+			) {
+				if (commandFrozen || failure !== undefined || closed) throw blocked()
+				let permissionEpoch = admissionEpoch()
+				let changes = ranges.map(change => Object.freeze({ ...change }))
+				let nextSource = replayRanges(source, changes)
+				if (nextSource === undefined) throw rejectedRanges()
+				if (expectedSource !== undefined && nextSource !== expectedSource) {
+					changes = fallback?.().map(change => Object.freeze({ ...change })) ?? [{ start: 0, remove: source.length, text: expectedSource }]
+					nextSource = replayRanges(source, changes)
+					if (nextSource !== expectedSource) throw rejectedRanges()
+				}
+				source = nextSource
+				let saved = Deferred.makeUnsafe<void, unknown>()
+				let edit: PendingEdit = {
+ persisted: Deferred.makeUnsafe<string, unknown>(),
+					clipboardToken,
+					expectedSource: nextSource,
+					kind: "edit",
+					admissionEpoch: permissionEpoch,
+					epoch,
+					sequence: ++sequence,
+					delivery: "queued",
+					ranges: Object.freeze(changes),
+					saved,
+				}
+				pending.push(edit)
+				if (accepting || closed || !Queue.offerUnsafe(durableQueue, edit) || !Queue.offerUnsafe(queue, edit)) {
+					if (accepting)
+						failure = new WorkerDocumentFailure({
+							reason: "AppliedUnknown",
+							category: "conflict",
+						})
+					edit.delivery = "blocked"
+					Deferred.doneUnsafe(saved, Effect.fail(blocked()))
+				}
+				return { source, sequence: edit.sequence, saved: Deferred.await(saved) }
+			}
+		return {
+			undo(redo: boolean) {
+				let saved = Deferred.makeUnsafe<{ status: "applied" | "not-applied" | "unknown"; action?: string; failure?: string }, unknown>()
+				if (closed || failure !== undefined || commandFrozen) {
+					Deferred.doneUnsafe(saved, Effect.fail(blocked()))
+					return Deferred.await(saved)
+				}
+				let permissionEpoch = admissionEpoch()
+				commandFrozen = true
+				sequence++
+				commandOwner = { epoch, sequence }
+				let command: UndoRequest = { phase: "queued", kind: "undo", admissionEpoch: permissionEpoch, request: crypto.randomUUID(), epoch, sequence, redo, saved }
+				undoRequests.add(command)
+				if (!Queue.offerUnsafe(queue, command)) { Deferred.doneUnsafe(saved, Effect.fail(blocked())); undoRequests.delete(command) }
+				return Deferred.await(saved)
+			},
+			replace,
+			replaceClipboard(token: string, ranges: readonly TextReplacement[], expectedSource: string, fallback?: () => readonly TextReplacement[]) {
+				return replace(ranges, expectedSource, fallback, token)
+			},
+			merge(
+				readSelection: () => EditorSelection,
+				accept: (source: string, selection: EditorSelection) => boolean,
+			) {
+				let saved = Deferred.makeUnsafe<boolean, unknown>()
+				let requested = Deferred.makeUnsafe<void, unknown>()
+				let command: MergeRequest = {
+					phase: "queued",
+					requested,
+					kind: "merge",
+					epoch,
+					sequence,
+					source,
+					selection: { ...readSelection() },
+					readSelection,
+					accept,
+					saved,
+				}
+				if (
+					closed ||
+					failure !== undefined ||
+					pending.length ||
+					!Queue.offerUnsafe(queue, command)
+				) {
+					Deferred.doneUnsafe(saved, Effect.succeed(false))
+					Deferred.doneUnsafe(requested, Effect.fail(blocked()))
+				} else merges.add(command)
+				return {
+					requested: Deferred.await(requested),
+					saved: Deferred.await(saved),
+				}
+			},
+			captureClipboard(start: number, end: number, expectedSource?: string) {
+				return Effect.suspend(() => {
+					let saved = Deferred.makeUnsafe<{ token: string; selected: string }, unknown>()
+					let command: ClipboardCapture = { kind: "clipboardCapture", epoch, sequence, start, end, saved }
+					if (expectedSource !== undefined && source !== expectedSource) return Effect.fail(new WorkerDocumentFailure({ reason: "ClipboardChanged", category: "conflict" }))
+					clipboardRequests.add(command)
+					if (closed || failure !== undefined || commandFrozen || !Queue.offerUnsafe(queue, command)) {
+						clipboardRequests.delete(command)
+						Deferred.doneUnsafe(saved, Effect.fail(blocked()))
+					}
+					return Deferred.await(saved)
+				})
+			},
+			resolveClipboard(token: string) {
+				return Effect.suspend(() => {
+					let saved = Deferred.makeUnsafe<{ epoch: string; sequence: number; source: string; start: number; end: number }, unknown>()
+					let command: ClipboardResolve = { kind: "clipboardResolve", epoch, sequence, token, saved }
+					clipboardRequests.add(command)
+					if (closed || failure !== undefined || commandFrozen || !Queue.offerUnsafe(queue, command)) {
+						clipboardRequests.delete(command)
+						Deferred.doneUnsafe(saved, Effect.fail(blocked()))
+					}
+					return Deferred.await(saved)
+				})
+			},
+			releaseClipboard(token: string) {
+				return Effect.suspend(() => {
+					let saved = Deferred.makeUnsafe<void, unknown>()
+					let command: ClipboardRelease = { kind: "clipboardRelease", token, saved }
+					clipboardRequests.add(command)
+					if (closed || !Queue.offerUnsafe(queue, command)) {
+						clipboardRequests.delete(command)
+						Deferred.doneUnsafe(saved, Effect.fail(blocked()))
+					}
+					return Deferred.await(saved)
+				})
+			},
+			settle: Effect.suspend(() => {
+				if (failure !== undefined) return Effect.succeed(false)
+				let saves = [...pending.map(edit => Deferred.await(edit.saved)), ...[...merges].map(merge => Deferred.await(merge.saved).pipe(Effect.asVoid)), ...[...domainRequests].map(request => Deferred.await(request.saved).pipe(Effect.asVoid)), ...[...undoRequests].map(request => Deferred.await(request.saved).pipe(Effect.asVoid))]
+				return Effect.all(saves, { discard: true }).pipe(Effect.map(() => failure === undefined && pending.length === 0 && undoRequests.size === 0 && domainRequests.size === 0 && !commandFrozen), Effect.catch(() => Effect.succeed(false)))
+			}),
+            admission(next: typeof WorkerAdmissionSchema.Type) {
+             let saved = Deferred.makeUnsafe<typeof WorkerOpenedNoticeSchema.Type, unknown>()
+             let request: AdmissionRequest = { kind: "admission", admission: next, saved }
+             admissionRequests.add(request)
+             if (closed || !Queue.offerUnsafe(queue, request)) { admissionRequests.delete(request); Deferred.doneUnsafe(saved, Effect.fail(blocked())) }
+             return Deferred.await(saved)
+            },
+            domain(intent: DomainIntent) {
+             if (closed || failure !== undefined || commandFrozen) return Effect.fail(blocked())
+             let permissionEpoch = admissionEpoch()
+             let saved = Deferred.makeUnsafe<{ action: string }, unknown>()
+             let persisted = Deferred.makeUnsafe<QueuedDomain, unknown>()
+             let command: DomainRequest = { request: crypto.randomUUID(), kind: "domain", intent: structuredClone(intent), admissionEpoch: permissionEpoch, epoch, sequence, source, persisted, phase: "queued", saved }
+             commandFrozen = true
+             commandOwner = { epoch, sequence }
+             domainRequests.add(command)
+             if (!Queue.offerUnsafe(durableQueue, command) || !Queue.offerUnsafe(queue, command)) { failure = blocked(); Deferred.doneUnsafe(saved, Effect.fail(failure)) }
+             return Deferred.await(saved)
+            },
+			state() {
+				return {
+					source,
+     diagnosticPhase,
+					epoch,
+					sequence,
+					acknowledged,
+					applied,
+					failure,
+					closed,
+					commandFrozen,
+					domains: [...domainRequests].map(command => ({ intent: command.intent, phase: command.phase, token: command.token })),
+				pending: pending.map(edit => ({
+						sequence: edit.sequence,
+						delivery: edit.delivery,
+						ranges: edit.ranges,
+					})),
+				}
+			},
+		}
+	})
+}
+
+function rejectedRanges() {
+ return new WorkerDocumentFailure({ reason: "Rejected", category: "conflict" })
+}
+function replayRanges(source: string, ranges: readonly TextReplacement[]) {
+ let parts: string[] = []
+ let position = 0
+ for (let range of ranges) {
+  if (!Number.isSafeInteger(range.start) || !Number.isSafeInteger(range.remove) || range.start < position || range.remove < 0 || range.start + range.remove > source.length) return
+  parts.push(source.slice(position, range.start), range.text)
+  position = range.start + range.remove
+ }
+ parts.push(source.slice(position))
+ return parts.join("")
+}

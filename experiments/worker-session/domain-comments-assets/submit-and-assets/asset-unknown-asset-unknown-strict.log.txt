@@ -1,0 +1,2 @@
+domain-worker-fixture.ts(20,1): error TS6133: 'parseBlobReference' is declared but its value is never read.
+error: "tsc" exited with code 2

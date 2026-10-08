@@ -1,0 +1,3 @@
+domain-worker-fixture.ts(5,1): error TS6133: 'Fiber' is declared but its value is never read.
+domain-worker-fixture.ts(13,1): error TS6133: 'makeWorkerAppOwner' is declared but its value is never read.
+error: "tsc" exited with code 2

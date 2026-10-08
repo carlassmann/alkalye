@@ -1,0 +1,52 @@
+import * as Effect from "effect/Effect"
+import * as Schema from "effect/Schema"
+import { accountHeader } from "./src/shared/authentication"
+import { DocumentSnapshotSchema, CommittedActionSchema, restoreSnapshot } from "./src/shared/document-actions"
+import { buildAction } from "./src/shared/document-actions"
+import { Replica } from "./src/shared/crdt"
+import { newDocument, newComment } from "./src/shared/documents"
+import { personalWorkspaceRequest } from "./src/shared/workspace"
+
+let input = Schema.Struct({ subject: Schema.String, document: Schema.String, source: Schema.String, thread: Schema.optional(Schema.String) })
+
+export async function provisionFixture(request: Request, backend: URL, origin: string) {
+	let parsed = Schema.decodeUnknownResult(input)(await request.json())
+	if (parsed._tag === "Failure") return new Response("Invalid fixture seed", { status: 400 })
+	let { subject, document, source, thread } = parsed.success
+	let headers = new Headers()
+	let cookie = request.headers.get("cookie")
+	let authorization = request.headers.get("authorization")
+	if (cookie) headers.set("cookie", cookie)
+	if (authorization) headers.set("authorization", authorization)
+	headers.set("origin", origin)
+	headers.set("content-type", "application/json")
+	headers.set("host", new URL(origin).host)
+	headers.set(accountHeader, subject)
+	let workspace = "personal-" + subject
+	let space = await fetch(new URL("/api/workspaces", backend), {
+		method: "POST", headers,
+		body: JSON.stringify({ workspace, name: "Personal", request: personalWorkspaceRequest }),
+	})
+	if (!space.ok) return new Response(space.body, { status: space.status })
+	let action = await Effect.runPromise(buildAction(new Replica(subject + "-fixture-" + document, subject), document, "Fixture seed", replica => { let changes = newDocument(replica, document, "Worker fixture", source); return thread ? [...changes, ...newComment(replica, thread, document, "Body😀", "Peer comment body", subject)] : changes }))
+	let created = await fetch(new URL("/api/documents", backend), {
+		method: "POST", headers,
+		body: JSON.stringify({ workspace, action }),
+	})
+	if (!created.ok) return new Response(created.body, { status: created.status })
+	return Response.json({ document, source })
+}
+
+export async function acceptedFixture(request: Request, backend: URL, origin: string) {
+ let url = new URL(request.url), document = url.searchParams.get("document"), subject = url.searchParams.get("subject")
+ if (!document || !subject) return new Response("Missing fixture identity",{status:400})
+ let headers = new Headers(request.headers); headers.set("host",new URL(origin).host); headers.set(accountHeader,subject)
+ let response = await fetch(new URL("/api/documents/"+encodeURIComponent(document)+"/snapshot?encoding=compact",backend),{headers})
+ if (!response.ok) return new Response(response.body,{status:response.status})
+ let snapshot = Schema.decodeUnknownSync(DocumentSnapshotSchema)(await response.json())
+ let replica = await Effect.runPromise(restoreSnapshot(snapshot,"fixture-server-read"))
+ let historyResponse = await fetch(new URL("/api/documents/" + encodeURIComponent(document) + "/history", backend), { headers })
+ if (!historyResponse.ok) return new Response(historyResponse.body, { status: historyResponse.status })
+ let history = Schema.decodeUnknownSync(Schema.Array(Schema.Struct({ position: Schema.Natural, action: CommittedActionSchema })))(await historyResponse.json())
+ return Response.json({source:replica.text(document),position:snapshot.position,threads:replica.records("comment").filter(thread => thread.fields.document === document).map(thread => ({ id: thread.id, body: thread.fields.body ?? "", resolved: thread.fields.resolved === "true", replies: Object.entries(thread.fields).filter(([field]) => field.startsWith("reply:")).map(([, value]) => value) })), actions:history.map(entry => ({ id: entry.action.id, label: entry.action.label, undoOf: entry.action.undoOf })), assets:replica.records("asset").filter(asset => asset.fields.document === document).map(asset => ({ id: asset.id, name: asset.fields.name ?? "Asset", reference: asset.fields.data ?? "", version: replica.register(asset.id, "data")?.id ?? "" }))})
+}

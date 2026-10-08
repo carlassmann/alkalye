@@ -1,0 +1,155 @@
+import * as Cause from "effect/Cause"
+import * as Deferred from "effect/Deferred"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
+import * as Scope from "effect/Scope"
+import * as Schema from "effect/Schema"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import { bootstrapBrowserAccount } from "./tests/browser-account-fixture"
+import { Storage } from "./src/client/storage"
+import { createWorkerSessionClient } from "./src/client/worker-document/worker-client"
+import { makeDomainLedger, queuedDomain, domainIntent } from "./src/client/worker-document/domain-ledger"
+import { commandIntentDigest } from "./src/client/worker-document/command-intent"
+
+let results: string[] = [], workerUrls: string[] = []
+let fixtures: { document: string; mode: string; request?: string }[] = []
+let phase = "account", terminated = 0
+let boundary = Deferred.makeUnsafe<void>()
+Object.assign(window, { domainWorkerResults: results, domainWorkerFixture: fixtures })
+function check(value: unknown, message: string) { if (!value) throw new Error(message); results.push(message) }
+let originalWorker = globalThis.Worker
+class BoundaryWorker extends originalWorker {
+ constructor(url: string | URL, options?: WorkerOptions) {
+  super(url, options)
+  workerUrls.push(new URL(String(url), location.href).href)
+  this.addEventListener("message", event => {
+   if (!Array.isArray(event.data) || event.data[0] !== 2) return
+   let parsed = Schema.decodeUnknownResult(Schema.Struct({ phase: Schema.String }))(event.data[1])
+   if (parsed._tag === "Success" && parsed.success.phase.startsWith("Domain:fault-")) Deferred.doneUnsafe(boundary, Effect.void)
+  })
+ }
+ terminate() { terminated++; super.terminate() }
+}
+globalThis.Worker = BoundaryWorker
+let Pins = Schema.Array(Schema.Struct({ path: Schema.String, sha256: Schema.String }))
+function verifyBodies() {
+ return Effect.tryPromise({ try: async () => {
+  let pins = Schema.decodeUnknownSync(Pins)(await (await fetch("/__tests/asset-pins", { cache: "no-store" })).json())
+  let urls = performance.getEntriesByType("resource").map(entry => entry.name).filter(url => new URL(url).pathname.endsWith(".js"))
+  for (let url of new Set([...urls, ...workerUrls])) {
+   let path = new URL(url).pathname
+   let expected = pins.find(pin => pin.path === path)
+   if (!expected) throw new Error("Unpinned script path")
+   let response = await fetch(url, { cache: "no-store" })
+   if (!response.ok) throw new Error("Script fetch failed")
+   let bytes = await crypto.subtle.digest("SHA-256", await response.arrayBuffer())
+   let digest = Array.from(new Uint8Array(bytes), byte => byte.toString(16).padStart(2, "0")).join("")
+   if (digest !== expected.sha256) throw new Error("Served script differs from frozen fixture build")
+  }
+  check(workerUrls.length > 0 && urls.length > 0, "requested main/worker scripts re-fetched against frozen served body hashes before invocation")
+ }, catch: error => error })
+}
+let AcceptedView = Schema.Struct({ source: Schema.String, position: Schema.Natural, threads: Schema.Array(Schema.Struct({ id: Schema.String, body: Schema.String, resolved: Schema.Boolean })), actions: Schema.Array(Schema.Struct({ id: Schema.String, label: Schema.String, undoOf: Schema.optional(Schema.String) })) })
+function acceptedView(subject: string, document: string) {
+ return Effect.tryPromise({ try: async () => {
+  let response = await fetch("/__tests/accepted?document=" + encodeURIComponent(document) + "&subject=" + encodeURIComponent(subject), { cache: "no-store" })
+  if (!response.ok) throw new Error("Independent server read failed: " + response.status)
+  return Schema.decodeUnknownSync(AcceptedView)(await response.json())
+ }, catch: error => error })
+}
+let program = Effect.scoped(Effect.gen(function* () {
+ yield* Effect.addFinalizer(() => Effect.sync(() => { globalThis.Worker = originalWorker }))
+ let ownerScope = yield* Scope.Scope
+ let account = yield* bootstrapBrowserAccount(check)
+ let storage = yield* Effect.acquireRelease(Storage.open(), opened => Effect.sync(() => opened.close()))
+ let document = crypto.randomUUID(), thread = crypto.randomUUID()
+ fixtures.push({ document, mode: "comment-resolve" })
+ phase = "seed-comment"
+ yield* storage.set("domain-test-fixture:" + document, { document, thread, phase: "before-create" })
+ yield* Effect.tryPromise({ try: async () => { let response = await fetch("/__tests/seed", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ subject: account.subject, document, thread, source: "---\ntitle: Worker fixture\n---\nBody😀\n" }) }); if (!response.ok) throw new Error("Seed failed: " + response.status) }, catch: error => error })
+ let admission = { subject: account.subject, epoch: 1, exists: true, deleted: false, role: "owner", account: "ready", online: true } satisfies { subject: string; epoch: number; exists: boolean; deleted: boolean; role: "owner"; account: "ready"; online: boolean }
+ let options = { document, subject: account.subject, workspace: "personal-" + account.subject, origin: location.origin, activityChannel: "comment-" + crypto.randomUUID(), online: true, cooperativeWork: true, admission }
+ let scope = yield* Scope.fork(ownerScope)
+ let client = yield* createWorkerSessionClient(new URL("/worker.js", location.href).href).pipe(Scope.provide(scope))
+ let opened = yield* client.Open(options)
+ let basis = yield* client.Begin()
+ yield* verifyBodies()
+ let initialThread = opened.projection?.threads.find(value => value.id === thread)
+ let start = basis.source.indexOf("Body😀")
+ check(initialThread?.range?.start === start && initialThread.range.end === start + "Body😀".length, "public opened thread preserves exact Unicode anchored range")
+ let peerScope = yield* Scope.fork(ownerScope)
+ let peer = yield* createWorkerSessionClient(new URL("/worker.js", location.href).href).pipe(Scope.provide(peerScope))
+ yield* peer.Open({ ...options, activityChannel: "peer-" + crypto.randomUUID() })
+ let peerBasis = yield* peer.Begin()
+ let ranges = [{ start, remove: 0, text: "Peer " }]
+ let input = { subject: account.subject, document, epoch: peerBasis.epoch, sequence: peerBasis.sequence + 1, admissionEpoch: 1, ranges }
+ let intentDigest = yield* commandIntentDigest(input)
+ yield* peer.ReplaceReceipt({ ...input, intentDigest })
+ yield* peer.Synchronize()
+ yield* client.Synchronize()
+ let candidate = yield* client.MergeCandidate({ ...basis, start, end: start })
+ yield* client.Adopt({ ...basis, candidate: candidate.candidate })
+ let merged = yield* client.EditorRead()
+ if (!merged.epoch || merged.sequence === undefined) throw new Error("Missing adopted basis")
+ basis = { epoch: merged.epoch, sequence: merged.sequence, source: merged.source }
+ let snapshot = yield* client.Read()
+ let shifted = snapshot.projection?.threads.find(value => value.id === thread)
+ check(shifted?.range?.start === start + 5 && shifted.range.end === start + 5 + "Body😀".length, "peer insertion shifts public comment range exactly")
+ check(shifted?.fields.body === "Peer comment body", "peer edit preserves comment body")
+ let ledger = makeDomainLedger(storage, account.subject, document)
+ let queued = yield* queuedDomain(account.subject, document, { request: crypto.randomUUID(), ...basis, admissionEpoch: 1, command: { type: "commentResolve", thread, resolved: true } }, basis.source)
+ yield* ledger.prepareQueued(queued, basis.source); yield* ledger.preparing(queued)
+ let held = yield* client.CommentResolve({ thread, resolved: true, admissionEpoch: 1 })
+ let intent = yield* domainIntent(account.subject, document, { ...queued, token: held.token }, basis.source)
+ yield* ledger.prepared(queued, intent); yield* ledger.started(queued)
+ phase = "resolve-once"
+ let attempt = "domain-test-attempt:" + document + ":" + intent.request
+ check((yield* storage.get(attempt)) === undefined, "resolve attempt has a fresh durable identity")
+ yield* storage.set(attempt, { request: intent.request, phase })
+ yield* client.ExecuteDomain({ intent })
+ let recovered = yield* client.RecoverDomain({ request: intent.request, intentDigest: intent.intentDigest })
+ if (!recovered.outcome) throw new Error("Missing known outcome")
+ check(recovered.outcome.status === "applied" && Boolean(recovered.outcome.action), "discarded applied reply recovers exact durable comment action")
+ let duplicate = yield* client.ExecuteDomain({ intent })
+ check(duplicate.action === recovered.outcome.action, "same intent returns same action without duplicate comment mutation")
+ yield* ledger.confirm(intent, recovered.outcome)
+ check((yield* ledger.inspect).rows.length === 0, "exact known receipt clears only its main pending row")
+ yield* client.Synchronize()
+ snapshot = yield* client.Read()
+ check(snapshot.projection?.threads.find(value => value.id === thread)?.fields.resolved === "true", "public resolve sets thread resolved flag")
+ let acceptedResolve = yield* acceptedView(account.subject, document)
+ check(acceptedResolve.source === basis.source && acceptedResolve.threads.find(value => value.id === thread)?.resolved === true && acceptedResolve.threads.find(value => value.id === thread)?.body === "Peer comment body", "independent SQLite snapshot has resolved flag and exact peer source/body")
+ check(acceptedResolve.actions.filter(action => action.id === recovered.outcome?.action).length === 1 && acceptedResolve.actions.filter(action => action.label === "Resolve comment").length === 1, "SQLite event history contains exactly one resolve action after duplicate intent")
+ let undo = yield* client.UndoQueued({ request: crypto.randomUUID(), epoch: basis.epoch, sequence: basis.sequence + 1, redo: false, admissionEpoch: 1 })
+ check(undo.status === "applied", "public Undo applies comment inverse")
+ snapshot = yield* client.Read()
+ check(snapshot.projection?.threads.find(value => value.id === thread)?.fields.resolved === "false", "Undo restores unresolved flag")
+ check(snapshot.projection?.document.content === basis.source && snapshot.projection.threads.find(value => value.id === thread)?.fields.body === "Peer comment body", "Undo preserves peer text and comment body")
+ yield* client.Synchronize()
+ let acceptedUndo = yield* acceptedView(account.subject, document)
+ check(acceptedUndo.source === basis.source && acceptedUndo.threads.find(value => value.id === thread)?.resolved === false && acceptedUndo.threads.find(value => value.id === thread)?.body === "Peer comment body", "independent SQLite snapshot confirms Undo and preserved peer source/body")
+ check(acceptedUndo.actions.filter(action => action.undoOf === recovered.outcome?.action).length === 1, "SQLite history contains exactly one accepted inverse for resolve")
+ yield* peer.Close(); yield* Scope.close(peerScope, Exit.void)
+ yield* client.Close(); yield* Scope.close(scope, Exit.void)
+ let reloadScope = yield* Scope.fork(ownerScope)
+ let reload = yield* createWorkerSessionClient(new URL("/worker.js", location.href).href).pipe(Scope.provide(reloadScope))
+ let reopened = yield* reload.Open({ ...options, activityChannel: "reload-" + crypto.randomUUID() })
+ check(reopened.projection?.threads.find(value => value.id === thread)?.fields.resolved === "false" && reopened.projection.document.content === basis.source, "scope reopen preserves undone flag and exact peer source")
+ let reloadBasis = yield* reload.Begin()
+ let revokeQueued = yield* queuedDomain(account.subject, document, { request: crypto.randomUUID(), ...reloadBasis, admissionEpoch: 1, command: { type: "commentResolve", thread, resolved: true } }, reloadBasis.source)
+ let revokeHeld = yield* reload.CommentResolve({ thread, resolved: true, admissionEpoch: 1 })
+ let revokeIntent = yield* domainIntent(account.subject, document, { ...revokeQueued, token: revokeHeld.token }, reloadBasis.source)
+ yield* reload.AdmissionEpoch({ admission: { ...admission, epoch: 2, role: "reader" } })
+ let denied = yield* reload.ExecuteDomain({ intent: revokeIntent })
+ check(denied.status === "not-applied", "revoked admission refuses staged comment before invocation")
+ let readDenied = yield* reload.Read()
+ check(readDenied.projection?.threads.find(value => value.id === thread)?.fields.resolved === "false", "revocation leaves thread unchanged")
+ yield* reload.Release({ token: revokeHeld.token })
+ yield* reload.Close(); yield* Scope.close(reloadScope, Exit.void)
+
+ check(terminated >= 3, "all owned worker scopes terminate after recovery/refusal gates")
+}))
+Effect.runPromise(program.pipe(Effect.provide(FetchHttpClient.layer), Effect.exit)).then(exit => {
+ if (Exit.isSuccess(exit)) Object.assign(window, { domainWorkerDone: true })
+ else { let error = Cause.squash(exit.cause); Object.assign(window, { domainWorkerDone: true, domainWorkerFailure: { phase, message: String(error), reason: typeof error === "object" && error !== null && "reason" in error ? String(error.reason) : undefined } }) }
+})

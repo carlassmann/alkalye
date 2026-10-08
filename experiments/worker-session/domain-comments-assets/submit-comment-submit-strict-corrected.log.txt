@@ -1,0 +1,9 @@
+src/client/worker-document/worker-session.ts(59,11): error TS2488: Type 'never' must have a '[Symbol.iterator]()' method that returns an iterator.
+src/client/worker-document/worker-session.ts(59,41): error TS2345: Argument of type '<A, R>(self: Effect<A, never, R>) => Effect<A, never, R>' is not assignable to parameter of type '(_: Effect<void, never, never> | Effect<never, WorkerDocumentFailure, never>) => Effect<void, never, never>'.
+  Types of parameters 'self' and '_' are incompatible.
+    Type 'Effect<void, never, never> | Effect<never, WorkerDocumentFailure, never>' is not assignable to type 'Effect<void, never, never>'.
+      Type 'Effect<never, WorkerDocumentFailure, never>' is not assignable to type 'Effect<void, never, never>'.
+        Type 'WorkerDocumentFailure' is not assignable to type 'never'.
+src/client/worker-document/worker.ts(43,2): error TS2345: Argument of type 'Effect<never, WorkerError, unknown>' is not assignable to parameter of type 'Effect<never, WorkerError, never>'.
+  Type 'unknown' is not assignable to type 'never'.
+error: "tsc" exited with code 2

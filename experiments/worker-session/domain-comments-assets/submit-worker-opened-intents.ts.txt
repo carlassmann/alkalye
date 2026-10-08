@@ -1,0 +1,198 @@
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import { DocumentSession } from "../../shared/document-session"
+import { DocumentProperties } from "../document-properties"
+import { DocumentDiscussion } from "../document-discussion"
+import { DocumentAssets } from "../document-assets"
+import { DocumentBlobs } from "../document-blobs"
+import { DocumentConflict, PermissionDenied } from "../../shared/document-errors"
+import { selectionAnchor } from "../../shared/documents"
+import { boardFile } from "../../shared/whiteboard"
+import type { Replica } from "../../shared/crdt"
+import type { AttachmentSelection } from "../document-assets"
+import type { MetadataPatch } from "../../shared/document-metadata"
+import type { DocumentRange } from "./opened-document-contract"
+
+type Properties = Context.Service.Shape<typeof DocumentProperties>
+type Discussion = Context.Service.Shape<typeof DocumentDiscussion>
+type Assets = Context.Service.Shape<typeof DocumentAssets>
+type Command = ReturnType<Context.Service.Shape<typeof DocumentSession>["change"]> | ReturnType<Properties["update"]> | ReturnType<Assets["attachFiles"]> | ReturnType<Discussion["resolve"]>
+type Composer = Effect.Success<ReturnType<Discussion["prepareComment"]>>
+interface IntentOptions {
+ document: string
+ session: Context.Service.Shape<typeof DocumentSession>
+ properties: Properties
+ discussion: Discussion
+ assets: Assets
+ blobs: Context.Service.Shape<typeof DocumentBlobs>
+ canWrite(): boolean
+ // This resolves the retained worker editor branch, never the main thread.
+ basis(range: DocumentRange): Replica | undefined
+}
+
+export function makeWorkerOpenedIntents(options: IntentOptions) {
+ return Effect.gen(function* () {
+  let closed = false
+  let commands = new Map<string, Command>()
+  let composers = new Map<string, Composer>()
+  let selections = new Map<string, AttachmentSelection>()
+  yield* Effect.addFinalizer(() => Effect.sync(() => { closed = true; commands.clear(); composers.clear(); selections.clear() }))
+  function unavailable(message = "This document capability is unavailable") { return new DocumentConflict({ message }) }
+  function requireOpen() { if (closed) throw unavailable("This document is closed") }
+  function writable() {
+   requireOpen()
+   if (!options.canWrite()) throw new PermissionDenied({ message: "This document is read-only" })
+  }
+  function capacity(size: number) {
+   if (size >= 8) throw unavailable("Close or finish an existing document command first")
+  }
+  function attempt<A>(operation: () => A) {
+   return Effect.try({ try: () => { requireOpen(); return operation() }, catch: cause => cause }).pipe(Effect.catch(cause => cause instanceof DocumentConflict || cause instanceof PermissionDenied ? Effect.fail(cause) : Effect.die(cause)))
+  }
+  function selected(range: DocumentRange) {
+   if (!Number.isSafeInteger(range.sequence) || range.sequence < 0 || !Number.isSafeInteger(range.start) || !Number.isSafeInteger(range.end)) throw unavailable("The editor selection is unavailable")
+   let replica = options.basis(range)
+   if (!replica) throw unavailable("The editor selection has changed")
+   let source = replica.text(options.document)
+   if (range.start < 0 || range.start > range.end || range.end > source.length) throw unavailable("The editor selection is unavailable")
+   let quote = source.slice(range.start, range.end)
+   if (/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/u.test(quote)) throw unavailable("Select complete characters")
+   return { replica, source, quote }
+  }
+  function prepare(command: Command) {
+   return attempt(() => {
+    writable()
+    capacity(commands.size)
+    let token = crypto.randomUUID()
+    commands.set(token, command)
+    return { token }
+   })
+  }
+  function attachmentSelection(token: string) {
+   let selection = selections.get(token)
+   if (!selection) throw unavailable("The attachment selection is unavailable")
+   return selection
+  }
+  return Object.freeze({
+   properties: Object.freeze({
+    update: (patch: MetadataPatch, label?: string) => prepare(options.properties.update(patch, label)),
+    present: (index: number) => prepare(options.properties.present(index)),
+    presentation: (enabled: boolean) => prepare(options.properties.presentation(enabled)),
+   }),
+   commands: Object.freeze({
+    // Worker-only composition; no RPC accepts an Effect.
+    prepare,
+    execute(token: string) {
+     return Effect.gen(function* () {
+      yield* attempt(requireOpen)
+      let command = commands.get(token)
+      if (!command) return yield* Effect.fail(unavailable())
+      let action = yield* command
+      return { action: action.id }
+     })
+    },
+    release(token: string) { return Effect.sync(() => { commands.delete(token) }) },
+   }),
+   discussion: Object.freeze({
+    capture(range: DocumentRange) {
+     return Effect.gen(function* () {
+      let captured = yield* attempt(() => {
+       writable()
+       capacity(composers.size)
+       let value = selected(range)
+       if (!value.quote) throw unavailable("Select text to comment on")
+       return selectionAnchor(value.replica.visible(options.document), value.source, value.quote, range.start)
+      })
+      let composer = yield* options.discussion.prepareComment(captured)
+      yield* attempt(requireOpen)
+      let token = crypto.randomUUID()
+      composers.set(token, composer)
+      return { token, quote: captured.quote }
+     })
+    },
+    reply(thread: string) {
+     return Effect.gen(function* () {
+      yield* attempt(() => { writable(); capacity(composers.size) })
+      let composer = yield* options.discussion.prepareReply(thread)
+      yield* attempt(requireOpen)
+      let token = crypto.randomUUID()
+      composers.set(token, composer)
+      return { token }
+     })
+    },
+    prepareSubmit(token: string, body: string) {
+     return Effect.gen(function* () {
+      yield* attempt(requireOpen)
+      if (!body.trim()) return yield* Effect.fail(unavailable("Write a comment before saving"))
+      if (options.session.replica.metadata(options.document).commentsDisabled) return yield* Effect.fail(unavailable("Comments are disabled"))
+      let composer = composers.get(token)
+      if (!composer) return yield* Effect.fail(unavailable())
+      return yield* prepare(composer.submit(body))
+     })
+    },
+    submit(token: string, body: string) {
+     return Effect.gen(function* () {
+      yield* attempt(requireOpen)
+      if (options.session.replica.metadata(options.document).commentsDisabled) return yield* Effect.fail(unavailable("Comments are disabled"))
+      let composer = composers.get(token)
+      if (!composer) return yield* Effect.fail(unavailable())
+      let action = yield* composer.submit(body)
+      return { action: action.id }
+     })
+    },
+    resolve: (thread: string, resolved: boolean) => prepare(options.discussion.resolve(thread, resolved)),
+    delete: (thread: string) => prepare(options.discussion.delete(thread)),
+    setEnabled: (enabled: boolean) => prepare(options.discussion.setEnabled(enabled)),
+    release(token: string) { return Effect.sync(() => { composers.delete(token) }) },
+   }),
+   assets: Object.freeze({
+    capture(range: DocumentRange, inline: boolean) {
+     return attempt(() => {
+      writable()
+      capacity(selections.size)
+      let value = selected(range)
+      let token = crypto.randomUUID()
+      selections.set(token, { atoms: value.replica.visible(options.document), start: range.start, end: range.end, inline })
+      return { token }
+     })
+    },
+    attachFiles(files: readonly File[], selection: string) {
+     return Effect.gen(function* () {
+      let captured = yield* attempt(() => attachmentSelection(selection))
+      let token = yield* prepare(options.assets.attachFiles(files.map(file => ({ blob: file, name: file.name })), captured))
+      selections.delete(selection)
+      return token
+     })
+    },
+    insert(asset: string, selection: string) {
+     return Effect.gen(function* () {
+      let captured = yield* attempt(() => attachmentSelection(selection))
+      let token = yield* prepare(options.assets.insert(asset, captured))
+      selections.delete(selection)
+      return token
+     })
+    },
+    rename: (asset: string, name: string) => prepare(options.assets.rename(asset, name)),
+    delete: (asset: string) => prepare(options.assets.delete(asset)),
+    mute: (asset: string, muted: boolean) => prepare(options.assets.mute(asset, muted)),
+    restore: (asset: string, file: File) => attempt(writable).pipe(Effect.andThen(options.assets.restore(asset, file))),
+    release(token: string) { return Effect.sync(() => { selections.delete(token) }) },
+    file(asset: string) {
+     return Effect.gen(function* () {
+      yield* attempt(requireOpen)
+      let fields = options.session.replica.fields(asset)
+      if (fields.document !== options.document) return yield* Effect.fail(unavailable())
+      if (fields.type === "whiteboard") {
+       let file = boardFile(fields)
+       if (!file) return yield* Effect.fail(unavailable())
+       return new File([file], (fields.name ?? "Whiteboard") + ".tldr", { type: "application/json" })
+      }
+      if (fields.type !== "asset" || !fields.data) return yield* Effect.fail(unavailable())
+      let file = yield* options.blobs.read(fields.data)
+      return new File([file], fields.name ?? "Asset", { type: file.type })
+     })
+    },
+   }),
+  })
+ })
+}

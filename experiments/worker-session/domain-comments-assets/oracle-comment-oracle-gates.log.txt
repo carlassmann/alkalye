@@ -1,0 +1,25 @@
+PASS real worker command fault gates complete: null
+PASS simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections
+PASS browser identity is available before any network authentication
+PASS native browser account login serializes cookie issuance and agrees with server verification
+PASS requested main/worker scripts re-fetched against frozen served body hashes before invocation
+PASS public opened thread preserves exact Unicode anchored range
+PASS peer insertion shifts public comment range exactly
+PASS peer edit preserves comment body
+PASS resolve attempt has a fresh durable identity
+PASS discarded applied reply recovers exact durable comment action
+PASS same intent returns same action without duplicate comment mutation
+PASS exact known receipt clears only its main pending row
+PASS public resolve sets thread resolved flag
+PASS independent SQLite snapshot has resolved flag and exact peer source/body
+PASS SQLite event history contains exactly one resolve action after duplicate intent
+PASS public Undo applies comment inverse
+PASS Undo restores unresolved flag
+PASS Undo preserves peer text and comment body
+PASS independent SQLite snapshot confirms Undo and preserved peer source/body
+PASS SQLite history contains exactly one accepted inverse for resolve
+PASS scope reopen preserves undone flag and exact peer source
+PASS revoked admission refuses staged comment before invocation
+PASS revocation leaves thread unchanged
+PASS all owned worker scopes terminate after recovery/refusal gates
+Retained closed fixture: [retained closed fixture path]

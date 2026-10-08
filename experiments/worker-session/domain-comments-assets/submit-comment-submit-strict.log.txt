@@ -1,0 +1,17 @@
+src/client/worker-document/worker-session.ts(264,17): error TS1005: ',' expected.
+src/client/worker-document/worker-session.ts(265,10): error TS1005: ',' expected.
+src/client/worker-document/worker-session.ts(266,15): error TS1005: ',' expected.
+src/client/worker-document/worker-session.ts(267,13): error TS1005: ',' expected.
+src/client/worker-document/worker-session.ts(268,14): error TS1005: ',' expected.
+src/client/worker-document/worker-session.ts(269,16): error TS1005: ',' expected.
+src/client/worker-document/worker-session.ts(270,17): error TS1005: ',' expected.
+src/client/worker-document/worker-session.ts(271,17): error TS1005: ',' expected.
+src/client/worker-document/worker-session.ts(272,16): error TS1005: ',' expected.
+src/client/worker-document/worker-session.ts(273,10): error TS1005: ',' expected.
+src/client/worker-document/worker-session.ts(274,10): error TS1005: ',' expected.
+src/client/worker-document/worker-session.ts(275,12): error TS1005: ',' expected.
+src/client/worker-document/worker-session.ts(276,8): error TS1005: ',' expected.
+src/client/worker-document/worker-session.ts(277,13): error TS1005: ',' expected.
+src/client/worker-document/worker-session.ts(278,8): error TS1005: ',' expected.
+src/client/worker-document/worker-session.ts(288,2): error TS1135: Argument expression expected.
+error: "tsc" exited with code 2

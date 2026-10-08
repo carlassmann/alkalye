@@ -1,0 +1,21 @@
+PASS real worker command fault gates complete: null
+PASS simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections
+PASS browser identity is available before any network authentication
+PASS native browser account login serializes cookie issuance and agrees with server verification
+PASS requested main/worker scripts re-fetched against frozen served body hashes before invocation
+PASS after: actual caller interruption reaches recorded worker boundary
+PASS after: interrupted command remains durable unknown
+PASS after: unknown receipt cannot clear pending intent
+PASS after: scoped worker reopen retains unknown result without execution replay
+PASS after: reopen preserves exact journal source at interruption boundary
+PASS after: reload keeps actual retained source read-only
+PASS after: one unresolved intent remains after reload
+PASS after: independent SQLite source matches real mutation boundary
+PASS requested main/worker scripts re-fetched against frozen served body hashes before invocation
+PASS wrong-token: invalid token/declaration refuses before invocation
+PASS wrong-token: invalid command preserves exact source
+PASS requested main/worker scripts re-fetched against frozen served body hashes before invocation
+PASS wrong-digest: invalid token/declaration refuses before invocation
+PASS wrong-digest: invalid command preserves exact source
+PASS all owned worker scopes terminate after recovery/refusal gates
+Retained closed fixture: [retained closed fixture path]

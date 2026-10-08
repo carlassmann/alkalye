@@ -1,0 +1,18 @@
+PASS real worker command fault gates complete: null
+PASS simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections
+PASS browser identity is available before any network authentication
+PASS native browser account login serializes cookie issuance and agrees with server verification
+PASS requested main/worker scripts re-fetched against frozen served body hashes before invocation
+PASS unknown comment command has fresh durable attempt identity
+PASS caller interruption reaches durable STARTED after durable comment mutation
+PASS interrupted comment retains unknown outcome
+PASS unknown comment receipt cannot clear mixed pending ledger
+PASS scope reopen never replays unknown comment command
+PASS after-mutation unknown reopens exactly one applied comment and exact source
+PASS mixed comment and metadata intents retain actual readonly draft
+PASS reload preserves both STARTED comment and unsent metadata tail
+PASS empty reconciliation cannot unfreeze mixed unknown tail
+PASS independent SQLite confirms exactly one unknown applied submit without replay
+PASS server acceptance cannot guess command receipt or clear mixed recovery tail
+PASS all owned worker scopes terminate after recovery/refusal gates
+Retained closed fixture: [retained closed fixture]

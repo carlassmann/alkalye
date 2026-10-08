@@ -1,0 +1,13 @@
+{"failure":{"message":"Error: after: independent SQLite source matches real mutation boundary","phase":"after:Execute"},"results":["simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections","browser identity is available before any network authentication","native browser account login serializes cookie issuance and agrees with server verification","requested main/worker scripts re-fetched against frozen served body hashes before invocation","after: actual caller interruption reaches recorded worker boundary","after: interrupted command remains durable unknown","after: unknown receipt cannot clear pending intent","after: scoped worker reopen retains unknown result without execution replay","after: reopen preserves exact journal source at interruption boundary","after: reload keeps actual retained source read-only","after: one unresolved intent remains after reload"],"fixture":[{"document":"[fixture-identity]","mode":"after","request":"[fixture-identity]"}],"boot":"[{\"phase\":\"worker:construct\",\"time\":140.89999997615814,\"details\":\"http://localhost:64792/worker.js?domainFault=after\"},{\"phase\":\"Open:start\",\"time\":44.89999997615814},{\"phase\":\"Open:blobs-start\",\"time\":45.69999998807907},{\"phase\":\"Open:blobs-done\",\"time\":51.19999998807907},{\"phase\":\"Open:session-done\",\"time\":75.89999997615814},{\"phase\":\"Open:capability-start\",\"time\":76.09999996423721},{\"phase\":\"Open:snapshot-done\",\"time\":77.39999997615814},{\"phase\":\"Begin:start\",\"time\":79.09999996423721},{\"phase\":\"Begin:done\",\"time\":80.09999996423721},{\"phase\":\"Domain:fault-after-durable\",\"time\":99.59999996423721},{\"phase\":\"worker:construct\",\"time\":249.69999998807907,\"details\":\"http://localhost:64792/worker.js\"},{\"phase\":\"Open:start\",\"time\":39.59999996423721},{\"phase\":\"Open:blobs-start\",\"time\":40},{\"phase\":\"Open:blobs-done\",\"time\":44.89999997615814},{\"phase\":\"Open:session-done\",\"time\":56.09999996423721},{\"phase\":\"Open:capability-start\",\"time\":56.19999998807907},{\"phase\":\"Open:snapshot-done\",\"time\":57.89999997615814}]"}
+Retained closed fixture: [retained closed fixture path]
+178 | 		)
+179 | 		throw new Error("Browser condition failed: " + source, { cause: error })
+180 | 	}
+181 | }
+182 | export function assert(condition: unknown, message: string) {
+183 | 	if (!condition) throw new Error(message)
+                                 ^
+error: real worker command fault gates complete: {"message":"Error: after: independent SQLite source matches real mutation boundary","phase":"after:Execute"}
+      at assert (/private/tmp/alkalye-worker-app-domain-unknown/tests/browser-driver.ts:183:28)
+
+Bun v1.4.0 (macOS arm64)

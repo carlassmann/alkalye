@@ -1,0 +1,2 @@
+domain-worker-fixture.ts(11,56): error TS2724: '"./src/client/worker-document/domain-ledger"' has no exported member named 'PendingDomainSchema'. Did you mean 'PendingDomain'?
+error: "tsc" exited with code 2

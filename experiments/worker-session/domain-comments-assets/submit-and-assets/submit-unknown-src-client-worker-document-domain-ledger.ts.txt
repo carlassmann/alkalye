@@ -1,0 +1,118 @@
+import { exportDomainRecords } from "./domain-export"
+import * as Effect from "effect/Effect"
+import * as Schema from "effect/Schema"
+import type { Storage } from "../storage"
+import { WorkerDocumentFailure } from "./worker-rpc"
+import { DomainCommandSchema, DomainIntentSchema, DomainOutcomeSchema, PendingDomainSchema, QueuedDomainSchema } from "./domain-schemas"
+export { DomainIntentSchema, DomainOutcomeSchema } from "./domain-schemas"
+export type DurableDomainIntent = typeof DomainIntentSchema.Type
+export type DomainOutcome = typeof DomainOutcomeSchema.Type
+export type DomainCommand = typeof DomainCommandSchema.Type
+export type QueuedDomain = typeof QueuedDomainSchema.Type
+export type PendingDomain = typeof PendingDomainSchema.Type
+function conflict() { return new WorkerDocumentFailure({ reason: "AppliedUnknown", category: "conflict" }) }
+function validateNumbers(sequence: number, admissionEpoch: number) { if (!Number.isSafeInteger(sequence) || sequence < 0 || !Number.isSafeInteger(admissionEpoch) || admissionEpoch < 0) throw conflict() }
+function validateDigest(value: string) { if (!/^[0-9a-f]{64}$/.test(value)) throw conflict() }
+export function domainDigest(value: string) {
+ return Effect.tryPromise({ try: async () => { let bytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)); return Array.from(new Uint8Array(bytes), byte => byte.toString(16).padStart(2, "0")).join("") }, catch: () => conflict() })
+}
+export function domainCommandDigest(command: DomainCommand) {
+ let canonical = command.type === "properties" ? [command.type, command.patch.title ?? null, command.patch.path ?? null, command.patch.tags ?? null, command.patch.pinned ?? null, command.patch.archived ?? null, command.patch.commentsDisabled ?? null] : command.type === "presentation" ? [command.type, command.enabled] : command.type === "present" ? [command.type, command.index] : command.type === "commentResolve" ? [command.type, command.thread, command.resolved] : [command.type, command.composer, command.body]
+ return domainDigest(JSON.stringify(canonical))
+}
+export function queuedDomain(subject: string, document: string, command: { request: string; epoch: string; sequence: number; admissionEpoch: number; command: DomainCommand }, source: string) {
+ return Effect.gen(function* () {
+  let basisDigest = yield* domainDigest(source)
+  let commandDigest = yield* domainCommandDigest(command.command)
+  let queuedDigest = yield* domainDigest(JSON.stringify(["queued-domain", subject, document, command.request, command.epoch, command.sequence, command.admissionEpoch, basisDigest, commandDigest]))
+  return { subject, document, request: command.request, epoch: command.epoch, sequence: command.sequence, admissionEpoch: command.admissionEpoch, command: command.command, basisDigest, commandDigest, queuedDigest }
+ })
+}
+export function domainIntent(subject: string, document: string, command: { request: string; token: string; epoch: string; sequence: number; admissionEpoch: number; commandDigest: string }, source: string) {
+ return Effect.gen(function* () {
+  let basisDigest = yield* domainDigest(source)
+  let intentDigest = yield* domainDigest(JSON.stringify(["domain", subject, document, command.request, command.token, command.epoch, command.sequence, command.admissionEpoch, basisDigest, command.commandDigest]))
+  return { subject, document, request: command.request, token: command.token, epoch: command.epoch, sequence: command.sequence, admissionEpoch: command.admissionEpoch, basisDigest, commandDigest: command.commandDigest, intentDigest }
+ })
+}
+export function matchesDomain(left: DurableDomainIntent, right: DurableDomainIntent) {
+ return left.subject === right.subject && left.document === right.document && left.request === right.request && left.token === right.token && left.epoch === right.epoch && left.sequence === right.sequence && left.admissionEpoch === right.admissionEpoch && left.basisDigest === right.basisDigest && left.commandDigest === right.commandDigest && left.intentDigest === right.intentDigest
+}
+export function domainOutcomeKey(subject: string, document: string, request: string) { return "worker-domain-outcome:" + encodeURIComponent(subject) + ":" + encodeURIComponent(document) + ":" + request }
+export function makeDomainLedger(storage: Storage, subject: string, document: string) {
+ let prefix = "worker-domain-pending:" + encodeURIComponent(subject) + ":" + encodeURIComponent(document) + ":"
+ function decode(value: unknown) {
+  let row = Schema.decodeUnknownSync(PendingDomainSchema)(value)
+  let queued = row.queued
+  validateNumbers(queued.sequence, queued.admissionEpoch)
+  for (let digest of [queued.basisDigest, queued.commandDigest, queued.queuedDigest]) validateDigest(digest)
+  if (queued.subject !== subject || queued.document !== document || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(queued.request)) throw conflict()
+  if (row.intent) {
+   validateNumbers(row.intent.sequence, row.intent.admissionEpoch)
+   validateDigest(row.intent.intentDigest)
+   if (row.intent.subject !== subject || row.intent.document !== document || row.intent.request !== queued.request || row.intent.epoch !== queued.epoch || row.intent.sequence !== queued.sequence || row.intent.admissionEpoch !== queued.admissionEpoch || row.intent.basisDigest !== queued.basisDigest || row.intent.commandDigest !== queued.commandDigest) throw conflict()
+  }
+  if ((row.phase === "NeverDispatched" || row.phase === "Preparing") && row.intent) throw conflict()
+  if ((row.phase === "Prepared" || row.phase === "STARTED" || row.phase === "Known") && !row.intent) throw conflict()
+  if (row.phase === "Known" && (!row.intent || !row.outcome || row.outcome.status === "unknown" || !matchesDomain(row.intent, row.outcome.intent) || (row.outcome.status === "applied" && !row.outcome.action))) throw conflict()
+  if (row.phase !== "Known" && row.outcome) throw conflict()
+  return row
+ }
+ function verified(value: unknown) {
+  return Effect.gen(function* () {
+   let row = yield* Effect.try({ try: () => decode(value), catch: () => conflict() })
+   let expected = yield* queuedDomain(subject, document, row.queued, row.source)
+   if (expected.queuedDigest !== row.queued.queuedDigest || expected.basisDigest !== row.queued.basisDigest || expected.commandDigest !== row.queued.commandDigest) return yield* Effect.fail(conflict())
+   if (row.intent) {
+    let intent = yield* domainIntent(subject, document, row.intent, row.source)
+    if (!matchesDomain(intent, row.intent)) return yield* Effect.fail(conflict())
+   }
+   return row
+  })
+ }
+ function update(queued: QueuedDomain, modify: (row: PendingDomain) => PendingDomain | undefined) { return storage.modify(prefix + queued.request, value => { let row = decode(value); if (row.queued.queuedDigest !== queued.queuedDigest) throw conflict(); return modify(row) }).pipe(Effect.asVoid) }
+ return {
+  subject, document,
+  exportRecords: Effect.gen(function* () {
+   let entries = yield* storage.getPrefixEntries(prefix)
+   let recovery = yield* storage.get("worker-native-recovery:" + encodeURIComponent(subject) + ":" + encodeURIComponent(document))
+   let records = Array.from(entries, ([key, value]) => ({ key: key.slice(prefix.length), value }))
+   if (recovery !== undefined) records.push({ key: "native-recovery", value: recovery })
+   return yield* exportDomainRecords(document, records)
+  }),
+  inspect: storage.getPrefixEntries(prefix).pipe(Effect.flatMap(raw => Effect.gen(function* () {
+   let rows: PendingDomain[] = [], corrupt: unknown[] = []
+   for (let [key, value] of raw) {
+    let result = yield* verified(value).pipe(Effect.map(row => ({ valid: true, row })), Effect.catch(() => Effect.succeed({ valid: false, row: undefined })))
+    if (result.row && key === prefix + result.row.queued.request) rows.push(result.row)
+    else corrupt.push(value)
+   }
+   return { rows, corrupt, raw }
+  }))),
+  prepareQueued(queued: QueuedDomain, source: string) {
+   return Effect.gen(function* () {
+    let digest = yield* domainDigest(source)
+    if (digest !== queued.basisDigest) return yield* Effect.fail(conflict())
+    yield* storage.modify(prefix + queued.request, value => {
+     let next: PendingDomain = { queued, source, phase: "NeverDispatched" }
+     decode(next)
+     if (value !== undefined) { let row = decode(value); if (row.queued.queuedDigest !== queued.queuedDigest || row.source !== source) throw conflict(); return value }
+     return next
+    })
+   })
+  },
+  preparing(queued: QueuedDomain) { return update(queued, row => { if (row.phase !== "NeverDispatched") throw conflict(); return { ...row, phase: "Preparing" } }) },
+  prepared(queued: QueuedDomain, intent: DurableDomainIntent) { return update(queued, row => { if (row.phase !== "Preparing") throw conflict(); return decode({ ...row, phase: "Prepared", intent }) }) },
+  started(queued: QueuedDomain) { return update(queued, row => { if (row.phase !== "Prepared") throw conflict(); return { ...row, phase: "STARTED" } }) },
+  discardNeverSent(row: PendingDomain) { return update(row.queued, current => { if (current.phase !== "NeverDispatched" && current.phase !== "Preparing" && current.phase !== "Prepared") throw conflict(); return undefined }) },
+  confirm(intent: DurableDomainIntent, outcome: DomainOutcome) {
+   return storage.modify(prefix + intent.request, value => {
+    let row = decode(value)
+    if ((row.phase !== "STARTED" && row.phase !== "Known") || !row.intent || !matchesDomain(row.intent, intent) || !matchesDomain(intent, outcome.intent) || outcome.status === "unknown" || (outcome.status === "applied" && !outcome.action)) throw conflict()
+    if (row.phase === "Known" && row.outcome && (row.outcome.status !== outcome.status || row.outcome.action !== outcome.action)) throw conflict()
+    return { ...row, phase: "Known", outcome }
+   }).pipe(Effect.andThen(storage.modify(prefix + intent.request, value => { let row = decode(value); if (row.phase !== "Known" || !row.intent || !row.outcome || !matchesDomain(row.intent, intent) || !matchesDomain(row.outcome.intent, outcome.intent)) throw conflict(); return undefined })), Effect.asVoid)
+  },
+ }
+}
+export type DomainLedger = ReturnType<typeof makeDomainLedger>

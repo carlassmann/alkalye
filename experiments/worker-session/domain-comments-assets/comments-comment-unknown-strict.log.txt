@@ -1,0 +1,3 @@
+domain-worker-fixture.ts(14,1): error TS6133: 'commandIntentDigest' is declared but its value is never read.
+domain-worker-fixture.ts(68,6): error TS6133: 'opened' is declared but its value is never read.
+error: "tsc" exited with code 2

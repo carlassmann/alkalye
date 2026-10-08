@@ -1,0 +1,127 @@
+import * as Cause from "effect/Cause"
+import * as Deferred from "effect/Deferred"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
+import * as Fiber from "effect/Fiber"
+import { makeWorkerAppOwner } from "./src/client/worker-document/app-owner"
+import * as Scope from "effect/Scope"
+import * as Schema from "effect/Schema"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import { bootstrapBrowserAccount } from "./tests/browser-account-fixture"
+import { Storage } from "./src/client/storage"
+import { createWorkerSessionClient } from "./src/client/worker-document/worker-client"
+import { makeDomainLedger, queuedDomain, domainIntent } from "./src/client/worker-document/domain-ledger"
+
+let results: string[] = [], workerUrls: string[] = []
+let fixtures: { document: string; mode: string; request?: string }[] = []
+let phase = "account", terminated = 0
+let boundary = Deferred.makeUnsafe<void>()
+Object.assign(window, { domainWorkerResults: results, domainWorkerFixture: fixtures })
+function check(value: unknown, message: string) { if (!value) throw new Error(message); results.push(message) }
+let originalWorker = globalThis.Worker
+class BoundaryWorker extends originalWorker {
+ constructor(url: string | URL, options?: WorkerOptions) {
+  super(url, options)
+  workerUrls.push(new URL(String(url), location.href).href)
+  this.addEventListener("message", event => {
+   if (!Array.isArray(event.data) || event.data[0] !== 2) return
+   let parsed = Schema.decodeUnknownResult(Schema.Struct({ phase: Schema.String }))(event.data[1])
+   if (parsed._tag === "Success" && parsed.success.phase.startsWith("Domain:fault-")) Deferred.doneUnsafe(boundary, Effect.void)
+  })
+ }
+ terminate() { terminated++; super.terminate() }
+}
+globalThis.Worker = BoundaryWorker
+let Pins = Schema.Array(Schema.Struct({ path: Schema.String, sha256: Schema.String }))
+function verifyBodies() {
+ return Effect.tryPromise({ try: async () => {
+  let pins = Schema.decodeUnknownSync(Pins)(await (await fetch("/__tests/asset-pins", { cache: "no-store" })).json())
+  let urls = performance.getEntriesByType("resource").map(entry => entry.name).filter(url => new URL(url).pathname.endsWith(".js"))
+  for (let url of new Set([...urls, ...workerUrls])) {
+   let path = new URL(url).pathname
+   let expected = pins.find(pin => pin.path === path)
+   if (!expected) throw new Error("Unpinned script path")
+   let response = await fetch(url, { cache: "no-store" })
+   if (!response.ok) throw new Error("Script fetch failed")
+   let bytes = await crypto.subtle.digest("SHA-256", await response.arrayBuffer())
+   let digest = Array.from(new Uint8Array(bytes), byte => byte.toString(16).padStart(2, "0")).join("")
+   if (digest !== expected.sha256) throw new Error("Served script differs from frozen fixture build")
+  }
+  check(workerUrls.length > 0 && urls.length > 0, "requested main/worker scripts re-fetched against frozen served body hashes before invocation")
+ }, catch: error => error })
+}
+let AcceptedView = Schema.Struct({ source: Schema.String, position: Schema.Natural, threads: Schema.Array(Schema.Struct({ id: Schema.String, body: Schema.String, resolved: Schema.Boolean, replies: Schema.Array(Schema.String) })), actions: Schema.Array(Schema.Struct({ id: Schema.String, label: Schema.String, undoOf: Schema.optional(Schema.String) })) })
+function acceptedView(subject: string, document: string) {
+ return Effect.tryPromise({ try: async () => {
+  let response = await fetch("/__tests/accepted?document=" + encodeURIComponent(document) + "&subject=" + encodeURIComponent(subject), { cache: "no-store" })
+  if (!response.ok) throw new Error("Independent server read failed: " + response.status)
+  return Schema.decodeUnknownSync(AcceptedView)(await response.json())
+ }, catch: error => error })
+}
+let program = Effect.scoped(Effect.gen(function* () {
+ yield* Effect.addFinalizer(() => Effect.sync(() => { globalThis.Worker = originalWorker }))
+ let ownerScope = yield* Scope.Scope
+ let account = yield* bootstrapBrowserAccount(check)
+ let storage = yield* Effect.acquireRelease(Storage.open(), opened => Effect.sync(() => opened.close()))
+ let document = crypto.randomUUID(), thread = crypto.randomUUID()
+ fixtures.push({ document, mode: "comment-resolve" })
+ phase = "seed-comment"
+ yield* storage.set("domain-test-fixture:" + document, { document, thread, phase: "before-create" })
+ yield* Effect.tryPromise({ try: async () => { let response = await fetch("/__tests/seed", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ subject: account.subject, document, thread, source: "---\ntitle: Worker fixture\n---\nBody😀\n" }) }); if (!response.ok) throw new Error("Seed failed: " + response.status) }, catch: error => error })
+ let admission = { subject: account.subject, epoch: 1, exists: true, deleted: false, role: "owner", account: "ready", online: true } satisfies { subject: string; epoch: number; exists: boolean; deleted: boolean; role: "owner"; account: "ready"; online: boolean }
+ let options = { document, subject: account.subject, workspace: "personal-" + account.subject, origin: location.origin, activityChannel: "comment-" + crypto.randomUUID(), online: true, cooperativeWork: true, admission }
+ let scope = yield* Scope.fork(ownerScope)
+ let client = yield* createWorkerSessionClient(new URL("/worker.js?commentFault=after", location.href).href).pipe(Scope.provide(scope))
+ yield* client.Open(options)
+ let basis = yield* client.Begin()
+ yield* verifyBodies()
+ let ledger = makeDomainLedger(storage, account.subject, document)
+ let composer = yield* client.CommentCapture({ range: { epoch: basis.epoch, sequence: basis.sequence, start: basis.source.indexOf("Body😀"), end: basis.source.indexOf("Body😀") + "Body😀".length }, admissionEpoch: 1 })
+ let queued = yield* queuedDomain(account.subject, document, { request: crypto.randomUUID(), ...basis, admissionEpoch: 1, command: { type: "commentSubmit", composer: composer.token, body: "Unknown submitted comment" } }, basis.source)
+ let tail = yield* queuedDomain(account.subject, document, { request: crypto.randomUUID(), ...basis, admissionEpoch: 1, command: { type: "properties", patch: { title: "Unsent metadata tail" } } }, basis.source)
+ yield* ledger.prepareQueued(queued, basis.source); yield* ledger.preparing(queued)
+ yield* ledger.prepareQueued(tail, basis.source)
+ let held = yield* client.CommentSubmit({ composer: composer.token, body: "Unknown submitted comment", admissionEpoch: 1 })
+ let intent = yield* domainIntent(account.subject, document, { ...queued, token: held.token }, basis.source)
+ yield* ledger.prepared(queued, intent); yield* ledger.started(queued)
+ phase = "comment-unknown-after-durable"
+ let attempt = "domain-test-attempt:" + document + ":" + intent.request
+ check((yield* storage.get(attempt)) === undefined, "unknown comment command has fresh durable attempt identity")
+ yield* storage.set(attempt, { request: intent.request, phase })
+ boundary = Deferred.makeUnsafe<void>()
+ let executing = yield* client.ExecuteDomain({ intent }).pipe(Effect.forkScoped())
+ yield* Deferred.await(boundary).pipe(Effect.timeout("15 seconds"))
+ yield* Fiber.interrupt(executing)
+ check(Exit.hasInterrupts(yield* Fiber.await(executing)), "caller interruption reaches durable STARTED after durable comment mutation")
+ let recovered = yield* client.RecoverDomain({ request: intent.request, intentDigest: intent.intentDigest })
+ if (!recovered.outcome) throw new Error("Missing unknown receipt")
+ check(recovered.outcome.status === "unknown", "interrupted comment retains unknown outcome")
+ check(Exit.isFailure(yield* ledger.confirm(intent, recovered.outcome).pipe(Effect.exit)), "unknown comment receipt cannot clear mixed pending ledger")
+ let owner = yield* makeWorkerAppOwner(storage, account.subject, document)
+ yield* owner.draft.recoverDomain({ format: "worker-domain-recovery/v1", subject: account.subject, document, source: basis.source, sourceDigest: queued.basisDigest, corrupt: false, bindings: [{ request: intent.request, queuedDigest: queued.queuedDigest, intentDigest: intent.intentDigest }, { request: tail.request, queuedDigest: tail.queuedDigest }] })
+ yield* client.Close(); yield* Scope.close(scope, Exit.void)
+ let reopenedScope = yield* Scope.fork(ownerScope)
+ let reopened = yield* createWorkerSessionClient(new URL("/worker.js", location.href).href).pipe(Scope.provide(reopenedScope))
+ let reload = yield* reopened.Open({ ...options, activityChannel: "comment-unknown-reload-" + crypto.randomUUID(), online: false, admission: { ...admission, online: false } })
+ let reloadedReceipt = yield* reopened.RecoverDomain({ request: intent.request, intentDigest: intent.intentDigest })
+ check(reloadedReceipt.outcome?.status === "unknown", "scope reopen never replays unknown comment command")
+ check(reload.projection?.document.content === basis.source && reload.projection.threads.filter(value => value.fields.body === "Unknown submitted comment").length === 1, "after-mutation unknown reopens exactly one applied comment and exact source")
+ let restoredOwner = yield* makeWorkerAppOwner(storage, account.subject, document)
+ check(restoredOwner.draft.hasRecovery() && restoredOwner.recovery() === basis.source, "mixed comment and metadata intents retain actual readonly draft")
+ let rows = yield* ledger.inspect
+ check(rows.rows.length === 2 && rows.rows.some(row => row.phase === "STARTED") && rows.rows.some(row => row.phase === "NeverDispatched"), "reload preserves both STARTED comment and unsent metadata tail")
+ check(!(yield* restoredOwner.draft.reconcileDomain([])), "empty reconciliation cannot unfreeze mixed unknown tail")
+ yield* reopened.Connectivity({ online: true })
+ yield* reopened.Synchronize()
+ let accepted = yield* acceptedView(account.subject, document)
+ check(accepted.source === basis.source && accepted.threads.filter(value => value.body === "Unknown submitted comment").length === 1 && accepted.actions.filter(value => value.label === "Add comment").length === 1, "independent SQLite confirms exactly one unknown applied submit without replay")
+ let afterSync = yield* reopened.RecoverDomain({ request: intent.request, intentDigest: intent.intentDigest })
+ check(afterSync.outcome?.status === "unknown" && (yield* ledger.inspect).rows.length === 2 && restoredOwner.draft.hasRecovery(), "server acceptance cannot guess command receipt or clear mixed recovery tail")
+ yield* reopened.Close(); yield* Scope.close(reopenedScope, Exit.void)
+
+ check(terminated >= 2, "all owned worker scopes terminate after recovery/refusal gates")
+}))
+Effect.runPromise(program.pipe(Effect.provide(FetchHttpClient.layer), Effect.exit)).then(exit => {
+ if (Exit.isSuccess(exit)) Object.assign(window, { domainWorkerDone: true })
+ else { let error = Cause.squash(exit.cause); Object.assign(window, { domainWorkerDone: true, domainWorkerFailure: { phase, message: String(error), reason: typeof error === "object" && error !== null && "reason" in error ? String(error.reason) : undefined } }) }
+})

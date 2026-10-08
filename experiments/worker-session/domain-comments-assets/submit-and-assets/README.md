@@ -1,0 +1,11 @@
+Untimed outside prototype. No production/UI enablement or performance claim.
+
+Submit after-durable unknown: strict and 16 public assertions passed including browser bootstrap. Real composer action saved, fixture interrupted caller before known receipt. Scoped reopen shows one applied comment; unknown cannot clear mixed STARTED+NeverDispatched tail; SQLite public history confirms one Add comment. Server acceptance cannot fabricate known receipt or thaw readonly draft.
+
+Asset known: strict and 18 public assertions passed including bootstrap. Existing DocumentBlobs verifies/stores bytes in IndexedDB; independent connection reads exact bytes before dispatch. Pending intent uses JSON-roundtripped durable manifest reference/name, not File/Blob. Worker reads verified reference then prepares existing DocumentAssets.attachFiles. ExecuteDomain preserves duplicate receipts, existing transport uploads chunks before action commit. SQLite public snapshot/history confirms one exact reference/revision/action; actual HTTP blob readback matches binary. Undo accepted source/asset state exact; blob remains for redo/recovery; scope reopen exact.
+
+Initial asset fixture failed before command invocation: substring JSON oracle mishandled escaped manifest quotes. State retained; corrected new fixture decodes PendingDomainSchema after JSON roundtrip. Failed import/unused-import strict logs retained.
+
+Asset after-durable unknown: strict and 18 public assertions passed. Actual caller interruption after attach saved but before known outcome; scope reopen one applied asset without dispatch replay. Exact reference/binary retained, readonly draft and mixed tail remain; SQLite confirms one applied attach, source and reference revision. Server acceptance does not clear unknown receipt or references. No automatic blob cleanup implemented or claimed.
+
+Each fixture re-fetched requested JS paths before invocation and compared SHA256 to served build bodies. Digest inventories were not retained; source hashes identify saved source, not retrospective execution hashes. Runtime datasets/profiles closed and retained privately; excluded here. Main app comments/assets UI, reply/delete/full feature parity and production worker cutover remain unproved.

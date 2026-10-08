@@ -1,0 +1,13 @@
+{"failure":{"message":"Error: pre-dispatch pending intent contains durable reference and name, not File or Blob","phase":"seed-comment"},"results":["simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections","browser identity is available before any network authentication","native browser account login serializes cookie issuance and agrees with server verification","requested main/worker scripts re-fetched against frozen served body hashes before invocation","public blob service reopens exact durable bytes through independent IndexedDB connection before dispatch"],"fixture":[{"document":"[fixture-identity]","mode":"comment-resolve"}],"boot":"[{\"phase\":\"worker:construct\",\"time\":103.39999997615814,\"details\":\"http://localhost:51822/worker.js\"},{\"phase\":\"Open:start\",\"time\":33},{\"phase\":\"Open:blobs-start\",\"time\":33.39999997615814},{\"phase\":\"Open:blobs-done\",\"time\":37.299999952316284},{\"phase\":\"Open:session-done\",\"time\":58.5},{\"phase\":\"Open:capability-start\",\"time\":58.59999996423721},{\"phase\":\"Open:snapshot-done\",\"time\":60.09999996423721},{\"phase\":\"Begin:start\",\"time\":62},{\"phase\":\"Begin:done\",\"time\":62.39999997615814}]"}
+Retained closed fixture: [retained closed fixture]
+178 | 		)
+179 | 		throw new Error("Browser condition failed: " + source, { cause: error })
+180 | 	}
+181 | }
+182 | export function assert(condition: unknown, message: string) {
+183 | 	if (!condition) throw new Error(message)
+                                 ^
+error: real worker command fault gates complete: {"message":"Error: pre-dispatch pending intent contains durable reference and name, not File or Blob","phase":"seed-comment"}
+      at assert (/private/tmp/alkalye-worker-assets-ledger/runtime/tests/browser-driver.ts:183:28)
+
+Bun v1.4.0 (macOS arm64)

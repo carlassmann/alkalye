@@ -1,0 +1,7 @@
+PASS real worker command fault gates complete: null
+PASS simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections
+PASS browser identity is available before any network authentication
+PASS native browser account login serializes cookie issuance and agrees with server verification
+PASS first seed accepts account-prefixed fixture actor
+PASS second distinct document refuses actor already bound to first document
+Retained closed fixture: [retained closed fixture path]
