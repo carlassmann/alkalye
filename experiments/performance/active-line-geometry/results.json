@@ -1,0 +1,785 @@
+{
+	"baseline": "aad445b frozen assets/native backend",
+	"candidate": "active-line cache plus top-only geometry invalidation; outside only",
+	"decision": "Rejected: public top-shift/native overlay geometry gate unproven; no adoption regardless microbenchmark.",
+	"method": "One matched history/profile pair, three positions per arm (six cells), not n3 repetitions. Timeline-only complete overlapping main-thread tasks scoped by scroll marks; Layout/Paint inclusive totals separate from tasks; no CPU sampler. Headless RAF cadence is not 120Hz proof.",
+	"summary": [
+		{
+			"phase": "before",
+			"position": "top",
+			"scopeMs": 584.017,
+			"largestMainTaskMs": 8.631,
+			"taskCount": 876,
+			"layoutTotalMs": 2.391,
+			"paintTotalMs": 0.933,
+			"rafMaxMs": 100
+		},
+		{
+			"phase": "before",
+			"position": "middle",
+			"scopeMs": 439.742,
+			"largestMainTaskMs": 23.234,
+			"taskCount": 609,
+			"layoutTotalMs": 2.874,
+			"paintTotalMs": 1.074,
+			"rafMaxMs": 100
+		},
+		{
+			"phase": "before",
+			"position": "end",
+			"scopeMs": 330.084,
+			"largestMainTaskMs": 5.379,
+			"taskCount": 132,
+			"layoutTotalMs": 4.285,
+			"paintTotalMs": 2.156,
+			"rafMaxMs": 16.80000000000109
+		},
+		{
+			"phase": "after",
+			"position": "top",
+			"scopeMs": 521.395,
+			"largestMainTaskMs": 8.756,
+			"taskCount": 771,
+			"layoutTotalMs": 2.654,
+			"paintTotalMs": 0.953,
+			"rafMaxMs": 116.60000000000036
+		},
+		{
+			"phase": "after",
+			"position": "middle",
+			"scopeMs": 483.679,
+			"largestMainTaskMs": 22.311,
+			"taskCount": 657,
+			"layoutTotalMs": 3.096,
+			"paintTotalMs": 1.167,
+			"rafMaxMs": 100
+		},
+		{
+			"phase": "after",
+			"position": "end",
+			"scopeMs": 330.818,
+			"largestMainTaskMs": 5.275,
+			"taskCount": 128,
+			"layoutTotalMs": 4.286,
+			"paintTotalMs": 2.097,
+			"rafMaxMs": 16.80000000000109
+		}
+	],
+	"raw": [
+		{
+			"phase": "before",
+			"trial": 0,
+			"ready": {
+				"coarse": false,
+				"height": 128018,
+				"nativeCharacters": 1962,
+				"nodes": 318,
+				"resources": [
+					"http://127.0.0.1:4461/__benchmark.js",
+					"http://127.0.0.1:4461/app.js",
+					"http://127.0.0.1:4461/chunks/document-worker-stats-06ykpceg.js"
+				],
+				"selection": {
+					"direction": "none",
+					"end": 0,
+					"start": 0
+				},
+				"sourceCharacters": 133987,
+				"top": 0
+			},
+			"observation": {
+				"duration": 584.0999999642372,
+				"frames": [
+					16.700000000000728, 16.599999999998545, 16.80000000000109,
+					16.600000000000364, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.600000000000364, 100, 100,
+					83.39999999999964, 100, 16.600000000000364, 16.600000000000364
+				],
+				"nativeCharacters": 2922,
+				"nodes": 486,
+				"scrolls": 2,
+				"selectionExact": true,
+				"settled": true,
+				"sourceExact": true,
+				"top": 1200,
+				"trusted": 8,
+				"wheelEvents": [
+					{
+						"at": 84.09999996423721,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 0
+					},
+					{
+						"at": 100,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 0
+					},
+					{
+						"at": 113,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 600
+					},
+					{
+						"at": 129.89999997615814,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 600
+					},
+					{
+						"at": 252.0999999642372,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 1200
+					},
+					{
+						"at": 353.80000001192093,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 1200
+					},
+					{
+						"at": 454.0999999642372,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 1200
+					},
+					{
+						"at": 555.5999999642372,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 1200
+					}
+				],
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-active-line/before-rich128-0.trace.json",
+			"metrics": {
+				"phase": "before",
+				"position": "top",
+				"scopeMs": 584.017,
+				"largestMainTaskMs": 8.631,
+				"taskCount": 876,
+				"layoutTotalMs": 2.391,
+				"paintTotalMs": 0.933,
+				"rafMaxMs": 100
+			}
+		},
+		{
+			"phase": "before",
+			"trial": 1,
+			"ready": {
+				"coarse": false,
+				"height": 128051,
+				"nativeCharacters": 3840,
+				"nodes": 642,
+				"resources": [
+					"http://127.0.0.1:4461/__benchmark.js",
+					"http://127.0.0.1:4461/app.js",
+					"http://127.0.0.1:4461/chunks/document-worker-stats-06ykpceg.js"
+				],
+				"selection": {
+					"direction": "none",
+					"end": 0,
+					"start": 0
+				},
+				"sourceCharacters": 133987,
+				"top": 63633
+			},
+			"observation": {
+				"duration": 439.7999999523163,
+				"frames": [
+					16.600000000000364, 16.69999999999891, 16.700000000000728,
+					16.700000000000728, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.599999999998545, 16.700000000000728,
+					16.600000000000364, 16.69999999999891, 16.700000000000728, 100,
+					16.700000000000728, 66.59999999999854, 33.400000000001455,
+					16.599999999998545, 16.700000000000728
+				],
+				"nativeCharacters": 3840,
+				"nodes": 642,
+				"scrolls": 2,
+				"selectionExact": true,
+				"settled": true,
+				"sourceExact": true,
+				"top": 64833,
+				"trusted": 8,
+				"wheelEvents": [
+					{
+						"at": 90.69999998807909,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 63633
+					},
+					{
+						"at": 107,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 63633
+					},
+					{
+						"at": 118.89999997615814,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 64233
+					},
+					{
+						"at": 135.0999999642372,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 64233
+					},
+					{
+						"at": 169.29999995231628,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 64833
+					},
+					{
+						"at": 274.19999998807907,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 64833
+					},
+					{
+						"at": 360.7999999523163,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 64833
+					},
+					{
+						"at": 393.199999988079,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 64833
+					}
+				],
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-active-line/before-rich128-1.trace.json",
+			"metrics": {
+				"phase": "before",
+				"position": "middle",
+				"scopeMs": 439.742,
+				"largestMainTaskMs": 23.234,
+				"taskCount": 609,
+				"layoutTotalMs": 2.874,
+				"paintTotalMs": 1.074,
+				"rafMaxMs": 100
+			}
+		},
+		{
+			"phase": "before",
+			"trial": 2,
+			"ready": {
+				"coarse": false,
+				"height": 128051,
+				"nativeCharacters": 2880,
+				"nodes": 505,
+				"resources": [
+					"http://127.0.0.1:4461/__benchmark.js",
+					"http://127.0.0.1:4461/app.js",
+					"http://127.0.0.1:4461/chunks/document-worker-stats-06ykpceg.js"
+				],
+				"selection": {
+					"direction": "none",
+					"end": 0,
+					"start": 0
+				},
+				"sourceCharacters": 133987,
+				"top": 119299
+			},
+			"observation": {
+				"duration": 330.19999998807907,
+				"frames": [
+					16.700000000000728, 16.599999999998545, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.700000000000728,
+					16.600000000000364, 16.69999999999891, 16.700000000000728,
+					16.700000000000728, 16.599999999998545, 16.700000000000728,
+					16.600000000000364, 16.69999999999891, 16.700000000000728,
+					16.600000000000364, 16.69999999999891, 16.600000000000364,
+					16.80000000000109, 16.599999999998545
+				],
+				"nativeCharacters": 3840,
+				"nodes": 673,
+				"scrolls": 3,
+				"selectionExact": true,
+				"settled": true,
+				"sourceExact": true,
+				"top": 121099,
+				"trusted": 8,
+				"wheelEvents": [
+					{
+						"at": 76.60000002384186,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 119299
+					},
+					{
+						"at": 114.4000000357628,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 119299
+					},
+					{
+						"at": 124.9000000357628,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 119899
+					},
+					{
+						"at": 164.10000002384186,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 119899
+					},
+					{
+						"at": 176.4000000357628,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 120499
+					},
+					{
+						"at": 214.10000002384183,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 120499
+					},
+					{
+						"at": 226.4000000357628,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 121099
+					},
+					{
+						"at": 264,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 121099
+					}
+				],
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-active-line/before-rich128-2.trace.json",
+			"metrics": {
+				"phase": "before",
+				"position": "end",
+				"scopeMs": 330.084,
+				"largestMainTaskMs": 5.379,
+				"taskCount": 132,
+				"layoutTotalMs": 4.285,
+				"paintTotalMs": 2.156,
+				"rafMaxMs": 16.80000000000109
+			}
+		},
+		{
+			"phase": "after",
+			"trial": 0,
+			"ready": {
+				"coarse": false,
+				"height": 128018,
+				"nativeCharacters": 1962,
+				"nodes": 318,
+				"resources": [
+					"http://127.0.0.1:4461/app.js",
+					"http://127.0.0.1:4461/chunks/document-worker-stats-xj2116pa.js"
+				],
+				"selection": {
+					"direction": "none",
+					"end": 0,
+					"start": 0
+				},
+				"sourceCharacters": 133987,
+				"top": 0
+			},
+			"observation": {
+				"duration": 521.3999999761581,
+				"frames": [
+					16.69999999999891, 16.700000000000728, 16.600000000000364,
+					16.599999999998545, 16.80000000000109, 16.600000000000364,
+					16.69999999999891, 16.700000000000728, 16.600000000000364,
+					16.599999999998545, 16.700000000000728, 83.39999999999964,
+					116.60000000000036, 16.700000000000728, 83.29999999999927,
+					16.700000000000728, 16.69999999999891
+				],
+				"nativeCharacters": 2922,
+				"nodes": 486,
+				"scrolls": 2,
+				"selectionExact": true,
+				"settled": true,
+				"sourceExact": true,
+				"top": 1200,
+				"trusted": 8,
+				"wheelEvents": [
+					{
+						"at": 88.09999996423721,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 0
+					},
+					{
+						"at": 105.0999999642372,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 0
+					},
+					{
+						"at": 116.0999999642372,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 600
+					},
+					{
+						"at": 133.0999999642372,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 600
+					},
+					{
+						"at": 167.19999998807907,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 1200
+					},
+					{
+						"at": 269.0999999642372,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 1200
+					},
+					{
+						"at": 371.5999999642372,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 1200
+					},
+					{
+						"at": 488.5,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 1200
+					}
+				],
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-active-line/after-rich128-0.trace.json",
+			"metrics": {
+				"phase": "after",
+				"position": "top",
+				"scopeMs": 521.395,
+				"largestMainTaskMs": 8.756,
+				"taskCount": 771,
+				"layoutTotalMs": 2.654,
+				"paintTotalMs": 0.953,
+				"rafMaxMs": 116.60000000000036
+			}
+		},
+		{
+			"phase": "after",
+			"trial": 1,
+			"ready": {
+				"coarse": false,
+				"height": 128051,
+				"nativeCharacters": 3840,
+				"nodes": 642,
+				"resources": [
+					"http://127.0.0.1:4461/app.js",
+					"http://127.0.0.1:4461/chunks/document-worker-stats-xj2116pa.js"
+				],
+				"selection": {
+					"direction": "none",
+					"end": 0,
+					"start": 0
+				},
+				"sourceCharacters": 133987,
+				"top": 63633
+			},
+			"observation": {
+				"duration": 483.7000000476837,
+				"frames": [
+					16.600000000000364, 16.69999999999891, 16.700000000000728,
+					16.700000000000728, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.599999999998545, 16.700000000000728,
+					16.700000000000728, 16.599999999998545, 100, 16.700000000000728, 100,
+					16.600000000000364, 16.69999999999891, 16.700000000000728,
+					16.600000000000364
+				],
+				"nativeCharacters": 3840,
+				"nodes": 642,
+				"scrolls": 2,
+				"selectionExact": true,
+				"settled": true,
+				"sourceExact": true,
+				"top": 64833,
+				"trusted": 8,
+				"wheelEvents": [
+					{
+						"at": 99.9000000357628,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 63633
+					},
+					{
+						"at": 116.70000004768372,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 63633
+					},
+					{
+						"at": 127.70000004768372,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 64233
+					},
+					{
+						"at": 145.70000004768372,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 64233
+					},
+					{
+						"at": 177.9000000357628,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 64833
+					},
+					{
+						"at": 282.9000000357628,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 64833
+					},
+					{
+						"at": 400.800000011921,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 64833
+					},
+					{
+						"at": 423.300000011921,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 64833
+					}
+				],
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-active-line/after-rich128-1.trace.json",
+			"metrics": {
+				"phase": "after",
+				"position": "middle",
+				"scopeMs": 483.679,
+				"largestMainTaskMs": 22.311,
+				"taskCount": 657,
+				"layoutTotalMs": 3.096,
+				"paintTotalMs": 1.167,
+				"rafMaxMs": 100
+			}
+		},
+		{
+			"phase": "after",
+			"trial": 2,
+			"ready": {
+				"coarse": false,
+				"height": 128051,
+				"nativeCharacters": 2880,
+				"nodes": 505,
+				"resources": [
+					"http://127.0.0.1:4461/app.js",
+					"http://127.0.0.1:4461/chunks/document-worker-stats-xj2116pa.js"
+				],
+				"selection": {
+					"direction": "none",
+					"end": 0,
+					"start": 0
+				},
+				"sourceCharacters": 133987,
+				"top": 119299
+			},
+			"observation": {
+				"duration": 330.89999997615814,
+				"frames": [
+					16.600000000000364, 16.700000000000728, 16.599999999998545,
+					16.700000000000728, 16.600000000000364, 16.69999999999891,
+					16.700000000000728, 16.700000000000728, 16.599999999998545,
+					16.700000000000728, 16.700000000000728, 16.599999999998545,
+					16.700000000000728, 16.700000000000728, 16.69999999999891, 16.5,
+					16.80000000000109, 16.599999999998545, 16.700000000000728
+				],
+				"nativeCharacters": 3840,
+				"nodes": 673,
+				"scrolls": 3,
+				"selectionExact": true,
+				"settled": true,
+				"sourceExact": true,
+				"top": 121099,
+				"trusted": 8,
+				"wheelEvents": [
+					{
+						"at": 75.59999996423721,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 119299
+					},
+					{
+						"at": 113,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 119299
+					},
+					{
+						"at": 124.5,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 119899
+					},
+					{
+						"at": 163.0999999642372,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 119899
+					},
+					{
+						"at": 175.29999995231628,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 120499
+					},
+					{
+						"at": 214,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 120499
+					},
+					{
+						"at": 226.0999999642372,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 121099
+					},
+					{
+						"at": 264.19999998807907,
+						"deltaMode": 0,
+						"deltaY": 600,
+						"prevented": false,
+						"target": "",
+						"top": 121099
+					}
+				],
+				"wheels": 8
+			},
+			"trace": "/tmp/alkalye-active-line/after-rich128-2.trace.json",
+			"metrics": {
+				"phase": "after",
+				"position": "end",
+				"scopeMs": 330.818,
+				"largestMainTaskMs": 5.275,
+				"taskCount": 128,
+				"layoutTotalMs": 4.286,
+				"paintTotalMs": 2.097,
+				"rafMaxMs": 16.80000000000109
+			}
+		}
+	],
+	"missing": "1MiB readiness expression incorrectly required source.length===0 for expected argument string 0. Correct Saved/writable 1048717-character document present in diagnostic; no measured 1MiB cells.",
+	"assetSha256": {
+		"before": "b87e08435c0b377467ed08d7de4bbc0a74f6ae31a6a33c41c718f7bd488687a3",
+		"after": "fbca54e5b2ede784ce6d20e27c30f2fc4159f5dc96f01a7fc8ce5d53d1010d18"
+	}
+}

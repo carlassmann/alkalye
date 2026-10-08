@@ -1,0 +1,88 @@
+--- a/src/client/components/editor.ts
++++ b/src/client/components/editor.ts
+@@ -201,6 +201,20 @@
+ 	let overlay = new EditorOverlay(highlight)
+ 	let nativeSearch = nativeSearchHighlights()
+ 	let geometryDirty = true
++	let geometryWindowTop = 0
++	let activeLineGeometry:
++		| {
++				projection: SourceTextarea["projection"]
++				start: number
++				end: number
++				windowTop: number
++				windowHeight: number
++				direction: "ltr" | "rtl" | undefined
++				selection: number
++				top: number
++				height: number
++		  }
++		| undefined
+ 	let highlightPending = false
+ 	let searchPattern: RegExp | undefined
+ 	let searchSource = ""
+@@ -508,7 +522,19 @@
+ 		let bounds: DOMRect | undefined
+ 		let view: DOMRect | undefined
+ 		let scrollTop = 0
+-		if (!hidden) {
++		let selection = text.toView(text.selectionStart)
++		let cached =
++			!geometryDirty &&
++			activeLineGeometry?.projection === text.projection &&
++			activeLineGeometry.start === text.viewport.viewport.start &&
++			activeLineGeometry.end === text.viewport.viewport.end &&
++			activeLineGeometry.windowTop === text.viewport.viewport.top &&
++			activeLineGeometry.windowHeight === text.viewport.viewport.height &&
++			activeLineGeometry.direction === text.viewport.viewport.direction &&
++			activeLineGeometry.selection === selection
++				? activeLineGeometry
++				: undefined
++		if (!hidden && !cached) {
+ 			let from = point(text.toView(text.selectionStart)),
+ 				range = document.createRange()
+ 			range.setStart(from.node, from.offset)
+@@ -528,9 +554,28 @@
+ 			geometryDirty = false
+ 		}
+ 		activeLine.hidden = hidden
+-		if (!bounds?.height || !view) return
+-		activeLine.style.top = `${bounds.top - view.top + scrollTop}px`
+-		activeLine.style.height = `${bounds.height}px`
++		if (cached) {
++			activeLine.style.top = `${cached.top}px`
++			activeLine.style.height = `${cached.height}px`
++			return
++		}
++		if (!bounds?.height || !view) {
++			activeLineGeometry = undefined
++			return
++		}
++		activeLineGeometry = {
++			projection: text.projection,
++			start: text.viewport.viewport.start,
++			end: text.viewport.viewport.end,
++			windowTop: text.viewport.viewport.top,
++			windowHeight: text.viewport.viewport.height,
++			direction: text.viewport.viewport.direction,
++			selection,
++			top: bounds.top - view.top + scrollTop,
++			height: bounds.height,
++		}
++		activeLine.style.top = `${activeLineGeometry.top}px`
++		activeLine.style.height = `${activeLineGeometry.height}px`
+ 	}
+ 	function preferences(next: EditorPreferences) {
+ 		options.preferences = next
+@@ -1140,6 +1185,11 @@
+ 		if (!highlightPending) return
+ 		highlightPending = false
+ 		if (listeners.signal.aborted) return
++		let windowTop = text.viewport.viewport.top
++		if (windowTop !== geometryWindowTop) {
++			geometryWindowTop = windowTop
++			geometryDirty = true
++		}
+ 		let ranges = [...secondarySelections].sort(
+ 			(left, right) => left.start - right.start,
+ 		)
