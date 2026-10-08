@@ -1,0 +1,97 @@
+--- a/src/shared/document-session.ts
++++ b/src/shared/document-session.ts
+@@ -707,6 +707,7 @@
+ 		}
+ 		function undo(redo: boolean, textTarget?: string) {
+ 			let generation = projection.editGeneration()
++			performance.mark("undo:requested")
+ 			return propose(actor =>
+ 				projection.undo(redo, actor, textTarget).pipe(
+ 					Effect.tap(() =>
+@@ -736,13 +737,20 @@
+ 				() =>
+ 					gate.withPermit(
+ 						Effect.gen(function* () {
++							performance.mark("propose:gate-acquired")
+ 							yield* requireOpen
++							performance.mark("propose:flush-start")
+ 							yield* flushUnlocked
++							performance.mark("propose:flush-end")
+ 							yield* recovery.attempt("projection", projection.replay)
++							performance.mark("propose:replay-end")
+ 							let action = yield* Ref.get(prepared)
+ 							if (!action) {
++								performance.mark("propose:actor-start")
+ 								let actor = yield* documentActor(cryptography, options)
++								performance.mark("propose:actor-end")
+ 								action = freezeAction(yield* prepare(actor))
++								performance.mark("propose:prepared")
+ 								yield* Ref.set(prepared, action)
+ 							}
+ 							if (projection.proposed(action.id)) {
+@@ -751,7 +759,9 @@
+ 								if (rejected) return yield* Effect.fail(rejected.failure)
+ 								return action
+ 							}
++							performance.mark("propose:persist-start")
+ 							yield* persistUnlocked({ kind: "proposed", action })
++							performance.mark("propose:persist-end")
+ 							return action
+ 						}),
+ 					),
+@@ -763,6 +773,7 @@
+ 		}
+ 
+ 		function advanceView() {
++			performance.mark("session:revision")
+ 			Effect.runSync(SubscriptionRef.update(revision, current => current + 1))
+ 		}
+ 		function pull() {
+--- a/src/client/document-app.ts
++++ b/src/client/document-app.ts
+@@ -2289,6 +2289,7 @@
+ 			}
+ 		}
+ 		function refreshDocument() {
++			performance.mark("app:refresh-document")
+ 			let presencePainted = false
+ 			let signedIn = account.state.current().status === "signedIn"
+ 			let signIn = app.querySelector<HTMLElement>(
+@@ -2637,6 +2638,7 @@
+ 			)
+ 		}
+ 		function requestRefresh(libraryChanged = false) {
++			performance.mark("app:request-refresh")
+ 			libraryRefreshPending ||= libraryChanged
+ 			documentRefreshPending = true
+ 			scheduleRefresh()
+@@ -2650,6 +2652,7 @@
+ 		function scheduleRefresh() {
+ 			if (refreshFrame) return
+ 			refreshFrame = requestAnimationFrame(() => {
++				performance.mark("app:refresh-frame")
+ 				refreshFrame = 0
+ 				if (events.signal.aborted) return
+ 				let refreshDocumentNow = documentRefreshPending
+--- a/src/client/source-textarea.ts
++++ b/src/client/source-textarea.ts
+@@ -312,7 +312,10 @@
+ 				insert: edit.text,
+ 			})
+ 		}
++		let sourceChanged = this.current.source !== next.source
+ 		this.current = next
++		if (sourceChanged)
++			performance.mark("editor:source-assigned", { detail: { characters: next.source.length } })
+ 		this.viewport.render(
+ 			next.text,
+ 			{
+@@ -322,6 +325,8 @@
+ 			},
+ 			{ revealSelection: reveal },
+ 		)
++		if (sourceChanged)
++			performance.mark("editor:viewport-rendered", { detail: { characters: next.source.length } })
+ 		this.options.painted()
+ 	}
+ }

@@ -1,0 +1,279 @@
+{
+	"status": "complete",
+	"strictExit": 0,
+	"buildExit": 0,
+	"runnerHandle": 45366,
+	"runnerExit": 0,
+	"serverPid": 28523,
+	"serverStopped": true,
+	"seedEditUndoExact": true,
+	"trustedMetaZ": true,
+	"sourceCaretRestored": true,
+	"diagnosticSamples": 1,
+	"undoInitialTaskMs": 0.561,
+	"undoWindowMaxTaskMs": 2.955,
+	"sourceAssignedMs": 29.4,
+	"viewportReturnedMs": 30.6,
+	"probeReadyMs": 45.3,
+	"marks": [
+		{
+			"name": "interaction:start",
+			"relativeMs": 0.0,
+			"detail": null
+		},
+		{
+			"name": "undo:requested",
+			"relativeMs": 0.1,
+			"detail": null
+		},
+		{
+			"name": "propose:gate-acquired",
+			"relativeMs": 0.2,
+			"detail": null
+		},
+		{
+			"name": "propose:flush-start",
+			"relativeMs": 0.2,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 0.2,
+			"detail": null
+		},
+		{
+			"name": "propose:flush-end",
+			"relativeMs": 0.2,
+			"detail": null
+		},
+		{
+			"name": "app:refresh-frame",
+			"relativeMs": 10.9,
+			"detail": null
+		},
+		{
+			"name": "app:refresh-document",
+			"relativeMs": 11.0,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 12.0,
+			"detail": null
+		},
+		{
+			"name": "propose:replay-end",
+			"relativeMs": 12.0,
+			"detail": null
+		},
+		{
+			"name": "propose:actor-start",
+			"relativeMs": 12.0,
+			"detail": null
+		},
+		{
+			"name": "propose:actor-end",
+			"relativeMs": 12.0,
+			"detail": null
+		},
+		{
+			"name": "propose:prepared",
+			"relativeMs": 15.3,
+			"detail": null
+		},
+		{
+			"name": "propose:persist-start",
+			"relativeMs": 15.3,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 16.4,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 16.6,
+			"detail": null
+		},
+		{
+			"name": "session:revision",
+			"relativeMs": 20.3,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 20.3,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 20.4,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 20.4,
+			"detail": null
+		},
+		{
+			"name": "propose:persist-end",
+			"relativeMs": 20.4,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 20.5,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 20.7,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 20.8,
+			"detail": null
+		},
+		{
+			"name": "app:refresh-frame",
+			"relativeMs": 28.7,
+			"detail": null
+		},
+		{
+			"name": "app:refresh-document",
+			"relativeMs": 29.0,
+			"detail": null
+		},
+		{
+			"name": "editor:source-assigned",
+			"relativeMs": 29.4,
+			"detail": {
+				"characters": 2048
+			}
+		},
+		{
+			"name": "editor:viewport-rendered",
+			"relativeMs": 30.6,
+			"detail": {
+				"characters": 2048
+			}
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 32.2,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 32.3,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 32.8,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 34.9,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 34.9,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 35.4,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 35.7,
+			"detail": null
+		},
+		{
+			"name": "session:revision",
+			"relativeMs": 38.0,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 38.0,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 38.0,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 38.1,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 38.7,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 39.1,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 40.2,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 41.6,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 43.0,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 43.1,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 43.1,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 43.2,
+			"detail": null
+		},
+		{
+			"name": "app:request-refresh",
+			"relativeMs": 43.3,
+			"detail": null
+		},
+		{
+			"name": "interaction:ready",
+			"relativeMs": 45.3,
+			"detail": null
+		},
+		{
+			"name": "app:refresh-frame",
+			"relativeMs": 45.4,
+			"detail": null
+		},
+		{
+			"name": "app:refresh-document",
+			"relativeMs": 45.7,
+			"detail": null
+		}
+	]
+}

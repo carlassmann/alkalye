@@ -1,0 +1,911 @@
+[
+	{
+		"version": "rewrite",
+		"commit": "c922a8d61d2730e0b9b6179b36b36ba85cd5e578",
+		"cell": "small-middle",
+		"trial": 0,
+		"status": "complete",
+		"trace": "/tmp/alkalye-small-undo-timeline/results/rewrite-small-middle-0.trace.json",
+		"observation": {
+			"network": {
+				"openedSockets": ["/api/live"],
+				"pollRequests": 0,
+				"received": 3,
+				"sends": 0
+			},
+			"probe": {
+				"end": 4379.400000035763,
+				"eventTiming": [],
+				"events": [
+					{
+						"ctrl": false,
+						"eventTimestamp": 1376,
+						"key": "x",
+						"meta": false,
+						"time": 1376.300000011921,
+						"type": "keydown"
+					},
+					{
+						"eventTimestamp": 1376.800000011921,
+						"time": 1376.800000011921,
+						"type": "beforeinput"
+					}
+				],
+				"frames": [
+					16.700000000000045, 16.59999999999991, 16.799999999999955,
+					16.600000000000136, 16.59999999999991, 16.799999999999955,
+					16.600000000000136, 16.59999999999991, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.700000000000045,
+					16.700000000000045, 16.699999999999818, 16.600000000000136,
+					16.700000000000045, 16.699999999999818, 16.600000000000136,
+					16.59999999999991, 16.700000000000045, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.699999999999818, 16.600000000000136,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.700000000000045,
+					16.59999999999991, 16.799999999999955, 16.59999999999991,
+					16.700000000000273, 16.59999999999991, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.700000000000273, 16.59999999999991, 16.699999999999818,
+					16.600000000000364, 16.799999999999727, 16.59999999999991,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.700000000000273, 16.59999999999991, 16.699999999999818,
+					16.700000000000273, 16.59999999999991, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.700000000000273, 16.59999999999991, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.59999999999991,
+					16.800000000000182, 16.59999999999991, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.800000000000182, 16.59999999999991, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.800000000000182, 16.59999999999991, 16.699999999999818,
+					16.700000000000273, 16.59999999999991, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.59999999999991, 16.699999999999818,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.59999999999991, 16.699999999999818,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.59999999999991, 16.800000000000182, 16.59999999999991,
+					16.700000000000273, 16.59999999999991, 16.699999999999818,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.59999999999991, 16.700000000000273,
+					16.599999999999454, 16.800000000000182, 16.699999999999818,
+					16.600000000000364, 16.599999999999454, 16.700000000000728,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.599999999999454, 16.699999999999818, 16.700000000000728,
+					16.699999999999818, 16.599999999999454, 16.700000000000728,
+					16.699999999999818
+				],
+				"networkAtEnd": {
+					"pollRequests": 0,
+					"received": 3,
+					"sends": 0
+				},
+				"networkAtStart": {
+					"pollRequests": 0,
+					"received": 1,
+					"sends": 0
+				},
+				"ready": 1380.5,
+				"start": 1376.300000011921
+			},
+			"scripts": [
+				{
+					"decoded": 253393,
+					"path": "/app.js"
+				},
+				{
+					"decoded": 122386,
+					"path": "/chunks/document-app-z8yna5gc.js"
+				},
+				{
+					"decoded": 2036,
+					"path": "/chunks/document-app-cpyrabzv.js"
+				},
+				{
+					"decoded": 2798,
+					"path": "/chunks/document-app-m2qx4cqf.js"
+				},
+				{
+					"decoded": 1330,
+					"path": "/chunks/document-app-zzda0gnp.js"
+				},
+				{
+					"decoded": 7968,
+					"path": "/chunks/document-app-fdca9e8a.js"
+				},
+				{
+					"decoded": 16754,
+					"path": "/chunks/document-app-kyjabmpr.js"
+				},
+				{
+					"decoded": 617,
+					"path": "/chunks/document-app-4bdv4e1h.js"
+				},
+				{
+					"decoded": 3894,
+					"path": "/chunks/document-app-njm9xdrd.js"
+				},
+				{
+					"decoded": 14375,
+					"path": "/chunks/document-app-zsc4xtxg.js"
+				},
+				{
+					"decoded": 901,
+					"path": "/chunks/document-app-0fyrxqjt.js"
+				},
+				{
+					"decoded": 2725,
+					"path": "/chunks/document-app-dw31ncjv.js"
+				},
+				{
+					"decoded": 1656,
+					"path": "/chunks/document-app-zc37nkfy.js"
+				},
+				{
+					"decoded": 5735,
+					"path": "/chunks/document-app-wnaem0wt.js"
+				},
+				{
+					"decoded": 7957,
+					"path": "/chunks/document-app-022w94n0.js"
+				},
+				{
+					"decoded": 6070,
+					"path": "/chunks/document-app-ef2e4sa0.js"
+				},
+				{
+					"decoded": 765,
+					"path": "/chunks/document-app-5w0555xf.js"
+				},
+				{
+					"decoded": 212993,
+					"path": "/chunks/document-app-1y6dkaw7.js"
+				},
+				{
+					"decoded": 11389,
+					"path": "/chunks/document-app-7es742rc.js"
+				},
+				{
+					"decoded": 24137,
+					"path": "/chunks/document-app-xryb03fv.js"
+				},
+				{
+					"decoded": 20425,
+					"path": "/chunks/document-app-2d5x6ewf.js"
+				},
+				{
+					"decoded": 2412,
+					"path": "/chunks/document-app-jxg7vknv.js"
+				},
+				{
+					"decoded": 75938,
+					"path": "/chunks/document-app-kjpwy0e1.js"
+				},
+				{
+					"decoded": 2354,
+					"path": "/chunks/document-app-vk38pqtz.js"
+				},
+				{
+					"decoded": 2075,
+					"path": "/chunks/document-app-1dxag10p.js"
+				},
+				{
+					"decoded": 713,
+					"path": "/chunks/document-app-kkm66nr6.js"
+				},
+				{
+					"decoded": 14516,
+					"path": "/chunks/document-app-3fnhg1mw.js"
+				},
+				{
+					"decoded": 27429,
+					"path": "/chunks/document-app-twgbb54m.js"
+				},
+				{
+					"decoded": 272,
+					"path": "/chunks/document-app-nz4nbhyt.js"
+				},
+				{
+					"decoded": 41742,
+					"path": "/chunks/document-app-qpn16pt3.js"
+				},
+				{
+					"decoded": 1109,
+					"path": "/chunks/document-app-bxa2bqfs.js"
+				},
+				{
+					"decoded": 174723,
+					"path": "/chunks/document-app-cksk812g.js"
+				},
+				{
+					"decoded": 20324,
+					"path": "/chunks/document-worker-stats-339x9rb5.js"
+				},
+				{
+					"decoded": 155969,
+					"path": "/document-worker.js"
+				},
+				{
+					"decoded": 2036,
+					"path": "/chunks/document-app-cpyrabzv.js"
+				},
+				{
+					"decoded": 122386,
+					"path": "/chunks/document-app-z8yna5gc.js"
+				},
+				{
+					"decoded": 253393,
+					"path": "/app.js"
+				},
+				{
+					"decoded": 2798,
+					"path": "/chunks/document-app-m2qx4cqf.js"
+				},
+				{
+					"decoded": 1330,
+					"path": "/chunks/document-app-zzda0gnp.js"
+				},
+				{
+					"decoded": 7968,
+					"path": "/chunks/document-app-fdca9e8a.js"
+				},
+				{
+					"decoded": 16754,
+					"path": "/chunks/document-app-kyjabmpr.js"
+				},
+				{
+					"decoded": 3894,
+					"path": "/chunks/document-app-njm9xdrd.js"
+				},
+				{
+					"decoded": 617,
+					"path": "/chunks/document-app-4bdv4e1h.js"
+				},
+				{
+					"decoded": 901,
+					"path": "/chunks/document-app-0fyrxqjt.js"
+				},
+				{
+					"decoded": 2725,
+					"path": "/chunks/document-app-dw31ncjv.js"
+				},
+				{
+					"decoded": 14375,
+					"path": "/chunks/document-app-zsc4xtxg.js"
+				},
+				{
+					"decoded": 1656,
+					"path": "/chunks/document-app-zc37nkfy.js"
+				},
+				{
+					"decoded": 5735,
+					"path": "/chunks/document-app-wnaem0wt.js"
+				},
+				{
+					"decoded": 7957,
+					"path": "/chunks/document-app-022w94n0.js"
+				},
+				{
+					"decoded": 212993,
+					"path": "/chunks/document-app-1y6dkaw7.js"
+				},
+				{
+					"decoded": 6070,
+					"path": "/chunks/document-app-ef2e4sa0.js"
+				},
+				{
+					"decoded": 765,
+					"path": "/chunks/document-app-5w0555xf.js"
+				},
+				{
+					"decoded": 24137,
+					"path": "/chunks/document-app-xryb03fv.js"
+				},
+				{
+					"decoded": 11389,
+					"path": "/chunks/document-app-7es742rc.js"
+				},
+				{
+					"decoded": 20425,
+					"path": "/chunks/document-app-2d5x6ewf.js"
+				},
+				{
+					"decoded": 2412,
+					"path": "/chunks/document-app-jxg7vknv.js"
+				},
+				{
+					"decoded": 2354,
+					"path": "/chunks/document-app-vk38pqtz.js"
+				},
+				{
+					"decoded": 2075,
+					"path": "/chunks/document-app-1dxag10p.js"
+				},
+				{
+					"decoded": 75938,
+					"path": "/chunks/document-app-kjpwy0e1.js"
+				},
+				{
+					"decoded": 27429,
+					"path": "/chunks/document-app-twgbb54m.js"
+				},
+				{
+					"decoded": 14516,
+					"path": "/chunks/document-app-3fnhg1mw.js"
+				},
+				{
+					"decoded": 713,
+					"path": "/chunks/document-app-kkm66nr6.js"
+				},
+				{
+					"decoded": 41742,
+					"path": "/chunks/document-app-qpn16pt3.js"
+				},
+				{
+					"decoded": 272,
+					"path": "/chunks/document-app-nz4nbhyt.js"
+				},
+				{
+					"decoded": 1109,
+					"path": "/chunks/document-app-bxa2bqfs.js"
+				},
+				{
+					"decoded": 174723,
+					"path": "/chunks/document-app-cksk812g.js"
+				},
+				{
+					"decoded": 20324,
+					"path": "/chunks/document-worker-stats-339x9rb5.js"
+				},
+				{
+					"decoded": 155969,
+					"path": "/document-worker.js"
+				}
+			],
+			"sourceSelection": {
+				"start": 1025,
+				"end": 1025
+			}
+		},
+		"undoTrace": "/tmp/alkalye-small-undo-timeline/results/rewrite-small-middle-0-undo.trace.json",
+		"history": {
+			"mode": "advancing",
+			"acceptedPairsThisRunBefore": 0,
+			"declaredPriorPairs": 3
+		},
+		"sessionDigests": [],
+		"undoObservation": {
+			"network": {
+				"openedSockets": ["/api/live"],
+				"pollRequests": 0,
+				"received": 4,
+				"sends": 0
+			},
+			"probe": {
+				"end": 7887.900000035763,
+				"eventTiming": [
+					{
+						"duration": 16,
+						"name": "keydown",
+						"processingEnd": 4886.5,
+						"processingStart": 4885.900000035763,
+						"startTime": 4885.900000035763
+					}
+				],
+				"events": [
+					{
+						"ctrl": false,
+						"eventTimestamp": 4885.900000035763,
+						"key": "z",
+						"meta": true,
+						"time": 4886.100000023842,
+						"type": "keydown"
+					}
+				],
+				"frames": [
+					16.599999999999454, 16.700000000000728, 16.699999999999818,
+					16.599999999999454, 16.700000000000728, 16.599999999999454,
+					16.800000000000182, 16.5, 16.699999999999818, 16.699999999999818,
+					16.700000000000728, 16.699999999999818, 16.599999999999454,
+					16.700000000000728, 16.599999999999454, 16.699999999999818,
+					16.700000000000728, 16.699999999999818, 16.599999999999454,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.700000000000728, 16.599999999999454, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.800000000000182, 16.599999999999454,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.700000000000728, 16.599999999999454, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.700000000000728, 16.599999999999454, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.700000000000728, 16.599999999999454, 16.699999999999818,
+					16.700000000000728, 16.599999999999454, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.700000000000728, 16.599999999999454, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.700000000000728, 16.599999999999454, 16.600000000000364,
+					16.800000000000182, 16.599999999999454, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.700000000000728, 16.599999999999454, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.800000000000182, 16.5, 16.799999999999272, 16.600000000000364,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.599999999999454,
+					16.800000000000182, 16.600000000000364, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.599999999999454,
+					16.800000000000182, 16.600000000000364, 16.599999999999454,
+					16.700000000000728, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.599999999999454,
+					16.700000000000728, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818
+				],
+				"networkAtEnd": {
+					"pollRequests": 0,
+					"received": 4,
+					"sends": 0
+				},
+				"networkAtStart": {
+					"pollRequests": 0,
+					"received": 3,
+					"sends": 0
+				},
+				"ready": 4931.400000035763,
+				"start": 4886.100000023842
+			},
+			"timeline": [
+				{
+					"detail": null,
+					"name": "interaction:start",
+					"time": 4886.100000023842
+				},
+				{
+					"detail": null,
+					"name": "undo:requested",
+					"time": 4886.200000047684
+				},
+				{
+					"detail": null,
+					"name": "propose:gate-acquired",
+					"time": 4886.300000011921
+				},
+				{
+					"detail": null,
+					"name": "propose:flush-start",
+					"time": 4886.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4886.300000011921
+				},
+				{
+					"detail": null,
+					"name": "propose:flush-end",
+					"time": 4886.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 4897
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 4897.100000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4898.100000023842
+				},
+				{
+					"detail": null,
+					"name": "propose:replay-end",
+					"time": 4898.100000023842
+				},
+				{
+					"detail": null,
+					"name": "propose:actor-start",
+					"time": 4898.100000023842
+				},
+				{
+					"detail": null,
+					"name": "propose:actor-end",
+					"time": 4898.100000023842
+				},
+				{
+					"detail": null,
+					"name": "propose:prepared",
+					"time": 4901.400000035763
+				},
+				{
+					"detail": null,
+					"name": "propose:persist-start",
+					"time": 4901.400000035763
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4902.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4902.700000047684
+				},
+				{
+					"detail": null,
+					"name": "session:revision",
+					"time": 4906.400000035763
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4906.400000035763
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4906.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4906.5
+				},
+				{
+					"detail": null,
+					"name": "propose:persist-end",
+					"time": 4906.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4906.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4906.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4906.900000035763
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 4914.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 4915.100000023842
+				},
+				{
+					"detail": {
+						"characters": 2048
+					},
+					"name": "editor:source-assigned",
+					"time": 4915.5
+				},
+				{
+					"detail": {
+						"characters": 2048
+					},
+					"name": "editor:viewport-rendered",
+					"time": 4916.700000047684
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4918.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4918.400000035763
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4918.900000035763
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4921.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4921.800000011921
+				},
+				{
+					"detail": null,
+					"name": "session:revision",
+					"time": 4924.100000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4924.100000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4924.100000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4924.200000047684
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4924.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4925.200000047684
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4926.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4927.700000047684
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4929.100000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4929.200000047684
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4929.200000047684
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4929.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4929.400000035763
+				},
+				{
+					"detail": null,
+					"name": "interaction:ready",
+					"time": 4931.400000035763
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 4931.5
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 4931.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4933.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4933.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4933.700000047684
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4933.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4933.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4934
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4934
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 4948.100000023842
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 4948.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5427.200000047684
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5427.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5428.700000047684
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5429.400000035763
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 5431.100000023842
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 5431.100000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5434.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5438.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5439
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5439
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 5448.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 5448.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 6064.700000047684
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 6107.900000035763
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 6114.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 6114.800000011921
+				}
+			]
+		},
+		"seedReceipt": {
+			"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+			"characters": 2048,
+			"phasesLog": "oracle-phases-0.json",
+			"logDigest": "925966e5ddf132ccd56f3ac196d502418d0c55e6920fde870a383ea87f8030d0"
+		},
+		"editedReceipt": {
+			"sha256": "a0079fbe7b0025cb7a9c653264283d7fbad4a62b90fcf41ab19fdbd79500b179",
+			"characters": 2049,
+			"phasesLog": "oracle-phases-1.json",
+			"logDigest": "99ed2f49283adde23094074468735396b5e351cb705a6d9dc772d949f5aa8eb5"
+		},
+		"undoReceipt": {
+			"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+			"characters": 2048,
+			"phasesLog": "oracle-phases-2.json",
+			"logDigest": "08cd82c7341fb5c69445f212f236c0a90f1511903a10c93f41d4f6dfabd6e702"
+		},
+		"fixture": {
+			"characters": 2048,
+			"bytes": 2048,
+			"realNewlines": 74,
+			"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2"
+		}
+	}
+]

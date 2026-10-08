@@ -1,0 +1,11 @@
+{
+	"base": "c922a8d61d2730e0b9b6179b36b36ba85cd5e578",
+	"run": true,
+	"sourceDigests": {
+		"shared/document-session.ts": "fdbc79466a33698c583c33e4d9d10410bfccaecd33bc324080da491a248c6ef8",
+		"client/document-app.ts": "a1809e1fb8d620bb7e53f6bf23c1eec2a810abce73608bfb1e7a87ca72d9509f",
+		"client/source-textarea.ts": "462a7c6793951e3d2898258eb1bf6978915c9fd9d49d2ad852620afb569d171c"
+	},
+	"scope": "diagnostic marks only, existing proposal and refresh boundaries; no policy or ordering changes",
+	"applicationDelta": "timeline.patch only"
+}
