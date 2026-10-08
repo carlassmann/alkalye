@@ -1474,10 +1474,20 @@
 			one restore.
 		</p>
 		<p>
-			The next loading candidate will reuse a privately validated snapshot only
-			for the exact committed entry bytes and unchanged projection state.
-			Failure, interruption and competing state must discard it. No reuse has
-			shipped. Evidence: <code>experiments/performance/first-open-replay</code>.
+			Snapshot opening now retains its validated replica for the exact committed
+			entry bytes and unchanged projection state. Failure, interruption and
+			competing state discard it. A separate browser count confirmed one restore
+			during validation and none during replay. Thirty focused integration tests
+			passed, followed by all 702 core tests, six browser module checks and the
+			fast app journey.
+		</p>
+		<p>
+			Three alternating cold-opening pairs passed exact source, route,
+			editability and independent server checks. Median readiness fell from
+			646.489ms to 529.380ms; the worst fell from 661.012ms to 533.519ms. Median
+			GC time fell from 35.101ms to 19.838ms. The worst task increased from
+			19.589ms to 20.336ms, so the frame budget remains unmet. Evidence:
+			<code>experiments/performance/open-entry-reuse</code>.
 		</p>
 		<h2>Forward Chunk replacement remains unshipped</h2>
 		<p>

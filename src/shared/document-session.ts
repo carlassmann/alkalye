@@ -246,10 +246,10 @@ class DocumentProjection extends Context.Service<
 	Effect.Success<ReturnType<typeof makeProjection>>
 >()("alkalye/DocumentProjection") {}
 let handlers = EventLog.group(changes, handlers =>
-	handlers.handle("DocumentRecorded", ({ payload }) =>
+	handlers.handle("DocumentRecorded", ({ payload, entry }) =>
 		DocumentProjection.use(projection =>
 			projection
-				.record(payload)
+				.record(payload, entry)
 				.pipe(
 					Effect.mapError(error =>
 						storageFailure("validate document action", error),
@@ -344,6 +344,7 @@ function makeSession(options: DocumentSessionOptions) {
 				Effect.andThen(recovery.run("projection", projection.replay)),
 				Effect.andThen(recovery.run("notification")),
 				Effect.mapError(error => storageFailure("save document action", error)),
+				Effect.onError(() => projection.discardPreparedOpen),
 			)
 		let persist = (value: Recording) => gate.withPermit(persistUnlocked(value))
 		let rawFlushUnlocked: Effect.Effect<void, DocumentFailure> = Effect.gen(
@@ -814,6 +815,27 @@ function makeProjection(options: DocumentSessionOptions) {
 		let undoPosition = 0
 		let undoOrder = 0
 		let projectionComplete = true
+		let preparedOpen:
+			| {
+					entry: string
+					payload: Uint8Array
+					restored: Replica
+					replica: Replica
+					durable: Replica
+					accepted: Replica
+					generation: number
+					durableGeneration: number
+					acceptedGeneration: number
+					position: number
+					remotePosition: number
+					document: string
+					subject: string
+			  }
+			| undefined
+		let discardPreparedOpen = Effect.sync(() => {
+			preparedOpen = undefined
+		})
+		yield* Effect.addFinalizer(() => discardPreparedOpen)
 		let version = yield* SubscriptionRef.make(0)
 		let knownProposals = yield* Cache.makeWith(
 			(id: string) =>
@@ -871,6 +893,7 @@ function makeProjection(options: DocumentSessionOptions) {
 			)
 		}
 		function resetProjection() {
+			preparedOpen = undefined
 			replica = new Replica(actor, options.author)
 			durable = new Replica("local-document", options.author)
 			accepted = new Replica("accepted-document", options.author)
@@ -1063,9 +1086,23 @@ function makeProjection(options: DocumentSessionOptions) {
 			let changed = false
 			while (true) {
 				let tail = yield* storage.readAfter(localPosition, 1000)
-				for (let entry of tail.entries) {
-					let value = yield* decode(entry)
-					let restored = yield* check(value)
+				for (let stored of tail.entries) {
+					let entry = detachedEntry(stored)
+					let prepared = preparedOpen
+					preparedOpen = undefined
+					let entryId = entry.idString
+					let value = yield* decode(entry, entry.payload)
+					let restored =
+						value.kind === "opened" &&
+						prepared &&
+						prepared.entry === entryId &&
+						matchesPreparedOpen(prepared) &&
+						prepared.payload.length === entry.payload.length &&
+						prepared.payload.every(
+							(byte, index) => byte === entry.payload[index],
+						)
+							? prepared.restored
+							: yield* check(value)
 					if (value.kind === "published") {
 						if (creation) {
 							accepted.apply(
@@ -1193,11 +1230,40 @@ function makeProjection(options: DocumentSessionOptions) {
 				changed ||= tail.entries.length > 0
 				if (tail.entries.length < 1000) break
 			}
+			preparedOpen = undefined
 			projectionComplete = true
 			if (changed)
 				yield* SubscriptionRef.update(version, current => current + 1)
-		}).pipe(Effect.mapError(error => storageFailure("replay document", error)))
+		}).pipe(
+			Effect.onError(() => discardPreparedOpen),
+			Effect.mapError(error => storageFailure("replay document", error)),
+		)
+		function detachedEntry(entry: EventJournal.Entry) {
+			return {
+				idString: entry.idString,
+				event: entry.event,
+				primaryKey: entry.primaryKey,
+				payload: new Uint8Array(entry.payload),
+			}
+		}
+		function matchesPreparedOpen(prepared: NonNullable<typeof preparedOpen>) {
+			return (
+				!log &&
+				!creation &&
+				replica === prepared.replica &&
+				durable === prepared.durable &&
+				accepted === prepared.accepted &&
+				replica.generation === prepared.generation &&
+				durable.generation === prepared.durableGeneration &&
+				accepted.generation === prepared.acceptedGeneration &&
+				localPosition === prepared.position &&
+				remotePosition === prepared.remotePosition &&
+				options.document === prepared.document &&
+				options.subject === prepared.subject
+			)
+		}
 		return {
+			discardPreparedOpen,
 			get replica() {
 				return replica
 			},
@@ -1333,21 +1399,45 @@ function makeProjection(options: DocumentSessionOptions) {
 			replay,
 			validate: (value: Recording) =>
 				replay.pipe(Effect.andThen(check(value)), Effect.asVoid),
-			record: (value: Recording) =>
-				replay.pipe(
-					Effect.andThen(
-						Effect.suspend(() =>
-							value.kind === "proposed" && !proposals.has(value.action.id)
-								? checkCompensationSuccessor(value.action)
-								: Effect.void,
-						),
-					),
-					Effect.andThen(check(value)),
+			record: (value: Recording, entry: EventJournal.Entry) =>
+				Effect.gen(function* () {
+					preparedOpen = undefined
+					yield* replay
+					if (value.kind === "proposed" && !proposals.has(value.action.id))
+						yield* checkCompensationSuccessor(value.action)
+					if (value.kind !== "opened")
+						return yield* check(value).pipe(Effect.asVoid)
+					let recorded = detachedEntry(entry)
+					let entryId = recorded.idString
+					let payload = recorded.payload
+					let decoded = yield* decode(recorded, payload)
+					if (decoded.kind !== "opened")
+						return yield* conflict("Encoded opening entry has another kind")
+					let basis = {
+						replica,
+						durable,
+						accepted,
+						generation: replica.generation,
+						durableGeneration: durable.generation,
+						acceptedGeneration: accepted.generation,
+						position: localPosition,
+						remotePosition,
+						document: options.document,
+						subject: options.subject,
+					}
+					let restored = yield* check(decoded)
+					if (
+						restored &&
+						matchesPreparedOpen({ ...basis, entry: entryId, payload, restored })
+					)
+						preparedOpen = { ...basis, entry: entryId, payload, restored }
+				}).pipe(
 					Effect.andThen(
 						value.kind === "proposed" || value.kind === "localCreated"
 							? (options.activity?.proposing ?? Effect.void)
 							: Effect.void,
 					),
+					Effect.onError(() => discardPreparedOpen),
 				),
 			captureState: Effect.gen(function* () {
 				yield* materializeDocument(durable)
@@ -1979,7 +2069,8 @@ export function documentDatabaseName(options: DocumentSessionOptions) {
 	)
 }
 function decode(
-	entry: EventJournal.Entry,
+	entry: Pick<EventJournal.Entry, "event" | "payload">,
+	payload = new Uint8Array(entry.payload),
 ): Effect.Effect<Recording, DocumentFailure> {
 	if (entry.event !== "DocumentRecorded")
 		return conflict("Unknown document journal entry").pipe(
@@ -1987,7 +2078,7 @@ function decode(
 				storageFailure("decode document journal", error),
 			),
 		)
-	return Schema.decodeEffect(codec)(new Uint8Array(entry.payload)).pipe(
+	return Schema.decodeEffect(codec)(payload).pipe(
 		Effect.mapError(error => storageFailure("decode document journal", error)),
 	)
 }
