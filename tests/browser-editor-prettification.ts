@@ -56,6 +56,44 @@ try {
 		true,
 		"Cancelled pointer drags resume native editing and syntax painting",
 	)
+	let carriageSource =
+		"# CRLF\r\n\r\nRead [Example](https://example.org).\r\nLast 🦊"
+	evaluate(
+		session,
+		`(() => { ${editor}.replace(${JSON.stringify(carriageSource)},${carriageSource.length},${carriageSource.length}); ${native}.dispatchEvent(new InputEvent("input",{bubbles:true,inputType:"insertText"})); ${native}.focus(); return true })()`,
+	)
+	wait(
+		session,
+		`${editor}.value === ${JSON.stringify(carriageSource)} && document.querySelector("#save-status").textContent === "Saved"`,
+	)
+	selectSource(carriageSource.length)
+	browser(session, "keyboard", "inserttext", "x")
+	wait(
+		session,
+		`${editor}.value === ${JSON.stringify(carriageSource + "x")} && ${editor}.selectionEnd === ${carriageSource.length + 1} && document.querySelector("#save-status").textContent === "Saved"`,
+	)
+	assert(
+		evaluate(
+			session,
+			`!${native}.value.includes("\\r") && ${editor}.sourceIndex.value === ${JSON.stringify(carriageSource + "x")}`,
+		),
+		"CRLF edits preserve raw source and use normalized native text",
+	)
+	browser(session, "press", "Control+z")
+	wait(
+		session,
+		`${editor}.value === ${JSON.stringify(carriageSource)} && document.querySelector("#save-status").textContent === "Saved"`,
+	)
+	browser(session, "reload")
+	wait(
+		session,
+		`${editor}?.value === ${JSON.stringify(carriageSource)} && !${native}.readOnly`,
+	)
+	selectSource(carriageSource.length)
+	assert(
+		evaluate(session, `${editor}.selectionEnd === ${carriageSource.length}`),
+		"CRLF Undo survives reload and restores the source EOF caret",
+	)
 	browser(session, "fill", "#editor", source)
 	wait(session, `${editor}.value === ${JSON.stringify(source)}`)
 	wait(session, `${native}.value === ${JSON.stringify(projected)}`)

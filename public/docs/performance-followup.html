@@ -216,6 +216,14 @@
 			anchors. These are measured bottlenecks, not a timing comparison with the
 			unsampled trials. Terminal Undo improvements do not cover this case.
 		</p>
+		<p>
+			CRLF correctness: the editor now maps Markdown source offsets to the
+			textarea's native LF offsets through its existing text index. Edits retain
+			untouched line endings, including across tree leaves. Native module checks
+			cover 145 assertions, eight edit cases and fourteen wrapping comparisons;
+			the app also passes CRLF typing, Undo and durable reload. These checks
+			prove correctness, not whole-app frame performance.
+		</p>
 		<h2>Earlier journey comparison with main</h2>
 		<p>
 			Both production builds used their own local sync servers, signed accounts

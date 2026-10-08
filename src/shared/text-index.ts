@@ -4,6 +4,10 @@ export interface Replacement {
 	insert: string
 }
 interface Summary {
+	nativeLength: number
+	nativeNewlines: number
+	startsLineFeed: boolean
+	endsCarriageReturn: boolean
 	length: number
 	newlines: number
 	first: number
@@ -25,6 +29,10 @@ interface Branch extends Summary {
 }
 type Node = Leaf | Branch
 let empty: Summary = {
+	nativeLength: 0,
+	nativeNewlines: 0,
+	startsLineFeed: false,
+	endsCarriageReturn: false,
 	length: 0,
 	newlines: 0,
 	first: 0,
@@ -56,6 +64,15 @@ function summary(text: string): Summary {
 	let lines = text.split("\n")
 	return {
 		length: text.length,
+		nativeLength:
+			text.length -
+			(text.includes("\r") ? (text.match(/\r\n/g)?.length ?? 0) : 0),
+		nativeNewlines:
+			lines.length -
+			1 +
+			(text.includes("\r") ? (text.match(/\r(?!\n)/g)?.length ?? 0) : 0),
+		startsLineFeed: text.startsWith("\n"),
+		endsCarriageReturn: text.endsWith("\r"),
 		codePoints: codePointLength(text),
 		startsLow: text.charCodeAt(0) >= 0xdc00 && text.charCodeAt(0) <= 0xdfff,
 		endsHigh:
@@ -69,6 +86,18 @@ function summary(text: string): Summary {
 function combine(left: Summary, right: Summary): Summary {
 	return {
 		length: left.length + right.length,
+		nativeLength:
+			left.nativeLength +
+			right.nativeLength -
+			(left.endsCarriageReturn && right.startsLineFeed ? 1 : 0),
+		nativeNewlines:
+			left.nativeNewlines +
+			right.nativeNewlines -
+			(left.endsCarriageReturn && right.startsLineFeed ? 1 : 0),
+		startsLineFeed: left.length ? left.startsLineFeed : right.startsLineFeed,
+		endsCarriageReturn: right.length
+			? right.endsCarriageReturn
+			: left.endsCarriageReturn,
 		codePoints:
 			left.codePoints +
 			right.codePoints -
@@ -193,6 +222,61 @@ export class TextIndex {
 		let index = new TextIndex("")
 		index.root = this.root
 		return index
+	}
+	nativeOffset(offset: number) {
+		let bounded = Math.max(0, Math.min(this.length, offset))
+		if (this.root?.nativeLength === this.length) return bounded
+		return prefix(this.root, bounded).nativeLength
+	}
+	offsetAtNative(position: number) {
+		if (this.root?.nativeLength === this.length)
+			return Math.max(0, Math.min(this.length, position))
+		function locate(node: Node | null, count: number): number {
+			if (!node || count <= 0) return 0
+			if (count >= node.nativeLength) return node.length
+			if (node.kind === "leaf") {
+				let offset = 0
+				while (count > 0) {
+					offset +=
+						node.text[offset] === "\r" && node.text[offset + 1] === "\n" ? 2 : 1
+					count--
+				}
+				return offset
+			}
+			let overlap =
+				node.left.endsCarriageReturn && node.right.startsLineFeed ? 1 : 0
+			let boundary = node.left.nativeLength - overlap
+			if (count <= boundary) return locate(node.left, count)
+			return node.left.length + locate(node.right, count - boundary)
+		}
+		return locate(this.root, position)
+	}
+	nativeLineAt(offset: number) {
+		return prefix(this.root, this.offsetAtNative(this.nativeOffset(offset)))
+			.nativeNewlines
+	}
+	offsetAtNativeLine(line: number) {
+		function locate(node: Node | null, count: number): number {
+			if (!node || count <= 0) return 0
+			if (count > node.nativeNewlines) return node.length
+			if (node.kind === "leaf") {
+				let offset = 0
+				while (offset < node.length) {
+					let value = node.text[offset++]
+					if (value === "\r") {
+						if (node.text[offset] === "\n") offset++
+						if (--count === 0) return offset
+					} else if (value === "\n" && --count === 0) return offset
+				}
+				return offset
+			}
+			let overlap =
+				node.left.endsCarriageReturn && node.right.startsLineFeed ? 1 : 0
+			let boundary = node.left.nativeNewlines - overlap
+			if (count <= boundary) return locate(node.left, count)
+			return node.left.length + locate(node.right, count - boundary)
+		}
+		return locate(this.root, line)
 	}
 	get codePoints() {
 		return this.root?.codePoints ?? 0

@@ -110,7 +110,9 @@ export class EditorViewport {
 		host.addEventListener("beforeinput", event => this.beforeInput(event), {
 			signal,
 		})
-		host.addEventListener("keydown", event => this.keydown(event), { signal })
+		host.addEventListener("keydown", event => this.keydown(event), {
+			signal,
+		})
 		for (let type of [
 			"beforeinput",
 			"keydown",
@@ -124,7 +126,9 @@ export class EditorViewport {
 				},
 				{ signal },
 			)
-		host.addEventListener("copy", event => this.copy(event, false), { signal })
+		host.addEventListener("copy", event => this.copy(event, false), {
+			signal,
+		})
 		host.addEventListener("cut", event => this.copy(event, true), { signal })
 		host.addEventListener("paste", event => this.paste(event), { signal })
 		element.addEventListener("select", () => this.readSelection(), { signal })
@@ -144,12 +148,18 @@ export class EditorViewport {
 				let anchor = this.offsetAtHeight(this.scrollElement.scrollTop)
 				let before = this.topAt(anchor) - this.scrollElement.scrollTop
 				this.paint()
-				this.measure.textContent = this.value + "\u200b"
+				this.measure.textContent = measurementText(this.value) + "\u200b"
 				let node = this.measure.firstChild
 				if (node) {
 					let range = document.createRange()
-					range.setStart(node, Math.min(anchor, this.text.length))
-					range.setEnd(node, Math.min(anchor + 1, this.text.length + 1))
+					range.setStart(node, this.text.nativeOffset(anchor))
+					range.setEnd(
+						node,
+						Math.min(
+							this.text.nativeOffset(anchor) + 1,
+							this.text.nativeOffset(this.text.length) + 1,
+						),
+					)
 					this.scrollElement.scrollTop =
 						this.paddingTop +
 						range.getBoundingClientRect().top -
@@ -334,11 +344,14 @@ export class EditorViewport {
 		direction?: ViewportSelection["direction"],
 	) {
 		this.selection = {
-			start: Math.max(0, Math.min(this.text.length, start)),
-			end: Math.max(0, Math.min(this.text.length, end)),
+			start: this.canonicalOffset(start),
+			end: this.canonicalOffset(end),
 			direction,
 		}
-		this.reveal(direction === "backward" ? start : end, true)
+		this.reveal(
+			direction === "backward" ? this.selection.start : this.selection.end,
+			true,
+		)
 	}
 	render(
 		source: string,
@@ -369,7 +382,12 @@ export class EditorViewport {
 		}
 		this.acknowledged = source
 		this.nativeAcknowledgement = false
-		if (selection) this.selection = selection
+		if (selection)
+			this.selection = {
+				...selection,
+				start: this.canonicalOffset(selection.start),
+				end: this.canonicalOffset(selection.end),
+			}
 		if (options?.revealSelection)
 			this.reveal(
 				this.selection.direction === "backward"
@@ -387,7 +405,12 @@ export class EditorViewport {
 		this.revision++
 		this.nativeAcknowledgement = false
 		this.acknowledged = source
-		if (selection) this.selection = selection
+		if (selection)
+			this.selection = {
+				...selection,
+				start: this.canonicalOffset(selection.start),
+				end: this.canonicalOffset(selection.end),
+			}
 		this.paint()
 	}
 	apply(edit: Replacement) {
@@ -398,7 +421,7 @@ export class EditorViewport {
 		this.directions.clear()
 		this.fragmentHeight = 0
 		this.rebuild(
-			dense ? 0 : this.blockAtOffset(edit.start),
+			dense ? 0 : this.blockAtOffset(Math.max(0, edit.start - 1)),
 			dense ? undefined : edit,
 		)
 	}
@@ -463,21 +486,21 @@ export class EditorViewport {
 			end++
 			tail++
 		}
-		let edit = {
-			start: this.window.start + start,
-			end: this.window.start + end,
+		let edit = this.nativeEdit({
+			start: this.rawOffset(start),
+			end: this.rawOffset(end),
 			insert: next.slice(start, tail),
-		}
+		})
+		this.apply(edit)
 		this.selection = {
-			start:
-				this.window.start +
+			start: this.rawOffset(
 				Math.max(0, this.element.selectionStart - this.prefix.length),
-			end:
-				this.window.start +
+			),
+			end: this.rawOffset(
 				Math.max(0, this.element.selectionEnd - this.prefix.length),
+			),
 			direction: this.element.selectionDirection,
 		}
-		this.apply(edit)
 		this.nativeAcknowledgement = true
 		this.fragment = next
 		result.push(edit)
@@ -561,12 +584,13 @@ export class EditorViewport {
 		return previous > start ? previous : next
 	}
 	private directionMark(offset: number) {
-		if (offset <= 0 || this.text.slice(offset - 1, offset) === "\n") return ""
-		let line = this.text.lineAt(offset),
-			start = this.text.offsetAtLine(line)
+		if (offset <= 0 || /[\r\n]/.test(this.text.slice(offset - 1, offset)))
+			return ""
+		let line = this.text.nativeLineAt(offset),
+			start = this.text.offsetAtNativeLine(line)
 		let direction = this.directions.get(start)
 		if (!direction) {
-			let end = this.text.offsetAtLine(line + 1)
+			let end = this.text.offsetAtNativeLine(line + 1)
 			for (let cursor = start; cursor < end; cursor += 2048) {
 				let first = this.text
 					.slice(cursor, Math.min(end, cursor + 2048))
@@ -593,15 +617,15 @@ export class EditorViewport {
 		let end = this.blockBoundary(Math.min(limit, start + 1024), start)
 		end = this.blockBoundary(end, start)
 		let part = this.text.slice(start, end)
-		let newline = part.lastIndexOf("\n")
+		let newline = Math.max(part.lastIndexOf("\n"), part.lastIndexOf("\r"))
 		if (newline >= 0 && end < this.text.length) {
 			end = start + newline + 1
 			part = part.slice(0, newline + 1)
 		}
 		let prefix = this.directionMark(start)
-		this.measure.textContent = prefix + part || "\u200b"
+		this.measure.textContent = prefix + measurementText(part) || "\u200b"
 		let node = this.measure.firstChild
-		if (end < this.text.length && !part.endsWith("\n") && node) {
+		if (end < this.text.length && !/[\r\n]$/.test(part) && node) {
 			let range = document.createRange()
 			range.setStart(node, prefix.length + part.length - 1)
 			range.setEnd(node, prefix.length + part.length)
@@ -620,7 +644,7 @@ export class EditorViewport {
 			if (low > 0) {
 				end = this.blockBoundary(start + low, start)
 				part = this.text.slice(start, end)
-				this.measure.textContent = prefix + part || "\u200b"
+				this.measure.textContent = prefix + measurementText(part) || "\u200b"
 			}
 		}
 		let lineHeight = this.lineHeight
@@ -642,12 +666,12 @@ export class EditorViewport {
 	): Block {
 		end = this.blockBoundary(end, start)
 		let part = this.text.slice(start, end)
-		let newline = part.lastIndexOf("\n")
+		let newline = Math.max(part.lastIndexOf("\n"), part.lastIndexOf("\r"))
 		if (newline >= 0 && end < this.text.length) {
 			part = part.slice(0, newline + 1)
 			end = start + part.length
 		}
-		let lines = part.split("\n")
+		let lines = part.split(/\r\n?|\n/)
 		let rows = lines.reduce(
 			(total, line) =>
 				total +
@@ -657,7 +681,7 @@ export class EditorViewport {
 				),
 			0,
 		)
-		if (part.endsWith("\n")) rows--
+		if (/[\r\n]$/.test(part)) rows--
 		return {
 			start,
 			end,
@@ -789,7 +813,7 @@ export class EditorViewport {
 		let top = block?.top ?? this.paddingTop
 		if (block) {
 			let prefix = this.directionMark(block.start)
-			this.measure.textContent = prefix + block.text + "\u200b"
+			this.measure.textContent = prefix + measurementText(block.text) + "\u200b"
 			let node = this.measure.firstChild
 			if (node) {
 				let range = document.createRange()
@@ -797,8 +821,11 @@ export class EditorViewport {
 					0,
 					Math.min(block.text.length, offset - block.start),
 				)
-				range.setStart(node, prefix.length + relative)
-				range.setEnd(node, prefix.length + relative + 1)
+				let nativeRelative =
+					this.text.nativeOffset(block.start + relative) -
+					this.text.nativeOffset(block.start)
+				range.setStart(node, prefix.length + nativeRelative)
+				range.setEnd(node, prefix.length + nativeRelative + 1)
 				top +=
 					range.getBoundingClientRect().top -
 					this.measure.getBoundingClientRect().top
@@ -908,7 +935,9 @@ export class EditorViewport {
 			this.paint()
 			return
 		}
-		let fragment = this.text.slice(this.window.start, this.window.end)
+		let fragment = this.text
+			.slice(this.window.start, this.window.end)
+			.replace(/\r\n?/g, "\n")
 		this.prefix = this.directionMark(this.window.start)
 		this.window.direction =
 			this.prefix === "\u200f" ? "rtl" : this.prefix ? "ltr" : undefined
@@ -941,13 +970,19 @@ export class EditorViewport {
 			this.selection.start,
 			Math.min(this.text.length, this.selection.end),
 		)
+		this.selection.start = this.text.offsetAtNative(
+			this.text.nativeOffset(this.selection.start),
+		)
+		this.selection.end = this.text.offsetAtNative(
+			this.text.nativeOffset(this.selection.end),
+		)
 		let start = Math.max(
 			0,
-			Math.min(fragment.length, this.selection.start - this.window.start),
+			Math.min(fragment.length, this.nativeOffset(this.selection.start)),
 		)
 		let end = Math.max(
 			0,
-			Math.min(fragment.length, this.selection.end - this.window.start),
+			Math.min(fragment.length, this.nativeOffset(this.selection.end)),
 		)
 		this.paintedSelection = { start, end }
 		if (
@@ -978,16 +1013,50 @@ export class EditorViewport {
 				start === this.paintedSelection.start &&
 				this.selection.start < this.window.start
 					? this.selection.start
-					: this.window.start + start,
+					: this.rawOffset(start),
 			end:
 				!force &&
 				end === this.paintedSelection.end &&
 				this.selection.end > this.window.end
 					? this.selection.end
-					: this.window.start + end,
+					: this.rawOffset(end),
 			direction: this.element.selectionDirection,
 		}
 		this.paintedSelection = { start, end }
+	}
+	private canonicalOffset(offset: number) {
+		return this.text.offsetAtNative(this.text.nativeOffset(offset))
+	}
+	private nativeEdit(edit: Replacement): Replacement {
+		let insert = edit.insert
+		if (
+			insert.endsWith("\r") &&
+			this.text.slice(edit.end, edit.end + 1) === "\n"
+		)
+			insert = insert.replace(/\r+$/, value => "\n".repeat(value.length))
+		let start = edit.start
+		if ((insert + this.text.slice(edit.end, edit.end + 1)).startsWith("\n")) {
+			while (start > 0) {
+				let from = Math.max(0, start - 2048)
+				let before = this.text.slice(from, start)
+				let length = before.match(/\r+$/)?.[0].length ?? 0
+				start -= length
+				if (length < before.length) break
+			}
+		}
+		return start !== edit.start || insert !== edit.insert
+			? { ...edit, start, insert: "\n".repeat(edit.start - start) + insert }
+			: edit
+	}
+	private nativeOffset(offset: number) {
+		return (
+			this.text.nativeOffset(offset) - this.text.nativeOffset(this.window.start)
+		)
+	}
+	private rawOffset(offset: number) {
+		return this.text.offsetAtNative(
+			this.text.nativeOffset(this.window.start) + offset,
+		)
 	}
 	private beforeInput(event: Event) {
 		if (
@@ -1059,10 +1128,14 @@ export class EditorViewport {
 			(!insert && this.selection.start === this.selection.end)
 		)
 			return
-		let edit = { start: this.selection.start, end: this.selection.end, insert }
+		let edit = this.nativeEdit({
+			start: this.selection.start,
+			end: this.selection.end,
+			insert,
+		})
 		this.apply(edit)
 		this.nativeAcknowledgement = true
-		let caret = edit.start + insert.length
+		let caret = edit.start + edit.insert.length
 		this.selection = { start: caret, end: caret }
 		this.pending.push(edit)
 		this.reveal(caret)
@@ -1213,4 +1286,8 @@ export class EditorViewport {
 		this.readSelection()
 		this.replaceSelection(event.clipboardData.getData("text/plain"))
 	}
+}
+
+function measurementText(source: string) {
+	return source.includes("\r") ? source.replace(/\r\n?/g, "\n") : source
 }
