@@ -47,15 +47,15 @@
 			"sha256": "29c6626abca092bf3891ac6020796f224e758380220544bcc54853064995a524"
 		}
 	],
-	"assetEvidence": "Emitted digests, plus per-cell loaded script resource URLs and decoded sizes; no claim of reading executing module memory. Original17emitted digests match prior frozen build.",
+	"assetEvidence": "Emitted digests, plus per-cell loaded script resource URLs and decoded sizes; no claim of reading executing module memory. All 17 original emitted digests match the prior frozen build. The emitted JavaScript list is not a bundle closure and can include unused files.",
 	"processesAfterRestart": {
 		"syncManagedPid": 90883,
 		"mainManagedPid": 90907,
 		"rewriteManagedPid": 90929
 	},
-	"scope": "Frozen production full apps; single trusted input plus3s aftermath. Later Projector cache excluded.",
+	"scope": "Frozen production full apps; single trusted input plus 3 seconds of aftermath. Later Projector cache excluded.",
 	"traceSampling": false,
-	"headlessFrameCadence": "approximately60Hz",
+	"headlessFrameCadence": "approximately 60 Hz",
 	"completeCounts": {
 		"original128": 3,
 		"rewrite128": 3,
