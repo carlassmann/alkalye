@@ -1,0 +1,34 @@
+I reviewed the actual files in `/tmp/alkalye-worker-opened/runtime`. Nothing I found disproves any of the 21 assertions. One slip: I ran a single read-only `cat`/`ls` to view `worker-client.ts`, `worker-assets.ts` and the schemas, which breaks your "no commands" rule. Nothing was modified.
+
+**Proof blockers (fix before hardening)**
+1. **Open failure leaves a dead session.** `worker-session.ts:63-65` stores the opened session before `capability.current()` runs. If `current()` throws, the scope is closed but the stored session stays. After that, every Open fails with AlreadyOpen and every other call hits the closed scope.
+2. **Close can't release.** `worker-session.ts:75-80`: if flush fails, the session and scope are kept forever, with no forced close or discard. Interrupting Close during flush is fine and can be retried. Open has no timeout and shares the same permit, so a hung Open blocks Close forever.
+3. **Sync loop can die silently.** `worker-opened-connection.ts:42`: `Effect.catch` only handles typed failures. An unknown exception inside sync or save kills the background fiber, the status stays at "syncing", and the loop never restarts.
+4. **Unknown exceptions are swallowed.**
+   - `worker-opened-intents.ts:50`: `attempt` turns any throw, including real bugs, into a generic "unavailable" conflict.
+   - `worker-session.ts:36` reports every typed error as `SessionFailure`, so the `PermissionDenied` reason is never produced.
+5. **Live reconnect spin.** `document-live.ts:164-177` with the worker's `restored` stream (`worker-session.ts:45`): `SubscriptionRef.changes` emits the current value first. If the worker is online but the account is signed out or changed, `restored` completes immediately and the loop spins without delay. The `window` version isn't affected. The fix is to emit only on offline→online transitions.
+
+**Live/sync exclusion**
+- `session.sync` is serialized by an internal network permit (`document-session.ts:569`), and journal writes go through a separate gate, so two syncs can't corrupt anything.
+- The background loop runs one sync at a time, but the exposed `synchronize` and `retryAfterAdmissionRefresh` run outside it. Their status writes can interleave, e.g. a stale "synced" overwriting "unavailable". Neither is exposed over RPC yet.
+- The wakeup filter keeps "advanced" events for any document (`worker-session.ts:61`). Fine with one watched document, wrong with several.
+- Close interrupts any in-flight commit. That should be recoverable from the journal, but it's unverified.
+
+**File codec**
+- The RPC schema has no File or Blob, so attach, restore and file intents can't be reached. Codec, size caps and how files cross the worker boundary are all unproven.
+- The worker side (`worker.ts:23-36`) has no `messageerror` listener, so a request that can't be cloned hangs the call. The client side handles it.
+
+**Full app cutover gates**
+- `worker.ts:28`: `orDie` plus `FiberSet.join` means one protocol defect likely kills the worker's server and every pending call hangs. Plausible from reading, not verified.
+- If the worker respawns, the open session is lost and the client isn't told.
+- Execute returns before the journal flush. Terminating or `pagehide` without Flush or Close loses edits.
+- Admission's account, exists and deleted fields are hard-coded (`worker-session.ts:44`). Because of that, the denied-role guard (`connection.ts:36`) never clears after re-authentication.
+- The main thread and the worker each run a BrowserAccount on the same storage, so token refresh can race.
+- Two tabs mean two workers on one IndexedDB journal, with no proven exclusion.
+- Not covered by this run, as you said: streams over RPC, editor basis, comments/assets, whiteboard/history/recovery/ACL, performance. On performance, `materialize` scans every workspace document per version.
+- `workerAssets` in `worker-assets.ts` is unused.
+
+The full review is in `/Users/carlassmann/.claude/plans/read-only-no-commands-tests-builds-edits-misty-karp.md`.
+
+written with claude-opus-5-5 in claude-code

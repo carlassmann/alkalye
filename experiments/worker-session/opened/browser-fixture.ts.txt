@@ -1,0 +1,80 @@
+import * as Effect from "effect/Effect"
+import * as Deferred from "effect/Deferred"
+import * as Schedule from "effect/Schedule"
+import * as Exit from "effect/Exit"
+import * as Fiber from "effect/Fiber"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import { bootstrapBrowserAccount } from "./tests/browser-account-fixture"
+import { createWorkerSessionClient } from "./worker-client"
+
+declare global { interface Window { openedProof?: { stage: string; assertions: string[]; failure?: string; finish(): Promise<void>; live(): Promise<{ connected: boolean; transport: string; opened: boolean }> } } }
+let assertions: string[] = []
+function assert(value: unknown, label: string) { if (!value) throw Error(label); assertions.push(label) }
+let source = "---\ntitle: Worker fixture\n---\n# Hello\nUnicode 🦊 café remains exact.\n"
+let program = Effect.scoped(Effect.gen(function* () {
+ let account = yield* bootstrapBrowserAccount(assert)
+ let document = "opened-" + crypto.randomUUID()
+ yield* Effect.promise(async () => {
+  let response = await fetch("/__tests/seed", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ subject: account.subject, document, source }) })
+  assert(response.ok, "real HTTP owner fixture seeded")
+ })
+ let worker = yield* createWorkerSessionClient(new URL("/worker.js", location.href).href)
+ let input = { document, workspace: "personal-" + account.subject, subject: account.subject, origin: location.origin, online: true }
+ yield* worker.Open(input)
+ let opened = yield* worker.Read().pipe(Effect.flatMap(value => value.projection ? Effect.succeed(value) : Effect.fail("DocumentNotReady")), Effect.retry(Schedule.spaced("20 millis")), Effect.timeout("10 seconds"))
+ assert(opened.projection?.document.content === source, "worker-owned real session loads exact Unicode source")
+ assert(opened.projection?.metadata.title === "Worker fixture", "explicit metadata DTO reflects frontmatter")
+ assert(!("atoms" in opened) && !JSON.stringify(opened).includes('"checkpoint"'), "automatic snapshot has no atom graph or checkpoint")
+ let duplicateOpen = yield* worker.Open(input).pipe(Effect.exit)
+ assert(Exit.isFailure(duplicateOpen), "second Open refused")
+ let update = yield* worker.PropertiesUpdate({ patch: { title: "Updated title", pinned: true } })
+ let first = yield* worker.Execute(update)
+ let second = yield* worker.Execute(update)
+ assert(first.action === second.action, "same prepared properties effect retains action identity")
+ yield* worker.Release(update)
+ let current = yield* worker.Read()
+ assert(current.projection?.metadata.title === "Updated title" && current.projection.metadata.pinned, "named properties intent updates readonly DTO")
+ assert(current.projection?.document.content.endsWith("# Hello\nUnicode 🦊 café remains exact.\n") ?? false, "properties preserve exact body")
+ let guarded = yield* worker.PropertiesUpdate({ patch: { title: "Denied title" } })
+ yield* worker.Admission({ writable: false, online: true })
+ let refused = yield* worker.Execute(guarded).pipe(Effect.exit)
+ assert(Exit.isFailure(refused), "prepared metadata command rechecks admission before execution")
+ assert((yield* worker.Read()).projection?.metadata.title === "Updated title", "refused properties preserve title")
+ yield* worker.Release(guarded)
+ yield* worker.Admission({ writable: true, online: true })
+ let presentation = yield* worker.Presentation({ enabled: true })
+ yield* worker.Execute(presentation)
+ yield* worker.Release(presentation)
+ assert((yield* worker.Read()).projection?.document.kind === "slides", "named presentation intent uses existing frontmatter service")
+ let settled = yield* worker.Read()
+ let exact = settled.projection?.document.content
+ assert(typeof exact === "string", "authoritative source remains available")
+ let done = yield* Deferred.make<void>()
+ window.openedProof = {
+  stage: "await-live", assertions,
+  live: () => Effect.runPromise(worker.LiveStatus()),
+  finish: () => Effect.runPromise(Effect.gen(function* () {
+   yield* worker.Admission({ writable: true, online: false })
+   yield* Effect.promise(() => fetch("/__tests/network?blocked=1"))
+   let offline = yield* worker.PropertiesUpdate({ patch: { archived: true } })
+   yield* worker.Execute(offline)
+   yield* worker.Release(offline)
+   yield* worker.Flush()
+   let saved = yield* worker.Read()
+   assert(saved.projection?.metadata.archived ?? false, "offline named properties edit is visible")
+   assert(saved.status.unsaved === 0, "offline command durably flushed")
+   let offlineSource = saved.projection?.document.content
+   yield* worker.Close()
+   assert(Exit.isFailure(yield* worker.Read().pipe(Effect.exit)), "closed authority rejects reads")
+   let reopened = yield* worker.Open({ ...input, online: false })
+   assert(reopened.projection?.document.content === offlineSource, "fresh worker-owned scope reopens exact offline journal source")
+   assert(reopened.projection?.metadata.archived ?? false, "offline metadata survives scope reopen")
+   yield* worker.Close()
+   yield* Deferred.succeed(done, undefined)
+   if (window.openedProof) window.openedProof.stage = "passed"
+  })),
+ }
+ yield* Deferred.await(done)
+})).pipe(Effect.provide(FetchHttpClient.layer), Effect.catchCause(cause => Effect.sync(() => { window.openedProof = { stage: "failed", assertions, failure: String(cause), finish: async () => {}, live: async () => ({ connected: false, transport: "none", opened: false }) } })))
+let lifetime = Effect.runFork(program)
+window.addEventListener("pagehide", () => { Effect.runFork(Fiber.interrupt(lifetime)) }, { once: true })

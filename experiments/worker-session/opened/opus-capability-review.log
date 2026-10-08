@@ -1,0 +1,56 @@
+**Not ready.** I only read files. Nothing was run, built or edited.
+
+One thing to know first: production has no worker-side DocumentSession, command queue or editor branch. `src/client/document-worker.ts` only computes stats. The "existing" pieces the draft relies on are in `experiments/worker-session/assets/worker-session.ts.txt`: the queue is the `commands` Semaphore(1) at :34 run through `execute`, and the editor branch is `basis`/`Begin` at :53/:200. So the draft is wired to that experiment, not to production.
+
+## Blockers
+
+1. **The API is incomplete and doesn't match its own contract.** There are no `Rpc.make` schemas for anything.
+   - Names differ between `opened-document-contract.ts` and the intents file: `prepareUpdate` vs `update`, `prepareReply`/`prepareResolution`/`prepareDelete`/`prepareEnabled` vs `reply`/`resolve`/`delete`/`setEnabled`, `assets.prepare` vs `attachFiles`, and `record` vs `readRecord`.
+   - `assets.execute` doesn't exist.
+   - `discussion.capture` returns `{token, quote}` but the contract says `DocumentToken`.
+   - Presence is in the contract but nothing implements it.
+   - There's no `close`, no `retry`, and no media, file or localMedia.
+   - No schemas exist for `DocumentRange`, `File`, receipts or errors.
+
+2. **The queue can be held during network work.** `capabilities.ts:103-105` exposes raw `session.sync`. Run inside `execute`, it holds the command queue for the whole network call, which the README already notes. It also skips the connection state, so a manual sync that succeeds leaves the status at "failed".
+   - Fix: `synchronize: connection.synchronize`, triggered as a wakeup outside `execute`.
+   - `intents.ts:159` `assets.file` is a read that may download blobs, but it sits under the queue. Move it to the observation side.
+   - `changes` and `presence.changes` must be served by handlers that never go through `execute`. Nothing enforces that today.
+
+3. **Raw services leak.** `capabilities.ts:100-102` returns the raw `properties`, `discussion` and `assets` services, which lets callers skip the token/intent path. Fix: build the intents inside capabilities and return only those.
+
+4. **The branch-basis check is unspecified.** `intents.ts:30` `basis(range)` must return undefined unless both epoch and sequence match exactly. It must never fall back to `session.replica`, which is the main state.
+   - Add `Number.isSafeInteger` checks at `intents.ts:53`.
+   - `editor.ranges` (thread ranges) is never computed. It needs `commentRanges` over the branch replica, memoized by epoch, sequence and version.
+
+5. **Intents that change text don't update the branch.** These are properties update/presentation, `setEnabled`, and asset attach/insert/delete. The receipt carries only the action id, so the main thread can't tell it should run MergeCandidate/Adopt (the experiment's step to pull session changes into the editor branch). Fix: mark text-changing receipts, or always run MergeCandidate after a receipt.
+
+6. **Error masking.** `intents.ts:47` turns every unknown throw into a `DocumentConflict` "unavailable". Real bugs then show up to users as conflicts. Fix: keep `DocumentConflict` and `PermissionDenied` as failures and let everything else die.
+
+7. **Admission and retry.**
+   - Nothing feeds the `admission` SubscriptionRef: role, deleted, account, online and focus are never pushed from the main thread.
+   - `connection.ts:68` `retryAfterAdmissionRefresh` doesn't refresh anything. Production retry is `refresh` and then `synchronize(true)` (`browser-library.ts:573`).
+   - The focus wakeup (`browser-library.ts:515`) was dropped.
+   - The `changes` merge at `capabilities.ts:91-96` doesn't include admission, so `canWrite` only updates as a side effect of a connection state change. Merge it explicitly.
+
+8. **Close and ownership.** `Layer.build` in capabilities and `forkScoped` in the connection use whatever Scope is ambient. They must run in the per-open scope (`worker-session.ts.txt:97`), or Close won't release them. The worker must still reject a second Open (AlreadyOpen).
+
+## Correctness gaps
+
+- **Projection can go missing.** `capabilities.ts:51` calls `documents(options.workspace, true)`. If the document's room isn't that workspace, the projection is silently undefined. Find the document by id instead.
+- **Strict schemas can stop the stream.** A record with an id that doesn't match `IdentifierSchema` (pattern `[\w:.-]{1,200}`), or an unknown `kind`, fails encoding. That ends the whole observation stream. Unconfirmed: I didn't check whether ingestion already validates these. If not, loosen the read-side schemas rather than adding limits.
+- **Two full copies of the document per snapshot.** It's in `projection.document.content` and in `editor.basis.source`, so every keystroke sends and deep-compares both. This isn't a size cap, which is fine. Drop `content`.
+- **`commentsDisabled` check.** `intents.ts:115` checks it against the main replica, outside the session gate. Capture and reply don't check it at all.
+- **Local-folder documents aren't handled.** Production passes `canWrite: () => false` to discussion for them (`browser-library.ts:410`). The worker should refuse local-folder documents or do the same.
+- **Count cap.** The cap of 8 at `intents.ts:44` limits how many tokens are open, not size, and it fails loudly. Tokens stay in the map after a successful execute. That's fine because re-running returns the same memoized action, but the main thread must release them.
+- **Small differences from production.** `connection.ts:47` uses `error.message` where production uses `message(error)`, and connection states aren't frozen.
+
+## What's fine
+
+- **DocumentLive change.** The diff is minimal and lazy, and `layer` behaves as before. Two caveats: in a worker you'd pass `self` events, and BrowserAccount working in a worker is unproven. The draft also uses spaces instead of tabs, so the format check will fail.
+- **Size limits.** None are added to documents, comments or files.
+- **Retries.** Retrying `commands.execute` and comment submit is idempotent, using the production `propose` and composer memoization. There's no invented action cache and no validation bypass.
+
+The review summary is saved at `/Users/carlassmann/.claude/plans/read-only-review-no-commands-tests-build-mellow-sundae.md`.
+
+written with claude-opus-5-5 in claude-code

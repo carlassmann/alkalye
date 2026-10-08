@@ -1,0 +1,6 @@
+../../../../../../tmp/alkalye-worker-opened/runtime/src/server/settings.ts(8,23): error TS2307: Cannot find module '../../build' or its corresponding type declarations.
+../../../../../../tmp/alkalye-worker-opened/runtime/tests/browser-preview-fixture.ts(10,36): error TS2307: Cannot find module '../experiments/performance/fixture' or its corresponding type declarations.
+../../../../../../tmp/alkalye-worker-opened/runtime/tests/causal-text.test.ts(13,28): error TS2307: Cannot find module '../experiments/causal-text-undo/document' or its corresponding type declarations.
+../../../../../../tmp/alkalye-worker-opened/runtime/tests/document-live-poll.test.ts(13,36): error TS2307: Cannot find module '../experiments/performance/fixture' or its corresponding type declarations.
+../../../../../../tmp/alkalye-worker-opened/runtime/tests/e2e.ts(4,23): error TS2307: Cannot find module '../build' or its corresponding type declarations.
+../../../../../../tmp/alkalye-worker-opened/runtime/tests/tldraw-build.test.ts(6,23): error TS2307: Cannot find module '../build' or its corresponding type declarations.

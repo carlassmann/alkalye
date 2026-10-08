@@ -1,0 +1,58 @@
+{
+	"status": "passed",
+	"assertions": 21,
+	"source": "outside real worker-opened bundle experiment",
+	"productionAdopted": false,
+	"types": "passed",
+	"underlyingSource": "current copied core after production DocumentProperties; SHA256 pins actual source, not an inferred git commit",
+	"limits": [
+		"Three assertions are BrowserAccount bootstrap; remaining eighteen test bounded bundle behavior.",
+		"Admission revocation is a worker-local UI admission hint, not authoritative server ACL revocation.",
+		"Main fixture has no DocumentSession or Replica; server fixture provisioning uses a server Replica.",
+		"Read readiness waits actual projection. No streaming Observe RPC or concurrent edit/read command flow tested.",
+		"The real DocumentLive uses HTTP polling because fixture proxy cannot upgrade WebSocket.",
+		"Scope Close/reopen verified; server watch cleanup under offline network not separately measured.",
+		"No editor basis, automatic adoption, comments/assets/whiteboard/history/recovery parity or app mount tested in this run.",
+		"File methods are drafted but absent from this RPCGroup. Earlier separate File codec proof uses JSON/base64, not zero-copy Blob; no file transport claim here.",
+		"DocumentLifecycle protects with a no-op fixture layer; actual activity/draft protection not integrated here.",
+		"Known source review gaps remain; not production replacement-ready."
+	],
+	"failedFixtures": [
+		{
+			"stage": "initial source gate",
+			"assertions": 4,
+			"reason": "Open precedes async sync, and seed newDocument replaces mismatching provided title. Added observable readiness and matched fixture title."
+		},
+		{
+			"stage": "initial source gate after readiness correction",
+			"assertions": 4,
+			"reason": "Seed title mismatch remained; no product failure."
+		}
+	],
+	"sha256": {
+		"worker-session.ts": "eae15ccfdf8eb3d3aa545d4d9ff5656f0755db51f7ad859034e19021baa817f4",
+		"worker-opened-capabilities.ts": "409b98d3cb1040682d07f4d3ec0901252bedf910502091672fd98a3557b530c2",
+		"worker-opened-intents.ts": "560fe359a856c583f3fc4e245b16591c832790a39cdaf232f7922f0666197544",
+		"worker-opened-connection.ts": "37868cad0a883eda39984e2c2febd430078281f20f9c83cfe4e32a1eb9afea20",
+		"worker-opened-schemas.ts": "0ed9f304266a714bbe2c147d2f9586c932573f515058a0066586899979d1cd94",
+		"worker-rpc.ts": "0da579f6ca0b85d57f36adc47fb7b05e40ab00fc03e7423013fcf7adb0b7f80e",
+		"worker-client.ts": "9be91716eff0370ebcacae8dda12f61110b7684f1107ace83b945aff3a4c71e4",
+		"worker.ts": "cfcd9f3ae3d67d0629f8728f08cfc02dc035b2929b125b37f21645d4ec278eb9",
+		"browser-fixture.ts": "2477b89f813d7ea08bff6d6ac5a31d10c8436b4f8b17f207ae993ee35c7893bd",
+		"server.ts": "8e4624605f0a7607aede9787fc422989012ef7a793426b8b17903992f49d47f5",
+		"seed.ts": "7f8cbff587a084d6cd6c9acb534e8fa0ef3fb665a8062be819dd3443bfff9a2f",
+		"src/client/document-live.ts": "080cb4db8cbd9a5ee6c0637a85bc15e27bcb48820a242520cdf5fd6a7d2049be",
+		"src/client/document-properties.ts": "a9f85a8f8bd706c3807f67e55245a96e2b0d00585340ae5bf1494559eaaa65e7",
+		"src/shared/crdt.ts": "79218941aa7ab7d664b7eff1fe7249f0193548216284d7465aaf421c2a9d348a",
+		"src/shared/document-session.ts": "34f674a9da19cd36d6c97796053dca56ab3f36c741f92067c27fbcb918b7b098",
+		"assets/worker.js": "3618e86c9cf81df91a7c2a685b2d471253c45726d2819511beabf635e8f638f6",
+		"assets/browser-fixture.js": "430e7a43c9a5fff22311b58b37de88bda0aa5c45ea7ac21e0216b01ddaf65c6a"
+	},
+	"review": "Terminal Opus runtime review found no contradiction of 21 assertions, but untested ownership/lifecycle/error hardening gaps remain. Separate next/ source fixes not executed.",
+	"referenceCommitAtPackaging": "bf517046a7ea87ee823f786fbf42fef9b98e4334",
+	"copiedCoreMatchesPackagingWorkspace": {
+		"src/client/document-properties.ts": true,
+		"src/shared/crdt.ts": true,
+		"src/shared/document-session.ts": true
+	}
+}

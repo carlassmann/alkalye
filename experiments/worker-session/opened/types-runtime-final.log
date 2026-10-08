@@ -1,0 +1,3 @@
+../../../../../../tmp/alkalye-worker-opened/runtime/browser-fixture.ts(13,47): error TS2345: Argument of type '(value: boolean, label: string) => void' is not assignable to parameter of type 'Check'.
+  Types of parameters 'value' and 'value' are incompatible.
+    Type 'unknown' is not assignable to type 'boolean'.

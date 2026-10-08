@@ -1,0 +1,2 @@
+../../../../../../tmp/alkalye-worker-opened/runtime/worker-session.ts(45,105): error TS2339: Property 'asVoid' does not exist on type 'typeof import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Stream")'.
+../../../../../../tmp/alkalye-worker-opened/runtime/worker-session.ts(72,140): error TS2322: Type 'string' is not assignable to type '"reader" | "writer" | "owner" | undefined'.

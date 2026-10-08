@@ -1,0 +1,35 @@
+import type * as Effect from "effect/Effect"
+import type * as Stream from "effect/Stream"
+import type { LocalFileState, LocalFileSync } from "./src/client/local-file-sync"
+import type { OpenedDocumentCapability, DocumentToken } from "./opened-document-contract"
+
+export interface OpenedLocalFile<Failure> {
+ current(): LocalFileState
+ changes: Stream.Stream<LocalFileState, Failure>
+ reconcile: Effect.Effect<void, Failure>
+ resolve(choice: "editor" | "disk"): Effect.Effect<void, Failure>
+ restoreRecovery: Effect.Effect<void, Failure>
+}
+export interface OpenedLocalDocument<Failure> extends OpenedDocumentCapability<Failure> {
+ readonly kind: "local"
+ readonly localFile: OpenedLocalFile<Failure>
+ readonly relativeAssets: {
+  prepareLink(files: readonly { source: string; name: string }[], selection: string): Effect.Effect<DocumentToken, Failure>
+  read(source: string): Effect.Effect<File | undefined, Failure>
+ }
+}
+export interface OpenedSharedDocument<Failure> extends OpenedDocumentCapability<Failure> {
+ readonly kind: "shared"
+}
+export type OpenedDocument<Failure> = OpenedLocalDocument<Failure> | OpenedSharedDocument<Failure>
+
+// Local file synchronization keeps its existing session; this port adds no authority.
+export function localFileCapability(sync: LocalFileSync) {
+ return Object.freeze({
+  current: sync.current,
+  changes: sync.changes,
+  reconcile: sync.reconcile,
+  resolve: sync.resolve,
+  restoreRecovery: sync.restoreRecovery,
+ })
+}

@@ -1,0 +1,82 @@
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
+import * as Layer from "effect/Layer"
+import * as Scope from "effect/Scope"
+import * as Semaphore from "effect/Semaphore"
+import * as Stream from "effect/Stream"
+import * as SubscriptionRef from "effect/SubscriptionRef"
+import { indexedDbJournalLayer } from "./src/platform/indexeddb-journal"
+import { DocumentLifecycle } from "./src/platform/document-lifecycle"
+import { DocumentSession, documentDatabaseName } from "./src/shared/document-session"
+import { makeDocumentTransport } from "./src/shared/document-transport"
+import { documentFailureCategory } from "./src/shared/document-observability"
+import { BrowserAccount } from "./src/client/browser-account"
+import { DocumentLive } from "./src/client/document-live"
+import { workerBlobServices } from "./worker-assets"
+import { makeWorkerOpenedCapabilities } from "./worker-opened-capabilities"
+import { makeWorkerOpenedConnection } from "./worker-opened-connection"
+import type { WorkerDocumentAdmission } from "./worker-opened-connection"
+import { WorkerDocumentFailure, WorkerDocumentRpc } from "./worker-rpc"
+
+let workerLifecycle = Layer.succeed(DocumentLifecycle, {
+ changes: Stream.never,
+ hidden: Stream.never,
+ protect: () => Effect.succeed({ update() {} }),
+})
+type Capability = Effect.Success<ReturnType<typeof makeWorkerOpenedCapabilities>>
+type Opened = { scope: Scope.Closeable; capability: Capability; admission: SubscriptionRef.SubscriptionRef<WorkerDocumentAdmission>; live: Context.Service.Shape<typeof DocumentLive> }
+export let workerSessionHandlers = WorkerDocumentRpc.toLayer(Effect.gen(function* () {
+ let owner = yield* Scope.Scope
+ let commands = yield* Semaphore.make(1)
+ let opened: Opened | undefined
+ function failure(reason: WorkerDocumentFailure["reason"]) { return new WorkerDocumentFailure({ reason, category: "conflict" }) }
+ function requireOpen() { return Effect.suspend(() => opened ? Effect.succeed(opened) : Effect.fail(failure("Closed"))) }
+ function execute<A, E, R>(work: Effect.Effect<A, E, R>) {
+  return commands.withPermit(work).pipe(Effect.mapError(error => error instanceof WorkerDocumentFailure ? error : new WorkerDocumentFailure({ reason: "SessionFailure", category: documentFailureCategory(error) })))
+ }
+ return WorkerDocumentRpc.of({
+  Open: input => execute(Effect.uninterruptibleMask(restore => Effect.gen(function* () {
+   if (opened) return yield* Effect.fail(failure("AlreadyOpen"))
+   let scope = yield* Scope.fork(owner)
+   return yield* restore(Effect.gen(function* () {
+    let { account, blobs } = yield* workerBlobServices(input.document, input.subject, input.origin, scope)
+    let admission = yield* SubscriptionRef.make<WorkerDocumentAdmission>({ exists: true, deleted: false, role: "writer", account: "ready", online: input.online })
+    let restored = SubscriptionRef.changes(admission).pipe(Stream.filter(value => value.online), Stream.map(() => undefined))
+    let liveContext = yield* Layer.buildWithScope(DocumentLive.layerWithConnectivity({ online: () => SubscriptionRef.getUnsafe(admission).online, restored }).pipe(Layer.provide(Layer.succeed(BrowserAccount, account))), scope)
+    let live = Context.get(liveContext, DocumentLive)
+    let transport = yield* makeDocumentTransport(input.origin, input.subject)
+    let options = { document: input.document, subject: input.subject, transport: {
+     ...transport,
+     snapshot: (document: string) => account.request(transport.snapshot(document)),
+     action: (...arguments_: Parameters<typeof transport.action>) => account.request(transport.action(...arguments_)),
+     chain: (...arguments_: Parameters<typeof transport.chain>) => account.request(transport.chain(...arguments_)),
+     history: (...arguments_: Parameters<typeof transport.history>) => account.request(transport.history(...arguments_)),
+     withdraw: (...arguments_: Parameters<typeof transport.withdraw>) => account.request(transport.withdraw(...arguments_)),
+     create: (...arguments_: Parameters<typeof transport.create>) => account.request(transport.create(...arguments_)),
+     commit: (action: Parameters<typeof transport.commit>[0]) => blobs.upload(action).pipe(Effect.andThen(account.request(transport.commit(action)))),
+    } }
+    let sessionContext = yield* Layer.buildWithScope(DocumentSession.layer(options).pipe(Layer.provide(indexedDbJournalLayer(documentDatabaseName(options))), Layer.provide(workerLifecycle)), scope)
+    let session = Context.get(sessionContext, DocumentSession)
+    let connection = yield* makeWorkerOpenedConnection({ session, admission, wakeups: live.changes.pipe(Stream.filter(event => event.type === "advanced")), observe: transport.observe }).pipe(Scope.provide(scope))
+    let capability = yield* makeWorkerOpenedCapabilities({ document: input.document, workspace: input.workspace, author: session.replica.author, session, blobs, connection, live, canWrite: connection.canWrite, basis: () => undefined, editor: { current: () => undefined, changes: Stream.never } }).pipe(Scope.provide(scope))
+    opened = { scope, capability, admission, live }
+    return capability.current()
+   })).pipe(Effect.onExit(exit => Exit.isSuccess(exit) ? Effect.void : Scope.close(scope, exit)))
+  }))),
+  Read: () => execute(requireOpen().pipe(Effect.map(current => current.capability.current()))),
+  PropertiesUpdate: input => execute(requireOpen().pipe(Effect.flatMap(current => current.capability.properties.update(input.patch)))),
+  Presentation: input => execute(requireOpen().pipe(Effect.flatMap(current => current.capability.properties.presentation(input.enabled)))),
+  Execute: input => execute(requireOpen().pipe(Effect.flatMap(current => current.capability.commands.execute(input.token)))),
+  Release: input => execute(requireOpen().pipe(Effect.flatMap(current => current.capability.commands.release(input.token)))),
+  Admission: input => execute(requireOpen().pipe(Effect.flatMap(current => SubscriptionRef.update(current.admission, (value): WorkerDocumentAdmission => ({ ...value, role: input.writable ? "writer" : "reader", online: input.online }))))),
+  Flush: () => execute(requireOpen().pipe(Effect.flatMap(current => current.capability.flush))),
+  LiveStatus: () => execute(requireOpen().pipe(Effect.map(current => ({ connected: current.live.connected(), transport: current.live.transport(), opened: true })))),
+  Close: () => execute(Effect.uninterruptibleMask(restore => Effect.gen(function* () {
+   let current = yield* requireOpen()
+   yield* restore(current.capability.flush)
+   opened = undefined
+   yield* Scope.close(current.scope, Exit.void)
+  }))),
+ })
+}))

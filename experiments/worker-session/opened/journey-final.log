@@ -1,0 +1,26 @@
+{
+  "assertions": [
+    "simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections",
+    "browser identity is available before any network authentication",
+    "native browser account login serializes cookie issuance and agrees with server verification",
+    "real HTTP owner fixture seeded",
+    "worker-owned real session loads exact Unicode source",
+    "explicit metadata DTO reflects frontmatter",
+    "automatic snapshot has no atom graph or checkpoint",
+    "second Open refused",
+    "same prepared properties effect retains action identity",
+    "named properties intent updates readonly DTO",
+    "properties preserve exact body",
+    "prepared metadata command rechecks admission before execution",
+    "refused properties preserve title",
+    "named presentation intent uses existing frontmatter service",
+    "authoritative source remains available",
+    "real DocumentLive connects through HTTP long polling in worker",
+    "offline named properties edit is visible",
+    "offline command durably flushed",
+    "closed authority rejects reads",
+    "fresh worker-owned scope reopens exact offline journal source",
+    "offline metadata survives scope reopen"
+  ],
+  "stage": "passed"
+}
