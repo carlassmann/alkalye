@@ -1,0 +1,43 @@
+{
+	"scope": "CrRendererMain only; interaction:start through interaction:end, clipped GC interval union; entire enclosing task durations for intersecting RunTasks",
+	"windowMs": 3001.074,
+	"readinessMs": 499.374,
+	"maximumEnclosingTaskMs": 18.28,
+	"mainGcUnionMs": 20.543,
+	"runTaskCount": 1252,
+	"largestTasks": [
+		{
+			"durationMs": 18.28,
+			"startRelativeMs": 466.556
+		},
+		{
+			"durationMs": 4.482,
+			"startRelativeMs": 485.142
+		},
+		{
+			"durationMs": 3.748,
+			"startRelativeMs": 336.762
+		},
+		{
+			"durationMs": 3.405,
+			"startRelativeMs": 2498.424
+		},
+		{
+			"durationMs": 3.195,
+			"startRelativeMs": 998.792
+		},
+		{
+			"durationMs": 3.148,
+			"startRelativeMs": 394.104
+		},
+		{
+			"durationMs": 3.122,
+			"startRelativeMs": 432.642
+		},
+		{
+			"durationMs": 2.442,
+			"startRelativeMs": 1015.149
+		}
+	],
+	"initialUnscopedSummary": "Prior trace-summary.json spans all threads/entire retained trace; not used as main/window timing."
+}

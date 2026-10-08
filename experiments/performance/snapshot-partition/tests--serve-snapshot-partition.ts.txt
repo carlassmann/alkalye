@@ -1,0 +1,19 @@
+import * as Effect from "effect/Effect"
+import { startServer } from "../src/server/index"
+
+let assets = process.argv[2]
+let data = process.argv[3]
+if (!assets || !data)
+	throw Error(
+		"Usage: bun experiments/performance/serve-rewrite.ts INSTRUMENTED_ASSETS EMPTY_DATA_DIRECTORY [PORT]",
+	)
+await Effect.runPromise(
+	startServer({
+		assets,
+		data,
+		port: Number(process.argv[4] ?? 4311),
+		hostname: "127.0.0.1",
+		build: false,
+		development: false,
+	}),
+)

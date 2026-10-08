@@ -1,0 +1,296 @@
+[
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "1",
+		"phase": "auth-before-gate",
+		"startedMs": 799.276583,
+		"endedMs": 799.415583,
+		"durationMs": 0.1390840000000253
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "1",
+		"phase": "notice-before-gate",
+		"startedMs": 799.453,
+		"endedMs": 799.541125,
+		"durationMs": 0.08816699999999855
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "1",
+		"phase": "session-and-gate-admission",
+		"durationMs": 0.424666000000002
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "1",
+		"phase": "auth-inside-gate",
+		"startedMs": 800.074542,
+		"endedMs": 800.121958,
+		"durationMs": 0.047458000000005995
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "1",
+		"phase": "notice-inside-gate",
+		"startedMs": 800.129625,
+		"endedMs": 800.141875,
+		"durationMs": 0.012249999999994543
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "1",
+		"phase": "read-checkpoint",
+		"startedMs": 800.373083,
+		"endedMs": 800.683125,
+		"durationMs": 0.3101250000000846
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "1",
+		"phase": "restore-checkpoint",
+		"startedMs": 800.720417,
+		"endedMs": 804.502917,
+		"durationMs": 3.782583000000045
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "1",
+		"phase": "read-tail",
+		"startedMs": 804.543375,
+		"endedMs": 806.027208,
+		"durationMs": 1.4838750000000118
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "1",
+		"phase": "decode-apply-tail",
+		"rows": 3,
+		"durationMs": 5.911458000000039
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "1",
+		"phase": "refresh",
+		"startedMs": 800.174708,
+		"endedMs": 811.9935,
+		"durationMs": 11.81879200000003
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "1",
+		"phase": "serialize-compact-snapshot",
+		"startedMs": 812.041125,
+		"endedMs": 813.429458,
+		"durationMs": 1.3883749999999964
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "http",
+		"phase": "router-through-response-encode",
+		"startedMs": 798.182667,
+		"endedMs": 813.600458,
+		"durationMs": 15.417874999999981
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "2",
+		"phase": "auth-before-gate",
+		"startedMs": 985.22625,
+		"endedMs": 985.294375,
+		"durationMs": 0.06816699999990306
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "2",
+		"phase": "notice-before-gate",
+		"startedMs": 985.3375,
+		"endedMs": 985.357458,
+		"durationMs": 0.019957999999974163
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "2",
+		"phase": "session-and-gate-admission",
+		"durationMs": 0.014542000000005828
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "2",
+		"phase": "auth-inside-gate",
+		"startedMs": 985.414875,
+		"endedMs": 985.440625,
+		"durationMs": 0.025749999999902684
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "2",
+		"phase": "notice-inside-gate",
+		"startedMs": 985.450542,
+		"endedMs": 985.460083,
+		"durationMs": 0.0095410000000129
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "2",
+		"phase": "refresh",
+		"startedMs": 985.46675,
+		"endedMs": 985.469292,
+		"durationMs": 0.0025829999999587017
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "2",
+		"phase": "serialize-compact-snapshot",
+		"startedMs": 985.482167,
+		"endedMs": 985.491917,
+		"durationMs": 0.009790999999950145
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "3",
+		"phase": "auth-before-gate",
+		"startedMs": 1408.784125,
+		"endedMs": 1408.878792,
+		"durationMs": 0.09470800000008239
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "3",
+		"phase": "notice-before-gate",
+		"startedMs": 1408.901375,
+		"endedMs": 1408.92125,
+		"durationMs": 0.019917000000077678
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "3",
+		"phase": "session-and-gate-admission",
+		"durationMs": 0.06087499999989632
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "3",
+		"phase": "auth-inside-gate",
+		"startedMs": 1409.0155,
+		"endedMs": 1409.040708,
+		"durationMs": 0.025249999999914507
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "3",
+		"phase": "notice-inside-gate",
+		"startedMs": 1409.046708,
+		"endedMs": 1409.072292,
+		"durationMs": 0.025624999999990905
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "3",
+		"phase": "read-checkpoint",
+		"startedMs": 1409.083875,
+		"endedMs": 1422.587167,
+		"durationMs": 13.503332999999884
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "3",
+		"phase": "restore-checkpoint",
+		"startedMs": 1422.635833,
+		"endedMs": 1633.045167,
+		"durationMs": 210.40941699999985
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "3",
+		"phase": "read-tail",
+		"startedMs": 1633.128583,
+		"endedMs": 1633.330917,
+		"durationMs": 0.20237500000007458
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "3",
+		"phase": "decode-apply-tail",
+		"rows": 0,
+		"durationMs": 0.000875000000178261
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "3",
+		"phase": "refresh",
+		"startedMs": 1409.078625,
+		"endedMs": 1633.383125,
+		"durationMs": 224.30454199999986
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "3",
+		"phase": "serialize-compact-snapshot",
+		"startedMs": 1633.437125,
+		"endedMs": 1661.692,
+		"durationMs": 28.254957999999988
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "http",
+		"phase": "router-through-response-encode",
+		"startedMs": 1408.325583,
+		"endedMs": 1661.959625,
+		"durationMs": 253.63408400000003
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "4",
+		"phase": "auth-before-gate",
+		"startedMs": 4801.331625,
+		"endedMs": 4801.3875,
+		"durationMs": 0.055957999999918684
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "4",
+		"phase": "notice-before-gate",
+		"startedMs": 4801.42275,
+		"endedMs": 4801.449292,
+		"durationMs": 0.026582999999845924
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "4",
+		"phase": "session-and-gate-admission",
+		"durationMs": 0.014040999999451742
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "4",
+		"phase": "auth-inside-gate",
+		"startedMs": 4801.491333,
+		"endedMs": 4801.511792,
+		"durationMs": 0.020499999999628926
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "4",
+		"phase": "notice-inside-gate",
+		"startedMs": 4801.517667,
+		"endedMs": 4801.527208,
+		"durationMs": 0.00954100000035396
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "4",
+		"phase": "refresh",
+		"startedMs": 4801.532625,
+		"endedMs": 4801.534333,
+		"durationMs": 0.001750000000356522
+	},
+	{
+		"diagnostic": "snapshot-partition",
+		"request": "4",
+		"phase": "serialize-compact-snapshot",
+		"startedMs": 4801.543167,
+		"endedMs": 4801.552167,
+		"durationMs": 0.009000000000014552
+	}
+]

@@ -1,0 +1,23 @@
+import * as Effect from "effect/Effect"
+
+export function serverPhase(name: string, request?: string) {
+	return function <A, E, R>(work: Effect.Effect<A, E, R>) {
+		if (request === undefined) return work
+		return Effect.suspend(() => {
+			let started = performance.now()
+			return work.pipe(Effect.onExit(() => Effect.sync(() => {
+				console.log(JSON.stringify({ diagnostic: "snapshot-partition", request, phase: name, startedMs: started, endedMs: performance.now(), durationMs: performance.now() - started }))
+			})))
+		})
+	}
+}
+export function clientPhase(name: string) {
+	return function <A, E, R>(work: Effect.Effect<A, E, R>) {
+		return Effect.suspend(() => {
+			let started = performance.now()
+			return work.pipe(Effect.onExit(() => Effect.sync(() => {
+				performance.measure("snapshot-partition:" + name, { start: started, end: performance.now() })
+			})))
+		})
+	}
+}

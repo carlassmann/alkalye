@@ -1,0 +1,20 @@
+{
+	"src/shared/open-phase.ts": "3cfce5eabb731500ae5c6dac02f71e1941782f649c2e287ef191a151f61d5e65",
+	"src/server/document-store.ts": "01f0a2cbb8b5e284dcbaf38180a60be2610e47707e7c7f73b03008679ba486e8",
+	"src/server/account-api.ts": "09d30d194a4e1cfd57c87c5090b48ae6252c3d9601fd0bd7616732a30a2a2c55",
+	"src/shared/document-transport.ts": "8546dcbf05b3af2c547bd456c7ee099bbb34642cec1c2a5f230fd170a765d3ef",
+	"tests/serve-snapshot-partition.ts": "eee31883635929928dfec0c24362e54e34edfd0d9b2fa7a9d899880ec3a34c0b",
+	"experiments/performance/interaction-matrix/runner.ts": "3d11096a62f5bdaae0f31ee85775931bd4acf5f0d070087b2d98b26d920d0b04",
+	"measure.ts": "904957e6e75c9122a24ff6c833206d26396ed71abae62afd496ed525a87a3912",
+	"work.config.js": "a3c4d816cb3f4ec9e1d18b9b789219eee7d75d2c54e2158a5a971ecdf869e567",
+	"servedAssets": [
+		{
+			"path": "/app.js",
+			"sha256": "298d161870bf9646ff65cf0fd5921dd794c380edfb76ddc36d2e9ddbecdba355"
+		},
+		{
+			"path": "/chunks/document-app-6p1jeg0v.js",
+			"sha256": "2ddd9b71b96229455db594ba3692370f4b4217ff18b775c5c22515133db21040"
+		}
+	]
+}

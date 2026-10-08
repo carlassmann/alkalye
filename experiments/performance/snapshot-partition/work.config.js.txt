@@ -1,0 +1,1 @@
+export default { project:"alkalye-snapshot-partition",commands:{web:{run:"bun tests/serve-snapshot-partition.ts /tmp/alkalye-snapshot-partition/assets-active /tmp/alkalye-snapshot-partition/data-active 4473",cwd:"/tmp/alkalye-snapshot-partition/runtime",route:false,portless:false}}}

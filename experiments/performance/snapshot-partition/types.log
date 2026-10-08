@@ -1,0 +1,2 @@
+$ tsc --noEmit
+src/server/document-store.ts(2308,26): error TS2551: Property 'randomUUID' does not exist on type 'Crypto'. Did you mean 'randomUUIDv4'?

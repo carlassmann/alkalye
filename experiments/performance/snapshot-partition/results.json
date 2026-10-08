@@ -1,0 +1,56 @@
+{
+	"baseline": "c922a8d61d2730e0b9b6179b36b36ba85cd5e578",
+	"status": "complete",
+	"kind": "one instrumented cold switch, no speed comparison",
+	"exactIndependentReceipts": {
+		"seedReceipt": {
+			"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+			"characters": 2048
+		},
+		"targetReceipt": {
+			"sha256": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac",
+			"characters": 131072
+		}
+	},
+	"heapPointSamples": {
+		"initial": {
+			"limit": 4395630592,
+			"total": 21129738,
+			"used": 14408138
+		},
+		"final": {
+			"limit": 4395630592,
+			"total": 155481097,
+			"used": 89799969
+		}
+	},
+	"resourceTiming": [
+		{
+			"decodedBodySize": 4475,
+			"encodedBodySize": 724,
+			"fetchStart": 92.10000002384186,
+			"requestStart": 92.30000001192091,
+			"responseEnd": 110.10000002384186,
+			"responseStart": 109.70000004768372,
+			"transferSize": 1024
+		},
+		{
+			"decodedBodySize": 137686,
+			"encodedBodySize": 1777,
+			"fetchStart": 703.2000000476837,
+			"requestStart": 703.5,
+			"responseEnd": 958.600000023842,
+			"responseStart": 957.600000023842,
+			"transferSize": 2077
+		}
+	],
+	"serverRichRequest": "3",
+	"clientCustomMarkers": [],
+	"clientMarkerGap": "BrowserLibrary snapshot override uses account.request/account API rather than instrumented DocumentTransport snapshot. No client Schema/JSON decode duration established.",
+	"serverCompressionGap": "router-through-response-encode excludes later compression pre-response hook; physical gzip CPU unmeasured.",
+	"rawTrace": {
+		"sha256": "074df96af94dd5bad979bb1538f5d4b799f0e4a9cff6be1f1b3bad2612c0cf5a",
+		"bytes": 6155451,
+		"location": "outside Git /tmp/alkalye-snapshot-partition/results/candidate-0/candidate-switch-small-rich-0.trace.json"
+	}
+}

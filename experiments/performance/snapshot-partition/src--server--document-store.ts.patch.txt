@@ -1,0 +1,90 @@
+--- /tmp/alkalye-snapshot-partition/baseline-src--server--document-store.ts	2026-10-08 20:50:45
++++ /tmp/alkalye-snapshot-partition/runtime/src/server/document-store.ts	2026-10-08 20:19:35
+@@ -1,3 +1,5 @@
++import { serverPhase } from "../shared/open-phase"
++let snapshotDiagnosticSequence = 0
+ import * as Context from "effect/Context"
+ import * as Config from "effect/Config"
+ import * as Crypto from "effect/Crypto"
+@@ -2304,28 +2306,31 @@
+ 			subject?: string | Context.Service.Shape<typeof Identity>,
+ 		) {
+ 			return Effect.gen(function* () {
++				let request = String(++snapshotDiagnosticSequence)
+ 				if (subject !== undefined)
+-					yield* readSql.withTransaction(authorizeRead(document, subject))
++					yield* readSql.withTransaction(authorizeRead(document, subject)).pipe(serverPhase("auth-before-gate", request))
+ 				else
+ 					yield* readSql.withTransaction(refuseManaged(document, readWorkspace))
+-				if (Option.isNone(yield* readQueries.notice(document))) return undefined
++				if (Option.isNone(yield* readQueries.notice(document).pipe(serverPhase("notice-before-gate", request)))) return undefined
++				let waiting = performance.now()
+ 				return yield* withSession(document, session =>
+ 					Effect.gen(function* () {
++						console.log(JSON.stringify({ diagnostic: "snapshot-partition", request, phase: "session-and-gate-admission", durationMs: performance.now() - waiting }))
+ 						let result = yield* readSql.withTransaction(
+ 							Effect.gen(function* () {
+ 								if (subject !== undefined)
+-									yield* authorizeRead(document, subject)
++									yield* authorizeRead(document, subject).pipe(serverPhase("auth-inside-gate", request))
+ 								else yield* refuseManaged(document, readWorkspace)
+ 								let tip = Option.getOrUndefined(
+-									yield* readQueries.notice(document),
++									yield* readQueries.notice(document).pipe(serverPhase("notice-inside-gate", request)),
+ 								)
+ 								if (!tip) return undefined
+-								let state = yield* refresh(document, session, tip, readQueries)
++								let state = yield* refresh(document, session, tip, readQueries, request).pipe(serverPhase("refresh", request))
+ 								return state
+ 							}),
+ 						)
+ 						session.state = result
+-						return result ? snapshotOf(document, result) : undefined
++						return result ? yield* Effect.sync(() => snapshotOf(document, result)).pipe(serverPhase("serialize-compact-snapshot", request)) : undefined
+ 					}),
+ 				)
+ 			})
+@@ -2403,6 +2408,7 @@
+ 			session: DocumentSession,
+ 			tip: typeof TipSchema.Type | undefined,
+ 			lookup = queries,
++			request?: string,
+ 		) {
+ 			return Effect.gen(function* () {
+ 				if (!tip)
+@@ -2420,7 +2426,7 @@
+ 					cached.fingerprint === tip.fingerprint
+ 				)
+ 					return cached
+-				let head = yield* lookup.checkpoint(document)
++				let head = yield* lookup.checkpoint(document).pipe(serverPhase("read-checkpoint", request))
+ 				let state: DocumentState
+ 				if (
+ 					cached?.log === tip.log &&
+@@ -2440,10 +2446,10 @@
+ 					let replica = yield* restoreSnapshot(
+ 						{ format: "document-state-v1", document, ...head },
+ 						"projection",
+-					)
++					).pipe(serverPhase("restore-checkpoint", request))
+ 					state = { ...head, replica, fingerprint: "" }
+ 				}
+-				let rows = yield* lookup.history({ document, after: state.position })
++				let rows = yield* lookup.history({ document, after: state.position }).pipe(serverPhase("read-tail", request))
+ 				if (
+ 					rows.length !== tip.version - state.version ||
+ 					(rows.at(-1)?.position ?? state.position) !== tip.position
+@@ -2453,11 +2459,13 @@
+ 							message: "Document recovery tail is incomplete",
+ 						}),
+ 					)
++				let applying = performance.now()
+ 				for (let row of rows)
+ 					yield* applyAction(
+ 						state.replica,
+ 						(yield* decodeRow(document, row)).action,
+ 					)
++				if (request !== undefined) console.log(JSON.stringify({ diagnostic: "snapshot-partition", request, phase: "decode-apply-tail", rows: rows.length, durationMs: performance.now() - applying }))
+ 				return { ...tip, replica: state.replica }
+ 			})
+ 		}

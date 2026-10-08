@@ -1,0 +1,24 @@
+--- /tmp/alkalye-snapshot-partition/baseline-src--shared--document-transport.ts	2026-10-08 20:50:45
++++ /tmp/alkalye-snapshot-partition/runtime/src/shared/document-transport.ts	2026-10-08 20:07:45
+@@ -1,3 +1,4 @@
++import { clientPhase } from "./open-phase"
+ import * as Context from "effect/Context"
+ import * as Effect from "effect/Effect"
+ import * as Layer from "effect/Layer"
+@@ -29,7 +30,7 @@
+ 				HttpClient.mapRequest(
+ 					client,
+ 					HttpClientRequest.setHeader(accountHeader, subject),
+-				),
++				).pipe(HttpClient.transform((response, request) => request.url.includes("/snapshot") ? response.pipe(clientPhase("fetch-to-headers")) : response)),
+ 		})
+ 		return {
+ 			diagnostics: observability.snapshot,
+@@ -77,6 +78,7 @@
+ 					.pipe(
+ 						Effect.timeout("20 seconds"),
+ 						observability.observe("snapshot"),
++						clientPhase("request-through-body-and-decode"),
+ 					),
+ 			action: (document: string, id: string) =>
+ 				api.documents
