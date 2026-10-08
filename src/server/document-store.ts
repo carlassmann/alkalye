@@ -2213,7 +2213,9 @@ function makeDocumentStore() {
 							}),
 					})
 					if (!tip || head.value.version % checkpointInterval === 0) {
-						let state = JSON.stringify(replacement.checkpoint())
+						let state = JSON.stringify(
+							compactCheckpoint(replacement.checkpoint()),
+						)
 						yield* sql`INSERT INTO document_heads VALUES (${action.document},${head.value.log},${position},${head.value.version},${state}) ON CONFLICT(document) DO UPDATE SET log=excluded.log,position=excluded.position,version=excluded.version,state=excluded.state WHERE excluded.position>document_heads.position OR excluded.log<>document_heads.log`
 					}
 				}
