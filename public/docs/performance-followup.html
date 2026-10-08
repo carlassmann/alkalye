@@ -119,8 +119,23 @@
 			publication. These are distinct proofs: the sampled and publication runs
 			were diagnostic, not timing arms. Ordinary typing and deferred task counts
 			did not improve; 21–22 main tasks still exceeded 8.33ms during the undo
-			window. Redo performance remains unmeasured. Evidence:
+			window. Evidence:
 			<code>experiments/performance/terminal-header-cancellation</code>.
+		</p>
+		<p>
+			A sampled diagnostic of production <code>52670c0</code> explains the
+			remaining Undo delay. Its largest task took 26.3ms; cursor-anchor
+			resolution accounted for 15.8ms of self samples. Exact accepted text, EOF
+			caret and bounded editing viewport checks passed. A separate Redo interval
+			contained a 195.9ms task, with 135.3ms in visible-atom traversal. Its
+			later validation timed out; the gate incorrectly demanded a caret at the
+			new document end. A separate untimed replay verified exact local and
+			independently accepted Redo text, with the caret preserved before the
+			restored character. The native editing fragment stayed bounded at 1,996
+			characters. This replay does not repair the sampled run's missing
+			final-state evidence. These single sampled intervals identify work to
+			remove; they are not a before/after comparison or proof of 120fps.
+			Evidence: <code>experiments/performance/undo-redo-526</code>.
 		</p>
 		<h2>Earlier journey comparison with main</h2>
 		<p>
