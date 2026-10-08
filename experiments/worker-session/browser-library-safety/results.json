@@ -1,0 +1,58 @@
+{
+	"status": "bounded-native-safety-proof-passed-not-production-cutover",
+	"core": "2ccca63 source plus four changed src files refreshed1b630c8; explicit worker connectivity/Editor/scheduler/sourceDifference ports retained",
+	"strict": {
+		"firstHandle": 97863,
+		"firstExit": 0,
+		"finalHandle": 42891,
+		"finalExit": 0
+	},
+	"firstRuntime": {
+		"handle": 48419,
+		"exit": 0,
+		"fixtureAssertions": [28, 12, 12, 12],
+		"total": 64,
+		"driverReadinessAssertions": 4
+	},
+	"addedServerOracle": {
+		"handle": 54017,
+		"exit": 0,
+		"fixtureAssertions": 13,
+		"driverReadinessAssertions": 1,
+		"scope": "death-only rerun; no aggregation with64",
+		"assertedAcceptedState": "exact acknowledged prefix or exact once-applied uncertain native source",
+		"observedBranch": "not separately returned"
+	},
+	"sourceSha256": {
+		"browser-worker-documents.ts": "279730faa2d017bcc78697fb912b7e8eead8065d5ce4906db0e70da8bc2f4c06",
+		"editor-queue.ts": "49202f5f69f1e31b13a3b8eee16c8379eb60be318a24d6685acb197cfd29f846",
+		"browser-fixture.ts": "01a43e6fd4d2a230878772ab06285ca44eab6cc64886ba8b72d4ea7bd37abff5",
+		"worker-session.ts": "b0fb2e30ce60470409f099b6d68981cd3b7cc9d168ad7c8476969a37ef33a02c",
+		"worker-editor-basis.ts": "fa987959d794a2eda7005e171d9d01bd97f8d9c53fcea8fa5067d7d12d9ac29b",
+		"worker-rpc.ts": "8b275b562503eaf0094405a577296704d0ba07513e121ef3183caabd419daa3a",
+		"worker-client.ts": "cf3ae2f2cc7f87909d95d50e7298e8e075399be431ff3847b4023d97db94cca1",
+		"tests/browser-worker-safety.ts": "81a73128a82a9b6001b824f0bc53deae4e4b08059794701558f9c9de9197890f",
+		"core-reference.txt": "9ab993cf6939d191e8087124ba21af8626fe12f945d5c272f0426c0608140a38"
+	},
+	"firstFixtureSha256": "87dcdfd380f110643b6fe721e1a52833e4e68a3ef00bf94dd5738fa3a612f842",
+	"review": {
+		"handle": 1917,
+		"exit": 0,
+		"verdict": "HOLD predecessor38 variant",
+		"fix": "nativeDiffers and explicit owner.hasRecovery preflight before/inside command permit, tested by unsent native source and independent server oracle",
+		"newFullReview": "not run"
+	},
+	"deadline": {
+		"fixtureMillis": 1000,
+		"defaultSeconds": 30,
+		"classification": "AppliedUnknown; retain full native draft, no blind mutation retry"
+	},
+	"limitations": [
+		"Standalone RcMap factory, not actual BrowserLibrary/document-app/drain cutover",
+		"SourceTextarea, not full EditorElement parity",
+		"Admission hints use same owner account; no actual separate-owner server ACL revocation",
+		"No offline zero-API reopen, peer merge, main-tab crash durability or1MiB performance",
+		"Idle dead worker detection unproved; mobile hidden/resume deadline policy unproved",
+		"Cached Undo receipt replay across permission epochs and eviction untested"
+	]
+}

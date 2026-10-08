@@ -1,0 +1,194 @@
+import * as Deferred from "effect/Deferred"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
+import * as Fiber from "effect/Fiber"
+import * as FiberSet from "effect/FiberSet"
+import * as Schedule from "effect/Schedule"
+import * as Scope from "effect/Scope"
+import * as Stream from "effect/Stream"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import { bootstrapBrowserAccount } from "./tests/browser-account-fixture"
+import { makeBrowserWorkerDocuments } from "./browser-worker-documents"
+import { documentMetadata } from "./src/shared/document-metadata"
+import { SourceTextarea, sourceDifference } from "./src/client/source-textarea"
+import type { makeEditorQueue } from "./editor-queue"
+
+let assertions: string[] = []
+let NativeWorker = globalThis.Worker
+let killReceipt = false
+let terminatedThreads = 0
+let errorEvents = 0
+class FixtureWorker extends NativeWorker {
+ constructor(url: string | URL, options?: WorkerOptions) {
+  super(url, options)
+  this.addEventListener("error", () => { errorEvents++ })
+  this.addEventListener("messageerror", () => { errorEvents++ })
+ }
+ postMessage(message: unknown, transfers?: Transferable[] | StructuredSerializeOptions) {
+  if (Array.isArray(transfers)) super.postMessage(message, transfers)
+  else super.postMessage(message, transfers)
+  if (killReceipt && JSON.stringify(message).includes("ReplaceReceipt")) {
+   killReceipt = false
+   terminatedThreads++
+   super.terminate()
+  }
+ }
+}
+globalThis.Worker = FixtureWorker
+function check(value: unknown, label: string) { if (!value) throw new Error(label); assertions.push(label) }
+interface Fixture { stage: string; assertions: string[]; failure?: string; inspect(): object; accepted(): Promise<object>; undo(): Promise<void>; metadata(): Promise<void>; revoke(): Promise<void>; heldRevocation(): Promise<void>; unsent(): Promise<void>; armDeath(): void; death(): Promise<void>; dispose(): Promise<void> }
+declare global { interface Window { workerBridge?: Fixture } }
+
+let program = Effect.scoped(Effect.gen(function* () {
+ yield* Effect.addFinalizer(() => Effect.sync(() => { globalThis.Worker = NativeWorker }))
+ let account = yield* bootstrapBrowserAccount(check)
+ let identity = "worker-library-" + crypto.randomUUID()
+ let original = "---\ntitle: Worker fixture\n---\nLine 🦊.\n"
+ yield* Effect.promise(async () => { let response = await fetch("/__tests/seed", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ subject: account.subject, document: identity, source: original }) }); check(response.ok, "real server seeds without main Replica") })
+ let native = document.createElement("textarea"); native.id = "editor"
+ let host = document.createElement("div"); host.className = "editor-wrap"; host.dataset.editor = ""; host.style.cssText = "height:800px;width:700px;overflow:auto;--editor-size:18px;--mono:monospace;--editor-width:65ch"; host.append(native); document.body.append(host)
+ let source: SourceTextarea | undefined
+ let queue: Pick<Effect.Success<ReturnType<typeof makeEditorQueue>>, "replace" | "state" | "settle" | "merge" | "captureClipboard" | "resolveClipboard" | "releaseClipboard" | "undo"> | undefined
+ let recovery: string | undefined
+ let generation = 0, observations = 0
+ let mergeBarrier: Deferred.Deferred<void> | undefined
+ let mergeEntered: Deferred.Deferred<void> | undefined
+ let tasks = yield* FiberSet.make()
+ let fork = yield* FiberSet.runtime(tasks)()
+ let owner = yield* Scope.Scope
+ let mount = yield* Scope.fork(owner)
+ let stopped = yield* Deferred.make<void>()
+ let admission: { subject: string; epoch: number; exists: boolean; deleted: boolean; role: "owner" | "reader"; account: "ready"; online: boolean } = { subject: account.subject, epoch: 1, exists: true, deleted: false, role: "owner", account: "ready", online: true } satisfies { subject: string; epoch: number; exists: boolean; deleted: boolean; role: "owner" | "reader"; account: "ready"; online: boolean }
+ let options = { commandTimeout: 1000, document: identity, workspace: "personal-" + account.subject, subject: account.subject, origin: location.origin, activityChannel: "worker-library-" + crypto.randomUUID(), admission }
+ let library = yield* makeBrowserWorkerDocuments(new URL("/worker.js", location.href).href, () => Effect.succeed(options), () => ({
+  pending: () => recovery !== undefined || !!queue && (!!queue.state().failure || !!queue.state().pending.length || queue.state().commandFrozen),
+  hasRecovery: () => recovery !== undefined,
+  freeze() { native.readOnly = true },
+  settle: Effect.suspend(() => queue ? queue.settle : Effect.succeed(true)),
+  retain: () => Effect.sync(() => { recovery = source?.value ?? native.value; native.readOnly = true }),
+ selection,
+ selectionReady(afterGeneration) {
+  return Effect.suspend(() => mergeBarrier ? (mergeEntered ? Deferred.succeed(mergeEntered, undefined) : Effect.void).pipe(Effect.andThen(Deferred.await(mergeBarrier))) : afterGeneration === undefined || generation !== afterGeneration ? Effect.void : Stream.fromEventListener(native, "select").pipe(Stream.filter(() => generation !== afterGeneration), Stream.runHead, Effect.asVoid))
+ },
+ adopt(next, selected) { if (recovery !== undefined || selected.generation !== generation || selected.source !== current.value) return false; current.reconcile(next, selected.start, selected.end); generation++; return true },
+ }))
+ let opened = yield* library.open(identity).pipe(Scope.provide(mount))
+ yield* Effect.suspend(() => opened.current().connection.status === "synced" ? Effect.void : Effect.fail("NotReady")).pipe(Effect.retry(Schedule.spaced("20 millis")), Effect.timeout("10 seconds"))
+ let another = yield* library.open(identity).pipe(Scope.provide(mount))
+ let initialized = yield* opened.queue()
+ queue = initialized.queue
+ check(initialized.initial.source === original, "Begin initializes exact native source from sole worker: " + JSON.stringify({expected:original,actual:initialized.initial.source}))
+ let secondQueue = yield* another.queue().pipe(Effect.exit)
+ check(Exit.isFailure(secondQueue), "overlapping opened lease refuses competing editor FIFO")
+ source = new SourceTextarea(native, original, { mode: () => "raw", documents: () => [], caretTop: () => undefined, painted() {}, fullDocument: true })
+ let current = source, currentQueue = initialized.queue
+ yield* opened.changes.pipe(Stream.runForEach(state => Effect.sync(() => { observations++; native.readOnly = !state.canWrite || recovery !== undefined })), Effect.forkScoped({ startImmediately: true }))
+ native.addEventListener("select", () => { generation++ })
+ native.addEventListener("input", () => {
+  current.input(); generation++
+  let before = currentQueue.state().source
+  try { let pending = currentQueue.replace(current.takeReplacements() ?? [sourceDifference(before, current.value)], current.value, () => [sourceDifference(before, current.value)]); fork(pending.saved.pipe(Effect.catch(() => Effect.sync(() => { recovery = current.value; native.readOnly = true })))) }
+  catch { recovery = current.value; native.readOnly = true }
+ })
+ current.setSelectionRange(original.length, original.length, "none")
+ function selection() { return { source: current.value, start: current.selectionStart, end: current.selectionEnd, direction: current.selectionDirection, generation, busy: false, composing: false } }
+ function accepted() {
+  return Effect.gen(function* () {
+   yield* Effect.suspend(() => opened.current().status.pending === 0 && opened.current().status.unsaved === 0 && currentQueue.state().pending.length === 0 ? Effect.void : Effect.fail("NotAccepted")).pipe(Effect.retry(Schedule.spaced("20 millis")), Effect.timeout("10 seconds"))
+   let response = yield* Effect.promise(() => fetch("/__tests/accepted?document=" + encodeURIComponent(identity) + "&subject=" + encodeURIComponent(account.subject)))
+   let data: unknown = yield* Effect.promise(() => response.json())
+   if (typeof data !== "object" || data === null || !("source" in data) || typeof data.source !== "string") throw Error("Invalid server read")
+   check(response.ok && data.source === current.value && currentQueue.state().source === current.value, "real accepted source equals actual native and queued source")
+   check(observations > 0, "bounded Observe active during native editing")
+   check(!("source" in opened.current()) && !("projection" in opened.current()), "Observe DTO has no full source/atom projection")
+   return { length: data.source.length, observations }
+  })
+ }
+ window.workerBridge = { stage: "ready", assertions,
+  inspect: () => ({ source: current.value, readonly: native.readOnly, queue: currentQueue.state().source, pending: currentQueue.state().pending.length, failed: opened.current().failed, recovery, observations }),
+  accepted: () => Effect.runPromise(accepted()),
+  undo: () => Effect.runPromise(Effect.gen(function* () { native.readOnly = true; yield* opened.undo(false); native.readOnly = !opened.current().canWrite; yield* accepted() })),
+  metadata: () => Effect.runPromise(Effect.gen(function* () {
+   let before = current.value
+   current.reconcile(before + "queued", before.length + 6, before.length + 6)
+   generation++
+   let edit = currentQueue.replace([{ start: before.length, remove: 0, text: "queued" }], current.value)
+   let changed = yield* opened.properties.update({ title: "Named update" })
+   yield* edit.saved
+   check(changed.action.length > 0 && documentMetadata(current.value).title === "Named update" && current.value.endsWith("queued"), "metadata FIFO waits prior native edit then adopts both changes")
+   yield* accepted()
+  })),
+  revoke: () => Effect.runPromise(Effect.gen(function* () {
+   let before = current.value
+   current.reconcile(before + "old", before.length + 3, before.length + 3)
+   generation++
+   let edit = currentQueue.replace([{ start: before.length, remove: 0, text: "old" }], current.value)
+   admission = { ...admission, epoch: 2 }
+   yield* opened.admission(admission)
+   yield* edit.saved
+   check(opened.current().canWrite && !native.readOnly, "same-writer refresh drains captured old epoch and reopens native admission")
+   yield* accepted()
+   yield* opened.connectivity(false)
+   yield* opened.connectivity(true)
+   check(opened.current().canWrite && !currentQueue.state().failure, "connectivity does not invalidate permission epoch or editor FIFO")
+   admission = { ...admission, epoch: 3, role: "reader" }
+   yield* opened.admission(admission)
+   check(!opened.current().canWrite && native.readOnly, "reader closes native admission")
+   let denied = yield* opened.properties.update({ title: "Refused reader" }).pipe(Effect.exit)
+   check(Exit.isFailure(denied) && !opened.current().failed && recovery === undefined, "benign reader command refusal does not invent recovery")
+   yield* opened.admission(admission)
+   check(!opened.current().failed, "stale admission is a benign no-op")
+   admission = { ...admission, epoch: 4, role: "owner" }
+   yield* opened.admission(admission)
+   check(opened.current().canWrite && !native.readOnly, "fresh explicit writer notice reopens reader admission")
+  })),
+  unsent: () => Effect.runPromise(Effect.gen(function* () {
+   let before = current.value
+   current.reconcile(before + "UNSUBMITTED", before.length + 11, before.length + 11)
+   generation++
+   try { currentQueue.replace([{ start: current.value.length + 1, remove: 0, text: "bad" }], current.value) }
+   catch { recovery = current.value; native.readOnly = true }
+   let refusedUndo = yield* opened.undo(false).pipe(Effect.exit)
+   let refusedMetadata = yield* opened.properties.update({ title: "Must refuse" }).pipe(Effect.exit)
+   check(Exit.isFailure(refusedUndo) && Exit.isFailure(refusedMetadata), "native/FIFO divergent recovered draft refuses Undo and metadata before mutation")
+   let response = yield* Effect.promise(() => fetch("/__tests/accepted?document=" + encodeURIComponent(identity) + "&subject=" + encodeURIComponent(account.subject)))
+   let data: unknown = yield* Effect.promise(() => response.json())
+   check(typeof data === "object" && data !== null && "source" in data && data.source === before, "refused commands leave real accepted source unchanged")
+   yield* Scope.close(mount, Exit.void)
+   check(native.readOnly && recovery === before + "UNSUBMITTED" && current.value === recovery, "Close preserves exact unsubmitted native text")
+   if (window.workerBridge) window.workerBridge.stage = "passed"
+   yield* Deferred.succeed(stopped, undefined)
+  })),
+  armDeath() { killReceipt = true },
+  death: () => Effect.runPromise(Effect.gen(function* () {
+   yield* Effect.suspend(() => recovery !== undefined && opened.current().failed ? Effect.void : Effect.fail("NotRetained")).pipe(Effect.retry(Schedule.spaced("20 millis")), Effect.timeout("5 seconds"))
+   check(terminatedThreads === 1 && errorEvents === 0, "actual native Worker termination without synthetic error notification")
+   check(native.readOnly && recovery === current.value && currentQueue.state().failure !== undefined, "timed-out uncertain receipt freezes and retains exact full native draft")
+   yield* Scope.close(mount, Exit.void)
+   check(native.readOnly && recovery === current.value, "Close does not discard terminated-worker recovery")
+   if (window.workerBridge) window.workerBridge.stage = "passed"
+   yield* Deferred.succeed(stopped, undefined)
+  })),
+  heldRevocation: () => Effect.runPromise(Effect.gen(function* () {
+   mergeBarrier = yield* Deferred.make<void>()
+   mergeEntered = yield* Deferred.make<void>()
+   let body = current.value
+   let command = fork(opened.properties.update({ title: "Held admission" }).pipe(Effect.exit))
+   yield* Deferred.await(mergeEntered).pipe(Effect.timeout("10 seconds"))
+   admission = { ...admission, epoch: admission.epoch + 1, role: "reader" }
+   yield* opened.admission(admission)
+   check(native.readOnly && recovery === body && !opened.current().canWrite, "revocation freezes and retains actual native draft while prior metadata adoption holds controls")
+   yield* Deferred.succeed(mergeBarrier, undefined)
+   mergeBarrier = undefined
+   let outcome = yield* Fiber.join(command)
+   check(Exit.isFailure(outcome) && current.value === body, "late metadata candidate cannot overwrite retained revoked draft")
+   yield* Scope.close(mount, Exit.void)
+   check(recovery === body && native.readOnly, "Close preserves actual native recovery after revoked domain")
+   if (window.workerBridge) window.workerBridge.stage = "passed"
+   yield* Deferred.succeed(stopped, undefined)
+  })),
+  dispose: () => Effect.runPromise(Effect.gen(function* () { yield* Scope.close(mount, Exit.void); check(native.readOnly, "scope Close freezes native admission"); check(recovery === undefined, "clean settled Close does not invent recovery"); check(!opened.current().canWrite, "disposed opened authority stays fail-closed"); if (window.workerBridge) window.workerBridge.stage = "passed"; yield* Deferred.succeed(stopped, undefined) })),
+ }
+ yield* Deferred.await(stopped)
+}))
+Effect.runPromise(program.pipe(Effect.provide(FetchHttpClient.layer))).catch(error => { console.error(error); if (window.workerBridge) window.workerBridge.failure = String(error); else window.workerBridge = { stage: "failed", assertions, failure: String(error), inspect: () => ({}), accepted: async () => ({}), undo: async () => {}, metadata: async () => {}, revoke: async () => {}, heldRevocation: async () => {}, unsent: async () => {}, armDeath: () => {}, death: async () => {}, dispose: async () => {} } })

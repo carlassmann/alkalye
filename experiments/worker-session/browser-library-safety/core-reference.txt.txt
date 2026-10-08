@@ -1,0 +1,1 @@
+Core2ccca63 copied originally; four changed production files refreshed from1b630c8. Existing worker Editor/connectivity/scheduler/sourceDifference adapters retained. No production changes.

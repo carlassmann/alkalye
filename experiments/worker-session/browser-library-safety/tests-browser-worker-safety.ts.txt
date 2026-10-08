@@ -1,0 +1,32 @@
+import { browser, evaluate, wait, assert } from "./browser-driver"
+let url = process.env.WORKER_LIBRARY_URL
+if (!url) throw new Error("Missing WORKER_LIBRARY_URL")
+for (let mode of process.env.WORKER_SAFETY_DEATH_ONLY ? ["death"] : ["ordinary", "held", "unsent", "death"]) {
+ let session = "worker-safety-" + mode + "-" + Date.now()
+ try {
+  browser(session,"open",url)
+  wait(session,'window.workerBridge?.stage === "ready" || window.workerBridge?.stage === "failed"')
+  assert(evaluate(session,'window.workerBridge.stage') === "ready",mode + " ready")
+  browser(session,"click","#editor")
+  browser(session,"press","x")
+  evaluate(session,"window.workerBridge.accepted()")
+  if (mode === "ordinary") {
+   evaluate(session,"window.workerBridge.undo()")
+   evaluate(session,"window.workerBridge.metadata()")
+   evaluate(session,"window.workerBridge.revoke()")
+   evaluate(session,"window.workerBridge.dispose()")
+  } else if (mode === "held") evaluate(session,"window.workerBridge.heldRevocation()")
+  else if (mode === "unsent") evaluate(session,"window.workerBridge.unsent()")
+  else {
+   evaluate(session,"window.workerBridge.armDeath()")
+   browser(session,"press","y")
+   evaluate(session,"window.workerBridge.death()")
+  }
+  console.log(JSON.stringify(evaluate(session,'({stage:window.workerBridge.stage,assertions:window.workerBridge.assertions,inspection:window.workerBridge.inspect()})')))
+ } catch (error) {
+  console.error(error)
+  try { console.error(JSON.stringify(evaluate(session,'({fixture:window.workerBridge && {stage:window.workerBridge.stage,failure:window.workerBridge.failure,assertions:window.workerBridge.assertions},inspection:window.workerBridge?.inspect()})'))) } catch {}
+  process.exitCode = 1
+ } finally { browser(session,"close") }
+ if (process.exitCode) break
+}
