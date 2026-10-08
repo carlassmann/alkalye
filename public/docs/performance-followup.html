@@ -1469,9 +1469,9 @@
 			A later diagnostic separated HTTP, journal validation and replay. HTTP
 			took 267.5ms. Validation restored the snapshot in 157.1ms; replay restored
 			it again in 133.5ms. Both used the same journal entry and identical
-			134,956-byte payload. Library acquisition took 624.6ms. These nested
-			spans include instrumentation overhead and do not predict the gain from
-			removing one restore.
+			134,956-byte payload. Library acquisition took 624.6ms. These nested spans
+			include instrumentation overhead and do not predict the gain from removing
+			one restore.
 		</p>
 		<p>
 			The next loading candidate will reuse a privately validated snapshot only
@@ -1495,6 +1495,16 @@
 			self time. Its call path was real; its apparent size was misleading. The
 			correction and failed hypothesis are preserved in
 			<code>experiments/performance/multicursor-forward-chunk</code>.
+		</p>
+		<h2>Original server comparison setup</h2>
+		<p>
+			The original application's installed SDK created one 2,048-character
+			document and completed its sync wait. A separate fresh SDK reader loaded
+			the exact source from the local sync server. The existing browser account
+			also opened that document with the same source hash. Its Welcome document
+			remained unchanged. This establishes the fixture and independent reader;
+			matched interaction and bundle comparisons still need to run. Evidence:
+			<code>experiments/performance/main-sdk-created</code>.
 		</p>
 		<footer>written with gpt-6 in codex</footer>
 	</body>
