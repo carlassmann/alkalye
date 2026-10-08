@@ -44,7 +44,7 @@ import {
 import type { UndoEntry } from "./document-undo"
 import { partitionDocumentActions } from "./document-dependencies"
 import { validateTextCausality } from "./document-causality"
-import { compactCheckpoint, compactCheckpointEffect } from "./checkpoint"
+import { compactCheckpoint } from "./checkpoint"
 import { Replica } from "./crdt"
 import type { TextReplacement } from "./crdt"
 import {
@@ -1370,12 +1370,9 @@ function makeProjection(options: DocumentSessionOptions) {
 					return
 				if (options.passiveState)
 					yield* materializeDocument(accepted).pipe(Effect.ignore)
-				let checkpoint = options.cooperativeWork
-					? yield* accepted.checkpointEffect()
-					: accepted.checkpoint()
 				let compact = options.cooperativeWork
-					? yield* compactCheckpointEffect(checkpoint)
-					: compactCheckpoint(checkpoint)
+					? yield* accepted.durableCheckpointEffect()
+					: compactCheckpoint(accepted.checkpoint())
 				return {
 					position: localPosition,
 					replica: options.passiveState ? accepted : undefined,

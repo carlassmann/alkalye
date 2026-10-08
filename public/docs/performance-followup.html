@@ -170,6 +170,19 @@
 			whole-window peaks or physical 120Hz presentation. Evidence:
 			<code>experiments/performance/source-textarea-difference/app</code>.
 		</p>
+		<p>
+			Durable snapshot capture now compacts immutable atom references before
+			copying its output, avoiding a temporary object for every retained atom.
+			Ten integration cases and independent reopen checks at 2,000,000 and
+			2,000,001 atoms passed. Six matched 1MiB app trials preserved accepted
+			text, Undo, caret and bounded viewport. Input-task median fell from 7.37ms
+			to 6.77ms; Undo-window busy work fell from 916ms to 833ms. Peak Undo tasks
+			stayed near 13.7ms, above the frame budget. A separate diagnostic verified
+			five real captures with independently owned output. Above two million
+			atoms, the existing uncompressed fallback remains and temporarily retains
+			an extra reference array. This is not a 120fps or total-memory result.
+			Evidence: <code>experiments/performance/fused-durable-checkpoint</code>.
+		</p>
 		<h2>Earlier journey comparison with main</h2>
 		<p>
 			Both production builds used their own local sync servers, signed accounts

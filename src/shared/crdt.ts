@@ -1,5 +1,9 @@
 import type { CausalReplicaCheckpoint, ReplicaCheckpoint } from "./checkpoint"
-import { parseCheckpoint, parseCheckpointEffect } from "./checkpoint"
+import {
+	parseCheckpoint,
+	parseCheckpointEffect,
+	compactCheckpointEffect,
+} from "./checkpoint"
 import * as Effect from "effect/Effect"
 import { attempt, cooperative } from "../platform/effects"
 import { TextVisibility } from "./text-visibility"
@@ -1503,8 +1507,61 @@ export class Replica {
 			return snapshot
 		})
 	}
+	durableCheckpointEffect() {
+		let source = this
+		return Effect.gen(function* () {
+			let generation = source.generation
+			function unchanged() {
+				if (source.generation !== generation)
+					throw new Error(
+						"Replica changed while its snapshot was being captured",
+					)
+			}
+			let borrowed = yield* cooperative("replica.checkpoint", () =>
+				source.checkpointSteps(true, true),
+			)
+			unchanged()
+			let compact = yield* compactCheckpointEffect(borrowed)
+			unchanged()
+			let owned = yield* cooperative("replica.checkpoint.output", function* () {
+				if (compact.format === "alkalye-state-v3") {
+					let targets: (typeof compact.targets)[number][] = []
+					for (let target of compact.targets) {
+						let atoms: Atom[] = []
+						let work = 0
+						for (let atom of target.atoms) {
+							atoms.push(
+								atom.order || atom.observed || atom.deleted
+									? copyAtom(atom)
+									: atom,
+							)
+							if (++work % 512 === 0) yield
+						}
+						targets.push({ ...target, atoms })
+					}
+					return { ...compact, targets }
+				}
+				if (compact.format === "alkalye-state-v1")
+					throw new Error("Unexpected legacy checkpoint capture")
+				let targets: CausalReplicaCheckpoint["targets"] = []
+				for (let target of compact.targets) {
+					let atoms: Atom[] = []
+					let work = 0
+					for (let atom of target.atoms) {
+						atoms.push(copyAtom(atom))
+						if (++work % 512 === 0) yield
+					}
+					targets.push({ ...target, atoms })
+				}
+				return { ...compact, targets }
+			})
+			unchanged()
+			return owned
+		})
+	}
 	private *checkpointSteps(
 		cooperative: boolean,
+		borrowAtoms = false,
 	): Generator<void, CausalReplicaCheckpoint> {
 		let clock = this.clock
 		let work = 0
@@ -1518,7 +1575,7 @@ export class Replica {
 			let atoms: Atom[] = []
 			for (let siblings of this.children.get(id)?.values() ?? [])
 				for (let atom of siblings) {
-					atoms.push(copyAtom(atom))
+					atoms.push(borrowAtoms ? atom : copyAtom(atom))
 					if (cooperative && ++work % 512 === 0) yield
 				}
 			let visibility = yield* (
