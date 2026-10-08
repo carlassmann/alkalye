@@ -1,0 +1,42 @@
+import type * as Crypto from "effect/Crypto"
+import * as Effect from "effect/Effect"
+
+let sequence = 0
+
+export function openPhase<A, E, R>(name: string, effect: Effect.Effect<A, E, R>) {
+	return Effect.suspend(() => {
+		let id = "document-open:" + name + ":" + ++sequence
+		performance.mark(id + ":start")
+		return effect.pipe(Effect.ensuring(Effect.sync(() => {
+			performance.mark(id + ":end")
+			performance.measure(id, id + ":start", id + ":end")
+		})))
+	})
+}
+
+export function openSync<A>(name: string, operation: () => A): A {
+	let id = "document-open:" + name + ":" + ++sequence
+	performance.mark(id + ":start")
+	try {
+		return operation()
+	} finally {
+		performance.mark(id + ":end")
+		performance.measure(id, id + ":start", id + ":end")
+	}
+}
+
+export function openBranch(name: string, detail?: Record<string, string | number>) {
+	performance.mark("document-open:branch:" + name, { detail })
+}
+
+export function openEntry(cryptography: Crypto.Crypto, stage: string, id: Uint8Array, payload: Uint8Array) {
+	return Effect.gen(function* () {
+		let identity = yield* cryptography.digest("SHA-256", id)
+		let bytes = yield* cryptography.digest("SHA-256", payload)
+		openBranch("opened-entry-" + stage, {
+			identity: Array.from(identity, value => value.toString(16).padStart(2, "0")).join(""),
+			payload: Array.from(bytes, value => value.toString(16).padStart(2, "0")).join(""),
+			bytes: payload.byteLength,
+		})
+	}).pipe(Effect.ignore)
+}

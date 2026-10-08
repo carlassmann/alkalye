@@ -1,0 +1,318 @@
+--- a/src/platform/open-diagnostic.ts
++++ b/src/platform/open-diagnostic.ts
+@@ -0,0 +1,42 @@
++import type * as Crypto from "effect/Crypto"
++import * as Effect from "effect/Effect"
++
++let sequence = 0
++
++export function openPhase<A, E, R>(name: string, effect: Effect.Effect<A, E, R>) {
++	return Effect.suspend(() => {
++		let id = "document-open:" + name + ":" + ++sequence
++		performance.mark(id + ":start")
++		return effect.pipe(Effect.ensuring(Effect.sync(() => {
++			performance.mark(id + ":end")
++			performance.measure(id, id + ":start", id + ":end")
++		})))
++	})
++}
++
++export function openSync<A>(name: string, operation: () => A): A {
++	let id = "document-open:" + name + ":" + ++sequence
++	performance.mark(id + ":start")
++	try {
++		return operation()
++	} finally {
++		performance.mark(id + ":end")
++		performance.measure(id, id + ":start", id + ":end")
++	}
++}
++
++export function openBranch(name: string, detail?: Record<string, string | number>) {
++	performance.mark("document-open:branch:" + name, { detail })
++}
++
++export function openEntry(cryptography: Crypto.Crypto, stage: string, id: Uint8Array, payload: Uint8Array) {
++	return Effect.gen(function* () {
++		let identity = yield* cryptography.digest("SHA-256", id)
++		let bytes = yield* cryptography.digest("SHA-256", payload)
++		openBranch("opened-entry-" + stage, {
++			identity: Array.from(identity, value => value.toString(16).padStart(2, "0")).join(""),
++			payload: Array.from(bytes, value => value.toString(16).padStart(2, "0")).join(""),
++			bytes: payload.byteLength,
++		})
++	}).pipe(Effect.ignore)
++}
+--- a/src/client/browser-library.ts
++++ b/src/client/browser-library.ts
+@@ -1,3 +1,4 @@
++import { openPhase } from "../platform/open-diagnostic"
+ import { makePassiveDocumentCache } from "./passive-document-cache"
+ import * as Context from "effect/Context"
+ import * as Crypto from "effect/Crypto"
+@@ -163,7 +164,7 @@
+ 				changes: SubscriptionRef.changes(state),
+ 			}),
+ 			refresh,
+-			open: (document: string) => RcMap.get(documents, document),
++			open: (document: string) => openPhase("library-open", RcMap.get(documents, document)),
+ 			create: (
+ 				source: string,
+ 				workspace = "personal-" + account.subject,
+@@ -452,13 +453,13 @@
+ 		}
+ 		function openSharedDocument(document: string) {
+ 			return Effect.gen(function* () {
+-				yield* live.watch(document)
++				yield* openPhase("live-watch", live.watch(document))
+ 				let blobs = Context.get(
+ 					yield* Layer.build(DocumentBlobs.layer(document)),
+ 					DocumentBlobs,
+ 				)
+-				let initialCreation = yield* local.creation(document)
+-				let context = yield* Layer.build(
++				let initialCreation = yield* openPhase("local-creation", local.creation(document))
++				let context = yield* openPhase("session-layer", Layer.build(
+ 					browserDocumentSessionLayer({
+ 						passiveState: passiveState(document),
+ 						document,
+@@ -503,7 +504,7 @@
+ 									.pipe(transport.observe("history")),
+ 						},
+ 					}),
+-				)
++				))
+ 				let session = Context.get(context, DocumentSession)
+ 				let connection = yield* SubscriptionRef.make<DocumentConnectionState>(
+ 					Object.freeze({ status: "offline" }),
+--- a/src/client/document-app.ts
++++ b/src/client/document-app.ts
+@@ -1,3 +1,4 @@
++import { openPhase, openSync } from "../platform/open-diagnostic"
+ import { bootMarkup } from "./components/boot"
+ import { SyncRecoveryElement } from "./components/sync-recovery"
+ import { makeSaveFeedback, saveIndicator } from "../shared/save-status"
+@@ -1314,7 +1315,7 @@
+ 							refreshSafely()
+ 							yield* Effect.gen(function* () {
+ 								if (selection) {
+-									yield* selection.opened.session.flush
++									yield* openPhase("previous-flush", selection.opened.session.flush)
+ 									if (
+ 										selection.opened.session.unsaved() ||
+ 										selection.opened.session.failures.current().save
+@@ -1365,7 +1366,7 @@
+ 										}
+ 										adopted = selection
+ 										slideIndex = 0
+-										mountDocument()
++										openSync("mount-document", mountDocument)
+ 										yield* Scope.addFinalizer(
+ 											scope,
+ 											Effect.sync(() => {
+@@ -1417,7 +1418,7 @@
+ 											),
+ 										)
+ 										if (previous)
+-											yield* Scope.close(previous.scope, Exit.void).pipe(
++											yield* openPhase("previous-scope-close", Scope.close(previous.scope, Exit.void)).pipe(
+ 												Effect.catchCause(cause =>
+ 													Effect.sync(() => report(Cause.squash(cause))),
+ 												),
+@@ -1711,7 +1712,7 @@
+ 				"mode-teleprompter",
+ 				"mode-history",
+ 			)
+-			let doc = currentDocument()
++			let doc = openSync("mount-current-document", currentDocument)
+ 			app.toggleAttribute("data-document-ready", Boolean(doc))
+ 			if ((mode === "slideshow" || mode === "teleprompter") && !presenting()) {
+ 				mode = "edit"
+@@ -1764,7 +1765,7 @@
+ 				return "image"
+ 			}
+ 			if (mode === "edit") {
+-				editor = mountEditor(element("#main"), {
++				editor = openSync("mount-editor", () => mountEditor(element("#main"), {
+ 					content: doc.content,
+ 					atoms: selected.opened.session.replica.visible(doc.id),
+ 					editable: writable(),
+@@ -1892,7 +1893,7 @@
+ 						requestRefresh(true)
+ 						return edit
+ 					},
+-				})
++				}))
+ 			} else if (mode === "preview") {
+ 				if (panel !== "comments") setLayout("tools", false, false)
+ 				setMarkup(
+--- a/src/shared/document-session.ts
++++ b/src/shared/document-session.ts
+@@ -1,3 +1,4 @@
++import { openPhase, openBranch, openEntry } from "../platform/open-diagnostic"
+ import * as Cache from "effect/Cache"
+ import type * as Cause from "effect/Cause"
+ import * as Context from "effect/Context"
+@@ -246,10 +247,10 @@
+ 	Effect.Success<ReturnType<typeof makeProjection>>
+ >()("alkalye/DocumentProjection") {}
+ let handlers = EventLog.group(changes, handlers =>
+-	handlers.handle("DocumentRecorded", ({ payload }) =>
++	handlers.handle("DocumentRecorded", ({ payload, entry }) =>
+ 		DocumentProjection.use(projection =>
+ 			projection
+-				.record(payload)
++				.record(payload, entry)
+ 				.pipe(
+ 					Effect.mapError(error =>
+ 						storageFailure("validate document action", error),
+@@ -335,7 +336,7 @@
+ 		let revision = yield* SubscriptionRef.make(0)
+ 		advanceView()
+ 		let persistUnlocked = (value: Recording) =>
+-			write("DocumentRecorded", value).pipe(
++			openPhase("eventlog-write-" + value.kind, write("DocumentRecorded", value)).pipe(
+ 				Effect.catchDefect(cause =>
+ 					SqlError.isSqlError(cause)
+ 						? Effect.fail(storageFailure("save document action", cause))
+@@ -379,14 +380,14 @@
+ 			Effect.forkScoped({ startImmediately: true }),
+ 			Effect.provideService(Scope.Scope, background),
+ 		)
+-		yield* gate.withPermit(projection.replay)
++		yield* openPhase("initial-journal-replay", gate.withPermit(projection.replay))
+ 		if (!projection.opened()) {
+ 			yield* persist(
+ 				options.initialCreation
+ 					? { kind: "localCreated", creation: options.initialCreation }
+ 					: {
+ 							kind: "opened",
+-							snapshot: yield* options.transport.snapshot(options.document),
++							snapshot: yield* openPhase("snapshot-http", options.transport.snapshot(options.document)),
+ 						},
+ 			)
+ 			yield* gate.withPermit(projection.replay)
+@@ -835,7 +836,8 @@
+ 				timeToLive: exit => (Exit.isSuccess(exit) ? "1 minute" : 0),
+ 			},
+ 		)
+-		let passive = yield* options.passiveState?.read ?? Effect.succeed(undefined)
++		let passive = yield* openPhase("passive-read", options.passiveState?.read ?? Effect.succeed(undefined))
++		openBranch(passive ? "passive-hit" : "passive-miss")
+ 		let cached =
+ 			passive ??
+ 			(yield* storage.cache.pipe(
+@@ -847,7 +849,7 @@
+ 				),
+ 			))
+ 		if (cached) {
+-			yield* restoreCache(cached).pipe(
++			yield* openPhase("restore-cache", restoreCache(cached)).pipe(
+ 				Effect.catch(error =>
+ 					Effect.gen(function* () {
+ 						yield* options.passiveState?.clear ?? Effect.void
+@@ -882,37 +884,37 @@
+ 			remotePosition = localPosition = cachedPosition = 0
+ 		}
+ 		function loadDocument(value: unknown, actor: string) {
+-			return Replica.fromCheckpointEffect(
++			return openPhase("checkpoint-hydration", Replica.fromCheckpointEffect(
+ 				value,
+ 				actor,
+ 				options.author,
+ 				options.cooperativeWork === true,
+-			)
++			))
+ 		}
+ 		function forkDocument(
+ 			source: Replica,
+ 			actor: string,
+ 		): Effect.Effect<Replica, Error> {
+ 			return options.cooperativeWork
+-				? source.forkEffect(actor, options.author)
+-				: Effect.try(() => source.fork(actor, options.author))
++				? openPhase("replica-fork", source.forkEffect(actor, options.author))
++				: openPhase("replica-fork", Effect.try(() => source.fork(actor, options.author)))
+ 		}
+ 		function materializeDocument(
+ 			source: Replica,
+ 		): Effect.Effect<string, Error> {
+ 			return options.cooperativeWork
+-				? source.textEffect(options.document)
+-				: Effect.try(() => source.text(options.document))
++				? openPhase("materialize-text", source.textEffect(options.document))
++				: openPhase("materialize-text", Effect.try(() => source.text(options.document)))
+ 		}
+ 		function restoreCache(cached: PassiveDocumentState) {
+ 			return Effect.gen(function* () {
+-				if (!(yield* storage.containsPosition(cached.position)))
++				if (!(yield* openPhase("cache-cursor", storage.containsPosition(cached.position))))
+ 					return yield* conflict(
+ 						"Saved document cache has a stale journal cursor",
+ 					)
+-				let state = yield* Schema.decodeUnknownEffect(materialization)(
++				let state = yield* openPhase("cache-state-schema", Schema.decodeUnknownEffect(materialization)(
+ 					cached.value,
+-				)
++				))
+ 				if (
+ 					state.document !== options.document ||
+ 					state.subject !== options.subject
+@@ -936,6 +938,7 @@
+ 						"Saved local creation is inconsistent with its pending action",
+ 					)
+ 				let nextAccepted: Replica
++				openBranch(cached.replica && cached.replica.generation === cached.generation ? "replica-cache-hit" : "replica-cache-miss")
+ 				if (cached.replica && cached.replica.generation === cached.generation)
+ 					nextAccepted = yield* forkDocument(
+ 						cached.replica,
+@@ -1062,10 +1065,12 @@
+ 			projectionComplete = false
+ 			let changed = false
+ 			while (true) {
+-				let tail = yield* storage.readAfter(localPosition, 1000)
++				let tail = yield* openPhase("journal-read", storage.readAfter(localPosition, 1000))
++				openBranch("journal-page-" + tail.entries.length)
+ 				for (let entry of tail.entries) {
+ 					let value = yield* decode(entry)
+-					let restored = yield* check(value)
++					if (value.kind === "opened") yield* openEntry(cryptography, "replay", entry.id, new Uint8Array(entry.payload))
++					let restored = yield* openPhase("replay-check-" + value.kind, check(value))
+ 					if (value.kind === "published") {
+ 						if (creation) {
+ 							accepted.apply(
+@@ -1333,8 +1338,9 @@
+ 			replay,
+ 			validate: (value: Recording) =>
+ 				replay.pipe(Effect.andThen(check(value)), Effect.asVoid),
+-			record: (value: Recording) =>
+-				replay.pipe(
++			record: (value: Recording, entry: EventJournal.Entry) =>
++				(value.kind === "opened" ? openEntry(cryptography, "record", entry.id, new Uint8Array(entry.payload)) : Effect.void).pipe(
++					Effect.andThen(replay),
+ 					Effect.andThen(
+ 						Effect.suspend(() =>
+ 							value.kind === "proposed" && !proposals.has(value.action.id)
+@@ -1342,7 +1348,7 @@
+ 								: Effect.void,
+ 						),
+ 					),
+-					Effect.andThen(check(value)),
++					Effect.andThen(openPhase("record-check-" + value.kind, check(value))),
+ 					Effect.andThen(
+ 						value.kind === "proposed" || value.kind === "localCreated"
+ 							? (options.activity?.proposing ?? Effect.void)
+@@ -1658,11 +1664,11 @@
+ 					if (value.snapshot.document !== options.document)
+ 						return yield* conflict("Snapshot belongs to another document")
+ 					if (!log && !creation)
+-						return yield* restoreSnapshot(
++						return yield* openPhase("restore-snapshot", restoreSnapshot(
+ 							value.snapshot,
+ 							actor,
+ 							options.cooperativeWork,
+-						)
++						))
+ 					return
+ 				}
+ 				if (!log && !creation)

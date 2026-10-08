@@ -1,0 +1,677 @@
+import { cp, mkdir, rm } from "node:fs/promises"
+import { join } from "node:path"
+import * as Schema from "effect/Schema"
+import {
+	browser,
+	browserBatch,
+	evaluate,
+	wait,
+} from "../../../tests/browser-driver"
+import { frontmatterBlock } from "../../../src/shared/markdown"
+
+let Fixture = Schema.Struct({
+	name: Schema.String,
+	path: Schema.String,
+	sourceFile: Schema.String,
+	query: Schema.optional(Schema.String),
+	token: Schema.optional(Schema.String),
+	selections: Schema.optional(Schema.Number),
+})
+let Version = Schema.Struct({
+	name: Schema.String,
+	kind: Schema.Literals(["original", "rewrite"]),
+	commit: Schema.String,
+	url: Schema.String,
+	seedProfile: Schema.String,
+	oracle: Schema.Array(Schema.String),
+	assets: Schema.Array(
+		Schema.Struct({ path: Schema.String, sha256: Schema.String }),
+	),
+	fixtures: Schema.Array(Fixture),
+})
+let Cell = Schema.Struct({
+	name: Schema.String,
+	journey: Schema.Literals([
+		"body",
+		"find",
+		"find-next",
+		"find-close",
+		"switch",
+		"multicursor",
+		"scroll",
+		"sync",
+		"offline",
+		"poll",
+	]),
+	fixture: Schema.String,
+	target: Schema.optional(Schema.String),
+	position: Schema.optional(Schema.Literals(["start", "middle", "end"])),
+	versions: Schema.optional(Schema.Array(Schema.String)),
+})
+let Manifest = Schema.Struct({
+	samples: Schema.Number,
+	output: Schema.String,
+	versions: Schema.Array(Version),
+	cells: Schema.Array(Cell),
+})
+let Receipt = Schema.Struct({
+	sha256: Schema.String,
+	characters: Schema.Number,
+	cursor: Schema.optional(Schema.Number),
+	log: Schema.optional(Schema.String),
+})
+type Version = typeof Version.Type
+type Fixture = typeof Fixture.Type
+type Cell = typeof Cell.Type
+let [manifestPath] = Bun.argv.slice(2)
+if (!manifestPath)
+	throw Error(
+		"Usage: bun experiments/performance/interaction-matrix/runner.ts PRIVATE_MANIFEST.json",
+	)
+let manifest = Schema.decodeUnknownSync(Manifest)(
+	await Bun.file(manifestPath).json(),
+)
+if (
+	!Number.isInteger(manifest.samples) ||
+	manifest.samples < 1 ||
+	manifest.samples > 5
+)
+	throw Error("Samples must be 1–5")
+await mkdir(manifest.output, { recursive: true })
+let results: object[] = [],
+	blocked = new Set<string>()
+let selected = Bun.env.BENCHMARK_CELLS?.split(",")
+for (let version of manifest.versions) {
+	if (!/^[a-f0-9]{40}$/.test(version.commit) || !version.assets.length)
+		throw Error("Frozen full SHA and emitted asset closure required")
+}
+for (let cell of manifest.cells.filter(
+	value => !selected || selected.includes(value.name),
+))
+	for (let trial = 0; trial < manifest.samples; trial++) {
+		let versions =
+			trial % 2 ? manifest.versions.slice().reverse() : manifest.versions
+		for (let version of versions) {
+			if (cell.versions && !cell.versions.includes(version.name)) continue
+			let fixture = version.fixtures.find(value => value.name === cell.fixture)
+			if (!fixture) throw Error("Manifest fixture missing: " + cell.fixture)
+			let key = version.name + ":" + fixture.name
+			if (blocked.has(key)) {
+				results.push({
+					version: version.name,
+					cell: cell.name,
+					trial,
+					status: "blocked",
+					reason: "Prior uncertain write/Undo; no action repeated",
+				})
+				await Bun.write(
+					join(manifest.output, "results.json"),
+					JSON.stringify(results, null, 2),
+				)
+				continue
+			}
+			await run(version, fixture, cell, trial, key)
+			await Bun.write(
+				join(manifest.output, "results.json"),
+				JSON.stringify(results, null, 2),
+			)
+		}
+	}
+
+function source(version: Version) {
+	return version.kind === "original"
+		? "document.querySelector('.cm-content')?.cmTile?.view?.state.doc.toString()"
+		: "document.querySelector('alkalye-editor')?.source?.value"
+}
+function length(version: Version) {
+	return version.kind === "original"
+		? "document.querySelector('.cm-content')?.cmTile?.view?.state.doc.length"
+		: "document.querySelector('alkalye-editor')?.source?.value.length"
+}
+function editable(version: Version) {
+	return version.kind === "original"
+		? "document.querySelector('.cm-content')?.getAttribute('contenteditable')==='true'"
+		: "document.querySelector('#editor')?.readOnly===false"
+}
+function setSelection(version: Version, start: string, end = start) {
+	return version.kind === "original"
+		? `let view=document.querySelector('.cm-content').cmTile.view;view.dispatch({selection:{anchor:${start},head:${end}}});view.focus();`
+		: `let editor=document.querySelector('alkalye-editor');editor.selectRange(${start},${end});editor.source.focus();`
+}
+function currentDocument() {
+	return "(location.pathname.match(/[/]doc[/]([^/]+)/)||[])[1]"
+}
+function findInput(version: Version) {
+	return version.kind === "original"
+		? "input[placeholder='Find...']"
+		: "#find-text"
+}
+function selection(version: Version) {
+	return version.kind === "original"
+		? "({start:document.querySelector('.cm-content').cmTile.view.state.selection.main.from,end:document.querySelector('.cm-content').cmTile.view.state.selection.main.to})"
+		: "({start:document.querySelector('alkalye-editor').source.selectionStart,end:document.querySelector('alkalye-editor').source.selectionEnd})"
+}
+function digest(session: string, expression: string) {
+	return Schema.decodeUnknownSync(Schema.String)(
+		evaluate(
+			session,
+			`crypto.subtle.digest('SHA-256',new TextEncoder().encode(${expression})).then(bytes=>[...new Uint8Array(bytes)].map(value=>value.toString(16).padStart(2,'0')).join(''))`,
+		),
+	)
+}
+async function accepted(
+	version: Version,
+	fixture: Fixture,
+	hash: string,
+	phase: string,
+) {
+	if (!version.oracle.length)
+		throw Error("Independent accepted-source oracle command required")
+	let oracleProcess = Bun.spawn([...version.oracle], {
+		stdin: "pipe",
+		stdout: "pipe",
+		stderr: "pipe",
+	})
+	let deadline = setTimeout(() => oracleProcess.kill(), 25000)
+	oracleProcess.stdin.write(
+		JSON.stringify({
+			fixture: fixture.name,
+			path: fixture.path,
+			expectedSha256: hash,
+			phase,
+			deadlineMs: 20000,
+		}),
+	)
+	oracleProcess.stdin.end()
+	let [stdout, stderr, exit] = await Promise.all([
+		new Response(oracleProcess.stdout).text(),
+		new Response(oracleProcess.stderr).text(),
+		oracleProcess.exited,
+	]).finally(() => clearTimeout(deadline))
+	if (exit !== 0) {
+		await Bun.write(join(manifest.output, "oracle-failure-private.log"), stderr)
+		throw Error(
+			"Independent accepted-source oracle failed; private diagnostic retained",
+		)
+	}
+	let receipt = Schema.decodeUnknownSync(Receipt)(JSON.parse(stdout))
+	if (receipt.sha256 !== hash)
+		throw Error("Independent accepted-source digest mismatch")
+	return receipt
+}
+async function profile(
+	version: Version,
+	session: string,
+	directory: string,
+	poll: boolean,
+) {
+	await rm(directory, { recursive: true, force: true })
+	await cp(version.seedProfile, directory, { recursive: true })
+	for (let name of [
+		"SingletonLock",
+		"SingletonSocket",
+		"SingletonCookie",
+		"Default/Service Worker",
+		"Default/Cache",
+		"Default/Code Cache",
+	])
+		await rm(join(directory, name), { force: true, recursive: true })
+	browser(
+		session,
+		"--profile",
+		directory,
+		"open",
+		"--init-script",
+		join(import.meta.dir, "network.js"),
+		...(poll
+			? ["--init-script", join(import.meta.dir, "block-sockets.js")]
+			: []),
+		version.url + "/changelog",
+	)
+	if (version.kind === "original")
+		evaluate(
+			session,
+			"(()=>{let keys=Object.keys(localStorage).filter(key=>/^co_[^_]+_[0-9]+$/.test(key));for(let key of keys)localStorage.removeItem(key);return keys.length})()",
+		)
+	browser(session, "set", "viewport", "1280", "800")
+}
+function completeClient(version: Version, session: string, expected: string) {
+	wait(session, `${source(version)}===${expected}`)
+	wait(
+		session,
+		version.kind === "original"
+			? `window.interactionOwnSaved?.content===${expected}`
+			: "document.querySelector('#save-status')?.dataset.pending==='0'&&document.querySelector('#save-status')?.getAttribute('aria-busy')==='false'",
+	)
+}
+function prepare(
+	version: Version,
+	session: string,
+	fixture: Fixture,
+	cell: Cell,
+) {
+	let read = source(version),
+		ready = "false"
+	evaluate(
+		session,
+		`window.interactionBase=${read};window.interactionExpected=window.interactionBase;window.interactionOwnSaved=null;window.addEventListener('alkalye:document-saved',event=>window.interactionOwnSaved=event.detail);true`,
+	)
+	if (["body", "sync", "offline", "poll"].includes(cell.journey)) {
+		let position =
+			cell.position === "start"
+				? "window.interactionBodyStart"
+				: cell.position === "middle"
+					? "Math.floor(text.length/2)"
+					: "text.length"
+		evaluate(
+			session,
+			`(()=>{let text=window.interactionBase,index=${position};if(index>0&&text.charCodeAt(index)>=0xdc00&&text.charCodeAt(index)<=0xdfff&&text.charCodeAt(index-1)>=0xd800&&text.charCodeAt(index-1)<=0xdbff)index--;window.interactionExpected=text.slice(0,index)+'x'+text.slice(index);${setSelection(version, "index")}return true})()`,
+		)
+		ready = `${length(version)}===window.interactionExpected.length&&${read}===window.interactionExpected`
+	} else if (cell.journey === "multicursor") {
+		if (!fixture.token || !fixture.selections)
+			throw Error("Multicursor token/count required")
+		let token = JSON.stringify(fixture.token)
+		let observed = evaluate(
+			session,
+			`(()=>{let text=window.interactionBase,token=${token},ranges=[],index=0;while((index=text.indexOf(token,index))>=0){ranges.push({start:index,end:index+token.length});index+=token.length}window.interactionExpected=text.split(token).join('x');window.interactionSelectionCount=ranges.length;window.interactionPrimaryExpected=text.indexOf(token)+1;${version.kind === "original" ? `let view=document.querySelector('.cm-content').cmTile.view;view.dispatch({selection:view.state.selection.constructor.create(ranges.map(range=>view.state.selection.constructor.range(range.start,range.end)))});view.focus();` : `if(!ranges.length)throw Error('No token');${setSelection(version, "ranges[0].start", "ranges[0].end")}`}return ranges.length})()`,
+		)
+		if (observed !== fixture.selections)
+			throw Error("Multicursor fixture count differs")
+		if (version.kind === "original")
+			wait(
+				session,
+				`document.querySelector('.cm-content').cmTile.view.state.selection.ranges.length===${fixture.selections}`,
+			)
+		else {
+			wait(
+				session,
+				`(${selection(version)}).start===window.interactionBase.indexOf(${token})&&(${selection(version)}).end===window.interactionBase.indexOf(${token})+${fixture.token.length}`,
+			)
+			browser(session, "press", "Control+Shift+l")
+			evaluate(
+				session,
+				"(()=>{let source=document.querySelector('alkalye-editor').source,replace=source.replace;window.interactionObservedRanges=0;source.replace=function(value,start,end,ranges){if(ranges)window.interactionObservedRanges=ranges.length;return replace.call(this,value,start,end,ranges)};return true})()",
+			)
+		}
+		ready = `${length(version)}===window.interactionExpected.length&&${read}===window.interactionExpected`
+	} else if (["find", "find-next", "find-close"].includes(cell.journey)) {
+		if (!fixture.query) throw Error("Find query required")
+		let query = JSON.stringify(fixture.query)
+		evaluate(
+			session,
+			`(()=>{let text=window.interactionBase,query=${query},offsets=[];for(let index=text.indexOf(query);index>=0;index=text.indexOf(query,index+query.length))offsets.push(index);if(!offsets.length)throw Error('Query has no exact occurrence');window.interactionQueryCount=offsets.length;return true})()`,
+		)
+		let matchesReady =
+			version.kind === "original"
+				? "document.querySelector('.cm-searchMatch')!==null"
+				: "!!(document.querySelector('.search-match')||CSS.highlights?.get('alkalye-search')?.size)&&document.querySelector('.find-count')?.textContent.endsWith(' of '+window.interactionQueryCount)"
+		let queryReady = `document.querySelector(${JSON.stringify(findInput(version))})?.value===${query}&&(${matchesReady})`
+		evaluate(session, `(()=>{${setSelection(version, "0")}return true})()`)
+		browser(
+			session,
+			"press",
+			process.platform === "darwin" ? "Meta+f" : "Control+f",
+		)
+		wait(
+			session,
+			`document.querySelector(${JSON.stringify(findInput(version))})?.checkVisibility()`,
+		)
+		browser(
+			session,
+			"fill",
+			findInput(version),
+			cell.journey === "find" ? "" : fixture.query,
+		)
+		if (cell.journey === "find") ready = queryReady
+		else {
+			wait(session, queryReady)
+			if (cell.journey === "find-close") {
+				evaluate(
+					session,
+					`window.interactionCloseExpected=${selection(version)};true`,
+				)
+				let noMatches =
+					version.kind === "original"
+						? "!document.querySelector('.cm-searchMatch')"
+						: "!document.querySelector('.search-match')&&!CSS.highlights?.get('alkalye-search')?.size"
+				ready = `!document.querySelector(${JSON.stringify(findInput(version))})?.checkVisibility()&&(${selection(version)}).start===window.interactionCloseExpected.start&&(${selection(version)}).end===window.interactionCloseExpected.end&&(${noMatches})`
+			} else {
+				let caret = selection(version)
+				evaluate(
+					session,
+					`(()=>{let caret=${caret},query=${query},text=window.interactionBase,offsets=[];for(let index=text.indexOf(query);index>=0;index=text.indexOf(query,index+query.length))offsets.push(index);let target=offsets.find(index=>index>=caret.end)??offsets[0];if(target===undefined)throw Error('No next match');window.interactionFindExpected={start:target,end:target+query.length};return true})()`,
+				)
+				ready = `(${caret}).start===window.interactionFindExpected.start&&(${caret}).end===window.interactionFindExpected.end`
+			}
+		}
+	} else if (cell.journey === "switch")
+		ready = `${currentDocument()}===window.interactionTargetDocument&&${length(version)}===window.interactionTargetCharacters&&(${editable(version)})`
+	else {
+		let host =
+			version.kind === "original"
+				? "document.querySelector('.cm-scroller')"
+				: "document.querySelector('alkalye-editor').source.viewport.scrollElement"
+		evaluate(
+			session,
+			`(()=>{let host=${host};host.scrollTop=0;window.interactionScrollHost=host;return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve(true))))})()`,
+		)
+		ready = "window.interactionScrollHost.scrollTop>0"
+	}
+	return ready
+}
+function arm(session: string, ready: string) {
+	evaluate(
+		session,
+		`(()=>{let state=window.interactionProbe={events:[],eventTiming:[],frames:[],start:0,ready:0,end:0},controller=new AbortController(),last=0;window.interactionProbeCleanup=()=>controller.abort();for(let name of ['keydown','beforeinput','pointerdown','wheel'])document.addEventListener(name,event=>{if(!event.isTrusted||event.timeStamp===0)return;state.events.push({type:name,time:performance.now(),eventTimestamp:event.timeStamp,key:event.key});if(!state.start){state.start=performance.now();performance.mark('interaction:start');setTimeout(()=>{state.end=performance.now();performance.mark('interaction:end');controller.abort()},3000)}},{capture:true,passive:true,signal:controller.signal});let observer;try{observer=new PerformanceObserver(list=>{for(let entry of list.getEntries())state.eventTiming.push({name:entry.name,startTime:entry.startTime,processingStart:entry.processingStart,processingEnd:entry.processingEnd,duration:entry.duration})});observer.observe({type:'event',buffered:false,durationThreshold:16})}catch{}window.interactionEventObserver=observer;function frame(time){if(state.start&&last)state.frames.push(time-last);last=time;if(state.start&&!state.ready&&(${ready})){state.ready=performance.now();performance.mark('interaction:ready')}if(!state.end)requestAnimationFrame(frame)}requestAnimationFrame(frame);return true})()`,
+	)
+}
+function act(version: Version, session: string, fixture: Fixture, cell: Cell) {
+	if (["body", "multicursor", "sync", "offline", "poll"].includes(cell.journey))
+		browser(session, "press", "x")
+	else if (cell.journey === "find")
+		browser(session, "keyboard", "inserttext", fixture.query ?? "")
+	else if (cell.journey === "find-next") {
+		if (version.kind === "rewrite") browser(session, "click", "#find-next")
+		else
+			browser(
+				session,
+				"find",
+				"role",
+				"button",
+				"click",
+				"--name",
+				"Next",
+				"--exact",
+			)
+	} else if (cell.journey === "find-close") {
+		if (version.kind === "rewrite") browser(session, "click", "#close-find")
+		else
+			browser(
+				session,
+				"find",
+				"role",
+				"button",
+				"click",
+				"--name",
+				"Close",
+				"--exact",
+			)
+	} else if (cell.journey === "switch") {
+		let target = version.fixtures.find(value => value.name === cell.target)
+		if (!target) throw Error("Switch target missing")
+		let id = target.path.split("/").at(-1)
+		browser(
+			session,
+			"click",
+			version.kind === "original"
+				? `[data-testid="doc-list-item"][data-doc-id="${id}"] a`
+				: `[data-doc="${id}"]`,
+		)
+	} else
+		browserBatch(
+			session,
+			Array.from({ length: 8 }, () => ["mouse", "wheel", "600"]),
+		)
+}
+async function run(
+	version: Version,
+	fixture: Fixture,
+	cell: Cell,
+	trial: number,
+	key: string,
+) {
+	let session = "im-" + Date.now().toString(36),
+		stage = "setup",
+		mutated = false,
+		tracing = false
+	let trace = join(
+		manifest.output,
+		`${version.name}-${cell.name}-${trial}.trace.json`,
+	)
+	let observation: unknown,
+		seedReceipt: unknown,
+		editedReceipt: unknown,
+		undoReceipt: unknown
+	let fixtureMetadata: unknown, targetReceipt: unknown
+	try {
+		let file = await Bun.file(fixture.sourceFile).arrayBuffer(),
+			hash = new Bun.CryptoHasher("sha256").update(file).digest("hex")
+		let text = new TextDecoder().decode(file)
+		fixtureMetadata = {
+			characters: text.length,
+			bytes: file.byteLength,
+			realNewlines: text.split("\n").length - 1,
+			sha256: hash,
+		}
+		await profile(
+			version,
+			session,
+			join(manifest.output, "profile-" + session),
+			cell.journey === "poll",
+		)
+		browser(session, "open", version.url + fixture.path)
+		wait(
+			session,
+			`${currentDocument()}===${JSON.stringify(fixture.path.split("/").at(-1))}&&${length(version)}===${text.length}&&(${editable(version)})`,
+		)
+		if (digest(session, source(version)) !== hash)
+			throw Error("Initial complete source hash differs")
+		seedReceipt = await accepted(version, fixture, hash, "seed")
+		let loadedScripts = evaluate(
+			session,
+			"performance.getEntriesByType('resource').filter(entry=>entry.initiatorType==='script').map(entry=>new URL(entry.name).pathname)",
+		)
+		let scripts = Schema.decodeUnknownSync(Schema.Array(Schema.String))(
+			loadedScripts,
+		)
+		for (let asset of version.assets) {
+			if (!scripts.includes(new URL(asset.path, version.url).pathname))
+				throw Error("Expected frozen script not loaded by app")
+			let fetched = Schema.decodeUnknownSync(Schema.String)(
+				evaluate(
+					session,
+					`fetch(${JSON.stringify(asset.path)}).then(response=>response.arrayBuffer()).then(bytes=>crypto.subtle.digest('SHA-256',bytes)).then(bytes=>[...new Uint8Array(bytes)].map(value=>value.toString(16).padStart(2,'0')).join(''))`,
+				),
+			)
+			if (fetched !== asset.sha256) throw Error("Served asset digest mismatch")
+		}
+		if (cell.journey === "poll")
+			wait(
+				session,
+				"window.interactionNetwork.pollRequests>0&&window.interactionNetwork.sends>0",
+			)
+		evaluate(
+			session,
+			`window.interactionBodyStart=${frontmatterBlock(text)?.[0].length ?? 0};true`,
+		)
+		let condition = prepare(version, session, fixture, cell)
+		if (cell.journey === "switch") {
+			let target = version.fixtures.find(value => value.name === cell.target)
+			if (!target) throw Error("Switch target missing")
+			let targetText = await Bun.file(target.sourceFile).text()
+			if (targetText.length === text.length)
+				throw Error(
+					"Switch readiness requires different-size fixture; use explicit same-size adapter",
+				)
+			evaluate(
+				session,
+				`window.interactionTargetCharacters=${targetText.length};window.interactionTargetDocument=${JSON.stringify(target.path.split("/").at(-1))};true`,
+			)
+			let id = target.path.split("/").at(-1),
+				selector =
+					version.kind === "original"
+						? `[data-testid="doc-list-item"][data-doc-id="${id}"] a`
+						: `[data-doc="${id}"]`
+			if (
+				!evaluate(
+					session,
+					`document.querySelector(${JSON.stringify(selector)})?.checkVisibility()`,
+				)
+			)
+				browser(
+					session,
+					"click",
+					version.kind === "original"
+						? '[aria-label="Documents"]'
+						: '[data-action="library"]',
+				)
+			wait(
+				session,
+				`document.querySelector(${JSON.stringify(selector)})?.checkVisibility()`,
+			)
+		}
+		if (cell.journey === "scroll")
+			browser(session, "mouse", "move", "640", "350")
+		if (cell.journey === "offline") browser(session, "set", "offline", "on")
+		evaluate(session, "performance.clearMarks();performance.clearMeasures();true")
+		stage = "trusted-action"
+		browser(
+			session,
+			"profiler",
+			"start",
+			"--categories",
+			"devtools.timeline,disabled-by-default-devtools.timeline,toplevel,blink.user_timing,v8,disabled-by-default-v8.cpu_profiler",
+		)
+		tracing = true
+		arm(session, condition)
+		mutated = ["body", "multicursor", "sync", "offline", "poll"].includes(
+			cell.journey,
+		)
+		act(version, session, fixture, cell)
+		if (cell.journey === "offline") {
+			wait(session, `${source(version)}===window.interactionExpected`)
+			browser(session, "set", "offline", "off")
+		}
+		wait(session, "window.interactionProbe.end>0")
+		browser(session, "profiler", "stop", trace)
+		tracing = false
+		observation = evaluate(
+			session,
+			"(()=>{window.interactionEventObserver?.disconnect();return {phases:performance.getEntriesByType('measure').filter(entry=>entry.name.startsWith('document-open:')).map(entry=>({name:entry.name,start:entry.startTime,duration:entry.duration})),branches:performance.getEntriesByType('mark').filter(entry=>entry.name.startsWith('document-open:branch:')).map(entry=>({name:entry.name,start:entry.startTime,detail:entry.detail})),probe:window.interactionProbe,network:window.interactionNetwork,scripts:performance.getEntriesByType('resource').filter(entry=>entry.initiatorType==='script').map(entry=>({path:new URL(entry.name).pathname,decoded:entry.decodedBodySize}))}})()",
+		)
+		if (
+			!evaluate(
+				session,
+				"window.interactionProbe.start>0&&window.interactionProbe.ready>0",
+			)
+		)
+			throw Error("Trusted-action readiness not observed")
+		if (
+			cell.journey === "multicursor" &&
+			version.kind === "rewrite" &&
+			evaluate(session, "window.interactionObservedRanges") !==
+				fixture.selections
+		)
+			throw Error("Trusted multicursor replacement range count differs")
+		let caret = Schema.decodeUnknownSync(
+			Schema.Struct({ start: Schema.Number, end: Schema.Number }),
+		)(evaluate(session, selection(version)))
+		if (
+			caret.start < 0 ||
+			caret.end < caret.start ||
+			caret.end > Number(evaluate(session, length(version)))
+		)
+			throw Error("Final source selection is out of bounds")
+		let queryCount = cell.journey.startsWith("find")
+			? evaluate(
+					session,
+					`(()=>{let text=window.interactionBase,query=${JSON.stringify(fixture.query)},count=0;for(let index=text.indexOf(query);index>=0;index=text.indexOf(query,index+query.length))count++;return count})()`,
+				)
+			: undefined
+		observation = {
+			...Schema.decodeUnknownSync(Schema.Record(Schema.String, Schema.Unknown))(
+				observation,
+			),
+			sourceSelection: caret,
+			queryOccurrences: queryCount,
+		}
+		stage = "source-unchanged"
+		if (mutated) {
+			stage = "edit-client-complete"
+			completeClient(version, session, "window.interactionExpected")
+			if (cell.journey === "multicursor")
+				wait(
+					session,
+					`(${selection(version)}).start===window.interactionPrimaryExpected&&(${selection(version)}).end===window.interactionPrimaryExpected`,
+				)
+			let editedHash = digest(session, "window.interactionExpected")
+			stage = "edit-accepted"
+			editedReceipt = await accepted(version, fixture, editedHash, "edit")
+			evaluate(session, "window.interactionOwnSaved=null;true")
+			stage = "undo-client-complete"
+			browser(
+				session,
+				"press",
+				process.platform === "darwin" ? "Meta+z" : "Control+z",
+			)
+			completeClient(version, session, "window.interactionBase")
+			stage = "undo-accepted"
+			undoReceipt = await accepted(version, fixture, hash, "undo")
+		} else if (cell.journey === "switch") {
+			let target = version.fixtures.find(value => value.name === cell.target)
+			if (!target) throw Error("Switch target missing")
+			let targetHash = new Bun.CryptoHasher("sha256")
+				.update(await Bun.file(target.sourceFile).arrayBuffer())
+				.digest("hex")
+			if (digest(session, source(version)) !== targetHash)
+				throw Error("Switch target complete source differs")
+			targetReceipt = await accepted(
+				version,
+				target,
+				targetHash,
+				"switch-target",
+			)
+		} else if (digest(session, source(version)) !== hash)
+			throw Error("Nonmutating journey changed complete source")
+		results.push({
+			version: version.name,
+			commit: version.commit,
+			cell: cell.name,
+			trial,
+			status: "complete",
+			trace,
+			observation,
+			seedReceipt,
+			targetReceipt,
+			editedReceipt,
+			undoReceipt,
+			fixture: fixtureMetadata,
+		})
+	} catch (error) {
+		try {
+			observation ??= evaluate(
+				session,
+				"(()=>{window.interactionEventObserver?.disconnect();return {probe:window.interactionProbe,network:window.interactionNetwork}})()",
+			)
+		} catch {}
+		if (mutated) blocked.add(key)
+		results.push({
+			version: version.name,
+			commit: version.commit,
+			cell: cell.name,
+			trial,
+			status: "failed",
+			stage,
+			error: String(error),
+			trace,
+			observation,
+			seedReceipt,
+			targetReceipt,
+			editedReceipt,
+			undoReceipt,
+			fixture: fixtureMetadata,
+		})
+	} finally {
+		if (tracing)
+			try {
+				browser(session, "profiler", "stop", trace)
+			} catch {}
+		try {
+			browser(session, "set", "offline", "off")
+		} catch {}
+		try {
+			browser(session, "close")
+		} catch {}
+	}
+}

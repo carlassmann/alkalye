@@ -1,0 +1,118 @@
+[
+	{
+		"version": "restore-count",
+		"commit": "72dd6f5edf6c8927b4c927d4c5c932d3940d6303",
+		"cell": "switch-small-rich",
+		"trial": 0,
+		"status": "complete",
+		"stage": null,
+		"error": null,
+		"gates": {
+			"seedReceipt": true,
+			"editedReceipt": false,
+			"undoReceipt": false
+		},
+		"traceStatus": "complete-window",
+		"initialEnclosingTaskMs": 0.376,
+		"aftermathMaxTaskMs": 22.791,
+		"windowMaxTaskMs": 22.791,
+		"presentationOpportunityMs": 665.742,
+		"layoutUnionMs": 15.358,
+		"paintUnionMs": 2.182,
+		"gcUnionMs": 27.002,
+		"largestTasks": [
+			{
+				"relativeStartMs": 624.654,
+				"durationMs": 22.791
+			},
+			{
+				"relativeStartMs": 674.135,
+				"durationMs": 5.882
+			},
+			{
+				"relativeStartMs": 647.765,
+				"durationMs": 5.263
+			},
+			{
+				"relativeStartMs": 411.936,
+				"durationMs": 4.47
+			},
+			{
+				"relativeStartMs": 347.828,
+				"durationMs": 3.686
+			}
+		],
+		"eventTiming": [
+			{
+				"duration": 16,
+				"name": "pointerdown",
+				"processingEnd": 713.3000000119209,
+				"processingStart": 713.0999999642372,
+				"startTime": 712.8000000119209
+			},
+			{
+				"duration": 16,
+				"name": "mousedown",
+				"processingEnd": 713.3000000119209,
+				"processingStart": 713.3000000119209,
+				"startTime": 712.8000000119209
+			},
+			{
+				"duration": 16,
+				"name": "pointerup",
+				"processingEnd": 713.6999999880791,
+				"processingStart": 713.5999999642372,
+				"startTime": 713.5999999642372
+			},
+			{
+				"duration": 16,
+				"name": "mouseup",
+				"processingEnd": 713.6999999880791,
+				"processingStart": 713.6999999880791,
+				"startTime": 713.5999999642372
+			},
+			{
+				"duration": 16,
+				"name": "click",
+				"processingEnd": 714.3000000119209,
+				"processingStart": 713.6999999880791,
+				"startTime": 713.5999999642372
+			},
+			{
+				"duration": 16,
+				"name": "pointerover",
+				"processingEnd": 1378.899999976158,
+				"processingStart": 1378.899999976158,
+				"startTime": 1378.699999988079
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1378.899999976158,
+				"processingStart": 1378.899999976158,
+				"startTime": 1378.699999988079
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1378.899999976158,
+				"processingStart": 1378.899999976158,
+				"startTime": 1378.699999988079
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1378.899999976158,
+				"processingStart": 1378.899999976158,
+				"startTime": 1378.699999988079
+			},
+			{
+				"duration": 16,
+				"name": "mouseover",
+				"processingEnd": 1378.899999976158,
+				"processingStart": 1378.899999976158,
+				"startTime": 1378.699999988079
+			}
+		]
+	}
+]

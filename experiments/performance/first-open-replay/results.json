@@ -1,0 +1,327 @@
+{
+	"version": "restore-count",
+	"commit": "72dd6f5edf6c8927b4c927d4c5c932d3940d6303",
+	"cell": "switch-small-rich",
+	"trial": 0,
+	"status": "complete",
+	"seedReceipt": {
+		"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+		"characters": 2048,
+		"log": "0297efe0-6705-479c-9ca4-b80852744c00:5"
+	},
+	"targetReceipt": {
+		"sha256": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac",
+		"characters": 131072,
+		"log": "8c5c6a5d-9d8a-4a78-bf50-89d1bd164f04:6"
+	},
+	"fixture": {
+		"characters": 2048,
+		"bytes": 2048,
+		"realNewlines": 121,
+		"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+	},
+	"observation": {
+		"phases": [
+			{
+				"duration": 0.10000002384185792,
+				"name": "document-open:materialize-text:28",
+				"start": 622.8999999761581
+			},
+			{
+				"duration": 0.30000001192092896,
+				"name": "document-open:journal-read:29",
+				"start": 623.5
+			},
+			{
+				"duration": 0.10000002384185792,
+				"name": "document-open:journal-read:30",
+				"start": 623.8999999761581
+			},
+			{
+				"duration": 0.30000001192092896,
+				"name": "document-open:journal-read:31",
+				"start": 637.5999999642372
+			},
+			{
+				"duration": 0,
+				"name": "document-open:materialize-text:32",
+				"start": 638
+			},
+			{
+				"duration": 624.5999999642372,
+				"name": "document-open:library-open:33",
+				"start": 713.8000000119209
+			},
+			{
+				"duration": 0.10000002384185792,
+				"name": "document-open:live-watch:34",
+				"start": 713.8999999761581
+			},
+			{
+				"duration": 14.300000011920927,
+				"name": "document-open:local-creation:35",
+				"start": 714
+			},
+			{
+				"duration": 609.6999999880791,
+				"name": "document-open:session-layer:36",
+				"start": 728.3999999761581
+			},
+			{
+				"duration": 0.09999996423721312,
+				"name": "document-open:passive-read:37",
+				"start": 730.5
+			},
+			{
+				"duration": 0.10000002384185792,
+				"name": "document-open:journal-read:39",
+				"start": 731.0999999642372
+			},
+			{
+				"duration": 0.10000002384185792,
+				"name": "document-open:initial-journal-replay:38",
+				"start": 731.0999999642372
+			},
+			{
+				"duration": 267.5,
+				"name": "document-open:snapshot-http:40",
+				"start": 731.3000000119209
+			},
+			{
+				"duration": 161.0999999642372,
+				"name": "document-open:eventlog-write-opened:41",
+				"start": 998.8000000119208
+			},
+			{
+				"duration": 0.19999998807907104,
+				"name": "document-open:journal-read:42",
+				"start": 999.899999976158
+			},
+			{
+				"duration": 157.10000002384186,
+				"name": "document-open:restore-snapshot:44",
+				"start": 1000.0999999642372
+			},
+			{
+				"duration": 157.10000002384186,
+				"name": "document-open:record-check-opened:43",
+				"start": 1000.0999999642372
+			},
+			{
+				"duration": 0.3999999761581421,
+				"name": "document-open:journal-read:45",
+				"start": 1160
+			},
+			{
+				"duration": 133.5,
+				"name": "document-open:restore-snapshot:47",
+				"start": 1160.699999988079
+			},
+			{
+				"duration": 133.60000002384186,
+				"name": "document-open:replay-check-opened:46",
+				"start": 1160.699999988079
+			},
+			{
+				"duration": 23.69999998807907,
+				"name": "document-open:materialize-text:48",
+				"start": 1294.300000011921
+			},
+			{
+				"duration": 10.399999976158142,
+				"name": "document-open:replica-fork:49",
+				"start": 1318
+			},
+			{
+				"duration": 9.100000023841858,
+				"name": "document-open:replica-fork:50",
+				"start": 1328.399999976158
+			},
+			{
+				"duration": 0.30000001192092896,
+				"name": "document-open:journal-read:51",
+				"start": 1337.5999999642372
+			},
+			{
+				"duration": 0.10000002384185792,
+				"name": "document-open:previous-flush:52",
+				"start": 1339.5999999642372
+			},
+			{
+				"duration": 18.099999964237213,
+				"name": "document-open:mount-document:53",
+				"start": 1339.800000011921
+			},
+			{
+				"duration": 0,
+				"name": "document-open:mount-current-document:54",
+				"start": 1340.699999988079
+			},
+			{
+				"duration": 16.30000001192093,
+				"name": "document-open:mount-editor:55",
+				"start": 1340.899999976158
+			},
+			{
+				"duration": 9.900000035762789,
+				"name": "document-open:previous-scope-close:56",
+				"start": 1358.0999999642372
+			},
+			{
+				"duration": 0,
+				"name": "document-open:materialize-text:57",
+				"start": 1359.5999999642372
+			},
+			{
+				"duration": 3.099999964237213,
+				"name": "document-open:journal-read:58",
+				"start": 1368.300000011921
+			},
+			{
+				"duration": 0.20000004768371585,
+				"name": "document-open:journal-read:59",
+				"start": 1371.5999999642372
+			},
+			{
+				"duration": 0.09999996423721312,
+				"name": "document-open:journal-read:60",
+				"start": 1374.800000011921
+			},
+			{
+				"duration": 0,
+				"name": "document-open:materialize-text:61",
+				"start": 1375.0999999642372
+			},
+			{
+				"duration": 0,
+				"name": "document-open:materialize-text:62",
+				"start": 1402
+			},
+			{
+				"duration": 0.09999996423721312,
+				"name": "document-open:materialize-text:63",
+				"start": 1866.800000011921
+			},
+			{
+				"duration": 0.19999998807907104,
+				"name": "document-open:journal-read:64",
+				"start": 1869
+			},
+			{
+				"duration": 0.09999996423721312,
+				"name": "document-open:journal-read:65",
+				"start": 1869.300000011921
+			},
+			{
+				"duration": 0.19999998807907104,
+				"name": "document-open:journal-read:66",
+				"start": 1872.5
+			},
+			{
+				"duration": 0,
+				"name": "document-open:materialize-text:67",
+				"start": 1872.899999976158
+			},
+			{
+				"duration": 0.09999996423721312,
+				"name": "document-open:materialize-text:68",
+				"start": 3361
+			}
+		],
+		"branches": [
+			{
+				"detail": null,
+				"name": "document-open:branch:journal-page-0",
+				"start": 623.8000000119209
+			},
+			{
+				"detail": null,
+				"name": "document-open:branch:journal-page-0",
+				"start": 624
+			},
+			{
+				"detail": null,
+				"name": "document-open:branch:journal-page-0",
+				"start": 637.8999999761581
+			},
+			{
+				"detail": null,
+				"name": "document-open:branch:passive-miss",
+				"start": 730.5999999642372
+			},
+			{
+				"detail": null,
+				"name": "document-open:branch:journal-page-0",
+				"start": 731.1999999880791
+			},
+			{
+				"detail": {
+					"bytes": 134956,
+					"identity": "88407aeaefe4736136687dfe888747430fbc7a92d35cf7c3f8069bb3ae00cd07",
+					"payload": "cb7e97fd3e2ca4d5206a079557116cf4ae69866c4540ed1ec1b009cd3689719e"
+				},
+				"name": "document-open:branch:opened-entry-record",
+				"start": 999.8000000119208
+			},
+			{
+				"detail": null,
+				"name": "document-open:branch:journal-page-0",
+				"start": 1000.0999999642372
+			},
+			{
+				"detail": null,
+				"name": "document-open:branch:journal-page-1",
+				"start": 1160.399999976158
+			},
+			{
+				"detail": {
+					"bytes": 134956,
+					"identity": "88407aeaefe4736136687dfe888747430fbc7a92d35cf7c3f8069bb3ae00cd07",
+					"payload": "cb7e97fd3e2ca4d5206a079557116cf4ae69866c4540ed1ec1b009cd3689719e"
+				},
+				"name": "document-open:branch:opened-entry-replay",
+				"start": 1160.699999988079
+			},
+			{
+				"detail": null,
+				"name": "document-open:branch:journal-page-0",
+				"start": 1337.899999976158
+			},
+			{
+				"detail": null,
+				"name": "document-open:branch:journal-page-0",
+				"start": 1371.5
+			},
+			{
+				"detail": null,
+				"name": "document-open:branch:journal-page-0",
+				"start": 1371.800000011921
+			},
+			{
+				"detail": null,
+				"name": "document-open:branch:journal-page-0",
+				"start": 1374.899999976158
+			},
+			{
+				"detail": null,
+				"name": "document-open:branch:journal-page-0",
+				"start": 1869.199999988079
+			},
+			{
+				"detail": null,
+				"name": "document-open:branch:journal-page-0",
+				"start": 1869.399999976158
+			},
+			{
+				"detail": null,
+				"name": "document-open:branch:journal-page-0",
+				"start": 1872.699999988079
+			}
+		]
+	},
+	"probe": {
+		"start": 713.3000000119209,
+		"ready": 1379,
+		"end": 3713.399999976158
+	}
+}
