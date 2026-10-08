@@ -1634,6 +1634,17 @@
 			duplicate work was demonstrated. The candidate was rejected. Evidence:
 			<code>experiments/performance/undo-refresh-consumption-865</code>.
 		</p>
+		<h2>Twenty real browser writers</h2>
+		<p>
+			A three-browser pilot and a twenty-browser journey now pass against the
+			production editor. Every independent account inserts one distinct marker;
+			all browsers converge, retain their own caret anchor and independently
+			read back the accepted snapshot. The twenty native inputs span 295ms.
+			These are untimed correctness checks alongside other jobs, not sustained
+			load, latency or 120fps evidence. Profiles and closed server data are
+			preserved. Evidence:
+			<code>experiments/performance/browser-writer-cohort</code>.
+		</p>
 		<h2>Cold snapshot storage and worker recovery</h2>
 		<p>
 			A cold 128KiB opening spent 210.409ms restoring the server checkpoint,

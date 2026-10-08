@@ -1,0 +1,26 @@
+[
+  {
+    "name": "three-writers.json",
+    "sha256": "c34f1af479c1f468894a392da9e0bddbc148a9e5c2dfe4a3d5d10d825c1cfbeb"
+  },
+  {
+    "name": "types.log.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "driver.ts.txt",
+    "sha256": "4b8eb1220ce0fd55029da9237a6d9fdcf6fc10b92c9da6e1c7b3de2672fd9f99"
+  },
+  {
+    "name": "twenty-writers.json",
+    "sha256": "b901bea58a411ae437dbb24f2ab8e97329e7b74a8c1dcab90be6cf74139ee7bd"
+  },
+  {
+    "name": "insert.ts.txt",
+    "sha256": "85ef6e0c09a02c8cdb459ed55084bd6e14d47d0da18eaf375efbdf594b3791d7"
+  },
+  {
+    "name": "README.md",
+    "sha256": "c8a16eb551d8052f017dbdba21f21a51300135d60874a9fb62073a83523c16b0"
+  }
+]

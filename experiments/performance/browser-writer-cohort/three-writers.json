@@ -1,0 +1,406 @@
+{
+	"stage": "complete",
+	"passed": true,
+	"error": "",
+	"configuration": {
+		"frozenCommit": "a8cd7dce44597229001f3c8e8431790c4ce228c0",
+		"writers": 3,
+		"sourceLength": 2048,
+		"browser": "background agent-browser",
+		"scope": "independent accounts/profiles, actual production editors, finite one-scalar native cohort; untimed correctness pilot without profiling",
+		"serverCapacityClaim": false,
+		"physical120HzClaim": false
+	},
+	"observations": [
+		{
+			"fixture": {
+				"document": "9071bb7c-7be7-4e11-92a2-a855fca26681",
+				"path": "/app/doc/9071bb7c-7be7-4e11-92a2-a855fca26681"
+			}
+		},
+		{
+			"assets": [
+				{
+					"path": "/chunks/document-app-6r462575.js",
+					"decodedBytes": 2036,
+					"sha256": "6a62d711f2f1b3d765d9a47703081f058d50cea6607f033e55469d48602a92f0"
+				},
+				{
+					"path": "/chunks/document-app-m2qx4cqf.js",
+					"decodedBytes": 2798,
+					"sha256": "a16f603c7e82fa73c3c08187e200539440a114333311e16d891b12060d5d40bc"
+				},
+				{
+					"path": "/chunks/document-app-29qc6wr3.js",
+					"decodedBytes": 122175,
+					"sha256": "e27d950371361b65f615663f53028f4e5b90210aa9d29079984c1f6bcb600d1e"
+				},
+				{
+					"path": "/app.js",
+					"decodedBytes": 253504,
+					"sha256": "7389ca181dc0195594773173dd2865b4d5b1d1a9e3311f81cfe0c691adcfb325"
+				},
+				{
+					"path": "/chunks/document-app-1hg6ttry.js",
+					"decodedBytes": 1330,
+					"sha256": "1b9d1dc8ff0a4313828319a4b6ba97baaa1b3ce82d808acf87ff7c662ae84046"
+				},
+				{
+					"path": "/chunks/document-app-dgnh6jbw.js",
+					"decodedBytes": 16754,
+					"sha256": "55b58ee094ebe1bd9a53e0223901d8cd61b5935e8030a2196f5375e3716751db"
+				},
+				{
+					"path": "/chunks/document-app-tkzx5s3a.js",
+					"decodedBytes": 7968,
+					"sha256": "fcbe1be58142c5dbed873a4c05d11a1712cf68f7970c4d0f572bc67cf1b958ab"
+				},
+				{
+					"path": "/chunks/document-app-ddjhmp2x.js",
+					"decodedBytes": 3894,
+					"sha256": "411f191d8978b334f9b8c2fc2212c8ba34fcede28537975c0427f880beb755b1"
+				},
+				{
+					"path": "/chunks/document-app-87ahz6jt.js",
+					"decodedBytes": 617,
+					"sha256": "d05da989701642a2f751babcaf098d3503352db367b04d1fdffbea76cbd5a653"
+				},
+				{
+					"path": "/chunks/document-app-7v4gqd66.js",
+					"decodedBytes": 901,
+					"sha256": "cdaea2f9d8998dd9fb3e941f6365905eb4214a6714d4ca3e9a63a71718c0571a"
+				},
+				{
+					"path": "/chunks/document-app-dtz2e7r0.js",
+					"decodedBytes": 14375,
+					"sha256": "ee90757237f3889151946ad108b678c24f572870ca68996e6b3fb24ae06d4a60"
+				},
+				{
+					"path": "/chunks/document-app-4yhdsfnj.js",
+					"decodedBytes": 2725,
+					"sha256": "1a51165197a38ee20a86e6042d5e28755fd067bde0c1c23609153430735a2160"
+				},
+				{
+					"path": "/chunks/document-app-j03jcp8c.js",
+					"decodedBytes": 1656,
+					"sha256": "2b9204148e734bc25c3aa6c79a2d779d291551e31cb0353d0ecd9198adcf9a99"
+				},
+				{
+					"path": "/chunks/document-app-znek0edn.js",
+					"decodedBytes": 5735,
+					"sha256": "6b6e79a01e21ec22282ead633acf254b21678f26ea9b1d49f36d710baa22b0d4"
+				},
+				{
+					"path": "/chunks/document-app-as6f3dg8.js",
+					"decodedBytes": 7957,
+					"sha256": "8518518541858b4a02b5300a8e4102cca47ec24445b2fd4033c11908fbe6bed9"
+				},
+				{
+					"path": "/chunks/document-app-6ey0cp43.js",
+					"decodedBytes": 6070,
+					"sha256": "8ea4501e278f1e46ef48780156bd53752a94ebd8465007b869e6ea302579029b"
+				},
+				{
+					"path": "/chunks/document-app-564pdk8m.js",
+					"decodedBytes": 900,
+					"sha256": "00af98e18c49b3006cff49afbbcc14df0d81178c740d45721eb8d1414aab968b"
+				},
+				{
+					"path": "/chunks/document-app-x5gk78nm.js",
+					"decodedBytes": 11389,
+					"sha256": "d0873a648f8e7b13cda62d245689f0513cf9dfa9e5f53827fa04f18bf5e5cdaa"
+				},
+				{
+					"path": "/chunks/document-app-kz0b5b6c.js",
+					"decodedBytes": 24137,
+					"sha256": "aedd56e36db143543567a78699dedce91534bda64c3b7eb110bad1ec55522c84"
+				},
+				{
+					"path": "/chunks/document-app-wndndbjh.js",
+					"decodedBytes": 212678,
+					"sha256": "421e0586c59430ff29259b79aa77ae353c9c658ca8cce136cda1c9b26eedb3e2"
+				},
+				{
+					"path": "/chunks/document-app-abrpy83y.js",
+					"decodedBytes": 20425,
+					"sha256": "b0ab13fc6c01a35bc8641fb9c70bf976d69486a847c177eededfae38deeaf511"
+				},
+				{
+					"path": "/chunks/document-app-jhd4qqch.js",
+					"decodedBytes": 2412,
+					"sha256": "15e084d736de9a090cc1b4f3ac9408389a541a0fe979be6c12091166d0a245de"
+				},
+				{
+					"path": "/chunks/document-app-k10g3325.js",
+					"decodedBytes": 2354,
+					"sha256": "ee34538cc80f249ad7f0a6ca5385468d75f19bfd0cb4127d3f033daa5bea11e4"
+				},
+				{
+					"path": "/chunks/document-app-y9jqc28f.js",
+					"decodedBytes": 2075,
+					"sha256": "20713184b153ddd3111c39f2819aae4d9b363a0180dc816b59999533191c37f7"
+				},
+				{
+					"path": "/chunks/document-app-567a65ef.js",
+					"decodedBytes": 75938,
+					"sha256": "bbbefcb22a05af71556b26d9db81ba730b06645f96b690c2a505c3f979357b36"
+				},
+				{
+					"path": "/chunks/document-app-panbyjez.js",
+					"decodedBytes": 713,
+					"sha256": "05ead945b02e711d7bed630726bae1324144cae877480c350846a575abfde7a9"
+				},
+				{
+					"path": "/chunks/document-app-rwzhfj0z.js",
+					"decodedBytes": 272,
+					"sha256": "67da5fa6d470425826ad2e8ad4faec0f4c372f8cbf1e99de5dce9fddcafc4ed4"
+				},
+				{
+					"path": "/chunks/document-app-cqph2zrk.js",
+					"decodedBytes": 27423,
+					"sha256": "a80b61abd7b8f6a13b4d47ef27a1065be339f15cf097860833159c1deb008f00"
+				},
+				{
+					"path": "/chunks/document-app-3c8jh4t6.js",
+					"decodedBytes": 14516,
+					"sha256": "4bf1304459e19bbc88e2760d54b8d2a5ba7bc953529b74a324c542d467cf25d6"
+				},
+				{
+					"path": "/chunks/document-app-afk9hpfa.js",
+					"decodedBytes": 41742,
+					"sha256": "93f40ea66f7ca77f971a415f5c7f8b639a74d4f9fedd7f607d8c2a5b4bb82a8e"
+				},
+				{
+					"path": "/chunks/document-app-2cafp1mq.js",
+					"decodedBytes": 1109,
+					"sha256": "ee8a86234e68c953d6e4ad87e08278d3dc24a9895e36af0c499e746a270f093b"
+				},
+				{
+					"path": "/chunks/document-app-ykdw1dfw.js",
+					"decodedBytes": 174723,
+					"sha256": "d6b4b4ff75d43962b5bf5bd37bf2baf096f1f62f265e5c31b8ee32099c785dee"
+				},
+				{
+					"path": "/chunks/document-worker-stats-rv552gtq.js",
+					"decodedBytes": 20324,
+					"sha256": "617c9fee23dfcb02584008920f61db76e1c00580c41c0e59182d17dcec171d07"
+				},
+				{
+					"path": "/document-worker.js",
+					"decodedBytes": 155969,
+					"sha256": "ba2c2d193e95a38f5c21f8680f66481ce6751e273feea60b085992467b853d88"
+				}
+			]
+		},
+		{
+			"stage": "before interaction",
+			"time": 1791497662810.8018,
+			"rows": [
+				{
+					"role": "server",
+					"pid": 21243,
+					"cpuTime": "0:00.74",
+					"rssKiB": 164256
+				},
+				{
+					"role": "driver",
+					"pid": 21275,
+					"cpuTime": "0:00.17",
+					"rssKiB": 84624
+				}
+			],
+			"scope": "process endpoint brackets; excludes browser descendants; CPU not precisely trace-aligned"
+		},
+		{
+			"scope": "Untimed concurrent correctness pilot; no trace or performance claim"
+		},
+		{
+			"stage": "after native cohort",
+			"time": 1791497666051.2654,
+			"rows": [
+				{
+					"role": "server",
+					"pid": 21243,
+					"cpuTime": "0:00.84",
+					"rssKiB": 165712
+				},
+				{
+					"role": "driver",
+					"pid": 21275,
+					"cpuTime": "0:00.18",
+					"rssKiB": 84912
+				}
+			],
+			"scope": "process endpoint brackets; excludes browser descendants; CPU not precisely trace-aligned"
+		},
+		{
+			"writerReceipts": [
+				{
+					"writer": 0,
+					"position": 8,
+					"sourceSha256": "b81d71181fb08013ac42c6972de58613484da4a8a54bf8898cbcdf7e76392c21",
+					"cursor": {
+						"start": 2051,
+						"end": 2051,
+						"length": 2051
+					}
+				},
+				{
+					"writer": 1,
+					"position": 8,
+					"sourceSha256": "b81d71181fb08013ac42c6972de58613484da4a8a54bf8898cbcdf7e76392c21",
+					"cursor": {
+						"start": 2050,
+						"end": 2050,
+						"length": 2051
+					}
+				},
+				{
+					"writer": 2,
+					"position": 8,
+					"sourceSha256": "b81d71181fb08013ac42c6972de58613484da4a8a54bf8898cbcdf7e76392c21",
+					"cursor": {
+						"start": 2049,
+						"end": 2049,
+						"length": 2051
+					}
+				}
+			]
+		},
+		{
+			"writer": 0,
+			"browser": {
+				"events": [
+					{
+						"time": 1791497662942.8,
+						"trusted": true,
+						"type": "insertText"
+					}
+				],
+				"finished": true,
+				"seen": {
+					"": 1791497662964.3,
+					"": 1791497663080.6,
+					"": 1791497663080.6
+				},
+				"windowEnd": 1791497665945.4,
+				"windowStart": 1791497662942.6
+			},
+			"local": {
+				"busy": "false",
+				"heap": 27310329,
+				"pending": "0",
+				"presence": 2
+			}
+		},
+		{
+			"writer": 1,
+			"browser": {
+				"events": [
+					{
+						"time": 1791497663011,
+						"trusted": true,
+						"type": "insertText"
+					}
+				],
+				"seen": {
+					"": 1791497663005.5,
+					"": 1791497663037.5,
+					"": 1791497663072.5
+				}
+			},
+			"local": {
+				"busy": "false",
+				"heap": 31535895,
+				"pending": "0",
+				"presence": 2
+			}
+		},
+		{
+			"writer": 2,
+			"browser": {
+				"events": [
+					{
+						"time": 1791497663010.8,
+						"trusted": true,
+						"type": "insertText"
+					}
+				],
+				"seen": {
+					"": 1791497663007.7,
+					"": 1791497663076,
+					"": 1791497663041.7
+				}
+			},
+			"local": {
+				"busy": "false",
+				"heap": 31658602,
+				"pending": "0",
+				"presence": 2
+			}
+		},
+		{
+			"accepted": {
+				"beforePosition": 5,
+				"afterPosition": 8,
+				"sha256": "b81d71181fb08013ac42c6972de58613484da4a8a54bf8898cbcdf7e76392c21",
+				"characters": 2051,
+				"requestStart": 1791497666084.1587,
+				"receiptObserved": 1791497666121.8572
+			},
+			"sourcePreserved": true,
+			"distinctAccounts": true
+		},
+		{
+			"nativeCohort": {
+				"primaryEventTime": 1791497662942.6,
+				"actualWindowEnd": 1791497665945.4,
+				"eventTimes": [1791497662942.8, 1791497663011, 1791497663010.8],
+				"spanMs": 68.199951171875,
+				"classified": [
+					{
+						"writer": 0,
+						"eventTime": 1791497662942.8,
+						"relativeToPrimaryMs": 0.199951171875,
+						"classification": "within primary window"
+					},
+					{
+						"writer": 1,
+						"eventTime": 1791497663011,
+						"relativeToPrimaryMs": 68.39990234375,
+						"classification": "within primary window"
+					},
+					{
+						"writer": 2,
+						"eventTime": 1791497663010.8,
+						"relativeToPrimaryMs": 68.199951171875,
+						"classification": "within primary window"
+					}
+				],
+				"inWindow": 3,
+				"total": 3,
+				"allWithinPrimaryWindow": true,
+				"measurementScope": "entire native cohort inside primary three-second window"
+			}
+		},
+		{
+			"stage": "after exact convergence",
+			"time": 1791497666693.3855,
+			"rows": [
+				{
+					"role": "server",
+					"pid": 21243,
+					"cpuTime": "0:00.85",
+					"rssKiB": 165840
+				},
+				{
+					"role": "driver",
+					"pid": 21275,
+					"cpuTime": "0:00.29",
+					"rssKiB": 119296
+				}
+			],
+			"scope": "process endpoint brackets; excludes browser descendants; CPU not precisely trace-aligned"
+		}
+	]
+}

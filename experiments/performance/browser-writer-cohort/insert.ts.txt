@@ -1,0 +1,4 @@
+import { browser } from "./runtime/tests/browser-driver"
+let session = process.argv[2], marker = process.argv[3]
+if (!session || !marker) throw new Error("Missing existing writer session/marker")
+browser(session,"keyboard","type",marker)
