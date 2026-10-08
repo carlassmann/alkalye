@@ -241,6 +241,19 @@
 			deferred work still exceed 8.33 ms. Method, controls and retained setup
 			failures: <code>experiments/performance/source-fence-guard/</code>.
 		</p>
+		<p>
+			Coalescing duplicate syntax updates in a microtask reduced a fresh matched
+			2,048-selection input task from 28.31 to 26.84 ms median and 28.61 to
+			27.39 ms maximum. All viewport rendering and refinement remains; geometry
+			readers flush synchronously. Five trials per version and size passed exact
+			source, trusted replacement and accepted edit/undo checks.
+			Single-selection controls stayed near 3 to 4 ms. The largest deferred task
+			remained about 53 ms. These full task durations include microtasks and
+			cannot be added to earlier pair medians. Public browser contracts cover
+			immediate geometry, simulated composition and scope cleanup; Find,
+			viewport, multicursor and link journeys passed. Method and samples:
+			<code>experiments/performance/overlay-coalescing/</code>.
+		</p>
 		<h2>Undo copies state cooperatively</h2>
 		<p>
 			Action staging now uses a detached, cooperative replica fork instead of
