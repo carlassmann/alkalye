@@ -1,0 +1,89 @@
+import { SourceTextarea } from "../src/client/source-textarea"
+import type { ProjectionMode } from "../src/client/source-textarea"
+
+let native = document.createElement("textarea")
+native.id = "editor"
+let host = document.createElement("div")
+host.className = "editor-wrap"
+host.dataset.editor = ""
+host.style.cssText = "height:800px;width:700px;--editor-size:18px;--mono:monospace;--editor-width:65ch"
+host.append(native)
+document.body.append(host)
+let mode: ProjectionMode = "raw"
+let original = "First\r\nBody [Label](https://example.org) 😀\r\nLast 🦊\n"
+let source = new SourceTextarea(native, original, {
+	documents: () => [],
+	mode: () => mode,
+	caretTop: () => undefined,
+	painted() {},
+	fullDocument: true,
+})
+let assertions = 0
+function check(condition: boolean, message: string) {
+	assertions++
+	if (!condition) throw new Error(message)
+}
+function exact(expected: string) {
+	check(source.value === expected, "source changed")
+	check(source.sourceIndex.slice(0, source.sourceIndex.length) === expected, "raw index changed during independent viewport update")
+	check(source.viewport.value === source.projection.text, "viewport differs from current projection")
+	check(!native.value.includes("\r"), "native CR normalization changed")
+}
+function prepare(value: string, start: number, end = start, projection: ProjectionMode = "raw") {
+	mode = projection
+	source.reconcile(value, start, end)
+	source.sync()
+	source.focus()
+	exact(value)
+	return { start: source.selectionStart, end: source.selectionEnd, characters: source.value.length }
+}
+function state() {
+	return { source: source.value, start: source.selectionStart, end: source.selectionEnd, native: native.value, window: source.viewport.viewport, replacements: source.takeReplacements(), assertions }
+}
+try {
+	for (let value of [original, "x".repeat(2047) + "\r\n😀\r\nEnd", "a\r\rb\r\nc\n🦊"])
+		for (let projection of ["raw", "project"] satisfies ProjectionMode[]) {
+			prepare(value, value.length, value.length, projection)
+			check(source.selectionStart === value.length, "EOF selection changed")
+			let inserted = value + "😀"
+			source.setRangeText("😀", value.length, value.length, "end")
+			exact(inserted)
+			check(source.selectionStart === inserted.length, "insert caret changed")
+			source.reconcile(value, value.length)
+			exact(value)
+			check(source.selectionStart === value.length, "Undo reconcile caret changed")
+		}
+	prepare(original, 0, 0, "project")
+	check(source.projection.text.length < original.length, "projected URL fixture did not collapse")
+	exact(original)
+	prepare(original, original.length)
+	native.addEventListener("input", () => source.input())
+	native.addEventListener("keydown", event => {
+		if (event.ctrlKey && event.key === "z") {
+			event.preventDefault()
+			source.reconcile(original, original.length)
+			exact(original)
+		}
+	})
+	Object.assign(window, {
+		initialIndexReady: true,
+		initialIndexAssertions: assertions,
+		initialIndexPrepare: prepare,
+		initialIndexState: state,
+		initialIndexUndo: () => { source.reconcile(original, original.length); exact(original); return state() },
+		initialIndexPeer(value: string, start: number) { source.reconcile(value, start); exact(value); return state() },
+		initialIndexComposition(value: string, start: number) {
+			mode = "hold"
+			native.dispatchEvent(new CompositionEvent("compositionstart"))
+			source.reconcile(value, start)
+			native.dispatchEvent(new CompositionEvent("compositionend"))
+			mode = "raw"
+			source.sync()
+			return value.length
+		},
+		initialIndexAssert: exact,
+		initialIndexDispose: () => source.dispose(),
+	})
+} catch (error) {
+	Object.assign(window, { initialIndexReady: true, initialIndexFailure: String(error), initialIndexAssertions: assertions })
+}

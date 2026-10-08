@@ -1,0 +1,42 @@
+{
+	"decision": "hold; no production adoption or A/B justified by one diagnostic",
+	"baseline": "c922a8d",
+	"native": {
+		"status": "pass",
+		"nativeGates": 7,
+		"publicAssertions": 123,
+		"undo": "trusted keyboard command routes public SourceTextarea.reconcile; not browser native history",
+		"composition": "programmatic DOM events; not physical IME"
+	},
+	"strict": {
+		"corrected": "pass before fixture Undo/composition corrections; production candidate modules unchanged afterward"
+	},
+	"constructorDiagnostic": {
+		"status": "complete",
+		"documentCharacters": 131072,
+		"rawTextIndexMs": 0.2,
+		"duplicateViewportTextIndexMs": 0.099,
+		"viewportConstructorMs": 2.099,
+		"sourceTextareaConstructorMs": 2.299,
+		"exactNativeRouteSourceAndIndependentHTTP": "pass",
+		"samples": 1,
+		"scope": "actual cold app open with constructor-only UserTiming instrumentation; not timing A/B or full mount attribution",
+		"correctnessBrowserPossibleOverlap": "corrected small native fixture was launched earlier and terminal before result inspection; constructor diagnostic not offered as speed comparison"
+	},
+	"failures": [
+		"initial union constructor compile failed acknowledged string assignment",
+		"Meta+z and Control+z browser history waits failed: standalone SourceTextarea has no app Undo authority",
+		"programmatic composition required source.sync after ending hold mode"
+	],
+	"candidateSourceSha256": {
+		"src/client/editor-viewport.ts": "bf0247a50e4f58c706346f1888bebd72f772e8860b407b57627479fc17daf0da",
+		"src/client/source-textarea.ts": "02812cb6c37a3563367ed4c17a124cee93c541751cfe821cccc666bb46e88be6"
+	},
+	"limits": [
+		"no1MiB measurement",
+		"no physical IME",
+		"no production feature/lifecycle proof",
+		"no all-mount index attribution"
+	],
+	"signature": "written with gpt-6 in codex"
+}

@@ -1,0 +1,3 @@
+$ tsc --noEmit
+src/client/editor-viewport.ts(287,3): error TS2322: Type 'string | TextIndex' is not assignable to type 'string | undefined'.
+  Type 'TextIndex' is not assignable to type 'string'.

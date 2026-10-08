@@ -1,0 +1,40 @@
+import { browser, evaluate } from "./browser-driver"
+
+let session = "initial-index-native-" + Date.now()
+let url = process.argv[2]
+if (!url) throw new Error("Fixture URL required")
+let original = "First\r\nBody [Label](https://example.org) 😀\r\nLast 🦊\n"
+let gateCount = 0
+function gate(expression: string, label: string) {
+	if (evaluate(session, expression) !== true) throw new Error(label)
+	gateCount++
+}
+try {
+	browser(session, "open", url)
+	browser(session, "wait", "--fn", "window.initialIndexReady===true")
+	gate("!window.initialIndexFailure", "programmatic public cases failed")
+	evaluate(session, "window.initialIndexPrepare(" + JSON.stringify(original) + "," + original.length + ")")
+	browser(session, "press", "x")
+	browser(session, "wait", "--fn", "window.initialIndexState().source===" + JSON.stringify(original + "x"))
+	gate("window.initialIndexState().start===" + (original.length + 1), "trusted EOF caret differs")
+	gate("window.initialIndexState().native===" + JSON.stringify(original.replace(/\r\n?/g, "\n") + "x"), "trusted native CRLF normalization differs")
+	browser(session, "press", "Control+z")
+	browser(session, "wait", "--fn", "window.initialIndexState().source===" + JSON.stringify(original))
+	gate("window.initialIndexState().start===" + original.length, "native Undo caret differs")
+	let offset = original.indexOf("😀")
+	evaluate(session, "window.initialIndexPrepare(" + JSON.stringify(original) + "," + offset + "," + (offset + 2) + ")")
+	browser(session, "press", "z")
+	let replaced = original.slice(0, offset) + "z" + original.slice(offset + 2)
+	browser(session, "wait", "--fn", "window.initialIndexState().source===" + JSON.stringify(replaced))
+	gate("window.initialIndexState().start===" + (offset + 1), "trusted surrogate selection replacement differs")
+	evaluate(session, "window.initialIndexPeer(" + JSON.stringify(original + "Peer\r\n") + ",0)")
+	browser(session, "press", "y")
+	browser(session, "wait", "--fn", "window.initialIndexState().source===" + JSON.stringify("y" + original + "Peer\r\n"))
+	gate("window.initialIndexState().start===1", "stale-source replacement uses wrong index")
+	evaluate(session, "window.initialIndexPrepare(" + JSON.stringify(original) + ",0);window.initialIndexComposition(" + JSON.stringify(original + "Composition peer\r\n") + ",0)")
+	browser(session, "wait", "--fn", "window.initialIndexState().native===" + JSON.stringify((original + "Composition peer\r\n").replace(/\r\n?/g, "\n")))
+	gate("window.initialIndexState().source===" + JSON.stringify(original + "Composition peer\r\n"), "programmatic composition peer reconcile differs")
+	console.log(JSON.stringify({ status: "pass", nativeGates: gateCount, publicAssertions: evaluate(session, "window.initialIndexState().assertions"), undo: "trusted command routes public reconcile; not browser history", composition: "programmatic DOM events; not physical IME" }))
+} finally {
+	browser(session, "close")
+}

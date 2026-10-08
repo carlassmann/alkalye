@@ -1,0 +1,17 @@
+{
+	"baseline": "c922a8d61d2730e0b9b6179b36b36ba85cd5e578",
+	"sourceSnapshotsSha256": {
+		"sources/initial-index-fork-fixture.ts.txt": "484b3c13e609ad3c06ab26d692c65ac502edbcba080d2e7d1f72fea1e41801e1",
+		"sources/editor-viewport.ts.txt": "bf0247a50e4f58c706346f1888bebd72f772e8860b407b57627479fc17daf0da",
+		"sources/browser-initial-index.ts.txt": "e2b9e34a7f3caab1a45b6d3f60457611ccd3292976e57c2d9b98b07d7f9ee94a",
+		"sources/baseline-editor-viewport-marked.ts.txt": "85e06eac53afae5cfecaace2c85fe62d36402c12bf309981a7d99f75cc8f9b8d",
+		"sources/serve-initial-index.ts.txt": "9a743e06cb9588e8a95f42bbb9856ba04abaf39c134f0b7793d437e902db52ba",
+		"sources/source-textarea.ts.txt": "02812cb6c37a3563367ed4c17a124cee93c541751cfe821cccc666bb46e88be6",
+		"sources/baseline-source-textarea-marked.ts.txt": "5e968a84cca5bbc866fd869d0d5d315df4807f10eed2098ad106f7f4a56d885f",
+		"sources/baseline-text-index-marked.ts.txt": "5fd53ae0793854d83b905d4dc9fcc4df6b5018d75138cc39622c2a9391cb142f"
+	},
+	"sourceSemantics": "candidate fork initialization plus acknowledgment reconstruction; no production changes",
+	"nativeExecutedLog": "native-pass.log",
+	"constructorDiagnostic": "ONE frozen-baseline application cold switch; UserTiming marks only",
+	"signature": "written with gpt-6 in codex"
+}

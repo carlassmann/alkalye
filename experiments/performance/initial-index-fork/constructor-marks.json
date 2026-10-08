@@ -1,0 +1,82 @@
+[
+	{
+		"name": "initial-index:TextIndex:131072",
+		"ph": "b",
+		"ts": 375219616515,
+		"dur": null,
+		"id": null,
+		"args": {
+			"callTime": 375219616821,
+			"startTime": 1156.400000035763,
+			"traceId": 3376379179
+		}
+	},
+	{
+		"name": "initial-index:SourceTextarea:131072",
+		"ph": "b",
+		"ts": 375219616515,
+		"dur": null,
+		"id": null,
+		"args": {
+			"callTime": 375219618825,
+			"startTime": 1156.400000035763,
+			"traceId": 1749084912
+		}
+	},
+	{
+		"name": "initial-index:TextIndex:131072",
+		"ph": "e",
+		"ts": 375219616715,
+		"dur": null,
+		"id": null,
+		"args": {}
+	},
+	{
+		"name": "initial-index:TextIndex:131072",
+		"ph": "b",
+		"ts": 375219616715,
+		"dur": null,
+		"id": null,
+		"args": {
+			"callTime": 375219616926,
+			"startTime": 1156.600000023842,
+			"traceId": 3118257282
+		}
+	},
+	{
+		"name": "initial-index:EditorViewport:131072",
+		"ph": "b",
+		"ts": 375219616715,
+		"dur": null,
+		"id": null,
+		"args": {
+			"callTime": 375219618821,
+			"startTime": 1156.600000023842,
+			"traceId": 270270185
+		}
+	},
+	{
+		"name": "initial-index:TextIndex:131072",
+		"ph": "e",
+		"ts": 375219616814,
+		"dur": null,
+		"id": null,
+		"args": {}
+	},
+	{
+		"name": "initial-index:EditorViewport:131072",
+		"ph": "e",
+		"ts": 375219618814,
+		"dur": null,
+		"id": null,
+		"args": {}
+	},
+	{
+		"name": "initial-index:SourceTextarea:131072",
+		"ph": "e",
+		"ts": 375219618814,
+		"dur": null,
+		"id": null,
+		"args": {}
+	}
+]

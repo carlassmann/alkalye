@@ -1,0 +1,27 @@
+let built = await Bun.build({
+	entrypoints: ["tests/initial-index-fork-fixture.ts"],
+	target: "browser",
+})
+if (!built.success)
+	throw new AggregateError(built.logs, "Initial-index fixture build failed")
+let script = built.outputs[0]
+if (!script) throw new Error("Missing fixture script")
+let css =
+	(await Bun.file("src/client/components/editor.css").text()) +
+	(await Bun.file("src/client/components/editor-viewport.css").text())
+let server = Bun.serve({
+	port: Number(process.env.PORT ?? 0),
+	routes: {
+		"/": new Response(
+			`<!doctype html><style>*{box-sizing:border-box}:root{--font-mono:monospace;--font-size:18px;--line-height:1.8;--background:#fff;--foreground:#111}html,body{height:800px;margin:0}textarea{font:18px/1.8 monospace}${css}</style><script type="module" src="/fixture.js"></script>`,
+			{ headers: { "Content-Type": "text/html" } },
+		),
+		"/fixture.js": new Response(script, {
+			headers: { "Content-Type": "text/javascript" },
+		}),
+	},
+	fetch: () => new Response("Missing", { status: 404 }),
+})
+console.log(server.url.href)
+
+export {}

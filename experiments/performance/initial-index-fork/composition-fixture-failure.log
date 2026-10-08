@@ -1,0 +1,13 @@
+43 | 			},
+44 | 		},
+45 | 	)
+46 | 	if (result.status !== 0) {
+47 | 		let failure = result.error?.message || result.stderr || result.stdout
+48 | 		throw new Error(`${session} ${args[0]}: ${failure}`)
+                 ^
+error: initial-index-native-1791482413723 wait: {"success":false,"data":null,"error":"Wait timed out after 20000ms"}
+
+      at browser (/private/tmp/alkalye-initial-index-fork/runtime/tests/browser-driver.ts:48:13)
+      at /private/tmp/alkalye-initial-index-fork/runtime/tests/browser-initial-index.ts:35:2
+
+Bun v1.4.0 (macOS arm64)
