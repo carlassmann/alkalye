@@ -1,0 +1,42 @@
+import json, collections, pathlib
+root=pathlib.Path('/tmp/alkalye-worker-map-immediate-predecessor')
+rows=[]
+for count in [1,512]:
+ path=root/'native-sampled-state'/('Undo-'+str(count)+'.trace.json')
+ loaded=json.loads(path.read_text());events=loaded.get('traceEvents',[]) if isinstance(loaded,dict) else loaded
+ workers={(e['pid'],e['tid']) for e in events if e.get('name')=='thread_name' and e.get('args',{}).get('name')=='DedicatedWorker thread'}
+ start=next(e['ts'] for e in events if e.get('name')=='worker-mc:start')
+ end=next(e['ts'] for e in events if e.get('name')=='worker-mc:end' and e['ts']>start)
+ tasks=[e for e in events if e.get('name')=='RunTask' and (e.get('pid'),e.get('tid')) in workers and e.get('ts',0)<end and e.get('ts',0)+e.get('dur',0)>start]
+ task=max(tasks,key=lambda e:e.get('dur',0));left=task['ts'];right=left+task['dur']
+ groups={}
+ for e in sorted(events,key=lambda e:e.get('ts',0)):
+  if e.get('name') not in ['Profile','ProfileChunk']:continue
+  key=(e['pid'],str(e.get('id',e.get('id2'))));g=groups.setdefault(key,{'nodes':{},'parents':{},'owner':None,'time':None,'samples':[]})
+  data=e.get('args',{}).get('data',{})
+  if e['name']=='Profile':g['owner']=(e['pid'],e['tid']);g['time']=data.get('startTime',e['ts']);continue
+  cpu=data.get('cpuProfile',{})
+  for node in cpu.get('nodes',[]):
+   g['nodes'][node['id']]=node
+   if 'parent' in node:g['parents'][node['id']]=node['parent']
+   for child in node.get('children',[]):g['parents'][child]=node['id']
+  for ident,delta in zip(cpu.get('samples',[]),data.get('timeDeltas',[])):
+   if g['time'] is None:continue
+   before=g['time'];g['time']+=delta
+   g['samples'].append((ident,before,g['time']))
+ profiles=[]
+ for key,g in groups.items():
+  if g['owner'] not in workers or g['owner'] != (task['pid'],task['tid']):continue
+  hasWorkerURL=any('/worker-editor.js' in node.get('callFrame',{}).get('url','') for node in g['nodes'].values())
+  if not hasWorkerURL:continue
+  own=collections.Counter();inclusive=collections.Counter()
+  for ident,a,b in g['samples']:
+   duration=max(0,min(b,right)-max(a,left))
+   if not duration:continue
+   own[ident]+=duration;ancestor=ident;seen=set()
+   while ancestor is not None and ancestor not in seen:
+    seen.add(ancestor);inclusive[ancestor]+=duration;ancestor=g['parents'].get(ancestor)
+  profiles.append({'owner':g['owner'],'workerURLVerified':True,'sampleWeightMs':sum(own.values())/1000,'self':[{'frame':g['nodes'].get(n,{}).get('callFrame',{}),'selfMs':v/1000,'inclusiveMs':inclusive[n]/1000} for n,v in own.most_common(35)],'inclusive':[{'frame':g['nodes'].get(n,{}).get('callFrame',{}),'selfMs':own[n]/1000,'inclusiveMs':v/1000} for n,v in inclusive.most_common(35)]})
+ rows.append({'count':count,'taskOwner':(task['pid'],task['tid']),'taskMs':task['dur']/1000,'taskOffsetMs':(left-start)/1000,'profiles':profiles,'failure':None if profiles else 'No actual-worker ProfileChunk attribution'})
+(root/'sampled-task-profiles.json').write_text(json.dumps(rows,indent=2)+'\n')
+print(json.dumps(rows))

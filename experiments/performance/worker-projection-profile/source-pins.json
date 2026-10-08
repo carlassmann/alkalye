@@ -1,0 +1,18 @@
+{
+	"native-runtime/sampled-undo.ts": {
+		"bytes": 18656,
+		"sha256": "975958717034bd0963842212f4835a1ee9b87ac1f4045177e9c873d02cc815ce"
+	},
+	"native-candidate.ts.txt": {
+		"bytes": 21153,
+		"sha256": "8b47b3e02827a1d9c96d4195915895ab96469316c921c75abf08c5f43fea8e8a"
+	},
+	"native-active/dist/worker-editor.js": {
+		"bytes": 610079,
+		"sha256": "6aadffe02c99af0103841d8b8eed1d34ed65af1042605678ab4cec9d0d758dbb"
+	},
+	"native-active/dist/worker-editor.js.map": {
+		"bytes": 5603628,
+		"sha256": "5fc503177c1b2d838cf67c1f1c2f9dff0793dbb0cab7d0c16f754f2bf5f2f6cb"
+	}
+}
