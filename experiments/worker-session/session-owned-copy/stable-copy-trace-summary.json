@@ -1,0 +1,347 @@
+[
+	{
+		"file": "stable-copy-native-mc-512-burst.trace.json",
+		"windowMs": 3000.98,
+		"mainInputEnclosingTaskMs": 6.352,
+		"mainWindowLargestTaskMs": 6.352,
+		"mainRunTaskCount": 937,
+		"mainGCLargestEventMs": 0.313,
+		"otherThreads": [
+			{
+				"pid": 27885,
+				"tid": 18595568,
+				"name": "DedicatedWorker thread",
+				"largestTaskMs": 206.273,
+				"count": 850
+			},
+			{
+				"pid": 27885,
+				"tid": 18594341,
+				"name": "PerfettoTrace",
+				"largestTaskMs": 0.032,
+				"count": 79
+			},
+			{
+				"pid": 27885,
+				"tid": 18594355,
+				"name": "Compositor",
+				"largestTaskMs": 0.137,
+				"count": 1163
+			},
+			{
+				"pid": 27878,
+				"tid": 18594281,
+				"name": "VizCompositorThread",
+				"largestTaskMs": 0.051,
+				"count": 712
+			},
+			{
+				"pid": 27885,
+				"tid": 18594350,
+				"name": "Chrome_ChildIOThread",
+				"largestTaskMs": 0.026,
+				"count": 207
+			},
+			{
+				"pid": 27869,
+				"tid": 18594198,
+				"name": "Chrome_IOThread",
+				"largestTaskMs": 0.06,
+				"count": 856
+			},
+			{
+				"pid": 27869,
+				"tid": 18594133,
+				"name": "CrBrowserMain",
+				"largestTaskMs": 0.06,
+				"count": 253
+			},
+			{
+				"pid": 27869,
+				"tid": 18594240,
+				"name": "Chrome_DevToolsHandlerThread",
+				"largestTaskMs": 0.026,
+				"count": 41
+			},
+			{
+				"pid": 27878,
+				"tid": 18594242,
+				"name": "PerfettoTrace",
+				"largestTaskMs": 0.025,
+				"count": 19
+			},
+			{
+				"pid": 27878,
+				"tid": 18594214,
+				"name": "CrGpuMain",
+				"largestTaskMs": 0.59,
+				"count": 219
+			},
+			{
+				"pid": 27869,
+				"tid": 18594191,
+				"name": "PerfettoTrace",
+				"largestTaskMs": 0.032,
+				"count": 33
+			},
+			{
+				"pid": 27869,
+				"tid": 18594199,
+				"name": "MemoryInfra",
+				"largestTaskMs": 0.009,
+				"count": 1
+			},
+			{
+				"pid": 27869,
+				"tid": 18594192,
+				"name": "ThreadPoolServiceThread",
+				"largestTaskMs": 0.539,
+				"count": 6
+			},
+			{
+				"pid": 27885,
+				"tid": 18594344,
+				"name": "ThreadPoolServiceThread",
+				"largestTaskMs": 0.009,
+				"count": 1
+			},
+			{
+				"pid": 27878,
+				"tid": 18594280,
+				"name": "Chrome_ChildIOThread",
+				"largestTaskMs": 0.003,
+				"count": 1
+			}
+		]
+	},
+	{
+		"file": "stable-copy-native-mc-512-selection.trace.json",
+		"windowMs": 3001.952,
+		"mainInputEnclosingTaskMs": 0.938,
+		"mainWindowLargestTaskMs": 1.592,
+		"mainRunTaskCount": 958,
+		"mainGCLargestEventMs": 0,
+		"otherThreads": [
+			{
+				"pid": 27869,
+				"tid": 18594198,
+				"name": "Chrome_IOThread",
+				"largestTaskMs": 0.033,
+				"count": 102
+			},
+			{
+				"pid": 27885,
+				"tid": 18595568,
+				"name": "DedicatedWorker thread",
+				"largestTaskMs": 0.406,
+				"count": 62
+			},
+			{
+				"pid": 27885,
+				"tid": 18594341,
+				"name": "PerfettoTrace",
+				"largestTaskMs": 0.027,
+				"count": 17
+			},
+			{
+				"pid": 27885,
+				"tid": 18594355,
+				"name": "Compositor",
+				"largestTaskMs": 0.138,
+				"count": 1494
+			},
+			{
+				"pid": 27869,
+				"tid": 18594133,
+				"name": "CrBrowserMain",
+				"largestTaskMs": 0.3,
+				"count": 110
+			},
+			{
+				"pid": 27869,
+				"tid": 18594240,
+				"name": "Chrome_DevToolsHandlerThread",
+				"largestTaskMs": 0.042,
+				"count": 33
+			},
+			{
+				"pid": 27878,
+				"tid": 18594281,
+				"name": "VizCompositorThread",
+				"largestTaskMs": 0.148,
+				"count": 885
+			},
+			{
+				"pid": 27885,
+				"tid": 18594350,
+				"name": "Chrome_ChildIOThread",
+				"largestTaskMs": 0.013,
+				"count": 68
+			},
+			{
+				"pid": 27878,
+				"tid": 18594214,
+				"name": "CrGpuMain",
+				"largestTaskMs": 0.316,
+				"count": 534
+			},
+			{
+				"pid": 27869,
+				"tid": 18594191,
+				"name": "PerfettoTrace",
+				"largestTaskMs": 0.085,
+				"count": 16
+			},
+			{
+				"pid": 27869,
+				"tid": 18594192,
+				"name": "ThreadPoolServiceThread",
+				"largestTaskMs": 0.066,
+				"count": 7
+			},
+			{
+				"pid": 27878,
+				"tid": 18594242,
+				"name": "PerfettoTrace",
+				"largestTaskMs": 0.069,
+				"count": 12
+			},
+			{
+				"pid": 27885,
+				"tid": 18594344,
+				"name": "ThreadPoolServiceThread",
+				"largestTaskMs": 0.025,
+				"count": 1
+			},
+			{
+				"pid": 27878,
+				"tid": 18594280,
+				"name": "Chrome_ChildIOThread",
+				"largestTaskMs": 0.008,
+				"count": 2
+			}
+		]
+	},
+	{
+		"file": "stable-copy-native-mc-512-single.trace.json",
+		"windowMs": 3002.367,
+		"mainInputEnclosingTaskMs": 5.02,
+		"mainWindowLargestTaskMs": 5.02,
+		"mainRunTaskCount": 1109,
+		"mainGCLargestEventMs": 0,
+		"otherThreads": [
+			{
+				"pid": 27885,
+				"tid": 18595568,
+				"name": "DedicatedWorker thread",
+				"largestTaskMs": 223.812,
+				"count": 901
+			},
+			{
+				"pid": 27885,
+				"tid": 18594350,
+				"name": "Chrome_ChildIOThread",
+				"largestTaskMs": 0.018,
+				"count": 118
+			},
+			{
+				"pid": 27869,
+				"tid": 18594198,
+				"name": "Chrome_IOThread",
+				"largestTaskMs": 0.313,
+				"count": 269
+			},
+			{
+				"pid": 27869,
+				"tid": 18594133,
+				"name": "CrBrowserMain",
+				"largestTaskMs": 1.208,
+				"count": 150
+			},
+			{
+				"pid": 27885,
+				"tid": 18594341,
+				"name": "PerfettoTrace",
+				"largestTaskMs": 0.05,
+				"count": 44
+			},
+			{
+				"pid": 27885,
+				"tid": 18594355,
+				"name": "Compositor",
+				"largestTaskMs": 0.133,
+				"count": 1503
+			},
+			{
+				"pid": 27869,
+				"tid": 18594240,
+				"name": "Chrome_DevToolsHandlerThread",
+				"largestTaskMs": 0.036,
+				"count": 40
+			},
+			{
+				"pid": 27878,
+				"tid": 18594281,
+				"name": "VizCompositorThread",
+				"largestTaskMs": 0.054,
+				"count": 882
+			},
+			{
+				"pid": 27878,
+				"tid": 18594242,
+				"name": "PerfettoTrace",
+				"largestTaskMs": 0.04,
+				"count": 16
+			},
+			{
+				"pid": 27878,
+				"tid": 18594214,
+				"name": "CrGpuMain",
+				"largestTaskMs": 3.56,
+				"count": 545
+			},
+			{
+				"pid": 27878,
+				"tid": 18594280,
+				"name": "Chrome_ChildIOThread",
+				"largestTaskMs": 0.003,
+				"count": 3
+			},
+			{
+				"pid": 27869,
+				"tid": 18594191,
+				"name": "PerfettoTrace",
+				"largestTaskMs": 0.041,
+				"count": 33
+			},
+			{
+				"pid": 27869,
+				"tid": 18594192,
+				"name": "ThreadPoolServiceThread",
+				"largestTaskMs": 0.645,
+				"count": 6
+			},
+			{
+				"pid": 27885,
+				"tid": 18594573,
+				"name": "ServiceWorker thread",
+				"largestTaskMs": 0.074,
+				"count": 2
+			},
+			{
+				"pid": 27885,
+				"tid": 18594344,
+				"name": "ThreadPoolServiceThread",
+				"largestTaskMs": 0.029,
+				"count": 2
+			},
+			{
+				"pid": 27869,
+				"tid": 18594199,
+				"name": "MemoryInfra",
+				"largestTaskMs": 0.023,
+				"count": 2
+			}
+		]
+	}
+]

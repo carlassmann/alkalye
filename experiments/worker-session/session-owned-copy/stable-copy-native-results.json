@@ -1,0 +1,138 @@
+{
+	"stage": "terminal",
+	"gates": [
+		"actual worker MC512 trusted replacements + primary + accepted edit/Undo"
+	],
+	"cells": [
+		{
+			"selectionProbe": {
+				"end": 5489.199999988079,
+				"events": [
+					{
+						"key": "l",
+						"time": 2487.300000011921,
+						"type": "keydown"
+					}
+				],
+				"heapAfter": 34005672,
+				"heapBefore": 25993793,
+				"label": "selection-512",
+				"localSaved": 2501.300000011921,
+				"ready": 2501.199999988079,
+				"start": 2487.300000011921
+			},
+			"singleProbe": {
+				"end": 8796.100000023842,
+				"events": [
+					{
+						"key": "x",
+						"time": 5793.800000011921,
+						"type": "keydown"
+					},
+					{
+						"inputType": "insertText",
+						"time": 5794.199999988079,
+						"type": "beforeinput"
+					}
+				],
+				"heapAfter": 43786523,
+				"heapBefore": 35431905,
+				"label": "single-512",
+				"localSaved": 5800.800000011921,
+				"ready": 5800.800000011921,
+				"start": 5793.800000011921
+			},
+			"acceptedObservedMs": 6367.180041999998,
+			"burstProbe": {
+				"end": 19330.69999998808,
+				"events": [
+					{
+						"inputType": "insertText",
+						"time": 16329.69999998808,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 16336.600000023842,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 16342.400000035765,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 16348.5,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 16354.69999998808,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 16360,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 16366.30000001192,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 16373.100000023842,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 16379.80000001192,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 16386.100000023842,
+						"type": "beforeinput"
+					}
+				],
+				"heapAfter": 92673587,
+				"heapBefore": 18998708,
+				"label": "burst-512",
+				"localSaved": 16401.100000023842,
+				"ready": 16401,
+				"start": 16329.69999998808
+			},
+			"burstAcceptedObservedMs": 10713.514333,
+			"scope": "Driver-inclusive accepted upperbounds include3s observation. Heap samples mainJS only. Burst intentionally retained accepted, no unknownUndo cleanup.",
+			"count": 512,
+			"documentId": "[document]",
+			"sourceLength": 1048614,
+			"expectedLength": 1046566,
+			"sourceSHA": "b02415e8fa741dec0ada1004ee4c6d5bda1a52cd90e01e3b6519a8c14abee241",
+			"editedSHA": "060f529ec77813c68fabce12b875917f7745967f29f21cc71d0a229e9231f111",
+			"after": {
+				"busy": false,
+				"end": 39,
+				"generation": 6,
+				"ranges": 512,
+				"start": 39
+			},
+			"restored": {
+				"busy": false,
+				"end": 38,
+				"generation": 9,
+				"ranges": 512,
+				"start": 38
+			}
+		}
+	],
+	"fixture": {
+		"documentId": "[document]",
+		"initialLength": 1048614,
+		"editedLength": 1046566,
+		"initialSHA": "b02415e8fa741dec0ada1004ee4c6d5bda1a52cd90e01e3b6519a8c14abee241",
+		"editedSHA": "060f529ec77813c68fabce12b875917f7745967f29f21cc71d0a229e9231f111"
+	}
+}

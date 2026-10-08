@@ -1,0 +1,34 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/session-owned-copy.test.ts:
+(pass) session-owned copies serialize accepted peer replay, release interrupted copies and reject closed access (cooperative=%s) [104.22ms]
+111 | 							)
+112 | 						}
+113 | 						let bootstrapScope = yield* Scope.make()
+114 | 						yield* open(bootstrapScope, transport)
+115 | 						yield* Scope.close(bootstrapScope, Exit.void)
+116 | 						expect((yield* passive.read)?.replica?.text("doc")).toBe(
+                                                                ^
+error: expect(received).toBe(expected)
+
+
+- Expected  - 0
++ Received  + 0
+
+      at <anonymous> (/private/tmp/alkalye-worker-app-stable-copy/tests/session-owned-copy.test.ts:116:59)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:737:13)
+      at runTasks (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:169:15)
+      at afterScheduled (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:159:10)
+(fail) session-owned copies serialize accepted peer replay, release interrupted copies and reject closed access (cooperative=%s) [1019.93ms]
+
+tests/durable-checkpoint-session.test.ts:
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [423.89ms]
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [406.53ms]
+
+ 3 pass
+ 1 fail
+ 36 expect() calls
+Ran 4 tests across 2 files. [2.02s]

@@ -1,0 +1,18 @@
+{
+	"argv": [
+		"claude",
+		"--model",
+		"opus",
+		"--print",
+		"--tools",
+		"Read",
+		"--allowedTools",
+		"Read",
+		"--output-format",
+		"json"
+	],
+	"handle": 26951,
+	"resolvedModel": "claude-opus-5-5",
+	"resolutionEvidence": "JSON modelUsage canonicalModel",
+	"verdict": "ACCEPT"
+}

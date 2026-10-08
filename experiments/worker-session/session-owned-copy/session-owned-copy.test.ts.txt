@@ -1,0 +1,224 @@
+import { expect, test } from "bun:test"
+import { mkdtemp, rm, cp } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import * as Layer from "effect/Layer"
+import * as Scope from "effect/Scope"
+import * as Exit from "effect/Exit"
+import * as Fiber from "effect/Fiber"
+import { BackgroundWork } from "../src/platform/background-work"
+import { makePassiveDocumentCache } from "../src/client/passive-document-cache"
+import { cliDocumentSessionLayer } from "../src/cli/document-platform"
+import { DocumentSession } from "../src/shared/document-session"
+import type { DocumentTransport } from "../src/shared/document-session"
+import { Replica } from "../src/shared/crdt"
+import {
+	buildAction,
+	ResourceUnavailable,
+} from "../src/shared/document-actions"
+import { newDocument } from "../src/shared/documents"
+import { metadataSource } from "../src/shared/document-metadata"
+import { Identity } from "../src/shared/workspace"
+import { WorkspaceStore } from "../src/server/document-store"
+
+test.each([false, true])(
+	"session-owned copies serialize accepted peer replay, release interrupted copies and reject closed access (cooperative=%s)",
+	async cooperativeWork => {
+		let directory = await mkdtemp(join(tmpdir(), "alkalye-passive-isolation-"))
+		try {
+			await Effect.runPromise(
+				Effect.scoped(
+					Effect.gen(function* () {
+						let services = yield* Layer.build(
+							WorkspaceStore.layer(join(directory, "server.sqlite")),
+						)
+						let store = Context.get(services, WorkspaceStore)
+						let subject = "passive-owner"
+						let initialSource = cooperativeWork
+							? "Initial 😀 source\r\n" + "a".repeat(128 * 1024)
+							: "Initial source"
+						let initialDocument = metadataSource(initialSource, {
+							title: "Cached",
+						})
+						let acceptedDocument = initialDocument + "\nRemote accepted source"
+						let creation = yield* buildAction(
+							new Replica("passive-birth"),
+							"doc",
+							"Create document",
+							staged => newDocument(staged, "doc", "Cached", initialSource),
+						)
+						yield* store
+							.create("space", "Cached workspace", "create-space")
+							.pipe(Effect.provideService(Identity, { subject, actors: [] }))
+						yield* store.createDocument("space", creation).pipe(
+							Effect.provideService(Identity, {
+								subject,
+								actors: [creation.actor],
+							}),
+						)
+						let passive = (yield* makePassiveDocumentCache())("doc")
+						function request<A, E>(work: Effect.Effect<A, E, Identity>) {
+							return work.pipe(
+								Effect.provideService(Identity, { subject, actors: [] }),
+							)
+						}
+						let transport: DocumentTransport = {
+							create: () => Effect.fail(new Error("Document already exists")),
+							snapshot: document =>
+								request(store.snapshot(document)).pipe(
+									Effect.flatMap(required),
+								),
+							commit: action =>
+								store.commit(action).pipe(
+									Effect.provideService(Identity, {
+										subject,
+										actors: [action.actor],
+									}),
+								),
+							history: (document, after, log, limit) =>
+								request(store.history(document, after, log, limit)),
+							action: (document, action) =>
+								request(store.action(document, action)).pipe(
+									Effect.flatMap(required),
+								),
+							chain: (document, action) =>
+								request(store.chain(document, action)).pipe(
+									Effect.flatMap(required),
+								),
+						}
+						function open(
+							scope: Scope.Scope,
+							transport: DocumentTransport,
+							local = directory,
+						) {
+							return Layer.build(
+								cliDocumentSessionLayer(local, {
+									document: "doc",
+									subject,
+									passiveState: passive,
+									cooperativeWork,
+									transport,
+								}),
+							).pipe(
+								Effect.provideService(Scope.Scope, scope),
+								Effect.provideService(BackgroundWork, {
+									beforeSnapshot: Effect.never,
+									beforeDerived: Effect.void,
+									betweenChunks: Effect.void,
+								}),
+								Effect.map(context => Context.get(context, DocumentSession)),
+							)
+						}
+						let bootstrapScope = yield* Scope.make()
+						yield* open(bootstrapScope, transport)
+						yield* Scope.close(bootstrapScope, Exit.void)
+						expect((yield* passive.read)?.replica?.text("doc")).toBe(
+							initialDocument,
+						)
+						let secondDirectory = join(directory, "peer")
+						yield* Effect.tryPromise(() =>
+							cp(
+								join(directory, "documents"),
+								join(secondDirectory, "documents"),
+								{ recursive: true },
+							),
+						)
+						let firstScope = yield* Scope.fork(yield* Scope.Scope, "sequential")
+						let first = yield* open(firstScope, transport)
+						let paused = true
+						let blocked: DocumentTransport = {
+							...transport,
+							snapshot: document =>
+								Effect.suspend(() =>
+									paused
+										? Effect.fail(new Error("Paused peer"))
+										: transport.snapshot(document),
+								),
+							history: (document, after, log, limit) =>
+								Effect.suspend(() =>
+									paused
+										? Effect.fail(new Error("Paused peer"))
+										: transport.history(document, after, log, limit),
+								),
+						}
+						let secondScope = yield* Scope.fork(
+							yield* Scope.Scope,
+							"sequential",
+						)
+						let second = yield* open(secondScope, blocked, secondDirectory)
+						let retained = (yield* passive.read)?.replica
+						expect(retained?.text("doc")).toBe(initialDocument)
+						yield* first.edit(acceptedDocument).saved
+						yield* first.sync
+						expect(first.replica.text("doc")).toBe(acceptedDocument)
+						expect(retained?.text("doc")).toBe(initialDocument)
+						let previousPosition = (yield* passive.read)?.position ?? 0
+						if (cooperativeWork) {
+							let saving = yield* Effect.forkChild(first.save, {
+								startImmediately: true,
+							})
+							yield* Fiber.interrupt(saving)
+							expect((yield* passive.read)?.position ?? 0).toBe(
+								previousPosition,
+							)
+						}
+						yield* first.edit(acceptedDocument + "\nUnpublished local draft")
+							.saved
+						yield* first.save
+						expect((yield* passive.read)?.position ?? 0).toBeGreaterThan(
+							previousPosition,
+						)
+						expect((yield* passive.read)?.replica?.text("doc")).toBe(
+							acceptedDocument,
+						)
+						expect(first.replica.text("doc")).toBe(
+							acceptedDocument + "\nUnpublished local draft",
+						)
+						paused = false
+						let copyingBeforeSync = yield* Effect.forkChild(
+							second.forkReplica(),
+							{ startImmediately: true },
+						)
+						yield* second.sync
+						let copied = yield* Fiber.join(copyingBeforeSync)
+						expect(copied.text("doc")).toBe(initialDocument)
+						expect(second.replica.text("doc")).toBe(acceptedDocument)
+						let acceptedCopy = yield* second.forkReplica("isolated-copy")
+						expect(acceptedCopy.text("doc")).toBe(acceptedDocument)
+						let copyEdit = acceptedCopy.edit(
+							"doc",
+							acceptedDocument + "Copy only",
+						)
+						if (!copyEdit) throw new Error("Expected copy edit")
+						acceptedCopy.apply([copyEdit])
+						expect(second.replica.text("doc")).toBe(acceptedDocument)
+						let copying = yield* Effect.forkChild(second.forkReplica(), {
+							startImmediately: true,
+						})
+						yield* Fiber.interrupt(copying)
+						if (cooperativeWork) expect(Exit.hasInterrupts(yield* Fiber.await(copying))).toBe(true)
+						expect((yield* second.forkReplica()).text("doc")).toBe(
+							acceptedDocument,
+						)
+						yield* second.flush
+						yield* Scope.close(secondScope, Exit.void)
+						expect((yield* second.forkReplica().pipe(Effect.result))._tag).toBe(
+							"Failure",
+						)
+					}),
+				),
+			)
+		} finally {
+			await rm(directory, { recursive: true, force: true })
+		}
+	},
+	20000,
+)
+
+function required<A>(value: A | undefined) {
+	return value === undefined
+		? Effect.fail(new ResourceUnavailable({ message: "Document unavailable" }))
+		: Effect.succeed(value)
+}

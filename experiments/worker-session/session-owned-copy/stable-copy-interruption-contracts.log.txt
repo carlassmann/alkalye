@@ -1,0 +1,10 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/session-owned-copy.test.ts:
+(pass) session-owned copies serialize accepted peer replay, release interrupted copies and reject closed access (cooperative=%s) [90.23ms]
+(pass) session-owned copies serialize accepted peer replay, release interrupted copies and reject closed access (cooperative=%s) [1086.95ms]
+
+ 2 pass
+ 0 fail
+ 28 expect() calls
+Ran 2 tests across 1 file. [1231.00ms]

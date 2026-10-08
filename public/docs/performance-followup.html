@@ -1666,17 +1666,33 @@
 			<code>experiments/worker-session/actual-app-route</code>.
 		</p>
 		<p>
-			The larger worker journey remains incomplete. A native replacement of 512
+			The initial larger worker journey failed. A native replacement of 512
 			selections in a 1MiB document reached the server and the local durable
 			ledger, then the editor became read-only. A separate instrumented
 			reproduction captured a SessionFailure during the subsequent merge
 			candidate request, after acknowledgement. A further reproduction captured
 			"Replica changed while being copied": synchronization changed the replica
-			during a cooperative background copy. Undo and continued typing were not
-			verified, so the worker cannot replace the production editor yet.
-			Evidence:
+			during a cooperative background copy. That failed run did not verify Undo
+			or continued typing. Evidence:
 			<code>experiments/worker-session/actual-app-multicursor-failure</code> and
 			<code>experiments/worker-session/replica-copy-race</code>.
+		</p>
+		<p>
+			The fix copies under the session's existing gate and skips ordinary
+			background merges while selections are busy. A fresh 1MiB document passed
+			512 trusted replacements, exact Undo and a ten-character typing burst,
+			with exact server acceptance and cursor positions. Storage integration
+			tests also passed, including an interrupted cooperative copy. Opus 5.5
+			reviewed the patch. The fix remains outside production while broader
+			recovery, offline, permission and feature parity checks remain unfinished.
+		</p>
+		<p>
+			In this single correctness run, main-thread input tasks took 5.02ms for
+			the replacement and at most 6.35ms during the burst. Worker tasks still
+			reached 223.81ms. These are headless trace observations, not a matched
+			speedup or proof of 120Hz presentation. Save-badge timings were discarded
+			because they could reflect the previous state. Evidence:
+			<code>experiments/worker-session/session-owned-copy</code>.
 		</p>
 		<h2>Fewer unchanged library notifications</h2>
 		<p>

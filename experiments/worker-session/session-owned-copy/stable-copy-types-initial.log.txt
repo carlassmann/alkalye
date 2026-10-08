@@ -1,0 +1,3 @@
+$ tsc --noEmit --project tsconfig-postsave.json
+tests/session-owned-copy.test.ts(188,8): error TS2322: Type 'Operation | null' is not assignable to type 'Operation'.
+  Type 'null' is not assignable to type 'Operation'.

@@ -1,0 +1,14 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/session-owned-copy.test.ts:
+(pass) session-owned copies serialize accepted peer replay, release interrupted copies and reject closed access (cooperative=%s) [80.41ms]
+(pass) session-owned copies serialize accepted peer replay, release interrupted copies and reject closed access (cooperative=%s) [1055.12ms]
+
+tests/durable-checkpoint-session.test.ts:
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [371.78ms]
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [364.55ms]
+
+ 4 pass
+ 0 fail
+ 49 expect() calls
+Ran 4 tests across 2 files. [1.92s]

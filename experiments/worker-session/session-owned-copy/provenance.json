@@ -1,0 +1,26 @@
+{
+	"sourceBase": "72dd6f5 actual worker route, DocumentSession snapshot reuse fdbc79466a33698c583c33e4d9d10410bfccaecd33bc324080da491a248c6ef8",
+	"files": [
+		{
+			"file": "stable-copy-native-mc-512-burst.trace.json",
+			"sha256": "2a2e6a222454a546300c8c308700c472d1cae2e72e38376805ec08c435701420"
+		},
+		{
+			"file": "stable-copy-native-mc-512-single.trace.json",
+			"sha256": "e544d4e9279d6ad8431c8c942c991bf865acc033ba2c962539782092ae756e81"
+		},
+		{
+			"file": "stable-copy-native-mc-512-selection.trace.json",
+			"sha256": "634ad62607550b3a02af62f1aeb93bcba95f23788edf7e5205caadfa027d7fab"
+		},
+		{
+			"file": "stable-copy-native-results.json",
+			"sha256": "bceb2b20576221373e5c6af9599e61e19d82c23b6ca963833d1ddbc9dcbf42f0"
+		}
+	],
+	"sourceHashes": {
+		"src/shared/document-session.ts": "f49813ffb4e8dbcee1dddba26e58207efd464e14fda56d6e9b184f7b3c36420f",
+		"src/client/worker-document/bindings.ts": "b2724111cf3dea67b46b1b35db4d1c71912e2f836a70c8795924994ad13298ab",
+		"src/client/worker-document/worker-editor-basis.ts": "894b1afee87fc442bca5de39ae73fb8e58e8689c24f9dbf6254494bf0354669d"
+	}
+}

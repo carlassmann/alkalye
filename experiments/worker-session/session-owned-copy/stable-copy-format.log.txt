@@ -1,0 +1,4 @@
+src/shared/document-session.ts 108ms
+src/client/worker-document/bindings.ts 9ms
+src/client/worker-document/worker-editor-basis.ts 18ms
+tests/session-owned-copy.test.ts 9ms
