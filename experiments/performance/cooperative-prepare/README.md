@@ -20,3 +20,24 @@ Candidate-cwd public module integration: 36 tests, 278 assertions; strict TypeSc
 Next bounded test: reuse preparation only for an equal immutable proposed action under the existing generation/clock guards; avoid staging already-known proposals. Recheck full session/public contracts and repeat the same browser journey before adoption.
 
 written with gpt-6 in codex
+
+
+## Semantic action reuse: rejected
+
+A separate three-pair experiment kept frozen f9508ce and the same native backend. The candidate adds structural `equalAction` reuse, requires identical captured durable/current replicas, retains atomic generation/clock guards, and leaves known proposal validation native. It passed 36 public session/module tests (278 assertions), strict TypeScript, and a read-only Opus review.
+
+| Median | Native | Reuse candidate |
+|---|---:|---:|
+| First frame opportunity | 330.9 ms | 1346.7 ms |
+| Second frame opportunity | 351.6 ms | 1368.0 ms |
+| Undo accepted cache | 1650.6 ms | 2653.5 ms |
+| Largest undo task | 164.4 ms | 29.9 ms |
+| Sampled heap after undo | 625 MB | 1103 MB |
+| Trusted character dispatch | 5.07 ms | 4.53 ms |
+| Largest deferred edit task | 10.21 ms | 9.55 ms |
+
+All six journeys passed exact source, trusted undo, strictly newer accepted journal cursor, and zero pending/rejected checks. Task size improved, but latency and memory still regressed badly. Do not adopt.
+
+`reuse.patch` applies after `candidate.patch`; `reuse-results.json` preserves all samples. Raw traces remain in `/tmp/alkalye-undo-warm-reuse`. Slot-hit and preparation counts were not instrumented, so the result does not establish whether structural reuse occurred. Inspect and measure slot invalidation before attributing the regression or changing index representation. Single-character controls do not establish sustained typing throughput; heap samples are not peaks.
+
+written with gpt-6 in codex

@@ -1,0 +1,58 @@
+--- a/src/shared/document-session.ts
++++ b/src/shared/document-session.ts
+@@ -796,7 +796,7 @@
+ 		let backgroundWork = yield* BackgroundWork
+ 		let preparedProposal:
+ 			| {
+-					recording: Recording
++					action: DocumentAction
+ 					durable: Replica
+ 					replica: Replica
+ 					commit(): void
+@@ -1639,7 +1639,10 @@
+ 		function cooperativelyPreparesUndo(action: DocumentAction) {
+ 			return options.cooperativeWork === true && action.undoOf !== undefined
+ 		}
+-		function prepareProposal(value: Recording, operations: Operation[]) {
++		function prepareProposal(
++			value: Extract<Recording, { kind: "proposed" }>,
++			operations: Operation[],
++		) {
+ 			let targets = { durable, replica }
+ 			return Replica.prepareTogetherEffect(
+ 				[targets.durable, targets.replica],
+@@ -1658,7 +1661,7 @@
+ 				),
+ 				Effect.map(handle => {
+ 					preparedProposal = {
+-						recording: value,
++						action: freezeAction(value.action),
+ 						...targets,
+ 						commit: handle.commit,
+ 					}
+@@ -1666,14 +1669,14 @@
+ 			)
+ 		}
+ 		function publishPreparedProposal(
+-			value: Recording,
++			value: Extract<Recording, { kind: "proposed" }>,
+ 		): Effect.Effect<void, DocumentFailure> {
+ 			return Effect.gen(function* () {
+ 				while (true) {
+ 					let candidate = preparedProposal
+ 					if (
+ 						!candidate ||
+-						candidate.recording !== value ||
++						!equalAction(candidate.action, value.action) ||
+ 						candidate.durable !== durable ||
+ 						candidate.replica !== replica
+ 					) {
+@@ -1874,7 +1877,7 @@
+ 					}
+ 					let operations = yield* validateAction(durable, value.action)
+ 					yield* validateTextCausality(durable, options.document, operations)
+-					if (cooperativelyPreparesUndo(value.action))
++					if (!previous && cooperativelyPreparesUndo(value.action))
+ 						yield* prepareProposal(value, operations)
+ 					else yield* validateChanges([durable, replica], operations)
+ 					return
