@@ -49,7 +49,31 @@
 			sections compare rewrite revisions or implementation paths and follow the
 			<a href="performance-interaction.html">previous comparison with main</a>.
 		</p>
-		<h2>Fresh comparison with main</h2>
+		<h2>Latest native input tasks</h2>
+		<p>
+			Main <code>a749728</code> and rewrite <code>dc2af56</code> used separate
+			local sync servers and matching documents. Three trials per version typed
+			one trusted key in the middle of a 128KiB document. Every trial verified
+			both the edit and undo through an independent server-backed reader. The
+			median whole input task took 4.12ms on main and 5.42ms on the rewrite.
+			Maximum input tasks were 4.15ms and 5.61ms. The largest tasks over the
+			following three seconds reached 15.91ms and 8.11ms respectively.
+		</p>
+		<p>
+			At the end of a 1MiB document, three rewrite trials passed the same edit
+			and undo gates. Median input work took 7.21ms, with a 7.29ms maximum. The
+			largest deferred tasks ranged from 17.23ms to 31.12ms, exceeding the
+			8.33ms budget. Main produced one valid input trace at 6.57ms, with a
+			126.11ms deferred task. Its local undo completed, but the independent
+			reader held only 560,128 of the expected 1,048,576 characters when the
+			20-second verification deadline expired. Further main trials stopped. This
+			leaves the 1MiB comparison incomplete and does not establish data loss.
+			These traces used a browser running near 60Hz and cannot prove 120Hz
+			presentation. The later projection cache in <code>f094700</code>
+			was absent from these builds. Evidence:
+			<code>experiments/performance/production-native-oct8</code>.
+		</p>
+		<h2>Earlier journey comparison with main</h2>
 		<p>
 			Both production builds used their own local sync servers, signed accounts
 			and matching documents. Main <code>a749728</code>; rewrite
