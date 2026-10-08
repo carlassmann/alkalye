@@ -1,0 +1,11 @@
+# Sampled cold clone during cooperative current-view warm
+
+Diagnostic only, no timing comparison. Exact rejected selected/cooperative worker candidate plus unique cold-text invocation/stage marks; original full mapper. Fresh pristine1MiB1/512 seed. Native source/all ranges/directions/primary/caret and independent edit+Undo accepted. Driver14393 terminal0, strict78049 pass; server39272/browser closed. Setup failures retained: overbroad copy excluded CLI profile.ts (fixed by exact copy); disposable work git init absent caused connection refusal before native mutation. No uncertain command repeated.
+
+Both traces contain actual dedicated-worker V8 ProfileChunks: pid/tid matches maximum RunTask and sampled stack contains served worker-editor.js. External exact source-map SHA pinned. Sampled maxima290.142/312.556ms are diagnostic, not comparable to unsampled pair.
+
+The maxima belong to MergeCandidate (worker-editor-basis.ts289): after session.forkReplica, replica.text(document) rebuilds the cold cloned source; original full-map construction then runs in the same task. Mapping self85.549/90.022ms. rawVisibleSteps self42.366/45.358ms, visibility and frontmatter costs nested under synchronous text reconstruction. Merge handler inclusive265.427/281.298ms. Self/inclusive samples overlap; do not sum ancestors or treat sampling as exact exclusive elapsed time.
+
+Only ONE cold textEffect visible:start invocation occurs in each Undo window (ID2, also including incomplete invocations check). Current-view cooperative warm starts324.153/264.316ms after key, publishes1203.913/1160.689ms. During that interval the fork is taken before warm cache publication, and its independent text() reconstructs synchronously. Thus same-projection multiple-reader hypothesis is NOT confirmed here. Warm elapsed879.760/896.373ms includes other work/scheduling, not CPU. Final joins2.339/2.361ms, immutable conversions/index stages tiny: these do not explain the maximum task.
+
+Next reversible slice: coordinate selected authoritative current-view warm with owned fork BEFORE cloning; exact source identity/generation preflight remains mandatory. Use installed owner-scoped Effect resource sharing, not arbitrary editor-source substitution or manual promises. Interrupted waiter must not poison other warm consumers; flush/Close must progress. No production changes/adoption.

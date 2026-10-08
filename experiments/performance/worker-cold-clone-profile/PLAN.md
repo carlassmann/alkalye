@@ -1,0 +1,1 @@
+Diagnostic only: rejected selected/cooperative candidate plus invocation/stage marks; original full mapper; sampled dedicated worker Undo1/512. Fresh pristine seed. No comparison. Profile owner must match worker task thread and worker-editor.js stack. No production changes.

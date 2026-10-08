@@ -1814,6 +1814,17 @@
 			<code>experiments/performance/worker-opened-projection</code>.
 		</p>
 		<p>
+			Sampling the rejected candidate identifies a cold clone during Merge. The
+			clone is taken before cooperative source warming publishes its cache, then
+			rebuilds text synchronously and constructs the full selection map in the
+			same worker task. Sampled maxima are 290–313ms, including 86–90ms of
+			mapping. Only one current-projection warm invocation was observed per
+			Undo; duplicated concurrent warming is not established. Next, warm and
+			clone must share the authoritative owner with exact generation checks.
+			These sampled timings diagnose the cause; they are not a speed comparison.
+			Evidence: <code>experiments/performance/worker-cold-clone-profile</code>.
+		</p>
+		<p>
 			The worker metadata pipeline passed 31 storage/owner assertions and a real
 			WorkerRPC journey. A dropped applied reply is recovered as the same
 			action, exact pending state clears, and Merge/Adopt matches an independent

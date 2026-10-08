@@ -1,0 +1,63 @@
+--- a/src/shared/crdt.ts
++++ b/src/shared/crdt.ts
+@@ -1,3 +1,4 @@
++let textReadSequence = 0
+ import type { CausalReplicaCheckpoint, ReplicaCheckpoint } from "./checkpoint"
+ import {
+ 	parseCheckpoint,
+@@ -1489,12 +1490,19 @@
+ 			let cached = replica.strings.get(target)
+ 			if (cached !== undefined) return replica.text(target)
+ 			let generation = replica.generation
++			let read = ++textReadSequence
++			function mark(phase: string) { performance.mark("text-read:" + read + ":" + phase) }
++			mark("visible:start")
+ 			let visible = yield* cooperative("replica.visible", () =>
+ 				replica.rawVisibleSteps(target, Infinity, true),
+ 			)
++			mark("visible:end")
+ 			yield* Effect.yieldNow
++			mark("raw:start")
+ 			let raw = immutableAtoms(visible)
++			mark("raw:end")
+ 			yield* Effect.yieldNow
++			mark("frontmatter:start")
+ 			let projected = yield* cooperative("replica.frontmatter", () =>
+ 				sourceAtomsSteps(
+ 					raw,
+@@ -1502,8 +1510,12 @@
+ 					true,
+ 				),
+ 			)
++			mark("frontmatter:end")
+ 			yield* Effect.yieldNow
++			mark("source:start")
+ 			let atoms = immutableAtoms(projected)
++			mark("source:end")
++			mark("values:start")
+ 			let values: string[] = []
+ 			let count = 0
+ 			for (let atom of atoms) {
+@@ -1513,7 +1525,10 @@
+ 					yield* Effect.yieldNow
+ 				}
+ 			}
++			mark("values:end")
++			mark("join:start")
+ 			let text = values.join("")
++			mark("join:end")
+ 			if (replica.generation !== generation)
+ 				return yield* Effect.fail(new Error("Replica changed while being read"))
+ 			replica.textCache.set(target, raw)
+@@ -1521,8 +1536,11 @@
+ 			replica.sourceCache.set(target, atoms)
+ 			replica.strings.set(target, text)
+ 			sourceStrings.set(atoms, text)
++			mark("index:start")
+ 			if (atoms.length !== text.length)
+ 				sourceOffsets.set(atoms, new TextIndex(text))
++			mark("index:end")
++			mark("publish")
+ 			return text
+ 		})
+ 	}

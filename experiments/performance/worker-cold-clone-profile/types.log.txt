@@ -1,0 +1,2 @@
+src/cli/documents.ts(31,28): error TS2307: Cannot find module './profile' or its corresponding type declarations.
+src/cli/main.ts(22,28): error TS2307: Cannot find module './profile' or its corresponding type declarations.

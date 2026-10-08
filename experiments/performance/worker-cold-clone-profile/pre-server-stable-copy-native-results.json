@@ -1,0 +1,48 @@
+{
+  "stage": "setup",
+  "gates": [],
+  "cells": [],
+  "failure": "Error: worker-actual-multicursor-1791500164718 --profile: {\"success\":false,\"data\":null,\"error\":\"Navigation failed: net::ERR_CONNECTION_REFUSED\"}\n",
+  "phases": null,
+  "errors": {
+    "errors": [],
+    "lifecycle": {
+      "effectiveLaunch": {
+        "browserLaunched": true,
+        "engine": "chrome",
+        "launchHash": 7390800266366072000
+      },
+      "launched": false,
+      "relaunchedBrowser": false,
+      "restartedBackground": false,
+      "restoreStatus": "not_configured",
+      "reused": true,
+      "saveStatus": "not_attempted"
+    }
+  },
+  "console": {
+    "lifecycle": {
+      "effectiveLaunch": {
+        "browserLaunched": true,
+        "engine": "chrome",
+        "launchHash": 7390800266366072000
+      },
+      "launched": false,
+      "relaunchedBrowser": false,
+      "restartedBackground": false,
+      "restoreStatus": "not_configured",
+      "reused": true,
+      "saveStatus": "not_attempted"
+    },
+    "messages": []
+  },
+  "state": {
+    "alerts": [],
+    "body": "This site can’t be reached\n\n127.0.0.1 refused to connect.\n\nTry:\n\nChecking the connection\nChecking the proxy and the firewall\nERR_CONNECTION_REFUSED\nReload\nDetails",
+    "path": "/",
+    "selection": [
+      null,
+      null
+    ]
+  }
+}
