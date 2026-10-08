@@ -1,0 +1,21 @@
+## Verdict: PASS for the source change
+
+The test needs fixes, but none of them blocks this change.
+
+## Source
+
+- **Validation is unchanged.** The new early return only runs after the existing check passes. At that point the stored `{target, kind}` already matches the incoming values, so the old `Map.set` only replaced it with an equal value. Every throw path behaves exactly as before.
+- **Repeats that are still allowed:** text with text in the same target, cancel with cancel in the same target, and a removal id that matches an atom's operation in the same target. A duplicate cancel in one target is still caught first by the `cancels` set.
+- **Mutation isolation is unchanged.** `operations` is created fresh for each parse and is never exposed. The parse still throws before it returns a snapshot.
+- **Sync, cooperative, v1, v2 and v3 behave the same.** All of them call the same `claim` after decoding. v1 never reaches the visibility claims, same as before. v3 claims run after expansion, so the order is unchanged.
+- I'm not claiming any speed gain from reading the source.
+
+## Test fixtures
+
+1. **The repeated-register fixture `[...fields, field]` never reaches `claim`.** It fails earlier on the field-name uniqueness check (`Invalid checkpoint registers`), so the `kind === "set"` branch is untested. Fix: use a second field with a different `field` name and the same `id`, or put the same field id in another target.
+2. **The cross-target fixture does reach `claim`, but by luck of ordering.** On the first atom the order is: owner check (passes, since the ids are shifted), then `claim`, which throws because the target differs. That is the intended check. But `after` isn't shifted, so the anchor check would also fail on that same atom. If the code order changes, the fixture still fails and stops proving anything about `claim`. Fix: also shift `after` (keeping `""` as is).
+3. **The mixed-kind fixture `{...field, id: insertion.id}` probably reaches `claim` but might not.** Fields are claimed as `set` first, then the atom prefix as `text`, which should throw. But if `parseOperation` or the envelope schema checks that the id prefix matches `clock`, it fails earlier. I can't confirm that from the source shown. Fix: also set `clock` to the insertion's clock, or assert the error message.
+4. **None of the failure cases check the error message.** `toThrow()` and `Exit.isFailure` pass on any error, which is why fixtures 1–3 can hide what they actually test. Add message matches for `ambiguous`.
+5. **Coverage gaps, not blockers:** failure cases only use v2 input. There's no v3 (compact) or v1 failure case, and no passing case with a text/text repeat in the same target, which is exactly the path the early return changes.
+
+Tests weren't run.

@@ -1,0 +1,52 @@
+[
+	{
+		"arm": "baseline",
+		"path": "src/shared/checkpoint.ts",
+		"sha256": "e06047210857a992c76af024fd6be8efb093fa705409393d6ca511c91f4d27e8"
+	},
+	{
+		"arm": "baseline",
+		"path": "dist/app.js",
+		"sha256": "f5f4df9cc9b13c96ec49bb95fc860f3d93e7f42f77ab923cf6b382577c7d64ed"
+	},
+	{
+		"arm": "candidate",
+		"path": "src/shared/checkpoint.ts",
+		"sha256": "4eda90d9ea075d2f25f25440012b6bf1e3aeaee917f6ca7ce7949524d27cbe79"
+	},
+	{
+		"arm": "candidate",
+		"path": "dist/app.js",
+		"sha256": "9616ab7c9928c9d71eddfe67ad0c1d13711a8ee536eee0e425d3645e6da9798f"
+	},
+	{
+		"arm": "baseline",
+		"trace": "baseline-switch-small-rich-0.trace.json",
+		"sha256": "e40aae033e9afbaab516d8c0de5744d152cb869e239a6bf87023feac431e87c7"
+	},
+	{
+		"arm": "baseline",
+		"trace": "baseline-switch-small-rich-0.trace.json",
+		"sha256": "5e90ddccd72b49b2a9178dab83b115fa933b90118186fd56b0fd896588b5f699"
+	},
+	{
+		"arm": "baseline",
+		"trace": "baseline-switch-small-rich-0.trace.json",
+		"sha256": "735dfb4b60d4648bd24504dde57583bc1e6a1d6a1be6154610dd0004d2d0591f"
+	},
+	{
+		"arm": "candidate",
+		"trace": "candidate-switch-small-rich-0.trace.json",
+		"sha256": "b0c63d0e3c32f3c99f175ee40baf1e7a879e489b30266342508f54b5665f77ce"
+	},
+	{
+		"arm": "candidate",
+		"trace": "candidate-switch-small-rich-0.trace.json",
+		"sha256": "46098dca62703b2be920bf9eba0bae7991a4d4067de71f5d89c7ae703aa635ae"
+	},
+	{
+		"arm": "candidate",
+		"trace": "candidate-switch-small-rich-0.trace.json",
+		"sha256": "b486a763df5f2208b730db98e808fe29bb74413ae276d0d5be5d59291a6b9d30"
+	}
+]

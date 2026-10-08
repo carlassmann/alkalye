@@ -1,0 +1,140 @@
+[
+	{
+		"version": "baseline",
+		"commit": "1b630c80268665f1c7838e584eeb9c6f9f0ad463",
+		"cell": "switch-small-rich",
+		"trial": 0,
+		"status": "complete",
+		"seedReceipt": {
+			"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+			"characters": 2048,
+			"log": "0297efe0-6705-479c-9ca4-b80852744c00:5"
+		},
+		"targetReceipt": {
+			"sha256": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac",
+			"characters": 131072,
+			"log": "8c5c6a5d-9d8a-4a78-bf50-89d1bd164f04:6"
+		},
+		"fixture": {
+			"characters": 2048,
+			"bytes": 2048,
+			"realNewlines": 121,
+			"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+		}
+	},
+	{
+		"version": "baseline",
+		"commit": "1b630c80268665f1c7838e584eeb9c6f9f0ad463",
+		"cell": "switch-small-rich",
+		"trial": 0,
+		"status": "complete",
+		"seedReceipt": {
+			"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+			"characters": 2048,
+			"log": "0297efe0-6705-479c-9ca4-b80852744c00:5"
+		},
+		"targetReceipt": {
+			"sha256": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac",
+			"characters": 131072,
+			"log": "8c5c6a5d-9d8a-4a78-bf50-89d1bd164f04:6"
+		},
+		"fixture": {
+			"characters": 2048,
+			"bytes": 2048,
+			"realNewlines": 121,
+			"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+		}
+	},
+	{
+		"version": "baseline",
+		"commit": "1b630c80268665f1c7838e584eeb9c6f9f0ad463",
+		"cell": "switch-small-rich",
+		"trial": 0,
+		"status": "complete",
+		"seedReceipt": {
+			"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+			"characters": 2048,
+			"log": "0297efe0-6705-479c-9ca4-b80852744c00:5"
+		},
+		"targetReceipt": {
+			"sha256": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac",
+			"characters": 131072,
+			"log": "8c5c6a5d-9d8a-4a78-bf50-89d1bd164f04:6"
+		},
+		"fixture": {
+			"characters": 2048,
+			"bytes": 2048,
+			"realNewlines": 121,
+			"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+		}
+	},
+	{
+		"version": "candidate",
+		"commit": "1b630c80268665f1c7838e584eeb9c6f9f0ad463",
+		"cell": "switch-small-rich",
+		"trial": 0,
+		"status": "complete",
+		"seedReceipt": {
+			"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+			"characters": 2048,
+			"log": "0297efe0-6705-479c-9ca4-b80852744c00:5"
+		},
+		"targetReceipt": {
+			"sha256": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac",
+			"characters": 131072,
+			"log": "8c5c6a5d-9d8a-4a78-bf50-89d1bd164f04:6"
+		},
+		"fixture": {
+			"characters": 2048,
+			"bytes": 2048,
+			"realNewlines": 121,
+			"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+		}
+	},
+	{
+		"version": "candidate",
+		"commit": "1b630c80268665f1c7838e584eeb9c6f9f0ad463",
+		"cell": "switch-small-rich",
+		"trial": 0,
+		"status": "complete",
+		"seedReceipt": {
+			"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+			"characters": 2048,
+			"log": "0297efe0-6705-479c-9ca4-b80852744c00:5"
+		},
+		"targetReceipt": {
+			"sha256": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac",
+			"characters": 131072,
+			"log": "8c5c6a5d-9d8a-4a78-bf50-89d1bd164f04:6"
+		},
+		"fixture": {
+			"characters": 2048,
+			"bytes": 2048,
+			"realNewlines": 121,
+			"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+		}
+	},
+	{
+		"version": "candidate",
+		"commit": "1b630c80268665f1c7838e584eeb9c6f9f0ad463",
+		"cell": "switch-small-rich",
+		"trial": 0,
+		"status": "complete",
+		"seedReceipt": {
+			"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+			"characters": 2048,
+			"log": "0297efe0-6705-479c-9ca4-b80852744c00:5"
+		},
+		"targetReceipt": {
+			"sha256": "76e5928ec7f9fa9257f420d19fd502202668551e1849682f58e11962bea698ac",
+			"characters": 131072,
+			"log": "8c5c6a5d-9d8a-4a78-bf50-89d1bd164f04:6"
+		},
+		"fixture": {
+			"characters": 2048,
+			"bytes": 2048,
+			"realNewlines": 121,
+			"sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+		}
+	}
+]

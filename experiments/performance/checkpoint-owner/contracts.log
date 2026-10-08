@@ -1,0 +1,42 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/checkpoint.test.ts:
+(pass) malformed checkpoint headers remain typed failures [1.28ms]
+(pass) checkpoint and shuffled duplicate replay converge to the full event log [34.79ms]
+(pass) checkpoint tombstones retain offline anchors and undo values [2.49ms]
+(pass) random offline writers converge when checkpoints arrive after pending local edits [2118.89ms]
+(pass) history hydration restores every version while current state stays unchanged [5.66ms]
+(pass) a checkpoint opens thousands of metadata events as winning registers [7.29ms]
+(pass) checkpoint validation rejects ambiguous identities and invalid clocks [0.87ms]
+(pass) compressed checkpoints authenticate their room and preserve materialized state [5.04ms]
+(pass) checkpoint streams reject corrupt gzip, invalid state and oversized decompression as typed failures [47.54ms]
+
+tests/checkpoint-owner.test.ts:
+(pass) checkpoint opening preserves repeated insertion ownership and refuses ambiguous facts [46.27ms]
+
+tests/checkpoint-hydration.test.ts:
+(pass) cooperative checkpoint hydration matches synchronous state and yields during schema, tombstone and atom loading [141.31ms]
+(pass) interruption never publishes a partially hydrated document [78.20ms]
+(pass) cooperative checkpoint decoding owns atom metadata before releasing a batch [63.65ms]
+(pass) cooperative snapshots retain deletion provenance when runs are unsorted and duplicate identities normalize [100.28ms]
+(pass) legacy checkpoints hydrate cooperatively with permanent tombstones and enforce their migration floor [31.52ms]
+(pass) small unsorted duplicate deletion runs hydrate to the same canonical facts [110.62ms]
+
+tests/replica-loading.test.ts:
+(pass) cooperative replica copies preserve snapshots and independently merge Unicode edits [175.12ms]
+(pass) interrupted replica copies leave the source usable and can be retried [107.43ms]
+(pass) a concurrent source edit rejects a partially copied replica [94.84ms]
+(pass) cooperative materialization yields while preserving frontmatter and Unicode offsets [138.26ms]
+(pass) concurrent materialization never publishes a stale source cache [141.77ms]
+(pass) interrupted materialization can be read and retried without partial caches [121.14ms]
+(pass) synchronous reads during cooperative materialization share the same source [146.72ms]
+(pass) forked deletion histories independently remove and undo the same atom (cooperative=false) [0.43ms]
+(pass) forked deletion histories independently remove and undo the same atom (cooperative=true) [0.12ms]
+(pass) forked cancellation chains keep repeated undo isolated (cooperative=false) [0.14ms]
+(pass) forked cancellation chains keep repeated undo isolated (cooperative=true) [0.07ms]
+(pass) a concurrent deletion undo rejects a partially copied replica [173.86ms]
+
+ 28 pass
+ 0 fail
+ 1711 expect() calls
+Ran 28 tests across 4 files. [3.93s]

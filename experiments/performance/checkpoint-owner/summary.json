@@ -1,0 +1,46 @@
+{
+	"baseline": {
+		"presentationOpportunityMs": {
+			"samples": [615.859, 615.342, 599.127],
+			"median": 615.342,
+			"max": 615.859
+		},
+		"windowMaxTaskMs": {
+			"samples": [19.707, 19.947, 19.763],
+			"median": 19.763,
+			"max": 19.947
+		},
+		"layoutUnionMs": {
+			"samples": [35.726, 35.993, 34.525],
+			"median": 35.726,
+			"max": 35.993
+		},
+		"gcUnionMs": {
+			"samples": [30.011, 28.834, 27.147],
+			"median": 28.834,
+			"max": 30.011
+		}
+	},
+	"candidate": {
+		"presentationOpportunityMs": {
+			"samples": [597.858, 598.645, 617.38],
+			"median": 598.645,
+			"max": 617.38
+		},
+		"windowMaxTaskMs": {
+			"samples": [18.393, 18.061, 18.554],
+			"median": 18.393,
+			"max": 18.554
+		},
+		"layoutUnionMs": {
+			"samples": [33.291, 35.726, 35.915],
+			"median": 35.726,
+			"max": 35.915
+		},
+		"gcUnionMs": {
+			"samples": [38.505, 27.02, 33.239],
+			"median": 33.239,
+			"max": 38.505
+		}
+	}
+}

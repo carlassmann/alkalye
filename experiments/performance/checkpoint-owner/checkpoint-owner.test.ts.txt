@@ -1,0 +1,41 @@
+import { expect, test } from "bun:test"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
+import { Replica } from "../src/shared/crdt"
+import { compactCheckpoint } from "../src/shared/checkpoint"
+
+test("checkpoint opening preserves repeated insertion ownership and refuses ambiguous facts", async () => {
+	let writer = new Replica("writer")
+	let insertion = writer.edit("document", "A😀B\n".repeat(1000))
+	if (!insertion) throw new Error("Missing insertion")
+	writer.apply([insertion, writer.set("document", "title", "Document")])
+	let checkpoint = writer.checkpoint()
+	let target = checkpoint.targets.find(value => value.id === "document")
+	let first = target?.atoms[0]
+	let field = target?.fields[0]
+	if (!target || !first || !field) throw new Error("Missing checkpoint")
+	for (let encoded of [checkpoint, compactCheckpoint(checkpoint)]) {
+		let sync = new Replica("sync")
+		sync.restoreCheckpoint(encoded)
+		let cooperative = await Effect.runPromise(Replica.fromCheckpointEffect(encoded, "cooperative"))
+		expect(sync.text("document")).toBe(writer.text("document"))
+		expect(cooperative.checkpoint()).toEqual(sync.checkpoint())
+	}
+	function shifted(id: string) {
+		return id ? id.slice(0, -8) + String(Number(id.slice(-8)) + 100000).padStart(8, "0") : ""
+	}
+	let malformed = [
+		{ ...checkpoint, targets: [{ ...target, atoms: [...target.atoms, first] }] },
+		{ ...checkpoint, targets: [{ ...target, fields: [...target.fields, field] }] },
+		{ ...checkpoint, targets: [{ ...target, fields: [field, { ...field, field: "other" }] }] },
+		{ ...checkpoint, targets: [{ ...target, fields: [{ ...field, id: insertion.id, clock: insertion.clock }] }] },
+		{ ...checkpoint, targets: [target, { ...target, id: "other", fields: [], atoms: target.atoms.map(atom => ({ ...atom, id: shifted(atom.id), after: shifted(atom.after) })) }] },
+	]
+	for (let [index, value] of malformed.entries()) {
+		let sync = new Replica("sync")
+		expect(() => sync.restoreCheckpoint(value)).toThrow(index < 2 ? index === 0 ? "identity" : "registers" : "ambiguous")
+		expect(sync.text("document")).toBe("")
+		let result = await Effect.runPromiseExit(Replica.fromCheckpointEffect(value, "cooperative"))
+		expect(Exit.isFailure(result)).toBe(true)
+	}
+})
