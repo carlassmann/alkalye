@@ -1,0 +1,16 @@
+35 | ()=>{let editor=document.querySelector("alkalye-editor");editor.selectRange(editor.source.value.length);return true})()"
+                                                                  ^
+error: Expected ")" but found "alkalye"
+    at /private/tmp/alkalye-worker-cold-open-diagnostic/native-tail-corrected/run.ts:35:62
+
+35 |   evaluate(session,"(()=>{let editor=document.querySelector("alkalye-editor");editor.selectRange(editor.source.value.length);return true})()")
+                                                                                ^
+error: Expected ";" but found "");editor.selectRange(editor.source.value.length);return true})()""
+    at /private/tmp/alkalye-worker-cold-open-diagnostic/native-tail-corrected/run.ts:35:76
+
+35 |   evaluate(session,"(()=>{let editor=document.querySelector("alkalye-editor");editor.selectRange(editor.source.value.length);return true})()")
+                                                                                                                                                  ^
+error: Unexpected )
+    at /private/tmp/alkalye-worker-cold-open-diagnostic/native-tail-corrected/run.ts:35:142
+
+Bun v1.4.0 (macOS arm64)
