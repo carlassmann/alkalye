@@ -197,6 +197,15 @@
 			cold-loading comparison. Evidence:
 			<code>experiments/performance/rich-current-readiness/reopen</code>.
 		</p>
+		<p>
+			An unchanged-line lexical-context cache passed 332 native assertions and
+			six rich-document app trials, but remains an experiment. Input median fell
+			from 18.8ms to 17.0ms; matched gains mostly coincided with garbage
+			collection in the baseline. Three-second busy work increased from 1012ms
+			to 1028ms, and deferred pauses stayed near 13ms. This does not establish a
+			useful cache improvement, so production retains the original lexer.
+			Evidence: <code>experiments/performance/projector-lexical-context</code>.
+		</p>
 		<h2>Earlier journey comparison with main</h2>
 		<p>
 			Both production builds used their own local sync servers, signed accounts
