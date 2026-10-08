@@ -1012,6 +1012,67 @@ function createEditorView(
 		for (let request of pending)
 			if (request.rank !== Infinity) resolved.set(request.id, request.offset)
 		if (!exhaustive.length) return resolved
+		function atomOrdinal(id: string) {
+			let suffix = id.slice(-9)
+			if (!/^:\d{8}$/.test(suffix)) return undefined
+			return { owner: id.slice(0, -9), ordinal: Number(suffix.slice(1)) }
+		}
+		let hints: { owner: string; base: number }[] = []
+		for (let index of [
+			0,
+			atoms.length - 1,
+			...exhaustive.map(request => request.previous),
+		]) {
+			if (index === undefined) continue
+			let atom = atoms[index]
+			let parsed = atom && atomOrdinal(atom.id)
+			if (!parsed) continue
+			let base = index - parsed.ordinal
+			if (
+				!hints.some(hint => hint.owner === parsed.owner && hint.base === base)
+			)
+				hints.push({ owner: parsed.owner, base })
+			if (hints.length === 3) break
+		}
+		if (
+			nextAtoms.length <= 256 &&
+			hints.length &&
+			exhaustive.every(request => request.previous !== undefined)
+		) {
+			let exact = true
+			let predictions = new Map<AnchorRequest, { index: number; end: number }>()
+			offset = 0
+			for (let atom of nextAtoms) {
+				offset += atom.value.length
+				let parsed = atomOrdinal(atom.id)
+				let index: number | undefined
+				if (parsed)
+					for (let hint of hints) {
+						if (hint.owner !== parsed.owner) continue
+						let proposed = parsed.ordinal + hint.base
+						if (atoms[proposed]?.id === atom.id) {
+							index = proposed
+							break
+						}
+					}
+				if (index === undefined) {
+					exact = false
+					break
+				}
+				for (let request of exhaustive)
+					if (
+						request.previous !== undefined &&
+						index < request.previous &&
+						index >= (predictions.get(request)?.index ?? -1)
+					)
+						predictions.set(request, { index, end: offset })
+			}
+			if (exact) {
+				for (let request of exhaustive)
+					resolved.set(request.id, predictions.get(request)?.end ?? 0)
+				return resolved
+			}
+		}
 		let survivingEnds = new Map<string, number>()
 		offset = 0
 		for (let atom of nextAtoms) {

@@ -92,7 +92,90 @@ let operation = owner.edit("doc", initial + "X😀")
 if (!operation) throw Error("Missing CRDT edit")
 let beforeUndo = owner.visible("doc")
 owner.cancel("doc", operation.id)
+let generated = new Replica("generated")
+generated.edit("sparse", "x".repeat(4096))
+let generatedAtoms = generated.visible("sparse")
+let gapped = new Replica("gapped")
+gapped.edit("gapped", "x".repeat(4096))
+gapped.edit("gapped", "x".repeat(100) + "new" + "x".repeat(3996))
+gapped.edit(
+	"gapped",
+	gapped.text("gapped").slice(0, 200) + gapped.text("gapped").slice(600),
+)
+let gappedAtoms = gapped.visible("gapped")
+let foreign = new Replica("foreign")
+foreign.edit("foreign", "new")
+let foreignAtoms = foreign.visible("foreign")
+let generatedEmoji = new Replica("emoji-owner")
+generatedEmoji.edit("emoji", "😀".repeat(4096))
+let generatedEmojiAtoms = generatedEmoji.visible("emoji")
+let mixedRuns = new Replica("mixed-owner")
+mixedRuns.edit("mixed", "x".repeat(2048))
+mixedRuns.edit("mixed", "x".repeat(2048) + "y".repeat(2048))
+let mixedAtoms = mixedRuns.visible("mixed")
 let scenarios: Scenario[] = [
+	{
+		name: "generated Unicode survivors preserve UTF16 offsets",
+		before: generatedEmojiAtoms,
+		after: [
+			requiredAtom(generatedEmojiAtoms, 120),
+			requiredAtom(generatedEmojiAtoms, 3000),
+		],
+		start: 4096,
+		end: 8192,
+		expected: [2, 4],
+	},
+	{
+		name: "two generated insertion owners retain independent anchor positions",
+		before: mixedAtoms,
+		after: [requiredAtom(mixedAtoms, 120), requiredAtom(mixedAtoms, 3000)],
+		start: 2048,
+		end: 4096,
+		expected: [1, 2],
+	},
+	{
+		name: "duplicate survivor keeps final next occurrence offset",
+		before: generatedAtoms,
+		after: [
+			requiredAtom(generatedAtoms, 120),
+			requiredAtom(generatedAtoms, 120),
+		],
+		start: 2048,
+		end: 4096,
+		expected: [2, 2],
+	},
+	{
+		name: "generated sparse survivors resolve independent distant anchors",
+		before: generatedAtoms,
+		after: [
+			requiredAtom(generatedAtoms, 120),
+			requiredAtom(generatedAtoms, 80),
+			requiredAtom(generatedAtoms, 3000),
+		],
+		start: 2048,
+		end: 4096,
+		expected: [1, 3],
+	},
+	{
+		name: "unhinted gapped insertion owner forces exact nearest-survivor fallback",
+		before: gappedAtoms,
+		after: [
+			requiredAtom(gappedAtoms, 120),
+			requiredAtom(gappedAtoms, 100),
+			requiredAtom(gappedAtoms, 3000),
+		],
+		start: 2048,
+		end: content(gappedAtoms).length,
+		expected: [1, 3],
+	},
+	{
+		name: "new owner survivor forces exact fallback",
+		before: generatedAtoms,
+		after: [requiredAtom(foreignAtoms, 0), requiredAtom(generatedAtoms, 120)],
+		start: 2048,
+		end: 4096,
+		expected: [2, 2],
+	},
 	{
 		name: "empty replacement preserves both range anchors at zero",
 		before: removedRange,

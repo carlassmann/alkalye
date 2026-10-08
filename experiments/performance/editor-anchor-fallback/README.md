@@ -16,3 +16,18 @@ Both changes were adopted. Empty replacement needs no old-atom traversal. The ex
 `results.json` retains all twelve samples. `probe.ts` exposes `window.fallbackProbe(characters, empty)`; bundle it as a browser entrypoint, serve with the app editor and viewport styles, then call through agent-browser. Compare frozen baseline9e5b303, an empty-return-only arm and the adopted source. Use fresh page loads per cell; verify `exact` before accepting a timing.
 
 Ten public component contracts include reordered survivors, distinct exhaustive range endpoints, variable-width Unicode legacy atoms, empty replacement and real Replica undo. Run `bun tests/browser-editor-anchors.ts`.
+
+## Verified sparse generated survivors
+
+A second experiment uses actual `Replica.edit`/`visible` atom IDs, rather than the manually named atoms above. Three alternating pairs per size compare the adopted native scan with an ordinal prediction. Initial construction and selection remain outside the measured interval; every sample verifies source and both caret positions.
+
+| Old source | Native update median | Verified ordinal median |
+| ---------- | -------------------: | ----------------------: |
+| 128 KiB    |               5.5 ms |                  0.4 ms |
+| 1 MiB      |              20.6 ms |                  0.7 ms |
+
+The different native baseline belongs to this different generated-ID fixture; do not compare it directly with the earlier 70.1 ms manual-ID sample. Median next-frame opportunity is 16.3→18.0 ms at128KiB and21.2→15.2 ms at1MiB. Headless frame cadence is not a120Hz display measurement.
+
+The shortcut derives at most three owner/ordinal base hints. It accepts a predicted old position only when `old[index].id` exactly matches. Every surviving atom must verify before any result is published. Choosing the largest verified old index below each endpoint then gives the exact old predecessor, with its UTF16 end in the new text. Unknown IDs, gaps, legacy formats or more than256 survivors use the native exhaustive fallback. This optimization helps sparse remnants of large deletions, not ordinary large-document editing.
+
+`ordinal-results.json` contains all twelve samples; `ordinal-probe.ts` exposes the same browser boundary using real Replica atom IDs. Sixteen public contracts include generated Unicode, two insertion owners, unhinted gaps, foreign IDs, duplicate survivor offsets and legacy exhaustive behavior.
