@@ -69,7 +69,8 @@ export class SourceTextarea {
 		})
 		ready = true
 	}
-	get projection() {
+	// Changing this borrowed state corrupts native/source coordinate mapping.
+	get projection(): Readonly<Projection> {
 		return this.current
 	}
 	get value() {
@@ -220,7 +221,8 @@ export class SourceTextarea {
 			direction: this.viewport.selectionDirection,
 		}
 		let next = this.projectionFor(this.current.source, selection)
-		if (sameProjection(next, this.current)) return false
+		if (next === this.current || sameProjection(next, this.current))
+			return false
 		this.apply(next, selection)
 		return true
 	}
@@ -250,12 +252,16 @@ export class SourceTextarea {
 		if (
 			previous &&
 			previous.source === source &&
-			previous.start === active.start &&
-			previous.end === active.end &&
 			previous.documents === key &&
-			previous.mode === mode
-		)
+			previous.mode === mode &&
+			((previous.start === active.start && previous.end === active.end) ||
+				(mode !== "raw" &&
+					this.projector.sameActiveTokens(source, previous, active)))
+		) {
+			previous.start = active.start
+			previous.end = active.end
 			return previous.value
+		}
 		let value =
 			mode === "raw" || !source.includes("[")
 				? identity(source)

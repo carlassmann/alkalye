@@ -46,6 +46,44 @@ export class Projector {
 	private source: string | undefined
 	private tokens: LinkToken[] = []
 	private documents = ""
+	sameActiveTokens(
+		source: string,
+		left?: { start: number; end: number },
+		right?: { start: number; end: number },
+	) {
+		if (source !== this.source || Boolean(left) !== Boolean(right)) return false
+		if (!left || !right) return true
+		if (
+			Number.isNaN(left.start) ||
+			Number.isNaN(left.end) ||
+			Number.isNaN(right.start) ||
+			Number.isNaN(right.end)
+		)
+			return false
+		let previous = this.activeTokens(source, left)
+		let next = this.activeTokens(source, right)
+		return previous.start === next.start && previous.end === next.end
+	}
+	private activeTokens(source: string, active: { start: number; end: number }) {
+		let selection = selectionBounds(source, active)
+		let low = 0,
+			high = this.tokens.length
+		while (low < high) {
+			let middle = (low + high) >>> 1
+			if ((this.tokens[middle]?.end ?? Infinity) < selection.start)
+				low = middle + 1
+			else high = middle
+		}
+		let start = low
+		high = this.tokens.length
+		while (low < high) {
+			let middle = (low + high) >>> 1
+			if ((this.tokens[middle]?.start ?? Infinity) <= selection.end)
+				low = middle + 1
+			else high = middle
+		}
+		return start === low ? { start: 0, end: 0 } : { start, end: low }
+	}
 	project(source: string, options: ProjectionOptions = {}) {
 		let documents = options.documents ?? []
 		let key = documents.map(doc => doc.id + ":" + doc.title).join("\n")
