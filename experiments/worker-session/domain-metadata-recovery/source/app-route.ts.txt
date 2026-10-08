@@ -1,0 +1,266 @@
+import { workerBootMark } from "./boot-diagnostics"
+import * as Effect from "effect/Effect"
+import * as FiberSet from "effect/FiberSet"
+import * as Stream from "effect/Stream"
+import { BrowserLibrary } from "../browser-library"
+import { EditorElement } from "../components/editor"
+import { openFind } from "../components/find"
+import type { EditorPreferences } from "../../shared/preferences"
+import type { DocumentLink } from "../../shared/model"
+import { workerEditorBindings } from "./bindings"
+
+export function mountWorkerAppRoute(
+	host: HTMLElement,
+	document: string,
+	options: {
+		preferences: EditorPreferences
+		documents(): readonly DocumentLink[]
+		openDocument(id: string): void
+		report(error: unknown): void
+		title(title: string): void
+		status(pending: number, unsaved: number, failed: boolean): void
+		findBar: HTMLElement
+	},
+) {
+	return Effect.gen(function* () {
+		let library = yield* BrowserLibrary
+		workerBootMark("route:open-start")
+		let opened = yield* library
+			.openWorker(document)
+			.pipe(
+				Effect.tapError(error =>
+					Effect.sync(() => workerBootMark("route:open-error", error)),
+				),
+			)
+		workerBootMark("route:open-done")
+		let owner = library.workerOwner(document)
+		if (!owner)
+			return yield* Effect.fail(new Error("Missing worker native owner"))
+		let initialized = yield* Effect.gen(function* () {
+			if (owner.recovery() !== undefined) return undefined
+			return yield* opened.queue()
+		}).pipe(
+			Effect.catch(error =>
+				owner.recovery() !== undefined
+					? Effect.succeed(undefined)
+					: Effect.fail(error),
+			),
+		)
+		let tasks = yield* FiberSet.make()
+		let fork = yield* FiberSet.runtime(tasks)()
+		if (!initialized) {
+			let recovery = owner.recovery()
+			if (recovery === undefined)
+				return yield* Effect.fail(new Error("Recovery source unavailable"))
+			workerBootMark("route:Editor-start")
+			let editor = new EditorElement()
+			function unsupported() {
+				options.report(
+					"Retained recovery is read-only; download before manual reconciliation",
+				)
+			}
+			editor.configure({
+				authority: "worker",
+				content: recovery,
+				atoms: [],
+				editable: false,
+				preferences: options.preferences,
+				documents: options.documents,
+				openDocument: options.openDocument,
+				isDrawing: () => false,
+				openDrawing: unsupported,
+				createLinkedDocument: async () => {
+					throw Error("Recovery is read-only")
+				},
+				canComment: () => false,
+				canAttach: () => false,
+				comments: () => [],
+				report: options.report,
+				change: () => ({ kind: "pending" }),
+				undo: unsupported,
+				select() {},
+				requestAsset: unsupported,
+				attach: unsupported,
+				command: unsupported,
+				find: unsupported,
+			})
+			let download = globalThis.document.createElement("button")
+			download.textContent = "Download retained draft"
+			download.addEventListener("click", () => {
+				let url = URL.createObjectURL(
+					new Blob([recovery], { type: "text/markdown" }),
+				)
+				let link = globalThis.document.createElement("a")
+				link.href = url
+				link.download = "retained-draft.md"
+				link.click()
+				URL.revokeObjectURL(url)
+			})
+   let commands = globalThis.document.createElement("button")
+   commands.textContent = "Download retained commands"
+   commands.addEventListener("click", () => {
+    fork(opened.exportDomainRecords.pipe(Effect.tap(contents => Effect.sync(() => {
+     let url = URL.createObjectURL(new Blob([contents], { type: "application/json" }))
+     let link = globalThis.document.createElement("a")
+     link.href = url; link.download = "retained-commands.json"; link.click(); URL.revokeObjectURL(url)
+    })), Effect.catch(error => Effect.sync(() => options.report(error)))))
+   })
+			host.replaceChildren(editor, download, commands)
+			owner.attachRecovered(editor)
+			yield* Effect.addFinalizer(() =>
+				Effect.sync(() => {
+					owner.detach(editor)
+					editor.remove()
+					download.remove()
+    commands.remove()
+				}),
+			)
+			return {
+				document,
+				editor,
+				save: Effect.void,
+				synchronize: Effect.void,
+				pending: owner.draft.pending,
+				recovery: owner.recovery,
+			}
+		}
+		let queue = initialized.queue
+		let lastMergedRevision = opened.current().revision
+		workerBootMark("route:Editor-start")
+		let editor = new EditorElement()
+		let bindings = workerEditorBindings(
+			editor,
+			queue,
+			command => {
+				fork(command)
+			},
+			options.report,
+			owner.draft.retain,
+		)
+		function unsupported() {
+			options.report(
+				"Worker route prototype: this feature has not crossed to worker authority",
+			)
+		}
+		editor.configure({
+			authority: "worker",
+			content: initialized.initial.source,
+			atoms: [],
+			editable: opened.current().canWrite,
+			preferences: options.preferences,
+			documents: options.documents,
+			openDocument: options.openDocument,
+			isDrawing: () => false,
+			openDrawing: unsupported,
+			createLinkedDocument: async () => {
+				throw new Error("Worker linked creation unavailable")
+			},
+			canComment: () => false,
+			canAttach: () => false,
+			comments: () => [],
+			report: options.report,
+			change: bindings.change,
+			undo: bindings.undo,
+			select: bindings.resumeUndo,
+			requestAsset: unsupported,
+			attach: unsupported,
+			command: unsupported,
+			find: query => openFind(query, false, { editor, bar: options.findBar }),
+		})
+		workerBootMark("route:Editor-configured")
+		host.replaceChildren(editor)
+		owner.attach(editor, queue, initialized.initial.source)
+		yield* Effect.addFinalizer(() =>
+			Effect.sync(() => {
+				owner.detach(editor)
+				editor.remove()
+				options.findBar.hidden = true
+				options.findBar.replaceChildren()
+			}),
+		)
+		yield* opened.changes.pipe(
+			Stream.runForEach(state =>
+				Effect.sync(() => {
+					editor.setEditable(state.canWrite && owner.recovery() === undefined)
+					options.title(state.metadata?.title ?? "Untitled")
+					options.status(
+						state.status.pending,
+						state.status.unsaved,
+						state.failed || state.status.failures.save !== undefined,
+					)
+				}),
+			),
+			Effect.forkScoped({ startImmediately: true }),
+		)
+		yield* Stream.fromEventListener(editor, "keyup").pipe(
+			Stream.merge(Stream.fromEventListener(editor, "pointerup")),
+			Stream.merge(Stream.fromEventListener(editor, "compositionend")),
+			Stream.runForEach(() => Effect.sync(bindings.resumeUndo)),
+			Effect.forkScoped({ startImmediately: true }),
+		)
+		yield* opened.changes.pipe(
+			Stream.map(() => undefined),
+			Stream.merge(
+				Stream.fromEventListener(editor, "keyup").pipe(
+					Stream.map(() => undefined),
+				),
+			),
+			Stream.merge(
+				Stream.fromEventListener(editor, "pointerup").pipe(
+					Stream.map(() => undefined),
+				),
+			),
+			Stream.merge(
+				Stream.fromEventListener(editor, "compositionend").pipe(
+					Stream.map(() => undefined),
+				),
+			),
+			Stream.buffer({ capacity: 1, strategy: "sliding" }),
+			Stream.runForEach(() =>
+				queue.settle.pipe(
+					Effect.flatMap(settled =>
+						Effect.suspend(() => {
+							let state = opened.current()
+							if (
+								!settled ||
+								!state.canWrite ||
+								owner.recovery() !== undefined ||
+								state.revision <= lastMergedRevision
+							)
+								return Effect.void
+							let revision = state.revision
+							return bindings.merge().saved.pipe(
+								Effect.tap(accepted =>
+									Effect.sync(() => {
+										if (accepted) lastMergedRevision = revision
+									}),
+								),
+								Effect.asVoid,
+								Effect.catch(error => Effect.sync(() => options.report(error))),
+							)
+						}),
+					),
+				),
+			),
+			Effect.forkScoped({ startImmediately: true }),
+		)
+		return {
+			document,
+			editor,
+			save: Effect.suspend(() =>
+				owner.recovery() !== undefined && !owner.draft.pending()
+					? Effect.void
+					: queue.settle.pipe(
+							Effect.flatMap(settled =>
+								settled
+									? opened.save
+									: Effect.fail(new Error("Native queue not settled")),
+							),
+						),
+			),
+			synchronize: opened.synchronize,
+			pending: owner.draft.pending,
+			recovery: owner.recovery,
+		}
+	})
+}

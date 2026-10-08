@@ -1,0 +1,104 @@
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import { DocumentSession } from "../../shared/document-session"
+import { downloadDocumentHistory } from "../document-history"
+import { restoreDocumentState } from "../../shared/document-history"
+import { DocumentConflict, PermissionDenied } from "../../shared/document-errors"
+import type { Storage } from "../storage"
+import type { Replica } from "../../shared/crdt"
+
+interface HistoryOptions {
+ document: string
+ subject: string
+ session: Context.Service.Shape<typeof DocumentSession>
+ storage: Pick<Storage, "get" | "set">
+ online(): boolean
+ canWrite(): boolean
+}
+type History = Effect.Success<ReturnType<typeof downloadDocumentHistory>>
+
+export function makeWorkerOpenedHistory(options: HistoryOptions) {
+ return Effect.gen(function* () {
+  let histories = new Map<string, History>()
+  let moments = new Map<string, { history: string; position: number; replica: Replica }>()
+  let closed = false
+  yield* Effect.addFinalizer(() => Effect.sync(() => { closed = true; histories.clear(); moments.clear() }))
+  function requireOpen() {
+   if (closed) throw new DocumentConflict({ message: "This document is closed" })
+  }
+  function capacity(size: number) {
+   if (size >= 8) throw new DocumentConflict({ message: "Close an existing history preview first" })
+  }
+  function attempt<A>(operation: () => A) {
+   return Effect.try({ try: operation, catch: cause => cause }).pipe(Effect.catch(cause => cause instanceof DocumentConflict || cause instanceof PermissionDenied ? Effect.fail(cause) : Effect.die(cause)))
+  }
+  return Object.freeze({
+   load: Effect.gen(function* () {
+    yield* attempt(() => { requireOpen(); capacity(histories.size) })
+    let history = yield* downloadDocumentHistory(options)
+    let token = yield* attempt(() => {
+     requireOpen()
+     let token = crypto.randomUUID()
+     histories.set(token, history)
+     return token
+    })
+    return Object.freeze({
+     token,
+     complete: history.complete,
+     moments: Object.freeze(history.moments.map(moment => Object.freeze({ position: moment.position, label: moment.action.label, time: moment.action.changes.at(-1)?.time ?? 0, subject: moment.source === "local" ? moment.subject : moment.action.subject }))),
+    })
+   }),
+   select(historyToken: string, position: number) {
+    return Effect.gen(function* () {
+     let history = yield* attempt(() => {
+      requireOpen()
+      capacity(moments.size)
+      let history = histories.get(historyToken)
+      if (!history || !Number.isSafeInteger(position) || position < 1) throw new DocumentConflict({ message: "This history moment is unavailable" })
+      return history
+     })
+     let replica = yield* history.at(position)
+     return yield* attempt(() => {
+      requireOpen()
+      if (!histories.has(historyToken)) throw new DocumentConflict({ message: "This history preview was released" })
+      let token = crypto.randomUUID()
+      moments.set(token, { history: historyToken, position, replica })
+      return Object.freeze({
+       token,
+       position,
+       source: replica.text(options.document),
+       metadata: Object.freeze({ ...replica.metadata(options.document), tags: Object.freeze([...replica.metadata(options.document).tags]) }),
+       records: Object.freeze(["comment", "asset", "whiteboard", "theme"].flatMap(kind => replica.records(kind).map(record => Object.freeze({ id: record.id, kind, label: record.fields.name || record.fields.body || kind })))),
+      })
+     })
+    })
+   },
+   restore(momentToken: string) {
+    return Effect.gen(function* () {
+    let moment = yield* attempt(() => {
+     let moment = moments.get(momentToken)
+     if (!moment) throw new DocumentConflict({ message: "This history moment is unavailable" })
+     requireOpen()
+     return moment
+    })
+    let command = options.session.change("Restore moment " + moment.position, staged => {
+     requireOpen()
+     if (!options.canWrite()) throw new PermissionDenied({ message: "This document is read-only" })
+     return restoreDocumentState(staged, moment.replica, options.document)
+    })
+    return attempt(() => {
+     requireOpen()
+     if (!options.canWrite()) throw new PermissionDenied({ message: "This document is read-only" })
+    }).pipe(Effect.andThen(command))
+    })
+   },
+   releaseMoment(token: string) { return Effect.sync(() => { moments.delete(token) }) },
+   releaseHistory(token: string) {
+    return Effect.sync(() => {
+     histories.delete(token)
+     for (let [id, moment] of moments) if (moment.history === token) moments.delete(id)
+    })
+   },
+  })
+ })
+}

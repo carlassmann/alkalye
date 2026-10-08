@@ -1,0 +1,133 @@
+import * as Schema from "effect/Schema"
+import { DomainRecoverySchema } from "./domain-schemas"
+import { domainDigest, matchesDomain, type PendingDomain, type DomainOutcome } from "./domain-ledger"
+export type DomainRecovery = typeof DomainRecoverySchema.Type
+export type ResolvedDomain = { row: PendingDomain; outcome?: DomainOutcome }
+import * as Effect from "effect/Effect"
+import * as Stream from "effect/Stream"
+import type { Storage } from "../storage"
+import type { EditorElement } from "../components/editor"
+import type { EditorSelection, makeEditorQueue } from "./editor-queue"
+import { WorkerDocumentFailure } from "./worker-rpc"
+
+type NativeQueue = Pick<Effect.Success<ReturnType<typeof makeEditorQueue>>, "state" | "settle">
+export function makeWorkerAppOwner(storage: Storage, subject: string, document: string) {
+ let key = "worker-native-recovery:" + encodeURIComponent(subject) + ":" + encodeURIComponent(document)
+ return Effect.gen(function* () {
+  let retained = yield* storage.get(key)
+  let tagged: DomainRecovery | undefined
+  let corruptRecovery = false
+  if (retained !== undefined && typeof retained !== "string") {
+   let parsed = Schema.decodeUnknownResult(DomainRecoverySchema)(retained)
+   if (parsed._tag === "Failure") corruptRecovery = true
+   else {
+    let digest = yield* domainDigest(parsed.success.source)
+    if (parsed.success.subject !== subject || parsed.success.document !== document || parsed.success.sourceDigest !== digest) corruptRecovery = true
+    else tagged = parsed.success
+   }
+  }
+  let recovery = typeof retained === "string" ? retained : tagged?.source
+  let editor: EditorElement | undefined
+  let queue: NativeQueue | undefined
+  let frozen = corruptRecovery || recovery !== undefined
+  let lastSource = recovery ?? ""
+ let hasSource = recovery !== undefined
+ let recoveryStored = recovery !== undefined
+  function selection(): EditorSelection {
+   return editor?.mergeSelection() ?? { source: lastSource, start: 0, end: 0, direction: "none", generation: 0, composing: false, busy: true }
+  }
+  let draft = {
+   pending: () => recovery !== undefined ? !recoveryStored : !!editor && !!queue && editor.source?.value !== queue.state().source || !!queue && (!!queue.state().pending.length || !!queue.state().failure || queue.state().commandFrozen),
+   hasRecovery: () => corruptRecovery || recovery !== undefined,
+   freeze() { frozen = true; editor?.setEditable(false) },
+   corruptRecovery: () => corruptRecovery,
+   resume() { if (corruptRecovery || recovery !== undefined) return; frozen = false; editor?.setEditable(true) },
+   settle: Effect.suspend(() => queue ? queue.settle : Effect.succeed(true)),
+   retain(_failure: unknown) {
+    return Effect.suspend(() => {
+     let state = queue?.state()
+     let reason = _failure instanceof WorkerDocumentFailure ? _failure.reason : _failure instanceof Error ? _failure.name : "UnknownFailure"
+     let diagnostic = { document, request: state ? state.epoch + ":" + state.sequence : undefined, epoch: state?.epoch, sequence: state?.sequence, acknowledged: state?.acknowledged, phase: state?.diagnosticPhase ?? "owner-retain", reason, category: _failure instanceof WorkerDocumentFailure ? _failure.category : undefined, time: Date.now() }
+     return storage.modify("worker-failure-diagnostic:" + encodeURIComponent(subject) + ":" + encodeURIComponent(document), previous => previous ?? diagnostic).pipe(Effect.catchCause(() => Effect.void), Effect.andThen(Effect.suspend(() => {
+     if (recovery !== undefined) return Effect.void
+     if (!hasSource) { frozen = true; return Effect.void }
+     frozen = true
+     editor?.failAuthority()
+     recovery = editor?.source?.value ?? lastSource
+     lastSource = recovery
+     return storage.set(key, recovery).pipe(Effect.tap(() => Effect.sync(() => { recoveryStored = true })), Effect.asVoid)
+    })))
+    })
+   },
+   recover(source: string) { if (recovery !== undefined) return Effect.void; recovery = source; lastSource = source; frozen = true; editor?.failAuthority(); hasSource = true; return storage.set(key, source).pipe(Effect.tap(() => Effect.sync(() => { recoveryStored = true })), Effect.asVoid) },
+   recoverDomain(record: DomainRecovery) {
+    return Effect.gen(function* () {
+     let digest = yield* domainDigest(record.source)
+     if (record.subject !== subject || record.document !== document || digest !== record.sourceDigest) return yield* Effect.fail(new WorkerDocumentFailure({ reason: "AppliedUnknown", category: "conflict" }))
+     yield* storage.modify(key, previous => {
+      if (previous !== undefined) return previous
+      return record
+     })
+     let stored = yield* storage.get(key)
+     if (typeof stored === "string") { recovery = stored; tagged = undefined }
+     else {
+      let parsed = Schema.decodeUnknownResult(DomainRecoverySchema)(stored)
+      if (parsed._tag === "Failure" || parsed.success.subject !== subject || parsed.success.document !== document || (yield* domainDigest(parsed.success.source)) !== parsed.success.sourceDigest) {
+       corruptRecovery = true; tagged = undefined; recovery = record.source
+      } else { tagged = parsed.success; recovery = parsed.success.source }
+     }
+     lastSource = recovery; hasSource = true; frozen = true; recoveryStored = true; editor?.failAuthority()
+    })
+   },
+   reconcileDomain(resolved: readonly ResolvedDomain[]) {
+    let bindings = resolved.map(({ row }) => ({ request: row.queued.request, queuedDigest: row.queued.queuedDigest, intentDigest: row.intent?.intentDigest })).sort((left, right) => left.request.localeCompare(right.request))
+    return Effect.gen(function* () {
+     for (let { row, outcome } of resolved) {
+      if (row.queued.subject !== subject || row.queued.document !== document) return false
+      if (row.phase === "STARTED" || row.phase === "Known") {
+       if (!row.intent || !outcome || outcome.status === "unknown" || !matchesDomain(row.intent, outcome.intent) || (outcome.status === "applied" && !outcome.action)) return false
+      } else if (outcome) return false
+     }
+     let expected = tagged
+     if (corruptRecovery || !expected || expected.corrupt || expected.bindings.length !== bindings.length) return false
+     function sameBindings(left: DomainRecovery["bindings"], right: DomainRecovery["bindings"]) {
+      return left.every((entry, index) => entry.request === right[index]?.request && entry.queuedDigest === right[index]?.queuedDigest && entry.intentDigest === right[index]?.intentDigest)
+     }
+     if (!sameBindings(expected.bindings, bindings)) return false
+     let cleared = yield* storage.modify(key, value => {
+      let current = Schema.decodeUnknownSync(DomainRecoverySchema)(value)
+      if (current.subject !== subject || current.document !== document || current.corrupt || current.source !== expected.source || current.sourceDigest !== expected.sourceDigest || !sameBindings(current.bindings, bindings)) throw new WorkerDocumentFailure({ reason: "AppliedUnknown", category: "conflict" })
+      return undefined
+     })
+     if (cleared) { tagged = undefined; recovery = undefined; recoveryStored = false }
+     return cleared
+    })
+   },
+   selection,
+   selectionReady(afterGeneration?: number) {
+    return Effect.suspend(() => {
+     let active = editor
+     if (!active) return Effect.fail(new WorkerDocumentFailure({ reason: "SelectionUnavailable", category: "conflict" }))
+     if (afterGeneration === undefined || selection().generation !== afterGeneration) return Effect.void
+     return Stream.fromEventListener(active, "keyup").pipe(Stream.merge(Stream.fromEventListener(active, "pointerup")), Stream.merge(Stream.fromEventListener(active, "compositionend")), Stream.filter(() => selection().generation !== afterGeneration), Stream.runHead, Effect.asVoid)
+    })
+   },
+   adopt(source: string, selected: EditorSelection) {
+    if (recovery !== undefined || !editor) return false
+    let adopted = editor.adoptMerged(source, selected)
+    if (adopted) { lastSource = source; frozen = false }
+    return adopted
+   },
+  }
+  return {
+   draft,
+   recovery: () => recovery,
+   attachRecovered(native: EditorElement) { hasSource = true; editor = native; native.setEditable(false) },
+   attach(native: EditorElement, activeQueue: NativeQueue, source: string) {
+    editor = native; queue = activeQueue; lastSource = source; hasSource = true
+    if (frozen || recovery !== undefined) native.setEditable(false)
+   },
+   detach(native: EditorElement) { if (editor === native) { lastSource = native.source?.value ?? lastSource; editor = undefined } },
+  }
+ })
+}

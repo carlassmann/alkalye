@@ -1,0 +1,10 @@
+{
+	"assets/worker.js": {
+		"sha256": "53d9f3062c3c9491e7ceb5a48a409a18b75a612f750e2dc60a4d45d84b44a601",
+		"bytes": 1312230
+	},
+	"assets/domain-worker-fixture.js": {
+		"sha256": "6974d14c95c2e584976181591dfeb9aa584a75601fab876125c40eea1604f3fb",
+		"bytes": 953209
+	}
+}

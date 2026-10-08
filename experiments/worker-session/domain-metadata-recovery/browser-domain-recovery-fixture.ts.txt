@@ -1,0 +1,97 @@
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
+import { Storage } from "../src/client/storage"
+import { makeDomainLedger, queuedDomain, domainIntent, domainDigest, type PendingDomain } from "../src/client/worker-document/domain-ledger"
+import { makeWorkerAppOwner, type DomainRecovery } from "../src/client/worker-document/app-owner"
+
+let results: string[] = []
+Object.assign(window, { domainResults: results })
+function check(value: unknown, message: string) { if (!value) throw new Error(message); results.push(message) }
+let test = Effect.scoped(Effect.gen(function* () {
+ let storage = yield* Effect.acquireRelease(Storage.open(), opened => Effect.sync(() => opened.close()))
+ let second = yield* Effect.acquireRelease(Storage.open(), opened => Effect.sync(() => opened.close()))
+ let subject = "domain-test-owner", document = "domain-test-document"
+ let source = "---\ntitle: Draft\n---\nBody😀\r\n"
+ let ledger = makeDomainLedger(storage, subject, document)
+ let reloaded = makeDomainLedger(second, subject, document)
+ let queued = yield* queuedDomain(subject, document, { request: crypto.randomUUID(), epoch: "basis-1", sequence: 3, admissionEpoch: 2, command: { type: "properties", patch: { title: "Changed", tags: ["one"] } } }, source)
+ yield* ledger.prepareQueued(queued, source)
+ check((yield* reloaded.inspect).rows[0]?.phase === "NeverDispatched", "queued declaration survives independent storage connection before token staging")
+ yield* ledger.preparing(queued)
+ let intent = yield* domainIntent(subject, document, { ...queued, token: "held-token" }, source)
+ yield* ledger.prepared(queued, intent)
+ check((yield* reloaded.inspect).rows[0]?.intent?.intentDigest === intent.intentDigest, "prepared token retains exact declaration and source binding")
+ yield* ledger.started(queued)
+ let row = (yield* reloaded.inspect).rows[0]
+ check(row?.phase === "STARTED", "ambiguous dispatch remains durable on reload")
+ if (!row) throw new Error("Missing started row")
+ check(Exit.isFailure(yield* ledger.discardNeverSent(row).pipe(Effect.exit)), "started intent cannot be discarded as never sent")
+ check((yield* ledger.inspect).rows.length === 1, "failed discard preserves ambiguous intent")
+ let wrong = { ...intent, token: "different-token" }
+ check(Exit.isFailure(yield* ledger.confirm(intent, { intent: wrong, status: "applied", action: "action-1" }).pipe(Effect.exit)), "wrong same-length receipt cannot clear pending intent")
+ check(Exit.isFailure(yield* ledger.confirm(intent, { intent, status: "unknown" }).pipe(Effect.exit)), "unknown receipt cannot clear pending intent")
+ let binding = { request: queued.request, queuedDigest: queued.queuedDigest, intentDigest: intent.intentDigest }
+ let bindings = [binding]
+ let tag: DomainRecovery = { format: "worker-domain-recovery/v1", subject, document, source, sourceDigest: yield* domainDigest(source), corrupt: false, bindings }
+ let owner = yield* makeWorkerAppOwner(storage, subject, document)
+ yield* owner.draft.recoverDomain(tag)
+ let reopened = yield* makeWorkerAppOwner(second, subject, document)
+ check(reopened.recovery() === source, "tagged recovery preserves actual Unicode and CRLF source across reload")
+ check(!(yield* reopened.draft.reconcileDomain([{ row: { ...row, queued: { ...queued, queuedDigest: "0".repeat(64) } }, outcome: { intent, status: "applied", action: "action-1" } }])), "wrong basis binding does not clear tagged recovery")
+ check(reopened.draft.hasRecovery(), "failed reconciliation remains read-only")
+ check(!(yield* reopened.draft.reconcileDomain([{ row, outcome: { intent, status: "unknown" } }])), "matching bindings alone cannot clear unknown outcome")
+ let other = makeDomainLedger(second, "different-owner", document)
+ check((yield* other.inspect).rows.length === 0, "another account cannot read pending command rows")
+ let otherOwner = yield* makeWorkerAppOwner(second, "different-owner", document)
+ check(otherOwner.recovery() === undefined, "another account cannot read recovery draft")
+ yield* ledger.confirm(intent, { intent, status: "applied", action: "action-1" })
+ check((yield* reloaded.inspect).rows.length === 0, "known exact outcome removes only its pending row")
+ check(yield* reopened.draft.reconcileDomain([{ row, outcome: { intent, status: "applied", action: "action-1" } }]), "exact tagged bindings clear matching recovery")
+ check(!reopened.draft.hasRecovery(), "resolved tag no longer freezes recovered owner")
+ let cleanOwner = yield* makeWorkerAppOwner(second, subject, document)
+ check(cleanOwner.recovery() === undefined, "exact clear persists through reload")
+ let legacyKey = "worker-native-recovery:" + encodeURIComponent(subject) + ":legacy"
+ yield* storage.set(legacyKey, source)
+ let legacy = yield* makeWorkerAppOwner(second, subject, "legacy")
+ check(!(yield* legacy.draft.reconcileDomain([])) && legacy.recovery() === source, "legacy plain recovery is never auto-cleared")
+ let unresolved = yield* queuedDomain(subject, document, { request: crypto.randomUUID(), epoch: "basis-2", sequence: 4, admissionEpoch: 2, command: { type: "present", index: 1 } }, source)
+ yield* ledger.prepareQueued(unresolved, source)
+ yield* ledger.preparing(unresolved)
+ let pendingIntent = yield* domainIntent(subject, document, { ...unresolved, token: "pending-token" }, source)
+ yield* ledger.prepared(unresolved, pendingIntent)
+ yield* ledger.started(unresolved)
+ let neverSent = yield* queuedDomain(subject, document, { request: crypto.randomUUID(), epoch: "basis-3", sequence: 5, admissionEpoch: 2, command: { type: "presentation", enabled: false } }, source)
+ yield* ledger.prepareQueued(neverSent, source)
+ let mixed = yield* ledger.inspect
+ check(mixed.rows.length === 2 && mixed.rows.some(item => item.phase === "STARTED"), "mixed unresolved tail retains distinct pending commands")
+ let prefix = "worker-domain-pending:" + encodeURIComponent(subject) + ":" + encodeURIComponent(document) + ":"
+ yield* storage.set(prefix + "wrong-key", { queued: neverSent, source, phase: "NeverDispatched" })
+ let corrupt: PendingDomain = { queued: { ...neverSent, sequence: 0.5 }, source, phase: "NeverDispatched" }
+ yield* storage.set(prefix + "corrupt", corrupt)
+ let cyclic: Record<string, unknown> = { value: NaN, source }; cyclic.self = cyclic
+ yield* storage.set(prefix + "cycle", cyclic)
+ let inspected = yield* reloaded.inspect
+ check(inspected.corrupt.length === 3 && inspected.rows.length === 2, "corruption is isolated without destroying valid unknown tail")
+ let exported = yield* ledger.exportRecords
+ check(exported.includes('"format":"worker-domain-records/v1"') && exported.includes('"NaN"'), "document-scoped export preserves nonfinite corrupted record values")
+ check(exported.includes('"reference"') && exported.includes("Body"), "opaque export preserves cyclic records and retained source")
+ check((yield* ledger.inspect).corrupt.length === 3, "export does not mutate corrupted storage")
+ yield* storage.set(prefix + "unsupported", new Blob(["opaque"], { type: "text/plain" }))
+ check(Exit.isFailure(yield* ledger.exportRecords.pipe(Effect.exit)), "unsupported corrupt object refuses lossy export")
+ check((yield* storage.get(prefix + "unsupported")) instanceof Blob, "failed export preserves original unsupported object")
+ let corruptKey = "worker-native-recovery:" + encodeURIComponent(subject) + ":corrupt-value"
+ let corruptValue = { source: "untrusted raw field", bindings: NaN }
+ yield* storage.set(corruptKey, corruptValue)
+ let corruptOwner = yield* makeWorkerAppOwner(second, subject, "corrupt-value")
+ check(corruptOwner.draft.corruptRecovery() && corruptOwner.draft.hasRecovery(), "malformed tag retains a frozen owner instead of failing mount")
+ check(corruptOwner.recovery() === undefined, "malformed raw source field is not rendered as a draft")
+ yield* corruptOwner.draft.recoverDomain({ ...tag, document: "corrupt-value", corrupt: true })
+ check(corruptOwner.recovery() === source, "corrupt owner can display only trusted canonical source supplied by worker boundary")
+ check(typeof (yield* storage.get(corruptKey)) === "object", "canonical recovery display does not overwrite malformed stored record")
+ let damagedOwner = yield* makeWorkerAppOwner(storage, subject, "corrupt-recovery")
+ let damagedTag = { ...tag, document: "corrupt-recovery", corrupt: true }
+ yield* damagedOwner.draft.recoverDomain(damagedTag)
+ check(!(yield* damagedOwner.draft.reconcileDomain([{ row, outcome: { intent, status: "applied", action: "action-1" } }])), "corruption-tagged recovery cannot be cleared by known prefix")
+ check(damagedOwner.recovery() === source, "corrupt recovery keeps the real display source")
+}))
+Effect.runPromise(test).then(() => Object.assign(window, { domainDone: true }), error => Object.assign(window, { domainDone: true, domainFailure: String(error) }))

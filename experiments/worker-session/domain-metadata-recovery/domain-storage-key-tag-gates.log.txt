@@ -1,0 +1,33 @@
+PASS real IndexedDB scenarios complete: 
+PASS queued declaration survives independent storage connection before token staging
+PASS prepared token retains exact declaration and source binding
+PASS ambiguous dispatch remains durable on reload
+PASS started intent cannot be discarded as never sent
+PASS failed discard preserves ambiguous intent
+PASS wrong same-length receipt cannot clear pending intent
+PASS unknown receipt cannot clear pending intent
+PASS tagged recovery preserves actual Unicode and CRLF source across reload
+PASS wrong basis binding does not clear tagged recovery
+PASS failed reconciliation remains read-only
+PASS matching bindings alone cannot clear unknown outcome
+PASS another account cannot read pending command rows
+PASS another account cannot read recovery draft
+PASS known exact outcome removes only its pending row
+PASS exact tagged bindings clear matching recovery
+PASS resolved tag no longer freezes recovered owner
+PASS exact clear persists through reload
+PASS legacy plain recovery is never auto-cleared
+PASS mixed unresolved tail retains distinct pending commands
+PASS corruption is isolated without destroying valid unknown tail
+PASS document-scoped export preserves nonfinite corrupted record values
+PASS opaque export preserves cyclic records and retained source
+PASS export does not mutate corrupted storage
+PASS unsupported corrupt object refuses lossy export
+PASS failed export preserves original unsupported object
+PASS malformed tag retains a frozen owner instead of failing mount
+PASS malformed raw source field is not rendered as a draft
+PASS corrupt owner can display only trusted canonical source supplied by worker boundary
+PASS canonical recovery display does not overwrite malformed stored record
+PASS corruption-tagged recovery cannot be cleared by known prefix
+PASS corrupt recovery keeps the real display source
+PASS all document domain recovery assertions ran

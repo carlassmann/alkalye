@@ -1,0 +1,14 @@
+{
+	"extends": "./tsconfig.json",
+	"include": [
+		"src/**/*.ts",
+		"tests/**/*.ts",
+		"scripts/**/*.ts",
+		"experiments/**/*.ts",
+		"build.ts",
+		"cli.ts",
+		"domain-worker-fixture.ts",
+		"domain-server.ts",
+		"domain-seed.ts"
+	]
+}

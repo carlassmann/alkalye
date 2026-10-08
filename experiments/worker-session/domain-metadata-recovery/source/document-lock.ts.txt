@@ -1,0 +1,17 @@
+import * as Effect from "effect/Effect"
+import { WorkerDocumentFailure } from "./worker-rpc"
+export function holdWorkerDocument(subject: string, document: string) {
+ return Effect.acquireRelease(Effect.callback<() => void, WorkerDocumentFailure>(resume => {
+  let cancelled = false, release: (() => void) | undefined
+  if (!navigator.locks) { resume(Effect.fail(new WorkerDocumentFailure({ reason: "BasisUnavailable", category: "ownership" }))); return Effect.void }
+  navigator.locks.request("worker-native:" + subject + ":" + document, { ifAvailable: true }, lock => {
+   if (!lock) { if (!cancelled) resume(Effect.fail(new WorkerDocumentFailure({ reason: "BasisUnavailable", category: "ownership" }))); return }
+   return new Promise<void>(resolve => {
+    release = resolve
+    if (cancelled) resolve()
+    else resume(Effect.succeed(resolve))
+   })
+  }).catch(() => { if (!cancelled) resume(Effect.fail(new WorkerDocumentFailure({ reason: "BasisUnavailable", category: "ownership" }))) })
+  return Effect.sync(() => { cancelled = true; release?.() })
+ }), release => Effect.sync(release))
+}

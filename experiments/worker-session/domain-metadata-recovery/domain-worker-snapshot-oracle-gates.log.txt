@@ -1,0 +1,14 @@
+PASS real worker command fault gates complete: null
+PASS simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections
+PASS browser identity is available before any network authentication
+PASS native browser account login serializes cookie issuance and agrees with server verification
+PASS caller loses actual applied reply after durable worker outcome
+PASS read-only recovery returns exact durable command result
+PASS duplicate execute returns same owned action without retrying mutation
+PASS known lost-reply outcome clears exact main pending row
+PASS real SQLite accepted source includes metadata edit and original body
+PASS domain command reconciles exact accepted source into editor basis
+PASS revocation before invocation returns durable not-applied outcome
+PASS revoked staged command cannot mutate document
+PASS rejected result remains recoverable after main pending cleanup
+Retained closed fixture: /var/folders/db/l4qrf5wx7452h6yr3ctszzn40000gn/T/alkalye-domain-worker-proof-CtqECP

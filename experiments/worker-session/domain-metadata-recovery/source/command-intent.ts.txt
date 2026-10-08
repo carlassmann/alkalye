@@ -1,0 +1,5 @@
+import * as Effect from "effect/Effect"
+export function commandIntentDigest(input: { subject: string; document: string; epoch: string; sequence: number; admissionEpoch: number; ranges: readonly { start: number; remove: number; text: string }[]; clipboardToken?: string }) {
+ let bytes = new TextEncoder().encode(JSON.stringify([input.subject, input.document, input.epoch, input.sequence, input.admissionEpoch, input.clipboardToken ?? null, input.ranges.map(range => [range.start, range.remove, range.text])]))
+ return Effect.tryPromise({ try: () => crypto.subtle.digest("SHA-256", bytes), catch: error => error }).pipe(Effect.map(hash => [...new Uint8Array(hash)].map(byte => byte.toString(16).padStart(2, "0")).join("")))
+}

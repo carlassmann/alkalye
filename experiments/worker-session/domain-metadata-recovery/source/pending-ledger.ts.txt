@@ -1,0 +1,91 @@
+import * as Effect from "effect/Effect"
+import * as Schema from "effect/Schema"
+import type { Storage } from "../storage"
+import { WorkerDocumentFailure } from "./worker-rpc"
+
+let Range = Schema.Struct({ start: Schema.Number, remove: Schema.Number, text: Schema.String })
+let Pending = Schema.Struct({ intentDigest: Schema.String, sequence: Schema.Number, admissionEpoch: Schema.Number, beforeLength: Schema.Number, afterLength: Schema.Number, ranges: Schema.Array(Range) })
+let Ledger = Schema.Struct({ subject: Schema.String, document: Schema.String, session: Schema.String, epoch: Schema.String, acceptedBasis: Schema.String, acknowledged: Schema.Number, pending: Schema.Array(Pending) })
+type Pending = typeof Pending.Type
+function decode(value: unknown) {
+ let row = Schema.decodeUnknownSync(Ledger)(value)
+ if (!Number.isSafeInteger(row.acknowledged) || row.acknowledged < 0) throw conflict()
+ for (let edit of row.pending) {
+  if (![edit.sequence, edit.admissionEpoch, edit.beforeLength, edit.afterLength].every(value => Number.isSafeInteger(value) && value >= 0)) throw conflict()
+ }
+ return row
+}
+export interface NativePendingLedger {
+ readonly subject: string
+ readonly document: string
+ advance(sequence: number): Effect.Effect<void, unknown>
+ rebase(initial: { epoch: string; sequence: number; source: string }): Effect.Effect<void, unknown>
+ prepare(edit: Pending): Effect.Effect<void, unknown>
+ confirm(receipt: { intentDigest: string; epoch: string; sequence: number; agreement: boolean; beforeLength: number; afterLength: number }, source: string): Effect.Effect<void, unknown>
+}
+function conflict() { return new WorkerDocumentFailure({ reason: "AppliedUnknown", category: "conflict" }) }
+export function makeNativePendingLedger(storage: Storage, subject: string, document: string, initial: { epoch: string; sequence: number; source: string }) {
+ let prefix = "worker-native-pending:" + encodeURIComponent(subject) + ":" + encodeURIComponent(document) + ":"
+ let key = prefix + initial.epoch
+ return Effect.gen(function* () {
+  let existing = yield* storage.getPrefix(prefix)
+  yield* Effect.addFinalizer(() => storage.modify(key, value => { if (value === undefined) return undefined; let row = decode(value); return row.pending.length ? value : undefined }).pipe(Effect.catch(() => Effect.void)))
+  let retained = yield* Effect.try({ try: () => existing.map(value => decode(value)).filter(row => row.subject === subject && row.document === document && row.pending.length > 0), catch: () => conflict() })
+  let initialize = storage.modify(key, value => {
+   if (value !== undefined) {
+    let previous = decode(value)
+    if (previous.epoch !== initial.epoch || previous.acceptedBasis !== initial.source || previous.pending.length) throw conflict()
+    return value
+   }
+   return { subject, document, session: initial.epoch, epoch: initial.epoch, acceptedBasis: initial.source, acknowledged: initial.sequence, pending: [] }
+  }).pipe(Effect.asVoid)
+  let ledger: NativePendingLedger = {
+   subject, document,
+   advance(sequence) {
+    return storage.modify(key, value => { let row = decode(value); if (row.pending.length || sequence !== row.acknowledged + 1) throw conflict(); return { ...row, acknowledged: sequence } }).pipe(Effect.asVoid)
+   },
+   rebase(next) {
+    return storage.modify(key, value => { let row = decode(value); if (row.pending.length) throw conflict(); return { ...row, epoch: next.epoch, acknowledged: next.sequence, acceptedBasis: next.source } }).pipe(Effect.asVoid)
+   },
+   prepare(edit) {
+    return storage.modify(key, value => {
+     let row = decode(value)
+     let last = row.pending.at(-1)
+     if (edit.sequence !== (last?.sequence ?? row.acknowledged) + 1 || edit.beforeLength !== (last?.afterLength ?? row.acceptedBasis.length)) throw conflict()
+     return { ...row, pending: [...row.pending, edit] }
+    }).pipe(Effect.asVoid)
+   },
+   confirm(receipt, source) {
+    return storage.modify(key, value => {
+     let row = decode(value), first = row.pending[0]
+     if (receipt.epoch !== row.epoch || !receipt.agreement || !first || first.intentDigest !== receipt.intentDigest || first.sequence !== receipt.sequence || first.beforeLength !== receipt.beforeLength || first.afterLength !== receipt.afterLength || source.length !== receipt.afterLength) throw conflict()
+     return { ...row, acceptedBasis: source, acknowledged: receipt.sequence, pending: row.pending.slice(1) }
+    }).pipe(Effect.andThen(storage.delete("worker-native-receipt:" + encodeURIComponent(subject) + ":" + encodeURIComponent(document) + ":" + receipt.intentDigest).pipe(Effect.catch(() => Effect.void))), Effect.asVoid)
+   },
+  }
+  return { retained, initialize, ledger, reconcile(row: typeof Ledger.Type, receipt: { intentDigest: string; epoch: string; sequence: number; agreement: boolean; beforeLength: number; afterLength: number }) {
+   return storage.modify(prefix + row.session, value => {
+    let current = decode(value), first = current.pending[0]
+    if (current.subject !== subject || current.document !== document || current.epoch !== receipt.epoch || !receipt.agreement || !first || first.intentDigest !== receipt.intentDigest || first.sequence !== receipt.sequence || first.beforeLength !== receipt.beforeLength || first.afterLength !== receipt.afterLength) throw conflict()
+    let acceptedBasis = retainedNativeSource({ ...current, pending: [first] })
+    return { ...current, acceptedBasis, acknowledged: receipt.sequence, pending: current.pending.slice(1) }
+   }).pipe(Effect.asVoid)
+  } }
+ })
+}
+
+export function retainedNativeSource(row: typeof Ledger.Type) {
+ let source = row.acceptedBasis, sequence = row.acknowledged
+ for (let edit of row.pending) {
+  if (edit.sequence !== ++sequence || edit.beforeLength !== source.length) throw conflict()
+  let cursor = 0, pieces: string[] = []
+  for (let range of edit.ranges) {
+   if (!Number.isSafeInteger(range.start) || !Number.isSafeInteger(range.remove) || range.start < cursor || range.remove < 0 || range.start + range.remove > source.length) throw conflict()
+   pieces.push(source.slice(cursor, range.start), range.text)
+   cursor = range.start + range.remove
+  }
+  pieces.push(source.slice(cursor)); source = pieces.join("")
+  if (source.length !== edit.afterLength) throw conflict()
+ }
+ return source
+}

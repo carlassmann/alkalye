@@ -1,0 +1,36 @@
+import { mkdtemp, cp, mkdir } from "node:fs/promises"
+import { join } from "node:path"
+import { tmpdir } from "node:os"
+import { assert, browser, evaluate, wait } from "./browser-driver"
+let runRoot = await mkdtemp(join(tmpdir(), "alkalye-domain-worker-proof-"))
+let profile = join(runRoot, "profile")
+let server = Bun.spawn(["bun", "domain-server.ts"], { stdout: "pipe", stderr: "inherit", env: { ...process.env, DOMAIN_RUN_ROOT: runRoot } })
+let session = "domain-worker-" + Date.now()
+try {
+ let output = await server.stdout.getReader().read()
+ if (!output.value) throw new Error("No worker server URL")
+ let url = new TextDecoder().decode(output.value).trim()
+ browser(session, "--profile", profile, "open", url)
+ wait(session, "window.domainWorkerDone === true")
+ await Bun.write(join(runRoot, "results.private.json"), JSON.stringify(evaluate(session, '({failure:window.domainWorkerFailure,results:window.domainWorkerResults,fixture:window.domainWorkerFixture,boot:document.querySelector("#worker-boot-diagnostics")?.textContent})')))
+ let failure = evaluate(session, "window.domainWorkerFailure ?? null")
+ if (failure) console.error(JSON.stringify({ failure, results: evaluate(session, "window.domainWorkerResults"), fixture: evaluate(session, "window.domainWorkerFixture"), boot: evaluate(session, 'document.querySelector("#worker-boot-diagnostics")?.textContent') }))
+ assert(!failure, "real worker command fault gates complete: " + JSON.stringify(failure))
+ let results = evaluate(session, "window.domainWorkerResults")
+ if (!Array.isArray(results)) throw new Error("Missing worker assertions")
+ for (let result of results) assert(true, String(result))
+} catch (error) {
+ try { await Bun.write(join(runRoot, "failure.private.json"), JSON.stringify({ error: String(error), state: evaluate(session, '({failure:window.domainWorkerFailure,results:window.domainWorkerResults,fixture:window.domainWorkerFixture,boot:document.querySelector("#worker-boot-diagnostics")?.textContent})') })) } catch {}
+ throw error
+} finally {
+ try { browser(session, "close") } finally {
+  server.kill(); await server.exited
+  let snapshot = join(runRoot, "closed-snapshot")
+  await mkdir(snapshot, { recursive: true })
+  for (let name of ["data", "profile"]) {
+   try { await cp(join(runRoot, name), join(snapshot, name), { recursive: true }) }
+   catch (error) { await Bun.write(join(snapshot, name + "-copy-error.private.txt"), String(error)) }
+  }
+  console.log("Retained closed fixture: " + runRoot)
+ }
+}

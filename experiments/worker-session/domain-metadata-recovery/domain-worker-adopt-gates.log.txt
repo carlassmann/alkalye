@@ -1,0 +1,13 @@
+{"failure":{"message":"Error: domain command reconciles exact accepted source into editor basis","phase":"Merge-after-domain"},"results":["simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections","browser identity is available before any network authentication","native browser account login serializes cookie issuance and agrees with server verification","caller loses actual applied reply after durable worker outcome","read-only recovery returns exact durable command result","duplicate execute returns same owned action without retrying mutation","known lost-reply outcome clears exact main pending row","real SQLite accepted source includes metadata edit and original body"],"fixture":{"document":"70db58ac-e731-48ac-87d4-44f29a3bf076"},"boot":"[{\"phase\":\"worker:construct\",\"time\":109.70000004768372,\"details\":\"http://localhost:58392/worker.js\"},{\"phase\":\"Open:start\",\"time\":35.10000002384186},{\"phase\":\"Open:blobs-start\",\"time\":35.5},{\"phase\":\"Open:blobs-done\",\"time\":39.5},{\"phase\":\"Open:session-done\",\"time\":61.10000002384186},{\"phase\":\"Open:capability-start\",\"time\":61.10000002384186},{\"phase\":\"Open:snapshot-done\",\"time\":62.69999998807907},{\"phase\":\"Begin:start\",\"time\":65.10000002384186},{\"phase\":\"Begin:done\",\"time\":65.5},{\"phase\":\"Merge:flush-start\",\"time\":2087,\"details\":\"{\\\"clock\\\":4,\\\"epoch\\\":\\\"872c09b5-05e0-4bdb-820f-d3a276d64d49:1\\\",\\\"sequence\\\":0}\"},{\"phase\":\"Merge:fork-start\",\"time\":2087.100000023842,\"details\":\"4\"},{\"phase\":\"Merge:text-start\",\"time\":2087.100000023842,\"details\":\"4\"},{\"phase\":\"Merge:visible-start\",\"time\":2087.399999976158},{\"phase\":\"Merge:visible-done\",\"time\":2087.399999976158},{\"phase\":\"Merge:map-start\",\"time\":2087.399999976158,\"details\":\"1\"},{\"phase\":\"Merge:map-done\",\"time\":2087.5}]"}
+Retained closed fixture: /var/folders/db/l4qrf5wx7452h6yr3ctszzn40000gn/T/alkalye-domain-worker-proof-crF4rc
+178 | 		)
+179 | 		throw new Error("Browser condition failed: " + source, { cause: error })
+180 | 	}
+181 | }
+182 | export function assert(condition: unknown, message: string) {
+183 | 	if (!condition) throw new Error(message)
+                                 ^
+error: real worker command fault gates complete: {"message":"Error: domain command reconciles exact accepted source into editor basis","phase":"Merge-after-domain"}
+      at assert (/private/tmp/alkalye-worker-app-domain-recovery/tests/browser-driver.ts:183:28)
+
+Bun v1.4.0 (macOS arm64)

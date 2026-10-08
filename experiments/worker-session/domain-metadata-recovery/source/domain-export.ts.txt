@@ -1,0 +1,39 @@
+import * as Effect from "effect/Effect"
+import { WorkerDocumentFailure } from "./worker-rpc"
+
+type ExportValue = null | boolean | string | number | { reference: number }
+type ExportNode = { type: string; values: unknown }
+
+export function exportDomainRecords(document: string, records: readonly unknown[]) {
+ return Effect.try({ try: () => {
+  let seen = new WeakMap<object, number>()
+  let nodes: ExportNode[] = []
+  function encode(value: unknown): ExportValue {
+   if (value === null || typeof value === "boolean" || typeof value === "string") return value
+   if (typeof value === "number" && Number.isFinite(value) && !Object.is(value, -0)) return value
+   if (typeof value === "number" || typeof value === "bigint" || value === undefined) {
+    let reference = nodes.length
+    nodes.push({ type: value === undefined ? "undefined" : typeof value, values: Object.is(value, -0) ? "-0" : String(value) })
+    return { reference }
+   }
+   if (typeof value !== "object") throw new Error("Unsupported retained command value")
+   let existing = seen.get(value)
+   if (existing !== undefined) return { reference: existing }
+   let reference = nodes.length
+   seen.set(value, reference)
+   let node: ExportNode = { type: "object", values: [] }
+   nodes.push(node)
+   if (Array.isArray(value)) { node.type = "array"; node.values = value.map(encode) }
+   else if (value instanceof Date) { node.type = "date"; node.values = encode(value.getTime()) }
+   else if (value instanceof Map) { node.type = "map"; node.values = Array.from(value, ([key, item]) => [encode(key), encode(item)]) }
+   else if (value instanceof Set) { node.type = "set"; node.values = Array.from(value, encode) }
+   else if (value instanceof ArrayBuffer) { node.type = "buffer"; node.values = Array.from(new Uint8Array(value)) }
+   else if (ArrayBuffer.isView(value)) { node.type = value.constructor.name; node.values = { buffer: encode(value.buffer), byteOffset: value.byteOffset, byteLength: value.byteLength } }
+   else if (Object.getPrototypeOf(value) === Object.prototype || Object.getPrototypeOf(value) === null) { node.values = Object.keys(value).sort().map(key => [key, encode(Reflect.get(value, key))]) }
+   else throw new Error("Retained command contains an unsupported object; original storage remains unchanged")
+   return { reference }
+  }
+  let roots = records.map(encode)
+  return JSON.stringify({ format: "worker-domain-records/v1", document, roots, nodes })
+ }, catch: () => new WorkerDocumentFailure({ reason: "AppliedUnknown", category: "failure" }) })
+}

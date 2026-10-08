@@ -1,0 +1,283 @@
+import { domainCommandDigest, type DomainCommand, domainIntent, domainOutcomeKey, DomainOutcomeSchema, matchesDomain, type DomainOutcome } from "./domain-ledger"
+import * as Cause from "effect/Cause"
+import { workerBootMark } from "./boot-diagnostics"
+import * as Schema from "effect/Schema"
+import type { Storage } from "../storage"
+import { commandIntentDigest } from "./command-intent"
+import * as EventJournal from "effect/eventlog/EventJournal"
+import { DocumentJournal } from "../../platform/document-journal"
+import * as Context from "effect/Context"
+import * as Deferred from "effect/Deferred"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
+import * as Layer from "effect/Layer"
+import * as Scope from "effect/Scope"
+import * as Semaphore from "effect/Semaphore"
+import * as Stream from "effect/Stream"
+import * as SubscriptionRef from "effect/SubscriptionRef"
+import { indexedDbJournalLayer } from "../../platform/indexeddb-journal"
+import { DocumentSession, documentDatabaseName } from "../../shared/document-session"
+import { makeDocumentTransport } from "../../shared/document-transport"
+import { PermissionDenied } from "../../shared/document-errors"
+import { documentFailureCategory } from "../../shared/document-observability"
+import { BrowserAccount } from "../browser-account"
+import { DocumentLive } from "../document-live"
+import { makeWorkerEditorBasis } from "./worker-editor-basis"
+import { makeWorkerActivity } from "./worker-activity"
+import { observeWorkerOpenedDocument } from "./worker-opened-observation"
+import { workerBlobServices } from "./worker-assets"
+import { makeWorkerOpenedCapabilities } from "./worker-opened-capabilities"
+import { makeWorkerOpenedConnection } from "./worker-opened-connection"
+import type { WorkerDocumentAdmission } from "./worker-opened-connection"
+import { WorkerDocumentFailure, WorkerDocumentRpc, NativeReceiptSchema } from "./worker-rpc"
+
+type Capability = Effect.Success<ReturnType<typeof makeWorkerOpenedCapabilities>>
+type Opened = { storage: Storage; document: string; commandEpochs: Map<string, number>; commandDigests: Map<string, string>; subject: string; admissionEpoch: number; editor: Effect.Success<ReturnType<typeof makeWorkerEditorBasis>>; activity: Effect.Success<ReturnType<typeof makeWorkerActivity>>; session: Context.Service.Shape<typeof DocumentSession>; observing: boolean; actor: string; closed: Deferred.Deferred<void>; scope: Scope.Closeable; capability: Capability; admission: SubscriptionRef.SubscriptionRef<WorkerDocumentAdmission>; live: Context.Service.Shape<typeof DocumentLive> }
+export let workerSessionHandlers = WorkerDocumentRpc.toLayer(Effect.gen(function* () {
+ let owner = yield* Scope.Scope
+ let commands = yield* Semaphore.make(1)
+ let opened: Opened | undefined
+ let openFailure = false
+ let writeFailure = false
+ function failure(reason: WorkerDocumentFailure["reason"]) { return new WorkerDocumentFailure({ reason, category: "conflict" }) }
+ function requireOpen() { return Effect.suspend(() => opened ? Effect.succeed(opened) : Effect.fail(failure("Closed"))) }
+ function admitted(current: Opened, epoch: number) { return current.admissionEpoch === epoch && current.capability.current().canWrite ? Effect.void : Effect.fail(failure("PermissionDenied")) }
+ function prepareAdmitted(current: Opened, epoch: number, command: Effect.Effect<{ token: string }, unknown>, declaration: DomainCommand) {
+  return Effect.uninterruptible(Effect.gen(function* () {
+   yield* admitted(current, epoch)
+   let digest = yield* domainCommandDigest(declaration)
+   let receipt = yield* command
+   current.commandEpochs.set(receipt.token, epoch)
+   current.commandDigests.set(receipt.token, digest)
+   return receipt
+  }))
+ }
+ function notice(current: Opened) {
+  let snapshot = current.capability.current()
+  return { revision: snapshot.revision, admissionEpoch: current.admissionEpoch, metadata: snapshot.projection?.metadata, canWrite: snapshot.canWrite, connection: snapshot.connection, status: snapshot.status }
+ }
+ function checked<A, E, R>(work: Effect.Effect<A, E, R>) {
+  return work.pipe(Effect.tapError(error => Effect.tryPromise({ try: async () => {
+   let message = error instanceof Error ? error.message : typeof error === "string" ? error : ""
+   let bytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(message))
+   let fingerprint = Array.from(new Uint8Array(bytes), value => value.toString(16).padStart(2, "0")).join("")
+   let tag = typeof error === "object" && error !== null && "_tag" in error && typeof error._tag === "string" ? error._tag : undefined
+   let frames = error instanceof Error ? error.stack?.split("\n").slice(1, 13).map(frame => frame.trim().replace(/\(.*/, "").slice(0, 120)) : undefined
+   workerBootMark("command:error", JSON.stringify({ frames, class: error instanceof Error ? error.name : typeof error, tag, reason: error instanceof WorkerDocumentFailure ? error.reason : message === "Replica changed while being copied" ? "ReplicaChangedWhileCopied" : message === "Replica changed while being read" ? "ReplicaChangedWhileRead" : undefined, fingerprint }))
+  }, catch: () => undefined }).pipe(Effect.catch(() => Effect.void))), Effect.ensuring(Effect.sync(() => opened?.activity.publish())), Effect.mapError(error => error instanceof WorkerDocumentFailure ? error : new WorkerDocumentFailure({ reason: error instanceof PermissionDenied ? "PermissionDenied" : "SessionFailure", category: documentFailureCategory(error) })))
+ }
+ function execute<A, E, R>(work: Effect.Effect<A, E, R>) { return checked(commands.withPermit(work)) }
+ return WorkerDocumentRpc.of({
+  FixtureFault: input => execute(Effect.sync(() => { openFailure = input.openFailure; writeFailure = input.writeFailure })),
+  FixtureDraft: () => Effect.fail(failure("Rejected")),
+  Open: input => execute(Effect.uninterruptibleMask(restore => Effect.gen(function* () {
+   workerBootMark("Open:start")
+   if (opened) return yield* Effect.fail(failure("AlreadyOpen"))
+   if (input.subject !== input.admission.subject) return yield* Effect.fail(failure("PermissionDenied"))
+   let scope = yield* Scope.fork(owner)
+   let closed = yield* Deferred.make<void>()
+   let activity: Effect.Success<ReturnType<typeof makeWorkerActivity>> | undefined
+   return yield* restore(Effect.gen(function* () {
+    let currentActivity = yield* makeWorkerActivity(input.activityChannel).pipe(Scope.provide(scope))
+    activity = currentActivity
+    let sessionScope = yield* Scope.fork(scope)
+    yield* Scope.addFinalizer(scope, Effect.sync(currentActivity.release))
+    workerBootMark("Open:blobs-start")
+    let { account, storage, blobs } = yield* workerBlobServices(input.document, input.subject, input.origin, sessionScope)
+    workerBootMark("Open:blobs-done")
+    let admission = yield* SubscriptionRef.make<WorkerDocumentAdmission>({ ...input.admission, role: input.admission.role, online: input.online })
+    let restored = SubscriptionRef.changes(admission).pipe(Stream.map(value => value.online), Stream.changes, Stream.drop(1), Stream.filter(value => value), Stream.map(() => undefined))
+    let liveContext = yield* Layer.buildWithScope(DocumentLive.layerWithConnectivity({ online: () => SubscriptionRef.getUnsafe(admission).online, restored }).pipe(Layer.provide(Layer.succeed(BrowserAccount, account))), sessionScope)
+    let live = Context.get(liveContext, DocumentLive)
+    let transport = yield* makeDocumentTransport(input.origin, input.subject)
+    let options = { document: input.document, subject: input.subject, cooperativeWork: input.cooperativeWork, transport: {
+     ...transport,
+     snapshot: (document: string) => account.request(transport.snapshot(document)),
+     action: (...arguments_: Parameters<typeof transport.action>) => account.request(transport.action(...arguments_)),
+     chain: (...arguments_: Parameters<typeof transport.chain>) => account.request(transport.chain(...arguments_)),
+     history: (...arguments_: Parameters<typeof transport.history>) => account.request(transport.history(...arguments_)),
+     withdraw: (...arguments_: Parameters<typeof transport.withdraw>) => account.request(transport.withdraw(...arguments_)),
+     create: (...arguments_: Parameters<typeof transport.create>) => account.request(transport.create(...arguments_)),
+     commit: (action: Parameters<typeof transport.commit>[0]) => blobs.upload(action).pipe(Effect.andThen(account.request(transport.commit(action)))),
+    } }
+    let journalContext = yield* Layer.buildWithScope(indexedDbJournalLayer(documentDatabaseName(options)), sessionScope)
+    let journalStorage = Context.get(journalContext, DocumentJournal)
+    let journal = EventJournal.EventJournal.of({ ...journalStorage.journal, write: options => Effect.suspend(() => writeFailure ? Effect.fail(new EventJournal.EventJournalError({ method: "write", cause: "fixture write failure" })) : journalStorage.journal.write(options)) })
+    let faultStorage = DocumentJournal.of({ ...journalStorage, journal, readAfter: (...arguments_) => openFailure ? Effect.fail(new EventJournal.EventJournalError({ method: "readAfter", cause: "fixture open failure" })) : journalStorage.readAfter(...arguments_), cache: Effect.suspend(() => openFailure ? Effect.fail(new EventJournal.EventJournalError({ method: "cache", cause: "fixture open failure" })) : journalStorage.cache) })
+    let sessionContext = yield* Layer.buildWithScope(DocumentSession.layer(options).pipe(Layer.provide(Layer.merge(Layer.succeed(DocumentJournal, faultStorage), Layer.succeed(EventJournal.EventJournal, journal))), Layer.provide(currentActivity.layer)), sessionScope)
+    let session = Context.get(sessionContext, DocumentSession)
+    let connection = yield* makeWorkerOpenedConnection({ session, admission, wakeups: live.changes.pipe(Stream.filter(event => event.type === "advanced")), observe: transport.observe }).pipe(Scope.provide(sessionScope))
+    workerBootMark("Open:session-done")
+    let editor = yield* makeWorkerEditorBasis({ document: input.document, session, canWrite: connection.canWrite }).pipe(Scope.provide(sessionScope))
+    workerBootMark("Open:capability-start")
+    let capability = yield* makeWorkerOpenedCapabilities({ document: input.document, subject: input.subject, storage, online: () => SubscriptionRef.getUnsafe(admission).online, workspace: input.workspace, author: session.replica.author, session, blobs, connection, live, canWrite: connection.canWrite, basis: editor.basis, editor }).pipe(Scope.provide(sessionScope))
+    let snapshot = capability.current()
+    yield* Scope.addFinalizer(scope, Deferred.done(closed, Exit.void))
+    opened = { storage, document: input.document, commandEpochs: new Map(), commandDigests: new Map(), subject: input.subject, admissionEpoch: input.admission.epoch, editor, activity: currentActivity, session, observing: false, actor: session.replica.actor, closed, scope, capability, admission, live }
+    workerBootMark("Open:snapshot-done")
+    return snapshot
+   })).pipe(Effect.onExit(exit => Exit.isSuccess(exit) ? Effect.void : Effect.sync(() => { workerBootMark("Open:error", Cause.pretty(exit.cause)); activity?.release() }).pipe(Effect.andThen(Scope.close(scope, exit)))))
+  }))),
+  Connectivity: input => checked(requireOpen().pipe(Effect.flatMap(current => SubscriptionRef.update(current.admission, value => ({ ...value, online: input.online })).pipe(Effect.map(() => notice(current)))))),
+  AdmissionEpoch: input => execute(requireOpen().pipe(Effect.flatMap(current => Effect.gen(function* () {
+   if (input.admission.subject !== current.subject || input.admission.epoch <= current.admissionEpoch) return yield* Effect.fail(failure("PermissionDenied"))
+   yield* Effect.uninterruptible(SubscriptionRef.set(current.admission, { ...input.admission, role: input.admission.role, online: SubscriptionRef.getUnsafe(current.admission).online }).pipe(Effect.andThen(Effect.sync(() => { current.admissionEpoch = input.admission.epoch }))))
+   return notice(current)
+  })))),
+  ExecuteAdmitted: () => Effect.fail(failure("Rejected")),
+  ExecuteDomain: input => execute(requireOpen().pipe(Effect.flatMap(current => Effect.uninterruptibleMask(restore => Effect.gen(function* () {
+   let intent = input.intent
+   let key = domainOutcomeKey(current.subject, current.document, intent.request)
+   function record(next: DomainOutcome, finish = false) {
+    return Effect.gen(function* () {
+     let selected: DomainOutcome | undefined
+     let created = false
+     yield* current.storage.modify(key, stored => {
+      if (stored !== undefined) {
+       let previous = Schema.decodeUnknownSync(DomainOutcomeSchema)(stored)
+       if (!matchesDomain(previous.intent, intent)) throw failure("Rejected")
+       if (!finish || previous.status !== "unknown") { selected = previous; return stored }
+      } else created = true
+      selected = next
+      return next
+     })
+     if (!selected) return yield* Effect.fail(failure("AppliedUnknown"))
+     return { outcome: selected, created }
+    })
+   }
+   function refuse() { let outcome: DomainOutcome = { intent, status: "not-applied" }; return record(outcome).pipe(Effect.map(recorded => recorded.outcome)) }
+   if (intent.subject !== current.subject || intent.document !== current.document) return yield* refuse()
+   let stored = yield* current.storage.get(key)
+   if (stored !== undefined) {
+    let outcome = yield* Effect.try({ try: () => Schema.decodeUnknownSync(DomainOutcomeSchema)(stored), catch: () => failure("AppliedUnknown") })
+    if (!matchesDomain(outcome.intent, intent)) return yield* Effect.fail(failure("Rejected"))
+    return outcome
+   }
+   let basis = current.editor.current()?.basis
+   if (!basis || basis.epoch !== intent.epoch || basis.sequence !== intent.sequence) return yield* refuse()
+   let expected = yield* domainIntent(current.subject, current.document, intent, basis.source)
+   if (!matchesDomain(expected, intent)) return yield* refuse()
+   if (current.commandDigests.get(intent.token) !== intent.commandDigest || current.commandEpochs.get(intent.token) !== intent.admissionEpoch || intent.admissionEpoch !== current.admissionEpoch || !current.capability.current().canWrite) return yield* refuse()
+   let started: DomainOutcome = { intent, status: "unknown" }
+   let claimed = yield* record(started)
+   if (!claimed.created) return claimed.outcome
+   let completed = yield* restore(current.capability.commands.execute(intent.token)).pipe(Effect.exit)
+   current.commandEpochs.delete(intent.token)
+   current.commandDigests.delete(intent.token)
+   yield* current.capability.commands.release(intent.token)
+   if (Exit.isFailure(completed)) return started
+   let outcome: DomainOutcome = { intent, status: "applied", action: completed.value.action }
+   return (yield* record(outcome, true)).outcome
+  }))))),
+  RecoverDomain: input => execute(requireOpen().pipe(Effect.flatMap(current => Effect.gen(function* () {
+   let stored = yield* current.storage.get(domainOutcomeKey(current.subject, current.document, input.request))
+   if (stored === undefined) return { found: false }
+   let outcome = yield* Effect.try({ try: () => Schema.decodeUnknownSync(DomainOutcomeSchema)(stored), catch: () => failure("AppliedUnknown") })
+   if (outcome.intent.subject !== current.subject || outcome.intent.document !== current.document || outcome.intent.intentDigest !== input.intentDigest) return yield* Effect.fail(failure("Rejected"))
+   return { found: true, outcome }
+  })))),
+  Synchronize: () => checked(requireOpen().pipe(Effect.flatMap(current => current.capability.synchronize))),
+  ReplaceReceipt: input => execute(requireOpen().pipe(Effect.flatMap(current => Effect.gen(function* () {
+   if (input.admissionEpoch !== current.admissionEpoch) return yield* Effect.fail(failure("PermissionDenied"))
+   yield* admitted(current, input.admissionEpoch)
+   let intentDigest = yield* commandIntentDigest({ subject: current.subject, document: current.document, ...input })
+   if (intentDigest !== input.intentDigest) return yield* Effect.fail(failure("Rejected"))
+   let before = yield* current.editor.handlers.EditorRead()
+   if (before.epoch !== input.epoch || before.sequence !== input.sequence - 1) return yield* Effect.fail(failure("BasisUnavailable"))
+   let expected = sourceAfterRanges(before.source, input.ranges)
+   if (expected === undefined) return yield* Effect.fail(failure("Rejected"))
+   let receipt = yield* current.editor.handlers.ReplaceQueued(input)
+   if (receipt.source !== expected) return yield* Effect.fail(failure("AppliedUnknown"))
+   let agreement: true = true
+   let result = { intentDigest, epoch: receipt.epoch, sequence: receipt.sequence, beforeLength: before.source.length, afterLength: receipt.source.length, agreement, unsaved: receipt.unsaved, ...(receipt.operation ? { operation: receipt.operation } : {}) }
+   yield* current.storage.set("worker-native-receipt:" + encodeURIComponent(current.subject) + ":" + encodeURIComponent(current.document) + ":" + intentDigest, result)
+   return result
+  })))),
+  RecoverReceipt: input => execute(requireOpen().pipe(Effect.flatMap(current => Effect.gen(function* () {
+   if (!/^[a-f0-9]{64}$/.test(input.intentDigest)) return yield* Effect.fail(failure("Rejected"))
+   let stored = yield* current.storage.get("worker-native-receipt:" + encodeURIComponent(current.subject) + ":" + encodeURIComponent(current.document) + ":" + input.intentDigest)
+   if (stored === undefined) return { found: false }
+   let receipt = yield* Effect.try({ try: () => Schema.decodeUnknownSync(NativeReceiptSchema)(stored), catch: () => failure("SessionFailure") })
+   if (receipt.intentDigest !== input.intentDigest) return yield* Effect.fail(failure("SessionFailure"))
+   return { found: true, receipt }
+  })))),
+  ObserveNotice: () => Stream.unwrap(Effect.acquireRelease(
+   execute(requireOpen().pipe(Effect.flatMap(current => Effect.suspend(() => {
+    if (current.observing) return Effect.fail(failure("AlreadyObserving"))
+    current.observing = true
+    return Effect.succeed(current)
+   })))),
+   current => Effect.sync(() => { current.observing = false }),
+  ).pipe(Effect.map(current => current.capability.changes.pipe(
+   Stream.mapEffect(() => execute(Effect.sync(() => {
+    return notice(current)
+   }))),
+   Stream.interruptWhen(Deferred.await(current.closed)),
+  )))),
+  Observe: () => Stream.unwrap(Effect.acquireRelease(
+   execute(requireOpen().pipe(Effect.flatMap(current => Effect.suspend(() => {
+    if (current.observing) return Effect.fail(failure("AlreadyObserving"))
+    current.observing = true
+    return Effect.succeed(current)
+   })))),
+   current => Effect.sync(() => { current.observing = false }),
+  ).pipe(Effect.map(current => observeWorkerOpenedDocument({
+   changes: current.capability.changes,
+   presence: current.capability.presence,
+   actor: () => current.actor,
+  }, current.closed)))),
+  EditorRead: () => execute(requireOpen().pipe(Effect.flatMap(current => current.editor.handlers.EditorRead()))),
+  Begin: () => execute(requireOpen().pipe(Effect.flatMap(current => { workerBootMark("Begin:start"); return current.editor.handlers.Begin().pipe(Effect.tap(() => Effect.sync(() => workerBootMark("Begin:done"))), Effect.tapError(error => Effect.sync(() => workerBootMark("Begin:error", error)))) }))),
+  ReplaceQueued: () => Effect.fail(failure("Rejected")),
+  UndoQueued: input => execute(requireOpen().pipe(Effect.flatMap(current => Effect.gen(function* () {
+   let retained = yield* current.editor.retainedUndo(input)
+   if (retained) return retained
+   yield* admitted(current, input.admissionEpoch)
+   return yield* current.editor.handlers.UndoQueued(input)
+  })))),
+  MergeCandidate: input => execute(requireOpen().pipe(Effect.flatMap(current => current.editor.handlers.MergeCandidate(input)))),
+  Adopt: input => execute(requireOpen().pipe(Effect.flatMap(current => current.editor.handlers.Adopt(input)))),
+  ReleaseCandidate: input => execute(requireOpen().pipe(Effect.flatMap(current => current.editor.handlers.ReleaseCandidate(input)))),
+  CaptureClipboard: input => execute(requireOpen().pipe(Effect.flatMap(current => current.editor.handlers.CaptureClipboard(input)))),
+  ResolveClipboard: input => execute(requireOpen().pipe(Effect.flatMap(current => current.editor.handlers.ResolveClipboard(input)))),
+  ReleaseClipboard: input => execute(requireOpen().pipe(Effect.flatMap(current => current.editor.handlers.ReleaseClipboard(input)))),
+  Protection: () => execute(requireOpen().pipe(Effect.map(current => ({ unsaved: current.session.unsaved(), dirty: current.activity.dirty() })))),
+  Read: () => execute(requireOpen().pipe(Effect.map(current => current.capability.current()))),
+  PropertiesUpdate: input => execute(requireOpen().pipe(Effect.flatMap(current => prepareAdmitted(current, input.admissionEpoch, current.capability.properties.update(input.patch), { type: "properties", patch: input.patch })))),
+  Present: input => execute(requireOpen().pipe(Effect.flatMap(current => prepareAdmitted(current, input.admissionEpoch, current.capability.properties.present(input.index), { type: "present", index: input.index })))),
+  Presentation: input => execute(requireOpen().pipe(Effect.flatMap(current => prepareAdmitted(current, input.admissionEpoch, current.capability.properties.presentation(input.enabled), { type: "presentation", enabled: input.enabled })))),
+  TaskToggle: () => Effect.fail(failure("Rejected")),
+  HistoryLoad: () => execute(requireOpen().pipe(Effect.flatMap(current => current.capability.history.load))),
+  HistorySelect: input => execute(requireOpen().pipe(Effect.flatMap(current => current.capability.history.select(input.token, input.position)))),
+  HistoryRestore: () => Effect.fail(failure("Rejected")),
+  HistoryRelease: input => execute(requireOpen().pipe(Effect.flatMap(current => current.capability.history.releaseHistory(input.token)))),
+  MomentRelease: input => execute(requireOpen().pipe(Effect.flatMap(current => current.capability.history.releaseMoment(input.token)))),
+  Execute: () => Effect.fail(failure("Rejected")),
+  Release: input => execute(requireOpen().pipe(Effect.flatMap(current => Effect.uninterruptible(current.capability.commands.release(input.token).pipe(Effect.andThen(Effect.sync(() => { current.commandEpochs.delete(input.token); current.commandDigests.delete(input.token) }))))))),
+  Admission: () => Effect.fail(failure("Rejected")),
+  Flush: () => checked(requireOpen().pipe(Effect.flatMap(current => current.capability.flush))),
+  LiveStatus: () => execute(requireOpen().pipe(Effect.map(current => ({ connected: current.live.connected(), transport: current.live.transport(), opened: true })))),
+  Close: () => execute(Effect.uninterruptibleMask(restore => Effect.gen(function* () {
+   let current = yield* requireOpen()
+   yield* restore(current.capability.flush).pipe(Effect.onExit(exit => Effect.gen(function* () {
+    // Failure stays a failure; the main owner must retain its full draft.
+    if (opened === current) opened = undefined
+    yield* Deferred.done(current.closed, Exit.void)
+    current.activity.release()
+    yield* Scope.close(current.scope, exit)
+   })))
+  }))),
+ })
+}))
+
+function sourceAfterRanges(source: string, ranges: readonly { start: number; remove: number; text: string }[]) {
+ let parts: string[] = []
+ let position = 0
+ for (let range of ranges) {
+  if (range.start < position || range.start + range.remove > source.length) return
+  parts.push(source.slice(position, range.start), range.text)
+  position = range.start + range.remove
+ }
+ parts.push(source.slice(position))
+ return parts.join("")
+}

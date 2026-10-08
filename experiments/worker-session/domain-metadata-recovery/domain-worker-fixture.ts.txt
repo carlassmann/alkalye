@@ -1,0 +1,102 @@
+import * as Cause from "effect/Cause"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
+import * as Schema from "effect/Schema"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import { bootstrapBrowserAccount } from "./tests/browser-account-fixture"
+import { Storage } from "./src/client/storage"
+import { createWorkerSessionClient } from "./src/client/worker-document/worker-client"
+import { makeDomainLedger, queuedDomain, domainIntent } from "./src/client/worker-document/domain-ledger"
+let results: string[] = []
+Object.assign(window, { domainWorkerResults: results })
+function check(value: unknown, message: string) { if (!value) throw new Error(message); results.push(message) }
+let phase = "account"
+let dropKnown = false
+let originalWorker = globalThis.Worker
+class ReceiptWorker extends originalWorker {
+ constructor(url: string | URL, options?: WorkerOptions) {
+  super(url, options)
+  this.addEventListener("message", event => {
+   let body = JSON.stringify(event.data)
+   if (dropKnown && body.includes('"intentDigest"') && body.includes('"status":"applied"')) { dropKnown = false; event.stopImmediatePropagation() }
+  })
+ }
+}
+globalThis.Worker = ReceiptWorker
+let program = Effect.scoped(Effect.gen(function* () {
+ yield* Effect.addFinalizer(() => Effect.sync(() => { globalThis.Worker = originalWorker }))
+ let account = yield* bootstrapBrowserAccount(check)
+ let storage = yield* Effect.acquireRelease(Storage.open(), opened => Effect.sync(() => opened.close()))
+ let document = crypto.randomUUID()
+ yield* storage.set("domain-test-fixture:" + document, { document, phase: "before-create" })
+ Object.assign(window, { domainWorkerFixture: { document } })
+ let source = "---\ntitle: Worker fixture\n---\nBody😀\r\n"
+ yield* Effect.tryPromise({ try: async () => { let response = await fetch("/__tests/seed", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ subject: account.subject, document, source }) }); if (!response.ok) throw new Error("Seed failed: " + response.status) }, catch: error => error })
+ let ledger = makeDomainLedger(storage, account.subject, document)
+ yield* storage.set("domain-test-fixture:" + document, { document, phase: "created" })
+ phase = "create-client"
+ let client = yield* createWorkerSessionClient(new URL("/worker.js", location.href).href)
+ let admission = { subject: account.subject, epoch: 1, exists: true, deleted: false, role: "owner", account: "ready", online: true } satisfies { subject: string; epoch: number; exists: boolean; deleted: boolean; role: "owner"; account: "ready"; online: boolean }
+ phase = "Open"
+ yield* client.Open({ document, subject: account.subject, workspace: "personal-" + account.subject, origin: location.origin, activityChannel: "domain-test-" + crypto.randomUUID(), online: true, cooperativeWork: true, admission })
+ phase = "Begin"
+ let basis = yield* client.Begin()
+ let command = { type: "properties", patch: { title: "Known durable title" } } satisfies { type: "properties"; patch: { title: string } }
+ let queued = yield* queuedDomain(account.subject, document, { request: crypto.randomUUID(), epoch: basis.epoch, sequence: basis.sequence, admissionEpoch: 1, command }, basis.source)
+ yield* ledger.prepareQueued(queued, basis.source)
+ yield* ledger.preparing(queued)
+ phase = "Stage"
+ let token = yield* client.PropertiesUpdate({ patch: command.patch, admissionEpoch: 1 })
+ let intent = yield* domainIntent(account.subject, document, { ...queued, token: token.token }, basis.source)
+ yield* ledger.prepared(queued, intent); yield* ledger.started(queued)
+ phase = "Execute-lost-reply"
+ dropKnown = true
+ let attemptKey = "domain-test-attempt:" + document + ":" + intent.request
+ if ((yield* storage.get(attemptKey)) !== undefined) throw new Error("Unknown command attempt cannot be replayed")
+ yield* storage.set(attemptKey, { request: intent.request, intentDigest: intent.intentDigest, epoch: intent.epoch, sequence: intent.sequence, phase: "beforeExecute" })
+ let lost = yield* client.ExecuteDomain({ intent }).pipe(Effect.timeout("2 seconds"), Effect.exit)
+ check(Exit.isFailure(lost) && !dropKnown, "caller loses actual applied reply after durable worker outcome")
+ phase = "Recover"
+ let recovered = yield* client.RecoverDomain({ request: intent.request, intentDigest: intent.intentDigest })
+ check(recovered.found && recovered.outcome?.status === "applied" && !!recovered.outcome.action, "read-only recovery returns exact durable command result")
+ if (!recovered.outcome) throw new Error("Missing outcome")
+ yield* storage.set(attemptKey, { request: intent.request, intentDigest: intent.intentDigest, action: recovered.outcome.action, phase: "known" })
+ phase = "Known-duplicate"
+ let duplicate = yield* client.ExecuteDomain({ intent })
+ check(duplicate.action === recovered.outcome.action, "duplicate execute returns same owned action without retrying mutation")
+ yield* ledger.confirm(intent, recovered.outcome)
+ check((yield* ledger.inspect).rows.length === 0, "known lost-reply outcome clears exact main pending row")
+ yield* client.Synchronize()
+ let accepted = yield* Effect.tryPromise({ try: async () => { let response = await fetch("/__tests/accepted?document=" + encodeURIComponent(document) + "&subject=" + encodeURIComponent(account.subject)); if (!response.ok) throw new Error("Accepted read failed"); return Schema.decodeUnknownSync(Schema.Struct({ source: Schema.String, position: Schema.Natural }))(await response.json()).source }, catch: error => error })
+ check(accepted.includes("Known durable title") && accepted.includes("Body"), "real SQLite accepted source includes metadata edit and original body")
+ phase = "Merge-after-domain"
+ let merged = yield* client.MergeCandidate({ epoch: basis.epoch, sequence: basis.sequence, start: 0, end: 0 })
+ check(merged.source === accepted, "domain command reconciles exact accepted source into editor basis")
+ yield* client.Adopt({ epoch: basis.epoch, sequence: basis.sequence, candidate: merged.candidate })
+ let adopted = yield* client.EditorRead()
+ if (adopted.epoch === undefined || adopted.sequence === undefined) throw new Error("Missing adopted domain basis")
+ basis = { epoch: adopted.epoch, sequence: adopted.sequence, source: adopted.source }
+ phase = "Stage-revoked"
+ let later = yield* queuedDomain(account.subject, document, { request: crypto.randomUUID(), epoch: basis.epoch, sequence: basis.sequence, admissionEpoch: 1, command: { type: "properties", patch: { title: "Denied title" } } }, basis.source)
+ yield* ledger.prepareQueued(later, basis.source); yield* ledger.preparing(later)
+ let held = yield* client.PropertiesUpdate({ patch: { title: "Denied title" }, admissionEpoch: 1 })
+ let deniedIntent = yield* domainIntent(account.subject, document, { ...later, token: held.token }, basis.source)
+ yield* ledger.prepared(later, deniedIntent); yield* ledger.started(later)
+ yield* client.AdmissionEpoch({ admission: { ...admission, epoch: 2, role: "reader" } })
+ phase = "Execute-revoked"
+ let deniedKey = "domain-test-attempt:" + document + ":" + deniedIntent.request
+ if ((yield* storage.get(deniedKey)) !== undefined) throw new Error("Unknown denied attempt cannot be replayed")
+ yield* storage.set(deniedKey, { request: deniedIntent.request, intentDigest: deniedIntent.intentDigest, epoch: deniedIntent.epoch, sequence: deniedIntent.sequence, phase: "beforeExecute" })
+ let denied = yield* client.ExecuteDomain({ intent: deniedIntent })
+ check(denied.status === "not-applied", "revocation before invocation returns durable not-applied outcome")
+ yield* ledger.confirm(deniedIntent, denied)
+ let read = yield* client.Read()
+ check(read.projection?.metadata.title === "Known durable title", "revoked staged command cannot mutate document")
+ let knownAgain = yield* client.RecoverDomain({ request: deniedIntent.request, intentDigest: deniedIntent.intentDigest })
+ check(knownAgain.outcome?.status === "not-applied", "rejected result remains recoverable after main pending cleanup")
+ yield* client.Close()
+}))
+Effect.runPromise(program.pipe(Effect.provide(FetchHttpClient.layer), Effect.exit)).then(exit => {
+ if (Exit.isSuccess(exit)) Object.assign(window, { domainWorkerDone: true })
+ else { let error = Cause.squash(exit.cause); Object.assign(window, { domainWorkerDone: true, domainWorkerFailure: { phase, message: String(error), reason: typeof error === "object" && error !== null && "reason" in error ? String(error.reason) : undefined } }) }
+})
