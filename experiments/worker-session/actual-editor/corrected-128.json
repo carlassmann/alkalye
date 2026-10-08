@@ -1,0 +1,92 @@
+[
+	{
+		"trial": 0,
+		"multicursor": false,
+		"geometry": {
+			"height": 800,
+			"nativeCharacters": 2207,
+			"readonly": false,
+			"scrollHeight": 129023,
+			"sourceCharacters": 131102
+		},
+		"observation": {
+			"durableMs": 91.69999998807909,
+			"failures": [],
+			"heap": 8219955,
+			"inputMs": 1.5999999642372131,
+			"microtaskMs": 0,
+			"nativeCharacters": 2208,
+			"nodes": 67,
+			"pending": 0,
+			"raf2Ms": 22.799999952316284,
+			"sourceCharacters": 131103,
+			"trusted": 1
+		},
+		"aftermath": {
+			"failures": [],
+			"heap": 8452305,
+			"pending": 0
+		},
+		"trace": "/tmp/alkalye-worker-editor/corrected-128.json-0.trace.json"
+	},
+	{
+		"trial": 1,
+		"multicursor": false,
+		"geometry": {
+			"height": 800,
+			"nativeCharacters": 2208,
+			"readonly": false,
+			"scrollHeight": 129023,
+			"sourceCharacters": 131103
+		},
+		"observation": {
+			"durableMs": 77.5,
+			"failures": [],
+			"heap": 9592551,
+			"inputMs": 1,
+			"microtaskMs": 0.19999998807907104,
+			"nativeCharacters": 2209,
+			"nodes": 67,
+			"pending": 0,
+			"raf2Ms": 12.699999988079073,
+			"sourceCharacters": 131104,
+			"trusted": 1
+		},
+		"aftermath": {
+			"failures": [],
+			"heap": 9595519,
+			"pending": 0
+		},
+		"trace": "/tmp/alkalye-worker-editor/corrected-128.json-1.trace.json"
+	},
+	{
+		"trial": 2,
+		"multicursor": false,
+		"geometry": {
+			"height": 800,
+			"nativeCharacters": 2209,
+			"readonly": false,
+			"scrollHeight": 129023,
+			"sourceCharacters": 131104
+		},
+		"observation": {
+			"durableMs": 83,
+			"failures": [],
+			"heap": 10717195,
+			"inputMs": 1,
+			"microtaskMs": 0.10000002384185792,
+			"nativeCharacters": 2210,
+			"nodes": 67,
+			"pending": 0,
+			"raf2Ms": 5.5,
+			"sourceCharacters": 131105,
+			"trusted": 1
+		},
+		"aftermath": {
+			"failures": [],
+			"heap": 10720067,
+			"pending": 0
+		},
+		"trace": "/tmp/alkalye-worker-editor/corrected-128.json-2.trace.json"
+	}
+]

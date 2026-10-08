@@ -30,9 +30,10 @@ try {
 		wait(session, `${api}.inspect().source===window.inputExpected&&${api}.inspect().pending===0&&window.inputProof.raf2>0`)
 		assert(evaluate(session, `${api}.flush().then(value=>value===window.inputExpected)`), "Native queue drains and durable source equals exact input")
 		let observation = evaluate(session, `(()=>{let state=window.inputProof;performance.mark('worker:input:durable');state.controller.abort();return {trusted:state.trusted,inputMs:state.input,microtaskMs:state.microtask,raf2Ms:state.raf2,durableMs:performance.now()-state.before,sourceCharacters:window.inputExpected.length,pending:${api}.inspect().pending,failures:${api}.inspect().failures,heap:performance.memory?.usedJSHeapSize,nativeCharacters:${source}.element.value.length,nodes:document.querySelector('#highlight').querySelectorAll('*').length}})()`)
+		let aftermath = evaluate(session, `new Promise(resolve=>setTimeout(()=>{performance.mark('worker:input:aftermath');resolve({pending:${api}.inspect().pending,failures:${api}.inspect().failures,heap:performance.memory?.usedJSHeapSize})},3000))`)
 		let trace = output + "-" + trial + ".trace.json"
 		browser(session, "profiler", "stop", trace)
-		rows.push({ trial, multicursor, geometry, observation, trace })
+		rows.push({ trial, multicursor, geometry, observation, aftermath, trace })
 		await Bun.write(output, JSON.stringify(rows, null, 2))
 	}
 	evaluate(session, `${api}.dispose()`)

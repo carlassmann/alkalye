@@ -1,0 +1,335 @@
+[
+	{
+		"fixture": "corrected-1m-mc.json",
+		"trial": 0,
+		"geometry": {
+			"height": 800,
+			"nativeCharacters": 2590,
+			"readonly": false,
+			"scrollHeight": 604261,
+			"sourceCharacters": 1048606
+		},
+		"observation": {
+			"durableMs": 302,
+			"failures": [],
+			"heap": 27548925,
+			"inputMs": null,
+			"microtaskMs": 0.10000002384185792,
+			"nativeCharacters": 2082,
+			"nodes": 11,
+			"pending": 0,
+			"raf2Ms": 17.30000001192093,
+			"sourceCharacters": 1050654,
+			"trusted": 1
+		},
+		"aftermath": {
+			"failures": [],
+			"heap": 27774411,
+			"pending": 0
+		},
+		"inputEnclosingTaskMs": 7.204,
+		"largestMainTaskToAftermathMs": 7.204,
+		"largestDeferredMainTaskMs": 2.101,
+		"layoutTotalMs": 22.544,
+		"paintTotalMs": 3.798,
+		"largestWorkerTaskMs": 236.163,
+		"taskCount": 1017,
+		"driverCompletionUpperBoundMs": 301.904
+	},
+	{
+		"fixture": "corrected-1m-mc.json",
+		"trial": 1,
+		"geometry": {
+			"height": 800,
+			"nativeCharacters": 2082,
+			"readonly": false,
+			"scrollHeight": 604390,
+			"sourceCharacters": 1050654
+		},
+		"observation": {
+			"durableMs": 507,
+			"failures": [],
+			"heap": 26894693,
+			"inputMs": null,
+			"microtaskMs": 0.10000002384185792,
+			"nativeCharacters": 2086,
+			"nodes": 11,
+			"pending": 0,
+			"raf2Ms": 24.80000001192093,
+			"sourceCharacters": 1052702,
+			"trusted": 1
+		},
+		"aftermath": {
+			"failures": [],
+			"heap": 27095135,
+			"pending": 0
+		},
+		"inputEnclosingTaskMs": 5.901,
+		"largestMainTaskToAftermathMs": 5.901,
+		"largestDeferredMainTaskMs": 1.126,
+		"layoutTotalMs": 26.882,
+		"paintTotalMs": 4.955,
+		"largestWorkerTaskMs": 210.45,
+		"taskCount": 1154,
+		"driverCompletionUpperBoundMs": 506.811
+	},
+	{
+		"fixture": "corrected-1m-mc.json",
+		"trial": 2,
+		"geometry": {
+			"height": 800,
+			"nativeCharacters": 2086,
+			"readonly": false,
+			"scrollHeight": 604779,
+			"sourceCharacters": 1052702
+		},
+		"observation": {
+			"durableMs": 504.5,
+			"failures": [],
+			"heap": 43470760,
+			"inputMs": null,
+			"microtaskMs": 0,
+			"nativeCharacters": 2090,
+			"nodes": 11,
+			"pending": 0,
+			"raf2Ms": 22.19999998807907,
+			"sourceCharacters": 1054750,
+			"trusted": 1
+		},
+		"aftermath": {
+			"failures": [],
+			"heap": 43665428,
+			"pending": 0
+		},
+		"inputEnclosingTaskMs": 5.094,
+		"largestMainTaskToAftermathMs": 5.094,
+		"largestDeferredMainTaskMs": 1.026,
+		"layoutTotalMs": 24.231,
+		"paintTotalMs": 4.425,
+		"largestWorkerTaskMs": 238.157,
+		"taskCount": 1079,
+		"driverCompletionUpperBoundMs": 504.494
+	},
+	{
+		"fixture": "corrected-1m.json",
+		"trial": 0,
+		"geometry": {
+			"height": 800,
+			"nativeCharacters": 2080,
+			"readonly": false,
+			"scrollHeight": 1030046,
+			"sourceCharacters": 1048606
+		},
+		"observation": {
+			"durableMs": 81.20000004768372,
+			"failures": [],
+			"heap": 21169223,
+			"inputMs": 1.800000011920929,
+			"microtaskMs": 0,
+			"nativeCharacters": 2081,
+			"nodes": 64,
+			"pending": 0,
+			"raf2Ms": 22,
+			"sourceCharacters": 1048607,
+			"trusted": 1
+		},
+		"aftermath": {
+			"failures": [],
+			"heap": 21572705,
+			"pending": 0
+		},
+		"inputEnclosingTaskMs": 2.049,
+		"largestMainTaskToAftermathMs": 2.049,
+		"largestDeferredMainTaskMs": 1.144,
+		"layoutTotalMs": 36.652,
+		"paintTotalMs": 3.938,
+		"largestWorkerTaskMs": 240.09,
+		"taskCount": 459,
+		"driverCompletionUpperBoundMs": 81.17
+	},
+	{
+		"fixture": "corrected-1m.json",
+		"trial": 1,
+		"geometry": {
+			"height": 800,
+			"nativeCharacters": 2081,
+			"readonly": false,
+			"scrollHeight": 1030052,
+			"sourceCharacters": 1048607
+		},
+		"observation": {
+			"durableMs": 185.19999998807907,
+			"failures": [],
+			"heap": 28790596,
+			"inputMs": 1.399999976158142,
+			"microtaskMs": 0,
+			"nativeCharacters": 2082,
+			"nodes": 64,
+			"pending": 0,
+			"raf2Ms": 29.19999998807907,
+			"sourceCharacters": 1048608,
+			"trusted": 1
+		},
+		"aftermath": {
+			"failures": [],
+			"heap": 29044060,
+			"pending": 0
+		},
+		"inputEnclosingTaskMs": 1.528,
+		"largestMainTaskToAftermathMs": 1.528,
+		"largestDeferredMainTaskMs": 1.054,
+		"layoutTotalMs": 31.025,
+		"paintTotalMs": 3.426,
+		"largestWorkerTaskMs": 204.195,
+		"taskCount": 464,
+		"driverCompletionUpperBoundMs": 185.158
+	},
+	{
+		"fixture": "corrected-1m.json",
+		"trial": 2,
+		"geometry": {
+			"height": 800,
+			"nativeCharacters": 2082,
+			"readonly": false,
+			"scrollHeight": 1030059,
+			"sourceCharacters": 1048608
+		},
+		"observation": {
+			"durableMs": 195.79999995231628,
+			"failures": [],
+			"heap": 21372457,
+			"inputMs": 1.199999988079071,
+			"microtaskMs": 0,
+			"nativeCharacters": 2083,
+			"nodes": 64,
+			"pending": 0,
+			"raf2Ms": 34.89999997615814,
+			"sourceCharacters": 1048609,
+			"trusted": 1
+		},
+		"aftermath": {
+			"failures": [],
+			"heap": 21635493,
+			"pending": 0
+		},
+		"inputEnclosingTaskMs": 1.376,
+		"largestMainTaskToAftermathMs": 1.376,
+		"largestDeferredMainTaskMs": 1.124,
+		"layoutTotalMs": 39.532000000000004,
+		"paintTotalMs": 4.378,
+		"largestWorkerTaskMs": 237.374,
+		"taskCount": 550,
+		"driverCompletionUpperBoundMs": 195.756
+	},
+	{
+		"fixture": "corrected-128.json",
+		"trial": 0,
+		"geometry": {
+			"height": 800,
+			"nativeCharacters": 2207,
+			"readonly": false,
+			"scrollHeight": 129023,
+			"sourceCharacters": 131102
+		},
+		"observation": {
+			"durableMs": 91.69999998807909,
+			"failures": [],
+			"heap": 8219955,
+			"inputMs": 1.5999999642372131,
+			"microtaskMs": 0,
+			"nativeCharacters": 2208,
+			"nodes": 67,
+			"pending": 0,
+			"raf2Ms": 22.799999952316284,
+			"sourceCharacters": 131103,
+			"trusted": 1
+		},
+		"aftermath": {
+			"failures": [],
+			"heap": 8452305,
+			"pending": 0
+		},
+		"inputEnclosingTaskMs": 1.739,
+		"largestMainTaskToAftermathMs": 1.739,
+		"largestDeferredMainTaskMs": 1.004,
+		"layoutTotalMs": 17.105,
+		"paintTotalMs": 1.459,
+		"largestWorkerTaskMs": 28.883,
+		"taskCount": 281,
+		"driverCompletionUpperBoundMs": 91.606
+	},
+	{
+		"fixture": "corrected-128.json",
+		"trial": 1,
+		"geometry": {
+			"height": 800,
+			"nativeCharacters": 2208,
+			"readonly": false,
+			"scrollHeight": 129023,
+			"sourceCharacters": 131103
+		},
+		"observation": {
+			"durableMs": 77.5,
+			"failures": [],
+			"heap": 9592551,
+			"inputMs": 1,
+			"microtaskMs": 0.19999998807907104,
+			"nativeCharacters": 2209,
+			"nodes": 67,
+			"pending": 0,
+			"raf2Ms": 12.699999988079073,
+			"sourceCharacters": 131104,
+			"trusted": 1
+		},
+		"aftermath": {
+			"failures": [],
+			"heap": 9595519,
+			"pending": 0
+		},
+		"inputEnclosingTaskMs": 1.026,
+		"largestMainTaskToAftermathMs": 1.026,
+		"largestDeferredMainTaskMs": 0.448,
+		"layoutTotalMs": 0.25,
+		"paintTotalMs": 0.088,
+		"largestWorkerTaskMs": 34.887,
+		"taskCount": 93,
+		"driverCompletionUpperBoundMs": 77.348
+	},
+	{
+		"fixture": "corrected-128.json",
+		"trial": 2,
+		"geometry": {
+			"height": 800,
+			"nativeCharacters": 2209,
+			"readonly": false,
+			"scrollHeight": 129023,
+			"sourceCharacters": 131104
+		},
+		"observation": {
+			"durableMs": 83,
+			"failures": [],
+			"heap": 10717195,
+			"inputMs": 1,
+			"microtaskMs": 0.10000002384185792,
+			"nativeCharacters": 2210,
+			"nodes": 67,
+			"pending": 0,
+			"raf2Ms": 5.5,
+			"sourceCharacters": 131105,
+			"trusted": 1
+		},
+		"aftermath": {
+			"failures": [],
+			"heap": 10720067,
+			"pending": 0
+		},
+		"inputEnclosingTaskMs": 1.01,
+		"largestMainTaskToAftermathMs": 1.341,
+		"largestDeferredMainTaskMs": 1.341,
+		"layoutTotalMs": 0.245,
+		"paintTotalMs": 0.094,
+		"largestWorkerTaskMs": 39.558,
+		"taskCount": 97,
+		"driverCompletionUpperBoundMs": 82.851
+	}
+]

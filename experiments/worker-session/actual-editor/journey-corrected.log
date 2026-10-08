@@ -1,0 +1,15 @@
+{
+  ready: "true",
+}
+PASS Actual EditorElement worker fixture opens
+PASS Trusted input uses real source replacement queue
+PASS Queued rapid native edits preserve FIFO source
+PASS Actual editor formatting queues canonical replacement
+PASS Actual editor multicursor source remains active
+PASS Remote handoff refuses active multicursors
+PASS Source caret is available
+PASS Worker candidate adopts through actual editor
+PASS Worker-resolved canonical caret follows peer prefix
+PASS Worker/native server durability preserves actual editor source
+PASS Actual native bridge reports no authority failures
+PASS Scope interruption removes editor and workers

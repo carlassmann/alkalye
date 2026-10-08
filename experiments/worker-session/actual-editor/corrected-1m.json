@@ -1,0 +1,92 @@
+[
+	{
+		"trial": 0,
+		"multicursor": false,
+		"geometry": {
+			"height": 800,
+			"nativeCharacters": 2080,
+			"readonly": false,
+			"scrollHeight": 1030046,
+			"sourceCharacters": 1048606
+		},
+		"observation": {
+			"durableMs": 81.20000004768372,
+			"failures": [],
+			"heap": 21169223,
+			"inputMs": 1.800000011920929,
+			"microtaskMs": 0,
+			"nativeCharacters": 2081,
+			"nodes": 64,
+			"pending": 0,
+			"raf2Ms": 22,
+			"sourceCharacters": 1048607,
+			"trusted": 1
+		},
+		"aftermath": {
+			"failures": [],
+			"heap": 21572705,
+			"pending": 0
+		},
+		"trace": "/tmp/alkalye-worker-editor/corrected-1m.json-0.trace.json"
+	},
+	{
+		"trial": 1,
+		"multicursor": false,
+		"geometry": {
+			"height": 800,
+			"nativeCharacters": 2081,
+			"readonly": false,
+			"scrollHeight": 1030052,
+			"sourceCharacters": 1048607
+		},
+		"observation": {
+			"durableMs": 185.19999998807907,
+			"failures": [],
+			"heap": 28790596,
+			"inputMs": 1.399999976158142,
+			"microtaskMs": 0,
+			"nativeCharacters": 2082,
+			"nodes": 64,
+			"pending": 0,
+			"raf2Ms": 29.19999998807907,
+			"sourceCharacters": 1048608,
+			"trusted": 1
+		},
+		"aftermath": {
+			"failures": [],
+			"heap": 29044060,
+			"pending": 0
+		},
+		"trace": "/tmp/alkalye-worker-editor/corrected-1m.json-1.trace.json"
+	},
+	{
+		"trial": 2,
+		"multicursor": false,
+		"geometry": {
+			"height": 800,
+			"nativeCharacters": 2082,
+			"readonly": false,
+			"scrollHeight": 1030059,
+			"sourceCharacters": 1048608
+		},
+		"observation": {
+			"durableMs": 195.79999995231628,
+			"failures": [],
+			"heap": 21372457,
+			"inputMs": 1.199999988079071,
+			"microtaskMs": 0,
+			"nativeCharacters": 2083,
+			"nodes": 64,
+			"pending": 0,
+			"raf2Ms": 34.89999997615814,
+			"sourceCharacters": 1048609,
+			"trusted": 1
+		},
+		"aftermath": {
+			"failures": [],
+			"heap": 21635493,
+			"pending": 0
+		},
+		"trace": "/tmp/alkalye-worker-editor/corrected-1m.json-2.trace.json"
+	}
+]
