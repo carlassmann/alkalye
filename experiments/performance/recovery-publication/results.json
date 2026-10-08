@@ -1,0 +1,37 @@
+{
+	"base": "059da17",
+	"candidate_modules": 2,
+	"strict": "PASS",
+	"public": {
+		"pass": 15,
+		"fail": 0,
+		"assertions": 180,
+		"new_assertions": 25
+	},
+	"browser": {
+		"exit": 0,
+		"fixture_assertions": 321
+	},
+	"protection_only_control": {
+		"exit": 1,
+		"cause": "Expected MissingSavedSignal after 3s; no draft-status publication"
+	},
+	"failures_preserved": {
+		"setup": "Outside cwd missing before invocation; no job ran",
+		"creation": "Fixture actor did not carry owner prefix",
+		"version": "Fixture compared across actual journal replay, which legitimately advances content revision",
+		"journal": "Hold after journal.write was still INSIDE withLock SQL transaction. Independent reader saw prior head; interruption rolled back. Not durable-commit or duplicate-write bug.",
+		"diagnostic_decode": "Partial/wrong binary schema throw prevented held signal; readiness deadline. Final full recorded DTO schema decode succeeded.",
+		"strict_narrowing": "Optional edit.operation.id failed assertion overload, fixed explicit non-null guard."
+	},
+	"review": {
+		"prior": "11359 HOLD on protection-only variant",
+		"final": "85868 terminal0 no source blockers"
+	},
+	"limits": [
+		"No actual production DOM hidden-after-commit Saved case yet",
+		"No performance count/latency/frame claim",
+		"No physical transaction cancellation claim",
+		"Repository formatting after execution changed whitespace; root fullcheck covers adopted format"
+	]
+}

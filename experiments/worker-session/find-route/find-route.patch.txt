@@ -1,0 +1,63 @@
+--- a/src/client/document-app.ts
++++ b/src/client/document-app.ts
+@@ -1312,6 +1312,7 @@
+     workerOpening = true
+     let route = yield* mountWorkerAppRoute(element("#main"), document, {
+      preferences: preferences.state.current().value.editor,
++     findBar: element("#find-bar"),
+      documents: documentLinks,
+      openDocument: id => launch(open(id)),
+      report,
+@@ -2880,7 +2881,18 @@
+ 			)
+ 		}
+ 		function act(action: string) {
+-   if (workerMount) return action === "save" ? workerMount.route.save : Effect.sync(() => report("Worker ordinary-route prototype: host command remains unsupported"))
++   if (workerMount) {
++    let mounted = workerMount
++    if (action === "save") return mounted.route.save
++    if (action === "find" || action === "find-replace")
++     return Effect.sync(() => openFind("", action === "find-replace", { editor: mounted.route.editor, bar: element("#find-bar") }))
++    if (action === "find-next" || action === "find-previous") return Effect.sync(() => {
++     let button = document.querySelector<HTMLButtonElement>("#" + action)
++     if (button) button.click()
++     else openFind("", false, { editor: mounted.route.editor, bar: element("#find-bar") })
++    })
++    return Effect.sync(() => report("Worker ordinary-route prototype: host command remains unsupported"))
++   }
+ 			return Effect.gen(function* () {
+ 				if (action === "toggle-preview") action = "preview"
+ 				if (action === "save-as" && !window.showSaveFilePicker)
+--- a/src/client/worker-document/app-route.ts
++++ b/src/client/worker-document/app-route.ts
+@@ -4,6 +4,7 @@
+ import * as Stream from "effect/Stream"
+ import { BrowserLibrary } from "../browser-library"
+ import { EditorElement } from "../components/editor"
++import { openFind } from "../components/find"
+ import type { EditorPreferences } from "../../shared/preferences"
+ import type { DocumentLink } from "../../shared/model"
+ import { workerEditorBindings } from "./bindings"
+@@ -15,6 +16,7 @@
+  report(error: unknown): void
+  title(title: string): void
+  status(pending: number, unsaved: number, failed: boolean): void
++ findBar: HTMLElement
+ }) {
+  return Effect.gen(function* () {
+   let library = yield* BrowserLibrary
+@@ -55,12 +57,12 @@
+    preferences: options.preferences, documents: options.documents, openDocument: options.openDocument,
+    isDrawing: () => false, openDrawing: unsupported, createLinkedDocument: async () => { throw new Error("Worker linked creation unavailable") },
+    canComment: () => false, canAttach: () => false, comments: () => [], report: options.report,
+-   change: bindings.change, undo: bindings.undo, select: bindings.resumeUndo, requestAsset: unsupported, attach: unsupported, command: unsupported, find: unsupported,
++   change: bindings.change, undo: bindings.undo, select: bindings.resumeUndo, requestAsset: unsupported, attach: unsupported, command: unsupported, find: query => openFind(query, false, { editor, bar: options.findBar }),
+   })
+   workerBootMark("route:Editor-configured")
+   host.replaceChildren(editor)
+   owner.attach(editor, queue, initialized.initial.source)
+-  yield* Effect.addFinalizer(() => Effect.sync(() => { owner.detach(editor); editor.remove() }))
++  yield* Effect.addFinalizer(() => Effect.sync(() => { owner.detach(editor); editor.remove(); options.findBar.hidden = true; options.findBar.replaceChildren() }))
+   yield* opened.changes.pipe(Stream.runForEach(state => Effect.sync(() => {
+    editor.setEditable(state.canWrite && owner.recovery() === undefined)
+    options.title(state.metadata?.title ?? "Untitled")

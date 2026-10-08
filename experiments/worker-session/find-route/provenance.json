@@ -1,0 +1,10 @@
+{
+	"base": "stable-copy outside actual-route derived72dd6f5+DocumentSessionfdbc snapshot reuse",
+	"sourceHashes": {
+		"src/client/document-app.ts": "4e5ef90497080b10e0484fc4710010cf56bccb25443f7afb46888ca5cc6695d6",
+		"src/client/worker-document/app-route.ts": "8205502d2937fbe95a23ef81d1f0f7429950ec71f6e191131381f8771a10a0dd",
+		"find-native.ts": "6840801223d4d7f36c42d389e750d6dadcc87fa6a3d877ef6f0d9f6ab593f64c"
+	},
+	"loadedResources": "Requested app/worker bodies refetched and matched candidate dist before native replacement.33 files.",
+	"execution": "parallel correctness CPU uncontrolled; no performance claims"
+}

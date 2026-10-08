@@ -1,0 +1,197 @@
+import * as Effect from "effect/Effect"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import * as Redacted from "effect/Redacted"
+import * as Schema from "effect/Schema"
+import { apiDocuments } from "./src/cli/api-documents"
+import { browser, evaluate } from "./tests/browser-driver"
+import { searchHighlightCount } from "./tests/browser-search-highlights"
+
+let configuration = Schema.decodeUnknownSync(
+	Schema.Struct({
+		origin: Schema.String,
+		keyFile: Schema.String,
+		scope: Schema.String,
+	}),
+)(
+	await Bun.file(
+		"/tmp/alkalye-interaction-matrix-smoke/oracle.private.json",
+	).json(),
+)
+let api = apiDocuments(
+	configuration.origin,
+	Redacted.make((await Bun.file(configuration.keyFile).text()).trim()),
+	configuration.scope,
+)
+let session = "worker-find-" + Date.now()
+let source = 'document.querySelector("alkalye-editor").source'
+let result: {
+	stage: string
+	gates: string[]
+	failure?: string
+	state?: unknown
+	initialSHA?: string
+	editedSHA?: string
+} = { stage: "setup", gates: [] }
+function run<A, E>(
+	work: Effect.Effect<A, E, import("effect/http/HttpClient").HttpClient>,
+) {
+	return Effect.runPromise(work.pipe(Effect.provide(FetchHttpClient.layer)))
+}
+function wait(expression: string) {
+	browser(session, "wait", "--fn", expression)
+}
+function accepted(document: string, expected: string) {
+	return run(
+		Effect.gen(function* () {
+			while (true) {
+				if ((yield* api.read(document)).content === expected) return
+				yield* Effect.sleep("100 millis")
+			}
+		}).pipe(Effect.timeout("30 seconds")),
+	)
+}
+try {
+	browser(
+		session,
+		"--profile",
+		"/tmp/alkalye-worker-app-find/profile-run",
+		"open",
+		configuration.origin + "/app",
+	)
+	evaluate(
+		session,
+		"(async()=>{for(let registration of await navigator.serviceWorker.getRegistrations())await registration.unregister();for(let name of await caches.keys())await caches.delete(name);return true})()",
+	)
+	browser(session, "open", configuration.origin + "/app")
+	let file = Bun.file("find-created.private.json")
+	let record = (await file.exists())
+		? Schema.decodeUnknownSync(Schema.Struct({ documentId: Schema.String }))(
+				await file.json(),
+			)
+		: await run(api.create("TOKEN 😀\r\nTOKEN Beta\n", "Worker find"))
+	if (!(await file.exists()))
+		await Bun.write(
+			file,
+			JSON.stringify({ documentId: record.documentId }) + "\n",
+		)
+	if (await Bun.file("find-attempt.private.json").exists())
+		throw Error("Recorded input attempt exists; refusing repeated mutation")
+	let initial = (await run(api.read(record.documentId))).content
+	let edited = initial.split("TOKEN").join("gamma")
+	result.initialSHA = new Bun.CryptoHasher("sha256")
+		.update(initial)
+		.digest("hex")
+	result.editedSHA = new Bun.CryptoHasher("sha256").update(edited).digest("hex")
+	wait(
+		"document.querySelector(" +
+			JSON.stringify('[data-library] [data-doc="' + record.documentId + '"]') +
+			")!==null",
+	)
+	browser(
+		session,
+		"open",
+		configuration.origin + "/app/doc/" + record.documentId + "?worker=1",
+	)
+	wait(
+		source +
+			"?.value===" +
+			JSON.stringify(initial) +
+			'&&!document.querySelector("#editor").readOnly&&document.querySelector("#app").getAttribute("aria-busy")!=="true"',
+	)
+	let resources = Schema.decodeUnknownSync(
+		Schema.Array(Schema.Struct({ url: Schema.String, sha256: Schema.String })),
+	)(
+		evaluate(
+			session,
+			'(async()=>{let urls=[...new Set(performance.getEntriesByType("resource").map(entry=>entry.name).filter(name=>new URL(name).pathname.endsWith(".js")))];urls.push(new URL("/worker-editor.js",location.href).href);return await Promise.all([...new Set(urls)].map(async url=>{let response=await fetch(url,{cache:"no-store"});if(!response.ok)throw Error("Script fetch failed");let hash=await crypto.subtle.digest("SHA-256",await response.arrayBuffer());return {url,sha256:Array.from(new Uint8Array(hash),value=>value.toString(16).padStart(2,"0")).join("")}}))})()',
+		),
+	)
+	for (let resource of resources) {
+		let url = new URL(resource.url)
+		if (
+			url.origin !== configuration.origin ||
+			new Bun.CryptoHasher("sha256")
+				.update(await Bun.file("dist" + url.pathname).arrayBuffer())
+				.digest("hex") !== resource.sha256
+		)
+			throw Error("Script differs from frozen graph")
+	}
+	await Bun.write(
+		"find-resources.json",
+		JSON.stringify(resources, null, 2) + "\n",
+	)
+	result.stage = "search"
+	evaluate(session, source + ".focus()")
+	browser(session, "press", "Control+f")
+	browser(session, "fill", "#find-text", "TOKEN")
+	wait(searchHighlightCount + "===2")
+	browser(session, "focus", "#find-text")
+	browser(session, "press", "Enter")
+	wait('document.querySelectorAll(".search-match[data-active]").length===1')
+	result.gates.push("native search and next")
+	browser(session, "click", '[data-find-action="toggle-replace"]')
+	browser(session, "fill", "#replace-text", "gamma")
+	await Bun.write(
+		"find-attempt.private.json",
+		JSON.stringify({
+			documentId: record.documentId,
+			time: Date.now(),
+			expectedSHA: result.editedSHA,
+		}) + "\n",
+	)
+	result.stage = "replace"
+	browser(session, "focus", "#replace-all")
+	browser(session, "press", "Enter")
+	wait(
+		source +
+			".value===" +
+			JSON.stringify(edited) +
+			'&&!document.querySelector("#editor").readOnly',
+	)
+	await accepted(record.documentId, edited)
+	result.gates.push("native replace exact accepted")
+	browser(session, "focus", "#close-find")
+	browser(session, "press", "Enter")
+	wait(
+		'document.querySelector("#find-bar").hidden&&' +
+			searchHighlightCount +
+			"===0",
+	)
+	result.stage = "undo"
+	browser(session, "press", "Control+z")
+	wait(
+		source +
+			".value===" +
+			JSON.stringify(initial) +
+			'&&!document.querySelector("#editor").readOnly',
+	)
+	await accepted(record.documentId, initial)
+	result.gates.push("native Undo exact accepted")
+	browser(session, "press", "Control+Shift+z")
+	wait(source + ".value===" + JSON.stringify(edited))
+	await accepted(record.documentId, edited)
+	browser(session, "reload")
+	wait(
+		source +
+			"?.value===" +
+			JSON.stringify(edited) +
+			'&&!document.querySelector("#editor").readOnly',
+	)
+	result.gates.push("native Redo and durable reload")
+	result.stage = "terminal"
+} catch (error) {
+	result.failure = String(error)
+	process.exitCode = 1
+	try {
+		result.state = evaluate(
+			session,
+			"({length:" +
+				source +
+				'?.value.length,readOnly:document.querySelector("#editor")?.readOnly,alerts:[...document.querySelectorAll("[role=alert]")].map(value=>value.textContent)})',
+		)
+	} catch {}
+} finally {
+	await Bun.write("find-results.json", JSON.stringify(result, null, 2) + "\n")
+	browser(session, "close")
+	console.log(JSON.stringify(result))
+}

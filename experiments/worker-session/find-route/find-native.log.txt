@@ -1,0 +1,1 @@
+{"stage":"terminal","gates":["native search and next","native replace exact accepted","native Undo exact accepted","native Redo and durable reload"],"initialSHA":"437a5bd9b32cd14e545187f12198b2e80984781e63ca62f497577baca0a11266","editedSHA":"238a46adef6a795b0c8e20100d657918355c1d6804a6632bf0df215f59cedddc"}

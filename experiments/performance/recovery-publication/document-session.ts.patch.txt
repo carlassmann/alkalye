@@ -1,0 +1,24 @@
+--- a/src/shared/document-session.ts
++++ b/src/shared/document-session.ts
+@@ -357,6 +357,7 @@
+ 					else yield* persistUnlocked({ kind: "proposed", action })
+ 					yield* Queue.take(unsaved)
+ 					projection.removeDraft(action.id)
++					publishDraftStatus()
+ 				}
+ 			},
+ 		).pipe(
+@@ -762,6 +763,13 @@
+ 			)
+ 		}
+ 
++		function publishDraftStatus() {
++			drafts.update()
++			// Durability changed without changing the document's content version.
++			Effect.runSync(
++				SubscriptionRef.set(revision, SubscriptionRef.getUnsafe(revision)),
++			)
++		}
+ 		function advanceView() {
+ 			Effect.runSync(SubscriptionRef.update(revision, current => current + 1))
+ 		}

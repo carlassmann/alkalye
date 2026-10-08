@@ -1,0 +1,13 @@
+{
+	"base_commit": "059da17",
+	"sources": {
+		"document-recovery.ts": "9812769552a628c9b501b173ab9ae1a7d0a8441086c66bd1c6363d7eb44d1b8f",
+		"document-session.ts": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+		"document-save-lifecycle.test.ts": "7b103dd415fadc584c00cb8354a8c8b37441d06b988ba2a8bc8794649ccd3caf"
+	},
+	"strict": "final-types.log PASS before whitespace formatting",
+	"public": "final-public-tests.log 15PASS180assertions",
+	"browser": "browser-api.log EXIT0, exact321 fixture assertion count",
+	"format": "Repository .prettierrc applied after proof; semantic diff unchanged, root full check pending",
+	"reviews": "11359 prior protection-only HOLD; 85868 terminal0 no source blockers. Native hidden-after-commit DOM Saved/beforeunload exact gate remains distinct from SQLite+existing321 browser corpus."
+}

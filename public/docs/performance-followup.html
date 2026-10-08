@@ -1703,9 +1703,31 @@
 			produced six notifications before the change and four afterward. Document
 			refreshes in the 100ms following Undo completion fell from four to three.
 			This single pair measures redundant work, not a latency or frame-rate
-			improvement. Save-status notifications remain a separate candidate.
-			Evidence:
+			improvement. Evidence:
 			<code>experiments/performance/library-scalar-publication</code>.
+		</p>
+		<h2>Save notifications follow durable work</h2>
+		<p>
+			Healthy recovery attempts no longer publish unchanged failure state. A
+			completed draft save explicitly notifies subscribers without changing the
+			content version. An integration test commits an edit to SQLite, verifies
+			it through an independent reader, interrupts the saving fiber, then saves
+			on a hidden-page signal. It checks exact offline reopening, no duplicate
+			entries, Saved notifications and draft protection. Real failure and retry
+			still publish their status changes.
+		</p>
+		<p>
+			Full checks passed: 706 tests plus browser journeys. The separate browser
+			module corpus passed 321 assertions. The specific production DOM
+			hidden-after-commit case remains untested; no speedup is claimed yet.
+			Evidence: <code>experiments/performance/recovery-publication</code>.
+		</p>
+		<p>
+			The worker prototype now uses the existing Find component. Native search
+			highlights, next match, Replace All, close, Undo, Redo and reload passed
+			with independent server acceptance. Regex, selection-only and navigation
+			cleanup still need checks. This remains outside production. Evidence:
+			<code>experiments/worker-session/find-route</code>.
 		</p>
 		<footer>written with gpt-6 in codex</footer>
 	</body>
