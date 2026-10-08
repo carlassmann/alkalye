@@ -1,0 +1,11 @@
+{
+	"completion": [
+		{ "name": "undo:completion-refresh-start", "time": 1513.800000011921 },
+		{ "name": "undo:completion-refresh-end", "time": 1513.800000011921 }
+	],
+	"events": [
+		{ "phase": "before-remove", "time": 1500.199999988079, "trusted": true },
+		{ "connected": false, "phase": "removed", "time": 1500.9000000357628 }
+	],
+	"sourceAssignments": []
+}

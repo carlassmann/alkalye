@@ -1,0 +1,30 @@
+{
+	"runtime": "passed",
+	"baselineFileSha256": "a1809e1fb8d620bb7e53f6bf23c1eec2a810abce73608bfb1e7a87ca72d9509f",
+	"candidateFileSha256": "ac89bddde896a83ad48b6444b6ba8fa5ab3f83a30531ab824a85cad150b613b4",
+	"scope": "finite actual app 2 KiB Undo/Redo, native/menu/disposal, no broad matrix",
+	"baselineCommit": "e7cc1367b9060136fe81b1a7950de1e0441939ec",
+	"candidateDelta": "candidate.patch",
+	"pairs": 3,
+	"phaseOrder": [
+		"baseline-0",
+		"candidate-0",
+		"candidate-1",
+		"baseline-1",
+		"baseline-2",
+		"candidate-2"
+	],
+	"sourceCharacters": 2048,
+	"sourceNewlines": 74,
+	"sourceSha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+	"rawTraces": "outside Git",
+	"privateFixtures": "not included",
+	"reproductionSourceSha256": {
+		"candidate.patch": "5b30b0451a8d56f658ed341d3d22d4a72a7471c152fa6a939989a07b3788fb50",
+		"runner.ts.txt": "be366e57b04b04e4f394e12180c6e735d4ca169e2d5670c305a5b105ee669b4d",
+		"lifecycle.js.txt": "f1772a3f4640dd96ebe4e08409edff840b7ad0e2fd8595a92613c0914a3af1b9",
+		"prepare.ts.txt": "e2f5e90218b9abf0e8128b161a9fa4943fc76a64c7ab58357bb92e1ec4b89e1c",
+		"run-pairs.js.txt": "6c3f9feb119d853dc5a4f1b0d1aeb1325a27a9794843b4dc9adfa32f896094d8",
+		"timeline.patch": "41ce5d5e35581646742658fd3b693e5967f308a763f35a1cdea05ad079b9bc13"
+	}
+}

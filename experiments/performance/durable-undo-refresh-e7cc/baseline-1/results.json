@@ -1,0 +1,1448 @@
+[
+	{
+		"version": "baseline",
+		"commit": "e7cc1367b9060136fe81b1a7950de1e0441939ec",
+		"cell": "small-middle",
+		"trial": 0,
+		"status": "complete",
+		"trace": "/tmp/alkalye-durable-undo-refresh/baseline-1/results/baseline-small-middle-0.trace.json",
+		"observation": {
+			"network": {
+				"openedSockets": ["/api/live"],
+				"pollRequests": 0,
+				"received": 3,
+				"sends": 0
+			},
+			"probe": {
+				"end": 4418.600000023842,
+				"eventTiming": [
+					{
+						"duration": 16,
+						"name": "keydown",
+						"processingEnd": 1417.699999988079,
+						"processingStart": 1417.100000023842,
+						"startTime": 1416.899999976158
+					},
+					{
+						"duration": 16,
+						"name": "keypress",
+						"processingEnd": 1420.300000011921,
+						"processingStart": 1417.699999988079,
+						"startTime": 1416.899999976158
+					},
+					{
+						"duration": 16,
+						"name": "beforeinput",
+						"processingEnd": 1418,
+						"processingStart": 1417.899999976158,
+						"startTime": 1417.800000011921
+					},
+					{
+						"duration": 16,
+						"name": "input",
+						"processingEnd": 1420.300000011921,
+						"processingStart": 1418.300000011921,
+						"startTime": 1418.199999988079
+					},
+					{
+						"duration": 16,
+						"name": "keyup",
+						"processingEnd": 1420.600000023842,
+						"processingStart": 1420.600000023842,
+						"startTime": 1420.5
+					}
+				],
+				"events": [
+					{
+						"ctrl": false,
+						"eventTimestamp": 1416.899999976158,
+						"key": "x",
+						"meta": false,
+						"shift": false,
+						"time": 1417.399999976158,
+						"type": "keydown"
+					},
+					{
+						"eventTimestamp": 1417.800000011921,
+						"time": 1417.899999976158,
+						"type": "beforeinput"
+					}
+				],
+				"frames": [
+					16.700000000000045, 16.700000000000045, 16.699999999999818,
+					16.600000000000136, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.700000000000045, 16.699999999999818,
+					16.600000000000136, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045, 16.699999999999818,
+					16.600000000000136, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.59999999999991, 16.700000000000045, 16.700000000000045,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.59999999999991, 16.700000000000273, 16.59999999999991,
+					16.799999999999727, 16.600000000000364, 16.59999999999991,
+					16.699999999999818, 16.700000000000273, 16.699999999999818,
+					16.59999999999991, 16.800000000000182, 16.59999999999991,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.59999999999991, 16.700000000000273, 16.699999999999818,
+					16.59999999999991, 16.700000000000273, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.59999999999991,
+					16.699999999999818, 16.700000000000273, 16.59999999999991,
+					16.699999999999818, 16.700000000000273, 16.699999999999818,
+					16.699999999999818, 16.5, 16.800000000000182, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.59999999999991, 16.699999999999818,
+					16.700000000000273, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.59999999999991, 16.699999999999818,
+					16.59999999999991, 16.800000000000182, 16.699999999999818, 16.5,
+					16.800000000000182, 16.59999999999991, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.799999999999727, 16.600000000000364,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.599999999999454, 16.700000000000728, 16.699999999999818,
+					16.599999999999454, 16.700000000000728, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.599999999999454,
+					16.699999999999818, 16.700000000000728, 16.699999999999818,
+					16.599999999999454, 16.700000000000728, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.599999999999454, 16.700000000000728
+				],
+				"heapEnd": 16460504,
+				"heapStart": 15922831,
+				"networkAtEnd": {
+					"pollRequests": 0,
+					"received": 3,
+					"sends": 0
+				},
+				"networkAtStart": {
+					"pollRequests": 0,
+					"received": 1,
+					"sends": 0
+				},
+				"ready": 1430.300000011921,
+				"start": 1417.399999976158
+			},
+			"scripts": [
+				{
+					"decoded": 253623,
+					"path": "/app.js"
+				},
+				{
+					"decoded": 2036,
+					"path": "/chunks/document-app-cpyrabzv.js"
+				},
+				{
+					"decoded": 122386,
+					"path": "/chunks/document-app-z8yna5gc.js"
+				},
+				{
+					"decoded": 1330,
+					"path": "/chunks/document-app-zzda0gnp.js"
+				},
+				{
+					"decoded": 2798,
+					"path": "/chunks/document-app-m2qx4cqf.js"
+				},
+				{
+					"decoded": 7968,
+					"path": "/chunks/document-app-fdca9e8a.js"
+				},
+				{
+					"decoded": 3894,
+					"path": "/chunks/document-app-njm9xdrd.js"
+				},
+				{
+					"decoded": 16754,
+					"path": "/chunks/document-app-kyjabmpr.js"
+				},
+				{
+					"decoded": 617,
+					"path": "/chunks/document-app-4bdv4e1h.js"
+				},
+				{
+					"decoded": 14375,
+					"path": "/chunks/document-app-zsc4xtxg.js"
+				},
+				{
+					"decoded": 2725,
+					"path": "/chunks/document-app-dw31ncjv.js"
+				},
+				{
+					"decoded": 901,
+					"path": "/chunks/document-app-0fyrxqjt.js"
+				},
+				{
+					"decoded": 1656,
+					"path": "/chunks/document-app-zc37nkfy.js"
+				},
+				{
+					"decoded": 5735,
+					"path": "/chunks/document-app-wnaem0wt.js"
+				},
+				{
+					"decoded": 7957,
+					"path": "/chunks/document-app-022w94n0.js"
+				},
+				{
+					"decoded": 6070,
+					"path": "/chunks/document-app-ef2e4sa0.js"
+				},
+				{
+					"decoded": 765,
+					"path": "/chunks/document-app-5w0555xf.js"
+				},
+				{
+					"decoded": 24137,
+					"path": "/chunks/document-app-xryb03fv.js"
+				},
+				{
+					"decoded": 11389,
+					"path": "/chunks/document-app-7es742rc.js"
+				},
+				{
+					"decoded": 212993,
+					"path": "/chunks/document-app-1y6dkaw7.js"
+				},
+				{
+					"decoded": 20425,
+					"path": "/chunks/document-app-2d5x6ewf.js"
+				},
+				{
+					"decoded": 2412,
+					"path": "/chunks/document-app-jxg7vknv.js"
+				},
+				{
+					"decoded": 2354,
+					"path": "/chunks/document-app-vk38pqtz.js"
+				},
+				{
+					"decoded": 2075,
+					"path": "/chunks/document-app-1dxag10p.js"
+				},
+				{
+					"decoded": 75938,
+					"path": "/chunks/document-app-kjpwy0e1.js"
+				},
+				{
+					"decoded": 14516,
+					"path": "/chunks/document-app-3fnhg1mw.js"
+				},
+				{
+					"decoded": 713,
+					"path": "/chunks/document-app-kkm66nr6.js"
+				},
+				{
+					"decoded": 27429,
+					"path": "/chunks/document-app-twgbb54m.js"
+				},
+				{
+					"decoded": 272,
+					"path": "/chunks/document-app-nz4nbhyt.js"
+				},
+				{
+					"decoded": 41742,
+					"path": "/chunks/document-app-qpn16pt3.js"
+				},
+				{
+					"decoded": 1109,
+					"path": "/chunks/document-app-bxa2bqfs.js"
+				},
+				{
+					"decoded": 174723,
+					"path": "/chunks/document-app-cksk812g.js"
+				},
+				{
+					"decoded": 20324,
+					"path": "/chunks/document-worker-stats-339x9rb5.js"
+				},
+				{
+					"decoded": 155969,
+					"path": "/document-worker.js"
+				},
+				{
+					"decoded": 2036,
+					"path": "/chunks/document-app-cpyrabzv.js"
+				},
+				{
+					"decoded": 2798,
+					"path": "/chunks/document-app-m2qx4cqf.js"
+				},
+				{
+					"decoded": 122386,
+					"path": "/chunks/document-app-z8yna5gc.js"
+				},
+				{
+					"decoded": 253623,
+					"path": "/app.js"
+				},
+				{
+					"decoded": 1330,
+					"path": "/chunks/document-app-zzda0gnp.js"
+				},
+				{
+					"decoded": 7968,
+					"path": "/chunks/document-app-fdca9e8a.js"
+				},
+				{
+					"decoded": 617,
+					"path": "/chunks/document-app-4bdv4e1h.js"
+				},
+				{
+					"decoded": 3894,
+					"path": "/chunks/document-app-njm9xdrd.js"
+				},
+				{
+					"decoded": 16754,
+					"path": "/chunks/document-app-kyjabmpr.js"
+				},
+				{
+					"decoded": 901,
+					"path": "/chunks/document-app-0fyrxqjt.js"
+				},
+				{
+					"decoded": 14375,
+					"path": "/chunks/document-app-zsc4xtxg.js"
+				},
+				{
+					"decoded": 2725,
+					"path": "/chunks/document-app-dw31ncjv.js"
+				},
+				{
+					"decoded": 1656,
+					"path": "/chunks/document-app-zc37nkfy.js"
+				},
+				{
+					"decoded": 5735,
+					"path": "/chunks/document-app-wnaem0wt.js"
+				},
+				{
+					"decoded": 7957,
+					"path": "/chunks/document-app-022w94n0.js"
+				},
+				{
+					"decoded": 6070,
+					"path": "/chunks/document-app-ef2e4sa0.js"
+				},
+				{
+					"decoded": 765,
+					"path": "/chunks/document-app-5w0555xf.js"
+				},
+				{
+					"decoded": 212993,
+					"path": "/chunks/document-app-1y6dkaw7.js"
+				},
+				{
+					"decoded": 24137,
+					"path": "/chunks/document-app-xryb03fv.js"
+				},
+				{
+					"decoded": 11389,
+					"path": "/chunks/document-app-7es742rc.js"
+				},
+				{
+					"decoded": 20425,
+					"path": "/chunks/document-app-2d5x6ewf.js"
+				},
+				{
+					"decoded": 75938,
+					"path": "/chunks/document-app-kjpwy0e1.js"
+				},
+				{
+					"decoded": 2412,
+					"path": "/chunks/document-app-jxg7vknv.js"
+				},
+				{
+					"decoded": 2354,
+					"path": "/chunks/document-app-vk38pqtz.js"
+				},
+				{
+					"decoded": 2075,
+					"path": "/chunks/document-app-1dxag10p.js"
+				},
+				{
+					"decoded": 713,
+					"path": "/chunks/document-app-kkm66nr6.js"
+				},
+				{
+					"decoded": 27429,
+					"path": "/chunks/document-app-twgbb54m.js"
+				},
+				{
+					"decoded": 14516,
+					"path": "/chunks/document-app-3fnhg1mw.js"
+				},
+				{
+					"decoded": 41742,
+					"path": "/chunks/document-app-qpn16pt3.js"
+				},
+				{
+					"decoded": 272,
+					"path": "/chunks/document-app-nz4nbhyt.js"
+				},
+				{
+					"decoded": 174723,
+					"path": "/chunks/document-app-cksk812g.js"
+				},
+				{
+					"decoded": 1109,
+					"path": "/chunks/document-app-bxa2bqfs.js"
+				},
+				{
+					"decoded": 20324,
+					"path": "/chunks/document-worker-stats-339x9rb5.js"
+				},
+				{
+					"decoded": 155969,
+					"path": "/document-worker.js"
+				}
+			],
+			"sourceSelection": {
+				"start": 1025,
+				"end": 1025
+			}
+		},
+		"undoTrace": "/tmp/alkalye-durable-undo-refresh/baseline-1/results/baseline-small-middle-0-undo.trace.json",
+		"history": {
+			"mode": "advancing",
+			"acceptedPairsThisRunBefore": 0,
+			"declaredPriorPairs": 4
+		},
+		"sessionDigests": [],
+		"undoObservation": {
+			"network": {
+				"openedSockets": ["/api/live"],
+				"pollRequests": 0,
+				"received": 4,
+				"sends": 0
+			},
+			"probe": {
+				"end": 7919.699999988079,
+				"eventTiming": [
+					{
+						"duration": 16,
+						"name": "keydown",
+						"processingEnd": 4918.699999988079,
+						"processingStart": 4918.199999988079,
+						"startTime": 4918.100000023842
+					}
+				],
+				"events": [
+					{
+						"ctrl": false,
+						"eventTimestamp": 4918.100000023842,
+						"key": "z",
+						"meta": true,
+						"shift": false,
+						"time": 4918.300000011921,
+						"type": "keydown"
+					}
+				],
+				"frames": [
+					16.600000000000364, 16.800000000000182, 16.599999999999454,
+					16.700000000000728, 16.599999999999454, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.700000000000728, 16.699999999999818, 16.599999999999454,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.700000000000728, 16.599999999999454, 16.699999999999818,
+					16.700000000000728, 16.699999999999818, 16.5, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.800000000000182,
+					16.599999999999454, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.699999999999818, 16.700000000000728,
+					16.599999999999454, 16.699999999999818, 16.700000000000728,
+					16.699999999999818, 16.599999999999454, 16.700000000000728,
+					16.599999999999454, 16.699999999999818, 16.700000000000728,
+					16.599999999999454, 16.699999999999818, 16.700000000000728,
+					16.599999999999454, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.699999999999818, 16.700000000000728,
+					16.599999999999454, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.700000000000728,
+					16.599999999999454, 16.699999999999818, 16.700000000000728,
+					16.599999999999454, 16.699999999999818, 16.600000000000364,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.799999999999272, 16.700000000000728,
+					16.599999999999454, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.600000000000364, 16.799999999999272, 16.5, 16.700000000000728,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.599999999999454, 16.800000000000182,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.600000000000364,
+					16.799999999999272, 16.600000000000364, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.599999999999454, 16.700000000000728,
+					16.699999999999818, 16.599999999999454, 16.700000000000728,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.599999999999454, 16.700000000000728,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.599999999999454, 16.800000000000182,
+					16.600000000000364, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.599999999999454, 16.700000000000728,
+					16.699999999999818, 16.699999999999818
+				],
+				"heapEnd": 17499661,
+				"heapStart": 16532653,
+				"networkAtEnd": {
+					"pollRequests": 0,
+					"received": 4,
+					"sends": 0
+				},
+				"networkAtStart": {
+					"pollRequests": 0,
+					"received": 3,
+					"sends": 0
+				},
+				"ready": 4962.600000023842,
+				"start": 4918.300000011921
+			},
+			"timeline": [
+				{
+					"detail": null,
+					"name": "interaction:start",
+					"time": 4918.399999976158
+				},
+				{
+					"detail": null,
+					"name": "undo:requested",
+					"time": 4918.399999976158
+				},
+				{
+					"detail": null,
+					"name": "propose:gate-acquired",
+					"time": 4918.5
+				},
+				{
+					"detail": null,
+					"name": "propose:flush-start",
+					"time": 4918.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4918.600000023842
+				},
+				{
+					"detail": null,
+					"name": "propose:flush-end",
+					"time": 4918.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 4929.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 4929.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4930.399999976158
+				},
+				{
+					"detail": null,
+					"name": "propose:replay-end",
+					"time": 4930.399999976158
+				},
+				{
+					"detail": null,
+					"name": "propose:actor-start",
+					"time": 4930.5
+				},
+				{
+					"detail": null,
+					"name": "propose:actor-end",
+					"time": 4930.5
+				},
+				{
+					"detail": null,
+					"name": "propose:prepared",
+					"time": 4933.5
+				},
+				{
+					"detail": null,
+					"name": "propose:persist-start",
+					"time": 4933.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4934.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4934.800000011921
+				},
+				{
+					"detail": null,
+					"name": "session:revision",
+					"time": 4936.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4936.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4936.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4936.399999976158
+				},
+				{
+					"detail": null,
+					"name": "propose:persist-end",
+					"time": 4936.399999976158
+				},
+				{
+					"detail": null,
+					"name": "undo:completion-refresh-start",
+					"time": 4936.5
+				},
+				{
+					"detail": null,
+					"name": "undo:completion-refresh-end",
+					"time": 4936.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4936.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4936.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4936.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4945.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4945.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 4946.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 4946.5
+				},
+				{
+					"detail": {
+						"characters": 2048
+					},
+					"name": "editor:source-assigned",
+					"time": 4946.899999976158
+				},
+				{
+					"detail": {
+						"characters": 2048
+					},
+					"name": "editor:viewport-rendered",
+					"time": 4948
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4950.100000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4952
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4952
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4952.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4953.100000023842
+				},
+				{
+					"detail": null,
+					"name": "session:revision",
+					"time": 4954.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4954.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4954.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4954.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4955.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4955.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4956.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4958
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4958.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4958.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4958.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4958.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4959
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4961.100000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4961.100000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4961.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4961.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4962
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4962.100000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4962.100000023842
+				},
+				{
+					"detail": null,
+					"name": "interaction:ready",
+					"time": 4962.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 4962.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 4963
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5456.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5456.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5458
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5458.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5460.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 5462.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 5462.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5471.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5471.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5471.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 5479.5
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 5479.5
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 6079.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 6114.100000023842
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 6129.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 6129.5
+				},
+				{
+					"detail": null,
+					"name": "interaction:end",
+					"time": 7919.699999988079
+				}
+			]
+		},
+		"redoObservation": {
+			"network": {
+				"openedSockets": ["/api/live"],
+				"pollRequests": 0,
+				"received": 6,
+				"sends": 0
+			},
+			"probe": {
+				"end": 11371.69999998808,
+				"eventTiming": [],
+				"events": [
+					{
+						"ctrl": false,
+						"eventTimestamp": 8370.399999976158,
+						"key": "z",
+						"meta": true,
+						"shift": true,
+						"time": 8370.600000023842,
+						"type": "keydown"
+					}
+				],
+				"frames": [
+					16.600000000000364, 16.700000000000728, 16.600000000000364,
+					16.69999999999891, 16.700000000000728, 16.69999999999891,
+					16.700000000000728, 16.600000000000364, 16.600000000000364,
+					16.799999999999272, 16.600000000000364, 16.600000000000364,
+					16.799999999999272, 16.600000000000364, 16.69999999999891,
+					16.600000000000364, 16.700000000000728, 16.600000000000364,
+					16.69999999999891, 16.600000000000364, 16.700000000000728,
+					16.69999999999891, 16.700000000000728, 16.600000000000364,
+					16.69999999999891, 16.700000000000728, 16.69999999999891,
+					16.700000000000728, 16.600000000000364, 16.69999999999891,
+					16.600000000000364, 16.700000000000728, 16.69999999999891,
+					16.600000000000364, 16.700000000000728, 16.600000000000364,
+					16.69999999999891, 16.700000000000728, 16.69999999999891,
+					16.600000000000364, 16.600000000000364, 16.799999999999272,
+					16.600000000000364, 16.700000000000728, 16.600000000000364,
+					16.69999999999891, 16.600000000000364, 16.700000000000728,
+					16.69999999999891, 16.700000000000728, 16.600000000000364,
+					16.69999999999891, 16.600000000000364, 16.799999999999272,
+					16.600000000000364, 16.700000000000728, 16.600000000000364,
+					16.69999999999891, 16.700000000000728, 16.600000000000364,
+					16.69999999999891, 16.700000000000728, 16.600000000000364,
+					16.599999999998545, 16.700000000000728, 16.700000000000728,
+					16.69999999999891, 16.600000000000364, 16.700000000000728,
+					16.69999999999891, 16.700000000000728, 16.600000000000364,
+					16.599999999998545, 16.80000000000109, 16.69999999999891,
+					16.600000000000364, 16.700000000000728, 16.600000000000364,
+					16.69999999999891, 16.700000000000728, 16.600000000000364,
+					16.69999999999891, 16.600000000000364, 16.700000000000728,
+					16.69999999999891, 16.700000000000728, 16.600000000000364,
+					16.69999999999891, 16.700000000000728, 16.600000000000364,
+					16.599999999998545, 16.700000000000728, 16.700000000000728,
+					16.599999999998545, 16.700000000000728, 16.600000000000364,
+					16.799999999999272, 16.600000000000364, 16.700000000000728,
+					16.69999999999891, 16.700000000000728, 16.600000000000364,
+					16.599999999998545, 16.700000000000728, 16.700000000000728,
+					16.69999999999891, 16.700000000000728, 16.600000000000364,
+					16.599999999998545, 16.700000000000728, 16.700000000000728,
+					16.69999999999891, 16.700000000000728, 16.600000000000364,
+					16.69999999999891, 16.600000000000364, 16.600000000000364,
+					16.799999999999272, 16.600000000000364, 16.600000000000364,
+					16.799999999999272, 16.700000000000728, 16.5, 16.69999999999891,
+					16.700000000000728, 16.700000000000728, 16.69999999999891,
+					16.600000000000364, 16.700000000000728, 16.69999999999891,
+					16.600000000000364, 16.700000000000728, 16.69999999999891,
+					16.600000000000364, 16.600000000000364, 16.799999999999272,
+					16.600000000000364, 16.600000000000364, 16.69999999999891,
+					16.700000000000728, 16.700000000000728, 16.599999999998545,
+					16.700000000000728, 16.600000000000364, 16.69999999999891,
+					16.700000000000728, 16.600000000000364, 16.69999999999891,
+					16.700000000000728, 16.700000000000728, 16.599999999998545,
+					16.700000000000728, 16.600000000000364, 16.69999999999891,
+					16.700000000000728, 16.700000000000728, 16.599999999998545,
+					16.700000000000728, 16.700000000000728, 16.599999999998545,
+					16.600000000000364, 16.80000000000109, 16.599999999998545,
+					16.700000000000728, 16.600000000000364, 16.69999999999891,
+					16.700000000000728, 16.700000000000728, 16.69999999999891,
+					16.600000000000364, 16.600000000000364, 16.69999999999891,
+					16.700000000000728, 16.600000000000364, 16.799999999999272,
+					16.600000000000364, 16.700000000000728, 16.599999999998545,
+					16.600000000000364, 16.700000000000728, 16.69999999999891
+				],
+				"heapEnd": 18217656,
+				"heapStart": 18007209,
+				"networkAtEnd": {
+					"pollRequests": 0,
+					"received": 6,
+					"sends": 0
+				},
+				"networkAtStart": {
+					"pollRequests": 0,
+					"received": 4,
+					"sends": 0
+				},
+				"ready": 8412.800000011921,
+				"start": 8370.600000023842
+			},
+			"timeline": [
+				{
+					"detail": null,
+					"name": "interaction:start",
+					"time": 8370.600000023842
+				},
+				{
+					"detail": null,
+					"name": "undo:requested",
+					"time": 8370.699999988079
+				},
+				{
+					"detail": null,
+					"name": "propose:gate-acquired",
+					"time": 8370.800000011921
+				},
+				{
+					"detail": null,
+					"name": "propose:flush-start",
+					"time": 8370.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8370.800000011921
+				},
+				{
+					"detail": null,
+					"name": "propose:flush-end",
+					"time": 8370.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 8379.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 8379.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8380.399999976158
+				},
+				{
+					"detail": null,
+					"name": "propose:replay-end",
+					"time": 8380.399999976158
+				},
+				{
+					"detail": null,
+					"name": "propose:actor-start",
+					"time": 8380.399999976158
+				},
+				{
+					"detail": null,
+					"name": "propose:actor-end",
+					"time": 8380.5
+				},
+				{
+					"detail": null,
+					"name": "propose:prepared",
+					"time": 8381.5
+				},
+				{
+					"detail": null,
+					"name": "propose:persist-start",
+					"time": 8381.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8382.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8382.800000011921
+				},
+				{
+					"detail": null,
+					"name": "session:revision",
+					"time": 8384.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8384.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8384.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8384.800000011921
+				},
+				{
+					"detail": null,
+					"name": "propose:persist-end",
+					"time": 8384.800000011921
+				},
+				{
+					"detail": null,
+					"name": "undo:completion-refresh-start",
+					"time": 8384.800000011921
+				},
+				{
+					"detail": null,
+					"name": "undo:completion-refresh-end",
+					"time": 8384.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8384.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8385.100000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8385.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8392.100000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8392.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8392.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8394.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8394.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8395.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8395.5
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 8396
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 8396.300000011921
+				},
+				{
+					"detail": {
+						"characters": 2049
+					},
+					"name": "editor:source-assigned",
+					"time": 8396.5
+				},
+				{
+					"detail": {
+						"characters": 2049
+					},
+					"name": "editor:viewport-rendered",
+					"time": 8397.600000023842
+				},
+				{
+					"detail": null,
+					"name": "session:revision",
+					"time": 8399.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8399.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8399.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8399.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8400
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8400.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8401.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8402.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8403.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8403.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8403.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8403.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8403.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8406.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8406.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8406.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8407
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8407.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8407.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8407.399999976158
+				},
+				{
+					"detail": null,
+					"name": "interaction:ready",
+					"time": 8412.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 8413
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 8413.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8901.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8901.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8902.600000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8903.100000023842
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8904.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8910.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8910.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8910.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 8912.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 8912.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 9079.69999998808
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 10116.5
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 10129.80000001192
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 10129.80000001192
+				},
+				{
+					"detail": null,
+					"name": "interaction:end",
+					"time": 11371.69999998808
+				}
+			]
+		},
+		"redoReceipt": {
+			"sha256": "a0079fbe7b0025cb7a9c653264283d7fbad4a62b90fcf41ab19fdbd79500b179",
+			"characters": 2049,
+			"phasesLog": "oracle-phases-3.json",
+			"journalPosition": 14,
+			"journalIdentitySha256": "8e9ed33bbdc20b155dd95b8e8ac23f4ff9d39a477eb966deb1bce4ba0369e35a"
+		},
+		"redoTrace": "/tmp/alkalye-durable-undo-refresh/baseline-1/results/baseline-small-middle-0-redo.trace.json",
+		"seedReceipt": {
+			"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+			"characters": 2048,
+			"phasesLog": "oracle-phases-0.json",
+			"journalPosition": 11,
+			"journalIdentitySha256": "8e9ed33bbdc20b155dd95b8e8ac23f4ff9d39a477eb966deb1bce4ba0369e35a"
+		},
+		"editedReceipt": {
+			"sha256": "a0079fbe7b0025cb7a9c653264283d7fbad4a62b90fcf41ab19fdbd79500b179",
+			"characters": 2049,
+			"phasesLog": "oracle-phases-1.json",
+			"journalPosition": 12,
+			"journalIdentitySha256": "8e9ed33bbdc20b155dd95b8e8ac23f4ff9d39a477eb966deb1bce4ba0369e35a"
+		},
+		"undoReceipt": {
+			"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+			"characters": 2048,
+			"phasesLog": "oracle-phases-2.json",
+			"journalPosition": 13,
+			"journalIdentitySha256": "8e9ed33bbdc20b155dd95b8e8ac23f4ff9d39a477eb966deb1bce4ba0369e35a"
+		},
+		"fixture": {
+			"characters": 2048,
+			"bytes": 2048,
+			"realNewlines": 74,
+			"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2"
+		}
+	}
+]

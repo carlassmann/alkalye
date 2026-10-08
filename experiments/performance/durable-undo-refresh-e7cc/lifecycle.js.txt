@@ -1,0 +1,31 @@
+import { cp, rm } from "node:fs/promises"
+import { join } from "node:path"
+import { browser, evaluate, wait } from "./tests/browser-driver"
+let root="/tmp/alkalye-durable-undo-refresh",manifest=await Bun.file(root+"/gate0/manifest.private.json").json(),v=manifest.versions[0],fixture=v.fixtures[0]
+let base=await Bun.file(fixture.sourceFile).text(),position=Math.floor(base.length/2),edited=base.slice(0,position)+"y"+base.slice(position)
+let profile=root+"/lifecycle-profile",session="undo-refresh-lifecycle-"+Date.now(),checks=[]
+function check(value,name){if(!value)throw Error(name);checks.push(name)}
+async function accepted(source,phase){let sha=Bun.CryptoHasher.hash("sha256",source,"hex"),child=Bun.spawn(v.oracle,{stdin:"pipe",stdout:"pipe",stderr:"pipe"});child.stdin.write(JSON.stringify({fixture:fixture.name,path:fixture.path,expectedSha256:sha,phase,deadlineMs:20000}));child.stdin.end();let [stdout,stderr,exit]=await Promise.all([new Response(child.stdout).text(),new Response(child.stderr).text(),child.exited]);if(exit!==0)throw Error("Independent lifecycle oracle failed");check(JSON.parse(stdout).sha256===sha,phase+" server source exact")}
+function sourceIs(source){wait(session,"document.querySelector('alkalye-editor')?.source.value==="+JSON.stringify(source))}
+function saved(){wait(session,"document.querySelector('#save-status')?.dataset.pending==='0'&&document.querySelector('#save-status')?.getAttribute('aria-busy')==='false'")}
+function caret(){check(evaluate(session,"(()=>{let source=document.querySelector('alkalye-editor').source;return source.selectionStart==="+position+"&&source.selectionEnd==="+position+"})()"),"exact preinsert anchor caret")}
+await cp(v.seedProfile,profile,{recursive:true})
+for(let name of ["SingletonLock","SingletonSocket","SingletonCookie","Default/Service Worker","Default/Cache","Default/Code Cache"])await rm(join(profile,name),{recursive:true,force:true})
+try {
+ browser(session,"--profile",profile,"open",v.url+fixture.path);sourceIs(base);saved();await accepted(base,"seed")
+ evaluate(session,"(()=>{let source=document.querySelector('alkalye-editor').source;source.focus();source.setSelectionRange("+position+","+position+");return true})()")
+ browser(session,"press","y");sourceIs(edited);saved();await accepted(edited,"native edit")
+ browser(session,"click",'[data-action="toggle-tools"]');wait(session,"document.querySelector('#inspector-body [data-group=edit] .menu-trigger')?.checkVisibility()")
+ browser(session,"click",'#inspector-body [data-group=edit] .menu-trigger');browser(session,"click",'#tools-edit [data-action=undo]');sourceIs(base);saved();caret();await accepted(base,"menu Undo")
+ browser(session,"click",'#inspector-body [data-group=edit] .menu-trigger');browser(session,"click",'#tools-edit [data-action=redo]');sourceIs(edited);saved();caret();await accepted(edited,"menu Redo")
+ evaluate(session,"(()=>{let component=document.querySelector('alkalye-editor'),native=component.querySelector('textarea');window.refreshDisposedNative=native;window.refreshDisposal=[];native.focus();native.addEventListener('keydown',event=>{if(event.key.toLowerCase()==='z'&&(event.metaKey||event.ctrlKey)){window.refreshDisposal.push({phase:'before-remove',time:performance.now(),trusted:event.isTrusted});component.remove();window.refreshDisposal.push({phase:'removed',time:performance.now(),connected:component.isConnected})}},{once:true});return true})()")
+ browser(session,"press",process.platform==="darwin"?"Meta+z":"Control+z")
+ await accepted(base,"disposed Undo")
+ wait(session,"window.refreshDisposedNative.oninput===null&&window.refreshDisposedNative.onkeydown===null")
+ check(evaluate(session,"window.refreshDisposedNative.value==="+JSON.stringify(edited)),"disposed native textarea untouched")
+ let disposal=evaluate(session,"(()=>{let detached=window.refreshDisposal.find(item=>item.phase==='removed');return {events:window.refreshDisposal,completion:performance.getEntriesByType('mark').filter(item=>item.name.startsWith('undo:completion')&&item.startTime>=detached.time).map(item=>({name:item.name,time:item.startTime})),sourceAssignments:performance.getEntriesByName('editor:source-assigned').filter(item=>item.startTime>=detached.time).map(item=>({time:item.startTime,detail:item.detail}))}})()")
+ check(disposal.events[0].trusted&&disposal.events[1].connected===false&&disposal.completion.length===2&&disposal.completion[0].time>=disposal.events[1].time&&disposal.sourceAssignments.length===0,"actual trusted in-flight disposal precedes completion; no stale source assignment")
+ await Bun.write(root+"/disposal.json",JSON.stringify(disposal))
+ browser(session,"open",v.url+fixture.path);sourceIs(base);saved();await accepted(base,"reopened after disposal")
+ console.log(JSON.stringify({status:"complete",checks}))
+} finally {browser(session,"close");await rm(profile,{recursive:true,force:true})}

@@ -1,0 +1,35 @@
+**Verdict:** the guards are safe, but the patch probably doesn't do anything. Most likely the success tap paints the old source again, and the real update still waits for the next rAF. I didn't run anything, so this needs one runtime check before any A/B.
+
+**Blocker: `currentDocument` returns a cached record keyed by revision**
+- `session.version()` reads `revision` (`document-session.ts:503`). After an undo, `revision` only goes up in a separate forked stream fiber listening to `projection.version` (`document-session.ts:395-397`). Normal edits bump it synchronously (`:492`); undo doesn't.
+- The undo fiber goes straight on to release the gate, then runs the tap. It most likely gets there before that stream fiber has run.
+- So `currentDocument()` (`document-app.ts:1486-1502`) finds the version unchanged and returns the stale record. `editor.update(oldContent)` sees `text.value === content` and only calls `sync()`. The source isn't assigned until the next rAF, same as today.
+- The live `view` (`:452`) is already correct at that point. Only the cache is stale.
+- Smallest fix: in the tap, compare `session.version()` with what `documentRecord` holds. If they're equal, set `documentRecord = undefined` before calling `refreshSafely()`. The cost is that `#save-status` `data-version` stays one frame behind; check that no E2E gate waits on it. The alternative is to accept that the patch does nothing.
+
+**Gate 0 (cheap experiment, run first):** record whether source assignment happens inside the tap's call stack. In the diagnostic arm, source-assigned should move from about 29.4 ms to about 20.4 ms. If it doesn't, the patch is a no-op and the A/B is pointless.
+
+**Other concerns, all OK:**
+- **Selection, mode, disposal:** checks for selection, mounted, mode `edit`, editor identity, `isConnected` (it's a real `EditorElement`) and abort cover it. If the selection scope closes, `selected.tasks` interrupts the fiber, so the tap is skipped.
+- **Stale editor capture:** the editor is captured when the call starts, so a remount on the same selection fails the identity check. Correct.
+- **Composition:** `Editor.update` still stores the change as `deferredUpdate` while composing. Unchanged.
+- **Pending own text:** `propose` flushes first, and the `editGeneration` Stale check stays. Own edits during undo advance the view synchronously, so there's no new overwrite risk.
+- **Errors and result:** `Effect.tap` keeps the value. `refreshSafely` catches and reports, so the tap can't fail. Failure, Stale and "Nothing to undo" paths are unchanged, and both paths still clear the waitingSet in `ensuring`.
+- **Duplicate work:** `refreshDocument` is the full refresh (`saveFeedback` launch, stats, presence, `media.refresh`), not just the editor. The rAF still runs it again, so expect twice the work per undo.
+
+**Correctness gates (public, smallest):**
+1. Trusted type → accepted → Undo: exact source, caret and `data-version`. Then Redo: same, plus a receipt. Run via native shortcut and via menu.
+2. Start an undo, then before it finishes: switch document, toggle to preview and back (remount), or dispose the app. No refresh on a stale editor, no error reported.
+3. Undo while composing: the change is deferred and applied after `compositionend`, with no lost characters.
+4. Type while an undo is waiting: you get the Stale error, and the typed text survives.
+
+**n=3 A/B pitfalls:**
+- Only the stale-cache issue above can make the candidate identical to baseline, so check gate 0 before timing.
+- Cold vs warm: first-run JIT and IndexedDB warmup. Alternate arm order and drop or flag trial 1.
+- The menu path moves focus away from the textarea, so compare native and menu separately.
+- Undo "completion" here means the local proposal finished, not that the server acknowledged it. Keep the server, client and caret gates independent.
+- Diagnostic marks change timing, so only compare marked against marked.
+- Count deferred tasks, Layout/Paint/GC and heap per undo, including the second refresh. Otherwise a frame-aligned win hides the extra main-thread cost.
+- n=3 can't separate a 9 ms gain from rAF phase jitter at 60 Hz. Report each trial, not just the mean.
+
+written with claude-opus-5-5 in claude CLI

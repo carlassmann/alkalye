@@ -1,0 +1,55 @@
+--- a/src/client/document-app.ts
++++ b/src/client/document-app.ts
+@@ -1863,10 +1863,7 @@
+ 							return
+ 						undoWaiting.add(selected)
+ 						selected.tasks.fork(
+-							(redo
+-								? selected.opened.session.redo()
+-								: selected.opened.session.undo()
+-							).pipe(
++							undoDocument(selected, redo).pipe(
+ 								Effect.catchCause(cause =>
+ 									selection === selected &&
+ 									(Cause.hasFails(cause) || Cause.hasDies(cause))
+@@ -2678,6 +2675,27 @@
+ 			let presence = element("#presence")
+ 			if (presence.textContent !== label) presence.textContent = label
+ 		}
++		function undoDocument(selected: Selection, redo: boolean) {
++			let activeEditor = editor
++			return (redo
++				? selected.opened.session.redo()
++				: selected.opened.session.undo()
++			).pipe(
++				Effect.tap(() =>
++					Effect.sync(() => {
++						if (
++							!events.signal.aborted &&
++							selection === selected &&
++							mounted === selected &&
++							mode === "edit" &&
++							editor === activeEditor &&
++							activeEditor?.isConnected
++						)
++							refreshSafely()
++					}),
++				),
++			)
++		}
+ 		function refreshSafely() {
+ 			try {
+ 				return refreshDocument()
+@@ -3796,11 +3814,7 @@
+ 							if (action === "undo" || action === "redo") {
+ 								if (!writable() || undoWaiting.has(selected)) return
+ 								undoWaiting.add(selected)
+-								return yield* (
+-									action === "redo"
+-										? selected.opened.session.redo()
+-										: selected.opened.session.undo()
+-								).pipe(
++								return yield* undoDocument(selected, action === "redo").pipe(
+ 									Effect.ensuring(
+ 										Effect.sync(() => undoWaiting.delete(selected)),
+ 									),

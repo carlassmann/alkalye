@@ -1,0 +1,149 @@
+[
+	{
+		"phase": "gate0",
+		"action": "trace",
+		"path": "/tmp/alkalye-durable-undo-refresh/gate0/results/candidate-small-middle-0.trace.json",
+		"bytes": 3786330,
+		"sha256": "ef45113e425278b0da0c00d3449521bd536700573b0228c49a09d7659c255743"
+	},
+	{
+		"phase": "gate0",
+		"action": "undoTrace",
+		"path": "/tmp/alkalye-durable-undo-refresh/gate0/results/candidate-small-middle-0-undo.trace.json",
+		"bytes": 3303458,
+		"sha256": "42aaf7722e62c9c2c6a419c5bc8f6eb7acef207be5021e7d47a411703bcec83f"
+	},
+	{
+		"phase": "gate0",
+		"action": "redoTrace",
+		"path": "/tmp/alkalye-durable-undo-refresh/gate0/results/candidate-small-middle-0-redo.trace.json",
+		"bytes": 3395049,
+		"sha256": "6965e392d354c59c9eaf465e799126842162674a9389d645f31aa85283989649"
+	},
+	{
+		"phase": "baseline-0",
+		"action": "trace",
+		"path": "/tmp/alkalye-durable-undo-refresh/baseline-0/results/baseline-small-middle-0.trace.json",
+		"bytes": 3792878,
+		"sha256": "5f0b25f9445822049be220739f6e15d5d1632d37d742c7f08edaf67071359320"
+	},
+	{
+		"phase": "baseline-0",
+		"action": "undoTrace",
+		"path": "/tmp/alkalye-durable-undo-refresh/baseline-0/results/baseline-small-middle-0-undo.trace.json",
+		"bytes": 3324023,
+		"sha256": "c6dbeddcb64f134632b01660ba89d1bb764d9bca36628a687dc04afa5632c852"
+	},
+	{
+		"phase": "baseline-0",
+		"action": "redoTrace",
+		"path": "/tmp/alkalye-durable-undo-refresh/baseline-0/results/baseline-small-middle-0-redo.trace.json",
+		"bytes": 3353198,
+		"sha256": "b10a475fab6aa9ef7e21eed669a88483caae58cc2b517b6102f6806d3d8ca705"
+	},
+	{
+		"phase": "candidate-0",
+		"action": "trace",
+		"path": "/tmp/alkalye-durable-undo-refresh/candidate-0/results/candidate-small-middle-0.trace.json",
+		"bytes": 3763072,
+		"sha256": "ac8a94d8c38fd50516d142ee2998e66be06f5190fbca1609c8fc215a857c7401"
+	},
+	{
+		"phase": "candidate-0",
+		"action": "undoTrace",
+		"path": "/tmp/alkalye-durable-undo-refresh/candidate-0/results/candidate-small-middle-0-undo.trace.json",
+		"bytes": 3292632,
+		"sha256": "0c7f69a739bf6776988e44a6e7206397061ed1e7dbf414c14c01176e42c61f50"
+	},
+	{
+		"phase": "candidate-0",
+		"action": "redoTrace",
+		"path": "/tmp/alkalye-durable-undo-refresh/candidate-0/results/candidate-small-middle-0-redo.trace.json",
+		"bytes": 3362863,
+		"sha256": "b4ee9a6ffeec4cc1285dbfd9bf1d71f744ef97d63470d29f34fe66d92e2ea23c"
+	},
+	{
+		"phase": "candidate-1",
+		"action": "trace",
+		"path": "/tmp/alkalye-durable-undo-refresh/candidate-1/results/candidate-small-middle-0.trace.json",
+		"bytes": 3778959,
+		"sha256": "9cdafee71f4fa9c93e7616d82fd414d9b7a9f3a5072b6811b992ad71436d2e79"
+	},
+	{
+		"phase": "candidate-1",
+		"action": "undoTrace",
+		"path": "/tmp/alkalye-durable-undo-refresh/candidate-1/results/candidate-small-middle-0-undo.trace.json",
+		"bytes": 3355950,
+		"sha256": "3bd09131570440f533147dd14dba36a483662284227a1e5d6f2b77b21966ebed"
+	},
+	{
+		"phase": "candidate-1",
+		"action": "redoTrace",
+		"path": "/tmp/alkalye-durable-undo-refresh/candidate-1/results/candidate-small-middle-0-redo.trace.json",
+		"bytes": 3361627,
+		"sha256": "61071e8ccc1a06027fb05c86136d3824fbdc9d1d4a9e5da91055b77d6a637901"
+	},
+	{
+		"phase": "baseline-1",
+		"action": "trace",
+		"path": "/tmp/alkalye-durable-undo-refresh/baseline-1/results/baseline-small-middle-0.trace.json",
+		"bytes": 3809961,
+		"sha256": "3d68b382122fb36f09640b113a390a2026c688c9e48f4025b1ec169d8e70fe4f"
+	},
+	{
+		"phase": "baseline-1",
+		"action": "undoTrace",
+		"path": "/tmp/alkalye-durable-undo-refresh/baseline-1/results/baseline-small-middle-0-undo.trace.json",
+		"bytes": 3302524,
+		"sha256": "c7ef9c7cce3941e3b89c7aab3a6119f4eb67afabd4be22262b47740969d1737c"
+	},
+	{
+		"phase": "baseline-1",
+		"action": "redoTrace",
+		"path": "/tmp/alkalye-durable-undo-refresh/baseline-1/results/baseline-small-middle-0-redo.trace.json",
+		"bytes": 3360848,
+		"sha256": "ac5b59e1149118c37944ae3ca409eca63eaa48a13e6692b3d66be02e993914ca"
+	},
+	{
+		"phase": "baseline-2",
+		"action": "trace",
+		"path": "/tmp/alkalye-durable-undo-refresh/baseline-2/results/baseline-small-middle-0.trace.json",
+		"bytes": 3788236,
+		"sha256": "602295b8974aa2e8953acab322a11864f14e4235a1eefb54697bfa989317e15a"
+	},
+	{
+		"phase": "baseline-2",
+		"action": "undoTrace",
+		"path": "/tmp/alkalye-durable-undo-refresh/baseline-2/results/baseline-small-middle-0-undo.trace.json",
+		"bytes": 3321095,
+		"sha256": "e1cd551c86435404ea77ff2ccbc397f1925df3bc0db79a0653d2c30056a850d1"
+	},
+	{
+		"phase": "baseline-2",
+		"action": "redoTrace",
+		"path": "/tmp/alkalye-durable-undo-refresh/baseline-2/results/baseline-small-middle-0-redo.trace.json",
+		"bytes": 3360943,
+		"sha256": "b3cff5549ac7ef9606c7062ac0067569ea2d30877d8caf37303655fed13e3ef5"
+	},
+	{
+		"phase": "candidate-2",
+		"action": "trace",
+		"path": "/tmp/alkalye-durable-undo-refresh/candidate-2/results/candidate-small-middle-0.trace.json",
+		"bytes": 3792734,
+		"sha256": "6035515410d1fbc9125dd65f8a63a4082df18d11f735a3913b17737474bebd87"
+	},
+	{
+		"phase": "candidate-2",
+		"action": "undoTrace",
+		"path": "/tmp/alkalye-durable-undo-refresh/candidate-2/results/candidate-small-middle-0-undo.trace.json",
+		"bytes": 3297496,
+		"sha256": "1fb20b49a6936e75bf1d1fcf26a80715b44ca6bd319d4f3634cf9a7e9c5cd97a"
+	},
+	{
+		"phase": "candidate-2",
+		"action": "redoTrace",
+		"path": "/tmp/alkalye-durable-undo-refresh/candidate-2/results/candidate-small-middle-0-redo.trace.json",
+		"bytes": 3361214,
+		"sha256": "7f3302ef4d94eaa2e845ac77fc5839a46d8f98f4f9d8d82f8dd1603211cb0be0"
+	}
+]

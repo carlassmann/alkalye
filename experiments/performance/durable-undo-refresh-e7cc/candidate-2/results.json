@@ -1,0 +1,1421 @@
+[
+	{
+		"version": "candidate",
+		"commit": "e7cc1367b9060136fe81b1a7950de1e0441939ec",
+		"cell": "small-middle",
+		"trial": 0,
+		"status": "complete",
+		"trace": "/tmp/alkalye-durable-undo-refresh/candidate-2/results/candidate-small-middle-0.trace.json",
+		"observation": {
+			"network": {
+				"openedSockets": ["/api/live"],
+				"pollRequests": 0,
+				"received": 3,
+				"sends": 0
+			},
+			"probe": {
+				"end": 4449.599999964237,
+				"eventTiming": [
+					{
+						"duration": 16,
+						"name": "keydown",
+						"processingEnd": 1448.5999999642372,
+						"processingStart": 1448,
+						"startTime": 1447.899999976158
+					},
+					{
+						"duration": 16,
+						"name": "keypress",
+						"processingEnd": 1451.399999976158,
+						"processingStart": 1448.5999999642372,
+						"startTime": 1447.899999976158
+					}
+				],
+				"events": [
+					{
+						"ctrl": false,
+						"eventTimestamp": 1447.899999976158,
+						"key": "x",
+						"meta": false,
+						"shift": false,
+						"time": 1448.300000011921,
+						"type": "keydown"
+					},
+					{
+						"eventTimestamp": 1448.699999988079,
+						"time": 1448.800000011921,
+						"type": "beforeinput"
+					}
+				],
+				"frames": [
+					16.700000000000045, 16.700000000000045, 16.59999999999991,
+					16.600000000000136, 16.799999999999955, 16.59999999999991,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.600000000000136, 16.699999999999818, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.600000000000136, 16.699999999999818, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000045,
+					16.700000000000045, 16.59999999999991, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.59999999999991,
+					16.800000000000182, 16.59999999999991, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.700000000000273,
+					16.699999999999818, 16.59999999999991, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.59999999999991, 16.800000000000182,
+					16.59999999999991, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.59999999999991, 16.800000000000182,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.699999999999818, 16.700000000000273,
+					16.59999999999991, 16.59999999999991, 16.800000000000182,
+					16.59999999999991, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.59999999999991, 16.699999999999818,
+					16.700000000000273, 16.59999999999991, 16.699999999999818,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.59999999999991, 16.699999999999818,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.699999999999818, 16.59999999999991,
+					16.700000000000273, 16.59999999999991, 16.699999999999818,
+					16.700000000000273, 16.59999999999991, 16.800000000000182,
+					16.59999999999991, 16.59999999999991, 16.699999999999818,
+					16.700000000000273, 16.59999999999991, 16.699999999999818,
+					16.699999999999818, 16.700000000000728, 16.599999999999454,
+					16.699999999999818, 16.700000000000728, 16.599999999999454,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.600000000000364
+				],
+				"heapEnd": 15894125,
+				"heapStart": 15693043,
+				"networkAtEnd": {
+					"pollRequests": 0,
+					"received": 3,
+					"sends": 0
+				},
+				"networkAtStart": {
+					"pollRequests": 0,
+					"received": 1,
+					"sends": 0
+				},
+				"ready": 1457.300000011921,
+				"start": 1448.300000011921
+			},
+			"scripts": [
+				{
+					"decoded": 2036,
+					"path": "/chunks/document-app-cpyrabzv.js"
+				},
+				{
+					"decoded": 1330,
+					"path": "/chunks/document-app-zzda0gnp.js"
+				},
+				{
+					"decoded": 2798,
+					"path": "/chunks/document-app-m2qx4cqf.js"
+				},
+				{
+					"decoded": 122386,
+					"path": "/chunks/document-app-z8yna5gc.js"
+				},
+				{
+					"decoded": 253585,
+					"path": "/app.js"
+				},
+				{
+					"decoded": 16754,
+					"path": "/chunks/document-app-kyjabmpr.js"
+				},
+				{
+					"decoded": 7968,
+					"path": "/chunks/document-app-fdca9e8a.js"
+				},
+				{
+					"decoded": 3894,
+					"path": "/chunks/document-app-njm9xdrd.js"
+				},
+				{
+					"decoded": 617,
+					"path": "/chunks/document-app-4bdv4e1h.js"
+				},
+				{
+					"decoded": 14375,
+					"path": "/chunks/document-app-zsc4xtxg.js"
+				},
+				{
+					"decoded": 901,
+					"path": "/chunks/document-app-0fyrxqjt.js"
+				},
+				{
+					"decoded": 2725,
+					"path": "/chunks/document-app-dw31ncjv.js"
+				},
+				{
+					"decoded": 1656,
+					"path": "/chunks/document-app-zc37nkfy.js"
+				},
+				{
+					"decoded": 5735,
+					"path": "/chunks/document-app-wnaem0wt.js"
+				},
+				{
+					"decoded": 7957,
+					"path": "/chunks/document-app-022w94n0.js"
+				},
+				{
+					"decoded": 6070,
+					"path": "/chunks/document-app-ef2e4sa0.js"
+				},
+				{
+					"decoded": 212993,
+					"path": "/chunks/document-app-1y6dkaw7.js"
+				},
+				{
+					"decoded": 765,
+					"path": "/chunks/document-app-5w0555xf.js"
+				},
+				{
+					"decoded": 24137,
+					"path": "/chunks/document-app-xryb03fv.js"
+				},
+				{
+					"decoded": 11389,
+					"path": "/chunks/document-app-7es742rc.js"
+				},
+				{
+					"decoded": 20425,
+					"path": "/chunks/document-app-2d5x6ewf.js"
+				},
+				{
+					"decoded": 75938,
+					"path": "/chunks/document-app-kjpwy0e1.js"
+				},
+				{
+					"decoded": 2412,
+					"path": "/chunks/document-app-jxg7vknv.js"
+				},
+				{
+					"decoded": 2354,
+					"path": "/chunks/document-app-vk38pqtz.js"
+				},
+				{
+					"decoded": 2075,
+					"path": "/chunks/document-app-1dxag10p.js"
+				},
+				{
+					"decoded": 27429,
+					"path": "/chunks/document-app-twgbb54m.js"
+				},
+				{
+					"decoded": 713,
+					"path": "/chunks/document-app-kkm66nr6.js"
+				},
+				{
+					"decoded": 14516,
+					"path": "/chunks/document-app-3fnhg1mw.js"
+				},
+				{
+					"decoded": 272,
+					"path": "/chunks/document-app-nz4nbhyt.js"
+				},
+				{
+					"decoded": 41742,
+					"path": "/chunks/document-app-qpn16pt3.js"
+				},
+				{
+					"decoded": 1109,
+					"path": "/chunks/document-app-bxa2bqfs.js"
+				},
+				{
+					"decoded": 174723,
+					"path": "/chunks/document-app-cksk812g.js"
+				},
+				{
+					"decoded": 20324,
+					"path": "/chunks/document-worker-stats-339x9rb5.js"
+				},
+				{
+					"decoded": 155969,
+					"path": "/document-worker.js"
+				},
+				{
+					"decoded": 2036,
+					"path": "/chunks/document-app-cpyrabzv.js"
+				},
+				{
+					"decoded": 122386,
+					"path": "/chunks/document-app-z8yna5gc.js"
+				},
+				{
+					"decoded": 253585,
+					"path": "/app.js"
+				},
+				{
+					"decoded": 2798,
+					"path": "/chunks/document-app-m2qx4cqf.js"
+				},
+				{
+					"decoded": 1330,
+					"path": "/chunks/document-app-zzda0gnp.js"
+				},
+				{
+					"decoded": 16754,
+					"path": "/chunks/document-app-kyjabmpr.js"
+				},
+				{
+					"decoded": 7968,
+					"path": "/chunks/document-app-fdca9e8a.js"
+				},
+				{
+					"decoded": 3894,
+					"path": "/chunks/document-app-njm9xdrd.js"
+				},
+				{
+					"decoded": 617,
+					"path": "/chunks/document-app-4bdv4e1h.js"
+				},
+				{
+					"decoded": 14375,
+					"path": "/chunks/document-app-zsc4xtxg.js"
+				},
+				{
+					"decoded": 901,
+					"path": "/chunks/document-app-0fyrxqjt.js"
+				},
+				{
+					"decoded": 2725,
+					"path": "/chunks/document-app-dw31ncjv.js"
+				},
+				{
+					"decoded": 1656,
+					"path": "/chunks/document-app-zc37nkfy.js"
+				},
+				{
+					"decoded": 5735,
+					"path": "/chunks/document-app-wnaem0wt.js"
+				},
+				{
+					"decoded": 7957,
+					"path": "/chunks/document-app-022w94n0.js"
+				},
+				{
+					"decoded": 6070,
+					"path": "/chunks/document-app-ef2e4sa0.js"
+				},
+				{
+					"decoded": 765,
+					"path": "/chunks/document-app-5w0555xf.js"
+				},
+				{
+					"decoded": 24137,
+					"path": "/chunks/document-app-xryb03fv.js"
+				},
+				{
+					"decoded": 212993,
+					"path": "/chunks/document-app-1y6dkaw7.js"
+				},
+				{
+					"decoded": 11389,
+					"path": "/chunks/document-app-7es742rc.js"
+				},
+				{
+					"decoded": 20425,
+					"path": "/chunks/document-app-2d5x6ewf.js"
+				},
+				{
+					"decoded": 2412,
+					"path": "/chunks/document-app-jxg7vknv.js"
+				},
+				{
+					"decoded": 2354,
+					"path": "/chunks/document-app-vk38pqtz.js"
+				},
+				{
+					"decoded": 75938,
+					"path": "/chunks/document-app-kjpwy0e1.js"
+				},
+				{
+					"decoded": 2075,
+					"path": "/chunks/document-app-1dxag10p.js"
+				},
+				{
+					"decoded": 713,
+					"path": "/chunks/document-app-kkm66nr6.js"
+				},
+				{
+					"decoded": 14516,
+					"path": "/chunks/document-app-3fnhg1mw.js"
+				},
+				{
+					"decoded": 27429,
+					"path": "/chunks/document-app-twgbb54m.js"
+				},
+				{
+					"decoded": 41742,
+					"path": "/chunks/document-app-qpn16pt3.js"
+				},
+				{
+					"decoded": 272,
+					"path": "/chunks/document-app-nz4nbhyt.js"
+				},
+				{
+					"decoded": 1109,
+					"path": "/chunks/document-app-bxa2bqfs.js"
+				},
+				{
+					"decoded": 174723,
+					"path": "/chunks/document-app-cksk812g.js"
+				},
+				{
+					"decoded": 20324,
+					"path": "/chunks/document-worker-stats-339x9rb5.js"
+				},
+				{
+					"decoded": 155969,
+					"path": "/document-worker.js"
+				}
+			],
+			"sourceSelection": {
+				"start": 1025,
+				"end": 1025
+			}
+		},
+		"undoTrace": "/tmp/alkalye-durable-undo-refresh/candidate-2/results/candidate-small-middle-0-undo.trace.json",
+		"history": {
+			"mode": "advancing",
+			"acceptedPairsThisRunBefore": 0,
+			"declaredPriorPairs": 4
+		},
+		"sessionDigests": [],
+		"undoObservation": {
+			"network": {
+				"openedSockets": ["/api/live"],
+				"pollRequests": 0,
+				"received": 4,
+				"sends": 0
+			},
+			"probe": {
+				"end": 7941.199999988079,
+				"eventTiming": [],
+				"events": [
+					{
+						"ctrl": false,
+						"eventTimestamp": 4939.899999976158,
+						"key": "z",
+						"meta": true,
+						"shift": false,
+						"time": 4940.199999988079,
+						"type": "keydown"
+					}
+				],
+				"frames": [
+					16.5, 16.799999999999272, 16.600000000000364, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.600000000000364,
+					16.799999999999272, 16.600000000000364, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.599999999999454, 16.700000000000728,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.599999999999454, 16.800000000000182,
+					16.600000000000364, 16.599999999999454, 16.700000000000728,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.599999999999454, 16.800000000000182,
+					16.600000000000364, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.699999999999818, 16.699999999999818,
+					16.600000000000364, 16.599999999999454, 16.700000000000728,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.599999999999454, 16.700000000000728,
+					16.699999999999818, 16.599999999999454, 16.700000000000728,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.599999999999454, 16.800000000000182, 16.600000000000364,
+					16.699999999999818, 16.699999999999818, 16.600000000000364,
+					16.699999999999818, 16.599999999999454, 16.700000000000728,
+					16.599999999999454, 16.699999999999818, 16.700000000000728,
+					16.699999999999818, 16.699999999999818, 16.5, 16.800000000000182,
+					16.599999999999454, 16.700000000000728, 16.699999999999818,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.599999999999454, 16.700000000000728, 16.699999999999818,
+					16.599999999999454, 16.700000000000728, 16.599999999999454,
+					16.699999999999818, 16.700000000000728, 16.699999999999818,
+					16.599999999999454, 16.700000000000728, 16.699999999999818,
+					16.599999999999454, 16.700000000000728, 16.699999999999818,
+					16.599999999999454, 16.700000000000728, 16.699999999999818,
+					16.599999999999454, 16.700000000000728, 16.599999999999454,
+					16.699999999999818, 16.700000000000728, 16.699999999999818,
+					16.599999999999454, 16.600000000000364, 16.699999999999818,
+					16.800000000000182, 16.600000000000364, 16.599999999999454,
+					16.699999999999818, 16.600000000000364, 16.800000000000182,
+					16.599999999999454, 16.700000000000728, 16.599999999999454,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.700000000000728, 16.699999999999818,
+					16.599999999999454, 16.700000000000728, 16.599999999999454,
+					16.699999999999818, 16.700000000000728, 16.599999999999454,
+					16.699999999999818, 16.600000000000364, 16.699999999999818,
+					16.699999999999818, 16.700000000000728, 16.599999999999454,
+					16.699999999999818, 16.700000000000728, 16.699999999999818,
+					16.599999999999454, 16.600000000000364, 16.800000000000182,
+					16.599999999999454, 16.700000000000728, 16.599999999999454,
+					16.699999999999818, 16.700000000000728, 16.599999999999454,
+					16.699999999999818, 16.600000000000364
+				],
+				"heapEnd": 17599651,
+				"heapStart": 15899059,
+				"networkAtEnd": {
+					"pollRequests": 0,
+					"received": 4,
+					"sends": 0
+				},
+				"networkAtStart": {
+					"pollRequests": 0,
+					"received": 3,
+					"sends": 0
+				},
+				"ready": 4958.199999988079,
+				"start": 4940.199999988079
+			},
+			"timeline": [
+				{
+					"detail": null,
+					"name": "interaction:start",
+					"time": 4940.199999988079
+				},
+				{
+					"detail": null,
+					"name": "undo:requested",
+					"time": 4940.199999988079
+				},
+				{
+					"detail": null,
+					"name": "propose:gate-acquired",
+					"time": 4940.399999976158
+				},
+				{
+					"detail": null,
+					"name": "propose:flush-start",
+					"time": 4940.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4940.399999976158
+				},
+				{
+					"detail": null,
+					"name": "propose:flush-end",
+					"time": 4940.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 4941.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 4941.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4942.5
+				},
+				{
+					"detail": null,
+					"name": "propose:replay-end",
+					"time": 4942.5
+				},
+				{
+					"detail": null,
+					"name": "propose:actor-start",
+					"time": 4942.5
+				},
+				{
+					"detail": null,
+					"name": "propose:actor-end",
+					"time": 4942.599999964237
+				},
+				{
+					"detail": null,
+					"name": "propose:prepared",
+					"time": 4945.5
+				},
+				{
+					"detail": null,
+					"name": "propose:persist-start",
+					"time": 4945.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4946.599999964237
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4946.699999988079
+				},
+				{
+					"detail": null,
+					"name": "session:revision",
+					"time": 4948.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4948.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4948.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4948.399999976158
+				},
+				{
+					"detail": null,
+					"name": "propose:persist-end",
+					"time": 4948.399999976158
+				},
+				{
+					"detail": null,
+					"name": "undo:completion-refresh-start",
+					"time": 4948.5
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 4948.5
+				},
+				{
+					"detail": {
+						"characters": 2048
+					},
+					"name": "editor:source-assigned",
+					"time": 4948.800000011921
+				},
+				{
+					"detail": {
+						"characters": 2048
+					},
+					"name": "editor:viewport-rendered",
+					"time": 4949.800000011921
+				},
+				{
+					"detail": null,
+					"name": "undo:completion-refresh-end",
+					"time": 4950.099999964237
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4950.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4950.599999964237
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4950.800000011921
+				},
+				{
+					"detail": null,
+					"name": "interaction:ready",
+					"time": 4958.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 4958.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 4958.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4960.599999964237
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4960.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4961.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4963.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4963.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4964.599999964237
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4965
+				},
+				{
+					"detail": null,
+					"name": "session:revision",
+					"time": 4966.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4966.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4966.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4966.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4967.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4968
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4969
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4970
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4970.599999964237
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4970.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4970.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4970.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4970.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4973
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4973
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4973.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4973.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4973.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4974.099999964237
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 4974.099999964237
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 4974.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 4974.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5468.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5468.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5469.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5469.599999964237
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5470.099999964237
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 5474.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 5474.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5479.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5479.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 5479.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 5490.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 5490.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 6074.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 6105.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 6107.399999976158
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 6107.5
+				}
+			]
+		},
+		"redoObservation": {
+			"network": {
+				"openedSockets": ["/api/live"],
+				"pollRequests": 0,
+				"received": 6,
+				"sends": 0
+			},
+			"probe": {
+				"end": 11401.80000001192,
+				"eventTiming": [],
+				"events": [
+					{
+						"ctrl": false,
+						"eventTimestamp": 8399.800000011921,
+						"key": "z",
+						"meta": true,
+						"shift": true,
+						"time": 8400,
+						"type": "keydown"
+					}
+				],
+				"frames": [
+					16.700000000000728, 16.599999999998545, 16.80000000000109,
+					16.600000000000364, 16.599999999998545, 16.700000000000728,
+					16.700000000000728, 16.599999999998545, 16.700000000000728,
+					16.700000000000728, 16.599999999998545, 16.700000000000728,
+					16.700000000000728, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.599999999998545, 16.700000000000728,
+					16.700000000000728, 16.69999999999891, 16.600000000000364,
+					16.600000000000364, 16.799999999999272, 16.600000000000364,
+					16.600000000000364, 16.799999999999272, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.600000000000364,
+					16.600000000000364, 16.69999999999891, 16.700000000000728,
+					16.600000000000364, 16.799999999999272, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.600000000000364,
+					16.600000000000364, 16.799999999999272, 16.600000000000364,
+					16.600000000000364, 16.69999999999891, 16.700000000000728,
+					16.600000000000364, 16.69999999999891, 16.700000000000728,
+					16.600000000000364, 16.69999999999891, 16.700000000000728,
+					16.600000000000364, 16.69999999999891, 16.700000000000728,
+					16.700000000000728, 16.599999999998545, 16.700000000000728,
+					16.600000000000364, 16.69999999999891, 16.700000000000728,
+					16.700000000000728, 16.599999999998545, 16.700000000000728,
+					16.600000000000364, 16.799999999999272, 16.600000000000364,
+					16.600000000000364, 16.69999999999891, 16.700000000000728,
+					16.700000000000728, 16.599999999998545, 16.700000000000728,
+					16.600000000000364, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.700000000000728,
+					16.700000000000728, 16.599999999998545, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.600000000000364,
+					16.80000000000109, 16.599999999998545, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.700000000000728,
+					16.600000000000364, 16.69999999999891, 16.700000000000728,
+					16.600000000000364, 16.69999999999891, 16.600000000000364,
+					16.80000000000109, 16.599999999998545, 16.700000000000728,
+					16.600000000000364, 16.600000000000364, 16.799999999999272,
+					16.600000000000364, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.600000000000364,
+					16.80000000000109, 16.599999999998545, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.700000000000728,
+					16.600000000000364, 16.600000000000364, 16.69999999999891,
+					16.80000000000109, 16.599999999998545, 16.600000000000364,
+					16.700000000000728, 16.600000000000364, 16.69999999999891,
+					16.700000000000728, 16.69999999999891, 16.700000000000728,
+					16.600000000000364, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.600000000000364, 16.799999999999272,
+					16.600000000000364, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.700000000000728,
+					16.600000000000364, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.69999999999891, 16.700000000000728,
+					16.600000000000364, 16.600000000000364, 16.69999999999891,
+					16.600000000000364, 16.700000000000728, 16.69999999999891,
+					16.700000000000728, 16.600000000000364, 16.69999999999891,
+					16.700000000000728, 16.69999999999891, 16.600000000000364,
+					16.700000000000728, 16.600000000000364, 16.69999999999891,
+					16.600000000000364
+				],
+				"heapEnd": 18637739,
+				"heapStart": 18106012,
+				"networkAtEnd": {
+					"pollRequests": 0,
+					"received": 6,
+					"sends": 0
+				},
+				"networkAtStart": {
+					"pollRequests": 0,
+					"received": 4,
+					"sends": 0
+				},
+				"ready": 8424.699999988079,
+				"start": 8400
+			},
+			"timeline": [
+				{
+					"detail": null,
+					"name": "interaction:start",
+					"time": 8400
+				},
+				{
+					"detail": null,
+					"name": "undo:requested",
+					"time": 8400.099999964237
+				},
+				{
+					"detail": null,
+					"name": "propose:gate-acquired",
+					"time": 8400.199999988079
+				},
+				{
+					"detail": null,
+					"name": "propose:flush-start",
+					"time": 8400.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8400.199999988079
+				},
+				{
+					"detail": null,
+					"name": "propose:flush-end",
+					"time": 8400.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 8408
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 8408
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8409
+				},
+				{
+					"detail": null,
+					"name": "propose:replay-end",
+					"time": 8409
+				},
+				{
+					"detail": null,
+					"name": "propose:actor-start",
+					"time": 8409
+				},
+				{
+					"detail": null,
+					"name": "propose:actor-end",
+					"time": 8409
+				},
+				{
+					"detail": null,
+					"name": "propose:prepared",
+					"time": 8410
+				},
+				{
+					"detail": null,
+					"name": "propose:persist-start",
+					"time": 8410
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8411
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8411.199999988079
+				},
+				{
+					"detail": null,
+					"name": "session:revision",
+					"time": 8413.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8413.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8413.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8413.300000011921
+				},
+				{
+					"detail": null,
+					"name": "propose:persist-end",
+					"time": 8413.300000011921
+				},
+				{
+					"detail": null,
+					"name": "undo:completion-refresh-start",
+					"time": 8413.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 8413.300000011921
+				},
+				{
+					"detail": {
+						"characters": 2049
+					},
+					"name": "editor:source-assigned",
+					"time": 8413.599999964237
+				},
+				{
+					"detail": {
+						"characters": 2049
+					},
+					"name": "editor:viewport-rendered",
+					"time": 8414.599999964237
+				},
+				{
+					"detail": null,
+					"name": "undo:completion-refresh-end",
+					"time": 8414.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8415.099999964237
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8415.599999964237
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8415.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8422.099999964237
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8422.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8422.899999976158
+				},
+				{
+					"detail": null,
+					"name": "interaction:ready",
+					"time": 8424.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 8424.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 8425
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8426.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8426.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8427.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8427.5
+				},
+				{
+					"detail": null,
+					"name": "session:revision",
+					"time": 8429
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8429
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8429
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8429
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8429.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8430.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8431.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8432.599999964237
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8433.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8433.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8433.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8433.699999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8433.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8435.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8436
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8436.599999964237
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8436.800000011921
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8437
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8437.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8437.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 8441.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 8441.599999964237
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8931
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8931.099999964237
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8931.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8932.5
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8934
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8937.899999976158
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8938.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 8938.199999988079
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 8940.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 8940.300000011921
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 9073.599999964235
+				},
+				{
+					"detail": null,
+					"name": "app:request-refresh",
+					"time": 10108.099999964235
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-frame",
+					"time": 10123.69999998808
+				},
+				{
+					"detail": null,
+					"name": "app:refresh-document",
+					"time": 10123.69999998808
+				}
+			]
+		},
+		"redoReceipt": {
+			"sha256": "a0079fbe7b0025cb7a9c653264283d7fbad4a62b90fcf41ab19fdbd79500b179",
+			"characters": 2049,
+			"phasesLog": "oracle-phases-3.json",
+			"journalPosition": 14,
+			"journalIdentitySha256": "8e9ed33bbdc20b155dd95b8e8ac23f4ff9d39a477eb966deb1bce4ba0369e35a"
+		},
+		"redoTrace": "/tmp/alkalye-durable-undo-refresh/candidate-2/results/candidate-small-middle-0-redo.trace.json",
+		"seedReceipt": {
+			"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+			"characters": 2048,
+			"phasesLog": "oracle-phases-0.json",
+			"journalPosition": 11,
+			"journalIdentitySha256": "8e9ed33bbdc20b155dd95b8e8ac23f4ff9d39a477eb966deb1bce4ba0369e35a"
+		},
+		"editedReceipt": {
+			"sha256": "a0079fbe7b0025cb7a9c653264283d7fbad4a62b90fcf41ab19fdbd79500b179",
+			"characters": 2049,
+			"phasesLog": "oracle-phases-1.json",
+			"journalPosition": 12,
+			"journalIdentitySha256": "8e9ed33bbdc20b155dd95b8e8ac23f4ff9d39a477eb966deb1bce4ba0369e35a"
+		},
+		"undoReceipt": {
+			"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2",
+			"characters": 2048,
+			"phasesLog": "oracle-phases-2.json",
+			"journalPosition": 13,
+			"journalIdentitySha256": "8e9ed33bbdc20b155dd95b8e8ac23f4ff9d39a477eb966deb1bce4ba0369e35a"
+		},
+		"fixture": {
+			"characters": 2048,
+			"bytes": 2048,
+			"realNewlines": 74,
+			"sha256": "2273364cd6f408d0ed16b26d0508aa43c39894cf3dc347b86eb996afbe87a4f2"
+		}
+	}
+]

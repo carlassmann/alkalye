@@ -1,0 +1,18 @@
+{"phase":"baseline-0","stage":"server-started","process":"started baseline pid=37852"}
+{"phase":"baseline-0","stage":"pins-ready"}
+{"phase":"baseline-0","stage":"complete"}
+{"phase":"candidate-0","stage":"server-started","process":"started candidate pid=38193"}
+{"phase":"candidate-0","stage":"pins-ready"}
+{"phase":"candidate-0","stage":"complete"}
+{"phase":"candidate-1","stage":"server-started","process":"started candidate pid=38523"}
+{"phase":"candidate-1","stage":"pins-ready"}
+{"phase":"candidate-1","stage":"complete"}
+{"phase":"baseline-1","stage":"server-started","process":"started baseline pid=38859"}
+{"phase":"baseline-1","stage":"pins-ready"}
+{"phase":"baseline-1","stage":"complete"}
+{"phase":"baseline-2","stage":"server-started","process":"started baseline pid=39174"}
+{"phase":"baseline-2","stage":"pins-ready"}
+{"phase":"baseline-2","stage":"complete"}
+{"phase":"candidate-2","stage":"server-started","process":"started candidate pid=39503"}
+{"phase":"candidate-2","stage":"pins-ready"}
+{"phase":"candidate-2","stage":"complete"}

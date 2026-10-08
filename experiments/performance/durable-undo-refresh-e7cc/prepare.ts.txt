@@ -1,0 +1,23 @@
+import { cp, rm } from "node:fs/promises"
+import { join } from "node:path"
+import * as Schema from "effect/Schema"
+import { browser, evaluate, wait } from "./tests/browser-driver"
+let base="/tmp/alkalye-durable-undo-refresh", root=base+"/"+process.argv[2], prior="/tmp/alkalye-main-current72"
+let original=await Bun.file(prior+"/undo-cwd-manifest.private.json").json()
+let version=original.versions.find((entry: {name:string})=>entry.name==="rewrite")
+let profile=root+"/pin-profile",session="undo-timeline-pin-"+Date.now()
+version.seedProfile=base+"/profile-seed";version.commit="e7cc1367b9060136fe81b1a7950de1e0441939ec";version.name=process.argv[3];await cp(version.seedProfile,profile,{recursive:true})
+for(let name of ["SingletonLock","SingletonSocket","SingletonCookie","Default/Service Worker","Default/Cache","Default/Code Cache"])await rm(join(profile,name),{recursive:true,force:true})
+try {
+ browser(session,"--profile",profile,"open",version.url+version.fixtures[0].path)
+ let source=await Bun.file(version.fixtures[0].sourceFile).text()
+ wait(session,"document.querySelector('alkalye-editor')?.source.value==="+JSON.stringify(source)+"&&document.querySelector('#editor')?.readOnly===false")
+ let scripts=Schema.decodeUnknownSync(Schema.Array(Schema.Struct({path:Schema.String,decoded:Schema.Number})))(evaluate(session,"performance.getEntriesByType('resource').filter(entry=>new URL(entry.name).origin===location.origin&&new URL(entry.name).pathname.endsWith('.js')).map(entry=>({path:new URL(entry.name).pathname,decoded:entry.decodedBodySize}))"))
+ let assets=[]
+ for(let {path} of scripts){let bytes=await Bun.file(join(import.meta.dir,"dist",path)).arrayBuffer();let response=await fetch(version.url+path);let served=await response.arrayBuffer();let emitted=Bun.CryptoHasher.hash("sha256",bytes,"hex"),actual=Bun.CryptoHasher.hash("sha256",served,"hex");if(emitted!==actual)throw Error("Served emitted mismatch");assets.push({path,sha256:emitted})}
+ version.assets=assets;version.seedAcceptedPairs={small2:4}
+ version.oracle=["bun",join(import.meta.dir,"experiments/performance/interaction-matrix/rewrite-oracle.ts"),prior+"/rewrite-oracle.private.json"]
+ await Bun.write(root+"/manifest.private.json",JSON.stringify({samples:1,output:root+"/results",versions:[version],cells:[{name:"small-middle",journey:"body",fixture:"small2",position:"middle"}]}))
+ await Bun.write(root+"/pins.json",JSON.stringify({commit:version.commit,scripts,assets}))
+ console.log(JSON.stringify({stage:"loaded-byte-pins",scripts:assets.length,sourceExact:true}))
+} finally {browser(session,"close");await rm(profile,{recursive:true,force:true})}
