@@ -21,20 +21,19 @@ Next bounded test: reuse preparation only for an equal immutable proposed action
 
 written with gpt-6 in codex
 
-
 ## Semantic action reuse: rejected
 
 A separate three-pair experiment kept frozen f9508ce and the same native backend. The candidate adds structural `equalAction` reuse, requires identical captured durable/current replicas, retains atomic generation/clock guards, and leaves known proposal validation native. It passed 36 public session/module tests (278 assertions), strict TypeScript, and a read-only Opus review.
 
-| Median | Native | Reuse candidate |
-|---|---:|---:|
-| First frame opportunity | 330.9 ms | 1346.7 ms |
-| Second frame opportunity | 351.6 ms | 1368.0 ms |
-| Undo accepted cache | 1650.6 ms | 2653.5 ms |
-| Largest undo task | 164.4 ms | 29.9 ms |
-| Sampled heap after undo | 625 MB | 1103 MB |
-| Trusted character dispatch | 5.07 ms | 4.53 ms |
-| Largest deferred edit task | 10.21 ms | 9.55 ms |
+| Median                     |    Native | Reuse candidate |
+| -------------------------- | --------: | --------------: |
+| First frame opportunity    |  330.9 ms |       1346.7 ms |
+| Second frame opportunity   |  351.6 ms |       1368.0 ms |
+| Undo accepted cache        | 1650.6 ms |       2653.5 ms |
+| Largest undo task          |  164.4 ms |         29.9 ms |
+| Sampled heap after undo    |    625 MB |         1103 MB |
+| Trusted character dispatch |   5.07 ms |         4.53 ms |
+| Largest deferred edit task |  10.21 ms |         9.55 ms |
 
 All six journeys passed exact source, trusted undo, strictly newer accepted journal cursor, and zero pending/rejected checks. Task size improved, but latency and memory still regressed badly. Do not adopt.
 
