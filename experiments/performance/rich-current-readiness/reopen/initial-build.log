@@ -1,0 +1,16 @@
+15 | length,recovery:document.querySelector("#sync-recovery")?.textContent??null,header:s.value.slice(0,s.value.indexOf('---'
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ^
+error: Expected ")" but found "#sync"
+    at /private/tmp/alkalye-rich-current/reopen.ts:15:580
+
+15 | y:document.querySelector("#sync-recovery")?.textContent??null,header:s.value.slice(0,s.value.indexOf('---',4)+3)}))})()"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ^
+error: Expected ";" but found "")?.textContent??null,header:s.value.slice(0,s.value.indexOf('---',4)+3)}))})()""
+    at /private/tmp/alkalye-rich-current/reopen.ts:15:594
+
+15 | ce(0,s.value.indexOf('---',4)+3)}))})()");let before=await accepted(document);result.state={native,before};await Bun.wri
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ^
+error: Unexpected )
+    at /private/tmp/alkalye-rich-current/reopen.ts:15:674
+
+Bun v1.4.0 (macOS arm64)

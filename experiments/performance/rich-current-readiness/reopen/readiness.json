@@ -1,0 +1,28 @@
+{
+	"stage": "existing-readiness",
+	"passed": false,
+	"error": "",
+	"sourceLength": 1048576,
+	"sourceBytes": 1056200,
+	"sourceHash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+	"state": {
+		"native": {
+			"busy": "false",
+			"hash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+			"header": "---\ntitle: Rich performance fixture\nlang: en\n---",
+			"indexLength": 1048576,
+			"length": 1048576,
+			"links": 11436,
+			"nativeLength": 2010,
+			"pending": "0",
+			"readOnly": false,
+			"recovery": null
+		},
+		"before": {
+			"hash": "8b55d9981225b3b19b39ac9d36ea9bccdc38c053a28bf04aac2ba4383c41697f",
+			"position": 61,
+			"length": 1048576
+		}
+	},
+	"readinessMs": 16256.925500000001
+}
