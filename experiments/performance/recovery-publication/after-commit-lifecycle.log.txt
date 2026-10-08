@@ -1,0 +1,9 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/document-save-lifecycle.test.ts:
+(pass) interrupted durable save retains protection until hidden-page retry, emits Saved without changing content, and reopens offline [56.19ms]
+
+ 1 pass
+ 0 fail
+ 25 expect() calls
+Ran 1 test across 1 file. [104.00ms]

@@ -1,0 +1,326 @@
+http://localhost:49351/
+PASS document scenarios finish within their progress budget
+PASS real browser document API scenarios complete: 
+PASS simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections
+PASS browser identity is available before any network authentication
+PASS native browser account login serializes cookie issuance and agrees with server verification
+PASS native browser session stays HttpOnly
+PASS typed browser client opens document from current snapshot
+PASS browser sidebar projection derives title from frontmatter
+PASS history is downloaded separately from document open
+PASS browser IndexedDB restores a 50,000-character document without fetching history
+PASS cached whole-document state includes comments
+PASS document session opens from one snapshot without requesting history
+PASS real editor input persists an exact whole-document action locally while offline
+PASS a failed IndexedDB save retains the optimistic edit and reports an unsaved failure
+PASS the next input retries earlier unsaved edits in order before saving itself
+PASS an oversized paste fails before optimistic mutation and cannot block the save queue
+PASS a normal editor input still saves after a permanently invalid paste
+PASS an invalid action label fails without poisoning the queue or pending actions
+PASS a derived cache failure does not turn durable source into unsaved work
+PASS a successful background cache save clears its earlier transient failure
+PASS offline reopening restores cached source and original pending action without network access
+PASS a reopened tab has a separate actor and preserves the previous tab's pending actor
+PASS reconnect removes pending work only after reading the authoritative receipt
+PASS reconnected server state preserves edited source and existing comments
+PASS a duplicate local proposal does not resurrect already accepted work
+PASS reusing a proposal identity with different content is rejected without changing pending work
+PASS a lost response after server commit leaves the original action durably pending
+PASS reopening after a lost receipt reconciles accepted work before attempting another write
+PASS invalid child ownership in received history fails before entering the durable journal
+PASS a rejected history page cannot poison later document reopening
+PASS a mismatched authoritative receipt preserves the original pending action
+PASS an epoch error remains typed and preserves pending work
+PASS two simultaneous local sessions converge while preserving both offline actions
+PASS both sessions reconcile receipts without submitting duplicate actions
+PASS comment and asset actions flush preceding source edits and persist offline in the same document journal
+PASS concurrent action creation and source editing use distinct actors and operation identities
+PASS source and whole-document actions preserve the session author's identity
+PASS invalid and cross-document action builders leave the document and pending work unchanged
+PASS a failed journal write cannot publish an uncommitted comment change
+PASS typing during an action write preserves both the optimistic source and durable comment state
+PASS permission actions retain the register observed in durable document state
+PASS offline reopening restores mixed document state and every original pending action identity
+PASS cached reopening preserves permission action authors, identities, labels and observed guards
+PASS reconnect accepts mixed source, comment and asset actions without clock gaps or lost fields
+PASS reconnect applies the preserved permission proposal under current owner authorization
+PASS successful replay preserves a persistent snapshot quota error without labeling source unsaved
+PASS a failed snapshot copy retries and heals without another editor input
+PASS a failed typed append retains its draft, save error and navigation guard
+PASS typed source automatically becomes durable while idle after storage recovers
+PASS post-append replay failure reports projection lag independently of snapshot copies
+PASS a committed action automatically reaches the visible projection without manual replay or another command
+PASS a failed cross-tab hint cannot turn a durable visible action into a projection or save failure
+PASS a later successful hint clears only the notification failure
+PASS the native read facade protects tracked atom arrays and atom values from mutation
+PASS optimistic input publishes a view revision and synchronously protects an unsaved draft
+PASS the navigation guard clears after the draft is durably saved
+PASS a delayed snapshot acknowledgement releases the editing gate so a source append can finish
+PASS two sessions serialize independent comment and asset actions through the real journal lock
+PASS both sessions reconcile concurrent whole-document actions without identity collisions
+PASS a blocked journal action keeps source typing responsive without exposing uncommitted settings
+PASS releasing the real journal lock persists the action before queued typing and preserves both
+PASS retrying the same action effect retains its original proposal and does not repeat the builder
+PASS a projection failure after journal append preserves the successful save and reports cache recovery separately
+PASS retry after an uncertain projection outcome reconciles the original action without duplicating it
+PASS a Ref-held stale permission action returns a typed conflict on every retry without regenerating its guards
+PASS a locally rejected stale permission action cannot block later document synchronization
+PASS the exact-proposal retry interface cannot introduce an action using the editor's actor
+PASS a generic action waiting for the journal protects navigation before it becomes durable
+PASS interrupting an uncommitted action releases its navigation guard
+PASS an action waiting for another tab's journal lock can be interrupted without appending
+PASS retry after lock-wait interruption preserves the prepared action and executes its builder once
+PASS cold local journal replay reconstructs all document state without a cached projection or HTTP snapshot
+PASS a local file without an agreed merge base preserves both different versions instead of overwriting the disk
+PASS overlapping local file edits preserve the editor and disk versions without writing
+PASS a disk edit during a durable editor merge is reread and preserved before any disk write
+PASS a disk merge reports durable journal failure as an error, preserving both source versions
+PASS independent edits on the same local-file line merge through the durable document session
+PASS a repeated disk merge does not duplicate already incorporated insertions
+PASS cold folder history replays creation, edits, undo and redo offline without inventing server positions
+PASS local history restores frontmatter metadata through the same validated document replay
+PASS a 200,000-character frontmatter document survives its checkpoint without exceeding browser argument limits
+PASS deleting a large body preserves its header without exceeding browser argument limits
+PASS local file merging preserves an independent 128 KB insertion without exceeding browser argument limits
+PASS durable offline comments edits retain convergent frontmatter through cold replay and Time machine
+PASS durable offline ending edits retain convergent frontmatter through cold replay and Time machine
+PASS durable offline separator edits retain convergent frontmatter through cold replay and Time machine
+PASS durable offline aliases edits retain convergent frontmatter through cold replay and Time machine
+PASS durable offline deleted-anchor edits retain convergent frontmatter through cold replay and Time machine
+PASS durable offline deleted-existing-alias edits retain convergent frontmatter through cold replay and Time machine
+PASS durable offline undone-anchor edits retain convergent frontmatter through cold replay and Time machine
+PASS closing retries a transient final append before releasing the document
+PASS closing ends editor intake before awaiting its final snapshot copy
+PASS closing refuses new whole-document commands before executing their builders
+PASS closed commit and sync reject use before touching the journal or remote transport
+PASS an exhausted final flush fails release observably and retains its queued draft for inspection
+PASS failed close cannot publish an unsaved draft as durable and leaves its source available for recovery
+PASS oversized derived actor identities fail before loading a document
+PASS invalid actor characters fail when opening instead of rejecting every edit
+PASS a bound browser client rejects a different account's cookie
+PASS a local creation opens its complete root without inventing a remote snapshot
+PASS local creation and subsequent editing share one durable document journal
+PASS cached reopening remembers publication data without depending on the creation locator
+PASS a lost creation response preserves the exact creation and later source proposal
+PASS publication cannot settle a creation receipt attributed to another subject
+PASS retry publication settles only the matching creation and then accepts its later local edits
+PASS the server retains one creation after lost and invalid publication receipts
+PASS independent sessions initialize and publish one identical creation without resetting accepted state
+PASS a delayed duplicate publication cannot rewind an accepted cursor or replay already accepted history
+PASS a local snapshot contains accepted source at its exact remote position
+PASS pending source, discussion and attachment records remain separate from the accepted checkpoint
+PASS incoming history cannot use a pending local atom to legitimize an unaccepted fact
+PASS invalid incoming history appends no journal entry and advances no accepted snapshot cursor
+PASS reopening an accepted-only snapshot restores complete pending document state
+PASS accepted-only reopening preserves exact ordered proposals without snapshot or history requests
+PASS v1 migration replays the local journal without losing pending source or action identities
+PASS v1 migration writes an accepted-only v3 checkpoint using no remote history
+PASS a damaged derived snapshot rebuilds from the journal and preserves every durable pending action
+PASS an unreadable derived cache rebuilds without losing pending actions or downloading remote history
+PASS legacy cache migration depends only on its identity and covered journal position
+PASS subsequent v3 opening reads only the local journal tail rather than replaying old entries
+PASS exact accepted receipts move source, comments and attachment records into the accepted checkpoint
+PASS an unpublished document keeps its root only in the exact pending creation action
+PASS publication installs the accepted creation root before later receipt replay
+PASS accepted history permits an anchor introduced by an earlier action in the same batch
+PASS a bad suffix rejects the entire incoming batch before its valid prefix is journaled or projected
+PASS a conflicting covered contribution rejects the entire received batch before persistence
+PASS a late initial snapshot cannot overwrite a concurrently recorded offline creation
+PASS the retained creation publishes its exact identity and then merges newer accepted source
+PASS the creation-snapshot race leaves a valid local checkpoint that reopens without another snapshot
+PASS a waiting writer cannot mark dirty before acquiring the lease held by marker clearing
+PASS an append after marker clearing remains discoverable by the closed-document drainer
+PASS only accepted journal state clears the durable dirty marker
+PASS a failed derived metadata copy does not invalidate a successful source journal append
+PASS metadata-copy recovery heals after the journal checkpoint was already copied
+PASS a durable creation intent repairs its missing sidebar summary after interrupted initialization
+PASS recovered creation intent initializes its complete journal without network or regenerated identities
+PASS normal: persisted catalogue excerpt matches existing semantics
+PASS normal: catalogue publishes the projected revision
+PASS interior boundary blanks: persisted catalogue excerpt matches existing semantics
+PASS interior boundary blanks: catalogue publishes the projected revision
+PASS terminal boundary blanks: persisted catalogue excerpt matches existing semantics
+PASS terminal boundary blanks: catalogue publishes the projected revision
+PASS leading markers: persisted catalogue excerpt matches existing semantics
+PASS leading markers: catalogue publishes the projected revision
+PASS all blank: persisted catalogue excerpt matches existing semantics
+PASS all blank: catalogue publishes the projected revision
+PASS CRLF interior: persisted catalogue excerpt matches existing semantics
+PASS CRLF interior: catalogue publishes the projected revision
+PASS ECMAScript whitespace: persisted catalogue excerpt matches existing semantics
+PASS ECMAScript whitespace: catalogue publishes the projected revision
+PASS non-trim control: persisted catalogue excerpt matches existing semantics
+PASS non-trim control: catalogue publishes the projected revision
+PASS astral boundary: persisted catalogue excerpt matches existing semantics
+PASS astral boundary: catalogue publishes the projected revision
+PASS astral within boundary: persisted catalogue excerpt matches existing semantics
+PASS astral within boundary: catalogue publishes the projected revision
+PASS lone high unit: persisted catalogue excerpt matches existing semantics
+PASS lone high unit: catalogue publishes the projected revision
+PASS lone low unit: persisted catalogue excerpt matches existing semantics
+PASS lone low unit: catalogue publishes the projected revision
+PASS closed header: persisted catalogue excerpt matches existing semantics
+PASS closed header: catalogue publishes the projected revision
+PASS BOM CRLF header: persisted catalogue excerpt matches existing semantics
+PASS BOM CRLF header: catalogue publishes the projected revision
+PASS malformed YAML header: persisted catalogue excerpt matches existing semantics
+PASS malformed YAML header: catalogue publishes the projected revision
+PASS unclosed header: persisted catalogue excerpt matches existing semantics
+PASS unclosed header: catalogue publishes the projected revision
+PASS non-leading header: persisted catalogue excerpt matches existing semantics
+PASS non-leading header: catalogue publishes the projected revision
+PASS header without closing newline: persisted catalogue excerpt matches existing semantics
+PASS header without closing newline: catalogue publishes the projected revision
+PASS empty body: persisted catalogue excerpt matches existing semantics
+PASS empty body: catalogue publishes the projected revision
+PASS BOM without header: persisted catalogue excerpt matches existing semantics
+PASS BOM without header: catalogue publishes the projected revision
+PASS catalogue excerpt survives storage close and reopen
+PASS discussion submit retries preserve the exact action and one comment identity
+PASS discussion captures the chosen occurrence before intervening source edits
+PASS discussion rendering reuses its immutable projection until the session changes
+PASS discussion exposes failed durable saves without reporting a successful reply
+PASS editing a failed reply rebuilds the action while retaining one reply identity
+PASS resubmitting a saved comment edits only its body while preserving anchors and peer replies
+PASS concurrent resolve intents set an explicit state instead of toggling a thread open
+PASS discussion reopens a resolved thread with an explicit action
+PASS reader and revoked discussion commands fail before changing local state
+PASS a permission change before staging prevents a discussion action from entering the journal
+PASS comments settings edit authoritative frontmatter without discarding queued source
+PASS disabled comments reject new replies while retaining existing discussion
+PASS a current server snapshot restores discussion without downloading old action bodies
+PASS discussion marks a deleted anchored occurrence orphaned without selecting an identical earlier quote
+PASS a reply prepared before deletion cannot resurrect its thread
+PASS discussion refuses a non-comment target even when it belongs to the document
+PASS source, comments, replies, settings and deletion appear in one document history
+PASS offline attachments chunk and persist bytes before appending without making HTTP requests
+PASS one attachment action commits its manifest and anchored source insertion while preserving intervening source edits
+PASS retrying an attachment Effect preserves its asset and exact action identity
+PASS identical attachment retry does not duplicate durable byte chunks
+PASS cached multi-chunk attachment bytes restore exactly without network access
+PASS a synchronous IndexedDB quota failure retains its cause and appends neither attachment nor source changes
+PASS native attachment producers refuse reader changes before any byte or document append
+PASS native transfer requests can exceed the ordinary document deadline while remaining interruptible
+PASS the supplied native transfer deadline still bounds a stalled request
+PASS offline creation publishes before its attachment bytes and action synchronize
+PASS a current native snapshot restores the attachment and source without history or binary payloads
+PASS attachment mutation rejects a non-asset target without appending
+PASS native binary download verifies and caches missing chunks for future offline opening
+PASS corrupt local attachment copies are repaired from verified server bytes
+PASS missing local attachment bytes keep the exact action pending rather than publishing a dangling manifest
+PASS restoring an attachment refuses a different file size without changing the queued journal
+PASS restoring an attachment refuses different content and cannot replace missing chunks with wrong bytes
+PASS attachment recovery checks the current writer role before saving bytes
+PASS attachment recovery refuses a document root as an asset target
+PASS restoring original attachment bytes allows the retained action to synchronize unchanged
+PASS deleting an unsynchronized attachment retains its blocked manifest action rather than falsely settling it
+PASS original bytes can recover a deleted pending attachment so its attach and delete synchronize in order
+PASS local causal validation refuses stale source before it can enter the durable document queue
+PASS concurrent native media renders share one content-addressed preview URL
+PASS releasing one media render cannot revoke a URL held by another render
+PASS attachment renaming preserves the acquired preview URL
+PASS native media never exposes executable HTML or a non-asset record as a preview URL
+PASS a missing native attachment reports its own failure while healthy preview resources remain usable
+PASS restoring native attachment bytes retries a failed resource immediately without reopening the document
+PASS SVG previews expose rasterized PNG bytes while preserving the original document attachment
+PASS native SVG rasterization preserves the visible image dimensions
+PASS safe SVG preview does not rewrite the attachment manifest or its original MIME type
+PASS control and non-ASCII MIME characters cannot produce an untyped executable preview URL
+PASS preview MIME normalization retains codec-bearing media while exposing a known inert content type
+PASS native image mute fails without appending an unrelated register action
+PASS native video mute retries its exact whole-document action identity
+PASS native reader attachment commands fail at the producer without altering document state
+PASS native insertion uses captured atoms and preserves source written after selection
+PASS native insertion retries one exact journal action without duplicating its source reference
+PASS native multi-file attachment commits both manifests and chosen source order in one action
+PASS native attachment batch retries the same action and asset identities
+PASS failure storing a batch's later file cannot append partial manifests or source references
+PASS a defective media lookup releases its lease and reports only that asset without hiding healthy previews
+PASS closing a document's media scope revokes its acquired object URLs
+PASS native attachment rename changes its document register without changing blob identity
+PASS attachment deletion removes its manifest and source reference together while retaining historical bytes
+PASS inline media insertion preserves concurrent peer text and replaces only the remembered Atom selection
+PASS the asset module reuses a same-document whiteboard inline without splitting surrounding paragraphs
+PASS a media picker with an invalid saved range cannot append an attachment action
+PASS revoking write access after a media picker opens prevents its saved insertion
+PASS native browser accepts the original whole-document action
+PASS browser discovers an uncompensated action through metadata only
+PASS snapshot and one indexed action derive a mixed causal compensation
+PASS browser session journals accepted text and record compensation as one action
+PASS browser resolves the current undo/redo tip without downloading earlier actions
+PASS browser redo retains peer deletion while restoring comments and manifests
+PASS offline reopening restores whole-document undo and redo without snapshots or historical downloads
+PASS cold browser checkpoint retains enough provenance for the next complete compensation
+PASS single-action HTTP carries server-recorded inherited register identities for deletion redo
+PASS browser receipt replay restores deleted records without changing inherited fields
+PASS native browser redo of mixed record deletion removes links and records together
+PASS a lost withdrawal response preserves the rejected chain and exact healthy proposal
+PASS a real stale undo quarantines its dependent redo and restores current accepted state
+PASS rejection preserves both exact proposals and their typed root failure
+PASS a later independent action synchronizes past a definitely rejected undo
+PASS retrying an exact quarantined proposal reports its recorded failure
+PASS a new redo referencing a quarantined action fails explicitly
+PASS withdrawal retries submit the exact same original bytes after a lost response
+PASS cold offline reopening retains rejection forensics without downloading state or history
+PASS a cold synchronized reopening does not resubmit acknowledged withdrawals
+PASS accepted history cannot resurrect an acknowledged withdrawn proposal
+PASS a changed rejected cache body is repaired from its exact journal proposal
+PASS typing during journal persistence survives a projection swap without reproducing a rejected undo
+PASS ordinary input against the stale displayed base preserves restored remote text
+PASS rollback keeps draft operation identities unique and never reuses a rejected id
+PASS typing retained through rollback reaches the server with its original operation identity
+PASS typing retained through rollback reaches the server with its original operation identity
+PASS rollback defers updating an active IME composition while accepted text changes
+PASS ending composition keeps its own input without restoring text from a rejected deletion undo
+PASS permission conflicts quarantine later actions that observed the rejected permission register
+PASS permission recovery preserves and synchronizes independent source edits
+PASS a peer asset reference rejects the entire mixed undo and its redo
+PASS a later authoritative acceptance wins over rejection while its unaccepted dependent stays quarantined
+PASS a dependent's own authoritative receipt also wins without silently resurrecting other proposals
+PASS non-definite transport failure preserves pending bytes: Offline
+PASS non-definite transport failure preserves pending bytes: Server failure
+PASS non-definite transport failure preserves pending bytes: Access revoked
+PASS non-definite transport failure preserves pending bytes: Other conflict
+PASS recovering connectivity retries the same proposal identity
+PASS a valid v2 cache restores accepted document state directly
+PASS a valid v2 cache is rewritten as v3 at its covered journal position
+PASS an optimistic undo temporarily restores the character needed by the deletion race
+PASS deleting a character restored only by a rejected undo survives the saved-rejection replay
+PASS the deletion race preserves its exact operation identity through durability and synchronization
+PASS a rejection requiring inserted-text recovery preserves its original typed failure
+PASS an inserted-text rejection closure preserves every exact pending action for explicit recovery
+PASS refused automatic rejection leaves the journal replayable without discarding typed content
+PASS the accepted-state cache separately persists rejected proposals in v3
+PASS offline undo compensates one mixed source, asset and settings action atomically
+PASS offline whole-document undo naturally includes discussion records
+PASS offline redo derives a pending compensation without treating it as a server fact
+PASS a cold offline opening restores its document without fetching undo history
+PASS cold offline redo reconstructs the same branch and complete asset state from its journal
+PASS undo follows the current compensation tip after a cold redo
+PASS a new normal action invalidates redo without changing or erasing pending history
+PASS the native server verifies and accepts the exact offline undo/redo chain in original order
+PASS accepted whole-document undo uses its canonical journal receipt
+PASS a stale selected undo is quarantined while its original action remains undoable
+PASS a new undo after rejection derives from canonical provenance and preserves peer registers
+PASS a peer compensation extends the indexed chain before another undo is proposed
+PASS a failed undo append preserves every pending action and the complete visible state
+PASS retrying the same undo retains its original target and identity after a later independent edit
+PASS interrupting undo while another tab holds the journal lock appends no compensation
+PASS undo interrupted after preparation retries its exact target rather than selecting a newer action
+PASS concurrent undo invocations serialize selection and create distinct compensations
+PASS two tabs selecting the same undo cannot append a fork through the shared journal lock
+PASS after a cross-tab undo conflict the next invocation continues the stack and the server accepts both tips
+PASS text typed during lazy undo indexing survives and makes the waiting command stale before any compensation append
+PASS a completely peer-overwritten newest action cannot block undo of an older independent contribution
+PASS a definite undo-floor rejection excludes its root without repeatedly proposing or withdrawing the same unavailable undo
+PASS cold undo derives the unavailable-root boundary from retained rejection facts
+PASS cold undo indexes a long local journal in bounded pages without a remote history download
+PASS closing a pending comment dialog suppresses cancelled submission errors and saved callbacks
+PASS a delayed old submission cannot close or report success for a newer dialog
+PASS a different browser identity refuses automatic cookie replacement without submitting a login proof
+PASS logout persists across account reacquisition and prevents another existing context from signing back in
+PASS explicit sign-in clears the shared sign-out policy and permits another account context to reconnect
+PASS explicit logout prevents automatic sign-in and rejects account requests before running them
+PASS logout revokes cookie access to document snapshots
+PASS all document browser assertions ran
+MEASURE {"decodedBodySize":11568862,"encodedBodySize":327900,"restoreMilliseconds":119.39999997615814,"snapshotDownloadMilliseconds":166.10000002384186}

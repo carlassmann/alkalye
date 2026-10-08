@@ -1,0 +1,28 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/document-save-lifecycle.test.ts:
+1658 | /** @internal */
+1659 | export const delay = /*#__PURE__*/dual(2, (self, duration) => andThen(sleep(duration), self));
+1660 | /** @internal */
+1661 | export const timeoutOrElse = /*#__PURE__*/dual(2, (self, options) => flatMap(timeoutOption(self, options.duration), option => Option.isNone(option) ? options.orElse() : succeed(option.value)));
+1662 | /** @internal */
+1663 | const timeoutErrorFromDuration = duration => new TimeoutError(`Operation timed out after '${Duration.format(duration)}'`);
+                                                    ^
+error: Operation timed out after '3s'
+       _tag: "TimeoutError",
+ ~effect/Cause/TimeoutError: "~effect/Cause/TimeoutError",
+
+      at timeoutErrorFromDuration (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:1663:46)
+      at orElse (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:1669:24)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:1139:9)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:434:19)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+(fail) interrupted durable save retains protection until hidden-page retry, emits Saved without changing content, and reopens offline [3088.37ms]
+
+ 0 pass
+ 1 fail
+ 6 expect() calls
+Ran 1 test across 1 file. [3.17s]

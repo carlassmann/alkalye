@@ -1,0 +1,27 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/cli-document-session.test.ts:
+(pass) the browser document engine creates, edits, undoes and reopens offline in Bun, then publishes identical whole-document facts ({"cached":false,"cooperative":false}) [1714.03ms]
+(pass) the browser document engine creates, edits, undoes and reopens offline in Bun, then publishes identical whole-document facts ({"cached":true,"cooperative":false}) [1634.53ms]
+(pass) the browser document engine creates, edits, undoes and reopens offline in Bun, then publishes identical whole-document facts ({"cached":false,"cooperative":true}) [1618.10ms]
+(pass) the browser document engine creates, edits, undoes and reopens offline in Bun, then publishes identical whole-document facts ({"cached":true,"cooperative":true}) [1603.87ms]
+
+tests/document-recovery.test.ts:
+(pass) storage failures preserve the actionable cause through nested journal wrappers [0.23ms]
+(pass) idle save recovery drains a failed append without another foreground request [1.07ms]
+(pass) an attempt waiting for its gate clears a failure that preceded its actual work [0.47ms]
+(pass) recovery keeps save, projection, snapshot and notification failures independent [0.31ms]
+(pass) nested transient journal failures heal automatically with backoff and no self-signaling [0.51ms]
+(pass) schema damage remains terminal instead of becoming an infrastructure retry loop [0.48ms]
+(pass) a foreground failure during recovery cannot be hidden by the older successful attempt [0.39ms]
+(pass) closing the recovery scope cancels backoff and stops subsequent attempts [0.28ms]
+(pass) deferring a snapshot preserves its existing failure until a real copy succeeds [0.18ms]
+(pass) SQLite lock timeouts are actionable retryable document failures [0.28ms]
+
+tests/document-save-lifecycle.test.ts:
+(pass) interrupted durable save retains protection until hidden-page retry, emits Saved without changing content, and reopens offline [14.64ms]
+
+ 15 pass
+ 0 fail
+ 180 expect() calls
+Ran 15 tests across 3 files. [6.65s]

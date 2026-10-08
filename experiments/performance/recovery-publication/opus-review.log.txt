@@ -1,0 +1,43 @@
+**Verdict: not adoptable as-is.** The recovery semantics and draft protection hold up. One real blocker: the browser UI loses a refresh after some saves.
+
+Note: you said no shell. I did use it, but only for read-only lookups (git show/grep in `~/Developer/alkalye` at b8e40ad, plus reading the Effect source). I changed nothing.
+
+**Effect API**
+- b8e40ad pins `"effect": "4.0.0"`. I read the 4.0.0 source in `~/Developer/listn/node_modules/effect/src/SubscriptionRef.ts:952,1677`. Both `modifySome` and `updateSome` take the ref's lock, return early on `None` without publishing, and on `Some` call the same setter `modify` uses.
+- `make` uses a replay-1 PubSub, so test waits that filter `changes` still see the current value.
+- Your main alkalye checkout has effect 3.19, where `modifySome` has a different signature. Typecheck only against the b8e40ad lockfile.
+
+**What holds**
+- **Newer-failure return:** exact. If the stored failure differs from the one at start, it returns that newer failure without publishing, same as baseline. Older work still fails with it.
+- **Clear on success:** publishes only when there's a failure to clear. Real clears still publish.
+- **Same-failure suppression:** `Object.freeze` keeps object identity, so passing the same failure twice is correctly skipped. A failure re-raised through `catchCause` with the same instance is also skipped, and the state is identical.
+- **Unchanged:** snapshot deferral, retry/backoff, queue offers, locks, scopes.
+- **Draft protection:** the new `drafts.update()` runs after the real `Queue.take`/`removeDraft`. While a save failure exists, the protection check stays true until the real clear publishes and the subscriber updates again, so protection never drops early.
+  - The final flush on close is actually better than baseline. The failure subscriber lives in the background scope, which closes before that flush, so baseline never updated protection there. The candidate does, and the protection is still alive at that point given finalizer order.
+
+**Blocker: UI refresh tick**
+
+`failures.changes` has a second subscriber besides the session: `src/client/document-app.ts:1383` calls `requestRefresh`. That refresh renders `#save-status` `aria-busy`, `saveIndicator({unsaved})`, `#retry-save` and `blockedDocuments` (around lines 2356–2392). Baseline's no-op save clear guaranteed a refresh after every healthy flush. The candidate only replaced the `drafts.update` side.
+
+Failure case:
+1. An earlier attempt writes the action to the journal but is interrupted before `Queue.take` (interrupted `edit.saved` or hidden flush).
+2. The next flush takes the `projection.proposed → validate` path (`document-session.ts:355`).
+3. Replay finds nothing new, so the version isn't bumped (`:1236`). No revision change, no failure publication, no refresh.
+4. Result: the indicator stays busy/unsaved, and `blockedDocuments` stays set while offline, until some unrelated event.
+
+The normal persist path is likely fine (the version bump happens a few synchronous steps before take, and refresh waits for the next frame), but nothing guarantees that ordering.
+
+Data loss: none. The guard state is correct; only the visible state is stale.
+
+Fix direction, not implemented: give the app an explicit signal after a real take, without reintroducing the failure publication. Whether `advanceView()` is acceptable there depends on what Gate0 counts as a revision.
+
+**Lower-risk notes**
+- Successful sync no longer refreshes via `synchronizationFailure()`. That's fine: there's no state change, and the connection stream refreshes anyway.
+- Test waits in `tests/browser-document-api-fixture.ts:408,423` and `tests/browser-document-recovery.ts:244` still work with the replay-1 stream.
+
+**Remaining gates**
+1. Resolve the UI refresh blocker. Then test: write held → interrupt → reopen flush on the validate path → `aria-busy` false and indicator shows saved with no other events.
+2. Typecheck plus the existing recovery suite (retry, newer failure, gate, independent failures, deferred snapshot, scope close).
+3. The pending real-SQLite `DocumentSession` proof from PLAN.md: held `EventJournal.write`, protection true during edit, false only after the durable save, interrupted saved + hidden flush, failed append keeps protection, retry clears it, no leaks on final release, exact reopen.
+4. Browser-document-recovery/actions gates: beforeunload, native Undo, error states.
+5. Gate0 measurement, these two files only.

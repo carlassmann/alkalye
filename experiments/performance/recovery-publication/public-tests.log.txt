@@ -1,0 +1,43 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/cli-document-session.test.ts:
+(pass) the browser document engine creates, edits, undoes and reopens offline in Bun, then publishes identical whole-document facts ({"cached":false,"cooperative":false}) [1693.63ms]
+(pass) the browser document engine creates, edits, undoes and reopens offline in Bun, then publishes identical whole-document facts ({"cached":true,"cooperative":false}) [1606.93ms]
+(pass) the browser document engine creates, edits, undoes and reopens offline in Bun, then publishes identical whole-document facts ({"cached":false,"cooperative":true}) [1635.17ms]
+(pass) the browser document engine creates, edits, undoes and reopens offline in Bun, then publishes identical whole-document facts ({"cached":true,"cooperative":true}) [1644.60ms]
+
+tests/document-recovery.test.ts:
+(pass) storage failures preserve the actionable cause through nested journal wrappers [0.20ms]
+(pass) idle save recovery drains a failed append without another foreground request [0.93ms]
+(pass) an attempt waiting for its gate clears a failure that preceded its actual work [0.41ms]
+(pass) recovery keeps save, projection, snapshot and notification failures independent [0.26ms]
+(pass) nested transient journal failures heal automatically with backoff and no self-signaling [0.47ms]
+(pass) schema damage remains terminal instead of becoming an infrastructure retry loop [0.41ms]
+(pass) a foreground failure during recovery cannot be hidden by the older successful attempt [0.33ms]
+(pass) closing the recovery scope cancels backoff and stops subsequent attempts [0.25ms]
+(pass) deferring a snapshot preserves its existing failure until a real copy succeeds [0.16ms]
+(pass) SQLite lock timeouts are actionable retryable document failures [0.23ms]
+
+tests/document-save-lifecycle.test.ts:
+2087 | 	return Schema.decodeEffect(codec)(payload).pipe(
+2088 | 		Effect.mapError(error => storageFailure("decode document journal", error)),
+2089 | 	)
+2090 | }
+2091 | function conflict(message: string) {
+2092 | 	return Effect.fail(new DocumentConflict({ message }))
+                               ^
+error: Creation belongs to another document or account
+ _tag: "DocumentConflict",
+
+      at conflict (/private/tmp/alkalye-recovery-noop-publication/runtime/src/shared/document-session.ts:2092:25)
+      at /private/tmp/alkalye-recovery-noop-publication/runtime/src/shared/document-session.ts:1697:21
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at /Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17
+(fail) interrupted durable save retains protection until hidden-page retry, emits Saved without changing content, and reopens offline [7.38ms]
+
+ 14 pass
+ 1 fail
+ 155 expect() calls
+Ran 15 tests across 3 files. [6.66s]

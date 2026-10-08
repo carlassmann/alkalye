@@ -1,0 +1,29 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/document-save-lifecycle.test.ts:
+ 97 | 					: Effect.void), Effect.forkScoped({ startImmediately: true }))
+ 98 | 				yield* PubSub.publish(hidden, undefined)
+ 99 | 				yield* Deferred.await(saved).pipe(Effect.timeout("3 seconds"))
+100 | 				expect(session.unsaved()).toBe(0)
+101 | 				expect(protectedDraft).toBe(false)
+102 | 				expect(session.version()).toBe(version)
+                                    ^
+error: expect(received).toBe(expected)
+
+Expected: 2
+Received: 3
+
+      at <anonymous> (/private/tmp/alkalye-recovery-noop-publication/runtime/tests/document-save-lifecycle.test.ts:102:31)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:434:19)
+      at runTasks (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:169:15)
+      at afterScheduled (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:159:10)
+(fail) interrupted durable save retains protection until hidden-page retry, emits Saved without changing content, and reopens offline [60.22ms]
+
+ 0 pass
+ 1 fail
+ 6 expect() calls
+Ran 1 test across 1 file. [126.00ms]

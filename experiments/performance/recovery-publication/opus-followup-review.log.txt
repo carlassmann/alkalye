@@ -1,0 +1,23 @@
+**Verdict: no source blocker in the two-file candidate.** What's left is browser-level proof, not a source fix.
+
+**What I checked**
+- **Emission:** the installed Effect `SubscriptionRef.set` (`node_modules/effect/src/SubscriptionRef.ts:289-298`) always publishes, even when the value is unchanged. So `publishDraftStatus` reliably emits on `session.changes` with the content version unchanged. `updateSome`/`modifySome` skip publishing on `Option.none()`, as the recovery change assumes.
+- **Draft drain order** (`document-session.ts:358-360`): `Queue.take` → `removeDraft` → `drafts.update` → publish. The last three are synchronous after `take`, so an interrupt can't land between them. An interrupt before `take` leaves the action queued and protected. The next flush goes through `proposed` → `validate` → `take` → publish, so it doesn't write a second journal entry. This matches the test at `document-save-lifecycle.test.ts:187-218`.
+- **Protection:** the `protect` predicate depends on queue size, `inFlight` and `save` failure, and each is refreshed when it changes: `publishDraftStatus`, `propose` acquire/release, and `failures.changes`. A successful save no longer publishes a failures change, which is fine because draft status now goes out through `publishDraftStatus`.
+- **Recovery** (`document-recovery.ts:127-137`): the newer-failure rule is kept. If the failure changed after the attempt started, `modifySome` returns the newer failure and the attempt fails with it. A clear is published only when there was a failure to clear. `setFailure`/`synchronizationFailure` skip no-op updates.
+- **Consumers:** an extra same-version emission is harmless in each one:
+  - `document-app` refresh and save-status rendering: wanted, this is the Saved update.
+  - `document-media`: deduplicated by `Stream.changes`.
+  - whiteboard `pull`: diff-based, so a repeat call does nothing.
+  - `browser-library` sync (500 ms debounce) and `local-file-sync` (400 ms debounce): at most one extra `synchronize`/`reconcile`.
+- **Resources:** no new fibers, scopes or subscriptions. A publish during the finalizer's flush after `Queue.end` is safe.
+
+**Not blockers**
+- A flush of N drafts emits N same-version events with no coalescing. Only the debounced sync/reconcile consumers notice.
+- `Effect.runSync(SubscriptionRef.set(...))` inside `Effect.gen` would read better as `yield* SubscriptionRef.set`. It's safe either way, because the ref's semaphore is never held across an await, and `advanceView` already uses the same pattern.
+
+**Still needs native browser proof**
+- IndexedDB journal plus a real `visibilitychange` → hidden flush, with `#save-status` `data-unsaved` going 1→0 at an unchanged `data-version`.
+- The real `DocumentLifecycle.protect` (`beforeunload`) is released after that retry.
+- Cross-tab notification and replay don't emit a stale Saved.
+- An extra sync after each drain doesn't cause visible churn.

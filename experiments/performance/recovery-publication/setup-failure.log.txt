@@ -1,0 +1,1 @@
+Initial invocation rejected before executing: outside workdir did not exist. No compilation or tests ran.

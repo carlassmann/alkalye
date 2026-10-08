@@ -1,0 +1,29 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/document-save-lifecycle.test.ts:
+104 | 				expect(savedStatus?.unsaved).toBe(0)
+105 | 				expect(precedingStatus?.unsaved).toBe(1)
+106 | 				expect(savedStatus?.version).toBe(precedingStatus?.version)
+107 | 				expect(session.replica.text("doc")).toBe("Saved 😀 offline")
+108 | 				let retried = yield* storage.readAfter(0)
+109 | 				expect(retried.position).toBe(persisted.position)
+                                   ^
+error: expect(received).toBe(expected)
+
+Expected: 1
+Received: 2
+
+      at <anonymous> (/private/tmp/alkalye-recovery-noop-publication/runtime/tests/document-save-lifecycle.test.ts:109:30)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:434:19)
+      at runTasks (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:169:15)
+      at afterScheduled (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:159:10)
+(fail) interrupted durable save retains protection until hidden-page retry, emits Saved without changing content, and reopens offline [50.59ms]
+
+ 0 pass
+ 1 fail
+ 10 expect() calls
+Ran 1 test across 1 file. [113.00ms]
