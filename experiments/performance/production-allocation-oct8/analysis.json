@@ -1,0 +1,3210 @@
+[
+	{
+		"trial": 0,
+		"sampled": false,
+		"inputRunTaskMs": 7.249,
+		"aftermathMaxMs": 20.755,
+		"mainThread": [18725, 16759964],
+		"heapSample": {
+			"limit": 4395630592,
+			"total": 756161652,
+			"used": 695749892
+		},
+		"largestTasks": [
+			{
+				"relativeMs": 602.594,
+				"taskMs": 20.755,
+				"children": [
+					{
+						"name": "FunctionCall",
+						"ms": 20.638,
+						"args": {
+							"data": {
+								"columnNumber": 122887,
+								"frame": "BC9511371142209F4F0CCFADE5BB9EE8",
+								"functionName": "o.port1.onmessage",
+								"isolate": "16854245537302923878",
+								"lineNumber": 8,
+								"sampleTraceId": 1475265053067659,
+								"scriptId": "19",
+								"url": "http://127.0.0.1:4461/chunks/document-app-5r0cx4gq.js"
+							}
+						}
+					},
+					{
+						"name": "MajorGC",
+						"ms": 20.272,
+						"args": {
+							"type": "finalize incremental marking via stack guard",
+							"usedHeapSizeAfter": 562613156,
+							"usedHeapSizeBefore": 1317781256
+						}
+					}
+				]
+			},
+			{
+				"relativeMs": 684.236,
+				"taskMs": 14.396,
+				"children": [
+					{
+						"name": "FunctionCall",
+						"ms": 14.38,
+						"args": {
+							"data": {
+								"columnNumber": 122887,
+								"frame": "BC9511371142209F4F0CCFADE5BB9EE8",
+								"functionName": "o.port1.onmessage",
+								"isolate": "16854245537302923878",
+								"lineNumber": 8,
+								"sampleTraceId": 1475265053067510,
+								"scriptId": "19",
+								"url": "http://127.0.0.1:4461/chunks/document-app-5r0cx4gq.js"
+							}
+						}
+					},
+					{
+						"name": "MinorGC",
+						"ms": 13.653,
+						"args": {
+							"type": "allocation failure",
+							"usedHeapSizeAfter": 587858276,
+							"usedHeapSizeBefore": 616468308
+						}
+					}
+				]
+			},
+			{
+				"relativeMs": 245.699,
+				"taskMs": 14.052,
+				"children": [
+					{
+						"name": "FunctionCall",
+						"ms": 14.036,
+						"args": {
+							"data": {
+								"columnNumber": 122887,
+								"frame": "BC9511371142209F4F0CCFADE5BB9EE8",
+								"functionName": "o.port1.onmessage",
+								"isolate": "16854245537302923878",
+								"lineNumber": 8,
+								"sampleTraceId": 1475265053072063,
+								"scriptId": "19",
+								"url": "http://127.0.0.1:4461/chunks/document-app-5r0cx4gq.js"
+							}
+						}
+					},
+					{
+						"name": "MinorGC",
+						"ms": 13.755,
+						"args": {
+							"type": "allocation failure",
+							"usedHeapSizeAfter": 1132090892,
+							"usedHeapSizeBefore": 1160988832
+						}
+					}
+				]
+			},
+			{
+				"relativeMs": 802.96,
+				"taskMs": 13.914,
+				"children": [
+					{
+						"name": "FunctionCall",
+						"ms": 13.886,
+						"args": {
+							"data": {
+								"columnNumber": 122887,
+								"frame": "BC9511371142209F4F0CCFADE5BB9EE8",
+								"functionName": "o.port1.onmessage",
+								"isolate": "16854245537302923878",
+								"lineNumber": 8,
+								"sampleTraceId": 1475265053068240,
+								"scriptId": "19",
+								"url": "http://127.0.0.1:4461/chunks/document-app-5r0cx4gq.js"
+							}
+						}
+					},
+					{
+						"name": "MinorGC",
+						"ms": 13.606,
+						"args": {
+							"type": "allocation failure",
+							"usedHeapSizeAfter": 598854492,
+							"usedHeapSizeBefore": 627760920
+						}
+					}
+				]
+			}
+		],
+		"profiles": [],
+		"threadNames": [
+			{
+				"args": {
+					"name": "swapper"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 0,
+				"tid": 0,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "CrRendererMain"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16759964,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "PerfettoTrace"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18718,
+				"tid": 16759900,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "PerfettoTrace"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16759995,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "DedicatedWorker thread"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760272,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ServiceWorker thread"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760172,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "PerfettoTrace"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18708,
+				"tid": 16759850,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "CrBrowserMain"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18708,
+				"tid": 16759792,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "Chrome_DevToolsHandlerThread"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18708,
+				"tid": 16759903,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "Compositor"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760015,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "VizCompositorThread"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18718,
+				"tid": 16759939,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760004,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760008,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760139,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760140,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760141,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760144,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760142,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760145,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760146,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760147,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "Chrome_IOThread"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18708,
+				"tid": 16759857,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "Chrome_ChildIOThread"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760007,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolBackgroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18708,
+				"tid": 16759854,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "Chrome_ChildIOThread"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18718,
+				"tid": 16759938,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "CrGpuMain"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18718,
+				"tid": 16759872,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760174,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760176,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760175,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18708,
+				"tid": 16759852,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolServiceThread"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18708,
+				"tid": 16759851,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18708,
+				"tid": 16759853,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18708,
+				"tid": 16759855,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18708,
+				"tid": 16759865,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18718,
+				"tid": 16759936,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18718,
+				"tid": 16760073,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18718,
+				"tid": 16760074,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolSingleThreadSharedForeground"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18708,
+				"tid": 16759885,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760177,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760178,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760179,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18725,
+				"tid": 16760180,
+				"ts": 0
+			}
+		]
+	},
+	{
+		"trial": 1,
+		"sampled": true,
+		"inputRunTaskMs": 7.582,
+		"aftermathMaxMs": 20.147,
+		"mainThread": [18985, 16761657],
+		"heapSample": {
+			"limit": 4395630592,
+			"total": 816661429,
+			"used": 748107641
+		},
+		"largestTasks": [
+			{
+				"relativeMs": 509.385,
+				"taskMs": 20.147,
+				"children": [
+					{
+						"name": "FunctionCall",
+						"ms": 20.107,
+						"args": {
+							"data": {
+								"columnNumber": 122887,
+								"frame": "C4D5852C33DB3AD477B524BC720C6F19",
+								"functionName": "o.port1.onmessage",
+								"isolate": "4374075446778442220",
+								"lineNumber": 8,
+								"sampleTraceId": 8240005870126581,
+								"scriptId": "19",
+								"url": "http://127.0.0.1:4461/chunks/document-app-5r0cx4gq.js"
+							}
+						}
+					},
+					{
+						"name": "MajorGC",
+						"ms": 19.775,
+						"args": {
+							"type": "finalize incremental marking via stack guard",
+							"usedHeapSizeAfter": 577762488,
+							"usedHeapSizeBefore": 1246506488
+						}
+					}
+				]
+			},
+			{
+				"relativeMs": 718.006,
+				"taskMs": 14.426,
+				"children": [
+					{
+						"name": "FunctionCall",
+						"ms": 14.41,
+						"args": {
+							"data": {
+								"columnNumber": 122887,
+								"frame": "C4D5852C33DB3AD477B524BC720C6F19",
+								"functionName": "o.port1.onmessage",
+								"isolate": "4374075446778442220",
+								"lineNumber": 8,
+								"sampleTraceId": 8240005870127473,
+								"scriptId": "19",
+								"url": "http://127.0.0.1:4461/chunks/document-app-5r0cx4gq.js"
+							}
+						}
+					},
+					{
+						"name": "MinorGC",
+						"ms": 14.081,
+						"args": {
+							"type": "allocation failure",
+							"usedHeapSizeAfter": 638740420,
+							"usedHeapSizeBefore": 667756036
+						}
+					}
+				]
+			},
+			{
+				"relativeMs": 744.71,
+				"taskMs": 14.281,
+				"children": [
+					{
+						"name": "FunctionCall",
+						"ms": 14.262,
+						"args": {
+							"data": {
+								"columnNumber": 122887,
+								"frame": "C4D5852C33DB3AD477B524BC720C6F19",
+								"functionName": "o.port1.onmessage",
+								"isolate": "4374075446778442220",
+								"lineNumber": 8,
+								"sampleTraceId": 8240005870127435,
+								"scriptId": "19",
+								"url": "http://127.0.0.1:4461/chunks/document-app-5r0cx4gq.js"
+							}
+						}
+					},
+					{
+						"name": "MinorGC",
+						"ms": 13.985,
+						"args": {
+							"type": "allocation failure",
+							"usedHeapSizeAfter": 640961388,
+							"usedHeapSizeBefore": 669856888
+						}
+					}
+				]
+			},
+			{
+				"relativeMs": 235.138,
+				"taskMs": 13.89,
+				"children": [
+					{
+						"name": "FunctionCall",
+						"ms": 13.876,
+						"args": {
+							"data": {
+								"columnNumber": 122887,
+								"frame": "C4D5852C33DB3AD477B524BC720C6F19",
+								"functionName": "o.port1.onmessage",
+								"isolate": "4374075446778442220",
+								"lineNumber": 8,
+								"sampleTraceId": 8240005870131412,
+								"scriptId": "19",
+								"url": "http://127.0.0.1:4461/chunks/document-app-5r0cx4gq.js"
+							}
+						}
+					},
+					{
+						"name": "MinorGC",
+						"ms": 13.591,
+						"args": {
+							"type": "allocation failure",
+							"usedHeapSizeAfter": 1138714052,
+							"usedHeapSizeBefore": 1167624096
+						}
+					}
+				]
+			}
+		],
+		"profiles": [
+			{
+				"inclusiveRows": [
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(root)",
+							"scriptId": 0
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 3000.672,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(idle)",
+							"scriptId": 0
+						},
+						"selfMs": 1692.474,
+						"inclusiveMs": 1692.474,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(garbage collector)",
+							"scriptId": 0
+						},
+						"selfMs": 468.439,
+						"inclusiveMs": 468.439,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 122886,
+							"functionName": "o.port1.onmessage",
+							"lineNumber": 7,
+							"scriptId": 19,
+							"url": "http://127.0.0.1:4461/chunks/document-app-5r0cx4gq.js"
+						},
+						"selfMs": 0.678,
+						"inclusiveMs": 417.49,
+						"mapped": {
+							"source": "../src/client/scheduler.ts",
+							"line": 28,
+							"column": 17,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 122663,
+							"functionName": "r",
+							"lineNumber": 7,
+							"scriptId": 19,
+							"url": "http://127.0.0.1:4461/chunks/document-app-5r0cx4gq.js"
+						},
+						"selfMs": 0.006,
+						"inclusiveMs": 416.812,
+						"mapped": {
+							"source": "../src/client/scheduler.ts",
+							"line": 12,
+							"column": 3,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 9327,
+							"functionName": "runTasks",
+							"lineNumber": 8,
+							"scriptId": 35,
+							"url": "http://127.0.0.1:4461/chunks/document-app-x9k35fb4.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 416.806,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js",
+							"line": 164,
+							"column": 11,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 9277,
+							"functionName": "afterScheduled",
+							"lineNumber": 8,
+							"scriptId": 35,
+							"url": "http://127.0.0.1:4461/chunks/document-app-x9k35fb4.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 416.806,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js",
+							"line": 157,
+							"column": 20,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1241,
+							"functionName": "evaluate",
+							"lineNumber": 22,
+							"scriptId": 35,
+							"url": "http://127.0.0.1:4461/chunks/document-app-x9k35fb4.js"
+						},
+						"selfMs": 0.397,
+						"inclusiveMs": 415.992,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 406,
+							"column": 11,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 4976,
+							"functionName": "",
+							"lineNumber": 22,
+							"scriptId": 35,
+							"url": "http://127.0.0.1:4461/chunks/document-app-x9k35fb4.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 415.992,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 735,
+							"column": 42,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1814,
+							"functionName": "runLoop",
+							"lineNumber": 22,
+							"scriptId": 35,
+							"url": "http://127.0.0.1:4461/chunks/document-app-x9k35fb4.js"
+						},
+						"selfMs": 0.493,
+						"inclusiveMs": 415.542,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 441,
+							"column": 10,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 4835,
+							"functionName": "mt",
+							"lineNumber": 22,
+							"scriptId": 35,
+							"url": "http://127.0.0.1:4461/chunks/document-app-x9k35fb4.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 410.773,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 717,
+							"column": 13,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1784,
+							"functionName": "",
+							"lineNumber": 0,
+							"scriptId": 29,
+							"url": "http://127.0.0.1:4461/chunks/document-app-vvdk6tcs.js"
+						},
+						"selfMs": 5.233,
+						"inclusiveMs": 410.686,
+						"mapped": {
+							"source": "../src/platform/effects.ts",
+							"line": 24,
+							"column": 41,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 5285,
+							"functionName": "",
+							"lineNumber": 22,
+							"scriptId": 35,
+							"url": "http://127.0.0.1:4461/chunks/document-app-x9k35fb4.js"
+						},
+						"selfMs": -0.008,
+						"inclusiveMs": 410.678,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 766,
+							"column": 18,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(program)",
+							"scriptId": 0
+						},
+						"selfMs": 327.265,
+						"inclusiveMs": 327.265,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 12522,
+							"functionName": "xr",
+							"lineNumber": 0,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 30.779,
+						"inclusiveMs": 219.0,
+						"mapped": {
+							"source": "../src/shared/checkpoint.ts",
+							"line": 155,
+							"column": 33,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3986,
+							"functionName": "We",
+							"lineNumber": 0,
+							"scriptId": 30,
+							"url": "http://127.0.0.1:4461/chunks/document-app-jb1jvatb.js"
+						},
+						"selfMs": 181.17,
+						"inclusiveMs": 188.221,
+						"mapped": {
+							"source": "../src/shared/model.ts",
+							"line": 346,
+							"column": 34,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1348,
+							"functionName": "rawVisibleSteps",
+							"lineNumber": 17,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 128.84,
+						"inclusiveMs": 128.84,
+						"mapped": {
+							"source": "../src/shared/crdt.ts",
+							"line": 1089,
+							"column": 26,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 446,
+							"functionName": "measuredBlock",
+							"lineNumber": 61,
+							"scriptId": 6,
+							"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+						},
+						"selfMs": 2.549,
+						"inclusiveMs": 50.134,
+						"mapped": {
+							"source": "../src/client/editor-viewport.ts",
+							"line": 588,
+							"column": 23,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 743,
+							"functionName": "",
+							"lineNumber": 66,
+							"scriptId": 6,
+							"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+						},
+						"selfMs": 0.569,
+						"inclusiveMs": 49.529,
+						"mapped": {
+							"source": "../src/client/editor-viewport.ts",
+							"line": 704,
+							"column": 42,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 97,
+							"functionName": "refine",
+							"lineNumber": 66,
+							"scriptId": 6,
+							"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+						},
+						"selfMs": -0.979,
+						"inclusiveMs": 49.011,
+						"mapped": {
+							"source": "../src/client/editor-viewport.ts",
+							"line": 670,
+							"column": 16,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"functionName": "getBoundingClientRect",
+							"scriptId": 0
+						},
+						"selfMs": 45.501,
+						"inclusiveMs": 45.501,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 5470,
+							"functionName": "",
+							"lineNumber": 17,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 0.49,
+						"inclusiveMs": 42.374,
+						"mapped": {
+							"source": "../src/shared/crdt.ts",
+							"line": 1346,
+							"column": 54,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 5638,
+							"functionName": "checkpointSteps",
+							"lineNumber": 17,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 30.099,
+						"inclusiveMs": 41.884,
+						"mapped": {
+							"source": "../src/shared/crdt.ts",
+							"line": 1354,
+							"column": 26,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 475,
+							"functionName": "",
+							"lineNumber": 1652,
+							"scriptId": 5,
+							"url": "http://127.0.0.1:4461/app.js"
+						},
+						"selfMs": 0.006,
+						"inclusiveMs": 15.653,
+						"mapped": {
+							"source": "../src/client/document-app.ts",
+							"line": 2658,
+							"column": 19,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 604,
+							"functionName": "It",
+							"lineNumber": 5,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 0.897,
+						"inclusiveMs": 15.239,
+						"mapped": {
+							"source": "../src/shared/frontmatter-merge.ts",
+							"line": 135,
+							"column": 34,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1992,
+							"functionName": "Hr",
+							"lineNumber": 10,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 9.731,
+						"inclusiveMs": 13.812,
+						"mapped": {
+							"source": "../src/shared/frontmatter-merge.ts",
+							"line": 454,
+							"column": 29,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 2088,
+							"functionName": "cn",
+							"lineNumber": 1578,
+							"scriptId": 5,
+							"url": "http://127.0.0.1:4461/app.js"
+						},
+						"selfMs": 0.261,
+						"inclusiveMs": 11.902,
+						"mapped": {
+							"source": "../src/client/document-app.ts",
+							"line": 2297,
+							"column": 27,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 823,
+							"functionName": "$t",
+							"lineNumber": 1652,
+							"scriptId": 5,
+							"url": "http://127.0.0.1:4461/app.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 11.902,
+						"mapped": {
+							"source": "../src/client/document-app.ts",
+							"line": 2687,
+							"column": 3,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 14071,
+							"functionName": "Bt",
+							"lineNumber": 17,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 11.533,
+						"inclusiveMs": 11.533,
+						"mapped": {
+							"source": "../src/shared/crdt.ts",
+							"line": 1816,
+							"column": 18,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 16305,
+							"functionName": "tt",
+							"lineNumber": 85,
+							"scriptId": 6,
+							"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+						},
+						"selfMs": 0.425,
+						"inclusiveMs": 7.806,
+						"mapped": {
+							"source": "../src/client/components/editor.ts",
+							"line": 917,
+							"column": 17,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3055,
+							"functionName": "update",
+							"lineNumber": 85,
+							"scriptId": 6,
+							"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 7.806,
+						"mapped": {
+							"source": "../src/client/components/editor.ts",
+							"line": 115,
+							"column": 8,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1321,
+							"functionName": "frame",
+							"lineNumber": 0,
+							"scriptId": 45
+						},
+						"selfMs": 6.297,
+						"inclusiveMs": 7.557,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"functionName": "RegExp: [\\uD800-\\uDFFF]",
+							"scriptId": 0
+						},
+						"selfMs": 7.051,
+						"inclusiveMs": 7.051,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1024,
+							"functionName": "h",
+							"lineNumber": 56,
+							"scriptId": 6,
+							"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+						},
+						"selfMs": 6.107,
+						"inclusiveMs": 6.107,
+						"mapped": {
+							"source": "../src/client/components/line-actions.ts",
+							"line": 62,
+							"column": 17,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 5059,
+							"functionName": "Li.s.oninput",
+							"lineNumber": 85,
+							"scriptId": 6,
+							"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+						},
+						"selfMs": 0.129,
+						"inclusiveMs": 4.838,
+						"mapped": {
+							"source": "../src/client/components/editor.ts",
+							"line": 258,
+							"column": 21,
+							"name": ""
+						}
+					}
+				],
+				"pid": 18985,
+				"ownerThread": 16761657,
+				"samplingThread": 16761996,
+				"main": true,
+				"rows": [
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(idle)",
+							"scriptId": 0
+						},
+						"selfMs": 1692.474,
+						"inclusiveMs": 1692.474,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(garbage collector)",
+							"scriptId": 0
+						},
+						"selfMs": 468.439,
+						"inclusiveMs": 468.439,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(program)",
+							"scriptId": 0
+						},
+						"selfMs": 327.265,
+						"inclusiveMs": 327.265,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3986,
+							"functionName": "We",
+							"lineNumber": 0,
+							"scriptId": 30,
+							"url": "http://127.0.0.1:4461/chunks/document-app-jb1jvatb.js"
+						},
+						"selfMs": 181.17,
+						"inclusiveMs": 188.221,
+						"mapped": {
+							"source": "../src/shared/model.ts",
+							"line": 346,
+							"column": 34,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1348,
+							"functionName": "rawVisibleSteps",
+							"lineNumber": 17,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 128.84,
+						"inclusiveMs": 128.84,
+						"mapped": {
+							"source": "../src/shared/crdt.ts",
+							"line": 1089,
+							"column": 26,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"functionName": "getBoundingClientRect",
+							"scriptId": 0
+						},
+						"selfMs": 45.501,
+						"inclusiveMs": 45.501,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 12522,
+							"functionName": "xr",
+							"lineNumber": 0,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 30.779,
+						"inclusiveMs": 219.0,
+						"mapped": {
+							"source": "../src/shared/checkpoint.ts",
+							"line": 155,
+							"column": 33,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 5638,
+							"functionName": "checkpointSteps",
+							"lineNumber": 17,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 30.099,
+						"inclusiveMs": 41.884,
+						"mapped": {
+							"source": "../src/shared/crdt.ts",
+							"line": 1354,
+							"column": 26,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 14071,
+							"functionName": "Bt",
+							"lineNumber": 17,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 11.533,
+						"inclusiveMs": 11.533,
+						"mapped": {
+							"source": "../src/shared/crdt.ts",
+							"line": 1816,
+							"column": 18,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1992,
+							"functionName": "Hr",
+							"lineNumber": 10,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 9.731,
+						"inclusiveMs": 13.812,
+						"mapped": {
+							"source": "../src/shared/frontmatter-merge.ts",
+							"line": 454,
+							"column": 29,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"functionName": "RegExp: [\\uD800-\\uDFFF]",
+							"scriptId": 0
+						},
+						"selfMs": 7.051,
+						"inclusiveMs": 7.051,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1321,
+							"functionName": "frame",
+							"lineNumber": 0,
+							"scriptId": 45
+						},
+						"selfMs": 6.297,
+						"inclusiveMs": 7.557,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1024,
+							"functionName": "h",
+							"lineNumber": 56,
+							"scriptId": 6,
+							"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+						},
+						"selfMs": 6.107,
+						"inclusiveMs": 6.107,
+						"mapped": {
+							"source": "../src/client/components/line-actions.ts",
+							"line": 62,
+							"column": 17,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1784,
+							"functionName": "",
+							"lineNumber": 0,
+							"scriptId": 29,
+							"url": "http://127.0.0.1:4461/chunks/document-app-vvdk6tcs.js"
+						},
+						"selfMs": 5.233,
+						"inclusiveMs": 410.686,
+						"mapped": {
+							"source": "../src/platform/effects.ts",
+							"line": 24,
+							"column": 41,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 64,
+							"functionName": "en",
+							"lineNumber": 13,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 4.081,
+						"inclusiveMs": 4.081,
+						"mapped": {
+							"source": "../src/shared/frontmatter-merge.ts",
+							"line": 562,
+							"column": 26,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 56751,
+							"functionName": "l",
+							"lineNumber": 7,
+							"scriptId": 19,
+							"url": "http://127.0.0.1:4461/chunks/document-app-5r0cx4gq.js"
+						},
+						"selfMs": 3.716,
+						"inclusiveMs": 4.094,
+						"mapped": {
+							"source": "../src/platform/indexeddb-journal.ts",
+							"line": 326,
+							"column": 19,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 446,
+							"functionName": "measuredBlock",
+							"lineNumber": 61,
+							"scriptId": 6,
+							"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+						},
+						"selfMs": 2.549,
+						"inclusiveMs": 50.134,
+						"mapped": {
+							"source": "../src/client/editor-viewport.ts",
+							"line": 588,
+							"column": 23,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 56751,
+							"functionName": "l",
+							"lineNumber": 7,
+							"scriptId": 19,
+							"url": "http://127.0.0.1:4461/chunks/document-app-5r0cx4gq.js"
+						},
+						"selfMs": 1.642,
+						"inclusiveMs": 1.771,
+						"mapped": {
+							"source": "../src/platform/indexeddb-journal.ts",
+							"line": 326,
+							"column": 19,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1024,
+							"functionName": "h",
+							"lineNumber": 56,
+							"scriptId": 6,
+							"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+						},
+						"selfMs": 1.533,
+						"inclusiveMs": 1.635,
+						"mapped": {
+							"source": "../src/client/components/line-actions.ts",
+							"line": 62,
+							"column": 17,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 2369,
+							"functionName": "",
+							"lineNumber": 17,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 1.295,
+						"inclusiveMs": 1.295,
+						"mapped": {
+							"source": "../src/shared/crdt.ts",
+							"line": 1157,
+							"column": 31,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 10986,
+							"functionName": "qn",
+							"lineNumber": 1569,
+							"scriptId": 5,
+							"url": "http://127.0.0.1:4461/app.js"
+						},
+						"selfMs": 1.276,
+						"inclusiveMs": 1.276,
+						"mapped": {
+							"source": "../src/client/document-app.ts",
+							"line": 956,
+							"column": 22,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1024,
+							"functionName": "h",
+							"lineNumber": 56,
+							"scriptId": 6,
+							"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+						},
+						"selfMs": 1.174,
+						"inclusiveMs": 1.174,
+						"mapped": {
+							"source": "../src/client/components/line-actions.ts",
+							"line": 62,
+							"column": 17,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 14664,
+							"functionName": "de",
+							"lineNumber": 17,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 1.147,
+						"inclusiveMs": 1.627,
+						"mapped": {
+							"source": "../src/shared/crdt.ts",
+							"line": 1858,
+							"column": 28,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 212,
+							"functionName": "",
+							"lineNumber": 1234,
+							"scriptId": 5,
+							"url": "http://127.0.0.1:4461/app.js"
+						},
+						"selfMs": 1.032,
+						"inclusiveMs": 1.032,
+						"mapped": {
+							"source": "../src/client/components/library.ts",
+							"line": 159,
+							"column": 13,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 604,
+							"functionName": "It",
+							"lineNumber": 5,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 0.897,
+						"inclusiveMs": 15.239,
+						"mapped": {
+							"source": "../src/shared/frontmatter-merge.ts",
+							"line": 135,
+							"column": 34,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 17817,
+							"functionName": "",
+							"lineNumber": 1569,
+							"scriptId": 5,
+							"url": "http://127.0.0.1:4461/app.js"
+						},
+						"selfMs": 0.779,
+						"inclusiveMs": 1.039,
+						"mapped": {
+							"source": "../src/client/document-app.ts",
+							"line": 1539,
+							"column": 10,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3014,
+							"functionName": "paint",
+							"lineNumber": 66,
+							"scriptId": 6,
+							"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+						},
+						"selfMs": 0.739,
+						"inclusiveMs": 0.854,
+						"mapped": {
+							"source": "../src/client/editor-viewport.ts",
+							"line": 836,
+							"column": 15,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"functionName": "querySelector",
+							"scriptId": 0
+						},
+						"selfMs": 0.735,
+						"inclusiveMs": 0.735,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"functionName": "fetch",
+							"scriptId": 0
+						},
+						"selfMs": 0.73,
+						"inclusiveMs": 0.73,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 14664,
+							"functionName": "de",
+							"lineNumber": 17,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 0.718,
+						"inclusiveMs": 0.847,
+						"mapped": {
+							"source": "../src/shared/crdt.ts",
+							"line": 1858,
+							"column": 28,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 122886,
+							"functionName": "o.port1.onmessage",
+							"lineNumber": 7,
+							"scriptId": 19,
+							"url": "http://127.0.0.1:4461/chunks/document-app-5r0cx4gq.js"
+						},
+						"selfMs": 0.678,
+						"inclusiveMs": 417.49,
+						"mapped": {
+							"source": "../src/client/scheduler.ts",
+							"line": 28,
+							"column": 17,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 743,
+							"functionName": "",
+							"lineNumber": 66,
+							"scriptId": 6,
+							"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+						},
+						"selfMs": 0.569,
+						"inclusiveMs": 49.529,
+						"mapped": {
+							"source": "../src/client/editor-viewport.ts",
+							"line": 704,
+							"column": 42,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 26899,
+							"functionName": "",
+							"lineNumber": 22,
+							"scriptId": 35,
+							"url": "http://127.0.0.1:4461/chunks/document-app-x9k35fb4.js"
+						},
+						"selfMs": 0.532,
+						"inclusiveMs": 0.665,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 2935,
+							"column": 41,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1923,
+							"functionName": "s",
+							"lineNumber": 13,
+							"scriptId": 25,
+							"url": "http://127.0.0.1:4461/chunks/document-app-e4xxqn99.js"
+						},
+						"selfMs": 0.53,
+						"inclusiveMs": 0.53,
+						"mapped": {
+							"source": "../src/shared/atom-sequence.ts",
+							"line": 45,
+							"column": 16,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1238,
+							"functionName": "update",
+							"lineNumber": 1521,
+							"scriptId": 5,
+							"url": "http://127.0.0.1:4461/app.js"
+						},
+						"selfMs": 0.523,
+						"inclusiveMs": 0.523,
+						"mapped": {
+							"source": "../src/client/components/statusbar.ts",
+							"line": 129,
+							"column": 8,
+							"name": ""
+						}
+					}
+				]
+			},
+			{
+				"inclusiveRows": [
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(root)",
+							"scriptId": 0
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 2845.245,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(idle)",
+							"scriptId": 0
+						},
+						"selfMs": 2835.028,
+						"inclusiveMs": 2835.028,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(program)",
+							"scriptId": 0
+						},
+						"selfMs": 4.876,
+						"inclusiveMs": 4.876,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1816,
+							"functionName": "runLoop",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 4.818,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 441,
+							"column": 10,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1242,
+							"functionName": "evaluate",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 4.818,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 406,
+							"column": 11,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 16606,
+							"functionName": "",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 4.818,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 2476,
+							"column": 39,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 62122,
+							"functionName": "y",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 4.818,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/rpc/RpcServer.js",
+							"line": 147,
+							"column": 25,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 61364,
+							"functionName": "",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 4.818,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/rpc/RpcServer.js",
+							"line": 85,
+							"column": 82,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6189,
+							"functionName": "ft",
+							"lineNumber": 6,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 4.818,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js",
+							"line": 335,
+							"column": 13,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1816,
+							"functionName": "runLoop",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 4.818,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 441,
+							"column": 10,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1242,
+							"functionName": "evaluate",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 4.818,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 406,
+							"column": 11,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 16606,
+							"functionName": "",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 4.818,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 2476,
+							"column": 39,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 29942,
+							"functionName": "",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 4.818,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/FiberSet.js",
+							"line": 391,
+							"column": 10,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 2956,
+							"functionName": "r",
+							"lineNumber": 38,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 4.818,
+						"mapped": {
+							"source": "../src/client/document-worker.ts",
+							"line": 22,
+							"column": 23,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 732,
+							"functionName": "mf",
+							"lineNumber": 36,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.394,
+						"inclusiveMs": 4.467,
+						"mapped": {
+							"source": "../src/shared/document-stats.ts",
+							"line": 18,
+							"column": 30,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3317,
+							"functionName": "",
+							"lineNumber": 38,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 4.467,
+						"mapped": {
+							"source": "../src/client/document-worker.ts",
+							"line": 52,
+							"column": 26,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 7021,
+							"functionName": "Je",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 4.467,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 984,
+							"column": 12,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 7221,
+							"functionName": "Je",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 4.467,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 998,
+							"column": 15,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 810,
+							"functionName": "yk",
+							"lineNumber": 36,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 3.931,
+						"inclusiveMs": 4.073,
+						"mapped": {
+							"source": "../src/shared/document-stats.ts",
+							"line": 37,
+							"column": 24,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(garbage collector)",
+							"scriptId": 0
+						},
+						"selfMs": 0.523,
+						"inclusiveMs": 0.523,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 555,
+							"functionName": "getRef",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.223,
+						"inclusiveMs": 0.223,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 361,
+							"column": 9,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 18941,
+							"functionName": "Oy",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 0.223,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 2701,
+							"column": 31,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 19950,
+							"functionName": "",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 0.223,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 2792,
+							"column": 20,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 6189,
+							"functionName": "ft",
+							"lineNumber": 6,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 0.223,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js",
+							"line": 335,
+							"column": 13,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1628,
+							"functionName": "Ek",
+							"lineNumber": 36,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.142,
+						"inclusiveMs": 0.142,
+						"mapped": {
+							"source": "../src/shared/document-stats.ts",
+							"line": 100,
+							"column": 24,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 14244,
+							"functionName": "fu",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.128,
+						"inclusiveMs": 0.128,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaAST.js",
+							"line": 1649,
+							"column": 29,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 13077,
+							"functionName": "",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 0.128,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaAST.js",
+							"line": 1581,
+							"column": 12,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 33615,
+							"functionName": "",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 0.128,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaParser.js",
+							"line": 829,
+							"column": 10,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 47665,
+							"functionName": "",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 0.128,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Schema.js",
+							"line": 8102,
+							"column": 12,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 3257,
+							"functionName": "",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 0.128,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaAST.js",
+							"line": 392,
+							"column": 12,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 30893,
+							"functionName": "",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 0.128,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/schema/interpreter.js",
+							"line": 140,
+							"column": 10,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 33615,
+							"functionName": "",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 0.128,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaParser.js",
+							"line": 829,
+							"column": 10,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 37555,
+							"functionName": "",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 0.128,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Schema.js",
+							"line": 1006,
+							"column": 10,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 64998,
+							"functionName": "onFromServer",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 0.128,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/rpc/RpcServer.js",
+							"line": 376,
+							"column": 17,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 62692,
+							"functionName": "",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 0.128,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/rpc/RpcServer.js",
+							"line": 183,
+							"column": 48,
+							"name": ""
+						}
+					}
+				],
+				"pid": 18985,
+				"ownerThread": 16761888,
+				"samplingThread": 16762038,
+				"main": false,
+				"rows": [
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(idle)",
+							"scriptId": 0
+						},
+						"selfMs": 2835.028,
+						"inclusiveMs": 2835.028,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(program)",
+							"scriptId": 0
+						},
+						"selfMs": 4.876,
+						"inclusiveMs": 4.876,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 810,
+							"functionName": "yk",
+							"lineNumber": 36,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 3.931,
+						"inclusiveMs": 4.073,
+						"mapped": {
+							"source": "../src/shared/document-stats.ts",
+							"line": 37,
+							"column": 24,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(garbage collector)",
+							"scriptId": 0
+						},
+						"selfMs": 0.523,
+						"inclusiveMs": 0.523,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 732,
+							"functionName": "mf",
+							"lineNumber": 36,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.394,
+						"inclusiveMs": 4.467,
+						"mapped": {
+							"source": "../src/shared/document-stats.ts",
+							"line": 18,
+							"column": 30,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 555,
+							"functionName": "getRef",
+							"lineNumber": 22,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.223,
+						"inclusiveMs": 0.223,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js",
+							"line": 361,
+							"column": 9,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 1628,
+							"functionName": "Ek",
+							"lineNumber": 36,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.142,
+						"inclusiveMs": 0.142,
+						"mapped": {
+							"source": "../src/shared/document-stats.ts",
+							"line": 100,
+							"column": 24,
+							"name": ""
+						}
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 14244,
+							"functionName": "fu",
+							"lineNumber": 24,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/document-worker.js"
+						},
+						"selfMs": 0.128,
+						"inclusiveMs": 0.128,
+						"mapped": {
+							"source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/SchemaAST.js",
+							"line": 1649,
+							"column": 29,
+							"name": ""
+						}
+					}
+				]
+			},
+			{
+				"inclusiveRows": [
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(root)",
+							"scriptId": 0
+						},
+						"selfMs": 0.0,
+						"inclusiveMs": 2427.883,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(idle)",
+							"scriptId": 0
+						},
+						"selfMs": 2417.096,
+						"inclusiveMs": 2417.096,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(program)",
+							"scriptId": 0
+						},
+						"selfMs": 10.657,
+						"inclusiveMs": 10.657,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 31,
+							"functionName": "",
+							"lineNumber": 133,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/sw.js"
+						},
+						"selfMs": 0.13,
+						"inclusiveMs": 0.13,
+						"mapped": null
+					}
+				],
+				"pid": 18985,
+				"ownerThread": 16761820,
+				"samplingThread": 16762050,
+				"main": false,
+				"rows": [
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(idle)",
+							"scriptId": 0
+						},
+						"selfMs": 2417.096,
+						"inclusiveMs": 2417.096,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "other",
+							"functionName": "(program)",
+							"scriptId": 0
+						},
+						"selfMs": 10.657,
+						"inclusiveMs": 10.657,
+						"mapped": null
+					},
+					{
+						"frame": {
+							"codeType": "JS",
+							"columnNumber": 31,
+							"functionName": "",
+							"lineNumber": 133,
+							"scriptId": 3,
+							"url": "http://127.0.0.1:4461/sw.js"
+						},
+						"selfMs": 0.13,
+						"inclusiveMs": 0.13,
+						"mapped": null
+					}
+				]
+			}
+		],
+		"threadNames": [
+			{
+				"args": {
+					"name": "swapper"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 0,
+				"tid": 0,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "CrRendererMain"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761657,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "PerfettoTrace"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18979,
+				"tid": 16761601,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "PerfettoTrace"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18974,
+				"tid": 16761552,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "CrBrowserMain"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18974,
+				"tid": 16761529,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "PerfettoTrace"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761680,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "DedicatedWorker thread"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761888,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ServiceWorker thread"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761820,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "Chrome_DevToolsHandlerThread"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18974,
+				"tid": 16761595,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "Compositor"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761695,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "VizCompositorThread"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18979,
+				"tid": 16761637,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "Chrome_IOThread"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18974,
+				"tid": 16761559,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "Chrome_ChildIOThread"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761691,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "v8:ProfEvntProc"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761996,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761687,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761693,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761797,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761799,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761798,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761802,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761800,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761803,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761801,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18974,
+				"tid": 16761554,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "CrGpuMain"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18979,
+				"tid": 16761573,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolServiceThread"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18974,
+				"tid": 16761553,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18974,
+				"tid": 16761555,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "Chrome_ChildIOThread"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18979,
+				"tid": 16761636,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761822,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761831,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761830,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761833,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolBackgroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18974,
+				"tid": 16761556,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "v8:ProfEvntProc"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16762038,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761834,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761835,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761832,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16761836,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18974,
+				"tid": 16761557,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolSingleThreadSharedForeground"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18974,
+				"tid": 16761582,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18979,
+				"tid": 16761634,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18979,
+				"tid": 16761743,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18979,
+				"tid": 16761749,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "v8:ProfEvntProc"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18985,
+				"tid": 16762050,
+				"ts": 0
+			},
+			{
+				"args": {
+					"name": "ThreadPoolForegroundWorker"
+				},
+				"cat": "__metadata",
+				"name": "thread_name",
+				"ph": "M",
+				"pid": 18974,
+				"tid": 16761565,
+				"ts": 0
+			}
+		]
+	}
+]
