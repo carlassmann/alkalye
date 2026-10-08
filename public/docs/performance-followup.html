@@ -1440,6 +1440,48 @@
 			still run on the main thread. Evidence:
 			<code>experiments/worker-session/browser-library-safety</code>.
 		</p>
+		<h2>Cold opening and the next shipped reduction</h2>
+		<p>
+			A marked first-opening diagnostic found a fresh snapshot path, with no
+			passive cache and an empty initial journal. Library acquisition took
+			626ms, including a 610ms session load. Synchronous editor mounting took
+			15ms. Snapshot HTTP and journal persistence were not separately marked;
+			the whole delay cannot be attributed to CPU parsing. Evidence:
+			<code>experiments/performance/first-open-phases</code>.
+		</p>
+		<p>
+			Checkpoint validation now keeps the first validated operation owner,
+			avoiding repeated identical Map writes for every character. Ambiguous
+			identities still fail. Public checkpoint tests cover Unicode, synchronous
+			and cooperative opening, duplicate facts, conflicting registers and
+			ownership across targets.
+		</p>
+		<p>
+			Three alternating cold-opening pairs used the same backend and restored
+			database and browser state. All exact source, route, editability and
+			independent server checks passed. Median largest task fell from 19.763ms
+			to 18.393ms; maximum fell from 19.947ms to 18.554ms. Median frame
+			opportunity fell from 615.342ms to 598.645ms, but the worst opening stayed
+			about 617ms. Total GC time increased; this is no GC or 120fps success.
+			Evidence: <code>experiments/performance/checkpoint-owner</code>.
+		</p>
+		<h2>Forward Chunk replacement remains unshipped</h2>
+		<p>
+			An outside candidate assembled multicursor changes from slices of the
+			original Effect Chunk. Strict types, 84 module tests and twelve native
+			browser cells passed, including peer edits, durable reopen and Undo.
+			Input-task medians barely changed: 14.875ms to 14.538ms for 512 cursors,
+			and 32.884ms to 32.647ms for 2,048 cursors. That gain does not justify
+			adoption.
+		</p>
+		<p>
+			The original profile interpretation overstated Chunk.drop. Its 8.862ms
+			inclusive total counted the same recursive function repeatedly. Counting
+			each function once per sampled stack gives 1.226ms inclusive and 0.466ms
+			self time. Its call path was real; its apparent size was misleading. The
+			correction and failed hypothesis are preserved in
+			<code>experiments/performance/multicursor-forward-chunk</code>.
+		</p>
 		<footer>written with gpt-6 in codex</footer>
 	</body>
 </html>

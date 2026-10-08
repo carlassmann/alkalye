@@ -441,6 +441,7 @@ function* parseCheckpointSteps(
 			(previous.target !== target || previous.kind !== kind || kind === "set")
 		)
 			throw new Error("Checkpoint operation identity is ambiguous")
+		if (previous) return
 		operations.set(operation, { target, kind })
 	}
 	let snapshots: (LegacyTargetCheckpoint | TargetCheckpoint)[] = []
