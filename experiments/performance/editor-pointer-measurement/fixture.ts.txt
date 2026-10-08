@@ -1,0 +1,45 @@
+import { EditorElement } from "/Users/carlassmann/.codex/worktrees/b513/alkalye/src/client/components/editor"
+import { editorPreferences } from "/Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/preferences"
+import { Replica } from "/Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/crdt"
+
+let content = "alpha beta gamma 😀\n".repeat(60000).slice(0, 1048576)
+let replica = new Replica("pointer-fixture")
+replica.edit("doc", content)
+let editor = new EditorElement()
+editor.configure({
+ content,
+ atoms: replica.visible("doc"),
+ editable: true,
+ preferences: editorPreferences({ autocomplete: false }),
+ documents: () => [],
+ isDrawing: () => false,
+ openDrawing() {},
+ openDocument() {},
+ comments: () => [],
+ createLinkedDocument: async () => "unused",
+ report(error) { throw error },
+ change() {},
+ undo() {},
+ select() {},
+ requestAsset() {},
+ attach() {},
+ command() {},
+ find() {},
+})
+editor.style.height = "800px"
+document.body.append(editor)
+let input = editor.querySelector<HTMLTextAreaElement>("#editor")
+if (!input) throw new Error("Missing input")
+let start = 0
+input.addEventListener("pointerdown", event => {
+ start = performance.now()
+ document.body.dataset.pointerTrusted = String(event.isTrusted)
+}, { capture: true })
+input.addEventListener("pointerdown", () => {
+ document.body.dataset.pointerHandler = String(performance.now() - start)
+ document.body.dataset.pointerLength = String(input.value.length)
+})
+input.addEventListener("pointerup", event => {
+ document.body.dataset.pointerUpTrusted = String(event.isTrusted)
+})
+document.body.dataset.ready = "true"

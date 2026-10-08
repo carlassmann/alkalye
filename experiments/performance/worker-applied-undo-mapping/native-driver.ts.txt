@@ -1,0 +1,423 @@
+import { rm } from "node:fs/promises"
+import * as Effect from "effect/Effect"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import * as Redacted from "effect/Redacted"
+import * as Schema from "effect/Schema"
+import { apiDocuments } from "./src/cli/api-documents"
+import { browser, evaluate } from "./tests/browser-driver"
+let configuration = Schema.decodeUnknownSync(
+	Schema.Struct({
+		origin: Schema.String,
+		keyFile: Schema.String,
+		scope: Schema.String,
+		documents: Schema.Array(
+			Schema.Struct({ fixture: Schema.String, documentId: Schema.String }),
+		),
+	}),
+)(
+	await Bun.file(
+		"/tmp/alkalye-worker-map-undo-guard/oracle.private.json",
+	).json(),
+)
+let api = apiDocuments(
+	configuration.origin,
+	Redacted.make((await Bun.file(configuration.keyFile).text()).trim()),
+	configuration.scope,
+)
+let session = "worker-actual-multicursor-" + Date.now()
+let result: {
+	stage: string
+	gates: string[]
+	cells: unknown[]
+	failure?: string
+	state?: unknown
+	diagnostic?: unknown
+	phases?: unknown
+	errors?: unknown
+	console?: unknown
+	acceptedOnFailure?: unknown
+	fixture?: unknown
+} = { stage: "setup", gates: [], cells: [] }
+let currentDocument = ""
+let editedSHA = ""
+let tracing = false
+let native = 'document.querySelector("alkalye-editor")?.source'
+function wait(expression: string) {
+	browser(session, "wait", "--fn", expression)
+}
+function accepted(id: string, source: string) {
+	return Effect.runPromise(
+		Effect.gen(function* () {
+			while (true) {
+				let value = yield* api.read(id)
+				if (value.content === source) return
+				yield* Effect.sleep("100 millis")
+			}
+		}).pipe(
+			Effect.timeout("30 seconds"),
+			Effect.provide(FetchHttpClient.layer),
+		),
+	)
+}
+function beginTrace(
+	label: string,
+	readyExpression = native + ".value===window.workerMCExpected",
+) {
+	browser(
+		session,
+		"profiler",
+		"start",
+		"--categories",
+		"devtools.timeline,disabled-by-default-devtools.timeline,toplevel,blink.user_timing,v8",
+	)
+	tracing = true
+	evaluate(
+		session,
+		`(()=>{let probe=window.workerMCProbe={label:${JSON.stringify(label)},start:0,ready:0,localSaved:0,end:0,events:[],heapBefore:performance.memory?.usedJSHeapSize},controller=new AbortController();for(let name of ['keydown','beforeinput','input'])document.addEventListener(name,event=>{if(!event.isTrusted||event.timeStamp===0)return;probe.events.push({type:name,inputType:event.inputType,key:event.key,time:performance.now()});if(!probe.start){probe.start=performance.now();performance.mark('worker-mc:start');setTimeout(()=>{probe.end=performance.now();probe.heapAfter=performance.memory?.usedJSHeapSize;performance.mark('worker-mc:end');controller.abort()},3000)}},{capture:true,signal:controller.signal});function frame(){if(probe.start&&!probe.ready&&${readyExpression}){probe.ready=performance.now();performance.mark('worker-mc:ready')}if(probe.ready&&!probe.localSaved&&document.querySelector('#save-status').getAttribute('aria-busy')==='false'&&document.querySelector('#save-status').dataset.pending==='0'){probe.localSaved=performance.now();performance.mark('worker-mc:local-saved')}if(!probe.end)requestAnimationFrame(frame)}requestAnimationFrame(frame);return true})()`,
+	)
+}
+function finishTrace(path: string) {
+	wait("window.workerMCProbe.end>0")
+	browser(session, "profiler", "stop", path)
+	tracing = false
+	return evaluate(session, "window.workerMCProbe")
+}
+try {
+	for (let folder of ["Service Worker", "Cache", "Code Cache", "GPUCache"])
+		await rm(
+			"/tmp/alkalye-worker-map-undo-guard/native-active/profile-run/Default/" + folder,
+			{ recursive: true, force: true },
+		)
+	browser(
+		session,
+		"--profile",
+		"/tmp/alkalye-worker-map-undo-guard/native-active/profile-run",
+		"open",
+		configuration.origin + "/app",
+	)
+	evaluate(session, "(async()=>{for(let registration of await navigator.serviceWorker.getRegistrations())await registration.unregister();for(let name of await caches.keys())await caches.delete(name);return true})()")
+	browser(session, "open", configuration.origin + "/app")
+	for (let count of [1, 512]) {
+		result.stage = "fixture-" + count
+		let fixtureFile =
+			"/tmp/alkalye-worker-map-undo-guard/native-active/stable-copy-" +
+			count +
+			"-created.json"
+		let fixtureSchema = Schema.Struct({ documentId: Schema.String })
+		let existing = await Bun.file(fixtureFile).exists()
+		let fixture = existing
+			? Schema.decodeUnknownSync(fixtureSchema)(
+					await Bun.file(fixtureFile).json(),
+				)
+			: await Effect.runPromise(
+					api
+						.create(
+							(
+								"TOKEN " +
+								"z".repeat(Math.floor(1048576 / count) - 7) +
+								"\n"
+							).repeat(count),
+							"Worker raw cause " + count,
+						)
+						.pipe(Effect.provide(FetchHttpClient.layer)),
+				)
+		if (!existing)
+			await Bun.write(
+				fixtureFile,
+				JSON.stringify({ documentId: fixture.documentId }) + "\n",
+			)
+		if (
+			await Bun.file(
+				"/tmp/alkalye-worker-map-undo-guard/native-active/stable-copy-" +
+					count +
+					"-input-attempt.json",
+			).exists()
+		)
+			throw Error(
+				"Input already attempted; unknown action must not be repeated",
+			)
+		let source = (
+			await Effect.runPromise(
+				api
+					.read(fixture.documentId)
+					.pipe(Effect.provide(FetchHttpClient.layer)),
+			)
+		).content
+		currentDocument = fixture.documentId
+		let expected = source.split("TOKEN").join("x")
+		editedSHA = new Bun.CryptoHasher("sha256").update(expected).digest("hex")
+		result.fixture = {
+			documentId: fixture.documentId,
+			initialLength: source.length,
+			editedLength: expected.length,
+			initialSHA: new Bun.CryptoHasher("sha256").update(source).digest("hex"),
+			editedSHA,
+		}
+		if (source.split("TOKEN").length - 1 !== count)
+			throw Error("Fixture TOKEN count differs; no reset allowed")
+		result.stage = "catalogue-readiness-" + count
+		wait(
+			"document.querySelector(" +
+				JSON.stringify(
+					'[data-library] [data-doc="' + fixture.documentId + '"]',
+				) +
+				")!==null",
+		)
+		browser(
+			session,
+			"open",
+			configuration.origin + "/app/doc/" + fixture.documentId + "?worker=1",
+		)
+		wait(
+			'document.querySelector("[data-worker-experiment=ordinary-document]")!==null&&document.querySelector("#app").getAttribute("aria-busy")!=="true"&&' +
+				native +
+				"?.value.length===" +
+				source.length +
+				'&&!document.querySelector("#editor").readOnly',
+		)
+		let hashSchema = Schema.String
+		let browserHash = Schema.decodeUnknownSync(hashSchema)(
+			evaluate(
+				session,
+				"(async()=>{let bytes=new TextEncoder().encode(" +
+					native +
+					'.value),hash=await crypto.subtle.digest("SHA-256",bytes);return Array.from(new Uint8Array(hash),value=>value.toString(16).padStart(2,"0")).join("")})()',
+			),
+		)
+		if (
+			browserHash !==
+			new Bun.CryptoHasher("sha256").update(source).digest("hex")
+		)
+			throw Error("Exact initial source hash differs")
+		evaluate(
+			session,
+			"(()=>{window.workerMCBase=" +
+				native +
+				'.value;window.workerMCExpected=window.workerMCBase.split("TOKEN").join("x");return true})()',
+		)
+		result.stage = "requested-build-verification-" + count
+		let resourceSchema = Schema.Array(
+			Schema.Struct({ url: Schema.String, sha256: Schema.String }),
+		)
+		let resources = Schema.decodeUnknownSync(resourceSchema)(
+			evaluate(
+				session,
+				'(async()=>{let urls=[...new Set(performance.getEntriesByType("resource").map(entry=>entry.name).filter(name=>new URL(name).pathname.endsWith(".js")))];let worker=new URL("/worker-editor.js",location.href).href;if(!urls.includes(worker))urls.push(worker);return await Promise.all(urls.map(async url=>{let response=await fetch(url,{cache:"no-store"});if(!response.ok)throw Error("Requested script fetch failed");let hash=await crypto.subtle.digest("SHA-256",await response.arrayBuffer());return {url,sha256:Array.from(new Uint8Array(hash),value=>value.toString(16).padStart(2,"0")).join("")}}))})()',
+			),
+		)
+		for (let resource of resources) {
+			let url = new URL(resource.url)
+			if (url.origin !== configuration.origin)
+				throw Error("Unexpected script origin")
+			let bytes = await Bun.file("/tmp/alkalye-worker-map-undo-guard/native-active/dist" + url.pathname).arrayBuffer()
+			if (
+				new Bun.CryptoHasher("sha256").update(bytes).digest("hex") !==
+				resource.sha256
+			)
+				throw Error("Network bytes differ from frozen built script")
+		}
+		await Bun.write(
+			"stable-copy-native-resources-" + count + ".json",
+			JSON.stringify(
+				{
+					scope:
+						"Network re-fetch of observed script URLs plus explicit worker entry before native input; not retrospective original response bytes",
+					resources,
+				},
+				null,
+				2,
+			) + "\n",
+		)
+		result.stage = "native-select-" + count
+		evaluate(
+			session,
+			'(()=>{let editor=document.querySelector("alkalye-editor"),source=editor.source,index=source.value.indexOf("TOKEN");source.focus();source.setSelectionRange(index,index+5);window.workerMCTrusted=false;document.addEventListener("beforeinput",event=>{window.workerMCTrusted=event.isTrusted},{once:true,capture:true});return true})()',
+		)
+		beginTrace(
+			"selection-" + count,
+			'document.querySelector("alkalye-editor").commandSelection().ranges.length===' +
+				count,
+		)
+		browser(session, "press", "Control+Shift+l")
+		let selectionProbe = finishTrace(
+			"/tmp/alkalye-worker-map-undo-guard/native-active/stable-copy-native-mc-" +
+				count +
+				"-selection.trace.json",
+		)
+		wait(
+			'document.querySelector("alkalye-editor").commandSelection().ranges.length===' +
+				count,
+		)
+		result.stage = "native-replace-" + count
+		let driverStart = performance.now()
+		beginTrace("single-" + count)
+		await Bun.write(
+			"/tmp/alkalye-worker-map-undo-guard/native-active/stable-copy-" +
+				count +
+				"-input-attempt.json",
+			JSON.stringify({
+				documentId: fixture.documentId,
+				time: Date.now(),
+				editedSHA,
+			}) + "\n",
+		)
+		browser(session, "press", "x")
+		let singleProbe = finishTrace(
+			"/tmp/alkalye-worker-map-undo-guard/native-active/stable-copy-native-mc-" +
+				count +
+				"-single.trace.json",
+		)
+		wait(
+			native +
+				".value===window.workerMCExpected&&window.workerMCTrusted===true",
+		)
+		wait(
+			'document.querySelector("#save-status").getAttribute("aria-busy")==="false"&&document.querySelector("#save-status").dataset.pending==="0"&&!document.querySelector("#editor").readOnly',
+		)
+		await accepted(fixture.documentId, expected)
+		let acceptedObservedMs = performance.now() - driverStart
+		let primary = source.indexOf("TOKEN") + 1
+		wait(
+			native +
+				".selectionStart===" +
+				primary +
+				"&&" +
+				native +
+				".selectionEnd===" +
+				primary,
+		)
+		let after = evaluate(
+			session,
+			'(()=>{let value=document.querySelector("alkalye-editor").commandSelection();return {start:value.start,end:value.end,ranges:value.ranges?.length,generation:value.generation,busy:value.busy,secondary:value.ranges}})()',
+		)
+		result.stage = "native-Undo-" + count
+        wait('document.querySelector("alkalye-editor").commandSelection().busy===false')
+        beginTrace("Undo-" + count, native + ".value===window.workerMCBase")
+        browser(session, "press", "Control+z")
+        let undoProbe=finishTrace("/tmp/alkalye-worker-map-undo-guard/native-active/Undo-"+count+".trace.json")
+        result.cells.push({phase:"Undo",count,probe:undoProbe})
+		wait(native + ".value===window.workerMCBase")
+		wait(
+			'document.querySelector("#save-status").getAttribute("aria-busy")==="false"&&document.querySelector("#save-status").dataset.pending==="0"&&!document.querySelector("#editor").readOnly',
+		)
+		await accepted(fixture.documentId, source)
+        let mergePhases = evaluate(session, `JSON.parse(document.querySelector("#worker-boot-diagnostics").textContent).filter(value=>value.phase.startsWith("Merge:")).map(value=>({phase:value.phase,time:value.time}))`)
+		let restored = evaluate(
+			session,
+			'(()=>{let value=document.querySelector("alkalye-editor").commandSelection();return {start:value.start,end:value.end,ranges:value.ranges?.length,generation:value.generation,busy:value.busy,secondary:value.ranges}})()',
+		)
+		if (process.env.MAPPING_INCLUDE_BURST !== "true") continue
+		let burst = "abcdefghij"
+		result.stage = "burst-select-" + count
+		evaluate(
+			session,
+			`(()=>{let source=${native},index=source.value.indexOf('TOKEN');source.focus();source.setSelectionRange(index,index+5);window.workerMCExpected=window.workerMCBase.split('TOKEN').join('abcdefghij');return true})()`,
+		)
+		browser(session, "press", "Control+Shift+l")
+		wait(
+			'document.querySelector("alkalye-editor").commandSelection().ranges.length===' +
+				count,
+		)
+		result.stage = "native-burst-" + count
+		let burstDriverStart = performance.now()
+		beginTrace("burst-" + count)
+		browser(session, "keyboard", "type", burst)
+		let burstProbe = finishTrace(
+			"/tmp/alkalye-worker-map-undo-guard/native-active/stable-copy-native-mc-" +
+				count +
+				"-burst.trace.json",
+		)
+		wait(native + ".value===window.workerMCExpected")
+		wait(
+			'document.querySelector("#save-status").getAttribute("aria-busy")==="false"&&document.querySelector("#save-status").dataset.pending==="0"&&!document.querySelector("#editor").readOnly',
+		)
+		await accepted(fixture.documentId, source.split("TOKEN").join(burst))
+		let burstAcceptedObservedMs = performance.now() - burstDriverStart
+		result.cells.push({
+			selectionProbe,
+			singleProbe,
+            mergePhases,
+			acceptedObservedMs,
+			burstProbe,
+			burstAcceptedObservedMs,
+			scope:
+				"Driver-inclusive accepted upperbounds include3s observation. Heap samples mainJS only. Burst intentionally retained accepted, no unknownUndo cleanup.",
+			count,
+			documentId: fixture.documentId,
+			sourceLength: source.length,
+			expectedLength: expected.length,
+			sourceSHA: new Bun.CryptoHasher("sha256").update(source).digest("hex"),
+			editedSHA: new Bun.CryptoHasher("sha256").update(expected).digest("hex"),
+			after,
+			restored,
+		})
+		result.gates.push(
+			"actual worker MC" +
+				count +
+				" trusted replacements + primary + accepted edit/Undo",
+		)
+	}
+	result.stage = "terminal"
+	console.log(JSON.stringify(result))
+} catch (error) {
+	result.failure = String(error)
+	try {
+		result.phases = evaluate(
+			session,
+			"document.querySelector('#worker-boot-diagnostics')?.textContent",
+		)
+		result.errors = browser(session, "errors")
+		result.console = browser(session, "console")
+	} catch {}
+	if (currentDocument) {
+		try {
+			let value = await Effect.runPromise(
+				api.read(currentDocument).pipe(Effect.provide(FetchHttpClient.layer)),
+			)
+			let sha256 = new Bun.CryptoHasher("sha256")
+				.update(value.content)
+				.digest("hex")
+			result.acceptedOnFailure = {
+				length: value.content.length,
+				sha256,
+				equalsEdited: sha256 === editedSHA,
+			}
+		} catch {}
+	}
+	try {
+		result.diagnostic = evaluate(
+			session,
+			`(async()=>{let database=await new Promise((resolve,reject)=>{let request=indexedDB.open('alkalye-native-v1');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error)});let values=await new Promise((resolve,reject)=>{let request=database.transaction('settings','readonly').objectStore('settings').openCursor(),values=[];request.onsuccess=()=>{let cursor=request.result;if(!cursor){resolve(values);return}if(String(cursor.key).startsWith('worker-failure-diagnostic:')&&String(cursor.key).includes('${currentDocument}'))values.push(cursor.value);cursor.continue()};request.onerror=()=>reject(request.error)});database.close();return values})()`,
+		)
+	} catch {}
+	try {
+		result.state = evaluate(
+			session,
+			"({path:location.pathname,length:" +
+				native +
+				"?.value.length,selection:[" +
+				native +
+				"?.selectionStart," +
+				native +
+				'?.selectionEnd],readOnly:document.querySelector("#editor")?.readOnly,toast:document.querySelector("#toast")?.textContent,alerts:[...document.querySelectorAll("[role=alert]")].map(value=>value.textContent),body:document.body.innerText.slice(0,1500)})',
+		)
+	} catch {}
+	console.log(JSON.stringify(result))
+	process.exitCode = 1
+} finally {
+	if (tracing) {
+		try {
+			browser(
+				session,
+				"profiler",
+				"stop",
+				"/tmp/alkalye-worker-map-undo-guard/native-active/stable-copy-native-mc-failed.trace.json",
+			)
+		} catch {}
+	}
+	await Bun.write(
+		"stable-copy-native-results.json",
+		JSON.stringify(result, null, 2) + "\n",
+	)
+	browser(session, "close")
+}

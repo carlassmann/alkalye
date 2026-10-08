@@ -1,0 +1,3 @@
+PASS Large document initially bounded
+PASS Trusted native pointer path exercised
+PASS Pointer keeps source length

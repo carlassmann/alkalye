@@ -1,0 +1,30 @@
+{
+	"candidate.ts.txt": {
+		"sha256": "ba933a364f540072bd8bfb6f5402de30169fe4dfe3c81b66ad2d3dbb47ee29c6",
+		"bytes": 20898
+	},
+	"undo-guard.patch": {
+		"sha256": "5c48b7e4d0b9b483f92616c5d5d32aba545060068e1aaf27875056e7253692ad",
+		"bytes": 1288
+	},
+	"runtime/src/client/worker-document/worker-editor-basis.ts": {
+		"sha256": "ba933a364f540072bd8bfb6f5402de30169fe4dfe3c81b66ad2d3dbb47ee29c6",
+		"bytes": 20898
+	},
+	"runtime/worker-rpc-gates.ts": {
+		"sha256": "34d4487d0e98af46e02a1bfc5c535f375049e5f3ba893b8dcd986b2af74ac244",
+		"bytes": 7669
+	},
+	"runtime/browser-rpc-binding.ts": {
+		"sha256": "a5fe3ea19049eb46a58e29ab09c1038dd768a2017e5ef39b0471f2723c4af9b9",
+		"bytes": 7786
+	},
+	"runtime/dist/baseline-worker-editor.js": {
+		"sha256": "6b8ddd3b9312c36249149c4728ab5a559819406a8214431dbad8958a23ec9d16",
+		"bytes": 609843
+	},
+	"runtime/dist/worker-editor.js": {
+		"sha256": "90e5b5e8ea08590c9fde2d8b19293f03f0a7423d56decceab4aac317d91fc9b0",
+		"bytes": 609969
+	}
+}

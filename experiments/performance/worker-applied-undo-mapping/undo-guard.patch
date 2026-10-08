@@ -1,0 +1,31 @@
+--- a/src/client/worker-document/worker-editor-basis.ts
++++ b/src/client/worker-document/worker-editor-basis.ts
+@@ -53,7 +53,7 @@
+ 		>()
+ 		let epoch = 0
+ 		let identity = crypto.randomUUID()
+-		let basis: { epoch: string; sequence: number; replica: Replica } | undefined
++		let basis: { epoch: string; sequence: number; replica: Replica; requiresFullSelectionMapping?: true } | undefined
+ 		let candidate:
+ 			| {
+ 					epoch: string
+@@ -262,6 +262,7 @@
+ 								let failure: string | undefined
+ 								if (Exit.isSuccess(result)) {
+ 									status = "applied"
++									local.requiresFullSelectionMapping = true
+ 									action = result.value.id
+ 								} else {
+ 									let error = Cause.squash(result.cause)
+@@ -340,7 +341,10 @@
+ 								{ start: input.start, end: input.end, direction: "none" },
+ 							]
+ 							workerBootMark("Merge:map-start", requestedRanges.length)
+-							let mapped = mapSelectionBoundaries(oldAtoms, newAtoms, [
++							let selectionMapper = local.requiresFullSelectionMapping && oldAtoms !== newAtoms
++								? mapSelectionBoundariesFallback
++								: mapSelectionBoundaries
++							let mapped = selectionMapper(oldAtoms, newAtoms, [
+ 								input.start,
+ 								input.end,
+ 								...requestedRanges.flatMap(range => [range.start, range.end]),

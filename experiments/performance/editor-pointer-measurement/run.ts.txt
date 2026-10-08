@@ -1,0 +1,32 @@
+import { browser, browserBatch, evaluate, serverAddress, wait, assert } from "/Users/carlassmann/.codex/worktrees/b513/alkalye/tests/browser-driver"
+let server = Bun.spawn(["bun", "/tmp/alkalye-editor-pointer-journey/server.ts", ...(process.argv.includes("--candidate") ? ["--candidate"] : [])], { stdout: "pipe", stderr: "inherit" })
+let session = "editor-pointer-public-" + Date.now()
+let failed = true
+try {
+ let origin = await serverAddress(server.stdout)
+ browser(session, "set", "viewport", "1280", "800")
+ browser(session, "open", origin)
+ wait(session, "document.body.dataset.ready==='true'")
+ let initial = evaluate(session, "({length:document.querySelector('#editor').value.length,source:document.querySelector('alkalye-editor').source.value.length})")
+ assert(evaluate(session,"document.querySelector('#editor').value.length<16384"),"Large document initially bounded")
+ browserBatch(session, [["mouse","move","600","180"],["mouse","down"],["mouse","up"]])
+ wait(session,"document.body.dataset.pointerUpTrusted==='true'")
+ wait(session,"document.querySelector('#editor').value.length<16384")
+ assert(evaluate(session,"document.body.dataset.pointerTrusted==='true'"),"Trusted native pointer path exercised")
+ assert(evaluate(session,"document.querySelector('alkalye-editor').source.value.length===1048576"),"Pointer keeps source length")
+ let pointer = evaluate(session,"({...document.body.dataset,caret:document.querySelector('alkalye-editor').source.selectionStart,nativeLength:document.querySelector('#editor').value.length})")
+ browserBatch(session, [["mouse","wheel","1200"],["wait","--fn","document.querySelector('[data-editor-viewport]').scrollTop>0"]])
+ evaluate(session,"document.querySelector('alkalye-editor').source.setSelectionRange(524288,524288)")
+ wait(session,"document.querySelector('[data-editor-viewport]').scrollTop>10000")
+ browserBatch(session, [["mouse","move","600","180"],["mouse","down"],["mouse","move","650","320"],["mouse","up"]])
+ let drag = evaluate(session,"({start:document.querySelector('alkalye-editor').source.selectionStart,end:document.querySelector('alkalye-editor').source.selectionEnd,direction:document.querySelector('alkalye-editor').source.selectionDirection,nativeLength:document.querySelector('#editor').value.length,top:document.querySelector('[data-editor-viewport]').scrollTop,sourceExact:document.querySelector('alkalye-editor').source.value==='alpha beta gamma 😀\\n'.repeat(60000).slice(0,1048576)})")
+ assert(evaluate(session,"document.querySelector('alkalye-editor').source.selectionEnd>document.querySelector('alkalye-editor').source.selectionStart"),"Native drag creates non-empty source selection")
+ let scroll = evaluate(session,"({top:document.querySelector('[data-editor-viewport]').scrollTop,nativeLength:document.querySelector('#editor').value.length,source:document.querySelector('alkalye-editor').source.value.length})")
+ await Bun.write(process.argv.includes("--candidate") ? "/tmp/alkalye-editor-pointer-journey/drag-candidate.json" : "/tmp/alkalye-editor-pointer-journey/drag-baseline.json",JSON.stringify({initial,pointer,scroll,drag,limit:"Untimed concurrent correctness run; handler samples not performance claims"},null,2))
+ failed = false
+} finally {
+ if(failed) {
+  try { await Bun.write("/tmp/alkalye-editor-pointer-journey/failure-state.json",JSON.stringify(evaluate(session,"({nativeLength:document.querySelector('#editor')?.value.length,sourceLength:document.querySelector('alkalye-editor')?.source?.value.length,dataset:{...document.body.dataset},viewport:document.querySelector('[data-editor-viewport]')?.getBoundingClientRect().toJSON(),font:getComputedStyle(document.querySelector('#editor')).font,window:document.querySelector('alkalye-editor').source.viewport.viewport})"))) } catch {}
+ }
+ try { browser(session,"close") } finally {server.kill();await server.exited}
+}

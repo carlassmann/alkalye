@@ -1,0 +1,21 @@
+{
+	"initial": {
+		"length": 2040,
+		"source": 1048576
+	},
+	"pointer": {
+		"caret": 99,
+		"nativeLength": 2040,
+		"pointerHandler": "499",
+		"pointerLength": "1048576",
+		"pointerTrusted": "true",
+		"pointerUpTrusted": "true",
+		"ready": "true"
+	},
+	"scroll": {
+		"nativeLength": 3060,
+		"source": 1048576,
+		"top": 1205
+	},
+	"limit": "Untimed concurrent correctness run; handler samples not performance claims"
+}

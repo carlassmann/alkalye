@@ -1,0 +1,30 @@
+{
+	"native-original.ts.txt": {
+		"sha256": "00c42f76544814d151dbb25f1b89af999d9e212cf2cd539fd00e66cbfcfe634d",
+		"bytes": 19008
+	},
+	"native-guarded.ts.txt": {
+		"sha256": "fb6c74853065e44362c58fd352b7724cabd55ba3dec0f8c5e7597f72f00ba148",
+		"bytes": 21097
+	},
+	"native-original-dist/app.js": {
+		"sha256": "0bf786faf674551f9a355d6d25499b8927d88c97ce343b9af423fdb331796f32",
+		"bytes": 297318
+	},
+	"native-guarded-dist/app.js": {
+		"sha256": "0bf786faf674551f9a355d6d25499b8927d88c97ce343b9af423fdb331796f32",
+		"bytes": 297318
+	},
+	"native-original-dist/worker-editor.js": {
+		"sha256": "a3e225ae4063e6a3318df5925f35fdca95ca97425c0a930d6c7b251547f8d733",
+		"bytes": 609158
+	},
+	"native-guarded-dist/worker-editor.js": {
+		"sha256": "1d7655fa245e93f7d5752bbdb3066ad9186e97c66270e1e66e2d1f9f48d43f8b",
+		"bytes": 610178
+	},
+	"native-runtime/src/client/worker-document/boot-diagnostics.ts": {
+		"sha256": "35dbab23dcd61d5c658d47980c235c6b2d5b8ccbf9abdbd178db01a172532edd",
+		"bytes": 939
+	}
+}

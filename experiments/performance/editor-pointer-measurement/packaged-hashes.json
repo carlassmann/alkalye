@@ -1,0 +1,50 @@
+{
+	"README.md": {
+		"sha256": "d483139f4fa24cd595accad71467165d38ccaa2957261ad179d45b45913ab178",
+		"bytes": 2074
+	},
+	"candidate.patch.txt": {
+		"sha256": "c20bd526cb21e6d09efd10f910d9105005371c81c14365ee3cf925e7b071fcb9",
+		"bytes": 1169
+	},
+	"click-baseline.json": {
+		"sha256": "33d916096e2d9fe54a154438e62dfc9cc23e97f3dfc43848abd3921af9019bd6",
+		"bytes": 413
+	},
+	"click-baseline.log.txt": {
+		"sha256": "56ac15fc581fc1094ea93af0d8bb1fda71e498e082ae6d412af66732611786e5",
+		"bytes": 114
+	},
+	"click-candidate.json": {
+		"sha256": "e81a9b694cde3ef4d2824b66ee9e5f31405c6079ca61af4e59b22225700f0fb2",
+		"bytes": 413
+	},
+	"click-candidate.log.txt": {
+		"sha256": "56ac15fc581fc1094ea93af0d8bb1fda71e498e082ae6d412af66732611786e5",
+		"bytes": 114
+	},
+	"drag-baseline-failure-state.json": {
+		"sha256": "eef3fb08aea665075f3d00a952cf408bada658d3c505ac85c2e4e2b3a346ea08",
+		"bytes": 456
+	},
+	"drag-baseline-failure.log.txt": {
+		"sha256": "f38aa8ff17d8eafe66900f1355cd33314c6bb0be4a09196e4a07b72bb7e7cfc9",
+		"bytes": 616
+	},
+	"fixture.ts.txt": {
+		"sha256": "f4d7fac40fc435835793a2ff4234c18bb3afe4385083f0f9dc043304db46111b",
+		"bytes": 1600
+	},
+	"run.ts.txt": {
+		"sha256": "728af6d3225b624bafa9a067572f787165f0961d78cdb834dbae4bfad70f61eb",
+		"bytes": 3864
+	},
+	"server.ts.txt": {
+		"sha256": "e0fc0d2205e1c6c5210b05ce510e485ee6c8a4e2d310bf5e96bde0fc00c1bc96",
+		"bytes": 1408
+	},
+	"setup-height-cascade-state.json": {
+		"sha256": "8bd1e5086a9b2db5dd02341033fe37864a2ca086ce1f882defe6109d9b24b461",
+		"bytes": 348
+	}
+}

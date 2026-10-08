@@ -1745,9 +1745,19 @@
 			burst acceptance checks passed, but single-selection Undo mapping took
 			304ms versus baseline samples of 128–147ms. Its worker task reached 391ms
 			and main-thread maximum 9.21ms. With 512 selections, Undo mapping improved
-			from 173 to 133ms. One measured pair per cell does not justify adoption;
-			the next experiment targets the extra scan before fallback. Evidence:
+			from 173 to 133ms. One measured pair per cell does not justify adoption.
+			Evidence:
 			<code>experiments/performance/worker-requested-anchor-mapping</code>.
+		</p>
+		<p>
+			A follow-up used the original mapper directly after an applied Undo. All
+			34 integration checks per arm and native accepted source, primary
+			selection and secondary ranges passed. It still regressed: one-selection
+			Undo mapping took 293ms, worker maximum 380ms and main-thread maximum
+			10.0ms, versus baseline 112–148ms, 288ms and 7.7ms. The trace confirms
+			direct fallback, so extra scans alone cannot explain the slowdown. This
+			candidate is also rejected; the remaining cause is unprofiled. Evidence:
+			<code>experiments/performance/worker-applied-undo-mapping</code>.
 		</p>
 		<footer>written with gpt-6 in codex</footer>
 	</body>

@@ -1,0 +1,25 @@
+--- a/src/client/editor-viewport.ts
++++ b/src/client/editor-viewport.ts
+@@ -148,16 +148,18 @@
+ 				let anchor = this.offsetAtHeight(this.scrollElement.scrollTop)
+ 				let before = this.topAt(anchor) - this.scrollElement.scrollTop
+ 				this.paint()
+-				this.measure.textContent = measurementText(this.value) + "\u200b"
++				let measuredPrefix = this.window.start === 0 && this.window.end === this.text.length ? this.prefix.length : 0
++				if (!measuredPrefix && (this.window.start !== 0 || this.window.end !== this.text.length))
++					this.measure.textContent = measurementText(this.value) + "\u200b"
+ 				let node = this.measure.firstChild
+ 				if (node) {
+ 					let range = document.createRange()
+-					range.setStart(node, this.text.nativeOffset(anchor))
++					range.setStart(node, measuredPrefix + this.text.nativeOffset(anchor))
+ 					range.setEnd(
+ 						node,
+ 						Math.min(
+-							this.text.nativeOffset(anchor) + 1,
+-							this.text.nativeOffset(this.text.length) + 1,
++							measuredPrefix + this.text.nativeOffset(anchor) + 1,
++							measuredPrefix + this.text.nativeOffset(this.text.length) + 1,
+ 						),
+ 					)
+ 					this.scrollElement.scrollTop =

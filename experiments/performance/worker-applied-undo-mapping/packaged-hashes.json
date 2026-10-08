@@ -1,0 +1,78 @@
+{
+	"README.md": {
+		"sha256": "dde37d059630c50284f03d7fbd79ade53ec9c2de09c59dcfed8f541ab7ba0e0d",
+		"bytes": 4154
+	},
+	"candidate.ts.txt": {
+		"sha256": "ba933a364f540072bd8bfb6f5402de30169fe4dfe3c81b66ad2d3dbb47ee29c6",
+		"bytes": 20898
+	},
+	"guarded-resources-1.json": {
+		"sha256": "3d1c4aca9d4830bd9cc41df7d49f56b7e9061d28d9551be984f930f1d7abda01",
+		"bytes": 5274
+	},
+	"guarded-resources-512.json": {
+		"sha256": "1a2be998ee43c955b600608075cd422f0afd5ef5005ebab151704f6643bc7cdd",
+		"bytes": 5274
+	},
+	"guarded-results.json": {
+		"sha256": "4e12e2587194cf5aacda977edf255e7faf6e7ac069507beffd7423479079a04e",
+		"bytes": 98400
+	},
+	"native-analysis.json": {
+		"sha256": "f8c76d250e660abdaf335b2318d2aa40ad50e9f688359edb0a7f87d2fa700d40",
+		"bytes": 35329
+	},
+	"native-driver.ts.txt": {
+		"sha256": "a5912021fb9468dc702e93b593417982c6c0eaee690e37553d8e83de0c1e61df",
+		"bytes": 16322
+	},
+	"native-source-pins.json": {
+		"sha256": "082f9c8e5501f50e2e4a2d17d45fa394a28ea161de85dfe24b85d8d9a25442b7",
+		"bytes": 991
+	},
+	"opus-review.txt": {
+		"sha256": "1911a6f80488160cfc4138e8603eae686edea9c689e2f2c9c9a0f7c6c3be6205",
+		"bytes": 4149
+	},
+	"original-resources-1.json": {
+		"sha256": "2853a229d130c32ea04fa1a1a81d09280736cb3e3b714fea61b6407807a1ce04",
+		"bytes": 5274
+	},
+	"original-resources-512.json": {
+		"sha256": "970849a73f8a12324832930f25bef27fdbe3d9ba19083d8e3a7423e6fa46cea8",
+		"bytes": 5274
+	},
+	"original-results.json": {
+		"sha256": "1d66a3f682e3bf7621dc9cdbcaf5712436a927695c7ac7cc44f575109a9ed8e0",
+		"bytes": 98819
+	},
+	"parse-native.py.txt": {
+		"sha256": "35b7c061b3b12b026ff9c0f30501e4c7aa1e8fd69cd2d8ff7ddba539bea25970",
+		"bytes": 2538
+	},
+	"rpc-binding.ts.txt": {
+		"sha256": "a5fe3ea19049eb46a58e29ab09c1038dd768a2017e5ef39b0471f2723c4af9b9",
+		"bytes": 7786
+	},
+	"rpc-gates.ts.txt": {
+		"sha256": "34d4487d0e98af46e02a1bfc5c535f375049e5f3ba893b8dcd986b2af74ac244",
+		"bytes": 7669
+	},
+	"rpc-results-cancel-protocol-failure.json": {
+		"sha256": "f5ce909b1f09b64a752c2362f441a45cebdd48f846e408217b84285538b8277b",
+		"bytes": 4762
+	},
+	"rpc-results.json": {
+		"sha256": "c093fcced371162ec28d3c1441885273c52d73d589172de8fd9e9e61c72afc9a",
+		"bytes": 4928
+	},
+	"source-pins.json": {
+		"sha256": "d38854889c1552d9692f14c76341fce3f4121fad0f60dab1d782d3a06f048880",
+		"bytes": 971
+	},
+	"undo-guard.patch": {
+		"sha256": "5c48b7e4d0b9b483f92616c5d5d32aba545060068e1aaf27875056e7253692ad",
+		"bytes": 1288
+	}
+}

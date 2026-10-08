@@ -1,0 +1,15 @@
+PASS Large document initially bounded
+PASS Trusted native pointer path exercised
+PASS Pointer keeps source length
+178 | 		)
+179 | 		throw new Error("Browser condition failed: " + source, { cause: error })
+180 | 	}
+181 | }
+182 | export function assert(condition: unknown, message: string) {
+183 | 	if (!condition) throw new Error(message)
+                                 ^
+error: Native drag creates non-empty source selection
+      at assert (/Users/carlassmann/.codex/worktrees/b513/alkalye/tests/browser-driver.ts:183:28)
+      at /private/tmp/alkalye-editor-pointer-journey/run.ts:23:2
+
+Bun v1.4.0 (macOS arm64)

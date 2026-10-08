@@ -1,0 +1,17 @@
+{
+	"dataset": { "ready": "true" },
+	"font": "18px / 32.4062px monospace",
+	"nativeLength": 1048576,
+	"sourceLength": 1048576,
+	"viewport": {
+		"bottom": 1699235.25,
+		"height": 1699235.25,
+		"left": 0,
+		"right": 1280,
+		"top": 0,
+		"width": 1280,
+		"x": 0,
+		"y": 0
+	},
+	"window": { "end": 1048576, "height": 1699027.25, "start": 0, "top": 48 }
+}

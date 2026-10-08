@@ -1,0 +1,23 @@
+{
+	"dataset": {
+		"pointerHandler": "532.5",
+		"pointerLength": "1048576",
+		"pointerTrusted": "true",
+		"pointerUpTrusted": "true",
+		"ready": "true"
+	},
+	"font": "18px / 32.4062px monospace",
+	"nativeLength": 4080,
+	"sourceLength": 1048576,
+	"viewport": {
+		"bottom": 800,
+		"height": 800,
+		"left": 0,
+		"right": 1280,
+		"top": 0,
+		"width": 1280,
+		"x": 0,
+		"y": 0
+	},
+	"window": { "end": 526320, "height": 6643.25, "start": 522240, "top": 846240 }
+}

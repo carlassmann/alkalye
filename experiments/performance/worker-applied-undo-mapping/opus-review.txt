@@ -1,0 +1,35 @@
+No blocker found. The guard is semantically safe because the complete mapper is always correct; only its performance benefit is unproven. I made no edits.
+
+**Semantic safety: OK**
+- **One basis, serialized:** each Open creates one `makeWorkerEditorBasis`, and every basis mutation goes through `execute` under the `commands` semaphore. `local === basis` is checked before `restore(undo)`, and nothing else can swap `basis` while Undo runs. Capabilities, intents and tasks only read through `editor.basis(range)`. Undo and Redo change `session.replica`, never the forked basis replica, so a successful `current.session.undo/redo` cannot advance another basis.
+- **Flag lifetime:** the flag lives on the basis object. Begin, Adopt and the reset after `AppliedUnknown` (then Begin) create a new object, which clears it. Release, a failed or repeated Merge, Replace and a not-applied Undo leave it in place, as intended.
+- **Cached receipt:** the retained receipt returns before the flag is set, so a retry cannot set it on a newer basis, including a retained receipt from an older epoch after Adopt.
+- **Epoch, sequence, admission:** the checks, `local.sequence`, the receipt store, `publishAfter` and admission (`retainedUndo` runs before `admitted`, as before) are unchanged.
+- **Source, caret, direction:** the patch only chooses which mapper runs. Source still comes from the fork, and ranges still copy their own direction. The `previous === next` fast path is kept, which matters for Undo→Redo returning the identical view.
+- **Do the two mappers agree?** For a deleted anchor, the requested-anchor mapper may return `insertionRemovalPosition` or `terminalRemovalPosition`, and the complete mapper returns `predecessor`.
+  - Insertion Undo: the receipt is a single standalone atom, and its predecessor ends at `receipt.offset`, so the results are equal.
+  - Terminal removal: the offset is `content.length`, which equals the predecessor's end.
+  - So the results match in the cases where the cached keys are found. Assert this rather than assume it.
+- **Interruption:** an interrupted or failing `restore(undo)` records `unknown` and leaves the flag unset. Undo may still have applied, but that only costs the slow path, not correctness.
+
+**Optional smaller correction (performance only)**
+- Set the flag on any status other than `not-applied` instead of only on `applied`. This covers Undo that applied and then failed or was interrupted. It is safe because the complete mapper is always correct. If you want to stay strictly "exact applied", keep it as is and add the interrupted-Undo case to the tests as known slow.
+
+**Performance: not proven**
+- n1 304ms vs 127–146ms is one sample, so it doesn't count as evidence. It needs repeated runs under the parent exclusive lease.
+- **Regression risk:** "applied Undo" doesn't mean "anchor deleted". After Undo of an edit far from the caret (surviving anchors, large document), and on every Merge until Adopt, the flagged basis now always builds the complete O(|next|) Map. The requested-anchor mapper would have finished on its cheaper path. That is no worse than the original mapper, but it can be slower than the requested-anchor mapper. Add this case to the timed comparison.
+
+**Lifecycle cases to run through public RPC before the new timed lease**
+- Do the local replacement through `ReplaceReceipt` with `commandIntentDigest`. Public `ReplaceQueued` is rejected.
+- Applied Undo → Merge → Release → Merge on the same basis: the full mapping must still be used.
+- Redo applied.
+- Adopt, then on the new epoch a Merge must use the requested-anchor mapper again.
+- A cached Undo receipt retried after Adopt must not set the flag.
+- Undo returns not-applied (`UndoUnavailable`) and Undo returns `unknown`, including an interrupted one.
+- Concurrent peer insert, delete and cancel.
+- 512 ranges with mixed directions.
+- Assert that both mappers give equal output on insertion-Undo and terminal-removal Undo.
+- Keep the lone-surrogate rejection as a control.
+
+**Nits**
+- `worker-editor-basis.ts:56` and `:344` are unformatted (line length, ternary layout), so `check` will fail on format.
