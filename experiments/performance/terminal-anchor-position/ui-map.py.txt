@@ -1,0 +1,49 @@
+import json,os,sys
+root='/tmp/alkalye-undo-redo-526';alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+def vlq(segment):
+ values=[];acc=shift=0
+ for char in segment:
+  number=alphabet.index(char);acc|=(number&31)<<shift
+  if number&32:shift+=5
+  else:values.append(-(acc>>1) if acc&1 else acc>>1);acc=shift=0
+ return values
+cache={}
+def map(frame):
+ url=frame.get('url','');asset=url.split(':4461/')[-1];p=root+'/runtime/dist/'+asset+'.map'
+ if not os.path.exists(p):return None
+ if p not in cache:
+  d=json.load(open(p));lines=[];source=line=column=name=0
+  for raw in d['mappings'].split(';'):
+   generated=0;segments=[]
+   for segment in raw.split(','):
+    if not segment:continue
+    v=vlq(segment);generated+=v[0]
+    if len(v)>=4:
+     source+=v[1];line+=v[2];column+=v[3]
+     if len(v)>=5:name+=v[4]
+     segments.append((generated,source,line,column,name))
+   lines.append(segments)
+  cache[p]=(d,lines)
+ d,lines=cache[p];ln=frame.get('lineNumber',-1);col=frame.get('columnNumber',-1)
+ if ln<0 or ln>=len(lines):return None
+ segments=[x for x in lines[ln] if x[0]<=col]
+ if not segments:return None
+ _,source,line,column,name=segments[-1]
+ return {'source':d['sources'][source],'line':line+1,'column':column+1,'name':d['names'][name] if name<len(d['names']) else ''}
+
+
+rows=[]
+for row in json.load(open('/tmp/alkalye-terminal-anchor/allocation-results.json'))['results']:
+ root='/tmp/alkalye-undo-redo-526' if row['kind']=='baseline' else '/tmp/alkalye-terminal-anchor'
+ events=json.load(open(row['undoTrace']))['traceEvents'];marks={e['name']:e for e in events if e.get('name') in ['compaction:undo:start','compaction:undo:end']};a,b=marks['compaction:undo:start'],marks['compaction:undo:end'];thread=a['pid'],a['tid']
+ tasks=[e for e in events if e.get('name')=='RunTask' and e.get('ph')=='X' and (e.get('pid'),e.get('tid'))==thread and a['ts']<=e['ts']<=b['ts']]
+ candidates=[]
+ for e in events:
+  if e.get('name')!='FunctionCall' or e.get('ph')!='X' or (e.get('pid'),e.get('tid'))!=thread or not a['ts']<=e['ts']<=b['ts']:continue
+  d=e.get('args',{}).get('data',{});mapped=map({'url':d.get('url',''),'lineNumber':d.get('lineNumber',0)-1,'columnNumber':d.get('columnNumber',0)-1})
+  if not mapped or not mapped['source'].endswith('document-app.ts'):continue
+  containing=[t for t in tasks if t['ts']<=e['ts'] and e['ts']+e.get('dur',0)<=t['ts']+t.get('dur',0)]
+  candidates.append({'callbackMs':e.get('dur',0)/1000,'taskMs':max((t.get('dur',0)/1000 for t in containing),default=0),'source':mapped,'relativeMs':(e['ts']-a['ts'])/1000})
+ rows.append({'arm':row['kind'],'trial':row['trial'],'callbacks':sorted(candidates,key=lambda x:x['callbackMs'],reverse=True)[:5]})
+json.dump(rows,open('/tmp/alkalye-terminal-anchor/ui-refresh.json','w'),indent=2)
+for row in rows: print(row)

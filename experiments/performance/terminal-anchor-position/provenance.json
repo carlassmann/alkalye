@@ -1,0 +1,104 @@
+{
+	"browserBaseline": "52670c02b4138fc0f22646f24d2d383815a7d439",
+	"backendBothArms": "same frozen52670c0",
+	"fixtureExpectedSha256": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a",
+	"dataSeed": "/tmp/alkalye-terminal-header/data-seed",
+	"profileSeed": "/tmp/alkalye-production-allocation-oct8/profile-seed",
+	"files": [
+		{
+			"path": "/tmp/alkalye-terminal-anchor/runtime/src/shared/crdt.ts",
+			"bytes": 61056,
+			"sha256": "55b507da6a0d90ee67c0fdd17d70468768c3105e37e338a22211d4491e279eea"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/runtime/src/client/components/editor.ts",
+			"bytes": 77740,
+			"sha256": "bd34a9293277203b79d2a7817ae909d89bb83b52c4cf9e325a433826c763f6ff"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/runtime/tests/browser-editor-anchor-fixture.ts",
+			"bytes": 9201,
+			"sha256": "bd696c0be6638f127f8e86dfba666485c99c614bbd5ab34d4059fe20a4f01cac"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/runtime/tests/browser-editor-anchors.ts",
+			"bytes": 2310,
+			"sha256": "7291a6866928a89434dd81713815b75fae86242caec5651fbca4522d8dccbc94"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/diagnostic/src/shared/crdt.ts",
+			"bytes": 61293,
+			"sha256": "c25593220598c47a84898b480381405bc76e2fbd21013669d9feb8a0b3eb72bc"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/diagnostic/src/client/components/editor.ts",
+			"bytes": 77871,
+			"sha256": "12862bf725c00ccedc98e5e8a5213bbda8a5238bcfd0bf2f89b8ffc70a81a269"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/diagnostic/dist/app.js",
+			"bytes": 253391,
+			"sha256": "e19c663badde9c94a172f3482db02bdafe45c19880d24190ae4547a7958664f1"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/core-candidate-long1m-end-1.trace.json",
+			"bytes": 11769023,
+			"sha256": "f5f93874cbf1ce721e95994d4c2c5f38618316f7a180e02dbf23f69bc9ab4021"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/core-baseline-long1m-end-1.trace.json",
+			"bytes": 11322027,
+			"sha256": "2975ba230a1c4ba7d4d689aa8a049c6a41bb4f9db9e3fc816a14b28d6ccf96f8"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/core-baseline-long1m-end-2.trace.json",
+			"bytes": 11362667,
+			"sha256": "65d61296fd152a5d31971df82b78be6fd9e53db4d66eea0ad99c6c3a40bf7c85"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/core-candidate-long1m-end-0.trace.json",
+			"bytes": 11717929,
+			"sha256": "af76f455eeef239af948364caa84a992a811c91c0c7a00d32e3155cee57fc722"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/core-baseline-long1m-end-0.trace.json",
+			"bytes": 11255560,
+			"sha256": "42d2220d1f083ec7236a6d97d98b60b0219f60111de079927e14754aa6781c89"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/core-candidate-long1m-end-2.trace.json",
+			"bytes": 12240336,
+			"sha256": "1b5661ad5722815849d0b27b9f13af74e38db6c8203c0d661410185fcf5b1d88"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/undo-candidate-long1m-0.trace.json",
+			"bytes": 6854014,
+			"sha256": "c5aa5fe7e814a7b0da014ff539250eed0edefdcd7bf11eda0804b31c1d6e2165"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/undo-candidate-long1m-2.trace.json",
+			"bytes": 6782299,
+			"sha256": "4a6ff7ea2434bac393d09606e22cfa1fd6ce530f90fd239fcaddf6d7e886da40"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/undo-baseline-long1m-1.trace.json",
+			"bytes": 6774443,
+			"sha256": "82e52c696a4cc25645922e2311f6e33c5c5e3965ced9891a890dbed16d0d164d"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/undo-candidate-long1m-1.trace.json",
+			"bytes": 6715117,
+			"sha256": "981fe93ad0645ddc8d686ef6d4fe02a27b3c26fed7c2184811e5a7e1aa9ab64e"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/undo-baseline-long1m-2.trace.json",
+			"bytes": 6704610,
+			"sha256": "f98005935ae126f67036f2658ca87898f48a55e0082083c55b07545e36f276e6"
+		},
+		{
+			"path": "/tmp/alkalye-terminal-anchor/undo-baseline-long1m-0.trace.json",
+			"bytes": 6798843,
+			"sha256": "c406d1791636c89825d73f4f95798511e7fb64201a9ea9fb7ee0ad6513e55e40"
+		}
+	]
+}

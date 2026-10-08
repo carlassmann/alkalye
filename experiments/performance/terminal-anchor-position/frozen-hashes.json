@@ -1,0 +1,30 @@
+[
+	{
+		"path": "/tmp/alkalye-undo-redo-526/runtime/src/shared/crdt.ts",
+		"sha256": "e1dc8399ed4f254afe97af53d93c5d9a113966533eb61f282fed6f083f0b53b5"
+	},
+	{
+		"path": "/tmp/alkalye-undo-redo-526/runtime/src/client/components/editor.ts",
+		"sha256": "d4669c811f7f8b72b87f512646f80e34482bbbb52d11a97027f7452ed4126c27"
+	},
+	{
+		"path": "/tmp/alkalye-undo-redo-526/runtime/dist/app.js",
+		"sha256": "3efce38c7e1da335aaa12be93dd76f15544730289d2cedeaf5bb32ab37cac3ab"
+	},
+	{
+		"path": "/tmp/alkalye-terminal-anchor/runtime/src/shared/crdt.ts",
+		"sha256": "55b507da6a0d90ee67c0fdd17d70468768c3105e37e338a22211d4491e279eea"
+	},
+	{
+		"path": "/tmp/alkalye-terminal-anchor/runtime/src/client/components/editor.ts",
+		"sha256": "bd34a9293277203b79d2a7817ae909d89bb83b52c4cf9e325a433826c763f6ff"
+	},
+	{
+		"path": "/tmp/alkalye-terminal-anchor/runtime/dist/app.js",
+		"sha256": "e9482a212e3ee0a51ca7bc276febab39cce9136b20b39a6f0d710d5890df1e25"
+	},
+	{
+		"path": "/tmp/alkalye-terminal-anchor/measure.ts",
+		"sha256": "614c2def2c31268ae238bd26657921aaac0a912e3d35f240f59472cd9eafef51"
+	}
+]

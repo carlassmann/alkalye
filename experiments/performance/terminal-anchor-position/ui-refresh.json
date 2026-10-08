@@ -1,0 +1,368 @@
+[
+	{
+		"arm": "baseline",
+		"trial": 0,
+		"callbacks": [
+			{
+				"callbackMs": 24.037,
+				"taskMs": 25.587,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 164.608
+			},
+			{
+				"callbackMs": 4.096,
+				"taskMs": 5.083,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 2682.368
+			},
+			{
+				"callbackMs": 2.477,
+				"taskMs": 3.487,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 947.583
+			},
+			{
+				"callbackMs": 1.843,
+				"taskMs": 3.075,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 1232.733
+			},
+			{
+				"callbackMs": 1.639,
+				"taskMs": 2.855,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 1216.415
+			}
+		]
+	},
+	{
+		"arm": "candidate",
+		"trial": 0,
+		"callbacks": [
+			{
+				"callbackMs": 7.588,
+				"taskMs": 9.023,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 154.93
+			},
+			{
+				"callbackMs": 2.391,
+				"taskMs": 4.152,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 2640.338
+			},
+			{
+				"callbackMs": 2.303,
+				"taskMs": 3.23,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 941.795
+			},
+			{
+				"callbackMs": 1.964,
+				"taskMs": 3.02,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 1222.453
+			},
+			{
+				"callbackMs": 1.68,
+				"taskMs": 2.896,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 806.492
+			}
+		]
+	},
+	{
+		"arm": "candidate",
+		"trial": 1,
+		"callbacks": [
+			{
+				"callbackMs": 7.458,
+				"taskMs": 9.083,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 175.744
+			},
+			{
+				"callbackMs": 3.442,
+				"taskMs": 4.308,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 2540.935
+			},
+			{
+				"callbackMs": 2.443,
+				"taskMs": 3.197,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 842.047
+			},
+			{
+				"callbackMs": 1.82,
+				"taskMs": 2.656,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 789.803
+			},
+			{
+				"callbackMs": 1.648,
+				"taskMs": 2.397,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 859.281
+			}
+		]
+	},
+	{
+		"arm": "baseline",
+		"trial": 1,
+		"callbacks": [
+			{
+				"callbackMs": 24.657,
+				"taskMs": 26.233,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 163.293
+			},
+			{
+				"callbackMs": 4.261,
+				"taskMs": 5.456,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 2494.774
+			},
+			{
+				"callbackMs": 1.961,
+				"taskMs": 2.762,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 833.21
+			},
+			{
+				"callbackMs": 1.916,
+				"taskMs": 2.664,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 761.431
+			},
+			{
+				"callbackMs": 1.839,
+				"taskMs": 3.249,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 1113.326
+			}
+		]
+	},
+	{
+		"arm": "baseline",
+		"trial": 2,
+		"callbacks": [
+			{
+				"callbackMs": 24.171,
+				"taskMs": 25.607,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 157.785
+			},
+			{
+				"callbackMs": 3.363,
+				"taskMs": 4.623,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 2555.656
+			},
+			{
+				"callbackMs": 2.402,
+				"taskMs": 3.154,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 840.533
+			},
+			{
+				"callbackMs": 1.884,
+				"taskMs": 3.106,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 1139.864
+			},
+			{
+				"callbackMs": 1.776,
+				"taskMs": 2.629,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 857.488
+			}
+		]
+	},
+	{
+		"arm": "candidate",
+		"trial": 2,
+		"callbacks": [
+			{
+				"callbackMs": 7.383,
+				"taskMs": 8.724,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 160.265
+			},
+			{
+				"callbackMs": 3.109,
+				"taskMs": 3.955,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 2626.303
+			},
+			{
+				"callbackMs": 2.018,
+				"taskMs": 2.761,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 877.173
+			},
+			{
+				"callbackMs": 1.809,
+				"taskMs": 2.808,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 843.761
+			},
+			{
+				"callbackMs": 1.778,
+				"taskMs": 2.642,
+				"source": {
+					"source": "../src/client/document-app.ts",
+					"line": 2654,
+					"column": 19,
+					"name": ""
+				},
+				"relativeMs": 859.841
+			}
+		]
+	}
+]

@@ -1,0 +1,1143 @@
+{
+	"rows": [
+		{
+			"arm": "baseline",
+			"fixture": "long1m",
+			"trial": 0,
+			"input": {
+				"trace": "/tmp/alkalye-terminal-anchor/core-baseline-long1m-end-0.trace.json",
+				"sha256": "42d2220d1f083ec7236a6d97d98b60b0219f60111de079927e14754aa6781c89",
+				"mainThread": [70385, 16977077],
+				"windowMs": 3002.409,
+				"initiatingTaskMs": 6.379,
+				"largestTaskMs": 20.717,
+				"aftermathTaskMs": 20.717,
+				"taskCountOver833": 28,
+				"busyUnionMs": 1039.225,
+				"layoutTotalMs": 18.147,
+				"paintTotalMs": 4.128,
+				"majorGcMaxMs": 19.862,
+				"minorGcMaxMs": 12.396,
+				"largestTaskBreakdown": {
+					"relativeMs": 517.643,
+					"taskMs": 20.717,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 20.695,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "84BB53F9E3BF041B26EC8DEABBBBB8A9",
+									"functionName": "o.port1.onmessage",
+									"isolate": "12238740871332121292",
+									"lineNumber": 8,
+									"sampleTraceId": 910611090507782,
+									"scriptId": "23",
+									"url": "http://127.0.0.1:4461/chunks/document-app-sjtc7r8p.js"
+								}
+							}
+						},
+						{
+							"name": "MajorGC",
+							"durationMs": 19.862,
+							"args": {
+								"type": "finalize incremental marking via stack guard",
+								"usedHeapSizeAfter": 617522360,
+								"usedHeapSizeBefore": 1280146768
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-terminal-anchor/undo-baseline-long1m-0.trace.json",
+				"sha256": "c406d1791636c89825d73f4f95798511e7fb64201a9ea9fb7ee0ad6513e55e40",
+				"mainThread": [70385, 16977077],
+				"windowMs": 3000.419,
+				"initiatingTaskMs": 0.51,
+				"largestTaskMs": 25.587,
+				"aftermathTaskMs": 25.587,
+				"taskCountOver833": 22,
+				"busyUnionMs": 891.599,
+				"layoutTotalMs": 29.362,
+				"paintTotalMs": 6.252,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 12.666,
+				"largestTaskBreakdown": {
+					"relativeMs": 163.93,
+					"taskMs": 25.587,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 24.037,
+							"args": {
+								"data": {
+									"columnNumber": 476,
+									"frame": "84BB53F9E3BF041B26EC8DEABBBBB8A9",
+									"functionName": "",
+									"isolate": "12238740871332121292",
+									"lineNumber": 1653,
+									"sampleTraceId": 910611090535948,
+									"scriptId": "5",
+									"url": "http://127.0.0.1:4461/app.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 0.637,
+							"args": {
+								"data": {
+									"columnNumber": 744,
+									"frame": "84BB53F9E3BF041B26EC8DEABBBBB8A9",
+									"functionName": "",
+									"isolate": "12238740871332121292",
+									"lineNumber": 67,
+									"sampleTraceId": 910611090535944,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+								}
+							}
+						},
+						{
+							"name": "Paint",
+							"durationMs": 0.167,
+							"args": {
+								"data": {
+									"clip": [0, 0, 1280, 0, 1280, 633, 0, 633],
+									"frame": "84BB53F9E3BF041B26EC8DEABBBBB8A9",
+									"layerId": 0,
+									"nodeId": 3,
+									"nodeName": "#document"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.151,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 27,
+									"frame": "84BB53F9E3BF041B26EC8DEABBBBB8A9",
+									"partialLayout": false,
+									"totalObjects": 203
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 0.125,
+							"args": {
+								"data": {
+									"columnNumber": 19128,
+									"frame": "84BB53F9E3BF041B26EC8DEABBBBB8A9",
+									"functionName": "me",
+									"isolate": "12238740871332121292",
+									"lineNumber": 86,
+									"sampleTraceId": 910611090535986,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.115,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "84BB53F9E3BF041B26EC8DEABBBBB8A9",
+									"partialLayout": false,
+									"totalObjects": 203
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.106,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "84BB53F9E3BF041B26EC8DEABBBBB8A9",
+									"partialLayout": false,
+									"totalObjects": 203
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.09,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 11,
+									"frame": "84BB53F9E3BF041B26EC8DEABBBBB8A9",
+									"partialLayout": false,
+									"totalObjects": 203
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"limit": 4395630592,
+				"total": 782107910,
+				"used": 724449594
+			},
+			"bundleSha": "3efce38c7e1da335aaa12be93dd76f15544730289d2cedeaf5bb32ab37cac3ab",
+			"exact": true,
+			"acceptedEditHash": "48fc71562c05fc08f94e30c55249d234b1c83b56803e3f109e7c18a42e3dd9cb",
+			"acceptedUndoHash": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a"
+		},
+		{
+			"arm": "candidate",
+			"fixture": "long1m",
+			"trial": 0,
+			"input": {
+				"trace": "/tmp/alkalye-terminal-anchor/core-candidate-long1m-end-0.trace.json",
+				"sha256": "af76f455eeef239af948364caa84a992a811c91c0c7a00d32e3155cee57fc722",
+				"mainThread": [70688, 16978722],
+				"windowMs": 3003.459,
+				"initiatingTaskMs": 7.623,
+				"largestTaskMs": 18.193,
+				"aftermathTaskMs": 18.193,
+				"taskCountOver833": 27,
+				"busyUnionMs": 1040.333,
+				"layoutTotalMs": 18.355,
+				"paintTotalMs": 4.307,
+				"majorGcMaxMs": 17.83,
+				"minorGcMaxMs": 12.454,
+				"largestTaskBreakdown": {
+					"relativeMs": 438.687,
+					"taskMs": 18.193,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 18.165,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "7E9AA76E932A6197EC0A31F6A163F41D",
+									"functionName": "o.port1.onmessage",
+									"isolate": "13134305659584919606",
+									"lineNumber": 8,
+									"sampleTraceId": 1244905521747994,
+									"scriptId": "18",
+									"url": "http://127.0.0.1:4461/chunks/document-app-yszd496w.js"
+								}
+							}
+						},
+						{
+							"name": "MajorGC",
+							"durationMs": 17.83,
+							"args": {
+								"type": "finalize incremental marking via stack guard",
+								"usedHeapSizeAfter": 562513012,
+								"usedHeapSizeBefore": 1318906684
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-terminal-anchor/undo-candidate-long1m-0.trace.json",
+				"sha256": "c5aa5fe7e814a7b0da014ff539250eed0edefdcd7bf11eda0804b31c1d6e2165",
+				"mainThread": [70688, 16978722],
+				"windowMs": 3002.855,
+				"initiatingTaskMs": 0.477,
+				"largestTaskMs": 13.449,
+				"aftermathTaskMs": 13.449,
+				"taskCountOver833": 21,
+				"busyUnionMs": 868.82,
+				"layoutTotalMs": 26.83,
+				"paintTotalMs": 5.703,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 13.178,
+				"largestTaskBreakdown": {
+					"relativeMs": 1181.946,
+					"taskMs": 13.449,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 13.433,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "7E9AA76E932A6197EC0A31F6A163F41D",
+									"functionName": "o.port1.onmessage",
+									"isolate": "13134305659584919606",
+									"lineNumber": 8,
+									"sampleTraceId": 1244905521774253,
+									"scriptId": "18",
+									"url": "http://127.0.0.1:4461/chunks/document-app-yszd496w.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 13.178,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 890181760,
+								"usedHeapSizeBefore": 919364304
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"limit": 4395630592,
+				"total": 755633959,
+				"used": 693170691
+			},
+			"bundleSha": "e9482a212e3ee0a51ca7bc276febab39cce9136b20b39a6f0d710d5890df1e25",
+			"exact": true,
+			"acceptedEditHash": "48fc71562c05fc08f94e30c55249d234b1c83b56803e3f109e7c18a42e3dd9cb",
+			"acceptedUndoHash": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a"
+		},
+		{
+			"arm": "candidate",
+			"fixture": "long1m",
+			"trial": 1,
+			"input": {
+				"trace": "/tmp/alkalye-terminal-anchor/core-candidate-long1m-end-1.trace.json",
+				"sha256": "f5f93874cbf1ce721e95994d4c2c5f38618316f7a180e02dbf23f69bc9ab4021",
+				"mainThread": [70979, 16980281],
+				"windowMs": 3001.632,
+				"initiatingTaskMs": 6.572,
+				"largestTaskMs": 18.689,
+				"aftermathTaskMs": 18.689,
+				"taskCountOver833": 26,
+				"busyUnionMs": 1001.999,
+				"layoutTotalMs": 17.937,
+				"paintTotalMs": 4.306,
+				"majorGcMaxMs": 18.341,
+				"minorGcMaxMs": 12.64,
+				"largestTaskBreakdown": {
+					"relativeMs": 405.91,
+					"taskMs": 18.689,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 18.658,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "FF79912A23906B5C90E7B396195819C5",
+									"functionName": "o.port1.onmessage",
+									"isolate": "2765011764514213525",
+									"lineNumber": 8,
+									"sampleTraceId": 3860951572394283,
+									"scriptId": "16",
+									"url": "http://127.0.0.1:4461/chunks/document-app-yszd496w.js"
+								}
+							}
+						},
+						{
+							"name": "MajorGC",
+							"durationMs": 18.341,
+							"args": {
+								"type": "finalize incremental marking via stack guard",
+								"usedHeapSizeAfter": 563235104,
+								"usedHeapSizeBefore": 1318588000
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-terminal-anchor/undo-candidate-long1m-1.trace.json",
+				"sha256": "981fe93ad0645ddc8d686ef6d4fe02a27b3c26fed7c2184811e5a7e1aa9ab64e",
+				"mainThread": [70979, 16980281],
+				"windowMs": 3000.863,
+				"initiatingTaskMs": 0.488,
+				"largestTaskMs": 13.148,
+				"aftermathTaskMs": 13.148,
+				"taskCountOver833": 23,
+				"busyUnionMs": 885.949,
+				"layoutTotalMs": 27.941,
+				"paintTotalMs": 5.637,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 12.862,
+				"largestTaskBreakdown": {
+					"relativeMs": 586.998,
+					"taskMs": 13.148,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 13.132,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "FF79912A23906B5C90E7B396195819C5",
+									"functionName": "o.port1.onmessage",
+									"isolate": "2765011764514213525",
+									"lineNumber": 8,
+									"sampleTraceId": 3860951572401404,
+									"scriptId": "16",
+									"url": "http://127.0.0.1:4461/chunks/document-app-yszd496w.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 12.804,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 817633532,
+								"usedHeapSizeBefore": 846674032
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"limit": 4395630592,
+				"total": 754487065,
+				"used": 692165405
+			},
+			"bundleSha": "e9482a212e3ee0a51ca7bc276febab39cce9136b20b39a6f0d710d5890df1e25",
+			"exact": true,
+			"acceptedEditHash": "48fc71562c05fc08f94e30c55249d234b1c83b56803e3f109e7c18a42e3dd9cb",
+			"acceptedUndoHash": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a"
+		},
+		{
+			"arm": "baseline",
+			"fixture": "long1m",
+			"trial": 1,
+			"input": {
+				"trace": "/tmp/alkalye-terminal-anchor/core-baseline-long1m-end-1.trace.json",
+				"sha256": "2975ba230a1c4ba7d4d689aa8a049c6a41bb4f9db9e3fc816a14b28d6ccf96f8",
+				"mainThread": [71280, 16981897],
+				"windowMs": 3001.819,
+				"initiatingTaskMs": 6.55,
+				"largestTaskMs": 19.78,
+				"aftermathTaskMs": 19.78,
+				"taskCountOver833": 22,
+				"busyUnionMs": 989.189,
+				"layoutTotalMs": 17.904,
+				"paintTotalMs": 4.306,
+				"majorGcMaxMs": 19.032,
+				"minorGcMaxMs": 12.294,
+				"largestTaskBreakdown": {
+					"relativeMs": 448.48,
+					"taskMs": 19.78,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 19.745,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "571538D08D0A32FCE9FE9F15EE82D838",
+									"functionName": "o.port1.onmessage",
+									"isolate": "14159699020042568996",
+									"lineNumber": 8,
+									"sampleTraceId": 8102131924394355,
+									"scriptId": "18",
+									"url": "http://127.0.0.1:4461/chunks/document-app-sjtc7r8p.js"
+								}
+							}
+						},
+						{
+							"name": "MajorGC",
+							"durationMs": 19.032,
+							"args": {
+								"type": "finalize incremental marking via stack guard",
+								"usedHeapSizeAfter": 613655316,
+								"usedHeapSizeBefore": 1284137228
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-terminal-anchor/undo-baseline-long1m-1.trace.json",
+				"sha256": "82e52c696a4cc25645922e2311f6e33c5c5e3965ced9891a890dbed16d0d164d",
+				"mainThread": [71280, 16981897],
+				"windowMs": 3000.788,
+				"initiatingTaskMs": 0.498,
+				"largestTaskMs": 26.233,
+				"aftermathTaskMs": 26.233,
+				"taskCountOver833": 22,
+				"busyUnionMs": 896.755,
+				"layoutTotalMs": 30.485,
+				"paintTotalMs": 6.327,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 13.73,
+				"largestTaskBreakdown": {
+					"relativeMs": 162.615,
+					"taskMs": 26.233,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 24.657,
+							"args": {
+								"data": {
+									"columnNumber": 476,
+									"frame": "571538D08D0A32FCE9FE9F15EE82D838",
+									"functionName": "",
+									"isolate": "14159699020042568996",
+									"lineNumber": 1653,
+									"sampleTraceId": 8102131924377356,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/app.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 0.625,
+							"args": {
+								"data": {
+									"columnNumber": 744,
+									"frame": "571538D08D0A32FCE9FE9F15EE82D838",
+									"functionName": "",
+									"isolate": "14159699020042568996",
+									"lineNumber": 67,
+									"sampleTraceId": 8102131924377357,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.532,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 791235496,
+								"usedHeapSizeBefore": 828090368
+							}
+						},
+						{
+							"name": "Paint",
+							"durationMs": 0.168,
+							"args": {
+								"data": {
+									"clip": [0, 0, 1280, 0, 1280, 633, 0, 633],
+									"frame": "571538D08D0A32FCE9FE9F15EE82D838",
+									"layerId": 0,
+									"nodeId": 3,
+									"nodeName": "#document"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 0.138,
+							"args": {
+								"data": {
+									"columnNumber": 19128,
+									"frame": "571538D08D0A32FCE9FE9F15EE82D838",
+									"functionName": "me",
+									"isolate": "14159699020042568996",
+									"lineNumber": 86,
+									"sampleTraceId": 8102131924377585,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.109,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "571538D08D0A32FCE9FE9F15EE82D838",
+									"partialLayout": false,
+									"totalObjects": 203
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.108,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 27,
+									"frame": "571538D08D0A32FCE9FE9F15EE82D838",
+									"partialLayout": false,
+									"totalObjects": 203
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.106,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 11,
+									"frame": "571538D08D0A32FCE9FE9F15EE82D838",
+									"partialLayout": false,
+									"totalObjects": 203
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"limit": 4395630592,
+				"total": 780682502,
+				"used": 723894390
+			},
+			"bundleSha": "3efce38c7e1da335aaa12be93dd76f15544730289d2cedeaf5bb32ab37cac3ab",
+			"exact": true,
+			"acceptedEditHash": "48fc71562c05fc08f94e30c55249d234b1c83b56803e3f109e7c18a42e3dd9cb",
+			"acceptedUndoHash": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a"
+		},
+		{
+			"arm": "baseline",
+			"fixture": "long1m",
+			"trial": 2,
+			"input": {
+				"trace": "/tmp/alkalye-terminal-anchor/core-baseline-long1m-end-2.trace.json",
+				"sha256": "65d61296fd152a5d31971df82b78be6fd9e53db4d66eea0ad99c6c3a40bf7c85",
+				"mainThread": [71563, 16983473],
+				"windowMs": 3010.187,
+				"initiatingTaskMs": 6.586,
+				"largestTaskMs": 18.534,
+				"aftermathTaskMs": 18.534,
+				"taskCountOver833": 27,
+				"busyUnionMs": 1044.904,
+				"layoutTotalMs": 18.432,
+				"paintTotalMs": 4.286,
+				"majorGcMaxMs": 17.274,
+				"minorGcMaxMs": 12.705,
+				"largestTaskBreakdown": {
+					"relativeMs": 524.883,
+					"taskMs": 18.534,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 18.471,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "42C9C546F71A3D57DEE4C877F0CB2AF0",
+									"functionName": "o.port1.onmessage",
+									"isolate": "17259085408459897617",
+									"lineNumber": 8,
+									"sampleTraceId": 2877543977198419,
+									"scriptId": "19",
+									"url": "http://127.0.0.1:4461/chunks/document-app-sjtc7r8p.js"
+								}
+							}
+						},
+						{
+							"name": "MajorGC",
+							"durationMs": 17.274,
+							"args": {
+								"type": "finalize incremental marking via stack guard",
+								"usedHeapSizeAfter": 615819864,
+								"usedHeapSizeBefore": 1280632004
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-terminal-anchor/undo-baseline-long1m-2.trace.json",
+				"sha256": "f98005935ae126f67036f2658ca87898f48a55e0082083c55b07545e36f276e6",
+				"mainThread": [71563, 16983473],
+				"windowMs": 3001.533,
+				"initiatingTaskMs": 0.493,
+				"largestTaskMs": 25.607,
+				"aftermathTaskMs": 25.607,
+				"taskCountOver833": 21,
+				"busyUnionMs": 915.508,
+				"layoutTotalMs": 29.3,
+				"paintTotalMs": 5.542,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 14.01,
+				"largestTaskBreakdown": {
+					"relativeMs": 157.131,
+					"taskMs": 25.607,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 24.171,
+							"args": {
+								"data": {
+									"columnNumber": 476,
+									"frame": "42C9C546F71A3D57DEE4C877F0CB2AF0",
+									"functionName": "",
+									"isolate": "17259085408459897617",
+									"lineNumber": 1653,
+									"sampleTraceId": 2877543977213218,
+									"scriptId": "6",
+									"url": "http://127.0.0.1:4461/app.js"
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 0.622,
+							"args": {
+								"data": {
+									"columnNumber": 744,
+									"frame": "42C9C546F71A3D57DEE4C877F0CB2AF0",
+									"functionName": "",
+									"isolate": "17259085408459897617",
+									"lineNumber": 67,
+									"sampleTraceId": 2877543977213224,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 0.484,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 802485184,
+								"usedHeapSizeBefore": 839143988
+							}
+						},
+						{
+							"name": "Paint",
+							"durationMs": 0.146,
+							"args": {
+								"data": {
+									"clip": [0, 0, 1280, 0, 1280, 633, 0, 633],
+									"frame": "42C9C546F71A3D57DEE4C877F0CB2AF0",
+									"layerId": 0,
+									"nodeId": 3,
+									"nodeName": "#document"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.112,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 30,
+									"frame": "42C9C546F71A3D57DEE4C877F0CB2AF0",
+									"partialLayout": false,
+									"totalObjects": 203
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "FunctionCall",
+							"durationMs": 0.112,
+							"args": {
+								"data": {
+									"columnNumber": 19128,
+									"frame": "42C9C546F71A3D57DEE4C877F0CB2AF0",
+									"functionName": "me",
+									"isolate": "17259085408459897617",
+									"lineNumber": 86,
+									"sampleTraceId": 2877543977213220,
+									"scriptId": "7",
+									"url": "http://127.0.0.1:4461/chunks/document-app-z7twvbyh.js"
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.11,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 10,
+									"frame": "42C9C546F71A3D57DEE4C877F0CB2AF0",
+									"partialLayout": false,
+									"totalObjects": 203
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Layout",
+							"durationMs": 0.102,
+							"args": {
+								"beginData": {
+									"dirtyObjects": 9,
+									"frame": "42C9C546F71A3D57DEE4C877F0CB2AF0",
+									"partialLayout": false,
+									"totalObjects": 203
+								},
+								"endData": {
+									"layoutRoots": [
+										{
+											"depth": 1,
+											"nodeId": 3,
+											"nodeName": "#document",
+											"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"limit": 4395630592,
+				"total": 781911291,
+				"used": 704918731
+			},
+			"bundleSha": "3efce38c7e1da335aaa12be93dd76f15544730289d2cedeaf5bb32ab37cac3ab",
+			"exact": true,
+			"acceptedEditHash": "48fc71562c05fc08f94e30c55249d234b1c83b56803e3f109e7c18a42e3dd9cb",
+			"acceptedUndoHash": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a"
+		},
+		{
+			"arm": "candidate",
+			"fixture": "long1m",
+			"trial": 2,
+			"input": {
+				"trace": "/tmp/alkalye-terminal-anchor/core-candidate-long1m-end-2.trace.json",
+				"sha256": "1b5661ad5722815849d0b27b9f13af74e38db6c8203c0d661410185fcf5b1d88",
+				"mainThread": [71851, 16985048],
+				"windowMs": 3005.305,
+				"initiatingTaskMs": 6.484,
+				"largestTaskMs": 20.889,
+				"aftermathTaskMs": 20.889,
+				"taskCountOver833": 30,
+				"busyUnionMs": 1054.909,
+				"layoutTotalMs": 17.32,
+				"paintTotalMs": 4.183,
+				"majorGcMaxMs": 20.856,
+				"minorGcMaxMs": 12.105,
+				"largestTaskBreakdown": {
+					"relativeMs": 703.671,
+					"taskMs": 20.889,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "MajorGC",
+							"durationMs": 20.856,
+							"args": {
+								"type": "finalize incremental marking via task",
+								"usedHeapSizeAfter": 537980028,
+								"usedHeapSizeBefore": 1194599636
+							}
+						}
+					]
+				}
+			},
+			"undo": {
+				"trace": "/tmp/alkalye-terminal-anchor/undo-candidate-long1m-2.trace.json",
+				"sha256": "4a6ff7ea2434bac393d09606e22cfa1fd6ce530f90fd239fcaddf6d7e886da40",
+				"mainThread": [71851, 16985048],
+				"windowMs": 3002.1,
+				"initiatingTaskMs": 0.525,
+				"largestTaskMs": 14.046,
+				"aftermathTaskMs": 14.046,
+				"taskCountOver833": 23,
+				"busyUnionMs": 888.852,
+				"layoutTotalMs": 27.922,
+				"paintTotalMs": 6.016,
+				"majorGcMaxMs": 0,
+				"minorGcMaxMs": 13.754,
+				"largestTaskBreakdown": {
+					"relativeMs": 795.233,
+					"taskMs": 14.046,
+					"childrenInclusiveNotAdditive": [
+						{
+							"name": "FunctionCall",
+							"durationMs": 14.027,
+							"args": {
+								"data": {
+									"columnNumber": 122887,
+									"frame": "EBB2B40236DD09544C4A9C07F14CF558",
+									"functionName": "o.port1.onmessage",
+									"isolate": "1894785612491027167",
+									"lineNumber": 8,
+									"sampleTraceId": 1449743836327687,
+									"scriptId": "20",
+									"url": "http://127.0.0.1:4461/chunks/document-app-yszd496w.js"
+								}
+							}
+						},
+						{
+							"name": "MinorGC",
+							"durationMs": 13.754,
+							"args": {
+								"type": "allocation failure",
+								"usedHeapSizeAfter": 765373152,
+								"usedHeapSizeBefore": 794529912
+							}
+						}
+					]
+				}
+			},
+			"heapSample": {
+				"limit": 4395630592,
+				"total": 695158564,
+				"used": 632625744
+			},
+			"bundleSha": "e9482a212e3ee0a51ca7bc276febab39cce9136b20b39a6f0d710d5890df1e25",
+			"exact": true,
+			"acceptedEditHash": "48fc71562c05fc08f94e30c55249d234b1c83b56803e3f109e7c18a42e3dd9cb",
+			"acceptedUndoHash": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a"
+		}
+	],
+	"summaries": [
+		{
+			"fixture": "long1m",
+			"arm": "baseline",
+			"n": 3,
+			"input": {
+				"initiatingTaskMs": {
+					"median": 6.55,
+					"max": 6.586
+				},
+				"aftermathTaskMs": {
+					"median": 19.78,
+					"max": 20.717
+				},
+				"largestTaskMs": {
+					"median": 19.78,
+					"max": 20.717
+				},
+				"busyUnionMs": {
+					"median": 1039.225,
+					"max": 1044.904
+				},
+				"layoutTotalMs": {
+					"median": 18.147,
+					"max": 18.432
+				},
+				"paintTotalMs": {
+					"median": 4.286,
+					"max": 4.306
+				},
+				"majorGcMaxMs": {
+					"median": 19.032,
+					"max": 19.862
+				},
+				"minorGcMaxMs": {
+					"median": 12.396,
+					"max": 12.705
+				},
+				"taskCountOver833": {
+					"median": 27,
+					"max": 28
+				}
+			},
+			"undo": {
+				"initiatingTaskMs": {
+					"median": 0.498,
+					"max": 0.51
+				},
+				"aftermathTaskMs": {
+					"median": 25.607,
+					"max": 26.233
+				},
+				"largestTaskMs": {
+					"median": 25.607,
+					"max": 26.233
+				},
+				"busyUnionMs": {
+					"median": 896.755,
+					"max": 915.508
+				},
+				"layoutTotalMs": {
+					"median": 29.362,
+					"max": 30.485
+				},
+				"paintTotalMs": {
+					"median": 6.252,
+					"max": 6.327
+				},
+				"majorGcMaxMs": {
+					"median": 0,
+					"max": 0
+				},
+				"minorGcMaxMs": {
+					"median": 13.73,
+					"max": 14.01
+				},
+				"taskCountOver833": {
+					"median": 22,
+					"max": 22
+				}
+			},
+			"mainHeapUsed": {
+				"median": 723894390,
+				"max": 724449594
+			}
+		},
+		{
+			"fixture": "long1m",
+			"arm": "candidate",
+			"n": 3,
+			"input": {
+				"initiatingTaskMs": {
+					"median": 6.572,
+					"max": 7.623
+				},
+				"aftermathTaskMs": {
+					"median": 18.689,
+					"max": 20.889
+				},
+				"largestTaskMs": {
+					"median": 18.689,
+					"max": 20.889
+				},
+				"busyUnionMs": {
+					"median": 1040.333,
+					"max": 1054.909
+				},
+				"layoutTotalMs": {
+					"median": 17.937,
+					"max": 18.355
+				},
+				"paintTotalMs": {
+					"median": 4.306,
+					"max": 4.307
+				},
+				"majorGcMaxMs": {
+					"median": 18.341,
+					"max": 20.856
+				},
+				"minorGcMaxMs": {
+					"median": 12.454,
+					"max": 12.64
+				},
+				"taskCountOver833": {
+					"median": 27,
+					"max": 30
+				}
+			},
+			"undo": {
+				"initiatingTaskMs": {
+					"median": 0.488,
+					"max": 0.525
+				},
+				"aftermathTaskMs": {
+					"median": 13.449,
+					"max": 14.046
+				},
+				"largestTaskMs": {
+					"median": 13.449,
+					"max": 14.046
+				},
+				"busyUnionMs": {
+					"median": 885.949,
+					"max": 888.852
+				},
+				"layoutTotalMs": {
+					"median": 27.922,
+					"max": 27.941
+				},
+				"paintTotalMs": {
+					"median": 5.703,
+					"max": 6.016
+				},
+				"majorGcMaxMs": {
+					"median": 0,
+					"max": 0
+				},
+				"minorGcMaxMs": {
+					"median": 13.178,
+					"max": 13.754
+				},
+				"taskCountOver833": {
+					"median": 23,
+					"max": 23
+				}
+			},
+			"mainHeapUsed": {
+				"median": 692165405,
+				"max": 693170691
+			}
+		}
+	],
+	"failures": []
+}

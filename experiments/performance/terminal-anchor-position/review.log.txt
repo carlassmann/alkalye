@@ -1,0 +1,39 @@
+**Verdict:** the certificate looks sound from reading the code. Nothing blocks it, but don't adopt it until it has been measured and tested. I only read files: no tests, builds or browser runs.
+
+**Biggest finding:** `prepareTerminalCancellation` is the same in 526 (`/tmp/alkalye-undo-redo-526/runtime/src/shared/crdt.ts:168-248`). The candidate only adds `terminalRemoval: true` and the record call at `crdt.ts:531`. The published cache N already equals P with its last atom removed (`replaceAtoms`), so the certificate trusts nothing that 526 doesn't already trust. It holds exactly when P has no duplicate of `last.id`.
+
+**Can the terminal ID appear twice in the canonical view? No, and this follows from the code rather than an assumption:**
+- **Raw view:** built by walking `children`. `indexAtom` returns early if `atomIndex` already has the id (`crdt.ts:1809`), so each atom appears at most once. The past-version path dedups with `known`. Atom ids must start with `operation.id + ":"` (`model.ts:318`).
+- **Canonical view:** `sourceAtomsSteps` only selects existing raw positions: one header's open, filtered entries, one close, and the body minus the header ranges. Headers never overlap (`offset < headers.at(-1).end` is skipped). `withoutLostAliases` only removes entries; it uses `originalFrames` to decide, never to output atoms. So no legacy, concurrent-header or alias path copies an id into the result.
+- **Cache producers:** only `visible`, `textEffect` and `cachePreparedText` set the canonical cache. Peer inserts check `!atomIndex.has(id) && !children.has(id)`. Local edits get fresh clock+1 ids.
+- **Raw tail = canonical tail:** if the body is empty, the canonical content is all header and the `content.length <= oldHeader.length` check rejects it. Otherwise the canonical last atom is a body atom, so it isn't inside any detected header. Removing it changes only the last line, which the `touchesSourceFence(next)` check covers. A header that ended earlier already has a fence line before that point, so an earlier failed header start can't suddenly match.
+
+**Same result as the old exact path:** `anchor()` always records `anchorIndices` before `positions()` runs. For a missing id, the fallback picks the atom just before it (rank 1), which is the unique last atom of N, so its answer is also the full length of N's text. That equals `edit.content.length`, as long as the cached string matches N. Unicode is fine: the textarea and `content.length` both count UTF-16 units, surrogate pairs are 1 atom, and the guard excludes legacy multi-character atoms.
+
+**Other risks checked, all safe:**
+- **Arbitrary or duplicate-ID arrays:** they miss the WeakMap (no factory view, no producer).
+- **Composition:** `atoms = local` is a plain array, so it misses. A deferred update with no edit hits, with the same result as the fallback.
+- **Races:** if P went to N1 then N2, the lookup for (N2, P) misses. Each N comes from a single `replaceAtoms` call, so overwriting it is harmless.
+- **Fork:** the views are shared, but the certificate describes the view pair itself, so sharing it across replicas is safe. Checkpoint or partial history: `!original` means fallback.
+- **Memory:** a tiny object, keyed weakly by both views; nothing holds P or history.
+
+**Hardening I recommend (cheap, constant-time):**
+1. **Public `operations` map:** the guard trusts `this.operations.get(...)` for `insert.length` and `remove.length`. Code that mutates the map could make the cache and N wrong. This already affects the 526 cache; the certificate stays consistent with N. Add checks against private state: `ownedAtomCounts.get(original.id) === 1`, `last.id.startsWith(original.id + ":")`, and `!visibility?.known(original.id)` (no private removal facts).
+2. **Editor:** accept only if `removed === content.length`. This guards against a stale `doc.content` paired with `visible()` (`document-app.ts:2332`).
+3. **Recorder:** also check `next.at(-1) === previous.at(-2)`.
+
+**Smallest tests:**
+- **Replica (deep):** a single-atom tail insert, then `cancel`. Assert `visible()` is a factory view, the certificate offset equals `text().length`, and `atoms.some(id)` is false. Repeat with:
+  - concurrent root headers (two writers' frontmatter) plus body
+  - a surrogate-pair tail
+  - CRLF where only `\n` is removed
+  - BOM header
+  - a tail ending in `---`, which must not certify
+  - redo (cancel of cancel), which must not certify
+  - a fork applying the same cancel, giving separate pairs
+- **nativeEditor:** caret at EOF, Undo moves it to the new EOF. Same while composing (deferred) and after a local input (local array, so fallback). Compare against the 526 result.
+- **Manual duplicate-ID fallback:** `terminalRemovalPosition(plainArray, plainArray, id)` is `undefined`, and the editor fallback returns the earlier occurrence.
+
+**Still needed before adoption:** a runtime profile showing the 15.755ms scan is gone and the RAF is under budget, `bun run check` for types, and the tests above.
+
+written with claude-opus-5-5 in claude code

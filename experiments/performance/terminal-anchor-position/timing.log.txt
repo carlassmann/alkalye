@@ -1,0 +1,6 @@
+{"kind":"baseline","name":"long1m","position":"end","trial":0,"phase":"complete"}
+{"kind":"candidate","name":"long1m","position":"end","trial":0,"phase":"complete"}
+{"kind":"candidate","name":"long1m","position":"end","trial":1,"phase":"complete"}
+{"kind":"baseline","name":"long1m","position":"end","trial":1,"phase":"complete"}
+{"kind":"baseline","name":"long1m","position":"end","trial":2,"phase":"complete"}
+{"kind":"candidate","name":"long1m","position":"end","trial":2,"phase":"complete"}

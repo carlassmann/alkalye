@@ -1,0 +1,22 @@
+PASS Editor anchor contracts complete
+PASS certified terminal X preserves caret
+PASS certified terminal 🌻 preserves caret
+PASS certified terminal 🌻 preserves selection
+PASS certified terminal X preserves caret
+PASS generated Unicode survivors preserve UTF16 offsets
+PASS two generated insertion owners retain independent anchor positions
+PASS duplicate survivor keeps final next occurrence offset
+PASS generated sparse survivors resolve independent distant anchors
+PASS unhinted gapped insertion owner forces exact nearest-survivor fallback
+PASS new owner survivor forces exact fallback
+PASS empty replacement preserves both range anchors at zero
+PASS exhaustive predecessor follows old order across reordered survivors
+PASS exhaustive legacy predecessor preserves variable-width offsets
+PASS primary survives beyond capped local radius
+PASS closer predecessor survives far away
+PASS more than64 missing predecessors retains exhaustive fallback
+PASS legacy variable-width atoms retain UTF16 offset
+PASS two deleted range endpoints resolve independently
+PASS no old atoms surviving resolves start
+PASS public CRDT undo restores Unicode caret to predecessor
+PASS Every editor anchor contract ran
