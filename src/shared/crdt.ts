@@ -398,7 +398,11 @@ export class Replica {
 		let header = sourceHeader(previous)
 		let displacement = 0
 		let changesFence = false
-		for (let change of replacements) {
+		let checkSourceFences =
+			replacements.length <= 1 ||
+			previous.includes("---") ||
+			next.includes("---")
+		for (let change of checkSourceFences ? replacements : []) {
 			let nextStart = change.start + displacement
 			changesFence ||=
 				touchesSourceFence(
