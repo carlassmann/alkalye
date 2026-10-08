@@ -1,0 +1,297 @@
+import { workerBootMark } from "./boot-diagnostics"
+import * as Context from "effect/Context"
+import * as Cause from "effect/Cause"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
+import * as SubscriptionRef from "effect/SubscriptionRef"
+import { UndoUnavailable } from "../../shared/document-errors"
+import { documentFailureCategory } from "../../shared/document-observability"
+import { DocumentSession } from "../../shared/document-session"
+import type { Replica, TextReplacement } from "../../shared/crdt"
+import type { Atom } from "../../shared/model"
+import type { DocumentRange } from "./opened-document-contract"
+import type { WorkerEditorProjection } from "./worker-opened-schemas"
+import type * as Rpc from "effect/rpc/Rpc"
+import type * as RpcGroup from "effect/rpc/RpcGroup"
+import type { WorkerDocumentRpc } from "./worker-rpc"
+import { WorkerDocumentFailure } from "./worker-rpc"
+
+type EditorInput<Tag extends string> = Rpc.Payload<Rpc.ExtractTag<RpcGroup.Rpcs<typeof WorkerDocumentRpc>, Tag>>
+
+interface EditorBasisOptions {
+ document: string
+ session: Context.Service.Shape<typeof DocumentSession>
+ canWrite(): boolean
+}
+
+export function makeWorkerEditorBasis(options: EditorBasisOptions) {
+ return Effect.gen(function* () {
+ let revision = yield* SubscriptionRef.make(0)
+		let undoReceipts = new Map<string, {
+			request: string; epoch: string; sequence: number; redo: boolean;
+			status: "applied" | "not-applied" | "unknown"; action?: string; failure?: string;
+		}>()
+		let clipboard = new Map<string, { document: string; start: ClipboardBoundary; end: ClipboardBoundary; selected: string }>()
+		let epoch = 0
+ let identity = crypto.randomUUID()
+		let basis: { epoch: string; sequence: number; replica: Replica } | undefined
+		let candidate: { epoch: string; priorEpoch: string; priorSequence: number; replica: Replica } | undefined
+		function fail(reason: WorkerDocumentFailure["reason"]) {
+			return new WorkerDocumentFailure({ reason, category: "conflict" })
+		}
+		function requireSession() {
+			return Effect.succeed({ document: options.document, session: options.session })
+		}
+
+
+ function publishAfter<A,E,R>(work: Effect.Effect<A,E,R>) {
+  return Effect.suspend(() => {
+   let previous = basis
+   let sequence = basis?.sequence
+   return work.pipe(Effect.ensuring(Effect.suspend(() => previous !== basis || sequence !== basis?.sequence ? SubscriptionRef.update(revision, value => value + 1) : Effect.void)))
+  })
+ }
+ function current(): WorkerEditorProjection | undefined {
+  if (!basis) return undefined
+  return { basis: { epoch: basis.epoch, sequence: basis.sequence, source: basis.replica.text(options.document) }, ranges: [] }
+ }
+ yield* Effect.addFinalizer(() => Effect.sync(() => { basis = undefined; candidate = undefined; clipboard.clear(); undoReceipts.clear() }))
+ return {
+  current,
+  retainedUndo(input: EditorInput<"UndoQueued">) {
+   return Effect.suspend(() => {
+    let receipt = undoReceipts.get(input.request)
+    if (receipt && (receipt.epoch !== input.epoch || receipt.sequence !== input.sequence || receipt.redo !== input.redo)) return Effect.fail(fail("SequenceUnavailable"))
+    return Effect.succeed(receipt)
+   })
+  },
+  changes: SubscriptionRef.changes(revision),
+  basis(range: DocumentRange) { return basis?.epoch === range.epoch && basis.sequence === range.sequence ? basis.replica : undefined },
+  handlers: {
+   EditorRead: () => Effect.sync(() => ({ epoch: basis?.epoch, sequence: basis?.sequence, source: basis?.replica.text(options.document) ?? options.session.replica.text(options.document) })),
+			Begin: () => publishAfter(Effect.gen(function* () {
+				let current = yield* requireSession()
+				if (basis) return yield* Effect.fail(fail("BasisUnavailable"))
+				let replica = yield* current.session.replica.forkEffect()
+				basis = { epoch: identity + ":" + String(++epoch), sequence: 0, replica }
+				return { epoch: basis.epoch, sequence: basis.sequence, source: replica.text(current.document) }
+			})),
+			ReplaceQueued: (input: EditorInput<"ReplaceQueued">) => publishAfter(Effect.gen(function* () {
+				let current = yield* requireSession()
+				let local = basis
+				if (!local || local.epoch !== input.epoch) return yield* Effect.fail(fail("BasisUnavailable"))
+				if (input.sequence !== local.sequence + 1) return yield* Effect.fail(fail("SequenceUnavailable"))
+				if (!options.canWrite()) return yield* Effect.fail(fail("PermissionDenied"))
+				candidate = undefined
+				let replacements: readonly TextReplacement[] = input.ranges
+				if (input.clipboardToken) {
+					let captured = clipboard.get(input.clipboardToken)
+					if (!captured || captured.document !== current.document) return yield* Effect.fail(fail("ClipboardUnavailable"))
+					clipboard.delete(input.clipboardToken)
+					let range = resolveClipboardRange(local.replica.visible(current.document), local.replica.text(current.document), captured)
+					let remoteRange = resolveClipboardRange(current.session.replica.visible(current.document), current.session.replica.text(current.document), captured)
+					let replacement = range && clipboardReplacement(local.replica.text(current.document), range, input.ranges)
+					if (!replacement || !remoteRange) return yield* Effect.fail(fail("ClipboardChanged"))
+					replacements = [replacement]
+				}
+				let edit = yield* Effect.try({
+					try: () => {
+						let edit = current.session.replace(replacements, local.replica.visible(current.document))
+						if (edit.operation) {
+							local.replica.apply([edit.operation])
+							local.sequence = input.sequence
+						}
+						return edit
+					},
+					catch: () => {
+						basis = undefined
+					candidate = undefined
+						return fail("AppliedUnknown")
+					},
+				})
+				let saved: Effect.Effect<void, unknown> = edit.saved
+				yield* saved.pipe(Effect.mapError(error => new WorkerDocumentFailure({
+					reason: edit.operation ? "Unsaved" : "Rejected", category: documentFailureCategory(error),
+				})))
+				local.sequence = input.sequence
+				return { epoch: local.epoch, sequence: local.sequence, source: local.replica.text(current.document), unsaved: current.session.unsaved(), ...(edit.operation ? { operation: edit.operation.id } : {}) }
+			})),
+			UndoQueued: (input: EditorInput<"UndoQueued">) => publishAfter(Effect.uninterruptibleMask(restore => Effect.gen(function* () {
+				let retained = undoReceipts.get(input.request)
+				if (retained) {
+					if (retained.epoch !== input.epoch || retained.sequence !== input.sequence || retained.redo !== input.redo)
+						return yield* Effect.fail(fail("SequenceUnavailable"))
+					return retained
+				}
+				let current = yield* requireSession()
+				let local = basis
+				if (!local || local.epoch !== input.epoch) return yield* Effect.fail(fail("BasisUnavailable"))
+				if (input.sequence !== local.sequence + 1) return yield* Effect.fail(fail("SequenceUnavailable"))
+				candidate = undefined
+				if (!options.canWrite()) return yield* Effect.fail(fail("PermissionDenied"))
+				let result = yield* restore(input.redo ? current.session.redo() : current.session.undo()).pipe(Effect.exit)
+				let status: "applied" | "not-applied" | "unknown"
+				let action: string | undefined
+				let failure: string | undefined
+				if (Exit.isSuccess(result)) {
+					status = "applied"
+					action = result.value.id
+				} else {
+					let error = Cause.squash(result.cause)
+					status = error instanceof UndoUnavailable ? "not-applied" : "unknown"
+					failure = documentFailureCategory(error)
+				}
+				local.sequence = input.sequence
+				let receipt = { ...input, status, ...(action ? { action } : {}), ...(failure ? { failure } : {}) }
+				undoReceipts.set(input.request, receipt)
+				if (undoReceipts.size > 64) {
+					let oldest = undoReceipts.keys().next().value
+					if (oldest) undoReceipts.delete(oldest)
+				}
+				return receipt
+			}))),
+			MergeCandidate: (input: EditorInput<"MergeCandidate">) => publishAfter(Effect.gen(function* () {
+				let current = yield* requireSession()
+				let local = basis
+				if (!local || local.epoch !== input.epoch) return yield* Effect.fail(fail("BasisUnavailable"))
+				if (local.sequence !== input.sequence) return yield* Effect.fail(fail("SequenceUnavailable"))
+				candidate = undefined
+				if (input.start > input.end || input.end > local.replica.text(current.document).length) return yield* Effect.fail(fail("SelectionUnavailable"))
+				workerBootMark("Merge:flush-start", JSON.stringify({ clock: current.session.replica.clock, epoch: input.epoch, sequence: input.sequence }))
+    yield* current.session.flush
+    workerBootMark("Merge:fork-start", current.session.replica.clock)
+    let replica = yield* current.session.replica.forkEffect().pipe(Effect.tapError(() => Effect.sync(() => workerBootMark("Merge:fork-error", current.session.replica.clock))))
+    workerBootMark("Merge:text-start", current.session.replica.clock)
+    let source = replica.text(current.document)
+    workerBootMark("Merge:visible-start")
+    let oldAtoms = local.replica.visible(current.document)
+    let newAtoms = replica.visible(current.document)
+    workerBootMark("Merge:visible-done")
+				if (input.ranges?.some(range => range.start > range.end || range.end > local.replica.text(current.document).length)) return yield* Effect.fail(fail("SelectionUnavailable"))
+				let requestedRanges = input.ranges ?? [{ start: input.start, end: input.end, direction: "none" }]
+				workerBootMark("Merge:map-start", requestedRanges.length)
+    let mapped = mapSelectionBoundaries(oldAtoms, newAtoms, [input.start, input.end, ...requestedRanges.flatMap(range => [range.start, range.end])])
+				workerBootMark("Merge:map-done")
+    let start = mapped.get(input.start), end = mapped.get(input.end)
+				if (start === undefined || end === undefined) return yield* Effect.fail(fail("SelectionUnavailable"))
+				let mappedRanges: { start: number; end: number; direction: "forward" | "backward" | "none" }[] = []
+				for (let range of requestedRanges) {
+					let start = mapped.get(range.start), end = mapped.get(range.end)
+					if (start === undefined || end === undefined) return yield* Effect.fail(fail("SelectionUnavailable"))
+					mappedRanges.push({ start, end, direction: range.direction })
+				}
+				let next = identity + ":" + String(++epoch)
+				candidate = { epoch: next, priorEpoch: local.epoch, priorSequence: local.sequence, replica }
+				return { candidate: next, source, start, end, ranges: mappedRanges }
+			})),
+			Adopt: (input: EditorInput<"Adopt">) => publishAfter(Effect.try({
+				try: () => {
+					if (!basis || !candidate || candidate.epoch !== input.candidate || basis.epoch !== input.epoch || basis.sequence !== input.sequence || candidate.priorEpoch !== input.epoch || candidate.priorSequence !== input.sequence) throw fail("CandidateUnavailable")
+					basis = { epoch: candidate.epoch, sequence: 0, replica: candidate.replica }
+					candidate = undefined
+				},
+				catch: error => error instanceof WorkerDocumentFailure ? error : fail("AppliedUnknown"),
+			})),
+			ReleaseCandidate: (input: EditorInput<"ReleaseCandidate">) => publishAfter(Effect.sync(() => {
+				if (candidate?.epoch === input.candidate) candidate = undefined
+			})),
+			CaptureClipboard: (input: EditorInput<"CaptureClipboard">) => publishAfter(Effect.gen(function* () {
+				let current = yield* requireSession()
+				let local = basis
+				if (!local || local.epoch !== input.epoch || local.sequence !== input.sequence) return yield* Effect.fail(fail("BasisUnavailable"))
+				if (clipboard.size >= 8) return yield* Effect.fail(fail("HandleCapacity"))
+				let source = local.replica.text(current.document)
+				if (input.start > input.end || input.end > source.length) return yield* Effect.fail(fail("SelectionUnavailable"))
+				let atoms = local.replica.visible(current.document)
+				let start = captureClipboardBoundary(atoms, input.start)
+				let end = captureClipboardBoundary(atoms, input.end)
+				if (!start || !end) return yield* Effect.fail(fail("SelectionUnavailable"))
+				let token = crypto.randomUUID()
+				let selected = source.slice(input.start, input.end)
+				clipboard.set(token, { document: current.document, start, end, selected })
+				return { token, selected }
+			})),
+			ResolveClipboard: (input: EditorInput<"ResolveClipboard">) => publishAfter(Effect.gen(function* () {
+				let current = yield* requireSession()
+				let local = basis
+				if (!local || local.epoch !== input.epoch || local.sequence !== input.sequence) return yield* Effect.fail(fail("BasisUnavailable"))
+				let captured = clipboard.get(input.token)
+				if (!captured || captured.document !== current.document) return yield* Effect.fail(fail("ClipboardUnavailable"))
+				let source = local.replica.text(current.document)
+				let range = resolveClipboardRange(local.replica.visible(current.document), source, captured)
+				let remoteSource = current.session.replica.text(current.document)
+				let remoteRange = resolveClipboardRange(current.session.replica.visible(current.document), remoteSource, captured)
+				if (!range || !remoteRange) return yield* Effect.fail(fail("ClipboardChanged"))
+				return { epoch: local.epoch, sequence: local.sequence, source, ...range }
+			})),
+			ReleaseClipboard: (input: EditorInput<"ReleaseClipboard">) => publishAfter(Effect.sync(() => { clipboard.delete(input.token) })),
+
+  },
+ }
+ })
+}
+
+function mapSelectionBoundaries(previous: readonly Atom[], next: readonly Atom[], offsets: number[]) {
+	let nextPositions = new Map<string, { start: number; end: number }>()
+	let nextOffset = 0
+	for (let atom of next) {
+		nextPositions.set(atom.id, { start: nextOffset, end: nextOffset + atom.value.length })
+		nextOffset += atom.value.length
+	}
+	let requests = [...new Set(offsets)].sort((left, right) => left - right)
+	let resolved = new Map<number, number>()
+	if (requests[0] === 0) { resolved.set(0, 0); requests.shift() }
+	let request = 0, position = 0, predecessor = 0
+	for (let atom of previous) {
+		let mapped = nextPositions.get(atom.id)
+		let offset = requests[request]
+		while (atom.value.length && offset !== undefined && offset <= position + atom.value.length) {
+			resolved.set(offset, mapped ? mapped.start + Math.min(offset - position, mapped.end - mapped.start) : predecessor)
+			request++
+			offset = requests[request]
+		}
+		if (mapped) predecessor = mapped.end
+		position += atom.value.length
+	}
+	return resolved
+}
+
+interface ClipboardBoundary { id: string; inside: number }
+function captureClipboardBoundary(atoms: readonly Atom[], offset: number): ClipboardBoundary | undefined {
+	if (offset === 0) return { id: "", inside: 0 }
+	let position = 0
+	for (let atom of atoms) {
+		if (atom.value.length && offset <= position + atom.value.length) return { id: atom.id, inside: offset - position }
+		position += atom.value.length
+	}
+}
+function resolveClipboardBoundary(atoms: readonly Atom[], boundary: ClipboardBoundary) {
+	if (!boundary.id) return 0
+	let position = 0
+	for (let atom of atoms) {
+		if (atom.id === boundary.id && boundary.inside <= atom.value.length) return position + boundary.inside
+		position += atom.value.length
+	}
+}
+function resolveClipboardRange(atoms: readonly Atom[], source: string, captured: { start: ClipboardBoundary; end: ClipboardBoundary; selected: string }) {
+	let start = resolveClipboardBoundary(atoms, captured.start)
+	let end = resolveClipboardBoundary(atoms, captured.end)
+	if (start === undefined || end === undefined || start > end || source.slice(start, end) !== captured.selected) return
+	return { start, end }
+}
+
+function clipboardReplacement(source: string, range: { start: number; end: number }, replacements: readonly TextReplacement[]): TextReplacement | undefined {
+	let pieces: string[] = []
+	let position = 0
+	for (let replacement of replacements) {
+		if (replacement.start < position || replacement.start + replacement.remove > source.length) return
+		pieces.push(source.slice(position, replacement.start), replacement.text)
+		position = replacement.start + replacement.remove
+	}
+	pieces.push(source.slice(position))
+	let next = pieces.join("")
+	let before = source.slice(0, range.start)
+	let after = source.slice(range.end)
+	if (next.length < before.length + after.length || !next.startsWith(before) || !next.endsWith(after)) return
+	return { start: range.start, remove: range.end - range.start, text: next.slice(before.length, next.length - after.length) }
+}

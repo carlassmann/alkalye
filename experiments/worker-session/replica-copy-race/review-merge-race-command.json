@@ -1,0 +1,17 @@
+{
+	"argv": [
+		"claude",
+		"--model",
+		"opus",
+		"--print",
+		"--tools",
+		"Read",
+		"--allowedTools",
+		"Read",
+		"--output-format",
+		"text"
+	],
+	"resolvedModel": null,
+	"limit": "Existing text output does not include modelUsage metadata. Only the opus CLI alias is verified; no claim of resolved Opus5.5.",
+	"handle": 96665
+}

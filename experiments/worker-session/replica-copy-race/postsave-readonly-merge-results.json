@@ -1,0 +1,758 @@
+{
+	"stage": "terminal",
+	"initialLength": 1046566,
+	"sourceSHA": "e42499f5ec1a310b6224f059eb4dd3a42fb6fb2dfda854322a2557a283879310",
+	"retainedBefore": [
+		{
+			"acknowledged": 0,
+			"keySHA": "c70282088516511e63bd330de4fd37721971212fb8a204f7819b72191c9f4ac3",
+			"kind": "worker-native-pending",
+			"length": 1048614,
+			"pending": 0,
+			"valueSHA": "7af399f557c23c043927e6c0fe642b7452834288cfa9a62dc7a244f1b7294297"
+		},
+		{
+			"acknowledged": 0,
+			"keySHA": "7a69fb73aef36fb019ef66edea9b178f58d3d452eb811858bcecb25146d0d9d4",
+			"kind": "worker-native-pending",
+			"length": 1048614,
+			"pending": 0,
+			"valueSHA": "b0fa1d041086bcf430eea8896eb6a66fa4ab9224807c9b7897c7440aa1f7b376"
+		},
+		{
+			"acknowledged": 1,
+			"keySHA": "a5fcb5f4a26edc2d524df819dde6ad016f20f2c07c1733a92cb25b27b1f00870",
+			"kind": "worker-native-pending",
+			"length": 1046566,
+			"pending": 0,
+			"valueSHA": "f40eea7c59121bace38109da2c172f0400cfce5f415fcaeaf04032fa93192eec"
+		},
+		{
+			"keySHA": "031abcb64c650b8044c0d4ce79ab02645b6f6b54c4d0185128427b9f13e3b461",
+			"kind": "worker-native-recovery",
+			"length": 1046566,
+			"valueSHA": "4e8f110cc2655fbb8d5423049f4ac6bfdbbb56de7bffc13ac55915756236f5b5"
+		}
+	],
+	"state": {
+		"alerts": [
+			{
+				"tag": "ALKALYE-TOASTER",
+				"text": ""
+			}
+		],
+		"appBusy": null,
+		"browserElapsedMs": 3442.300000011921,
+		"documentReady": true,
+		"editorPresent": true,
+		"libraryCount": 5,
+		"phaseLog": "[{\"phase\":\"route:open-start\",\"time\":76.5},{\"phase\":\"lookup:row-start\",\"time\":76.90000003576279,\"details\":\"[document]\"},{\"phase\":\"lookup:row-done\",\"time\":76.90000003576279,\"details\":\"true\"},{\"phase\":\"lookup:lock-done\",\"time\":78.5},{\"phase\":\"host:Open-start\",\"time\":80.60000002384186},{\"phase\":\"worker:construct\",\"time\":81.40000003576279,\"details\":\"http://127.0.0.1:4473/worker-editor.js\"},{\"phase\":\"Open:start\",\"time\":36.59999996423721},{\"phase\":\"Open:blobs-start\",\"time\":37.19999998807907},{\"phase\":\"Open:blobs-done\",\"time\":41.89999997615814},{\"phase\":\"Open:session-done\",\"time\":2754.899999976158},{\"phase\":\"Open:capability-start\",\"time\":2755},{\"phase\":\"Open:snapshot-done\",\"time\":2756.5},{\"phase\":\"host:Open-done\",\"time\":2847.100000023842},{\"phase\":\"ReadonlyMerge:start\",\"time\":2847.100000023842},{\"phase\":\"Begin:start\",\"time\":2757.899999976158},{\"phase\":\"Begin:done\",\"time\":2930.7999999523163},{\"phase\":\"ReadonlyMerge:basis-ready\",\"time\":3020.900000035763,\"details\":\"1046566\"},{\"phase\":\"Merge:flush-start\",\"time\":2931.699999988079,\"details\":\"{\\\"clock\\\":4,\\\"epoch\\\":\\\"[document]:1\\\",\\\"sequence\\\":0}\"},{\"phase\":\"Merge:fork-start\",\"time\":2931.699999988079,\"details\":\"4\"},{\"phase\":\"Merge:text-start\",\"time\":3148.899999976158,\"details\":\"4\"},{\"phase\":\"Merge:visible-start\",\"time\":3148.899999976158},{\"phase\":\"Merge:visible-done\",\"time\":3149},{\"phase\":\"Merge:map-start\",\"time\":3149,\"details\":\"1\"},{\"phase\":\"Merge:map-done\",\"time\":3305.599999964237},{\"phase\":\"ReadonlyMerge:released\",\"time\":3396.600000023842},{\"phase\":\"ReadonlyMerge:done\",\"time\":3396.600000023842,\"details\":\"success\"},{\"phase\":\"route:open-done\",\"time\":3397},{\"phase\":\"route:Editor-start\",\"time\":3397}]",
+		"readOnly": true,
+		"resources": [
+			{
+				"duration": 6.700000047683716,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-5snwaj28.js",
+				"size": 901,
+				"start": 3.5
+			},
+			{
+				"duration": 6.700000047683716,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-5hgg4jhd.js",
+				"size": 14376,
+				"start": 3.5
+			},
+			{
+				"duration": 7.600000023841858,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-ncjf2wxx.js",
+				"size": 1656,
+				"start": 3.5
+			},
+			{
+				"duration": 7.400000035762787,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-281eesyv.js",
+				"size": 20108,
+				"start": 3.5
+			},
+			{
+				"duration": 7.900000035762787,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-waxhwvqn.js",
+				"size": 5735,
+				"start": 3.5
+			},
+			{
+				"duration": 8.200000047683716,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-9t309qct.js",
+				"size": 7957,
+				"start": 3.5
+			},
+			{
+				"duration": 8.400000035762787,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-3g161rtg.js",
+				"size": 6070,
+				"start": 3.5
+			},
+			{
+				"duration": 9.300000011920927,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-c05sa202.js",
+				"size": 765,
+				"start": 3.5
+			},
+			{
+				"duration": 8.700000047683716,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-z4j087f1.js",
+				"size": 212574,
+				"start": 3.5
+			},
+			{
+				"duration": 9.5,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-05kjexam.js",
+				"size": 24137,
+				"start": 3.700000047683716
+			},
+			{
+				"duration": 9.699999988079073,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-9wy04nbx.js",
+				"size": 11389,
+				"start": 3.700000047683716
+			},
+			{
+				"duration": 10.099999964237211,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-b9aejcn7.js",
+				"size": 20419,
+				"start": 3.700000047683716
+			},
+			{
+				"duration": 10.5,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-2pvxnp5r.js",
+				"size": 2412,
+				"start": 3.700000047683716
+			},
+			{
+				"duration": 10.5,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-5e5da339.js",
+				"size": 2354,
+				"start": 3.700000047683716
+			},
+			{
+				"duration": 10.799999952316284,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-zm3skfsb.js",
+				"size": 2075,
+				"start": 3.700000047683716
+			},
+			{
+				"duration": 11.699999988079073,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-39wtzcbq.js",
+				"size": 713,
+				"start": 3.700000047683716
+			},
+			{
+				"duration": 10.599999964237211,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-pac5vb7w.js",
+				"size": 75938,
+				"start": 3.700000047683716
+			},
+			{
+				"duration": 11.799999952316284,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-8pa55mrt.js",
+				"size": 14516,
+				"start": 3.700000047683716
+			},
+			{
+				"duration": 11.699999988079073,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-05w0y7z2.js",
+				"size": 27429,
+				"start": 3.700000047683716
+			},
+			{
+				"duration": 12,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-rgakaa8z.js",
+				"size": 41742,
+				"start": 3.700000047683716
+			},
+			{
+				"duration": 12,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-3sv6e9cp.js",
+				"size": 272,
+				"start": 3.800000011920929
+			},
+			{
+				"duration": 12.699999988079073,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-ypg29j2n.js",
+				"size": 1109,
+				"start": 3.800000011920929
+			},
+			{
+				"duration": 13,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/chunks/document-app-xjch7gzf.js",
+				"size": 175260,
+				"start": 3.800000011920929
+			},
+			{
+				"duration": 12,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/account-email.css",
+				"size": 354,
+				"start": 5.100000023841858
+			},
+			{
+				"duration": 12.100000023841858,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/access.css",
+				"size": 452,
+				"start": 5.100000023841858
+			},
+			{
+				"duration": 12.5,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/menu.css",
+				"size": 4590,
+				"start": 5.100000023841858
+			},
+			{
+				"duration": 12.699999988079073,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/settings-page.css",
+				"size": 16143,
+				"start": 5.200000047683716
+			},
+			{
+				"duration": 12.899999976158142,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/settings-themes.css",
+				"size": 1834,
+				"start": 5.200000047683716
+			},
+			{
+				"duration": 13.099999964237211,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/space-avatar.css",
+				"size": 1027,
+				"start": 5.200000047683716
+			},
+			{
+				"duration": 13.199999988079073,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/invitations.css",
+				"size": 1202,
+				"start": 5.200000047683716
+			},
+			{
+				"duration": 13.399999976158142,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/invitation-screen.css",
+				"size": 1164,
+				"start": 5.200000047683716
+			},
+			{
+				"duration": 13.699999988079073,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/account-agents.css",
+				"size": 2457,
+				"start": 5.200000047683716
+			},
+			{
+				"duration": 13.699999988079073,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/theme-picker.css",
+				"size": 108,
+				"start": 5.200000047683716
+			},
+			{
+				"duration": 13.799999952316284,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/media-picker.css",
+				"size": 1656,
+				"start": 5.200000047683716
+			},
+			{
+				"duration": 14.099999964237211,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/teleprompter.css",
+				"size": 3350,
+				"start": 5.200000047683716
+			},
+			{
+				"duration": 14.299999952316284,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/progress.css",
+				"size": 454,
+				"start": 5.200000047683716
+			},
+			{
+				"duration": 14.400000035762789,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/context-menu.css",
+				"size": 1809,
+				"start": 5.300000011920929
+			},
+			{
+				"duration": 14.600000023841858,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/line-actions.css",
+				"size": 1656,
+				"start": 5.300000011920929
+			},
+			{
+				"duration": 14.800000011920927,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/print.css",
+				"size": 509,
+				"start": 5.300000011920929
+			},
+			{
+				"duration": 14.899999976158142,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/app.css",
+				"size": 5873,
+				"start": 5.400000035762787
+			},
+			{
+				"duration": 15.099999964237211,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/boot.css",
+				"size": 114,
+				"start": 5.400000035762787
+			},
+			{
+				"duration": 15.099999964237211,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/library.css",
+				"size": 6020,
+				"start": 5.400000035762787
+			},
+			{
+				"duration": 15.300000011920927,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/toolbar.css",
+				"size": 1915,
+				"start": 5.400000035762787
+			},
+			{
+				"duration": 15.599999964237211,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/editor.css",
+				"size": 7150,
+				"start": 5.400000035762787
+			},
+			{
+				"duration": 15.599999964237211,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/statusbar.css",
+				"size": 1574,
+				"start": 5.400000035762787
+			},
+			{
+				"duration": 15.699999988079073,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/sync-recovery.css",
+				"size": 806,
+				"start": 5.400000035762787
+			},
+			{
+				"duration": 15.899999976158142,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/inspector.css",
+				"size": 3136,
+				"start": 5.400000035762787
+			},
+			{
+				"duration": 16.099999964237213,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/preview.css",
+				"size": 4499,
+				"start": 5.400000035762787
+			},
+			{
+				"duration": 16.30000001192093,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/dialog.css",
+				"size": 4461,
+				"start": 5.400000035762787
+			},
+			{
+				"duration": 16.399999976158142,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/history.css",
+				"size": 3869,
+				"start": 5.400000035762787
+			},
+			{
+				"duration": 16.599999964237213,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/presentation.css",
+				"size": 9168,
+				"start": 5.400000035762787
+			},
+			{
+				"duration": 16.899999976158142,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/find.css",
+				"size": 2424,
+				"start": 5.400000035762787
+			},
+			{
+				"duration": 17.099999964237213,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/toast.css",
+				"size": 6201,
+				"start": 5.400000035762787
+			},
+			{
+				"duration": 17.30000001192093,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/update-banner.css",
+				"size": 718,
+				"start": 5.400000035762787
+			},
+			{
+				"duration": 17.5,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/theme-workbench.css",
+				"size": 8269,
+				"start": 5.400000035762787
+			},
+			{
+				"duration": 17.5,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/whiteboard.css",
+				"size": 3117,
+				"start": 5.5
+			},
+			{
+				"duration": 17.600000023841858,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/help.css",
+				"size": 304,
+				"start": 5.5
+			},
+			{
+				"duration": 18.100000023841854,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/palette.css",
+				"size": 1362,
+				"start": 5.5
+			},
+			{
+				"duration": 18.100000023841854,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/comments.css",
+				"size": 1869,
+				"start": 5.5
+			},
+			{
+				"duration": 18.400000035762787,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/attachments.css",
+				"size": 1245,
+				"start": 5.5
+			},
+			{
+				"duration": 14.899999976158142,
+				"initiator": "link",
+				"name": "http://127.0.0.1:4473/manifest.webmanifest",
+				"size": 644,
+				"start": 9.400000035762789
+			},
+			{
+				"duration": 3.5,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/components/editor-viewport.css",
+				"size": 433,
+				"start": 21
+			},
+			{
+				"duration": 1.2000000476837158,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/icons/alkalye-icon.png",
+				"size": 193160,
+				"start": 52
+			},
+			{
+				"duration": 5.399999976158142,
+				"initiator": "fetch",
+				"name": "http://127.0.0.1:4473/api/accounts/session",
+				"size": 81,
+				"start": 66.60000002384186
+			},
+			{
+				"duration": 5,
+				"initiator": "fetch",
+				"name": "http://127.0.0.1:4473/api/library",
+				"size": 3009,
+				"start": 80.30000001192093
+			},
+			{
+				"duration": 6,
+				"initiator": "css",
+				"name": "http://127.0.0.1:4473/fonts/geist-latin.woff2",
+				"size": 28400,
+				"start": 83.40000003576279
+			},
+			{
+				"duration": -3.600000023841858,
+				"initiator": "other",
+				"name": "http://127.0.0.1:4473/worker-editor.js",
+				"size": 608879,
+				"start": 90.9000000357628
+			},
+			{
+				"duration": 2.400000035762787,
+				"initiator": "fetch",
+				"name": "http://127.0.0.1:4473/api/accounts/preferences",
+				"size": 508,
+				"start": 93
+			},
+			{
+				"duration": 2.900000035762787,
+				"initiator": "fetch",
+				"name": "http://127.0.0.1:4473/api/library",
+				"size": 3009,
+				"start": 94.5
+			},
+			{
+				"duration": 1.699999988079071,
+				"initiator": "fetch",
+				"name": "http://127.0.0.1:4473/api/accounts/preferences",
+				"size": 508,
+				"start": 100.30000001192091
+			}
+		],
+		"sourceLength": 1046566,
+		"targetCatalogue": [
+			{
+				"text": "\n\t\t\t\t\t\t\t\t\t\t\t\t\tTodayWorker actual MC 512\n\t\t\t\t\t\t\t\t\t\t\t\t",
+				"visible": true
+			}
+		],
+		"url": "http://127.0.0.1:4473/app/doc/[document]",
+		"worker": "ordinary-document"
+	},
+	"retainedAfter": [
+		{
+			"acknowledged": 0,
+			"keySHA": "c70282088516511e63bd330de4fd37721971212fb8a204f7819b72191c9f4ac3",
+			"kind": "worker-native-pending",
+			"length": 1048614,
+			"pending": 0,
+			"valueSHA": "7af399f557c23c043927e6c0fe642b7452834288cfa9a62dc7a244f1b7294297"
+		},
+		{
+			"acknowledged": 0,
+			"keySHA": "7a69fb73aef36fb019ef66edea9b178f58d3d452eb811858bcecb25146d0d9d4",
+			"kind": "worker-native-pending",
+			"length": 1048614,
+			"pending": 0,
+			"valueSHA": "b0fa1d041086bcf430eea8896eb6a66fa4ab9224807c9b7897c7440aa1f7b376"
+		},
+		{
+			"acknowledged": 1,
+			"keySHA": "a5fcb5f4a26edc2d524df819dde6ad016f20f2c07c1733a92cb25b27b1f00870",
+			"kind": "worker-native-pending",
+			"length": 1046566,
+			"pending": 0,
+			"valueSHA": "f40eea7c59121bace38109da2c172f0400cfce5f415fcaeaf04032fa93192eec"
+		},
+		{
+			"keySHA": "031abcb64c650b8044c0d4ce79ab02645b6f6b54c4d0185128427b9f13e3b461",
+			"kind": "worker-native-recovery",
+			"length": 1046566,
+			"valueSHA": "4e8f110cc2655fbb8d5423049f4ac6bfdbbb56de7bffc13ac55915756236f5b5"
+		}
+	],
+	"acceptedAfter": {
+		"length": 1046566,
+		"sha256": "e42499f5ec1a310b6224f059eb4dd3a42fb6fb2dfda854322a2557a283879310",
+		"unchanged": true,
+		"retainedUnchanged": true
+	},
+	"resources": [
+		{
+			"url": "http://127.0.0.1:4473/app.js",
+			"sha256": "812204352b8312bdbd0cc4f385dccb07ac92f75d969f6ca0a9d58671da517c65",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-krsa5qgp.js",
+			"sha256": "351d173ad2b1f1f4e1b1ff01a8fd13367cb8957f70249befa9b66ee3d22ce4d8",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-65drjwwj.js",
+			"sha256": "9ff1b4e025cc34478b8083e2e4fc777c561c15153bd4c1806847c07d34f6c06b",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-1xvjj3bm.js",
+			"sha256": "5ad0cde4797476efd56471f4bad0223abfd28385a224f525e501110b0a46d85c",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-30ctz9ws.js",
+			"sha256": "94e3cdfb9e630f518250c399cbd6889d530cbf2348ea33ae4dded0e0276291ad",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-y9bvngz5.js",
+			"sha256": "5ac8b737980eb46b6ca1c5b5fb7ec854eb5ec8403462d4c6bb982a019ba0dfc6",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-h8pt0gbb.js",
+			"sha256": "1becfd6a54810ab1c30c71736c5c00742c00809b2fd5f22796312bde124f2c60",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-jd36dnf4.js",
+			"sha256": "58bfadd28c2cdb161a961bffab712ef39dc3a486bf4f1fb0c8618f2be3940620",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-zddzedhb.js",
+			"sha256": "a303a4367194f1e7b3912e368a69a941d7cf4c8369bb7510c8bc1039aa8ad096",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-5snwaj28.js",
+			"sha256": "8afe094c0fea3d31cd31aa25442e62fdaa30aa19d4d01d67f020d36acdc5ea8e",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-5hgg4jhd.js",
+			"sha256": "f845784d185922144109f951670009f8a35c82949e1cfc8e436017acbe0773d2",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-ncjf2wxx.js",
+			"sha256": "70403f770cb1d68b939991c818faf673d929d50d45516f23643631ec0259a783",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-281eesyv.js",
+			"sha256": "724b345b618291d46ecea44b0d30176ffccb3d3fd3404591c10aa53adadaabad",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-waxhwvqn.js",
+			"sha256": "560d34109218c67288620ee12bcd2c943b2cbc298f59345d8bf83246b884088f",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-9t309qct.js",
+			"sha256": "551770328db9bbb4f3fea664148b20bc8ffa73a76d41856ef20c6bd2367bcf35",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-3g161rtg.js",
+			"sha256": "7d7a70f548ce93981580cfcea177ffb9fc12d549848678011ce3aef919769b5e",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-c05sa202.js",
+			"sha256": "3dfb090356f6bbb586b0f456301566dec11ecbeeacc2cd8e65cf8017f6ed04d5",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-z4j087f1.js",
+			"sha256": "2c212fecb334edb59bc09a245da0a6b4e1cf11c0e5efef6b413ad452a2844596",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-05kjexam.js",
+			"sha256": "98521c5aa09113b0ffcce3bb09dd69f5e2d04177e68cabfe4fcf3366933f3606",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-9wy04nbx.js",
+			"sha256": "6dae8c8d85e2f596f14127b52a9fbd98dd171a47fc5cf4fb3de118ed8f867691",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-b9aejcn7.js",
+			"sha256": "56fd2cb1b307347262825f23aa965c72160b6a7f5ad95b4081934cbeee1d20d6",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-2pvxnp5r.js",
+			"sha256": "baabe5f2ad887da9d8d12df25ae4de9349f5cd14c9efe3c506340b5cecdb2f25",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-5e5da339.js",
+			"sha256": "271d23b22a653093f0eb1e6a26fdc34ef0b9b8bbcd9d01cd240714305db5d706",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-zm3skfsb.js",
+			"sha256": "2836d8cd774de74fbc85897e6582cf01a7d0e72af2225a9439e877af48e410c8",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-39wtzcbq.js",
+			"sha256": "27382f836a42c7c435e9f3db16ed8fcfbf4301d9af4cbd460aac7061ff970ec1",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-pac5vb7w.js",
+			"sha256": "501c2cc4963042919874cb60f31890d9a054960ffcad8cf193bbd2cdf8099384",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-8pa55mrt.js",
+			"sha256": "e063e206b44a66ef20d4c015495d19ecfcabb35add7ef987d6cad7a957835457",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-05w0y7z2.js",
+			"sha256": "2614a0d68bdc1414ed63886e4fbb8374f34fcfe7f5545f645c4025c95002f518",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-rgakaa8z.js",
+			"sha256": "df1ec4d031817d99bf3e0617dc640082c676f4f37887f3b5bfeeadd506a2513a",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-3sv6e9cp.js",
+			"sha256": "7243207dc663d20a974a8a7856432dc0b040444ef1935159e2070cffd6f66bd9",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-ypg29j2n.js",
+			"sha256": "224f4b076e78adaa03fd1f6ec6987214d477881dd9236bbaad2f64ae550b7174",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/chunks/document-app-xjch7gzf.js",
+			"sha256": "11ac0c4237a980f214f9b932c9ad5835a30cddaf567e55ba0ad0500655ee50c9",
+			"status": 200
+		},
+		{
+			"url": "http://127.0.0.1:4473/worker-editor.js",
+			"sha256": "2dcd878b9eb71f74cecc5b12469d96d39c22773461f28951d6cae404f7211bb7",
+			"status": 200
+		}
+	]
+}

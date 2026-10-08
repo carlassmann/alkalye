@@ -1670,10 +1670,26 @@
 			selections in a 1MiB document reached the server and the local durable
 			ledger, then the editor became read-only. A separate instrumented
 			reproduction captured a SessionFailure during the subsequent merge
-			candidate request, after acknowledgement. Its underlying cause remains
-			unknown. Undo and continued typing were not verified, so the worker cannot
-			replace the production editor yet. Evidence:
-			<code>experiments/worker-session/actual-app-multicursor-failure</code>.
+			candidate request, after acknowledgement. A further reproduction captured
+			"Replica changed while being copied": synchronization changed the replica
+			during a cooperative background copy. Undo and continued typing were not
+			verified, so the worker cannot replace the production editor yet.
+			Evidence:
+			<code>experiments/worker-session/actual-app-multicursor-failure</code> and
+			<code>experiments/worker-session/replica-copy-race</code>.
+		</p>
+		<h2>Fewer unchanged library notifications</h2>
+		<p>
+			Library refreshes now publish scalar status only when refresh state,
+			message or cache failure changes. Catalogue updates still publish. A
+			matched 2KiB input and Undo pair passed exact source, caret and
+			independent server acceptance checks. Six scalar publication requests
+			produced six notifications before the change and four afterward. Document
+			refreshes in the 100ms following Undo completion fell from four to three.
+			This single pair measures redundant work, not a latency or frame-rate
+			improvement. Save-status notifications remain a separate candidate.
+			Evidence:
+			<code>experiments/performance/library-scalar-publication</code>.
 		</p>
 		<footer>written with gpt-6 in codex</footer>
 	</body>

@@ -1,0 +1,28 @@
+{
+	"originalFiles": [
+		{
+			"path": "rawcause-catalogue-native-results.json",
+			"sha256": "b2b9499ee449ae90de31473684b46b2db9510d83093676c78e64e95c884d8b0c"
+		},
+		{
+			"path": "rawcause-catalogue-native-resources-512.json",
+			"sha256": "e1699308d7fe6b4541b736837c9188a22d1ec2e33fe77a775a0056aa508b9994"
+		},
+		{
+			"path": "rawcause-512-input-attempt.json",
+			"sha256": "8010bee95df408350b81e1091a78dbf938060b5c0e29f10c7a167448457b746e"
+		},
+		{
+			"path": "postsave-readonly-merge-results.json",
+			"sha256": "31448c7f4240c0b62d61960b527bf9306a79653b12f7d86ce05cdc906f37d59c"
+		},
+		{
+			"path": "review-merge-race-command.json",
+			"sha256": "a1d5aec1ede126b5a4a922295e584e4669de4e8fcaf773f8a17b3226b8bcba5f"
+		}
+	],
+	"rawcause": "ReplicaChangedWhileCopied",
+	"errorMessageSHA": "78316d8a3439f1d136c802f749972fff84f16f4e32f6f018c2b1cc45b3d072d3",
+	"nativeEditedSHA": "060f529ec77813c68fabce12b875917f7745967f29f21cc71d0a229e9231f111",
+	"scope": "Successful trusted512 replacement and exact independent acceptance followed failed merge; no successful Undo/burst journey; diagnostic source only."
+}

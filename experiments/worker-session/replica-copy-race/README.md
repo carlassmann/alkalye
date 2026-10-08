@@ -1,0 +1,3 @@
+Confirmed copy race after saved native edit
+
+One fresh512-range native edit saved and matched independent accepted source. Subsequent worker MergeCandidate failed ReplicaChangedWhileCopied. Clock stayed4; accepted sync may change generation without clock. Native remained readonly with exact retained draft. Undo/burst unrun. Earlier missing-catalogue and cached-build readiness failures are separate, not attributed to this race. Readonly prior accepted fixture merged successfully but did not reproduce the post-edit race. Original result hashes retained; sanitized copies replace document UUIDs. No profiles, account settings or credentials included.

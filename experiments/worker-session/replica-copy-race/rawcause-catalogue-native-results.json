@@ -1,0 +1,40 @@
+{
+	"stage": "native-replace-512",
+	"gates": [],
+	"cells": [],
+	"fixture": {
+		"documentId": "[document]",
+		"initialLength": 1048614,
+		"editedLength": 1046566,
+		"initialSHA": "b02415e8fa741dec0ada1004ee4c6d5bda1a52cd90e01e3b6519a8c14abee241",
+		"editedSHA": "060f529ec77813c68fabce12b875917f7745967f29f21cc71d0a229e9231f111"
+	},
+	"failure": "Error: worker-actual-multicursor-1791491981590 wait: {\"success\":false,\"data\":null,\"error\":\"Wait timed out after 20000ms\"}\n",
+	"phases": "[{\"phase\":\"route:open-start\",\"time\":46},{\"phase\":\"lookup:row-start\",\"time\":46.30000001192093,\"details\":\"[document]\"},{\"phase\":\"lookup:row-state\",\"time\":46.30000001192093,\"details\":\"{\\\"found\\\":true,\\\"kind\\\":\\\"document\\\"}\"},{\"phase\":\"lookup:row-done\",\"time\":46.30000001192093,\"details\":\"true\"},{\"phase\":\"lookup:lock-done\",\"time\":47},{\"phase\":\"worker:construct\",\"time\":48,\"details\":\"http://127.0.0.1:4473/worker-editor.js\"},{\"phase\":\"host:Open-start\",\"time\":48.10000002384186},{\"phase\":\"Open:start\",\"time\":39.19999998807907},{\"phase\":\"Open:blobs-start\",\"time\":39.69999998807907},{\"phase\":\"Open:blobs-done\",\"time\":46},{\"phase\":\"Open:session-done\",\"time\":2868.600000023842},{\"phase\":\"Open:capability-start\",\"time\":2868.699999988079},{\"phase\":\"Open:snapshot-done\",\"time\":2870.399999976158},{\"phase\":\"host:Open-done\",\"time\":2930.699999988079},{\"phase\":\"route:open-done\",\"time\":2931.199999988079},{\"phase\":\"host:Begin-start\",\"time\":2931.300000011921},{\"phase\":\"Begin:start\",\"time\":2872.100000023842},{\"phase\":\"Begin:done\",\"time\":3080.699999988079},{\"phase\":\"host:Begin-done\",\"time\":3140.600000023842},{\"phase\":\"host:queue-done\",\"time\":3146.5},{\"phase\":\"route:Editor-start\",\"time\":3146.600000023842},{\"phase\":\"route:Editor-configured\",\"time\":3146.699999988079},{\"phase\":\"Merge:flush-start\",\"time\":7133.600000023842,\"details\":\"{\\\"clock\\\":4,\\\"epoch\\\":\\\"[document]:1\\\",\\\"sequence\\\":1}\"},{\"phase\":\"Merge:fork-start\",\"time\":7392.899999976158,\"details\":\"4\"},{\"phase\":\"Merge:text-start\",\"time\":7565.399999976158,\"details\":\"4\"},{\"phase\":\"Merge:visible-start\",\"time\":7565.5},{\"phase\":\"Merge:visible-done\",\"time\":7565.5},{\"phase\":\"Merge:map-start\",\"time\":7565.5,\"details\":\"1\"},{\"phase\":\"Merge:map-done\",\"time\":7688.800000011921},{\"phase\":\"Merge:flush-start\",\"time\":7690.199999988079,\"details\":\"{\\\"clock\\\":4,\\\"epoch\\\":\\\"[document]:1\\\",\\\"sequence\\\":1}\"},{\"phase\":\"Merge:fork-start\",\"time\":7690.300000011921,\"details\":\"4\"},{\"phase\":\"Merge:text-start\",\"time\":7853.199999988079,\"details\":\"4\"},{\"phase\":\"Merge:visible-start\",\"time\":7853.300000011921},{\"phase\":\"Merge:visible-done\",\"time\":7853.300000011921},{\"phase\":\"Merge:map-start\",\"time\":7853.300000011921,\"details\":\"1\"},{\"phase\":\"Merge:map-done\",\"time\":7965.899999976158},{\"phase\":\"Merge:flush-start\",\"time\":7966.899999976158,\"details\":\"{\\\"clock\\\":4,\\\"epoch\\\":\\\"[document]:1\\\",\\\"sequence\\\":1}\"},{\"phase\":\"Merge:fork-start\",\"time\":7967,\"details\":\"4\"},{\"phase\":\"Merge:text-start\",\"time\":8135.699999988079,\"details\":\"4\"},{\"phase\":\"Merge:visible-start\",\"time\":8135.699999988079},{\"phase\":\"Merge:visible-done\",\"time\":8135.699999988079},{\"phase\":\"Merge:map-start\",\"time\":8135.699999988079,\"details\":\"1\"},{\"phase\":\"Merge:map-done\",\"time\":8253.899999976158},{\"phase\":\"Merge:flush-start\",\"time\":8255.399999976158,\"details\":\"{\\\"clock\\\":4,\\\"epoch\\\":\\\"[document]:1\\\",\\\"sequence\\\":1}\"},{\"phase\":\"Merge:fork-start\",\"time\":8255.399999976158,\"details\":\"4\"},{\"phase\":\"Merge:fork-error\",\"time\":8466.5,\"details\":\"4\"},{\"phase\":\"command:error\",\"time\":8466.899999976158,\"details\":\"{\\\"frames\\\":[\\\"at http://127.0.0.1:4473/worker-editor.js:74:3859\\\",\\\"at next \\\",\\\"at ~effect/Effect/successCont \\\",\\\"at ~effect/Effect/evaluate \\\",\\\"at sw.runLoop \\\",\\\"at sw.evaluate \\\",\\\"at Array.<anonymous> \\\",\\\"at NT.runTasks \\\",\\\"at afterScheduled \\\",\\\"at n \\\"],\\\"class\\\":\\\"Error\\\",\\\"reason\\\":\\\"ReplicaChangedWhileCopied\\\",\\\"fingerprint\\\":\\\"78316d8a3439f1d136c802f749972fff84f16f4e32f6f018c2b1cc45b3d072d3\\\"}\"}]",
+	"acceptedOnFailure": {
+		"length": 1046566,
+		"sha256": "060f529ec77813c68fabce12b875917f7745967f29f21cc71d0a229e9231f111",
+		"equalsEdited": true
+	},
+	"diagnostic": [
+		{
+			"acknowledged": 1,
+			"category": "failure",
+			"document": "[document]",
+			"epoch": "[document]:1",
+			"phase": "merge-candidate",
+			"reason": "SessionFailure",
+			"request": "[document]:1:1",
+			"sequence": 1,
+			"time": 1791492002392
+		}
+	],
+	"state": {
+		"alerts": ["Could not save on this device"],
+		"length": 1046566,
+		"path": "/app/doc/[document]",
+		"readOnly": true,
+		"selection": [39, 39],
+		"toast": ""
+	}
+}
