@@ -1,0 +1,38 @@
+--- a/src/shared/document-session.ts
++++ b/src/shared/document-session.ts
+@@ -1616,6 +1616,7 @@
+ 		function check(value: Recording): Effect.Effect<void, DocumentFailure> {
+ 			return Effect.gen(function* () {
+ 				while (true) {
++					if (preparedProposal) performance.mark("undo-stage:discard-check", { detail: { kind: value.kind } })
+ 					preparedProposal = undefined
+ 					let checked = yield* checkOnce(value).pipe(
+ 						Effect.as(true),
+@@ -1643,6 +1644,7 @@
+ 			value: Extract<Recording, { kind: "proposed" }>,
+ 			operations: Operation[],
+ 		) {
++			performance.mark("undo-stage:prepare")
+ 			let targets = { durable, replica }
+ 			return Replica.prepareTogetherEffect(
+ 				[targets.durable, targets.replica],
+@@ -1660,6 +1662,7 @@
+ 							}),
+ 				),
+ 				Effect.map(handle => {
++					performance.mark("undo-stage:stored", { detail: { durableGeneration: durable.generation, currentGeneration: replica.generation, durableClock: durable.clock, currentClock: replica.clock } })
+ 					preparedProposal = {
+ 						action: freezeAction(value.action),
+ 						...targets,
+@@ -1680,9 +1683,11 @@
+ 						candidate.durable !== durable ||
+ 						candidate.replica !== replica
+ 					) {
++						performance.mark("undo-stage:miss", { detail: { missing: !candidate, actionMatches: candidate ? equalAction(candidate.action, value.action) : false, durableMatches: candidate?.durable === durable, currentMatches: candidate?.replica === replica } })
+ 						yield* check(value)
+ 						continue
+ 					}
++					performance.mark("undo-stage:hit", { detail: { durableGeneration: durable.generation, currentGeneration: replica.generation, durableClock: durable.clock, currentClock: replica.clock } })
+ 					preparedProposal = undefined
+ 					let published = yield* Effect.try({
+ 						try: () => {

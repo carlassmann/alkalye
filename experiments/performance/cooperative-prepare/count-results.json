@@ -1,0 +1,109 @@
+{
+	"sourceRevision": "f9508ce",
+	"adopted": false,
+	"sampleCountPerVariant": 1,
+	"scope": "Diagnostic count attribution, not general performance claim",
+	"instrumentation": "User Timing marks only; prepare/stored/check discard/replay hit/miss; no IDs/content; marks exported after profiler stop",
+	"candidate": "Rejected semantic-action reuse candidate plus diagnostic markers",
+	"controls": {
+		"backend": "Same native f9508ce backend, identical backend/profile reset",
+		"sourceAndCursor": "Exact original source after trusted edit and undo; accepted cursor54 then56; zero pending/rejected",
+		"assetHash": "Distinct asset SHA verified after removing cached service worker/assets"
+	},
+	"candidateMarks": [
+		{
+			"detail": null,
+			"name": "undo-stage:prepare",
+			"startTime": 4782.599999964237
+		},
+		{
+			"detail": {
+				"currentClock": 28,
+				"currentGeneration": 5,
+				"durableClock": 28,
+				"durableGeneration": 4
+			},
+			"name": "undo-stage:stored",
+			"startTime": 5368.699999988079
+		},
+		{
+			"detail": {
+				"kind": "proposed"
+			},
+			"name": "undo-stage:discard-check",
+			"startTime": 5370.899999976158
+		},
+		{
+			"detail": null,
+			"name": "undo-stage:prepare",
+			"startTime": 5371
+		},
+		{
+			"detail": {
+				"currentClock": 28,
+				"currentGeneration": 5,
+				"durableClock": 28,
+				"durableGeneration": 4
+			},
+			"name": "undo-stage:stored",
+			"startTime": 5917.699999988079
+		},
+		{
+			"detail": {
+				"currentClock": 28,
+				"currentGeneration": 5,
+				"durableClock": 28,
+				"durableGeneration": 4
+			},
+			"name": "undo-stage:hit",
+			"startTime": 5917.800000011921
+		}
+	],
+	"candidateStages": [
+		{
+			"delay": 2418.600000023842,
+			"heap": 1065322018,
+			"pending": 0,
+			"position": 54,
+			"rejected": 0,
+			"stage": "edit"
+		},
+		{
+			"delay": 2800.099999964237,
+			"heap": 1054184382,
+			"pending": 0,
+			"position": 56,
+			"rejected": 0,
+			"stage": "undo"
+		}
+	],
+	"nativeStages": [
+		{
+			"delay": 2394.699999988079,
+			"heap": 1135254843,
+			"pending": 0,
+			"position": 54,
+			"rejected": 0,
+			"stage": "edit"
+		},
+		{
+			"delay": 1438.300000011921,
+			"heap": 742723467,
+			"pending": 0,
+			"position": 56,
+			"rejected": 0,
+			"stage": "undo"
+		}
+	],
+	"candidateExact": true,
+	"candidateTrusted": true,
+	"counts": {
+		"prepare": 2,
+		"stored": 2,
+		"discardCheck": 1,
+		"publicationHit": 1,
+		"publicationMiss": 0
+	},
+	"attribution": "Replay invokes check(value) before publication; check unconditionally clears stored slot. Both preparations see identical current/durable generation and clock. Structural equalAction check in later publication cannot remove this earlier restage.",
+	"nextExperiment": "Retain equal-action slot while rerunning full preflight; skip preparation only for matching action, replica identity, generation and clock. Always regenerate on stale state."
+}

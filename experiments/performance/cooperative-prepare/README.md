@@ -40,3 +40,15 @@ All six journeys passed exact source, trusted undo, strictly newer accepted jour
 `reuse.patch` applies after `candidate.patch`; `reuse-results.json` preserves all samples. Raw traces remain in `/tmp/alkalye-undo-warm-reuse`. Slot-hit and preparation counts were not instrumented, so the result does not establish whether structural reuse occurred. Inspect and measure slot invalidation before attributing the regression or changing index representation. Single-character controls do not establish sustained typing throughput; heap samples are not peaks.
 
 written with gpt-6 in codex
+
+## Stage-count diagnostic
+
+One matched instrumented browser pair confirmed the cause of failed reuse. The candidate prepared twice, taking 586.1 ms and 546.7 ms of elapsed time. Between them, `check` discarded the stored slot while checking the same proposed action. Both preparations saw identical durable/current generations and clocks; publication then hit the second slot once. There were no publication misses.
+
+The replay loop invokes `check(value)` before `publishPreparedProposal`. Clearing the slot in `check` defeats a later semantic equality comparison. This is observed lifecycle evidence, not a guess from total latency.
+
+`count-results.json` preserves markers, exact source/cursor controls and the single-pair limit. `count-instrumentation.patch` applies after the reuse variant and adds only User Timing marks. Raw trace/profile files remain outside Git at `/tmp/alkalye-undo-warm-count`. Do not use instrumented single-pair timings as a general speed claim.
+
+Next experiment retains a semantically matching slot through full preflight, then avoids preparation only if action, replica identity, generation and clock all remain equal. Permission, causality and receipt checks still run before reuse. Production remains unchanged.
+
+written with gpt-6 in codex
