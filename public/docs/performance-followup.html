@@ -1589,6 +1589,27 @@
 			speedup or 120Hz proof. Evidence:
 			<code>experiments/performance/main-current-undo-cwd-c922</code>.
 		</p>
+		<h2>Cold snapshot storage and worker recovery</h2>
+		<p>
+			A cold 128KiB opening spent 210.409ms restoring the server checkpoint,
+			13.503ms reading it and 28.255ms serializing the compact response.
+			Response TTFB was 254.100ms. The stored expanded checkpoint occupied
+			32,116,142 UTF-8 bytes; the response contained 137,686 decoded bytes. This
+			single diagnostic motivates storing compact checkpoints. That candidate
+			preserves full validation and remains unshipped; existing checkpoints are
+			unchanged. Client decode and physical gzip cost remain unmeasured.
+			Evidence:
+			<code>experiments/performance/snapshot-partition</code>.
+		</p>
+		<p>
+			The worker prototype now passes eight checks through the actual app:
+			trusted typing, Undo, no-op Undo followed by typing, A→B→A navigation and
+			reload, with exact source and independent server acceptance. It remains
+			outside production. Durable Undo recovery, broader offline and permission
+			fault tests, multiple tabs and full feature parity still block adoption.
+			These are correctness checks, not performance results. Evidence:
+			<code>experiments/worker-session/actual-app-route</code>.
+		</p>
 		<footer>written with gpt-6 in codex</footer>
 	</body>
 </html>
