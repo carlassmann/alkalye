@@ -1,0 +1,15 @@
+{
+	"results": [
+		{
+			"version": "rewrite",
+			"name": "replace all occurrences",
+			"kb": 128,
+			"n": 1,
+			"values": [53.29999995231629],
+			"cursors": [1298],
+			"selectionSetup": "Select all occurrences shortcut",
+			"restoration": "Complete original source through public editor boundary; excluded from replacement timing"
+		}
+	],
+	"failures": []
+}

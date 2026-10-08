@@ -1,0 +1,74 @@
+[
+	{
+		"file": "baseline-pending-rewrite-0.trace.json",
+		"inputMs": 47.143,
+		"largestMs": 88.684,
+		"overBudget": 7
+	},
+	{
+		"file": "candidate-clean-rewrite-1.trace.json",
+		"inputMs": 40.47,
+		"largestMs": 114.066,
+		"overBudget": 13
+	},
+	{
+		"file": "candidate-pending-rewrite-2.trace.json",
+		"inputMs": 39.126,
+		"largestMs": 1480.695,
+		"overBudget": 11
+	},
+	{
+		"file": "baseline-clean-rewrite-1.trace.json",
+		"inputMs": 40.115,
+		"largestMs": 114.076,
+		"overBudget": 12
+	},
+	{
+		"file": "baseline-pending-rewrite-2.trace.json",
+		"inputMs": 38.363,
+		"largestMs": 1610.534,
+		"overBudget": 11
+	},
+	{
+		"file": "candidate-pending-rewrite-0.trace.json",
+		"inputMs": 47.316,
+		"largestMs": 85.623,
+		"overBudget": 8
+	},
+	{
+		"file": "baseline-pending-rewrite-1.trace.json",
+		"inputMs": 41.077,
+		"largestMs": 115.415,
+		"overBudget": 16
+	},
+	{
+		"file": "baseline-clean-rewrite-2.trace.json",
+		"inputMs": 39.318,
+		"largestMs": 120.471,
+		"overBudget": 12
+	},
+	{
+		"file": "candidate-clean-rewrite-0.trace.json",
+		"inputMs": 47.366,
+		"largestMs": 86.71,
+		"overBudget": 7
+	},
+	{
+		"file": "candidate-pending-rewrite-1.trace.json",
+		"inputMs": 40.087,
+		"largestMs": 118.914,
+		"overBudget": 18
+	},
+	{
+		"file": "baseline-clean-rewrite-0.trace.json",
+		"inputMs": 47.986,
+		"largestMs": 87.33,
+		"overBudget": 7
+	},
+	{
+		"file": "candidate-clean-rewrite-2.trace.json",
+		"inputMs": 39.168,
+		"largestMs": 116.408,
+		"overBudget": 12
+	}
+]

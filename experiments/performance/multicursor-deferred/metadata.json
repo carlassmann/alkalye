@@ -1,0 +1,33 @@
+{
+	"application": "aad445b6fdf3a2efe5679daa5a0e010d58785a61",
+	"purpose": "Diagnostic sampled attribution, not comparable latency benchmark",
+	"sourceMapBuild": "Frozen production dist at /tmp/alkalye-fresh-matrix/rewrite/dist",
+	"rawTraceSHA256": {
+		"mc-diagnostic-rewrite-0.trace.json": "3946995ecb1c73babeeab55b0e1160bc65eb78245d091f99b891a4e6823cbbd4",
+		"mc-diagnostic-repeat-rewrite-0.trace.json": "97cac0c1693fd8e783a319433988d02e403818326fdd65e8cb8ddb1f43354d8b",
+		"mc-diagnostic-repeat-rewrite-1.trace.json": "34696cb561927254ddcaa4300ace2d5c9e1aa15358887bc98de5720fd85b7cd6",
+		"mc-diagnostic-repeat-rewrite-2.trace.json": "51d58f1b27015fc44e81ed324b1f419138d397c576bf31752bd4b185d6e5bb7d"
+	},
+	"traceDirectory": "/tmp/alkalye-fresh-matrix/",
+	"sampling": "V8 CPU profiler plus devtools timeline; startup occurs before trusted input marker; sampling overhead changes timing.",
+	"ownershipCaveat": "CPU samples do not include action IDs/arguments. Prior full-source restoration contamination is suspected, not proven.",
+	"comparison": {
+		"samplesPerArm": 3,
+		"arms": [
+			"baseline-pending",
+			"candidate-clean",
+			"baseline-clean",
+			"candidate-pending"
+		],
+		"initialHistory": "Identical stopped-backend SQLite/blob directory + quiet browser profile copies restored before each arm. Service Worker/HTTP/Code caches removed. Within each arm, edits/restores advance history.",
+		"backend": "Each frozen source tree own backend; baseline aad + candidate only private batch patch. Sameorigin4461, unchanged actual data snapshot.",
+		"control": "Both wait initial accepted projection cache at latest journal position. Clean waits this criterion after every whole-source restoration; pending-only waits exact source and pending zero, same as original harness. Cache hook snapshots stage at put and verifies current positions head in transaction completion callback.",
+		"diagnosticExcluded": "One initial arm aborted because server script path resolved current root backend; all results excluded and correct four-arm run reset common data/profile.",
+		"sourceSHA256": {
+			"baseline": "7b9fc32242f1955982531c38748364c3ae776c5660767710c932a7e8df343cda",
+			"candidate": "fcdce16c9cce9d17d80c1f4f099c157ae1e2b04887c477d2fa649ce35cbe4bc9"
+		},
+		"correctness": "44 public contracts,405assertions; candidate types pass. All12 replacement/restore checks passed, clean accepted-cache restoration gates passed. Three-second replacement acceptance maystillpending; raw observations retained.",
+		"decision": "Rejected: clean deferred task median unchanged114.076\u2192114.066ms; input40.115\u219240.470ms. Pending-only max1610.534\u21921480.695ms not sufficient clean workload proof."
+	}
+}

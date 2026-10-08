@@ -1,0 +1,24 @@
+I read the frozen sources plus the candidate; no tools run. Short version: you can only label the full-restore contamination as suspected, and deduplicated parsing alone won't reach 8.33ms.
+
+**Attribution: suspected only**
+- Deferred task 1642ms at +1671ms, triggered by `tx.oncomplete`, with time mapped to `applyChanges`/`validateChanges`: this shows the stall is replica preparation of a large batch. It doesn't show which batch it was.
+- What's missing:
+  - Identity of the operations in the stalled task: action id, op count, target, roughly 128KiB worth of atoms. Either from journal position or from a counter inside `applyTogether`.
+  - Proof that the prior restore's accepted, durable and projection replay hadn't finished when the next iteration started. Seeing exact source with pending 0 isn't enough. In the rewrite's `document-session.ts` (line numbers cited are there), `pending.delete` (1190) runs inside the remote-log loop. Validation at 1756/1827 and snapshot/projection work can run in later tasks.
+  - A control run that waits for projection-version/snapshot idle (or skips the restore) and makes the stall go away.
+- 91ms, then 126ms on a repeat: noisy, fits either explanation.
+
+**Parse-once candidate (`/tmp/alkalye-parse-once-source/crdt.ts:145-169,398-401`)**
+- Correct as far as it goes. `decoded` is a private parameter fed only by `applyTogether`'s own parse, so no trust flag leaks. Fast paths still read raw `input`, same as the original. Prepare-all-then-commit-all atomicity is kept.
+- Ownership risks:
+  - Replicas now share the same frozen `Operation` and `Atom` objects; before, each replica had its own copy. `forkSteps` already shares frozen facts, so the pattern is precedented. You still need to confirm nothing mutates stored ops or atoms in place: atom `order`/`observed`/`deleted` arrays, `operations`/`targets` history entries.
+  - Ops are frozen before validation. Harmless if validation throws (they're discarded), but the freeze cost is paid even on rejection.
+  - Stored-op freezing is now uneven: ops from `apply()` stay unfrozen, ops from `applyTogether` are frozen. Fine as long as nothing relies on either state.
+- Limited savings. Callers already parse (`document-session.ts:1126,1187`), and `validateChanges` (2008) still parses once per replica in a separate task. For one remote action that's 1 + 3 validate + 3 apply = 7 parses, down to 5. The ~515ms validate path isn't touched.
+- `validateIdentities` (334ms incl.) still runs per replica, with `JSON.stringify` and `atomIdentity` per atom. Visibility `prepare` is also per replica. Neither is shared.
+
+**8.33ms: yes, cooperative preparation is required**
+- Even one parse of a 128KiB whole-source op set (~130k atoms) is roughly 100ms+ of work. The profile shows `parseOperation` self 380ms across about 3–7 parses, and identity checking and visibility preparation scale with atom count too.
+- So you need chunked preparation (decode, freeze, identity, visibility steps yielding every N atoms, like `freezeFactSteps`). Before the synchronous commit, re-check generation and clock per replica, the way `forkEffect` does (crdt.ts:86-95). On a mismatch, restart or fail.
+- That brings new risks: interruption mid-prepare must leave no partial state, and visibility's "cannot change between synchronous preparation and publication" assumption (crdt.ts:424) stops holding. Visibility prep must be re-checked under the same generation preflight.
+- The validate pass also has to go cooperative, or be merged into a single prepare whose result is carried to apply.

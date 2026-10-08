@@ -1,0 +1,2009 @@
+{
+	"worstTaskMs": 90.998,
+	"offsetMs": 111.125,
+	"sampledMs": 90.926,
+	"rows": [
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 2096,
+				"functionName": "Ze",
+				"lineNumber": 0,
+				"scriptId": 29,
+				"url": "http://127.0.0.1:4461/chunks/document-app-68q58m06.js"
+			},
+			"selfMs": 13.586,
+			"inclusiveMs": 31.273,
+			"mapped": {
+				"source": "../src/shared/model.ts",
+				"line": 232,
+				"column": 31,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 23524,
+				"functionName": "Fl.ci.expected",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 9.135,
+			"inclusiveMs": 9.135,
+			"mapped": {
+				"source": "../node_modules/effect/dist/SchemaAST.js",
+				"line": 2310,
+				"column": 21,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 5226,
+				"functionName": "atomTarget",
+				"lineNumber": 17,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 6.749,
+			"inclusiveMs": 6.749,
+			"mapped": {
+				"source": "../src/shared/crdt.ts",
+				"line": 1214,
+				"column": 12,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 11960,
+				"functionName": "validateIdentities",
+				"lineNumber": 17,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 6.578,
+			"inclusiveMs": 11.953,
+			"mapped": {
+				"source": "../src/shared/crdt.ts",
+				"line": 1577,
+				"column": 28,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 9657,
+				"functionName": "Xe",
+				"lineNumber": 0,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 5.351,
+			"inclusiveMs": 5.351,
+			"mapped": {
+				"source": "../src/shared/text-visibility.ts",
+				"line": 400,
+				"column": 30,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 13127,
+				"functionName": "indexAtom",
+				"lineNumber": 17,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 4.744,
+			"inclusiveMs": 5.205,
+			"mapped": {
+				"source": "../src/shared/crdt.ts",
+				"line": 1647,
+				"column": 19,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 14474,
+				"functionName": "",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 4.707,
+			"inclusiveMs": 32.956,
+			"mapped": {
+				"source": "../node_modules/effect/dist/SchemaAST.js",
+				"line": 1581,
+				"column": 12,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 10006,
+				"functionName": "onItem",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 4.418,
+			"inclusiveMs": 24.084,
+			"mapped": {
+				"source": "../node_modules/effect/dist/SchemaAST.js",
+				"line": 1268,
+				"column": 9,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 13832,
+				"functionName": "We",
+				"lineNumber": 17,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 2.762,
+			"inclusiveMs": 2.762,
+			"mapped": {
+				"source": "../src/shared/crdt.ts",
+				"line": 1680,
+				"column": 22,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 6423,
+				"functionName": "matchesRemoval",
+				"lineNumber": 0,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 2.613,
+			"inclusiveMs": 2.613,
+			"mapped": {
+				"source": "../src/shared/text-visibility.ts",
+				"line": 197,
+				"column": 16,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 6002,
+				"functionName": "s",
+				"lineNumber": 0,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 2.139,
+			"inclusiveMs": 2.139,
+			"mapped": {
+				"source": "../src/shared/text-visibility.ts",
+				"line": 170,
+				"column": 19,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 2231,
+				"functionName": "",
+				"lineNumber": 0,
+				"scriptId": 29,
+				"url": "http://127.0.0.1:4461/chunks/document-app-68q58m06.js"
+			},
+			"selfMs": 1.84,
+			"inclusiveMs": 2.753,
+			"mapped": {
+				"source": "../src/shared/model.ts",
+				"line": 243,
+				"column": 33,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 93213,
+				"functionName": "tA",
+				"lineNumber": 7,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 1.698,
+			"inclusiveMs": 1.698,
+			"mapped": {
+				"source": "../src/shared/text-dependencies.ts",
+				"line": 139,
+				"column": 1,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "other",
+				"functionName": "(garbage collector)",
+				"scriptId": 0
+			},
+			"selfMs": 1.67,
+			"inclusiveMs": 1.67,
+			"mapped": null
+		},
+		{
+			"frame": {
+				"codeType": "other",
+				"functionName": "(program)",
+				"scriptId": 0
+			},
+			"selfMs": 1.668,
+			"inclusiveMs": 1.668,
+			"mapped": null
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 10013,
+				"functionName": "prepare",
+				"lineNumber": 13,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 1.44,
+			"inclusiveMs": 53.159,
+			"mapped": {
+				"source": "../src/shared/crdt.ts",
+				"line": 394,
+				"column": 17,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 8656,
+				"functionName": "p",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 1.381,
+			"inclusiveMs": 27.157,
+			"mapped": {
+				"source": "../node_modules/effect/dist/SchemaAST.js",
+				"line": 1180,
+				"column": 19,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 1599,
+				"functionName": "",
+				"lineNumber": 0,
+				"scriptId": 29,
+				"url": "http://127.0.0.1:4461/chunks/document-app-68q58m06.js"
+			},
+			"selfMs": 1.381,
+			"inclusiveMs": 1.381,
+			"mapped": {
+				"source": "../src/shared/model.ts",
+				"line": 179,
+				"column": 3,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 20185,
+				"functionName": "",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 1.368,
+			"inclusiveMs": 16.054,
+			"mapped": {
+				"source": "../node_modules/effect/dist/SchemaAST.js",
+				"line": 2009,
+				"column": 12,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 18888,
+				"functionName": "o",
+				"lineNumber": 22,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 1.234,
+			"inclusiveMs": 25.776,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/effect.js",
+				"line": 2214,
+				"column": 25,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 5203,
+				"functionName": "Ue",
+				"lineNumber": 0,
+				"scriptId": 29,
+				"url": "http://127.0.0.1:4461/chunks/document-app-68q58m06.js"
+			},
+			"selfMs": 1.229,
+			"inclusiveMs": 2.307,
+			"mapped": {
+				"source": "../src/shared/model.ts",
+				"line": 443,
+				"column": 32,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 4726,
+				"functionName": "Pe",
+				"lineNumber": 0,
+				"scriptId": 29,
+				"url": "http://127.0.0.1:4461/chunks/document-app-68q58m06.js"
+			},
+			"selfMs": 1.078,
+			"inclusiveMs": 1.078,
+			"mapped": {
+				"source": "../src/shared/model.ts",
+				"line": 413,
+				"column": 29,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 92485,
+				"functionName": "m",
+				"lineNumber": 7,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.918,
+			"inclusiveMs": 7.97,
+			"mapped": {
+				"source": "../src/shared/text-dependencies.ts",
+				"line": 75,
+				"column": 4,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 2729,
+				"functionName": "",
+				"lineNumber": 0,
+				"scriptId": 29,
+				"url": "http://127.0.0.1:4461/chunks/document-app-68q58m06.js"
+			},
+			"selfMs": 0.913,
+			"inclusiveMs": 0.913,
+			"mapped": {
+				"source": "../src/shared/model.ts",
+				"line": 267,
+				"column": 26,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 91680,
+				"functionName": "",
+				"lineNumber": 7,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.767,
+			"inclusiveMs": 10.744,
+			"mapped": {
+				"source": "../src/shared/text-dependencies.ts",
+				"line": 22,
+				"column": 2,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 31779,
+				"functionName": "d",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.612,
+			"inclusiveMs": 14.567,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/schema/interpreter.js",
+				"line": 87,
+				"column": 23,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 27957,
+				"functionName": "",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.604,
+			"inclusiveMs": 0.628,
+			"mapped": {
+				"source": "../node_modules/effect/dist/SchemaAST.js",
+				"line": 2733,
+				"column": 10,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"functionName": "decode",
+				"scriptId": 0
+			},
+			"selfMs": 0.482,
+			"inclusiveMs": 0.482,
+			"mapped": null
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 9296,
+				"functionName": "JE",
+				"lineNumber": 0,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.48,
+			"inclusiveMs": 0.962,
+			"mapped": {
+				"source": "../node_modules/effect/dist/encoding/SchemaBinary.js",
+				"line": 805,
+				"column": 20,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 23007,
+				"functionName": "",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.465,
+			"inclusiveMs": 11.29,
+			"mapped": {
+				"source": "../node_modules/effect/dist/SchemaAST.js",
+				"line": 2234,
+				"column": 21,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 92119,
+				"functionName": "",
+				"lineNumber": 7,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.46,
+			"inclusiveMs": 8.279,
+			"mapped": {
+				"source": "../src/shared/text-dependencies.ts",
+				"line": 50,
+				"column": 18,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 28776,
+				"functionName": "cr",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.459,
+			"inclusiveMs": 11.749,
+			"mapped": {
+				"source": "../node_modules/effect/dist/SchemaAST.js",
+				"line": 2901,
+				"column": 30,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 9652,
+				"functionName": "NT",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.454,
+			"inclusiveMs": 0.454,
+			"mapped": {
+				"source": "../node_modules/effect/dist/SchemaAST.js",
+				"line": 1249,
+				"column": 26,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 58047,
+				"functionName": "Xb",
+				"lineNumber": 0,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.41,
+			"inclusiveMs": 14.434,
+			"mapped": {
+				"source": "../node_modules/effect/dist/encoding/SchemaBinary.js",
+				"line": 4258,
+				"column": 30,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 9986,
+				"functionName": "validate",
+				"lineNumber": 13,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 0.368,
+			"inclusiveMs": 26.362,
+			"mapped": {
+				"source": "../src/shared/crdt.ts",
+				"line": 391,
+				"column": 10,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 6585,
+				"functionName": "",
+				"lineNumber": 13,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 0.315,
+			"inclusiveMs": 8.119,
+			"mapped": {
+				"source": "../src/shared/crdt.ts",
+				"line": 160,
+				"column": 10,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 6463,
+				"functionName": "prepareApplication",
+				"lineNumber": 13,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 0.311,
+			"inclusiveMs": 27.476,
+			"mapped": {
+				"source": "../src/shared/crdt.ts",
+				"line": 154,
+				"column": 28,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 106295,
+				"functionName": "",
+				"lineNumber": 7,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.307,
+			"inclusiveMs": 8.804,
+			"mapped": {
+				"source": "../src/shared/document-session.ts",
+				"line": 1061,
+				"column": 27,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 19854,
+				"functionName": "t",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.307,
+			"inclusiveMs": 0.307,
+			"mapped": {
+				"source": "../node_modules/effect/dist/SchemaAST.js",
+				"line": 1976,
+				"column": 13,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 13637,
+				"functionName": "",
+				"lineNumber": 17,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 0.307,
+			"inclusiveMs": 0.307,
+			"mapped": {
+				"source": "../src/shared/crdt.ts",
+				"line": 1669,
+				"column": 34,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 53381,
+				"functionName": "Wb",
+				"lineNumber": 0,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.305,
+			"inclusiveMs": 3.319,
+			"mapped": {
+				"source": "../node_modules/effect/dist/encoding/SchemaBinary.js",
+				"line": 3941,
+				"column": 25,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 92548,
+				"functionName": "p",
+				"lineNumber": 7,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.303,
+			"inclusiveMs": 0.303,
+			"mapped": {
+				"source": "../src/shared/text-dependencies.ts",
+				"line": 84,
+				"column": 4,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 482,
+				"functionName": "D",
+				"lineNumber": 0,
+				"scriptId": 29,
+				"url": "http://127.0.0.1:4461/chunks/document-app-68q58m06.js"
+			},
+			"selfMs": 0.301,
+			"inclusiveMs": 21.712,
+			"mapped": {
+				"source": "../src/shared/collection-copy.ts",
+				"line": 35,
+				"column": 31,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 53748,
+				"functionName": "$b",
+				"lineNumber": 0,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.16,
+			"inclusiveMs": 2.856,
+			"mapped": {
+				"source": "../node_modules/effect/dist/encoding/SchemaBinary.js",
+				"line": 3969,
+				"column": 22,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 8420,
+				"functionName": "ua",
+				"lineNumber": 22,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.16,
+			"inclusiveMs": 0.16,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/effect.js",
+				"line": 1016,
+				"column": 31,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 10437,
+				"functionName": "",
+				"lineNumber": 13,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 0.159,
+			"inclusiveMs": 7.804,
+			"mapped": {
+				"source": "../src/shared/crdt.ts",
+				"line": 425,
+				"column": 10,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 16081,
+				"functionName": "enter",
+				"lineNumber": 0,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.158,
+			"inclusiveMs": 0.158,
+			"mapped": {
+				"source": "../node_modules/effect/dist/encoding/SchemaBinary.js",
+				"line": 1283,
+				"column": 8,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 68711,
+				"functionName": "kx",
+				"lineNumber": 22,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.158,
+			"inclusiveMs": 0.158,
+			"mapped": {
+				"source": "../node_modules/effect/dist/SchemaIssue.js",
+				"line": 484,
+				"column": 38,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 9533,
+				"functionName": "G",
+				"lineNumber": 22,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.157,
+			"inclusiveMs": 0.157,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/effect.js",
+				"line": 1165,
+				"column": 29,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 4689,
+				"functionName": "pn",
+				"lineNumber": 19,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 0.155,
+			"inclusiveMs": 5.716,
+			"mapped": {
+				"source": "../src/shared/document-actions.ts",
+				"line": 418,
+				"column": 26,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 10216,
+				"functionName": "Di",
+				"lineNumber": 0,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 0.155,
+			"inclusiveMs": 0.155,
+			"mapped": {
+				"source": "../src/shared/text-visibility.ts",
+				"line": 448,
+				"column": 29,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 60649,
+				"functionName": "Zb",
+				"lineNumber": 0,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.154,
+			"inclusiveMs": 2.658,
+			"mapped": {
+				"source": "../node_modules/effect/dist/encoding/SchemaBinary.js",
+				"line": 4418,
+				"column": 25,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 14173,
+				"functionName": "qr",
+				"lineNumber": 17,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 0.154,
+			"inclusiveMs": 0.154,
+			"mapped": {
+				"source": "../src/shared/crdt.ts",
+				"line": 1704,
+				"column": 24,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 54726,
+				"functionName": "cu",
+				"lineNumber": 0,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.152,
+			"inclusiveMs": 2.696,
+			"mapped": {
+				"source": "../node_modules/effect/dist/encoding/SchemaBinary.js",
+				"line": 4032,
+				"column": 23,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 36715,
+				"functionName": "xw",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.152,
+			"inclusiveMs": 0.152,
+			"mapped": {
+				"source": "../node_modules/effect/dist/SchemaParser.js",
+				"line": 951,
+				"column": 24,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 988,
+				"functionName": "pe.check.B.message",
+				"lineNumber": 19,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 0.151,
+			"inclusiveMs": 0.151,
+			"mapped": {
+				"source": "../src/shared/document-actions.ts",
+				"line": 74,
+				"column": 3,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 55293,
+				"functionName": "Jb",
+				"lineNumber": 0,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.146,
+			"inclusiveMs": 4.319,
+			"mapped": {
+				"source": "../node_modules/effect/dist/encoding/SchemaBinary.js",
+				"line": 4070,
+				"column": 21,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 2126,
+				"functionName": "oe",
+				"lineNumber": 6,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.144,
+			"inclusiveMs": 0.144,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/record.js",
+				"line": 2,
+				"column": 31,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 51119,
+				"functionName": "qb",
+				"lineNumber": 0,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.067,
+			"inclusiveMs": 5.385,
+			"mapped": {
+				"source": "../node_modules/effect/dist/encoding/SchemaBinary.js",
+				"line": 3774,
+				"column": 22,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 2678,
+				"functionName": "Kt",
+				"lineNumber": 0,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.024,
+			"inclusiveMs": 0.024,
+			"mapped": {
+				"source": "../node_modules/effect/dist/Predicate.js",
+				"line": 225,
+				"column": 25,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "other",
+				"functionName": "(root)",
+				"scriptId": 0
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 90.926,
+			"mapped": null
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 8032,
+				"functionName": "Ue",
+				"lineNumber": 22,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 8.804,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/effect.js",
+				"line": 984,
+				"column": 12,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 2751,
+				"functionName": "succeedWith",
+				"lineNumber": 22,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 3.43,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/effect.js",
+				"line": 512,
+				"column": 14,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 8825,
+				"functionName": "Sb",
+				"lineNumber": 22,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 3.43,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/effect.js",
+				"line": 1051,
+				"column": 26,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 5660,
+				"functionName": "wf",
+				"lineNumber": 6,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 8.707,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/core.js",
+				"line": 295,
+				"column": 13,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 1814,
+				"functionName": "runLoop",
+				"lineNumber": 22,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 87.284,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/effect.js",
+				"line": 441,
+				"column": 10,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 1241,
+				"functionName": "evaluate",
+				"lineNumber": 22,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 87.444,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/effect.js",
+				"line": 406,
+				"column": 11,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 5862,
+				"functionName": "",
+				"lineNumber": 22,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 87.444,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/effect.js",
+				"line": 812,
+				"column": 66,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 60212,
+				"functionName": "s.oncomplete",
+				"lineNumber": 7,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 87.284,
+			"mapped": {
+				"source": "../src/platform/indexeddb-journal.ts",
+				"line": 585,
+				"column": 20,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 61011,
+				"functionName": "Yb",
+				"lineNumber": 0,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 2.658,
+			"mapped": {
+				"source": "../node_modules/effect/dist/encoding/SchemaBinary.js",
+				"line": 4437,
+				"column": 23,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 61368,
+				"functionName": "decode",
+				"lineNumber": 0,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 2.658,
+			"mapped": {
+				"source": "../node_modules/effect/dist/encoding/SchemaBinary.js",
+				"line": 4460,
+				"column": 13,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 30853,
+				"functionName": "",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 2.658,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/schema/interpreter.js",
+				"line": 30,
+				"column": 83,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 9560,
+				"functionName": "",
+				"lineNumber": 22,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 2.658,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/effect.js",
+				"line": 1167,
+				"column": 50,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 840,
+				"functionName": "",
+				"lineNumber": 0,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 2.818,
+			"mapped": {
+				"source": "../node_modules/effect/dist/Function.js",
+				"line": 76,
+				"column": 23,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 30420,
+				"functionName": "pi",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 2.658,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/schema/interpreter.js",
+				"line": 7,
+				"column": 31,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 30837,
+				"functionName": "",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 2.658,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/schema/interpreter.js",
+				"line": 30,
+				"column": 14,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 32344,
+				"functionName": "",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 3.279,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/schema/interpreter.js",
+				"line": 140,
+				"column": 10,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 35711,
+				"functionName": "",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 29.672,
+			"mapped": {
+				"source": "../node_modules/effect/dist/SchemaParser.js",
+				"line": 829,
+				"column": 10,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 44438,
+				"functionName": "",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 3.279,
+			"mapped": {
+				"source": "../node_modules/effect/dist/Schema.js",
+				"line": 632,
+				"column": 10,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 120922,
+				"functionName": "Fa",
+				"lineNumber": 7,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 3.279,
+			"mapped": {
+				"source": "../src/shared/document-session.ts",
+				"line": 1988,
+				"column": 1,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 57906,
+				"functionName": "No",
+				"lineNumber": 0,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 14.434,
+			"mapped": {
+				"source": "../node_modules/effect/dist/encoding/SchemaBinary.js",
+				"line": 4247,
+				"column": 21,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 48937,
+				"functionName": "Ke",
+				"lineNumber": 0,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 14.434,
+			"mapped": {
+				"source": "../node_modules/effect/dist/encoding/SchemaBinary.js",
+				"line": 3623,
+				"column": 23,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 57024,
+				"functionName": "Gb",
+				"lineNumber": 0,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 3.358,
+			"mapped": {
+				"source": "../node_modules/effect/dist/encoding/SchemaBinary.js",
+				"line": 4185,
+				"column": 21,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 50924,
+				"functionName": "yl",
+				"lineNumber": 0,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 5.174,
+			"mapped": {
+				"source": "../node_modules/effect/dist/encoding/SchemaBinary.js",
+				"line": 3757,
+				"column": 28,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 16237,
+				"functionName": "readUtf8",
+				"lineNumber": 0,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 0.962,
+			"mapped": {
+				"source": "../node_modules/effect/dist/encoding/SchemaBinary.js",
+				"line": 1293,
+				"column": 11,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 9061,
+				"functionName": "",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 27.157,
+			"mapped": {
+				"source": "../node_modules/effect/dist/SchemaAST.js",
+				"line": 1208,
+				"column": 12,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 44583,
+				"functionName": "",
+				"lineNumber": 24,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 26.393,
+			"mapped": {
+				"source": "../node_modules/effect/dist/Schema.js",
+				"line": 942,
+				"column": 10,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 3460,
+				"functionName": "",
+				"lineNumber": 19,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 5.716,
+			"mapped": {
+				"source": "../src/shared/document-actions.ts",
+				"line": 315,
+				"column": 17,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 5285,
+				"functionName": "",
+				"lineNumber": 22,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 67.673,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/effect.js",
+				"line": 766,
+				"column": 18,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 4835,
+				"functionName": "mt",
+				"lineNumber": 22,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 67.673,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/effect.js",
+				"line": 717,
+				"column": 13,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 4734,
+				"functionName": "mt",
+				"lineNumber": 22,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 10.904,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/effect.js",
+				"line": 708,
+				"column": 13,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 82885,
+				"functionName": "$v",
+				"lineNumber": 7,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 8.279,
+			"mapped": {
+				"source": "../node_modules/effect/dist/Graph.js",
+				"line": 443,
+				"column": 22,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 82534,
+				"functionName": "",
+				"lineNumber": 7,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 8.279,
+			"mapped": {
+				"source": "../node_modules/effect/dist/Graph.js",
+				"line": 284,
+				"column": 29,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 121212,
+				"functionName": "try",
+				"lineNumber": 7,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 26.362,
+			"mapped": {
+				"source": "../src/shared/document-session.ts",
+				"line": 2006,
+				"column": 16,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 9424,
+				"functionName": "Ui",
+				"lineNumber": 0,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 13.766,
+			"mapped": {
+				"source": "../src/shared/text-visibility.ts",
+				"line": 384,
+				"column": 30,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 5240,
+				"functionName": "prepareSteps",
+				"lineNumber": 0,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 19.272,
+			"mapped": {
+				"source": "../src/shared/text-visibility.ts",
+				"line": 125,
+				"column": 23,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 5066,
+				"functionName": "prepare",
+				"lineNumber": 0,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 19.272,
+			"mapped": {
+				"source": "../src/shared/text-visibility.ts",
+				"line": 114,
+				"column": 9,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 6317,
+				"functionName": "applyTogether",
+				"lineNumber": 13,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 35.595,
+			"mapped": {
+				"source": "../src/shared/crdt.ts",
+				"line": 145,
+				"column": 22,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 121366,
+				"functionName": "try",
+				"lineNumber": 7,
+				"scriptId": 18,
+				"url": "http://127.0.0.1:4461/chunks/document-app-dh3m50w7.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 35.595,
+			"mapped": {
+				"source": "../src/shared/document-session.ts",
+				"line": 2018,
+				"column": 16,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 5132,
+				"functionName": "",
+				"lineNumber": 0,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 2.44,
+			"mapped": {
+				"source": "../src/shared/text-visibility.ts",
+				"line": 118,
+				"column": 10,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 10395,
+				"functionName": "",
+				"lineNumber": 13,
+				"scriptId": 24,
+				"url": "http://127.0.0.1:4461/chunks/document-app-qenvjegg.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 2.44,
+			"mapped": {
+				"source": "../src/shared/crdt.ts",
+				"line": 420,
+				"column": 17,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 30903,
+				"functionName": "Iu",
+				"lineNumber": 22,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 0.16,
+			"mapped": {
+				"source": "../node_modules/effect/dist/Deferred.js",
+				"line": 675,
+				"column": 27,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 28438,
+				"functionName": "qr",
+				"lineNumber": 0,
+				"scriptId": 32,
+				"url": "http://127.0.0.1:4461/chunks/document-app-jev26rbc.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 0.16,
+			"mapped": {
+				"source": "../node_modules/effect/dist/PubSub.js",
+				"line": 2165,
+				"column": 39,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 27863,
+				"functionName": "completePollersUnsafe",
+				"lineNumber": 0,
+				"scriptId": 32,
+				"url": "http://127.0.0.1:4461/chunks/document-app-jev26rbc.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 0.16,
+			"mapped": {
+				"source": "../node_modules/effect/dist/PubSub.js",
+				"line": 2072,
+				"column": 24,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 28643,
+				"functionName": "Vr",
+				"lineNumber": 0,
+				"scriptId": 32,
+				"url": "http://127.0.0.1:4461/chunks/document-app-jev26rbc.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 0.16,
+			"mapped": {
+				"source": "../node_modules/effect/dist/PubSub.js",
+				"line": 2187,
+				"column": 43,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 27922,
+				"functionName": "completeSubscribersUnsafe",
+				"lineNumber": 0,
+				"scriptId": 32,
+				"url": "http://127.0.0.1:4461/chunks/document-app-jev26rbc.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 0.16,
+			"mapped": {
+				"source": "../node_modules/effect/dist/PubSub.js",
+				"line": 2075,
+				"column": 28,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 14379,
+				"functionName": "",
+				"lineNumber": 0,
+				"scriptId": 32,
+				"url": "http://127.0.0.1:4461/chunks/document-app-jev26rbc.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 0.16,
+			"mapped": {
+				"source": "../node_modules/effect/dist/PubSub.js",
+				"line": 788,
+				"column": 51,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 420,
+				"functionName": "c",
+				"lineNumber": 0,
+				"scriptId": 21,
+				"url": "http://127.0.0.1:4461/chunks/document-app-ncxg3qzf.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 0.16,
+			"mapped": {
+				"source": "../node_modules/effect/dist/SubscriptionRef.js",
+				"line": 195,
+				"column": 19,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 638,
+				"functionName": "",
+				"lineNumber": 0,
+				"scriptId": 21,
+				"url": "http://127.0.0.1:4461/chunks/document-app-ncxg3qzf.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": 0.16,
+			"mapped": {
+				"source": "../node_modules/effect/dist/SubscriptionRef.js",
+				"line": 573,
+				"column": 100,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 8779,
+				"functionName": "releaseUnsafe",
+				"lineNumber": 0,
+				"scriptId": 32,
+				"url": "http://127.0.0.1:4461/chunks/document-app-jev26rbc.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": -0.097,
+			"mapped": {
+				"source": "../node_modules/effect/dist/Semaphore.js",
+				"line": 83,
+				"column": 16,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 9295,
+				"functionName": "",
+				"lineNumber": 0,
+				"scriptId": 32,
+				"url": "http://127.0.0.1:4461/chunks/document-app-jev26rbc.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": -0.097,
+			"mapped": {
+				"source": "../node_modules/effect/dist/Semaphore.js",
+				"line": 117,
+				"column": 56,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 16262,
+				"functionName": "Ue",
+				"lineNumber": 22,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": 0.0,
+			"inclusiveMs": -0.097,
+			"mapped": {
+				"source": "../node_modules/effect/dist/internal/effect.js",
+				"line": 1853,
+				"column": 12,
+				"name": ""
+			}
+		},
+		{
+			"frame": {
+				"codeType": "JS",
+				"columnNumber": 9150,
+				"functionName": "scheduleTask",
+				"lineNumber": 8,
+				"scriptId": 34,
+				"url": "http://127.0.0.1:4461/chunks/document-app-eznwvf0k.js"
+			},
+			"selfMs": -0.097,
+			"inclusiveMs": -0.097,
+			"mapped": {
+				"source": "../node_modules/effect/dist/Scheduler.js",
+				"line": 148,
+				"column": 15,
+				"name": ""
+			}
+		}
+	]
+}

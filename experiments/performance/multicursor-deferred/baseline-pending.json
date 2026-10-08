@@ -1,0 +1,163 @@
+{
+	"results": [
+		{
+			"version": "rewrite",
+			"name": "replace all occurrences",
+			"kb": 128,
+			"n": 3,
+			"values": [49.40000003576279, 45.29999995231629, 42.39999997615814],
+			"cursors": [1298, 1298, 1298],
+			"after": [
+				{
+					"busy": "false",
+					"cacheReady": false,
+					"metrics": [
+						{
+							"at": 6851.200000047684,
+							"latest": 255,
+							"pending": 1,
+							"position": 255,
+							"rejected": 0,
+							"stage": "replace"
+						}
+					],
+					"pending": "1",
+					"sourceExact": true
+				},
+				{
+					"busy": "false",
+					"cacheReady": true,
+					"metrics": [
+						{
+							"at": 6851.200000047684,
+							"latest": 255,
+							"pending": 1,
+							"position": 255,
+							"rejected": 0,
+							"stage": "replace"
+						},
+						{
+							"at": 11739.100000023842,
+							"latest": 256,
+							"pending": 2,
+							"position": 256,
+							"rejected": 0,
+							"stage": "restore"
+						},
+						{
+							"at": 13304.5,
+							"latest": 257,
+							"pending": 1,
+							"position": 257,
+							"rejected": 0,
+							"stage": "restore"
+						},
+						{
+							"at": 16600.400000035763,
+							"latest": 258,
+							"pending": 0,
+							"position": 258,
+							"rejected": 0,
+							"stage": "replace"
+						},
+						{
+							"at": 17755.80000001192,
+							"latest": 259,
+							"pending": 1,
+							"position": 259,
+							"rejected": 0,
+							"stage": "replace"
+						},
+						{
+							"at": 18788.900000035763,
+							"latest": 260,
+							"pending": 0,
+							"position": 260,
+							"rejected": 0,
+							"stage": "replace"
+						}
+					],
+					"pending": "0",
+					"sourceExact": true
+				},
+				{
+					"busy": "false",
+					"cacheReady": false,
+					"metrics": [
+						{
+							"at": 6851.200000047684,
+							"latest": 255,
+							"pending": 1,
+							"position": 255,
+							"rejected": 0,
+							"stage": "replace"
+						},
+						{
+							"at": 11739.100000023842,
+							"latest": 256,
+							"pending": 2,
+							"position": 256,
+							"rejected": 0,
+							"stage": "restore"
+						},
+						{
+							"at": 13304.5,
+							"latest": 257,
+							"pending": 1,
+							"position": 257,
+							"rejected": 0,
+							"stage": "restore"
+						},
+						{
+							"at": 16600.400000035763,
+							"latest": 258,
+							"pending": 0,
+							"position": 258,
+							"rejected": 0,
+							"stage": "replace"
+						},
+						{
+							"at": 17755.80000001192,
+							"latest": 259,
+							"pending": 1,
+							"position": 259,
+							"rejected": 0,
+							"stage": "replace"
+						},
+						{
+							"at": 18788.900000035763,
+							"latest": 260,
+							"pending": 0,
+							"position": 260,
+							"rejected": 0,
+							"stage": "replace"
+						},
+						{
+							"at": 22213,
+							"latest": 261,
+							"pending": 1,
+							"position": 261,
+							"rejected": 0,
+							"stage": "replace"
+						},
+						{
+							"at": 23461.200000047684,
+							"latest": 262,
+							"pending": 2,
+							"position": 262,
+							"rejected": 0,
+							"stage": "replace"
+						}
+					],
+					"pending": "1",
+					"sourceExact": true
+				}
+			],
+			"medianMs": 45.29999995231629,
+			"p95Ms": 49.40000003576279,
+			"selectionSetup": "Select all occurrences shortcut",
+			"restoration": "Complete original source through public editor boundary; excluded from replacement timing"
+		}
+	],
+	"failures": []
+}

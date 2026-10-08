@@ -1,0 +1,42 @@
+--- a/src/shared/crdt.ts
++++ b/src/shared/crdt.ts
+@@ -143,20 +143,24 @@
+ 		return this.stateGeneration
+ 	}
+ 	static applyTogether(replicas: Replica[], input: Operation[]) {
++		let members = new Set(replicas)
++		if (!members.size) return
++		let operations = input.map(parseOperation)
++		for (let operation of operations) finishSteps(freezeFactSteps(operation, false))
+ 		let commits: (() => void)[] = []
+-		for (let replica of new Set(replicas))
+-			commits.push(replica.prepareApplication(input))
++		for (let replica of members)
++			commits.push(replica.prepareApplication(input, operations))
+ 		for (let commit of commits) commit()
+ 	}
+ 	apply(input: Operation[]) {
+ 		this.prepareApplication(input)()
+ 	}
+-	private prepareApplication(input: Operation[]) {
++	private prepareApplication(input: Operation[], decoded?: Operation[]) {
+ 		let edit =
+ 			this.preparedEdit ??
+ 			this.prepareTerminalCancellation(input) ??
+ 			this.prepareTerminalPeerEdit(input)
+-		let commit = this.prepare(input)
++		let commit = this.prepareOperations(decoded ?? input.map(parseOperation))
+ 		return () => {
+ 			this.preparedEdit = undefined
+ 			commit()
+@@ -392,7 +396,9 @@
+ 		this.prepare(input)
+ 	}
+ 	private prepare(input: Operation[]) {
+-		let operations = input.map(parseOperation)
++		return this.prepareOperations(input.map(parseOperation))
++	}
++	private prepareOperations(operations: Operation[]) {
+ 		this.validateIdentities(operations)
+ 		let facts = new Map<string, VisibilityFact[]>()
+ 		for (let operation of operations) {
