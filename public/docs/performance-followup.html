@@ -546,6 +546,18 @@
 			<code>experiments/worker-session/opened-observe-budget</code>.
 		</p>
 		<p>
+			The worker fixture omitted the app's MessageChannel scheduler. A matched
+			control remained unopened after 20 seconds; reusing that scheduler opened
+			the 1MiB document in 4.4 seconds and reopened it offline in 1.8 seconds.
+			Eight trusted keystrokes reached the server and survived offline
+			reopening. The worker's initial validation used no timers with the native
+			scheduler; the incomplete control used thousands. Initialization still
+			validates and restores the snapshot three times, each costing about
+			1.2–1.3 seconds. This is one corrected fixture comparison, not a
+			production loading result or proof of scheduler channel release. Evidence:
+			<code>experiments/worker-session/cold-open-scheduler</code>.
+		</p>
+		<p>
 			The first cache reuses parsed link tokens when the caret moves through
 			unchanged Markdown. It still assembles each projection; document-title
 			changes invalidate the cache. In an isolated actual Editor, the median
