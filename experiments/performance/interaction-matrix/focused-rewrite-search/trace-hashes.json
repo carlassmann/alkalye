@@ -1,0 +1,17 @@
+[
+	{
+		"trace": "rewrite-find-close-rich-0.trace.json",
+		"bytes": 3204041,
+		"sha256": "fe3e540966bec637de82952d903bc2d1d52a85b39f770ea96ab298c1ce77c6b5"
+	},
+	{
+		"trace": "rewrite-find-next-rich-0.trace.json",
+		"bytes": 4494454,
+		"sha256": "f96addfd5b3ba8c97715b152926e39ae2084a8fd4b85fe91b5dafc5ba795a702"
+	},
+	{
+		"trace": "rewrite-find-rich-0.trace.json",
+		"bytes": 4278971,
+		"sha256": "4db2ff02f318f3ec8a38fc45013d07777d583e8d74298142ea1537b97b6e1bf6"
+	}
+]

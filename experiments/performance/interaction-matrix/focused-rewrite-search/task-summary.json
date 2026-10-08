@@ -1,0 +1,315 @@
+[
+	{
+		"version": "rewrite",
+		"commit": "1b630c80268665f1c7838e584eeb9c6f9f0ad463",
+		"cell": "find-rich",
+		"trial": 0,
+		"status": "complete",
+		"stage": null,
+		"error": null,
+		"gates": {
+			"seedReceipt": true,
+			"editedReceipt": false,
+			"undoReceipt": false
+		},
+		"traceStatus": "complete-window",
+		"initialEnclosingTaskMs": 1.092,
+		"aftermathMaxTaskMs": 2.381,
+		"windowMaxTaskMs": 2.381,
+		"presentationOpportunityMs": 29.861,
+		"layoutUnionMs": 16.553,
+		"paintUnionMs": 9.072,
+		"gcUnionMs": 0.0,
+		"largestTasks": [
+			{
+				"relativeStartMs": 614.393,
+				"durationMs": 2.381
+			},
+			{
+				"relativeStartMs": 447.799,
+				"durationMs": 2.356
+			},
+			{
+				"relativeStartMs": 514.367,
+				"durationMs": 2.284
+			},
+			{
+				"relativeStartMs": 531.034,
+				"durationMs": 2.239
+			},
+			{
+				"relativeStartMs": 1347.636,
+				"durationMs": 2.219
+			}
+		],
+		"eventTiming": [
+			{
+				"duration": 16,
+				"name": "beforeinput",
+				"processingEnd": 1097.199999988079,
+				"processingStart": 1097,
+				"startTime": 1097
+			},
+			{
+				"duration": 16,
+				"name": "input",
+				"processingEnd": 1098,
+				"processingStart": 1097.5,
+				"startTime": 1097.399999976158
+			}
+		]
+	},
+	{
+		"version": "rewrite",
+		"commit": "1b630c80268665f1c7838e584eeb9c6f9f0ad463",
+		"cell": "find-next-rich",
+		"trial": 0,
+		"status": "complete",
+		"stage": null,
+		"error": null,
+		"gates": {
+			"seedReceipt": true,
+			"editedReceipt": false,
+			"undoReceipt": false
+		},
+		"traceStatus": "complete-window",
+		"initialEnclosingTaskMs": 0.435,
+		"aftermathMaxTaskMs": 2.861,
+		"windowMaxTaskMs": 2.861,
+		"presentationOpportunityMs": 16.312,
+		"layoutUnionMs": 13.018,
+		"paintUnionMs": 6.696,
+		"gcUnionMs": 0.0,
+		"largestTasks": [
+			{
+				"relativeStartMs": 1847.48,
+				"durationMs": 2.861
+			},
+			{
+				"relativeStartMs": 0.527,
+				"durationMs": 2.661
+			},
+			{
+				"relativeStartMs": 1213.637,
+				"durationMs": 2.602
+			},
+			{
+				"relativeStartMs": 413.803,
+				"durationMs": 2.454
+			},
+			{
+				"relativeStartMs": 17.526,
+				"durationMs": 2.247
+			}
+		],
+		"eventTiming": [
+			{
+				"duration": 16,
+				"name": "pointerover",
+				"processingEnd": 1234.5,
+				"processingStart": 1234.5,
+				"startTime": 1220.800000011921
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1234.5,
+				"processingStart": 1234.5,
+				"startTime": 1220.800000011921
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1234.5,
+				"processingStart": 1234.5,
+				"startTime": 1220.800000011921
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1234.5,
+				"processingStart": 1234.5,
+				"startTime": 1220.800000011921
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1234.5,
+				"processingStart": 1234.5,
+				"startTime": 1220.800000011921
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1234.5,
+				"processingStart": 1234.5,
+				"startTime": 1220.800000011921
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1234.5,
+				"processingStart": 1234.5,
+				"startTime": 1220.800000011921
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1234.5,
+				"processingStart": 1234.5,
+				"startTime": 1220.800000011921
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1234.5,
+				"processingStart": 1234.5,
+				"startTime": 1220.800000011921
+			},
+			{
+				"duration": 16,
+				"name": "pointerenter",
+				"processingEnd": 1234.5,
+				"processingStart": 1234.5,
+				"startTime": 1220.800000011921
+			},
+			{
+				"duration": 16,
+				"name": "mouseover",
+				"processingEnd": 1234.5,
+				"processingStart": 1234.5,
+				"startTime": 1220.800000011921
+			},
+			{
+				"duration": 16,
+				"name": "pointerdown",
+				"processingEnd": 1235.600000023842,
+				"processingStart": 1235.5,
+				"startTime": 1234.9000000357628
+			},
+			{
+				"duration": 16,
+				"name": "mousedown",
+				"processingEnd": 1235.600000023842,
+				"processingStart": 1235.600000023842,
+				"startTime": 1234.9000000357628
+			},
+			{
+				"duration": 16,
+				"name": "pointerup",
+				"processingEnd": 1236.100000023842,
+				"processingStart": 1236.100000023842,
+				"startTime": 1236
+			},
+			{
+				"duration": 16,
+				"name": "mouseup",
+				"processingEnd": 1236.100000023842,
+				"processingStart": 1236.100000023842,
+				"startTime": 1236
+			},
+			{
+				"duration": 16,
+				"name": "click",
+				"processingEnd": 1238.600000023842,
+				"processingStart": 1236.100000023842,
+				"startTime": 1236
+			}
+		]
+	},
+	{
+		"version": "rewrite",
+		"commit": "1b630c80268665f1c7838e584eeb9c6f9f0ad463",
+		"cell": "find-close-rich",
+		"trial": 0,
+		"status": "complete",
+		"stage": null,
+		"error": null,
+		"gates": {
+			"seedReceipt": true,
+			"editedReceipt": false,
+			"undoReceipt": false
+		},
+		"traceStatus": "complete-window",
+		"initialEnclosingTaskMs": 0.43,
+		"aftermathMaxTaskMs": 2.874,
+		"windowMaxTaskMs": 2.874,
+		"presentationOpportunityMs": 32.297,
+		"layoutUnionMs": 16.295,
+		"paintUnionMs": 2.195,
+		"gcUnionMs": 0.0,
+		"largestTasks": [
+			{
+				"relativeStartMs": 1231.385,
+				"durationMs": 2.874
+			},
+			{
+				"relativeStartMs": 682.175,
+				"durationMs": 2.338
+			},
+			{
+				"relativeStartMs": 313.615,
+				"durationMs": 1.998
+			},
+			{
+				"relativeStartMs": 547.81,
+				"durationMs": 1.952
+			},
+			{
+				"relativeStartMs": 664.884,
+				"durationMs": 1.945
+			}
+		],
+		"eventTiming": [
+			{
+				"duration": 16,
+				"name": "pointerdown",
+				"processingEnd": 1210.4000000357628,
+				"processingStart": 1210.300000011921,
+				"startTime": 1209.5
+			},
+			{
+				"duration": 16,
+				"name": "mousedown",
+				"processingEnd": 1210.4000000357628,
+				"processingStart": 1210.4000000357628,
+				"startTime": 1209.5
+			},
+			{
+				"duration": 16,
+				"name": "pointerup",
+				"processingEnd": 1210.9000000357628,
+				"processingStart": 1210.9000000357628,
+				"startTime": 1210.9000000357628
+			},
+			{
+				"duration": 16,
+				"name": "mouseup",
+				"processingEnd": 1210.9000000357628,
+				"processingStart": 1210.9000000357628,
+				"startTime": 1210.9000000357628
+			},
+			{
+				"duration": 16,
+				"name": "click",
+				"processingEnd": 1212.100000023842,
+				"processingStart": 1210.9000000357628,
+				"startTime": 1210.9000000357628
+			},
+			{
+				"duration": 16,
+				"name": "pointerover",
+				"processingEnd": 1212.2000000476835,
+				"processingStart": 1212.2000000476835,
+				"startTime": 1210.9000000357628
+			},
+			{
+				"duration": 16,
+				"name": "mouseover",
+				"processingEnd": 1212.2000000476835,
+				"processingStart": 1212.2000000476835,
+				"startTime": 1210.9000000357628
+			}
+		]
+	}
+]

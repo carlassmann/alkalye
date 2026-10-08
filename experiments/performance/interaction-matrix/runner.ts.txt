@@ -138,10 +138,18 @@ function setSelection(version: Version, start: string, end = start) {
 		? `let view=document.querySelector('.cm-content').cmTile.view;view.dispatch({selection:{anchor:${start},head:${end}}});view.focus();`
 		: `let editor=document.querySelector('alkalye-editor');editor.selectRange(${start},${end});editor.source.focus();`
 }
+function currentDocument() {
+	return "(location.pathname.match(/[/]doc[/]([^/]+)/)||[])[1]"
+}
 function findInput(version: Version) {
 	return version.kind === "original"
 		? "input[placeholder='Find...']"
 		: "#find-text"
+}
+function selection(version: Version) {
+	return version.kind === "original"
+		? "({start:document.querySelector('.cm-content').cmTile.view.state.selection.main.from,end:document.querySelector('.cm-content').cmTile.view.state.selection.main.to})"
+		: "({start:document.querySelector('alkalye-editor').source.selectionStart,end:document.querySelector('alkalye-editor').source.selectionEnd})"
 }
 function digest(session: string, expression: string) {
 	return Schema.decodeUnknownSync(Schema.String)(
@@ -270,7 +278,16 @@ function prepare(
 		)
 		if (observed !== fixture.selections)
 			throw Error("Multicursor fixture count differs")
-		if (version.kind === "rewrite") {
+		if (version.kind === "original")
+			wait(
+				session,
+				`document.querySelector('.cm-content').cmTile.view.state.selection.ranges.length===${fixture.selections}`,
+			)
+		else {
+			wait(
+				session,
+				`(${selection(version)}).start===window.interactionBase.indexOf(${token})&&(${selection(version)}).end===window.interactionBase.indexOf(${token})+${fixture.token.length}`,
+			)
 			browser(session, "press", "Control+Shift+l")
 			evaluate(
 				session,
@@ -280,6 +297,16 @@ function prepare(
 		ready = `${length(version)}===window.interactionExpected.length&&${read}===window.interactionExpected`
 	} else if (["find", "find-next", "find-close"].includes(cell.journey)) {
 		if (!fixture.query) throw Error("Find query required")
+		let query = JSON.stringify(fixture.query)
+		evaluate(
+			session,
+			`(()=>{let text=window.interactionBase,query=${query},offsets=[];for(let index=text.indexOf(query);index>=0;index=text.indexOf(query,index+query.length))offsets.push(index);if(!offsets.length)throw Error('Query has no exact occurrence');window.interactionQueryCount=offsets.length;return true})()`,
+		)
+		let matchesReady =
+			version.kind === "original"
+				? "document.querySelector('.cm-searchMatch')!==null"
+				: "!!(document.querySelector('.search-match')||CSS.highlights?.get('alkalye-search')?.size)&&document.querySelector('.find-count')?.textContent.endsWith(' of '+window.interactionQueryCount)"
+		let queryReady = `document.querySelector(${JSON.stringify(findInput(version))})?.value===${query}&&(${matchesReady})`
 		evaluate(session, `(()=>{${setSelection(version, "0")}return true})()`)
 		browser(
 			session,
@@ -296,29 +323,30 @@ function prepare(
 			findInput(version),
 			cell.journey === "find" ? "" : fixture.query,
 		)
-		if (cell.journey === "find") {
-			ready =
-				version.kind === "original"
-					? "document.querySelector('.cm-searchMatch')!==null"
-					: "!!(document.querySelector('.search-match')||CSS.highlights?.get('alkalye-search')?.size)"
-		} else if (cell.journey === "find-close")
-			ready = `!document.querySelector(${JSON.stringify(findInput(version))})?.checkVisibility()`
+		if (cell.journey === "find") ready = queryReady
 		else {
-			wait(
-				session,
-				version.kind === "original"
-					? "document.querySelector('.cm-searchMatch')!==null"
-					: "!!(document.querySelector('.search-match')||CSS.highlights?.get('alkalye-search')?.size)",
-			)
-			let before =
-				version.kind === "original"
-					? "document.querySelector('.cm-content').cmTile.view.state.selection.main.from"
-					: "document.querySelector('alkalye-editor').source.selectionStart"
-			evaluate(session, `window.interactionPriorSelection=${before};true`)
-			ready = `${before}!==window.interactionPriorSelection`
+			wait(session, queryReady)
+			if (cell.journey === "find-close") {
+				evaluate(
+					session,
+					`window.interactionCloseExpected=${selection(version)};true`,
+				)
+				let noMatches =
+					version.kind === "original"
+						? "!document.querySelector('.cm-searchMatch')"
+						: "!document.querySelector('.search-match')&&!CSS.highlights?.get('alkalye-search')?.size"
+				ready = `!document.querySelector(${JSON.stringify(findInput(version))})?.checkVisibility()&&(${selection(version)}).start===window.interactionCloseExpected.start&&(${selection(version)}).end===window.interactionCloseExpected.end&&(${noMatches})`
+			} else {
+				let caret = selection(version)
+				evaluate(
+					session,
+					`(()=>{let caret=${caret},query=${query},text=window.interactionBase,offsets=[];for(let index=text.indexOf(query);index>=0;index=text.indexOf(query,index+query.length))offsets.push(index);let target=offsets.find(index=>index>=caret.end)??offsets[0];if(target===undefined)throw Error('No next match');window.interactionFindExpected={start:target,end:target+query.length};return true})()`,
+				)
+				ready = `(${caret}).start===window.interactionFindExpected.start&&(${caret}).end===window.interactionFindExpected.end`
+			}
 		}
 	} else if (cell.journey === "switch")
-		ready = `${length(version)}===window.interactionTargetCharacters`
+		ready = `${currentDocument()}===window.interactionTargetDocument&&${length(version)}===window.interactionTargetCharacters&&(${editable(version)})`
 	else {
 		let host =
 			version.kind === "original"
@@ -343,18 +371,20 @@ function act(version: Version, session: string, fixture: Fixture, cell: Cell) {
 		browser(session, "press", "x")
 	else if (cell.journey === "find")
 		browser(session, "keyboard", "inserttext", fixture.query ?? "")
-	else if (cell.journey === "find-next")
-		browser(
-			session,
-			"find",
-			"role",
-			"button",
-			"click",
-			"--name",
-			"Next",
-			"--exact",
-		)
-	else if (cell.journey === "find-close") {
+	else if (cell.journey === "find-next") {
+		if (version.kind === "rewrite") browser(session, "click", "#find-next")
+		else
+			browser(
+				session,
+				"find",
+				"role",
+				"button",
+				"click",
+				"--name",
+				"Next",
+				"--exact",
+			)
+	} else if (cell.journey === "find-close") {
 		if (version.kind === "rewrite") browser(session, "click", "#close-find")
 		else
 			browser(
@@ -403,7 +433,7 @@ async function run(
 		seedReceipt: unknown,
 		editedReceipt: unknown,
 		undoReceipt: unknown
-	let fixtureMetadata: unknown
+	let fixtureMetadata: unknown, targetReceipt: unknown
 	try {
 		let file = await Bun.file(fixture.sourceFile).arrayBuffer(),
 			hash = new Bun.CryptoHasher("sha256").update(file).digest("hex")
@@ -421,7 +451,10 @@ async function run(
 			cell.journey === "poll",
 		)
 		browser(session, "open", version.url + fixture.path)
-		wait(session, `${length(version)}===${text.length}&&(${editable(version)})`)
+		wait(
+			session,
+			`${currentDocument()}===${JSON.stringify(fixture.path.split("/").at(-1))}&&${length(version)}===${text.length}&&(${editable(version)})`,
+		)
 		if (digest(session, source(version)) !== hash)
 			throw Error("Initial complete source hash differs")
 		seedReceipt = await accepted(version, fixture, hash, "seed")
@@ -463,7 +496,7 @@ async function run(
 				)
 			evaluate(
 				session,
-				`window.interactionTargetCharacters=${targetText.length};true`,
+				`window.interactionTargetCharacters=${targetText.length};window.interactionTargetDocument=${JSON.stringify(target.path.split("/").at(-1))};true`,
 			)
 			let id = target.path.split("/").at(-1),
 				selector =
@@ -483,6 +516,10 @@ async function run(
 						? '[aria-label="Documents"]'
 						: '[data-action="library"]',
 				)
+			wait(
+				session,
+				`document.querySelector(${JSON.stringify(selector)})?.checkVisibility()`,
+			)
 		}
 		if (cell.journey === "scroll")
 			browser(session, "mouse", "move", "640", "350")
@@ -526,6 +563,28 @@ async function run(
 				fixture.selections
 		)
 			throw Error("Trusted multicursor replacement range count differs")
+		let caret = Schema.decodeUnknownSync(
+			Schema.Struct({ start: Schema.Number, end: Schema.Number }),
+		)(evaluate(session, selection(version)))
+		if (
+			caret.start < 0 ||
+			caret.end < caret.start ||
+			caret.end > Number(evaluate(session, length(version)))
+		)
+			throw Error("Final source selection is out of bounds")
+		let queryCount = cell.journey.startsWith("find")
+			? evaluate(
+					session,
+					`(()=>{let text=window.interactionBase,query=${JSON.stringify(fixture.query)},count=0;for(let index=text.indexOf(query);index>=0;index=text.indexOf(query,index+query.length))count++;return count})()`,
+				)
+			: undefined
+		observation = {
+			...Schema.decodeUnknownSync(Schema.Record(Schema.String, Schema.Unknown))(
+				observation,
+			),
+			sourceSelection: caret,
+			queryOccurrences: queryCount,
+		}
 		stage = "source-unchanged"
 		if (mutated) {
 			stage = "edit-client-complete"
@@ -551,6 +610,12 @@ async function run(
 				.digest("hex")
 			if (digest(session, source(version)) !== targetHash)
 				throw Error("Switch target complete source differs")
+			targetReceipt = await accepted(
+				version,
+				target,
+				targetHash,
+				"switch-target",
+			)
 		} else if (digest(session, source(version)) !== hash)
 			throw Error("Nonmutating journey changed complete source")
 		results.push({
@@ -562,6 +627,7 @@ async function run(
 			trace,
 			observation,
 			seedReceipt,
+			targetReceipt,
 			editedReceipt,
 			undoReceipt,
 			fixture: fixtureMetadata,
@@ -585,6 +651,7 @@ async function run(
 			trace,
 			observation,
 			seedReceipt,
+			targetReceipt,
 			editedReceipt,
 			undoReceipt,
 			fixture: fixtureMetadata,

@@ -1,6 +1,6 @@
 # Interaction matrix runner
 
-Archived runner/rewrite oracle strict types passed against frozen production 5c5b6aa. One real 2 KiB middle-input cell passed trusted input, exact client save, independent server receipt, native-platform Undo and server receipt. All other cells remain unrun; original SDK oracle stays archived. This directory changes no production code.
+Archived runner/rewrite oracle strict types passed against frozen production 5c5b6aa. One real 2 KiB middle-input cell passed trusted input, exact client save, independent server receipt, native-platform Undo and server receipt. Current rewrite `1b630c8` additionally passed strict types, public fixture seed/readback and the three 128 KiB search cells once each; see `focused-rewrite-search`. Switch/multicursor and original SDK runtime remain unrun. This directory changes no production code.
 
 The runner reuses `tests/browser-driver.ts`, public editor interfaces and the existing trace machinery. It measures trusted actions in a three-second window, preserves failed stages and blocks dependent cells after an uncertain write or Undo. It records complete source hashes, server acceptance, client save completion and restoration separately. A failed setup produces no interaction timing.
 
@@ -54,7 +54,7 @@ It must return only a JSON receipt with `sha256`, `characters` and, where availa
 4. `summarize.py` passed the small trace; preserve incomplete windows and failed cells.
 5. Grant an exclusive CPU window before any measured matrix. Keep setup and sampled diagnostics separate.
 
-The current production evidence is narrower: older full-app native traces cover rich-128 KiB middle and 1 MiB EOF; older search/switch/multicursor/sync comparisons predate recent cache changes. Recent actual app Undo/Redo proofs cover specific changes, not this complete interaction matrix. Only the small rewrite body cell is passed. Its enclosing task was 3.303 ms; the largest subsequent task was 2.118 ms over the three-second window. This is one small-cell observation, not 120 Hz proof.
+The current production evidence is narrower: older full-app native traces cover rich-128 KiB middle and 1 MiB EOF; older search/switch/multicursor/sync comparisons predate recent cache changes. Recent actual app Undo/Redo proofs cover specific changes, not this complete interaction matrix. The small rewrite body cell and the three current rewrite search cells are passed. This is not a main/rewrite comparison. Its enclosing task was 3.303 ms; the largest subsequent task was 2.118 ms over the three-second window. This is one small-cell observation, not 120 Hz proof.
 
 ## Replay commands
 
@@ -66,3 +66,17 @@ python3 experiments/performance/interaction-matrix/summarize.py /tmp/RESULTS/res
 Promote the archived `.ts.txt` / `.js.txt` files in a copied frozen checkout first; relative imports rely on its existing production modules and browser driver. These runnable copies passed the smoke; archives keep future unverified changes out of production type checks.
 
 The example manifest has no versions and is a schema outline, not a runnable configuration. Populate real frozen versions, private profiles and oracle configuration first. A future full run requires an exclusive CPU window.
+
+## Focused rewrite search smoke
+
+Frozen rewrite `1b630c80268665f1c7838e584eeb9c6f9f0ad463` passed the query, next and close adapters on one exact 131,072-character rich document with 1,298 query occurrences. Each client source hash matched the independent public API receipt before the action; each nonmutating action retained exact source. Query kept caret 0, next selected 65–72, and close preserved caret 0 while hiding the find bar and clearing highlights. The original main was not started.
+
+Complete three-second windows had largest RunTasks of 2.381, 2.861 and 2.874 ms. Initial enclosing tasks were 1.092, 0.435 and 0.430 ms; next/close click handling can occur after the initial pointerdown task. Presentation opportunities were 29.861, 16.312 and 32.297 ms. These are three n1 correctness observations, not a repeated timing comparison, physical 120 Hz or proof of painted completion. No source-allocation or heap claim follows.
+
+The corrected source-only adapters now wait for the queried match/count before capturing close state, verify switch route plus editability before its exact source/server receipt, check primary multicursor selection before selecting all matches, and retain the precise replacement count plus complete edit/Undo receipts. The switch and multicursor changes have strict types but await runtime gates. Multicursor's full rewrite range count is observed only at the public replacement boundary, not claimed as pre-action introspection.
+
+Public rewrite fixture creation uses matching frontmatter/API titles and genuine newlines, preserves assigned IDs before readback, resumes assigned documents without creating duplicates, and leaves a sticky marker after uncertain creation. Original seeding checks the manifest's full Git SHA before importing its frozen Jazz SDK; it remains unexecuted. Main creation/reader and transport isolation require separate runtime proof. Source bytes were generated anew; copied profiles do not reset backend history.
+
+The fixture generator was initially misread from JSON-escaped tool output as emitting literal backslash-newlines. A byte check disproved that; the defect claim was withdrawn before seeding. One setup command used a relative focused-cells path from the old workdir and failed before creation/browser actions; it was corrected to an absolute path. Exact public seeds then passed for rich128, mc512 and mc2048. Only rich search was run. The copied own backend used 4473 and was stopped; no phone or user data was changed. Credentials, profiles and private manifests are excluded. Raw traces remain under `/tmp/alkalye-focused-interaction/results`; committed hashes identify them.
+
+written with gpt-6 in codex

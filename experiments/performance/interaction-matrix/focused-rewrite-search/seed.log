@@ -1,0 +1,3 @@
+{"fixture":"rich128","characters":131072,"exactServerRead":true}
+{"fixture":"mc512","characters":1048585,"exactServerRead":true}
+{"fixture":"mc2048","characters":1048582,"exactServerRead":true}

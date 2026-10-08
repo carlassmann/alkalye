@@ -1,0 +1,42 @@
+{
+	"samples": 1,
+	"cells": [
+		{
+			"name": "find-rich",
+			"journey": "find",
+			"fixture": "rich128"
+		},
+		{
+			"name": "find-next-rich",
+			"journey": "find-next",
+			"fixture": "rich128"
+		},
+		{
+			"name": "find-close-rich",
+			"journey": "find-close",
+			"fixture": "rich128"
+		},
+		{
+			"name": "switch-small-rich",
+			"journey": "switch",
+			"fixture": "small2",
+			"target": "rich128"
+		},
+		{
+			"name": "switch-rich-small",
+			"journey": "switch",
+			"fixture": "rich128",
+			"target": "small2"
+		},
+		{
+			"name": "multicursor-512",
+			"journey": "multicursor",
+			"fixture": "mc512"
+		},
+		{
+			"name": "multicursor-2048",
+			"journey": "multicursor",
+			"fixture": "mc2048"
+		}
+	]
+}

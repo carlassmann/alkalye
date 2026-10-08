@@ -1,0 +1,22 @@
+[
+	{
+		"path": "src/client/source-textarea.ts",
+		"sha256": "462a7c6793951e3d2898258eb1bf6978915c9fd9d49d2ad852620afb569d171c"
+	},
+	{
+		"path": "src/client/components/find.ts",
+		"sha256": "be2b6d87c196e45471929887be3afa660008ffbe85c8256ae36f6ad4b1cd8aea"
+	},
+	{
+		"path": "dist/app.js",
+		"sha256": "f5f4df9cc9b13c96ec49bb95fc860f3d93e7f42f77ab923cf6b382577c7d64ed"
+	},
+	{
+		"path": "experiments/performance/interaction-matrix/runner.ts",
+		"sha256": "3d9bab57c650b2f60ee69eee7d5b0da40bdf973b67bf2bfb2863957749dcc6a8"
+	},
+	{
+		"path": "experiments/performance/interaction-matrix/seed-rewrite.ts",
+		"sha256": "cd5882369e7c523a8a6a17b5a4e78546c9aa2b38c392c12e3f935c8fe727f07a"
+	}
+]
