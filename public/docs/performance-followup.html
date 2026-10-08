@@ -301,6 +301,23 @@
 			<code>experiments/performance/cooperative-prepare/</code>.
 		</p>
 		<p>
+			A later incremental cancellation cache keeps a validated terminal
+			insertion undo from discarding the whole source. Three matched browser
+			trials per version measured the largest undo task at 180.9 versus 31.5 ms,
+			two frame opportunities at 423.9 versus 267.8 ms, and the accepted
+			checkpoint at 2,266.6 versus 2,056.4 ms. All six trusted journeys passed
+			exact text and strictly newer accepted checkpoints. A separate diagnostic
+			confirmed cache publication on the real undo path. Sampled postjourney
+			Chromium heap was lower, roughly 840 versus 800 MB; this is not a peak
+			memory or allocation measurement. The shortcut retains normal validation,
+			visibility, signature and generation checks. Merged headers, unknown
+			contributions and structural changes use the full path. Sixteen public
+			CRDT contracts cover cancellation chains, Unicode, peer edits, compaction
+			and atomic rejection. The remaining 31.5 ms task and 267.8 ms readiness
+			still exceed the target. Method and samples:
+			<code>experiments/performance/terminal-cancel/</code>.
+		</p>
+		<p>
 			Large-deletion cursor recovery now returns immediately for empty text and
 			uses shared native iterator scans for distant surviving atoms. An actual
 			EditorElement component matrix measured 1 MiB-to-empty updates at 170.6
