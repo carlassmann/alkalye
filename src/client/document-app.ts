@@ -1863,10 +1863,7 @@ function mountApplication() {
 							return
 						undoWaiting.add(selected)
 						selected.tasks.fork(
-							(redo
-								? selected.opened.session.redo()
-								: selected.opened.session.undo()
-							).pipe(
+							undoDocument(selected, redo).pipe(
 								Effect.catchCause(cause =>
 									selection === selected &&
 									(Cause.hasFails(cause) || Cause.hasDies(cause))
@@ -2677,6 +2674,26 @@ function mountApplication() {
 				: ""
 			let presence = element("#presence")
 			if (presence.textContent !== label) presence.textContent = label
+		}
+		function undoDocument(selected: Selection, redo: boolean) {
+			let activeEditor = editor
+			return (
+				redo ? selected.opened.session.redo() : selected.opened.session.undo()
+			).pipe(
+				Effect.tap(() =>
+					Effect.sync(() => {
+						if (
+							!events.signal.aborted &&
+							selection === selected &&
+							mounted === selected &&
+							mode === "edit" &&
+							editor === activeEditor &&
+							activeEditor?.isConnected
+						)
+							refreshSafely()
+					}),
+				),
+			)
 		}
 		function refreshSafely() {
 			try {
@@ -3796,11 +3813,7 @@ function mountApplication() {
 							if (action === "undo" || action === "redo") {
 								if (!writable() || undoWaiting.has(selected)) return
 								undoWaiting.add(selected)
-								return yield* (
-									action === "redo"
-										? selected.opened.session.redo()
-										: selected.opened.session.undo()
-								).pipe(
+								return yield* undoDocument(selected, action === "redo").pipe(
 									Effect.ensuring(
 										Effect.sync(() => undoWaiting.delete(selected)),
 									),
