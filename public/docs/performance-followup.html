@@ -509,6 +509,32 @@
 			<code>experiments/worker-session/opened-native-interruption</code>.
 		</p>
 		<p>
+			A separate native prefix test passed 19 assertions. Six typed characters
+			reached the server before a marked journal write was held. Interrupting
+			the client RPC interrupted that journal await; the recovery textarea
+			retained nine further characters. With later writes deliberately refused,
+			an independent offline worker reopened exactly the saved prefix with zero
+			API requests. Reload protection survived editor and worker disposal. This
+			proves recovery after interruption plus later write refusal, not
+			interruption of a physical IndexedDB transaction or survival of tab death.
+			Evidence: <code>experiments/worker-session/opened-native-prefix</code>.
+		</p>
+		<p>
+			One 1MiB Unicode typing trial used the same worker-opened architecture
+			with observation active. During eight native keystrokes, eight
+			acknowledgements and 25 observation callbacks, every measured main-thread
+			task stayed below 2.314ms. Exact edited source reached the server and
+			reopened offline. The observation callback only counted updates; it did
+			not render the full app or apply remote edits. Browser frame opportunities
+			were 60Hz. Main heap peaked at 96.5MB; worker memory was unmeasured.
+			Initial readiness and the full offline verification method each exceeded a
+			20-second driver wait before completing. That method includes flushing,
+			closing and reopening; its slow stage remains unidentified. Opening and
+			verification delays still block this implementation. This single trial
+			proves neither a comparative speedup nor 120fps. Evidence:
+			<code>experiments/worker-session/opened-observe-budget</code>.
+		</p>
+		<p>
 			The first cache reuses parsed link tokens when the caret moves through
 			unchanged Markdown. It still assembles each projection; document-title
 			changes invalidate the cache. In an isolated actual Editor, the median
