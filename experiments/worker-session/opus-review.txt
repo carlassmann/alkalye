@@ -1,0 +1,47 @@
+The draft is close, but I found 3 blockers. Every point below comes from reading the source against the installed Effect 4 and DocumentSession code; I did not run types or tests.
+
+## Blockers
+
+**1. Open can leak a live session** (`worker-session.ts:73-78`)
+- `Effect.onError` only covers the layer build.
+- If an interrupt lands after the build succeeds but before `opened = …`, the forked scope stays open under `owner`. That leaves IndexedDB, BroadcastChannel and background fibers running, and the session flushes nothing.
+- The next Open then builds a second session on the same database inside the same worker.
+- Fix: do the assignment inside the guarded effect.
+  `buildWithScope(...).pipe(Effect.tap(ctx => Effect.sync(() => { opened = {…} })), Effect.onExit(exit => Exit.isSuccess(exit) ? Effect.void : Scope.close(scope, exit)))`
+
+**2. A failed Close leaves the worker stuck and hits every client call** (`:94-99`)
+- The session finalizer flushes with `Effect.orDie`, and `Scope.close` passes that defect through.
+- After that, `opened` and `handles` are never cleared, so every Open returns `AlreadyOpen`. Only a second Close recovers.
+- The RPC server treats defects as fatal by default (`disableFatalDefects` is false), so it sends a Defect message that fails every in-flight client request.
+- An interrupt observed right after the uninterruptible close also skips the clearing.
+- Fix:
+  - Copy `current`, set `opened = undefined` and `handles.clear()` first, then `Scope.close(...)`.
+  - Add `Effect.catchDefect` that maps to `SessionFailure` with category `"storage"`.
+
+**3. A failed Replace can be applied twice** (`:87-88`)
+- The `saved` failure is ambiguous.
+  - **Rejected, nothing applied:** `RangeError`, oversize and closed paths, where `edit.operation === null`.
+  - **Applied but not saved:** storage failure, where `operation` is set. The edit is already in the replica and queued.
+- Both come back as `SessionFailure`. A client that retries the second case with the same handle duplicates the inserted text.
+- Fix: add reasons `"Rejected"` and `"Unsaved"`. Pick them with `edit.saved.pipe(Effect.mapError(e => edit.operation ? Unsaved : Rejected))`. On `Unsaved` the client calls Flush or Read, never Replace again.
+
+## Checked and fine
+- **Retained stale handle bases are safe.**
+  - `visible()` returns frozen, cached atom arrays.
+  - `prepareReplacements` handles `atoms !== current` by rebuilding the base text, and keeps code-unit offsets per base via `sourceOffsets`.
+  - The removes and anchors are atom ids, so they still merge under peer edits.
+  - `read()` takes `visible` and `text` from the same snapshot.
+- **The session layer gets everything it needs:** journal and EventJournal via `indexedDbJournalLayer`, lifecycle stub, `BackgroundWork` default, `webCryptoLayer`, and HttpClient through the handler layer then `FetchHttpClient`.
+- **Worker APIs match installed Effect:**
+  - `WorkerRunnerPlatform`, `PlatformMessage`, `makePlatform`, `layerProtocolWorker` and `layerProtocolWorkerRunner` signatures.
+  - The `[0]` ready / `[1, msg]` data framing.
+  - `Effect.try` thunk form and `Context.Service.Shape`.
+- **RPC schema is fine.** The worker protocol uses `toCodecJson`, and the range checks live in `prepareReplacements`.
+
+## Non-blocking (cheap)
+- **Graceful shutdown never happens.** The worker runner ignores `[1]` close, and the client setup calls `terminate()` straight away, so session finalizers never run on dispose.
+  - Low risk today, because Replace waits for the save. The only exposure is an interrupted Replace.
+  - Fix: client posts `[1]` before terminating; on `[1]` the runner ends `run` and calls `self.close()`.
+- **Sync blocks everything else.** It holds the `commands` permit for the whole network loop, so Read, Replace and Close wait behind it. Running it outside the permit is safe: it captured the session, and `requireOpen` fails it after Close.
+- **Worker crash restarts quietly.** The client protocol retries the spawn every second, so a crashed worker comes back empty. Later calls get `Closed`, which is correct; tests should assert that rather than expect the session to survive.
+- **Read failure inside Open** leaves the session open while the caller sees an error; a retried Open gets `AlreadyOpen`. Either close the session on that path, or have the client fall back to Read.

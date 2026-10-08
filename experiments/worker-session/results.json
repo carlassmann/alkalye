@@ -1,0 +1,48 @@
+{
+	"status": "passed",
+	"productionAdopted": false,
+	"sourceRevision": "42ace956ef04b21cfc0a7b13388b0687b5321e08",
+	"model": "gpt-6",
+	"harness": "codex",
+	"reviewModel": "claude-opus-5-5",
+	"runtime": "Background Chromium via agent-browser, real worker Effect RPC, native Bun HTTP and IndexedDB",
+	"typeCheck": "Passed outside draft tsconfig after union saved Effect normalization",
+	"assertionCount": 17,
+	"assertions": [
+		"simultaneous browser account acquisitions atomically preserve one recovery key across IndexedDB connections",
+		"browser identity is available before any network authentication",
+		"native browser account login serializes cookie issuance and agrees with server verification",
+		"worker opens real HTTP source into its IndexedDB-backed session",
+		"worker sync pulls independent peer HTTP action",
+		"replacement against stale Unicode source handle preserves peer insertion and persists locally",
+		"independent stale frontmatter replacement preserves prior local edit and peer body",
+		"worker edits converge through native server accepted snapshot",
+		"explicit Close releases session and prevents subsequent read",
+		"same worker reopens exact durable source",
+		"old session handles fail without mutation after reopen",
+		"expired handle rejection leaves source unchanged",
+		"worker saves local edit while HTTP is unavailable",
+		"failed remote sync remains a typed worker boundary failure",
+		"offline Close and reopen preserve durable pending source",
+		"reconnected worker publishes exact offline source and clears pending actions",
+		"independent worker opens existing durable accepted state after scoped close"
+	],
+	"failure": null,
+	"testedOriginalSourcesSha256": {
+		"worker-rpc.ts": "850b9d958d95d15ac3eee697f40e79bf4a22dce06ad8d71417c57a0a11882fd7",
+		"worker-session.ts": "8d91504d3dd9e4e30c86765fcb6fb4af24d67ac8f032546303ed44f74712bc7a",
+		"worker.ts": "cfcd9f3ae3d67d0629f8728f08cfc02dc035b2929b125b37f21645d4ec278eb9",
+		"worker-client.ts": "ce1af1569236c7ed789d32b0d40c8985344c5abf40be67bdb0985527612b66e7",
+		"browser-fixture.ts": "8977c729571ba98db91d2d9149be96894dbb45bebfa38633c62a183db127f8f3",
+		"server.ts": "c344d10dee2804e2d248e90abdfa790a5694ff1bd05728df4b1e37f4604c6d5e"
+	},
+	"artifactChanges": "Imports rewritten from outside symlinks to repository relative paths; server derives entrypoint paths from import.meta.dir and stores built assets in disposable directory. This locator-only adaptation has not been rerun yet.",
+	"unproven": [
+		"Continuous queued typing and editor-local bases",
+		"Permission revocation and complete recovery UI",
+		"Abrupt worker termination before durable acknowledgement",
+		"Interrupted Open/Replace/Close runtime branches",
+		"Input and RPC serialization timings",
+		"Production document-session facade parity"
+	]
+}
