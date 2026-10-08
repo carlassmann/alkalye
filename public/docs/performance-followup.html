@@ -215,14 +215,15 @@
 			261ms. Production retains the existing token representation.
 		</p>
 		<p>
-			Mid-document Undo in the same 1MiB rich fixture remains slow: six trials
-			contain a 203–233ms task. The key handler takes about 0.5ms; the long task
-			starts about 150ms later in the scheduled document refresh. Layout takes
-			about 0.4ms within that task. A separate sampled run passed exact source,
-			caret and server-acceptance checks: its 208ms refresh included 117ms of
-			self time rebuilding visible CRDT atoms and 15ms resolving editor cursor
-			anchors. These are measured bottlenecks, not a timing comparison with the
-			unsampled trials. Terminal Undo improvements do not cover this case.
+			Before the insertion inverse below, mid-document Undo in the same 1MiB
+			rich fixture was slow: six trials contain a 203–233ms task. The key
+			handler takes about 0.5ms; the long task starts about 150ms later in the
+			scheduled document refresh. Layout takes about 0.4ms within that task. A
+			separate sampled run passed exact source, caret and server-acceptance
+			checks: its 208ms refresh included 117ms of self time rebuilding visible
+			CRDT atoms and 15ms resolving editor cursor anchors. These are measured
+			bottlenecks, not a timing comparison with the unsampled trials. Terminal
+			Undo improvements do not cover this case.
 		</p>
 		<p>
 			A guarded inverse of the latest single-character insertion restores its
@@ -233,6 +234,15 @@
 			busy time fell from 1657ms to 1441ms. This remains above 8.33ms;
 			intervening operations and full-source Unicode edits use the existing
 			fallback.
+		</p>
+		<p>
+			A separate CPU-sampled run of the shipped inverse passed exact source,
+			server acceptance, caret and bounded-viewport checks. Its largest Undo
+			task took 23.6ms. Projection rebuilding accounted for 4.2ms of self time,
+			viewport rendering 2.4ms and applying the source change 1.6ms. The
+			previous CRDT rebuild and full cursor-anchor scan were absent from that
+			task. Sampling adds overhead; this is a diagnostic, not a comparison with
+			the 20.4ms unsampled median. Rendering remains above the frame budget.
 		</p>
 		<p>
 			CRLF correctness: the editor now maps Markdown source offsets to the
