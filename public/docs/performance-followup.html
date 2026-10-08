@@ -1601,6 +1601,31 @@
 			<code>experiments/performance/main-current-small-undo-timeline-c922</code
 			>.
 		</p>
+		<p>
+			Three matched pairs on the same production core test refreshing the
+			mounted editor immediately after durable Undo/Redo completes. On the 2KiB
+			document, median completion-to-model assignment falls from 9.9ms to 0.4ms
+			for Undo and from 11.7ms to 0.3ms for Redo. Viewport-render return falls
+			from 11.1ms to 1.5ms and from 12.8ms to 1.3ms respectively. Observer frame
+			opportunities fall from 44.3ms to 26.2ms for Undo and from 44.0ms to
+			24.7ms for Redo; these are not displayed-pixel latency. Exact source,
+			native caret, independent server receipts, loaded-script byte pins, native
+			and menu Undo/Redo all pass. An in-flight disposal removes the editor
+			12.9ms before completion: no stale assignment occurs, callbacks clear, and
+			durable reopening restores the exact source.
+		</p>
+		<p>
+			The later scheduled refresh remains. Median main-task union across each
+			three-second window increases from 79.528ms to 88.919ms for Undo and from
+			76.393ms to 94.905ms for Redo. Maximum tasks remain bounded in these
+			samples: Undo 3.332ms to 3.065ms, Redo 2.852ms to 2.888ms. This improves
+			feedback while doing more aggregate work, not a CPU win. Both arms restore
+			the same backend and browser-profile snapshot before each trial; the
+			candidate changes only the guarded completion refresh. Finite 2KiB scope,
+			three pairs and headless 60Hz do not establish large document or physical
+			120Hz performance. Evidence:
+			<code>experiments/performance/durable-undo-refresh-e7cc</code>.
+		</p>
 		<h2>Cold snapshot storage and worker recovery</h2>
 		<p>
 			A cold 128KiB opening spent 210.409ms restoring the server checkpoint,
