@@ -1,0 +1,100 @@
+import * as Effect from "effect/Effect"
+import * as Schema from "effect/Schema"
+import { browser, evaluate, wait } from "./runtime/tests/browser-driver"
+import { DocumentSnapshotSchema, restoreSnapshot } from "./runtime/src/shared/document-actions"
+
+let origin = process.argv[2]
+if (!origin) throw new Error("Usage: bun two-writers.ts ACTUAL_ORIGIN")
+let root = "/tmp/alkalye-browser-collaboration"
+let source = ("# Collaboration\n\n" + "Coauthor source.\n".repeat(130)).slice(0, 2048)
+let sessions = ["coauthor-owner-" + Date.now(), "coauthor-member-" + Date.now()]
+let read = "document.querySelector('alkalye-editor')?.source.value"
+let durable = "document.querySelector('#save-status')?.dataset.pending==='0' && document.querySelector('#save-status')?.getAttribute('aria-busy')==='false'"
+let configuration = { frozenCommit: "1b630c8", writers: 2, sourceLength: source.length, browser: "background agent-browser", scope: "two real accounts; actual production editor; trusted native keys", serverCapacityClaim: false, physical120HzClaim: false }
+let result: { stage: string; passed: boolean; error: string; configuration: typeof configuration; observations: unknown[] } = { stage: "setup", passed: false, error: "", configuration, observations: [] }
+let accountSchema = Schema.Struct({ subject: Schema.String })
+let string = Schema.decodeUnknownSync(Schema.String)
+async function receipt(document: string) {
+ let owner = sessions[0]
+ if (!owner) throw new Error("Missing owner session")
+ let requestedAt = performance.timeOrigin + performance.now()
+ let raw = evaluate(owner, `fetch('/api/documents/'+${JSON.stringify(document)}+'/snapshot?encoding=compact').then(response=>{if(!response.ok)throw new Error('Snapshot HTTP '+response.status);return response.json()})`)
+ let snapshot = Schema.decodeUnknownSync(DocumentSnapshotSchema)(raw)
+ let replica = await Effect.runPromise(restoreSnapshot(snapshot, "collaboration-oracle"))
+ let content = replica.text(document)
+ return { content, sha256: new Bun.CryptoHasher("sha256").update(content).digest("hex"), position: snapshot.position, requestedAt, receivedAt: performance.timeOrigin + performance.now() }
+}
+try {
+ for (let [index, session] of sessions.entries()) {
+  browser(session, "--profile", root + "/profile-" + session, "open", origin + "/app")
+  wait(session, "document.querySelector('[data-document-app]')!==null")
+  wait(session, "fetch('/api/accounts/session').then(response=>response.ok)")
+  let account = evaluate(session, "fetch('/api/accounts/session').then(response=>response.json())")
+  let ready = Schema.decodeUnknownResult(accountSchema)(account)
+  if (ready._tag === "Failure") {
+   browser(session, "click", '[data-action="sign-in"]')
+   wait(session, "fetch('/api/accounts/session').then(response=>response.json()).then(account=>typeof account.subject==='string')")
+  }
+  evaluate(session, `fetch('/api/accounts/preferences',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({request:'coauthor-name-'+${index},patch:{name:'Writer '+${index}}})}).then(response=>{if(!response.ok)throw new Error('Name HTTP '+response.status);return true})`)
+ }
+ let owner = sessions[0], member = sessions[1]
+ if (!owner || !member) throw new Error("Missing writer sessions")
+ browser(owner, "click", '[data-action="new"]')
+ wait(owner, "document.querySelector('#editor')?.readOnly===false")
+ let path = string(evaluate(owner, "location.pathname"))
+ let document = path.split("/").at(-1)
+ if (!document) throw new Error("Missing document route")
+ browser(owner, "fill", "#editor", source)
+ wait(owner, read + "===" + JSON.stringify(source) + "&&" + durable)
+ let seeded = await receipt(document)
+ if (seeded.content !== source) throw new Error("Initial document not independently accepted")
+ let ownerAccount = Schema.decodeUnknownSync(accountSchema)(evaluate(owner, "fetch('/api/accounts/session').then(response=>response.json())"))
+ let memberAccount = Schema.decodeUnknownSync(accountSchema)(evaluate(member, "fetch('/api/accounts/session').then(response=>response.json())"))
+ if (ownerAccount.subject === memberAccount.subject) throw new Error("Writer accounts are not independent")
+ evaluate(owner, `fetch('/api/workspaces/personal-'+${JSON.stringify(ownerAccount.subject)}+'/members/'+${JSON.stringify(memberAccount.subject)},{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({role:'writer',request:'coauthor-writer'})}).then(response=>{if(!response.ok)throw new Error('Membership HTTP '+response.status);return true})`)
+ browser(member, "open", origin + path)
+ wait(member, read + "===" + JSON.stringify(source) + "&&document.querySelector('#editor')?.readOnly===false")
+ for (let session of sessions) {
+  evaluate(session, "(()=>{let source=document.querySelector('alkalye-editor').source;source.setSelectionRange(source.value.length-2,source.value.length-2);source.focus();return true})()")
+  browser(session, "press", "Shift+ArrowRight")
+ }
+ for (let [index, session] of sessions.entries()) wait(session, `Array.from(document.querySelectorAll('.remote-caret small')).some(node=>node.textContent==='Writer '+${1-index})`)
+ let loaded = Schema.decodeUnknownSync(Schema.Array(Schema.Struct({path:Schema.String,decodedBytes:Schema.Number})))(evaluate(owner,"performance.getEntriesByType('resource').filter(entry=>entry.initiatorType==='script').map(entry=>({path:new URL(entry.name).pathname,decodedBytes:entry.decodedBodySize}))"))
+ let assets = []
+ for (let entry of loaded) {
+  let expected = new Bun.CryptoHasher("sha256").update(await Bun.file(root + "/runtime/dist" + entry.path).arrayBuffer()).digest("hex")
+  let actual = string(evaluate(owner, `fetch(${JSON.stringify(entry.path)},{cache:'no-store'}).then(response=>response.arrayBuffer()).then(bytes=>crypto.subtle.digest('SHA-256',bytes)).then(bytes=>Array.from(new Uint8Array(bytes),value=>value.toString(16).padStart(2,'0')).join(''))`))
+  if (actual !== expected) throw new Error("Frozen loaded asset path content mismatch")
+  assets.push({...entry,sha256:actual})
+ }
+ result.observations.push({assets})
+ result.stage = "native input"
+ for (let session of sessions) evaluate(session, `(()=>{window.__coauthor={events:[],seen:{}};document.addEventListener('beforeinput',event=>{window.__coauthor.events.push({trusted:event.isTrusted,type:event.inputType,time:performance.timeOrigin+performance.now()});performance.mark('coauthor:input')});function observe(){let source=${read};for(let marker of ['1','2'])if(source?.includes(marker)&&!window.__coauthor.seen[marker])requestAnimationFrame(()=>window.__coauthor.seen[marker]=performance.timeOrigin+performance.now());requestAnimationFrame(observe)}requestAnimationFrame(observe);let source=document.querySelector('alkalye-editor').source;source.setSelectionRange(source.value.length,source.value.length);source.focus();return true})()`)
+ browser(owner, "profiler", "start", "--categories", "devtools.timeline,disabled-by-default-devtools.timeline,toplevel,blink.user_timing,v8,disabled-by-default-v8.gc")
+ try {
+  evaluate(owner, "(()=>{window.__coauthor.finished=false;document.addEventListener('beforeinput',()=>{performance.mark('coauthor:start');setTimeout(()=>{performance.mark('coauthor:end');window.__coauthor.finished=true},3000)},{once:true,capture:true});return true})()")
+  browser(owner, "press", "1")
+  browser(member, "press", "2")
+  wait(owner, "window.__coauthor.finished===true")
+ } finally { browser(owner, "profiler", "stop", root + "/two-writers.trace.json") }
+ result.stage = "convergence"
+ for (let session of sessions) wait(session, durable + "&&" + read + ".includes('1')&&" + read + ".includes('2')")
+ let first = string(evaluate(owner, read)), second = string(evaluate(member, read))
+ let final = await receipt(document)
+ if (first !== second || final.content !== first || !first.startsWith(source) || !/^[12]{2}$/.test(first.slice(source.length)) || final.position <= seeded.position) throw new Error("Visible sources/server accepted revision did not converge exactly")
+ let eventSchema = Schema.Struct({events: Schema.Array(Schema.Struct({trusted: Schema.Boolean,type: Schema.String,time: Schema.Number})),seen: Schema.Record(Schema.String,Schema.Number),finished: Schema.optional(Schema.Boolean)})
+ for (let session of sessions) {
+  let events = Schema.decodeUnknownSync(eventSchema)(evaluate(session,"window.__coauthor"))
+  if (events.events.length !== 1 || events.events[0]?.trusted !== true || events.events[0]?.type !== "insertText") throw new Error("Expected one trusted native insertion per real writer")
+ }
+ for (let [index, session] of sessions.entries()) result.observations.push({ writer: index, browser: evaluate(session, "window.__coauthor"), local: evaluate(session, "({pending:document.querySelector('#save-status').dataset.pending,busy:document.querySelector('#save-status').getAttribute('aria-busy'),presence:document.querySelectorAll('.remote-caret').length,heap:performance.memory?.usedJSHeapSize})") })
+ result.observations.push({ accepted: { beforePosition: seeded.position, afterPosition: final.position, sha256: final.sha256, characters: final.content.length, requestStart: final.requestedAt, receiptObserved: final.receivedAt }, sourcePreserved: true, distinctAccounts: true })
+ result.passed = true
+ result.stage = "complete"
+} catch (error) { result.error = error instanceof Error ? error.stack ?? error.message : String(error) }
+finally {
+ for (let session of sessions) try { browser(session, "close") } catch {}
+ await Bun.write(root + "/two-writers-result.json", JSON.stringify(result, null, 2))
+}
+console.log(JSON.stringify({ stage: result.stage, passed: result.passed, error: result.error }))
+if (!result.passed) process.exitCode = 1

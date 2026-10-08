@@ -1,0 +1,183 @@
+{
+	"passed": true,
+	"primaryMainThread": {
+		"trace": "/tmp/alkalye-browser-collaboration/two-writers.trace.json",
+		"sha256": "8608f5fa8e992d480f716cf64dd58fb85065cd305e21fc35257a9daace0af448",
+		"mainThread": [57800, 17735474],
+		"windowMs": 3003.099,
+		"initiatingTaskMs": 2.062,
+		"largestTaskMs": 3.389,
+		"aftermathTaskMs": 3.389,
+		"taskCountOver833": 0,
+		"busyUnionMs": 87.963,
+		"layoutTotalMs": 2.903,
+		"paintTotalMs": 1.409,
+		"majorGcMaxMs": 0,
+		"minorGcMaxMs": 0,
+		"largestTaskBreakdown": {
+			"relativeMs": 76.194,
+			"taskMs": 3.389,
+			"childrenInclusiveNotAdditive": [
+				{
+					"name": "FunctionCall",
+					"durationMs": 2.122,
+					"args": {
+						"data": {
+							"columnNumber": 476,
+							"frame": "63BF16886978797734BA61729BEC0CEC",
+							"functionName": "",
+							"isolate": "1097855901467693882",
+							"lineNumber": 1653,
+							"sampleTraceId": 5028382718532023,
+							"scriptId": "3",
+							"url": "http://127.0.0.1:4487/app.js"
+						}
+					}
+				},
+				{
+					"name": "Layout",
+					"durationMs": 0.173,
+					"args": {
+						"beginData": {
+							"dirtyObjects": 373,
+							"frame": "63BF16886978797734BA61729BEC0CEC",
+							"partialLayout": false,
+							"totalObjects": 804
+						},
+						"endData": {
+							"layoutRoots": [
+								{
+									"depth": 1,
+									"nodeId": 2,
+									"nodeName": "#document",
+									"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Layout",
+					"durationMs": 0.162,
+					"args": {
+						"beginData": {
+							"dirtyObjects": 9,
+							"frame": "63BF16886978797734BA61729BEC0CEC",
+							"partialLayout": false,
+							"totalObjects": 804
+						},
+						"endData": {
+							"layoutRoots": [
+								{
+									"depth": 1,
+									"nodeId": 2,
+									"nodeName": "#document",
+									"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Paint",
+					"durationMs": 0.156,
+					"args": {
+						"data": {
+							"clip": [0, 0, 1280, 0, 1280, 633, 0, 633],
+							"frame": "63BF16886978797734BA61729BEC0CEC",
+							"layerId": 0,
+							"nodeId": 2,
+							"nodeName": "#document"
+						}
+					}
+				},
+				{
+					"name": "Layout",
+					"durationMs": 0.147,
+					"args": {
+						"beginData": {
+							"dirtyObjects": 33,
+							"frame": "63BF16886978797734BA61729BEC0CEC",
+							"partialLayout": false,
+							"totalObjects": 804
+						},
+						"endData": {
+							"layoutRoots": [
+								{
+									"depth": 1,
+									"nodeId": 2,
+									"nodeName": "#document",
+									"quads": [[0, 0, 1280, 0, 1280, 633, 0, 633]]
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "FunctionCall",
+					"durationMs": 0.121,
+					"args": {
+						"data": {
+							"columnNumber": 19508,
+							"frame": "63BF16886978797734BA61729BEC0CEC",
+							"functionName": "",
+							"isolate": "1097855901467693882",
+							"lineNumber": 88,
+							"sampleTraceId": 5028382718531976,
+							"scriptId": "4",
+							"url": "http://127.0.0.1:4487/chunks/document-app-b8c36cwb.js"
+						}
+					}
+				},
+				{
+					"name": "FunctionCall",
+					"durationMs": 0.102,
+					"args": {
+						"data": {
+							"columnNumber": 19263,
+							"frame": "63BF16886978797734BA61729BEC0CEC",
+							"functionName": "ge",
+							"isolate": "1097855901467693882",
+							"lineNumber": 88,
+							"sampleTraceId": 5028382718532022,
+							"scriptId": "4",
+							"url": "http://127.0.0.1:4487/chunks/document-app-b8c36cwb.js"
+						}
+					}
+				},
+				{
+					"name": "Paint",
+					"durationMs": 0.078,
+					"args": {
+						"data": {
+							"clip": [0, 0, 1056, 0, 1056, 3954, 0, 3954],
+							"frame": "63BF16886978797734BA61729BEC0CEC",
+							"layerId": 0,
+							"nodeId": 222,
+							"nodeName": "TEXTAREA id='editor'"
+						}
+					}
+				}
+			]
+		}
+	},
+	"peerSourceNextFrameOpportunities": [
+		{
+			"writer": 0,
+			"observer": 1,
+			"marker": "1",
+			"trustedInputEpochMs": 1791476384526.7002,
+			"observedNextFrameEpochMs": 1791476384593.7,
+			"nextFrameOpportunityMs": 66.999755859375
+		},
+		{
+			"writer": 1,
+			"observer": 0,
+			"marker": "2",
+			"trustedInputEpochMs": 1791476384563.5,
+			"observedNextFrameEpochMs": 1791476384636.2002,
+			"nextFrameOpportunityMs": 72.7001953125
+		}
+	],
+	"scope": "one two-writer pilot; not completed paint, physical refresh rate, sustained capacity or twenty browser clients"
+}

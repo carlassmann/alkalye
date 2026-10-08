@@ -1,0 +1,1 @@
+export default {project:"alkalye-browser-collaboration",commands:{web:{run:"bun experiments/performance/serve-rewrite.ts /tmp/alkalye-browser-collaboration/runtime/dist /tmp/alkalye-browser-collaboration/data 4487",cwd:"/tmp/alkalye-browser-collaboration/runtime",route:false,portless:false}}}

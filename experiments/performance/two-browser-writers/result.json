@@ -1,0 +1,87 @@
+{
+	"stage": "complete",
+	"passed": true,
+	"error": "",
+	"configuration": {
+		"frozenCommit": "1b630c8",
+		"writers": 2,
+		"sourceLength": 2048,
+		"browser": "background agent-browser",
+		"scope": "two real accounts; actual production editor; trusted native keys",
+		"serverCapacityClaim": false,
+		"physical120HzClaim": false
+	},
+	"observations": [
+		{
+			"assets": [
+				{
+					"path": "/app.js",
+					"decodedBytes": 253274,
+					"sha256": "f5f4df9cc9b13c96ec49bb95fc860f3d93e7f42f77ab923cf6b382577c7d64ed"
+				},
+				{
+					"path": "/chunks/document-worker-stats-339x9rb5.js",
+					"decodedBytes": 20324,
+					"sha256": "c7ccb25034156f994f2b83f0c1246dbfa8ce63e83b393da62380994a98e5721b"
+				}
+			]
+		},
+		{
+			"writer": 0,
+			"browser": {
+				"events": [
+					{
+						"time": 1791476384526.7002,
+						"trusted": true,
+						"type": "insertText"
+					}
+				],
+				"finished": true,
+				"seen": {
+					"1": 1791476384553,
+					"2": 1791476384636.2002
+				}
+			},
+			"local": {
+				"busy": "false",
+				"heap": 35744095,
+				"pending": "0",
+				"presence": 1
+			}
+		},
+		{
+			"writer": 1,
+			"browser": {
+				"events": [
+					{
+						"time": 1791476384563.5,
+						"trusted": true,
+						"type": "insertText"
+					}
+				],
+				"seen": {
+					"1": 1791476384593.7,
+					"2": 1791476384593.7
+				}
+			},
+			"local": {
+				"busy": "false",
+				"heap": 27367466,
+				"pending": "0",
+				"presence": 1
+			}
+		},
+		{
+			"accepted": {
+				"beforePosition": 4,
+				"afterPosition": 6,
+				"sha256": "8ac7a009fee772612c8f29d615545311c270e22ab07392a0c11da1a2c83a3cf5",
+				"characters": 2050,
+				"requestStart": 1791476387837.6997,
+				"receiptObserved": 1791476387867.793
+			},
+			"sourcePreserved": true,
+			"distinctAccounts": true
+		}
+	]
+}
