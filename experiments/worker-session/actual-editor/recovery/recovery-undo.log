@@ -1,0 +1,11 @@
+PASS Actual native undo fixture is ready
+PASS Nothing-to-undo outcome unfreezes native input
+PASS Undo resolves deleted own emoji caret to nearest surviving predecessor
+PASS Redo preserves exact local durable source
+PASS Undo retains multicursor selections through resolved candidate adoption
+PASS New same-subject peer edit invalidates old redo
+PASS Undo retains previously merged peer prefix
+PASS Redo keeps previously merged peer prefix and exact local journal
+PASS Native undo delegation reports no failures
+PASS Undo/redo source survives actual worker/native reload
+PASS Undo lifecycle disposes scoped resources

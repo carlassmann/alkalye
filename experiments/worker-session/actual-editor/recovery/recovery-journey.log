@@ -1,0 +1,13 @@
+PASS Small native recovery fixture ready
+PASS Lost completed Undo reply retries exact request once, no second mutation
+PASS Lost reply retains exact local journal
+PASS Selection changed during candidate handoff retries mapping without repeating Undo
+PASS Lost Adopt reply reconciles accepted epoch and unfreezes
+PASS Evicted original receipt rejects old sequence without replay
+PASS Successful recovery gates report no authority failures
+PASS Small native recovery fixture ready
+PASS Uncertain outcome keeps sticky readonly draft despite permission refresh
+PASS Small native recovery fixture ready
+PASS Close during completed Undo reply releases scope without waiting for transport
+PASS Small native recovery fixture ready
+PASS Public queue receipt resolves AppliedUnknown when scope closes after mutation and before reply

@@ -1,0 +1,33 @@
+I found no blockers in the three corrections. This was a read-only source review; nothing was built or run, so the updated runtime is still untested.
+
+**1. Sticky authority failure: holds**
+- `editor.ts:1020-1034`: `failAuthority` sets `authorityFailed`. Both `freezeCommands` (`:1028`) and `setEditable` (`:1033`) include `!authorityFailed`, so they can't re-enable a failed editor. The only other places that write `editable` or `readOnly` are `:298` (init) and `:1043-1044`, and the worker path returns at `:1037` before reaching them.
+- The undo key paths (`:1734`, `:1837`, `:2435`) check `permissionEditable`, but `bindings.ts:99` returns early when `failed`, so that's fine.
+- `bindings.ts:24-31`: dedupes on `failed`, clears `postponedUndo` and `needsAdoption`, and reports through a fork.
+- `editor-queue.ts:370`: `replace` throws on closed, failure or frozen before it changes `source`, `sequence` or `pending`.
+
+**2. Bounded adoption retry: holds**
+- `bindings.ts:76-78`: returns if `failed` or `runningUndo`, and returns before counting an attempt if composing or busy (busy includes dragging, `editor.ts:992`). Composing or dragging therefore doesn't use up attempts.
+- `:85`: fails immediately if the queue is closed or failed.
+- `:86-87`: no more than 3 attempts.
+- `:94`: retries only when `needsAdoption && !failed`.
+- It only calls `queue.merge`, never `queue.undo`, so there is no second undo.
+- Unverified: after a busy return at `:78`, the host has to call `resumeUndo` again. That wiring is outside these files.
+
+**3. Undo receipt publication: holds**
+- `editor-queue.ts:138-150`: the Deferred is completed, then `undoRequests.delete` runs, all inside `Effect.uninterruptible`.
+- `:128-129` and `:362` complete the Deferred, then remove the entry.
+- `:145`: `not-applied` clears `commandFrozen`/`commandOwner` before `Deferred.succeed`, so the queue is unfrozen before the binding's `freezeCommands(false)` runs (`bindings.ts:108`).
+
+**Effect API checks (installed Effect 4)**
+- `Deferred.ts:1649-1650`: `doneUnsafe` returns `false` if already completed. The docs for `fail`, `succeed`, `failCause` and `done` (`:605`, `:1450`, `:811`, `:499`) say the same. So if the finalizer at `editor-queue.ts:93` and the publication block both complete the same Deferred, whichever runs first wins and the other does nothing.
+- `Queue.ts:780-782`: `offerUnsafe` returns `false` once the queue isn't open.
+- `Queue.ts:1446-1452`: `shutdown` clears buffered messages, so commands still queued are only settled by the finalizer's `undoRequests`/`merges`/`pending` loops (`:93-120`). They cover all three kinds.
+- `Effect.uninterruptible`, `ensuring` and `forkScoped` exist (`Effect.ts:14701`, `:13279`, `:17527`).
+- These are from the worktree's `node_modules`. `/tmp/alkalye-worker-editor-undo` has no `node_modules/effect/src` of its own, so I'm assuming it uses the same install.
+
+**Not blockers, for awareness**
+- Interruption can land after `:134-137` returns but before `:138`. The entry is still `sending`, so the finalizer reports `AppliedUnknown` even if the worker actually applied the undo. That answer is conservative but true. Wrap the send and publication in `Effect.uninterruptibleMask` only if you need the exact receipt.
+- `bindings.ts:85`: if `resumeUndo` runs during teardown while adoption is still needed, it reports a spurious `Closed` failure.
+
+Several claude.ai connectors (GitHub, Slack, Notion, etc.) need authorizing in your claude.ai connector settings before they can be used. This review didn't need them.
