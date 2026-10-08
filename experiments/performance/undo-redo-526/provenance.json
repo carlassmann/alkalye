@@ -1,0 +1,44 @@
+{
+	"revision": "52670c02b4138fc0f22646f24d2d383815a7d439",
+	"browserAndBackend": "same frozen52670c0",
+	"fixtureExpectedSha256": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a",
+	"profileSeed": "/tmp/alkalye-production-allocation-oct8/profile-seed",
+	"dataSeed": "/tmp/alkalye-terminal-header/data-seed",
+	"files": [
+		{
+			"path": "/tmp/alkalye-undo-redo-526/runtime/src/shared/crdt.ts",
+			"bytes": 60327,
+			"sha256": "e1dc8399ed4f254afe97af53d93c5d9a113966533eb61f282fed6f083f0b53b5"
+		},
+		{
+			"path": "/tmp/alkalye-undo-redo-526/runtime/src/client/components/editor.ts",
+			"bytes": 77505,
+			"sha256": "d4669c811f7f8b72b87f512646f80e34482bbbb52d11a97027f7452ed4126c27"
+		},
+		{
+			"path": "/tmp/alkalye-undo-redo-526/runtime/dist/app.js",
+			"bytes": 253391,
+			"sha256": "3efce38c7e1da335aaa12be93dd76f15544730289d2cedeaf5bb32ab37cac3ab"
+		},
+		{
+			"path": "/tmp/alkalye-undo-redo-526/diagnostic.ts",
+			"bytes": 7334,
+			"sha256": "25ab3518fc06322942afcbda4911980e71b50c91daa79885d2123d98e4cb7f98"
+		},
+		{
+			"path": "/tmp/alkalye-undo-redo-526/untimed.ts",
+			"bytes": 7921,
+			"sha256": "3dc67ac955051e2c0642efa4c6fe06c65fef33508906aa7868e8fc1ef8e3a117"
+		},
+		{
+			"path": "/tmp/alkalye-undo-redo-526/undo.trace.json",
+			"bytes": 8249669,
+			"sha256": "d6df8255a9829db89a46c5afaa9b0fcb32491e55d92ddb85889ab9105008b52a"
+		},
+		{
+			"path": "/tmp/alkalye-undo-redo-526/redo.trace.json",
+			"bytes": 11864147,
+			"sha256": "d39598abef94370b0b08d44f3b6853632b407a99102003ac68e92ff6cb34117a"
+		}
+	]
+}

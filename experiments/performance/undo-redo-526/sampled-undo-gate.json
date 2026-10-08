@@ -1,0 +1,20 @@
+{
+	"bundleSha": "3efce38c7e1da335aaa12be93dd76f15544730289d2cedeaf5bb32ab37cac3ab",
+	"state": {
+		"accepted": "88841858e1ef1cc2c1db5c35f98912a3175b1c10ed5b0536b523b623dc53212a",
+		"clientHeight": 585,
+		"nativeLength": 1995,
+		"scrollHeight": 565327,
+		"scrollTop": 564742,
+		"selectionEnd": 1048576,
+		"selectionStart": 1048576,
+		"sourceLength": 1048576,
+		"window": {
+			"direction": "ltr",
+			"end": 1048576,
+			"height": 1101.8125,
+			"start": 1046582,
+			"top": 564099.03125
+		}
+	}
+}

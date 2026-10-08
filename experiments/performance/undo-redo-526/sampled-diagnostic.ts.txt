@@ -1,0 +1,59 @@
+import { browser, evaluate } from '/Users/carlassmann/.codex/worktrees/b513/alkalye/tests/browser-driver'
+import { cp, rm } from 'node:fs/promises'
+let root = '/tmp/alkalye-undo-redo-526'
+let seed = '/tmp/alkalye-production-allocation-oct8/profile-seed'
+let session = 'undo-redo-526', observer = session + '-observer'
+let url = 'http://127.0.0.1:4461/app/doc/47522f3e-4811-413b-a36a-51c1225c4246'
+let read = "document.querySelector('alkalye-editor')?.source.value"
+let result: { stage: string; passed: boolean; error: string; state: unknown } = { stage: 'prepare', passed: false, error: '', state: null }
+try {
+ let env = { ...process.env, WORK_STATE_ROOT: root + '/work-state' }, cwd = root + '/serve'
+ Bun.spawnSync(['work', 'down'], { cwd, env })
+ await rm(root + '/data-active', { recursive: true, force: true }); await cp('/tmp/alkalye-terminal-header/data-seed', root + '/data-active', { recursive: true })
+ if (Bun.spawnSync(['work', 'run', 'rewrite'], { cwd, env }).exitCode) throw Error('Server start failed')
+ for (let name of [session, observer]) {
+  let profile = root + '/profile-' + name
+  await rm(profile, { recursive: true, force: true }); await cp(seed, profile, { recursive: true })
+  for (let lock of ['SingletonLock', 'SingletonCookie', 'SingletonSocket', 'Default/Service Worker', 'Default/Cache', 'Default/Code Cache']) await rm(profile + '/' + lock, { recursive: true, force: true })
+  browser(name, '--profile', profile, 'open', 'http://127.0.0.1:4461/changelog')
+ }
+ evaluate(observer, `indexedDB.databases().then(async rows=>{for(let row of rows)if(row.name?.startsWith('alkalye-document-v1:'))await new Promise((resolve,reject)=>{let r=indexedDB.deleteDatabase(row.name);r.onsuccess=()=>resolve(true);r.onerror=()=>reject(r.error)});return true})`)
+ result.stage = 'initial'
+ browser(session, 'open', url); browser(session, 'wait', '--fn', `${read}?.length===1048576&&!document.querySelector('#editor').readOnly`)
+ evaluate(session, `(()=>{let source=document.querySelector('alkalye-editor').source;window.__original=source.value;source.setSelectionRange(source.value.length,source.value.length);source.focus();return true})()`)
+ browser(session, 'wait', '--fn', "document.activeElement?.id==='editor'")
+ browser(session, 'press', 'x'); browser(session, 'wait', '--fn', `${read}===window.__original+'x'&&document.querySelector('#save-status').dataset.pending==='0'&&document.querySelector('#save-status').getAttribute('aria-busy')==='false'`)
+ browser(observer, 'open', url); browser(observer, 'wait', '--fn', `${read}?.length===1048577`)
+ let wanted=new Bun.CryptoHasher('sha256').update(await Bun.file(root+'/runtime/dist/app.js').arrayBuffer()).digest('hex')
+ let actual=evaluate(session,`fetch('/app.js',{cache:'no-store'}).then(r=>r.arrayBuffer()).then(b=>crypto.subtle.digest('SHA-256',b)).then(b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''))`)
+ if(actual!==wanted)throw Error('Browser entry bundle mismatch')
+ async function profile(phase,key){
+  browser(session,'profiler','start','--categories','devtools.timeline,disabled-by-default-devtools.timeline,toplevel,blink.user_timing,v8,disabled-by-default-v8.gc,disabled-by-default-v8.cpu_profiler')
+  evaluate(session,`(()=>{window.__profileEnd=0;document.addEventListener('keydown',()=>{performance.mark('diagnostic:${phase}:start');setTimeout(()=>{performance.mark('diagnostic:${phase}:end');window.__profileEnd=1},3000)},{capture:true,once:true});return true})()`)
+  try{browser(session,'press',key);browser(session,'wait','--fn','window.__profileEnd===1')}finally{browser(session,'profiler','stop',root+'/'+phase+'.trace.json')}
+ }
+ result.stage='undo'
+ await profile('undo','Control+z')
+ browser(session, 'wait', '--fn', `${read}===window.__original&&document.querySelector('#save-status').dataset.pending==='0'&&document.querySelector('#save-status').getAttribute('aria-busy')==='false'`)
+ browser(observer, 'open', url); browser(observer, 'wait', '--fn', `${read}?.length===1048576`)
+ let expected = new Bun.CryptoHasher('sha256').update(await Bun.file('/tmp/alkalye-prod-current-oct8/long1m.txt').arrayBuffer()).digest('hex')
+ let accepted = evaluate(observer, `crypto.subtle.digest('SHA-256',new TextEncoder().encode(${read})).then(b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''))`)
+ if (accepted !== expected) throw Error('Accepted Undo source mismatch')
+ browser(session, 'wait', '--fn', `(()=>{let source=document.querySelector('alkalye-editor').source,host=source.viewport.scrollElement;return source.selectionStart===source.value.length&&source.selectionEnd===source.value.length&&source.viewport.viewport.end===source.projection.text.length&&host.scrollHeight-host.clientHeight-host.scrollTop<host.clientHeight&&document.querySelector('#editor').value.length<32768})()`)
+ result.state = evaluate(session, `(()=>{let source=document.querySelector('alkalye-editor').source,host=source.viewport.scrollElement;return {selectionStart:source.selectionStart,selectionEnd:source.selectionEnd,sourceLength:source.value.length,nativeLength:document.querySelector('#editor').value.length,window:source.viewport.viewport,scrollTop:host.scrollTop,scrollHeight:host.scrollHeight,clientHeight:host.clientHeight,accepted:${JSON.stringify(accepted)}}})()`)
+ await Bun.write(root+'/undo-gate.json',JSON.stringify({bundleSha:actual,state:result.state},null,2))
+ result.stage='redo'
+ await profile('redo','Control+Shift+z')
+ browser(session,'wait','--fn',`${read}===window.__original+'x'&&document.querySelector('#save-status').dataset.pending==='0'&&document.querySelector('#save-status').getAttribute('aria-busy')==='false'`)
+ browser(observer,'open',url);browser(observer,'wait','--fn',`${read}?.length===1048577`)
+ let expectedRedo=new Bun.CryptoHasher('sha256').update(await Bun.file('/tmp/alkalye-prod-current-oct8/long1m.txt').text()+'x').digest('hex')
+ let acceptedRedo=evaluate(observer,`crypto.subtle.digest('SHA-256',new TextEncoder().encode(${read})).then(b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''))`)
+ if(acceptedRedo!==expectedRedo)throw Error('Accepted Redo source mismatch')
+ browser(session,'wait','--fn',`(()=>{let s=document.querySelector('alkalye-editor').source,h=s.viewport.scrollElement;return s.selectionStart===s.value.length&&s.selectionEnd===s.value.length&&s.viewport.viewport.end===s.projection.text.length&&h.scrollHeight-h.clientHeight-h.scrollTop<h.clientHeight&&document.querySelector('#editor').value.length<32768})()`)
+ let redoState=evaluate(session,`(()=>{let s=document.querySelector('alkalye-editor').source,h=s.viewport.scrollElement;return {selectionStart:s.selectionStart,selectionEnd:s.selectionEnd,sourceLength:s.value.length,nativeLength:document.querySelector('#editor').value.length,window:s.viewport.viewport,scrollTop:h.scrollTop,scrollHeight:h.scrollHeight,clientHeight:h.clientHeight,accepted:${JSON.stringify(acceptedRedo)}}})()`)
+ result.state={undo:result.state,redo:redoState,bundleSha:actual}
+ result.passed = true; result.stage = 'complete'
+} catch(error) { result.error=String(error) }
+finally { for(let name of [session,observer])try{browser(name,'close')}catch{};await Bun.write(root+'/gate-results.json',JSON.stringify(result,null,2)) }
+console.log(JSON.stringify(result))
+if(!result.passed)process.exitCode=1
