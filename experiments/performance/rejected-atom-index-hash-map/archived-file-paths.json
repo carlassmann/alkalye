@@ -30,9 +30,12 @@
 		"bytes": 5751
 	},
 	"tests-public.log": {
-		"archived": "tests-public.log.txt",
+		"archived": "tests-public.log.txt.gz",
 		"sha256": "2ee5aa3c4d4c22165bf54e2ab3644392989158f662839e1cc7535c64d42e3178",
-		"bytes": 3077127
+		"bytes": 3077127,
+		"encoding": "gzip",
+		"compressedBytes": 142893,
+		"compressedSha256": "5a9850a294d00eb0070801ca39aa9c66ebb481b3f09a932bd527d66355093df9"
 	},
 	"measured-baseline-crdt.ts.txt": {
 		"archived": "measured-baseline-crdt.ts.txt",

@@ -22,3 +22,5 @@ Opus 5.5 source review found no semantic blocker; explicitly warned about cold i
 written with gpt-6 in codex
 
 Root archive preserves original JSON, source and logs as text. `archived-file-paths.json` maps original paths and exact bytes/hashes; original manifests retain original names.
+
+The large initial failing test log is losslessly compressed. Its original hash and byte count describe the decompressed bytes; the path map also records compressed bytes and hash.
