@@ -8,6 +8,7 @@ import {
 
 let workerSource = await Bun.file("public/sw.js").text()
 let version = 1
+let failShell = false
 let development = Bun.argv.includes("--development")
 let session = "service-worker-" + Date.now()
 let server = Bun.argv.includes("--serve")
@@ -18,6 +19,7 @@ let server = Bun.argv.includes("--serve")
 				let path = url.pathname
 				if (path === "/api/test/version") {
 					version = Number(url.searchParams.get("value"))
+					failShell = url.searchParams.get("fail") === "true"
 					return new Response("ok")
 				}
 				if (path === "/sw.js")
@@ -44,6 +46,8 @@ let server = Bun.argv.includes("--serve")
 							},
 						},
 					)
+				if (failShell && path === "/manifest.webmanifest")
+					return new Response("Unavailable", { status: 503 })
 				if (path.startsWith("/chunks/")) {
 					if (!path.includes(hash()))
 						return new Response("Old build removed", { status: 404 })
@@ -287,6 +291,31 @@ if (server) {
 			true,
 			"A later activation removes the old build once no live tab owns it",
 		)
+		await fetch(new URL("/api/test/version?value=5&fail=true", origin))
+		evaluate(
+			session,
+			`window.failedInstall = false;
+			window.registration.addEventListener("updatefound", () => {
+				let installing = window.registration.installing;
+				installing.addEventListener("statechange", () => {
+					if (installing.state === "redundant") window.failedInstall = true;
+				});
+			}, {once:true});
+			window.registration.update()`,
+		)
+		wait(session, "window.failedInstall === true")
+		assert(
+			evaluate(session, "window.registration.waiting === null"),
+			"An incomplete offline shell cannot become an available update",
+		)
+		browser(session, "set", "offline", "on")
+		browser(session, "reload")
+		wait(session, "window.buildVersion === 4")
+		assert(
+			true,
+			"A failed update preserves the working shell for cold offline reload",
+		)
+		browser(session, "set", "offline", "off")
 	} finally {
 		try {
 			browser(session, "close")
