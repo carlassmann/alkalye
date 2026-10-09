@@ -1,0 +1,72 @@
+[
+	{
+		"arm": "combined",
+		"source": "client/worker-document/worker-editor-basis.ts",
+		"sha256": "fa11ec4ff09406dec6300873a4883d04e21664dc5251a804f03106aaef3275ac"
+	},
+	{
+		"arm": "combined",
+		"source": "client/worker-document/worker-opened-capabilities.ts",
+		"sha256": "834abdd3a085cf5b3a9463bd24ffbd590c3f8672503f4d17981483edf37db004"
+	},
+	{
+		"arm": "combined",
+		"source": "client/worker-document/worker-opened-observation.ts",
+		"sha256": "cb697a5c684020a63ca762af21bffd1fdd701f587763f902f331a5c897e30e17"
+	},
+	{
+		"arm": "combined",
+		"source": "client/worker-document/worker-session.ts",
+		"sha256": "f7a873027e50deb2f42255975f5242016021ec47f6a2b3f643c3263b5520d1da"
+	},
+	{
+		"arm": "combined",
+		"source": "shared/crdt.ts",
+		"sha256": "e61d7819830f0a6ab9adb4ed15b58870c50e912bc4f9564d56ab3379bdb6bc2b"
+	},
+	{
+		"arm": "combined",
+		"source": "shared/document-actions.ts",
+		"sha256": "2cb868e892987a8b0e210fdee585bf293bc0fa6bbcc41dd2b9c3d02211b1ac23"
+	},
+	{
+		"arm": "combined",
+		"source": "shared/document-session.ts",
+		"sha256": "f49813ffb4e8dbcee1dddba26e58207efd464e14fda56d6e9b184f7b3c36420f"
+	},
+	{
+		"arm": "single-proposal",
+		"source": "client/worker-document/worker-editor-basis.ts",
+		"sha256": "fa11ec4ff09406dec6300873a4883d04e21664dc5251a804f03106aaef3275ac"
+	},
+	{
+		"arm": "single-proposal",
+		"source": "client/worker-document/worker-opened-capabilities.ts",
+		"sha256": "834abdd3a085cf5b3a9463bd24ffbd590c3f8672503f4d17981483edf37db004"
+	},
+	{
+		"arm": "single-proposal",
+		"source": "client/worker-document/worker-opened-observation.ts",
+		"sha256": "cb697a5c684020a63ca762af21bffd1fdd701f587763f902f331a5c897e30e17"
+	},
+	{
+		"arm": "single-proposal",
+		"source": "client/worker-document/worker-session.ts",
+		"sha256": "f7a873027e50deb2f42255975f5242016021ec47f6a2b3f643c3263b5520d1da"
+	},
+	{
+		"arm": "single-proposal",
+		"source": "shared/crdt.ts",
+		"sha256": "e61d7819830f0a6ab9adb4ed15b58870c50e912bc4f9564d56ab3379bdb6bc2b"
+	},
+	{
+		"arm": "single-proposal",
+		"source": "shared/document-actions.ts",
+		"sha256": "ce0306e866e2ee931a2d4472f3fc9298fed54c5443e24722eb7cd4b3f2f2eafe"
+	},
+	{
+		"arm": "single-proposal",
+		"source": "shared/document-session.ts",
+		"sha256": "f49813ffb4e8dbcee1dddba26e58207efd464e14fda56d6e9b184f7b3c36420f"
+	}
+]

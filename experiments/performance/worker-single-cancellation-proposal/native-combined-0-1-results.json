@@ -1,0 +1,280 @@
+{
+	"stage": "terminal",
+	"gates": [
+		"native 1 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+	],
+	"cells": [
+		{
+			"phase": "Undo",
+			"count": 1,
+			"probe": {
+				"end": 14057.399999976158,
+				"events": [
+					{
+						"key": "z",
+						"time": 11055.600000023842,
+						"type": "keydown"
+					}
+				],
+				"heapAfter": 23686093,
+				"heapBefore": 43552251,
+				"label": "Undo-1",
+				"localSaved": 12248.899999976158,
+				"ready": 11335.5,
+				"start": 11055.600000023842
+			}
+		},
+		{
+			"phase": "accepted-input-and-Undo",
+			"count": 1,
+			"selectionProbe": {
+				"end": 5155.600000023842,
+				"events": [
+					{
+						"key": "l",
+						"time": 2154,
+						"type": "keydown"
+					}
+				],
+				"heapAfter": 26343224,
+				"heapBefore": 31903751,
+				"label": "selection-1",
+				"localSaved": 2167.600000023842,
+				"ready": 2167.5,
+				"start": 2154
+			},
+			"singleProbe": {
+				"end": 8455.800000011921,
+				"events": [
+					{
+						"key": "x",
+						"time": 5454.100000023842,
+						"type": "keydown"
+					},
+					{
+						"inputType": "insertText",
+						"time": 5454.5,
+						"type": "beforeinput"
+					},
+					{
+						"inputType": "insertText",
+						"time": 5454.899999976158,
+						"type": "input"
+					}
+				],
+				"heapAfter": 42666575,
+				"heapBefore": 26455407,
+				"label": "single-1",
+				"localSaved": 5467.899999976158,
+				"ready": 5467.899999976158,
+				"start": 5454.100000023842
+			},
+			"mergePhases": [
+				{
+					"phase": "Merge:flush-start",
+					"time": 5606.299999952316
+				},
+				{
+					"phase": "Merge:fork-start",
+					"time": 5606.399999976158
+				},
+				{
+					"phase": "Merge:text-start",
+					"time": 5751.099999964237
+				},
+				{
+					"phase": "Merge:visible-start",
+					"time": 5751.099999964237
+				},
+				{
+					"phase": "Merge:visible-done",
+					"time": 5751.099999964237
+				},
+				{
+					"phase": "Merge:map-start",
+					"time": 5751.099999964237
+				},
+				{
+					"phase": "Merge:map-done",
+					"time": 5752.5
+				},
+				{
+					"phase": "Merge:flush-start",
+					"time": 6431.199999988079
+				},
+				{
+					"phase": "Merge:fork-start",
+					"time": 6618.699999988079
+				},
+				{
+					"phase": "Merge:text-start",
+					"time": 6727.099999964237
+				},
+				{
+					"phase": "Merge:visible-start",
+					"time": 6727.199999988079
+				},
+				{
+					"phase": "Merge:visible-done",
+					"time": 6727.199999988079
+				},
+				{
+					"phase": "Merge:map-start",
+					"time": 6727.199999988079
+				},
+				{
+					"phase": "Merge:map-done",
+					"time": 6727.199999988079
+				},
+				{
+					"phase": "Merge:flush-start",
+					"time": 11151.799999952316
+				},
+				{
+					"phase": "Merge:fork-start",
+					"time": 11151.899999976158
+				},
+				{
+					"phase": "Merge:text-start",
+					"time": 11268.399999976158
+				},
+				{
+					"phase": "Merge:visible-start",
+					"time": 11268.399999976158
+				},
+				{
+					"phase": "Merge:visible-done",
+					"time": 11268.399999976158
+				},
+				{
+					"phase": "Merge:map-start",
+					"time": 11268.5
+				},
+				{
+					"phase": "Merge:map-done",
+					"time": 11278.099999964235
+				},
+				{
+					"phase": "Merge:flush-start",
+					"time": 11287.19999998808
+				},
+				{
+					"phase": "Merge:fork-start",
+					"time": 11287.299999952316
+				},
+				{
+					"phase": "Merge:text-start",
+					"time": 11395.5
+				},
+				{
+					"phase": "Merge:visible-start",
+					"time": 11395.5
+				},
+				{
+					"phase": "Merge:visible-done",
+					"time": 11395.5
+				},
+				{
+					"phase": "Merge:map-start",
+					"time": 11395.5
+				},
+				{
+					"phase": "Merge:map-done",
+					"time": 11395.5
+				},
+				{
+					"phase": "Merge:flush-start",
+					"time": 11396.599999964235
+				},
+				{
+					"phase": "Merge:fork-start",
+					"time": 11396.69999998808
+				},
+				{
+					"phase": "Merge:text-start",
+					"time": 11505.5
+				},
+				{
+					"phase": "Merge:visible-start",
+					"time": 11505.5
+				},
+				{
+					"phase": "Merge:visible-done",
+					"time": 11505.5
+				},
+				{
+					"phase": "Merge:map-start",
+					"time": 11505.5
+				},
+				{
+					"phase": "Merge:map-done",
+					"time": 11505.599999964235
+				},
+				{
+					"phase": "Merge:flush-start",
+					"time": 12203.69999998808
+				},
+				{
+					"phase": "Merge:fork-start",
+					"time": 12376.099999964235
+				},
+				{
+					"phase": "Merge:text-start",
+					"time": 12482.19999998808
+				},
+				{
+					"phase": "Merge:visible-start",
+					"time": 12482.19999998808
+				},
+				{
+					"phase": "Merge:visible-done",
+					"time": 12482.19999998808
+				},
+				{
+					"phase": "Merge:map-start",
+					"time": 12482.19999998808
+				},
+				{
+					"phase": "Merge:map-done",
+					"time": 12482.19999998808
+				}
+			],
+			"acceptedObservedMs": 5519.983041000001,
+			"sourceLength": 1048610,
+			"expectedLength": 1048606,
+			"sourceSHA": "d675ebef528946b884a7088f5d3b81d1120f0c5416bce767855f49367af8a1b3",
+			"editedSHA": "9ba37b24c80f5b7049bb81b5fdb909716dd8fcb2477b75b3e61d27a1d94419c5",
+			"after": {
+				"start": 35,
+				"end": 35,
+				"ranges": 1,
+				"secondary": [
+					{
+						"start": 35,
+						"end": 35,
+						"direction": "none"
+					}
+				]
+			},
+			"restored": {
+				"start": 34,
+				"end": 34,
+				"ranges": 1,
+				"secondary": [
+					{
+						"start": 34,
+						"end": 34,
+						"direction": "none"
+					}
+				]
+			}
+		}
+	],
+	"fixture": {
+		"documentId": "7cb37552-8d96-40ce-aa33-3ea76968aed9",
+		"initialLength": 1048610,
+		"editedLength": 1048606,
+		"initialSHA": "d675ebef528946b884a7088f5d3b81d1120f0c5416bce767855f49367af8a1b3",
+		"editedSHA": "9ba37b24c80f5b7049bb81b5fdb909716dd8fcb2477b75b3e61d27a1d94419c5"
+	}
+}

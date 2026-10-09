@@ -1,0 +1,3 @@
+src/shared/document-actions.ts 56ms
+tests/replacement-cache-diagnostic.test.ts 13ms
+tests/document-undo.test.ts 31ms

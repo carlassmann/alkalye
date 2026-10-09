@@ -7,6 +7,7 @@ import * as Context from "effect/Context"
 import * as Layer from "effect/Layer"
 import * as Fiber from "effect/Fiber"
 import * as Exit from "effect/Exit"
+import * as Scope from "effect/Scope"
 import { cliDocumentSessionLayer } from "../src/cli/document-platform"
 import { DocumentSession } from "../src/shared/document-session"
 import type { DocumentTransport } from "../src/shared/document-session"
@@ -147,22 +148,58 @@ test.each(cases)(
 						let expectedUndo = source
 						let expectedRedo = expected
 						if (peer === "scope") {
+							let closedScope = yield* Scope.make()
+							let closedServices = yield* Layer.build(
+								cliDocumentSessionLayer(join(directory, "closed-client"), {
+									document: "document",
+									subject,
+									author: "Closed",
+									transport,
+									cooperativeWork: true,
+								}),
+							).pipe(Scope.provide(closedScope))
+							let closedSession = Context.get(closedServices, DocumentSession)
+							let closedText = closedSession.replica.text("document")
+							yield* Scope.close(closedScope, Exit.void)
+							expect(
+								yield* closedSession.undo().pipe(Effect.flip),
+							).toMatchObject({
+								_tag: "DocumentConflict",
+								message: "This document session is closed",
+							})
+							expect(closedSession.replica.text("document")).toBe(closedText)
+							expect((yield* transport.snapshot("document")).position).toBe(
+								editSnapshot.position,
+							)
 							let canceling = yield* session
 								.undo()
 								.pipe(Effect.forkScoped({ startImmediately: true }))
-							expect(canceling.pollUnsafe()).toBeUndefined()
-							yield* Fiber.interrupt(canceling)
-							expect(Exit.isFailure(yield* Fiber.await(canceling))).toBe(true)
+							let completion = canceling.pollUnsafe()
+							if (completion && Exit.isSuccess(completion)) {
+								yield* session.flush
+								yield* session.sync
+								expect(session.replica.text("document")).toBe(source)
+								expect(
+									(yield* restoreSnapshot(
+										yield* transport.snapshot("document"),
+										"completed-oracle",
+									)).text("document"),
+								).toBe(source)
+								yield* session.redo()
+							} else {
+								expect(completion).toBeUndefined()
+								yield* Fiber.interrupt(canceling)
+								expect(Exit.isFailure(yield* Fiber.await(canceling))).toBe(true)
+								expect(session.replica.text("document")).toBe(expected)
+							}
 							yield* session.flush
 							yield* session.sync
 							expect(session.pending()).toHaveLength(0)
 							expect(session.replica.text("document")).toBe(expected)
-							let canceledSnapshot = yield* transport.snapshot("document")
-							expect(canceledSnapshot.position).toBe(editSnapshot.position)
 							expect(
 								(yield* restoreSnapshot(
-									canceledSnapshot,
-									"interrupted-oracle",
+									yield* transport.snapshot("document"),
+									"scope-oracle",
 								)).text("document"),
 							).toBe(expected)
 						}

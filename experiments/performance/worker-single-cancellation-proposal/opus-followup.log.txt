@@ -1,0 +1,18 @@
+Review only. I made no edits and ran nothing.
+
+**`document-actions.ts`**
+- The single-cancel path builds the same op as the compensating path: same id, kind and value, and the same `Exhausted` failure. `committedAction`'s `semanticChanges` check matches either way. No blocker.
+- The `before.length===0` check is fine. `actionProvenance` only adds before-images for `set` ops, so ordinary actions always pass and odd caller provenance falls back to `protectedRecords`.
+- Nit: in `singleCancellationAction`, the calls to `registerCompensations` (`:568`) and `assertUndoBirth` (`:571`) can never fire once `before` is empty and the op isn't a `set`. You can drop them.
+
+**Test blockers**
+1. **The closed-Scope check proves nothing (`:166`).** The `closed-client` session never wrote anything of its own, so `undo()` likely fails with "Nothing to undo" whether or not the Scope is closed. Assert the actual error ("This document session is closed" from `requireOpen`). Better: make an edit in that session before closing it, so there is something to undo.
+2. **The else branch hides immediate failures (`:177`).** If `pollUnsafe()` returns a Failure, interrupting does nothing, `await` returns that failure and the test passes. So a broken undo looks like a successful interrupt. Require `completion === undefined` before interrupting, and fail on any immediate Failure.
+3. **Interrupt during persist can leak the undo.** `persistUnlocked` (`document-session.ts:337`) can be interrupted between the journal write and `projection.replay`. `onError` then runs `discardPreparedOpen`, but the proposal is already in the journal. The next replay or sync applies it and sends it to the server, even though the fiber ended as interrupted. The test only catches this as a flaky failure at `:185`. Fix: make the write and replay one uninterruptible step, or prepare-through-persist under `uninterruptibleMask`.
+4. **No record of which branch ran.** With no artificial yield, CLI/sqlite may finish undo before the interrupt every time, so the interrupt branch may never run. Add a mark per branch, e.g. `scope:completed` / `scope:interrupted`, so the diagnostics show coverage.
+
+**Minor**
+- Interrupt branch: also check the server snapshot position still equals `editSnapshot.position`. The local check at `:185` covers this only indirectly.
+- Completed branch: Redo isn't checked against the exact server source until the main Undo/Redo sequence later in the test. Add a server check there if you want the claim to hold at that point.
+
+The rest of the lifecycle looks right: closing the Scope triggers `requireOpen`, local and server stay unchanged, completed Undo goes through flush, sync, server source and Redo, and the env-gated `visible` checks also run for `scope`.

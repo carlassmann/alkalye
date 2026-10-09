@@ -1,0 +1,45 @@
+test("single cancellation preserves baseline schema, identity and header behavior", () =>
+	run(
+		Effect.gen(function* () {
+			let baseline = yield* Effect.promise(
+				() => import("../src/shared/document-actions-baseline"),
+			)
+			for (let source of [
+				"Body 😀",
+				"---\ntitle: Before\n---\nBody 😀",
+				"\ufeff---\r\ntitle: Before\r\n---\r\nBody 😀",
+			]) {
+				let { replica } = yield* setup(source)
+				let edited = source.replace("Before", "After") + "x"
+				let original = yield* accept(
+					replica,
+					yield* buildAction(replica, "doc", "Edit", staged => [
+						staged.edit("doc", edited),
+					]),
+				)
+				let checkpoint = replica.checkpoint()
+				let expected = yield* baseline.undoAction(replica, original)
+				let actual = yield* undoAction(replica, original)
+				expect(replica.checkpoint()).toEqual(checkpoint)
+				expect(actual.changes.map(({ time, ...change }) => change)).toEqual(
+					expected.changes.map(({ time, ...change }) => change),
+				)
+				expect(actual.actor).toBe(expected.actor)
+				expect(actual.guards).toEqual(expected.guards)
+				expect(actual.accessGuards).toEqual(expected.accessGuards)
+				let invalid = yield* undoAction(
+					replica,
+					original,
+					"x".repeat(101),
+				).pipe(Effect.exit)
+				expect(invalid._tag).toBe("Failure")
+				expect(replica.checkpoint()).toEqual(checkpoint)
+				let undone = yield* accept(replica, actual, original)
+				expect(replica.text("doc")).toBe(source)
+				let exhausted = yield* undoAction(replica, original).pipe(Effect.exit)
+				expect(exhausted._tag).toBe("Failure")
+				yield* accept(replica, yield* undoAction(replica, undone), undone)
+				expect(replica.text("doc")).toBe(edited)
+			}
+		}),
+	))

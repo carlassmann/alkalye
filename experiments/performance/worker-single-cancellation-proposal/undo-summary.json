@@ -1,0 +1,130 @@
+[
+	{
+		"arm": "combined",
+		"count": 1,
+		"sourceMs": {
+			"median": 279.0,
+			"max": 279.9
+		},
+		"savedMs": {
+			"median": 1220.1,
+			"max": 1228.1
+		},
+		"mainMax": {
+			"median": 6.167,
+			"max": 6.363
+		},
+		"mainUnion": {
+			"median": 192.436,
+			"max": 207.287
+		},
+		"workerMax": {
+			"median": 16.665,
+			"max": 23.508
+		},
+		"workerUnion": {
+			"median": 983.466,
+			"max": 998.352
+		},
+		"gcSpan": {
+			"median": 9.816,
+			"max": 9.91
+		}
+	},
+	{
+		"arm": "single-proposal",
+		"count": 1,
+		"sourceMs": {
+			"median": 155.2,
+			"max": 157.8
+		},
+		"savedMs": {
+			"median": 870.7,
+			"max": 889.4
+		},
+		"mainMax": {
+			"median": 6.531,
+			"max": 6.592
+		},
+		"mainUnion": {
+			"median": 213.464,
+			"max": 230.755
+		},
+		"workerMax": {
+			"median": 16.694,
+			"max": 16.812
+		},
+		"workerUnion": {
+			"median": 875.166,
+			"max": 887.573
+		},
+		"gcSpan": {
+			"median": 9.509,
+			"max": 10.037
+		}
+	},
+	{
+		"arm": "combined",
+		"count": 512,
+		"sourceMs": {
+			"median": 284.4,
+			"max": 360.3
+		},
+		"savedMs": {
+			"median": 1318.0,
+			"max": 1323.8
+		},
+		"mainMax": {
+			"median": 4.542,
+			"max": 5.193
+		},
+		"mainUnion": {
+			"median": 182.585,
+			"max": 205.618
+		},
+		"workerMax": {
+			"median": 28.716,
+			"max": 29.351
+		},
+		"workerUnion": {
+			"median": 606.999,
+			"max": 683.841
+		},
+		"gcSpan": {
+			"median": 4.315,
+			"max": 4.465
+		}
+	},
+	{
+		"arm": "single-proposal",
+		"count": 512,
+		"sourceMs": {
+			"median": 173.3,
+			"max": 178.9
+		},
+		"savedMs": {
+			"median": 891.8,
+			"max": 894.2
+		},
+		"mainMax": {
+			"median": 4.493,
+			"max": 4.522
+		},
+		"mainUnion": {
+			"median": 227.334,
+			"max": 235.444
+		},
+		"workerMax": {
+			"median": 28.962,
+			"max": 29.261
+		},
+		"workerUnion": {
+			"median": 531.232,
+			"max": 532.126
+		},
+		"gcSpan": {
+			"median": 4.858,
+			"max": 4.998
+		}
+	}
+]

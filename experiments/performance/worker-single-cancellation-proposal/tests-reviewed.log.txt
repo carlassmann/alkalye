@@ -1,0 +1,84 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/document-undo.test.ts:
+(pass) one compensation restores text, frontmatter, comments, assets, drawings and settings without history replay [17.02ms]
+(pass) peer insertion inside cancelled text survives undo and redo [1.00ms]
+(pass) peer deletion inside inserted text remains deleted after cold undo and redo [0.99ms]
+(pass) compensation preserves a peer reply, changed drawing and settings across the complete action [1.12ms]
+(pass) a stale asset compensation rejects atomically; rederivation retains the peer's exact reference and whole manifest [1.43ms]
+(pass) asset tokens compare complete identities rather than matching prefixes [0.75ms]
+(pass) omitted changes, duplicate cancels, unrelated contributions and wrong references fail before any mutation [3.83ms]
+(pass) multiple source operations compensate in reverse order without replacing peer text [0.96ms]
+(pass) register beforeimages use the winning operation, even when repeated field writes are reordered [0.57ms]
+(pass) undo never restores permissions from beforeimages [0.55ms]
+(pass) birth and migrated text reject complete undo without leaking partial register changes [1.66ms]
+(pass) a peer-owned type protects every field of created comments and referenced assets [1.05ms]
+(pass) metadata compensation follows frontmatter while preserving the canonical source marker [0.92ms]
+(pass) explicit permission-only compensation retains exact observed guards while mixed content undo keeps current access [0.42ms]
+(pass) legacy undo guards remain valid when matching and return typed stale failures after independent changes [1.19ms]
+(pass) plain record deletion supports cold undo and redo without mistaking inherited fields for peer changes [0.97ms]
+(pass) redo of record deletion preserves peer edits regardless of the peer's clock relative to the restoration [0.87ms]
+(pass) legacy restoration without record provenance refuses whole mixed compensation [0.75ms]
+(pass) a peer-owned type protects an old restoration without preventing eligible source compensation [0.79ms]
+(pass) prepared offline actions retain whole-document provenance through encoding and cold restore [1.58ms]
+(pass) canonical before-images replace local preparation when a peer changes a register before acceptance [0.54ms]
+(pass) theme text undo and redo retain the document and peer edits [0.63ms]
+(pass) child text cancellation rejects unowned and foreign document records [0.44ms]
+(pass) single cancellation preserves baseline schema, identity and header behavior [4.36ms]
+
+tests/document-register-undo.test.ts:
+(pass) successive setting undos and redos retain their contributors through cold snapshots [2.57ms]
+(pass) an intervening peer write with the same value remains an independent contribution [0.48ms]
+(pass) provisional provenance with the right value but wrong contributor is refused atomically [0.59ms]
+(pass) forged contributor tags require a canonical compensation and cannot change another field [0.42ms]
+(pass) old beforeimages remain compensable without fabricating missing contributor provenance [0.29ms]
+(pass) restoration tags survive compaction, reject forward references and remain immutable [0.16ms]
+(pass) a compensation restoring a pending register also depends on that register's action [0.60ms]
+
+tests/replacement-reconstruction.test.ts:
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: &n T\nalias: *n\n---\nBody TOKEN 😀\n","text":""}) [1.92ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: &n T\nalias: *n\n---\nBody TOKEN 😀\n","text":"🦊é中"}) [1.33ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nx: 1\nalias: *n\n---\nBody TOKEN 😀\n","text":""}) [1.26ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nx: 1\nalias: *n\n---\nBody TOKEN 😀\n","text":"🦊é中"}) [1.47ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"﻿---\r\ntitle: &n T\r\nalias: *n\r\n---\r\nBody TOKEN 😀\r\n","text":""}) [1.27ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"﻿---\r\ntitle: &n T\r\nalias: *n\r\n---\r\nBody TOKEN 😀\r\n","text":"🦊é中"}) [1.25ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: \"Broken\n---\nBody TOKEN 😀\n","text":""}) [2.15ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: \"Broken\n---\nBody TOKEN 😀\n","text":"🦊é中"}) [1.02ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nunclosed: *n\nBody TOKEN 😀\n","text":""}) [0.79ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nunclosed: *n\nBody TOKEN 😀\n","text":"🦊é中"}) [0.77ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"Body TOKEN 😀\n","text":""}) [0.60ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"Body TOKEN 😀\n","text":"🦊é中"}) [0.60ms]
+(pass) root header replacement cancellation always preserves cold alias normalization (---
+anchor: &n T
+alias: *n
+---
+Body
+) [0.62ms]
+(pass) root header replacement cancellation always preserves cold alias normalization (﻿---
+anchor: &n T
+alias: *n
+---
+Body
+) [0.53ms]
+(pass) body replacement inverse preserves concurrent lost-alias normalization [2.36ms]
+
+tests/replacement-cache-diagnostic.test.ts:
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"none"}) [609.10ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"insert"}) [611.75ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"delete"}) [556.61ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"retype"}) [565.64ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"frontmatter"}) [582.21ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"comment"}) [577.03ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"scope"}) [634.65ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"none"}) [623.53ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"insert"}) [791.32ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"delete"}) [929.80ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"retype"}) [747.89ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"frontmatter"}) [751.14ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"comment"}) [723.86ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"scope"}) [806.10ms]
+
+ 60 pass
+ 0 fail
+ 716 expect() calls
+Ran 60 tests across 4 files. [9.63s]

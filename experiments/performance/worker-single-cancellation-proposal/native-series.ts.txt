@@ -1,0 +1,44 @@
+import { cp, rename } from "node:fs/promises"
+import * as Schema from "effect/Schema"
+let root = "/tmp/alkalye-worker-single-cancel-proposal"
+let cwd = root + "/runtime"
+let state = "/tmp/alkalye-worker-single-cancel-proposal-native-work-state"
+let files = ["shared/crdt.ts", "shared/document-actions.ts", "shared/document-session.ts", "client/worker-document/worker-opened-capabilities.ts", "client/worker-document/worker-session.ts", "client/worker-document/worker-opened-observation.ts", "client/worker-document/worker-editor-basis.ts"]
+let resultSchema = Schema.Struct({stage:Schema.String,gates:Schema.Array(Schema.String),failure:Schema.optional(Schema.String)})
+let cells: {arm:string;trial:number;count:number;stage:string;driverPid?:number;code?:number;gates?:readonly string[];failure?:string}[] = []
+async function publish() {await Bun.write(root+"/native-series-progress.json",JSON.stringify(cells,null,2)+"\n")}
+async function work(action:string) {
+ let process = Bun.spawn(["work",action,"native"],{cwd,env:{...Bun.env,WORK_STATE_ROOT:state},stdout:"pipe",stderr:"pipe"})
+ let output=await new Response(process.stdout).text()
+ let error=await new Response(process.stderr).text()
+ let code=await process.exited
+ if(code!==0)throw Error("Scoped process command failed: "+output+error)
+ console.log(output.trim())
+}
+for(let trial=0;trial<3;trial++) {
+ for(let count of [1,512]) {
+  for(let arm of trial%2 ? ["single-proposal","combined"] : ["combined","single-proposal"]) {
+   let closed=root+"/native-"+arm+"-"+trial+"-"+count+"-state"
+   if(await Bun.file(closed+"/stable-copy-"+count+"-created.json").exists())throw Error("Retained state already exists; never repeat")
+   let cell:{arm:string;trial:number;count:number;stage:string;driverPid?:number;code?:number;gates?:readonly string[];failure?:string}={arm,trial,count,stage:"setup"}
+   cells.push(cell);await publish()
+   await cp("/tmp/alkalye-worker-anchor-mapping/native-seeded-snapshot",root+"/native-active",{recursive:true,errorOnExist:true,force:false})
+   await cp(root+"/native-"+arm+"-dist",root+"/native-active/dist",{recursive:true})
+   for(let file of files)await Bun.write(cwd+"/src/"+file,await Bun.file(root+"/"+arm+"-src/"+file).arrayBuffer())
+   try {
+    await work("run")
+    let driver=Bun.spawn(["bun","native-merge-undo.ts"],{cwd,env:{...Bun.env,NATIVE_COUNT:String(count),MAPPING_INCLUDE_BURST:"false"},stdout:Bun.file(root+"/native-"+arm+"-"+trial+"-"+count+".log"),stderr:Bun.file(root+"/native-"+arm+"-"+trial+"-"+count+"-stderr.log")})
+    cell.driverPid=driver.pid;cell.stage="native";await publish();console.log(JSON.stringify(cell))
+    cell.code=await driver.exited
+    let result=Schema.decodeUnknownSync(resultSchema)(await Bun.file(cwd+"/stable-copy-native-results.json").json())
+    await Bun.write(root+"/native-"+arm+"-"+trial+"-"+count+"-results.json",await Bun.file(cwd+"/stable-copy-native-results.json").arrayBuffer())
+    cell.gates=result.gates;cell.failure=result.failure;cell.stage="terminal";await publish()
+    if(cell.code!==0 || result.failure || result.gates.length!==1)throw Error("Native gate failed; retained cell will not repeat")
+   }finally {
+    await work("stop")
+    await rename(root+"/native-active",closed)
+   }
+  }
+ }
+}
+console.log(JSON.stringify({stage:"complete",cells:cells.length}))

@@ -1,0 +1,27 @@
+The candidate keeps the old cancel semantics, but it has one concrete blocker: interruption. The single-cancel undo path never yields, so the two `scope` tests in your intended set fail.
+
+**Blocker (new risk): interruption**
+- Before: undo went through `buildAction` → `replica.forkEffect`, which yields while copying in cooperative mode. That gave the scoped undo fiber a point where it could be interrupted.
+- Now: `singleCancellationAction` (`document-actions.ts:555`) runs entirely synchronously inside `attempt`. In this run, `session.undo()` with `startImmediately` returned already finished (`Exit.Success` carrying the cancel action) before the test could interrupt it.
+- In `tests.log`, `replacement-cache-diagnostic.test.ts:161` fails for `{count:1, peer:"scope"}` and `{count:512, peer:"scope"}`. The other 57 tests pass. I did not run the baseline to confirm these two pass there.
+- That test is the only check on interrupting an undo before commit. With this patch, a single-cancel undo cannot be interrupted before commit.
+- Fix options: put a yield back in the single path (for example `Effect.yieldNow` before or after the attempt when cooperative), or change the test to interrupt at a different point. Either way, decide this on purpose.
+
+**Preserved: matches the old fork + `staged.cancel` path**
+- **Actor, author, clock:** `new Replica(actor, replica.author)` with `clock = replica.clock`, then `create` (clock+1). This gives the same id, clock, actor and author as the old fork with default author followed by `cancel` (`makeOperation(clock+1)`). Only `time` differs (`Date.now()`), and that isn't compared.
+- **Schema quotas and normalization:** same `compactOperation` and `DocumentActionSchema` decode. `id` is the last change, same as before. `guards` and `accessGuards` are both `[]`, because a cancel has field `""`.
+- **Retained provenance, floor and `canCancel`:**
+  - Same check order: BirthRoot, then BelowFloor, then canCancel, then Exhausted, with the same reasons and messages.
+  - `replica.canCancel` gives the same answer as the old `staged.canCancel` on a fresh fork.
+  - The validation `staged.cancel` used to run through `apply` (`validateIdentities`, visibility `prepare`) can't fail here: the id is fresh, its clock is above the target's, and canCancel already covers floor and active. The server's `committedAction` still parses and applies the cancel.
+- **BirthRoot:** the old `protectedRecords` BirthRoot check (`type` `"deleted"` on the root) is skipped. This only holds because `before` is derived solely from `set` changes (`actionProvenance`), so it's empty for a non-set action. That was already true before; it's not new risk.
+- **Permissions:** unchanged. `accessGuards` is empty in both paths, and the "Cancellation requires undoOf" check is unchanged.
+- **Stale actions:** `committedAction` re-derives the expected undo through the same function and compares with `semanticChanges`, so client and server agree. The old "Replica changed while being copied" failure can't happen now because there's no copy. Stale detection through `editGeneration` and guards is unchanged.
+- **Error mapping:** `attempt` passes `UndoUnavailable` through and wraps everything else as `DocumentConflict`, as before.
+
+**Fallback unchanged**
+- Multi-op, `set`/register and empty-text actions return `undefined` and go through the original `buildAction(compensatingChanges)`.
+- The refactor only extracts `assertUndoBirth` and `assertRetainedChange`, with the same order and messages.
+- The `registerCompensations(...).length` guard in the single path is dead code: it is always 0 for one non-set change. It's harmless; you could drop it.
+
+Separately, the claude.ai connectors (GitHub, Slack, Notion and others) need authorizing in the claude.ai connector settings before they can be used; this review didn't need them.

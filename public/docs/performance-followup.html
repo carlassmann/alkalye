@@ -1489,6 +1489,30 @@
 			19.589ms to 20.336ms, so the frame budget remains unmet. Evidence:
 			<code>experiments/performance/open-entry-reuse</code>.
 		</p>
+		<h2>Single cancellation proposals</h2>
+		<p>
+			Undo of one known text contribution now builds a validated cancellation
+			proposal without copying the whole replica. Actions with beforeimages,
+			registers or multiple operations retain the existing compensation path.
+			Schema checks, provenance, migration floors and permission acceptance
+			remain in place.
+		</p>
+		<p>
+			Twelve fresh experimental worker cells compared the same receipt and
+			mapper with only this proposal change. Across three repetitions, median
+			Undo source readiness improved 279→155ms for one range and 284→173ms for
+			512 ranges. Saved observer readiness improved 1220→871ms and 1318→892ms.
+			Every source, range, direction, caret and independent server-acceptance
+			check passed.
+		</p>
+		<p>
+			Worker peaks stayed near 17/29ms; main total work increased. The owned
+			replica copy during Merge remains. These observer opportunities are not
+			physical paint measurements or production-worker parity. A possible
+			pre-existing interruption race after journal persistence remains to be
+			exercised separately. Evidence:
+			<code>experiments/performance/worker-single-cancellation-proposal</code>.
+		</p>
 		<h2>Repeated worker selection mapping comparison</h2>
 		<p>
 			Twelve fresh native cells compared the published replacement receipt alone

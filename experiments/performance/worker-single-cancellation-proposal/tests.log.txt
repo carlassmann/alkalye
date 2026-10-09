@@ -1,0 +1,175 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/document-undo.test.ts:
+(pass) one compensation restores text, frontmatter, comments, assets, drawings and settings without history replay [17.72ms]
+(pass) peer insertion inside cancelled text survives undo and redo [1.02ms]
+(pass) peer deletion inside inserted text remains deleted after cold undo and redo [0.99ms]
+(pass) compensation preserves a peer reply, changed drawing and settings across the complete action [1.13ms]
+(pass) a stale asset compensation rejects atomically; rederivation retains the peer's exact reference and whole manifest [1.42ms]
+(pass) asset tokens compare complete identities rather than matching prefixes [0.76ms]
+(pass) omitted changes, duplicate cancels, unrelated contributions and wrong references fail before any mutation [3.54ms]
+(pass) multiple source operations compensate in reverse order without replacing peer text [0.88ms]
+(pass) register beforeimages use the winning operation, even when repeated field writes are reordered [0.57ms]
+(pass) undo never restores permissions from beforeimages [0.55ms]
+(pass) birth and migrated text reject complete undo without leaking partial register changes [1.63ms]
+(pass) a peer-owned type protects every field of created comments and referenced assets [1.05ms]
+(pass) metadata compensation follows frontmatter while preserving the canonical source marker [0.92ms]
+(pass) explicit permission-only compensation retains exact observed guards while mixed content undo keeps current access [0.42ms]
+(pass) legacy undo guards remain valid when matching and return typed stale failures after independent changes [1.15ms]
+(pass) plain record deletion supports cold undo and redo without mistaking inherited fields for peer changes [0.88ms]
+(pass) redo of record deletion preserves peer edits regardless of the peer's clock relative to the restoration [0.84ms]
+(pass) legacy restoration without record provenance refuses whole mixed compensation [0.71ms]
+(pass) a peer-owned type protects an old restoration without preventing eligible source compensation [0.69ms]
+(pass) prepared offline actions retain whole-document provenance through encoding and cold restore [1.46ms]
+(pass) canonical before-images replace local preparation when a peer changes a register before acceptance [0.57ms]
+(pass) theme text undo and redo retain the document and peer edits [0.60ms]
+(pass) child text cancellation rejects unowned and foreign document records [0.41ms]
+
+tests/document-register-undo.test.ts:
+(pass) successive setting undos and redos retain their contributors through cold snapshots [1.37ms]
+(pass) an intervening peer write with the same value remains an independent contribution [0.44ms]
+(pass) provisional provenance with the right value but wrong contributor is refused atomically [0.56ms]
+(pass) forged contributor tags require a canonical compensation and cannot change another field [0.41ms]
+(pass) old beforeimages remain compensable without fabricating missing contributor provenance [0.35ms]
+(pass) restoration tags survive compaction, reject forward references and remain immutable [0.18ms]
+(pass) a compensation restoring a pending register also depends on that register's action [0.56ms]
+
+tests/replacement-reconstruction.test.ts:
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: &n T\nalias: *n\n---\nBody TOKEN 😀\n","text":""}) [3.71ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: &n T\nalias: *n\n---\nBody TOKEN 😀\n","text":"🦊é中"}) [1.32ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nx: 1\nalias: *n\n---\nBody TOKEN 😀\n","text":""}) [1.26ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nx: 1\nalias: *n\n---\nBody TOKEN 😀\n","text":"🦊é中"}) [1.27ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"﻿---\r\ntitle: &n T\r\nalias: *n\r\n---\r\nBody TOKEN 😀\r\n","text":""}) [1.24ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"﻿---\r\ntitle: &n T\r\nalias: *n\r\n---\r\nBody TOKEN 😀\r\n","text":"🦊é中"}) [1.18ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: \"Broken\n---\nBody TOKEN 😀\n","text":""}) [1.14ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: \"Broken\n---\nBody TOKEN 😀\n","text":"🦊é中"}) [1.09ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nunclosed: *n\nBody TOKEN 😀\n","text":""}) [3.17ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nunclosed: *n\nBody TOKEN 😀\n","text":"🦊é中"}) [0.81ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"Body TOKEN 😀\n","text":""}) [0.52ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"Body TOKEN 😀\n","text":"🦊é中"}) [0.54ms]
+(pass) root header replacement cancellation always preserves cold alias normalization (---
+anchor: &n T
+alias: *n
+---
+Body
+) [0.62ms]
+(pass) root header replacement cancellation always preserves cold alias normalization (﻿---
+anchor: &n T
+alias: *n
+---
+Body
+) [0.52ms]
+(pass) body replacement inverse preserves concurrent lost-alias normalization [2.51ms]
+
+tests/replacement-cache-diagnostic.test.ts:
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"none"}) [598.47ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"insert"}) [608.29ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"delete"}) [593.62ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"retype"}) [598.62ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"frontmatter"}) [589.05ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"comment"}) [564.95ms]
+156 | 						let expectedRedo = expected
+157 | 						if (peer === "scope") {
+158 | 							let canceling = yield* session
+159 | 								.undo()
+160 | 								.pipe(Effect.forkScoped({ startImmediately: true }))
+161 | 							expect(canceling.pollUnsafe()).toBeUndefined()
+      ^
+error: expect(received).toBeUndefined()
+
+Received: {
+  _id: "Exit",
+  _tag: "Success",
+  value: {
+    id: "0000000000000005:replacement-owner-Aig553fcQHpgMpI_HPWP3VTWHrjYHm8iwrhjla9J_Ts",
+    document: "document",
+    actor: "replacement-owner-Aig553fcQHpgMpI_HPWP3VTWHrjYHm8iwrhjla9J_Ts",
+    label: "Undo Type",
+    changes: [
+      {
+        id: "0000000000000005:replacement-owner-Aig553fcQHpgMpI_HPWP3VTWHrjYHm8iwrhjla9J_Ts",
+        clock: 5,
+        actor: "replacement-owner-Aig553fcQHpgMpI_HPWP3VTWHrjYHm8iwrhjla9J_Ts",
+        time: 1791504545906,
+        author: "Writer",
+        target: "document",
+        kind: "cancel",
+        insert: [],
+        remove: [],
+        field: "",
+        value: "0000000000000004:replacement-owner-quo0UkagrMrZ-MqD9gXSupnpHeVWEmVTiPSnP0R1ois",
+      }
+    ],
+    guards: [],
+    accessGuards: [],
+    undoOf: "0000000000000004:replacement-owner-quo0UkagrMrZ-MqD9gXSupnpHeVWEmVTiPSnP0R1ois",
+  },
+}
+
+      at toBeUndefined (unknown:1:1)
+      at /private/tmp/alkalye-worker-single-cancel-proposal/runtime/tests/replacement-cache-diagnostic.test.ts:161:39
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at /Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17
+(fail) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"scope"}) [359.14ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"none"}) [610.81ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"insert"}) [754.51ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"delete"}) [745.66ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"retype"}) [738.81ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"frontmatter"}) [744.30ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"comment"}) [711.77ms]
+156 | 						let expectedRedo = expected
+157 | 						if (peer === "scope") {
+158 | 							let canceling = yield* session
+159 | 								.undo()
+160 | 								.pipe(Effect.forkScoped({ startImmediately: true }))
+161 | 							expect(canceling.pollUnsafe()).toBeUndefined()
+      ^
+error: expect(received).toBeUndefined()
+
+Received: {
+  _id: "Exit",
+  _tag: "Success",
+  value: {
+    id: "0000000000000005:replacement-owner-TaSW9K3LkwEX3Un33fOouGCDf4duawGfDJHS4TB7kNM",
+    document: "document",
+    actor: "replacement-owner-TaSW9K3LkwEX3Un33fOouGCDf4duawGfDJHS4TB7kNM",
+    label: "Undo Type",
+    changes: [
+      {
+        id: "0000000000000005:replacement-owner-TaSW9K3LkwEX3Un33fOouGCDf4duawGfDJHS4TB7kNM",
+        clock: 5,
+        actor: "replacement-owner-TaSW9K3LkwEX3Un33fOouGCDf4duawGfDJHS4TB7kNM",
+        time: 1791504550660,
+        author: "Writer",
+        target: "document",
+        kind: "cancel",
+        insert: [],
+        remove: [],
+        field: "",
+        value: "0000000000000004:replacement-owner--x9AasggIwQqntEfvjmLElWrdWDKuG1GSO9YOEClaM4",
+      }
+    ],
+    guards: [],
+    accessGuards: [],
+    undoOf: "0000000000000004:replacement-owner--x9AasggIwQqntEfvjmLElWrdWDKuG1GSO9YOEClaM4",
+  },
+}
+
+      at toBeUndefined (unknown:1:1)
+      at /private/tmp/alkalye-worker-single-cancel-proposal/runtime/tests/replacement-cache-diagnostic.test.ts:161:39
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at /Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17
+(fail) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"scope"}) [457.13ms]
+
+2 tests failed:
+(fail) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"scope"}) [359.14ms]
+(fail) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"scope"}) [457.13ms]
+
+ 57 pass
+ 2 fail
+ 660 expect() calls
+Ran 59 tests across 4 files. [8.79s]

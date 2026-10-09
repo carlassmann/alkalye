@@ -360,13 +360,23 @@ export function undoAction(
 	action: PreparedAction | CommittedAction,
 	actor = replica.actor,
 ) {
-	return buildAction(
-		replica,
-		action.document,
-		("Undo " + action.label).slice(0, 256),
-		staged => compensatingChanges(replica, action, staged),
-		actor,
-	).pipe(Effect.map(undo => ({ ...undo, undoOf: action.id })))
+	let label = ("Undo " + action.label).slice(0, 256)
+	return attempt(() =>
+		singleCancellationAction(replica, action, actor, label),
+	).pipe(
+		Effect.flatMap(single =>
+			single
+				? Effect.succeed(single)
+				: buildAction(
+						replica,
+						action.document,
+						label,
+						staged => compensatingChanges(replica, action, staged),
+						actor,
+					),
+		),
+		Effect.map(undo => ({ ...undo, undoOf: action.id })),
+	)
 }
 
 export function restoreSnapshot(
@@ -544,11 +554,46 @@ export function committedAction(
 	})
 }
 
-function compensatingChanges(
+function singleCancellationAction(
 	replica: Replica,
 	action: PreparedAction | CommittedAction,
-	staged: Replica,
+	actor: string,
+	label: string,
 ) {
+	let change = action.changes[0]
+	if (
+		action.changes.length !== 1 ||
+		action.before.length !== 0 ||
+		!change ||
+		change.kind === "set" ||
+		(change.kind === "text" &&
+			!change.insert.length &&
+			!change.remove.length) ||
+		registerCompensations(replica, action).length
+	)
+		return undefined
+	assertUndoBirth(action)
+	assertRetainedChange(replica, change)
+	if (!replica.canCancel(change.target, change.id))
+		throw new UndoUnavailable({
+			reason: "Exhausted",
+			message: "No contribution from this action remains eligible for undo",
+		})
+	let proposal = new Replica(actor, replica.author)
+	proposal.clock = replica.clock
+	let inverse = proposal.create(change.target, "cancel")
+	inverse.value = change.id
+	return Schema.decodeUnknownSync(DocumentActionSchema)({
+		id: inverse.id,
+		document: action.document,
+		actor,
+		label,
+		changes: [compactOperation(inverse)],
+		guards: [],
+		accessGuards: [],
+	})
+}
+function assertUndoBirth(action: PreparedAction | CommittedAction) {
 	if (
 		action.before.some(
 			field =>
@@ -561,6 +606,28 @@ function compensatingChanges(
 			reason: "BirthRoot",
 			message: "Undoing document creation requires document deletion",
 		})
+}
+function assertRetainedChange(
+	replica: Replica,
+	change: Pick<Operation, "target" | "id" | "clock">,
+) {
+	if (
+		!replica.hasTextOperation(change.target, change.id) ||
+		change.clock <= replica.textMigrationFloor(change.target)
+	)
+		throw new UndoUnavailable({
+			reason: "BelowFloor",
+			message:
+				"This action lacks retained text provenance; undo is unavailable",
+		})
+}
+
+function compensatingChanges(
+	replica: Replica,
+	action: PreparedAction | CommittedAction,
+	staged: Replica,
+) {
+	assertUndoBirth(action)
 	let changes: Operation[] = []
 	for (let change of [...action.changes].reverse()) {
 		if (
@@ -568,15 +635,7 @@ function compensatingChanges(
 			(change.kind === "text" && !change.insert.length && !change.remove.length)
 		)
 			continue
-		if (
-			!replica.hasTextOperation(change.target, change.id) ||
-			change.clock <= replica.textMigrationFloor(change.target)
-		)
-			throw new UndoUnavailable({
-				reason: "BelowFloor",
-				message:
-					"This action lacks retained text provenance; undo is unavailable",
-			})
+		assertRetainedChange(replica, change)
 		if (staged.canCancel(change.target, change.id))
 			changes.push(staged.cancel(change.target, change.id))
 	}

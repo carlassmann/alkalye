@@ -1,0 +1,37 @@
+started native pid=70660
+{"arm":"combined","trial":0,"count":1,"stage":"native","driverPid":70661}
+stopped alkalye-worker-single-cancel-proposal/main/native
+started native pid=70880
+{"arm":"single-proposal","trial":0,"count":1,"stage":"native","driverPid":70881}
+stopped alkalye-worker-single-cancel-proposal/main/native
+started native pid=71090
+{"arm":"combined","trial":0,"count":512,"stage":"native","driverPid":71091}
+stopped alkalye-worker-single-cancel-proposal/main/native
+started native pid=71364
+{"arm":"single-proposal","trial":0,"count":512,"stage":"native","driverPid":71365}
+stopped alkalye-worker-single-cancel-proposal/main/native
+started native pid=71574
+{"arm":"single-proposal","trial":1,"count":1,"stage":"native","driverPid":71575}
+stopped alkalye-worker-single-cancel-proposal/main/native
+started native pid=71797
+{"arm":"combined","trial":1,"count":1,"stage":"native","driverPid":71798}
+stopped alkalye-worker-single-cancel-proposal/main/native
+started native pid=72012
+{"arm":"single-proposal","trial":1,"count":512,"stage":"native","driverPid":72013}
+stopped alkalye-worker-single-cancel-proposal/main/native
+started native pid=72223
+{"arm":"combined","trial":1,"count":512,"stage":"native","driverPid":72224}
+stopped alkalye-worker-single-cancel-proposal/main/native
+started native pid=72439
+{"arm":"combined","trial":2,"count":1,"stage":"native","driverPid":72440}
+stopped alkalye-worker-single-cancel-proposal/main/native
+started native pid=72646
+{"arm":"single-proposal","trial":2,"count":1,"stage":"native","driverPid":72647}
+stopped alkalye-worker-single-cancel-proposal/main/native
+started native pid=72870
+{"arm":"combined","trial":2,"count":512,"stage":"native","driverPid":72871}
+stopped alkalye-worker-single-cancel-proposal/main/native
+started native pid=73086
+{"arm":"single-proposal","trial":2,"count":512,"stage":"native","driverPid":73087}
+stopped alkalye-worker-single-cancel-proposal/main/native
+{"stage":"complete","cells":12}
