@@ -268,6 +268,60 @@ test("distinct SQLite-backed writers retain remote edits through burst undo, ret
 					expect(peer.pending()).toHaveLength(0)
 					yield* owner.sync
 					expect(owner.replica.text("doc")).toBe(peer.replica.text("doc"))
+					let writers: DocumentSession["Service"][] = [owner, peer]
+					for (let index = 1; index <= 18; index++) {
+						let subject = "writer-" + index
+						yield* asAccount(
+							"owner",
+							[],
+							store.membership(
+								"workspace",
+								subject,
+								"writer",
+								"invite-" + index,
+							),
+						)
+						let context = yield* Layer.build(
+							cliDocumentSessionLayer(directory, {
+								document: "doc",
+								subject,
+								transport: transport(subject),
+								batchTyping: true,
+							}),
+						)
+						writers.push(Context.get(context, DocumentSession))
+					}
+					for (let [index, writer] of writers.entries()) {
+						writer.closeTypingGroup()
+						for (let letter of "[contribution-" + index + "]")
+							writer.edit(writer.replica.text("doc") + letter)
+					}
+					yield* Effect.forEach(writers, writer => writer.sync, {
+						concurrency: "unbounded",
+					})
+					yield* Effect.forEach(writers, writer => writer.sync, {
+						concurrency: "unbounded",
+					})
+					let converged = owner.replica.text("doc")
+					for (let [index, writer] of writers.entries()) {
+						expect(writer.replica.text("doc")).toBe(converged)
+						expect(writer.pending()).toHaveLength(0)
+						expect(
+							converged.split("[contribution-" + index + "]"),
+						).toHaveLength(2)
+					}
+					let accepted = yield* asAccount(
+						"owner",
+						[],
+						store.history("doc", 0, owner.historyCursor().log, 100),
+					)
+					let last = accepted.slice(-20)
+					expect(
+						new Set(last.map(receipt => receipt.action.subject)).size,
+					).toBe(20)
+					expect(last.every(receipt => receipt.action.changes.length > 1)).toBe(
+						true,
+					)
 				}),
 			),
 		)
