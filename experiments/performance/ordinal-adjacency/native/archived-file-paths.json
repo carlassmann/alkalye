@@ -1,0 +1,290 @@
+[
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/README.md",
+		"archive": "experiments/performance/ordinal-adjacency/native/README.md.txt",
+		"bytes": 2857,
+		"sha256": "76e5e83908c093e6558502db7ad03309853016f5cdae2b9d42d3b7613a3a7e63"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/adjacency.patch",
+		"archive": "experiments/performance/ordinal-adjacency/native/adjacency.patch.txt",
+		"bytes": 4464,
+		"sha256": "c7767da81fa2b6c26e63af692dd2abde61851e4e7df647cbf9b627407ac0e8a4"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/build-native-map.log",
+		"archive": "experiments/performance/ordinal-adjacency/native/build-native-map.log.txt",
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/build-ordinal-pages.log",
+		"archive": "experiments/performance/ordinal-adjacency/native/build-ordinal-pages.log.txt",
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/crdt-candidate.ts.txt",
+		"archive": "experiments/performance/ordinal-adjacency/native/crdt-candidate.ts.txt.txt",
+		"bytes": 78514,
+		"sha256": "6bcad274fcac66bf8ec36e0bd06aebd6de569b99879936427204f8d23df78605"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/crdt-control.ts.txt",
+		"archive": "experiments/performance/ordinal-adjacency/native/crdt-control.ts.txt.txt",
+		"bytes": 76683,
+		"sha256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-analysis.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-analysis.json.txt",
+		"bytes": 112122,
+		"sha256": "d631c6de9187d60ebffcf96a3d21eb061a4b52dc7ca0f1b872b959d249e27b56"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-merge-undo.ts.txt",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-merge-undo.ts.txt.txt",
+		"bytes": 18675,
+		"sha256": "48c96d4cb4a9203ea7c0bf0001829736da665b54ca382271c86fc2992629b0c8"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-native-map-children-0-1-results.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-native-map-children-0-1-results.json.txt",
+		"bytes": 6091,
+		"sha256": "6cbabf29b69935fa957bdd5ca929c333977ba8b841c22247a022724c21b183cc"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-native-map-children-0-1-state-stable-copy-native-resources-1.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-native-map-children-0-1-state-stable-copy-native-resources-1.json.txt",
+		"bytes": 5607,
+		"sha256": "327c38165e3408a1326bc2b8d2fa58d1e342cac29ab5e1fe6c68632602851354"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-native-map-children-0-512-results.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-native-map-children-0-512-results.json.txt",
+		"bytes": 118659,
+		"sha256": "f14d3116facb3d9445d6c2fbbd8ec36c5abccc4d509bfd417b7197edfefb35c4"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-native-map-children-0-512-state-stable-copy-native-resources-512.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-native-map-children-0-512-state-stable-copy-native-resources-512.json.txt",
+		"bytes": 5607,
+		"sha256": "9140830316ec2d1ed7f693e87e62fee8635702e6d28d007011a762301d2a0053"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-native-map-children-1-1-results.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-native-map-children-1-1-results.json.txt",
+		"bytes": 6033,
+		"sha256": "4107d1df30310ab91b0d339ede0534fbc174dfd3f85bf3ef1267cd6a9c1136ff"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-native-map-children-1-1-state-stable-copy-native-resources-1.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-native-map-children-1-1-state-stable-copy-native-resources-1.json.txt",
+		"bytes": 5607,
+		"sha256": "ae92007c79cc65c31558dd372ec1e179ca060e70e4add03a0c200b8960a1b60d"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-native-map-children-1-512-results.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-native-map-children-1-512-results.json.txt",
+		"bytes": 118699,
+		"sha256": "fa5f4a3e3cd094208dfc345d4da04a0895968abc93ffd65c91d950cd66e74330"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-native-map-children-1-512-state-stable-copy-native-resources-512.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-native-map-children-1-512-state-stable-copy-native-resources-512.json.txt",
+		"bytes": 5607,
+		"sha256": "229f577d84690cd131b1d1a5852788c022a1b64e336b2ff0f3017e4cd78f002d"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-native-map-children-2-1-results.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-native-map-children-2-1-results.json.txt",
+		"bytes": 6092,
+		"sha256": "65ad2518f5842723efd9668606ecb0a4d99cfa545f104a5028fc7ec3ce075d43"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-native-map-children-2-1-state-stable-copy-native-resources-1.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-native-map-children-2-1-state-stable-copy-native-resources-1.json.txt",
+		"bytes": 5607,
+		"sha256": "aa176df7712f5b63d3d64df03c720e8be7d6c21a582986cdc10160340b319c17"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-native-map-children-2-512-results.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-native-map-children-2-512-results.json.txt",
+		"bytes": 118713,
+		"sha256": "8505bf25220c814b145e556f0aacef814e6063d48af0f2fa1e3a669c506a5ad4"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-native-map-children-2-512-state-stable-copy-native-resources-512.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-native-map-children-2-512-state-stable-copy-native-resources-512.json.txt",
+		"bytes": 5607,
+		"sha256": "327c38165e3408a1326bc2b8d2fa58d1e342cac29ab5e1fe6c68632602851354"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-ordinal-pages-0-1-results.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-ordinal-pages-0-1-results.json.txt",
+		"bytes": 6065,
+		"sha256": "fb26e77884f9599bfd4558f68b30635d48fb421eb346e47c627a276350671457"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-ordinal-pages-0-1-state-stable-copy-native-resources-1.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-ordinal-pages-0-1-state-stable-copy-native-resources-1.json.txt",
+		"bytes": 5607,
+		"sha256": "dc0a39f30734aaaf5447b081867c90c874921a61491c2ded173cf0ac85ea6faa"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-ordinal-pages-0-512-results.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-ordinal-pages-0-512-results.json.txt",
+		"bytes": 118729,
+		"sha256": "25bc73df528ffccb4065fa432e3106de0287488534310ff770da6627c20c1ce4"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-ordinal-pages-0-512-state-stable-copy-native-resources-512.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-ordinal-pages-0-512-state-stable-copy-native-resources-512.json.txt",
+		"bytes": 5607,
+		"sha256": "48a4cadae9b1d0bf205cddcbca8c4680c94a7a43db511123d13644d3ca6d5ee5"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-ordinal-pages-1-1-results.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-ordinal-pages-1-1-results.json.txt",
+		"bytes": 6135,
+		"sha256": "3bed1e8ea1d182c55c24a9e3ca23f7ef9e73860be9cca34c2a6b0ba40c9e0053"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-ordinal-pages-1-1-state-stable-copy-native-resources-1.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-ordinal-pages-1-1-state-stable-copy-native-resources-1.json.txt",
+		"bytes": 5607,
+		"sha256": "a3ca9c063e2ae74660beba3cc4a9c740ba0231f1acb71a6083134e8a93ff3b6e"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-ordinal-pages-1-512-results.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-ordinal-pages-1-512-results.json.txt",
+		"bytes": 118713,
+		"sha256": "0ad1fb1ac7506b5c8fb372b6374058af3369347bd23114381f5090f34dda2e80"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-ordinal-pages-1-512-state-stable-copy-native-resources-512.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-ordinal-pages-1-512-state-stable-copy-native-resources-512.json.txt",
+		"bytes": 5607,
+		"sha256": "8d0c2a2d16e555c91860a785047479caa77c1fb32863f6d57d2a93a0daa95bce"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-ordinal-pages-2-1-results.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-ordinal-pages-2-1-results.json.txt",
+		"bytes": 6128,
+		"sha256": "745fcecd2cd694d6c920aa72c101b8399728115278cc88b1aed1a5c2cd6e8678"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-ordinal-pages-2-1-state-stable-copy-native-resources-1.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-ordinal-pages-2-1-state-stable-copy-native-resources-1.json.txt",
+		"bytes": 5607,
+		"sha256": "91857827a5c18c7d5457f6892a8a12df410cdb16dddfb32fda904c8726e4bc5f"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-ordinal-pages-2-512-results.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-ordinal-pages-2-512-results.json.txt",
+		"bytes": 118653,
+		"sha256": "f30a7ed242f1bbc7a1cc2a22cea71f076994d0968589e9f8867fb72e99786c5f"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-ordinal-pages-2-512-state-stable-copy-native-resources-512.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-ordinal-pages-2-512-state-stable-copy-native-resources-512.json.txt",
+		"bytes": 5607,
+		"sha256": "dc0a39f30734aaaf5447b081867c90c874921a61491c2ded173cf0ac85ea6faa"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-parse.log",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-parse.log.txt",
+		"bytes": 60201,
+		"sha256": "3144041c6e4e31ca7306e464da4ce42abf7f0b37bcd018ea8f54543cf5dc56a2"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-plan.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-plan.json.txt",
+		"bytes": 633,
+		"sha256": "837d1043ec65263fab1870c43ba8f88df9ad09ab6f5372167927150116d05abb"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-series-progress.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-series-progress.json.txt",
+		"bytes": 3147,
+		"sha256": "2b5e4913ec2d9945d7c1b8a9a5ba7753d483cd94567c27a0d141cf05f78e529e"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-series.ts.txt",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-series.ts.txt.txt",
+		"bytes": 3346,
+		"sha256": "242a693ab1f1836274fecba28ef077f5e03d81aae86639e1ad2faa93ffefb7e1"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-setup-no-git-failed-progress.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-setup-no-git-failed-progress.json.txt",
+		"bytes": 99,
+		"sha256": "d4f4ff027823d4d695c3775869146e1b7e4310a09bbe42d9facc2ffbb3799023"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-setup-no-git-failed.log",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-setup-no-git-failed.log.txt",
+		"bytes": 626,
+		"sha256": "a5828793c9d637bcea8d95f28c27c63e4cf3b5672192cbacba6ff83f34aa17dc"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-setup-work-config-failed-progress.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-setup-work-config-failed-progress.json.txt",
+		"bytes": 99,
+		"sha256": "d4f4ff027823d4d695c3775869146e1b7e4310a09bbe42d9facc2ffbb3799023"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-setup-work-config-failed.log",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-setup-work-config-failed.log.txt",
+		"bytes": 626,
+		"sha256": "a5828793c9d637bcea8d95f28c27c63e4cf3b5672192cbacba6ff83f34aa17dc"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-source-pins.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-source-pins.json.txt",
+		"bytes": 1984,
+		"sha256": "b8fb46b4746e669de5e1736e16e742345fc9779761d5276774b4011941a3ff1d"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/native-summary.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/native-summary.json.txt",
+		"bytes": 22851,
+		"sha256": "88869ec9012e2c14c34bb18f41489a57973587cd1c2888cd4c212e152c1bfecd"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/parse-series.py.txt",
+		"archive": "experiments/performance/ordinal-adjacency/native/parse-series.py.txt.txt",
+		"bytes": 3900,
+		"sha256": "5535b917bf41c11256888ff78c609a6f5cd8d18c5dc3353bfd1ce349091b3c15"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/server-native.ts.txt",
+		"archive": "experiments/performance/ordinal-adjacency/native/server-native.ts.txt.txt",
+		"bytes": 573,
+		"sha256": "1b5f86648e03698942ba9f66dc17bda2f4ed902f1ea5c3117dfcc573dbc553af"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/source-pins.json",
+		"archive": "experiments/performance/ordinal-adjacency/native/source-pins.json.txt",
+		"bytes": 518,
+		"sha256": "74e3277e40a2d9884fb595fc401cd13f0843c550bb5aeb44a75341463f72e784"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/summarize-native.py.txt",
+		"archive": "experiments/performance/ordinal-adjacency/native/summarize-native.py.txt.txt",
+		"bytes": 2232,
+		"sha256": "ac63df6c0076cd83094355d06f6f39b1ad746bc6c016c03d0e7a2ab6e4179bde"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/tsconfig.native.json.txt",
+		"archive": "experiments/performance/ordinal-adjacency/native/tsconfig.native.json.txt.txt",
+		"bytes": 165,
+		"sha256": "98949bdbb3b52224576b0ef5bc752459a136081e56808ce03ce27058eaf99765"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-native-prepared/work.config.js.txt",
+		"archive": "experiments/performance/ordinal-adjacency/native/work.config.js.txt.txt",
+		"bytes": 230,
+		"sha256": "f10c7cf3c18105df4637f22a329127edf8b7b1260d4e9fa4fff08c691b119412"
+	}
+]

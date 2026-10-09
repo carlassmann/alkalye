@@ -1,0 +1,182 @@
+[
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/README.md",
+		"archive": "experiments/performance/ordinal-adjacency/cost/README.md.txt",
+		"bytes": 2842,
+		"sha256": "62aa78207b2375b80f2dba1cc44a2bfcb3b7df3b80e4309f265e1bf3d8138b50"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/adjacency.patch",
+		"archive": "experiments/performance/ordinal-adjacency/cost/adjacency.patch.txt",
+		"bytes": 4464,
+		"sha256": "c7767da81fa2b6c26e63af692dd2abde61851e4e7df647cbf9b627407ac0e8a4"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/cost-many-targets-results.json",
+		"archive": "experiments/performance/ordinal-adjacency/cost/cost-many-targets-results.json.txt",
+		"bytes": 16504,
+		"sha256": "f60c0775140c19a0b964a69af1f77a66274c4a7d6e0227e59f45ad383c515b07"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/cost-many-targets-summary.json",
+		"archive": "experiments/performance/ordinal-adjacency/cost/cost-many-targets-summary.json.txt",
+		"bytes": 14000,
+		"sha256": "ce47d6b1c37f4c4a0e3f501be814d4eb3acd00d789adeaca878f6d7df38c1d9a"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/cost-many-targets.log",
+		"archive": "experiments/performance/ordinal-adjacency/cost/cost-many-targets.log.txt",
+		"bytes": 2482,
+		"sha256": "fcb455b735b2a0741ffc8c92bd32d38e2146a7eeacc656448e4f5d3def725ec1"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/cost-many-targets.ts.txt",
+		"archive": "experiments/performance/ordinal-adjacency/cost/cost-many-targets.ts.txt.txt",
+		"bytes": 7877,
+		"sha256": "79f58c2d497014f4718462de96165fdcc154f94718402b0866c3efc5059207f8"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/cost-ordinal.log",
+		"archive": "experiments/performance/ordinal-adjacency/cost/cost-ordinal.log.txt",
+		"bytes": 6381,
+		"sha256": "5f3c09426e6febcb8be8c0358a296c94cd122fe229ece0a6f310eea7b1d5a13b"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/cost-results.json",
+		"archive": "experiments/performance/ordinal-adjacency/cost/cost-results.json.txt",
+		"bytes": 48987,
+		"sha256": "0513ea45c4f6e2806c0a41952791c410c99e38315ec83a04802463e8241e5f00"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/cost-summary.json",
+		"archive": "experiments/performance/ordinal-adjacency/cost/cost-summary.json.txt",
+		"bytes": 41997,
+		"sha256": "d70fc931fbd3378ce5f84bb2c66b8805af16026f02cad27186bcb81f84f7282e"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/crdt-candidate.ts.txt",
+		"archive": "experiments/performance/ordinal-adjacency/cost/crdt-candidate.ts.txt.txt",
+		"bytes": 78514,
+		"sha256": "6bcad274fcac66bf8ec36e0bd06aebd6de569b99879936427204f8d23df78605"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/crdt-control.ts.txt",
+		"archive": "experiments/performance/ordinal-adjacency/cost/crdt-control.ts.txt.txt",
+		"bytes": 76683,
+		"sha256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/fact-index-cost.ts.txt",
+		"archive": "experiments/performance/ordinal-adjacency/cost/fact-index-cost.ts.txt.txt",
+		"bytes": 8928,
+		"sha256": "28c7f1d810cc46a0dff1ebd924c59dfce9e96caf71f576406a5734f56ffe73b9"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/fixture-1000-small-targets-plus-128k-utf16-document.json",
+		"archive": "experiments/performance/ordinal-adjacency/cost/fixture-1000-small-targets-plus-128k-utf16-document.json.txt",
+		"bytes": 263,
+		"sha256": "3d51778872c28a6ab532bb5c24769ca558d7eda089077e180e9797d6d107592a"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/fixture-logical-clock-10000-wrap.json",
+		"archive": "experiments/performance/ordinal-adjacency/cost/fixture-logical-clock-10000-wrap.json.txt",
+		"bytes": 240,
+		"sha256": "fd554ea915ce1e7ac752ac957a2484a9b16d71d476ae767813336740c9bbbfe5"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/fixture-long-one-operation.json",
+		"archive": "experiments/performance/ordinal-adjacency/cost/fixture-long-one-operation.json.txt",
+		"bytes": 237,
+		"sha256": "44f1c5e91c8d333d33b3f6f381cb8142efbdbf1a297fa98b09d19a1fcf3b3eec"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/fixture-sustained-260-and-20-concurrent-writers.json",
+		"archive": "experiments/performance/ordinal-adjacency/cost/fixture-sustained-260-and-20-concurrent-writers.json.txt",
+		"bytes": 257,
+		"sha256": "e7f41d01a9ae0c821dffa9df0a89e085b9658829ed17e996aecdd771986acb4d"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/format-candidate.log",
+		"archive": "experiments/performance/ordinal-adjacency/cost/format-candidate.log.txt",
+		"bytes": 24,
+		"sha256": "15f48aa6b99ec80031e1f481ed20b6e893f519c39c410094fd791e8cbacfd1d8"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/many-targets-pins.json",
+		"archive": "experiments/performance/ordinal-adjacency/cost/many-targets-pins.json.txt",
+		"bytes": 285,
+		"sha256": "8f4724d556d821a28892f1aa49771403127752e555976042713cfa22c4d39ad4"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/many-targets-plan.json",
+		"archive": "experiments/performance/ordinal-adjacency/cost/many-targets-plan.json.txt",
+		"bytes": 525,
+		"sha256": "e155e24c9f05897e97b2cf12a3e5a2bdf2f81d5876ddfa7ab4e1136870ffa8b8"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/opus-review.log",
+		"archive": "experiments/performance/ordinal-adjacency/cost/opus-review.log.txt",
+		"bytes": 3427,
+		"sha256": "b2bc7acdde48d976716ef3cc1b935cccaf7b2dcd13bce39863ab66ea01b1dd22"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/proof-status.json",
+		"archive": "experiments/performance/ordinal-adjacency/cost/proof-status.json.txt",
+		"bytes": 407,
+		"sha256": "d88d941bc5b49ffa3b555aff0884531b11eae119072124db72666b5f1d4a6d0b"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/replica-adjacency-old-page.test.ts.txt",
+		"archive": "experiments/performance/ordinal-adjacency/cost/replica-adjacency-old-page.test.ts.txt.txt",
+		"bytes": 1744,
+		"sha256": "72d58bd835377d60b21833e6ee8613f771bb1e0d993c80bd00f1726eb3a2a83e"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/replica-adjacency.test.ts.txt",
+		"archive": "experiments/performance/ordinal-adjacency/cost/replica-adjacency.test.ts.txt.txt",
+		"bytes": 2421,
+		"sha256": "96875232114b148bae0821951b171535d457b7c454ebfefa04243a2897be1059"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/source-pins.json",
+		"archive": "experiments/performance/ordinal-adjacency/cost/source-pins.json.txt",
+		"bytes": 518,
+		"sha256": "74e3277e40a2d9884fb595fc401cd13f0843c550bb5aeb44a75341463f72e784"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/summarize-cost.py.txt",
+		"archive": "experiments/performance/ordinal-adjacency/cost/summarize-cost.py.txt.txt",
+		"bytes": 1285,
+		"sha256": "10f9260e4dcc3bb4d5f87da197e40d9a603e5f4dcff0c303d8e2ff978d842c6d"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/tests-first.log",
+		"archive": "experiments/performance/ordinal-adjacency/cost/tests-first.log.txt",
+		"bytes": 7027,
+		"sha256": "f377d9aecc13978b135b2438790fea26d635e4fa6f577cf8104246640239d73c"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/tests-old-page.log",
+		"archive": "experiments/performance/ordinal-adjacency/cost/tests-old-page.log.txt",
+		"bytes": 261,
+		"sha256": "fd6641a7cc4fe58fd96948efffc9fd7e1fedb5b42b6aab1b4477b519838d6686"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/types-first.log",
+		"archive": "experiments/performance/ordinal-adjacency/cost/types-first.log.txt",
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/types-many-targets-first.log",
+		"archive": "experiments/performance/ordinal-adjacency/cost/types-many-targets-first.log.txt",
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-ordinal-pages/archive-cost-prepared/types-old-page.log",
+		"archive": "experiments/performance/ordinal-adjacency/cost/types-old-page.log.txt",
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	}
+]

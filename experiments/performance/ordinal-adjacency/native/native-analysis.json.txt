@@ -1,0 +1,4304 @@
+[
+  {
+    "arm": "native-map-children",
+    "trial": 0,
+    "count": 1,
+    "file": "Undo-1.trace.json",
+    "sha256": "bde632cae15db2fd81a33b943a3a25b5cfe4259f1d71b66fa29027d6eae1a669",
+    "bytes": 6637068,
+    "windowMs": 3001.917,
+    "threads": {
+      "(20239, 19956527)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 6.297,
+        "taskUnionMs": 219.937
+      },
+      "(20233, 19956458)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.085,
+        "taskUnionMs": 0.421
+      },
+      "(20227, 19956407)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.079,
+        "taskUnionMs": 0.669
+      },
+      "(20239, 19956755)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.168,
+        "taskUnionMs": 0.63
+      },
+      "(20239, 19956919)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 16.5,
+        "taskUnionMs": 652.732
+      },
+      "(20227, 19956351)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.115,
+        "taskUnionMs": 4.679
+      },
+      "(20239, 19956558)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.057,
+        "taskUnionMs": 0.763
+      },
+      "(20227, 19956456)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.122,
+        "taskUnionMs": 1.066
+      },
+      "(20239, 19956575)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.147,
+        "taskUnionMs": 10.07
+      },
+      "(20233, 19956495)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.128,
+        "taskUnionMs": 9.936
+      },
+      "(20227, 19956414)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.041,
+        "taskUnionMs": 1.808
+      },
+      "(20239, 19956569)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.019,
+        "taskUnionMs": 0.648
+      },
+      "(20233, 19956430)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 2.88,
+        "taskUnionMs": 12.022
+      },
+      "(20233, 19956494)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.003,
+        "taskUnionMs": 0.006
+      },
+      "(20227, 19956408)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.824,
+        "taskUnionMs": 0.992
+      },
+      "(20239, 19956563)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.02,
+        "taskUnionMs": 0.02
+      },
+      "(20227, 19956415)": {
+        "name": "MemoryInfra",
+        "maxTaskMs": 0.029,
+        "taskUnionMs": 0.031
+      }
+    },
+    "resourceFinishedEncodedBytes": 7184,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(20239, 19956919)",
+        "durationMs": 0.631,
+        "startRelativeMs": 24.434,
+        "endRelativeMs": 25.065
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(20239, 19956919)",
+        "durationMs": 0.202,
+        "startRelativeMs": 874.723,
+        "endRelativeMs": 874.925
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(20239, 19956919)",
+        "durationMs": 9.142,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(20239, 19956919)",
+        "durationMs": 0.019,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(20239, 19956919)",
+        "durationMs": 0.008,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 30.573
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 0,
+    "count": 1,
+    "file": "stable-copy-native-mc-1-selection.trace.json",
+    "sha256": "0534c3d2fc64652d47903c434324b872342ea15e8c9394912e115a7bcdf7d0a1",
+    "bytes": 3353981,
+    "windowMs": 3002.748,
+    "threads": {
+      "(20239, 19956527)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 5.372,
+        "taskUnionMs": 260.781
+      },
+      "(20233, 19956458)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.09,
+        "taskUnionMs": 0.515
+      },
+      "(20239, 19956919)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 0.528,
+        "taskUnionMs": 4.496
+      },
+      "(20239, 19956755)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.097,
+        "taskUnionMs": 0.105
+      },
+      "(20239, 19956558)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.099,
+        "taskUnionMs": 0.728
+      },
+      "(20227, 19956407)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.079,
+        "taskUnionMs": 0.64
+      },
+      "(20227, 19956351)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.813,
+        "taskUnionMs": 6.555
+      },
+      "(20227, 19956456)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.081,
+        "taskUnionMs": 0.913
+      },
+      "(20239, 19956569)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.031,
+        "taskUnionMs": 0.566
+      },
+      "(20227, 19956414)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.064,
+        "taskUnionMs": 1.342
+      },
+      "(20239, 19956575)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.243,
+        "taskUnionMs": 8.128
+      },
+      "(20233, 19956495)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.141,
+        "taskUnionMs": 9.583
+      },
+      "(20233, 19956430)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 0.955,
+        "taskUnionMs": 3.478
+      },
+      "(20233, 19956494)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.012,
+        "taskUnionMs": 0.021
+      },
+      "(20227, 19956408)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.27,
+        "taskUnionMs": 0.458
+      },
+      "(20239, 19956563)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.044,
+        "taskUnionMs": 0.044
+      }
+    },
+    "resourceFinishedEncodedBytes": 167,
+    "resourceFinishes": 1,
+    "openedSpans": [],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 3.325
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 0,
+    "count": 1,
+    "file": "stable-copy-native-mc-1-single.trace.json",
+    "sha256": "f14ae02d141cf67a770e45ddad163d8d86db5512eb6ce6aa2d1ae4eac7e3b58e",
+    "bytes": 5378061,
+    "windowMs": 3002.127,
+    "threads": {
+      "(20233, 19956458)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.068,
+        "taskUnionMs": 0.369
+      },
+      "(20227, 19956407)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.102,
+        "taskUnionMs": 0.642
+      },
+      "(20239, 19956558)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.187,
+        "taskUnionMs": 0.704
+      },
+      "(20239, 19956527)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 5.512,
+        "taskUnionMs": 213.257
+      },
+      "(20227, 19956351)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.134,
+        "taskUnionMs": 4.188
+      },
+      "(20239, 19956919)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 163.22,
+        "taskUnionMs": 696.622
+      },
+      "(20239, 19956755)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.098,
+        "taskUnionMs": 0.431
+      },
+      "(20239, 19956575)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.281,
+        "taskUnionMs": 9.522
+      },
+      "(20233, 19956495)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.132,
+        "taskUnionMs": 10.035
+      },
+      "(20227, 19956456)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.073,
+        "taskUnionMs": 0.783
+      },
+      "(20227, 19956414)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.056,
+        "taskUnionMs": 1.533
+      },
+      "(20239, 19956569)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.023,
+        "taskUnionMs": 0.603
+      },
+      "(20233, 19956494)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.003,
+        "taskUnionMs": 0.006
+      },
+      "(20233, 19956430)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 3.241,
+        "taskUnionMs": 11.328
+      },
+      "(20227, 19956408)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.83,
+        "taskUnionMs": 1.045
+      },
+      "(20239, 19956563)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.046,
+        "taskUnionMs": 0.068
+      }
+    },
+    "resourceFinishedEncodedBytes": 7334,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(20239, 19956919)",
+        "durationMs": 0.62,
+        "startRelativeMs": 23.606,
+        "endRelativeMs": 24.226
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(20239, 19956919)",
+        "durationMs": 0.215,
+        "startRelativeMs": 196.109,
+        "endRelativeMs": 196.324
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(20239, 19956919)",
+        "durationMs": 0.285,
+        "startRelativeMs": 1013.412,
+        "endRelativeMs": 1013.697
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(20239, 19956919)",
+        "durationMs": 1.419,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(20239, 19956919)",
+        "durationMs": 0.043,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 7.977
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 0,
+    "count": 1,
+    "file": "Undo-1.trace.json",
+    "sha256": "9e55760d94babb53105be0b63cbfffb150e823589c35ff9457894e21a7486d5c",
+    "bytes": 5813174,
+    "windowMs": 3002.654,
+    "threads": {
+      "(20448, 19958500)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.07,
+        "taskUnionMs": 0.473
+      },
+      "(20454, 19958561)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 6.69,
+        "taskUnionMs": 237.471
+      },
+      "(20454, 19958950)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 17.053,
+        "taskUnionMs": 467.316
+      },
+      "(20454, 19958587)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.061,
+        "taskUnionMs": 0.772
+      },
+      "(20444, 19958451)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.081,
+        "taskUnionMs": 0.562
+      },
+      "(20444, 19958428)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.155,
+        "taskUnionMs": 4.037
+      },
+      "(20454, 19958759)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.158,
+        "taskUnionMs": 0.502
+      },
+      "(20444, 19958494)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.06,
+        "taskUnionMs": 0.888
+      },
+      "(20454, 19958601)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.151,
+        "taskUnionMs": 9.283
+      },
+      "(20448, 19958536)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.131,
+        "taskUnionMs": 9.655
+      },
+      "(20444, 19958458)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.086,
+        "taskUnionMs": 1.737
+      },
+      "(20454, 19958598)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.024,
+        "taskUnionMs": 0.579
+      },
+      "(20448, 19958535)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.006,
+        "taskUnionMs": 0.012
+      },
+      "(20448, 19958472)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 3.211,
+        "taskUnionMs": 10.35
+      },
+      "(20454, 19958592)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.013,
+        "taskUnionMs": 0.013
+      },
+      "(20444, 19958452)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.707,
+        "taskUnionMs": 0.849
+      },
+      "(20444, 19958459)": {
+        "name": "MemoryInfra",
+        "maxTaskMs": 0.03,
+        "taskUnionMs": 0.038
+      }
+    },
+    "resourceFinishedEncodedBytes": 7184,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(20454, 19958950)",
+        "durationMs": 0.618,
+        "startRelativeMs": 17.451,
+        "endRelativeMs": 18.069
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(20454, 19958950)",
+        "durationMs": 0.153,
+        "startRelativeMs": 789.784,
+        "endRelativeMs": 789.937
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(20454, 19958950)",
+        "durationMs": 16.698,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(20454, 19958950)",
+        "durationMs": 0.011,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(20454, 19958950)",
+        "durationMs": 0.007,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 9.772
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 0,
+    "count": 1,
+    "file": "stable-copy-native-mc-1-selection.trace.json",
+    "sha256": "6f633b864df89b11446e3d264566f1d5322d2df9d945ad00be264dc3d873d6b6",
+    "bytes": 2955813,
+    "windowMs": 3001.765,
+    "threads": {
+      "(20454, 19958561)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 2.762,
+        "taskUnionMs": 279.154
+      },
+      "(20448, 19958500)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.07,
+        "taskUnionMs": 0.507
+      },
+      "(20454, 19958587)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.055,
+        "taskUnionMs": 0.48
+      },
+      "(20454, 19958950)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 0.54,
+        "taskUnionMs": 5.407
+      },
+      "(20454, 19958759)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.119,
+        "taskUnionMs": 0.127
+      },
+      "(20444, 19958451)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.083,
+        "taskUnionMs": 0.571
+      },
+      "(20444, 19958428)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.787,
+        "taskUnionMs": 5.316
+      },
+      "(20444, 19958494)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.084,
+        "taskUnionMs": 0.903
+      },
+      "(20454, 19958601)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.453,
+        "taskUnionMs": 9.192
+      },
+      "(20448, 19958536)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.111,
+        "taskUnionMs": 10.3
+      },
+      "(20448, 19958472)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 0.932,
+        "taskUnionMs": 3.74
+      },
+      "(20444, 19958458)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.059,
+        "taskUnionMs": 1.461
+      },
+      "(20454, 19958598)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.032,
+        "taskUnionMs": 0.587
+      },
+      "(20444, 19958452)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.082,
+        "taskUnionMs": 0.252
+      },
+      "(20448, 19958535)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.015,
+        "taskUnionMs": 0.027
+      },
+      "(20454, 19958592)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.046,
+        "taskUnionMs": 0.046
+      }
+    },
+    "resourceFinishedEncodedBytes": 167,
+    "resourceFinishes": 1,
+    "openedSpans": [],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 0
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 0,
+    "count": 1,
+    "file": "stable-copy-native-mc-1-single.trace.json",
+    "sha256": "cd11b011d6b2dd5317d3d637a44e0be7834b0528135444191eed82e4ef81c663",
+    "bytes": 5308727,
+    "windowMs": 3002.911,
+    "threads": {
+      "(20444, 19958451)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.079,
+        "taskUnionMs": 0.591
+      },
+      "(20448, 19958500)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.078,
+        "taskUnionMs": 0.466
+      },
+      "(20454, 19958561)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 5.906,
+        "taskUnionMs": 239.718
+      },
+      "(20454, 19958587)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.089,
+        "taskUnionMs": 0.754
+      },
+      "(20454, 19958950)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 148.887,
+        "taskUnionMs": 615.265
+      },
+      "(20454, 19958759)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.178,
+        "taskUnionMs": 0.614
+      },
+      "(20444, 19958428)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.333,
+        "taskUnionMs": 5.727
+      },
+      "(20444, 19958494)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.051,
+        "taskUnionMs": 0.861
+      },
+      "(20454, 19958601)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.152,
+        "taskUnionMs": 9.173
+      },
+      "(20448, 19958536)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.124,
+        "taskUnionMs": 9.948
+      },
+      "(20444, 19958458)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.058,
+        "taskUnionMs": 1.784
+      },
+      "(20454, 19958598)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.021,
+        "taskUnionMs": 0.628
+      },
+      "(20448, 19958535)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.008,
+        "taskUnionMs": 0.015
+      },
+      "(20448, 19958472)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 2.95,
+        "taskUnionMs": 9.963
+      },
+      "(20444, 19958452)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.188,
+        "taskUnionMs": 0.37
+      },
+      "(20454, 19958592)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.047,
+        "taskUnionMs": 0.075
+      }
+    },
+    "resourceFinishedEncodedBytes": 7334,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(20454, 19958950)",
+        "durationMs": 0.578,
+        "startRelativeMs": 17.46,
+        "endRelativeMs": 18.038
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(20454, 19958950)",
+        "durationMs": 0.167,
+        "startRelativeMs": 174.584,
+        "endRelativeMs": 174.751
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(20454, 19958950)",
+        "durationMs": 0.218,
+        "startRelativeMs": 938.955,
+        "endRelativeMs": 939.173
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(20454, 19958950)",
+        "durationMs": 1.657,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(20454, 19958950)",
+        "durationMs": 0.038,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 7.966
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 0,
+    "count": 512,
+    "file": "Undo-512.trace.json",
+    "sha256": "a37a3fbc726072403fea85ece40952ef4089334c654d53dd387ae26362512eeb",
+    "bytes": 8403662,
+    "windowMs": 3002.172,
+    "threads": {
+      "(20665, 19960554)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 5.093,
+        "taskUnionMs": 209.131
+      },
+      "(20659, 19960493)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.082,
+        "taskUnionMs": 0.425
+      },
+      "(20665, 19960578)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.081,
+        "taskUnionMs": 0.749
+      },
+      "(20665, 19960911)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 27.747,
+        "taskUnionMs": 490.381
+      },
+      "(20655, 19960445)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.086,
+        "taskUnionMs": 0.65
+      },
+      "(20665, 19960745)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.156,
+        "taskUnionMs": 0.478
+      },
+      "(20655, 19960418)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.158,
+        "taskUnionMs": 4.475
+      },
+      "(20655, 19960485)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.075,
+        "taskUnionMs": 0.871
+      },
+      "(20655, 19960446)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.769,
+        "taskUnionMs": 0.899
+      },
+      "(20659, 19960528)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.136,
+        "taskUnionMs": 19.656
+      },
+      "(20665, 19960593)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.644,
+        "taskUnionMs": 23.661
+      },
+      "(20659, 19960465)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 3.099,
+        "taskUnionMs": 21.617
+      },
+      "(20655, 19960452)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.048,
+        "taskUnionMs": 1.938
+      },
+      "(20665, 19960589)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.02,
+        "taskUnionMs": 0.604
+      },
+      "(20659, 19960527)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.003,
+        "taskUnionMs": 0.006
+      },
+      "(20665, 19960583)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.04,
+        "taskUnionMs": 0.075
+      },
+      "(20655, 19960453)": {
+        "name": "MemoryInfra",
+        "maxTaskMs": 0.023,
+        "taskUnionMs": 0.044
+      }
+    },
+    "resourceFinishedEncodedBytes": 7184,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(20665, 19960911)",
+        "durationMs": 0.587,
+        "startRelativeMs": 25.864,
+        "endRelativeMs": 26.451
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(20665, 19960911)",
+        "durationMs": 0.142,
+        "startRelativeMs": 904.108,
+        "endRelativeMs": 904.25
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(20665, 19960911)",
+        "durationMs": 26.909,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 40.319
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 0,
+    "count": 512,
+    "file": "stable-copy-native-mc-512-selection.trace.json",
+    "sha256": "9a39448556e022448918dee2ba70a26cc86ba9fd68010bfcf3eee5409ac7c804",
+    "bytes": 4447344,
+    "windowMs": 3002.363,
+    "threads": {
+      "(20665, 19960554)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 4.971,
+        "taskUnionMs": 285.383
+      },
+      "(20659, 19960493)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.093,
+        "taskUnionMs": 0.54
+      },
+      "(20665, 19960911)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 0.715,
+        "taskUnionMs": 4.621
+      },
+      "(20665, 19960578)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.108,
+        "taskUnionMs": 0.638
+      },
+      "(20665, 19960745)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.09,
+        "taskUnionMs": 0.097
+      },
+      "(20655, 19960445)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.076,
+        "taskUnionMs": 0.68
+      },
+      "(20655, 19960418)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.876,
+        "taskUnionMs": 7.232
+      },
+      "(20655, 19960485)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.057,
+        "taskUnionMs": 0.861
+      },
+      "(20659, 19960528)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.143,
+        "taskUnionMs": 23.671
+      },
+      "(20665, 19960593)": {
+        "name": "Compositor",
+        "maxTaskMs": 2.081,
+        "taskUnionMs": 29.09
+      },
+      "(20659, 19960465)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 2.08,
+        "taskUnionMs": 18.992
+      },
+      "(20655, 19960452)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.079,
+        "taskUnionMs": 1.337
+      },
+      "(20665, 19960589)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.035,
+        "taskUnionMs": 0.521
+      },
+      "(20659, 19960527)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.025,
+        "taskUnionMs": 0.031
+      },
+      "(20655, 19960446)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.388,
+        "taskUnionMs": 0.573
+      },
+      "(20665, 19960583)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.045,
+        "taskUnionMs": 0.045
+      }
+    },
+    "resourceFinishedEncodedBytes": 167,
+    "resourceFinishes": 1,
+    "openedSpans": [],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 0
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 0,
+    "count": 512,
+    "file": "stable-copy-native-mc-512-single.trace.json",
+    "sha256": "a8a35707f78520bf78389036fc2f3d0c3f11a3e94a87b7d911d6f191132d5ab2",
+    "bytes": 6391657,
+    "windowMs": 3001.995,
+    "threads": {
+      "(20665, 19960554)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 4.663,
+        "taskUnionMs": 186.089
+      },
+      "(20659, 19960493)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.072,
+        "taskUnionMs": 0.358
+      },
+      "(20665, 19960578)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.07,
+        "taskUnionMs": 0.574
+      },
+      "(20655, 19960418)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.14,
+        "taskUnionMs": 4.176
+      },
+      "(20665, 19960745)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.173,
+        "taskUnionMs": 0.64
+      },
+      "(20655, 19960445)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.074,
+        "taskUnionMs": 0.577
+      },
+      "(20665, 19960911)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 167.07,
+        "taskUnionMs": 603.179
+      },
+      "(20665, 19960593)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.239,
+        "taskUnionMs": 20.694
+      },
+      "(20655, 19960485)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.068,
+        "taskUnionMs": 0.808
+      },
+      "(20659, 19960528)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.142,
+        "taskUnionMs": 17.707
+      },
+      "(20659, 19960465)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 3.23,
+        "taskUnionMs": 21.84
+      },
+      "(20655, 19960452)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.096,
+        "taskUnionMs": 1.897
+      },
+      "(20665, 19960589)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.025,
+        "taskUnionMs": 0.651
+      },
+      "(20659, 19960527)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.003,
+        "taskUnionMs": 0.008
+      },
+      "(20655, 19960446)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.734,
+        "taskUnionMs": 0.979
+      },
+      "(20665, 19960583)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.052,
+        "taskUnionMs": 0.074
+      }
+    },
+    "resourceFinishedEncodedBytes": 200494,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(20665, 19960911)",
+        "durationMs": 0.608,
+        "startRelativeMs": 28.001,
+        "endRelativeMs": 28.609
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(20665, 19960911)",
+        "durationMs": 0.213,
+        "startRelativeMs": 222.534,
+        "endRelativeMs": 222.747
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(20665, 19960911)",
+        "durationMs": 0.181,
+        "startRelativeMs": 1111.753,
+        "endRelativeMs": 1111.934
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 8.985
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 0,
+    "count": 512,
+    "file": "Undo-512.trace.json",
+    "sha256": "fecb34ad535121d65fdb96dc8a487ec6ef0fe57e2f4aff6ad622b75c0670c3af",
+    "bytes": 6629620,
+    "windowMs": 3001.172,
+    "threads": {
+      "(20879, 19962570)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 4.942,
+        "taskUnionMs": 239.647
+      },
+      "(20873, 19962518)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.068,
+        "taskUnionMs": 0.375
+      },
+      "(20869, 19962464)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.091,
+        "taskUnionMs": 0.63
+      },
+      "(20879, 19962597)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.059,
+        "taskUnionMs": 0.562
+      },
+      "(20879, 19962771)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.182,
+        "taskUnionMs": 0.629
+      },
+      "(20879, 19962940)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 29.02,
+        "taskUnionMs": 448.703
+      },
+      "(20869, 19962444)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.164,
+        "taskUnionMs": 4.875
+      },
+      "(20869, 19962510)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.049,
+        "taskUnionMs": 0.888
+      },
+      "(20879, 19962610)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.161,
+        "taskUnionMs": 24.666
+      },
+      "(20873, 19962551)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.135,
+        "taskUnionMs": 21.251
+      },
+      "(20873, 19962486)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 3.209,
+        "taskUnionMs": 21.591
+      },
+      "(20869, 19962471)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.059,
+        "taskUnionMs": 2.075
+      },
+      "(20879, 19962607)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.043,
+        "taskUnionMs": 0.694
+      },
+      "(20873, 19962550)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.005,
+        "taskUnionMs": 0.01
+      },
+      "(20879, 19962601)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.012,
+        "taskUnionMs": 0.012
+      },
+      "(20869, 19962465)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.671,
+        "taskUnionMs": 0.77
+      },
+      "(20869, 19962472)": {
+        "name": "MemoryInfra",
+        "maxTaskMs": 0.011,
+        "taskUnionMs": 0.015
+      }
+    },
+    "resourceFinishedEncodedBytes": 7184,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(20879, 19962940)",
+        "durationMs": 0.539,
+        "startRelativeMs": 29.467,
+        "endRelativeMs": 30.006
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(20879, 19962940)",
+        "durationMs": 0.142,
+        "startRelativeMs": 812.525,
+        "endRelativeMs": 812.667
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(20879, 19962940)",
+        "durationMs": 27.507,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 4.727
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 0,
+    "count": 512,
+    "file": "stable-copy-native-mc-512-selection.trace.json",
+    "sha256": "0e08ec9a90350cfd2b3c1985e563bae216857084553680a7f911e2dc006f2baa",
+    "bytes": 4367896,
+    "windowMs": 3003.179,
+    "threads": {
+      "(20879, 19962570)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 2.799,
+        "taskUnionMs": 273.615
+      },
+      "(20873, 19962518)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.067,
+        "taskUnionMs": 0.428
+      },
+      "(20879, 19962597)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.062,
+        "taskUnionMs": 0.546
+      },
+      "(20879, 19962771)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.199,
+        "taskUnionMs": 0.21
+      },
+      "(20879, 19962940)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 0.686,
+        "taskUnionMs": 5.471
+      },
+      "(20869, 19962464)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.08,
+        "taskUnionMs": 0.575
+      },
+      "(20869, 19962444)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.479,
+        "taskUnionMs": 4.796
+      },
+      "(20869, 19962510)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.062,
+        "taskUnionMs": 0.864
+      },
+      "(20873, 19962551)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.123,
+        "taskUnionMs": 22.957
+      },
+      "(20879, 19962610)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.157,
+        "taskUnionMs": 26.486
+      },
+      "(20869, 19962471)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.044,
+        "taskUnionMs": 1.246
+      },
+      "(20873, 19962550)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.022,
+        "taskUnionMs": 0.027
+      },
+      "(20873, 19962486)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 0.873,
+        "taskUnionMs": 17.142
+      },
+      "(20879, 19962607)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.027,
+        "taskUnionMs": 0.495
+      },
+      "(20869, 19962465)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.08,
+        "taskUnionMs": 0.241
+      },
+      "(20879, 19962601)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.049,
+        "taskUnionMs": 0.049
+      }
+    },
+    "resourceFinishedEncodedBytes": 167,
+    "resourceFinishes": 1,
+    "openedSpans": [],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 0
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 0,
+    "count": 512,
+    "file": "stable-copy-native-mc-512-single.trace.json",
+    "sha256": "7a43f84713440bd8c8ab68d45f9d8f177a397b133cf47c4033e808fbcf8442c0",
+    "bytes": 6425734,
+    "windowMs": 3000.649,
+    "threads": {
+      "(20879, 19962570)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 4.74,
+        "taskUnionMs": 238.811
+      },
+      "(20873, 19962518)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.076,
+        "taskUnionMs": 0.39
+      },
+      "(20879, 19962597)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.071,
+        "taskUnionMs": 0.644
+      },
+      "(20879, 19962771)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.228,
+        "taskUnionMs": 0.786
+      },
+      "(20879, 19962940)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 162.638,
+        "taskUnionMs": 651.605
+      },
+      "(20869, 19962464)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.097,
+        "taskUnionMs": 0.541
+      },
+      "(20869, 19962444)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.154,
+        "taskUnionMs": 5.015
+      },
+      "(20869, 19962510)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.131,
+        "taskUnionMs": 0.972
+      },
+      "(20873, 19962551)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.131,
+        "taskUnionMs": 21.922
+      },
+      "(20879, 19962610)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.608,
+        "taskUnionMs": 25.879
+      },
+      "(20873, 19962486)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 3.3,
+        "taskUnionMs": 21.749
+      },
+      "(20869, 19962471)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.043,
+        "taskUnionMs": 1.882
+      },
+      "(20879, 19962607)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.026,
+        "taskUnionMs": 0.608
+      },
+      "(20873, 19962550)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.005,
+        "taskUnionMs": 0.012
+      },
+      "(20869, 19962465)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.181,
+        "taskUnionMs": 0.344
+      },
+      "(20879, 19962601)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.055,
+        "taskUnionMs": 0.073
+      }
+    },
+    "resourceFinishedEncodedBytes": 200494,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(20879, 19962940)",
+        "durationMs": 0.551,
+        "startRelativeMs": 33.553,
+        "endRelativeMs": 34.104
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(20879, 19962940)",
+        "durationMs": 0.166,
+        "startRelativeMs": 222.733,
+        "endRelativeMs": 222.899
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(20879, 19962940)",
+        "durationMs": 0.222,
+        "startRelativeMs": 1019.999,
+        "endRelativeMs": 1020.221
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 8.193
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 1,
+    "count": 1,
+    "file": "Undo-1.trace.json",
+    "sha256": "d8a746567cc3707459c56a307535917211e17f0fee235c71f45aa540485b9185",
+    "bytes": 5752552,
+    "windowMs": 3003.257,
+    "threads": {
+      "(21085, 19964569)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.07,
+        "taskUnionMs": 0.447
+      },
+      "(21081, 19964513)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.085,
+        "taskUnionMs": 0.593
+      },
+      "(21091, 19964647)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.065,
+        "taskUnionMs": 0.846
+      },
+      "(21091, 19964622)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 6.644,
+        "taskUnionMs": 241.808
+      },
+      "(21091, 19964998)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 10.375,
+        "taskUnionMs": 474.253
+      },
+      "(21091, 19964820)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.178,
+        "taskUnionMs": 0.536
+      },
+      "(21081, 19964490)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.129,
+        "taskUnionMs": 4.531
+      },
+      "(21081, 19964561)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.078,
+        "taskUnionMs": 0.99
+      },
+      "(21091, 19964664)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.134,
+        "taskUnionMs": 8.986
+      },
+      "(21085, 19964602)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.218,
+        "taskUnionMs": 9.56
+      },
+      "(21081, 19964521)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.062,
+        "taskUnionMs": 1.789
+      },
+      "(21091, 19964654)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.021,
+        "taskUnionMs": 0.644
+      },
+      "(21085, 19964601)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.006,
+        "taskUnionMs": 0.009
+      },
+      "(21085, 19964536)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 2.986,
+        "taskUnionMs": 10.647
+      },
+      "(21091, 19964651)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.029,
+        "taskUnionMs": 0.029
+      },
+      "(21081, 19964514)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.679,
+        "taskUnionMs": 0.848
+      },
+      "(21081, 19964522)": {
+        "name": "MemoryInfra",
+        "maxTaskMs": 0.046,
+        "taskUnionMs": 0.06
+      }
+    },
+    "resourceFinishedEncodedBytes": 7184,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(21091, 19964998)",
+        "durationMs": 0.606,
+        "startRelativeMs": 23.011,
+        "endRelativeMs": 23.617
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(21091, 19964998)",
+        "durationMs": 0.217,
+        "startRelativeMs": 791.664,
+        "endRelativeMs": 791.881
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(21091, 19964998)",
+        "durationMs": 9.971,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(21091, 19964998)",
+        "durationMs": 0.014,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(21091, 19964998)",
+        "durationMs": 0.007,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 10.069
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 1,
+    "count": 1,
+    "file": "stable-copy-native-mc-1-selection.trace.json",
+    "sha256": "827789f9e51ae5db7b55e749d6fe7e9f66e892263279474c47f17a75a69e445a",
+    "bytes": 2969661,
+    "windowMs": 3001.495,
+    "threads": {
+      "(21091, 19964622)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 2.829,
+        "taskUnionMs": 281.787
+      },
+      "(21085, 19964569)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.08,
+        "taskUnionMs": 0.542
+      },
+      "(21091, 19964647)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.059,
+        "taskUnionMs": 0.516
+      },
+      "(21091, 19964820)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.082,
+        "taskUnionMs": 0.088
+      },
+      "(21091, 19964998)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 0.361,
+        "taskUnionMs": 3.733
+      },
+      "(21081, 19964513)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.098,
+        "taskUnionMs": 0.796
+      },
+      "(21081, 19964490)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.649,
+        "taskUnionMs": 4.768
+      },
+      "(21081, 19964561)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.081,
+        "taskUnionMs": 0.904
+      },
+      "(21091, 19964654)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.042,
+        "taskUnionMs": 0.537
+      },
+      "(21081, 19964521)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.057,
+        "taskUnionMs": 1.315
+      },
+      "(21091, 19964664)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.15,
+        "taskUnionMs": 8.832
+      },
+      "(21085, 19964602)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.139,
+        "taskUnionMs": 10.361
+      },
+      "(21085, 19964536)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 0.698,
+        "taskUnionMs": 3.285
+      },
+      "(21081, 19964514)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.073,
+        "taskUnionMs": 0.182
+      },
+      "(21085, 19964601)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.014,
+        "taskUnionMs": 0.016
+      },
+      "(21091, 19964651)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.032,
+        "taskUnionMs": 0.032
+      }
+    },
+    "resourceFinishedEncodedBytes": 167,
+    "resourceFinishes": 1,
+    "openedSpans": [],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 0
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 1,
+    "count": 1,
+    "file": "stable-copy-native-mc-1-single.trace.json",
+    "sha256": "c101c3d5c2886081cb70eda8c76b8c95a8a7ccf58903192c1d1c1478d148d05f",
+    "bytes": 5298596,
+    "windowMs": 3002.904,
+    "threads": {
+      "(21085, 19964569)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.074,
+        "taskUnionMs": 0.378
+      },
+      "(21091, 19964647)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.157,
+        "taskUnionMs": 0.872
+      },
+      "(21091, 19964622)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 5.672,
+        "taskUnionMs": 234.335
+      },
+      "(21091, 19964820)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.108,
+        "taskUnionMs": 0.546
+      },
+      "(21091, 19964998)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 154.601,
+        "taskUnionMs": 601.76
+      },
+      "(21081, 19964513)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.094,
+        "taskUnionMs": 0.519
+      },
+      "(21081, 19964490)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.338,
+        "taskUnionMs": 5.384
+      },
+      "(21081, 19964561)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.062,
+        "taskUnionMs": 0.84
+      },
+      "(21091, 19964664)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.177,
+        "taskUnionMs": 8.742
+      },
+      "(21085, 19964602)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.166,
+        "taskUnionMs": 9.411
+      },
+      "(21081, 19964521)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.042,
+        "taskUnionMs": 1.647
+      },
+      "(21091, 19964654)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.017,
+        "taskUnionMs": 0.604
+      },
+      "(21085, 19964601)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.005,
+        "taskUnionMs": 0.012
+      },
+      "(21085, 19964536)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 2.821,
+        "taskUnionMs": 8.995
+      },
+      "(21081, 19964514)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.188,
+        "taskUnionMs": 0.357
+      },
+      "(21091, 19964651)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.048,
+        "taskUnionMs": 0.091
+      }
+    },
+    "resourceFinishedEncodedBytes": 7334,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(21091, 19964998)",
+        "durationMs": 0.577,
+        "startRelativeMs": 16.582,
+        "endRelativeMs": 17.159
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(21091, 19964998)",
+        "durationMs": 0.17,
+        "startRelativeMs": 179.358,
+        "endRelativeMs": 179.528
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(21091, 19964998)",
+        "durationMs": 0.215,
+        "startRelativeMs": 948.207,
+        "endRelativeMs": 948.422
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(21091, 19964998)",
+        "durationMs": 1.382,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(21091, 19964998)",
+        "durationMs": 0.038,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 8.447
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 1,
+    "count": 1,
+    "file": "Undo-1.trace.json",
+    "sha256": "dd651b3c102f4741e70183f1f5d3e52c9b6803cfa917b03badf4a51e9ef55110",
+    "bytes": 5945620,
+    "windowMs": 3002.894,
+    "threads": {
+      "(21296, 19966565)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.074,
+        "taskUnionMs": 0.436
+      },
+      "(21302, 19966650)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.058,
+        "taskUnionMs": 0.794
+      },
+      "(21302, 19966624)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 6.598,
+        "taskUnionMs": 240.435
+      },
+      "(21302, 19966780)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.163,
+        "taskUnionMs": 0.571
+      },
+      "(21302, 19966988)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 23.224,
+        "taskUnionMs": 655.596
+      },
+      "(21292, 19966510)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.079,
+        "taskUnionMs": 0.551
+      },
+      "(21292, 19966490)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.198,
+        "taskUnionMs": 4.71
+      },
+      "(21292, 19966558)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.05,
+        "taskUnionMs": 0.909
+      },
+      "(21302, 19966666)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.277,
+        "taskUnionMs": 11.532
+      },
+      "(21296, 19966599)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.136,
+        "taskUnionMs": 11.172
+      },
+      "(21296, 19966530)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 2.847,
+        "taskUnionMs": 13.871
+      },
+      "(21292, 19966517)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.081,
+        "taskUnionMs": 1.883
+      },
+      "(21302, 19966662)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.024,
+        "taskUnionMs": 0.676
+      },
+      "(21296, 19966598)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.003,
+        "taskUnionMs": 0.005
+      },
+      "(21292, 19966511)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.356,
+        "taskUnionMs": 0.487
+      },
+      "(21302, 19966658)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.061,
+        "taskUnionMs": 0.095
+      },
+      "(21292, 19966518)": {
+        "name": "MemoryInfra",
+        "maxTaskMs": 0.032,
+        "taskUnionMs": 0.038
+      }
+    },
+    "resourceFinishedEncodedBytes": 7184,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(21302, 19966988)",
+        "durationMs": 0.758,
+        "startRelativeMs": 25.313,
+        "endRelativeMs": 26.071
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(21302, 19966988)",
+        "durationMs": 0.21,
+        "startRelativeMs": 875.905,
+        "endRelativeMs": 876.115
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(21302, 19966988)",
+        "durationMs": 16.011,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(21302, 19966988)",
+        "durationMs": 0.018,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(21302, 19966988)",
+        "durationMs": 0.008,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 28.624
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 1,
+    "count": 1,
+    "file": "stable-copy-native-mc-1-selection.trace.json",
+    "sha256": "18848dd15fe0516a65292aea322f074a791c15b68fd7dc56bc9ae8d6b253feb1",
+    "bytes": 3001943,
+    "windowMs": 3001.843,
+    "threads": {
+      "(21302, 19966624)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 4.858,
+        "taskUnionMs": 269.823
+      },
+      "(21296, 19966565)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.05,
+        "taskUnionMs": 0.418
+      },
+      "(21302, 19966988)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 0.595,
+        "taskUnionMs": 5.691
+      },
+      "(21302, 19966650)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.109,
+        "taskUnionMs": 0.508
+      },
+      "(21302, 19966780)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.157,
+        "taskUnionMs": 0.164
+      },
+      "(21302, 19966666)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.229,
+        "taskUnionMs": 8.016
+      },
+      "(21296, 19966599)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.14,
+        "taskUnionMs": 9.261
+      },
+      "(21292, 19966510)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.059,
+        "taskUnionMs": 0.537
+      },
+      "(21292, 19966490)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.935,
+        "taskUnionMs": 5.859
+      },
+      "(21292, 19966558)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.083,
+        "taskUnionMs": 0.862
+      },
+      "(21292, 19966517)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.052,
+        "taskUnionMs": 1.179
+      },
+      "(21296, 19966598)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.012,
+        "taskUnionMs": 0.021
+      },
+      "(21296, 19966530)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 1.045,
+        "taskUnionMs": 3.264
+      },
+      "(21302, 19966662)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.021,
+        "taskUnionMs": 0.447
+      },
+      "(21292, 19966511)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.072,
+        "taskUnionMs": 0.208
+      }
+    },
+    "resourceFinishedEncodedBytes": 167,
+    "resourceFinishes": 1,
+    "openedSpans": [],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 0
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 1,
+    "count": 1,
+    "file": "stable-copy-native-mc-1-single.trace.json",
+    "sha256": "eaaa4299f58c944bf4dc1c10fc7027347b0b439535a0d58bcd1bc70aa6bf9575",
+    "bytes": 5608261,
+    "windowMs": 3003.494,
+    "threads": {
+      "(21296, 19966565)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.065,
+        "taskUnionMs": 0.395
+      },
+      "(21292, 19966510)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.079,
+        "taskUnionMs": 0.587
+      },
+      "(21302, 19966624)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 5.821,
+        "taskUnionMs": 235.774
+      },
+      "(21302, 19966780)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.239,
+        "taskUnionMs": 0.668
+      },
+      "(21302, 19966650)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.056,
+        "taskUnionMs": 0.569
+      },
+      "(21292, 19966490)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.123,
+        "taskUnionMs": 5.017
+      },
+      "(21302, 19966988)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 168.702,
+        "taskUnionMs": 709.641
+      },
+      "(21292, 19966558)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.075,
+        "taskUnionMs": 0.837
+      },
+      "(21302, 19966666)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.283,
+        "taskUnionMs": 10.47
+      },
+      "(21296, 19966599)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.204,
+        "taskUnionMs": 11.256
+      },
+      "(21292, 19966517)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.044,
+        "taskUnionMs": 1.71
+      },
+      "(21302, 19966662)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.041,
+        "taskUnionMs": 0.695
+      },
+      "(21296, 19966598)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.003,
+        "taskUnionMs": 0.005
+      },
+      "(21296, 19966530)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 3.026,
+        "taskUnionMs": 13.214
+      },
+      "(21292, 19966511)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.781,
+        "taskUnionMs": 0.98
+      },
+      "(21302, 19966658)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.052,
+        "taskUnionMs": 0.065
+      }
+    },
+    "resourceFinishedEncodedBytes": 7334,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(21302, 19966988)",
+        "durationMs": 0.61,
+        "startRelativeMs": 26.314,
+        "endRelativeMs": 26.924
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(21302, 19966988)",
+        "durationMs": 0.213,
+        "startRelativeMs": 203.73,
+        "endRelativeMs": 203.943
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(21302, 19966988)",
+        "durationMs": 0.216,
+        "startRelativeMs": 1041.985,
+        "endRelativeMs": 1042.201
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(21302, 19966988)",
+        "durationMs": 1.426,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(21302, 19966988)",
+        "durationMs": 0.036,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 7.775
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 1,
+    "count": 512,
+    "file": "Undo-512.trace.json",
+    "sha256": "6a0e95ebb77b4dd150fbbf053203eadc9d36d0df217e1a406adaf4016617243a",
+    "bytes": 6294298,
+    "windowMs": 3000.967,
+    "threads": {
+      "(21536, 19968675)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 4.748,
+        "taskUnionMs": 189.115
+      },
+      "(21530, 19968619)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.056,
+        "taskUnionMs": 0.415
+      },
+      "(21526, 19968567)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.06,
+        "taskUnionMs": 0.526
+      },
+      "(21536, 19968699)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.053,
+        "taskUnionMs": 0.587
+      },
+      "(21536, 19969018)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 29.113,
+        "taskUnionMs": 431.568
+      },
+      "(21536, 19968829)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.157,
+        "taskUnionMs": 0.551
+      },
+      "(21526, 19968539)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.126,
+        "taskUnionMs": 3.802
+      },
+      "(21526, 19968611)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.081,
+        "taskUnionMs": 0.831
+      },
+      "(21530, 19968652)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.089,
+        "taskUnionMs": 17.234
+      },
+      "(21536, 19968716)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.12,
+        "taskUnionMs": 19.734
+      },
+      "(21530, 19968588)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 3.228,
+        "taskUnionMs": 19.58
+      },
+      "(21526, 19968574)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.065,
+        "taskUnionMs": 1.835
+      },
+      "(21536, 19968709)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.015,
+        "taskUnionMs": 0.578
+      },
+      "(21530, 19968651)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.006,
+        "taskUnionMs": 0.012
+      },
+      "(21536, 19968704)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.012,
+        "taskUnionMs": 0.012
+      },
+      "(21526, 19968568)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.24,
+        "taskUnionMs": 0.31
+      },
+      "(21526, 19968575)": {
+        "name": "MemoryInfra",
+        "maxTaskMs": 0.026,
+        "taskUnionMs": 0.037
+      }
+    },
+    "resourceFinishedEncodedBytes": 7184,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(21536, 19969018)",
+        "durationMs": 0.603,
+        "startRelativeMs": 20.642,
+        "endRelativeMs": 21.245
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(21536, 19969018)",
+        "durationMs": 0.146,
+        "startRelativeMs": 793.587,
+        "endRelativeMs": 793.733
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(21536, 19969018)",
+        "durationMs": 27.609,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 4.854
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 1,
+    "count": 512,
+    "file": "stable-copy-native-mc-512-selection.trace.json",
+    "sha256": "067d0fdacdf556ff7973384ffef9efaf532b0a9a1737302c0a2eb8eafb6cc518",
+    "bytes": 4382778,
+    "windowMs": 3002.23,
+    "threads": {
+      "(21536, 19968675)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 3.066,
+        "taskUnionMs": 294.507
+      },
+      "(21530, 19968619)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.075,
+        "taskUnionMs": 0.356
+      },
+      "(21536, 19969018)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 0.617,
+        "taskUnionMs": 5.413
+      },
+      "(21536, 19968699)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.065,
+        "taskUnionMs": 0.496
+      },
+      "(21536, 19968829)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.15,
+        "taskUnionMs": 0.157
+      },
+      "(21526, 19968567)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.08,
+        "taskUnionMs": 0.607
+      },
+      "(21526, 19968539)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.656,
+        "taskUnionMs": 5.034
+      },
+      "(21530, 19968652)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.105,
+        "taskUnionMs": 24.231
+      },
+      "(21526, 19968574)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.044,
+        "taskUnionMs": 1.318
+      },
+      "(21536, 19968716)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.123,
+        "taskUnionMs": 26.753
+      },
+      "(21530, 19968651)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.007,
+        "taskUnionMs": 0.008
+      },
+      "(21530, 19968588)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 0.252,
+        "taskUnionMs": 17.007
+      },
+      "(21526, 19968611)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.065,
+        "taskUnionMs": 0.892
+      },
+      "(21536, 19968709)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.028,
+        "taskUnionMs": 0.524
+      },
+      "(21526, 19968568)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.096,
+        "taskUnionMs": 0.269
+      }
+    },
+    "resourceFinishedEncodedBytes": 167,
+    "resourceFinishes": 1,
+    "openedSpans": [],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 0
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 1,
+    "count": 512,
+    "file": "stable-copy-native-mc-512-single.trace.json",
+    "sha256": "adaaf759ec448a92eeaa02e82e93719c4cc5725f4c947ca8b062e8d93de25f9c",
+    "bytes": 6410669,
+    "windowMs": 3001.448,
+    "threads": {
+      "(21536, 19968675)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 4.817,
+        "taskUnionMs": 204.577
+      },
+      "(21530, 19968619)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.066,
+        "taskUnionMs": 0.293
+      },
+      "(21536, 19969018)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 157.542,
+        "taskUnionMs": 643.374
+      },
+      "(21536, 19968829)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.134,
+        "taskUnionMs": 0.575
+      },
+      "(21526, 19968567)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.084,
+        "taskUnionMs": 0.449
+      },
+      "(21526, 19968539)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.335,
+        "taskUnionMs": 5.153
+      },
+      "(21536, 19968699)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.075,
+        "taskUnionMs": 0.508
+      },
+      "(21526, 19968611)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.05,
+        "taskUnionMs": 0.759
+      },
+      "(21530, 19968652)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.097,
+        "taskUnionMs": 18.027
+      },
+      "(21536, 19968716)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.134,
+        "taskUnionMs": 20.684
+      },
+      "(21530, 19968588)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 3.365,
+        "taskUnionMs": 19.28
+      },
+      "(21526, 19968574)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.041,
+        "taskUnionMs": 1.753
+      },
+      "(21536, 19968709)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.094,
+        "taskUnionMs": 0.617
+      },
+      "(21530, 19968651)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.004,
+        "taskUnionMs": 0.01
+      },
+      "(21526, 19968568)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.273,
+        "taskUnionMs": 0.484
+      },
+      "(21536, 19968704)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.048,
+        "taskUnionMs": 0.06
+      }
+    },
+    "resourceFinishedEncodedBytes": 200494,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(21536, 19969018)",
+        "durationMs": 0.57,
+        "startRelativeMs": 31.901,
+        "endRelativeMs": 32.471
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(21536, 19969018)",
+        "durationMs": 0.191,
+        "startRelativeMs": 216.735,
+        "endRelativeMs": 216.926
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(21536, 19969018)",
+        "durationMs": 0.217,
+        "startRelativeMs": 1016.599,
+        "endRelativeMs": 1016.816
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 8.444
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 1,
+    "count": 512,
+    "file": "Undo-512.trace.json",
+    "sha256": "7d0562ec0679729c6026e386bf7158e9657510f764bd870f9d8c866925fc7d9b",
+    "bytes": 8642915,
+    "windowMs": 3001.323,
+    "threads": {
+      "(21806, 19970778)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 4.807,
+        "taskUnionMs": 221.803
+      },
+      "(21800, 19970716)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.062,
+        "taskUnionMs": 0.404
+      },
+      "(21796, 19970664)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.077,
+        "taskUnionMs": 0.679
+      },
+      "(21806, 19970802)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.166,
+        "taskUnionMs": 0.878
+      },
+      "(21806, 19971130)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 28.661,
+        "taskUnionMs": 483.904
+      },
+      "(21806, 19970963)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.093,
+        "taskUnionMs": 0.455
+      },
+      "(21796, 19970645)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.117,
+        "taskUnionMs": 4.497
+      },
+      "(21796, 19970710)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.077,
+        "taskUnionMs": 0.832
+      },
+      "(21800, 19970754)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.106,
+        "taskUnionMs": 19.871
+      },
+      "(21806, 19970817)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.176,
+        "taskUnionMs": 23.108
+      },
+      "(21800, 19970685)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 3.152,
+        "taskUnionMs": 21.378
+      },
+      "(21796, 19970665)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.769,
+        "taskUnionMs": 0.935
+      },
+      "(21796, 19970671)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.045,
+        "taskUnionMs": 1.961
+      },
+      "(21806, 19970813)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.026,
+        "taskUnionMs": 0.636
+      },
+      "(21800, 19970753)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.002,
+        "taskUnionMs": 0.004
+      },
+      "(21806, 19970807)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.031,
+        "taskUnionMs": 0.059
+      },
+      "(21796, 19970672)": {
+        "name": "MemoryInfra",
+        "maxTaskMs": 0.013,
+        "taskUnionMs": 0.017
+      }
+    },
+    "resourceFinishedEncodedBytes": 7184,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(21806, 19971130)",
+        "durationMs": 0.613,
+        "startRelativeMs": 20.849,
+        "endRelativeMs": 21.462
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(21806, 19971130)",
+        "durationMs": 0.151,
+        "startRelativeMs": 867.28,
+        "endRelativeMs": 867.431
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(21806, 19971130)",
+        "durationMs": 27.86,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 42.334
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 1,
+    "count": 512,
+    "file": "stable-copy-native-mc-512-selection.trace.json",
+    "sha256": "304d14d424cdbfb87cc54e8d7bb9109dd761a0eb597e241b93e129d3cb387756",
+    "bytes": 4426086,
+    "windowMs": 3001.584,
+    "threads": {
+      "(21806, 19970778)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 4.728,
+        "taskUnionMs": 267.119
+      },
+      "(21800, 19970716)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.063,
+        "taskUnionMs": 0.418
+      },
+      "(21806, 19970802)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.095,
+        "taskUnionMs": 0.549
+      },
+      "(21806, 19971130)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 0.966,
+        "taskUnionMs": 5.001
+      },
+      "(21806, 19970963)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.104,
+        "taskUnionMs": 0.111
+      },
+      "(21796, 19970664)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.064,
+        "taskUnionMs": 0.551
+      },
+      "(21796, 19970645)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.757,
+        "taskUnionMs": 7.092
+      },
+      "(21796, 19970710)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.052,
+        "taskUnionMs": 0.85
+      },
+      "(21800, 19970754)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.148,
+        "taskUnionMs": 24.648
+      },
+      "(21806, 19970817)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.154,
+        "taskUnionMs": 26.865
+      },
+      "(21796, 19970671)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.072,
+        "taskUnionMs": 1.237
+      },
+      "(21800, 19970753)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.023,
+        "taskUnionMs": 0.03
+      },
+      "(21800, 19970685)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 1.53,
+        "taskUnionMs": 18.503
+      },
+      "(21806, 19970813)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.021,
+        "taskUnionMs": 0.45
+      },
+      "(21796, 19970665)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.209,
+        "taskUnionMs": 0.391
+      },
+      "(21806, 19970807)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.037,
+        "taskUnionMs": 0.037
+      }
+    },
+    "resourceFinishedEncodedBytes": 167,
+    "resourceFinishes": 1,
+    "openedSpans": [],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 0
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 1,
+    "count": 512,
+    "file": "stable-copy-native-mc-512-single.trace.json",
+    "sha256": "487375f0ae5942b6e5613faa3fc201769f8570b1a9258d26268ccdd1b274c03e",
+    "bytes": 6366154,
+    "windowMs": 3000.638,
+    "threads": {
+      "(21806, 19970778)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 4.517,
+        "taskUnionMs": 185.675
+      },
+      "(21800, 19970716)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.049,
+        "taskUnionMs": 0.252
+      },
+      "(21796, 19970664)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.051,
+        "taskUnionMs": 0.413
+      },
+      "(21806, 19970802)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.046,
+        "taskUnionMs": 0.507
+      },
+      "(21806, 19970963)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.191,
+        "taskUnionMs": 0.689
+      },
+      "(21806, 19971130)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 170.414,
+        "taskUnionMs": 618.1
+      },
+      "(21796, 19970645)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.091,
+        "taskUnionMs": 4.038
+      },
+      "(21796, 19970710)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.064,
+        "taskUnionMs": 0.749
+      },
+      "(21806, 19970817)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.13,
+        "taskUnionMs": 20.143
+      },
+      "(21800, 19970754)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.117,
+        "taskUnionMs": 17.217
+      },
+      "(21800, 19970685)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 3.21,
+        "taskUnionMs": 20.834
+      },
+      "(21796, 19970671)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.045,
+        "taskUnionMs": 1.752
+      },
+      "(21806, 19970813)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.018,
+        "taskUnionMs": 0.575
+      },
+      "(21800, 19970753)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.003,
+        "taskUnionMs": 0.006
+      },
+      "(21796, 19970665)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.397,
+        "taskUnionMs": 0.592
+      },
+      "(21806, 19970807)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.027,
+        "taskUnionMs": 0.045
+      }
+    },
+    "resourceFinishedEncodedBytes": 200494,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(21806, 19971130)",
+        "durationMs": 0.617,
+        "startRelativeMs": 31.808,
+        "endRelativeMs": 32.425
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(21806, 19971130)",
+        "durationMs": 0.206,
+        "startRelativeMs": 227.483,
+        "endRelativeMs": 227.689
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(21806, 19971130)",
+        "durationMs": 0.179,
+        "startRelativeMs": 1132.423,
+        "endRelativeMs": 1132.602
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 8.62
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 2,
+    "count": 1,
+    "file": "Undo-1.trace.json",
+    "sha256": "86c6190133c9142b48d707a34c435af9338c0d9af8b90ce7ea660e59ccfcd067",
+    "bytes": 7647292,
+    "windowMs": 3002.619,
+    "threads": {
+      "(22013, 19972741)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.08,
+        "taskUnionMs": 0.423
+      },
+      "(22009, 19972687)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.094,
+        "taskUnionMs": 0.671
+      },
+      "(22019, 19972825)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.12,
+        "taskUnionMs": 0.968
+      },
+      "(22019, 19972800)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 8.066,
+        "taskUnionMs": 213.247
+      },
+      "(22019, 19973149)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 24.074,
+        "taskUnionMs": 659.526
+      },
+      "(22019, 19972986)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.121,
+        "taskUnionMs": 0.514
+      },
+      "(22009, 19972663)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.121,
+        "taskUnionMs": 4.517
+      },
+      "(22009, 19972733)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.07,
+        "taskUnionMs": 0.836
+      },
+      "(22019, 19972838)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.345,
+        "taskUnionMs": 10.985
+      },
+      "(22013, 19972777)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.112,
+        "taskUnionMs": 10.227
+      },
+      "(22013, 19972707)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 3.122,
+        "taskUnionMs": 14.111
+      },
+      "(22009, 19972694)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.05,
+        "taskUnionMs": 1.771
+      },
+      "(22019, 19972836)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.024,
+        "taskUnionMs": 0.617
+      },
+      "(22013, 19972776)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.002,
+        "taskUnionMs": 0.005
+      },
+      "(22009, 19972688)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.518,
+        "taskUnionMs": 0.687
+      },
+      "(22019, 19972833)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.064,
+        "taskUnionMs": 0.093
+      },
+      "(22009, 19972695)": {
+        "name": "MemoryInfra",
+        "maxTaskMs": 0.015,
+        "taskUnionMs": 0.023
+      }
+    },
+    "resourceFinishedEncodedBytes": 7184,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(22019, 19973149)",
+        "durationMs": 0.542,
+        "startRelativeMs": 19.902,
+        "endRelativeMs": 20.444
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(22019, 19973149)",
+        "durationMs": 0.232,
+        "startRelativeMs": 866.067,
+        "endRelativeMs": 866.299
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(22019, 19973149)",
+        "durationMs": 16.707,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(22019, 19973149)",
+        "durationMs": 0.019,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(22019, 19973149)",
+        "durationMs": 0.008,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 30.639
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 2,
+    "count": 1,
+    "file": "stable-copy-native-mc-1-selection.trace.json",
+    "sha256": "eddcd766b76a555e57fcfcbe30aa5b52ae6cb84c4f4acea0cba519584943d3de",
+    "bytes": 3031895,
+    "windowMs": 3003.017,
+    "threads": {
+      "(22019, 19972800)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 4.809,
+        "taskUnionMs": 272.983
+      },
+      "(22013, 19972741)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.067,
+        "taskUnionMs": 0.413
+      },
+      "(22019, 19972825)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.122,
+        "taskUnionMs": 0.659
+      },
+      "(22019, 19973149)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 0.626,
+        "taskUnionMs": 4.626
+      },
+      "(22019, 19972986)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.103,
+        "taskUnionMs": 0.109
+      },
+      "(22009, 19972687)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.086,
+        "taskUnionMs": 0.644
+      },
+      "(22009, 19972663)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.866,
+        "taskUnionMs": 7.352
+      },
+      "(22009, 19972733)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.08,
+        "taskUnionMs": 0.876
+      },
+      "(22019, 19972838)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.242,
+        "taskUnionMs": 8.648
+      },
+      "(22013, 19972777)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.136,
+        "taskUnionMs": 9.842
+      },
+      "(22009, 19972694)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.083,
+        "taskUnionMs": 1.324
+      },
+      "(22013, 19972776)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.017,
+        "taskUnionMs": 0.025
+      },
+      "(22013, 19972707)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 1.101,
+        "taskUnionMs": 3.6
+      },
+      "(22019, 19972836)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.024,
+        "taskUnionMs": 0.494
+      },
+      "(22009, 19972688)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.308,
+        "taskUnionMs": 0.486
+      },
+      "(22019, 19972833)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.051,
+        "taskUnionMs": 0.051
+      }
+    },
+    "resourceFinishedEncodedBytes": 167,
+    "resourceFinishes": 1,
+    "openedSpans": [],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 0
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 2,
+    "count": 1,
+    "file": "stable-copy-native-mc-1-single.trace.json",
+    "sha256": "5932901e88607aea7387026e8e53fd736bd3688452cabf19f266f6557389c484",
+    "bytes": 5865147,
+    "windowMs": 3002.958,
+    "threads": {
+      "(22009, 19972687)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.08,
+        "taskUnionMs": 0.465
+      },
+      "(22013, 19972741)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.069,
+        "taskUnionMs": 0.368
+      },
+      "(22009, 19972663)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.108,
+        "taskUnionMs": 4.324
+      },
+      "(22019, 19972800)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 5.647,
+        "taskUnionMs": 207.137
+      },
+      "(22019, 19972825)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.056,
+        "taskUnionMs": 0.668
+      },
+      "(22019, 19973149)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 168.984,
+        "taskUnionMs": 689.185
+      },
+      "(22019, 19972986)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.145,
+        "taskUnionMs": 0.5
+      },
+      "(22009, 19972733)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.052,
+        "taskUnionMs": 0.788
+      },
+      "(22019, 19972838)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.192,
+        "taskUnionMs": 8.636
+      },
+      "(22013, 19972777)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.121,
+        "taskUnionMs": 9.216
+      },
+      "(22009, 19972694)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.066,
+        "taskUnionMs": 1.616
+      },
+      "(22019, 19972836)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.021,
+        "taskUnionMs": 0.629
+      },
+      "(22013, 19972776)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.002,
+        "taskUnionMs": 0.005
+      },
+      "(22013, 19972707)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 2.735,
+        "taskUnionMs": 10.752
+      },
+      "(22009, 19972688)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.373,
+        "taskUnionMs": 0.577
+      },
+      "(22019, 19972833)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.033,
+        "taskUnionMs": 0.066
+      }
+    },
+    "resourceFinishedEncodedBytes": 7334,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(22019, 19973149)",
+        "durationMs": 0.621,
+        "startRelativeMs": 26.899,
+        "endRelativeMs": 27.52
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(22019, 19973149)",
+        "durationMs": 0.161,
+        "startRelativeMs": 204.064,
+        "endRelativeMs": 204.225
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(22019, 19973149)",
+        "durationMs": 0.186,
+        "startRelativeMs": 1042.181,
+        "endRelativeMs": 1042.367
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(22019, 19973149)",
+        "durationMs": 1.441,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(22019, 19973149)",
+        "durationMs": 0.037,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 8.037
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 2,
+    "count": 1,
+    "file": "Undo-1.trace.json",
+    "sha256": "db4f7c7d91991304423508f717a8bd704d2a74f820fb524680046532908e997a",
+    "bytes": 5023949,
+    "windowMs": 3002.19,
+    "threads": {
+      "(22234, 19974756)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.086,
+        "taskUnionMs": 0.48
+      },
+      "(22230, 19974704)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.096,
+        "taskUnionMs": 0.687
+      },
+      "(22240, 19974817)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 6.721,
+        "taskUnionMs": 250.912
+      },
+      "(22240, 19974842)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.071,
+        "taskUnionMs": 0.654
+      },
+      "(22240, 19974976)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.159,
+        "taskUnionMs": 0.614
+      },
+      "(22240, 19975173)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 10.424,
+        "taskUnionMs": 496.541
+      },
+      "(22230, 19974685)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.12,
+        "taskUnionMs": 4.27
+      },
+      "(22230, 19974748)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.064,
+        "taskUnionMs": 0.851
+      },
+      "(22240, 19974855)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.134,
+        "taskUnionMs": 9.335
+      },
+      "(22234, 19974792)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.122,
+        "taskUnionMs": 9.968
+      },
+      "(22230, 19974711)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.051,
+        "taskUnionMs": 1.792
+      },
+      "(22240, 19974853)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.025,
+        "taskUnionMs": 0.584
+      },
+      "(22234, 19974791)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.003,
+        "taskUnionMs": 0.006
+      },
+      "(22234, 19974724)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 2.993,
+        "taskUnionMs": 9.5
+      },
+      "(22240, 19974848)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.015,
+        "taskUnionMs": 0.015
+      },
+      "(22230, 19974705)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.215,
+        "taskUnionMs": 0.27
+      },
+      "(22230, 19974712)": {
+        "name": "MemoryInfra",
+        "maxTaskMs": 0.009,
+        "taskUnionMs": 0.013
+      }
+    },
+    "resourceFinishedEncodedBytes": 7184,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(22240, 19975173)",
+        "durationMs": 0.551,
+        "startRelativeMs": 20.293,
+        "endRelativeMs": 20.844
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(22240, 19975173)",
+        "durationMs": 0.359,
+        "startRelativeMs": 797.532,
+        "endRelativeMs": 797.891
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(22240, 19975173)",
+        "durationMs": 10.055,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(22240, 19975173)",
+        "durationMs": 0.01,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(22240, 19975173)",
+        "durationMs": 0.007,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 9.881
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 2,
+    "count": 1,
+    "file": "stable-copy-native-mc-1-selection.trace.json",
+    "sha256": "4d20f74721214ac300949dc9da995ee8c7b2f0ae49b3fa8b4221bb66ab8ef0f9",
+    "bytes": 3054249,
+    "windowMs": 3002.364,
+    "threads": {
+      "(22240, 19974817)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 2.73,
+        "taskUnionMs": 249.731
+      },
+      "(22234, 19974756)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.113,
+        "taskUnionMs": 0.611
+      },
+      "(22240, 19974842)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.088,
+        "taskUnionMs": 0.556
+      },
+      "(22240, 19974976)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.119,
+        "taskUnionMs": 0.128
+      },
+      "(22230, 19974704)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.083,
+        "taskUnionMs": 0.739
+      },
+      "(22230, 19974685)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.468,
+        "taskUnionMs": 4.671
+      },
+      "(22240, 19975173)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 0.541,
+        "taskUnionMs": 4.735
+      },
+      "(22230, 19974748)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.074,
+        "taskUnionMs": 0.836
+      },
+      "(22234, 19974792)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.123,
+        "taskUnionMs": 9.62
+      },
+      "(22230, 19974711)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.065,
+        "taskUnionMs": 1.261
+      },
+      "(22234, 19974791)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.024,
+        "taskUnionMs": 0.027
+      },
+      "(22234, 19974724)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 0.842,
+        "taskUnionMs": 3.599
+      },
+      "(22240, 19974855)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.155,
+        "taskUnionMs": 8.326
+      },
+      "(22240, 19974853)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.047,
+        "taskUnionMs": 0.519
+      },
+      "(22230, 19974705)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.107,
+        "taskUnionMs": 0.255
+      }
+    },
+    "resourceFinishedEncodedBytes": 167,
+    "resourceFinishes": 1,
+    "openedSpans": [],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 0
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 2,
+    "count": 1,
+    "file": "stable-copy-native-mc-1-single.trace.json",
+    "sha256": "41ef17f35aa35eb761341996e405db29eec2472d4f286bceb62a5f80b0f9edca",
+    "bytes": 5325171,
+    "windowMs": 3002.335,
+    "threads": {
+      "(22234, 19974756)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.084,
+        "taskUnionMs": 0.43
+      },
+      "(22230, 19974704)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.106,
+        "taskUnionMs": 0.692
+      },
+      "(22240, 19974842)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.073,
+        "taskUnionMs": 0.689
+      },
+      "(22240, 19974817)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 5.53,
+        "taskUnionMs": 235.007
+      },
+      "(22240, 19975173)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 154.135,
+        "taskUnionMs": 603.379
+      },
+      "(22240, 19974976)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.283,
+        "taskUnionMs": 0.76
+      },
+      "(22230, 19974685)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.331,
+        "taskUnionMs": 5.76
+      },
+      "(22230, 19974748)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.073,
+        "taskUnionMs": 0.873
+      },
+      "(22240, 19974855)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.184,
+        "taskUnionMs": 8.588
+      },
+      "(22234, 19974792)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.111,
+        "taskUnionMs": 9.173
+      },
+      "(22230, 19974711)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.052,
+        "taskUnionMs": 1.698
+      },
+      "(22240, 19974853)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.039,
+        "taskUnionMs": 0.629
+      },
+      "(22234, 19974791)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.008,
+        "taskUnionMs": 0.015
+      },
+      "(22234, 19974724)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 2.973,
+        "taskUnionMs": 9.783
+      },
+      "(22230, 19974705)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.205,
+        "taskUnionMs": 0.39
+      },
+      "(22240, 19974848)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.036,
+        "taskUnionMs": 0.072
+      }
+    },
+    "resourceFinishedEncodedBytes": 7334,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(22240, 19975173)",
+        "durationMs": 0.574,
+        "startRelativeMs": 27.512,
+        "endRelativeMs": 28.086
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(22240, 19975173)",
+        "durationMs": 0.187,
+        "startRelativeMs": 191.621,
+        "endRelativeMs": 191.808
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(22240, 19975173)",
+        "durationMs": 0.214,
+        "startRelativeMs": 939.297,
+        "endRelativeMs": 939.511
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(22240, 19975173)",
+        "durationMs": 1.577,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      },
+      {
+        "thread": "(22240, 19975173)",
+        "durationMs": 0.038,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 7.959
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 2,
+    "count": 512,
+    "file": "Undo-512.trace.json",
+    "sha256": "2eadf87c665d34618a816388105ec07aa8c1cd076c868878c880e1580c0d8499",
+    "bytes": 6764395,
+    "windowMs": 3001.363,
+    "threads": {
+      "(22445, 19976765)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 4.992,
+        "taskUnionMs": 239.577
+      },
+      "(22439, 19976705)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.079,
+        "taskUnionMs": 0.404
+      },
+      "(22445, 19977120)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 29.233,
+        "taskUnionMs": 484.983
+      },
+      "(22445, 19976792)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.067,
+        "taskUnionMs": 0.531
+      },
+      "(22435, 19976652)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.09,
+        "taskUnionMs": 0.694
+      },
+      "(22445, 19976955)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.193,
+        "taskUnionMs": 0.752
+      },
+      "(22435, 19976629)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.135,
+        "taskUnionMs": 5.06
+      },
+      "(22435, 19976697)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.088,
+        "taskUnionMs": 0.946
+      },
+      "(22439, 19976738)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.119,
+        "taskUnionMs": 21.535
+      },
+      "(22445, 19976805)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.138,
+        "taskUnionMs": 25.343
+      },
+      "(22439, 19976673)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 3.166,
+        "taskUnionMs": 23.346
+      },
+      "(22435, 19976659)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.048,
+        "taskUnionMs": 2.063
+      },
+      "(22445, 19976803)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.021,
+        "taskUnionMs": 0.656
+      },
+      "(22439, 19976737)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.003,
+        "taskUnionMs": 0.005
+      },
+      "(22445, 19976800)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.044,
+        "taskUnionMs": 0.086
+      },
+      "(22435, 19976653)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.654,
+        "taskUnionMs": 0.814
+      },
+      "(22435, 19976660)": {
+        "name": "MemoryInfra",
+        "maxTaskMs": 0.012,
+        "taskUnionMs": 0.017
+      }
+    },
+    "resourceFinishedEncodedBytes": 7184,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(22445, 19977120)",
+        "durationMs": 0.576,
+        "startRelativeMs": 31.23,
+        "endRelativeMs": 31.806
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(22445, 19977120)",
+        "durationMs": 0.137,
+        "startRelativeMs": 906.443,
+        "endRelativeMs": 906.58
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(22445, 19977120)",
+        "durationMs": 28.406,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 4.857
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 2,
+    "count": 512,
+    "file": "stable-copy-native-mc-512-selection.trace.json",
+    "sha256": "28314d19a293e4fc78859783994cb0e10afc0766e227328c64e0139ecb347792",
+    "bytes": 4455443,
+    "windowMs": 3002.305,
+    "threads": {
+      "(22445, 19976765)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 3.214,
+        "taskUnionMs": 300.462
+      },
+      "(22439, 19976705)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.074,
+        "taskUnionMs": 0.524
+      },
+      "(22445, 19976792)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.061,
+        "taskUnionMs": 0.499
+      },
+      "(22445, 19976955)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.108,
+        "taskUnionMs": 0.115
+      },
+      "(22445, 19977120)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 0.427,
+        "taskUnionMs": 4.579
+      },
+      "(22435, 19976652)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.081,
+        "taskUnionMs": 0.692
+      },
+      "(22435, 19976629)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.646,
+        "taskUnionMs": 6.062
+      },
+      "(22435, 19976697)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.063,
+        "taskUnionMs": 0.908
+      },
+      "(22445, 19976803)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.053,
+        "taskUnionMs": 0.542
+      },
+      "(22435, 19976659)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.115,
+        "taskUnionMs": 1.361
+      },
+      "(22439, 19976738)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.139,
+        "taskUnionMs": 24.749
+      },
+      "(22445, 19976805)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.592,
+        "taskUnionMs": 28.851
+      },
+      "(22439, 19976673)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 0.635,
+        "taskUnionMs": 18.39
+      },
+      "(22439, 19976737)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.026,
+        "taskUnionMs": 0.032
+      },
+      "(22435, 19976653)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.173,
+        "taskUnionMs": 0.317
+      },
+      "(22445, 19976800)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.037,
+        "taskUnionMs": 0.037
+      }
+    },
+    "resourceFinishedEncodedBytes": 167,
+    "resourceFinishes": 1,
+    "openedSpans": [],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 0
+  },
+  {
+    "arm": "native-map-children",
+    "trial": 2,
+    "count": 512,
+    "file": "stable-copy-native-mc-512-single.trace.json",
+    "sha256": "3eee1fe8544d59f637da610f3e32f811bd688b2c8188f1cdf62fbca124f0e7c0",
+    "bytes": 6469516,
+    "windowMs": 3002.369,
+    "threads": {
+      "(22445, 19976765)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 4.778,
+        "taskUnionMs": 201.549
+      },
+      "(22439, 19976705)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.063,
+        "taskUnionMs": 0.394
+      },
+      "(22445, 19976792)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.054,
+        "taskUnionMs": 0.683
+      },
+      "(22435, 19976652)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.085,
+        "taskUnionMs": 0.641
+      },
+      "(22435, 19976629)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 3.598,
+        "taskUnionMs": 9.028
+      },
+      "(22445, 19976955)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.173,
+        "taskUnionMs": 0.715
+      },
+      "(22445, 19977120)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 177.046,
+        "taskUnionMs": 637.284
+      },
+      "(22435, 19976697)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.072,
+        "taskUnionMs": 0.834
+      },
+      "(22439, 19976738)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.137,
+        "taskUnionMs": 18.46
+      },
+      "(22445, 19976805)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.272,
+        "taskUnionMs": 21.52
+      },
+      "(22439, 19976673)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 3.228,
+        "taskUnionMs": 22.67
+      },
+      "(22435, 19976659)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.075,
+        "taskUnionMs": 1.841
+      },
+      "(22445, 19976803)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.02,
+        "taskUnionMs": 0.605
+      },
+      "(22439, 19976737)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.003,
+        "taskUnionMs": 0.005
+      },
+      "(22435, 19976653)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.37,
+        "taskUnionMs": 0.583
+      },
+      "(22445, 19976800)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.034,
+        "taskUnionMs": 0.057
+      },
+      "(22435, 19976660)": {
+        "name": "MemoryInfra",
+        "maxTaskMs": 6.969,
+        "taskUnionMs": 11.407
+      },
+      "(22439, 19977660)": {
+        "name": "MemoryInfra",
+        "maxTaskMs": 5.983,
+        "taskUnionMs": 5.983
+      },
+      "(22445, 19977663)": {
+        "name": "MemoryInfra",
+        "maxTaskMs": 0.83,
+        "taskUnionMs": 0.83
+      }
+    },
+    "resourceFinishedEncodedBytes": 200494,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(22445, 19977120)",
+        "durationMs": 0.6,
+        "startRelativeMs": 24.131,
+        "endRelativeMs": 24.731
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(22445, 19977120)",
+        "durationMs": 0.22,
+        "startRelativeMs": 227.868,
+        "endRelativeMs": 228.088
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(22445, 19977120)",
+        "durationMs": 0.18,
+        "startRelativeMs": 1104.766,
+        "endRelativeMs": 1104.946
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 7.496
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 2,
+    "count": 512,
+    "file": "Undo-512.trace.json",
+    "sha256": "d900ea3483c3a8592b66c1803d5fe376a5de93caeaf5c44e858b07cbee95fa65",
+    "bytes": 6646155,
+    "windowMs": 3002.013,
+    "threads": {
+      "(22660, 19978759)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 4.686,
+        "taskUnionMs": 232.67
+      },
+      "(22654, 19978697)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.062,
+        "taskUnionMs": 0.369
+      },
+      "(22650, 19978647)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.071,
+        "taskUnionMs": 0.582
+      },
+      "(22660, 19978784)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.065,
+        "taskUnionMs": 0.559
+      },
+      "(22660, 19979107)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 29.948,
+        "taskUnionMs": 441.176
+      },
+      "(22660, 19978951)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.141,
+        "taskUnionMs": 0.523
+      },
+      "(22650, 19978626)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.153,
+        "taskUnionMs": 4.442
+      },
+      "(22650, 19978690)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.079,
+        "taskUnionMs": 0.895
+      },
+      "(22654, 19978732)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.121,
+        "taskUnionMs": 20.585
+      },
+      "(22660, 19978800)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.144,
+        "taskUnionMs": 24.384
+      },
+      "(22654, 19978668)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 3.264,
+        "taskUnionMs": 22.895
+      },
+      "(22650, 19978654)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.047,
+        "taskUnionMs": 2.054
+      },
+      "(22660, 19978794)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.031,
+        "taskUnionMs": 0.71
+      },
+      "(22654, 19978731)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.007,
+        "taskUnionMs": 0.012
+      },
+      "(22660, 19978788)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.051,
+        "taskUnionMs": 0.094
+      },
+      "(22650, 19978648)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.682,
+        "taskUnionMs": 0.802
+      },
+      "(22650, 19978655)": {
+        "name": "MemoryInfra",
+        "maxTaskMs": 0.038,
+        "taskUnionMs": 0.046
+      }
+    },
+    "resourceFinishedEncodedBytes": 7184,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(22660, 19979107)",
+        "durationMs": 0.574,
+        "startRelativeMs": 27.345,
+        "endRelativeMs": 27.919
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(22660, 19979107)",
+        "durationMs": 0.145,
+        "startRelativeMs": 806.797,
+        "endRelativeMs": 806.942
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [
+      {
+        "thread": "(22660, 19979107)",
+        "durationMs": 28.379,
+        "policies": [
+          "mapping-policy:original"
+        ]
+      }
+    ],
+    "mapperObserved": true,
+    "maxGCInclusiveMs": 4.536
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 2,
+    "count": 512,
+    "file": "stable-copy-native-mc-512-selection.trace.json",
+    "sha256": "8ebb80d645d693738638483b016f29dd320420ad4c7aab27b4db58fce78f6aa2",
+    "bytes": 4380622,
+    "windowMs": 3002.649,
+    "threads": {
+      "(22660, 19978759)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 2.99,
+        "taskUnionMs": 252.553
+      },
+      "(22654, 19978697)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.08,
+        "taskUnionMs": 0.468
+      },
+      "(22660, 19978784)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.06,
+        "taskUnionMs": 0.422
+      },
+      "(22660, 19978951)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.162,
+        "taskUnionMs": 0.171
+      },
+      "(22660, 19979107)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 0.678,
+        "taskUnionMs": 5.671
+      },
+      "(22650, 19978647)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.088,
+        "taskUnionMs": 0.572
+      },
+      "(22650, 19978626)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.61,
+        "taskUnionMs": 4.777
+      },
+      "(22650, 19978690)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.073,
+        "taskUnionMs": 0.828
+      },
+      "(22654, 19978732)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.107,
+        "taskUnionMs": 22.3
+      },
+      "(22660, 19978800)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.147,
+        "taskUnionMs": 25.213
+      },
+      "(22654, 19978668)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 1.228,
+        "taskUnionMs": 17.375
+      },
+      "(22650, 19978654)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.056,
+        "taskUnionMs": 1.234
+      },
+      "(22654, 19978731)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.025,
+        "taskUnionMs": 0.03
+      },
+      "(22660, 19978794)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.042,
+        "taskUnionMs": 0.468
+      },
+      "(22650, 19978648)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.073,
+        "taskUnionMs": 0.157
+      },
+      "(22660, 19978788)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.047,
+        "taskUnionMs": 0.047
+      }
+    },
+    "resourceFinishedEncodedBytes": 167,
+    "resourceFinishes": 1,
+    "openedSpans": [],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 0
+  },
+  {
+    "arm": "ordinal-pages",
+    "trial": 2,
+    "count": 512,
+    "file": "stable-copy-native-mc-512-single.trace.json",
+    "sha256": "f15ba14244b4ce2712d21b10a3fc146b404a5e9c7abe475eaf04c359790fbe1e",
+    "bytes": 6438629,
+    "windowMs": 3002.82,
+    "threads": {
+      "(22660, 19978759)": {
+        "name": "CrRendererMain",
+        "maxTaskMs": 4.836,
+        "taskUnionMs": 213.441
+      },
+      "(22654, 19978697)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.055,
+        "taskUnionMs": 0.389
+      },
+      "(22660, 19978784)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.112,
+        "taskUnionMs": 0.61
+      },
+      "(22650, 19978647)": {
+        "name": "PerfettoTrace",
+        "maxTaskMs": 0.068,
+        "taskUnionMs": 0.587
+      },
+      "(22660, 19979107)": {
+        "name": "DedicatedWorker thread",
+        "maxTaskMs": 159.207,
+        "taskUnionMs": 657.384
+      },
+      "(22660, 19978951)": {
+        "name": "ServiceWorker thread",
+        "maxTaskMs": 0.269,
+        "taskUnionMs": 0.809
+      },
+      "(22650, 19978626)": {
+        "name": "CrBrowserMain",
+        "maxTaskMs": 0.143,
+        "taskUnionMs": 4.765
+      },
+      "(22650, 19978690)": {
+        "name": "Chrome_DevToolsHandlerThread",
+        "maxTaskMs": 0.062,
+        "taskUnionMs": 0.846
+      },
+      "(22654, 19978732)": {
+        "name": "VizCompositorThread",
+        "maxTaskMs": 0.094,
+        "taskUnionMs": 19.042
+      },
+      "(22660, 19978800)": {
+        "name": "Compositor",
+        "maxTaskMs": 0.315,
+        "taskUnionMs": 22.858
+      },
+      "(22654, 19978668)": {
+        "name": "CrGpuMain",
+        "maxTaskMs": 3.374,
+        "taskUnionMs": 21.661
+      },
+      "(22650, 19978654)": {
+        "name": "Chrome_IOThread",
+        "maxTaskMs": 0.049,
+        "taskUnionMs": 1.825
+      },
+      "(22660, 19978794)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.075,
+        "taskUnionMs": 0.688
+      },
+      "(22654, 19978731)": {
+        "name": "Chrome_ChildIOThread",
+        "maxTaskMs": 0.004,
+        "taskUnionMs": 0.008
+      },
+      "(22650, 19978648)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.202,
+        "taskUnionMs": 0.36
+      },
+      "(22660, 19978788)": {
+        "name": "ThreadPoolServiceThread",
+        "maxTaskMs": 0.029,
+        "taskUnionMs": 0.046
+      }
+    },
+    "resourceFinishedEncodedBytes": 200494,
+    "resourceFinishes": 6,
+    "openedSpans": [
+      {
+        "phase": "opened:materialize",
+        "thread": "(22660, 19979107)",
+        "durationMs": 0.594,
+        "startRelativeMs": 22.387,
+        "endRelativeMs": 22.981
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(22660, 19979107)",
+        "durationMs": 0.225,
+        "startRelativeMs": 208.602,
+        "endRelativeMs": 208.827
+      },
+      {
+        "phase": "opened:materialize",
+        "thread": "(22660, 19979107)",
+        "durationMs": 0.172,
+        "startRelativeMs": 1021.014,
+        "endRelativeMs": 1021.186
+      }
+    ],
+    "cpuProfileChunks": 0,
+    "mappingSpans": [],
+    "mapperObserved": false,
+    "maxGCInclusiveMs": 7.979
+  }
+]

@@ -49,6 +49,65 @@
 			sections compare rewrite revisions or implementation paths and follow the
 			<a href="performance-interaction.html">previous comparison with main</a>.
 		</p>
+		<h2>Ordinal adjacency experiment</h2>
+		<p>
+			Twelve isolated native browser cases passed exact source, selection, caret
+			and independent accepted edit/Undo checks. The private CRDT children index
+			shares insertion-ordered sibling pages between forks. Production adoption
+			is held because small-target loading and snapshot work regress.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Observed median, ms</th>
+					<th>Control</th>
+					<th>Candidate</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Undo value frame, one selection</td>
+					<td>128.2</td>
+					<td>42.8</td>
+				</tr>
+				<tr>
+					<td>Undo value frame, 512 selections</td>
+					<td>126.8</td>
+					<td>63.6</td>
+				</tr>
+				<tr>
+					<td>Input value frame, one selection</td>
+					<td>6.3</td>
+					<td>10.7</td>
+				</tr>
+				<tr>
+					<td>Input value frame, 512 selections</td>
+					<td>11.7</td>
+					<td>13.4</td>
+				</tr>
+				<tr>
+					<td>Module load, 1,000 small targets</td>
+					<td>70.49</td>
+					<td>86.25</td>
+				</tr>
+				<tr>
+					<td>Large module snapshot</td>
+					<td>53.14</td>
+					<td>67.73</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+			Value-frame observations check the native input value at
+			requestAnimationFrame after a trusted key event. They do not measure
+			painted pixels or physical 120Hz presentation. The earlier 154–170ms
+			figures describe the largest worker tasks, not input-to-visible-text
+			latency. Native drafts already update before worker acknowledgment.
+			Main-thread task peaks were 8.066ms for control and 6.721ms for candidate;
+			total main-thread work increased. Saved-badge observations can see a stale
+			badge and are not accepted-receipt latency. This compares experimental
+			worker implementations, not production against main.
+		</p>
 		<h2>Fresh bundle comparison</h2>
 		<p>
 			Fresh production builds of main <code>a749728</code> and rewrite

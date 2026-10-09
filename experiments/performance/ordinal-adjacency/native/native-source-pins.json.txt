@@ -1,0 +1,26 @@
+{
+  "shared/document-actions.ts": "ce0306e866e2ee931a2d4472f3fc9298fed54c5443e24722eb7cd4b3f2f2eafe",
+  "shared/document-session.ts": "f49813ffb4e8dbcee1dddba26e58207efd464e14fda56d6e9b184f7b3c36420f",
+  "client/worker-document/worker-opened-capabilities.ts": "834abdd3a085cf5b3a9463bd24ffbd590c3f8672503f4d17981483edf37db004",
+  "client/worker-document/worker-session.ts": "f7a873027e50deb2f42255975f5242016021ec47f6a2b3f643c3263b5520d1da",
+  "client/worker-document/worker-opened-observation.ts": "cb697a5c684020a63ca762af21bffd1fdd701f587763f902f331a5c897e30e17",
+  "client/worker-document/worker-editor-basis.ts": "fa11ec4ff09406dec6300873a4883d04e21664dc5251a804f03106aaef3275ac",
+  "src/client/components/editor.ts": "ba304aebd2cc9ab9e326f1943e7b9a2645187bed0494f895d9ae22bab9945cb2",
+  "src/client/source-textarea.ts": "21887f5aab82815b14c20d8d261b17cb5ffd53fd51f299f2f00229b7a768c0d1",
+  "src/client/editor-viewport.ts": "98959330a68d6b096a7d3b5b4efd3179606ad37729c2f5dc199f8eca50867b2c",
+  "src/shared/projection.ts": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e",
+  "public/app.css": "81f837602e54ed6695e3d900d3701bb4c2ef49b31701b3586e6b1d49fe5e513d",
+  "controlCRDT": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+  "candidateCRDT": "6bcad274fcac66bf8ec36e0bd06aebd6de569b99879936427204f8d23df78605",
+  "scope": "Verified experimental Worker component/session/driver lineage identical to prior atomIndex comparison; only children source delta, no full-production Worker parity claim.",
+  "builtAssets": {
+    "native-map-children": {
+      "app.js": "afc662fe24816d814c0c4b18d39f688c987d64ee29355224e78bbaa7770d8cf4",
+      "worker-editor.js": "aec40eb1a50128a3cd99cc1150e23404a4e24069adaef8ed9e6ac41969a725b8"
+    },
+    "ordinal-pages": {
+      "app.js": "3b5e90270d3e83b487357ee64bbfce60df03eef571c06128182bcc883ba93b7e",
+      "worker-editor.js": "c05f83f6afb1a81b41bba5d6d663829119a088781ac1b1603dd4e1c07ba6b189"
+    }
+  }
+}

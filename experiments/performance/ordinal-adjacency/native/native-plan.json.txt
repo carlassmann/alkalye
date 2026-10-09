@@ -1,0 +1,18 @@
+{
+  "status": "UNRUN",
+  "cells": 12,
+  "n": 3,
+  "counts": [
+    1,
+    512
+  ],
+  "arms": [
+    "native-map-children",
+    "ordinal-pages"
+  ],
+  "pristineSeed": "/tmp/alkalye-worker-anchor-mapping/native-seeded-snapshot",
+  "allRanges": "Exact direction/primary/caret/source/accepted edit+Undo retained",
+  "windows": "Selection/native input/Undo3s each, no sampler",
+  "workState": "/tmp/alkalye-worker-adjacency-ordinal-pages-native-work-state",
+  "setupFailure": "Copied-file list included nonexistent top-level cli.ts; corrected source-only. Actual driver imports existing src/cli/api-documents. No process/actions issued."
+}

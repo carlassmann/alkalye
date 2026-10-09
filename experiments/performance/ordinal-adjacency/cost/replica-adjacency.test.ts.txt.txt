@@ -1,0 +1,49 @@
+import { expect, test } from "bun:test"
+import * as Effect from "effect/Effect"
+import { Replica } from "../src/shared/crdt"
+import { Replica as Baseline } from "../src/shared/crdt-baseline"
+
+for (let source of [
+ "Paragraph 😀\n".repeat(1024),
+ "Body 😀\r\nTail",
+ '\uFEFF---\r\ntitle: One\r\n---\r\nBody 🦋',
+ '---\ntitle: One\n---\n---\ntitle: Two\n---\nBody 🌻',
+ '---\n---\nBody',
+]) {
+ test("adjacency preserves exact checkpoint and canonical source case " + source.length, async () => {
+  let control = new Baseline("owner")
+  let candidate = new Replica("owner")
+  let seed = control.edit("document", source)
+  if (!seed) throw Error("Missing seed")
+  candidate.apply([seed])
+  let first = control.fork("first")
+  let second = control.fork("second")
+  let firstEdit = first.edit("document", source + "First 😀")
+  let secondEdit = second.edit("document", "Second 🦋\n" + source)
+  if (!firstEdit || !secondEdit) throw Error("Missing sibling edit")
+  for (let operation of [secondEdit, firstEdit]) {
+   control.apply([operation]); candidate.apply([operation])
+   expect(candidate.checkpoint()).toEqual(control.checkpoint())
+   expect(candidate.text("document")).toBe(control.text("document"))
+   expect(candidate.visible("document")).toEqual(control.visible("document"))
+   expect(candidate.metadata("document")).toEqual(control.metadata("document"))
+   expect(candidate.revision("document")).toBe(control.revision("document"))
+  }
+  let retained = candidate.checkpoint()
+  let child = await Effect.runPromise(candidate.forkEffect("child"))
+  let cancellation = control.cancel("document", firstEdit.id)
+  candidate.apply([cancellation])
+  expect(candidate.checkpoint()).toEqual(control.checkpoint())
+  expect(candidate.text("document")).toBe(control.text("document"))
+  expect(child.checkpoint()).toEqual(retained)
+  let childEdit = child.edit("other", "Different target 😀")
+  if (!childEdit) throw Error("Missing child target")
+  expect(candidate.text("other")).toBe("")
+  candidate.apply([childEdit]);control.apply([childEdit])
+  expect(candidate.checkpoint()).toEqual(control.checkpoint())
+  let cold = await Effect.runPromise(Replica.fromCheckpointEffect(candidate.checkpoint(), "cold"))
+  expect(cold.checkpoint()).toEqual(candidate.checkpoint())
+  expect(cold.text("document")).toBe(candidate.text("document"))
+  expect(cold.metadata("document")).toEqual(candidate.metadata("document"))
+ })
+}

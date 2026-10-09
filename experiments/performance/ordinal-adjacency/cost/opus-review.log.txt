@@ -1,0 +1,28 @@
+No semantic blocker found. The only concrete correction is formatting. I reviewed the patch and code by reading only; nothing was run or measured.
+
+**Blocker (mechanical):** `ChildrenIndex` is indented with single spaces, and the long default-parameter line and the `get` return line are over the Prettier line width. The Prettier step in `bun run check` will fail. Fix: run `prettier --write` on the file.
+
+**Fork independence: correct**
+- Each side gets its own spine and bucket array (`slice`), and `fork()` resets ownership on both sides. Any later write to a shared page or bucket copies it first, on either side.
+- Old pages and root siblings: updating an existing key (`""` hashes to bucket 0) only replaces that key's sibling array in its page. The page is copied first if shared, and the bucket Map is untouched because the ordinal doesn't change. Correct.
+- Sibling arrays are shared between replicas. That's safe: the only writer is `indexAtom`, which spreads before splicing. The read at line 689 and `values()` only read.
+- Duplicate insert/apply: the `atomIndex.has` guard runs before any children write.
+- Interrupted or cancelled cooperative fork: targets already forked lose ownership in the parent too. That only costs an extra copy later and is never wrong, same as `AtomIndex`. A replica rejected after a concurrent edit is discarded; the source stays consistent.
+- Restore and the `sourceOffsets` fork at line 811 don't touch children.
+
+**Order: exact**
+- Ordinals come from `size++` at a key's first insertion. Map insertion order did the same: updates kept a key's place and no code path deletes keys. So `values()` gives the same order for checkpoint, `revision` and `originalFrames`.
+- New pages are only ever created at `pages.length`, so pages stay dense with no holes. `Math.floor` and `%` on non-negative integers are safe beyond 2³².
+
+**Cost risks (unmeasured):**
+- **Hot get:** every `get` now parses the id in `atomIndexBucket` (~12–20 char reads) before `Map.get`. The old single Map used the string's cached hash. The materialization stack walk does one `get` per atom, so it could be up to ~2× slower. Measure it before the 54-test run.
+- **Cold load:** `indexAtom` now parses each id 4× (`atomIndex.has`/`set` plus `children.get`/`set`). This is cheap to remove later if it shows up, but not needed now.
+- **Memory and fork cost for small targets:** each target allocates a 256-slot array, a 256-byte `Uint8Array` and a `Set`, and reallocates them on every fork. Control copied only the actual keys. That matters only if replicas hold many small targets (comments, frontmatter fields). If your fixture has those, add a fork benchmark with many targets.
+- **Bucket clustering:** keys from the same operation cluster ≤4096 per bucket, so the first new key after a fork copies at most ~4096 Map entries. That's acceptable.
+
+**Cheaper page copy?** Not needed.
+- The tail page is dense, so `slice()` copies only `size % 4096` entries. Typing appends to the tail.
+- A full page (32 KB of pointers, a few µs) is copied at most once per page per fork, and only when a sibling list under an older key changes.
+- Smaller pages (e.g. 1024) are the only lever. It's a one-constant change, but try it only if measurements show page slices costing time.
+
+**Next:** measure snapshot, durable, materialize and cold load against the 53/111 ms baselines. Reject the variant if the hot get regresses.

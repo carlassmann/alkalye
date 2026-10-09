@@ -1,0 +1,9 @@
+{
+  "name": "1000-small-targets-plus-128k-utf16-document",
+  "utf16Units": 131072,
+  "utf8Bytes": 151236,
+  "realNewlines": 10082,
+  "literalBackslashN": 0,
+  "sourceSHA": "cacd4d99577fe65770daec1b18a95090b5cd82d0982a1d1bbf0cddc75b260fcf",
+  "operations": 1001
+}

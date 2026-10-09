@@ -1,0 +1,12 @@
+{
+  "types": "PASS96006+72108",
+  "publicProof": {
+    "broadTests": 54,
+    "broadAssertions": 783,
+    "oldPageTests": 1,
+    "oldPageAssertions": 16
+  },
+  "performance": "UNRUN",
+  "review": "38334 terminal0, no semantic blocker; formatter-only correction applied",
+  "scope": "Only domain children index. Current adopted atomIndex control unchanged. Exact sibling order/paged values/COW both sides."
+}

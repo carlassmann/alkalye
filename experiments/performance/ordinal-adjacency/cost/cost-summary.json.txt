@@ -1,0 +1,1589 @@
+{
+  "samples": 54,
+  "summary": [
+    {
+      "fixture": "long-one-operation",
+      "mode": "apply",
+      "arm": "baseline",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 898.4260419999998,
+          "min": 894.9929169999996,
+          "max": 923.1023340000029
+        },
+        "textMs": {
+          "median": 145.74387500000012,
+          "min": 141.2333749999998,
+          "max": 150.95183300000008
+        },
+        "lookupMs": {
+          "median": 0.7641659999972035,
+          "min": 0.6243749999994179,
+          "max": 0.8127910000002885
+        },
+        "checkpointMs": {
+          "median": 56.37012500000128,
+          "min": 56.07841600000029,
+          "max": 59.05745900000011
+        },
+        "durableCheckpointMs": {
+          "median": 117.83729099999982,
+          "min": 117.22683300000062,
+          "max": 123.20241600000008
+        },
+        "checkpointBytes": {
+          "median": 192114707,
+          "min": 192114707,
+          "max": 192114707
+        },
+        "durableCheckpointBytes": {
+          "median": 1273623,
+          "min": 1273623,
+          "max": 1273623
+        },
+        "forkMs": {
+          "median": 336.79170799999974,
+          "min": 333.6386249999996,
+          "max": 341.74220799999966
+        },
+        "firstForkWriteMs": {
+          "median": 1.0122919999994338,
+          "min": 0.9547919999968144,
+          "max": 1.1091250000026776
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.846917000002577,
+          "min": 0.8413749999999709,
+          "max": 0.8512919999993755
+        },
+        "heapBefore": {
+          "median": 507613133,
+          "min": 261791645,
+          "max": 533114740
+        },
+        "heapAfterLoad": {
+          "median": 877582075,
+          "min": 785765500,
+          "max": 920782615
+        },
+        "heapAfterFork": {
+          "median": 860328103,
+          "min": 840945936,
+          "max": 868647164
+        },
+        "rssBefore": {
+          "median": 4982079488,
+          "min": 1780105216,
+          "max": 4990058496
+        },
+        "rssAfterLoad": {
+          "median": 4982358016,
+          "min": 1883750400,
+          "max": 4990074880
+        },
+        "rssAfterFork": {
+          "median": 4990025728,
+          "min": 3826827264,
+          "max": 5002182656
+        }
+      }
+    },
+    {
+      "fixture": "long-one-operation",
+      "mode": "apply",
+      "arm": "candidate",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 785.2667499999989,
+          "min": 768.0655000000006,
+          "max": 786.8937920000026
+        },
+        "textMs": {
+          "median": 113.8804999999993,
+          "min": 112.70375000000058,
+          "max": 114.7671250000003
+        },
+        "lookupMs": {
+          "median": 0.7718339999992168,
+          "min": 0.747083999998722,
+          "max": 0.8036250000004657
+        },
+        "checkpointMs": {
+          "median": 65.38291700000264,
+          "min": 64.69354200000089,
+          "max": 72.88545800000065
+        },
+        "durableCheckpointMs": {
+          "median": 132.56954199999745,
+          "min": 126.40637500000048,
+          "max": 158.73254100000122
+        },
+        "checkpointBytes": {
+          "median": 192114707,
+          "min": 192114707,
+          "max": 192114707
+        },
+        "durableCheckpointBytes": {
+          "median": 1273623,
+          "min": 1273623,
+          "max": 1273623
+        },
+        "forkMs": {
+          "median": 237.07058300000062,
+          "min": 228.7671249999985,
+          "max": 237.27820799999972
+        },
+        "firstForkWriteMs": {
+          "median": 1.2873340000005555,
+          "min": 0.9497080000001006,
+          "max": 1.4327499999999418
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.7789169999996375,
+          "min": 0.7512080000014976,
+          "max": 0.7837500000005093
+        },
+        "heapBefore": {
+          "median": 532779168,
+          "min": 503351257,
+          "max": 533260034
+        },
+        "heapAfterLoad": {
+          "median": 930808162,
+          "min": 792020414,
+          "max": 931429986
+        },
+        "heapAfterFork": {
+          "median": 827190728,
+          "min": 817759866,
+          "max": 889569806
+        },
+        "rssBefore": {
+          "median": 4971610112,
+          "min": 4887986176,
+          "max": 5002772480
+        },
+        "rssAfterLoad": {
+          "median": 4971839488,
+          "min": 4902191104,
+          "max": 5002772480
+        },
+        "rssAfterFork": {
+          "median": 4981358592,
+          "min": 4937269248,
+          "max": 5003411456
+        }
+      }
+    },
+    {
+      "fixture": "long-one-operation",
+      "mode": "sync",
+      "arm": "baseline",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 675.9004170000044,
+          "min": 670.188666,
+          "max": 740.1288749999985
+        },
+        "textMs": {
+          "median": 221.6138329999958,
+          "min": 220.32712500000343,
+          "max": 229.58491700000013
+        },
+        "lookupMs": {
+          "median": 0.635708000001614,
+          "min": 0.6132090000000971,
+          "max": 0.7665409999972326
+        },
+        "checkpointMs": {
+          "median": 53.139000000000124,
+          "min": 52.729999999995925,
+          "max": 54.382166999996116
+        },
+        "durableCheckpointMs": {
+          "median": 117.38654200000019,
+          "min": 115.89862499999981,
+          "max": 118.5749169999981
+        },
+        "checkpointBytes": {
+          "median": 192114707,
+          "min": 192114707,
+          "max": 192114707
+        },
+        "durableCheckpointBytes": {
+          "median": 1273623,
+          "min": 1273623,
+          "max": 1273623
+        },
+        "forkMs": {
+          "median": 98.95620799999597,
+          "min": 98.11725000000024,
+          "max": 106.5379580000008
+        },
+        "firstForkWriteMs": {
+          "median": 0.9768330000006245,
+          "min": 0.9094999999997526,
+          "max": 1.0080419999940204
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.814249999995809,
+          "min": 0.7972079999999551,
+          "max": 0.9460409999956028
+        },
+        "heapBefore": {
+          "median": 550455577,
+          "min": 549184202,
+          "max": 551067278
+        },
+        "heapAfterLoad": {
+          "median": 792584666,
+          "min": 791071557,
+          "max": 792938016
+        },
+        "heapAfterFork": {
+          "median": 801774100,
+          "min": 798326328,
+          "max": 804185177
+        },
+        "rssBefore": {
+          "median": 4990042112,
+          "min": 4162469888,
+          "max": 5002575872
+        },
+        "rssAfterLoad": {
+          "median": 4990042112,
+          "min": 4166172672,
+          "max": 5002592256
+        },
+        "rssAfterFork": {
+          "median": 4990058496,
+          "min": 4819894272,
+          "max": 5002756096
+        }
+      }
+    },
+    {
+      "fixture": "long-one-operation",
+      "mode": "sync",
+      "arm": "candidate",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 564.1127080000006,
+          "min": 561.9377080000049,
+          "max": 574.8278330000012
+        },
+        "textMs": {
+          "median": 165.28016699999898,
+          "min": 163.75983300000007,
+          "max": 166.42324999999983
+        },
+        "lookupMs": {
+          "median": 0.6850840000006428,
+          "min": 0.6499170000024606,
+          "max": 0.7315419999995356
+        },
+        "checkpointMs": {
+          "median": 67.72945900000195,
+          "min": 63.556125000000975,
+          "max": 73.92329199999949
+        },
+        "durableCheckpointMs": {
+          "median": 124.1965420000015,
+          "min": 123.37020800000028,
+          "max": 126.15958299999875
+        },
+        "checkpointBytes": {
+          "median": 192114707,
+          "min": 192114707,
+          "max": 192114707
+        },
+        "durableCheckpointBytes": {
+          "median": 1273623,
+          "min": 1273623,
+          "max": 1273623
+        },
+        "forkMs": {
+          "median": 0.6980000000003201,
+          "min": 0.6835829999981797,
+          "max": 0.9136250000010477
+        },
+        "firstForkWriteMs": {
+          "median": 1.0377499999995052,
+          "min": 0.9344580000033602,
+          "max": 1.4002910000017437
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.8162500000034925,
+          "min": 0.7782090000000608,
+          "max": 0.9864159999997355
+        },
+        "heapBefore": {
+          "median": 547904618,
+          "min": 545240512,
+          "max": 547951818
+        },
+        "heapAfterLoad": {
+          "median": 794570534,
+          "min": 784040792,
+          "max": 794581788
+        },
+        "heapAfterFork": {
+          "median": 796098182,
+          "min": 792191460,
+          "max": 797333516
+        },
+        "rssBefore": {
+          "median": 4981358592,
+          "min": 4941561856,
+          "max": 5003411456
+        },
+        "rssAfterLoad": {
+          "median": 4981653504,
+          "min": 4941643776,
+          "max": 5003411456
+        },
+        "rssAfterFork": {
+          "median": 4981915648,
+          "min": 4948295680,
+          "max": 5003427840
+        }
+      }
+    },
+    {
+      "fixture": "long-one-operation",
+      "mode": "cooperative",
+      "arm": "baseline",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 1991.1590419999993,
+          "min": 1949.1747090000063,
+          "max": 2047.1352910000005
+        },
+        "textMs": {
+          "median": 246.98112499999843,
+          "min": 245.88804199999868,
+          "max": 306.42095799999515
+        },
+        "lookupMs": {
+          "median": 0.7280839999948512,
+          "min": 0.651625000005879,
+          "max": 0.7295420000009472
+        },
+        "checkpointMs": {
+          "median": 64.09124999999767,
+          "min": 63.96654200000194,
+          "max": 92.69062500000109
+        },
+        "durableCheckpointMs": {
+          "median": 152.33491700000013,
+          "min": 143.60599999999977,
+          "max": 152.62362500000017
+        },
+        "checkpointBytes": {
+          "median": 192114707,
+          "min": 192114707,
+          "max": 192114707
+        },
+        "durableCheckpointBytes": {
+          "median": 1273623,
+          "min": 1273623,
+          "max": 1273623
+        },
+        "forkMs": {
+          "median": 102.03287500000442,
+          "min": 99.17108400000143,
+          "max": 104.56654100000014
+        },
+        "firstForkWriteMs": {
+          "median": 1.0004169999992882,
+          "min": 0.9026669999948354,
+          "max": 1.0661669999972219
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.8554999999978463,
+          "min": 0.7733749999970314,
+          "max": 0.8725420000009763
+        },
+        "heapBefore": {
+          "median": 516747734,
+          "min": 516563665,
+          "max": 573796562
+        },
+        "heapAfterLoad": {
+          "median": 686284506,
+          "min": 657317647,
+          "max": 698553467
+        },
+        "heapAfterFork": {
+          "median": 866054690,
+          "min": 840920203,
+          "max": 903290416
+        },
+        "rssBefore": {
+          "median": 4990058496,
+          "min": 4836851712,
+          "max": 5002756096
+        },
+        "rssAfterLoad": {
+          "median": 4990058496,
+          "min": 4837490688,
+          "max": 5002772480
+        },
+        "rssAfterFork": {
+          "median": 4990058496,
+          "min": 4887986176,
+          "max": 5002772480
+        }
+      }
+    },
+    {
+      "fixture": "long-one-operation",
+      "mode": "cooperative",
+      "arm": "candidate",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 1901.7707499999997,
+          "min": 1880.9505420000023,
+          "max": 1916.3717499999984
+        },
+        "textMs": {
+          "median": 190.59208300000319,
+          "min": 180.74695799999972,
+          "max": 196.63475000000471
+        },
+        "lookupMs": {
+          "median": 0.6098339999989548,
+          "min": 0.6058340000017779,
+          "max": 0.6388329999972484
+        },
+        "checkpointMs": {
+          "median": 73.84179099999892,
+          "min": 72.48970800000097,
+          "max": 76.20358300000225
+        },
+        "durableCheckpointMs": {
+          "median": 150.71941700000025,
+          "min": 144.81779200000165,
+          "max": 166.01725000000442
+        },
+        "checkpointBytes": {
+          "median": 192114707,
+          "min": 192114707,
+          "max": 192114707
+        },
+        "durableCheckpointBytes": {
+          "median": 1273623,
+          "min": 1273623,
+          "max": 1273623
+        },
+        "forkMs": {
+          "median": 0.7752920000020822,
+          "min": 0.545750000001135,
+          "max": 0.7845000000015716
+        },
+        "firstForkWriteMs": {
+          "median": 1.2463329999991402,
+          "min": 1.0640419999981532,
+          "max": 1.280917000003683
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.9186249999984284,
+          "min": 0.9035409999996773,
+          "max": 0.9599169999928563
+        },
+        "heapBefore": {
+          "median": 513318245,
+          "min": 469849966,
+          "max": 513593507
+        },
+        "heapAfterLoad": {
+          "median": 767890912,
+          "min": 687597936,
+          "max": 772931127
+        },
+        "heapAfterFork": {
+          "median": 833016478,
+          "min": 816887809,
+          "max": 840933752
+        },
+        "rssBefore": {
+          "median": 4981915648,
+          "min": 4948295680,
+          "max": 5003427840
+        },
+        "rssAfterLoad": {
+          "median": 4981964800,
+          "min": 4949573632,
+          "max": 5003542528
+        },
+        "rssAfterFork": {
+          "median": 4982079488,
+          "min": 4970676224,
+          "max": 5003542528
+        }
+      }
+    },
+    {
+      "fixture": "sustained-260-and-20-concurrent-writers",
+      "mode": "apply",
+      "arm": "baseline",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 69.94683300000179,
+          "min": 67.07791699999507,
+          "max": 74.59595799999806
+        },
+        "textMs": {
+          "median": 9.23370900000009,
+          "min": 8.543375000001106,
+          "max": 9.396999999997206
+        },
+        "lookupMs": {
+          "median": 0.4417089999988093,
+          "min": 0.4364999999961583,
+          "max": 0.5097080000050482
+        },
+        "checkpointMs": {
+          "median": 6.02258399999846,
+          "min": 5.967917000001762,
+          "max": 7.61699999999837
+        },
+        "durableCheckpointMs": {
+          "median": 15.747666999996,
+          "min": 11.79637499999808,
+          "max": 19.74516699999367
+        },
+        "checkpointBytes": {
+          "median": 14127064,
+          "min": 14127064,
+          "max": 14127064
+        },
+        "durableCheckpointBytes": {
+          "median": 193942,
+          "min": 193942,
+          "max": 193942
+        },
+        "forkMs": {
+          "median": 22.9788750000007,
+          "min": 22.528250000003027,
+          "max": 23.324625000001106
+        },
+        "firstForkWriteMs": {
+          "median": 0.6307919999962905,
+          "min": 0.5829999999987194,
+          "max": 0.6737089999951422
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.5897919999988517,
+          "min": 0.535875000001397,
+          "max": 0.5968750000029104
+        },
+        "heapBefore": {
+          "median": 322788321,
+          "min": 307880130,
+          "max": 501494543
+        },
+        "heapAfterLoad": {
+          "median": 322788321,
+          "min": 307880130,
+          "max": 501494543
+        },
+        "heapAfterFork": {
+          "median": 426377168,
+          "min": 410728355,
+          "max": 632301077
+        },
+        "rssBefore": {
+          "median": 5007015936,
+          "min": 5003558912,
+          "max": 5007392768
+        },
+        "rssAfterLoad": {
+          "median": 5007015936,
+          "min": 5003558912,
+          "max": 5007392768
+        },
+        "rssAfterFork": {
+          "median": 5007048704,
+          "min": 5004410880,
+          "max": 5007392768
+        }
+      }
+    },
+    {
+      "fixture": "sustained-260-and-20-concurrent-writers",
+      "mode": "apply",
+      "arm": "candidate",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 74.67662500000006,
+          "min": 72.83766699999978,
+          "max": 79.62950000000274
+        },
+        "textMs": {
+          "median": 8.812583999999333,
+          "min": 7.8466670000052545,
+          "max": 9.732374999999593
+        },
+        "lookupMs": {
+          "median": 0.35183300000062445,
+          "min": 0.3370409999988624,
+          "max": 0.49458299999969313
+        },
+        "checkpointMs": {
+          "median": 9.13262499999837,
+          "min": 7.582125000000815,
+          "max": 10.494166999997105
+        },
+        "durableCheckpointMs": {
+          "median": 16.061000000001513,
+          "min": 14.12225000000035,
+          "max": 16.845250000005763
+        },
+        "checkpointBytes": {
+          "median": 14127064,
+          "min": 14127064,
+          "max": 14127064
+        },
+        "durableCheckpointBytes": {
+          "median": 193942,
+          "min": 193942,
+          "max": 193942
+        },
+        "forkMs": {
+          "median": 19.365958000002138,
+          "min": 18.446666999996523,
+          "max": 19.743916999999783
+        },
+        "firstForkWriteMs": {
+          "median": 0.8993330000012065,
+          "min": 0.6909159999995609,
+          "max": 1.1046249999999418
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.5986250000059954,
+          "min": 0.5479579999955604,
+          "max": 0.871541000000434
+        },
+        "heapBefore": {
+          "median": 308489039,
+          "min": 308005049,
+          "max": 322634938
+        },
+        "heapAfterLoad": {
+          "median": 308489039,
+          "min": 308005049,
+          "max": 322634938
+        },
+        "heapAfterFork": {
+          "median": 426025248,
+          "min": 322634938,
+          "max": 489545021
+        },
+        "rssBefore": {
+          "median": 5006688256,
+          "min": 5005901824,
+          "max": 5007458304
+        },
+        "rssAfterLoad": {
+          "median": 5006688256,
+          "min": 5005983744,
+          "max": 5007474688
+        },
+        "rssAfterFork": {
+          "median": 5006688256,
+          "min": 5006508032,
+          "max": 5007474688
+        }
+      }
+    },
+    {
+      "fixture": "sustained-260-and-20-concurrent-writers",
+      "mode": "sync",
+      "arm": "baseline",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 49.91374999999971,
+          "min": 49.068458000001556,
+          "max": 53.172333000002254
+        },
+        "textMs": {
+          "median": 15.13933299999917,
+          "min": 14.623417000002519,
+          "max": 16.11620799999946
+        },
+        "lookupMs": {
+          "median": 0.4383749999979045,
+          "min": 0.42562500000349246,
+          "max": 0.44308299999829615
+        },
+        "checkpointMs": {
+          "median": 6.742249999995693,
+          "min": 6.682207999998354,
+          "max": 6.807959000005212
+        },
+        "durableCheckpointMs": {
+          "median": 12.846124999996391,
+          "min": 11.98479199999565,
+          "max": 18.602083999998285
+        },
+        "checkpointBytes": {
+          "median": 14127064,
+          "min": 14127064,
+          "max": 14127064
+        },
+        "durableCheckpointBytes": {
+          "median": 193942,
+          "min": 193942,
+          "max": 193942
+        },
+        "forkMs": {
+          "median": 4.025500000003376,
+          "min": 3.8967500000071595,
+          "max": 4.905666000006022
+        },
+        "firstForkWriteMs": {
+          "median": 0.6058340000017779,
+          "min": 0.5629999999946449,
+          "max": 0.6212499999965075
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.5487500000017462,
+          "min": 0.5389580000046408,
+          "max": 0.5596670000013546
+        },
+        "heapBefore": {
+          "median": 310805279,
+          "min": 310305064,
+          "max": 312438157
+        },
+        "heapAfterLoad": {
+          "median": 310805279,
+          "min": 310305064,
+          "max": 312438157
+        },
+        "heapAfterFork": {
+          "median": 413141705,
+          "min": 312438157,
+          "max": 414278173
+        },
+        "rssBefore": {
+          "median": 5007048704,
+          "min": 5004967936,
+          "max": 5007392768
+        },
+        "rssAfterLoad": {
+          "median": 5007048704,
+          "min": 5004967936,
+          "max": 5007409152
+        },
+        "rssAfterFork": {
+          "median": 5007065088,
+          "min": 5005017088,
+          "max": 5007409152
+        }
+      }
+    },
+    {
+      "fixture": "sustained-260-and-20-concurrent-writers",
+      "mode": "sync",
+      "arm": "candidate",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 55.65920800000458,
+          "min": 54.97404099999403,
+          "max": 63.49866699999984
+        },
+        "textMs": {
+          "median": 15.404916999999841,
+          "min": 14.255874999995285,
+          "max": 15.607958000000508
+        },
+        "lookupMs": {
+          "median": 0.4087920000019949,
+          "min": 0.37245800000528106,
+          "max": 0.4525419999990845
+        },
+        "checkpointMs": {
+          "median": 8.09337499999674,
+          "min": 8.033082999994804,
+          "max": 9.112541999995301
+        },
+        "durableCheckpointMs": {
+          "median": 19.328916000005847,
+          "min": 14.127000000000407,
+          "max": 21.28995799999393
+        },
+        "checkpointBytes": {
+          "median": 14127064,
+          "min": 14127064,
+          "max": 14127064
+        },
+        "durableCheckpointBytes": {
+          "median": 193942,
+          "min": 193942,
+          "max": 193942
+        },
+        "forkMs": {
+          "median": 0.13604099999793107,
+          "min": 0.13466700000572018,
+          "max": 0.3375000000014552
+        },
+        "firstForkWriteMs": {
+          "median": 0.6108750000057626,
+          "min": 0.5756250000049477,
+          "max": 0.6917500000054133
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.4970829999947455,
+          "min": 0.4704580000034184,
+          "max": 0.5580000000045402
+        },
+        "heapBefore": {
+          "median": 324495318,
+          "min": 324337445,
+          "max": 325635008
+        },
+        "heapAfterLoad": {
+          "median": 324495318,
+          "min": 324337445,
+          "max": 325635008
+        },
+        "heapAfterFork": {
+          "median": 441959431,
+          "min": 393164793,
+          "max": 447035174
+        },
+        "rssBefore": {
+          "median": 5006999552,
+          "min": 5006508032,
+          "max": 5007474688
+        },
+        "rssAfterLoad": {
+          "median": 5007015936,
+          "min": 5006557184,
+          "max": 5007474688
+        },
+        "rssAfterFork": {
+          "median": 5007015936,
+          "min": 5006557184,
+          "max": 5007540224
+        }
+      }
+    },
+    {
+      "fixture": "sustained-260-and-20-concurrent-writers",
+      "mode": "cooperative",
+      "arm": "baseline",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 155.39133299999958,
+          "min": 134.25941700000112,
+          "max": 156.28791599999386
+        },
+        "textMs": {
+          "median": 18.27491700000246,
+          "min": 17.06608299999789,
+          "max": 18.8974589999998
+        },
+        "lookupMs": {
+          "median": 0.4368749999994179,
+          "min": 0.3836250000022119,
+          "max": 0.45108299999992596
+        },
+        "checkpointMs": {
+          "median": 8.72966599999927,
+          "min": 7.028749999997672,
+          "max": 8.826625000001513
+        },
+        "durableCheckpointMs": {
+          "median": 26.448166000001947,
+          "min": 12.666791999996349,
+          "max": 27.06554199999664
+        },
+        "checkpointBytes": {
+          "median": 14127064,
+          "min": 14127064,
+          "max": 14127064
+        },
+        "durableCheckpointBytes": {
+          "median": 193942,
+          "min": 193942,
+          "max": 193942
+        },
+        "forkMs": {
+          "median": 4.153791999997338,
+          "min": 3.245875000000524,
+          "max": 4.584750000001804
+        },
+        "firstForkWriteMs": {
+          "median": 0.5722919999971054,
+          "min": 0.5604160000002594,
+          "max": 0.6133750000008149
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.5357919999951264,
+          "min": 0.5307089999987511,
+          "max": 0.5489999999990687
+        },
+        "heapBefore": {
+          "median": 306343078,
+          "min": 305663891,
+          "max": 313466876
+        },
+        "heapAfterLoad": {
+          "median": 334838294,
+          "min": 313466876,
+          "max": 336081383
+        },
+        "heapAfterFork": {
+          "median": 434016550,
+          "min": 393498951,
+          "max": 482948379
+        },
+        "rssBefore": {
+          "median": 5007228928,
+          "min": 5005574144,
+          "max": 5007409152
+        },
+        "rssAfterLoad": {
+          "median": 5007228928,
+          "min": 5005574144,
+          "max": 5007458304
+        },
+        "rssAfterFork": {
+          "median": 5007392768,
+          "min": 5005623296,
+          "max": 5007458304
+        }
+      }
+    },
+    {
+      "fixture": "sustained-260-and-20-concurrent-writers",
+      "mode": "cooperative",
+      "arm": "candidate",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 146.5219169999982,
+          "min": 143.43258399999468,
+          "max": 167.78237499999523
+        },
+        "textMs": {
+          "median": 19.403041000005032,
+          "min": 19.10908300000301,
+          "max": 20.189125000004424
+        },
+        "lookupMs": {
+          "median": 0.36462500000197906,
+          "min": 0.36020799999823794,
+          "max": 0.3949590000047465
+        },
+        "checkpointMs": {
+          "median": 12.159833999998227,
+          "min": 11.920583000006445,
+          "max": 12.375833999998576
+        },
+        "durableCheckpointMs": {
+          "median": 18.72125000000233,
+          "min": 16.51641699999891,
+          "max": 28.7465830000001
+        },
+        "checkpointBytes": {
+          "median": 14127064,
+          "min": 14127064,
+          "max": 14127064
+        },
+        "durableCheckpointBytes": {
+          "median": 193942,
+          "min": 193942,
+          "max": 193942
+        },
+        "forkMs": {
+          "median": 0.13450000000011642,
+          "min": 0.11599999999452848,
+          "max": 0.16862500000570435
+        },
+        "firstForkWriteMs": {
+          "median": 0.6721659999966505,
+          "min": 0.6452080000017304,
+          "max": 0.7616249999991851
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.546582999995735,
+          "min": 0.5244579999998678,
+          "max": 0.6552920000031008
+        },
+        "heapBefore": {
+          "median": 320592526,
+          "min": 319975253,
+          "max": 320755643
+        },
+        "heapAfterLoad": {
+          "median": 347268959,
+          "min": 340195486,
+          "max": 356228930
+        },
+        "heapAfterFork": {
+          "median": 460468180,
+          "min": 356228930,
+          "max": 466139764
+        },
+        "rssBefore": {
+          "median": 5007015936,
+          "min": 5006557184,
+          "max": 5007638528
+        },
+        "rssAfterLoad": {
+          "median": 5007015936,
+          "min": 5006688256,
+          "max": 5007654912
+        },
+        "rssAfterFork": {
+          "median": 5007015936,
+          "min": 5006688256,
+          "max": 5007704064
+        }
+      }
+    },
+    {
+      "fixture": "logical-clock-10000-wrap",
+      "mode": "apply",
+      "arm": "baseline",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 14.898500000002969,
+          "min": 14.6439160000009,
+          "max": 16.669709000001603
+        },
+        "textMs": {
+          "median": 0.8082920000015292,
+          "min": 0.6404580000016722,
+          "max": 1.0620409999974072
+        },
+        "lookupMs": {
+          "median": 0.2810830000016722,
+          "min": 0.2665839999972377,
+          "max": 0.28416599999764003
+        },
+        "checkpointMs": {
+          "median": 0.5482499999998254,
+          "min": 0.5475000000005821,
+          "max": 0.6922919999997248
+        },
+        "durableCheckpointMs": {
+          "median": 1.1524159999971744,
+          "min": 1.1257079999995767,
+          "max": 2.055832999998529
+        },
+        "checkpointBytes": {
+          "median": 1101770,
+          "min": 1101770,
+          "max": 1101770
+        },
+        "durableCheckpointBytes": {
+          "median": 1051954,
+          "min": 1051954,
+          "max": 1051954
+        },
+        "forkMs": {
+          "median": 3.494749999998021,
+          "min": 3.1291669999991427,
+          "max": 3.719583000005514
+        },
+        "firstForkWriteMs": {
+          "median": 0.4685830000016722,
+          "min": 0.4638340000019525,
+          "max": 0.5132499999963329
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.4495000000024447,
+          "min": 0.4254579999978887,
+          "max": 0.4682920000050217
+        },
+        "heapBefore": {
+          "median": 273468799,
+          "min": 269740052,
+          "max": 321840780
+        },
+        "heapAfterLoad": {
+          "median": 273468799,
+          "min": 269740052,
+          "max": 321840780
+        },
+        "heapAfterFork": {
+          "median": 273468799,
+          "min": 269740052,
+          "max": 321840780
+        },
+        "rssBefore": {
+          "median": 5009686528,
+          "min": 5007704064,
+          "max": 5009866752
+        },
+        "rssAfterLoad": {
+          "median": 5009686528,
+          "min": 5007900672,
+          "max": 5009866752
+        },
+        "rssAfterFork": {
+          "median": 5009768448,
+          "min": 5008949248,
+          "max": 5009866752
+        }
+      }
+    },
+    {
+      "fixture": "logical-clock-10000-wrap",
+      "mode": "apply",
+      "arm": "candidate",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 16.04862499999581,
+          "min": 15.55133300000307,
+          "max": 16.15083400000003
+        },
+        "textMs": {
+          "median": 1.0322080000041751,
+          "min": 0.751416999999492,
+          "max": 1.079874999995809
+        },
+        "lookupMs": {
+          "median": 0.2823329999955604,
+          "min": 0.2813750000059372,
+          "max": 0.29391600000235485
+        },
+        "checkpointMs": {
+          "median": 0.8134589999972377,
+          "min": 0.7889159999976982,
+          "max": 0.8866669999988517
+        },
+        "durableCheckpointMs": {
+          "median": 1.2704579999990528,
+          "min": 1.2625410000036936,
+          "max": 1.2885840000017197
+        },
+        "checkpointBytes": {
+          "median": 1101770,
+          "min": 1101770,
+          "max": 1101770
+        },
+        "durableCheckpointBytes": {
+          "median": 1051954,
+          "min": 1051954,
+          "max": 1051954
+        },
+        "forkMs": {
+          "median": 3.0371659999946132,
+          "min": 2.765791999998328,
+          "max": 3.7342500000013388
+        },
+        "firstForkWriteMs": {
+          "median": 0.5577499999999418,
+          "min": 0.519666000000143,
+          "max": 0.6214590000017779
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.465875000001688,
+          "min": 0.4482090000019525,
+          "max": 0.47791700000379933
+        },
+        "heapBefore": {
+          "median": 273557323,
+          "min": 273121844,
+          "max": 275338076
+        },
+        "heapAfterLoad": {
+          "median": 273557323,
+          "min": 273121844,
+          "max": 275338076
+        },
+        "heapAfterFork": {
+          "median": 273557323,
+          "min": 273121844,
+          "max": 275338076
+        },
+        "rssBefore": {
+          "median": 5009686528,
+          "min": 5009686528,
+          "max": 5009866752
+        },
+        "rssAfterLoad": {
+          "median": 5009686528,
+          "min": 5009686528,
+          "max": 5009866752
+        },
+        "rssAfterFork": {
+          "median": 5009686528,
+          "min": 5009686528,
+          "max": 5009866752
+        }
+      }
+    },
+    {
+      "fixture": "logical-clock-10000-wrap",
+      "mode": "sync",
+      "arm": "baseline",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 5.188791000000492,
+          "min": 5.033833000001323,
+          "max": 5.444958000000042
+        },
+        "textMs": {
+          "median": 0.8387920000022859,
+          "min": 0.8022920000003069,
+          "max": 1.101042000002053
+        },
+        "lookupMs": {
+          "median": 0.26704199999949196,
+          "min": 0.2584160000042175,
+          "max": 0.28995800000120653
+        },
+        "checkpointMs": {
+          "median": 0.5780000000013388,
+          "min": 0.5591249999997672,
+          "max": 0.6746670000065933
+        },
+        "durableCheckpointMs": {
+          "median": 1.2351249999992433,
+          "min": 1.1980419999963487,
+          "max": 1.261624999999185
+        },
+        "checkpointBytes": {
+          "median": 1101770,
+          "min": 1101770,
+          "max": 1101770
+        },
+        "durableCheckpointBytes": {
+          "median": 1051954,
+          "min": 1051954,
+          "max": 1051954
+        },
+        "forkMs": {
+          "median": 0.6859580000018468,
+          "min": 0.6726249999992433,
+          "max": 0.7474579999980051
+        },
+        "firstForkWriteMs": {
+          "median": 0.4681249999994179,
+          "min": 0.45275000000401633,
+          "max": 0.7030000000013388
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.41758399999525864,
+          "min": 0.4150420000005397,
+          "max": 0.41808299999684095
+        },
+        "heapBefore": {
+          "median": 278210230,
+          "min": 277925231,
+          "max": 278298111
+        },
+        "heapAfterLoad": {
+          "median": 278210230,
+          "min": 277925231,
+          "max": 278298111
+        },
+        "heapAfterFork": {
+          "median": 278210230,
+          "min": 277925231,
+          "max": 278298111
+        },
+        "rssBefore": {
+          "median": 5009768448,
+          "min": 5008949248,
+          "max": 5009866752
+        },
+        "rssAfterLoad": {
+          "median": 5009768448,
+          "min": 5008949248,
+          "max": 5009866752
+        },
+        "rssAfterFork": {
+          "median": 5009768448,
+          "min": 5009342464,
+          "max": 5009866752
+        }
+      }
+    },
+    {
+      "fixture": "logical-clock-10000-wrap",
+      "mode": "sync",
+      "arm": "candidate",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 5.955666000001656,
+          "min": 5.751916000001074,
+          "max": 6.445332999996026
+        },
+        "textMs": {
+          "median": 1.346125000003667,
+          "min": 1.2881249999991269,
+          "max": 1.4673340000008466
+        },
+        "lookupMs": {
+          "median": 0.2713750000038999,
+          "min": 0.26675000000250293,
+          "max": 0.3263329999972484
+        },
+        "checkpointMs": {
+          "median": 0.8150420000019949,
+          "min": 0.7628750000003492,
+          "max": 0.8527499999981956
+        },
+        "durableCheckpointMs": {
+          "median": 1.3950420000037411,
+          "min": 1.2910829999964335,
+          "max": 1.4000000000014552
+        },
+        "checkpointBytes": {
+          "median": 1101770,
+          "min": 1101770,
+          "max": 1101770
+        },
+        "durableCheckpointBytes": {
+          "median": 1051954,
+          "min": 1051954,
+          "max": 1051954
+        },
+        "forkMs": {
+          "median": 0.511583999999857,
+          "min": 0.4769579999992857,
+          "max": 0.6506659999940894
+        },
+        "firstForkWriteMs": {
+          "median": 0.5982090000034077,
+          "min": 0.5383329999967827,
+          "max": 0.625291999996989
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.4779580000031274,
+          "min": 0.4386670000021695,
+          "max": 0.5254999999961001
+        },
+        "heapBefore": {
+          "median": 274536386,
+          "min": 274187229,
+          "max": 276437508
+        },
+        "heapAfterLoad": {
+          "median": 274536386,
+          "min": 274187229,
+          "max": 276437508
+        },
+        "heapAfterFork": {
+          "median": 274536386,
+          "min": 274187229,
+          "max": 276437508
+        },
+        "rssBefore": {
+          "median": 5009686528,
+          "min": 5009686528,
+          "max": 5009866752
+        },
+        "rssAfterLoad": {
+          "median": 5009686528,
+          "min": 5009686528,
+          "max": 5009915904
+        },
+        "rssAfterFork": {
+          "median": 5009686528,
+          "min": 5009686528,
+          "max": 5009915904
+        }
+      }
+    },
+    {
+      "fixture": "logical-clock-10000-wrap",
+      "mode": "cooperative",
+      "arm": "baseline",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 10.573833000002196,
+          "min": 10.453999999997905,
+          "max": 10.952125000003434
+        },
+        "textMs": {
+          "median": 0.8551669999942533,
+          "min": 0.7932919999948354,
+          "max": 1.1378750000003492
+        },
+        "lookupMs": {
+          "median": 0.25645799999620067,
+          "min": 0.2559580000015558,
+          "max": 0.2683340000003227
+        },
+        "checkpointMs": {
+          "median": 0.5159999999959837,
+          "min": 0.5130839999983436,
+          "max": 0.626709000003757
+        },
+        "durableCheckpointMs": {
+          "median": 1.0849589999997988,
+          "min": 1.0604999999995925,
+          "max": 1.0976250000021537
+        },
+        "checkpointBytes": {
+          "median": 1101770,
+          "min": 1101770,
+          "max": 1101770
+        },
+        "durableCheckpointBytes": {
+          "median": 1051954,
+          "min": 1051954,
+          "max": 1051954
+        },
+        "forkMs": {
+          "median": 0.7017500000001746,
+          "min": 0.6678749999991851,
+          "max": 0.7249169999995502
+        },
+        "firstForkWriteMs": {
+          "median": 0.4915830000027199,
+          "min": 0.4539169999989099,
+          "max": 0.49262499999895226
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.4433340000032331,
+          "min": 0.4227919999975711,
+          "max": 0.45420800000283634
+        },
+        "heapBefore": {
+          "median": 273000175,
+          "min": 272652992,
+          "max": 273103841
+        },
+        "heapAfterLoad": {
+          "median": 273000175,
+          "min": 272652992,
+          "max": 273103841
+        },
+        "heapAfterFork": {
+          "median": 273000175,
+          "min": 272652992,
+          "max": 273103841
+        },
+        "rssBefore": {
+          "median": 5009768448,
+          "min": 5009342464,
+          "max": 5009866752
+        },
+        "rssAfterLoad": {
+          "median": 5009768448,
+          "min": 5009342464,
+          "max": 5009866752
+        },
+        "rssAfterFork": {
+          "median": 5009866752,
+          "min": 5009686528,
+          "max": 5009866752
+        }
+      }
+    },
+    {
+      "fixture": "logical-clock-10000-wrap",
+      "mode": "cooperative",
+      "arm": "candidate",
+      "n": 3,
+      "metrics": {
+        "loadMs": {
+          "median": 11.160415999998804,
+          "min": 10.942125000001397,
+          "max": 11.218500000002678
+        },
+        "textMs": {
+          "median": 1.2867499999993015,
+          "min": 1.2073749999981374,
+          "max": 1.4667919999992591
+        },
+        "lookupMs": {
+          "median": 0.26366600000619655,
+          "min": 0.260708000001614,
+          "max": 0.2659579999963171
+        },
+        "checkpointMs": {
+          "median": 0.7750830000004498,
+          "min": 0.7653749999954016,
+          "max": 0.7752919999984442
+        },
+        "durableCheckpointMs": {
+          "median": 1.233749999999418,
+          "min": 1.230374999999185,
+          "max": 1.258625000002212
+        },
+        "checkpointBytes": {
+          "median": 1101770,
+          "min": 1101770,
+          "max": 1101770
+        },
+        "durableCheckpointBytes": {
+          "median": 1051954,
+          "min": 1051954,
+          "max": 1051954
+        },
+        "forkMs": {
+          "median": 0.5264160000006086,
+          "min": 0.5100830000010319,
+          "max": 0.578125
+        },
+        "firstForkWriteMs": {
+          "median": 0.5275000000037835,
+          "min": 0.5103339999986929,
+          "max": 0.5308749999967404
+        },
+        "firstOwnerWriteMs": {
+          "median": 0.46174999999493593,
+          "min": 0.4608749999970314,
+          "max": 0.46450000000186265
+        },
+        "heapBefore": {
+          "median": 270034018,
+          "min": 269701050,
+          "max": 275343234
+        },
+        "heapAfterLoad": {
+          "median": 270034018,
+          "min": 269701050,
+          "max": 275343234
+        },
+        "heapAfterFork": {
+          "median": 270034018,
+          "min": 269701050,
+          "max": 275343234
+        },
+        "rssBefore": {
+          "median": 5009686528,
+          "min": 5009686528,
+          "max": 5009915904
+        },
+        "rssAfterLoad": {
+          "median": 5009686528,
+          "min": 5009686528,
+          "max": 5009915904
+        },
+        "rssAfterFork": {
+          "median": 5009686528,
+          "min": 5009686528,
+          "max": 5009915904
+        }
+      }
+    }
+  ]
+}

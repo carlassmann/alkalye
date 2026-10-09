@@ -1,0 +1,35 @@
+import { expect, test } from "bun:test"
+import { Replica } from "../src/shared/crdt"
+import { Replica as Baseline } from "../src/shared/crdt-baseline"
+
+test("parent and sibling branches independently replace first-page root children after a multi-page fork", () => {
+ let source = "Body 😀\n".repeat(6000)
+ let control = new Baseline("owner")
+ let owner = new Replica("owner")
+ let seed = control.edit("document", source)
+ if (!seed) throw Error("Missing seed")
+ owner.apply([seed])
+ let retained = owner.checkpoint()
+ let first = owner.fork("first")
+ let second = owner.fork("second")
+ let firstEdit = first.edit("document", "First 🦋\n" + source)
+ let secondEdit = second.edit("document", "Second 🌻\n" + source)
+ let ownerEdit = owner.edit("document", "Owner 😀\n" + source)
+ if (!firstEdit || !secondEdit || !ownerEdit) throw Error("Missing branch edit")
+ expect(first.text("document")).toBe("First 🦋\n" + source)
+ expect(second.text("document")).toBe("Second 🌻\n" + source)
+ expect(owner.text("document")).toBe("Owner 😀\n" + source)
+ let cold = new Replica("cold")
+ cold.restore(retained)
+ expect(cold.text("document")).toBe(source)
+ for (let operation of [ownerEdit,secondEdit,firstEdit]) control.apply([operation])
+ first.apply([ownerEdit,secondEdit]);second.apply([ownerEdit,firstEdit]);owner.apply([secondEdit,firstEdit])
+ for (let branch of [first,second,owner]) {
+  expect(branch.text("document")).toBe(control.text("document"))
+  expect(branch.revision("document")).toBe(control.revision("document"))
+  let restored = new Replica("restored")
+  restored.restore(branch.checkpoint())
+  expect(restored.checkpoint()).toEqual(branch.checkpoint())
+  expect(restored.text("document")).toBe(branch.text("document"))
+ }
+})

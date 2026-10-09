@@ -1,0 +1,12 @@
+10 | async function work(action:string) {
+11 |  let process = Bun.spawn(["work",action,"native"],{cwd,env:{...Bun.env,WORK_STATE_ROOT:state},stdout:"pipe",stderr:"pipe"})
+12 |  let output=await new Response(process.stdout).text()
+13 |  let error=await new Response(process.stderr).text()
+14 |  let code=await process.exited
+15 |  if(code!==0)throw Error("Scoped process command failed: "+output+error)
+                        ^
+error: Scoped process command failed: no tracked command: native
+
+      at work (/private/tmp/alkalye-worker-adjacency-ordinal-pages/native-runtime/native-series.ts:15:20)
+
+Bun v1.4.0 (macOS arm64)

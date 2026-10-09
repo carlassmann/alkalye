@@ -1,0 +1,11 @@
+{
+ "status": "UNRUN",
+ "separateCells": 18,
+ "n": 3,
+ "arms": ["baseline", "candidate"],
+ "modes": ["apply", "sync", "cooperative"],
+ "targets": 1001,
+ "scope": "1000 public small frontmatter+Unicode text targets and one131072 UTF16 document; exact alltarget sources plus wire/checkpoint/durable/fork/first512 bothwrite gates; fullprocess memory brackets only",
+ "control": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+ "candidate": "6bcad274fcac66bf8ec36e0bd06aebd6de569b99879936427204f8d23df78605"
+}

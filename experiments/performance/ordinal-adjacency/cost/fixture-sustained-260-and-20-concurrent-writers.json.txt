@@ -1,0 +1,9 @@
+{
+  "name": "sustained-260-and-20-concurrent-writers",
+  "utf16Units": 131972,
+  "utf8Bytes": 150696,
+  "realNewlines": 9362,
+  "literalBackslashN": 0,
+  "sourceSHA": "ae395747fcb7ad11c8534a75fd9331df7c3bb07a8af88ebea73604a8631870e5",
+  "operations": 281
+}

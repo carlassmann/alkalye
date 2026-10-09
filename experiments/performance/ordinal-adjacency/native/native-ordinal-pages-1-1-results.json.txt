@@ -1,0 +1,251 @@
+{
+  "stage": "terminal",
+  "gates": [
+    "native 1 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+  ],
+  "cells": [
+    {
+      "phase": "Undo",
+      "count": 1,
+      "probe": {
+        "end": 13431.5,
+        "events": [
+          {
+            "key": "z",
+            "time": 10428.19999998808,
+            "type": "keydown"
+          }
+        ],
+        "heapAfter": 18515113,
+        "heapBefore": 18413633,
+        "label": "Undo-1",
+        "localSaved": 11237.099999964235,
+        "ready": 10470.799999952316,
+        "start": 10428.19999998808
+      }
+    },
+    {
+      "phase": "accepted-input-and-Undo",
+      "count": 1,
+      "selectionProbe": {
+        "end": 4842.5,
+        "events": [
+          {
+            "key": "l",
+            "time": 1841,
+            "type": "keydown"
+          }
+        ],
+        "heapAfter": 28494698,
+        "heapBefore": 26231103,
+        "label": "selection-1",
+        "localSaved": 1851.7999999523165,
+        "ready": 1851.699999988079,
+        "start": 1841
+      },
+      "singleProbe": {
+        "end": 8129.599999964237,
+        "events": [
+          {
+            "key": "x",
+            "time": 5126.699999988079,
+            "type": "keydown"
+          },
+          {
+            "inputType": "insertText",
+            "time": 5126.899999976158,
+            "type": "beforeinput"
+          },
+          {
+            "inputType": "insertText",
+            "time": 5127.399999976158,
+            "type": "input"
+          }
+        ],
+        "heapAfter": 23653670,
+        "heapBefore": 28597955,
+        "label": "single-1",
+        "localSaved": 5137.399999976158,
+        "ready": 5137.399999976158,
+        "start": 5126.699999988079
+      },
+      "mergePhases": [
+        {
+          "phase": "Merge:flush-start",
+          "time": 5266.099999964237
+        },
+        {
+          "phase": "Merge:fork-start",
+          "time": 5266.099999964237
+        },
+        {
+          "phase": "Merge:text-start",
+          "time": 5266.199999988079
+        },
+        {
+          "phase": "Merge:visible-start",
+          "time": 5266.199999988079
+        },
+        {
+          "phase": "Merge:visible-done",
+          "time": 5266.199999988079
+        },
+        {
+          "phase": "Merge:map-start",
+          "time": 5266.199999988079
+        },
+        {
+          "phase": "Merge:map-done",
+          "time": 5267.599999964237
+        },
+        {
+          "phase": "Merge:flush-start",
+          "time": 6033.399999976158
+        },
+        {
+          "phase": "Merge:fork-start",
+          "time": 6230.899999976158
+        },
+        {
+          "phase": "Merge:text-start",
+          "time": 6230.899999976158
+        },
+        {
+          "phase": "Merge:visible-start",
+          "time": 6230.899999976158
+        },
+        {
+          "phase": "Merge:visible-done",
+          "time": 6231
+        },
+        {
+          "phase": "Merge:map-start",
+          "time": 6231
+        },
+        {
+          "phase": "Merge:map-done",
+          "time": 6231
+        },
+        {
+          "phase": "Merge:flush-start",
+          "time": 10409.599999964235
+        },
+        {
+          "phase": "Merge:fork-start",
+          "time": 10409.599999964235
+        },
+        {
+          "phase": "Merge:text-start",
+          "time": 10409.799999952316
+        },
+        {
+          "phase": "Merge:visible-start",
+          "time": 10409.799999952316
+        },
+        {
+          "phase": "Merge:visible-done",
+          "time": 10409.799999952316
+        },
+        {
+          "phase": "Merge:map-start",
+          "time": 10409.799999952316
+        },
+        {
+          "phase": "Merge:map-done",
+          "time": 10419.799999952316
+        },
+        {
+          "phase": "Merge:flush-start",
+          "time": 10429.899999976158
+        },
+        {
+          "phase": "Merge:fork-start",
+          "time": 10429.899999976158
+        },
+        {
+          "phase": "Merge:text-start",
+          "time": 10430.099999964235
+        },
+        {
+          "phase": "Merge:visible-start",
+          "time": 10430.099999964235
+        },
+        {
+          "phase": "Merge:visible-done",
+          "time": 10430.099999964235
+        },
+        {
+          "phase": "Merge:map-start",
+          "time": 10430.099999964235
+        },
+        {
+          "phase": "Merge:map-done",
+          "time": 10430.099999964235
+        },
+        {
+          "phase": "Merge:flush-start",
+          "time": 11178.299999952316
+        },
+        {
+          "phase": "Merge:fork-start",
+          "time": 11370.19999998808
+        },
+        {
+          "phase": "Merge:text-start",
+          "time": 11370.299999952316
+        },
+        {
+          "phase": "Merge:visible-start",
+          "time": 11370.299999952316
+        },
+        {
+          "phase": "Merge:visible-done",
+          "time": 11370.299999952316
+        },
+        {
+          "phase": "Merge:map-start",
+          "time": 11370.299999952316
+        },
+        {
+          "phase": "Merge:map-done",
+          "time": 11370.399999976158
+        }
+      ],
+      "acceptedObservedMs": 5215.199500000001,
+      "sourceLength": 1048610,
+      "expectedLength": 1048606,
+      "sourceSHA": "d675ebef528946b884a7088f5d3b81d1120f0c5416bce767855f49367af8a1b3",
+      "editedSHA": "9ba37b24c80f5b7049bb81b5fdb909716dd8fcb2477b75b3e61d27a1d94419c5",
+      "after": {
+        "start": 35,
+        "end": 35,
+        "ranges": 1,
+        "secondary": [
+          {
+            "start": 35,
+            "end": 35,
+            "direction": "none"
+          }
+        ]
+      },
+      "restored": {
+        "start": 34,
+        "end": 34,
+        "ranges": 1,
+        "secondary": [
+          {
+            "start": 34,
+            "end": 34,
+            "direction": "none"
+          }
+        ]
+      }
+    }
+  ],
+  "fixture": {
+    "initialLength": 1048610,
+    "editedLength": 1048606,
+    "initialSHA": "d675ebef528946b884a7088f5d3b81d1120f0c5416bce767855f49367af8a1b3",
+    "editedSHA": "9ba37b24c80f5b7049bb81b5fdb909716dd8fcb2477b75b3e61d27a1d94419c5"
+  }
+}

@@ -1,0 +1,959 @@
+{
+  "rows": [
+    {
+      "arm": "native-map-children",
+      "trial": 0,
+      "count": 1,
+      "phase": "input",
+      "sourceOpportunityMs": 16.69999998807907,
+      "localSavedOpportunityMs": 16.80000001192093,
+      "heapBefore": 26373415,
+      "heapAfter": 42612600,
+      "maxGCEventSpanMs": 7.977,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 5.512,
+      "mainUnionMs": 213.257,
+      "workerMaxMs": 163.22,
+      "workerUnionMs": 696.622
+    },
+    {
+      "arm": "native-map-children",
+      "trial": 0,
+      "count": 1,
+      "phase": "Undo",
+      "sourceOpportunityMs": 128.20000004768372,
+      "localSavedOpportunityMs": 877.5,
+      "heapBefore": 43477100,
+      "heapAfter": 23055634,
+      "maxGCEventSpanMs": 30.573,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 6.297,
+      "mainUnionMs": 219.937,
+      "workerMaxMs": 16.5,
+      "workerUnionMs": 652.732
+    },
+    {
+      "arm": "ordinal-pages",
+      "trial": 0,
+      "count": 1,
+      "phase": "input",
+      "sourceOpportunityMs": 11.800000011920929,
+      "localSavedOpportunityMs": 11.800000011920929,
+      "heapBefore": 28724590,
+      "heapAfter": 23680426,
+      "maxGCEventSpanMs": 7.966,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 5.906,
+      "mainUnionMs": 239.718,
+      "workerMaxMs": 148.887,
+      "workerUnionMs": 615.265
+    },
+    {
+      "arm": "ordinal-pages",
+      "trial": 0,
+      "count": 1,
+      "phase": "Undo",
+      "sourceOpportunityMs": 42.80000001192275,
+      "localSavedOpportunityMs": 805.8000000119227,
+      "heapBefore": 17988173,
+      "heapAfter": 18247931,
+      "maxGCEventSpanMs": 9.772,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 6.69,
+      "mainUnionMs": 237.471,
+      "workerMaxMs": 17.053,
+      "workerUnionMs": 467.316
+    },
+    {
+      "arm": "native-map-children",
+      "trial": 0,
+      "count": 512,
+      "phase": "input",
+      "sourceOpportunityMs": 11.699999988079071,
+      "localSavedOpportunityMs": 11.699999988079071,
+      "heapBefore": 35351873,
+      "heapAfter": 43847479,
+      "maxGCEventSpanMs": 8.985,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.663,
+      "mainUnionMs": 186.089,
+      "workerMaxMs": 167.07,
+      "workerUnionMs": 603.179
+    },
+    {
+      "arm": "native-map-children",
+      "trial": 0,
+      "count": 512,
+      "phase": "Undo",
+      "sourceOpportunityMs": 126.80000001191911,
+      "localSavedOpportunityMs": 908.1999999880809,
+      "heapBefore": 19128639,
+      "heapAfter": 27577257,
+      "maxGCEventSpanMs": 40.319,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 5.093,
+      "mainUnionMs": 209.131,
+      "workerMaxMs": 27.747,
+      "workerUnionMs": 490.381
+    },
+    {
+      "arm": "ordinal-pages",
+      "trial": 0,
+      "count": 512,
+      "phase": "input",
+      "sourceOpportunityMs": 16.099999964237213,
+      "localSavedOpportunityMs": 16.099999964237213,
+      "heapBefore": 34908840,
+      "heapAfter": 43638496,
+      "maxGCEventSpanMs": 8.193,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.74,
+      "mainUnionMs": 238.811,
+      "workerMaxMs": 162.638,
+      "workerUnionMs": 651.605
+    },
+    {
+      "arm": "ordinal-pages",
+      "trial": 0,
+      "count": 512,
+      "phase": "Undo",
+      "sourceOpportunityMs": 65.0,
+      "localSavedOpportunityMs": 828.0,
+      "heapBefore": 19179371,
+      "heapAfter": 27634754,
+      "maxGCEventSpanMs": 4.727,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.942,
+      "mainUnionMs": 239.647,
+      "workerMaxMs": 29.02,
+      "workerUnionMs": 448.703
+    },
+    {
+      "arm": "ordinal-pages",
+      "trial": 1,
+      "count": 1,
+      "phase": "input",
+      "sourceOpportunityMs": 10.699999988079071,
+      "localSavedOpportunityMs": 10.699999988079071,
+      "heapBefore": 28597955,
+      "heapAfter": 23653670,
+      "maxGCEventSpanMs": 8.447,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 5.672,
+      "mainUnionMs": 234.335,
+      "workerMaxMs": 154.601,
+      "workerUnionMs": 601.76
+    },
+    {
+      "arm": "ordinal-pages",
+      "trial": 1,
+      "count": 1,
+      "phase": "Undo",
+      "sourceOpportunityMs": 42.599999964235394,
+      "localSavedOpportunityMs": 808.8999999761545,
+      "heapBefore": 18413633,
+      "heapAfter": 18515113,
+      "maxGCEventSpanMs": 10.069,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 6.644,
+      "mainUnionMs": 241.808,
+      "workerMaxMs": 10.375,
+      "workerUnionMs": 474.253
+    },
+    {
+      "arm": "native-map-children",
+      "trial": 1,
+      "count": 1,
+      "phase": "input",
+      "sourceOpportunityMs": 6.300000011920929,
+      "localSavedOpportunityMs": 6.300000011920929,
+      "heapBefore": 28825355,
+      "heapAfter": 23608318,
+      "maxGCEventSpanMs": 7.775,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 5.821,
+      "mainUnionMs": 235.774,
+      "workerMaxMs": 168.702,
+      "workerUnionMs": 709.641
+    },
+    {
+      "arm": "native-map-children",
+      "trial": 1,
+      "count": 1,
+      "phase": "Undo",
+      "sourceOpportunityMs": 134.10000002384186,
+      "localSavedOpportunityMs": 877.8999999761581,
+      "heapBefore": 24478730,
+      "heapAfter": 36255951,
+      "maxGCEventSpanMs": 28.624,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 6.598,
+      "mainUnionMs": 240.435,
+      "workerMaxMs": 23.224,
+      "workerUnionMs": 655.596
+    },
+    {
+      "arm": "ordinal-pages",
+      "trial": 1,
+      "count": 512,
+      "phase": "input",
+      "sourceOpportunityMs": 13.400000035762787,
+      "localSavedOpportunityMs": 13.400000035762787,
+      "heapBefore": 34835714,
+      "heapAfter": 43316402,
+      "maxGCEventSpanMs": 8.444,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.817,
+      "mainUnionMs": 204.577,
+      "workerMaxMs": 157.542,
+      "workerUnionMs": 643.374
+    },
+    {
+      "arm": "ordinal-pages",
+      "trial": 1,
+      "count": 512,
+      "phase": "Undo",
+      "sourceOpportunityMs": 56.099999964235394,
+      "localSavedOpportunityMs": 804.3999999761545,
+      "heapBefore": 18772328,
+      "heapAfter": 27139198,
+      "maxGCEventSpanMs": 4.854,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.748,
+      "mainUnionMs": 189.115,
+      "workerMaxMs": 29.113,
+      "workerUnionMs": 431.568
+    },
+    {
+      "arm": "native-map-children",
+      "trial": 1,
+      "count": 512,
+      "phase": "input",
+      "sourceOpportunityMs": 15.5,
+      "localSavedOpportunityMs": 15.5,
+      "heapBefore": 35247447,
+      "heapAfter": 43697465,
+      "maxGCEventSpanMs": 8.62,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.517,
+      "mainUnionMs": 185.675,
+      "workerMaxMs": 170.414,
+      "workerUnionMs": 618.1
+    },
+    {
+      "arm": "native-map-children",
+      "trial": 1,
+      "count": 512,
+      "phase": "Undo",
+      "sourceOpportunityMs": 119.69999998808089,
+      "localSavedOpportunityMs": 870.3999999761581,
+      "heapBefore": 19020119,
+      "heapAfter": 27467877,
+      "maxGCEventSpanMs": 42.334,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.807,
+      "mainUnionMs": 221.803,
+      "workerMaxMs": 28.661,
+      "workerUnionMs": 483.904
+    },
+    {
+      "arm": "native-map-children",
+      "trial": 2,
+      "count": 1,
+      "phase": "input",
+      "sourceOpportunityMs": 6.200000047683716,
+      "localSavedOpportunityMs": 6.200000047683716,
+      "heapBefore": 28938270,
+      "heapAfter": 18077339,
+      "maxGCEventSpanMs": 8.037,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 5.647,
+      "mainUnionMs": 207.137,
+      "workerMaxMs": 168.984,
+      "workerUnionMs": 689.185
+    },
+    {
+      "arm": "native-map-children",
+      "trial": 2,
+      "count": 1,
+      "phase": "Undo",
+      "sourceOpportunityMs": 106.39999997615814,
+      "localSavedOpportunityMs": 873,
+      "heapBefore": 18394744,
+      "heapAfter": 18703576,
+      "maxGCEventSpanMs": 30.639,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 8.066,
+      "mainUnionMs": 213.247,
+      "workerMaxMs": 24.074,
+      "workerUnionMs": 659.526
+    },
+    {
+      "arm": "ordinal-pages",
+      "trial": 2,
+      "count": 1,
+      "phase": "input",
+      "sourceOpportunityMs": 6.0,
+      "localSavedOpportunityMs": 6.0,
+      "heapBefore": 28613151,
+      "heapAfter": 23650386,
+      "maxGCEventSpanMs": 7.959,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 5.53,
+      "mainUnionMs": 235.007,
+      "workerMaxMs": 154.135,
+      "workerUnionMs": 603.379
+    },
+    {
+      "arm": "ordinal-pages",
+      "trial": 2,
+      "count": 1,
+      "phase": "Undo",
+      "sourceOpportunityMs": 43.80000001191911,
+      "localSavedOpportunityMs": 807.8000000119191,
+      "heapBefore": 24434742,
+      "heapAfter": 36175208,
+      "maxGCEventSpanMs": 9.881,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 6.721,
+      "mainUnionMs": 250.912,
+      "workerMaxMs": 10.424,
+      "workerUnionMs": 496.541
+    },
+    {
+      "arm": "native-map-children",
+      "trial": 2,
+      "count": 512,
+      "phase": "input",
+      "sourceOpportunityMs": 6.199999988079071,
+      "localSavedOpportunityMs": 6.199999988079071,
+      "heapBefore": 35424981,
+      "heapAfter": 43759091,
+      "maxGCEventSpanMs": 7.496,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.778,
+      "mainUnionMs": 201.549,
+      "workerMaxMs": 177.046,
+      "workerUnionMs": 637.284
+    },
+    {
+      "arm": "native-map-children",
+      "trial": 2,
+      "count": 512,
+      "phase": "Undo",
+      "sourceOpportunityMs": 133.3000000119191,
+      "localSavedOpportunityMs": 914.5999999642354,
+      "heapBefore": 19113207,
+      "heapAfter": 27610065,
+      "maxGCEventSpanMs": 4.857,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.992,
+      "mainUnionMs": 239.577,
+      "workerMaxMs": 29.233,
+      "workerUnionMs": 484.983
+    },
+    {
+      "arm": "ordinal-pages",
+      "trial": 2,
+      "count": 512,
+      "phase": "input",
+      "sourceOpportunityMs": 5.100000023841858,
+      "localSavedOpportunityMs": 5.100000023841858,
+      "heapBefore": 34900710,
+      "heapAfter": 43233584,
+      "maxGCEventSpanMs": 7.979,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.836,
+      "mainUnionMs": 213.441,
+      "workerMaxMs": 159.207,
+      "workerUnionMs": 657.384
+    },
+    {
+      "arm": "ordinal-pages",
+      "trial": 2,
+      "count": 512,
+      "phase": "Undo",
+      "sourceOpportunityMs": 63.599999964235394,
+      "localSavedOpportunityMs": 811.8000000119191,
+      "heapBefore": 18800738,
+      "heapAfter": 27168268,
+      "maxGCEventSpanMs": 4.536,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.686,
+      "mainUnionMs": 232.67,
+      "workerMaxMs": 29.948,
+      "workerUnionMs": 441.176
+    }
+  ],
+  "summary": [
+    {
+      "arm": "native-map-children",
+      "count": 1,
+      "phase": "input",
+      "n": 3,
+      "metrics": {
+        "sourceOpportunityMs": {
+          "median": 6.300000011920929,
+          "max": 16.69999998807907,
+          "samples": [
+            16.69999998807907,
+            6.300000011920929,
+            6.200000047683716
+          ]
+        },
+        "localSavedOpportunityMs": {
+          "median": 6.300000011920929,
+          "max": 16.80000001192093,
+          "samples": [
+            16.80000001192093,
+            6.300000011920929,
+            6.200000047683716
+          ]
+        },
+        "mainMaxMs": {
+          "median": 5.647,
+          "max": 5.821,
+          "samples": [
+            5.512,
+            5.821,
+            5.647
+          ]
+        },
+        "mainUnionMs": {
+          "median": 213.257,
+          "max": 235.774,
+          "samples": [
+            213.257,
+            235.774,
+            207.137
+          ]
+        },
+        "workerMaxMs": {
+          "median": 168.702,
+          "max": 168.984,
+          "samples": [
+            163.22,
+            168.702,
+            168.984
+          ]
+        },
+        "workerUnionMs": {
+          "median": 696.622,
+          "max": 709.641,
+          "samples": [
+            696.622,
+            709.641,
+            689.185
+          ]
+        },
+        "maxGCEventSpanMs": {
+          "median": 7.977,
+          "max": 8.037,
+          "samples": [
+            7.977,
+            7.775,
+            8.037
+          ]
+        }
+      }
+    },
+    {
+      "arm": "ordinal-pages",
+      "count": 1,
+      "phase": "input",
+      "n": 3,
+      "metrics": {
+        "sourceOpportunityMs": {
+          "median": 10.699999988079071,
+          "max": 11.800000011920929,
+          "samples": [
+            11.800000011920929,
+            10.699999988079071,
+            6.0
+          ]
+        },
+        "localSavedOpportunityMs": {
+          "median": 10.699999988079071,
+          "max": 11.800000011920929,
+          "samples": [
+            11.800000011920929,
+            10.699999988079071,
+            6.0
+          ]
+        },
+        "mainMaxMs": {
+          "median": 5.672,
+          "max": 5.906,
+          "samples": [
+            5.906,
+            5.672,
+            5.53
+          ]
+        },
+        "mainUnionMs": {
+          "median": 235.007,
+          "max": 239.718,
+          "samples": [
+            239.718,
+            234.335,
+            235.007
+          ]
+        },
+        "workerMaxMs": {
+          "median": 154.135,
+          "max": 154.601,
+          "samples": [
+            148.887,
+            154.601,
+            154.135
+          ]
+        },
+        "workerUnionMs": {
+          "median": 603.379,
+          "max": 615.265,
+          "samples": [
+            615.265,
+            601.76,
+            603.379
+          ]
+        },
+        "maxGCEventSpanMs": {
+          "median": 7.966,
+          "max": 8.447,
+          "samples": [
+            7.966,
+            8.447,
+            7.959
+          ]
+        }
+      }
+    },
+    {
+      "arm": "native-map-children",
+      "count": 1,
+      "phase": "Undo",
+      "n": 3,
+      "metrics": {
+        "sourceOpportunityMs": {
+          "median": 128.20000004768372,
+          "max": 134.10000002384186,
+          "samples": [
+            128.20000004768372,
+            134.10000002384186,
+            106.39999997615814
+          ]
+        },
+        "localSavedOpportunityMs": {
+          "median": 877.5,
+          "max": 877.8999999761581,
+          "samples": [
+            877.5,
+            877.8999999761581,
+            873
+          ]
+        },
+        "mainMaxMs": {
+          "median": 6.598,
+          "max": 8.066,
+          "samples": [
+            6.297,
+            6.598,
+            8.066
+          ]
+        },
+        "mainUnionMs": {
+          "median": 219.937,
+          "max": 240.435,
+          "samples": [
+            219.937,
+            240.435,
+            213.247
+          ]
+        },
+        "workerMaxMs": {
+          "median": 23.224,
+          "max": 24.074,
+          "samples": [
+            16.5,
+            23.224,
+            24.074
+          ]
+        },
+        "workerUnionMs": {
+          "median": 655.596,
+          "max": 659.526,
+          "samples": [
+            652.732,
+            655.596,
+            659.526
+          ]
+        },
+        "maxGCEventSpanMs": {
+          "median": 30.573,
+          "max": 30.639,
+          "samples": [
+            30.573,
+            28.624,
+            30.639
+          ]
+        }
+      }
+    },
+    {
+      "arm": "ordinal-pages",
+      "count": 1,
+      "phase": "Undo",
+      "n": 3,
+      "metrics": {
+        "sourceOpportunityMs": {
+          "median": 42.80000001192275,
+          "max": 43.80000001191911,
+          "samples": [
+            42.80000001192275,
+            42.599999964235394,
+            43.80000001191911
+          ]
+        },
+        "localSavedOpportunityMs": {
+          "median": 807.8000000119191,
+          "max": 808.8999999761545,
+          "samples": [
+            805.8000000119227,
+            808.8999999761545,
+            807.8000000119191
+          ]
+        },
+        "mainMaxMs": {
+          "median": 6.69,
+          "max": 6.721,
+          "samples": [
+            6.69,
+            6.644,
+            6.721
+          ]
+        },
+        "mainUnionMs": {
+          "median": 241.808,
+          "max": 250.912,
+          "samples": [
+            237.471,
+            241.808,
+            250.912
+          ]
+        },
+        "workerMaxMs": {
+          "median": 10.424,
+          "max": 17.053,
+          "samples": [
+            17.053,
+            10.375,
+            10.424
+          ]
+        },
+        "workerUnionMs": {
+          "median": 474.253,
+          "max": 496.541,
+          "samples": [
+            467.316,
+            474.253,
+            496.541
+          ]
+        },
+        "maxGCEventSpanMs": {
+          "median": 9.881,
+          "max": 10.069,
+          "samples": [
+            9.772,
+            10.069,
+            9.881
+          ]
+        }
+      }
+    },
+    {
+      "arm": "native-map-children",
+      "count": 512,
+      "phase": "input",
+      "n": 3,
+      "metrics": {
+        "sourceOpportunityMs": {
+          "median": 11.699999988079071,
+          "max": 15.5,
+          "samples": [
+            11.699999988079071,
+            15.5,
+            6.199999988079071
+          ]
+        },
+        "localSavedOpportunityMs": {
+          "median": 11.699999988079071,
+          "max": 15.5,
+          "samples": [
+            11.699999988079071,
+            15.5,
+            6.199999988079071
+          ]
+        },
+        "mainMaxMs": {
+          "median": 4.663,
+          "max": 4.778,
+          "samples": [
+            4.663,
+            4.517,
+            4.778
+          ]
+        },
+        "mainUnionMs": {
+          "median": 186.089,
+          "max": 201.549,
+          "samples": [
+            186.089,
+            185.675,
+            201.549
+          ]
+        },
+        "workerMaxMs": {
+          "median": 170.414,
+          "max": 177.046,
+          "samples": [
+            167.07,
+            170.414,
+            177.046
+          ]
+        },
+        "workerUnionMs": {
+          "median": 618.1,
+          "max": 637.284,
+          "samples": [
+            603.179,
+            618.1,
+            637.284
+          ]
+        },
+        "maxGCEventSpanMs": {
+          "median": 8.62,
+          "max": 8.985,
+          "samples": [
+            8.985,
+            8.62,
+            7.496
+          ]
+        }
+      }
+    },
+    {
+      "arm": "ordinal-pages",
+      "count": 512,
+      "phase": "input",
+      "n": 3,
+      "metrics": {
+        "sourceOpportunityMs": {
+          "median": 13.400000035762787,
+          "max": 16.099999964237213,
+          "samples": [
+            16.099999964237213,
+            13.400000035762787,
+            5.100000023841858
+          ]
+        },
+        "localSavedOpportunityMs": {
+          "median": 13.400000035762787,
+          "max": 16.099999964237213,
+          "samples": [
+            16.099999964237213,
+            13.400000035762787,
+            5.100000023841858
+          ]
+        },
+        "mainMaxMs": {
+          "median": 4.817,
+          "max": 4.836,
+          "samples": [
+            4.74,
+            4.817,
+            4.836
+          ]
+        },
+        "mainUnionMs": {
+          "median": 213.441,
+          "max": 238.811,
+          "samples": [
+            238.811,
+            204.577,
+            213.441
+          ]
+        },
+        "workerMaxMs": {
+          "median": 159.207,
+          "max": 162.638,
+          "samples": [
+            162.638,
+            157.542,
+            159.207
+          ]
+        },
+        "workerUnionMs": {
+          "median": 651.605,
+          "max": 657.384,
+          "samples": [
+            651.605,
+            643.374,
+            657.384
+          ]
+        },
+        "maxGCEventSpanMs": {
+          "median": 8.193,
+          "max": 8.444,
+          "samples": [
+            8.193,
+            8.444,
+            7.979
+          ]
+        }
+      }
+    },
+    {
+      "arm": "native-map-children",
+      "count": 512,
+      "phase": "Undo",
+      "n": 3,
+      "metrics": {
+        "sourceOpportunityMs": {
+          "median": 126.80000001191911,
+          "max": 133.3000000119191,
+          "samples": [
+            126.80000001191911,
+            119.69999998808089,
+            133.3000000119191
+          ]
+        },
+        "localSavedOpportunityMs": {
+          "median": 908.1999999880809,
+          "max": 914.5999999642354,
+          "samples": [
+            908.1999999880809,
+            870.3999999761581,
+            914.5999999642354
+          ]
+        },
+        "mainMaxMs": {
+          "median": 4.992,
+          "max": 5.093,
+          "samples": [
+            5.093,
+            4.807,
+            4.992
+          ]
+        },
+        "mainUnionMs": {
+          "median": 221.803,
+          "max": 239.577,
+          "samples": [
+            209.131,
+            221.803,
+            239.577
+          ]
+        },
+        "workerMaxMs": {
+          "median": 28.661,
+          "max": 29.233,
+          "samples": [
+            27.747,
+            28.661,
+            29.233
+          ]
+        },
+        "workerUnionMs": {
+          "median": 484.983,
+          "max": 490.381,
+          "samples": [
+            490.381,
+            483.904,
+            484.983
+          ]
+        },
+        "maxGCEventSpanMs": {
+          "median": 40.319,
+          "max": 42.334,
+          "samples": [
+            40.319,
+            42.334,
+            4.857
+          ]
+        }
+      }
+    },
+    {
+      "arm": "ordinal-pages",
+      "count": 512,
+      "phase": "Undo",
+      "n": 3,
+      "metrics": {
+        "sourceOpportunityMs": {
+          "median": 63.599999964235394,
+          "max": 65.0,
+          "samples": [
+            65.0,
+            56.099999964235394,
+            63.599999964235394
+          ]
+        },
+        "localSavedOpportunityMs": {
+          "median": 811.8000000119191,
+          "max": 828.0,
+          "samples": [
+            828.0,
+            804.3999999761545,
+            811.8000000119191
+          ]
+        },
+        "mainMaxMs": {
+          "median": 4.748,
+          "max": 4.942,
+          "samples": [
+            4.942,
+            4.748,
+            4.686
+          ]
+        },
+        "mainUnionMs": {
+          "median": 232.67,
+          "max": 239.647,
+          "samples": [
+            239.647,
+            189.115,
+            232.67
+          ]
+        },
+        "workerMaxMs": {
+          "median": 29.113,
+          "max": 29.948,
+          "samples": [
+            29.02,
+            29.113,
+            29.948
+          ]
+        },
+        "workerUnionMs": {
+          "median": 441.176,
+          "max": 448.703,
+          "samples": [
+            448.703,
+            431.568,
+            441.176
+          ]
+        },
+        "maxGCEventSpanMs": {
+          "median": 4.727,
+          "max": 4.854,
+          "samples": [
+            4.727,
+            4.854,
+            4.536
+          ]
+        }
+      }
+    }
+  ],
+  "failures": []
+}

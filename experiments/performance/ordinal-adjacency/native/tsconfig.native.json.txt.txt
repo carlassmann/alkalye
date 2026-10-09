@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*.ts",
+    "build.ts",
+    "server-native.ts",
+    "native-merge-undo.ts",
+    "native-series.ts"
+  ]
+}

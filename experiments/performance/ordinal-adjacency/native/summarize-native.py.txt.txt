@@ -1,0 +1,21 @@
+import json,statistics
+from pathlib import Path
+root=Path('/tmp/alkalye-worker-adjacency-ordinal-pages');traces=json.loads((root/'native-analysis.json').read_text());rows=[]
+for cell in json.loads((root/'native-series-progress.json').read_text()):
+ a=cell['arm'];t=cell['trial'];n=cell['count'];result=json.loads((root/f'native-{a}-{t}-{n}-results.json').read_text());u=next(c for c in result['cells'] if c['phase']=='Undo')['probe'];i=next(c for c in result['cells'] if c['phase']=='accepted-input-and-Undo')['singleProbe']
+ for phase,probe in [('input',i),('Undo',u)]:
+  trace=next(r for r in traces if r['arm']==a and r['trial']==t and r['count']==n and (r['file'].startswith('Undo-') if phase=='Undo' else r['file'].endswith('-single.trace.json')))
+  row={'arm':a,'trial':t,'count':n,'phase':phase,'sourceOpportunityMs':probe['ready']-probe['start'],'localSavedOpportunityMs':probe['localSaved']-probe['start'],'heapBefore':probe['heapBefore'],'heapAfter':probe['heapAfter'],'maxGCEventSpanMs':trace['maxGCInclusiveMs'],'cpuProfileChunks':trace['cpuProfileChunks']}
+  for role,name in [('main','CrRendererMain'),('worker','DedicatedWorker thread')]:
+   threads=[v for v in trace['threads'].values() if v['name']==name];row[role+'MaxMs']=max([v['maxTaskMs'] for v in threads],default=0);row[role+'UnionMs']=sum(v['taskUnionMs'] for v in threads)
+  rows.append(row)
+summary=[]
+for n in [1,512]:
+ for phase in ['input','Undo']:
+  for arm in ['native-map-children','ordinal-pages']:
+   group=[r for r in rows if r['arm']==arm and r['count']==n and r['phase']==phase]; metrics={}
+   for key in ['sourceOpportunityMs','localSavedOpportunityMs','mainMaxMs','mainUnionMs','workerMaxMs','workerUnionMs','maxGCEventSpanMs']:
+    vals=[r[key] for r in group];metrics[key]={'median':statistics.median(vals),'max':max(vals),'samples':vals}
+   summary.append({'arm':arm,'count':n,'phase':phase,'n':len(group),'metrics':metrics})
+(root/'native-summary.json').write_text(json.dumps({'rows':rows,'summary':summary,'failures':[r for r in traces if 'failure' in r]},indent=2)+'\n')
+for r in summary:print(r['count'],r['phase'],r['arm'],{k:round(v['median'],3) for k,v in r['metrics'].items()},'mainPeak',round(r['metrics']['mainMaxMs']['max'],3))

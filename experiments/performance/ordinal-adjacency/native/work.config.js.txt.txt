@@ -1,0 +1,1 @@
+export default {"project": "alkalye-worker-adjacency-ordinal-pages", "commands": {"native": {"run": "bun server-native.ts", "cwd": "/tmp/alkalye-worker-adjacency-ordinal-pages/native-runtime", "route": false, "portless": false}}}
