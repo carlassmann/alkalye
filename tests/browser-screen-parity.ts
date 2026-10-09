@@ -631,7 +631,8 @@ function verifySettings() {
 				let groups = [...document.querySelectorAll("#settings-editor .group-label")].map(label => label.textContent.trim());
 				return heading.querySelector("[data-preference-action=reset]") !== null &&
 					groups.join() === "Typography,Display,Authoring behavior" &&
-					document.querySelectorAll("#settings-editor input[role=switch]").length === 10 &&
+					document.querySelectorAll("#settings-editor input[role=switch]").length === 11 &&
+					document.querySelector('#settings-editor input[name="accessibleInput"][role=switch]') !== null &&
 					document.querySelector("[data-number=lineWidth] .number-unit").textContent === "ch" &&
 					document.querySelector("[data-number=fontSize] .row-description").hidden
 			})()`,
