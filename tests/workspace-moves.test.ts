@@ -140,6 +140,10 @@ test("durable gateway moves resume unknown target acceptance and preserve cyclic
 	}
 	let requests: WorkspaceRequest = async (workspace, identity, request) => {
 		let runtime = workspace === "first" ? first : second
+		if (new URL(request.url).pathname === "/internal/moves/import")
+			expect(request.headers.get("content-type")).toBe(
+				"application/octet-stream",
+			)
 		if (
 			new URL(request.url).pathname === "/internal/moves/import" &&
 			rejectImport
@@ -159,6 +163,13 @@ test("durable gateway moves resume unknown target acceptance and preserve cyclic
 				? { subject: "stranger", actors: ["stranger"] }
 				: identity
 		let response = await handler(request, Context.make(Identity, principal))
+		if (
+			new URL(request.url).pathname === "/internal/moves/stage" &&
+			response.ok
+		)
+			expect(response.headers.get("content-type")).toBe(
+				"application/octet-stream",
+			)
 		if (
 			new URL(request.url).pathname === "/internal/moves/import" &&
 			loseImport &&
