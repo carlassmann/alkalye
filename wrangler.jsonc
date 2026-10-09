@@ -2,7 +2,7 @@
 	"$schema": "./node_modules/wrangler/config-schema.json",
 	"name": "alkalye-effect-rewrite",
 	"main": "src/cloudflare/index.ts",
-	"compatibility_date": "2026-10-09",
+	"compatibility_date": "2026-09-18",
 	"compatibility_flags": ["nodejs_compat"],
 	"assets": {
 		"directory": "./dist",
