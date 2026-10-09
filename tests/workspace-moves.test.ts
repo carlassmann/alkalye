@@ -30,6 +30,7 @@ import { restoreSnapshot, buildAction } from "../src/shared/document-actions"
 import { makeWorkspaceHandler } from "../src/cloudflare/workspace-api"
 import { WorkspaceDirectory } from "../src/cloudflare/workspace-directory"
 import { makeWorkspaceMoves } from "../src/cloudflare/workspace-moves"
+import { makeFederatedWorkspaceStore } from "../src/cloudflare/workspace-store"
 import type { WorkspaceRequest } from "../src/cloudflare/workspace-rpc"
 class Handler extends Context.Service<
 	Handler,
@@ -72,9 +73,22 @@ function gateway(request: WorkspaceRequest, file: string) {
 			Moves,
 			Effect.gen(function* () {
 				let budget = yield* CloudflareBlobBudget
+				let directory = yield* WorkspaceDirectory
 				return yield* makeWorkspaceMoves(
 					request,
-					route => Effect.succeed(route),
+					route =>
+						route.state === "legacy"
+							? directory
+									.freezeWorkspace(route.workspace, route.generation)
+									.pipe(
+										Effect.flatMap(frozen =>
+											directory.activateWorkspace(
+												frozen.workspace,
+												frozen.generation,
+											),
+										),
+									)
+							: Effect.succeed(route),
 					(document, from, to) => {
 						let original = from === "first" ? "owner" : "destination-owner",
 							next = to === "first" ? "owner" : "destination-owner"
@@ -115,6 +129,7 @@ test("durable gateway moves resume unknown target acceptance and preserve cyclic
 		second = remote()
 	let loseImport = true
 	let rejectImport = true
+	let refuseSource = false
 	function destination<A, E, R>(effect: Effect.Effect<A, E, R>) {
 		return effect.pipe(
 			Effect.provideService(Identity, {
@@ -139,7 +154,11 @@ test("durable gateway moves resume unknown target acceptance and preserve cyclic
 			)
 		}
 		let handler = await runtime.runPromise(Handler)
-		let response = await handler(request, Context.make(Identity, identity))
+		let principal =
+			refuseSource && new URL(request.url).pathname === "/internal/moves/stage"
+				? { subject: "stranger", actors: ["stranger"] }
+				: identity
+		let response = await handler(request, Context.make(Identity, principal))
 		if (
 			new URL(request.url).pathname === "/internal/moves/import" &&
 			loseImport &&
@@ -191,8 +210,8 @@ test("durable gateway moves resume unknown target acceptance and preserve cyclic
 		await central.runPromise(
 			WorkspaceDirectory.use(d =>
 				Effect.gen(function* () {
-					yield* d.registerWorkspace("first", "owner")
-					yield* d.registerWorkspace("second", "destination-owner")
+					yield* d.registerWorkspace("first", "owner", "legacy")
+					yield* d.registerWorkspace("second", "destination-owner", "legacy")
 					yield* d.registerDocument("moving", "first")
 				}),
 			),
@@ -217,10 +236,43 @@ test("durable gateway moves resume unknown target acceptance and preserve cyclic
 				}),
 			),
 		)
+		let local = await first.runPromise(
+			Effect.gen(function* () {
+				return yield* WorkspaceStore
+			}),
+		)
+		let adapter = await central.runPromise(
+			Effect.gen(function* () {
+				let directory = yield* WorkspaceDirectory,
+					moveDocument = yield* Moves
+				return yield* makeFederatedWorkspaceStore({
+					local,
+					directory,
+					request: requests,
+					moveDocument,
+				})
+			}),
+		)
 		let quota = await central.runPromise(
-			owner(Moves.use(m => m("moving", "second", "quota")).pipe(Effect.flip)),
+			owner(
+				adapter.moveDocument("moving", "second", "quota").pipe(Effect.flip),
+			),
 		)
 		expect(quota instanceof DocumentConflict).toBe(true)
+		expect(
+			(
+				await central.runPromise(
+					WorkspaceDirectory.use(d => d.workspace("first")),
+				)
+			)?.state,
+		).toBe("active")
+		expect(
+			(
+				await central.runPromise(
+					WorkspaceDirectory.use(d => d.workspace("second")),
+				)
+			)?.state,
+		).toBe("active")
 		expect(
 			await first.runPromise(
 				owner(WorkspaceStore.use(s => s.snapshot("moving"))),
@@ -319,10 +371,63 @@ test("durable gateway moves resume unknown target acceptance and preserve cyclic
 				)
 			)?.workspace,
 		).toBe("first")
+		expect(
+			(
+				await second.runPromise(
+					destination(WorkspaceStore.use(s => s.library())),
+				)
+			).documents.some(row => row.document === "moving"),
+		).toBe(false)
+		expect(
+			(
+				await second.runPromise(
+					owner(WorkspaceStore.use(s => s.sharedDocuments())),
+				)
+			).some(row => row.document === "moving"),
+		).toBe(false)
+		expect(
+			(
+				await second.runPromise(
+					destination(WorkspaceStore.use(s => s.workspaceSnapshot("second"))),
+				)
+			)?.documents.some(row => row.document === "moving"),
+		).toBe(false)
+		expect(
+			(
+				await first.runPromise(owner(WorkspaceStore.use(s => s.library())))
+			).documents.some(row => row.document === "moving"),
+		).toBe(true)
+		refuseSource = true
+		expect(
+			(
+				await central.runPromise(
+					owner(Moves.use(m => m("moving", "second", "out")).pipe(Effect.exit)),
+				)
+			)._tag,
+		).toBe("Failure")
+		expect(
+			(
+				await central.runPromise(
+					CloudflareBlobBudget.use(b =>
+						b.reserve({ ...allocation, owner: "destination-owner" }),
+					),
+				)
+			).receipt,
+		).toBe(allocation.receipt)
+		expect(
+			(
+				await first.runPromise(
+					owner(
+						WorkspaceStore.use(s => s.snapshot("moving")).pipe(Effect.exit),
+					),
+				)
+			)._tag,
+		).toBe("Failure")
+		refuseSource = false
 		await central.dispose()
 		central = gateway(requests, file)
 		let receipt = await central.runPromise(
-			owner(Moves.use(m => m("moving", "second", "out"))),
+			owner(Moves.use(m => m("moving", "second", "refresh-new-request"))),
 		)
 		expect(
 			await central.runPromise(
@@ -339,6 +444,13 @@ test("durable gateway moves resume unknown target acceptance and preserve cyclic
 					notice.documents.has("moving") &&
 					notice.subjects.has("source-writer"),
 			),
+		).toBe(true)
+		expect(
+			(
+				await second.runPromise(
+					destination(WorkspaceStore.use(s => s.library())),
+				)
+			).documents.some(row => row.document === "moving"),
 		).toBe(true)
 		let saved = await second.runPromise(
 			owner(
@@ -398,6 +510,22 @@ test("durable gateway moves resume unknown target acceptance and preserve cyclic
 				owner(Moves.use(m => m("moving", "second", "out"))),
 			),
 		).toBe(receipt)
+		expect(
+			await central.runPromise(
+				owner(Moves.use(m => m("moving", "second", "refresh-new-request"))),
+			),
+		).toBe(receipt)
+		expect(
+			(
+				await central.runPromise(
+					owner(
+						Moves.use(m => m("moving", "first", "refresh-new-request")).pipe(
+							Effect.exit,
+						),
+					),
+				)
+			)._tag,
+		).toBe("Failure")
 	} finally {
 		await Effect.runPromise(Scope.close(scope, Exit.void))
 		await central.dispose()

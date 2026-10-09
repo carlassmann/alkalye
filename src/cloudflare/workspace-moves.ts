@@ -30,6 +30,8 @@ let ledgerRow = Schema.Struct({
 	destination: Schema.String,
 	phase: Schema.Literals([
 		"staged",
+		"admitting",
+		"importing",
 		"imported",
 		"published",
 		"done",
@@ -59,6 +61,7 @@ export function makeWorkspaceMoves(
 			lookup: (_document: string) => Semaphore.make(1),
 		})
 		yield* sql`CREATE TABLE IF NOT EXISTS gateway_document_moves (subject TEXT NOT NULL,request TEXT NOT NULL,document TEXT NOT NULL,source TEXT NOT NULL,destination TEXT NOT NULL,phase TEXT NOT NULL,position INTEGER,PRIMARY KEY(subject,request))`
+		yield* sql`CREATE TABLE IF NOT EXISTS gateway_document_move_aliases(subject TEXT NOT NULL,request TEXT NOT NULL,document TEXT NOT NULL,destination TEXT NOT NULL,canonical_request TEXT NOT NULL,PRIMARY KEY(subject,request))`
 		let read = SqlSchema.findOneOption({
 			Request: Schema.Struct({
 				subject: Schema.String,
@@ -73,6 +76,7 @@ export function makeWorkspaceMoves(
 			destination: string,
 			command: string,
 		) {
+			let requestedCommand = command
 			return Effect.scoped(
 				Effect.gen(function* () {
 					let identity = yield* Identity
@@ -85,6 +89,21 @@ export function makeWorkspaceMoves(
 					let gate = yield* RcMap.get(gates, document)
 					return yield* gate.withPermits(1)(
 						Effect.gen(function* () {
+							let command = requestedCommand
+							let aliases = yield* sql<{
+								document: string
+								destination: string
+								canonical_request: string
+							}>`SELECT document,destination,canonical_request FROM gateway_document_move_aliases WHERE subject=${identity.subject} AND request=${command}`
+							let alias = aliases[0]
+							if (alias) {
+								if (
+									alias.document !== document ||
+									alias.destination !== destination
+								)
+									return yield* unavailable("Move request identity conflicts")
+								command = alias.canonical_request
+							}
 							let key = { subject: identity.subject, request: command }
 							let prior = yield* read(key)
 							let entry = prior._tag === "Some" ? prior.value : undefined
@@ -105,7 +124,25 @@ export function makeWorkspaceMoves(
 							let inFlight = yield* sql<{
 								request: string
 								subject: string
-							}>`SELECT request,subject FROM gateway_document_moves WHERE document=${document} AND phase NOT IN ('done','aborted') LIMIT 1`
+								destination: string
+							}>`SELECT request,subject,destination FROM gateway_document_moves WHERE document=${document} AND phase NOT IN ('done','aborted') LIMIT 1`
+							let pending = inFlight[0]
+							if (
+								!entry &&
+								pending &&
+								pending.subject === identity.subject &&
+								pending.destination === destination
+							) {
+								yield* sql`INSERT INTO gateway_document_move_aliases VALUES(${identity.subject},${requestedCommand},${document},${destination},${pending.request})`
+								command = pending.request
+								let resumed = yield* read({
+									subject: identity.subject,
+									request: command,
+								})
+								if (resumed._tag !== "Some")
+									return yield* unavailable("Prior move receipt disappeared")
+								entry = resumed.value
+							}
 							if (
 								inFlight[0] &&
 								(inFlight[0].request !== command ||
@@ -166,7 +203,13 @@ export function makeWorkspaceMoves(
 								}
 							}
 							let originalSource = entry.source
-							if (entry.phase === "staged") {
+							if (
+								entry.phase === "staged" ||
+								entry.phase === "admitting" ||
+								entry.phase === "importing"
+							) {
+								let admissionNotStarted = entry.phase === "staged"
+								let importMayHaveCommitted = entry.phase === "importing"
 								let bundle = yield* remote(originalSource, c =>
 									c.internal.stageDocumentMove({
 										payload: { document, destination, request: command },
@@ -184,12 +227,18 @@ export function makeWorkspaceMoves(
 												!(error instanceof ResourceUnavailable)
 											)
 												return Effect.fail(error)
+											if (!admissionNotStarted)
+												return unavailable(
+													"Prior move admission outcome remains unknown",
+												)
 											return sql`UPDATE gateway_document_moves SET phase='aborted' WHERE subject=${identity.subject} AND request=${command}`.pipe(
 												Effect.andThen(Effect.fail(error)),
 											)
 										},
 									),
 								)
+								if (admissionNotStarted)
+									yield* sql`UPDATE gateway_document_moves SET phase='admitting' WHERE subject=${identity.subject} AND request=${command}`
 								let rollback = yield* (
 									beforeImport
 										? beforeImport(document, originalSource, destination)
@@ -204,6 +253,10 @@ export function makeWorkspaceMoves(
 										> => {
 											if (!(error instanceof BlobQuotaExceeded))
 												return Effect.fail(error)
+											if (importMayHaveCommitted)
+												return unavailable(
+													"Prior import outcome remains unknown",
+												)
 											return remote(originalSource, c =>
 												c.internal.abortDocumentMove({
 													payload: { document, request: command },
@@ -223,6 +276,7 @@ export function makeWorkspaceMoves(
 										},
 									),
 								)
+								yield* sql`UPDATE gateway_document_moves SET phase='importing' WHERE subject=${identity.subject} AND request=${command}`
 								yield* remote(destination, c =>
 									c.internal.importDocumentMove({ payload: bundle }),
 								).pipe(

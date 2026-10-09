@@ -520,7 +520,7 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 				Request: Schema.String,
 				Result: SummaryRowSchema,
 				execute: id =>
-					sql`SELECT d.document,d.workspace,d.owner,s.log,s.position,s.deleted,s.metadata FROM workspace_documents d JOIN document_summaries s ON s.document=d.document WHERE d.workspace=${id} ORDER BY d.document`,
+					sql`SELECT d.document,d.workspace,d.owner,s.log,s.position,s.deleted,s.metadata FROM workspace_documents d JOIN document_summaries s ON s.document=d.document WHERE d.workspace=${id} AND NOT EXISTS (SELECT 1 FROM document_transfer_fences f WHERE f.document=d.document AND f.phase IN ('imported','retired')) ORDER BY d.document`,
 			})(id)
 			let avatar = yield* workspaceAvatar(id)
 			let ownerProfile = yield* preferences(record.value.owner)
@@ -548,7 +548,7 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 			Request: Schema.String,
 			Result: SummaryRowSchema,
 			execute: subject =>
-				sql`SELECT d.document,d.workspace,d.owner,s.log,s.position,s.deleted,s.metadata FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace AND w.deleted=0 JOIN document_summaries s ON s.document=d.document WHERE (d.owner=${subject} OR EXISTS (SELECT 1 FROM document_grants a WHERE a.document=d.document AND a.member=${subject})) ORDER BY d.document`,
+				sql`SELECT d.document,d.workspace,d.owner,s.log,s.position,s.deleted,s.metadata FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace AND w.deleted=0 JOIN document_summaries s ON s.document=d.document WHERE NOT EXISTS (SELECT 1 FROM document_transfer_fences f WHERE f.document=d.document AND f.phase IN ('imported','retired')) AND (d.owner=${subject} OR EXISTS (SELECT 1 FROM document_grants a WHERE a.document=d.document AND a.member=${subject})) ORDER BY d.document`,
 		})(subject).pipe(
 			Effect.map(rows =>
 				rows.map(row => ({ ...row, deleted: row.deleted === 1 })),
@@ -582,7 +582,7 @@ export function makeWorkspaceProjection(sql: SqlClient.SqlClient) {
 					created: Schema.Natural,
 				}),
 				execute: subject =>
-					sql`SELECT d.document,d.workspace,d.owner,s.log,s.position,s.deleted,s.metadata,s.kind,s.excerpt,s.links,s.updated,s.created,CASE WHEN d.owner=${subject} OR w.owner=${subject} THEN 'owner' WHEN m.role='writer' OR a.role='writer' THEN 'writer' WHEN m.role='reader' OR a.role='reader' THEN 'reader' END AS role FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace JOIN document_summaries s ON s.document=d.document LEFT JOIN workspace_grants m ON m.workspace=d.workspace AND m.member=${subject} LEFT JOIN document_grants a ON a.document=d.document AND a.member=${subject} WHERE w.deleted=0 AND (d.owner=${subject} OR w.owner=${subject} OR m.role IS NOT NULL OR a.role IS NOT NULL) ORDER BY d.workspace,d.document`,
+					sql`SELECT d.document,d.workspace,d.owner,s.log,s.position,s.deleted,s.metadata,s.kind,s.excerpt,s.links,s.updated,s.created,CASE WHEN d.owner=${subject} OR w.owner=${subject} THEN 'owner' WHEN m.role='writer' OR a.role='writer' THEN 'writer' WHEN m.role='reader' OR a.role='reader' THEN 'reader' END AS role FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace JOIN document_summaries s ON s.document=d.document LEFT JOIN workspace_grants m ON m.workspace=d.workspace AND m.member=${subject} LEFT JOIN document_grants a ON a.document=d.document AND a.member=${subject} WHERE w.deleted=0 AND NOT EXISTS (SELECT 1 FROM document_transfer_fences f WHERE f.document=d.document AND f.phase IN ('imported','retired')) AND (d.owner=${subject} OR w.owner=${subject} OR m.role IS NOT NULL OR a.role IS NOT NULL) ORDER BY d.workspace,d.document`,
 			})(subject)
 			return {
 				workspaces,
