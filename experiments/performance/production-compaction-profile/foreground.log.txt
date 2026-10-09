@@ -1,0 +1,18 @@
+task 12.074 samplewindow 11.708
+1.81 1.81 (program) None
+1.691 5.135 projectionFor {'column': 23, 'line': 247, 'name': '', 'source': '../src/client/source-textarea.ts'}
+1.614 1.92 bn {'column': 23, 'line': 171, 'name': '', 'source': '../src/shared/projection.ts'}
+1.042 3.147 project {'column': 9, 'line': 87, 'name': '', 'source': '../src/shared/projection.ts'}
+0.764 0.764 getBoundingClientRect None
+0.472 2.315 input {'column': 7, 'line': 161, 'name': '', 'source': '../src/client/source-textarea.ts'}
+0.31 0.609 measuredBlock {'column': 23, 'line': 628, 'name': '', 'source': '../src/client/editor-viewport.ts'}
+0.309 1.081 replace {'column': 4, 'line': 546, 'name': '', 'source': '../src/shared/document-session.ts'}
+0.306 0.306  {'column': 31, 'line': 186, 'name': '', 'source': '../src/shared/projection.ts'}
+0.306 0.306  {'column': 4, 'line': 365, 'name': '', 'source': '../src/shared/projection.ts'}
+0.303 0.303 update {'column': 8, 'line': 40, 'name': '', 'source': '../src/client/components/editor-overlay.ts'}
+0.284 0.284 Pt {'column': 28, 'line': 332, 'name': '', 'source': '../src/shared/projection.ts'}
+stack 1.81 [('(program)', None), ('(root)', None)]
+stack 1.691 [('projectionFor', {'column': 23, 'line': 247, 'name': '', 'source': '../src/client/source-textarea.ts'}), ('sync', {'column': 6, 'line': 221, 'name': '', 'source': '../src/client/source-textarea.ts'}), ('nt', {'column': 17, 'line': 921, 'name': '', 'source': '../src/client/components/editor.ts'}), ('Ci.s.oninput', {'column': 21, 'line': 262, 'name': '', 'source': '../src/client/components/editor.ts'}), ('(root)', None)]
+stack 1.614 [('bn', {'column': 23, 'line': 171, 'name': '', 'source': '../src/shared/projection.ts'}), ('project', {'column': 9, 'line': 87, 'name': '', 'source': '../src/shared/projection.ts'}), ('projectionFor', {'column': 23, 'line': 247, 'name': '', 'source': '../src/client/source-textarea.ts'}), ('sync', {'column': 6, 'line': 221, 'name': '', 'source': '../src/client/source-textarea.ts'}), ('nt', {'column': 17, 'line': 921, 'name': '', 'source': '../src/client/components/editor.ts'}), ('Ci.s.oninput', {'column': 21, 'line': 262, 'name': '', 'source': '../src/client/components/editor.ts'}), ('(root)', None)]
+stack 1.042 [('project', {'column': 9, 'line': 87, 'name': '', 'source': '../src/shared/projection.ts'}), ('projectionFor', {'column': 23, 'line': 247, 'name': '', 'source': '../src/client/source-textarea.ts'}), ('sync', {'column': 6, 'line': 221, 'name': '', 'source': '../src/client/source-textarea.ts'}), ('nt', {'column': 17, 'line': 921, 'name': '', 'source': '../src/client/components/editor.ts'}), ('Ci.s.oninput', {'column': 21, 'line': 262, 'name': '', 'source': '../src/client/components/editor.ts'}), ('(root)', None)]
+children [('EventDispatch', 11.451), ('EventDispatch', 11.149), ('EventDispatch', 10.375), ('FunctionCall', 9.873), ('EventDispatch', 0.475), ('FunctionCall', 0.464), ('UpdateLayoutTree', 0.329), ('UpdateLayoutTree', 0.294), ('Layout', 0.286), ('EventDispatch', 0.182), ('UpdateLayoutTree', 0.178), ('Layout', 0.149)]

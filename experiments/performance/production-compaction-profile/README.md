@@ -10,4 +10,6 @@ Source-map witnesses connect loaded assets to frozen source bytes. The minified 
 
 Producer files are preserved byte-for-byte, including the preparation-time plan status. The native log records completed capture and server shutdown. Raw traces remain outside Git; databases, browser profiles and credentials are excluded. This diagnostic establishes neither a candidate speedup nor 120Hz presentation.
 
+The retained initial input task also supplies a foreground lead. Its 12.074ms enclosing task includes 5.135ms of sampled inclusive work under `SourceTextarea.projectionFor`, reached through editor update and projection synchronization. `Projector.project` and token projection are nested within that cost. The input method accounts for another 2.315ms inclusive; document replacement accounts for 1.081ms. These sampled spans overlap and are not additive. GC does not dominate this initial task. The foreground parser, source-mapped rows and call stacks are retained separately; this is one historical diagnostic, not a current repeated benchmark.
+
 written with gpt-6 in codex

@@ -1,0 +1,20 @@
+[
+  {
+    "source": "/tmp/alkalye-production-snapshot-profile-prep/foreground.py",
+    "archive": "foreground.py.txt",
+    "bytes": 3208,
+    "sha256": "ca22bd124accb1c912f2c8d4231ac098441890b8acb1b86ef5b68008b58dc703"
+  },
+  {
+    "source": "/tmp/alkalye-production-snapshot-profile-prep/foreground.json",
+    "archive": "foreground.json.txt",
+    "bytes": 44370,
+    "sha256": "5fa9ad4ce867f5104e15bb4f95b8ac88528ed22e168a5f1f02981adbfeb1e745"
+  },
+  {
+    "source": "/tmp/alkalye-production-snapshot-profile-prep/foreground.log",
+    "archive": "foreground.log.txt",
+    "bytes": 3074,
+    "sha256": "f6a9a48689758dc17d1791bc1821c7105de61469dc78a434cc50d15b97149dc9"
+  }
+]

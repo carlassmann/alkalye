@@ -1,0 +1,1748 @@
+{
+  "scope": "Retained sampled baseline85a6/4a/e9 initial enclosing input RunTask only, n1 diagnostic; overlapping inclusive costs notadditive",
+  "taskMs": 12.074,
+  "sampleWindowMs": 11.708,
+  "owner": [
+    54383,
+    20275650
+  ],
+  "rows": [
+    {
+      "frame": {
+        "codeType": "other",
+        "functionName": "(program)",
+        "scriptId": 0
+      },
+      "mapped": null,
+      "selfMs": 1.81,
+      "inclusiveMs": 1.81
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 3373,
+        "functionName": "projectionFor",
+        "lineNumber": 69,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 23,
+        "line": 247,
+        "name": "",
+        "source": "../src/client/source-textarea.ts"
+      },
+      "selfMs": 1.691,
+      "inclusiveMs": 5.135
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 950,
+        "functionName": "bn",
+        "lineNumber": 13,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 23,
+        "line": 171,
+        "name": "",
+        "source": "../src/shared/projection.ts"
+      },
+      "selfMs": 1.614,
+      "inclusiveMs": 1.92
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 1236,
+        "functionName": "project",
+        "lineNumber": 11,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 9,
+        "line": 87,
+        "name": "",
+        "source": "../src/shared/projection.ts"
+      },
+      "selfMs": 1.042,
+      "inclusiveMs": 3.147
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "functionName": "getBoundingClientRect",
+        "scriptId": 0
+      },
+      "mapped": null,
+      "selfMs": 0.764,
+      "inclusiveMs": 0.764
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 1847,
+        "functionName": "input",
+        "lineNumber": 69,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 7,
+        "line": 161,
+        "name": "",
+        "source": "../src/client/source-textarea.ts"
+      },
+      "selfMs": 0.472,
+      "inclusiveMs": 2.315
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 633,
+        "functionName": "measuredBlock",
+        "lineNumber": 60,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 23,
+        "line": 628,
+        "name": "",
+        "source": "../src/client/editor-viewport.ts"
+      },
+      "selfMs": 0.31,
+      "inclusiveMs": 0.609
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 99427,
+        "functionName": "replace",
+        "lineNumber": 7,
+        "scriptId": 20,
+        "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+      },
+      "mapped": {
+        "column": 4,
+        "line": 546,
+        "name": "",
+        "source": "../src/shared/document-session.ts"
+      },
+      "selfMs": 0.309,
+      "inclusiveMs": 1.081
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 1136,
+        "functionName": "",
+        "lineNumber": 13,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 31,
+        "line": 186,
+        "name": "",
+        "source": "../src/shared/projection.ts"
+      },
+      "selfMs": 0.306,
+      "inclusiveMs": 0.306
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 3061,
+        "functionName": "",
+        "lineNumber": 13,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 4,
+        "line": 365,
+        "name": "",
+        "source": "../src/shared/projection.ts"
+      },
+      "selfMs": 0.306,
+      "inclusiveMs": 0.306
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 228,
+        "functionName": "update",
+        "lineNumber": 83,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 8,
+        "line": 40,
+        "name": "",
+        "source": "../src/client/components/editor-overlay.ts"
+      },
+      "selfMs": 0.303,
+      "inclusiveMs": 0.303
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 2645,
+        "functionName": "Pt",
+        "lineNumber": 13,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 28,
+        "line": 332,
+        "name": "",
+        "source": "../src/shared/projection.ts"
+      },
+      "selfMs": 0.284,
+      "inclusiveMs": 0.284
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 2179,
+        "functionName": "vn",
+        "lineNumber": 13,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 37,
+        "line": 292,
+        "name": "",
+        "source": "../src/shared/projection.ts"
+      },
+      "selfMs": 0.228,
+      "inclusiveMs": 0.462
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 2963,
+        "functionName": "Sn",
+        "lineNumber": 13,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 31,
+        "line": 359,
+        "name": "",
+        "source": "../src/shared/projection.ts"
+      },
+      "selfMs": 0.222,
+      "inclusiveMs": 0.528
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 5556,
+        "functionName": "ot",
+        "lineNumber": 13,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 15,
+        "line": 590,
+        "name": "",
+        "source": "../src/shared/projection.ts"
+      },
+      "selfMs": 0.185,
+      "inclusiveMs": 0.185
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 16487,
+        "functionName": "G",
+        "lineNumber": 40,
+        "scriptId": 27,
+        "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+      },
+      "mapped": {
+        "column": 28,
+        "line": 2430,
+        "name": "",
+        "source": "../src/shared/crdt.ts"
+      },
+      "selfMs": 0.158,
+      "inclusiveMs": 0.158
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 1646,
+        "functionName": "K",
+        "lineNumber": 0,
+        "scriptId": 34,
+        "url": "http://127.0.0.1:4498/chunks/document-app-afk9hpfa.js"
+      },
+      "mapped": {
+        "column": 23,
+        "line": 101,
+        "name": "",
+        "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/MutableList.js"
+      },
+      "selfMs": 0.157,
+      "inclusiveMs": 0.157
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 6169,
+        "functionName": "mt",
+        "lineNumber": 6,
+        "scriptId": 36,
+        "url": "http://127.0.0.1:4498/chunks/document-app-ykdw1dfw.js"
+      },
+      "mapped": {
+        "column": 13,
+        "line": 335,
+        "name": "",
+        "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js"
+      },
+      "selfMs": 0.157,
+      "inclusiveMs": 0.157
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 5059,
+        "functionName": "Ci.s.oninput",
+        "lineNumber": 87,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 21,
+        "line": 262,
+        "name": "",
+        "source": "../src/client/components/editor.ts"
+      },
+      "selfMs": 0.154,
+      "inclusiveMs": 9.499
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 3291,
+        "functionName": "me",
+        "lineNumber": 2,
+        "scriptId": 31,
+        "url": "http://127.0.0.1:4498/chunks/document-app-cqph2zrk.js"
+      },
+      "mapped": {
+        "column": 14,
+        "line": 280,
+        "name": "",
+        "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/encoding/Yaml.js"
+      },
+      "selfMs": 0.152,
+      "inclusiveMs": 0.152
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 1024,
+        "functionName": "h",
+        "lineNumber": 56,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 17,
+        "line": 62,
+        "name": "",
+        "source": "../src/client/components/line-actions.ts"
+      },
+      "selfMs": 0.152,
+      "inclusiveMs": 0.152
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 120665,
+        "functionName": "documents",
+        "lineNumber": 7,
+        "scriptId": 20,
+        "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+      },
+      "mapped": {
+        "column": 3,
+        "line": 1995,
+        "name": "",
+        "source": "../src/shared/document-session.ts"
+      },
+      "selfMs": 0.145,
+      "inclusiveMs": 0.297
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 54130,
+        "functionName": "VR",
+        "lineNumber": 22,
+        "scriptId": 36,
+        "url": "http://127.0.0.1:4498/chunks/document-app-ykdw1dfw.js"
+      },
+      "mapped": {
+        "column": 29,
+        "line": 242,
+        "name": "",
+        "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Chunk.js"
+      },
+      "selfMs": 0.143,
+      "inclusiveMs": 0.143
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 58366,
+        "functionName": "",
+        "lineNumber": 7,
+        "scriptId": 20,
+        "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+      },
+      "mapped": {
+        "column": 3,
+        "line": 441,
+        "name": "",
+        "source": "../src/platform/indexeddb-journal.ts"
+      },
+      "selfMs": 0.134,
+      "inclusiveMs": 0.134
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 266,
+        "functionName": "nr",
+        "lineNumber": 32,
+        "scriptId": 27,
+        "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+      },
+      "mapped": {
+        "column": 17,
+        "line": 86,
+        "name": "",
+        "source": "../src/shared/text-index.ts"
+      },
+      "selfMs": 0.106,
+      "inclusiveMs": 0.106
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 3580,
+        "functionName": "",
+        "lineNumber": 13,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 25,
+        "line": 418,
+        "name": "",
+        "source": "../src/shared/projection.ts"
+      },
+      "selfMs": 0.095,
+      "inclusiveMs": 0.095
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 16043,
+        "functionName": "mr",
+        "lineNumber": 40,
+        "scriptId": 27,
+        "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+      },
+      "mapped": {
+        "column": 24,
+        "line": 2397,
+        "name": "",
+        "source": "../src/shared/crdt.ts"
+      },
+      "selfMs": 0.094,
+      "inclusiveMs": 0.094
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "functionName": "mark",
+        "scriptId": 0
+      },
+      "mapped": null,
+      "selfMs": 0.073,
+      "inclusiveMs": 0.073
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 15059,
+        "functionName": "set",
+        "lineNumber": 40,
+        "scriptId": 27,
+        "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+      },
+      "mapped": {
+        "column": 5,
+        "line": 2321,
+        "name": "",
+        "source": "../src/shared/crdt.ts"
+      },
+      "selfMs": 0.063,
+      "inclusiveMs": 0.063
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 1188,
+        "functionName": "rebuild",
+        "lineNumber": 62,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 17,
+        "line": 760,
+        "name": "",
+        "source": "../src/client/editor-viewport.ts"
+      },
+      "selfMs": 0.031,
+      "inclusiveMs": 0.056
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 766,
+        "functionName": "estimatedBlock",
+        "lineNumber": 61,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 24,
+        "line": 678,
+        "name": "",
+        "source": "../src/client/editor-viewport.ts"
+      },
+      "selfMs": 0.025,
+      "inclusiveMs": 0.025
+    },
+    {
+      "frame": {
+        "codeType": "JS",
+        "columnNumber": 19262,
+        "functionName": "ge",
+        "lineNumber": 87,
+        "scriptId": 7,
+        "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+      },
+      "mapped": {
+        "column": 25,
+        "line": 1157,
+        "name": "",
+        "source": "../src/client/components/editor.ts"
+      },
+      "selfMs": 0.023,
+      "inclusiveMs": 0.326
+    }
+  ],
+  "topStacks": [
+    {
+      "selfMs": 1.81,
+      "stack": [
+        {
+          "frame": {
+            "codeType": "other",
+            "functionName": "(program)",
+            "scriptId": 0
+          },
+          "mapped": null
+        },
+        {
+          "frame": {
+            "codeType": "other",
+            "functionName": "(root)",
+            "scriptId": 0
+          },
+          "mapped": null
+        }
+      ]
+    },
+    {
+      "selfMs": 1.691,
+      "stack": [
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 3373,
+            "functionName": "projectionFor",
+            "lineNumber": 69,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 23,
+            "line": 247,
+            "name": "",
+            "source": "../src/client/source-textarea.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 2928,
+            "functionName": "sync",
+            "lineNumber": 69,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 6,
+            "line": 221,
+            "name": "",
+            "source": "../src/client/source-textarea.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 16305,
+            "functionName": "nt",
+            "lineNumber": 87,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 17,
+            "line": 921,
+            "name": "",
+            "source": "../src/client/components/editor.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 5059,
+            "functionName": "Ci.s.oninput",
+            "lineNumber": 87,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 21,
+            "line": 262,
+            "name": "",
+            "source": "../src/client/components/editor.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "other",
+            "functionName": "(root)",
+            "scriptId": 0
+          },
+          "mapped": null
+        }
+      ]
+    },
+    {
+      "selfMs": 1.614,
+      "stack": [
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 950,
+            "functionName": "bn",
+            "lineNumber": 13,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 23,
+            "line": 171,
+            "name": "",
+            "source": "../src/shared/projection.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 1236,
+            "functionName": "project",
+            "lineNumber": 11,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 9,
+            "line": 87,
+            "name": "",
+            "source": "../src/shared/projection.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 3373,
+            "functionName": "projectionFor",
+            "lineNumber": 69,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 23,
+            "line": 247,
+            "name": "",
+            "source": "../src/client/source-textarea.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 2928,
+            "functionName": "sync",
+            "lineNumber": 69,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 6,
+            "line": 221,
+            "name": "",
+            "source": "../src/client/source-textarea.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 16305,
+            "functionName": "nt",
+            "lineNumber": 87,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 17,
+            "line": 921,
+            "name": "",
+            "source": "../src/client/components/editor.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 5059,
+            "functionName": "Ci.s.oninput",
+            "lineNumber": 87,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 21,
+            "line": 262,
+            "name": "",
+            "source": "../src/client/components/editor.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "other",
+            "functionName": "(root)",
+            "scriptId": 0
+          },
+          "mapped": null
+        }
+      ]
+    },
+    {
+      "selfMs": 1.042,
+      "stack": [
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 1236,
+            "functionName": "project",
+            "lineNumber": 11,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 9,
+            "line": 87,
+            "name": "",
+            "source": "../src/shared/projection.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 3373,
+            "functionName": "projectionFor",
+            "lineNumber": 69,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 23,
+            "line": 247,
+            "name": "",
+            "source": "../src/client/source-textarea.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 2928,
+            "functionName": "sync",
+            "lineNumber": 69,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 6,
+            "line": 221,
+            "name": "",
+            "source": "../src/client/source-textarea.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 16305,
+            "functionName": "nt",
+            "lineNumber": 87,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 17,
+            "line": 921,
+            "name": "",
+            "source": "../src/client/components/editor.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 5059,
+            "functionName": "Ci.s.oninput",
+            "lineNumber": 87,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 21,
+            "line": 262,
+            "name": "",
+            "source": "../src/client/components/editor.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "other",
+            "functionName": "(root)",
+            "scriptId": 0
+          },
+          "mapped": null
+        }
+      ]
+    },
+    {
+      "selfMs": 0.472,
+      "stack": [
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 1847,
+            "functionName": "input",
+            "lineNumber": 69,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 7,
+            "line": 161,
+            "name": "",
+            "source": "../src/client/source-textarea.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 5059,
+            "functionName": "Ci.s.oninput",
+            "lineNumber": 87,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 21,
+            "line": 262,
+            "name": "",
+            "source": "../src/client/components/editor.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "other",
+            "functionName": "(root)",
+            "scriptId": 0
+          },
+          "mapped": null
+        }
+      ]
+    },
+    {
+      "selfMs": 0.465,
+      "stack": [
+        {
+          "frame": {
+            "codeType": "JS",
+            "functionName": "getBoundingClientRect",
+            "scriptId": 0
+          },
+          "mapped": null
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 3333,
+            "functionName": "paint",
+            "lineNumber": 62,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 15,
+            "line": 881,
+            "name": "",
+            "source": "../src/client/editor-viewport.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 10042,
+            "functionName": "acknowledge",
+            "lineNumber": 59,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 13,
+            "line": 415,
+            "name": "",
+            "source": "../src/client/editor-viewport.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 1847,
+            "functionName": "input",
+            "lineNumber": 69,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 7,
+            "line": 161,
+            "name": "",
+            "source": "../src/client/source-textarea.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 5059,
+            "functionName": "Ci.s.oninput",
+            "lineNumber": 87,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 21,
+            "line": 262,
+            "name": "",
+            "source": "../src/client/components/editor.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "other",
+            "functionName": "(root)",
+            "scriptId": 0
+          },
+          "mapped": null
+        }
+      ]
+    },
+    {
+      "selfMs": 0.31,
+      "stack": [
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 633,
+            "functionName": "measuredBlock",
+            "lineNumber": 60,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 23,
+            "line": 628,
+            "name": "",
+            "source": "../src/client/editor-viewport.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 310,
+            "functionName": "refine",
+            "lineNumber": 62,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 16,
+            "line": 710,
+            "name": "",
+            "source": "../src/client/editor-viewport.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 3333,
+            "functionName": "paint",
+            "lineNumber": 62,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 15,
+            "line": 881,
+            "name": "",
+            "source": "../src/client/editor-viewport.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 10042,
+            "functionName": "acknowledge",
+            "lineNumber": 59,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 13,
+            "line": 415,
+            "name": "",
+            "source": "../src/client/editor-viewport.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 1847,
+            "functionName": "input",
+            "lineNumber": 69,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 7,
+            "line": 161,
+            "name": "",
+            "source": "../src/client/source-textarea.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 5059,
+            "functionName": "Ci.s.oninput",
+            "lineNumber": 87,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 21,
+            "line": 262,
+            "name": "",
+            "source": "../src/client/components/editor.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "other",
+            "functionName": "(root)",
+            "scriptId": 0
+          },
+          "mapped": null
+        }
+      ]
+    },
+    {
+      "selfMs": 0.309,
+      "stack": [
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 99427,
+            "functionName": "replace",
+            "lineNumber": 7,
+            "scriptId": 20,
+            "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+          },
+          "mapped": {
+            "column": 4,
+            "line": 546,
+            "name": "",
+            "source": "../src/shared/document-session.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 1929,
+            "functionName": "change",
+            "lineNumber": 1576,
+            "scriptId": 6,
+            "url": "http://127.0.0.1:4498/app.js"
+          },
+          "mapped": {
+            "column": 14,
+            "line": 1862,
+            "name": "",
+            "source": "../src/client/document-app.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "JS",
+            "columnNumber": 5059,
+            "functionName": "Ci.s.oninput",
+            "lineNumber": 87,
+            "scriptId": 7,
+            "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+          },
+          "mapped": {
+            "column": 21,
+            "line": 262,
+            "name": "",
+            "source": "../src/client/components/editor.ts"
+          }
+        },
+        {
+          "frame": {
+            "codeType": "other",
+            "functionName": "(root)",
+            "scriptId": 0
+          },
+          "mapped": null
+        }
+      ]
+    }
+  ],
+  "children": [
+    {
+      "name": "EventDispatch",
+      "ms": 11.451,
+      "relativeMs": 0.579,
+      "args": {
+        "data": {
+          "type": "keypress"
+        }
+      }
+    },
+    {
+      "name": "EventDispatch",
+      "ms": 11.149,
+      "relativeMs": 0.88,
+      "args": {
+        "data": {
+          "type": "textInput"
+        }
+      }
+    },
+    {
+      "name": "EventDispatch",
+      "ms": 10.375,
+      "relativeMs": 1.153,
+      "args": {
+        "data": {
+          "type": "input"
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 9.873,
+      "relativeMs": 1.162,
+      "args": {
+        "data": {
+          "columnNumber": 5060,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "Ci.s.oninput",
+          "isolate": "6525355556393849645",
+          "lineNumber": 88,
+          "sampleTraceId": 3041432116139873,
+          "scriptId": "7",
+          "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+        }
+      }
+    },
+    {
+      "name": "EventDispatch",
+      "ms": 0.475,
+      "relativeMs": 0.098,
+      "args": {
+        "data": {
+          "type": "keydown"
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.464,
+      "relativeMs": 11.041,
+      "args": {
+        "data": {
+          "columnNumber": 19263,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "ge",
+          "isolate": "6525355556393849645",
+          "lineNumber": 88,
+          "sampleTraceId": 3041432116139796,
+          "scriptId": "7",
+          "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+        }
+      }
+    },
+    {
+      "name": "UpdateLayoutTree",
+      "ms": 0.329,
+      "relativeMs": 11.533,
+      "args": {
+        "beginData": {
+          "frame": "65497E0FEC794F0C3EB9B447BE637053"
+        },
+        "elementCount": 156
+      }
+    },
+    {
+      "name": "UpdateLayoutTree",
+      "ms": 0.294,
+      "relativeMs": 2.512,
+      "args": {
+        "beginData": {
+          "frame": "65497E0FEC794F0C3EB9B447BE637053"
+        },
+        "elementCount": 129
+      }
+    },
+    {
+      "name": "Layout",
+      "ms": 0.286,
+      "relativeMs": 3.175,
+      "args": {
+        "beginData": {
+          "dirtyObjects": 9,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "partialLayout": false,
+          "totalObjects": 1392
+        },
+        "endData": {
+          "layoutRoots": [
+            {
+              "depth": 1,
+              "nodeId": 5,
+              "nodeName": "#document",
+              "quads": [
+                [
+                  0,
+                  0,
+                  1280,
+                  0,
+                  1280,
+                  800,
+                  0,
+                  800
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "EventDispatch",
+      "ms": 0.182,
+      "relativeMs": 0.695,
+      "args": {
+        "data": {
+          "type": "beforeinput"
+        }
+      }
+    },
+    {
+      "name": "UpdateLayoutTree",
+      "ms": 0.178,
+      "relativeMs": 2.996,
+      "args": {
+        "beginData": {
+          "frame": "65497E0FEC794F0C3EB9B447BE637053"
+        },
+        "elementCount": 129
+      }
+    },
+    {
+      "name": "Layout",
+      "ms": 0.149,
+      "relativeMs": 11.863,
+      "args": {
+        "beginData": {
+          "dirtyObjects": 39,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "partialLayout": false,
+          "totalObjects": 1392
+        },
+        "endData": {
+          "layoutRoots": [
+            {
+              "depth": 1,
+              "nodeId": 5,
+              "nodeName": "#document",
+              "quads": [
+                [
+                  0,
+                  0,
+                  1280,
+                  0,
+                  1280,
+                  800,
+                  0,
+                  800
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Layout",
+      "ms": 0.129,
+      "relativeMs": 2.807,
+      "args": {
+        "beginData": {
+          "dirtyObjects": 9,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "partialLayout": false,
+          "totalObjects": 1392
+        },
+        "endData": {
+          "layoutRoots": [
+            {
+              "depth": 1,
+              "nodeId": 5,
+              "nodeName": "#document",
+              "quads": [
+                [
+                  0,
+                  0,
+                  1280,
+                  0,
+                  1280,
+                  800,
+                  0,
+                  800
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.116,
+      "relativeMs": 0.288,
+      "args": {
+        "data": {
+          "columnNumber": 5071,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "si",
+          "isolate": "6525355556393849645",
+          "lineNumber": 91,
+          "sampleTraceId": 3041432116139891,
+          "scriptId": "7",
+          "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+        }
+      }
+    },
+    {
+      "name": "UpdateLayoutTree",
+      "ms": 0.103,
+      "relativeMs": 0.581,
+      "args": {
+        "beginData": {
+          "frame": "65497E0FEC794F0C3EB9B447BE637053"
+        },
+        "elementCount": 2
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.091,
+      "relativeMs": 0.741,
+      "args": {
+        "data": {
+          "columnNumber": 3175,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "oi",
+          "isolate": "6525355556393849645",
+          "lineNumber": 110,
+          "sampleTraceId": 3041432116139899,
+          "scriptId": "7",
+          "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.08,
+      "relativeMs": 0.193,
+      "args": {
+        "data": {
+          "columnNumber": 289,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "document.addEventListener.capture",
+          "isolate": "6525355556393849645",
+          "lineNumber": 1,
+          "sampleTraceId": 3041432116139892,
+          "scriptId": "89",
+          "url": ""
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.074,
+      "relativeMs": 0.485,
+      "args": {
+        "data": {
+          "columnNumber": 5376,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "window.addEventListener.signal",
+          "isolate": "6525355556393849645",
+          "lineNumber": 1570,
+          "sampleTraceId": 3041432116139903,
+          "scriptId": "6",
+          "url": "http://127.0.0.1:4498/app.js"
+        }
+      }
+    },
+    {
+      "name": "Layout",
+      "ms": 0.066,
+      "relativeMs": 0.968,
+      "args": {
+        "beginData": {
+          "dirtyObjects": 11,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "partialLayout": false,
+          "totalObjects": 1392
+        },
+        "endData": {
+          "layoutRoots": [
+            {
+              "depth": 1,
+              "nodeId": 5,
+              "nodeName": "#document",
+              "quads": [
+                [
+                  0,
+                  0,
+                  1280,
+                  0,
+                  1280,
+                  800,
+                  0,
+                  800
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.053,
+      "relativeMs": 0.407,
+      "args": {
+        "data": {
+          "columnNumber": 4834,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "It.i.addEventListener.signal",
+          "isolate": "6525355556393849645",
+          "lineNumber": 60,
+          "sampleTraceId": 3041432116139888,
+          "scriptId": "7",
+          "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.039,
+      "relativeMs": 0.834,
+      "args": {
+        "data": {
+          "columnNumber": 4768,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "It.i.addEventListener.signal",
+          "isolate": "6525355556393849645",
+          "lineNumber": 60,
+          "sampleTraceId": 3041432116139896,
+          "scriptId": "7",
+          "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.028,
+      "relativeMs": 0.144,
+      "args": {
+        "data": {
+          "columnNumber": 123810,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "t",
+          "isolate": "6525355556393849645",
+          "lineNumber": 8,
+          "sampleTraceId": 3041432116139894,
+          "scriptId": "20",
+          "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.023,
+      "relativeMs": 0.705,
+      "args": {
+        "data": {
+          "columnNumber": 123810,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "t",
+          "isolate": "6525355556393849645",
+          "lineNumber": 8,
+          "sampleTraceId": 3041432116139900,
+          "scriptId": "20",
+          "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.014,
+      "relativeMs": 0.469,
+      "args": {
+        "data": {
+          "columnNumber": 5379,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "document.addEventListener.signal",
+          "isolate": "6525355556393849645",
+          "lineNumber": 1,
+          "sampleTraceId": 3041432116139902,
+          "scriptId": "12",
+          "url": "http://127.0.0.1:4498/chunks/document-app-tkzx5s3a.js"
+        }
+      }
+    },
+    {
+      "name": "UpdateLayoutTree",
+      "ms": 0.013,
+      "relativeMs": 1.071,
+      "args": {
+        "beginData": {
+          "frame": "65497E0FEC794F0C3EB9B447BE637053"
+        },
+        "elementCount": 1
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.013,
+      "relativeMs": 11.512,
+      "args": {
+        "data": {
+          "columnNumber": 1025,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "h",
+          "isolate": "6525355556393849645",
+          "lineNumber": 57,
+          "sampleTraceId": 3041432116139797,
+          "scriptId": "7",
+          "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.008,
+      "relativeMs": 0.275,
+      "args": {
+        "data": {
+          "columnNumber": 39,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "",
+          "isolate": "6525355556393849645",
+          "lineNumber": 4,
+          "sampleTraceId": 3041432116139890,
+          "scriptId": "90",
+          "url": ""
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.005,
+      "relativeMs": 0.186,
+      "args": {
+        "data": {
+          "columnNumber": 123810,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "t",
+          "isolate": "6525355556393849645",
+          "lineNumber": 8,
+          "sampleTraceId": 3041432116139895,
+          "scriptId": "20",
+          "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.005,
+      "relativeMs": 0.462,
+      "args": {
+        "data": {
+          "columnNumber": 4960,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "It.i.addEventListener.signal",
+          "isolate": "6525355556393849645",
+          "lineNumber": 60,
+          "sampleTraceId": 3041432116139889,
+          "scriptId": "7",
+          "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.005,
+      "relativeMs": 0.733,
+      "args": {
+        "data": {
+          "columnNumber": 289,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "document.addEventListener.capture",
+          "isolate": "6525355556393849645",
+          "lineNumber": 1,
+          "sampleTraceId": 3041432116139898,
+          "scriptId": "89",
+          "url": ""
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.003,
+      "relativeMs": 1.154,
+      "args": {
+        "data": {
+          "columnNumber": 123810,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "t",
+          "isolate": "6525355556393849645",
+          "lineNumber": 8,
+          "sampleTraceId": 3041432116139875,
+          "scriptId": "20",
+          "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.001,
+      "relativeMs": 0.73,
+      "args": {
+        "data": {
+          "columnNumber": 123810,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "t",
+          "isolate": "6525355556393849645",
+          "lineNumber": 8,
+          "sampleTraceId": 3041432116139901,
+          "scriptId": "20",
+          "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.001,
+      "relativeMs": 0.875,
+      "args": {
+        "data": {
+          "columnNumber": 4960,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "It.i.addEventListener.signal",
+          "isolate": "6525355556393849645",
+          "lineNumber": 60,
+          "sampleTraceId": 3041432116139897,
+          "scriptId": "7",
+          "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+        }
+      }
+    },
+    {
+      "name": "FunctionCall",
+      "ms": 0.001,
+      "relativeMs": 1.159,
+      "args": {
+        "data": {
+          "columnNumber": 123810,
+          "frame": "65497E0FEC794F0C3EB9B447BE637053",
+          "functionName": "t",
+          "isolate": "6525355556393849645",
+          "lineNumber": 8,
+          "sampleTraceId": 3041432116139872,
+          "scriptId": "20",
+          "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+        }
+      }
+    }
+  ]
+}

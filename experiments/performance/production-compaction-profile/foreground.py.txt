@@ -1,0 +1,35 @@
+import json,pathlib,collections
+root=pathlib.Path('/tmp/alkalye-production-snapshot-profile-prep')
+namespace={};exec((root/'map.py.txt').read_text().split('data=json.load')[0],namespace)
+result=json.loads(pathlib.Path((root/'result-path.txt').read_text()).read_text())[0]
+events=json.loads(pathlib.Path(result['trace']).read_text())['traceEvents']
+mark=next(e for e in events if e.get('name')=='interaction:start');owner=(mark['pid'],mark['tid'])
+tasks=[e for e in events if e.get('name')=='RunTask' and e.get('dur') and (e.get('pid'),e.get('tid'))==owner and e['ts']<=mark['ts']<=e['ts']+e['dur']]
+task=max(tasks,key=lambda e:e['dur']);a=task['ts'];b=a+task['dur'];groups={}
+for e in sorted(events,key=lambda e:e.get('ts',0)):
+ if e.get('name') not in ['Profile','ProfileChunk']:continue
+ key=e['pid'],e.get('id');g=groups.setdefault(key,{'owner':(e['pid'],e['tid']),'nodes':{},'time':0,'samples':[]});d=e.get('args',{}).get('data',{})
+ if e['name']=='Profile':g['time']=d.get('startTime',e['ts']);continue
+ for n in d.get('cpuProfile',{}).get('nodes',[]):g['nodes'][n['id']]=n
+ for ident,delta in zip(d.get('cpuProfile',{}).get('samples',[]),d.get('timeDeltas',[])):
+  g['time']+=delta
+  if a<=g['time']<=b:g['samples'].append((g['time'],min(delta,g['time']-a),ident))
+g=next(g for g in groups.values() if g['owner']==owner);self=collections.Counter();inclusive=collections.Counter();stacks=collections.Counter()
+def stack(ident):
+ out=[];seen=set()
+ while ident and ident not in seen:
+  seen.add(ident);n=g['nodes'].get(ident,{});f=n.get('callFrame',{});out.append({'frame':f,'mapped':namespace['map'](f)});ident=n.get('parent')
+ return out
+for ts,delta,ident in g['samples']:
+ chain=stack(ident)
+ if not chain:continue
+ leaf=json.dumps(chain[0],sort_keys=True);self[leaf]+=delta;stacks[json.dumps(chain,sort_keys=True)]+=delta
+ for key in set(json.dumps(v,sort_keys=True) for v in chain):inclusive[key]+=delta
+rows=[{**json.loads(k),'selfMs':v/1000,'inclusiveMs':inclusive[k]/1000} for k,v in self.most_common()]
+children=[{'name':e['name'],'ms':e['dur']/1000,'relativeMs':(e['ts']-a)/1000,'args':e.get('args',{})} for e in events if (e.get('pid'),e.get('tid'))==owner and e.get('dur') and e['ts']>=a and e['ts']+e['dur']<=b and e['name'] in ['FunctionCall','EventDispatch','Layout','UpdateLayoutTree','MinorGC','MajorGC']]
+out={'scope':'Retained sampled baseline85a6/4a/e9 initial enclosing input RunTask only, n1 diagnostic; overlapping inclusive costs notadditive','taskMs':task['dur']/1000,'sampleWindowMs':sum(v[1] for v in g['samples'])/1000,'owner':owner,'rows':rows,'topStacks':[{'selfMs':v/1000,'stack':json.loads(k)} for k,v in stacks.most_common(8)],'children':sorted(children,key=lambda e:e['ms'],reverse=True)}
+(root/'foreground.json').write_text(json.dumps(out,indent=2)+'\n')
+print('task',out['taskMs'],'samplewindow',out['sampleWindowMs'])
+for row in rows[:12]:print(round(row['selfMs'],3),round(row['inclusiveMs'],3),row['frame'].get('functionName'),row['mapped'])
+for row in out['topStacks'][:4]:print('stack',round(row['selfMs'],3),[(v['frame'].get('functionName'),v['mapped']) for v in row['stack'][:7]])
+print('children',[(v['name'],round(v['ms'],3)) for v in out['children'][:12]])
