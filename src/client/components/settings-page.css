@@ -679,3 +679,30 @@
 	align-items: center;
 	gap: 12px;
 }
+
+.installation-hint {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	width: 100%;
+}
+.installation-hint [data-content] {
+	flex-basis: 100%;
+}
+.installation-hint button {
+	padding: 4px 8px;
+	border: 1px solid var(--normal-text);
+	border-radius: 4px;
+	background: var(--normal-text);
+	color: var(--normal-bg);
+	font: inherit;
+	cursor: pointer;
+}
+.installation-hint button.secondary {
+	background: transparent;
+	color: inherit;
+}
+.installation-hint button:focus-visible {
+	outline: 2px solid var(--normal-text);
+	outline-offset: 2px;
+}

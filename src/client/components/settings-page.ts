@@ -26,6 +26,8 @@ import type { BrowserLibrary } from "../browser-library"
 import type { BrowserPreferences } from "../browser-preferences"
 import type { ThemeLibrary } from "../theme-library"
 import { setMarkup } from "../dom"
+import { isIOS, isMobile } from "../installation"
+import type { Installation } from "../installation"
 import { icon } from "../icons"
 import type { IconName } from "../icons"
 import { html, joinMarkup, translate } from "../language"
@@ -50,7 +52,7 @@ export interface SettingsPageOptions {
 	readonly choose: (category: SettingsCategory) => void
 	readonly backup: () => void
 	readonly importFiles: () => void
-	readonly install: (() => Promise<unknown>) | undefined
+	readonly installation: Installation
 	readonly report: (error: unknown) => void
 	// The shared application dialog; found in the document when omitted.
 	readonly dialog?: HTMLDialogElement
@@ -188,6 +190,10 @@ export class SettingsPageElement extends HTMLElement {
 					)
 					host.renderFrame()
 					host.showCategory()
+					let unsubscribe = configured.installation.subscribe(() => {
+						if (host.options?.category === "app") host.showCategory()
+					})
+					yield* Effect.addFinalizer(() => Effect.sync(unsubscribe))
 					yield* configured.preferences.state.changes.pipe(
 						Stream.runForEach(() => Effect.sync(() => host.syncStatus())),
 					)
@@ -290,7 +296,7 @@ export class SettingsPageElement extends HTMLElement {
 						? html`<alkalye-account-agents
 								data-account-agents
 							></alkalye-account-agents>`
-						: appMarkup(),
+						: appMarkup(options.installation.installed()),
 		)
 		content.insertAdjacentHTML("beforeend", String(footerMarkup()))
 		let theme = content.querySelector('alkalye-picker[name="appearance"]')
@@ -695,22 +701,7 @@ export class SettingsPageElement extends HTMLElement {
 		let options = this.options
 		let dialog = this.dialog()
 		if (!options || !dialog) return
-		let install = options.install
-		openDialog(
-			dialog,
-			options.report,
-			() => {},
-			translate("Install Alkalye"),
-			installMarkup(Boolean(install)),
-		)
-		let button = dialog.querySelector<HTMLButtonElement>("[data-install-app]")
-		if (button && install)
-			button.onclick = () =>
-				this.run?.(
-					Effect.tryPromise(() => install()).pipe(
-						Effect.andThen(Effect.sync(() => dialog.close())),
-					),
-				)
+		showInstallationInstructions(dialog, options.installation, options.report)
 	}
 	private checkUpdates(manual: boolean) {
 		let panel = this.querySelector<HTMLElement>("[data-app-status]")
@@ -1120,8 +1111,7 @@ function numberRow(name: NumberSetting, value: number) {
 	</div>`
 }
 
-function appMarkup() {
-	let installed = matchMedia("(display-mode: standalone)").matches
+function appMarkup(installed: boolean) {
 	return html`${
 		installed
 			? ""
@@ -1252,8 +1242,8 @@ function diagnosticsMarkup(events: readonly StartupEvent[]) {
 }
 
 function installMarkup(installable: boolean) {
-	let mobile = matchMedia("(pointer: coarse)").matches
-	let ios = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+	let mobile = isMobile()
+	let ios = isIOS()
 	let android = /Android/i.test(navigator.userAgent)
 	let steps = (title: string, items: string[]) =>
 		html`<p class="muted">${translate(title)}</p>
@@ -1286,7 +1276,7 @@ function installMarkup(installable: boolean) {
 									],
 								)}
 								<p class="muted">
-									${translate("Note: This only works in Safari, not other browsers on iOS.")}
+									${translate("If Add to Home Screen is missing, open this page in Safari.")}
 								</p>`
 						: android || mobile
 							? steps("To install, follow these steps:", [
@@ -1306,7 +1296,7 @@ function installMarkup(installable: boolean) {
 										<dd>${translate("Click File > Add to Dock")}</dd>
 										<dt>Firefox</dt>
 										<dd>
-											${translate("Firefox doesn't support PWA installation. Use Chrome or Edge instead.")}
+											${translate("On supported Windows versions, use Firefox’s web app button. Otherwise use Chrome or Edge.")}
 										</dd>
 									</dl>`
 			}
@@ -1381,4 +1371,65 @@ function isCategory(value: string): value is SettingsCategory {
 }
 function fromOf(back: string) {
 	return back.startsWith("/app") && back !== "/app"
+}
+
+export function showInstallationInstructions(
+	dialog: HTMLDialogElement,
+	installation: Installation,
+	report: (error: unknown) => void,
+) {
+	let unsubscribe = () => {}
+	let marker: Element | null = null
+	let active = true
+	let observer = new MutationObserver(() => {
+		if (!ownsDialog()) release()
+	})
+	function ownsDialog() {
+		return (
+			active &&
+			dialog.open &&
+			marker !== null &&
+			marker === dialog.querySelector("[data-installation-instructions]")
+		)
+	}
+	function release() {
+		active = false
+		unsubscribe()
+		observer.disconnect()
+		dialog.removeEventListener("close", release)
+	}
+	function render() {
+		if (marker && !ownsDialog()) {
+			release()
+			return
+		}
+		if (installation.installed()) {
+			if (ownsDialog()) dialog.close()
+			release()
+			return
+		}
+		openDialog(
+			dialog,
+			report,
+			release,
+			translate("Install Alkalye"),
+			html`<div data-installation-instructions>
+				${installMarkup(installation.available())}
+			</div>`,
+		)
+		marker = dialog.querySelector("[data-installation-instructions]")
+		let button = dialog.querySelector<HTMLButtonElement>("[data-install-app]")
+		if (button)
+			button.onclick = () => {
+				installation.prompt().then(outcome => {
+					if (outcome === "accepted" && ownsDialog()) dialog.close()
+				}, report)
+			}
+	}
+	render()
+	if (dialog.open && active) {
+		unsubscribe = installation.subscribe(render)
+		observer.observe(dialog, { childList: true, subtree: true })
+		dialog.addEventListener("close", release)
+	}
 }

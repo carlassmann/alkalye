@@ -9,6 +9,7 @@ let fullSuite = [
 	"tests/browser-editor-overlay.ts",
 	"tests/browser-document-api.ts",
 	"tests/browser-document-app.ts",
+	"tests/browser-offline-data.ts",
 	"tests/browser-native-tools.ts",
 	"tests/browser-native-portability.ts",
 	"tests/browser-native-invitations.ts",

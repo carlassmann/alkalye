@@ -1,3 +1,5 @@
+import { makeInstallation, isMobile } from "./installation"
+import { showInstallationInstructions } from "./components/settings-page"
 import { bootMarkup } from "./components/boot"
 import { SyncRecoveryElement } from "./components/sync-recovery"
 import { makeSaveFeedback, saveIndicator } from "../shared/save-status"
@@ -109,15 +111,7 @@ import { ThemeLibrary } from "./theme-library"
 import { libraryThemes, resolveTheme } from "../shared/theme-library"
 
 type Mode = "edit" | "preview" | "slideshow" | "teleprompter" | "history"
-// Chromium's install prompt, which the standard DOM types do not describe.
-interface BeforeInstallPromptEvent extends Event {
-	prompt(): Promise<unknown>
-}
-declare global {
-	interface WindowEventMap {
-		beforeinstallprompt: BeforeInstallPromptEvent
-	}
-}
+
 type OpenDocument = Effect.Success<
 	ReturnType<Context.Service.Shape<typeof BrowserLibrary>["open"]>
 >
@@ -209,7 +203,7 @@ function mountApplication() {
 			return place
 		}
 		let page: HTMLElement | undefined
-		let installPrompt: BeforeInstallPromptEvent | undefined
+		let installation = yield* makeInstallation
 		let panel: "tools" | "comments" = "tools"
 		let dialogOwner: Selection | undefined
 		let dialogElement = element("#dialog")
@@ -341,6 +335,54 @@ function mountApplication() {
 		app.classList.toggle("library-open", layout.library)
 		app.classList.toggle("tools-open", layout.tools)
 		let events = new AbortController()
+		let dismissInstallHint: (() => void) | undefined
+		let offeredInstallHint = false
+		let unsubscribeInstallation = installation.subscribe(() => {
+			if (!installation.hint()) {
+				dismissInstallHint?.()
+				dismissInstallHint = undefined
+				return
+			}
+			if (offeredInstallHint) return
+			let notifications = element("#toast")
+			if (!(notifications instanceof ToasterElement)) return
+			offeredInstallHint = true
+			let content = document.createElement("div")
+			content.className = "installation-hint"
+			let body = document.createElement("div")
+			body.dataset.content = ""
+			let title = document.createElement("div")
+			title.dataset.title = ""
+			title.textContent = translate("Install Alkalye for the best experience")
+			let description = document.createElement("div")
+			description.textContent = translate(
+				"Quick access from your Home Screen, with offline support.",
+			)
+			body.append(title, description)
+			let instructions = document.createElement("button")
+			instructions.type = "button"
+			instructions.textContent = translate("Show me how")
+			instructions.onclick = () => {
+				dismissInstallHint?.()
+				let dialog = element("#dialog")
+				if (dialog instanceof HTMLDialogElement)
+					showInstallationInstructions(dialog, installation, report)
+			}
+			let dismiss = document.createElement("button")
+			dismiss.type = "button"
+			dismiss.className = "secondary"
+			dismiss.textContent = translate("Maybe later")
+			dismiss.onclick = () => installation.dismissHint()
+			content.append(body, instructions, dismiss)
+			dismissInstallHint = notifications.showContent(content, true)
+		})
+		yield* Effect.addFinalizer(() =>
+			Effect.sync(() => {
+				unsubscribeInstallation()
+				dismissInstallHint?.()
+			}),
+		)
+
 		let refreshFrame = 0
 		let libraryRefreshPending = false
 		let documentRefreshPending = false
@@ -578,14 +620,6 @@ function mountApplication() {
 			},
 			{ signal: events.signal },
 		)
-		window.addEventListener(
-			"beforeinstallprompt",
-			event => {
-				event.preventDefault()
-				installPrompt = event
-			},
-			{ signal: events.signal },
-		)
 
 		let stats = app.querySelector("alkalye-stats")
 		if (stats instanceof StatsElement)
@@ -792,25 +826,38 @@ function mountApplication() {
 		else finishOpening()
 		if ("serviceWorker" in navigator)
 			launch(
-				watchUpdates(events.signal, apply => {
-					let banner = new UpdateBannerElement()
-					// Reloading flushes the open document's last edits first.
-					banner.offer(() =>
-						launch(
-							(selection?.opened.session.flush ?? Effect.void).pipe(
-								Effect.andThen(Effect.sync(apply)),
-								Effect.onError(() => Effect.sync(() => banner.enableReload())),
+				watchUpdates(
+					events.signal,
+					apply => {
+						let banner = new UpdateBannerElement()
+						// Reloading flushes the open document's last edits first.
+						banner.offer(() =>
+							launch(
+								(selection?.opened.session.flush ?? Effect.void).pipe(
+									Effect.andThen(
+										Effect.sync(() => {
+											if (!events.signal.aborted) apply()
+										}),
+									),
+									Effect.onError(() =>
+										Effect.sync(() => banner.enableReload()),
+									),
+								),
 							),
-						),
-					)
-					let notifications = element("#toast")
-					if (notifications instanceof ToasterElement) {
-						let dismiss = notifications.showContent(banner, true)
-						events.signal.addEventListener("abort", () => dismiss?.(), {
-							once: true,
-						})
-					}
-				}),
+						)
+						let notifications = element("#toast")
+						if (notifications instanceof ToasterElement) {
+							let dismiss = notifications.showContent(banner, true)
+							events.signal.addEventListener("abort", () => dismiss?.(), {
+								once: true,
+							})
+						}
+					},
+					() => {
+						if (isMobile() && installation.installed())
+							toast(translate("Alkalye is ready to work offline"))
+					},
+				),
 			)
 		function finishOpening() {
 			if (!opening) return
@@ -1034,13 +1081,7 @@ function mountApplication() {
 							),
 						backup: () => launch(act("export-all")),
 						importFiles: () => importInput.click(),
-						install: installPrompt
-							? () => {
-									let prompt = installPrompt
-									installPrompt = undefined
-									return prompt?.prompt() ?? Promise.resolve()
-								}
-							: undefined,
+						installation,
 						report,
 					})
 					mountPage(current)
