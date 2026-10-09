@@ -55,6 +55,19 @@ export let documentHandlers = HttpApiBuilder.group(
 								}),
 							),
 				)
+				.handle("commitBatch", ({ params, payload }) =>
+					payload.actions.every(action => action.document === params.document)
+						? asAccount(
+								store.commitBatch(payload.actions),
+								payload.actions.map(action => action.actor),
+								"commit",
+							)
+						: Effect.fail(
+								new DocumentConflict({
+									message: "The action belongs to another document",
+								}),
+							),
+				)
 				.handle("withdraw", ({ params, payload }) =>
 					params.document === payload.document
 						? asAccount(store.withdraw(payload), [payload.actor], "withdraw")

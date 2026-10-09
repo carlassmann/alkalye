@@ -2526,3 +2526,239 @@ test(
 		),
 	90000,
 )
+
+test("HTTP action batches preserve ordered receipts, dependent Unicode edits, retries and Undo after cold reads", () =>
+	run(
+		Effect.gen(function* () {
+			let owner = yield* client(181)
+			let document = "batch-ordered"
+			let actor = owner.subject + "-batch-ordered"
+			yield* owner.api.workspaces.create({
+				payload: { workspace: "batch-space", name: "Batch", request: "create" },
+			})
+			yield* owner.api.documents.create({
+				payload: {
+					workspace: "batch-space",
+					action: yield* createAction(document, actor),
+				},
+			})
+			let before = yield* owner.api.documents.snapshot({
+				params: { document },
+				query: {},
+			})
+			let replica = yield* restoreSnapshot(before, actor)
+			let source = replica.text(document)
+			let first = yield* buildAction(replica, document, "First", staged => [
+				staged.prepareEdit(document, source + "α"),
+			])
+			replica.apply(first.changes.map(parseOperation))
+			let second = yield* buildAction(replica, document, "Second", staged => [
+				staged.prepareEdit(document, source + "α😀"),
+			])
+			let positions = yield* owner.api.documents.commitBatch({
+				params: { document },
+				payload: { actions: [first, second] },
+			})
+			expect(positions.length).toBe(2)
+			let firstPosition = positions[0]
+			if (firstPosition === undefined)
+				throw new Error("Missing first batch receipt")
+			expect(firstPosition).toBeGreaterThan(before.position)
+			let secondPosition = positions[1]
+			if (secondPosition === undefined)
+				throw new Error("Missing second batch receipt")
+			expect(secondPosition).toBeGreaterThan(firstPosition)
+			expect(
+				yield* owner.api.documents.commitBatch({
+					params: { document },
+					payload: { actions: [first, second] },
+				}),
+			).toEqual(positions)
+			let after = yield* owner.api.documents.snapshot({
+				params: { document },
+				query: {},
+			})
+			expect(after.position).toBe(secondPosition)
+			let cold = yield* restoreSnapshot(after, actor)
+			expect(cold.text(document)).toBe(source + "α😀")
+			let history = yield* owner.api.documents.history({
+				params: { document },
+				query: { after: before.position, log: before.log },
+			})
+			expect(history.map(receipt => receipt.action.id)).toEqual([
+				first.id,
+				second.id,
+			])
+			let last = history.at(-1)
+			if (!last) throw new Error("Missing batch history")
+			let undo = yield* undoAction(cold, last.action)
+			yield* owner.api.documents.commitBatch({
+				params: { document },
+				payload: { actions: [undo] },
+			})
+			let undone = yield* owner.api.documents.snapshot({
+				params: { document },
+				query: {},
+			})
+			expect((yield* restoreSnapshot(undone, actor)).text(document)).toBe(
+				source + "α",
+			)
+		}),
+	))
+
+test("HTTP action batch rolls back earlier text and receipts when a later action violates metadata authority", () =>
+	run(
+		Effect.gen(function* () {
+			let owner = yield* client(182)
+			let document = "batch-rollback"
+			let actor = owner.subject + "-batch-rollback"
+			yield* owner.api.workspaces.create({
+				payload: {
+					workspace: "batch-rollback-space",
+					name: "Batch rollback",
+					request: "create",
+				},
+			})
+			yield* owner.api.documents.create({
+				payload: {
+					workspace: "batch-rollback-space",
+					action: yield* createAction(document, actor),
+				},
+			})
+			let before = yield* owner.api.documents.snapshot({
+				params: { document },
+				query: {},
+			})
+			let replica = yield* restoreSnapshot(before, actor)
+			let source = replica.text(document)
+			let first = yield* buildAction(replica, document, "First", staged => [
+				staged.prepareEdit(document, source + " must roll back"),
+			])
+			replica.apply(first.changes.map(parseOperation))
+			let invalid = yield* buildAction(
+				replica,
+				document,
+				"Invalid title",
+				staged => [staged.set(document, "title", "Forbidden register")],
+			)
+			let refused = yield* owner.api.documents
+				.commitBatch({
+					params: { document },
+					payload: { actions: [first, invalid] },
+				})
+				.pipe(Effect.result)
+			expect(refused._tag).toBe("Failure")
+			let after = yield* owner.api.documents.snapshot({
+				params: { document },
+				query: {},
+			})
+			expect(after.position).toBe(before.position)
+			expect((yield* restoreSnapshot(after, actor)).text(document)).toBe(source)
+			expect(
+				yield* owner.api.documents.history({
+					params: { document },
+					query: { after: before.position, log: before.log },
+				}),
+			).toEqual([])
+			yield* owner.api.documents.commitBatch({
+				params: { document },
+				payload: { actions: [first] },
+			})
+			let retried = yield* owner.api.documents.snapshot({
+				params: { document },
+				query: {},
+			})
+			expect((yield* restoreSnapshot(retried, actor)).text(document)).toBe(
+				source + " must roll back",
+			)
+		}),
+	))
+
+test("HTTP batches refuse reader and revoked writer authority without consuming frozen action identities", () =>
+	run(
+		Effect.gen(function* () {
+			let owner = yield* client(183)
+			let member = yield* client(184)
+			let workspace = "batch-authority-space"
+			let document = "batch-authority"
+			yield* owner.api.workspaces.create({
+				payload: { workspace, name: "Batch authority", request: "create" },
+			})
+			yield* owner.api.documents.create({
+				payload: {
+					workspace,
+					action: yield* createAction(document, owner.subject + "-batch-birth"),
+				},
+			})
+			yield* owner.api.workspaces.membership({
+				params: { workspace, member: member.subject },
+				payload: { role: "reader", request: "reader" },
+			})
+			let before = yield* member.api.documents.snapshot({
+				params: { document },
+				query: {},
+			})
+			let replica = yield* restoreSnapshot(
+				before,
+				member.subject + "-batch-member",
+			)
+			let action = yield* buildAction(
+				replica,
+				document,
+				"Writer batch",
+				staged => [
+					staged.prepareEdit(
+						document,
+						replica.text(document) + " contribution",
+					),
+				],
+			)
+			expect(
+				(yield* member.api.documents
+					.commitBatch({ params: { document }, payload: { actions: [action] } })
+					.pipe(Effect.result))._tag,
+			).toBe("Failure")
+			yield* owner.api.workspaces.membership({
+				params: { workspace, member: member.subject },
+				payload: { role: "writer", request: "writer" },
+			})
+			yield* owner.api.workspaces.membership({
+				params: { workspace, member: member.subject },
+				payload: { role: null, request: "revoke" },
+			})
+			expect(
+				(yield* member.api.documents
+					.commitBatch({ params: { document }, payload: { actions: [action] } })
+					.pipe(Effect.result))._tag,
+			).toBe("Failure")
+			expect(
+				(yield* owner.api.documents.snapshot({
+					params: { document },
+					query: {},
+				})).position,
+			).toBe(before.position)
+			yield* owner.api.workspaces.membership({
+				params: { workspace, member: member.subject },
+				payload: { role: "writer", request: "restore-writer" },
+			})
+			let [left, right] = yield* Effect.all(
+				[
+					member.api.documents.commitBatch({
+						params: { document },
+						payload: { actions: [action] },
+					}),
+					member.api.documents.commitBatch({
+						params: { document },
+						payload: { actions: [action] },
+					}),
+				],
+				{ concurrency: 2 },
+			)
+			expect(left).toEqual(right)
+			let history = yield* owner.api.documents.history({
+				params: { document },
+				query: { after: before.position, log: before.log },
+			})
+			expect(history.map(receipt => receipt.action.id)).toEqual([action.id])
+		}),
+	))

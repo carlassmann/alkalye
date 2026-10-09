@@ -195,6 +195,21 @@ export let DocumentApi = HttpApi.make("DocumentApi").add(
 				success: Schema.Natural,
 				error: errors,
 			}),
+			HttpApiEndpoint.post(
+				"commitBatch",
+				"/api/documents/:document/actions/batch",
+				{
+					params: documentParams,
+					payload: Schema.Struct({
+						actions: Schema.Array(DocumentActionSchema).check(
+							Schema.isMinLength(1),
+							Schema.isMaxLength(64),
+						),
+					}),
+					success: Schema.Array(Schema.Natural),
+					error: errors,
+				},
+			),
 			HttpApiEndpoint.post("withdraw", "/api/documents/:document/withdrawals", {
 				params: documentParams,
 				payload: DocumentActionSchema,

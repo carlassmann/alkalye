@@ -614,6 +614,9 @@ function makeDocumentStore() {
 					createDocument,
 				),
 				commit: Effect.fn("WorkspaceStore.commit")(commitAuthorized),
+				commitBatch: Effect.fn("WorkspaceStore.commitBatch")(
+					commitBatchAuthorized,
+				),
 				withdraw: Effect.fn("WorkspaceStore.withdraw")(withdrawAuthorized),
 				snapshot: (document: string) =>
 					Identity.use(identity => snapshot(document, identity)),
@@ -999,6 +1002,69 @@ function makeDocumentStore() {
 							return yield* accept(action, principal, session, true, expected)
 						}),
 						result => finish(action.document, session, result, true),
+					),
+				)
+			})
+		}
+		function commitBatchAuthorized(inputs: ReadonlyArray<DocumentAction>) {
+			return Effect.gen(function* () {
+				if (
+					inputs.length === 0 ||
+					inputs.length > 64 ||
+					new TextEncoder().encode(JSON.stringify(inputs)).byteLength >
+						2 * 1024 * 1024
+				)
+					return yield* conflict("Document action batch exceeds its limits")
+				let actions = yield* Effect.forEach(inputs, decodeProposal)
+				let first = actions[0]
+				if (!first) return yield* conflict("Document action batch is empty")
+				let identity = yield* Identity
+				if (
+					actions.some(
+						action =>
+							action.document !== first.document ||
+							!identity.actors.includes(action.actor),
+					)
+				)
+					return yield* conflict(
+						"Document action batch must belong to one document and its authenticated actors",
+					)
+				return yield* withSession(first.document, session =>
+					transact(
+						Effect.gen(function* () {
+							let positions: number[] = []
+							let latest: Effect.Success<ReturnType<typeof accept>> | undefined
+							for (let action of actions) {
+								let role = yield* workspace.documentRole(
+									action.document,
+									identity.subject,
+									identity.access,
+								)
+								if (!role) return yield* unavailable()
+								if (role === "reader") return yield* forbidden()
+								let principal = { ...identity, role }
+								yield* authorizeProposal(action, principal, true)
+								let result = yield* accept(action, principal, session, true)
+								positions.push(result.position)
+								if (result.accepted) {
+									let { base, tip, changes, replacement } = result.accepted
+									// Later actions see this transaction's state; rollback invalidates the shared cache.
+									session.uncommitted = true
+									if (!replacement) base.replica.apply(changes)
+									session.state = {
+										...tip,
+										replica: replacement ?? base.replica,
+									}
+									latest = result
+								}
+							}
+							return { positions, latest }
+						}),
+						result =>
+							(result.latest
+								? finish(first.document, session, result.latest, true, true)
+								: Effect.void
+							).pipe(Effect.as(result.positions)),
 					),
 				)
 			})
@@ -1869,12 +1935,13 @@ function makeDocumentStore() {
 			session: DocumentSession,
 			result: Effect.Success<ReturnType<typeof accept>>,
 			managed = false,
+			alreadyApplied = false,
 		) {
 			return Effect.gen(function* () {
 				if (result.accepted) {
 					let { base, tip, changes, replacement } = result.accepted
 					yield* Effect.sync(() => {
-						if (!replacement) base.replica.apply(changes)
+						if (!replacement && !alreadyApplied) base.replica.apply(changes)
 						session.state = { ...tip, replica: replacement ?? base.replica }
 						session.uncommitted = false
 					}).pipe(
