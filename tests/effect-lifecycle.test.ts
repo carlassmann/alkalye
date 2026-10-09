@@ -15,6 +15,7 @@ import { fetchResponse } from "../src/platform/http"
 import { TaskGroup } from "../src/platform/tasks"
 import { makeSaveFeedback } from "../src/shared/save-status"
 import { RelaySettings } from "../src/server/settings"
+import { bunSettingsLayer } from "../src/server/bun-settings"
 
 test("closing a task group interrupts active callbacks and runs each finalizer once", async () => {
 	let releases: string[] = []
@@ -183,7 +184,7 @@ test("Effect config rejects invalid ports and origins before server startup", as
 	]) {
 		let result = await Effect.runPromise(
 			RelaySettings.pipe(
-				Effect.provide(RelaySettings.layer()),
+				Effect.provide(bunSettingsLayer()),
 				Effect.provideService(
 					ConfigProvider.ConfigProvider,
 					ConfigProvider.fromUnknown(values),
@@ -195,7 +196,7 @@ test("Effect config rejects invalid ports and origins before server startup", as
 	}
 	let settings = await Effect.runPromise(
 		RelaySettings.pipe(
-			Effect.provide(RelaySettings.layer({ port: 0, build: false })),
+			Effect.provide(bunSettingsLayer({ port: 0, build: false })),
 			Effect.provideService(
 				ConfigProvider.ConfigProvider,
 				ConfigProvider.fromUnknown({
@@ -211,7 +212,7 @@ test("Effect config rejects invalid ports and origins before server startup", as
 	expect(settings.development).toBe(true)
 	let production = await Effect.runPromise(
 		RelaySettings.pipe(
-			Effect.provide(RelaySettings.layer({ build: false })),
+			Effect.provide(bunSettingsLayer({ build: false })),
 			Effect.provideService(
 				ConfigProvider.ConfigProvider,
 				ConfigProvider.fromUnknown({ NODE_ENV: "production" }),

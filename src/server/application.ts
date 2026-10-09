@@ -5,7 +5,6 @@ import * as Context from "effect/Context"
 import * as Effect from "effect/Effect"
 import * as FiberSet from "effect/FiberSet"
 import * as Layer from "effect/Layer"
-import { resolve, sep } from "node:path"
 import { Cipher } from "../platform/cipher"
 import { promise } from "../platform/effects"
 import { isInfrastructureFailure } from "./failures"
@@ -19,10 +18,8 @@ import { AccountApplication } from "./account-api"
 import { AgentCredentials } from "./agent-credentials"
 import { OAuth } from "./oauth"
 import { RelaySettings } from "./settings"
-import { serveAsset } from "./static-files"
+import { StaticAssets } from "./static-assets"
 
-let contentSecurityPolicy =
-	"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: data: https:; font-src 'self' data: https:; connect-src 'self' ws: wss:; frame-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'"
 export interface Connection {
 	live: LiveConnection
 }
@@ -45,7 +42,7 @@ function makeApplication() {
 		let handleMcp = yield* makeMcpHandler(mcp, documents, settings.publicOrigin)
 		let oauth = new OAuth(database.oauth, mcp, cipher, settings.publicOrigin)
 		yield* startOAuthMaintenance(database.oauth.cleanup())
-		let dist = settings.assets
+		let assets = yield* StaticAssets
 		function handleRequest(request: Request, server: Server<Connection>) {
 			return Effect.gen(function* () {
 				let url = new URL(request.url)
@@ -94,45 +91,7 @@ function makeApplication() {
 						effect: "4.0.0",
 						architecture: "documents",
 					})
-				let path =
-					url.pathname === "/"
-						? resolve(dist, "index.html")
-						: resolve(dist, `.${decodeURIComponent(url.pathname)}`)
-				if (!path.startsWith(dist + sep))
-					return new Response("Not found", { status: 404 })
-				if (
-					[
-						"/en",
-						"/de",
-						"/privacy",
-						"/terms",
-						"/imprint",
-						"/support",
-						"/changelog",
-					].includes(url.pathname)
-				)
-					path += ".html"
-				let headers = {
-					"Cache-Control": url.pathname.startsWith("/chunks/")
-						? "public, max-age=31536000, immutable"
-						: "no-cache",
-					"X-Content-Type-Options": "nosniff",
-					"Content-Security-Policy": contentSecurityPolicy,
-				}
-				let asset = yield* serveAsset(request, path, headers)
-				if (asset) return asset
-				if (
-					url.pathname === "/app" ||
-					url.pathname.startsWith("/app/") ||
-					url.pathname === "/invite"
-				) {
-					let app = yield* serveAsset(request, resolve(dist, "app.html"), {
-						...headers,
-						"Cache-Control": "no-cache",
-					})
-					if (app) return app
-				}
-				return new Response("Not found", { status: 404 })
+				return yield* assets.serve(request)
 			}).pipe(
 				Effect.catchCause(cause =>
 					Cause.hasInterrupts(cause)

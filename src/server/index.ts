@@ -20,9 +20,11 @@ import { WorkspaceStore } from "./document-store"
 import { Sessions } from "./sessions"
 import { DocumentObservability } from "../shared/document-observability"
 import { Application } from "./application"
+import { bunAssetsLayer } from "./bun-assets"
 import { AgentStore } from "./agent-store"
 import type { ServerOptions } from "./settings"
-import { RelaySecrets, RelaySettings } from "./settings"
+import { RelaySettings } from "./settings"
+import { bunSettingsLayer, bunSecretsLayer } from "./bun-settings"
 
 export class BunServer extends Context.Service<
 	BunServer,
@@ -31,8 +33,8 @@ export class BunServer extends Context.Service<
 	static layer = Layer.effect(BunServer, serve())
 }
 export function serverLayer(options: ServerOptions = {}) {
-	let settings = RelaySettings.layer(options)
-	let secrets = RelaySecrets.layer.pipe(
+	let settings = bunSettingsLayer(options)
+	let secrets = bunSecretsLayer.pipe(
 		Layer.provideMerge(Layer.merge(settings, Cipher.live)),
 	)
 	let store = Layer.unwrap(
@@ -68,6 +70,7 @@ export function serverLayer(options: ServerOptions = {}) {
 	)
 	let application = Application.layer.pipe(
 		Layer.provideMerge(Layer.merge(credentials, account)),
+		Layer.provideMerge(bunAssetsLayer.pipe(Layer.provide(settings))),
 		Layer.provideMerge(FetchHttpClient.layer),
 		Layer.provideMerge(webCryptoLayer),
 	)
