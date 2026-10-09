@@ -1,0 +1,575 @@
+{
+  "phases": [
+    {
+      "phase": "input",
+      "status": "measured-complete",
+      "traceSHA256": "dd400b4a6816bbdf98c92041056d8e79a8af56bba1b2033a5a89e3d06187f174",
+      "traceBytes": 8410422,
+      "owner": [
+        56989,
+        21030443
+      ],
+      "markers": [
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 7.433
+        },
+        {
+          "name": "interaction:ready",
+          "ms": 9.195
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 10.134
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 22.5
+        },
+        {
+          "name": "undo-early:journal-write-return",
+          "ms": 29.35
+        },
+        {
+          "name": "undo-early:apply-start",
+          "ms": 30.459
+        },
+        {
+          "name": "undo-early:apply-return",
+          "ms": 30.665
+        },
+        {
+          "name": "undo-early:persist-replay-return",
+          "ms": 30.749
+        },
+        {
+          "name": "undo-early:notification-return",
+          "ms": 30.773
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 38.883
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 256.707
+        },
+        {
+          "name": "undo-early:journal-write-return",
+          "ms": 257.948
+        },
+        {
+          "name": "undo-early:apply-start",
+          "ms": 258.643
+        },
+        {
+          "name": "undo-early:apply-return",
+          "ms": 258.849
+        },
+        {
+          "name": "undo-early:persist-replay-return",
+          "ms": 258.905
+        },
+        {
+          "name": "undo-early:notification-return",
+          "ms": 258.921
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 273.862
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 771.369
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 789.686
+        }
+      ],
+      "stages": [],
+      "minorGC": [
+        {
+          "name": "MinorGC",
+          "ms": 24.061,
+          "durationMs": 0.822
+        },
+        {
+          "name": "MinorGC",
+          "ms": 324.706,
+          "durationMs": 1.037
+        },
+        {
+          "name": "MinorGC",
+          "ms": 350.048,
+          "durationMs": 1.415
+        },
+        {
+          "name": "MinorGC",
+          "ms": 358.657,
+          "durationMs": 0.287
+        },
+        {
+          "name": "MinorGC",
+          "ms": 363.845,
+          "durationMs": 0.191
+        },
+        {
+          "name": "MinorGC",
+          "ms": 368.278,
+          "durationMs": 0.154
+        },
+        {
+          "name": "MinorGC",
+          "ms": 380.659,
+          "durationMs": 1.33
+        },
+        {
+          "name": "MinorGC",
+          "ms": 396.467,
+          "durationMs": 1.029
+        },
+        {
+          "name": "MinorGC",
+          "ms": 415.076,
+          "durationMs": 0.516
+        },
+        {
+          "name": "MinorGC",
+          "ms": 425.23,
+          "durationMs": 0.676
+        },
+        {
+          "name": "MinorGC",
+          "ms": 433.552,
+          "durationMs": 0.885
+        },
+        {
+          "name": "MinorGC",
+          "ms": 445.075,
+          "durationMs": 10.662
+        },
+        {
+          "name": "MinorGC",
+          "ms": 466.155,
+          "durationMs": 10.196
+        },
+        {
+          "name": "MinorGC",
+          "ms": 486.837,
+          "durationMs": 10.139
+        },
+        {
+          "name": "MinorGC",
+          "ms": 508.399,
+          "durationMs": 9.87
+        },
+        {
+          "name": "MinorGC",
+          "ms": 529.43,
+          "durationMs": 8.885
+        },
+        {
+          "name": "MinorGC",
+          "ms": 548.975,
+          "durationMs": 9.106
+        },
+        {
+          "name": "MinorGC",
+          "ms": 569.121,
+          "durationMs": 9.717
+        },
+        {
+          "name": "MinorGC",
+          "ms": 590.506,
+          "durationMs": 9.001
+        },
+        {
+          "name": "MinorGC",
+          "ms": 610.55,
+          "durationMs": 10.173
+        },
+        {
+          "name": "MinorGC",
+          "ms": 671.442,
+          "durationMs": 3.169
+        },
+        {
+          "name": "MinorGC",
+          "ms": 710.636,
+          "durationMs": 1.328
+        },
+        {
+          "name": "MinorGC",
+          "ms": 721.437,
+          "durationMs": 0.271
+        },
+        {
+          "name": "MinorGC",
+          "ms": 727.047,
+          "durationMs": 0.253
+        },
+        {
+          "name": "MinorGC",
+          "ms": 733.292,
+          "durationMs": 0.791
+        },
+        {
+          "name": "MinorGC",
+          "ms": 747.274,
+          "durationMs": 1.049
+        }
+      ],
+      "mainMaxTaskMs": 11.309,
+      "mainBusyUnionMs": 769.078,
+      "sourceSelection": {
+        "start": 524289,
+        "end": 524289
+      }
+    },
+    {
+      "phase": "undo",
+      "status": "measured-complete",
+      "traceSHA256": "a3622ac2aedc126abe69afa365aac96f41e34b1747c0231ad276cbe8cc9267ba",
+      "traceBytes": 9702087,
+      "owner": [
+        56989,
+        21030443
+      ],
+      "markers": [
+        {
+          "name": "undo-early:permit-acquired",
+          "ms": 0.221
+        },
+        {
+          "name": "undo-early:flush-return",
+          "ms": 0.243
+        },
+        {
+          "name": "undo-early:replay-return",
+          "ms": 11.005
+        },
+        {
+          "name": "undo-early:prepare-start",
+          "ms": 11.115
+        },
+        {
+          "name": "undo-early:index-start",
+          "ms": 11.236
+        },
+        {
+          "name": "undo-early:history-read-start",
+          "ms": 11.3
+        },
+        {
+          "name": "undo-early:history-read-return",
+          "ms": 16.885
+        },
+        {
+          "name": "undo-early:history-decode-start",
+          "ms": 16.894
+        },
+        {
+          "name": "undo-early:history-decode-return",
+          "ms": 17.175
+        },
+        {
+          "name": "undo-early:history-decode-start",
+          "ms": 17.179
+        },
+        {
+          "name": "undo-early:history-decode-return",
+          "ms": 17.246
+        },
+        {
+          "name": "undo-early:history-decode-start",
+          "ms": 17.287
+        },
+        {
+          "name": "undo-early:history-decode-return",
+          "ms": 17.322
+        },
+        {
+          "name": "undo-early:index-return",
+          "ms": 17.706
+        },
+        {
+          "name": "undo-early:candidates-start",
+          "ms": 17.709
+        },
+        {
+          "name": "undo-early:candidates-return",
+          "ms": 17.945
+        },
+        {
+          "name": "undo-early:basis-start",
+          "ms": 17.947
+        },
+        {
+          "name": "undo-early:receipt-cache-start",
+          "ms": 18.001
+        },
+        {
+          "name": "undo-early:receipt-cache-return",
+          "ms": 18.008
+        },
+        {
+          "name": "undo-early:basis-return",
+          "ms": 18.011
+        },
+        {
+          "name": "undo-early:action-start",
+          "ms": 18.013
+        },
+        {
+          "name": "undo-early:action-return",
+          "ms": 18.207
+        },
+        {
+          "name": "undo-early:prepare-return",
+          "ms": 18.226
+        },
+        {
+          "name": "undo-early:persist-start",
+          "ms": 18.236
+        },
+        {
+          "name": "undo-early:journal-write-return",
+          "ms": 21.579
+        },
+        {
+          "name": "undo-early:apply-start",
+          "ms": 22.05
+        },
+        {
+          "name": "undo-early:apply-return",
+          "ms": 22.147
+        },
+        {
+          "name": "undo-early:persist-replay-return",
+          "ms": 22.215
+        },
+        {
+          "name": "undo-early:notification-return",
+          "ms": 22.227
+        },
+        {
+          "name": "undo-early:persist-return",
+          "ms": 22.232
+        },
+        {
+          "name": "undo-residual:durable-completion",
+          "ms": 22.281
+        },
+        {
+          "name": "undo-residual:projection-inverse-hit",
+          "ms": 23.485
+        },
+        {
+          "name": "undo-residual:apply-start",
+          "ms": 23.49
+        },
+        {
+          "name": "undo-residual:model-source-assigned",
+          "ms": 23.58
+        },
+        {
+          "name": "undo-residual:native-render-return",
+          "ms": 29.227
+        },
+        {
+          "name": "interaction:ready",
+          "ms": 30.89
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 31.27
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 32.396
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 245.562
+        },
+        {
+          "name": "undo-early:journal-write-return",
+          "ms": 257.935
+        },
+        {
+          "name": "undo-early:apply-start",
+          "ms": 258.383
+        },
+        {
+          "name": "undo-early:apply-return",
+          "ms": 258.457
+        },
+        {
+          "name": "undo-early:persist-replay-return",
+          "ms": 258.502
+        },
+        {
+          "name": "undo-early:notification-return",
+          "ms": 258.516
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 262.4
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 278.796
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 745.198
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 761.436
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 778.115
+        }
+      ],
+      "stages": [],
+      "minorGC": [
+        {
+          "name": "MinorGC",
+          "ms": 291.78,
+          "durationMs": 0.69
+        },
+        {
+          "name": "MinorGC",
+          "ms": 342.297,
+          "durationMs": 1.13
+        },
+        {
+          "name": "MinorGC",
+          "ms": 355.512,
+          "durationMs": 0.373
+        },
+        {
+          "name": "MinorGC",
+          "ms": 361.768,
+          "durationMs": 0.223
+        },
+        {
+          "name": "MinorGC",
+          "ms": 370.555,
+          "durationMs": 1.285
+        },
+        {
+          "name": "MinorGC",
+          "ms": 389.455,
+          "durationMs": 1.253
+        },
+        {
+          "name": "MinorGC",
+          "ms": 401.037,
+          "durationMs": 0.504
+        },
+        {
+          "name": "MinorGC",
+          "ms": 411.625,
+          "durationMs": 0.746
+        },
+        {
+          "name": "MinorGC",
+          "ms": 420.96,
+          "durationMs": 0.876
+        },
+        {
+          "name": "MinorGC",
+          "ms": 432.804,
+          "durationMs": 10.497
+        },
+        {
+          "name": "MinorGC",
+          "ms": 453.96,
+          "durationMs": 10.385
+        },
+        {
+          "name": "MinorGC",
+          "ms": 474.795,
+          "durationMs": 9.411
+        },
+        {
+          "name": "MinorGC",
+          "ms": 495.15,
+          "durationMs": 10.754
+        },
+        {
+          "name": "MinorGC",
+          "ms": 516.579,
+          "durationMs": 6.703
+        },
+        {
+          "name": "MinorGC",
+          "ms": 533.796,
+          "durationMs": 8.821
+        },
+        {
+          "name": "MinorGC",
+          "ms": 553.229,
+          "durationMs": 9.995
+        },
+        {
+          "name": "MinorGC",
+          "ms": 573.714,
+          "durationMs": 8.651
+        },
+        {
+          "name": "MinorGC",
+          "ms": 593.06,
+          "durationMs": 9.262
+        },
+        {
+          "name": "MinorGC",
+          "ms": 663.543,
+          "durationMs": 1.948
+        },
+        {
+          "name": "MinorGC",
+          "ms": 689.834,
+          "durationMs": 1.352
+        },
+        {
+          "name": "MinorGC",
+          "ms": 699.413,
+          "durationMs": 0.284
+        },
+        {
+          "name": "MinorGC",
+          "ms": 705.852,
+          "durationMs": 0.998
+        },
+        {
+          "name": "MinorGC",
+          "ms": 718.149,
+          "durationMs": 1.081
+        }
+      ],
+      "mainMaxTaskMs": 11.298,
+      "mainBusyUnionMs": 670.527,
+      "sourceSelection": null
+    }
+  ],
+  "receipts": {
+    "seedReceipt": {
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+      "characters": 1048576
+    },
+    "editedReceipt": {
+      "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+      "characters": 1048577
+    },
+    "undoReceipt": {
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+      "characters": 1048576
+    }
+  },
+  "fixture": "rich1m"
+}

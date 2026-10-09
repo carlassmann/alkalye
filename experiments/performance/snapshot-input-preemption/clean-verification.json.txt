@@ -1,0 +1,11 @@
+{
+  "testSHA256": "abd2afb729574bc61f966f2a449ffb02b78ed799fcbc376eeeac7df617cfb548",
+  "strictExit": 0,
+  "runtimeExit": 0,
+  "cases": 6,
+  "assertions": 101,
+  "logs": {
+    "public-clean-stripped.log": "4cf6dfa450cd9dbda84c3065cad6429b2874cd1bd5870b811b28da8367eaa38d",
+    "types-clean-stripped.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

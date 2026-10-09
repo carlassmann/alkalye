@@ -1,0 +1,50 @@
+[
+  {
+    "producer": "/tmp/alkalye-undo-early-stages-754c9d6/proof-ready/README.md",
+    "archive": "README.md",
+    "sha256": "ee1b603eb0ba077d1af3378958d0532477f4226e6b5eee07a496f8fffecd03bc",
+    "bytes": 617
+  },
+  {
+    "producer": "/tmp/alkalye-undo-early-stages-754c9d6/proof-ready/analysis.json.txt",
+    "archive": "analysis.json.txt",
+    "sha256": "553a4cd0601bf1f3a673d473d49eef8287fd1e653eaba957a6b09e50880a1daa",
+    "bytes": 13002
+  },
+  {
+    "producer": "/tmp/alkalye-undo-early-stages-754c9d6/proof-ready/bundle-parity.json.txt",
+    "archive": "bundle-parity.json.txt",
+    "sha256": "d422107ca864eff35ef82833056c96fdaed41544ce4251968231d58901226e29",
+    "bytes": 48787
+  },
+  {
+    "producer": "/tmp/alkalye-undo-early-stages-754c9d6/proof-ready/diagnostic.log.txt",
+    "archive": "diagnostic.log.txt",
+    "sha256": "305213b4e702651c8b290be8c381fe0f4c3e7217bc177d5c678fad26d44b22af",
+    "bytes": 443
+  },
+  {
+    "producer": "/tmp/alkalye-undo-early-stages-754c9d6/proof-ready/markers.patch.txt",
+    "archive": "markers.patch.txt",
+    "sha256": "15601e4ca8752475f516c26aaea0294697efd8d932db00d12821ab6ea79c0543",
+    "bytes": 4840
+  },
+  {
+    "producer": "/tmp/alkalye-undo-early-stages-754c9d6/proof-ready/parse-marked.py.txt",
+    "archive": "parse-marked.py.txt",
+    "sha256": "64c8ea2d55f5c4729a6edc108f61c332eaaa392437ccddb3c09e3f38fecc595e",
+    "bytes": 2949
+  },
+  {
+    "producer": "/tmp/alkalye-undo-early-stages-754c9d6/proof-ready/preparation.log.txt",
+    "archive": "preparation.log.txt",
+    "sha256": "ed6b83991f73e4c0572fd52bcde9146c9ce7ec94abf0501e30317d3728ba3c65",
+    "bytes": 30
+  },
+  {
+    "producer": "/tmp/alkalye-undo-early-stages-754c9d6/proof-ready/strict-driver-final.log.txt",
+    "archive": "strict-driver-final.log.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  }
+]

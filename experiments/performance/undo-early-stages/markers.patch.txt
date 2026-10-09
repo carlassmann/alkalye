@@ -1,0 +1,117 @@
+--- a/src/shared/document-session.ts
++++ b/src/shared/document-session.ts
+@@ -341,8 +341,11 @@
+ 						? Effect.fail(storageFailure("save document action", cause))
+ 						: Effect.die(cause),
+ 				),
++				Effect.tap(() => Effect.sync(() => performance.mark("undo-early:journal-write-return"))),
+ 				Effect.andThen(recovery.run("projection", projection.replay)),
++				Effect.tap(() => Effect.sync(() => performance.mark("undo-early:persist-replay-return"))),
+ 				Effect.andThen(recovery.run("notification")),
++				Effect.tap(() => Effect.sync(() => performance.mark("undo-early:notification-return"))),
+ 				Effect.mapError(error => storageFailure("save document action", error)),
+ 				Effect.onError(() => projection.discardPreparedOpen),
+ 			)
+@@ -738,12 +741,17 @@
+ 					gate.withPermit(
+ 						Effect.gen(function* () {
+ 							yield* requireOpen
++							performance.mark("undo-early:permit-acquired")
+ 							yield* flushUnlocked
++							performance.mark("undo-early:flush-return")
+ 							yield* recovery.attempt("projection", projection.replay)
++							performance.mark("undo-early:replay-return")
+ 							let action = yield* Ref.get(prepared)
+ 							if (!action) {
+ 								let actor = yield* documentActor(cryptography, options)
++								performance.mark("undo-early:prepare-start")
+ 								action = freezeAction(yield* prepare(actor))
++								performance.mark("undo-early:prepare-return")
+ 								yield* Ref.set(prepared, action)
+ 							}
+ 							if (projection.proposed(action.id)) {
+@@ -752,7 +760,9 @@
+ 								if (rejected) return yield* Effect.fail(rejected.failure)
+ 								return action
+ 							}
++							performance.mark("undo-early:persist-start")
+ 							yield* persistUnlocked({ kind: "proposed", action })
++							performance.mark("undo-early:persist-return")
+ 							return action
+ 						}),
+ 					),
+@@ -1282,7 +1292,9 @@
+ 			) => buildAction(durable, options.document, label, build, actor),
+ 			undo: (redo: boolean, actor: string, textTarget?: string) =>
+ 				Effect.gen(function* () {
++					performance.mark("undo-early:index-start")
+ 					yield* indexUndoHistory()
++					performance.mark("undo-early:index-return")
+ 					let excluded = new Set<string>()
+ 					for (let item of rejected.values()) {
+ 						if (
+@@ -1298,6 +1310,7 @@
+ 						}
+ 						if (entry) excluded.add(entry.id)
+ 					}
++					performance.mark("undo-early:candidates-start")
+ 					let candidates = yield* documentUndoCandidates(
+ 						[...undoEntries.values()].map(entry => ({
+ 							...entry,
+@@ -1310,12 +1323,17 @@
+ 						redo,
+ 						textTarget,
+ 					)
++					performance.mark("undo-early:candidates-return")
+ 					let unavailable: UndoUnavailable | undefined
+ 					for (let candidate of candidates) {
++						performance.mark("undo-early:basis-start")
+ 						let original = yield* undoBasis(candidate.tip.id)
++						performance.mark("undo-early:basis-return")
++						performance.mark("undo-early:action-start")
+ 						let result = yield* undoAction(durable, original, actor).pipe(
+ 							Effect.result,
+ 						)
++						performance.mark("undo-early:action-return")
+ 						if (result._tag === "Success") return result.success
+ 						if (
+ 							!(result.failure instanceof UndoUnavailable) ||
+@@ -1511,11 +1529,15 @@
+ 		function indexUndoHistory() {
+ 			return Effect.gen(function* () {
+ 				while (undoPosition < localPosition) {
++					performance.mark("undo-early:history-read-start")
+ 					let page = yield* storage.readAfter(undoPosition, 100, localPosition)
++					performance.mark("undo-early:history-read-return")
+ 					if (!page.entries.length)
+ 						return yield* conflict("Undo history lost its journal position")
+ 					for (let entry of page.entries) {
++						performance.mark("undo-early:history-decode-start")
+ 						let value = yield* decode(entry)
++						performance.mark("undo-early:history-decode-return")
+ 						if (value.kind === "received" || value.kind === "published")
+ 							yield* Cache.set(knownProposals, entry.idString, value)
+ 						if (value.kind === "proposed" || value.kind === "localCreated") {
+@@ -1623,7 +1645,9 @@
+ 		}
+ 		function receiptAction(receipt: UndoReceipt, id: string) {
+ 			return Effect.gen(function* () {
++				performance.mark("undo-early:receipt-cache-start")
+ 				let value = yield* Cache.get(knownProposals, receipt.entry)
++				performance.mark("undo-early:receipt-cache-return")
+ 				let action =
+ 					value.kind === "received"
+ 						? value.actions[receipt.index]?.action
+@@ -2108,7 +2132,11 @@
+ }
+ function applyChanges(replicas: Replica[], operations: Operation[]) {
+ 	return Effect.try({
+-		try: () => Replica.applyTogether(replicas, operations),
++		try: () => {
++			performance.mark("undo-early:apply-start")
++			Replica.applyTogether(replicas, operations)
++			performance.mark("undo-early:apply-return")
++		},
+ 		catch: cause =>
+ 			new DocumentConflict({
+ 				message:
