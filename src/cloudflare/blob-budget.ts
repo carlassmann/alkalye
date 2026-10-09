@@ -199,7 +199,7 @@ function makeBudget() {
 					Effect.gen(function* () {
 						let rows = yield* sql<{
 							document: string
-						}>`UPDATE cloudflare_blob_budget SET state='confirmed' WHERE document=${reservation.document} AND digest=${reservation.digest} AND owner=${reservation.owner} AND size=${reservation.size} AND receipt=${reservation.receipt} RETURNING document`
+						}>`UPDATE cloudflare_blob_budget SET state='confirmed' WHERE document=${reservation.document} AND digest=${reservation.digest} AND size=${reservation.size} AND receipt=${reservation.receipt} RETURNING document`
 						if (!rows.length)
 							return yield* Effect.fail(
 								storageFailure(
@@ -218,7 +218,7 @@ function makeBudget() {
 				return sql.withTransaction(
 					sql<{
 						document: string
-					}>`DELETE FROM cloudflare_blob_budget WHERE document=${reservation.document} AND digest=${reservation.digest} AND owner=${reservation.owner} AND size=${reservation.size} AND receipt=${reservation.receipt} AND state='pending' AND shared=0 RETURNING document`.pipe(
+					}>`DELETE FROM cloudflare_blob_budget WHERE document=${reservation.document} AND digest=${reservation.digest} AND size=${reservation.size} AND receipt=${reservation.receipt} AND state='pending' AND shared=0 RETURNING document`.pipe(
 						Effect.map(rows => rows.length === 1),
 					),
 				)

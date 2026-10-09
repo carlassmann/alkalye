@@ -208,6 +208,19 @@ test("attachment ownership moves preserve receipts and refuse destination accoun
 			})
 			expect(moved.receipt).toBe(original.receipt)
 			expect(moved.state).toBe("confirmed")
+			yield* budget.confirm(original)
+			let movingPending = yield* budget.reserve({
+				document: "pending-move",
+				digest,
+				owner: "pending-source",
+				size: 1,
+			})
+			yield* budget.reassignDocument(
+				"pending-move",
+				"pending-source",
+				"pending-target",
+			)
+			expect(yield* budget.release(movingPending, "notCommitted")).toBe(true)
 			yield* budget.importUsage({
 				document: "source-refilled",
 				digest,
