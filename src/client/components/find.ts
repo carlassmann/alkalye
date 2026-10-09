@@ -54,6 +54,7 @@ export class FindElement extends HTMLElement {
 	private matchedValues: RegExpExecArray[] = []
 	private matchedRanges: { start: number; end: number }[] = []
 	private replacedRange: { start: number; end: number } | undefined
+	private activeMatch: { start: number; end: number } | undefined
 	private lifetime: Fiber.Fiber<void, never> | undefined
 	configure(host: EditorElement, close: () => void, query = "") {
 		this.host = host
@@ -296,18 +297,20 @@ export class FindElement extends HTMLElement {
 			let matches = this.findMatches(pattern)
 			let match =
 				action === "next"
-					? (matches.find(
-							match =>
-								match.index >= editor.selectionEnd &&
-								(match[0].length > 0 || match.index > editor.selectionEnd),
-						) ?? matches[0])
+					? (matches.find(match => match.index > editor.selectionEnd) ??
+						matches[0])
 					: (matches
-							.filter(match => match.index < editor.selectionStart)
+							.filter(
+								match => match.index + match[0].length < editor.selectionEnd,
+							)
 							.at(-1) ?? matches.at(-1))
 			if (!match) return toast("No match")
-			if (this.host)
-				this.host.selectRange(match.index, match.index + match[0].length)
-			else editor.setSelectionRange(match.index, match.index + match[0].length)
+			this.activeMatch = {
+				start: match.index,
+				end: match.index + match[0].length,
+			}
+			if (this.host) this.host.selectRange(this.activeMatch.end)
+			else editor.setSelectionRange(this.activeMatch.end, this.activeMatch.end)
 			editor.dispatchEvent(new Event("select"))
 			this.querySelector<HTMLInputElement>("#find-text")?.focus({
 				preventScroll: true,
@@ -399,8 +402,10 @@ export class FindElement extends HTMLElement {
 				(!repeated
 					? matches.find(
 							match =>
-								match.index === editor.selectionStart &&
-								match.index + match[0].length === editor.selectionEnd,
+								(match.index === this.activeMatch?.start &&
+									match.index + match[0].length === this.activeMatch.end) ||
+								(match.index === editor.selectionStart &&
+									match.index + match[0].length === editor.selectionEnd),
 						)
 					: undefined) ??
 				matches.find(match => match.index >= editor.selectionEnd) ??
@@ -465,12 +470,21 @@ export class FindElement extends HTMLElement {
 		this.trackScope()
 		let pattern = this.expression(false)
 		let matches = pattern ? this.findMatches(pattern) : []
+		if (
+			this.activeMatch &&
+			(this.editor.selectionStart !== this.activeMatch.end ||
+				this.editor.selectionEnd !== this.activeMatch.end)
+		)
+			this.activeMatch = undefined
 		this.host?.search(pattern, {
 			source: this.editor.value,
+			active: this.activeMatch,
 			matches: pattern ? this.matchedRanges : [],
 		})
-		let current = matches.findIndex(
-			match => match.index === this.editor?.selectionStart,
+		let current = matches.findIndex(match =>
+			this.activeMatch
+				? match.index === this.activeMatch.start
+				: match.index === this.editor?.selectionStart,
 		)
 		count.textContent = pattern
 			? matches.length
@@ -487,6 +501,7 @@ export class FindElement extends HTMLElement {
 		let source = this.editor?.value ?? ""
 		let key = pattern.source + "/" + pattern.flags
 		if (source !== this.matchedSource || key !== this.matchedPattern) {
+			this.activeMatch = undefined
 			this.matchedSource = source
 			this.matchedPattern = key
 			this.matchedValues = [...source.matchAll(pattern)]

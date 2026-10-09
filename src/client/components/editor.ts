@@ -35,6 +35,7 @@ import type {
 } from "../../shared/model"
 import type { EditorPreferences } from "../../shared/preferences"
 interface SearchResults {
+	active?: { start: number; end: number }
 	source: string
 	matches: { start: number; end: number }[]
 }
@@ -206,6 +207,7 @@ function createEditorView(
 	let nativeSearch = nativeSearchHighlights()
 	let geometryDirty = true
 	let highlightPending = false
+	let activeSearch: { start: number; end: number } | undefined
 	let searchPattern: RegExp | undefined
 	let searchSource = ""
 	let searchMatches: { start: number; end: number }[] = []
@@ -452,6 +454,7 @@ function createEditorView(
 				searchPattern = pattern
 				searchSource = results.source
 				searchMatches = results.matches
+				activeSearch = results.active
 				return schedulePaint()
 			}
 			if (
@@ -460,6 +463,7 @@ function createEditorView(
 			)
 				return schedulePaint()
 			searchPattern = pattern
+			activeSearch = undefined
 			searchSource = ""
 			searchMatches = []
 			schedulePaint()
@@ -779,6 +783,7 @@ function createEditorView(
 		if (listeners.signal.aborted) return
 		let comments = options.comments()
 		if (searchPattern && searchSource !== text.value) {
+			activeSearch = undefined
 			searchSource = text.value
 			searchMatches = [...searchSource.matchAll(searchPattern)]
 				.filter(match => match[0].length > 0)
@@ -817,8 +822,9 @@ function createEditorView(
 			let range = document.createRange()
 			range.setStart(from.node, from.offset)
 			range.setEnd(to.node, to.offset)
-			let active =
-				match.start === text.selectionStart && match.end === text.selectionEnd
+			let active = activeSearch
+				? match.start === activeSearch.start && match.end === activeSearch.end
+				: match.start === text.selectionStart && match.end === text.selectionEnd
 			if (nativeSearch && !active) {
 				searchRanges.push(range)
 				continue

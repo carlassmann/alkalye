@@ -81,34 +81,65 @@ try {
 		session,
 		`document.querySelector(".find-count").textContent.endsWith("of 2") && ${searchHighlightCount} === 2`,
 	)
-	browser(session, "click", "#find-next")
-	wait(
+	evaluate(
 		session,
-		'document.querySelector("alkalye-editor").source.selectionStart === 0',
+		'document.querySelector("alkalye-editor").source.setSelectionRange(21, 21)',
 	)
 	browser(session, "click", "#find-next")
 	wait(
 		session,
-		'document.querySelector("alkalye-editor").source.selectionStart === 15',
+		'document.querySelector("alkalye-editor").source.selectionStart === 6 && document.querySelector("alkalye-editor").source.selectionEnd === 6',
 	)
 	browser(session, "click", "#find-next")
 	wait(
 		session,
-		'document.querySelector("alkalye-editor").source.selectionStart === 0',
+		'document.querySelector("alkalye-editor").source.selectionStart === 21 && document.querySelector("alkalye-editor").source.selectionEnd === 21',
+	)
+	browser(session, "click", "#find-next")
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.selectionStart === 6 && document.querySelector("alkalye-editor").source.selectionEnd === 6',
 	)
 	assert(
 		true,
 		"Editing invalidates cached matches; repeated navigation wraps through the new source",
 	)
-	fill("needle\n" + "Distant paragraph.\n".repeat(2000) + "needle")
-	evaluate(
+	browser(session, "click", '[data-find-action="toggle-replace"]')
+	browser(session, "fill", "#replace-text", "mark")
+	browser(session, "click", "#replace-one")
+	wait(
 		session,
-		'(() => {let source = document.querySelector("alkalye-editor").source; source.setSelectionRange(0, 0); source.viewport.scrollTop = 8000; return true})()',
+		'document.querySelector("alkalye-editor").source.value === "mark changed needle"',
+	)
+	assert(
+		true,
+		"Replace changes the active match even when navigation leaves a collapsed caret",
 	)
 	browser(session, "click", "#find-next")
 	wait(
 		session,
-		'document.querySelector("alkalye-editor").source.selectionStart === 0 && document.querySelector("alkalye-editor").source.selectionEnd === 6 && document.querySelectorAll(".search-match[data-active]").length === 1',
+		'document.querySelector("alkalye-editor").source.selectionStart === 19 && document.querySelector("alkalye-editor").source.selectionEnd === 19',
+	)
+	browser(session, "click", "#close-find")
+	browser(session, "press", "x")
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.value === "mark changed needlex"',
+	)
+	assert(
+		true,
+		"Typing after closing Find appends at the match end without replacing the match",
+	)
+	browser(session, "press", "Control+f")
+	fill("needle\n" + "Distant paragraph.\n".repeat(2000) + "needle")
+	evaluate(
+		session,
+		'(() => {let source = document.querySelector("alkalye-editor").source; source.setSelectionRange(source.value.length, source.value.length); source.viewport.scrollTop = 8000; return true})()',
+	)
+	browser(session, "click", "#find-next")
+	wait(
+		session,
+		'document.querySelector("alkalye-editor").source.selectionStart === 6 && document.querySelector("alkalye-editor").source.selectionEnd === 6 && document.querySelectorAll(".search-match[data-active]").length === 1',
 	)
 	assert(
 		evaluate(
