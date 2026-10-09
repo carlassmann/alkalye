@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*.ts",
+    "tests/browser-driver.ts",
+    "server-journey.ts",
+    "experiments/performance/interaction-matrix/*.ts",
+    "production-body-gate.ts",
+    "production-body-series.ts",
+    "production-dom-agreement-gate.ts",
+    "production-dom-agreement-series.ts"
+  ]
+}

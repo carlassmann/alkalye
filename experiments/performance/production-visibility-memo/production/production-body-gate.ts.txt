@@ -1,0 +1,77 @@
+import * as Schema from "effect/Schema"
+import { cp, mkdir, rm } from "node:fs/promises"
+import { join } from "node:path"
+import { browser, evaluate, wait } from "./tests/browser-driver"
+
+let root = "/tmp/alkalye-production-visibility-memo"
+let Arm = Schema.Literals(["control", "memo"])
+let Fixture = Schema.Struct({ name: Schema.String, path: Schema.String, sourceFile: Schema.String })
+let Seed = Schema.Struct({ versions: Schema.Array(Schema.Struct({ seedProfile: Schema.String, fixtures: Schema.Array(Fixture) })) })
+let Oracle = Schema.Struct({ origin: Schema.String, keyFile: Schema.String, scope: Schema.String, documents: Schema.Array(Schema.Struct({ fixture: Schema.String, documentId: Schema.String })) })
+let arm = Schema.decodeUnknownSync(Arm)(Bun.argv[2])
+let fixtureName = Schema.decodeUnknownSync(Schema.Literals(["small2", "rich1m"]))(Bun.argv[3])
+let seedRoot = join(root, "frozen-fixture")
+if (!(await Bun.file(join(seedRoot, "ready.json")).exists())) throw Error("Explicit closed fixture required")
+let seed = Schema.decodeUnknownSync(Seed)(await Bun.file(join(seedRoot, "manifest.private.json")).json())
+let oracle = Schema.decodeUnknownSync(Oracle)(await Bun.file(join(seedRoot, "oracle.private.json")).json())
+let ready = Schema.decodeUnknownSync(Schema.Struct({ keySHA256: Schema.String }))(await Bun.file(join(seedRoot, "ready.json")).json())
+if (new Bun.CryptoHasher("sha256").update(await Bun.file(oracle.keyFile).arrayBuffer()).digest("hex") !== ready.keySHA256) throw Error("Read-only oracle key changed; setup unavailable")
+let version = seed.versions[0]
+if (!version) throw Error("Known seed version required")
+let fixture = version.fixtures.find(value => value.name === fixtureName)
+if (!fixture) throw Error("Known accepted fixture required")
+let measure = Bun.argv.includes("--measure")
+let run = Bun.env.PRODUCTION_BODY_RUN ?? join(root, (measure ? "measured-" : "correctness-") + arm + "-" + fixtureName + "-" + crypto.randomUUID())
+if (!run.startsWith(root + "/") || await Bun.file(join(run, "pending.json")).exists()) throw Error("Fresh owned cell path required")
+let session = "pcg-" + crypto.randomUUID().slice(0, 8)
+let url = "http://127.0.0.1:4498"
+let stateRoot = "/tmp/alkalye-production-visibility-memo-work-state"
+let stage = "prepare"
+let failure = false
+async function command(args: string[], variables: Record<string, string> = {}) {
+ let child = Bun.spawn(args, { cwd: import.meta.dir, env: { ...process.env, WORK_STATE_ROOT: stateRoot, ...variables }, stdout: "inherit", stderr: "inherit" })
+ let exit = await child.exited
+ if (exit !== 0) throw Error("Owned command failed: " + args[0] + " (" + exit + ")")
+}
+try {
+ await mkdir(run, { recursive: true })
+ await Bun.write(join(run, "pending.json"), JSON.stringify({ arm, fixture: fixtureName, phase: "before-server-and-keys" }))
+ await cp(join(root, arm + "-src"), join(import.meta.dir, "src"), { recursive: true })
+ await rm(join(import.meta.dir, "dist"), { recursive: true, force: true })
+ await cp(join(root, arm + "-dist"), join(import.meta.dir, "dist"), { recursive: true })
+ await cp(join(seedRoot, "data"), join(run, "data"), { recursive: true })
+ let profile = join(run, "profile-seed")
+ await cp(version.seedProfile, profile, { recursive: true })
+ for (let name of ["SingletonLock", "SingletonSocket", "SingletonCookie", "Default/Service Worker", "Default/Cache", "Default/Code Cache"])
+  await rm(join(profile, name), { force: true, recursive: true })
+ await Bun.write(join(run, "oracle.private.json"), JSON.stringify({ ...oracle, origin: url }))
+ stage = "server-start"
+ await command(["work", "run", "web"], { CHILDREN_FIXTURE_DATA: join(run, "data") })
+ stage = "read-only-loaded-byte-preflight"
+ browser(session, "--profile", profile, "open", "--init-script", join(import.meta.dir, "experiments/performance/interaction-matrix/network.js"), url + fixture.path)
+ wait(session, "document.querySelector('alkalye-editor')?.source?.value.length===" + (await Bun.file(fixture.sourceFile).text()).length + "&&document.querySelector('#editor')?.readOnly===false")
+ let scripts = Schema.decodeUnknownSync(Schema.Array(Schema.String))(evaluate(session, "[...new Set(performance.getEntriesByType('resource').map(entry=>new URL(entry.name).pathname).filter(path=>path.endsWith('.js')))]"))
+ let assets: { path: string; sha256: string }[] = []
+ for (let path of scripts) {
+  let sha256 = new Bun.CryptoHasher("sha256").update(await Bun.file(join(import.meta.dir, "dist", path)).arrayBuffer()).digest("hex")
+  let served = Schema.decodeUnknownSync(Schema.String)(evaluate(session, "fetch(" + JSON.stringify(path) + ").then(response=>response.arrayBuffer()).then(bytes=>crypto.subtle.digest('SHA-256',bytes)).then(bytes=>[...new Uint8Array(bytes)].map(value=>value.toString(16).padStart(2,'0')).join(''))"))
+  if (served !== sha256) throw Error("Loaded route script differs from frozen dist")
+  assets.push({ path, sha256 })
+ }
+ browser(session, "close")
+ await Bun.write(join(run, "assets.json"), JSON.stringify(assets, null, 2))
+ let manifest = { samples: 1, output: join(run, "results"), versions: [{ name: arm, kind: "rewrite", commit: "85a6e15f2665e6ee4092dc9d66f88c5e7aae56b8", url, seedProfile: profile, oracle: ["bun", join(import.meta.dir, "experiments/performance/interaction-matrix/rewrite-oracle.ts"), join(run, "oracle.private.json")], assets, fixtures: [fixture] }], cells: [{ name: "body-" + fixtureName, journey: "body", fixture: fixtureName, position: "middle" }] }
+ await Bun.write(join(run, "manifest.private.json"), JSON.stringify(manifest))
+ stage = "native-body-edit-undo-independent-receipts"
+ await command(["bun", "experiments/performance/interaction-matrix/runner.ts", join(run, "manifest.private.json"), ...(measure ? ["--measure"] : [])])
+ stage = "complete"
+ console.log(JSON.stringify({ stage, arm, fixture: fixtureName, resultDirectory: join(run, "results"), timing: measure ? "separate-input-and-undo-3s-windows" : "UNRUN" }))
+} catch (error) {
+ failure = true
+ await Bun.write(join(run, "failure.json"), JSON.stringify({ stage, error: String(error), noUnknownActionRetry: true }, null, 2))
+ throw error
+} finally {
+ try { browser(session, "close") } catch {}
+ await command(["work", "down"])
+ await Bun.write(join(run, "terminal.json"), JSON.stringify({ stage, failure, ownedScopesClosed: true }))
+}

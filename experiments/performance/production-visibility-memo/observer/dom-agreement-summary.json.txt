@@ -1,0 +1,42 @@
+[
+  {
+    "arm": "control",
+    "phase": "input",
+    "status": "measured-complete",
+    "nativeToDomAgreementMs": 9.599999964237213,
+    "nativeToRAFMs": 11.099999964237213,
+    "domToRAFMs": 1.5,
+    "observerChecks": 1,
+    "missingDomWitness": false
+  },
+  {
+    "arm": "control",
+    "phase": "undo",
+    "status": "measured-complete",
+    "nativeToDomAgreementMs": 25.199999988077252,
+    "nativeToRAFMs": 26.800000011922748,
+    "domToRAFMs": 1.6000000238454959,
+    "observerChecks": 1,
+    "missingDomWitness": false
+  },
+  {
+    "arm": "memo",
+    "phase": "input",
+    "status": "measured-complete",
+    "nativeToDomAgreementMs": 9.900000035762787,
+    "nativeToRAFMs": 11.200000047683716,
+    "domToRAFMs": 1.300000011920929,
+    "observerChecks": 1,
+    "missingDomWitness": false
+  },
+  {
+    "arm": "memo",
+    "phase": "undo",
+    "status": "measured-complete",
+    "nativeToDomAgreementMs": 19.5,
+    "nativeToRAFMs": 20.899999976158142,
+    "domToRAFMs": 1.399999976158142,
+    "observerChecks": 1,
+    "missingDomWitness": false
+  }
+]

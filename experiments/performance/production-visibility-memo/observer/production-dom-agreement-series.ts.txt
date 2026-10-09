@@ -1,0 +1,10 @@
+let root="/tmp/alkalye-production-visibility-memo"
+if(await Bun.file(root+"/dom-agreement-pending.json").exists()) throw Error("Retained diagnostic exists; inspect before restart")
+await Bun.write(root+"/dom-agreement-pending.json",JSON.stringify({phase:"before-any-cell",n:1,fixture:"rich1m",instrumented:true}))
+for(let arm of ["control","memo"]){
+ let run=root+"/dom-agreement-"+arm+"-"+crypto.randomUUID()
+ let child=Bun.spawn(["bun","production-dom-agreement-gate.ts",arm,"rich1m","--measure"],{cwd:import.meta.dir,env:{...process.env,PRODUCTION_BODY_RUN:run},stdout:"inherit",stderr:"inherit"})
+ let exit=await child.exited
+ console.log(JSON.stringify({arm,run,exit}))
+ if(exit!==0)throw Error("Stop after failed diagnostic; no uncertain repeat")
+}

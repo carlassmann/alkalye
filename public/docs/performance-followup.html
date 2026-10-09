@@ -105,15 +105,28 @@
 			Undo journey were 11.952ms and 12.783ms; neither meets 8.33ms. GC overlaps
 			those tasks. The traces do not identify allocation ownership.
 		</p>
-		<h2>Bounded visibility memo pilot</h2>
+		<h2>Production bounded visibility memo</h2>
+		<p>
+			Adopted as 18dbb76 for consistently lower total main-thread work. Twelve
+			production trials passed exact native text, caret, independently accepted
+			edit/Undo and reload checks. On the 1MiB fixture, median three-second main
+			work fell from 857.548ms to 781.657ms for typing and from 772.455ms to
+			682.088ms for Undo. Feedback timings remain mixed: median observed Undo
+			frame opportunity increased from 22.7ms to 31.7ms, while a separate
+			diagnostic pair observed exact DOM/native/caret agreement at 25.2ms versus
+			19.5ms. The pair does not explain or erase the earlier result. No faster
+			Undo, physical paint or 120Hz presentation claim; main peaks remain above
+			8.33ms.
+		</p>
+		<h2>Earlier bounded visibility memo pilot</h2>
 		<p>
 			One ordinary 1MiB trial per arm on the experimental worker editor reduced
 			the largest edit worker task from 165.221ms to 125.296ms. Sampled
 			visibility activity checks explain much of the reduction. Main task peaks
 			did not improve. Exact text, overlay, caret and independently accepted
-			edit/Undo checks passed. Production adoption awaits a production
-			comparison; this pilot does not establish a reliable latency gain or
-			physical 120Hz presentation.
+			edit/Undo checks passed. At this stage, production adoption awaited a
+			production comparison; this pilot does not establish a reliable latency
+			gain or physical 120Hz presentation.
 		</p>
 		<h2>Experimental worker ordinal adjacency</h2>
 		<p>
