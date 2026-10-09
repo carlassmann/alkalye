@@ -286,7 +286,15 @@ async function exercise() {
 					stored.every((value, index) => value === bytes[index]),
 				"durable blob differs",
 			)
-			return { document, content, token: login.token, position, digest, bytes }
+			return {
+				document,
+				content,
+				token: login.token,
+				subject: identity.subject,
+				position,
+				digest,
+				bytes,
+			}
 		}).pipe(
 			Effect.provide(FetchHttpClient.layer),
 			Effect.provide(Signatures.layer),
@@ -339,6 +347,229 @@ async function readback(
 	)
 }
 
+async function mcpRequest(
+	token: string,
+	name: string,
+	args: Record<string, unknown>,
+) {
+	return fetch(origin + "/mcp", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			Accept: "application/json, text/event-stream",
+			Authorization: "Bearer " + token,
+			"MCP-Protocol-Version": "2026-07-28",
+			"Mcp-Method": "tools/call",
+			"Mcp-Name": name,
+		},
+		body: JSON.stringify({
+			jsonrpc: "2.0",
+			id: 1,
+			method: "tools/call",
+			params: {
+				name,
+				arguments: args,
+				_meta: {
+					"io.modelcontextprotocol/protocolVersion": "2026-07-28",
+					"io.modelcontextprotocol/clientCapabilities": {},
+				},
+			},
+		}),
+		signal: AbortSignal.timeout(15000),
+	})
+}
+async function mcpResult(
+	token: string,
+	name: string,
+	args: Record<string, unknown>,
+) {
+	let response = await mcpRequest(token, name, args)
+	ensure(response.status === 200, "MCP tool request failed")
+	let envelope = Schema.decodeUnknownSync(
+		Schema.Struct({
+			result: Schema.Struct({
+				isError: Schema.optionalKey(Schema.Boolean),
+				structuredContent: Schema.Unknown,
+			}),
+		}),
+	)(await response.json())
+	ensure(envelope.result.isError !== true, "MCP tool returned an error")
+	return envelope.result.structuredContent
+}
+async function verifyAgentCapabilities(
+	state: Awaited<ReturnType<typeof exercise>>,
+) {
+	await Effect.runPromise(
+		Effect.gen(function* () {
+			let api = yield* HttpApiClient.make(DocumentApi, {
+				baseUrl: origin,
+				transformClient: client =>
+					HttpClient.mapRequest(
+						client,
+						HttpClientRequest.bearerToken(Redacted.make(state.token)),
+					),
+			})
+			let name = "Worker smoke reader"
+			yield* Effect.promise(() =>
+				Bun.write(
+					join(directory, "agent.private.json"),
+					JSON.stringify({ name, stage: "before-create" }),
+				),
+			)
+			let key = yield* api.agents.create({
+				payload: {
+					name,
+					workspaces: ["personal-" + state.subject],
+					ceiling: "reader",
+				},
+			})
+			yield* Effect.promise(() =>
+				Bun.write(
+					join(directory, "agent.private.json"),
+					JSON.stringify({ name, token: key.token, stage: "created" }),
+				),
+			)
+			let connection = (yield* api.agents.list()).find(
+				entry => entry.name === name,
+			)
+			if (!connection) throw Error("Reader connection receipt missing")
+			yield* Effect.promise(() =>
+				Bun.write(
+					join(directory, "agent.private.json"),
+					JSON.stringify({
+						name,
+						token: key.token,
+						id: connection.id,
+						stage: "created",
+					}),
+				),
+			)
+			let record = yield* Effect.promise(async () =>
+				Schema.decodeUnknownSync(
+					Schema.Struct({
+						documentId: Schema.String,
+						content: Schema.String,
+						revision: Schema.String,
+					}),
+				)(
+					await mcpResult(key.token, "get_document", {
+						documentId: state.document,
+					}),
+				),
+			)
+			ensure(
+				record.documentId === state.document &&
+					record.content === state.content,
+				"MCP exact source differs",
+			)
+			let listing = yield* Effect.promise(async () =>
+				Schema.decodeUnknownSync(
+					Schema.Struct({
+						personal: Schema.Array(
+							Schema.Struct({ documentId: Schema.String }),
+						),
+						spaces: Schema.Array(
+							Schema.Struct({
+								documents: Schema.Array(
+									Schema.Struct({ documentId: Schema.String }),
+								),
+							}),
+						),
+					}),
+				)(await mcpResult(key.token, "list_documents", {})),
+			)
+			ensure(
+				[
+					...listing.personal,
+					...listing.spaces.flatMap(space => space.documents),
+				].some(document => document.documentId === state.document),
+				"MCP reader listing missing document",
+			)
+			let denied = yield* Effect.promise(() =>
+				mcpRequest(key.token, "update_document", {
+					documentId: state.document,
+					content: "Reader must not write",
+					expectedRevision: record.revision,
+				}),
+			)
+			let denial = Schema.decodeUnknownSync(
+				Schema.Struct({
+					result: Schema.Struct({ isError: Schema.Literal(true) }),
+				}),
+			)(yield* Effect.promise(() => denied.json()))
+			ensure(denial.result.isError, "Reader grant permitted a write")
+			let child = yield* Effect.acquireRelease(
+				Effect.sync(() =>
+					Bun.spawn(
+						[
+							"bun",
+							"cli.ts",
+							"--server",
+							origin,
+							"--home",
+							join(directory, "cli-home"),
+							"doc",
+							"content",
+							state.document,
+						],
+						{
+							cwd: root,
+							env: {
+								...process.env,
+								ALKALYE_API_KEY: key.token,
+								ALKALYE_MCP_TOKEN: "",
+							},
+							stdin: "ignore",
+							stdout: "pipe",
+							stderr: "pipe",
+						},
+					),
+				),
+				child =>
+					Effect.promise(async () => {
+						if (child.exitCode === null) child.kill("SIGTERM")
+						await child.exited
+					}),
+			)
+			let [output, error, status] = yield* Effect.promise(() =>
+				Promise.all([
+					new Response(child.stdout).text(),
+					new Response(child.stderr).text(),
+					child.exited,
+				]),
+			)
+			yield* Effect.promise(() =>
+				Bun.write(join(directory, "cli.private.stderr"), error),
+			)
+			ensure(
+				status === 0 && output === state.content + "\n",
+				"CLI scoped-key exact source differs",
+			)
+			yield* Effect.promise(() =>
+				Bun.write(
+					join(directory, "agent.private.json"),
+					JSON.stringify({
+						name,
+						token: key.token,
+						id: connection.id,
+						stage: "before-revoke",
+					}),
+				),
+			)
+			yield* api.agents.revoke({ params: { id: connection.id } })
+			let revoked = yield* Effect.promise(() =>
+				mcpRequest(key.token, "get_document", { documentId: state.document }),
+			)
+			ensure(revoked.status === 401, "Revoked API key still accesses MCP")
+		}).pipe(
+			Effect.scoped,
+			Effect.provide(FetchHttpClient.layer),
+			Effect.timeout("60 seconds"),
+		),
+	)
+	await readback(state)
+}
+
 try {
 	await start()
 	let home = await fetch(origin + "/app.html")
@@ -381,10 +612,11 @@ try {
 		await start()
 		await readback(state)
 	}
+	await verifyAgentCapabilities(state)
 	console.log(
 		remote
-			? "PASS deployed Worker: health, static app, signed auth, durable creation, access denial, durable blob, independent readback"
-			: "PASS local workerd: health, static app, signed auth, durable creation, access denial, physical R2 bytes/key reuse/new receipts, cold restart/readback",
+			? "PASS deployed Worker: health, static app, signed auth, durable creation, access denial, durable blob, independent readback, scoped API-key MCP/CLI/revocation"
+			: "PASS local workerd: health, static app, signed auth, durable creation, access denial, physical R2 bytes/key reuse/new receipts, cold restart/readback, scoped API-key MCP/CLI/revocation",
 	)
 	await stop()
 	await rm(directory, { recursive: true, force: true })
