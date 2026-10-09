@@ -42,6 +42,8 @@ let child = Bun.spawn(
 	{ cwd: root, stdout: log, stderr: log },
 )
 let resultSchema = Schema.Struct({
+	binary: Schema.Array(Schema.Number),
+	boolean: Schema.Array(Schema.Struct({ value: Schema.Number })),
 	failed: Schema.Struct({
 		_tag: Schema.Literal("Failure"),
 		failure: Schema.Literal("expected"),
@@ -72,6 +74,8 @@ try {
 	await Bun.write(join(directory, "result.json"), body)
 	let result = Schema.decodeUnknownSync(resultSchema)(JSON.parse(body))
 	if (
+		JSON.stringify(result.binary) !== "[1,2,255]" ||
+		JSON.stringify(result.boolean) !== '[{"value":1}]' ||
 		JSON.stringify(result.nested.value) !== '[{"name":"outer"}]' ||
 		JSON.stringify(result.rows) !== '[{"name":"isolated"},{"name":"outer"}]' ||
 		JSON.stringify(result.isolatedRead) !== JSON.stringify(result.rows)
