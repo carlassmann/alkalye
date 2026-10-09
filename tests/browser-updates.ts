@@ -55,7 +55,7 @@ if (Bun.argv.includes("--serve")) {
 				url.pathname.endsWith(".html")
 			)
 				return new Response(
-					`<!doctype html><html lang="en"><body data-version="${version}"><textarea aria-label="Draft"></textarea><button data-release>Finish saving</button><button data-abort>Close watcher</button><script type="module" src="/app.js"></script></body></html>`,
+					`<!doctype html><html lang="en"><body data-version="${version}"><textarea aria-label="Draft"></textarea><button data-release>Finish saving</button><button data-abort>Close watcher</button><button data-fail>Fail saving</button><script type="module" src="/app.js"></script></body></html>`,
 					{ headers: { "content-type": "text/html" } },
 				)
 			return new Response("fixture")
@@ -152,10 +152,29 @@ if (Bun.argv.includes("--serve")) {
 		evaluate(session, 'window.dispatchEvent(new Event("online"))')
 		wait(session, 'document.body.dataset.offered === "true"')
 		browser(session, "click", "[data-update-apply]")
+		browser(session, "click", "[data-fail]")
+		wait(
+			session,
+			'document.body.dataset.saveFailed === "true" && !document.querySelector("[data-update-apply]").disabled',
+		)
+		assert(
+			evaluate(session, 'document.body.dataset.version === "2"'),
+			"A failed save preserves the open build and enables retry",
+		)
+		browser(session, "click", "[data-update-apply]")
+		browser(session, "click", "[data-release]")
+		wait(
+			session,
+			'document.body.dataset.version === "3" && document.body.dataset.ready',
+		)
+		await fetch(new URL("/version?value=4", origin))
+		evaluate(session, 'window.dispatchEvent(new Event("online"))')
+		wait(session, 'document.body.dataset.offered === "true"')
+		browser(session, "click", "[data-update-apply]")
 		browser(session, "click", "[data-abort]")
 		browser(session, "click", "[data-release]")
 		assert(
-			evaluate(session, 'document.body.dataset.version === "2"'),
+			evaluate(session, 'document.body.dataset.version === "3"'),
 			"An aborted owner cannot apply a pending update after saving",
 		)
 		console.log("Update lifecycle PASS")

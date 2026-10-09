@@ -14,6 +14,7 @@ export function watchUpdates(
 				let offered = false
 				let applying = false
 				let controller = navigator.serviceWorker.controller
+				let initialActive = registration.active
 				let changed = false
 				let development = process.env.NODE_ENV === "development"
 				function apply() {
@@ -34,7 +35,10 @@ export function watchUpdates(
 					() => {
 						if (!controller) {
 							controller = navigator.serviceWorker.controller
-							offlineReady?.()
+							if (initialActive && controller !== initialActive) {
+								changed = true
+								check()
+							} else if (!initialActive) offlineReady?.()
 							return
 						}
 						changed = true

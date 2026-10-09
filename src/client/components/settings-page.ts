@@ -734,16 +734,48 @@ export class SettingsPageElement extends HTMLElement {
 	}
 	private applyUpdate() {
 		this.run?.(
-			Effect.tryPromise(async () => {
-				let registration = await navigator.serviceWorker?.getRegistration()
-				let waiting = registration?.waiting
-				if (!waiting) return location.reload()
-				navigator.serviceWorker.addEventListener(
-					"controllerchange",
-					() => location.reload(),
-					{ once: true },
+			Effect.suspend(() => {
+				let options = this.options
+				let owner = this.content
+				if (!options || !owner || owner.signal.aborted) return Effect.void
+				let control = this.querySelector<HTMLButtonElement>(
+					'[data-settings="reload-update"]',
 				)
-				waiting.postMessage("activate")
+				if (control) control.disabled = true
+				return Effect.tryPromise(() =>
+					navigator.serviceWorker?.getRegistration(),
+				).pipe(
+					Effect.flatMap(registration =>
+						options.prepareRestore.pipe(
+							Effect.andThen(
+								Effect.sync(() => {
+									if (
+										!this.isConnected ||
+										this.content !== owner ||
+										owner.signal.aborted
+									)
+										return
+									let waiting = registration?.waiting
+									if (!waiting) return location.reload()
+									navigator.serviceWorker.addEventListener(
+										"controllerchange",
+										() => {
+											if (this.isConnected && !owner.signal.aborted)
+												location.reload()
+										},
+										{ once: true, signal: owner.signal },
+									)
+									waiting.postMessage("activate")
+								}),
+							),
+						),
+					),
+					Effect.onExit(exit =>
+						Effect.sync(() => {
+							if (exit._tag === "Failure" && control) control.disabled = false
+						}),
+					),
+				)
 			}),
 		)
 	}

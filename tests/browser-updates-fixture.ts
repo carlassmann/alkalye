@@ -14,6 +14,10 @@ editor.value = localStorage.getItem("draft") ?? ""
 let input = editor
 let button = release
 let flush = Promise.withResolvers<void>()
+document.querySelector("[data-fail]")?.addEventListener("click", () => {
+	flush.reject(new Error("Fixture save failed"))
+	flush = Promise.withResolvers<void>()
+})
 button.onclick = () => flush.resolve()
 document
 	.querySelector("[data-abort]")
@@ -25,11 +29,16 @@ await Effect.runPromise(
 			let banner = new UpdateBannerElement()
 			banner.offer(() => {
 				document.body.dataset.flushing = "true"
-				void flush.promise.then(() => {
-					if (events.signal.aborted) return
-					localStorage.setItem("draft", input.value)
-					apply()
-				})
+				void flush.promise
+					.then(() => {
+						if (events.signal.aborted) return
+						localStorage.setItem("draft", input.value)
+						apply()
+					})
+					.catch(() => {
+						document.body.dataset.saveFailed = "true"
+						banner.enableReload()
+					})
 			})
 			document.body.append(banner)
 			document.body.dataset.offered = "true"
