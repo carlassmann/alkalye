@@ -1,5 +1,6 @@
 import { parseCheckpoint } from "../shared/checkpoint"
 import * as Effect from "effect/Effect"
+import * as Option from "effect/Option"
 import * as Layer from "effect/Layer"
 import * as HttpApiBuilder from "effect/http-api/HttpApiBuilder"
 import { DocumentObservability } from "../shared/document-observability"
@@ -203,7 +204,7 @@ export let workspaceHandlers = HttpApiBuilder.group(
 				)
 		}),
 )
-let invitationHandlers = HttpApiBuilder.group(
+export let invitationHandlers = HttpApiBuilder.group(
 	DocumentApi,
 	"invitations",
 	handlers =>
@@ -281,7 +282,7 @@ export let documentApiHandlers = Layer.mergeAll(
 	invitationHandlers,
 	preferenceHandlers,
 )
-function asAccount<A, E>(
+export function asAccount<A, E>(
 	effect: Effect.Effect<A, E, Identity>,
 	actors: ReadonlyArray<string> = [],
 	operation: DocumentOperation = "other",
@@ -290,6 +291,17 @@ function asAccount<A, E>(
 		let observability = yield* DocumentObservability
 		return yield* Effect.gen(function* () {
 			let account = yield* RequestAccount
+			let delegated = yield* Effect.serviceOption(Identity)
+			if (
+				Option.isSome(delegated) &&
+				delegated.value.subject !== account.subject
+			)
+				return yield* Effect.fail(
+					new PermissionDenied({
+						message:
+							"Delegated account does not match the authenticated account",
+					}),
+				)
 			if (actors.some(actor => !actor.startsWith(account.subject + "-")))
 				return yield* Effect.fail(
 					new DocumentConflict({
@@ -297,7 +309,12 @@ function asAccount<A, E>(
 					}),
 				)
 			return yield* effect.pipe(
-				Effect.provideService(Identity, { subject: account.subject, actors }),
+				Effect.provideService(
+					Identity,
+					Option.isSome(delegated)
+						? { ...delegated.value, actors }
+						: { subject: account.subject, actors },
+				),
 				Effect.mapError(error =>
 					expected(error)
 						? error

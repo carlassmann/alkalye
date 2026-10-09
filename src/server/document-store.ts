@@ -140,9 +140,27 @@ export class DocumentStore extends Context.Service<
 		).pipe(Layer.provide(documentDatabaseLayer))
 	}
 }
+type WidenWorkspaceFailures<Store> = {
+	readonly [Key in keyof Store]: Store[Key] extends (
+		...args: infer Args
+	) => Effect.Effect<infer Value, infer Failure, infer Services>
+		? (
+				...args: Args
+			) => Effect.Effect<Value, Failure | SqlError.SqlError, Services>
+		: Store[Key] extends Effect.Effect<
+					infer Value,
+					infer Failure,
+					infer Services
+			  >
+			? Effect.Effect<Value, Failure | SqlError.SqlError, Services>
+			: Store[Key]
+}
+
 export class WorkspaceStore extends Context.Service<
 	WorkspaceStore,
-	Effect.Success<ReturnType<typeof makeDocumentStore>>["workspace"]
+	WidenWorkspaceFailures<
+		Effect.Success<ReturnType<typeof makeDocumentStore>>["workspace"]
+	>
 >()("WorkspaceStore/Store") {
 	static get live() {
 		return Layer.effect(
