@@ -23,6 +23,7 @@
 		"cloudflare:types": "bun scripts/cloudflare.ts types",
 		"cloudflare:check": "bun scripts/cloudflare.ts check",
 		"cloudflare:smoke": "bun scripts/cloudflare-smoke.ts",
+		"cloudflare:live-smoke": "bun scripts/cloudflare-live-smoke.ts",
 		"cloudflare:sqlite-smoke": "bun scripts/cloudflare-sqlite-smoke.ts"
 	},
 	"devDependencies": {

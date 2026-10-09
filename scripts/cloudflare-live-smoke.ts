@@ -1,6 +1,7 @@
 import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join, resolve } from "node:path"
+import { connect } from "node:tls"
 import * as Effect from "effect/Effect"
 import * as Redacted from "effect/Redacted"
 import * as Schema from "effect/Schema"
@@ -14,7 +15,11 @@ import { encode } from "../src/shared/base64"
 import { DocumentApi } from "../src/shared/document-api"
 import { buildAction, restoreSnapshot } from "../src/shared/document-actions"
 import { cookieLogin, livePoll, liveSocket } from "../tests/live-fixture"
-import type { LivePeerFixture } from "../tests/live-fixture"
+import type {
+	LiveLogin,
+	LiveMessage,
+	LivePeerFixture,
+} from "../tests/live-fixture"
 import { object } from "../src/shared/model"
 import type * as Crypto from "effect/Crypto"
 import { Replica } from "../src/shared/crdt"
@@ -22,41 +27,61 @@ import { newDocument } from "../src/shared/documents"
 
 let root = resolve(import.meta.dir, "..")
 let directory = await mkdtemp(join(tmpdir(), "alkalye-cloudflare-live-"))
-let origin = "http://127.0.0.1:18802"
-let configurationSchema = Schema.StructWithRest(
-	Schema.Struct({
-		main: Schema.String,
-		assets: Schema.StructWithRest(Schema.Struct({ directory: Schema.String }), [
-			Schema.Record(Schema.String, Schema.Unknown),
-		]),
-	}),
-	[Schema.Record(Schema.String, Schema.Unknown)],
-)
-let configuration = Schema.decodeUnknownSync(configurationSchema)(
-	Bun.JSONC.parse(await Bun.file(join(root, "wrangler.jsonc")).text()),
-)
-let localConfiguration = {
-	...configuration,
-	main: join(root, configuration.main),
-	assets: {
-		...configuration.assets,
-		directory: join(root, configuration.assets.directory),
-	},
-}
+let requestedOrigin = Bun.argv[2] === "--origin" ? Bun.argv[3] : undefined
+if (Bun.argv.length > 2 && (!requestedOrigin || Bun.argv.length !== 4))
+	throw Error(
+		"Usage: bun scripts/cloudflare-live-smoke.ts [--origin https://host]",
+	)
+let remote = requestedOrigin !== undefined
+let origin = requestedOrigin
+	? new URL(requestedOrigin).origin
+	: "http://127.0.0.1:18802"
+if (remote && !origin.startsWith("https://"))
+	throw Error("Remote mode requires HTTPS")
 let config = join(directory, "wrangler.json")
-await Bun.write(config, JSON.stringify(localConfiguration))
-await Bun.write(
-	join(directory, ".dev.vars"),
-	"ALKALYE_MASTER_KEY=" +
-		encode(crypto.getRandomValues(new Uint8Array(32))) +
-		"\n",
-)
+if (!remote) {
+	let configurationSchema = Schema.StructWithRest(
+		Schema.Struct({
+			main: Schema.String,
+			assets: Schema.StructWithRest(
+				Schema.Struct({ directory: Schema.String }),
+				[Schema.Record(Schema.String, Schema.Unknown)],
+			),
+		}),
+		[Schema.Record(Schema.String, Schema.Unknown)],
+	)
+	let configuration = Schema.decodeUnknownSync(configurationSchema)(
+		Bun.JSONC.parse(await Bun.file(join(root, "wrangler.jsonc")).text()),
+	)
+	let localConfiguration = {
+		...configuration,
+		main: join(root, configuration.main),
+		assets: {
+			...configuration.assets,
+			directory: join(root, configuration.assets.directory),
+		},
+	}
+	await Bun.write(config, JSON.stringify(localConfiguration))
+	await Bun.write(
+		join(directory, ".dev.vars"),
+		"ALKALYE_MASTER_KEY=" +
+			encode(crypto.getRandomValues(new Uint8Array(32))) +
+			"\n",
+	)
+}
 let child: ReturnType<typeof Bun.spawn> | undefined
 let runs = 0
 function ensure(value: boolean, message: string) {
 	if (!value) throw Error(message)
 }
 async function start() {
+	if (remote) {
+		let response = await fetch(origin + "/api/health", {
+			signal: AbortSignal.timeout(30000),
+		})
+		ensure(response.ok, "Remote health unavailable")
+		return
+	}
 	runs++
 	let log = Bun.file(join(directory, `worker-${runs}.log`))
 	child = Bun.spawn(
@@ -97,6 +122,148 @@ async function stop() {
 	child.kill("SIGTERM")
 	await child.exited
 	child = undefined
+}
+function socketPeer(login: LiveLogin): Promise<LivePeerFixture> {
+	if (login.base.protocol !== "https:") return liveSocket(login)
+	return new Promise((resolve, reject) => {
+		let buffer = Buffer.alloc(0),
+			upgraded = false
+		let inbox: LiveMessage[] = []
+		let waiters: {
+			resolve(message: LiveMessage): void
+			reject(error: Error): void
+		}[] = []
+		let socket = connect(
+			{
+				host: login.base.hostname,
+				port: Number(login.base.port) || 443,
+				servername: login.base.hostname,
+			},
+			() => {
+				socket.write(
+					[
+						`GET /api/live?account=${encodeURIComponent(login.subject)} HTTP/1.1`,
+						`Host: ${login.base.host}`,
+						`Origin: ${login.base.origin}`,
+						`Cookie: ${login.cookie}`,
+						"Connection: Upgrade",
+						"Upgrade: websocket",
+						"Sec-WebSocket-Version: 13",
+						"Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==",
+						"",
+						"",
+					].join("\r\n"),
+				)
+			},
+		)
+		let timeout = setTimeout(
+			() => fail(Error("Remote websocket upgrade timed out")),
+			30000,
+		)
+		function fail(error: Error) {
+			clearTimeout(timeout)
+			socket.destroy()
+			reject(error)
+			for (let waiter of waiters.splice(0)) waiter.reject(error)
+		}
+		socket.on("error", fail)
+		socket.on("close", () => fail(Error("Remote websocket closed")))
+		socket.on("data", (bytes: Buffer) => {
+			buffer = Buffer.concat([buffer, bytes])
+			if (!upgraded) {
+				let end = buffer.indexOf("\r\n\r\n")
+				if (end < 0) return
+				let head = buffer.subarray(0, end).toString()
+				if (!head.includes(" 101 "))
+					return fail(
+						Error(
+							"Remote websocket upgrade rejected: " + head.split("\r\n")[0],
+						),
+					)
+				buffer = buffer.subarray(end + 4)
+				upgraded = true
+				clearTimeout(timeout)
+				resolve({ inbox, send, until, close: () => socket.destroy() })
+			}
+			while (buffer.length >= 2) {
+				let opcode = buffer.readUInt8(0) & 15,
+					length = buffer.readUInt8(1) & 127,
+					offset = 2
+				if (length === 127)
+					return fail(Error("Remote live frame exceeds bounded protocol"))
+				if (length === 126) {
+					if (buffer.length < 4) return
+					length = buffer.readUInt16BE(2)
+					offset = 4
+				}
+				if (buffer.length < offset + length) return
+				let payload = buffer.subarray(offset, offset + length)
+				buffer = buffer.subarray(offset + length)
+				if (opcode === 8)
+					return fail(Error("Remote server closed live channel"))
+				if (opcode === 9) {
+					frame(10, payload)
+					continue
+				}
+				if (opcode !== 1) continue
+				try {
+					let value = object(JSON.parse(payload.toString()))
+					let message = {
+						...value,
+						type: Schema.decodeUnknownSync(Schema.String)(value.type),
+					}
+					let waiter = waiters.shift()
+					if (waiter) waiter.resolve(message)
+					else inbox.push(message)
+				} catch (error) {
+					fail(Error("Malformed remote live message: " + String(error)))
+					return
+				}
+			}
+		})
+		function frame(opcode: number, payload: Buffer) {
+			let mask = crypto.getRandomValues(new Uint8Array(4))
+			let header =
+				payload.length < 126
+					? Buffer.from([0x80 | opcode, 0x80 | payload.length])
+					: Buffer.from([
+							0x80 | opcode,
+							0xfe,
+							payload.length >> 8,
+							payload.length & 255,
+						])
+			let encoded = Buffer.from(payload)
+			for (let index = 0; index < encoded.length; index++)
+				encoded[index] = encoded.readUInt8(index) ^ (mask[index % 4] ?? 0)
+			socket.write(Buffer.concat([header, Buffer.from(mask), encoded]))
+		}
+		function send(message: unknown) {
+			frame(1, Buffer.from(JSON.stringify(message)))
+		}
+		async function until(match: (message: LiveMessage) => boolean) {
+			while (true) {
+				let message =
+					inbox.shift() ??
+					(await new Promise<LiveMessage>((resolve, reject) => {
+						let timer = setTimeout(
+							() => fail(Error("No matching remote live message")),
+							10000,
+						)
+						waiters.push({
+							resolve: message => {
+								clearTimeout(timer)
+								resolve(message)
+							},
+							reject: error => {
+								clearTimeout(timer)
+								reject(error)
+							},
+						})
+					}))
+				if (match(message)) return message
+			}
+		}
+	})
 }
 type Client = Effect.Success<ReturnType<typeof client>>
 function run<A, E>(
@@ -226,7 +393,7 @@ try {
 	let readerActor = (
 		await polling.until(message => message.type === "connected")
 	).actor
-	socket = await liveSocket(await cookieLogin(new URL(origin), 201))
+	socket = await socketPeer(await cookieLogin(new URL(origin), 201))
 	let ownerActor = (await socket.until(message => message.type === "connected"))
 		.actor
 	ensure(ownerActor !== readerActor, "Peer actors must be unique")
@@ -345,33 +512,39 @@ try {
 	)
 	ensure((await polling.close()) === 204, "Final poll cleanup failed")
 	polling = undefined
-	phase = "cold-object-restart-and-resume"
-	let ownerLogin = await cookieLogin(new URL(origin), 201)
-	polling = livePoll(ownerLogin)
-	await polling.open()
-	await polling.until(message => message.type === "connected")
-	await stop()
-	await start()
-	ensure(
-		(await polling.poll()) === 410,
-		"Old in-memory poll survived a cold object restart",
-	)
-	await polling.open()
-	await polling.until(message => message.type === "connected")
-	socket = await liveSocket(ownerLogin)
-	await socket.until(message => message.type === "connected")
-	socket.send({ type: "watch", document })
-	let reopened = await run(
-		restoreSnapshot(await run(snapshot(owner, document)), crypto.randomUUID()),
-	)
-	ensure(
-		reopened.text(document) === text,
-		"Cold object restart changed durable source",
-	)
-	socket.close()
-	socket = undefined
-	await polling.close()
-	polling = undefined
+	if (!remote) {
+		phase = "cold-object-restart-and-resume"
+		let ownerLogin = await cookieLogin(new URL(origin), 201)
+		polling = livePoll(ownerLogin)
+		await polling.open()
+		await polling.until(message => message.type === "connected")
+		await stop()
+		await start()
+		ensure(
+			(await polling.poll()) === 410,
+			"Old in-memory poll survived a cold object restart",
+		)
+		await polling.open()
+		await polling.until(message => message.type === "connected")
+		socket = await socketPeer(ownerLogin)
+		await socket.until(message => message.type === "connected")
+		socket.send({ type: "watch", document })
+		let reopened = await run(
+			restoreSnapshot(
+				await run(snapshot(owner, document)),
+				crypto.randomUUID(),
+			),
+		)
+		ensure(
+			reopened.text(document) === text,
+			"Cold object restart changed durable source",
+		)
+		socket.close()
+		socket = undefined
+		await polling.close()
+		polling = undefined
+	}
+
 	await Bun.write(
 		join(directory, "result.json"),
 		JSON.stringify({
@@ -387,9 +560,11 @@ try {
 				"poll-reconnect",
 				"peer-cleanup",
 				"revocation",
-				"cold-object-restart-and-resume",
+				...(remote ? [] : ["cold-object-restart-and-resume"]),
 			],
-			runtime: "local workerd actual AlkalyeRelay",
+			runtime: remote
+				? "remote HTTPS AlkalyeRelay"
+				: "local workerd actual AlkalyeRelay",
 			sourceSHA: new Bun.CryptoHasher("sha256").update(text).digest("hex"),
 		}),
 	)
