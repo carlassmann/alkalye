@@ -6,6 +6,7 @@ import * as Fiber from "effect/Fiber"
 import * as Redacted from "effect/Redacted"
 import * as FetchHttpClient from "effect/http/FetchHttpClient"
 import { EmailDelivery } from "../src/server/email-delivery"
+import { bunEmailDeliveryLayer } from "../src/server/bun-email-delivery"
 
 let configuration = {
 	NODE_ENV: "test",
@@ -27,7 +28,7 @@ function fixture<A, E>(
 ) {
 	return Effect.runPromise(
 		work.pipe(
-			Effect.provide(EmailDelivery.layer),
+			Effect.provide(bunEmailDeliveryLayer),
 			Effect.provideService(
 				ConfigProvider.ConfigProvider,
 				ConfigProvider.fromUnknown(config),

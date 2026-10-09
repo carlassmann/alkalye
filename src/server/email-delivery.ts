@@ -8,10 +8,7 @@ import * as Redacted from "effect/Redacted"
 import * as HttpClient from "effect/http/HttpClient"
 import * as HttpClientRequest from "effect/http/HttpClientRequest"
 import * as FetchHttpClient from "effect/http/FetchHttpClient"
-import { chmod, mkdir } from "node:fs/promises"
-import { join } from "node:path"
 import { EmailAuthenticationRejected } from "../shared/email-authentication"
-import { promise } from "../platform/effects"
 
 export class EmailDelivery extends Context.Service<
 	EmailDelivery,
@@ -31,40 +28,12 @@ export class EmailDelivery extends Context.Service<
 			let sender = yield* Config.String("EMAIL_FROM").pipe(
 				Config.withDefault(""),
 			)
-			let mailbox = yield* Config.option(
-				Config.String("ALKALYE_TEST_EMAIL_MAILBOX"),
-			)
-			let environment = yield* Config.String("NODE_ENV").pipe(
-				Config.withDefault("development"),
-			)
 			let client = yield* HttpClient.HttpClient
-			if (Option.isSome(mailbox) && environment === "production")
-				return yield* Effect.fail(
-					new EmailAuthenticationRejected({
-						message: "Test email mailbox cannot run in production",
-					}),
-				)
-			let enabled =
-				Option.isSome(mailbox) || (Option.isSome(token) && sender.length > 0)
+			let enabled = Option.isSome(token) && sender.length > 0
 			return {
 				enabled,
 				send(email: string, code: Redacted.Redacted<string>, id: string) {
 					return Effect.gen(function* () {
-						if (Option.isSome(mailbox)) {
-							let directory = mailbox.value
-							yield* promise("test mailbox", () =>
-								mkdir(directory, { recursive: true, mode: 0o700 }),
-							)
-							let path = join(directory, id + ".json")
-							yield* promise("test email", () =>
-								Bun.write(
-									path,
-									JSON.stringify({ email, code: Redacted.value(code), id }),
-								),
-							)
-							yield* promise("test email permissions", () => chmod(path, 0o600))
-							return
-						}
 						if (!Option.isSome(token) || !sender) return yield* unavailable()
 						let request = HttpClientRequest.post(
 							"https://api.resend.com/emails",
