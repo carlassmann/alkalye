@@ -1,0 +1,48 @@
+--- runner.ts
++++ runner.ts
+@@ -65,6 +65,9 @@
+ type Fixture = typeof Fixture.Type
+ type Cell = typeof Cell.Type
+ let measure = Bun.argv.includes("--measure")
++let sampled = Bun.env.PRODUCTION_SAMPLE_CPU === "1"
++if (sampled && !measure) throw Error("Sampled diagnostic requires marked windows")
++let traceCategories = "devtools.timeline,disabled-by-default-devtools.timeline,toplevel,blink.user_timing,v8" + (sampled ? ",disabled-by-default-v8.gc,disabled-by-default-v8.cpu_profiler" : "")
+ let [manifestPath] = Bun.argv.slice(2).filter(value => value !== "--measure")
+ if (!manifestPath)
+ 	throw Error(
+@@ -566,7 +569,7 @@
+ 			"profiler",
+ 			"start",
+ 			"--categories",
+-			"devtools.timeline,disabled-by-default-devtools.timeline,toplevel,blink.user_timing,v8",
++			traceCategories,
+ 		)
+ 		tracing = measure
+ 		if (measure) arm(session, condition)
+@@ -645,7 +648,7 @@
+ 			stage = "undo-trusted-action"
+ 			if (measure) {
+ 				activeTrace = undoTrace
+-				browser(session, "profiler", "start", "--categories", "devtools.timeline,disabled-by-default-devtools.timeline,toplevel,blink.user_timing,v8")
++				browser(session, "profiler", "start", "--categories", traceCategories)
+ 				tracing = true
+ 				arm(session, `${source(version)}===window.interactionBase&&(${nativeCaretAgreement("window.interactionInsertion")})`)
+ 			}
+@@ -699,7 +702,7 @@
+ 			trial,
+ 			status: measure ? "measured-complete" : "correctness-complete",
+ 			trace: measure ? trace : undefined,
+-			mode: measure ? "measured" : "correctness",
++			mode: sampled ? "sampled-diagnostic" : measure ? "measured" : "correctness",
+ 			observation,
+ 			undoObservation,
+ 			undoTrace: measure ? undoTrace : undefined,
+@@ -728,7 +731,7 @@
+ 			stage,
+ 			error: String(error),
+ 			trace: measure ? trace : undefined,
+-			mode: measure ? "measured" : "correctness",
++			mode: sampled ? "sampled-diagnostic" : measure ? "measured" : "correctness",
+ 			observation,
+ 			undoObservation,
+ 			undoTrace: measure ? undoTrace : undefined,

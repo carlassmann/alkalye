@@ -1,0 +1,38 @@
+import json,collections, pathlib,sys
+root=pathlib.Path('/tmp/alkalye-production-snapshot-profile-prep')
+original=json.load(open(sys.argv[1]))[0]
+result={'results':[{'trial':0,'phase':'input','trace':original['trace'],'observation':original['observation']},{'trial':1,'phase':'undo','trace':original['undoTrace'],'observation':original['undoObservation']}]}
+summary=[]
+for row in result['results']:
+ events=json.load(open(row['trace']))['traceEvents'];marks={e['name']:e for e in events if e.get('name') in ['interaction:start','interaction:end']};a,b=marks['interaction:start'],marks['interaction:end'];thread=a['pid'],a['tid']
+ tasks=[e for e in events if e.get('name')=='RunTask' and e.get('ph')=='X' and (e.get('pid'),e.get('tid'))==thread and e['ts']<=b['ts'] and e['ts']+e.get('dur',0)>=a['ts']]
+ initial=[e for e in tasks if e['ts']<=a['ts']<=e['ts']+e.get('dur',0) or e['ts']<=marks['interaction:start']['ts']<=e['ts']+e.get('dur',0)]
+ children=[]
+ for t in sorted(tasks,key=lambda e:e.get('dur',0),reverse=True)[:4]:
+  inside=[e for e in events if e.get('ph')=='X' and (e.get('pid'),e.get('tid'))==thread and e.get('ts',0)>=t['ts'] and e.get('ts',0)+e.get('dur',0)<=t['ts']+t.get('dur',0) and e.get('name') in ['FunctionCall','MinorGC','MajorGC','Layout','Paint','TimerFire','EventDispatch']]
+  children.append({'relativeMs':(t['ts']-a['ts'])/1000,'taskMs':t.get('dur',0)/1000,'children':[{'name':e['name'],'ms':e.get('dur',0)/1000,'args':e.get('args',{})} for e in sorted(inside,key=lambda e:e.get('dur',0),reverse=True)[:5]]})
+ groups={}
+ for e in sorted(events,key=lambda event:event.get('ts',0)):
+  if e.get('name') not in ['Profile','ProfileChunk']:continue
+  key=e['pid'],e.get('id');g=groups.setdefault(key,{'nodes':{},'ownerTid':e['tid'],'tid':e['tid'],'time':0,'self':collections.Counter(),'inclusive':collections.Counter()});d=e.get('args',{}).get('data',{})
+  if e['name']=='Profile':g['time']=d.get('startTime',e['ts']);continue
+  g['tid']=e['tid'];cpu=d.get('cpuProfile',{})
+  for n in cpu.get('nodes',[]):g['nodes'][n['id']]=n
+  for ident,delta in zip(cpu.get('samples',[]),d.get('timeDeltas',[])):
+   g['time']+=delta
+   if not a['ts']<=g['time']<=b['ts']:continue
+   g['self'][ident]+=delta;seen=set();ancestor=ident
+   while ancestor and ancestor not in seen:
+    seen.add(ancestor);g['inclusive'][ancestor]+=delta;ancestor=g['nodes'].get(ancestor,{}).get('parent')
+ profiles=[]
+ for key,g in groups.items():
+  rows=[{'frame':g['nodes'].get(ident,{}).get('callFrame',{}),'selfMs':value/1000,'inclusiveMs':g['inclusive'][ident]/1000} for ident,value in g['self'].most_common()]
+  inclusiveRows=[{'frame':g['nodes'].get(ident,{}).get('callFrame',{}),'selfMs':g['self'][ident]/1000,'inclusiveMs':value/1000} for ident,value in g['inclusive'].most_common(35)]
+  profiles.append({'inclusiveRows':inclusiveRows,'pid':key[0],'ownerThread':g['ownerTid'],'samplingThread':g['tid'],'main':(key[0],g['ownerTid'])==thread,'rows':rows})
+ summary.append({'trial':row['trial'],'phase':row['phase'],'sampled':True,'inputRunTaskMs':max(e.get('dur',0)/1000 for e in initial),'aftermathMaxMs':max((e.get('dur',0)/1000 for e in tasks if e not in initial),default=0),'mainThread':thread,'heapSample':row['observation'].get('heap'),'largestTasks':children,'profiles':profiles,'threadNames':[e for e in events if e.get('name')=='thread_name']})
+json.dump(summary,open(root/'analysis.json','w'),indent=2)
+for s in summary:
+ print('trial',s['trial'],'input',s['inputRunTaskMs'],'deferred',s['aftermathMaxMs'],'heap',s['heapSample'])
+ for p in s['profiles']:
+  print('profile',p['pid'],p['ownerThread'],'MAIN',p['main'])
+  for r in p['rows'][:10]:print(round(r['selfMs'],2),round(r['inclusiveMs'],2),r['frame'])

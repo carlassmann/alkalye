@@ -1,0 +1,14 @@
+{
+  "status": "SOURCE_ONLY_UNRUN",
+  "sourceCommit": "85a6e15f2665e6ee4092dc9d66f88c5e7aae56b8",
+  "sourceCRDT": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+  "runnerBeforeSHA256": "918190be858c8305567b030b9e501d58fdb7a7256770ae8a14f8493198c7f2c2",
+  "runnerSampledSHA256": "18ebe408c71a3f68cfb582c8da8c31980aad33b69fa3bfa8fb747762a13b468a",
+  "command": "PRODUCTION_SAMPLE_CPU=1 PRODUCTION_BODY_RUN=<FRESH_OWNED_RUN> bun production-body-gate.ts control rich1m --measure",
+  "cwd": "/tmp/alkalye-production-children-ordinal/runtime",
+  "scope": "One fresh accepted 1MiB actual production body input plus Undo, separate3s sampled windows; control dist immutable; no candidate comparison or latency gain claim",
+  "gates": "Existing exactnativefragment/source/caret/changedSaved/independentAPIreceipts/Undo/reload/per-armloadedJSpin gates unchanged",
+  "profileRequirement": "ProfileChunk on main owner of interaction:start with samples inside marked windows, source-mapped FunctionCall stacks; allinclusiveoverlaps nonadditive; retain GC event spans separately",
+  "ownershipLimit": "CPU samples attribute execution; timeline GC may show triggering stack but not retained allocation ownership. No HeapProfiler claim",
+  "failurePolicy": "Stop unavailable setup/unknown mutation; preserve cell, close scopes; no retry keys"
+}

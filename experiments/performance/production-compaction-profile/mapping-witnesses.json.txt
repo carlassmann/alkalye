@@ -1,0 +1,4025 @@
+[
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 3986,
+      "functionName": "We",
+      "lineNumber": 0,
+      "scriptId": 31,
+      "url": "http://127.0.0.1:4498/chunks/document-app-cqph2zrk.js"
+    },
+    "mapped": {
+      "source": "../src/shared/model.ts",
+      "line": 346,
+      "column": 34,
+      "name": ""
+    },
+    "loadedJSSHA256": "a80b61abd7b8f6a13b4d47ef27a1065be339f15cf097860833159c1deb008f00",
+    "sourceMapSHA256": "811e825322be1138e3784e9423bc2b02aed85decf62092642e49f8a99341359d",
+    "sourceSHA256": "70f8ce900a37b8a9bc3fab851528755367eba0eddac527610e4d88a53039cac8",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function* compactAtomSteps(",
+      "\tatoms: readonly Atom[],",
+      "\tcooperative: boolean,",
+      "): Generator<void, Atom[]> {",
+      "\tlet work = 0"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1347,
+      "functionName": "rawVisibleSteps",
+      "lineNumber": 40,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/crdt.ts",
+      "line": 1530,
+      "column": 26,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate *rawVisibleSteps(",
+      "\t\ttarget: string,",
+      "\t\tuntil: number | string,",
+      "\t\tcooperative: boolean,",
+      "\t): Generator<void, Atom[], void> {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 3215,
+      "functionName": "active",
+      "lineNumber": 17,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/text-visibility.ts",
+      "line": 219,
+      "column": 8,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "e9a76f46b757a8fa0aab4134492f43d76a497d1f062cacd052e02fca086947df",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tactive(operation: string) {",
+      "\t\tif (clock(operation) <= this.floor || !this.cancellers.has(operation))",
+      "\t\t\treturn true",
+      "\t\tlet stack = [this.node(operation)]",
+      "\t\twhile (stack.length) {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 5786,
+      "functionName": "B",
+      "lineNumber": 17,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/text-visibility.ts",
+      "line": 375,
+      "column": 15,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "e9a76f46b757a8fa0aab4134492f43d76a497d1f062cacd052e02fca086947df",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function clock(id: string) {",
+      "\treturn Number(id.slice(0, 16))",
+      "}",
+      "",
+      "let RemovalFactHeaderSchema = Schema.Struct({"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 8963,
+      "functionName": "Ut",
+      "lineNumber": 17,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/checkpoint.ts",
+      "line": 155,
+      "column": 33,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "4eda90d9ea075d2f25f25440012b6bf1e3aeaee917f6ca7ce7949524d27cbe79",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function* compactCheckpointSteps(",
+      "\tsnapshot: ReplicaCheckpoint,",
+      "\tcooperative: boolean,",
+      "): Generator<void, ReplicaCheckpoint | typeof CompactCheckpointSchema.Type> {",
+      "\tif ("
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1784,
+      "functionName": "",
+      "lineNumber": 0,
+      "scriptId": 30,
+      "url": "http://127.0.0.1:4498/chunks/document-app-y9jqc28f.js"
+    },
+    "mapped": {
+      "source": "../src/platform/effects.ts",
+      "line": 24,
+      "column": 41,
+      "name": ""
+    },
+    "loadedJSSHA256": "20713184b153ddd3111c39f2819aae4d9b363a0180dc816b59999533191c37f7",
+    "sourceMapSHA256": "9518573b962065e205ecc93ed3571d00962ba4790f4b51c83aa00b17477f9092",
+    "sourceSHA256": "f2e2150de87a67e73eb36f57941c10f2c68e35d16673d59cf3a9c43742a772de",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\tlet next = yield* attempt(operation, () => steps.next())",
+      "\t\t\tif (next.done) return next.value",
+      "\t\t\tif (++count === 16 || (yield* Clock.currentTimeMillis) >= deadline) {",
+      "\t\t\t\tyield* Effect.yieldNow",
+      "\t\t\t\tcount = 0"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 2367,
+      "functionName": "",
+      "lineNumber": 40,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/crdt.ts",
+      "line": 1598,
+      "column": 31,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\treturn Effect.gen(function* () {",
+      "\t\t\tlet cached = replica.strings.get(target)",
+      "\t\t\tif (cached !== undefined) return replica.text(target)",
+      "\t\t\tlet generation = replica.generation",
+      "\t\t\tlet visible = yield* cooperative(\"replica.visible\", () =>"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 3633,
+      "functionName": "hidden",
+      "lineNumber": 17,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/text-visibility.ts",
+      "line": 245,
+      "column": 8,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "e9a76f46b757a8fa0aab4134492f43d76a497d1f062cacd052e02fca086947df",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\thidden(atom: string) {",
+      "\t\tif (this.legacyRemoved.has(atom)) return true",
+      "\t\tif (!this.active(atom.slice(0, -9))) return true",
+      "\t\tfor (let remover of this.removers.get(atom) ?? [])",
+      "\t\t\tif (this.active(remover)) return true"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 633,
+      "functionName": "measuredBlock",
+      "lineNumber": 60,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/editor-viewport.ts",
+      "line": 628,
+      "column": 23,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate measuredBlock(",
+      "\t\tstart: number,",
+      "\t\ttop: number,",
+      "\t\tlimit = this.text.length,",
+      "\t): Block {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 19682,
+      "functionName": "",
+      "lineNumber": 0,
+      "scriptId": 39,
+      "url": "http://127.0.0.1:4498/chunks/document-worker-stats-rv552gtq.js"
+    },
+    "mapped": {
+      "source": "../src/client/document-worker-stats.ts",
+      "line": 88,
+      "column": 30,
+      "name": ""
+    },
+    "loadedJSSHA256": "617c9fee23dfcb02584008920f61db76e1c00580c41c0e59182d17dcec171d07",
+    "sourceMapSHA256": "cb6637894851e605f406c76917709041d924c4c92d3df934637003642fd29490",
+    "sourceSHA256": "a342d3fc091295b6b641266d94e6682e5a993042e891041f4a31b0da150dc274",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\treturn Effect.gen(function* () {",
+      "\t\tlet background = yield* BackgroundWork",
+      "\t\tlet start = 0",
+      "\t\tlet chunks = 0",
+      "\t\tlet deadline = (yield* Clock.currentTimeMillis) + 1"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1990,
+      "functionName": "Zt",
+      "lineNumber": 27,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/frontmatter-merge.ts",
+      "line": 454,
+      "column": 29,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "9b1d3afe8706817b8445736880166cc3b292911e2e61f7af669ab6d57fbd44f8",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function* sourceHeadersSteps(",
+      "\tatoms: Atom[],",
+      "\tcooperative: boolean,",
+      "): Generator<void, Header[], void> {",
+      "\tlet count = 0"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 3373,
+      "functionName": "projectionFor",
+      "lineNumber": 69,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/source-textarea.ts",
+      "line": 247,
+      "column": 23,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "462a7c6793951e3d2898258eb1bf6978915c9fd9d49d2ad852620afb569d171c",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate projectionFor(",
+      "\t\tsource: string,",
+      "\t\tactive: { start: number; end: number },",
+      "\t) {",
+      "\t\tlet mode = this.options.mode()"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 950,
+      "functionName": "bn",
+      "lineNumber": 13,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/shared/projection.ts",
+      "line": 171,
+      "column": 23,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function projectTokens(",
+      "\tsource: string,",
+      "\toptions: ProjectionOptions,",
+      "\ttokens: LinkToken[],",
+      ") {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 56751,
+      "functionName": "l",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/platform/indexeddb-journal.ts",
+      "line": 326,
+      "column": 19,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "4688e51f4278fc4884c6b6ec38a0381b453650849cdb3462cb01199dd4808e59",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tfunction publish() {",
+      "\t\t\tif (!checkedPosition || !checkedCache || !alive || previous > position)",
+      "\t\t\t\treturn",
+      "\t\t\tcache.put({ position, value }, \"projection\")",
+      "\t\t\tsaved = true"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 63,
+      "functionName": "Gr",
+      "lineNumber": 30,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/frontmatter-merge.ts",
+      "line": 562,
+      "column": 26,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "9b1d3afe8706817b8445736880166cc3b292911e2e61f7af669ab6d57fbd44f8",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function* sourceTextSteps(atoms: Atom[], cooperative: boolean) {",
+      "\tif (!cooperative) return sourceText(atoms)",
+      "\tlet values: string[] = []",
+      "\tlet count = 0",
+      "\tfor (let atom of atoms) {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 2963,
+      "functionName": "Sn",
+      "lineNumber": 13,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/shared/projection.ts",
+      "line": 359,
+      "column": 31,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function sameProjection(left: Projection, right: Projection) {",
+      "\treturn (",
+      "\t\tleft.source === right.source &&",
+      "\t\tleft.text === right.text &&",
+      "\t\tleft.links.length === right.links.length &&"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1236,
+      "functionName": "project",
+      "lineNumber": 11,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/shared/projection.ts",
+      "line": 87,
+      "column": 9,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tproject(source: string, options: ProjectionOptions = {}) {",
+      "\t\tlet documents = options.documents ?? []",
+      "\t\tlet key = documents.map(doc => doc.id + \":\" + doc.title).join(\"\\n\")",
+      "\t\tlet changed = key !== this.documents",
+      "\t\tthis.documents = key"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 212,
+      "functionName": "",
+      "lineNumber": 1234,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/library.ts",
+      "line": 159,
+      "column": 13,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "222fb5bb05a4b2c2b14e23084a5e5b2e765b5fdb33c474cabfab933221c99d82",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\t\t\t.every(term =>",
+      "\t\t\t\t\t\t`${doc.title} ${\"content\" in doc ? doc.content : doc.excerpt} ${doc.folder} ${doc.tags?.join(\" \")}`",
+      "\t\t\t\t\t\t\t.toLowerCase()",
+      "\t\t\t\t\t\t\t.includes(term),",
+      "\t\t\t\t\t),"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 604,
+      "functionName": "tt",
+      "lineNumber": 22,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/frontmatter-merge.ts",
+      "line": 135,
+      "column": 34,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "9b1d3afe8706817b8445736880166cc3b292911e2e61f7af669ab6d57fbd44f8",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function* sourceAtomsSteps(",
+      "\traw: Atom[],",
+      "\toriginalFrames: () => readonly Atom[][],",
+      "\tcooperative: boolean,",
+      "): Generator<void, Atom[], void> {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 10586,
+      "functionName": "qn",
+      "lineNumber": 1569,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/document-app.ts",
+      "line": 939,
+      "column": 22,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tfunction presenting() {",
+      "\t\t\tlet doc = currentDocument()",
+      "\t\t\tif (!doc) return false",
+      "\t\t\tif (presentationSource !== doc.content) {",
+      "\t\t\t\tpresentationSource = doc.content"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1847,
+      "functionName": "input",
+      "lineNumber": 69,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/source-textarea.ts",
+      "line": 161,
+      "column": 7,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "462a7c6793951e3d2898258eb1bf6978915c9fd9d49d2ad852620afb569d171c",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tinput() {",
+      "\t\tlet reprojected = false",
+      "\t\tlet caret = this.selectionEnd",
+      "\t\tfor (let edit of this.viewport.input()) {",
+      "\t\t\tlet range = sourceRange(this.current, edit.start, edit.end)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 124152,
+      "functionName": "o.port1.onmessage",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/client/scheduler.ts",
+      "line": 28,
+      "column": 17,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "814aa5e3277372171c8c9bb5d0a67cc2b6b8ce3c4a4782fa6e97a2c34fec4fa2",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tchannel.port1.onmessage = (event: MessageEvent<unknown>) => {",
+      "\t\t\tif (typeof event.data !== \"number\") return",
+      "\t\t\tdispatch(event.data)",
+      "\t\t}",
+      "\t\t// Native tasks avoid the browser's delay on repeatedly nested timers."
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1238,
+      "functionName": "update",
+      "lineNumber": 1521,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/statusbar.ts",
+      "line": 129,
+      "column": 8,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "1d4c80f7708f7a5bea8779e5fe396c9992c181ba11e9c5800884beb9b34e5468",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tupdate(content: string, unit: StatsUnit) {",
+      "\t\tthis.requested = true",
+      "\t\tif (unit === \"hidden\") this.stopWorker()",
+      "\t\tif (unit === this.pending) this.pending = undefined",
+      "\t\tif (content !== this.content || !this.available) {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 2483,
+      "functionName": "rt",
+      "lineNumber": 32,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/text-index.ts",
+      "line": 199,
+      "column": 17,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "79e7ea2f341bd5aa93462f8b93235ca10a36010000f66f397ef4c5fa7221a8e8",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function collect(",
+      "\tnode: Node | null,",
+      "\tstart: number,",
+      "\tend: number,",
+      "\tparts: string[],"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 2293,
+      "functionName": "gi",
+      "lineNumber": 2,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/shared/routes.ts",
+      "line": 206,
+      "column": 16,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "9362fb6790bad20299a9446cfddce97dc7379f8213ced8abcd77b099fd01fbcf",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function decode(segment: string) {",
+      "\ttry {",
+      "\t\treturn decodeURIComponent(segment)",
+      "\t} catch {",
+      "\t\treturn undefined"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 91748,
+      "functionName": "",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/shared/text-dependencies.ts",
+      "line": 22,
+      "column": 2,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "2bd205095e5a81b875d898d1b0db0f9419114b2eaab05f6a5dc17c9e085a7abb",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\treturn Effect.sync(() => {",
+      "\t\tlet inserted = new Map<string, { atom: Atom; change: Operation }>()",
+      "\t\tfor (let change of changes)",
+      "\t\t\tif (change.kind === \"text\")",
+      "\t\t\t\tfor (let atom of change.insert) inserted.set(atom.id, { atom, change })"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 99427,
+      "functionName": "replace",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/shared/document-session.ts",
+      "line": 546,
+      "column": 4,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\treplace: (",
+      "\t\t\t\treplacements: readonly TextReplacement[],",
+      "\t\t\t\tbase?: Atom[],",
+      "\t\t\t\ttarget = options.document,",
+      "\t\t\t) => {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1136,
+      "functionName": "",
+      "lineNumber": 13,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/shared/projection.ts",
+      "line": 186,
+      "column": 31,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tlet parts = token.parts.map(part => ({",
+      "\t\t\tsource: part.start,",
+      "\t\t\tview: view + prefix.length + part.offset,",
+      "\t\t\tlength: part.end - part.start,",
+      "\t\t}))"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 3061,
+      "functionName": "",
+      "lineNumber": 13,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/shared/projection.ts",
+      "line": 365,
+      "column": 4,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\t(link, index) =>",
+      "\t\t\t\tlink.kind === right.links[index]?.kind &&",
+      "\t\t\t\tlink.target === right.links[index]?.target &&",
+      "\t\t\t\tlink.source.start === right.links[index]?.source.start &&",
+      "\t\t\t\tlink.source.end === right.links[index]?.source.end &&"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 16305,
+      "functionName": "nt",
+      "lineNumber": 87,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/editor.ts",
+      "line": 921,
+      "column": 17,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tfunction update(content: string, nextAtoms: Atom[], nextEditable: boolean) {",
+      "\t\teditable = nextEditable",
+      "\t\ttextarea.readOnly = !editable",
+      "\t\tif (composing) {",
+      "\t\t\tdeferredUpdate = { content, atoms: nextAtoms, editable: nextEditable }"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 13230,
+      "functionName": "blockBoundary",
+      "lineNumber": 59,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/editor-viewport.ts",
+      "line": 588,
+      "column": 23,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate blockBoundary(offset: number, start: number) {",
+      "\t\tif (offset >= this.text.length || offset <= start) return offset",
+      "\t\tlet nearby = this.text.slice(offset - 1, offset + 1)",
+      "\t\tif (",
+      "\t\t\tnearby.charCodeAt(0) < 128 &&"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 956,
+      "functionName": "",
+      "lineNumber": 62,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/editor-viewport.ts",
+      "line": 744,
+      "column": 42,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tthis.idleFrame = requestAnimationFrame(() => {",
+      "\t\t\tthis.idleFrame = 0",
+      "\t\t\tif (",
+      "\t\t\t\t!this.composing &&",
+      "\t\t\t\t!this.dragging &&"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 2179,
+      "functionName": "vn",
+      "lineNumber": 13,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/shared/projection.ts",
+      "line": 292,
+      "column": 37,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function applyViewReplacement(",
+      "\tprojection: Projection,",
+      "\tprefix: number,",
+      "\tviewEnd: number,",
+      "\tinserted: string,"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 5556,
+      "functionName": "ot",
+      "lineNumber": 13,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/shared/projection.ts",
+      "line": 590,
+      "column": 15,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function shift(token: LinkToken, base: number): LinkToken {",
+      "\treturn {",
+      "\t\t...token,",
+      "\t\tstart: token.start + base,",
+      "\t\tend: token.end + base,"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1727,
+      "functionName": "",
+      "lineNumber": 0,
+      "scriptId": 30,
+      "url": "http://127.0.0.1:4498/chunks/document-app-y9jqc28f.js"
+    },
+    "mapped": {
+      "source": "../src/platform/effects.ts",
+      "line": 19,
+      "column": 30,
+      "name": ""
+    },
+    "loadedJSSHA256": "20713184b153ddd3111c39f2819aae4d9b363a0180dc816b59999533191c37f7",
+    "sourceMapSHA256": "9518573b962065e205ecc93ed3571d00962ba4790f4b51c83aa00b17477f9092",
+    "sourceSHA256": "f2e2150de87a67e73eb36f57941c10f2c68e35d16673d59cf3a9c43742a772de",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\treturn Effect.gen(function* () {",
+      "\t\tlet steps = createSteps()",
+      "\t\tlet count = 0",
+      "\t\tlet deadline = (yield* Clock.currentTimeMillis) + 2",
+      "\t\twhile (true) {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 16487,
+      "functionName": "G",
+      "lineNumber": 40,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/crdt.ts",
+      "line": 2430,
+      "column": 28,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function touchesSourceFence(source: string, start: number, end: number) {",
+      "\tlet first = source.lastIndexOf(\"\\n\", start - 1) + 1",
+      "\tlet last = source.indexOf(\"\\n\", end)",
+      "\treturn /^---[ \\t]*\\r?$/m.test(",
+      "\t\tsource.slice(first, last < 0 ? source.length : last),"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 45075,
+      "functionName": "",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/client/storage.ts",
+      "line": 252,
+      "column": 46,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "257a1ace0fdba86a2cf286a62ae678e9c888398360b67e02fa740225c23bcaeb",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\treturn Effect.callback<void, StorageError>(resume => {",
+      "\t\t\tlet transaction: IDBTransaction | undefined",
+      "\t\t\tlet finished = false",
+      "\t\t\ttry {",
+      "\t\t\t\ttransaction = this.database.transaction(names, \"readwrite\")"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1963,
+      "functionName": "blockAtHeight",
+      "lineNumber": 62,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/editor-viewport.ts",
+      "line": 807,
+      "column": 23,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate blockAtHeight(top: number) {",
+      "\t\tlet low = 0,",
+      "\t\t\thigh = this.blocks.length - 1",
+      "\t\twhile (low < high) {",
+      "\t\t\tlet middle = (low + high) >>> 1"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 2733,
+      "functionName": "get length",
+      "lineNumber": 32,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/text-index.ts",
+      "line": 218,
+      "column": 12,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "79e7ea2f341bd5aa93462f8b93235ca10a36010000f66f397ef4c5fa7221a8e8",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tget length() {",
+      "\t\treturn this.root?.length ?? 0",
+      "\t}",
+      "\tfork() {",
+      "\t\tlet index = new TextIndex(\"\")"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 120665,
+      "functionName": "documents",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/shared/document-session.ts",
+      "line": 1995,
+      "column": 3,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tdocuments: (room: string, includeDeleted = false) =>",
+      "\t\t\tstructuredClone(current().documents(room, includeDeleted)),",
+      "\t\tcheckpoint: () => structuredClone(current().checkpoint()),",
+      "\t\tforkEffect: (actor?: string, author?: string) =>",
+      "\t\t\tcurrent().forkEffect(actor, author),"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 5824,
+      "functionName": "",
+      "lineNumber": 40,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/crdt.ts",
+      "line": 1805,
+      "column": 60,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\tlet borrowed = yield* cooperative(\"replica.checkpoint\", () =>",
+      "\t\t\t\tsource.checkpointSteps(true, true),",
+      "\t\t\t)",
+      "\t\t\tunchanged()",
+      "\t\t\tlet compact = yield* compactCheckpointEffect(borrowed)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 821,
+      "functionName": "slice",
+      "lineNumber": 35,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/text-index.ts",
+      "line": 316,
+      "column": 7,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "79e7ea2f341bd5aa93462f8b93235ca10a36010000f66f397ef4c5fa7221a8e8",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tslice(start: number, end: number) {",
+      "\t\tlet parts: string[] = []",
+      "\t\tcollect(this.root, start, end, parts)",
+      "\t\treturn parts.join(\"\")",
+      "\t}"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 5059,
+      "functionName": "Ci.s.oninput",
+      "lineNumber": 87,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/editor.ts",
+      "line": 262,
+      "column": 21,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\ttextarea.oninput = () => {",
+      "\t\treleaseTab = false",
+      "\t\tlet source = text.input()",
+      "\t\tupdateHighlight()",
+      "\t\tif (composing) return"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 219,
+      "functionName": "k",
+      "lineNumber": 0,
+      "scriptId": 14,
+      "url": "http://127.0.0.1:4498/chunks/document-app-87ahz6jt.js"
+    },
+    "mapped": {
+      "source": "../src/client/dom.ts",
+      "line": 11,
+      "column": 23,
+      "name": ""
+    },
+    "loadedJSSHA256": "d05da989701642a2f751babcaf098d3503352db367b04d1fdffbea76cbd5a653",
+    "sourceMapSHA256": "ad511d13396b223df0816b5e88777cd998119f2a0660d59f12f5fdfbca9169a0",
+    "sourceSHA256": "35d4543b49e2c9baeeaf9243a76ef50a513655ab5b5420a7e4b107a3a2863970",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function button(",
+      "\taction: string,",
+      "\tlabel: string,",
+      "\ticon: string | Markup = \"\",",
+      "\textra = \"\","
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 25145,
+      "functionName": "",
+      "lineNumber": 241,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/browser-library.ts",
+      "line": 298,
+      "column": 32,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "14fb720b6cf121f800eb018e500c955f40b77bb371acff2b6709c0cc307b366e",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\treturn Effect.gen(function* () {",
+      "\t\t\t\tlet rows = yield* local.rows",
+      "\t\t\t\tlet updated = false",
+      "\t\t\t\tfor (let row of rows.filter(row => row.dirty || row.creation)) {",
+      "\t\t\t\t\tyield* Effect.scoped("
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 310,
+      "functionName": "refine",
+      "lineNumber": 62,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/editor-viewport.ts",
+      "line": 710,
+      "column": 16,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate refine(index: number, updateScroll = true) {",
+      "\t\tlet previous = this.blocks[index]",
+      "\t\tif (!previous || previous.measured) return",
+      "\t\tlet anchor = updateScroll",
+      "\t\t\t? this.offsetAtHeight(this.scrollElement.scrollTop)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 4552,
+      "functionName": "Xi",
+      "lineNumber": 2,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/shortcuts.ts",
+      "line": 110,
+      "column": 36,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "78e1ac49e85f4f4a457385cf537335438d3c9f79a2644abd32e9d3e3f61b4bb1",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function actionShortcutLabel(action: string, platform: string) {",
+      "\tlet clipboard = { cut: \"X\", \"copy-text\": \"C\", paste: \"V\" }",
+      "\tif (action === \"cut\" || action === \"copy-text\" || action === \"paste\")",
+      "\t\treturn (platform === \"mac\" ? \"\u2318\" : \"Ctrl+\") + clipboard[action]",
+      "\tlet shortcut = shortcuts.find(shortcut => shortcut.action === action)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 15059,
+      "functionName": "set",
+      "lineNumber": 40,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/crdt.ts",
+      "line": 2321,
+      "column": 5,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tset(id: string, entry: AtomIndexEntry) {",
+      "\t\tlet bucket = atomIndexBucket(id)",
+      "\t\tlet entries = this.buckets[bucket]",
+      "\t\tif (!entries) throw new Error(\"Missing atom index partition\")",
+      "\t\tif (!this.ownedBuckets[bucket]) {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 23207,
+      "functionName": "l",
+      "lineNumber": 0,
+      "scriptId": 24,
+      "url": "http://127.0.0.1:4498/chunks/document-app-kz0b5b6c.js"
+    },
+    "mapped": {
+      "source": "../src/client/language.ts",
+      "line": 11,
+      "column": 23,
+      "name": ""
+    },
+    "loadedJSSHA256": "aedd56e36db143543567a78699dedce91534bda64c3b7eb110bad1ec55522c84",
+    "sourceMapSHA256": "86bc94857a54b4820225879a968922ffd24d25310fb5239e74de19d1b7e8ed9f",
+    "sourceSHA256": "cacfbf9732f7b6b12edc214e072189df96cbd6bf420a8a0246dc46318208b80f",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function locale() {",
+      "\treturn selected === \"system\"",
+      "\t\t? typeof window !== \"undefined\" && navigator.language.startsWith(\"de\")",
+      "\t\t\t? \"de\"",
+      "\t\t\t: \"en\""
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 22,
+      "functionName": "se",
+      "lineNumber": 1652,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/document-app.ts",
+      "line": 2589,
+      "column": 16,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tfunction tool(action: string, label: string, name: IconName) {",
+      "\t\t\tlet shortcut = actionShortcutLabel(",
+      "\t\t\t\taction,",
+      "\t\t\t\t/Mac/i.test(navigator.platform) ? \"mac\" : \"other\",",
+      "\t\t\t)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 2102,
+      "functionName": "offsetAtHeight",
+      "lineNumber": 62,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/editor-viewport.ts",
+      "line": 818,
+      "column": 24,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate offsetAtHeight(top: number) {",
+      "\t\treturn this.blocks[this.blockAtHeight(top)]?.start ?? 0",
+      "\t}",
+      "\tprivate topAt(offset: number) {",
+      "\t\treturn this.blocks[this.blockAtOffset(offset)]?.top ?? 0"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1024,
+      "functionName": "h",
+      "lineNumber": 56,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/line-actions.ts",
+      "line": 62,
+      "column": 17,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "9d0367509bde4052a5f88161f871f1b003a81db7fee5f517d48972f596da44b9",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tfunction update() {",
+      "\t\tlet start =",
+      "\t\t\teditor.value.slice(0, editor.selectionStart).lastIndexOf(\"\\n\") + 1",
+      "\t\tlet end = editor.value.indexOf(\"\\n\", editor.selectionStart)",
+      "\t\tif (end < 0) end = editor.value.length"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 15702,
+      "functionName": "Ae",
+      "lineNumber": 40,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/crdt.ts",
+      "line": 2373,
+      "column": 22,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function atomIdentity(atom: Atom) {",
+      "\treturn JSON.stringify([",
+      "\t\tatom.after,",
+      "\t\tatom.value,",
+      "\t\tatom.order ?? null,"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 120617,
+      "functionName": "metadata",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/shared/document-session.ts",
+      "line": 1994,
+      "column": 3,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tmetadata: (target: string) => structuredClone(current().metadata(target)),",
+      "\t\tdocuments: (room: string, includeDeleted = false) =>",
+      "\t\t\tstructuredClone(current().documents(room, includeDeleted)),",
+      "\t\tcheckpoint: () => structuredClone(current().checkpoint()),",
+      "\t\tforkEffect: (actor?: string, author?: string) =>"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1138,
+      "functionName": "S",
+      "lineNumber": 19,
+      "scriptId": 31,
+      "url": "http://127.0.0.1:4498/chunks/document-app-cqph2zrk.js"
+    },
+    "mapped": {
+      "source": "../src/shared/markdown.ts",
+      "line": 159,
+      "column": 23,
+      "name": ""
+    },
+    "loadedJSSHA256": "a80b61abd7b8f6a13b4d47ef27a1065be339f15cf097860833159c1deb008f00",
+    "sourceMapSHA256": "811e825322be1138e3784e9423bc2b02aed85decf62092642e49f8a99341359d",
+    "sourceSHA256": "ffa8c2fb770a349740bbf62f72b8259e28398b3a56bfe190e401abe4149cd3d1",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function escape(text: string) {",
+      "\treturn text",
+      "\t\t.replaceAll(\"&\", \"&amp;\")",
+      "\t\t.replaceAll(\"<\", \"&lt;\")",
+      "\t\t.replaceAll(\">\", \"&gt;\")"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 17417,
+      "functionName": "",
+      "lineNumber": 1569,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/document-app.ts",
+      "line": 1522,
+      "column": 10,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\t\t.map(doc => {",
+      "\t\t\t\t\tif (doc.document === current?.id)",
+      "\t\t\t\t\t\treturn {",
+      "\t\t\t\t\t\t\t...current,",
+      "\t\t\t\t\t\t\t// A folder document is listed by its file name and location."
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 92553,
+      "functionName": "m",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/shared/text-dependencies.ts",
+      "line": 75,
+      "column": 4,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "2bd205095e5a81b875d898d1b0db0f9419114b2eaab05f6a5dc17c9e085a7abb",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\tfunction requireAtom(change: Operation, id: string) {",
+      "\t\t\t\trequireDependency(",
+      "\t\t\t\t\tchange,",
+      "\t\t\t\t\tid,",
+      "\t\t\t\t\t\"atom\","
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 3055,
+      "functionName": "update",
+      "lineNumber": 87,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/editor.ts",
+      "line": 119,
+      "column": 8,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tupdate(content: string, atoms: Atom[], editable: boolean) {",
+      "\t\tthis.view?.update(content, atoms, editable)",
+      "\t}",
+      "\tcommand(action: string) {",
+      "\t\tthis.view?.command(action)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 622,
+      "functionName": "L",
+      "lineNumber": 0,
+      "scriptId": 21,
+      "url": "http://127.0.0.1:4498/chunks/document-app-as6f3dg8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/portable-links.ts",
+      "line": 34,
+      "column": 28,
+      "name": ""
+    },
+    "loadedJSSHA256": "8518518541858b4a02b5300a8e4102cca47ec24445b2fd4033c11908fbe6bed9",
+    "sourceMapSHA256": "248d09132e72dc8e80be353701bb33a9c1b9b86c14befd87d521b042584d73b9",
+    "sourceSHA256": "7bcc7c538cea262a5240b829ac07af8d6b8071ccb19b3a1cfbebd9ae87af2400",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function wikiTargets(source: string) {",
+      "\tlet targets = new Set<string>()",
+      "\tfor (let match of source.matchAll(/\\[\\[([^\\]\\n|]+)/g)) {",
+      "\t\tlet target = (match[1] ?? \"\").trim()",
+      "\t\tif (target) targets.add(target.slice(0, 200))"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 7619,
+      "functionName": "Ft",
+      "lineNumber": 0,
+      "scriptId": 26,
+      "url": "http://127.0.0.1:4498/chunks/document-app-gseh3v8c.js"
+    },
+    "mapped": {
+      "source": "../src/shared/document-actions.ts",
+      "line": 428,
+      "column": 26,
+      "name": ""
+    },
+    "loadedJSSHA256": "4ec71ae1958879e40b4faccb7e2c320ef3bfeb5b4c6545b104bebdc189f1e5dc",
+    "sourceMapSHA256": "3fa909a1bf4abb117701bc38f39a899a313622fa82b3374fa0777588712a515b",
+    "sourceSHA256": "ce0306e866e2ee931a2d4472f3fc9298fed54c5443e24722eb7cd4b3f2f2eafe",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function actionOperations(",
+      "\taction: Pick<DocumentAction, \"id\" | \"actor\" | \"changes\">,",
+      ") {",
+      "\tlet changes = action.changes.map(parseOperation)",
+      "\tif ("
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 606,
+      "functionName": "V",
+      "lineNumber": 12,
+      "scriptId": 31,
+      "url": "http://127.0.0.1:4498/chunks/document-app-cqph2zrk.js"
+    },
+    "mapped": {
+      "source": "../src/shared/markdown.ts",
+      "line": 36,
+      "column": 33,
+      "name": ""
+    },
+    "loadedJSSHA256": "a80b61abd7b8f6a13b4d47ef27a1065be339f15cf097860833159c1deb008f00",
+    "sourceMapSHA256": "811e825322be1138e3784e9423bc2b02aed85decf62092642e49f8a99341359d",
+    "sourceSHA256": "ffa8c2fb770a349740bbf62f72b8259e28398b3a56bfe190e401abe4149cd3d1",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function frontmatterBlock(source: string) {",
+      "\tlet match = source.match(",
+      "\t\t/^(\\uFEFF?---[ \\t]*\\r?\\n)([\\s\\S]*?)(^---[ \\t]*(?:\\r?\\n|$))/m,",
+      "\t)",
+      "\treturn match?.index === 0 ? match : undefined"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 12873,
+      "functionName": "validateIdentities",
+      "lineNumber": 40,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/crdt.ts",
+      "line": 2195,
+      "column": 28,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate validateIdentities(operations: Operation[]) {",
+      "\t\tlet known = new Map<string, Operation>()",
+      "\t\tlet atoms = new Map<string, { target: string; atom: Atom }>()",
+      "\t\tfor (let operation of operations) {",
+      "\t\t\tlet previous ="
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 2645,
+      "functionName": "Pt",
+      "lineNumber": 13,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/shared/projection.ts",
+      "line": 332,
+      "column": 28,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function sourceRange(",
+      "\tprojection: Projection,",
+      "\tviewStart: number,",
+      "\tviewEnd: number,",
+      ") {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1671,
+      "functionName": "readSelection",
+      "lineNumber": 63,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/editor-viewport.ts",
+      "line": 1019,
+      "column": 23,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate readSelection(force = false) {",
+      "\t\tlet start = Math.max(0, this.element.selectionStart - this.prefix.length),",
+      "\t\t\tend = Math.max(0, this.element.selectionEnd - this.prefix.length)",
+      "\t\tif (",
+      "\t\t\t!force &&"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 8938,
+      "functionName": "",
+      "lineNumber": 17,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/checkpoint.ts",
+      "line": 151,
+      "column": 43,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "4eda90d9ea075d2f25f25440012b6bf1e3aeaee917f6ca7ce7949524d27cbe79",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\treturn cooperative(\"checkpoint.compact\", () =>",
+      "\t\tcompactCheckpointSteps(snapshot, true),",
+      "\t)",
+      "}",
+      "function* compactCheckpointSteps("
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1005,
+      "functionName": "wt",
+      "lineNumber": 1652,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/document-app.ts",
+      "line": 2680,
+      "column": 3,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tfunction refreshSafely() {",
+      "\t\t\ttry {",
+      "\t\t\t\treturn refreshDocument()",
+      "\t\t\t} catch (error) {",
+      "\t\t\t\treport(error)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 10276,
+      "functionName": "Xt",
+      "lineNumber": 87,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/editor.ts",
+      "line": 595,
+      "column": 21,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tfunction paintLinks() {",
+      "\t\tflushHighlight()",
+      "\t\tlet existing = [...links.querySelectorAll(\"a\")]",
+      "\t\tlet used = new Set<HTMLAnchorElement>()",
+      "\t\tlet available = new Map("
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 58366,
+      "functionName": "",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/platform/indexeddb-journal.ts",
+      "line": 441,
+      "column": 3,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "4688e51f4278fc4884c6b6ec38a0381b453650849cdb3462cb01199dd4808e59",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\ttx => {",
+      "\t\t\tlet position = after",
+      "\t\t\tlet rows: unknown[] = []",
+      "\t\t\tlet positions = tx.objectStore(\"positions\")",
+      "\t\t\tif (after > 0) {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 688,
+      "functionName": "k",
+      "lineNumber": 0,
+      "scriptId": 29,
+      "url": "http://127.0.0.1:4498/chunks/document-app-k10g3325.js"
+    },
+    "mapped": {
+      "source": "../src/shared/document-metadata.ts",
+      "line": 59,
+      "column": 33,
+      "name": ""
+    },
+    "loadedJSSHA256": "ee34538cc80f249ad7f0a6ca5385468d75f19bfd0cb4127d3f033daa5bea11e4",
+    "sourceMapSHA256": "ad41f0eb1e60e3693d7e51aa37e4f956f24314ff212b39235fb7bbad71c1f748",
+    "sourceSHA256": "4c73710d3968826e25fe02f3f6f4c3c16f8b035a770df31abee4d0517a64302d",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function documentMetadata(",
+      "\tsource: string,",
+      "\tlegacy: Record<string, string> = {},",
+      ") {",
+      "\tlet header = frontmatter(source)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 19507,
+      "functionName": "",
+      "lineNumber": 87,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/editor.ts",
+      "line": 1179,
+      "column": 39,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\tpaintFrame = requestAnimationFrame(() => {",
+      "\t\t\t\tflushHighlight()",
+      "\t\t\t\tpaintFrame = 0",
+      "\t\t\t\tpaintActiveLine()",
+      "\t\t\t\tpaintDecorations()"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 266,
+      "functionName": "nr",
+      "lineNumber": 32,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/text-index.ts",
+      "line": 86,
+      "column": 17,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "79e7ea2f341bd5aa93462f8b93235ca10a36010000f66f397ef4c5fa7221a8e8",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function combine(left: Summary, right: Summary): Summary {",
+      "\treturn {",
+      "\t\tlength: left.length + right.length,",
+      "\t\tnativeLength:",
+      "\t\t\tleft.nativeLength +"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 3580,
+      "functionName": "",
+      "lineNumber": 13,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/shared/projection.ts",
+      "line": 418,
+      "column": 25,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tparts: link.parts.map((part, index) =>",
+      "\t\t\tafter || index > edited",
+      "\t\t\t\t? {",
+      "\t\t\t\t\t\tsource: part.source + sourceShift,",
+      "\t\t\t\t\t\tview: part.view + viewShift,"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 16043,
+      "functionName": "mr",
+      "lineNumber": 40,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/crdt.ts",
+      "line": 2397,
+      "column": 24,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function freezeTextAtom(atom: Atom) {",
+      "\tif (Object.isFrozen(atom)) return",
+      "\tif (atom.order) Object.freeze(atom.order)",
+      "\tif (atom.observed) Object.freeze(atom.observed)",
+      "\tif (atom.deleted) Object.freeze(atom.deleted)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 56892,
+      "functionName": "u.onsuccess",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/platform/indexeddb-journal.ts",
+      "line": 338,
+      "column": 23,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "4688e51f4278fc4884c6b6ec38a0381b453650849cdb3462cb01199dd4808e59",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tcurrent.onsuccess = () => {",
+      "\t\t\tlet decoded = Schema.decodeUnknownOption(storedCache)(current.result)",
+      "\t\t\tif (Option.isNone(decoded)) {",
+      "\t\t\t\tcheckedCache = true",
+      "\t\t\t\tpublish()"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 108617,
+      "functionName": "Kt",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/shared/document-session.ts",
+      "line": 1249,
+      "column": 3,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tfunction detachedEntry(entry: EventJournal.Entry) {",
+      "\t\t\treturn {",
+      "\t\t\t\tidString: entry.idString,",
+      "\t\t\t\tevent: entry.event,",
+      "\t\t\t\tprimaryKey: entry.primaryKey,"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 28181,
+      "functionName": "",
+      "lineNumber": 241,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/browser-library.ts",
+      "line": 542,
+      "column": 9,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "14fb720b6cf121f800eb018e500c955f40b77bb371acff2b6709c0cc307b366e",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\t\t\t\t\t\tstate =>",
+      "\t\t\t\t\t\t\t\t\tstate.library.documents.find(",
+      "\t\t\t\t\t\t\t\t\t\tentry => entry.document === document,",
+      "\t\t\t\t\t\t\t\t\t)?.role,",
+      "\t\t\t\t\t\t\t),"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1188,
+      "functionName": "rebuild",
+      "lineNumber": 62,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/editor-viewport.ts",
+      "line": 760,
+      "column": 17,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate rebuild(first: number, edit?: Replacement) {",
+      "\t\tlet previous = this.blocks",
+      "\t\tlet blocks = previous.slice(0, first)",
+      "\t\tlet last = blocks.at(-1)",
+      "\t\tlet start = last?.end ?? 0,"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 3333,
+      "functionName": "paint",
+      "lineNumber": 62,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/editor-viewport.ts",
+      "line": 881,
+      "column": 15,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate paint(selectionMoved = false) {",
+      "\t\tif (this.composing || this.dragging) return",
+      "\t\tlet selected = this.selection.start !== this.selection.end",
+      "\t\tif (!selected) this.selectionDocument = false",
+      "\t\telse if (selectionMoved) {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 766,
+      "functionName": "estimatedBlock",
+      "lineNumber": 61,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/editor-viewport.ts",
+      "line": 678,
+      "column": 24,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate estimatedBlock(",
+      "\t\tstart: number,",
+      "\t\ttop: number,",
+      "\t\tend = Math.min(this.text.length, start + 1024),",
+      "\t): Block {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 124219,
+      "functionName": "",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/client/scheduler.ts",
+      "line": 33,
+      "column": 39,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "814aa5e3277372171c8c9bb5d0a67cc2b6b8ce3c4a4782fa6e97a2c34fec4fa2",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\treturn new Scheduler.MixedScheduler(\"async\", task => {",
+      "\t\t\tif (closed) {",
+      "\t\t\t\tlet timer = setTimeout(task, 0)",
+      "\t\t\t\treturn () => clearTimeout(timer)",
+      "\t\t\t}"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 5653,
+      "functionName": "",
+      "lineNumber": 241,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/local-documents.ts",
+      "line": 186,
+      "column": 37,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "9648bb9d4816013c5efa1edf77888ee549d02b1fc1d7ac54c69c7ea877939b49",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\t\tproposing: Effect.gen(function* () {",
+      "\t\t\t\t\tlet known = yield* storage.get(summaryPrefix + document)",
+      "\t\t\t\t\tif (known === undefined) {",
+      "\t\t\t\t\t\tlet summary = baseline()",
+      "\t\t\t\t\t\tif (!summary)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 5022,
+      "functionName": "",
+      "lineNumber": 241,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/local-documents.ts",
+      "line": 132,
+      "column": 24,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "9648bb9d4816013c5efa1edf77888ee549d02b1fc1d7ac54c69c7ea877939b49",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\treturn repaired.map(row => ({",
+      "\t\t\t\t...row,",
+      "\t\t\t\tcreation: pending.get(row.summary.document),",
+      "\t\t\t\tdirty: marked.has(row.summary.document),",
+      "\t\t\t}))"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 29,
+      "functionName": "",
+      "lineNumber": 30,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/frontmatter-merge.ts",
+      "line": 559,
+      "column": 19,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "9b1d3afe8706817b8445736880166cc3b292911e2e61f7af669ab6d57fbd44f8",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\treturn atoms.map(atom => atom.value).join(\"\")",
+      "}",
+      "",
+      "function* sourceTextSteps(atoms: Atom[], cooperative: boolean) {",
+      "\tif (!cooperative) return sourceText(atoms)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 58728,
+      "functionName": "l.onsuccess",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/platform/indexeddb-journal.ts",
+      "line": 464,
+      "column": 25,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "4688e51f4278fc4884c6b6ec38a0381b453650849cdb3462cb01199dd4808e59",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\t\t\t\tentry.onsuccess = () => {",
+      "\t\t\t\t\t\t\trows.push(entry.result)",
+      "\t\t\t\t\t\t}",
+      "\t\t\t\t\t}",
+      "\t\t\t\t} catch {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 123929,
+      "functionName": "r",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/client/scheduler.ts",
+      "line": 12,
+      "column": 3,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "814aa5e3277372171c8c9bb5d0a67cc2b6b8ce3c4a4782fa6e97a2c34fec4fa2",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tfunction dispatch(id: number) {",
+      "\t\t\tlet callback = callbacks.get(id)",
+      "\t\t\tcallbacks.delete(id)",
+      "\t\t\tcallback?.()",
+      "\t\t}"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 8754,
+      "functionName": "tt",
+      "lineNumber": 87,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/editor.ts",
+      "line": 509,
+      "column": 26,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tfunction paintActiveLine() {",
+      "\t\tflushHighlight()",
+      "\t\tlet hidden = !options.preferences.highlightCurrentLine",
+      "\t\tlet bounds: DOMRect | undefined",
+      "\t\tlet view: DOMRect | undefined"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 58449,
+      "functionName": "f.onsuccess",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/platform/indexeddb-journal.ts",
+      "line": 447,
+      "column": 25,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "4688e51f4278fc4884c6b6ec38a0381b453650849cdb3462cb01199dd4808e59",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\t\tcovered.onsuccess = () => {",
+      "\t\t\t\t\tif (covered.result === undefined) tx.abort()",
+      "\t\t\t\t}",
+      "\t\t\t}",
+      "\t\t\tlet range ="
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 314,
+      "functionName": "or",
+      "lineNumber": 36,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/atom-sequence.ts",
+      "line": 33,
+      "column": 18,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "94f6fb6946fae3ac58cf21f5587c61629b9e87a1e23374fe760a54675f0aaf46",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function atomView(sequence: Chunk.Chunk<Atom>): Atom[] {",
+      "\tfunction index(property: string | symbol) {",
+      "\t\tif (typeof property !== \"string\" || !/^(0|[1-9]\\d*)$/.test(property))",
+      "\t\t\treturn undefined",
+      "\t\tlet value = Number(property)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 10136,
+      "functionName": "ne",
+      "lineNumber": 87,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/editor.ts",
+      "line": 583,
+      "column": 16,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tfunction point(offset: number) {",
+      "\t\tflushHighlight()",
+      "\t\treturn overlay.point(offset)",
+      "\t}",
+      "\tfunction paintLinkHover() {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 123044,
+      "functionName": "n",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/client/document-lifecycle.ts",
+      "line": 30,
+      "column": 2,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "682b6af99f2128c2a3106112c5d56d407e4d9957b579fe484098ebbb24c7703a",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tfunction update() {",
+      "\t\tlet dirty = hasUnsaved()",
+      "\t\tif (dirty === attached) return",
+      "\t\tif (dirty) window.addEventListener(\"beforeunload\", preventUnload)",
+      "\t\telse window.removeEventListener(\"beforeunload\", preventUnload)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 44895,
+      "functionName": "r.onsuccess",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/client/storage.ts",
+      "line": 233,
+      "column": 25,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "257a1ace0fdba86a2cf286a62ae678e9c888398360b67e02fa740225c23bcaeb",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\t\trequest.onsuccess = () => resume(Effect.succeed(request.result))",
+      "\t\t\t\trequest.onerror = () =>",
+      "\t\t\t\t\tresume(",
+      "\t\t\t\t\t\tEffect.fail(",
+      "\t\t\t\t\t\t\tnew StorageError({ operation: name, cause: request.error }),"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 493,
+      "functionName": "",
+      "lineNumber": 83,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/editor-overlay.ts",
+      "line": 61,
+      "column": 36,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "6a457d3985f9a2562b21de4439490bbb9e6c83f711db73bea69490d2e711f4bf",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tlet documentsKey = documents.map(doc => doc.id + \":\" + doc.title).join(\"\\n\")",
+      "\t\tlet marks = JSON.stringify(selections)",
+      "\t\tlet mediaNames = new Map(",
+      "\t\t\tprojection.links",
+      "\t\t\t\t.filter(link => link.kind === \"media\")"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 48,
+      "functionName": "",
+      "lineNumber": 84,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/editor-overlay.ts",
+      "line": 65,
+      "column": 13,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "6a457d3985f9a2562b21de4439490bbb9e6c83f711db73bea69490d2e711f4bf",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\t\t.filter(link => link.kind === \"media\")",
+      "\t\t\t\t.map(link => [link.target, mediaIcon?.(link.target) ?? \"image\"]),",
+      "\t\t)",
+      "\t\tlet media = JSON.stringify([...mediaNames])",
+      "\t\tif ("
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 3151,
+      "functionName": "completeDocument",
+      "lineNumber": 62,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/editor-viewport.ts",
+      "line": 870,
+      "column": 26,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate completeDocument() {",
+      "\t\treturn (",
+      "\t\t\tthis.accessibleDocument ||",
+      "\t\t\tthis.denseDocument ||",
+      "\t\t\tthis.coarsePointer.matches ||"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 99721,
+      "functionName": "",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/shared/document-session.ts",
+      "line": 573,
+      "column": 17,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\t\t\tEffect.gen(function* () {",
+      "\t\t\t\t\t\tyield* requireOpen",
+      "\t\t\t\t\t\tyield* flush",
+      "\t\t\t\t\t\tyield* recovery.attempt(\"projection\")",
+      "\t\t\t\t\t\tlet creation = projection.creation()"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 37,
+      "functionName": "nativeOffset",
+      "lineNumber": 67,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/editor-viewport.ts",
+      "line": 1069,
+      "column": 22,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate nativeOffset(offset: number) {",
+      "\t\treturn (",
+      "\t\t\tthis.text.nativeOffset(offset) - this.text.nativeOffset(this.window.start)",
+      "\t\t)",
+      "\t}"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 56239,
+      "functionName": "",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/platform/indexeddb-journal.ts",
+      "line": 292,
+      "column": 29,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "4688e51f4278fc4884c6b6ec38a0381b453650849cdb3462cb01199dd4808e59",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\tEffect.callback<A, E, R>((resume, signal) => {",
+      "\t\t\t\tlet release: (() => void) | undefined",
+      "\t\t\t\tlocks",
+      "\t\t\t\t\t.request(database, { signal }, () => {",
+      "\t\t\t\t\t\tif (signal.aborted) return"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 16969,
+      "functionName": "Na",
+      "lineNumber": 1569,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/document-app.ts",
+      "line": 1486,
+      "column": 25,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tfunction documentLinks(): DocumentLink[] {",
+      "\t\t\tlet catalogue = library.state.current().library.documents",
+      "\t\t\tlet current = currentDocument()",
+      "\t\t\tlet key = JSON.stringify([",
+      "\t\t\t\tshowTrash,"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 2177,
+      "functionName": "replace",
+      "lineNumber": 87,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/editor-search.ts",
+      "line": 14,
+      "column": 10,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "c21de253110f41e3f7eee6a873f5ca5e86acac2f2ff464167829999e9bba5872",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\treplace(next: Range[]) {",
+      "\t\t\tfor (let range of ranges) highlight.delete(range)",
+      "\t\t\tranges = next",
+      "\t\t\tfor (let range of ranges) highlight.add(range)",
+      "\t\t\tif (highlight.size) {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 503,
+      "functionName": "l",
+      "lineNumber": 36,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/atom-sequence.ts",
+      "line": 45,
+      "column": 16,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "94f6fb6946fae3ac58cf21f5587c61629b9e87a1e23374fe760a54675f0aaf46",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tfunction slice(this: Atom[], start?: number, end?: number) {",
+      "\t\treturn nativeSlice.call(",
+      "\t\t\tthis === view ? Chunk.toReadonlyArray(sequence) : this,",
+      "\t\t\tstart,",
+      "\t\t\tend,"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1576,
+      "functionName": "Ne",
+      "lineNumber": 13,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/shared/projection.ts",
+      "line": 221,
+      "column": 23,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function toView(projection: Projection, offset: number) {",
+      "\tlet link = linkBefore(projection, offset, \"source\")",
+      "\tif (!link) return Math.max(0, Math.min(projection.text.length, offset))",
+      "\tif (offset >= link.source.end)",
+      "\t\treturn Math.max("
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 19262,
+      "functionName": "ge",
+      "lineNumber": 87,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/editor.ts",
+      "line": 1157,
+      "column": 25,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tfunction flushHighlight() {",
+      "\t\tif (!highlightPending) return",
+      "\t\thighlightPending = false",
+      "\t\tif (listeners.signal.aborted) return",
+      "\t\tlet ranges = [...secondarySelections].sort("
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 16615,
+      "functionName": "sn",
+      "lineNumber": 1569,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/document-app.ts",
+      "line": 1457,
+      "column": 27,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tfunction currentDocument(): DocumentRecord | undefined {",
+      "\t\t\tlet current = selection",
+      "\t\t\tif (!current) {",
+      "\t\t\t\tdocumentRecord = undefined",
+      "\t\t\t\treturn undefined"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 228,
+      "functionName": "update",
+      "lineNumber": 83,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/editor-overlay.ts",
+      "line": 40,
+      "column": 8,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "6a457d3985f9a2562b21de4439490bbb9e6c83f711db73bea69490d2e711f4bf",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tupdate(",
+      "\t\tprojection: Projection,",
+      "\t\tdocuments: readonly DocumentLink[],",
+      "\t\tmediaIcon: ((url: string) => IconName) | undefined,",
+      "\t\tselections: readonly Selection[],"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 6415,
+      "functionName": "checkpointSteps",
+      "lineNumber": 40,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/crdt.ts",
+      "line": 1847,
+      "column": 26,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate *checkpointSteps(",
+      "\t\tcooperative: boolean,",
+      "\t\tborrowAtoms = false,",
+      "\t): Generator<void, CausalReplicaCheckpoint> {",
+      "\t\tlet clock = this.clock"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 9456,
+      "functionName": "render",
+      "lineNumber": 59,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/editor-viewport.ts",
+      "line": 371,
+      "column": 8,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\trender(",
+      "\t\tsource: string,",
+      "\t\tselection?: ViewportSelection,",
+      "\t\toptions?: ViewportRenderOptions,",
+      "\t) {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 643,
+      "functionName": "apply",
+      "lineNumber": 70,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/source-textarea.ts",
+      "line": 302,
+      "column": 15,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "462a7c6793951e3d2898258eb1bf6978915c9fd9d49d2ad852620afb569d171c",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate apply(",
+      "\t\tnext: Projection,",
+      "\t\tselection: { start: number; end: number; direction?: Direction },",
+      "\t\treveal = false,",
+      "\t) {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1341,
+      "functionName": "update",
+      "lineNumber": 25,
+      "scriptId": 11,
+      "url": "http://127.0.0.1:4498/chunks/document-app-dgnh6jbw.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/menu.ts",
+      "line": 186,
+      "column": 8,
+      "name": ""
+    },
+    "loadedJSSHA256": "55b58ee094ebe1bd9a53e0223901d8cd61b5935e8030a2196f5375e3716751db",
+    "sourceMapSHA256": "711458ab13ad7b0ec0fd1e8142f2e1c10dd5cba874537553748bb6cabb490276",
+    "sourceSHA256": "234ef0f03f066c2075a884c9cc30a3234cc5ce126c0b94d43e5030ad5f849452",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tupdate(",
+      "\t\tchoices: readonly MenuChoice[] = this.choices,",
+      "\t\tcommands: readonly MenuCommand[] = this.commands,",
+      "\t) {",
+      "\t\tlet changed ="
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 2088,
+      "functionName": "cn",
+      "lineNumber": 1578,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/document-app.ts",
+      "line": 2270,
+      "column": 27,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tfunction refreshDocument() {",
+      "\t\t\tlet presencePainted = false",
+      "\t\t\tlet signedIn = account.state.current().status === \"signedIn\"",
+      "\t\t\tlet signIn = app.querySelector<HTMLElement>(",
+      "\t\t\t\t'#profile-menu [data-action=\"sign-in\"]',"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1858,
+      "functionName": "ir",
+      "lineNumber": 30,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/text-index.ts",
+      "line": 63,
+      "column": 17,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "79e7ea2f341bd5aa93462f8b93235ca10a36010000f66f397ef4c5fa7221a8e8",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function summary(text: string): Summary {",
+      "\tlet lines = text.split(\"\\n\")",
+      "\treturn {",
+      "\t\tlength: text.length,",
+      "\t\tnativeLength:"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 44733,
+      "functionName": "",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/client/storage.ts",
+      "line": 221,
+      "column": 33,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "257a1ace0fdba86a2cf286a62ae678e9c888398360b67e02fa740225c23bcaeb",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\treturn this.write(\"settings\", transaction => {",
+      "\t\t\tfor (let [key, value] of values)",
+      "\t\t\t\ttransaction.objectStore(\"settings\").put(value, key)",
+      "\t\t})",
+      "\t}"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 43039,
+      "functionName": "getPrefix",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/client/storage.ts",
+      "line": 59,
+      "column": 11,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "257a1ace0fdba86a2cf286a62ae678e9c888398360b67e02fa740225c23bcaeb",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tgetPrefix(prefix: string) {",
+      "\t\treturn this.read<unknown[]>(\"settings\", store =>",
+      "\t\t\tstore.getAll(IDBKeyRange.bound(prefix, prefix + \"\\uffff\")),",
+      "\t\t)",
+      "\t}"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 2463,
+      "functionName": "l",
+      "lineNumber": 17,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/text-visibility.ts",
+      "line": 170,
+      "column": 19,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "e9a76f46b757a8fa0aab4134492f43d76a497d1f062cacd052e02fca086947df",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tfunction* commit(): Generator<void> {",
+      "\t\t\tvisibility.generation++",
+      "\t\t\tfor (let atom of legacyRemoved) {",
+      "\t\t\t\tvisibility.legacyRemoved.add(atom)",
+      "\t\t\t\tif (cooperative && ++work % 512 === 0) yield"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 112481,
+      "functionName": "",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/shared/document-session.ts",
+      "line": 1512,
+      "column": 22,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\treturn Effect.gen(function* () {",
+      "\t\t\t\twhile (undoPosition < localPosition) {",
+      "\t\t\t\t\tlet page = yield* storage.readAfter(undoPosition, 100, localPosition)",
+      "\t\t\t\t\tif (!page.entries.length)",
+      "\t\t\t\t\t\treturn yield* conflict(\"Undo history lost its journal position\")"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 964,
+      "functionName": "Bt",
+      "lineNumber": 70,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/source-textarea.ts",
+      "line": 329,
+      "column": 20,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "462a7c6793951e3d2898258eb1bf6978915c9fd9d49d2ad852620afb569d171c",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function difference(before: string, after: string): SourceReplacement {",
+      "\tlet start = 0",
+      "\tlet blockLength = 4096",
+      "\tlet limit = Math.min(before.length, after.length)",
+      "\twhile ("
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 5247,
+      "functionName": "le",
+      "lineNumber": 0,
+      "scriptId": 31,
+      "url": "http://127.0.0.1:4498/chunks/document-app-cqph2zrk.js"
+    },
+    "mapped": {
+      "source": "../src/shared/model.ts",
+      "line": 450,
+      "column": 24,
+      "name": ""
+    },
+    "loadedJSSHA256": "a80b61abd7b8f6a13b4d47ef27a1065be339f15cf097860833159c1deb008f00",
+    "sourceMapSHA256": "811e825322be1138e3784e9423bc2b02aed85decf62092642e49f8a99341359d",
+    "sourceSHA256": "70f8ce900a37b8a9bc3fab851528755367eba0eddac527610e4d88a53039cac8",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function validTextClock(id: string) {",
+      "\tlet clock = Number(id.slice(0, 16))",
+      "\treturn Number.isSafeInteger(clock) && clock >= 1",
+      "}",
+      ""
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 92,
+      "functionName": "Vr",
+      "lineNumber": 1578,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/document-app.ts",
+      "line": 2149,
+      "column": 20,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tfunction announce(x = -1, y = -1) {",
+      "\t\t\tlet selected = selection",
+      "\t\t\tif (!selected) return Effect.void",
+      "\t\t\t// Heartbeats keep the presenter's laser where it last pointed, so a",
+      "\t\t\t// follower's laser does not blink off between pointer movements."
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 78,
+      "functionName": "l",
+      "lineNumber": 8,
+      "scriptId": 14,
+      "url": "http://127.0.0.1:4498/chunks/document-app-87ahz6jt.js"
+    },
+    "mapped": {
+      "source": "../src/client/dom.ts",
+      "line": 33,
+      "column": 29,
+      "name": ""
+    },
+    "loadedJSSHA256": "d05da989701642a2f751babcaf098d3503352db367b04d1fdffbea76cbd5a653",
+    "sourceMapSHA256": "ad511d13396b223df0816b5e88777cd998119f2a0660d59f12f5fdfbca9169a0",
+    "sourceSHA256": "35d4543b49e2c9baeeaf9243a76ef50a513655ab5b5420a7e4b107a3a2863970",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function updateMarkup(host: Element, value: string | Markup) {",
+      "\tlet markup = String(value)",
+      "\tif (renderedMarkup.get(host) === markup) return",
+      "\thost.innerHTML = markup",
+      "\trenderedMarkup.set(host, markup)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 31192,
+      "functionName": "mu",
+      "lineNumber": 241,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/browser-library.ts",
+      "line": 786,
+      "column": 25,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "14fb720b6cf121f800eb018e500c955f40b77bb371acff2b6709c0cc307b366e",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function freezeCatalogue(library: BrowserCatalogue): BrowserCatalogue {",
+      "\treturn Object.freeze({",
+      "\t\tworkspaces: Object.freeze(",
+      "\t\t\tlibrary.workspaces.map(workspace => Object.freeze({ ...workspace })),",
+      "\t\t),"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 106509,
+      "functionName": "",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/shared/document-session.ts",
+      "line": 1092,
+      "column": 27,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tlet replay = Effect.gen(function* () {",
+      "\t\t\tprojectionComplete = false",
+      "\t\t\tlet changed = false",
+      "\t\t\twhile (true) {",
+      "\t\t\t\tlet tail = yield* storage.readAfter(localPosition, 1000)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 5665,
+      "functionName": "",
+      "lineNumber": 40,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/crdt.ts",
+      "line": 1797,
+      "column": 31,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\treturn Effect.gen(function* () {",
+      "\t\t\tlet generation = source.generation",
+      "\t\t\tfunction unchanged() {",
+      "\t\t\t\tif (source.generation !== generation)",
+      "\t\t\t\t\tthrow new Error("
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 120,
+      "functionName": "directionMark",
+      "lineNumber": 60,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/editor-viewport.ts",
+      "line": 602,
+      "column": 23,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate directionMark(offset: number) {",
+      "\t\tif (offset <= 0 || /[\\r\\n]/.test(this.text.slice(offset - 1, offset)))",
+      "\t\t\treturn \"\"",
+      "\t\tlet line = this.text.nativeLineAt(offset),",
+      "\t\t\tstart = this.text.offsetAtNativeLine(line)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1086,
+      "functionName": "",
+      "lineNumber": 62,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/editor-viewport.ts",
+      "line": 751,
+      "column": 39,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\t\tlet index = this.blocks.findIndex(block => !block.measured)",
+      "\t\t\t\tif (index < 0) return",
+      "\t\t\t\tthis.readSelection()",
+      "\t\t\t\tthis.refine(index)",
+      "\t\t\t\tthis.paint()"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 888,
+      "functionName": "Ue",
+      "lineNumber": 32,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/text-index.ts",
+      "line": 112,
+      "column": 14,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "79e7ea2f341bd5aa93462f8b93235ca10a36010000f66f397ef4c5fa7221a8e8",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function leaf(text: string): Leaf {",
+      "\treturn { ...summary(text), kind: \"leaf\", text, height: 1 }",
+      "}",
+      "function branch(left: Node, right: Node): Branch {",
+      "\treturn {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 8172,
+      "functionName": "Pt",
+      "lineNumber": 0,
+      "scriptId": 26,
+      "url": "http://127.0.0.1:4498/chunks/document-app-gseh3v8c.js"
+    },
+    "mapped": {
+      "source": "../src/shared/document-actions.ts",
+      "line": 557,
+      "column": 34,
+      "name": ""
+    },
+    "loadedJSSHA256": "4ec71ae1958879e40b4faccb7e2c320ef3bfeb5b4c6545b104bebdc189f1e5dc",
+    "sourceMapSHA256": "3fa909a1bf4abb117701bc38f39a899a313622fa82b3374fa0777588712a515b",
+    "sourceSHA256": "ce0306e866e2ee931a2d4472f3fc9298fed54c5443e24722eb7cd4b3f2f2eafe",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function singleCancellationAction(",
+      "\treplica: Replica,",
+      "\taction: PreparedAction | CommittedAction,",
+      "\tactor: string,",
+      "\tlabel: string,"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 44281,
+      "functionName": "",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/client/storage.ts",
+      "line": 182,
+      "column": 4,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "257a1ace0fdba86a2cf286a62ae678e9c888398360b67e02fa740225c23bcaeb",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\tresume => {",
+      "\t\t\t\tlet values = new Map<string, unknown>()",
+      "\t\t\t\ttry {",
+      "\t\t\t\t\tlet transaction = this.database.transaction(\"settings\")",
+      "\t\t\t\t\tlet store = transaction.objectStore(\"settings\")"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 177,
+      "functionName": "d",
+      "lineNumber": 0,
+      "scriptId": 24,
+      "url": "http://127.0.0.1:4498/chunks/document-app-kz0b5b6c.js"
+    },
+    "mapped": {
+      "source": "../src/shared/html.ts",
+      "line": 12,
+      "column": 21,
+      "name": ""
+    },
+    "loadedJSSHA256": "aedd56e36db143543567a78699dedce91534bda64c3b7eb110bad1ec55522c84",
+    "sourceMapSHA256": "86bc94857a54b4820225879a968922ffd24d25310fb5239e74de19d1b7e8ed9f",
+    "sourceSHA256": "19efbf35675500cd6d9a58d0e5b1ed108c7b8f2c0bb060d05924807e0f31c714",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function html(parts: readonly string[], ...values: unknown[]) {",
+      "\treturn new Markup(",
+      "\t\tparts",
+      "\t\t\t.map((part, index) => {",
+      "\t\t\t\tlet value = values[index]"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1088,
+      "functionName": "previousGrapheme",
+      "lineNumber": 35,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/text-index.ts",
+      "line": 328,
+      "column": 18,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "79e7ea2f341bd5aa93462f8b93235ca10a36010000f66f397ef4c5fa7221a8e8",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tpreviousGrapheme(offset: number) {",
+      "\t\tif (offset <= 0) return 0",
+      "\t\tlet width = 2048",
+      "\t\twhile (true) {",
+      "\t\t\tlet start = Math.max(0, offset - width),"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 115214,
+      "functionName": "",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/shared/document-session.ts",
+      "line": 1687,
+      "column": 22,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\treturn Effect.gen(function* () {",
+      "\t\t\t\tif (value.kind === \"localCreated\") {",
+      "\t\t\t\t\tlet action = value.creation.action",
+      "\t\t\t\t\tif (hasBlobReferences(action))",
+      "\t\t\t\t\t\treturn yield* conflict("
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 43460,
+      "functionName": "c.onsuccess",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/client/storage.ts",
+      "line": 88,
+      "column": 25,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "257a1ace0fdba86a2cf286a62ae678e9c888398360b67e02fa740225c23bcaeb",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\t\trequest.onsuccess = () => {",
+      "\t\t\t\t\ttry {",
+      "\t\t\t\t\t\tlet next = update(request.result)",
+      "\t\t\t\t\t\tif (next !== request.result) {",
+      "\t\t\t\t\t\t\tchanged = true"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 4633,
+      "functionName": "h.check.D.message",
+      "lineNumber": 0,
+      "scriptId": 26,
+      "url": "http://127.0.0.1:4498/chunks/document-app-gseh3v8c.js"
+    },
+    "mapped": {
+      "source": "../src/shared/document-actions.ts",
+      "line": 131,
+      "column": 3,
+      "name": ""
+    },
+    "loadedJSSHA256": "4ec71ae1958879e40b4faccb7e2c320ef3bfeb5b4c6545b104bebdc189f1e5dc",
+    "sourceMapSHA256": "3fa909a1bf4abb117701bc38f39a899a313622fa82b3374fa0777588712a515b",
+    "sourceSHA256": "ce0306e866e2ee931a2d4472f3fc9298fed54c5443e24722eb7cd4b3f2f2eafe",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\taction => {",
+      "\t\t\tlet targets = new Set(action.changes.map(change => change.target))",
+      "\t\t\treturn (",
+      "\t\t\t\t(!action.guards.length || !!action.undoOf) &&",
+      "\t\t\t\tnew Set(action.guards.map(guard => guard.target)).size ==="
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 434,
+      "functionName": "Va",
+      "lineNumber": 1652,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/document-app.ts",
+      "line": 2629,
+      "column": 27,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\tfunction scheduleRefresh() {",
+      "\t\t\tif (refreshFrame) return",
+      "\t\t\trefreshFrame = requestAnimationFrame(() => {",
+      "\t\t\t\trefreshFrame = 0",
+      "\t\t\t\tif (events.signal.aborted) return"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 4726,
+      "functionName": "Pe",
+      "lineNumber": 0,
+      "scriptId": 31,
+      "url": "http://127.0.0.1:4498/chunks/document-app-cqph2zrk.js"
+    },
+    "mapped": {
+      "source": "../src/shared/model.ts",
+      "line": 413,
+      "column": 29,
+      "name": ""
+    },
+    "loadedJSSHA256": "a80b61abd7b8f6a13b4d47ef27a1065be339f15cf097860833159c1deb008f00",
+    "sourceMapSHA256": "811e825322be1138e3784e9423bc2b02aed85decf62092642e49f8a99341359d",
+    "sourceSHA256": "70f8ce900a37b8a9bc3fab851528755367eba0eddac527610e4d88a53039cac8",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function* deletionIds(",
+      "\truns: readonly (string | typeof DeletionRunSchema.Type)[],",
+      "\tmaximum = 4_000_000,",
+      ") {",
+      "\tlet count = 0"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 2096,
+      "functionName": "Ze",
+      "lineNumber": 0,
+      "scriptId": 31,
+      "url": "http://127.0.0.1:4498/chunks/document-app-cqph2zrk.js"
+    },
+    "mapped": {
+      "source": "../src/shared/model.ts",
+      "line": 232,
+      "column": 31,
+      "name": ""
+    },
+    "loadedJSSHA256": "a80b61abd7b8f6a13b4d47ef27a1065be339f15cf097860833159c1deb008f00",
+    "sourceMapSHA256": "811e825322be1138e3784e9423bc2b02aed85decf62092642e49f8a99341359d",
+    "sourceSHA256": "70f8ce900a37b8a9bc3fab851528755367eba0eddac527610e4d88a53039cac8",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function parseOperation(value: unknown): Operation {",
+      "\tlet record = decodeOperation(value)",
+      "\tlet operation: Operation = {",
+      "\t\tid: record.id,",
+      "\t\tclock: record.clock,"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 101700,
+      "functionName": "",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/shared/document-session.ts",
+      "line": 739,
+      "column": 18,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\t\t\t\tEffect.gen(function* () {",
+      "\t\t\t\t\t\t\tyield* requireOpen",
+      "\t\t\t\t\t\t\tyield* flushUnlocked",
+      "\t\t\t\t\t\t\tyield* recovery.attempt(\"projection\", projection.replay)",
+      "\t\t\t\t\t\t\tlet action = yield* Ref.get(prepared)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 60212,
+      "functionName": "s.oncomplete",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/platform/indexeddb-journal.ts",
+      "line": 585,
+      "column": 20,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "4688e51f4278fc4884c6b6ec38a0381b453650849cdb3462cb01199dd4808e59",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\ttx.oncomplete = () => {",
+      "\t\t\t\tfinished = true",
+      "\t\t\t\tresume(",
+      "\t\t\t\t\tEffect.try({ try: result, catch: cause => failure(method, cause) }),",
+      "\t\t\t\t)"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 19447,
+      "functionName": "xe",
+      "lineNumber": 87,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/editor.ts",
+      "line": 1176,
+      "column": 24,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tfunction schedulePaint() {",
+      "\t\tif (listeners.signal.aborted) return",
+      "\t\tif (!paintFrame)",
+      "\t\t\tpaintFrame = requestAnimationFrame(() => {",
+      "\t\t\t\tflushHighlight()"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1320,
+      "functionName": "lineAt",
+      "lineNumber": 87,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/editor-overlay.ts",
+      "line": 300,
+      "column": 16,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "6a457d3985f9a2562b21de4439490bbb9e6c83f711db73bea69490d2e711f4bf",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate lineAt(offset: number) {",
+      "\t\tlet low = 0,",
+      "\t\t\thigh = this.lines.length",
+      "\t\twhile (low < high) {",
+      "\t\t\tlet middle = (low + high) >>> 1"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 2826,
+      "functionName": "nativeOffset",
+      "lineNumber": 32,
+      "scriptId": 27,
+      "url": "http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js"
+    },
+    "mapped": {
+      "source": "../src/shared/text-index.ts",
+      "line": 226,
+      "column": 14,
+      "name": ""
+    },
+    "loadedJSSHA256": "b6943c270a0062285cc1bd7327cbd7ce490e37d9133e2c09f57275b43d233cf2",
+    "sourceMapSHA256": "d7deda9b3b414db41b7c2dd6d26f69c849da6f5aeb48009ef7ad6b537af56f82",
+    "sourceSHA256": "79e7ea2f341bd5aa93462f8b93235ca10a36010000f66f397ef4c5fa7221a8e8",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tnativeOffset(offset: number) {",
+      "\t\tlet bounded = Math.max(0, Math.min(this.length, offset))",
+      "\t\tif (this.root?.nativeLength === this.length) return bounded",
+      "\t\treturn prefix(this.root, bounded).nativeLength",
+      "\t}"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 13586,
+      "functionName": "ei",
+      "lineNumber": 87,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/editor.ts",
+      "line": 777,
+      "column": 27,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tfunction paintDecorations() {",
+      "\t\tflushHighlight()",
+      "\t\tif (listeners.signal.aborted) return",
+      "\t\tlet comments = options.comments()",
+      "\t\tif (searchPattern && searchSource !== text.value) {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 43217,
+      "functionName": "",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/client/storage.ts",
+      "line": 70,
+      "column": 49,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "257a1ace0fdba86a2cf286a62ae678e9c888398360b67e02fa740225c23bcaeb",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\treturn Effect.callback<boolean, StorageError>(resume => {",
+      "\t\t\tlet transaction: IDBTransaction | undefined",
+      "\t\t\tlet finished = false",
+      "\t\t\tlet changed = false",
+      "\t\t\tfunction fail(cause: unknown) {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 1438,
+      "functionName": "kn",
+      "lineNumber": 13,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/shared/projection.ts",
+      "line": 206,
+      "column": 20,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "a916e4b736add72aaebeff0bab3f1e22665b47dd34ebdb976c92166fe5d49a1e",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "function linkBefore(",
+      "\tprojection: Projection,",
+      "\toffset: number,",
+      "\tcoordinates: \"source\" | \"view\",",
+      ") {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 16697,
+      "functionName": "",
+      "lineNumber": 1569,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/document-app.ts",
+      "line": 1466,
+      "column": 30,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\t\t\t.library.documents.find(doc => doc.document === current?.document)",
+      "\t\t\t\t\t?.workspace ?? \"\"",
+      "\t\t\tlet version = current.opened.session.version()",
+      "\t\t\tif (",
+      "\t\t\t\tdocumentRecord?.selection !== current ||"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 76822,
+      "functionName": "",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/shared/document-observability.ts",
+      "line": 55,
+      "column": 33,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "89217c6eb62fa8a20cb5cf6c7209a3c67c7de2e875b1a0c10486147cc65f6b0b",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\t\treturn Effect.gen(function* () {",
+      "\t\t\t\t\tlet started = yield* Clock.currentTimeNanos",
+      "\t\t\t\t\treturn yield* work.pipe(",
+      "\t\t\t\t\t\tEffect.onExit(exit =>",
+      "\t\t\t\t\t\t\tEffect.gen(function* () {"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 60124,
+      "functionName": "",
+      "lineNumber": 7,
+      "scriptId": 20,
+      "url": "http://127.0.0.1:4498/chunks/document-app-2hyk45kb.js"
+    },
+    "mapped": {
+      "source": "../src/platform/indexeddb-journal.ts",
+      "line": 579,
+      "column": 60,
+      "name": ""
+    },
+    "loadedJSSHA256": "a3ae88cb7eb636c72d96828239626afb4706ca0141539541312af8c1aa8b882e",
+    "sourceMapSHA256": "71bba4bbe8685ec93ddc3244ed9273e258a78ec7ae6b135d86bef3f2d0bab0e0",
+    "sourceSHA256": "4688e51f4278fc4884c6b6ec38a0381b453650849cdb3462cb01199dd4808e59",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\treturn Effect.callback<A, EventJournal.EventJournalError>(resume => {",
+      "\t\tlet tx: IDBTransaction | undefined",
+      "\t\tlet finished = false",
+      "\t\ttry {",
+      "\t\t\ttx = db.transaction(stores, mode, { durability: \"strict\" })"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 337,
+      "functionName": "point",
+      "lineNumber": 87,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/components/editor-overlay.ts",
+      "line": 233,
+      "column": 7,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "6a457d3985f9a2562b21de4439490bbb9e6c83f711db73bea69490d2e711f4bf",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tpoint(offset: number) {",
+      "\t\tlet index = this.lineAt(offset)",
+      "\t\tlet line = this.lines[index]",
+      "\t\tif (!line) return { node: this.host, offset: 0 }",
+      "\t\tlet local = offset - line.start"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 267,
+      "functionName": "X",
+      "lineNumber": 12,
+      "scriptId": 31,
+      "url": "http://127.0.0.1:4498/chunks/document-app-cqph2zrk.js"
+    },
+    "mapped": {
+      "source": "../src/shared/markdown.ts",
+      "line": 17,
+      "column": 28,
+      "name": ""
+    },
+    "loadedJSSHA256": "a80b61abd7b8f6a13b4d47ef27a1065be339f15cf097860833159c1deb008f00",
+    "sourceMapSHA256": "811e825322be1138e3784e9423bc2b02aed85decf62092642e49f8a99341359d",
+    "sourceSHA256": "ffa8c2fb770a349740bbf62f72b8259e28398b3a56bfe190e401abe4149cd3d1",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "export function frontmatter(source: string): Frontmatter {",
+      "\tlet match = frontmatterBlock(source)",
+      "\tlet values: Record<string, string> = {}",
+      "\tlet data: Record<string, unknown> = {}",
+      "\tif (!match) return { body: source, values, data }"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 909,
+      "functionName": "",
+      "lineNumber": 1652,
+      "scriptId": 6,
+      "url": "http://127.0.0.1:4498/app.js"
+    },
+    "mapped": {
+      "source": "../src/client/document-app.ts",
+      "line": 2665,
+      "column": 12,
+      "name": ""
+    },
+    "loadedJSSHA256": "52ed0e571d931a729b1d6709f5eb73be8f570f8dc2873c9527706e047d15700b",
+    "sourceMapSHA256": "2a7aab57fb076d2cecf35be77be18b48bee398848372a1663f0312a62441d1b4",
+    "sourceSHA256": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\t\t\t\tEffect.tap(() =>",
+      "\t\t\t\t\tEffect.sync(() => {",
+      "\t\t\t\t\t\tif (",
+      "\t\t\t\t\t\t\t!events.signal.aborted &&",
+      "\t\t\t\t\t\t\tselection === selected &&"
+    ]
+  },
+  {
+    "rawFrame": {
+      "codeType": "JS",
+      "columnNumber": 3196,
+      "functionName": "render",
+      "lineNumber": 69,
+      "scriptId": 7,
+      "url": "http://127.0.0.1:4498/chunks/document-app-xzbjhn15.js"
+    },
+    "mapped": {
+      "source": "../src/client/source-textarea.ts",
+      "line": 234,
+      "column": 16,
+      "name": ""
+    },
+    "loadedJSSHA256": "6b425609fefc6857cbb77aee49cd7b382de109c4ff23e1bb9ccbc869bc5583d0",
+    "sourceMapSHA256": "9754e90385eecc3a327dd61b413e66687950d68932a99d3bbe525691b0a765d1",
+    "sourceSHA256": "462a7c6793951e3d2898258eb1bf6978915c9fd9d49d2ad852620afb569d171c",
+    "sourceContentMatchesFrozen": true,
+    "sourceSnippet": [
+      "\tprivate render(",
+      "\t\tsource: string,",
+      "\t\tselection: { start: number; end: number; direction?: Direction },",
+      "\t\treveal = false,",
+      "\t) {"
+    ]
+  }
+]

@@ -1,0 +1,47 @@
+trial 0 input 12.074 deferred 12.498 heap None
+profile 54383 20275650 MAIN True
+2185.2 2185.2 {'codeType': 'other', 'functionName': '(idle)', 'scriptId': 0}
+366.8 366.8 {'codeType': 'other', 'functionName': '(program)', 'scriptId': 0}
+95.36 95.36 {'codeType': 'other', 'functionName': '(garbage collector)', 'scriptId': 0}
+56.02 59.28 {'codeType': 'JS', 'columnNumber': 3986, 'functionName': 'We', 'lineNumber': 0, 'scriptId': 31, 'url': 'http://127.0.0.1:4498/chunks/document-app-cqph2zrk.js'}
+45.15 101.03 {'codeType': 'JS', 'columnNumber': 1347, 'functionName': 'rawVisibleSteps', 'lineNumber': 40, 'scriptId': 27, 'url': 'http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js'}
+42.91 98.11 {'codeType': 'JS', 'columnNumber': 1347, 'functionName': 'rawVisibleSteps', 'lineNumber': 40, 'scriptId': 27, 'url': 'http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js'}
+29.66 52.22 {'codeType': 'JS', 'columnNumber': 3215, 'functionName': 'active', 'lineNumber': 17, 'scriptId': 27, 'url': 'http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js'}
+28.58 51.54 {'codeType': 'JS', 'columnNumber': 3215, 'functionName': 'active', 'lineNumber': 17, 'scriptId': 27, 'url': 'http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js'}
+27.94 27.94 {'codeType': 'JS', 'functionName': 'getBoundingClientRect', 'scriptId': 0}
+22.96 22.96 {'codeType': 'JS', 'columnNumber': 5786, 'functionName': 'B', 'lineNumber': 17, 'scriptId': 27, 'url': 'http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js'}
+profile 54383 20275863 MAIN False
+2964.44 2964.44 {'codeType': 'other', 'functionName': '(idle)', 'scriptId': 0}
+10.04 10.04 {'codeType': 'other', 'functionName': '(program)', 'scriptId': 0}
+-0.01 -0.01 {'codeType': 'other', 'functionName': '(garbage collector)', 'scriptId': 0}
+profile 54383 20275910 MAIN False
+2862.62 2862.62 {'codeType': 'other', 'functionName': '(idle)', 'scriptId': 0}
+6.52 6.52 {'codeType': 'other', 'functionName': '(program)', 'scriptId': 0}
+3.26 4.75 {'codeType': 'JS', 'columnNumber': 810, 'functionName': 'yk', 'lineNumber': 36, 'scriptId': 3, 'url': 'http://127.0.0.1:4498/document-worker.js'}
+1.27 1.27 {'codeType': 'JS', 'columnNumber': 108, 'functionName': 'hg', 'lineNumber': 38, 'scriptId': 3, 'url': 'http://127.0.0.1:4498/document-worker.js'}
+0.5 0.5 {'codeType': 'other', 'functionName': '(garbage collector)', 'scriptId': 0}
+0.22 0.22 {'codeType': 'JS', 'columnNumber': 612, 'functionName': 'Sk', 'lineNumber': 36, 'scriptId': 3, 'url': 'http://127.0.0.1:4498/document-worker.js'}
+0.15 0.15 {'codeType': 'JS', 'columnNumber': 62692, 'functionName': '', 'lineNumber': 24, 'scriptId': 3, 'url': 'http://127.0.0.1:4498/document-worker.js'}
+0.14 4.89 {'codeType': 'JS', 'columnNumber': 732, 'functionName': 'mf', 'lineNumber': 36, 'scriptId': 3, 'url': 'http://127.0.0.1:4498/document-worker.js'}
+trial 1 input 0.584 deferred 11.408 heap None
+profile 54383 20275650 MAIN True
+2210.39 2210.39 {'codeType': 'other', 'functionName': '(idle)', 'scriptId': 0}
+359.19 359.19 {'codeType': 'other', 'functionName': '(program)', 'scriptId': 0}
+87.48 207.17 {'codeType': 'JS', 'columnNumber': 1347, 'functionName': 'rawVisibleSteps', 'lineNumber': 40, 'scriptId': 27, 'url': 'http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js'}
+87.45 87.45 {'codeType': 'other', 'functionName': '(garbage collector)', 'scriptId': 0}
+60.19 111.94 {'codeType': 'JS', 'columnNumber': 3215, 'functionName': 'active', 'lineNumber': 17, 'scriptId': 27, 'url': 'http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js'}
+57.23 57.23 {'codeType': 'JS', 'columnNumber': 3986, 'functionName': 'We', 'lineNumber': 0, 'scriptId': 31, 'url': 'http://127.0.0.1:4498/chunks/document-app-cqph2zrk.js'}
+51.76 51.76 {'codeType': 'JS', 'columnNumber': 5786, 'functionName': 'B', 'lineNumber': 17, 'scriptId': 27, 'url': 'http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js'}
+34.47 34.47 {'codeType': 'JS', 'functionName': 'getBoundingClientRect', 'scriptId': 0}
+10.32 67.55 {'codeType': 'JS', 'columnNumber': 8963, 'functionName': 'Ut', 'lineNumber': 17, 'scriptId': 27, 'url': 'http://127.0.0.1:4498/chunks/document-app-hmmmqqx8.js'}
+9.82 275.54 {'codeType': 'JS', 'columnNumber': 1784, 'functionName': '', 'lineNumber': 0, 'scriptId': 30, 'url': 'http://127.0.0.1:4498/chunks/document-app-y9jqc28f.js'}
+profile 54383 20275863 MAIN False
+2959.94 2959.94 {'codeType': 'other', 'functionName': '(idle)', 'scriptId': 0}
+2.38 2.38 {'codeType': 'other', 'functionName': '(program)', 'scriptId': 0}
+profile 54383 20275910 MAIN False
+2876.09 2876.09 {'codeType': 'other', 'functionName': '(idle)', 'scriptId': 0}
+2.86 4.58 {'codeType': 'JS', 'columnNumber': 810, 'functionName': 'yk', 'lineNumber': 36, 'scriptId': 3, 'url': 'http://127.0.0.1:4498/document-worker.js'}
+2.04 2.04 {'codeType': 'other', 'functionName': '(program)', 'scriptId': 0}
+1.51 1.51 {'codeType': 'JS', 'columnNumber': 108, 'functionName': 'hg', 'lineNumber': 38, 'scriptId': 3, 'url': 'http://127.0.0.1:4498/document-worker.js'}
+0.32 0.32 {'codeType': 'other', 'functionName': '(garbage collector)', 'scriptId': 0}
+0.21 0.21 {'codeType': 'JS', 'columnNumber': 5622, 'functionName': '', 'lineNumber': 6, 'scriptId': 3, 'url': 'http://127.0.0.1:4498/document-worker.js'}
