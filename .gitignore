@@ -13,3 +13,8 @@ example
 tsconfig.tsbuildinfo
 
 .data
+
+.wrangler
+.cloudflare
+.dev.vars
+.dev.vars.*

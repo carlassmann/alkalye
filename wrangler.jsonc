@@ -1,0 +1,36 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "alkalye-effect-rewrite",
+	"main": "src/cloudflare/index.ts",
+	"compatibility_date": "2026-10-09",
+	"compatibility_flags": ["nodejs_compat"],
+	"assets": {
+		"directory": "./dist",
+		"binding": "ASSETS",
+		"run_worker_first": true,
+		"html_handling": "none",
+	},
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "RELAY",
+				"class_name": "AlkalyeRelay",
+			},
+		],
+	},
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": ["AlkalyeRelay"],
+		},
+	],
+	"r2_buckets": [
+		{
+			"binding": "ASSETS_BUCKET",
+			"bucket_name": "alkalye-effect-rewrite-assets",
+		},
+	],
+	"observability": {
+		"enabled": true,
+	},
+}
