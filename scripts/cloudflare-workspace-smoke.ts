@@ -1,4 +1,4 @@
-import { mkdtemp } from "node:fs/promises"
+import { mkdtemp, symlink } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join, resolve } from "node:path"
 import { Database } from "bun:sqlite"
@@ -13,7 +13,11 @@ import { Signatures } from "../src/platform/signatures"
 import { webCryptoLayer } from "../src/platform/web-crypto"
 import { encode } from "../src/shared/base64"
 import { DocumentApi } from "../src/shared/document-api"
-import { buildAction, restoreSnapshot } from "../src/shared/document-actions"
+import {
+	buildAction,
+	restoreSnapshot,
+	undoAction,
+} from "../src/shared/document-actions"
 import { cookieLogin, livePoll, liveSocket } from "../tests/live-fixture"
 import type {
 	LiveLogin,
@@ -29,14 +33,16 @@ import { invitationDigest } from "../src/shared/invitations"
 let root = resolve(import.meta.dir, "..")
 let directory = await mkdtemp(join(tmpdir(), "alkalye-cloudflare-workspaces-"))
 let probeOnly = Bun.argv[2] === "--rpc-probe"
+let legacyMigration = Bun.argv[2] === "--legacy-migration"
 let requestedOrigin = Bun.argv[2] === "--origin" ? Bun.argv[3] : undefined
 if (
 	!probeOnly &&
+	!legacyMigration &&
 	Bun.argv.length > 2 &&
 	(!requestedOrigin || Bun.argv.length !== 4)
 )
 	throw Error(
-		"Usage: bun scripts/cloudflare-live-smoke.ts [--origin https://host]",
+		"Usage: bun scripts/cloudflare-workspace-smoke.ts [--rpc-probe|--legacy-migration]",
 	)
 let remote = requestedOrigin !== undefined
 let origin = requestedOrigin
@@ -46,6 +52,41 @@ if (remote && !origin.startsWith("https://"))
 	throw Error("Remote mode requires HTTPS")
 let config = join(directory, "wrangler.json")
 let gateway = join(directory, "workspace-gateway.ts")
+let legacyGateway = join(directory, "legacy-gateway.ts")
+if (legacyMigration) {
+	await symlink(
+		join(root, "node_modules"),
+		join(directory, "node_modules"),
+		"dir",
+	)
+	let historical = Bun.spawn(
+		["git", "show", "4792a3e:src/cloudflare/index.ts"],
+		{ cwd: root, stdout: "pipe", stderr: "pipe" },
+	)
+	let source = await new Response(historical.stdout).text()
+	ensure((await historical.exited) === 0, "Historical relay source unavailable")
+	let legacyEntry = join(directory, "legacy-entry.ts")
+	await Bun.write(
+		legacyEntry,
+		source
+			.replaceAll('from "../', 'from "' + root + "/src/")
+			.replaceAll('from "./', 'from "' + root + "/src/cloudflare/") +
+			'\nexport { AlkalyeWorkspace } from "' +
+			root +
+			'/src/cloudflare/workspace-object"\n',
+	)
+	await Bun.write(
+		legacyGateway,
+		(
+			await Bun.file(
+				join(root, "tests/cloudflare-workspace-gateway.ts.txt"),
+			).text()
+		)
+			.replaceAll('"../src/cloudflare/index"', JSON.stringify(legacyEntry))
+			.replaceAll("../src/", root + "/src/"),
+	)
+}
+
 await Bun.write(
 	gateway,
 	(
@@ -98,6 +139,17 @@ async function start() {
 		return
 	}
 	runs++
+	let configuration = Schema.decodeUnknownSync(
+		Schema.Record(Schema.String, Schema.Unknown),
+	)(JSON.parse(await Bun.file(config).text()))
+	await Bun.write(
+		config,
+		JSON.stringify({
+			...configuration,
+			main: legacyMigration && runs === 1 ? legacyGateway : gateway,
+		}),
+	)
+
 	let log = Bun.file(join(directory, `worker-${runs}.log`))
 	child = Bun.spawn(
 		[
@@ -295,6 +347,17 @@ try {
 	await run(
 		owner.api.documents.create({ payload: { workspace, action: birth } }),
 	)
+	let migrationBlob = new Uint8Array([0, 1, 127, 128, 255])
+	let migrationDigest = encode(
+		new Uint8Array(await crypto.subtle.digest("SHA-256", migrationBlob)),
+	)
+	if (legacyMigration)
+		await run(
+			owner.api.documents.putBlob({
+				params: { document, digest: migrationDigest },
+				payload: migrationBlob,
+			}),
+		)
 	phase = "second-workspace-isolation"
 	await run(
 		owner.api.workspaces.create({
@@ -570,6 +633,11 @@ try {
 	polling = undefined
 	if (!remote) {
 		phase = "cold-object-restart-and-resume"
+		let beforeMigration = await run(snapshot(owner, document))
+		let receiptBefore = await run(
+			owner.api.documents.action({ params: { document, action: first.id } }),
+		)
+
 		let ownerLogin = await cookieLogin(new URL(origin), 201)
 		polling = livePoll(ownerLogin)
 		await polling.open()
@@ -595,18 +663,118 @@ try {
 			reopened.text(document) === text,
 			"Cold object restart changed durable source",
 		)
+		if (legacyMigration) {
+			let restoredBlob = await run(
+				owner.api.documents.getBlob({
+					params: { document, digest: migrationDigest },
+				}),
+			)
+			ensure(
+				restoredBlob.length === migrationBlob.length &&
+					restoredBlob.every((byte, index) => byte === migrationBlob[index]),
+				"Migration changed blob bytes",
+			)
+			let afterMigration = await run(snapshot(owner, document))
+			let receiptAfter = await run(
+				owner.api.documents.action({ params: { document, action: first.id } }),
+			)
+			ensure(
+				afterMigration.log === beforeMigration.log &&
+					afterMigration.position === beforeMigration.position,
+				"Migration changed document log/position",
+			)
+			ensure(
+				JSON.stringify(receiptAfter) === JSON.stringify(receiptBefore),
+				"Migration changed accepted action",
+			)
+			ensure(
+				(await run(
+					owner.api.documents.commit({ params: { document }, payload: first }),
+				)) === accepted[0],
+				"Migration duplicate action lost original position",
+			)
+			let undo = await run(
+				undoAction(
+					reopened,
+					receiptAfter,
+					owner.subject + "-" + crypto.randomUUID(),
+				),
+			)
+			await run(
+				owner.api.documents.commit({ params: { document }, payload: undo }),
+			)
+			let undone = await run(
+				restoreSnapshot(
+					await run(snapshot(owner, document)),
+					crypto.randomUUID(),
+				),
+			)
+			ensure(
+				undone.text(document) === source + " WRITER",
+				"Migrated Undo changed peer contribution",
+			)
+			text = undone.text(document)
+			let secondary = await run(
+				restoreSnapshot(
+					await run(snapshot(owner, otherDocument)),
+					crypto.randomUUID(),
+				),
+			)
+			ensure(
+				secondary.text(otherDocument) === otherSource,
+				"Second legacy workspace migration differs",
+			)
+			ensure(
+				(await run(snapshot(reader, document).pipe(Effect.result)))._tag ===
+					"Failure",
+				"Migration restored revoked membership",
+			)
+		}
+
 		socket.close()
 		socket = undefined
 		await polling.close()
 		polling = undefined
 	}
 
+	if (legacyMigration) {
+		phase = "migrated-current-cold-restart"
+		await stop()
+		await start()
+		let restored = await run(
+			restoreSnapshot(
+				await run(snapshot(owner, document)),
+				crypto.randomUUID(),
+			),
+		)
+		ensure(
+			restored.text(document) === text,
+			"Post-migration restart lost accepted Undo",
+		)
+		let independent = await run(
+			restoreSnapshot(
+				await run(snapshot(owner, otherDocument)),
+				crypto.randomUUID(),
+			),
+		)
+		ensure(
+			independent.text(otherDocument) === otherSource,
+			"Post-migration restart crossed workspace source",
+		)
+		ensure(
+			(await run(snapshot(reader, document).pipe(Effect.result)))._tag ===
+				"Failure",
+			"Post-migration restart restored revoked reader",
+		)
+	}
 	phase = "closed-native-sqlite-partitions"
 	await stop()
 	let partitions: {
 		workspace: string | null
 		first: number
 		second: number
+		fences: number
+		receipts: number
 	}[] = []
 	for await (let path of new Bun.Glob("**/*.sqlite").scan({
 		cwd: join(directory, "state"),
@@ -641,7 +809,21 @@ try {
 						)
 						.get(otherDocument)?.count ?? 0)
 				: 0
-			partitions.push({ workspace: binding, first, second })
+			let fences = tables.includes("workspace_transfer_fences")
+				? (database
+						.query<{ count: number }, [string, string]>(
+							"SELECT COUNT(*) count FROM workspace_transfer_fences WHERE workspace IN (?,?)",
+						)
+						.get(workspace, otherWorkspace)?.count ?? 0)
+				: 0
+			let receipts = tables.includes("workspace_transfer_receipts")
+				? (database
+						.query<{ count: number }, [string, string]>(
+							"SELECT COUNT(*) count FROM workspace_transfer_receipts WHERE workspace IN (?,?)",
+						)
+						.get(workspace, otherWorkspace)?.count ?? 0)
+				: 0
+			partitions.push({ workspace: binding, first, second, fences, receipts })
 		} finally {
 			database.close()
 		}
@@ -662,15 +844,38 @@ try {
 	ensure(
 		partitions
 			.filter(row => row.workspace === null)
-			.every(row => row.first === 0 && row.second === 0),
+			.every(row =>
+				legacyMigration
+					? row.first + row.second === 0 || row.fences === 2
+					: row.first === 0 && row.second === 0,
+			),
 		"Primary database retained new document bodies",
 	)
+	if (legacyMigration)
+		ensure(
+			partitions
+				.filter(row => row.workspace !== null)
+				.every(row => row.receipts === 1),
+			"Migration receipt missing or duplicate",
+		)
 	await Bun.write(
 		join(directory, "result.json"),
 		JSON.stringify({
 			passed: true,
+			legacyMigration,
 			phases: [
 				"two-workspaces-isolated-native-sqlite",
+				...(legacyMigration
+					? [
+							"historical-relay-composition-cutover",
+							"exact-log-position-receipt",
+							"duplicate-action-idempotency",
+							"binary-blob-preserved",
+							"migrated-undo-preserves-peer",
+							"post-migration-cold-restart",
+							"source-fences-target-receipts",
+						]
+					: []),
 				"invitation-acceptance-and-revocation",
 				"scoped-key-and-mcp-attenuation",
 				"untrusted-identity-headers-denied",
