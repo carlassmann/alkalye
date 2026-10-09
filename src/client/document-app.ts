@@ -644,24 +644,6 @@ function mountApplication() {
 						writable()
 					)
 						changeMode("edit")
-				} else if (
-					(mode === "slideshow" || mode === "teleprompter") &&
-					!document.querySelector(
-						'[role="menu"]:popover-open, [role="listbox"]:popover-open',
-					) &&
-					!event.altKey &&
-					!event.metaKey &&
-					!event.ctrlKey &&
-					!(
-						event.target instanceof Element &&
-						event.target.closest("input, textarea, select, [contenteditable]")
-					) &&
-					["ArrowRight", "ArrowLeft", "PageDown", "PageUp"].includes(event.key)
-				) {
-					event.preventDefault()
-					presentation?.change(
-						event.key === "ArrowLeft" || event.key === "PageUp" ? -1 : 1,
-					)
 				}
 			},
 			{ signal: events.signal },

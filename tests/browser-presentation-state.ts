@@ -26,6 +26,16 @@ try {
 		session,
 		'document.querySelector("alkalye-presentation").dataset.slide === "2"',
 	)
+	browser(session, "press", "PageUp")
+	wait(
+		session,
+		'document.querySelector("alkalye-presentation").dataset.slide === "1"',
+	)
+	browser(session, "press", "PageDown")
+	wait(
+		session,
+		'document.querySelector("alkalye-presentation").dataset.slide === "2"',
+	)
 	wait(
 		session,
 		'document.querySelector("#save-status").textContent === "Saved"',

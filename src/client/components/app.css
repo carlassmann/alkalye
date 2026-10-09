@@ -75,11 +75,13 @@
 	color: var(--muted);
 	font-size: 12px;
 }
-[data-app].mode-slideshow {
+[data-app]#app.mode-slideshow {
 	grid-template-columns: 0 minmax(0, 1fr) 0 !important;
+	transition: none;
 }
-[data-app].mode-teleprompter {
+[data-app]#app.mode-teleprompter {
 	grid-template-columns: 0 minmax(0, 1fr) 0 !important;
+	transition: none;
 }
 [data-app].mode-slideshow .library {
 	display: none;

@@ -418,7 +418,8 @@ function presentationView(host: HTMLElement, options: PresentationOptions) {
 			slideIndex = slideTarget
 			if (index !== undefined) {
 				rememberedItems.set(documentId, index)
-				persisted = index
+				// Keep the last observed position until the asynchronous write arrives.
+				persisted = options.position?.()
 				options.present?.(index)
 			}
 			prompter?.select(index)
@@ -483,9 +484,26 @@ function presentationView(host: HTMLElement, options: PresentationOptions) {
 		function navigate(event: KeyboardEvent) {
 			if (event.defaultPrevented || event.metaKey || event.ctrlKey) return
 			if (event.altKey || document.querySelector("dialog[open]")) return
+			if (
+				document.querySelector(
+					'[role="menu"]:popover-open, [role="listbox"]:popover-open',
+				)
+			)
+				return
 			let target = event.target instanceof Element ? event.target : undefined
 			if (target?.closest("input, textarea, select, [contenteditable]")) return
 			if (target?.closest("[popover]")) return
+			let slideDirection =
+				event.key === "ArrowLeft" || event.key === "PageUp"
+					? -1
+					: event.key === "ArrowRight" || event.key === "PageDown"
+						? 1
+						: 0
+			if (slideDirection) {
+				event.preventDefault()
+				change(slideDirection)
+				return
+			}
 			if (!prompter) {
 				if (event.key === " ") {
 					event.preventDefault()

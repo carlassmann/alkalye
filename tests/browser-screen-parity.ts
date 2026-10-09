@@ -186,16 +186,21 @@ function verifySlideshow() {
 		),
 		"Slideshow opens at the teleprompter's shared slide",
 	)
+	let layout = evaluate(
+		session,
+		`(() => {
+			let bounds = document.querySelector("#slide").getBoundingClientRect();
+			if (bounds.width === innerWidth && bounds.height === innerHeight &&
+				document.querySelector(".presentation-controls") === null) return "fills";
+			return JSON.stringify({width: bounds.width, height: bounds.height,
+				viewportWidth: innerWidth, viewportHeight: innerHeight,
+				columns: getComputedStyle(document.querySelector("#app")).gridTemplateColumns});
+		})()`,
+	)
 	assert(
-		evaluate(
-			session,
-			`(() => {
-				let bounds = document.querySelector("#slide").getBoundingClientRect();
-				return bounds.width === innerWidth && bounds.height === innerHeight &&
-					document.querySelector(".presentation-controls") === null
-			})()`,
-		),
-		"The slide fills the window with no toolbar, as in the original",
+		layout === "fills",
+		"The slide fills the window with no toolbar, as in the original: " +
+			String(layout),
 	)
 	browser(session, "click", ".presentation-canvas")
 	wait(
@@ -563,7 +568,7 @@ function verifySettings() {
 			`(() => {
 				let titles = [...document.querySelectorAll("#settings-general .settings-section h2")].map(title => title.textContent.trim());
 				let themes = [...document.querySelectorAll('alkalye-picker[name="appearance"] [role=option]')];
-				return titles.join() === "Profile,Cloud Sync & Backup,Appearance" &&
+				return titles.join() === "Profile,Cloud Sync & Backup,Appearance,Email sign-in" &&
 					themes.map(option => option.dataset.value).join() === "light,dark,system" &&
 					themes.every(option => option.querySelector("svg")) &&
 					document.querySelector("#settings-general #account-id").readOnly
