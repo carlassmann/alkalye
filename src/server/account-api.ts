@@ -33,6 +33,7 @@ import { AgentStore } from "./agent-store"
 import { RelaySettings } from "./settings"
 import { Cipher } from "../platform/cipher"
 import { OAuth } from "./oauth"
+import { ClientMetadata } from "./client-metadata"
 
 export class AccountApplication extends Context.Service<
 	AccountApplication,
@@ -55,6 +56,7 @@ function makeAccountApplication() {
 			database.oauth,
 			credentials,
 			cipher,
+			yield* ClientMetadata,
 			settings.publicOrigin,
 		)
 

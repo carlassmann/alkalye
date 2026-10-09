@@ -7,7 +7,7 @@ import { attempt, promise } from "../platform/effects"
 import { ApplicationError } from "../platform/errors"
 import type { Cipher } from "../platform/cipher"
 import { isInfrastructureFailure } from "./failures"
-import { clientMetadata, redirectUris } from "./client-metadata"
+import { ClientMetadata, redirectUris } from "./client-metadata"
 import type { OAuthDatabase } from "./oauth-database"
 import type { AgentCredentials } from "./agent-credentials"
 import { OAuthGrants } from "./oauth-grants"
@@ -18,6 +18,7 @@ export class OAuth {
 		private database: OAuthDatabase,
 		private mcp: Context.Service.Shape<typeof AgentCredentials>,
 		private cipher: Context.Service.Shape<typeof Cipher>,
+		private metadata: Context.Service.Shape<typeof ClientMetadata>,
 		private publicOrigin?: string,
 	) {
 		this.grants = new OAuthGrants(database, mcp, cipher)
@@ -127,7 +128,7 @@ export class OAuth {
 					),
 					state = url.searchParams.get("state") ?? ""
 				if (id.startsWith("https://")) {
-					let metadata = yield* clientMetadata(id)
+					let metadata = yield* self.metadata.load(id)
 					yield* self.database.putClient(id, metadata.name, metadata.redirects)
 				}
 				let client = yield* self.database.client(id)
