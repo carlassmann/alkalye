@@ -1,9 +1,11 @@
 # Cloudflare deployment
 
 The browser bundle and service worker stay unchanged. A Worker serves static
-files and forwards API, OAuth, MCP and live requests to one named Durable Object.
-The object runs the same Effect application used by Bun. Its SQLite database
-stores accounts, permissions, document events and immediately readable snapshots.
+files and forwards API, OAuth, MCP and live requests to an authenticated gateway.
+The gateway stores accounts, credentials and routing metadata. Each workspace
+has its own named SQLite Durable Object running the same Effect document module
+used by Bun. That workspace stores permissions, document events and immediately
+readable snapshots; directory membership hints never authorize access.
 WebSocket and HTTP polling clients share that application and authorization path.
 R2 stores attachment bytes. SQLite records their verified sizes and object
 receipts, so current permissions and quotas govern access through the API.
@@ -56,6 +58,8 @@ bun run cloudflare:check
 bun run cloudflare:smoke
 bun run cloudflare:sqlite-smoke
 bun run cloudflare:live-smoke
+bun run cloudflare:workspace-smoke
+bun run cloudflare:migration-smoke
 bun run cloudflare:deploy
 ```
 
@@ -64,16 +68,33 @@ Worker without publishing. The smoke test uses isolated local Workers storage
 and exercises the real application. Deployment uploads the Worker and static
 assets and applies the Durable Object migration.
 
+Workspace tests exercise separate native SQLite objects, invitations and
+revocation, scoped MCP access, WebSocket and polling reconnects, and cold
+restart. Migration tests seed the prior single-object composition, then verify
+exact history positions, action retries, attachments and collaborative Undo
+after moving the journal and restarting again.
+
 For local development, put a private test key in `.dev.vars`, then run
 `bun run cloudflare:dev`. Open http://127.0.0.1:8787/app. `.dev.vars` and local
 Workers state are ignored by Git.
 
 ## Current limits
 
-The first deployment uses one SQLite Durable Object to retain transactions
-across account, workspace and document permissions. It is not sharded. D1 is
-not used: its batch API cannot replace these interactive transactions without
-changing the permission and event-commit model.
+Workspace documents share one object so permission checks and document commits
+remain local transactions. Existing gateway journals migrate on first access:
+freeze writes, copy the complete workspace, verify a durable import receipt,
+then switch routing. Retries resume the same transfer. Document history, action
+IDs and pending-client retry receipts are preserved. D1 is not used.
+
+Browser typing is persisted as bounded bursts rather than one event per key.
+CRDT operation identities remain unchanged for concurrent merging and Undo;
+batching reduces journal events and sync requests, rather than deleting history
+or claiming that the operation payload disappears.
+
+Authentication and live notification routing still share one gateway. Workspace
+partitioning distributes document storage and execution; it does not remove
+every shared-service bottleneck. Migrated source journals remain fenced and
+retained; automatic deletion is not enabled.
 
 Sockets use regular acceptance. Hibernation would require restoring authenticated
 peers and scoped subscriptions. Disconnects and object restarts already use the

@@ -24,6 +24,8 @@
 		"cloudflare:check": "bun scripts/cloudflare.ts check",
 		"cloudflare:smoke": "bun scripts/cloudflare-smoke.ts",
 		"cloudflare:live-smoke": "bun scripts/cloudflare-live-smoke.ts",
+		"cloudflare:workspace-smoke": "bun scripts/cloudflare-workspace-smoke.ts",
+		"cloudflare:migration-smoke": "bun scripts/cloudflare-workspace-smoke.ts --legacy-migration",
 		"cloudflare:sqlite-smoke": "bun scripts/cloudflare-sqlite-smoke.ts"
 	},
 	"devDependencies": {

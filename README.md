@@ -19,9 +19,10 @@ NODE_ENV=production bun run start
 
 ## Cloudflare
 
-The Worker serves the app shell and uses a SQLite Durable Object for the same
-Effect server application. Attachment bytes live in R2; permissions, quotas,
-events and snapshots stay in SQLite. WebSockets and polling remain available.
+The Worker serves the app shell. Each workspace has a SQLite Durable Object for
+its permissions, document events and snapshots. A shared gateway authenticates
+requests and routes them to the workspace; attachment bytes live in R2.
+WebSockets and polling remain available.
 See [deployment, configuration and platform limits](docs/cloudflare.md).
 
 ## Email sign-in
@@ -38,7 +39,7 @@ Integration tests use an injected delivery service or an explicitly enabled `ALK
 
 The browser, CLI and MCP use the same document protocol. Each document has one event stream for source, comments, attachment references, drawings, themes and access changes. Opening downloads a current snapshot; older history loads on demand. Frontmatter owns document metadata. Sidebar entries cache its derived values.
 
-Browser actions commit to an IndexedDB journal before publication. CLI actions use the same Effect EventLog and document session with a Bun SQLite journal. Cached documents open offline, pending actions survive restarts, and synchronization publishes them after reconnecting. Text uses an operation-based CRDT. Whole-document undo records compensating actions and preserves other writers’ changes.
+Typing appears immediately and commits to IndexedDB in bursts: after 250 ms of quiet, or within one second of continued typing. Selection changes and composition boundaries separate undo groups; navigation and hiding the page flush pending edits. The Saved indicator confirms persistence. Only durable actions are published. CLI actions use the same Effect EventLog and document session with a Bun SQLite journal. Cached documents open offline, durable pending actions survive restarts, and synchronization publishes them after reconnecting. Text uses an operation-based CRDT. Whole-document undo records compensating actions and preserves other writers’ changes.
 
 Whiteboards mount tldraw inside a Web Component. An Effect scope owns the React root, store listeners, queued saves and cursor presence. Each tldraw record occupies a document register field and names its schema, so interrupted upgrades remain readable. Shape edits use the same journal, synchronization and history as other document actions. Cached light and dark previews let documents and slides show drawings without mounting the editor.
 

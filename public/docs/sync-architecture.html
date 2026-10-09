@@ -1049,10 +1049,13 @@
 						notification routing and coordinated storage.
 					</li>
 					<li>
-						<strong>Current deployment targets Bun.</strong> Cloudflare
-						deployment would require platform adapters and distributed
-						coordination work. There is no current Worker deployment behind this
-						walkthrough.
+						<strong>Bun and Cloudflare run the same document module.</strong>
+						On Cloudflare, each workspace owns a SQLite Durable Object;
+						attachments live in R2. A shared gateway handles authentication,
+						routing and live notifications. Workspace partitioning distributes
+						document storage, while those shared services remain a scaling
+						boundary. Sockets currently use regular acceptance, without
+						hibernation.
 					</li>
 					<li>
 						<strong
