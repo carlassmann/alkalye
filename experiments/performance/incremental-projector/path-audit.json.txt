@@ -1,0 +1,16 @@
+{
+  "writeRoot": "/tmp/alkalye-projector-certified-edit",
+  "runtime": "/tmp/alkalye-projector-certified-edit/app-runtime",
+  "workStateRoot": "/tmp/alkalye-projector-certified-edit-work-state",
+  "workProject": "alkalye-projector-certified-edit",
+  "workspace": "codex-projector-proof",
+  "browserProfileOutputOwnership": "runner checks output prefix, profile prefix, directory and canonical /private/tmp realpath",
+  "publicRuntimePreflight": "Git HEAD + work cwd + HTTP app.js readiness + fetched resource hashes + exact source/caret/independent seed oracle before keys",
+  "readonlyExternalPaths": [
+    "frozen fixture manifest source/profile paths retained from preceding compaction fixture; copied into owned cell before use",
+    "oracle keyFile retained readonly; digest matches frozen ready.json",
+    "node_modules readonly root symlink"
+  ],
+  "setupFailureCount": 3,
+  "uncertainDocumentMutationRetry": false
+}

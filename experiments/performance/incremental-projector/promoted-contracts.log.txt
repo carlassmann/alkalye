@@ -1,0 +1,11 @@
+bun test v1.4.0 (34cbb9a40)
+
+runtime/tests/projector-certified-edit-promoted.test.ts:
+(pass) certified edits preserve canonical projections across Unicode and Markdown contexts [2.27ms]
+(pass) syntax changes fall back to canonical projection [0.11ms]
+(pass) sequential linked-line edits preserve cache ownership, mapped tokens and option guards [0.15ms]
+
+ 3 pass
+ 0 fail
+ 670 expect() calls
+Ran 3 tests across 1 file. [69.00ms]

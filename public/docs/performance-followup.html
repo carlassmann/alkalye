@@ -49,6 +49,24 @@
 			sections compare rewrite revisions or implementation paths and follow the
 			<a href="performance-interaction.html">previous comparison with main</a>.
 		</p>
+		<h2>Incremental projection during typing</h2>
+		<p>
+			Three alternating production comparisons typed at the same midpoint in a
+			1MiB Markdown document. Links remained in the edited paragraph. Reusing
+			projected text and reparsing the changed line reduced the initiating input
+			task from 11.017 to 11.981ms to 7.859 to 8.110ms. Median was 11.073ms
+			versus 8.004ms. Every run checked native input, exact source and caret,
+			accepted edit and Undo receipts, and reload. Uncertain syntax uses the
+			full parser.
+		</p>
+		<p>
+			This meets the 8.33ms task budget in these three typing samples. It does
+			not prove sustained 120Hz paint. Over the whole three-second capture,
+			background tasks still reached 11.180ms. Undo remained mixed: median
+			exact-state frame opportunity rose from 22.1ms to 25.1ms, and total main
+			work rose 5.9%. The change targets typing; it is not an Undo speedup.
+			Evidence: <code>experiments/performance/incremental-projector</code>.
+		</p>
 		<h2>Production offline and peer editing</h2>
 		<p>
 			Twelve untimed production checks on rewrite 514e1bb passed peer editing,

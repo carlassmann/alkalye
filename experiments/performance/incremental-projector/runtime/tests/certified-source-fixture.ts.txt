@@ -1,0 +1,92 @@
+import { SourceTextarea } from "../src/client/source-textarea"
+import type { ProjectionMode } from "../src/client/source-textarea"
+import { identity, project } from "../src/shared/projection"
+import type { DocumentLink } from "../src/shared/model"
+
+declare global {
+	interface Window {
+		certifiedPrepare(index: number): boolean
+		certifiedPrepareAgain(): boolean
+		certifiedVerify(): { assertions: number; trusted: boolean; source: boolean; caret: number }
+		certifiedDone: boolean
+	}
+}
+let native = document.createElement("textarea")
+native.id = "editor"
+document.body.append(native)
+let documents: DocumentLink[] = [{ id: "board", title: "Board", archived: false }]
+let mode: ProjectionMode = "project"
+let textarea = new SourceTextarea(native, "", { documents: () => documents, mode: () => mode, caretTop: () => undefined, painted() {}, fullDocument: true })
+let cases = [
+	{ source: "# Heading\nPlain checkpoint\n[Link](https://example.com) [[board]] ![image](asset:photo)", marker: "checkpoint", initial: "project" },
+	{ source: "# Heading\r\nPlain 😀checkpoint\r\n[Link](https://example.com) [[board]]", marker: "checkpoint", initial: "project" },
+	{ source: "---\ntitle: Demo\n---\nPlain checkpoint\n[[board]]", marker: "checkpoint", initial: "project" },
+	{ source: "~~~js\nPlain checkpoint\n~~~\n[[board]]", marker: "checkpoint", initial: "project" },
+	{ source: "# Heading\n    Plain checkpoint\n[[board]]", marker: "checkpoint", initial: "project" },
+	{ source: "# Heading\nPlain checkpoint\n[x](https://example.com) [[board]]", marker: "checkpoint", initial: "raw" },
+	{ source: "# Heading\nPlain checkpoint\n[x](https://example.com) [[board]]", marker: "checkpoint", initial: "hold" },
+	{ source: "# Heading\n[checkpoint](https://example.com)\n[[board]]", marker: "checkpoint", initial: "project" },
+	{ source: "# Heading\nPlain checkpoint\n[[board]]", marker: "checkpoint", initial: "project", insert: "[" },
+	{ source: "# Heading\nPlain checkpoint\n[[board]]", marker: "checkpoint", initial: "project", insert: "Enter" },
+	{ source: "# Heading\nPlain checkpoint\n[[board]]", marker: "checkpoint", initial: "raw" },
+	{ source: "# Heading\n[before](https://example.com) Plain checkpoint [after](https://example.org)\n[[board]]", marker: "checkpoint", initial: "project" },
+	{ source: "# Heading\n[before](https://example.com) Plain checkpoint\n[[board]]", marker: "checkpoint", initial: "project" },
+] satisfies { source: string; marker: string; initial: ProjectionMode; insert?: string }[]
+let expected = "", caret = 0, trusted = false, assertions = 0
+function check(condition: boolean, label: string) {
+	assertions++
+	if (!condition) throw new Error(label)
+}
+window.certifiedPrepare = index => {
+	let item = cases[index]
+	if (!item) throw new Error("Missing fixture case")
+	documents = [{ id: "board", title: index === 10 ? "1234567" : "Board", archived: false }]
+	mode = "project"
+	textarea.value = item.source
+	let position = item.source.indexOf(item.marker) + 2
+	textarea.setSelectionRange(position, position)
+	mode = item.initial
+	if (mode !== "project") textarea.sync()
+	mode = "project"
+	textarea.focus()
+	let insert = item.insert === "Enter" ? "\n" : item.insert ?? "x"
+	expected = item.source.slice(0, position) + insert + item.source.slice(position)
+	caret = position + insert.length
+	trusted = false
+	window.certifiedDone = false
+	return true
+}
+window.certifiedPrepareAgain = () => {
+	let value = textarea.value, position = textarea.selectionEnd
+	expected = value.slice(0, position) + "x" + value.slice(position)
+	caret = position + 1
+	trusted = false
+	window.certifiedDone = false
+	textarea.focus()
+	return true
+}
+native.addEventListener("input", event => {
+	trusted = event.isTrusted
+	textarea.input()
+	textarea.takeReplacements()
+	textarea.sync()
+	window.certifiedDone = true
+})
+window.certifiedVerify = () => {
+	check(trusted, "Native input untrusted")
+	check(textarea.value === expected, "Exact source differs")
+	check(textarea.selectionStart === caret && textarea.selectionEnd === caret, "Caret differs")
+	let fresh = project(expected, { documents, active: { start: caret, end: caret }, iconSpace: true })
+	check(JSON.stringify(textarea.projection) === JSON.stringify(fresh), "Full canonical projection differs")
+	check(native.value === fresh.text.replace(/\r\n?/g, "\n"), "Native fragment differs")
+	documents[0] = { id: "board", title: "Renamed board", archived: false }
+	textarea.sync()
+	check(JSON.stringify(textarea.projection) === JSON.stringify(project(expected, { documents, active: { start: caret, end: caret }, iconSpace: true })), "Rename projection differs")
+	mode = "raw"
+	textarea.sync()
+	check(JSON.stringify(textarea.projection) === JSON.stringify(identity(expected)), "Raw projection differs")
+	mode = "project"
+	textarea.sync()
+	check(textarea.value === expected, "Mode switch changed source")
+	return { assertions, trusted, source: true, caret }
+}

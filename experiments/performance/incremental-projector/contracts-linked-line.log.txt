@@ -1,0 +1,73 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/projector-certified-edit.test.ts:
+(pass) certified plain edit ["\n","Plain checkpoint text","# Heading"] [0.72ms]
+(pass) certified plain edit ["\n","Plain checkpoint text","---\ntitle: Demo\n---"] [0.09ms]
+(pass) certified plain edit ["\n","Plain checkpoint text","~~~js"] [0.03ms]
+(pass) certified plain edit ["\n","Plain checkpoint text","```\nLiteral fence body\n```"] [0.09ms]
+(pass) certified plain edit ["\n","Plain checkpoint text","[before](https://example.com)"] [0.08ms]
+(pass) certified plain edit ["\n","  - List item","# Heading"] [0.08ms]
+(pass) certified plain edit ["\n","  - List item","---\ntitle: Demo\n---"] [0.05ms]
+(pass) certified plain edit ["\n","  - List item","~~~js"] [0.03ms]
+(pass) certified plain edit ["\n","  - List item","```\nLiteral fence body\n```"] [0.07ms]
+(pass) certified plain edit ["\n","  - List item","[before](https://example.com)"] [0.11ms]
+(pass) certified plain edit ["\n","    Literal body","# Heading"] [0.06ms]
+(pass) certified plain edit ["\n","    Literal body","---\ntitle: Demo\n---"] [0.04ms]
+(pass) certified plain edit ["\n","    Literal body","~~~js"] [0.01ms]
+(pass) certified plain edit ["\n","    Literal body","```\nLiteral fence body\n```"] [0.05ms]
+(pass) certified plain edit ["\n","    Literal body","[before](https://example.com)"] [0.04ms]
+(pass) certified plain edit ["\n","Emoji 😀é lone\ud800","# Heading"] [0.03ms]
+(pass) certified plain edit ["\n","Emoji 😀é lone\ud800","---\ntitle: Demo\n---"] [0.04ms]
+(pass) certified plain edit ["\n","Emoji 😀é lone\ud800","~~~js"] [0.01ms]
+(pass) certified plain edit ["\n","Emoji 😀é lone\ud800","```\nLiteral fence body\n```"] [0.04ms]
+(pass) certified plain edit ["\n","Emoji 😀é lone\ud800","[before](https://example.com)"] [0.04ms]
+(pass) certified plain edit ["\r\n","Plain checkpoint text","# Heading"] [0.03ms]
+(pass) certified plain edit ["\r\n","Plain checkpoint text","---\ntitle: Demo\n---"] [0.04ms]
+(pass) certified plain edit ["\r\n","Plain checkpoint text","~~~js"] [0.01ms]
+(pass) certified plain edit ["\r\n","Plain checkpoint text","```\nLiteral fence body\n```"] [0.04ms]
+(pass) certified plain edit ["\r\n","Plain checkpoint text","[before](https://example.com)"] [0.04ms]
+(pass) certified plain edit ["\r\n","  - List item","# Heading"] [0.03ms]
+(pass) certified plain edit ["\r\n","  - List item","---\ntitle: Demo\n---"] [0.05ms]
+(pass) certified plain edit ["\r\n","  - List item","~~~js"] [0.02ms]
+(pass) certified plain edit ["\r\n","  - List item","```\nLiteral fence body\n```"] [0.04ms]
+(pass) certified plain edit ["\r\n","  - List item","[before](https://example.com)"] [0.03ms]
+(pass) certified plain edit ["\r\n","    Literal body","# Heading"] [0.04ms]
+(pass) certified plain edit ["\r\n","    Literal body","---\ntitle: Demo\n---"] [0.03ms]
+(pass) certified plain edit ["\r\n","    Literal body","~~~js"] [0.02ms]
+(pass) certified plain edit ["\r\n","    Literal body","```\nLiteral fence body\n```"] [0.03ms]
+(pass) certified plain edit ["\r\n","    Literal body","[before](https://example.com)"] [0.03ms]
+(pass) certified plain edit ["\r\n","Emoji 😀é lone\ud800","# Heading"] [0.02ms]
+(pass) certified plain edit ["\r\n","Emoji 😀é lone\ud800","---\ntitle: Demo\n---"] [0.03ms]
+(pass) certified plain edit ["\r\n","Emoji 😀é lone\ud800","~~~js"] [0.01ms]
+(pass) certified plain edit ["\r\n","Emoji 😀é lone\ud800","```\nLiteral fence body\n```"] [0.02ms]
+(pass) certified plain edit ["\r\n","Emoji 😀é lone\ud800","[before](https://example.com)"] [0.03ms]
+(pass) uncertain syntax falls back "[new](https://example.com)" [0.06ms]
+(pass) uncertain syntax falls back "[[note]]" [0.02ms]
+(pass) uncertain syntax falls back "![media](asset:photo)"
+(pass) uncertain syntax falls back "\n"
+(pass) uncertain syntax falls back "~~~"
+(pass) uncertain syntax falls back "---"
+(pass) uncertain syntax falls back "..."
+(pass) active tokens, rename, stale source and root line reject without corrupting cache [0.06ms]
+(pass) borrowed output mutations are rejected or reconstructed from private tokens [0.03ms]
+85 | 	let previous = projector.project(source, { documents, active: { start, end: start }, iconSpace: true })
+86 | 	for (let insert of ["x", "😀", "", "[", "\\"]) {
+87 | 		let end = start + 1, next = source.slice(0, start) + insert + source.slice(end)
+88 | 		let active = { start: start + insert.length, end: start + insert.length }
+89 | 		let certified = projector.replace(previous, start, end, insert, { documents, active, iconSpace: true })
+90 | 		expect(certified).toBeDefined()
+                         ^
+error: expect(received).toBeDefined()
+
+Received: undefined
+
+      at <anonymous> (/private/tmp/alkalye-projector-certified-edit/runtime/tests/projector-certified-edit.test.ts:90:21)
+(fail) plain edit in a linked paragraph preserves every mapped token field [0.22ms]
+
+1 tests failed:
+(fail) plain edit in a linked paragraph preserves every mapped token field [0.22ms]
+
+ 49 pass
+ 1 fail
+ 667 expect() calls
+Ran 50 tests across 1 file. [31.00ms]

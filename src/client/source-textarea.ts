@@ -161,6 +161,15 @@ export class SourceTextarea {
 	input() {
 		let reprojected = false
 		let caret = this.selectionEnd
+		let mode = this.options.mode()
+		let documents =
+			mode === "project"
+				? this.options.documents().map(document => ({
+						id: document.id,
+						title: document.title,
+						archived: document.archived,
+					}))
+				: []
 		for (let edit of this.viewport.input()) {
 			let range = sourceRange(this.current, edit.start, edit.end)
 			this.sourceIndex.replace({
@@ -176,12 +185,41 @@ export class SourceTextarea {
 			let expectedLength =
 				this.current.text.length + edit.insert.length - (edit.end - edit.start)
 			caret = range.start + edit.insert.length
-			this.current = applyViewReplacement(
-				this.current,
-				edit.start,
-				edit.end,
-				edit.insert,
-			)
+			let previous = this.projected
+			let certified =
+				mode === "project" &&
+				previous?.value === this.current &&
+				previous.mode === "project"
+					? this.projector.replace(
+							this.current,
+							range.start,
+							range.end,
+							edit.insert,
+							{
+								active: { start: caret, end: caret },
+								documents,
+								iconSpace: true,
+							},
+						)
+					: undefined
+			this.current =
+				certified ??
+				applyViewReplacement(this.current, edit.start, edit.end, edit.insert)
+			if (certified) {
+				if (previous && previous.source !== certified.source)
+					this.previousProjected = previous
+				this.projected = {
+					source: certified.source,
+					start: caret,
+					end: caret,
+					documents: documents
+						.map(document => document.id + ":" + document.title)
+						.join("\n"),
+					mode: "project",
+					prefix: iconPrefix,
+					value: certified,
+				}
+			}
 			reprojected ||= this.current.text.length !== expectedLength
 		}
 		if (reprojected)

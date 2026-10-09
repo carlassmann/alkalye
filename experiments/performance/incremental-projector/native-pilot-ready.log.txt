@@ -1,0 +1,36 @@
+{"stage":"running","arm":"control","pid":71381,"run":"/tmp/alkalye-projector-certified-edit/native-control-rich1m-31fbe59f-21ac-42f3-903c-626ba1a31e05"}
+started web pid=71395
+80 | 	!Number.isInteger(manifest.samples) ||
+81 | 	manifest.samples < 1 ||
+82 | 	manifest.samples > 5
+83 | )
+84 | 	throw Error("Samples must be 1–5")
+85 | if (!resolve(manifest.output).startsWith("/tmp/alkalye-compaction-id-compare/")) throw Error("Controlled fixture output required")
+                                                                                            ^
+error: Controlled fixture output required
+      at /private/tmp/alkalye-projector-certified-edit/app-runtime/experiments/performance/interaction-matrix/runner.ts:85:88
+
+Bun v1.4.0 (macOS arm64)
+stopped alkalye-projector-certified-edit/codex-projector-proof/web
+53 | let stage = "prepare"
+54 | let failure = false
+55 | async function command(args: string[], variables: Record<string, string> = {}) {
+56 |  let child = Bun.spawn(args, { cwd: import.meta.dir, env: { ...process.env, WORK_STATE_ROOT: stateRoot, ...variables }, stdout: "inherit", stderr: "inherit" })
+57 |  let exit = await child.exited
+58 |  if (exit !== 0) throw Error("Owned command failed: " + args[0] + " (" + exit + ")")
+                            ^
+error: Owned command failed: bun (1)
+      at command (/private/tmp/alkalye-projector-certified-edit/app-runtime/production-body-gate.ts:58:24)
+
+Bun v1.4.0 (macOS arm64)
+ 7 |  let child = Bun.spawn(["bun", "production-body-gate.ts", arm, "rich1m", "--measure"], { cwd: root + "/app-runtime", env: { ...process.env, PRODUCTION_BODY_RUN: run }, stdout: "inherit", stderr: "inherit" })
+ 8 |  console.log(JSON.stringify({ stage: "running", arm, pid: child.pid, run }))
+ 9 |  let exit = await child.exited
+10 |  cells.push({ arm, run, pid: child.pid, exit })
+11 |  await Bun.write(root + "/pilot-ready-progress.json", JSON.stringify(cells, null, 2))
+12 |  if (exit !== 0) throw Error("Stop after failed or uncertain cell")
+                            ^
+error: Stop after failed or uncertain cell
+      at /private/tmp/alkalye-projector-certified-edit/pilot-ready.ts:12:24
+
+Bun v1.4.0 (macOS arm64)

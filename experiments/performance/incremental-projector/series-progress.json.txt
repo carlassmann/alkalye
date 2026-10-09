@@ -1,0 +1,50 @@
+[
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 0,
+    "run": "/tmp/alkalye-projector-certified-edit/series-control-rich1m-0-73b5095c-937a-4bd3-8823-9f4769208930",
+    "pid": 73648,
+    "exit": 0
+  },
+  {
+    "arm": "candidate",
+    "fixture": "rich1m",
+    "trial": 0,
+    "run": "/tmp/alkalye-projector-certified-edit/series-candidate-rich1m-0-d63f3714-d76d-47a1-aafa-f99673bb54b1",
+    "pid": 74090,
+    "exit": 0
+  },
+  {
+    "arm": "candidate",
+    "fixture": "rich1m",
+    "trial": 1,
+    "run": "/tmp/alkalye-projector-certified-edit/series-candidate-rich1m-1-71b620c5-ed6b-4337-afe6-fcc180508534",
+    "pid": 74553,
+    "exit": 0
+  },
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 1,
+    "run": "/tmp/alkalye-projector-certified-edit/series-control-rich1m-1-41cd725e-7315-409c-9aa3-57aa1ca9516e",
+    "pid": 74977,
+    "exit": 0
+  },
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 2,
+    "run": "/tmp/alkalye-projector-certified-edit/series-control-rich1m-2-06466c47-d47d-41b6-914f-85a58339d7d3",
+    "pid": 75406,
+    "exit": 0
+  },
+  {
+    "arm": "candidate",
+    "fixture": "rich1m",
+    "trial": 2,
+    "run": "/tmp/alkalye-projector-certified-edit/series-candidate-rich1m-2-d144e808-c3c7-43c2-b6d9-5ace776b126a",
+    "pid": 75849,
+    "exit": 0
+  }
+]

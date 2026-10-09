@@ -1,0 +1,57 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/projector-certified-edit.test.ts:
+(pass) certified plain edit ["\n","Plain checkpoint text","# Heading"] [0.72ms]
+(pass) certified plain edit ["\n","Plain checkpoint text","---\ntitle: Demo\n---"] [0.09ms]
+(pass) certified plain edit ["\n","Plain checkpoint text","~~~js"] [0.03ms]
+(pass) certified plain edit ["\n","Plain checkpoint text","```\nLiteral fence body\n```"] [0.08ms]
+(pass) certified plain edit ["\n","Plain checkpoint text","[before](https://example.com)"] [0.09ms]
+(pass) certified plain edit ["\n","  - List item","# Heading"] [0.09ms]
+(pass) certified plain edit ["\n","  - List item","---\ntitle: Demo\n---"] [0.05ms]
+(pass) certified plain edit ["\n","  - List item","~~~js"] [0.03ms]
+(pass) certified plain edit ["\n","  - List item","```\nLiteral fence body\n```"] [0.06ms]
+(pass) certified plain edit ["\n","  - List item","[before](https://example.com)"] [0.10ms]
+(pass) certified plain edit ["\n","    Literal body","# Heading"] [0.04ms]
+(pass) certified plain edit ["\n","    Literal body","---\ntitle: Demo\n---"] [0.04ms]
+(pass) certified plain edit ["\n","    Literal body","~~~js"] [0.01ms]
+(pass) certified plain edit ["\n","    Literal body","```\nLiteral fence body\n```"] [0.04ms]
+(pass) certified plain edit ["\n","    Literal body","[before](https://example.com)"] [0.03ms]
+(pass) certified plain edit ["\n","Emoji 😀é lone\ud800","# Heading"] [0.03ms]
+(pass) certified plain edit ["\n","Emoji 😀é lone\ud800","---\ntitle: Demo\n---"] [0.04ms]
+(pass) certified plain edit ["\n","Emoji 😀é lone\ud800","~~~js"] [0.01ms]
+(pass) certified plain edit ["\n","Emoji 😀é lone\ud800","```\nLiteral fence body\n```"] [0.03ms]
+(pass) certified plain edit ["\n","Emoji 😀é lone\ud800","[before](https://example.com)"] [0.04ms]
+(pass) certified plain edit ["\r\n","Plain checkpoint text","# Heading"] [0.06ms]
+(pass) certified plain edit ["\r\n","Plain checkpoint text","---\ntitle: Demo\n---"] [0.04ms]
+(pass) certified plain edit ["\r\n","Plain checkpoint text","~~~js"] [0.01ms]
+(pass) certified plain edit ["\r\n","Plain checkpoint text","```\nLiteral fence body\n```"] [0.03ms]
+(pass) certified plain edit ["\r\n","Plain checkpoint text","[before](https://example.com)"] [0.04ms]
+(pass) certified plain edit ["\r\n","  - List item","# Heading"] [0.04ms]
+(pass) certified plain edit ["\r\n","  - List item","---\ntitle: Demo\n---"] [0.04ms]
+(pass) certified plain edit ["\r\n","  - List item","~~~js"] [0.02ms]
+(pass) certified plain edit ["\r\n","  - List item","```\nLiteral fence body\n```"] [0.03ms]
+(pass) certified plain edit ["\r\n","  - List item","[before](https://example.com)"] [0.04ms]
+(pass) certified plain edit ["\r\n","    Literal body","# Heading"] [0.03ms]
+(pass) certified plain edit ["\r\n","    Literal body","---\ntitle: Demo\n---"] [0.03ms]
+(pass) certified plain edit ["\r\n","    Literal body","~~~js"] [0.01ms]
+(pass) certified plain edit ["\r\n","    Literal body","```\nLiteral fence body\n```"] [0.03ms]
+(pass) certified plain edit ["\r\n","    Literal body","[before](https://example.com)"] [0.04ms]
+(pass) certified plain edit ["\r\n","Emoji 😀é lone\ud800","# Heading"] [0.03ms]
+(pass) certified plain edit ["\r\n","Emoji 😀é lone\ud800","---\ntitle: Demo\n---"] [0.03ms]
+(pass) certified plain edit ["\r\n","Emoji 😀é lone\ud800","~~~js"] [0.01ms]
+(pass) certified plain edit ["\r\n","Emoji 😀é lone\ud800","```\nLiteral fence body\n```"] [0.03ms]
+(pass) certified plain edit ["\r\n","Emoji 😀é lone\ud800","[before](https://example.com)"] [0.03ms]
+(pass) uncertain syntax falls back "[new](https://example.com)" [0.05ms]
+(pass) uncertain syntax falls back "[[note]]" [0.02ms]
+(pass) uncertain syntax falls back "![media](asset:photo)"
+(pass) uncertain syntax falls back "\n"
+(pass) uncertain syntax falls back "~~~"
+(pass) uncertain syntax falls back "---"
+(pass) uncertain syntax falls back "..."
+(pass) active tokens, rename, stale source and root line reject without corrupting cache [0.05ms]
+(pass) borrowed output mutations are rejected or reconstructed from private tokens [0.02ms]
+
+ 49 pass
+ 0 fail
+ 662 expect() calls
+Ran 49 tests across 1 file. [31.00ms]

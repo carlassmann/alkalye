@@ -1,0 +1,27 @@
+{"stage":"running","arm":"control","pid":71197,"run":"/tmp/alkalye-projector-certified-edit/native-control-rich1m-df948f28-76d9-4fd4-a5ec-9225f5ace8e1"}
+started web pid=71212
+stopped alkalye-projector-certified-edit/codex-projector-proof/web
+43 | 			},
+44 | 		},
+45 | 	)
+46 | 	if (result.status !== 0) {
+47 | 		let failure = result.error?.message || result.stderr || result.stdout
+48 | 		throw new Error(`${session} ${args[0]}: ${failure}`)
+                 ^
+error: pcg-23abce78 --profile: {"success":false,"data":null,"error":"Navigation failed: net::ERR_CONNECTION_REFUSED"}
+
+      at browser (/private/tmp/alkalye-projector-certified-edit/app-runtime/tests/browser-driver.ts:48:13)
+      at /private/tmp/alkalye-projector-certified-edit/app-runtime/production-body-gate.ts:75:2
+
+Bun v1.4.0 (macOS arm64)
+ 7 |  let child = Bun.spawn(["bun", "production-body-gate.ts", arm, "rich1m", "--measure"], { cwd: root + "/app-runtime", env: { ...process.env, PRODUCTION_BODY_RUN: run }, stdout: "inherit", stderr: "inherit" })
+ 8 |  console.log(JSON.stringify({ stage: "running", arm, pid: child.pid, run }))
+ 9 |  let exit = await child.exited
+10 |  cells.push({ arm, run, pid: child.pid, exit })
+11 |  await Bun.write(root + "/pilot-retry-progress.json", JSON.stringify(cells, null, 2))
+12 |  if (exit !== 0) throw Error("Stop after failed or uncertain cell")
+                            ^
+error: Stop after failed or uncertain cell
+      at /private/tmp/alkalye-projector-certified-edit/pilot-retry.ts:12:24
+
+Bun v1.4.0 (macOS arm64)

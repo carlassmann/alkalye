@@ -1,0 +1,1001 @@
+$ bun scripts/check.ts
+$ bun scripts/test-integration.ts
+$ bun tests/e2e.ts
+$ prettier --check src tests experiments scripts public/app.html public/app.css public/sw.js public/manifest.webmanifest package.json tsconfig.json build.ts cli.ts work.config.js README.md
+$ tsc --noEmit
+bun test v1.4.0 (34cbb9a40)
+
+tests/document-undo.test.ts:
+Checking formatting...
+(pass) one compensation restores text, frontmatter, comments, assets, drawings and settings without history replay [26.22ms]
+(pass) peer insertion inside cancelled text survives undo and redo [1.82ms]
+(pass) peer deletion inside inserted text remains deleted after cold undo and redo [2.17ms]
+(pass) compensation preserves a peer reply, changed drawing and settings across the complete action [1.69ms]
+(pass) a stale asset compensation rejects atomically; rederivation retains the peer's exact reference and whole manifest [2.13ms]
+(pass) asset tokens compare complete identities rather than matching prefixes [4.45ms]
+(pass) omitted changes, duplicate cancels, unrelated contributions and wrong references fail before any mutation [2.53ms]
+(pass) multiple source operations compensate in reverse order without replacing peer text [1.70ms]
+(pass) register beforeimages use the winning operation, even when repeated field writes are reordered [1.02ms]
+(pass) undo never restores permissions from beforeimages [1.08ms]
+(pass) birth and migrated text reject complete undo without leaking partial register changes [2.70ms]
+(pass) a peer-owned type protects every field of created comments and referenced assets [2.27ms]
+(pass) metadata compensation follows frontmatter while preserving the canonical source marker [1.47ms]
+(pass) explicit permission-only compensation retains exact observed guards while mixed content undo keeps current access [1.14ms]
+(pass) legacy undo guards remain valid when matching and return typed stale failures after independent changes [2.21ms]
+(pass) plain record deletion supports cold undo and redo without mistaking inherited fields for peer changes [1.31ms]
+(pass) redo of record deletion preserves peer edits regardless of the peer's clock relative to the restoration [1.04ms]
+(pass) legacy restoration without record provenance refuses whole mixed compensation [1.74ms]
+(pass) a peer-owned type protects an old restoration without preventing eligible source compensation [1.55ms]
+(pass) prepared offline actions retain whole-document provenance through encoding and cold restore [2.86ms]
+(pass) canonical before-images replace local preparation when a peer changes a register before acceptance [1.18ms]
+(pass) theme text undo and redo retain the document and peer edits [1.30ms]
+(pass) child text cancellation rejects unowned and foreign document records [0.89ms]
+
+tests/document-causality.test.ts:
+(pass) unknown insertion anchors and deletion identities fail without mutating accepted state [0.62ms]
+(pass) causality survives cold checkpoints and accepts tombstoned anchors and same-action insertions [0.42ms]
+(pass) a text atom belongs to its target even when the same action inserts text into another target [0.40ms]
+(pass) anchor cycles fail while frontmatter key order and deleted keys remain metadata [0.18ms]
+(pass) a large reverse-ordered insertion chain validates without recursive traversal [143.84ms]
+
+tests/document-stats.test.ts:
+(pass) document counts retain Markdown, Unicode, frontmatter and task semantics in both execution modes [41.94ms]
+(pass) large incomplete Markdown remains countable without regex backtracking [13.83ms]
+(pass) synced task text recognizes every ECMAScript line boundary and many fence blocks [15.00ms]
+
+tests/replica-stale-source.test.ts:
+(pass) published stale base matches cold action and reconstruction 4 [1.37ms]
+(pass) published stale base matches cold action and reconstruction 8 [0.64ms]
+(pass) published stale base matches cold action and reconstruction 42 [1.32ms]
+(pass) published stale base matches cold action and reconstruction 31 [1.15ms]
+(pass) published stale base matches cold action and reconstruction 131094 [1062.94ms]
+(pass) stale prepareEdit matches cold frontmatter merge and peer preservation [3.10ms]
+(pass) external mutable atom arrays keep current values and Unicode bounds [0.87ms]
+(pass) published frontmatter atoms and nested arrays cannot mutate before stale use [0.79ms]
+(pass) cooperative source materialization preserves stale bases through cancellation [4.23ms]
+(pass) cold cooperative materialization publishes an exact immutable stale basis [7.41ms]
+(pass) published fast source view remains exact through stale use local [1.55ms]
+(pass) published fast source view remains exact through stale use peer-scalar [0.85ms]
+(pass) published fast source view remains exact through stale use peer-run [1.07ms]
+(pass) published fast source view remains exact through stale use terminal-cancel [0.61ms]
+
+tests/document-register-undo.test.ts:
+(pass) successive setting undos and redos retain their contributors through cold snapshots [2.03ms]
+(pass) an intervening peer write with the same value remains an independent contribution [0.77ms]
+(pass) provisional provenance with the right value but wrong contributor is refused atomically [0.93ms]
+(pass) forged contributor tags require a canonical compensation and cannot change another field [0.52ms]
+(pass) old beforeimages remain compensable without fabricating missing contributor provenance [0.36ms]
+(pass) restoration tags survive compaction, reject forward references and remain immutable [0.17ms]
+(pass) a compensation restoring a pending register also depends on that register's action [0.62ms]
+
+tests/document-live.test.ts:
+(pass) live upgrades use the secure cookie behind a TLS-terminating proxy [5.50ms]
+(pass) live upgrades reject a wrong account and a plain cookie under a secure public origin [2.58ms]
+(pass) live upgrades require the application's exact Origin [0.46ms]
+
+tests/tldraw-build.test.ts:
+PASS tests/browser-native-eventlog.ts (1.6s)
+[warn] src/client/source-textarea.ts
+(pass) tldraw and React remain outside the initial application graph [0.43ms]
+(pass) the offline shell caches every local tldraw asset [0.50ms]
+
+tests/cli-mcp.test.ts:
+(pass) Effect MCP proxy initializes with shared API key %s, skips notifications and forwards the final unframed request [161.77ms]
+(pass) Effect MCP proxy initializes with shared API key %s, skips notifications and forwards the final unframed request [123.36ms]
+(pass) malformed and invalid MCP frames produce distinct errors and preserve the next request [128.80ms]
+(pass) bad MCP tokens fail without echoing credentials [118.19ms]
+(pass) MCP proxy preserves stateless metadata and encodes Unicode tool headers [104.55ms]
+(pass) non-JSON HTTP errors become protocol errors without a secondary parse crash [109.55ms]
+(pass) MCP proxy passes responses and batches unchanged and decodes SSE through Effect [116.69ms]
+(pass) termination interrupts a stalled MCP request through the Effect runtime [121.32ms]
+(pass) a cancellation bypasses queued requests and later pretty JSON remains one stdio frame [124.62ms]
+(pass) SSE priming and a retry after the result never create a duplicate response [107.05ms]
+(pass) failed batches report each request and failed client responses stay silent [116.61ms]
+(pass) cancelling a queued request prevents its HTTP call without losing later requests [117.45ms]
+(pass) legacy MCP proxy silently reinitializes expired sessions and retries once [123.59ms]
+(pass) legacy MCP recovery retries an expired request at most once [123.78ms]
+(pass) an expired legacy notification cannot strand later proxy requests [114.60ms]
+(pass) a failed recovery notification leaves the old session available for another recovery [107.65ms]
+(pass) MCP API-key transport preserves a server path prefix and refuses redirects [226.59ms]
+
+tests/document-api.test.ts:
+(pass) HTTP refuses orphaned text anchors and unknown removals atomically, then accepts a corrected action [67.12ms]
+(pass) attachment source and manifest commit atomically only after their bytes exist; deletion retains historical bytes [50.15ms]
+(pass) document history pages preserve global cursor gaps and reject unsafe page sizes [73.08ms]
+(pass) a bound client cannot read or write through another account's session [24.71ms]
+(pass) whole-document HTTP stream includes text, comments and asset references; snapshots and sidebar do not require history [42.68ms]
+(pass) action chain discovery uses current permissions and masks missing or unrelated receipts [32.53ms]
+(pass) HTTP owner/writer/reader permissions are persisted and cannot be supplied in a request body [40.44ms]
+(pass) unknown documents do not leak existence and history epochs must match [15.48ms]
+(pass) native Effect compression negotiates downloadable snapshots without compressing authentication responses [11.18ms]
+(pass) workspace owner retains control of writer-created documents after membership removal [46.01ms]
+(pass) an account cannot reserve another account's unused producer identity [22.81ms]
+(pass) HTTP rejects excessive actions and compact text expansions before durable mutation [149.79ms]
+(pass) library catalogue lists only current access, includes separate document grants and preserves effective roles [50.66ms]
+(pass) native blob HTTP verifies immutable chunks, scopes them to a document and checks current roles [56.48ms]
+(pass) single-action HTTP reads recover register beforeimages without fetching preceding history [37.62ms]
+(pass) single-action HTTP reads enforce current access and mask unrelated identities [39.95ms]
+(pass) a pruned single action returns its typed history failure while current snapshot remains readable [48.26ms]
+(pass) native document actions refuse unreferenced cancellation and implicit document birth undo [22.19ms]
+(pass) cold native stores migrate a legacy head once and keep its undo boundary across later edits [58.66ms]
+(pass) whole-document HTTP compensation lazily fetches one action, retains blobs and preserves peer deletions through cold redo [95.14ms]
+(pass) Effect routing accepts encoded document identifiers and native action ids at their legal bounds [15.88ms]
+(pass) account preference events merge only changed fields, retry exactly and remain private [18.42ms]
+(pass) document observability measures real HTTP outcomes without document labels and isolates client registries [16.85ms]
+(pass) interrupting a real document request records cancellation and releases its fetch [7.38ms]
+PASS tests/browser-fast-app.ts (5.3s)
+fast: 1 suites, 0 failed, 5.5s
+[warn] Code style issues found in the above file. Run Prettier with --write to fix.
+error: script "check:format" exited with code 1
+PASS tests/browser-document-api.ts (10.5s)
+PASS tests/browser-editor-overlay.ts (1.0s)
+PASS tests/browser-editor-anchors.ts (10.0s)
+PASS tests/browser-storage.ts (0.8s)
+PASS tests/browser-live-presence.ts (2.6s)
+PASS tests/browser-library-sync.ts (3.4s)
+modules: 7 suites, 0 failed, 15.1s
+(pass) a one MiB document syncs bounded actions and downloads a compact editable snapshot [13563.10ms]
+[04:53:08.755] WARN (#2987): Slow document operation {
+  boundary: "server",
+  traceId: "911e1d25b53e4434c88d0d9df983e839",
+  spanId: "82385b866dae0f21",
+  operation: "commit",
+  outcome: "success",
+  durationMs: 3568,
+}
+(pass) a one MiB paste is one durable HTTP contribution and one undo, with bounded aggregate rejection [18270.99ms]
+
+tests/durable-checkpoint.test.ts:
+(pass) durable capture equals existing compact output and reopens 4 [4.43ms]
+(pass) durable capture equals existing compact output and reopens 57344 [320.25ms]
+(pass) durable capture equals existing compact output and reopens 8 [1.87ms]
+(pass) durable capture equals existing compact output and reopens 9984 [43.11ms]
+(pass) owned captured arrays and atom values cannot mutate live header or discussion [1.21ms]
+(pass) concurrent writer, source fence and retained cancellations survive durable capture [1.05ms]
+(pass) interrupted durable capture leaves live replica and later capture intact [107.21ms]
+(pass) generation changes reject the entire captured output [105.85ms]
+
+tests/history-timeline.test.ts:
+(pass) history day filters preserve accepted ordering and count whole-document actions [1.73ms]
+
+tests/cli-document-session.test.ts:
+(pass) the browser document engine creates, edits, undoes and reopens offline in Bun, then publishes identical whole-document facts ({"cached":false,"cooperative":false}) [1632.88ms]
+(pass) the browser document engine creates, edits, undoes and reopens offline in Bun, then publishes identical whole-document facts ({"cached":true,"cooperative":false}) [1627.31ms]
+(pass) the browser document engine creates, edits, undoes and reopens offline in Bun, then publishes identical whole-document facts ({"cached":false,"cooperative":true}) [1653.32ms]
+(pass) the browser document engine creates, edits, undoes and reopens offline in Bun, then publishes identical whole-document facts ({"cached":true,"cooperative":true}) [1630.38ms]
+
+tests/document-history-cache.test.ts:
+(pass) optional history uses its verified cached moments offline and during a server outage [1.05ms]
+[04:53:30.271] WARN (#4751): Could not cache document history
+(pass) optional history remains readable when its cache is damaged or cannot be written [0.34ms]
+(pass) optional history reports an unavailable server when no moment has been downloaded [0.07ms]
+
+tests/replica-terminal-redo.test.ts:
+(pass) terminal redo with duplicate ACK and distinct views false:4 [0.71ms]
+(pass) terminal redo with duplicate ACK and distinct views false:6 [0.44ms]
+(pass) terminal redo with duplicate ACK and distinct views false:65540 [560.01ms]
+(pass) terminal redo with duplicate ACK and distinct views true:4 [1.77ms]
+(pass) terminal redo with duplicate ACK and distinct views true:6 [1.16ms]
+(pass) terminal redo with duplicate ACK and distinct views true:65540 [576.18ms]
+(pass) terminal redo after intervening metadata [0.81ms]
+(pass) terminal redo after intervening other-target [0.46ms]
+(pass) terminal redo after intervening peer-prefix [0.66ms]
+(pass) terminal redo after intervening restore [0.54ms]
+(pass) terminal redo after intervening restored-reader [0.52ms]
+(pass) prearrived redo cancellation chain 0 [0.41ms]
+(pass) prearrived redo cancellation chain 1 [0.36ms]
+(pass) prearrived redo cancellation chain 2 [0.36ms]
+(pass) malformed redo batch rejects atomically and retains valid redo [0.69ms]
+(pass) wrong-target redo cannot alter original document [0.09ms]
+(pass) terminal redo cycles restore scalar "x" [0.50ms]
+(pass) terminal redo cycles restore scalar "\n" [0.38ms]
+(pass) terminal redo cycles restore scalar "🌻" [0.36ms]
+(pass) mixed duplicate and new batch cannot retain an old terminal redo projection [0.18ms]
+(pass) fork divergence retains only each replica's own source [0.22ms]
+(pass) lower-clock redo rejects before publication [0.11ms]
+(pass) structural terminal insertion redo matches rebuilt source "Body\n--" [0.14ms]
+(pass) structural terminal insertion redo matches rebuilt source "---\ntitle: T\n--" [0.48ms]
+(pass) structural terminal insertion redo matches rebuilt source "---\ntitle: T\n---\n" [0.21ms]
+
+tests/theme-library-birth.test.ts:
+(pass) two devices create one theme library and retain both first themes [17.71ms]
+
+tests/cipher.test.ts:
+(pass) native Crypto supplies deterministic IVs and digests to Cipher [0.51ms]
+(pass) concurrent Cipher imports share a lookup and distinct scopes import independently [0.39ms]
+(pass) failed Cipher key imports expire immediately and retain sanitized errors [0.20ms]
+(pass) interrupting an in-flight Cipher import leaves a retryable cache [0.20ms]
+(pass) Cipher key imports expire after fifteen minutes using native cache time [0.43ms]
+(pass) Web Crypto adapter supports secure byte requests beyond the platform chunk limit [0.07ms]
+(pass) Cipher cache evicts old imports beyond its 256-key bound [1.20ms]
+(pass) live Cipher interoperates with legacy hashes and ciphertext in both directions [0.45ms]
+(pass) malformed Cipher packets report typed decryption failures [0.37ms]
+(pass) interrupting one Cipher waiter preserves another waiter's shared import [0.28ms]
+(pass) closing child work interrupts crypto without disposing the root Cipher cache [0.45ms]
+(pass) native Cipher authenticates frozen standard-Base64 bytes and rejects changed room, key and ciphertext [0.36ms]
+
+tests/text-index.integration.test.ts:
+(pass) document text index preserves Unicode patches and logical line addressing [631.18ms]
+(pass) large document index supports complete replacement and graphemes crossing storage boundaries [1.41ms]
+(pass) document index preserves lone UTF-16 units, paired boundaries, CRLF and independent forks [59.56ms]
+
+tests/opened-reuse.test.ts:
+(pass) opened snapshot retains authorship, exact source, save, undo and independent offline reopen (cooperative=%s) [16.10ms]
+(pass) opened snapshot retains authorship, exact source, save, undo and independent offline reopen (cooperative=%s) [11.95ms]
+(pass) wrong-document and corrupt snapshots do not poison a subsequent valid open (cooperative=%s) [13.43ms]
+(pass) wrong-document and corrupt snapshots do not poison a subsequent valid open (cooperative=%s) [12.16ms]
+(pass) a racing second opened record cannot replace the already accepted snapshot (cooperative=%s) [9.33ms]
+(pass) a racing second opened record cannot replace the already accepted snapshot (cooperative=%s) [8.54ms]
+(pass) interruption after a real opened journal write leaves replay independently recoverable (cooperative=%s) [7.45ms]
+(pass) interruption after a real opened journal write leaves replay independently recoverable (cooperative=%s) [7.31ms]
+
+tests/document-recovery.test.ts:
+(pass) storage failures preserve the actionable cause through nested journal wrappers [0.18ms]
+(pass) idle save recovery drains a failed append without another foreground request [0.57ms]
+(pass) an attempt waiting for its gate clears a failure that preceded its actual work [0.35ms]
+(pass) recovery keeps save, projection, snapshot and notification failures independent [0.29ms]
+(pass) nested transient journal failures heal automatically with backoff and no self-signaling [0.46ms]
+(pass) schema damage remains terminal instead of becoming an infrastructure retry loop [0.33ms]
+(pass) a foreground failure during recovery cannot be hidden by the older successful attempt [0.33ms]
+(pass) closing the recovery scope cancels backoff and stops subsequent attempts [0.27ms]
+(pass) deferring a snapshot preserves its existing failure until a real copy succeeds [0.17ms]
+(pass) SQLite lock timeouts are actionable retryable document failures [0.23ms]
+
+tests/opened-entry-reuse.test.ts:
+(pass) encoded journal bytes retain original snapshot despite later caller mutation (cooperative=%s) [10.44ms]
+(pass) encoded journal bytes retain original snapshot despite later caller mutation (cooperative=%s) [17.56ms]
+(pass) failed journal commit does not publish prepared snapshot (cooperative=%s) [10.19ms]
+(pass) failed journal commit does not publish prepared snapshot (cooperative=%s) [10.93ms]
+(pass) interruption before journal commit leaves no prepared publication (cooperative=%s) [13.61ms]
+(pass) interruption before journal commit leaves no prepared publication (cooperative=%s) [12.66ms]
+[04:53:32.355] ERROR (#6525): Document recovery required {
+  category: "conflict",
+  operation: "projection",
+}
+(pass) same entry identity cannot reuse validation of different payload bytes (cooperative=%s) [9.65ms]
+[04:53:32.364] ERROR (#6577): Document recovery required {
+  category: "conflict",
+  operation: "projection",
+}
+(pass) same entry identity cannot reuse validation of different payload bytes (cooperative=%s) [8.04ms]
+
+tests/replica-terminal-peer.test.ts:
+(pass) two writers append and remove terminal body scalar 4 [0.64ms]
+(pass) two writers append and remove terminal body scalar 6 [0.29ms]
+(pass) two writers append and remove terminal body scalar 26 [0.53ms]
+(pass) two writers append and remove terminal body scalar 28 [0.45ms]
+(pass) two writers append and remove terminal body scalar 65558 [400.58ms]
+(pass) prearrived orphan subtree is revealed with incoming parent [0.32ms]
+(pass) prearrived remove keeps incoming scalar hidden [0.20ms]
+(pass) prearrived cancel keeps incoming scalar hidden [0.12ms]
+(pass) cancelled prearrived remover permits later incoming scalar [0.16ms]
+(pass) checkpoint indexed identity redelivery preserves warm body [0.32ms]
+(pass) conflicting identity rejects entire multi-replica publication [0.16ms]
+(pass) terminal removal preserves structural projection "Body\n---x" [0.18ms]
+(pass) terminal removal preserves structural projection "---\ntitle: Shared\n---\nx" [0.27ms]
+(pass) terminal removal preserves structural projection "Body\n---" [0.14ms]
+(pass) terminal removal preserves structural projection "Body\r---x" [0.13ms]
+(pass) terminal removal preserves structural projection "Body ---x" [0.15ms]
+(pass) concurrent header edits retain independently projected body offsets [0.98ms]
+(pass) concurrent root header completion does not cache a truncated source [0.26ms]
+(pass) malformed incoming suffix is rejected atomically [0.12ms]
+(pass) prearrived cancellation keeps terminal removal inactive [0.10ms]
+(pass) legacy checkpoint tail remains correct through remote append and removal [0.27ms]
+
+tests/email-api.test.ts:
+(pass) browser email enrollment preserves account and one-time sign-in requires requesting browser [10.67ms]
+(pass) email endpoints reject missing or wrong origin, bearer credentials and recovery belonging to another account [2.30ms]
+(pass) unlink requires current browser account and stops further email sign-in [2.70ms]
+
+tests/invitations.test.ts:
+(pass) personal workspace identifiers cannot be claimed by another account [25.42ms]
+(pass) leaving invitations requires an active membership and retries never grow the owner's journal [47.26ms]
+(pass) moving into another owner's workspace preserves document ownership and inherits destination access [170.18ms]
+(pass) invitation links round-trip and reject malformed fragments [0.43ms]
+(pass) a document link grants its role until revocation removes everyone who joined through it [72.08ms]
+(pass) wrong secrets look like unknown invitations and secrets are never stored [34.01ms]
+(pass) workspace links combine with direct membership and only the owner may manage them [42.85ms]
+(pass) members can leave, owners can remove them and the same link can be accepted again [53.83ms]
+(pass) concurrent acceptance and revocation never leave access through a revoked link [113.68ms]
+(pass) owners move documents between workspaces with their history and access follows [36.41ms]
+(pass) collaborators leave every link they joined and only owners delete documents [21.11ms]
+(pass) public links let any account read without listing or writing, until unpublished [29.82ms]
+(pass) library summaries carry wiki link targets for backlinks [12.28ms]
+(pass) invitation grants survive a server restart [80.39ms]
+(pass) workspace snapshots include named invite members and effective grant sources [47.67ms]
+
+tests/checkpoint.test.ts:
+(pass) malformed checkpoint headers remain typed failures [0.70ms]
+(pass) checkpoint and shuffled duplicate replay converge to the full event log [36.15ms]
+(pass) checkpoint tombstones retain offline anchors and undo values [1.90ms]
+(pass) random offline writers converge when checkpoints arrive after pending local edits [2696.57ms]
+(pass) history hydration restores every version while current state stays unchanged [5.54ms]
+(pass) a checkpoint opens thousands of metadata events as winning registers [8.84ms]
+(pass) checkpoint validation rejects ambiguous identities and invalid clocks [1.44ms]
+(pass) compressed checkpoints authenticate their room and preserve materialized state [19.55ms]
+(pass) checkpoint streams reject corrupt gzip, invalid state and oversized decompression as typed failures [46.45ms]
+
+tests/text-admission.test.ts:
+(pass) admission leaves its replica untouched and a missing baseline outside the current snapshot [0.97ms]
+(pass) changed copies cannot supply dependencies under an accepted operation identity [0.28ms]
+(pass) same-batch forks are isolated before graph nodes can collapse their identities [0.17ms]
+(pass) a cross-operation anchor cycle rejects only its members and defers their dependent suffix [0.15ms]
+(pass) foreign atoms retained by a cold snapshot are rejected rather than indefinitely deferred [0.12ms]
+(pass) missing removals and their cancellation stay deferred until their accepted baseline arrives [0.29ms]
+(pass) compact wire runs expose cycles through their interior atoms and preserve original packet associations [0.13ms]
+(pass) compact and expanded copies share one identity and ready results retain their input references [0.10ms]
+(pass) every packet copy of a cyclic identity remains accounted for in the rejection partition [0.11ms]
+
+tests/replica-replacement-reconstruction.test.ts:
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: &n T\nalias: *n\n---\nBody TOKEN 😀\n","text":""}) [1.57ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: &n T\nalias: *n\n---\nBody TOKEN 😀\n","text":"🦊é中"}) [1.05ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nx: 1\nalias: *n\n---\nBody TOKEN 😀\n","text":""}) [1.07ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nx: 1\nalias: *n\n---\nBody TOKEN 😀\n","text":"🦊é中"}) [1.02ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"﻿---\r\ntitle: &n T\r\nalias: *n\r\n---\r\nBody TOKEN 😀\r\n","text":""}) [1.02ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"﻿---\r\ntitle: &n T\r\nalias: *n\r\n---\r\nBody TOKEN 😀\r\n","text":"🦊é中"}) [1.16ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: \"Broken\n---\nBody TOKEN 😀\n","text":""}) [0.93ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: \"Broken\n---\nBody TOKEN 😀\n","text":"🦊é中"}) [0.90ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nunclosed: *n\nBody TOKEN 😀\n","text":""}) [0.65ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nunclosed: *n\nBody TOKEN 😀\n","text":"🦊é中"}) [0.75ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"Body TOKEN 😀\n","text":""}) [0.59ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"Body TOKEN 😀\n","text":"🦊é中"}) [0.72ms]
+(pass) root header replacement cancellation always preserves cold alias normalization (---
+anchor: &n T
+alias: *n
+---
+Body
+) [0.76ms]
+(pass) root header replacement cancellation always preserves cold alias normalization (﻿---
+anchor: &n T
+alias: *n
+---
+Body
+) [0.54ms]
+(pass) body replacement inverse preserves concurrent lost-alias normalization [2.61ms]
+
+tests/core.test.ts:
+(pass) Concurrent offline text > concurrent edits survive duplicate and reverse replay [0.28ms]
+(pass) Concurrent offline text > inserts at one position are deterministic and preserve runs [0.13ms]
+(pass) Concurrent offline text > deletion before insertion and history reconstruct correctly [0.07ms]
+(pass) Concurrent offline text > large documents do not overflow stack [136.52ms]
+(pass) authenticated encryption binds ciphertext to room and identity [10.76ms]
+(pass) markdown escapes HTML and unsafe links, parses tables and tasks [0.23ms]
+(pass) slides hide notes and keep fenced slide breaks [0.19ms]
+(pass) theme template validation [0.25ms]
+(pass) hash is stable [0.09ms]
+(pass) ZIP round trip and corruption detection [0.56ms]
+(pass) authoring toggles the current word and selected lines [0.38ms]
+(pass) selective undo preserves another writer's insertion [0.31ms]
+(pass) undo deletion restores content and can be redone [0.08ms]
+(pass) wire runs preserve Unicode edits and deletion identities [54.87ms]
+(pass) decoded operations reject forged clocks and atom identities [0.25ms]
+(pass) shuffled multi-actor delivery and duplicates converge [7.49ms]
+(pass) theme compilation reports unfinished fences and carries embedded fonts [0.19ms]
+(pass) composition edits against their starting atoms preserve remote changes [0.13ms]
+(pass) moving a document preserves its history without copying unrelated documents [0.92ms]
+(pass) undo restores deleted atoms after earlier insertions and concurrent changes [0.14ms]
+(pass) typing groups undo and redo together without removing a peer's insertion [0.54ms]
+(pass) undo follows restored atom identities through backspace and redo [0.15ms]
+(pass) asset deletion removes matching media without changing other links [0.07ms]
+(pass) time machine restores metadata, assets and comments as new edits [1.02ms]
+(pass) interface markup translates labels without changing action identifiers [0.84ms]
+(pass) preferences merge independent fields from disconnected devices [0.30ms]
+(pass) comment anchors track concurrent inserts and detect deleted passages [0.28ms]
+(pass) purging a document preserves shared themes and another document's assets [0.12ms]
+(pass) theme ZIP conversion embeds relative fonts and template images [0.67ms]
+(pass) line commands preserve selection and respect first and last lines [0.13ms]
+(pass) version copies detach assets and boards and retain comment positions [1.42ms]
+(pass) document copies remap source theme bindings and retain comment anchors [0.61ms]
+(pass) restoring deleted text restores its comment anchors [0.70ms]
+(pass) folder moves include descendants and deletion retains documents [1.18ms]
+(pass) theme metadata selects appearance presets and carries colors and fonts [0.27ms]
+(pass) portable frontmatter retains unrelated fields and round-trips quoted titles [0.09ms]
+(pass) legacy theme archives honor declared paths, fonts, and presets [0.17ms]
+(pass) distant body edits retain comment anchors and a concurrent insertion between them [0.45ms]
+(pass) body formatting removes block prefixes but keeps indentation and inline markup [0.04ms]
+(pass) image insertion selects the URL and preserves selected alt text [0.03ms]
+
+tests/checkpoint-capture.test.ts:
+(pass) cooperative capture and compaction preserve the complete document and return owned snapshots [361.68ms]
+(pass) concurrent writes reject a captured snapshot instead of publishing a mixed revision [137.54ms]
+(pass) interrupted capture and compaction leave the document usable and publish no partial snapshot [276.40ms]
+(pass) cooperative compact checkpoints retain lone surrogate atom identities [0.51ms]
+
+tests/replica-atom-index.test.ts:
+(pass) siblings and parent remain independent through sustained edits and repeated fork [3.14ms]
+(pass) legacy arbitrary UTF16 atom identities survive fork and cold restore [0.26ms]
+
+tests/document-live-poll.test.ts:
+(pass) polling and WebSocket peers share notifications, presence and departures [28.05ms]
+(pass) profile edits invalidate shared labels without disclosing another account's preferences [1234.71ms]
+(pass) document and workspace changes wake shared libraries but leave unrelated peers asleep [2047.97ms]
+[04:53:41.021] WARN (#12875): Committed change notification lookup failed effect/sql/SqlError: SQLite execute failed
+    at failure (/Users/carlassmann/.codex/worktrees/b513/alkalye/src/platform/sqlite.ts:152:22)
+    at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:770:19)
+    at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+    at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+    at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+    at WorkspaceStore.commit (/Users/carlassmann/.codex/worktrees/b513/alkalye/src/server/document-api.ts:51:25)
+    at WorkspaceStore.commit (definition) (/Users/carlassmann/.codex/worktrees/b513/alkalye/src/server/document-store.ts:600:20)
+    at document.commit (/Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/document-observability.ts:117:13) {
+  [cause]: effect/sql/SqlError/UnknownError: SQLite execute failed
+      at classifySqliteError (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/sql/SqlError.js:486:20)
+      at failure (/Users/carlassmann/.codex/worktrees/b513/alkalye/src/platform/sqlite.ts:153:20)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:770:19)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17) {
+    [cause]: SQLiteError: no such table: document_grants
+        at all (unknown)
+        at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/src/platform/sqlite.ts:104:26)
+        at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:768:22)
+        at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+        at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+        at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+  }
+}
+(pass) a failed postcommit recipient read preserves the durable write and only wakes its watchers [573.60ms]
+(pass) accepted and revoked invitation members receive their library changes [15.01ms]
+(pass) moving a document wakes both libraries and retains its creator after workspace access ends [26.46ms]
+(pass) public document watchers receive advances and lose access on workspace deletion [18.75ms]
+(pass) real polling presenters converge on ties and clock skew while readers cannot present [104.32ms]
+(pass) two polling peers see each other and a closed session announces departure [12.71ms]
+(pass) revoked access withholds presence already queued for a polling reader [476.79ms]
+(pass) logging out during a pending poll prevents delivery and closes its session [408.92ms]
+(pass) demotion strips presenter privileges from queued and replayed presence [26.16ms]
+(pass) one presence batch updates each watched document [15.63ms]
+(pass) polling authenticates the cookie, account, origin and session owner [7.96ms]
+(pass) polling bounds request size, message count, watched documents and sessions [89.87ms]
+(pass) aborted and superseded polls release their waiter and abandoned sessions expire [6963.01ms]
+(pass) a restarted server expires old sessions and a new session resynchronizes [50.22ms]
+24-writer8KBburst {"operations":192,"roundMilliseconds":[384.8764169999995,620.3417919999993,1105.3110830000078,414.7282919999998,375.2623750000057,565.018333999993,1235.2511250000098,464.97004100000777],"commitRequestMilliseconds":{"count":192,"median":123.37283300000126,"p95":386.38229200000933,"max":561.8017499999987},"journeyOperationsPerSecond":37.167816566737116}
+(pass) 24 independently persisted writers converge over mixed live transports, reconnect and enforce reader permissions [6905.32ms]
+
+tests/document-journal-interruption.test.ts:
+(pass) interruption at the journal commit boundary retains exactly the durable contribution ("before") [28.21ms]
+(pass) interruption at the journal commit boundary retains exactly the durable contribution ("after") [23.55ms]
+
+tests/http-server.test.ts:
+(pass) native HTTP request resources live until a streamed body is cancelled [0.82ms]
+(pass) HEAD releases request resources without transferring them to an omitted stream [0.20ms]
+
+tests/replica-terminal-cancel.test.ts:
+(pass) cancel redo cancel preserves exact suffix 0 [0.49ms]
+(pass) cancel redo cancel preserves exact suffix 4 [0.29ms]
+(pass) cancel redo cancel preserves exact suffix 6 [0.23ms]
+(pass) cancel redo cancel preserves exact suffix 26 [0.56ms]
+(pass) cancel redo cancel preserves exact suffix 65536 [638.81ms]
+(pass) prearrived cancel-of-cancel chain retains visibility 0 [0.29ms]
+(pass) prearrived cancel-of-cancel chain retains visibility 1 [0.14ms]
+(pass) prearrived cancel-of-cancel chain retains visibility 2 [0.07ms]
+(pass) concurrent duplicate cancellation stays inactive until both are undone [0.22ms]
+(pass) peer visible descendants survive cancellation of their terminal parent [0.13ms]
+(pass) compacted original insertion uses retained provenance fallback [0.10ms]
+(pass) conflicting cancellation cannot publish any warm replica cache [0.12ms]
+(pass) malformed cancellation leaves warm source untouched [0.06ms]
+(pass) unapplied prepared edit cannot change cancellation semantics [0.06ms]
+(pass) cancellation that completes a concurrent root fence rebuilds source projection [0.21ms]
+(pass) migration floor rejects terminal cancellation without changing cached source [0.14ms]
+
+tests/sessions.test.ts:
+(pass) challenge expires exactly at the boundary even when its proof was already signed [4.99ms]
+(pass) idle sessions expire and the same token cannot switch authentication purpose [4.44ms]
+(pass) use extends idle expiry but never the absolute lifetime [4.15ms]
+(pass) tokens survive a server restart, remain redacted and are stored only as hashes [7.59ms]
+(pass) expired entries are reclaimed before applying the challenge capacity [5.44ms]
+(pass) signing identity is deterministic, domain-bound and rejects incomplete recovery keys [0.48ms]
+(pass) native SQL migrations upgrade pre-purpose databases and invalidate unbound old sessions [5.68ms]
+
+tests/effect-lifecycle.test.ts:
+(pass) closing a task group interrupts active callbacks and runs each finalizer once [0.24ms]
+(pass) parent scope closure releases nested task groups and rejects later callbacks [0.15ms]
+(pass) abort interrupts a scoped operation and releases resources before returning [0.11ms]
+(pass) an already aborted signal performs no work [0.12ms]
+(pass) Effect HTTP transport exposes typed faults and injectable native fetch [0.43ms]
+(pass) interrupting an Effect HTTP request aborts the native transport [0.20ms]
+(pass) Effect config rejects invalid ports and origins before server startup [0.48ms]
+(pass) native callback runners give acquired resources their own task scope [0.13ms]
+(pass) OAuth maintenance survives startup and scheduled failures and stops with its scope [0.46ms]
+(pass) save feedback coalesces rapid writes, reports failures immediately, and releases timers [0.49ms]
+
+tests/whiteboard.test.ts:
+(pass) each tldraw record is stored in its own register field naming its schema [4.21ms]
+(pass) deleting a record leaves an empty tombstone and peers follow without echo [3.64ms]
+(pass) local edits in flight win over stale register reads until they settle [0.61ms]
+(pass) a failed write keeps its records for the next attempt [0.46ms]
+(pass) register undo replays as a remote change and removes the shape [0.63ms]
+(pass) legacy drawings convert to valid records and migrate with the first edit [3.47ms]
+(pass) .tldr files round-trip losslessly and reject media and extra pages [1.24ms]
+(pass) register writes split into actions within the server limits [1.15ms]
+(pass) backups carry boards as .tldr files and restore the same records [3.64ms]
+(pass) an older board rewritten in several actions reads correctly when only the first lands [143.20ms]
+(pass) a board saved by a newer schema is shown but never written [1.19ms]
+(pass) a legacy conversion cut short neither duplicates nor revives shapes [85.34ms]
+(pass) .tldr imports reject duplicate records and dangling references [1.95ms]
+(pass) malformed and mismatched register values only lose themselves [0.76ms]
+(pass) edits not yet reported are written, kept and win over the register [0.93ms]
+(pass) edits not yet reported are written, kept and win over the register before the next frame [14.44ms]
+(pass) a failed close keeps deletions as well as edits for the next open [1.49ms]
+(pass) arrows bound before bindings were records keep their bindings on every peer [3.94ms]
+(pass) a backup of a legacy board cut short keeps its legacy shapes and tombstones [60.71ms]
+(pass) a backup preserves a legacy deletion before any converted record lands [1.41ms]
+
+tests/checkpoint-owner.test.ts:
+(pass) checkpoint opening preserves repeated insertion ownership and refuses ambiguous facts [62.66ms]
+
+tests/cli-runtime.test.ts:
+(pass) native main removes both signal listeners when its fiber finishes immediately [0.13ms]
+(pass) a second signal forces exit while the native main waits for cleanup [28.14ms]
+
+tests/replica-insertion-inverse.test.ts:
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 15 [0.85ms]
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 13 [0.36ms]
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 30 [0.58ms]
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 34 [0.51ms]
+(pass) middle insertion cancellation and repeated redo reconstruct exact source 49 [0.53ms]
+(pass) accepted duplicate insertion preserves exact source and inverse through a detached fork [0.29ms]
+(pass) concurrent sibling and metadata publication preserve peer text across cancellation [0.17ms]
+(pass) identity mutation cannot preserve acknowledgement or publish an inverse [0.17ms]
+(pass) cold restored cancellation preserves exact Unicode without a receipt [0.19ms]
+(pass) previously unknown child revealed by its parent survives parent cancellation [0.18ms]
+(pass) intervening metadata keeps source reconstruction and later inverse exact [0.12ms]
+(pass) all prepared replicas retain their own exact cursor removal proof [0.20ms]
+(pass) malformed UTF16 insertion and its inverse preserve exact source 55296 [0.09ms]
+(pass) malformed UTF16 insertion and its inverse preserve exact source 56320 [0.07ms]
+(pass) peer cancellation uses validated inverse and reconstructs the same source [0.11ms]
+(pass) a cancellation received before its target cannot publish an inactive inverse [0.15ms]
+(pass) mixed known acknowledgement and new metadata preserve reconstruction [0.13ms]
+
+tests/text-dependencies.test.ts:
+(pass) missing predecessors stay outside a valid snapshot and promote after cold restoration [0.48ms]
+(pass) deferral propagates through insertion, removal and cancellation dependencies [0.27ms]
+(pass) closed insertion groups are accepted together without requiring operation order [0.14ms]
+(pass) foreign-target atoms cannot satisfy a dependency or its dependent suffix [0.09ms]
+(pass) an unknown removal defers while a tombstoned atom remains a valid dependency [0.12ms]
+(pass) a cyclic anchor group fails as a typed conflict before independent registers change [0.09ms]
+(pass) paged offline cancellation and redo tails converge after their missing snapshot arrives [57.36ms]
+
+tests/frontmatter.test.ts:
+(pass) Effect YAML retains typed frontmatter, nested data and body offsets [0.31ms]
+(pass) empty headers and EOF fences retain the actual body [0.04ms]
+(pass) metadata patches preserve inline comments and anchor references [0.60ms]
+(pass) flow-map frontmatter patches retain unknown nested values [0.16ms]
+(pass) frontmatter patches preserve unrelated YAML, comments and CRLF [0.12ms]
+(pass) source fields override legacy registers, including empty and false values [0.06ms]
+(pass) malformed field types fail independently through Schema [0.10ms]
+(pass) first metadata edit materializes legacy fields, later deletion cannot resurrect them [0.63ms]
+(pass) frontmatter converges through wire and snapshot: identical booleans [1.36ms]
+(pass) frontmatter converges through wire and snapshot: different titles [1.24ms]
+(pass) frontmatter converges through wire and snapshot: independent keys [1.36ms]
+(pass) frontmatter converges through wire and snapshot: concurrent first headers [0.80ms]
+(pass) metadata edits preserve concurrent body insertions and comment atom identities [0.58ms]
+(pass) removing and recreating a header keeps a single valid source [0.17ms]
+(pass) header deletion concurrent with a metadata edit retains a complete header [0.40ms]
+(pass) slide separators and local duplicate keys remain literal source [0.16ms]
+(pass) undo after resolving metadata conflicts restores the previous winner [0.71ms]
+(pass) undo header deletion preserves a concurrent metadata change [0.43ms]
+(pass) concurrent body prepends cannot displace frontmatter [0.57ms]
+(pass) typing a duplicate key leaves it visible for correction [0.17ms]
+(pass) header typing preserves source order, scalar continuations and broken fences [2.40ms]
+(pass) headers over list and separator prefixes remain complete during concurrent creation [0.94ms]
+(pass) body typing does not rewrite a header containing literal duplicate keys [0.33ms]
+(pass) selective undo and redo preserve a subsequent rename by the same actor [0.45ms]
+(pass) undoing a slide deletion never turns body text into frontmatter [0.20ms]
+(pass) composition over a header comment preserves unseen remote metadata [0.62ms]
+(pass) header comments retain unchanged quotes after atomic entry edits [0.26ms]
+(pass) copying legacy metadata into an existing canonical document materializes its source [0.29ms]
+(pass) concurrent legacy migration cannot overwrite another writer's explicit metadata edit [0.59ms]
+(pass) three writers converge through delayed delivery, duplicate replay and cached reopen [487.85ms]
+(pass) header deletion preserves body identities and concurrent prepends [0.28ms]
+(pass) stale header deletion removes every frame observed by the editor [0.34ms]
+(pass) stale composition does not resurrect an unchanged key deleted by a peer [0.38ms]
+(pass) undo restores header comments and its original EOF closing fence [0.27ms]
+(pass) plain ampersands and asterisks do not turn independent keys into one conflict [1.14ms]
+(pass) migration at a higher unrelated room clock cannot replace explicit metadata [0.96ms]
+(pass) body edits cannot erase a deletion that outranks a delayed legacy migration [0.40ms]
+(pass) native YAML keys with spaces, Unicode and periods remain independent entries [1.18ms]
+(pass) first full-source write migrates legacy metadata before marking its source authoritative [0.27ms]
+(pass) header comments must preserve concurrent untouched keys [0.70ms]
+(pass) EOF formatting must preserve concurrent untouched keys [0.70ms]
+(pass) concurrent body separators cannot swallow a new header [0.33ms]
+(pass) concurrent source edits cannot leave dangling YAML aliases [2.71ms]
+(pass) invalid source YAML retains independent concurrent fields and literal asterisks [0.94ms]
+(pass) concurrent deletion of an anchor cannot break an unseen alias [0.99ms]
+(pass) concurrent replacement of an existing value by an alias survives anchor deletion as valid source [0.94ms]
+(pass) removing an anchor after reading its alias preserves deliberately invalid source [0.29ms]
+(pass) an undone anchor cannot justify hiding newly typed invalid aliases [2.54ms]
+(pass) typing after an EOF header preserves its newline and body across checkpoints [0.27ms]
+(pass) closing an offline root header cannot leave the incremental view different from its checkpoint [0.17ms]
+(pass) editing a promoted offline header body preserves raw anchors for following metadata edits [0.37ms]
+(pass) body edits promote a header revealed by another writer deleting its prefix [0.74ms]
+(pass) bulk reads preserve immutable replica views through incremental edits and concurrent metadata [20.85ms]
+
+tests/durable-insertion-inverse.test.ts:
+(pass) accepted middle insertion undo and redo persist and reopen exact document and discussion (cooperative=%s) [48.66ms]
+(pass) accepted middle insertion undo and redo persist and reopen exact document and discussion (cooperative=%s) [51.10ms]
+
+tests/document-revision.test.ts:
+(pass) exact revisions serialize competing writers and include child changes [11.65ms]
+
+tests/native-mcp.test.ts:
+(pass) native Effect MCP serves discovery and keeps concurrent bearer contexts separate [4.77ms]
+
+tests/checkpoint-hydration.test.ts:
+(pass) cooperative checkpoint hydration matches synchronous state and yields during schema, tombstone and atom loading [170.48ms]
+(pass) interruption never publishes a partially hydrated document [107.65ms]
+(pass) cooperative checkpoint decoding owns atom metadata before releasing a batch [80.42ms]
+(pass) cooperative snapshots retain deletion provenance when runs are unsorted and duplicate identities normalize [120.55ms]
+(pass) legacy checkpoints hydrate cooperatively with permanent tombstones and enforce their migration floor [41.62ms]
+(pass) small unsorted duplicate deletion runs hydrate to the same canonical facts [141.93ms]
+
+tests/document-media-view.test.ts:
+(pass) adding an asset and editing source retain an unrelated in-flight download [9.74ms]
+(pass) retry replaces failed leases without restarting healthy or pending downloads [2.77ms]
+(pass) a failed DOM swap retains old and new leases until a successful render [4.19ms]
+(pass) hiding aborts unfinished work, clears the DOM before release, and can reopen [3.01ms]
+(pass) closing one viewer preserves a lease held by a second viewer [1.59ms]
+(pass) closing while a theme is broken still detaches the DOM before releasing URLs [1.55ms]
+(pass) a dropped download completing after a failed render cannot join its own fiber [4.15ms]
+(pass) an interrupted shared lookup is visible and retryable without reopening the view [2.80ms]
+
+tests/replica-batch.test.ts:
+(pass) an atomic replica batch validates the last replica before publishing any changes [0.62ms]
+(pass) atomic replica batches merge concurrent text and metadata and preserve causal undo [0.83ms]
+(pass) atomic removal and cancellation batches keep forked visibility histories independent [0.15ms]
+
+tests/document-archive.test.ts:
+(pass) a document archive round-trips text, assets, whiteboards, themes, comments and links [4.48ms]
+(pass) plain documents download as Markdown with wiki links named by title [0.12ms]
+(pass) archives from the original application import folders, assets and comment sidecars [0.78ms]
+(pass) malformed archives fail as ArchiveInvalid before any document is planned [0.79ms]
+(pass) unzip refuses entries that inflate past their declared size, truncation and duplicates [1.89ms]
+(pass) large whiteboards and discussions import in actions within the server limits [23.14ms]
+
+tests/projector-certified-edit.test.ts:
+(pass) certified edits preserve canonical projections across Unicode and Markdown contexts [2.29ms]
+(pass) syntax changes fall back to canonical projection [0.11ms]
+(pass) sequential linked-line edits preserve cache ownership, mapped tokens and option guards [0.17ms]
+
+tests/document-properties.test.ts:
+(pass) document properties preserve source metadata, peer text, undo, permissions and durable reopening [18.68ms]
+(pass) queued property commands recheck permissions after a real journal read releases the session gate [7.99ms]
+
+tests/document-rejection.test.ts:
+(pass) rejection partitions whole actions through anchors, removals, cancellations, record ownership and permission observations [1.00ms]
+(pass) a displayed base preserves typing without reproducing rejected compensation: "A" [0.38ms]
+(pass) a displayed base preserves typing without reproducing rejected compensation: "AB" [0.18ms]
+(pass) a displayed base preserves typing without reproducing rejected compensation: "---\ntitle: After\n---\nA" [0.60ms]
+(pass) missing causal references fail instead of entering the healthy partition [0.20ms]
+(pass) displayed frontmatter provenance survives replacing its replica, including whole-header replacement and removal [1.34ms]
+(pass) clock admission counts supplied operations and preserves the frontier across rejected actions [0.18ms]
+
+tests/markdown-url.test.ts:
+(pass) Markdown keeps relative file paths but still refuses unknown schemes [0.14ms]
+
+tests/action-fork.test.ts:
+(pass) detached action builders retain author, clock, guards and exact operation semantics [283.24ms]
+(pass) interruption prevents action publication and leaves the source independent [163.19ms]
+(pass) a concurrent edit rejects stale staging without publishing or losing the edit [178.60ms]
+(pass) legacy text atoms retain identical staged edit semantics [0.49ms]
+(pass) document views expose independent detached staging through real durable sessions [6.77ms]
+
+tests/preference-state.test.ts:
+(pass) preference cache upgrades fill missing defaults while preserving undecodable intents [0.45ms]
+(pass) older app versions never quarantine newer preference intents during unrelated writes [0.20ms]
+(pass) rejecting and acknowledging exact intents preserve unrelated pending work and recovery entries [0.10ms]
+(pass) damaged preference envelopes remain recoverable instead of blocking a new valid intent [0.11ms]
+
+tests/account-agents.test.ts:
+(pass) account agent tools share document snapshots, discussion history and exact revisions [38.74ms]
+(pass) native OAuth consent requires a browser session; PKCE and refresh retain only current grants [18.71ms]
+(pass) agent grants attenuate live authority, isolate accounts and cannot authenticate as account sessions [19.46ms]
+
+tests/document-blob-store.test.ts:
+(pass) concurrent native chunk writes share a durable document quota and retries do not charge twice [9.04ms]
+(pass) owner account quota covers separate workspaces and charges inherited writers to the workspace owner [21.42ms]
+(pass) concurrent uploads across workspaces cannot exceed their shared owner account quota [9.37ms]
+(pass) server quota covers concurrent uploads from independent account owners [9.38ms]
+(pass) native chunks survive closing and reopening the SQLite engine without the event payload table [11.14ms]
+(pass) corrupted durable blob bytes are reported missing and repaired only by digest-verified incoming bytes [8.36ms]
+(pass) missing chunk discovery repairs wrong-size and non-binary rows without downloading them [8.62ms]
+
+tests/native-eventlog.test.ts:
+(pass) native EventLog commits typed CRDT events through Bun SQLite and replays after reopening [3.96ms]
+(pass) native EventLog rejects reader edits without journaling or changing the SQL projection [2.54ms]
+(pass) native EventLog rolls back its SQL projection when the journal insert fails [3.25ms]
+(pass) native journal echo dedupes retries and a new remote identity requeues committed entries [3.23ms]
+(pass) default native remote replay retains the journal when its SQL projection fails [3.17ms]
+
+tests/account-api.test.ts:
+(pass) typed Effect client signs in to the real Bun server with an opaque bearer [8.84ms]
+(pass) browser receives only identity and an HttpOnly cookie, then cookie authenticates reads and logout [1.72ms]
+(pass) a proof can be consumed once under concurrent requests [1.31ms]
+(pass) proofs are bound to purpose and origin, not merely a signature [1.86ms]
+(pass) an invalid signer cannot consume another account's valid challenge [0.86ms]
+(pass) malformed keys, signatures and forged request hosts fail before authentication [1.09ms]
+(pass) anonymous and arbitrary tokens never establish account identity [1.03ms]
+(pass) small-order public keys cannot request or prove an account [0.33ms]
+[04:54:00.159] ERROR (#44350): Account storage failed
+(pass) cookie authentication storage failures remain 503 and cannot fall back to anonymous 401 [1.75ms]
+(pass) HTTPS public origin uses a host-only secure cookie through the HTTP reverse-proxy hop [19.17ms]
+(pass) automatic browser login cannot replace another live account cookie; explicit replacement is transactional [2.74ms]
+
+tests/workspace-avatars.test.ts:
+(pass) an owner's avatar reaches every member and can be removed [11.77ms]
+(pass) only owners change avatars, never on personal workspaces, and only images [7.34ms]
+(pass) avatars survive a restart [35.74ms]
+
+tests/replica-peer-runs.test.ts:
+(pass) concurrent insertion runs reconstruct exactly 4 0,1,2 [2.97ms]
+(pass) concurrent insertion runs reconstruct exactly 4 2,1,0 [2.33ms]
+(pass) concurrent insertion runs reconstruct exactly 4 1,2,0 [2.37ms]
+(pass) concurrent insertion runs reconstruct exactly 6 0,1,2 [2.60ms]
+(pass) concurrent insertion runs reconstruct exactly 6 2,1,0 [2.50ms]
+(pass) concurrent insertion runs reconstruct exactly 6 1,2,0 [2.38ms]
+(pass) concurrent insertion runs reconstruct exactly 28 0,1,2 [2.96ms]
+(pass) concurrent insertion runs reconstruct exactly 28 2,1,0 [3.10ms]
+(pass) concurrent insertion runs reconstruct exactly 28 1,2,0 [2.81ms]
+(pass) concurrent insertion runs reconstruct exactly 131094 0,1,2 [1804.40ms]
+(pass) concurrent insertion runs reconstruct exactly 131094 2,1,0 [1788.53ms]
+(pass) concurrent insertion runs reconstruct exactly 131094 1,2,0 [1759.28ms]
+(pass) run source fences, links and Unicode reconstruct with canonical metadata [1.46ms]
+(pass) concurrent merged header blocks retain body run mapping [0.98ms]
+(pass) cancellation before inserted run, hidden branch and causal undo reconstruct [0.17ms]
+(pass) multi-operation runs and conflicting final replica retain atomic publication [0.30ms]
+(pass) run insertion reveals pre-existing orphan descendants through full reconstruction [0.23ms]
+(pass) hidden source anchor and hidden lower sibling preserve peer branch ordering [0.54ms]
+(pass) BOM-prefixed body fence insertions retain full canonical reconstruction [0.36ms]
+
+tests/replica-replacement-session.test.ts:
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"none"}) [595.29ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"insert"}) [669.85ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"delete"}) [575.30ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"retype"}) [637.81ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"frontmatter"}) [712.28ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"comment"}) [629.09ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"scope"}) [844.24ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"none"}) [710.78ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"insert"}) [772.75ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"delete"}) [844.00ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"retype"}) [795.21ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"frontmatter"}) [800.10ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"comment"}) [866.56ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"scope"}) [991.74ms]
+
+tests/passive-session-isolation.test.ts:
+(pass) concurrent sessions keep cached accepted state isolated until each journal receives the remote edit (cooperative=%s) [25.66ms]
+(pass) concurrent sessions keep cached accepted state isolated until each journal receives the remote edit (cooperative=%s) [732.02ms]
+
+tests/background-work.test.ts:
+(pass) interaction suspends optional work before its document lock while durable edits remain runnable [0.69ms]
+(pass) continuous input cannot starve optional work and checkpoints yield a bounded input window [0.38ms]
+(pass) lifecycle release bypasses interaction and closing the owner releases waits and debounce resources [0.19ms]
+(pass) deferred recovery snapshots cannot hold the snapshot lock against an explicit lifecycle flush [0.23ms]
+(pass) large document statistics suspend between chunks and resume with complete counts [3.52ms]
+(pass) periodic snapshots get a bounded opportunity during uninterrupted interaction [1.76ms]
+
+tests/document-role-lookup.test.ts:
+(pass) role lookups preserve current self authority, cross-subject privacy and scoped admission [11.63ms]
+
+tests/untrusted-input.test.ts:
+(pass) untrusted identifiers and workspace roles reject markup and unknown authority [0.19ms]
+(pass) templates escape text and attributes while allowing explicit markup [0.07ms]
+
+tests/static-files.test.ts:
+(pass) static assets negotiate gzip while preserving their original media type [0.25ms]
+(pass) gzip refusals and unsupported encodings receive the original asset [0.58ms]
+(pass) missing compressed files fall back and missing source files remain missing [0.24ms]
+
+tests/crypto-codec.test.ts:
+(pass) native Base64Url preserves every byte, padding remainder and stored alphabet [2.97ms]
+(pass) native decoding retains platform rejection of malformed stored encodings [0.14ms]
+(pass) native codec keeps known recovery hashes and Unicode invitation links compatible [0.26ms]
+(pass) native codec opens packets encoded with legacy standard Base64 [0.27ms]
+(pass) native decoding opens a frozen pre-adapter AES-GCM packet [0.08ms]
+(pass) malformed cryptographic fields retain typed sanitized failures [0.09ms]
+
+tests/replica-source-fence.test.ts:
+(pass) precise replacements preserve separator assembled from two disjoint edits [0.35ms]
+(pass) precise replacements preserve editing a literal body separator [0.13ms]
+(pass) precise replacements preserve editing away from a literal separator [0.14ms]
+(pass) precise replacements preserve plain Unicode and CRLF document [0.18ms]
+(pass) precise replacements preserve separator assembled across replacement boundaries [0.10ms]
+(pass) precise replacements preserve new frontmatter assembled from existing dashes [0.37ms]
+(pass) precise replacements preserve removing an existing opening fence [0.41ms]
+(pass) precise replacements preserve BOM and CRLF frontmatter body edit [0.19ms]
+(pass) plain precise edits from stale atoms retain another writer through convergence and causal undo [0.23ms]
+
+tests/causal-text.test.ts:
+(pass) causal undo and redo preserve a peer anchored inside the cancelled insertion [0.27ms]
+(pass) each deletion retains its owner so undo cannot resurrect a peer's deletion [0.15ms]
+(pass) redo cannot restore the part of an insertion subsequently deleted by a peer [0.10ms]
+(pass) cold snapshots support undo and redo without any historical text operations [0.13ms]
+(pass) replacement cancellation restores original identities after a cold reopen [0.09ms]
+(pass) historical views use only facts at that version and hydration does not change current state [0.20ms]
+(pass) a cancelled contribution changes revision even when a peer deletion keeps visible text unchanged [0.10ms]
+(pass) a conflicting suffix cannot partly apply registers or cancellation facts [0.11ms]
+(pass) identical covered operations hydrate once, while changed empty-removal provenance fails [0.08ms]
+(pass) a covered delete-only operation cannot lose or change its removal set [0.07ms]
+(pass) new snapshot merges retain local text and both cancellation branches [0.19ms]
+(pass) legacy snapshots retain permanent deletions and block old text undo [0.21ms]
+(pass) an accepted cancellation prevents a late legacy snapshot from raising its floor [0.09ms]
+(pass) frontmatter undo preserves peer metadata, and metadata always follows the source [0.76ms]
+(pass) checkpoint deletion runs retain ownership without repeating every identity [25.92ms]
+(pass) malformed snapshot cancellation targets and operation ownership fail before restore [0.25ms]
+(pass) snapshot copies cannot mutate live atom metadata or winning registers [0.19ms]
+(pass) cancellation dependency validation requires known same-target text even after snapshot reopening [0.34ms]
+(pass) cancellation wire identities require a higher safe clock and no embedded text or register [0.09ms]
+(pass) oversized provenance and overflowing deletion runs fail before expansion [0.10ms]
+(pass) production visibility agrees with the independent contribution oracle through edits, cancellation and cold snapshots [3.38ms]
+(pass) legacy restored aliases reject cycles rather than trapping later undo [0.14ms]
+(pass) deletion wire expansions are bounded and cannot overflow atom offsets [0.07ms]
+(pass) cold insertion ownership cannot gain or lose atoms through historical replay [0.14ms]
+(pass) a covered deletion cannot acquire an insertion after snapshot reopening [0.08ms]
+(pass) merging snapshots cannot change an insertion owner's removal set in either direction [0.15ms]
+(pass) snapshot merges cannot enlarge or shrink a covered insertion [0.13ms]
+(pass) restore aliases reject backward clocks before merging any state [0.33ms]
+(pass) concurrent legacy undo restoration hints merge deterministically [0.31ms]
+(pass) a hot empty text contribution cannot acquire facts through snapshot merging [0.09ms]
+(pass) hydrating migrated history preserves revision and permanent deletion marks [0.12ms]
+(pass) a rejected legacy inverse cannot leave restoration hints or reserve a clock [0.08ms]
+(pass) packed checkpoints preserve causal facts, forks and legacy decoding [0.20ms]
+(pass) checkpoint hydration owns its input across restores and fork edits [0.78ms]
+(pass) checkpoint aliases cannot restore an atom into another target [0.08ms]
+(pass) packed checkpoints reject overlapping runs, invalid anchors and forged clocks [2.91ms]
+(pass) operation and checkpoint runs preserve adjacent lone surrogate atom identities [0.13ms]
+(pass) prepared visibility owns its input and commits once without changing a fork [0.05ms]
+(pass) stale prepared visibility rejects before publishing after apply or restore [0.07ms]
+(pass) raising a visibility migration floor invalidates a prepared removal [0.04ms]
+(pass) cached absent operation is invalidated by out-of-order cancellation and redo [0.04ms]
+(pass) warmed removal and cancellation forks retain independent activity and exact snapshots [0.08ms]
+(pass) restoring facts and migration floors invalidates prior cached activity [0.06ms]
+(pass) stale or malformed prepared changes preserve warm activity and exact checkpoint [0.03ms]
+(pass) public Replica cached reads preserve peer Unicode and exact Undo checkpoints ("Body 😀\r\nTOKEN\r\n") [0.29ms]
+(pass) public Replica cached reads preserve peer Unicode and exact Undo checkpoints ("---\ntitle: Visibility\n---\nBody 🦊\nTOKEN\n") [0.40ms]
+(pass) alternating unknown owners and graph cache stay exact after cancellation [1.93ms]
+(pass) public malformed activity values still fail before any visibility mutation [0.10ms]
+
+tests/email-delivery.test.ts:
+(pass) Resend adapter uses authorized idempotent request and consumes validated response without leaking errors [1.15ms]
+(pass) interrupting delivery aborts provider transport and closes the Effect scope [0.24ms]
+(pass) unconfigured server disables email; test mailbox cannot be enabled in production [0.13ms]
+
+tests/replica-header-cancel.test.ts:
+(pass) derived header body cancellation, redelivery and redo preserve both views 0 [2.06ms]
+(pass) derived header body cancellation, redelivery and redo preserve both views 4 [1.70ms]
+(pass) derived header body cancellation, redelivery and redo preserve both views 6 [1.76ms]
+(pass) derived header body cancellation, redelivery and redo preserve both views 6 [1.75ms]
+(pass) derived header body cancellation, redelivery and redo preserve both views 9 [1.76ms]
+(pass) derived header body cancellation, redelivery and redo preserve both views 65540 [726.05ms]
+(pass) concurrent header edits and peer body prefix survive terminal cancellation [1.75ms]
+(pass) prearrived cancellation chain preserves merged header body 0 [0.74ms]
+(pass) prearrived cancellation chain preserves merged header body 1 [0.58ms]
+(pass) prearrived cancellation chain preserves merged header body 2 [0.59ms]
+(pass) concurrent duplicate cancels and their undos preserve derived body [1.06ms]
+(pass) visible peer descendant remains after cancelling its parent beside merged header [0.85ms]
+(pass) atomic malformed cancellation cannot publish either derived cache [0.88ms]
+
+tests/document-save-lifecycle.test.ts:
+(pass) interrupted durable save retains protection until hidden-page retry, emits Saved without changing content, and reopens offline [15.44ms]
+
+tests/sqlite-document-journal.test.ts:
+(pass) SQLite positions follow commits, retain immutable remote entries and never reuse deleted cursors [7.24ms]
+(pass) SQLite journal projections publish only committed coverage and retain the newest cache [5.09ms]
+(pass) a failed SQLite journal handler commits neither entry nor position [3.65ms]
+(pass) uncached SQLite replay reads beyond one page and remote duplicates invoke a handler once [465.15ms]
+(pass) a malformed SQLite derived cache can be replaced without changing the journal [4.88ms]
+(pass) an interrupted SQLite handler rolls back the durable entry and position [3.96ms]
+(pass) SQLite adds stable positions for a journal created before the document adapter [4.33ms]
+
+tests/native-eventlog-transport.test.ts:
+(pass) native encrypted EventLog streams Bun WebSocket writes between separate workspace grants [19.58ms]
+(pass) native EventLog rejects reader writes and interrupts a revoked live reader [14.78ms]
+(pass) native encrypted transport chunks a large document and echoes duplicate retries [15.47ms]
+(pass) authenticated readers cannot forge writer grants and revoked writers cannot reuse sessions [10.69ms]
+(pass) a fresh native journal seeds an encrypted checkpoint and downloads only its tail [39.93ms]
+(pass) native EventLog journals offline, registers later, and converges concurrent writers with a reader [55.04ms]
+
+tests/replica-projected-tail.test.ts:
+(pass) projected terminal peer edits reconstruct exactly "---\ntitle: Shared\n---\nBody" [1.97ms]
+(pass) projected terminal peer edits reconstruct exactly "﻿---\r\ntitle: Shared\r\n---\r\nBody😀" [1.49ms]
+(pass) projected terminal peer edits reconstruct exactly "---\n---\nBody" [0.97ms]
+(pass) projected terminal peer edits reconstruct exactly "---\ntitle: Shared\n---\n" [1.22ms]
+(pass) projected terminal peer edits reconstruct exactly "---\ntitle: Shared" [0.67ms]
+(pass) projected terminal peer edits reconstruct exactly "---\ntitle: Shared\n---\nBody\n---\nSecond" [1.33ms]
+(pass) projected terminal peer edits reconstruct exactly "Body without frontmatter" [0.68ms]
+(pass) concurrent header rewrites, terminal siblings and metadata reconstruct [1.67ms]
+(pass) non-scalar legacy body retains full reconstruction and future Unicode edits [0.43ms]
+(pass) cold cooperative projected view and hidden tail cancellation remain exact [1.01ms]
+(pass) tail fence completion and removal reconstruct "\n" [0.81ms]
+(pass) tail fence completion and removal reconstruct "\r" [0.80ms]
+(pass) tail fence completion and removal reconstruct " " [0.77ms]
+(pass) deleted frames mid-line, frontmatter undo and terminal peer edit reconstruct [1.50ms]
+
+tests/sqlite.test.ts:
+(pass) cached SQLite statements rebind values and reset integer decoding between requests [0.75ms]
+(pass) native SQLite compiles identifiers and binds Unicode, blobs and integers without interpolation [3.65ms]
+(pass) nested transactions roll back failed savepoints while preserving the outer work [2.56ms]
+(pass) interrupting a transaction rolls back and releases an unrelated waiting reader [2.81ms]
+(pass) failed deferred constraints clean up the commit before the connection is reused [2.99ms]
+(pass) database scope closure releases handles while committed data survives reopening [2.41ms]
+(pass) raw executions return Bun change metadata and malformed bindings fail before writing [2.02ms]
+(pass) a managed runtime releases its connection after a failed transaction [2.76ms]
+(pass) read-only connections allow snapshot transactions and reject writes without creating files [2.90ms]
+
+tests/document-replacements.test.ts:
+(pass) precise document transactions retain repeated-character intent, concurrent contributions, Unicode, undo and durable reopening [17.13ms]
+(pass) frontmatter authoring keeps literal fences and the body anchor through merged snapshots, saves and undo (precise: %s) [23.10ms]
+(pass) frontmatter authoring keeps literal fences and the body anchor through merged snapshots, saves and undo (precise: %s) [21.33ms]
+(pass) large body transactions after merged frontmatter retain exact source, Unicode, remote writers, undo and snapshots [845.50ms]
+(pass) body-boundary edits after adding a header match replayed and reopened documents [0.90ms]
+(pass) empty body under an EOF header stays canonical through deletion, undo and reopening (precise=%s) [0.54ms]
+(pass) empty body under an EOF header stays canonical through deletion, undo and reopening (precise=%s) [0.34ms]
+(pass) body-boundary insertion keeps a closing newline restored below a tombstoned anchor (precise=%s) [0.71ms]
+(pass) body-boundary insertion keeps a closing newline restored below a tombstoned anchor (precise=%s) [0.61ms]
+(pass) adding a body to an EOF header preserves one canonical header (precise=%s) [0.17ms]
+(pass) adding a body to an EOF header preserves one canonical header (precise=%s) [0.12ms]
+
+tests/server.test.ts:
+(pass) the default app and former preview path serve one document app bundle [1.16ms]
+(pass) retired room and socket protocols fail explicitly rather than reaching another engine [0.46ms]
+(pass) fresh server databases contain document and agent storage without room relay tables [0.38ms]
+(pass) servers can serve an isolated app shell without replacing another server's assets [24.04ms]
+
+tests/compact-server-head.test.ts:
+(pass) compact creation and interval checkpoints reopen with exact Unicode source, history and Undo [85.94ms]
+(pass) legacy expanded heads remain readable after a fresh store scope [16.34ms]
+(pass) fresh compact checkpoint corruption is rejected without publishing a snapshot [23.04ms]
+
+tests/cli.test.ts:
+(pass) CLI offline creation and updates survive restart and publish through the shared document API [694.54ms]
+(pass) two CLI processes and HTTP snapshots share source, history, undo, and current reader permissions [1618.40ms]
+(pass) CLI uses frontmatter metadata, explicit empty updates, archive lifecycle, and strict failed publication retains its ID [1309.25ms]
+(pass) concurrent signup admits one private profile and logout preserves document datasets [388.47ms]
+(pass) API-key CLI shares scoped MCP permissions, revisions and revocation without opening an account profile [1115.11ms]
+(pass) API-key CLI refuses remote HTTP and redirects before exposing its credential [152.74ms]
+
+tests/durable-checkpoint-session.test.ts:
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [336.84ms]
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [328.54ms]
+
+tests/replica-loading.test.ts:
+(pass) cooperative replica copies preserve snapshots and independently merge Unicode edits [227.27ms]
+(pass) interrupted replica copies leave the source usable and can be retried [144.53ms]
+(pass) a concurrent source edit rejects a partially copied replica [122.18ms]
+(pass) cooperative materialization yields while preserving frontmatter and Unicode offsets [171.21ms]
+(pass) concurrent materialization never publishes a stale source cache [154.45ms]
+(pass) interrupted materialization can be read and retried without partial caches [140.28ms]
+(pass) synchronous reads during cooperative materialization share the same source [155.06ms]
+(pass) forked deletion histories independently remove and undo the same atom (cooperative=false) [0.40ms]
+(pass) forked deletion histories independently remove and undo the same atom (cooperative=true) [0.11ms]
+(pass) forked cancellation chains keep repeated undo isolated (cooperative=false) [0.13ms]
+(pass) forked cancellation chains keep repeated undo isolated (cooperative=true) [0.07ms]
+(pass) a concurrent deletion undo rejects a partially copied replica [199.06ms]
+
+tests/document-history.test.ts:
+(pass) whole-document moments replay source, discussion and drawings in accepted order [2.66ms]
+(pass) time machine rejects incomplete or foreign document histories [0.35ms]
+
+tests/workspace-deletion.test.ts:
+(pass) deleting a workspace removes it and its documents for everyone and denies every later use [39.65ms]
+(pass) only the owner deletes, the personal workspace stays and the name must match [14.91ms]
+(pass) retrying a deletion returns its receipt while a new request is refused [6.45ms]
+(pass) concurrent deletions and writes settle on one tombstone without leaking access [13.86ms]
+(pass) watching collaborators learn a deleted workspace's documents became unavailable [12.12ms]
+(pass) deletions survive restarts and the tombstone migration upgrades existing data [63.49ms]
+
+tests/email-authentication.test.ts:
+(pass) email links existing signing identity; recovery escrow is encrypted and survives process restart [6.59ms]
+(pass) challenge is browser, origin, purpose and current signed account bound without consuming the valid attempt [3.15ms]
+(pass) five failed guesses stay committed; challenges expire exactly at five minutes [3.70ms]
+(pass) per-email cooldown and hourly guess budget cover all purposes and challenge IDs [5.34ms]
+(pass) concurrent consume yields one success; another account cannot claim an existing email [3.24ms]
+(pass) unknown emails receive the same request response and delivery; codes cannot restore an account [2.45ms]
+(pass) provider failure and interruption invalidate pending codes and retain abuse limits [5.97ms]
+(pass) unlink removes escrow and invalidates pending sign-in without changing signing identity [3.30ms]
+
+ 751 pass
+ 0 fail
+ 41728 expect() calls
+Ran 751 tests across 85 files. [101.05s]
+error: script "check" exited with code 1

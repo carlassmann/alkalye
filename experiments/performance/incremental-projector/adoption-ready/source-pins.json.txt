@@ -1,0 +1,7 @@
+{
+  "adoption-ready/prettification-insertion.ts.txt": "cb6ed8f36a9c8a5f0d671ca9cbfb9a442d98e2523460b621b923c26ccc24f967",
+  "adoption-ready/projection.ts": "b6af74ddc2d20e9bc9d740deaa2cdb0cb214a323b3a7e681d0e10726bd67c93f",
+  "adoption-ready/candidate.patch": "e1277fa03c6505ba718cbdb66b2b2e534b44db4637e9a77a73041f91e28416bc",
+  "adoption-ready/projector-certified-edit.test.ts": "b95bc18c2e61d3b5e04fe22a2c634efec8f165a45f8f2b0e8b790818fae6ff3c",
+  "adoption-ready/source-textarea.ts": "32e113365477cb9156e5e09b023e87f2fd3487556b46915220508a8b378d6053"
+}

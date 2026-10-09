@@ -1,0 +1,16 @@
+[
+	{
+		"path": "shared/projection.ts",
+		"capturedSHA256": "3439bfb2a4c5014121def59dd78c4d0e4d154166d9f67a272eb7ba99cadc71fe",
+		"productionSHA256": "b6af74ddc2d20e9bc9d740deaa2cdb0cb214a323b3a7e681d0e10726bd67c93f",
+		"minifiedModuleSHA256": "d970229fcffa47e285c3d3c5ed2421659b7e49f66563f8ed33599ca8653e3e33",
+		"minifiedModuleEqual": true
+	},
+	{
+		"path": "client/source-textarea.ts",
+		"capturedSHA256": "fc7de9ca6faa964c4e47fb522b476fa3011ecb5bc870f848d2268394b5730b0a",
+		"productionSHA256": "ea21278c971230d2e6444d11b54c3c6180f1022e777f84f254f01531c15e40ec",
+		"minifiedModuleSHA256": "3f898728b1d4699ee384544425017dda9606210b06619db1d86bb4d14841130a",
+		"minifiedModuleEqual": true
+	}
+]

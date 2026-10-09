@@ -1,0 +1,33 @@
+Done reviewing. I only read the code; I ran no tests, builds or browser.
+
+**Verdict:** the candidate fixes both hot spots and doesn't skip any grammar that could matter. It has one real blocker (the textarea and the Projector cache can disagree) plus a few cheap fixes.
+
+## Is the output identical to a fresh parse? Yes, given the gates
+- **Lexical context:** frontmatter only depends on line 0, which is rejected. Fence state only changes on lines matching the opening regex, and old/new lines that match it are rejected. The frontmatter delimiter regex is the same one used in `project()`. The indentation class is checked. The edited line contains no `[` before or after, so `lineTokens` gives `[]` whatever its `literal` value is, and that flag is kept correctly. Backticks and backslashes only act within a line. Grammar that is skipped is provably irrelevant here.
+- **Active tokens:** the previous active selection must touch no token (via `activeTokens`), so `projectedText` is the fully collapsed projection. The new active check uses the same intersection rule as `projectTokens`. The edit-vs-token check never fires here, since the line has no tokens and it can't cross a newline, but it is harmless.
+- **Rebuilt links:** `view`, `viewEnd`, `parts` and `editView` match how `projectTokens` builds them. Field order and `iconSpace` also match.
+- **CRLF / UTF-16:** `\r` stays inside the line text and `\s*$` handles it. Lone surrogates have no effect on tokenizing; the behaviour equals the fallback.
+- **Dirty-line binary search:** correct, including `start === line.start` and the end-of-line boundary.
+
+## Blocker
+1. **Unchecked invariant: `projector.projectedText` must equal `this.current.text` (`source-textarea.ts` input).** The source equality gate doesn't guarantee this. Example: the textarea shows `identity(S)` because it was in raw mode or held, then mode becomes `project` with no `sync()` in between. The projector still holds collapsed text for S.
+   - The certified text then differs from the DOM, and `editView` may not equal `edit.start`.
+   - If the lengths happen to match, `reprojected` stays false and `acknowledge()` accepts a string the DOM doesn't show, which corrupts the coordinate mapping.
+   - **Fix:** only call `replace` when `this.projected?.value === this.current && this.projected.mode === "project"`. Optionally also check `certified.text.length === expectedLength` and fall back if not.
+
+## Non-blocking, minimal fixes
+2. **Line metadata rebuild:** `this.lines.map` allocates a spread object plus a `tokens.slice` array for every later line. That is about as much allocation as the `split` it replaces, which is the very cost being removed.
+   - **Fix:** the lines are private to the Projector, so update later lines in place (`line.start += delta`). Keep `previous.tokens` when it's empty, and only rewrite `tokens` on lines that have them.
+3. **Reentrant getters:** `input()` now calls `options.documents()`/`mode()` inside the edit loop; production didn't.
+   - `documentLinks` (`document-app.ts:1486`) is memoised and doesn't call back into the textarea, and `mode` is a pure closure, so there's no blocker.
+   - **Fix:** read them once before the loop. The documents key is also built twice per edit (once in `input`, once in `replace`); compute it once and pass it in.
+4. **`previousProjected` in multi-edit loops:** it now points at the intermediate state between edits, which changes the Undo restore path slightly. This is harmless because the restored state's source won't match the projector, so it falls back. Worth an Undo test.
+5. **`prefix` field:** comparing `iconPrefix !== this.prefix` is dead code because the module binding never changes. It can be dropped.
+
+## Does it address both hotspots?
+- **Split/scan:** removed from the certified path. That covers `split`, the prefix/suffix scan and the per-line regex loop.
+- **`projectTokens` string rebuild:** replaced by one splice of the private canonical string. The links are rebuilt from private tokens in O(tokens), and the borrowed public `Projection` links are never reused, so it is safe.
+- Full regeneration is avoided. What remains is O(lines + tokens) metadata work, which fix 2 makes allocation-free.
+- Fallback and source authority are unchanged. Hold/composition and raw/multi-selection are correctly excluded.
+
+The CPU gate can proceed once fix 1 is in. Add a test for fix 1 specifically: raw→project switch with no `sync()` before the next input, using equal-length labels.

@@ -1,0 +1,578 @@
+[
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 0,
+    "phase": "input",
+    "trace": "/tmp/alkalye-projector-certified-edit/series-control-rich1m-0-73b5095c-937a-4bd3-8823-9f4769208930/results/a3a76e35-a2eb-42fb-94f8-63db75b8d912/control-body-rich1m-0.trace.json",
+    "sha256": "dc87dcc8f77eaca199abb3a088cc34085a55314cd66f622999a9081c7e644926",
+    "bytes": 8410546,
+    "windowMs": 3000.779,
+    "mainThread": [
+      73810,
+      20441974
+    ],
+    "initialInputTaskMs": 11.981,
+    "inputDispatchMs": 10.269,
+    "mainMaxTaskMs": 11.981,
+    "mainBusyMs": 731.974,
+    "largestMainGCSpanMs": 9.957,
+    "readyFromStartMs": 12.200000047683716,
+    "readyFromNativeEventMs": 11.700000047683716,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.09999996423721313,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:28"
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:36"
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:37"
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  },
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 0,
+    "phase": "undo",
+    "trace": "/tmp/alkalye-projector-certified-edit/series-control-rich1m-0-73b5095c-937a-4bd3-8823-9f4769208930/results/a3a76e35-a2eb-42fb-94f8-63db75b8d912/control-body-rich1m-0-undo.trace.json",
+    "sha256": "54614e594a2272d57feaa9b48921390f0861d566c5c0ae8060f8b6d395980b0b",
+    "bytes": 9971062,
+    "windowMs": 3000.324,
+    "mainThread": [
+      73810,
+      20441974
+    ],
+    "initialInputTaskMs": null,
+    "inputDispatchMs": null,
+    "mainMaxTaskMs": 11.345,
+    "mainBusyMs": 659.52,
+    "largestMainGCSpanMs": 10.813,
+    "readyFromStartMs": 21.800000011922748,
+    "readyFromNativeEventMs": 21.800000011922748,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.2999999523162842,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:28"
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:36"
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:37"
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  },
+  {
+    "arm": "candidate",
+    "fixture": "rich1m",
+    "trial": 0,
+    "phase": "input",
+    "trace": "/tmp/alkalye-projector-certified-edit/series-candidate-rich1m-0-d63f3714-d76d-47a1-aafa-f99673bb54b1/results/ef12eea6-d933-433f-a1b1-67a69b935e5f/candidate-body-rich1m-0.trace.json",
+    "sha256": "17db2ce2bd393298b650965dadc586a16275438a5fd4e24d7229b8dbb17f94a5",
+    "bytes": 8408175,
+    "windowMs": 3002.649,
+    "mainThread": [
+      74252,
+      20447459
+    ],
+    "initialInputTaskMs": 7.859,
+    "inputDispatchMs": 6.274,
+    "mainMaxTaskMs": 9.947,
+    "mainBusyMs": 744.298,
+    "largestMainGCSpanMs": 9.47,
+    "readyFromStartMs": 7.800000011920929,
+    "readyFromNativeEventMs": 7.399999976158142,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:28"
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:36"
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:37"
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  },
+  {
+    "arm": "candidate",
+    "fixture": "rich1m",
+    "trial": 0,
+    "phase": "undo",
+    "trace": "/tmp/alkalye-projector-certified-edit/series-candidate-rich1m-0-d63f3714-d76d-47a1-aafa-f99673bb54b1/results/ef12eea6-d933-433f-a1b1-67a69b935e5f/candidate-body-rich1m-0-undo.trace.json",
+    "sha256": "355edf5d7637d21970f4f2fc773daef633678c5892ac8ff84ee1377920dbc900",
+    "bytes": 9776850,
+    "windowMs": 3002.621,
+    "mainThread": [
+      74252,
+      20447459
+    ],
+    "initialInputTaskMs": null,
+    "inputDispatchMs": null,
+    "mainMaxTaskMs": 10.585,
+    "mainBusyMs": 701.468,
+    "largestMainGCSpanMs": 10.04,
+    "readyFromStartMs": 28.60000002383822,
+    "readyFromNativeEventMs": 28.60000002383822,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.30000001192274794,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:28"
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:36"
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:37"
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  },
+  {
+    "arm": "candidate",
+    "fixture": "rich1m",
+    "trial": 1,
+    "phase": "input",
+    "trace": "/tmp/alkalye-projector-certified-edit/series-candidate-rich1m-1-71b620c5-ed6b-4337-afe6-fcc180508534/results/ec440fbd-1ded-4bd3-a2e6-b4ef18a62a3a/candidate-body-rich1m-0.trace.json",
+    "sha256": "b60c04588fea3a624fc67315de947312ec5e02fac8e8fe03d57d8493a05d000f",
+    "bytes": 8549358,
+    "windowMs": 3002.459,
+    "mainThread": [
+      74705,
+      20452395
+    ],
+    "initialInputTaskMs": 8.11,
+    "inputDispatchMs": 6.599,
+    "mainMaxTaskMs": 9.935,
+    "mainBusyMs": 770.252,
+    "largestMainGCSpanMs": 9.368,
+    "readyFromStartMs": 8.100000023841858,
+    "readyFromNativeEventMs": 7.699999988079071,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:28"
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:36"
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:37"
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  },
+  {
+    "arm": "candidate",
+    "fixture": "rich1m",
+    "trial": 1,
+    "phase": "undo",
+    "trace": "/tmp/alkalye-projector-certified-edit/series-candidate-rich1m-1-71b620c5-ed6b-4337-afe6-fcc180508534/results/ec440fbd-1ded-4bd3-a2e6-b4ef18a62a3a/candidate-body-rich1m-0-undo.trace.json",
+    "sha256": "1065c6bb2db0aaceef92ba05bf949aa58169755c18aef7d6a370b2f347e17d61",
+    "bytes": 8551058,
+    "windowMs": 3001.595,
+    "mainThread": [
+      74705,
+      20452395
+    ],
+    "initialInputTaskMs": null,
+    "inputDispatchMs": null,
+    "mainMaxTaskMs": 10.294,
+    "mainBusyMs": 743.039,
+    "largestMainGCSpanMs": 9.845,
+    "readyFromStartMs": 25.0,
+    "readyFromNativeEventMs": 25.100000023845496,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.19999998807725206,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:28"
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:36"
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:37"
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  },
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 1,
+    "phase": "input",
+    "trace": "/tmp/alkalye-projector-certified-edit/series-control-rich1m-1-41cd725e-7315-409c-9aa3-57aa1ca9516e/results/9437eadc-ed54-4ac6-9969-7f2d84eff5f0/control-body-rich1m-0.trace.json",
+    "sha256": "8deb923799569893fc05e1a45a0d3c889a24b10c0e64ee174984b96e9df2da87",
+    "bytes": 8469125,
+    "windowMs": 3001.277,
+    "mainThread": [
+      75126,
+      20457436
+    ],
+    "initialInputTaskMs": 11.017,
+    "inputDispatchMs": 9.461,
+    "mainMaxTaskMs": 11.017,
+    "mainBusyMs": 780.761,
+    "largestMainGCSpanMs": 9.394,
+    "readyFromStartMs": 10.899999976158142,
+    "readyFromNativeEventMs": 10.599999964237213,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:28"
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:36"
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:37"
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  },
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 1,
+    "phase": "undo",
+    "trace": "/tmp/alkalye-projector-certified-edit/series-control-rich1m-1-41cd725e-7315-409c-9aa3-57aa1ca9516e/results/9437eadc-ed54-4ac6-9969-7f2d84eff5f0/control-body-rich1m-0-undo.trace.json",
+    "sha256": "fc2ccc28699c36308fd90bc141025f257144e5823244277c02009b2c8a2c5fc5",
+    "bytes": 10014685,
+    "windowMs": 3001.648,
+    "mainThread": [
+      75126,
+      20457436
+    ],
+    "initialInputTaskMs": null,
+    "inputDispatchMs": null,
+    "mainMaxTaskMs": 11.77,
+    "mainBusyMs": 675.917,
+    "largestMainGCSpanMs": 11.222,
+    "readyFromStartMs": 22.099999964239032,
+    "readyFromNativeEventMs": 22.099999964239032,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.19999998807725206,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:28"
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:36"
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:37"
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  },
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 2,
+    "phase": "input",
+    "trace": "/tmp/alkalye-projector-certified-edit/series-control-rich1m-2-06466c47-d47d-41b6-914f-85a58339d7d3/results/5d0032ed-c325-4352-add6-8640cf5f0b0a/control-body-rich1m-0.trace.json",
+    "sha256": "ecb87b2927f9c42bd0c9355480fd0aed8e7338b35f3e4a6065c3eaef8afa5547",
+    "bytes": 8429734,
+    "windowMs": 3000.702,
+    "mainThread": [
+      75560,
+      20462261
+    ],
+    "initialInputTaskMs": 11.073,
+    "inputDispatchMs": 9.428,
+    "mainMaxTaskMs": 11.073,
+    "mainBusyMs": 789.139,
+    "largestMainGCSpanMs": 10.101,
+    "readyFromStartMs": 11.199999988079071,
+    "readyFromNativeEventMs": 10.800000011920929,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:28"
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:36"
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:37"
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  },
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 2,
+    "phase": "undo",
+    "trace": "/tmp/alkalye-projector-certified-edit/series-control-rich1m-2-06466c47-d47d-41b6-914f-85a58339d7d3/results/5d0032ed-c325-4352-add6-8640cf5f0b0a/control-body-rich1m-0-undo.trace.json",
+    "sha256": "3394a7edc1a5d1cef525ecef8891b467a624b702e71f04e92c742f2e3e4dd767",
+    "bytes": 9874988,
+    "windowMs": 3001.39,
+    "mainThread": [
+      75560,
+      20462261
+    ],
+    "initialInputTaskMs": null,
+    "inputDispatchMs": null,
+    "mainMaxTaskMs": 10.924,
+    "mainBusyMs": 662.482,
+    "largestMainGCSpanMs": 10.444,
+    "readyFromStartMs": 26.599999964235394,
+    "readyFromNativeEventMs": 26.599999964235394,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.30000001192274794,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:28"
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:36"
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:37"
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  },
+  {
+    "arm": "candidate",
+    "fixture": "rich1m",
+    "trial": 2,
+    "phase": "input",
+    "trace": "/tmp/alkalye-projector-certified-edit/series-candidate-rich1m-2-d144e808-c3c7-43c2-b6d9-5ace776b126a/results/a5c2b92b-b847-43e6-a40a-41e016bed35b/candidate-body-rich1m-0.trace.json",
+    "sha256": "80a306586311256755e244ed51c5cf79aff99a3edf41e7ad75f76fe7fcb966ff",
+    "bytes": 8504442,
+    "windowMs": 3000.605,
+    "mainThread": [
+      75996,
+      20467353
+    ],
+    "initialInputTaskMs": 8.004,
+    "inputDispatchMs": 6.47,
+    "mainMaxTaskMs": 11.18,
+    "mainBusyMs": 782.452,
+    "largestMainGCSpanMs": 10.642,
+    "readyFromStartMs": 13.0,
+    "readyFromNativeEventMs": 12.599999964237213,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.10000002384185791,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:28"
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:36"
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:37"
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  },
+  {
+    "arm": "candidate",
+    "fixture": "rich1m",
+    "trial": 2,
+    "phase": "undo",
+    "trace": "/tmp/alkalye-projector-certified-edit/series-candidate-rich1m-2-d144e808-c3c7-43c2-b6d9-5ace776b126a/results/a5c2b92b-b847-43e6-a40a-41e016bed35b/candidate-body-rich1m-0-undo.trace.json",
+    "sha256": "0e6e20d09da746a68f8d9095a6b9a7a4354c1482f1345a3fdfb1ef83030f855c",
+    "bytes": 10134394,
+    "windowMs": 3003.158,
+    "mainThread": [
+      75996,
+      20467353
+    ],
+    "initialInputTaskMs": null,
+    "inputDispatchMs": null,
+    "mainMaxTaskMs": 10.975,
+    "mainBusyMs": 679.716,
+    "largestMainGCSpanMs": 10.448,
+    "readyFromStartMs": 24.69999998808089,
+    "readyFromNativeEventMs": 24.69999998808089,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.30000001191910997,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:28"
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:36"
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "log": "c0fdede1-1a37-4863-b445-008c57931f74:37"
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  }
+]

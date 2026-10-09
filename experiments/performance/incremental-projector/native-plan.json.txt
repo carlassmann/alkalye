@@ -1,0 +1,11 @@
+{
+  "baseCommit": "18dbb7679877bb366fd4f1702f4b051f6157ca1b",
+  "fixtureSHA256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+  "UTF16Units": 1048576,
+  "UTF8Bytes": 1048576,
+  "insertionOffset": 524288,
+  "dirtyLineStart": 524236,
+  "dirtyLineEnd": 524335,
+  "dirtyLine": "A responsiveness fixture with **bold words**, ==highlight== and [a reference](https://example.com).",
+  "policy": "Original midpoint unchanged. Dirty-line exact-token-parity certificate required. No blank-line/fixture substitution. n1 unsampled input +Undo separate3s windows; source/native/caret/HTTP/reload exact."
+}

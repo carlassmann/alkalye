@@ -1,0 +1,2 @@
+src/shared/projection.ts(277,16): error TS2304: Cannot find name 'iconSpace'.
+src/shared/projection.ts(288,8): error TS2304: Cannot find name 'iconSpace'.

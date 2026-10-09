@@ -1,0 +1,25 @@
+{"stage":"running","arm":"control","trial":0,"pid":73648,"run":"/tmp/alkalye-projector-certified-edit/series-control-rich1m-0-73b5095c-937a-4bd3-8823-9f4769208930"}
+started web pid=73666
+{"stage":"complete","arm":"control","fixture":"rich1m","resultDirectory":"/tmp/alkalye-projector-certified-edit/series-control-rich1m-0-73b5095c-937a-4bd3-8823-9f4769208930/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-projector-certified-edit/codex-projector-proof/web
+{"stage":"running","arm":"candidate","trial":0,"pid":74090,"run":"/tmp/alkalye-projector-certified-edit/series-candidate-rich1m-0-d63f3714-d76d-47a1-aafa-f99673bb54b1"}
+started web pid=74108
+{"stage":"complete","arm":"candidate","fixture":"rich1m","resultDirectory":"/tmp/alkalye-projector-certified-edit/series-candidate-rich1m-0-d63f3714-d76d-47a1-aafa-f99673bb54b1/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-projector-certified-edit/codex-projector-proof/web
+{"stage":"running","arm":"candidate","trial":1,"pid":74553,"run":"/tmp/alkalye-projector-certified-edit/series-candidate-rich1m-1-71b620c5-ed6b-4337-afe6-fcc180508534"}
+started web pid=74567
+{"stage":"complete","arm":"candidate","fixture":"rich1m","resultDirectory":"/tmp/alkalye-projector-certified-edit/series-candidate-rich1m-1-71b620c5-ed6b-4337-afe6-fcc180508534/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-projector-certified-edit/codex-projector-proof/web
+{"stage":"running","arm":"control","trial":1,"pid":74977,"run":"/tmp/alkalye-projector-certified-edit/series-control-rich1m-1-41cd725e-7315-409c-9aa3-57aa1ca9516e"}
+started web pid=74995
+{"stage":"complete","arm":"control","fixture":"rich1m","resultDirectory":"/tmp/alkalye-projector-certified-edit/series-control-rich1m-1-41cd725e-7315-409c-9aa3-57aa1ca9516e/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-projector-certified-edit/codex-projector-proof/web
+{"stage":"running","arm":"control","trial":2,"pid":75406,"run":"/tmp/alkalye-projector-certified-edit/series-control-rich1m-2-06466c47-d47d-41b6-914f-85a58339d7d3"}
+started web pid=75420
+{"stage":"complete","arm":"control","fixture":"rich1m","resultDirectory":"/tmp/alkalye-projector-certified-edit/series-control-rich1m-2-06466c47-d47d-41b6-914f-85a58339d7d3/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-projector-certified-edit/codex-projector-proof/web
+{"stage":"running","arm":"candidate","trial":2,"pid":75849,"run":"/tmp/alkalye-projector-certified-edit/series-candidate-rich1m-2-d144e808-c3c7-43c2-b6d9-5ace776b126a"}
+started web pid=75863
+{"stage":"complete","arm":"candidate","fixture":"rich1m","resultDirectory":"/tmp/alkalye-projector-certified-edit/series-candidate-rich1m-2-d144e808-c3c7-43c2-b6d9-5ace776b126a/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-projector-certified-edit/codex-projector-proof/web
+series complete

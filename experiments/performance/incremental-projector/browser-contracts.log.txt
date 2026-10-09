@@ -1,0 +1,20 @@
+PASS Trusted exact native fixture 0
+{"index":0,"assertions":8,"caret":19,"source":true,"trusted":true}
+PASS Trusted exact native fixture 1
+{"index":1,"assertions":16,"caret":22,"source":true,"trusted":true}
+PASS Trusted exact native fixture 2
+{"index":2,"assertions":24,"caret":29,"source":true,"trusted":true}
+PASS Trusted exact native fixture 3
+{"index":3,"assertions":32,"caret":15,"source":true,"trusted":true}
+PASS Trusted exact native fixture 4
+{"index":4,"assertions":40,"caret":23,"source":true,"trusted":true}
+PASS Trusted exact native fixture 5
+{"index":5,"assertions":48,"caret":19,"source":true,"trusted":true}
+PASS Trusted exact native fixture 6
+{"index":6,"assertions":56,"caret":19,"source":true,"trusted":true}
+PASS Trusted exact native fixture 7
+{"index":7,"assertions":64,"caret":14,"source":true,"trusted":true}
+PASS Trusted exact native fixture 8
+{"index":8,"assertions":72,"caret":19,"source":true,"trusted":true}
+PASS Trusted exact native fixture 9
+{"index":9,"assertions":80,"caret":19,"source":true,"trusted":true}

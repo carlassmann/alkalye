@@ -1,0 +1,17 @@
+let root = "/tmp/alkalye-projector-certified-edit"
+if (await Bun.file(root + "/series-pending.json").exists()) throw Error("Retained series; no uncertain restart")
+await Bun.write(root + "/series-pending.json", JSON.stringify({ stage: "before-keys", samples: 3, originalMidpoint: 524288 }))
+let cells: { arm: string; fixture: string; trial: number; run: string; pid: number; exit: number }[] = []
+for (let trial = 0; trial < 3; trial++) {
+	let arms = trial % 2 ? ["candidate", "control"] : ["control", "candidate"]
+	for (let arm of arms) {
+		let run = root + "/series-" + arm + "-rich1m-" + trial + "-" + crypto.randomUUID()
+		let child = Bun.spawn(["bun", "production-body-gate.ts", arm, "rich1m", "--measure"], { cwd: root + "/app-runtime", env: { ...process.env, PRODUCTION_BODY_RUN: run }, stdout: "inherit", stderr: "inherit" })
+		console.log(JSON.stringify({ stage: "running", arm, trial, pid: child.pid, run }))
+		let exit = await child.exited
+		cells.push({ arm, fixture: "rich1m", trial, run, pid: child.pid, exit })
+		await Bun.write(root + "/series-progress.json", JSON.stringify(cells, null, 2))
+		if (exit !== 0) throw Error("Stop after failed or uncertain cell")
+	}
+}
+console.log("series complete")

@@ -46,6 +46,11 @@ export class Projector {
 	private source: string | undefined
 	private tokens: LinkToken[] = []
 	private documents = ""
+	private projectedText: string | undefined
+	private active: { start: number; end: number } | undefined
+	private iconSpace = false
+	private prefix = iconPrefix
+	private generation = 0
 	sameActiveTokens(
 		source: string,
 		left?: { start: number; end: number },
@@ -90,7 +95,7 @@ export class Projector {
 		let changed = key !== this.documents
 		this.documents = key
 		if (source === this.source && !changed)
-			return projectTokens(source, options, this.tokens)
+			return this.materialize(source, options)
 		let texts = source.split("\n"),
 			offset = 0,
 			first = true
@@ -164,8 +169,186 @@ export class Projector {
 		this.lines = lines
 		this.source = source
 		this.tokens = tokens
-		return projectTokens(source, options, tokens)
+		return this.materialize(source, options)
 	}
+	private materialize(source: string, options: ProjectionOptions) {
+		let projection = projectTokens(source, options, this.tokens)
+		this.generation++
+		this.projectedText = projection.text
+		this.active = options.active && { ...options.active }
+		this.iconSpace = Boolean(options.iconSpace)
+		this.prefix = iconPrefix
+		return projection
+	}
+	replace(
+		projection: Projection,
+		start: number,
+		end: number,
+		insert: string,
+		options: ProjectionOptions = {},
+	): Projection | undefined {
+		let source = projection.source,
+			visible = projection.text
+		let activeSelection = options.active && {
+			start: options.active.start,
+			end: options.active.end,
+		}
+		let iconSpace = Boolean(options.iconSpace)
+		let key = (options.documents ?? [])
+			.map(doc => doc.id + ":" + doc.title)
+			.join("\n")
+		if (
+			source !== this.source ||
+			this.projectedText === undefined ||
+			visible !== this.projectedText ||
+			key !== this.documents ||
+			iconSpace !== this.iconSpace ||
+			iconPrefix !== this.prefix ||
+			!Number.isSafeInteger(start) ||
+			!Number.isSafeInteger(end) ||
+			start < 0 ||
+			end < start ||
+			end > source.length ||
+			insert.includes("\n")
+		)
+			return undefined
+		if (
+			activeSelection &&
+			(!Number.isFinite(activeSelection.start) ||
+				!Number.isFinite(activeSelection.end))
+		)
+			return undefined
+		if (this.active) {
+			if (
+				!Number.isFinite(this.active.start) ||
+				!Number.isFinite(this.active.end)
+			)
+				return undefined
+			let active = this.activeTokens(source, this.active)
+			if (active.start !== active.end) return undefined
+		}
+		let low = 0,
+			high = this.lines.length
+		while (low < high) {
+			let middle = (low + high) >>> 1
+			if ((this.lines[middle]?.start ?? Infinity) <= start) low = middle + 1
+			else high = middle
+		}
+		let index = low - 1,
+			line = this.lines[index]
+		if (!line || index === 0 || end > line.start + line.text.length)
+			return undefined
+		let text =
+			line.text.slice(0, start - line.start) +
+			insert +
+			line.text.slice(end - line.start)
+		if (
+			/^ {0,3}(`{3,}|~{3,})/.test(line.text) ||
+			/^ {0,3}(`{3,}|~{3,})/.test(text) ||
+			/^(---|\.\.\.)\s*$/.test(line.text) ||
+			/^(---|\.\.\.)\s*$/.test(text) ||
+			/^( {4}|\t)/.test(line.text) !== /^( {4}|\t)/.test(text)
+		)
+			return undefined
+		let delta = insert.length - (end - start)
+		let generation = this.generation
+		let parsed = line.literal
+			? []
+			: lineTokens(text, line.start, options.documents ?? [])
+		if (generation !== this.generation || parsed.length !== line.tokens.length)
+			return undefined
+		for (let position = 0; position < parsed.length; position++) {
+			let before = line.tokens[position],
+				after = parsed[position]
+			if (!before || !after || (before.end >= start && before.start <= end))
+				return undefined
+			let shift = before.start > end ? delta : 0
+			if (!sameShiftedToken(before, after, shift)) return undefined
+		}
+		let nextSource = source.slice(0, start) + insert + source.slice(end)
+		let active = activeSelection && selectionBounds(nextSource, activeSelection)
+		let viewDelta = 0,
+			editView = start
+		let tokens: LinkToken[] = [],
+			links: ProjectedLink[] = []
+		for (let token of this.tokens) {
+			if (token.end >= start && token.start <= end) return undefined
+			let next = token.start > end ? shift(token, delta) : token
+			if (active && next.end >= active.start && next.start <= active.end)
+				return undefined
+			let view = next.start + viewDelta
+			let prefix = iconSpace ? iconPrefix : ""
+			let viewEnd = view + prefix.length + next.label.length
+			links.push({
+				kind: next.kind,
+				target: next.target,
+				broken: next.broken,
+				...(iconSpace ? { iconSpace: true } : {}),
+				source: { start: next.start, end: next.end },
+				view: { start: view, end: viewEnd },
+				parts: next.parts.map(part => ({
+					source: part.start,
+					view: view + prefix.length + part.offset,
+					length: part.end - part.start,
+				})),
+			})
+			tokens.push(next)
+			viewDelta += prefix.length + next.label.length - (next.end - next.start)
+			if (token.end < start) editView = start + viewDelta
+		}
+		let projectedText =
+			this.projectedText.slice(0, editView) +
+			insert +
+			this.projectedText.slice(editView + end - start)
+		line.text = text
+		line.tokens = parsed
+		if (delta !== 0) {
+			let tokenOffset = 0
+			for (let position = 0; position < this.lines.length; position++) {
+				let previous = this.lines[position]
+				if (!previous) continue
+				let count = previous.tokens.length
+				if (position > index) {
+					previous.start += delta
+					if (count)
+						previous.tokens = tokens.slice(tokenOffset, tokenOffset + count)
+				}
+				tokenOffset += count
+			}
+		}
+		this.generation++
+		this.source = nextSource
+		this.tokens = tokens
+		this.projectedText = projectedText
+		this.active = activeSelection
+		return { source: nextSource, text: projectedText, links }
+	}
+}
+
+function sameShiftedToken(before: LinkToken, after: LinkToken, shift: number) {
+	if (
+		before.kind !== after.kind ||
+		before.target !== after.target ||
+		before.broken !== after.broken ||
+		before.label !== after.label ||
+		before.start + shift !== after.start ||
+		before.end + shift !== after.end ||
+		before.parts.length !== after.parts.length
+	)
+		return false
+	for (let index = 0; index < before.parts.length; index++) {
+		let left = before.parts[index],
+			right = after.parts[index]
+		if (
+			!left ||
+			!right ||
+			left.start + shift !== right.start ||
+			left.end + shift !== right.end ||
+			left.offset !== right.offset
+		)
+			return false
+	}
+	return true
 }
 
 function projectTokens(

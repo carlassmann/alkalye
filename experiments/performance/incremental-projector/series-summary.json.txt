@@ -1,0 +1,214 @@
+[
+  {
+    "fixture": "rich1m",
+    "phase": "input",
+    "arm": "control",
+    "n": 3,
+    "metrics": {
+      "readyFromNativeEventMs": {
+        "median": 10.800000011920929,
+        "max": 11.700000047683716,
+        "samples": [
+          11.700000047683716,
+          10.599999964237213,
+          10.800000011920929
+        ]
+      },
+      "readyFromStartMs": {
+        "median": 11.199999988079071,
+        "max": 12.200000047683716,
+        "samples": [
+          12.200000047683716,
+          10.899999976158142,
+          11.199999988079071
+        ]
+      },
+      "mainMaxTaskMs": {
+        "median": 11.073,
+        "max": 11.981,
+        "samples": [
+          11.981,
+          11.017,
+          11.073
+        ]
+      },
+      "mainBusyMs": {
+        "median": 780.761,
+        "max": 789.139,
+        "samples": [
+          731.974,
+          780.761,
+          789.139
+        ]
+      },
+      "largestMainGCSpanMs": {
+        "median": 9.957,
+        "max": 10.101,
+        "samples": [
+          9.957,
+          9.394,
+          10.101
+        ]
+      }
+    }
+  },
+  {
+    "fixture": "rich1m",
+    "phase": "input",
+    "arm": "candidate",
+    "n": 3,
+    "metrics": {
+      "readyFromNativeEventMs": {
+        "median": 7.699999988079071,
+        "max": 12.599999964237213,
+        "samples": [
+          7.399999976158142,
+          7.699999988079071,
+          12.599999964237213
+        ]
+      },
+      "readyFromStartMs": {
+        "median": 8.100000023841858,
+        "max": 13.0,
+        "samples": [
+          7.800000011920929,
+          8.100000023841858,
+          13.0
+        ]
+      },
+      "mainMaxTaskMs": {
+        "median": 9.947,
+        "max": 11.18,
+        "samples": [
+          9.947,
+          9.935,
+          11.18
+        ]
+      },
+      "mainBusyMs": {
+        "median": 770.252,
+        "max": 782.452,
+        "samples": [
+          744.298,
+          770.252,
+          782.452
+        ]
+      },
+      "largestMainGCSpanMs": {
+        "median": 9.47,
+        "max": 10.642,
+        "samples": [
+          9.47,
+          9.368,
+          10.642
+        ]
+      }
+    }
+  },
+  {
+    "fixture": "rich1m",
+    "phase": "undo",
+    "arm": "control",
+    "n": 3,
+    "metrics": {
+      "readyFromNativeEventMs": {
+        "median": 22.099999964239032,
+        "max": 26.599999964235394,
+        "samples": [
+          21.800000011922748,
+          22.099999964239032,
+          26.599999964235394
+        ]
+      },
+      "readyFromStartMs": {
+        "median": 22.099999964239032,
+        "max": 26.599999964235394,
+        "samples": [
+          21.800000011922748,
+          22.099999964239032,
+          26.599999964235394
+        ]
+      },
+      "mainMaxTaskMs": {
+        "median": 11.345,
+        "max": 11.77,
+        "samples": [
+          11.345,
+          11.77,
+          10.924
+        ]
+      },
+      "mainBusyMs": {
+        "median": 662.482,
+        "max": 675.917,
+        "samples": [
+          659.52,
+          675.917,
+          662.482
+        ]
+      },
+      "largestMainGCSpanMs": {
+        "median": 10.813,
+        "max": 11.222,
+        "samples": [
+          10.813,
+          11.222,
+          10.444
+        ]
+      }
+    }
+  },
+  {
+    "fixture": "rich1m",
+    "phase": "undo",
+    "arm": "candidate",
+    "n": 3,
+    "metrics": {
+      "readyFromNativeEventMs": {
+        "median": 25.100000023845496,
+        "max": 28.60000002383822,
+        "samples": [
+          28.60000002383822,
+          25.100000023845496,
+          24.69999998808089
+        ]
+      },
+      "readyFromStartMs": {
+        "median": 25.0,
+        "max": 28.60000002383822,
+        "samples": [
+          28.60000002383822,
+          25.0,
+          24.69999998808089
+        ]
+      },
+      "mainMaxTaskMs": {
+        "median": 10.585,
+        "max": 10.975,
+        "samples": [
+          10.585,
+          10.294,
+          10.975
+        ]
+      },
+      "mainBusyMs": {
+        "median": 701.468,
+        "max": 743.039,
+        "samples": [
+          701.468,
+          743.039,
+          679.716
+        ]
+      },
+      "largestMainGCSpanMs": {
+        "median": 10.04,
+        "max": 10.448,
+        "samples": [
+          10.04,
+          9.845,
+          10.448
+        ]
+      }
+    }
+  }
+]

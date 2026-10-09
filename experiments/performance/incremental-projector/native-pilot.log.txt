@@ -1,0 +1,30 @@
+{"stage":"running","arm":"control","pid":71078,"run":"/tmp/alkalye-projector-certified-edit/native-control-rich1m-e01be2a0-230c-4e34-a293-c6cb8d2072c9"}
+not a git repository: /private/tmp/alkalye-projector-certified-edit/app-runtime
+caused by: failed to run git rev-parse --show-toplevel
+caused by: Command failed: git rev-parse --show-toplevel
+fatal: not a git repository (or any of the parent directories): .git
+
+stderr: fatal: not a git repository (or any of the parent directories): .git
+missing workspace outside a work project. Usage: work down [workspace] | work down --all
+53 | let stage = "prepare"
+54 | let failure = false
+55 | async function command(args: string[], variables: Record<string, string> = {}) {
+56 |  let child = Bun.spawn(args, { cwd: import.meta.dir, env: { ...process.env, WORK_STATE_ROOT: stateRoot, ...variables }, stdout: "inherit", stderr: "inherit" })
+57 |  let exit = await child.exited
+58 |  if (exit !== 0) throw Error("Owned command failed: " + args[0] + " (" + exit + ")")
+                            ^
+error: Owned command failed: work (1)
+      at command (/private/tmp/alkalye-projector-certified-edit/app-runtime/production-body-gate.ts:58:24)
+
+Bun v1.4.0 (macOS arm64)
+ 7 |  let child = Bun.spawn(["bun", "production-body-gate.ts", arm, "rich1m", "--measure"], { cwd: root + "/app-runtime", env: { ...process.env, PRODUCTION_BODY_RUN: run }, stdout: "inherit", stderr: "inherit" })
+ 8 |  console.log(JSON.stringify({ stage: "running", arm, pid: child.pid, run }))
+ 9 |  let exit = await child.exited
+10 |  cells.push({ arm, run, pid: child.pid, exit })
+11 |  await Bun.write(root + "/pilot-progress.json", JSON.stringify(cells, null, 2))
+12 |  if (exit !== 0) throw Error("Stop after failed or uncertain cell")
+                            ^
+error: Stop after failed or uncertain cell
+      at /private/tmp/alkalye-projector-certified-edit/pilot.ts:12:24
+
+Bun v1.4.0 (macOS arm64)

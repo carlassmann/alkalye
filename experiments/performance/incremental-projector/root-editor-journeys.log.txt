@@ -1,0 +1,4 @@
+PASS tests/browser-multicursor.ts (7.6s)
+PASS tests/browser-editor-selection.ts (10.5s)
+PASS tests/browser-editor-prettification.ts (20.4s)
+selected: 3 suites, 0 failed, 20.6s

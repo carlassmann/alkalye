@@ -1,0 +1,39 @@
+Reviewed; no blockers. Writing it up.
+
+## Verdict: no new semantic, ownership or cache blocker
+
+I only read `candidate.patch`, `src/shared/projection.ts`, `src/client/source-textarea.ts` and the two prior logs. I ran no tests, builds or browser. No performance claim.
+
+**Linked-line extension is equivalent to a fresh parse:**
+- **Dirty line:** `parsed` is a real `lineTokens` reparse, which is the ground truth for that line. The certified path requires the same token count, each old token outside `[start,end]` (inclusive), and `sameShiftedToken` matching kind, target, broken, label, start/end and every part's start/end/offset. Anything that adds, removes or changes a token is rejected, including a token swapped in at the same index. The splice is valid only under exactly these conditions.
+- **Literal context:** `literal` is kept. The fence-opener regex is checked on the old and new text, which covers both opening and closing (closing needs a line matching the opener). The frontmatter delimiter is checked on old and new, the indent class must match, and line 0 is excluded. All other grammar works within a single line, so no other line's state can change.
+- **Active/intersection:** the previous `this.active` must touch no token, so `projectedText` is fully collapsed. The new caret is checked against the shifted tokens with the same inclusive rule `projectTokens` uses. An edit next to a link, or one mapped via iconSpace/part to `link.source.start/end`, is rejected. That's conservative.
+- **Links before and after on the same line:** earlier tokens get shift 0 and later ones get `delta`. Edits between two links are handled correctly.
+- **`editView`:** its accumulation matches `projectTokens`.
+- **delta 0 / +1 / +2 / negative:** deleting across `\n` fails the `end > lineEnd` check, and backspace at a line start lands on the previous line and fails too. With `delta === 0` later lines aren't touched. `this.tokens` then holds value-equal copies (`shift(t,0)`) while the line objects keep the originals, which is harmless.
+- **Ownership:**
+  - All mutations happen after the last `return undefined`, so a rejected call leaves the cache untouched.
+  - `line.tokens = parsed` publishes the emoji/offset fix.
+  - Later lines take `tokens.slice` aligned to the old concatenation order, which still holds because it is maintained in `project()` and `replace`.
+  - Public links are rebuilt fresh, and the borrowed `projection.links` is never read.
+- **Generation guard:** `documents` is a local plain copy and `lineTokens` is pure, so the guard can't fire today. It's harmless as a defensive check.
+- **Later full fallback:**
+  - The `project()` early path (`source === this.source && !changed`) runs `materialize` over `this.tokens`, which equals a fresh parse.
+  - The diff path compares `line.text`, `start` and `literal`, all kept consistent.
+  - A source with no `[` falls back to `identity`. That leaves the projector stale, but the source gate covers it, and a certified source without tokens projects to identity anyway.
+- **Undo/restore:** a restored `ProjectedSource` sets `projected` without touching the projector. The next `replace` then fails on source or text, unless both match the private state, and in that case the certified result is built only from private state. Text equality with iconSpace implies the same set of collapsed links. `previousProjected` now points at the intermediate state in multi-edit loops; this is still harmless.
+- **Textarea gate:** `previous.value === current && mode === "project"`, plus the private text check, still blocks the raw→project mismatch with equal-length labels.
+
+## Nits (not blockers)
+- `iconPrefix !== this.prefix` and the `prefix` field are dead code.
+- `shift(token, 0)` still allocates when `delta === 0`. Use `delta && token.start > end ? shift(...) : token`.
+- The documents key is built twice per certified edit, and `archived` is copied but never used.
+- Edits right next to a link (typing right after `)`) never take the certified path. That's correct, but it limits coverage if the retained midpoint caret sits next to a link.
+
+## Not verified yet
+These were still pending as of your message (none are proven):
+- The exclusive root fullcheck rerun after the emoji fix.
+- The 13 expanded trusted SourceTextarea cases.
+- App edit/Undo receipts plus reload at the rich midpoint.
+- The giant single-line extreme.
+- `SourceTextarea`-level tests for linked-line sequential edits followed by a sync fallback.

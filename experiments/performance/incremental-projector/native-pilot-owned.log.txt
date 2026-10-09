@@ -1,0 +1,9 @@
+{"stage":"running","arm":"control","pid":71849,"run":"/tmp/alkalye-projector-certified-edit/native-control-rich1m-aceaca81-f04e-4fab-9b28-624960bc0b76"}
+started web pid=71863
+{"stage":"complete","arm":"control","fixture":"rich1m","resultDirectory":"/tmp/alkalye-projector-certified-edit/native-control-rich1m-aceaca81-f04e-4fab-9b28-624960bc0b76/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-projector-certified-edit/codex-projector-proof/web
+{"stage":"running","arm":"candidate","pid":72275,"run":"/tmp/alkalye-projector-certified-edit/native-candidate-rich1m-450ecedf-437c-4a85-aebb-9dcb1019b159"}
+started web pid=72289
+{"stage":"complete","arm":"candidate","fixture":"rich1m","resultDirectory":"/tmp/alkalye-projector-certified-edit/native-candidate-rich1m-450ecedf-437c-4a85-aebb-9dcb1019b159/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-projector-certified-edit/codex-projector-proof/web
+pilot complete

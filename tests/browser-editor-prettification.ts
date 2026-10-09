@@ -94,6 +94,75 @@ try {
 		evaluate(session, `${editor}.selectionEnd === ${carriageSource.length}`),
 		"CRLF Undo survives reload and restores the source EOF caret",
 	)
+	let linkedParagraph =
+		"# Sequential links\n[Before](https://before.example) plain paragraph [After](https://after.example)\nlast"
+	let linkedCaret = linkedParagraph.indexOf("paragraph") + 3
+	let linkedEdited = linkedParagraph
+	browser(session, "fill", "#editor", linkedParagraph)
+	wait(
+		session,
+		`${editor}.value === ${JSON.stringify(linkedParagraph)} && document.querySelector('#save-status').textContent === 'Saved'`,
+	)
+	selectSource(linkedCaret)
+	for (let insert of ["x", "😀"]) {
+		browser(session, "keyboard", "inserttext", insert)
+		linkedEdited =
+			linkedEdited.slice(0, linkedCaret) +
+			insert +
+			linkedEdited.slice(linkedCaret)
+		linkedCaret += insert.length
+		let linkedProjected = linkedEdited
+			.replace("[Before](https://before.example)", "\u2003\u2060Before")
+			.replace("[After](https://after.example)", "\u2003\u2060After")
+		wait(
+			session,
+			`${editor}.value === ${JSON.stringify(linkedEdited)} && ${editor}.selectionStart === ${linkedCaret} && ${editor}.selectionEnd === ${linkedCaret} && ${native}.value === ${JSON.stringify(linkedProjected)} && document.querySelector('#save-status').textContent === 'Saved'`,
+		)
+		assert(
+			true,
+			"Sequential Unicode edits between links preserve source, caret and collapsed projection",
+		)
+	}
+	browser(session, "press", "Backspace")
+	linkedEdited =
+		linkedEdited.slice(0, linkedCaret - 2) + linkedEdited.slice(linkedCaret)
+	linkedCaret -= 2
+	wait(
+		session,
+		`${editor}.value === ${JSON.stringify(linkedEdited)} && ${editor}.selectionEnd === ${linkedCaret} && document.querySelector('#save-status').textContent === 'Saved'`,
+	)
+	let newLink = "[New](https://new.example)"
+	browser(session, "keyboard", "inserttext", newLink)
+	linkedEdited =
+		linkedEdited.slice(0, linkedCaret) +
+		newLink +
+		linkedEdited.slice(linkedCaret)
+	linkedCaret += newLink.length
+	wait(
+		session,
+		`${editor}.value === ${JSON.stringify(linkedEdited)} && ${editor}.selectionEnd === ${linkedCaret} && document.querySelector('#save-status').textContent === 'Saved'`,
+	)
+	selectSource(2)
+	let grammarProjected = linkedEdited
+		.replace("[Before](https://before.example)", "\u2003\u2060Before")
+		.replace("[After](https://after.example)", "\u2003\u2060After")
+		.replace(newLink, "\u2003\u2060New")
+	wait(session, `${native}.value === ${JSON.stringify(grammarProjected)}`)
+	assert(
+		true,
+		"Token-changing input falls back to a complete canonical link projection",
+	)
+	browser(session, "reload")
+	wait(
+		session,
+		`${editor}?.value === ${JSON.stringify(linkedEdited)} && !${native}.readOnly`,
+	)
+	selectSource(2)
+	wait(session, `${native}.value === ${JSON.stringify(grammarProjected)}`)
+	assert(
+		true,
+		"Sequential plain edits and new link syntax survive durable reload",
+	)
 	browser(session, "fill", "#editor", source)
 	wait(session, `${editor}.value === ${JSON.stringify(source)}`)
 	wait(session, `${native}.value === ${JSON.stringify(projected)}`)

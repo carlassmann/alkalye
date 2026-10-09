@@ -1,0 +1,34 @@
+**Verdict:** the original mismatch is fixed, and I found no new semantic blocker. I only read the code; I ran no tests, builds or browser.
+
+## Original mismatch, including equal-length raw→project
+Two independent guards now block it:
+1. **Textarea gate** (`source-textarea.ts:182`): it needs `previous.value === this.current` and `previous.mode === "project"`. After raw mode, or after a raw→project switch with no `sync()`, `projected.mode` is still `"raw"`, so it falls back.
+2. **Projector gate:** `projection.text !== this.projectedText` rejects any stale state, and it does not depend on length.
+   - With `iconSpace` on, equal text plus equal source means the same collapse set. At the first token where the two differ, all earlier text matches, so one side starts with `\u2003` and the other with `[` or `!`.
+   - So when the private `active` touches no token, the textarea's projection is fully collapsed too.
+   - When `projectionFor` uses the `sameActiveTokens` or `restored` paths without calling the projector, the source or text check catches it.
+   - When `projectionFor` uses `identity()` for a source with no `[`, the projector's source can't match, since `project()` only ever sees sources containing `[`.
+
+## Audit
+- **Mutation order:** `line.text`, `start`, `tokens` and `this.*` are all written after the last `return undefined`, so a rejected call leaves the cache untouched.
+- **Reuse by `project()`:** it reuses line objects by identity when `start` matches, and otherwise shifts by `start - previous.start`. Because `replace` updates `start` and `tokens` in place and consistently, the later prefix/suffix diff stays correct.
+- **`delta === 0`:** later lines keep their old token objects, while `this.tokens` gets copies of equal value from `shift(token, 0)`. Nothing compares tokens by identity, so this is harmless. It does allocate for no reason: use `delta && token.start > end ? shift(...) : token`.
+- **UTF-16 / CRLF:**
+  - `\r` stays in `line.text`, and `\s*$` covers the delimiter check.
+  - Inserting or deleting a `\r` in the middle of a line only matters to `/^---\r?\n/`, which tests line 0, and line 0 is excluded.
+  - Split surrogates don't affect tokenizing.
+- **View/source mapping:** `editView` equals `edit.start`, because every token is collapsed, the edit is strictly outside all tokens, and the edited line has no tokens.
+  - An edit right next to a collapsed link maps to `token.end`, which the inclusive check rejects. That is conservative and correct.
+  - The length always matches, so `acknowledge` sees the same text the DOM shows.
+- **Borrowed objects:** only `projection.source` and `projection.text` (both immutable strings) are read. Links and parts are rebuilt fresh, and private tokens are never exposed.
+- **Multi-edit loop:**
+  - After a certified edit, `projected.value === current`, so the next edit can certify as well.
+  - After a fallback, the identity check fails, so every later edit in that loop falls back too, with the projector unchanged.
+  - The next `sync()` does a full `project()` diff against the mutated lines, which is consistent.
+  - `previousProjected` is handled the same way as in `projectionFor`.
+- **Documents:** they are captured once per loop. The key uses `id:title` and ignores `archived`, the same as `project()`'s `changed` check, so behaviour matches existing code. A rename with no `sync()` changes the key and falls back.
+
+## Nits (not blockers)
+- The `prefix` field and the `iconPrefix !== this.prefix` check are dead code.
+- The documents key string is built twice per certified edit (in `replace` and in the textarea). `archived` is copied but never used.
+- **Test gap:** `tests/projector-certified-edit.test.ts` only tests `Projector`. Nothing goes through `SourceTextarea` for raw→project with no `sync()` and equal-length labels, or for multi-edit Undo. The logic holds as written, but that path is currently guaranteed only by the gate's code, not by a test.
