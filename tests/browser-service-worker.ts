@@ -32,11 +32,13 @@ let server = Bun.argv.includes("--serve")
 							)
 							.replace(
 								'"BUILD_STYLES"',
-								'"/chunks/whiteboard-' + hash() + '.css"',
+								'"/chunks/whiteboard-' +
+									hash() +
+									'.css","/components/preview.css"',
 							)
 							.replace(
 								'"BUILD_SCRIPTS"',
-								'"/chunks/whiteboard-' + hash() + '.js"',
+								'"/chunks/whiteboard-' + hash() + '.js","/document-worker.js"',
 							)
 							.replace('"BUILD_TLDRAW"', '"/tldraw/fixture.svg"'),
 						{
@@ -90,7 +92,9 @@ let server = Bun.argv.includes("--serve")
 						{ headers: { "content-type": "text/html" } },
 					)
 				return new Response(
-					path.endsWith(".js") ? `export let version = ${version}` : "fixture",
+					path.endsWith(".js")
+						? `export let version = ${version}`
+						: "fixture " + version,
 					{
 						headers: {
 							"content-type": path.endsWith(".js")
@@ -193,13 +197,18 @@ if (server) {
 			),
 			"An older lazy island also retains its hashed stylesheet offline",
 		)
-		assert(
-			evaluate(
-				session,
-				'fetch("/app.js").then(response => response.text()).then(script => script.includes("version = 2"))',
-			),
-			"Unversioned scripts always come from the current build",
-		)
+		for (let asset of [
+			"/app.js",
+			"/document-worker.js",
+			"/components/preview.css",
+		])
+			assert(
+				evaluate(
+					session,
+					`fetch(${JSON.stringify(asset)}).then(response => response.text()).then(source => source.includes(${JSON.stringify(development ? "2" : "1")}))`,
+				),
+				`An older tab retains its matching ${asset} after another tab updates`,
+			)
 		assert(
 			evaluate(session, 'caches.has("another-app")'),
 			"Activation preserves caches belonging to other applications",
@@ -320,6 +329,9 @@ if (server) {
 				? "Development network caching retains an available shell after a failed install"
 				: "A failed update preserves the working shell for cold offline reload",
 		)
+		browser(session, "open", new URL("/de?ref=offline", origin).href)
+		wait(session, 'document.documentElement.lang === "de"')
+		assert(true, "Offline localized navigation ignores tracking query strings")
 		browser(session, "set", "offline", "off")
 	} finally {
 		try {

@@ -131,6 +131,16 @@ async function previousAsset(request) {
 	}
 }
 
+async function ownedAsset(request, clientId) {
+	if (!clientId || request.mode === "navigate") return
+	let owners = await caches.open(ownerCacheName)
+	let saved = await owners.match(ownerPath + encodeURIComponent(clientId))
+	if (!saved) return
+	let version = await saved.text()
+	if (version === cacheName || !(await caches.has(version))) return
+	return (await caches.open(version)).match(request)
+}
+
 self.addEventListener("fetch", event => {
 	let url = new URL(event.request.url)
 	if (
@@ -156,7 +166,11 @@ self.addEventListener("fetch", event => {
 		owner
 			.then(() => caches.open(cacheName))
 			.then(async cache => {
-				let key = app ? "/app" : event.request
+				let key = app
+					? "/app"
+					: event.request.mode === "navigate" && shell.includes(url.pathname)
+						? url.pathname
+						: event.request
 				let cached = await cache.match(key)
 				if (development) {
 					try {
@@ -179,6 +193,8 @@ self.addEventListener("fetch", event => {
 						throw error
 					}
 				}
+				let owned = await ownedAsset(event.request, event.clientId)
+				if (owned) return owned
 				if (cached) return cached
 				let previous = await previousAsset(event.request)
 				if (previous) return previous
