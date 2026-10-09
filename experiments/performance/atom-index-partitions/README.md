@@ -12,6 +12,8 @@ Browser comparisons used the same experimental worker/editor in both arms, with 
 
 `cost/` and `native/` preserve the supplied evidence byte-for-byte. Their path maps record original names, archived names, bytes and SHA256. Original READMEs, failed setup and strict checks are retained separately. Raw trace hashes are retained; private accounts, API keys, databases, browser profiles and oversized raw traces remain outside Git. Scripts and JSON witnesses are archived as text, not added as executable product or test infrastructure.
 
+Large JSON witnesses use lossless gzip to keep review diffs readable. Path maps retain the original byte count and SHA256, plus compressed byte count and SHA256. Every compressed witness passed an exact decompression round trip.
+
 Production validation: `bun run check` passed 739 tests / 16,403 assertions, six browser module suites and the fast app journey, with static checks passing. The build passed. The restarted Tailnet server served JavaScript byte-identical to `dist/app.js`. These checks cover production correctness, not the experimental worker timing claims above.
 
 written with gpt-6 in codex

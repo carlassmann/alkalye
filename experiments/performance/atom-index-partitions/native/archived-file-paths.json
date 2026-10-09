@@ -30,9 +30,12 @@
 		"sha256": "937455a1bd75faa8fce9ded888b45db2a5fb6e977bf9b198012533aec305ab62"
 	},
 	"native-analysis.json": {
-		"archivedPath": "native-analysis.json.txt",
+		"archivedPath": "native-analysis.json.txt.gz",
 		"bytes": 111849,
-		"sha256": "05223e5be7a130065744739a401e1681b2456512ce9d6cd1a348042b2067b8fc"
+		"sha256": "05223e5be7a130065744739a401e1681b2456512ce9d6cd1a348042b2067b8fc",
+		"encoding": "gzip",
+		"compressedBytes": 10027,
+		"compressedSha256": "356c032d60ef8d04c60e218d7e61d8cf83713625b6a670715812302ea95f2604"
 	},
 	"native-atom-index.patch": {
 		"archivedPath": "native-atom-index.patch.txt",
@@ -60,9 +63,12 @@
 		"sha256": "fb0fd44e3c5f810a25162198d449be20c59680c80f8039d398ec7bba8f57f464"
 	},
 	"native-native-map-0-512-results.json": {
-		"archivedPath": "native-native-map-0-512-results.json.txt",
+		"archivedPath": "native-native-map-0-512-results.json.txt.gz",
 		"bytes": 118712,
-		"sha256": "131665bdb3b30392de16967418c5fe54c4e4a1072c328d65999200f2d39d1fb2"
+		"sha256": "131665bdb3b30392de16967418c5fe54c4e4a1072c328d65999200f2d39d1fb2",
+		"encoding": "gzip",
+		"compressedBytes": 7951,
+		"compressedSha256": "dfba65e58515348a7d6e96a63446f2cf22c4039197f18ae318ad68a4bf326c7f"
 	},
 	"native-native-map-1-1-resources.json": {
 		"archivedPath": "native-native-map-1-1-resources.json.txt",
@@ -80,9 +86,12 @@
 		"sha256": "8cb81c4c38ab4c1635c333464dde80820f8fa7016563e8e3e006d17ec1fd896a"
 	},
 	"native-native-map-1-512-results.json": {
-		"archivedPath": "native-native-map-1-512-results.json.txt",
+		"archivedPath": "native-native-map-1-512-results.json.txt.gz",
 		"bytes": 118665,
-		"sha256": "eb159a7f9f2f26fe159ee2ba8456457196b822a8c350f2df66a884e56c88b212"
+		"sha256": "eb159a7f9f2f26fe159ee2ba8456457196b822a8c350f2df66a884e56c88b212",
+		"encoding": "gzip",
+		"compressedBytes": 7938,
+		"compressedSha256": "d402b82a1f061adf2e50dbd57962b93846b5e47ff6b1b5cc50f07bb6fc026efd"
 	},
 	"native-native-map-2-1-resources.json": {
 		"archivedPath": "native-native-map-2-1-resources.json.txt",
@@ -100,9 +109,12 @@
 		"sha256": "11112c073cd4bff3e3427766871750a992cd6642b0c88e6d932d1ebea1003ac3"
 	},
 	"native-native-map-2-512-results.json": {
-		"archivedPath": "native-native-map-2-512-results.json.txt",
+		"archivedPath": "native-native-map-2-512-results.json.txt.gz",
 		"bytes": 118698,
-		"sha256": "4ef7f442f095b9629ac33bdef2e3d24bc0501367f237bd7f37b11eb8ae192bbd"
+		"sha256": "4ef7f442f095b9629ac33bdef2e3d24bc0501367f237bd7f37b11eb8ae192bbd",
+		"encoding": "gzip",
+		"compressedBytes": 7954,
+		"compressedSha256": "fa8730c2c1308e89578f36b89ca72446b9bd0880b7f08416a8bad3e72ab7cdfd"
 	},
 	"native-partition-0-1-resources.json": {
 		"archivedPath": "native-partition-0-1-resources.json.txt",
@@ -120,9 +132,12 @@
 		"sha256": "c7ece50d382591c774c67d145484f32a3b507b2ca9eac0afd177aac4e16217a1"
 	},
 	"native-partition-0-512-results.json": {
-		"archivedPath": "native-partition-0-512-results.json.txt",
+		"archivedPath": "native-partition-0-512-results.json.txt.gz",
 		"bytes": 118686,
-		"sha256": "7079a7b9fdf1eabad1aabe905260314a5d3f03f4680c9edaa32d7114c09a0d3a"
+		"sha256": "7079a7b9fdf1eabad1aabe905260314a5d3f03f4680c9edaa32d7114c09a0d3a",
+		"encoding": "gzip",
+		"compressedBytes": 7950,
+		"compressedSha256": "6124217df6871d5a79af6ccff00d5b85c61fb680c9e57ad144881dc68c7eff71"
 	},
 	"native-partition-1-1-resources.json": {
 		"archivedPath": "native-partition-1-1-resources.json.txt",
@@ -140,9 +155,12 @@
 		"sha256": "dc50eb043e077e2d2977403cf9330c5eb068a00cd4f84227910cdbacbc331c3b"
 	},
 	"native-partition-1-512-results.json": {
-		"archivedPath": "native-partition-1-512-results.json.txt",
+		"archivedPath": "native-partition-1-512-results.json.txt.gz",
 		"bytes": 118697,
-		"sha256": "c4abb185a97ef47caf7f25d28a03d5469db8b7b4f84011ac1c441e9eb6b46ca8"
+		"sha256": "c4abb185a97ef47caf7f25d28a03d5469db8b7b4f84011ac1c441e9eb6b46ca8",
+		"encoding": "gzip",
+		"compressedBytes": 7961,
+		"compressedSha256": "e1be112cea5447f5d9dfcd5d97f94f10a7a9fbe10bc147fb17588db2284701fd"
 	},
 	"native-partition-2-1-resources.json": {
 		"archivedPath": "native-partition-2-1-resources.json.txt",
@@ -160,9 +178,12 @@
 		"sha256": "aeec7098072605cb7c698a1765bb48471839955effa8022c26e7068a55edbb7e"
 	},
 	"native-partition-2-512-results.json": {
-		"archivedPath": "native-partition-2-512-results.json.txt",
+		"archivedPath": "native-partition-2-512-results.json.txt.gz",
 		"bytes": 118726,
-		"sha256": "bc131c7c0627b15874d89b0b9b308261a070c7aa0e02a25500a449ea67b10ef7"
+		"sha256": "bc131c7c0627b15874d89b0b9b308261a070c7aa0e02a25500a449ea67b10ef7",
+		"encoding": "gzip",
+		"compressedBytes": 7970,
+		"compressedSha256": "496fa241c64c9232deaf42a1fd6544cb139e2ed03e79ca67e08e8a46f57a8ce4"
 	},
 	"native-series-progress.json": {
 		"archivedPath": "native-series-progress.json.txt",
