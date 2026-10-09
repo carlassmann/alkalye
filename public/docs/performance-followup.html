@@ -118,6 +118,18 @@
 			Undo, physical paint or 120Hz presentation claim; main peaks remain above
 			8.33ms.
 		</p>
+		<h2>Production compaction allocation pilot</h2>
+		<p>
+			Held after one fresh 1MiB typing/Undo trial per arm. Comparing atom IDs
+			without allocating a combined expected ID reduced the largest observed GC
+			spans from 10.134ms to 2.830ms after typing and from 9.582ms to 3.197ms
+			after Undo. Total three-second main-thread work increased from 718.367ms
+			to 795.169ms and from 652.075ms to 782.120ms respectively. Typing's worst
+			main task increased from 10.748ms to 11.397ms; Undo's fell from 10.052ms
+			to 7.864ms. Exact native text, caret, accepted edit/Undo and reload checks
+			passed. This mixed pilot does not establish faster typing or consistent
+			120Hz interactions; the candidate is not deployed.
+		</p>
 		<h2>Earlier bounded visibility memo pilot</h2>
 		<p>
 			One ordinary 1MiB trial per arm on the experimental worker editor reduced
