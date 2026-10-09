@@ -417,7 +417,7 @@ export function makeDocumentLive() {
 						})
 					}),
 				)
-				let messages = Option.getOrElse(taken, () => [])
+				let messages = latestPresence(Option.getOrElse(taken, () => []))
 				// Presence waited in the queue; access may have been revoked since.
 				let documents = new Set(
 					messages.flatMap(item =>
@@ -656,6 +656,26 @@ export function makeDocumentLive() {
 			)
 		}
 	})
+}
+function latestPresence(messages: ReadonlyArray<LiveServerMessage>) {
+	let seen = new Map<string, Set<string>>()
+	let retained: LiveServerMessage[] = []
+	for (let index = messages.length - 1; index >= 0; index--) {
+		let message = messages[index]
+		if (!message) continue
+		if (message.type === "presence") {
+			let presence = message.presence
+			let documents = seen.get(presence.actor)
+			if (documents?.has(presence.document)) continue
+			if (!documents) {
+				documents = new Set<string>()
+				seen.set(presence.actor, documents)
+			}
+			documents.add(presence.document)
+		} else seen.clear()
+		retained.push(message)
+	}
+	return retained.reverse()
 }
 function body(request: Request) {
 	return Effect.gen(function* () {

@@ -1,0 +1,10 @@
+{
+  "baseline": "a7bca94b3398cd6422f3d410c1e5eb4797a34fdb",
+  "productionCandidateSHA256": {
+    "src/server/document-live.ts": "4eff2e41c3c096ce33c3ce3789350cd6567052d84c84ab4fa7defb544a9cc39a",
+    "tests/document-live-poll.test.ts": "5aba95db53611eddefa94a8214331b6c608247b11ed8b897c40dc8ecaa8c791e"
+  },
+  "model": "claude-opus-5-5, canonical firstParty, PASS",
+  "runtime": "Bun1.4.0",
+  "SQLCounter": "installed Effect Statement.CurrentTransformer returns unchanged statements; SQL text only, no bound params"
+}

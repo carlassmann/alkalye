@@ -90,6 +90,22 @@
 			includes session opening; its authorization counts cannot be attributed
 			solely to cursor delivery.
 		</p>
+		<h2>Latest cursor states in slow polls</h2>
+		<p>
+			A real polling reader queued 24 accepted cursor updates from two actors
+			across two documents. Keeping the latest state within each uninterrupted
+			presence run reduced delivery to eight. Every control message separates
+			runs. Departure, document changes and fresh recipient and sender checks
+			remain intact. Queued reader revocation still withholds the whole batch.
+		</p>
+		<p>
+			Both diagnostic arms passed 39 assertions; the clean candidate passed 28
+			public transport and permission cases with 1,683 assertions. Session SQL
+			fell from 25 to nine and role SQL from 58 to 26 for this poll. These are
+			statement counts, not latency measurements. WebSockets and queue overflow
+			behavior are unchanged. Evidence:
+			<code>experiments/performance/poll-presence-coalescing</code>.
+		</p>
 		<h2>One fresh role lookup per transaction</h2>
 		<p>
 			For an unscoped caller checking its own role, reuse the authorized lookup

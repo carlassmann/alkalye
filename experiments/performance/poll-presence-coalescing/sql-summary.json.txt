@@ -1,0 +1,98 @@
+{
+  "scope": "untimed instrumented public slow-poll diagnostic; no speed/overflow/WS claim",
+  "assertionsEach": 39,
+  "results": {
+    "baseline": {
+      "offered": 24,
+      "delivered": 24,
+      "controls": [
+        "gone",
+        "advanced"
+      ],
+      "sessionChecks": 25,
+      "roleChecks": 26,
+      "sessionSQL": 25,
+      "roleSQL": 58,
+      "queries": [
+        [
+          "session:poll:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          1
+        ],
+        [
+          "role:poll-recipient:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          2
+        ],
+        [
+          "role:poll-recipient:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          4
+        ],
+        [
+          "role:poll-recipient:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          2
+        ],
+        [
+          "role:poll-recipient:SELECT member,role FROM document_grants WHERE document=? AND member=?",
+          2
+        ],
+        [
+          "session:poll-sender:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          24
+        ],
+        [
+          "role:poll-sender:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          24
+        ],
+        [
+          "role:poll-sender:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          24
+        ]
+      ]
+    },
+    "candidate": {
+      "offered": 24,
+      "delivered": 8,
+      "controls": [
+        "gone",
+        "advanced"
+      ],
+      "sessionChecks": 9,
+      "roleChecks": 10,
+      "sessionSQL": 9,
+      "roleSQL": 26,
+      "queries": [
+        [
+          "session:poll:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          1
+        ],
+        [
+          "role:poll-recipient:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          2
+        ],
+        [
+          "role:poll-recipient:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          4
+        ],
+        [
+          "role:poll-recipient:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          2
+        ],
+        [
+          "role:poll-recipient:SELECT member,role FROM document_grants WHERE document=? AND member=?",
+          2
+        ],
+        [
+          "session:poll-sender:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          8
+        ],
+        [
+          "role:poll-sender:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          8
+        ],
+        [
+          "role:poll-sender:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          8
+        ]
+      ]
+    }
+  }
+}

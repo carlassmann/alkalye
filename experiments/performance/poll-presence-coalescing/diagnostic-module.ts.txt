@@ -1,0 +1,92 @@
+import * as Effect from "effect/Effect"
+import * as Statement from "effect/sql/Statement"
+import type { LiveServerMessage } from "../shared/document-live"
+
+function empty(phase: string) {
+	return {
+		phase,
+		started: performance.now(),
+		ended: 0,
+		sessionChecks: 0,
+		active: 0,
+		queries: new Map<string, number>(),
+		roleChecks: 0,
+		sessionSql: 0,
+		roleSql: 0,
+		sessionMilliseconds: 0,
+		roleMilliseconds: 0,
+		deliveries: { advanced: 0, presence: 0, gone: 0, unavailable: 0, other: 0 },
+	}
+}
+let current = empty("setup")
+let phases: ReturnType<typeof empty>[] = []
+export let completed = false
+export function phase(name: string) {
+	current.ended = performance.now()
+	current = empty(name)
+	phases.push(current)
+}
+export function delivered(message: LiveServerMessage) {
+	if (
+		message.type === "advanced" ||
+		message.type === "presence" ||
+		message.type === "gone" ||
+		message.type === "unavailable"
+	)
+		current.deliveries[message.type]++
+	else current.deliveries.other++
+}
+export function counts() {
+	let row = structuredClone(current)
+	return { ...row, queries: [...row.queries] }
+}
+export function idle() {
+	return phases.every(row => row.active === 0) && current.active === 0
+}
+export function complete() {
+	current.ended = performance.now()
+	completed = true
+}
+export function results() {
+	return phases.map(row => ({
+		...structuredClone(row),
+		queries: [...row.queries],
+	}))
+}
+export function authorization<A, E, R>(
+	kind: "session" | "role",
+	stage: string,
+	effect: Effect.Effect<A, E, R>,
+): Effect.Effect<A, E, R> {
+	return Effect.suspend(() => {
+		let row = current,
+			started = performance.now()
+		row.active++
+		if (kind === "session") row.sessionChecks++
+		else row.roleChecks++
+		let transformer: Statement.Transformer = statement =>
+			Effect.sync(() => {
+				let query =
+					kind +
+					":" +
+					stage +
+					":" +
+					statement.compile()[0].replace(/\s+/g, " ").trim()
+				row.queries.set(query, (row.queries.get(query) ?? 0) + 1)
+				if (kind === "session") row.sessionSql++
+				else row.roleSql++
+				return statement
+			})
+		return effect.pipe(
+			Effect.provideService(Statement.CurrentTransformer, transformer),
+			Effect.ensuring(
+				Effect.sync(() => {
+					row.active--
+					if (kind === "session")
+						row.sessionMilliseconds += performance.now() - started
+					else row.roleMilliseconds += performance.now() - started
+				}),
+			),
+		)
+	})
+}

@@ -1,0 +1,67 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/document-live-poll.test.ts:
+(pass) polling and WebSocket peers share notifications, presence and departures [53.29ms]
+(pass) profile edits invalidate shared labels without disclosing another account's preferences [1235.42ms]
+(pass) document and workspace changes wake shared libraries but leave unrelated peers asleep [2051.92ms]
+[04:54:28.329] WARN (#511): Committed change notification lookup failed effect/sql/SqlError: SQLite execute failed
+    at failure (/private/tmp/alkalye-poll-presence-backlog/candidate/src/platform/sqlite.ts:152:22)
+    at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:770:19)
+    at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+    at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+    at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+    at WorkspaceStore.commit (/private/tmp/alkalye-poll-presence-backlog/candidate/src/server/document-api.ts:51:25)
+    at WorkspaceStore.commit (definition) (/private/tmp/alkalye-poll-presence-backlog/candidate/src/server/document-store.ts:600:20)
+    at document.commit (/private/tmp/alkalye-poll-presence-backlog/candidate/src/shared/document-observability.ts:117:13) {
+  [cause]: effect/sql/SqlError/UnknownError: SQLite execute failed
+      at classifySqliteError (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/sql/SqlError.js:486:20)
+      at failure (/private/tmp/alkalye-poll-presence-backlog/candidate/src/platform/sqlite.ts:153:20)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:770:19)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17) {
+    [cause]: SQLiteError: no such table: document_grants
+        at all (unknown)
+        at <anonymous> (/private/tmp/alkalye-poll-presence-backlog/candidate/src/platform/sqlite.ts:104:26)
+        at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:768:22)
+        at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+        at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+        at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+  }
+}
+(pass) a failed postcommit recipient read preserves the durable write and only wakes its watchers [600.75ms]
+(pass) accepted and revoked invitation members receive their library changes [24.68ms]
+(pass) moving a document wakes both libraries and retains its creator after workspace access ends [31.69ms]
+(pass) public document watchers receive advances and lose access on workspace deletion [14.14ms]
+(pass) real polling presenters converge on ties and clock skew while readers cannot present [107.83ms]
+(pass) two polling peers see each other and a closed session announces departure [12.39ms]
+(pass) revoked access withholds presence already queued for a polling reader [487.51ms]
+(pass) logging out during a pending poll prevents delivery and closes its session [406.36ms]
+(pass) demotion strips presenter privileges from queued and replayed presence [18.97ms]
+(pass) one presence batch updates each watched document [10.62ms]
+(pass) polling authenticates the cookie, account, origin and session owner [6.41ms]
+(pass) polling bounds request size, message count, watched documents and sessions [91.56ms]
+(pass) aborted and superseded polls release their waiter and abandoned sessions expire [6982.69ms]
+(pass) a restarted server expires old sessions and a new session resynchronizes [49.51ms]
+24-writer8KBburst {"operations":192,"roundMilliseconds":[400.1616670000003,590.1637920000012,1109.4432079999988,435.90345799999886,380.4477079999997,562.0755420000005,1280.9978330000013,434.92083400000047],"commitRequestMilliseconds":{"count":192,"median":126.69349999999758,"p95":439.2332499999993,"max":671.2963750000017},"journeyOperationsPerSecond":36.96491806831221}
+(pass) 24 independently persisted writers converge over mixed live transports, reconnect and enforce reader permissions [6721.57ms]
+slow-poll-backlog {"offered":24,"frames":8,"controls":["gone","advanced"],"before":{"phase":"slow-poll-backlog","started":19047.151292,"ended":0,"sessionChecks":108,"active":0,"queries":[["session:receive:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",28],["role:receive:SELECT workspace,owner FROM workspace_documents WHERE document=?",27],["role:receive:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",27],["session:broadcast-recipient:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",75],["role:broadcast-recipient:SELECT workspace,owner FROM workspace_documents WHERE document=?",75],["role:broadcast-recipient:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",100],["role:broadcast-recipient:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",25],["role:broadcast-recipient:SELECT member,role FROM document_grants WHERE document=? AND member=?",25],["session:watch-sender:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",1],["role:watch-sender:SELECT workspace,owner FROM workspace_documents WHERE document=?",1],["role:watch-sender:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",1],["session:notice:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",4],["role:notice:SELECT workspace,owner FROM workspace_documents WHERE document=?",4],["role:notice:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",5],["role:notice:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",1],["role:notice:SELECT member,role FROM document_grants WHERE document=? AND member=?",1]],"roleChecks":107,"sessionSql":108,"roleSql":292,"sessionMilliseconds":1.7062019999866607,"roleMilliseconds":3.5622480000020005,"deliveries":{"advanced":4,"presence":73,"gone":3,"unavailable":0,"other":0}},"after":{"phase":"slow-poll-backlog","started":19047.151292,"ended":0,"sessionChecks":117,"active":0,"queries":[["session:receive:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",28],["role:receive:SELECT workspace,owner FROM workspace_documents WHERE document=?",27],["role:receive:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",27],["session:broadcast-recipient:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",75],["role:broadcast-recipient:SELECT workspace,owner FROM workspace_documents WHERE document=?",75],["role:broadcast-recipient:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",100],["role:broadcast-recipient:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",25],["role:broadcast-recipient:SELECT member,role FROM document_grants WHERE document=? AND member=?",25],["session:watch-sender:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",1],["role:watch-sender:SELECT workspace,owner FROM workspace_documents WHERE document=?",1],["role:watch-sender:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",1],["session:notice:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",4],["role:notice:SELECT workspace,owner FROM workspace_documents WHERE document=?",4],["role:notice:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",5],["role:notice:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",1],["role:notice:SELECT member,role FROM document_grants WHERE document=? AND member=?",1],["session:poll:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",1],["role:poll-recipient:SELECT workspace,owner FROM workspace_documents WHERE document=?",2],["role:poll-recipient:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",4],["role:poll-recipient:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",2],["role:poll-recipient:SELECT member,role FROM document_grants WHERE document=? AND member=?",2],["session:poll-sender:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",8],["role:poll-sender:SELECT workspace,owner FROM workspace_documents WHERE document=?",8],["role:poll-sender:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",8]],"roleChecks":117,"sessionSql":117,"roleSql":318,"sessionMilliseconds":1.8912449999952514,"roleMilliseconds":4.0081629999949655,"deliveries":{"advanced":4,"presence":73,"gone":3,"unavailable":0,"other":0}}}
+(pass) slow polling retains latest actor/document state and ordered controls before fresh permission checks [287.60ms]
+
+tests/account-agents.test.ts:
+(pass) account agent tools share document snapshots, discussion history and exact revisions [50.01ms]
+(pass) native OAuth consent requires a browser session; PKCE and refresh retain only current grants [19.01ms]
+(pass) agent grants attenuate live authority, isolate accounts and cannot authenticate as account sessions [20.05ms]
+
+tests/workspace-deletion.test.ts:
+(pass) deleting a workspace removes it and its documents for everyone and denies every later use [38.90ms]
+(pass) only the owner deletes, the personal workspace stays and the name must match [14.63ms]
+(pass) retrying a deletion returns its receipt while a new request is refused [6.91ms]
+(pass) concurrent deletions and writes settle on one tombstone without leaking access [15.02ms]
+(pass) watching collaborators learn a deleted workspace's documents became unavailable [11.93ms]
+(pass) deletions survive restarts and the tombstone migration upgrades existing data [64.51ms]
+
+ 28 pass
+ 0 fail
+ 1683 expect() calls
+Ran 28 tests across 3 files. [19.63s]

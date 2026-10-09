@@ -1,0 +1,3 @@
+PASS tests/browser-live-network-fallback.ts (36.9s)
+PASS tests/browser-live-polling.ts (110.2s)
+selected: 2 suites, 0 failed, 110.3s

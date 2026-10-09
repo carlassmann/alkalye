@@ -1,0 +1,182 @@
+[
+	{
+		"producerPath": "src__server__document-live.ts.txt",
+		"archivePath": "src__server__document-live.ts.txt",
+		"sha256": "4eff2e41c3c096ce33c3ce3789350cd6567052d84c84ab4fa7defb544a9cc39a",
+		"bytes": 21676
+	},
+	{
+		"producerPath": "candidate-format.log.txt",
+		"archivePath": "candidate-format.log.txt",
+		"sha256": "d01fc8f2df9e32d49089eee3efeb11499681b0c6fc18f543a24f7b7879683d61",
+		"bytes": 83
+	},
+	{
+		"producerPath": "baseline__document-live-poll.test.ts.txt",
+		"archivePath": "baseline__document-live-poll.test.ts.txt",
+		"sha256": "814c5b9a5e192e08b128418d7a3fe188a8f04b3d0eb5690f593f330593acff08",
+		"bytes": 51525
+	},
+	{
+		"producerPath": "candidate-opus-5-5-review.json",
+		"archivePath": "candidate-opus-5-5-review.json.txt",
+		"sha256": "671173d0e8c5c20cc7150375d84b60b5f46701f2ce7657bc191333110eb3ee04",
+		"bytes": 4175
+	},
+	{
+		"producerPath": "candidate-public-tests.log.txt",
+		"archivePath": "candidate-public-tests.log.txt",
+		"sha256": "799bb2a9c182570211409fe4ebd91650cbfc1c580d489415b8b355813f67c450",
+		"bytes": 10587
+	},
+	{
+		"producerPath": "sql-summary.json",
+		"archivePath": "sql-summary.json.txt",
+		"sha256": "63cc8fbef745aaf287bf1d1a50ee0d0844ac7061a547a3455e17b74d5f391ba9",
+		"bytes": 2886
+	},
+	{
+		"producerPath": "production-format.log.txt",
+		"archivePath": "production-format.log.txt",
+		"sha256": "b06e452329014e49244d4de4c4eecdda3fa3a99466570e5f61168e4f7567d971",
+		"bytes": 131
+	},
+	{
+		"producerPath": "types.log.txt",
+		"archivePath": "types.log.txt",
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"bytes": 0
+	},
+	{
+		"producerPath": "initial-runtime.log.txt",
+		"archivePath": "initial-runtime.log.txt",
+		"sha256": "6581dc211f9d3ae25e7b3640113e9f1fa4461951a17d392e4d9a164592936ea3",
+		"bytes": 1327
+	},
+	{
+		"producerPath": "format.log.txt",
+		"archivePath": "format.log.txt",
+		"sha256": "99a254adcc6b191e395264f82db17dcfb148f65cb631baa3aca52e53b0781661",
+		"bytes": 138
+	},
+	{
+		"producerPath": "candidate-types.log.txt",
+		"archivePath": "candidate-types.log.txt",
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"bytes": 0
+	},
+	{
+		"producerPath": "diagnostic-module.ts.txt",
+		"archivePath": "diagnostic-module.ts.txt",
+		"sha256": "f730fdfb22d41e0ff5f9b13d2fd2d8f8c2feb97b3d69f69ad04b91831feec0dd",
+		"bytes": 2396
+	},
+	{
+		"producerPath": "candidate-results.json",
+		"archivePath": "candidate-results.json.txt",
+		"sha256": "eed24f3dd8a492fbba294a8cfb8b5e647eaf8865020940f128fa41ee0bfffe1d",
+		"bytes": 6233
+	},
+	{
+		"producerPath": "results.json",
+		"archivePath": "results.json.txt",
+		"sha256": "390e1bd6f16959d9dfdc97383517ca5ca77bd9c20a29f810243bc8f2e5336a92",
+		"bytes": 6232
+	},
+	{
+		"producerPath": "baseline__document-live.ts.txt",
+		"archivePath": "baseline__document-live.ts.txt",
+		"sha256": "577dd44e7475e7008cdcaf9e5ed20d58673976db2941974c5626e15fe4bb8a78",
+		"bytes": 21650
+	},
+	{
+		"producerPath": "production-public-test.log.txt",
+		"archivePath": "production-public-test.log.txt",
+		"sha256": "913e65b680217fc2e3cb6f76202042d4bff1e056c9b6623fc8477a2dff769bb4",
+		"bytes": 260
+	},
+	{
+		"producerPath": "candidate-instrumented__document-live-poll.test.ts.txt",
+		"archivePath": "candidate-instrumented__document-live-poll.test.ts.txt",
+		"sha256": "4d313b58570d4fc737cdc5ef5a5115e2101a396c6b383745f7e2918408827b3f",
+		"bytes": 51539
+	},
+	{
+		"producerPath": "README.md",
+		"archivePath": "README.producer.md.txt",
+		"sha256": "19b2a973ca3cf19efc6881cee704f7109f993f8dc75151aeae808cebb671ac5b",
+		"bytes": 2828
+	},
+	{
+		"producerPath": "corrected-format.log.txt",
+		"archivePath": "corrected-format.log.txt",
+		"sha256": "a91dbb72fdd15e15d00f2986ee012c722ba5a3572e47d1c94d434d30e30b5ddc",
+		"bytes": 38
+	},
+	{
+		"producerPath": "corrected-runtime.log.txt",
+		"archivePath": "corrected-runtime.log.txt",
+		"sha256": "21f9290f7fe04ece93bff51a62c083f9ecd343bf733557727b3884af75d784ec",
+		"bytes": 4967
+	},
+	{
+		"producerPath": "production-public-tests.log.txt",
+		"archivePath": "production-public-tests.log.txt",
+		"sha256": "07ba305c87550548ebad9f731c776a0e519253e77bd06fffabaecf64587ea6d9",
+		"bytes": 5848
+	},
+	{
+		"producerPath": "candidate-runtime.log.txt",
+		"archivePath": "candidate-runtime.log.txt",
+		"sha256": "7897a67b555fdab7ad3c48ff5573cb6b9c7f76fe807e2b6c8a4c3e92e0b1b2d8",
+		"bytes": 4964
+	},
+	{
+		"producerPath": "production.patch",
+		"archivePath": "production.patch",
+		"sha256": "e5b370800f3b6963f944c8ee8adf979dd5b833157f6169d555a1910a2a99ca7c",
+		"bytes": 7558
+	},
+	{
+		"producerPath": "candidate-instrumented__document-live.ts.txt",
+		"archivePath": "candidate-instrumented__document-live.ts.txt",
+		"sha256": "7da89e146a30b02743d7431910159d884a8f11caea842aae63272a91eb6af44f",
+		"bytes": 22320
+	},
+	{
+		"producerPath": "candidate-review-prompt.txt",
+		"archivePath": "candidate-review-prompt.txt",
+		"sha256": "67b054b115f66adf072f32491e4d3055f01c1e0cb2adac620dfb2717f6fada4b",
+		"bytes": 1601
+	},
+	{
+		"producerPath": "production-types.log.txt",
+		"archivePath": "production-types.log.txt",
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"bytes": 0
+	},
+	{
+		"producerPath": "candidate-opus-5-5-stderr.log.txt",
+		"archivePath": "candidate-opus-5-5-stderr.log.txt",
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"bytes": 0
+	},
+	{
+		"producerPath": "pins.json",
+		"archivePath": "pins.json.txt",
+		"sha256": "469ca4cde968559410a30df82f4a26e2eafe9b0dcfe31acf09d39a579ac386b8",
+		"bytes": 518
+	},
+	{
+		"producerPath": "corrected-types.log.txt",
+		"archivePath": "corrected-types.log.txt",
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"bytes": 0
+	},
+	{
+		"producerPath": "tests__document-live-poll.test.ts.txt",
+		"archivePath": "tests__document-live-poll.test.ts.txt",
+		"sha256": "5aba95db53611eddefa94a8214331b6c608247b11ed8b897c40dc8ecaa8c791e",
+		"bytes": 50423
+	}
+]

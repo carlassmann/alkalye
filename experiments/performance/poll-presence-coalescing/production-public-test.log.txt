@@ -1,0 +1,10 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/document-live-poll.test.ts:
+(pass) slow polling coalesces superseded cursors while retaining controls and fresh permissions [327.26ms]
+
+ 1 pass
+ 18 filtered out
+ 0 fail
+ 39 expect() calls
+Ran 1 test across 1 file. [463.00ms]

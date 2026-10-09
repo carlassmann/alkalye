@@ -1,0 +1,242 @@
+--- a/src/server/document-live.ts
++++ b/src/server/document-live.ts
+@@ -417,7 +417,7 @@
+ 						})
+ 					}),
+ 				)
+-				let messages = Option.getOrElse(taken, () => [])
++				let messages = latestPresence(Option.getOrElse(taken, () => []))
+ 				// Presence waited in the queue; access may have been revoked since.
+ 				let documents = new Set(
+ 					messages.flatMap(item =>
+@@ -657,6 +657,26 @@
+ 		}
+ 	})
+ }
++function latestPresence(messages: ReadonlyArray<LiveServerMessage>) {
++	let seen = new Map<string, Set<string>>()
++	let retained: LiveServerMessage[] = []
++	for (let index = messages.length - 1; index >= 0; index--) {
++		let message = messages[index]
++		if (!message) continue
++		if (message.type === "presence") {
++			let presence = message.presence
++			let documents = seen.get(presence.actor)
++			if (documents?.has(presence.document)) continue
++			if (!documents) {
++				documents = new Set<string>()
++				seen.set(presence.actor, documents)
++			}
++			documents.add(presence.document)
++		} else seen.clear()
++		retained.push(message)
++	}
++	return retained.reverse()
++}
+ function body(request: Request) {
+ 	return Effect.gen(function* () {
+ 		if (Number(request.headers.get("content-length")) > pollBodyLimit)
+--- a/tests/document-live-poll.test.ts
++++ b/tests/document-live-poll.test.ts
+@@ -1402,3 +1402,201 @@
+ 		),
+ 	)
+ }
++
++test("slow polling coalesces superseded cursors while retaining controls and fresh permissions", async () => {
++	let owner = await run(client(184)),
++		reader = await run(client(185))
++	let documents = ["slow-one", "slow-two"]
++	await run(
++		Effect.gen(function* () {
++			yield* createWorkspace(owner, "slow-space", "Slow")
++			for (let document of documents)
++				yield* createDocument(owner, "slow-space", document)
++			yield* member(owner, "slow-space", reader, "reader")
++		}),
++	)
++	let ownerLogin = await cookieLogin(instance.server.url, 184)
++	let observer = livePoll(await cookieLogin(instance.server.url, 185))
++	let first = livePoll(ownerLogin),
++		second = livePoll(ownerLogin)
++	let witness = await liveSocket(ownerLogin)
++	let senders = [first, second]
++	try {
++		await observer.open()
++		await first.open()
++		await second.open()
++		let watches = documents.map(document => ({ type: "watch", document }))
++		expect(await observer.send(watches)).toBe(204)
++		for (let sender of senders) expect(await sender.send(watches)).toBe(204)
++		for (let watch of watches) witness.send(watch)
++		await observer.until(is("connected"))
++		observer.inbox.splice(0)
++		let actors = new Set<string>()
++		let expectedLatest = new Map<string, number>()
++		let initial = await run(
++			restoreSnapshot(
++				await run(
++					owner.api.documents.snapshot({
++						params: { document: "slow-one" },
++						query: {},
++					}),
++				),
++				"initial-verification",
++			),
++		)
++		let originalSource = initial.text("slow-one")
++		let previous = 0
++		for (let round = 0; round < 6; round++) {
++			await Bun.sleep(Math.max(0, previous + 40 - Date.now()))
++			for (let [index, sender] of senders.entries()) {
++				let position = 100 + round * 10 + index
++				expect(
++					await sender.send(
++						documents.map(document => ({
++							type: "presence",
++							presence: cursor(document, position),
++						})),
++					),
++				).toBe(204)
++				for (let document of documents) {
++					let accepted = await witness.until(
++						message =>
++							message.type === "presence" &&
++							object(message.presence).document === document &&
++							object(message.presence).cursor === position,
++					)
++					let presence = parsePresence(accepted.presence)
++					actors.add(presence.actor)
++					expectedLatest.set(
++						presence.actor + ":" + presence.document,
++						presence.cursor,
++					)
++				}
++			}
++			previous = Date.now()
++			if (round === 2) {
++				expect(
++					await first.send([{ type: "unwatch", document: documents[0] }]),
++				).toBe(204)
++				expect(
++					await first.send([{ type: "watch", document: documents[0] }]),
++				).toBe(204)
++				let snapshot = await run(
++					owner.api.documents.snapshot({
++						params: { document: "slow-one" },
++						query: {},
++					}),
++				)
++				let staged = await run(
++					restoreSnapshot(snapshot, owner.subject + "-backlog-control"),
++				)
++				let action = await run(
++					buildAction(staged, "slow-one", "Queued control", replica => [
++						replica.set("slow-one", "note", "Control"),
++					]),
++				)
++				await run(
++					owner.api.documents.commit({
++						params: { document: "slow-one" },
++						payload: action,
++					}),
++				)
++				await witness.until(is("advanced"))
++				let verified = await run(
++					restoreSnapshot(
++						await run(
++							owner.api.documents.snapshot({
++								params: { document: "slow-one" },
++								query: {},
++							}),
++						),
++						"control-verification",
++					),
++				)
++				expect(verified.text("slow-one")).toBe(originalSource)
++				expect(verified.fields("slow-one").note).toBe("Control")
++			}
++		}
++		expect(actors.size).toBe(2)
++		let response = await observer.poll()
++		if (typeof response === "number")
++			throw Error("Slow poll expired: " + response)
++		let frames = response.filter(is("presence"))
++		expect(frames.length).toBe(8)
++		expect(response.filter(is("gone"))).toHaveLength(1)
++		expect(response.filter(is("advanced"))).toHaveLength(1)
++		let latest = new Map<string, number>()
++		for (let frame of frames) {
++			let presence = parsePresence(frame.presence)
++			latest.set(presence.actor + ":" + presence.document, presence.cursor)
++		}
++		expect(latest.size).toBe(4)
++		expect([...latest.entries()].sort()).toEqual(
++			[...expectedLatest.entries()].sort(),
++		)
++		let goneIndex = response.findIndex(is("gone")),
++			gone = response[goneIndex]
++		if (!gone) throw Error("Missing gone barrier")
++		expect(
++			response
++				.slice(0, goneIndex)
++				.some(
++					frame =>
++						frame.type === "presence" &&
++						object(frame.presence).actor === gone.actor &&
++						object(frame.presence).document === "slow-one",
++				),
++		).toBe(true)
++		expect(
++			response
++				.slice(goneIndex + 1)
++				.some(
++					frame =>
++						frame.type === "presence" &&
++						object(frame.presence).actor === gone.actor &&
++						object(frame.presence).document === "slow-one",
++				),
++		).toBe(true)
++
++		// A separate queued batch must be withheld after real recipient revocation.
++		await Bun.sleep(Math.max(0, previous + 40 - Date.now()))
++		expect(
++			await second.send(
++				documents.map(document => ({
++					type: "presence",
++					presence: cursor(document, 200),
++				})),
++			),
++		).toBe(204)
++		await run(
++			owner.api.workspaces.membership({
++				params: { workspace: "slow-space", member: reader.subject },
++				payload: { role: null, request: "revoke-slow-reader" },
++			}),
++		)
++		let unavailable = new Set<unknown>()
++		while (unavailable.size < documents.length) {
++			let rejected = await observer.poll()
++			if (typeof rejected === "number")
++				throw Error("Revocation poll failed: " + rejected)
++			expect(rejected.filter(is("presence"))).toEqual([])
++			for (let message of rejected.filter(is("unavailable")))
++				unavailable.add(message.document)
++		}
++		expect([...unavailable].sort()).toEqual(documents)
++	} finally {
++		witness.close()
++		let closed = await Promise.allSettled([
++			observer.close(),
++			first.close(),
++			second.close(),
++		])
++		expect(closed.map(result => result.status)).toEqual([
++			"fulfilled",
++			"fulfilled",
++			"fulfilled",
++		])
++		for (let result of closed)
++			if (result.status === "fulfilled") expect(result.value).toBe(204)
++	}
++}, 20_000)
