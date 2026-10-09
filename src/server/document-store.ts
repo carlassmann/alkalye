@@ -469,6 +469,9 @@ function makeDocumentStore() {
 				"002_blob_object_receipts": Effect.gen(function* () {
 					yield* sql`ALTER TABLE document_blobs ADD COLUMN object_key TEXT`
 				}),
+				"003_blob_object_versions": Effect.gen(function* () {
+					yield* sql`ALTER TABLE document_blobs ADD COLUMN object_receipt TEXT`
+				}),
 			}),
 		})
 		let readBlob = SqlSchema.findOneOption({
@@ -480,9 +483,10 @@ function makeDocumentStore() {
 				bytes: Schema.Unknown,
 				external: Schema.Literals([0, 1]),
 				object_key: Schema.NullOr(Schema.String),
+				object_receipt: Schema.NullOr(Schema.String),
 			}),
 			execute: ({ document, digest }) =>
-				readSql`SELECT bytes,external,object_key FROM document_blobs WHERE document=${document} AND digest=${digest}`,
+				readSql`SELECT bytes,external,object_key,object_receipt FROM document_blobs WHERE document=${document} AND digest=${digest}`,
 		})
 		let storedBlobSize = SqlSchema.findOneOption({
 			Request: Schema.Struct({
@@ -722,7 +726,7 @@ function makeDocumentStore() {
 				yield* verifyBlobChunk(digest, bytes).pipe(
 					Effect.provideService(Crypto.Crypto, crypto),
 				)
-				let objectKey = blobObjects
+				let object = blobObjects
 					? yield* blobObjects
 							.put(document, digest, bytes)
 							.pipe(Effect.mapError(blobObjectFailure))
@@ -774,7 +778,7 @@ function makeDocumentStore() {
 							)
 						let storedBytes = blobObjects ? new Uint8Array() : bytes
 						let external = blobObjects ? 1 : 0
-						yield* sql`INSERT INTO document_blobs(document,digest,bytes,size,external,object_key) VALUES (${document},${digest},${storedBytes},${bytes.length},${external},${objectKey}) ON CONFLICT(document,digest) DO UPDATE SET bytes=excluded.bytes,size=excluded.size,external=excluded.external,object_key=excluded.object_key WHERE document_blobs.bytes IS NOT excluded.bytes OR document_blobs.size IS NOT excluded.size OR document_blobs.external IS NOT excluded.external OR document_blobs.object_key IS NOT excluded.object_key`
+						yield* sql`INSERT INTO document_blobs(document,digest,bytes,size,external,object_key,object_receipt) VALUES (${document},${digest},${storedBytes},${bytes.length},${external},${object?.key ?? null},${object?.receipt ?? null}) ON CONFLICT(document,digest) DO UPDATE SET bytes=excluded.bytes,size=excluded.size,external=excluded.external,object_key=excluded.object_key,object_receipt=excluded.object_receipt WHERE document_blobs.bytes IS NOT excluded.bytes OR document_blobs.size IS NOT excluded.size OR document_blobs.external IS NOT excluded.external OR document_blobs.object_key IS NOT excluded.object_key OR document_blobs.object_receipt IS NOT excluded.object_receipt`
 					}),
 					() => Effect.void,
 				)
@@ -785,6 +789,7 @@ function makeDocumentStore() {
 				Effect.gen(function* () {
 					let corrupted: unknown
 					let corruptedObjectKey: string | undefined
+					let corruptedReceipt: string | null = null
 					return yield* readSql
 						.withTransaction(
 							Effect.gen(function* () {
@@ -805,6 +810,7 @@ function makeDocumentStore() {
 										Effect.sync(() => {
 											if (error._tag === "BlobCorrupt") {
 												corrupted = stored.value.bytes
+												corruptedReceipt = stored.value.object_receipt
 												corruptedObjectKey =
 													stored.value.external === 1
 														? (stored.value.object_key ?? undefined)
@@ -828,7 +834,7 @@ function makeDocumentStore() {
 										)
 											return yield* unavailable()
 										if (corruptedObjectKey !== undefined)
-											yield* sql`DELETE FROM document_blobs WHERE document=${document} AND digest=${digest} AND external=1 AND object_key=${corruptedObjectKey}`
+											yield* sql`DELETE FROM document_blobs WHERE document=${document} AND digest=${digest} AND external=1 AND object_key=${corruptedObjectKey} AND object_receipt IS ${corruptedReceipt}`
 										else if (corrupted instanceof Uint8Array)
 											yield* sql`DELETE FROM document_blobs WHERE document=${document} AND digest=${digest} AND external=0 AND bytes=${corrupted}`
 										else

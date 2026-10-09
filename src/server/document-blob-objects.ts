@@ -2,12 +2,17 @@ import * as Context from "effect/Context"
 import type * as Effect from "effect/Effect"
 import type { ApplicationError } from "../platform/errors"
 
+export interface BlobObjectReceipt {
+	readonly key: string
+	readonly receipt: string
+}
+
 export interface BlobObjects {
 	put(
 		document: string,
 		digest: string,
 		bytes: Uint8Array,
-	): Effect.Effect<string, ApplicationError>
+	): Effect.Effect<BlobObjectReceipt, ApplicationError>
 	get(
 		document: string,
 		digest: string,
