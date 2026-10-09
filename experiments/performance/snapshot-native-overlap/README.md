@@ -2,14 +2,14 @@
 
 One fresh control/candidate pair; eight trusted native keys, nominal100ms cadence, then one trusted Undo. Actual production754c9d6 with identical markers; candidate only two snapshot modules. Both arms passed loaded-byte, complete source/native caret, independent seed, post-capture immutable prime history, final accepted edit/Undo and reload gates. Prime was excluded from the measured first event. The first burst key occurred inside actual compaction in both arms; ensuring recorded a terminal compact-end even if interrupted.
 
-|3s window|Control|Candidate|
-|---|---:|---:|
-|Input max main RunTask|13.526ms|16.857ms|
-|Input main task union|2224.097ms|2467.723ms|
-|Input largest main GC span|12.558ms|13.697ms|
-|Undo max main RunTask|12.719ms|13.764ms|
-|Undo main task union|595.120ms|696.876ms|
-|Undo largest main GC span|12.066ms|12.966ms|
+| 3s window                  |    Control |  Candidate |
+| -------------------------- | ---------: | ---------: |
+| Input max main RunTask     |   13.526ms |   16.857ms |
+| Input main task union      | 2224.097ms | 2467.723ms |
+| Input largest main GC span |   12.558ms |   13.697ms |
+| Undo max main RunTask      |   12.719ms |   13.764ms |
+| Undo main task union       |  595.120ms |  696.876ms |
+| Undo largest main GC span  |   12.066ms |   12.966ms |
 
 Final eight-key source/caret rAF opportunity727.9→760.8ms; this includes the intentionally paced sequence, not single-key latency or displayed paint. Last-key→opportunity8.5→6.9ms in this pair. Undo source/caret opportunity34.6→37.7ms. All main task durations include nested GC; GC spans are separately reported, non-additive, and do not establish retained allocation ownership. No physical120Hz claim.
 
@@ -22,3 +22,5 @@ Preserved earlier failures: short commit SHA rejected before keys; full-source p
 Clean six-case real-storage preemption proof6/101 and active checkpoint interruption proof1/20 are archived separately at d9fed83. They demonstrate capability behavior; this native pair did not exercise interruption. Sources reconstruct from Git754 + control-markers.patch + candidate-vs-control.patch; per-arm source/build/served assets retained. Raw traces remain outside Git, with SHA256/bytes in pipeline-analysis. No cookie/config/profile/database/key material is allowlisted.
 
 written with gpt-6 in codex
+
+Raw producer prose is preserved in `README.md.txt`. Producer JSON uses `.json.txt` so formatting checks do not change signed bytes. `archive-verification.json` records the independent archive checks.

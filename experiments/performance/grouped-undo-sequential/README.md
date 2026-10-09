@@ -9,3 +9,5 @@ Initial archive setup rejected absolute read-only reference symlink; excluded re
 Source patches are against unchanged production Session/editor baseline; runtime-provenance pins actual archive revision. Original reviewed Session SHA and exact tested source/test SHA are in manifest. Optional editor intent hook compiled, but new public tests do not exercise it. Opus5.5 initial/followup HOLD findings fixed; final semantic Session/recorder review no local blocker, canonicalModel/provider recorded. No bodies, accounts, keys, profiles, databases or full duplicate Session source included.
 
 written with gpt-6 in codex
+
+Raw producer prose is preserved in `README.md.txt`. Producer JSON uses `.json.txt` so formatting checks do not change signed bytes. `archive-verification.json` records the independent archive checks.
