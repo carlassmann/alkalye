@@ -1,0 +1,22 @@
+{
+  "producerHashesVerified": 49,
+  "moduleReconstructionVerified": {
+    "control": [
+      "platform/background-work.ts",
+      "shared/document-session.ts",
+      "shared/crdt.ts",
+      "client/document-app.ts",
+      "client/source-textarea.ts",
+      "client/editor-viewport.ts"
+    ],
+    "candidate": [
+      "platform/background-work.ts",
+      "shared/document-session.ts",
+      "shared/crdt.ts",
+      "client/document-app.ts",
+      "client/source-textarea.ts",
+      "client/editor-viewport.ts"
+    ]
+  },
+  "baseline": "754c9d643c461e736a36c2b1760499edfbd885a4"
+}

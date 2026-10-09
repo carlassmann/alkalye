@@ -1,0 +1,31 @@
+{
+  "status": "strict-passed-runtime-pending",
+  "applicationBaseline": "754c9d643c461e736a36c2b1760499edfbd885a4",
+  "files": [
+    {
+      "path": "/tmp/alkalye-snapshot-input-native/app-runtime/experiments/performance/interaction-matrix/runner.ts",
+      "bytes": 37084,
+      "sha256": "e436ecedba15b1a973b7a8f2e3ea71adc01b96b69acb073ea07606a06f0274d8"
+    },
+    {
+      "path": "/tmp/alkalye-snapshot-input-native/app-runtime/experiments/performance/interaction-matrix/paced-input.ts",
+      "bytes": 2837,
+      "sha256": "9b3fbffa7061991037666f19a99187b1c99e8611286b046e521b2a6cc1fc1e99"
+    },
+    {
+      "path": "/tmp/alkalye-snapshot-input-native/app-runtime/experiments/performance/interaction-matrix/prime-history.ts",
+      "bytes": 3117,
+      "sha256": "d88a25d5cba863326507ddf347f19773b2d9fd7987b8dcd1e3288b400594201d"
+    },
+    {
+      "path": "/tmp/alkalye-snapshot-input-native/app-runtime/experiments/performance/interaction-matrix/prime-history-reader.ts",
+      "bytes": 3440,
+      "sha256": "638dd24fd608652a8e8d89cda440cd8a198eb6af743660d2f233fc69d419e498"
+    },
+    {
+      "path": "/tmp/alkalye-snapshot-input-native/run-pair-pipeline.ts",
+      "bytes": 1262,
+      "sha256": "d323b79b00a04e7c8fcd8bb3a6f8cc5818bb5c7a0ad7d834ea560fc2238d9214"
+    }
+  ]
+}

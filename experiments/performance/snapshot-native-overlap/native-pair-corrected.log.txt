@@ -1,0 +1,8 @@
+1 | let root = "/tmp/alkalye-snapshot-input-native"
+2 | if (!(await Bun.file(root + "/preparation-ready.json").exists())) throw Error("Strict/build/graph gate required")
+3 | if (await Bun.file(root + "/pair-pending.json").exists()) throw Error("Existing attempt retained; do not replay unknown keys")
+                                                                    ^
+error: Existing attempt retained; do not replay unknown keys
+      at /private/tmp/alkalye-snapshot-input-native/run-pair.ts:3:65
+
+Bun v1.4.0 (macOS arm64)

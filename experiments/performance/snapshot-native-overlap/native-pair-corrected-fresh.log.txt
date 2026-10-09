@@ -1,0 +1,26 @@
+{"stage":"pair-live","pid":67744}
+{"stage":"arm-live","arm":"control","pid":67746,"run":"/tmp/alkalye-snapshot-input-native/paced-control-c96539a4-8fc2-486f-81f8-91c590875de4"}
+started web pid=67780
+stopped alkalye-snapshot-input-native/codex-snapshot-input-native/web
+53 | let stage = "prepare"
+54 | let failure = false
+55 | async function command(args: string[], variables: Record<string, string> = {}) {
+56 |  let child = Bun.spawn(args, { cwd: import.meta.dir, env: { ...process.env, WORK_STATE_ROOT: stateRoot, ...variables }, stdout: "inherit", stderr: "inherit" })
+57 |  let exit = await child.exited
+58 |  if (exit !== 0) throw Error("Owned command failed: " + args[0] + " (" + exit + ")")
+                            ^
+error: Owned command failed: bun (1)
+      at command (/private/tmp/alkalye-snapshot-input-native/app-runtime/production-body-gate.ts:58:24)
+
+Bun v1.4.0 (macOS arm64)
+ 7 |  let run = root + "/paced-" + arm + "-" + crypto.randomUUID()
+ 8 |  let child = Bun.spawn(["bun", "production-body-gate.ts", arm, "rich1m", "--measure"], { cwd: root + "/app-runtime", env: { ...process.env, SNAPSHOT_INPUT_BURST: "1", PRODUCTION_BODY_RUN: run }, stdout: "inherit", stderr: "inherit" })
+ 9 |  console.log(JSON.stringify({ stage: "arm-live", arm, pid: child.pid, run }))
+10 |  let exit = await child.exited
+11 |  await Bun.write(root + "/" + arm + "-corrected-terminal.json", JSON.stringify({ exit, run }))
+12 |  if (exit) throw Error("Arm failed; preserve cell, no repeat")
+                      ^
+error: Arm failed; preserve cell, no repeat
+      at /private/tmp/alkalye-snapshot-input-native/run-pair-corrected.ts:12:18
+
+Bun v1.4.0 (macOS arm64)

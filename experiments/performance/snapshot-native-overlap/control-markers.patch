@@ -1,0 +1,155 @@
+--- a/src/client/source-textarea.ts
++++ b/src/client/source-textarea.ts
+@@ -304,6 +304,7 @@
+ 		) {
+ 			previous.start = active.start
+ 			previous.end = active.end
++			performance.mark("undo-residual:projection-current-hit")
+ 			return previous.value
+ 		}
+ 		let restored = this.previousProjected
+@@ -318,8 +319,10 @@
+ 		) {
+ 			this.previousProjected = previous
+ 			this.projected = restored
++			performance.mark("undo-residual:projection-inverse-hit")
+ 			return restored.value
+ 		}
++		performance.mark("undo-residual:projection-fallback-start")
+ 		let value =
+ 			mode === "raw" || !source.includes("[")
+ 				? identity(source)
+@@ -335,6 +338,7 @@
+ 			prefix: iconPrefix,
+ 			value,
+ 		}
++		performance.mark("undo-residual:projection-fallback-end")
+ 		return value
+ 	}
+ 	private apply(
+@@ -342,6 +346,7 @@
+ 		selection: { start: number; end: number; direction?: Direction },
+ 		reveal = false,
+ 	) {
++		performance.mark("undo-residual:apply-start")
+ 		if (next.source !== this.current.source) {
+ 			let edit = difference(this.current.source, next.source)
+ 			this.sourceIndex.replace({
+@@ -351,6 +356,7 @@
+ 			})
+ 		}
+ 		this.current = next
++		performance.mark("undo-residual:model-source-assigned")
+ 		this.viewport.render(
+ 			next.text,
+ 			{
+@@ -360,6 +366,7 @@
+ 			},
+ 			{ revealSelection: reveal },
+ 		)
++		performance.mark("undo-residual:native-render-return")
+ 		this.options.painted()
+ 	}
+ }
+--- a/src/client/document-app.ts
++++ b/src/client/document-app.ts
+@@ -2664,6 +2664,7 @@
+ 			).pipe(
+ 				Effect.tap(() =>
+ 					Effect.sync(() => {
++						performance.mark("undo-residual:durable-completion")
+ 						if (
+ 							!events.signal.aborted &&
+ 							selection === selected &&
+--- a/src/shared/projection.ts
++++ b/src/shared/projection.ts
+@@ -269,6 +269,7 @@
+ 		let active = activeSelection && selectionBounds(nextSource, activeSelection)
+ 		let viewDelta = 0,
+ 			editView = start
++		performance.mark("undo-residual:certified-token-metadata-start")
+ 		let tokens: LinkToken[] = [],
+ 			links: ProjectedLink[] = []
+ 		for (let token of this.tokens) {
+@@ -296,6 +297,7 @@
+ 			viewDelta += prefix.length + next.label.length - (next.end - next.start)
+ 			if (token.end < start) editView = start + viewDelta
+ 		}
++		performance.mark("undo-residual:certified-token-metadata-end")
+ 		let projectedText =
+ 			this.projectedText.slice(0, editView) +
+ 			insert +
+--- a/src/shared/crdt.ts
++++ b/src/shared/crdt.ts
+@@ -1802,12 +1802,18 @@
+ 						"Replica changed while its snapshot was being captured",
+ 					)
+ 			}
++			performance.mark("undo-residual:checkpoint-borrowed-start")
+ 			let borrowed = yield* cooperative("replica.checkpoint", () =>
+ 				source.checkpointSteps(true, true),
+ 			)
+ 			unchanged()
+-			let compact = yield* compactCheckpointEffect(borrowed)
++			performance.mark("undo-residual:checkpoint-borrowed-end")
++			performance.mark("undo-residual:checkpoint-compact-start")
++			let compact = yield* compactCheckpointEffect(borrowed).pipe(
++				Effect.ensuring(Effect.sync(() => performance.mark("undo-residual:checkpoint-compact-end"))),
++			)
+ 			unchanged()
++			performance.mark("undo-residual:checkpoint-output-start")
+ 			let owned = yield* cooperative("replica.checkpoint.output", function* () {
+ 				if (compact.format === "alkalye-state-v3") {
+ 					let targets: (typeof compact.targets)[number][] = []
+@@ -1841,6 +1847,7 @@
+ 				return { ...compact, targets }
+ 			})
+ 			unchanged()
++			performance.mark("undo-residual:checkpoint-output-end")
+ 			return owned
+ 		})
+ 	}
+--- a/src/shared/document-session.ts
++++ b/src/shared/document-session.ts
+@@ -304,6 +304,8 @@
+ 				]),
+ 			)
+ 			.pipe(
++				Effect.onInterrupt(() => Effect.sync(() => performance.mark("snapshot:capture-interrupted"))),
++				Effect.ensuring(Effect.sync(() => performance.mark("snapshot:permit-return"))),
+ 				Effect.flatMap(([snapshot, state]) =>
+ 					Effect.gen(function* () {
+ 						if (snapshot) yield* projection.saveSnapshot(snapshot)
+@@ -1466,12 +1468,14 @@
+ 					localPosition === cachedPosition
+ 				)
+ 					return
++				performance.mark("undo-residual:snapshot-start")
+ 				if (options.passiveState)
+ 					yield* materializeDocument(accepted).pipe(Effect.ignore)
+ 				let compact = options.cooperativeWork
+ 					? yield* accepted.durableCheckpointEffect()
+ 					: compactCheckpoint(accepted.checkpoint())
+-				return {
++				performance.mark("undo-residual:snapshot-encode-start")
++				let snapshot = {
+ 					position: localPosition,
+ 					replica: options.passiveState ? accepted : undefined,
+ 					generation: accepted.generation,
+@@ -1492,6 +1496,8 @@
+ 						creation,
+ 					}),
+ 				}
++				performance.mark("undo-residual:snapshot-encode-end")
++				return snapshot
+ 			}),
+ 			saveSnapshot: (snapshot: PassiveDocumentState) =>
+ 				Effect.gen(function* () {
+@@ -1504,6 +1510,7 @@
+ 							"The snapshot's journal position was removed",
+ 						)
+ 					cachedPosition = Math.max(cachedPosition, snapshot.position)
++					performance.mark("snapshot:cache-saved", { detail: { position: snapshot.position } })
+ 					yield* options.passiveState?.write(snapshot) ?? Effect.void
+ 				}),
+ 		}

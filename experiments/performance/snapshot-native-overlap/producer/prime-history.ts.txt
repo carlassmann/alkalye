@@ -1,0 +1,59 @@
+import * as Schema from "effect/Schema"
+import { join } from "node:path"
+import { chmod } from "node:fs/promises"
+import { browser } from "../../../tests/browser-driver"
+
+let cookies = Schema.Struct({ cookies: Schema.Array(Schema.Struct({ name: Schema.String, value: Schema.String })) })
+let message = Schema.Union([
+ Schema.Struct({ stage: Schema.Literal("ready"), position: Schema.Natural, log: Schema.String }),
+ Schema.Struct({ stage: Schema.Literal("receipt"), sha256: Schema.String, characters: Schema.Natural, log: Schema.String, actionSha256: Schema.String, historyCount: Schema.Natural }),
+])
+export async function preparePrimeHistory(session: string, origin: string, path: string, output: string, seedSha256: string, primeSha256: string, seedLog: string) {
+ let values = Schema.decodeUnknownSync(cookies)(browser(session, "cookies", "get"))
+ let cookie = values.cookies.find(value => value.name === "alkalye-session")
+ if (!cookie) throw Error("Own account-session cookie required for read-only history")
+ let document = path.split("/").at(-1)
+ if (!document) throw Error("Document route missing")
+ let configuration = join(output, "prime-history.private.json")
+ await Bun.write(configuration, JSON.stringify({ origin, document, cookie: cookie.name + "=" + cookie.value, seedSha256, primeSha256 }))
+ await chmod(configuration, 0o600)
+ let child = Bun.spawn(["bun", join(import.meta.dir, "prime-history-reader.ts"), configuration], { stdin: "pipe", stdout: "pipe", stderr: "pipe" })
+ let ready = Promise.withResolvers<void>(), receipt = Promise.withResolvers<{sha256: string; characters: number; log: string; actionSha256: string; historyCount: number}>()
+ let deadline = setTimeout(() => child.kill(), 60000)
+ let read = (async () => {
+  let pending = "", decoder = new TextDecoder()
+  for await (let chunk of child.stdout) {
+   pending += decoder.decode(chunk, { stream: true })
+   while (pending.includes("\n")) {
+    let end = pending.indexOf("\n"), line = pending.slice(0, end)
+    pending = pending.slice(end + 1)
+    let value = Schema.decodeUnknownSync(message)(JSON.parse(line))
+    if (value.stage === "ready") {
+     if (value.log + ":" + value.position !== seedLog) throw Error("Independent seed snapshot position differs")
+     ready.resolve()
+    }
+    else receipt.resolve(value)
+   }
+  }
+ })()
+ let closed = Promise.all([read, new Response(child.stderr).text(), child.exited]).then(async ([, stderr, exit]) => {
+  await Bun.write(join(output, "prime-history-private.log"), stderr)
+  if (exit) throw Error("Independent history reader failed; private diagnostic retained")
+ }).catch(error => { ready.reject(error); receipt.reject(error); throw error }).finally(() => clearTimeout(deadline))
+ closed.catch(() => {})
+ receipt.promise.catch(() => {})
+ try { await ready.promise } catch (error) { child.kill(); await closed.catch(() => {}); throw error }
+ return {
+  async finish() {
+   child.stdin.write("capture-finished\n")
+   child.stdin.end()
+   let value = await receipt.promise
+   await closed
+   return value
+  },
+  async close() {
+   child.kill()
+   await closed.catch(() => {})
+  },
+ }
+}

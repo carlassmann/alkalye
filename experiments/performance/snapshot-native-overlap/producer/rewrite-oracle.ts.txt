@@ -1,0 +1,64 @@
+import * as Effect from "effect/Effect"
+import * as Schema from "effect/Schema"
+import * as Redacted from "effect/Redacted"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import { apiDocuments } from "../../../src/cli/api-documents"
+
+let Configuration = Schema.Struct({
+	origin: Schema.String,
+	keyFile: Schema.String,
+	scope: Schema.String,
+	documents: Schema.Array(
+		Schema.Struct({ fixture: Schema.String, documentId: Schema.String }),
+	),
+})
+let Request = Schema.Struct({
+	fixture: Schema.String,
+	path: Schema.String,
+	expectedSha256: Schema.String,
+	phase: Schema.String,
+	deadlineMs: Schema.Number,
+})
+let [configurationPath] = Bun.argv.slice(2)
+if (!configurationPath)
+	throw Error("Private oracle configuration path required")
+let configuration = Schema.decodeUnknownSync(Configuration)(
+	await Bun.file(configurationPath).json(),
+)
+let request = Schema.decodeUnknownSync(Request)(
+	JSON.parse(await Bun.stdin.text()),
+)
+let document = configuration.documents.find(
+	value => value.fixture === request.fixture,
+)
+if (!document || !request.path.endsWith("/" + document.documentId))
+	throw Error("Oracle fixture and public document route disagree")
+if (
+	!/^[a-f0-9]{64}$/.test(request.expectedSha256) ||
+	request.deadlineMs <= 0 ||
+	request.deadlineMs > 20000
+)
+	throw Error("Oracle digest/deadline invalid")
+let key = Redacted.make((await Bun.file(configuration.keyFile).text()).trim())
+let documents = apiDocuments(configuration.origin, key, configuration.scope)
+let receipt = await Effect.runPromise(
+	Effect.gen(function* () {
+		while (true) {
+			let accepted = yield* documents.read(document.documentId)
+			let sha256 = new Bun.CryptoHasher("sha256")
+				.update(accepted.content)
+				.digest("hex")
+			if (sha256 === request.expectedSha256)
+				return {
+					sha256,
+					characters: accepted.content.length,
+					log: accepted.revision,
+				}
+			yield* Effect.sleep("100 millis")
+		}
+	}).pipe(
+		Effect.timeout(request.deadlineMs),
+		Effect.provide(FetchHttpClient.layer),
+	),
+)
+console.log(JSON.stringify(receipt))

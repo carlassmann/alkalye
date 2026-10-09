@@ -1,0 +1,62 @@
+[
+  {
+    "version": "control",
+    "commit": "754c9d643c461e736a36c2b1760499edfbd885a4",
+    "cell": "body-rich1m",
+    "trial": 0,
+    "status": "failed",
+    "stage": "trusted-action",
+    "error": "Error: Browser condition failed: (()=>{let start=performance.getEntriesByName('undo-residual:checkpoint-compact-start').at(-1),end=performance.getEntriesByName('undo-residual:checkpoint-compact-end').at(-1);return Boolean(start&&(!end||end.startTime<start.startTime))})()",
+    "trace": "/tmp/alkalye-snapshot-input-native/paced-control-7fedc487-ff9a-4377-9044-fefbba38c33e/results/4cb6e650-10b0-489e-87ac-febb4d81b379/control-body-rich1m-0.trace.json",
+    "mode": "measured",
+    "observation": {
+      "caret": {
+        "focused": true,
+        "native": [
+          1492,
+          1492
+        ],
+        "nativeLength": 2881,
+        "projectedLength": 830576,
+        "raw": [
+          524288,
+          524288
+        ],
+        "view": 415298,
+        "window": {
+          "end": 416687,
+          "height": 3532.28125,
+          "start": 413806,
+          "top": 503025.40625
+        }
+      },
+      "network": {
+        "openedSockets": [
+          "/api/live"
+        ],
+        "pollRequests": 0,
+        "sends": 0
+      },
+      "probe": {
+        "end": 0,
+        "eventTiming": [],
+        "events": [],
+        "frames": [],
+        "ready": 0,
+        "start": 0
+      }
+    },
+    "undoTrace": "/tmp/alkalye-snapshot-input-native/paced-control-7fedc487-ff9a-4377-9044-fefbba38c33e/results/4cb6e650-10b0-489e-87ac-febb4d81b379/control-body-rich1m-0-undo.trace.json",
+    "seedReceipt": {
+      "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+      "characters": 1048577,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:36"
+    },
+    "fixture": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  }
+]

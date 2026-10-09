@@ -1,0 +1,28 @@
+{
+  "baselineCommit": "754c9d643c461e736a36c2b1760499edfbd885a4",
+  "graphGate": true,
+  "arms": {
+    "control": {
+      "source": {
+        "platform/background-work.ts": "db2845852c680feca095209d00b263111deea8f7526651557d340e063d022151",
+        "shared/document-session.ts": "3d935aabdd48e14c4d8e6be783f9de7b204611d3fbf43b384fc468ab5df8c457",
+        "shared/crdt.ts": "3b1c391be4c6b1c59f3717293f483bdfb41932433a6db1e3a921745c3eabc1aa",
+        "client/document-app.ts": "af22539869fc5c3eb187c9438e6013c8dfabad4a358c241a1ad50adc4bf2a574",
+        "client/source-textarea.ts": "43003b9a98815301c4f872805b479a984d96f871cae9950de5a6e5b06fbf7235",
+        "client/editor-viewport.ts": "7351252e7c6cf596d250de56c19b685a4a96efb097a698f280b9ea98e643788a"
+      },
+      "entrySHA256": "d00a9ac3b27a5003c30a8b8212bf83a8f9aa0c596ff5170139a0ea78bdeb8ef0"
+    },
+    "candidate": {
+      "source": {
+        "platform/background-work.ts": "625ec1b9af735d16c69b56b7a75692adbb4262268dffd3805d493be51e994ac6",
+        "shared/document-session.ts": "4e0c95bd509990e11bedfb21143f709c1d2e4febb74d5f204333b107bdefb33c",
+        "shared/crdt.ts": "3b1c391be4c6b1c59f3717293f483bdfb41932433a6db1e3a921745c3eabc1aa",
+        "client/document-app.ts": "af22539869fc5c3eb187c9438e6013c8dfabad4a358c241a1ad50adc4bf2a574",
+        "client/source-textarea.ts": "43003b9a98815301c4f872805b479a984d96f871cae9950de5a6e5b06fbf7235",
+        "client/editor-viewport.ts": "7351252e7c6cf596d250de56c19b685a4a96efb097a698f280b9ea98e643788a"
+      },
+      "entrySHA256": "0a758f760907ed1fd9b772b50bed55a6d18441319e0d1ed5ec3729dd8ffb8070"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+[
+  {
+    "version": "control",
+    "commit": "754c9d643c461e736a36c2b1760499edfbd885a4",
+    "cell": "body-rich1m",
+    "trial": 0,
+    "status": "failed",
+    "stage": "prime-edit",
+    "error": "Error: im-mv0lyyj3 eval: spawnSync agent-browser ENOBUFS (stdout or stderr buffer reached maxBuffer size limit)",
+    "trace": "/tmp/alkalye-snapshot-input-native/paced-control-c96539a4-8fc2-486f-81f8-91c590875de4/results/67617c15-aca0-4d11-b56a-6ce4f5772654/control-body-rich1m-0.trace.json",
+    "mode": "measured",
+    "observation": {
+      "caret": {
+        "focused": true,
+        "native": [
+          1493,
+          1493
+        ],
+        "nativeLength": 2881,
+        "projectedLength": 830576,
+        "raw": [
+          524289,
+          524289
+        ],
+        "view": 415299,
+        "window": {
+          "end": 416687,
+          "height": 3532.28125,
+          "start": 413806,
+          "top": 503025.40625
+        }
+      },
+      "network": {
+        "openedSockets": [
+          "/api/live"
+        ],
+        "pollRequests": 0,
+        "sends": 0
+      }
+    },
+    "undoTrace": "/tmp/alkalye-snapshot-input-native/paced-control-c96539a4-8fc2-486f-81f8-91c590875de4/results/67617c15-aca0-4d11-b56a-6ce4f5772654/control-body-rich1m-0-undo.trace.json",
+    "seedReceipt": {
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+      "characters": 1048576,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:28"
+    },
+    "fixture": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  }
+]

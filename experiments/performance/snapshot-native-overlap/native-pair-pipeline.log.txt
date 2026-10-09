@@ -1,0 +1,9 @@
+{"stage":"pair-live","pid":87426}
+{"stage":"arm-live","arm":"control","pid":87434,"run":"/tmp/alkalye-snapshot-input-native/paced-control-2e162d1b-83e2-46b0-8598-709fe3ab1a91"}
+started web pid=87488
+{"stage":"complete","arm":"control","fixture":"rich1m","resultDirectory":"/tmp/alkalye-snapshot-input-native/paced-control-2e162d1b-83e2-46b0-8598-709fe3ab1a91/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-snapshot-input-native/codex-snapshot-input-native/web
+{"stage":"arm-live","arm":"candidate","pid":88313,"run":"/tmp/alkalye-snapshot-input-native/paced-candidate-8ba5cd3a-6743-4f25-9f7e-8ead3ed37c63"}
+started web pid=88350
+{"stage":"complete","arm":"candidate","fixture":"rich1m","resultDirectory":"/tmp/alkalye-snapshot-input-native/paced-candidate-8ba5cd3a-6743-4f25-9f7e-8ead3ed37c63/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-snapshot-input-native/codex-snapshot-input-native/web

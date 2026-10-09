@@ -1,0 +1,2825 @@
+{
+  "scope": "n1 paced native diagnostic; each arm first trusted burst key overlaps active compaction; prime excluded; GC spans are not retained allocation ownership",
+  "rows": [
+    {
+      "arm": "control",
+      "phase": "input",
+      "status": "measured-complete",
+      "owner": [
+        87721,
+        21207667
+      ],
+      "tracePath": "/tmp/alkalye-snapshot-input-native/paced-control-2e162d1b-83e2-46b0-8598-709fe3ab1a91/results/f8e04a7c-9e9e-447d-b8ad-461ccdd1d862/control-body-rich1m-0.trace.json",
+      "traceSHA256": "74ccabb87f66cca2af554b899e6641fecfbd7f8c07b2ebf88c73f7cf80371b48",
+      "traceBytes": 26140945,
+      "windowMs": 3001.243,
+      "mainMaxTaskMs": 13.526,
+      "mainBusyUnionMs": 2224.097,
+      "largestMainGCSpanMs": 12.558,
+      "mainGCCount": 84,
+      "sourceReadyFrameOpportunityMs": 727.8999999761581,
+      "keyTasks": [
+        {
+          "offsetMs": 0.0,
+          "maxEnclosingRunTaskMs": 8.506
+        },
+        {
+          "offsetMs": 115.30000001191911,
+          "maxEnclosingRunTaskMs": 13.192
+        },
+        {
+          "offsetMs": 239.89999997615814,
+          "maxEnclosingRunTaskMs": 6.129
+        },
+        {
+          "offsetMs": 354.3000000119191,
+          "maxEnclosingRunTaskMs": 5.921
+        },
+        {
+          "offsetMs": 470.6999999880809,
+          "maxEnclosingRunTaskMs": 5.791
+        },
+        {
+          "offsetMs": 585.5999999642354,
+          "maxEnclosingRunTaskMs": 5.781
+        },
+        {
+          "offsetMs": 709.5,
+          "maxEnclosingRunTaskMs": 5.542
+        },
+        {
+          "offsetMs": 719.3999999761581,
+          "maxEnclosingRunTaskMs": 5.185
+        }
+      ],
+      "markers": [
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": -661.087
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": -657.668
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -653.971
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -650.673
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -638.747
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -622.937
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -320.609
+        },
+        {
+          "name": "undo-residual:snapshot-start",
+          "ms": -314.609
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -304.75
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -227.42
+        },
+        {
+          "name": "undo-residual:apply-start",
+          "ms": -227.4
+        },
+        {
+          "name": "undo-residual:model-source-assigned",
+          "ms": -227.396
+        },
+        {
+          "name": "undo-residual:native-render-return",
+          "ms": -226.725
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -225.374
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-start",
+          "ms": -104.75
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-end",
+          "ms": -75.273
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-start",
+          "ms": -75.256
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 3.054
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 5.257
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 7.255
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 11.026
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 14.053
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 115.893
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 117.568
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 126.843
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 129.27
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 145.723
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-end",
+          "ms": 169.918
+        },
+        {
+          "name": "undo-residual:checkpoint-output-start",
+          "ms": 169.944
+        },
+        {
+          "name": "undo-residual:checkpoint-output-end",
+          "ms": 170.042
+        },
+        {
+          "name": "undo-residual:snapshot-encode-start",
+          "ms": 170.05
+        },
+        {
+          "name": "undo-residual:snapshot-encode-end",
+          "ms": 170.143
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 240.481
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 242.566
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 244.699
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 246.696
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 262.538
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 354.827
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 356.692
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 358.976
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 360.883
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 377.584
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 393.063
+        },
+        {
+          "name": "snapshot:cache-saved",
+          "ms": 397.493
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 412.303
+        },
+        {
+          "name": "undo-residual:snapshot-start",
+          "ms": 419.19
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-start",
+          "ms": 419.217
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 426.59
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-end",
+          "ms": 452.11
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-start",
+          "ms": 452.134
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 471.316
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 473.138
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 475.198
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 477.21
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 495.117
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 586.254
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 588.094
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 590.128
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 593.622
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 596.792
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 700.357
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-end",
+          "ms": 702.342
+        },
+        {
+          "name": "undo-residual:checkpoint-output-start",
+          "ms": 702.364
+        },
+        {
+          "name": "undo-residual:checkpoint-output-end",
+          "ms": 702.407
+        },
+        {
+          "name": "undo-residual:snapshot-encode-start",
+          "ms": 702.412
+        },
+        {
+          "name": "undo-residual:snapshot-encode-end",
+          "ms": 702.483
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 710.049
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 711.862
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 713.864
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 716.169
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 719.885
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 721.673
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 723.548
+        },
+        {
+          "name": "interaction:ready",
+          "ms": 727.817
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 729.42
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 732.703
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 903.317
+        },
+        {
+          "name": "snapshot:cache-saved",
+          "ms": 907.635
+        },
+        {
+          "name": "undo-residual:snapshot-start",
+          "ms": 920.949
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-start",
+          "ms": 920.978
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 928.896
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-end",
+          "ms": 954.093
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-start",
+          "ms": 954.115
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-end",
+          "ms": 1166.688
+        },
+        {
+          "name": "undo-residual:checkpoint-output-start",
+          "ms": 1166.718
+        },
+        {
+          "name": "undo-residual:checkpoint-output-end",
+          "ms": 1166.772
+        },
+        {
+          "name": "undo-residual:snapshot-encode-start",
+          "ms": 1166.778
+        },
+        {
+          "name": "undo-residual:snapshot-encode-end",
+          "ms": 1166.895
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 1344.523
+        },
+        {
+          "name": "snapshot:cache-saved",
+          "ms": 1350.065
+        },
+        {
+          "name": "undo-residual:snapshot-start",
+          "ms": 1353.248
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 1363.922
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-start",
+          "ms": 1549.466
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-end",
+          "ms": 1575.917
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-start",
+          "ms": 1575.939
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 1617.313
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 1628.43
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-end",
+          "ms": 1792.49
+        },
+        {
+          "name": "undo-residual:checkpoint-output-start",
+          "ms": 1792.513
+        },
+        {
+          "name": "undo-residual:checkpoint-output-end",
+          "ms": 1792.569
+        },
+        {
+          "name": "undo-residual:snapshot-encode-start",
+          "ms": 1792.574
+        },
+        {
+          "name": "undo-residual:snapshot-encode-end",
+          "ms": 1792.65
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 1792.699
+        },
+        {
+          "name": "snapshot:cache-saved",
+          "ms": 1798.835
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 1814.67
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 2045.384
+        },
+        {
+          "name": "undo-residual:snapshot-start",
+          "ms": 2217.871
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 2279.367
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 2295.765
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-start",
+          "ms": 2408.559
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-end",
+          "ms": 2434.553
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-start",
+          "ms": 2434.572
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-end",
+          "ms": 2641.77
+        },
+        {
+          "name": "undo-residual:checkpoint-output-start",
+          "ms": 2641.795
+        },
+        {
+          "name": "undo-residual:checkpoint-output-end",
+          "ms": 2641.829
+        },
+        {
+          "name": "undo-residual:snapshot-encode-start",
+          "ms": 2641.835
+        },
+        {
+          "name": "undo-residual:snapshot-encode-end",
+          "ms": 2641.904
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 2641.953
+        },
+        {
+          "name": "snapshot:cache-saved",
+          "ms": 2648.601
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 2650.057
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 2660.423
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 2877.723
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 2895.714
+        }
+      ],
+      "stages": [
+        {
+          "stage": "checkpoint-borrowed",
+          "startMs": 419.217,
+          "endMs": 452.11,
+          "wallMs": 32.89300000000003,
+          "overlappingGCCount": 3
+        },
+        {
+          "stage": "checkpoint-borrowed",
+          "startMs": 920.978,
+          "endMs": 954.093,
+          "wallMs": 33.11500000000001,
+          "overlappingGCCount": 2
+        },
+        {
+          "stage": "checkpoint-borrowed",
+          "startMs": 1549.466,
+          "endMs": 1575.917,
+          "wallMs": 26.451000000000022,
+          "overlappingGCCount": 3
+        },
+        {
+          "stage": "checkpoint-borrowed",
+          "startMs": 2408.559,
+          "endMs": 2434.553,
+          "wallMs": 25.993999999999687,
+          "overlappingGCCount": 3
+        },
+        {
+          "stage": "checkpoint-compact",
+          "startMs": -75.256,
+          "endMs": 169.918,
+          "wallMs": 245.174,
+          "overlappingGCCount": 6
+        },
+        {
+          "stage": "checkpoint-compact",
+          "startMs": 452.134,
+          "endMs": 702.342,
+          "wallMs": 250.20799999999997,
+          "overlappingGCCount": 10
+        },
+        {
+          "stage": "checkpoint-compact",
+          "startMs": 954.115,
+          "endMs": 1166.688,
+          "wallMs": 212.5730000000001,
+          "overlappingGCCount": 10
+        },
+        {
+          "stage": "checkpoint-compact",
+          "startMs": 1575.939,
+          "endMs": 1792.49,
+          "wallMs": 216.55099999999993,
+          "overlappingGCCount": 9
+        },
+        {
+          "stage": "checkpoint-compact",
+          "startMs": 2434.572,
+          "endMs": 2641.77,
+          "wallMs": 207.19799999999987,
+          "overlappingGCCount": 9
+        },
+        {
+          "stage": "checkpoint-output",
+          "startMs": 169.944,
+          "endMs": 170.042,
+          "wallMs": 0.09800000000001319,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "checkpoint-output",
+          "startMs": 702.364,
+          "endMs": 702.407,
+          "wallMs": 0.043000000000006366,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "checkpoint-output",
+          "startMs": 1166.718,
+          "endMs": 1166.772,
+          "wallMs": 0.05399999999985994,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "checkpoint-output",
+          "startMs": 1792.513,
+          "endMs": 1792.569,
+          "wallMs": 0.05600000000004002,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "checkpoint-output",
+          "startMs": 2641.795,
+          "endMs": 2641.829,
+          "wallMs": 0.0340000000001055,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "snapshot-encode",
+          "startMs": 170.05,
+          "endMs": 170.143,
+          "wallMs": 0.09299999999998931,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "snapshot-encode",
+          "startMs": 702.412,
+          "endMs": 702.483,
+          "wallMs": 0.07099999999991269,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "snapshot-encode",
+          "startMs": 1166.778,
+          "endMs": 1166.895,
+          "wallMs": 0.1169999999999618,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "snapshot-encode",
+          "startMs": 1792.574,
+          "endMs": 1792.65,
+          "wallMs": 0.07600000000002183,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "snapshot-encode",
+          "startMs": 2641.835,
+          "endMs": 2641.904,
+          "wallMs": 0.06899999999995998,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 3.054,
+          "endMs": 5.257,
+          "wallMs": 2.203,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 115.893,
+          "endMs": 117.568,
+          "wallMs": 1.6749999999999972,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 240.481,
+          "endMs": 242.566,
+          "wallMs": 2.085000000000008,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 354.827,
+          "endMs": 356.692,
+          "wallMs": 1.865000000000009,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 471.316,
+          "endMs": 473.138,
+          "wallMs": 1.8220000000000027,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 586.254,
+          "endMs": 588.094,
+          "wallMs": 1.8400000000000318,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 710.049,
+          "endMs": 711.862,
+          "wallMs": 1.8129999999999882,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 719.885,
+          "endMs": 721.673,
+          "wallMs": 1.788000000000011,
+          "overlappingGCCount": 0
+        }
+      ],
+      "gc": [
+        {
+          "name": "MinorGC",
+          "ms": 16.422,
+          "durationMs": 9.641
+        },
+        {
+          "name": "MinorGC",
+          "ms": 35.952,
+          "durationMs": 11.299
+        },
+        {
+          "name": "MinorGC",
+          "ms": 59.373,
+          "durationMs": 3.505
+        },
+        {
+          "name": "MinorGC",
+          "ms": 73.495,
+          "durationMs": 11.372
+        },
+        {
+          "name": "MinorGC",
+          "ms": 96.055,
+          "durationMs": 11.06
+        },
+        {
+          "name": "MinorGC",
+          "ms": 147.976,
+          "durationMs": 10.433
+        },
+        {
+          "name": "MinorGC",
+          "ms": 187.408,
+          "durationMs": 7.404
+        },
+        {
+          "name": "MinorGC",
+          "ms": 302.628,
+          "durationMs": 1.374
+        },
+        {
+          "name": "MinorGC",
+          "ms": 323.935,
+          "durationMs": 1.139
+        },
+        {
+          "name": "MinorGC",
+          "ms": 331.97,
+          "durationMs": 0.303
+        },
+        {
+          "name": "MinorGC",
+          "ms": 337.145,
+          "durationMs": 0.253
+        },
+        {
+          "name": "MinorGC",
+          "ms": 345.554,
+          "durationMs": 1.216
+        },
+        {
+          "name": "MinorGC",
+          "ms": 379.07,
+          "durationMs": 1.163
+        },
+        {
+          "name": "MinorGC",
+          "ms": 423.237,
+          "durationMs": 0.69
+        },
+        {
+          "name": "MinorGC",
+          "ms": 437.262,
+          "durationMs": 0.865
+        },
+        {
+          "name": "MinorGC",
+          "ms": 447.468,
+          "durationMs": 0.951
+        },
+        {
+          "name": "MinorGC",
+          "ms": 458.325,
+          "durationMs": 7.274
+        },
+        {
+          "name": "MinorGC",
+          "ms": 499.552,
+          "durationMs": 11.419
+        },
+        {
+          "name": "MinorGC",
+          "ms": 521.351,
+          "durationMs": 10.727
+        },
+        {
+          "name": "MinorGC",
+          "ms": 543.44,
+          "durationMs": 12.171
+        },
+        {
+          "name": "MinorGC",
+          "ms": 566.858,
+          "durationMs": 11.861
+        },
+        {
+          "name": "MinorGC",
+          "ms": 599.306,
+          "durationMs": 7.25
+        },
+        {
+          "name": "MinorGC",
+          "ms": 616.585,
+          "durationMs": 10.397
+        },
+        {
+          "name": "MinorGC",
+          "ms": 640.354,
+          "durationMs": 11.656
+        },
+        {
+          "name": "MinorGC",
+          "ms": 664.109,
+          "durationMs": 11.884
+        },
+        {
+          "name": "MinorGC",
+          "ms": 689.525,
+          "durationMs": 9.956
+        },
+        {
+          "name": "MinorGC",
+          "ms": 807.896,
+          "durationMs": 1.648
+        },
+        {
+          "name": "MinorGC",
+          "ms": 855.251,
+          "durationMs": 1.444
+        },
+        {
+          "name": "MinorGC",
+          "ms": 866.564,
+          "durationMs": 0.4
+        },
+        {
+          "name": "MinorGC",
+          "ms": 872.706,
+          "durationMs": 1.031
+        },
+        {
+          "name": "MinorGC",
+          "ms": 886.006,
+          "durationMs": 1.03
+        },
+        {
+          "name": "MinorGC",
+          "ms": 919.904,
+          "durationMs": 0.762
+        },
+        {
+          "name": "MinorGC",
+          "ms": 936.135,
+          "durationMs": 0.691
+        },
+        {
+          "name": "MinorGC",
+          "ms": 946.561,
+          "durationMs": 0.933
+        },
+        {
+          "name": "MinorGC",
+          "ms": 957.675,
+          "durationMs": 4.277
+        },
+        {
+          "name": "MinorGC",
+          "ms": 975.071,
+          "durationMs": 12.558
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1000.911,
+          "durationMs": 11.602
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1025.026,
+          "durationMs": 10.784
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1048.843,
+          "durationMs": 11.384
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1072.225,
+          "durationMs": 6.732
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1091.072,
+          "durationMs": 11.284
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1115.293,
+          "durationMs": 11.354
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1139.101,
+          "durationMs": 10.258
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1162.374,
+          "durationMs": 4.102
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1275.036,
+          "durationMs": 1.309
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1301.248,
+          "durationMs": 1.098
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1308.629,
+          "durationMs": 0.299
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1318.118,
+          "durationMs": 1.128
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1332.767,
+          "durationMs": 1.192
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1436.839,
+          "durationMs": 0.791
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1500.947,
+          "durationMs": 1.448
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1514.833,
+          "durationMs": 0.417
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1520.9,
+          "durationMs": 0.331
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1532.108,
+          "durationMs": 1.08
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1551.297,
+          "durationMs": 1.173
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1560.692,
+          "durationMs": 0.729
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1571.162,
+          "durationMs": 0.993
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1583.135,
+          "durationMs": 7.495
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1603.569,
+          "durationMs": 12.122
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1633.317,
+          "durationMs": 11.138
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1656.267,
+          "durationMs": 11.562
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1680.007,
+          "durationMs": 11.508
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1703.232,
+          "durationMs": 9.081
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1723.72,
+          "durationMs": 11.282
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1747.564,
+          "durationMs": 11.864
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1771.113,
+          "durationMs": 11.729
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1815.661,
+          "durationMs": 0.516
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2337.612,
+          "durationMs": 1.086
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2367.103,
+          "durationMs": 1.182
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2374.782,
+          "durationMs": 0.376
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2382.835,
+          "durationMs": 1.291
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2397.214,
+          "durationMs": 1.175
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2413.093,
+          "durationMs": 0.588
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2421.975,
+          "durationMs": 0.784
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2431.799,
+          "durationMs": 1.073
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2443.868,
+          "durationMs": 10.183
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2466.234,
+          "durationMs": 12.077
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2490.416,
+          "durationMs": 11.054
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2513.908,
+          "durationMs": 11.059
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2536.587,
+          "durationMs": 10.152
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2557.963,
+          "durationMs": 10.074
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2580.283,
+          "durationMs": 10.003
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2601.799,
+          "durationMs": 11.42
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2624.348,
+          "durationMs": 11.353
+        }
+      ],
+      "sourceSelection": {
+        "start": 524296,
+        "end": 524296
+      }
+    },
+    {
+      "arm": "control",
+      "phase": "undo",
+      "status": "measured-complete",
+      "owner": [
+        87721,
+        21207667
+      ],
+      "tracePath": "/tmp/alkalye-snapshot-input-native/paced-control-2e162d1b-83e2-46b0-8598-709fe3ab1a91/results/f8e04a7c-9e9e-447d-b8ad-461ccdd1d862/control-body-rich1m-0-undo.trace.json",
+      "traceSHA256": "32396955533b670a40ce9c1f3d7681b5940ab5101380ef383067febee94d1be6",
+      "traceBytes": 8158774,
+      "windowMs": 3000.912,
+      "mainMaxTaskMs": 12.719,
+      "mainBusyUnionMs": 595.12,
+      "largestMainGCSpanMs": 12.066,
+      "mainGCCount": 23,
+      "sourceReadyFrameOpportunityMs": 34.60000002384186,
+      "keyTasks": [
+        {
+          "offsetMs": 0.0,
+          "maxEnclosingRunTaskMs": 0.546
+        }
+      ],
+      "markers": [
+        {
+          "name": "undo-residual:durable-completion",
+          "ms": 24.666
+        },
+        {
+          "name": "undo-residual:projection-inverse-hit",
+          "ms": 25.617
+        },
+        {
+          "name": "undo-residual:apply-start",
+          "ms": 25.628
+        },
+        {
+          "name": "undo-residual:model-source-assigned",
+          "ms": 25.725
+        },
+        {
+          "name": "undo-residual:native-render-return",
+          "ms": 32.581
+        },
+        {
+          "name": "interaction:ready",
+          "ms": 34.584
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 34.739
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 36.036
+        },
+        {
+          "name": "undo-residual:snapshot-start",
+          "ms": 278.868
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 280.991
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 298.583
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-start",
+          "ms": 420.164
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-end",
+          "ms": 444.741
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-start",
+          "ms": 444.762
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-end",
+          "ms": 643.748
+        },
+        {
+          "name": "undo-residual:checkpoint-output-start",
+          "ms": 643.772
+        },
+        {
+          "name": "undo-residual:checkpoint-output-end",
+          "ms": 643.8
+        },
+        {
+          "name": "undo-residual:snapshot-encode-start",
+          "ms": 643.805
+        },
+        {
+          "name": "undo-residual:snapshot-encode-end",
+          "ms": 643.839
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 813.631
+        },
+        {
+          "name": "snapshot:cache-saved",
+          "ms": 818.564
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 820.091
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 824.713
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 827.684
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 831.249
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 997.667
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 2998.262
+        }
+      ],
+      "stages": [
+        {
+          "stage": "checkpoint-borrowed",
+          "startMs": 420.164,
+          "endMs": 444.741,
+          "wallMs": 24.576999999999998,
+          "overlappingGCCount": 3
+        },
+        {
+          "stage": "checkpoint-compact",
+          "startMs": 444.762,
+          "endMs": 643.748,
+          "wallMs": 198.98600000000005,
+          "overlappingGCCount": 9
+        },
+        {
+          "stage": "checkpoint-output",
+          "startMs": 643.772,
+          "endMs": 643.8,
+          "wallMs": 0.027999999999906322,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "snapshot-encode",
+          "startMs": 643.805,
+          "endMs": 643.839,
+          "wallMs": 0.0340000000001055,
+          "overlappingGCCount": 0
+        }
+      ],
+      "gc": [
+        {
+          "name": "MinorGC",
+          "ms": 337.86,
+          "durationMs": 0.929
+        },
+        {
+          "name": "MinorGC",
+          "ms": 377.132,
+          "durationMs": 1.389
+        },
+        {
+          "name": "MinorGC",
+          "ms": 388.897,
+          "durationMs": 0.418
+        },
+        {
+          "name": "MinorGC",
+          "ms": 394.733,
+          "durationMs": 0.217
+        },
+        {
+          "name": "MinorGC",
+          "ms": 404.26,
+          "durationMs": 0.978
+        },
+        {
+          "name": "MinorGC",
+          "ms": 421.988,
+          "durationMs": 1.364
+        },
+        {
+          "name": "MinorGC",
+          "ms": 431.376,
+          "durationMs": 0.64
+        },
+        {
+          "name": "MinorGC",
+          "ms": 440.279,
+          "durationMs": 0.961
+        },
+        {
+          "name": "MinorGC",
+          "ms": 450.766,
+          "durationMs": 7.005
+        },
+        {
+          "name": "MinorGC",
+          "ms": 468.24,
+          "durationMs": 12.035
+        },
+        {
+          "name": "MinorGC",
+          "ms": 490.767,
+          "durationMs": 11.459
+        },
+        {
+          "name": "MinorGC",
+          "ms": 512.83,
+          "durationMs": 11.057
+        },
+        {
+          "name": "MinorGC",
+          "ms": 535.183,
+          "durationMs": 11.783
+        },
+        {
+          "name": "MinorGC",
+          "ms": 557.623,
+          "durationMs": 10.352
+        },
+        {
+          "name": "MinorGC",
+          "ms": 578.232,
+          "durationMs": 11.863
+        },
+        {
+          "name": "MinorGC",
+          "ms": 600.709,
+          "durationMs": 12.016
+        },
+        {
+          "name": "MinorGC",
+          "ms": 623.224,
+          "durationMs": 12.066
+        },
+        {
+          "name": "MinorGC",
+          "ms": 678.12,
+          "durationMs": 7.248
+        },
+        {
+          "name": "MinorGC",
+          "ms": 758.666,
+          "durationMs": 2.394
+        },
+        {
+          "name": "MinorGC",
+          "ms": 775.273,
+          "durationMs": 0.468
+        },
+        {
+          "name": "MinorGC",
+          "ms": 781.727,
+          "durationMs": 0.285
+        },
+        {
+          "name": "MinorGC",
+          "ms": 791.7,
+          "durationMs": 1.728
+        },
+        {
+          "name": "MinorGC",
+          "ms": 811.156,
+          "durationMs": 1.41
+        }
+      ],
+      "sourceSelection": null
+    },
+    {
+      "arm": "candidate",
+      "phase": "input",
+      "status": "measured-complete",
+      "owner": [
+        88568,
+        21212308
+      ],
+      "tracePath": "/tmp/alkalye-snapshot-input-native/paced-candidate-8ba5cd3a-6743-4f25-9f7e-8ead3ed37c63/results/faf070da-b622-450b-976d-146f28e5076e/candidate-body-rich1m-0.trace.json",
+      "traceSHA256": "0b14a1b5334d37f90fbe623b41601ddc58869398f1870c62d271a4208169281d",
+      "traceBytes": 25504380,
+      "windowMs": 3001.326,
+      "mainMaxTaskMs": 16.857,
+      "mainBusyUnionMs": 2467.723,
+      "largestMainGCSpanMs": 13.697,
+      "mainGCCount": 79,
+      "sourceReadyFrameOpportunityMs": 760.8000000119227,
+      "keyTasks": [
+        {
+          "offsetMs": 0.0,
+          "maxEnclosingRunTaskMs": 16.857
+        },
+        {
+          "offsetMs": 142.1999999880809,
+          "maxEnclosingRunTaskMs": 15.154
+        },
+        {
+          "offsetMs": 271.5,
+          "maxEnclosingRunTaskMs": 6.51
+        },
+        {
+          "offsetMs": 387.09999996423903,
+          "maxEnclosingRunTaskMs": 6.723
+        },
+        {
+          "offsetMs": 398.8999999761618,
+          "maxEnclosingRunTaskMs": 7.084
+        },
+        {
+          "offsetMs": 512.5,
+          "maxEnclosingRunTaskMs": 6.535
+        },
+        {
+          "offsetMs": 627.099999964239,
+          "maxEnclosingRunTaskMs": 6.368
+        },
+        {
+          "offsetMs": 753.8999999761618,
+          "maxEnclosingRunTaskMs": 6.779
+        }
+      ],
+      "markers": [
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": -753.044
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": -750.597
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -747.039
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -741.504
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -738.858
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -709.593
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -408.544
+        },
+        {
+          "name": "undo-residual:snapshot-start",
+          "ms": -395.39
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -392.19
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -373.721
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -326.975
+        },
+        {
+          "name": "undo-residual:apply-start",
+          "ms": -326.96
+        },
+        {
+          "name": "undo-residual:model-source-assigned",
+          "ms": -326.957
+        },
+        {
+          "name": "undo-residual:native-render-return",
+          "ms": -326.332
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": -324.154
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-start",
+          "ms": -113.945
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-end",
+          "ms": -82.213
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-start",
+          "ms": -82.19
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 0.842
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 3.152
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 15.322
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 17.54
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 23.344
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 142.864
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 144.587
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 155.827
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 158.051
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 174.786
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-end",
+          "ms": 178.767
+        },
+        {
+          "name": "undo-residual:checkpoint-output-start",
+          "ms": 178.789
+        },
+        {
+          "name": "undo-residual:checkpoint-output-end",
+          "ms": 178.891
+        },
+        {
+          "name": "undo-residual:snapshot-encode-start",
+          "ms": 178.902
+        },
+        {
+          "name": "undo-residual:snapshot-encode-end",
+          "ms": 179.003
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 272.176
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 274.378
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 276.62
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 278.784
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 291.077
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 387.722
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 389.919
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 392.377
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 394.437
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 400.642
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 402.596
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 404.794
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 408.095
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 413.429
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 462.02
+        },
+        {
+          "name": "snapshot:cache-saved",
+          "ms": 469.402
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 473.25
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 491.757
+        },
+        {
+          "name": "undo-residual:snapshot-start",
+          "ms": 504.622
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-start",
+          "ms": 504.654
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 507.914
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 513.106
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 515.823
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 517.927
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 524.861
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 527.259
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-end",
+          "ms": 553.116
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-start",
+          "ms": 553.136
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 627.79
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 629.911
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 632.188
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 639.884
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 643.363
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 754.57
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 756.566
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 759.23
+        },
+        {
+          "name": "interaction:ready",
+          "ms": 760.825
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 761.655
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 775.177
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 816.797
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-end",
+          "ms": 818.444
+        },
+        {
+          "name": "undo-residual:checkpoint-output-start",
+          "ms": 818.466
+        },
+        {
+          "name": "undo-residual:checkpoint-output-end",
+          "ms": 818.508
+        },
+        {
+          "name": "undo-residual:snapshot-encode-start",
+          "ms": 818.512
+        },
+        {
+          "name": "undo-residual:snapshot-encode-end",
+          "ms": 818.591
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 842.755
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 1044.974
+        },
+        {
+          "name": "snapshot:cache-saved",
+          "ms": 1052.325
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 1058.624
+        },
+        {
+          "name": "undo-residual:snapshot-start",
+          "ms": 1068.937
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-start",
+          "ms": 1068.968
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 1075.293
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-end",
+          "ms": 1104.724
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-start",
+          "ms": 1104.746
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-end",
+          "ms": 1334.001
+        },
+        {
+          "name": "undo-residual:checkpoint-output-start",
+          "ms": 1334.04
+        },
+        {
+          "name": "undo-residual:checkpoint-output-end",
+          "ms": 1334.102
+        },
+        {
+          "name": "undo-residual:snapshot-encode-start",
+          "ms": 1334.108
+        },
+        {
+          "name": "undo-residual:snapshot-encode-end",
+          "ms": 1334.224
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 1564.747
+        },
+        {
+          "name": "snapshot:cache-saved",
+          "ms": 1577.826
+        },
+        {
+          "name": "undo-residual:snapshot-start",
+          "ms": 1591.863
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 1609.555
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-start",
+          "ms": 1860.208
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-end",
+          "ms": 1888.397
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-start",
+          "ms": 1888.421
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 1923.918
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 1948.797
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-end",
+          "ms": 2125.256
+        },
+        {
+          "name": "undo-residual:checkpoint-output-start",
+          "ms": 2125.289
+        },
+        {
+          "name": "undo-residual:checkpoint-output-end",
+          "ms": 2125.357
+        },
+        {
+          "name": "undo-residual:snapshot-encode-start",
+          "ms": 2125.364
+        },
+        {
+          "name": "undo-residual:snapshot-encode-end",
+          "ms": 2125.462
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 2125.529
+        },
+        {
+          "name": "snapshot:cache-saved",
+          "ms": 2136.873
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 2142.318
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 2163.884
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 2456.896
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 2475.134
+        },
+        {
+          "name": "undo-residual:snapshot-start",
+          "ms": 2624.162
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 2742.552
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-start",
+          "ms": 2842.969
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-end",
+          "ms": 2875.057
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-start",
+          "ms": 2875.081
+        }
+      ],
+      "stages": [
+        {
+          "stage": "checkpoint-borrowed",
+          "startMs": 504.654,
+          "endMs": 553.116,
+          "wallMs": 48.46199999999999,
+          "overlappingGCCount": 3
+        },
+        {
+          "stage": "checkpoint-borrowed",
+          "startMs": 1068.968,
+          "endMs": 1104.724,
+          "wallMs": 35.75599999999986,
+          "overlappingGCCount": 3
+        },
+        {
+          "stage": "checkpoint-borrowed",
+          "startMs": 1860.208,
+          "endMs": 1888.397,
+          "wallMs": 28.18899999999985,
+          "overlappingGCCount": 2
+        },
+        {
+          "stage": "checkpoint-borrowed",
+          "startMs": 2842.969,
+          "endMs": 2875.057,
+          "wallMs": 32.08799999999974,
+          "overlappingGCCount": 3
+        },
+        {
+          "stage": "checkpoint-compact",
+          "startMs": -82.19,
+          "endMs": 178.767,
+          "wallMs": 260.957,
+          "overlappingGCCount": 6
+        },
+        {
+          "stage": "checkpoint-compact",
+          "startMs": 553.136,
+          "endMs": 818.444,
+          "wallMs": 265.308,
+          "overlappingGCCount": 10
+        },
+        {
+          "stage": "checkpoint-compact",
+          "startMs": 1104.746,
+          "endMs": 1334.001,
+          "wallMs": 229.25499999999988,
+          "overlappingGCCount": 9
+        },
+        {
+          "stage": "checkpoint-compact",
+          "startMs": 1888.421,
+          "endMs": 2125.256,
+          "wallMs": 236.8349999999998,
+          "overlappingGCCount": 10
+        },
+        {
+          "stage": "checkpoint-output",
+          "startMs": 178.789,
+          "endMs": 178.891,
+          "wallMs": 0.10200000000000387,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "checkpoint-output",
+          "startMs": 818.466,
+          "endMs": 818.508,
+          "wallMs": 0.04200000000003001,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "checkpoint-output",
+          "startMs": 1334.04,
+          "endMs": 1334.102,
+          "wallMs": 0.06200000000012551,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "checkpoint-output",
+          "startMs": 2125.289,
+          "endMs": 2125.357,
+          "wallMs": 0.06799999999975626,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "snapshot-encode",
+          "startMs": 178.902,
+          "endMs": 179.003,
+          "wallMs": 0.10099999999999909,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "snapshot-encode",
+          "startMs": 818.512,
+          "endMs": 818.591,
+          "wallMs": 0.07900000000006457,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "snapshot-encode",
+          "startMs": 1334.108,
+          "endMs": 1334.224,
+          "wallMs": 0.11599999999998545,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "snapshot-encode",
+          "startMs": 2125.364,
+          "endMs": 2125.462,
+          "wallMs": 0.09799999999995634,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 0.842,
+          "endMs": 3.152,
+          "wallMs": 2.31,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 142.864,
+          "endMs": 144.587,
+          "wallMs": 1.7229999999999848,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 272.176,
+          "endMs": 274.378,
+          "wallMs": 2.201999999999998,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 387.722,
+          "endMs": 389.919,
+          "wallMs": 2.1970000000000027,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 400.642,
+          "endMs": 402.596,
+          "wallMs": 1.9540000000000077,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 513.106,
+          "endMs": 515.823,
+          "wallMs": 2.7169999999999845,
+          "overlappingGCCount": 1
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 627.79,
+          "endMs": 629.911,
+          "wallMs": 2.120999999999981,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 754.57,
+          "endMs": 756.566,
+          "wallMs": 1.995999999999981,
+          "overlappingGCCount": 0
+        }
+      ],
+      "gc": [
+        {
+          "name": "MinorGC",
+          "ms": 4.78,
+          "durationMs": 9.951
+        },
+        {
+          "name": "MinorGC",
+          "ms": 33.135,
+          "durationMs": 11.178
+        },
+        {
+          "name": "MinorGC",
+          "ms": 56.82,
+          "durationMs": 10.513
+        },
+        {
+          "name": "MinorGC",
+          "ms": 78.351,
+          "durationMs": 12.35
+        },
+        {
+          "name": "MinorGC",
+          "ms": 102.001,
+          "durationMs": 11.501
+        },
+        {
+          "name": "MinorGC",
+          "ms": 125.172,
+          "durationMs": 12.213
+        },
+        {
+          "name": "MinorGC",
+          "ms": 226.727,
+          "durationMs": 6.299
+        },
+        {
+          "name": "MinorGC",
+          "ms": 363.52,
+          "durationMs": 1.378
+        },
+        {
+          "name": "MinorGC",
+          "ms": 399.535,
+          "durationMs": 1.007
+        },
+        {
+          "name": "MinorGC",
+          "ms": 417.541,
+          "durationMs": 0.662
+        },
+        {
+          "name": "MinorGC",
+          "ms": 423.531,
+          "durationMs": 0.444
+        },
+        {
+          "name": "MinorGC",
+          "ms": 432.698,
+          "durationMs": 1.506
+        },
+        {
+          "name": "MinorGC",
+          "ms": 451.138,
+          "durationMs": 1.336
+        },
+        {
+          "name": "MinorGC",
+          "ms": 514.741,
+          "durationMs": 0.813
+        },
+        {
+          "name": "MinorGC",
+          "ms": 536.38,
+          "durationMs": 0.927
+        },
+        {
+          "name": "MinorGC",
+          "ms": 547.965,
+          "durationMs": 1.268
+        },
+        {
+          "name": "MinorGC",
+          "ms": 561.167,
+          "durationMs": 8.106
+        },
+        {
+          "name": "MinorGC",
+          "ms": 581.096,
+          "durationMs": 12.51
+        },
+        {
+          "name": "MinorGC",
+          "ms": 606.887,
+          "durationMs": 11.84
+        },
+        {
+          "name": "MinorGC",
+          "ms": 645.327,
+          "durationMs": 11.509
+        },
+        {
+          "name": "MinorGC",
+          "ms": 668.032,
+          "durationMs": 12.82
+        },
+        {
+          "name": "MinorGC",
+          "ms": 692.25,
+          "durationMs": 9.319
+        },
+        {
+          "name": "MinorGC",
+          "ms": 713.004,
+          "durationMs": 11.108
+        },
+        {
+          "name": "MinorGC",
+          "ms": 737.503,
+          "durationMs": 12.12
+        },
+        {
+          "name": "MinorGC",
+          "ms": 781.503,
+          "durationMs": 11.66
+        },
+        {
+          "name": "MinorGC",
+          "ms": 806.268,
+          "durationMs": 9.546
+        },
+        {
+          "name": "MinorGC",
+          "ms": 961.809,
+          "durationMs": 1.419
+        },
+        {
+          "name": "MinorGC",
+          "ms": 995.248,
+          "durationMs": 1.217
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1004.172,
+          "durationMs": 0.388
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1014.455,
+          "durationMs": 1.226
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1031.315,
+          "durationMs": 1.205
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1076.617,
+          "durationMs": 0.904
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1090.44,
+          "durationMs": 0.88
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1100.799,
+          "durationMs": 1.117
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1113.751,
+          "durationMs": 9.292
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1135.505,
+          "durationMs": 11.786
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1160.778,
+          "durationMs": 11.629
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1185.12,
+          "durationMs": 12.277
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1210.675,
+          "durationMs": 12.216
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1236.806,
+          "durationMs": 11.68
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1262.11,
+          "durationMs": 12.91
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1287.066,
+          "durationMs": 11.3
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1313.377,
+          "durationMs": 12.392
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1404.672,
+          "durationMs": 5.828
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1510.787,
+          "durationMs": 1.22
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1525.687,
+          "durationMs": 0.398
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1531.934,
+          "durationMs": 0.421
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1545.917,
+          "durationMs": 1.156
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1649.18,
+          "durationMs": 1.758
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1800.401,
+          "durationMs": 1.361
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1816.521,
+          "durationMs": 0.503
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1822.884,
+          "durationMs": 0.378
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1834.363,
+          "durationMs": 1.95
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1857.3,
+          "durationMs": 1.596
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1867.896,
+          "durationMs": 0.663
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1878.896,
+          "durationMs": 0.831
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1891.048,
+          "durationMs": 1.211
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1904.331,
+          "durationMs": 13.697
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1935.184,
+          "durationMs": 11.899
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1964.242,
+          "durationMs": 8.252
+        },
+        {
+          "name": "MinorGC",
+          "ms": 1985.195,
+          "durationMs": 12.049
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2010.854,
+          "durationMs": 8.14
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2031.889,
+          "durationMs": 11.403
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2055.908,
+          "durationMs": 13.222
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2083.261,
+          "durationMs": 12.249
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2109.847,
+          "durationMs": 11.603
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2729.989,
+          "durationMs": 0.917
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2794.268,
+          "durationMs": 1.339
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2805.662,
+          "durationMs": 0.462
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2814.613,
+          "durationMs": 0.443
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2826.125,
+          "durationMs": 1.054
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2845.881,
+          "durationMs": 1.6
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2858.727,
+          "durationMs": 0.805
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2869.042,
+          "durationMs": 0.996
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2881.637,
+          "durationMs": 7.084
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2901.1,
+          "durationMs": 13.202
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2928.538,
+          "durationMs": 11.396
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2953.248,
+          "durationMs": 12.409
+        },
+        {
+          "name": "MinorGC",
+          "ms": 2979.264,
+          "durationMs": 11.681
+        }
+      ],
+      "sourceSelection": {
+        "start": 524296,
+        "end": 524296
+      }
+    },
+    {
+      "arm": "candidate",
+      "phase": "undo",
+      "status": "measured-complete",
+      "owner": [
+        88568,
+        21212308
+      ],
+      "tracePath": "/tmp/alkalye-snapshot-input-native/paced-candidate-8ba5cd3a-6743-4f25-9f7e-8ead3ed37c63/results/faf070da-b622-450b-976d-146f28e5076e/candidate-body-rich1m-0-undo.trace.json",
+      "traceSHA256": "5580dfb99e5b07fe1ed9d19d1eedfa0630b3cc458e00c5ab3d6aa63e5727cbc9",
+      "traceBytes": 7752730,
+      "windowMs": 3001.914,
+      "mainMaxTaskMs": 13.764,
+      "mainBusyUnionMs": 696.876,
+      "largestMainGCSpanMs": 12.966,
+      "mainGCCount": 23,
+      "sourceReadyFrameOpportunityMs": 37.69999998807907,
+      "keyTasks": [
+        {
+          "offsetMs": 0.0,
+          "maxEnclosingRunTaskMs": 0.608
+        }
+      ],
+      "markers": [
+        {
+          "name": "undo-residual:durable-completion",
+          "ms": 27.07
+        },
+        {
+          "name": "undo-residual:projection-inverse-hit",
+          "ms": 28.142
+        },
+        {
+          "name": "undo-residual:apply-start",
+          "ms": 28.153
+        },
+        {
+          "name": "undo-residual:model-source-assigned",
+          "ms": 28.254
+        },
+        {
+          "name": "undo-residual:native-render-return",
+          "ms": 35.863
+        },
+        {
+          "name": "interaction:ready",
+          "ms": 37.706
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 37.863
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 39.447
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 310.822
+        },
+        {
+          "name": "undo-residual:snapshot-start",
+          "ms": 313.791
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 327.88
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-start",
+          "ms": 516.357
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-end",
+          "ms": 544.814
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-start",
+          "ms": 544.833
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-end",
+          "ms": 754.589
+        },
+        {
+          "name": "undo-residual:checkpoint-output-start",
+          "ms": 754.615
+        },
+        {
+          "name": "undo-residual:checkpoint-output-end",
+          "ms": 754.65
+        },
+        {
+          "name": "undo-residual:snapshot-encode-start",
+          "ms": 754.656
+        },
+        {
+          "name": "undo-residual:snapshot-encode-end",
+          "ms": 754.692
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 941.708
+        },
+        {
+          "name": "snapshot:cache-saved",
+          "ms": 946.249
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 948.027
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 948.896
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 954.725
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 958.177
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 960.873
+        },
+        {
+          "name": "snapshot:permit-return",
+          "ms": 2702.67
+        }
+      ],
+      "stages": [
+        {
+          "stage": "checkpoint-borrowed",
+          "startMs": 516.357,
+          "endMs": 544.814,
+          "wallMs": 28.456999999999994,
+          "overlappingGCCount": 3
+        },
+        {
+          "stage": "checkpoint-compact",
+          "startMs": 544.833,
+          "endMs": 754.589,
+          "wallMs": 209.75600000000009,
+          "overlappingGCCount": 9
+        },
+        {
+          "stage": "checkpoint-output",
+          "startMs": 754.615,
+          "endMs": 754.65,
+          "wallMs": 0.03499999999996817,
+          "overlappingGCCount": 0
+        },
+        {
+          "stage": "snapshot-encode",
+          "startMs": 754.656,
+          "endMs": 754.692,
+          "wallMs": 0.03600000000005821,
+          "overlappingGCCount": 0
+        }
+      ],
+      "gc": [
+        {
+          "name": "MinorGC",
+          "ms": 365.709,
+          "durationMs": 0.882
+        },
+        {
+          "name": "MinorGC",
+          "ms": 463.514,
+          "durationMs": 1.216
+        },
+        {
+          "name": "MinorGC",
+          "ms": 478.78,
+          "durationMs": 0.403
+        },
+        {
+          "name": "MinorGC",
+          "ms": 485.247,
+          "durationMs": 0.363
+        },
+        {
+          "name": "MinorGC",
+          "ms": 498.846,
+          "durationMs": 1.203
+        },
+        {
+          "name": "MinorGC",
+          "ms": 518.359,
+          "durationMs": 1.426
+        },
+        {
+          "name": "MinorGC",
+          "ms": 529.216,
+          "durationMs": 0.826
+        },
+        {
+          "name": "MinorGC",
+          "ms": 539.58,
+          "durationMs": 1.043
+        },
+        {
+          "name": "MinorGC",
+          "ms": 551.505,
+          "durationMs": 7.172
+        },
+        {
+          "name": "MinorGC",
+          "ms": 569.949,
+          "durationMs": 12.966
+        },
+        {
+          "name": "MinorGC",
+          "ms": 594.418,
+          "durationMs": 11.835
+        },
+        {
+          "name": "MinorGC",
+          "ms": 617.647,
+          "durationMs": 11.783
+        },
+        {
+          "name": "MinorGC",
+          "ms": 640.5,
+          "durationMs": 11.878
+        },
+        {
+          "name": "MinorGC",
+          "ms": 663.409,
+          "durationMs": 10.546
+        },
+        {
+          "name": "MinorGC",
+          "ms": 684.737,
+          "durationMs": 12.825
+        },
+        {
+          "name": "MinorGC",
+          "ms": 710.003,
+          "durationMs": 12.693
+        },
+        {
+          "name": "MinorGC",
+          "ms": 734.155,
+          "durationMs": 11.885
+        },
+        {
+          "name": "MinorGC",
+          "ms": 795.198,
+          "durationMs": 6.845
+        },
+        {
+          "name": "MinorGC",
+          "ms": 885.451,
+          "durationMs": 1.761
+        },
+        {
+          "name": "MinorGC",
+          "ms": 900.265,
+          "durationMs": 0.46
+        },
+        {
+          "name": "MinorGC",
+          "ms": 907.145,
+          "durationMs": 0.369
+        },
+        {
+          "name": "MinorGC",
+          "ms": 918.577,
+          "durationMs": 1.752
+        },
+        {
+          "name": "MinorGC",
+          "ms": 939.073,
+          "durationMs": 1.373
+        }
+      ],
+      "sourceSelection": null
+    }
+  ]
+}
