@@ -115,6 +115,7 @@ async function verifyLocalR2(state: {
 	bytes: Uint8Array
 }) {
 	let objectKey: string | undefined
+	let objectReceipt: string | undefined
 	for await (let path of new Bun.Glob("**/*.sqlite").scan({
 		cwd: join(directory, "state"),
 		absolute: true,
@@ -127,7 +128,7 @@ async function verifyLocalR2(state: {
 			if (!table) continue
 			let row = database
 				.query(
-					"SELECT external,length(bytes) AS retainedBytes,object_key FROM document_blobs WHERE document=? AND digest=?",
+					"SELECT external,length(bytes) AS retainedBytes,object_key,object_receipt FROM document_blobs WHERE document=? AND digest=?",
 				)
 				.get(state.document, state.digest)
 			if (!row) continue
@@ -136,16 +137,23 @@ async function verifyLocalR2(state: {
 					external: Schema.Literal(1),
 					retainedBytes: Schema.Literal(0),
 					object_key: Schema.String,
+					object_receipt: Schema.String,
 				}),
 			)(row)
 			ensure(objectKey === undefined, "Multiple persisted attachment receipts")
 			objectKey = receipt.object_key
+			objectReceipt = receipt.object_receipt
 		} finally {
 			database.close()
 		}
 	}
 	ensure(objectKey !== undefined, "Attachment is not stored externally in R2")
-	if (!objectKey) throw Error("R2 object receipt unavailable")
+	if (!objectKey || !objectReceipt) throw Error("R2 object receipt unavailable")
+	ensure(
+		objectKey ===
+			`documents/${encodeURIComponent(state.document)}/chunks/${state.digest}`,
+		"R2 object key is not deterministic",
+	)
 	let output = join(directory, "r2.private.bin")
 	let log = Bun.file(join(directory, "r2-readback.log"))
 	let readback = Bun.spawn(
@@ -176,6 +184,7 @@ async function verifyLocalR2(state: {
 			bytes.every((value, index) => value === state.bytes[index]),
 		"Direct R2 bytes differ",
 	)
+	return { key: objectKey, receipt: objectReceipt }
 }
 async function exercise() {
 	return Effect.runPromise(
@@ -286,28 +295,10 @@ async function exercise() {
 		),
 	)
 }
-try {
-	await start()
-	let home = await fetch(origin + "/app.html")
-	ensure(
-		home.ok && (await home.text()).includes("app.js"),
-		"Static app missing",
-	)
-	let state = await exercise()
-	let route = origin + "/app/doc/" + state.document
-	let page = await fetch(route, { redirect: "manual" })
-	ensure(
-		page.status === 200 &&
-			page.headers.get("location") === null &&
-			page.url === route &&
-			(await page.text()).includes("app.js"),
-		"Document route redirected or lost its original URL",
-	)
-	if (!remote) {
-		await stop()
-		await verifyLocalR2(state)
-		await start()
-	}
+async function readback(
+	state: Awaited<ReturnType<typeof exercise>>,
+	upload = false,
+) {
 	await Effect.runPromise(
 		Effect.gen(function* () {
 			let api = yield* HttpApiClient.make(DocumentApi, {
@@ -318,6 +309,11 @@ try {
 						HttpClientRequest.bearerToken(Redacted.make(state.token)),
 					),
 			})
+			if (upload)
+				yield* api.documents.putBlob({
+					params: { document: state.document, digest: state.digest },
+					payload: state.bytes,
+				})
 			let snapshot = yield* api.documents.snapshot({
 				params: { document: state.document },
 				query: { encoding: "compact" },
@@ -341,10 +337,54 @@ try {
 			Effect.timeout("60 seconds"),
 		),
 	)
+}
+
+try {
+	await start()
+	let home = await fetch(origin + "/app.html")
+	ensure(
+		home.ok && (await home.text()).includes("app.js"),
+		"Static app missing",
+	)
+	let state = await exercise()
+	let route = origin + "/app/doc/" + state.document
+	let page = await fetch(route, { redirect: "manual" })
+	ensure(
+		page.status === 200 &&
+			page.headers.get("location") === null &&
+			page.url === route &&
+			(await page.text()).includes("app.js"),
+		"Document route redirected or lost its original URL",
+	)
+	let firstR2: Awaited<ReturnType<typeof verifyLocalR2>> | undefined
+	if (!remote) {
+		await stop()
+		firstR2 = await verifyLocalR2(state)
+		await start()
+	}
+	await readback(state, true)
+	if (!remote) {
+		await stop()
+		let secondR2 = await verifyLocalR2(state)
+		ensure(
+			firstR2 !== undefined &&
+				firstR2.key === secondR2.key &&
+				firstR2.receipt !== secondR2.receipt,
+			"Repeated upload did not reuse physical key with a fresh receipt",
+		)
+		let receiptProof = directory + ".receipts.private.json"
+		await Bun.write(
+			receiptProof,
+			JSON.stringify({ first: firstR2, second: secondR2 }),
+		)
+		console.log("Local R2 receipt-only proof retained at", receiptProof)
+		await start()
+		await readback(state)
+	}
 	console.log(
 		remote
 			? "PASS deployed Worker: health, static app, signed auth, durable creation, access denial, durable blob, independent readback"
-			: "PASS local workerd: health, static app, signed auth, durable creation, access denial, physical R2 bytes, cold restart/readback",
+			: "PASS local workerd: health, static app, signed auth, durable creation, access denial, physical R2 bytes/key reuse/new receipts, cold restart/readback",
 	)
 	await stop()
 	await rm(directory, { recursive: true, force: true })
