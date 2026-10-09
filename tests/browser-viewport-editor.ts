@@ -79,6 +79,28 @@ try {
 		"Durable reload restores the bounded production input",
 	)
 
+	evaluate(
+		session,
+		`(()=>{${source}.setSelectionRange(65536,65536);window.viewportHeightSource=${source}.value;return true})()`,
+	)
+	browser(session, "set", "viewport", "1280", "500")
+	wait(
+		session,
+		"window.innerHeight===500 && document.querySelector('#editor').getBoundingClientRect().height>0",
+	)
+	browser(session, "set", "viewport", "1280", "1000")
+	wait(
+		session,
+		`(()=>{let viewport=${source}.viewport,fragment=viewport.viewport;return window.innerHeight===1000&&fragment.top+fragment.height>=viewport.scrollTop+viewport.scrollElement.clientHeight})()`,
+	)
+	assert(
+		evaluate(
+			session,
+			`${source}.value===window.viewportHeightSource&&${source}.selectionStart===65536&&${source}.selectionEnd===65536&&document.querySelector('#editor').value.length<16384`,
+		),
+		"Same-width height growth fills the visible source window without changing its caret",
+	)
+
 	assert(
 		evaluate(
 			session,

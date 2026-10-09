@@ -1,0 +1,1273 @@
+[
+  {
+    "arm": "control",
+    "status": "measured-complete",
+    "windowMs": 3000.974,
+    "mainMaxTaskMs": 4.623,
+    "mainBusyMs": 223.183,
+    "tasksOver833": 0,
+    "gcUnionMs": 0.0,
+    "readyFromStartMs": 0.2999999523162842,
+    "traceSHA256": "dbcd990686fcb88f643966289fac513b8ad278c2cf6f90458fcc1a5088073927",
+    "functions": [
+      {
+        "mapped": {
+          "column": 42,
+          "line": 744,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 181,
+        "inclusiveMs": 128.33000000000004,
+        "maxMs": 0.94
+      },
+      {
+        "mapped": {
+          "column": 25,
+          "line": 1157,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 169,
+        "inclusiveMs": 13.872999999999994,
+        "maxMs": 0.616
+      },
+      {
+        "mapped": {
+          "column": 38,
+          "line": 864,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 5.322,
+        "maxMs": 1.764
+      },
+      {
+        "mapped": {
+          "column": 39,
+          "line": 1179,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 89,
+        "inclusiveMs": 5.122999999999995,
+        "maxMs": 0.66
+      },
+      {
+        "mapped": {
+          "column": 22,
+          "line": 337,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 1.522,
+        "maxMs": 0.526
+      },
+      {
+        "mapped": null,
+        "count": 205,
+        "inclusiveMs": 1.216999999999997,
+        "maxMs": 0.086
+      },
+      {
+        "mapped": {
+          "column": 33,
+          "line": 2893,
+          "name": "",
+          "source": "../node_modules/effect/dist/internal/effect.js"
+        },
+        "count": 9,
+        "inclusiveMs": 0.518,
+        "maxMs": 0.115
+      },
+      {
+        "mapped": {
+          "column": 20,
+          "line": 157,
+          "name": "",
+          "source": "../node_modules/effect/dist/Scheduler.js"
+        },
+        "count": 16,
+        "inclusiveMs": 0.3510000000000001,
+        "maxMs": 0.07
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 45,
+          "name": "",
+          "source": "../src/client/background-work.ts"
+        },
+        "count": 30,
+        "inclusiveMs": 0.3320000000000001,
+        "maxMs": 0.047
+      },
+      {
+        "mapped": {
+          "column": 17,
+          "line": 28,
+          "name": "",
+          "source": "../src/client/scheduler.ts"
+        },
+        "count": 2,
+        "inclusiveMs": 0.212,
+        "maxMs": 0.19
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 292,
+          "name": "",
+          "source": "../src/client/ui/menu.ts"
+        },
+        "count": 112,
+        "inclusiveMs": 0.16200000000000012,
+        "maxMs": 0.012
+      },
+      {
+        "mapped": {
+          "column": 4,
+          "line": 105,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 0.07500000000000001,
+        "maxMs": 0.028
+      },
+      {
+        "mapped": {
+          "column": 38,
+          "line": 135,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.045,
+        "maxMs": 0.016
+      },
+      {
+        "mapped": {
+          "column": 30,
+          "line": 100,
+          "name": "",
+          "source": "../src/client/storage.ts"
+        },
+        "count": 1,
+        "inclusiveMs": 0.037,
+        "maxMs": 0.037
+      },
+      {
+        "mapped": {
+          "column": 17,
+          "line": 62,
+          "name": "",
+          "source": "../src/client/components/line-actions.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.036,
+        "maxMs": 0.013
+      },
+      {
+        "mapped": {
+          "column": 34,
+          "line": 401,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.030000000000000002,
+        "maxMs": 0.021
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 330,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.017,
+        "maxMs": 0.006
+      },
+      {
+        "mapped": {
+          "column": 25,
+          "line": 88,
+          "name": "",
+          "source": "../src/client/storage.ts"
+        },
+        "count": 1,
+        "inclusiveMs": 0.005,
+        "maxMs": 0.005
+      }
+    ],
+    "sourceSelection": {
+      "start": 0,
+      "end": 0
+    }
+  },
+  {
+    "arm": "candidate",
+    "status": "measured-complete",
+    "windowMs": 3000.746,
+    "mainMaxTaskMs": 4.549,
+    "mainBusyMs": 216.058,
+    "tasksOver833": 0,
+    "gcUnionMs": 0.0,
+    "readyFromStartMs": 0.30000001191910997,
+    "traceSHA256": "0d7d044de6afe515e6fbbfca0ab6af7c5465a1536f8761765150ff5eea8da2a3",
+    "functions": [
+      {
+        "mapped": {
+          "column": 42,
+          "line": 748,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 181,
+        "inclusiveMs": 131.54199999999994,
+        "maxMs": 1.036
+      },
+      {
+        "mapped": {
+          "column": 38,
+          "line": 877,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 5.4030000000000005,
+        "maxMs": 1.747
+      },
+      {
+        "mapped": {
+          "column": 39,
+          "line": 1179,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 2.27,
+        "maxMs": 0.661
+      },
+      {
+        "mapped": {
+          "column": 25,
+          "line": 1157,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 1.951,
+        "maxMs": 0.599
+      },
+      {
+        "mapped": null,
+        "count": 205,
+        "inclusiveMs": 1.7529999999999966,
+        "maxMs": 0.139
+      },
+      {
+        "mapped": {
+          "column": 22,
+          "line": 337,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 1.44,
+        "maxMs": 0.492
+      },
+      {
+        "mapped": {
+          "column": 33,
+          "line": 2893,
+          "name": "",
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js"
+        },
+        "count": 9,
+        "inclusiveMs": 0.751,
+        "maxMs": 0.252
+      },
+      {
+        "mapped": {
+          "column": 20,
+          "line": 157,
+          "name": "",
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js"
+        },
+        "count": 16,
+        "inclusiveMs": 0.386,
+        "maxMs": 0.076
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 45,
+          "name": "",
+          "source": "../src/client/background-work.ts"
+        },
+        "count": 30,
+        "inclusiveMs": 0.3650000000000001,
+        "maxMs": 0.048
+      },
+      {
+        "mapped": {
+          "column": 17,
+          "line": 28,
+          "name": "",
+          "source": "../src/client/scheduler.ts"
+        },
+        "count": 2,
+        "inclusiveMs": 0.22899999999999998,
+        "maxMs": 0.207
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 292,
+          "name": "",
+          "source": "../src/client/ui/menu.ts"
+        },
+        "count": 112,
+        "inclusiveMs": 0.1840000000000001,
+        "maxMs": 0.013
+      },
+      {
+        "mapped": {
+          "column": 4,
+          "line": 105,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 0.08000000000000002,
+        "maxMs": 0.032
+      },
+      {
+        "mapped": {
+          "column": 38,
+          "line": 135,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.051000000000000004,
+        "maxMs": 0.02
+      },
+      {
+        "mapped": {
+          "column": 30,
+          "line": 100,
+          "name": "",
+          "source": "../src/client/storage.ts"
+        },
+        "count": 1,
+        "inclusiveMs": 0.038,
+        "maxMs": 0.038
+      },
+      {
+        "mapped": {
+          "column": 34,
+          "line": 401,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.032,
+        "maxMs": 0.021
+      },
+      {
+        "mapped": {
+          "column": 17,
+          "line": 62,
+          "name": "",
+          "source": "../src/client/components/line-actions.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.031,
+        "maxMs": 0.011
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 330,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.016,
+        "maxMs": 0.007
+      },
+      {
+        "mapped": {
+          "column": 25,
+          "line": 88,
+          "name": "",
+          "source": "../src/client/storage.ts"
+        },
+        "count": 1,
+        "inclusiveMs": 0.01,
+        "maxMs": 0.01
+      }
+    ],
+    "sourceSelection": {
+      "start": 0,
+      "end": 0
+    }
+  },
+  {
+    "arm": "candidate",
+    "status": "measured-complete",
+    "windowMs": 3001.145,
+    "mainMaxTaskMs": 4.404,
+    "mainBusyMs": 191.639,
+    "tasksOver833": 0,
+    "gcUnionMs": 0.0,
+    "readyFromStartMs": 0.19999998807725206,
+    "traceSHA256": "ebcf3f44d8fdbeb96598b9dd1410f46de3c7fa92550a1aaa8e06c24a4593411d",
+    "functions": [
+      {
+        "mapped": {
+          "column": 42,
+          "line": 748,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 181,
+        "inclusiveMs": 115.39799999999994,
+        "maxMs": 0.874
+      },
+      {
+        "mapped": {
+          "column": 38,
+          "line": 877,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 5.360999999999999,
+        "maxMs": 1.748
+      },
+      {
+        "mapped": {
+          "column": 39,
+          "line": 1179,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 2.238,
+        "maxMs": 0.686
+      },
+      {
+        "mapped": {
+          "column": 25,
+          "line": 1157,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 2.0020000000000002,
+        "maxMs": 0.636
+      },
+      {
+        "mapped": null,
+        "count": 205,
+        "inclusiveMs": 1.5189999999999957,
+        "maxMs": 0.108
+      },
+      {
+        "mapped": {
+          "column": 22,
+          "line": 337,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 1.479,
+        "maxMs": 0.507
+      },
+      {
+        "mapped": {
+          "column": 33,
+          "line": 2893,
+          "name": "",
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js"
+        },
+        "count": 9,
+        "inclusiveMs": 0.5840000000000001,
+        "maxMs": 0.157
+      },
+      {
+        "mapped": {
+          "column": 20,
+          "line": 157,
+          "name": "",
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js"
+        },
+        "count": 16,
+        "inclusiveMs": 0.3720000000000001,
+        "maxMs": 0.07
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 45,
+          "name": "",
+          "source": "../src/client/background-work.ts"
+        },
+        "count": 30,
+        "inclusiveMs": 0.31600000000000006,
+        "maxMs": 0.041
+      },
+      {
+        "mapped": {
+          "column": 17,
+          "line": 28,
+          "name": "",
+          "source": "../src/client/scheduler.ts"
+        },
+        "count": 2,
+        "inclusiveMs": 0.222,
+        "maxMs": 0.191
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 292,
+          "name": "",
+          "source": "../src/client/ui/menu.ts"
+        },
+        "count": 112,
+        "inclusiveMs": 0.17900000000000013,
+        "maxMs": 0.013
+      },
+      {
+        "mapped": {
+          "column": 23,
+          "line": 554,
+          "name": "",
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/socket/Socket.js"
+        },
+        "count": 1,
+        "inclusiveMs": 0.169,
+        "maxMs": 0.169
+      },
+      {
+        "mapped": {
+          "column": 4,
+          "line": 105,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 0.07600000000000001,
+        "maxMs": 0.031
+      },
+      {
+        "mapped": {
+          "column": 38,
+          "line": 135,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.043,
+        "maxMs": 0.015
+      },
+      {
+        "mapped": {
+          "column": 17,
+          "line": 62,
+          "name": "",
+          "source": "../src/client/components/line-actions.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.031,
+        "maxMs": 0.011
+      },
+      {
+        "mapped": {
+          "column": 34,
+          "line": 401,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.029,
+        "maxMs": 0.02
+      },
+      {
+        "mapped": {
+          "column": 30,
+          "line": 100,
+          "name": "",
+          "source": "../src/client/storage.ts"
+        },
+        "count": 1,
+        "inclusiveMs": 0.02,
+        "maxMs": 0.02
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 330,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.014,
+        "maxMs": 0.006
+      },
+      {
+        "mapped": {
+          "column": 25,
+          "line": 88,
+          "name": "",
+          "source": "../src/client/storage.ts"
+        },
+        "count": 1,
+        "inclusiveMs": 0.006,
+        "maxMs": 0.006
+      }
+    ],
+    "sourceSelection": {
+      "start": 0,
+      "end": 0
+    }
+  },
+  {
+    "arm": "candidate",
+    "status": "measured-complete",
+    "windowMs": 3001.65,
+    "mainMaxTaskMs": 4.849,
+    "mainBusyMs": 206.779,
+    "tasksOver833": 0,
+    "gcUnionMs": 0.0,
+    "readyFromStartMs": 0.19999998808089003,
+    "traceSHA256": "94cacdc1f9c8e0881487820f705029c7bbf933962cd76f65adb66c7346079822",
+    "functions": [
+      {
+        "mapped": {
+          "column": 42,
+          "line": 748,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 181,
+        "inclusiveMs": 125.45000000000009,
+        "maxMs": 0.961
+      },
+      {
+        "mapped": {
+          "column": 38,
+          "line": 877,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 5.499,
+        "maxMs": 1.778
+      },
+      {
+        "mapped": {
+          "column": 39,
+          "line": 1179,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 2.3470000000000004,
+        "maxMs": 0.711
+      },
+      {
+        "mapped": {
+          "column": 25,
+          "line": 1157,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 1.964,
+        "maxMs": 0.62
+      },
+      {
+        "mapped": null,
+        "count": 205,
+        "inclusiveMs": 1.6719999999999964,
+        "maxMs": 0.101
+      },
+      {
+        "mapped": {
+          "column": 22,
+          "line": 337,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 1.487,
+        "maxMs": 0.504
+      },
+      {
+        "mapped": {
+          "column": 33,
+          "line": 2893,
+          "name": "",
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js"
+        },
+        "count": 9,
+        "inclusiveMs": 0.616,
+        "maxMs": 0.157
+      },
+      {
+        "mapped": {
+          "column": 20,
+          "line": 157,
+          "name": "",
+          "source": "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js"
+        },
+        "count": 16,
+        "inclusiveMs": 0.40900000000000003,
+        "maxMs": 0.095
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 45,
+          "name": "",
+          "source": "../src/client/background-work.ts"
+        },
+        "count": 30,
+        "inclusiveMs": 0.3660000000000001,
+        "maxMs": 0.059
+      },
+      {
+        "mapped": {
+          "column": 17,
+          "line": 28,
+          "name": "",
+          "source": "../src/client/scheduler.ts"
+        },
+        "count": 2,
+        "inclusiveMs": 0.207,
+        "maxMs": 0.186
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 292,
+          "name": "",
+          "source": "../src/client/ui/menu.ts"
+        },
+        "count": 112,
+        "inclusiveMs": 0.1760000000000001,
+        "maxMs": 0.013
+      },
+      {
+        "mapped": {
+          "column": 4,
+          "line": 105,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 0.083,
+        "maxMs": 0.033
+      },
+      {
+        "mapped": {
+          "column": 38,
+          "line": 135,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.049,
+        "maxMs": 0.017
+      },
+      {
+        "mapped": {
+          "column": 17,
+          "line": 62,
+          "name": "",
+          "source": "../src/client/components/line-actions.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.031,
+        "maxMs": 0.011
+      },
+      {
+        "mapped": {
+          "column": 30,
+          "line": 100,
+          "name": "",
+          "source": "../src/client/storage.ts"
+        },
+        "count": 1,
+        "inclusiveMs": 0.031,
+        "maxMs": 0.031
+      },
+      {
+        "mapped": {
+          "column": 34,
+          "line": 401,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.030000000000000002,
+        "maxMs": 0.021
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 330,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.022,
+        "maxMs": 0.011
+      },
+      {
+        "mapped": {
+          "column": 25,
+          "line": 88,
+          "name": "",
+          "source": "../src/client/storage.ts"
+        },
+        "count": 1,
+        "inclusiveMs": 0.02,
+        "maxMs": 0.02
+      }
+    ],
+    "sourceSelection": {
+      "start": 0,
+      "end": 0
+    }
+  },
+  {
+    "arm": "control",
+    "status": "measured-complete",
+    "windowMs": 3000.561,
+    "mainMaxTaskMs": 4.727,
+    "mainBusyMs": 208.998,
+    "tasksOver833": 0,
+    "gcUnionMs": 0.0,
+    "readyFromStartMs": 0.30000001192274794,
+    "traceSHA256": "fcddcd7dc142b8f714bba5530f76567d9710c4d1a1f5df3a3f59f87065af916c",
+    "functions": [
+      {
+        "mapped": {
+          "column": 42,
+          "line": 744,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 181,
+        "inclusiveMs": 119.951,
+        "maxMs": 0.952
+      },
+      {
+        "mapped": {
+          "column": 25,
+          "line": 1157,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 168,
+        "inclusiveMs": 13.04000000000001,
+        "maxMs": 0.632
+      },
+      {
+        "mapped": {
+          "column": 38,
+          "line": 864,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 5.33,
+        "maxMs": 1.773
+      },
+      {
+        "mapped": {
+          "column": 39,
+          "line": 1179,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 88,
+        "inclusiveMs": 4.990000000000001,
+        "maxMs": 0.646
+      },
+      {
+        "mapped": {
+          "column": 22,
+          "line": 337,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 1.5310000000000001,
+        "maxMs": 0.535
+      },
+      {
+        "mapped": null,
+        "count": 205,
+        "inclusiveMs": 1.245999999999998,
+        "maxMs": 0.1
+      },
+      {
+        "mapped": {
+          "column": 33,
+          "line": 2893,
+          "name": "",
+          "source": "../node_modules/effect/dist/internal/effect.js"
+        },
+        "count": 9,
+        "inclusiveMs": 0.6240000000000001,
+        "maxMs": 0.162
+      },
+      {
+        "mapped": {
+          "column": 20,
+          "line": 157,
+          "name": "",
+          "source": "../node_modules/effect/dist/Scheduler.js"
+        },
+        "count": 16,
+        "inclusiveMs": 0.397,
+        "maxMs": 0.077
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 45,
+          "name": "",
+          "source": "../src/client/background-work.ts"
+        },
+        "count": 30,
+        "inclusiveMs": 0.35400000000000004,
+        "maxMs": 0.054
+      },
+      {
+        "mapped": {
+          "column": 17,
+          "line": 28,
+          "name": "",
+          "source": "../src/client/scheduler.ts"
+        },
+        "count": 2,
+        "inclusiveMs": 0.208,
+        "maxMs": 0.185
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 292,
+          "name": "",
+          "source": "../src/client/ui/menu.ts"
+        },
+        "count": 112,
+        "inclusiveMs": 0.16700000000000012,
+        "maxMs": 0.013
+      },
+      {
+        "mapped": {
+          "column": 4,
+          "line": 105,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 0.08100000000000002,
+        "maxMs": 0.033
+      },
+      {
+        "mapped": {
+          "column": 38,
+          "line": 135,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.046,
+        "maxMs": 0.018
+      },
+      {
+        "mapped": {
+          "column": 30,
+          "line": 100,
+          "name": "",
+          "source": "../src/client/storage.ts"
+        },
+        "count": 1,
+        "inclusiveMs": 0.036,
+        "maxMs": 0.036
+      },
+      {
+        "mapped": {
+          "column": 17,
+          "line": 62,
+          "name": "",
+          "source": "../src/client/components/line-actions.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.032,
+        "maxMs": 0.011
+      },
+      {
+        "mapped": {
+          "column": 34,
+          "line": 401,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.030000000000000002,
+        "maxMs": 0.021
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 330,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.018000000000000002,
+        "maxMs": 0.008
+      },
+      {
+        "mapped": {
+          "column": 25,
+          "line": 88,
+          "name": "",
+          "source": "../src/client/storage.ts"
+        },
+        "count": 1,
+        "inclusiveMs": 0.007,
+        "maxMs": 0.007
+      }
+    ],
+    "sourceSelection": {
+      "start": 0,
+      "end": 0
+    }
+  },
+  {
+    "arm": "control",
+    "status": "measured-complete",
+    "windowMs": 3000.626,
+    "mainMaxTaskMs": 4.405,
+    "mainBusyMs": 224.275,
+    "tasksOver833": 0,
+    "gcUnionMs": 2.958,
+    "readyFromStartMs": 0.30000001191910997,
+    "traceSHA256": "116bb4e745223135876f6c4182b6b47d636c94bd432bdff401b33805a465cacb",
+    "functions": [
+      {
+        "mapped": {
+          "column": 42,
+          "line": 744,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 181,
+        "inclusiveMs": 127.19700000000003,
+        "maxMs": 0.954
+      },
+      {
+        "mapped": {
+          "column": 25,
+          "line": 1157,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 168,
+        "inclusiveMs": 13.723999999999986,
+        "maxMs": 0.615
+      },
+      {
+        "mapped": {
+          "column": 38,
+          "line": 864,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 5.351,
+        "maxMs": 1.777
+      },
+      {
+        "mapped": {
+          "column": 39,
+          "line": 1179,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 88,
+        "inclusiveMs": 5.2709999999999955,
+        "maxMs": 0.783
+      },
+      {
+        "mapped": {
+          "column": 22,
+          "line": 337,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 1.5350000000000001,
+        "maxMs": 0.537
+      },
+      {
+        "mapped": null,
+        "count": 205,
+        "inclusiveMs": 1.2579999999999962,
+        "maxMs": 0.08
+      },
+      {
+        "mapped": {
+          "column": 33,
+          "line": 2893,
+          "name": "",
+          "source": "../node_modules/effect/dist/internal/effect.js"
+        },
+        "count": 9,
+        "inclusiveMs": 0.5539999999999999,
+        "maxMs": 0.109
+      },
+      {
+        "mapped": {
+          "column": 20,
+          "line": 157,
+          "name": "",
+          "source": "../node_modules/effect/dist/Scheduler.js"
+        },
+        "count": 16,
+        "inclusiveMs": 0.383,
+        "maxMs": 0.08
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 45,
+          "name": "",
+          "source": "../src/client/background-work.ts"
+        },
+        "count": 30,
+        "inclusiveMs": 0.337,
+        "maxMs": 0.044
+      },
+      {
+        "mapped": {
+          "column": 17,
+          "line": 28,
+          "name": "",
+          "source": "../src/client/scheduler.ts"
+        },
+        "count": 2,
+        "inclusiveMs": 0.22699999999999998,
+        "maxMs": 0.205
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 292,
+          "name": "",
+          "source": "../src/client/ui/menu.ts"
+        },
+        "count": 112,
+        "inclusiveMs": 0.1900000000000001,
+        "maxMs": 0.012
+      },
+      {
+        "mapped": {
+          "column": 4,
+          "line": 105,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 8,
+        "inclusiveMs": 0.07600000000000001,
+        "maxMs": 0.028
+      },
+      {
+        "mapped": {
+          "column": 38,
+          "line": 135,
+          "name": "",
+          "source": "../src/client/editor-viewport.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.071,
+        "maxMs": 0.043
+      },
+      {
+        "mapped": {
+          "column": 17,
+          "line": 62,
+          "name": "",
+          "source": "../src/client/components/line-actions.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.034,
+        "maxMs": 0.012
+      },
+      {
+        "mapped": {
+          "column": 34,
+          "line": 401,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.029,
+        "maxMs": 0.02
+      },
+      {
+        "mapped": {
+          "column": 30,
+          "line": 100,
+          "name": "",
+          "source": "../src/client/storage.ts"
+        },
+        "count": 1,
+        "inclusiveMs": 0.027,
+        "maxMs": 0.027
+      },
+      {
+        "mapped": {
+          "column": 25,
+          "line": 88,
+          "name": "",
+          "source": "../src/client/storage.ts"
+        },
+        "count": 1,
+        "inclusiveMs": 0.021,
+        "maxMs": 0.021
+      },
+      {
+        "mapped": {
+          "column": 3,
+          "line": 330,
+          "name": "",
+          "source": "../src/client/components/editor.ts"
+        },
+        "count": 3,
+        "inclusiveMs": 0.015,
+        "maxMs": 0.006
+      }
+    ],
+    "sourceSelection": {
+      "start": 0,
+      "end": 0
+    }
+  }
+]

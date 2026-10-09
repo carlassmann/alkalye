@@ -1,0 +1,13 @@
+PASS Local canonical seed matches independent fixture digest
+PASS Independent durable source remains unchanged
+PASS Scrolling and geometry refinement preserve canonical source and logical selection
+PASS Ordinary large source remains bounded
+PASS Public presence renders visible named caret and range
+PASS Height-only expansion fills the visible window without scrolling
+PASS Scrolling and geometry refinement preserve canonical source and logical selection
+PASS Ordinary large source remains bounded
+PASS Scrolling and geometry refinement preserve canonical source and logical selection
+PASS Ordinary large source remains bounded
+PASS Scrolling and geometry refinement preserve canonical source and logical selection
+PASS Ordinary large source remains bounded
+PASS Independent durable source remains unchanged

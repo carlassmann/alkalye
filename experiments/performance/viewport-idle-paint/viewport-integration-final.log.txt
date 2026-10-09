@@ -1,0 +1,26 @@
+PASS Deleting similar adjacent emoji preserves whole Unicode characters
+PASS Large production documents mount bounded native input
+PASS Trusted top, middle and end edits preserve Unicode source offsets
+128KiB input milliseconds [ 2.900000035762787, 3, 2.5 ]
+PASS Durable reload restores the bounded production input
+PASS Copy includes the complete canonical document
+PASS Canonical select-all spans every viewport
+PASS Mobile resize keeps the source caret and accepts native text
+PASS Viewport edits retain contribution-based undo
+PASS Bounded composition absorbs the final native text before the final input event
+PASS The worker and bounded editor reopen a saved document offline
+PASS Document routing stays stable
+PASS A one-megabyte paragraph remains bounded
+PASS One-megabyte edits reach durable sync
+PASS One-megabyte trusted editing retains every source character
+PASS One-megabyte input retains collaborative undo
+PASS One-megabyte snapshots reopen durably
+PASS Full-document native input selects the complete source
+[08:14:28.089] WARN (#712): Slow document operation {
+  boundary: "server",
+  traceId: "553ae3c67608f6f5441d498c5a5e89cc",
+  spanId: "ddc0bb0625737186",
+  operation: "commit",
+  outcome: "success",
+  durationMs: 8132,
+}

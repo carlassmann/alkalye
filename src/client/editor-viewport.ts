@@ -248,7 +248,11 @@ export class EditorViewport {
 		this.resize = new ResizeObserver(() => {
 			if (this.composing) return
 			let key = this.styleMeasurement()
-			if (key === this.layoutKey) return
+			if (key === this.layoutKey) {
+				this.readSelection()
+				this.paint()
+				return
+			}
 			let anchor = this.offsetAtHeight(this.scrollElement.scrollTop)
 			let before = this.topAt(anchor)
 			this.layoutKey = key
@@ -750,9 +754,18 @@ export class EditorViewport {
 			) {
 				let index = this.blocks.findIndex(block => !block.measured)
 				if (index < 0) return
+				let selection = this.selection
 				this.readSelection()
+				let beyondWindow = (this.blocks[index]?.start ?? 0) >= this.window.end
+				let scrollTop = this.scrollElement.scrollTop
 				this.refine(index)
-				this.paint()
+				if (
+					this.selection !== selection ||
+					!beyondWindow ||
+					this.completeDocument() ||
+					this.scrollElement.scrollTop !== scrollTop
+				)
+					this.paint()
 			}
 			this.idle()
 		})

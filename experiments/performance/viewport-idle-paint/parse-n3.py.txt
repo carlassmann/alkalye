@@ -1,0 +1,16 @@
+import json,pathlib,hashlib,collections
+r=pathlib.Path('/tmp/alkalye-wheel-idle-paint');rows=[]
+def union(xs):
+ total=0;end=None
+ for a,b in sorted(xs):
+  if end is None or a>end:total+=b-a;end=b
+  elif b>end:total+=b-end;end=b
+ return total/1000
+mapping_source=pathlib.Path('/tmp/alkalye-production-snapshot-profile-prep/map.py.txt').read_text().split('data=json.load')[0]
+for p in(r/'n3-results').glob('*/results.json'):
+ result=json.loads(p.read_text())[0];arm=result['version'];trace=pathlib.Path(result['trace']);es=json.loads(trace.read_text())['traceEvents'];mark=next(e for e in es if e['name']=='interaction:start');start=mark['ts'];owner=mark['pid'],mark['tid'];end=next(e['ts']for e in es if e['name']=='interaction:end'and(e['pid'],e['tid'])==owner);selected=[e for e in es if(e.get('pid'),e.get('tid'))==owner and e.get('ts',0)<end and e.get('ts',0)+e.get('dur',0)>start];tasks=[e for e in selected if e['name']=='RunTask'and e.get('dur')];gc=[e for e in selected if e.get('dur')and('GC'in e['name']or'CollectGarbage'in e['name'])];ns={};source=mapping_source.replace("asset=url.split(':4498/')[-1];p='/tmp/alkalye-production-children-ordinal/control-dist/'+asset+'.map'",f"asset=url.split(':4491/')[-1];p='/tmp/alkalye-wheel-idle-paint/{arm}-dist/'+asset+'.map'");exec(source,ns);groups={}
+ for e in selected:
+  if e['name']!='FunctionCall':continue
+  d=e.get('args',{}).get('data',{});mapped=ns['map']({'url':d.get('url',''),'lineNumber':d.get('lineNumber',0)-1,'columnNumber':d.get('columnNumber',0)-1});key=json.dumps(mapped,sort_keys=True);g=groups.setdefault(key,{'count':0,'inclusiveMs':0,'maxMs':0});g['count']+=1;g['inclusiveMs']+=e.get('dur',0)/1000;g['maxMs']=max(g['maxMs'],e.get('dur',0)/1000)
+ functions=sorted([{'mapped':json.loads(k),**v}for k,v in groups.items()],key=lambda x:x['inclusiveMs'],reverse=True);probe=result['observation']['probe'];row={'arm':arm,'status':result['status'],'windowMs':(end-start)/1000,'mainMaxTaskMs':max([e['dur']/1000 for e in tasks],default=0),'mainBusyMs':union([(max(start,e['ts']),min(end,e['ts']+e['dur']))for e in tasks]),'tasksOver833':sum(e['dur']>8333 for e in tasks),'gcUnionMs':union([(max(start,e['ts']),min(end,e['ts']+e['dur']))for e in gc]),'readyFromStartMs':probe['ready']-probe['start'],'traceSHA256':hashlib.sha256(trace.read_bytes()).hexdigest(),'functions':functions,'sourceSelection':result['observation'].get('sourceSelection')};rows.append(row);print(json.dumps({k:v for k,v in row.items()if k!='functions'}));print(json.dumps(functions[:4]))
+(r/'n3-analysis.json').write_text(json.dumps(rows,indent=2)+'\n')

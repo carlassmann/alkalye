@@ -1,0 +1,32 @@
+pair PID 30534
+no tracked commands
+started web pid=30561
+capture 0 control
+runner PID 30562
+terminal 0 control 0
+stopped alkalye-wheel-idle-paint/codex-wheel-idle-paint/web
+started web pid=31024
+capture 0 candidate
+runner PID 31025
+terminal 0 candidate 0
+stopped alkalye-wheel-idle-paint/codex-wheel-idle-paint/web
+started web pid=31543
+capture 1 candidate
+runner PID 31544
+terminal 1 candidate 0
+stopped alkalye-wheel-idle-paint/codex-wheel-idle-paint/web
+started web pid=32398
+capture 1 control
+runner PID 32399
+terminal 1 control 0
+stopped alkalye-wheel-idle-paint/codex-wheel-idle-paint/web
+started web pid=32805
+capture 2 control
+runner PID 32806
+terminal 2 control 0
+stopped alkalye-wheel-idle-paint/codex-wheel-idle-paint/web
+started web pid=33145
+capture 2 candidate
+runner PID 33146
+terminal 2 candidate 0
+stopped alkalye-wheel-idle-paint/codex-wheel-idle-paint/web

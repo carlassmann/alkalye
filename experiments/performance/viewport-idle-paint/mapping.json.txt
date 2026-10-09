@@ -1,0 +1,67 @@
+[
+  {
+    "producer": "/tmp/alkalye-wheel-idle-paint/source-hashes-final.json",
+    "archive": "source-hashes-final.json.txt",
+    "sha256": "a6e81f31d31f551b728ae2be869f2df5fa06849fb0c1618b5833d69d49d152ad"
+  },
+  {
+    "producer": "/tmp/alkalye-wheel-idle-paint/opus-corrected-review.json",
+    "archive": "opus-corrected-review.json.txt",
+    "sha256": "88e8205ee7d971df952a45e22eb20b3500e869cb2d0b4e2eb8e8a994e97a19c5"
+  },
+  {
+    "producer": "/tmp/alkalye-wheel-idle-paint/opus-corrected-prompt.txt",
+    "archive": "opus-corrected-prompt.txt.txt",
+    "sha256": "1183e12b978ac9a2496020f1cbd03983368813ef071f6f127b43e8fdadf95310"
+  },
+  {
+    "producer": "/tmp/alkalye-wheel-idle-paint/public-gates-final.log",
+    "archive": "public-gates-final.log.txt",
+    "sha256": "38b1e174babf5d670fac87d0374ae941121c0f633069ac62a60dcfac27cfe747"
+  },
+  {
+    "producer": "/tmp/alkalye-wheel-idle-paint/viewport-integration-final.log",
+    "archive": "viewport-integration-final.log.txt",
+    "sha256": "d6dfa349746ddfc84aacbb5f92f29baabe0e362f206249f958e793fb9c1bc2a3"
+  },
+  {
+    "producer": "/tmp/alkalye-wheel-idle-paint/strict-final-selection.log",
+    "archive": "strict-final-selection.log.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "producer": "/tmp/alkalye-wheel-idle-paint/build-final.log",
+    "archive": "build-final.log.txt",
+    "sha256": "a1e1ec9bdb36d7dd3f2aa0b8ef9ca9120691b4a84ccf5f8d8bac12f2ba04504c"
+  },
+  {
+    "producer": "/tmp/alkalye-wheel-idle-paint/n3-analysis.json",
+    "archive": "n3-analysis.json.txt",
+    "sha256": "8d1668c162178635a083056adbab46b767eaa1b69523a05f612d2d83edb8d9e8"
+  },
+  {
+    "producer": "/tmp/alkalye-wheel-idle-paint/n3-analysis.log",
+    "archive": "n3-analysis.log.txt",
+    "sha256": "9a980d4514ea3792ef62c52e4ef252bf9bdd0a3480e61bca1fa3792cb93b7641"
+  },
+  {
+    "producer": "/tmp/alkalye-wheel-idle-paint/parse-n3.py",
+    "archive": "parse-n3.py.txt",
+    "sha256": "c41388042274837d1eb3eff2ebfcfa4a7977dbbcab63c096491d250450868903"
+  },
+  {
+    "producer": "/tmp/alkalye-wheel-idle-paint/n3.log",
+    "archive": "n3.log.txt",
+    "sha256": "407cffb0cfc0bc88c5c3ffe8ee927b189deec27ce91be13586bf97e3a6b24a8b"
+  },
+  {
+    "producer": "/tmp/alkalye-wheel-idle-paint/pair-analysis.json",
+    "archive": "pair-analysis.json.txt",
+    "sha256": "815a19f478dc6fd177d586d3b43dc933737b98fa9d45f43891a7ffc7e0a7bd49"
+  },
+  {
+    "producer": "/tmp/alkalye-wheel-idle-paint/pair-analysis.log",
+    "archive": "pair-analysis.log.txt",
+    "sha256": "f4b8b7d4e8a38b74cf13ad0b6676e52e724ed61c9a968bc75007006f8f1110df"
+  }
+]
