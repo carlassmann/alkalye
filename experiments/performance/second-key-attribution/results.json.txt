@@ -1,0 +1,1080 @@
+[
+  {
+    "version": "control",
+    "commit": "b5577ba899b46ef5900b21328535409a6c5fe99c",
+    "cell": "body-rich1m",
+    "trial": 0,
+    "status": "measured-complete",
+    "trace": "/tmp/alkalye-second-key-attribution/marked-ddaf9f77-91c3-4957-8711-ac41669a4f3a/results/4fc975ee-d6d7-4f58-925b-a71aa5928bf2/control-body-rich1m-0.trace.json",
+    "mode": "measured",
+    "observation": {
+      "network": {
+        "openedSockets": [
+          "/api/live"
+        ],
+        "pollRequests": 0,
+        "sends": 0
+      },
+      "probe": {
+        "end": 16706.599999964237,
+        "eventTiming": [
+          {
+            "duration": 32,
+            "name": "keydown",
+            "processingEnd": 12505,
+            "processingStart": 12504.5,
+            "startTime": 12504.19999998808
+          },
+          {
+            "duration": 32,
+            "name": "keyup",
+            "processingEnd": 12505.30000001192,
+            "processingStart": 12505.19999998808,
+            "startTime": 12505
+          },
+          {
+            "duration": 32,
+            "name": "keydown",
+            "processingEnd": 12506.599999964235,
+            "processingStart": 12506.599999964235,
+            "startTime": 12506.5
+          },
+          {
+            "duration": 32,
+            "name": "keypress",
+            "processingEnd": 12515.30000001192,
+            "processingStart": 12506.599999964235,
+            "startTime": 12506.5
+          },
+          {
+            "duration": 32,
+            "name": "beforeinput",
+            "processingEnd": 12506.899999976158,
+            "processingStart": 12506.69999998808,
+            "startTime": 12506.69999998808
+          },
+          {
+            "duration": 32,
+            "name": "input",
+            "processingEnd": 12514.80000001192,
+            "processingStart": 12507.19999998808,
+            "startTime": 12507.099999964235
+          },
+          {
+            "duration": 24,
+            "name": "keyup",
+            "processingEnd": 12515.80000001192,
+            "processingStart": 12515.80000001192,
+            "startTime": 12515.599999964235
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 13705,
+            "processingStart": 13704.69999998808,
+            "startTime": 13704.399999976158
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 13711.099999964235,
+            "processingStart": 13705,
+            "startTime": 13704.399999976158
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 13705,
+            "processingStart": 13705,
+            "startTime": 13705
+          },
+          {
+            "duration": 16,
+            "name": "input",
+            "processingEnd": 13710.599999964235,
+            "processingStart": 13705.30000001192,
+            "startTime": 13705.19999998808
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 13817.19999998808,
+            "processingStart": 13817.099999964235,
+            "startTime": 13817
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 13832,
+            "processingStart": 13817.19999998808,
+            "startTime": 13817
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 13817.30000001192,
+            "processingStart": 13817.19999998808,
+            "startTime": 13817.19999998808
+          },
+          {
+            "duration": 16,
+            "name": "input",
+            "processingEnd": 13831.399999976158,
+            "processingStart": 13817.599999964235,
+            "startTime": 13817.5
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 13942.5,
+            "processingStart": 13942.5,
+            "startTime": 13942.30000001192
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 13949.399999976158,
+            "processingStart": 13942.5,
+            "startTime": 13942.30000001192
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 13942.599999964235,
+            "processingStart": 13942.5,
+            "startTime": 13942.5
+          },
+          {
+            "duration": 16,
+            "name": "input",
+            "processingEnd": 13948.80000001192,
+            "processingStart": 13943,
+            "startTime": 13942.80000001192
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 14059.099999964235,
+            "processingStart": 14058.899999976158,
+            "startTime": 14058.899999976158
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 14065.5,
+            "processingStart": 14059.099999964235,
+            "startTime": 14058.899999976158
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 14059.19999998808,
+            "processingStart": 14059.099999964235,
+            "startTime": 14059.099999964235
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 14171.599999964235,
+            "processingStart": 14171.5,
+            "startTime": 14171.399999976158
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 14177.899999976158,
+            "processingStart": 14171.599999964235,
+            "startTime": 14171.399999976158
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 14171.69999998808,
+            "processingStart": 14171.599999964235,
+            "startTime": 14171.599999964235
+          },
+          {
+            "duration": 16,
+            "name": "input",
+            "processingEnd": 14177.399999976158,
+            "processingStart": 14172,
+            "startTime": 14171.80000001192
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 14291.5,
+            "processingStart": 14291.5,
+            "startTime": 14291.399999976158
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 14298.899999976158,
+            "processingStart": 14291.5,
+            "startTime": 14291.399999976158
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 14291.599999964235,
+            "processingStart": 14291.5,
+            "startTime": 14291.5
+          },
+          {
+            "duration": 16,
+            "name": "input",
+            "processingEnd": 14298.30000001192,
+            "processingStart": 14291.80000001192,
+            "startTime": 14291.69999998808
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 14304.599999964235,
+            "processingStart": 14304.5,
+            "startTime": 14304.5
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 14309.899999976158,
+            "processingStart": 14304.599999964235,
+            "startTime": 14304.5
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 14304.69999998808,
+            "processingStart": 14304.69999998808,
+            "startTime": 14304.69999998808
+          },
+          {
+            "duration": 16,
+            "name": "input",
+            "processingEnd": 14309.30000001192,
+            "processingStart": 14305,
+            "startTime": 14304.899999976158
+          }
+        ],
+        "events": [
+          {
+            "editor": true,
+            "eventTimestamp": 13704.399999976158,
+            "key": "x",
+            "time": 13704.899999976158,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 13705,
+            "inputType": "insertText",
+            "time": 13705,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 13817,
+            "key": "x",
+            "time": 13817.099999964235,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 13817.19999998808,
+            "inputType": "insertText",
+            "time": 13817.30000001192,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 13942.30000001192,
+            "key": "x",
+            "time": 13942.5,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 13942.5,
+            "inputType": "insertText",
+            "time": 13942.599999964235,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 14058.899999976158,
+            "key": "x",
+            "time": 14059,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 14059.099999964235,
+            "inputType": "insertText",
+            "time": 14059.19999998808,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 14171.399999976158,
+            "key": "x",
+            "time": 14171.5,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 14171.599999964235,
+            "inputType": "insertText",
+            "time": 14171.69999998808,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 14291.399999976158,
+            "key": "x",
+            "time": 14291.5,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 14291.5,
+            "inputType": "insertText",
+            "time": 14291.599999964235,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 14304.5,
+            "key": "x",
+            "time": 14304.599999964235,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 14304.69999998808,
+            "inputType": "insertText",
+            "time": 14304.69999998808,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 14416.099999964235,
+            "key": "x",
+            "time": 14416.19999998808,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 14416.399999976158,
+            "inputType": "insertText",
+            "time": 14416.399999976158,
+            "type": "beforeinput"
+          }
+        ],
+        "frames": [
+          16.69999999999891,
+          16.600000000000364,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.600000000000364,
+          16.799999999999272,
+          16.600000000000364,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.600000000000364,
+          16.799999999999272,
+          16.600000000000364,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000000364,
+          16.799999999999272,
+          16.600000000000364,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.799999999999272,
+          16.600000000000364,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999891,
+          16.5,
+          16.80000000000109,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.80000000000109,
+          16.5,
+          16.69999999999891,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.799999999999272,
+          16.600000000000364,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.69999999999891,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.600000000002183
+        ],
+        "ready": 14422.5,
+        "start": 13704.899999976158
+      },
+      "scripts": [
+        {
+          "decoded": 127410,
+          "path": "/chunks/document-app-nhnat99q.js"
+        },
+        {
+          "decoded": 253588,
+          "path": "/app.js"
+        },
+        {
+          "decoded": 2036,
+          "path": "/chunks/document-app-kpbwqep0.js"
+        },
+        {
+          "decoded": 2798,
+          "path": "/chunks/document-app-m2qx4cqf.js"
+        },
+        {
+          "decoded": 1330,
+          "path": "/chunks/document-app-r8r0nq7g.js"
+        },
+        {
+          "decoded": 16754,
+          "path": "/chunks/document-app-cexnbd8t.js"
+        },
+        {
+          "decoded": 7968,
+          "path": "/chunks/document-app-9ypv7nra.js"
+        },
+        {
+          "decoded": 3894,
+          "path": "/chunks/document-app-ew928nz9.js"
+        },
+        {
+          "decoded": 617,
+          "path": "/chunks/document-app-kg9t3hng.js"
+        },
+        {
+          "decoded": 14375,
+          "path": "/chunks/document-app-swqvk0cc.js"
+        },
+        {
+          "decoded": 901,
+          "path": "/chunks/document-app-rqmj7266.js"
+        },
+        {
+          "decoded": 2725,
+          "path": "/chunks/document-app-xpjhat46.js"
+        },
+        {
+          "decoded": 1656,
+          "path": "/chunks/document-app-je8c407k.js"
+        },
+        {
+          "decoded": 5735,
+          "path": "/chunks/document-app-pm09p2qa.js"
+        },
+        {
+          "decoded": 7957,
+          "path": "/chunks/document-app-a50xzcb6.js"
+        },
+        {
+          "decoded": 212921,
+          "path": "/chunks/document-app-s4yx1kna.js"
+        },
+        {
+          "decoded": 6070,
+          "path": "/chunks/document-app-xj31222e.js"
+        },
+        {
+          "decoded": 900,
+          "path": "/chunks/document-app-g39gv1hj.js"
+        },
+        {
+          "decoded": 24137,
+          "path": "/chunks/document-app-ssbdhaay.js"
+        },
+        {
+          "decoded": 11587,
+          "path": "/chunks/document-app-668yqyqd.js"
+        },
+        {
+          "decoded": 21028,
+          "path": "/chunks/document-app-10f05sq2.js"
+        },
+        {
+          "decoded": 2412,
+          "path": "/chunks/document-app-3xpmercn.js"
+        },
+        {
+          "decoded": 2354,
+          "path": "/chunks/document-app-90xqd9ew.js"
+        },
+        {
+          "decoded": 2075,
+          "path": "/chunks/document-app-zv05ys61.js"
+        },
+        {
+          "decoded": 79633,
+          "path": "/chunks/document-app-myyfz5fq.js"
+        },
+        {
+          "decoded": 27423,
+          "path": "/chunks/document-app-d4w8m08h.js"
+        },
+        {
+          "decoded": 14516,
+          "path": "/chunks/document-app-hbyascjt.js"
+        },
+        {
+          "decoded": 713,
+          "path": "/chunks/document-app-0q9yx4da.js"
+        },
+        {
+          "decoded": 272,
+          "path": "/chunks/document-app-tpanw5pb.js"
+        },
+        {
+          "decoded": 1109,
+          "path": "/chunks/document-app-8yz9px1k.js"
+        },
+        {
+          "decoded": 43364,
+          "path": "/chunks/document-app-0be1cwbe.js"
+        },
+        {
+          "decoded": 174723,
+          "path": "/chunks/document-app-b4jajpc9.js"
+        },
+        {
+          "decoded": 20324,
+          "path": "/chunks/document-worker-stats-mfc1yjrr.js"
+        },
+        {
+          "decoded": 0,
+          "path": "/document-worker.js"
+        },
+        {
+          "decoded": 253588,
+          "path": "/app.js"
+        },
+        {
+          "decoded": 2036,
+          "path": "/chunks/document-app-kpbwqep0.js"
+        },
+        {
+          "decoded": 2798,
+          "path": "/chunks/document-app-m2qx4cqf.js"
+        },
+        {
+          "decoded": 1330,
+          "path": "/chunks/document-app-r8r0nq7g.js"
+        },
+        {
+          "decoded": 16754,
+          "path": "/chunks/document-app-cexnbd8t.js"
+        },
+        {
+          "decoded": 127410,
+          "path": "/chunks/document-app-nhnat99q.js"
+        },
+        {
+          "decoded": 7968,
+          "path": "/chunks/document-app-9ypv7nra.js"
+        },
+        {
+          "decoded": 3894,
+          "path": "/chunks/document-app-ew928nz9.js"
+        },
+        {
+          "decoded": 617,
+          "path": "/chunks/document-app-kg9t3hng.js"
+        },
+        {
+          "decoded": 901,
+          "path": "/chunks/document-app-rqmj7266.js"
+        },
+        {
+          "decoded": 14375,
+          "path": "/chunks/document-app-swqvk0cc.js"
+        },
+        {
+          "decoded": 2725,
+          "path": "/chunks/document-app-xpjhat46.js"
+        },
+        {
+          "decoded": 5735,
+          "path": "/chunks/document-app-pm09p2qa.js"
+        },
+        {
+          "decoded": 1656,
+          "path": "/chunks/document-app-je8c407k.js"
+        },
+        {
+          "decoded": 212921,
+          "path": "/chunks/document-app-s4yx1kna.js"
+        },
+        {
+          "decoded": 7957,
+          "path": "/chunks/document-app-a50xzcb6.js"
+        },
+        {
+          "decoded": 6070,
+          "path": "/chunks/document-app-xj31222e.js"
+        },
+        {
+          "decoded": 900,
+          "path": "/chunks/document-app-g39gv1hj.js"
+        },
+        {
+          "decoded": 24137,
+          "path": "/chunks/document-app-ssbdhaay.js"
+        },
+        {
+          "decoded": 11587,
+          "path": "/chunks/document-app-668yqyqd.js"
+        },
+        {
+          "decoded": 21028,
+          "path": "/chunks/document-app-10f05sq2.js"
+        },
+        {
+          "decoded": 2412,
+          "path": "/chunks/document-app-3xpmercn.js"
+        },
+        {
+          "decoded": 2354,
+          "path": "/chunks/document-app-90xqd9ew.js"
+        },
+        {
+          "decoded": 79633,
+          "path": "/chunks/document-app-myyfz5fq.js"
+        },
+        {
+          "decoded": 2075,
+          "path": "/chunks/document-app-zv05ys61.js"
+        },
+        {
+          "decoded": 27423,
+          "path": "/chunks/document-app-d4w8m08h.js"
+        },
+        {
+          "decoded": 14516,
+          "path": "/chunks/document-app-hbyascjt.js"
+        },
+        {
+          "decoded": 713,
+          "path": "/chunks/document-app-0q9yx4da.js"
+        },
+        {
+          "decoded": 272,
+          "path": "/chunks/document-app-tpanw5pb.js"
+        },
+        {
+          "decoded": 43364,
+          "path": "/chunks/document-app-0be1cwbe.js"
+        },
+        {
+          "decoded": 1109,
+          "path": "/chunks/document-app-8yz9px1k.js"
+        },
+        {
+          "decoded": 174723,
+          "path": "/chunks/document-app-b4jajpc9.js"
+        },
+        {
+          "decoded": 20324,
+          "path": "/chunks/document-worker-stats-mfc1yjrr.js"
+        },
+        {
+          "decoded": 155969,
+          "path": "/document-worker.js"
+        }
+      ],
+      "sourceSelection": {
+        "start": 524296,
+        "end": 524296
+      }
+    },
+    "undoObservation": {
+      "network": {
+        "openedSockets": [
+          "/api/live"
+        ],
+        "pollRequests": 0,
+        "sends": 0
+      },
+      "probe": {
+        "end": 25061.19999998808,
+        "eventTiming": [],
+        "events": [
+          {
+            "editor": true,
+            "eventTimestamp": 22060.19999998808,
+            "key": "z",
+            "time": 22060.39999997616,
+            "type": "keydown"
+          }
+        ],
+        "frames": [
+          16.599999999998545,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.599999999998545,
+          16.799999999999272,
+          16.600000000002183,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.599999999998545,
+          16.80000000000291,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.599999999998545,
+          16.80000000000291,
+          16.599999999998545,
+          16.599999999998545,
+          16.80000000000291,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.80000000000291,
+          16.599999999998545,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.599999999998545,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.600000000002183,
+          16.799999999999272,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.600000000002183,
+          16.799999999999272,
+          16.599999999998545,
+          16.600000000002183,
+          16.799999999999272,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.599999999998545,
+          16.799999999999272,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728
+        ],
+        "ready": 22089.80000001192,
+        "start": 22060.39999997616
+      }
+    },
+    "undoTrace": "/tmp/alkalye-second-key-attribution/marked-ddaf9f77-91c3-4957-8711-ac41669a4f3a/results/4fc975ee-d6d7-4f58-925b-a71aa5928bf2/control-body-rich1m-0-undo.trace.json",
+    "seedReceipt": {
+      "stage": "receipt",
+      "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+      "characters": 1048577,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:36",
+      "actionSha256": "14ea5907ad51d0aa67010b9ba2a0aa18e3b0a8a33216836d7ec8ccdb479ab1c6",
+      "historyCount": 9
+    },
+    "editedReceipt": {
+      "sha256": "bcf3b98ac55a7ba2d80e7dbda81c4c160d972a25f481fb6c9d5f145c50af5aaf",
+      "characters": 1048585,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:44"
+    },
+    "undoReceipt": {
+      "sha256": "31afa0bd439b3a96aeed38caeb34e38b35583efe289884e9cacaece57f3d2bfa",
+      "characters": 1048584,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:45"
+    },
+    "fixture": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  }
+]

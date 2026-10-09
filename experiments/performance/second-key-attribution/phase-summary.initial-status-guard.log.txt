@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/private/tmp/alkalye-second-key-attribution/parse-phases.py", line 7, in <module>
+    if result['status']!='complete':raise RuntimeError('Incomplete public source/receipt proof')
+RuntimeError: Incomplete public source/receipt proof

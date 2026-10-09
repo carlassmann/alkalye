@@ -1,0 +1,21 @@
+--- a/src/client/components/editor.ts
++++ b/src/client/components/editor.ts
+@@ -263,12 +263,18 @@
+ 	textarea.readOnly = !editable
+ 	textarea.oninput = () => {
+ 		releaseTab = false
++		performance.mark("second-key:text-input-start")
+ 		let source = text.input()
++		performance.mark("second-key:text-input-end")
+ 		updateHighlight()
+ 		if (composing) return
++		performance.mark("second-key:change-start")
+ 		let edit = options.change(source, atoms, text.takeReplacements())
++		performance.mark("second-key:change-end")
++		performance.mark("second-key:update-start")
+ 		if (edit) update(edit.content, edit.atoms, editable)
+ 		else text.sync()
++		performance.mark("second-key:update-end")
+ 		if (options.preferences.autocomplete) showCompletions()
+ 	}
+ 	textarea.addEventListener(

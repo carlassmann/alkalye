@@ -1,0 +1,174 @@
+{
+  "source": "/tmp/alkalye-second-key-attribution/proof-ready",
+  "files": [
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/README.md",
+      "archive": "README.md",
+      "sha256": "dbdb67f086257ab113a252dd71ab0168e43f918d255f2c4c465e971f608b3f7c",
+      "bytes": 2115
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/assets.json.txt",
+      "archive": "assets.json.txt",
+      "sha256": "feb2e6e8f79da598b6904c45de7287d89f22c522d37e7472a96049ba272cb14c",
+      "bytes": 4665
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/build-marked.log.txt",
+      "archive": "build-marked.log.txt",
+      "sha256": "a1e1ec9bdb36d7dd3f2aa0b8ef9ca9120691b4a84ccf5f8d8bac12f2ba04504c",
+      "bytes": 15
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/build-unmarked.log.txt",
+      "archive": "build-unmarked.log.txt",
+      "sha256": "a1e1ec9bdb36d7dd3f2aa0b8ef9ca9120691b4a84ccf5f8d8bac12f2ba04504c",
+      "bytes": 15
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/bundle-parity.json.txt",
+      "archive": "bundle-parity.json.txt",
+      "sha256": "46cb7c366d920eb0336da77759915bcaf8fdcebd6fa896f975cdcb88d0ae4efa",
+      "bytes": 48787
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/burst-probe.json.txt",
+      "archive": "burst-probe.json.txt",
+      "sha256": "bf5ecc40cda5cc6f8e36f47f575857bace13623c85917bf4ee3ee5da76924f18",
+      "bytes": 1744
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/diagnostic-terminal.json.txt",
+      "archive": "diagnostic-terminal.json.txt",
+      "sha256": "eb03ecf7d04bda0dda6b223060cc254bd30c73f7ec3b299e3393c31fb2152933",
+      "bytes": 98
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/diagnostic.log.txt",
+      "archive": "diagnostic.log.txt",
+      "sha256": "b48e436caaf642d74888591ca5e9f2a4e9ede7c17f8c82ec9c649eba7fd80f0c",
+      "bytes": 409
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/existing-metadata-and-compact-markers.patch.txt",
+      "archive": "existing-metadata-and-compact-markers.patch.txt",
+      "sha256": "ed070e36e7d164b7a9480176351ad94e06446b3ee5c93f810dbf7dc1b1aa6163",
+      "bytes": 3215
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/map-frame.py.txt",
+      "archive": "map-frame.py.txt",
+      "sha256": "bd667326a17722fa90b43053bfa69f61f828f62f606ec7c0419ae44c8fcb3946",
+      "bytes": 1477
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/oninput-source-map.json.txt",
+      "archive": "oninput-source-map.json.txt",
+      "sha256": "397610df2174540c50cdb043098dd024d511f108f5afa047baa8b4019e004153",
+      "bytes": 662
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/owned-terminal.json.txt",
+      "archive": "owned-terminal.json.txt",
+      "sha256": "bec4ae8bee2b8d9b875fd290595bbd96d44cf687e602f7971d48ff190a61da70",
+      "bytes": 61
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/paced-input.ts.txt",
+      "archive": "paced-input.ts.txt",
+      "sha256": "6d15d8b0ca3331138f5f17d5a2b9ccbbab33f74d33fa3361b329aca4f456253c",
+      "bytes": 3657
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/parse-phases.initial-status-guard.py.txt",
+      "archive": "parse-phases.initial-status-guard.py.txt",
+      "sha256": "a07dabe22964414b519377f5b5145ceed55f4c9ab6eb90bccf149e8cf8b3f807",
+      "bytes": 3251
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/parse-phases.py.txt",
+      "archive": "parse-phases.py.txt",
+      "sha256": "0fd057ab845f49db163bdb1f30358c624df81edc3b98cb7c2b00c21e027ce688",
+      "bytes": 3260
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/phase-attribution.json.txt",
+      "archive": "phase-attribution.json.txt",
+      "sha256": "37839e8ecc87462ac111f7aaf971e3c7635ea56cad938f08919b49fa765192f9",
+      "bytes": 8652
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/phase-summary.initial-status-guard.log.txt",
+      "archive": "phase-summary.initial-status-guard.log.txt",
+      "sha256": "5255406f3c2a49facc0a8195fa2fe6d5531eb93d2b4e95113a42bf0f553c4c20",
+      "bytes": 275
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/phase-summary.log.txt",
+      "archive": "phase-summary.log.txt",
+      "sha256": "2972eef71a4a03df36a86d8119793bf6b3ef7717b971cda415c98b45f7e41a96",
+      "bytes": 785
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/preparation-ready.json.txt",
+      "archive": "preparation-ready.json.txt",
+      "sha256": "a4bf34059b23d8b674c17c40fc94c99f3563566608a05845319b95ce187fc410",
+      "bytes": 211
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/producer-pins.json.txt",
+      "archive": "producer-pins.json.txt",
+      "sha256": "e224ade689992b54ddd944966506c80be7d58f1b293a35b6f8cf35c83c254334",
+      "bytes": 2955
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/production-body-gate.ts.txt",
+      "archive": "production-body-gate.ts.txt",
+      "sha256": "a36c4e91f1dc7f22a3416cee87de8f7f5e1c7cf48c0392853684ad528aed1ce4",
+      "bytes": 8627
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/results.json.txt",
+      "archive": "results.json.txt",
+      "sha256": "4a8f69d3aae90d74eff6516791ad454e2ce1baf6e075706de9ab433db7f7f8e9",
+      "bytes": 30883
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/run-diagnostic.ts.txt",
+      "archive": "run-diagnostic.ts.txt",
+      "sha256": "768b63628072813c38676e62d890f20d8ed44002045b16979eb07657d865e749",
+      "bytes": 994
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/runner.ts.txt",
+      "archive": "runner.ts.txt",
+      "sha256": "59172e036c5061ea2bcfbdd824617dca425b13c71bdead799bd6e8bf9c0d6c90",
+      "bytes": 37087
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/second-key-markers.patch.txt",
+      "archive": "second-key-markers.patch.txt",
+      "sha256": "c80325cf876a9d231581b184f1ca338dba97d16316a405f9edfc8d060c5d4ac6",
+      "bytes": 777
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/source-pins.json.txt",
+      "archive": "source-pins.json.txt",
+      "sha256": "72c7989f1267bdd822cae9cad00598491bc6989252f4249e7eb1cafc65f07d40",
+      "bytes": 451
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/types-marked.log.txt",
+      "archive": "types-marked.log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": "/tmp/alkalye-second-key-attribution/proof-ready/types-unmarked.log.txt",
+      "archive": "types-unmarked.log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ],
+  "verified": true
+}

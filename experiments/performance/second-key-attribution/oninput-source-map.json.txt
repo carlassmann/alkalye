@@ -1,0 +1,19 @@
+[
+  {
+    "arm": "control",
+    "raw": {
+      "url": "http://127.0.0.1:4498/chunks/document-app-nhnat99q.js",
+      "lineNumber": 91,
+      "columnNumber": 5061,
+      "coordinates": "Chrome one-based"
+    },
+    "generatedMappingColumnZeroBased": 5060,
+    "source": "../src/client/components/editor.ts",
+    "line": 264,
+    "column": 21,
+    "snippet": "\ttextarea.oninput = () => {",
+    "sourceContentSHA256": "10d23185149169cb958c2023cfb1c5c6ed4024ee8b6b6e3d1e521d24741a57aa",
+    "scriptSHA256": "e1d83ebdffe812c79ad0100adde162537ed9c8f4d76c7ae73259fb727051854d",
+    "mapSHA256": "a8887edda2149167340c32b67647b8197ae06ebb81ee3305531273f85eada662"
+  }
+]

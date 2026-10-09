@@ -1,0 +1,75 @@
+{
+  "baseline": "b5577ba899b46ef5900b21328535409a6c5fe99c",
+  "existingMarkers": [
+    {
+      "path": "src/client/source-textarea.ts",
+      "baselineSHA256": "ea21278c971230d2e6444d11b54c3c6180f1022e777f84f254f01531c15e40ec",
+      "markedSHA256": "43003b9a98815301c4f872805b479a984d96f871cae9950de5a6e5b06fbf7235"
+    },
+    {
+      "path": "src/shared/projection.ts",
+      "baselineSHA256": "b6af74ddc2d20e9bc9d740deaa2cdb0cb214a323b3a7e681d0e10726bd67c93f",
+      "markedSHA256": "e802609eb0ab5546d6fd72feadeac64441d6d0d37fd76f5534367cccc219a802"
+    },
+    {
+      "path": "src/shared/model.ts",
+      "baselineSHA256": "70f8ce900a37b8a9bc3fab851528755367eba0eddac527610e4d88a53039cac8",
+      "markedSHA256": "70f8ce900a37b8a9bc3fab851528755367eba0eddac527610e4d88a53039cac8"
+    },
+    {
+      "path": "src/shared/crdt.ts",
+      "baselineSHA256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+      "markedSHA256": "3b1c391be4c6b1c59f3717293f483bdfb41932433a6db1e3a921745c3eabc1aa"
+    }
+  ],
+  "producers": [
+    {
+      "path": "production-body-gate.ts",
+      "sha256": "a36c4e91f1dc7f22a3416cee87de8f7f5e1c7cf48c0392853684ad528aed1ce4"
+    },
+    {
+      "path": "server-journey.ts",
+      "sha256": "b81c9bd8b0b0dfa6e2841bb9a9fa1baade2e6bfbdb59c6d6785b6e44518219fe"
+    },
+    {
+      "path": "work.config.js",
+      "sha256": "0a178dfd860d9755f312a70ec93e29c424bb8acf440d28d5660a7fa06cb5a1b1"
+    },
+    {
+      "path": "tsconfig.native.json",
+      "sha256": "95d05076ffc6fa22291f8beb83c32ad2e99b362f76ba75199f33088e62f9b04f"
+    },
+    {
+      "path": "experiments/performance/interaction-matrix/runner.ts",
+      "sha256": "59172e036c5061ea2bcfbdd824617dca425b13c71bdead799bd6e8bf9c0d6c90"
+    },
+    {
+      "path": "experiments/performance/interaction-matrix/paced-input.ts",
+      "sha256": "6d15d8b0ca3331138f5f17d5a2b9ccbbab33f74d33fa3361b329aca4f456253c"
+    },
+    {
+      "path": "experiments/performance/interaction-matrix/prime-history.ts",
+      "sha256": "d88a25d5cba863326507ddf347f19773b2d9fd7987b8dcd1e3288b400594201d"
+    },
+    {
+      "path": "experiments/performance/interaction-matrix/prime-history-reader.ts",
+      "sha256": "638dd24fd608652a8e8d89cda440cd8a198eb6af743660d2f233fc69d419e498"
+    },
+    {
+      "path": "experiments/performance/interaction-matrix/rewrite-oracle.ts",
+      "sha256": "c8f15b4b5aedd3b23d00b28b86bce76194a205e061448bcf3c7cc894272cd8e2"
+    },
+    {
+      "path": "experiments/performance/interaction-matrix/browser-probes.ts",
+      "sha256": "016ee3be72a7ecbe05ea1d265d6eb3c9e0f9d183f521c4d5962108979cf5e976"
+    },
+    {
+      "path": "experiments/performance/interaction-matrix/network.js",
+      "sha256": "7a94ec05710f749d5e1c689181b00078c62e0fbbcd1e596f2d3fa9fa4b0747c0"
+    },
+    {
+      "path": "experiments/performance/interaction-matrix/block-sockets.js",
+      "sha256": "b0b5373552c29a69d14151ec6a3d50ecb27b8dbf55e892a99e3089219f537469"
+    }
+  ]
+}

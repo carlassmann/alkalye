@@ -1,0 +1,10 @@
+let root = "/tmp/alkalye-second-key-attribution"
+if (!(await Bun.file(root + "/preparation-ready.json").exists())) throw Error("Strict/build/graph proof prerequisite")
+if (await Bun.file(root + "/diagnostic-pending.json").exists()) throw Error("Existing attempt; no unknown mutation replay")
+await Bun.write(root + "/diagnostic-pending.json", JSON.stringify({ stage: "before-keys", baseline: "b5577ba899b46ef5900b21328535409a6c5fe99c" }))
+let run = root + "/marked-" + crypto.randomUUID()
+let child = Bun.spawn(["bun", "production-body-gate.ts", "control", "rich1m", "--measure"], { cwd: root + "/app-runtime", env: { ...process.env, SNAPSHOT_INPUT_BURST: "1", PRODUCTION_BODY_RUN: run }, stdout: "inherit", stderr: "inherit" })
+console.log(JSON.stringify({ stage: "live", pid: process.pid, child: child.pid, run }))
+let exit = await child.exited
+await Bun.write(root + "/diagnostic-terminal.json", JSON.stringify({ exit, run }))
+if (exit) throw Error("Preserve failed cell; no unknown retry")

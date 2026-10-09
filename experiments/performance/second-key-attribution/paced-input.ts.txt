@@ -1,0 +1,43 @@
+import * as Schema from "effect/Schema"
+import { browserBatch, evaluate } from "../../../tests/browser-driver"
+
+let burstProbe = Schema.Struct({
+ clock: Schema.Struct({ eventTime: Schema.Number, observerTime: Schema.Number, started: Schema.Number, finished: Schema.Number }),
+	started: Schema.Number,
+	finished: Schema.Number,
+	events: Schema.Array(Schema.Struct({
+		type: Schema.String,
+		time: Schema.Number,
+		eventTime: Schema.Number,
+		trusted: Schema.Boolean,
+		key: Schema.optional(Schema.String),
+		data: Schema.optional(Schema.String),
+	})),
+})
+
+export function pacedNativeInput(session: string, primeReady: string, selection: string, caretReady: string) {
+	evaluate(session, `(()=>{let state=window.snapshotBurst={started:0,finished:0,events:[],clock:{eventTime:0,observerTime:0,started:performance.now(),finished:0}};document.addEventListener("keydown",event=>{if(event.key==="Shift"&&event.isTrusted&&event.timeStamp>0){state.clock.eventTime=event.timeStamp;state.clock.observerTime=performance.now()}},{capture:true});for(let type of ['keydown','beforeinput'])document.addEventListener(type,event=>{if(window.snapshotBurstLive&&event.target===document.querySelector('#editor')&&event.isTrusted&&event.timeStamp>0)state.events.push({type,time:performance.now(),eventTime:event.timeStamp,trusted:event.isTrusted,key:event.key,data:event.data})},{capture:true});return true})()`)
+	let commands: string[][] = [
+ ["press", "Shift"],
+ ["eval", "(()=>{let c=window.snapshotBurst.clock;c.finished=performance.now();if(!(Number.isFinite(c.eventTime)&&c.eventTime>=c.started&&c.eventTime<=c.observerTime&&c.observerTime<=c.finished&&c.observerTime-c.eventTime<1000))throw Error('Native Event.timeStamp clock calibration failed before typing');return true})()"],
+		["press", "x"],
+		["wait", "--fn", primeReady],
+		["eval", `window.interactionBase=window.snapshotPrimeExpected;window.interactionInsertion=window.snapshotBurstInsertion;window.interactionExpected=window.snapshotBurstExpected;${selection}true`],
+		["wait", "--fn", caretReady],
+		["wait", "--fn", `(()=>{let start=performance.getEntriesByName('undo-residual:checkpoint-compact-start').at(-1),end=performance.getEntriesByName('undo-residual:checkpoint-compact-end').at(-1);return Boolean(start&&(!end||end.startTime<start.startTime))})()`],
+		["eval", "window.snapshotBurst.started=performance.now();window.snapshotBurstLive=true;true"],
+	]
+	for (let index = 0; index < 8; index++) {
+		commands.push(["wait", "--fn", `performance.now()>=window.snapshotBurst.started+${index * 100}`])
+		commands.push(["press", "x"])
+	}
+	browserBatch(session, commands)
+	evaluate(session, "window.snapshotBurst.finished=performance.now();true")
+	let result = Schema.decodeUnknownSync(burstProbe)(evaluate(session, "window.snapshotBurst"))
+	let overlap = Schema.decodeUnknownSync(Schema.Boolean)(evaluate(session, `(()=>{let first=window.snapshotBurst.events.find(event=>event.type==='keydown'),start=performance.getEntriesByName('undo-residual:checkpoint-compact-start').filter(entry=>entry.startTime<=first?.eventTime).at(-1),end=performance.getEntriesByName('undo-residual:checkpoint-compact-end').find(entry=>entry.startTime>start?.startTime);return Boolean(first&&start&&end&&first.eventTime>=start.startTime&&first.eventTime<end.startTime)})()`))
+	if (!overlap) throw new Error("First trusted key did not overlap active compaction; retain mutation, no replay")
+	let inputs = result.events.filter(event => event.type === "beforeinput" && event.data === "x")
+	if (inputs.length !== 8 || inputs.some(event => !event.trusted))
+		throw new Error("Expected eight trusted native input events")
+	return result
+}

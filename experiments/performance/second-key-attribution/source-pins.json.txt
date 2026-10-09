@@ -1,0 +1,8 @@
+{
+  "baselineCommit": "b5577ba899b46ef5900b21328535409a6c5fe99c",
+  "module": "src/client/components/editor.ts",
+  "baselineSHA256": "61c2627f622e0bc815544843b5e591f7b68e6f5663a4fb874438fc0464ebdb2c",
+  "markedSHA256": "10d23185149169cb958c2023cfb1c5c6ed4024ee8b6b6e3d1e521d24741a57aa",
+  "patchSHA256": "c80325cf876a9d231581b184f1ca338dba97d16316a405f9edfc8d060c5d4ac6",
+  "execution": "UNRUN; source-only preparation; no type/build/browser calls"
+}
