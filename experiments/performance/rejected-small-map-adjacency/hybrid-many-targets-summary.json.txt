@@ -1,0 +1,71 @@
+[
+  {
+    "mode": "apply",
+    "baseline": {
+      "loadMs": 98.72550000000001,
+      "textMs": 8.997624999999971,
+      "lookupMs": 0.45666700000037963,
+      "checkpointMs": 12.10470799999996,
+      "durableCheckpointMs": 20.040458999999828,
+      "forkMs": 29.04429200000004,
+      "firstForkWriteMs": 0.72787500000004,
+      "firstOwnerWriteMs": 0.6145420000002559
+    },
+    "candidate": {
+      "loadMs": 100.72379200000023,
+      "textMs": 8.997624999999971,
+      "lookupMs": 0.44041699999979755,
+      "checkpointMs": 15.834792000000107,
+      "durableCheckpointMs": 23.14270899999974,
+      "forkMs": 22.441167000000178,
+      "firstForkWriteMs": 0.9002500000001419,
+      "firstOwnerWriteMs": 0.6300420000000031
+    }
+  },
+  {
+    "mode": "sync",
+    "baseline": {
+      "loadMs": 65.05679099999998,
+      "textMs": 12.811208000000079,
+      "lookupMs": 0.4442909999997937,
+      "checkpointMs": 10.430166999999528,
+      "durableCheckpointMs": 18.958834000000024,
+      "forkMs": 10.4315830000005,
+      "firstForkWriteMs": 0.7058329999999842,
+      "firstOwnerWriteMs": 0.6252919999999449
+    },
+    "candidate": {
+      "loadMs": 78.483833,
+      "textMs": 13.255750000000262,
+      "lookupMs": 0.4619590000002063,
+      "checkpointMs": 11.957499999999982,
+      "durableCheckpointMs": 22.243291000000227,
+      "forkMs": 4.586832999999842,
+      "firstForkWriteMs": 0.6517089999999826,
+      "firstOwnerWriteMs": 0.5720830000000205
+    }
+  },
+  {
+    "mode": "cooperative",
+    "baseline": {
+      "loadMs": 191.6805830000003,
+      "textMs": 23.082500000000437,
+      "lookupMs": 0.4717080000000351,
+      "checkpointMs": 16.21891599999981,
+      "durableCheckpointMs": 23.516749999999774,
+      "forkMs": 8.971083999999792,
+      "firstForkWriteMs": 0.7979590000004464,
+      "firstOwnerWriteMs": 0.6618750000006912
+    },
+    "candidate": {
+      "loadMs": 211.32908300000008,
+      "textMs": 23.476458999999977,
+      "lookupMs": 0.4509589999997843,
+      "checkpointMs": 20.37612500000023,
+      "durableCheckpointMs": 24.6167089999999,
+      "forkMs": 4.577708999999231,
+      "firstForkWriteMs": 0.6902499999996508,
+      "firstOwnerWriteMs": 0.588416000000052
+    }
+  }
+]

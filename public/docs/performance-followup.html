@@ -108,6 +108,13 @@
 			badge and are not accepted-receipt latency. This compares experimental
 			worker implementations, not production against main.
 		</p>
+		<p>
+			A follow-up small-map wrapper was also rejected. Eighteen exact module
+			gates passed, but synchronous loading increased from 65.057 to 78.484ms
+			and durable checkpoint creation from 18.959 to 22.243ms. The larger
+			planned comparison was stopped. Diagnostic profiles have not established
+			the cause; this variant did not enter production.
+		</p>
 		<h2>Fresh bundle comparison</h2>
 		<p>
 			Fresh production builds of main <code>a749728</code> and rewrite

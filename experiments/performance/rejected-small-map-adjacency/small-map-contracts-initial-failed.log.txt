@@ -1,0 +1,34 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/replica-adjacency-old-page.test.ts:
+(pass) parent and sibling branches independently replace first-page root children after a multi-page fork [297.96ms]
+
+tests/replica-adjacency-promotion.test.ts:
+(pass) adjacency source and checkpoint bytes match across promotion boundary 4095 [22.10ms]
+(pass) adjacency source and checkpoint bytes match across promotion boundary 4096 [18.00ms]
+(pass) adjacency source and checkpoint bytes match across promotion boundary 4097 [15.29ms]
+(pass) parent and child promote independently in write order ownerFirst=true [14.64ms]
+(pass) parent and child promote independently in write order ownerFirst=false [13.50ms]
+(pass) grandchild promotion and merge restore keep still-small ancestors independent [16.92ms]
+127 |   ]) {
+128 |     let others = [owner, child, grandchild, sibling].filter(
+129 |       (replica) => replica !== branch,
+130 |     );
+131 |     let retained = others.map((replica) => replica.checkpoint());
+132 |     let edit = reference.edit("document", next);
+                     ^
+TypeError: undefined is not an object (evaluating 'reference.edit')
+      at <anonymous> (/private/tmp/alkalye-worker-adjacency-small-map/runtime/tests/replica-adjacency-promotion.test.ts:132:16)
+(fail) forks after promotion preserve old-page updates and independent descendants [30.84ms]
+
+tests/replica-adjacency.test.ts:
+(pass) adjacency preserves exact checkpoint and canonical source case 13312 [76.71ms]
+(pass) adjacency preserves exact checkpoint and canonical source case 13 [1.35ms]
+(pass) adjacency preserves exact checkpoint and canonical source case 30 [3.98ms]
+(pass) adjacency preserves exact checkpoint and canonical source case 45 [1.91ms]
+(pass) adjacency preserves exact checkpoint and canonical source case 12 [1.36ms]
+
+ 12 pass
+ 1 fail
+ 176 expect() calls
+Ran 13 tests across 3 files. [555.00ms]

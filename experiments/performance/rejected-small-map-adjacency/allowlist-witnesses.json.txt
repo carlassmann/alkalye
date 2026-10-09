@@ -1,0 +1,157 @@
+[
+  {
+    "path": "README.md",
+    "bytes": 2452,
+    "sha256": "8f855b266cf40f0df8f54dbc3e2dfaff6db92f4ccfbe6617a267afd81e5f5f65"
+  },
+  {
+    "path": "adjacency-final.patch",
+    "bytes": 5850,
+    "sha256": "aef9fcd2cbdc750d9d723cd6e8041c5c4de5209872ca88c3bd8f6c6b2e661f27"
+  },
+  {
+    "path": "constructor-blocker-source.ts.txt",
+    "bytes": 79764,
+    "sha256": "ac565adb2723eab291a2d335b48e19dd2b06da380f437f9f08eea6ce928eaac7"
+  },
+  {
+    "path": "cost-many-targets-results.json",
+    "bytes": 16517,
+    "sha256": "bdf73c90a286e0fc751195760cdc74a4bb2e6329ffebfa1d8a83bb3e85ba6bac"
+  },
+  {
+    "path": "cost-many-targets.ts.txt",
+    "bytes": 7877,
+    "sha256": "79f58c2d497014f4718462de96165fdcc154f94718402b0866c3efc5059207f8"
+  },
+  {
+    "path": "crdt-candidate.ts.txt",
+    "bytes": 79771,
+    "sha256": "7a9bee889d498a40e650aa8f03aaf44e4f171d26712b3ff6983d3a0ea9f37b98"
+  },
+  {
+    "path": "crdt-control.ts.txt",
+    "bytes": 76683,
+    "sha256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d"
+  },
+  {
+    "path": "fact-index-cost.ts.txt",
+    "bytes": 8928,
+    "sha256": "28c7f1d810cc46a0dff1ebd924c59dfce9e96caf71f576406a5734f56ffe73b9"
+  },
+  {
+    "path": "fixture-1000-small-targets-plus-128k-utf16-document.json",
+    "bytes": 263,
+    "sha256": "3d51778872c28a6ab532bb5c24769ca558d7eda089077e180e9797d6d107592a"
+  },
+  {
+    "path": "hybrid-cost-plan.json",
+    "bytes": 2101,
+    "sha256": "e286208278c526e5a4a1708cd3fb3ab54d83e5f77de2b0c3a111d758c495e40c"
+  },
+  {
+    "path": "hybrid-cost-types.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "hybrid-many-targets-summary.json",
+    "bytes": 2195,
+    "sha256": "0c2722859e72b8db2a697c80677ed3984b6e61bd87cc1c35f3c2b04afb44751c"
+  },
+  {
+    "path": "hybrid-many-targets.log",
+    "bytes": 2482,
+    "sha256": "fcb455b735b2a0741ffc8c92bd32d38e2146a7eeacc656448e4f5d3def725ec1"
+  },
+  {
+    "path": "opus-final-prompt.txt",
+    "bytes": 882,
+    "sha256": "1af8573ccc22208e00b6440a58627ce760a06fe581f5d26a1a51750ee9f8822e"
+  },
+  {
+    "path": "opus-final-review.log",
+    "bytes": 3168,
+    "sha256": "1b7a9a70a8964dbb1c56a2e3cfabc7bacbfd6e7e741765a84929ad4c9e182c9f"
+  },
+  {
+    "path": "opus-review.log",
+    "bytes": 3668,
+    "sha256": "b5b3aec3eee1585587870dadc7b49411c7fb6e84b835eae9423480045a7e411f"
+  },
+  {
+    "path": "ordinal-control.ts.txt",
+    "bytes": 78514,
+    "sha256": "6bcad274fcac66bf8ec36e0bd06aebd6de569b99879936427204f8d23df78605"
+  },
+  {
+    "path": "replica-adjacency-promotion.test.ts.txt",
+    "bytes": 7790,
+    "sha256": "6b6ec6844ab3fcb0a786c0d0a50e1dcca6138a12f0af73ad985a2b45d931ee70"
+  },
+  {
+    "path": "reviewed-preformat-source.ts.txt",
+    "bytes": 88238,
+    "sha256": "5ae6500484213cb1ce2c42681d625a226db1d16e8a0d4e04f7588a235f8634d1"
+  },
+  {
+    "path": "reviewed-preformat.patch",
+    "bytes": 169021,
+    "sha256": "b679468a72c95655174081d46c31d98635bb1032aedff2c6e11210cd5e6bf016"
+  },
+  {
+    "path": "small-map-broad-final.log",
+    "bytes": 7870,
+    "sha256": "67779618df6188a15a0db6c6bd9c1c7cc0e5f25de6b652cda7e6b5633d1ef087"
+  },
+  {
+    "path": "small-map-contracts-final.log",
+    "bytes": 1397,
+    "sha256": "a060afe2c40baba35082f03fd7e331cc1e1f061b927d476261a1bd81abbd6843"
+  },
+  {
+    "path": "small-map-contracts-initial-failed.log",
+    "bytes": 1881,
+    "sha256": "656742e8a4886238f84478f42f332bcd44ab3e777c4f90d58a8b7c1b2ffc6f62"
+  },
+  {
+    "path": "small-map-interruption-contracts.log",
+    "bytes": 923,
+    "sha256": "eefebab2839953abeea2e4abdfe1e2a080cb5face94716a086bfeb911f354d2b"
+  },
+  {
+    "path": "small-map-interruption-types.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "small-map-types-broad-final.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "small-map-types-final.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "small-map-types-initial-failed.log",
+    "bytes": 8002,
+    "sha256": "67342dc177217ad6482247f1029d7fa7078d825db44436b3902a5b1954e57293"
+  },
+  {
+    "path": "source-pins-final.json",
+    "bytes": 603,
+    "sha256": "bdaa3516f9fd7e685b4731bf6640a7a6a5c5a8badcda964d7730fa87cdbc290f"
+  },
+  {
+    "path": "tsconfig.hybrid-cost.json.txt",
+    "bytes": 127,
+    "sha256": "d52713c58e55c777335207617f8615114bffa44ed144d50b942fb30cfa670056"
+  },
+  {
+    "path": "tsconfig.small-map.json.txt",
+    "bytes": 335,
+    "sha256": "bb9341d5ed32bbc67d3f51aca12fc359b61d9949864628e40535604cff96d768"
+  }
+]

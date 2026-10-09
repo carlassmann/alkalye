@@ -1,0 +1,32 @@
+**Verdict: no correctness blockers. One blocker before landing: formatting.** I only read the source and logs; I didn't run anything or modify files.
+
+**Landing blocker: formatting**
+- `crdt-candidate.ts` uses spaces and semicolons. The control file and the rest of `runtime/src` (e.g. `crdt-baseline.ts`, `text-index.ts`) use tabs and no semicolons.
+- As a result, `adjacency-final.patch` reformats the whole file (`@@ -1,2464 +1,2597 @@`), which hides the roughly 50 real lines of change.
+- The runtime copy has no prettier config, so prettier fell back to its defaults. `small-map-format.log` also only checked the test file, which has the same style.
+- Against the real repo config, `check:format` will most likely fail for both files. Fix: reformat with the repo's config and regenerate the patch so the diff is limited to the `ChildrenIndex` / `PagedChildrenIndex` change.
+
+**What I verified**
+- **Constructor fix:** `crdt-candidate.ts:2420` now calls `new PagedChildrenIndex(...)` correctly.
+- **Copy-on-write, both sides:**
+  - Forking a small index marks parent and child as not owning the shared map, and the first write on either side copies it.
+  - Forking a large index resets the parent's ownership and gives the child no ownership.
+  - Promotion only reads the shared map, so a sibling that hasn't promoted stays intact.
+  - Grandchildren share the same map and all start without ownership. Correct, at the cost of extra copies.
+- **Order after promotion:**
+  - The map keeps first-insertion order, so promoted ordinals are 0..4095 and the new key gets 4096.
+  - Updating an existing key never moves it, in either form.
+  - So `values()` order, and therefore checkpoint and durable bytes (`crdt-candidate.ts:1875`), match the control.
+- **Promotion is safe:** it doesn't yield, call back or throw part-way, and it only swaps `large`/`small` after the loop. No partially built index can leak.
+- **Interrupted cooperative fork** (`crdt-candidate.ts:181`): the parent can be left marked as not owning targets it already visited. That costs one extra copy and nothing else, and the existing tests for concurrent edits rejecting partial copies still cover it.
+- **Open iterator during checkpoint writes:** behaves the same as the control. Not a regression.
+- **Tests:** the post-promotion fork test (8193 chars, edits to the old page, child, grandchild and sibling) closes the gap from the earlier review.
+
+**Smallest missing public contract (optional, no architecture change)**
+Add one test: run an interrupted cooperative fork over a promoted target (>4097 keys), then write on the parent, retry the fork, and compare the checkpoint and durable checkpoint bytes with Baseline. Today the post-fork test compares checkpoints with `toEqual`, never durable bytes.
+
+Not covered here: performance is still unmeasured, including the cost of copying up to 4096 entries on the first write after a fork. The frozen ordinal6b arms are unchanged.
+
+Several claude.ai connectors (GitHub, Slack, Notion, etc.) need authorizing in your claude.ai connector settings before they can be used. They weren't needed for this review.
+
+written with claude-opus-5-5 in Claude Code

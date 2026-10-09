@@ -1,0 +1,25 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/replica-adjacency-old-page.test.ts:
+(pass) parent and sibling branches independently replace first-page root children after a multi-page fork [432.21ms]
+
+tests/replica-adjacency-promotion.test.ts:
+(pass) adjacency source and checkpoint bytes match across promotion boundary 4095 [31.65ms]
+(pass) adjacency source and checkpoint bytes match across promotion boundary 4096 [32.90ms]
+(pass) adjacency source and checkpoint bytes match across promotion boundary 4097 [18.33ms]
+(pass) parent and child promote independently in write order ownerFirst=true [15.73ms]
+(pass) parent and child promote independently in write order ownerFirst=false [14.83ms]
+(pass) grandchild promotion and merge restore keep still-small ancestors independent [17.88ms]
+(pass) forks after promotion preserve old-page updates and independent descendants [67.77ms]
+
+tests/replica-adjacency.test.ts:
+(pass) adjacency preserves exact checkpoint and canonical source case 13312 [85.71ms]
+(pass) adjacency preserves exact checkpoint and canonical source case 13 [1.73ms]
+(pass) adjacency preserves exact checkpoint and canonical source case 30 [5.26ms]
+(pass) adjacency preserves exact checkpoint and canonical source case 45 [2.18ms]
+(pass) adjacency preserves exact checkpoint and canonical source case 12 [1.90ms]
+
+ 13 pass
+ 0 fail
+ 193 expect() calls
+Ran 13 tests across 3 files. [775.00ms]

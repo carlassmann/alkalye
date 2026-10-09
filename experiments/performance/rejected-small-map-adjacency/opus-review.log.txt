@@ -1,0 +1,36 @@
+## Verdict: blocked. There's one real bug; the rest of the design holds up.
+
+This was a source-only review. I made no edits and ran no tests, build or runtime.
+
+### Blocker
+- **`crdt-candidate.ts:2409`**: `PagedChildrenIndex.fork()` returns `new ChildrenIndex(buckets, pages, size)`. The rename missed this spot; it should be `new PagedChildrenIndex(...)`.
+  - **Types:** `ChildrenIndex` has no constructor arguments, so tsc should fail (TS2554), and the return type doesn't fit `large`.
+  - **If it ran anyway:** a forked index that has already been promoted would get an empty `small` map. The child would lose all its adjacency, and its next `set` would write into `small`.
+  - **So "large fork unchanged" is false in the source as written.**
+  - **The draft tests miss it:** no test forks *after* promotion. Every fork happens at ≤4095 keys.
+
+### Non-blocker
+- **Formatting**: `ChildrenIndex` is indented with spaces and the file uses tabs, so `check` will fail on format.
+
+### Verified OK
+- **Private map sharing:**
+  - Fork sets `ownsSmall=false` on both parent and child. The first write on either side copies the map, so the other side never sees it.
+  - Promotion only reads the shared map and never mutates it.
+  - The only writer is the one at `crdt-candidate.ts:2289`, which clones the sibling array before `splice`. Readers at 689, 1507, 1749 and 1864 only read, and the `readonly Atom[]` type enforces it.
+- **Threshold:**
+  - An update to an existing key at size 4096 stays small (`has(id)` short-circuits).
+  - A new 4097th key promotes. The new key is set after the loop, so it gets ordinal 4096.
+  - Atoms are one per code point (`Array.from`), so `"b".repeat(n)` gives n keys. The 4095/4096/4097 cases really do straddle the boundary.
+- **Ordering:** small map insertion order = paged ordinal order = first insertion. Copying the map keeps that order, so `values()` order, which drives checkpoint/durable bytes at 1864, matches the control.
+- **Atomicity of promotion:** promotion never yields, and `large` and `small` are only reassigned after the loop. If it throws midway, the index is left intact.
+- **Interrupted cooperative fork:** if a fork is abandoned partway, the parent keeps `ownsSmall=false` on targets already visited. The only cost is one extra copy later; nothing is corrupted. Interleaving between the 64-target yields is the same as in the control.
+- **Large-only fields:** `large` stays undefined until promotion. The 256-slot arrays are only allocated at promotion.
+
+### Boundaries to state or gate
+1. **Checkpoint iteration at 1864 can see a stale or mixed state.** It yields every 512 atoms while a live `values()` generator is open.
+   - With the small map, a write after a fork, or a promotion, replaces `this.small`. The open iterator keeps walking the old map.
+   - The paged control has the same mixed behaviour at page level, so this isn't a regression. It is still safe only if that path runs on a frozen fork or under the existing exclusion. Please confirm.
+2. **Cost of repeated fork-then-write:** each first write after a fork copies up to 4096 map entries. The control copied one bucket plus one 4096-slot page. This is a performance question, not correctness, and the 6b numbers don't cover it.
+
+### Smallest extra gate
+Add one test: promote past 4097, fork, write on parent and child (and a grandchild), then check that the checkpoint, text, revision and cold restore are each independent and byte-equal to the baseline. That catches the blocker and covers the "large fork unchanged" claim. It needs `tsc` plus the format check to pass first. The rest of the draft, and the frozen 6b arms, can stay as they are.

@@ -1,0 +1,17 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/replica-adjacency-promotion.test.ts:
+(pass) adjacency source and checkpoint bytes match across promotion boundary 4095 [38.07ms]
+(pass) adjacency source and checkpoint bytes match across promotion boundary 4096 [20.39ms]
+(pass) adjacency source and checkpoint bytes match across promotion boundary 4097 [22.98ms]
+(pass) parent and child promote independently in write order ownerFirst=true [20.64ms]
+(pass) parent and child promote independently in write order ownerFirst=false [16.21ms]
+(pass) grandchild promotion and merge restore keep still-small ancestors independent [16.79ms]
+(pass) forks after promotion preserve old-page updates and independent descendants [70.71ms]
+{"promotedFork":"interrupted"}
+(pass) promoted target remains exact after cooperative fork interruption and parent write retry [187.85ms]
+
+ 8 pass
+ 0 fail
+ 96 expect() calls
+Ran 8 tests across 1 file. [433.00ms]

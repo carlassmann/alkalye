@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*.ts",
+    "fact-index-cost.ts",
+    "cost-many-targets.ts"
+  ]
+}

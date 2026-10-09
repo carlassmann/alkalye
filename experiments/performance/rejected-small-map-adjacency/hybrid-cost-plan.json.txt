@@ -1,0 +1,51 @@
+{
+  "status": "UNRUN cost; scoped strict and public promoted-interruption contract PASS",
+  "controlSHA256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+  "candidateSHA256": "7a9bee889d498a40e650aa8f03aaf44e4f171d26712b3ff6983d3a0ea9f37b98",
+  "frozenOrdinalSHA256": "6bcad274fcac66bf8ec36e0bd06aebd6de569b99879936427204f8d23df78605",
+  "delta": "private ChildrenIndex small native Map COW until 4096 predecessor keys then ordinal pages; no other source delta",
+  "normalSamples": 54,
+  "manyTargetSamples": 18,
+  "order": "n3 alternating arms for each supported fixture/mode",
+  "commands": [
+    "bun fact-index-cost.ts",
+    "bun cost-many-targets.ts"
+  ],
+  "cwd": "/tmp/alkalye-worker-adjacency-small-map/runtime",
+  "independentResultsRoot": "/tmp/alkalye-worker-adjacency-small-map",
+  "fixtureScope": "same generators as ordinal72; long 1048576 UTF16 units, distinct UTF8 count; 1000 public small targets plus128KiB UTF16 document",
+  "sourceWitnesses": [
+    {
+      "path": "runtime/fact-index-cost.ts",
+      "sha256": "28c7f1d810cc46a0dff1ebd924c59dfce9e96caf71f576406a5734f56ffe73b9",
+      "bytes": 8928
+    },
+    {
+      "path": "runtime/cost-many-targets.ts",
+      "sha256": "79f58c2d497014f4718462de96165fdcc154f94718402b0866c3efc5059207f8",
+      "bytes": 7877
+    },
+    {
+      "path": "runtime/tests/replica-adjacency-promotion.test.ts",
+      "sha256": "6b6ec6844ab3fcb0a786c0d0a50e1dcca6138a12f0af73ad985a2b45d931ee70",
+      "bytes": 7790
+    },
+    {
+      "path": "runtime/src/shared/crdt.ts",
+      "sha256": "7a9bee889d498a40e650aa8f03aaf44e4f171d26712b3ff6983d3a0ea9f37b98",
+      "bytes": 79771
+    },
+    {
+      "path": "runtime/src/shared/crdt-baseline.ts",
+      "sha256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+      "bytes": 76683
+    }
+  ],
+  "regressionQuestions": [
+    "1000-small-target cold sync/cooperative load",
+    "large checkpoint/durable serialization",
+    "large owned fork and first512 both-way write",
+    "hot get and small target first-write after fork"
+  ],
+  "noPerformanceClaims": true
+}

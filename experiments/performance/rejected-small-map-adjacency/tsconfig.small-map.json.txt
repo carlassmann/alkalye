@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*.ts",
+    "tests/replica-adjacency*.test.ts",
+    "tests/replacement-reconstruction.test.ts",
+    "tests/replica-fact-index.test.ts",
+    "tests/replacement-cache-diagnostic.test.ts",
+    "tests/replica-native-atom-index.test.ts",
+    "tests/replica-loading.test.ts"
+  ]
+}
