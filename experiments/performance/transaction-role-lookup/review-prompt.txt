@@ -1,0 +1,7 @@
+Review this exact small outside candidate read-only. No commands/tests/builds/edits.
+Baseline source: /Users/carlassmann/.codex/worktrees/b513/alkalye/src/server/document-store.ts
+Candidate source: /tmp/alkalye-role-lookup/candidate/src/server/document-store.ts (accessRole near618)
+Public integration test: /tmp/alkalye-role-lookup/candidate/tests/document-role-lookup.test.ts
+Supporting workspace role/authority source: /tmp/alkalye-role-lookup/candidate/src/server/workspace-projection.ts and src/shared/workspace.ts.
+Only change: in existing read transaction, identity.subject===subject AND identity.access===undefined obtains documentRole once, refuses unavailable, returns it. All other callers retain authorizeRead plus requested-subject unscoped role lookup exactly. No cross-request cache or ACL bypass.
+Find concrete privacy/attenuation/revocation/transaction semantic regressions. Note scoped same-subject API intentionally preserves baseline unscoped result after scoped admission. Check test public boundary quality; existing real transport/invitation/account-agent suites will also run. Do not propose architecture. Return PASS/HOLD and concise blockers. Instrumented20writer diagnostic will follow; no120fps claims.

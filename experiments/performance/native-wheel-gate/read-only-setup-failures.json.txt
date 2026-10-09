@@ -1,0 +1,17 @@
+[
+  {
+    "phase": "post-get-before-http-ready",
+    "reason": "ConnectionRefused",
+    "documentMutation": false
+  },
+  {
+    "phase": "post-get-scope-before-oracle-terminal",
+    "reason": "premature-server-close",
+    "documentMutation": false
+  },
+  {
+    "phase": "post-get-corrected",
+    "terminal": 0,
+    "sourceAndRevisionUnchanged": true
+  }
+]

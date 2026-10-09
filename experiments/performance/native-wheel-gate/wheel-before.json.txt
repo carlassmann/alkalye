@@ -1,0 +1,1 @@
+{"caret":[0,0],"clientHeight":752,"frame":{"end":1966,"height":2527.6875,"start":0,"top":48},"hit":"TEXTAREA","hostScroll":0,"inputScroll":0,"scrollHeight":1009630,"x":752,"y":424}

@@ -1,0 +1,26 @@
+{
+  "baseline": "679f04c45bcc719edfd052d3274d300af97e54c7",
+  "sourceSha256": {
+    "src/server/document-store.ts": "58e1e4011b73a5eb9d1cb68d07bd54e2b122c502110ff2af28d28f78c4b6cf5d",
+    "tests/document-role-lookup.test.ts": "f8948f31125273ff0e06352793770923d12b59c2a767098de65a7ca95415558f",
+    "baseline-counts": {
+      "src/server/document-store.ts": "370b48ea5bd90b91648a714b6274c6ad46e7e6fb9336f3f44ab630db00cee250",
+      "src/server/document-live.ts": "577dd44e7475e7008cdcaf9e5ed20d58673976db2941974c5626e15fe4bb8a78",
+      "src/server/collaboration-diagnostic.ts": "f730fdfb22d41e0ff5f9b13d2fd2d8f8c2feb97b3d69f69ad04b91831feec0dd",
+      "tests/document-live-poll.test.ts": "bd020aae9d685f4413ffe626cb765a0afe5c4ac78e0d0c61d18a156bcd6cae96"
+    },
+    "candidate-counts": {
+      "src/server/document-store.ts": "58e1e4011b73a5eb9d1cb68d07bd54e2b122c502110ff2af28d28f78c4b6cf5d",
+      "src/server/document-live.ts": "577dd44e7475e7008cdcaf9e5ed20d58673976db2941974c5626e15fe4bb8a78",
+      "src/server/collaboration-diagnostic.ts": "f730fdfb22d41e0ff5f9b13d2fd2d8f8c2feb97b3d69f69ad04b91831feec0dd",
+      "tests/document-live-poll.test.ts": "9757d2d2eb66c9a5f486135d16c594dd01698cc1369a3bc5de0e22abce1766fc"
+    }
+  },
+  "commands": [
+    "bunx tsc --noEmit",
+    "bun test tests/document-role-lookup.test.ts tests/document-live-poll.test.ts tests/account-agents.test.ts tests/workspace-deletion.test.ts",
+    "bun test tests/document-live-poll.test.ts"
+  ],
+  "modelReview": "canonical claude-opus-5-5/firstParty, semanticPASS, formatting-onlyHOLD resolved by Prettier; no second semanticdelta",
+  "ownedResources": "Effect server/scopes close in afterAll, no browser processes"
+}

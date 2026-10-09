@@ -1,0 +1,350 @@
+{
+  "status": "correctness-complete",
+  "phases": [
+    {
+      "phase": "presence-only",
+      "started": 1095.940833,
+      "ended": 1330.826833,
+      "sessionChecks": 1820,
+      "active": 0,
+      "queries": [
+        [
+          "session:receive:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          60
+        ],
+        [
+          "role:receive:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          60
+        ],
+        [
+          "role:receive:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          117
+        ],
+        [
+          "session:broadcast-recipient:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          1140
+        ],
+        [
+          "role:broadcast-recipient:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          1140
+        ],
+        [
+          "role:broadcast-recipient:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          2223
+        ],
+        [
+          "role:broadcast-recipient:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          1083
+        ],
+        [
+          "role:receive:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          57
+        ],
+        [
+          "session:poll:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          50
+        ],
+        [
+          "role:poll-recipient:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          50
+        ],
+        [
+          "role:poll-recipient:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          100
+        ],
+        [
+          "role:poll-recipient:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          50
+        ],
+        [
+          "session:poll-sender:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          570
+        ],
+        [
+          "role:poll-sender:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          570
+        ],
+        [
+          "role:poll-sender:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          1110
+        ],
+        [
+          "role:poll-sender:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          540
+        ]
+      ],
+      "roleChecks": 1820,
+      "sessionSql": 1820,
+      "roleSql": 7100,
+      "sessionMilliseconds": 21.640993999999637,
+      "roleMilliseconds": 414.7727710000006,
+      "deliveries": {
+        "advanced": 0,
+        "presence": 1140,
+        "gone": 0,
+        "unavailable": 0,
+        "other": 0
+      }
+    },
+    {
+      "phase": "edit-only",
+      "started": 1330.827666,
+      "ended": 2623.962,
+      "sessionChecks": 1800,
+      "active": 0,
+      "queries": [
+        [
+          "session:notice:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          1200
+        ],
+        [
+          "role:notice:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          1200
+        ],
+        [
+          "role:notice:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          2340
+        ],
+        [
+          "role:notice:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          1140
+        ],
+        [
+          "session:poll:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          600
+        ]
+      ],
+      "roleChecks": 1200,
+      "sessionSql": 1800,
+      "roleSql": 4680,
+      "sessionMilliseconds": 23.953643000001875,
+      "roleMilliseconds": 37.8843440000046,
+      "deliveries": {
+        "advanced": 1200,
+        "presence": 0,
+        "gone": 0,
+        "unavailable": 0,
+        "other": 0
+      }
+    },
+    {
+      "phase": "combined",
+      "started": 2623.962541,
+      "ended": 3585.144041,
+      "sessionChecks": 3417,
+      "active": 0,
+      "queries": [
+        [
+          "session:notice:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          1200
+        ],
+        [
+          "role:notice:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          1200
+        ],
+        [
+          "role:notice:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          2340
+        ],
+        [
+          "role:notice:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          1140
+        ],
+        [
+          "session:poll:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          630
+        ],
+        [
+          "session:receive:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          60
+        ],
+        [
+          "role:receive:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          60
+        ],
+        [
+          "role:receive:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          117
+        ],
+        [
+          "session:broadcast-recipient:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          1140
+        ],
+        [
+          "role:broadcast-recipient:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          1140
+        ],
+        [
+          "role:broadcast-recipient:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          2223
+        ],
+        [
+          "role:broadcast-recipient:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          1083
+        ],
+        [
+          "role:receive:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          57
+        ],
+        [
+          "role:poll-recipient:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          30
+        ],
+        [
+          "role:poll-recipient:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          60
+        ],
+        [
+          "role:poll-recipient:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          30
+        ],
+        [
+          "session:poll-sender:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          387
+        ],
+        [
+          "role:poll-sender:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          387
+        ],
+        [
+          "role:poll-sender:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          753
+        ],
+        [
+          "role:poll-sender:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          366
+        ]
+      ],
+      "roleChecks": 2817,
+      "sessionSql": 3417,
+      "roleSql": 10986,
+      "sessionMilliseconds": 43.94879100000844,
+      "roleMilliseconds": 698.9856589999945,
+      "deliveries": {
+        "advanced": 1200,
+        "presence": 1140,
+        "gone": 0,
+        "unavailable": 0,
+        "other": 0
+      }
+    },
+    {
+      "phase": "offline-reconnect-reader",
+      "started": 3585.14475,
+      "ended": 0,
+      "sessionChecks": 512,
+      "active": 0,
+      "queries": [
+        [
+          "session:poll-sender:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          202
+        ],
+        [
+          "role:poll-sender:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          202
+        ],
+        [
+          "role:poll-sender:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          404
+        ],
+        [
+          "role:poll-sender:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          202
+        ],
+        [
+          "session:broadcast-recipient:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          75
+        ],
+        [
+          "session:receive:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          4
+        ],
+        [
+          "role:broadcast-recipient:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          75
+        ],
+        [
+          "role:broadcast-recipient:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          148
+        ],
+        [
+          "role:broadcast-recipient:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          73
+        ],
+        [
+          "session:poll:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          82
+        ],
+        [
+          "role:receive:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          4
+        ],
+        [
+          "role:receive:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          7
+        ],
+        [
+          "session:watch-sender:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          69
+        ],
+        [
+          "role:watch-sender:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          69
+        ],
+        [
+          "role:watch-sender:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          138
+        ],
+        [
+          "role:watch-sender:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          69
+        ],
+        [
+          "role:receive:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          3
+        ],
+        [
+          "role:poll-recipient:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          4
+        ],
+        [
+          "role:poll-recipient:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          8
+        ],
+        [
+          "role:poll-recipient:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          4
+        ],
+        [
+          "session:notice:SELECT subject,expires FROM authentication_sessions WHERE token=? AND expires>? AND idle>?",
+          80
+        ],
+        [
+          "role:notice:SELECT workspace,owner FROM workspace_documents WHERE document=?",
+          80
+        ],
+        [
+          "role:notice:SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+          156
+        ],
+        [
+          "role:notice:SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+          76
+        ]
+      ],
+      "roleChecks": 434,
+      "sessionSql": 512,
+      "roleSql": 1722,
+      "sessionMilliseconds": 7.075156000005791,
+      "roleMilliseconds": 212.32651800000258,
+      "deliveries": {
+        "advanced": 80,
+        "presence": 69,
+        "gone": 75,
+        "unavailable": 0,
+        "other": 5
+      }
+    }
+  ],
+  "scope": "20 signed accounts; mixed real live transports; persisted SQLite sessions; server diagnostic, no BrowserLibrary/phone DOM"
+}

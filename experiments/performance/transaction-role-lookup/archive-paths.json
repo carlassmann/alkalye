@@ -1,0 +1,26 @@
+[
+	{
+		"producer": "baseline-counts-results.json",
+		"archive": "baseline-counts-results.json.txt"
+	},
+	{
+		"producer": "candidate-counts-results.json",
+		"archive": "candidate-counts-results.json.txt"
+	},
+	{
+		"producer": "opus-5-5-review.json",
+		"archive": "opus-5-5-review.json.txt"
+	},
+	{
+		"producer": "manifest.json",
+		"archive": "manifest.json.txt"
+	},
+	{
+		"producer": "pins.json",
+		"archive": "pins.json.txt"
+	},
+	{
+		"producer": "matched-summary.json",
+		"archive": "matched-summary.json.txt"
+	}
+]

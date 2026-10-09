@@ -72,6 +72,18 @@
 			includes session opening; its authorization counts cannot be attributed
 			solely to cursor delivery.
 		</p>
+		<h2>One fresh role lookup per transaction</h2>
+		<p>
+			For an unscoped caller checking its own role, reuse the authorized lookup
+			inside the existing read transaction. Other-subject and scoped requests
+			retain their separate admission and result lookups. There is no permission
+			cache: revocations are checked fresh. Public permission suites passed 28
+			cases; both matched twenty-writer runs passed 786 assertions with equal
+			delivery counts. Role SQL fell from 9360 to 4680 in edit-only rounds and
+			from 21956 to 10986 in combined edit/presence rounds. This proves less
+			database work; the single instrumented timing pair does not establish a
+			reliable latency gain or browser frame-rate improvement.
+		</p>
 		<h2>Production children-index comparison</h2>
 		<p>
 			Twelve actual production trials passed exact native text, caret,

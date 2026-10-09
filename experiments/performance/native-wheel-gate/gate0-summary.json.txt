@@ -1,0 +1,64 @@
+{
+  "status": "correctness-complete",
+  "wheelCount": 8,
+  "allTrusted": true,
+  "allOwnedHost": true,
+  "coords": [
+    [
+      752,
+      424
+    ],
+    [
+      752,
+      424
+    ],
+    [
+      752,
+      424
+    ],
+    [
+      752,
+      424
+    ],
+    [
+      752,
+      424
+    ],
+    [
+      752,
+      424
+    ],
+    [
+      752,
+      424
+    ],
+    [
+      752,
+      424
+    ]
+  ],
+  "deltas": [
+    600,
+    600,
+    600,
+    600,
+    600,
+    600,
+    600,
+    600
+  ],
+  "scrollBefore": 0,
+  "scrollAfter": 4800,
+  "caretBefore": [
+    0,
+    0
+  ],
+  "caretAfter": [
+    0,
+    0
+  ],
+  "seedAcceptedSHA": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+  "postAcceptedReceiptPresent": true,
+  "sourceAndServerRevisionUnchanged": true,
+  "characterCount": 1048576
+}

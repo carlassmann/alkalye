@@ -1,0 +1,66 @@
+import * as Schema from "effect/Schema"
+import { browser } from "../../../tests/browser-driver"
+
+let Targets = Schema.Struct({ targetInfos: Schema.Array(Schema.Struct({ targetId: Schema.String, type: Schema.String, url: Schema.String })) })
+let Response = Schema.Struct({ id: Schema.optional(Schema.Number), result: Schema.optional(Schema.Unknown), error: Schema.optional(Schema.Struct({ code: Schema.Number, message: Schema.String })) })
+
+export async function dispatchOwnedWheel(session: string, targetURL: string, point: { x: number; y: number }, count: number) {
+ let data = browser(session, "get", "cdp-url")
+ let endpoint = [data.url, data.cdpUrl, data.cdp_url].find(value => typeof value === "string")
+ if (typeof endpoint !== "string") throw Error("Owned agent-browser CDP endpoint missing")
+ let url = new URL(endpoint)
+ if (!["127.0.0.1", "localhost", "[::1]"].includes(url.hostname)) throw Error("Owned local CDP endpoint required")
+ if (url.protocol === "http:" || url.protocol === "https:") {
+  let version = Schema.decodeUnknownSync(Schema.Struct({ webSocketDebuggerUrl: Schema.String }))(await (await fetch(new URL("/json/version", url))).json())
+  endpoint = version.webSocketDebuggerUrl
+ }
+ if (!endpoint.startsWith("ws://") && !endpoint.startsWith("wss://")) throw Error("CDP WebSocket required")
+ let socket = new WebSocket(endpoint)
+ let next = 0
+ let pending = new Map<number, { resolve(value: unknown): void; reject(reason: Error): void; timer: ReturnType<typeof setTimeout> }>()
+ function fail(reason: Error) {
+  for (let wait of pending.values()) { clearTimeout(wait.timer); wait.reject(reason) }
+  pending.clear()
+ }
+ socket.addEventListener("message", event => {
+  try {
+   let raw: unknown = event.data
+   if (typeof raw !== "string") throw Error("Unexpected CDP frame")
+   let message = Schema.decodeUnknownSync(Response)(JSON.parse(raw))
+   if (message.id === undefined) return
+   let wait = pending.get(message.id)
+   if (!wait) return
+   pending.delete(message.id); clearTimeout(wait.timer)
+   if (message.error) wait.reject(Error("CDP command refused: " + message.error.code))
+   else wait.resolve(message.result)
+  } catch { fail(Error("Invalid owned CDP response")) }
+ })
+ socket.addEventListener("close", () => fail(Error("Owned CDP socket closed")))
+ async function request(method: string, params: object, sessionId?: string): Promise<unknown> {
+  return new Promise((resolve, reject) => {
+   let id = ++next
+   let timer = setTimeout(() => { pending.delete(id); reject(Error("Bounded CDP request deadline")) }, 5000)
+   pending.set(id, { resolve, reject, timer })
+   socket.send(JSON.stringify({ id, method, params, ...(sessionId ? { sessionId } : {}) }))
+  })
+ }
+ let attached: string | undefined
+ try {
+  await new Promise<void>((resolve, reject) => {
+   let timer = setTimeout(() => reject(Error("Owned CDP connect deadline")), 5000)
+   socket.addEventListener("open", () => { clearTimeout(timer); resolve() }, { once: true })
+   socket.addEventListener("error", () => { clearTimeout(timer); reject(Error("Owned CDP connect failed")) }, { once: true })
+  })
+  let targets = Schema.decodeUnknownSync(Targets)(await request("Target.getTargets", {}))
+  let matches = targets.targetInfos.filter(target => target.type === "page" && target.url === targetURL)
+  let target = matches[0]
+  if (matches.length !== 1 || !target) throw Error("Unique owned route target required")
+  attached = Schema.decodeUnknownSync(Schema.Struct({ sessionId: Schema.String }))(await request("Target.attachToTarget", { targetId: target.targetId, flatten: true })).sessionId
+  for (let index = 0; index < count; index++) await request("Input.dispatchMouseEvent", { type: "mouseWheel", x: point.x, y: point.y, deltaX: 0, deltaY: 600 }, attached)
+ } finally {
+  if (attached && socket.readyState === WebSocket.OPEN) {
+   try { await request("Target.detachFromTarget", { sessionId: attached }) } catch {}
+  }
+  fail(Error("Owned wheel scope released")); socket.close()
+ }
+}

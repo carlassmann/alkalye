@@ -1,0 +1,55 @@
+61 |       headers,
+62 |       body,
+63 |       duplex: typeof ReadableStream !== "undefined" && body instanceof ReadableStream ? "half" : undefined,
+64 |       signal
+65 |     }),
+66 |     catch: cause => new HttpClientError.HttpClientError({
+                         ^
+error: Transport error (POST http://127.0.0.1:4498/mcp)
+       _tag: "HttpClientError",
+ ~effect/http/HttpClientError: "~effect/http/HttpClientError",
+
+      at catch (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/http/FetchHttpClient.js:66:21)
+      at ~effect/Utils/internal (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Utils.js:76:16)
+      at failWithCatch (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:787:21)
+
+62 |       body,
+63 |       duplex: typeof ReadableStream !== "undefined" && body instanceof ReadableStream ? "half" : undefined,
+64 |       signal
+65 |     }),
+66 |     catch: cause => new HttpClientError.HttpClientError({
+67 |       reason: new HttpClientError.TransportError({
+                   ^
+error: Transport error (POST http://127.0.0.1:4498/mcp)
+ request: {
+  method: "POST",
+  url: "http://127.0.0.1:4498/mcp",
+  urlParams: [Object ...],
+  hash: [Object ...],
+  headers: [Object ...],
+  body: [Object ...],
+  "~effect/http/HttpClientRequest": "~effect/http/HttpClientRequest",
+  toJSON: [Function: toJSON],
+  [Symbol(nodejs.util.inspect.custom)]: [Function],
+  toString: [Function: toString],
+  pipe: [Function: pipe],
+},
+    _tag: "TransportError",
+
+      at catch (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/http/FetchHttpClient.js:67:15)
+      at ~effect/Utils/internal (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Utils.js:76:16)
+      at failWithCatch (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:787:21)
+
+TypeError: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "http://127.0.0.1:4498/mcp",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+TypeError: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "http://127.0.0.1:4498/mcp",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+Bun v1.4.0 (macOS arm64)

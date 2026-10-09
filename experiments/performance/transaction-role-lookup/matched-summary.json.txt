@@ -1,0 +1,210 @@
+{
+  "scope": "instrumented n1 server/deep-session, 20 accounts, no native/BrowseLibrary benchmark",
+  "assertionsPerArm": 786,
+  "results": {
+    "baseline": [
+      {
+        "phase": "presence-only",
+        "milliseconds": 263.187042,
+        "roleSQL": 14192,
+        "sessionSQL": 1819,
+        "roleChecks": 1819,
+        "deliveries": {
+          "advanced": 0,
+          "presence": 1140,
+          "gone": 0,
+          "unavailable": 0,
+          "other": 0
+        },
+        "roleStageSQL": {
+          "receive": 468,
+          "broadcast-recipient": 8892,
+          "poll-recipient": 392,
+          "poll-sender": 4440
+        },
+        "roleQueries": [
+          [
+            "SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+            7096
+          ],
+          [
+            "SELECT workspace,owner FROM workspace_documents WHERE document=?",
+            3638
+          ],
+          [
+            "SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+            3458
+          ]
+        ]
+      },
+      {
+        "phase": "edit-only",
+        "milliseconds": 1309.1003749999998,
+        "roleSQL": 9360,
+        "sessionSQL": 1800,
+        "roleChecks": 1200,
+        "deliveries": {
+          "advanced": 1200,
+          "presence": 0,
+          "gone": 0,
+          "unavailable": 0,
+          "other": 0
+        },
+        "roleStageSQL": {
+          "notice": 9360
+        },
+        "roleQueries": [
+          [
+            "SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+            4680
+          ],
+          [
+            "SELECT workspace,owner FROM workspace_documents WHERE document=?",
+            2400
+          ],
+          [
+            "SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+            2280
+          ]
+        ]
+      },
+      {
+        "phase": "combined",
+        "milliseconds": 1021.0894579999999,
+        "roleSQL": 21956,
+        "sessionSQL": 3413,
+        "roleChecks": 2815,
+        "deliveries": {
+          "advanced": 1200,
+          "presence": 1140,
+          "gone": 0,
+          "unavailable": 0,
+          "other": 0
+        },
+        "roleStageSQL": {
+          "notice": 9360,
+          "receive": 468,
+          "broadcast-recipient": 8892,
+          "poll-recipient": 240,
+          "poll-sender": 2996
+        },
+        "roleQueries": [
+          [
+            "SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+            10978
+          ],
+          [
+            "SELECT workspace,owner FROM workspace_documents WHERE document=?",
+            5630
+          ],
+          [
+            "SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+            5348
+          ]
+        ]
+      }
+    ],
+    "candidate": [
+      {
+        "phase": "presence-only",
+        "milliseconds": 234.88599999999997,
+        "roleSQL": 7100,
+        "sessionSQL": 1820,
+        "roleChecks": 1820,
+        "deliveries": {
+          "advanced": 0,
+          "presence": 1140,
+          "gone": 0,
+          "unavailable": 0,
+          "other": 0
+        },
+        "roleStageSQL": {
+          "receive": 234,
+          "broadcast-recipient": 4446,
+          "poll-recipient": 200,
+          "poll-sender": 2220
+        },
+        "roleQueries": [
+          [
+            "SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+            3550
+          ],
+          [
+            "SELECT workspace,owner FROM workspace_documents WHERE document=?",
+            1820
+          ],
+          [
+            "SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+            1730
+          ]
+        ]
+      },
+      {
+        "phase": "edit-only",
+        "milliseconds": 1293.134334,
+        "roleSQL": 4680,
+        "sessionSQL": 1800,
+        "roleChecks": 1200,
+        "deliveries": {
+          "advanced": 1200,
+          "presence": 0,
+          "gone": 0,
+          "unavailable": 0,
+          "other": 0
+        },
+        "roleStageSQL": {
+          "notice": 4680
+        },
+        "roleQueries": [
+          [
+            "SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+            2340
+          ],
+          [
+            "SELECT workspace,owner FROM workspace_documents WHERE document=?",
+            1200
+          ],
+          [
+            "SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+            1140
+          ]
+        ]
+      },
+      {
+        "phase": "combined",
+        "milliseconds": 961.1815000000001,
+        "roleSQL": 10986,
+        "sessionSQL": 3417,
+        "roleChecks": 2817,
+        "deliveries": {
+          "advanced": 1200,
+          "presence": 1140,
+          "gone": 0,
+          "unavailable": 0,
+          "other": 0
+        },
+        "roleStageSQL": {
+          "notice": 4680,
+          "receive": 234,
+          "broadcast-recipient": 4446,
+          "poll-recipient": 120,
+          "poll-sender": 1506
+        },
+        "roleQueries": [
+          [
+            "SELECT name,owner,position FROM workspaces WHERE workspace=? AND deleted=0",
+            5493
+          ],
+          [
+            "SELECT workspace,owner FROM workspace_documents WHERE document=?",
+            2817
+          ],
+          [
+            "SELECT member,role FROM workspace_grants WHERE workspace=? AND member=?",
+            2676
+          ]
+        ]
+      }
+    ]
+  }
+}

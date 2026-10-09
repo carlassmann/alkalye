@@ -1,0 +1,42 @@
+[
+	{
+		"producer": "pilot-progress.json",
+		"archive": "pilot-progress.json.txt"
+	},
+	{
+		"producer": "production-summary.json",
+		"archive": "production-summary.json.txt"
+	},
+	{
+		"producer": "review-provenance.json",
+		"archive": "review-provenance.json.txt"
+	},
+	{
+		"producer": "WITNESSES.json",
+		"archive": "WITNESSES.json.txt"
+	},
+	{
+		"producer": "source-pins.json",
+		"archive": "source-pins.json.txt"
+	},
+	{
+		"producer": "native-largest-tasks.json",
+		"archive": "native-largest-tasks.json.txt"
+	},
+	{
+		"producer": "public-cell-witnesses.json",
+		"archive": "public-cell-witnesses.json.txt"
+	},
+	{
+		"producer": "production-analysis.json",
+		"archive": "production-analysis.json.txt"
+	},
+	{
+		"producer": "native-package-pins.json",
+		"archive": "native-package-pins.json.txt"
+	},
+	{
+		"producer": "README.md",
+		"archive": "README.producer.md.txt"
+	}
+]

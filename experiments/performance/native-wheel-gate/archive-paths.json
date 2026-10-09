@@ -1,0 +1,116 @@
+[
+	{
+		"producer": "types.log",
+		"archive": "types.log.txt",
+		"sha256": "6513011d5c15645156844ed278eb6ea9f9aeddc4ff00a74b63d7938fed8d79e2",
+		"bytes": 129
+	},
+	{
+		"producer": "tsconfig.journey.json.txt",
+		"archive": "tsconfig.journey.json.txt",
+		"sha256": "21565e8a2bc428453c929c289f5928877648417dbc4c2d0b18d0e10b1821aa76",
+		"bytes": 248
+	},
+	{
+		"producer": "runner.ts.txt",
+		"archive": "runner.ts.txt",
+		"sha256": "6218e8aeb65ffa1bab8996bd5afb9d42a1721ad78d56963242876fb9596da4fd",
+		"bytes": 34658
+	},
+	{
+		"producer": "source-commit.txt",
+		"archive": "source-commit.txt",
+		"sha256": "d24e5c1aa42416c7f7dcce437f5ddaf40c00c49d92f555e80755f84bde540526",
+		"bytes": 41
+	},
+	{
+		"producer": "production-body-gate.ts.txt",
+		"archive": "production-body-gate.ts.txt",
+		"sha256": "feac1db64ec158d71ce7b75bcdc978746d7f0718c62d82d0d636654b90e51f37",
+		"bytes": 6310
+	},
+	{
+		"producer": "wheel-after.json",
+		"archive": "wheel-after.json.txt",
+		"sha256": "716e1ddcd7a3bb7dfaad009df432bbb9d2fee35a388cf377fb63fe804f9440e3",
+		"bytes": 1726
+	},
+	{
+		"producer": "refetched-script-pins.json",
+		"archive": "refetched-script-pins.json.txt",
+		"sha256": "82a4b622b8d8e2c874f9dd24e606c4eac84b17fa9bb549d5979393749a19f275",
+		"bytes": 4665
+	},
+	{
+		"producer": "types-corrected.log",
+		"archive": "types-corrected.log.txt",
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"bytes": 0
+	},
+	{
+		"producer": "README.md",
+		"archive": "README.md.txt",
+		"sha256": "e44be66c44d65616d413e74ea3ac3afb3ae85d5cc05e2eb170852bf28d7a08dc",
+		"bytes": 1824
+	},
+	{
+		"producer": "gate0.log",
+		"archive": "gate0.log.txt",
+		"sha256": "8a0180208f1250129c8faa3921c4ad4b9feb15af25df4c7886a5034390358630",
+		"bytes": 290
+	},
+	{
+		"producer": "wheel-before.json",
+		"archive": "wheel-before.json.txt",
+		"sha256": "82e93ca061763e5664bc72623bd7c431c8610fef8a9dae8d08645b18d0fc185a",
+		"bytes": 180
+	},
+	{
+		"producer": "owned-wheel-cdp.ts.txt",
+		"archive": "owned-wheel-cdp.ts.txt",
+		"sha256": "1eb48a043f303073400f74c0663477a914fd070075a66b3630537e4392a9d24c",
+		"bytes": 3983
+	},
+	{
+		"producer": "browser-probes.ts.txt",
+		"archive": "browser-probes.ts.txt",
+		"sha256": "016ee3be72a7ecbe05ea1d265d6eb3c9e0f9d183f521c4d5962108979cf5e976",
+		"bytes": 7234
+	},
+	{
+		"producer": "read-only-setup-failures.json",
+		"archive": "read-only-setup-failures.json.txt",
+		"sha256": "326273e63d9f31c2892ebafe589019644040aeb899bd4376cfcd9214e5e91499",
+		"bytes": 355
+	},
+	{
+		"producer": "post-get-premature-close.log",
+		"archive": "post-get-premature-close.log.txt",
+		"sha256": "61fffd7e6459a15035846acfae6062b4cf2982763c4e1be99f1536d01627135a",
+		"bytes": 2363
+	},
+	{
+		"producer": "server-journey.ts.txt",
+		"archive": "server-journey.ts.txt",
+		"sha256": "49b37d84e20240b38e5f5cdfc363e68517248d3d85810365737e5c12d8b3bbd0",
+		"bytes": 622
+	},
+	{
+		"producer": "accepted-receipts.json",
+		"archive": "accepted-receipts.json.txt",
+		"sha256": "c9e3a48cc0fe80fe10b1541dc848971caf325dbe880e69cbe7cf7aa6fa41fef6",
+		"bytes": 524
+	},
+	{
+		"producer": "gate0-summary.json",
+		"archive": "gate0-summary.json.txt",
+		"sha256": "b7d76d9e2391bad3a4e43694529659abb95652cb2a979e9552e68e83fb8addc8",
+		"bytes": 801
+	},
+	{
+		"producer": "build.log",
+		"archive": "build.log.txt",
+		"sha256": "a1e1ec9bdb36d7dd3f2aa0b8ef9ca9120691b4a84ccf5f8d8bac12f2ba04504c",
+		"bytes": 15
+	}
+]

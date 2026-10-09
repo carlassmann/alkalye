@@ -1,0 +1,26 @@
+[
+	{
+		"producer": "production-summary.json",
+		"archive": "production-summary.json.txt"
+	},
+	{
+		"producer": "SHA256.json",
+		"archive": "SHA256.json.txt"
+	},
+	{
+		"producer": "production-analysis.json",
+		"archive": "production-analysis.json.txt"
+	},
+	{
+		"producer": "native-cell-pins.json",
+		"archive": "native-cell-pins.json.txt"
+	},
+	{
+		"producer": "preflight.json",
+		"archive": "preflight.json.txt"
+	},
+	{
+		"producer": "module-review.json",
+		"archive": "module-review.json.txt"
+	}
+]

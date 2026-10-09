@@ -1,0 +1,19 @@
+{
+  "before": {
+    "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+    "characters": 1048576
+  },
+  "after": {
+    "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+    "characters": 1048576
+  },
+  "sameServerLog": true,
+  "sameCompleteSource": true,
+  "status": "correctness-complete",
+  "fixture": {
+    "characters": 1048576,
+    "bytes": 1048576,
+    "realNewlines": 20767,
+    "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+  }
+}

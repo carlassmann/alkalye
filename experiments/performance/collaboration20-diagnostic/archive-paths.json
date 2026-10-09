@@ -1,0 +1,18 @@
+[
+	{
+		"producer": "summary.json",
+		"archive": "summary.json.txt"
+	},
+	{
+		"producer": "provenance.json",
+		"archive": "provenance.json.txt"
+	},
+	{
+		"producer": "results.json",
+		"archive": "results.json.txt"
+	},
+	{
+		"producer": "manifest.json",
+		"archive": "manifest.json.txt"
+	}
+]

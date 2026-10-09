@@ -619,6 +619,16 @@ function makeDocumentStore() {
 					Identity.use(identity =>
 						readSql.withTransaction(
 							Effect.gen(function* () {
+								if (
+									identity.subject === subject &&
+									identity.access === undefined
+								) {
+									let role = yield* readWorkspace.documentRole(
+										document,
+										subject,
+									)
+									return role ?? (yield* unavailable())
+								}
 								yield* authorizeRead(document, identity)
 								return yield* readWorkspace.documentRole(document, subject)
 							}),

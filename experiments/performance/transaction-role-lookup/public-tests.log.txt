@@ -1,0 +1,68 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/document-live-poll.test.ts:
+(pass) polling and WebSocket peers share notifications, presence and departures [49.00ms]
+(pass) profile edits invalidate shared labels without disclosing another account's preferences [1247.03ms]
+(pass) document and workspace changes wake shared libraries but leave unrelated peers asleep [2078.58ms]
+[04:20:06.748] WARN (#511): Committed change notification lookup failed effect/sql/SqlError: SQLite execute failed
+    at failure (/private/tmp/alkalye-role-lookup/candidate/src/platform/sqlite.ts:152:22)
+    at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:770:19)
+    at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+    at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+    at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+    at WorkspaceStore.commit (/private/tmp/alkalye-role-lookup/candidate/src/server/document-api.ts:51:25)
+    at WorkspaceStore.commit (definition) (/private/tmp/alkalye-role-lookup/candidate/src/server/document-store.ts:600:20)
+    at document.commit (/private/tmp/alkalye-role-lookup/candidate/src/shared/document-observability.ts:117:13) {
+  [cause]: effect/sql/SqlError/UnknownError: SQLite execute failed
+      at classifySqliteError (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/sql/SqlError.js:486:20)
+      at failure (/private/tmp/alkalye-role-lookup/candidate/src/platform/sqlite.ts:153:20)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:770:19)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17) {
+    [cause]: SQLiteError: no such table: document_grants
+        at all (unknown)
+        at <anonymous> (/private/tmp/alkalye-role-lookup/candidate/src/platform/sqlite.ts:104:26)
+        at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:768:22)
+        at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+        at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+        at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+  }
+}
+(pass) a failed postcommit recipient read preserves the durable write and only wakes its watchers [590.00ms]
+(pass) accepted and revoked invitation members receive their library changes [20.19ms]
+(pass) moving a document wakes both libraries and retains its creator after workspace access ends [28.00ms]
+(pass) public document watchers receive advances and lose access on workspace deletion [13.96ms]
+(pass) real polling presenters converge on ties and clock skew while readers cannot present [105.39ms]
+(pass) two polling peers see each other and a closed session announces departure [11.66ms]
+(pass) revoked access withholds presence already queued for a polling reader [488.33ms]
+(pass) logging out during a pending poll prevents delivery and closes its session [407.18ms]
+(pass) demotion strips presenter privileges from queued and replayed presence [32.39ms]
+(pass) one presence batch updates each watched document [11.90ms]
+(pass) polling authenticates the cookie, account, origin and session owner [4.00ms]
+(pass) polling bounds request size, message count, watched documents and sessions [101.79ms]
+(pass) aborted and superseded polls release their waiter and abandoned sessions expire [6978.33ms]
+(pass) a restarted server expires old sessions and a new session resynchronizes [59.42ms]
+24-writer8KBburst {"operations":192,"roundMilliseconds":[365.8512499999997,536.4632089999996,1027.262417,429.739458,353.8467920000003,487.59199999999873,1155.6160830000008,412.25395899999785],"commitRequestMilliseconds":{"count":192,"median":111.13154199999917,"p95":365.86533300000156,"max":520.0035000000025},"journeyOperationsPerSecond":40.26317717073294}
+(pass) 24 independently persisted writers converge over mixed live transports, reconnect and enforce reader permissions [6267.15ms]
+
+tests/account-agents.test.ts:
+(pass) account agent tools share document snapshots, discussion history and exact revisions [45.74ms]
+(pass) native OAuth consent requires a browser session; PKCE and refresh retain only current grants [36.43ms]
+(pass) agent grants attenuate live authority, isolate accounts and cannot authenticate as account sessions [19.57ms]
+
+tests/document-role-lookup.test.ts:
+(pass) role lookups preserve current self authority, cross-subject privacy and scoped admission [10.76ms]
+
+tests/workspace-deletion.test.ts:
+(pass) deleting a workspace removes it and its documents for everyone and denies every later use [41.78ms]
+(pass) only the owner deletes, the personal workspace stays and the name must match [13.88ms]
+(pass) retrying a deletion returns its receipt while a new request is refused [6.39ms]
+(pass) concurrent deletions and writes settle on one tombstone without leaking access [21.08ms]
+(pass) watching collaborators learn a deleted workspace's documents became unavailable [12.00ms]
+(pass) deletions survive restarts and the tombstone migration upgrades existing data [58.23ms]
+
+ 28 pass
+ 0 fail
+ 1657 expect() calls
+Ran 28 tests across 4 files. [18.94s]
