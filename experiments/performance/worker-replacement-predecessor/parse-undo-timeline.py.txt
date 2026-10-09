@@ -1,0 +1,35 @@
+import json,pathlib
+root=pathlib.Path('/tmp/alkalye-worker-replacement-predecessor')
+def union(xs):
+ total=0;end=None
+ for a,b in sorted(xs):
+  if end is None or a>end:total+=b-a;end=b
+  elif b>end:total+=b-end;end=b
+ return total/1000
+rows=[]
+for count in [1,512]:
+ path=root/f'native-combined-0-{count}-state'/f'Undo-{count}.trace.json'
+ raw=json.loads(path.read_text());events=raw['traceEvents'] if isinstance(raw,dict) else raw
+ start=next(e for e in events if e.get('name')=='worker-mc:start');ready=next(e for e in events if e.get('name')=='worker-mc:ready' and e['ts']>start['ts'])
+ marks=sorted([e for e in events if start['ts']<=e.get('ts',0)<=ready['ts'] and e.get('name','').startswith('mapping:Merge:')],key=lambda e:e['ts'])
+ groups=[]
+ for e in marks:
+  if e['name']=='mapping:Merge:flush-start':groups.append({})
+  if groups:groups[-1][e['name'].replace('mapping:Merge:','')]=e
+ worker=(marks[0]['pid'],marks[0]['tid']) if marks else None
+ def bracket(label,a,b):
+  threads=[]
+  for role,key in [('main',(start['pid'],start['tid'])),('mapper-worker',worker)]:
+   tasks=[e for e in events if (e.get('pid'),e.get('tid'))==key and e.get('name')=='RunTask' and e.get('dur',0)>0 and e.get('ts',0)<b and e.get('ts',0)+e['dur']>a]
+   threads.append({'role':role,'taskUnionMs':union([(max(a,e['ts']),min(b,e['ts']+e['dur'])) for e in tasks]),'overlappingTaskMaxMs':max([e['dur']/1000 for e in tasks],default=0),'tasks':len(tasks)})
+  return {'phase':label,'startRelativeMs':(a-start['ts'])/1000,'endRelativeMs':(b-start['ts'])/1000,'elapsedMs':(b-a)/1000,'threads':threads}
+ brackets=[]
+ if groups:
+  first=groups[0];brackets.append(bracket('trusted-key-to-first-Merge-flush',start['ts'],first['flush-start']['ts']))
+  for index,g in enumerate(groups):
+   for label,left,right in [('flush','flush-start','fork-start'),('owned-fork','fork-start','text-start'),('text/visible','text-start','map-start'),('mapper','map-start','map-done')]:
+    if left in g and right in g:brackets.append(bracket(f'Merge{index}:{label}',g[left]['ts'],g[right]['ts']))
+  if 'map-done' in groups[-1]:brackets.append(bracket('last-map-done-to-observer-ready',groups[-1]['map-done']['ts'],ready['ts']))
+ rows.append({'count':count,'trial':0,'sourceReadyMs':(ready['ts']-start['ts'])/1000,'completeGroupsBeforeReady':len(groups),'brackets':brackets,'phaseMarks':[{'name':e['name'],'relativeMs':(e['ts']-start['ts'])/1000} for e in marks]})
+(root/'undo-global-timeline.json').write_text(json.dumps(rows,indent=2)+'\n')
+print(json.dumps(rows))

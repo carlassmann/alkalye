@@ -1508,8 +1508,12 @@
 		</p>
 		<p>
 			Evidence:
-			<code>experiments/performance/worker-replacement-predecessor</code>. The
-			next target is the remaining queue/merge delay before source publication.
+			<code>experiments/performance/worker-replacement-predecessor</code>.
+			Common-clock attribution of two retained cells isolates about 108ms in the
+			worker's owned replica copy. Flush takes under 0.04ms; final observer
+			delivery takes 6–9ms. The preceding 130–132ms also contains mostly worker
+			work, but lacks detailed Undo phase marks. The next target is document
+			copying, rather than main-thread queue delay.
 		</p>
 		<h2>Validated replacement Undo cache</h2>
 		<p>
