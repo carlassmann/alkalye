@@ -49,6 +49,74 @@
 			sections compare rewrite revisions or implementation paths and follow the
 			<a href="performance-interaction.html">previous comparison with main</a>.
 		</p>
+		<h2>Fresh interaction comparison with main</h2>
+		<p>
+			One observation per arm compares main a749728 with rewrite 1b50852. These
+			are the largest enclosing main-thread tasks across three seconds,
+			including background work, not input-handler or paint timings. Both
+			versions passed exact accepted typing, Undo and reload prerequisites on
+			the same repeated Markdown fixtures.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Journey</th>
+					<th>Main, ms</th>
+					<th>Rewrite, ms</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Type, 128KiB</td>
+					<td>32.084</td>
+					<td>4.584</td>
+				</tr>
+				<tr>
+					<td>Undo, 128KiB</td>
+					<td>58.275</td>
+					<td>5.968</td>
+				</tr>
+				<tr>
+					<td>Type, 1MiB</td>
+					<td>116.605</td>
+					<td>11.471</td>
+				</tr>
+				<tr>
+					<td>Undo, 1MiB</td>
+					<td>586.614</td>
+					<td>13.001</td>
+				</tr>
+				<tr>
+					<td>Switch small to 128KiB</td>
+					<td>90.123</td>
+					<td>20.523</td>
+				</tr>
+				<tr>
+					<td>Trusted wheel, 1MiB</td>
+					<td>2.568</td>
+					<td>4.077</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+			The rewrite's 128KiB typing and Undo windows stayed below 8.33ms per task;
+			each 1MiB window still had nine tasks above it. Scrolling used more total
+			CPU: 336ms versus 51ms. Feedback remains mixed: observed search-close
+			frame opportunity was 33.3ms versus 14.1ms, and 1MiB Undo was 31.2ms
+			versus 2.3ms. Those observer marks do not measure physical presentation or
+			durable saves. This browser ran near 60Hz; sustained 120Hz remains
+			unproved.
+		</p>
+		<p>
+			Sixteen of seventeen arms completed. The rewrite's 2,048-selection Undo
+			missed its three-second source-and-range readiness gate; a later
+			independent read proved the original source was restored. That incomplete
+			journey remains separate. Main's native command caps selections above
+			1,000, and its 512-selection save did not complete within the prerequisite
+			gate. Evidence and unresolved limits:
+			<code>experiments/performance/interaction-parity-7d</code> and
+			<code>experiments/performance/main-multicursor-save-gate</code>.
+		</p>
 		<h2>Incremental projection during typing</h2>
 		<p>
 			Three alternating production comparisons typed at the same midpoint in a
