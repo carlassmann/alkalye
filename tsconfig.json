@@ -20,5 +20,6 @@
 		"experiments/**/*.ts",
 		"build.ts",
 		"cli.ts"
-	]
+	],
+	"exclude": ["src/cloudflare/**"]
 }

@@ -68,6 +68,8 @@ async function inspect(path: string) {
 			["tldraw", "react", "react-dom/client"].includes(specifier)
 		)
 			continue
+		if (path.includes("/cloudflare/") && specifier === "cloudflare:workers")
+			continue
 		if (
 			!browser &&
 			(specifier === "bun" ||
@@ -89,7 +91,13 @@ await inspectDirectory("src")
 await inspect(resolve("cli.ts"))
 if (failures.length) throw new Error(failures.join("\n"))
 checkEffects()
-let checks = ["check:types", "check:format", "test:integration", "test:e2e"]
+let checks = [
+	"check:types",
+	"check:cloudflare-types",
+	"check:format",
+	"test:integration",
+	"test:e2e",
+]
 let results = await Promise.all(
 	checks.map(async script => {
 		let process = Bun.spawn(["bun", "run", script], {
