@@ -1,0 +1,22 @@
+{
+  "modelFlag": "claude-opus-5-5",
+  "modelUsage": {
+    "claude-opus-5-5": {
+      "inputTokens": 4,
+      "outputTokens": 382,
+      "cacheReadInputTokens": 36055,
+      "cacheCreationInputTokens": 15291,
+      "webSearchRequests": 0,
+      "costUSD": 0.13719499999999998,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 9,
+      "canonicalModel": "claude-opus-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "is_error": true,
+  "result": null,
+  "reason": "Interrupted at parent measurement-lane request; no completed verdict."
+}

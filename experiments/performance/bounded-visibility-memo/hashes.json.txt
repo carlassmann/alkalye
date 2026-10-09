@@ -1,0 +1,116 @@
+[
+  {
+    "arm": "baseline",
+    "kind": "source",
+    "file": "src/shared/text-visibility.ts",
+    "sha256": "e9a76f46b757a8fa0aab4134492f43d76a497d1f062cacd052e02fca086947df"
+  },
+  {
+    "arm": "baseline",
+    "kind": "source",
+    "file": "src/shared/crdt.ts",
+    "sha256": "6bcad274fcac66bf8ec36e0bd06aebd6de569b99879936427204f8d23df78605"
+  },
+  {
+    "arm": "baseline",
+    "kind": "source",
+    "file": "src/shared/document-session.ts",
+    "sha256": "f49813ffb4e8dbcee1dddba26e58207efd464e14fda56d6e9b184f7b3c36420f"
+  },
+  {
+    "arm": "baseline",
+    "kind": "source",
+    "file": "src/client/worker-document/worker-opened-capabilities.ts",
+    "sha256": "834abdd3a085cf5b3a9463bd24ffbd590c3f8672503f4d17981483edf37db004"
+  },
+  {
+    "arm": "baseline",
+    "kind": "emitted",
+    "file": "dist/worker-editor.js",
+    "sha256": "c05f83f6afb1a81b41bba5d6d663829119a088781ac1b1603dd4e1c07ba6b189"
+  },
+  {
+    "arm": "baseline",
+    "kind": "emitted",
+    "file": "dist/app.js",
+    "sha256": "3b5e90270d3e83b487357ee64bbfce60df03eef571c06128182bcc883ba93b7e"
+  },
+  {
+    "arm": "baseline",
+    "kind": "raw-trace",
+    "file": "Undo-1.trace.json",
+    "sha256": "62928abc510dbe583eb8c43aacecc489697d186217466d414697af9dcd1afdf0",
+    "bytes": 6591162
+  },
+  {
+    "arm": "baseline",
+    "kind": "raw-trace",
+    "file": "stable-copy-native-mc-1-selection.trace.json",
+    "sha256": "572ec839a1087869589f35968273273f80c82f8ae532668491326a331c6df4eb",
+    "bytes": 3666579
+  },
+  {
+    "arm": "baseline",
+    "kind": "raw-trace",
+    "file": "stable-copy-native-mc-1-single.trace.json",
+    "sha256": "4c58cb1e551351f75259a8418107e267e69dbc201670265bfecb4376e9ce69a0",
+    "bytes": 6152596
+  },
+  {
+    "arm": "candidate",
+    "kind": "source",
+    "file": "src/shared/text-visibility.ts",
+    "sha256": "f7ebd2b64fc77baa1193bed8cb0010fe1b9bdbccb215a1b62afe633a9fd74506"
+  },
+  {
+    "arm": "candidate",
+    "kind": "source",
+    "file": "src/shared/crdt.ts",
+    "sha256": "6bcad274fcac66bf8ec36e0bd06aebd6de569b99879936427204f8d23df78605"
+  },
+  {
+    "arm": "candidate",
+    "kind": "source",
+    "file": "src/shared/document-session.ts",
+    "sha256": "f49813ffb4e8dbcee1dddba26e58207efd464e14fda56d6e9b184f7b3c36420f"
+  },
+  {
+    "arm": "candidate",
+    "kind": "source",
+    "file": "src/client/worker-document/worker-opened-capabilities.ts",
+    "sha256": "834abdd3a085cf5b3a9463bd24ffbd590c3f8672503f4d17981483edf37db004"
+  },
+  {
+    "arm": "candidate",
+    "kind": "emitted",
+    "file": "dist/worker-editor.js",
+    "sha256": "e95c9847d60dc97b75d47e548034908975dbfb3a1ca9da3d6be54da5e40c1f9e"
+  },
+  {
+    "arm": "candidate",
+    "kind": "emitted",
+    "file": "dist/app.js",
+    "sha256": "3c152b3863c401db0ccf16599582f9612895073e5f44ef9a6bf4c3051774c32c"
+  },
+  {
+    "arm": "candidate",
+    "kind": "raw-trace",
+    "file": "Undo-1.trace.json",
+    "sha256": "62bf50ba5effa6a9440fc50dfbf9876f5e51446957571f79ea5f5aebd7dd2fc3",
+    "bytes": 6158860
+  },
+  {
+    "arm": "candidate",
+    "kind": "raw-trace",
+    "file": "stable-copy-native-mc-1-selection.trace.json",
+    "sha256": "56bc1be0a01424b6dacae2f6389685d54402b52f4dc17bf362147cba3595035d",
+    "bytes": 3483717
+  },
+  {
+    "arm": "candidate",
+    "kind": "raw-trace",
+    "file": "stable-copy-native-mc-1-single.trace.json",
+    "sha256": "34f0239a59fdea1cdd3c77bdc335eef24aa9f2fc5351ae3be9c36de78de7684b",
+    "bytes": 6206333
+  }
+]

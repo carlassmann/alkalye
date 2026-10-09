@@ -59,6 +59,16 @@
 			latency comparison, separate-account permission test or twenty-writer
 			capacity claim.
 		</p>
+		<h2>Bounded visibility memo pilot</h2>
+		<p>
+			One ordinary 1MiB trial per arm on the experimental worker editor reduced
+			the largest edit worker task from 165.221ms to 125.296ms. Sampled
+			visibility activity checks explain much of the reduction. Main task peaks
+			did not improve. Exact text, overlay, caret and independently accepted
+			edit/Undo checks passed. Production adoption awaits a production
+			comparison; this pilot does not establish a reliable latency gain or
+			physical 120Hz presentation.
+		</p>
 		<h2>Ordinal adjacency experiment</h2>
 		<p>
 			Twelve isolated native browser cases passed exact source, selection, caret

@@ -1,0 +1,793 @@
+{
+  "scope": "n1 per arm sampled causal pilot; whole3s marked windows plus full enclosing intersecting RunTasks. GC event duration not additive with parent tasks. Profile inclusive deduplicates source frame per stack; no physical-paint/durability/latency-adoption claim.",
+  "summaries": [
+    {
+      "arm": "baseline",
+      "phase": "selection",
+      "windowMs": 3000.183,
+      "windowStart": 408127381710,
+      "windowEnd": 408130381893,
+      "roles": [
+        {
+          "role": "main",
+          "pid": 34460,
+          "tid": 20067657,
+          "taskCount": 472,
+          "maxTaskClippedMs": 1.17,
+          "maxFullTaskMs": 1.17,
+          "taskClippedUnionMs": 94.775,
+          "gcMaxEventMs": 0,
+          "gcClippedUnionMs": 0,
+          "largestTask": {
+            "ts": 408127532956,
+            "dur": 1170,
+            "tdur": 1148
+          }
+        },
+        {
+          "role": "worker",
+          "pid": 34460,
+          "tid": 20068044,
+          "taskCount": 47,
+          "maxTaskClippedMs": 134.288,
+          "maxFullTaskMs": 134.288,
+          "taskClippedUnionMs": 136.809,
+          "gcMaxEventMs": 0,
+          "gcClippedUnionMs": 0,
+          "largestTask": {
+            "ts": 408127381717,
+            "dur": 134288,
+            "tdur": 134198
+          },
+          "profile": {
+            "sampleCount": 2,
+            "self": [
+              [
+                "(program)",
+                134.055
+              ],
+              [
+                "(idle)",
+                0.163
+              ]
+            ],
+            "uniqueInclusive": [
+              [
+                "(root)",
+                134.21800000000002
+              ],
+              [
+                "(program)",
+                134.055
+              ],
+              [
+                "(idle)",
+                0.163
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "arm": "baseline",
+      "phase": "single",
+      "windowMs": 3000.222,
+      "windowStart": 408130788114,
+      "windowEnd": 408133788336,
+      "roles": [
+        {
+          "role": "main",
+          "pid": 34460,
+          "tid": 20067657,
+          "taskCount": 776,
+          "maxTaskClippedMs": 6.219,
+          "maxFullTaskMs": 6.396,
+          "taskClippedUnionMs": 129.728,
+          "gcMaxEventMs": 1.387,
+          "gcClippedUnionMs": 1.754,
+          "largestTask": {
+            "ts": 408130787937,
+            "dur": 6396,
+            "tdur": 6305
+          }
+        },
+        {
+          "role": "worker",
+          "pid": 34460,
+          "tid": 20068044,
+          "taskCount": 794,
+          "maxTaskClippedMs": 165.221,
+          "maxFullTaskMs": 165.221,
+          "taskClippedUnionMs": 746.545,
+          "gcMaxEventMs": 9.215,
+          "gcClippedUnionMs": 149.555,
+          "largestTask": {
+            "ts": 408130908863,
+            "dur": 165221,
+            "tdur": 163582
+          },
+          "profile": {
+            "sampleCount": 1092,
+            "self": [
+              [
+                "../src/shared/text-visibility.ts:219:8 active",
+                35.80800000000001
+              ],
+              [
+                "../src/shared/text-visibility.ts:245:8 hidden",
+                19.972999999999995
+              ],
+              [
+                "../src/shared/crdt.ts:2411:25 _d",
+                19.84599999999999
+              ],
+              [
+                "../src/shared/text-visibility.ts:375:15 Va",
+                15.72399999999999
+              ],
+              [
+                "../src/shared/crdt.ts:2367:5 get",
+                15.638999999999989
+              ],
+              [
+                "../src/shared/frontmatter-merge.ts:135:34 kI",
+                9.812999999999999
+              ],
+              [
+                "../src/shared/frontmatter-merge.ts:454:29 KB",
+                9.363
+              ],
+              [
+                "../src/shared/atom-sequence.ts:52:17 c",
+                8.899999999999999
+              ],
+              [
+                "../src/shared/crdt.ts:1533:26 rawVisibleSteps",
+                6.556999999999998
+              ],
+              [
+                "../src/shared/collection-copy.ts:35:31 kn",
+                5.8229999999999995
+              ],
+              [
+                "(program)",
+                4.559999999999998
+              ],
+              [
+                "(garbage collector)",
+                4.497999999999999
+              ],
+              [
+                "../src/shared/frontmatter-merge.ts:558:20 Za",
+                2.296
+              ],
+              [
+                "../src/shared/crdt.ts:1642:6 text",
+                2.271
+              ],
+              [
+                "../src/shared/atom-sequence.ts:59:46 ",
+                1.687
+              ],
+              [
+                "../src/shared/crdt.ts:1652:9 ",
+                0.767
+              ],
+              [
+                "../src/shared/frontmatter-merge.ts:559:19 ",
+                0.46499999999999997
+              ],
+              [
+                "../src/shared/document-metadata.ts:59:33 GS",
+                0.271
+              ],
+              [
+                "(idle)",
+                0.268
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:406:11 evaluate",
+                0.155
+              ],
+              [
+                "../src/shared/atom-sequence.ts:80:6 get",
+                0.155
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:949:33 oR",
+                0.151
+              ],
+              [
+                "../src/shared/document-session.ts:2000:14 documents",
+                0.145
+              ],
+              [
+                "mark",
+                0.111
+              ],
+              [
+                "../src/shared/atom-sequence.ts:63:15 f",
+                0.031
+              ]
+            ],
+            "uniqueInclusive": [
+              [
+                "(root)",
+                165.2769999999997
+              ],
+              [
+                "../src/client/worker-document/worker-opened-capabilities.ts:82:16 l",
+                155.79599999999996
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Stream.js:1293:56 ",
+                155.79599999999996
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Array.js:2863:41 ",
+                155.79599999999996
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Function.js:80:25 ",
+                155.79599999999996
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Channel.js:1488:27 ",
+                155.79599999999996
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:1053:77 ",
+                155.79599999999996
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Utils.js:69:23 Uq.t",
+                155.79599999999996
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:1051:26 o$",
+                155.79599999999996
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js:295:13 JA",
+                155.79599999999996
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:441:10 runLoop",
+                155.79599999999996
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:406:11 evaluate",
+                155.79599999999996
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:812:66 ",
+                155.79599999999996
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Queue.js:1551:23 P_",
+                155.79599999999996
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Queue.js:1569:32 ",
+                155.79599999999996
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:164:11 runTasks",
+                155.79599999999996
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:157:20 afterScheduled",
+                155.79599999999996
+              ],
+              [
+                "../src/client/scheduler.ts:12:20 n",
+                155.79599999999996
+              ]
+            ]
+          }
+        }
+      ],
+      "firstFrames": [
+        {
+          "caretExact": true,
+          "caretInViewport": true,
+          "expectedPrimary": 35,
+          "logicalSource": true,
+          "nativeEnd": 35,
+          "nativeFragment": true,
+          "nativeLength": 2076,
+          "nativeStart": 35,
+          "overlayFragment": true,
+          "primaryEnd": 35,
+          "primaryStart": 35,
+          "projectionSource": true,
+          "time": 5295.699999988079,
+          "viewportEnd": 2076,
+          "viewportStart": 0,
+          "afterBeforeInputMs": 10.600000023841858
+        },
+        {
+          "caretExact": true,
+          "caretInViewport": true,
+          "expectedPrimary": 35,
+          "logicalSource": true,
+          "nativeEnd": 35,
+          "nativeFragment": true,
+          "nativeLength": 2076,
+          "nativeStart": 35,
+          "overlayFragment": true,
+          "primaryEnd": 35,
+          "primaryStart": 35,
+          "projectionSource": true,
+          "time": 5313.300000011921,
+          "viewportEnd": 2076,
+          "viewportStart": 0,
+          "afterBeforeInputMs": 28.200000047683716
+        }
+      ],
+      "frameOpportunityMs": 10.799999952316284
+    },
+    {
+      "arm": "baseline",
+      "phase": "Undo",
+      "windowMs": 3000.098,
+      "windowStart": 408136127163,
+      "windowEnd": 408139127261,
+      "roles": [
+        {
+          "role": "main",
+          "pid": 34460,
+          "tid": 20067657,
+          "taskCount": 930,
+          "maxTaskClippedMs": 7.413,
+          "maxFullTaskMs": 7.413,
+          "taskClippedUnionMs": 122.288,
+          "gcMaxEventMs": 1.386,
+          "gcClippedUnionMs": 1.386,
+          "largestTask": {
+            "ts": 408136307518,
+            "dur": 7413,
+            "tdur": 7369
+          }
+        },
+        {
+          "role": "worker",
+          "pid": 34460,
+          "tid": 20068044,
+          "taskCount": 808,
+          "maxTaskClippedMs": 153.354,
+          "maxFullTaskMs": 153.374,
+          "taskClippedUnionMs": 631.875,
+          "gcMaxEventMs": 9.717,
+          "gcClippedUnionMs": 176.045,
+          "largestTask": {
+            "ts": 408136127143,
+            "dur": 153374,
+            "tdur": 153249
+          },
+          "profile": {
+            "sampleCount": 2,
+            "self": [
+              [
+                "(program)",
+                153.209
+              ],
+              [
+                "(idle)",
+                0.116
+              ]
+            ],
+            "uniqueInclusive": [
+              [
+                "(root)",
+                153.32500000000002
+              ],
+              [
+                "(program)",
+                153.209
+              ],
+              [
+                "(idle)",
+                0.116
+              ]
+            ]
+          }
+        }
+      ],
+      "sourceOpportunityMs": 190.40000003576097
+    },
+    {
+      "arm": "candidate",
+      "phase": "selection",
+      "windowMs": 3000.228,
+      "windowStart": 408148907740,
+      "windowEnd": 408151907968,
+      "roles": [
+        {
+          "role": "main",
+          "pid": 34675,
+          "tid": 20069709,
+          "taskCount": 472,
+          "maxTaskClippedMs": 0.919,
+          "maxFullTaskMs": 0.919,
+          "taskClippedUnionMs": 88.325,
+          "gcMaxEventMs": 0,
+          "gcClippedUnionMs": 0,
+          "largestTask": {
+            "ts": 408149073110,
+            "dur": 919,
+            "tdur": 900
+          }
+        },
+        {
+          "role": "worker",
+          "pid": 34675,
+          "tid": 20070099,
+          "taskCount": 47,
+          "maxTaskClippedMs": 130.469,
+          "maxFullTaskMs": 130.469,
+          "taskClippedUnionMs": 132.864,
+          "gcMaxEventMs": 0,
+          "gcClippedUnionMs": 0,
+          "largestTask": {
+            "ts": 408148907760,
+            "dur": 130469,
+            "tdur": 130339
+          },
+          "profile": {
+            "sampleCount": 2,
+            "self": [
+              [
+                "(program)",
+                130.217
+              ],
+              [
+                "(idle)",
+                0.19
+              ]
+            ],
+            "uniqueInclusive": [
+              [
+                "(root)",
+                130.407
+              ],
+              [
+                "(program)",
+                130.217
+              ],
+              [
+                "(idle)",
+                0.19
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "phase": "single",
+      "windowMs": 3000.17,
+      "windowStart": 408152304311,
+      "windowEnd": 408155304481,
+      "roles": [
+        {
+          "role": "main",
+          "pid": 34675,
+          "tid": 20069709,
+          "taskCount": 775,
+          "maxTaskClippedMs": 6.578,
+          "maxFullTaskMs": 6.753,
+          "taskClippedUnionMs": 126.505,
+          "gcMaxEventMs": 1.334,
+          "gcClippedUnionMs": 1.727,
+          "largestTask": {
+            "ts": 408152304136,
+            "dur": 6753,
+            "tdur": 6664
+          }
+        },
+        {
+          "role": "worker",
+          "pid": 34675,
+          "tid": 20070099,
+          "taskCount": 798,
+          "maxTaskClippedMs": 125.296,
+          "maxFullTaskMs": 125.296,
+          "taskClippedUnionMs": 698.603,
+          "gcMaxEventMs": 7.67,
+          "gcClippedUnionMs": 137.318,
+          "largestTask": {
+            "ts": 408152422994,
+            "dur": 125296,
+            "tdur": 124269
+          },
+          "profile": {
+            "sampleCount": 829,
+            "self": [
+              [
+                "../src/shared/crdt.ts:2411:25 _d",
+                21.11799999999998
+              ],
+              [
+                "../src/shared/text-visibility.ts:257:8 hidden",
+                17.83899999999998
+              ],
+              [
+                "../src/shared/crdt.ts:2367:5 get",
+                16.068999999999996
+              ],
+              [
+                "../src/shared/frontmatter-merge.ts:135:34 kI",
+                11.779999999999998
+              ],
+              [
+                "../src/shared/text-visibility.ts:222:8 active",
+                10.590999999999994
+              ],
+              [
+                "../src/shared/frontmatter-merge.ts:454:29 KB",
+                10.044999999999996
+              ],
+              [
+                "../src/shared/atom-sequence.ts:52:17 c",
+                9.507999999999996
+              ],
+              [
+                "../src/shared/crdt.ts:1533:26 rawVisibleSteps",
+                6.7379999999999995
+              ],
+              [
+                "../src/shared/collection-copy.ts:35:31 kn",
+                6.59
+              ],
+              [
+                "(garbage collector)",
+                4.255999999999999
+              ],
+              [
+                "../src/shared/crdt.ts:1642:6 text",
+                2.443
+              ],
+              [
+                "(program)",
+                2.3029999999999995
+              ],
+              [
+                "../src/shared/frontmatter-merge.ts:558:20 Za",
+                2.3
+              ],
+              [
+                "../src/shared/atom-sequence.ts:59:46 ",
+                1.228
+              ],
+              [
+                "../src/shared/crdt.ts:1652:9 ",
+                0.913
+              ],
+              [
+                "../src/shared/frontmatter-merge.ts:559:19 ",
+                0.305
+              ],
+              [
+                "(idle)",
+                0.302
+              ],
+              [
+                "../src/shared/document-metadata.ts:59:33 GS",
+                0.297
+              ],
+              [
+                "../src/shared/document-session.ts:2000:14 documents",
+                0.158
+              ],
+              [
+                "../src/shared/atom-sequence.ts:45:16 a",
+                0.157
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/encoding/Yaml.js:515:40 ",
+                0.155
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Function.js:76:23 ",
+                0.147
+              ],
+              [
+                "mark",
+                0.096
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Array.js:215:29 Nr",
+                0.03
+              ]
+            ],
+            "uniqueInclusive": [
+              [
+                "(root)",
+                125.3680000000005
+              ],
+              [
+                "../src/client/worker-document/worker-opened-capabilities.ts:82:16 l",
+                117.89400000000047
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Stream.js:1293:56 ",
+                117.89400000000047
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Array.js:2863:41 ",
+                117.89400000000047
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Function.js:80:25 ",
+                117.89400000000047
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Channel.js:1488:27 ",
+                117.89400000000047
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:1053:77 ",
+                117.89400000000047
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Utils.js:69:23 Uq.t",
+                117.89400000000047
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:1051:26 o$",
+                117.89400000000047
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/core.js:295:13 JA",
+                117.89400000000047
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:441:10 runLoop",
+                117.89400000000047
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:406:11 evaluate",
+                117.89400000000047
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:812:66 ",
+                117.89400000000047
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Queue.js:1551:23 P_",
+                117.89400000000047
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Queue.js:1569:32 ",
+                117.89400000000047
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:164:11 runTasks",
+                117.89400000000047
+              ],
+              [
+                "../../../../../Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:157:20 afterScheduled",
+                117.89400000000047
+              ],
+              [
+                "../src/client/scheduler.ts:12:20 n",
+                117.89400000000047
+              ]
+            ]
+          }
+        }
+      ],
+      "firstFrames": [
+        {
+          "caretExact": true,
+          "caretInViewport": true,
+          "expectedPrimary": 35,
+          "logicalSource": true,
+          "nativeEnd": 35,
+          "nativeFragment": true,
+          "nativeLength": 2076,
+          "nativeStart": 35,
+          "overlayFragment": true,
+          "primaryEnd": 35,
+          "primaryStart": 35,
+          "projectionSource": true,
+          "time": 5261.400000035763,
+          "viewportEnd": 2076,
+          "viewportStart": 0,
+          "afterBeforeInputMs": 7
+        },
+        {
+          "caretExact": true,
+          "caretInViewport": true,
+          "expectedPrimary": 35,
+          "logicalSource": true,
+          "nativeEnd": 35,
+          "nativeFragment": true,
+          "nativeLength": 2076,
+          "nativeStart": 35,
+          "overlayFragment": true,
+          "primaryEnd": 35,
+          "primaryStart": 35,
+          "projectionSource": true,
+          "time": 5272.400000035763,
+          "viewportEnd": 2076,
+          "viewportStart": 0,
+          "afterBeforeInputMs": 18
+        }
+      ],
+      "frameOpportunityMs": 7.300000011920929
+    },
+    {
+      "arm": "candidate",
+      "phase": "Undo",
+      "windowMs": 3000.203,
+      "windowStart": 408157707898,
+      "windowEnd": 408160708101,
+      "roles": [
+        {
+          "role": "main",
+          "pid": 34675,
+          "tid": 20069709,
+          "taskCount": 689,
+          "maxTaskClippedMs": 7.323,
+          "maxFullTaskMs": 7.323,
+          "taskClippedUnionMs": 118.351,
+          "gcMaxEventMs": 0,
+          "gcClippedUnionMs": 0,
+          "largestTask": {
+            "ts": 408157884772,
+            "dur": 7323,
+            "tdur": 7278
+          }
+        },
+        {
+          "role": "worker",
+          "pid": 34675,
+          "tid": 20070099,
+          "taskCount": 807,
+          "maxTaskClippedMs": 143.216,
+          "maxFullTaskMs": 143.229,
+          "taskClippedUnionMs": 632.108,
+          "gcMaxEventMs": 9.689,
+          "gcClippedUnionMs": 175.542,
+          "largestTask": {
+            "ts": 408157707885,
+            "dur": 143229,
+            "tdur": 143069
+          },
+          "profile": {
+            "sampleCount": 2,
+            "self": [
+              [
+                "(program)",
+                143.067
+              ],
+              [
+                "(idle)",
+                0.115
+              ]
+            ],
+            "uniqueInclusive": [
+              [
+                "(root)",
+                143.18200000000002
+              ],
+              [
+                "(program)",
+                143.067
+              ],
+              [
+                "(idle)",
+                0.115
+              ]
+            ]
+          }
+        }
+      ],
+      "sourceOpportunityMs": 185.60000002383822
+    }
+  ]
+}

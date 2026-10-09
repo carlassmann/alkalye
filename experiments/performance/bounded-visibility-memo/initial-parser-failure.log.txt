@@ -1,0 +1,8 @@
+ENOENT: no such file or directory, open '/tmp/alkalye-worker-visibility-single-memo/baseline-closed/stable-copy-native-mc-1-Undo.trace.json'
+    path: "/tmp/alkalye-worker-visibility-single-memo/baseline-closed/stable-copy-native-mc-1-Undo.trace.json",
+ syscall: "open",
+   errno: -2,
+    code: "ENOENT"
+
+
+Bun v1.4.0 (macOS arm64)

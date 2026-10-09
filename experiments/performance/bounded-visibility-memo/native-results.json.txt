@@ -1,0 +1,278 @@
+[
+  {
+    "arm": "baseline",
+    "stage": "terminal",
+    "gates": [
+      "first/second RAF native-overlay-caret exact",
+      "native 1 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+    ],
+    "cells": [
+      {
+        "phase": "Undo",
+        "count": 1,
+        "probe": {
+          "start": 10623.899999976158,
+          "end": 13624,
+          "ready": 10814.30000001192,
+          "events": [
+            {
+              "key": "z",
+              "time": 10623.899999976158,
+              "type": "keydown"
+            }
+          ],
+          "frames": [],
+          "heapBefore": 21718635,
+          "heapAfter": 18608911
+        }
+      },
+      {
+        "phase": "accepted-input-and-Undo",
+        "count": 1,
+        "sourceLength": 1048610,
+        "expectedLength": 1048606,
+        "sourceSHA": "d675ebef528946b884a7088f5d3b81d1120f0c5416bce767855f49367af8a1b3",
+        "editedSHA": "9ba37b24c80f5b7049bb81b5fdb909716dd8fcb2477b75b3e61d27a1d94419c5",
+        "after": {
+          "start": 35,
+          "end": 35,
+          "ranges": 1,
+          "secondary": [
+            {
+              "start": 35,
+              "end": 35,
+              "direction": "none"
+            }
+          ]
+        },
+        "restored": {
+          "start": 34,
+          "end": 34,
+          "ranges": 1,
+          "secondary": [
+            {
+              "start": 34,
+              "end": 34,
+              "direction": "none"
+            }
+          ]
+        },
+        "selectionProbe": {
+          "start": 1878.399999976158,
+          "end": 4878.5,
+          "ready": 1896.5,
+          "events": [
+            {
+              "key": "l",
+              "time": 1878.399999976158,
+              "type": "keydown"
+            }
+          ],
+          "frames": [],
+          "heapBefore": 26542010,
+          "heapAfter": 28839733
+        },
+        "singleProbe": {
+          "start": 5284.800000011921,
+          "end": 8285,
+          "ready": 5295.599999964237,
+          "frameScheduled": 5285.099999964237,
+          "events": [
+            {
+              "key": "x",
+              "time": 5284.800000011921,
+              "type": "keydown"
+            },
+            {
+              "inputType": "insertText",
+              "time": 5285.099999964237,
+              "type": "beforeinput"
+            },
+            {
+              "inputType": "insertText",
+              "time": 5285.599999964237,
+              "type": "input"
+            }
+          ],
+          "frames": [
+            {
+              "caretExact": true,
+              "caretInViewport": true,
+              "expectedPrimary": 35,
+              "logicalSource": true,
+              "nativeEnd": 35,
+              "nativeFragment": true,
+              "nativeLength": 2076,
+              "nativeStart": 35,
+              "overlayFragment": true,
+              "primaryEnd": 35,
+              "primaryStart": 35,
+              "projectionSource": true,
+              "time": 5295.699999988079,
+              "viewportEnd": 2076,
+              "viewportStart": 0
+            },
+            {
+              "caretExact": true,
+              "caretInViewport": true,
+              "expectedPrimary": 35,
+              "logicalSource": true,
+              "nativeEnd": 35,
+              "nativeFragment": true,
+              "nativeLength": 2076,
+              "nativeStart": 35,
+              "overlayFragment": true,
+              "primaryEnd": 35,
+              "primaryStart": 35,
+              "projectionSource": true,
+              "time": 5313.300000011921,
+              "viewportEnd": 2076,
+              "viewportStart": 0
+            }
+          ],
+          "heapBefore": 29002178,
+          "heapAfter": 23830348
+        }
+      }
+    ],
+    "failure": null
+  },
+  {
+    "arm": "candidate",
+    "stage": "terminal",
+    "gates": [
+      "first/second RAF native-overlay-caret exact",
+      "native 1 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+    ],
+    "cells": [
+      {
+        "phase": "Undo",
+        "count": 1,
+        "probe": {
+          "start": 10657.69999998808,
+          "end": 13657.900000035765,
+          "ready": 10843.30000001192,
+          "events": [
+            {
+              "key": "z",
+              "time": 10657.69999998808,
+              "type": "keydown"
+            }
+          ],
+          "frames": [],
+          "heapBefore": 21719683,
+          "heapAfter": 36472586
+        }
+      },
+      {
+        "phase": "accepted-input-and-Undo",
+        "count": 1,
+        "sourceLength": 1048610,
+        "expectedLength": 1048606,
+        "sourceSHA": "d675ebef528946b884a7088f5d3b81d1120f0c5416bce767855f49367af8a1b3",
+        "editedSHA": "9ba37b24c80f5b7049bb81b5fdb909716dd8fcb2477b75b3e61d27a1d94419c5",
+        "after": {
+          "start": 35,
+          "end": 35,
+          "ranges": 1,
+          "secondary": [
+            {
+              "start": 35,
+              "end": 35,
+              "direction": "none"
+            }
+          ]
+        },
+        "restored": {
+          "start": 34,
+          "end": 34,
+          "ranges": 1,
+          "secondary": [
+            {
+              "start": 34,
+              "end": 34,
+              "direction": "none"
+            }
+          ]
+        },
+        "selectionProbe": {
+          "start": 1857.600000023842,
+          "end": 4857.800000011921,
+          "ready": 1872.800000011921,
+          "events": [
+            {
+              "key": "l",
+              "time": 1857.600000023842,
+              "type": "keydown"
+            }
+          ],
+          "frames": [],
+          "heapBefore": 26488722,
+          "heapAfter": 28794005
+        },
+        "singleProbe": {
+          "start": 5254.100000023842,
+          "end": 8254.300000011921,
+          "ready": 5261.400000035763,
+          "frameScheduled": 5254.400000035763,
+          "events": [
+            {
+              "key": "x",
+              "time": 5254.100000023842,
+              "type": "keydown"
+            },
+            {
+              "inputType": "insertText",
+              "time": 5254.400000035763,
+              "type": "beforeinput"
+            },
+            {
+              "inputType": "insertText",
+              "time": 5255,
+              "type": "input"
+            }
+          ],
+          "frames": [
+            {
+              "caretExact": true,
+              "caretInViewport": true,
+              "expectedPrimary": 35,
+              "logicalSource": true,
+              "nativeEnd": 35,
+              "nativeFragment": true,
+              "nativeLength": 2076,
+              "nativeStart": 35,
+              "overlayFragment": true,
+              "primaryEnd": 35,
+              "primaryStart": 35,
+              "projectionSource": true,
+              "time": 5261.400000035763,
+              "viewportEnd": 2076,
+              "viewportStart": 0
+            },
+            {
+              "caretExact": true,
+              "caretInViewport": true,
+              "expectedPrimary": 35,
+              "logicalSource": true,
+              "nativeEnd": 35,
+              "nativeFragment": true,
+              "nativeLength": 2076,
+              "nativeStart": 35,
+              "overlayFragment": true,
+              "primaryEnd": 35,
+              "primaryStart": 35,
+              "projectionSource": true,
+              "time": 5272.400000035763,
+              "viewportEnd": 2076,
+              "viewportStart": 0
+            }
+          ],
+          "heapBefore": 28943562,
+          "heapAfter": 23803992
+        }
+      }
+    ],
+    "failure": null
+  }
+]

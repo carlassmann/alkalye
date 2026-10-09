@@ -1,0 +1,140 @@
+[
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/README.md",
+		"archive": "experiments/performance/bounded-visibility-memo/README.md.txt",
+		"bytes": 3845,
+		"sha256": "8e4129ce2b418a12788833568f97958ba829886f605d5fb300a813d755baf37d"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/baseline-build.log",
+		"archive": "experiments/performance/bounded-visibility-memo/baseline-build.log.txt",
+		"bytes": 15,
+		"sha256": "a1e1ec9bdb36d7dd3f2aa0b8ef9ca9120691b4a84ccf5f8d8bac12f2ba04504c"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/baseline-server.ts.txt",
+		"archive": "experiments/performance/bounded-visibility-memo/baseline-server.ts.txt",
+		"bytes": 646,
+		"sha256": "d3beabfd1037c8af9faca1ea68df467f4b85608938bc9d44bb44a2035c84054b"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/baseline-text-visibility.ts.txt",
+		"archive": "experiments/performance/bounded-visibility-memo/baseline-text-visibility.ts.txt",
+		"bytes": 16932,
+		"sha256": "e9a76f46b757a8fa0aab4134492f43d76a497d1f062cacd052e02fca086947df"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/candidate-build.log",
+		"archive": "experiments/performance/bounded-visibility-memo/candidate-build.log.txt",
+		"bytes": 15,
+		"sha256": "a1e1ec9bdb36d7dd3f2aa0b8ef9ca9120691b4a84ccf5f8d8bac12f2ba04504c"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/candidate-text-visibility.ts.txt",
+		"archive": "experiments/performance/bounded-visibility-memo/candidate-text-visibility.ts.txt",
+		"bytes": 17410,
+		"sha256": "f7ebd2b64fc77baa1193bed8cb0010fe1b9bdbccb215a1b62afe633a9fd74506"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/contracts.log",
+		"archive": "experiments/performance/bounded-visibility-memo/contracts.log.txt",
+		"bytes": 6447,
+		"sha256": "73591a084c559519c09386acc85ddbf57382655ce27b45ac24cade33a7a03203"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/driver-strict.log",
+		"archive": "experiments/performance/bounded-visibility-memo/driver-strict.log.txt",
+		"bytes": 57,
+		"sha256": "ce3d5bd9de651bee4930e5c850cc58da9a4127c08ec4049e685f5d5ebfb2d09c"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/driver-types.json.txt",
+		"archive": "experiments/performance/bounded-visibility-memo/driver-types.json.txt",
+		"bytes": 92,
+		"sha256": "4588e4a3281cab2c6dd1cee3ba9b315ad276a972707752f0823b284828267f91"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/hashes.json",
+		"archive": "experiments/performance/bounded-visibility-memo/hashes.json.txt",
+		"bytes": 3418,
+		"sha256": "c8e5915b2bb9367d7f4f4160860d80316045a732f993b95befe67c7fe2931ae9"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/initial-parser-failure.log",
+		"archive": "experiments/performance/bounded-visibility-memo/initial-parser-failure.log.txt",
+		"bytes": 331,
+		"sha256": "76b78ac2434e50c16be2088a923c66b11dec54b62dd089ab264d41b663b46e46"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/interrupted-review.json",
+		"archive": "experiments/performance/bounded-visibility-memo/interrupted-review.json.txt",
+		"bytes": 604,
+		"sha256": "59d2ebd84a5963164e666f4197468f61b85990e13a829086af7f8589a6d35a21"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/loaded-refetch-pins.json",
+		"archive": "experiments/performance/bounded-visibility-memo/loaded-refetch-pins.json.txt",
+		"bytes": 12422,
+		"sha256": "d78ea17c83b2ea0d53470d2c0cb893e3c6230393b9b310547050d5665ff6b11e"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/native-driver.ts.txt",
+		"archive": "experiments/performance/bounded-visibility-memo/native-driver.ts.txt",
+		"bytes": 21017,
+		"sha256": "1f44f5ec597e9fe480ecde9e7f8f77ac469468ee34486c7a27a1fbb1496f94df"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/native-results.json",
+		"archive": "experiments/performance/bounded-visibility-memo/native-results.json.txt",
+		"bytes": 7627,
+		"sha256": "ece98597b96964415ffc68c65db366bac778787c0eddb1d18194fa5b1e274ae1"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/opus-review.json",
+		"archive": "experiments/performance/bounded-visibility-memo/opus-review.json.txt",
+		"bytes": 5358,
+		"sha256": "94c8f55fc6330d0fa39bb583cd1ea4cfab686794dec441e5d084fb670349a829"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/production-public-contracts.log",
+		"archive": "experiments/performance/bounded-visibility-memo/production-public-contracts.log.txt",
+		"bytes": 6407,
+		"sha256": "4b177d139cf8b4715d8b11abb96d15a87498e9d746785b442cf2974c9f095a1d"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/profile-analysis.json",
+		"archive": "experiments/performance/bounded-visibility-memo/profile-analysis.json.txt",
+		"bytes": 24365,
+		"sha256": "644ca890a0405a2228ced3dbb25bcfb1dfff63f6496705196c70ed09ac9c0ac5"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/profile-parser.js.txt",
+		"archive": "experiments/performance/bounded-visibility-memo/profile-parser.js.txt",
+		"bytes": 5979,
+		"sha256": "717fb72caa5f3692220b857be6cfa64edb8b6cbdc01b661d227c1e19a4c515c7"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/public-contracts.ts.txt",
+		"archive": "experiments/performance/bounded-visibility-memo/public-contracts.ts.txt",
+		"bytes": 6145,
+		"sha256": "5bd88537716bebd5a562a916ea7f1bcda1f2db11c9f18c6b3e434c82e25e00f4"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/scoped-types.json.txt",
+		"archive": "experiments/performance/bounded-visibility-memo/scoped-types.json.txt",
+		"bytes": 172,
+		"sha256": "387bf6b6cce3e7016ac86df371bfaf130c6bf7e7f51019b7b0504aa8797e95ea"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/sqlite-contracts.ts.txt",
+		"archive": "experiments/performance/bounded-visibility-memo/sqlite-contracts.ts.txt",
+		"bytes": 9936,
+		"sha256": "21e947cd84462db6c228139f8567a62a29406cc7cc564b2ec48ef73255ba663b"
+	},
+	{
+		"source": "/tmp/alkalye-worker-visibility-single-memo/proof-ready/strict.log",
+		"archive": "experiments/performance/bounded-visibility-memo/strict.log.txt",
+		"bytes": 56,
+		"sha256": "2c3a86fe62edeaa0c77992f9fb55f77a4df0331b7f9c03c0ac321c98ad27e8a2"
+	}
+]

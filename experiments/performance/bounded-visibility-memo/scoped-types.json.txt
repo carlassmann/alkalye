@@ -1,0 +1,8 @@
+{
+	"extends": "./tsconfig.json",
+	"include": [
+		"tests/visibility-active-cache.test.ts",
+		"tests/causal-text.test.ts",
+		"tests/replica-replacement-session.test.ts"
+	]
+}
