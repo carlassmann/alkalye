@@ -508,6 +508,7 @@ function makeDocumentStore() {
 				"003_blob_object_versions": Effect.gen(function* () {
 					yield* sql`ALTER TABLE document_blobs ADD COLUMN object_receipt TEXT`
 				}),
+				"004_blob_usage_counters": initializeBlobUsage(sql),
 			}),
 		})
 		let readBlob = SqlSchema.findOneOption({
@@ -537,19 +538,19 @@ function makeDocumentStore() {
 			Request: IdentifierSchema,
 			Result: Schema.Struct({ size: Schema.Natural }),
 			execute: owner =>
-				sql`SELECT COALESCE(SUM(CASE WHEN b.external=1 THEN b.size ELSE length(b.bytes) END),0) AS size FROM document_blobs b JOIN workspace_documents d ON d.document=b.document JOIN workspaces w ON w.workspace=d.workspace WHERE w.owner=${owner}`,
+				sql`SELECT COALESCE((SELECT size FROM document_blob_account_usage WHERE owner=${owner}),0) AS size`,
 		})
 		let blobBytes = SqlSchema.findOne({
 			Request: IdentifierSchema,
 			Result: Schema.Struct({ size: Schema.Natural }),
 			execute: document =>
-				sql`SELECT COALESCE(SUM(CASE WHEN external=1 THEN size ELSE length(bytes) END),0) AS size FROM document_blobs WHERE document=${document}`,
+				sql`SELECT COALESCE((SELECT size FROM document_blob_document_usage WHERE document=${document}),0) AS size`,
 		})
 		let serverBlobBytes = SqlSchema.findOne({
 			Request: Schema.Void,
 			Result: Schema.Struct({ size: Schema.Natural }),
 			execute: () =>
-				sql`SELECT COALESCE(SUM(CASE WHEN external=1 THEN size ELSE length(bytes) END),0) AS size FROM document_blobs`,
+				sql`SELECT size FROM document_blob_server_usage WHERE singleton=1`,
 		})
 		let knownBlobs = SqlSchema.findAll({
 			Request: Schema.Struct({
@@ -747,8 +748,14 @@ function makeDocumentStore() {
 								)
 							sizes.set(chunk.digest, chunk.size)
 						}
-						for (let row of yield* knownBlobs({ document, chunks }))
-							if (sizes.get(row.digest) === row.size) sizes.delete(row.digest)
+						if (chunks.length > 4096)
+							return yield* conflict("Too many blob descriptors")
+						for (let offset = 0; offset < chunks.length; offset += 98)
+							for (let row of yield* knownBlobs({
+								document,
+								chunks: chunks.slice(offset, offset + 98),
+							}))
+								if (sizes.get(row.digest) === row.size) sizes.delete(row.digest)
 						return [...sizes.keys()]
 					}),
 				),
@@ -3060,5 +3067,52 @@ function blobObjectFailure(cause: unknown) {
 			message: "Attachment object storage unavailable",
 			cause,
 		}),
+	})
+}
+
+function initializeBlobUsage(sql: SqlClient.SqlClient) {
+	return Effect.gen(function* () {
+		yield* sql`CREATE TABLE document_blob_document_usage(document TEXT PRIMARY KEY,size INTEGER NOT NULL CHECK(size>=0))`
+		yield* sql`CREATE TABLE document_blob_account_usage(owner TEXT PRIMARY KEY,size INTEGER NOT NULL CHECK(size>=0))`
+		yield* sql`CREATE TABLE document_blob_server_usage(singleton INTEGER PRIMARY KEY CHECK(singleton=1),size INTEGER NOT NULL CHECK(size>=0))`
+		yield* sql`INSERT INTO document_blob_document_usage SELECT document,COALESCE(SUM(CASE WHEN external=1 THEN size ELSE length(bytes) END),0) FROM document_blobs GROUP BY document`
+		yield* sql`INSERT INTO document_blob_account_usage SELECT w.owner,SUM(b.size) FROM document_blob_document_usage b JOIN workspace_documents d ON d.document=b.document JOIN workspaces w ON w.workspace=d.workspace WHERE NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=d.document AND f.phase='retired') GROUP BY w.owner`
+		yield* sql`INSERT INTO document_blob_server_usage SELECT 1,COALESCE(SUM(size),0) FROM document_blob_document_usage b WHERE NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=b.document AND f.phase='retired')`
+		yield* sql`CREATE TRIGGER document_blob_usage_insert AFTER INSERT ON document_blobs BEGIN
+		INSERT INTO document_blob_document_usage VALUES(NEW.document,COALESCE(CASE WHEN NEW.external=1 THEN NEW.size ELSE length(NEW.bytes) END,0)) ON CONFLICT(document) DO UPDATE SET size=size+excluded.size;
+		INSERT INTO document_blob_account_usage SELECT w.owner,COALESCE(CASE WHEN NEW.external=1 THEN NEW.size ELSE length(NEW.bytes) END,0) FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace WHERE d.document=NEW.document AND NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=d.document AND f.phase='retired') ON CONFLICT(owner) DO UPDATE SET size=size+excluded.size;
+		UPDATE document_blob_server_usage SET size=size+COALESCE(CASE WHEN NEW.external=1 THEN NEW.size ELSE length(NEW.bytes) END,0) WHERE singleton=1 AND NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=NEW.document AND f.phase='retired'); END`
+		yield* sql`CREATE TRIGGER document_blob_usage_delete AFTER DELETE ON document_blobs BEGIN
+		UPDATE document_blob_document_usage SET size=size-COALESCE(CASE WHEN OLD.external=1 THEN OLD.size ELSE length(OLD.bytes) END,0) WHERE document=OLD.document;
+		UPDATE document_blob_account_usage SET size=size-COALESCE(CASE WHEN OLD.external=1 THEN OLD.size ELSE length(OLD.bytes) END,0) WHERE owner=(SELECT w.owner FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace WHERE d.document=OLD.document) AND NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=OLD.document AND f.phase='retired');
+		UPDATE document_blob_server_usage SET size=size-COALESCE(CASE WHEN OLD.external=1 THEN OLD.size ELSE length(OLD.bytes) END,0) WHERE singleton=1 AND NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=OLD.document AND f.phase='retired'); END`
+		yield* sql`CREATE TRIGGER document_blob_usage_update AFTER UPDATE OF bytes,size,external ON document_blobs BEGIN
+		UPDATE document_blob_document_usage SET size=size+COALESCE(CASE WHEN NEW.external=1 THEN NEW.size ELSE length(NEW.bytes) END,0)-COALESCE(CASE WHEN OLD.external=1 THEN OLD.size ELSE length(OLD.bytes) END,0) WHERE document=NEW.document;
+		UPDATE document_blob_account_usage SET size=size+COALESCE(CASE WHEN NEW.external=1 THEN NEW.size ELSE length(NEW.bytes) END,0)-COALESCE(CASE WHEN OLD.external=1 THEN OLD.size ELSE length(OLD.bytes) END,0) WHERE owner=(SELECT w.owner FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace WHERE d.document=NEW.document) AND NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=NEW.document AND f.phase='retired');
+		UPDATE document_blob_server_usage SET size=size+COALESCE(CASE WHEN NEW.external=1 THEN NEW.size ELSE length(NEW.bytes) END,0)-COALESCE(CASE WHEN OLD.external=1 THEN OLD.size ELSE length(OLD.bytes) END,0) WHERE singleton=1 AND NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=NEW.document AND f.phase='retired'); END`
+		yield* sql`CREATE TRIGGER document_blob_association_insert AFTER INSERT ON workspace_documents BEGIN
+		INSERT INTO document_blob_account_usage SELECT w.owner,b.size FROM workspaces w JOIN document_blob_document_usage b ON b.document=NEW.document WHERE w.workspace=NEW.workspace AND NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=NEW.document AND f.phase='retired') ON CONFLICT(owner) DO UPDATE SET size=size+excluded.size; END`
+		yield* sql`CREATE TRIGGER document_blob_association_delete AFTER DELETE ON workspace_documents BEGIN
+		UPDATE document_blob_account_usage SET size=size-COALESCE((SELECT size FROM document_blob_document_usage WHERE document=OLD.document),0) WHERE owner=(SELECT owner FROM workspaces WHERE workspace=OLD.workspace) AND NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=OLD.document AND f.phase='retired'); END`
+		yield* sql`CREATE TRIGGER document_blob_association_move AFTER UPDATE OF workspace ON workspace_documents WHEN OLD.workspace<>NEW.workspace BEGIN
+		UPDATE document_blob_account_usage SET size=size-COALESCE((SELECT size FROM document_blob_document_usage WHERE document=OLD.document),0) WHERE owner=(SELECT owner FROM workspaces WHERE workspace=OLD.workspace) AND NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=OLD.document AND f.phase='retired');
+		INSERT INTO document_blob_account_usage SELECT w.owner,b.size FROM workspaces w JOIN document_blob_document_usage b ON b.document=NEW.document WHERE w.workspace=NEW.workspace AND NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=NEW.document AND f.phase='retired') ON CONFLICT(owner) DO UPDATE SET size=size+excluded.size; END`
+		yield* sql`CREATE TRIGGER document_blob_workspace_owner AFTER UPDATE OF owner ON workspaces WHEN OLD.owner<>NEW.owner BEGIN
+		UPDATE document_blob_account_usage SET size=size-COALESCE((SELECT SUM(b.size) FROM document_blob_document_usage b JOIN workspace_documents d ON d.document=b.document WHERE d.workspace=OLD.workspace AND NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=d.document AND f.phase='retired')),0) WHERE owner=OLD.owner;
+		INSERT INTO document_blob_account_usage SELECT NEW.owner,COALESCE(SUM(b.size),0) FROM document_blob_document_usage b JOIN workspace_documents d ON d.document=b.document WHERE d.workspace=NEW.workspace AND NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=d.document AND f.phase='retired') ON CONFLICT(owner) DO UPDATE SET size=size+excluded.size; END`
+		yield* sql`CREATE TRIGGER document_blob_workspace_insert AFTER INSERT ON workspaces BEGIN
+		INSERT INTO document_blob_account_usage SELECT NEW.owner,COALESCE(SUM(b.size),0) FROM document_blob_document_usage b JOIN workspace_documents d ON d.document=b.document WHERE d.workspace=NEW.workspace AND NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=d.document AND f.phase='retired') ON CONFLICT(owner) DO UPDATE SET size=size+excluded.size; END`
+		yield* sql`CREATE TRIGGER document_blob_workspace_delete AFTER DELETE ON workspaces BEGIN
+		UPDATE document_blob_account_usage SET size=size-COALESCE((SELECT SUM(b.size) FROM document_blob_document_usage b JOIN workspace_documents d ON d.document=b.document WHERE d.workspace=OLD.workspace AND NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=d.document AND f.phase='retired')),0) WHERE owner=OLD.owner; END`
+		yield* sql`CREATE TRIGGER document_blob_retire_insert AFTER INSERT ON document_transfer_fences WHEN NEW.phase='retired' BEGIN
+		UPDATE document_blob_account_usage SET size=size-COALESCE((SELECT size FROM document_blob_document_usage WHERE document=NEW.document),0) WHERE owner=(SELECT w.owner FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace WHERE d.document=NEW.document);
+		UPDATE document_blob_server_usage SET size=size-COALESCE((SELECT size FROM document_blob_document_usage WHERE document=NEW.document),0) WHERE singleton=1; END`
+		yield* sql`CREATE TRIGGER document_blob_retire_change AFTER UPDATE OF phase ON document_transfer_fences WHEN OLD.phase<>NEW.phase AND (OLD.phase='retired' OR NEW.phase='retired') BEGIN
+		UPDATE document_blob_account_usage SET size=size-COALESCE((SELECT size FROM document_blob_document_usage WHERE document=NEW.document),0) WHERE NEW.phase='retired' AND owner=(SELECT w.owner FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace WHERE d.document=NEW.document);
+		INSERT INTO document_blob_account_usage SELECT w.owner,b.size FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace JOIN document_blob_document_usage b ON b.document=d.document WHERE d.document=NEW.document AND NEW.phase<>'retired' ON CONFLICT(owner) DO UPDATE SET size=size+excluded.size;
+		UPDATE document_blob_server_usage SET size=size+COALESCE((SELECT size FROM document_blob_document_usage WHERE document=NEW.document),0)*CASE WHEN NEW.phase='retired' THEN -1 ELSE 1 END WHERE singleton=1; END`
+		yield* sql`CREATE TRIGGER document_blob_retire_delete AFTER DELETE ON document_transfer_fences WHEN OLD.phase='retired' BEGIN
+		INSERT INTO document_blob_account_usage SELECT w.owner,b.size FROM workspace_documents d JOIN workspaces w ON w.workspace=d.workspace JOIN document_blob_document_usage b ON b.document=d.document WHERE d.document=OLD.document ON CONFLICT(owner) DO UPDATE SET size=size+excluded.size;
+		UPDATE document_blob_server_usage SET size=size+COALESCE((SELECT size FROM document_blob_document_usage WHERE document=OLD.document),0) WHERE singleton=1; END`
 	})
 }
